@@ -1,0 +1,137 @@
+.video-container {
+  width: 90%;
+}
+
+.video-controls-container {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease-in-out 2.25s;
+}
+
+.video-controls {
+  pointer-events: auto;
+}
+
+.video-container:hover .video-controls-container,
+.video-container:focus-within .video-controls-container,
+.video-container.paused .video-controls-container {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+/* paused */
+.video-container.paused .pause-icon {
+  display: none;
+}
+
+.video-container:not(.paused) .play-icon {
+  display: none;
+}
+
+/* theater */
+.video-container.theater {
+  max-width: initial;
+  width: 100%;
+  max-height: 90vh;
+}
+
+.video-container.theater .theater-icon {
+  display: none;
+}
+
+.video-container:not(.theater) .exit-theater-icon {
+  display: none;
+}
+
+/* full-screen */
+.video-container.full-screen {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}
+
+.video-container.full-screen .full-screen-icon {
+  display: none;
+}
+
+.video-container:not(.full-screen) .exit-full-screen-icon {
+  display: none;
+}
+
+/* mini-player */
+.video-container.mini-player {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}
+
+.video-container.mini-player .mini-player-icon {
+  display: none;
+}
+
+.video-container:not(.mini-player) .exit-mini-player-icon {
+  display: none;
+}
+
+/* volume */
+.volume-high-icon,
+.volume-low-icon,
+.volume-off-icon {
+  display: none;
+  transition: opacity 0.3s ease;
+}
+
+.video-container[data-volume-level="high"] .volume-high-icon,
+.video-container[data-volume-level="low"] .volume-low-icon,
+.video-container[data-volume-level="muted"] .volume-off-icon {
+  display: block;
+  opacity: 1;
+}
+
+.volume-slider {
+  width: 0;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: width 150ms ease-in-out, transfrom 150ms ease-in-out;
+}
+
+.volume-container:hover .volume-slider,
+.volume-container:focus-within .volume-slider {
+  width: 80px;
+  transform: scaleX(1);
+}
+
+.volume-slider {
+  -webkit-appearance: none;
+  -moz-apperance: none;
+  appearance: none;
+  height: 4px;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Thumb styles */
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  background-color: #f57e41;
+  border-radius: 50%;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  background-color: #f57e41;
+  border-radius: 50%;
+}
+
+.volume-slider::-ms-thumb {
+  width: 15px;
+  height: 15px;
+  background-color: #f57e41;
+  border-radius: 50%;
+}
