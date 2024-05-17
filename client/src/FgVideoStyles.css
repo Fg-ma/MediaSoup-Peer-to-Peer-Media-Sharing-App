@@ -74,20 +74,6 @@
 }
 
 /* volume */
-.volume-high-icon,
-.volume-low-icon,
-.volume-off-icon {
-  display: none;
-  transition: opacity 0.3s ease;
-}
-
-.video-container[data-volume-level="high"] .volume-high-icon,
-.video-container[data-volume-level="low"] .volume-low-icon,
-.video-container[data-volume-level="muted"] .volume-off-icon {
-  display: block;
-  opacity: 1;
-}
-
 .volume-slider {
   width: 0;
   transform-origin: left;

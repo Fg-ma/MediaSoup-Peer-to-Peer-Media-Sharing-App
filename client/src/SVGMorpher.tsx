@@ -2,8 +2,8 @@ import { interpolate } from "flubber";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, animate, useMotionValue, useTransform } from "framer-motion";
 
-export default function SVGMorph({ paths }: { paths: string[] }) {
-  if (!paths) {
+export default function SVGMorpher({ pathsArray }: { pathsArray: string[][] }) {
+  if (!pathsArray) {
     return;
   }
 
@@ -12,13 +12,16 @@ export default function SVGMorph({ paths }: { paths: string[] }) {
   const isAnimateRef = useRef(true);
   const progress = useMotionValue(0);
 
-  const arrayOfIndex = paths.map((_: any, i: any) => i);
+  let paths = [];
+  for (const pathArray of pathsArray) {
+    const arrayOfIndices = pathArray.map((_: any, i: any) => i);
 
-  const path = useTransform(progress, arrayOfIndex, paths, {
-    mixer: (a, b) => interpolate(a, b, { maxSegmentLength: 15 }),
-  });
-
-  let animation: any;
+    paths.push(
+      useTransform(progress, arrayOfIndices, pathArray, {
+        mixer: (a, b) => interpolate(a, b, { maxSegmentLength: 15 }),
+      })
+    );
+  }
 
   useEffect(() => {
     pathIndexRef.current = 0;
@@ -29,9 +32,8 @@ export default function SVGMorph({ paths }: { paths: string[] }) {
       pathIndexRef.current = 0;
       isAnimateRef.current = true;
       progress.set(0);
-      animation?.stop();
     };
-  }, [paths]);
+  }, [pathsArray]);
 
   useEffect(() => {
     if (!isAnimateRef.current) {
@@ -39,7 +41,7 @@ export default function SVGMorph({ paths }: { paths: string[] }) {
     }
 
     const onAnimationComplete = () => {
-      if (pathIndexRef.current >= paths.length - 1) {
+      if (pathIndexRef.current >= pathsArray[0].length - 1) {
         isAnimateRef.current = false;
       } else {
         pathIndexRef.current++;
@@ -47,16 +49,22 @@ export default function SVGMorph({ paths }: { paths: string[] }) {
       }
     };
 
-    animation = animate(progress, pathIndexRef.current, {
-      duration: 0.35,
-      ease: pathIndexRef.current >= paths.length ? "easeOut" : "linear",
+    const animation = animate(progress, pathIndexRef.current, {
+      duration: 0.2,
+      ease: pathIndexRef.current >= pathsArray[0].length ? "easeOut" : "linear",
       delay: 0,
       onComplete: onAnimationComplete,
     });
     return () => {
       animation?.stop();
     };
-  }, [pathIndexRef.current, paths]);
+  }, [pathIndexRef.current, pathsArray]);
 
-  return <motion.path fill='white' d={path} />;
+  return (
+    <>
+      {paths.map((d, index) => (
+        <motion.path key={index} fill='white' d={d} />
+      ))}
+    </>
+  );
 }

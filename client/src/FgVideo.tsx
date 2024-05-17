@@ -1,23 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import "./FgVideoStyles.css";
-import VolumeIcon from "./VolumeIcon";
+import VolumeSection from "./VolumeSection";
 
 export default function FgVideo({
   autoPlay = false,
-  primaryVolumeColor = "white",
-  secondaryVolumeColor = "#D9D9D9",
+  primaryVolumeSliderColor,
+  secondaryVolumeSliderColor,
 }: {
   autoPlay?: boolean;
-  primaryVolumeColor?: string;
-  secondaryVolumeColor?: string;
+  primaryVolumeSliderColor?: string;
+  secondaryVolumeSliderColor?: string;
 }) {
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const muteButtonRef = useRef<HTMLButtonElement>(null);
-  const volumeSliderRef = useRef<HTMLInputElement>(null);
   const currentTimeRef = useRef<HTMLDivElement>(null);
+  const volumeSliderRef = useRef<HTMLInputElement>(null);
   const totalTimeRef = useRef<HTMLDivElement>(null);
   const shift = useRef(false);
   const control = useRef(false);
@@ -26,29 +25,6 @@ export default function FgVideo({
     const fullscreenChangeHandler = () => {
       if (!document.fullscreenElement) {
         videoContainerRef.current?.classList.remove("full-screen");
-      }
-    };
-
-    const volumeChangeHandler = () => {
-      if (
-        volumeSliderRef.current &&
-        videoRef.current &&
-        videoContainerRef.current
-      ) {
-        volumeSliderRef.current.value = videoRef.current.volume.toString();
-        let volumeLevel;
-        if (videoRef.current.muted || videoRef.current.volume === 0) {
-          volumeSliderRef.current.value = "0";
-          volumeLevel = "muted";
-        } else if (videoRef.current.volume >= 0.5) {
-          volumeLevel = "high";
-        } else {
-          volumeLevel = "low";
-        }
-
-        videoContainerRef.current.dataset.volumeLevel = volumeLevel;
-
-        trackColorSetter();
       }
     };
 
@@ -93,14 +69,8 @@ export default function FgVideo({
       }
     };
 
-    // Set initial volume
-    volumeChangeHandler();
-
     // Set initial time
     timeUpdate();
-
-    // Set initial volume slider
-    trackColorSetter();
 
     document.addEventListener("fullscreenchange", fullscreenChangeHandler);
 
@@ -116,8 +86,6 @@ export default function FgVideo({
       pictureInPictureHandler("leave")
     );
 
-    videoRef.current?.addEventListener("volumechange", volumeChangeHandler);
-
     return () => {
       document.removeEventListener("fullscreenchange", fullscreenChangeHandler);
       videoRef.current?.removeEventListener("loadeddata", loadedData);
@@ -128,10 +96,6 @@ export default function FgVideo({
       );
       videoRef.current?.removeEventListener("leavepictureinpicture", () =>
         pictureInPictureHandler("leave")
-      );
-      videoRef.current?.removeEventListener(
-        "volumechange",
-        volumeChangeHandler
       );
     };
   }, []);
@@ -235,43 +199,18 @@ export default function FgVideo({
     }
   };
 
-  const handleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-    }
-  };
-
-  const trackColorSetter = () => {
-    if (!volumeSliderRef.current) {
-      return;
-    }
-
-    const value = parseFloat(volumeSliderRef.current.value);
-    const min = parseFloat(volumeSliderRef.current.min);
-    const max = parseFloat(volumeSliderRef.current.max);
-    const percentage = ((value - min) / (max - min)) * 100;
-    const trackColor = `linear-gradient(to right, ${primaryVolumeColor} 0%, ${primaryVolumeColor} ${percentage}%, ${secondaryVolumeColor} ${percentage}%, ${secondaryVolumeColor} 100%)`;
-    volumeSliderRef.current.style.background = trackColor;
-    volumeSliderRef.current.style.borderRadius = "2px";
-  };
-
-  const handleVolumeSlider = () => {
-    if (!volumeSliderRef.current) {
-      return;
-    }
-
-    const volume = parseFloat(volumeSliderRef.current.value);
-    if (videoRef.current) {
-      videoRef.current.volume = volume;
-      videoRef.current.muted = volume === 0;
-    }
-
-    trackColorSetter();
-  };
-
   const skip = (duration: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime += duration;
+    }
+  };
+
+  const handleMute = () => {
+    if (videoRef.current && volumeSliderRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      if (videoRef.current.muted) {
+        volumeSliderRef.current.value = "0";
+      }
     }
   };
 
@@ -283,7 +222,6 @@ export default function FgVideo({
       className={`video-container ${
         autoPlay ? "" : "paused"
       } relative overflow-hidden flex items-center justify-center`}
-      data-volume-level=''
     >
       <video
         ref={videoRef}
@@ -303,7 +241,7 @@ export default function FgVideo({
         <div className='video-controls w-full h-10 flex items-center pl-2 pr-4 pb-3 z-50 space-x-2'>
           <button
             onClick={handlePausePlay}
-            className='flex items-center justify-center'
+            className='flex items-center justify-center w-10 aspect-square'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -326,24 +264,13 @@ export default function FgVideo({
               <path d='M640-200q-33 0-56.5-23.5T560-280v-400q0-33 23.5-56.5T640-760q33 0 56.5 23.5T720-680v400q0 33-23.5 56.5T640-200Zm-320 0q-33 0-56.5-23.5T240-280v-400q0-33 23.5-56.5T320-760q33 0 56.5 23.5T400-680v400q0 33-23.5 56.5T320-200Z' />
             </svg>
           </button>
-          <div className='volume-container flex items-center justify-center'>
-            <button
-              ref={muteButtonRef}
-              onClick={handleMute}
-              className='w-14 h-14 flex items-center justify-center'
-            >
-              <VolumeIcon videoRef={videoRef} />
-            </button>
-            <input
-              ref={volumeSliderRef}
-              onInput={handleVolumeSlider}
-              className='volume-slider'
-              type='range'
-              min='0'
-              max='1'
-              step='any'
-            />
-          </div>
+          <VolumeSection
+            videoRef={videoRef}
+            volumeSliderRef={volumeSliderRef}
+            handleMute={handleMute}
+            primaryVolumeSliderColor={primaryVolumeSliderColor}
+            secondaryVolumeSliderColor={secondaryVolumeSliderColor}
+          />
           <div className='duration-container font-K2D text-white flex items-center gap-1 grow'>
             <div ref={currentTimeRef} className='current-time'></div>/
             <div ref={totalTimeRef} className='total-time'></div>
