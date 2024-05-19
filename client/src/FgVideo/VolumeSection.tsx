@@ -43,14 +43,14 @@ import {
   volumeLowOffB3a,
   volumeLowOffB3b,
 } from "./paths";
-import SVGMorpher from "./SVGMorpher";
+import SVGMorpher from "../SVGMorpher/SVGMorpher";
 
 export default function VolumeSection({
   videoRef,
   volumeSliderRef,
   handleMute,
   primaryVolumeSliderColor = "white",
-  secondaryVolumeSliderColor = "#D9D9D9",
+  secondaryVolumeSliderColor = "rgba(150, 150, 150, 0.5)",
   defaultVolume = "high",
 }: {
   videoRef: React.RefObject<HTMLVideoElement>;
@@ -70,8 +70,8 @@ export default function VolumeSection({
   ]);
   const muteButtonRef = useRef<HTMLButtonElement>(null);
   const videoIconStateRef = useRef({ from: "", to: defaultVolume });
-  const changed = useRef(false);
-  const timerRef = useRef<any>(null);
+  const isFinishedRef = useRef(true);
+  const changedWhileNotFinishedRef = useRef(false);
 
   const trackColorSetter = () => {
     if (!volumeSliderRef.current) {
@@ -102,8 +102,12 @@ export default function VolumeSection({
   };
 
   const volumeChangeHandler = () => {
-    if (!videoRef.current) {
+    if (!volumeSliderRef.current || !videoRef.current) {
       return;
+    }
+
+    if (!videoRef.current.muted) {
+      volumeSliderRef.current.value = videoRef.current.volume.toString();
     }
 
     trackColorSetter();
@@ -118,11 +122,17 @@ export default function VolumeSection({
       newVolumeState = "low";
     }
 
+    if (
+      !isFinishedRef.current &&
+      videoIconStateRef.current.to !== newVolumeState
+    ) {
+      if (!changedWhileNotFinishedRef.current) {
+        changedWhileNotFinishedRef.current = true;
+      }
+      return;
+    }
+
     if (videoIconStateRef.current.to !== newVolumeState) {
-      changed.current = true;
-      setTimeout(() => {
-        changed.current = false;
-      }, 750);
       const { from, to } = videoIconStateRef.current;
       videoIconStateRef.current = { from: to, to: newVolumeState };
 
@@ -190,28 +200,15 @@ export default function VolumeSection({
     // Set initial volume slider
     trackColorSetter();
 
-    videoRef.current?.addEventListener("volumechange", () => {
-      if (!volumeSliderRef.current || !videoRef.current) return;
-      if (!videoRef.current.muted) {
-        volumeSliderRef.current.value = videoRef.current.volume.toString();
-      }
-      if (!changed.current) {
-        volumeChangeHandler();
+    videoRef.current?.addEventListener("volumechange", volumeChangeHandler);
 
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-        }
-
-        timerRef.current = setTimeout(() => {
-          volumeChangeHandler();
-          clearTimeout(timerRef.current);
-          timerRef.current = null;
-        }, 900);
-      }
-    });
-
-    return () => {};
-  }, []);
+    return () => {
+      videoRef.current?.removeEventListener(
+        "volumechange",
+        volumeChangeHandler
+      );
+    };
+  }, [videoRef]);
 
   return (
     <div className='volume-container flex items-center justify-center'>
@@ -220,62 +217,52 @@ export default function VolumeSection({
         onClick={handleMute}
         className='w-10 aspect-square flex items-center justify-center'
       >
-        {videoIconStateRef.current.from && videoIconStateRef.current.to ? (
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='36px'
-            height='36px'
-            viewBox='200 200 600 680'
-            fill='white'
-          >
-            <SVGMorpher pathsArray={paths} />
-          </svg>
-        ) : videoIconStateRef.current.to === "high" ? (
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='36px'
-            height='36px'
-            viewBox='200 200 600 680'
-            fill='white'
-          >
-            <path d={volumeHigh1a} />
-            <path d={volumeHigh1b} />
-            <path d={volumeHigh2a} />
-            <path d={volumeHigh2b} />
-            <path d={volumeHigh3a} />
-            <path d={volumeHigh3b} />
-          </svg>
-        ) : videoIconStateRef.current.to === "low" ? (
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='36px'
-            height='36px'
-            viewBox='200 200 600 680'
-            fill='white'
-          >
-            <path d={volumeLow1a} />
-            <path d={volumeLow1b} />
-            <path d={volumeLow2a} />
-            <path d={volumeLow2b} />
-            <path d={volumeLow3a} />
-            <path d={volumeLow3b} />
-          </svg>
-        ) : videoIconStateRef.current.to === "off" ? (
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='36px'
-            height='36px'
-            viewBox='200 200 600 680'
-            fill='white'
-          >
-            <path d={volumeOff1a} />
-            <path d={volumeOff1b} />
-            <path d={volumeOff2a} />
-            <path d={volumeOff2b} />
-            <path d={volumeOff3a} />
-            <path d={volumeOff3b} />
-          </svg>
-        ) : null}
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='36px'
+          height='36px'
+          viewBox='250 250 500 580'
+          fill='white'
+        >
+          {videoIconStateRef.current.from && videoIconStateRef.current.to ? (
+            <SVGMorpher
+              pathsArray={paths}
+              videoRef={videoRef}
+              isFinishedRef={isFinishedRef}
+              changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+            />
+          ) : videoIconStateRef.current.from === "" &&
+            videoIconStateRef.current.to === "high" ? (
+            <>
+              <path d={volumeHigh1a} />
+              <path d={volumeHigh1b} />
+              <path d={volumeHigh2a} />
+              <path d={volumeHigh2b} />
+              <path d={volumeHigh3a} />
+              <path d={volumeHigh3b} />
+            </>
+          ) : videoIconStateRef.current.from === "" &&
+            videoIconStateRef.current.to === "low" ? (
+            <>
+              <path d={volumeLow1a} />
+              <path d={volumeLow1b} />
+              <path d={volumeLow2a} />
+              <path d={volumeLow2b} />
+              <path d={volumeLow3a} />
+              <path d={volumeLow3b} />
+            </>
+          ) : videoIconStateRef.current.from === "" &&
+            videoIconStateRef.current.to === "off" ? (
+            <>
+              <path d={volumeOff1a} />
+              <path d={volumeOff1b} />
+              <path d={volumeOff2a} />
+              <path d={volumeOff2b} />
+              <path d={volumeOff3a} />
+              <path d={volumeOff3b} />
+            </>
+          ) : null}
+        </svg>
       </button>
       <input
         ref={volumeSliderRef}

@@ -2,7 +2,17 @@ import { interpolate } from "flubber";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, animate, useMotionValue, useTransform } from "framer-motion";
 
-export default function SVGMorpher({ pathsArray }: { pathsArray: string[][] }) {
+export default function SVGMorpher({
+  pathsArray,
+  videoRef,
+  isFinishedRef,
+  changedWhileNotFinishedRef,
+}: {
+  pathsArray: string[][];
+  videoRef: React.RefObject<HTMLVideoElement>;
+  isFinishedRef: React.MutableRefObject<boolean>;
+  changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
+}) {
   if (!pathsArray) {
     return;
   }
@@ -18,12 +28,13 @@ export default function SVGMorpher({ pathsArray }: { pathsArray: string[][] }) {
 
     paths.push(
       useTransform(progress, arrayOfIndices, pathArray, {
-        mixer: (a, b) => interpolate(a, b, { maxSegmentLength: 15 }),
+        mixer: (a, b) => interpolate(a, b, { maxSegmentLength: 16 }),
       })
     );
   }
 
   useEffect(() => {
+    isFinishedRef.current = false;
     pathIndexRef.current = 0;
     isAnimateRef.current = true;
     progress.set(0);
@@ -42,7 +53,20 @@ export default function SVGMorpher({ pathsArray }: { pathsArray: string[][] }) {
 
     const onAnimationComplete = () => {
       if (pathIndexRef.current >= pathsArray[0].length - 1) {
+        isFinishedRef.current = true;
         isAnimateRef.current = false;
+        if (changedWhileNotFinishedRef.current) {
+          setTimeout(() => {
+            changedWhileNotFinishedRef.current = false;
+            if (videoRef.current) {
+              const currentVolume = videoRef.current.volume ?? 0;
+              videoRef.current.volume = Math.min(
+                Math.abs(currentVolume - 0.0000000000001),
+                1
+              );
+            }
+          }, 0);
+        }
       } else {
         pathIndexRef.current++;
         setRerender(pathIndexRef.current);
@@ -50,11 +74,17 @@ export default function SVGMorpher({ pathsArray }: { pathsArray: string[][] }) {
     };
 
     const animation = animate(progress, pathIndexRef.current, {
-      duration: 0.2,
-      ease: pathIndexRef.current >= pathsArray[0].length ? "easeOut" : "linear",
+      duration: changedWhileNotFinishedRef.current ? 0.01 : 0.2,
+      ease:
+        pathIndexRef.current >= pathsArray[0].length
+          ? "easeOut"
+          : pathIndexRef.current === 0
+          ? "easeIn"
+          : "linear",
       delay: 0,
       onComplete: onAnimationComplete,
     });
+
     return () => {
       animation?.stop();
     };

@@ -18,84 +18,63 @@ export default function FgVideo({
   const currentTimeRef = useRef<HTMLDivElement>(null);
   const volumeSliderRef = useRef<HTMLInputElement>(null);
   const totalTimeRef = useRef<HTMLDivElement>(null);
-  const shift = useRef(false);
-  const control = useRef(false);
+  const shiftPressed = useRef(false);
+  const controlPressed = useRef(false);
+  const leaveVideoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
+  let captions: TextTrack | undefined;
 
   useEffect(() => {
-    const fullscreenChangeHandler = () => {
-      if (!document.fullscreenElement) {
-        videoContainerRef.current?.classList.remove("full-screen");
-      }
-    };
-
-    const pictureInPictureHandler = (action: string) => {
-      if (action === "enter") {
-        videoContainerRef.current?.classList.add("mini-player");
-      } else if (action === "leave") {
-        videoContainerRef.current?.classList.remove("mini-player");
-      }
-    };
-
-    const leadingZeroFormatter = new Intl.NumberFormat(undefined, {
-      minimumIntegerDigits: 2,
-    });
-
-    const formatDuration = (time: number) => {
-      const seconds = Math.floor(time % 60);
-      const minutes = Math.floor(time / 60) % 60;
-      const hours = Math.floor(time / 3600);
-      if (hours === 0) {
-        return `${minutes}:${leadingZeroFormatter.format(seconds)}`;
-      } else {
-        return `${hours}:${leadingZeroFormatter.format(
-          minutes
-        )}:${leadingZeroFormatter.format(seconds)}`;
-      }
-    };
-
-    const loadedData = () => {
-      if (totalTimeRef.current && videoRef.current) {
-        totalTimeRef.current.textContent = formatDuration(
-          videoRef.current.duration
-        );
-      }
-    };
-
-    const timeUpdate = () => {
-      if (currentTimeRef.current && videoRef.current) {
-        currentTimeRef.current.textContent = formatDuration(
-          videoRef.current.currentTime
-        );
-      }
-    };
-
     // Set initial time
     timeUpdate();
 
-    document.addEventListener("fullscreenchange", fullscreenChangeHandler);
+    // Get captions and set them to hidden initially
+    if (videoRef.current) {
+      captions = videoRef.current.textTracks[0];
+      captions.mode = "hidden";
+    }
+
+    document.addEventListener("fullscreenchange", handlerFullscreenChange);
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    document.addEventListener("keyup", handleKeyUp);
 
     videoRef.current?.addEventListener("loadeddata", loadedData);
 
     videoRef.current?.addEventListener("timeupdate", timeUpdate);
 
+    videoContainerRef.current?.addEventListener("mouseenter", handleMouseEnter);
+
+    videoContainerRef.current?.addEventListener("mouseleave", handleMouseLeave);
+
     videoRef.current?.addEventListener("enterpictureinpicture", () =>
-      pictureInPictureHandler("enter")
+      handlerPictureInPicture("enter")
     );
 
     videoRef.current?.addEventListener("leavepictureinpicture", () =>
-      pictureInPictureHandler("leave")
+      handlerPictureInPicture("leave")
     );
 
     return () => {
-      document.removeEventListener("fullscreenchange", fullscreenChangeHandler);
+      document.removeEventListener("fullscreenchange", handlerFullscreenChange);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
       videoRef.current?.removeEventListener("loadeddata", loadedData);
-
       videoRef.current?.removeEventListener("timeupdate", timeUpdate);
+      videoContainerRef.current?.removeEventListener(
+        "mouseenter",
+        handleMouseEnter
+      );
+      videoContainerRef.current?.removeEventListener(
+        "mouseleave",
+        handleMouseLeave
+      );
       videoRef.current?.removeEventListener("enterpictureinpicture", () =>
-        pictureInPictureHandler("enter")
+        handlerPictureInPicture("enter")
       );
       videoRef.current?.removeEventListener("leavepictureinpicture", () =>
-        pictureInPictureHandler("leave")
+        handlerPictureInPicture("leave")
       );
     };
   }, []);
@@ -103,22 +82,24 @@ export default function FgVideo({
   const handleKeyUp = (event: any) => {
     switch (event.key.toLowerCase()) {
       case "shift":
-        shift.current = false;
+        shiftPressed.current = false;
         break;
       case "control":
-        control.current = false;
+        controlPressed.current = false;
         break;
     }
   };
 
   const handleKeyDown = (event: any) => {
+    if (!videoContainerRef.current?.classList.contains("in-video")) return;
     const tagName = document.activeElement?.tagName.toLowerCase();
     if (tagName === "input") return;
-    if (control.current || shift.current) return;
+    if (controlPressed.current || shiftPressed.current) return;
 
     switch (event.key.toLowerCase()) {
       case " ":
         if (tagName === "button") return;
+        handlePausePlay();
         break;
       case "mediaplaypause":
         handlePausePlay();
@@ -150,15 +131,80 @@ export default function FgVideo({
       case "k":
         skip(10);
         break;
+      case "c":
+        handleClosedCaptions();
+        break;
       case "shift":
-        shift.current = true;
+        shiftPressed.current = true;
         break;
       case "control":
-        control.current = true;
+        controlPressed.current = true;
         break;
       default:
         break;
     }
+  };
+
+  const handlerFullscreenChange = () => {
+    if (!document.fullscreenElement) {
+      videoContainerRef.current?.classList.remove("full-screen");
+    }
+  };
+
+  const handlerPictureInPicture = (action: string) => {
+    if (action === "enter") {
+      videoContainerRef.current?.classList.add("mini-player");
+    } else if (action === "leave") {
+      videoContainerRef.current?.classList.remove("mini-player");
+    }
+  };
+
+  const leadingZeroFormatter = new Intl.NumberFormat(undefined, {
+    minimumIntegerDigits: 2,
+  });
+
+  const formatDuration = (time: number) => {
+    const seconds = Math.floor(time % 60);
+    const minutes = Math.floor(time / 60) % 60;
+    const hours = Math.floor(time / 3600);
+    if (hours === 0) {
+      return `${minutes}:${leadingZeroFormatter.format(seconds)}`;
+    } else {
+      return `${hours}:${leadingZeroFormatter.format(
+        minutes
+      )}:${leadingZeroFormatter.format(seconds)}`;
+    }
+  };
+
+  const loadedData = () => {
+    if (totalTimeRef.current && videoRef.current) {
+      totalTimeRef.current.textContent = formatDuration(
+        videoRef.current.duration
+      );
+    }
+  };
+
+  const timeUpdate = () => {
+    if (currentTimeRef.current && videoRef.current) {
+      currentTimeRef.current.textContent = formatDuration(
+        videoRef.current.currentTime
+      );
+    }
+  };
+
+  const handleMouseEnter = () => {
+    videoContainerRef.current?.classList.add("in-video");
+    if (leaveVideoTimer.current) {
+      clearTimeout(leaveVideoTimer.current);
+      leaveVideoTimer.current = null;
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (videoContainerRef.current?.classList.contains("paused")) return;
+    leaveVideoTimer.current = setTimeout(() => {
+      videoContainerRef.current?.classList.remove("in-video");
+    }, 1250);
   };
 
   const handlePausePlay = () => {
@@ -214,31 +260,60 @@ export default function FgVideo({
     }
   };
 
+  const handleClosedCaptions = () => {
+    if (captions) {
+      const isHidden = captions.mode === "hidden";
+      captions.mode = isHidden ? "showing" : "hidden";
+      videoContainerRef.current?.classList.toggle("captions", isHidden);
+    }
+  };
+
+  const handlePlaybackSpeed = () => {
+    if (!videoRef.current || !playbackSpeedButtonRef.current) return;
+
+    const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+    const currentPlaybackRateIndex = playbackRates.findIndex(
+      (rate) => rate === videoRef.current?.playbackRate
+    );
+
+    const nextPlaybackRateIndex =
+      (currentPlaybackRateIndex + 1) % playbackRates.length;
+
+    videoRef.current.playbackRate = playbackRates[nextPlaybackRateIndex];
+    playbackSpeedButtonRef.current.textContent = `${playbackRates[nextPlaybackRateIndex]}x`;
+  };
+
   return (
     <div
       ref={videoContainerRef}
-      onKeyDown={handleKeyDown}
-      onKeyUp={handleKeyUp}
       className={`video-container ${
         autoPlay ? "" : "paused"
-      } relative overflow-hidden flex items-center justify-center`}
+      } relative overflow-hidden flex items-center justify-center text-white font-K2D rounded-md`}
     >
       <video
         ref={videoRef}
         onClick={handlePausePlay}
-        className='w-full'
+        className='main-video w-full z-0'
         src='./24.mp4'
         controls={false}
         autoPlay={autoPlay}
-      ></video>
-      <div className='video-controls-container absolute bottom-0 w-full h-min flex items-end'>
-        <div
-          className='absolute bottom-0 w-full h-20'
-          style={{
-            background: `linear-gradient(to top, rgba(0, 255, 255, .9) 0%, rgba(0, 255, 255, 0.5) 40%, rgba(0, 255, 255, 0) 100%)`,
-          }}
-        ></div>
-        <div className='video-controls w-full h-10 flex items-center pl-2 pr-4 pb-3 z-50 space-x-2'>
+      >
+        <track
+          kind='captions'
+          srcLang='eng'
+          src='./subtitles.vtt'
+          default
+        ></track>
+      </video>
+      <div className='timeline-container absolute bottom-11 w-full z-20'>
+        <img className='thumbnail-img' />
+        <div className='timeline'>
+          <img className='preview-img' />
+          <div className='thumb-indicator'></div>
+        </div>
+      </div>
+      <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
+        <div className='video-controls w-full h-10 flex items-center pl-2 pr-4 pb-3 space-x-2'>
           <button
             onClick={handlePausePlay}
             className='flex items-center justify-center w-10 aspect-square'
@@ -271,10 +346,32 @@ export default function FgVideo({
             primaryVolumeSliderColor={primaryVolumeSliderColor}
             secondaryVolumeSliderColor={secondaryVolumeSliderColor}
           />
-          <div className='duration-container font-K2D text-white flex items-center gap-1 grow'>
+          <div className='duration-container flex items-center gap-1 grow'>
             <div ref={currentTimeRef} className='current-time'></div>/
             <div ref={totalTimeRef} className='total-time'></div>
           </div>
+          <button
+            ref={playbackSpeedButtonRef}
+            onClick={handlePlaybackSpeed}
+            className='playback-speed-button wide-button text-lg'
+          >
+            1x
+          </button>
+          <button
+            onClick={handleClosedCaptions}
+            className='caption-button flex-col items-center justify-center'
+          >
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              height='36px'
+              viewBox='0 -960 960 960'
+              width='36px'
+              fill='white'
+            >
+              <path d='M200-160q-33 0-56.5-23.5T120-240v-480q0-33 23.5-56.5T200-800h560q33 0 56.5 23.5T840-720v480q0 33-23.5 56.5T760-160H200Zm80-200h120q17 0 28.5-11.5T440-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T400-600H280q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm400-240H560q-17 0-28.5 11.5T520-560v160q0 17 11.5 28.5T560-360h120q17 0 28.5-11.5T720-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T680-600Z' />
+            </svg>
+            <div className='caption-button-underline'></div>
+          </button>
           <button
             onClick={handleMiniPlayer}
             className='flex items-center justify-center'
@@ -328,17 +425,12 @@ export default function FgVideo({
           </button>
         </div>
       </div>
+      <div
+        className='controls-gradient absolute bottom-0 w-full h-14 z-10'
+        style={{
+          background: `linear-gradient(to top, rgba(0, 0, 0, .75) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
+        }}
+      ></div>
     </div>
   );
 }
-
-//<button>Volume</button>
-//<input type='' />
-//<div>Time Ellapsed</div>
-//<button>Caption</button>
-//<button>Subtitles</button>
-//<button>Play back spped</button>
-//<button>subtitles</button>
-//<button>picture in picture</button>
-//<button>theator mode</button>
-//<button>full screen</button>

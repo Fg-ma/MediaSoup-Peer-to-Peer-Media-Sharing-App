@@ -12,7 +12,7 @@ import joinRoom from "./joinRoom";
 import onNewConsumerSubscribed from "./lib/onNewConsumerSubscribed";
 import onNewProducerAvailable from "./lib/onNewProducerAvailable";
 import onNewProducer from "./lib/onNewProducer";
-import FgVideo from "./FgVideo";
+import FgVideo from "./FgVideo/FgVideo";
 
 const websocketURL = "http://localhost:8000";
 
