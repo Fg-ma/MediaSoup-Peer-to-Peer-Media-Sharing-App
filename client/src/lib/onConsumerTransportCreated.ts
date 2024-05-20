@@ -1,5 +1,8 @@
+import React from "react";
+import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
+import FgVideo from "../FgVideo/FgVideo";
 
 const onConsumerTransportCreated = async (
   event: {
@@ -85,22 +88,36 @@ const onConsumerTransportCreated = async (
         Object.entries(remoteTracksMap.current).forEach(
           ([trackUsername, tracks]) => {
             for (const [trackType, trackData] of Object.entries(tracks)) {
-              const newVideo = document.createElement("video");
-              newVideo.autoplay = true;
-              newVideo.playsInline = true;
-              newVideo.controls = true;
+              const videoContainer = document.createElement("div");
+              let flipVideo = false;
               if (trackType === "webcam") {
-                newVideo.id = `live_video_track_${trackUsername}`;
-                newVideo.style.transform = "scaleX(-1)";
+                videoContainer.id = `live_video_track_${trackUsername}`;
+                flipVideo = true;
               } else if (trackType === "screen") {
-                newVideo.id = `screen_track_${trackUsername}`;
+                videoContainer.id = `screen_track_${trackUsername}`;
               }
+              remoteVideosContainerRef.current?.appendChild(videoContainer);
 
               const stream = new MediaStream();
               stream.addTrack(trackData);
-              newVideo.srcObject = stream;
 
-              remoteVideosContainerRef.current?.appendChild(newVideo);
+              const root = createRoot(videoContainer);
+              root.render(
+                React.createElement(FgVideo, {
+                  stream,
+                  flipVideo,
+                  isPlayPause: false,
+                  isVolume: false,
+                  isTotalTime: false,
+                  isPlaybackSpeed: false,
+                  isClosedCaptions: false,
+                  isTheater: false,
+                  isTimeLine: false,
+                  isSkip: false,
+                  isThumbnail: false,
+                  isPreview: false,
+                })
+              );
             }
           }
         );

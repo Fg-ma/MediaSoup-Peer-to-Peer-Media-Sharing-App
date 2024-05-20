@@ -1,6 +1,9 @@
+import React from "react";
+import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
-import { Socket } from "socket.io-client";
 import getBrowserMedia from "../getBrowserMedia";
+import { Socket } from "socket.io-client";
+import FgVideo from "../FgVideo/FgVideo";
 
 const onProducerTransportCreated = async (
   event: {
@@ -87,28 +90,54 @@ const onProducerTransportCreated = async (
       case "connected":
         if (isWebcam.current && cameraStream.current) {
           webcamBtnRef.current!.disabled = false;
-          const newVideo = document.createElement("video");
-          newVideo.autoplay = true;
-          newVideo.playsInline = true;
-          newVideo.controls = true;
-          newVideo.id = `live_video_track_${username.current}`;
-          newVideo.style.transform = "scaleX(-1)";
+          screenBtnRef.current!.disabled = false;
 
-          newVideo.srcObject = cameraStream.current;
+          const videoContainer = document.createElement("div");
+          videoContainer.id = `live_video_track_${username.current}`;
+          remoteVideosContainerRef.current?.appendChild(videoContainer);
 
-          remoteVideosContainerRef.current?.appendChild(newVideo);
+          const root = createRoot(videoContainer);
+          root.render(
+            React.createElement(FgVideo, {
+              stream: cameraStream.current,
+              flipVideo: true,
+              isPlayPause: false,
+              isVolume: false,
+              isTotalTime: false,
+              isPlaybackSpeed: false,
+              isClosedCaptions: false,
+              isTheater: false,
+              isTimeLine: false,
+              isSkip: false,
+              isThumbnail: false,
+              isPreview: false,
+            })
+          );
         }
         if (isScreen.current && screenStream.current) {
+          webcamBtnRef.current!.disabled = false;
           screenBtnRef.current!.disabled = false;
-          const newVideo = document.createElement("video");
-          newVideo.autoplay = true;
-          newVideo.playsInline = true;
-          newVideo.controls = true;
-          newVideo.id = `screen_track_${username.current}`;
 
-          newVideo.srcObject = screenStream.current;
+          const videoContainer = document.createElement("div");
+          videoContainer.id = `screen_track_${username.current}`;
+          remoteVideosContainerRef.current?.appendChild(videoContainer);
 
-          remoteVideosContainerRef.current?.appendChild(newVideo);
+          const root = createRoot(videoContainer);
+          root.render(
+            React.createElement(FgVideo, {
+              stream: screenStream.current,
+              isPlayPause: false,
+              isVolume: false,
+              isTotalTime: false,
+              isPlaybackSpeed: false,
+              isClosedCaptions: false,
+              isTheater: false,
+              isTimeLine: false,
+              isSkip: false,
+              isThumbnail: false,
+              isPreview: false,
+            })
+          );
         }
         break;
       case "failed":

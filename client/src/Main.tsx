@@ -12,7 +12,6 @@ import joinRoom from "./joinRoom";
 import onNewConsumerSubscribed from "./lib/onNewConsumerSubscribed";
 import onNewProducerAvailable from "./lib/onNewProducerAvailable";
 import onNewProducer from "./lib/onNewProducer";
-import FgVideo from "./FgVideo/FgVideo";
 
 const websocketURL = "http://localhost:8000";
 
@@ -160,6 +159,7 @@ export default function Main() {
         if (producerType === "webcam") {
           if (disconnectedProducerUsername === username.current) {
             webcamBtnRef.current!.disabled = false;
+            screenBtnRef.current!.disabled = false;
             const tracks = cameraStream.current?.getTracks();
 
             tracks?.forEach((track) => {
@@ -192,6 +192,7 @@ export default function Main() {
         }
         if (producerType === "screen") {
           if (disconnectedProducerUsername === username.current) {
+            webcamBtnRef.current!.disabled = false;
             screenBtnRef.current!.disabled = false;
             const tracks = screenStream.current?.getTracks();
 
@@ -244,6 +245,7 @@ export default function Main() {
                 publishCamera(
                   isWebcam,
                   webcamBtnRef,
+                  screenBtnRef,
                   setWebcamActive,
                   socket,
                   device,
@@ -266,6 +268,7 @@ export default function Main() {
               onClick={() =>
                 publishScreen(
                   isScreen,
+                  webcamBtnRef,
                   screenBtnRef,
                   setScreenActive,
                   socket,
@@ -347,7 +350,6 @@ export default function Main() {
           className='w-full grid grid-cols-4'
         ></div>
       </div>
-      <FgVideo />
     </div>
   );
 }

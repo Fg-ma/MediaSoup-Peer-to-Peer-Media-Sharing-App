@@ -3,6 +3,7 @@ import { Socket } from "socket.io-client";
 
 const publishScreen = (
   isScreen: React.MutableRefObject<boolean>,
+  webcamBtnRef: React.RefObject<HTMLButtonElement>,
   screenBtnRef: React.RefObject<HTMLButtonElement>,
   setScreenActive: (value: React.SetStateAction<boolean>) => void,
   socket: React.MutableRefObject<Socket>,
@@ -14,6 +15,7 @@ const publishScreen = (
     console.error("Missing roomName or username!");
     return;
   }
+  webcamBtnRef.current!.disabled = true;
   screenBtnRef.current!.disabled = true;
   isScreen.current = !isScreen.current;
   setScreenActive((prev) => !prev);

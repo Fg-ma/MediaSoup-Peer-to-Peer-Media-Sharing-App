@@ -1,5 +1,8 @@
+import React from "react";
+import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import getBrowserMedia from "../getBrowserMedia";
+import FgVideo from "../FgVideo/FgVideo";
 
 const onNewProducer = async (
   event: {
@@ -25,6 +28,8 @@ const onNewProducer = async (
     cameraStream.current = await getBrowserMedia(event.producerType, device);
     if (cameraStream.current) {
       webcamBtnRef.current!.disabled = false;
+      screenBtnRef.current!.disabled = false;
+
       const track = cameraStream.current.getVideoTracks()[0];
       const params = {
         track: track,
@@ -38,16 +43,29 @@ const onNewProducer = async (
         console.error("Camera new transport failed to produce");
         return;
       }
-      const newVideo = document.createElement("video");
-      newVideo.autoplay = true;
-      newVideo.playsInline = true;
-      newVideo.controls = true;
-      newVideo.style.transform = "scaleX(-1)";
-      newVideo.id = `live_video_track_${username.current}`;
 
-      newVideo.srcObject = cameraStream.current;
+      const videoContainer = document.createElement("div");
 
-      remoteVideosContainerRef.current?.appendChild(newVideo);
+      videoContainer.id = `live_video_track_${username.current}`;
+      remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+      const root = createRoot(videoContainer);
+      root.render(
+        React.createElement(FgVideo, {
+          stream: cameraStream.current,
+          flipVideo: true,
+          isPlayPause: false,
+          isVolume: false,
+          isTotalTime: false,
+          isPlaybackSpeed: false,
+          isClosedCaptions: false,
+          isTheater: false,
+          isTimeLine: false,
+          isSkip: false,
+          isThumbnail: false,
+          isPreview: false,
+        })
+      );
     }
   } else if (event.producerType === "screen") {
     if (screenStream.current) {
@@ -56,6 +74,7 @@ const onNewProducer = async (
     }
     screenStream.current = await getBrowserMedia(event.producerType, device);
     if (screenStream.current) {
+      webcamBtnRef.current!.disabled = false;
       screenBtnRef.current!.disabled = false;
       const track = screenStream.current.getVideoTracks()[0];
       const params = {
@@ -64,17 +83,33 @@ const onNewProducer = async (
           producerType: "screen",
         },
       };
-      await producerTransport.current?.produce(params);
+      try {
+        await producerTransport.current?.produce(params);
+      } catch {
+        console.error("Camera new transport failed to produce");
+        return;
+      }
 
-      const newVideo = document.createElement("video");
-      newVideo.autoplay = true;
-      newVideo.playsInline = true;
-      newVideo.controls = true;
-      newVideo.id = `screen_track_${username.current}`;
+      const videoContainer = document.createElement("div");
+      videoContainer.id = `screen_track_${username.current}`;
+      remoteVideosContainerRef.current?.appendChild(videoContainer);
 
-      newVideo.srcObject = screenStream.current;
-
-      remoteVideosContainerRef.current?.appendChild(newVideo);
+      const root = createRoot(videoContainer);
+      root.render(
+        React.createElement(FgVideo, {
+          stream: screenStream.current,
+          isPlayPause: false,
+          isVolume: false,
+          isTotalTime: false,
+          isPlaybackSpeed: false,
+          isClosedCaptions: false,
+          isTheater: false,
+          isTimeLine: false,
+          isSkip: false,
+          isThumbnail: false,
+          isPreview: false,
+        })
+      );
     }
   }
 };
