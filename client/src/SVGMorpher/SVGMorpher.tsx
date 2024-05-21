@@ -7,11 +7,13 @@ export default function SVGMorpher({
   videoRef,
   isFinishedRef,
   changedWhileNotFinishedRef,
+  color = "white",
 }: {
   pathsArray: string[][];
   videoRef: React.RefObject<HTMLVideoElement>;
   isFinishedRef: React.MutableRefObject<boolean>;
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
+  color?: string;
 }) {
   if (!pathsArray) {
     return;
@@ -93,7 +95,7 @@ export default function SVGMorpher({
   return (
     <>
       {paths.map((d, index) => (
-        <motion.path key={index} fill='white' d={d} />
+        <motion.path key={index} fill={color} d={d} />
       ))}
     </>
   );

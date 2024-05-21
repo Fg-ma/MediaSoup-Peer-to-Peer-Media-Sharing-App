@@ -48,6 +48,14 @@ const onConsume = async (
         type: string;
         producerPaused: boolean;
       };
+      audio?: {
+        producerId: string;
+        id: string;
+        kind: string;
+        rtpParameters: any;
+        type: string;
+        producerPaused: boolean;
+      };
     };
   } = {};
 
@@ -81,6 +89,22 @@ const onConsume = async (
         rtpParameters: screenConsumerData!.rtpParameters,
         type: screenConsumerData!.type,
         producerPaused: screenConsumerData!.producerPaused,
+      };
+    }
+
+    if (consumers[producerUsername].audio) {
+      const audioConsumerData = consumers[producerUsername].audio;
+
+      if (!newConsumers[producerUsername]) {
+        newConsumers[producerUsername] = {};
+      }
+      newConsumers[producerUsername].audio = {
+        producerId: audioConsumerData!.producerId,
+        id: audioConsumerData!.id,
+        kind: audioConsumerData!.kind,
+        rtpParameters: audioConsumerData!.rtpParameters,
+        type: audioConsumerData!.type,
+        producerPaused: audioConsumerData!.producerPaused,
       };
     }
   }

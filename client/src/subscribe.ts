@@ -44,11 +44,17 @@ const subscribe = (
       const oldScreen = document.getElementById(
         `screen_track_${producerUsername}`
       );
+      const oldAudio = document.getElementById(
+        `audio_track_${producerUsername}`
+      );
       if (oldVideo) {
         remoteVideosContainerRef.current?.removeChild(oldVideo);
       }
       if (oldScreen) {
         remoteVideosContainerRef.current?.removeChild(oldScreen);
+      }
+      if (oldAudio) {
+        remoteVideosContainerRef.current?.removeChild(oldAudio);
       }
       delete remoteTracksMap.current[producerUsername];
     }

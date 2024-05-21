@@ -21,7 +21,7 @@ const onRemoveProducer = async (
       Object.keys(roomProducers[event.roomName][event.username] || {}).length ==
         1 &&
       roomProducers[event.roomName][event.username][
-        event.producerType as "webcam" | "screen"
+        event.producerType as "webcam" | "screen" | "audio"
       ]
     ) {
       delete roomProducerTransports[event.roomName][event.username];
@@ -31,7 +31,7 @@ const onRemoveProducer = async (
       roomProducers[event.roomName] &&
       roomProducers[event.roomName][event.username] &&
       roomProducers[event.roomName][event.username][
-        event.producerType as "webcam" | "screen"
+        event.producerType as "webcam" | "screen" | "audio"
       ]
     ) {
       if (
@@ -41,7 +41,7 @@ const onRemoveProducer = async (
         delete roomProducers[event.roomName][event.username];
       } else {
         delete roomProducers[event.roomName][event.username][
-          event.producerType as "webcam" | "screen"
+          event.producerType as "webcam" | "screen" | "audio"
         ];
       }
     }

@@ -32,7 +32,7 @@ const onNewConsumer = async (
   const transport = roomConsumerTransports[event.roomName][event.username];
   const producer =
     roomProducers[event.roomName][event.producerUsername][
-      event.consumerType as "webcam" | "screen"
+      event.consumerType as "webcam" | "screen" | "audio"
     ];
 
   if (!producer) {
@@ -82,7 +82,7 @@ const onNewConsumer = async (
     roomConsumers[event.roomName][event.username][event.producerUsername] = {};
   }
   roomConsumers[event.roomName][event.username][event.producerUsername][
-    event.consumerType as "webcam" | "screen"
+    event.consumerType as "webcam" | "screen" | "audio"
   ] = newConsumer;
 
   io.to(`${event.roomName}_${event.username}`).emit("message", {

@@ -3,10 +3,13 @@ import "./FgVideoStyles.css";
 import VolumeSection from "./VolumeSection";
 
 export default function FgVideo({
-  stream,
+  videoStream,
+  audioStream,
+  isStream = false,
   id,
   videoStyles,
   autoPlay = true,
+  muted = false,
   flipVideo = false,
   primaryVolumeSliderColor,
   secondaryVolumeSliderColor,
@@ -32,10 +35,13 @@ export default function FgVideo({
   isThumbnail = true,
   isPreview = true,
 }: {
-  stream: MediaStream;
+  videoStream?: MediaStream;
+  audioStream?: MediaStream;
+  isStream?: boolean;
   id?: string;
   videoStyles?: {};
   autoPlay?: boolean;
+  muted?: boolean;
   flipVideo?: boolean;
   primaryVolumeSliderColor?: string;
   secondaryVolumeSliderColor?: string;
@@ -81,8 +87,22 @@ export default function FgVideo({
   const thumbnails = useRef<string[]>([]);
 
   const init = () => {
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream;
+    if (videoRef.current && isStream) {
+      const combinedStream = new MediaStream();
+
+      if (videoStream) {
+        videoStream
+          .getVideoTracks()
+          .forEach((track) => combinedStream.addTrack(track));
+      }
+
+      if (audioStream && !muted) {
+        audioStream
+          .getAudioTracks()
+          .forEach((track) => combinedStream.addTrack(track));
+      }
+
+      videoRef.current.srcObject = combinedStream;
     }
 
     // Get captions and set them to hidden initially
@@ -218,7 +238,7 @@ export default function FgVideo({
         handlePictureInPicture("leave")
       );
     };
-  }, []);
+  }, [videoStream, audioStream]);
 
   const handleKeyUp = (event: any) => {
     switch (event.key.toLowerCase()) {
@@ -461,11 +481,13 @@ export default function FgVideo({
   };
 
   const handleMute = () => {
-    if (videoRef.current && volumeSliderRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      if (videoRef.current.muted) {
-        volumeSliderRef.current.value = "0";
-      }
+    if (!videoRef.current) {
+      return;
+    }
+
+    videoRef.current.muted = !videoRef.current.muted;
+    if (videoRef.current.muted && volumeSliderRef.current) {
+      volumeSliderRef.current.value = "0";
     }
   };
 
@@ -537,7 +559,6 @@ export default function FgVideo({
       1,
       Math.floor((percent * videoRef.current.duration) / 10)
     );
-    console.log(previewImgIndex, thumbnails.current);
     const previewImgSrc = thumbnails.current[previewImgIndex];
     previewImgRef.current.src = previewImgSrc;
     timelineContainerRef.current.style.setProperty(
@@ -619,172 +640,210 @@ export default function FgVideo({
         autoPlay ? "" : "paused"
       } relative overflow-hidden flex items-center justify-center text-white font-K2D rounded-md`}
     >
-      <video
-        ref={videoRef}
-        onClick={isPlayPause ? handlePausePlay : () => {}}
-        className='main-video w-full z-0'
-        controls={false}
-        autoPlay={autoPlay}
-        style={videoStyles}
-      >
-        <track
-          kind='captions'
-          srcLang='eng'
-          src='./subtitles.vtt'
-          default
-        ></track>
-      </video>
-      {isTimeLine && isThumbnail && (
-        <img ref={thumbnailImgRef} className='thumbnail-img' />
-      )}
-      {isTimeLine && (
-        <div ref={timelineContainerRef} className='timeline-container z-20'>
-          <div className='timeline'>
-            {isPreview && (
-              <img ref={previewImgRef} className='preview-img shadow-md' />
+      {videoStream && (
+        <>
+          <video
+            ref={videoRef}
+            onClick={isPlayPause ? handlePausePlay : () => {}}
+            className='main-video w-full z-0'
+            controls={false}
+            autoPlay={autoPlay}
+            style={videoStyles}
+          >
+            {isClosedCaptions && (
+              <track
+                kind='captions'
+                srcLang='eng'
+                src='./subtitles.vtt'
+                default
+              ></track>
             )}
-            <div className='thumb-indicator'></div>
+          </video>
+          {isTimeLine && isThumbnail && (
+            <img ref={thumbnailImgRef} className='thumbnail-img' />
+          )}
+          {isTimeLine && (
+            <div ref={timelineContainerRef} className='timeline-container z-20'>
+              <div className='timeline'>
+                {isPreview && (
+                  <img ref={previewImgRef} className='preview-img shadow-md' />
+                )}
+                <div className='thumb-indicator'></div>
+              </div>
+            </div>
+          )}
+          <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
+            <div className='video-controls w-full h-10 flex items-center space-x-2'>
+              {isPlayPause && (
+                <button
+                  onClick={handlePausePlay}
+                  className='flex items-center justify-center w-10 aspect-square'
+                >
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    height='36px'
+                    viewBox='0 -960 960 960'
+                    width='36px'
+                    fill='white'
+                    className='play-icon'
+                  >
+                    <path d='M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z' />
+                  </svg>
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    height='36px'
+                    viewBox='0 -960 960 960'
+                    width='36px'
+                    fill='white'
+                    className='pause-icon'
+                  >
+                    <path d='M640-200q-33 0-56.5-23.5T560-280v-400q0-33 23.5-56.5T640-760q33 0 56.5 23.5T720-680v400q0 33-23.5 56.5T640-200Zm-320 0q-33 0-56.5-23.5T240-280v-400q0-33 23.5-56.5T320-760q33 0 56.5 23.5T400-680v400q0 33-23.5 56.5T320-200Z' />
+                  </svg>
+                </button>
+              )}
+              {isVolume && (
+                <VolumeSection
+                  videoRef={videoRef}
+                  volumeSliderRef={volumeSliderRef}
+                  handleMute={handleMute}
+                  primaryVolumeSliderColor={primaryVolumeSliderColor}
+                  secondaryVolumeSliderColor={secondaryVolumeSliderColor}
+                  isSlider={audioStream ? false : true}
+                />
+              )}
+              <div className='duration-container flex items-center gap-1 grow'>
+                {isCurrentTime && (
+                  <div ref={currentTimeRef} className='current-time'></div>
+                )}
+                {isCurrentTime && isTotalTime && "/"}
+                {isTotalTime && (
+                  <div ref={totalTimeRef} className='total-time'></div>
+                )}
+              </div>
+              {isPlaybackSpeed && (
+                <button
+                  ref={playbackSpeedButtonRef}
+                  onClick={handlePlaybackSpeed}
+                  className='playback-speed-button wide-button text-lg'
+                >
+                  1x
+                </button>
+              )}
+              {isClosedCaptions && (
+                <button
+                  onClick={handleClosedCaptions}
+                  className='caption-button flex-col items-center justify-center'
+                >
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    height='36px'
+                    viewBox='0 -960 960 960'
+                    width='36px'
+                    fill='white'
+                  >
+                    <path d='M200-160q-33 0-56.5-23.5T120-240v-480q0-33 23.5-56.5T200-800h560q33 0 56.5 23.5T840-720v480q0 33-23.5 56.5T760-160H200Zm80-200h120q17 0 28.5-11.5T440-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T400-600H280q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm400-240H560q-17 0-28.5 11.5T520-560v160q0 17 11.5 28.5T560-360h120q17 0 28.5-11.5T720-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T680-600Z' />
+                  </svg>
+                  <div className='caption-button-underline'></div>
+                </button>
+              )}
+              {isPictureInPicture && (
+                <button
+                  onClick={handleMiniPlayer}
+                  className='flex items-center justify-center'
+                >
+                  <div className='mini-player-icon h-9 w-9 flex items-center justify-center'>
+                    <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-end items-end'>
+                      <div className='bg-white w-3 h-2 rounded-sm mr-0.5 mb-0.5'></div>
+                    </div>
+                  </div>
+                  <div className='exit-mini-player-icon h-9 w-9 flex items-center justify-center'>
+                    <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-start items-start'>
+                      <div className='bg-white w-3 h-2 rounded-sm ml-0.5 mt-0.5'></div>
+                    </div>
+                  </div>
+                </button>
+              )}
+              {isTheater && (
+                <button
+                  onClick={handleTheater}
+                  className='flex items-center justify-center'
+                >
+                  <div className='theater-icon h-9 w-9 flex items-center justify-center'>
+                    <div className='border-3 border-white w-8 h-6 rounded-md'></div>
+                  </div>
+                  <div className='exit-theater-icon h-9 w-9 flex items-center justify-center'>
+                    <div className='border-3 border-white w-8 h-4 rounded-md'></div>
+                  </div>
+                </button>
+              )}
+              {isFullScreen && (
+                <button
+                  onClick={handleFullScreen}
+                  className='flex items-center justify-center'
+                >
+                  <svg
+                    className='full-screen-icon'
+                    xmlns='http://www.w3.org/2000/svg'
+                    height='36px'
+                    viewBox='0 -960 960 960'
+                    width='36px'
+                    fill='white'
+                  >
+                    <path d='M200-200h80q17 0 28.5 11.5T320-160q0 17-11.5 28.5T280-120H160q-17 0-28.5-11.5T120-160v-120q0-17 11.5-28.5T160-320q17 0 28.5 11.5T200-280v80Zm560 0v-80q0-17 11.5-28.5T800-320q17 0 28.5 11.5T840-280v120q0 17-11.5 28.5T800-120H680q-17 0-28.5-11.5T640-160q0-17 11.5-28.5T680-200h80ZM200-760v80q0 17-11.5 28.5T160-640q-17 0-28.5-11.5T120-680v-120q0-17 11.5-28.5T160-840h120q17 0 28.5 11.5T320-800q0 17-11.5 28.5T280-760h-80Zm560 0h-80q-17 0-28.5-11.5T640-800q0-17 11.5-28.5T680-840h120q17 0 28.5 11.5T840-800v120q0 17-11.5 28.5T800-640q-17 0-28.5-11.5T760-680v-80Z' />
+                  </svg>
+                  <svg
+                    className='exit-full-screen-icon'
+                    xmlns='http://www.w3.org/2000/svg'
+                    height='36px'
+                    viewBox='0 -960 960 960'
+                    width='36px'
+                    fill='white'
+                  >
+                    <path d='M240-240h-80q-17 0-28.5-11.5T120-280q0-17 11.5-28.5T160-320h120q17 0 28.5 11.5T320-280v120q0 17-11.5 28.5T280-120q-17 0-28.5-11.5T240-160v-80Zm480 0v80q0 17-11.5 28.5T680-120q-17 0-28.5-11.5T640-160v-120q0-17 11.5-28.5T680-320h120q17 0 28.5 11.5T840-280q0 17-11.5 28.5T800-240h-80ZM240-720v-80q0-17 11.5-28.5T280-840q17 0 28.5 11.5T320-800v120q0 17-11.5 28.5T280-640H160q-17 0-28.5-11.5T120-680q0-17 11.5-28.5T160-720h80Zm480 0h80q17 0 28.5 11.5T840-680q0 17-11.5 28.5T800-640H680q-17 0-28.5-11.5T640-680v-120q0-17 11.5-28.5T680-840q17 0 28.5 11.5T720-800v80Z' />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
+          <div
+            className='controls-gradient absolute bottom-0 w-full h-14 z-10'
+            style={{
+              background: `linear-gradient(to top, rgba(0, 0, 0, .75) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
+            }}
+          ></div>
+        </>
+      )}
+      {!videoStream && audioStream && (
+        <div>
+          <video
+            ref={videoRef}
+            onClick={isPlayPause ? handlePausePlay : () => {}}
+            className='main-video w-0 z-0'
+            controls={false}
+            autoPlay={autoPlay}
+            style={videoStyles}
+          >
+            {isClosedCaptions && (
+              <track
+                kind='captions'
+                srcLang='eng'
+                src='./subtitles.vtt'
+                default
+              ></track>
+            )}
+          </video>
+          <VolumeSection
+            videoRef={videoRef}
+            volumeSliderRef={volumeSliderRef}
+            iconSize='5rem'
+            handleMute={handleMute}
+            primaryColor={"black"}
+            primaryVolumeSliderColor={primaryVolumeSliderColor}
+            secondaryVolumeSliderColor={secondaryVolumeSliderColor}
+            isSlider={false}
+          />
         </div>
       )}
-      <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
-        <div className='video-controls w-full h-10 flex items-center space-x-2'>
-          {isPlayPause && (
-            <button
-              onClick={handlePausePlay}
-              className='flex items-center justify-center w-10 aspect-square'
-            >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                height='36px'
-                viewBox='0 -960 960 960'
-                width='36px'
-                fill='white'
-                className='play-icon'
-              >
-                <path d='M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z' />
-              </svg>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                height='36px'
-                viewBox='0 -960 960 960'
-                width='36px'
-                fill='white'
-                className='pause-icon'
-              >
-                <path d='M640-200q-33 0-56.5-23.5T560-280v-400q0-33 23.5-56.5T640-760q33 0 56.5 23.5T720-680v400q0 33-23.5 56.5T640-200Zm-320 0q-33 0-56.5-23.5T240-280v-400q0-33 23.5-56.5T320-760q33 0 56.5 23.5T400-680v400q0 33-23.5 56.5T320-200Z' />
-              </svg>
-            </button>
-          )}
-          {isVolume && (
-            <VolumeSection
-              videoRef={videoRef}
-              volumeSliderRef={volumeSliderRef}
-              handleMute={handleMute}
-              primaryVolumeSliderColor={primaryVolumeSliderColor}
-              secondaryVolumeSliderColor={secondaryVolumeSliderColor}
-            />
-          )}
-          <div className='duration-container flex items-center gap-1 grow'>
-            {isCurrentTime && (
-              <div ref={currentTimeRef} className='current-time'></div>
-            )}
-            {isCurrentTime && isTotalTime && "/"}
-            {isTotalTime && (
-              <div ref={totalTimeRef} className='total-time'></div>
-            )}
-          </div>
-          {isPlaybackSpeed && (
-            <button
-              ref={playbackSpeedButtonRef}
-              onClick={handlePlaybackSpeed}
-              className='playback-speed-button wide-button text-lg'
-            >
-              1x
-            </button>
-          )}
-          {isClosedCaptions && (
-            <button
-              onClick={handleClosedCaptions}
-              className='caption-button flex-col items-center justify-center'
-            >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                height='36px'
-                viewBox='0 -960 960 960'
-                width='36px'
-                fill='white'
-              >
-                <path d='M200-160q-33 0-56.5-23.5T120-240v-480q0-33 23.5-56.5T200-800h560q33 0 56.5 23.5T840-720v480q0 33-23.5 56.5T760-160H200Zm80-200h120q17 0 28.5-11.5T440-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T400-600H280q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm400-240H560q-17 0-28.5 11.5T520-560v160q0 17 11.5 28.5T560-360h120q17 0 28.5-11.5T720-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T680-600Z' />
-              </svg>
-              <div className='caption-button-underline'></div>
-            </button>
-          )}
-          {isPictureInPicture && (
-            <button
-              onClick={handleMiniPlayer}
-              className='flex items-center justify-center'
-            >
-              <div className='mini-player-icon h-9 w-9 flex items-center justify-center'>
-                <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-end items-end'>
-                  <div className='bg-white w-3 h-2 rounded-sm mr-0.5 mb-0.5'></div>
-                </div>
-              </div>
-              <div className='exit-mini-player-icon h-9 w-9 flex items-center justify-center'>
-                <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-start items-start'>
-                  <div className='bg-white w-3 h-2 rounded-sm ml-0.5 mt-0.5'></div>
-                </div>
-              </div>
-            </button>
-          )}
-          {isTheater && (
-            <button
-              onClick={handleTheater}
-              className='flex items-center justify-center'
-            >
-              <div className='theater-icon h-9 w-9 flex items-center justify-center'>
-                <div className='border-3 border-white w-8 h-6 rounded-md'></div>
-              </div>
-              <div className='exit-theater-icon h-9 w-9 flex items-center justify-center'>
-                <div className='border-3 border-white w-8 h-4 rounded-md'></div>
-              </div>
-            </button>
-          )}
-          {isFullScreen && (
-            <button
-              onClick={handleFullScreen}
-              className='flex items-center justify-center'
-            >
-              <svg
-                className='full-screen-icon'
-                xmlns='http://www.w3.org/2000/svg'
-                height='36px'
-                viewBox='0 -960 960 960'
-                width='36px'
-                fill='white'
-              >
-                <path d='M200-200h80q17 0 28.5 11.5T320-160q0 17-11.5 28.5T280-120H160q-17 0-28.5-11.5T120-160v-120q0-17 11.5-28.5T160-320q17 0 28.5 11.5T200-280v80Zm560 0v-80q0-17 11.5-28.5T800-320q17 0 28.5 11.5T840-280v120q0 17-11.5 28.5T800-120H680q-17 0-28.5-11.5T640-160q0-17 11.5-28.5T680-200h80ZM200-760v80q0 17-11.5 28.5T160-640q-17 0-28.5-11.5T120-680v-120q0-17 11.5-28.5T160-840h120q17 0 28.5 11.5T320-800q0 17-11.5 28.5T280-760h-80Zm560 0h-80q-17 0-28.5-11.5T640-800q0-17 11.5-28.5T680-840h120q17 0 28.5 11.5T840-800v120q0 17-11.5 28.5T800-640q-17 0-28.5-11.5T760-680v-80Z' />
-              </svg>
-              <svg
-                className='exit-full-screen-icon'
-                xmlns='http://www.w3.org/2000/svg'
-                height='36px'
-                viewBox='0 -960 960 960'
-                width='36px'
-                fill='white'
-              >
-                <path d='M240-240h-80q-17 0-28.5-11.5T120-280q0-17 11.5-28.5T160-320h120q17 0 28.5 11.5T320-280v120q0 17-11.5 28.5T280-120q-17 0-28.5-11.5T240-160v-80Zm480 0v80q0 17-11.5 28.5T680-120q-17 0-28.5-11.5T640-160v-120q0-17 11.5-28.5T680-320h120q17 0 28.5 11.5T840-280q0 17-11.5 28.5T800-240h-80ZM240-720v-80q0-17 11.5-28.5T280-840q17 0 28.5 11.5T320-800v120q0 17-11.5 28.5T280-640H160q-17 0-28.5-11.5T120-680q0-17 11.5-28.5T160-720h80Zm480 0h80q17 0 28.5 11.5T840-680q0 17-11.5 28.5T800-640H680q-17 0-28.5-11.5T640-680v-120q0-17 11.5-28.5T680-840q17 0 28.5 11.5T720-800v80Z' />
-              </svg>
-            </button>
-          )}
-        </div>
-      </div>
-      <div
-        className='controls-gradient absolute bottom-0 w-full h-14 z-10'
-        style={{
-          background: `linear-gradient(to top, rgba(0, 0, 0, .75) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
-        }}
-      ></div>
     </div>
   );
 }

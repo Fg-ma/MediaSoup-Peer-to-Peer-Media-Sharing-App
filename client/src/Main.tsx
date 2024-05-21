@@ -12,12 +12,14 @@ import joinRoom from "./joinRoom";
 import onNewConsumerSubscribed from "./lib/onNewConsumerSubscribed";
 import onNewProducerAvailable from "./lib/onNewProducerAvailable";
 import onNewProducer from "./lib/onNewProducer";
+import publishAudio from "./publishAudio";
 
 const websocketURL = "http://localhost:8000";
 
 export default function Main() {
   const webcamBtnRef = useRef<HTMLButtonElement>(null);
   const screenBtnRef = useRef<HTMLButtonElement>(null);
+  const audioBtnRef = useRef<HTMLButtonElement>(null);
   const subBtnRef = useRef<HTMLButtonElement>(null);
   const roomNameRef = useRef<HTMLInputElement>(null);
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -30,17 +32,21 @@ export default function Main() {
   const [webcamActive, setWebcamActive] = useState(false);
   const isScreen = useRef(false);
   const [screenActive, setScreenActive] = useState(false);
+  const isAudio = useRef(false);
+  const [audioActive, setAudioActive] = useState(false);
   const [subscribedActive, setSubscribedActive] = useState(false);
   const isSubscribed = useRef(false);
   const [isInRoom, setIsInRoom] = useState(false);
 
   const cameraStream = useRef<MediaStream>();
   const screenStream = useRef<MediaStream>();
+  const audioStream = useRef<MediaStream>();
 
   const remoteTracksMap = useRef<{
     [username: string]: {
       webcam?: MediaStreamTrack;
       screen?: MediaStreamTrack;
+      audio?: MediaStreamTrack;
     };
   }>({});
   const roomName = useRef("");
@@ -73,10 +79,13 @@ export default function Main() {
             username,
             isWebcam,
             isScreen,
+            isAudio,
             cameraStream,
             screenStream,
+            audioStream,
             webcamBtnRef,
             screenBtnRef,
+            audioBtnRef,
             remoteVideosContainerRef,
             producerTransport
           );
@@ -124,10 +133,14 @@ export default function Main() {
             event,
             device,
             username,
+            isWebcam,
+            isAudio,
             cameraStream,
             screenStream,
+            audioStream,
             webcamBtnRef,
             screenBtnRef,
+            audioBtnRef,
             remoteVideosContainerRef,
             producerTransport
           );
@@ -137,6 +150,7 @@ export default function Main() {
       }
     });
 
+    // User disconnect
     socket.current.on("userDisconnected", (disconnectedUsername) => {
       const oldVideo = document.getElementById(
         `live_video_track_${disconnectedUsername}`
@@ -144,15 +158,22 @@ export default function Main() {
       const oldScreen = document.getElementById(
         `screen_track_${disconnectedUsername}`
       );
+      const oldAudio = document.getElementById(
+        `audio_track_${disconnectedUsername}`
+      );
       if (oldVideo) {
         remoteVideosContainerRef.current?.removeChild(oldVideo);
       }
       if (oldScreen) {
         remoteVideosContainerRef.current?.removeChild(oldScreen);
       }
+      if (oldAudio) {
+        remoteVideosContainerRef.current?.removeChild(oldAudio);
+      }
       delete remoteTracksMap.current[disconnectedUsername];
     });
 
+    // Producer disconnect
     socket.current.on(
       "producerDisconnected",
       (disconnectedProducerUsername, producerType) => {
@@ -160,6 +181,7 @@ export default function Main() {
           if (disconnectedProducerUsername === username.current) {
             webcamBtnRef.current!.disabled = false;
             screenBtnRef.current!.disabled = false;
+            audioBtnRef.current!.disabled = false;
             const tracks = cameraStream.current?.getTracks();
 
             tracks?.forEach((track) => {
@@ -194,6 +216,7 @@ export default function Main() {
           if (disconnectedProducerUsername === username.current) {
             webcamBtnRef.current!.disabled = false;
             screenBtnRef.current!.disabled = false;
+            audioBtnRef.current!.disabled = false;
             const tracks = screenStream.current?.getTracks();
 
             tracks?.forEach((track) => {
@@ -224,7 +247,42 @@ export default function Main() {
             delete remoteTracksMap.current[disconnectedProducerUsername].screen;
           }
         }
-        if (!screenStream.current && !cameraStream.current) {
+        if (producerType === "audio") {
+          if (disconnectedProducerUsername === username.current) {
+            webcamBtnRef.current!.disabled = false;
+            screenBtnRef.current!.disabled = false;
+            audioBtnRef.current!.disabled = false;
+            const tracks = audioStream.current?.getTracks();
+
+            tracks?.forEach((track) => {
+              track.stop();
+            });
+            audioStream.current = undefined;
+          }
+          const oldAudio = document.getElementById(
+            `audio_track_${disconnectedProducerUsername}`
+          ) as HTMLVideoElement;
+          if (oldAudio) {
+            remoteVideosContainerRef.current?.removeChild(oldAudio);
+          }
+          if (
+            remoteTracksMap.current[disconnectedProducerUsername] &&
+            Object.keys(
+              remoteTracksMap.current[disconnectedProducerUsername] || {}
+            ).length == 1
+          ) {
+            remoteTracksMap.current[disconnectedProducerUsername].audio?.stop();
+            delete remoteTracksMap.current[disconnectedProducerUsername];
+          } else if (remoteTracksMap.current[disconnectedProducerUsername]) {
+            remoteTracksMap.current[disconnectedProducerUsername].audio?.stop();
+            delete remoteTracksMap.current[disconnectedProducerUsername].audio;
+          }
+        }
+        if (
+          !cameraStream.current &&
+          !screenStream.current &&
+          !audioStream.current
+        ) {
           producerTransport.current = undefined;
         }
       }
@@ -260,6 +318,31 @@ export default function Main() {
               } text-white font-bold py-2 px-3 disabled:opacity-25`}
             >
               {webcamActive ? "Remove Camera" : "Publish Camera"}
+            </button>
+          </div>
+          <div className='flex flex-col mx-2'>
+            <button
+              ref={audioBtnRef}
+              onClick={() =>
+                publishAudio(
+                  isAudio,
+                  audioBtnRef,
+                  webcamBtnRef,
+                  screenBtnRef,
+                  setAudioActive,
+                  socket,
+                  device,
+                  roomName,
+                  username
+                )
+              }
+              className={`${
+                audioActive
+                  ? "bg-orange-500 hover:bg-orange-700"
+                  : "bg-blue-500 hover:bg-blue-700"
+              } text-white font-bold py-2 px-3 disabled:opacity-25`}
+            >
+              {audioActive ? "Remove Audio" : "Publish Audio"}
             </button>
           </div>
           <div className='flex flex-col mx-2'>

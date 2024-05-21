@@ -48,25 +48,31 @@ import SVGMorpher from "../SVGMorpher/SVGMorpher";
 export default function VolumeSection({
   videoRef,
   volumeSliderRef,
+  iconSize = "2.5rem",
   handleMute,
+  primaryColor = "white",
   primaryVolumeSliderColor = "white",
   secondaryVolumeSliderColor = "rgba(150, 150, 150, 0.5)",
   defaultVolume = "high",
+  isSlider = true,
 }: {
   videoRef: React.RefObject<HTMLVideoElement>;
   volumeSliderRef: React.RefObject<HTMLInputElement>;
+  iconSize?: string;
   handleMute: () => void;
+  primaryColor?: string;
   primaryVolumeSliderColor?: string;
   secondaryVolumeSliderColor?: string;
   defaultVolume?: string;
+  isSlider?: boolean;
 }) {
   const [paths, setPaths] = useState<string[][]>([
-    [volumeHigh1a, volumeHighOffIB1a, volumeOff1a],
-    [volumeHigh1b, volumeHighOffIB1b, volumeOff1b],
-    [volumeHigh2a, volumeHighOffIB2a, volumeOff2a],
-    [volumeHigh2b, volumeHighOffIB2b, volumeOff2b],
-    [volumeHigh3a, volumeHighOffIB3a, volumeOff3a],
-    [volumeHigh3b, volumeHighOffIB3b, volumeOff3b],
+    [volumeOff1a, volumeHighOffIB1a, volumeHigh1a],
+    [volumeOff1b, volumeHighOffIB1b, volumeHigh1b],
+    [volumeOff2a, volumeHighOffIB2a, volumeHigh2a],
+    [volumeOff2b, volumeHighOffIB2b, volumeHigh2b],
+    [volumeOff3a, volumeHighOffIB3a, volumeHigh3a],
+    [volumeOff3b, volumeHighOffIB3b, volumeHigh3b],
   ]);
   const muteButtonRef = useRef<HTMLButtonElement>(null);
   const videoIconStateRef = useRef({ from: "", to: defaultVolume });
@@ -102,11 +108,11 @@ export default function VolumeSection({
   };
 
   const volumeChangeHandler = () => {
-    if (!volumeSliderRef.current || !videoRef.current) {
+    if (!videoRef.current) {
       return;
     }
 
-    if (!videoRef.current.muted) {
+    if (volumeSliderRef.current && !videoRef.current.muted) {
       volumeSliderRef.current.value = videoRef.current.volume.toString();
     }
 
@@ -198,7 +204,9 @@ export default function VolumeSection({
 
   useEffect(() => {
     // Set initial volume slider
-    trackColorSetter();
+    if (isSlider) {
+      trackColorSetter();
+    }
 
     videoRef.current?.addEventListener("volumechange", volumeChangeHandler);
 
@@ -215,14 +223,15 @@ export default function VolumeSection({
       <button
         ref={muteButtonRef}
         onClick={handleMute}
-        className='w-10 aspect-square flex items-center justify-center'
+        className='aspect-square flex items-center justify-center'
+        style={{ width: iconSize }}
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          width='36px'
-          height='36px'
+          width={`calc(${iconSize} - 0.25rem)`}
+          height={`calc(${iconSize} - 0.25rem)`}
           viewBox='250 250 500 580'
-          fill='white'
+          fill={primaryColor}
         >
           {videoIconStateRef.current.from && videoIconStateRef.current.to ? (
             <SVGMorpher
@@ -230,6 +239,7 @@ export default function VolumeSection({
               videoRef={videoRef}
               isFinishedRef={isFinishedRef}
               changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+              color={primaryColor}
             />
           ) : videoIconStateRef.current.from === "" &&
             videoIconStateRef.current.to === "high" ? (
@@ -264,15 +274,17 @@ export default function VolumeSection({
           ) : null}
         </svg>
       </button>
-      <input
-        ref={volumeSliderRef}
-        onInput={handleVolumeSlider}
-        className='volume-slider'
-        type='range'
-        min='0'
-        max='1'
-        step='any'
-      />
+      {isSlider && (
+        <input
+          ref={volumeSliderRef}
+          onInput={handleVolumeSlider}
+          className='volume-slider'
+          type='range'
+          min='0'
+          max='1'
+          step='any'
+        />
+      )}
     </div>
   );
 }

@@ -21,6 +21,14 @@ const onSubscribed = async (
           type: string;
           producerPaused: boolean;
         };
+        audio?: {
+          producerId: string;
+          id: string;
+          kind: "audio" | "video" | undefined;
+          rtpParameters: any;
+          type: string;
+          producerPaused: boolean;
+        };
       };
     };
   },
@@ -31,6 +39,7 @@ const onSubscribed = async (
     [username: string]: {
       webcam?: MediaStreamTrack | undefined;
       screen?: MediaStreamTrack | undefined;
+      audio?: MediaStreamTrack | undefined;
     };
   }>,
   subBtnRef: React.RefObject<HTMLButtonElement>
@@ -48,6 +57,7 @@ const onSubscribed = async (
     let newRemoteTrack: {
       webcam?: MediaStreamTrack;
       screen?: MediaStreamTrack;
+      audio?: MediaStreamTrack;
     } = {};
 
     if (subscriptions[producerUsername].webcam) {
@@ -74,6 +84,19 @@ const onSubscribed = async (
         rtpParameters,
       });
       newRemoteTrack.screen = consumer.track;
+    }
+
+    if (subscriptions[producerUsername].audio) {
+      const subscriptionAudioData = subscriptions[producerUsername].audio!;
+      const { producerId, id, kind, rtpParameters } = subscriptionAudioData;
+
+      const consumer = await consumerTransport.current.consume({
+        id,
+        producerId,
+        kind,
+        rtpParameters,
+      });
+      newRemoteTrack.audio = consumer.track;
     }
 
     remoteTracksMap.current[producerUsername] = newRemoteTrack;

@@ -28,7 +28,7 @@ const onCreateNewProducer = async (
     roomProducers[event.roomName] &&
     roomProducers[event.roomName][event.username] &&
     roomProducers[event.roomName][event.username][
-      event.producerType as "webcam" | "screen"
+      event.producerType as "webcam" | "screen" | "audio"
     ]
   ) {
     console.error("Producer already created for: ", event.username);
@@ -50,7 +50,7 @@ const onCreateNewProducer = async (
   }
 
   roomProducers[event.roomName][event.username][
-    event.producerType as "webcam" | "screen"
+    event.producerType as "webcam" | "screen" | "audio"
   ] = newProducer;
 
   const msg = {

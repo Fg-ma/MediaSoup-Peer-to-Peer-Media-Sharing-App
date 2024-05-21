@@ -11,10 +11,14 @@ const onNewProducer = async (
   },
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   username: React.MutableRefObject<string>,
+  isWebcam: React.MutableRefObject<boolean>,
+  isAudio: React.MutableRefObject<boolean>,
   cameraStream: React.MutableRefObject<MediaStream | undefined>,
   screenStream: React.MutableRefObject<MediaStream | undefined>,
+  audioStream: React.MutableRefObject<MediaStream | undefined>,
   webcamBtnRef: React.RefObject<HTMLButtonElement>,
   screenBtnRef: React.RefObject<HTMLButtonElement>,
+  audioBtnRef: React.RefObject<HTMLButtonElement>,
   remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
@@ -29,6 +33,7 @@ const onNewProducer = async (
     if (cameraStream.current) {
       webcamBtnRef.current!.disabled = false;
       screenBtnRef.current!.disabled = false;
+      audioBtnRef.current!.disabled = false;
 
       const track = cameraStream.current.getVideoTracks()[0];
       const params = {
@@ -44,28 +49,60 @@ const onNewProducer = async (
         return;
       }
 
-      const videoContainer = document.createElement("div");
+      if (isAudio.current && audioStream.current) {
+        const audioChild = document.getElementById(
+          `audio_track_${username.current}`
+        );
+        if (audioChild) {
+          remoteVideosContainerRef.current?.removeChild(audioChild);
+        }
 
-      videoContainer.id = `live_video_track_${username.current}`;
-      remoteVideosContainerRef.current?.appendChild(videoContainer);
+        const videoContainer = document.createElement("div");
+        videoContainer.id = `live_video_track_${username.current}`;
+        remoteVideosContainerRef.current?.appendChild(videoContainer);
 
-      const root = createRoot(videoContainer);
-      root.render(
-        React.createElement(FgVideo, {
-          stream: cameraStream.current,
-          flipVideo: true,
-          isPlayPause: false,
-          isVolume: false,
-          isTotalTime: false,
-          isPlaybackSpeed: false,
-          isClosedCaptions: false,
-          isTheater: false,
-          isTimeLine: false,
-          isSkip: false,
-          isThumbnail: false,
-          isPreview: false,
-        })
-      );
+        const root = createRoot(videoContainer);
+        root.render(
+          React.createElement(FgVideo, {
+            videoStream: cameraStream.current,
+            audioStream: audioStream.current,
+            isStream: true,
+            muted: true,
+            flipVideo: true,
+            isPlayPause: false,
+            isTotalTime: false,
+            isPlaybackSpeed: false,
+            isClosedCaptions: false,
+            isTheater: false,
+            isTimeLine: false,
+            isSkip: false,
+            isThumbnail: false,
+            isPreview: false,
+          })
+        );
+      } else {
+        const videoContainer = document.createElement("div");
+        videoContainer.id = `live_video_track_${username.current}`;
+        remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+        const root = createRoot(videoContainer);
+        root.render(
+          React.createElement(FgVideo, {
+            videoStream: cameraStream.current,
+            isStream: true,
+            flipVideo: true,
+            isPlayPause: false,
+            isTotalTime: false,
+            isPlaybackSpeed: false,
+            isClosedCaptions: false,
+            isTheater: false,
+            isTimeLine: false,
+            isSkip: false,
+            isThumbnail: false,
+            isPreview: false,
+          })
+        );
+      }
     }
   } else if (event.producerType === "screen") {
     if (screenStream.current) {
@@ -76,6 +113,8 @@ const onNewProducer = async (
     if (screenStream.current) {
       webcamBtnRef.current!.disabled = false;
       screenBtnRef.current!.disabled = false;
+      audioBtnRef.current!.disabled = false;
+
       const track = screenStream.current.getVideoTracks()[0];
       const params = {
         track: track,
@@ -86,7 +125,7 @@ const onNewProducer = async (
       try {
         await producerTransport.current?.produce(params);
       } catch {
-        console.error("Camera new transport failed to produce");
+        console.error("Screen new transport failed to produce");
         return;
       }
 
@@ -97,9 +136,9 @@ const onNewProducer = async (
       const root = createRoot(videoContainer);
       root.render(
         React.createElement(FgVideo, {
-          stream: screenStream.current,
+          videoStream: screenStream.current,
+          isStream: true,
           isPlayPause: false,
-          isVolume: false,
           isTotalTime: false,
           isPlaybackSpeed: false,
           isClosedCaptions: false,
@@ -110,6 +149,86 @@ const onNewProducer = async (
           isPreview: false,
         })
       );
+    }
+  } else if (event.producerType === "audio") {
+    if (audioStream.current) {
+      console.error("Already existing audio stream for: ", username.current);
+      return;
+    }
+    audioStream.current = await getBrowserMedia(event.producerType, device);
+    if (audioStream.current) {
+      webcamBtnRef.current!.disabled = false;
+      screenBtnRef.current!.disabled = false;
+      audioBtnRef.current!.disabled = false;
+
+      const track = audioStream.current.getAudioTracks()[0];
+      const params = {
+        track: track,
+        appData: {
+          producerType: "audio",
+        },
+      };
+      try {
+        await producerTransport.current?.produce(params);
+      } catch {
+        console.error("Audio new transport failed to produce");
+        return;
+      }
+
+      if (isWebcam.current && cameraStream.current) {
+        const liveVideoChild = document.getElementById(
+          `live_video_track_${username.current}`
+        );
+        if (liveVideoChild) {
+          remoteVideosContainerRef.current?.removeChild(liveVideoChild);
+        }
+
+        const videoContainer = document.createElement("div");
+        videoContainer.id = `live_video_track_${username.current}`;
+        remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+        const root = createRoot(videoContainer);
+        root.render(
+          React.createElement(FgVideo, {
+            videoStream: cameraStream.current,
+            audioStream: audioStream.current,
+            isStream: true,
+            muted: true,
+            flipVideo: true,
+            isPlayPause: false,
+            isTotalTime: false,
+            isPlaybackSpeed: false,
+            isClosedCaptions: false,
+            isTheater: false,
+            isTimeLine: false,
+            isSkip: false,
+            isThumbnail: false,
+            isPreview: false,
+          })
+        );
+      } else {
+        const videoContainer = document.createElement("div");
+        videoContainer.id = `audio_track_${username.current}`;
+        remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+        const root = createRoot(videoContainer);
+        root.render(
+          React.createElement(FgVideo, {
+            audioStream: audioStream.current,
+            isStream: true,
+            muted: true,
+            isPlayPause: false,
+            isTotalTime: false,
+            isPlaybackSpeed: false,
+            isClosedCaptions: false,
+            isTheater: false,
+            isTimeLine: false,
+            isSkip: false,
+            isThumbnail: false,
+            isPreview: false,
+          })
+        );
+      }
     }
   }
 };

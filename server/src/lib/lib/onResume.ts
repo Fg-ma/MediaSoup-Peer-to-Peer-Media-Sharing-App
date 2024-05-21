@@ -27,6 +27,13 @@ const onResume = async (
           producerUsername
         ].screen?.consumer.resume();
       }
+      if (
+        roomConsumers[event.roomName][event.username][producerUsername].audio
+      ) {
+        await roomConsumers[event.roomName][event.username][
+          producerUsername
+        ].audio?.consumer.resume();
+      }
     } catch (error) {
       console.error(
         "Failed to resume consumer for user:",

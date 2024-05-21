@@ -27,6 +27,7 @@ const onConsumerTransportCreated = async (
     [username: string]: {
       webcam?: MediaStreamTrack | undefined;
       screen?: MediaStreamTrack | undefined;
+      audio?: MediaStreamTrack | undefined;
     };
   }>
 ) => {
@@ -75,6 +76,9 @@ const onConsumerTransportCreated = async (
         const userScreen = document.getElementById(
           `screen_track_${username.current}`
         );
+        const userAudio = document.getElementById(
+          `audio_track_${username.current}`
+        );
 
         remoteVideosContainerRef.current.innerHTML = "";
 
@@ -84,40 +88,139 @@ const onConsumerTransportCreated = async (
         if (userScreen) {
           remoteVideosContainerRef.current.appendChild(userScreen);
         }
+        if (userAudio) {
+          remoteVideosContainerRef.current.appendChild(userAudio);
+        }
 
         Object.entries(remoteTracksMap.current).forEach(
           ([trackUsername, tracks]) => {
             for (const [trackType, trackData] of Object.entries(tracks)) {
-              const videoContainer = document.createElement("div");
-              let flipVideo = false;
-              if (trackType === "webcam") {
-                videoContainer.id = `live_video_track_${trackUsername}`;
-                flipVideo = true;
-              } else if (trackType === "screen") {
-                videoContainer.id = `screen_track_${trackUsername}`;
-              }
-              remoteVideosContainerRef.current?.appendChild(videoContainer);
-
               const stream = new MediaStream();
               stream.addTrack(trackData);
 
-              const root = createRoot(videoContainer);
-              root.render(
-                React.createElement(FgVideo, {
-                  stream,
-                  flipVideo,
-                  isPlayPause: false,
-                  isVolume: false,
-                  isTotalTime: false,
-                  isPlaybackSpeed: false,
-                  isClosedCaptions: false,
-                  isTheater: false,
-                  isTimeLine: false,
-                  isSkip: false,
-                  isThumbnail: false,
-                  isPreview: false,
-                })
-              );
+              if (
+                trackType === "webcam" &&
+                remoteTracksMap.current[trackUsername].audio
+              ) {
+                const audioChild = document.getElementById(
+                  `audio_track_${trackUsername}`
+                );
+                if (audioChild) {
+                  remoteVideosContainerRef.current?.removeChild(audioChild);
+                }
+                const liveVideoChild = document.getElementById(
+                  `live_video_track_${trackUsername}`
+                );
+                if (liveVideoChild) {
+                  remoteVideosContainerRef.current?.removeChild(liveVideoChild);
+                }
+
+                const audioStream = new MediaStream();
+                audioStream.addTrack(
+                  remoteTracksMap.current[trackUsername].audio!
+                );
+
+                const videoContainer = document.createElement("div");
+                videoContainer.id = `live_video_track_${trackUsername}`;
+                remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+                const root = createRoot(videoContainer);
+                root.render(
+                  React.createElement(FgVideo, {
+                    videoStream: stream,
+                    audioStream: audioStream,
+                    isStream: true,
+                    flipVideo: true,
+                    isPlayPause: false,
+                    isTotalTime: false,
+                    isPlaybackSpeed: false,
+                    isClosedCaptions: false,
+                    isTheater: false,
+                    isTimeLine: false,
+                    isSkip: false,
+                    isThumbnail: false,
+                    isPreview: false,
+                  })
+                );
+              } else if (
+                trackType === "audio" &&
+                remoteTracksMap.current[trackUsername].webcam
+              ) {
+                const audioChild = document.getElementById(
+                  `audio_track_${trackUsername}`
+                );
+                if (audioChild) {
+                  remoteVideosContainerRef.current?.removeChild(audioChild);
+                }
+                const liveVideoChild = document.getElementById(
+                  `live_video_track_${trackUsername}`
+                );
+                if (liveVideoChild) {
+                  remoteVideosContainerRef.current?.removeChild(liveVideoChild);
+                }
+
+                const cameraStream = new MediaStream();
+                cameraStream.addTrack(
+                  remoteTracksMap.current[trackUsername].webcam!
+                );
+
+                const videoContainer = document.createElement("div");
+                videoContainer.id = `live_video_track_${trackUsername}`;
+                remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+                const root = createRoot(videoContainer);
+                root.render(
+                  React.createElement(FgVideo, {
+                    videoStream: cameraStream,
+                    audioStream: stream,
+                    isStream: true,
+                    flipVideo: true,
+                    isPlayPause: false,
+                    isTotalTime: false,
+                    isPlaybackSpeed: false,
+                    isClosedCaptions: false,
+                    isTheater: false,
+                    isTimeLine: false,
+                    isSkip: false,
+                    isThumbnail: false,
+                    isPreview: false,
+                  })
+                );
+              } else {
+                const videoContainer = document.createElement("div");
+                let flipVideo = false;
+                if (trackType === "webcam") {
+                  videoContainer.id = `live_video_track_${trackUsername}`;
+                  flipVideo = true;
+                } else if (trackType === "screen") {
+                  videoContainer.id = `screen_track_${trackUsername}`;
+                } else if (trackType === "audio") {
+                  videoContainer.id = `audio_track_${trackUsername}`;
+                }
+                remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+                const root = createRoot(videoContainer);
+                root.render(
+                  React.createElement(FgVideo, {
+                    videoStream:
+                      trackType === "webcam" || trackType === "screen"
+                        ? stream
+                        : undefined,
+                    audioStream: trackType === "audio" ? stream : undefined,
+                    isStream: true,
+                    flipVideo,
+                    isPlayPause: false,
+                    isTotalTime: false,
+                    isPlaybackSpeed: false,
+                    isClosedCaptions: false,
+                    isTheater: false,
+                    isTimeLine: false,
+                    isSkip: false,
+                    isThumbnail: false,
+                    isPreview: false,
+                  })
+                );
+              }
             }
           }
         );

@@ -9,7 +9,13 @@ import { roomConsumerTransports } from "./mediasoupVars";
 const createConsumer = async (
   roomName: string,
   username: string,
-  producers: { [username: string]: { webcam?: Producer; screen?: Producer } },
+  producers: {
+    [username: string]: {
+      webcam?: Producer;
+      screen?: Producer;
+      audio?: Producer;
+    };
+  },
   rtpCapabilities: RtpCapabilities,
   mediasoupRouter: Router
 ) => {
@@ -37,6 +43,15 @@ const createConsumer = async (
         producerPaused: boolean;
       };
       screen?: {
+        consumer: Consumer;
+        producerId: string;
+        id: string;
+        kind: string;
+        rtpParameters: any;
+        type: string;
+        producerPaused: boolean;
+      };
+      audio?: {
         consumer: Consumer;
         producerId: string;
         id: string;
@@ -122,6 +137,47 @@ const createConsumer = async (
         consumers[producerUsername].screen = {
           consumer: consumer,
           producerId: screenProducer.id,
+          id: consumer.id,
+          kind: consumer.kind,
+          rtpParameters: consumer.rtpParameters,
+          type: consumer.type,
+          producerPaused: consumer.producerPaused,
+        };
+      } catch (error) {
+        console.error("consume failed: ", error);
+        continue;
+      }
+    }
+
+    const audioProducer = producers[producerUsername].audio;
+
+    if (audioProducer) {
+      // Check if consumer transport can consume from this producer
+      if (
+        !mediasoupRouter.canConsume({
+          producerId: audioProducer.id,
+          rtpCapabilities,
+        })
+      ) {
+        console.error(`Cannot consume from producer ${audioProducer.id}`);
+        continue;
+      }
+
+      try {
+        // Create a consumer for the producer
+        const consumer = await transport.consume({
+          producerId: audioProducer.id,
+          rtpCapabilities,
+          paused: audioProducer.kind === "audio",
+        });
+
+        // Store the consumer in the consumers object
+        if (!consumers[producerUsername]) {
+          consumers[producerUsername] = {};
+        }
+        consumers[producerUsername].audio = {
+          consumer: consumer,
+          producerId: audioProducer.id,
           id: consumer.id,
           kind: consumer.kind,
           rtpParameters: consumer.rtpParameters,

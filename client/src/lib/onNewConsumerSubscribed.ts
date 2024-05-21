@@ -12,7 +12,7 @@ const onNewConsumerSubscribed = async (
     data: {
       producerId: string;
       id: string;
-      kind: "audio" | "video" | undefined;
+      kind: "audio" | "video" | "audio" | undefined;
       rtpParameters: mediasoup.types.RtpParameters;
       type: string;
       producerPaused: boolean;
@@ -29,6 +29,7 @@ const onNewConsumerSubscribed = async (
     [username: string]: {
       webcam?: MediaStreamTrack | undefined;
       screen?: MediaStreamTrack | undefined;
+      audio?: MediaStreamTrack | undefined;
     };
   }>
 ) => {
@@ -49,7 +50,7 @@ const onNewConsumerSubscribed = async (
     remoteTracksMap.current[event.producerUsername] = {};
   }
   remoteTracksMap.current[event.producerUsername][
-    event.consumerType as "webcam" | "screen"
+    event.consumerType as "webcam" | "screen" | "audio"
   ] = consumer.track;
 
   // Create a new video element
@@ -60,6 +61,8 @@ const onNewConsumerSubscribed = async (
     flipVideo = true;
   } else if (event.consumerType === "screen") {
     videoContainer.id = `screen_track_${event.producerUsername}`;
+  } else if (event.consumerType === "audio") {
+    videoContainer.id = `audio_track_${event.producerUsername}`;
   }
   remoteVideosContainerRef.current?.appendChild(videoContainer);
 
@@ -70,10 +73,14 @@ const onNewConsumerSubscribed = async (
   const root = createRoot(videoContainer);
   root.render(
     React.createElement(FgVideo, {
-      stream,
+      videoStream:
+        event.consumerType === "webcam" || event.consumerType === "screen"
+          ? stream
+          : undefined,
+      audioStream: event.consumerType === "audio" ? stream : undefined,
+      isStream: true,
       flipVideo,
       isPlayPause: false,
-      isVolume: false,
       isTotalTime: false,
       isPlaybackSpeed: false,
       isClosedCaptions: false,
