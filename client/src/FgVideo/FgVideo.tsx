@@ -1,8 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
 import VolumeSection from "./VolumeSection";
 
 export default function FgVideo({
+  socket,
+  roomName,
+  username,
   videoStream,
   audioStream,
   isStream = false,
@@ -11,6 +15,7 @@ export default function FgVideo({
   autoPlay = true,
   muted = false,
   flipVideo = false,
+  isSlider = true,
   primaryVolumeSliderColor,
   secondaryVolumeSliderColor,
   skipIncrement = 10,
@@ -34,7 +39,12 @@ export default function FgVideo({
   isSkip = true,
   isThumbnail = true,
   isPreview = true,
+  muteButtonCallback,
+  initialMute = false,
 }: {
+  socket: React.MutableRefObject<Socket>;
+  roomName: React.MutableRefObject<string>;
+  username: React.MutableRefObject<string>;
   videoStream?: MediaStream;
   audioStream?: MediaStream;
   isStream?: boolean;
@@ -43,6 +53,7 @@ export default function FgVideo({
   autoPlay?: boolean;
   muted?: boolean;
   flipVideo?: boolean;
+  isSlider?: boolean;
   primaryVolumeSliderColor?: string;
   secondaryVolumeSliderColor?: string;
   skipIncrement?: number;
@@ -66,6 +77,8 @@ export default function FgVideo({
   isSkip?: boolean;
   isThumbnail?: boolean;
   isPreview?: boolean;
+  muteButtonCallback?: any;
+  initialMute?: boolean;
 }) {
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
@@ -85,8 +98,10 @@ export default function FgVideo({
   const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
   const captions = useRef<TextTrack | undefined>();
   const thumbnails = useRef<string[]>([]);
+  const muteLock = useRef(false);
 
   const init = () => {
+    // Combine all streams into one
     if (videoRef.current && isStream) {
       const combinedStream = new MediaStream();
 
@@ -103,6 +118,21 @@ export default function FgVideo({
       }
 
       videoRef.current.srcObject = combinedStream;
+    }
+
+    // Handle initial mute
+    if (videoRef.current && videoRef.current.srcObject instanceof MediaStream) {
+      const mediaStream = videoRef.current.srcObject;
+      mediaStream.getAudioTracks().forEach((track) => {
+        if (videoRef.current) {
+          track.enabled = !initialMute;
+        }
+      });
+
+      videoRef.current.muted = initialMute;
+    }
+    if (videoRef.current && videoRef.current.muted && volumeSliderRef.current) {
+      volumeSliderRef.current.value = "0";
     }
 
     // Get captions and set them to hidden initially
@@ -481,13 +511,30 @@ export default function FgVideo({
   };
 
   const handleMute = () => {
-    if (!videoRef.current) {
+    if (!videoRef.current || muteLock.current) {
       return;
     }
 
-    videoRef.current.muted = !videoRef.current.muted;
+    if (videoRef.current && videoRef.current.srcObject instanceof MediaStream) {
+      const mediaStream = videoRef.current.srcObject;
+      mediaStream.getAudioTracks().forEach((track) => {
+        if (videoRef.current) {
+          track.enabled = videoRef.current.muted;
+        }
+      });
+
+      videoRef.current.muted = !videoRef.current.muted;
+    }
+    if (videoRef.current.muted) {
+      videoContainerRef.current?.classList.add("mute");
+    } else {
+      videoContainerRef.current?.classList.remove("mute");
+    }
     if (videoRef.current.muted && volumeSliderRef.current) {
       volumeSliderRef.current.value = "0";
+    }
+    if (muteButtonCallback) {
+      muteButtonCallback();
     }
   };
 
@@ -705,10 +752,13 @@ export default function FgVideo({
                 <VolumeSection
                   videoRef={videoRef}
                   volumeSliderRef={volumeSliderRef}
+                  videoContainerRef={videoContainerRef}
                   handleMute={handleMute}
                   primaryVolumeSliderColor={primaryVolumeSliderColor}
                   secondaryVolumeSliderColor={secondaryVolumeSliderColor}
-                  isSlider={audioStream ? false : true}
+                  isSlider={isSlider}
+                  initialVolume={initialMute ? "off" : "high"}
+                  muteLock={muteLock}
                 />
               )}
               <div className='duration-container flex items-center gap-1 grow'>
@@ -835,12 +885,15 @@ export default function FgVideo({
           <VolumeSection
             videoRef={videoRef}
             volumeSliderRef={volumeSliderRef}
+            videoContainerRef={videoContainerRef}
             iconSize='5rem'
             handleMute={handleMute}
             primaryColor={"black"}
             primaryVolumeSliderColor={primaryVolumeSliderColor}
             secondaryVolumeSliderColor={secondaryVolumeSliderColor}
             isSlider={false}
+            initialVolume={initialMute ? "off" : "high"}
+            muteLock={muteLock}
           />
         </div>
       )}

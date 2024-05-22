@@ -5,6 +5,7 @@ const publishCamera = (
   isWebcam: React.MutableRefObject<boolean>,
   webcamBtnRef: React.RefObject<HTMLButtonElement>,
   screenBtnRef: React.RefObject<HTMLButtonElement>,
+  audioBtnRef: React.RefObject<HTMLButtonElement>,
   setWebcamActive: (value: React.SetStateAction<boolean>) => void,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -17,6 +18,7 @@ const publishCamera = (
   }
   webcamBtnRef.current!.disabled = true;
   screenBtnRef.current!.disabled = true;
+  audioBtnRef.current!.disabled = true;
   isWebcam.current = !isWebcam.current;
   setWebcamActive((prev) => !prev);
 

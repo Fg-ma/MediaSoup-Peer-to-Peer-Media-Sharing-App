@@ -100,6 +100,7 @@ const onConsumerTransportCreated = async (
 
               if (
                 trackType === "webcam" &&
+                remoteTracksMap.current[trackUsername] &&
                 remoteTracksMap.current[trackUsername].audio
               ) {
                 const audioChild = document.getElementById(
@@ -108,12 +109,6 @@ const onConsumerTransportCreated = async (
                 if (audioChild) {
                   remoteVideosContainerRef.current?.removeChild(audioChild);
                 }
-                const liveVideoChild = document.getElementById(
-                  `live_video_track_${trackUsername}`
-                );
-                if (liveVideoChild) {
-                  remoteVideosContainerRef.current?.removeChild(liveVideoChild);
-                }
 
                 const audioStream = new MediaStream();
                 audioStream.addTrack(
@@ -121,12 +116,15 @@ const onConsumerTransportCreated = async (
                 );
 
                 const videoContainer = document.createElement("div");
-                videoContainer.id = `live_video_track_${trackUsername}`;
+                videoContainer.id = `live_video_audio_track_${trackUsername}`;
                 remoteVideosContainerRef.current?.appendChild(videoContainer);
 
                 const root = createRoot(videoContainer);
                 root.render(
                   React.createElement(FgVideo, {
+                    socket: socket,
+                    roomName: roomName,
+                    username: username,
                     videoStream: stream,
                     audioStream: audioStream,
                     isStream: true,
@@ -143,8 +141,9 @@ const onConsumerTransportCreated = async (
                   })
                 );
               } else if (
-                trackType === "audio" &&
-                remoteTracksMap.current[trackUsername].webcam
+                trackType === "screen" &&
+                remoteTracksMap.current[trackUsername] &&
+                remoteTracksMap.current[trackUsername].audio
               ) {
                 const audioChild = document.getElementById(
                   `audio_track_${trackUsername}`
@@ -152,29 +151,25 @@ const onConsumerTransportCreated = async (
                 if (audioChild) {
                   remoteVideosContainerRef.current?.removeChild(audioChild);
                 }
-                const liveVideoChild = document.getElementById(
-                  `live_video_track_${trackUsername}`
-                );
-                if (liveVideoChild) {
-                  remoteVideosContainerRef.current?.removeChild(liveVideoChild);
-                }
 
-                const cameraStream = new MediaStream();
-                cameraStream.addTrack(
-                  remoteTracksMap.current[trackUsername].webcam!
+                const audioStream = new MediaStream();
+                audioStream.addTrack(
+                  remoteTracksMap.current[trackUsername].audio!
                 );
 
                 const videoContainer = document.createElement("div");
-                videoContainer.id = `live_video_track_${trackUsername}`;
+                videoContainer.id = `screen_audio_track_${trackUsername}`;
                 remoteVideosContainerRef.current?.appendChild(videoContainer);
 
                 const root = createRoot(videoContainer);
                 root.render(
                   React.createElement(FgVideo, {
-                    videoStream: cameraStream,
-                    audioStream: stream,
+                    socket: socket,
+                    roomName: roomName,
+                    username: username,
+                    videoStream: stream,
+                    audioStream: audioStream,
                     isStream: true,
-                    flipVideo: true,
                     isPlayPause: false,
                     isTotalTime: false,
                     isPlaybackSpeed: false,
@@ -186,6 +181,92 @@ const onConsumerTransportCreated = async (
                     isPreview: false,
                   })
                 );
+              } else if (
+                (trackType === "audio" &&
+                  remoteTracksMap.current[trackUsername] &&
+                  remoteTracksMap.current[trackUsername].webcam) ||
+                (remoteTracksMap.current[trackUsername] &&
+                  remoteTracksMap.current[trackUsername].screen)
+              ) {
+                if (remoteTracksMap.current[trackUsername].webcam) {
+                  const liveVideoChild = document.getElementById(
+                    `live_video_track_${trackUsername}`
+                  );
+                  if (liveVideoChild) {
+                    remoteVideosContainerRef.current?.removeChild(
+                      liveVideoChild
+                    );
+                  }
+
+                  const cameraStream = new MediaStream();
+                  cameraStream.addTrack(
+                    remoteTracksMap.current[trackUsername].webcam!
+                  );
+
+                  const videoContainer = document.createElement("div");
+                  videoContainer.id = `live_video_audio_track_${trackUsername}`;
+                  remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+                  const root = createRoot(videoContainer);
+                  root.render(
+                    React.createElement(FgVideo, {
+                      socket: socket,
+                      roomName: roomName,
+                      username: username,
+                      videoStream: cameraStream,
+                      audioStream: stream,
+                      isStream: true,
+                      flipVideo: true,
+                      isPlayPause: false,
+                      isTotalTime: false,
+                      isPlaybackSpeed: false,
+                      isClosedCaptions: false,
+                      isTheater: false,
+                      isTimeLine: false,
+                      isSkip: false,
+                      isThumbnail: false,
+                      isPreview: false,
+                    })
+                  );
+                }
+                if (remoteTracksMap.current[trackUsername].screen) {
+                  const screenChild = document.getElementById(
+                    `screen_track_${trackUsername}`
+                  );
+                  if (screenChild) {
+                    remoteVideosContainerRef.current?.removeChild(screenChild);
+                  }
+
+                  const screenStream = new MediaStream();
+                  screenStream.addTrack(
+                    remoteTracksMap.current[trackUsername].screen!
+                  );
+
+                  const videoContainer = document.createElement("div");
+                  videoContainer.id = `screen_audio_track_${trackUsername}`;
+                  remoteVideosContainerRef.current?.appendChild(videoContainer);
+
+                  const root = createRoot(videoContainer);
+                  root.render(
+                    React.createElement(FgVideo, {
+                      socket: socket,
+                      roomName: roomName,
+                      username: username,
+                      videoStream: screenStream,
+                      audioStream: stream,
+                      isStream: true,
+                      isPlayPause: false,
+                      isTotalTime: false,
+                      isPlaybackSpeed: false,
+                      isClosedCaptions: false,
+                      isTheater: false,
+                      isTimeLine: false,
+                      isSkip: false,
+                      isThumbnail: false,
+                      isPreview: false,
+                    })
+                  );
+                }
               } else {
                 const videoContainer = document.createElement("div");
                 let flipVideo = false;
@@ -202,6 +283,9 @@ const onConsumerTransportCreated = async (
                 const root = createRoot(videoContainer);
                 root.render(
                   React.createElement(FgVideo, {
+                    socket: socket,
+                    roomName: roomName,
+                    username: username,
                     videoStream:
                       trackType === "webcam" || trackType === "screen"
                         ? stream
@@ -210,6 +294,10 @@ const onConsumerTransportCreated = async (
                     isStream: true,
                     flipVideo,
                     isPlayPause: false,
+                    isVolume:
+                      trackType === "webcam" || trackType === "screen"
+                        ? false
+                        : true,
                     isTotalTime: false,
                     isPlaybackSpeed: false,
                     isClosedCaptions: false,

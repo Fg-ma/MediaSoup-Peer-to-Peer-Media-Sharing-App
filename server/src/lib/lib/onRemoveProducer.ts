@@ -72,11 +72,13 @@ const onRemoveProducer = async (
       delete roomProducers[event.roomName];
     }
 
-    io.to(event.roomName).emit(
-      "producerDisconnected",
-      event.username,
-      event.producerType
-    );
+    const msg = {
+      type: "producerDisconnected",
+      producerUsername: event.username,
+      producerType: event.producerType,
+    };
+
+    io.to(event.roomName).emit("message", msg);
   } catch (error) {
     console.error(error);
   }
