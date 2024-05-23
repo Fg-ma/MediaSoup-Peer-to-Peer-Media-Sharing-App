@@ -1,16 +1,17 @@
 import { interpolate } from "flubber";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, animate, useMotionValue, useTransform } from "framer-motion";
+import { volumeOff1a } from "../FgVideo/paths";
 
 export default function SVGMorpher({
   pathsArray,
-  videoRef,
+  audioRef,
   isFinishedRef,
   changedWhileNotFinishedRef,
   color = "white",
 }: {
   pathsArray: string[][];
-  videoRef: React.RefObject<HTMLVideoElement>;
+  audioRef: React.RefObject<HTMLAudioElement>;
   isFinishedRef: React.MutableRefObject<boolean>;
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   color?: string;
@@ -60,9 +61,9 @@ export default function SVGMorpher({
         if (changedWhileNotFinishedRef.current) {
           setTimeout(() => {
             changedWhileNotFinishedRef.current = false;
-            if (videoRef.current) {
-              const currentVolume = videoRef.current.volume ?? 0;
-              videoRef.current.volume = Math.min(
+            if (audioRef.current) {
+              const currentVolume = audioRef.current.volume ?? 0;
+              audioRef.current.volume = Math.min(
                 Math.abs(currentVolume - 0.0000000000001),
                 1
               );

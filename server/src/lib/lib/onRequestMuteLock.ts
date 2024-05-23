@@ -1,20 +1,19 @@
 import { Server as SocketIOServer } from "socket.io";
 
-const onMuteLock = (
+const onRequestMuteLock = (
   event: {
     type: string;
-    isMuteLock: boolean;
     roomName: string;
     username: string;
+    producerUsername: string;
   },
   io: SocketIOServer
 ) => {
   const msg = {
-    type: "muteLockChange",
-    isMuteLock: event.isMuteLock,
+    type: "requestedMuteLock",
     username: event.username,
   };
-  io.to(event.roomName).emit("message", msg);
+  io.to(`${event.roomName}_${event.producerUsername}`).emit("message", msg);
 };
 
-export default onMuteLock;
+export default onRequestMuteLock;

@@ -37,27 +37,14 @@ const subscribe = (
     socket.current.send(msg);
   } else if (!isSubscribed.current) {
     consumerTransport.current = undefined;
-    for (const producerUsername in remoteTracksMap.current) {
-      const oldVideo = document.getElementById(
-        `live_video_track_${producerUsername}`
-      );
-      const oldScreen = document.getElementById(
-        `screen_track_${producerUsername}`
-      );
-      const oldAudio = document.getElementById(
-        `audio_track_${producerUsername}`
-      );
-      if (oldVideo) {
-        remoteVideosContainerRef.current?.removeChild(oldVideo);
+
+    for (const username in remoteTracksMap.current) {
+      const oldBundle = document.getElementById(`${username}_bundle`);
+      if (oldBundle) {
+        remoteVideosContainerRef.current?.removeChild(oldBundle);
       }
-      if (oldScreen) {
-        remoteVideosContainerRef.current?.removeChild(oldScreen);
-      }
-      if (oldAudio) {
-        remoteVideosContainerRef.current?.removeChild(oldAudio);
-      }
-      delete remoteTracksMap.current[producerUsername];
     }
+    remoteTracksMap.current = {};
 
     const msg = {
       type: "unsubscribe",

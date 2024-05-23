@@ -1,9 +1,9 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
+import { Root, createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import getBrowserMedia from "../getBrowserMedia";
-import FgVideo from "../FgVideo/FgVideo";
+import Bundle from "../Bundle";
 
 const onProducerTransportCreated = async (
   event: {
@@ -33,8 +33,7 @@ const onProducerTransportCreated = async (
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  muteAudio: () => void,
-  mutedAudioRef: React.MutableRefObject<boolean>
+  muteAudio: () => void
 ) => {
   if (event.error) {
     console.error("Producer transport create error: ", event.error);
@@ -93,260 +92,34 @@ const onProducerTransportCreated = async (
       case "connecting":
         break;
       case "connected":
-        if (isWebcam.current && cameraStream.current) {
-          webcamBtnRef.current!.disabled = false;
-          screenBtnRef.current!.disabled = false;
-          audioBtnRef.current!.disabled = false;
+        webcamBtnRef.current!.disabled = false;
+        screenBtnRef.current!.disabled = false;
+        audioBtnRef.current!.disabled = false;
 
-          if (isAudio.current && audioStream.current) {
-            const audioChild = document.getElementById(
-              `audio_track_${username.current}`
-            );
-            if (audioChild) {
-              remoteVideosContainerRef.current?.removeChild(audioChild);
-            }
+        if (remoteVideosContainerRef.current) {
+          const bundleContainer = document.createElement("div");
+          bundleContainer.id = `${username.current}_bundle`;
+          remoteVideosContainerRef.current.append(bundleContainer);
 
-            const videoContainer = document.createElement("div");
-            videoContainer.id = `live_video_audio_track_${username.current}`;
-            remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-            const root = createRoot(videoContainer);
-            root.render(
-              React.createElement(FgVideo, {
-                socket: socket,
-                roomName: roomName,
-                username: username,
-                videoStream: cameraStream.current,
-                audioStream: audioStream.current,
-                isStream: true,
-                muted: true,
-                flipVideo: true,
-                isSlider: false,
-                isPlayPause: false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: false,
-                isTheater: false,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-                muteButtonCallback: muteAudio,
-                initialMute: mutedAudioRef.current,
-              })
-            );
-          } else {
-            const videoContainer = document.createElement("div");
-            videoContainer.id = `live_video_track_${username.current}`;
-            remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-            const root = createRoot(videoContainer);
-            root.render(
-              React.createElement(FgVideo, {
-                socket: socket,
-                roomName: roomName,
-                username: username,
-                videoStream: cameraStream.current,
-                isStream: true,
-                flipVideo: true,
-                isPlayPause: false,
-                isVolume: false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: false,
-                isTheater: false,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-              })
-            );
-          }
-        }
-        if (isScreen.current && screenStream.current) {
-          webcamBtnRef.current!.disabled = false;
-          screenBtnRef.current!.disabled = false;
-          audioBtnRef.current!.disabled = false;
-
-          if (isAudio.current && audioStream.current) {
-            const audioChild = document.getElementById(
-              `audio_track_${username.current}`
-            );
-            if (audioChild) {
-              remoteVideosContainerRef.current?.removeChild(audioChild);
-            }
-
-            const videoContainer = document.createElement("div");
-            videoContainer.id = `screen_audio_track_${username.current}`;
-            remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-            const root = createRoot(videoContainer);
-            root.render(
-              React.createElement(FgVideo, {
-                socket: socket,
-                roomName: roomName,
-                username: username,
-                videoStream: screenStream.current,
-                audioStream: audioStream.current,
-                isStream: true,
-                isSlider: false,
-                isPlayPause: false,
-                isVolume: false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: false,
-                isTheater: false,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-                muteButtonCallback: muteAudio,
-                initialMute: mutedAudioRef.current,
-              })
-            );
-          } else {
-            const videoContainer = document.createElement("div");
-            videoContainer.id = `screen_track_${username.current}`;
-            remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-            const root = createRoot(videoContainer);
-            root.render(
-              React.createElement(FgVideo, {
-                socket: socket,
-                roomName: roomName,
-                username: username,
-                videoStream: screenStream.current,
-                isStream: true,
-                isPlayPause: false,
-                isVolume: false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: false,
-                isTheater: false,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-              })
-            );
-          }
-        }
-        if (isAudio.current && audioStream.current) {
-          webcamBtnRef.current!.disabled = false;
-          screenBtnRef.current!.disabled = false;
-          audioBtnRef.current!.disabled = false;
-
-          if (isWebcam.current && cameraStream.current) {
-            const liveVideoChild = document.getElementById(
-              `live_video_track_${username.current}`
-            );
-            if (liveVideoChild) {
-              remoteVideosContainerRef.current?.removeChild(liveVideoChild);
-            }
-
-            const videoContainer = document.createElement("div");
-            videoContainer.id = `live_video_audio_track_${username.current}`;
-            remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-            const root = createRoot(videoContainer);
-            root.render(
-              React.createElement(FgVideo, {
-                socket: socket,
-                roomName: roomName,
-                username: username,
-                videoStream: cameraStream.current,
-                audioStream: audioStream.current,
-                isStream: true,
-                muted: true,
-                flipVideo: true,
-                isSlider: false,
-                isPlayPause: false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: false,
-                isTheater: false,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-                muteButtonCallback: muteAudio,
-                initialMute: mutedAudioRef.current,
-              })
-            );
-          }
-          if (isScreen.current && screenStream.current) {
-            const screenChild = document.getElementById(
-              `screen_track_${username.current}`
-            );
-            if (screenChild) {
-              remoteVideosContainerRef.current?.removeChild(screenChild);
-            }
-
-            const videoContainer = document.createElement("div");
-            videoContainer.id = `screen_audio_track_${username.current}`;
-            remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-            const root = createRoot(videoContainer);
-            root.render(
-              React.createElement(FgVideo, {
-                socket: socket,
-                roomName: roomName,
-                username: username,
-                videoStream: screenStream.current,
-                audioStream: audioStream.current,
-                isStream: true,
-                muted: true,
-                isSlider: false,
-                isPlayPause: false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: false,
-                isTheater: false,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-                muteButtonCallback: muteAudio,
-                initialMute: mutedAudioRef.current,
-              })
-            );
-          }
-          if (
-            !isWebcam.current &&
-            !cameraStream.current &&
-            !isScreen.current &&
-            !screenStream.current
-          ) {
-            const videoContainer = document.createElement("div");
-            videoContainer.id = `audio_track_${username.current}`;
-            remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-            const root = createRoot(videoContainer);
-            root.render(
-              React.createElement(FgVideo, {
-                socket: socket,
-                roomName: roomName,
-                username: username,
-                audioStream: audioStream.current,
-                isStream: true,
-                muted: true,
-                isPlayPause: false,
-                isVolume: false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: false,
-                isPictureInPicture: false,
-                isTheater: false,
-                isFullScreen: false,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-                muteButtonCallback: muteAudio,
-                initialMute: mutedAudioRef.current,
-              })
-            );
-          }
+          const root = createRoot(bundleContainer);
+          root.render(
+            React.createElement(Bundle, {
+              cameraStream:
+                isWebcam.current && cameraStream.current
+                  ? cameraStream.current
+                  : undefined,
+              screenStream:
+                isScreen.current && screenStream.current
+                  ? screenStream.current
+                  : undefined,
+              audioStream:
+                isAudio.current && audioStream.current
+                  ? audioStream.current
+                  : undefined,
+              isUser: true,
+              muteButtonCallback: muteAudio,
+            })
+          );
         }
         break;
       case "failed":

@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import FgVideo from "../FgVideo/FgVideo";
+import Bundle from "../Bundle";
 
 const onConsumerTransportCreated = async (
   event: {
@@ -70,245 +70,73 @@ const onConsumerTransportCreated = async (
         if (!remoteVideosContainerRef.current) {
           break;
         }
-        const userVideo = document.getElementById(
-          `live_video_track_${username.current}`
-        );
-        const userScreen = document.getElementById(
-          `screen_track_${username.current}`
-        );
-        const userAudio = document.getElementById(
-          `audio_track_${username.current}`
+        const userBundle = document.getElementById(
+          `${username.current}_bundle`
         );
 
         remoteVideosContainerRef.current.innerHTML = "";
 
-        if (userVideo) {
-          remoteVideosContainerRef.current.appendChild(userVideo);
-        }
-        if (userScreen) {
-          remoteVideosContainerRef.current.appendChild(userScreen);
-        }
-        if (userAudio) {
-          remoteVideosContainerRef.current.appendChild(userAudio);
+        if (userBundle) {
+          remoteVideosContainerRef.current.appendChild(userBundle);
         }
 
         Object.entries(remoteTracksMap.current).forEach(
           ([trackUsername, tracks]) => {
-            for (const [trackType, trackData] of Object.entries(tracks)) {
-              const stream = new MediaStream();
-              stream.addTrack(trackData);
+            const msg = {
+              type: "requestMuteLock",
+              roomName: roomName.current,
+              username: username.current,
+              producerUsername: trackUsername,
+            };
 
+            socket.current.emit("message", msg);
+
+            if (remoteVideosContainerRef.current) {
+              let cameraStream;
               if (
-                trackType === "webcam" &&
                 remoteTracksMap.current[trackUsername] &&
-                remoteTracksMap.current[trackUsername].audio
+                remoteTracksMap.current[trackUsername].webcam
               ) {
-                const audioChild = document.getElementById(
-                  `audio_track_${trackUsername}`
-                );
-                if (audioChild) {
-                  remoteVideosContainerRef.current?.removeChild(audioChild);
-                }
-
-                const audioStream = new MediaStream();
-                audioStream.addTrack(
-                  remoteTracksMap.current[trackUsername].audio!
-                );
-
-                const videoContainer = document.createElement("div");
-                videoContainer.id = `live_video_audio_track_${trackUsername}`;
-                remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-                const root = createRoot(videoContainer);
-                root.render(
-                  React.createElement(FgVideo, {
-                    socket: socket,
-                    roomName: roomName,
-                    username: username,
-                    videoStream: stream,
-                    audioStream: audioStream,
-                    isStream: true,
-                    flipVideo: true,
-                    isPlayPause: false,
-                    isTotalTime: false,
-                    isPlaybackSpeed: false,
-                    isClosedCaptions: false,
-                    isTheater: false,
-                    isTimeLine: false,
-                    isSkip: false,
-                    isThumbnail: false,
-                    isPreview: false,
-                  })
-                );
-              } else if (
-                trackType === "screen" &&
-                remoteTracksMap.current[trackUsername] &&
-                remoteTracksMap.current[trackUsername].audio
-              ) {
-                const audioChild = document.getElementById(
-                  `audio_track_${trackUsername}`
-                );
-                if (audioChild) {
-                  remoteVideosContainerRef.current?.removeChild(audioChild);
-                }
-
-                const audioStream = new MediaStream();
-                audioStream.addTrack(
-                  remoteTracksMap.current[trackUsername].audio!
-                );
-
-                const videoContainer = document.createElement("div");
-                videoContainer.id = `screen_audio_track_${trackUsername}`;
-                remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-                const root = createRoot(videoContainer);
-                root.render(
-                  React.createElement(FgVideo, {
-                    socket: socket,
-                    roomName: roomName,
-                    username: username,
-                    videoStream: stream,
-                    audioStream: audioStream,
-                    isStream: true,
-                    isPlayPause: false,
-                    isTotalTime: false,
-                    isPlaybackSpeed: false,
-                    isClosedCaptions: false,
-                    isTheater: false,
-                    isTimeLine: false,
-                    isSkip: false,
-                    isThumbnail: false,
-                    isPreview: false,
-                  })
-                );
-              } else if (
-                (trackType === "audio" &&
-                  remoteTracksMap.current[trackUsername] &&
-                  remoteTracksMap.current[trackUsername].webcam) ||
-                (remoteTracksMap.current[trackUsername] &&
-                  remoteTracksMap.current[trackUsername].screen)
-              ) {
-                if (remoteTracksMap.current[trackUsername].webcam) {
-                  const liveVideoChild = document.getElementById(
-                    `live_video_track_${trackUsername}`
-                  );
-                  if (liveVideoChild) {
-                    remoteVideosContainerRef.current?.removeChild(
-                      liveVideoChild
-                    );
-                  }
-
-                  const cameraStream = new MediaStream();
-                  cameraStream.addTrack(
-                    remoteTracksMap.current[trackUsername].webcam!
-                  );
-
-                  const videoContainer = document.createElement("div");
-                  videoContainer.id = `live_video_audio_track_${trackUsername}`;
-                  remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-                  const root = createRoot(videoContainer);
-                  root.render(
-                    React.createElement(FgVideo, {
-                      socket: socket,
-                      roomName: roomName,
-                      username: username,
-                      videoStream: cameraStream,
-                      audioStream: stream,
-                      isStream: true,
-                      flipVideo: true,
-                      isPlayPause: false,
-                      isTotalTime: false,
-                      isPlaybackSpeed: false,
-                      isClosedCaptions: false,
-                      isTheater: false,
-                      isTimeLine: false,
-                      isSkip: false,
-                      isThumbnail: false,
-                      isPreview: false,
-                    })
-                  );
-                }
-                if (remoteTracksMap.current[trackUsername].screen) {
-                  const screenChild = document.getElementById(
-                    `screen_track_${trackUsername}`
-                  );
-                  if (screenChild) {
-                    remoteVideosContainerRef.current?.removeChild(screenChild);
-                  }
-
-                  const screenStream = new MediaStream();
-                  screenStream.addTrack(
-                    remoteTracksMap.current[trackUsername].screen!
-                  );
-
-                  const videoContainer = document.createElement("div");
-                  videoContainer.id = `screen_audio_track_${trackUsername}`;
-                  remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-                  const root = createRoot(videoContainer);
-                  root.render(
-                    React.createElement(FgVideo, {
-                      socket: socket,
-                      roomName: roomName,
-                      username: username,
-                      videoStream: screenStream,
-                      audioStream: stream,
-                      isStream: true,
-                      isPlayPause: false,
-                      isTotalTime: false,
-                      isPlaybackSpeed: false,
-                      isClosedCaptions: false,
-                      isTheater: false,
-                      isTimeLine: false,
-                      isSkip: false,
-                      isThumbnail: false,
-                      isPreview: false,
-                    })
-                  );
-                }
-              } else {
-                const videoContainer = document.createElement("div");
-                let flipVideo = false;
-                if (trackType === "webcam") {
-                  videoContainer.id = `live_video_track_${trackUsername}`;
-                  flipVideo = true;
-                } else if (trackType === "screen") {
-                  videoContainer.id = `screen_track_${trackUsername}`;
-                } else if (trackType === "audio") {
-                  videoContainer.id = `audio_track_${trackUsername}`;
-                }
-                remoteVideosContainerRef.current?.appendChild(videoContainer);
-
-                const root = createRoot(videoContainer);
-                root.render(
-                  React.createElement(FgVideo, {
-                    socket: socket,
-                    roomName: roomName,
-                    username: username,
-                    videoStream:
-                      trackType === "webcam" || trackType === "screen"
-                        ? stream
-                        : undefined,
-                    audioStream: trackType === "audio" ? stream : undefined,
-                    isStream: true,
-                    flipVideo,
-                    isPlayPause: false,
-                    isVolume:
-                      trackType === "webcam" || trackType === "screen"
-                        ? false
-                        : true,
-                    isTotalTime: false,
-                    isPlaybackSpeed: false,
-                    isClosedCaptions: false,
-                    isTheater: false,
-                    isTimeLine: false,
-                    isSkip: false,
-                    isThumbnail: false,
-                    isPreview: false,
-                  })
+                cameraStream = new MediaStream();
+                cameraStream.addTrack(
+                  remoteTracksMap.current[trackUsername].webcam!
                 );
               }
+
+              let screenStream;
+              if (
+                remoteTracksMap.current[trackUsername] &&
+                remoteTracksMap.current[trackUsername].screen
+              ) {
+                screenStream = new MediaStream();
+                screenStream.addTrack(
+                  remoteTracksMap.current[trackUsername].screen!
+                );
+              }
+
+              let audioStream;
+              if (
+                remoteTracksMap.current[trackUsername] &&
+                remoteTracksMap.current[trackUsername].audio
+              ) {
+                audioStream = new MediaStream();
+                audioStream.addTrack(
+                  remoteTracksMap.current[trackUsername].audio!
+                );
+              }
+
+              const bundleContainer = document.createElement("div");
+              bundleContainer.id = `${trackUsername}_bundle`;
+              remoteVideosContainerRef.current.append(bundleContainer);
+
+              const root = createRoot(bundleContainer);
+              root.render(
+                React.createElement(Bundle, {
+                  cameraStream: cameraStream ? cameraStream : undefined,
+                  screenStream: screenStream ? screenStream : undefined,
+                  audioStream: audioStream ? audioStream : undefined,
+                })
+              );
             }
           }
         );

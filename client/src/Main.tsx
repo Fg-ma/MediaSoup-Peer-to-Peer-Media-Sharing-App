@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { createRoot } from "react-dom/client";
+import { Root, createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import publishCamera from "./publishCamera";
@@ -15,7 +15,6 @@ import onNewProducerAvailable from "./lib/onNewProducerAvailable";
 import onNewProducer from "./lib/onNewProducer";
 import onProducerDisconnected from "./lib/onProducerDisconnected";
 import publishAudio from "./publishAudio";
-import FgVideo from "./FgVideo/FgVideo";
 
 const websocketURL = "http://localhost:8000";
 
@@ -94,8 +93,7 @@ export default function Main() {
             audioBtnRef,
             remoteVideosContainerRef,
             producerTransport,
-            muteAudio,
-            mutedAudioRef
+            muteAudio
           );
           break;
         case "consumerTransportCreated":
@@ -140,8 +138,6 @@ export default function Main() {
           onNewProducer(
             event,
             device,
-            socket,
-            roomName,
             username,
             isWebcam,
             isScreen,
@@ -154,15 +150,12 @@ export default function Main() {
             audioBtnRef,
             remoteVideosContainerRef,
             producerTransport,
-            muteAudio,
-            mutedAudioRef
+            muteAudio
           );
           break;
         case "producerDisconnected":
           onProducerDisconnected(
             event,
-            socket,
-            roomName,
             username,
             webcamBtnRef,
             screenBtnRef,
@@ -173,12 +166,17 @@ export default function Main() {
             audioStream,
             remoteTracksMap,
             producerTransport,
-            muteAudio,
-            mutedAudioRef
+            muteAudio
           );
           break;
         case "muteLockChange":
           onMuteLockChange(event);
+          break;
+        case "requestedMuteLock":
+          onRequestedMuteLock(event);
+          break;
+        case "acceptedMuteLock":
+          onAcceptedMuteLock(event);
           break;
         default:
           break;
@@ -221,6 +219,57 @@ export default function Main() {
     };
   }, [socket, mutedAudio]);
 
+  const onAcceptedMuteLock = (event: {
+    type: string;
+    producerUsername: string;
+  }) => {
+    const audioElement = document.getElementById(
+      `audio_track_${event.producerUsername}`
+    );
+    if (audioElement) {
+      const videoContainer =
+        audioElement.getElementsByClassName("video-container");
+      if (videoContainer[0]) {
+        videoContainer[0].classList.add("mute-lock");
+      }
+    }
+
+    const screenAudioElement = document.getElementById(
+      `screen_audio_track_${event.producerUsername}`
+    );
+    if (screenAudioElement) {
+      const videoContainer =
+        screenAudioElement.getElementsByClassName("video-container");
+      if (videoContainer[0]) {
+        videoContainer[0].classList.add("mute-lock");
+      }
+    }
+
+    const liveVideoAudioElement = document.getElementById(
+      `live_video_audio_track_${event.producerUsername}`
+    );
+    if (liveVideoAudioElement) {
+      const videoContainer =
+        liveVideoAudioElement.getElementsByClassName("video-container");
+      if (videoContainer[0]) {
+        videoContainer[0].classList.add("mute-lock");
+      }
+    }
+  };
+
+  const onRequestedMuteLock = (event: { type: string; username: string }) => {
+    if (mutedAudioRef.current) {
+      const msg = {
+        type: "acceptMuteLock",
+        roomName: roomName.current,
+        username: event.username,
+        producerUsername: username.current,
+      };
+
+      socket.current.emit("message", msg);
+    }
+  };
+
   const onMuteLockChange = (event: {
     type: string;
     isMuteLock: boolean;
@@ -236,7 +285,7 @@ export default function Main() {
     if (audioElement) {
       const videoContainer =
         audioElement.getElementsByClassName("video-container");
-      if (videoContainer) {
+      if (videoContainer[0]) {
         if (event.isMuteLock) {
           videoContainer[0].classList.add("mute-lock");
         } else {
@@ -251,7 +300,7 @@ export default function Main() {
     if (screenAudioElement) {
       const videoContainer =
         screenAudioElement.getElementsByClassName("video-container");
-      if (videoContainer) {
+      if (videoContainer[0]) {
         if (event.isMuteLock) {
           videoContainer[0].classList.add("mute-lock");
         } else {
@@ -266,7 +315,7 @@ export default function Main() {
     if (liveVideoAudioElement) {
       const videoContainer =
         liveVideoAudioElement.getElementsByClassName("video-container");
-      if (videoContainer) {
+      if (videoContainer[0]) {
         if (event.isMuteLock) {
           videoContainer[0].classList.add("mute-lock");
         } else {

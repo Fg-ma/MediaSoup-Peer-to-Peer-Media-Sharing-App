@@ -1,14 +1,10 @@
 import React, { useEffect, useRef } from "react";
-import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
 import VolumeSection from "./VolumeSection";
 
 export default function FgVideo({
-  socket,
-  roomName,
-  username,
+  handleMute,
   videoStream,
-  audioStream,
   isStream = false,
   id,
   videoStyles,
@@ -16,8 +12,6 @@ export default function FgVideo({
   muted = false,
   flipVideo = false,
   isSlider = true,
-  primaryVolumeSliderColor,
-  secondaryVolumeSliderColor,
   skipIncrement = 10,
   initialProgressPosition = 0,
   controlsVanishTime = 1250,
@@ -39,14 +33,17 @@ export default function FgVideo({
   isSkip = true,
   isThumbnail = true,
   isPreview = true,
-  muteButtonCallback,
   initialMute = false,
+  muteLock,
+  audioRef,
+  handleVolumeSlider,
+  paths,
+  videoIconStateRef,
+  isFinishedRef,
+  changedWhileNotFinishedRef,
 }: {
-  socket: React.MutableRefObject<Socket>;
-  roomName: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
+  handleMute: () => void;
   videoStream?: MediaStream;
-  audioStream?: MediaStream;
   isStream?: boolean;
   id?: string;
   videoStyles?: {};
@@ -54,8 +51,6 @@ export default function FgVideo({
   muted?: boolean;
   flipVideo?: boolean;
   isSlider?: boolean;
-  primaryVolumeSliderColor?: string;
-  secondaryVolumeSliderColor?: string;
   skipIncrement?: number;
   initialProgressPosition?: number;
   controlsVanishTime?: number;
@@ -77,8 +72,17 @@ export default function FgVideo({
   isSkip?: boolean;
   isThumbnail?: boolean;
   isPreview?: boolean;
-  muteButtonCallback?: any;
   initialMute?: boolean;
+  muteLock: React.MutableRefObject<boolean>;
+  audioRef: React.RefObject<HTMLAudioElement>;
+  handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  paths: string[][];
+  videoIconStateRef: React.MutableRefObject<{
+    from: string;
+    to: string;
+  }>;
+  isFinishedRef: React.MutableRefObject<boolean>;
+  changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
 }) {
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
@@ -98,26 +102,11 @@ export default function FgVideo({
   const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
   const captions = useRef<TextTrack | undefined>();
   const thumbnails = useRef<string[]>([]);
-  const muteLock = useRef(false);
 
   const init = () => {
     // Combine all streams into one
-    if (videoRef.current && isStream) {
-      const combinedStream = new MediaStream();
-
-      if (videoStream) {
-        videoStream
-          .getVideoTracks()
-          .forEach((track) => combinedStream.addTrack(track));
-      }
-
-      if (audioStream && !muted) {
-        audioStream
-          .getAudioTracks()
-          .forEach((track) => combinedStream.addTrack(track));
-      }
-
-      videoRef.current.srcObject = combinedStream;
+    if (videoRef.current && isStream && videoStream) {
+      videoRef.current.srcObject = videoStream;
     }
 
     // Handle initial mute
@@ -133,6 +122,10 @@ export default function FgVideo({
     }
     if (videoRef.current && videoRef.current.muted && volumeSliderRef.current) {
       volumeSliderRef.current.value = "0";
+    }
+
+    if (muteLock.current) {
+      videoContainerRef.current?.classList.add("mute-lock");
     }
 
     // Get captions and set them to hidden initially
@@ -268,7 +261,7 @@ export default function FgVideo({
         handlePictureInPicture("leave")
       );
     };
-  }, [videoStream, audioStream]);
+  }, [videoStream]);
 
   const handleKeyUp = (event: any) => {
     switch (event.key.toLowerCase()) {
@@ -510,34 +503,6 @@ export default function FgVideo({
     }
   };
 
-  const handleMute = () => {
-    if (!videoRef.current || muteLock.current) {
-      return;
-    }
-
-    if (videoRef.current && videoRef.current.srcObject instanceof MediaStream) {
-      const mediaStream = videoRef.current.srcObject;
-      mediaStream.getAudioTracks().forEach((track) => {
-        if (videoRef.current) {
-          track.enabled = videoRef.current.muted;
-        }
-      });
-
-      videoRef.current.muted = !videoRef.current.muted;
-    }
-    if (videoRef.current.muted) {
-      videoContainerRef.current?.classList.add("mute");
-    } else {
-      videoContainerRef.current?.classList.remove("mute");
-    }
-    if (videoRef.current.muted && volumeSliderRef.current) {
-      volumeSliderRef.current.value = "0";
-    }
-    if (muteButtonCallback) {
-      muteButtonCallback();
-    }
-  };
-
   const handleClosedCaptions = () => {
     if (captions.current) {
       const isHidden = captions.current.mode === "hidden";
@@ -750,15 +715,14 @@ export default function FgVideo({
               )}
               {isVolume && (
                 <VolumeSection
-                  videoRef={videoRef}
-                  volumeSliderRef={volumeSliderRef}
-                  videoContainerRef={videoContainerRef}
-                  handleMute={handleMute}
-                  primaryVolumeSliderColor={primaryVolumeSliderColor}
-                  secondaryVolumeSliderColor={secondaryVolumeSliderColor}
                   isSlider={isSlider}
-                  initialVolume={initialMute ? "off" : "high"}
-                  muteLock={muteLock}
+                  audioRef={audioRef}
+                  handleVolumeSlider={handleVolumeSlider}
+                  handleMute={handleMute}
+                  paths={paths}
+                  videoIconStateRef={videoIconStateRef}
+                  isFinishedRef={isFinishedRef}
+                  changedWhileNotFinishedRef={changedWhileNotFinishedRef}
                 />
               )}
               <div className='duration-container flex items-center gap-1 grow'>
@@ -862,40 +826,6 @@ export default function FgVideo({
             }}
           ></div>
         </>
-      )}
-      {!videoStream && audioStream && (
-        <div>
-          <video
-            ref={videoRef}
-            onClick={isPlayPause ? handlePausePlay : () => {}}
-            className='main-video w-0 z-0'
-            controls={false}
-            autoPlay={autoPlay}
-            style={videoStyles}
-          >
-            {isClosedCaptions && (
-              <track
-                kind='captions'
-                srcLang='eng'
-                src='./subtitles.vtt'
-                default
-              ></track>
-            )}
-          </video>
-          <VolumeSection
-            videoRef={videoRef}
-            volumeSliderRef={volumeSliderRef}
-            videoContainerRef={videoContainerRef}
-            iconSize='5rem'
-            handleMute={handleMute}
-            primaryColor={"black"}
-            primaryVolumeSliderColor={primaryVolumeSliderColor}
-            secondaryVolumeSliderColor={secondaryVolumeSliderColor}
-            isSlider={false}
-            initialVolume={initialMute ? "off" : "high"}
-            muteLock={muteLock}
-          />
-        </div>
       )}
     </div>
   );
