@@ -1,7 +1,6 @@
 import { interpolate } from "flubber";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, animate, useMotionValue, useTransform } from "framer-motion";
-import { volumeOff1a } from "../FgVideo/paths";
 
 export default function SVGMorpher({
   pathsArray,

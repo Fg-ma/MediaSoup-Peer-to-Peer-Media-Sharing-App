@@ -3,7 +3,7 @@ import { Root, createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import getBrowserMedia from "../getBrowserMedia";
-import Bundle from "../Bundle";
+import Bundle from "../bundle/Bundle";
 
 const onProducerTransportCreated = async (
   event: {
@@ -33,7 +33,8 @@ const onProducerTransportCreated = async (
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  muteAudio: () => void
+  muteAudio: () => void,
+  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   if (event.error) {
     console.error("Producer transport create error: ", event.error);
@@ -104,6 +105,7 @@ const onProducerTransportCreated = async (
           const root = createRoot(bundleContainer);
           root.render(
             React.createElement(Bundle, {
+              username: username.current,
               cameraStream:
                 isWebcam.current && cameraStream.current
                   ? cameraStream.current
@@ -116,6 +118,7 @@ const onProducerTransportCreated = async (
                 isAudio.current && audioStream.current
                   ? audioStream.current
                   : undefined,
+              isAudio: false,
               isUser: true,
               muteButtonCallback: muteAudio,
             })
@@ -136,7 +139,15 @@ const onProducerTransportCreated = async (
       if (cameraStream.current) {
         return;
       }
-      cameraStream.current = await getBrowserMedia("webcam", device);
+      cameraStream.current = await getBrowserMedia(
+        "webcam",
+        device,
+        webcamBtnRef,
+        screenBtnRef,
+        audioBtnRef,
+        isScreen,
+        setScreenActive
+      );
       if (cameraStream.current) {
         const cameraTrack = cameraStream.current.getVideoTracks()[0];
         const cameraParams = {
@@ -145,14 +156,30 @@ const onProducerTransportCreated = async (
             producerType: "webcam",
           },
         };
-        await producerTransport.current.produce(cameraParams);
+        await producerTransport.current?.produce(cameraParams);
+      } else {
+        producerTransport.current = undefined;
+        const msg = {
+          type: "deleteProducerTransport",
+          roomName: roomName.current,
+          username: username.current,
+        };
+        socket.current.emit("message", msg);
       }
     }
     if (isScreen.current) {
       if (screenStream.current) {
         return;
       }
-      screenStream.current = await getBrowserMedia("screen", device);
+      screenStream.current = await getBrowserMedia(
+        "screen",
+        device,
+        webcamBtnRef,
+        screenBtnRef,
+        audioBtnRef,
+        isScreen,
+        setScreenActive
+      );
       if (screenStream.current) {
         const screenTrack = screenStream.current.getVideoTracks()[0];
         const screenParams = {
@@ -161,14 +188,30 @@ const onProducerTransportCreated = async (
             producerType: "screen",
           },
         };
-        await producerTransport.current.produce(screenParams);
+        await producerTransport.current?.produce(screenParams);
+      } else {
+        producerTransport.current = undefined;
+        const msg = {
+          type: "deleteProducerTransport",
+          roomName: roomName.current,
+          username: username.current,
+        };
+        socket.current.emit("message", msg);
       }
     }
     if (isAudio.current) {
       if (audioStream.current) {
         return;
       }
-      audioStream.current = await getBrowserMedia("audio", device);
+      audioStream.current = await getBrowserMedia(
+        "audio",
+        device,
+        webcamBtnRef,
+        screenBtnRef,
+        audioBtnRef,
+        isScreen,
+        setScreenActive
+      );
       if (audioStream.current) {
         const audioTrack = audioStream.current.getAudioTracks()[0];
         const audioParams = {
@@ -177,7 +220,15 @@ const onProducerTransportCreated = async (
             producerType: "audio",
           },
         };
-        await producerTransport.current.produce(audioParams);
+        await producerTransport.current?.produce(audioParams);
+      } else {
+        producerTransport.current = undefined;
+        const msg = {
+          type: "deleteProducerTransport",
+          roomName: roomName.current,
+          username: username.current,
+        };
+        socket.current.emit("message", msg);
       }
     }
   } catch (error) {

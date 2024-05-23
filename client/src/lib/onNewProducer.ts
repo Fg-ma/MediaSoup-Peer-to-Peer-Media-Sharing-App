@@ -2,7 +2,7 @@ import React from "react";
 import { Root, createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import getBrowserMedia from "../getBrowserMedia";
-import Bundle from "../Bundle";
+import Bundle from "../bundle/Bundle";
 
 const onNewProducer = async (
   event: {
@@ -24,20 +24,32 @@ const onNewProducer = async (
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  muteAudio: () => void
+  muteAudio: () => void,
+  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   webcamBtnRef.current!.disabled = false;
   screenBtnRef.current!.disabled = false;
   audioBtnRef.current!.disabled = false;
 
   const oldBundle = document.getElementById(`${username.current}_bundle`);
+  const oldBundleContainer = document.getElementById(
+    `${username.current}_bundle_container`
+  );
 
   if (event.producerType === "webcam") {
     if (cameraStream.current) {
       console.error("Already existing camera stream for: ", username.current);
       return;
     }
-    cameraStream.current = await getBrowserMedia(event.producerType, device);
+    cameraStream.current = await getBrowserMedia(
+      event.producerType,
+      device,
+      webcamBtnRef,
+      screenBtnRef,
+      audioBtnRef,
+      isScreen,
+      setScreenActive
+    );
     if (cameraStream.current) {
       const track = cameraStream.current.getVideoTracks()[0];
       const params = {
@@ -58,7 +70,15 @@ const onNewProducer = async (
       console.error("Already existing screen stream for: ", username.current);
       return;
     }
-    screenStream.current = await getBrowserMedia(event.producerType, device);
+    screenStream.current = await getBrowserMedia(
+      event.producerType,
+      device,
+      webcamBtnRef,
+      screenBtnRef,
+      audioBtnRef,
+      isScreen,
+      setScreenActive
+    );
     if (screenStream.current) {
       const track = screenStream.current.getVideoTracks()[0];
       const params = {
@@ -79,7 +99,15 @@ const onNewProducer = async (
       console.error("Already existing audio stream for: ", username.current);
       return;
     }
-    audioStream.current = await getBrowserMedia(event.producerType, device);
+    audioStream.current = await getBrowserMedia(
+      event.producerType,
+      device,
+      webcamBtnRef,
+      screenBtnRef,
+      audioBtnRef,
+      isScreen,
+      setScreenActive
+    );
     if (audioStream.current) {
       const track = audioStream.current.getAudioTracks()[0];
       const params = {
@@ -111,6 +139,7 @@ const onNewProducer = async (
     const root = createRoot(bundleContainer);
     root.render(
       React.createElement(Bundle, {
+        username: username.current,
         cameraStream:
           isWebcam.current && cameraStream.current
             ? cameraStream.current
@@ -123,8 +152,19 @@ const onNewProducer = async (
           isAudio.current && audioStream.current
             ? audioStream.current
             : undefined,
+        isAudio: false,
         isUser: true,
         muteButtonCallback: muteAudio,
+        onRendered: () => {
+          // Add mute to new bundle container if the old bundle container contained it
+          if (oldBundleContainer?.classList.contains("mute")) {
+            const newBundleContainer = document.getElementById(
+              `${username.current}_bundle_container`
+            );
+
+            newBundleContainer?.classList.add("mute");
+          }
+        },
       })
     );
   }

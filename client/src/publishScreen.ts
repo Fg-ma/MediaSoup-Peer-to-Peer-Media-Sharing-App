@@ -32,7 +32,7 @@ const publishScreen = (
         roomName: roomName.current,
         username: username.current,
       };
-      socket.current.send(msg);
+      socket.current.emit("message", msg);
     }
   } else if (!isScreen.current) {
     const msg = {
@@ -41,7 +41,7 @@ const publishScreen = (
       username: username.current,
       producerType: "screen",
     };
-    socket.current.send(msg);
+    socket.current.emit("message", msg);
   }
 };
 

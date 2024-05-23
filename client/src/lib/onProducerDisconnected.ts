@@ -1,7 +1,7 @@
 import React from "react";
-import { Root, createRoot } from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
-import Bundle from "../Bundle";
+import Bundle from "../bundle/Bundle";
 
 const onProducerDisconnected = (
   event: { type: string; producerUsername: string; producerType: string },
@@ -26,6 +26,12 @@ const onProducerDisconnected = (
   muteAudio: () => void
 ) => {
   const oldBundle = document.getElementById(`${event.producerUsername}_bundle`);
+  const oldAudioStream = document.getElementById(
+    `${event.producerUsername}_audio_stream`
+  );
+  const oldBundleContainer = document.getElementById(
+    `${event.producerUsername}_bundle_container`
+  );
   if (oldBundle) {
     remoteVideosContainerRef.current?.removeChild(oldBundle);
   }
@@ -102,20 +108,22 @@ const onProducerDisconnected = (
     }
 
     if (
-      cameraStream.current ||
-      screenStream.current ||
-      audioStream.current ||
+      (event.producerUsername === username.current &&
+        (cameraStream.current ||
+          screenStream.current ||
+          audioStream.current)) ||
       remoteCameraStream ||
       remoteScreenStream ||
       remoteAudioStream
     ) {
-      const bundleContainer = document.createElement("div");
-      bundleContainer.id = `${event.producerUsername}_bundle`;
-      remoteVideosContainerRef.current.append(bundleContainer);
+      const bundle = document.createElement("div");
+      bundle.id = `${event.producerUsername}_bundle`;
+      remoteVideosContainerRef.current.append(bundle);
 
-      const root = createRoot(bundleContainer);
+      const root = createRoot(bundle);
       root.render(
         React.createElement(Bundle, {
+          username: event.producerUsername,
           cameraStream:
             event.producerUsername === username.current
               ? cameraStream.current
@@ -137,6 +145,35 @@ const onProducerDisconnected = (
           isUser: event.producerUsername === username.current,
           muteButtonCallback:
             event.producerUsername === username.current ? muteAudio : undefined,
+          onRendered: () => {
+            // Add mute to new bundle container if the old bundle container contained it
+            if (oldBundleContainer?.classList.contains("mute")) {
+              const newBundleContainer = document.getElementById(
+                `${username.current}_bundle_container`
+              );
+
+              newBundleContainer?.classList.add("mute");
+            }
+
+            // Add mute-lock to new bundle container if the old bundle container contained it
+            if (oldBundleContainer?.classList.contains("mute-lock")) {
+              const newBundleContainer = document.getElementById(
+                `${event.producerUsername}_bundle_container`
+              );
+
+              newBundleContainer?.classList.add("mute-lock");
+            }
+
+            // Set the volume of the new audio element to that of the old
+            if (oldAudioStream instanceof HTMLAudioElement) {
+              const newAudioStream = document.getElementById(
+                `${event.producerUsername}_audio_stream`
+              );
+              if (newAudioStream instanceof HTMLAudioElement) {
+                newAudioStream.volume = oldAudioStream.volume;
+              }
+            }
+          },
         })
       );
     }
@@ -144,6 +181,9 @@ const onProducerDisconnected = (
 
   if (!cameraStream.current && !screenStream.current && !audioStream.current) {
     producerTransport.current = undefined;
+  }
+  if (!remoteTracksMap.current[event.producerUsername]) {
+    delete remoteTracksMap.current[event.producerUsername];
   }
 };
 

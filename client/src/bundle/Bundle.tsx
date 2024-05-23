@@ -42,28 +42,36 @@ import {
   volumeLowOffB2b,
   volumeLowOffB3a,
   volumeLowOffB3b,
-} from "./FgVideo/paths";
-import FgVideo from "./FgVideo/FgVideo";
-import VolumeSection from "./FgVideo/VolumeSection";
+} from "./svgPaths";
+import FgVideo from "./FgVideo";
+import VolumeSection from "./VolumeSection";
 
 export default function ({
+  username,
   cameraStream,
   screenStream,
   audioStream,
+  isAudio = true,
   isUser = false,
   primaryVolumeSliderColor = "white",
   secondaryVolumeSliderColor = "rgba(150, 150, 150, 0.5)",
   muteButtonCallback,
   initialVolume = "high",
+  onRendered,
 }: {
+  username?: string;
   cameraStream?: MediaStream;
   screenStream?: MediaStream;
   audioStream?: MediaStream;
+  isAudio?: boolean;
   isUser?: boolean;
   primaryVolumeSliderColor?: string;
   secondaryVolumeSliderColor?: string;
+  tertiaryVolumeSliderColor?: string;
+  quaternaryVolumeSliderColor?: string;
   muteButtonCallback?: any;
   initialVolume?: string;
+  onRendered?: () => any;
 }) {
   const [paths, setPaths] = useState<string[][]>([
     [volumeOff1a, volumeHighOffIB1a, volumeHigh1a],
@@ -79,9 +87,10 @@ export default function ({
   const videoIconStateRef = useRef({ from: "", to: initialVolume });
   const isFinishedRef = useRef(true);
   const changedWhileNotFinishedRef = useRef(false);
+  const isAudioMuted = useRef(false);
 
   useEffect(() => {
-    if (audioRef.current && audioStream) {
+    if (audioRef.current && audioStream && isAudio) {
       audioRef.current.srcObject = audioStream;
     }
 
@@ -156,16 +165,28 @@ export default function ({
       const volumeSliders =
         bundleRef.current.querySelectorAll(".volume-slider");
 
-      const value = audioRef.current.volume;
+      let value = audioRef.current.volume;
+      if (isAudioMuted.current) {
+        value = 0;
+      }
       const min = 0;
       const max = 1;
       const percentage = ((value - min) / (max - min)) * 100;
       const trackColor = `linear-gradient(to right, ${primaryVolumeSliderColor} 0%, ${primaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} 100%)`;
+      if (audioStream && !cameraStream && !screenStream) {
+        bundleRef.current?.style.setProperty(
+          "--volume-slider-thumb-size",
+          "1.5rem"
+        );
+      }
 
       volumeSliders.forEach((slider) => {
         const sliderElement = slider as HTMLInputElement;
         sliderElement.style.background = trackColor;
-        sliderElement.style.borderRadius = "2px";
+        sliderElement.style.borderRadius =
+          audioStream && !cameraStream && !screenStream
+            ? "0.3125rem"
+            : "0.125rem";
       });
     }
   };
@@ -185,6 +206,8 @@ export default function ({
       return;
     }
 
+    isAudioMuted.current = !isAudioMuted.current;
+
     if (audioRef.current && audioRef.current.srcObject instanceof MediaStream) {
       const mediaStream = audioRef.current.srcObject;
       mediaStream.getAudioTracks().forEach((track) => {
@@ -195,12 +218,8 @@ export default function ({
 
       audioRef.current.muted = !audioRef.current.muted;
     }
-    if (audioRef.current.muted) {
+    if (isAudioMuted.current) {
       bundleRef.current?.classList.add("mute");
-    } else {
-      bundleRef.current?.classList.remove("mute");
-    }
-    if (audioRef.current.muted) {
       const volumeSliders =
         bundleRef.current?.querySelectorAll(".volume-slider");
 
@@ -208,7 +227,12 @@ export default function ({
         const sliderElement = slider as HTMLInputElement;
         sliderElement.value = "0";
       });
+    } else {
+      bundleRef.current?.classList.remove("mute");
     }
+
+    tracksColorSetter();
+
     if (muteButtonCallback) {
       muteButtonCallback();
     }
@@ -350,7 +374,6 @@ export default function ({
                 from: videoIconStateRef.current.to,
                 to: "off",
               };
-
               const newPaths = getPaths(videoIconStateRef.current.from, "off");
               if (newPaths[0]) {
                 setPaths(newPaths);
@@ -361,6 +384,7 @@ export default function ({
             muteLock.current
           ) {
             muteLock.current = false;
+
             if (!audioRef.current) {
               return;
             }
@@ -375,7 +399,10 @@ export default function ({
               newVolumeState = "low";
             }
 
-            if (newVolumeState !== videoIconStateRef.current.to) {
+            if (
+              newVolumeState !== videoIconStateRef.current.to &&
+              !audioRef.current.muted
+            ) {
               videoIconStateRef.current = {
                 from: videoIconStateRef.current.to,
                 to: newVolumeState,
@@ -406,10 +433,31 @@ export default function ({
     };
   }, []);
 
+  // Initial functions & call onRendered call back if one is availiable
+  useEffect(() => {
+    if (audioStream && !cameraStream && !screenStream) {
+      bundleRef.current?.style.setProperty(
+        "--volume-slider-height",
+        "0.625rem"
+      );
+      bundleRef.current?.style.setProperty("--volume-slider-width", "8rem");
+    }
+
+    if (onRendered) {
+      onRendered();
+    }
+  }, []);
+
   return (
-    <div ref={bundleRef}>
+    <div
+      ref={bundleRef}
+      id={username && `${username}_bundle_container`}
+      className='bundle-container'
+    >
       {cameraStream && (
         <FgVideo
+          type={"camera"}
+          username={username}
           videoStream={cameraStream}
           isStream={true}
           muted={isUser}
@@ -440,6 +488,8 @@ export default function ({
       )}
       {screenStream && (
         <FgVideo
+          type={"screen"}
+          username={username}
           videoStream={screenStream}
           isStream={true}
           muted={isUser}
@@ -469,15 +519,20 @@ export default function ({
         />
       )}
       {audioStream && !cameraStream && !screenStream && (
-        <div>
-          <audio ref={audioRef} className='w-0 z-0' autoPlay={true}></audio>
+        <div id={username && `${username}_audio_container`}>
+          <audio
+            ref={audioRef}
+            id={username && `${username}_audio_stream`}
+            className='w-0 z-0'
+            autoPlay={true}
+          ></audio>
           <VolumeSection
             audioRef={audioRef}
             handleVolumeSlider={handleVolumeSlider}
             iconSize={"5rem"}
             handleMute={handleMute}
             primaryColor={"black"}
-            isSlider={false}
+            isSlider={!isUser}
             paths={paths}
             videoIconStateRef={videoIconStateRef}
             isFinishedRef={isFinishedRef}
@@ -486,7 +541,12 @@ export default function ({
         </div>
       )}
       {audioStream && (cameraStream || screenStream) && (
-        <audio ref={audioRef} className='w-0 z-0' autoPlay={true}></audio>
+        <audio
+          ref={audioRef}
+          id={username && `${username}_audio_stream`}
+          className='w-0 z-0'
+          autoPlay={true}
+        ></audio>
       )}
     </div>
   );

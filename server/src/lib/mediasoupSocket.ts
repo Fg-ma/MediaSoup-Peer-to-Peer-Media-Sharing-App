@@ -22,6 +22,7 @@ import onUnsubscribe from "./lib/onUnsubscribe";
 import onMuteLock from "./lib/onMuteLock";
 import onRequestMuteLock from "./lib/onRequestMuteLock";
 import onAcceptMuteLock from "./lib/onAcceptMuteLock";
+import onDeleteProducerTransport from "./lib/ondeleteProducerTransport";
 
 let mediasoupRouter: Router;
 
@@ -143,6 +144,10 @@ const SocketIOConnection = async (io: SocketIOServer) => {
           break;
         case "acceptMuteLock":
           onAcceptMuteLock(event, io);
+          break;
+        case "deleteProducerTransport":
+          onDeleteProducerTransport(event);
+          break;
         default:
           break;
       }

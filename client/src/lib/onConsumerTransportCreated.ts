@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import Bundle from "../Bundle";
+import Bundle from "../bundle/Bundle";
 
 const onConsumerTransportCreated = async (
   event: {
@@ -132,6 +132,7 @@ const onConsumerTransportCreated = async (
               const root = createRoot(bundleContainer);
               root.render(
                 React.createElement(Bundle, {
+                  username: trackUsername,
                   cameraStream: cameraStream ? cameraStream : undefined,
                   screenStream: screenStream ? screenStream : undefined,
                   audioStream: audioStream ? audioStream : undefined,

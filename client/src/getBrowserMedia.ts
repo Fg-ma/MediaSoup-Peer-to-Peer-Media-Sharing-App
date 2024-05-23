@@ -2,7 +2,12 @@ import * as mediasoup from "mediasoup-client";
 
 const getBrowserMedia = async (
   type: string,
-  device: React.MutableRefObject<mediasoup.types.Device | undefined>
+  device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+  webcamBtnRef: React.RefObject<HTMLButtonElement>,
+  screenBtnRef: React.RefObject<HTMLButtonElement>,
+  audioBtnRef: React.RefObject<HTMLButtonElement>,
+  isScreen: React.MutableRefObject<boolean>,
+  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   if (
     type === "webcam" &&
@@ -35,6 +40,11 @@ const getBrowserMedia = async (
       : navigator.mediaDevices.getUserMedia(constraints));
     return stream;
   } catch (error) {
+    webcamBtnRef.current!.disabled = false;
+    screenBtnRef.current!.disabled = false;
+    audioBtnRef.current!.disabled = false;
+    isScreen.current = false;
+    setScreenActive(false);
     console.error("Error accessing media devices:", error);
     return;
   }

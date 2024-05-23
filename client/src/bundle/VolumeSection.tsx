@@ -18,13 +18,14 @@ import {
   volumeLow2b,
   volumeLow3a,
   volumeLow3b,
-} from "./paths";
+} from "./svgPaths";
 import SVGMorpher from "../SVGMorpher/SVGMorpher";
 
 export default function VolumeSection({
   audioRef,
   handleVolumeSlider = () => {},
   iconSize = "2.5rem",
+  sliderSize = "2.5rem",
   handleMute,
   primaryColor = "white",
   isSlider = true,
@@ -37,6 +38,7 @@ export default function VolumeSection({
   handleVolumeSlider?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleMute: () => void;
   iconSize?: string;
+  sliderSize?: string;
   primaryColor?: string;
   isSlider?: boolean;
   paths: string[][];

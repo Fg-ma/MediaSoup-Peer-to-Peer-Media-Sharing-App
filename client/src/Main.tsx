@@ -15,6 +15,9 @@ import onNewProducerAvailable from "./lib/onNewProducerAvailable";
 import onNewProducer from "./lib/onNewProducer";
 import onProducerDisconnected from "./lib/onProducerDisconnected";
 import publishAudio from "./publishAudio";
+import onRequestedMuteLock from "./lib/onRequestedMuteLock";
+import onMuteLockChange from "./lib/onMuteLockChange";
+import onAcceptedMuteLock from "./lib/onAcceptedMuteLock";
 
 const websocketURL = "http://localhost:8000";
 
@@ -93,7 +96,8 @@ export default function Main() {
             audioBtnRef,
             remoteVideosContainerRef,
             producerTransport,
-            muteAudio
+            muteAudio,
+            setScreenActive
           );
           break;
         case "consumerTransportCreated":
@@ -150,7 +154,8 @@ export default function Main() {
             audioBtnRef,
             remoteVideosContainerRef,
             producerTransport,
-            muteAudio
+            muteAudio,
+            setScreenActive
           );
           break;
         case "producerDisconnected":
@@ -170,10 +175,10 @@ export default function Main() {
           );
           break;
         case "muteLockChange":
-          onMuteLockChange(event);
+          onMuteLockChange(event, username);
           break;
         case "requestedMuteLock":
-          onRequestedMuteLock(event);
+          onRequestedMuteLock(event, socket, username, roomName, mutedAudioRef);
           break;
         case "acceptedMuteLock":
           onAcceptedMuteLock(event);
@@ -185,29 +190,11 @@ export default function Main() {
 
     // User disconnect
     socket.current.on("userDisconnected", (disconnectedUsername) => {
-      const oldVideo = document.getElementById(
-        `live_video_track_${disconnectedUsername}`
+      const oldBundle = document.getElementById(
+        `${disconnectedUsername}_bundle`
       );
-      const oldScreen = document.getElementById(
-        `screen_track_${disconnectedUsername}`
-      );
-      const oldAudio = document.getElementById(
-        `audio_track_${disconnectedUsername}`
-      );
-      const oldVideoAudio = document.getElementById(
-        `live_video_audio_track_${disconnectedUsername}`
-      );
-      if (oldVideo) {
-        remoteVideosContainerRef.current?.removeChild(oldVideo);
-      }
-      if (oldScreen) {
-        remoteVideosContainerRef.current?.removeChild(oldScreen);
-      }
-      if (oldAudio) {
-        remoteVideosContainerRef.current?.removeChild(oldAudio);
-      }
-      if (oldVideoAudio) {
-        remoteVideosContainerRef.current?.removeChild(oldVideoAudio);
+      if (oldBundle) {
+        remoteVideosContainerRef.current?.removeChild(oldBundle);
       }
       delete remoteTracksMap.current[disconnectedUsername];
     });
@@ -217,113 +204,7 @@ export default function Main() {
       socket.current.off("message");
       socket.current.off("userDisconnected");
     };
-  }, [socket, mutedAudio]);
-
-  const onAcceptedMuteLock = (event: {
-    type: string;
-    producerUsername: string;
-  }) => {
-    const audioElement = document.getElementById(
-      `audio_track_${event.producerUsername}`
-    );
-    if (audioElement) {
-      const videoContainer =
-        audioElement.getElementsByClassName("video-container");
-      if (videoContainer[0]) {
-        videoContainer[0].classList.add("mute-lock");
-      }
-    }
-
-    const screenAudioElement = document.getElementById(
-      `screen_audio_track_${event.producerUsername}`
-    );
-    if (screenAudioElement) {
-      const videoContainer =
-        screenAudioElement.getElementsByClassName("video-container");
-      if (videoContainer[0]) {
-        videoContainer[0].classList.add("mute-lock");
-      }
-    }
-
-    const liveVideoAudioElement = document.getElementById(
-      `live_video_audio_track_${event.producerUsername}`
-    );
-    if (liveVideoAudioElement) {
-      const videoContainer =
-        liveVideoAudioElement.getElementsByClassName("video-container");
-      if (videoContainer[0]) {
-        videoContainer[0].classList.add("mute-lock");
-      }
-    }
-  };
-
-  const onRequestedMuteLock = (event: { type: string; username: string }) => {
-    if (mutedAudioRef.current) {
-      const msg = {
-        type: "acceptMuteLock",
-        roomName: roomName.current,
-        username: event.username,
-        producerUsername: username.current,
-      };
-
-      socket.current.emit("message", msg);
-    }
-  };
-
-  const onMuteLockChange = (event: {
-    type: string;
-    isMuteLock: boolean;
-    username: string;
-  }) => {
-    if (event.username === username.current) {
-      return;
-    }
-
-    const audioElement = document.getElementById(
-      `audio_track_${event.username}`
-    );
-    if (audioElement) {
-      const videoContainer =
-        audioElement.getElementsByClassName("video-container");
-      if (videoContainer[0]) {
-        if (event.isMuteLock) {
-          videoContainer[0].classList.add("mute-lock");
-        } else {
-          videoContainer[0].classList.remove("mute-lock");
-        }
-      }
-    }
-
-    const screenAudioElement = document.getElementById(
-      `screen_audio_track_${event.username}`
-    );
-    if (screenAudioElement) {
-      const videoContainer =
-        screenAudioElement.getElementsByClassName("video-container");
-      if (videoContainer[0]) {
-        if (event.isMuteLock) {
-          videoContainer[0].classList.add("mute-lock");
-        } else {
-          videoContainer[0].classList.remove("mute-lock");
-        }
-      }
-    }
-
-    const liveVideoAudioElement = document.getElementById(
-      `live_video_audio_track_${event.username}`
-    );
-    if (liveVideoAudioElement) {
-      const videoContainer =
-        liveVideoAudioElement.getElementsByClassName("video-container");
-      if (videoContainer[0]) {
-        if (event.isMuteLock) {
-          videoContainer[0].classList.add("mute-lock");
-        } else {
-          videoContainer[0].classList.remove("mute-lock");
-        }
-      }
-    }
-  };
+  }, [socket]);
 
   const muteAudio = () => {
     if (audioStream.current) {
@@ -344,48 +225,14 @@ export default function Main() {
 
     socket.current.emit("message", msg);
 
-    const audioElement = document.getElementById(
-      `audio_track_${username.current}`
+    const bundleContainerElement = document.getElementById(
+      `${username.current}_bundle_container`
     );
-    if (audioElement) {
-      const videoContainer =
-        audioElement.getElementsByClassName("video-container");
-      if (videoContainer) {
-        if (mutedAudioRef.current) {
-          videoContainer[0].classList.add("mute");
-        } else {
-          videoContainer[0].classList.remove("mute");
-        }
-      }
-    }
-
-    const screenAudioElement = document.getElementById(
-      `screen_audio_track_${username.current}`
-    );
-    if (screenAudioElement) {
-      const videoContainer =
-        screenAudioElement.getElementsByClassName("video-container");
-      if (videoContainer) {
-        if (mutedAudioRef.current) {
-          videoContainer[0].classList.add("mute");
-        } else {
-          videoContainer[0].classList.remove("mute");
-        }
-      }
-    }
-
-    const liveVideoAudioElement = document.getElementById(
-      `live_video_audio_track_${username.current}`
-    );
-    if (liveVideoAudioElement) {
-      const videoContainer =
-        liveVideoAudioElement.getElementsByClassName("video-container");
-      if (videoContainer) {
-        if (mutedAudioRef.current) {
-          videoContainer[0].classList.add("mute");
-        } else {
-          videoContainer[0].classList.remove("mute");
-        }
+    if (bundleContainerElement) {
+      if (mutedAudioRef.current) {
+        bundleContainerElement.classList.add("mute");
+      } else {
+        bundleContainerElement.classList.remove("mute");
       }
     }
   };
@@ -453,12 +300,12 @@ export default function Main() {
                 ref={muteBtnRef}
                 onClick={muteAudio}
                 className={`${
-                  mutedAudio
+                  mutedAudioRef.current
                     ? "bg-orange-500 hover:bg-orange-700"
                     : "bg-blue-500 hover:bg-blue-700"
                 } text-white font-bold py-2 px-3 disabled:opacity-25`}
               >
-                {mutedAudio ? "Unmute" : "Mute"}
+                {mutedAudioRef.current ? "Unmute" : "Mute"}
               </button>
             </div>
           )}

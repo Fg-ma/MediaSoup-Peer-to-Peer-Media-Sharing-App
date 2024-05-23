@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import Bundle from "../Bundle";
+import Bundle from "../bundle/Bundle";
 
 const onNewConsumerSubscribed = async (
   event: {
@@ -51,6 +51,9 @@ const onNewConsumerSubscribed = async (
   }
 
   const oldBundle = document.getElementById(`${event.producerUsername}_bundle`);
+  const oldAudioStream = document.getElementById(
+    `${event.producerUsername}_audio_stream`
+  );
   if (oldBundle) {
     remoteVideosContainerRef.current?.removeChild(oldBundle);
   }
@@ -103,9 +106,20 @@ const onNewConsumerSubscribed = async (
     const root = createRoot(bundleContainer);
     root.render(
       React.createElement(Bundle, {
+        username: event.producerUsername,
         cameraStream: cameraStream ? cameraStream : undefined,
         screenStream: screenStream ? screenStream : undefined,
         audioStream: audioStream ? audioStream : undefined,
+        onRendered: () => {
+          if (oldAudioStream instanceof HTMLAudioElement) {
+            const newAudioStream = document.getElementById(
+              `${event.producerUsername}_audio_stream`
+            );
+            if (newAudioStream instanceof HTMLAudioElement) {
+              newAudioStream.volume = oldAudioStream.volume;
+            }
+          }
+        },
       })
     );
   }

@@ -1,12 +1,30 @@
 import React, { useEffect, useRef } from "react";
 import "./FgVideoStyles.css";
 import VolumeSection from "./VolumeSection";
+import handleFullscreenChange from "./lib/handleFullscreenChange";
+import handlePictureInPicture from "./lib/handlePictureInPicture";
+import formatDuration from "./lib/formatDuration";
+import loadedData from "./lib/loadedData";
+import timeUpdate from "./lib/timeUpdate";
+import handleMouseEnter from "./lib/handleMouseEnter";
+import handleMouseLeave from "./lib/handleMouseLeave";
+import handlePausePlay from "./lib/handlePausePlay";
+import handleFullscreen from "./lib/handleFullscreen";
+import handleTheater from "./lib/handleTheater";
+import handleMiniPlayer from "./lib/handleMiniPlayer";
+import handleClosedCaptions from "./lib/handleClosedCaptions";
+import handlePlaybackSpeed from "./lib/handlePlaybackSpeed";
+import handleScrubbing from "./lib/handleScrubbing";
+import handleTimelineUpdate from "./lib/handleTimelineUpdate";
+import handleKeyDown from "./lib/handleKeyDown";
+import handleKeyUp from "./lib/handleKeyUp";
 
 export default function FgVideo({
+  type,
+  username,
   handleMute,
   videoStream,
   isStream = false,
-  id,
   videoStyles,
   autoPlay = true,
   muted = false,
@@ -42,10 +60,11 @@ export default function FgVideo({
   isFinishedRef,
   changedWhileNotFinishedRef,
 }: {
+  type?: string;
+  username?: string;
   handleMute: () => void;
   videoStream?: MediaStream;
   isStream?: boolean;
-  id?: string;
   videoStyles?: {};
   autoPlay?: boolean;
   muted?: boolean;
@@ -184,470 +203,243 @@ export default function FgVideo({
     // Set up initial conditions
     init();
 
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    document.addEventListener("keyup", handleKeyUp);
-
-    videoRef.current?.addEventListener("loadeddata", loadedData);
-
-    videoRef.current?.addEventListener("timeupdate", timeUpdate);
-
-    videoContainerRef.current?.addEventListener("mouseenter", handleMouseEnter);
-
-    videoContainerRef.current?.addEventListener("mouseleave", handleMouseLeave);
-
-    timelineContainerRef.current?.addEventListener(
-      "mousemove",
-      handleTimelineUpdate
+    document.addEventListener("fullscreenchange", () =>
+      handleFullscreenChange(videoContainerRef)
     );
 
-    timelineContainerRef.current?.addEventListener(
-      "mousedown",
-      handleScrubbing
+    document.addEventListener("keydown", (event) =>
+      handleKeyDown(
+        event,
+        videoContainerRef,
+        controlPressed,
+        shiftPressed,
+        isPlayPause,
+        paused,
+        videoRef,
+        isFullScreen,
+        isTheater,
+        theater,
+        isPictureInPicture,
+        isVolume,
+        handleMute,
+        isSkip,
+        skipIncrement,
+        isClosedCaptions,
+        captions
+      )
     );
 
-    document.addEventListener("mouseup", (e) => {
-      if (isScrubbing.current) handleScrubbing(e);
+    document.addEventListener("keyup", (event) =>
+      handleKeyUp(event, shiftPressed, controlPressed)
+    );
+
+    videoRef.current?.addEventListener("loadeddata", () =>
+      loadedData(
+        videoRef,
+        totalTimeRef,
+        thumbnails,
+        isTimeLine,
+        isPreview,
+        isThumbnail
+      )
+    );
+
+    videoRef.current?.addEventListener("timeupdate", () =>
+      timeUpdate(videoRef, currentTimeRef, timelineContainerRef)
+    );
+
+    videoContainerRef.current?.addEventListener("mouseenter", () =>
+      handleMouseEnter(videoContainerRef, leaveVideoTimer)
+    );
+
+    videoContainerRef.current?.addEventListener("mouseleave", () =>
+      handleMouseLeave(videoContainerRef, leaveVideoTimer, controlsVanishTime)
+    );
+
+    timelineContainerRef.current?.addEventListener("mousemove", (event) =>
+      handleTimelineUpdate(
+        event,
+        timelineContainerRef,
+        videoRef,
+        previewImgRef,
+        thumbnails,
+        isScrubbing,
+        thumbnailImgRef,
+        currentTimeRef
+      )
+    );
+
+    timelineContainerRef.current?.addEventListener("mousedown", (event) =>
+      handleScrubbing(
+        event,
+        timelineContainerRef,
+        videoRef,
+        currentTimeRef,
+        isScrubbing,
+        videoContainerRef,
+        wasPaused,
+        previewImgRef,
+        thumbnails,
+        thumbnailImgRef
+      )
+    );
+
+    document.addEventListener("mouseup", (event) => {
+      if (isScrubbing.current) {
+        handleScrubbing(
+          event,
+          timelineContainerRef,
+          videoRef,
+          currentTimeRef,
+          isScrubbing,
+          videoContainerRef,
+          wasPaused,
+          previewImgRef,
+          thumbnails,
+          thumbnailImgRef
+        );
+      }
     });
 
-    document.addEventListener("mousemove", (e) => {
-      if (isScrubbing.current) handleTimelineUpdate(e);
+    document.addEventListener("mousemove", (event) => {
+      if (isScrubbing.current) {
+        handleTimelineUpdate(
+          event,
+          timelineContainerRef,
+          videoRef,
+          previewImgRef,
+          thumbnails,
+          isScrubbing,
+          thumbnailImgRef,
+          currentTimeRef
+        );
+      }
     });
 
     videoRef.current?.addEventListener("enterpictureinpicture", () =>
-      handlePictureInPicture("enter")
+      handlePictureInPicture("enter", videoContainerRef)
     );
 
     videoRef.current?.addEventListener("leavepictureinpicture", () =>
-      handlePictureInPicture("leave")
+      handlePictureInPicture("leave", videoContainerRef)
     );
 
     return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("keyup", handleKeyUp);
-      videoRef.current?.removeEventListener("loadeddata", loadedData);
-      videoRef.current?.removeEventListener("timeupdate", timeUpdate);
-      videoContainerRef.current?.removeEventListener(
-        "mouseenter",
-        handleMouseEnter
+      document.removeEventListener("fullscreenchange", () =>
+        handleFullscreenChange(videoContainerRef)
       );
-      videoContainerRef.current?.removeEventListener(
-        "mouseleave",
-        handleMouseLeave
+      document.removeEventListener("keydown", (event) =>
+        handleKeyDown(
+          event,
+          videoContainerRef,
+          controlPressed,
+          shiftPressed,
+          isPlayPause,
+          paused,
+          videoRef,
+          isFullScreen,
+          isTheater,
+          theater,
+          isPictureInPicture,
+          isVolume,
+          handleMute,
+          isSkip,
+          skipIncrement,
+          isClosedCaptions,
+          captions
+        )
       );
-      timelineContainerRef.current?.removeEventListener(
-        "mousemove",
-        handleTimelineUpdate
+      document.removeEventListener("keyup", (event) =>
+        handleKeyUp(event, shiftPressed, controlPressed)
       );
-      timelineContainerRef.current?.removeEventListener(
-        "mousedown",
-        handleScrubbing
+      videoRef.current?.removeEventListener("loadeddata", () =>
+        loadedData(
+          videoRef,
+          totalTimeRef,
+          thumbnails,
+          isTimeLine,
+          isPreview,
+          isThumbnail
+        )
       );
-
-      document.removeEventListener("mouseup", (e) => {
-        if (isScrubbing.current) handleScrubbing(e);
+      videoRef.current?.removeEventListener("timeupdate", () =>
+        timeUpdate(videoRef, currentTimeRef, timelineContainerRef)
+      );
+      videoContainerRef.current?.removeEventListener("mouseenter", () =>
+        handleMouseEnter(videoContainerRef, leaveVideoTimer)
+      );
+      videoContainerRef.current?.removeEventListener("mouseleave", () =>
+        handleMouseLeave(videoContainerRef, leaveVideoTimer, controlsVanishTime)
+      );
+      timelineContainerRef.current?.removeEventListener("mousemove", (event) =>
+        handleTimelineUpdate(
+          event,
+          timelineContainerRef,
+          videoRef,
+          previewImgRef,
+          thumbnails,
+          isScrubbing,
+          thumbnailImgRef,
+          currentTimeRef
+        )
+      );
+      timelineContainerRef.current?.removeEventListener("mousedown", (event) =>
+        handleScrubbing(
+          event,
+          timelineContainerRef,
+          videoRef,
+          currentTimeRef,
+          isScrubbing,
+          videoContainerRef,
+          wasPaused,
+          previewImgRef,
+          thumbnails,
+          thumbnailImgRef
+        )
+      );
+      document.removeEventListener("mouseup", (event) => {
+        if (isScrubbing.current) {
+          handleScrubbing(
+            event,
+            timelineContainerRef,
+            videoRef,
+            currentTimeRef,
+            isScrubbing,
+            videoContainerRef,
+            wasPaused,
+            previewImgRef,
+            thumbnails,
+            thumbnailImgRef
+          );
+        }
       });
-
-      document.removeEventListener("mousemove", (e) => {
-        if (isScrubbing.current) handleTimelineUpdate(e);
+      document.removeEventListener("mousemove", (event) => {
+        if (isScrubbing.current) {
+          handleTimelineUpdate(
+            event,
+            timelineContainerRef,
+            videoRef,
+            previewImgRef,
+            thumbnails,
+            isScrubbing,
+            thumbnailImgRef,
+            currentTimeRef
+          );
+        }
       });
       videoRef.current?.removeEventListener("enterpictureinpicture", () =>
-        handlePictureInPicture("enter")
+        handlePictureInPicture("enter", videoContainerRef)
       );
       videoRef.current?.removeEventListener("leavepictureinpicture", () =>
-        handlePictureInPicture("leave")
+        handlePictureInPicture("leave", videoContainerRef)
       );
     };
   }, [videoStream]);
 
-  const handleKeyUp = (event: any) => {
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        shiftPressed.current = false;
-        break;
-      case "control":
-        controlPressed.current = false;
-        break;
-    }
-  };
-
-  const handleKeyDown = (event: any) => {
-    if (!videoContainerRef.current?.classList.contains("in-video")) return;
-    const tagName = document.activeElement?.tagName.toLowerCase();
-    if (tagName === "input") return;
-    if (controlPressed.current || shiftPressed.current) return;
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        shiftPressed.current = true;
-        break;
-      case "control":
-        controlPressed.current = true;
-        break;
-      case " ":
-        if (tagName === "button") return;
-        if (isPlayPause) {
-          handlePausePlay();
-        }
-        break;
-      case "mediaplaypause":
-        if (isPlayPause) {
-          handlePausePlay();
-        }
-        break;
-      case "k":
-        if (isPlayPause) {
-          handlePausePlay();
-        }
-        break;
-      case "f":
-        if (isFullScreen) {
-          handleFullScreen();
-        }
-        break;
-      case "t":
-        if (isTheater) {
-          handleTheater();
-        }
-        break;
-      case "i":
-        if (isPictureInPicture) {
-          handleMiniPlayer();
-        }
-        break;
-      case "m":
-        if (isVolume) {
-          handleMute();
-        }
-        break;
-      case "arrowleft":
-        if (isSkip) {
-          skip(-skipIncrement);
-        }
-        break;
-      case "j":
-        if (isSkip) {
-          skip(-skipIncrement);
-        }
-        break;
-      case "arrowright":
-        if (isSkip) {
-          skip(skipIncrement);
-        }
-        break;
-      case "k":
-        if (isSkip) {
-          skip(skipIncrement);
-        }
-        break;
-      case "c":
-        if (isClosedCaptions) {
-          handleClosedCaptions();
-        }
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleFullscreenChange = () => {
-    if (!document.fullscreenElement) {
-      videoContainerRef.current?.classList.remove("full-screen");
-    }
-  };
-
-  const handlePictureInPicture = (action: string) => {
-    if (action === "enter") {
-      videoContainerRef.current?.classList.add("mini-player");
-    } else if (action === "leave") {
-      videoContainerRef.current?.classList.remove("mini-player");
-    }
-  };
-
-  const leadingZeroFormatter = new Intl.NumberFormat(undefined, {
-    minimumIntegerDigits: 2,
-  });
-
-  const formatDuration = (time: number) => {
-    const seconds = Math.floor(time % 60);
-    const minutes = Math.floor(time / 60) % 60;
-    const hours = Math.floor(time / 3600);
-    if (hours === 0) {
-      return `${minutes}:${leadingZeroFormatter.format(seconds)}`;
-    } else {
-      return `${hours}:${leadingZeroFormatter.format(
-        minutes
-      )}:${leadingZeroFormatter.format(seconds)}`;
-    }
-  };
-
-  const loadedData = () => {
-    if (!videoRef.current) return;
-
-    if (totalTimeRef.current) {
-      totalTimeRef.current.textContent = formatDuration(
-        videoRef.current.duration
-      );
-    }
-
-    const loadThumbnails = async () => {
-      if (videoRef.current) {
-        const videoSrc = videoRef.current.src;
-        const generatedThumbnails = await extractThumbnails(
-          videoRef.current,
-          videoSrc,
-          10,
-          5
-        );
-        thumbnails.current = generatedThumbnails;
-      }
-    };
-
-    if (isTimeLine && (isPreview || isThumbnail)) {
-      loadThumbnails();
-    }
-  };
-
-  const timeUpdate = () => {
-    if (!videoRef.current) return;
-
-    if (currentTimeRef.current) {
-      currentTimeRef.current.textContent = formatDuration(
-        videoRef.current.currentTime
-      );
-    }
-    const percent = videoRef.current.currentTime / videoRef.current.duration;
-    if (timelineContainerRef.current) {
-      timelineContainerRef.current.style.setProperty(
-        "--progress-position",
-        `${percent}`
-      );
-    }
-  };
-
-  const handleMouseEnter = () => {
-    videoContainerRef.current?.classList.add("in-video");
-    if (leaveVideoTimer.current) {
-      clearTimeout(leaveVideoTimer.current);
-      leaveVideoTimer.current = null;
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (videoContainerRef.current?.classList.contains("paused")) return;
-    leaveVideoTimer.current = setTimeout(() => {
-      videoContainerRef.current?.classList.remove("in-video");
-    }, controlsVanishTime);
-  };
-
-  const handlePausePlay = () => {
-    paused.current = !paused.current;
-    if (paused.current) {
-      videoRef.current?.pause();
-      videoContainerRef.current?.classList.add("paused");
-    } else {
-      videoRef.current?.play();
-      videoContainerRef.current?.classList.remove("paused");
-    }
-  };
-
-  const handleFullScreen = () => {
-    if (videoContainerRef.current?.classList.contains("full-screen")) {
-      document
-        .exitFullscreen()
-        .then(() => {
-          videoContainerRef.current?.classList.remove("full-screen");
-        })
-        .catch((error) => {
-          console.error("Failed to exit full screen:", error);
-        });
-    } else {
-      videoContainerRef.current
-        ?.requestFullscreen()
-        .then(() => {
-          videoContainerRef.current?.classList.add("full-screen");
-        })
-        .catch((error) => {
-          console.error("Failed to request full screen:", error);
-        });
-    }
-  };
-
-  const handleTheater = () => {
-    theater.current = !theater.current;
-    if (theater.current) {
-      videoContainerRef.current?.classList.add("theater");
-    } else {
-      videoContainerRef.current?.classList.remove("theater");
-    }
-  };
-
-  const handleMiniPlayer = () => {
-    if (videoContainerRef.current?.classList.contains("mini-player")) {
-      document.exitPictureInPicture().catch((error) => {
-        console.error("Failed to exit picture in picture:", error);
-      });
-    } else {
-      videoRef.current?.requestPictureInPicture().catch((error) => {
-        console.error("Failed to request picture in picture:", error);
-      });
-    }
-  };
-
-  const skip = (duration: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime += duration;
-    }
-  };
-
-  const handleClosedCaptions = () => {
-    if (captions.current) {
-      const isHidden = captions.current.mode === "hidden";
-      captions.current.mode = isHidden ? "showing" : "hidden";
-      videoContainerRef.current?.classList.toggle("captions", isHidden);
-    }
-  };
-
-  const handlePlaybackSpeed = () => {
-    if (!videoRef.current || !playbackSpeedButtonRef.current) return;
-
-    const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
-    const currentPlaybackRateIndex = playbackRates.findIndex(
-      (rate) => rate === videoRef.current?.playbackRate
-    );
-
-    const nextPlaybackRateIndex =
-      (currentPlaybackRateIndex + 1) % playbackRates.length;
-
-    videoRef.current.playbackRate = playbackRates[nextPlaybackRateIndex];
-    playbackSpeedButtonRef.current.textContent = `${playbackRates[nextPlaybackRateIndex]}x`;
-  };
-
-  const handleScrubbing = (e: MouseEvent) => {
-    if (
-      !timelineContainerRef.current ||
-      !videoRef.current ||
-      !currentTimeRef.current
-    )
-      return;
-
-    const rect = timelineContainerRef.current.getBoundingClientRect();
-    const percent =
-      Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width;
-
-    isScrubbing.current = (e.buttons & 1) === 1;
-    videoContainerRef.current?.classList.toggle(
-      "scrubbing",
-      isScrubbing.current
-    );
-    if (isScrubbing.current) {
-      videoContainerRef.current?.classList.add("scrubbing");
-      wasPaused.current = videoRef.current.paused;
-      videoRef.current.pause();
-    } else {
-      videoContainerRef.current?.classList.remove("scrubbing");
-      videoRef.current.currentTime = percent * videoRef.current.duration;
-      if (!wasPaused) videoRef.current.play();
-    }
-
-    handleTimelineUpdate(e);
-  };
-
-  const handleTimelineUpdate = (e: MouseEvent) => {
-    if (
-      !timelineContainerRef.current ||
-      !videoRef.current ||
-      !previewImgRef.current
-    )
-      return;
-
-    const rect = timelineContainerRef.current.getBoundingClientRect();
-    const percent =
-      Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width;
-    const previewImgIndex = Math.max(
-      1,
-      Math.floor((percent * videoRef.current.duration) / 10)
-    );
-    const previewImgSrc = thumbnails.current[previewImgIndex];
-    previewImgRef.current.src = previewImgSrc;
-    timelineContainerRef.current.style.setProperty(
-      "--preview-position",
-      `${percent}`
-    );
-
-    if (
-      isScrubbing.current &&
-      thumbnailImgRef.current &&
-      currentTimeRef.current
-    ) {
-      e.preventDefault();
-      thumbnailImgRef.current.src = previewImgSrc;
-      timelineContainerRef.current.style.setProperty(
-        "--progress-position",
-        `${percent}`
-      );
-
-      currentTimeRef.current.textContent = formatDuration(
-        percent * videoRef.current.duration
-      );
-    }
-  };
-
-  const extractThumbnails = async (
-    video: HTMLVideoElement,
-    videoSrc: string,
-    interval: number,
-    thumbnailClarity = 5
-  ): Promise<string[]> => {
-    const thumbnails: string[] = [];
-    const offscreenVideo = document.createElement("video");
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const videoAspectRatio = video.videoWidth / video.videoHeight;
-
-    if (!ctx) throw new Error("Failed to get 2D context");
-
-    offscreenVideo.src = videoSrc;
-    offscreenVideo.crossOrigin = "anonymous";
-
-    await new Promise<void>((resolve) => {
-      offscreenVideo.onloadedmetadata = () => {
-        resolve();
-      };
-    });
-
-    const duration = offscreenVideo.duration;
-    const thumbnailHeight = Math.max(video.videoHeight / thumbnailClarity, 90);
-    const thumbnailWidth = Math.max(
-      video.videoWidth / thumbnailClarity,
-      90 * videoAspectRatio
-    );
-
-    for (let time = 0; time < duration; time += interval) {
-      offscreenVideo.currentTime = time;
-
-      await new Promise<void>((resolve) => {
-        offscreenVideo.onseeked = () => {
-          canvas.width = thumbnailWidth;
-          canvas.height = thumbnailHeight;
-          ctx.drawImage(offscreenVideo, 0, 0, thumbnailWidth, thumbnailHeight);
-          const thumbnail = canvas.toDataURL("image/png");
-          thumbnails.push(thumbnail);
-          resolve();
-        };
-      });
-    }
-
-    return thumbnails;
-  };
-
   return (
     <div
       ref={videoContainerRef}
-      id={id}
+      id={username && type && `${username}_${type}_stream_container`}
       className={`video-container ${
         autoPlay ? "" : "paused"
       } relative overflow-hidden flex items-center justify-center text-white font-K2D rounded-md`}
@@ -656,7 +448,12 @@ export default function FgVideo({
         <>
           <video
             ref={videoRef}
-            onClick={isPlayPause ? handlePausePlay : () => {}}
+            id={username && type && `${username}_${type}_stream`}
+            onClick={
+              isPlayPause
+                ? () => handlePausePlay(paused, videoRef, videoContainerRef)
+                : () => {}
+            }
             className='main-video w-full z-0'
             controls={false}
             autoPlay={autoPlay}
@@ -688,7 +485,9 @@ export default function FgVideo({
             <div className='video-controls w-full h-10 flex items-center space-x-2'>
               {isPlayPause && (
                 <button
-                  onClick={handlePausePlay}
+                  onClick={() =>
+                    handlePausePlay(paused, videoRef, videoContainerRef)
+                  }
                   className='flex items-center justify-center w-10 aspect-square'
                 >
                   <svg
@@ -737,7 +536,9 @@ export default function FgVideo({
               {isPlaybackSpeed && (
                 <button
                   ref={playbackSpeedButtonRef}
-                  onClick={handlePlaybackSpeed}
+                  onClick={() =>
+                    handlePlaybackSpeed(videoRef, playbackSpeedButtonRef)
+                  }
                   className='playback-speed-button wide-button text-lg'
                 >
                   1x
@@ -745,7 +546,9 @@ export default function FgVideo({
               )}
               {isClosedCaptions && (
                 <button
-                  onClick={handleClosedCaptions}
+                  onClick={() =>
+                    handleClosedCaptions(captions, videoContainerRef)
+                  }
                   className='caption-button flex-col items-center justify-center'
                 >
                   <svg
@@ -762,7 +565,7 @@ export default function FgVideo({
               )}
               {isPictureInPicture && (
                 <button
-                  onClick={handleMiniPlayer}
+                  onClick={() => handleMiniPlayer(videoContainerRef, videoRef)}
                   className='flex items-center justify-center'
                 >
                   <div className='mini-player-icon h-9 w-9 flex items-center justify-center'>
@@ -779,7 +582,7 @@ export default function FgVideo({
               )}
               {isTheater && (
                 <button
-                  onClick={handleTheater}
+                  onClick={() => handleTheater(theater, videoContainerRef)}
                   className='flex items-center justify-center'
                 >
                   <div className='theater-icon h-9 w-9 flex items-center justify-center'>
@@ -792,7 +595,7 @@ export default function FgVideo({
               )}
               {isFullScreen && (
                 <button
-                  onClick={handleFullScreen}
+                  onClick={() => handleFullscreen(videoContainerRef)}
                   className='flex items-center justify-center'
                 >
                   <svg
