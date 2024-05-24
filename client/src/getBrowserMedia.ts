@@ -3,12 +3,17 @@ import * as mediasoup from "mediasoup-client";
 const getBrowserMedia = async (
   type: string,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-  newCameraBtnRef: React.RefObject<HTMLButtonElement>,
-  webcamBtnRef: React.RefObject<HTMLButtonElement>,
-  screenBtnRef: React.RefObject<HTMLButtonElement>,
-  audioBtnRef: React.RefObject<HTMLButtonElement>,
+  handleDisableEnableBtns: (disabled: boolean) => void,
   isScreen: React.MutableRefObject<boolean>,
-  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>
+  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
+  isWebcam: React.MutableRefObject<boolean>,
+  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
+  cameraStreams: React.MutableRefObject<{
+    [webcamId: string]: MediaStream;
+  }>,
+  screenStreams: React.MutableRefObject<{
+    [screenId: string]: MediaStream;
+  }>
 ) => {
   if (
     type === "webcam" &&
@@ -41,13 +46,14 @@ const getBrowserMedia = async (
       : navigator.mediaDevices.getUserMedia(constraints));
     return stream;
   } catch (error) {
-    if (webcamBtnRef.current) webcamBtnRef.current.disabled = false;
-    if (screenBtnRef.current) screenBtnRef.current.disabled = false;
-    if (audioBtnRef.current) audioBtnRef.current.disabled = false;
-    if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = false;
-    if (type === "screen") {
+    handleDisableEnableBtns(false);
+    if (type === "screen" && Object.keys(cameraStreams).length === 0) {
       isScreen.current = false;
       setScreenActive(false);
+    }
+    if (type === "camera" && Object.keys(screenStreams).length === 0) {
+      isWebcam.current = false;
+      setWebcamActive(false);
     }
     console.error("Error accessing media devices:", error);
     return;

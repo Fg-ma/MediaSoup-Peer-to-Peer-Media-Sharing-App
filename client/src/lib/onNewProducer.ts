@@ -23,16 +23,14 @@ const onNewProducer = async (
   }>,
   screenCount: React.MutableRefObject<number>,
   audioStream: React.MutableRefObject<MediaStream | undefined>,
-  newCameraBtnRef: React.RefObject<HTMLButtonElement>,
-  webcamBtnRef: React.RefObject<HTMLButtonElement>,
-  screenBtnRef: React.RefObject<HTMLButtonElement>,
-  audioBtnRef: React.RefObject<HTMLButtonElement>,
+  handleDisableEnableBtns: (disabled: boolean) => void,
   remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
   muteAudio: () => void,
-  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>
+  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
+  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const oldBundle = document.getElementById(`${username.current}_bundle`);
   const oldBundleContainer = document.getElementById(
@@ -50,12 +48,13 @@ const onNewProducer = async (
     const cameraBrowserMedia = await getBrowserMedia(
       event.producerType,
       device,
-      newCameraBtnRef,
-      webcamBtnRef,
-      screenBtnRef,
-      audioBtnRef,
+      handleDisableEnableBtns,
       isScreen,
-      setScreenActive
+      setScreenActive,
+      isWebcam,
+      setWebcamActive,
+      cameraStreams,
+      screenStreams
     );
     if (cameraBrowserMedia) {
       cameraStreams.current[
@@ -89,12 +88,13 @@ const onNewProducer = async (
     const screenBrowserMedia = await getBrowserMedia(
       event.producerType,
       device,
-      newCameraBtnRef,
-      webcamBtnRef,
-      screenBtnRef,
-      audioBtnRef,
+      handleDisableEnableBtns,
       isScreen,
-      setScreenActive
+      setScreenActive,
+      isWebcam,
+      setWebcamActive,
+      cameraStreams,
+      screenStreams
     );
     if (screenBrowserMedia) {
       screenStreams.current[
@@ -125,12 +125,13 @@ const onNewProducer = async (
     audioStream.current = await getBrowserMedia(
       event.producerType,
       device,
-      newCameraBtnRef,
-      webcamBtnRef,
-      screenBtnRef,
-      audioBtnRef,
+      handleDisableEnableBtns,
       isScreen,
-      setScreenActive
+      setScreenActive,
+      isWebcam,
+      setWebcamActive,
+      cameraStreams,
+      screenStreams
     );
     if (audioStream.current) {
       const track = audioStream.current.getAudioTracks()[0];
@@ -193,10 +194,8 @@ const onNewProducer = async (
     );
   }
 
-  if (webcamBtnRef.current) webcamBtnRef.current.disabled = false;
-  if (screenBtnRef.current) screenBtnRef.current.disabled = false;
-  if (audioBtnRef.current) audioBtnRef.current.disabled = false;
-  if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = false;
+  // Reenable buttons
+  handleDisableEnableBtns(false);
 };
 
 export default onNewProducer;

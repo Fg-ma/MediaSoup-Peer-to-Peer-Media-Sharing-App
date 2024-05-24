@@ -2,10 +2,8 @@ import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 
 const publishScreen = (
+  handleDisableEnableBtns: (disabled: boolean) => void,
   isScreen: React.MutableRefObject<boolean>,
-  webcamBtnRef: React.RefObject<HTMLButtonElement>,
-  screenBtnRef: React.RefObject<HTMLButtonElement>,
-  audioBtnRef: React.RefObject<HTMLButtonElement>,
   setScreenActive: (value: React.SetStateAction<boolean>) => void,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -20,13 +18,12 @@ const publishScreen = (
     console.error("Missing roomName or username!");
     return;
   }
-  webcamBtnRef.current!.disabled = true;
-  screenBtnRef.current!.disabled = true;
-  audioBtnRef.current!.disabled = true;
+  handleDisableEnableBtns(true);
   isScreen.current = !isScreen.current;
   setScreenActive((prev) => !prev);
 
   if (isScreen.current) {
+    screenCount.current = screenCount.current + 1;
     if (device.current) {
       const msg = {
         type: "createProducerTransport",

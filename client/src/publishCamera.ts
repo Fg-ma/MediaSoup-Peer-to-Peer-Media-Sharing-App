@@ -2,11 +2,8 @@ import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 
 const publishCamera = (
+  handleDisableEnableBtns: (disabled: boolean) => void,
   isWebcam: React.MutableRefObject<boolean>,
-  newCameraBtnRef: React.RefObject<HTMLButtonElement>,
-  webcamBtnRef: React.RefObject<HTMLButtonElement>,
-  screenBtnRef: React.RefObject<HTMLButtonElement>,
-  audioBtnRef: React.RefObject<HTMLButtonElement>,
   setWebcamActive: (value: React.SetStateAction<boolean>) => void,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -21,10 +18,7 @@ const publishCamera = (
     console.error("Missing roomName or username!");
     return;
   }
-  if (webcamBtnRef.current) webcamBtnRef.current.disabled = true;
-  if (screenBtnRef.current) screenBtnRef.current.disabled = true;
-  if (audioBtnRef.current) audioBtnRef.current.disabled = true;
-  if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = true;
+  handleDisableEnableBtns(true);
   isWebcam.current = !isWebcam.current;
   setWebcamActive((prev) => !prev);
 

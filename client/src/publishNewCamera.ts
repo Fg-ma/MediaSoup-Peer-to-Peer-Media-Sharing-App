@@ -2,10 +2,7 @@ import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 
 const publishNewCamera = (
-  newCameraBtnRef: React.RefObject<HTMLButtonElement>,
-  webcamBtnRef: React.RefObject<HTMLButtonElement>,
-  screenBtnRef: React.RefObject<HTMLButtonElement>,
-  audioBtnRef: React.RefObject<HTMLButtonElement>,
+  handleDisableEnableBtns: (disabled: boolean) => void,
   cameraCount: React.MutableRefObject<number>,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -16,10 +13,7 @@ const publishNewCamera = (
     console.error("Missing roomName or username!");
     return;
   }
-  newCameraBtnRef.current!.disabled = true;
-  webcamBtnRef.current!.disabled = true;
-  screenBtnRef.current!.disabled = true;
-  audioBtnRef.current!.disabled = true;
+  handleDisableEnableBtns(true);
   cameraCount.current = cameraCount.current + 1;
 
   if (device.current) {

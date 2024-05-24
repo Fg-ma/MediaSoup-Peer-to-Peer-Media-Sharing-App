@@ -19,12 +19,14 @@ import onRequestedMuteLock from "./lib/onRequestedMuteLock";
 import onMuteLockChange from "./lib/onMuteLockChange";
 import onAcceptedMuteLock from "./lib/onAcceptedMuteLock";
 import publishNewCamera from "./publishNewCamera";
+import publishNewScreen from "./publishNewScreen";
 
 const websocketURL = "http://localhost:8000";
 
 export default function Main() {
   const webcamBtnRef = useRef<HTMLButtonElement>(null);
   const newCameraBtnRef = useRef<HTMLButtonElement>(null);
+  const newScreenBtnRef = useRef<HTMLButtonElement>(null);
   const screenBtnRef = useRef<HTMLButtonElement>(null);
   const audioBtnRef = useRef<HTMLButtonElement>(null);
   const muteBtnRef = useRef<HTMLButtonElement>(null);
@@ -51,7 +53,7 @@ export default function Main() {
   const cameraStreams = useRef<{ [webcamId: string]: MediaStream }>({});
   const cameraCount = useRef(0);
   const screenStreams = useRef<{ [screenId: string]: MediaStream }>({});
-  const screenCount = useRef(0);
+  let screenCount = useRef(0);
   const audioStream = useRef<MediaStream>();
 
   const remoteTracksMap = useRef<{
@@ -97,14 +99,12 @@ export default function Main() {
             screenStreams,
             screenCount,
             audioStream,
-            newCameraBtnRef,
-            webcamBtnRef,
-            screenBtnRef,
-            audioBtnRef,
+            handleDisableEnableBtns,
             remoteVideosContainerRef,
             producerTransport,
             muteAudio,
-            setScreenActive
+            setScreenActive,
+            setWebcamActive
           );
           break;
         case "consumerTransportCreated":
@@ -158,24 +158,19 @@ export default function Main() {
             screenStreams,
             screenCount,
             audioStream,
-            newCameraBtnRef,
-            webcamBtnRef,
-            screenBtnRef,
-            audioBtnRef,
+            handleDisableEnableBtns,
             remoteVideosContainerRef,
             producerTransport,
             muteAudio,
-            setScreenActive
+            setScreenActive,
+            setWebcamActive
           );
           break;
         case "producerDisconnected":
           onProducerDisconnected(
             event,
             username,
-            newCameraBtnRef,
-            webcamBtnRef,
-            screenBtnRef,
-            audioBtnRef,
+            handleDisableEnableBtns,
             remoteVideosContainerRef,
             cameraStreams,
             screenStreams,
@@ -252,6 +247,14 @@ export default function Main() {
     }
   };
 
+  const handleDisableEnableBtns = (disabled: boolean) => {
+    if (webcamBtnRef.current) webcamBtnRef.current!.disabled = disabled;
+    if (screenBtnRef.current) screenBtnRef.current!.disabled = disabled;
+    if (audioBtnRef.current) audioBtnRef.current!.disabled = disabled;
+    if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = disabled;
+    if (newScreenBtnRef.current) newScreenBtnRef.current.disabled = disabled;
+  };
+
   return (
     <div className='min-w-full min-h-full overflow-x-hidden flex-col'>
       <div className='flex justify-center min-w-full bg-black h-16 text-white items-center mb-10'>
@@ -264,11 +267,8 @@ export default function Main() {
               ref={webcamBtnRef}
               onClick={() =>
                 publishCamera(
+                  handleDisableEnableBtns,
                   isWebcam,
-                  newCameraBtnRef,
-                  webcamBtnRef,
-                  screenBtnRef,
-                  audioBtnRef,
                   setWebcamActive,
                   socket,
                   device,
@@ -296,10 +296,7 @@ export default function Main() {
               ref={newCameraBtnRef}
               onClick={() =>
                 publishNewCamera(
-                  newCameraBtnRef,
-                  webcamBtnRef,
-                  screenBtnRef,
-                  audioBtnRef,
+                  handleDisableEnableBtns,
                   cameraCount,
                   socket,
                   device,
@@ -317,11 +314,8 @@ export default function Main() {
               ref={audioBtnRef}
               onClick={() =>
                 publishAudio(
+                  handleDisableEnableBtns,
                   isAudio,
-                  webcamBtnRef,
-                  newCameraBtnRef,
-                  screenBtnRef,
-                  audioBtnRef,
                   setAudioActive,
                   socket,
                   device,
@@ -358,10 +352,8 @@ export default function Main() {
               ref={screenBtnRef}
               onClick={() =>
                 publishScreen(
+                  handleDisableEnableBtns,
                   isScreen,
-                  webcamBtnRef,
-                  screenBtnRef,
-                  audioBtnRef,
                   setScreenActive,
                   socket,
                   device,
@@ -386,14 +378,11 @@ export default function Main() {
             } flex flex-col mx-2`}
           >
             <button
-              ref={newCameraBtnRef}
+              ref={newScreenBtnRef}
               onClick={() =>
                 publishNewScreen(
-                  newCameraBtnRef,
-                  webcamBtnRef,
-                  screenBtnRef,
-                  audioBtnRef,
-                  cameraCount,
+                  handleDisableEnableBtns,
+                  screenCount,
                   socket,
                   device,
                   roomName,
