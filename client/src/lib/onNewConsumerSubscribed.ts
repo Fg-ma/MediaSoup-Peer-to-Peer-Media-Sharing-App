@@ -8,6 +8,7 @@ const onNewConsumerSubscribed = async (
   event: {
     type: string;
     producerUsername: string;
+    consumerId?: string;
     consumerType: string;
     data: {
       producerId: string;
@@ -27,8 +28,8 @@ const onNewConsumerSubscribed = async (
   remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?: MediaStreamTrack | undefined;
-      screen?: MediaStreamTrack | undefined;
+      webcam?: { [webcamId: string]: MediaStreamTrack };
+      screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack | undefined;
     };
   }>
@@ -54,47 +55,60 @@ const onNewConsumerSubscribed = async (
   const oldAudioStream = document.getElementById(
     `${event.producerUsername}_audio_stream`
   );
-  if (oldBundle) {
+  if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
     remoteVideosContainerRef.current?.removeChild(oldBundle);
   }
 
   if (!remoteTracksMap.current[event.producerUsername]) {
     remoteTracksMap.current[event.producerUsername] = {};
   }
-  remoteTracksMap.current[event.producerUsername][
-    event.consumerType as "webcam" | "screen" | "audio"
-  ] = consumer.track;
+  if (event.consumerType === "webcam" || event.consumerType === "screen") {
+    if (!remoteTracksMap.current[event.producerUsername][event.consumerType]) {
+      remoteTracksMap.current[event.producerUsername][event.consumerType] = {};
+    }
+    if (event.consumerId) {
+      remoteTracksMap.current[event.producerUsername][
+        event.consumerType as "webcam" | "screen"
+      ]![event.consumerId] = consumer.track;
+    }
+  } else {
+    remoteTracksMap.current[event.producerUsername][
+      event.consumerType as "audio"
+    ] = consumer.track;
+  }
 
   if (remoteVideosContainerRef.current) {
-    let cameraStream;
-    if (
-      remoteTracksMap.current[event.producerUsername] &&
-      remoteTracksMap.current[event.producerUsername].webcam
-    ) {
-      cameraStream = new MediaStream();
-      cameraStream.addTrack(
-        remoteTracksMap.current[event.producerUsername].webcam!
-      );
+    let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
+    if (remoteTracksMap.current[event.producerUsername]?.webcam) {
+      for (const key in remoteTracksMap.current[event.producerUsername]
+        .webcam) {
+        const remoteCameraStream = new MediaStream();
+        remoteCameraStream.addTrack(
+          remoteTracksMap.current[event.producerUsername].webcam![key]
+        );
+        remoteCameraStreams[key] = remoteCameraStream;
+      }
     }
 
-    let screenStream;
-    if (
-      remoteTracksMap.current[event.producerUsername] &&
-      remoteTracksMap.current[event.producerUsername].screen
-    ) {
-      screenStream = new MediaStream();
-      screenStream.addTrack(
-        remoteTracksMap.current[event.producerUsername].screen!
-      );
+    let remoteScreenStreams: { [screenId: string]: MediaStream } = {};
+    if (remoteTracksMap.current[event.producerUsername]?.screen) {
+      for (const key in remoteTracksMap.current[event.producerUsername]
+        .screen) {
+        const remoteScreenStream = new MediaStream();
+        remoteScreenStream.addTrack(
+          remoteTracksMap.current[event.producerUsername].screen![key]
+        );
+        remoteScreenStreams[key] = remoteScreenStream;
+      }
     }
 
-    let audioStream;
+    let remoteAudioStream;
     if (
       remoteTracksMap.current[event.producerUsername] &&
       remoteTracksMap.current[event.producerUsername].audio
     ) {
-      audioStream = new MediaStream();
-      audioStream.addTrack(
+      remoteAudioStream = new MediaStream();
+      remoteAudioStream.addTrack(
         remoteTracksMap.current[event.producerUsername].audio!
       );
     }
@@ -107,9 +121,9 @@ const onNewConsumerSubscribed = async (
     root.render(
       React.createElement(Bundle, {
         username: event.producerUsername,
-        cameraStream: cameraStream ? cameraStream : undefined,
-        screenStream: screenStream ? screenStream : undefined,
-        audioStream: audioStream ? audioStream : undefined,
+        cameraStreams: remoteCameraStreams ? remoteCameraStreams : undefined,
+        screenStreams: remoteScreenStreams ? remoteScreenStreams : undefined,
+        audioStream: remoteAudioStream ? remoteAudioStream : undefined,
         onRendered: () => {
           if (oldAudioStream instanceof HTMLAudioElement) {
             const newAudioStream = document.getElementById(

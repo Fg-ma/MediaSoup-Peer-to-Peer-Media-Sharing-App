@@ -10,7 +10,11 @@ const publishScreen = (
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   roomName: React.MutableRefObject<string>,
-  username: React.MutableRefObject<string>
+  username: React.MutableRefObject<string>,
+  screenCount: React.MutableRefObject<number>,
+  screenStreams: React.MutableRefObject<{
+    [webcamId: string]: MediaStream;
+  }>
 ) => {
   if (!roomName.current || !username.current) {
     console.error("Missing roomName or username!");
@@ -35,13 +39,21 @@ const publishScreen = (
       socket.current.emit("message", msg);
     }
   } else if (!isScreen.current) {
-    const msg = {
-      type: "removeProducer",
-      roomName: roomName.current,
-      username: username.current,
-      producerType: "screen",
-    };
-    socket.current.emit("message", msg);
+    for (let i = screenCount.current; i >= 0; i--) {
+      const streamKey = `${username.current}_screen_stream_${i}`;
+
+      if (streamKey in screenStreams.current) {
+        const msg = {
+          type: "removeProducer",
+          roomName: roomName.current,
+          username: username.current,
+          producerType: "screen",
+          producerId: `${username.current}_screen_stream_${i}`,
+        };
+        socket.current.emit("message", msg);
+        break;
+      }
+    }
   }
 };
 

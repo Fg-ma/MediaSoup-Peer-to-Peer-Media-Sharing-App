@@ -16,23 +16,29 @@ const onResume = async (
       if (
         roomConsumers[event.roomName][event.username][producerUsername].webcam
       ) {
-        await roomConsumers[event.roomName][event.username][
-          producerUsername
-        ].webcam?.consumer.resume();
+        const webcams =
+          roomConsumers[event.roomName][event.username][producerUsername]
+            .webcam;
+        for (const webcamId in webcams) {
+          await webcams[webcamId].consumer?.resume();
+        }
       }
       if (
         roomConsumers[event.roomName][event.username][producerUsername].screen
       ) {
-        await roomConsumers[event.roomName][event.username][
-          producerUsername
-        ].screen?.consumer.resume();
+        const screens =
+          roomConsumers[event.roomName][event.username][producerUsername]
+            .screen;
+        for (const screenId in screens) {
+          await screens[screenId].consumer?.resume();
+        }
       }
       if (
         roomConsumers[event.roomName][event.username][producerUsername].audio
       ) {
         await roomConsumers[event.roomName][event.username][
           producerUsername
-        ].audio?.consumer.resume();
+        ].audio!.consumer?.resume();
       }
     } catch (error) {
       console.error(

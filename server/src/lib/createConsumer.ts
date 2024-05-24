@@ -11,8 +11,8 @@ const createConsumer = async (
   username: string,
   producers: {
     [username: string]: {
-      webcam?: Producer;
-      screen?: Producer;
+      webcam?: { [webcamId: string]: Producer };
+      screen?: { [screenId: string]: Producer };
       audio?: Producer;
     };
   },
@@ -31,25 +31,29 @@ const createConsumer = async (
     return;
   }
 
-  const consumers: {
+  let consumers: {
     [username: string]: {
       webcam?: {
-        consumer: Consumer;
-        producerId: string;
-        id: string;
-        kind: string;
-        rtpParameters: any;
-        type: string;
-        producerPaused: boolean;
+        [webcamId: string]: {
+          consumer: Consumer;
+          producerId: string;
+          id: string;
+          kind: string;
+          rtpParameters: any;
+          type: string;
+          producerPaused: boolean;
+        };
       };
       screen?: {
-        consumer: Consumer;
-        producerId: string;
-        id: string;
-        kind: string;
-        rtpParameters: any;
-        type: string;
-        producerPaused: boolean;
+        [screenId: string]: {
+          consumer: Consumer;
+          producerId: string;
+          id: string;
+          kind: string;
+          rtpParameters: any;
+          type: string;
+          producerPaused: boolean;
+        };
       };
       audio?: {
         consumer: Consumer;
@@ -69,83 +73,97 @@ const createConsumer = async (
       continue;
     }
 
-    const webcamProducer = producers[producerUsername].webcam;
+    const webcamProducers = producers[producerUsername].webcam;
 
-    if (webcamProducer) {
-      // Check if consumer transport can consume from this producer
-      if (
-        !mediasoupRouter.canConsume({
-          producerId: webcamProducer.id,
-          rtpCapabilities,
-        })
-      ) {
-        console.error(`Cannot consume from producer ${webcamProducer.id}`);
-      }
+    if (webcamProducers) {
+      for (const webcamProducerId in webcamProducers) {
+        const webcamProducer = webcamProducers[webcamProducerId];
 
-      try {
-        // Create a consumer for the producer
-        const consumer = await transport.consume({
-          producerId: webcamProducer.id,
-          rtpCapabilities,
-          paused: webcamProducer.kind === "video",
-        });
-
-        // Store the consumer in the consumers object
-        if (!consumers[producerUsername]) {
-          consumers[producerUsername] = {};
+        // Check if consumer transport can consume from this producer
+        if (
+          !mediasoupRouter.canConsume({
+            producerId: webcamProducer.id,
+            rtpCapabilities,
+          })
+        ) {
+          console.error(`Cannot consume from producer ${webcamProducer.id}`);
         }
-        consumers[producerUsername].webcam = {
-          consumer: consumer,
-          producerId: webcamProducer.id,
-          id: consumer.id,
-          kind: consumer.kind,
-          rtpParameters: consumer.rtpParameters,
-          type: consumer.type,
-          producerPaused: consumer.producerPaused,
-        };
-      } catch (error) {
-        console.error("consume failed: ", error);
+
+        try {
+          // Create a consumer for the producer
+          const consumer = await transport.consume({
+            producerId: webcamProducer.id,
+            rtpCapabilities,
+            paused: webcamProducer.kind === "video",
+          });
+
+          // Store the consumer in the consumers object
+          if (!consumers[producerUsername]) {
+            consumers[producerUsername] = {};
+          }
+          if (!consumers[producerUsername].webcam) {
+            consumers[producerUsername].webcam = {};
+          }
+          consumers[producerUsername].webcam![webcamProducerId] = {
+            consumer: consumer,
+            producerId: webcamProducer.id,
+            id: consumer.id,
+            kind: consumer.kind,
+            rtpParameters: consumer.rtpParameters,
+            type: consumer.type,
+            producerPaused: consumer.producerPaused,
+          };
+        } catch (error) {
+          console.error("consume failed: ", error);
+        }
       }
     }
 
-    const screenProducer = producers[producerUsername].screen;
+    const screenProducers = producers[producerUsername].screen;
 
-    if (screenProducer) {
-      // Check if consumer transport can consume from this producer
-      if (
-        !mediasoupRouter.canConsume({
-          producerId: screenProducer.id,
-          rtpCapabilities,
-        })
-      ) {
-        console.error(`Cannot consume from producer ${screenProducer.id}`);
-        continue;
-      }
+    if (screenProducers) {
+      for (const screenProducerId in screenProducers) {
+        const screenProducer = screenProducers[screenProducerId];
 
-      try {
-        // Create a consumer for the producer
-        const consumer = await transport.consume({
-          producerId: screenProducer.id,
-          rtpCapabilities,
-          paused: screenProducer.kind === "video",
-        });
-
-        // Store the consumer in the consumers object
-        if (!consumers[producerUsername]) {
-          consumers[producerUsername] = {};
+        // Check if consumer transport can consume from this producer
+        if (
+          !mediasoupRouter.canConsume({
+            producerId: screenProducer.id,
+            rtpCapabilities,
+          })
+        ) {
+          console.error(`Cannot consume from producer ${screenProducer.id}`);
+          continue;
         }
-        consumers[producerUsername].screen = {
-          consumer: consumer,
-          producerId: screenProducer.id,
-          id: consumer.id,
-          kind: consumer.kind,
-          rtpParameters: consumer.rtpParameters,
-          type: consumer.type,
-          producerPaused: consumer.producerPaused,
-        };
-      } catch (error) {
-        console.error("consume failed: ", error);
-        continue;
+
+        try {
+          // Create a consumer for the producer
+          const consumer = await transport.consume({
+            producerId: screenProducer.id,
+            rtpCapabilities,
+            paused: screenProducer.kind === "video",
+          });
+
+          // Store the consumer in the consumers object
+          if (!consumers[producerUsername]) {
+            consumers[producerUsername] = {};
+          }
+          if (!consumers[producerUsername].screen) {
+            consumers[producerUsername].screen = {};
+          }
+          consumers[producerUsername].screen![screenProducerId] = {
+            consumer: consumer,
+            producerId: screenProducer.id,
+            id: consumer.id,
+            kind: consumer.kind,
+            rtpParameters: consumer.rtpParameters,
+            type: consumer.type,
+            producerPaused: consumer.producerPaused,
+          };
+        } catch (error) {
+          console.error("consume failed: ", error);
+          continue;
+        }
       }
     }
 

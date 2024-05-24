@@ -48,8 +48,8 @@ import VolumeSection from "./VolumeSection";
 
 export default function ({
   username,
-  cameraStream,
-  screenStream,
+  cameraStreams,
+  screenStreams,
   audioStream,
   isAudio = true,
   isUser = false,
@@ -60,8 +60,8 @@ export default function ({
   onRendered,
 }: {
   username?: string;
-  cameraStream?: MediaStream;
-  screenStream?: MediaStream;
+  cameraStreams?: { [cameraKey: string]: MediaStream };
+  screenStreams?: { [screenKey: string]: MediaStream };
   audioStream?: MediaStream;
   isAudio?: boolean;
   isUser?: boolean;
@@ -173,7 +173,7 @@ export default function ({
       const max = 1;
       const percentage = ((value - min) / (max - min)) * 100;
       const trackColor = `linear-gradient(to right, ${primaryVolumeSliderColor} 0%, ${primaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} 100%)`;
-      if (audioStream && !cameraStream && !screenStream) {
+      if (audioStream && !cameraStreams && !screenStreams) {
         bundleRef.current?.style.setProperty(
           "--volume-slider-thumb-size",
           "1.5rem"
@@ -184,7 +184,7 @@ export default function ({
         const sliderElement = slider as HTMLInputElement;
         sliderElement.style.background = trackColor;
         sliderElement.style.borderRadius =
-          audioStream && !cameraStream && !screenStream
+          audioStream && !cameraStreams && !screenStreams
             ? "0.3125rem"
             : "0.125rem";
       });
@@ -196,6 +196,16 @@ export default function ({
     if (audioRef.current) {
       audioRef.current.volume = volume;
       audioRef.current.muted = volume === 0;
+    }
+
+    if (bundleRef.current) {
+      const volumeSliders =
+        bundleRef.current.querySelectorAll(".volume-slider");
+
+      volumeSliders.forEach((slider) => {
+        const sliderElement = slider as HTMLInputElement;
+        sliderElement.value = `${volume}`;
+      });
     }
 
     tracksColorSetter();
@@ -435,7 +445,7 @@ export default function ({
 
   // Initial functions & call onRendered call back if one is availiable
   useEffect(() => {
-    if (audioStream && !cameraStream && !screenStream) {
+    if (audioStream && !cameraStreams && !screenStreams) {
       bundleRef.current?.style.setProperty(
         "--volume-slider-height",
         "0.625rem"
@@ -454,100 +464,108 @@ export default function ({
       id={username && `${username}_bundle_container`}
       className='bundle-container'
     >
-      {cameraStream && (
-        <FgVideo
-          type={"camera"}
-          username={username}
-          videoStream={cameraStream}
-          isStream={true}
-          muted={isUser}
-          flipVideo={true}
-          isSlider={!isUser}
-          isPlayPause={false}
-          isVolume={audioStream ? true : false}
-          isTotalTime={false}
-          isPlaybackSpeed={false}
-          isClosedCaptions={false}
-          isPictureInPicture={true}
-          isTheater={false}
-          isFullScreen={true}
-          isTimeLine={false}
-          isSkip={false}
-          isThumbnail={false}
-          isPreview={false}
-          initialMute={false}
-          handleMute={handleMute}
-          muteLock={muteLock}
-          audioRef={audioRef}
-          handleVolumeSlider={handleVolumeSlider}
-          paths={paths}
-          videoIconStateRef={videoIconStateRef}
-          isFinishedRef={isFinishedRef}
-          changedWhileNotFinishedRef={changedWhileNotFinishedRef}
-        />
-      )}
-      {screenStream && (
-        <FgVideo
-          type={"screen"}
-          username={username}
-          videoStream={screenStream}
-          isStream={true}
-          muted={isUser}
-          flipVideo={false}
-          isSlider={!isUser}
-          isPlayPause={false}
-          isVolume={audioStream ? true : false}
-          isTotalTime={false}
-          isPlaybackSpeed={false}
-          isClosedCaptions={false}
-          isPictureInPicture={true}
-          isTheater={false}
-          isFullScreen={true}
-          isTimeLine={false}
-          isSkip={false}
-          isThumbnail={false}
-          isPreview={false}
-          initialMute={false}
-          handleMute={handleMute}
-          muteLock={muteLock}
-          audioRef={audioRef}
-          handleVolumeSlider={handleVolumeSlider}
-          paths={paths}
-          videoIconStateRef={videoIconStateRef}
-          isFinishedRef={isFinishedRef}
-          changedWhileNotFinishedRef={changedWhileNotFinishedRef}
-        />
-      )}
-      {audioStream && !cameraStream && !screenStream && (
-        <div id={username && `${username}_audio_container`}>
+      {cameraStreams &&
+        Object.keys(cameraStreams).length !== 0 &&
+        Object.entries(cameraStreams).map(([key, cameraStream]) => (
+          <FgVideo
+            key={key}
+            id={key}
+            videoStream={cameraStream}
+            isStream={true}
+            muted={isUser}
+            flipVideo={true}
+            isSlider={!isUser}
+            isPlayPause={false}
+            isVolume={!!audioStream}
+            isTotalTime={false}
+            isPlaybackSpeed={false}
+            isClosedCaptions={false}
+            isPictureInPicture={true}
+            isTheater={false}
+            isFullScreen={true}
+            isTimeLine={false}
+            isSkip={false}
+            isThumbnail={false}
+            isPreview={false}
+            initialMute={false}
+            handleMute={handleMute}
+            muteLock={muteLock}
+            audioRef={audioRef}
+            handleVolumeSlider={handleVolumeSlider}
+            paths={paths}
+            videoIconStateRef={videoIconStateRef}
+            isFinishedRef={isFinishedRef}
+            changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+          />
+        ))}
+      {screenStreams &&
+        Object.keys(screenStreams).length !== 0 &&
+        Object.entries(screenStreams).map(([key, screenStream]) => (
+          <FgVideo
+            key={key}
+            id={key}
+            videoStream={screenStream}
+            isStream={true}
+            muted={isUser}
+            flipVideo={false}
+            isSlider={!isUser}
+            isPlayPause={false}
+            isVolume={audioStream ? true : false}
+            isTotalTime={false}
+            isPlaybackSpeed={false}
+            isClosedCaptions={false}
+            isPictureInPicture={true}
+            isTheater={false}
+            isFullScreen={true}
+            isTimeLine={false}
+            isSkip={false}
+            isThumbnail={false}
+            isPreview={false}
+            initialMute={false}
+            handleMute={handleMute}
+            muteLock={muteLock}
+            audioRef={audioRef}
+            handleVolumeSlider={handleVolumeSlider}
+            paths={paths}
+            videoIconStateRef={videoIconStateRef}
+            isFinishedRef={isFinishedRef}
+            changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+          />
+        ))}
+      {audioStream &&
+        Object.keys(cameraStreams || {}).length === 0 &&
+        Object.keys(screenStreams || {}).length === 0 && (
+          <div id={username && `${username}_audio_container`}>
+            <audio
+              ref={audioRef}
+              id={username && `${username}_audio_stream`}
+              className='w-0 z-0'
+              autoPlay={true}
+            ></audio>
+            <VolumeSection
+              audioRef={audioRef}
+              handleVolumeSlider={handleVolumeSlider}
+              iconSize={"5rem"}
+              handleMute={handleMute}
+              primaryColor={"black"}
+              isSlider={!isUser}
+              paths={paths}
+              videoIconStateRef={videoIconStateRef}
+              isFinishedRef={isFinishedRef}
+              changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+            />
+          </div>
+        )}
+      {audioStream &&
+        (Object.keys(cameraStreams || {}).length !== 0 ||
+          Object.keys(screenStreams || {}).length !== 0) && (
           <audio
             ref={audioRef}
             id={username && `${username}_audio_stream`}
             className='w-0 z-0'
             autoPlay={true}
           ></audio>
-          <VolumeSection
-            audioRef={audioRef}
-            handleVolumeSlider={handleVolumeSlider}
-            iconSize={"5rem"}
-            handleMute={handleMute}
-            primaryColor={"black"}
-            isSlider={!isUser}
-            paths={paths}
-            videoIconStateRef={videoIconStateRef}
-            isFinishedRef={isFinishedRef}
-            changedWhileNotFinishedRef={changedWhileNotFinishedRef}
-          />
-        </div>
-      )}
-      {audioStream && (cameraStream || screenStream) && (
-        <audio
-          ref={audioRef}
-          id={username && `${username}_audio_stream`}
-          className='w-0 z-0'
-          autoPlay={true}
-        ></audio>
-      )}
+        )}
     </div>
   );
 }

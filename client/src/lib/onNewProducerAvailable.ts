@@ -6,6 +6,7 @@ const onNewProducerAvailable = (
     type: string;
     producerUsername: string;
     producerType: string;
+    producerId?: string;
   },
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -26,6 +27,7 @@ const onNewProducerAvailable = (
       producerUsername: event.producerUsername,
       roomName: roomName.current,
       username: username.current,
+      incomingProducerId: event.producerId,
     };
     socket.current.send(msg);
   }

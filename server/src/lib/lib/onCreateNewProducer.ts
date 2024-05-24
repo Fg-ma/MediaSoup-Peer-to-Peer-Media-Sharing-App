@@ -10,6 +10,7 @@ const onCreateNewProducer = async (
     rtpParameters: RtpParameters;
     roomName: string;
     username: string;
+    producerId?: string;
   },
   socket: Socket,
   io: SocketIOServer
@@ -25,11 +26,15 @@ const onCreateNewProducer = async (
   }
 
   if (
-    roomProducers[event.roomName] &&
-    roomProducers[event.roomName][event.username] &&
-    roomProducers[event.roomName][event.username][
-      event.producerType as "webcam" | "screen" | "audio"
-    ]
+    ((event.producerType === "webcam" || event.producerType === "screen") &&
+      event.producerId &&
+      roomProducers[event.roomName]?.[event.username]?.[
+        event.producerType as "webcam" | "screen"
+      ]?.[event.producerId]) ||
+    (event.producerType === "audio" &&
+      roomProducers[event.roomName]?.[event.username]?.[
+        event.producerType as "audio"
+      ])
   ) {
     console.error("Producer already created for: ", event.username);
     return;
@@ -48,15 +53,38 @@ const onCreateNewProducer = async (
   if (!roomProducers[event.roomName][event.username]) {
     roomProducers[event.roomName][event.username] = {};
   }
+  if (
+    (event.producerType === "webcam" || event.producerType === "screen") &&
+    !roomProducers[event.roomName][event.username][
+      event.producerType as "webcam" | "screen"
+    ]
+  ) {
+    roomProducers[event.roomName][event.username][
+      event.producerType as "webcam" | "screen"
+    ] = {};
+  }
 
-  roomProducers[event.roomName][event.username][
-    event.producerType as "webcam" | "screen" | "audio"
-  ] = newProducer;
+  if (
+    (event.producerType === "webcam" || event.producerType === "screen") &&
+    event.producerId &&
+    roomProducers[event.roomName][event.username][
+      event.producerType as "webcam" | "screen"
+    ]
+  ) {
+    roomProducers[event.roomName][event.username][
+      event.producerType as "webcam" | "screen"
+    ]![event.producerId] = newProducer;
+  } else {
+    roomProducers[event.roomName][event.username][
+      event.producerType as "audio"
+    ] = newProducer;
+  }
 
   const msg = {
     type: "newProducerAvailable",
     producerUsername: event.username,
     producerType: event.producerType,
+    producerId: event.producerId,
   };
   socket.to(event.roomName).emit("message", msg);
   io.to(`${event.roomName}_${event.username}`).emit("newProducerCreated", {

@@ -22,7 +22,7 @@ import onUnsubscribe from "./lib/onUnsubscribe";
 import onMuteLock from "./lib/onMuteLock";
 import onRequestMuteLock from "./lib/onRequestMuteLock";
 import onAcceptMuteLock from "./lib/onAcceptMuteLock";
-import onDeleteProducerTransport from "./lib/ondeleteProducerTransport";
+import onDeleteProducerTransport from "./lib/onDeleteProducerTransport";
 
 let mediasoupRouter: Router;
 

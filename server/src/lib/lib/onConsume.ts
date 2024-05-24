@@ -9,6 +9,7 @@ const onConsume = async (
     rtpCapabilities: RtpCapabilities;
     roomName: string;
     username: string;
+    producerId?: string;
   },
   io: SocketIOServer,
   mediasoupRouter: Router
@@ -27,26 +28,32 @@ const onConsume = async (
   if (consumers) {
     roomConsumers[event.roomName][event.username] = consumers;
   } else {
-    roomConsumers[event.roomName][event.username] = {};
+    if (roomConsumers[event.roomName][event.username]) {
+      delete roomConsumers[event.roomName][event.username];
+    }
   }
 
   let newConsumers: {
     [username: string]: {
       webcam?: {
-        producerId: string;
-        id: string;
-        kind: string;
-        rtpParameters: any;
-        type: string;
-        producerPaused: boolean;
+        [webcamId: string]: {
+          producerId: string;
+          id: string;
+          kind: string;
+          rtpParameters: any;
+          type: string;
+          producerPaused: boolean;
+        };
       };
       screen?: {
-        producerId: string;
-        id: string;
-        kind: string;
-        rtpParameters: any;
-        type: string;
-        producerPaused: boolean;
+        [screenId: string]: {
+          producerId: string;
+          id: string;
+          kind: string;
+          rtpParameters: any;
+          type: string;
+          producerPaused: boolean;
+        };
       };
       audio?: {
         producerId: string;
@@ -61,35 +68,45 @@ const onConsume = async (
 
   for (const producerUsername in consumers) {
     if (consumers[producerUsername].webcam) {
-      const webcamConsumerData = consumers[producerUsername].webcam;
-
       if (!newConsumers[producerUsername]) {
         newConsumers[producerUsername] = {};
       }
-      newConsumers[producerUsername].webcam = {
-        producerId: webcamConsumerData!.producerId,
-        id: webcamConsumerData!.id,
-        kind: webcamConsumerData!.kind,
-        rtpParameters: webcamConsumerData!.rtpParameters,
-        type: webcamConsumerData!.type,
-        producerPaused: webcamConsumerData!.producerPaused,
-      };
+      if (!newConsumers[producerUsername].webcam) {
+        newConsumers[producerUsername].webcam = {};
+      }
+      for (const webcamId in consumers[producerUsername].webcam) {
+        const webcam = consumers[producerUsername].webcam?.[webcamId];
+        if (webcam)
+          newConsumers[producerUsername].webcam![webcamId] = {
+            producerId: webcam.producerId,
+            id: webcam.id,
+            kind: webcam.kind,
+            rtpParameters: webcam.rtpParameters,
+            type: webcam.type,
+            producerPaused: webcam.producerPaused,
+          };
+      }
     }
 
     if (consumers[producerUsername].screen) {
-      const screenConsumerData = consumers[producerUsername].screen;
-
       if (!newConsumers[producerUsername]) {
         newConsumers[producerUsername] = {};
       }
-      newConsumers[producerUsername].screen = {
-        producerId: screenConsumerData!.producerId,
-        id: screenConsumerData!.id,
-        kind: screenConsumerData!.kind,
-        rtpParameters: screenConsumerData!.rtpParameters,
-        type: screenConsumerData!.type,
-        producerPaused: screenConsumerData!.producerPaused,
-      };
+      if (!newConsumers[producerUsername].screen) {
+        newConsumers[producerUsername].screen = {};
+      }
+      for (const screenId in consumers[producerUsername].screen) {
+        const screen = consumers[producerUsername].screen?.[screenId];
+        if (screen)
+          newConsumers[producerUsername].screen![screenId] = {
+            producerId: screen.producerId,
+            id: screen.id,
+            kind: screen.kind,
+            rtpParameters: screen.rtpParameters,
+            type: screen.type,
+            producerPaused: screen.producerPaused,
+          };
+      }
     }
 
     if (consumers[producerUsername].audio) {

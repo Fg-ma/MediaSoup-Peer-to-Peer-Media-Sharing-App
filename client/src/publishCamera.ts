@@ -3,6 +3,7 @@ import { Socket } from "socket.io-client";
 
 const publishCamera = (
   isWebcam: React.MutableRefObject<boolean>,
+  newCameraBtnRef: React.RefObject<HTMLButtonElement>,
   webcamBtnRef: React.RefObject<HTMLButtonElement>,
   screenBtnRef: React.RefObject<HTMLButtonElement>,
   audioBtnRef: React.RefObject<HTMLButtonElement>,
@@ -10,19 +11,25 @@ const publishCamera = (
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   roomName: React.MutableRefObject<string>,
-  username: React.MutableRefObject<string>
+  username: React.MutableRefObject<string>,
+  cameraCount: React.MutableRefObject<number>,
+  cameraStreams: React.MutableRefObject<{
+    [webcamId: string]: MediaStream;
+  }>
 ) => {
   if (!roomName.current || !username.current) {
     console.error("Missing roomName or username!");
     return;
   }
-  webcamBtnRef.current!.disabled = true;
-  screenBtnRef.current!.disabled = true;
-  audioBtnRef.current!.disabled = true;
+  if (webcamBtnRef.current) webcamBtnRef.current.disabled = true;
+  if (screenBtnRef.current) screenBtnRef.current.disabled = true;
+  if (audioBtnRef.current) audioBtnRef.current.disabled = true;
+  if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = true;
   isWebcam.current = !isWebcam.current;
   setWebcamActive((prev) => !prev);
 
   if (isWebcam.current) {
+    cameraCount.current = cameraCount.current + 1;
     if (device.current) {
       const msg = {
         type: "createProducerTransport",
@@ -35,13 +42,21 @@ const publishCamera = (
       socket.current.emit("message", msg);
     }
   } else if (!isWebcam.current) {
-    const msg = {
-      type: "removeProducer",
-      roomName: roomName.current,
-      username: username.current,
-      producerType: "webcam",
-    };
-    socket.current.emit("message", msg);
+    for (let i = cameraCount.current; i >= 0; i--) {
+      const streamKey = `${username.current}_camera_stream_${i}`;
+
+      if (streamKey in cameraStreams.current) {
+        const msg = {
+          type: "removeProducer",
+          roomName: roomName.current,
+          username: username.current,
+          producerType: "webcam",
+          producerId: `${username.current}_camera_stream_${i}`,
+        };
+        socket.current.emit("message", msg);
+        break;
+      }
+    }
   }
 };
 

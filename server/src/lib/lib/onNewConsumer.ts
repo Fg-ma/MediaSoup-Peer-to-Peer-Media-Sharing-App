@@ -12,6 +12,7 @@ const onNewConsumer = async (
     consumerType: string;
     rtpCapabilities: RtpCapabilities;
     producerUsername: string;
+    incomingProducerId?: string;
     roomName: string;
     username: string;
   },
@@ -31,9 +32,15 @@ const onNewConsumer = async (
   // Get the consumer transport associated with the user
   const transport = roomConsumerTransports[event.roomName][event.username];
   const producer =
-    roomProducers[event.roomName][event.producerUsername][
-      event.consumerType as "webcam" | "screen" | "audio"
-    ];
+    event.consumerType === "webcam" || event.consumerType === "screen"
+      ? event.incomingProducerId
+        ? roomProducers[event.roomName][event.producerUsername][
+            event.consumerType as "webcam" | "screen"
+          ]?.[event.incomingProducerId]
+        : undefined
+      : roomProducers[event.roomName][event.producerUsername][
+          event.consumerType as "audio"
+        ];
 
   if (!producer) {
     console.error(`No producer found`);
@@ -81,13 +88,34 @@ const onNewConsumer = async (
   if (!roomConsumers[event.roomName][event.username][event.producerUsername]) {
     roomConsumers[event.roomName][event.username][event.producerUsername] = {};
   }
-  roomConsumers[event.roomName][event.username][event.producerUsername][
-    event.consumerType as "webcam" | "screen" | "audio"
-  ] = newConsumer;
+  if (
+    (event.consumerType === "webcam" || event.consumerType === "screen") &&
+    !roomConsumers[event.roomName][event.username][event.producerUsername][
+      event.consumerType as "webcam" | "screen"
+    ]
+  ) {
+    roomConsumers[event.roomName][event.username][event.producerUsername][
+      event.consumerType as "webcam" | "screen"
+    ] = {};
+  }
+
+  if (
+    (event.consumerType === "webcam" || event.consumerType === "screen") &&
+    event.incomingProducerId
+  ) {
+    roomConsumers[event.roomName][event.username][event.producerUsername][
+      event.consumerType as "webcam" | "screen"
+    ]![event.incomingProducerId] = newConsumer;
+  } else {
+    roomConsumers[event.roomName][event.username][event.producerUsername][
+      event.consumerType as "audio"
+    ] = newConsumer;
+  }
 
   io.to(`${event.roomName}_${event.username}`).emit("message", {
     type: "newConsumerSubscribed",
     producerUsername: event.producerUsername,
+    consumerId: event.incomingProducerId,
     consumerType: event.consumerType,
     data: {
       producerId: newConsumer.producerId,

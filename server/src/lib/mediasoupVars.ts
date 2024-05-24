@@ -14,8 +14,8 @@ export let roomConsumerTransports: {
 export let roomProducers: {
   [roomName: string]: {
     [username: string]: {
-      webcam?: Producer;
-      screen?: Producer;
+      webcam?: { [webcamId: string]: Producer };
+      screen?: { [screenId: string]: Producer };
       audio?: Producer;
     };
   };
@@ -25,22 +25,26 @@ export let roomConsumers: {
     [username: string]: {
       [producerUsername: string]: {
         webcam?: {
-          consumer: Consumer;
-          producerId: string;
-          id: string;
-          kind: string;
-          rtpParameters: any;
-          type: string;
-          producerPaused: boolean;
+          [webcamId: string]: {
+            consumer: Consumer;
+            producerId: string;
+            id: string;
+            kind: string;
+            rtpParameters: any;
+            type: string;
+            producerPaused: boolean;
+          };
         };
         screen?: {
-          consumer: Consumer;
-          producerId: string;
-          id: string;
-          kind: string;
-          rtpParameters: any;
-          type: string;
-          producerPaused: boolean;
+          [screenId: string]: {
+            consumer: Consumer;
+            producerId: string;
+            id: string;
+            kind: string;
+            rtpParameters: any;
+            type: string;
+            producerPaused: boolean;
+          };
         };
         audio?: {
           consumer: Consumer;

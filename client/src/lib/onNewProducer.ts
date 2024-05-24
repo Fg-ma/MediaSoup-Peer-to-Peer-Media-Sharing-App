@@ -14,9 +14,16 @@ const onNewProducer = async (
   isWebcam: React.MutableRefObject<boolean>,
   isScreen: React.MutableRefObject<boolean>,
   isAudio: React.MutableRefObject<boolean>,
-  cameraStream: React.MutableRefObject<MediaStream | undefined>,
-  screenStream: React.MutableRefObject<MediaStream | undefined>,
+  cameraStreams: React.MutableRefObject<{
+    [webcamId: string]: MediaStream;
+  }>,
+  cameraCount: React.MutableRefObject<number>,
+  screenStreams: React.MutableRefObject<{
+    [screenId: string]: MediaStream;
+  }>,
+  screenCount: React.MutableRefObject<number>,
   audioStream: React.MutableRefObject<MediaStream | undefined>,
+  newCameraBtnRef: React.RefObject<HTMLButtonElement>,
   webcamBtnRef: React.RefObject<HTMLButtonElement>,
   screenBtnRef: React.RefObject<HTMLButtonElement>,
   audioBtnRef: React.RefObject<HTMLButtonElement>,
@@ -27,31 +34,37 @@ const onNewProducer = async (
   muteAudio: () => void,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  webcamBtnRef.current!.disabled = false;
-  screenBtnRef.current!.disabled = false;
-  audioBtnRef.current!.disabled = false;
-
   const oldBundle = document.getElementById(`${username.current}_bundle`);
   const oldBundleContainer = document.getElementById(
     `${username.current}_bundle_container`
   );
 
   if (event.producerType === "webcam") {
-    if (cameraStream.current) {
-      console.error("Already existing camera stream for: ", username.current);
+    if (
+      cameraStreams.current[
+        `${username.current}_camera_stream_${cameraCount.current}`
+      ]
+    ) {
       return;
     }
-    cameraStream.current = await getBrowserMedia(
+    const cameraBrowserMedia = await getBrowserMedia(
       event.producerType,
       device,
+      newCameraBtnRef,
       webcamBtnRef,
       screenBtnRef,
       audioBtnRef,
       isScreen,
       setScreenActive
     );
-    if (cameraStream.current) {
-      const track = cameraStream.current.getVideoTracks()[0];
+    if (cameraBrowserMedia) {
+      cameraStreams.current[
+        `${username.current}_camera_stream_${cameraCount.current}`
+      ] = cameraBrowserMedia;
+      const track =
+        cameraStreams.current[
+          `${username.current}_camera_stream_${cameraCount.current}`
+        ].getVideoTracks()[0];
       const params = {
         track: track,
         appData: {
@@ -66,21 +79,31 @@ const onNewProducer = async (
       }
     }
   } else if (event.producerType === "screen") {
-    if (screenStream.current) {
-      console.error("Already existing screen stream for: ", username.current);
+    if (
+      screenStreams.current[
+        `${username.current}_screen_stream_${screenCount.current}`
+      ]
+    ) {
       return;
     }
-    screenStream.current = await getBrowserMedia(
+    const screenBrowserMedia = await getBrowserMedia(
       event.producerType,
       device,
+      newCameraBtnRef,
       webcamBtnRef,
       screenBtnRef,
       audioBtnRef,
       isScreen,
       setScreenActive
     );
-    if (screenStream.current) {
-      const track = screenStream.current.getVideoTracks()[0];
+    if (screenBrowserMedia) {
+      screenStreams.current[
+        `${username.current}_screen_stream_${screenCount.current}`
+      ] = screenBrowserMedia;
+      const track =
+        screenStreams.current[
+          `${username.current}_screen_stream_${screenCount.current}`
+        ].getVideoTracks()[0];
       const params = {
         track: track,
         appData: {
@@ -102,6 +125,7 @@ const onNewProducer = async (
     audioStream.current = await getBrowserMedia(
       event.producerType,
       device,
+      newCameraBtnRef,
       webcamBtnRef,
       screenBtnRef,
       audioBtnRef,
@@ -127,7 +151,7 @@ const onNewProducer = async (
 
   if (remoteVideosContainerRef.current) {
     // Remove old bundle
-    if (oldBundle) {
+    if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
       remoteVideosContainerRef.current?.removeChild(oldBundle);
     }
 
@@ -140,13 +164,13 @@ const onNewProducer = async (
     root.render(
       React.createElement(Bundle, {
         username: username.current,
-        cameraStream:
-          isWebcam.current && cameraStream.current
-            ? cameraStream.current
+        cameraStreams:
+          isWebcam.current && cameraStreams.current
+            ? cameraStreams.current
             : undefined,
-        screenStream:
-          isScreen.current && screenStream.current
-            ? screenStream.current
+        screenStreams:
+          isScreen.current && screenStreams.current
+            ? screenStreams.current
             : undefined,
         audioStream:
           isAudio.current && audioStream.current
@@ -168,6 +192,11 @@ const onNewProducer = async (
       })
     );
   }
+
+  if (webcamBtnRef.current) webcamBtnRef.current.disabled = false;
+  if (screenBtnRef.current) screenBtnRef.current.disabled = false;
+  if (audioBtnRef.current) audioBtnRef.current.disabled = false;
+  if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = false;
 };
 
 export default onNewProducer;

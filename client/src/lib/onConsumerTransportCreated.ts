@@ -25,8 +25,8 @@ const onConsumerTransportCreated = async (
   remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?: MediaStreamTrack | undefined;
-      screen?: MediaStreamTrack | undefined;
+      webcam?: { [webcamId: string]: MediaStreamTrack };
+      screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack | undefined;
     };
   }>
@@ -92,35 +92,37 @@ const onConsumerTransportCreated = async (
             socket.current.emit("message", msg);
 
             if (remoteVideosContainerRef.current) {
-              let cameraStream;
-              if (
-                remoteTracksMap.current[trackUsername] &&
-                remoteTracksMap.current[trackUsername].webcam
-              ) {
-                cameraStream = new MediaStream();
-                cameraStream.addTrack(
-                  remoteTracksMap.current[trackUsername].webcam!
-                );
+              let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
+              if (remoteTracksMap.current[trackUsername]?.webcam) {
+                for (const key in remoteTracksMap.current[trackUsername]
+                  .webcam) {
+                  const remoteCameraStream = new MediaStream();
+                  remoteCameraStream.addTrack(
+                    remoteTracksMap.current[trackUsername].webcam![key]
+                  );
+                  remoteCameraStreams[key] = remoteCameraStream;
+                }
               }
 
-              let screenStream;
-              if (
-                remoteTracksMap.current[trackUsername] &&
-                remoteTracksMap.current[trackUsername].screen
-              ) {
-                screenStream = new MediaStream();
-                screenStream.addTrack(
-                  remoteTracksMap.current[trackUsername].screen!
-                );
+              let remoteScreenStreams: { [screenId: string]: MediaStream } = {};
+              if (remoteTracksMap.current[trackUsername]?.screen) {
+                for (const key in remoteTracksMap.current[trackUsername]
+                  .screen) {
+                  const remoteScreenStream = new MediaStream();
+                  remoteScreenStream.addTrack(
+                    remoteTracksMap.current[trackUsername].screen![key]
+                  );
+                  remoteScreenStreams[key] = remoteScreenStream;
+                }
               }
 
-              let audioStream;
+              let remoteAudioStream;
               if (
                 remoteTracksMap.current[trackUsername] &&
                 remoteTracksMap.current[trackUsername].audio
               ) {
-                audioStream = new MediaStream();
-                audioStream.addTrack(
+                remoteAudioStream = new MediaStream();
+                remoteAudioStream.addTrack(
                   remoteTracksMap.current[trackUsername].audio!
                 );
               }
@@ -133,9 +135,15 @@ const onConsumerTransportCreated = async (
               root.render(
                 React.createElement(Bundle, {
                   username: trackUsername,
-                  cameraStream: cameraStream ? cameraStream : undefined,
-                  screenStream: screenStream ? screenStream : undefined,
-                  audioStream: audioStream ? audioStream : undefined,
+                  cameraStreams: remoteCameraStreams
+                    ? remoteCameraStreams
+                    : undefined,
+                  screenStreams: remoteScreenStreams
+                    ? remoteScreenStreams
+                    : undefined,
+                  audioStream: remoteAudioStream
+                    ? remoteAudioStream
+                    : undefined,
                 })
               );
             }

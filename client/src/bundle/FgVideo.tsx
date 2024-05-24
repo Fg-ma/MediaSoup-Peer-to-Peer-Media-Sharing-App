@@ -20,8 +20,7 @@ import handleKeyDown from "./lib/handleKeyDown";
 import handleKeyUp from "./lib/handleKeyUp";
 
 export default function FgVideo({
-  type,
-  username,
+  id,
   handleMute,
   videoStream,
   isStream = false,
@@ -60,8 +59,7 @@ export default function FgVideo({
   isFinishedRef,
   changedWhileNotFinishedRef,
 }: {
-  type?: string;
-  username?: string;
+  id?: string;
   handleMute: () => void;
   videoStream?: MediaStream;
   isStream?: boolean;
@@ -439,7 +437,7 @@ export default function FgVideo({
   return (
     <div
       ref={videoContainerRef}
-      id={username && type && `${username}_${type}_stream_container`}
+      id={id && `${id}_container`}
       className={`video-container ${
         autoPlay ? "" : "paused"
       } relative overflow-hidden flex items-center justify-center text-white font-K2D rounded-md`}
@@ -448,7 +446,7 @@ export default function FgVideo({
         <>
           <video
             ref={videoRef}
-            id={username && type && `${username}_${type}_stream`}
+            id={id && id}
             onClick={
               isPlayPause
                 ? () => handlePausePlay(paused, videoRef, videoContainerRef)

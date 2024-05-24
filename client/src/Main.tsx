@@ -18,11 +18,13 @@ import publishAudio from "./publishAudio";
 import onRequestedMuteLock from "./lib/onRequestedMuteLock";
 import onMuteLockChange from "./lib/onMuteLockChange";
 import onAcceptedMuteLock from "./lib/onAcceptedMuteLock";
+import publishNewCamera from "./publishNewCamera";
 
 const websocketURL = "http://localhost:8000";
 
 export default function Main() {
   const webcamBtnRef = useRef<HTMLButtonElement>(null);
+  const newCameraBtnRef = useRef<HTMLButtonElement>(null);
   const screenBtnRef = useRef<HTMLButtonElement>(null);
   const audioBtnRef = useRef<HTMLButtonElement>(null);
   const muteBtnRef = useRef<HTMLButtonElement>(null);
@@ -46,14 +48,16 @@ export default function Main() {
   const isSubscribed = useRef(false);
   const [isInRoom, setIsInRoom] = useState(false);
 
-  const cameraStream = useRef<MediaStream>();
-  const screenStream = useRef<MediaStream>();
+  const cameraStreams = useRef<{ [webcamId: string]: MediaStream }>({});
+  const cameraCount = useRef(0);
+  const screenStreams = useRef<{ [screenId: string]: MediaStream }>({});
+  const screenCount = useRef(0);
   const audioStream = useRef<MediaStream>();
 
   const remoteTracksMap = useRef<{
     [username: string]: {
-      webcam?: MediaStreamTrack;
-      screen?: MediaStreamTrack;
+      webcam?: { [webcamId: string]: MediaStreamTrack };
+      screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack;
     };
   }>({});
@@ -88,9 +92,12 @@ export default function Main() {
             isWebcam,
             isScreen,
             isAudio,
-            cameraStream,
-            screenStream,
+            cameraStreams,
+            cameraCount,
+            screenStreams,
+            screenCount,
             audioStream,
+            newCameraBtnRef,
             webcamBtnRef,
             screenBtnRef,
             audioBtnRef,
@@ -146,9 +153,12 @@ export default function Main() {
             isWebcam,
             isScreen,
             isAudio,
-            cameraStream,
-            screenStream,
+            cameraStreams,
+            cameraCount,
+            screenStreams,
+            screenCount,
             audioStream,
+            newCameraBtnRef,
             webcamBtnRef,
             screenBtnRef,
             audioBtnRef,
@@ -162,16 +172,21 @@ export default function Main() {
           onProducerDisconnected(
             event,
             username,
+            newCameraBtnRef,
             webcamBtnRef,
             screenBtnRef,
             audioBtnRef,
             remoteVideosContainerRef,
-            cameraStream,
-            screenStream,
+            cameraStreams,
+            screenStreams,
             audioStream,
             remoteTracksMap,
             producerTransport,
-            muteAudio
+            muteAudio,
+            isWebcam,
+            setWebcamActive,
+            isScreen,
+            setScreenActive
           );
           break;
         case "muteLockChange":
@@ -193,7 +208,7 @@ export default function Main() {
       const oldBundle = document.getElementById(
         `${disconnectedUsername}_bundle`
       );
-      if (oldBundle) {
+      if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
         remoteVideosContainerRef.current?.removeChild(oldBundle);
       }
       delete remoteTracksMap.current[disconnectedUsername];
@@ -250,6 +265,7 @@ export default function Main() {
               onClick={() =>
                 publishCamera(
                   isWebcam,
+                  newCameraBtnRef,
                   webcamBtnRef,
                   screenBtnRef,
                   audioBtnRef,
@@ -257,7 +273,9 @@ export default function Main() {
                   socket,
                   device,
                   roomName,
-                  username
+                  username,
+                  cameraCount,
+                  cameraStreams
                 )
               }
               className={`${
@@ -269,15 +287,41 @@ export default function Main() {
               {webcamActive ? "Remove Camera" : "Publish Camera"}
             </button>
           </div>
+          <div
+            className={`${
+              webcamActive ? "visible" : "hidden"
+            } flex flex-col mx-2`}
+          >
+            <button
+              ref={newCameraBtnRef}
+              onClick={() =>
+                publishNewCamera(
+                  newCameraBtnRef,
+                  webcamBtnRef,
+                  screenBtnRef,
+                  audioBtnRef,
+                  cameraCount,
+                  socket,
+                  device,
+                  roomName,
+                  username
+                )
+              }
+              className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 disabled:opacity-25'
+            >
+              Publish New Camera
+            </button>
+          </div>
           <div className='flex flex-col mx-2'>
             <button
               ref={audioBtnRef}
               onClick={() =>
                 publishAudio(
                   isAudio,
-                  audioBtnRef,
                   webcamBtnRef,
+                  newCameraBtnRef,
                   screenBtnRef,
+                  audioBtnRef,
                   setAudioActive,
                   socket,
                   device,
@@ -293,7 +337,7 @@ export default function Main() {
             >
               {audioActive ? "Remove Audio" : "Publish Audio"}
             </button>
-          </div>{" "}
+          </div>
           {audioActive && (
             <div className='flex flex-col mx-2'>
               <button
@@ -322,7 +366,9 @@ export default function Main() {
                   socket,
                   device,
                   roomName,
-                  username
+                  username,
+                  screenCount,
+                  screenStreams
                 )
               }
               className={`${
@@ -331,7 +377,32 @@ export default function Main() {
                   : "bg-blue-500 hover:bg-blue-700"
               } text-white font-bold py-2 px-3 disabled:opacity-25`}
             >
-              {screenActive ? "Remove Desktop" : "Publish Desktop"}
+              {screenActive ? "Remove Screen" : "Publish Screen"}
+            </button>
+          </div>
+          <div
+            className={`${
+              screenActive ? "visible" : "hidden"
+            } flex flex-col mx-2`}
+          >
+            <button
+              ref={newCameraBtnRef}
+              onClick={() =>
+                publishNewScreen(
+                  newCameraBtnRef,
+                  webcamBtnRef,
+                  screenBtnRef,
+                  audioBtnRef,
+                  cameraCount,
+                  socket,
+                  device,
+                  roomName,
+                  username
+                )
+              }
+              className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 disabled:opacity-25'
+            >
+              Publish New Screen
             </button>
           </div>
           <div className='flex flex-col mx-2'>

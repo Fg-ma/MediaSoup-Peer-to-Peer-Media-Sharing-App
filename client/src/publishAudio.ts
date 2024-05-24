@@ -3,9 +3,10 @@ import { Socket } from "socket.io-client";
 
 const publishAudio = (
   isAudio: React.MutableRefObject<boolean>,
-  audioBtnRef: React.RefObject<HTMLButtonElement>,
+  newCameraBtnRef: React.RefObject<HTMLButtonElement>,
   webcamBtnRef: React.RefObject<HTMLButtonElement>,
   screenBtnRef: React.RefObject<HTMLButtonElement>,
+  audioBtnRef: React.RefObject<HTMLButtonElement>,
   setAudioActive: (value: React.SetStateAction<boolean>) => void,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -16,9 +17,10 @@ const publishAudio = (
     console.error("Missing roomName or username!");
     return;
   }
-  webcamBtnRef.current!.disabled = true;
-  screenBtnRef.current!.disabled = true;
-  audioBtnRef.current!.disabled = true;
+  if (webcamBtnRef.current) webcamBtnRef.current.disabled = true;
+  if (screenBtnRef.current) screenBtnRef.current.disabled = true;
+  if (audioBtnRef.current) audioBtnRef.current.disabled = true;
+  if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = true;
   isAudio.current = !isAudio.current;
   setAudioActive((prev) => !prev);
 
