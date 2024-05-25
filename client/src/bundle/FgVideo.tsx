@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
 import VolumeSection from "./VolumeSection";
 import handleFullscreenChange from "./lib/handleFullscreenChange";
@@ -20,13 +21,15 @@ import handleKeyDown from "./lib/handleKeyDown";
 import handleKeyUp from "./lib/handleKeyUp";
 
 export default function FgVideo({
+  username,
+  roomName,
+  socket,
   id,
   handleMute,
   videoStream,
   isStream = false,
   videoStyles,
   autoPlay = true,
-  muted = false,
   flipVideo = false,
   isSlider = true,
   skipIncrement = 10,
@@ -59,13 +62,15 @@ export default function FgVideo({
   isFinishedRef,
   changedWhileNotFinishedRef,
 }: {
+  username?: string;
+  roomName?: string;
+  socket?: React.MutableRefObject<Socket>;
   id?: string;
   handleMute: () => void;
   videoStream?: MediaStream;
   isStream?: boolean;
   videoStyles?: {};
   autoPlay?: boolean;
-  muted?: boolean;
   flipVideo?: boolean;
   isSlider?: boolean;
   skipIncrement?: number;
@@ -433,6 +438,33 @@ export default function FgVideo({
       );
     };
   }, [videoStream]);
+
+  // Set up event listener to removeProducer if the stream ends
+  useEffect(() => {
+    if (videoStream) {
+      const videoTrack = videoStream.getVideoTracks()[0];
+
+      // Listen for the 'ended' eveont on the video track
+      const handleEnded = () => {
+        if (roomName && username && id && socket) {
+          const msg = {
+            type: "removeProducer",
+            roomName: roomName,
+            username: username,
+            producerType: "screen",
+            producerId: id,
+          };
+          socket.current.emit("message", msg);
+        }
+      };
+
+      videoTrack.onended = handleEnded;
+
+      return () => {
+        videoTrack.onended = null;
+      };
+    }
+  }, []);
 
   return (
     <div

@@ -121,6 +121,8 @@ const onNewConsumerSubscribed = async (
     root.render(
       React.createElement(Bundle, {
         username: event.producerUsername,
+        roomName: roomName.current,
+        socket: socket,
         cameraStreams: remoteCameraStreams ? remoteCameraStreams : undefined,
         screenStreams: remoteScreenStreams ? remoteScreenStreams : undefined,
         audioStream: remoteAudioStream ? remoteAudioStream : undefined,

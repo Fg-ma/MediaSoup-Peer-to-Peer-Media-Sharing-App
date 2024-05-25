@@ -135,6 +135,8 @@ const onConsumerTransportCreated = async (
               root.render(
                 React.createElement(Bundle, {
                   username: trackUsername,
+                  roomName: roomName.current,
+                  socket: socket,
                   cameraStreams: remoteCameraStreams
                     ? remoteCameraStreams
                     : undefined,

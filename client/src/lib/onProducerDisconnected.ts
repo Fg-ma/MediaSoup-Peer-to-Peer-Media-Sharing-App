@@ -1,4 +1,5 @@
 import React from "react";
+import { Socket } from "socket.io-client";
 import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import Bundle from "../bundle/Bundle";
@@ -11,6 +12,8 @@ const onProducerDisconnected = (
     producerId: string;
   },
   username: React.MutableRefObject<string>,
+  roomName: React.MutableRefObject<string>,
+  socket: React.MutableRefObject<Socket>,
   handleDisableEnableBtns: (disabled: boolean) => void,
   remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   cameraStreams: React.MutableRefObject<{
@@ -139,6 +142,8 @@ const onProducerDisconnected = (
       root.render(
         React.createElement(Bundle, {
           username: event.producerUsername,
+          roomName: roomName.current,
+          socket: socket,
           cameraStreams:
             event.producerUsername === username.current
               ? cameraStreams.current
@@ -208,11 +213,17 @@ const onProducerDisconnected = (
   if (!remoteTracksMap.current[event.producerUsername]) {
     delete remoteTracksMap.current[event.producerUsername];
   }
-  if (Object.keys(cameraStreams.current).length !== 0) {
+  if (Object.keys(cameraStreams.current).length === 0) {
+    isWebcam.current = false;
+    setWebcamActive(false);
+  } else {
     isWebcam.current = true;
     setWebcamActive(true);
   }
-  if (Object.keys(screenStreams.current).length !== 0) {
+  if (Object.keys(screenStreams.current).length === 0) {
+    isScreen.current = false;
+    setScreenActive(false);
+  } else {
     isScreen.current = true;
     setScreenActive(true);
   }

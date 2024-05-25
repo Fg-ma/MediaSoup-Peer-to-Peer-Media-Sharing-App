@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Socket } from "socket.io-client";
 import {
   volumeHigh1a,
   volumeHigh1b,
@@ -48,6 +49,8 @@ import VolumeSection from "./VolumeSection";
 
 export default function ({
   username,
+  roomName,
+  socket,
   cameraStreams,
   screenStreams,
   audioStream,
@@ -60,6 +63,8 @@ export default function ({
   onRendered,
 }: {
   username?: string;
+  roomName: string;
+  socket: React.MutableRefObject<Socket>;
   cameraStreams?: { [cameraKey: string]: MediaStream };
   screenStreams?: { [screenKey: string]: MediaStream };
   audioStream?: MediaStream;
@@ -469,10 +474,12 @@ export default function ({
         Object.entries(cameraStreams).map(([key, cameraStream]) => (
           <FgVideo
             key={key}
+            username={username}
+            roomName={roomName}
+            socket={socket}
             id={key}
             videoStream={cameraStream}
             isStream={true}
-            muted={isUser}
             flipVideo={true}
             isSlider={!isUser}
             isPlayPause={false}
@@ -503,10 +510,12 @@ export default function ({
         Object.entries(screenStreams).map(([key, screenStream]) => (
           <FgVideo
             key={key}
+            username={username}
+            roomName={roomName}
+            socket={socket}
             id={key}
             videoStream={screenStream}
             isStream={true}
-            muted={isUser}
             flipVideo={false}
             isSlider={!isUser}
             isPlayPause={false}

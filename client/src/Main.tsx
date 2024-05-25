@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Root, createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import publishCamera from "./publishCamera";
@@ -150,6 +149,8 @@ export default function Main() {
             event,
             device,
             username,
+            roomName,
+            socket,
             isWebcam,
             isScreen,
             isAudio,
@@ -170,6 +171,8 @@ export default function Main() {
           onProducerDisconnected(
             event,
             username,
+            roomName,
+            socket,
             handleDisableEnableBtns,
             remoteVideosContainerRef,
             cameraStreams,

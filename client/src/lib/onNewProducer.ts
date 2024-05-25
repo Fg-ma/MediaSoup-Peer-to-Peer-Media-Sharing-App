@@ -1,5 +1,6 @@
 import React from "react";
-import { Root, createRoot } from "react-dom/client";
+import { Socket } from "socket.io-client";
+import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import getBrowserMedia from "../getBrowserMedia";
 import Bundle from "../bundle/Bundle";
@@ -11,6 +12,8 @@ const onNewProducer = async (
   },
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   username: React.MutableRefObject<string>,
+  roomName: React.MutableRefObject<string>,
+  socket: React.MutableRefObject<Socket>,
   isWebcam: React.MutableRefObject<boolean>,
   isScreen: React.MutableRefObject<boolean>,
   isAudio: React.MutableRefObject<boolean>,
@@ -165,6 +168,8 @@ const onNewProducer = async (
     root.render(
       React.createElement(Bundle, {
         username: username.current,
+        roomName: roomName.current,
+        socket: socket,
         cameraStreams:
           isWebcam.current && cameraStreams.current
             ? cameraStreams.current

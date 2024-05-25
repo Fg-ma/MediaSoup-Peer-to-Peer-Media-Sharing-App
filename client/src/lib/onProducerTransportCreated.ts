@@ -113,6 +113,8 @@ const onProducerTransportCreated = async (
           root.render(
             React.createElement(Bundle, {
               username: username.current,
+              roomName: roomName.current,
+              socket: socket,
               cameraStreams:
                 isWebcam.current && cameraStreams.current
                   ? cameraStreams.current
