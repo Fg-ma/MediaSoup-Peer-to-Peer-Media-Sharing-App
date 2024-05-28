@@ -20,9 +20,11 @@ import {
   volumeLow3b,
 } from "./svgPaths";
 import SVGMorpher from "../SVGMorpher/SVGMorpher";
+import VolumeIndicator from "./VolumeIndicator";
 
 export default function VolumeSection({
   audioRef,
+  audioStream,
   handleVolumeSlider = () => {},
   iconSize = "2.5rem",
   sliderSize = "2.5rem",
@@ -35,6 +37,7 @@ export default function VolumeSection({
   changedWhileNotFinishedRef,
 }: {
   audioRef: React.RefObject<HTMLAudioElement>;
+  audioStream?: MediaStream;
   handleVolumeSlider?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleMute: () => void;
   iconSize?: string;
@@ -50,10 +53,13 @@ export default function VolumeSection({
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
 }) {
   return (
-    <div className='volume-container flex items-center justify-center'>
+    <div
+      className='volume-container flex items-center justify-center'
+      style={{ height: `calc(${iconSize} * 2)` }}
+    >
       <button
         onClick={handleMute}
-        className='aspect-square flex items-center justify-center'
+        className='aspect-square flex items-center justify-center relative'
         style={{ width: iconSize }}
       >
         <svg

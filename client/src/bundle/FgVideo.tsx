@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
-import VolumeSection from "./VolumeSection";
+import VolumeSection from "./VolumeSectionBad";
 import handleFullscreenChange from "./lib/handleFullscreenChange";
 import handlePictureInPicture from "./lib/handlePictureInPicture";
 import formatDuration from "./lib/formatDuration";

@@ -46,6 +46,7 @@ import {
 } from "./svgPaths";
 import FgVideo from "./FgVideo";
 import VolumeSection from "./VolumeSection";
+import VolumeIndicator from "./VolumeIndicator";
 
 export default function ({
   username,
@@ -161,7 +162,10 @@ export default function ({
         bundleRef.current?.classList.remove("mute");
       }
 
-      setPaths(getPaths(to, newVolumeState));
+      const newPaths = getPaths(to, newVolumeState);
+      if (newPaths[0]) {
+        setPaths(newPaths);
+      }
     }
   };
 
@@ -483,7 +487,7 @@ export default function ({
             flipVideo={true}
             isSlider={!isUser}
             isPlayPause={false}
-            isVolume={!!audioStream}
+            isVolume={audioStream ? true : false}
             isTotalTime={false}
             isPlaybackSpeed={false}
             isClosedCaptions={false}
@@ -544,24 +548,20 @@ export default function ({
       {audioStream &&
         Object.keys(cameraStreams || {}).length === 0 &&
         Object.keys(screenStreams || {}).length === 0 && (
-          <div id={username && `${username}_audio_container`}>
+          <div
+            id={username && `${username}_audio_container`}
+            className='relative'
+          >
             <audio
               ref={audioRef}
               id={username && `${username}_audio_stream`}
               className='w-0 z-0'
               autoPlay={true}
             ></audio>
-            <VolumeSection
-              audioRef={audioRef}
-              handleVolumeSlider={handleVolumeSlider}
-              iconSize={"5rem"}
+            <VolumeIndicator
+              audioStream={audioStream}
+              bundleRef={bundleRef}
               handleMute={handleMute}
-              primaryColor={"black"}
-              isSlider={!isUser}
-              paths={paths}
-              videoIconStateRef={videoIconStateRef}
-              isFinishedRef={isFinishedRef}
-              changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             />
           </div>
         )}

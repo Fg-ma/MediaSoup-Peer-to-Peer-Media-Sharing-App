@@ -458,7 +458,7 @@ export default function Main() {
         </div>
         <div
           ref={remoteVideosContainerRef}
-          className='w-full grid grid-cols-4'
+          className='w-full grid grid-cols-3'
         ></div>
       </div>
     </div>

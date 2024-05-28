@@ -25,6 +25,7 @@
     "postcss-loader": "^8.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-spring": "^9.7.3",
     "socket.io-client": "^4.7.5",
     "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.3",
