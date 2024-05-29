@@ -3,8 +3,9 @@ import { useSpring, animated } from "react-spring";
 
 const VolumeIndicator = ({
   audioStream,
-  bundleRef,
+  audioRef,
   handleMute,
+  isUser = false,
   springDuration = 250,
   noiseThreshold = 0.2,
   numFixedPoints = 10,
@@ -13,8 +14,9 @@ const VolumeIndicator = ({
   bellCurveStdDev = 0.4,
 }: {
   audioStream?: MediaStream;
-  bundleRef: React.RefObject<HTMLDivElement>;
+  audioRef: React.RefObject<HTMLAudioElement>;
   handleMute: () => void;
+  isUser?: boolean;
   springDuration?: number;
   noiseThreshold?: number;
   numFixedPoints?: number;
@@ -22,17 +24,93 @@ const VolumeIndicator = ({
   bellCurveMean?: number;
   bellCurveStdDev?: number;
 }) => {
+  const [movingY, setMovingY] = useState<number[]>(
+    Array(numFixedPoints - 1).fill(0)
+  );
+  const [isDragging, setIsDragging] = useState(false);
+  const [leftHandlePosition, setLeftHandlePosition] = useState({ x: 10, y: 0 });
+  const [rightHandlePosition, setRightHandlePosition] = useState({
+    x: 190,
+    y: 0,
+  });
   const bellCurveY = useRef<number[]>([]);
   const fixedPointsX = useRef<number[]>([]);
   const pathRef = useRef<SVGPathElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const [movingY, setMovingY] = useState<number[]>(
-    Array(numFixedPoints - 1).fill(0)
-  );
+  const leftHandleRef = useRef<SVGRectElement>(null);
+  const rightHandleRef = useRef<SVGRectElement>(null);
+  const sideDragging = useRef<"left" | "right" | null>(null);
+  const patternWidth = 0.18;
+  const patternHeight = 0.2;
+
   const springs = useSpring<{ [key: string]: any }>({
     ...Object.fromEntries(movingY.map((y, index) => [`y${index + 1}`, y])),
     config: { duration: springDuration },
   });
+
+  useEffect(() => {
+    const startDrag = (event: MouseEvent, side: "left" | "right") => {
+      event.preventDefault();
+      setIsDragging(true);
+      sideDragging.current = side;
+    };
+
+    const drag = (event: MouseEvent) => {
+      if (!isDragging || !svgRef.current || !sideDragging.current) return;
+
+      const svgPoint = svgRef.current.createSVGPoint();
+      svgPoint.x = event.clientX;
+      svgPoint.y = event.clientY;
+      const cursorPoint = svgPoint.matrixTransform(
+        svgRef.current.getScreenCTM()?.inverse()
+      );
+      const newY = Math.max(-220, Math.min(220, cursorPoint.y));
+      if (sideDragging.current === "left") {
+        setLeftHandlePosition((prevState) => ({ ...prevState, y: newY }));
+      } else if (sideDragging.current === "right") {
+        setRightHandlePosition((prevState) => ({ ...prevState, y: newY }));
+      }
+      handleVolumeSlider(Math.abs(newY / 220));
+    };
+
+    const handleVolumeSlider = (volume: number) => {
+      if (audioRef.current) {
+        audioRef.current.volume = volume;
+        audioRef.current.muted = volume === 0;
+      }
+    };
+
+    const stopDrag = () => {
+      setIsDragging(false);
+      setLeftHandlePosition((prevState) => ({ ...prevState, y: 0 }));
+      setRightHandlePosition((prevState) => ({ ...prevState, y: 0 }));
+      sideDragging.current = null;
+    };
+
+    if (!isUser) {
+      leftHandleRef.current?.addEventListener("mousedown", (event) =>
+        startDrag(event, "left")
+      );
+      rightHandleRef.current?.addEventListener("mousedown", (event) =>
+        startDrag(event, "right")
+      );
+      window.addEventListener("mousemove", drag);
+      window.addEventListener("mouseup", stopDrag);
+    }
+
+    return () => {
+      if (!isUser) {
+        leftHandleRef.current?.addEventListener("mousedown", (event) =>
+          startDrag(event, "left")
+        );
+        rightHandleRef.current?.addEventListener("mousedown", (event) =>
+          startDrag(event, "right")
+        );
+        window.removeEventListener("mousemove", drag);
+        window.removeEventListener("mouseup", stopDrag);
+      }
+    };
+  }, [isDragging]);
 
   // Init
   useEffect(() => {
@@ -52,33 +130,25 @@ const VolumeIndicator = ({
       if (
         svgPointTransformed.x >= bbox.x &&
         svgPointTransformed.x <= bbox.x + bbox.width &&
-        svgPointTransformed.y >= bbox.y &&
-        svgPointTransformed.y <= bbox.y + bbox.height
+        svgPointTransformed.y >= Math.min(bbox.y, -20) &&
+        svgPointTransformed.y <= bbox.y + Math.max(bbox.height, 40)
       ) {
         handleMute();
-        if (
-          pathRef.current &&
-          bundleRef.current &&
-          bundleRef.current.classList.contains("mute")
-        ) {
-          pathRef.current.style.stroke = "#F56114";
-        } else if (
-          pathRef.current &&
-          bundleRef.current &&
-          !bundleRef.current.classList.contains("mute")
-        ) {
-          pathRef.current.style.stroke = "black";
-        }
       }
     };
 
     svgRef.current?.addEventListener("click", (event) => onClick(event));
 
     // X points
-    const step = 200 / (numFixedPoints - 1);
+    const totalWidth = 200;
+    const startOffset = 20;
+    const endOffset = 20;
+    const usableWidth = totalWidth - startOffset - endOffset;
+    const step = usableWidth / (numFixedPoints - 1);
+
     fixedPointsX.current = Array.from(
       { length: numFixedPoints },
-      (_, i) => i * step
+      (_, i) => startOffset + i * step
     );
 
     // Bell curve
@@ -193,13 +263,16 @@ const VolumeIndicator = ({
 
   // Generate the path data using the fixed and moving points
   const generatePathData = (ySprings: number[]) => {
-    const path = [`M${fixedPointsX.current[0]} 0`];
+    const path = [`M0 0`];
+    path.push(`Q 10 ${leftHandlePosition.y} 20 0`);
     for (let i = 1; i < fixedPointsX.current.length; i++) {
       const xMid =
         fixedPointsX.current[i - 1] +
         (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
       path.push(`Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} 0`);
     }
+    path.push(`Q 190 ${rightHandlePosition.y} 200 0`);
+
     return path.join(" ");
   };
 
@@ -209,25 +282,12 @@ const VolumeIndicator = ({
   const animatedPathData = springs.y1.to(() => generatePathData(ySpringsArray));
 
   return (
-    <div className='w-min h-min relative'>
+    <div className='w-60 aspect-square'>
       <svg
         ref={svgRef}
-        className='z-50 w-40 aspect-square'
+        className='z-50 w-full aspect-square'
         viewBox='0 -150 200 300'
       >
-        <animated.path
-          ref={pathRef}
-          d={animatedPathData}
-          stroke='black'
-          strokeWidth='7'
-          fill='none'
-          strokeLinecap='round'
-          filter={
-            !ySpringsArray.every((element) => element === 0)
-              ? "url(#shadow)"
-              : ""
-          }
-        />
         <defs>
           <filter id='shadow'>
             <feGaussianBlur in='SourceAlpha' stdDeviation='2' result='blur' />
@@ -237,7 +297,272 @@ const VolumeIndicator = ({
               <feMergeNode in='SourceGraphic' />
             </feMerge>
           </filter>
+          <mask id='mask'>
+            <rect x='-10' y='-150' width='220' height='450' fill='black' />
+            <animated.path
+              ref={pathRef}
+              d={animatedPathData}
+              stroke='white'
+              strokeWidth='7'
+              fill='none'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+          </mask>
+
+          <linearGradient
+            id='orangeTopGradient'
+            x1='0%'
+            y1='0%'
+            x2='0%'
+            y2='100%'
+          >
+            <stop offset='45%' stop-color='#F56114' />
+            <stop offset='95%' stop-color='black' />
+          </linearGradient>
+
+          <linearGradient
+            id='orangeBottomGradient'
+            x1='0%'
+            y1='0%'
+            x2='0%'
+            y2='100%'
+          >
+            <stop offset='5%' stop-color='black' />
+            <stop offset='55%' stop-color='#F56114' />
+          </linearGradient>
+
+          <pattern
+            id='orangeBlackMatrix'
+            x='-20'
+            y='-120'
+            width={svgRef.current?.clientWidth}
+            height={svgRef.current?.clientHeight}
+            patternUnits='userSpaceOnUse'
+          >
+            <rect
+              x='0'
+              y='0'
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              fill='url(#orangeTopGradient)'
+            ></rect>
+            <rect
+              x={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              y='0'
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              fill='black'
+            ></rect>
+            <rect
+              x={
+                svgRef.current
+                  ? svgRef.current.clientWidth * (1 - patternWidth)
+                  : undefined
+              }
+              y='0'
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              fill='url(#orangeTopGradient)'
+            ></rect>
+
+            <rect
+              x='0'
+              y={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
+                  : undefined
+              }
+              fill='black'
+            ></rect>
+            <rect
+              x={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              y={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
+                  : undefined
+              }
+              fill='black'
+            ></rect>
+            <rect
+              x={
+                svgRef.current
+                  ? svgRef.current.clientWidth * (1 - patternWidth)
+                  : undefined
+              }
+              y={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
+                  : undefined
+              }
+              fill='black'
+            ></rect>
+
+            <rect
+              x='0'
+              y={
+                svgRef.current
+                  ? svgRef.current.clientHeight * (1 - patternHeight)
+                  : undefined
+              }
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              fill='url(#orangeBottomGradient)'
+            ></rect>
+            <rect
+              x={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              y={
+                svgRef.current
+                  ? svgRef.current.clientHeight * (1 - patternHeight)
+                  : undefined
+              }
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              fill='black'
+            ></rect>
+            <rect
+              x={
+                svgRef.current
+                  ? svgRef.current.clientWidth * (1 - patternWidth)
+                  : undefined
+              }
+              y={
+                svgRef.current
+                  ? svgRef.current.clientHeight * (1 - patternHeight)
+                  : undefined
+              }
+              width={
+                svgRef.current
+                  ? svgRef.current.clientWidth * patternWidth
+                  : undefined
+              }
+              height={
+                svgRef.current
+                  ? svgRef.current.clientHeight * patternHeight
+                  : undefined
+              }
+              fill='url(#orangeBottomGradient)'
+            ></rect>
+          </pattern>
         </defs>
+        <g filter='url(#shadow)'>
+          <rect
+            x='-20'
+            y='-120'
+            width={svgRef.current?.clientWidth}
+            height={svgRef.current?.clientHeight}
+            fill='url(#orangeBlackMatrix)'
+            mask='url(#mask)'
+          />
+        </g>
+        {!isUser && (
+          <animated.rect
+            ref={leftHandleRef}
+            x={-5.5}
+            y={-5.5}
+            width={31}
+            height={11}
+            rx={5.5}
+            ry={5.5}
+            fill='transparent'
+            style={{ cursor: "pointer" }}
+          />
+        )}
+        {!isUser && (
+          <animated.rect
+            ref={rightHandleRef}
+            x={174.5}
+            y={-5.5}
+            width={31}
+            height={11}
+            rx={5.5}
+            ry={5.5}
+            fill='transparent'
+            style={{ cursor: "pointer" }}
+          />
+        )}
       </svg>
     </div>
   );

@@ -560,8 +560,9 @@ export default function ({
             ></audio>
             <VolumeIndicator
               audioStream={audioStream}
-              bundleRef={bundleRef}
+              audioRef={audioRef}
               handleMute={handleMute}
+              isUser={isUser}
             />
           </div>
         )}
