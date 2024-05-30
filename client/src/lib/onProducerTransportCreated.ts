@@ -127,7 +127,6 @@ const onProducerTransportCreated = async (
                 isAudio.current && audioStream.current
                   ? audioStream.current
                   : undefined,
-              isAudio: false,
               isUser: true,
               muteButtonCallback: muteAudio,
             })
@@ -165,6 +164,7 @@ const onProducerTransportCreated = async (
         cameraStreams,
         screenStreams
       );
+
       if (cameraBrowserMedia) {
         cameraStreams.current[
           `${username.current}_camera_stream_${cameraCount.current}`
@@ -199,6 +199,7 @@ const onProducerTransportCreated = async (
       ) {
         return;
       }
+
       const screenBrowserMedia = await getBrowserMedia(
         "screen",
         device,
@@ -210,6 +211,7 @@ const onProducerTransportCreated = async (
         cameraStreams,
         screenStreams
       );
+
       if (screenBrowserMedia) {
         screenStreams.current[
           `${username.current}_screen_stream_${screenCount.current}`
@@ -238,8 +240,10 @@ const onProducerTransportCreated = async (
     }
     if (isAudio.current) {
       if (audioStream.current) {
+        console.error("Already existing audio stream for: ", username.current);
         return;
       }
+
       audioStream.current = await getBrowserMedia(
         "audio",
         device,
@@ -251,6 +255,7 @@ const onProducerTransportCreated = async (
         cameraStreams,
         screenStreams
       );
+
       if (audioStream.current) {
         const audioTrack = audioStream.current.getAudioTracks()[0];
         const audioParams = {

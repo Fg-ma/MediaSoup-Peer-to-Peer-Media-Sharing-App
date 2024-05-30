@@ -39,6 +39,9 @@ const onNewProducer = async (
   const oldBundleContainer = document.getElementById(
     `${username.current}_bundle_container`
   );
+  const oldAudioStream = document.getElementById(
+    `${username.current}_audio_stream`
+  );
 
   if (event.producerType === "webcam") {
     if (
@@ -48,6 +51,7 @@ const onNewProducer = async (
     ) {
       return;
     }
+
     const cameraBrowserMedia = await getBrowserMedia(
       event.producerType,
       device,
@@ -59,26 +63,30 @@ const onNewProducer = async (
       cameraStreams,
       screenStreams
     );
-    if (cameraBrowserMedia) {
+
+    if (!cameraBrowserMedia) {
+      console.error("Error getting camera data");
+      return;
+    }
+
+    cameraStreams.current[
+      `${username.current}_camera_stream_${cameraCount.current}`
+    ] = cameraBrowserMedia;
+    const track =
       cameraStreams.current[
         `${username.current}_camera_stream_${cameraCount.current}`
-      ] = cameraBrowserMedia;
-      const track =
-        cameraStreams.current[
-          `${username.current}_camera_stream_${cameraCount.current}`
-        ].getVideoTracks()[0];
-      const params = {
-        track: track,
-        appData: {
-          producerType: "webcam",
-        },
-      };
-      try {
-        await producerTransport.current?.produce(params);
-      } catch {
-        console.error("Camera new transport failed to produce");
-        return;
-      }
+      ].getVideoTracks()[0];
+    const params = {
+      track: track,
+      appData: {
+        producerType: "webcam",
+      },
+    };
+    try {
+      await producerTransport.current?.produce(params);
+    } catch {
+      console.error("Camera new transport failed to produce");
+      return;
     }
   } else if (event.producerType === "screen") {
     if (
@@ -88,6 +96,7 @@ const onNewProducer = async (
     ) {
       return;
     }
+
     const screenBrowserMedia = await getBrowserMedia(
       event.producerType,
       device,
@@ -99,32 +108,37 @@ const onNewProducer = async (
       cameraStreams,
       screenStreams
     );
-    if (screenBrowserMedia) {
+
+    if (!screenBrowserMedia) {
+      console.error("Error getting screen data");
+      return;
+    }
+
+    screenStreams.current[
+      `${username.current}_screen_stream_${screenCount.current}`
+    ] = screenBrowserMedia;
+    const track =
       screenStreams.current[
         `${username.current}_screen_stream_${screenCount.current}`
-      ] = screenBrowserMedia;
-      const track =
-        screenStreams.current[
-          `${username.current}_screen_stream_${screenCount.current}`
-        ].getVideoTracks()[0];
-      const params = {
-        track: track,
-        appData: {
-          producerType: "screen",
-        },
-      };
-      try {
-        await producerTransport.current?.produce(params);
-      } catch {
-        console.error("Screen new transport failed to produce");
-        return;
-      }
+      ].getVideoTracks()[0];
+    const params = {
+      track: track,
+      appData: {
+        producerType: "screen",
+      },
+    };
+    try {
+      await producerTransport.current?.produce(params);
+    } catch {
+      console.error("Screen new transport failed to produce");
+      return;
     }
   } else if (event.producerType === "audio") {
     if (audioStream.current) {
       console.error("Already existing audio stream for: ", username.current);
       return;
     }
+
     audioStream.current = await getBrowserMedia(
       event.producerType,
       device,
@@ -136,20 +150,24 @@ const onNewProducer = async (
       cameraStreams,
       screenStreams
     );
-    if (audioStream.current) {
-      const track = audioStream.current.getAudioTracks()[0];
-      const params = {
-        track: track,
-        appData: {
-          producerType: "audio",
-        },
-      };
-      try {
-        await producerTransport.current?.produce(params);
-      } catch {
-        console.error("Audio new transport failed to produce");
-        return;
-      }
+
+    if (!audioStream.current) {
+      console.error("Error getting audio data");
+      return;
+    }
+
+    const track = audioStream.current.getAudioTracks()[0];
+    const params = {
+      track: track,
+      appData: {
+        producerType: "audio",
+      },
+    };
+    try {
+      await producerTransport.current?.produce(params);
+    } catch {
+      console.error("Audio new transport failed to produce");
+      return;
     }
   }
 
@@ -182,7 +200,6 @@ const onNewProducer = async (
           isAudio.current && audioStream.current
             ? audioStream.current
             : undefined,
-        isAudio: false,
         isUser: true,
         muteButtonCallback: muteAudio,
         onRendered: () => {
@@ -193,6 +210,19 @@ const onNewProducer = async (
             );
 
             newBundleContainer?.classList.add("mute");
+          }
+
+          // Set the volume of the new audio element to that of the old
+          if (
+            oldAudioStream instanceof HTMLAudioElement &&
+            !oldAudioStream.muted
+          ) {
+            const newAudioStream = document.getElementById(
+              `${username.current}_audio_stream`
+            );
+            if (newAudioStream instanceof HTMLAudioElement) {
+              newAudioStream.volume = oldAudioStream.volume;
+            }
           }
         },
       })

@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from "react-spring";
+import { colors } from "./colors";
 
 const VolumeIndicator = ({
   audioStream,
   audioRef,
+  bundleRef,
   handleMute,
+  muteLock,
   isUser = false,
   springDuration = 250,
   noiseThreshold = 0.2,
@@ -12,10 +15,16 @@ const VolumeIndicator = ({
   bellCurveAmplitude = 1,
   bellCurveMean = 0.5,
   bellCurveStdDev = 0.4,
+  shadowColor = "black",
+  volumeColor = "FgPrimary",
+  primaryMuteColor = "FgPrimary",
+  secondaryMuteColor = "black",
 }: {
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
+  bundleRef: React.RefObject<HTMLDivElement>;
   handleMute: () => void;
+  muteLock: React.MutableRefObject<boolean>;
   isUser?: boolean;
   springDuration?: number;
   noiseThreshold?: number;
@@ -23,7 +32,24 @@ const VolumeIndicator = ({
   bellCurveAmplitude?: number;
   bellCurveMean?: number;
   bellCurveStdDev?: number;
+  shadowColor?: string;
+  volumeColor?: string;
+  primaryMuteColor?: string;
+  secondaryMuteColor?: string;
 }) => {
+  const shadowColors = {
+    black: "rgba(0, 0, 0, 0.8)",
+    red: "rgba(90, 0, 0, 0.8)",
+    green: "rgba(0, 90, 0, 0.8)",
+    blue: "rgba(0, 0, 90, 0.8)",
+    purple: "rgba(70, 8, 91, 0.8)",
+    pink: "rgba(95, 23, 71, 0.8)",
+    yellow: "rgba(96, 82, 30, 0.8)",
+    lime: "rgba(67, 96, 30, 0.8)",
+    aqua: "rgba(30, 96, 96, 0.8)",
+    FgPrimary: "rgba(96, 38, 8, 0.8)",
+    FgSecondary: "rgba(17, 57, 96, 0.8)",
+  };
   const [movingY, setMovingY] = useState<number[]>(
     Array(numFixedPoints - 1).fill(0)
   );
@@ -48,97 +74,7 @@ const VolumeIndicator = ({
     config: { duration: springDuration },
   });
 
-  useEffect(() => {
-    const startDrag = (event: MouseEvent, side: "left" | "right") => {
-      event.preventDefault();
-      setIsDragging(true);
-      sideDragging.current = side;
-    };
-
-    const drag = (event: MouseEvent) => {
-      if (!isDragging || !svgRef.current || !sideDragging.current) return;
-
-      const svgPoint = svgRef.current.createSVGPoint();
-      svgPoint.x = event.clientX;
-      svgPoint.y = event.clientY;
-      const cursorPoint = svgPoint.matrixTransform(
-        svgRef.current.getScreenCTM()?.inverse()
-      );
-      const newY = Math.max(-220, Math.min(220, cursorPoint.y));
-      if (sideDragging.current === "left") {
-        setLeftHandlePosition((prevState) => ({ ...prevState, y: newY }));
-      } else if (sideDragging.current === "right") {
-        setRightHandlePosition((prevState) => ({ ...prevState, y: newY }));
-      }
-      handleVolumeSlider(Math.abs(newY / 220));
-    };
-
-    const handleVolumeSlider = (volume: number) => {
-      if (audioRef.current) {
-        audioRef.current.volume = volume;
-        audioRef.current.muted = volume === 0;
-      }
-    };
-
-    const stopDrag = () => {
-      setIsDragging(false);
-      setLeftHandlePosition((prevState) => ({ ...prevState, y: 0 }));
-      setRightHandlePosition((prevState) => ({ ...prevState, y: 0 }));
-      sideDragging.current = null;
-    };
-
-    if (!isUser) {
-      leftHandleRef.current?.addEventListener("mousedown", (event) =>
-        startDrag(event, "left")
-      );
-      rightHandleRef.current?.addEventListener("mousedown", (event) =>
-        startDrag(event, "right")
-      );
-      window.addEventListener("mousemove", drag);
-      window.addEventListener("mouseup", stopDrag);
-    }
-
-    return () => {
-      if (!isUser) {
-        leftHandleRef.current?.addEventListener("mousedown", (event) =>
-          startDrag(event, "left")
-        );
-        rightHandleRef.current?.addEventListener("mousedown", (event) =>
-          startDrag(event, "right")
-        );
-        window.removeEventListener("mousemove", drag);
-        window.removeEventListener("mouseup", stopDrag);
-      }
-    };
-  }, [isDragging]);
-
-  // Init
-  useEffect(() => {
-    const onClick = (event: MouseEvent) => {
-      const bbox = pathRef.current?.getBBox();
-      const svgPoint = svgRef.current?.createSVGPoint();
-      if (!bbox || !svgPoint) return;
-
-      svgPoint.x = event.clientX;
-      svgPoint.y = event.clientY;
-
-      // Convert client coordinates to SVG coordinates
-      const svgPointTransformed = svgPoint.matrixTransform(
-        svgRef.current?.getScreenCTM()?.inverse()
-      );
-
-      if (
-        svgPointTransformed.x >= bbox.x &&
-        svgPointTransformed.x <= bbox.x + bbox.width &&
-        svgPointTransformed.y >= Math.min(bbox.y, -20) &&
-        svgPointTransformed.y <= bbox.y + Math.max(bbox.height, 40)
-      ) {
-        handleMute();
-      }
-    };
-
-    svgRef.current?.addEventListener("click", (event) => onClick(event));
-
+  const init = () => {
     // X points
     const totalWidth = 200;
     const startOffset = 20;
@@ -177,11 +113,99 @@ const VolumeIndicator = ({
       bellCurveMean,
       bellCurveStdDev
     );
+  };
+
+  const handleVolumeSlider = (volume: number) => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+      audioRef.current.muted = volume === 0;
+    }
+  };
+
+  useEffect(() => {
+    const startDrag = (event: MouseEvent, side: "left" | "right") => {
+      event.preventDefault();
+      setIsDragging(true);
+      sideDragging.current = side;
+    };
+
+    const drag = (event: MouseEvent) => {
+      if (!isDragging || !svgRef.current || !sideDragging.current) return;
+
+      const svgPoint = svgRef.current.createSVGPoint();
+      svgPoint.x = event.clientX;
+      svgPoint.y = event.clientY;
+      const cursorPoint = svgPoint.matrixTransform(
+        svgRef.current.getScreenCTM()?.inverse()
+      );
+      const newY = Math.max(-220, Math.min(220, cursorPoint.y));
+      if (sideDragging.current === "left") {
+        setLeftHandlePosition((prevState) => ({ ...prevState, y: newY }));
+      } else if (sideDragging.current === "right") {
+        setRightHandlePosition((prevState) => ({ ...prevState, y: newY }));
+      }
+      handleVolumeSlider(Math.abs(newY / 220));
+    };
+
+    const stopDrag = () => {
+      setIsDragging(false);
+      setLeftHandlePosition((prevState) => ({ ...prevState, y: 0 }));
+      setRightHandlePosition((prevState) => ({ ...prevState, y: 0 }));
+      sideDragging.current = null;
+    };
+
+    const onClick = (event: MouseEvent) => {
+      const bbox = pathRef.current?.getBBox();
+      const svgPoint = svgRef.current?.createSVGPoint();
+      if (!bbox || !svgPoint || muteLock.current) return;
+
+      svgPoint.x = event.clientX;
+      svgPoint.y = event.clientY;
+
+      // Convert client coordinates to SVG coordinates
+      const svgPointTransformed = svgPoint.matrixTransform(
+        svgRef.current?.getScreenCTM()?.inverse()
+      );
+
+      if (
+        svgPointTransformed.x >= bbox.x &&
+        svgPointTransformed.x <= bbox.x + bbox.width &&
+        svgPointTransformed.y >= Math.min(bbox.y, -20) &&
+        svgPointTransformed.y <= bbox.y + Math.max(bbox.height, 40)
+      ) {
+        handleMute();
+      }
+    };
+
+    init();
+
+    svgRef.current?.addEventListener("click", (event) => onClick(event));
+
+    if (!isUser) {
+      leftHandleRef.current?.addEventListener("mousedown", (event) =>
+        startDrag(event, "left")
+      );
+      rightHandleRef.current?.addEventListener("mousedown", (event) =>
+        startDrag(event, "right")
+      );
+      window.addEventListener("mousemove", drag);
+      window.addEventListener("mouseup", stopDrag);
+    }
 
     return () => {
       svgRef.current?.removeEventListener("click", (event) => onClick(event));
+      if (!isUser) {
+        leftHandleRef.current?.addEventListener("mousedown", (event) =>
+          startDrag(event, "left")
+        );
+        rightHandleRef.current?.addEventListener("mousedown", (event) =>
+          startDrag(event, "right")
+        );
+        window.removeEventListener("mousemove", drag);
+        window.removeEventListener("mouseup", stopDrag);
+      }
     };
-  }, []);
+  }, [isDragging]);
 
   // Audio analyser
   useEffect(() => {
@@ -292,11 +316,26 @@ const VolumeIndicator = ({
           <filter id='shadow'>
             <feGaussianBlur in='SourceAlpha' stdDeviation='2' result='blur' />
             <feOffset in='blur' dx='1' dy='2' result='offsetBlur' />
+
+            <feFlood
+              floodColor={
+                shadowColors[shadowColor as keyof typeof shadowColors]
+              }
+              result='colorBlur'
+            />
+            <feComposite
+              in='colorBlur'
+              in2='offsetBlur'
+              operator='in'
+              result='coloredBlur'
+            />
+
             <feMerge>
-              <feMergeNode in='offsetBlur' />
+              <feMergeNode in='coloredBlur' />
               <feMergeNode in='SourceGraphic' />
             </feMerge>
           </filter>
+
           <mask id='mask'>
             <rect x='-10' y='-150' width='220' height='450' fill='black' />
             <animated.path
@@ -311,29 +350,143 @@ const VolumeIndicator = ({
           </mask>
 
           <linearGradient
-            id='orangeTopGradient'
+            id='muteGradient'
             x1='0%'
             y1='0%'
-            x2='0%'
-            y2='100%'
+            x2='100%'
+            y2='0%'
+            gradientUnits='userSpaceOnUse'
           >
-            <stop offset='45%' stop-color='#F56114' />
-            <stop offset='95%' stop-color='black' />
+            <stop
+              offset='0%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='10.61%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='11.61%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='14.31%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='15.31%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='25.42%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+
+            <stop
+              offset='26.42%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='36.53%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+
+            <stop
+              offset='37.53%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='40.23%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='41.23%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='43.93%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='44.93%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='47.63%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='48.63%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='51.33%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='52.33%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='62.44%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+
+            <stop
+              offset='63.44%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='73.55%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+
+            <stop
+              offset='74.55%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='84.66%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+
+            <stop
+              offset='85.66%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='95.77%'
+              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+            />
+
+            <stop
+              offset='96.77%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
+            <stop
+              offset='100%'
+              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+            />
           </linearGradient>
 
-          <linearGradient
-            id='orangeBottomGradient'
-            x1='0%'
-            y1='0%'
-            x2='0%'
-            y2='100%'
-          >
-            <stop offset='5%' stop-color='black' />
-            <stop offset='55%' stop-color='#F56114' />
+          <linearGradient id='topGradient' x1='0%' y1='0%' x2='0%' y2='100%'>
+            <stop
+              offset='45%'
+              stopColor={colors[volumeColor as keyof typeof colors]}
+            />
+            <stop offset='95%' stopColor='black' />
+          </linearGradient>
+
+          <linearGradient id='bottomGradient' x1='0%' y1='0%' x2='0%' y2='100%'>
+            <stop offset='5%' stopColor='black' />
+            <stop
+              offset='55%'
+              stopColor={colors[volumeColor as keyof typeof colors]}
+            />
           </linearGradient>
 
           <pattern
-            id='orangeBlackMatrix'
+            id='backgroundMatrix'
             x='-20'
             y='-120'
             width={svgRef.current?.clientWidth}
@@ -353,7 +506,7 @@ const VolumeIndicator = ({
                   ? svgRef.current.clientHeight * patternHeight
                   : undefined
               }
-              fill='url(#orangeTopGradient)'
+              fill='url(#topGradient)'
             ></rect>
             <rect
               x={
@@ -391,7 +544,7 @@ const VolumeIndicator = ({
                   ? svgRef.current.clientHeight * patternHeight
                   : undefined
               }
-              fill='url(#orangeTopGradient)'
+              fill='url(#topGradient)'
             ></rect>
 
             <rect
@@ -477,7 +630,7 @@ const VolumeIndicator = ({
                   ? svgRef.current.clientHeight * patternHeight
                   : undefined
               }
-              fill='url(#orangeBottomGradient)'
+              fill='url(#bottomGradient)'
             ></rect>
             <rect
               x={
@@ -523,7 +676,7 @@ const VolumeIndicator = ({
                   ? svgRef.current.clientHeight * patternHeight
                   : undefined
               }
-              fill='url(#orangeBottomGradient)'
+              fill='url(#bottomGradient)'
             ></rect>
           </pattern>
         </defs>
@@ -533,7 +686,13 @@ const VolumeIndicator = ({
             y='-120'
             width={svgRef.current?.clientWidth}
             height={svgRef.current?.clientHeight}
-            fill='url(#orangeBlackMatrix)'
+            fill={
+              (bundleRef.current &&
+                bundleRef.current.classList.contains("mute")) ||
+              muteLock.current
+                ? "url(#muteGradient)"
+                : "url(#backgroundMatrix)"
+            }
             mask='url(#mask)'
           />
         </g>

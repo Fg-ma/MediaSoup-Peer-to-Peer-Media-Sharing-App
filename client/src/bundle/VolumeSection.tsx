@@ -20,7 +20,6 @@ import {
   volumeLow3b,
 } from "./svgPaths";
 import SVGMorpher from "../SVGMorpher/SVGMorpher";
-import VolumeIndicator from "./VolumeIndicator";
 
 export default function VolumeSection({
   audioRef,

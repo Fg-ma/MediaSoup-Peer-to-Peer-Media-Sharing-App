@@ -173,7 +173,7 @@ const onProducerDisconnected = (
             // Add mute to new bundle container if the old bundle container contained it
             if (oldBundleContainer?.classList.contains("mute")) {
               const newBundleContainer = document.getElementById(
-                `${username.current}_bundle_container`
+                `${event.producerUsername}_bundle_container`
               );
 
               newBundleContainer?.classList.add("mute");
@@ -189,7 +189,10 @@ const onProducerDisconnected = (
             }
 
             // Set the volume of the new audio element to that of the old
-            if (oldAudioStream instanceof HTMLAudioElement) {
+            if (
+              oldAudioStream instanceof HTMLAudioElement &&
+              !oldAudioStream.muted
+            ) {
               const newAudioStream = document.getElementById(
                 `${event.producerUsername}_audio_stream`
               );

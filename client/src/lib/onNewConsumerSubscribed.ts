@@ -52,6 +52,9 @@ const onNewConsumerSubscribed = async (
   }
 
   const oldBundle = document.getElementById(`${event.producerUsername}_bundle`);
+  const oldBundleContainer = document.getElementById(
+    `${event.producerUsername}_bundle_container`
+  );
   const oldAudioStream = document.getElementById(
     `${event.producerUsername}_audio_stream`
   );
@@ -127,7 +130,29 @@ const onNewConsumerSubscribed = async (
         screenStreams: remoteScreenStreams ? remoteScreenStreams : undefined,
         audioStream: remoteAudioStream ? remoteAudioStream : undefined,
         onRendered: () => {
-          if (oldAudioStream instanceof HTMLAudioElement) {
+          // Add mute to new bundle container if the old bundle container contained it
+          if (oldBundleContainer?.classList.contains("mute")) {
+            const newBundleContainer = document.getElementById(
+              `${event.producerUsername}_bundle_container`
+            );
+
+            newBundleContainer?.classList.add("mute");
+          }
+
+          // Add mute-lock to new bundle container if the old bundle container contained it
+          if (oldBundleContainer?.classList.contains("mute-lock")) {
+            const newBundleContainer = document.getElementById(
+              `${event.producerUsername}_bundle_container`
+            );
+
+            newBundleContainer?.classList.add("mute-lock");
+          }
+
+          // Set the volume of the new audio element to that of the old
+          if (
+            oldAudioStream instanceof HTMLAudioElement &&
+            !oldAudioStream.muted
+          ) {
             const newAudioStream = document.getElementById(
               `${event.producerUsername}_audio_stream`
             );
