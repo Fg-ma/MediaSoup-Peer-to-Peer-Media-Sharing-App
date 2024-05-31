@@ -91,13 +91,34 @@ export default function ({
   const isFinishedRef = useRef(true);
   const changedWhileNotFinishedRef = useRef(false);
 
+  // Initial functions & call onRendered call back if one is availiable
   useEffect(() => {
-    if (audioRef.current && audioStream && !isUser) {
-      audioRef.current.srcObject = audioStream;
+    // Set volume-slider-height
+    if (audioStream && !cameraStreams && !screenStreams) {
+      bundleRef.current?.style.setProperty(
+        "--volume-slider-height",
+        "0.625rem"
+      );
+      bundleRef.current?.style.setProperty("--volume-slider-width", "8rem");
+    }
+
+    // Set initial muteLock state
+    if (bundleRef.current?.classList.contains("mute-lock")) {
+      muteLock.current = true;
     }
 
     // Set initial volume slider
     tracksColorSetter();
+
+    if (onRendered) {
+      onRendered();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current && audioStream && !isUser) {
+      audioRef.current.srcObject = audioStream;
+    }
 
     audioRef.current?.addEventListener("volumechange", volumeChangeHandler);
 
@@ -110,23 +131,21 @@ export default function ({
   }, [audioRef]);
 
   const volumeChangeHandler = () => {
+    const volumeSliders = bundleRef.current?.querySelectorAll(".volume-slider");
+
+    volumeSliders?.forEach((slider) => {
+      const sliderElement = slider as HTMLInputElement;
+      if (audioRef.current) {
+        sliderElement.value = audioRef.current.muted
+          ? "0"
+          : audioRef.current.volume.toString();
+      }
+    });
+    tracksColorSetter();
+
     if (!audioRef.current || muteLock.current) {
       return;
     }
-
-    if (!audioRef.current.muted) {
-      const volumeSliders =
-        bundleRef.current?.querySelectorAll(".volume-slider");
-
-      volumeSliders?.forEach((slider) => {
-        const sliderElement = slider as HTMLInputElement;
-        if (audioRef.current) {
-          sliderElement.value = audioRef.current.volume.toString();
-        }
-      });
-    }
-
-    tracksColorSetter();
 
     const newVolume = audioRef.current.volume;
     let newVolumeState;
@@ -198,6 +217,7 @@ export default function ({
 
   const handleVolumeSlider = (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
+
     if (audioRef.current) {
       audioRef.current.volume = volume;
       audioRef.current.muted = volume > 0 ? false : true;
@@ -231,27 +251,12 @@ export default function ({
     }
 
     if (!isUser) {
-      audioRef.current.muted = !audioRef.current.muted;
-    }
-
-    if (audioRef.current.muted) {
-      if (!isUser) {
+      if (!audioRef.current.muted) {
         bundleRef.current?.classList.add("mute");
-      }
-      const volumeSliders =
-        bundleRef.current?.querySelectorAll(".volume-slider");
-
-      volumeSliders?.forEach((slider) => {
-        const sliderElement = slider as HTMLInputElement;
-        sliderElement.value = "0";
-      });
-    } else {
-      if (!isUser) {
+      } else {
         bundleRef.current?.classList.remove("mute");
       }
     }
-
-    tracksColorSetter();
 
     if (muteButtonCallback) {
       muteButtonCallback();
@@ -349,6 +354,14 @@ export default function ({
             if (audioRef.current) {
               audioRef.current.muted = true;
             }
+
+            if (!isFinishedRef.current) {
+              if (!changedWhileNotFinishedRef.current) {
+                changedWhileNotFinishedRef.current = true;
+              }
+              return;
+            }
+
             videoIconStateRef.current = {
               from: videoIconStateRef.current.to,
               to: "off",
@@ -358,18 +371,6 @@ export default function ({
             if (newPaths[0]) {
               setPaths(newPaths);
             }
-
-            if (bundleRef.current) {
-              const volumeSliders =
-                bundleRef.current.querySelectorAll(".volume-slider");
-
-              volumeSliders.forEach((slider) => {
-                const sliderElement = slider as HTMLInputElement;
-                sliderElement.value = "0";
-              });
-            }
-
-            tracksColorSetter();
           } else if (
             removedClasses?.includes("mute") &&
             videoIconStateRef.current.to === "off"
@@ -390,6 +391,16 @@ export default function ({
               newVolumeState = "low";
             }
 
+            if (
+              !isFinishedRef.current &&
+              videoIconStateRef.current.to !== newVolumeState
+            ) {
+              if (!changedWhileNotFinishedRef.current) {
+                changedWhileNotFinishedRef.current = true;
+              }
+              return;
+            }
+
             videoIconStateRef.current = {
               from: videoIconStateRef.current.to,
               to: newVolumeState,
@@ -402,24 +413,11 @@ export default function ({
             if (newPaths[0]) {
               setPaths(newPaths);
             }
-
-            if (bundleRef.current) {
-              const volumeSliders =
-                bundleRef.current.querySelectorAll(".volume-slider");
-
-              if (audioRef.current) {
-                volumeSliders.forEach((slider) => {
-                  const sliderElement = slider as HTMLInputElement;
-                  sliderElement.value = audioRef.current!.volume.toString();
-                });
-              }
-            }
-
-            tracksColorSetter();
           }
 
           if (addedClasses.includes("mute-lock") && !muteLock.current) {
             muteLock.current = true;
+
             if (videoIconStateRef.current.to !== "off") {
               videoIconStateRef.current = {
                 from: videoIconStateRef.current.to,
@@ -434,11 +432,11 @@ export default function ({
             removedClasses?.includes("mute-lock") &&
             muteLock.current
           ) {
-            muteLock.current = false;
-
             if (!audioRef.current) {
               return;
             }
+
+            muteLock.current = false;
 
             const newVolume = audioRef.current.volume;
             let newVolumeState;
@@ -482,27 +480,6 @@ export default function ({
     return () => {
       observer.disconnect();
     };
-  }, []);
-
-  // Initial functions & call onRendered call back if one is availiable
-  useEffect(() => {
-    // Set volume-slider-height
-    if (audioStream && !cameraStreams && !screenStreams) {
-      bundleRef.current?.style.setProperty(
-        "--volume-slider-height",
-        "0.625rem"
-      );
-      bundleRef.current?.style.setProperty("--volume-slider-width", "8rem");
-    }
-
-    // Set initial muteLock state
-    if (bundleRef.current?.classList.contains("mute-lock")) {
-      muteLock.current = true;
-    }
-
-    if (onRendered) {
-      onRendered();
-    }
   }, []);
 
   return (

@@ -82,15 +82,6 @@ const onConsumerTransportCreated = async (
 
         Object.entries(remoteTracksMap.current).forEach(
           ([trackUsername, tracks]) => {
-            const msg = {
-              type: "requestMuteLock",
-              roomName: roomName.current,
-              username: username.current,
-              producerUsername: trackUsername,
-            };
-
-            socket.current.emit("message", msg);
-
             if (remoteVideosContainerRef.current) {
               let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
               if (remoteTracksMap.current[trackUsername]?.webcam) {
@@ -146,6 +137,16 @@ const onConsumerTransportCreated = async (
                   audioStream: remoteAudioStream
                     ? remoteAudioStream
                     : undefined,
+                  onRendered: () => {
+                    const msg = {
+                      type: "requestMuteLock",
+                      roomName: roomName.current,
+                      username: username.current,
+                      producerUsername: trackUsername,
+                    };
+
+                    socket.current.emit("message", msg);
+                  },
                 })
               );
             }
