@@ -4,7 +4,7 @@ const onMuteLock = (
   event: {
     type: string;
     isMuteLock: boolean;
-    roomName: string;
+    table_id: string;
     username: string;
   },
   io: SocketIOServer
@@ -14,7 +14,7 @@ const onMuteLock = (
     isMuteLock: event.isMuteLock,
     username: event.username,
   };
-  io.to(event.roomName).emit("message", msg);
+  io.to(event.table_id).emit("message", msg);
 };
 
 export default onMuteLock;

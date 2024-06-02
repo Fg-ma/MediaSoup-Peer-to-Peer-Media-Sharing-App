@@ -4,7 +4,7 @@ const onNewConsumerCreated = (
   event: {
     type: string;
     username: string;
-    roomName: string;
+    table_id: string;
     producerUsername: string;
     consumerId?: string;
     consumerType: string;
@@ -17,7 +17,7 @@ const onNewConsumerCreated = (
     consumerId: event.consumerId,
     consumerType: event.consumerType,
   };
-  io.to(`${event.roomName}_${event.username}`).emit("message", msg);
+  io.to(`${event.table_id}_${event.username}`).emit("message", msg);
 };
 
 export default onNewConsumerCreated;

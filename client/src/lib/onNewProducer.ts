@@ -10,7 +10,7 @@ const onNewProducer = async (
   },
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   username: React.MutableRefObject<string>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   socket: React.MutableRefObject<Socket>,
   userCameraStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
@@ -28,7 +28,6 @@ const onNewProducer = async (
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  muteAudio: () => void,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
@@ -189,7 +188,7 @@ const onNewProducer = async (
   const msg = {
     type: "newProducerCreated",
     username: username.current,
-    roomName: roomName.current,
+    table_id: table_id.current,
     producerType: event.producerType,
   };
 

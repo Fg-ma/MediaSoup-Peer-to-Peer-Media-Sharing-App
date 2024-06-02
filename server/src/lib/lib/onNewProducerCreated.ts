@@ -4,7 +4,7 @@ const onNewProducerCreated = (
   event: {
     type: string;
     username: string;
-    roomName: string;
+    table_id: string;
     producerType: "webcam" | "screen" | "audio";
   },
   io: SocketIOServer
@@ -13,7 +13,7 @@ const onNewProducerCreated = (
     type: "newProducerWasCreated",
     producerType: event.producerType,
   };
-  io.to(`${event.roomName}_${event.username}`).emit("message", msg);
+  io.to(`${event.table_id}_${event.username}`).emit("message", msg);
 };
 
 export default onNewProducerCreated;

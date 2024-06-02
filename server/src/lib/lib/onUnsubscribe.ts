@@ -1,32 +1,48 @@
 import { Server as SocketIOServer } from "socket.io";
-import { roomConsumerTransports, roomConsumers } from "../mediasoupVars";
+import {
+  roomConsumerTransports,
+  roomConsumers,
+  roomProducerTransports,
+  workersMap,
+} from "../mediasoupVars";
 
 const onUnsubscribe = (
   event: {
     type: string;
-    roomName: string;
+    table_id: string;
     username: string;
   },
   io: SocketIOServer
 ) => {
   if (
-    roomConsumerTransports[event.roomName] &&
-    roomConsumerTransports[event.roomName][event.username]
+    roomConsumerTransports[event.table_id] &&
+    roomConsumerTransports[event.table_id][event.username]
   ) {
-    delete roomConsumerTransports[event.roomName][event.username];
+    delete roomConsumerTransports[event.table_id][event.username];
   }
 
   if (
-    roomConsumers[event.roomName] &&
-    roomConsumers[event.roomName][event.username]
+    (!roomProducerTransports ||
+      (roomProducerTransports[event.table_id] &&
+        Object.keys(roomProducerTransports[event.table_id]).length === 0)) &&
+    (!roomConsumerTransports ||
+      (roomConsumerTransports[event.table_id] &&
+        Object.keys(roomConsumerTransports[event.table_id]).length === 0))
   ) {
-    delete roomConsumers[event.roomName][event.username];
+    delete workersMap[event.table_id];
+  }
+
+  if (
+    roomConsumers[event.table_id] &&
+    roomConsumers[event.table_id][event.username]
+  ) {
+    delete roomConsumers[event.table_id][event.username];
   }
 
   const msg = {
     type: "unsubscribed",
   };
-  io.to(`${event.roomName}_${event.username}`).emit("message", msg);
+  io.to(`${event.table_id}_${event.username}`).emit("message", msg);
 };
 
 export default onUnsubscribe;

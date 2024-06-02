@@ -1,5 +1,4 @@
 import React from "react";
-import { Socket } from "socket.io-client";
 import * as mediasoup from "mediasoup-client";
 
 const onProducerDisconnected = (
@@ -10,8 +9,6 @@ const onProducerDisconnected = (
     producerId: string;
   },
   username: React.MutableRefObject<string>,
-  roomName: React.MutableRefObject<string>,
-  socket: React.MutableRefObject<Socket>,
   userCameraStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
   }>,
@@ -20,7 +17,6 @@ const onProducerDisconnected = (
   }>,
   userAudioStream: React.MutableRefObject<MediaStream | undefined>,
   handleDisableEnableBtns: (disabled: boolean) => void,
-  remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       webcam?: { [webcamId: string]: MediaStreamTrack };
@@ -31,7 +27,6 @@ const onProducerDisconnected = (
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  muteAudio: () => void,
   isWebcam: React.MutableRefObject<boolean>,
   setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
   isScreen: React.MutableRefObject<boolean>,

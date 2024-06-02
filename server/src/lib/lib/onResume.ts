@@ -4,39 +4,39 @@ import { roomConsumers } from "../mediasoupVars";
 const onResume = async (
   event: {
     type: string;
-    roomName: string;
+    table_id: string;
     username: string;
   },
   io: SocketIOServer
 ) => {
-  for (const producerUsername in roomConsumers[event.roomName][
+  for (const producerUsername in roomConsumers[event.table_id][
     event.username
   ]) {
     try {
       if (
-        roomConsumers[event.roomName][event.username][producerUsername].webcam
+        roomConsumers[event.table_id][event.username][producerUsername].webcam
       ) {
         const webcams =
-          roomConsumers[event.roomName][event.username][producerUsername]
+          roomConsumers[event.table_id][event.username][producerUsername]
             .webcam;
         for (const webcamId in webcams) {
           await webcams[webcamId].consumer?.resume();
         }
       }
       if (
-        roomConsumers[event.roomName][event.username][producerUsername].screen
+        roomConsumers[event.table_id][event.username][producerUsername].screen
       ) {
         const screens =
-          roomConsumers[event.roomName][event.username][producerUsername]
+          roomConsumers[event.table_id][event.username][producerUsername]
             .screen;
         for (const screenId in screens) {
           await screens[screenId].consumer?.resume();
         }
       }
       if (
-        roomConsumers[event.roomName][event.username][producerUsername].audio
+        roomConsumers[event.table_id][event.username][producerUsername].audio
       ) {
-        await roomConsumers[event.roomName][event.username][
+        await roomConsumers[event.table_id][event.username][
           producerUsername
         ].audio!.consumer?.resume();
       }
@@ -49,7 +49,7 @@ const onResume = async (
     }
   }
 
-  io.to(`${event.roomName}_${event.username}`).emit("message", {
+  io.to(`${event.table_id}_${event.username}`).emit("message", {
     type: "resumed",
     data: "resumed",
   });

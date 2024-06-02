@@ -1,8 +1,6 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import Bundle from "../bundle/Bundle";
 
 const onNewConsumerSubscribed = async (
   event: {
@@ -20,7 +18,7 @@ const onNewConsumerSubscribed = async (
     };
   },
   socket: React.MutableRefObject<Socket>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   consumerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
@@ -124,7 +122,7 @@ const onNewConsumerSubscribed = async (
 
   const msg = {
     type: "resume",
-    roomName: roomName.current,
+    table_id: table_id.current,
     username: username.current,
   };
   socket.current.send(msg);
@@ -132,7 +130,7 @@ const onNewConsumerSubscribed = async (
   const message = {
     type: "newConsumerCreated",
     username: username.current,
-    roomName: roomName.current,
+    table_id: table_id.current,
     producerUsername: event.producerUsername,
     consumerId: event.consumerId,
     consumerType: event.consumerType,

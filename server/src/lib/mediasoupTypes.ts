@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 
 export interface MediasoupSocket extends Socket {
-  roomName?: string;
+  table_id?: string;
   username?: string;
 }

@@ -1,10 +1,12 @@
-import { Consumer, Router, RtpCapabilities } from "mediasoup/node/lib/types";
+import { Consumer, RtpCapabilities } from "mediasoup/node/lib/types";
 import { Server as SocketIOServer } from "socket.io";
 import {
   roomConsumerTransports,
   roomProducers,
   roomConsumers,
+  workersMap,
 } from "../mediasoupVars";
+import { getWorkerByIdx } from "../workerManager";
 
 const onNewConsumer = async (
   event: {
@@ -13,12 +15,16 @@ const onNewConsumer = async (
     rtpCapabilities: RtpCapabilities;
     producerUsername: string;
     incomingProducerId?: string;
-    roomName: string;
+    table_id: string;
     username: string;
   },
-  io: SocketIOServer,
-  mediasoupRouter: Router
+  io: SocketIOServer
 ) => {
+  // Get the next available worker and router
+  const { router: mediasoupRouter } = getWorkerByIdx(
+    workersMap[event.table_id]
+  );
+
   let newConsumer: {
     consumer: Consumer;
     producerId: string;
@@ -30,15 +36,15 @@ const onNewConsumer = async (
   };
 
   // Get the consumer transport associated with the user
-  const transport = roomConsumerTransports[event.roomName][event.username];
+  const transport = roomConsumerTransports[event.table_id][event.username];
   const producer =
     event.consumerType === "webcam" || event.consumerType === "screen"
       ? event.incomingProducerId
-        ? roomProducers[event.roomName][event.producerUsername][
+        ? roomProducers[event.table_id][event.producerUsername][
             event.consumerType as "webcam" | "screen"
           ]?.[event.incomingProducerId]
         : undefined
-      : roomProducers[event.roomName][event.producerUsername][
+      : roomProducers[event.table_id][event.producerUsername][
           event.consumerType as "audio"
         ];
 
@@ -79,22 +85,22 @@ const onNewConsumer = async (
     return;
   }
 
-  if (!roomConsumers[event.roomName]) {
-    roomConsumers[event.roomName] = {};
+  if (!roomConsumers[event.table_id]) {
+    roomConsumers[event.table_id] = {};
   }
-  if (!roomConsumers[event.roomName][event.username]) {
-    roomConsumers[event.roomName][event.username] = {};
+  if (!roomConsumers[event.table_id][event.username]) {
+    roomConsumers[event.table_id][event.username] = {};
   }
-  if (!roomConsumers[event.roomName][event.username][event.producerUsername]) {
-    roomConsumers[event.roomName][event.username][event.producerUsername] = {};
+  if (!roomConsumers[event.table_id][event.username][event.producerUsername]) {
+    roomConsumers[event.table_id][event.username][event.producerUsername] = {};
   }
   if (
     (event.consumerType === "webcam" || event.consumerType === "screen") &&
-    !roomConsumers[event.roomName][event.username][event.producerUsername][
+    !roomConsumers[event.table_id][event.username][event.producerUsername][
       event.consumerType as "webcam" | "screen"
     ]
   ) {
-    roomConsumers[event.roomName][event.username][event.producerUsername][
+    roomConsumers[event.table_id][event.username][event.producerUsername][
       event.consumerType as "webcam" | "screen"
     ] = {};
   }
@@ -103,16 +109,16 @@ const onNewConsumer = async (
     (event.consumerType === "webcam" || event.consumerType === "screen") &&
     event.incomingProducerId
   ) {
-    roomConsumers[event.roomName][event.username][event.producerUsername][
+    roomConsumers[event.table_id][event.username][event.producerUsername][
       event.consumerType as "webcam" | "screen"
     ]![event.incomingProducerId] = newConsumer;
   } else {
-    roomConsumers[event.roomName][event.username][event.producerUsername][
+    roomConsumers[event.table_id][event.username][event.producerUsername][
       event.consumerType as "audio"
     ] = newConsumer;
   }
 
-  io.to(`${event.roomName}_${event.username}`).emit("message", {
+  io.to(`${event.table_id}_${event.username}`).emit("message", {
     type: "newConsumerSubscribed",
     producerUsername: event.producerUsername,
     consumerId: event.incomingProducerId,

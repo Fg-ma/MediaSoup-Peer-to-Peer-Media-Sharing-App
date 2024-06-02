@@ -22,7 +22,7 @@ import handleKeyUp from "./lib/handleKeyUp";
 
 export default function FgVideo({
   username,
-  roomName,
+  table_id,
   socket,
   videoId,
   handleMute,
@@ -62,7 +62,7 @@ export default function FgVideo({
   tracksColorSetter,
 }: {
   username: string;
-  roomName: string;
+  table_id: string;
   socket?: React.MutableRefObject<Socket>;
   videoId: string;
   handleMute: () => void;
@@ -441,7 +441,7 @@ export default function FgVideo({
         if (socket) {
           const msg = {
             type: "removeProducer",
-            roomName: roomName,
+            table_id: table_id,
             username: username,
             producerType: "screen",
             producerId: videoId,

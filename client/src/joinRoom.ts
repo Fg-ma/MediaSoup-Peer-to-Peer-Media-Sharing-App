@@ -2,29 +2,29 @@ import { Socket } from "socket.io-client";
 
 const joinRoom = (
   socket: React.MutableRefObject<Socket>,
-  roomNameRef: React.RefObject<HTMLInputElement>,
+  tableIdRef: React.RefObject<HTMLInputElement>,
   usernameRef: React.RefObject<HTMLInputElement>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   setIsInRoom: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const previousRoomName = roomName.current;
+  const previousTableId = table_id.current;
   const previousUsername = username.current;
 
-  if (roomNameRef.current) {
-    roomName.current = roomNameRef.current?.value;
+  if (tableIdRef.current) {
+    table_id.current = tableIdRef.current?.value;
   }
   if (usernameRef.current) {
     username.current = usernameRef.current?.value;
   }
-  if (roomName.current.trim() !== "" && username.current.trim() !== "") {
+  if (table_id.current.trim() !== "" && username.current.trim() !== "") {
     // Leave previous room if there is one
-    if (previousRoomName.trim() !== "" && previousUsername.trim() !== "") {
-      socket.current.emit("leaveRoom", previousRoomName, previousUsername);
+    if (previousTableId.trim() !== "" && previousUsername.trim() !== "") {
+      socket.current.emit("leaveRoom", previousTableId, previousUsername);
     }
 
     // Join new room
-    socket.current.emit("joinRoom", roomName.current, username.current);
+    socket.current.emit("joinRoom", table_id.current, username.current);
     setIsInRoom(true);
   }
 };

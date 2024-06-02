@@ -6,7 +6,7 @@ const subscribe = (
   subBtnRef: React.RefObject<HTMLButtonElement>,
   setSubscribedActive: (value: React.SetStateAction<boolean>) => void,
   socket: React.MutableRefObject<Socket>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   consumerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
@@ -20,8 +20,8 @@ const subscribe = (
   }>,
   remoteVideosContainerRef: React.RefObject<HTMLDivElement>
 ) => {
-  if (!roomName.current || !username.current) {
-    console.error("Missing roomName or username!");
+  if (!table_id.current || !username.current) {
+    console.error("Missing table_id or username!");
     return;
   }
   subBtnRef.current!.disabled = true;
@@ -32,7 +32,7 @@ const subscribe = (
     const msg = {
       type: "createConsumerTransport",
       forceTcp: false,
-      roomName: roomName.current,
+      table_id: table_id.current,
       username: username.current,
     };
     socket.current.send(msg);
@@ -49,7 +49,7 @@ const subscribe = (
 
     const msg = {
       type: "unsubscribe",
-      roomName: roomName.current,
+      table_id: table_id.current,
       username: username.current,
     };
     socket.current.emit("message", msg);

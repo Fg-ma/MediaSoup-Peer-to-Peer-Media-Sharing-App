@@ -4,13 +4,13 @@ const onRequestedMuteLock = (
   event: { type: string; username: string },
   socket: React.MutableRefObject<Socket>,
   username: React.MutableRefObject<string>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   mutedAudioRef: React.MutableRefObject<boolean>
 ) => {
   if (mutedAudioRef.current) {
     const msg = {
       type: "acceptMuteLock",
-      roomName: roomName.current,
+      table_id: table_id.current,
       username: event.username,
       producerUsername: username.current,
     };

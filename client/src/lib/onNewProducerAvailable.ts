@@ -10,7 +10,7 @@ const onNewProducerAvailable = (
   },
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   isSubscribed: React.MutableRefObject<boolean>
 ) => {
@@ -25,7 +25,7 @@ const onNewProducerAvailable = (
       consumerType: event.producerType,
       rtpCapabilities: rtpCapabilities,
       producerUsername: event.producerUsername,
-      roomName: roomName.current,
+      table_id: table_id.current,
       username: username.current,
       incomingProducerId: event.producerId,
     };

@@ -50,7 +50,7 @@ import { useStreamsContext } from "../context/StreamsContext";
 
 export default function ({
   username,
-  roomName,
+  table_id,
   socket,
   initCameraStreams,
   initScreenStreams,
@@ -63,7 +63,7 @@ export default function ({
   onRendered,
 }: {
   username: string;
-  roomName: string;
+  table_id: string;
   socket: React.MutableRefObject<Socket>;
   initCameraStreams?: { [cameraKey: string]: MediaStream };
   initScreenStreams?: { [screenKey: string]: MediaStream };
@@ -741,7 +741,7 @@ export default function ({
           <FgVideo
             key={key}
             username={username}
-            roomName={roomName}
+            table_id={table_id}
             socket={socket}
             videoId={key}
             videoStream={cameraStream}
@@ -776,7 +776,7 @@ export default function ({
           <FgVideo
             key={key}
             username={username}
-            roomName={roomName}
+            table_id={table_id}
             socket={socket}
             videoId={key}
             videoStream={screenStream}

@@ -1,18 +1,16 @@
-import {
-  Consumer,
-  Producer,
-  Transport,
-  Router,
-} from "mediasoup/node/lib/types";
+import { Consumer, Producer, Transport } from "mediasoup/node/lib/types";
 
+export let workersMap: {
+  [table_id: string]: number;
+} = {};
 export let roomProducerTransports: {
-  [roomName: string]: { [username: string]: Transport };
+  [table_id: string]: { [username: string]: Transport };
 } = {};
 export let roomConsumerTransports: {
-  [roomName: string]: { [username: string]: Transport };
+  [table_id: string]: { [username: string]: Transport };
 } = {};
 export let roomProducers: {
-  [roomName: string]: {
+  [table_id: string]: {
     [username: string]: {
       webcam?: { [webcamId: string]: Producer };
       screen?: { [screenId: string]: Producer };
@@ -21,7 +19,7 @@ export let roomProducers: {
   };
 } = {};
 export let roomConsumers: {
-  [roomName: string]: {
+  [table_id: string]: {
     [username: string]: {
       [producerUsername: string]: {
         webcam?: {

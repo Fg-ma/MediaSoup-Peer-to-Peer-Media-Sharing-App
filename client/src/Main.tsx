@@ -38,7 +38,7 @@ export default function Main() {
   const audioBtnRef = useRef<HTMLButtonElement>(null);
   const muteBtnRef = useRef<HTMLButtonElement>(null);
   const subBtnRef = useRef<HTMLButtonElement>(null);
-  const roomNameRef = useRef<HTMLInputElement>(null);
+  const tableIdRef = useRef<HTMLInputElement>(null);
   const usernameRef = useRef<HTMLInputElement>(null);
   const remoteVideosContainerRef = useRef<HTMLDivElement>(null);
   const consumerTransport =
@@ -57,7 +57,7 @@ export default function Main() {
   const isSubscribed = useRef(false);
   const [isInRoom, setIsInRoom] = useState(false);
 
-  const roomName = useRef("");
+  const table_id = useRef("");
   const username = useRef("");
 
   let socket = useRef<Socket>(io(websocketURL));
@@ -80,7 +80,7 @@ export default function Main() {
     const msg = {
       type: "muteLock",
       isMuteLock: mutedAudioRef.current,
-      roomName: roomName.current,
+      table_id: table_id.current,
       username: username.current,
     };
 
@@ -92,7 +92,7 @@ export default function Main() {
 
     const msg = {
       type: "sendMuteRequest",
-      roomName: roomName.current,
+      table_id: table_id.current,
       username: username.current,
     };
 
@@ -117,7 +117,7 @@ export default function Main() {
           event,
           socket,
           device,
-          roomName,
+          table_id,
           username,
           userCameraStreams,
           userCameraCount,
@@ -128,9 +128,7 @@ export default function Main() {
           isScreen,
           isAudio,
           handleDisableEnableBtns,
-          remoteVideosContainerRef,
           producerTransport,
-          muteAudio,
           setScreenActive,
           setWebcamActive,
           createProducerBundle
@@ -141,7 +139,7 @@ export default function Main() {
           event,
           socket,
           device,
-          roomName,
+          table_id,
           username,
           consumerTransport,
           remoteTracksMap,
@@ -157,7 +155,7 @@ export default function Main() {
         onNewConsumerSubscribed(
           event,
           socket,
-          roomName,
+          table_id,
           username,
           consumerTransport,
           remoteTracksMap,
@@ -169,7 +167,7 @@ export default function Main() {
           event,
           socket,
           device,
-          roomName,
+          table_id,
           username,
           isSubscribed
         );
@@ -179,7 +177,7 @@ export default function Main() {
           event,
           device,
           username,
-          roomName,
+          table_id,
           socket,
           userCameraStreams,
           userCameraCount,
@@ -190,7 +188,6 @@ export default function Main() {
           isScreen,
           handleDisableEnableBtns,
           producerTransport,
-          muteAudio,
           setScreenActive,
           setWebcamActive
         );
@@ -199,16 +196,12 @@ export default function Main() {
         onProducerDisconnected(
           event,
           username,
-          roomName,
-          socket,
           userCameraStreams,
           userScreenStreams,
           userAudioStream,
           handleDisableEnableBtns,
-          remoteVideosContainerRef,
           remoteTracksMap,
           producerTransport,
-          muteAudio,
           isWebcam,
           setWebcamActive,
           isScreen,
@@ -217,7 +210,7 @@ export default function Main() {
         );
         break;
       case "requestedMuteLock":
-        onRequestedMuteLock(event, socket, username, roomName, mutedAudioRef);
+        onRequestedMuteLock(event, socket, username, table_id, mutedAudioRef);
         break;
       default:
         break;
@@ -228,7 +221,7 @@ export default function Main() {
     socket.current.on("connect", () => {
       const msg = {
         type: "getRouterRtpCapabilities",
-        roomName: roomName.current,
+        table_id: table_id.current,
         username: username.current,
       };
       socket.current.emit("message", msg);
@@ -266,7 +259,7 @@ export default function Main() {
         [username.current]: (
           <Bundle
             username={username.current}
-            roomName={roomName.current}
+            table_id={table_id.current}
             socket={socket}
             initCameraStreams={
               isWebcam.current && userCameraStreams.current
@@ -306,7 +299,7 @@ export default function Main() {
       [trackUsername]: (
         <Bundle
           username={trackUsername}
-          roomName={roomName.current}
+          table_id={table_id.current}
           socket={socket}
           initCameraStreams={
             Object.keys(remoteCameraStreams).length !== 0
@@ -322,7 +315,7 @@ export default function Main() {
           onRendered={() => {
             const msg = {
               type: "requestMuteLock",
-              roomName: roomName.current,
+              table_id: table_id.current,
               username: username.current,
               producerUsername: trackUsername,
             };
@@ -351,7 +344,7 @@ export default function Main() {
                   setWebcamActive,
                   socket,
                   device,
-                  roomName,
+                  table_id,
                   username,
                   userCameraCount,
                   userCameraStreams
@@ -379,7 +372,7 @@ export default function Main() {
                   userCameraCount,
                   socket,
                   device,
-                  roomName,
+                  table_id,
                   username
                 )
               }
@@ -398,7 +391,7 @@ export default function Main() {
                   setAudioActive,
                   socket,
                   device,
-                  roomName,
+                  table_id,
                   username
                 )
               }
@@ -436,7 +429,7 @@ export default function Main() {
                   setScreenActive,
                   socket,
                   device,
-                  roomName,
+                  table_id,
                   username,
                   userScreenCount,
                   userScreenStreams
@@ -464,7 +457,7 @@ export default function Main() {
                   userScreenCount,
                   socket,
                   device,
-                  roomName,
+                  table_id,
                   username
                 )
               }
@@ -482,7 +475,7 @@ export default function Main() {
                   subBtnRef,
                   setSubscribedActive,
                   socket,
-                  roomName,
+                  table_id,
                   username,
                   consumerTransport,
                   remoteTracksMap,
@@ -502,7 +495,7 @@ export default function Main() {
         <div className='flex justify-center mt-5'>
           <input
             type='text'
-            ref={roomNameRef}
+            ref={tableIdRef}
             className='border border-gray-400 px-4 py-2 mr-2'
             placeholder='Enter room name'
           />
@@ -516,9 +509,9 @@ export default function Main() {
             onClick={() =>
               joinRoom(
                 socket,
-                roomNameRef,
+                tableIdRef,
                 usernameRef,
-                roomName,
+                table_id,
                 username,
                 setIsInRoom
               )

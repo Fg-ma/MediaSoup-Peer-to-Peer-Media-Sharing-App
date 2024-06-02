@@ -1,6 +1,5 @@
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import { useUserStreamsContext } from "./context/StreamsContext";
 
 const publishCamera = (
   handleDisableEnableBtns: (disabled: boolean) => void,
@@ -8,15 +7,15 @@ const publishCamera = (
   setWebcamActive: (value: React.SetStateAction<boolean>) => void,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   userCameraCount: React.MutableRefObject<number>,
   userCameraStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
   }>
 ) => {
-  if (!roomName.current || !username.current) {
-    console.error("Missing roomName or username!");
+  if (!table_id.current || !username.current) {
+    console.error("Missing table_id or username!");
     return;
   }
 
@@ -32,7 +31,7 @@ const publishCamera = (
         forceTcp: false,
         rtpCapabilities: device.current.rtpCapabilities,
         producerType: "webcam",
-        roomName: roomName.current,
+        table_id: table_id.current,
         username: username.current,
       };
       socket.current.emit("message", msg);
@@ -44,7 +43,7 @@ const publishCamera = (
       if (streamKey in userCameraStreams.current) {
         const msg = {
           type: "removeProducer",
-          roomName: roomName.current,
+          table_id: table_id.current,
           username: username.current,
           producerType: "webcam",
           producerId: `${username.current}_camera_stream_${i}`,

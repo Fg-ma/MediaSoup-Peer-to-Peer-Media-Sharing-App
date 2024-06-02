@@ -6,11 +6,11 @@ const publishNewScreen = (
   userScreenCount: React.MutableRefObject<number>,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>
 ) => {
-  if (!roomName.current || !username.current) {
-    console.error("Missing roomName or username!");
+  if (!table_id.current || !username.current) {
+    console.error("Missing table_id or username!");
     return;
   }
   handleDisableEnableBtns(true);
@@ -22,7 +22,7 @@ const publishNewScreen = (
       forceTcp: false,
       rtpCapabilities: device.current.rtpCapabilities,
       producerType: "screen",
-      roomName: roomName.current,
+      table_id: table_id.current,
       username: username.current,
     };
     socket.current.emit("message", msg);

@@ -7,24 +7,24 @@ const onConnectConsumerTransport = async (
     type: string;
     transportId: string;
     dtlsParameters: DtlsParameters;
-    roomName: string;
+    table_id: string;
     username: string;
   },
   io: SocketIOServer
 ) => {
   if (
-    !roomConsumerTransports[event.roomName] ||
-    !roomConsumerTransports[event.roomName][event.username]
+    !roomConsumerTransports[event.table_id] ||
+    !roomConsumerTransports[event.table_id][event.username]
   ) {
     console.error("No consumer transport found for: ", event.username);
     return;
   }
 
-  await roomConsumerTransports[event.roomName][event.username].connect({
+  await roomConsumerTransports[event.table_id][event.username].connect({
     dtlsParameters: event.dtlsParameters,
   });
 
-  io.to(`${event.roomName}_${event.username}`).emit("message", {
+  io.to(`${event.table_id}_${event.username}`).emit("message", {
     type: "consumerTransportConnected",
     data: "consumer transport connected",
   });

@@ -16,7 +16,7 @@ const onProducerTransportCreated = async (
   },
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   userCameraStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
@@ -31,11 +31,9 @@ const onProducerTransportCreated = async (
   isScreen: React.MutableRefObject<boolean>,
   isAudio: React.MutableRefObject<boolean>,
   handleDisableEnableBtns: (disabled: boolean) => void,
-  remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  muteAudio: () => void,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
   createProducerBundle: () => void
@@ -57,7 +55,7 @@ const onProducerTransportCreated = async (
       const msg = {
         type: "connectProducerTransport",
         dtlsParameters,
-        roomName: roomName.current,
+        table_id: table_id.current,
         username: username.current,
       };
 
@@ -80,7 +78,7 @@ const onProducerTransportCreated = async (
       transportId: producerTransport.current?.id,
       kind,
       rtpParameters,
-      roomName: roomName.current,
+      table_id: table_id.current,
       username: username.current,
       producerId:
         appData.producerType === "webcam"
@@ -156,7 +154,7 @@ const onProducerTransportCreated = async (
         userCameraCount.current = userCameraCount.current - 1;
         const msg = {
           type: "deleteProducerTransport",
-          roomName: roomName.current,
+          table_id: table_id.current,
           username: username.current,
         };
         socket.current.emit("message", msg);
@@ -203,7 +201,7 @@ const onProducerTransportCreated = async (
         userScreenCount.current = userScreenCount.current - 1;
         const msg = {
           type: "deleteProducerTransport",
-          roomName: roomName.current,
+          table_id: table_id.current,
           username: username.current,
         };
         socket.current.emit("message", msg);
@@ -240,7 +238,7 @@ const onProducerTransportCreated = async (
         producerTransport.current = undefined;
         const msg = {
           type: "deleteProducerTransport",
-          roomName: roomName.current,
+          table_id: table_id.current,
           username: username.current,
         };
         socket.current.emit("message", msg);

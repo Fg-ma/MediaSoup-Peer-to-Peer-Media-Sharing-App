@@ -7,15 +7,15 @@ const publishScreen = (
   setScreenActive: (value: React.SetStateAction<boolean>) => void,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   userScreenCount: React.MutableRefObject<number>,
   userScreenStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
   }>
 ) => {
-  if (!roomName.current || !username.current) {
-    console.error("Missing roomName or username!");
+  if (!table_id.current || !username.current) {
+    console.error("Missing table_id or username!");
     return;
   }
   handleDisableEnableBtns(true);
@@ -30,7 +30,7 @@ const publishScreen = (
         forceTcp: false,
         rtpCapabilities: device.current.rtpCapabilities,
         producerType: "screen",
-        roomName: roomName.current,
+        table_id: table_id.current,
         username: username.current,
       };
       socket.current.emit("message", msg);
@@ -42,7 +42,7 @@ const publishScreen = (
       if (streamKey in userScreenStreams.current) {
         const msg = {
           type: "removeProducer",
-          roomName: roomName.current,
+          table_id: table_id.current,
           username: username.current,
           producerType: "screen",
           producerId: `${username.current}_screen_stream_${i}`,

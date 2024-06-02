@@ -8,7 +8,7 @@ const onCreateNewProducer = async (
     transportId: string;
     kind: MediaKind;
     rtpParameters: RtpParameters;
-    roomName: string;
+    table_id: string;
     username: string;
     producerId?: string;
   },
@@ -18,8 +18,8 @@ const onCreateNewProducer = async (
   const { kind, rtpParameters } = event;
 
   if (
-    !roomProducerTransports[event.roomName] ||
-    !roomProducerTransports[event.roomName][event.username]
+    !roomProducerTransports[event.table_id] ||
+    !roomProducerTransports[event.table_id][event.username]
   ) {
     console.error("No producer transport found for: ", event.username);
     return;
@@ -28,11 +28,11 @@ const onCreateNewProducer = async (
   if (
     ((event.producerType === "webcam" || event.producerType === "screen") &&
       event.producerId &&
-      roomProducers[event.roomName]?.[event.username]?.[
+      roomProducers[event.table_id]?.[event.username]?.[
         event.producerType as "webcam" | "screen"
       ]?.[event.producerId]) ||
     (event.producerType === "audio" &&
-      roomProducers[event.roomName]?.[event.username]?.[
+      roomProducers[event.table_id]?.[event.username]?.[
         event.producerType as "audio"
       ])
   ) {
@@ -40,26 +40,26 @@ const onCreateNewProducer = async (
     return;
   }
 
-  const newProducer = await roomProducerTransports[event.roomName][
+  const newProducer = await roomProducerTransports[event.table_id][
     event.username
   ].produce({
     kind,
     rtpParameters,
   });
 
-  if (!roomProducers[event.roomName]) {
-    roomProducers[event.roomName] = {};
+  if (!roomProducers[event.table_id]) {
+    roomProducers[event.table_id] = {};
   }
-  if (!roomProducers[event.roomName][event.username]) {
-    roomProducers[event.roomName][event.username] = {};
+  if (!roomProducers[event.table_id][event.username]) {
+    roomProducers[event.table_id][event.username] = {};
   }
   if (
     (event.producerType === "webcam" || event.producerType === "screen") &&
-    !roomProducers[event.roomName][event.username][
+    !roomProducers[event.table_id][event.username][
       event.producerType as "webcam" | "screen"
     ]
   ) {
-    roomProducers[event.roomName][event.username][
+    roomProducers[event.table_id][event.username][
       event.producerType as "webcam" | "screen"
     ] = {};
   }
@@ -67,15 +67,15 @@ const onCreateNewProducer = async (
   if (
     (event.producerType === "webcam" || event.producerType === "screen") &&
     event.producerId &&
-    roomProducers[event.roomName][event.username][
+    roomProducers[event.table_id][event.username][
       event.producerType as "webcam" | "screen"
     ]
   ) {
-    roomProducers[event.roomName][event.username][
+    roomProducers[event.table_id][event.username][
       event.producerType as "webcam" | "screen"
     ]![event.producerId] = newProducer;
   } else {
-    roomProducers[event.roomName][event.username][
+    roomProducers[event.table_id][event.username][
       event.producerType as "audio"
     ] = newProducer;
   }
@@ -86,8 +86,8 @@ const onCreateNewProducer = async (
     producerType: event.producerType,
     producerId: event.producerId,
   };
-  socket.to(event.roomName).emit("message", msg);
-  io.to(`${event.roomName}_${event.username}`).emit("newProducerCallback", {
+  socket.to(event.table_id).emit("message", msg);
+  io.to(`${event.table_id}_${event.username}`).emit("newProducerCallback", {
     id: newProducer.id,
   });
 };

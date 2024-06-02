@@ -1,12 +1,11 @@
-import { Router } from "mediasoup/node/lib/types";
 import { Server as SocketIOServer } from "socket.io";
 import {
   roomProducerTransports,
   roomConsumerTransports,
   roomProducers,
   roomConsumers,
+  workersMap,
 } from "./mediasoupVars";
-import createWorker from "./createWorker";
 import { MediasoupSocket } from "./mediasoupTypes";
 import onGetRouterRtpCapabilities from "./lib/onGetRouterRtpCapabilities";
 import onCreateProducerTransport from "./lib/onCreateProducerTransport";
@@ -27,90 +26,95 @@ import onNewProducerCreated from "./lib/onNewProducerCreated";
 import onNewConsumerCreated from "./lib/onNewConsumerCreated";
 import onSendMuteRequest from "./lib/onSendMuteRequest";
 
-let mediasoupRouter: Router;
-
 const SocketIOConnection = async (io: SocketIOServer) => {
-  try {
-    mediasoupRouter = await createWorker();
-  } catch (error) {
-    throw error;
-  }
-
   io.on("connection", (socket: MediasoupSocket) => {
-    socket.on("joinRoom", (roomName: string, username: string) => {
-      socket.join(roomName);
-      socket.join(`${roomName}_${username}`);
+    socket.on("joinRoom", (table_id: string, username: string) => {
+      socket.join(table_id);
+      socket.join(`${table_id}_${username}`);
 
-      socket.roomName = roomName;
+      socket.table_id = table_id;
       socket.username = username;
     });
 
-    socket.on("leaveRoom", (roomName: string, username: string) => {
-      socket.leave(roomName);
-      socket.leave(`${roomName}_${username}`);
+    socket.on("leaveRoom", (table_id: string, username: string) => {
+      socket.leave(table_id);
+      socket.leave(`${table_id}_${username}`);
 
-      socket.roomName = "";
+      socket.table_id = "";
       socket.username = "";
     });
 
     socket.on("disconnect", () => {
-      if (socket.roomName && socket.username) {
-        socket.leave(socket.roomName);
-        socket.leave(`${socket.roomName}_${socket.username}`);
+      if (socket.table_id && socket.username) {
+        socket.leave(socket.table_id);
+        socket.leave(`${socket.table_id}_${socket.username}`);
 
         if (
-          roomProducerTransports[socket.roomName] &&
-          roomProducerTransports[socket.roomName][socket.username]
+          roomProducerTransports[socket.table_id] &&
+          roomProducerTransports[socket.table_id][socket.username]
         ) {
-          delete roomProducerTransports[socket.roomName][socket.username];
+          delete roomProducerTransports[socket.table_id][socket.username];
         }
 
         if (
-          roomConsumerTransports[socket.roomName] &&
-          roomConsumerTransports[socket.roomName][socket.username]
+          roomConsumerTransports[socket.table_id] &&
+          roomConsumerTransports[socket.table_id][socket.username]
         ) {
-          delete roomConsumerTransports[socket.roomName][socket.username];
+          delete roomConsumerTransports[socket.table_id][socket.username];
         }
 
         if (
-          roomProducers[socket.roomName] &&
-          roomProducers[socket.roomName][socket.username]
+          (!roomProducerTransports ||
+            (roomProducerTransports[socket.table_id] &&
+              Object.keys(roomProducerTransports[socket.table_id]).length ===
+                0)) &&
+          (!roomConsumerTransports ||
+            (roomConsumerTransports[socket.table_id] &&
+              Object.keys(roomConsumerTransports[socket.table_id]).length ===
+                0))
         ) {
-          delete roomProducers[socket.roomName][socket.username];
+          delete workersMap[socket.table_id];
         }
 
         if (
-          roomConsumers[socket.roomName] &&
-          roomConsumers[socket.roomName][socket.username]
+          roomProducers[socket.table_id] &&
+          roomProducers[socket.table_id][socket.username]
         ) {
-          delete roomConsumers[socket.roomName][socket.username];
+          delete roomProducers[socket.table_id][socket.username];
         }
 
-        for (const username in roomConsumers[socket.roomName]) {
-          for (const producerUsername in roomConsumers[socket.roomName][
+        if (
+          roomConsumers[socket.table_id] &&
+          roomConsumers[socket.table_id][socket.username]
+        ) {
+          delete roomConsumers[socket.table_id][socket.username];
+        }
+
+        for (const username in roomConsumers[socket.table_id]) {
+          for (const producerUsername in roomConsumers[socket.table_id][
             username
           ]) {
             if (
               producerUsername === socket.username &&
-              roomConsumers[socket.roomName] &&
-              roomConsumers[socket.roomName][username]
+              roomConsumers[socket.table_id] &&
+              roomConsumers[socket.table_id][username]
             ) {
-              delete roomConsumers[socket.roomName][username][socket.username];
+              delete roomConsumers[socket.table_id][username][socket.username];
             }
           }
         }
 
-        io.to(socket.roomName).emit("userDisconnected", socket.username);
+        io.to(socket.table_id).emit("userDisconnected", socket.username);
       }
     });
 
     socket.on("message", (event: any) => {
       switch (event.type) {
         case "getRouterRtpCapabilities":
-          onGetRouterRtpCapabilities(socket, mediasoupRouter);
+          onGetRouterRtpCapabilities(socket);
           break;
         case "createProducerTransport":
-          onCreateProducerTransport(event, io, mediasoupRouter);
+          onCreateProducerTransport(event, io);
           break;
         case "connectProducerTransport":
           onConnectProducerTransport(event, io);
@@ -119,7 +123,7 @@ const SocketIOConnection = async (io: SocketIOServer) => {
           onCreateNewProducer(event, socket, io);
           break;
         case "createConsumerTransport":
-          onCreateConsumerTransport(event, io, mediasoupRouter);
+          onCreateConsumerTransport(event, io);
           break;
         case "connectConsumerTransport":
           onConnectConsumerTransport(event, io);
@@ -128,10 +132,10 @@ const SocketIOConnection = async (io: SocketIOServer) => {
           onResume(event, io);
           break;
         case "consume":
-          onConsume(event, io, mediasoupRouter);
+          onConsume(event, io);
           break;
         case "newConsumer":
-          onNewConsumer(event, io, mediasoupRouter);
+          onNewConsumer(event, io);
           break;
         case "removeProducer":
           onRemoveProducer(event, io);

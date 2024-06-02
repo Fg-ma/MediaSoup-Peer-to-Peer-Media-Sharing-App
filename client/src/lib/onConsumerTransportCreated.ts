@@ -15,7 +15,7 @@ const onConsumerTransportCreated = async (
   },
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-  roomName: React.MutableRefObject<string>,
+  table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   consumerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
@@ -56,7 +56,7 @@ const onConsumerTransportCreated = async (
         type: "connectConsumerTransport",
         transportId: consumerTransport.current?.id,
         dtlsParameters,
-        roomName: roomName.current,
+        table_id: table_id.current,
         username: username.current,
       };
 
@@ -119,7 +119,7 @@ const onConsumerTransportCreated = async (
         );
         const msg = {
           type: "resume",
-          roomName: roomName.current,
+          table_id: table_id.current,
           username: username.current,
         };
         socket.current.send(msg);
@@ -136,7 +136,7 @@ const onConsumerTransportCreated = async (
   const msg = {
     type: "consume",
     rtpCapabilities: rtpCapabilities,
-    roomName: roomName.current,
+    table_id: table_id.current,
     username: username.current,
   };
   socket.current.send(msg);

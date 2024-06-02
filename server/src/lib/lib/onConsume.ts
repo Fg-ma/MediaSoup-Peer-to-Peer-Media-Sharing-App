@@ -1,35 +1,40 @@
-import { Router, RtpCapabilities, Consumer } from "mediasoup/node/lib/types";
+import { Router, RtpCapabilities } from "mediasoup/node/lib/types";
 import { Server as SocketIOServer } from "socket.io";
 import createConsumer from "../createConsumer";
-import { roomProducers, roomConsumers } from "../mediasoupVars";
+import { roomProducers, roomConsumers, workersMap } from "../mediasoupVars";
+import { getWorkerByIdx } from "../workerManager";
 
 const onConsume = async (
   event: {
     type: string;
     rtpCapabilities: RtpCapabilities;
-    roomName: string;
+    table_id: string;
     username: string;
     producerId?: string;
   },
-  io: SocketIOServer,
-  mediasoupRouter: Router
+  io: SocketIOServer
 ) => {
+  // Get the next available worker and router
+  const { router: mediasoupRouter } = getWorkerByIdx(
+    workersMap[event.table_id]
+  );
+
   const consumers = await createConsumer(
-    event.roomName,
+    event.table_id,
     event.username,
-    roomProducers[event.roomName],
+    roomProducers[event.table_id],
     event.rtpCapabilities,
     mediasoupRouter
   );
 
-  if (!roomConsumers[event.roomName]) {
-    roomConsumers[event.roomName] = {};
+  if (!roomConsumers[event.table_id]) {
+    roomConsumers[event.table_id] = {};
   }
   if (consumers) {
-    roomConsumers[event.roomName][event.username] = consumers;
+    roomConsumers[event.table_id][event.username] = consumers;
   } else {
-    if (roomConsumers[event.roomName][event.username]) {
-      delete roomConsumers[event.roomName][event.username];
+    if (roomConsumers[event.table_id][event.username]) {
+      delete roomConsumers[event.table_id][event.username];
     }
   }
 
@@ -126,7 +131,7 @@ const onConsume = async (
     }
   }
 
-  io.to(`${event.roomName}_${event.username}`).emit("message", {
+  io.to(`${event.table_id}_${event.username}`).emit("message", {
     type: "subscribed",
     data: newConsumers,
   });

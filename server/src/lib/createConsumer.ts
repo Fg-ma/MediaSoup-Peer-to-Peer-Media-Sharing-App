@@ -7,7 +7,7 @@ import {
 import { roomConsumerTransports } from "./mediasoupVars";
 
 const createConsumer = async (
-  roomName: string,
+  table_id: string,
   username: string,
   producers: {
     [username: string]: {
@@ -24,7 +24,7 @@ const createConsumer = async (
   }
 
   // Get the consumer transport associated with the user
-  const transport = roomConsumerTransports[roomName][username];
+  const transport = roomConsumerTransports[table_id][username];
 
   if (!transport) {
     console.error("No transport found for: ", username);
