@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 
 const publishNewScreen = (
   handleDisableEnableBtns: (disabled: boolean) => void,
-  screenCount: React.MutableRefObject<number>,
+  userScreenCount: React.MutableRefObject<number>,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   roomName: React.MutableRefObject<string>,
@@ -14,7 +14,7 @@ const publishNewScreen = (
     return;
   }
   handleDisableEnableBtns(true);
-  screenCount.current = screenCount.current + 1;
+  userScreenCount.current = userScreenCount.current + 1;
 
   if (device.current) {
     const msg = {

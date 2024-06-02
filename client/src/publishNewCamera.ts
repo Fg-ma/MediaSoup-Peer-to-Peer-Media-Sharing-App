@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 
 const publishNewCamera = (
   handleDisableEnableBtns: (disabled: boolean) => void,
-  cameraCount: React.MutableRefObject<number>,
+  userCameraCount: React.MutableRefObject<number>,
   socket: React.MutableRefObject<Socket>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   roomName: React.MutableRefObject<string>,
@@ -14,7 +14,7 @@ const publishNewCamera = (
     return;
   }
   handleDisableEnableBtns(true);
-  cameraCount.current = cameraCount.current + 1;
+  userCameraCount.current = userCameraCount.current + 1;
 
   if (device.current) {
     const msg = {

@@ -9,8 +9,8 @@ const publishScreen = (
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   roomName: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
-  screenCount: React.MutableRefObject<number>,
-  screenStreams: React.MutableRefObject<{
+  userScreenCount: React.MutableRefObject<number>,
+  userScreenStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
   }>
 ) => {
@@ -23,7 +23,7 @@ const publishScreen = (
   setScreenActive((prev) => !prev);
 
   if (isScreen.current) {
-    screenCount.current = screenCount.current + 1;
+    userScreenCount.current = userScreenCount.current + 1;
     if (device.current) {
       const msg = {
         type: "createProducerTransport",
@@ -36,10 +36,10 @@ const publishScreen = (
       socket.current.emit("message", msg);
     }
   } else if (!isScreen.current) {
-    for (let i = screenCount.current; i >= 0; i--) {
+    for (let i = userScreenCount.current; i >= 0; i--) {
       const streamKey = `${username.current}_screen_stream_${i}`;
 
-      if (streamKey in screenStreams.current) {
+      if (streamKey in userScreenStreams.current) {
         const msg = {
           type: "removeProducer",
           roomName: roomName.current,

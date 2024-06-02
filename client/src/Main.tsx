@@ -15,14 +15,22 @@ import onNewProducer from "./lib/onNewProducer";
 import onProducerDisconnected from "./lib/onProducerDisconnected";
 import publishAudio from "./publishAudio";
 import onRequestedMuteLock from "./lib/onRequestedMuteLock";
-import onMuteLockChange from "./lib/onMuteLockChange";
-import onAcceptedMuteLock from "./lib/onAcceptedMuteLock";
 import publishNewCamera from "./publishNewCamera";
 import publishNewScreen from "./publishNewScreen";
+import { useStreamsContext } from "./context/StreamsContext";
+import Bundle from "./bundle/Bundle";
 
 const websocketURL = "http://localhost:8000";
 
 export default function Main() {
+  const {
+    userCameraStreams,
+    userCameraCount,
+    userScreenStreams,
+    userScreenCount,
+    userAudioStream,
+    remoteTracksMap,
+  } = useStreamsContext();
   const webcamBtnRef = useRef<HTMLButtonElement>(null);
   const newCameraBtnRef = useRef<HTMLButtonElement>(null);
   const newScreenBtnRef = useRef<HTMLButtonElement>(null);
@@ -49,179 +57,19 @@ export default function Main() {
   const isSubscribed = useRef(false);
   const [isInRoom, setIsInRoom] = useState(false);
 
-  const cameraStreams = useRef<{ [webcamId: string]: MediaStream }>({});
-  const cameraCount = useRef(0);
-  const screenStreams = useRef<{ [screenId: string]: MediaStream }>({});
-  let screenCount = useRef(0);
-  const audioStream = useRef<MediaStream>();
-
-  const remoteTracksMap = useRef<{
-    [username: string]: {
-      webcam?: { [webcamId: string]: MediaStreamTrack };
-      screen?: { [screenId: string]: MediaStreamTrack };
-      audio?: MediaStreamTrack;
-    };
-  }>({});
   const roomName = useRef("");
   const username = useRef("");
 
   let socket = useRef<Socket>(io(websocketURL));
   let device = useRef<mediasoup.Device>();
 
-  useEffect(() => {
-    socket.current.on("connect", () => {
-      const msg = {
-        type: "getRouterRtpCapabilities",
-        roomName: roomName.current,
-        username: username.current,
-      };
-      socket.current.emit("message", msg);
-    });
-
-    socket.current.on("message", (event) => {
-      switch (event.type) {
-        case "routerCapabilities":
-          onRouterCapabilities(event, device);
-          break;
-        case "producerTransportCreated":
-          onProducerTransportCreated(
-            event,
-            socket,
-            device,
-            roomName,
-            username,
-            isWebcam,
-            isScreen,
-            isAudio,
-            cameraStreams,
-            cameraCount,
-            screenStreams,
-            screenCount,
-            audioStream,
-            handleDisableEnableBtns,
-            remoteVideosContainerRef,
-            producerTransport,
-            muteAudio,
-            setScreenActive,
-            setWebcamActive
-          );
-          break;
-        case "consumerTransportCreated":
-          onConsumerTransportCreated(
-            event,
-            socket,
-            device,
-            roomName,
-            username,
-            consumerTransport,
-            remoteVideosContainerRef,
-            remoteTracksMap
-          );
-          break;
-        case "resumed":
-          break;
-        case "subscribed":
-          onSubscribed(event, consumerTransport, remoteTracksMap, subBtnRef);
-          break;
-        case "newConsumerSubscribed":
-          onNewConsumerSubscribed(
-            event,
-            socket,
-            roomName,
-            username,
-            consumerTransport,
-            remoteVideosContainerRef,
-            remoteTracksMap
-          );
-          break;
-        case "newProducerAvailable":
-          onNewProducerAvailable(
-            event,
-            socket,
-            device,
-            roomName,
-            username,
-            isSubscribed
-          );
-          break;
-        case "newProducer":
-          onNewProducer(
-            event,
-            device,
-            username,
-            roomName,
-            socket,
-            isWebcam,
-            isScreen,
-            isAudio,
-            cameraStreams,
-            cameraCount,
-            screenStreams,
-            screenCount,
-            audioStream,
-            handleDisableEnableBtns,
-            remoteVideosContainerRef,
-            producerTransport,
-            muteAudio,
-            setScreenActive,
-            setWebcamActive
-          );
-          break;
-        case "producerDisconnected":
-          onProducerDisconnected(
-            event,
-            username,
-            roomName,
-            socket,
-            handleDisableEnableBtns,
-            remoteVideosContainerRef,
-            cameraStreams,
-            screenStreams,
-            audioStream,
-            remoteTracksMap,
-            producerTransport,
-            muteAudio,
-            isWebcam,
-            setWebcamActive,
-            isScreen,
-            setScreenActive
-          );
-          break;
-        case "muteLockChange":
-          onMuteLockChange(event, username);
-          break;
-        case "requestedMuteLock":
-          onRequestedMuteLock(event, socket, username, roomName, mutedAudioRef);
-          break;
-        case "acceptedMuteLock":
-          onAcceptedMuteLock(event);
-          break;
-        default:
-          break;
-      }
-    });
-
-    // User disconnect
-    socket.current.on("userDisconnected", (disconnectedUsername) => {
-      const oldBundle = document.getElementById(
-        `${disconnectedUsername}_bundle`
-      );
-      if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
-        remoteVideosContainerRef.current?.removeChild(oldBundle);
-      }
-      delete remoteTracksMap.current[disconnectedUsername];
-    });
-
-    return () => {
-      socket.current.off("connect");
-      socket.current.off("message");
-      socket.current.off("userDisconnected");
-    };
-  }, [socket]);
+  const [bundles, setBundles] = useState<{
+    [username: string]: React.JSX.Element;
+  }>();
 
   const muteAudio = () => {
-    if (audioStream.current) {
-      audioStream.current.getAudioTracks().forEach((track) => {
+    if (userAudioStream.current) {
+      userAudioStream.current.getAudioTracks().forEach((track) => {
         track.enabled = mutedAudioRef.current;
       });
     }
@@ -237,17 +85,6 @@ export default function Main() {
     };
 
     socket.current.emit("message", msg);
-
-    const bundleContainerElement = document.getElementById(
-      `${username.current}_bundle_container`
-    );
-    if (bundleContainerElement) {
-      if (mutedAudioRef.current) {
-        bundleContainerElement.classList.add("mute");
-      } else {
-        bundleContainerElement.classList.remove("mute");
-      }
-    }
   };
 
   const handleDisableEnableBtns = (disabled: boolean) => {
@@ -256,6 +93,233 @@ export default function Main() {
     if (audioBtnRef.current) audioBtnRef.current!.disabled = disabled;
     if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = disabled;
     if (newScreenBtnRef.current) newScreenBtnRef.current.disabled = disabled;
+  };
+
+  const handleMessage = (event: any) => {
+    switch (event.type) {
+      case "routerCapabilities":
+        onRouterCapabilities(event, device);
+        break;
+      case "producerTransportCreated":
+        onProducerTransportCreated(
+          event,
+          socket,
+          device,
+          roomName,
+          username,
+          userCameraStreams,
+          userCameraCount,
+          userScreenStreams,
+          userScreenCount,
+          userAudioStream,
+          isWebcam,
+          isScreen,
+          isAudio,
+          handleDisableEnableBtns,
+          remoteVideosContainerRef,
+          producerTransport,
+          muteAudio,
+          setScreenActive,
+          setWebcamActive,
+          createProducerBundle
+        );
+        break;
+      case "consumerTransportCreated":
+        onConsumerTransportCreated(
+          event,
+          socket,
+          device,
+          roomName,
+          username,
+          consumerTransport,
+          remoteTracksMap,
+          createConsumerBundle
+        );
+        break;
+      case "resumed":
+        break;
+      case "subscribed":
+        onSubscribed(event, consumerTransport, remoteTracksMap, subBtnRef);
+        break;
+      case "newConsumerSubscribed":
+        onNewConsumerSubscribed(
+          event,
+          socket,
+          roomName,
+          username,
+          consumerTransport,
+          remoteTracksMap,
+          createConsumerBundle
+        );
+        break;
+      case "newProducerAvailable":
+        onNewProducerAvailable(
+          event,
+          socket,
+          device,
+          roomName,
+          username,
+          isSubscribed
+        );
+        break;
+      case "newProducer":
+        onNewProducer(
+          event,
+          device,
+          username,
+          roomName,
+          socket,
+          userCameraStreams,
+          userCameraCount,
+          userScreenStreams,
+          userScreenCount,
+          userAudioStream,
+          isWebcam,
+          isScreen,
+          handleDisableEnableBtns,
+          producerTransport,
+          muteAudio,
+          setScreenActive,
+          setWebcamActive
+        );
+        break;
+      case "producerDisconnected":
+        onProducerDisconnected(
+          event,
+          username,
+          roomName,
+          socket,
+          userCameraStreams,
+          userScreenStreams,
+          userAudioStream,
+          handleDisableEnableBtns,
+          remoteVideosContainerRef,
+          remoteTracksMap,
+          producerTransport,
+          muteAudio,
+          isWebcam,
+          setWebcamActive,
+          isScreen,
+          setScreenActive,
+          setBundles
+        );
+        break;
+      case "requestedMuteLock":
+        onRequestedMuteLock(event, socket, username, roomName, mutedAudioRef);
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    socket.current.on("connect", () => {
+      const msg = {
+        type: "getRouterRtpCapabilities",
+        roomName: roomName.current,
+        username: username.current,
+      };
+      socket.current.emit("message", msg);
+    });
+
+    socket.current.on("message", handleMessage);
+
+    // User disconnect
+    socket.current.on("userDisconnected", (disconnectedUsername) => {
+      const oldBundle = document.getElementById(
+        `${disconnectedUsername}_bundle`
+      );
+      if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
+        try {
+          remoteVideosContainerRef.current?.removeChild(oldBundle);
+        } catch {
+          console.error("Failed to remove disconnected bundle");
+          return;
+        }
+      }
+      delete remoteTracksMap.current[disconnectedUsername];
+    });
+
+    return () => {
+      socket.current.off("connect");
+      socket.current.off("message", handleMessage);
+      socket.current.off("userDisconnected");
+    };
+  }, [socket]);
+
+  const createProducerBundle = () => {
+    if (remoteVideosContainerRef.current) {
+      setBundles((prev) => ({
+        ...prev,
+        [username.current]: (
+          <Bundle
+            username={username.current}
+            roomName={roomName.current}
+            socket={socket}
+            initCameraStreams={
+              isWebcam.current && userCameraStreams.current
+                ? userCameraStreams.current
+                : undefined
+            }
+            initScreenStreams={
+              isScreen.current && userScreenStreams.current
+                ? userScreenStreams.current
+                : undefined
+            }
+            initAudioStream={
+              isAudio.current && userAudioStream.current
+                ? userAudioStream.current
+                : undefined
+            }
+            isUser={true}
+            muteButtonCallback={muteAudio}
+          />
+        ),
+      }));
+    }
+  };
+
+  const createConsumerBundle = (
+    trackUsername: string,
+    remoteCameraStreams: {
+      [screenId: string]: MediaStream;
+    },
+    remoteScreenStreams: {
+      [screenId: string]: MediaStream;
+    },
+    remoteAudioStream: MediaStream | undefined
+  ) => {
+    setBundles((prev) => ({
+      ...prev,
+      [trackUsername]: (
+        <Bundle
+          username={trackUsername}
+          roomName={roomName.current}
+          socket={socket}
+          initCameraStreams={
+            Object.keys(remoteCameraStreams).length !== 0
+              ? remoteCameraStreams
+              : undefined
+          }
+          initScreenStreams={
+            Object.keys(remoteScreenStreams).length !== 0
+              ? remoteScreenStreams
+              : undefined
+          }
+          initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
+          onRendered={() => {
+            const msg = {
+              type: "requestMuteLock",
+              roomName: roomName.current,
+              username: username.current,
+              producerUsername: trackUsername,
+            };
+
+            socket.current.emit("message", msg);
+          }}
+        />
+      ),
+    }));
   };
 
   return (
@@ -277,8 +341,8 @@ export default function Main() {
                   device,
                   roomName,
                   username,
-                  cameraCount,
-                  cameraStreams
+                  userCameraCount,
+                  userCameraStreams
                 )
               }
               className={`${
@@ -300,7 +364,7 @@ export default function Main() {
               onClick={() =>
                 publishNewCamera(
                   handleDisableEnableBtns,
-                  cameraCount,
+                  userCameraCount,
                   socket,
                   device,
                   roomName,
@@ -362,8 +426,8 @@ export default function Main() {
                   device,
                   roomName,
                   username,
-                  screenCount,
-                  screenStreams
+                  userScreenCount,
+                  userScreenStreams
                 )
               }
               className={`${
@@ -385,7 +449,7 @@ export default function Main() {
               onClick={() =>
                 publishNewScreen(
                   handleDisableEnableBtns,
-                  screenCount,
+                  userScreenCount,
                   socket,
                   device,
                   roomName,
@@ -456,10 +520,14 @@ export default function Main() {
             {isInRoom ? "Join New Room" : "Join Room"}
           </button>
         </div>
-        <div
-          ref={remoteVideosContainerRef}
-          className='w-full grid grid-cols-3'
-        ></div>
+        <div ref={remoteVideosContainerRef} className='w-full grid grid-cols-3'>
+          {bundles &&
+            Object.entries(bundles).map(([key, bundle]) => (
+              <div key={key} id={`${key}_bundle`}>
+                {bundle}
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );

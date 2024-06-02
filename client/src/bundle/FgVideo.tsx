@@ -146,10 +146,6 @@ export default function FgVideo({
       volumeSliderRef.current.value = "0";
     }
 
-    if (muteLock.current) {
-      videoContainerRef.current?.classList.add("mute-lock");
-    }
-
     // Get captions and set them to hidden initially
     if (videoRef.current && videoRef.current.textTracks[0]) {
       captions.current = videoRef.current.textTracks[0];

@@ -1,33 +1,30 @@
 import React from "react";
 import { Socket } from "socket.io-client";
-import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import getBrowserMedia from "../getBrowserMedia";
-import Bundle from "../bundle/Bundle";
 
 const onNewProducer = async (
   event: {
     type: string;
-    producerType: "webcam" | "screen";
+    producerType: "webcam" | "screen" | "audio";
   },
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   username: React.MutableRefObject<string>,
   roomName: React.MutableRefObject<string>,
   socket: React.MutableRefObject<Socket>,
-  isWebcam: React.MutableRefObject<boolean>,
-  isScreen: React.MutableRefObject<boolean>,
-  isAudio: React.MutableRefObject<boolean>,
-  cameraStreams: React.MutableRefObject<{
+  userCameraStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
   }>,
-  cameraCount: React.MutableRefObject<number>,
-  screenStreams: React.MutableRefObject<{
+  userCameraCount: React.MutableRefObject<number>,
+  userScreenStreams: React.MutableRefObject<{
     [screenId: string]: MediaStream;
   }>,
-  screenCount: React.MutableRefObject<number>,
-  audioStream: React.MutableRefObject<MediaStream | undefined>,
+  userScreenCount: React.MutableRefObject<number>,
+  userAudioStream: React.MutableRefObject<MediaStream | undefined>,
+
+  isWebcam: React.MutableRefObject<boolean>,
+  isScreen: React.MutableRefObject<boolean>,
   handleDisableEnableBtns: (disabled: boolean) => void,
-  remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
@@ -35,20 +32,16 @@ const onNewProducer = async (
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const oldBundle = document.getElementById(`${username.current}_bundle`);
-  const oldBundleContainer = document.getElementById(
-    `${username.current}_bundle_container`
-  );
-  const oldAudioStream = document.getElementById(
-    `${username.current}_audio_stream`
-  );
-
   if (event.producerType === "webcam") {
     if (
-      cameraStreams.current[
-        `${username.current}_camera_stream_${cameraCount.current}`
+      userCameraStreams.current[
+        `${username.current}_camera_stream_${userCameraCount.current}`
       ]
     ) {
+      // Reenable buttons
+      handleDisableEnableBtns(false);
+
+      console.error("Already existing camera stream for: ", username.current);
       return;
     }
 
@@ -60,21 +53,24 @@ const onNewProducer = async (
       setScreenActive,
       isWebcam,
       setWebcamActive,
-      cameraStreams,
-      screenStreams
+      userCameraStreams,
+      userScreenStreams
     );
 
     if (!cameraBrowserMedia) {
+      // Reenable buttons
+      handleDisableEnableBtns(false);
+
       console.error("Error getting camera data");
       return;
     }
 
-    cameraStreams.current[
-      `${username.current}_camera_stream_${cameraCount.current}`
+    userCameraStreams.current[
+      `${username.current}_camera_stream_${userCameraCount.current}`
     ] = cameraBrowserMedia;
     const track =
-      cameraStreams.current[
-        `${username.current}_camera_stream_${cameraCount.current}`
+      userCameraStreams.current[
+        `${username.current}_camera_stream_${userCameraCount.current}`
       ].getVideoTracks()[0];
     const params = {
       track: track,
@@ -82,6 +78,7 @@ const onNewProducer = async (
         producerType: "webcam",
       },
     };
+
     try {
       await producerTransport.current?.produce(params);
     } catch {
@@ -90,10 +87,14 @@ const onNewProducer = async (
     }
   } else if (event.producerType === "screen") {
     if (
-      screenStreams.current[
-        `${username.current}_screen_stream_${screenCount.current}`
+      userScreenStreams.current[
+        `${username.current}_screen_stream_${userScreenCount.current}`
       ]
     ) {
+      // Reenable buttons
+      handleDisableEnableBtns(false);
+
+      console.error("Already existing screen stream for: ", username.current);
       return;
     }
 
@@ -105,21 +106,24 @@ const onNewProducer = async (
       setScreenActive,
       isWebcam,
       setWebcamActive,
-      cameraStreams,
-      screenStreams
+      userCameraStreams,
+      userScreenStreams
     );
 
     if (!screenBrowserMedia) {
+      // Reenable buttons
+      handleDisableEnableBtns(false);
+
       console.error("Error getting screen data");
       return;
     }
 
-    screenStreams.current[
-      `${username.current}_screen_stream_${screenCount.current}`
+    userScreenStreams.current[
+      `${username.current}_screen_stream_${userScreenCount.current}`
     ] = screenBrowserMedia;
     const track =
-      screenStreams.current[
-        `${username.current}_screen_stream_${screenCount.current}`
+      userScreenStreams.current[
+        `${username.current}_screen_stream_${userScreenCount.current}`
       ].getVideoTracks()[0];
     const params = {
       track: track,
@@ -127,6 +131,7 @@ const onNewProducer = async (
         producerType: "screen",
       },
     };
+
     try {
       await producerTransport.current?.produce(params);
     } catch {
@@ -134,12 +139,15 @@ const onNewProducer = async (
       return;
     }
   } else if (event.producerType === "audio") {
-    if (audioStream.current) {
+    if (userAudioStream.current) {
+      // Reenable buttons
+      handleDisableEnableBtns(false);
+
       console.error("Already existing audio stream for: ", username.current);
       return;
     }
 
-    audioStream.current = await getBrowserMedia(
+    userAudioStream.current = await getBrowserMedia(
       event.producerType,
       device,
       handleDisableEnableBtns,
@@ -147,22 +155,26 @@ const onNewProducer = async (
       setScreenActive,
       isWebcam,
       setWebcamActive,
-      cameraStreams,
-      screenStreams
+      userCameraStreams,
+      userScreenStreams
     );
 
-    if (!audioStream.current) {
+    if (!userAudioStream.current) {
+      // Reenable buttons
+      handleDisableEnableBtns(false);
+
       console.error("Error getting audio data");
       return;
     }
 
-    const track = audioStream.current.getAudioTracks()[0];
+    const track = userAudioStream.current.getAudioTracks()[0];
     const params = {
       track: track,
       appData: {
         producerType: "audio",
       },
     };
+
     try {
       await producerTransport.current?.produce(params);
     } catch {
@@ -171,66 +183,17 @@ const onNewProducer = async (
     }
   }
 
-  if (remoteVideosContainerRef.current) {
-    // Remove old bundle
-    if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
-      remoteVideosContainerRef.current?.removeChild(oldBundle);
-    }
-
-    // create new bundle
-    const bundleContainer = document.createElement("div");
-    bundleContainer.id = `${username.current}_bundle`;
-    remoteVideosContainerRef.current.append(bundleContainer);
-
-    const root = createRoot(bundleContainer);
-    root.render(
-      React.createElement(Bundle, {
-        username: username.current,
-        roomName: roomName.current,
-        socket: socket,
-        cameraStreams:
-          isWebcam.current && cameraStreams.current
-            ? cameraStreams.current
-            : undefined,
-        screenStreams:
-          isScreen.current && screenStreams.current
-            ? screenStreams.current
-            : undefined,
-        audioStream:
-          isAudio.current && audioStream.current
-            ? audioStream.current
-            : undefined,
-        isUser: true,
-        muteButtonCallback: muteAudio,
-        onRendered: () => {
-          // Add mute to new bundle container if the old bundle container contained it
-          if (oldBundleContainer?.classList.contains("mute")) {
-            const newBundleContainer = document.getElementById(
-              `${username.current}_bundle_container`
-            );
-
-            newBundleContainer?.classList.add("mute");
-          }
-
-          // Set the volume of the new audio element to that of the old
-          if (
-            oldAudioStream instanceof HTMLAudioElement &&
-            !oldAudioStream.muted
-          ) {
-            const newAudioStream = document.getElementById(
-              `${username.current}_audio_stream`
-            );
-            if (newAudioStream instanceof HTMLAudioElement) {
-              newAudioStream.volume = oldAudioStream.volume;
-            }
-          }
-        },
-      })
-    );
-  }
-
   // Reenable buttons
   handleDisableEnableBtns(false);
+
+  const msg = {
+    type: "newProducerCreated",
+    username: username.current,
+    roomName: roomName.current,
+    producerType: event.producerType,
+  };
+
+  socket.current.emit("message", msg);
 };
 
 export default onNewProducer;

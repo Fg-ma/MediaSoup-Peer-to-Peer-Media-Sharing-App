@@ -1,4 +1,5 @@
 import * as mediasoup from "mediasoup-client";
+import { useUserStreamsContext } from "./context/StreamsContext";
 
 const getBrowserMedia = async (
   type: string,
@@ -8,10 +9,10 @@ const getBrowserMedia = async (
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   isWebcam: React.MutableRefObject<boolean>,
   setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
-  cameraStreams: React.MutableRefObject<{
+  userCameraStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
   }>,
-  screenStreams: React.MutableRefObject<{
+  userScreenStreams: React.MutableRefObject<{
     [screenId: string]: MediaStream;
   }>
 ) => {
@@ -47,11 +48,17 @@ const getBrowserMedia = async (
     return stream;
   } catch (error) {
     handleDisableEnableBtns(false);
-    if (type === "screen" && Object.keys(cameraStreams).length === 0) {
+    if (
+      type === "screen" &&
+      Object.keys(userCameraStreams.current).length === 0
+    ) {
       isScreen.current = false;
       setScreenActive(false);
     }
-    if (type === "camera" && Object.keys(screenStreams).length === 0) {
+    if (
+      type === "camera" &&
+      Object.keys(userScreenStreams.current).length === 0
+    ) {
       isWebcam.current = false;
       setWebcamActive(false);
     }

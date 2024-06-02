@@ -1,8 +1,6 @@
 import React from "react";
 import { Socket } from "socket.io-client";
-import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
-import Bundle from "../bundle/Bundle";
 
 const onProducerDisconnected = (
   event: {
@@ -14,15 +12,15 @@ const onProducerDisconnected = (
   username: React.MutableRefObject<string>,
   roomName: React.MutableRefObject<string>,
   socket: React.MutableRefObject<Socket>,
-  handleDisableEnableBtns: (disabled: boolean) => void,
-  remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
-  cameraStreams: React.MutableRefObject<{
+  userCameraStreams: React.MutableRefObject<{
     [webcamId: string]: MediaStream;
   }>,
-  screenStreams: React.MutableRefObject<{
+  userScreenStreams: React.MutableRefObject<{
     [screenId: string]: MediaStream;
   }>,
-  audioStream: React.MutableRefObject<MediaStream | undefined>,
+  userAudioStream: React.MutableRefObject<MediaStream | undefined>,
+  handleDisableEnableBtns: (disabled: boolean) => void,
+  remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       webcam?: { [webcamId: string]: MediaStreamTrack };
@@ -37,34 +35,63 @@ const onProducerDisconnected = (
   isWebcam: React.MutableRefObject<boolean>,
   setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
   isScreen: React.MutableRefObject<boolean>,
-  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>
+  setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
+  setBundles: React.Dispatch<
+    React.SetStateAction<
+      | {
+          [username: string]: React.JSX.Element;
+        }
+      | undefined
+    >
+  >
 ) => {
-  const oldBundle = document.getElementById(`${event.producerUsername}_bundle`);
-  const oldAudioStream = document.getElementById(
-    `${event.producerUsername}_audio_stream`
-  );
-  const oldBundleContainer = document.getElementById(
-    `${event.producerUsername}_bundle_container`
-  );
-  if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
-    remoteVideosContainerRef.current?.removeChild(oldBundle);
-  }
-
   if (event.producerUsername === username.current) {
     if (event.producerType === "webcam") {
-      cameraStreams.current[event.producerId]
+      userCameraStreams.current[event.producerId]
         ?.getTracks()
         .forEach((track) => track.stop());
-      delete cameraStreams.current[event.producerId];
+      delete userCameraStreams.current[event.producerId];
     } else if (event.producerType === "screen") {
-      screenStreams.current[event.producerId]
+      userScreenStreams.current[event.producerId]
         ?.getTracks()
         .forEach((track) => track.stop());
-      delete screenStreams.current[event.producerId];
+      delete userScreenStreams.current[event.producerId];
     } else if (event.producerType === "audio") {
-      audioStream.current?.getTracks().forEach((track) => track.stop());
-      audioStream.current = undefined;
+      userAudioStream.current?.getTracks().forEach((track) => track.stop());
+      userAudioStream.current = undefined;
     }
+
+    if (
+      (!userCameraStreams.current ||
+        Object.keys(userCameraStreams.current).length === 0) &&
+      (!userScreenStreams.current ||
+        Object.keys(userScreenStreams.current).length === 0) &&
+      !userAudioStream.current
+    ) {
+      setBundles((prev) => {
+        const newBundles = prev;
+        if (newBundles) {
+          delete newBundles[event.producerUsername];
+        }
+        return newBundles;
+      });
+      producerTransport.current = undefined;
+    }
+    if (Object.keys(userCameraStreams.current).length === 0) {
+      isWebcam.current = false;
+      setWebcamActive(false);
+    } else {
+      isWebcam.current = true;
+      setWebcamActive(true);
+    }
+    if (Object.keys(userScreenStreams.current).length === 0) {
+      isScreen.current = false;
+      setScreenActive(false);
+    } else {
+      isScreen.current = true;
+      setScreenActive(true);
+    }
+    handleDisableEnableBtns(false);
   } else {
     if (
       event.producerType === "webcam" &&
@@ -90,148 +117,20 @@ const onProducerDisconnected = (
     ) {
       delete remoteTracksMap.current[event.producerUsername]?.audio;
     }
-  }
-
-  if (remoteVideosContainerRef.current) {
-    let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
-    if (remoteTracksMap.current[event.producerUsername]?.webcam) {
-      for (const key in remoteTracksMap.current[event.producerUsername]
-        .webcam) {
-        const remoteCameraStream = new MediaStream();
-        remoteCameraStream.addTrack(
-          remoteTracksMap.current[event.producerUsername].webcam![key]
-        );
-        remoteCameraStreams[key] = remoteCameraStream;
-      }
-    }
-
-    let remoteScreenStreams: { [screenId: string]: MediaStream } = {};
-    if (remoteTracksMap.current[event.producerUsername]?.screen) {
-      for (const key in remoteTracksMap.current[event.producerUsername]
-        .screen) {
-        const remoteScreenStream = new MediaStream();
-        remoteScreenStream.addTrack(
-          remoteTracksMap.current[event.producerUsername].screen![key]
-        );
-        remoteScreenStreams[key] = remoteScreenStream;
-      }
-    }
-
-    let remoteAudioStream;
-    if (remoteTracksMap.current[event.producerUsername]?.audio) {
-      remoteAudioStream = new MediaStream();
-      remoteAudioStream.addTrack(
-        remoteTracksMap.current[event.producerUsername].audio!
-      );
-    }
 
     if (
-      (event.producerUsername === username.current &&
-        (Object.keys(cameraStreams.current).length !== 0 ||
-          Object.keys(screenStreams.current).length !== 0 ||
-          audioStream.current)) ||
-      Object.keys(remoteCameraStreams).length !== 0 ||
-      Object.keys(remoteScreenStreams).length !== 0 ||
-      remoteAudioStream
+      remoteTracksMap.current[event.producerUsername] &&
+      Object.keys(remoteTracksMap.current[event.producerUsername]).length === 0
     ) {
-      const bundle = document.createElement("div");
-      bundle.id = `${event.producerUsername}_bundle`;
-      remoteVideosContainerRef.current.append(bundle);
-
-      const root = createRoot(bundle);
-      root.render(
-        React.createElement(Bundle, {
-          username: event.producerUsername,
-          roomName: roomName.current,
-          socket: socket,
-          cameraStreams:
-            event.producerUsername === username.current
-              ? cameraStreams.current
-                ? cameraStreams.current
-                : undefined
-              : remoteCameraStreams
-              ? remoteCameraStreams
-              : undefined,
-          screenStreams:
-            event.producerUsername === username.current
-              ? screenStreams.current
-                ? screenStreams.current
-                : undefined
-              : remoteScreenStreams
-              ? remoteScreenStreams
-              : undefined,
-          audioStream:
-            event.producerUsername === username.current
-              ? audioStream.current
-              : remoteAudioStream
-              ? remoteAudioStream
-              : undefined,
-          isUser: event.producerUsername === username.current,
-          muteButtonCallback:
-            event.producerUsername === username.current ? muteAudio : undefined,
-          onRendered: () => {
-            // Add mute to new bundle container if the old bundle container contained it
-            if (oldBundleContainer?.classList.contains("mute")) {
-              const newBundleContainer = document.getElementById(
-                `${event.producerUsername}_bundle_container`
-              );
-
-              newBundleContainer?.classList.add("mute");
-            }
-
-            // Add mute-lock to new bundle container if the old bundle container contained it
-            if (oldBundleContainer?.classList.contains("mute-lock")) {
-              const newBundleContainer = document.getElementById(
-                `${event.producerUsername}_bundle_container`
-              );
-
-              newBundleContainer?.classList.add("mute-lock");
-            }
-
-            // Set the volume of the new audio element to that of the old
-            if (
-              oldAudioStream instanceof HTMLAudioElement &&
-              !oldAudioStream.muted
-            ) {
-              const newAudioStream = document.getElementById(
-                `${event.producerUsername}_audio_stream`
-              );
-              if (newAudioStream instanceof HTMLAudioElement) {
-                newAudioStream.volume = oldAudioStream.volume;
-              }
-            }
-          },
-        })
-      );
+      delete remoteTracksMap.current[event.producerUsername];
+      setBundles((prev) => {
+        const newBundles = prev;
+        if (newBundles) {
+          delete newBundles[event.producerUsername];
+        }
+        return newBundles;
+      });
     }
-  }
-
-  if (
-    !cameraStreams.current &&
-    !screenStreams.current &&
-    !audioStream.current
-  ) {
-    producerTransport.current = undefined;
-  }
-  if (!remoteTracksMap.current[event.producerUsername]) {
-    delete remoteTracksMap.current[event.producerUsername];
-  }
-  if (Object.keys(cameraStreams.current).length === 0) {
-    isWebcam.current = false;
-    setWebcamActive(false);
-  } else {
-    isWebcam.current = true;
-    setWebcamActive(true);
-  }
-  if (Object.keys(screenStreams.current).length === 0) {
-    isScreen.current = false;
-    setScreenActive(false);
-  } else {
-    isScreen.current = true;
-    setScreenActive(true);
-  }
-  if (event.producerUsername === username.current) {
-    handleDisableEnableBtns(false);
   }
 };
 

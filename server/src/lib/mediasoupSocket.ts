@@ -23,6 +23,8 @@ import onMuteLock from "./lib/onMuteLock";
 import onRequestMuteLock from "./lib/onRequestMuteLock";
 import onAcceptMuteLock from "./lib/onAcceptMuteLock";
 import onDeleteProducerTransport from "./lib/onDeleteProducerTransport";
+import onNewProducerCreated from "./lib/onNewProducerCreated";
+import onNewConsumerCreated from "./lib/onNewConsumerCreated";
 
 let mediasoupRouter: Router;
 
@@ -147,6 +149,12 @@ const SocketIOConnection = async (io: SocketIOServer) => {
           break;
         case "deleteProducerTransport":
           onDeleteProducerTransport(event);
+          break;
+        case "newProducerCreated":
+          onNewProducerCreated(event, io);
+          break;
+        case "newConsumerCreated":
+          onNewConsumerCreated(event, io);
           break;
         default:
           break;

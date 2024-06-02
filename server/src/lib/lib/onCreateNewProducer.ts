@@ -87,7 +87,7 @@ const onCreateNewProducer = async (
     producerId: event.producerId,
   };
   socket.to(event.roomName).emit("message", msg);
-  io.to(`${event.roomName}_${event.username}`).emit("newProducerCreated", {
+  io.to(`${event.roomName}_${event.username}`).emit("newProducerCallback", {
     id: newProducer.id,
   });
 };

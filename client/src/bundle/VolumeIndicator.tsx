@@ -8,6 +8,7 @@ const VolumeIndicator = ({
   bundleRef,
   handleMute,
   muteLock,
+  localMuted,
   isUser = false,
   springDuration = 250,
   noiseThreshold = 0.2,
@@ -25,6 +26,7 @@ const VolumeIndicator = ({
   bundleRef: React.RefObject<HTMLDivElement>;
   handleMute: () => void;
   muteLock: React.MutableRefObject<boolean>;
+  localMuted: React.MutableRefObject<boolean>;
   isUser?: boolean;
   springDuration?: number;
   noiseThreshold?: number;
@@ -214,7 +216,6 @@ const VolumeIndicator = ({
 
     const initAudio = async () => {
       try {
-        // Get access to the user's microphone
         const stream = audioStream;
 
         if (!stream) {
@@ -275,7 +276,7 @@ const VolumeIndicator = ({
         audioContext.close();
       }
     };
-  }, []);
+  }, [audioStream]);
 
   // Function to update the moving points' Y values
   const updateMovingY = (volumeLevel: number) => {
@@ -687,8 +688,8 @@ const VolumeIndicator = ({
             width={svgRef.current?.clientWidth}
             height={svgRef.current?.clientHeight}
             fill={
-              (bundleRef.current &&
-                bundleRef.current.classList.contains("mute")) ||
+              (audioRef.current && audioRef.current.muted) ||
+              localMuted.current ||
               muteLock.current
                 ? "url(#muteGradient)"
                 : "url(#backgroundMatrix)"

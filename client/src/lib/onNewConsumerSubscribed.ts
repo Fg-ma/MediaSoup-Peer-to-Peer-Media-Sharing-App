@@ -25,14 +25,23 @@ const onNewConsumerSubscribed = async (
   consumerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       webcam?: { [webcamId: string]: MediaStreamTrack };
       screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack | undefined;
     };
-  }>
+  }>,
+  createConsumerBundle: (
+    trackUsername: string,
+    remoteCameraStreams: {
+      [screenId: string]: MediaStream;
+    },
+    remoteScreenStreams: {
+      [screenId: string]: MediaStream;
+    },
+    remoteAudioStream: MediaStream | undefined
+  ) => void
 ) => {
   if (event.producerUsername === username.current) {
     return;
@@ -51,17 +60,6 @@ const onNewConsumerSubscribed = async (
     return;
   }
 
-  const oldBundle = document.getElementById(`${event.producerUsername}_bundle`);
-  const oldBundleContainer = document.getElementById(
-    `${event.producerUsername}_bundle_container`
-  );
-  const oldAudioStream = document.getElementById(
-    `${event.producerUsername}_audio_stream`
-  );
-  if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
-    remoteVideosContainerRef.current?.removeChild(oldBundle);
-  }
-
   if (!remoteTracksMap.current[event.producerUsername]) {
     remoteTracksMap.current[event.producerUsername] = {};
   }
@@ -75,12 +73,12 @@ const onNewConsumerSubscribed = async (
       ]![event.consumerId] = consumer.track;
     }
   } else {
-    remoteTracksMap.current[event.producerUsername][
-      event.consumerType as "audio"
-    ] = consumer.track;
+    remoteTracksMap.current[event.producerUsername].audio = consumer.track;
   }
 
-  if (remoteVideosContainerRef.current) {
+  if (
+    Object.keys(remoteTracksMap.current[event.producerUsername]).length === 1
+  ) {
     let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
     if (remoteTracksMap.current[event.producerUsername]?.webcam) {
       for (const key in remoteTracksMap.current[event.producerUsername]
@@ -105,7 +103,7 @@ const onNewConsumerSubscribed = async (
       }
     }
 
-    let remoteAudioStream;
+    let remoteAudioStream: MediaStream | undefined = undefined;
     if (
       remoteTracksMap.current[event.producerUsername] &&
       remoteTracksMap.current[event.producerUsername].audio
@@ -116,52 +114,11 @@ const onNewConsumerSubscribed = async (
       );
     }
 
-    const bundleContainer = document.createElement("div");
-    bundleContainer.id = `${event.producerUsername}_bundle`;
-    remoteVideosContainerRef.current.append(bundleContainer);
-
-    const root = createRoot(bundleContainer);
-    root.render(
-      React.createElement(Bundle, {
-        username: event.producerUsername,
-        roomName: roomName.current,
-        socket: socket,
-        cameraStreams: remoteCameraStreams ? remoteCameraStreams : undefined,
-        screenStreams: remoteScreenStreams ? remoteScreenStreams : undefined,
-        audioStream: remoteAudioStream ? remoteAudioStream : undefined,
-        onRendered: () => {
-          // Add mute to new bundle container if the old bundle container contained it
-          if (oldBundleContainer?.classList.contains("mute")) {
-            const newBundleContainer = document.getElementById(
-              `${event.producerUsername}_bundle_container`
-            );
-
-            newBundleContainer?.classList.add("mute");
-          }
-
-          // Add mute-lock to new bundle container if the old bundle container contained it
-          if (oldBundleContainer?.classList.contains("mute-lock")) {
-            const newBundleContainer = document.getElementById(
-              `${event.producerUsername}_bundle_container`
-            );
-
-            newBundleContainer?.classList.add("mute-lock");
-          }
-
-          // Set the volume of the new audio element to that of the old
-          if (
-            oldAudioStream instanceof HTMLAudioElement &&
-            !oldAudioStream.muted
-          ) {
-            const newAudioStream = document.getElementById(
-              `${event.producerUsername}_audio_stream`
-            );
-            if (newAudioStream instanceof HTMLAudioElement) {
-              newAudioStream.volume = oldAudioStream.volume;
-            }
-          }
-        },
-      })
+    createConsumerBundle(
+      event.producerUsername,
+      remoteCameraStreams,
+      remoteScreenStreams,
+      remoteAudioStream
     );
   }
 
@@ -171,6 +128,17 @@ const onNewConsumerSubscribed = async (
     username: username.current,
   };
   socket.current.send(msg);
+
+  const message = {
+    type: "newConsumerCreated",
+    username: username.current,
+    roomName: roomName.current,
+    producerUsername: event.producerUsername,
+    consumerId: event.consumerId,
+    consumerType: event.consumerType,
+  };
+
+  socket.current.emit("message", message);
 };
 
 export default onNewConsumerSubscribed;

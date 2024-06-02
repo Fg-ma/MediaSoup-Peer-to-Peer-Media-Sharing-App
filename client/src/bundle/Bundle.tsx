@@ -46,14 +46,15 @@ import {
 } from "./svgPaths";
 import FgVideo from "./FgVideo";
 import VolumeIndicator from "./VolumeIndicator";
+import { useStreamsContext } from "../context/StreamsContext";
 
 export default function ({
   username,
   roomName,
   socket,
-  cameraStreams,
-  screenStreams,
-  audioStream,
+  initCameraStreams,
+  initScreenStreams,
+  initAudioStream,
   isUser = false,
   primaryVolumeSliderColor = "white",
   secondaryVolumeSliderColor = "rgba(150, 150, 150, 0.5)",
@@ -64,18 +65,41 @@ export default function ({
   username?: string;
   roomName: string;
   socket: React.MutableRefObject<Socket>;
-  cameraStreams?: { [cameraKey: string]: MediaStream };
-  screenStreams?: { [screenKey: string]: MediaStream };
-  audioStream?: MediaStream;
+  initCameraStreams?: { [cameraKey: string]: MediaStream };
+  initScreenStreams?: { [screenKey: string]: MediaStream };
+  initAudioStream?: MediaStream;
   isUser?: boolean;
   primaryVolumeSliderColor?: string;
   secondaryVolumeSliderColor?: string;
   tertiaryVolumeSliderColor?: string;
   quaternaryVolumeSliderColor?: string;
-  muteButtonCallback?: any;
+  muteButtonCallback?: () => any;
   initialVolume?: string;
   onRendered?: () => any;
 }) {
+  const {
+    userCameraStreams,
+    userCameraCount,
+    userScreenStreams,
+    userScreenCount,
+    userAudioStream,
+    remoteTracksMap,
+  } = useStreamsContext();
+  const [cameraStreams, setCameraStreams] = useState<
+    | {
+        [screenKey: string]: MediaStream;
+      }
+    | undefined
+  >(initCameraStreams);
+  const [screenStreams, setScreenStreams] = useState<
+    | {
+        [screenKey: string]: MediaStream;
+      }
+    | undefined
+  >(initScreenStreams);
+  const [audioStream, setAudioStream] = useState<MediaStream | undefined>(
+    initAudioStream
+  );
   const [paths, setPaths] = useState<string[][]>([
     [volumeOff1a, volumeHighOffIB1a, volumeHigh1a],
     [volumeOff1b, volumeHighOffIB1b, volumeHigh1b],
@@ -90,6 +114,230 @@ export default function ({
   const videoIconStateRef = useRef({ from: "", to: initialVolume });
   const isFinishedRef = useRef(true);
   const changedWhileNotFinishedRef = useRef(false);
+  const localMuted = useRef(false);
+
+  const onProducerDisconnected = (event: {
+    type: string;
+    producerUsername: string;
+    producerType: string;
+    producerId: string;
+  }) => {
+    if (event.producerUsername === username) {
+      if (event.producerType === "webcam") {
+        setCameraStreams((prev) => {
+          const newStreams = { ...prev };
+          delete newStreams[event.producerId];
+          return newStreams;
+        });
+      } else if (event.producerType === "screen") {
+        setScreenStreams((prev) => {
+          const newStreams = { ...prev };
+          delete newStreams[event.producerId];
+          return newStreams;
+        });
+      } else if (event.producerType === "audio") {
+        setAudioStream(undefined);
+      }
+    }
+  };
+
+  const onNewProducerWasCreated = (event: {
+    type: string;
+    producerType: "webcam" | "screen" | "audio";
+  }) => {
+    if (!isUser) {
+      return;
+    }
+
+    if (event.producerType === "webcam") {
+      setCameraStreams((prev) => {
+        const newStreams = { ...prev };
+        newStreams[`${username}_camera_stream_${userCameraCount.current}`] =
+          userCameraStreams.current[
+            `${username}_camera_stream_${userCameraCount.current}`
+          ];
+        return newStreams;
+      });
+    } else if (event.producerType === "screen") {
+      setScreenStreams((prev) => {
+        const newStreams = { ...prev };
+        newStreams[`${username}_screen_stream_${userScreenCount.current}`] =
+          userScreenStreams.current[
+            `${username}_screen_stream_${userScreenCount.current}`
+          ];
+        return newStreams;
+      });
+    } else if (event.producerType === "audio") {
+      setAudioStream(userAudioStream.current);
+    }
+  };
+
+  const onNewConsumerWasCreated = async (event: {
+    type: string;
+    producerUsername: string;
+    consumerId?: string;
+    consumerType: string;
+  }) => {
+    if (username !== event.producerUsername) {
+      return;
+    }
+
+    if (event.consumerType === "webcam") {
+      setCameraStreams((prev) => {
+        const newStreams = { ...prev };
+        const newStream = new MediaStream();
+        if (event.consumerId) {
+          const track =
+            remoteTracksMap.current[event.producerUsername].webcam?.[
+              event.consumerId
+            ];
+          if (track) {
+            newStream.addTrack(track);
+          }
+
+          newStreams[event.consumerId] = newStream;
+        }
+        return newStreams;
+      });
+    } else if (event.consumerType === "screen") {
+      setScreenStreams((prev) => {
+        const newStreams = { ...prev };
+        const newStream = new MediaStream();
+        if (event.consumerId) {
+          const track =
+            remoteTracksMap.current[event.producerUsername].screen?.[
+              event.consumerId
+            ];
+          if (track) {
+            newStream.addTrack(track);
+          }
+
+          newStreams[event.consumerId] = newStream;
+        }
+        return newStreams;
+      });
+    } else if (event.consumerType === "audio") {
+      const newStream = new MediaStream();
+      const track = remoteTracksMap.current[event.producerUsername].audio;
+      if (track) {
+        newStream.addTrack(track);
+      }
+
+      setAudioStream(newStream);
+    }
+  };
+
+  const onAcceptedMuteLock = (event: {
+    type: string;
+    producerUsername: string;
+  }) => {
+    if (isUser || username !== event.producerUsername) {
+      return;
+    }
+
+    muteLock.current = true;
+
+    if (videoIconStateRef.current.to !== "off") {
+      videoIconStateRef.current = {
+        from: videoIconStateRef.current.to,
+        to: "off",
+      };
+      const newPaths = getPaths(videoIconStateRef.current.from, "off");
+      if (newPaths[0]) {
+        setPaths(newPaths);
+      }
+    }
+  };
+
+  const onMuteLockChange = (event: {
+    type: string;
+    isMuteLock: boolean;
+    username: string;
+  }) => {
+    if (isUser || username !== event.username) {
+      return;
+    }
+
+    if (event.isMuteLock) {
+      muteLock.current = true;
+
+      if (videoIconStateRef.current.to !== "off") {
+        videoIconStateRef.current = {
+          from: videoIconStateRef.current.to,
+          to: "off",
+        };
+        const newPaths = getPaths(videoIconStateRef.current.from, "off");
+        if (newPaths[0]) {
+          setPaths(newPaths);
+        }
+      }
+    } else {
+      muteLock.current = false;
+
+      if (!audioRef.current) {
+        return;
+      }
+
+      const newVolume = audioRef.current.volume;
+      let newVolumeState;
+      if (newVolume === 0) {
+        newVolumeState = "off";
+      } else if (newVolume >= 0.5) {
+        newVolumeState = "high";
+      } else {
+        newVolumeState = "low";
+      }
+
+      if (
+        newVolumeState !== videoIconStateRef.current.to &&
+        !audioRef.current.muted
+      ) {
+        videoIconStateRef.current = {
+          from: videoIconStateRef.current.to,
+          to: newVolumeState,
+        };
+
+        const newPaths = getPaths(
+          videoIconStateRef.current.from,
+          newVolumeState
+        );
+        if (newPaths[0]) {
+          setPaths(newPaths);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleMessage = (event: any) => {
+      switch (event.type) {
+        case "producerDisconnected":
+          onProducerDisconnected(event);
+          break;
+        case "newProducerWasCreated":
+          onNewProducerWasCreated(event);
+          break;
+        case "newConsumerWasCreated":
+          onNewConsumerWasCreated(event);
+          break;
+        case "acceptedMuteLock":
+          onAcceptedMuteLock(event);
+          break;
+        case "muteLockChange":
+          onMuteLockChange(event);
+          break;
+        default:
+          break;
+      }
+    };
+
+    socket.current.on("message", handleMessage);
+
+    // Cleanup event listener on unmount
+    return () => {
+      socket.current.off("message", handleMessage);
+    };
+  }, []);
 
   // Initial functions & call onRendered call back if one is availiable
   useEffect(() => {
@@ -100,11 +348,6 @@ export default function ({
         "0.625rem"
       );
       bundleRef.current?.style.setProperty("--volume-slider-width", "8rem");
-    }
-
-    // Set initial muteLock state
-    if (bundleRef.current?.classList.contains("mute-lock")) {
-      muteLock.current = true;
     }
 
     // Set initial volume slider
@@ -128,7 +371,7 @@ export default function ({
         volumeChangeHandler
       );
     };
-  }, [audioRef]);
+  }, [audioRef, audioStream]);
 
   const volumeChangeHandler = () => {
     const volumeSliders = bundleRef.current?.querySelectorAll(".volume-slider");
@@ -172,9 +415,59 @@ export default function ({
       videoIconStateRef.current = { from: to, to: newVolumeState };
 
       if (newVolumeState === "off") {
-        bundleRef.current?.classList.add("mute");
+        audioRef.current.muted = true;
+
+        if (!isFinishedRef.current) {
+          if (!changedWhileNotFinishedRef.current) {
+            changedWhileNotFinishedRef.current = true;
+          }
+          return;
+        }
+
+        videoIconStateRef.current = {
+          from: videoIconStateRef.current.to,
+          to: "off",
+        };
+
+        const newPaths = getPaths(videoIconStateRef.current.from, "off");
+        if (newPaths[0]) {
+          setPaths(newPaths);
+        }
       } else {
-        bundleRef.current?.classList.remove("mute");
+        audioRef.current.muted = false;
+
+        const newVolume = audioRef.current.volume;
+        let newVolumeState;
+        if (newVolume === 0) {
+          newVolumeState = "off";
+        } else if (newVolume >= 0.5) {
+          newVolumeState = "high";
+        } else {
+          newVolumeState = "low";
+        }
+
+        if (
+          !isFinishedRef.current &&
+          videoIconStateRef.current.to !== newVolumeState
+        ) {
+          if (!changedWhileNotFinishedRef.current) {
+            changedWhileNotFinishedRef.current = true;
+          }
+          return;
+        }
+
+        videoIconStateRef.current = {
+          from: videoIconStateRef.current.to,
+          to: newVolumeState,
+        };
+
+        const newPaths = getPaths(
+          videoIconStateRef.current.from,
+          newVolumeState
+        );
+        if (newPaths[0]) {
+          setPaths(newPaths);
+        }
       }
 
       const newPaths = getPaths(to, newVolumeState);
@@ -237,29 +530,88 @@ export default function ({
   };
 
   const handleMute = () => {
+    if (muteButtonCallback) {
+      muteButtonCallback();
+    }
+
     if (!audioRef.current || muteLock.current) {
       return;
     }
-
-    if (audioRef.current.srcObject instanceof MediaStream) {
-      const mediaStream = audioRef.current.srcObject;
-      mediaStream.getAudioTracks().forEach((track) => {
-        if (audioRef.current) {
-          track.enabled = audioRef.current.muted;
-        }
-      });
-    }
-
-    if (!isUser) {
-      if (!audioRef.current.muted) {
-        bundleRef.current?.classList.add("mute");
-      } else {
-        bundleRef.current?.classList.remove("mute");
+    if (isUser) {
+      localMuted.current = !localMuted.current;
+      console.log(username, audioRef.current.srcObject);
+      if (audioStream) {
+        audioStream.getAudioTracks().forEach((track) => {
+          if (audioRef.current) {
+            track.enabled = localMuted.current;
+          }
+        });
       }
-    }
+    } else {
+      if (audioRef.current.srcObject instanceof MediaStream) {
+        const mediaStream = audioRef.current.srcObject;
+        mediaStream.getAudioTracks().forEach((track) => {
+          if (audioRef.current) {
+            track.enabled = audioRef.current.muted;
+          }
+        });
+      }
 
-    if (muteButtonCallback) {
-      muteButtonCallback();
+      if (!audioRef.current.muted) {
+        audioRef.current.muted = true;
+
+        if (!isFinishedRef.current) {
+          if (!changedWhileNotFinishedRef.current) {
+            changedWhileNotFinishedRef.current = true;
+          }
+          return;
+        }
+
+        videoIconStateRef.current = {
+          from: videoIconStateRef.current.to,
+          to: "off",
+        };
+
+        const newPaths = getPaths(videoIconStateRef.current.from, "off");
+        if (newPaths[0]) {
+          setPaths(newPaths);
+        }
+      } else {
+        audioRef.current.muted = false;
+
+        const newVolume = audioRef.current.volume;
+        let newVolumeState;
+        if (newVolume === 0) {
+          newVolumeState = "off";
+        } else if (newVolume >= 0.5) {
+          newVolumeState = "high";
+        } else {
+          newVolumeState = "low";
+        }
+
+        if (
+          !isFinishedRef.current &&
+          videoIconStateRef.current.to !== newVolumeState
+        ) {
+          if (!changedWhileNotFinishedRef.current) {
+            changedWhileNotFinishedRef.current = true;
+          }
+          return;
+        }
+
+        videoIconStateRef.current = {
+          from: videoIconStateRef.current.to,
+          to: newVolumeState,
+        };
+
+        const newPaths = getPaths(
+          videoIconStateRef.current.from,
+          newVolumeState
+        );
+        if (newPaths[0]) {
+          setPaths(newPaths);
+        }
+      }
     }
   };
 
@@ -322,165 +674,6 @@ export default function ({
     }
     return newPaths;
   };
-
-  useEffect(() => {
-    if (!bundleRef.current) return;
-
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === "class") {
-          const targetElement = mutation.target as Element;
-          const oldClass = mutation.oldValue;
-          const newClass = targetElement.className;
-
-          // Compare old and new class names
-          const oldClassList: string[] | undefined = oldClass?.split(" ");
-          const newClassList: string[] = newClass.split(" ");
-
-          // Find added classes
-          const addedClasses = newClassList.filter(
-            (cls: string) => !oldClassList?.includes(cls)
-          );
-
-          // Find removed classes
-          const removedClasses = oldClassList?.filter(
-            (cls: string) => !newClassList.includes(cls)
-          );
-
-          if (
-            addedClasses.includes("mute") &&
-            videoIconStateRef.current.to !== "off"
-          ) {
-            if (audioRef.current) {
-              audioRef.current.muted = true;
-            }
-
-            if (!isFinishedRef.current) {
-              if (!changedWhileNotFinishedRef.current) {
-                changedWhileNotFinishedRef.current = true;
-              }
-              return;
-            }
-
-            videoIconStateRef.current = {
-              from: videoIconStateRef.current.to,
-              to: "off",
-            };
-
-            const newPaths = getPaths(videoIconStateRef.current.from, "off");
-            if (newPaths[0]) {
-              setPaths(newPaths);
-            }
-          } else if (
-            removedClasses?.includes("mute") &&
-            videoIconStateRef.current.to === "off"
-          ) {
-            if (!audioRef.current) {
-              return;
-            }
-
-            audioRef.current.muted = false;
-
-            const newVolume = audioRef.current.volume;
-            let newVolumeState;
-            if (newVolume === 0) {
-              newVolumeState = "off";
-            } else if (newVolume >= 0.5) {
-              newVolumeState = "high";
-            } else {
-              newVolumeState = "low";
-            }
-
-            if (
-              !isFinishedRef.current &&
-              videoIconStateRef.current.to !== newVolumeState
-            ) {
-              if (!changedWhileNotFinishedRef.current) {
-                changedWhileNotFinishedRef.current = true;
-              }
-              return;
-            }
-
-            videoIconStateRef.current = {
-              from: videoIconStateRef.current.to,
-              to: newVolumeState,
-            };
-
-            const newPaths = getPaths(
-              videoIconStateRef.current.from,
-              newVolumeState
-            );
-            if (newPaths[0]) {
-              setPaths(newPaths);
-            }
-          }
-
-          if (addedClasses.includes("mute-lock") && !muteLock.current) {
-            muteLock.current = true;
-
-            if (videoIconStateRef.current.to !== "off") {
-              videoIconStateRef.current = {
-                from: videoIconStateRef.current.to,
-                to: "off",
-              };
-              const newPaths = getPaths(videoIconStateRef.current.from, "off");
-              if (newPaths[0]) {
-                setPaths(newPaths);
-              }
-            }
-          } else if (
-            removedClasses?.includes("mute-lock") &&
-            muteLock.current
-          ) {
-            if (!audioRef.current) {
-              return;
-            }
-
-            muteLock.current = false;
-
-            const newVolume = audioRef.current.volume;
-            let newVolumeState;
-            if (newVolume === 0) {
-              newVolumeState = "off";
-            } else if (newVolume >= 0.5) {
-              newVolumeState = "high";
-            } else {
-              newVolumeState = "low";
-            }
-
-            if (
-              newVolumeState !== videoIconStateRef.current.to &&
-              !audioRef.current.muted
-            ) {
-              videoIconStateRef.current = {
-                from: videoIconStateRef.current.to,
-                to: newVolumeState,
-              };
-
-              const newPaths = getPaths(
-                videoIconStateRef.current.from,
-                newVolumeState
-              );
-              if (newPaths[0]) {
-                setPaths(newPaths);
-              }
-            }
-          }
-        }
-      });
-    });
-
-    observer.observe(bundleRef.current, {
-      attributes: true,
-      attributeOldValue: true,
-      attributeFilter: ["class"],
-    });
-
-    // Cleanup function to disconnect the observer when the component unmounts
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 
   return (
     <div
@@ -567,32 +760,25 @@ export default function ({
             id={username && `${username}_audio_container`}
             className='relative'
           >
-            <audio
-              ref={audioRef}
-              id={username && `${username}_audio_stream`}
-              className='w-0 z-0'
-              autoPlay={true}
-            ></audio>
             <VolumeIndicator
               audioStream={audioStream}
               audioRef={audioRef}
               bundleRef={bundleRef}
               handleMute={handleMute}
+              localMuted={localMuted}
               isUser={isUser}
               muteLock={muteLock}
             />
           </div>
         )}
-      {audioStream &&
-        (Object.keys(cameraStreams || {}).length !== 0 ||
-          Object.keys(screenStreams || {}).length !== 0) && (
-          <audio
-            ref={audioRef}
-            id={username && `${username}_audio_stream`}
-            className='w-0 z-0'
-            autoPlay={true}
-          ></audio>
-        )}
+      {audioStream && (
+        <audio
+          ref={audioRef}
+          id={username && `${username}_audio_stream`}
+          className='w-0 z-0'
+          autoPlay={true}
+        ></audio>
+      )}
     </div>
   );
 }

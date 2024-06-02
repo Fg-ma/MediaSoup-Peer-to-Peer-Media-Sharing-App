@@ -1,9 +1,7 @@
 import React from "react";
-import { Root, createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import getBrowserMedia from "../getBrowserMedia";
-import Bundle from "../bundle/Bundle";
 
 const onProducerTransportCreated = async (
   event: {
@@ -20,18 +18,18 @@ const onProducerTransportCreated = async (
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   roomName: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
+  userCameraStreams: React.MutableRefObject<{
+    [webcamId: string]: MediaStream;
+  }>,
+  userCameraCount: React.MutableRefObject<number>,
+  userScreenStreams: React.MutableRefObject<{
+    [screenId: string]: MediaStream;
+  }>,
+  userScreenCount: React.MutableRefObject<number>,
+  userAudioStream: React.MutableRefObject<MediaStream | undefined>,
   isWebcam: React.MutableRefObject<boolean>,
   isScreen: React.MutableRefObject<boolean>,
   isAudio: React.MutableRefObject<boolean>,
-  cameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
-  }>,
-  cameraCount: React.MutableRefObject<number>,
-  screenStreams: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
-  }>,
-  screenCount: React.MutableRefObject<number>,
-  audioStream: React.MutableRefObject<MediaStream | undefined>,
   handleDisableEnableBtns: (disabled: boolean) => void,
   remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   producerTransport: React.MutableRefObject<
@@ -39,7 +37,8 @@ const onProducerTransportCreated = async (
   >,
   muteAudio: () => void,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
-  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>
+  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
+  createProducerBundle: () => void
 ) => {
   if (event.error) {
     console.error("Producer transport create error: ", event.error);
@@ -85,13 +84,13 @@ const onProducerTransportCreated = async (
       username: username.current,
       producerId:
         appData.producerType === "webcam"
-          ? `${username.current}_camera_stream_${cameraCount.current}`
+          ? `${username.current}_camera_stream_${userCameraCount.current}`
           : appData.producerType === "screen"
-          ? `${username.current}_screen_stream_${screenCount.current}`
+          ? `${username.current}_screen_stream_${userScreenCount.current}`
           : undefined,
     };
     socket.current.emit("message", msg);
-    socket.current.once("newProducerCreated", (res: { id: string }) => {
+    socket.current.once("newProducerCallback", (res: { id: string }) => {
       callback(res);
     });
     return;
@@ -104,35 +103,7 @@ const onProducerTransportCreated = async (
       case "connecting":
         break;
       case "connected":
-        if (remoteVideosContainerRef.current) {
-          const bundleContainer = document.createElement("div");
-          bundleContainer.id = `${username.current}_bundle`;
-          remoteVideosContainerRef.current.append(bundleContainer);
-
-          const root = createRoot(bundleContainer);
-          root.render(
-            React.createElement(Bundle, {
-              username: username.current,
-              roomName: roomName.current,
-              socket: socket,
-              cameraStreams:
-                isWebcam.current && cameraStreams.current
-                  ? cameraStreams.current
-                  : undefined,
-              screenStreams:
-                isScreen.current && screenStreams.current
-                  ? screenStreams.current
-                  : undefined,
-              audioStream:
-                isAudio.current && audioStream.current
-                  ? audioStream.current
-                  : undefined,
-              isUser: true,
-              muteButtonCallback: muteAudio,
-            })
-          );
-        }
-
+        createProducerBundle();
         handleDisableEnableBtns(false);
         break;
       case "failed":
@@ -147,8 +118,8 @@ const onProducerTransportCreated = async (
   try {
     if (isWebcam.current) {
       if (
-        cameraStreams.current[
-          `${username.current}_camera_stream_${cameraCount.current}`
+        userCameraStreams.current[
+          `${username.current}_camera_stream_${userCameraCount.current}`
         ]
       ) {
         return;
@@ -161,17 +132,17 @@ const onProducerTransportCreated = async (
         setScreenActive,
         isWebcam,
         setWebcamActive,
-        cameraStreams,
-        screenStreams
+        userCameraStreams,
+        userScreenStreams
       );
 
       if (cameraBrowserMedia) {
-        cameraStreams.current[
-          `${username.current}_camera_stream_${cameraCount.current}`
+        userCameraStreams.current[
+          `${username.current}_camera_stream_${userCameraCount.current}`
         ] = cameraBrowserMedia;
         const cameraTrack =
-          cameraStreams.current[
-            `${username.current}_camera_stream_${cameraCount.current}`
+          userCameraStreams.current[
+            `${username.current}_camera_stream_${userCameraCount.current}`
           ].getVideoTracks()[0];
         const cameraParams = {
           track: cameraTrack,
@@ -182,7 +153,7 @@ const onProducerTransportCreated = async (
         await producerTransport.current?.produce(cameraParams);
       } else {
         producerTransport.current = undefined;
-        cameraCount.current = cameraCount.current - 1;
+        userCameraCount.current = userCameraCount.current - 1;
         const msg = {
           type: "deleteProducerTransport",
           roomName: roomName.current,
@@ -193,8 +164,8 @@ const onProducerTransportCreated = async (
     }
     if (isScreen.current) {
       if (
-        screenStreams.current[
-          `${username.current}_screen_stream_${screenCount.current}`
+        userScreenStreams.current[
+          `${username.current}_screen_stream_${userScreenCount.current}`
         ]
       ) {
         return;
@@ -208,17 +179,17 @@ const onProducerTransportCreated = async (
         setScreenActive,
         isWebcam,
         setWebcamActive,
-        cameraStreams,
-        screenStreams
+        userCameraStreams,
+        userScreenStreams
       );
 
       if (screenBrowserMedia) {
-        screenStreams.current[
-          `${username.current}_screen_stream_${screenCount.current}`
+        userScreenStreams.current[
+          `${username.current}_screen_stream_${userScreenCount.current}`
         ] = screenBrowserMedia;
         const screenTrack =
-          screenStreams.current[
-            `${username.current}_screen_stream_${screenCount.current}`
+          userScreenStreams.current[
+            `${username.current}_screen_stream_${userScreenCount.current}`
           ].getVideoTracks()[0];
         const screenParams = {
           track: screenTrack,
@@ -229,7 +200,7 @@ const onProducerTransportCreated = async (
         await producerTransport.current?.produce(screenParams);
       } else {
         producerTransport.current = undefined;
-        screenCount.current = screenCount.current - 1;
+        userScreenCount.current = userScreenCount.current - 1;
         const msg = {
           type: "deleteProducerTransport",
           roomName: roomName.current,
@@ -239,12 +210,12 @@ const onProducerTransportCreated = async (
       }
     }
     if (isAudio.current) {
-      if (audioStream.current) {
+      if (userAudioStream.current) {
         console.error("Already existing audio stream for: ", username.current);
         return;
       }
 
-      audioStream.current = await getBrowserMedia(
+      userAudioStream.current = await getBrowserMedia(
         "audio",
         device,
         handleDisableEnableBtns,
@@ -252,12 +223,12 @@ const onProducerTransportCreated = async (
         setScreenActive,
         isWebcam,
         setWebcamActive,
-        cameraStreams,
-        screenStreams
+        userCameraStreams,
+        userScreenStreams
       );
 
-      if (audioStream.current) {
-        const audioTrack = audioStream.current.getAudioTracks()[0];
+      if (userAudioStream.current) {
+        const audioTrack = userAudioStream.current.getAudioTracks()[0];
         const audioParams = {
           track: audioTrack,
           appData: {

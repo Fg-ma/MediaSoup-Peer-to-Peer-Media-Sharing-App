@@ -1,8 +1,6 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import Bundle from "../bundle/Bundle";
 
 const onConsumerTransportCreated = async (
   event: {
@@ -22,14 +20,23 @@ const onConsumerTransportCreated = async (
   consumerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       webcam?: { [webcamId: string]: MediaStreamTrack };
       screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack | undefined;
     };
-  }>
+  }>,
+  createConsumerBundle: (
+    trackUsername: string,
+    remoteCameraStreams: {
+      [screenId: string]: MediaStream;
+    },
+    remoteScreenStreams: {
+      [screenId: string]: MediaStream;
+    },
+    remoteAudioStream: MediaStream | undefined
+  ) => void
 ) => {
   if (event.error) {
     console.error("On consumer transport create error: ", event.error);
@@ -67,89 +74,47 @@ const onConsumerTransportCreated = async (
       case "connecting":
         break;
       case "connected":
-        if (!remoteVideosContainerRef.current) {
-          break;
-        }
-        const userBundle = document.getElementById(
-          `${username.current}_bundle`
-        );
-
-        remoteVideosContainerRef.current.innerHTML = "";
-
-        if (userBundle) {
-          remoteVideosContainerRef.current.appendChild(userBundle);
-        }
-
         Object.entries(remoteTracksMap.current).forEach(
           ([trackUsername, tracks]) => {
-            if (remoteVideosContainerRef.current) {
-              let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
-              if (remoteTracksMap.current[trackUsername]?.webcam) {
-                for (const key in remoteTracksMap.current[trackUsername]
-                  .webcam) {
-                  const remoteCameraStream = new MediaStream();
-                  remoteCameraStream.addTrack(
-                    remoteTracksMap.current[trackUsername].webcam![key]
-                  );
-                  remoteCameraStreams[key] = remoteCameraStream;
-                }
-              }
-
-              let remoteScreenStreams: { [screenId: string]: MediaStream } = {};
-              if (remoteTracksMap.current[trackUsername]?.screen) {
-                for (const key in remoteTracksMap.current[trackUsername]
-                  .screen) {
-                  const remoteScreenStream = new MediaStream();
-                  remoteScreenStream.addTrack(
-                    remoteTracksMap.current[trackUsername].screen![key]
-                  );
-                  remoteScreenStreams[key] = remoteScreenStream;
-                }
-              }
-
-              let remoteAudioStream;
-              if (
-                remoteTracksMap.current[trackUsername] &&
-                remoteTracksMap.current[trackUsername].audio
-              ) {
-                remoteAudioStream = new MediaStream();
-                remoteAudioStream.addTrack(
-                  remoteTracksMap.current[trackUsername].audio!
+            let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
+            if (remoteTracksMap.current[trackUsername]?.webcam) {
+              for (const key in remoteTracksMap.current[trackUsername].webcam) {
+                const remoteCameraStream = new MediaStream();
+                remoteCameraStream.addTrack(
+                  remoteTracksMap.current[trackUsername].webcam![key]
                 );
+                remoteCameraStreams[key] = remoteCameraStream;
               }
+            }
 
-              const bundleContainer = document.createElement("div");
-              bundleContainer.id = `${trackUsername}_bundle`;
-              remoteVideosContainerRef.current.append(bundleContainer);
+            let remoteScreenStreams: { [screenId: string]: MediaStream } = {};
+            if (remoteTracksMap.current[trackUsername]?.screen) {
+              for (const key in remoteTracksMap.current[trackUsername].screen) {
+                const remoteScreenStream = new MediaStream();
+                remoteScreenStream.addTrack(
+                  remoteTracksMap.current[trackUsername].screen![key]
+                );
+                remoteScreenStreams[key] = remoteScreenStream;
+              }
+            }
 
-              const root = createRoot(bundleContainer);
-              root.render(
-                React.createElement(Bundle, {
-                  username: trackUsername,
-                  roomName: roomName.current,
-                  socket: socket,
-                  cameraStreams: remoteCameraStreams
-                    ? remoteCameraStreams
-                    : undefined,
-                  screenStreams: remoteScreenStreams
-                    ? remoteScreenStreams
-                    : undefined,
-                  audioStream: remoteAudioStream
-                    ? remoteAudioStream
-                    : undefined,
-                  onRendered: () => {
-                    const msg = {
-                      type: "requestMuteLock",
-                      roomName: roomName.current,
-                      username: username.current,
-                      producerUsername: trackUsername,
-                    };
-
-                    socket.current.emit("message", msg);
-                  },
-                })
+            let remoteAudioStream: MediaStream | undefined = undefined;
+            if (
+              remoteTracksMap.current[trackUsername] &&
+              remoteTracksMap.current[trackUsername].audio
+            ) {
+              remoteAudioStream = new MediaStream();
+              remoteAudioStream.addTrack(
+                remoteTracksMap.current[trackUsername].audio!
               );
             }
+
+            createConsumerBundle(
+              trackUsername,
+              remoteCameraStreams,
+              remoteScreenStreams,
+              remoteAudioStream
+            );
           }
         );
         const msg = {
