@@ -87,6 +87,18 @@ export default function Main() {
     socket.current.emit("message", msg);
   };
 
+  const handleMuteAudioBtn = () => {
+    muteAudio();
+
+    const msg = {
+      type: "sendMuteRequest",
+      roomName: roomName.current,
+      username: username.current,
+    };
+
+    socket.current.emit("message", msg);
+  };
+
   const handleDisableEnableBtns = (disabled: boolean) => {
     if (webcamBtnRef.current) webcamBtnRef.current!.disabled = disabled;
     if (screenBtnRef.current) screenBtnRef.current!.disabled = disabled;
@@ -403,7 +415,7 @@ export default function Main() {
             <div className='flex flex-col mx-2'>
               <button
                 ref={muteBtnRef}
-                onClick={muteAudio}
+                onClick={handleMuteAudioBtn}
                 className={`${
                   mutedAudioRef.current
                     ? "bg-orange-500 hover:bg-orange-700"

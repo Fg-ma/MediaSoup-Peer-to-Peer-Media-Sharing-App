@@ -5,7 +5,7 @@ import { colors } from "./colors";
 const VolumeIndicator = ({
   audioStream,
   audioRef,
-  bundleRef,
+  username,
   handleMute,
   muteLock,
   localMuted,
@@ -23,7 +23,7 @@ const VolumeIndicator = ({
 }: {
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
-  bundleRef: React.RefObject<HTMLDivElement>;
+  username: string;
   handleMute: () => void;
   muteLock: React.MutableRefObject<boolean>;
   localMuted: React.MutableRefObject<boolean>;
@@ -120,7 +120,9 @@ const VolumeIndicator = ({
   const handleVolumeSlider = (volume: number) => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
-      audioRef.current.muted = volume === 0;
+      if (!isUser) {
+        audioRef.current.muted = volume === 0;
+      }
     }
   };
 
@@ -207,7 +209,7 @@ const VolumeIndicator = ({
         window.removeEventListener("mouseup", stopDrag);
       }
     };
-  }, [isDragging]);
+  }, [isDragging, svgRef, leftHandleRef, rightHandleRef]);
 
   // Audio analyser
   useEffect(() => {
@@ -314,7 +316,7 @@ const VolumeIndicator = ({
         viewBox='0 -150 200 300'
       >
         <defs>
-          <filter id='shadow'>
+          <filter id={`${username}_shadow`}>
             <feGaussianBlur in='SourceAlpha' stdDeviation='2' result='blur' />
             <feOffset in='blur' dx='1' dy='2' result='offsetBlur' />
 
@@ -337,7 +339,7 @@ const VolumeIndicator = ({
             </feMerge>
           </filter>
 
-          <mask id='mask'>
+          <mask id={`${username}_mask`}>
             <rect x='-10' y='-150' width='220' height='450' fill='black' />
             <animated.path
               ref={pathRef}
@@ -351,7 +353,7 @@ const VolumeIndicator = ({
           </mask>
 
           <linearGradient
-            id='muteGradient'
+            id={`${username}_mute_gradient`}
             x1='0%'
             y1='0%'
             x2='100%'
@@ -470,7 +472,13 @@ const VolumeIndicator = ({
             />
           </linearGradient>
 
-          <linearGradient id='topGradient' x1='0%' y1='0%' x2='0%' y2='100%'>
+          <linearGradient
+            id={`${username}_top_gradient`}
+            x1='0%'
+            y1='0%'
+            x2='0%'
+            y2='100%'
+          >
             <stop
               offset='45%'
               stopColor={colors[volumeColor as keyof typeof colors]}
@@ -478,7 +486,13 @@ const VolumeIndicator = ({
             <stop offset='95%' stopColor='black' />
           </linearGradient>
 
-          <linearGradient id='bottomGradient' x1='0%' y1='0%' x2='0%' y2='100%'>
+          <linearGradient
+            id={`${username}_bottom_gradient`}
+            x1='0%'
+            y1='0%'
+            x2='0%'
+            y2='100%'
+          >
             <stop offset='5%' stopColor='black' />
             <stop
               offset='55%'
@@ -487,7 +501,7 @@ const VolumeIndicator = ({
           </linearGradient>
 
           <pattern
-            id='backgroundMatrix'
+            id={`${username}_background_matrix`}
             x='-20'
             y='-120'
             width={svgRef.current?.clientWidth}
@@ -507,7 +521,7 @@ const VolumeIndicator = ({
                   ? svgRef.current.clientHeight * patternHeight
                   : undefined
               }
-              fill='url(#topGradient)'
+              fill={`url(#${username}_top_gradient)`}
             ></rect>
             <rect
               x={
@@ -545,7 +559,7 @@ const VolumeIndicator = ({
                   ? svgRef.current.clientHeight * patternHeight
                   : undefined
               }
-              fill='url(#topGradient)'
+              fill={`url(#${username}_top_gradient)`}
             ></rect>
 
             <rect
@@ -631,7 +645,7 @@ const VolumeIndicator = ({
                   ? svgRef.current.clientHeight * patternHeight
                   : undefined
               }
-              fill='url(#bottomGradient)'
+              fill={`url(#${username}_bottom_gradient)`}
             ></rect>
             <rect
               x={
@@ -677,24 +691,22 @@ const VolumeIndicator = ({
                   ? svgRef.current.clientHeight * patternHeight
                   : undefined
               }
-              fill='url(#bottomGradient)'
+              fill={`url(#${username}_bottom_gradient)`}
             ></rect>
           </pattern>
         </defs>
-        <g filter='url(#shadow)'>
+        <g filter={`url(#${username}_shadow)`}>
           <rect
             x='-20'
             y='-120'
             width={svgRef.current?.clientWidth}
             height={svgRef.current?.clientHeight}
             fill={
-              (audioRef.current && audioRef.current.muted) ||
-              localMuted.current ||
-              muteLock.current
-                ? "url(#muteGradient)"
-                : "url(#backgroundMatrix)"
+              localMuted.current || muteLock.current
+                ? `url(#${username}_mute_gradient)`
+                : `url(#${username}_background_matrix)`
             }
-            mask='url(#mask)'
+            mask={`url(#${username}_mask)`}
           />
         </g>
         {!isUser && (

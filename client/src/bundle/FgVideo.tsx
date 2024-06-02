@@ -24,7 +24,7 @@ export default function FgVideo({
   username,
   roomName,
   socket,
-  id,
+  videoId,
   handleMute,
   videoStream,
   isStream = false,
@@ -53,19 +53,18 @@ export default function FgVideo({
   isSkip = true,
   isThumbnail = true,
   isPreview = true,
-  initialMute = false,
-  muteLock,
   audioRef,
   handleVolumeSlider,
   paths,
   videoIconStateRef,
   isFinishedRef,
   changedWhileNotFinishedRef,
+  tracksColorSetter,
 }: {
-  username?: string;
-  roomName?: string;
+  username: string;
+  roomName: string;
   socket?: React.MutableRefObject<Socket>;
-  id?: string;
+  videoId: string;
   handleMute: () => void;
   videoStream?: MediaStream;
   isStream?: boolean;
@@ -94,8 +93,6 @@ export default function FgVideo({
   isSkip?: boolean;
   isThumbnail?: boolean;
   isPreview?: boolean;
-  initialMute?: boolean;
-  muteLock: React.MutableRefObject<boolean>;
   audioRef: React.RefObject<HTMLAudioElement>;
   handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;
   paths: string[][];
@@ -105,13 +102,13 @@ export default function FgVideo({
   }>;
   isFinishedRef: React.MutableRefObject<boolean>;
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
+  tracksColorSetter: () => void;
 }) {
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const currentTimeRef = useRef<HTMLDivElement>(null);
-  const volumeSliderRef = useRef<HTMLInputElement>(null);
   const totalTimeRef = useRef<HTMLDivElement>(null);
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const previewImgRef = useRef<HTMLImageElement>(null);
@@ -126,25 +123,24 @@ export default function FgVideo({
   const thumbnails = useRef<string[]>([]);
 
   const init = () => {
-    // Combine all streams into one
+    // Set videoStream as srcObject
     if (videoRef.current && isStream && videoStream) {
       videoRef.current.srcObject = videoStream;
     }
 
-    // Handle initial mute
-    if (videoRef.current && videoRef.current.srcObject instanceof MediaStream) {
-      const mediaStream = videoRef.current.srcObject;
-      mediaStream.getAudioTracks().forEach((track) => {
-        if (videoRef.current) {
-          track.enabled = !initialMute;
-        }
-      });
+    // Set initial track statte
+    const volumeSliders =
+      videoContainerRef.current?.querySelectorAll(".volume-slider");
 
-      videoRef.current.muted = initialMute;
-    }
-    if (videoRef.current && videoRef.current.muted && volumeSliderRef.current) {
-      volumeSliderRef.current.value = "0";
-    }
+    volumeSliders?.forEach((slider) => {
+      const sliderElement = slider as HTMLInputElement;
+      if (audioRef.current) {
+        sliderElement.value = audioRef.current.muted
+          ? "0"
+          : audioRef.current.volume.toString();
+      }
+    });
+    tracksColorSetter();
 
     // Get captions and set them to hidden initially
     if (videoRef.current && videoRef.current.textTracks[0]) {
@@ -442,13 +438,13 @@ export default function FgVideo({
 
       // Listen for the 'ended' eveont on the video track
       const handleEnded = () => {
-        if (roomName && username && id && socket) {
+        if (socket) {
           const msg = {
             type: "removeProducer",
             roomName: roomName,
             username: username,
             producerType: "screen",
-            producerId: id,
+            producerId: videoId,
           };
           socket.current.emit("message", msg);
         }
@@ -465,7 +461,7 @@ export default function FgVideo({
   return (
     <div
       ref={videoContainerRef}
-      id={id && `${id}_container`}
+      id={`${videoId}_container`}
       className={`video-container ${
         autoPlay ? "" : "paused"
       } relative overflow-hidden flex items-center justify-center text-white font-K2D rounded-md`}
@@ -474,7 +470,7 @@ export default function FgVideo({
         <>
           <video
             ref={videoRef}
-            id={id && id}
+            id={videoId}
             onClick={
               isPlayPause
                 ? () => handlePausePlay(paused, videoRef, videoContainerRef)

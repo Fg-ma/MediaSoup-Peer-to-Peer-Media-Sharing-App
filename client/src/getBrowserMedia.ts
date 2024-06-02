@@ -1,5 +1,4 @@
 import * as mediasoup from "mediasoup-client";
-import { useUserStreamsContext } from "./context/StreamsContext";
 
 const getBrowserMedia = async (
   type: string,

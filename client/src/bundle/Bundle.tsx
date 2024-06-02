@@ -62,7 +62,7 @@ export default function ({
   initialVolume = "high",
   onRendered,
 }: {
-  username?: string;
+  username: string;
   roomName: string;
   socket: React.MutableRefObject<Socket>;
   initCameraStreams?: { [cameraKey: string]: MediaStream };
@@ -259,6 +259,13 @@ export default function ({
     }
 
     if (event.isMuteLock) {
+      if (!isFinishedRef.current) {
+        if (!changedWhileNotFinishedRef.current) {
+          changedWhileNotFinishedRef.current = true;
+        }
+        return;
+      }
+
       muteLock.current = true;
 
       if (videoIconStateRef.current.to !== "off") {
@@ -289,6 +296,16 @@ export default function ({
       }
 
       if (
+        !isFinishedRef.current &&
+        videoIconStateRef.current.to !== newVolumeState
+      ) {
+        if (!changedWhileNotFinishedRef.current) {
+          changedWhileNotFinishedRef.current = true;
+        }
+        return;
+      }
+
+      if (
         newVolumeState !== videoIconStateRef.current.to &&
         !audioRef.current.muted
       ) {
@@ -304,6 +321,63 @@ export default function ({
         if (newPaths[0]) {
           setPaths(newPaths);
         }
+      }
+    }
+  };
+
+  const onMuteRequest = () => {
+    localMuted.current = !localMuted.current;
+
+    if (localMuted.current) {
+      if (!isFinishedRef.current) {
+        if (!changedWhileNotFinishedRef.current) {
+          changedWhileNotFinishedRef.current = true;
+        }
+        return;
+      }
+
+      videoIconStateRef.current = {
+        from: videoIconStateRef.current.to,
+        to: "off",
+      };
+
+      const newPaths = getPaths(videoIconStateRef.current.from, "off");
+      if (newPaths[0]) {
+        setPaths(newPaths);
+      }
+    } else {
+      if (!audioRef.current) {
+        return;
+      }
+
+      const newVolume = audioRef.current.volume;
+      let newVolumeState;
+      if (newVolume === 0) {
+        newVolumeState = "off";
+      } else if (newVolume >= 0.5) {
+        newVolumeState = "high";
+      } else {
+        newVolumeState = "low";
+      }
+
+      if (
+        !isFinishedRef.current &&
+        videoIconStateRef.current.to !== newVolumeState
+      ) {
+        if (!changedWhileNotFinishedRef.current) {
+          changedWhileNotFinishedRef.current = true;
+        }
+        return;
+      }
+
+      videoIconStateRef.current = {
+        from: videoIconStateRef.current.to,
+        to: newVolumeState,
+      };
+
+      const newPaths = getPaths(videoIconStateRef.current.from, newVolumeState);
+      if (newPaths[0]) {
+        setPaths(newPaths);
       }
     }
   };
@@ -326,6 +400,9 @@ export default function ({
         case "muteLockChange":
           onMuteLockChange(event);
           break;
+        case "muteRequest":
+          onMuteRequest();
+          break;
         default:
           break;
       }
@@ -341,15 +418,6 @@ export default function ({
 
   // Initial functions & call onRendered call back if one is availiable
   useEffect(() => {
-    // Set volume-slider-height
-    if (audioStream && !cameraStreams && !screenStreams) {
-      bundleRef.current?.style.setProperty(
-        "--volume-slider-height",
-        "0.625rem"
-      );
-      bundleRef.current?.style.setProperty("--volume-slider-width", "8rem");
-    }
-
     // Set initial volume slider
     tracksColorSetter();
 
@@ -490,20 +558,10 @@ export default function ({
       const max = 1;
       const percentage = ((value - min) / (max - min)) * 100;
       const trackColor = `linear-gradient(to right, ${primaryVolumeSliderColor} 0%, ${primaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} 100%)`;
-      if (audioStream && !cameraStreams && !screenStreams) {
-        bundleRef.current?.style.setProperty(
-          "--volume-slider-thumb-size",
-          "1.5rem"
-        );
-      }
 
       volumeSliders.forEach((slider) => {
         const sliderElement = slider as HTMLInputElement;
         sliderElement.style.background = trackColor;
-        sliderElement.style.borderRadius =
-          audioStream && !cameraStreams && !screenStreams
-            ? "0.3125rem"
-            : "0.125rem";
       });
     }
   };
@@ -513,7 +571,9 @@ export default function ({
 
     if (audioRef.current) {
       audioRef.current.volume = volume;
-      audioRef.current.muted = volume > 0 ? false : true;
+      if (!muteLock.current) {
+        audioRef.current.muted = volume > 0 ? false : true;
+      }
     }
 
     if (bundleRef.current) {
@@ -534,83 +594,77 @@ export default function ({
       muteButtonCallback();
     }
 
-    if (!audioRef.current || muteLock.current) {
+    if (muteLock.current) {
       return;
     }
-    if (isUser) {
-      localMuted.current = !localMuted.current;
-      console.log(username, audioRef.current.srcObject);
-      if (audioStream) {
-        audioStream.getAudioTracks().forEach((track) => {
-          if (audioRef.current) {
-            track.enabled = localMuted.current;
-          }
-        });
+
+    localMuted.current = !localMuted.current;
+
+    if (audioRef.current && !isUser) {
+      audioRef.current.muted = localMuted.current;
+    }
+
+    if (
+      audioRef.current &&
+      audioRef.current.srcObject instanceof MediaStream &&
+      !isUser
+    ) {
+      const mediaStream = audioRef.current.srcObject;
+      mediaStream.getAudioTracks().forEach((track) => {
+        track.enabled = !localMuted.current;
+      });
+    }
+
+    if (localMuted.current) {
+      if (!isFinishedRef.current) {
+        if (!changedWhileNotFinishedRef.current) {
+          changedWhileNotFinishedRef.current = true;
+        }
+        return;
+      }
+
+      videoIconStateRef.current = {
+        from: videoIconStateRef.current.to,
+        to: "off",
+      };
+
+      const newPaths = getPaths(videoIconStateRef.current.from, "off");
+      if (newPaths[0]) {
+        setPaths(newPaths);
       }
     } else {
-      if (audioRef.current.srcObject instanceof MediaStream) {
-        const mediaStream = audioRef.current.srcObject;
-        mediaStream.getAudioTracks().forEach((track) => {
-          if (audioRef.current) {
-            track.enabled = audioRef.current.muted;
-          }
-        });
+      if (!audioRef.current) {
+        return;
       }
 
-      if (!audioRef.current.muted) {
-        audioRef.current.muted = true;
-
-        if (!isFinishedRef.current) {
-          if (!changedWhileNotFinishedRef.current) {
-            changedWhileNotFinishedRef.current = true;
-          }
-          return;
-        }
-
-        videoIconStateRef.current = {
-          from: videoIconStateRef.current.to,
-          to: "off",
-        };
-
-        const newPaths = getPaths(videoIconStateRef.current.from, "off");
-        if (newPaths[0]) {
-          setPaths(newPaths);
-        }
+      const newVolume = audioRef.current.volume;
+      let newVolumeState;
+      if (newVolume === 0) {
+        newVolumeState = "off";
+      } else if (newVolume >= 0.5) {
+        newVolumeState = "high";
       } else {
-        audioRef.current.muted = false;
+        newVolumeState = "low";
+      }
 
-        const newVolume = audioRef.current.volume;
-        let newVolumeState;
-        if (newVolume === 0) {
-          newVolumeState = "off";
-        } else if (newVolume >= 0.5) {
-          newVolumeState = "high";
-        } else {
-          newVolumeState = "low";
+      if (
+        !isFinishedRef.current &&
+        videoIconStateRef.current.to !== newVolumeState
+      ) {
+        if (!changedWhileNotFinishedRef.current) {
+          changedWhileNotFinishedRef.current = true;
         }
+        return;
+      }
 
-        if (
-          !isFinishedRef.current &&
-          videoIconStateRef.current.to !== newVolumeState
-        ) {
-          if (!changedWhileNotFinishedRef.current) {
-            changedWhileNotFinishedRef.current = true;
-          }
-          return;
-        }
+      videoIconStateRef.current = {
+        from: videoIconStateRef.current.to,
+        to: newVolumeState,
+      };
 
-        videoIconStateRef.current = {
-          from: videoIconStateRef.current.to,
-          to: newVolumeState,
-        };
-
-        const newPaths = getPaths(
-          videoIconStateRef.current.from,
-          newVolumeState
-        );
-        if (newPaths[0]) {
-          setPaths(newPaths);
-        }
+      const newPaths = getPaths(videoIconStateRef.current.from, newVolumeState);
+      if (newPaths[0]) {
+        setPaths(newPaths);
       }
     }
   };
@@ -678,7 +732,7 @@ export default function ({
   return (
     <div
       ref={bundleRef}
-      id={username && `${username}_bundle_container`}
+      id={`${username}_bundle_container`}
       className='bundle-container'
     >
       {cameraStreams &&
@@ -689,7 +743,7 @@ export default function ({
             username={username}
             roomName={roomName}
             socket={socket}
-            id={key}
+            videoId={key}
             videoStream={cameraStream}
             isStream={true}
             flipVideo={true}
@@ -706,15 +760,14 @@ export default function ({
             isSkip={false}
             isThumbnail={false}
             isPreview={false}
-            initialMute={false}
             handleMute={handleMute}
-            muteLock={muteLock}
             audioRef={audioRef}
             handleVolumeSlider={handleVolumeSlider}
             paths={paths}
             videoIconStateRef={videoIconStateRef}
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+            tracksColorSetter={tracksColorSetter}
           />
         ))}
       {screenStreams &&
@@ -725,7 +778,7 @@ export default function ({
             username={username}
             roomName={roomName}
             socket={socket}
-            id={key}
+            videoId={key}
             videoStream={screenStream}
             isStream={true}
             flipVideo={false}
@@ -742,28 +795,24 @@ export default function ({
             isSkip={false}
             isThumbnail={false}
             isPreview={false}
-            initialMute={false}
             handleMute={handleMute}
-            muteLock={muteLock}
             audioRef={audioRef}
             handleVolumeSlider={handleVolumeSlider}
             paths={paths}
             videoIconStateRef={videoIconStateRef}
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+            tracksColorSetter={tracksColorSetter}
           />
         ))}
       {audioStream &&
         Object.keys(cameraStreams || {}).length === 0 &&
         Object.keys(screenStreams || {}).length === 0 && (
-          <div
-            id={username && `${username}_audio_container`}
-            className='relative'
-          >
+          <div id={`${username}_audio_container`} className='relative'>
             <VolumeIndicator
               audioStream={audioStream}
               audioRef={audioRef}
-              bundleRef={bundleRef}
+              username={username}
               handleMute={handleMute}
               localMuted={localMuted}
               isUser={isUser}
@@ -774,7 +823,7 @@ export default function ({
       {audioStream && (
         <audio
           ref={audioRef}
-          id={username && `${username}_audio_stream`}
+          id={`${username}_audio_stream`}
           className='w-0 z-0'
           autoPlay={true}
         ></audio>
