@@ -44,12 +44,6 @@
   --flip-video: "1";
 }
 
-.bundle-container {
-  --volume-slider-height: 0.25rem;
-  --volume-slider-width: 5rem;
-  --volume-slider-thumb-size: 0.9375rem;
-}
-
 .video-controls-container {
   opacity: 0;
   pointer-events: none;
@@ -136,7 +130,13 @@
   transform-origin: left;
   transform: scaleX(0);
   transition: width 150ms ease-in-out, transfrom 150ms ease-in-out;
-  border-radius: 0.125rem;
+  border-radius: calc(var(--volume-slider-height) / 2);
+}
+
+.volume-container {
+  --volume-slider-height: 0.25rem;
+  --volume-slider-width: 5rem;
+  --volume-slider-thumb-size: 0.9375rem;
 }
 
 .volume-container:hover .volume-slider,

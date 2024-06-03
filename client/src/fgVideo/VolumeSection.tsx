@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   volumeHigh1a,
   volumeHigh1b,
@@ -23,10 +23,11 @@ import SVGMorpher from "../SVGMorpher/SVGMorpher";
 
 export default function VolumeSection({
   audioRef,
-  audioStream,
   handleVolumeSlider = () => {},
   iconSize = "2.5rem",
-  sliderSize = "2.5rem",
+  volumeSliderHeight = "0.25rem",
+  volumeSliderWidth = "5rem",
+  volumeSliderThumbSize = "0.9375rem",
   handleMute,
   primaryColor = "white",
   isSlider = true,
@@ -36,11 +37,12 @@ export default function VolumeSection({
   changedWhileNotFinishedRef,
 }: {
   audioRef: React.RefObject<HTMLAudioElement>;
-  audioStream?: MediaStream;
   handleVolumeSlider?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleMute: () => void;
   iconSize?: string;
-  sliderSize?: string;
+  volumeSliderHeight?: string;
+  volumeSliderWidth?: string;
+  volumeSliderThumbSize?: string;
   primaryColor?: string;
   isSlider?: boolean;
   paths: string[][];
@@ -51,8 +53,26 @@ export default function VolumeSection({
   isFinishedRef: React.MutableRefObject<boolean>;
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
 }) {
+  const volumeContainer = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    volumeContainer.current?.style.setProperty(
+      "--volume-slider-width",
+      volumeSliderWidth
+    );
+    volumeContainer.current?.style.setProperty(
+      "--volume-slider-height",
+      volumeSliderHeight
+    );
+    volumeContainer.current?.style.setProperty(
+      "--volume-slider-thumb-size",
+      volumeSliderThumbSize
+    );
+  }, [volumeSliderWidth, volumeSliderHeight, volumeSliderThumbSize]);
+
   return (
     <div
+      ref={volumeContainer}
       className='volume-container flex items-center justify-center'
       style={{ height: `calc(${iconSize} * 2)` }}
     >

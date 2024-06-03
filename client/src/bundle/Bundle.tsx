@@ -43,10 +43,16 @@ import {
   volumeLowOffB2b,
   volumeLowOffB3a,
   volumeLowOffB3b,
-} from "./svgPaths";
-import FgVideo from "./FgVideo";
-import VolumeIndicator from "./VolumeIndicator";
+} from "../fgVideo/svgPaths";
+import FgVideo from "../fgVideo/FgVideo";
+import VolumeIndicator from "../fgVideo/VolumeIndicator";
 import { useStreamsContext } from "../context/StreamsContext";
+import onProducerDisconnected from "./lib/onProducerDisconnected";
+import onNewProducerWasCreated from "./lib/onNewProducerWasCreated";
+import onNewConsumerWasCreated from "./lib/onNewConsumerWasCreated";
+import onAcceptedMuteLock from "./lib/onAcceptedMuteLock";
+import onMuteLockChange from "./lib/onMuteLockChange";
+import onMuteRequest from "./lib/onMuteRequest";
 
 export default function ({
   username,
@@ -116,292 +122,78 @@ export default function ({
   const changedWhileNotFinishedRef = useRef(false);
   const localMuted = useRef(false);
 
-  const onProducerDisconnected = (event: {
-    type: string;
-    producerUsername: string;
-    producerType: string;
-    producerId: string;
-  }) => {
-    if (event.producerUsername === username) {
-      if (event.producerType === "webcam") {
-        setCameraStreams((prev) => {
-          const newStreams = { ...prev };
-          delete newStreams[event.producerId];
-          return newStreams;
-        });
-      } else if (event.producerType === "screen") {
-        setScreenStreams((prev) => {
-          const newStreams = { ...prev };
-          delete newStreams[event.producerId];
-          return newStreams;
-        });
-      } else if (event.producerType === "audio") {
-        setAudioStream(undefined);
-      }
-    }
-  };
-
-  const onNewProducerWasCreated = (event: {
-    type: string;
-    producerType: "webcam" | "screen" | "audio";
-  }) => {
-    if (!isUser) {
-      return;
-    }
-
-    if (event.producerType === "webcam") {
-      setCameraStreams((prev) => {
-        const newStreams = { ...prev };
-        newStreams[`${username}_camera_stream_${userCameraCount.current}`] =
-          userCameraStreams.current[
-            `${username}_camera_stream_${userCameraCount.current}`
-          ];
-        return newStreams;
-      });
-    } else if (event.producerType === "screen") {
-      setScreenStreams((prev) => {
-        const newStreams = { ...prev };
-        newStreams[`${username}_screen_stream_${userScreenCount.current}`] =
-          userScreenStreams.current[
-            `${username}_screen_stream_${userScreenCount.current}`
-          ];
-        return newStreams;
-      });
-    } else if (event.producerType === "audio") {
-      setAudioStream(userAudioStream.current);
-    }
-  };
-
-  const onNewConsumerWasCreated = async (event: {
-    type: string;
-    producerUsername: string;
-    consumerId?: string;
-    consumerType: string;
-  }) => {
-    if (username !== event.producerUsername) {
-      return;
-    }
-
-    if (event.consumerType === "webcam") {
-      setCameraStreams((prev) => {
-        const newStreams = { ...prev };
-        const newStream = new MediaStream();
-        if (event.consumerId) {
-          const track =
-            remoteTracksMap.current[event.producerUsername].webcam?.[
-              event.consumerId
-            ];
-          if (track) {
-            newStream.addTrack(track);
-          }
-
-          newStreams[event.consumerId] = newStream;
-        }
-        return newStreams;
-      });
-    } else if (event.consumerType === "screen") {
-      setScreenStreams((prev) => {
-        const newStreams = { ...prev };
-        const newStream = new MediaStream();
-        if (event.consumerId) {
-          const track =
-            remoteTracksMap.current[event.producerUsername].screen?.[
-              event.consumerId
-            ];
-          if (track) {
-            newStream.addTrack(track);
-          }
-
-          newStreams[event.consumerId] = newStream;
-        }
-        return newStreams;
-      });
-    } else if (event.consumerType === "audio") {
-      const newStream = new MediaStream();
-      const track = remoteTracksMap.current[event.producerUsername].audio;
-      if (track) {
-        newStream.addTrack(track);
-      }
-
-      setAudioStream(newStream);
-    }
-  };
-
-  const onAcceptedMuteLock = (event: {
-    type: string;
-    producerUsername: string;
-  }) => {
-    if (isUser || username !== event.producerUsername) {
-      return;
-    }
-
-    muteLock.current = true;
-
-    if (videoIconStateRef.current.to !== "off") {
-      videoIconStateRef.current = {
-        from: videoIconStateRef.current.to,
-        to: "off",
-      };
-      const newPaths = getPaths(videoIconStateRef.current.from, "off");
-      if (newPaths[0]) {
-        setPaths(newPaths);
-      }
-    }
-  };
-
-  const onMuteLockChange = (event: {
-    type: string;
-    isMuteLock: boolean;
-    username: string;
-  }) => {
-    if (isUser || username !== event.username) {
-      return;
-    }
-
-    if (event.isMuteLock) {
-      if (!isFinishedRef.current) {
-        if (!changedWhileNotFinishedRef.current) {
-          changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      muteLock.current = true;
-
-      if (videoIconStateRef.current.to !== "off") {
-        videoIconStateRef.current = {
-          from: videoIconStateRef.current.to,
-          to: "off",
-        };
-        const newPaths = getPaths(videoIconStateRef.current.from, "off");
-        if (newPaths[0]) {
-          setPaths(newPaths);
-        }
-      }
-    } else {
-      muteLock.current = false;
-
-      if (!audioRef.current) {
-        return;
-      }
-
-      const newVolume = audioRef.current.volume;
-      let newVolumeState;
-      if (newVolume === 0) {
-        newVolumeState = "off";
-      } else if (newVolume >= 0.5) {
-        newVolumeState = "high";
-      } else {
-        newVolumeState = "low";
-      }
-
-      if (
-        !isFinishedRef.current &&
-        videoIconStateRef.current.to !== newVolumeState
-      ) {
-        if (!changedWhileNotFinishedRef.current) {
-          changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      if (
-        newVolumeState !== videoIconStateRef.current.to &&
-        !audioRef.current.muted
-      ) {
-        videoIconStateRef.current = {
-          from: videoIconStateRef.current.to,
-          to: newVolumeState,
-        };
-
-        const newPaths = getPaths(
-          videoIconStateRef.current.from,
-          newVolumeState
-        );
-        if (newPaths[0]) {
-          setPaths(newPaths);
-        }
-      }
-    }
-  };
-
-  const onMuteRequest = () => {
-    localMuted.current = !localMuted.current;
-
-    if (localMuted.current) {
-      if (!isFinishedRef.current) {
-        if (!changedWhileNotFinishedRef.current) {
-          changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      videoIconStateRef.current = {
-        from: videoIconStateRef.current.to,
-        to: "off",
-      };
-
-      const newPaths = getPaths(videoIconStateRef.current.from, "off");
-      if (newPaths[0]) {
-        setPaths(newPaths);
-      }
-    } else {
-      if (!audioRef.current) {
-        return;
-      }
-
-      const newVolume = audioRef.current.volume;
-      let newVolumeState;
-      if (newVolume === 0) {
-        newVolumeState = "off";
-      } else if (newVolume >= 0.5) {
-        newVolumeState = "high";
-      } else {
-        newVolumeState = "low";
-      }
-
-      if (
-        !isFinishedRef.current &&
-        videoIconStateRef.current.to !== newVolumeState
-      ) {
-        if (!changedWhileNotFinishedRef.current) {
-          changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      videoIconStateRef.current = {
-        from: videoIconStateRef.current.to,
-        to: newVolumeState,
-      };
-
-      const newPaths = getPaths(videoIconStateRef.current.from, newVolumeState);
-      if (newPaths[0]) {
-        setPaths(newPaths);
-      }
-    }
-  };
-
   useEffect(() => {
     const handleMessage = (event: any) => {
       switch (event.type) {
         case "producerDisconnected":
-          onProducerDisconnected(event);
+          onProducerDisconnected(
+            event,
+            username,
+            setCameraStreams,
+            setScreenStreams,
+            setAudioStream
+          );
           break;
         case "newProducerWasCreated":
-          onNewProducerWasCreated(event);
+          onNewProducerWasCreated(
+            event,
+            isUser,
+            username,
+            setCameraStreams,
+            setScreenStreams,
+            setAudioStream,
+            userCameraStreams,
+            userCameraCount,
+            userScreenStreams,
+            userScreenCount,
+            userAudioStream
+          );
           break;
         case "newConsumerWasCreated":
-          onNewConsumerWasCreated(event);
+          onNewConsumerWasCreated(
+            event,
+            username,
+            setCameraStreams,
+            setScreenStreams,
+            setAudioStream,
+            remoteTracksMap
+          );
           break;
         case "acceptedMuteLock":
-          onAcceptedMuteLock(event);
+          onAcceptedMuteLock(
+            event,
+            isUser,
+            username,
+            muteLock,
+            videoIconStateRef,
+            getPaths,
+            setPaths
+          );
           break;
         case "muteLockChange":
-          onMuteLockChange(event);
+          onMuteLockChange(
+            event,
+            isUser,
+            username,
+            isFinishedRef,
+            changedWhileNotFinishedRef,
+            muteLock,
+            videoIconStateRef,
+            getPaths,
+            setPaths,
+            audioRef
+          );
           break;
         case "muteRequest":
-          onMuteRequest();
+          onMuteRequest(
+            localMuted,
+            isFinishedRef,
+            changedWhileNotFinishedRef,
+            videoIconStateRef,
+            getPaths,
+            setPaths,
+            audioRef
+          );
           break;
         default:
           break;
