@@ -1,30 +1,79 @@
+import * as mediasoup from "mediasoup";
 import { Worker, Router } from "mediasoup/node/lib/types";
-import createWorker from "./createWorker";
 import { config } from "../config";
+import { workers } from "./mediasoupVars";
 
-const workers: Array<{ worker: Worker; router: Router }> = [];
-let nextMediasoupWorkerIdx = 0;
-
+// Initialize as many workers as there are number of cpus
 const initializeWorkers = async () => {
   const numWorkers = config.mediasoup.numWorkers;
 
   for (let i = 0; i < numWorkers; i++) {
-    const mediasoupWorker = await createWorker();
-    workers.push(mediasoupWorker);
-    console.log(`Worker ${i} initialized:`, mediasoupWorker);
+    const { worker, router } = await createWorker();
+    workers.push({ worker, router, activeConnections: 0 });
   }
 };
 
+const createWorker = async (): Promise<{ worker: Worker; router: Router }> => {
+  const worker = await mediasoup.createWorker({
+    logLevel: config.mediasoup.worker.logLevel,
+    logTags: config.mediasoup.worker.logTags,
+    rtcMinPort: config.mediasoup.worker.rtcMinPort,
+    rtcMaxPort: config.mediasoup.worker.rtcMaxPort,
+  });
+
+  worker.on("died", () => {
+    console.error(
+      "mediasoup worker died, exiting in 2 seconds ... [pid:&d]",
+      worker.pid
+    );
+    setTimeout(() => {
+      process.exit(1);
+    }, 2000);
+  });
+
+  const mediaCodecs = config.mediasoup.router.mediaCodes;
+  const router = await worker.createRouter({ mediaCodecs });
+
+  return { worker, router };
+};
+
+// Least connections load balancing
 const getNextWorker = () => {
-  const worker = workers[nextMediasoupWorkerIdx];
-  console.log(`Selected worker index: ${nextMediasoupWorkerIdx}`);
-  const fullWorker = { ...worker, workerIdx: nextMediasoupWorkerIdx };
-  nextMediasoupWorkerIdx = (nextMediasoupWorkerIdx + 1) % workers.length;
-  return fullWorker;
+  let leastConnectionsIdx = 0;
+
+  for (let i = 1; i < workers.length; i++) {
+    console.log(i, workers[i].activeConnections);
+    if (
+      workers[i].activeConnections <
+      workers[leastConnectionsIdx].activeConnections
+    ) {
+      leastConnectionsIdx = i;
+    }
+  }
+
+  const selectedWorker = workers[leastConnectionsIdx];
+  selectedWorker.activeConnections += 1;
+  console.log("selectedWorker: ", leastConnectionsIdx);
+  return { ...selectedWorker, workerIdx: leastConnectionsIdx };
+};
+
+// Decrement active connections count when a connection is closed
+const releaseWorker = (workerIdx: number) => {
+  workers[workerIdx].activeConnections -= 1;
 };
 
 const getWorkerByIdx = (idx: number) => {
   return workers[idx];
 };
 
-export { initializeWorkers, getNextWorker, getWorkerByIdx };
+export { initializeWorkers, getNextWorker, getWorkerByIdx, releaseWorker };
+
+// Round Robin load balancing setup
+// let nextMediasoupWorkerIdx = 0;
+// Get the next worker in the sequence
+//const getNextWorker = () => {
+//  const worker = workers[nextMediasoupWorkerIdx];
+//  const fullWorker = { ...worker, workerIdx: nextMediasoupWorkerIdx };
+//  nextMediasoupWorkerIdx = (nextMediasoupWorkerIdx + 1) % workers.length;
+//  return fullWorker;
+//};

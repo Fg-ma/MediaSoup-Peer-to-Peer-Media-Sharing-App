@@ -2,7 +2,7 @@ import * as mediasoup from "mediasoup-client";
 
 const onRouterCapabilities = async (
   event: {
-    type: "routerCapabilities";
+    type: string;
     rtpCapabilities: mediasoup.types.RtpCapabilities;
   },
   device: React.MutableRefObject<mediasoup.types.Device | undefined>

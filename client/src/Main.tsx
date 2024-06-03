@@ -217,16 +217,20 @@ export default function Main() {
     }
   };
 
+  // Make these states
   useEffect(() => {
-    socket.current.on("connect", () => {
+    console.log("Work");
+    if (table_id.current && username.current) {
       const msg = {
         type: "getRouterRtpCapabilities",
-        table_id: table_id.current,
         username: username.current,
+        table_id: table_id.current,
       };
       socket.current.emit("message", msg);
-    });
+    }
+  }, [table_id.current, username.current]);
 
+  useEffect(() => {
     socket.current.on("message", handleMessage);
 
     // User disconnect

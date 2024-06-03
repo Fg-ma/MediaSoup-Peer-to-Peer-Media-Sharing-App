@@ -25,6 +25,7 @@ import onDeleteProducerTransport from "./lib/onDeleteProducerTransport";
 import onNewProducerCreated from "./lib/onNewProducerCreated";
 import onNewConsumerCreated from "./lib/onNewConsumerCreated";
 import onSendMuteRequest from "./lib/onSendMuteRequest";
+import { releaseWorker } from "./workerManager";
 
 const SocketIOConnection = async (io: SocketIOServer) => {
   io.on("connection", (socket: MediasoupSocket) => {
@@ -73,6 +74,7 @@ const SocketIOConnection = async (io: SocketIOServer) => {
               Object.keys(roomConsumerTransports[socket.table_id]).length ===
                 0))
         ) {
+          releaseWorker(workersMap[socket.table_id]);
           delete workersMap[socket.table_id];
         }
 
@@ -111,7 +113,7 @@ const SocketIOConnection = async (io: SocketIOServer) => {
     socket.on("message", (event: any) => {
       switch (event.type) {
         case "getRouterRtpCapabilities":
-          onGetRouterRtpCapabilities(socket);
+          onGetRouterRtpCapabilities(event, io);
           break;
         case "createProducerTransport":
           onCreateProducerTransport(event, io);

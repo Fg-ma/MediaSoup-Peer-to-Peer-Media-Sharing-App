@@ -3,6 +3,7 @@ import {
   roomProducerTransports,
   workersMap,
 } from "../mediasoupVars";
+import { releaseWorker } from "../workerManager";
 
 const onDeleteProducerTransport = async (event: {
   type: string;
@@ -27,6 +28,7 @@ const onDeleteProducerTransport = async (event: {
         (roomConsumerTransports[event.table_id] &&
           Object.keys(roomConsumerTransports[event.table_id]).length === 0))
     ) {
+      releaseWorker(workersMap[event.table_id]);
       delete workersMap[event.table_id];
     }
   } catch (error) {

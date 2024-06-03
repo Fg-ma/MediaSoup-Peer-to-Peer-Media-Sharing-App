@@ -1,14 +1,29 @@
-import { MediasoupSocket } from "../mediasoupTypes";
-import { getNextWorker } from "../workerManager";
+import { Router } from "mediasoup/node/lib/Router";
+import { Server as SocketIOServer } from "socket.io";
+import { workersMap } from "../mediasoupVars";
+import { getNextWorker, getWorkerByIdx } from "../workerManager";
 
-const onGetRouterRtpCapabilities = (socket: MediasoupSocket) => {
-  // Get the next available worker and router
-  const { router: mediasoupRouter } = getNextWorker();
+const onGetRouterRtpCapabilities = (
+  event: { type: string; username: string; table_id: string },
+  io: SocketIOServer
+) => {
+  // Get the next available worker and router if one doesn't already exist
+  let mediasoupRouter: Router;
+  if (!workersMap[event.table_id]) {
+    const { router, workerIdx } = getNextWorker();
+    workersMap[event.table_id] = workerIdx;
+    mediasoupRouter = router;
+  } else {
+    const { router } = getWorkerByIdx(workersMap[event.table_id]);
+    mediasoupRouter = router;
+  }
 
-  socket.emit("message", {
+  const msg = {
     type: "routerCapabilities",
     rtpCapabilities: mediasoupRouter.rtpCapabilities,
-  });
+  };
+
+  io.to(`${event.table_id}_${event.username}`).emit("message", msg);
 };
 
 export default onGetRouterRtpCapabilities;

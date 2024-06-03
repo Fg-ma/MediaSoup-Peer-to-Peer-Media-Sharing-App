@@ -5,6 +5,7 @@ import {
   roomProducerTransports,
   workersMap,
 } from "../mediasoupVars";
+import { releaseWorker } from "../workerManager";
 
 const onUnsubscribe = (
   event: {
@@ -29,6 +30,7 @@ const onUnsubscribe = (
       (roomConsumerTransports[event.table_id] &&
         Object.keys(roomConsumerTransports[event.table_id]).length === 0))
   ) {
+    releaseWorker(workersMap[event.table_id]);
     delete workersMap[event.table_id];
   }
 
