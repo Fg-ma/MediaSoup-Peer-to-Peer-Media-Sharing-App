@@ -8,7 +8,7 @@ import onProducerTransportCreated from "./lib/onProducerTransportCreated";
 import onConsumerTransportCreated from "./lib/onConsumerTransportCreated";
 import onSubscribed from "./lib/onSubscribed";
 import subscribe from "./subscribe";
-import joinRoom from "./joinRoom";
+import joinTable from "./joinTable";
 import onNewConsumerSubscribed from "./lib/onNewConsumerSubscribed";
 import onNewProducerAvailable from "./lib/onNewProducerAvailable";
 import onNewProducer from "./lib/onNewProducer";
@@ -55,13 +55,13 @@ export default function Main() {
   const mutedAudioRef = useRef(false);
   const [subscribedActive, setSubscribedActive] = useState(false);
   const isSubscribed = useRef(false);
-  const [isInRoom, setIsInRoom] = useState(false);
+  const [isInTable, setIsInTable] = useState(false);
 
   const table_id = useRef("");
   const username = useRef("");
 
-  let socket = useRef<Socket>(io(websocketURL));
-  let device = useRef<mediasoup.Device>();
+  const socket = useRef<Socket>(io(websocketURL));
+  const device = useRef<mediasoup.Device>();
 
   const [bundles, setBundles] = useState<{
     [username: string]: React.JSX.Element;
@@ -217,36 +217,27 @@ export default function Main() {
     }
   };
 
-  // Make these states
-  useEffect(() => {
-    console.log("Work");
-    if (table_id.current && username.current) {
-      const msg = {
-        type: "getRouterRtpCapabilities",
-        username: username.current,
-        table_id: table_id.current,
-      };
-      socket.current.emit("message", msg);
-    }
-  }, [table_id.current, username.current]);
-
   useEffect(() => {
     socket.current.on("message", handleMessage);
 
-    // User disconnect
-    socket.current.on("userDisconnected", (disconnectedUsername) => {
-      const oldBundle = document.getElementById(
-        `${disconnectedUsername}_bundle`
-      );
-      if (oldBundle && remoteVideosContainerRef.current?.contains(oldBundle)) {
-        try {
-          remoteVideosContainerRef.current?.removeChild(oldBundle);
-        } catch {
-          console.error("Failed to remove disconnected bundle");
-          return;
-        }
-      }
+    // Handle user disconnect
+    socket.current.on("userDisconnected", (disconnectedUsername: string) => {
+      setBundles((prev) => {
+        const updatedBundles = { ...prev };
+        delete updatedBundles[disconnectedUsername];
+        return updatedBundles;
+      });
       delete remoteTracksMap.current[disconnectedUsername];
+    });
+
+    // Handle user left table
+    socket.current.on("userLeftTable", (leftUsername: string) => {
+      setBundles((prev) => {
+        const updatedBundles = { ...prev };
+        delete updatedBundles[leftUsername];
+        return updatedBundles;
+      });
+      delete remoteTracksMap.current[leftUsername];
     });
 
     return () => {
@@ -498,35 +489,64 @@ export default function Main() {
         </div>
         <div className='flex justify-center mt-5'>
           <input
-            type='text'
             ref={tableIdRef}
+            id='tableIdyInputField'
+            type='text'
             className='border border-gray-400 px-4 py-2 mr-2'
             placeholder='Enter room name'
           />
           <input
-            type='text'
             ref={usernameRef}
+            id='usernameInputField'
+            type='text'
             className='border border-gray-400 px-4 py-2 mr-2'
             placeholder='Enter username'
           />
           <button
-            onClick={() =>
-              joinRoom(
+            onClick={() => {
+              joinTable(
                 socket,
                 tableIdRef,
                 usernameRef,
                 table_id,
                 username,
-                setIsInRoom
-              )
-            }
+                setIsInTable,
+                userCameraStreams,
+                userCameraCount,
+                userScreenStreams,
+                userScreenCount,
+                userAudioStream,
+                remoteTracksMap,
+                handleDisableEnableBtns,
+                setBundles,
+                consumerTransport,
+                producerTransport,
+                isWebcam,
+                setWebcamActive,
+                isScreen,
+                setScreenActive,
+                isAudio,
+                setAudioActive,
+                setMutedAudio,
+                mutedAudioRef,
+                setSubscribedActive,
+                isSubscribed,
+                device
+              );
+              const msg = {
+                type: "getRouterRtpCapabilities",
+                username: username.current,
+                table_id: table_id.current,
+              };
+              socket.current.emit("message", msg);
+            }}
             className={`${
-              isInRoom
+              isInTable
                 ? "bg-orange-500 hover:bg-orange-700"
                 : "bg-blue-500 hover:bg-blue-700"
             } text-white font-bold py-2 px-4`}
           >
-            {isInRoom ? "Join New Room" : "Join Room"}
+            {isInTable ? "Join New Room" : "Join Room"}
           </button>
         </div>
         <div ref={remoteVideosContainerRef} className='w-full grid grid-cols-3'>

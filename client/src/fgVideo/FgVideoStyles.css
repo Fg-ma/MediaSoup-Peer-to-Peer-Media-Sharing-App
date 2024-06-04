@@ -44,7 +44,8 @@
   --flip-video: "1";
 }
 
-.video-controls-container {
+.video-controls-container,
+.video-navigation-container {
   opacity: 0;
   pointer-events: none;
   transition: opacity 150ms ease-in-out;
@@ -56,11 +57,13 @@
   padding-bottom: 0.75rem;
 }
 
-.video-container.paused .video-controls-container {
+.video-container.paused .video-controls-container,
+.video-container.paused .video-navigation-container {
   opacity: 1;
 }
 
-.video-container.in-video .video-controls-container {
+.video-container.in-video .video-controls-container,
+.video-container.in-video .video-navigation-container {
   opacity: 1;
   transition-delay: 0s;
 }

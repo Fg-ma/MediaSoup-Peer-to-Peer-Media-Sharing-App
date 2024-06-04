@@ -42,7 +42,6 @@ const getNextWorker = () => {
   let leastConnectionsIdx = 0;
 
   for (let i = 1; i < workers.length; i++) {
-    console.log(i, workers[i].activeConnections);
     if (
       workers[i].activeConnections <
       workers[leastConnectionsIdx].activeConnections
@@ -53,7 +52,6 @@ const getNextWorker = () => {
 
   const selectedWorker = workers[leastConnectionsIdx];
   selectedWorker.activeConnections += 1;
-  console.log("selectedWorker: ", leastConnectionsIdx);
   return { ...selectedWorker, workerIdx: leastConnectionsIdx };
 };
 

@@ -3,6 +3,10 @@ const handleKeyUp = (
   shiftPressed: React.MutableRefObject<boolean>,
   controlPressed: React.MutableRefObject<boolean>
 ) => {
+  if (!event.key) {
+    return;
+  }
+
   switch (event.key.toLowerCase()) {
     case "shift":
       shiftPressed.current = false;

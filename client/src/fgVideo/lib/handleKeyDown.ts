@@ -24,10 +24,16 @@ const handleKeyDown = (
   isClosedCaptions: boolean,
   captions: React.MutableRefObject<TextTrack | undefined>
 ) => {
-  if (!videoContainerRef.current?.classList.contains("in-video")) return;
+  if (
+    !event.key ||
+    !videoContainerRef.current?.classList.contains("in-video") ||
+    controlPressed.current ||
+    shiftPressed.current
+  ) {
+    return;
+  }
   const tagName = document.activeElement?.tagName.toLowerCase();
   if (tagName === "input") return;
-  if (controlPressed.current || shiftPressed.current) return;
 
   switch (event.key.toLowerCase()) {
     case "shift":

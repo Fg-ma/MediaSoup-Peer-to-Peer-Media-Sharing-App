@@ -29,7 +29,7 @@ import { releaseWorker } from "./workerManager";
 
 const SocketIOConnection = async (io: SocketIOServer) => {
   io.on("connection", (socket: MediasoupSocket) => {
-    socket.on("joinRoom", (table_id: string, username: string) => {
+    socket.on("joinTable", (table_id: string, username: string) => {
       socket.join(table_id);
       socket.join(`${table_id}_${username}`);
 
@@ -37,12 +37,60 @@ const SocketIOConnection = async (io: SocketIOServer) => {
       socket.username = username;
     });
 
-    socket.on("leaveRoom", (table_id: string, username: string) => {
+    socket.on("leaveTable", (table_id: string, username: string) => {
       socket.leave(table_id);
       socket.leave(`${table_id}_${username}`);
 
       socket.table_id = "";
       socket.username = "";
+
+      if (
+        roomProducerTransports[table_id] &&
+        roomProducerTransports[table_id][username]
+      ) {
+        delete roomProducerTransports[table_id][username];
+      }
+
+      if (
+        roomConsumerTransports[table_id] &&
+        roomConsumerTransports[table_id][username]
+      ) {
+        delete roomConsumerTransports[table_id][username];
+      }
+
+      if (
+        (!roomProducerTransports ||
+          (roomProducerTransports[table_id] &&
+            Object.keys(roomProducerTransports[table_id]).length === 0)) &&
+        (!roomConsumerTransports ||
+          (roomConsumerTransports[table_id] &&
+            Object.keys(roomConsumerTransports[table_id]).length === 0))
+      ) {
+        releaseWorker(workersMap[table_id]);
+        delete workersMap[table_id];
+      }
+
+      if (roomProducers[table_id] && roomProducers[table_id][username]) {
+        delete roomProducers[table_id][username];
+      }
+
+      if (roomConsumers[table_id] && roomConsumers[table_id][username]) {
+        delete roomConsumers[table_id][username];
+      }
+
+      for (const username in roomConsumers[table_id]) {
+        for (const producerUsername in roomConsumers[table_id][username]) {
+          if (
+            producerUsername === username &&
+            roomConsumers[table_id] &&
+            roomConsumers[table_id][username]
+          ) {
+            delete roomConsumers[table_id][username][username];
+          }
+        }
+      }
+
+      io.to(table_id).emit("userLeftTable", username);
     });
 
     socket.on("disconnect", () => {

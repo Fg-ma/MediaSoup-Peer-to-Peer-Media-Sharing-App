@@ -175,15 +175,43 @@ const VolumeIndicator = ({
         svgPointTransformed.x >= bbox.x &&
         svgPointTransformed.x <= bbox.x + bbox.width &&
         svgPointTransformed.y >= Math.min(bbox.y, -20) &&
-        svgPointTransformed.y <= bbox.y + Math.max(bbox.height, 40)
+        svgPointTransformed.y <= bbox.y + Math.max(bbox.height, 20)
       ) {
         handleMute();
+      }
+    };
+
+    const onMouseMove = (event: MouseEvent) => {
+      const bbox = pathRef.current?.getBBox();
+      const svgPoint = svgRef.current?.createSVGPoint();
+      if (!bbox || !svgPoint || muteLock.current) return;
+
+      svgPoint.x = event.clientX;
+      svgPoint.y = event.clientY;
+
+      // Convert client coordinates to SVG coordinates
+      const svgPointTransformed = svgPoint.matrixTransform(
+        svgRef.current?.getScreenCTM()?.inverse()
+      );
+
+      if (
+        svgPointTransformed.x >= bbox.x &&
+        svgPointTransformed.x <= bbox.x + bbox.width &&
+        svgPointTransformed.y >= Math.min(bbox.y, -20) &&
+        svgPointTransformed.y <= bbox.y + Math.max(bbox.height, 20)
+      ) {
+        svgRef.current?.classList.add("cursor-pointer");
+      } else {
+        svgRef.current?.classList.remove("cursor-pointer");
       }
     };
 
     init();
 
     svgRef.current?.addEventListener("click", (event) => onClick(event));
+    svgRef.current?.addEventListener("mousemove", (event) =>
+      onMouseMove(event)
+    );
 
     if (!isUser) {
       leftHandleRef.current?.addEventListener("mousedown", (event) =>
@@ -198,6 +226,10 @@ const VolumeIndicator = ({
 
     return () => {
       svgRef.current?.removeEventListener("click", (event) => onClick(event));
+      svgRef.current?.removeEventListener("mousemove", (event) =>
+        onMouseMove(event)
+      );
+
       if (!isUser) {
         leftHandleRef.current?.addEventListener("mousedown", (event) =>
           startDrag(event, "left")

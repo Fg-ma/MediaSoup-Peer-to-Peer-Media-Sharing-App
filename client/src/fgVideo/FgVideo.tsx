@@ -22,6 +22,7 @@ import handleKeyUp from "./lib/handleKeyUp";
 
 export default function FgVideo({
   username,
+  name,
   table_id,
   socket,
   videoId,
@@ -53,6 +54,7 @@ export default function FgVideo({
   isSkip = true,
   isThumbnail = true,
   isPreview = true,
+  isClose = true,
   audioRef,
   handleVolumeSlider,
   paths,
@@ -62,6 +64,7 @@ export default function FgVideo({
   tracksColorSetter,
 }: {
   username: string;
+  name?: string;
   table_id: string;
   socket?: React.MutableRefObject<Socket>;
   videoId: string;
@@ -93,6 +96,7 @@ export default function FgVideo({
   isSkip?: boolean;
   isThumbnail?: boolean;
   isPreview?: boolean;
+  isClose?: boolean;
   audioRef: React.RefObject<HTMLAudioElement>;
   handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;
   paths: string[][];
@@ -458,6 +462,17 @@ export default function FgVideo({
     }
   }, []);
 
+  const handleCloseVideo = () => {
+    const msg = {
+      type: "removeProducer",
+      table_id: table_id,
+      username: username,
+      producerType: "webcam",
+      producerId: videoId,
+    };
+    socket?.current.emit("message", msg);
+  };
+
   return (
     <div
       ref={videoContainerRef}
@@ -503,6 +518,27 @@ export default function FgVideo({
               </div>
             </div>
           )}
+          <div className='video-navigation-container absolute top-0 w-full h-10 flex items-center justify-center z-20 space-x-2 pl-4 pr-1.5 pt-0.5'>
+            <div className='grow text-lg cursor-pointer'>
+              {name ? name : username}
+            </div>
+            {isClose && (
+              <button
+                onClick={() => handleCloseVideo()}
+                className='flex items-center justify-center w-10 aspect-square'
+              >
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  height='36px'
+                  viewBox='0 -960 960 960'
+                  width='36px'
+                  fill='white'
+                >
+                  <path d='M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z' />
+                </svg>
+              </button>
+            )}
+          </div>
           <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
             <div className='video-controls w-full h-10 flex items-center space-x-2'>
               {isPlayPause && (
