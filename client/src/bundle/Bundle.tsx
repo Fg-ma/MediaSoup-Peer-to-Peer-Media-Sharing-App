@@ -67,6 +67,7 @@ export default function ({
   muteButtonCallback,
   initialVolume = "high",
   onRendered,
+  blurCameraStream,
 }: {
   username: string;
   table_id: string;
@@ -82,6 +83,7 @@ export default function ({
   muteButtonCallback?: () => any;
   initialVolume?: string;
   onRendered?: () => any;
+  blurCameraStream?: (webcamId: string) => Promise<void>;
 }) {
   const {
     userCameraStreams,
@@ -560,6 +562,7 @@ export default function ({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
+            blurCameraStream={blurCameraStream}
           />
         ))}
       {screenStreams &&

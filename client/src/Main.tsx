@@ -31,6 +31,9 @@ export default function Main() {
     userAudioStream,
     remoteTracksMap,
   } = useStreamsContext();
+  const unbluredUserCameraStreams = useRef<{
+    [webcamId: string]: MediaStream;
+  }>({});
   const webcamBtnRef = useRef<HTMLButtonElement>(null);
   const newCameraBtnRef = useRef<HTMLButtonElement>(null);
   const newScreenBtnRef = useRef<HTMLButtonElement>(null);
@@ -217,6 +220,66 @@ export default function Main() {
     }
   };
 
+  const blurCameraStream = async (webcamId: string) => {
+    console.log(webcamId, userCameraStreams.current);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const video = document.createElement("video");
+
+    const stream = userCameraStreams.current[webcamId];
+    video.srcObject = stream;
+    await video.play();
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const outputStream = canvas.captureStream(30);
+    const outputTrack = outputStream.getVideoTracks()[0];
+
+    function drawFrame() {
+      if (video.paused || video.ended) {
+        return;
+      }
+
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.filter = "blur(10px)";
+        ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+      }
+
+      requestAnimationFrame(drawFrame);
+    }
+
+    drawFrame();
+    unbluredUserCameraStreams.current[webcamId] =
+      userCameraStreams.current[webcamId];
+    userCameraStreams.current[webcamId]
+      .getTracks()
+      .forEach((track) => track.stop());
+    console.log(unbluredUserCameraStreams.current[webcamId]);
+    console.log(userCameraStreams.current[webcamId]);
+
+    userCameraStreams.current[webcamId] = new MediaStream([outputTrack]);
+    setRe((prev) => prev + 1);
+    console.log("2", userCameraStreams.current[webcamId]);
+  };
+
+  const [re, setRe] = useState(0);
+
+  const unblurCameraStream = (webcamId: string) => {
+    userCameraStreams.current[webcamId]
+      .getTracks()
+      .forEach((track) => track.stop());
+
+    userCameraStreams.current[webcamId] =
+      unbluredUserCameraStreams.current[webcamId];
+
+    unbluredUserCameraStreams.current[webcamId]
+      .getTracks()
+      .forEach((track) => track.stop());
+    delete unbluredUserCameraStreams.current[webcamId];
+  };
+
   useEffect(() => {
     socket.current.on("message", handleMessage);
 
@@ -273,6 +336,7 @@ export default function Main() {
             }
             isUser={true}
             muteButtonCallback={muteAudio}
+            blurCameraStream={blurCameraStream}
           />
         ),
       }));

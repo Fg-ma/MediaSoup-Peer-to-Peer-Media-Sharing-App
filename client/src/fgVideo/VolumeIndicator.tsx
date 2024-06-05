@@ -6,6 +6,7 @@ const VolumeIndicator = ({
   audioStream,
   audioRef,
   username,
+  name,
   handleMute,
   muteLock,
   localMuted,
@@ -20,10 +21,12 @@ const VolumeIndicator = ({
   volumeColor = "FgPrimary",
   primaryMuteColor = "FgPrimary",
   secondaryMuteColor = "black",
+  muteStyleOption = "smile",
 }: {
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   username: string;
+  name?: string;
   handleMute: () => void;
   muteLock: React.MutableRefObject<boolean>;
   localMuted: React.MutableRefObject<boolean>;
@@ -38,6 +41,7 @@ const VolumeIndicator = ({
   volumeColor?: string;
   primaryMuteColor?: string;
   secondaryMuteColor?: string;
+  muteStyleOption?: "morse" | "smile";
 }) => {
   const shadowColors = {
     black: "rgba(0, 0, 0, 0.8)",
@@ -55,24 +59,35 @@ const VolumeIndicator = ({
   const [movingY, setMovingY] = useState<number[]>(
     Array(numFixedPoints - 1).fill(0)
   );
+  const [fixedY, setFixedY] = useState<number[]>(
+    Array(numFixedPoints - 1).fill(0)
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [leftHandlePosition, setLeftHandlePosition] = useState({ x: 10, y: 0 });
   const [rightHandlePosition, setRightHandlePosition] = useState({
     x: 190,
     y: 0,
   });
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const bellCurveY = useRef<number[]>([]);
+  const sineCurveY = useRef<number[]>([]);
   const fixedPointsX = useRef<number[]>([]);
   const pathRef = useRef<SVGPathElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const leftHandleRef = useRef<SVGRectElement>(null);
   const rightHandleRef = useRef<SVGRectElement>(null);
   const sideDragging = useRef<"left" | "right" | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const patternWidth = 0.18;
   const patternHeight = 0.2;
 
   const springs = useSpring<{ [key: string]: any }>({
     ...Object.fromEntries(movingY.map((y, index) => [`y${index + 1}`, y])),
+    ...Object.fromEntries(fixedY.map((y, index) => [`fixed_y${index + 1}`, y])),
     config: { duration: springDuration },
   });
 
@@ -108,6 +123,27 @@ const VolumeIndicator = ({
 
       return yCoordinates;
     };
+
+    // Sine curve
+    const generateSineWave = (
+      numPoints: number,
+      amplitude: number,
+      frequency: number,
+      phase: number
+    ) => {
+      const yCoordinates = [];
+      const step = Math.PI / (numPoints - 1);
+
+      for (let i = 0; i < numPoints; i++) {
+        const x = i * step;
+        const y = amplitude * Math.sin(frequency * x + phase);
+        yCoordinates.push(y);
+      }
+
+      return yCoordinates;
+    };
+
+    sineCurveY.current = generateSineWave(numFixedPoints * 2 - 3, 1, 1, 0);
 
     bellCurveY.current = generateBellCurve(
       numFixedPoints - 1,
@@ -174,8 +210,8 @@ const VolumeIndicator = ({
       if (
         svgPointTransformed.x >= bbox.x &&
         svgPointTransformed.x <= bbox.x + bbox.width &&
-        svgPointTransformed.y >= Math.min(bbox.y, -20) &&
-        svgPointTransformed.y <= bbox.y + Math.max(bbox.height, 20)
+        svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
+        svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
       ) {
         handleMute();
       }
@@ -197,21 +233,40 @@ const VolumeIndicator = ({
       if (
         svgPointTransformed.x >= bbox.x &&
         svgPointTransformed.x <= bbox.x + bbox.width &&
-        svgPointTransformed.y >= Math.min(bbox.y, -20) &&
-        svgPointTransformed.y <= bbox.y + Math.max(bbox.height, 20)
+        svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
+        svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
       ) {
-        svgRef.current?.classList.add("cursor-pointer");
+        setMousePosition({
+          x: event.clientX,
+          y: event.clientY - 192,
+        });
+
+        if (!svgRef.current?.classList.contains("cursor-pointer")) {
+          svgRef.current?.classList.add("cursor-pointer");
+        }
+
+        if (!timerRef.current) {
+          timerRef.current = setTimeout(() => {
+            setPopupVisible(true);
+          }, 2500);
+        }
       } else {
-        svgRef.current?.classList.remove("cursor-pointer");
+        if (svgRef.current?.classList.contains("cursor-pointer")) {
+          svgRef.current?.classList.remove("cursor-pointer");
+        }
+
+        if (timerRef.current) {
+          setPopupVisible(false);
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+        }
       }
     };
 
     init();
 
     svgRef.current?.addEventListener("click", (event) => onClick(event));
-    svgRef.current?.addEventListener("mousemove", (event) =>
-      onMouseMove(event)
-    );
+    document?.addEventListener("mousemove", (event) => onMouseMove(event));
 
     if (!isUser) {
       leftHandleRef.current?.addEventListener("mousedown", (event) =>
@@ -226,9 +281,7 @@ const VolumeIndicator = ({
 
     return () => {
       svgRef.current?.removeEventListener("click", (event) => onClick(event));
-      svgRef.current?.removeEventListener("mousemove", (event) =>
-        onMouseMove(event)
-      );
+      document.removeEventListener("mousemove", (event) => onMouseMove(event));
 
       if (!isUser) {
         leftHandleRef.current?.addEventListener("mousedown", (event) =>
@@ -314,21 +367,59 @@ const VolumeIndicator = ({
 
   // Function to update the moving points' Y values
   const updateMovingY = (volumeLevel: number) => {
-    const curvedArray = bellCurveY.current.map(
-      (value, index) => value * volumeLevel * 200 * (-1) ** index
-    );
-    setMovingY(curvedArray);
+    let movingYArray;
+    let fixedYArray;
+    if (
+      (!localMuted.current && !muteLock.current) ||
+      muteStyleOption !== "smile"
+    ) {
+      movingYArray = bellCurveY.current.map(
+        (value, index) => value * volumeLevel * 200 * (-1) ** index
+      );
+      fixedYArray = Array(numFixedPoints - 1).fill(0);
+    } else if (muteStyleOption === "smile") {
+      movingYArray = sineCurveY.current
+        .filter((_, index) => index % 2 === 0)
+        .map((value, index) => value * 20);
+      fixedYArray = sineCurveY.current
+        .filter((_, index) => index % 2 === 1)
+        .map((value, index) => value * 20);
+      fixedYArray.push(0);
+    }
+
+    if (movingYArray) {
+      setMovingY(movingYArray);
+    }
+    if (fixedYArray) {
+      setFixedY(fixedYArray);
+    }
   };
 
   // Generate the path data using the fixed and moving points
   const generatePathData = (ySprings: number[]) => {
     const path = [`M0 0`];
     path.push(`Q 10 ${leftHandlePosition.y} 20 0`);
-    for (let i = 1; i < fixedPointsX.current.length; i++) {
-      const xMid =
-        fixedPointsX.current[i - 1] +
-        (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
-      path.push(`Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} 0`);
+    if (
+      (!localMuted.current && !muteLock.current) ||
+      muteStyleOption !== "smile"
+    ) {
+      for (let i = 1; i < fixedPointsX.current.length; i++) {
+        const xMid =
+          fixedPointsX.current[i - 1] +
+          (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
+        path.push(`Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} 0`);
+      }
+    } else if (muteStyleOption === "smile") {
+      for (let i = 1; i < fixedPointsX.current.length; i++) {
+        const xMid =
+          fixedPointsX.current[i - 1] +
+          (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
+        path.push(
+          `Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} ${
+            ySprings[fixedPointsX.current.length + i - 2]
+          }`
+        );
+      }
     }
     path.push(`Q 190 ${rightHandlePosition.y} 200 0`);
 
@@ -385,7 +476,7 @@ const VolumeIndicator = ({
           </mask>
 
           <linearGradient
-            id={`${username}_mute_gradient`}
+            id={`${username}_mute_morse_gradient`}
             x1='0%'
             y1='0%'
             x2='100%'
@@ -734,8 +825,9 @@ const VolumeIndicator = ({
             width={svgRef.current?.clientWidth}
             height={svgRef.current?.clientHeight}
             fill={
-              localMuted.current || muteLock.current
-                ? `url(#${username}_mute_gradient)`
+              (localMuted.current || muteLock.current) &&
+              muteStyleOption === "morse"
+                ? `url(#${username}_mute_morse_gradient)`
                 : `url(#${username}_background_matrix)`
             }
             mask={`url(#${username}_mask)`}
@@ -768,6 +860,14 @@ const VolumeIndicator = ({
           />
         )}
       </svg>
+      {popupVisible && (
+        <div
+          className='w-max h-max absolute shadow-lg px-4 py-2 z-50 rounded-md text-lg font-Josefin'
+          style={{ left: mousePosition.x, top: mousePosition.y }}
+        >
+          {name ? name : username}
+        </div>
+      )}
     </div>
   );
 };

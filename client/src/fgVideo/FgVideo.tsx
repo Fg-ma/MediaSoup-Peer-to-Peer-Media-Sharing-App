@@ -62,6 +62,7 @@ export default function FgVideo({
   isFinishedRef,
   changedWhileNotFinishedRef,
   tracksColorSetter,
+  blurCameraStream,
 }: {
   username: string;
   name?: string;
@@ -107,6 +108,7 @@ export default function FgVideo({
   isFinishedRef: React.MutableRefObject<boolean>;
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   tracksColorSetter: () => void;
+  blurCameraStream?: (webcamId: string) => Promise<void>;
 }) {
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
@@ -570,6 +572,14 @@ export default function FgVideo({
                   </svg>
                 </button>
               )}
+              <button
+                onClick={() => {
+                  if (blurCameraStream) blurCameraStream(videoId);
+                }}
+                className='flex items-center justify-center w-20 bg-red-500 aspect-square'
+              >
+                Blur
+              </button>
               {isVolume && (
                 <VolumeSection
                   isSlider={isSlider}
