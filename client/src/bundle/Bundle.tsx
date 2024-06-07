@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import {
   volumeHigh1a,
@@ -54,7 +55,7 @@ import onAcceptedMuteLock from "./lib/onAcceptedMuteLock";
 import onMuteLockChange from "./lib/onMuteLockChange";
 import onMuteRequest from "./lib/onMuteRequest";
 
-export default function ({
+export default function Bundle({
   username,
   table_id,
   socket,
@@ -67,7 +68,8 @@ export default function ({
   muteButtonCallback,
   initialVolume = "high",
   onRendered,
-  blurCameraStream,
+  device,
+  producerTransport,
 }: {
   username: string;
   table_id: string;
@@ -83,7 +85,10 @@ export default function ({
   muteButtonCallback?: () => any;
   initialVolume?: string;
   onRendered?: () => any;
-  blurCameraStream?: (webcamId: string) => Promise<void>;
+  device?: React.MutableRefObject<mediasoup.types.Device | undefined>;
+  producerTransport?: React.MutableRefObject<
+    mediasoup.types.Transport<mediasoup.types.AppData> | undefined
+  >;
 }) {
   const {
     userCameraStreams,
@@ -91,6 +96,8 @@ export default function ({
     userScreenStreams,
     userScreenCount,
     userAudioStream,
+    userStreamEffects,
+    userStopStreamEffects,
     remoteTracksMap,
   } = useStreamsContext();
   const [cameraStreams, setCameraStreams] = useState<
@@ -534,6 +541,7 @@ export default function ({
         Object.entries(cameraStreams).map(([key, cameraStream]) => (
           <FgVideo
             key={key}
+            type='webcam'
             username={username}
             table_id={table_id}
             socket={socket}
@@ -562,7 +570,11 @@ export default function ({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
-            blurCameraStream={blurCameraStream}
+            userStreamEffects={userStreamEffects}
+            userStopStreamEffects={userStopStreamEffects}
+            device={device}
+            userCameraStreams={userCameraStreams}
+            producerTransport={producerTransport}
           />
         ))}
       {screenStreams &&
@@ -570,6 +582,7 @@ export default function ({
         Object.entries(screenStreams).map(([key, screenStream]) => (
           <FgVideo
             key={key}
+            type='screen'
             username={username}
             table_id={table_id}
             socket={socket}
@@ -598,6 +611,11 @@ export default function ({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
+            userStreamEffects={userStreamEffects}
+            userStopStreamEffects={userStopStreamEffects}
+            device={device}
+            userScreenStreams={userScreenStreams}
+            producerTransport={producerTransport}
           />
         ))}
       {audioStream &&

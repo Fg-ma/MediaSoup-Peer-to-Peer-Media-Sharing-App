@@ -39,24 +39,28 @@ const getBrowserMedia = async (
       : { video: false, audio: true };
 
   try {
-    const stream = await (type === "webcam"
-      ? navigator.mediaDevices.getUserMedia(constraints)
-      : type === "screen"
-      ? navigator.mediaDevices.getDisplayMedia(constraints)
-      : navigator.mediaDevices.getUserMedia(constraints));
+    let stream;
+    if (type === "webcam" || type === "audio") {
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+    } else if (type === "screen") {
+      stream = await navigator.mediaDevices.getDisplayMedia(constraints);
+    } else {
+      throw new Error("Invalid media type");
+    }
+
     return stream;
   } catch (error) {
     handleDisableEnableBtns(false);
     if (
       type === "screen" &&
-      Object.keys(userCameraStreams.current).length === 0
+      Object.keys(userScreenStreams.current).length === 0
     ) {
       isScreen.current = false;
       setScreenActive(false);
     }
     if (
-      type === "camera" &&
-      Object.keys(userScreenStreams.current).length === 0
+      type === "webcam" &&
+      Object.keys(userCameraStreams.current).length === 0
     ) {
       isWebcam.current = false;
       setWebcamActive(false);

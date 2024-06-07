@@ -1,5 +1,6 @@
 import React from "react";
 import * as mediasoup from "mediasoup-client";
+import { EffectTypes } from "../context/StreamsContext";
 
 const onProducerDisconnected = (
   event: {
@@ -38,7 +39,33 @@ const onProducerDisconnected = (
         }
       | undefined
     >
-  >
+  >,
+  userStreamEffects: React.MutableRefObject<{
+    [effectType in EffectTypes]: {
+      webcam?:
+        | {
+            [webcamId: string]: boolean;
+          }
+        | undefined;
+      screen?:
+        | {
+            [screenId: string]: boolean;
+          }
+        | undefined;
+      audio?: boolean | undefined;
+    };
+  }>,
+  userStopStreamEffects: React.MutableRefObject<{
+    [effectType in EffectTypes]: {
+      webcam?: {
+        [webcamId: string]: () => void;
+      };
+      screen?: {
+        [screenId: string]: () => void;
+      };
+      audio?: () => void;
+    };
+  }>
 ) => {
   if (event.producerUsername === username.current) {
     if (event.producerType === "webcam") {
@@ -54,6 +81,48 @@ const onProducerDisconnected = (
     } else if (event.producerType === "audio") {
       userAudioStream.current?.getTracks().forEach((track) => track.stop());
       userAudioStream.current = undefined;
+    }
+
+    for (const effectType in userStopStreamEffects.current) {
+      const typedEffectType =
+        effectType as keyof typeof userStopStreamEffects.current;
+
+      if (
+        (event.producerType === "webcam" || event.producerType === "screen") &&
+        userStopStreamEffects.current[typedEffectType][event.producerType]?.[
+          event.producerId
+        ]
+      ) {
+        userStopStreamEffects.current[typedEffectType][event.producerType]![
+          event.producerId
+        ]();
+      } else if (
+        event.producerType === "audio" &&
+        userStopStreamEffects.current[typedEffectType][event.producerType]
+      ) {
+        userStopStreamEffects.current[typedEffectType][event.producerType]!();
+      }
+    }
+
+    for (const effectType in userStreamEffects.current) {
+      const typedEffectType =
+        effectType as keyof typeof userStreamEffects.current;
+
+      if (
+        (event.producerType === "webcam" || event.producerType === "screen") &&
+        userStreamEffects.current[typedEffectType][event.producerType]?.[
+          event.producerId
+        ]
+      ) {
+        delete userStreamEffects.current[typedEffectType][event.producerType]?.[
+          event.producerId
+        ];
+      } else if (
+        event.producerType === "audio" &&
+        userStreamEffects.current[typedEffectType][event.producerType]
+      ) {
+        delete userStreamEffects.current[typedEffectType][event.producerType];
+      }
     }
 
     if (

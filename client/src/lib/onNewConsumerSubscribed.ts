@@ -11,7 +11,7 @@ const onNewConsumerSubscribed = async (
     data: {
       producerId: string;
       id: string;
-      kind: "audio" | "video" | "audio" | undefined;
+      kind: "audio" | "video" | undefined;
       rtpParameters: mediasoup.types.RtpParameters;
       type: string;
       producerPaused: boolean;
@@ -135,7 +135,6 @@ const onNewConsumerSubscribed = async (
     consumerId: event.consumerId,
     consumerType: event.consumerType,
   };
-
   socket.current.emit("message", message);
 };
 

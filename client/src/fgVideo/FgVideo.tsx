@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
 import VolumeSection from "./VolumeSection";
@@ -19,8 +20,11 @@ import handleScrubbing from "./lib/handleScrubbing";
 import handleTimelineUpdate from "./lib/handleTimelineUpdate";
 import handleKeyDown from "./lib/handleKeyDown";
 import handleKeyUp from "./lib/handleKeyUp";
+import { blur } from "../blur";
+import { EffectTypes } from "src/context/StreamsContext";
 
 export default function FgVideo({
+  type,
   username,
   name,
   table_id,
@@ -62,8 +66,14 @@ export default function FgVideo({
   isFinishedRef,
   changedWhileNotFinishedRef,
   tracksColorSetter,
-  blurCameraStream,
+  userStreamEffects,
+  userStopStreamEffects,
+  device,
+  userCameraStreams,
+  userScreenStreams,
+  producerTransport,
 }: {
+  type?: "webcam" | "screen";
   username: string;
   name?: string;
   table_id: string;
@@ -109,6 +119,42 @@ export default function FgVideo({
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   tracksColorSetter: () => void;
   blurCameraStream?: (webcamId: string) => Promise<void>;
+  userStreamEffects?: React.MutableRefObject<{
+    [effectType in EffectTypes]: {
+      webcam?:
+        | {
+            [webcamId: string]: boolean;
+          }
+        | undefined;
+      screen?:
+        | {
+            [screenId: string]: boolean;
+          }
+        | undefined;
+      audio?: boolean | undefined;
+    };
+  }>;
+  userStopStreamEffects?: React.MutableRefObject<{
+    [effectType in EffectTypes]: {
+      webcam?: {
+        [webcamId: string]: () => void;
+      };
+      screen?: {
+        [screenId: string]: () => void;
+      };
+      audio?: () => void;
+    };
+  }>;
+  device?: React.MutableRefObject<mediasoup.types.Device | undefined>;
+  userCameraStreams?: React.MutableRefObject<{
+    [webcamId: string]: MediaStream;
+  }>;
+  userScreenStreams?: React.MutableRefObject<{
+    [screenId: string]: MediaStream;
+  }>;
+  producerTransport?: React.MutableRefObject<
+    mediasoup.types.Transport<mediasoup.types.AppData> | undefined
+  >;
 }) {
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
@@ -437,32 +483,18 @@ export default function FgVideo({
     };
   }, [videoStream]);
 
-  // Set up event listener to removeProducer if the stream ends
-  useEffect(() => {
-    if (videoStream) {
-      const videoTrack = videoStream.getVideoTracks()[0];
-
-      // Listen for the 'ended' eveont on the video track
-      const handleEnded = () => {
-        if (socket) {
-          const msg = {
-            type: "removeProducer",
-            table_id: table_id,
-            username: username,
-            producerType: "screen",
-            producerId: videoId,
-          };
-          socket.current.emit("message", msg);
-        }
-      };
-
-      videoTrack.onended = handleEnded;
-
-      return () => {
-        videoTrack.onended = null;
-      };
-    }
-  }, []);
+  const handleBlur = () => {
+    blur(
+      type,
+      userCameraStreams,
+      userScreenStreams,
+      videoId,
+      userStreamEffects,
+      userStopStreamEffects,
+      device,
+      producerTransport
+    );
+  };
 
   const handleCloseVideo = () => {
     const msg = {
@@ -573,9 +605,7 @@ export default function FgVideo({
                 </button>
               )}
               <button
-                onClick={() => {
-                  if (blurCameraStream) blurCameraStream(videoId);
-                }}
+                onClick={handleBlur}
                 className='flex items-center justify-center w-20 bg-red-500 aspect-square'
               >
                 Blur

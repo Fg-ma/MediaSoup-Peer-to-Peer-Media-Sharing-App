@@ -2,6 +2,7 @@ import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import getBrowserMedia from "../getBrowserMedia";
+import { handleBlur } from "../blur";
 
 const onProducerTransportCreated = async (
   event: {
@@ -72,22 +73,42 @@ const onProducerTransportCreated = async (
   producerTransport.current.on("produce", async (params, callback, errback) => {
     const { kind, rtpParameters, appData } = params;
 
-    const msg = {
-      type: "createNewProducer",
-      producerType: appData.producerType,
-      transportId: producerTransport.current?.id,
-      kind,
-      rtpParameters,
-      table_id: table_id.current,
-      username: username.current,
-      producerId:
-        appData.producerType === "webcam"
-          ? `${username.current}_camera_stream_${userCameraCount.current}`
-          : appData.producerType === "screen"
-          ? `${username.current}_screen_stream_${userScreenCount.current}`
-          : undefined,
-    };
+    let msg;
+    if (
+      appData.producerDirection &&
+      appData.producerDirection === "swap" &&
+      device.current
+    ) {
+      msg = {
+        type: "swapProducer",
+        producerType: appData.producerType,
+        transportId: producerTransport.current?.id,
+        kind,
+        rtpParameters,
+        table_id: table_id.current,
+        username: username.current,
+        producerId: appData.producerId,
+      };
+    } else {
+      msg = {
+        type: "createNewProducer",
+        producerType: appData.producerType,
+        transportId: producerTransport.current?.id,
+        kind,
+        rtpParameters,
+        table_id: table_id.current,
+        username: username.current,
+        producerId:
+          appData.producerType === "webcam"
+            ? `${username.current}_camera_stream_${userCameraCount.current}`
+            : appData.producerType === "screen"
+            ? `${username.current}_screen_stream_${userScreenCount.current}`
+            : undefined,
+      };
+    }
+
     socket.current.emit("message", msg);
+
     socket.current.once("newProducerCallback", (res: { id: string }) => {
       callback(res);
     });
@@ -122,6 +143,7 @@ const onProducerTransportCreated = async (
       ) {
         return;
       }
+
       const cameraBrowserMedia = await getBrowserMedia(
         "webcam",
         device,
@@ -138,17 +160,24 @@ const onProducerTransportCreated = async (
         userCameraStreams.current[
           `${username.current}_camera_stream_${userCameraCount.current}`
         ] = cameraBrowserMedia;
-        const cameraTrack =
+
+        const track =
           userCameraStreams.current[
             `${username.current}_camera_stream_${userCameraCount.current}`
           ].getVideoTracks()[0];
-        const cameraParams = {
-          track: cameraTrack,
+        const params = {
+          track: track,
           appData: {
             producerType: "webcam",
           },
         };
-        await producerTransport.current?.produce(cameraParams);
+
+        try {
+          await producerTransport.current?.produce(params);
+        } catch {
+          console.error("Camera new transport failed to produce");
+          return;
+        }
       } else {
         producerTransport.current = undefined;
         userCameraCount.current = userCameraCount.current - 1;
@@ -185,17 +214,24 @@ const onProducerTransportCreated = async (
         userScreenStreams.current[
           `${username.current}_screen_stream_${userScreenCount.current}`
         ] = screenBrowserMedia;
-        const screenTrack =
+
+        const track =
           userScreenStreams.current[
             `${username.current}_screen_stream_${userScreenCount.current}`
           ].getVideoTracks()[0];
-        const screenParams = {
-          track: screenTrack,
+        const params = {
+          track: track,
           appData: {
             producerType: "screen",
           },
         };
-        await producerTransport.current?.produce(screenParams);
+
+        try {
+          await producerTransport.current?.produce(params);
+        } catch {
+          console.error("Screen new transport failed to produce");
+          return;
+        }
       } else {
         producerTransport.current = undefined;
         userScreenCount.current = userScreenCount.current - 1;

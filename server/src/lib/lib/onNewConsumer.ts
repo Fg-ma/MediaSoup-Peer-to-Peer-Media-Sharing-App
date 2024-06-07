@@ -20,7 +20,7 @@ const onNewConsumer = async (
   },
   io: SocketIOServer
 ) => {
-  // Get the next available worker and router
+  // Get the worker and router by idx
   const { router: mediasoupRouter } = getWorkerByIdx(
     workersMap[event.table_id]
   );
@@ -50,17 +50,6 @@ const onNewConsumer = async (
 
   if (!producer) {
     console.error(`No producer found`);
-    return;
-  }
-
-  // Check if consumer transport can consume from this producer
-  if (
-    !mediasoupRouter.canConsume({
-      producerId: producer.id,
-      rtpCapabilities: event.rtpCapabilities,
-    })
-  ) {
-    console.error(`Cannot consume from producer ${producer.id}`);
     return;
   }
 

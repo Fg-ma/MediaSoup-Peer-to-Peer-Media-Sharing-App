@@ -2,6 +2,7 @@ import React from "react";
 import { Socket } from "socket.io-client";
 import * as mediasoup from "mediasoup-client";
 import getBrowserMedia from "../getBrowserMedia";
+import { handleBlur } from "../blur";
 
 const onNewProducer = async (
   event: {
@@ -21,7 +22,6 @@ const onNewProducer = async (
   }>,
   userScreenCount: React.MutableRefObject<number>,
   userAudioStream: React.MutableRefObject<MediaStream | undefined>,
-
   isWebcam: React.MutableRefObject<boolean>,
   isScreen: React.MutableRefObject<boolean>,
   handleDisableEnableBtns: (disabled: boolean) => void,
@@ -67,6 +67,7 @@ const onNewProducer = async (
     userCameraStreams.current[
       `${username.current}_camera_stream_${userCameraCount.current}`
     ] = cameraBrowserMedia;
+
     const track =
       userCameraStreams.current[
         `${username.current}_camera_stream_${userCameraCount.current}`
@@ -120,6 +121,7 @@ const onNewProducer = async (
     userScreenStreams.current[
       `${username.current}_screen_stream_${userScreenCount.current}`
     ] = screenBrowserMedia;
+
     const track =
       userScreenStreams.current[
         `${username.current}_screen_stream_${userScreenCount.current}`

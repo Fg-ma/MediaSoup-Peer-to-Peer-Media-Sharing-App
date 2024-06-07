@@ -1,5 +1,7 @@
 import React, { ReactNode, createContext, useContext, useRef } from "react";
 
+export type EffectTypes = "blur";
+
 export interface StreamsContextProviderProps {
   children: ReactNode;
 }
@@ -14,6 +16,28 @@ export interface StreamsContextType {
   }>;
   userScreenCount: React.MutableRefObject<number>;
   userAudioStream: React.MutableRefObject<MediaStream | undefined>;
+  userStreamEffects: React.MutableRefObject<{
+    [effectType in EffectTypes]: {
+      webcam?: {
+        [webcamId: string]: boolean;
+      };
+      screen?: {
+        [screenId: string]: boolean;
+      };
+      audio?: boolean;
+    };
+  }>;
+  userStopStreamEffects: React.MutableRefObject<{
+    [effectType in EffectTypes]: {
+      webcam?: {
+        [webcamId: string]: () => void;
+      };
+      screen?: {
+        [screenId: string]: () => void;
+      };
+      audio?: () => void;
+    };
+  }>;
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       webcam?:
@@ -46,11 +70,35 @@ export const useStreamsContext = () => {
 export function StreamsContextProvider({
   children,
 }: StreamsContextProviderProps) {
-  const userCameraStreams = useRef<{ [webcamId: string]: MediaStream }>({});
+  const userCameraStreams = useRef<{
+    [webcamId: string]: MediaStream;
+  }>({});
   const userCameraCount = useRef(0);
   const userScreenStreams = useRef<{ [screenId: string]: MediaStream }>({});
   const userScreenCount = useRef(0);
   const userAudioStream = useRef<MediaStream>();
+  const userStreamEffects = useRef<{
+    [effectType in EffectTypes]: {
+      webcam?: {
+        [webcamId: string]: boolean;
+      };
+      screen?: {
+        [screenId: string]: boolean;
+      };
+      audio?: boolean;
+    };
+  }>({ blur: { webcam: {}, screen: {} } });
+  const userStopStreamEffects = useRef<{
+    [effectType in EffectTypes]: {
+      webcam?: {
+        [webcamId: string]: () => void;
+      };
+      screen?: {
+        [screenId: string]: () => void;
+      };
+      audio?: () => void;
+    };
+  }>({ blur: { webcam: {}, screen: {} } });
   const remoteTracksMap = useRef<{
     [username: string]: {
       webcam?: { [webcamId: string]: MediaStreamTrack };
@@ -67,6 +115,8 @@ export function StreamsContextProvider({
         userScreenStreams,
         userScreenCount,
         userAudioStream,
+        userStreamEffects,
+        userStopStreamEffects,
         remoteTracksMap,
       }}
     >

@@ -20,6 +20,7 @@ const onNewProducerAvailable = (
     device.current
   ) {
     const { rtpCapabilities } = device.current;
+
     const msg = {
       type: "newConsumer",
       consumerType: event.producerType,

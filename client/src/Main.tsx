@@ -19,6 +19,8 @@ import publishNewCamera from "./publishNewCamera";
 import publishNewScreen from "./publishNewScreen";
 import { useStreamsContext } from "./context/StreamsContext";
 import Bundle from "./bundle/Bundle";
+import onSwapedProducer from "./lib/onSwapedProducer";
+import onSwapedConsumer from "./lib/onSwapedConsumer";
 
 const websocketURL = "http://localhost:8000";
 
@@ -29,11 +31,10 @@ export default function Main() {
     userScreenStreams,
     userScreenCount,
     userAudioStream,
+    userStreamEffects,
+    userStopStreamEffects,
     remoteTracksMap,
   } = useStreamsContext();
-  const unbluredUserCameraStreams = useRef<{
-    [webcamId: string]: MediaStream;
-  }>({});
   const webcamBtnRef = useRef<HTMLButtonElement>(null);
   const newCameraBtnRef = useRef<HTMLButtonElement>(null);
   const newScreenBtnRef = useRef<HTMLButtonElement>(null);
@@ -48,17 +49,18 @@ export default function Main() {
     useRef<mediasoup.types.Transport<mediasoup.types.AppData>>();
   const producerTransport =
     useRef<mediasoup.types.Transport<mediasoup.types.AppData>>();
+  const [mutedAudio, setMutedAudio] = useState(false);
+  const mutedAudioRef = useRef(false);
+  const [subscribedActive, setSubscribedActive] = useState(false);
+  const isSubscribed = useRef(false);
+  const [isInTable, setIsInTable] = useState(false);
+
   const isWebcam = useRef(false);
   const [webcamActive, setWebcamActive] = useState(false);
   const isScreen = useRef(false);
   const [screenActive, setScreenActive] = useState(false);
   const isAudio = useRef(false);
   const [audioActive, setAudioActive] = useState(false);
-  const [mutedAudio, setMutedAudio] = useState(false);
-  const mutedAudioRef = useRef(false);
-  const [subscribedActive, setSubscribedActive] = useState(false);
-  const isSubscribed = useRef(false);
-  const [isInTable, setIsInTable] = useState(false);
 
   const table_id = useRef("");
   const username = useRef("");
@@ -209,75 +211,39 @@ export default function Main() {
           setWebcamActive,
           isScreen,
           setScreenActive,
-          setBundles
+          setBundles,
+          userStreamEffects,
+          userStopStreamEffects
         );
         break;
       case "requestedMuteLock":
         onRequestedMuteLock(event, socket, username, table_id, mutedAudioRef);
         break;
+      case "swapedProducer":
+        onSwapedProducer(
+          event,
+          socket,
+          device,
+          table_id,
+          username,
+          isSubscribed
+        );
+        break;
+      case "swapedConsumer":
+        onSwapedConsumer(
+          event,
+          socket,
+          device,
+          table_id,
+          username,
+          isSubscribed,
+          remoteTracksMap,
+          consumerTransport
+        );
+        break;
       default:
         break;
     }
-  };
-
-  const blurCameraStream = async (webcamId: string) => {
-    console.log(webcamId, userCameraStreams.current);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const video = document.createElement("video");
-
-    const stream = userCameraStreams.current[webcamId];
-    video.srcObject = stream;
-    await video.play();
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const outputStream = canvas.captureStream(30);
-    const outputTrack = outputStream.getVideoTracks()[0];
-
-    function drawFrame() {
-      if (video.paused || video.ended) {
-        return;
-      }
-
-      if (ctx) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        ctx.filter = "blur(10px)";
-        ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
-      }
-
-      requestAnimationFrame(drawFrame);
-    }
-
-    drawFrame();
-    unbluredUserCameraStreams.current[webcamId] =
-      userCameraStreams.current[webcamId];
-    userCameraStreams.current[webcamId]
-      .getTracks()
-      .forEach((track) => track.stop());
-    console.log(unbluredUserCameraStreams.current[webcamId]);
-    console.log(userCameraStreams.current[webcamId]);
-
-    userCameraStreams.current[webcamId] = new MediaStream([outputTrack]);
-    setRe((prev) => prev + 1);
-    console.log("2", userCameraStreams.current[webcamId]);
-  };
-
-  const [re, setRe] = useState(0);
-
-  const unblurCameraStream = (webcamId: string) => {
-    userCameraStreams.current[webcamId]
-      .getTracks()
-      .forEach((track) => track.stop());
-
-    userCameraStreams.current[webcamId] =
-      unbluredUserCameraStreams.current[webcamId];
-
-    unbluredUserCameraStreams.current[webcamId]
-      .getTracks()
-      .forEach((track) => track.stop());
-    delete unbluredUserCameraStreams.current[webcamId];
   };
 
   useEffect(() => {
@@ -336,7 +302,8 @@ export default function Main() {
             }
             isUser={true}
             muteButtonCallback={muteAudio}
-            blurCameraStream={blurCameraStream}
+            device={device}
+            producerTransport={producerTransport}
           />
         ),
       }));
@@ -381,6 +348,7 @@ export default function Main() {
 
             socket.current.emit("message", msg);
           }}
+          producerTransport={producerTransport}
         />
       ),
     }));
