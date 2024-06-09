@@ -10,8 +10,14 @@ const publishScreen = (
   table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   userScreenCount: React.MutableRefObject<number>,
-  userScreenStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>
 ) => {
   if (!table_id.current || !username.current) {
@@ -39,7 +45,7 @@ const publishScreen = (
     for (let i = userScreenCount.current; i >= 0; i--) {
       const streamKey = `${username.current}_screen_stream_${i}`;
 
-      if (streamKey in userScreenStreams.current) {
+      if (streamKey in userStreams.current.screen) {
         const msg = {
           type: "removeProducer",
           table_id: table_id.current,

@@ -16,7 +16,15 @@ export interface StreamsContextType {
     };
     audio: MediaStream | undefined;
   }>;
-
+  userUneffectedStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
+  }>;
   userCameraCount: React.MutableRefObject<number>;
   userScreenCount: React.MutableRefObject<number>;
   userStreamEffects: React.MutableRefObject<{
@@ -29,15 +37,6 @@ export interface StreamsContextType {
       };
       audio?: { active: boolean; stopFunction: () => void };
     };
-  }>;
-  userUneffectedStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
-    };
-    screen: {
-      [screenId: string]: MediaStream;
-    };
-    audio: MediaStream | undefined;
   }>;
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
@@ -78,6 +77,13 @@ export function StreamsContextProvider({
     screen: { [screenId: string]: MediaStream };
     audio: MediaStream | undefined;
   }>({ webcam: {}, screen: {}, audio: undefined });
+  const userUneffectedStreams = useRef<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: { [screenId: string]: MediaStream };
+    audio: MediaStream | undefined;
+  }>({ webcam: {}, screen: {}, audio: undefined });
   const userCameraCount = useRef(0);
   const userScreenCount = useRef(0);
   const userStreamEffects = useRef<{
@@ -91,13 +97,6 @@ export function StreamsContextProvider({
       audio?: { active: boolean; stopFunction: () => void };
     };
   }>({ blur: { webcam: {}, screen: {} } });
-  const userUneffectedStreams = useRef<{
-    webcam: {
-      [webcamId: string]: MediaStream;
-    };
-    screen: { [screenId: string]: MediaStream };
-    audio: MediaStream | undefined;
-  }>({ webcam: {}, screen: {}, audio: undefined });
   const remoteTracksMap = useRef<{
     [username: string]: {
       webcam?: { [webcamId: string]: MediaStreamTrack };
@@ -110,10 +109,10 @@ export function StreamsContextProvider({
     <StreamsContext.Provider
       value={{
         userStreams,
+        userUneffectedStreams,
         userCameraCount,
         userScreenCount,
         userStreamEffects,
-        userUneffectedStreams,
         remoteTracksMap,
       }}
     >

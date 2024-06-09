@@ -2,7 +2,6 @@ import React from "react";
 import { Socket } from "socket.io-client";
 import * as mediasoup from "mediasoup-client";
 import getBrowserMedia from "../getBrowserMedia";
-import { handleBlur } from "../fgVideo/blur";
 
 const onNewProducer = async (
   event: {
@@ -13,15 +12,17 @@ const onNewProducer = async (
   username: React.MutableRefObject<string>,
   table_id: React.MutableRefObject<string>,
   socket: React.MutableRefObject<Socket>,
-  userCameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>,
   userCameraCount: React.MutableRefObject<number>,
-  userScreenStreams: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
-  }>,
   userScreenCount: React.MutableRefObject<number>,
-  userAudioStream: React.MutableRefObject<MediaStream | undefined>,
   isWebcam: React.MutableRefObject<boolean>,
   isScreen: React.MutableRefObject<boolean>,
   handleDisableEnableBtns: (disabled: boolean) => void,
@@ -31,9 +32,11 @@ const onNewProducer = async (
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  let producerId: string | undefined;
   if (event.producerType === "webcam") {
+    producerId = `${username.current}_camera_stream_${userCameraCount.current}`;
     if (
-      userCameraStreams.current[
+      userStreams.current.webcam[
         `${username.current}_camera_stream_${userCameraCount.current}`
       ]
     ) {
@@ -52,8 +55,7 @@ const onNewProducer = async (
       setScreenActive,
       isWebcam,
       setWebcamActive,
-      userCameraStreams,
-      userScreenStreams
+      userStreams
     );
 
     if (!cameraBrowserMedia) {
@@ -64,12 +66,12 @@ const onNewProducer = async (
       return;
     }
 
-    userCameraStreams.current[
+    userStreams.current.webcam[
       `${username.current}_camera_stream_${userCameraCount.current}`
     ] = cameraBrowserMedia;
 
     const track =
-      userCameraStreams.current[
+      userStreams.current.webcam[
         `${username.current}_camera_stream_${userCameraCount.current}`
       ].getVideoTracks()[0];
     const params = {
@@ -86,8 +88,9 @@ const onNewProducer = async (
       return;
     }
   } else if (event.producerType === "screen") {
+    producerId = `${username.current}_screen_stream_${userCameraCount.current}`;
     if (
-      userScreenStreams.current[
+      userStreams.current.screen[
         `${username.current}_screen_stream_${userScreenCount.current}`
       ]
     ) {
@@ -106,8 +109,7 @@ const onNewProducer = async (
       setScreenActive,
       isWebcam,
       setWebcamActive,
-      userCameraStreams,
-      userScreenStreams
+      userStreams
     );
 
     if (!screenBrowserMedia) {
@@ -118,12 +120,12 @@ const onNewProducer = async (
       return;
     }
 
-    userScreenStreams.current[
+    userStreams.current.screen[
       `${username.current}_screen_stream_${userScreenCount.current}`
     ] = screenBrowserMedia;
 
     const track =
-      userScreenStreams.current[
+      userStreams.current.screen[
         `${username.current}_screen_stream_${userScreenCount.current}`
       ].getVideoTracks()[0];
     const params = {
@@ -140,7 +142,7 @@ const onNewProducer = async (
       return;
     }
   } else if (event.producerType === "audio") {
-    if (userAudioStream.current) {
+    if (userStreams.current.audio) {
       // Reenable buttons
       handleDisableEnableBtns(false);
 
@@ -148,7 +150,7 @@ const onNewProducer = async (
       return;
     }
 
-    userAudioStream.current = await getBrowserMedia(
+    userStreams.current.audio = await getBrowserMedia(
       event.producerType,
       device,
       handleDisableEnableBtns,
@@ -156,11 +158,10 @@ const onNewProducer = async (
       setScreenActive,
       isWebcam,
       setWebcamActive,
-      userCameraStreams,
-      userScreenStreams
+      userStreams
     );
 
-    if (!userAudioStream.current) {
+    if (!userStreams.current.audio) {
       // Reenable buttons
       handleDisableEnableBtns(false);
 
@@ -168,7 +169,7 @@ const onNewProducer = async (
       return;
     }
 
-    const track = userAudioStream.current.getAudioTracks()[0];
+    const track = userStreams.current.audio.getAudioTracks()[0];
     const params = {
       track: track,
       appData: {
@@ -192,6 +193,7 @@ const onNewProducer = async (
     username: username.current,
     table_id: table_id.current,
     producerType: event.producerType,
+    producerId: producerId,
   };
 
   socket.current.emit("message", msg);

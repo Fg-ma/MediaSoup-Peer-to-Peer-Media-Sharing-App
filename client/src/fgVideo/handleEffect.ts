@@ -1,9 +1,9 @@
 import * as mediasoup from "mediasoup-client";
 import { EffectTypes } from "src/context/StreamsContext";
-import { handleBlur } from "./blur";
+import handleBlur from "./blur";
 
 const handleEffect = async (
-  effect: "blur",
+  effect: EffectTypes,
   type: "webcam" | "screen" | "audio",
   id: string,
   userStreams: React.MutableRefObject<{
@@ -186,29 +186,41 @@ const handleEffect = async (
       userStreams.current[type][id] = new MediaStream([finalTrack]);
     } else if (userUneffectedStreams.current[type][id]) {
       userStreams.current[type][id] = userUneffectedStreams.current[type][id];
+      delete userUneffectedStreams.current[type][id];
     }
   } else if (type === "audio") {
     if (finalTrack) {
       userStreams.current[type] = new MediaStream([finalTrack]);
     } else if (userUneffectedStreams.current[type]) {
       userStreams.current[type] = userUneffectedStreams.current[type];
+      delete userUneffectedStreams.current[type];
     }
   }
 
-  const params = {
-    track: finalTrack,
-    appData: {
-      producerType: type,
-      producerDirection: "swap",
-      producerId: id,
-    },
-  };
+  finalTrack = finalTrack
+    ? finalTrack
+    : type === "webcam" || type === "screen"
+    ? userStreams.current[type][id].getTracks()[0]
+    : type === "audio"
+    ? userStreams.current[type]?.getTracks()[0]
+    : undefined;
 
-  try {
-    await producerTransport.current.produce(params);
-  } catch (error) {
-    console.error("Transport failed to produce: ", error);
-    return;
+  if (finalTrack) {
+    const params = {
+      track: finalTrack,
+      appData: {
+        producerType: type,
+        producerDirection: "swap",
+        producerId: id,
+      },
+    };
+
+    try {
+      await producerTransport.current.produce(params);
+    } catch (error) {
+      console.error("Transport failed to produce: ", error);
+      return;
+    }
   }
 };
 

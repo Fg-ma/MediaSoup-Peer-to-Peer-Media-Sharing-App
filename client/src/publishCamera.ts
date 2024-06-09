@@ -10,8 +10,14 @@ const publishCamera = (
   table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   userCameraCount: React.MutableRefObject<number>,
-  userCameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>
 ) => {
   if (!table_id.current || !username.current) {
@@ -40,7 +46,7 @@ const publishCamera = (
     for (let i = userCameraCount.current; i >= 0; i--) {
       const streamKey = `${username.current}_camera_stream_${i}`;
 
-      if (streamKey in userCameraStreams.current) {
+      if (streamKey in userStreams.current.webcam) {
         const msg = {
           type: "removeProducer",
           table_id: table_id.current,

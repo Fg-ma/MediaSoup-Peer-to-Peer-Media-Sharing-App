@@ -2,7 +2,6 @@ import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import getBrowserMedia from "../getBrowserMedia";
-import { handleBlur } from "../fgVideo/blur";
 
 const onProducerTransportCreated = async (
   event: {
@@ -19,15 +18,17 @@ const onProducerTransportCreated = async (
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
-  userCameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>,
   userCameraCount: React.MutableRefObject<number>,
-  userScreenStreams: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
-  }>,
   userScreenCount: React.MutableRefObject<number>,
-  userAudioStream: React.MutableRefObject<MediaStream | undefined>,
   isWebcam: React.MutableRefObject<boolean>,
   isScreen: React.MutableRefObject<boolean>,
   isAudio: React.MutableRefObject<boolean>,
@@ -69,7 +70,7 @@ const onProducerTransportCreated = async (
     }
   );
 
-  // begin transport on producer
+  // Begin transport on producer
   producerTransport.current.on("produce", async (params, callback, errback) => {
     const { kind, rtpParameters, appData } = params;
 
@@ -137,7 +138,7 @@ const onProducerTransportCreated = async (
   try {
     if (isWebcam.current) {
       if (
-        userCameraStreams.current[
+        userStreams.current.webcam[
           `${username.current}_camera_stream_${userCameraCount.current}`
         ]
       ) {
@@ -152,17 +153,16 @@ const onProducerTransportCreated = async (
         setScreenActive,
         isWebcam,
         setWebcamActive,
-        userCameraStreams,
-        userScreenStreams
+        userStreams
       );
 
       if (cameraBrowserMedia) {
-        userCameraStreams.current[
+        userStreams.current.webcam[
           `${username.current}_camera_stream_${userCameraCount.current}`
         ] = cameraBrowserMedia;
 
         const track =
-          userCameraStreams.current[
+          userStreams.current.webcam[
             `${username.current}_camera_stream_${userCameraCount.current}`
           ].getVideoTracks()[0];
         const params = {
@@ -191,7 +191,7 @@ const onProducerTransportCreated = async (
     }
     if (isScreen.current) {
       if (
-        userScreenStreams.current[
+        userStreams.current.screen[
           `${username.current}_screen_stream_${userScreenCount.current}`
         ]
       ) {
@@ -206,17 +206,16 @@ const onProducerTransportCreated = async (
         setScreenActive,
         isWebcam,
         setWebcamActive,
-        userCameraStreams,
-        userScreenStreams
+        userStreams
       );
 
       if (screenBrowserMedia) {
-        userScreenStreams.current[
+        userStreams.current.screen[
           `${username.current}_screen_stream_${userScreenCount.current}`
         ] = screenBrowserMedia;
 
         const track =
-          userScreenStreams.current[
+          userStreams.current.screen[
             `${username.current}_screen_stream_${userScreenCount.current}`
           ].getVideoTracks()[0];
         const params = {
@@ -244,12 +243,12 @@ const onProducerTransportCreated = async (
       }
     }
     if (isAudio.current) {
-      if (userAudioStream.current) {
+      if (userStreams.current.audio) {
         console.error("Already existing audio stream for: ", username.current);
         return;
       }
 
-      userAudioStream.current = await getBrowserMedia(
+      userStreams.current.audio = await getBrowserMedia(
         "audio",
         device,
         handleDisableEnableBtns,
@@ -257,12 +256,11 @@ const onProducerTransportCreated = async (
         setScreenActive,
         isWebcam,
         setWebcamActive,
-        userCameraStreams,
-        userScreenStreams
+        userStreams
       );
 
-      if (userAudioStream.current) {
-        const audioTrack = userAudioStream.current.getAudioTracks()[0];
+      if (userStreams.current.audio) {
+        const audioTrack = userStreams.current.audio.getAudioTracks()[0];
         const audioParams = {
           track: audioTrack,
           appData: {

@@ -1,15 +1,17 @@
 import * as mediasoup from "mediasoup-client";
 
 const leaveTable = (
-  userCameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>,
   userCameraCount: React.MutableRefObject<number>,
-  userScreenStreams: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
-  }>,
   userScreenCount: React.MutableRefObject<number>,
-  userAudioStream: React.MutableRefObject<MediaStream | undefined>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       webcam?:
@@ -53,24 +55,24 @@ const leaveTable = (
   setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>
 ) => {
-  for (const webcamId in userCameraStreams.current) {
-    userCameraStreams.current[webcamId]
+  for (const webcamId in userStreams.current.webcam) {
+    userStreams.current.webcam[webcamId]
       ?.getTracks()
       .forEach((track) => track.stop());
-    delete userCameraStreams.current[webcamId];
+    delete userStreams.current.webcam[webcamId];
   }
   userCameraCount.current = 0;
 
-  for (const webcamId in userScreenStreams.current) {
-    userScreenStreams.current[webcamId]
+  for (const screenId in userStreams.current.screen) {
+    userStreams.current.screen[screenId]
       ?.getTracks()
       .forEach((track) => track.stop());
-    delete userScreenStreams.current[webcamId];
+    delete userStreams.current.screen[screenId];
   }
   userScreenCount.current = 0;
 
-  userAudioStream.current?.getTracks().forEach((track) => track.stop());
-  userAudioStream.current = undefined;
+  userStreams.current.audio?.getTracks().forEach((track) => track.stop());
+  userStreams.current.audio = undefined;
 
   remoteTracksMap.current = {};
 

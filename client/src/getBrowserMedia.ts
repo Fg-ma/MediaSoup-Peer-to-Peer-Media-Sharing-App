@@ -8,11 +8,14 @@ const getBrowserMedia = async (
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   isWebcam: React.MutableRefObject<boolean>,
   setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
-  userCameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
-  }>,
-  userScreenStreams: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>
 ) => {
   if (
@@ -52,18 +55,18 @@ const getBrowserMedia = async (
   } catch (error) {
     handleDisableEnableBtns(false);
     if (
-      type === "screen" &&
-      Object.keys(userScreenStreams.current).length === 0
-    ) {
-      isScreen.current = false;
-      setScreenActive(false);
-    }
-    if (
       type === "webcam" &&
-      Object.keys(userCameraStreams.current).length === 0
+      Object.keys(userStreams.current.webcam).length === 0
     ) {
       isWebcam.current = false;
       setWebcamActive(false);
+    }
+    if (
+      type === "screen" &&
+      Object.keys(userStreams.current.screen).length === 0
+    ) {
+      isScreen.current = false;
+      setScreenActive(false);
     }
     console.error("Error accessing media devices:", error);
     return;

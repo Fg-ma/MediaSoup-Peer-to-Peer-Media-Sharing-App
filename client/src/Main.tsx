@@ -26,13 +26,11 @@ const websocketURL = "http://localhost:8000";
 
 export default function Main() {
   const {
-    userCameraStreams,
+    userStreams,
+    userUneffectedStreams,
     userCameraCount,
-    userScreenStreams,
     userScreenCount,
-    userAudioStream,
     userStreamEffects,
-    userStopStreamEffects,
     remoteTracksMap,
   } = useStreamsContext();
   const webcamBtnRef = useRef<HTMLButtonElement>(null);
@@ -73,8 +71,8 @@ export default function Main() {
   }>();
 
   const muteAudio = () => {
-    if (userAudioStream.current) {
-      userAudioStream.current.getAudioTracks().forEach((track) => {
+    if (userStreams.current.audio) {
+      userStreams.current.audio.getAudioTracks().forEach((track) => {
         track.enabled = mutedAudioRef.current;
       });
     }
@@ -124,11 +122,9 @@ export default function Main() {
           device,
           table_id,
           username,
-          userCameraStreams,
+          userStreams,
           userCameraCount,
-          userScreenStreams,
           userScreenCount,
-          userAudioStream,
           isWebcam,
           isScreen,
           isAudio,
@@ -184,11 +180,9 @@ export default function Main() {
           username,
           table_id,
           socket,
-          userCameraStreams,
+          userStreams,
           userCameraCount,
-          userScreenStreams,
           userScreenCount,
-          userAudioStream,
           isWebcam,
           isScreen,
           handleDisableEnableBtns,
@@ -201,9 +195,7 @@ export default function Main() {
         onProducerDisconnected(
           event,
           username,
-          userCameraStreams,
-          userScreenStreams,
-          userAudioStream,
+          userStreams,
           handleDisableEnableBtns,
           remoteTracksMap,
           producerTransport,
@@ -213,7 +205,7 @@ export default function Main() {
           setScreenActive,
           setBundles,
           userStreamEffects,
-          userStopStreamEffects
+          userUneffectedStreams
         );
         break;
       case "requestedMuteLock":
@@ -286,18 +278,18 @@ export default function Main() {
             table_id={table_id.current}
             socket={socket}
             initCameraStreams={
-              isWebcam.current && userCameraStreams.current
-                ? userCameraStreams.current
+              isWebcam.current && userStreams.current.webcam
+                ? userStreams.current.webcam
                 : undefined
             }
             initScreenStreams={
-              isScreen.current && userScreenStreams.current
-                ? userScreenStreams.current
+              isScreen.current && userStreams.current.screen
+                ? userStreams.current.screen
                 : undefined
             }
             initAudioStream={
-              isAudio.current && userAudioStream.current
-                ? userAudioStream.current
+              isAudio.current && userStreams.current.audio
+                ? userStreams.current.audio
                 : undefined
             }
             isUser={true}
@@ -374,7 +366,7 @@ export default function Main() {
                   table_id,
                   username,
                   userCameraCount,
-                  userCameraStreams
+                  userStreams
                 )
               }
               className={`${
@@ -459,7 +451,7 @@ export default function Main() {
                   table_id,
                   username,
                   userScreenCount,
-                  userScreenStreams
+                  userStreams
                 )
               }
               className={`${
@@ -543,11 +535,9 @@ export default function Main() {
                 table_id,
                 username,
                 setIsInTable,
-                userCameraStreams,
+                userStreams,
                 userCameraCount,
-                userScreenStreams,
                 userScreenCount,
-                userAudioStream,
                 remoteTracksMap,
                 handleDisableEnableBtns,
                 setBundles,

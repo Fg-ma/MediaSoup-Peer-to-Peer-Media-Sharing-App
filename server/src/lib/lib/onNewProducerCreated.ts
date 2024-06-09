@@ -6,12 +6,14 @@ const onNewProducerCreated = (
     username: string;
     table_id: string;
     producerType: "webcam" | "screen" | "audio";
+    producerId: string;
   },
   io: SocketIOServer
 ) => {
   const msg = {
     type: "newProducerWasCreated",
     producerType: event.producerType,
+    producerId: event.producerId,
   };
   io.to(`${event.table_id}_${event.username}`).emit("message", msg);
 };

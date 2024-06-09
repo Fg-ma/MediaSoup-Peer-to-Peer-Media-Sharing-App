@@ -9,15 +9,17 @@ const joinTable = (
   table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
-  userCameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>,
   userCameraCount: React.MutableRefObject<number>,
-  userScreenStreams: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
-  }>,
   userScreenCount: React.MutableRefObject<number>,
-  userAudioStream: React.MutableRefObject<MediaStream | undefined>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       webcam?:
@@ -74,11 +76,9 @@ const joinTable = (
     if (previousTableId.trim() !== "" && previousUsername.trim() !== "") {
       socket.current.emit("leaveTable", previousTableId, previousUsername);
       leaveTable(
-        userCameraStreams,
+        userStreams,
         userCameraCount,
-        userScreenStreams,
         userScreenCount,
-        userAudioStream,
         remoteTracksMap,
         handleDisableEnableBtns,
         setBundles,

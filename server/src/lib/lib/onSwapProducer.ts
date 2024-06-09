@@ -64,6 +64,7 @@ const onSwapProducer = async (
   const message = {
     type: "newProducerWasCreated",
     producerType: event.producerType,
+    producerId: event.producerId,
   };
   io.to(`${event.table_id}_${event.username}`).emit("message", message);
 

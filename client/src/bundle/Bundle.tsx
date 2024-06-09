@@ -92,10 +92,10 @@ export default function Bundle({
 }) {
   const {
     userStreams,
+    userUneffectedStreams,
     userCameraCount,
     userScreenCount,
     userStreamEffects,
-    userUneffectedStreams,
     remoteTracksMap,
   } = useStreamsContext();
   const [cameraStreams, setCameraStreams] = useState<

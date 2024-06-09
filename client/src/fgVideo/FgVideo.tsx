@@ -20,7 +20,6 @@ import handleScrubbing from "./lib/handleScrubbing";
 import handleTimelineUpdate from "./lib/handleTimelineUpdate";
 import handleKeyDown from "./lib/handleKeyDown";
 import handleKeyUp from "./lib/handleKeyUp";
-import { blur } from "./blur";
 import { EffectTypes } from "src/context/StreamsContext";
 import handleCloseVideo from "./lib/handleCloseVideo";
 import effectIcon from "../../public/svgs/effectIcon.svg";

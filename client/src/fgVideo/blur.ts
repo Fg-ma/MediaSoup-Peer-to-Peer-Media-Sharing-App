@@ -1,135 +1,3 @@
-import * as mediasoup from "mediasoup-client";
-import { EffectTypes } from "../context/StreamsContext";
-
-const blur = async (
-  type: "webcam" | "screen" | undefined,
-  userCameraStreams:
-    | React.MutableRefObject<{
-        [webcamId: string]: MediaStream;
-      }>
-    | undefined,
-  userScreenStreams:
-    | React.MutableRefObject<{
-        [webcamId: string]: MediaStream;
-      }>
-    | undefined,
-  id: string,
-  userStreamEffects:
-    | React.MutableRefObject<{
-        [effectType in EffectTypes]: {
-          webcam?:
-            | {
-                [webcamId: string]: boolean;
-              }
-            | undefined;
-          screen?:
-            | {
-                [screenId: string]: boolean;
-              }
-            | undefined;
-          audio?: boolean | undefined;
-        };
-      }>
-    | undefined,
-  userStopStreamEffects:
-    | React.MutableRefObject<{
-        [effectType in EffectTypes]: {
-          webcam?: {
-            [webcamId: string]: () => void;
-          };
-          screen?: {
-            [screenId: string]: () => void;
-          };
-          audio?: () => void;
-        };
-      }>
-    | undefined,
-  device:
-    | React.MutableRefObject<mediasoup.types.Device | undefined>
-    | undefined,
-  producerTransport:
-    | React.MutableRefObject<
-        mediasoup.types.Transport<mediasoup.types.AppData> | undefined
-      >
-    | undefined
-) => {
-  if (!device?.current || !producerTransport || !producerTransport.current) {
-    return;
-  }
-
-  if (type === "webcam") {
-    if (!userCameraStreams?.current) {
-      return;
-    }
-
-    if (userStreamEffects?.current.blur.webcam) {
-      userStreamEffects.current.blur.webcam[id] = true;
-    }
-
-    const cameraTrack = userCameraStreams.current[id].getVideoTracks()[0];
-
-    // Apply blur to the screen track
-    const { blurredTrack, stop } = await handleBlur(cameraTrack);
-
-    if (userStopStreamEffects?.current.blur.webcam) {
-      userStopStreamEffects.current.blur.webcam[id] = stop;
-    }
-
-    userCameraStreams.current[id] = new MediaStream([blurredTrack]);
-
-    const params = {
-      track: blurredTrack,
-      appData: {
-        producerType: "webcam",
-        producerDirection: "swap",
-        producerId: id,
-      },
-    };
-
-    try {
-      await producerTransport.current.produce(params);
-    } catch (error) {
-      console.error("Transport failed to produce: ", error);
-      return;
-    }
-  } else if (type === "screen") {
-    if (!userScreenStreams?.current) {
-      return;
-    }
-
-    if (userStreamEffects?.current.blur.screen) {
-      userStreamEffects.current.blur.screen[id] = true;
-    }
-
-    const screenTrack = userScreenStreams.current[id].getVideoTracks()[0];
-
-    // Apply blur to the screen track
-    const { blurredTrack, stop } = await handleBlur(screenTrack);
-
-    if (userStopStreamEffects?.current.blur.screen) {
-      userStopStreamEffects.current.blur.screen[id] = stop;
-    }
-
-    userScreenStreams.current[id] = new MediaStream([blurredTrack]);
-
-    const params = {
-      track: blurredTrack,
-      appData: {
-        producerType: "screen",
-        producerDirection: "swap",
-        producerId: id,
-      },
-    };
-
-    try {
-      await producerTransport.current.produce(params);
-    } catch (error) {
-      console.error("Transport failed to produce: ", error);
-      return;
-    }
-  }
-};
-
 const handleBlur = async (
   track: MediaStreamTrack
 ): Promise<{ blurredTrack: MediaStreamTrack; stop: () => void }> => {
@@ -163,7 +31,6 @@ const handleBlur = async (
   const stop = () => {
     isRunning = false;
     clearInterval(intervalId);
-    track.stop();
     video.pause();
     video.srcObject = null;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -277,4 +144,4 @@ const applyBoxBlur = (
   ctx.putImageData(imageData, 0, 0);
 };
 
-export { blur, handleBlur };
+export default handleBlur;
