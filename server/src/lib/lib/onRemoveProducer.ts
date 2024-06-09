@@ -177,7 +177,6 @@ const onRemoveProducer = async (
       producerType: event.producerType,
       producerId: event.producerId,
     };
-
     io.to(event.table_id).emit("message", msg);
   } catch (error) {
     console.error(error);

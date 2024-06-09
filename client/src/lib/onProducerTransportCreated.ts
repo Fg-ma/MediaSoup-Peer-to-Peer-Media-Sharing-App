@@ -2,7 +2,7 @@ import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import getBrowserMedia from "../getBrowserMedia";
-import { handleBlur } from "../blur";
+import { handleBlur } from "../fgVideo/blur";
 
 const onProducerTransportCreated = async (
   event: {

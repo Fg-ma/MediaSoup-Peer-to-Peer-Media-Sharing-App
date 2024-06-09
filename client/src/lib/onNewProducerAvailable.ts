@@ -30,7 +30,7 @@ const onNewProducerAvailable = (
       username: username.current,
       incomingProducerId: event.producerId,
     };
-    socket.current.send(msg);
+    socket.current.emit("message", msg);
   }
 };
 

@@ -1,5 +1,5 @@
 import * as mediasoup from "mediasoup-client";
-import { EffectTypes } from "./context/StreamsContext";
+import { EffectTypes } from "../context/StreamsContext";
 
 const blur = async (
   type: "webcam" | "screen" | undefined,
@@ -53,13 +53,12 @@ const blur = async (
       >
     | undefined
 ) => {
+  if (!device?.current || !producerTransport || !producerTransport.current) {
+    return;
+  }
+
   if (type === "webcam") {
-    if (
-      !userCameraStreams?.current ||
-      !device?.current ||
-      !producerTransport ||
-      !producerTransport.current
-    ) {
+    if (!userCameraStreams?.current) {
       return;
     }
 
@@ -94,12 +93,7 @@ const blur = async (
       return;
     }
   } else if (type === "screen") {
-    if (
-      !userScreenStreams?.current ||
-      !device?.current ||
-      !producerTransport ||
-      !producerTransport.current
-    ) {
+    if (!userScreenStreams?.current) {
       return;
     }
 

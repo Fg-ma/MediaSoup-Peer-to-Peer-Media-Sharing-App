@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+.effect-container {
+  padding: 0.5rem;
+  width: max-content;
+  height: max-content;
+  position: relative;
+  border-radius: 0.25rem;
+  background-color: rgba(0, 0, 0, 1);
+  border-width: 1px;
+  border-color: rgb(255 255 255);
+  margin-bottom: 0.75rem;
+}
+
+.effect-container-trapezoid {
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 12px;
+  clip-path: polygon(34% 79%, 63% 80%, 100% 0%, 0 0%);
+  background-color: rgba(0, 0, 0, 1);
+}
+
+.effect-container-tip {
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 1);
+}
+
 .main-video::cue {
   background: var(--closed-captions-decorator-color);
   color: white;
@@ -23,7 +57,8 @@
   opacity: 0;
 }
 
-.video-container.in-video .controls-gradient {
+.video-container.in-video .controls-gradient,
+.video-container.in-effects .controls-gradient {
   opacity: 1;
 }
 
@@ -31,7 +66,8 @@
   opacity: 1;
 }
 
-.video-container.in-video .main-video::cue {
+.video-container.in-video .main-video::cue,
+.video-container.in-effects .main-video::cue {
   line-height: 8rem;
 }
 
@@ -47,8 +83,11 @@
 .video-controls-container,
 .video-navigation-container {
   opacity: 0;
-  pointer-events: none;
   transition: opacity 150ms ease-in-out;
+}
+
+.video-controls-container {
+  pointer-events: none;
 }
 
 .video-controls {
@@ -63,7 +102,9 @@
 }
 
 .video-container.in-video .video-controls-container,
-.video-container.in-video .video-navigation-container {
+.video-container.in-video .video-navigation-container,
+.video-container.in-effects .video-controls-container,
+.video-container.in-effects .video-navigation-container {
   opacity: 1;
   transition-delay: 0s;
 }
@@ -219,7 +260,8 @@
 }
 
 .video-container.paused .timeline-container,
-.video-container.in-video .timeline-container {
+.video-container.in-video .timeline-container,
+.video-container.in-effects .timeline-container {
   opacity: 1;
 }
 

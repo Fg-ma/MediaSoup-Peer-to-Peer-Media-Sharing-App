@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
@@ -20,8 +20,12 @@ import handleScrubbing from "./lib/handleScrubbing";
 import handleTimelineUpdate from "./lib/handleTimelineUpdate";
 import handleKeyDown from "./lib/handleKeyDown";
 import handleKeyUp from "./lib/handleKeyUp";
-import { blur } from "../blur";
+import { blur } from "./blur";
 import { EffectTypes } from "src/context/StreamsContext";
+import handleCloseVideo from "./lib/handleCloseVideo";
+import effectIcon from "../../public/svgs/effectIcon.svg";
+import handleEffects from "./lib/handleEffects";
+import handleEffect from "./handleEffect";
 
 export default function FgVideo({
   type,
@@ -32,6 +36,7 @@ export default function FgVideo({
   videoId,
   handleMute,
   videoStream,
+  isUser = false,
   isStream = false,
   videoStyles,
   autoPlay = true,
@@ -66,14 +71,13 @@ export default function FgVideo({
   isFinishedRef,
   changedWhileNotFinishedRef,
   tracksColorSetter,
+  userStreams,
+  userUneffectedStreams,
   userStreamEffects,
-  userStopStreamEffects,
   device,
-  userCameraStreams,
-  userScreenStreams,
   producerTransport,
 }: {
-  type?: "webcam" | "screen";
+  type: "webcam" | "screen";
   username: string;
   name?: string;
   table_id: string;
@@ -81,6 +85,7 @@ export default function FgVideo({
   videoId: string;
   handleMute: () => void;
   videoStream?: MediaStream;
+  isUser?: boolean;
   isStream?: boolean;
   videoStyles?: {};
   autoPlay?: boolean;
@@ -119,43 +124,56 @@ export default function FgVideo({
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   tracksColorSetter: () => void;
   blurCameraStream?: (webcamId: string) => Promise<void>;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
+  }>;
+  userUneffectedStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
+  }>;
   userStreamEffects?: React.MutableRefObject<{
     [effectType in EffectTypes]: {
       webcam?:
         | {
-            [webcamId: string]: boolean;
+            [webcamId: string]: {
+              active: boolean;
+              stopFunction: () => void;
+            };
           }
         | undefined;
       screen?:
         | {
-            [screenId: string]: boolean;
+            [screenId: string]: {
+              active: boolean;
+              stopFunction: () => void;
+            };
           }
         | undefined;
-      audio?: boolean | undefined;
-    };
-  }>;
-  userStopStreamEffects?: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      webcam?: {
-        [webcamId: string]: () => void;
-      };
-      screen?: {
-        [screenId: string]: () => void;
-      };
-      audio?: () => void;
+      audio?:
+        | {
+            active: boolean;
+            stopFunction: () => void;
+          }
+        | undefined;
     };
   }>;
   device?: React.MutableRefObject<mediasoup.types.Device | undefined>;
-  userCameraStreams?: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
-  }>;
-  userScreenStreams?: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
-  }>;
   producerTransport?: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >;
 }) {
+  const [isEffects, setIsEffects] = useState(false);
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -483,28 +501,51 @@ export default function FgVideo({
     };
   }, [videoStream]);
 
+  useEffect(() => {
+    const handleMessage = (event: any) => {
+      switch (event.type) {
+        case "acceptBlur":
+          onAcceptBlur(event);
+          break;
+        default:
+          break;
+      }
+    };
+
+    socket?.current.on("message", handleMessage);
+
+    // Cleanup event listener on unmount
+    return () => {
+      socket?.current.off("message", handleMessage);
+    };
+  }, []);
+
   const handleBlur = () => {
-    blur(
-      type,
-      userCameraStreams,
-      userScreenStreams,
-      videoId,
-      userStreamEffects,
-      userStopStreamEffects,
-      device,
-      producerTransport
-    );
+    if (isUser) {
+      handleEffect(
+        "blur",
+        type,
+        videoId,
+        userStreams,
+        userUneffectedStreams,
+        userStreamEffects,
+        producerTransport
+      );
+    } else {
+      const msg = {
+        type: "requestBlur",
+        table_id: table_id,
+        username: username,
+        producerId: videoId,
+      };
+      socket?.current.emit("message", msg);
+    }
   };
 
-  const handleCloseVideo = () => {
-    const msg = {
-      type: "removeProducer",
-      table_id: table_id,
-      username: username,
-      producerType: "webcam",
-      producerId: videoId,
-    };
-    socket?.current.emit("message", msg);
+  const onAcceptBlur = (event: { type: "acceptBlur"; producerId: string }) => {
+    if (videoId === event.producerId) {
+      handleBlur();
+    }
   };
 
   return (
@@ -558,7 +599,9 @@ export default function FgVideo({
             </div>
             {isClose && (
               <button
-                onClick={() => handleCloseVideo()}
+                onClick={() =>
+                  handleCloseVideo(socket, table_id, username, type, videoId)
+                }
                 className='flex items-center justify-center w-10 aspect-square'
               >
                 <svg
@@ -604,12 +647,6 @@ export default function FgVideo({
                   </svg>
                 </button>
               )}
-              <button
-                onClick={handleBlur}
-                className='flex items-center justify-center w-20 bg-red-500 aspect-square'
-              >
-                Blur
-              </button>
               {isVolume && (
                 <VolumeSection
                   isSlider={isSlider}
@@ -629,6 +666,42 @@ export default function FgVideo({
                 {isCurrentTime && isTotalTime && "/"}
                 {isTotalTime && (
                   <div ref={totalTimeRef} className='total-time'></div>
+                )}
+              </div>
+              <div className='relative'>
+                <button
+                  onClick={() =>
+                    handleEffects(isEffects, setIsEffects, videoContainerRef)
+                  }
+                  className='flex items-center justify-center w-10 aspect-square relative'
+                >
+                  <img
+                    src={effectIcon}
+                    alt='icon'
+                    className='w-5/6 h-5/6 fill-white stroke-white'
+                  />
+                </button>
+                {isEffects && (
+                  <div className='absolute bottom-full left-1/2 -translate-x-1/2 w-max h-max'>
+                    <div className='effect-container shadow-md'>
+                      <button
+                        onClick={handleBlur}
+                        className='flex items-center justify-center w-10 aspect-square'
+                      >
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          height='36px'
+                          viewBox='0 -960 960 960'
+                          width='36px'
+                          fill='white'
+                        >
+                          <path d='M120-380q-8 0-14-6t-6-14q0-8 6-14t14-6q8 0 14 6t6 14q0 8-6 14t-14 6Zm0-160q-8 0-14-6t-6-14q0-8 6-14t14-6q8 0 14 6t6 14q0 8-6 14t-14 6Zm120 340q-17 0-28.5-11.5T200-240q0-17 11.5-28.5T240-280q17 0 28.5 11.5T280-240q0 17-11.5 28.5T240-200Zm0-160q-17 0-28.5-11.5T200-400q0-17 11.5-28.5T240-440q17 0 28.5 11.5T280-400q0 17-11.5 28.5T240-360Zm0-160q-17 0-28.5-11.5T200-560q0-17 11.5-28.5T240-600q17 0 28.5 11.5T280-560q0 17-11.5 28.5T240-520Zm0-160q-17 0-28.5-11.5T200-720q0-17 11.5-28.5T240-760q17 0 28.5 11.5T280-720q0 17-11.5 28.5T240-680Zm160 340q-25 0-42.5-17.5T340-400q0-25 17.5-42.5T400-460q25 0 42.5 17.5T460-400q0 25-17.5 42.5T400-340Zm0-160q-25 0-42.5-17.5T340-560q0-25 17.5-42.5T400-620q25 0 42.5 17.5T460-560q0 25-17.5 42.5T400-500Zm0 300q-17 0-28.5-11.5T360-240q0-17 11.5-28.5T400-280q17 0 28.5 11.5T440-240q0 17-11.5 28.5T400-200Zm0-480q-17 0-28.5-11.5T360-720q0-17 11.5-28.5T400-760q17 0 28.5 11.5T440-720q0 17-11.5 28.5T400-680Zm0 580q-8 0-14-6t-6-14q0-8 6-14t14-6q8 0 14 6t6 14q0 8-6 14t-14 6Zm0-720q-8 0-14-6t-6-14q0-8 6-14t14-6q8 0 14 6t6 14q0 8-6 14t-14 6Zm160 480q-25 0-42.5-17.5T500-400q0-25 17.5-42.5T560-460q25 0 42.5 17.5T620-400q0 25-17.5 42.5T560-340Zm0-160q-25 0-42.5-17.5T500-560q0-25 17.5-42.5T560-620q25 0 42.5 17.5T620-560q0 25-17.5 42.5T560-500Zm0 300q-17 0-28.5-11.5T520-240q0-17 11.5-28.5T560-280q17 0 28.5 11.5T600-240q0 17-11.5 28.5T560-200Zm0-480q-17 0-28.5-11.5T520-720q0-17 11.5-28.5T560-760q17 0 28.5 11.5T600-720q0 17-11.5 28.5T560-680Zm0 580q-8 0-14-6t-6-14q0-8 6-14t14-6q8 0 14 6t6 14q0 8-6 14t-14 6Zm0-720q-8 0-14-6t-6-14q0-8 6-14t14-6q8 0 14 6t6 14q0 8-6 14t-14 6Zm160 620q-17 0-28.5-11.5T680-240q0-17 11.5-28.5T720-280q17 0 28.5 11.5T760-240q0 17-11.5 28.5T720-200Zm0-160q-17 0-28.5-11.5T680-400q0-17 11.5-28.5T720-440q17 0 28.5 11.5T760-400q0 17-11.5 28.5T720-360Zm0-160q-17 0-28.5-11.5T680-560q0-17 11.5-28.5T720-600q17 0 28.5 11.5T760-560q0 17-11.5 28.5T720-520Zm0-160q-17 0-28.5-11.5T680-720q0-17 11.5-28.5T720-760q17 0 28.5 11.5T760-720q0 17-11.5 28.5T720-680Zm120 300q-8 0-14-6t-6-14q0-8 6-14t14-6q8 0 14 6t6 14q0 8-6 14t-14 6Zm0-160q-8 0-14-6t-6-14q0-8 6-14t14-6q8 0 14 6t6 14q0 8-6 14t-14 6Z' />
+                        </svg>
+                      </button>
+                      <div className='effect-container-trapezoid'></div>
+                      <div className='effect-container-tip'></div>
+                    </div>
+                  </div>
                 )}
               </div>
               {isPlaybackSpeed && (

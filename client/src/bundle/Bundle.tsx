@@ -91,13 +91,11 @@ export default function Bundle({
   >;
 }) {
   const {
-    userCameraStreams,
+    userStreams,
     userCameraCount,
-    userScreenStreams,
     userScreenCount,
-    userAudioStream,
     userStreamEffects,
-    userStopStreamEffects,
+    userUneffectedStreams,
     remoteTracksMap,
   } = useStreamsContext();
   const [cameraStreams, setCameraStreams] = useState<
@@ -151,11 +149,9 @@ export default function Bundle({
             setCameraStreams,
             setScreenStreams,
             setAudioStream,
-            userCameraStreams,
+            userStreams,
             userCameraCount,
-            userScreenStreams,
-            userScreenCount,
-            userAudioStream
+            userScreenCount
           );
           break;
         case "newConsumerWasCreated":
@@ -547,6 +543,7 @@ export default function Bundle({
             socket={socket}
             videoId={key}
             videoStream={cameraStream}
+            isUser={isUser}
             isStream={true}
             flipVideo={true}
             isSlider={!isUser}
@@ -570,10 +567,10 @@ export default function Bundle({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
+            userStreams={userStreams}
+            userUneffectedStreams={userUneffectedStreams}
             userStreamEffects={userStreamEffects}
-            userStopStreamEffects={userStopStreamEffects}
             device={device}
-            userCameraStreams={userCameraStreams}
             producerTransport={producerTransport}
           />
         ))}
@@ -588,6 +585,7 @@ export default function Bundle({
             socket={socket}
             videoId={key}
             videoStream={screenStream}
+            isUser={isUser}
             isStream={true}
             flipVideo={false}
             isSlider={!isUser}
@@ -611,10 +609,10 @@ export default function Bundle({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
+            userStreams={userStreams}
+            userUneffectedStreams={userUneffectedStreams}
             userStreamEffects={userStreamEffects}
-            userStopStreamEffects={userStopStreamEffects}
             device={device}
-            userScreenStreams={userScreenStreams}
             producerTransport={producerTransport}
           />
         ))}

@@ -7,36 +7,37 @@ export interface StreamsContextProviderProps {
 }
 
 export interface StreamsContextType {
-  userCameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>;
+
   userCameraCount: React.MutableRefObject<number>;
-  userScreenStreams: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
-  }>;
   userScreenCount: React.MutableRefObject<number>;
-  userAudioStream: React.MutableRefObject<MediaStream | undefined>;
   userStreamEffects: React.MutableRefObject<{
     [effectType in EffectTypes]: {
       webcam?: {
-        [webcamId: string]: boolean;
+        [webcamId: string]: { active: boolean; stopFunction: () => void };
       };
       screen?: {
-        [screenId: string]: boolean;
+        [screenId: string]: { active: boolean; stopFunction: () => void };
       };
-      audio?: boolean;
+      audio?: { active: boolean; stopFunction: () => void };
     };
   }>;
-  userStopStreamEffects: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      webcam?: {
-        [webcamId: string]: () => void;
-      };
-      screen?: {
-        [screenId: string]: () => void;
-      };
-      audio?: () => void;
+  userUneffectedStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
     };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>;
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
@@ -70,35 +71,33 @@ export const useStreamsContext = () => {
 export function StreamsContextProvider({
   children,
 }: StreamsContextProviderProps) {
-  const userCameraStreams = useRef<{
-    [webcamId: string]: MediaStream;
-  }>({});
+  const userStreams = useRef<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: { [screenId: string]: MediaStream };
+    audio: MediaStream | undefined;
+  }>({ webcam: {}, screen: {}, audio: undefined });
   const userCameraCount = useRef(0);
-  const userScreenStreams = useRef<{ [screenId: string]: MediaStream }>({});
   const userScreenCount = useRef(0);
-  const userAudioStream = useRef<MediaStream>();
   const userStreamEffects = useRef<{
     [effectType in EffectTypes]: {
       webcam?: {
-        [webcamId: string]: boolean;
+        [webcamId: string]: { active: boolean; stopFunction: () => void };
       };
       screen?: {
-        [screenId: string]: boolean;
+        [screenId: string]: { active: boolean; stopFunction: () => void };
       };
-      audio?: boolean;
+      audio?: { active: boolean; stopFunction: () => void };
     };
   }>({ blur: { webcam: {}, screen: {} } });
-  const userStopStreamEffects = useRef<{
-    [effectType in EffectTypes]: {
-      webcam?: {
-        [webcamId: string]: () => void;
-      };
-      screen?: {
-        [screenId: string]: () => void;
-      };
-      audio?: () => void;
+  const userUneffectedStreams = useRef<{
+    webcam: {
+      [webcamId: string]: MediaStream;
     };
-  }>({ blur: { webcam: {}, screen: {} } });
+    screen: { [screenId: string]: MediaStream };
+    audio: MediaStream | undefined;
+  }>({ webcam: {}, screen: {}, audio: undefined });
   const remoteTracksMap = useRef<{
     [username: string]: {
       webcam?: { [webcamId: string]: MediaStreamTrack };
@@ -110,13 +109,11 @@ export function StreamsContextProvider({
   return (
     <StreamsContext.Provider
       value={{
-        userCameraStreams,
+        userStreams,
         userCameraCount,
-        userScreenStreams,
         userScreenCount,
-        userAudioStream,
         userStreamEffects,
-        userStopStreamEffects,
+        userUneffectedStreams,
         remoteTracksMap,
       }}
     >

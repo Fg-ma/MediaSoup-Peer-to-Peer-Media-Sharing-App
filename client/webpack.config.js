@@ -32,6 +32,18 @@ module.exports = {
         test: /\.css$/i,
         use: ["style-loader", "css-loader", "postcss-loader"],
       },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: "url-loader", // or 'file-loader'
+            options: {
+              limit: 10000, // if you want to inline files smaller than 10kb
+              name: "[name].[hash:8].[ext]", // to specify the naming convention
+            },
+          },
+        ],
+      },
     ],
   },
   plugins: [

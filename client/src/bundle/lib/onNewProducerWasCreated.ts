@@ -8,7 +8,7 @@ const onNewProducerWasCreated = (
   setCameraStreams: React.Dispatch<
     React.SetStateAction<
       | {
-          [screenKey: string]: MediaStream;
+          [webcamId: string]: MediaStream;
         }
       | undefined
     >
@@ -16,21 +16,23 @@ const onNewProducerWasCreated = (
   setScreenStreams: React.Dispatch<
     React.SetStateAction<
       | {
-          [screenKey: string]: MediaStream;
+          [screenId: string]: MediaStream;
         }
       | undefined
     >
   >,
   setAudioStream: React.Dispatch<React.SetStateAction<MediaStream | undefined>>,
-  userCameraStreams: React.MutableRefObject<{
-    [webcamId: string]: MediaStream;
+  userStreams: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
   }>,
   userCameraCount: React.MutableRefObject<number>,
-  userScreenStreams: React.MutableRefObject<{
-    [screenId: string]: MediaStream;
-  }>,
-  userScreenCount: React.MutableRefObject<number>,
-  userAudioStream: React.MutableRefObject<MediaStream | undefined>
+  userScreenCount: React.MutableRefObject<number>
 ) => {
   if (!isUser) {
     return;
@@ -40,7 +42,7 @@ const onNewProducerWasCreated = (
     setCameraStreams((prev) => {
       const newStreams = { ...prev };
       newStreams[`${username}_camera_stream_${userCameraCount.current}`] =
-        userCameraStreams.current[
+        userStreams.current.webcam[
           `${username}_camera_stream_${userCameraCount.current}`
         ];
       return newStreams;
@@ -49,13 +51,13 @@ const onNewProducerWasCreated = (
     setScreenStreams((prev) => {
       const newStreams = { ...prev };
       newStreams[`${username}_screen_stream_${userScreenCount.current}`] =
-        userScreenStreams.current[
+        userStreams.current.screen[
           `${username}_screen_stream_${userScreenCount.current}`
         ];
       return newStreams;
     });
   } else if (event.producerType === "audio") {
-    setAudioStream(userAudioStream.current);
+    setAudioStream(userStreams.current.audio);
   }
 };
 
