@@ -46,16 +46,25 @@ const onProducerDisconnected = (
     [effectType in EffectTypes]: {
       webcam?:
         | {
-            [webcamId: string]: { active: boolean; stopFunction: () => void };
+            [webcamId: string]: boolean;
           }
         | undefined;
       screen?:
         | {
-            [screenId: string]: { active: boolean; stopFunction: () => void };
+            [screenId: string]: boolean;
           }
         | undefined;
-      audio?: { active: boolean; stopFunction: () => void } | undefined;
+      audio?: boolean;
     };
+  }>,
+  userStopStreamEffects: React.MutableRefObject<{
+    webcam: {
+      [webcamId: string]: () => void;
+    };
+    screen: {
+      [screenId: string]: () => void;
+    };
+    audio: (() => void) | undefined;
   }>,
   userUneffectedStreams: React.MutableRefObject<{
     webcam: {
@@ -95,35 +104,25 @@ const onProducerDisconnected = (
       userUneffectedStreams.current.audio = undefined;
     }
 
-    for (const effectType in userStreamEffects.current) {
-      const typedEffectType =
-        effectType as keyof typeof userStreamEffects.current;
-
-      if (
-        (event.producerType === "webcam" || event.producerType === "screen") &&
-        userStreamEffects.current[typedEffectType] &&
-        userStreamEffects.current[typedEffectType][event.producerType] &&
-        userStreamEffects.current[typedEffectType][event.producerType]?.[
-          event.producerId
-        ] &&
-        typeof userStreamEffects.current[typedEffectType][event.producerType]?.[
-          event.producerId
-        ].stopFunction === "function"
-      ) {
-        userStreamEffects.current[typedEffectType][event.producerType]?.[
-          event.producerId
-        ].stopFunction();
-      } else if (
-        event.producerType === "audio" &&
-        userStreamEffects.current[typedEffectType] &&
-        userStreamEffects.current[typedEffectType][event.producerType] &&
-        typeof userStreamEffects.current[typedEffectType][event.producerType]
-          ?.stopFunction === "function"
-      ) {
-        userStreamEffects.current[typedEffectType][
-          event.producerType
-        ]?.stopFunction();
-      }
+    if (
+      (event.producerType === "webcam" || event.producerType === "screen") &&
+      userStopStreamEffects.current[event.producerType] &&
+      userStopStreamEffects.current[event.producerType]?.[event.producerId] &&
+      typeof userStopStreamEffects.current[event.producerType]?.[
+        event.producerId
+      ] === "function"
+    ) {
+      userStopStreamEffects.current[event.producerType]?.[event.producerId]();
+      delete userStopStreamEffects.current[event.producerType][
+        event.producerId
+      ];
+    } else if (
+      event.producerType === "audio" &&
+      userStopStreamEffects.current[event.producerType] &&
+      typeof userStopStreamEffects.current[event.producerType] === "function"
+    ) {
+      userStopStreamEffects.current[event.producerType]?.();
+      delete userStopStreamEffects.current[event.producerType];
     }
 
     for (const effectType in userStreamEffects.current) {

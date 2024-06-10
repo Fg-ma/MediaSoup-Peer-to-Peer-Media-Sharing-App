@@ -1,47 +1,3 @@
-const handleBlur = async (
-  track: MediaStreamTrack
-): Promise<{ blurredTrack: MediaStreamTrack; stop: () => void }> => {
-  // Create a video element to play the track
-  const video = document.createElement("video");
-  video.srcObject = new MediaStream([track]);
-  video.play();
-
-  // Create a canvas to draw the video frames
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-  if (!ctx) {
-    return { blurredTrack: track, stop: () => {} };
-  }
-
-  video.onloadedmetadata = () => {
-    canvas.width = video.videoWidth / 4;
-    canvas.height = video.videoHeight / 4;
-  };
-
-  let isRunning = true;
-  const frameRate = 60;
-  const intervalId = setInterval(() => {
-    if (!isRunning) return;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    applyBoxBlur(ctx, canvas);
-  }, 1000 / frameRate);
-
-  // Function to stop the blurring process
-  const stop = () => {
-    isRunning = false;
-    clearInterval(intervalId);
-    video.pause();
-    video.srcObject = null;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  };
-
-  return {
-    blurredTrack: canvas.captureStream().getVideoTracks()[0],
-    stop,
-  };
-};
-
 const applyGaussianBlur = (
   ctx: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement
@@ -144,4 +100,22 @@ const applyBoxBlur = (
   ctx.putImageData(imageData, 0, 0);
 };
 
-export default handleBlur;
+const applyRedTinge = (
+  ctx: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement
+) => {
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const { data } = imageData;
+
+  const redTingeStrength = 0.15; // Strength of the red tinge effect (adjust as needed)
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = data[i] + redTingeStrength * (255 - data[i]); // Increase red
+    data[i + 1] = data[i + 1] * (1 - redTingeStrength); // Decrease green
+    data[i + 2] = data[i + 2] * (1 - redTingeStrength); // Decrease blue
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+};
+
+export { applyGaussianBlur, applyBoxBlur, applyRedTinge };

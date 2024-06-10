@@ -195,6 +195,7 @@ const onNewProducer = async (
     producerType: event.producerType,
     producerId: producerId,
   };
+  console.log(msg);
 
   socket.current.emit("message", msg);
 };

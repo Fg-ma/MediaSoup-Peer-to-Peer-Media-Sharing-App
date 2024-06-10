@@ -13,54 +13,13 @@ const onRemoveProducer = async (
     type: string;
     table_id: string;
     username: string;
-    producerType: string;
+    producerType: "webcam" | "screen" | "audio";
     producerId?: string;
   },
   io: SocketIOServer
 ) => {
   try {
-    if (
-      roomProducerTransports[event.table_id] &&
-      roomProducerTransports[event.table_id][event.username] &&
-      Object.keys(roomProducers[event.table_id][event.username] || {})
-        .length === 1 &&
-      Object.keys(
-        roomProducers[event.table_id][event.username][
-          event.producerType as "webcam" | "screen" | "audio"
-        ] || {}
-      ).length === 1 &&
-      ((event.producerId &&
-        (event.producerType === "webcam" || event.producerType === "screen") &&
-        roomProducers[event.table_id]?.[event.username]?.[event.producerType]?.[
-          event.producerId
-        ]) ||
-        (event.producerType === "audio" &&
-          roomProducers[event.table_id]?.[event.username]?.[
-            event.producerType
-          ]))
-    ) {
-      delete roomProducerTransports[event.table_id][event.username];
-    }
-
-    if (
-      roomProducerTransports[event.table_id] &&
-      Object.keys(roomProducerTransports[event.table_id]).length == 0
-    ) {
-      delete roomProducerTransports[event.table_id];
-    }
-
-    if (
-      (!roomProducerTransports ||
-        (roomProducerTransports[event.table_id] &&
-          Object.keys(roomProducerTransports[event.table_id]).length === 0)) &&
-      (!roomConsumerTransports ||
-        (roomConsumerTransports[event.table_id] &&
-          Object.keys(roomConsumerTransports[event.table_id]).length === 0))
-    ) {
-      releaseWorker(workersMap[event.table_id]);
-      delete workersMap[event.table_id];
-    }
-
+    // Remove producers
     if (
       event.producerId &&
       (event.producerType === "webcam" || event.producerType === "screen") &&
@@ -114,6 +73,7 @@ const onRemoveProducer = async (
       }
     }
 
+    // Remove consumers
     for (const username in roomConsumers[event.table_id]) {
       for (const producerUsername in roomConsumers[event.table_id][username]) {
         if (producerUsername === event.username) {
@@ -169,6 +129,39 @@ const onRemoveProducer = async (
       if (Object.keys(roomConsumers[event.table_id]).length === 0) {
         delete roomConsumers[event.table_id];
       }
+    }
+
+    // Remove producer transports
+    if (
+      (roomProducerTransports[event.table_id] &&
+        roomProducerTransports[event.table_id][event.username] &&
+        roomProducers[event.table_id] &&
+        roomProducers[event.table_id][event.username] &&
+        Object.keys(roomProducers[event.table_id][event.username]).length ===
+          0) ||
+      !roomProducers[event.table_id] ||
+      !roomProducers[event.table_id][event.username]
+    ) {
+      delete roomProducerTransports[event.table_id][event.username];
+    }
+    if (
+      roomProducerTransports[event.table_id] &&
+      Object.keys(roomProducerTransports[event.table_id]).length == 0
+    ) {
+      delete roomProducerTransports[event.table_id];
+    }
+
+    // Release workers
+    if (
+      (!roomProducerTransports ||
+        (roomProducerTransports[event.table_id] &&
+          Object.keys(roomProducerTransports[event.table_id]).length === 0)) &&
+      (!roomConsumerTransports ||
+        (roomConsumerTransports[event.table_id] &&
+          Object.keys(roomConsumerTransports[event.table_id]).length === 0))
+    ) {
+      releaseWorker(workersMap[event.table_id]);
+      delete workersMap[event.table_id];
     }
 
     const msg = {

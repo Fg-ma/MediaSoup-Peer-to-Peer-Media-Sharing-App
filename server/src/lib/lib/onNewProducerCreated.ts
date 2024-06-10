@@ -6,7 +6,7 @@ const onNewProducerCreated = (
     username: string;
     table_id: string;
     producerType: "webcam" | "screen" | "audio";
-    producerId: string;
+    producerId: string | undefined;
   },
   io: SocketIOServer
 ) => {

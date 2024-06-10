@@ -93,9 +93,8 @@ export default function Bundle({
   const {
     userStreams,
     userUneffectedStreams,
-    userCameraCount,
-    userScreenCount,
     userStreamEffects,
+    userStopStreamEffects,
     remoteTracksMap,
   } = useStreamsContext();
   const [cameraStreams, setCameraStreams] = useState<
@@ -145,13 +144,10 @@ export default function Bundle({
           onNewProducerWasCreated(
             event,
             isUser,
-            username,
             setCameraStreams,
             setScreenStreams,
             setAudioStream,
-            userStreams,
-            userCameraCount,
-            userScreenCount
+            userStreams
           );
           break;
         case "newConsumerWasCreated":
@@ -570,6 +566,7 @@ export default function Bundle({
             userStreams={userStreams}
             userUneffectedStreams={userUneffectedStreams}
             userStreamEffects={userStreamEffects}
+            userStopStreamEffects={userStopStreamEffects}
             device={device}
             producerTransport={producerTransport}
           />
@@ -612,6 +609,7 @@ export default function Bundle({
             userStreams={userStreams}
             userUneffectedStreams={userUneffectedStreams}
             userStreamEffects={userStreamEffects}
+            userStopStreamEffects={userStopStreamEffects}
             device={device}
             producerTransport={producerTransport}
           />

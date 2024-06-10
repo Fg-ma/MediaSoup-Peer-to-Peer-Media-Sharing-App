@@ -31,6 +31,7 @@ export default function Main() {
     userCameraCount,
     userScreenCount,
     userStreamEffects,
+    userStopStreamEffects,
     remoteTracksMap,
   } = useStreamsContext();
   const webcamBtnRef = useRef<HTMLButtonElement>(null);
@@ -205,6 +206,7 @@ export default function Main() {
           setScreenActive,
           setBundles,
           userStreamEffects,
+          userStopStreamEffects,
           userUneffectedStreams
         );
         break;
@@ -573,6 +575,7 @@ export default function Main() {
         </div>
         <div ref={remoteVideosContainerRef} className='w-full grid grid-cols-3'>
           {bundles &&
+            Object.keys(bundles).length !== 0 &&
             Object.entries(bundles).map(([key, bundle]) => (
               <div key={key} id={`${key}_bundle`}>
                 {bundle}

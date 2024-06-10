@@ -2,10 +2,9 @@ const onNewProducerWasCreated = (
   event: {
     type: string;
     producerType: "webcam" | "screen" | "audio";
-    producerId: string;
+    producerId: string | undefined;
   },
   isUser: boolean,
-  username: string,
   setCameraStreams: React.Dispatch<
     React.SetStateAction<
       | {
@@ -31,10 +30,9 @@ const onNewProducerWasCreated = (
       [screenId: string]: MediaStream;
     };
     audio: MediaStream | undefined;
-  }>,
-  userCameraCount: React.MutableRefObject<number>,
-  userScreenCount: React.MutableRefObject<number>
+  }>
 ) => {
+  console.log("new", event);
   if (!isUser) {
     return;
   }
@@ -42,15 +40,19 @@ const onNewProducerWasCreated = (
   if (event.producerType === "webcam") {
     setCameraStreams((prev) => {
       const newStreams = { ...prev };
-      newStreams[event.producerId] =
-        userStreams.current.webcam[event.producerId];
+      if (event.producerId) {
+        newStreams[event.producerId] =
+          userStreams.current.webcam[event.producerId];
+      }
       return newStreams;
     });
   } else if (event.producerType === "screen") {
     setScreenStreams((prev) => {
       const newStreams = { ...prev };
-      newStreams[event.producerId] =
-        userStreams.current.screen[event.producerId];
+      if (event.producerId) {
+        newStreams[event.producerId] =
+          userStreams.current.screen[event.producerId];
+      }
       return newStreams;
     });
   } else if (event.producerType === "audio") {
