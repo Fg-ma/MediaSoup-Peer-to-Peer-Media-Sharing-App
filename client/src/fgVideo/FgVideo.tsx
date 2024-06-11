@@ -25,6 +25,7 @@ import handleCloseVideo from "./lib/handleCloseVideo";
 import effectIcon from "../../public/svgs/effectIcon.svg";
 import handleEffects from "./lib/handleEffects";
 import handleEffect from "./handleEffect";
+import handleEffect2 from "./handleEffect2";
 
 export default function FgVideo({
   type,
@@ -520,7 +521,7 @@ export default function FgVideo({
 
   const handleBlur = () => {
     if (isUser) {
-      handleEffect(
+      handleEffect2(
         "blur",
         type,
         videoId,
