@@ -1,8 +1,8 @@
 import * as mediasoup from "mediasoup-client";
 import { EffectTypes } from "src/context/StreamsContext";
-import { applyBoxBlur, applyRedTinge } from "./effects";
+import { applyBoxBlur, applyTint } from "./effects";
 
-const handleEffect = async (
+const EffectSectionCPU = async (
   effect: EffectTypes,
   type: "webcam" | "screen" | "audio",
   id: string,
@@ -52,7 +52,9 @@ const handleEffect = async (
     | React.MutableRefObject<
         mediasoup.types.Transport<mediasoup.types.AppData> | undefined
       >
-    | undefined
+    | undefined,
+  tintColor: React.MutableRefObject<string>,
+  blockStateChange: boolean = false
 ) => {
   if (
     !userStreamEffects ||
@@ -110,13 +112,15 @@ const handleEffect = async (
   ) {
     userStreamEffects.current[effect][type]![id] = false;
   }
-  // Fill stream effects
-  if (type === "webcam" || type === "screen") {
-    userStreamEffects.current[effect][type]![id] =
-      !userStreamEffects.current[effect][type]![id];
-  } else if (type === "audio") {
-    userStreamEffects.current[effect][type] =
-      !userStreamEffects.current[effect][type];
+  if (!blockStateChange) {
+    // Fill stream effects
+    if (type === "webcam" || type === "screen") {
+      userStreamEffects.current[effect][type]![id] =
+        !userStreamEffects.current[effect][type]![id];
+    } else if (type === "audio") {
+      userStreamEffects.current[effect][type] =
+        !userStreamEffects.current[effect][type];
+    }
   }
 
   // Stop old effect streams
@@ -184,6 +188,9 @@ const handleEffect = async (
       if (effects.blur) {
         applyBoxBlur(ctx, canvas);
       }
+      if (effects.tint) {
+        applyTint(ctx, canvas, hexToRgb(tintColor.current));
+      }
     }, 1000 / frameRate);
 
     const stop = () => {
@@ -245,4 +252,14 @@ const handleEffect = async (
   }
 };
 
-export default handleEffect;
+function hexToRgb(hex: string) {
+  hex = hex.replace(/^#/, "");
+
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+
+  return [r, g, b];
+}
+
+export default EffectSectionCPU;

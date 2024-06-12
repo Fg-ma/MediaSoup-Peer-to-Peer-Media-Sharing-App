@@ -28,7 +28,7 @@ import onSendMuteRequest from "./lib/onSendMuteRequest";
 import { releaseWorker } from "./workerManager";
 import onSwapProducer from "./lib/onSwapProducer";
 import onSwapConsumer from "./lib/onSwapConsumer";
-import onRequestBlur from "./lib/onRequestBlur";
+import onRequestEffect from "./lib/onRequestEffect";
 
 const SocketIOConnection = async (io: SocketIOServer) => {
   io.on("connection", (socket: MediasoupSocket) => {
@@ -223,8 +223,8 @@ const SocketIOConnection = async (io: SocketIOServer) => {
         case "swapConsumer":
           onSwapConsumer(event, io);
           break;
-        case "requestBlur":
-          onRequestBlur(event, io);
+        case "requestEffect":
+          onRequestEffect(event, io);
           break;
         default:
           break;

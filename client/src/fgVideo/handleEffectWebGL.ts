@@ -1,8 +1,7 @@
 import * as mediasoup from "mediasoup-client";
 import { EffectTypes } from "src/context/StreamsContext";
-import { applyBoxBlur, applyRedTinge } from "./effects";
 
-const handleEffect2 = async (
+const handleEffectWebGL = async (
   effect: EffectTypes,
   type: "webcam" | "screen" | "audio",
   id: string,
@@ -52,7 +51,9 @@ const handleEffect2 = async (
     | React.MutableRefObject<
         mediasoup.types.Transport<mediasoup.types.AppData> | undefined
       >
-    | undefined
+    | undefined,
+  tintColor: React.MutableRefObject<string>,
+  blockStateChange: boolean = false
 ) => {
   if (
     !userStreamEffects ||
@@ -60,7 +61,9 @@ const handleEffect2 = async (
     !producerTransport ||
     !producerTransport.current
   ) {
-    return;
+    return new Error(
+      "No userStreamEffects, userStreamEffects.current, producerTransport, or producerTransport.current"
+    );
   }
 
   // Set uneffected screen if necesary
@@ -111,12 +114,14 @@ const handleEffect2 = async (
     userStreamEffects.current[effect][type]![id] = false;
   }
   // Fill stream effects
-  if (type === "webcam" || type === "screen") {
-    userStreamEffects.current[effect][type]![id] =
-      !userStreamEffects.current[effect][type]![id];
-  } else if (type === "audio") {
-    userStreamEffects.current[effect][type] =
-      !userStreamEffects.current[effect][type];
+  if (!blockStateChange) {
+    if (type === "webcam" || type === "screen") {
+      userStreamEffects.current[effect][type]![id] =
+        !userStreamEffects.current[effect][type]![id];
+    } else if (type === "audio") {
+      userStreamEffects.current[effect][type] =
+        !userStreamEffects.current[effect][type];
+    }
   }
 
   // Stop old effect streams
@@ -159,8 +164,7 @@ const handleEffect2 = async (
     const gl = canvas.getContext("webgl");
 
     if (!gl) {
-      console.error("WebGL not supported");
-      return;
+      return new Error("WebGL not supported");
     }
 
     // Shaders
@@ -168,6 +172,7 @@ const handleEffect2 = async (
       attribute vec2 a_position;
       attribute vec2 a_texCoord;
       varying vec2 v_texCoord;
+
       void main() {
         gl_Position = vec4(a_position, 0.0, 1.0);
         v_texCoord = a_texCoord;
@@ -180,24 +185,40 @@ const handleEffect2 = async (
       uniform sampler2D u_image;
       uniform float u_blurRadius;
       uniform vec2 u_textureSize;
-
+      uniform vec3 u_tintColor;
+    
       void main() {
         vec4 color = vec4(0.0);
         float total = 0.0;
-
-        const int MAX_RADIUS = 16;
-
-        for (int x = -MAX_RADIUS; x <= MAX_RADIUS; x++) {
-          for (int y = -MAX_RADIUS; y <= MAX_RADIUS; y++) {
-            if (abs(float(x)) <= u_blurRadius && abs(float(y)) <= u_blurRadius) {
-              vec2 offset = vec2(float(x), float(y)) / u_textureSize;
-              color += texture2D(u_image, v_texCoord + offset);
-              total += 1.0;
+    
+        const int MAX_RADIUS = 32;
+    
+        // Apply blur effect
+        if (${effects.blur ? "true" : "false"}) {
+          for (int x = -MAX_RADIUS; x <= MAX_RADIUS; x++) {
+            for (int y = -MAX_RADIUS; y <= MAX_RADIUS; y++) {
+              if (abs(float(x)) <= u_blurRadius && abs(float(y)) <= u_blurRadius) {
+                vec2 offset = vec2(float(x), float(y)) / u_textureSize;
+                color += texture2D(u_image, v_texCoord + offset);
+                total += 1.0;
+              }
             }
           }
+          color /= total;
+        } else {
+          color = texture2D(u_image, v_texCoord);
         }
-
-        gl_FragColor = color / total;
+    
+        // Apply tint effect
+        if (${effects.tint ? "true" : "false"}) {
+          vec4 texColor = color;
+          float luminance = dot(texColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+          vec3 tintedColor = mix(texColor.rgb, u_tintColor, 0.75);
+          vec3 finalColor = mix(texColor.rgb, tintedColor, luminance);
+          color = vec4(finalColor, texColor.a);
+        }
+    
+        gl_FragColor = color;
       }
     `;
 
@@ -208,18 +229,15 @@ const handleEffect2 = async (
       fragmentShaderSource
     );
     if (!vertexShader) {
-      console.error("no vertexshader");
-      return;
+      return new Error("No vertex shader");
     }
     if (!fragmentShader) {
-      console.error("no fragmenthsader");
-      return;
+      return new Error("No fragment shader");
     }
-    const program = createProgram(gl, vertexShader, fragmentShader);
 
+    const program = createProgram(gl, vertexShader, fragmentShader);
     if (!program) {
-      console.error("no program");
-      return;
+      return new Error("No program");
     }
 
     gl.useProgram(program);
@@ -249,17 +267,21 @@ const handleEffect2 = async (
     const texture = createAndSetupTexture(gl);
 
     if (!texture) {
-      console.error("no texture");
-      return;
+      return new Error("No texture");
     }
 
-    // Render Loop
     const blurRadiusLocation = gl.getUniformLocation(program, "u_blurRadius");
     const textureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
 
-    if (!blurRadiusLocation || !textureSizeLocation) {
-      console.error("no blurRadiusLocation or textureSizeLocation");
-      return;
+    if (effects.blur && (!blurRadiusLocation || !textureSizeLocation)) {
+      return new Error("No blurRadiusLocation or textureSizeLocation");
+    }
+
+    const tintColorLocation = gl.getUniformLocation(program, "u_tintColor");
+    const tintColorVector = hexToRgb(tintColor.current);
+
+    if (effects.tint && !tintColorLocation) {
+      return new Error("No tintColorLocation");
     }
 
     // Start video and render loop
@@ -269,6 +291,7 @@ const handleEffect2 = async (
         ? userUneffectedStreams.current[type][id].getVideoTracks()[0]
         : userUneffectedStreams.current[type]!.getVideoTracks()[0],
     ]);
+    let animationFrameId: number[] = [];
     video.addEventListener("play", () => {
       render(
         gl,
@@ -276,16 +299,56 @@ const handleEffect2 = async (
         video,
         blurRadiusLocation,
         textureSizeLocation,
-        canvas
+        tintColorLocation,
+        canvas,
+        animationFrameId,
+        tintColorVector
       );
     });
     video.onloadedmetadata = () => {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      canvas.width = video.videoWidth / 2;
+      canvas.height = video.videoHeight / 2;
       gl.viewport(0, 0, canvas.width, canvas.height);
       video.play();
     };
 
+    if (type === "webcam" || type === "screen") {
+      userStopStreamEffects.current[type][id] = () => {
+        if (animationFrameId[0]) {
+          cancelAnimationFrame(animationFrameId[0]);
+        }
+        video.pause();
+        video.srcObject = null;
+
+        gl.deleteTexture(texture);
+        gl.deleteProgram(program);
+        gl.deleteShader(vertexShader);
+        gl.deleteShader(fragmentShader);
+        gl.deleteBuffer(positionBuffer);
+        gl.deleteBuffer(texCoordBuffer);
+
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        canvas.remove();
+      };
+    } else if (type === "audio") {
+      userStopStreamEffects.current[type] = () => {
+        if (animationFrameId[0]) {
+          cancelAnimationFrame(animationFrameId[0]);
+        }
+        video.pause();
+        video.srcObject = null;
+
+        gl.deleteTexture(texture);
+        gl.deleteProgram(program);
+        gl.deleteShader(vertexShader);
+        gl.deleteShader(fragmentShader);
+        gl.deleteBuffer(positionBuffer);
+        gl.deleteBuffer(texCoordBuffer);
+
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        canvas.remove();
+      };
+    }
     // Capture final track
     finalTrack = canvas.captureStream().getVideoTracks()[0];
   }
@@ -327,26 +390,35 @@ const handleEffect2 = async (
     try {
       await producerTransport.current.produce(params);
     } catch (error) {
-      console.error("Transport failed to produce: ", error);
-      return;
+      return new Error(`Transport failed to produce: ${error}`);
     }
   }
 };
 
-export default handleEffect2;
+export default handleEffectWebGL;
+
+function hexToRgb(hex: string) {
+  hex = hex.replace(/^#/, "");
+
+  let r = parseInt(hex.substring(0, 2), 16) / 255;
+  let g = parseInt(hex.substring(2, 4), 16) / 255;
+  let b = parseInt(hex.substring(4, 6), 16) / 255;
+
+  return [r, g, b];
+}
 
 function createShader(gl: WebGLRenderingContext, type: number, source: string) {
   const shader = gl.createShader(type);
   if (!shader) {
-    console.error("no shader");
-    return;
+    return new Error("No shader");
   }
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error("Shader compile failed with: " + gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
-    return null;
+    return new Error(
+      "Shader compile failed with: " + gl.getShaderInfoLog(shader)
+    );
   }
   return shader;
 }
@@ -358,21 +430,20 @@ function createProgram(
 ) {
   const program = gl.createProgram();
   if (!program) {
-    console.error("no program from createProgram");
-    return;
+    return new Error("No program from createProgram");
   }
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error("Program failed to link: " + gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
-    return null;
+    return new Error(
+      "Program failed to link: " + gl.getProgramInfoLog(program)
+    );
   }
   return program;
 }
 
-// Texture
 function createAndSetupTexture(gl: WebGLRenderingContext) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -396,15 +467,36 @@ function render(
   gl: WebGLRenderingContext,
   texture: WebGLTexture,
   video: HTMLVideoElement,
-  blurRadiusLocation: WebGLUniformLocation,
-  textureSizeLocation: WebGLUniformLocation,
-  canvas: HTMLCanvasElement
+  blurRadiusLocation: WebGLUniformLocation | null,
+  textureSizeLocation: WebGLUniformLocation | null,
+  tintColorLocation: WebGLUniformLocation | null,
+  canvas: HTMLCanvasElement,
+  animationFrameId: number[],
+  tintColorVector: number[]
 ) {
   updateTexture(gl, texture, video);
-  gl.uniform1f(blurRadiusLocation, 8.0);
-  gl.uniform2f(textureSizeLocation, canvas.width, canvas.height);
+  if (blurRadiusLocation) {
+    gl.uniform1f(blurRadiusLocation, 8.0);
+  }
+  if (textureSizeLocation) {
+    gl.uniform2f(textureSizeLocation, canvas.width, canvas.height);
+  }
+  if (tintColorLocation) {
+    gl.uniform3fv(tintColorLocation, tintColorVector);
+  }
+
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  requestAnimationFrame(() =>
-    render(gl, texture, video, blurRadiusLocation, textureSizeLocation, canvas)
+  animationFrameId[0] = requestAnimationFrame(() =>
+    render(
+      gl,
+      texture,
+      video,
+      blurRadiusLocation,
+      textureSizeLocation,
+      tintColorLocation,
+      canvas,
+      animationFrameId,
+      tintColorVector
+    )
   );
 }

@@ -567,7 +567,6 @@ export default function Bundle({
             userUneffectedStreams={userUneffectedStreams}
             userStreamEffects={userStreamEffects}
             userStopStreamEffects={userStopStreamEffects}
-            device={device}
             producerTransport={producerTransport}
           />
         ))}
@@ -610,7 +609,6 @@ export default function Bundle({
             userUneffectedStreams={userUneffectedStreams}
             userStreamEffects={userStreamEffects}
             userStopStreamEffects={userStopStreamEffects}
-            device={device}
             producerTransport={producerTransport}
           />
         ))}

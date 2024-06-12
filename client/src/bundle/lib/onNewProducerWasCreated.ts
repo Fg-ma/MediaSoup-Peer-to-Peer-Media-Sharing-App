@@ -32,7 +32,6 @@ const onNewProducerWasCreated = (
     audio: MediaStream | undefined;
   }>
 ) => {
-  console.log("new", event);
   if (!isUser) {
     return;
   }
