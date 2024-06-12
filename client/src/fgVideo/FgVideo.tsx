@@ -22,9 +22,8 @@ import handleKeyDown from "./lib/handleKeyDown";
 import handleKeyUp from "./lib/handleKeyUp";
 import { EffectTypes } from "src/context/StreamsContext";
 import handleCloseVideo from "./lib/handleCloseVideo";
-import handleEffectCPU from "./handleEffectCPU";
-import handleEffectWebGL from "./handleEffectWebGL";
 import EffectSection from "./EffectSection";
+import handleEffect from "../effects/handleEffect";
 
 export default function FgVideo({
   type,
@@ -521,7 +520,7 @@ export default function FgVideo({
     blockStateChange?: boolean
   ) => {
     if (isUser) {
-      const error = await handleEffectWebGL(
+      await handleEffect(
         effect,
         type,
         videoId,
@@ -533,25 +532,6 @@ export default function FgVideo({
         tintColor,
         blockStateChange
       );
-      if (error) {
-        console.error(
-          "Failed to render with WebGL defaulting to CPU render, which may effect performance!",
-          error
-        );
-
-        handleEffectCPU(
-          effect,
-          type,
-          videoId,
-          userStreams,
-          userUneffectedStreams,
-          userStreamEffects,
-          userStopStreamEffects,
-          producerTransport,
-          tintColor,
-          blockStateChange
-        );
-      }
     } else {
       const msg = {
         type: "requestEffect",

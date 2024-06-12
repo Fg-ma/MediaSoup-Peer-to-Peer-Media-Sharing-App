@@ -5,10 +5,8 @@ const applyBoxBlur = (
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const { data, width, height } = imageData;
 
-  // Adjust blur radius for stronger blur effect
-  const blurRadius = 6; // Increased blur radius
+  const blurRadius = 6;
 
-  // Apply box blur effect to the image data
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       let r = 0,
@@ -33,35 +31,14 @@ const applyBoxBlur = (
     }
   }
 
-  const glazeStrength = 0.15; // Strength of the glaze effect (adjust as needed)
+  const glazeStrength = 0.15;
   for (let i = 0; i < data.length; i += 4) {
-    data[i] = data[i] * (1 - glazeStrength); // Red
-    data[i + 1] = data[i + 1] * (1 - glazeStrength); // Green
-    data[i + 2] = data[i + 2] * (1 - glazeStrength); // Blue
+    data[i] = data[i] * (1 - glazeStrength);
+    data[i + 1] = data[i + 1] * (1 - glazeStrength);
+    data[i + 2] = data[i + 2] * (1 - glazeStrength);
   }
 
   ctx.putImageData(imageData, 0, 0);
 };
 
-const applyTint = (
-  ctx: CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
-  tintColorVector: number[]
-) => {
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const { data } = imageData;
-
-  const tintStrength = 0.3;
-
-  for (let i = 0; i < data.length; i += 4) {
-    data[i] = data[i] + tintStrength * (tintColorVector[0] - data[i]);
-    data[i + 1] =
-      data[i + 1] + tintStrength * (tintColorVector[1] - data[i + 1]);
-    data[i + 2] =
-      data[i + 2] + tintStrength * (tintColorVector[2] - data[i + 2]);
-  }
-
-  ctx.putImageData(imageData, 0, 0);
-};
-
-export { applyBoxBlur, applyTint };
+export default applyBoxBlur;

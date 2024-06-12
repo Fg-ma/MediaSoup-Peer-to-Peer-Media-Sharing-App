@@ -1,8 +1,9 @@
 import * as mediasoup from "mediasoup-client";
-import { EffectTypes } from "src/context/StreamsContext";
-import { applyBoxBlur, applyTint } from "./effects";
+import handleEffectWebGL from "../EffectsWebGL/handleEffectWebGL";
+import handleEffectCPU from "../EffectsCPU/handleEffectCPU";
+import { EffectTypes } from "../context/StreamsContext";
 
-const EffectSectionCPU = async (
+const handleEffect = async (
   effect: EffectTypes,
   type: "webcam" | "screen" | "audio",
   id: string,
@@ -62,7 +63,9 @@ const EffectSectionCPU = async (
     !producerTransport ||
     !producerTransport.current
   ) {
-    return;
+    return new Error(
+      "No userStreamEffects, userStreamEffects.current, producerTransport, or producerTransport.current"
+    );
   }
 
   // Set uneffected screen if necesary
@@ -112,8 +115,8 @@ const EffectSectionCPU = async (
   ) {
     userStreamEffects.current[effect][type]![id] = false;
   }
+  // Fill stream effects
   if (!blockStateChange) {
-    // Fill stream effects
     if (type === "webcam" || type === "screen") {
       userStreamEffects.current[effect][type]![id] =
         !userStreamEffects.current[effect][type]![id];
@@ -158,55 +161,35 @@ const EffectSectionCPU = async (
 
   let finalTrack: MediaStreamTrack | undefined;
   if (Object.keys(effects).length !== 0) {
-    // Create a video element to play the track
-    const video = document.createElement("video");
-    video.srcObject = new MediaStream([
-      type === "webcam" || type === "screen"
-        ? userUneffectedStreams.current[type][id].getVideoTracks()[0]
-        : userUneffectedStreams.current[type]!.getVideoTracks()[0],
-    ]);
-    video.play();
+    const webGlEffect = await handleEffectWebGL(
+      type,
+      id,
+      userUneffectedStreams,
+      userStopStreamEffects,
+      tintColor,
+      effects
+    );
+    if (webGlEffect instanceof Error) {
+      console.error(
+        "Failed to render with WebGL defaulting to CPU render, which may effect performance!",
+        webGlEffect
+      );
 
-    // Create a canvas to draw the video frames
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      const cpuEffect = await handleEffectCPU(
+        type,
+        id,
+        userUneffectedStreams,
+        userStopStreamEffects,
+        tintColor,
+        effects
+      );
 
-    if (!ctx) {
-      return;
-    }
-
-    video.onloadedmetadata = () => {
-      canvas.width = video.videoWidth / 4;
-      canvas.height = video.videoHeight / 4;
-    };
-
-    let isRunning = true;
-    const frameRate = 60;
-    const intervalId = setInterval(() => {
-      if (!isRunning) return;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      if (effects.blur) {
-        applyBoxBlur(ctx, canvas);
+      if (cpuEffect instanceof MediaStreamTrack) {
+        finalTrack = cpuEffect;
       }
-      if (effects.tint) {
-        applyTint(ctx, canvas, hexToRgb(tintColor.current));
-      }
-    }, 1000 / frameRate);
-
-    const stop = () => {
-      isRunning = false;
-      clearInterval(intervalId);
-      video.pause();
-      video.srcObject = null;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    };
-    if (type === "webcam" || type === "screen") {
-      userStopStreamEffects.current[type][id] = stop;
-    } else if (type === "audio") {
-      userStopStreamEffects.current[type] = stop;
+    } else {
+      finalTrack = webGlEffect;
     }
-
-    finalTrack = canvas.captureStream().getVideoTracks()[0];
   }
 
   if (type === "webcam" || type === "screen") {
@@ -246,20 +229,9 @@ const EffectSectionCPU = async (
     try {
       await producerTransport.current.produce(params);
     } catch (error) {
-      console.error("Transport failed to produce: ", error);
-      return;
+      return new Error(`Transport failed to produce: ${error}`);
     }
   }
 };
 
-function hexToRgb(hex: string) {
-  hex = hex.replace(/^#/, "");
-
-  let r = parseInt(hex.substring(0, 2), 16);
-  let g = parseInt(hex.substring(2, 4), 16);
-  let b = parseInt(hex.substring(4, 6), 16);
-
-  return [r, g, b];
-}
-
-export default EffectSectionCPU;
+export default handleEffect;
