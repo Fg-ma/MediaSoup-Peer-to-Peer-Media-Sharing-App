@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useContext, useRef } from "react";
 
-export type EffectTypes = "blur" | "tint";
+export type EffectTypes = "blur" | "tint" | "dogEars";
 
 export interface StreamsContextProviderProps {
   children: ReactNode;
@@ -111,6 +111,7 @@ export function StreamsContextProvider({
       webcam: {},
       screen: {},
     },
+    dogEars: { webcam: {}, screen: {} },
   });
   const userStopStreamEffects = useRef<{
     webcam: {

@@ -38,7 +38,7 @@ export default function EffectSection({
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [color, setColor] = useState("#F56114");
   const [tempColor, setTempColor] = useState(color);
-  const effectContainer = useRef<HTMLDivElement>(null);
+  const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (userStreamEffects.current.tint[type]?.[videoId]) {
@@ -94,7 +94,7 @@ export default function EffectSection({
                 </svg>
               )}
             </button>
-            <div className='col-span-2  border-l border-white flex'>
+            <div className='col-span-2 border-l border-white flex'>
               <button
                 onClick={() => handleEffectChange("tint")}
                 className='flex items-center justify-center w-10 aspect-square'
@@ -162,11 +162,9 @@ export default function EffectSection({
                   />
                 )}
               </button>
-              <div
-                ref={effectContainer}
-                className='flex items-center justify-center w-10 aspect-square'
-              >
+              <div className='flex items-center justify-center w-10 aspect-square'>
                 <button
+                  ref={colorPickerBtnRef}
                   className='w-6 aspect-square border bottom-2 border-white rounded'
                   style={{ backgroundColor: tempColor }}
                   onClick={handleColorPicker}
@@ -180,7 +178,7 @@ export default function EffectSection({
                     setIsColorPicker={setIsColorPicker}
                     tintColor={tintColor}
                     videoId={videoId}
-                    effectContainer={effectContainer}
+                    colorPickerBtnRef={colorPickerBtnRef}
                   />
                 )}
               </div>

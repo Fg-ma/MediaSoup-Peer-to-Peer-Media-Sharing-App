@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import ReactDOM from "react-dom";
 
@@ -10,7 +10,7 @@ export default function ColorPicker({
   setIsColorPicker,
   tintColor,
   videoId,
-  effectContainer,
+  colorPickerBtnRef,
 }: {
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
@@ -19,7 +19,7 @@ export default function ColorPicker({
   setIsColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
   tintColor: React.MutableRefObject<string>;
   videoId: string;
-  effectContainer: React.RefObject<HTMLDivElement>;
+  colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
 }) {
   const [hexValue, setHexValue] = useState(color.slice(1));
   const [colorPickerPosition, setColorPickerPosition] = useState<{
@@ -30,18 +30,21 @@ export default function ColorPicker({
     left: null,
   });
 
+  const [isDragging, setIsDragging] = useState(false);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const getColorPickerPosition = () => {
-      const rect = effectContainer.current?.getBoundingClientRect();
+      const rect = colorPickerBtnRef.current?.getBoundingClientRect();
       if (!rect) {
         return;
       }
       const bodyRect = document.body.getBoundingClientRect();
 
       const topPercent =
-        ((rect.top + rect.height + 10) / bodyRect.height) * 100;
+        ((rect.top + rect.height + 15) / bodyRect.height) * 100;
       const leftPercent =
-        ((rect.left + rect.width + 10) / bodyRect.width) * 100;
+        ((rect.left + rect.width + 15) / bodyRect.width) * 100;
 
       setColorPickerPosition({
         top: topPercent,
@@ -49,11 +52,23 @@ export default function ColorPicker({
       });
     };
 
+    const handleClick = (event: MouseEvent) => {
+      if (
+        !colorPickerRef.current?.contains(event.target as Node) &&
+        event.target !== colorPickerBtnRef.current
+      ) {
+        setTempColor(color);
+        setIsColorPicker(false);
+      }
+    };
+
     getColorPickerPosition();
 
+    document.addEventListener("mousedown", handleClick);
     window.addEventListener("resize", getColorPickerPosition);
 
     return () => {
+      document.removeEventListener("mousedown", handleClick);
       window.removeEventListener("resize", getColorPickerPosition);
     };
   }, []);
@@ -136,15 +151,95 @@ export default function ColorPicker({
     return `#${rHex}${gHex}${bHex}`;
   };
 
+  const mousePickerOffset = useRef<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
+
+  const startDrag = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const excludedElements = [
+      "input",
+      "button",
+      ".react-colorful",
+      "svg",
+      "label",
+    ];
+
+    const isExcluded = excludedElements.some((selector) => {
+      if (selector.startsWith(".")) {
+        return (e.target as Element).closest(selector);
+      }
+      return (e.target as Element).tagName.toLowerCase() === selector;
+    });
+
+    if (isExcluded) {
+      return;
+    }
+
+    setIsDragging(true);
+    const rect = colorPickerRef.current?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
+    const bodyRect = document.body.getBoundingClientRect();
+
+    const topColorPickerPercent = (rect.top / bodyRect.height) * 100;
+    const leftColorPickerPercent = (rect.left / bodyRect.width) * 100;
+
+    const topMousePercent = (e.clientY / bodyRect.height) * 100;
+    const leftMousePercent = (e.clientX / bodyRect.width) * 100;
+
+    mousePickerOffset.current = {
+      top: topMousePercent - topColorPickerPercent,
+      left: leftMousePercent - leftColorPickerPercent,
+    };
+  };
+
+  const onDrag = (e: MouseEvent) => {
+    e.preventDefault();
+    if (!isDragging) return;
+    const bodyRect = document.body.getBoundingClientRect();
+    const topPercent = (e.clientY / bodyRect.height) * 100;
+    const leftPercent = (e.clientX / bodyRect.width) * 100;
+
+    setColorPickerPosition({
+      top: topPercent - mousePickerOffset.current.top,
+      left: leftPercent - mousePickerOffset.current.left,
+    });
+  };
+
+  const stopDrag = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener("mousemove", onDrag);
+      document.addEventListener("mouseup", stopDrag);
+    } else {
+      document.removeEventListener("mousemove", onDrag);
+      document.removeEventListener("mouseup", stopDrag);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", onDrag);
+      document.removeEventListener("mouseup", stopDrag);
+    };
+  }, [isDragging]);
+
   return ReactDOM.createPortal(
     <>
       {colorPickerPosition.top && colorPickerPosition.left && (
         <div
+          ref={colorPickerRef}
           className='absolute bg-white rounded-lg shadow-md p-3 flex flex-col space-y-2 z-50'
           style={{
             top: `${colorPickerPosition.top}%`,
             left: `${colorPickerPosition.left}%`,
+            cursor: isDragging ? "grabbing" : "",
           }}
+          onMouseDown={startDrag}
         >
           <HexColorPicker color={tempColor} onChange={handleChangeComplete} />
           <div className='flex space-x-1'>

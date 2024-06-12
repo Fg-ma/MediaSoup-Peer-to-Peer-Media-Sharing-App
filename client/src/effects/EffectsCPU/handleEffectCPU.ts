@@ -2,6 +2,7 @@ import { EffectTypes } from "src/context/StreamsContext";
 import applyBoxBlur from "./lib/applyBoxBlur";
 import applyTint from "./lib/applyTint";
 import setStopFunction from "./lib/setStopFunction";
+import * as faceapi from "face-api.js";
 
 function hexToRgb(hex: string) {
   hex = hex.replace(/^#/, "");
@@ -72,6 +73,12 @@ const EffectSectionCPU = async (
     if (effects.tint) {
       applyTint(ctx, canvas, hexToRgb(tintColor.current));
     }
+    if (effects.dogEars) {
+      (async () => {
+        await loadModels();
+        detectFaces(video);
+      })();
+    }
   }, 1000 / frameRate);
 
   setStopFunction(
@@ -89,3 +96,57 @@ const EffectSectionCPU = async (
 };
 
 export default EffectSectionCPU;
+
+async function loadModels() {
+  await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+  await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+}
+
+async function detectFaces(video) {
+  const displaySize = { width: video.width, height: video.height };
+  faceapi.matchDimensions(overlay, displaySize);
+
+  setInterval(async () => {
+    const detections = await faceapi
+      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks();
+
+    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    drawDogEars(resizedDetections);
+  }, 100);
+}
+
+function drawDogEars(detections) {
+  detections.forEach((detection) => {
+    const landmarks = detection.landmarks;
+    const leftEar = landmarks.getLeftEye();
+    const rightEar = landmarks.getRightEye();
+
+    // Calculate dog ear positions based on eye positions
+    const earImage = new Image();
+    earImage.src = "dog-ears.png"; // Path to your dog ears image
+
+    earImage.onload = () => {
+      const earWidth = 50;
+      const earHeight = 50;
+
+      // Draw left ear
+      ctx.drawImage(
+        earImage,
+        leftEar[0].x - earWidth / 2,
+        leftEar[0].y - earHeight * 2,
+        earWidth,
+        earHeight
+      );
+
+      // Draw right ear
+      ctx.drawImage(
+        earImage,
+        rightEar[3].x - earWidth / 2,
+        rightEar[3].y - earHeight * 2,
+        earWidth,
+        earHeight
+      );
+    };
+  });
+}
