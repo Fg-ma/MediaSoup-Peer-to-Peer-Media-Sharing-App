@@ -1,6 +1,6 @@
 import * as mediasoup from "mediasoup-client";
-import handleEffectWebGL from "../EffectsWebGL/handleEffectWebGL";
-import handleEffectCPU from "../EffectsCPU/handleEffectCPU";
+import handleEffectWebGL from "./EffectsWebGL/handleEffectWebGL";
+import handleEffectCPU from "./EffectsCPU/handleEffectCPU";
 import { EffectTypes } from "../context/StreamsContext";
 
 const handleEffect = async (

@@ -7,6 +7,11 @@ const fragmentShaderSource = `
   uniform vec3 u_tintColor;
   uniform bool u_blurEffect;
   uniform bool u_tintEffect;
+  uniform bool u_dogEars;
+  uniform sampler2D u_earImageLeft;
+  uniform sampler2D u_earImageRight;
+  uniform vec2 u_leftEarPosition;
+  uniform vec2 u_rightEarPosition;
 
   void main() {
     vec4 color = vec4(0.0);
@@ -37,6 +42,22 @@ const fragmentShaderSource = `
       vec3 tintedColor = mix(texColor.rgb, u_tintColor, 0.75);
       vec3 finalColor = mix(texColor.rgb, tintedColor, luminance);
       color = vec4(finalColor, texColor.a);
+    }
+
+    // Apply dog ears effect
+    if (u_dogEars) {
+      vec2 leftEarTexCoord = (v_texCoord - u_leftEarPosition / u_textureSize) * 0.5 + 0.5;
+      vec2 rightEarTexCoord = (v_texCoord - u_rightEarPosition / u_textureSize) * 0.5 + 0.5;
+
+      vec4 leftEarColor = texture2D(u_earImage, leftEarTexCoord);
+      vec4 rightEarColor = texture2D(u_earImageLeft, rightEarTexCoord);
+
+      if (leftEarColor.a > 0.0) {
+        color = mix(color, leftEarColor, leftEarColor.a);
+      }
+      if (rightEarColor.a > 0.0) {
+        color = mix(color, rightEarColor, rightEarColor.a);
+      }
     }
 
     gl_FragColor = color;

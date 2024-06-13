@@ -1,3 +1,5 @@
+import { EffectTypes } from "src/context/StreamsContext";
+
 const hexToRgb = (hex: string) => {
   hex = hex.replace(/^#/, "");
 
@@ -13,41 +15,71 @@ const setUniforms = (
   program: WebGLProgram,
   canvas: HTMLCanvasElement,
   effects: {
-    blur?: boolean | undefined;
-    tint?: boolean | undefined;
+    [effectType in EffectTypes]?: boolean | undefined;
   },
-  tintColor: React.MutableRefObject<string>
+  tintColor: React.MutableRefObject<string>,
+  earImageLeft: WebGLTexture | null | undefined,
+  earImageRight: WebGLTexture | null | undefined
 ) => {
-  const blurRadiusLocation = gl.getUniformLocation(program, "u_blurRadius");
   const textureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
-
-  if (effects.blur && (!blurRadiusLocation || !textureSizeLocation)) {
-    return new Error("No blurRadiusLocation or textureSizeLocation");
-  }
-
-  if (blurRadiusLocation) {
-    gl.uniform1f(blurRadiusLocation, 8.0);
-  }
   if (textureSizeLocation) {
     gl.uniform2f(textureSizeLocation, canvas.width, canvas.height);
   }
 
-  const tintColorLocation = gl.getUniformLocation(program, "u_tintColor");
-  const tintColorVector = hexToRgb(tintColor.current);
+  // blur uniforms
+  if (effects.blur) {
+    const blurRadiusLocation = gl.getUniformLocation(program, "u_blurRadius");
 
-  if (effects.tint && !tintColorLocation) {
-    return new Error("No tintColorLocation");
+    gl.uniform1f(blurRadiusLocation, 8.0);
+
+    if (!blurRadiusLocation || !textureSizeLocation) {
+      return new Error("No blurRadiusLocation or textureSizeLocation");
+    }
   }
 
-  if (tintColorLocation) {
+  // blur tint
+  if (effects.tint) {
+    const tintColorLocation = gl.getUniformLocation(program, "u_tintColor");
+    const tintColorVector = hexToRgb(tintColor.current);
+
     gl.uniform3fv(tintColorLocation, tintColorVector);
+
+    if (!tintColorLocation) {
+      return new Error("No tintColorLocation");
+    }
+  }
+
+  // blur dogEars
+  if (effects.dogEars) {
+    const uEarImageLeftLocation = gl.getUniformLocation(
+      program,
+      "u_earImageLeft"
+    );
+    const uEarImageRightLocation = gl.getUniformLocation(
+      program,
+      "u_earImageRight"
+    );
+
+    if (!earImageLeft || !earImageRight) {
+      return new Error("No earImageLeft or earImageRight");
+    }
+
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, earImageLeft);
+    gl.uniform1i(uEarImageLeftLocation, 1);
+
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, earImageRight);
+    gl.uniform1i(uEarImageRightLocation, 2);
   }
 
   const uBlurEffectLocation = gl.getUniformLocation(program, "u_blurEffect");
   const uTintEffectLocation = gl.getUniformLocation(program, "u_tintEffect");
+  const uDogEarsEffectLocation = gl.getUniformLocation(program, "u_dogEars");
 
   gl.uniform1i(uBlurEffectLocation, effects.blur ? 1 : 0);
   gl.uniform1i(uTintEffectLocation, effects.tint ? 1 : 0);
+  gl.uniform1i(uDogEarsEffectLocation, effects.dogEars ? 1 : 0);
 };
 
 export default setUniforms;

@@ -183,6 +183,14 @@ export default function EffectSection({
                 )}
               </div>
             </div>
+            <button
+              onClick={() => handleEffectChange("dogEars")}
+              className='flex items-center justify-center w-10 aspect-square bg-blue-500'
+            >
+              {userStreamEffects.current.dogEars[type]?.[videoId]
+                ? "stp"
+                : "srt"}
+            </button>
             <div className='effect-container-trapezoid'></div>
             <div className='effect-container-tip'></div>
           </div>

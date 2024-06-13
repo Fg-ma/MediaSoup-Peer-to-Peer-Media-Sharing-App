@@ -1,4 +1,5 @@
-import { EffectTypes } from "src/context/StreamsContext";
+import * as faceapi from "face-api.js";
+import { EffectTypes } from "../../context/StreamsContext";
 import vertexShaderSource from "./lib/vertexShader";
 import fragmentShaderSource from "./lib/fragmentShader";
 import setUniforms from "./lib/setUniforms";
@@ -49,15 +50,15 @@ const handleEffectWebGL = async (
     gl.FRAGMENT_SHADER,
     fragmentShaderSource
   );
-  if (!vertexShader) {
+  if (vertexShader instanceof Error) {
     return new Error("No vertex shader");
   }
-  if (!fragmentShader) {
+  if (fragmentShader instanceof Error) {
     return new Error("No fragment shader");
   }
 
   const program = createProgram(gl, vertexShader, fragmentShader);
-  if (!program) {
+  if (program instanceof Error) {
     return new Error("No program");
   }
 
@@ -72,8 +73,31 @@ const handleEffectWebGL = async (
     return new Error("No texture");
   }
 
+  // Load dogEar images as textures
+  let earImageLeft: WebGLTexture | null | undefined;
+  let earImageRight: WebGLTexture | null | undefined;
+  if (effects.dogEars) {
+    earImageLeft = await loadTexture(gl, "/dogEarsLeft.png");
+    earImageRight = await loadTexture(gl, "/dogEarsRight.png");
+  }
+
+  if (effects.dogEars && (!earImageLeft || !earImageRight)) {
+    return new Error("No earImageLeft or earImageRight");
+  }
+
   // Set up the uniforms in the fragment shader
-  setUniforms(gl, program, canvas, effects, tintColor);
+  setUniforms(
+    gl,
+    program,
+    canvas,
+    effects,
+    tintColor,
+    earImageLeft,
+    earImageRight
+  );
+
+  // Load face detection models
+  await loadModels();
 
   // Start video and render loop
   let animationFrameId: number[] = [];
@@ -84,11 +108,11 @@ const handleEffectWebGL = async (
       : userUneffectedStreams.current[type]!.getVideoTracks()[0],
   ]);
   video.addEventListener("play", () => {
-    render(gl, texture, video, animationFrameId);
+    render(gl, texture, video, animationFrameId, program, effects);
   });
   video.onloadedmetadata = () => {
-    canvas.width = video.videoWidth / 2;
-    canvas.height = video.videoHeight / 2;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
     gl.viewport(0, 0, canvas.width, canvas.height);
     video.play();
   };
@@ -112,5 +136,40 @@ const handleEffectWebGL = async (
 
   return canvas.captureStream().getVideoTracks()[0];
 };
+
+async function loadModels() {
+  await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+  await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+}
+
+async function loadTexture(
+  gl: WebGLRenderingContext,
+  url: string
+): Promise<WebGLTexture | null> {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        image
+      );
+      resolve(texture);
+    };
+    image.onerror = (error) => reject(error);
+    image.src = url;
+  });
+}
 
 export default handleEffectWebGL;

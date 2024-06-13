@@ -1,8 +1,9 @@
-import { EffectTypes } from "src/context/StreamsContext";
+import * as faceapi from "face-api.js";
+import { EffectTypes } from "../../context/StreamsContext";
 import applyBoxBlur from "./lib/applyBoxBlur";
 import applyTint from "./lib/applyTint";
+import loadModels from "./lib/loadModels";
 import setStopFunction from "./lib/setStopFunction";
-import * as faceapi from "face-api.js";
 
 function hexToRgb(hex: string) {
   hex = hex.replace(/^#/, "");
@@ -40,6 +41,9 @@ const EffectSectionCPU = async (
     [effectType in EffectTypes]?: boolean | undefined;
   }
 ) => {
+  let earImageLeft: HTMLImageElement | undefined;
+  let earImageRight: HTMLImageElement | undefined;
+
   // Create a video element to play the track
   const video = document.createElement("video");
   video.srcObject = new MediaStream([
@@ -58,14 +62,22 @@ const EffectSectionCPU = async (
   }
 
   video.onloadedmetadata = () => {
-    canvas.width = video.videoWidth / 2;
-    canvas.height = video.videoHeight / 2;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
   };
 
-  let isRunning = true;
-  const frameRate = 60;
-  const intervalId = setInterval(() => {
+  if (effects.dogEars) {
+    earImageLeft = new Image();
+    earImageLeft.src = "/dogEars.png";
+    earImageRight = new Image();
+    earImageRight.src = "/dogEarsLeft.png";
+
+    await loadModels();
+  }
+
+  const main = async () => {
     if (!isRunning) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     if (effects.blur) {
       applyBoxBlur(ctx, canvas);
@@ -73,13 +85,14 @@ const EffectSectionCPU = async (
     if (effects.tint) {
       applyTint(ctx, canvas, hexToRgb(tintColor.current));
     }
-    if (effects.dogEars) {
-      (async () => {
-        await loadModels();
-        detectFaces(video);
-      })();
+    if (effects.dogEars && earImageLeft && earImageRight) {
+      await detectFaces(video, canvas, ctx, earImageLeft, earImageRight);
     }
-  }, 1000 / frameRate);
+  };
+
+  let isRunning = true;
+  const frameRate = 60;
+  const intervalId = setInterval(main, 1000 / frameRate);
 
   setStopFunction(
     isRunning,
@@ -97,42 +110,63 @@ const EffectSectionCPU = async (
 
 export default EffectSectionCPU;
 
-async function loadModels() {
-  await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
-  await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-}
+const detectFaces = async (
+  video: HTMLVideoElement,
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  earImageLeft: HTMLImageElement,
+  earImageRight: HTMLImageElement
+) => {
+  const displaySize = { width: canvas.width, height: canvas.height };
+  // Match dimensions only if necessary (when canvas size changes)
+  if (
+    canvas.width !== video.videoWidth ||
+    canvas.height !== video.videoHeight
+  ) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  }
 
-async function detectFaces(video) {
-  const displaySize = { width: video.width, height: video.height };
-  faceapi.matchDimensions(overlay, displaySize);
+  const detections = await faceapi
+    .detectAllFaces(
+      video,
+      new faceapi.TinyFaceDetectorOptions({
+        inputSize: 160,
+        scoreThreshold: 0.6,
+      })
+    )
+    .withFaceLandmarks();
 
-  setInterval(async () => {
-    const detections = await faceapi
-      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-      .withFaceLandmarks();
+  const resizedDetections = faceapi.resizeResults(detections, displaySize);
+  await drawDogEars(resizedDetections, ctx, earImageLeft, earImageRight);
+};
 
-    const resizedDetections = faceapi.resizeResults(detections, displaySize);
-    drawDogEars(resizedDetections);
-  }, 100);
-}
+const drawDogEars = async (
+  detections: faceapi.WithFaceLandmarks<{
+    detection: faceapi.FaceDetection;
+  }>[],
+  ctx: CanvasRenderingContext2D,
+  earImageLeft: HTMLImageElement,
+  earImageRight: HTMLImageElement
+) => {
+  const earWidth = 50;
+  const earHeight = 50;
 
-function drawDogEars(detections) {
-  detections.forEach((detection) => {
-    const landmarks = detection.landmarks;
-    const leftEar = landmarks.getLeftEye();
-    const rightEar = landmarks.getRightEye();
+  // Create an array to collect all promises of drawing operations
+  const drawPromises = detections.map((detection) => {
+    return new Promise<void>((resolve, reject) => {
+      const landmarks = detection.landmarks;
+      if (!landmarks) {
+        reject(new Error("No landmarks detected"));
+        return;
+      }
 
-    // Calculate dog ear positions based on eye positions
-    const earImage = new Image();
-    earImage.src = "dog-ears.png"; // Path to your dog ears image
-
-    earImage.onload = () => {
-      const earWidth = 50;
-      const earHeight = 50;
+      const leftEar = landmarks.getLeftEye();
+      const rightEar = landmarks.getRightEye();
 
       // Draw left ear
       ctx.drawImage(
-        earImage,
+        earImageLeft,
         leftEar[0].x - earWidth / 2,
         leftEar[0].y - earHeight * 2,
         earWidth,
@@ -141,12 +175,18 @@ function drawDogEars(detections) {
 
       // Draw right ear
       ctx.drawImage(
-        earImage,
+        earImageRight,
         rightEar[3].x - earWidth / 2,
         rightEar[3].y - earHeight * 2,
         earWidth,
         earHeight
       );
-    };
+
+      // Resolve the promise once drawing is complete
+      resolve();
+    });
   });
-}
+
+  // Wait for all drawing operations to complete
+  await Promise.all(drawPromises);
+};

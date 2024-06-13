@@ -7,19 +7,30 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "./dist"),
     filename: "index_bundle.js",
+    publicPath: "/",
   },
   target: "web",
   devServer: {
     port: 8080,
-    static: {
-      directory: path.join(__dirname, "public"),
-    },
+    static: [
+      {
+        directory: path.join(__dirname, "public"),
+        publicPath: "/",
+      },
+      {
+        directory: path.join(__dirname, "models"),
+        publicPath: "/models",
+      },
+    ],
     open: true,
     hot: true,
     liveReload: true,
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+    fallback: {
+      fs: false,
+    },
   },
   module: {
     rules: [
@@ -36,13 +47,17 @@ module.exports = {
         test: /\.svg$/,
         use: [
           {
-            loader: "url-loader", // or 'file-loader'
+            loader: "url-loader",
             options: {
-              limit: 10000, // if you want to inline files smaller than 10kb
-              name: "[name].[hash:8].[ext]", // to specify the naming convention
+              limit: 10000,
+              name: "[name].[hash:8].[ext]",
             },
           },
         ],
+      },
+      {
+        test: /\.json$/,
+        type: "javascript/auto",
       },
     ],
   },
