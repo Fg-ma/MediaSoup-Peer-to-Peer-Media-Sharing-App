@@ -68,9 +68,9 @@ const EffectSectionCPU = async (
 
   if (effects.dogEars) {
     earImageLeft = new Image();
-    earImageLeft.src = "/dogEars.png";
+    earImageLeft.src = "/dogEarsLeft.png";
     earImageRight = new Image();
-    earImageRight.src = "/dogEarsLeft.png";
+    earImageRight.src = "/dogEarsRight.png";
 
     await loadModels();
   }
@@ -118,14 +118,6 @@ const detectFaces = async (
   earImageRight: HTMLImageElement
 ) => {
   const displaySize = { width: canvas.width, height: canvas.height };
-  // Match dimensions only if necessary (when canvas size changes)
-  if (
-    canvas.width !== video.videoWidth ||
-    canvas.height !== video.videoHeight
-  ) {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-  }
 
   const detections = await faceapi
     .detectAllFaces(

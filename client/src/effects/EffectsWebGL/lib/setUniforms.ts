@@ -18,8 +18,8 @@ const setUniforms = (
     [effectType in EffectTypes]?: boolean | undefined;
   },
   tintColor: React.MutableRefObject<string>,
-  earImageLeft: WebGLTexture | null | undefined,
-  earImageRight: WebGLTexture | null | undefined
+  earImageLeftTexture: WebGLTexture | null | undefined,
+  earImageRightTexture: WebGLTexture | null | undefined
 ) => {
   const textureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
   if (textureSizeLocation) {
@@ -59,17 +59,29 @@ const setUniforms = (
       program,
       "u_earImageRight"
     );
+    const leftEarSizeLocation = gl.getUniformLocation(program, "u_leftEarSize");
+    const rightEarSizeLocation = gl.getUniformLocation(
+      program,
+      "u_rightEarSize"
+    );
 
-    if (!earImageLeft || !earImageRight) {
+    if (leftEarSizeLocation) {
+      gl.uniform2f(leftEarSizeLocation, 50, 50);
+    }
+    if (rightEarSizeLocation) {
+      gl.uniform2f(rightEarSizeLocation, 50, 50);
+    }
+
+    if (!earImageLeftTexture || !earImageRightTexture) {
       return new Error("No earImageLeft or earImageRight");
     }
 
     gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, earImageLeft);
+    gl.bindTexture(gl.TEXTURE_2D, earImageLeftTexture);
     gl.uniform1i(uEarImageLeftLocation, 1);
 
     gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, earImageRight);
+    gl.bindTexture(gl.TEXTURE_2D, earImageRightTexture);
     gl.uniform1i(uEarImageRightLocation, 2);
   }
 

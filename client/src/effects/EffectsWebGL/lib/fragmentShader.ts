@@ -12,6 +12,8 @@ const fragmentShaderSource = `
   uniform sampler2D u_earImageRight;
   uniform vec2 u_leftEarPosition;
   uniform vec2 u_rightEarPosition;
+  uniform vec2 u_leftEarSize;
+  uniform vec2 u_rightEarSize;
 
   void main() {
     vec4 color = vec4(0.0);
@@ -46,11 +48,11 @@ const fragmentShaderSource = `
 
     // Apply dog ears effect
     if (u_dogEars) {
-      vec2 leftEarTexCoord = (v_texCoord - u_leftEarPosition / u_textureSize) * 0.5 + 0.5;
-      vec2 rightEarTexCoord = (v_texCoord - u_rightEarPosition / u_textureSize) * 0.5 + 0.5;
+      vec2 leftEarTexCoord = (v_texCoord - (u_leftEarPosition / u_textureSize)) / (u_leftEarSize / u_textureSize) + 0.5;
+      vec2 rightEarTexCoord = (v_texCoord - (u_rightEarPosition / u_textureSize)) / (u_rightEarSize / u_textureSize) + 0.5;
 
-      vec4 leftEarColor = texture2D(u_earImage, leftEarTexCoord);
-      vec4 rightEarColor = texture2D(u_earImageLeft, rightEarTexCoord);
+      vec4 leftEarColor = texture2D(u_earImageLeft, leftEarTexCoord);
+      vec4 rightEarColor = texture2D(u_earImageRight, rightEarTexCoord);
 
       if (leftEarColor.a > 0.0) {
         color = mix(color, leftEarColor, leftEarColor.a);

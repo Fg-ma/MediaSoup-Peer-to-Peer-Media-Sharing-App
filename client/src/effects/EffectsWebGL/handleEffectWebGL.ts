@@ -9,6 +9,7 @@ import render from "./lib/render";
 import createProgram from "./lib/createProgram";
 import setStopFunction from "./lib/setStopFunction";
 import createBuffers from "./lib/createBuffers";
+import loadTexture from "./lib/loadTexture";
 
 const handleEffectWebGL = async (
   type: "webcam" | "screen" | "audio",
@@ -51,10 +52,11 @@ const handleEffectWebGL = async (
     fragmentShaderSource
   );
   if (vertexShader instanceof Error) {
-    return new Error("No vertex shader");
+    return new Error("No vertex shader: ", vertexShader);
   }
   if (fragmentShader instanceof Error) {
-    return new Error("No fragment shader");
+    console.log(fragmentShader);
+    return new Error("No fragment shader: ", fragmentShader);
   }
 
   const program = createProgram(gl, vertexShader, fragmentShader);
@@ -74,14 +76,17 @@ const handleEffectWebGL = async (
   }
 
   // Load dogEar images as textures
-  let earImageLeft: WebGLTexture | null | undefined;
-  let earImageRight: WebGLTexture | null | undefined;
+  let earImageLeftTexture: WebGLTexture | null | undefined;
+  let earImageRightTexture: WebGLTexture | null | undefined;
   if (effects.dogEars) {
-    earImageLeft = await loadTexture(gl, "/dogEarsLeft.png");
-    earImageRight = await loadTexture(gl, "/dogEarsRight.png");
+    earImageLeftTexture = await loadTexture(gl, "/dogEarsLeft.png");
+    earImageRightTexture = await loadTexture(gl, "/dogEarsRight.png");
+
+    // Load face detection models
+    await loadModels();
   }
 
-  if (effects.dogEars && (!earImageLeft || !earImageRight)) {
+  if (effects.dogEars && (!earImageLeftTexture || !earImageRightTexture)) {
     return new Error("No earImageLeft or earImageRight");
   }
 
@@ -92,12 +97,9 @@ const handleEffectWebGL = async (
     canvas,
     effects,
     tintColor,
-    earImageLeft,
-    earImageRight
+    earImageLeftTexture,
+    earImageRightTexture
   );
-
-  // Load face detection models
-  await loadModels();
 
   // Start video and render loop
   let animationFrameId: number[] = [];
@@ -131,7 +133,9 @@ const handleEffectWebGL = async (
     canvas,
     type,
     id,
-    userStopStreamEffects
+    userStopStreamEffects,
+    earImageLeftTexture,
+    earImageRightTexture
   );
 
   return canvas.captureStream().getVideoTracks()[0];
@@ -140,36 +144,6 @@ const handleEffectWebGL = async (
 async function loadModels() {
   await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
   await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-}
-
-async function loadTexture(
-  gl: WebGLRenderingContext,
-  url: string
-): Promise<WebGLTexture | null> {
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => {
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        image
-      );
-      resolve(texture);
-    };
-    image.onerror = (error) => reject(error);
-    image.src = url;
-  });
 }
 
 export default handleEffectWebGL;
