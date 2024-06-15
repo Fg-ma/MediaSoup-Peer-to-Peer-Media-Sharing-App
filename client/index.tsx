@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import Main from "./src/Main";
 import "./index.css";
+import "./scrollbar.css";
 import { StreamsContextProvider } from "./src/context/StreamsContext";
 
 const container = document.getElementById("root");

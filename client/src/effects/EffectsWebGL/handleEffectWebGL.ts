@@ -39,7 +39,9 @@ const handleEffectWebGL = async (
 ) => {
   // Setup WebGL context
   const canvas = document.createElement("canvas");
-  const gl = canvas.getContext("webgl");
+  const gl = canvas.getContext("webgl", {
+    willReadFrequently: true,
+  }) as WebGLRenderingContext | null;
 
   if (!gl) {
     return new Error("WebGL not supported");
@@ -81,8 +83,6 @@ const handleEffectWebGL = async (
   if (effects.dogEars) {
     earImageLeftTexture = await loadTexture(gl, "/dogEarsLeft.png");
     earImageRightTexture = await loadTexture(gl, "/dogEarsRight.png");
-
-    // Load face detection models
     await loadModels();
   }
 
@@ -91,7 +91,7 @@ const handleEffectWebGL = async (
   }
 
   // Set up the uniforms in the fragment shader
-  setUniforms(
+  const uniformLocations = setUniforms(
     gl,
     program,
     canvas,
@@ -100,6 +100,10 @@ const handleEffectWebGL = async (
     earImageLeftTexture,
     earImageRightTexture
   );
+
+  if (uniformLocations instanceof Error) {
+    return new Error("Error setting uniforms: ", uniformLocations);
+  }
 
   // Start video and render loop
   let animationFrameId: number[] = [];
@@ -110,7 +114,15 @@ const handleEffectWebGL = async (
       : userUneffectedStreams.current[type]!.getVideoTracks()[0],
   ]);
   video.addEventListener("play", () => {
-    render(gl, texture, video, animationFrameId, program, effects);
+    render(
+      gl,
+      texture,
+      video,
+      canvas,
+      animationFrameId,
+      effects,
+      uniformLocations
+    );
   });
   video.onloadedmetadata = () => {
     canvas.width = video.videoWidth;

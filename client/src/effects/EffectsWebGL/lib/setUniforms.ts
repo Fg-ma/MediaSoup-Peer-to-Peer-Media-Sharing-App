@@ -1,5 +1,21 @@
 import { EffectTypes } from "src/context/StreamsContext";
 
+export type Uniforms =
+  | "uBlurEffectLocation"
+  | "uTintEffectLocation"
+  | "uDogEarsEffectLocation"
+  | "uTextureSizeLocation"
+  | "uBlurRadiusLocation"
+  | "uTintColorLocation"
+  | "uEarImageLeftLocation"
+  | "uEarImageRightLocation"
+  | "uLeftEarPositionsLocation"
+  | "uRightEarPositionsLocation"
+  | "uLeftEarSizesLocation"
+  | "uRightEarSizesLocation"
+  | "uHeadRotationAnglesLocation"
+  | "uFaceCountLocation";
+
 const hexToRgb = (hex: string) => {
   hex = hex.replace(/^#/, "");
 
@@ -21,56 +37,42 @@ const setUniforms = (
   earImageLeftTexture: WebGLTexture | null | undefined,
   earImageRightTexture: WebGLTexture | null | undefined
 ) => {
-  const textureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
-  if (textureSizeLocation) {
-    gl.uniform2f(textureSizeLocation, canvas.width, canvas.height);
+  const uTextureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
+  if (uTextureSizeLocation) {
+    gl.uniform2f(uTextureSizeLocation, canvas.width, canvas.height);
   }
 
   // blur uniforms
+  let uBlurRadiusLocation: WebGLUniformLocation | null | undefined;
   if (effects.blur) {
-    const blurRadiusLocation = gl.getUniformLocation(program, "u_blurRadius");
+    uBlurRadiusLocation = gl.getUniformLocation(program, "u_blurRadius");
 
-    gl.uniform1f(blurRadiusLocation, 8.0);
+    gl.uniform1f(uBlurRadiusLocation, 8.0);
 
-    if (!blurRadiusLocation || !textureSizeLocation) {
-      return new Error("No blurRadiusLocation or textureSizeLocation");
+    if (!uBlurRadiusLocation || !uTextureSizeLocation) {
+      return new Error("No uBlurRadiusLocation or uTextureSizeLocation");
     }
   }
 
   // blur tint
+  let uTintColorLocation: WebGLUniformLocation | null | undefined;
   if (effects.tint) {
-    const tintColorLocation = gl.getUniformLocation(program, "u_tintColor");
+    uTintColorLocation = gl.getUniformLocation(program, "u_tintColor");
     const tintColorVector = hexToRgb(tintColor.current);
 
-    gl.uniform3fv(tintColorLocation, tintColorVector);
+    gl.uniform3fv(uTintColorLocation, tintColorVector);
 
-    if (!tintColorLocation) {
-      return new Error("No tintColorLocation");
+    if (!uTintColorLocation) {
+      return new Error("No uTintColorLocation");
     }
   }
 
   // blur dogEars
+  let uEarImageLeftLocation: WebGLUniformLocation | null | undefined;
+  let uEarImageRightLocation: WebGLUniformLocation | null | undefined;
   if (effects.dogEars) {
-    const uEarImageLeftLocation = gl.getUniformLocation(
-      program,
-      "u_earImageLeft"
-    );
-    const uEarImageRightLocation = gl.getUniformLocation(
-      program,
-      "u_earImageRight"
-    );
-    const leftEarSizeLocation = gl.getUniformLocation(program, "u_leftEarSize");
-    const rightEarSizeLocation = gl.getUniformLocation(
-      program,
-      "u_rightEarSize"
-    );
-
-    if (leftEarSizeLocation) {
-      gl.uniform2f(leftEarSizeLocation, 50, 50);
-    }
-    if (rightEarSizeLocation) {
-      gl.uniform2f(rightEarSizeLocation, 50, 50);
-    }
+    uEarImageLeftLocation = gl.getUniformLocation(program, "u_earImageLeft");
+    uEarImageRightLocation = gl.getUniformLocation(program, "u_earImageRight");
 
     if (!earImageLeftTexture || !earImageRightTexture) {
       return new Error("No earImageLeft or earImageRight");
@@ -92,6 +94,36 @@ const setUniforms = (
   gl.uniform1i(uBlurEffectLocation, effects.blur ? 1 : 0);
   gl.uniform1i(uTintEffectLocation, effects.tint ? 1 : 0);
   gl.uniform1i(uDogEarsEffectLocation, effects.dogEars ? 1 : 0);
+
+  const uniformLocations: {
+    [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
+  } = {
+    uBlurEffectLocation: uBlurEffectLocation,
+    uTintEffectLocation: uTintEffectLocation,
+    uDogEarsEffectLocation: uDogEarsEffectLocation,
+    uTextureSizeLocation: uTextureSizeLocation,
+    uBlurRadiusLocation: uBlurRadiusLocation,
+    uTintColorLocation: uTintColorLocation,
+    uEarImageLeftLocation: uEarImageLeftLocation,
+    uEarImageRightLocation: uEarImageRightLocation,
+    uLeftEarPositionsLocation: gl.getUniformLocation(
+      program,
+      "u_leftEarPositions"
+    ),
+    uRightEarPositionsLocation: gl.getUniformLocation(
+      program,
+      "u_rightEarPositions"
+    ),
+    uLeftEarSizesLocation: gl.getUniformLocation(program, "u_leftEarSizes"),
+    uRightEarSizesLocation: gl.getUniformLocation(program, "u_rightEarSizes"),
+    uHeadRotationAnglesLocation: gl.getUniformLocation(
+      program,
+      "u_headRotationAngles"
+    ),
+    uFaceCountLocation: gl.getUniformLocation(program, "u_faceCount"),
+  };
+
+  return uniformLocations;
 };
 
 export default setUniforms;

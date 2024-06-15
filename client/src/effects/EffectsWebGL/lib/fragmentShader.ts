@@ -1,4 +1,5 @@
 const fragmentShaderSource = `
+  #define MAX_FACES 8
   precision mediump float;
   varying vec2 v_texCoord;
   uniform sampler2D u_image;
@@ -14,6 +15,28 @@ const fragmentShaderSource = `
   uniform vec2 u_rightEarPosition;
   uniform vec2 u_leftEarSize;
   uniform vec2 u_rightEarSize;
+  uniform float u_headRotationAngle;
+  uniform vec2 u_leftEarPositions[MAX_FACES]; 
+  uniform vec2 u_rightEarPositions[MAX_FACES]; 
+  uniform vec2 u_leftEarSizes[MAX_FACES]; 
+  uniform vec2 u_rightEarSizes[MAX_FACES];
+  uniform float u_headRotationAngles[MAX_FACES]; 
+  uniform int u_faceCount;
+
+  mat2 getRotationMatrix(float angle) {
+    float cosA = cos(angle);
+    float sinA = sin(angle);
+    return mat2(cosA, -sinA, sinA, cosA);
+  }
+
+  void applyEarEffect(inout vec4 color, vec2 texCoord, sampler2D earImage, vec2 earPosition, vec2 earSize, float headRotationAngle) {
+    mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
+    vec2 earTexCoord = (rotationMatrix * (texCoord - earPosition) * u_textureSize / earSize) + 0.5;
+    vec4 earColor = texture2D(earImage, earTexCoord);
+    if (earColor.a > 0.0) {
+      color = mix(color, earColor, earColor.a);
+    }
+  }
 
   void main() {
     vec4 color = vec4(0.0);
@@ -48,17 +71,11 @@ const fragmentShaderSource = `
 
     // Apply dog ears effect
     if (u_dogEars) {
-      vec2 leftEarTexCoord = (v_texCoord - (u_leftEarPosition / u_textureSize)) / (u_leftEarSize / u_textureSize) + 0.5;
-      vec2 rightEarTexCoord = (v_texCoord - (u_rightEarPosition / u_textureSize)) / (u_rightEarSize / u_textureSize) + 0.5;
-
-      vec4 leftEarColor = texture2D(u_earImageLeft, leftEarTexCoord);
-      vec4 rightEarColor = texture2D(u_earImageRight, rightEarTexCoord);
-
-      if (leftEarColor.a > 0.0) {
-        color = mix(color, leftEarColor, leftEarColor.a);
-      }
-      if (rightEarColor.a > 0.0) {
-        color = mix(color, rightEarColor, rightEarColor.a);
+      for (int i = 0; i < MAX_FACES; i++) {
+        if (i < u_faceCount) {
+          applyEarEffect(color, v_texCoord, u_earImageLeft, u_leftEarPositions[i], u_leftEarSizes[i], u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_earImageRight, u_rightEarPositions[i], u_rightEarSizes[i], u_headRotationAngles[i]);
+        }
       }
     }
 
