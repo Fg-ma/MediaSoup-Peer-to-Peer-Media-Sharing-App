@@ -1,7 +1,7 @@
 const loadTexture = async (
   gl: WebGLRenderingContext,
   url: string
-): Promise<WebGLTexture | null> => {
+): Promise<{ texture: WebGLTexture | null; aspectRatio: number }> => {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -21,7 +21,9 @@ const loadTexture = async (
         gl.UNSIGNED_BYTE,
         image
       );
-      resolve(texture);
+
+      const aspectRatio = image.width / image.height;
+      resolve({ texture, aspectRatio });
     };
     image.onerror = (error) => reject(error);
     image.src = url;

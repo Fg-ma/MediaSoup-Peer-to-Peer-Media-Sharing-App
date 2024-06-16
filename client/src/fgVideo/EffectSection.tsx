@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import effectIcon from "../../public/svgs/effectIcon.svg";
+import effectOffIcon from "../../public/svgs/effectOffIcon.svg";
 import tintIcon from "../../public/svgs/tintIcon.svg";
 import dogEarsIcon from "../../public/svgs/dogEarsIcon.svg";
 import dogEarsOffIcon from "../../public/svgs/dogEarsOffIcon.svg";
+import glassesIcon from "../../public/svgs/glassesIcon.svg";
+import glassesOffIcon from "../../public/svgs/glassesOffIcon.svg";
 import handleEffects from "./lib/handleEffects";
 import { EffectTypes } from "src/context/StreamsContext";
 import ColorPicker from "./ColorPicker";
@@ -40,6 +43,7 @@ export default function EffectSection({
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [color, setColor] = useState("#F56114");
   const [tempColor, setTempColor] = useState(color);
+  const [effectsWidth, setEffectsWidth] = useState(0);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -53,6 +57,32 @@ export default function EffectSection({
     setIsColorPicker((prev) => !prev);
   };
 
+  const [overflowingXDirection, setOverflowingXDirection] = useState(false);
+  const effectsContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (videoContainerRef.current) {
+        setEffectsWidth(videoContainerRef.current.clientWidth * 0.9);
+      }
+      if (effectsContainerRef.current) {
+        setOverflowingXDirection(
+          effectsContainerRef.current.scrollWidth >
+            effectsContainerRef.current.clientWidth
+        );
+      }
+    };
+
+    // Update width on mount
+    updateWidth();
+
+    // Add resize event listener
+    window.addEventListener("resize", updateWidth);
+
+    // Cleanup event listener on unmount
+    return () => window.removeEventListener("resize", updateWidth);
+  }, [videoContainerRef]);
+
   return (
     <div>
       <button
@@ -61,19 +91,28 @@ export default function EffectSection({
         }
         className='flex items-center justify-center w-10 aspect-square relative'
       >
-        <img
-          src={effectIcon}
-          alt='icon'
-          className='w-5/6 h-5/6 fill-white stroke-white'
-        />
+        {isEffects ? (
+          <img
+            src={effectOffIcon}
+            alt='icon'
+            style={{ width: "90%", height: "90%" }}
+          />
+        ) : (
+          <img
+            src={effectIcon}
+            alt='icon'
+            style={{ width: "90%", height: "90%" }}
+          />
+        )}
       </button>
       {isEffects && (
         <div
-          className='tiny-horizontal-scroll-bar rounded border mb-3 border-white border-opacity-75 bg-black bg-opacity-75 shadow-md overflow-x-auto overflow-y-hidden flex px-2 pt-2 absolute bottom-full left-1/2 -translate-x-1/2 h-max'
+          ref={effectsContainerRef}
+          className={`${
+            overflowingXDirection ? "" : "pb-2"
+          } tiny-horizontal-scroll-bar rounded border mb-5 border-white border-opacity-75 bg-black bg-opacity-75 shadow-xl overflow-x-auto overflow-y-hidden flex space-x-1 px-2 pt-2 absolute bottom-full left-1/2 -translate-x-1/2 h-max items-center`}
           style={{
-            width: videoContainerRef.current
-              ? `${videoContainerRef.current.clientWidth * 0.9}px`
-              : "",
+            width: effectsWidth,
           }}
         >
           <button
@@ -102,7 +141,8 @@ export default function EffectSection({
               </svg>
             )}
           </button>
-          <div className='w-max border-x border-white flex'>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <div className='w-max flex'>
             <button
               onClick={() => handleEffectChange("tint")}
               className='flex items-center justify-center w-10 aspect-square'
@@ -191,6 +231,7 @@ export default function EffectSection({
               )}
             </div>
           </div>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <button
             onClick={() => handleEffectChange("dogEars")}
             className='flex items-center justify-center w-10 min-w-10 aspect-square'
@@ -199,13 +240,32 @@ export default function EffectSection({
               <img
                 src={dogEarsOffIcon}
                 alt='icon'
-                className='w-5/6 h-5/6 fill-white stroke-white'
+                style={{ width: "90%", height: "90%" }}
               />
             ) : (
               <img
                 src={dogEarsIcon}
                 alt='icon'
-                className='w-5/6 h-5/6 fill-white stroke-white'
+                style={{ width: "90%", height: "90%" }}
+              />
+            )}
+          </button>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <button
+            onClick={() => handleEffectChange("glasses")}
+            className='flex items-center justify-center w-10 aspect-square'
+          >
+            {userStreamEffects.current.glasses[type]?.[videoId] ? (
+              <img
+                src={glassesOffIcon}
+                alt='icon'
+                style={{ width: "90%", height: "90%" }}
+              />
+            ) : (
+              <img
+                src={glassesIcon}
+                alt='icon'
+                style={{ width: "90%", height: "90%" }}
               />
             )}
           </button>

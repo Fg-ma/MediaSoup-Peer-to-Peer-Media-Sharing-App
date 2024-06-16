@@ -3,25 +3,43 @@ const fragmentShaderSource = `
   precision mediump float;
   varying vec2 v_texCoord;
   uniform sampler2D u_image;
+
+  // Blur
   uniform float u_blurRadius;
   uniform vec2 u_textureSize;
+
+  // Tint
   uniform vec3 u_tintColor;
+
+  // Effect booleans
   uniform bool u_blurEffect;
   uniform bool u_tintEffect;
-  uniform bool u_dogEars;
-  uniform sampler2D u_earImageLeft;
-  uniform sampler2D u_earImageRight;
-  uniform vec2 u_leftEarPosition;
-  uniform vec2 u_rightEarPosition;
-  uniform vec2 u_leftEarSize;
-  uniform vec2 u_rightEarSize;
-  uniform float u_headRotationAngle;
+  uniform bool u_dogEarsEffect;
+  uniform bool u_glassesEffect;
+
+  // Effect images
+  uniform sampler2D u_leftDogEarImage;
+  uniform float u_leftDogEarAspectRatio;
+  uniform sampler2D u_rightDogEarImage;
+  uniform float u_rightDogEarAspectRatio;
+  uniform sampler2D u_glassesImage;
+  uniform float u_glassesAspectRatio;
+
+  // Universal face data
+  uniform int u_faceCount;
+  uniform float u_headRotationAngles[MAX_FACES]; 
+
+  // Ears
   uniform vec2 u_leftEarPositions[MAX_FACES]; 
   uniform vec2 u_rightEarPositions[MAX_FACES]; 
   uniform vec2 u_leftEarSizes[MAX_FACES]; 
   uniform vec2 u_rightEarSizes[MAX_FACES];
-  uniform float u_headRotationAngles[MAX_FACES]; 
-  uniform int u_faceCount;
+
+  // Eyes
+  uniform vec2 u_leftEyePositions[MAX_FACES];
+  uniform vec2 u_rightEyePositions[MAX_FACES];
+  uniform vec2 u_eyesCenters[MAX_FACES];
+  uniform float u_eyesWidths[MAX_FACES];
 
   mat2 getRotationMatrix(float angle) {
     float cosA = cos(angle);
@@ -30,7 +48,11 @@ const fragmentShaderSource = `
   }
 
   void applyEarEffect(inout vec4 color, vec2 texCoord, sampler2D earImage, vec2 earPosition, vec2 earSize, float headRotationAngle) {
+    float earHeight = earWidth / earAspectRatio;
+    vec2 earSize = vec2(earWidth, earHeight);  
+  
     mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
+
     vec2 earTexCoord = (rotationMatrix * (texCoord - earPosition) * u_textureSize / earSize) + 0.5;
     vec4 earColor = texture2D(earImage, earTexCoord);
     if (earColor.a > 0.0) {
@@ -38,8 +60,21 @@ const fragmentShaderSource = `
     }
   }
 
+  void applyGlassesEffect(inout vec4 color, vec2 texCoord, sampler2D glassesImage, vec2 eyeCenter, float glassesWidth, float headRotationAngle) {
+    float glassesHeight = glassesWidth / u_glassesAspectRatio;
+    vec2 glassesSize = vec2(glassesWidth, glassesHeight);
+
+    mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
+
+    vec2 glassesTexCoord = (rotationMatrix * (texCoord - eyeCenter) * u_textureSize / glassesSize) + 0.5;
+    vec4 glassesColor = texture2D(glassesImage, glassesTexCoord);
+    if (glassesColor.a > 0.0) {
+      color = mix(color, glassesColor, glassesColor.a);
+    }
+  }
+
   void main() {
-    vec4 color = vec4(0.0);
+    vec4 color = texture2D(u_image, v_texCoord);
     float total = 0.0;
 
     const int MAX_RADIUS = 32;
@@ -56,8 +91,6 @@ const fragmentShaderSource = `
         }
       }
       color /= total;
-    } else {
-      color = texture2D(u_image, v_texCoord);
     }
 
     // Apply tint effect
@@ -70,11 +103,20 @@ const fragmentShaderSource = `
     }
 
     // Apply dog ears effect
-    if (u_dogEars) {
+    if (u_dogEarsEffect) {
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
-          applyEarEffect(color, v_texCoord, u_earImageLeft, u_leftEarPositions[i], u_leftEarSizes[i], u_headRotationAngles[i]);
-          applyEarEffect(color, v_texCoord, u_earImageRight, u_rightEarPositions[i], u_rightEarSizes[i], u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_leftDogEarImage, u_leftEarPositions[i], u_leftEarSizes[i], u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_rightDogEarImage, u_rightEarPositions[i], u_rightEarSizes[i], u_headRotationAngles[i]);
+        }
+      }
+    }
+
+    // Apply glasses effect
+    if (u_glassesEffect) {
+      for (int i = 0; i < MAX_FACES; i++) {
+        if (i < u_faceCount) {
+          applyGlassesEffect(color, v_texCoord, u_glassesImage, u_eyesCenters[i], u_eyesWidths[i], u_headRotationAngles[i]);
         }
       }
     }

@@ -4,17 +4,25 @@ export type Uniforms =
   | "uBlurEffectLocation"
   | "uTintEffectLocation"
   | "uDogEarsEffectLocation"
+  | "uGlassesEffectLocation"
   | "uTextureSizeLocation"
   | "uBlurRadiusLocation"
   | "uTintColorLocation"
-  | "uEarImageLeftLocation"
-  | "uEarImageRightLocation"
+  | "uLeftDogEarImageLocation"
+  | "uLeftDogEarAspectRatioLocation"
+  | "uRightDogEarImageLocation"
+  | "uRightDogEarAspectRatioLocation"
   | "uLeftEarPositionsLocation"
   | "uRightEarPositionsLocation"
   | "uLeftEarSizesLocation"
   | "uRightEarSizesLocation"
   | "uHeadRotationAnglesLocation"
-  | "uFaceCountLocation";
+  | "uFaceCountLocation"
+  | "uLeftEyePositionsLocation"
+  | "uRightEyePositionsLocation"
+  | "uEyesCentersLocation"
+  | "uEyesWidths"
+  | "uGlassesAspectRatioLocation";
 
 const hexToRgb = (hex: string) => {
   hex = hex.replace(/^#/, "");
@@ -34,8 +42,12 @@ const setUniforms = (
     [effectType in EffectTypes]?: boolean | undefined;
   },
   tintColor: React.MutableRefObject<string>,
-  earImageLeftTexture: WebGLTexture | null | undefined,
-  earImageRightTexture: WebGLTexture | null | undefined
+  leftDogEarImageTexture: WebGLTexture | null | undefined,
+  leftDogEarImageAspectRatio: number | undefined,
+  rightDogEarImageTexture: WebGLTexture | null | undefined,
+  rightDogEarImageAspectRatio: number | undefined,
+  glassesImageTexture: WebGLTexture | null | undefined,
+  glassesImageAspectRatio: number | undefined
 ) => {
   const uTextureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
   if (uTextureSizeLocation) {
@@ -67,33 +79,95 @@ const setUniforms = (
     }
   }
 
-  // blur dogEars
-  let uEarImageLeftLocation: WebGLUniformLocation | null | undefined;
-  let uEarImageRightLocation: WebGLUniformLocation | null | undefined;
+  // dogEars
+  let uLeftDogEarImageLocation: WebGLUniformLocation | null | undefined;
+  let uLeftDogEarAspectRatioLocation: WebGLUniformLocation | null | undefined;
+  let uRightDogEarImageLocation: WebGLUniformLocation | null | undefined;
+  let uRightDogEarAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.dogEars) {
-    uEarImageLeftLocation = gl.getUniformLocation(program, "u_earImageLeft");
-    uEarImageRightLocation = gl.getUniformLocation(program, "u_earImageRight");
+    uLeftDogEarImageLocation = gl.getUniformLocation(
+      program,
+      "u_leftDogEarImage"
+    );
+    uLeftDogEarAspectRatioLocation = gl.getUniformLocation(
+      program,
+      "u_leftDogEarAspectRatio"
+    );
+    uRightDogEarImageLocation = gl.getUniformLocation(
+      program,
+      "u_rightDogEarImage"
+    );
+    uRightDogEarAspectRatioLocation = gl.getUniformLocation(
+      program,
+      "u_rightDogEarAspectRatioLocation"
+    );
 
-    if (!earImageLeftTexture || !earImageRightTexture) {
-      return new Error("No earImageLeft or earImageRight");
+    if (
+      !leftDogEarImageTexture ||
+      !leftDogEarImageAspectRatio ||
+      !rightDogEarImageTexture ||
+      !rightDogEarImageAspectRatio
+    ) {
+      return new Error(
+        "No leftDogEarImageTexture or leftDogEarImageAspectRatio or rightDogEarImageTexture or rightDogEarImageAspectRatio"
+      );
     }
 
     gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, earImageLeftTexture);
-    gl.uniform1i(uEarImageLeftLocation, 1);
+    gl.bindTexture(gl.TEXTURE_2D, leftDogEarImageTexture);
+    gl.uniform1i(uLeftDogEarImageLocation, 1);
+
+    gl.uniform1f(uLeftDogEarAspectRatioLocation, leftDogEarImageAspectRatio);
 
     gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, earImageRightTexture);
-    gl.uniform1i(uEarImageRightLocation, 2);
+    gl.bindTexture(gl.TEXTURE_2D, rightDogEarImageTexture);
+    gl.uniform1i(uRightDogEarImageLocation, 2);
+
+    gl.uniform1f(uRightDogEarAspectRatioLocation, rightDogEarImageAspectRatio);
+  }
+
+  // glasses
+  let uGlassesImageLocation: WebGLUniformLocation | null | undefined;
+  let uGlassesAspectRatioLocation: WebGLUniformLocation | null | undefined;
+  if (effects.glasses) {
+    uGlassesImageLocation = gl.getUniformLocation(program, "u_glassesImage");
+    uGlassesAspectRatioLocation = gl.getUniformLocation(
+      program,
+      "u_glassesAspectRatio"
+    );
+
+    if (
+      !glassesImageTexture ||
+      !glassesImageAspectRatio ||
+      !uGlassesImageLocation
+    ) {
+      return new Error(
+        "No glassesImageTexture or glassesImageAspectRatio or no uGlassesImageLocation"
+      );
+    }
+
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, glassesImageTexture);
+    gl.uniform1i(uGlassesImageLocation, 3);
+
+    gl.uniform1f(uGlassesAspectRatioLocation, glassesImageAspectRatio);
   }
 
   const uBlurEffectLocation = gl.getUniformLocation(program, "u_blurEffect");
   const uTintEffectLocation = gl.getUniformLocation(program, "u_tintEffect");
-  const uDogEarsEffectLocation = gl.getUniformLocation(program, "u_dogEars");
+  const uDogEarsEffectLocation = gl.getUniformLocation(
+    program,
+    "u_dogEarsEffect"
+  );
+  const uGlassesEffectLocation = gl.getUniformLocation(
+    program,
+    "u_glassesEffect"
+  );
 
   gl.uniform1i(uBlurEffectLocation, effects.blur ? 1 : 0);
   gl.uniform1i(uTintEffectLocation, effects.tint ? 1 : 0);
   gl.uniform1i(uDogEarsEffectLocation, effects.dogEars ? 1 : 0);
+  gl.uniform1i(uGlassesEffectLocation, effects.glasses ? 1 : 0);
 
   const uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
@@ -101,11 +175,14 @@ const setUniforms = (
     uBlurEffectLocation: uBlurEffectLocation,
     uTintEffectLocation: uTintEffectLocation,
     uDogEarsEffectLocation: uDogEarsEffectLocation,
+    uGlassesEffectLocation: uGlassesEffectLocation,
     uTextureSizeLocation: uTextureSizeLocation,
     uBlurRadiusLocation: uBlurRadiusLocation,
     uTintColorLocation: uTintColorLocation,
-    uEarImageLeftLocation: uEarImageLeftLocation,
-    uEarImageRightLocation: uEarImageRightLocation,
+    uLeftDogEarImageLocation: uLeftDogEarImageLocation,
+    uLeftDogEarAspectRatioLocation: uLeftDogEarAspectRatioLocation,
+    uRightDogEarImageLocation: uRightDogEarImageLocation,
+    uRightDogEarAspectRatioLocation: uRightDogEarAspectRatioLocation,
     uLeftEarPositionsLocation: gl.getUniformLocation(
       program,
       "u_leftEarPositions"
@@ -121,6 +198,17 @@ const setUniforms = (
       "u_headRotationAngles"
     ),
     uFaceCountLocation: gl.getUniformLocation(program, "u_faceCount"),
+    uLeftEyePositionsLocation: gl.getUniformLocation(
+      program,
+      "u_leftEyePositions"
+    ),
+    uRightEyePositionsLocation: gl.getUniformLocation(
+      program,
+      "u_rightEyePositions"
+    ),
+    uEyesCentersLocation: gl.getUniformLocation(program, "u_eyesCenters"),
+    uEyesWidths: gl.getUniformLocation(program, "u_eyesWidths"),
+    uGlassesAspectRatioLocation: uGlassesAspectRatioLocation,
   };
 
   return uniformLocations;

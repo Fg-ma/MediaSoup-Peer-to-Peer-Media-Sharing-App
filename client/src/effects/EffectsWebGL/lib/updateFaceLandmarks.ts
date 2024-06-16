@@ -1,5 +1,7 @@
 import * as faceapi from "face-api.js";
 import { Uniforms } from "./setUniforms";
+import { EffectTypes } from "src/context/StreamsContext";
+import { FaceLandmarks } from "../handleEffectWebGL";
 
 const maxFaces = 8;
 let smoothedNormalizedLeftEarPositions: { [id: string]: number[] } = {};
@@ -20,22 +22,35 @@ const updateFaceLandmarks = async (
   canvas: HTMLCanvasElement,
   uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
-  }
+  },
+  effects: {
+    [effectType in EffectTypes]?: boolean | undefined;
+  },
+  faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean }
 ) => {
   const detections = await faceapi
     .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks();
 
-  if (detections.length !== 0 && uniformLocations.uDogEarsEffectLocation) {
-    gl.uniform1i(uniformLocations.uDogEarsEffectLocation, 1);
+  if (detections.length !== 0) {
+    if (effects.dogEars && uniformLocations.uDogEarsEffectLocation) {
+      gl.uniform1i(uniformLocations.uDogEarsEffectLocation, 1);
+    }
+    if (effects.glasses && uniformLocations.uGlassesEffectLocation) {
+      gl.uniform1i(uniformLocations.uGlassesEffectLocation, 1);
+    }
   }
 
+  const faceCount = detections.length;
+  const headRotationAngles: number[] = [];
   const leftEarPositions: number[][] = [];
   const rightEarPositions: number[][] = [];
   const leftEarSizes: number[][] = [];
   const rightEarSizes: number[][] = [];
-  const headRotationAngles: number[] = [];
-  const faceCount = detections.length;
+  const leftEyePositions: number[][] = [];
+  const rightEyePositions: number[][] = [];
+  const eyesCenterPositions: number[][] = [];
+  const eyesWidths: number[] = [];
 
   const newFaceTrackers: {
     [id: string]: { position: faceapi.Point; lastSeen: number };
@@ -48,7 +63,7 @@ const updateFaceLandmarks = async (
 
     // Set the faceTracker based on which face is closest to which face in
     // the set of last seen faces
-    const faceCenter = {
+    const eyeCenterPosition = {
       x: (leftEye[0].x + rightEye[3].x) / 2,
       y: (leftEye[0].y + rightEye[3].y) / 2,
     };
@@ -58,8 +73,8 @@ const updateFaceLandmarks = async (
 
     for (const [id, tracker] of Object.entries(faceTrackers)) {
       const distance = Math.sqrt(
-        Math.pow(faceCenter.x - tracker.position.x, 2) +
-          Math.pow(faceCenter.y - tracker.position.y, 2)
+        Math.pow(eyeCenterPosition.x - tracker.position.x, 2) +
+          Math.pow(eyeCenterPosition.y - tracker.position.y, 2)
       );
       if (distance < closestDistance) {
         closestDistance = distance;
@@ -73,7 +88,7 @@ const updateFaceLandmarks = async (
       return;
     }
     newFaceTrackers[faceId] = {
-      position: faceCenter as faceapi.Point,
+      position: eyeCenterPosition as faceapi.Point,
       lastSeen: 0,
     };
 
@@ -126,15 +141,35 @@ const updateFaceLandmarks = async (
 
     // Calculate ear size based on interocular distance
     const earSizeFactor = 300;
-    const earWidth = interocularDistance * earSizeFactor;
-    const earHeight = interocularDistance * earSizeFactor;
-    const normalizedEarSize = [earWidth, earHeight];
+    const normalizedEarSize = [
+      interocularDistance * earSizeFactor,
+      interocularDistance * earSizeFactor,
+    ];
+
+    // Calculate eye positions and size
+    const leftEyePosition = [
+      leftEye[0].x / canvas.width,
+      leftEye[0].y / canvas.height,
+    ];
+    const rightEyePosition = [
+      rightEye[3].x / canvas.width,
+      rightEye[3].y / canvas.height,
+    ];
+    const eyesWidthSizeFactor = 600;
+    const normalizedEyesWidth = interocularDistance * eyesWidthSizeFactor;
 
     leftEarPositions.push(smoothedNormalizedLeftEarPositions[faceId]);
     rightEarPositions.push(smoothedNormalizedRightEarPositions[faceId]);
     leftEarSizes.push(normalizedEarSize);
     rightEarSizes.push(normalizedEarSize);
     headRotationAngles.push(headAngle);
+    leftEyePositions.push(leftEyePosition);
+    rightEyePositions.push(rightEyePosition);
+    eyesCenterPositions.push([
+      eyeCenterPosition.x / canvas.width,
+      eyeCenterPosition.y / canvas.height,
+    ]);
+    eyesWidths.push(normalizedEyesWidth);
   });
 
   // Remove old face trackers
@@ -151,11 +186,14 @@ const updateFaceLandmarks = async (
   }
   faceTrackers = newFaceTrackers;
 
-  // Set timeout to turn off dog ears effect if no detections after a delay
+  // Set timeout to turn off effects if no detections after a delay
   if (detections.length === 0 && !detectTimeout) {
     detectTimeout = setTimeout(() => {
-      if (uniformLocations.uDogEarsEffectLocation) {
+      if (effects.dogEars && uniformLocations.uDogEarsEffectLocation) {
         gl.uniform1i(uniformLocations.uDogEarsEffectLocation, 0);
+      }
+      if (effects.glasses && uniformLocations.uGlassesEffectLocation) {
+        gl.uniform1i(uniformLocations.uGlassesEffectLocation, 0);
       }
       detectTimeout = undefined;
     }, detectionTimeout);
@@ -166,36 +204,61 @@ const updateFaceLandmarks = async (
   }
 
   // Update uniforms
-  if (
-    detections.length > 0 &&
-    uniformLocations.uLeftEarPositionsLocation &&
-    uniformLocations.uRightEarPositionsLocation &&
-    uniformLocations.uHeadRotationAnglesLocation &&
-    uniformLocations.uLeftEarSizesLocation &&
-    uniformLocations.uRightEarSizesLocation &&
-    uniformLocations.uFaceCountLocation
-  ) {
-    gl.uniform2fv(
-      uniformLocations.uLeftEarPositionsLocation,
-      flattenArray(leftEarPositions, maxFaces)
-    );
-    gl.uniform2fv(
-      uniformLocations.uRightEarPositionsLocation,
-      flattenArray(rightEarPositions, maxFaces)
-    );
-    gl.uniform2fv(
-      uniformLocations.uLeftEarSizesLocation,
-      flattenArray(leftEarSizes, maxFaces)
-    );
-    gl.uniform2fv(
-      uniformLocations.uRightEarSizesLocation,
-      flattenArray(rightEarSizes, maxFaces)
-    );
-    gl.uniform1fv(
-      uniformLocations.uHeadRotationAnglesLocation,
-      new Float32Array(headRotationAngles)
-    );
-    gl.uniform1i(uniformLocations.uFaceCountLocation, faceCount);
+  if (detections.length > 0) {
+    if (uniformLocations.uFaceCountLocation) {
+      gl.uniform1i(uniformLocations.uFaceCountLocation, faceCount);
+    }
+    if (uniformLocations.uHeadRotationAnglesLocation) {
+      gl.uniform1fv(
+        uniformLocations.uHeadRotationAnglesLocation,
+        new Float32Array(headRotationAngles)
+      );
+    }
+    if (uniformLocations.uLeftEarPositionsLocation) {
+      gl.uniform2fv(
+        uniformLocations.uLeftEarPositionsLocation,
+        flattenArray(leftEarPositions, maxFaces)
+      );
+    }
+    if (uniformLocations.uRightEarPositionsLocation) {
+      gl.uniform2fv(
+        uniformLocations.uRightEarPositionsLocation,
+        flattenArray(rightEarPositions, maxFaces)
+      );
+    }
+    if (uniformLocations.uLeftEarSizesLocation) {
+      gl.uniform2fv(
+        uniformLocations.uLeftEarSizesLocation,
+        flattenArray(leftEarSizes, maxFaces)
+      );
+    }
+    if (uniformLocations.uRightEarSizesLocation) {
+      gl.uniform2fv(
+        uniformLocations.uRightEarSizesLocation,
+        flattenArray(rightEarSizes, maxFaces)
+      );
+    }
+    if (uniformLocations.uLeftEyePositionsLocation) {
+      gl.uniform2fv(
+        uniformLocations.uLeftEyePositionsLocation,
+        flattenArray(leftEyePositions, maxFaces)
+      );
+    }
+    if (uniformLocations.uRightEyePositionsLocation) {
+      gl.uniform2fv(
+        uniformLocations.uRightEyePositionsLocation,
+        flattenArray(rightEyePositions, maxFaces)
+      );
+    }
+    if (uniformLocations.uEyesCentersLocation) {
+      gl.uniform2fv(
+        uniformLocations.uEyesCentersLocation,
+        flattenArray(eyesCenterPositions, maxFaces)
+      );
+    }
+    if (uniformLocations.uEyesWidths) {
+      gl.uniform1fv(uniformLocations.uEyesWidths, new Float32Array(eyesWidths));
+    }
   }
 };
 

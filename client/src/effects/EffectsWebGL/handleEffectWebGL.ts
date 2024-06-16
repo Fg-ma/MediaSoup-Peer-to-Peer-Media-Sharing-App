@@ -11,6 +11,17 @@ import setStopFunction from "./lib/setStopFunction";
 import createBuffers from "./lib/createBuffers";
 import loadTexture from "./lib/loadTexture";
 
+export type FaceLandmarks =
+  | "headRotationAngles"
+  | "leftEarPositions"
+  | "rightEarPositions"
+  | "leftEarSize"
+  | "rightEarSize"
+  | "leftEyePositions"
+  | "rightEyePositions"
+  | "eyesCenterPositions"
+  | "uEyesWidths";
+
 const handleEffectWebGL = async (
   type: "webcam" | "screen" | "audio",
   id: string,
@@ -77,17 +88,42 @@ const handleEffectWebGL = async (
     return new Error("No texture");
   }
 
-  // Load dogEar images as textures
-  let earImageLeftTexture: WebGLTexture | null | undefined;
-  let earImageRightTexture: WebGLTexture | null | undefined;
-  if (effects.dogEars) {
-    earImageLeftTexture = await loadTexture(gl, "/dogEarsLeft.png");
-    earImageRightTexture = await loadTexture(gl, "/dogEarsRight.png");
+  if (effects.dogEars || effects.glasses) {
     await loadModels();
   }
 
-  if (effects.dogEars && (!earImageLeftTexture || !earImageRightTexture)) {
-    return new Error("No earImageLeft or earImageRight");
+  // Load dogEar images as textures
+  let leftDogEarImageTexture: WebGLTexture | null | undefined;
+  let leftDogEarImageAspectRatio: number | undefined;
+  let rightDogEarImageTexture: WebGLTexture | null | undefined;
+  let rightDogEarImageAspectRatio: number | undefined;
+  if (effects.dogEars) {
+    const leftEarTexture = await loadTexture(gl, "/assets/dogEarsLeft.png");
+    leftDogEarImageTexture = leftEarTexture.texture;
+    leftDogEarImageAspectRatio = leftEarTexture.aspectRatio;
+    const rightEarTexture = await loadTexture(gl, "/assets/dogEarsRight.png");
+    rightDogEarImageTexture = rightEarTexture.texture;
+    rightDogEarImageAspectRatio = rightEarTexture.aspectRatio;
+  }
+
+  if (
+    effects.dogEars &&
+    (!leftDogEarImageTexture || !rightDogEarImageTexture)
+  ) {
+    return new Error("No leftDogEarImageTexture or rightDogEarImageTexture");
+  }
+
+  // Load glasses images as textures
+  let glassesImageTexture: WebGLTexture | null | undefined;
+  let glassesImageAspectRatio: number | undefined;
+  if (effects.glasses) {
+    const glassesTexture = await loadTexture(gl, "/assets/glasses1.png");
+    glassesImageTexture = glassesTexture.texture;
+    glassesImageAspectRatio = glassesTexture.aspectRatio;
+  }
+
+  if (effects.glasses && !glassesImageTexture) {
+    return new Error("No glassesImage");
   }
 
   // Set up the uniforms in the fragment shader
@@ -97,12 +133,41 @@ const handleEffectWebGL = async (
     canvas,
     effects,
     tintColor,
-    earImageLeftTexture,
-    earImageRightTexture
+    leftDogEarImageTexture,
+    leftDogEarImageAspectRatio,
+    rightDogEarImageTexture,
+    rightDogEarImageAspectRatio,
+    glassesImageTexture,
+    glassesImageAspectRatio
   );
 
   if (uniformLocations instanceof Error) {
     return new Error("Error setting uniforms: ", uniformLocations);
+  }
+
+  const faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean } = {
+    headRotationAngles: false,
+    leftEarPositions: false,
+    rightEarPositions: false,
+    leftEarSize: false,
+    rightEarSize: false,
+    leftEyePositions: false,
+    rightEyePositions: false,
+    eyesCenterPositions: false,
+    uEyesWidths: false,
+  };
+
+  if (effects.dogEars) {
+    faceLandmarks.headRotationAngles = true;
+    faceLandmarks.leftEarPositions = true;
+    faceLandmarks.rightEarPositions = true;
+    faceLandmarks.leftEarSize = true;
+    faceLandmarks.rightEarSize = true;
+  }
+  if (effects.glasses) {
+    faceLandmarks.headRotationAngles = true;
+    faceLandmarks.eyesCenterPositions = true;
+    faceLandmarks.uEyesWidths = true;
   }
 
   // Start video and render loop
@@ -121,7 +186,8 @@ const handleEffectWebGL = async (
       canvas,
       animationFrameId,
       effects,
-      uniformLocations
+      uniformLocations,
+      faceLandmarks
     );
   });
   video.onloadedmetadata = () => {
@@ -146,8 +212,9 @@ const handleEffectWebGL = async (
     type,
     id,
     userStopStreamEffects,
-    earImageLeftTexture,
-    earImageRightTexture
+    leftDogEarImageTexture,
+    rightDogEarImageTexture,
+    glassesImageTexture
   );
 
   return canvas.captureStream().getVideoTracks()[0];

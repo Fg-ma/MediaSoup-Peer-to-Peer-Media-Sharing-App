@@ -2,6 +2,7 @@ import { EffectTypes } from "src/context/StreamsContext";
 import updateFaceLandmarks from "./updateFaceLandmarks";
 import updateTexture from "./updateTexture";
 import { Uniforms } from "./setUniforms";
+import { FaceLandmarks } from "../handleEffectWebGL";
 
 const render = async (
   gl: WebGLRenderingContext,
@@ -14,12 +15,20 @@ const render = async (
   },
   uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
-  }
+  },
+  faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean }
 ) => {
   updateTexture(gl, texture, video);
 
-  if (effects.dogEars) {
-    await updateFaceLandmarks(gl, video, canvas, uniformLocations);
+  if (effects.dogEars || effects.glasses) {
+    await updateFaceLandmarks(
+      gl,
+      video,
+      canvas,
+      uniformLocations,
+      effects,
+      faceLandmarks
+    );
   }
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -31,7 +40,8 @@ const render = async (
       canvas,
       animationFrameId,
       effects,
-      uniformLocations
+      uniformLocations,
+      faceLandmarks
     )
   );
 };
