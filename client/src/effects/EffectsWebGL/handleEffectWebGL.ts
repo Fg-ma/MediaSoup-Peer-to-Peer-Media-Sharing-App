@@ -15,12 +15,14 @@ export type FaceLandmarks =
   | "headRotationAngles"
   | "leftEarPositions"
   | "rightEarPositions"
-  | "leftEarSize"
-  | "rightEarSize"
+  | "leftEarWidths"
+  | "rightEarWidths"
   | "leftEyePositions"
   | "rightEyePositions"
   | "eyesCenterPositions"
-  | "uEyesWidths";
+  | "eyesWidths"
+  | "nosePositions"
+  | "chinWidths";
 
 const handleEffectWebGL = async (
   type: "webcam" | "screen" | "audio",
@@ -88,7 +90,7 @@ const handleEffectWebGL = async (
     return new Error("No texture");
   }
 
-  if (effects.dogEars || effects.glasses) {
+  if (effects.dogEars || effects.glasses || effects.beard) {
     await loadModels();
   }
 
@@ -104,13 +106,17 @@ const handleEffectWebGL = async (
     const rightEarTexture = await loadTexture(gl, "/assets/dogEarsRight.png");
     rightDogEarImageTexture = rightEarTexture.texture;
     rightDogEarImageAspectRatio = rightEarTexture.aspectRatio;
-  }
 
-  if (
-    effects.dogEars &&
-    (!leftDogEarImageTexture || !rightDogEarImageTexture)
-  ) {
-    return new Error("No leftDogEarImageTexture or rightDogEarImageTexture");
+    if (
+      !leftDogEarImageTexture ||
+      !leftDogEarImageAspectRatio ||
+      !rightDogEarImageTexture ||
+      !rightDogEarImageAspectRatio
+    ) {
+      return new Error(
+        "No leftDogEarImageTexture or leftDogEarImageAspectRatio or rightDogEarImageTexture or rightDogEarImageAspectRatio"
+      );
+    }
   }
 
   // Load glasses images as textures
@@ -120,10 +126,23 @@ const handleEffectWebGL = async (
     const glassesTexture = await loadTexture(gl, "/assets/glasses1.png");
     glassesImageTexture = glassesTexture.texture;
     glassesImageAspectRatio = glassesTexture.aspectRatio;
+
+    if (!glassesImageTexture || !glassesImageAspectRatio) {
+      return new Error("No glassesImage or glassesImageAspectRatio");
+    }
   }
 
-  if (effects.glasses && !glassesImageTexture) {
-    return new Error("No glassesImage");
+  // Load beard images as textures
+  let beardImageTexture: WebGLTexture | null | undefined;
+  let beardImageAspectRatio: number | undefined;
+  if (effects.beard) {
+    const beardTexture = await loadTexture(gl, "/assets/beard2.png");
+    beardImageTexture = beardTexture.texture;
+    beardImageAspectRatio = beardTexture.aspectRatio;
+
+    if (!beardImageAspectRatio || !beardImageAspectRatio) {
+      return new Error("No beardImageTexture or beardImageAspectRatio");
+    }
   }
 
   // Set up the uniforms in the fragment shader
@@ -138,7 +157,9 @@ const handleEffectWebGL = async (
     rightDogEarImageTexture,
     rightDogEarImageAspectRatio,
     glassesImageTexture,
-    glassesImageAspectRatio
+    glassesImageAspectRatio,
+    beardImageTexture,
+    beardImageAspectRatio
   );
 
   if (uniformLocations instanceof Error) {
@@ -149,25 +170,32 @@ const handleEffectWebGL = async (
     headRotationAngles: false,
     leftEarPositions: false,
     rightEarPositions: false,
-    leftEarSize: false,
-    rightEarSize: false,
+    leftEarWidths: false,
+    rightEarWidths: false,
     leftEyePositions: false,
     rightEyePositions: false,
     eyesCenterPositions: false,
-    uEyesWidths: false,
+    eyesWidths: false,
+    nosePositions: false,
+    chinWidths: false,
   };
 
   if (effects.dogEars) {
     faceLandmarks.headRotationAngles = true;
     faceLandmarks.leftEarPositions = true;
     faceLandmarks.rightEarPositions = true;
-    faceLandmarks.leftEarSize = true;
-    faceLandmarks.rightEarSize = true;
+    faceLandmarks.leftEarWidths = true;
+    faceLandmarks.rightEarWidths = true;
   }
   if (effects.glasses) {
     faceLandmarks.headRotationAngles = true;
     faceLandmarks.eyesCenterPositions = true;
-    faceLandmarks.uEyesWidths = true;
+    faceLandmarks.eyesWidths = true;
+  }
+  if (effects.beard) {
+    faceLandmarks.headRotationAngles = true;
+    faceLandmarks.nosePositions = true;
+    faceLandmarks.chinWidths = true;
   }
 
   // Start video and render loop
@@ -214,7 +242,8 @@ const handleEffectWebGL = async (
     userStopStreamEffects,
     leftDogEarImageTexture,
     rightDogEarImageTexture,
-    glassesImageTexture
+    glassesImageTexture,
+    beardImageTexture
   );
 
   return canvas.captureStream().getVideoTracks()[0];

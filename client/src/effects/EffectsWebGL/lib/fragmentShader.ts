@@ -16,6 +16,7 @@ const fragmentShaderSource = `
   uniform bool u_tintEffect;
   uniform bool u_dogEarsEffect;
   uniform bool u_glassesEffect;
+  uniform bool u_beardEffect;
 
   // Effect images
   uniform sampler2D u_leftDogEarImage;
@@ -24,6 +25,8 @@ const fragmentShaderSource = `
   uniform float u_rightDogEarAspectRatio;
   uniform sampler2D u_glassesImage;
   uniform float u_glassesAspectRatio;
+  uniform sampler2D u_beardImage;
+  uniform float u_beardAspectRatio;
 
   // Universal face data
   uniform int u_faceCount;
@@ -32,8 +35,8 @@ const fragmentShaderSource = `
   // Ears
   uniform vec2 u_leftEarPositions[MAX_FACES]; 
   uniform vec2 u_rightEarPositions[MAX_FACES]; 
-  uniform vec2 u_leftEarSizes[MAX_FACES]; 
-  uniform vec2 u_rightEarSizes[MAX_FACES];
+  uniform float u_leftEarWidths[MAX_FACES]; 
+  uniform float u_rightEarWidths[MAX_FACES];
 
   // Eyes
   uniform vec2 u_leftEyePositions[MAX_FACES];
@@ -41,13 +44,19 @@ const fragmentShaderSource = `
   uniform vec2 u_eyesCenters[MAX_FACES];
   uniform float u_eyesWidths[MAX_FACES];
 
+  // Chin
+  uniform float u_chinWidths[MAX_FACES];
+
+  // Nose
+  uniform vec2 u_nosePositions[MAX_FACES];
+
   mat2 getRotationMatrix(float angle) {
     float cosA = cos(angle);
     float sinA = sin(angle);
     return mat2(cosA, -sinA, sinA, cosA);
   }
 
-  void applyEarEffect(inout vec4 color, vec2 texCoord, sampler2D earImage, vec2 earPosition, vec2 earSize, float headRotationAngle) {
+  void applyEarEffect(inout vec4 color, vec2 texCoord, sampler2D earImage, vec2 earPosition, float earWidth, float earAspectRatio, float headRotationAngle) {
     float earHeight = earWidth / earAspectRatio;
     vec2 earSize = vec2(earWidth, earHeight);  
   
@@ -70,6 +79,19 @@ const fragmentShaderSource = `
     vec4 glassesColor = texture2D(glassesImage, glassesTexCoord);
     if (glassesColor.a > 0.0) {
       color = mix(color, glassesColor, glassesColor.a);
+    }
+  }
+
+  void applyBeardEffect(inout vec4 color, vec2 texCoord, sampler2D beardImage, vec2 nosePosition, float chinWidth, float beardAspectRatio, float headRotationAngle) {
+    float beardHeight = chinWidth / beardAspectRatio;
+    vec2 beardSize = vec2(chinWidth, beardHeight);
+
+    mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
+
+    vec2 beardTexCoord = (rotationMatrix * (texCoord - nosePosition) * u_textureSize / beardSize) + 0.5;
+    vec4 beardColor = texture2D(beardImage, beardTexCoord);
+    if (beardColor.a > 0.0) {
+      color = mix(color, beardColor, beardColor.a);
     }
   }
 
@@ -106,8 +128,8 @@ const fragmentShaderSource = `
     if (u_dogEarsEffect) {
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
-          applyEarEffect(color, v_texCoord, u_leftDogEarImage, u_leftEarPositions[i], u_leftEarSizes[i], u_headRotationAngles[i]);
-          applyEarEffect(color, v_texCoord, u_rightDogEarImage, u_rightEarPositions[i], u_rightEarSizes[i], u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_leftDogEarImage, u_leftEarPositions[i], u_leftEarWidths[i], u_leftDogEarAspectRatio, u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_rightDogEarImage, u_rightEarPositions[i], u_rightEarWidths[i], u_rightDogEarAspectRatio, u_headRotationAngles[i]);
         }
       }
     }
@@ -117,6 +139,15 @@ const fragmentShaderSource = `
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
           applyGlassesEffect(color, v_texCoord, u_glassesImage, u_eyesCenters[i], u_eyesWidths[i], u_headRotationAngles[i]);
+        }
+      }
+    }
+
+    // Apply beard effect
+    if (u_beardEffect) {
+      for (int i = 0; i < MAX_FACES; i++) {
+        if (i < u_faceCount) {
+          applyBeardEffect(color, v_texCoord, u_beardImage, u_nosePositions[i], u_chinWidths[i], u_beardAspectRatio, u_headRotationAngles[i]);
         }
       }
     }

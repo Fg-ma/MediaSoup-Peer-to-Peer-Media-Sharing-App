@@ -6,6 +6,8 @@ import dogEarsIcon from "../../public/svgs/dogEarsIcon.svg";
 import dogEarsOffIcon from "../../public/svgs/dogEarsOffIcon.svg";
 import glassesIcon from "../../public/svgs/glassesIcon.svg";
 import glassesOffIcon from "../../public/svgs/glassesOffIcon.svg";
+import beardIcon from "../../public/svgs/beardIcon.svg";
+import beardOffIcon from "../../public/svgs/beardOffIcon.svg";
 import handleEffects from "./lib/handleEffects";
 import { EffectTypes } from "src/context/StreamsContext";
 import ColorPicker from "./ColorPicker";
@@ -264,6 +266,25 @@ export default function EffectSection({
             ) : (
               <img
                 src={glassesIcon}
+                alt='icon'
+                style={{ width: "90%", height: "90%" }}
+              />
+            )}
+          </button>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <button
+            onClick={() => handleEffectChange("beard")}
+            className='flex items-center justify-center w-10 aspect-square'
+          >
+            {userStreamEffects.current.beard[type]?.[videoId] ? (
+              <img
+                src={beardOffIcon}
+                alt='icon'
+                style={{ width: "90%", height: "90%" }}
+              />
+            ) : (
+              <img
+                src={beardIcon}
                 alt='icon'
                 style={{ width: "90%", height: "90%" }}
               />
