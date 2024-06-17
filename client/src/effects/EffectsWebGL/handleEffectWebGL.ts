@@ -10,6 +10,7 @@ import createProgram from "./lib/createProgram";
 import setStopFunction from "./lib/setStopFunction";
 import createBuffers from "./lib/createBuffers";
 import loadTexture from "./lib/loadTexture";
+import loadModels from "../lib/loadModels";
 
 export type FaceLandmarks =
   | "headRotationAngles"
@@ -100,10 +101,16 @@ const handleEffectWebGL = async (
   let rightDogEarImageTexture: WebGLTexture | null | undefined;
   let rightDogEarImageAspectRatio: number | undefined;
   if (effects.dogEars) {
-    const leftEarTexture = await loadTexture(gl, "/assets/dogEarsLeft.png");
+    const leftEarTexture = await loadTexture(
+      gl,
+      "/assets/ears/dogEarsLeft.png"
+    );
     leftDogEarImageTexture = leftEarTexture.texture;
     leftDogEarImageAspectRatio = leftEarTexture.aspectRatio;
-    const rightEarTexture = await loadTexture(gl, "/assets/dogEarsRight.png");
+    const rightEarTexture = await loadTexture(
+      gl,
+      "/assets/ears/dogEarsRight.png"
+    );
     rightDogEarImageTexture = rightEarTexture.texture;
     rightDogEarImageAspectRatio = rightEarTexture.aspectRatio;
 
@@ -123,7 +130,10 @@ const handleEffectWebGL = async (
   let glassesImageTexture: WebGLTexture | null | undefined;
   let glassesImageAspectRatio: number | undefined;
   if (effects.glasses) {
-    const glassesTexture = await loadTexture(gl, "/assets/glasses1.png");
+    const glassesTexture = await loadTexture(
+      gl,
+      "/assets/glasses/glasses3.png"
+    );
     glassesImageTexture = glassesTexture.texture;
     glassesImageAspectRatio = glassesTexture.aspectRatio;
 
@@ -136,7 +146,7 @@ const handleEffectWebGL = async (
   let beardImageTexture: WebGLTexture | null | undefined;
   let beardImageAspectRatio: number | undefined;
   if (effects.beard) {
-    const beardTexture = await loadTexture(gl, "/assets/beard2.png");
+    const beardTexture = await loadTexture(gl, "/assets/beards/beard2.png");
     beardImageTexture = beardTexture.texture;
     beardImageAspectRatio = beardTexture.aspectRatio;
 
@@ -248,10 +258,5 @@ const handleEffectWebGL = async (
 
   return canvas.captureStream().getVideoTracks()[0];
 };
-
-async function loadModels() {
-  await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
-  await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-}
 
 export default handleEffectWebGL;

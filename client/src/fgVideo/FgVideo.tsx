@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
@@ -24,6 +24,9 @@ import { EffectTypes } from "src/context/StreamsContext";
 import handleCloseVideo from "./lib/handleCloseVideo";
 import EffectSection from "./EffectSection";
 import handleEffect from "../effects/handleEffect";
+import effectIcon from "../../public/svgs/effectIcon.svg";
+import effectOffIcon from "../../public/svgs/effectOffIcon.svg";
+import handleEffects from "./lib/handleEffects";
 
 export default function FgVideo({
   type,
@@ -168,6 +171,7 @@ export default function FgVideo({
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >;
 }) {
+  const [isEffects, setIsEffects] = useState(false);
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -623,6 +627,18 @@ export default function FgVideo({
             )}
           </div>
           <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
+            <div className='relative pointer-events-auto'>
+              {isEffects && (
+                <EffectSection
+                  videoContainerRef={videoContainerRef}
+                  userStreamEffects={userStreamEffects}
+                  type={type}
+                  videoId={videoId}
+                  handleEffectChange={handleEffectChange}
+                  tintColor={tintColor}
+                />
+              )}
+            </div>
             <div className='video-controls w-full h-10 flex items-center space-x-2'>
               {isPlayPause && (
                 <button
@@ -674,14 +690,26 @@ export default function FgVideo({
                   <div ref={totalTimeRef} className='total-time'></div>
                 )}
               </div>
-              <EffectSection
-                videoContainerRef={videoContainerRef}
-                userStreamEffects={userStreamEffects}
-                type={type}
-                videoId={videoId}
-                handleEffectChange={handleEffectChange}
-                tintColor={tintColor}
-              />
+              <button
+                onClick={() =>
+                  handleEffects(isEffects, setIsEffects, videoContainerRef)
+                }
+                className='flex items-center justify-center w-10 aspect-square relative'
+              >
+                {isEffects ? (
+                  <img
+                    src={effectOffIcon}
+                    alt='icon'
+                    style={{ width: "90%", height: "90%" }}
+                  />
+                ) : (
+                  <img
+                    src={effectIcon}
+                    alt='icon'
+                    style={{ width: "90%", height: "90%" }}
+                  />
+                )}
+              </button>
               {isPlaybackSpeed && (
                 <button
                   ref={playbackSpeedButtonRef}

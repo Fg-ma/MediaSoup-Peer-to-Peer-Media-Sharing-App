@@ -2,8 +2,8 @@ import * as faceapi from "face-api.js";
 import { EffectTypes } from "../../context/StreamsContext";
 import applyBoxBlur from "./lib/applyBoxBlur";
 import applyTint from "./lib/applyTint";
-import loadModels from "./lib/loadModels";
 import setStopFunction from "./lib/setStopFunction";
+import loadModels from "../lib/loadModels";
 
 function hexToRgb(hex: string) {
   hex = hex.replace(/^#/, "");
@@ -68,9 +68,9 @@ const EffectSectionCPU = async (
 
   if (effects.dogEars) {
     earImageLeft = new Image();
-    earImageLeft.src = "/dogEarsLeft.png";
+    earImageLeft.src = "/assets/ears/dogEarsLeft.png";
     earImageRight = new Image();
-    earImageRight.src = "/dogEarsRight.png";
+    earImageRight.src = "/assets/ears/dogEarsRight.png";
 
     await loadModels();
   }

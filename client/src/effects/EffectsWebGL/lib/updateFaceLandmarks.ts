@@ -315,7 +315,7 @@ const updateFaceLandmarks = async (
 
     // Set eye widths
     if (faceLandmarks.eyesWidths) {
-      const eyesWidthSizeFactor = 600;
+      const eyesWidthSizeFactor = 700;
       const normalizedEyesWidth = interocularDistance * eyesWidthSizeFactor;
 
       eyesWidths.push(normalizedEyesWidth);
