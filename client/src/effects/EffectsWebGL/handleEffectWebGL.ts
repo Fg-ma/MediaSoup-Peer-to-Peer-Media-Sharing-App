@@ -211,11 +211,19 @@ const handleEffectWebGL = async (
   // Start video and render loop
   let animationFrameId: number[] = [];
   const video = document.createElement("video");
-  video.srcObject = new MediaStream([
-    type === "webcam" || type === "screen"
-      ? userUneffectedStreams.current[type][id].getVideoTracks()[0]
-      : userUneffectedStreams.current[type]!.getVideoTracks()[0],
-  ]);
+  if (
+    ((type === "webcam" || type === "screen") &&
+      userUneffectedStreams.current[type][id]) ||
+    (type === "audio" && userUneffectedStreams.current[type])
+  ) {
+    video.srcObject = new MediaStream([
+      type === "webcam" || type === "screen"
+        ? userUneffectedStreams.current[type][id].getVideoTracks()[0]
+        : userUneffectedStreams.current[type]!.getVideoTracks()[0],
+    ]);
+  } else {
+    return new Error("Error getting user uneffected streams");
+  }
   video.addEventListener("play", () => {
     render(
       gl,

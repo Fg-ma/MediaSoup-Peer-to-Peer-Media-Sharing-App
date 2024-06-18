@@ -7,43 +7,48 @@ export default function HoldButton({
   contentFunction,
   holdContent,
   styles,
-  dataValue,
+  defaultDataValue,
 }: {
   clickFunction: () => void;
   holdFunction: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction: () => React.ReactElement;
   holdContent: React.ReactElement;
   styles: string;
-  dataValue: string;
+  defaultDataValue: string;
 }) {
   const [isHeld, setIsHeld] = useState(false);
   const isHeldRef = useRef(false);
   const holdTimeout = useRef<NodeJS.Timeout>();
   const holdButtonRef = useRef<HTMLButtonElement>(null);
+  const isClicked = useRef(false);
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    event.stopPropagation();
     holdTimeout.current = setTimeout(() => {
       isHeldRef.current = true;
       setIsHeld(true);
     }, 500);
+    isClicked.current = true;
   };
 
   const handleMouseUp = (event: React.MouseEvent<Element, MouseEvent>) => {
-    if (!isHeldRef.current) {
-      clickFunction();
-    } else {
-      holdFunction(event);
-    }
+    if (isClicked.current) {
+      if (!isHeldRef.current) {
+        clickFunction();
+      } else {
+        holdFunction(event);
+      }
 
-    if (holdTimeout.current !== null) {
-      clearTimeout(holdTimeout.current);
+      if (holdTimeout.current !== null) {
+        clearTimeout(holdTimeout.current);
+      }
+
+      isHeldRef.current = false;
+      setIsHeld(false);
+      isClicked.current = false;
     }
-    isHeldRef.current = false;
-    setIsHeld(false);
   };
 
   useEffect(() => {
@@ -63,7 +68,7 @@ export default function HoldButton({
         ref={holdButtonRef}
         onMouseDown={(event) => handleMouseDown(event)}
         className={styles}
-        data-thing={"1"}
+        data-value={defaultDataValue}
       >
         {contentFunction()}
       </button>

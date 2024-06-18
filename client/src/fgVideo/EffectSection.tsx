@@ -2,13 +2,26 @@ import React, { useState, useEffect, useRef } from "react";
 import tintIcon from "../../public/svgs/tintIcon.svg";
 import dogEarsIcon from "../../public/svgs/dogEarsIcon.svg";
 import dogEarsOffIcon from "../../public/svgs/dogEarsOffIcon.svg";
-import glassesIcon from "../../public/svgs/glassesIcon.svg";
-import glassesOffIcon from "../../public/svgs/glassesOffIcon.svg";
 import beardIcon from "../../public/svgs/beardIcon.svg";
 import beardOffIcon from "../../public/svgs/beardOffIcon.svg";
 import { EffectTypes } from "src/context/StreamsContext";
 import ColorPicker from "./ColorPicker";
 import HoldButton from "./HoldButton";
+import glassesImage1 from "../../public/assets/glasses/glasses1.png";
+import glassesImage2 from "../../public/assets/glasses/glasses2.png";
+import glassesImage3 from "../../public/assets/glasses/glasses3.png";
+import glassesImage4 from "../../public/assets/glasses/glasses4.png";
+import glassesImage5 from "../../public/assets/glasses/glasses5.png";
+import glassesIcon1 from "../../public/svgs/glassesIcon1.svg";
+import glassesOffIcon1 from "../../public/svgs/glassesOffIcon1.svg";
+import glassesIcon2 from "../../public/svgs/glassesIcon2.svg";
+import glassesOffIcon2 from "../../public/svgs/glassesOffIcon2.svg";
+import glassesIcon3 from "../../public/svgs/glassesIcon3.svg";
+import glassesOffIcon3 from "../../public/svgs/glassesOffIcon3.svg";
+import glassesIcon4 from "../../public/svgs/glassesIcon4.svg";
+import glassesOffIcon4 from "../../public/svgs/glassesOffIcon4.svg";
+import glassesIcon5 from "../../public/svgs/glassesIcon5.svg";
+import glassesOffIcon5 from "../../public/svgs/glassesOffIcon5.svg";
 
 export default function EffectSection({
   videoContainerRef,
@@ -81,6 +94,14 @@ export default function EffectSection({
     // Cleanup event listener on unmount
     return () => window.removeEventListener("resize", updateWidth);
   }, [videoContainerRef]);
+
+  const currentGlassesEffect = useRef<
+    | "glassesEffect1"
+    | "glassesEffect2"
+    | "glassesEffect3"
+    | "glassesEffect4"
+    | "glassesEffect5"
+  >("glassesEffect1");
 
   return (
     <div
@@ -233,70 +254,112 @@ export default function EffectSection({
         clickFunction={() => handleEffectChange("glasses")}
         holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
           const target = event.target as HTMLElement;
-          if (target) {
-            console.log(`Held button value: ${target.dataset.thing}`);
+          if (target && target.dataset.value) {
+            console.log(`Held button value: ${target.dataset.value}`);
+            if (target.dataset.value === "glassesEffect1") {
+              currentGlassesEffect.current = target.dataset.value;
+            } else if (target.dataset.value === "glassesEffect2") {
+              currentGlassesEffect.current = target.dataset.value;
+            } else if (target.dataset.value === "glassesEffect3") {
+              currentGlassesEffect.current = target.dataset.value;
+            } else if (target.dataset.value === "glassesEffect4") {
+              currentGlassesEffect.current = target.dataset.value;
+            } else if (target.dataset.value === "glassesEffect5") {
+              currentGlassesEffect.current = target.dataset.value;
+            }
           }
         }}
         contentFunction={() => {
-          if (userStreamEffects.current.glasses[type]?.[videoId]) {
-            return (
-              <img
-                src={glassesOffIcon}
-                alt='icon'
-                style={{ width: "90%", height: "90%" }}
-              />
-            );
-          } else {
-            return (
-              <img
-                src={glassesIcon}
-                alt='icon'
-                style={{ width: "90%", height: "90%" }}
-              />
-            );
-          }
+          const iconSrc = userStreamEffects.current.glasses[type]?.[videoId]
+            ? (currentGlassesEffect.current === "glassesEffect1" &&
+                glassesOffIcon1) ||
+              (currentGlassesEffect.current === "glassesEffect2" &&
+                glassesOffIcon2) ||
+              (currentGlassesEffect.current === "glassesEffect3" &&
+                glassesOffIcon3) ||
+              (currentGlassesEffect.current === "glassesEffect4" &&
+                glassesOffIcon4) ||
+              glassesOffIcon5
+            : (currentGlassesEffect.current === "glassesEffect1" &&
+                glassesIcon1) ||
+              (currentGlassesEffect.current === "glassesEffect2" &&
+                glassesIcon2) ||
+              (currentGlassesEffect.current === "glassesEffect3" &&
+                glassesIcon3) ||
+              (currentGlassesEffect.current === "glassesEffect4" &&
+                glassesIcon4) ||
+              glassesIcon5;
+
+          return (
+            <img
+              src={iconSrc}
+              alt='icon'
+              style={{ width: "90%", height: "90%" }}
+              data-value={"glassesEffect1"}
+            />
+          );
         }}
         holdContent={
-          <div className='mb-4 grid grid-cols-3 w-max space-x-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
-            <div className='flex items-center justify-center w-10 min-w-10 aspect-square'>
+          <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
+            <div
+              className='flex items-center justify-center w-10 min-w-10 aspect-square bg-white border-fg-black-35 hover:border-fg-secondary rounded border hover:border-2 border-opacity-75'
+              data-value={"glassesEffect1"}
+            >
               <img
-                src={glassesIcon}
+                src={glassesImage1}
                 alt='icon'
-                style={{ width: "90%", height: "90%" }}
+                style={{ width: "90%" }}
+                data-value={"glassesEffect1"}
               />
             </div>
-            <div className='flex items-center justify-center w-10 min-w-10 aspect-square'>
+            <div
+              className='flex items-center justify-center w-10 min-w-10 aspect-square bg-white rounded border hover:border-2 border-fg-black-35 hover:border-fg-secondary border-opacity-75 scale-x-[-1]'
+              data-value={"glassesEffect2"}
+            >
               <img
-                src={glassesIcon}
+                src={glassesImage2}
                 alt='icon'
-                style={{ width: "90%", height: "90%" }}
+                style={{ width: "90%" }}
+                data-value={"glassesEffect2"}
               />
             </div>
-            <div className='flex items-center justify-center w-10 min-w-10 aspect-square'>
+            <div
+              className='flex items-center justify-center w-10 min-w-10 aspect-square rounded border hover:border-2 border-white hover:border-fg-secondary border-opacity-75 scale-x-[-1]'
+              data-value={"glassesEffect3"}
+            >
               <img
-                src={glassesIcon}
+                src={glassesImage3}
                 alt='icon'
-                style={{ width: "90%", height: "90%" }}
+                style={{ width: "90%" }}
+                data-value={"glassesEffect3"}
               />
             </div>
-            <div className='flex items-center justify-center w-10 min-w-10 aspect-square'>
+            <div
+              className='flex items-center justify-center w-10 min-w-10 aspect-square rounded border hover:border-2 border-white hover:border-fg-secondary border-opacity-75'
+              data-value={"glassesEffect4"}
+            >
               <img
-                src={glassesIcon}
+                src={glassesImage4}
                 alt='icon'
-                style={{ width: "90%", height: "90%" }}
+                style={{ width: "90%" }}
+                data-value={"glassesEffect4"}
               />
             </div>
-            <div className='flex items-center justify-center w-10 min-w-10 aspect-square'>
+            <div
+              className='flex items-center justify-center w-10 min-w-10 aspect-square rounded border hover:border-2 border-white hover:border-fg-secondary border-opacity-75'
+              data-value={"glassesEffect5"}
+            >
               <img
-                src={glassesIcon}
+                src={glassesImage5}
                 alt='icon'
-                style={{ width: "90%", height: "90%" }}
+                style={{ width: "90%" }}
+                data-value={"glassesEffect5"}
               />
             </div>
           </div>
         }
         styles={"flex items-center justify-center w-10 aspect-square"}
-        dataValue={"1"}
+        defaultDataValue={currentGlassesEffect.current}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <button
