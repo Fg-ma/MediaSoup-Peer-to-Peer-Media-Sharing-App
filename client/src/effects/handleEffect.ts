@@ -2,6 +2,7 @@ import * as mediasoup from "mediasoup-client";
 import handleEffectWebGL from "./EffectsWebGL/handleEffectWebGL";
 import handleEffectCPU from "./EffectsCPU/handleEffectCPU";
 import { EffectTypes } from "../context/StreamsContext";
+import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 
 const handleEffect = async (
   effect: EffectTypes,
@@ -55,7 +56,8 @@ const handleEffect = async (
       >
     | undefined,
   tintColor: React.MutableRefObject<string>,
-  blockStateChange: boolean = false
+  blockStateChange: boolean = false,
+  currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
   if (
     !userStreamEffects ||
@@ -167,7 +169,8 @@ const handleEffect = async (
       userUneffectedStreams,
       userStopStreamEffects,
       tintColor,
-      effects
+      effects,
+      currentEffectsStyles
     );
     if (webGlEffect instanceof Error) {
       console.error(
@@ -181,7 +184,8 @@ const handleEffect = async (
         userUneffectedStreams,
         userStopStreamEffects,
         tintColor,
-        effects
+        effects,
+        currentEffectsStyles
       );
 
       if (cpuEffect instanceof MediaStreamTrack) {

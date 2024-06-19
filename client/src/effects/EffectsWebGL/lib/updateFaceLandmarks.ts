@@ -180,8 +180,8 @@ const updateFaceLandmarks = async (
     .withFaceLandmarks();
 
   if (detections.length !== 0) {
-    if (effects.dogEars && uniformLocations.uDogEarsEffectLocation) {
-      gl.uniform1i(uniformLocations.uDogEarsEffectLocation, 1);
+    if (effects.ears && uniformLocations.uEarsEffectLocation) {
+      gl.uniform1i(uniformLocations.uEarsEffectLocation, 1);
     }
     if (effects.glasses && uniformLocations.uGlassesEffectLocation) {
       gl.uniform1i(uniformLocations.uGlassesEffectLocation, 1);
@@ -376,8 +376,8 @@ const updateFaceLandmarks = async (
   // Set timeout to turn off effects if no detections after a delay
   if (detections.length === 0 && !detectTimeout) {
     detectTimeout = setTimeout(() => {
-      if (effects.dogEars && uniformLocations.uDogEarsEffectLocation) {
-        gl.uniform1i(uniformLocations.uDogEarsEffectLocation, 0);
+      if (effects.ears && uniformLocations.uEarsEffectLocation) {
+        gl.uniform1i(uniformLocations.uEarsEffectLocation, 0);
       }
       if (effects.glasses && uniformLocations.uGlassesEffectLocation) {
         gl.uniform1i(uniformLocations.uGlassesEffectLocation, 0);

@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
+import { AnimatePresence } from "framer-motion";
 import "./FgVideoStyles.css";
+import { useStreamsContext, EffectTypes } from "../context/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
 import VolumeSection from "./VolumeSection";
 import handleFullscreenChange from "./lib/handleFullscreenChange";
 import handlePictureInPicture from "./lib/handlePictureInPicture";
@@ -20,7 +23,6 @@ import handleScrubbing from "./lib/handleScrubbing";
 import handleTimelineUpdate from "./lib/handleTimelineUpdate";
 import handleKeyDown from "./lib/handleKeyDown";
 import handleKeyUp from "./lib/handleKeyUp";
-import { EffectTypes } from "src/context/StreamsContext";
 import handleCloseVideo from "./lib/handleCloseVideo";
 import EffectSection from "./EffectSection";
 import handleEffect from "../effects/handleEffect";
@@ -72,10 +74,6 @@ export default function FgVideo({
   isFinishedRef,
   changedWhileNotFinishedRef,
   tracksColorSetter,
-  userStreams,
-  userUneffectedStreams,
-  userStreamEffects,
-  userStopStreamEffects,
   producerTransport,
 }: {
   type: "webcam" | "screen";
@@ -125,52 +123,17 @@ export default function FgVideo({
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   tracksColorSetter: () => void;
   blurCameraStream?: (webcamId: string) => Promise<void>;
-  userStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
-    };
-    screen: {
-      [screenId: string]: MediaStream;
-    };
-    audio: MediaStream | undefined;
-  }>;
-  userUneffectedStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
-    };
-    screen: {
-      [screenId: string]: MediaStream;
-    };
-    audio: MediaStream | undefined;
-  }>;
-  userStreamEffects: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      webcam?:
-        | {
-            [webcamId: string]: boolean;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: boolean;
-          }
-        | undefined;
-      audio?: boolean;
-    };
-  }>;
-  userStopStreamEffects: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: () => void;
-    };
-    screen: {
-      [screenId: string]: () => void;
-    };
-    audio: (() => void) | undefined;
-  }>;
   producerTransport?: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >;
 }) {
+  const {
+    userStreams,
+    userUneffectedStreams,
+    userStreamEffects,
+    userStopStreamEffects,
+  } = useStreamsContext();
+  const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const [isEffects, setIsEffects] = useState(false);
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
@@ -534,7 +497,8 @@ export default function FgVideo({
         userStopStreamEffects,
         producerTransport,
         tintColor,
-        blockStateChange
+        blockStateChange,
+        currentEffectsStyles
       );
     } else {
       const msg = {
@@ -628,16 +592,17 @@ export default function FgVideo({
           </div>
           <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
             <div className='relative pointer-events-auto'>
-              {isEffects && (
-                <EffectSection
-                  videoContainerRef={videoContainerRef}
-                  userStreamEffects={userStreamEffects}
-                  type={type}
-                  videoId={videoId}
-                  handleEffectChange={handleEffectChange}
-                  tintColor={tintColor}
-                />
-              )}
+              <AnimatePresence>
+                {isEffects && (
+                  <EffectSection
+                    videoContainerRef={videoContainerRef}
+                    type={type}
+                    videoId={videoId}
+                    handleEffectChange={handleEffectChange}
+                    tintColor={tintColor}
+                  />
+                )}
+              </AnimatePresence>
             </div>
             <div className='video-controls w-full h-10 flex items-center space-x-2'>
               {isPlayPause && (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
+import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 
 export default function HoldButton({
   clickFunction,
@@ -72,15 +73,34 @@ export default function HoldButton({
       >
         {contentFunction()}
       </button>
-      {isHeld ? (
-        <HoldButtonPortal
-          holdContent={holdContent}
-          holdButtonRef={holdButtonRef}
-        />
-      ) : null}
+      <AnimatePresence>
+        {isHeld && (
+          <HoldButtonPortal
+            holdContent={holdContent}
+            holdButtonRef={holdButtonRef}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
+const HoldButtonPortalVar: Variants = {
+  init: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      scale: { type: "spring", stiffness: 100 },
+    },
+  },
+};
+
+const HoldButtonPortalTransition: Transition = {
+  transition: {
+    opacity: { duration: 0.2, delay: 0.0 },
+  },
+};
 
 function HoldButtonPortal({
   holdContent,
@@ -100,9 +120,11 @@ function HoldButtonPortal({
       return;
     }
 
-    const top = holdButtonRect.top - portalRect.height;
+    const top = holdButtonRect.top - portalRect.height / 0.8;
     const left =
-      holdButtonRect.left + holdButtonRect.width / 2 - portalRect.width / 2;
+      holdButtonRect.left +
+      holdButtonRect.width / 2 -
+      portalRect.width / 2 / 0.8;
 
     const bodyRect = document.body.getBoundingClientRect();
     const topPercent = (top / bodyRect.height) * 100;
@@ -119,7 +141,7 @@ function HoldButtonPortal({
   }, []);
 
   return ReactDOM.createPortal(
-    <div
+    <motion.div
       ref={portalRef}
       className={`${
         !portalPosition.top && !portalPosition.left && "opacity-0"
@@ -128,9 +150,14 @@ function HoldButtonPortal({
         top: `${portalPosition.top}%`,
         left: `${portalPosition.left}%`,
       }}
+      variants={HoldButtonPortalVar}
+      initial='init'
+      animate='animate'
+      exit='init'
+      transition={HoldButtonPortalTransition}
     >
       {holdContent}
-    </div>,
+    </motion.div>,
     document.body
   );
 }

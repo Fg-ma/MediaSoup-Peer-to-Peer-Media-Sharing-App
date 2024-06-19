@@ -68,7 +68,6 @@ export default function Bundle({
   muteButtonCallback,
   initialVolume = "high",
   onRendered,
-  device,
   producerTransport,
 }: {
   username: string;
@@ -85,18 +84,11 @@ export default function Bundle({
   muteButtonCallback?: () => any;
   initialVolume?: string;
   onRendered?: () => any;
-  device?: React.MutableRefObject<mediasoup.types.Device | undefined>;
   producerTransport?: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >;
 }) {
-  const {
-    userStreams,
-    userUneffectedStreams,
-    userStreamEffects,
-    userStopStreamEffects,
-    remoteTracksMap,
-  } = useStreamsContext();
+  const { userStreams, remoteTracksMap } = useStreamsContext();
   const [cameraStreams, setCameraStreams] = useState<
     | {
         [screenKey: string]: MediaStream;
@@ -563,10 +555,6 @@ export default function Bundle({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
-            userStreams={userStreams}
-            userUneffectedStreams={userUneffectedStreams}
-            userStreamEffects={userStreamEffects}
-            userStopStreamEffects={userStopStreamEffects}
             producerTransport={producerTransport}
           />
         ))}
@@ -605,10 +593,6 @@ export default function Bundle({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
-            userStreams={userStreams}
-            userUneffectedStreams={userUneffectedStreams}
-            userStreamEffects={userStreamEffects}
-            userStopStreamEffects={userStopStreamEffects}
             producerTransport={producerTransport}
           />
         ))}

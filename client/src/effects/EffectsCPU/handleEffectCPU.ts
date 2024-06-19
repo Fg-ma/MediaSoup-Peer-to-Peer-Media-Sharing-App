@@ -4,6 +4,7 @@ import applyBoxBlur from "./lib/applyBoxBlur";
 import applyTint from "./lib/applyTint";
 import setStopFunction from "./lib/setStopFunction";
 import loadModels from "../lib/loadModels";
+import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 
 function hexToRgb(hex: string) {
   hex = hex.replace(/^#/, "");
@@ -39,7 +40,8 @@ const EffectSectionCPU = async (
   tintColor: React.MutableRefObject<string>,
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
-  }
+  },
+  currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
   let earImageLeft: HTMLImageElement | undefined;
   let earImageRight: HTMLImageElement | undefined;
@@ -74,7 +76,7 @@ const EffectSectionCPU = async (
     canvas.height = video.videoHeight;
   };
 
-  if (effects.dogEars) {
+  if (effects.ears) {
     earImageLeft = new Image();
     earImageLeft.src = "/assets/ears/dogEarsLeft.png";
     earImageRight = new Image();
@@ -93,7 +95,7 @@ const EffectSectionCPU = async (
     if (effects.tint) {
       applyTint(ctx, canvas, hexToRgb(tintColor.current));
     }
-    if (effects.dogEars && earImageLeft && earImageRight) {
+    if (effects.ears && earImageLeft && earImageRight) {
       await detectFaces(video, canvas, ctx, earImageLeft, earImageRight);
     }
   };

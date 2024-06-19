@@ -20,8 +20,8 @@ const setStopFunction = (
     };
     audio: (() => void) | undefined;
   }>,
-  leftDogEarImageTexture: WebGLTexture | null | undefined,
-  rightDogEarImageTexture: WebGLTexture | null | undefined,
+  leftEarImageTexture: WebGLTexture | null | undefined,
+  rightEarImageTexture: WebGLTexture | null | undefined,
   glassesImageTexture: WebGLTexture | null | undefined,
   beardImageTexture: WebGLTexture | null | undefined
 ) => {
@@ -33,11 +33,11 @@ const setStopFunction = (
     video.srcObject = null;
 
     gl.deleteTexture(texture);
-    if (leftDogEarImageTexture) {
-      gl.deleteTexture(leftDogEarImageTexture);
+    if (leftEarImageTexture) {
+      gl.deleteTexture(leftEarImageTexture);
     }
-    if (rightDogEarImageTexture) {
-      gl.deleteTexture(rightDogEarImageTexture);
+    if (rightEarImageTexture) {
+      gl.deleteTexture(rightEarImageTexture);
     }
     if (glassesImageTexture) {
       gl.deleteTexture(glassesImageTexture);

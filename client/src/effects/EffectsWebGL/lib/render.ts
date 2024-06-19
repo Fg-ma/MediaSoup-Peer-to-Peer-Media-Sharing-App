@@ -20,7 +20,7 @@ const render = async (
 ) => {
   updateTexture(gl, texture, video);
 
-  if (effects.dogEars || effects.glasses || effects.beard) {
+  if (effects.ears || effects.glasses || effects.beard) {
     await updateFaceLandmarks(
       gl,
       video,

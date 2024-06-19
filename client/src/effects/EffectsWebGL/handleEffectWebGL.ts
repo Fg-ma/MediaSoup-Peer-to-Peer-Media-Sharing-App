@@ -11,6 +11,7 @@ import setStopFunction from "./lib/setStopFunction";
 import createBuffers from "./lib/createBuffers";
 import loadTexture from "./lib/loadTexture";
 import loadModels from "../lib/loadModels";
+import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 
 export type FaceLandmarks =
   | "headRotationAngles"
@@ -49,7 +50,8 @@ const handleEffectWebGL = async (
   tintColor: React.MutableRefObject<string>,
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
-  }
+  },
+  currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
   // Setup WebGL context
   const canvas = document.createElement("canvas");
@@ -91,37 +93,37 @@ const handleEffectWebGL = async (
     return new Error("No texture");
   }
 
-  if (effects.dogEars || effects.glasses || effects.beard) {
+  if (effects.ears || effects.glasses || effects.beard) {
     await loadModels();
   }
 
-  // Load dogEar images as textures
-  let leftDogEarImageTexture: WebGLTexture | null | undefined;
-  let leftDogEarImageAspectRatio: number | undefined;
-  let rightDogEarImageTexture: WebGLTexture | null | undefined;
-  let rightDogEarImageAspectRatio: number | undefined;
-  if (effects.dogEars) {
+  // Load ear images as textures
+  let leftEarImageTexture: WebGLTexture | null | undefined;
+  let leftEarImageAspectRatio: number | undefined;
+  let rightEarImageTexture: WebGLTexture | null | undefined;
+  let rightEarImageAspectRatio: number | undefined;
+  if (effects.ears) {
     const leftEarTexture = await loadTexture(
       gl,
-      "/assets/ears/dogEarsLeft.png"
+      `/assets/ears/${currentEffectsStyles.current.ears}Left.png`
     );
-    leftDogEarImageTexture = leftEarTexture.texture;
-    leftDogEarImageAspectRatio = leftEarTexture.aspectRatio;
+    leftEarImageTexture = leftEarTexture.texture;
+    leftEarImageAspectRatio = leftEarTexture.aspectRatio;
     const rightEarTexture = await loadTexture(
       gl,
-      "/assets/ears/dogEarsRight.png"
+      `/assets/ears/${currentEffectsStyles.current.ears}Right.png`
     );
-    rightDogEarImageTexture = rightEarTexture.texture;
-    rightDogEarImageAspectRatio = rightEarTexture.aspectRatio;
+    rightEarImageTexture = rightEarTexture.texture;
+    rightEarImageAspectRatio = rightEarTexture.aspectRatio;
 
     if (
-      !leftDogEarImageTexture ||
-      !leftDogEarImageAspectRatio ||
-      !rightDogEarImageTexture ||
-      !rightDogEarImageAspectRatio
+      !leftEarImageTexture ||
+      !leftEarImageAspectRatio ||
+      !rightEarImageTexture ||
+      !rightEarImageAspectRatio
     ) {
       return new Error(
-        "No leftDogEarImageTexture or leftDogEarImageAspectRatio or rightDogEarImageTexture or rightDogEarImageAspectRatio"
+        "No leftEarImageTexture or leftEarImageAspectRatio or rightEarImageTexture or rightEarImageAspectRatio"
       );
     }
   }
@@ -132,7 +134,7 @@ const handleEffectWebGL = async (
   if (effects.glasses) {
     const glassesTexture = await loadTexture(
       gl,
-      "/assets/glasses/glasses3.png"
+      `/assets/glasses/${currentEffectsStyles.current.glasses}.png`
     );
     glassesImageTexture = glassesTexture.texture;
     glassesImageAspectRatio = glassesTexture.aspectRatio;
@@ -146,7 +148,10 @@ const handleEffectWebGL = async (
   let beardImageTexture: WebGLTexture | null | undefined;
   let beardImageAspectRatio: number | undefined;
   if (effects.beard) {
-    const beardTexture = await loadTexture(gl, "/assets/beards/beard2.png");
+    const beardTexture = await loadTexture(
+      gl,
+      `/assets/beards/${currentEffectsStyles.current.beards}.png`
+    );
     beardImageTexture = beardTexture.texture;
     beardImageAspectRatio = beardTexture.aspectRatio;
 
@@ -162,10 +167,10 @@ const handleEffectWebGL = async (
     canvas,
     effects,
     tintColor,
-    leftDogEarImageTexture,
-    leftDogEarImageAspectRatio,
-    rightDogEarImageTexture,
-    rightDogEarImageAspectRatio,
+    leftEarImageTexture,
+    leftEarImageAspectRatio,
+    rightEarImageTexture,
+    rightEarImageAspectRatio,
     glassesImageTexture,
     glassesImageAspectRatio,
     beardImageTexture,
@@ -190,7 +195,7 @@ const handleEffectWebGL = async (
     chinWidths: false,
   };
 
-  if (effects.dogEars) {
+  if (effects.ears) {
     faceLandmarks.headRotationAngles = true;
     faceLandmarks.leftEarPositions = true;
     faceLandmarks.rightEarPositions = true;
@@ -258,8 +263,8 @@ const handleEffectWebGL = async (
     type,
     id,
     userStopStreamEffects,
-    leftDogEarImageTexture,
-    rightDogEarImageTexture,
+    leftEarImageTexture,
+    rightEarImageTexture,
     glassesImageTexture,
     beardImageTexture
   );

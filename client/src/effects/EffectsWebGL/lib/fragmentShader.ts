@@ -14,15 +14,15 @@ const fragmentShaderSource = `
   // Effect booleans
   uniform bool u_blurEffect;
   uniform bool u_tintEffect;
-  uniform bool u_dogEarsEffect;
+  uniform bool u_earsEffect;
   uniform bool u_glassesEffect;
   uniform bool u_beardEffect;
 
   // Effect images
-  uniform sampler2D u_leftDogEarImage;
-  uniform float u_leftDogEarAspectRatio;
-  uniform sampler2D u_rightDogEarImage;
-  uniform float u_rightDogEarAspectRatio;
+  uniform sampler2D u_leftEarImage;
+  uniform float u_leftEarAspectRatio;
+  uniform sampler2D u_rightEarImage;
+  uniform float u_rightEarAspectRatio;
   uniform sampler2D u_glassesImage;
   uniform float u_glassesAspectRatio;
   uniform sampler2D u_beardImage;
@@ -124,12 +124,12 @@ const fragmentShaderSource = `
       color = vec4(finalColor, texColor.a);
     }
 
-    // Apply dog ears effect
-    if (u_dogEarsEffect) {
+    // Apply ears effect
+    if (u_earsEffect) {
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
-          applyEarEffect(color, v_texCoord, u_leftDogEarImage, u_leftEarPositions[i], u_leftEarWidths[i], u_leftDogEarAspectRatio, u_headRotationAngles[i]);
-          applyEarEffect(color, v_texCoord, u_rightDogEarImage, u_rightEarPositions[i], u_rightEarWidths[i], u_rightDogEarAspectRatio, u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_leftEarImage, u_leftEarPositions[i], u_leftEarWidths[i], u_leftEarAspectRatio, u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_rightEarImage, u_rightEarPositions[i], u_rightEarWidths[i], u_rightEarAspectRatio, u_headRotationAngles[i]);
         }
       }
     }

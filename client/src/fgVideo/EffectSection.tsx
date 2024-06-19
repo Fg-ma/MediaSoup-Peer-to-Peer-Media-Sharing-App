@@ -1,57 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Transition, Variants, motion } from "framer-motion";
 import tintIcon from "../../public/svgs/tintIcon.svg";
-import dogEarsIcon from "../../public/svgs/dogEarsIcon.svg";
-import dogEarsOffIcon from "../../public/svgs/dogEarsOffIcon.svg";
-import beardIcon from "../../public/svgs/beardIcon.svg";
-import beardOffIcon from "../../public/svgs/beardOffIcon.svg";
-import { EffectTypes } from "src/context/StreamsContext";
+import beardIcon from "../../public/svgs/beards/beardIcon.svg";
+import beardOffIcon from "../../public/svgs/beards/beardOffIcon.svg";
+import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
 import ColorPicker from "./ColorPicker";
-import HoldButton from "./HoldButton";
-import glassesImage1 from "../../public/assets/glasses/glasses1.png";
-import glassesImage2 from "../../public/assets/glasses/glasses2.png";
-import glassesImage3 from "../../public/assets/glasses/glasses3.png";
-import glassesImage4 from "../../public/assets/glasses/glasses4.png";
-import glassesImage5 from "../../public/assets/glasses/glasses5.png";
-import glassesIcon1 from "../../public/svgs/glassesIcon1.svg";
-import glassesOffIcon1 from "../../public/svgs/glassesOffIcon1.svg";
-import glassesIcon2 from "../../public/svgs/glassesIcon2.svg";
-import glassesOffIcon2 from "../../public/svgs/glassesOffIcon2.svg";
-import glassesIcon3 from "../../public/svgs/glassesIcon3.svg";
-import glassesOffIcon3 from "../../public/svgs/glassesOffIcon3.svg";
-import glassesIcon4 from "../../public/svgs/glassesIcon4.svg";
-import glassesOffIcon4 from "../../public/svgs/glassesOffIcon4.svg";
-import glassesIcon5 from "../../public/svgs/glassesIcon5.svg";
-import glassesOffIcon5 from "../../public/svgs/glassesOffIcon5.svg";
+import GlassesEffectSectionButton from "./GlassesEffectSectionButton";
+import EarsEffectSectionButton from "./EarsEffectSectionButton";
+
+const EffectSectionVar: Variants = {
+  init: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      scale: { type: "spring", stiffness: 80 },
+    },
+  },
+};
+
+const EffectSectionTransition: Transition = {
+  transition: {
+    opacity: { duration: 0.3, delay: 0.0 },
+  },
+};
 
 export default function EffectSection({
   videoContainerRef,
-  userStreamEffects,
   type,
   videoId,
   handleEffectChange,
   tintColor,
 }: {
   videoContainerRef: React.RefObject<HTMLDivElement>;
-  userStreamEffects: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      webcam?:
-        | {
-            [webcamId: string]: boolean;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: boolean;
-          }
-        | undefined;
-      audio?: boolean;
-    };
-  }>;
   type: "webcam" | "screen";
   videoId: string;
   handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   tintColor: React.MutableRefObject<string>;
 }) {
+  const { userStreamEffects } = useStreamsContext();
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [color, setColor] = useState("#F56114");
   const [tempColor, setTempColor] = useState(color);
@@ -75,13 +62,15 @@ export default function EffectSection({
   useEffect(() => {
     const updateWidth = () => {
       if (videoContainerRef.current) {
-        setEffectsWidth(videoContainerRef.current.clientWidth * 0.9);
-      }
-      if (effectsContainerRef.current) {
-        setOverflowingXDirection(
-          effectsContainerRef.current.scrollWidth >
-            effectsContainerRef.current.clientWidth
-        );
+        const newEffectsWidth = videoContainerRef.current.clientWidth * 0.9;
+
+        setEffectsWidth(newEffectsWidth);
+
+        if (effectsContainerRef.current) {
+          setOverflowingXDirection(
+            effectsContainerRef.current.scrollWidth > newEffectsWidth
+          );
+        }
       }
     };
 
@@ -95,24 +84,28 @@ export default function EffectSection({
     return () => window.removeEventListener("resize", updateWidth);
   }, [videoContainerRef]);
 
-  const currentGlassesEffect = useRef<
-    | "glassesEffect1"
-    | "glassesEffect2"
-    | "glassesEffect3"
-    | "glassesEffect4"
-    | "glassesEffect5"
-  >("glassesEffect1");
-
   return (
-    <div
+    <motion.div
       ref={effectsContainerRef}
       className={`${
         overflowingXDirection ? "" : "pb-2"
-      } tiny-horizontal-scroll-bar rounded border mb-5 border-white border-opacity-75 bg-black bg-opacity-75 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full left-1/2 -translate-x-1/2 items-center`}
+      } tiny-horizontal-scroll-bar overflow-x-auto rounded border mb-5 border-white border-opacity-75 bg-black bg-opacity-75 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center`}
       style={{
         width: effectsWidth,
-        overflow: "auto visible",
+        left: videoContainerRef.current
+          ? `${
+              ((videoContainerRef.current.clientWidth - effectsWidth) /
+                2 /
+                videoContainerRef.current.clientWidth) *
+              100
+            }%`
+          : undefined,
       }}
+      variants={EffectSectionVar}
+      initial='init'
+      animate='animate'
+      exit='init'
+      transition={EffectSectionTransition}
     >
       <button
         onClick={() => handleEffectChange("blur")}
@@ -231,135 +224,16 @@ export default function EffectSection({
         </div>
       </div>
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <button
-        onClick={() => handleEffectChange("dogEars")}
-        className='flex items-center justify-center w-10 min-w-10 aspect-square'
-      >
-        {userStreamEffects.current.dogEars[type]?.[videoId] ? (
-          <img
-            src={dogEarsOffIcon}
-            alt='icon'
-            style={{ width: "90%", height: "90%" }}
-          />
-        ) : (
-          <img
-            src={dogEarsIcon}
-            alt='icon'
-            style={{ width: "90%", height: "90%" }}
-          />
-        )}
-      </button>
+      <EarsEffectSectionButton
+        handleEffectChange={handleEffectChange}
+        type={type}
+        videoId={videoId}
+      />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <HoldButton
-        clickFunction={() => handleEffectChange("glasses")}
-        holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
-          const target = event.target as HTMLElement;
-          if (target && target.dataset.value) {
-            console.log(`Held button value: ${target.dataset.value}`);
-            if (target.dataset.value === "glassesEffect1") {
-              currentGlassesEffect.current = target.dataset.value;
-            } else if (target.dataset.value === "glassesEffect2") {
-              currentGlassesEffect.current = target.dataset.value;
-            } else if (target.dataset.value === "glassesEffect3") {
-              currentGlassesEffect.current = target.dataset.value;
-            } else if (target.dataset.value === "glassesEffect4") {
-              currentGlassesEffect.current = target.dataset.value;
-            } else if (target.dataset.value === "glassesEffect5") {
-              currentGlassesEffect.current = target.dataset.value;
-            }
-          }
-        }}
-        contentFunction={() => {
-          const iconSrc = userStreamEffects.current.glasses[type]?.[videoId]
-            ? (currentGlassesEffect.current === "glassesEffect1" &&
-                glassesOffIcon1) ||
-              (currentGlassesEffect.current === "glassesEffect2" &&
-                glassesOffIcon2) ||
-              (currentGlassesEffect.current === "glassesEffect3" &&
-                glassesOffIcon3) ||
-              (currentGlassesEffect.current === "glassesEffect4" &&
-                glassesOffIcon4) ||
-              glassesOffIcon5
-            : (currentGlassesEffect.current === "glassesEffect1" &&
-                glassesIcon1) ||
-              (currentGlassesEffect.current === "glassesEffect2" &&
-                glassesIcon2) ||
-              (currentGlassesEffect.current === "glassesEffect3" &&
-                glassesIcon3) ||
-              (currentGlassesEffect.current === "glassesEffect4" &&
-                glassesIcon4) ||
-              glassesIcon5;
-
-          return (
-            <img
-              src={iconSrc}
-              alt='icon'
-              style={{ width: "90%", height: "90%" }}
-              data-value={"glassesEffect1"}
-            />
-          );
-        }}
-        holdContent={
-          <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
-            <div
-              className='flex items-center justify-center w-10 min-w-10 aspect-square bg-white border-fg-black-35 hover:border-fg-secondary rounded border hover:border-2 border-opacity-75'
-              data-value={"glassesEffect1"}
-            >
-              <img
-                src={glassesImage1}
-                alt='icon'
-                style={{ width: "90%" }}
-                data-value={"glassesEffect1"}
-              />
-            </div>
-            <div
-              className='flex items-center justify-center w-10 min-w-10 aspect-square bg-white rounded border hover:border-2 border-fg-black-35 hover:border-fg-secondary border-opacity-75 scale-x-[-1]'
-              data-value={"glassesEffect2"}
-            >
-              <img
-                src={glassesImage2}
-                alt='icon'
-                style={{ width: "90%" }}
-                data-value={"glassesEffect2"}
-              />
-            </div>
-            <div
-              className='flex items-center justify-center w-10 min-w-10 aspect-square rounded border hover:border-2 border-white hover:border-fg-secondary border-opacity-75 scale-x-[-1]'
-              data-value={"glassesEffect3"}
-            >
-              <img
-                src={glassesImage3}
-                alt='icon'
-                style={{ width: "90%" }}
-                data-value={"glassesEffect3"}
-              />
-            </div>
-            <div
-              className='flex items-center justify-center w-10 min-w-10 aspect-square rounded border hover:border-2 border-white hover:border-fg-secondary border-opacity-75'
-              data-value={"glassesEffect4"}
-            >
-              <img
-                src={glassesImage4}
-                alt='icon'
-                style={{ width: "90%" }}
-                data-value={"glassesEffect4"}
-              />
-            </div>
-            <div
-              className='flex items-center justify-center w-10 min-w-10 aspect-square rounded border hover:border-2 border-white hover:border-fg-secondary border-opacity-75'
-              data-value={"glassesEffect5"}
-            >
-              <img
-                src={glassesImage5}
-                alt='icon'
-                style={{ width: "90%" }}
-                data-value={"glassesEffect5"}
-              />
-            </div>
-          </div>
-        }
-        styles={"flex items-center justify-center w-10 aspect-square"}
-        defaultDataValue={currentGlassesEffect.current}
+      <GlassesEffectSectionButton
+        handleEffectChange={handleEffectChange}
+        type={type}
+        videoId={videoId}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <button
@@ -380,6 +254,6 @@ export default function EffectSection({
           />
         )}
       </button>
-    </div>
+    </motion.div>
   );
 }

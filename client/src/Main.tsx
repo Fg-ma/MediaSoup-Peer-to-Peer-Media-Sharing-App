@@ -296,7 +296,6 @@ export default function Main() {
             }
             isUser={true}
             muteButtonCallback={muteAudio}
-            device={device}
             producerTransport={producerTransport}
           />
         ),
