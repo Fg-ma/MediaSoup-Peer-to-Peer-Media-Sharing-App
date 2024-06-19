@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import tintIcon from "../../public/svgs/tintIcon.svg";
-import beardIcon from "../../public/svgs/beards/beardIcon.svg";
-import beardOffIcon from "../../public/svgs/beards/beardOffIcon.svg";
 import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
 import ColorPicker from "./ColorPicker";
 import GlassesEffectSectionButton from "./GlassesEffectSectionButton";
 import EarsEffectSectionButton from "./EarsEffectSectionButton";
+import BeardsEffectSectionButton from "./BeardsEffectSectionButton";
+import MustachesEffectSectionButton from "./MustachesEffectSectionButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -236,24 +236,17 @@ export default function EffectSection({
         videoId={videoId}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <button
-        onClick={() => handleEffectChange("beard")}
-        className='flex items-center justify-center w-10 min-w-10 aspect-square'
-      >
-        {userStreamEffects.current.beard[type]?.[videoId] ? (
-          <img
-            src={beardOffIcon}
-            alt='icon'
-            style={{ width: "90%", height: "90%" }}
-          />
-        ) : (
-          <img
-            src={beardIcon}
-            alt='icon'
-            style={{ width: "90%", height: "90%" }}
-          />
-        )}
-      </button>
+      <BeardsEffectSectionButton
+        handleEffectChange={handleEffectChange}
+        type={type}
+        videoId={videoId}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <MustachesEffectSectionButton
+        handleEffectChange={handleEffectChange}
+        type={type}
+        videoId={videoId}
+      />
     </motion.div>
   );
 }

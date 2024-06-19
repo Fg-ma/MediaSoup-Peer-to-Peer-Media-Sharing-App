@@ -2,12 +2,21 @@ import * as faceapi from "face-api.js";
 import { Uniforms } from "./setUniforms";
 import { EffectTypes } from "src/context/StreamsContext";
 import { FaceLandmarks } from "../handleEffectWebGL";
+import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import directionalShift from "./directionalShift";
+import updateSmoothPosition from "./updateSmoothPosition";
+
+export type FeatureTypes = "leftEye" | "rightEye" | "nose" | "chin";
 
 const maxFaces = 8;
-let smoothedNormalizedLeftEyePositions: { [id: string]: number[] } = {};
-let smoothedNormalizedRightEyePositions: { [id: string]: number[] } = {};
-let smoothedNormalizedNosePositions: { [id: string]: number[] } = {};
-const deadbandingThreshold = 0.035;
+export const smoothedPositions: {
+  [featureType in FeatureTypes]: { [id: string]: number[] };
+} = {
+  leftEye: {},
+  rightEye: {},
+  nose: {},
+  chin: {},
+};
 
 let faceTrackers: {
   [id: string]: { position: faceapi.Point; lastSeen: number };
@@ -16,152 +25,6 @@ const maxTrackerAge = 5;
 const detectionTimeout = 200;
 
 let detectTimeout: NodeJS.Timeout | undefined;
-
-const adaptiveSmoothingFactor = (distance: number) => {
-  const minFactor = 0.4;
-  const maxFactor = 0.9;
-  const threshold = 0.08;
-
-  if (distance < threshold) {
-    return maxFactor;
-  } else {
-    return minFactor;
-  }
-};
-
-const smoothPositionWithDeadbanding = (
-  previous: number[],
-  current: number[],
-  smoothingFactor: number
-): number[] => {
-  const deltaX = current[0] - previous[0];
-  const deltaY = current[1] - previous[1];
-
-  if (
-    Math.abs(deltaX) < deadbandingThreshold &&
-    Math.abs(deltaY) < deadbandingThreshold
-  ) {
-    return previous;
-  }
-
-  return [
-    previous[0] * smoothingFactor + current[0] * (1 - smoothingFactor),
-    previous[1] * smoothingFactor + current[1] * (1 - smoothingFactor),
-  ];
-};
-
-const updateSmoothEyePosition = (
-  faceId: string,
-  leftEye: faceapi.Point[],
-  rightEye: faceapi.Point[],
-  canvas: HTMLCanvasElement
-) => {
-  // Initialize smoothed positions
-  if (!smoothedNormalizedLeftEyePositions[faceId]) {
-    smoothedNormalizedLeftEyePositions[faceId] = [
-      leftEye[0].x / canvas.width,
-      leftEye[0].y / canvas.height,
-    ];
-  }
-  if (!smoothedNormalizedRightEyePositions[faceId]) {
-    smoothedNormalizedRightEyePositions[faceId] = [
-      rightEye[3].x / canvas.width,
-      rightEye[3].y / canvas.height,
-    ];
-  }
-
-  const leftEyeCurrentPosition = [
-    leftEye[0].x / canvas.width,
-    leftEye[0].y / canvas.height,
-  ];
-  const rightEyeCurrentPosition = [
-    rightEye[3].x / canvas.width,
-    rightEye[3].y / canvas.height,
-  ];
-
-  // Calculate distances
-  const leftEyeDistance = Math.sqrt(
-    Math.pow(
-      leftEyeCurrentPosition[0] - smoothedNormalizedLeftEyePositions[faceId][0],
-      2
-    ) +
-      Math.pow(
-        leftEyeCurrentPosition[1] -
-          smoothedNormalizedLeftEyePositions[faceId][1],
-        2
-      )
-  );
-  const rightEyeDistance = Math.sqrt(
-    Math.pow(
-      rightEyeCurrentPosition[0] -
-        smoothedNormalizedRightEyePositions[faceId][0],
-      2
-    ) +
-      Math.pow(
-        rightEyeCurrentPosition[1] -
-          smoothedNormalizedRightEyePositions[faceId][1],
-        2
-      )
-  );
-
-  // Adaptive smoothing
-  const leftEyeSmoothingFactor = adaptiveSmoothingFactor(leftEyeDistance);
-  const rightEyeSmoothingFactor = adaptiveSmoothingFactor(rightEyeDistance);
-
-  // Apply smoothing
-  smoothedNormalizedLeftEyePositions[faceId] = smoothPositionWithDeadbanding(
-    smoothedNormalizedLeftEyePositions[faceId],
-    leftEyeCurrentPosition,
-    leftEyeSmoothingFactor
-  );
-
-  smoothedNormalizedRightEyePositions[faceId] = smoothPositionWithDeadbanding(
-    smoothedNormalizedRightEyePositions[faceId],
-    rightEyeCurrentPosition,
-    rightEyeSmoothingFactor
-  );
-};
-
-const updateSmoothNosePosition = (
-  faceId: string,
-  nose: faceapi.Point[],
-  canvas: HTMLCanvasElement
-) => {
-  // Initialize smoothed positions
-  if (!smoothedNormalizedNosePositions[faceId]) {
-    smoothedNormalizedNosePositions[faceId] = [
-      nose[0].x / canvas.width,
-      nose[0].y / canvas.height,
-    ];
-  }
-
-  const noseCurrentPosition = [
-    nose[0].x / canvas.width,
-    nose[0].y / canvas.height,
-  ];
-
-  // Calculate distance
-  const noseDistance = Math.sqrt(
-    Math.pow(
-      noseCurrentPosition[0] - smoothedNormalizedNosePositions[faceId][0],
-      2
-    ) +
-      Math.pow(
-        noseCurrentPosition[1] - smoothedNormalizedNosePositions[faceId][1],
-        2
-      )
-  );
-
-  // Adaptive smoothing
-  const noseSmoothingFactor = adaptiveSmoothingFactor(noseDistance);
-
-  // Apply smoothing
-  smoothedNormalizedNosePositions[faceId] = smoothPositionWithDeadbanding(
-    smoothedNormalizedNosePositions[faceId],
-    noseCurrentPosition,
-    noseSmoothingFactor
-  );
-};
 
 const updateFaceLandmarks = async (
   gl: WebGLRenderingContext,
@@ -173,7 +36,8 @@ const updateFaceLandmarks = async (
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   },
-  faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean }
+  faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
+  currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
   const detections = await faceapi
     .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
@@ -186,8 +50,11 @@ const updateFaceLandmarks = async (
     if (effects.glasses && uniformLocations.uGlassesEffectLocation) {
       gl.uniform1i(uniformLocations.uGlassesEffectLocation, 1);
     }
-    if (effects.beard && uniformLocations.uBeardEffectLocation) {
+    if (effects.beards && uniformLocations.uBeardEffectLocation) {
       gl.uniform1i(uniformLocations.uBeardEffectLocation, 1);
+    }
+    if (effects.mustaches && uniformLocations.uMustacheEffectLocation) {
+      gl.uniform1i(uniformLocations.uMustacheEffectLocation, 1);
     }
   }
 
@@ -201,8 +68,12 @@ const updateFaceLandmarks = async (
   const rightEyePositions: number[][] = [];
   const eyesCenterPositions: number[][] = [];
   const eyesWidths: number[] = [];
+  const chinPositions: number[][] = [];
   const nosePositions: number[][] = [];
   const chinWidths: number[] = [];
+  const earsImageOffset: number[] = [];
+  const beardImageOffset: number[] = [];
+  const mustacheImageOffset: number[] = [];
 
   const newFaceTrackers: {
     [id: string]: { position: faceapi.Point; lastSeen: number };
@@ -216,6 +87,7 @@ const updateFaceLandmarks = async (
     const nose = landmarks.getNose();
     let updatedSmoothEyePosition = false;
     let updatedSmoothNosePosition = false;
+    let updatedSmoothChinPosition = false;
 
     // Set the faceTracker based on which face is closest to which face in
     // the set of last seen faces
@@ -263,39 +135,31 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.leftEyePositions || faceLandmarks.leftEyePositions) {
       // Update smooth eye position if it hasn't already been done for this dection
       if (!updatedSmoothEyePosition) {
-        updateSmoothEyePosition(faceId, leftEye, rightEye, canvas);
+        updateSmoothPosition("leftEye", faceId, leftEye, canvas);
+        updateSmoothPosition("rightEye", faceId, rightEye, canvas);
         updatedSmoothEyePosition = true;
       }
 
-      leftEyePositions.push(smoothedNormalizedLeftEyePositions[faceId]);
-      rightEyePositions.push(smoothedNormalizedRightEyePositions[faceId]);
+      leftEyePositions.push(smoothedPositions.leftEye[faceId]);
+      rightEyePositions.push(smoothedPositions.rightEye[faceId]);
     }
 
     // Set leftEarPositions and rightEarPositions
     if (faceLandmarks.leftEarPositions || faceLandmarks.rightEarPositions) {
-      // Determines how far above the eyes the ears should be
-      const shiftFactor = 2;
-
-      // Calculate the shift distance for the ear position taking into account
-      // headAngle for direction of shift and interocularDistance for scaling
-      const shiftDistance = interocularDistance * shiftFactor;
-      const perpendicularAngle = headAngle + Math.PI / 2;
-      const shiftX = Math.cos(perpendicularAngle) * shiftDistance;
-      const shiftY = Math.sin(perpendicularAngle) * shiftDistance;
-
       // Update smooth eye position if it hasn't already been done for this dection
       if (!updatedSmoothEyePosition) {
-        updateSmoothEyePosition(faceId, leftEye, rightEye, canvas);
+        updateSmoothPosition("leftEye", faceId, leftEye, canvas);
+        updateSmoothPosition("rightEye", faceId, rightEye, canvas);
         updatedSmoothEyePosition = true;
       }
 
       leftEarPositions.push([
-        smoothedNormalizedLeftEyePositions[faceId][0] - shiftX,
-        smoothedNormalizedLeftEyePositions[faceId][1] - shiftY,
+        smoothedPositions.leftEye[faceId][0],
+        smoothedPositions.leftEye[faceId][1],
       ]);
       rightEarPositions.push([
-        smoothedNormalizedRightEyePositions[faceId][0] - shiftX,
-        smoothedNormalizedRightEyePositions[faceId][1] - shiftY,
+        smoothedPositions.rightEye[faceId][0],
+        smoothedPositions.rightEye[faceId][1],
       ]);
     }
 
@@ -315,8 +179,7 @@ const updateFaceLandmarks = async (
 
     // Set eye widths
     if (faceLandmarks.eyesWidths) {
-      const eyesWidthSizeFactor = 700;
-      const normalizedEyesWidth = interocularDistance * eyesWidthSizeFactor;
+      const normalizedEyesWidth = interocularDistance * canvas.width;
 
       eyesWidths.push(normalizedEyesWidth);
     }
@@ -331,17 +194,17 @@ const updateFaceLandmarks = async (
       eyesCenterPositions.push(normalizedEyesCenterPosition);
     }
 
-    // Set nose positions
-    if (faceLandmarks.nosePositions) {
-      // Update smooth nose position if it hasn't already been done for this dection
-      if (!updatedSmoothNosePosition) {
-        updateSmoothNosePosition(faceId, nose, canvas);
-        updatedSmoothNosePosition = true;
+    // Set chin positions
+    if (faceLandmarks.chinPositions) {
+      // Update smooth chin position if it hasn't already been done for this dection
+      if (!updatedSmoothChinPosition) {
+        updateSmoothPosition("chin", faceId, jawOutline, canvas);
+        updatedSmoothChinPosition = true;
       }
 
-      nosePositions.push([
-        smoothedNormalizedNosePositions[faceId][0],
-        smoothedNormalizedNosePositions[faceId][1] + 0.24,
+      chinPositions.push([
+        smoothedPositions.chin[faceId][0],
+        smoothedPositions.chin[faceId][1],
       ]);
     }
 
@@ -357,6 +220,59 @@ const updateFaceLandmarks = async (
         Math.sqrt(dxJaw * dxJaw + dyJaw * dyJaw) * chinWidthFactor;
       chinWidths.push(chinWidth);
     }
+
+    // Set nose positions
+    if (faceLandmarks.nosePositions) {
+      // Update smooth nose position if it hasn't already been done for this dection
+      if (!updatedSmoothNosePosition) {
+        updateSmoothPosition("nose", faceId, nose, canvas);
+        updatedSmoothNosePosition = true;
+      }
+
+      nosePositions.push([
+        smoothedPositions.nose[faceId][0],
+        smoothedPositions.nose[faceId][1],
+      ]);
+    }
+
+    if (effects.ears && !earsImageOffset[0]) {
+      // Determines how far above the eyes the ears should be
+      const shiftFactor = 2;
+
+      // Calculate the shift distance for the ear position taking into account
+      // headAngle for direction of shift and interocularDistance for scaling
+      const { shiftX, shiftY } = directionalShift(
+        interocularDistance * shiftFactor,
+        headAngle
+      );
+
+      earsImageOffset.push(shiftX);
+      earsImageOffset.push(shiftY);
+    }
+
+    if (effects.beards && !beardImageOffset[0]) {
+      // Calculate the shift distance for the chin position taking into account
+      // headAngle for direction of shift
+      const { shiftX, shiftY } = directionalShift(
+        currentEffectsStyles.current.beards.chinOffset,
+        headAngle
+      );
+
+      beardImageOffset.push(shiftX);
+      beardImageOffset.push(shiftY);
+    }
+
+    if (effects.mustaches && !mustacheImageOffset[0]) {
+      // Calculate the shift distance for the nose position taking into account
+      // headAngle for direction of shift
+      const { shiftX, shiftY } = directionalShift(
+        currentEffectsStyles.current.mustaches.noseOffset,
+        headAngle
+      );
+
+      mustacheImageOffset.push(shiftX);
+      mustacheImageOffset.push(shiftY);
+    }
   });
 
   // Remove old face trackers
@@ -364,8 +280,10 @@ const updateFaceLandmarks = async (
     if (!newFaceTrackers[id]) {
       tracker.lastSeen++;
       if (tracker.lastSeen > maxTrackerAge) {
-        delete smoothedNormalizedLeftEyePositions[id];
-        delete smoothedNormalizedRightEyePositions[id];
+        Object.keys(smoothedPositions).forEach((featureType) => {
+          const feature = featureType as FeatureTypes;
+          delete smoothedPositions[feature][id];
+        });
       } else {
         newFaceTrackers[id] = tracker;
       }
@@ -382,8 +300,11 @@ const updateFaceLandmarks = async (
       if (effects.glasses && uniformLocations.uGlassesEffectLocation) {
         gl.uniform1i(uniformLocations.uGlassesEffectLocation, 0);
       }
-      if (effects.beard && uniformLocations.uBeardEffectLocation) {
+      if (effects.beards && uniformLocations.uBeardEffectLocation) {
         gl.uniform1i(uniformLocations.uBeardEffectLocation, 0);
+      }
+      if (effects.mustaches && uniformLocations.uMustacheEffectLocation) {
+        gl.uniform1i(uniformLocations.uMustacheEffectLocation, 0);
       }
       detectTimeout = undefined;
     }, detectionTimeout);
@@ -477,6 +398,21 @@ const updateFaceLandmarks = async (
       );
     }
     if (
+      uniformLocations.uChinPositionsLocation &&
+      faceLandmarks.chinPositions
+    ) {
+      gl.uniform2fv(
+        uniformLocations.uChinPositionsLocation,
+        flattenArray(chinPositions, maxFaces)
+      );
+    }
+    if (uniformLocations.uChinWidthsLocation && faceLandmarks.chinWidths) {
+      gl.uniform1fv(
+        uniformLocations.uChinWidthsLocation,
+        new Float32Array(chinWidths)
+      );
+    }
+    if (
       uniformLocations.uNosePositionsLocation &&
       faceLandmarks.nosePositions
     ) {
@@ -485,11 +421,14 @@ const updateFaceLandmarks = async (
         flattenArray(nosePositions, maxFaces)
       );
     }
-    if (uniformLocations.uChinWidthsLocation && faceLandmarks.chinWidths) {
-      gl.uniform1fv(
-        uniformLocations.uChinWidthsLocation,
-        new Float32Array(chinWidths)
-      );
+    if (uniformLocations.uEarsImageOffset && effects.ears) {
+      gl.uniform2fv(uniformLocations.uEarsImageOffset, earsImageOffset);
+    }
+    if (uniformLocations.uBeardImageOffset && effects.beards) {
+      gl.uniform2fv(uniformLocations.uBeardImageOffset, beardImageOffset);
+    }
+    if (uniformLocations.uMustacheImageOffset && effects.mustaches) {
+      gl.uniform2fv(uniformLocations.uMustacheImageOffset, mustacheImageOffset);
     }
   }
 };

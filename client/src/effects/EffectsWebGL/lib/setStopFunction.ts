@@ -23,7 +23,8 @@ const setStopFunction = (
   leftEarImageTexture: WebGLTexture | null | undefined,
   rightEarImageTexture: WebGLTexture | null | undefined,
   glassesImageTexture: WebGLTexture | null | undefined,
-  beardImageTexture: WebGLTexture | null | undefined
+  beardImageTexture: WebGLTexture | null | undefined,
+  mustacheImageTexture: WebGLTexture | null | undefined
 ) => {
   const stopFunction = () => {
     if (animationFrameId[0]) {
@@ -44,6 +45,9 @@ const setStopFunction = (
     }
     if (beardImageTexture) {
       gl.deleteTexture(beardImageTexture);
+    }
+    if (mustacheImageTexture) {
+      gl.deleteTexture(mustacheImageTexture);
     }
     gl.deleteProgram(program);
     gl.deleteShader(vertexShader);

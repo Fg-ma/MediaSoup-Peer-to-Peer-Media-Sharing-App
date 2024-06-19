@@ -23,8 +23,9 @@ export type FaceLandmarks =
   | "rightEyePositions"
   | "eyesCenterPositions"
   | "eyesWidths"
-  | "nosePositions"
-  | "chinWidths";
+  | "chinPositions"
+  | "chinWidths"
+  | "nosePositions";
 
 const handleEffectWebGL = async (
   type: "webcam" | "screen" | "audio",
@@ -93,7 +94,7 @@ const handleEffectWebGL = async (
     return new Error("No texture");
   }
 
-  if (effects.ears || effects.glasses || effects.beard) {
+  if (effects.ears || effects.glasses || effects.beards || effects.mustaches) {
     await loadModels();
   }
 
@@ -105,13 +106,13 @@ const handleEffectWebGL = async (
   if (effects.ears) {
     const leftEarTexture = await loadTexture(
       gl,
-      `/assets/ears/${currentEffectsStyles.current.ears}Left.png`
+      `/assets/ears/${currentEffectsStyles.current.ears.style}Left.png`
     );
     leftEarImageTexture = leftEarTexture.texture;
     leftEarImageAspectRatio = leftEarTexture.aspectRatio;
     const rightEarTexture = await loadTexture(
       gl,
-      `/assets/ears/${currentEffectsStyles.current.ears}Right.png`
+      `/assets/ears/${currentEffectsStyles.current.ears.style}Right.png`
     );
     rightEarImageTexture = rightEarTexture.texture;
     rightEarImageAspectRatio = rightEarTexture.aspectRatio;
@@ -128,13 +129,13 @@ const handleEffectWebGL = async (
     }
   }
 
-  // Load glasses images as textures
+  // Load glasses image as textures
   let glassesImageTexture: WebGLTexture | null | undefined;
   let glassesImageAspectRatio: number | undefined;
   if (effects.glasses) {
     const glassesTexture = await loadTexture(
       gl,
-      `/assets/glasses/${currentEffectsStyles.current.glasses}.png`
+      `/assets/glasses/${currentEffectsStyles.current.glasses.style}.png`
     );
     glassesImageTexture = glassesTexture.texture;
     glassesImageAspectRatio = glassesTexture.aspectRatio;
@@ -144,19 +145,35 @@ const handleEffectWebGL = async (
     }
   }
 
-  // Load beard images as textures
+  // Load beard image as textures
   let beardImageTexture: WebGLTexture | null | undefined;
   let beardImageAspectRatio: number | undefined;
-  if (effects.beard) {
+  if (effects.beards) {
     const beardTexture = await loadTexture(
       gl,
-      `/assets/beards/${currentEffectsStyles.current.beards}.png`
+      `/assets/beards/${currentEffectsStyles.current.beards.style}.png`
     );
     beardImageTexture = beardTexture.texture;
     beardImageAspectRatio = beardTexture.aspectRatio;
 
-    if (!beardImageAspectRatio || !beardImageAspectRatio) {
+    if (!beardImageTexture || !beardImageAspectRatio) {
       return new Error("No beardImageTexture or beardImageAspectRatio");
+    }
+  }
+
+  // Load mustaches image as textures
+  let mustacheImageTexture: WebGLTexture | null | undefined;
+  let mustacheImageAspectRatio: number | undefined;
+  if (effects.mustaches) {
+    const mustacheTexture = await loadTexture(
+      gl,
+      `/assets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
+    );
+    mustacheImageTexture = mustacheTexture.texture;
+    mustacheImageAspectRatio = mustacheTexture.aspectRatio;
+
+    if (!mustacheImageTexture || !mustacheImageAspectRatio) {
+      return new Error("No mustacheImageTexture or mustacheImageAspectRatio");
     }
   }
 
@@ -174,7 +191,9 @@ const handleEffectWebGL = async (
     glassesImageTexture,
     glassesImageAspectRatio,
     beardImageTexture,
-    beardImageAspectRatio
+    beardImageAspectRatio,
+    mustacheImageTexture,
+    mustacheImageAspectRatio
   );
 
   if (uniformLocations instanceof Error) {
@@ -191,8 +210,9 @@ const handleEffectWebGL = async (
     rightEyePositions: false,
     eyesCenterPositions: false,
     eyesWidths: false,
-    nosePositions: false,
+    chinPositions: false,
     chinWidths: false,
+    nosePositions: false,
   };
 
   if (effects.ears) {
@@ -207,10 +227,15 @@ const handleEffectWebGL = async (
     faceLandmarks.eyesCenterPositions = true;
     faceLandmarks.eyesWidths = true;
   }
-  if (effects.beard) {
+  if (effects.beards) {
+    faceLandmarks.headRotationAngles = true;
+    faceLandmarks.chinPositions = true;
+    faceLandmarks.chinWidths = true;
+  }
+  if (effects.mustaches) {
     faceLandmarks.headRotationAngles = true;
     faceLandmarks.nosePositions = true;
-    faceLandmarks.chinWidths = true;
+    faceLandmarks.eyesWidths = true;
   }
 
   // Start video and render loop
@@ -238,7 +263,8 @@ const handleEffectWebGL = async (
       animationFrameId,
       effects,
       uniformLocations,
-      faceLandmarks
+      faceLandmarks,
+      currentEffectsStyles
     );
   });
   video.onloadedmetadata = () => {
@@ -266,7 +292,8 @@ const handleEffectWebGL = async (
     leftEarImageTexture,
     rightEarImageTexture,
     glassesImageTexture,
-    beardImageTexture
+    beardImageTexture,
+    mustacheImageTexture
   );
 
   return canvas.captureStream().getVideoTracks()[0];

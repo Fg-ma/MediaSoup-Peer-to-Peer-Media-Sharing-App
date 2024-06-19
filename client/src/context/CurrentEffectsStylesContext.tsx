@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useContext, useRef } from "react";
+import React, { createContext, useContext, useRef } from "react";
 
 export type GlassesEffectTypes =
   | "defaultGlasses"
@@ -11,14 +11,38 @@ export type EarsEffectTypes = "dogEars";
 
 export type BeardsEffectTypes = "classicalCurlyBeard";
 
+export const beardChinOffsets: {
+  [beardEffectType in BeardsEffectTypes]: number;
+} = {
+  classicalCurlyBeard: 0.0,
+};
+
+export type MustachesEffectTypes =
+  | "mustache1"
+  | "mustache2"
+  | "mustache3"
+  | "mustache4"
+  | "disguiseMustache";
+
+export const mustacheNoseOffsets: {
+  [mustacheEffectType in MustachesEffectTypes]: number;
+} = {
+  mustache1: 0.135,
+  mustache2: 0.115,
+  mustache3: 0.13,
+  mustache4: 0.115,
+  disguiseMustache: 0.025,
+};
+
 export type EffectStylesType = {
-  glasses: GlassesEffectTypes;
-  ears: EarsEffectTypes;
-  beards: BeardsEffectTypes;
+  glasses: { style: GlassesEffectTypes };
+  ears: { style: EarsEffectTypes };
+  beards: { style: BeardsEffectTypes; chinOffset: number };
+  mustaches: { style: MustachesEffectTypes; noseOffset: number };
 };
 
 export interface CurrentEffectsStylesContextProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export interface CurrentEffectsStylesContextType {
@@ -42,10 +66,17 @@ export const useCurrentEffectsStylesContext = () => {
 export function CurrentEffectsStylesContextProvider({
   children,
 }: CurrentEffectsStylesContextProviderProps) {
+  const defaultBeard = "classicalCurlyBeard";
+  const defaultMustache = "mustache1";
+
   const currentEffectsStyles = useRef<EffectStylesType>({
-    glasses: "defaultGlasses",
-    ears: "dogEars",
-    beards: "classicalCurlyBeard",
+    glasses: { style: "defaultGlasses" },
+    ears: { style: "dogEars" },
+    beards: { style: defaultBeard, chinOffset: beardChinOffsets[defaultBeard] },
+    mustaches: {
+      style: defaultMustache,
+      noseOffset: mustacheNoseOffsets[defaultMustache],
+    },
   });
 
   return (

@@ -17,16 +17,22 @@ const fragmentShaderSource = `
   uniform bool u_earsEffect;
   uniform bool u_glassesEffect;
   uniform bool u_beardEffect;
+  uniform bool u_mustacheEffect;
 
   // Effect images
   uniform sampler2D u_leftEarImage;
   uniform float u_leftEarAspectRatio;
   uniform sampler2D u_rightEarImage;
   uniform float u_rightEarAspectRatio;
+  uniform vec2 u_earsImageOffset;
   uniform sampler2D u_glassesImage;
   uniform float u_glassesAspectRatio;
   uniform sampler2D u_beardImage;
   uniform float u_beardAspectRatio;
+  uniform vec2 u_beardImageOffset;
+  uniform sampler2D u_mustacheImage;
+  uniform float u_mustacheAspectRatio;
+  uniform vec2 u_mustacheImageOffset;
 
   // Universal face data
   uniform int u_faceCount;
@@ -45,6 +51,7 @@ const fragmentShaderSource = `
   uniform float u_eyesWidths[MAX_FACES];
 
   // Chin
+  uniform vec2 u_chinPositions[MAX_FACES];
   uniform float u_chinWidths[MAX_FACES];
 
   // Nose
@@ -62,7 +69,7 @@ const fragmentShaderSource = `
   
     mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
 
-    vec2 earTexCoord = (rotationMatrix * (texCoord - earPosition) * u_textureSize / earSize) + 0.5;
+    vec2 earTexCoord = (rotationMatrix * (texCoord - earPosition + u_earsImageOffset) * u_textureSize / earSize) + 0.5;
     vec4 earColor = texture2D(earImage, earTexCoord);
     if (earColor.a > 0.0) {
       color = mix(color, earColor, earColor.a);
@@ -82,16 +89,29 @@ const fragmentShaderSource = `
     }
   }
 
-  void applyBeardEffect(inout vec4 color, vec2 texCoord, sampler2D beardImage, vec2 nosePosition, float chinWidth, float beardAspectRatio, float headRotationAngle) {
+  void applyBeardEffect(inout vec4 color, vec2 texCoord, sampler2D beardImage, vec2 chinPosition, float chinWidth, float beardAspectRatio, float headRotationAngle) {
     float beardHeight = chinWidth / beardAspectRatio;
     vec2 beardSize = vec2(chinWidth, beardHeight);
 
     mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
 
-    vec2 beardTexCoord = (rotationMatrix * (texCoord - nosePosition) * u_textureSize / beardSize) + 0.5;
+    vec2 beardTexCoord = (rotationMatrix * (texCoord - chinPosition + u_beardImageOffset) * u_textureSize / beardSize) + 0.5;
     vec4 beardColor = texture2D(beardImage, beardTexCoord);
     if (beardColor.a > 0.0) {
       color = mix(color, beardColor, beardColor.a);
+    }
+  }
+
+  void applyMustacheEffect(inout vec4 color, vec2 texCoord, sampler2D mustacheImage, vec2 nosePosition, float eyesWidth, float mustacheAspectRatio, float headRotationAngle) {
+    float mustacheHeight = eyesWidth / mustacheAspectRatio;
+    vec2 mustacheSize = vec2(eyesWidth, mustacheHeight);
+
+    mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
+
+    vec2 mustacheTexCoord = (rotationMatrix * (texCoord - nosePosition - u_mustacheImageOffset) * u_textureSize / mustacheSize) + 0.5;
+    vec4 mustacheColor = texture2D(mustacheImage, mustacheTexCoord);
+    if (mustacheColor.a > 0.0) {
+      color = mix(color, mustacheColor, mustacheColor.a);
     }
   }
 
@@ -147,7 +167,16 @@ const fragmentShaderSource = `
     if (u_beardEffect) {
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
-          applyBeardEffect(color, v_texCoord, u_beardImage, u_nosePositions[i], u_chinWidths[i], u_beardAspectRatio, u_headRotationAngles[i]);
+          applyBeardEffect(color, v_texCoord, u_beardImage, u_chinPositions[i], u_chinWidths[i], u_beardAspectRatio, u_headRotationAngles[i]);
+        }
+      }
+    }
+
+    // Apply mustache effect
+    if (u_mustacheEffect) {
+      for (int i = 0; i < MAX_FACES; i++) {
+        if (i < u_faceCount) {
+          applyMustacheEffect(color, v_texCoord, u_mustacheImage, u_nosePositions[i], u_eyesWidths[i], u_mustacheAspectRatio, u_headRotationAngles[i]);
         }
       }
     }

@@ -48,10 +48,10 @@ export default function EarsEffectSectionButton({
           const effectType = target.dataset.value as EarsEffectTypes;
           if (
             effectType in earsEffects &&
-            (currentEffectsStyles.current.ears !== effectType ||
+            (currentEffectsStyles.current.ears.style !== effectType ||
               !userStreamEffects.current.ears[type]?.[videoId])
           ) {
-            currentEffectsStyles.current.ears = effectType;
+            currentEffectsStyles.current.ears.style = effectType;
             handleEffectChange(
               "ears",
               userStreamEffects.current.ears[type]?.[videoId] ? true : false
@@ -61,7 +61,7 @@ export default function EarsEffectSectionButton({
       }}
       contentFunction={() => {
         const iconSrc =
-          earsEffects[currentEffectsStyles.current.ears][
+          earsEffects[currentEffectsStyles.current.ears.style][
             userStreamEffects.current.ears[type]?.[videoId] ? "offIcon" : "icon"
           ];
 
@@ -70,7 +70,7 @@ export default function EarsEffectSectionButton({
             src={iconSrc}
             alt='icon'
             style={{ width: "90%", height: "90%" }}
-            data-value={currentEffectsStyles.current.ears}
+            data-value={currentEffectsStyles.current.ears.style}
           />
         );
       }}
@@ -97,7 +97,7 @@ export default function EarsEffectSectionButton({
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}
-      defaultDataValue={currentEffectsStyles.current.ears}
+      defaultDataValue={currentEffectsStyles.current.ears.style}
     />
   );
 }

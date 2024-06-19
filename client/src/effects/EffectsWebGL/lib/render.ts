@@ -3,6 +3,7 @@ import updateFaceLandmarks from "./updateFaceLandmarks";
 import updateTexture from "./updateTexture";
 import { Uniforms } from "./setUniforms";
 import { FaceLandmarks } from "../handleEffectWebGL";
+import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 
 const render = async (
   gl: WebGLRenderingContext,
@@ -16,18 +17,20 @@ const render = async (
   uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   },
-  faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean }
+  faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
+  currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
   updateTexture(gl, texture, video);
 
-  if (effects.ears || effects.glasses || effects.beard) {
+  if (effects.ears || effects.glasses || effects.beards || effects.mustaches) {
     await updateFaceLandmarks(
       gl,
       video,
       canvas,
       uniformLocations,
       effects,
-      faceLandmarks
+      faceLandmarks,
+      currentEffectsStyles
     );
   }
 
@@ -41,7 +44,8 @@ const render = async (
       animationFrameId,
       effects,
       uniformLocations,
-      faceLandmarks
+      faceLandmarks,
+      currentEffectsStyles
     )
   );
 };

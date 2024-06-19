@@ -88,10 +88,10 @@ export default function GlassesEffectSectionButton({
           const effectType = target.dataset.value as GlassesEffectTypes;
           if (
             effectType in glassesEffects &&
-            (currentEffectsStyles.current.glasses !== effectType ||
+            (currentEffectsStyles.current.glasses.style !== effectType ||
               !userStreamEffects.current.glasses[type]?.[videoId])
           ) {
-            currentEffectsStyles.current.glasses = effectType;
+            currentEffectsStyles.current.glasses.style = effectType;
             handleEffectChange(
               "glasses",
               userStreamEffects.current.glasses[type]?.[videoId] ? true : false
@@ -101,7 +101,7 @@ export default function GlassesEffectSectionButton({
       }}
       contentFunction={() => {
         const iconSrc =
-          glassesEffects[currentEffectsStyles.current.glasses][
+          glassesEffects[currentEffectsStyles.current.glasses.style][
             userStreamEffects.current.glasses[type]?.[videoId]
               ? "offIcon"
               : "icon"
@@ -112,7 +112,7 @@ export default function GlassesEffectSectionButton({
             src={iconSrc}
             alt='icon'
             style={{ width: "90%", height: "90%" }}
-            data-value={currentEffectsStyles.current.glasses}
+            data-value={currentEffectsStyles.current.glasses.style}
           />
         );
       }}
@@ -139,7 +139,7 @@ export default function GlassesEffectSectionButton({
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}
-      defaultDataValue={currentEffectsStyles.current.glasses}
+      defaultDataValue={currentEffectsStyles.current.glasses.style}
     />
   );
 }
