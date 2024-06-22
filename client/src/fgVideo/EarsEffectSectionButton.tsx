@@ -3,6 +3,7 @@ import HoldButton from "./HoldButton";
 import {
   useCurrentEffectsStylesContext,
   EarsEffectTypes,
+  earsWidthFactorMap,
 } from "../context/CurrentEffectsStylesContext";
 import dogEars from "../../public/assets/ears/dogEars.png";
 import dogEarsIcon from "../../public/svgs/ears/dogEarsIcon.svg";
@@ -52,6 +53,10 @@ export default function EarsEffectSectionButton({
               !userStreamEffects.current.ears[type]?.[videoId])
           ) {
             currentEffectsStyles.current.ears.style = effectType;
+            currentEffectsStyles.current.ears.leftEarWidthFactor =
+              earsWidthFactorMap[effectType].leftEarWidthFactor;
+            currentEffectsStyles.current.ears.rightEarWidthFactor =
+              earsWidthFactorMap[effectType].rightEarWidthFactor;
             handleEffectChange(
               "ears",
               userStreamEffects.current.ears[type]?.[videoId] ? true : false

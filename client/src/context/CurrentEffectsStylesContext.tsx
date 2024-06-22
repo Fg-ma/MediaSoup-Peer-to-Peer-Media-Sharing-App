@@ -9,9 +9,18 @@ export type GlassesEffectTypes =
 
 export type EarsEffectTypes = "dogEars";
 
+export const earsWidthFactorMap: {
+  [earEffectType in EarsEffectTypes]: {
+    leftEarWidthFactor: number;
+    rightEarWidthFactor: number;
+  };
+} = {
+  dogEars: { leftEarWidthFactor: 300, rightEarWidthFactor: 300 },
+};
+
 export type BeardsEffectTypes = "classicalCurlyBeard";
 
-export const beardChinOffsets: {
+export const beardChinOffsetsMap: {
   [beardEffectType in BeardsEffectTypes]: number;
 } = {
   classicalCurlyBeard: 0.0,
@@ -24,7 +33,7 @@ export type MustachesEffectTypes =
   | "mustache4"
   | "disguiseMustache";
 
-export const mustacheNoseOffsets: {
+export const mustacheNoseOffsetsMap: {
   [mustacheEffectType in MustachesEffectTypes]: number;
 } = {
   mustache1: 0.135,
@@ -36,7 +45,11 @@ export const mustacheNoseOffsets: {
 
 export type EffectStylesType = {
   glasses: { style: GlassesEffectTypes };
-  ears: { style: EarsEffectTypes };
+  ears: {
+    style: EarsEffectTypes;
+    leftEarWidthFactor: number;
+    rightEarWidthFactor: number;
+  };
   beards: { style: BeardsEffectTypes; chinOffset: number };
   mustaches: { style: MustachesEffectTypes; noseOffset: number };
 };
@@ -68,14 +81,22 @@ export function CurrentEffectsStylesContextProvider({
 }: CurrentEffectsStylesContextProviderProps) {
   const defaultBeard = "classicalCurlyBeard";
   const defaultMustache = "mustache1";
+  const defaultEars = "dogEars";
 
   const currentEffectsStyles = useRef<EffectStylesType>({
     glasses: { style: "defaultGlasses" },
-    ears: { style: "dogEars" },
-    beards: { style: defaultBeard, chinOffset: beardChinOffsets[defaultBeard] },
+    ears: {
+      style: defaultEars,
+      leftEarWidthFactor: earsWidthFactorMap[defaultEars].leftEarWidthFactor,
+      rightEarWidthFactor: earsWidthFactorMap[defaultEars].rightEarWidthFactor,
+    },
+    beards: {
+      style: defaultBeard,
+      chinOffset: beardChinOffsetsMap[defaultBeard],
+    },
     mustaches: {
       style: defaultMustache,
-      noseOffset: mustacheNoseOffsets[defaultMustache],
+      noseOffset: mustacheNoseOffsetsMap[defaultMustache],
     },
   });
 

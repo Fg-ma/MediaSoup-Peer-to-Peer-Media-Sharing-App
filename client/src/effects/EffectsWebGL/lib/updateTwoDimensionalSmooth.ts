@@ -1,10 +1,13 @@
 import * as faceapi from "face-api.js";
-import { FeatureTypes, smoothedPositions } from "./updateFaceLandmarks";
+import {
+  TwoDimensionalVariableTypes,
+  smoothedTwoDimensionalVariables,
+} from "./updateFaceLandmarks";
 import adaptiveSmoothingFactor from "./adaptiveSmoothingFactor";
-import smoothPositionWithDeadbanding from "./smoothPositionWithDeadbanding";
+import twoDimensionalSmoothWithDeadbanding from "./twoDimensionalSmoothWithDeadbanding";
 
-const updateSmoothPosition = (
-  featureType: FeatureTypes,
+const updateTwoDimensionalSmooth = (
+  featureType: TwoDimensionalVariableTypes,
   faceId: string,
   featurePoints: faceapi.Point[],
   canvas: HTMLCanvasElement
@@ -13,25 +16,31 @@ const updateSmoothPosition = (
 
   // Determine the current position based on feature type
   switch (featureType) {
-    case "leftEye":
+    case "eyesCenterPosition":
       currentFeaturePosition = [
         featurePoints[0].x / canvas.width,
         featurePoints[0].y / canvas.height,
       ];
       break;
-    case "rightEye":
+    case "leftEyePosition":
+      currentFeaturePosition = [
+        featurePoints[0].x / canvas.width,
+        featurePoints[0].y / canvas.height,
+      ];
+      break;
+    case "rightEyePosition":
       currentFeaturePosition = [
         featurePoints[3].x / canvas.width,
         featurePoints[3].y / canvas.height,
       ];
       break;
-    case "nose":
+    case "nosePosition":
       currentFeaturePosition = [
         featurePoints[0].x / canvas.width,
         featurePoints[0].y / canvas.height,
       ];
       break;
-    case "chin":
+    case "chinPosition":
       const chinValuePosition = Math.floor(featurePoints.length / 2);
       currentFeaturePosition = [
         featurePoints[chinValuePosition].x / canvas.width,
@@ -43,18 +52,21 @@ const updateSmoothPosition = (
   }
 
   // Initialize smoothed position if not already initialized
-  if (!smoothedPositions[featureType][faceId]) {
-    smoothedPositions[featureType][faceId] = currentFeaturePosition.slice();
+  if (!smoothedTwoDimensionalVariables[featureType][faceId]) {
+    smoothedTwoDimensionalVariables[featureType][faceId] =
+      currentFeaturePosition.slice();
   }
 
   // Calculate distance
   const distance = Math.sqrt(
     Math.pow(
-      currentFeaturePosition[0] - smoothedPositions[featureType][faceId][0],
+      currentFeaturePosition[0] -
+        smoothedTwoDimensionalVariables[featureType][faceId][0],
       2
     ) +
       Math.pow(
-        currentFeaturePosition[1] - smoothedPositions[featureType][faceId][1],
+        currentFeaturePosition[1] -
+          smoothedTwoDimensionalVariables[featureType][faceId][1],
         2
       )
   );
@@ -63,11 +75,13 @@ const updateSmoothPosition = (
   const smoothingFactor = adaptiveSmoothingFactor(distance);
 
   // Apply smoothing
-  smoothedPositions[featureType][faceId] = smoothPositionWithDeadbanding(
-    smoothedPositions[featureType][faceId],
-    currentFeaturePosition,
-    smoothingFactor
-  );
+  smoothedTwoDimensionalVariables[featureType][faceId] =
+    twoDimensionalSmoothWithDeadbanding(
+      featureType,
+      smoothedTwoDimensionalVariables[featureType][faceId],
+      currentFeaturePosition,
+      smoothingFactor
+    );
 };
 
-export default updateSmoothPosition;
+export default updateTwoDimensionalSmooth;

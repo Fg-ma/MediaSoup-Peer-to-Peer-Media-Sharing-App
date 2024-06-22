@@ -4,6 +4,7 @@ import updateTexture from "./updateTexture";
 import { Uniforms } from "./setUniforms";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import updateFaceLandmarksNew from "./updateFaceLandmarksNew";
 
 const render = async (
   gl: WebGLRenderingContext,
@@ -23,7 +24,7 @@ const render = async (
   updateTexture(gl, texture, video);
 
   if (effects.ears || effects.glasses || effects.beards || effects.mustaches) {
-    await updateFaceLandmarks(
+    await updateFaceLandmarksNew(
       gl,
       video,
       canvas,

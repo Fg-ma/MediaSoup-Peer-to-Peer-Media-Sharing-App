@@ -1,4 +1,3 @@
-import * as faceapi from "face-api.js";
 import { EffectTypes } from "../../context/StreamsContext";
 import vertexShaderSource from "./lib/vertexShader";
 import fragmentShaderSource from "./lib/fragmentShader";
@@ -12,9 +11,12 @@ import createBuffers from "./lib/createBuffers";
 import loadTexture from "./lib/loadTexture";
 import loadModels from "../lib/loadModels";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
 
 export type FaceLandmarks =
   | "headRotationAngles"
+  | "headPitchAngles"
+  | "headYawAngles"
   | "leftEarPositions"
   | "rightEarPositions"
   | "leftEarWidths"
@@ -74,7 +76,6 @@ const handleEffectWebGL = async (
     return new Error("No vertex shader: ", vertexShader);
   }
   if (fragmentShader instanceof Error) {
-    console.log(fragmentShader);
     return new Error("No fragment shader: ", fragmentShader);
   }
 
@@ -202,6 +203,8 @@ const handleEffectWebGL = async (
 
   const faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean } = {
     headRotationAngles: false,
+    headPitchAngles: false,
+    headYawAngles: false,
     leftEarPositions: false,
     rightEarPositions: false,
     leftEarWidths: false,
@@ -217,6 +220,8 @@ const handleEffectWebGL = async (
 
   if (effects.ears) {
     faceLandmarks.headRotationAngles = true;
+    faceLandmarks.headPitchAngles = true;
+    faceLandmarks.headYawAngles = true;
     faceLandmarks.leftEarPositions = true;
     faceLandmarks.rightEarPositions = true;
     faceLandmarks.leftEarWidths = true;
@@ -224,19 +229,27 @@ const handleEffectWebGL = async (
   }
   if (effects.glasses) {
     faceLandmarks.headRotationAngles = true;
+    faceLandmarks.headPitchAngles = true;
+    faceLandmarks.headYawAngles = true;
     faceLandmarks.eyesCenterPositions = true;
     faceLandmarks.eyesWidths = true;
   }
   if (effects.beards) {
     faceLandmarks.headRotationAngles = true;
+    faceLandmarks.headPitchAngles = true;
+    faceLandmarks.headYawAngles = true;
     faceLandmarks.chinPositions = true;
     faceLandmarks.chinWidths = true;
   }
   if (effects.mustaches) {
     faceLandmarks.headRotationAngles = true;
+    faceLandmarks.headPitchAngles = true;
+    faceLandmarks.headYawAngles = true;
     faceLandmarks.nosePositions = true;
     faceLandmarks.eyesWidths = true;
   }
+
+  updateDeadbandingMaps(effects, currentEffectsStyles);
 
   // Start video and render loop
   let animationFrameId: number[] = [];

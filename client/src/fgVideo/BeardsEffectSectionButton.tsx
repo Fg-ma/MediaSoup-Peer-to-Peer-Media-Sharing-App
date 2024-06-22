@@ -3,7 +3,7 @@ import HoldButton from "./HoldButton";
 import {
   useCurrentEffectsStylesContext,
   BeardsEffectTypes,
-  beardChinOffsets,
+  beardChinOffsetsMap,
 } from "../context/CurrentEffectsStylesContext";
 import classicalCurlyBeard from "../../public/assets/beards/classicalCurlyBeard.png";
 import classicalCurlyBeardIcon from "../../public/svgs/beards/classicalCurlyBeardIcon.svg";
@@ -54,7 +54,7 @@ export default function BeardsEffectSectionButton({
           ) {
             currentEffectsStyles.current.beards.style = effectType;
             currentEffectsStyles.current.beards.chinOffset =
-              beardChinOffsets[effectType];
+              beardChinOffsetsMap[effectType];
             handleEffectChange(
               "beards",
               userStreamEffects.current.beards[type]?.[videoId] ? true : false

@@ -3,7 +3,7 @@ import HoldButton from "./HoldButton";
 import {
   useCurrentEffectsStylesContext,
   MustachesEffectTypes,
-  mustacheNoseOffsets,
+  mustacheNoseOffsetsMap,
 } from "../context/CurrentEffectsStylesContext";
 import mustache1 from "../../public/assets/mustaches/mustache1.png";
 import mustache2 from "../../public/assets/mustaches/mustache2.png";
@@ -94,7 +94,7 @@ export default function MustachesEffectSectionButton({
           ) {
             currentEffectsStyles.current.mustaches.style = effectType;
             currentEffectsStyles.current.mustaches.noseOffset =
-              mustacheNoseOffsets[effectType];
+              mustacheNoseOffsetsMap[effectType];
             handleEffectChange(
               "mustaches",
               userStreamEffects.current.mustaches[type]?.[videoId]

@@ -4,6 +4,8 @@ export type Uniforms =
   | "uFaceCountLocation"
   | "uTextureSizeLocation"
   | "uHeadRotationAnglesLocation"
+  | "uHeadPitchAnglesLocation"
+  | "uHeadYawAnglesLocation"
   | "uBlurRadiusLocation"
   | "uTintColorLocation"
   | "uBlurEffectLocation"
@@ -244,12 +246,6 @@ const setUniforms = (
   gl.uniform1i(uBeardEffectLocation, effects.beards ? 1 : 0);
   gl.uniform1i(uMustacheEffectLocation, effects.mustaches ? 1 : 0);
 
-  console.log(
-    uMustacheEffectLocation,
-    uMustacheImageLocation,
-    uMustacheAspectRatioLocation
-  );
-
   const uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   } = {
@@ -259,6 +255,11 @@ const setUniforms = (
       program,
       "u_headRotationAngles"
     ),
+    uHeadPitchAnglesLocation: gl.getUniformLocation(
+      program,
+      "u_headPitchAngles"
+    ),
+    uHeadYawAnglesLocation: gl.getUniformLocation(program, "u_headYawAngles"),
 
     uBlurRadiusLocation: uBlurRadiusLocation,
     uTintColorLocation: uTintColorLocation,

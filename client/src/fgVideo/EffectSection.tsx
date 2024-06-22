@@ -21,7 +21,7 @@ const EffectSectionVar: Variants = {
 
 const EffectSectionTransition: Transition = {
   transition: {
-    opacity: { duration: 0.3, delay: 0.0 },
+    opacity: { duration: 0.2, delay: 0.0 },
   },
 };
 

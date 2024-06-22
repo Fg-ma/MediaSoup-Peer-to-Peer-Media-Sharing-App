@@ -98,7 +98,7 @@ const HoldButtonPortalVar: Variants = {
 
 const HoldButtonPortalTransition: Transition = {
   transition: {
-    opacity: { duration: 0.2, delay: 0.0 },
+    opacity: { duration: 0.15, delay: 0.0 },
   },
 };
 
