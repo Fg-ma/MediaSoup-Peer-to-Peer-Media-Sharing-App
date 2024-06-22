@@ -12,6 +12,7 @@ import loadTexture from "./lib/loadTexture";
 import loadModels from "../lib/loadModels";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
+import { FaceMesh, Results } from "@mediapipe/face_mesh";
 
 export type FaceLandmarks =
   | "headRotationAngles"
@@ -251,6 +252,22 @@ const handleEffectWebGL = async (
 
   updateDeadbandingMaps(effects, currentEffectsStyles);
 
+  let faceMeshResults: Results[] = [];
+  const faceMesh = new FaceMesh({
+    locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+    },
+  });
+  faceMesh.setOptions({
+    maxNumFaces: 1,
+    refineLandmarks: true,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5,
+  });
+  faceMesh.onResults((results) => {
+    faceMeshResults[0] = results;
+  });
+
   // Start video and render loop
   let animationFrameId: number[] = [];
   const video = document.createElement("video");
@@ -277,7 +294,9 @@ const handleEffectWebGL = async (
       effects,
       uniformLocations,
       faceLandmarks,
-      currentEffectsStyles
+      currentEffectsStyles,
+      faceMesh,
+      faceMeshResults
     );
   });
   video.onloadedmetadata = () => {
