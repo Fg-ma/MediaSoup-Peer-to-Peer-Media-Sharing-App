@@ -1,5 +1,11 @@
 import { EffectTypes } from "src/context/StreamsContext";
 
+export type Attributes =
+  | "aVideoPositionLocation"
+  | "aVideoTexCoordLocation"
+  | "aTrianglePositionLocation"
+  | "aTriangleTexCoordLocation";
+
 export type Uniforms =
   | "uFaceCountLocation"
   | "uTextureSizeLocation"
@@ -50,8 +56,9 @@ const hexToRgb = (hex: string) => {
 };
 
 const setUniforms = (
-  gl: WebGLRenderingContext,
-  program: WebGLProgram,
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  videoProgram: WebGLProgram,
+  triangleProgram: WebGLProgram,
   canvas: HTMLCanvasElement,
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
@@ -68,10 +75,15 @@ const setUniforms = (
   mustacheImageTexture: WebGLTexture | null | undefined,
   mustacheImageAspectRatio: number | undefined
 ) => {
-  const uTextureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
+  gl.useProgram(videoProgram);
+
+  const uTextureSizeLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_textureSize"
+  );
 
   if (!uTextureSizeLocation) {
-    return new Error("No uBlurRadiusLocation or uTextureSizeLocation");
+    return new Error("No uTextureSizeLocation");
   }
 
   gl.uniform2f(uTextureSizeLocation, canvas.width, canvas.height);
@@ -79,7 +91,7 @@ const setUniforms = (
   // blur uniforms
   let uBlurRadiusLocation: WebGLUniformLocation | null | undefined;
   if (effects.blur) {
-    uBlurRadiusLocation = gl.getUniformLocation(program, "u_blurRadius");
+    uBlurRadiusLocation = gl.getUniformLocation(videoProgram, "u_blurRadius");
 
     if (!uBlurRadiusLocation) {
       return new Error("No uBlurRadiusLocation");
@@ -91,7 +103,7 @@ const setUniforms = (
   // blur tint
   let uTintColorLocation: WebGLUniformLocation | null | undefined;
   if (effects.tint) {
-    uTintColorLocation = gl.getUniformLocation(program, "u_tintColor");
+    uTintColorLocation = gl.getUniformLocation(videoProgram, "u_tintColor");
     const tintColorVector = hexToRgb(tintColor.current);
 
     if (!uTintColorLocation) {
@@ -107,14 +119,20 @@ const setUniforms = (
   let uRightEarImageLocation: WebGLUniformLocation | null | undefined;
   let uRightEarAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.ears) {
-    uLeftEarImageLocation = gl.getUniformLocation(program, "u_leftEarImage");
+    uLeftEarImageLocation = gl.getUniformLocation(
+      videoProgram,
+      "u_leftEarImage"
+    );
     uLeftEarAspectRatioLocation = gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_leftEarAspectRatio"
     );
-    uRightEarImageLocation = gl.getUniformLocation(program, "u_rightEarImage");
+    uRightEarImageLocation = gl.getUniformLocation(
+      videoProgram,
+      "u_rightEarImage"
+    );
     uRightEarAspectRatioLocation = gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_rightEarAspectRatio"
     );
 
@@ -146,9 +164,12 @@ const setUniforms = (
   let uGlassesImageLocation: WebGLUniformLocation | null | undefined;
   let uGlassesAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.glasses) {
-    uGlassesImageLocation = gl.getUniformLocation(program, "u_glassesImage");
+    uGlassesImageLocation = gl.getUniformLocation(
+      videoProgram,
+      "u_glassesImage"
+    );
     uGlassesAspectRatioLocation = gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_glassesAspectRatio"
     );
 
@@ -174,9 +195,9 @@ const setUniforms = (
   let uBeardImageLocation: WebGLUniformLocation | null | undefined;
   let uBeardAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.beards) {
-    uBeardImageLocation = gl.getUniformLocation(program, "u_beardImage");
+    uBeardImageLocation = gl.getUniformLocation(videoProgram, "u_beardImage");
     uBeardAspectRatioLocation = gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_beardAspectRatio"
     );
 
@@ -202,9 +223,12 @@ const setUniforms = (
   let uMustacheImageLocation: WebGLUniformLocation | null | undefined;
   let uMustacheAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.mustaches) {
-    uMustacheImageLocation = gl.getUniformLocation(program, "u_mustacheImage");
+    uMustacheImageLocation = gl.getUniformLocation(
+      videoProgram,
+      "u_mustacheImage"
+    );
     uMustacheAspectRatioLocation = gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_mustacheAspectRatio"
     );
 
@@ -226,16 +250,28 @@ const setUniforms = (
     gl.uniform1f(uMustacheAspectRatioLocation, mustacheImageAspectRatio);
   }
 
-  const uBlurEffectLocation = gl.getUniformLocation(program, "u_blurEffect");
-  const uTintEffectLocation = gl.getUniformLocation(program, "u_tintEffect");
-  const uEarsEffectLocation = gl.getUniformLocation(program, "u_earsEffect");
+  const uBlurEffectLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_blurEffect"
+  );
+  const uTintEffectLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_tintEffect"
+  );
+  const uEarsEffectLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_earsEffect"
+  );
   const uGlassesEffectLocation = gl.getUniformLocation(
-    program,
+    videoProgram,
     "u_glassesEffect"
   );
-  const uBeardEffectLocation = gl.getUniformLocation(program, "u_beardEffect");
+  const uBeardEffectLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_beardEffect"
+  );
   const uMustacheEffectLocation = gl.getUniformLocation(
-    program,
+    videoProgram,
     "u_mustacheEffect"
   );
 
@@ -246,20 +282,52 @@ const setUniforms = (
   gl.uniform1i(uBeardEffectLocation, effects.beards ? 1 : 0);
   gl.uniform1i(uMustacheEffectLocation, effects.mustaches ? 1 : 0);
 
+  const aVideoPositionLocation = gl.getAttribLocation(
+    videoProgram,
+    "a_position"
+  );
+  const aVideoTexCoordLocation = gl.getAttribLocation(
+    videoProgram,
+    "a_texCoord"
+  );
+
+  gl.useProgram(triangleProgram);
+
+  const aTrianglePositionLocation = gl.getAttribLocation(
+    triangleProgram,
+    "a_position"
+  );
+  const aTriangleTexCoordLocation = gl.getAttribLocation(
+    triangleProgram,
+    "a_texCoord"
+  );
+
+  const attributeLocations: {
+    [attribute in Attributes]: number | null | undefined;
+  } = {
+    aVideoPositionLocation: aVideoPositionLocation,
+    aVideoTexCoordLocation: aVideoTexCoordLocation,
+    aTrianglePositionLocation: aTrianglePositionLocation,
+    aTriangleTexCoordLocation: aTriangleTexCoordLocation,
+  };
+
   const uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   } = {
-    uFaceCountLocation: gl.getUniformLocation(program, "u_faceCount"),
+    uFaceCountLocation: gl.getUniformLocation(videoProgram, "u_faceCount"),
     uTextureSizeLocation: uTextureSizeLocation,
     uHeadRotationAnglesLocation: gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_headRotationAngles"
     ),
     uHeadPitchAnglesLocation: gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_headPitchAngles"
     ),
-    uHeadYawAnglesLocation: gl.getUniformLocation(program, "u_headYawAngles"),
+    uHeadYawAnglesLocation: gl.getUniformLocation(
+      videoProgram,
+      "u_headYawAngles"
+    ),
 
     uBlurRadiusLocation: uBlurRadiusLocation,
     uTintColorLocation: uTintColorLocation,
@@ -275,46 +343,61 @@ const setUniforms = (
     uLeftEarAspectRatioLocation: uLeftEarAspectRatioLocation,
     uRightEarImageLocation: uRightEarImageLocation,
     uRightEarAspectRatioLocation: uRightEarAspectRatioLocation,
-    uEarsImageOffset: gl.getUniformLocation(program, "u_earsImageOffset"),
+    uEarsImageOffset: gl.getUniformLocation(videoProgram, "u_earsImageOffset"),
     uGlassesImageLocation: uGlassesImageLocation,
     uGlassesAspectRatioLocation: uGlassesAspectRatioLocation,
     uBeardImageLocation: uBeardImageLocation,
     uBeardAspectRatioLocation: uBeardAspectRatioLocation,
-    uBeardImageOffset: gl.getUniformLocation(program, "u_beardImageOffset"),
+    uBeardImageOffset: gl.getUniformLocation(
+      videoProgram,
+      "u_beardImageOffset"
+    ),
     uMustacheImageLocation: uMustacheImageLocation,
     uMustacheAspectRatioLocation: uMustacheAspectRatioLocation,
     uMustacheImageOffset: gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_mustacheImageOffset"
     ),
 
     uLeftEarPositionsLocation: gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_leftEarPositions"
     ),
     uRightEarPositionsLocation: gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_rightEarPositions"
     ),
     uLeftEyePositionsLocation: gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_leftEyePositions"
     ),
     uRightEyePositionsLocation: gl.getUniformLocation(
-      program,
+      videoProgram,
       "u_rightEyePositions"
     ),
-    uEyesCentersLocation: gl.getUniformLocation(program, "u_eyesCenters"),
-    uChinPositionsLocation: gl.getUniformLocation(program, "u_chinPositions"),
-    uNosePositionsLocation: gl.getUniformLocation(program, "u_nosePositions"),
+    uEyesCentersLocation: gl.getUniformLocation(videoProgram, "u_eyesCenters"),
+    uChinPositionsLocation: gl.getUniformLocation(
+      videoProgram,
+      "u_chinPositions"
+    ),
+    uNosePositionsLocation: gl.getUniformLocation(
+      videoProgram,
+      "u_nosePositions"
+    ),
 
-    uRightEarWidthsLocation: gl.getUniformLocation(program, "u_rightEarWidths"),
-    uLeftEarWidthsLocation: gl.getUniformLocation(program, "u_leftEarWidths"),
-    uEyesWidthsLocation: gl.getUniformLocation(program, "u_eyesWidths"),
-    uChinWidthsLocation: gl.getUniformLocation(program, "u_chinWidths"),
+    uRightEarWidthsLocation: gl.getUniformLocation(
+      videoProgram,
+      "u_rightEarWidths"
+    ),
+    uLeftEarWidthsLocation: gl.getUniformLocation(
+      videoProgram,
+      "u_leftEarWidths"
+    ),
+    uEyesWidthsLocation: gl.getUniformLocation(videoProgram, "u_eyesWidths"),
+    uChinWidthsLocation: gl.getUniformLocation(videoProgram, "u_chinWidths"),
   };
 
-  return uniformLocations;
+  return { uniformLocations, attributeLocations };
 };
 
 export default setUniforms;

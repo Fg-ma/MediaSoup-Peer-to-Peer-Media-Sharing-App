@@ -1,6 +1,8 @@
 import { EffectTypes } from "../../context/StreamsContext";
-import vertexShaderSource from "./lib/vertexShader";
-import fragmentShaderSource from "./lib/fragmentShader";
+import videoVertexShaderSource from "./lib/videoVertexShader";
+import videoFragmentShaderSource from "./lib/videoFragmentShader";
+import triangleVertexShaderSource from "./lib/triangleVertexShader";
+import triangleFragmentShaderSource from "./lib/triangleFragmentShader";
 import setUniforms from "./lib/setUniforms";
 import createShader from "./lib/createShader";
 import createAndSetupTexture from "./lib/createAndSetupTexture";
@@ -59,36 +61,76 @@ const handleEffectWebGL = async (
 ) => {
   // Setup WebGL context
   const canvas = document.createElement("canvas");
-  const gl = canvas.getContext("webgl", {
-    willReadFrequently: true,
-  }) as WebGLRenderingContext | null;
+  const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
 
   if (!gl) {
     return new Error("WebGL not supported");
   }
 
-  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-  const fragmentShader = createShader(
+  const videoVertexShader = createShader(
+    gl,
+    gl.VERTEX_SHADER,
+    videoVertexShaderSource
+  );
+  if (videoVertexShader instanceof Error) {
+    return new Error("No video vertex shader: ", videoVertexShader);
+  }
+  const videoFragmentShader = createShader(
     gl,
     gl.FRAGMENT_SHADER,
-    fragmentShaderSource
+    videoFragmentShaderSource
   );
-  if (vertexShader instanceof Error) {
-    return new Error("No vertex shader: ", vertexShader);
-  }
-  if (fragmentShader instanceof Error) {
-    return new Error("No fragment shader: ", fragmentShader);
+  if (videoFragmentShader instanceof Error) {
+    return new Error("No video fragment shader: ", videoFragmentShader);
   }
 
-  const program = createProgram(gl, vertexShader, fragmentShader);
-  if (program instanceof Error) {
-    return new Error("No program");
+  const triangleVertexShader = createShader(
+    gl,
+    gl.VERTEX_SHADER,
+    triangleVertexShaderSource
+  );
+  if (triangleVertexShader instanceof Error) {
+    return new Error("No triangle vertex shader: ", triangleVertexShader);
+  }
+  const triangleFragmentShader = createShader(
+    gl,
+    gl.FRAGMENT_SHADER,
+    triangleFragmentShaderSource
+  );
+  if (triangleFragmentShader instanceof Error) {
+    return new Error("No triangle fragment shader: ", triangleFragmentShader);
   }
 
-  gl.useProgram(program);
+  const videoProgram = createProgram(
+    gl,
+    videoVertexShader,
+    videoFragmentShader
+  );
+  if (videoProgram instanceof Error) {
+    return new Error("No video program");
+  }
+  gl.useProgram(videoProgram);
+
+  const triangleProgram = createProgram(
+    gl,
+    triangleVertexShader,
+    triangleFragmentShader
+  );
+  if (triangleProgram instanceof Error) {
+    return new Error("No triangle program");
+  }
+  gl.useProgram(triangleProgram);
 
   // Create buffers
-  const { positionBuffer, texCoordBuffer } = createBuffers(gl, program);
+  const {
+    positionBuffer: videoPositionBuffer,
+    texCoordBuffer: videoTexCoordBuffer,
+  } = createBuffers(gl, videoProgram);
+
+  const {
+    positionBuffer: trianglePositionBuffer,
+    texCoordBuffer: triangleTexCoordBuffer,
+  } = createBuffers(gl, triangleProgram);
 
   const texture = createAndSetupTexture(gl);
 
@@ -180,9 +222,10 @@ const handleEffectWebGL = async (
   }
 
   // Set up the uniforms in the fragment shader
-  const uniformLocations = setUniforms(
+  const { uniformLocations, attributeLocations } = setUniforms(
     gl,
-    program,
+    videoProgram,
+    triangleProgram,
     canvas,
     effects,
     tintColor,
@@ -287,6 +330,8 @@ const handleEffectWebGL = async (
   video.addEventListener("play", () => {
     render(
       gl,
+      videoProgram,
+      triangleProgram,
       texture,
       video,
       canvas,
@@ -312,11 +357,16 @@ const handleEffectWebGL = async (
     video,
     gl,
     texture,
-    program,
-    vertexShader,
-    fragmentShader,
-    positionBuffer,
-    texCoordBuffer,
+    videoProgram,
+    videoVertexShader,
+    videoFragmentShader,
+    videoPositionBuffer,
+    videoTexCoordBuffer,
+    triangleProgram,
+    triangleVertexShader,
+    triangleFragmentShader,
+    trianglePositionBuffer,
+    triangleTexCoordBuffer,
     canvas,
     type,
     id,

@@ -3,7 +3,7 @@ import { Uniforms } from "./setUniforms";
 
 const toggleFaceTrackedEffects = (
   toggleValue: 0 | 1,
-  gl: WebGLRenderingContext,
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
   uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   },

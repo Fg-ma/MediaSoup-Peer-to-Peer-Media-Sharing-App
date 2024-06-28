@@ -4,7 +4,7 @@ import { EffectTypes } from "src/context/StreamsContext";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import directionalShift from "./directionalShift";
-import updateTwoDimensionalSmooth from "./updateTwoDimensionalSmooth";
+import updateTwoDimensionalSmoothVariables from "./updateTwoDimensionalSmoothVariables";
 import updateOneDimensionalSmoothVariables from "./updateOneDimensionalSmoothVariables";
 import updateUniforms from "./updateUniforms";
 import toggleFaceTrackedEffects from "./toggleFaceTrackedEffects";
@@ -177,8 +177,13 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.leftEyePositions || faceLandmarks.leftEyePositions) {
       // Update smooth eye position if it hasn't already been done for this dection
       if (!updatedSmoothEyePosition) {
-        updateTwoDimensionalSmooth("leftEyePosition", faceId, leftEye, canvas);
-        updateTwoDimensionalSmooth(
+        updateTwoDimensionalSmoothVariables(
+          "leftEyePosition",
+          faceId,
+          leftEye,
+          canvas
+        );
+        updateTwoDimensionalSmoothVariables(
           "rightEyePosition",
           faceId,
           rightEye,
@@ -199,8 +204,13 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.leftEarPositions || faceLandmarks.rightEarPositions) {
       // Update smooth eye position if it hasn't already been done for this dection
       if (!updatedSmoothEyePosition) {
-        updateTwoDimensionalSmooth("leftEyePosition", faceId, leftEye, canvas);
-        updateTwoDimensionalSmooth(
+        updateTwoDimensionalSmoothVariables(
+          "leftEyePosition",
+          faceId,
+          leftEye,
+          canvas
+        );
+        updateTwoDimensionalSmoothVariables(
           "rightEyePosition",
           faceId,
           rightEye,
@@ -282,7 +292,7 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.eyesCenterPositions) {
       // Update smooth eyes center position if it hasn't already been done for this dection
       if (!updatedSmoothEyesCenterPosition) {
-        updateTwoDimensionalSmooth(
+        updateTwoDimensionalSmoothVariables(
           "eyesCenterPosition",
           faceId,
           [eyesCenterPosition as faceapi.Point],
@@ -303,7 +313,12 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.chinPositions) {
       // Update smooth chin position if it hasn't already been done for this dection
       if (!updatedSmoothChinPosition) {
-        updateTwoDimensionalSmooth("chinPosition", faceId, jawOutline, canvas);
+        updateTwoDimensionalSmoothVariables(
+          "chinPosition",
+          faceId,
+          jawOutline,
+          canvas
+        );
         updatedSmoothChinPosition = true;
       }
 
@@ -335,7 +350,12 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.nosePositions) {
       // Update smooth nose position if it hasn't already been done for this dection
       if (!updatedSmoothNosePosition) {
-        updateTwoDimensionalSmooth("nosePosition", faceId, nose, canvas);
+        updateTwoDimensionalSmoothVariables(
+          "nosePosition",
+          faceId,
+          nose,
+          canvas
+        );
         updatedSmoothNosePosition = true;
       }
 
@@ -349,13 +369,18 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.headPitchAngles) {
       // Update smooth nose position if it hasn't already been done for this dection
       if (!updatedSmoothNosePosition) {
-        updateTwoDimensionalSmooth("nosePosition", faceId, nose, canvas);
+        updateTwoDimensionalSmoothVariables(
+          "nosePosition",
+          faceId,
+          nose,
+          canvas
+        );
         updatedSmoothNosePosition = true;
       }
 
       // Update smooth eyes center position if it hasn't already been done for this dection
       if (!updatedSmoothEyesCenterPosition) {
-        updateTwoDimensionalSmooth(
+        updateTwoDimensionalSmoothVariables(
           "eyesCenterPosition",
           faceId,
           [eyesCenterPosition as faceapi.Point],

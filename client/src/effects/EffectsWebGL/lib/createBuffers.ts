@@ -1,4 +1,7 @@
-const createBuffers = (gl: WebGLRenderingContext, program: WebGLProgram) => {
+const createBuffers = (
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  program: WebGLProgram
+) => {
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   const positions = [-1, -1, 1, -1, -1, 1, 1, 1];

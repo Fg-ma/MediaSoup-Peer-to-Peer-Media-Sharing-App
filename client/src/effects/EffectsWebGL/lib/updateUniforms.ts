@@ -6,7 +6,9 @@ import { EffectTypes } from "src/context/StreamsContext";
 const maxFaces = 8;
 
 const updateUniforms = (
-  gl: WebGLRenderingContext,
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  videoProgram: WebGLProgram,
+  triangleProgram: WebGLProgram,
   uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   },
@@ -33,6 +35,8 @@ const updateUniforms = (
   beardImageOffset: number[],
   mustacheImageOffset: number[]
 ) => {
+  gl.useProgram(videoProgram);
+
   if (uniformLocations.uFaceCountLocation) {
     gl.uniform1i(uniformLocations.uFaceCountLocation, faceCount);
   }
@@ -42,25 +46,26 @@ const updateUniforms = (
   ) {
     gl.uniform1fv(
       uniformLocations.uHeadRotationAnglesLocation,
-      new Float32Array([0.0])
+      new Float32Array(headRotationAngles)
     );
   }
   if (
     uniformLocations.uHeadPitchAnglesLocation &&
     faceLandmarks.headPitchAngles
   ) {
-    console.log(headPitchAngles);
+    // console.log(headPitchAngles);
     gl.uniform1fv(
       uniformLocations.uHeadPitchAnglesLocation,
-      // new Float32Array([0.0])
+      new Float32Array([0.0])
       // new Float32Array([Math.PI / 4.0])
-      new Float32Array(headPitchAngles)
+      // new Float32Array(headPitchAngles)
     );
   }
   if (uniformLocations.uHeadYawAnglesLocation && faceLandmarks.headYawAngles) {
     gl.uniform1fv(
       uniformLocations.uHeadYawAnglesLocation,
-      new Float32Array([0.0])
+      new Float32Array(headYawAngles)
+      // new Float32Array([0.0])
       // new Float32Array([Math.PI / 3.0])
     );
   }

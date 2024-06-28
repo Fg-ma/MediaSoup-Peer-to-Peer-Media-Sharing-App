@@ -1,5 +1,5 @@
 const createShader = (
-  gl: WebGLRenderingContext,
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
   type: number,
   source: string
 ) => {

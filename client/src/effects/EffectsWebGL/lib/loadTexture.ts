@@ -1,5 +1,5 @@
 const loadTexture = async (
-  gl: WebGLRenderingContext,
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
   url: string
 ): Promise<{ texture: WebGLTexture | null; aspectRatio: number }> => {
   const texture = gl.createTexture();

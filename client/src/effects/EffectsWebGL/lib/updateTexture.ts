@@ -1,5 +1,5 @@
 const updateTexture = (
-  gl: WebGLRenderingContext,
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
   texture: WebGLTexture,
   video: HTMLVideoElement
 ) => {

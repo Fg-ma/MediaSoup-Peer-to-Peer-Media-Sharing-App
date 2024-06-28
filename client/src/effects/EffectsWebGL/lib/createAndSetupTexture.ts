@@ -1,4 +1,6 @@
-const createAndSetupTexture = (gl: WebGLRenderingContext) => {
+const createAndSetupTexture = (
+  gl: WebGLRenderingContext | WebGL2RenderingContext
+) => {
   const texture = gl.createTexture();
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);

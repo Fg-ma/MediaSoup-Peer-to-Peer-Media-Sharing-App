@@ -1,6 +1,10 @@
-const fragmentShaderSource = `
-  #define MAX_FACES 8
+const videoFragmentShaderSource = `
+  #ifdef GL_ES
   precision mediump float;
+  #endif
+
+  #define MAX_FACES 8
+
   varying vec2 v_texCoord;
   uniform sampler2D u_image;
 
@@ -231,4 +235,4 @@ const fragmentShaderSource = `
   }
 `;
 
-export default fragmentShaderSource;
+export default videoFragmentShaderSource;

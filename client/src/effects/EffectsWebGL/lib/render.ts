@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { EffectTypes } from "src/context/StreamsContext";
 import updateFaceLandmarks from "./updateFaceLandmarks";
 import updateTexture from "./updateTexture";
@@ -8,7 +9,9 @@ import updateFaceLandmarksNew from "./updateFaceLandmarksNew";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 
 const render = async (
-  gl: WebGLRenderingContext,
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  videoProgram: WebGLProgram,
+  triangleProgram: WebGLProgram,
   texture: WebGLTexture,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
@@ -29,6 +32,8 @@ const render = async (
   if (effects.ears || effects.glasses || effects.beards || effects.mustaches) {
     await updateFaceLandmarksNew(
       gl,
+      videoProgram,
+      triangleProgram,
       video,
       canvas,
       uniformLocations,
@@ -44,6 +49,8 @@ const render = async (
   animationFrameId[0] = requestAnimationFrame(() =>
     render(
       gl,
+      videoProgram,
+      triangleProgram,
       texture,
       video,
       canvas,
