@@ -1,4 +1,4 @@
-const loadTexture = async (
+export const loadTexture = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   url: string
 ): Promise<{ texture: WebGLTexture | null; aspectRatio: number }> => {
@@ -29,5 +29,3 @@ const loadTexture = async (
     image.src = url;
   });
 };
-
-export default loadTexture;

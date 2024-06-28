@@ -2,7 +2,7 @@ const setStopFunction = (
   animationFrameId: number[],
   video: HTMLVideoElement,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  texture: WebGLTexture,
+  videoTexture: WebGLTexture,
   videoProgram: WebGLProgram,
   videoVertexShader: WebGLShader,
   videoFragmentShader: WebGLShader,
@@ -11,8 +11,6 @@ const setStopFunction = (
   triangleProgram: WebGLProgram,
   triangleVertexShader: WebGLShader,
   triangleFragmentShader: WebGLShader,
-  trianglePositionBuffer: WebGLBuffer | null,
-  triangleTexCoordBuffer: WebGLBuffer | null,
   canvas: HTMLCanvasElement,
   type: "webcam" | "screen" | "audio",
   id: string,
@@ -38,7 +36,7 @@ const setStopFunction = (
     video.pause();
     video.srcObject = null;
 
-    gl.deleteTexture(texture);
+    gl.deleteTexture(videoTexture);
     if (leftEarImageTexture) {
       gl.deleteTexture(leftEarImageTexture);
     }
@@ -61,9 +59,7 @@ const setStopFunction = (
     gl.deleteShader(videoFragmentShader);
     gl.deleteShader(triangleFragmentShader);
     gl.deleteBuffer(videoPositionBuffer);
-    gl.deleteBuffer(trianglePositionBuffer);
     gl.deleteBuffer(videoTexCoordBuffer);
-    gl.deleteBuffer(triangleTexCoordBuffer);
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 

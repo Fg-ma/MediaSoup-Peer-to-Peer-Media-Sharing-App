@@ -9,12 +9,13 @@ import createAndSetupTexture from "./lib/createAndSetupTexture";
 import render from "./lib/render";
 import createProgram from "./lib/createProgram";
 import setStopFunction from "./lib/setStopFunction";
-import createBuffers from "./lib/createBuffers";
-import loadTexture from "./lib/loadTexture";
+import { loadTexture } from "./lib/loadTexture";
 import loadModels from "../lib/loadModels";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
+import setAttributes from "./lib/setAttributes";
+import { createBuffers } from "./lib/createBuffers";
 
 export type FaceLandmarks =
   | "headRotationAngles"
@@ -126,16 +127,14 @@ const handleEffectWebGL = async (
     positionBuffer: videoPositionBuffer,
     texCoordBuffer: videoTexCoordBuffer,
   } = createBuffers(gl, videoProgram);
+  if (!videoPositionBuffer || !videoTexCoordBuffer) {
+    return new Error("No videoPositionBuffer or videoTexCoordBuffer");
+  }
 
-  const {
-    positionBuffer: trianglePositionBuffer,
-    texCoordBuffer: triangleTexCoordBuffer,
-  } = createBuffers(gl, triangleProgram);
+  const videoTexture = createAndSetupTexture(gl);
 
-  const texture = createAndSetupTexture(gl);
-
-  if (!texture) {
-    return new Error("No texture");
+  if (!videoTexture) {
+    return new Error("No videoTexture");
   }
 
   if (effects.ears || effects.glasses || effects.beards || effects.mustaches) {
@@ -221,8 +220,17 @@ const handleEffectWebGL = async (
     }
   }
 
+  // Load triangle image as textures
+  let triangleTexture: WebGLTexture | null | undefined;
+  const loadedTriangleTexture = await loadTexture(gl, `/assets/james2.png`);
+  triangleTexture = loadedTriangleTexture.texture;
+
+  if (!triangleTexture) {
+    return new Error("No triangleTexture or triangleAspectRatio");
+  }
+
   // Set up the uniforms in the fragment shader
-  const { uniformLocations, attributeLocations } = setUniforms(
+  const uniformLocations = setUniforms(
     gl,
     videoProgram,
     triangleProgram,
@@ -238,11 +246,18 @@ const handleEffectWebGL = async (
     beardImageTexture,
     beardImageAspectRatio,
     mustacheImageTexture,
-    mustacheImageAspectRatio
+    mustacheImageAspectRatio,
+    triangleTexture
   );
 
   if (uniformLocations instanceof Error) {
     return new Error("Error setting uniforms: ", uniformLocations);
+  }
+
+  const attributeLocations = setAttributes(gl, videoProgram, triangleProgram);
+
+  if (attributeLocations instanceof Error) {
+    return new Error("Error setting attributes: ", attributeLocations);
   }
 
   const faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean } = {
@@ -332,16 +347,20 @@ const handleEffectWebGL = async (
       gl,
       videoProgram,
       triangleProgram,
-      texture,
+      videoTexture,
       video,
       canvas,
       animationFrameId,
       effects,
       uniformLocations,
+      attributeLocations,
       faceLandmarks,
       currentEffectsStyles,
       faceMesh,
-      faceMeshResults
+      faceMeshResults,
+      triangleTexture,
+      videoPositionBuffer,
+      videoTexCoordBuffer
     );
   });
   video.onloadedmetadata = () => {
@@ -356,7 +375,7 @@ const handleEffectWebGL = async (
     animationFrameId,
     video,
     gl,
-    texture,
+    videoTexture,
     videoProgram,
     videoVertexShader,
     videoFragmentShader,
@@ -365,8 +384,6 @@ const handleEffectWebGL = async (
     triangleProgram,
     triangleVertexShader,
     triangleFragmentShader,
-    trianglePositionBuffer,
-    triangleTexCoordBuffer,
     canvas,
     type,
     id,

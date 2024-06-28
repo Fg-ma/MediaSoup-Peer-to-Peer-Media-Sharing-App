@@ -1,18 +1,18 @@
-import * as THREE from "three";
 import { EffectTypes } from "src/context/StreamsContext";
 import updateFaceLandmarks from "./updateFaceLandmarks";
-import updateTexture from "./updateTexture";
+import updateVideoTexture from "./updateVideoTexture";
 import { Uniforms } from "./setUniforms";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateFaceLandmarksNew from "./updateFaceLandmarksNew";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
+import { Attributes } from "./setAttributes";
 
 const render = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   videoProgram: WebGLProgram,
   triangleProgram: WebGLProgram,
-  texture: WebGLTexture,
+  videoTexture: WebGLTexture,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
   animationFrameId: number[],
@@ -22,12 +22,25 @@ const render = async (
   uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   },
+  attributeLocations: {
+    [uniform in Attributes]: number | null | undefined;
+  },
   faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
   faceMesh: FaceMesh,
-  faceMeshResults: Results[]
+  faceMeshResults: Results[],
+  triangleTexture: WebGLTexture,
+  videoPositionBuffer: WebGLBuffer,
+  videoTexCoordBuffer: WebGLBuffer
 ) => {
-  updateTexture(gl, texture, video);
+  updateVideoTexture(
+    gl,
+    videoTexture,
+    video,
+    videoProgram,
+    videoPositionBuffer,
+    videoTexCoordBuffer
+  );
 
   if (effects.ears || effects.glasses || effects.beards || effects.mustaches) {
     await updateFaceLandmarksNew(
@@ -37,11 +50,13 @@ const render = async (
       video,
       canvas,
       uniformLocations,
+      attributeLocations,
       effects,
       faceLandmarks,
       currentEffectsStyles,
       faceMesh,
-      faceMeshResults
+      faceMeshResults,
+      triangleTexture
     );
   }
 
@@ -51,16 +66,20 @@ const render = async (
       gl,
       videoProgram,
       triangleProgram,
-      texture,
+      videoTexture,
       video,
       canvas,
       animationFrameId,
       effects,
       uniformLocations,
+      attributeLocations,
       faceLandmarks,
       currentEffectsStyles,
       faceMesh,
-      faceMeshResults
+      faceMeshResults,
+      triangleTexture,
+      videoPositionBuffer,
+      videoTexCoordBuffer
     )
   );
 };

@@ -18,6 +18,7 @@ import {
   smoothedTwoDimensionalVariables,
 } from "./updateFaceLandmarks";
 import overlayImageOnLiveVideo from "./overlayImageOnLiveVideo";
+import { Attributes } from "./setAttributes";
 
 export type TwoDimensionalVariableTypes =
   | "eyesCenterPosition"
@@ -75,13 +76,19 @@ const updateFaceLandmarksNew = async (
   uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   },
+  attributeLocations: {
+    [uniform in Attributes]: number | null | undefined;
+  },
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   },
   faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
   faceMesh: FaceMesh,
-  faceMeshResults: Results[]
+  faceMeshResults: Results[],
+  // trianglePositionBuffer: WebGLBuffer,
+  // triangleTexCoordBuffer: WebGLBuffer,
+  triangleTexture: WebGLTexture
 ) => {
   await faceMesh.send({ image: video });
   if (!faceMeshResults[0]) {
@@ -134,7 +141,15 @@ const updateFaceLandmarksNew = async (
   } = {};
 
   multiFaceLandmarks.forEach((landmarks, faceIndex) => {
-    overlayImageOnLiveVideo(gl, triangleProgram, landmarks, canvas);
+    overlayImageOnLiveVideo(
+      gl,
+      triangleProgram,
+      landmarks.slice(0, -10),
+      canvas,
+      uniformLocations,
+      attributeLocations,
+      triangleTexture
+    );
     const directions = calculateDirection(landmarks);
     const LEFT_EYE_INDEX = 33;
     const RIGHT_EYE_INDEX = 263;

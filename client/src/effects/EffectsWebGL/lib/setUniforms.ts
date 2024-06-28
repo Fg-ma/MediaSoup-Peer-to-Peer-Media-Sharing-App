@@ -1,11 +1,5 @@
 import { EffectTypes } from "src/context/StreamsContext";
 
-export type Attributes =
-  | "aVideoPositionLocation"
-  | "aVideoTexCoordLocation"
-  | "aTrianglePositionLocation"
-  | "aTriangleTexCoordLocation";
-
 export type Uniforms =
   | "uFaceCountLocation"
   | "uTextureSizeLocation"
@@ -43,7 +37,8 @@ export type Uniforms =
   | "uRightEarWidthsLocation"
   | "uLeftEarWidthsLocation"
   | "uEyesWidthsLocation"
-  | "uChinWidthsLocation";
+  | "uChinWidthsLocation"
+  | "uTriangleTextureLocation";
 
 const hexToRgb = (hex: string) => {
   hex = hex.replace(/^#/, "");
@@ -73,7 +68,8 @@ const setUniforms = (
   beardImageTexture: WebGLTexture | null | undefined,
   beardImageAspectRatio: number | undefined,
   mustacheImageTexture: WebGLTexture | null | undefined,
-  mustacheImageAspectRatio: number | undefined
+  mustacheImageAspectRatio: number | undefined,
+  triangleImageTexture: WebGLTexture | null | undefined
 ) => {
   gl.useProgram(videoProgram);
 
@@ -282,52 +278,99 @@ const setUniforms = (
   gl.uniform1i(uBeardEffectLocation, effects.beards ? 1 : 0);
   gl.uniform1i(uMustacheEffectLocation, effects.mustaches ? 1 : 0);
 
-  const aVideoPositionLocation = gl.getAttribLocation(
+  const uFaceCountLocation = gl.getUniformLocation(videoProgram, "u_faceCount");
+  const uHeadRotationAnglesLocation = gl.getUniformLocation(
     videoProgram,
-    "a_position"
+    "u_headRotationAngles"
   );
-  const aVideoTexCoordLocation = gl.getAttribLocation(
+  const uHeadPitchAnglesLocation = gl.getUniformLocation(
     videoProgram,
-    "a_texCoord"
+    "u_headPitchAngles"
+  );
+  const uHeadYawAnglesLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_headYawAngles"
+  );
+  const uEarsImageOffset = gl.getUniformLocation(
+    videoProgram,
+    "u_earsImageOffset"
+  );
+  const uBeardImageOffset = gl.getUniformLocation(
+    videoProgram,
+    "u_beardImageOffset"
+  );
+  const uMustacheImageOffset = gl.getUniformLocation(
+    videoProgram,
+    "u_mustacheImageOffset"
+  );
+  const uLeftEarPositionsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_leftEarPositions"
+  );
+  const uRightEarPositionsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_rightEarPositions"
+  );
+  const uLeftEyePositionsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_leftEyePositions"
+  );
+  const uRightEyePositionsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_rightEyePositions"
+  );
+  const uEyesCentersLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_eyesCenters"
+  );
+  const uChinPositionsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_chinPositions"
+  );
+  const uNosePositionsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_nosePositions"
+  );
+  const uRightEarWidthsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_rightEarWidths"
+  );
+  const uLeftEarWidthsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_leftEarWidths"
+  );
+  const uEyesWidthsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_eyesWidths"
+  );
+  const uChinWidthsLocation = gl.getUniformLocation(
+    videoProgram,
+    "u_chinWidths"
   );
 
   gl.useProgram(triangleProgram);
 
-  const aTrianglePositionLocation = gl.getAttribLocation(
+  const uTriangleTextureLocation = gl.getUniformLocation(
     triangleProgram,
-    "a_position"
-  );
-  const aTriangleTexCoordLocation = gl.getAttribLocation(
-    triangleProgram,
-    "a_texCoord"
+    "u_triangleTexture"
   );
 
-  const attributeLocations: {
-    [attribute in Attributes]: number | null | undefined;
-  } = {
-    aVideoPositionLocation: aVideoPositionLocation,
-    aVideoTexCoordLocation: aVideoTexCoordLocation,
-    aTrianglePositionLocation: aTrianglePositionLocation,
-    aTriangleTexCoordLocation: aTriangleTexCoordLocation,
-  };
+  if (!triangleImageTexture || !uTriangleTextureLocation) {
+    return new Error("No triangleImageTexture or uTriangleTextureLocation");
+  }
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, triangleImageTexture);
+  gl.uniform1i(uTriangleTextureLocation, 3);
 
   const uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   } = {
-    uFaceCountLocation: gl.getUniformLocation(videoProgram, "u_faceCount"),
+    uFaceCountLocation: uFaceCountLocation,
     uTextureSizeLocation: uTextureSizeLocation,
-    uHeadRotationAnglesLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_headRotationAngles"
-    ),
-    uHeadPitchAnglesLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_headPitchAngles"
-    ),
-    uHeadYawAnglesLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_headYawAngles"
-    ),
+    uHeadRotationAnglesLocation: uHeadRotationAnglesLocation,
+    uHeadPitchAnglesLocation: uHeadPitchAnglesLocation,
+    uHeadYawAnglesLocation: uHeadYawAnglesLocation,
 
     uBlurRadiusLocation: uBlurRadiusLocation,
     uTintColorLocation: uTintColorLocation,
@@ -343,61 +386,33 @@ const setUniforms = (
     uLeftEarAspectRatioLocation: uLeftEarAspectRatioLocation,
     uRightEarImageLocation: uRightEarImageLocation,
     uRightEarAspectRatioLocation: uRightEarAspectRatioLocation,
-    uEarsImageOffset: gl.getUniformLocation(videoProgram, "u_earsImageOffset"),
+    uEarsImageOffset: uEarsImageOffset,
     uGlassesImageLocation: uGlassesImageLocation,
     uGlassesAspectRatioLocation: uGlassesAspectRatioLocation,
     uBeardImageLocation: uBeardImageLocation,
     uBeardAspectRatioLocation: uBeardAspectRatioLocation,
-    uBeardImageOffset: gl.getUniformLocation(
-      videoProgram,
-      "u_beardImageOffset"
-    ),
+    uBeardImageOffset: uBeardImageOffset,
     uMustacheImageLocation: uMustacheImageLocation,
     uMustacheAspectRatioLocation: uMustacheAspectRatioLocation,
-    uMustacheImageOffset: gl.getUniformLocation(
-      videoProgram,
-      "u_mustacheImageOffset"
-    ),
+    uMustacheImageOffset: uMustacheImageOffset,
 
-    uLeftEarPositionsLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_leftEarPositions"
-    ),
-    uRightEarPositionsLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_rightEarPositions"
-    ),
-    uLeftEyePositionsLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_leftEyePositions"
-    ),
-    uRightEyePositionsLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_rightEyePositions"
-    ),
-    uEyesCentersLocation: gl.getUniformLocation(videoProgram, "u_eyesCenters"),
-    uChinPositionsLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_chinPositions"
-    ),
-    uNosePositionsLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_nosePositions"
-    ),
+    uLeftEarPositionsLocation: uLeftEarPositionsLocation,
+    uRightEarPositionsLocation: uRightEarPositionsLocation,
+    uLeftEyePositionsLocation: uLeftEyePositionsLocation,
+    uRightEyePositionsLocation: uRightEyePositionsLocation,
+    uEyesCentersLocation: uEyesCentersLocation,
+    uChinPositionsLocation: uChinPositionsLocation,
+    uNosePositionsLocation: uNosePositionsLocation,
 
-    uRightEarWidthsLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_rightEarWidths"
-    ),
-    uLeftEarWidthsLocation: gl.getUniformLocation(
-      videoProgram,
-      "u_leftEarWidths"
-    ),
-    uEyesWidthsLocation: gl.getUniformLocation(videoProgram, "u_eyesWidths"),
-    uChinWidthsLocation: gl.getUniformLocation(videoProgram, "u_chinWidths"),
+    uRightEarWidthsLocation: uRightEarWidthsLocation,
+    uLeftEarWidthsLocation: uLeftEarWidthsLocation,
+    uEyesWidthsLocation: uEyesWidthsLocation,
+    uChinWidthsLocation: uChinWidthsLocation,
+
+    uTriangleTextureLocation: uTriangleTextureLocation,
   };
 
-  return { uniformLocations, attributeLocations };
+  return uniformLocations;
 };
 
 export default setUniforms;

@@ -1,7 +1,9 @@
-import * as THREE from "three";
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
-import drawTriangles from "./drawTriangles";
+import drawMesh from "./drawMesh";
 import { getTriangles } from "./getTriangles";
+import { Attributes } from "./setAttributes";
+import { Uniforms } from "./setUniforms";
+import { createTrianglesBuffer } from "./createBuffers";
 
 export interface Point2D {
   x: number;
@@ -18,22 +20,49 @@ export const overlayImageOnLiveVideo = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   triangleProgram: WebGLProgram,
   liveLandmarks: NormalizedLandmarkList,
-  canvas: HTMLCanvasElement
+  canvas: HTMLCanvasElement,
+  uniformLocations: {
+    [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
+  },
+  attributeLocations: {
+    [uniform in Attributes]: number | null | undefined;
+  },
+  triangleTexture: WebGLTexture
 ) => {
   // Get the triangles
   const { overlayTriangles, liveTriangles } = getTriangles(liveLandmarks);
 
-  // Draw the triangles
-  drawTriangles(
+  const loadedTrianglesBuffers = createTrianglesBuffer(
     gl,
     overlayTriangles,
     liveTriangles,
     canvas,
-    triangleTexture,
+    attributeLocations
+  );
+
+  if (!loadedTrianglesBuffers) {
+    return;
+  }
+
+  const { positionBuffer, texCoordBuffer, indexBuffer, indexCount } =
+    loadedTrianglesBuffers;
+
+  if (!positionBuffer || !texCoordBuffer || !indexBuffer) {
+    return;
+  }
+
+  // Draw the triangles
+  drawMesh(
+    gl,
+    canvas,
     triangleProgram,
-    trianglePositionBufferr,
-    triangleTexCoordBuffer,
-    uniformLocations
+    triangleTexture,
+    positionBuffer,
+    texCoordBuffer,
+    indexBuffer,
+    indexCount,
+    uniformLocations,
+    attributeLocations
   );
 };
 
