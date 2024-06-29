@@ -1,5 +1,5 @@
 import { Delaunay } from "d3-delaunay";
-import { Point2D, Point3D } from "./overlayImageOnLiveVideo";
+import { Point2D, Point3D } from "./drawFaceMesh";
 import { uvPoints } from "./uvPoints";
 
 export const getTriangles = (livePoints: Point3D[]) => {

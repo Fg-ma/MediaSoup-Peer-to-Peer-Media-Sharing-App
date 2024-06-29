@@ -4,10 +4,17 @@ import { EffectTypes } from "src/context/StreamsContext";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import directionalShift from "./directionalShift";
-import updateTwoDimensionalSmoothVariables from "./updateTwoDimensionalSmoothVariables";
+import updateTwoDimensionalSmoothVariables from "./updateTwoDimensionalSmoothVariablesNew";
 import updateOneDimensionalSmoothVariables from "./updateOneDimensionalSmoothVariables";
 import updateUniforms from "./updateUniforms";
 import toggleFaceTrackedEffects from "./toggleFaceTrackedEffects";
+import {
+  FaceMesh,
+  NormalizedLandmarkList,
+  Results,
+} from "@mediapipe/face_mesh";
+import drawFaceMesh from "./drawFaceMesh";
+import { Attributes } from "./setAttributes";
 
 export type TwoDimensionalVariableTypes =
   | "eyesCenterPosition"
@@ -57,23 +64,37 @@ let detectTimeout: NodeJS.Timeout | undefined;
 let detectionTimedout = false;
 
 const updateFaceLandmarks = async (
-  gl: WebGLRenderingContext,
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  videoProgram: WebGLProgram,
+  triangleProgram: WebGLProgram,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
   uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   },
+  attributeLocations: {
+    [uniform in Attributes]: number | null | undefined;
+  },
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   },
   faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
-  currentEffectsStyles: React.MutableRefObject<EffectStylesType>
+  currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+  faceMesh: FaceMesh,
+  faceMeshResults: Results[],
+  triangleTexture: WebGLTexture
 ) => {
-  const detections = await faceapi
-    .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks();
+  await faceMesh.send({ image: video });
+  if (!faceMeshResults[0]) {
+    return;
+  }
+  const multiFaceLandmarks = faceMeshResults[0].multiFaceLandmarks;
+  if (!multiFaceLandmarks) {
+    return;
+  }
 
-  const faceCount = detections.length;
+  const faceCount = multiFaceLandmarks.length;
+
   const headRotationAngles: number[] = [];
   const headPitchAngles: number[] = [];
   const headYawAngles: number[] = [];
@@ -113,13 +134,27 @@ const updateFaceLandmarks = async (
     [id: string]: { position: faceapi.Point; lastSeen: number };
   } = {};
 
-  detections.forEach((detection, faceIndex) => {
-    const landmarks = detection.landmarks;
+  multiFaceLandmarks.forEach((landmarks, faceIndex) => {
+    drawFaceMesh(
+      gl,
+      triangleProgram,
+      landmarks.slice(0, -10),
+      canvas,
+      uniformLocations,
+      attributeLocations,
+      triangleTexture
+    );
+    const directions = calculateDirection(landmarks);
+    const LEFT_EYE_INDEX = 33;
+    const RIGHT_EYE_INDEX = 263;
+    const NOSE_INDEX = 1;
 
-    const leftEye = landmarks.getLeftEye();
-    const rightEye = landmarks.getRightEye();
-    const jawOutline = landmarks.getJawOutline();
-    const nose = landmarks.getNose();
+    const leftEye = landmarks[LEFT_EYE_INDEX];
+    const rightEye = landmarks[RIGHT_EYE_INDEX];
+    const nose = landmarks[NOSE_INDEX];
+    const jawOutline = landmarks[5];
+    const leftmostJawPoint = landmarks[234];
+    const rightmostJawPoint = landmarks[454];
     let updatedSmoothEyePosition = false;
     let updatedSmoothNosePosition = false;
     let updatedSmoothChinPosition = false;
@@ -129,8 +164,8 @@ const updateFaceLandmarks = async (
     // Set the faceTracker based on which face is closest to which face in
     // the set of last seen faces
     const eyesCenterPosition = {
-      x: (leftEye[0].x + rightEye[3].x) / 2,
-      y: (leftEye[0].y + rightEye[3].y) / 2,
+      x: (leftEye.x + rightEye.x) / 2,
+      y: (leftEye.y + rightEye.y) / 2,
     };
 
     let closestTrackerId = null;
@@ -158,8 +193,9 @@ const updateFaceLandmarks = async (
     };
 
     // Calculate the difference in coordinated of eyes
-    const dx = (rightEye[0].x - leftEye[0].x) / canvas.width;
-    const dy = (rightEye[0].y - leftEye[0].y) / canvas.height;
+    const dx = rightEye.x - leftEye.x;
+    const dy = rightEye.y - leftEye.y;
+    const dz = rightEye.z - leftEye.z;
 
     // Calculate head angle in plane
     if (faceLandmarks.headRotationAngles) {
@@ -177,18 +213,14 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.leftEyePositions || faceLandmarks.leftEyePositions) {
       // Update smooth eye position if it hasn't already been done for this dection
       if (!updatedSmoothEyePosition) {
-        updateTwoDimensionalSmoothVariables(
-          "leftEyePosition",
-          faceId,
-          leftEye,
-          canvas
-        );
-        updateTwoDimensionalSmoothVariables(
-          "rightEyePosition",
-          faceId,
-          rightEye,
-          canvas
-        );
+        updateTwoDimensionalSmoothVariables("leftEyePosition", faceId, [
+          leftEye.x,
+          leftEye.y,
+        ]);
+        updateTwoDimensionalSmoothVariables("rightEyePosition", faceId, [
+          rightEye.x,
+          rightEye.y,
+        ]);
         updatedSmoothEyePosition = true;
       }
 
@@ -204,18 +236,14 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.leftEarPositions || faceLandmarks.rightEarPositions) {
       // Update smooth eye position if it hasn't already been done for this dection
       if (!updatedSmoothEyePosition) {
-        updateTwoDimensionalSmoothVariables(
-          "leftEyePosition",
-          faceId,
-          leftEye,
-          canvas
-        );
-        updateTwoDimensionalSmoothVariables(
-          "rightEyePosition",
-          faceId,
-          rightEye,
-          canvas
-        );
+        updateTwoDimensionalSmoothVariables("leftEyePosition", faceId, [
+          leftEye.x,
+          leftEye.y,
+        ]);
+        updateTwoDimensionalSmoothVariables("rightEyePosition", faceId, [
+          rightEye.x,
+          rightEye.y,
+        ]);
         updatedSmoothEyePosition = true;
       }
 
@@ -292,12 +320,10 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.eyesCenterPositions) {
       // Update smooth eyes center position if it hasn't already been done for this dection
       if (!updatedSmoothEyesCenterPosition) {
-        updateTwoDimensionalSmoothVariables(
-          "eyesCenterPosition",
-          faceId,
-          [eyesCenterPosition as faceapi.Point],
-          canvas
-        );
+        updateTwoDimensionalSmoothVariables("eyesCenterPosition", faceId, [
+          eyesCenterPosition.x,
+          eyesCenterPosition.y,
+        ]);
         updatedSmoothEyesCenterPosition = true;
       }
 
@@ -313,12 +339,10 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.chinPositions) {
       // Update smooth chin position if it hasn't already been done for this dection
       if (!updatedSmoothChinPosition) {
-        updateTwoDimensionalSmoothVariables(
-          "chinPosition",
-          faceId,
-          jawOutline,
-          canvas
-        );
+        updateTwoDimensionalSmoothVariables("chinPosition", faceId, [
+          jawOutline.x,
+          jawOutline.y,
+        ]);
         updatedSmoothChinPosition = true;
       }
 
@@ -331,11 +355,9 @@ const updateFaceLandmarks = async (
     // Set chin widths
     if (faceLandmarks.chinWidths) {
       // Calculate chin width based on jawline points
-      const leftJawPoint = jawOutline[0];
-      const rightJawPoint = jawOutline[jawOutline.length - 1];
       const chinWidthFactor = 0.55;
-      const dxJaw = rightJawPoint.x - leftJawPoint.x;
-      const dyJaw = rightJawPoint.y - leftJawPoint.y;
+      const dxJaw = rightmostJawPoint.x - leftmostJawPoint.x;
+      const dyJaw = rightmostJawPoint.y - leftmostJawPoint.y;
 
       updateOneDimensionalSmoothVariables(
         "chinWidth",
@@ -350,12 +372,10 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.nosePositions) {
       // Update smooth nose position if it hasn't already been done for this dection
       if (!updatedSmoothNosePosition) {
-        updateTwoDimensionalSmoothVariables(
-          "nosePosition",
-          faceId,
-          nose,
-          canvas
-        );
+        updateTwoDimensionalSmoothVariables("nosePosition", faceId, [
+          nose.x,
+          nose.y,
+        ]);
         updatedSmoothNosePosition = true;
       }
 
@@ -369,50 +389,45 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.headPitchAngles) {
       // Update smooth nose position if it hasn't already been done for this dection
       if (!updatedSmoothNosePosition) {
-        updateTwoDimensionalSmoothVariables(
-          "nosePosition",
-          faceId,
-          nose,
-          canvas
-        );
+        updateTwoDimensionalSmoothVariables("nosePosition", faceId, [
+          nose.x,
+          nose.y,
+        ]);
         updatedSmoothNosePosition = true;
       }
 
       // Update smooth eyes center position if it hasn't already been done for this dection
       if (!updatedSmoothEyesCenterPosition) {
-        updateTwoDimensionalSmoothVariables(
-          "eyesCenterPosition",
-          faceId,
-          [eyesCenterPosition as faceapi.Point],
-          canvas
-        );
+        updateTwoDimensionalSmoothVariables("eyesCenterPosition", faceId, [
+          eyesCenterPosition.x,
+          eyesCenterPosition.y,
+        ]);
         updatedSmoothEyesCenterPosition = true;
       }
 
       // Calculate head tilt (pitch) angle
+      // Calculate the difference in x, y, and z coordinates
       const dx =
-        nose[0].x / canvas.width -
-        smoothedTwoDimensionalVariables.eyesCenterPosition[faceId][0];
-      let dy =
-        nose[0].y / canvas.height -
-        smoothedTwoDimensionalVariables.eyesCenterPosition[faceId][1] -
-        0.005;
-      if (-0.005 < dy && dy < 0.005) {
-        dy = 0;
-      }
-      console.log(dy);
-      let headPitchAngle = Math.atan2(dy, dx);
-      console.log(headPitchAngle);
+        nose.x - smoothedTwoDimensionalVariables.eyesCenterPosition[faceId][0];
+      const dy =
+        nose.y - smoothedTwoDimensionalVariables.eyesCenterPosition[faceId][1];
+      const dz = nose.z - leftEye.z;
 
-      if (dy === 0) {
-        headPitchAngle = 0;
+      // Calculate head tilt (pitch) angle using 3D coordinates
+      let headPitchAngle =
+        (Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)) - 0.8) * 2;
+
+      if (headPitchAngle > Math.PI / 2) {
+        headPitchAngle = Math.PI / 2;
+      } else if (headPitchAngle < -Math.PI / 2) {
+        headPitchAngle = -Math.PI / 2;
       }
 
       // Update smoothed variable for head angle
       updateOneDimensionalSmoothVariables(
         "headPitchAngle",
         faceId,
-        headPitchAngle
+        -headPitchAngle
       );
 
       headPitchAngles.push(
@@ -424,8 +439,8 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.headYawAngles) {
       // Using the difference in x-coordinates of eyes to estimate yaw angle
       const yawAngle = Math.atan2(
-        rightEye[3].x - leftEye[0].x,
-        rightEye[3].y - leftEye[0].y
+        rightEye.x - leftEye.x,
+        rightEye.y - leftEye.y
       );
 
       // Normalize yaw angle to range -1 to 1
@@ -434,7 +449,7 @@ const updateFaceLandmarks = async (
       updateOneDimensionalSmoothVariables(
         "headYawAngle",
         faceId,
-        normalizedYawAngle
+        (directions.turn * Math.PI) / 180 - Math.PI / 2
       );
       headYawAngles.push(smoothedOneDimensionalVariables.headYawAngle[faceId]);
     }
@@ -513,6 +528,8 @@ const updateFaceLandmarks = async (
   if (faceCount > 0) {
     updateUniforms(
       gl,
+      videoProgram,
+      triangleProgram,
       uniformLocations,
       faceLandmarks,
       effects,
@@ -539,3 +556,63 @@ const updateFaceLandmarks = async (
 };
 
 export default updateFaceLandmarks;
+
+function calculateDirection(keyPoints: NormalizedLandmarkList) {
+  const noseTip = { ...keyPoints[1], name: "nose tip" };
+  const leftNose = { ...keyPoints[279], name: "left nose" };
+  const rightNose = { ...keyPoints[49], name: "right nose" };
+
+  // MIDESCTION OF NOSE IS BACK OF NOSE PERPENDICULAR
+  const midpoint = {
+    x: (leftNose.x + rightNose.x) / 2,
+    y: (leftNose.y + rightNose.y) / 2,
+    z: (leftNose.z + rightNose.z) / 2,
+  };
+  const perpendicularUp = { x: midpoint.x, y: midpoint.y - 50, z: midpoint.z };
+
+  // CALC ANGLES
+  const yaw = getAngleBetweenLines(midpoint, noseTip, perpendicularUp);
+  const turn = getAngleBetweenLines(midpoint, rightNose, noseTip);
+
+  // CALC DISTANCE BETWEEN NOSE TIP AND MIDPOINT, AND LEFT AND RIGHT NOSE POINTS
+  const zDistance = getDistanceBetweenPoints(noseTip, midpoint);
+  const xDistance = getDistanceBetweenPoints(leftNose, rightNose);
+
+  return { yaw, turn, zDistance, xDistance };
+}
+
+function getDistanceBetweenPoints(
+  point1: { x: number; y: number },
+  point2: { x: number; y: number }
+) {
+  const xDistance = point1.x - point2.x;
+  const yDistance = point1.y - point2.y;
+  return Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+}
+
+function getAngleBetweenLines(
+  midpoint: { x: number; y: number },
+  point1: { x: number; y: number },
+  point2: { x: number; y: number }
+) {
+  const vector1 = { x: point1.x - midpoint.x, y: point1.y - midpoint.y };
+  const vector2 = { x: point2.x - midpoint.x, y: point2.y - midpoint.y };
+
+  // Calculate the dot product of the two vectors
+  const dotProduct = vector1.x * vector2.x + vector1.y * vector2.y;
+
+  // Calculate the magnitudes of the vectors
+  const magnitude1 = Math.sqrt(vector1.x * vector1.x + vector1.y * vector1.y);
+  const magnitude2 = Math.sqrt(vector2.x * vector2.x + vector2.y * vector2.y);
+
+  // Calculate the cosine of the angle between the two vectors
+  const cosineTheta = dotProduct / (magnitude1 * magnitude2);
+
+  // Use the arccosine function to get the angle in radians
+  const angleInRadians = Math.acos(cosineTheta);
+
+  // Convert the angle to degrees
+  const angleInDegrees = (angleInRadians * 180) / Math.PI;
+
+  return angleInDegrees;
+}

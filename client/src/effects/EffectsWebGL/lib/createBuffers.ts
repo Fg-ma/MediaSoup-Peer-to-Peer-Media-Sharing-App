@@ -1,4 +1,4 @@
-import { Point2D, Point3D } from "./overlayImageOnLiveVideo";
+import { Point2D, Point3D } from "./drawFaceMesh";
 import { Attributes } from "./setAttributes";
 
 export const createBuffers = (
@@ -72,7 +72,7 @@ export const createTrianglesBuffer = (
     }
     const destVertices: number[] = [];
     destTriangle.forEach((point) => {
-      destVertices.push(point.x, 1 - point.y, point.z);
+      destVertices.push(point.x, 1 - point.y, point.z - 0.5);
     });
 
     positions.push(...destVertices);

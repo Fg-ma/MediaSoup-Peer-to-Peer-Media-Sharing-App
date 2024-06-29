@@ -1,6 +1,7 @@
 import { EffectTypes } from "src/context/StreamsContext";
 
 export type Uniforms =
+  | "uImageLocation"
   | "uFaceCountLocation"
   | "uTextureSizeLocation"
   | "uHeadRotationAnglesLocation"
@@ -72,6 +73,8 @@ const setUniforms = (
   triangleImageTexture: WebGLTexture | null | undefined
 ) => {
   gl.useProgram(videoProgram);
+
+  const uImageLocation = gl.getUniformLocation(videoProgram, "u_image");
 
   const uTextureSizeLocation = gl.getUniformLocation(
     videoProgram,
@@ -366,6 +369,7 @@ const setUniforms = (
   const uniformLocations: {
     [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
   } = {
+    uImageLocation: uImageLocation,
     uFaceCountLocation: uFaceCountLocation,
     uTextureSizeLocation: uTextureSizeLocation,
     uHeadRotationAnglesLocation: uHeadRotationAnglesLocation,

@@ -1,10 +1,9 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import updateFaceLandmarks from "./updateFaceLandmarks";
 import updateVideoTexture from "./updateVideoTexture";
 import { Uniforms } from "./setUniforms";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
-import updateFaceLandmarksNew from "./updateFaceLandmarksNew";
+import updateFaceLandmarks from "./updateFaceLandmarks";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { Attributes } from "./setAttributes";
 
@@ -33,17 +32,23 @@ const render = async (
   videoPositionBuffer: WebGLBuffer,
   videoTexCoordBuffer: WebGLBuffer
 ) => {
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+
   updateVideoTexture(
     gl,
     videoTexture,
     video,
     videoProgram,
     videoPositionBuffer,
-    videoTexCoordBuffer
+    videoTexCoordBuffer,
+    videoTexture,
+    uniformLocations,
+    attributeLocations
   );
 
   if (effects.ears || effects.glasses || effects.beards || effects.mustaches) {
-    await updateFaceLandmarksNew(
+    await updateFaceLandmarks(
       gl,
       videoProgram,
       triangleProgram,
@@ -60,7 +65,6 @@ const render = async (
     );
   }
 
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   animationFrameId[0] = requestAnimationFrame(() =>
     render(
       gl,
