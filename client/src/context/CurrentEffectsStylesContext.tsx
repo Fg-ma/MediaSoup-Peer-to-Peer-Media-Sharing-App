@@ -15,7 +15,7 @@ export const earsWidthFactorMap: {
     rightEarWidthFactor: number;
   };
 } = {
-  dogEars: { leftEarWidthFactor: 300, rightEarWidthFactor: 300 },
+  dogEars: { leftEarWidthFactor: 325, rightEarWidthFactor: 325 },
 };
 
 export type BeardsEffectTypes = "classicalCurlyBeard";
@@ -36,11 +36,11 @@ export type MustachesEffectTypes =
 export const mustacheNoseOffsetsMap: {
   [mustacheEffectType in MustachesEffectTypes]: number;
 } = {
-  mustache1: 0.135,
-  mustache2: 0.115,
-  mustache3: 0.13,
-  mustache4: 0.115,
-  disguiseMustache: 0.025,
+  mustache1: 0.07,
+  mustache2: 0.05,
+  mustache3: 0.07,
+  mustache4: 0.05,
+  disguiseMustache: -0.025,
 };
 
 export type EffectStylesType = {

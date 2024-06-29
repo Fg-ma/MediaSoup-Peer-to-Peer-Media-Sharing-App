@@ -1,16 +1,15 @@
 import flattenArray from "./flattenArray";
 import { FaceLandmarks } from "../handleEffectWebGL";
-import { Uniforms } from "./setUniforms";
+import { BaseUniforms } from "./initializeBaseUniforms";
 import { EffectTypes } from "src/context/StreamsContext";
 
 const maxFaces = 8;
 
-const updateUniforms = (
+const updateBaseUniforms = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   videoProgram: WebGLProgram,
-  triangleProgram: WebGLProgram,
-  uniformLocations: {
-    [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
+  baseUniformLocations: {
+    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
   },
   faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
   effects: {
@@ -37,131 +36,146 @@ const updateUniforms = (
 ) => {
   gl.useProgram(videoProgram);
 
-  if (uniformLocations.uFaceCountLocation) {
-    gl.uniform1i(uniformLocations.uFaceCountLocation, faceCount);
+  if (baseUniformLocations.uFaceCountLocation) {
+    gl.uniform1i(baseUniformLocations.uFaceCountLocation, faceCount);
   }
   if (
-    uniformLocations.uHeadRotationAnglesLocation &&
+    baseUniformLocations.uHeadRotationAnglesLocation &&
     faceLandmarks.headRotationAngles
   ) {
     gl.uniform1fv(
-      uniformLocations.uHeadRotationAnglesLocation,
+      baseUniformLocations.uHeadRotationAnglesLocation,
       new Float32Array(headRotationAngles)
     );
   }
   if (
-    uniformLocations.uHeadPitchAnglesLocation &&
+    baseUniformLocations.uHeadPitchAnglesLocation &&
     faceLandmarks.headPitchAngles
   ) {
     // console.log(headPitchAngles);
     gl.uniform1fv(
-      uniformLocations.uHeadPitchAnglesLocation,
+      baseUniformLocations.uHeadPitchAnglesLocation,
       new Float32Array([0.0])
       // new Float32Array([Math.PI / 4.0])
       // new Float32Array(headPitchAngles)
     );
   }
-  if (uniformLocations.uHeadYawAnglesLocation && faceLandmarks.headYawAngles) {
+  if (
+    baseUniformLocations.uHeadYawAnglesLocation &&
+    faceLandmarks.headYawAngles
+  ) {
     gl.uniform1fv(
-      uniformLocations.uHeadYawAnglesLocation,
+      baseUniformLocations.uHeadYawAnglesLocation,
       new Float32Array(headYawAngles)
       // new Float32Array([0.0])
       // new Float32Array([Math.PI / 3.0])
     );
   }
   if (
-    uniformLocations.uLeftEarPositionsLocation &&
+    baseUniformLocations.uLeftEarPositionsLocation &&
     faceLandmarks.leftEarPositions
   ) {
     gl.uniform2fv(
-      uniformLocations.uLeftEarPositionsLocation,
+      baseUniformLocations.uLeftEarPositionsLocation,
       flattenArray(leftEarPositions, maxFaces)
     );
   }
   if (
-    uniformLocations.uRightEarPositionsLocation &&
+    baseUniformLocations.uRightEarPositionsLocation &&
     faceLandmarks.rightEarPositions
   ) {
     gl.uniform2fv(
-      uniformLocations.uRightEarPositionsLocation,
+      baseUniformLocations.uRightEarPositionsLocation,
       flattenArray(rightEarPositions, maxFaces)
     );
   }
-  if (uniformLocations.uLeftEarWidthsLocation && faceLandmarks.leftEarWidths) {
+  if (
+    baseUniformLocations.uLeftEarWidthsLocation &&
+    faceLandmarks.leftEarWidths
+  ) {
     gl.uniform1fv(
-      uniformLocations.uLeftEarWidthsLocation,
+      baseUniformLocations.uLeftEarWidthsLocation,
       new Float32Array(leftEarWidths)
     );
   }
   if (
-    uniformLocations.uRightEarWidthsLocation &&
+    baseUniformLocations.uRightEarWidthsLocation &&
     faceLandmarks.rightEarWidths
   ) {
     gl.uniform1fv(
-      uniformLocations.uRightEarWidthsLocation,
+      baseUniformLocations.uRightEarWidthsLocation,
       new Float32Array(rightEarWidths)
     );
   }
   if (
-    uniformLocations.uLeftEyePositionsLocation &&
+    baseUniformLocations.uLeftEyePositionsLocation &&
     faceLandmarks.leftEyePositions
   ) {
     gl.uniform2fv(
-      uniformLocations.uLeftEyePositionsLocation,
+      baseUniformLocations.uLeftEyePositionsLocation,
       flattenArray(leftEyePositions, maxFaces)
     );
   }
   if (
-    uniformLocations.uRightEyePositionsLocation &&
+    baseUniformLocations.uRightEyePositionsLocation &&
     faceLandmarks.rightEyePositions
   ) {
     gl.uniform2fv(
-      uniformLocations.uRightEyePositionsLocation,
+      baseUniformLocations.uRightEyePositionsLocation,
       flattenArray(rightEyePositions, maxFaces)
     );
   }
   if (
-    uniformLocations.uEyesCentersLocation &&
+    baseUniformLocations.uEyesCentersLocation &&
     faceLandmarks.eyesCenterPositions
   ) {
     gl.uniform2fv(
-      uniformLocations.uEyesCentersLocation,
+      baseUniformLocations.uEyesCentersLocation,
       flattenArray(eyesCenterPositions, maxFaces)
     );
   }
-  if (uniformLocations.uEyesWidthsLocation && faceLandmarks.eyesWidths) {
+  if (baseUniformLocations.uEyesWidthsLocation && faceLandmarks.eyesWidths) {
     gl.uniform1fv(
-      uniformLocations.uEyesWidthsLocation,
+      baseUniformLocations.uEyesWidthsLocation,
       new Float32Array(eyesWidths)
     );
   }
-  if (uniformLocations.uChinPositionsLocation && faceLandmarks.chinPositions) {
+  if (
+    baseUniformLocations.uChinPositionsLocation &&
+    faceLandmarks.chinPositions
+  ) {
     gl.uniform2fv(
-      uniformLocations.uChinPositionsLocation,
+      baseUniformLocations.uChinPositionsLocation,
       flattenArray(chinPositions, maxFaces)
     );
   }
-  if (uniformLocations.uChinWidthsLocation && faceLandmarks.chinWidths) {
+  if (baseUniformLocations.uChinWidthsLocation && faceLandmarks.chinWidths) {
     gl.uniform1fv(
-      uniformLocations.uChinWidthsLocation,
+      baseUniformLocations.uChinWidthsLocation,
       new Float32Array(chinWidths)
     );
   }
-  if (uniformLocations.uNosePositionsLocation && faceLandmarks.nosePositions) {
+  if (
+    baseUniformLocations.uNosePositionsLocation &&
+    faceLandmarks.nosePositions
+  ) {
     gl.uniform2fv(
-      uniformLocations.uNosePositionsLocation,
+      baseUniformLocations.uNosePositionsLocation,
       flattenArray(nosePositions, maxFaces)
     );
   }
-  if (uniformLocations.uEarsImageOffset && effects.ears) {
-    gl.uniform2fv(uniformLocations.uEarsImageOffset, earsImageOffset);
+  if (baseUniformLocations.uEarsImageOffset && effects.ears) {
+    gl.uniform2fv(baseUniformLocations.uEarsImageOffset, earsImageOffset);
   }
-  if (uniformLocations.uBeardImageOffset && effects.beards) {
-    gl.uniform2fv(uniformLocations.uBeardImageOffset, beardImageOffset);
+  if (baseUniformLocations.uBeardImageOffset && effects.beards) {
+    gl.uniform2fv(baseUniformLocations.uBeardImageOffset, beardImageOffset);
   }
-  if (uniformLocations.uMustacheImageOffset && effects.mustaches) {
-    gl.uniform2fv(uniformLocations.uMustacheImageOffset, mustacheImageOffset);
+  if (baseUniformLocations.uMustacheImageOffset && effects.mustaches) {
+    gl.uniform2fv(
+      baseUniformLocations.uMustacheImageOffset,
+      mustacheImageOffset
+    );
   }
 };
 
-export default updateUniforms;
+export default updateBaseUniforms;

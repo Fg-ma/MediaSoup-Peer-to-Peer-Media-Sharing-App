@@ -1,4 +1,4 @@
-const setStopFunction = (
+const createStopFunction = (
   animationFrameId: number[],
   video: HTMLVideoElement,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -85,4 +85,4 @@ const setStopFunction = (
   }
 };
 
-export default setStopFunction;
+export default createStopFunction;

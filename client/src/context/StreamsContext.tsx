@@ -6,7 +6,8 @@ export type EffectTypes =
   | "ears"
   | "glasses"
   | "beards"
-  | "mustaches";
+  | "mustaches"
+  | "faceMask";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;
@@ -118,6 +119,9 @@ export function StreamsContextProvider({
     glasses: { webcam: {} },
     beards: { webcam: {} },
     mustaches: { webcam: {} },
+    faceMask: {
+      webcam: {},
+    },
   });
   const userStopStreamEffects = useRef<{
     webcam: {

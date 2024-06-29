@@ -1,6 +1,6 @@
 import { EffectTypes } from "src/context/StreamsContext";
 
-export type Uniforms =
+export type BaseUniforms =
   | "uImageLocation"
   | "uFaceCountLocation"
   | "uTextureSizeLocation"
@@ -38,8 +38,7 @@ export type Uniforms =
   | "uRightEarWidthsLocation"
   | "uLeftEarWidthsLocation"
   | "uEyesWidthsLocation"
-  | "uChinWidthsLocation"
-  | "uTriangleTextureLocation";
+  | "uChinWidthsLocation";
 
 const hexToRgb = (hex: string) => {
   hex = hex.replace(/^#/, "");
@@ -51,10 +50,9 @@ const hexToRgb = (hex: string) => {
   return [r, g, b];
 };
 
-const setUniforms = (
+const initializeBaseUniforms = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   videoProgram: WebGLProgram,
-  triangleProgram: WebGLProgram,
   canvas: HTMLCanvasElement,
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
@@ -69,8 +67,7 @@ const setUniforms = (
   beardImageTexture: WebGLTexture | null | undefined,
   beardImageAspectRatio: number | undefined,
   mustacheImageTexture: WebGLTexture | null | undefined,
-  mustacheImageAspectRatio: number | undefined,
-  triangleImageTexture: WebGLTexture | null | undefined
+  mustacheImageAspectRatio: number | undefined
 ) => {
   gl.useProgram(videoProgram);
 
@@ -351,23 +348,8 @@ const setUniforms = (
     "u_chinWidths"
   );
 
-  gl.useProgram(triangleProgram);
-
-  const uTriangleTextureLocation = gl.getUniformLocation(
-    triangleProgram,
-    "u_triangleTexture"
-  );
-
-  if (!triangleImageTexture || !uTriangleTextureLocation) {
-    return new Error("No triangleImageTexture or uTriangleTextureLocation");
-  }
-
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, triangleImageTexture);
-  gl.uniform1i(uTriangleTextureLocation, 3);
-
-  const uniformLocations: {
-    [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
+  const baseUniformLocations: {
+    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
   } = {
     uImageLocation: uImageLocation,
     uFaceCountLocation: uFaceCountLocation,
@@ -412,11 +394,9 @@ const setUniforms = (
     uLeftEarWidthsLocation: uLeftEarWidthsLocation,
     uEyesWidthsLocation: uEyesWidthsLocation,
     uChinWidthsLocation: uChinWidthsLocation,
-
-    uTriangleTextureLocation: uTriangleTextureLocation,
   };
 
-  return uniformLocations;
+  return baseUniformLocations;
 };
 
-export default setUniforms;
+export default initializeBaseUniforms;

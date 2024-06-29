@@ -5,7 +5,7 @@ import {
   BeardsEffectTypes,
   beardChinOffsetsMap,
 } from "../context/CurrentEffectsStylesContext";
-import classicalCurlyBeard from "../../public/assets/beards/classicalCurlyBeard.png";
+import classicalCurlyBeard from "../../public/2DAssets/beards/classicalCurlyBeard.png";
 import classicalCurlyBeardIcon from "../../public/svgs/beards/classicalCurlyBeardIcon.svg";
 import classicalCurlyBeardOffIcon from "../../public/svgs/beards/classicalCurlyBeardOffIcon.svg";
 import { EffectTypes, useStreamsContext } from "../context/StreamsContext";

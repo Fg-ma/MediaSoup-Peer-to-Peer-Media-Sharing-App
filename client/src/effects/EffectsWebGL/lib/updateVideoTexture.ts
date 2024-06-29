@@ -1,51 +1,49 @@
-import { Attributes } from "./setAttributes";
-import { Uniforms } from "./setUniforms";
+import { BaseAttributes } from "./initializeBaseAttributes";
 
 const updateVideoTexture = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  updateVideoTexture: WebGLTexture,
+  videoTexture: WebGLTexture,
   video: HTMLVideoElement,
   videoProgram: WebGLProgram,
   videoPositionBuffer: WebGLBuffer,
   videoTexCoordBuffer: WebGLBuffer,
-  videoTexture: WebGLTexture,
-  uniformLocations: {
-    [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
-  },
-  attributeLocations: {
-    [uniform in Attributes]: number | null | undefined;
+  baseAttributeLocations: {
+    [uniform in BaseAttributes]: number | null | undefined;
   }
 ) => {
-  gl.useProgram(videoProgram);
+  if (
+    baseAttributeLocations.aPositionLocation === null ||
+    baseAttributeLocations.aPositionLocation === undefined ||
+    baseAttributeLocations.aTexCoordLocation === null ||
+    baseAttributeLocations.aTexCoordLocation === undefined
+  ) {
+    return;
+  }
 
-  // gl.activeTexture(gl.TEXTURE0);
-  // gl.bindTexture(gl.TEXTURE_2D, videoTexture);
-  // gl.uniform1i(uniformLocations.uImageLocation!, 0);
+  gl.useProgram(videoProgram);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, videoPositionBuffer);
   gl.vertexAttribPointer(
-    attributeLocations.aVideoPositionLocation!,
+    baseAttributeLocations.aPositionLocation,
     2,
     gl.FLOAT,
     false,
     0,
     0
   );
-  // gl.enableVertexAttribArray(attributeLocations.aVideoPositionLocation!);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, videoTexCoordBuffer);
   gl.vertexAttribPointer(
-    attributeLocations.aVideoTexCoordLocation!,
+    baseAttributeLocations.aTexCoordLocation,
     2,
     gl.FLOAT,
     false,
     0,
     0
   );
-  // gl.enableVertexAttribArray(attributeLocations.aVideoTexCoordLocation!);
 
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, updateVideoTexture);
+  gl.bindTexture(gl.TEXTURE_2D, videoTexture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);

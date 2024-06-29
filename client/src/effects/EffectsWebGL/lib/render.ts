@@ -1,11 +1,16 @@
 import { EffectTypes } from "src/context/StreamsContext";
 import updateVideoTexture from "./updateVideoTexture";
-import { Uniforms } from "./setUniforms";
+import { BaseUniforms } from "./initializeBaseUniforms";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateFaceLandmarks from "./updateFaceLandmarks";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
-import { Attributes } from "./setAttributes";
+import drawFaceMesh from "./drawFaceMesh";
+import { TriangleUniforms } from "./initializeTriangleUniforms";
+import { BaseAttributes } from "./initializeBaseAttributes";
+import { TriangleAttributes } from "./initializeTriangleAttributes";
+import applyFaceTracker from "./applyFaceTracker";
+import landmarksSmoothWithDeadbanding from "./landmarksSmoothWithDeadbanding";
 
 const render = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -18,22 +23,30 @@ const render = async (
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   },
-  uniformLocations: {
-    [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
+  baseUniformLocations: {
+    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
   },
-  attributeLocations: {
-    [uniform in Attributes]: number | null | undefined;
+  triangleUniformLocations: {
+    [uniform in TriangleUniforms]: WebGLUniformLocation | null | undefined;
+  },
+  baseAttributeLocations: {
+    [uniform in BaseAttributes]: number | null | undefined;
+  },
+  triangleAttributeLocations: {
+    [uniform in TriangleAttributes]: number | null | undefined;
   },
   faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
   faceMesh: FaceMesh,
   faceMeshResults: Results[],
-  triangleTexture: WebGLTexture,
+  triangleTexture: WebGLTexture | null | undefined,
   videoPositionBuffer: WebGLBuffer,
   videoTexCoordBuffer: WebGLBuffer
 ) => {
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.CULL_FACE);
+  gl.cullFace(gl.BACK);
 
   updateVideoTexture(
     gl,
@@ -42,27 +55,53 @@ const render = async (
     videoProgram,
     videoPositionBuffer,
     videoTexCoordBuffer,
-    videoTexture,
-    uniformLocations,
-    attributeLocations
+    baseAttributeLocations
   );
 
-  if (effects.ears || effects.glasses || effects.beards || effects.mustaches) {
+  if (
+    effects.ears ||
+    effects.glasses ||
+    effects.beards ||
+    effects.mustaches ||
+    effects.faceMask
+  ) {
+    await faceMesh.send({ image: video });
+    if (!faceMeshResults[0]) {
+      return;
+    }
+    const multiFaceLandmarks = faceMeshResults[0].multiFaceLandmarks;
+    if (!multiFaceLandmarks) {
+      return;
+    }
+
+    const faceIdLandmarksPairs = applyFaceTracker(multiFaceLandmarks);
+
+    const smoothedFaceIdLandmarksPairs =
+      landmarksSmoothWithDeadbanding(faceIdLandmarksPairs);
+
     await updateFaceLandmarks(
+      smoothedFaceIdLandmarksPairs,
       gl,
       videoProgram,
-      triangleProgram,
-      video,
       canvas,
-      uniformLocations,
-      attributeLocations,
+      baseUniformLocations,
       effects,
       faceLandmarks,
-      currentEffectsStyles,
-      faceMesh,
-      faceMeshResults,
-      triangleTexture
+      currentEffectsStyles
     );
+
+    if (effects.faceMask && triangleTexture) {
+      smoothedFaceIdLandmarksPairs.forEach((smoothedFaceIdLandmarksPair) => {
+        drawFaceMesh(
+          gl,
+          triangleProgram,
+          smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
+          triangleUniformLocations,
+          triangleAttributeLocations,
+          triangleTexture
+        );
+      });
+    }
   }
 
   animationFrameId[0] = requestAnimationFrame(() =>
@@ -75,8 +114,10 @@ const render = async (
       canvas,
       animationFrameId,
       effects,
-      uniformLocations,
-      attributeLocations,
+      baseUniformLocations,
+      triangleUniformLocations,
+      baseAttributeLocations,
+      triangleAttributeLocations,
       faceLandmarks,
       currentEffectsStyles,
       faceMesh,

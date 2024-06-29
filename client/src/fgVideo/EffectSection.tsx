@@ -247,6 +247,12 @@ export default function EffectSection({
         type={type}
         videoId={videoId}
       />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <button onClick={() => handleEffectChange("faceMask")}>
+        {userStreamEffects.current.mustaches[type]?.[videoId]
+          ? "remove mask"
+          : "add mask"}
+      </button>
     </motion.div>
   );
 }

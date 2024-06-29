@@ -1,27 +1,27 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import { Uniforms } from "./setUniforms";
+import { BaseUniforms } from "./initializeBaseUniforms";
 
 const toggleFaceTrackedEffects = (
   toggleValue: 0 | 1,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  uniformLocations: {
-    [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
+  baseUniformLocations: {
+    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
   },
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   }
 ) => {
-  if (effects.ears && uniformLocations.uEarsEffectLocation) {
-    gl.uniform1i(uniformLocations.uEarsEffectLocation, toggleValue);
+  if (effects.ears && baseUniformLocations.uEarsEffectLocation) {
+    gl.uniform1i(baseUniformLocations.uEarsEffectLocation, toggleValue);
   }
-  if (effects.glasses && uniformLocations.uGlassesEffectLocation) {
-    gl.uniform1i(uniformLocations.uGlassesEffectLocation, toggleValue);
+  if (effects.glasses && baseUniformLocations.uGlassesEffectLocation) {
+    gl.uniform1i(baseUniformLocations.uGlassesEffectLocation, toggleValue);
   }
-  if (effects.beards && uniformLocations.uBeardEffectLocation) {
-    gl.uniform1i(uniformLocations.uBeardEffectLocation, toggleValue);
+  if (effects.beards && baseUniformLocations.uBeardEffectLocation) {
+    gl.uniform1i(baseUniformLocations.uBeardEffectLocation, toggleValue);
   }
-  if (effects.mustaches && uniformLocations.uMustacheEffectLocation) {
-    gl.uniform1i(uniformLocations.uMustacheEffectLocation, toggleValue);
+  if (effects.mustaches && baseUniformLocations.uMustacheEffectLocation) {
+    gl.uniform1i(baseUniformLocations.uMustacheEffectLocation, toggleValue);
   }
 };
 

@@ -1,8 +1,8 @@
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
 import { getTriangles } from "./getTriangles";
-import { Attributes } from "./setAttributes";
-import { Uniforms } from "./setUniforms";
-import { createTrianglesBuffer } from "./createBuffers";
+import { TriangleAttributes } from "./initializeTriangleAttributes";
+import createTrianglesBuffers from "./createTrianglesBuffers";
+import { TriangleUniforms } from "./initializeTriangleUniforms";
 
 export interface Point2D {
   x: number;
@@ -19,23 +19,21 @@ export const drawFaceMesh = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   triangleProgram: WebGLProgram,
   liveLandmarks: NormalizedLandmarkList,
-  canvas: HTMLCanvasElement,
-  uniformLocations: {
-    [uniform in Uniforms]: WebGLUniformLocation | null | undefined;
+  triangleUniformLocations: {
+    [uniform in TriangleUniforms]: WebGLUniformLocation | null | undefined;
   },
   attributeLocations: {
-    [uniform in Attributes]: number | null | undefined;
+    [uniform in TriangleAttributes]: number | null | undefined;
   },
   triangleTexture: WebGLTexture
 ) => {
   // Get the triangles
   const { overlayTriangles, liveTriangles } = getTriangles(liveLandmarks);
 
-  const loadedTrianglesBuffers = createTrianglesBuffer(
+  const loadedTrianglesBuffers = createTrianglesBuffers(
     gl,
     overlayTriangles,
     liveTriangles,
-    canvas,
     attributeLocations
   );
 
@@ -51,8 +49,10 @@ export const drawFaceMesh = (
   }
 
   gl.useProgram(triangleProgram);
+
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
   // Bind position buffer
   // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   // gl.vertexAttribPointer(
@@ -82,7 +82,7 @@ export const drawFaceMesh = (
 
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, triangleTexture);
-  gl.uniform1i(uniformLocations.uTriangleTextureLocation!, 0);
+  gl.uniform1i(triangleUniformLocations.uTriangleTextureLocation!, 0);
 
   // Draw the mesh
   // gl.viewport(0, 0, canvas.width, canvas.height);
@@ -90,7 +90,9 @@ export const drawFaceMesh = (
   // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // gl.enable(gl.DEPTH_TEST);
 
+  // Draw the mesh
   gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
+
   gl.disable(gl.BLEND);
 };
 

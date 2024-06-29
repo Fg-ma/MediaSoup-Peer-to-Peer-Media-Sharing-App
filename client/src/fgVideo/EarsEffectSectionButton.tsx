@@ -5,7 +5,7 @@ import {
   EarsEffectTypes,
   earsWidthFactorMap,
 } from "../context/CurrentEffectsStylesContext";
-import dogEars from "../../public/assets/ears/dogEars.png";
+import dogEars from "../../public/2DAssets/ears/dogEars.png";
 import dogEarsIcon from "../../public/svgs/ears/dogEarsIcon.svg";
 import dogEarsOffIcon from "../../public/svgs/ears/dogEarsOffIcon.svg";
 import { EffectTypes, useStreamsContext } from "../context/StreamsContext";

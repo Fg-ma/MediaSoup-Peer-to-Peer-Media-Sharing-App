@@ -4,11 +4,11 @@ import {
   useCurrentEffectsStylesContext,
   GlassesEffectTypes,
 } from "../context/CurrentEffectsStylesContext";
-import defaultGlasses from "../../public/assets/glasses/defaultGlasses.png";
-import memeGlasses from "../../public/assets/glasses/memeGlasses.png";
-import americaGlasses from "../../public/assets/glasses/americaGlasses.png";
-import threeDGlasses from "../../public/assets/glasses/threeDGlasses.png";
-import shades from "../../public/assets/glasses/shades.png";
+import defaultGlasses from "../../public/2DAssets/glasses/defaultGlasses.png";
+import memeGlasses from "../../public/2DAssets/glasses/memeGlasses.png";
+import americaGlasses from "../../public/2DAssets/glasses/americaGlasses.png";
+import threeDGlasses from "../../public/2DAssets/glasses/threeDGlasses.png";
+import shades from "../../public/2DAssets/glasses/shades.png";
 import defaultGlassesIcon from "../../public/svgs/glasses/defaultGlassesIcon.svg";
 import defaultGlassesOffIcon from "../../public/svgs/glasses/defaultGlassesOffIcon.svg";
 import memeGlassesIcon from "../../public/svgs/glasses/memeGlassesIcon.svg";

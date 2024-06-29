@@ -5,11 +5,11 @@ import {
   MustachesEffectTypes,
   mustacheNoseOffsetsMap,
 } from "../context/CurrentEffectsStylesContext";
-import mustache1 from "../../public/assets/mustaches/mustache1.png";
-import mustache2 from "../../public/assets/mustaches/mustache2.png";
-import mustache3 from "../../public/assets/mustaches/mustache3.png";
-import mustache4 from "../../public/assets/mustaches/mustache4.png";
-import disguiseMustache from "../../public/assets/mustaches/disguiseMustache.png";
+import mustache1 from "../../public/2DAssets/mustaches/mustache1.png";
+import mustache2 from "../../public/2DAssets/mustaches/mustache2.png";
+import mustache3 from "../../public/2DAssets/mustaches/mustache3.png";
+import mustache4 from "../../public/2DAssets/mustaches/mustache4.png";
+import disguiseMustache from "../../public/2DAssets/mustaches/disguiseMustache.png";
 import mustacheIcon1 from "../../public/svgs/mustaches/mustacheIcon1.svg";
 import mustacheOffIcon1 from "../../public/svgs/mustaches/mustacheOffIcon1.svg";
 import mustacheIcon2 from "../../public/svgs/mustaches/mustacheIcon2.svg";
