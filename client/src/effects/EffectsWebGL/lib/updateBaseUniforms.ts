@@ -7,7 +7,7 @@ const maxFaces = 8;
 
 const updateBaseUniforms = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  videoProgram: WebGLProgram,
+  baseProgram: WebGLProgram,
   baseUniformLocations: {
     [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
   },
@@ -30,11 +30,11 @@ const updateBaseUniforms = (
   chinPositions: number[][],
   chinWidths: number[],
   nosePositions: number[][],
-  earsImageOffset: number[],
-  beardImageOffset: number[],
-  mustacheImageOffset: number[]
+  earsImageOffset: number[][],
+  beardImageOffset: number[][],
+  mustacheImageOffset: number[][]
 ) => {
-  gl.useProgram(videoProgram);
+  gl.useProgram(baseProgram);
 
   if (baseUniformLocations.uFaceCountLocation) {
     gl.uniform1i(baseUniformLocations.uFaceCountLocation, faceCount);
@@ -46,18 +46,19 @@ const updateBaseUniforms = (
     gl.uniform1fv(
       baseUniformLocations.uHeadRotationAnglesLocation,
       new Float32Array(headRotationAngles)
+      // new Float32Array([0.0])
+      // new Float32Array([Math.PI / 4.0])
     );
   }
   if (
     baseUniformLocations.uHeadPitchAnglesLocation &&
     faceLandmarks.headPitchAngles
   ) {
-    // console.log(headPitchAngles);
     gl.uniform1fv(
       baseUniformLocations.uHeadPitchAnglesLocation,
-      new Float32Array([0.0])
+      new Float32Array(headPitchAngles)
+      // new Float32Array([0.0])
       // new Float32Array([Math.PI / 4.0])
-      // new Float32Array(headPitchAngles)
     );
   }
   if (
@@ -165,17 +166,58 @@ const updateBaseUniforms = (
     );
   }
   if (baseUniformLocations.uEarsImageOffset && effects.ears) {
-    gl.uniform2fv(baseUniformLocations.uEarsImageOffset, earsImageOffset);
+    gl.uniform2fv(
+      baseUniformLocations.uEarsImageOffset,
+      flattenArray(earsImageOffset, maxFaces)
+    );
   }
   if (baseUniformLocations.uBeardImageOffset && effects.beards) {
-    gl.uniform2fv(baseUniformLocations.uBeardImageOffset, beardImageOffset);
+    gl.uniform2fv(
+      baseUniformLocations.uBeardImageOffset,
+      flattenArray(beardImageOffset, maxFaces)
+    );
   }
   if (baseUniformLocations.uMustacheImageOffset && effects.mustaches) {
     gl.uniform2fv(
       baseUniformLocations.uMustacheImageOffset,
-      mustacheImageOffset
+      flattenArray(mustacheImageOffset, maxFaces)
     );
   }
+
+  if (
+    baseUniformLocations.uBeardEffectLocation &&
+    baseUniformLocations.uHeadRotationAnglesLocation &&
+    baseUniformLocations.uHeadPitchAnglesLocation &&
+    baseUniformLocations.uHeadYawAnglesLocation &&
+    baseUniformLocations.uChinPositionsLocation &&
+    baseUniformLocations.uChinWidthsLocation &&
+    baseUniformLocations.uBeardImageOffset &&
+    baseUniformLocations.uBeardAspectRatioLocation &&
+    baseUniformLocations.uBeardImageLocation
+  )
+    console.log(
+      gl.getUniform(baseProgram, baseUniformLocations.uBeardEffectLocation),
+      headRotationAngles,
+      gl.getUniform(
+        baseProgram,
+        baseUniformLocations.uHeadRotationAnglesLocation
+      ),
+      headPitchAngles,
+      gl.getUniform(baseProgram, baseUniformLocations.uHeadPitchAnglesLocation),
+      headYawAngles,
+      gl.getUniform(baseProgram, baseUniformLocations.uHeadYawAnglesLocation),
+      chinPositions,
+      gl.getUniform(baseProgram, baseUniformLocations.uChinPositionsLocation),
+      chinWidths,
+      gl.getUniform(baseProgram, baseUniformLocations.uChinWidthsLocation),
+      beardImageOffset,
+      gl.getUniform(baseProgram, baseUniformLocations.uBeardImageOffset),
+      gl.getUniform(
+        baseProgram,
+        baseUniformLocations.uBeardAspectRatioLocation
+      ),
+      gl.getUniform(baseProgram, baseUniformLocations.uBeardImageLocation)
+    );
 };
 
 export default updateBaseUniforms;

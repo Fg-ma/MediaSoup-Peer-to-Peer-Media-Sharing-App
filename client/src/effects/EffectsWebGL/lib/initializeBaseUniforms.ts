@@ -52,7 +52,7 @@ const hexToRgb = (hex: string) => {
 
 const initializeBaseUniforms = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  videoProgram: WebGLProgram,
+  baseProgram: WebGLProgram,
   canvas: HTMLCanvasElement,
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
@@ -69,12 +69,12 @@ const initializeBaseUniforms = (
   mustacheImageTexture: WebGLTexture | null | undefined,
   mustacheImageAspectRatio: number | undefined
 ) => {
-  gl.useProgram(videoProgram);
+  gl.useProgram(baseProgram);
 
-  const uImageLocation = gl.getUniformLocation(videoProgram, "u_image");
+  const uImageLocation = gl.getUniformLocation(baseProgram, "u_image");
 
   const uTextureSizeLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_textureSize"
   );
 
@@ -87,7 +87,7 @@ const initializeBaseUniforms = (
   // blur uniforms
   let uBlurRadiusLocation: WebGLUniformLocation | null | undefined;
   if (effects.blur) {
-    uBlurRadiusLocation = gl.getUniformLocation(videoProgram, "u_blurRadius");
+    uBlurRadiusLocation = gl.getUniformLocation(baseProgram, "u_blurRadius");
 
     if (!uBlurRadiusLocation) {
       return new Error("No uBlurRadiusLocation");
@@ -99,7 +99,7 @@ const initializeBaseUniforms = (
   // blur tint
   let uTintColorLocation: WebGLUniformLocation | null | undefined;
   if (effects.tint) {
-    uTintColorLocation = gl.getUniformLocation(videoProgram, "u_tintColor");
+    uTintColorLocation = gl.getUniformLocation(baseProgram, "u_tintColor");
     const tintColorVector = hexToRgb(tintColor.current);
 
     if (!uTintColorLocation) {
@@ -116,19 +116,19 @@ const initializeBaseUniforms = (
   let uRightEarAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.ears) {
     uLeftEarImageLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_leftEarImage"
     );
     uLeftEarAspectRatioLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_leftEarAspectRatio"
     );
     uRightEarImageLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_rightEarImage"
     );
     uRightEarAspectRatioLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_rightEarAspectRatio"
     );
 
@@ -161,11 +161,11 @@ const initializeBaseUniforms = (
   let uGlassesAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.glasses) {
     uGlassesImageLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_glassesImage"
     );
     uGlassesAspectRatioLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_glassesAspectRatio"
     );
 
@@ -191,9 +191,9 @@ const initializeBaseUniforms = (
   let uBeardImageLocation: WebGLUniformLocation | null | undefined;
   let uBeardAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.beards) {
-    uBeardImageLocation = gl.getUniformLocation(videoProgram, "u_beardImage");
+    uBeardImageLocation = gl.getUniformLocation(baseProgram, "u_beardImage");
     uBeardAspectRatioLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_beardAspectRatio"
     );
 
@@ -220,11 +220,11 @@ const initializeBaseUniforms = (
   let uMustacheAspectRatioLocation: WebGLUniformLocation | null | undefined;
   if (effects.mustaches) {
     uMustacheImageLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_mustacheImage"
     );
     uMustacheAspectRatioLocation = gl.getUniformLocation(
-      videoProgram,
+      baseProgram,
       "u_mustacheAspectRatio"
     );
 
@@ -247,27 +247,27 @@ const initializeBaseUniforms = (
   }
 
   const uBlurEffectLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_blurEffect"
   );
   const uTintEffectLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_tintEffect"
   );
   const uEarsEffectLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_earsEffect"
   );
   const uGlassesEffectLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_glassesEffect"
   );
   const uBeardEffectLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_beardEffect"
   );
   const uMustacheEffectLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_mustacheEffect"
   );
 
@@ -278,73 +278,73 @@ const initializeBaseUniforms = (
   gl.uniform1i(uBeardEffectLocation, effects.beards ? 1 : 0);
   gl.uniform1i(uMustacheEffectLocation, effects.mustaches ? 1 : 0);
 
-  const uFaceCountLocation = gl.getUniformLocation(videoProgram, "u_faceCount");
+  const uFaceCountLocation = gl.getUniformLocation(baseProgram, "u_faceCount");
   const uHeadRotationAnglesLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_headRotationAngles"
   );
   const uHeadPitchAnglesLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_headPitchAngles"
   );
   const uHeadYawAnglesLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_headYawAngles"
   );
   const uEarsImageOffset = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_earsImageOffset"
   );
   const uBeardImageOffset = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_beardImageOffset"
   );
   const uMustacheImageOffset = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_mustacheImageOffset"
   );
   const uLeftEarPositionsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_leftEarPositions"
   );
   const uRightEarPositionsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_rightEarPositions"
   );
   const uLeftEyePositionsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_leftEyePositions"
   );
   const uRightEyePositionsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_rightEyePositions"
   );
   const uEyesCentersLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_eyesCenters"
   );
   const uChinPositionsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_chinPositions"
   );
   const uNosePositionsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_nosePositions"
   );
   const uRightEarWidthsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_rightEarWidths"
   );
   const uLeftEarWidthsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_leftEarWidths"
   );
   const uEyesWidthsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_eyesWidths"
   );
   const uChinWidthsLocation = gl.getUniformLocation(
-    videoProgram,
+    baseProgram,
     "u_chinWidths"
   );
 

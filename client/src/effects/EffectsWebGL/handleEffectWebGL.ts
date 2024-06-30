@@ -1,6 +1,6 @@
 import { EffectTypes } from "../../context/StreamsContext";
-import videoVertexShaderSource from "./lib/videoVertexShader";
-import videoFragmentShaderSource from "./lib/videoFragmentShader";
+import baseVertexShaderSource from "./lib/baseVertexShader";
+import baseFragmentShaderSource from "./lib/baseFragmentShader";
 import triangleVertexShaderSource from "./lib/triangleVertexShader";
 import triangleFragmentShaderSource from "./lib/triangleFragmentShader";
 import initializeBaseUniforms from "./lib/initializeBaseUniforms";
@@ -70,21 +70,21 @@ const handleEffectWebGL = async (
     return new Error("WebGL not supported");
   }
 
-  const videoVertexShader = createShader(
+  const baseVertexShader = createShader(
     gl,
     gl.VERTEX_SHADER,
-    videoVertexShaderSource
+    baseVertexShaderSource
   );
-  if (videoVertexShader instanceof Error) {
-    return new Error("No video vertex shader: ", videoVertexShader);
+  if (baseVertexShader instanceof Error) {
+    return new Error("No base vertex shader: ", baseVertexShader);
   }
-  const videoFragmentShader = createShader(
+  const baseFragmentShader = createShader(
     gl,
     gl.FRAGMENT_SHADER,
-    videoFragmentShaderSource
+    baseFragmentShaderSource
   );
-  if (videoFragmentShader instanceof Error) {
-    return new Error("No video fragment shader: ", videoFragmentShader);
+  if (baseFragmentShader instanceof Error) {
+    return new Error("No base fragment shader: ", baseFragmentShader);
   }
 
   const triangleVertexShader = createShader(
@@ -104,15 +104,11 @@ const handleEffectWebGL = async (
     return new Error("No triangle fragment shader: ", triangleFragmentShader);
   }
 
-  const videoProgram = createProgram(
-    gl,
-    videoVertexShader,
-    videoFragmentShader
-  );
-  if (videoProgram instanceof Error) {
-    return new Error("No video program");
+  const baseProgram = createProgram(gl, baseVertexShader, baseFragmentShader);
+  if (baseProgram instanceof Error) {
+    return new Error("No base program");
   }
-  gl.useProgram(videoProgram);
+  gl.useProgram(baseProgram);
 
   const triangleProgram = createProgram(
     gl,
@@ -126,17 +122,17 @@ const handleEffectWebGL = async (
 
   // Create buffers
   const {
-    positionBuffer: videoPositionBuffer,
-    texCoordBuffer: videoTexCoordBuffer,
-  } = createBuffers(gl, videoProgram);
-  if (!videoPositionBuffer || !videoTexCoordBuffer) {
-    return new Error("No videoPositionBuffer or videoTexCoordBuffer");
+    positionBuffer: basePositionBuffer,
+    texCoordBuffer: baseTexCoordBuffer,
+  } = createBuffers(gl, baseProgram);
+  if (!basePositionBuffer || !baseTexCoordBuffer) {
+    return new Error("No basePositionBuffer or baseTexCoordBuffer");
   }
 
-  const videoTexture = createAndSetupTexture(gl);
+  const baseVideoTexture = createAndSetupTexture(gl);
 
-  if (!videoTexture) {
-    return new Error("No videoTexture");
+  if (!baseVideoTexture) {
+    return new Error("No baseVideoTexture");
   }
 
   if (
@@ -242,7 +238,7 @@ const handleEffectWebGL = async (
   // Set up the uniforms in the base fragment shader
   const baseUniformLocations = initializeBaseUniforms(
     gl,
-    videoProgram,
+    baseProgram,
     canvas,
     effects,
     tintColor,
@@ -277,7 +273,7 @@ const handleEffectWebGL = async (
     );
   }
 
-  const baseAttributeLocations = initializeBaseAttributes(gl, videoProgram);
+  const baseAttributeLocations = initializeBaseAttributes(gl, baseProgram);
 
   if (baseAttributeLocations instanceof Error) {
     return new Error("Error setting base attributes: ", baseAttributeLocations);
@@ -352,7 +348,7 @@ const handleEffectWebGL = async (
     },
   });
   faceMesh.setOptions({
-    maxNumFaces: 1,
+    maxNumFaces: 2,
     refineLandmarks: true,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5,
@@ -380,9 +376,9 @@ const handleEffectWebGL = async (
   video.addEventListener("play", () => {
     render(
       gl,
-      videoProgram,
+      baseProgram,
       triangleProgram,
-      videoTexture,
+      baseVideoTexture,
       video,
       canvas,
       animationFrameId,
@@ -396,8 +392,8 @@ const handleEffectWebGL = async (
       faceMesh,
       faceMeshResults,
       triangleTexture,
-      videoPositionBuffer,
-      videoTexCoordBuffer
+      basePositionBuffer,
+      baseTexCoordBuffer
     );
   });
   video.onloadedmetadata = () => {
@@ -412,12 +408,12 @@ const handleEffectWebGL = async (
     animationFrameId,
     video,
     gl,
-    videoTexture,
-    videoProgram,
-    videoVertexShader,
-    videoFragmentShader,
-    videoPositionBuffer,
-    videoTexCoordBuffer,
+    baseVideoTexture,
+    baseProgram,
+    baseVertexShader,
+    baseFragmentShader,
+    basePositionBuffer,
+    baseTexCoordBuffer,
     triangleProgram,
     triangleVertexShader,
     triangleFragmentShader,

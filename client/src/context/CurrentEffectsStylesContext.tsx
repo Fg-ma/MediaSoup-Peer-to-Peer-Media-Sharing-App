@@ -23,7 +23,7 @@ export type BeardsEffectTypes = "classicalCurlyBeard";
 export const beardChinOffsetsMap: {
   [beardEffectType in BeardsEffectTypes]: number;
 } = {
-  classicalCurlyBeard: 0.0,
+  classicalCurlyBeard: 0.01,
 };
 
 export type MustachesEffectTypes =
@@ -79,12 +79,13 @@ export const useCurrentEffectsStylesContext = () => {
 export function CurrentEffectsStylesContextProvider({
   children,
 }: CurrentEffectsStylesContextProviderProps) {
+  const defaultGlasses = "defaultGlasses";
   const defaultBeard = "classicalCurlyBeard";
   const defaultMustache = "mustache1";
   const defaultEars = "dogEars";
 
   const currentEffectsStyles = useRef<EffectStylesType>({
-    glasses: { style: "defaultGlasses" },
+    glasses: { style: defaultGlasses },
     ears: {
       style: defaultEars,
       leftEarWidthFactor: earsWidthFactorMap[defaultEars].leftEarWidthFactor,

@@ -48,7 +48,7 @@ const updateFaceLandmarks = async (
     landmarks: NormalizedLandmarkList;
   }[],
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  videoProgram: WebGLProgram,
+  baseProgram: WebGLProgram,
   canvas: HTMLCanvasElement,
   baseUniformLocations: {
     [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
@@ -75,9 +75,9 @@ const updateFaceLandmarks = async (
   const chinPositions: number[][] = [];
   const nosePositions: number[][] = [];
   const chinWidths: number[] = [];
-  const earsImageOffset: number[] = [];
-  const beardImageOffset: number[] = [];
-  const mustacheImageOffset: number[] = [];
+  const earsImageOffset: number[][] = [];
+  const beardImageOffset: number[][] = [];
+  const mustacheImageOffset: number[][] = [];
 
   // Handle case of no dections
   if (detectionTimedout && faceCount !== 0) {
@@ -110,8 +110,6 @@ const updateFaceLandmarks = async (
 
     let updatedSmoothInterocularDistance = false;
 
-    // Set the faceTracker based on which face is closest to which face in
-    // the set of last seen faces
     const eyesCenterPosition = [
       (leftEye.x + rightEye.x) / 2,
       (leftEye.y + rightEye.y) / 2,
@@ -287,7 +285,7 @@ const updateFaceLandmarks = async (
       headYawAngles.push(smoothedOneDimensionalVariables.headYawAngle[faceId]);
     }
 
-    if (effects.ears && !earsImageOffset[0]) {
+    if (effects.ears) {
       // Update InterocularDistance if needed
       if (!updatedSmoothInterocularDistance) {
         updateOneDimensionalSmoothVariables(
@@ -308,11 +306,10 @@ const updateFaceLandmarks = async (
         smoothedOneDimensionalVariables.headRotationAngle[faceId]
       );
 
-      earsImageOffset.push(shiftX);
-      earsImageOffset.push(shiftY);
+      earsImageOffset.push([shiftX, shiftY]);
     }
 
-    if (effects.beards && !beardImageOffset[0]) {
+    if (effects.beards) {
       // Calculate the shift distance for the chin position taking into account
       // headAngle for direction of shift
       const { shiftX, shiftY } = directionalShift(
@@ -320,11 +317,10 @@ const updateFaceLandmarks = async (
         smoothedOneDimensionalVariables.headRotationAngle[faceId]
       );
 
-      beardImageOffset.push(shiftX);
-      beardImageOffset.push(shiftY);
+      beardImageOffset.push([shiftX, shiftY]);
     }
 
-    if (effects.mustaches && !mustacheImageOffset[0]) {
+    if (effects.mustaches) {
       // Calculate the shift distance for the nose position taking into account
       // headAngle for direction of shift
       const { shiftX, shiftY } = directionalShift(
@@ -332,8 +328,7 @@ const updateFaceLandmarks = async (
         smoothedOneDimensionalVariables.headRotationAngle[faceId]
       );
 
-      mustacheImageOffset.push(shiftX);
-      mustacheImageOffset.push(shiftY);
+      mustacheImageOffset.push([shiftX, shiftY]);
     }
   });
 
@@ -341,7 +336,7 @@ const updateFaceLandmarks = async (
   if (faceCount > 0) {
     updateBaseUniforms(
       gl,
-      videoProgram,
+      baseProgram,
       baseUniformLocations,
       faceLandmarks,
       effects,

@@ -1,4 +1,4 @@
-const videoFragmentShaderSource = `
+const baseFragmentShaderSource = `
   #ifdef GL_ES
   precision mediump float;
   #endif
@@ -34,15 +34,15 @@ const videoFragmentShaderSource = `
   uniform float u_leftEarAspectRatio;
   uniform sampler2D u_rightEarImage;
   uniform float u_rightEarAspectRatio;
-  uniform vec2 u_earsImageOffset;
+  uniform vec2 u_earsImageOffset[MAX_FACES];
   uniform sampler2D u_glassesImage;
   uniform float u_glassesAspectRatio;
   uniform sampler2D u_beardImage;
   uniform float u_beardAspectRatio;
-  uniform vec2 u_beardImageOffset;
+  uniform vec2 u_beardImageOffset[MAX_FACES];
   uniform sampler2D u_mustacheImage;
   uniform float u_mustacheAspectRatio;
-  uniform vec2 u_mustacheImageOffset;
+  uniform vec2 u_mustacheImageOffset[MAX_FACES];
 
   // Ears
   uniform vec2 u_leftEarPositions[MAX_FACES]; 
@@ -69,13 +69,13 @@ const videoFragmentShaderSource = `
     return mat2(cosA, -sinA, sinA, cosA);
   }
 
-  void applyEarEffect(inout vec4 color, vec2 texCoord, sampler2D earImage, vec2 earPosition, float earWidth, float earAspectRatio, float headRotationAngle) {
+  void applyEarEffect(inout vec4 color, vec2 texCoord, sampler2D earImage, vec2 earPosition, vec2 earsImageOffset, float earWidth, float earAspectRatio, float headRotationAngle) {
     float earHeight = earWidth / earAspectRatio;
     vec2 earSize = vec2(earWidth, earHeight);  
   
     mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
 
-    vec2 earTexCoord = (rotationMatrix * (texCoord - earPosition + u_earsImageOffset) * u_textureSize / earSize) + 0.5;
+    vec2 earTexCoord = (rotationMatrix * (texCoord - earPosition + earsImageOffset) * u_textureSize / earSize) + 0.5;
     vec4 earColor = texture2D(earImage, earTexCoord);
     if (earColor.a > 0.0) {
       color = mix(color, earColor, earColor.a);
@@ -139,26 +139,26 @@ const videoFragmentShaderSource = `
     }
   }
 
-  void applyBeardEffect(inout vec4 color, vec2 texCoord, sampler2D beardImage, vec2 chinPosition, float chinWidth, float beardAspectRatio, float headRotationAngle) {
+  void applyBeardEffect(inout vec4 color, vec2 texCoord, sampler2D beardImage, vec2 chinPosition, vec2 beardImageOffset, float chinWidth, float beardAspectRatio, float headRotationAngle) {
     float beardHeight = chinWidth / beardAspectRatio;
     vec2 beardSize = vec2(chinWidth, beardHeight);
 
     mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
 
-    vec2 beardTexCoord = (rotationMatrix * (texCoord - chinPosition + u_beardImageOffset) * u_textureSize / beardSize) + 0.5;
+    vec2 beardTexCoord = (rotationMatrix * (texCoord - chinPosition - beardImageOffset) * u_textureSize / beardSize) + 0.5;
     vec4 beardColor = texture2D(beardImage, beardTexCoord);
     if (beardColor.a > 0.0) {
       color = mix(color, beardColor, beardColor.a);
     }
   }
 
-  void applyMustacheEffect(inout vec4 color, vec2 texCoord, sampler2D mustacheImage, vec2 nosePosition, float eyesWidth, float mustacheAspectRatio, float headRotationAngle) {
+  void applyMustacheEffect(inout vec4 color, vec2 texCoord, sampler2D mustacheImage, vec2 nosePosition, vec2 mustacheImageOffset, float eyesWidth, float mustacheAspectRatio, float headRotationAngle) {
     float mustacheHeight = eyesWidth / mustacheAspectRatio;
     vec2 mustacheSize = vec2(eyesWidth, mustacheHeight);
 
     mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
 
-    vec2 mustacheTexCoord = (rotationMatrix * (texCoord - nosePosition - u_mustacheImageOffset) * u_textureSize / mustacheSize) + 0.5;
+    vec2 mustacheTexCoord = (rotationMatrix * (texCoord - nosePosition - mustacheImageOffset) * u_textureSize / mustacheSize) + 0.5;
     vec4 mustacheColor = texture2D(mustacheImage, mustacheTexCoord);
     if (mustacheColor.a > 0.0) {
       color = mix(color, mustacheColor, mustacheColor.a);
@@ -173,8 +173,8 @@ const videoFragmentShaderSource = `
     if (u_earsEffect) {
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
-          applyEarEffect(color, v_texCoord, u_leftEarImage, u_leftEarPositions[i], u_leftEarWidths[i], u_leftEarAspectRatio, u_headRotationAngles[i]);
-          applyEarEffect(color, v_texCoord, u_rightEarImage, u_rightEarPositions[i], u_rightEarWidths[i], u_rightEarAspectRatio, u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_leftEarImage, u_leftEarPositions[i], u_earsImageOffset[i], u_leftEarWidths[i], u_leftEarAspectRatio, u_headRotationAngles[i]);
+          applyEarEffect(color, v_texCoord, u_rightEarImage, u_rightEarPositions[i], u_earsImageOffset[i], u_rightEarWidths[i], u_rightEarAspectRatio, u_headRotationAngles[i]);
         }
       }
     }
@@ -192,7 +192,7 @@ const videoFragmentShaderSource = `
     if (u_beardEffect) {
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
-          applyBeardEffect(color, v_texCoord, u_beardImage, u_chinPositions[i], u_chinWidths[i], u_beardAspectRatio, u_headRotationAngles[i]);
+          applyBeardEffect(color, v_texCoord, u_beardImage, u_chinPositions[i], u_beardImageOffset[i], u_chinWidths[i], u_beardAspectRatio, u_headRotationAngles[i]);
         }
       }
     }
@@ -201,7 +201,8 @@ const videoFragmentShaderSource = `
     if (u_mustacheEffect) {
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
-          applyMustacheEffect(color, v_texCoord, u_mustacheImage, u_nosePositions[i], u_eyesWidths[i], u_mustacheAspectRatio, u_headRotationAngles[i]);
+          applyMustacheEffect(color, v_texCoord, u_mustacheImage, u_nosePositions[i], u_mustacheImageOffset[i], u_eyesWidths[i], u_mustacheAspectRatio, u_headRotationAngles[i]);
+          applyMustacheEffect(color, v_texCoord, u_beardImage, u_chinPositions[i], u_beardImageOffset[i], u_chinWidths[i], u_beardAspectRatio, u_headRotationAngles[i]);
         }
       }
     }
@@ -235,4 +236,4 @@ const videoFragmentShaderSource = `
   }
 `;
 
-export default videoFragmentShaderSource;
+export default baseFragmentShaderSource;

@@ -1,12 +1,12 @@
 import { BaseAttributes } from "./initializeBaseAttributes";
 
-const updateVideoTexture = (
+const updateBaseVideoTexture = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  videoTexture: WebGLTexture,
+  baseVideoTexture: WebGLTexture,
   video: HTMLVideoElement,
-  videoProgram: WebGLProgram,
-  videoPositionBuffer: WebGLBuffer,
-  videoTexCoordBuffer: WebGLBuffer,
+  baseProgram: WebGLProgram,
+  basePositionBuffer: WebGLBuffer,
+  baseTexCoordBuffer: WebGLBuffer,
   baseAttributeLocations: {
     [uniform in BaseAttributes]: number | null | undefined;
   }
@@ -20,9 +20,9 @@ const updateVideoTexture = (
     return;
   }
 
-  gl.useProgram(videoProgram);
+  gl.useProgram(baseProgram);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, videoPositionBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, basePositionBuffer);
   gl.vertexAttribPointer(
     baseAttributeLocations.aPositionLocation,
     2,
@@ -32,7 +32,7 @@ const updateVideoTexture = (
     0
   );
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, videoTexCoordBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, baseTexCoordBuffer);
   gl.vertexAttribPointer(
     baseAttributeLocations.aTexCoordLocation,
     2,
@@ -43,10 +43,10 @@ const updateVideoTexture = (
   );
 
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, videoTexture);
+  gl.bindTexture(gl.TEXTURE_2D, baseVideoTexture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 };
 
-export default updateVideoTexture;
+export default updateBaseVideoTexture;

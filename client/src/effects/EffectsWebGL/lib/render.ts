@@ -1,5 +1,5 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import updateVideoTexture from "./updateVideoTexture";
+import updateBaseVideoTexture from "./updateBaseVideoTexture";
 import { BaseUniforms } from "./initializeBaseUniforms";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
@@ -14,9 +14,9 @@ import landmarksSmoothWithDeadbanding from "./landmarksSmoothWithDeadbanding";
 
 const render = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  videoProgram: WebGLProgram,
+  baseProgram: WebGLProgram,
   triangleProgram: WebGLProgram,
-  videoTexture: WebGLTexture,
+  baseVideoTexture: WebGLTexture,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
   animationFrameId: number[],
@@ -40,21 +40,21 @@ const render = async (
   faceMesh: FaceMesh,
   faceMeshResults: Results[],
   triangleTexture: WebGLTexture | null | undefined,
-  videoPositionBuffer: WebGLBuffer,
-  videoTexCoordBuffer: WebGLBuffer
+  basePositionBuffer: WebGLBuffer,
+  baseTexCoordBuffer: WebGLBuffer
 ) => {
   gl.enable(gl.DEPTH_TEST);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.CULL_FACE);
   gl.cullFace(gl.BACK);
 
-  updateVideoTexture(
+  updateBaseVideoTexture(
     gl,
-    videoTexture,
+    baseVideoTexture,
     video,
-    videoProgram,
-    videoPositionBuffer,
-    videoTexCoordBuffer,
+    baseProgram,
+    basePositionBuffer,
+    baseTexCoordBuffer,
     baseAttributeLocations
   );
 
@@ -82,7 +82,7 @@ const render = async (
     await updateFaceLandmarks(
       smoothedFaceIdLandmarksPairs,
       gl,
-      videoProgram,
+      baseProgram,
       canvas,
       baseUniformLocations,
       effects,
@@ -107,9 +107,9 @@ const render = async (
   animationFrameId[0] = requestAnimationFrame(() =>
     render(
       gl,
-      videoProgram,
+      baseProgram,
       triangleProgram,
-      videoTexture,
+      baseVideoTexture,
       video,
       canvas,
       animationFrameId,
@@ -123,8 +123,8 @@ const render = async (
       faceMesh,
       faceMeshResults,
       triangleTexture,
-      videoPositionBuffer,
-      videoTexCoordBuffer
+      basePositionBuffer,
+      baseTexCoordBuffer
     )
   );
 };
