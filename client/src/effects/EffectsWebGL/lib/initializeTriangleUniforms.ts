@@ -1,6 +1,7 @@
 import { EffectTypes } from "src/context/StreamsContext";
+import bindTexture from "./bindTexture";
 
-export type TriangleUniforms = "uTriangleTextureLocation";
+export type TriangleUniformsLocations = "uTriangleTextureLocation";
 
 const initializeTriangleUniforms = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -8,7 +9,7 @@ const initializeTriangleUniforms = (
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   },
-  triangleImageTexture: WebGLTexture | null | undefined
+  triangleTexture: WebGLTexture | null | undefined
 ) => {
   gl.useProgram(triangleProgram);
 
@@ -17,17 +18,18 @@ const initializeTriangleUniforms = (
     "u_triangleTexture"
   );
   if (effects.faceMask) {
-    if (!triangleImageTexture || !uTriangleTextureLocation) {
-      return new Error("No triangleImageTexture or uTriangleTextureLocation");
+    if (!triangleTexture || !uTriangleTextureLocation) {
+      return new Error("No triangleTexture or uTriangleTextureLocation");
     }
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, triangleImageTexture);
-    gl.uniform1i(uTriangleTextureLocation, 3);
+    bindTexture(gl, triangleTexture, uTriangleTextureLocation);
   }
 
   const uniformLocations: {
-    [uniform in TriangleUniforms]: WebGLUniformLocation | null | undefined;
+    [uniform in TriangleUniformsLocations]:
+      | WebGLUniformLocation
+      | null
+      | undefined;
   } = {
     uTriangleTextureLocation: uTriangleTextureLocation,
   };

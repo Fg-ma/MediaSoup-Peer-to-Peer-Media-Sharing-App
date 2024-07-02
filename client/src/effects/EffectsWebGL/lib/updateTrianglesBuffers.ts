@@ -1,25 +1,22 @@
 import { Point2D, Point3D } from "./drawFaceMesh";
-import { TriangleAttributes } from "./initializeTriangleAttributes";
+import { TriangleAttributesLocations } from "./initializeTriangleAttributes";
 
-let buffers = {
-  positionBuffer: null,
-  texCoordBuffer: null,
-  indexBuffer: null,
-};
-
-const createTrianglesBuffers = (
+const updateTrianglesBuffers = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   srcTrianglesArray: [Point2D, Point2D, Point2D][],
   destTrianglesArray: [Point3D, Point3D, Point3D][],
-  attributeLocations: {
-    [attribute in TriangleAttributes]: number | null | undefined;
-  }
+  triangleAttributeLocations: {
+    [attribute in TriangleAttributesLocations]: number | null | undefined;
+  },
+  trianglePositionBuffer: WebGLBuffer,
+  triangleTexCoordBuffer: WebGLBuffer,
+  triangleIndexBuffer: WebGLBuffer
 ) => {
   if (
-    attributeLocations.aPositionLocation === undefined ||
-    attributeLocations.aPositionLocation === null ||
-    attributeLocations.aTexCoordLocation === undefined ||
-    attributeLocations.aTexCoordLocation === null
+    triangleAttributeLocations.aPositionLocation === undefined ||
+    triangleAttributeLocations.aPositionLocation === null ||
+    triangleAttributeLocations.aTexCoordLocation === undefined ||
+    triangleAttributeLocations.aTexCoordLocation === null
   ) {
     return;
   }
@@ -59,46 +56,38 @@ const createTrianglesBuffers = (
   });
 
   // Create or reuse buffers
-  const positionBuffer = buffers.positionBuffer || gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglePositionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.DYNAMIC_DRAW);
   gl.vertexAttribPointer(
-    attributeLocations.aPositionLocation,
+    triangleAttributeLocations.aPositionLocation,
     3,
     gl.FLOAT,
     false,
     0,
     0
   );
-  gl.enableVertexAttribArray(attributeLocations.aPositionLocation);
+  // gl.enableVertexAttribArray(triangleAttributeLocations.aPositionLocation);
 
-  const texCoordBuffer = buffers.texCoordBuffer || gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, triangleTexCoordBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.DYNAMIC_DRAW);
   gl.vertexAttribPointer(
-    attributeLocations.aTexCoordLocation,
+    triangleAttributeLocations.aTexCoordLocation,
     2,
     gl.FLOAT,
     false,
     0,
     0
   );
-  gl.enableVertexAttribArray(attributeLocations.aTexCoordLocation);
+  // gl.enableVertexAttribArray(triangleAttributeLocations.aTexCoordLocation);
 
-  const indexBuffer = buffers.indexBuffer || gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleIndexBuffer);
   gl.bufferData(
     gl.ELEMENT_ARRAY_BUFFER,
     new Uint16Array(indices),
     gl.DYNAMIC_DRAW
   );
 
-  return {
-    positionBuffer,
-    texCoordBuffer,
-    indexBuffer,
-    indexCount: indices.length,
-  };
+  return indices.length;
 };
 
-export default createTrianglesBuffers;
+export default updateTrianglesBuffers;

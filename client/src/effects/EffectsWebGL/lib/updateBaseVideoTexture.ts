@@ -1,4 +1,4 @@
-import { BaseAttributes } from "./initializeBaseAttributes";
+import { BaseAttributesLocations } from "./initializeBaseAttributes";
 
 const updateBaseVideoTexture = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -8,7 +8,7 @@ const updateBaseVideoTexture = (
   basePositionBuffer: WebGLBuffer,
   baseTexCoordBuffer: WebGLBuffer,
   baseAttributeLocations: {
-    [uniform in BaseAttributes]: number | null | undefined;
+    [uniform in BaseAttributesLocations]: number | null | undefined;
   }
 ) => {
   if (

@@ -1,12 +1,11 @@
 import { EffectTypes } from "src/context/StreamsContext";
+import bindTexture from "./bindTexture";
 
-export type BaseUniforms =
+export type BaseUniformsLocations =
   | "uImageLocation"
   | "uFaceCountLocation"
   | "uTextureSizeLocation"
   | "uHeadRotationAnglesLocation"
-  | "uHeadPitchAnglesLocation"
-  | "uHeadYawAnglesLocation"
   | "uBlurRadiusLocation"
   | "uTintColorLocation"
   | "uBlurEffectLocation"
@@ -135,23 +134,23 @@ const initializeBaseUniforms = (
     if (
       !leftEarImageTexture ||
       !leftEarImageAspectRatio ||
+      !uLeftEarImageLocation ||
+      !uLeftEarAspectRatioLocation ||
       !rightEarImageTexture ||
-      !rightEarImageAspectRatio
+      !rightEarImageAspectRatio ||
+      !uRightEarImageLocation ||
+      !uRightEarAspectRatioLocation
     ) {
       return new Error(
-        "No leftEarImageTexture or leftEarImageAspectRatio or rightEarImageTexture or rightEarImageAspectRatio"
+        "No leftEarImageTexture or leftEarImageAspectRatio or uLeftEarImageLocation or uLeftEarAspectRatioLocation or rightEarImageTexture or rightEarImageAspectRatio or uRightEarImageLocation or uRightEarAspectRatioLocation"
       );
     }
 
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, leftEarImageTexture);
-    gl.uniform1i(uLeftEarImageLocation, 1);
+    bindTexture(gl, leftEarImageTexture, uLeftEarImageLocation);
 
     gl.uniform1f(uLeftEarAspectRatioLocation, leftEarImageAspectRatio);
 
-    gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, rightEarImageTexture);
-    gl.uniform1i(uRightEarImageLocation, 2);
+    bindTexture(gl, rightEarImageTexture, uRightEarImageLocation);
 
     gl.uniform1f(uRightEarAspectRatioLocation, rightEarImageAspectRatio);
   }
@@ -180,9 +179,7 @@ const initializeBaseUniforms = (
       );
     }
 
-    gl.activeTexture(gl.TEXTURE3);
-    gl.bindTexture(gl.TEXTURE_2D, glassesImageTexture);
-    gl.uniform1i(uGlassesImageLocation, 3);
+    bindTexture(gl, glassesImageTexture, uGlassesImageLocation);
 
     gl.uniform1f(uGlassesAspectRatioLocation, glassesImageAspectRatio);
   }
@@ -208,9 +205,7 @@ const initializeBaseUniforms = (
       );
     }
 
-    gl.activeTexture(gl.TEXTURE4);
-    gl.bindTexture(gl.TEXTURE_2D, beardImageTexture);
-    gl.uniform1i(uBeardImageLocation, 4);
+    bindTexture(gl, beardImageTexture, uBeardImageLocation);
 
     gl.uniform1f(uBeardAspectRatioLocation, beardImageAspectRatio);
   }
@@ -239,9 +234,7 @@ const initializeBaseUniforms = (
       );
     }
 
-    gl.activeTexture(gl.TEXTURE5);
-    gl.bindTexture(gl.TEXTURE_2D, mustacheImageTexture);
-    gl.uniform1i(uMustacheImageLocation, 5);
+    bindTexture(gl, mustacheImageTexture, uMustacheImageLocation);
 
     gl.uniform1f(uMustacheAspectRatioLocation, mustacheImageAspectRatio);
   }
@@ -282,14 +275,6 @@ const initializeBaseUniforms = (
   const uHeadRotationAnglesLocation = gl.getUniformLocation(
     baseProgram,
     "u_headRotationAngles"
-  );
-  const uHeadPitchAnglesLocation = gl.getUniformLocation(
-    baseProgram,
-    "u_headPitchAngles"
-  );
-  const uHeadYawAnglesLocation = gl.getUniformLocation(
-    baseProgram,
-    "u_headYawAngles"
   );
   const uEarsImageOffset = gl.getUniformLocation(
     baseProgram,
@@ -349,14 +334,12 @@ const initializeBaseUniforms = (
   );
 
   const baseUniformLocations: {
-    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
+    [uniform in BaseUniformsLocations]: WebGLUniformLocation | null | undefined;
   } = {
     uImageLocation: uImageLocation,
     uFaceCountLocation: uFaceCountLocation,
     uTextureSizeLocation: uTextureSizeLocation,
     uHeadRotationAnglesLocation: uHeadRotationAnglesLocation,
-    uHeadPitchAnglesLocation: uHeadPitchAnglesLocation,
-    uHeadYawAnglesLocation: uHeadYawAnglesLocation,
 
     uBlurRadiusLocation: uBlurRadiusLocation,
     uTintColorLocation: uTintColorLocation,

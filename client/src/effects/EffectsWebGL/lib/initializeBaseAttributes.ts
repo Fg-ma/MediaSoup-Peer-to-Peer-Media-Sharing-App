@@ -1,4 +1,4 @@
-export type BaseAttributes = "aPositionLocation" | "aTexCoordLocation";
+export type BaseAttributesLocations = "aPositionLocation" | "aTexCoordLocation";
 
 const initializeBaseAttributes = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -10,7 +10,7 @@ const initializeBaseAttributes = (
   const aTexCoordLocation = gl.getAttribLocation(baseProgram, "a_texCoord");
 
   const baseAttributeLocations: {
-    [attribute in BaseAttributes]: number | null | undefined;
+    [attribute in BaseAttributesLocations]: number | null | undefined;
   } = {
     aPositionLocation: aPositionLocation,
     aTexCoordLocation: aTexCoordLocation,

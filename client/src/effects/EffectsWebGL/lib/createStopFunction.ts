@@ -6,11 +6,14 @@ const createStopFunction = (
   baseProgram: WebGLProgram,
   baseVertexShader: WebGLShader,
   baseFragmentShader: WebGLShader,
-  basePositionBuffer: WebGLBuffer | null,
-  baseTexCoordBuffer: WebGLBuffer | null,
+  basePositionBuffer: WebGLBuffer,
+  baseTexCoordBuffer: WebGLBuffer,
   triangleProgram: WebGLProgram,
   triangleVertexShader: WebGLShader,
   triangleFragmentShader: WebGLShader,
+  trianglePositionBuffer: WebGLBuffer,
+  triangleTexCoordBuffer: WebGLBuffer,
+  triangleIndexBuffer: WebGLBuffer,
   canvas: HTMLCanvasElement,
   type: "webcam" | "screen" | "audio",
   id: string,
@@ -54,12 +57,17 @@ const createStopFunction = (
     }
     gl.deleteProgram(baseProgram);
     gl.deleteProgram(triangleProgram);
+
     gl.deleteShader(baseVertexShader);
-    gl.deleteShader(triangleVertexShader);
     gl.deleteShader(baseFragmentShader);
+    gl.deleteShader(triangleVertexShader);
     gl.deleteShader(triangleFragmentShader);
+
     gl.deleteBuffer(basePositionBuffer);
     gl.deleteBuffer(baseTexCoordBuffer);
+    gl.deleteBuffer(trianglePositionBuffer);
+    gl.deleteBuffer(triangleTexCoordBuffer);
+    gl.deleteBuffer(triangleIndexBuffer);
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 

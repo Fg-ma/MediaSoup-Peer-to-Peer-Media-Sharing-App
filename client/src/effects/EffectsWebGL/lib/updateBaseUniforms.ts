@@ -17,8 +17,6 @@ const updateBaseUniforms = (
   },
   faceCount: number,
   headRotationAngles: number[],
-  headPitchAngles: number[],
-  headYawAngles: number[],
   leftEarPositions: number[][],
   rightEarPositions: number[][],
   leftEarWidths: number[],
@@ -46,30 +44,6 @@ const updateBaseUniforms = (
     gl.uniform1fv(
       baseUniformLocations.uHeadRotationAnglesLocation,
       new Float32Array(headRotationAngles)
-      // new Float32Array([0.0])
-      // new Float32Array([Math.PI / 4.0])
-    );
-  }
-  if (
-    baseUniformLocations.uHeadPitchAnglesLocation &&
-    faceLandmarks.headPitchAngles
-  ) {
-    gl.uniform1fv(
-      baseUniformLocations.uHeadPitchAnglesLocation,
-      new Float32Array(headPitchAngles)
-      // new Float32Array([0.0])
-      // new Float32Array([Math.PI / 4.0])
-    );
-  }
-  if (
-    baseUniformLocations.uHeadYawAnglesLocation &&
-    faceLandmarks.headYawAngles
-  ) {
-    gl.uniform1fv(
-      baseUniformLocations.uHeadYawAnglesLocation,
-      new Float32Array(headYawAngles)
-      // new Float32Array([0.0])
-      // new Float32Array([Math.PI / 3.0])
     );
   }
   if (
@@ -183,41 +157,6 @@ const updateBaseUniforms = (
       flattenArray(mustacheImageOffset, maxFaces)
     );
   }
-
-  if (
-    baseUniformLocations.uBeardEffectLocation &&
-    baseUniformLocations.uHeadRotationAnglesLocation &&
-    baseUniformLocations.uHeadPitchAnglesLocation &&
-    baseUniformLocations.uHeadYawAnglesLocation &&
-    baseUniformLocations.uChinPositionsLocation &&
-    baseUniformLocations.uChinWidthsLocation &&
-    baseUniformLocations.uBeardImageOffset &&
-    baseUniformLocations.uBeardAspectRatioLocation &&
-    baseUniformLocations.uBeardImageLocation
-  )
-    console.log(
-      gl.getUniform(baseProgram, baseUniformLocations.uBeardEffectLocation),
-      headRotationAngles,
-      gl.getUniform(
-        baseProgram,
-        baseUniformLocations.uHeadRotationAnglesLocation
-      ),
-      headPitchAngles,
-      gl.getUniform(baseProgram, baseUniformLocations.uHeadPitchAnglesLocation),
-      headYawAngles,
-      gl.getUniform(baseProgram, baseUniformLocations.uHeadYawAnglesLocation),
-      chinPositions,
-      gl.getUniform(baseProgram, baseUniformLocations.uChinPositionsLocation),
-      chinWidths,
-      gl.getUniform(baseProgram, baseUniformLocations.uChinWidthsLocation),
-      beardImageOffset,
-      gl.getUniform(baseProgram, baseUniformLocations.uBeardImageOffset),
-      gl.getUniform(
-        baseProgram,
-        baseUniformLocations.uBeardAspectRatioLocation
-      ),
-      gl.getUniform(baseProgram, baseUniformLocations.uBeardImageLocation)
-    );
 };
 
 export default updateBaseUniforms;

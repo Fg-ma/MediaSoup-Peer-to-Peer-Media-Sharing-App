@@ -1,4 +1,6 @@
-export type TriangleAttributes = "aPositionLocation" | "aTexCoordLocation";
+export type TriangleAttributesLocations =
+  | "aPositionLocation"
+  | "aTexCoordLocation";
 
 const initializeTriangleAttributes = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -10,7 +12,7 @@ const initializeTriangleAttributes = (
   const aTexCoordLocation = gl.getAttribLocation(triangleProgram, "a_texCoord");
 
   const triangleAttributeLocations: {
-    [attribute in TriangleAttributes]: number | null | undefined;
+    [attribute in TriangleAttributesLocations]: number | null | undefined;
   } = {
     aPositionLocation: aPositionLocation,
     aTexCoordLocation: aTexCoordLocation,

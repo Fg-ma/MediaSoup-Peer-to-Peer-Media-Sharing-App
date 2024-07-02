@@ -11,8 +11,6 @@ const baseFragmentShaderSource = `
   // Universal face data
   uniform int u_faceCount;
   uniform float u_headRotationAngles[MAX_FACES]; 
-  uniform float u_headPitchAngles[MAX_FACES]; 
-  uniform float u_headYawAngles[MAX_FACES];
 
   // Blur
   uniform float u_blurRadius;
@@ -82,58 +80,14 @@ const baseFragmentShaderSource = `
     }
   }
 
-  void applyGlassesEffect(inout vec4 color, vec2 texCoord, sampler2D glassesImage, vec2 eyeCenter, float glassesWidth, float headRotationAngle, float headPitchAngle, float headYawAngle) {
-    // Calculate the aspect ratio of the glasses
-    float glassesHeight = glassesWidth / u_glassesAspectRatio;
-    vec2 glassesSize = vec2(glassesWidth, glassesHeight);
-
-    // Calculate the rotation matrix
+  void applyGlassesEffect(inout vec4 color, vec2 texCoord, sampler2D glassesImage, vec2 eyesCenterPosition, float eyesWidth, float glassesAspectRatio, float headRotationAngle) {
+    float glassesHeight = eyesWidth / glassesAspectRatio;
+    vec2 glassesSize = vec2(eyesWidth, glassesHeight);  
+  
     mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
 
-    // Calculate scaling factors for pitch and yaw
-    float pitchStretch = tan(headPitchAngle);
-    float yawStretch = tan(headYawAngle);
-
-    // Calculate the half-size of the glasses
-    vec2 halfGlassesSize = glassesSize / 2.0;
-
-    // Calculate offsets from eyeCenter
-    vec2 topLeftOffset = -halfGlassesSize;
-    vec2 topRightOffset = vec2(halfGlassesSize.x, -halfGlassesSize.y);
-    vec2 bottomLeftOffset = vec2(-halfGlassesSize.x, halfGlassesSize.y);
-    vec2 bottomRightOffset = halfGlassesSize;
-
-    // Apply pitch distortion to offsets
-    if (pitchStretch > 0.0) {
-      topLeftOffset.x += pitchStretch * halfGlassesSize.x;
-      topRightOffset.x -= pitchStretch * halfGlassesSize.x;
-    } else if (pitchStretch < 0.0) {
-      bottomLeftOffset.x -= pitchStretch * halfGlassesSize.x;
-      bottomRightOffset.x += pitchStretch * halfGlassesSize.x;
-    }
-
-    // Apply yaw distortion to offsets
-    if (yawStretch > 0.0) {
-      topLeftOffset.y += yawStretch * halfGlassesSize.y;
-      bottomLeftOffset.y -= yawStretch * halfGlassesSize.y;
-    } else if (yawStretch < 0.0) {
-      topRightOffset.y -= yawStretch * halfGlassesSize.y;
-      bottomRightOffset.y += yawStretch * halfGlassesSize.y;
-    }
-      
-    // Calculate final texture coordinates for each corner
-    vec2 rotatedTopLeft = rotationMatrix * (texCoord - eyeCenter + (topLeftOffset * 1.0 / u_textureSize)) * u_textureSize / glassesSize + 0.5;
-    vec2 rotatedTopRight = rotationMatrix * (texCoord - eyeCenter + (topRightOffset * 1.0 / u_textureSize)) * u_textureSize / glassesSize + 0.5;
-    vec2 rotatedBottomLeft = rotationMatrix * (texCoord - eyeCenter + (bottomLeftOffset * 1.0 / u_textureSize)) * u_textureSize / glassesSize + 0.5;
-    vec2 rotatedBottomRight = rotationMatrix * (texCoord - eyeCenter + (bottomRightOffset * 1.0 / u_textureSize)) * u_textureSize / glassesSize + 0.5;
-
-    // Compute interpolation weights
-    vec2 topInterp = mix(rotatedTopLeft, rotatedTopRight, texCoord.x);
-    vec2 bottomInterp = mix(rotatedBottomLeft, rotatedBottomRight, texCoord.x);
-    vec2 finalCoord = mix(topInterp, bottomInterp, texCoord.y);
-
-    // Sample texture and apply alpha blending
-    vec4 glassesColor = texture2D(glassesImage, finalCoord);
+    vec2 glassesTexCoord = (rotationMatrix * (texCoord - eyesCenterPosition) * u_textureSize / glassesSize) + 0.5;
+    vec4 glassesColor = texture2D(glassesImage, glassesTexCoord);
     if (glassesColor.a > 0.0) {
       color = mix(color, glassesColor, glassesColor.a);
     }
@@ -183,7 +137,7 @@ const baseFragmentShaderSource = `
     if (u_glassesEffect) {
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
-          applyGlassesEffect(color, v_texCoord, u_glassesImage, u_eyesCenters[i], u_eyesWidths[i], u_headRotationAngles[i], u_headPitchAngles[i], u_headYawAngles[i]);
+          applyGlassesEffect(color, v_texCoord, u_glassesImage, u_eyesCenters[i], u_eyesWidths[i], u_glassesAspectRatio, u_headRotationAngles[i]);
         }
       }
     }
@@ -202,7 +156,6 @@ const baseFragmentShaderSource = `
       for (int i = 0; i < MAX_FACES; i++) {
         if (i < u_faceCount) {
           applyMustacheEffect(color, v_texCoord, u_mustacheImage, u_nosePositions[i], u_mustacheImageOffset[i], u_eyesWidths[i], u_mustacheAspectRatio, u_headRotationAngles[i]);
-          applyMustacheEffect(color, v_texCoord, u_beardImage, u_chinPositions[i], u_beardImageOffset[i], u_chinWidths[i], u_beardAspectRatio, u_headRotationAngles[i]);
         }
       }
     }

@@ -15,14 +15,13 @@ import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import initializeBaseAttributes from "./lib/initializeBaseAttributes";
-import createBuffers from "./lib/createBuffers";
+import { createBaseBuffers, createTriangleBuffers } from "./lib/createBuffers";
 import initializeTriangleUniforms from "./lib/initializeTriangleUniforms";
 import initializeTriangleAttributes from "./lib/initializeTriangleAttributes";
+import { releaseAllTexturePositions } from "./lib/handleTexturePosition";
 
 export type FaceLandmarks =
   | "headRotationAngles"
-  | "headPitchAngles"
-  | "headYawAngles"
   | "leftEarPositions"
   | "rightEarPositions"
   | "leftEarWidths"
@@ -62,6 +61,8 @@ const handleEffectWebGL = async (
   },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
+  releaseAllTexturePositions();
+
   // Setup WebGL context
   const canvas = document.createElement("canvas");
   const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
@@ -108,7 +109,6 @@ const handleEffectWebGL = async (
   if (baseProgram instanceof Error) {
     return new Error("No base program");
   }
-  gl.useProgram(baseProgram);
 
   const triangleProgram = createProgram(
     gl,
@@ -118,17 +118,8 @@ const handleEffectWebGL = async (
   if (triangleProgram instanceof Error) {
     return new Error("No triangle program");
   }
-  gl.useProgram(triangleProgram);
 
-  // Create buffers
-  const {
-    positionBuffer: basePositionBuffer,
-    texCoordBuffer: baseTexCoordBuffer,
-  } = createBuffers(gl, baseProgram);
-  if (!basePositionBuffer || !baseTexCoordBuffer) {
-    return new Error("No basePositionBuffer or baseTexCoordBuffer");
-  }
-
+  // Create base video texture
   const baseVideoTexture = createAndSetupTexture(gl);
 
   if (!baseVideoTexture) {
@@ -236,7 +227,7 @@ const handleEffectWebGL = async (
   }
 
   // Set up the uniforms in the base fragment shader
-  const baseUniformLocations = initializeBaseUniforms(
+  const baseUniformsLocations = initializeBaseUniforms(
     gl,
     baseProgram,
     canvas,
@@ -254,47 +245,82 @@ const handleEffectWebGL = async (
     mustacheImageAspectRatio
   );
 
-  if (baseUniformLocations instanceof Error) {
-    return new Error("Error setting base uniforms: ", baseUniformLocations);
+  if (baseUniformsLocations instanceof Error) {
+    return new Error("Error setting base uniforms: ", baseUniformsLocations);
   }
 
   // Set up the uniforms in the triangle fragment shader
-  const triangleUniformLocations = initializeTriangleUniforms(
+  const triangleUniformsLocations = initializeTriangleUniforms(
     gl,
     triangleProgram,
     effects,
     triangleTexture
   );
 
-  if (triangleUniformLocations instanceof Error) {
+  if (triangleUniformsLocations instanceof Error) {
     return new Error(
       "Error setting triangle uniforms: ",
-      triangleUniformLocations
+      triangleUniformsLocations
     );
   }
 
-  const baseAttributeLocations = initializeBaseAttributes(gl, baseProgram);
+  const baseAttributesLocations = initializeBaseAttributes(gl, baseProgram);
 
-  if (baseAttributeLocations instanceof Error) {
-    return new Error("Error setting base attributes: ", baseAttributeLocations);
+  if (baseAttributesLocations instanceof Error) {
+    return new Error(
+      "Error setting base attributes: ",
+      baseAttributesLocations
+    );
   }
 
-  const triangleAttributeLocations = initializeTriangleAttributes(
+  const triangleAttributesLocations = initializeTriangleAttributes(
     gl,
     triangleProgram
   );
 
-  if (triangleAttributeLocations instanceof Error) {
+  if (triangleAttributesLocations instanceof Error) {
     return new Error(
       "Error setting triangle attributes: ",
-      triangleAttributeLocations
+      triangleAttributesLocations
     );
   }
 
+  // Create buffers
+  const baseBuffers = createBaseBuffers(
+    gl,
+    baseProgram,
+    baseAttributesLocations
+  );
+  if (
+    !baseBuffers ||
+    baseBuffers.basePositionBuffer === null ||
+    baseBuffers.baseTexCoordBuffer === null
+  ) {
+    return new Error("Failed to create base buffers");
+  }
+  const { basePositionBuffer, baseTexCoordBuffer } = baseBuffers;
+
+  const triangleBuffers = createTriangleBuffers(
+    gl,
+    triangleProgram,
+    triangleAttributesLocations
+  );
+  if (
+    !triangleBuffers ||
+    triangleBuffers.trianglePositionBuffer === null ||
+    triangleBuffers.triangleTexCoordBuffer === null ||
+    triangleBuffers.triangleIndexBuffer === null
+  ) {
+    return new Error("Failed to create triangle buffers");
+  }
+  const {
+    trianglePositionBuffer,
+    triangleTexCoordBuffer,
+    triangleIndexBuffer,
+  } = triangleBuffers;
+
   const faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean } = {
     headRotationAngles: false,
-    headPitchAngles: false,
-    headYawAngles: false,
     leftEarPositions: false,
     rightEarPositions: false,
     leftEarWidths: false,
@@ -310,8 +336,6 @@ const handleEffectWebGL = async (
 
   if (effects.ears) {
     faceLandmarks.headRotationAngles = true;
-    faceLandmarks.headPitchAngles = true;
-    faceLandmarks.headYawAngles = true;
     faceLandmarks.leftEarPositions = true;
     faceLandmarks.rightEarPositions = true;
     faceLandmarks.leftEarWidths = true;
@@ -319,22 +343,16 @@ const handleEffectWebGL = async (
   }
   if (effects.glasses) {
     faceLandmarks.headRotationAngles = true;
-    faceLandmarks.headPitchAngles = true;
-    faceLandmarks.headYawAngles = true;
     faceLandmarks.eyesCenterPositions = true;
     faceLandmarks.eyesWidths = true;
   }
   if (effects.beards) {
     faceLandmarks.headRotationAngles = true;
-    faceLandmarks.headPitchAngles = true;
-    faceLandmarks.headYawAngles = true;
     faceLandmarks.chinPositions = true;
     faceLandmarks.chinWidths = true;
   }
   if (effects.mustaches) {
     faceLandmarks.headRotationAngles = true;
-    faceLandmarks.headPitchAngles = true;
-    faceLandmarks.headYawAngles = true;
     faceLandmarks.nosePositions = true;
     faceLandmarks.eyesWidths = true;
   }
@@ -383,17 +401,20 @@ const handleEffectWebGL = async (
       canvas,
       animationFrameId,
       effects,
-      baseUniformLocations,
-      triangleUniformLocations,
-      baseAttributeLocations,
-      triangleAttributeLocations,
+      baseUniformsLocations,
+      triangleUniformsLocations,
+      baseAttributesLocations,
+      triangleAttributesLocations,
       faceLandmarks,
       currentEffectsStyles,
       faceMesh,
       faceMeshResults,
       triangleTexture,
       basePositionBuffer,
-      baseTexCoordBuffer
+      baseTexCoordBuffer,
+      trianglePositionBuffer,
+      triangleTexCoordBuffer,
+      triangleIndexBuffer
     );
   });
   video.onloadedmetadata = () => {
@@ -417,6 +438,9 @@ const handleEffectWebGL = async (
     triangleProgram,
     triangleVertexShader,
     triangleFragmentShader,
+    trianglePositionBuffer,
+    triangleTexCoordBuffer,
+    triangleIndexBuffer,
     canvas,
     type,
     id,

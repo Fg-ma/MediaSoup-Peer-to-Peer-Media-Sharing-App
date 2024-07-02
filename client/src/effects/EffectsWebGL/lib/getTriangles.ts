@@ -1,8 +1,12 @@
 import { Delaunay } from "d3-delaunay";
 import { Point2D, Point3D } from "./drawFaceMesh";
-import { uvPoints } from "./uvPoints";
 
-export const getTriangles = (livePoints: Point3D[]) => {
+interface PointUV {
+  u: number;
+  v: number;
+}
+
+export const getTriangles = (livePoints: Point3D[], uvPoints: PointUV[]) => {
   const liveDelaunay = Delaunay.from(
     livePoints,
     (p) => p.x,

@@ -1,16 +1,17 @@
 import { EffectTypes } from "src/context/StreamsContext";
 import updateBaseVideoTexture from "./updateBaseVideoTexture";
-import { BaseUniforms } from "./initializeBaseUniforms";
+import { BaseUniformsLocations } from "./initializeBaseUniforms";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateFaceLandmarks from "./updateFaceLandmarks";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import drawFaceMesh from "./drawFaceMesh";
-import { TriangleUniforms } from "./initializeTriangleUniforms";
-import { BaseAttributes } from "./initializeBaseAttributes";
-import { TriangleAttributes } from "./initializeTriangleAttributes";
+import { TriangleUniformsLocations } from "./initializeTriangleUniforms";
+import { BaseAttributesLocations } from "./initializeBaseAttributes";
+import { TriangleAttributesLocations } from "./initializeTriangleAttributes";
 import applyFaceTracker from "./applyFaceTracker";
 import landmarksSmoothWithDeadbanding from "./landmarksSmoothWithDeadbanding";
+import drawMustacheMesh from "./drawMustacheMesh";
 
 const render = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -24,16 +25,19 @@ const render = async (
     [effectType in EffectTypes]?: boolean | undefined;
   },
   baseUniformLocations: {
-    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
+    [uniform in BaseUniformsLocations]: WebGLUniformLocation | null | undefined;
   },
   triangleUniformLocations: {
-    [uniform in TriangleUniforms]: WebGLUniformLocation | null | undefined;
+    [uniform in TriangleUniformsLocations]:
+      | WebGLUniformLocation
+      | null
+      | undefined;
   },
   baseAttributeLocations: {
-    [uniform in BaseAttributes]: number | null | undefined;
+    [attribute in BaseAttributesLocations]: number | null | undefined;
   },
   triangleAttributeLocations: {
-    [uniform in TriangleAttributes]: number | null | undefined;
+    [attribute in TriangleAttributesLocations]: number | null | undefined;
   },
   faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
@@ -41,7 +45,10 @@ const render = async (
   faceMeshResults: Results[],
   triangleTexture: WebGLTexture | null | undefined,
   basePositionBuffer: WebGLBuffer,
-  baseTexCoordBuffer: WebGLBuffer
+  baseTexCoordBuffer: WebGLBuffer,
+  trianglePositionBuffer: WebGLBuffer,
+  triangleTexCoordBuffer: WebGLBuffer,
+  triangleIndexBuffer: WebGLBuffer
 ) => {
   gl.enable(gl.DEPTH_TEST);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -96,9 +103,19 @@ const render = async (
           gl,
           triangleProgram,
           smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
-          triangleUniformLocations,
           triangleAttributeLocations,
-          triangleTexture
+          trianglePositionBuffer,
+          triangleTexCoordBuffer,
+          triangleIndexBuffer
+        );
+        drawMustacheMesh(
+          gl,
+          triangleProgram,
+          smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
+          triangleAttributeLocations,
+          trianglePositionBuffer,
+          triangleTexCoordBuffer,
+          triangleIndexBuffer
         );
       });
     }
@@ -124,7 +141,10 @@ const render = async (
       faceMeshResults,
       triangleTexture,
       basePositionBuffer,
-      baseTexCoordBuffer
+      baseTexCoordBuffer,
+      trianglePositionBuffer,
+      triangleTexCoordBuffer,
+      triangleIndexBuffer
     )
   );
 };

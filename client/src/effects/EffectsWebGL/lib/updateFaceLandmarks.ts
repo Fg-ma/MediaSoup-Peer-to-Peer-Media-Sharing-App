@@ -14,8 +14,6 @@ export type OneDimensionalVariableTypes =
   | "eyesWidth"
   | "chinWidth"
   | "headRotationAngle"
-  | "headPitchAngle"
-  | "headYawAngle"
   | "interocularDistance";
 
 export const smoothedOneDimensionalVariables: {
@@ -26,8 +24,6 @@ export const smoothedOneDimensionalVariables: {
   eyesWidth: {},
   chinWidth: {},
   headRotationAngle: {},
-  headPitchAngle: {},
-  headYawAngle: {},
   interocularDistance: {},
 };
 
@@ -62,8 +58,6 @@ const updateFaceLandmarks = async (
   const faceCount = smoothedFaceIdLandmarksPairs.length;
 
   const headRotationAngles: number[] = [];
-  const headPitchAngles: number[] = [];
-  const headYawAngles: number[] = [];
   const leftEarPositions: number[][] = [];
   const rightEarPositions: number[][] = [];
   const leftEarWidths: number[] = [];
@@ -98,8 +92,6 @@ const updateFaceLandmarks = async (
 
   smoothedFaceIdLandmarksPairs.forEach((smoothedFaceIdLandmarksPair) => {
     const { faceId, landmarks } = smoothedFaceIdLandmarksPair;
-
-    const directions = calculateDirection(landmarks);
 
     const leftEye = landmarks[LEFT_EYE_INDEX];
     const rightEye = landmarks[RIGHT_EYE_INDEX];
@@ -218,14 +210,16 @@ const updateFaceLandmarks = async (
     // Set chin widths
     if (faceLandmarks.chinWidths) {
       // Calculate chin width based on jawline points
-      const chinWidthFactor = 0.55;
+      const chinWidthFactor = 0.75;
       const dxJaw = rightJawPoint.x - leftJawPoint.x;
       const dyJaw = rightJawPoint.y - leftJawPoint.y;
 
       updateOneDimensionalSmoothVariables(
         "chinWidth",
         faceId,
-        Math.sqrt(dxJaw * dxJaw + dyJaw * dyJaw) * chinWidthFactor
+        Math.sqrt(dxJaw * dxJaw + dyJaw * dyJaw) *
+          canvas.width *
+          chinWidthFactor
       );
 
       chinWidths.push(smoothedOneDimensionalVariables.chinWidth[faceId]);
@@ -234,55 +228,6 @@ const updateFaceLandmarks = async (
     // Set nose positions
     if (faceLandmarks.nosePositions) {
       nosePositions.push([nose.x, nose.y]);
-    }
-
-    // Calculate head pitch angle
-    if (faceLandmarks.headPitchAngles) {
-      // Calculate head tilt (pitch) angle
-      // Calculate the difference in x, y, and z coordinates
-      const dx = nose.x - eyesCenterPosition[0];
-      const dy = nose.y - eyesCenterPosition[1];
-      const dz = nose.z - leftEye.z;
-
-      // Calculate head tilt (pitch) angle using 3D coordinates
-      let headPitchAngle =
-        (Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)) - 0.8) * 2;
-
-      if (headPitchAngle > Math.PI / 2) {
-        headPitchAngle = Math.PI / 2;
-      } else if (headPitchAngle < -Math.PI / 2) {
-        headPitchAngle = -Math.PI / 2;
-      }
-
-      // Update smoothed variable for head angle
-      updateOneDimensionalSmoothVariables(
-        "headPitchAngle",
-        faceId,
-        -headPitchAngle
-      );
-
-      headPitchAngles.push(
-        smoothedOneDimensionalVariables.headPitchAngle[faceId]
-      );
-    }
-
-    // Calculate and set headYawAngle (for left/right head movement)
-    if (faceLandmarks.headYawAngles) {
-      // Using the difference in x-coordinates of eyes to estimate yaw angle
-      const yawAngle = Math.atan2(
-        rightEye.x - leftEye.x,
-        rightEye.y - leftEye.y
-      );
-
-      // Normalize yaw angle to range -1 to 1
-      const normalizedYawAngle = yawAngle / Math.PI;
-
-      updateOneDimensionalSmoothVariables(
-        "headYawAngle",
-        faceId,
-        (directions.turn * Math.PI) / 180 - Math.PI / 2
-      );
-      headYawAngles.push(smoothedOneDimensionalVariables.headYawAngle[faceId]);
     }
 
     if (effects.ears) {
@@ -342,8 +287,6 @@ const updateFaceLandmarks = async (
       effects,
       faceCount,
       headRotationAngles,
-      headPitchAngles,
-      headYawAngles,
       leftEarPositions,
       rightEarPositions,
       leftEarWidths,
@@ -363,63 +306,3 @@ const updateFaceLandmarks = async (
 };
 
 export default updateFaceLandmarks;
-
-function calculateDirection(keyPoints: NormalizedLandmarkList) {
-  const noseTip = { ...keyPoints[1], name: "nose tip" };
-  const leftNose = { ...keyPoints[279], name: "left nose" };
-  const rightNose = { ...keyPoints[49], name: "right nose" };
-
-  // MIDESCTION OF NOSE IS BACK OF NOSE PERPENDICULAR
-  const midpoint = {
-    x: (leftNose.x + rightNose.x) / 2,
-    y: (leftNose.y + rightNose.y) / 2,
-    z: (leftNose.z + rightNose.z) / 2,
-  };
-  const perpendicularUp = { x: midpoint.x, y: midpoint.y - 50, z: midpoint.z };
-
-  // CALC ANGLES
-  const yaw = getAngleBetweenLines(midpoint, noseTip, perpendicularUp);
-  const turn = getAngleBetweenLines(midpoint, rightNose, noseTip);
-
-  // CALC DISTANCE BETWEEN NOSE TIP AND MIDPOINT, AND LEFT AND RIGHT NOSE POINTS
-  const zDistance = getDistanceBetweenPoints(noseTip, midpoint);
-  const xDistance = getDistanceBetweenPoints(leftNose, rightNose);
-
-  return { yaw, turn, zDistance, xDistance };
-}
-
-function getDistanceBetweenPoints(
-  point1: { x: number; y: number },
-  point2: { x: number; y: number }
-) {
-  const xDistance = point1.x - point2.x;
-  const yDistance = point1.y - point2.y;
-  return Math.sqrt(xDistance * xDistance + yDistance * yDistance);
-}
-
-function getAngleBetweenLines(
-  midpoint: { x: number; y: number },
-  point1: { x: number; y: number },
-  point2: { x: number; y: number }
-) {
-  const vector1 = { x: point1.x - midpoint.x, y: point1.y - midpoint.y };
-  const vector2 = { x: point2.x - midpoint.x, y: point2.y - midpoint.y };
-
-  // Calculate the dot product of the two vectors
-  const dotProduct = vector1.x * vector2.x + vector1.y * vector2.y;
-
-  // Calculate the magnitudes of the vectors
-  const magnitude1 = Math.sqrt(vector1.x * vector1.x + vector1.y * vector1.y);
-  const magnitude2 = Math.sqrt(vector2.x * vector2.x + vector2.y * vector2.y);
-
-  // Calculate the cosine of the angle between the two vectors
-  const cosineTheta = dotProduct / (magnitude1 * magnitude2);
-
-  // Use the arccosine function to get the angle in radians
-  const angleInRadians = Math.acos(cosineTheta);
-
-  // Convert the angle to degrees
-  const angleInDegrees = (angleInRadians * 180) / Math.PI;
-
-  return angleInDegrees;
-}
