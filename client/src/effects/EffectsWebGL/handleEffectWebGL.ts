@@ -1,6 +1,9 @@
 import { EffectTypes } from "../../context/StreamsContext";
 import baseVertexShaderSource from "./lib/baseVertexShader";
-import baseFragmentShaderSource from "./lib/baseFragmentShader";
+import {
+  baseFragmentShaderSource,
+  baseFragmentShaderSource2,
+} from "./lib/baseFragmentShader";
 import triangleVertexShaderSource from "./lib/triangleVertexShader";
 import triangleFragmentShaderSource from "./lib/triangleFragmentShader";
 import initializeBaseUniforms from "./lib/initializeBaseUniforms";

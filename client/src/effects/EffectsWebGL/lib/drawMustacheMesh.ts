@@ -1,7 +1,10 @@
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
 import { getTriangles } from "./getTriangles";
 import { TriangleAttributesLocations } from "./initializeTriangleAttributes";
-import updateTrianglesBuffers from "./updateTrianglesBuffers";
+import {
+  updateTrianglesBuffers2,
+  updateTrianglesBuffers3,
+} from "./updateTrianglesBuffers2";
 import { TriangleUniformsLocations } from "./initializeTriangleUniforms";
 import mustaches from "../../../../public/3DAssests/mustaches/mustacheData.json";
 import obj from "../../../../public/3DAssests/mustaches/mustache.obj";
@@ -17,7 +20,7 @@ interface Point3D {
   z: number;
 }
 
-interface PointUV {
+export interface PointUV {
   u: number;
   v: number;
 }
@@ -147,6 +150,26 @@ function scaleVerticesUniformly(
   return vertices;
 }
 
+function transformArray(arr: number[]) {
+  // Create a new array to store the transformed values
+  let transformedArray: number[] = [];
+
+  // Loop through the original array
+  for (let i = 0; i < arr.length; i++) {
+    // Check if the current index is even or odd (0-based index)
+    if (i % 2 === 1) {
+      // Transform the value (1 - current value) and push to the new array
+      transformedArray.push(1 - arr[i]);
+    } else {
+      // If the index is even, just push the value as is
+      transformedArray.push(arr[i]);
+    }
+  }
+
+  // Return the transformed array
+  return transformedArray;
+}
+
 export const drawMustacheMesh = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   triangleProgram: WebGLProgram,
@@ -160,19 +183,10 @@ export const drawMustacheMesh = (
 ) => {
   gl.useProgram(triangleProgram);
 
-  // console.log("obj", obj);
-  // const objData = parseOBJ(obj);
-  // console.log(objData);
-  console.log(scaleVerticesUniformly(mustaches.vertices), mustaches.uv);
-
-  // Get the triangles
-  const { overlayTriangles: uvTriangles, liveTriangles: meshTriangles } =
-    getTriangles(scaleVerticesUniformly(mustaches.vertices), mustaches.uv);
-
-  const indexCount = updateTrianglesBuffers(
+  const indexCount = updateTrianglesBuffers3(
     gl,
-    uvTriangles,
-    meshTriangles,
+    mustaches.uv_faces,
+    mustaches.vertex_faces,
     triangleAttributeLocations,
     trianglePositionBuffer,
     triangleTexCoordBuffer,
@@ -186,7 +200,7 @@ export const drawMustacheMesh = (
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  // // Draw the mesh
+  // Draw the mesh
   gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
 
   gl.disable(gl.BLEND);

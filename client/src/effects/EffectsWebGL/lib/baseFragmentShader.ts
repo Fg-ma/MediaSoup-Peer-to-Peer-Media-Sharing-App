@@ -189,4 +189,91 @@ const baseFragmentShaderSource = `
   }
 `;
 
-export default baseFragmentShaderSource;
+const baseFragmentShaderSource2 = `
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+
+  #define MAX_FACES 8
+
+  varying vec2 v_texCoord;
+  uniform sampler2D u_image;
+
+  // Universal face data
+  uniform int u_faceCount;
+  uniform vec2 u_headRotationAngles[MAX_FACES];
+
+  // Effects
+  struct EffectData {
+    bool enabled;
+    sampler2D image;
+    vec2 position[MAX_FACES];
+    vec2 imageOffset[MAX_FACES];
+    float aspectRatio[MAX_FACES];
+    float width[MAX_FACES];
+  };
+
+  uniform EffectData u_effects[4]; // Maximum number of effects
+
+  // Blur
+  uniform float u_blurRadius;
+  uniform vec2 u_textureSize;
+
+  // Tint
+  uniform vec3 u_tintColor;
+
+  mat2 getRotationMatrix(float angle) {
+    float cosA = cos(angle);
+    float sinA = sin(angle);
+    return mat2(cosA, -sinA, sinA, cosA);
+  }
+
+  void applyEffect(inout vec4 color, vec2 texCoord, EffectData effect, float headRotationAngle) {
+    if (effect.enabled) {
+      for (int i = 0; i < MAX_FACES; i++) {
+        if (i < u_faceCount) {
+          mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
+          vec2 imageTexCoord = (rotationMatrix * (texCoord - effect.position[i] + effect.imageOffset[i]) * u_textureSize / vec2(effect.width[i], effect.width[i] / effect.aspectRatio[i])) + 0.5;
+          vec4 effectColor = texture2D(effect.image, imageTexCoord);
+          if (effectColor.a > 0.0) {
+            color = mix(color, effectColor, effectColor.a);
+          }
+        }
+      }
+    }
+  }
+
+  void main() {
+    vec4 color = texture2D(u_image, v_texCoord);
+    float total = 0.0;
+
+    // Apply effects
+    for (int j = 0; j < 4; j++) {
+      applyEffect(color, v_texCoord, u_effects[j], u_headRotationAngles[0].x); // Use the first face's rotation angle
+    }
+
+    const int MAX_RADIUS = 32;
+
+    // Apply blur effect
+    for (int x = -MAX_RADIUS; x <= MAX_RADIUS; x++) {
+      for (int y = -MAX_RADIUS; y <= MAX_RADIUS; y++) {
+        if (abs(float(x)) <= u_blurRadius && abs(float(y)) <= u_blurRadius) {
+          vec2 offset = vec2(float(x), float(y)) / u_textureSize;
+          color += texture2D(u_image, v_texCoord + offset);
+          total += 1.0;
+        }
+      }
+    }
+    color /= total;
+
+    // Apply tint effect
+    float luminance = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
+    vec3 tintedColor = mix(color.rgb, u_tintColor, 0.75);
+    vec3 finalColor = mix(color.rgb, tintedColor, luminance);
+    color = vec4(finalColor, color.a);
+
+    gl_FragColor = color;
+  }
+`;
+
+export { baseFragmentShaderSource, baseFragmentShaderSource2 };

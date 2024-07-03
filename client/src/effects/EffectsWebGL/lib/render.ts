@@ -108,7 +108,6 @@ const render = async (
         //   triangleTexCoordBuffer,
         //   triangleIndexBuffer
         // );
-        // console.log(smoothedFaceIdLandmarksPair.landmarks.slice(0, -10));
         drawMustacheMesh(
           gl,
           triangleProgram,
