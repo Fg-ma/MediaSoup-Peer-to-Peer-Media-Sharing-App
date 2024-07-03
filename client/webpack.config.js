@@ -68,9 +68,22 @@ module.exports = {
         ],
       },
       {
+        test: /\.obj$/,
+        use: [
+          {
+            loader: "raw-loader",
+          },
+        ],
+        type: "javascript/auto",
+      },
+      {
         test: /\.json$/,
         type: "javascript/auto",
-        use: "json-loader",
+        use: [
+          {
+            loader: "json-loader",
+          },
+        ],
       },
     ],
   },

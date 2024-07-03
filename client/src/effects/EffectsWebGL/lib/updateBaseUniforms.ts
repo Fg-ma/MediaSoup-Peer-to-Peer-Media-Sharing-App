@@ -1,6 +1,6 @@
 import flattenArray from "./flattenArray";
 import { FaceLandmarks } from "../handleEffectWebGL";
-import { BaseUniforms } from "./initializeBaseUniforms";
+import { BaseUniformsLocations } from "./initializeBaseUniforms";
 import { EffectTypes } from "src/context/StreamsContext";
 
 const maxFaces = 8;
@@ -9,7 +9,7 @@ const updateBaseUniforms = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseProgram: WebGLProgram,
   baseUniformLocations: {
-    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
+    [uniform in BaseUniformsLocations]: WebGLUniformLocation | null | undefined;
   },
   faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
   effects: {

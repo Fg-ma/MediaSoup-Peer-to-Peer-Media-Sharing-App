@@ -1,4 +1,4 @@
-import { BaseUniforms } from "./initializeBaseUniforms";
+import { BaseUniformsLocations } from "./initializeBaseUniforms";
 import { EffectTypes } from "src/context/StreamsContext";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
@@ -47,7 +47,7 @@ const updateFaceLandmarks = async (
   baseProgram: WebGLProgram,
   canvas: HTMLCanvasElement,
   baseUniformLocations: {
-    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
+    [uniform in BaseUniformsLocations]: WebGLUniformLocation | null | undefined;
   },
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;

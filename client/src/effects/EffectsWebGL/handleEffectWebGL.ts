@@ -218,7 +218,11 @@ const handleEffectWebGL = async (
   // Load triangle image as textures
   let triangleTexture: WebGLTexture | null | undefined;
   if (effects.faceMask) {
-    const loadedTriangleTexture = await loadTexture(gl, `/2DAssets/james2.png`);
+    const loadedTriangleTexture = await loadTexture(
+      gl,
+      `/2DAssets/mustacheTexture.png`
+      // `/2DAssets/james2.png`
+    );
     triangleTexture = loadedTriangleTexture.texture;
 
     if (!triangleTexture) {

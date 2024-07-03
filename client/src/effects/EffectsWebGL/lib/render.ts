@@ -99,15 +99,16 @@ const render = async (
 
     if (effects.faceMask && triangleTexture) {
       smoothedFaceIdLandmarksPairs.forEach((smoothedFaceIdLandmarksPair) => {
-        drawFaceMesh(
-          gl,
-          triangleProgram,
-          smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
-          triangleAttributeLocations,
-          trianglePositionBuffer,
-          triangleTexCoordBuffer,
-          triangleIndexBuffer
-        );
+        // drawFaceMesh(
+        //   gl,
+        //   triangleProgram,
+        //   smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
+        //   triangleAttributeLocations,
+        //   trianglePositionBuffer,
+        //   triangleTexCoordBuffer,
+        //   triangleIndexBuffer
+        // );
+        // console.log(smoothedFaceIdLandmarksPair.landmarks.slice(0, -10));
         drawMustacheMesh(
           gl,
           triangleProgram,
