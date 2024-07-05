@@ -195,82 +195,150 @@ const baseFragmentShaderSource2 = `
   #endif
 
   #define MAX_FACES 8
+  #define MAX_EFFECTS 5
+  #define MAX_POSITIONS 5
+  #define MAX_WIDTHS 4
 
+  // Effect indices
+  #define LEFT_EAR 0
+  #define RIGHT_EAR 1
+  #define GLASSES 2
+  #define BEARDS 3
+  #define MUSTACHES 4
+  #define BLUR 5
+  #define TINT 6
+
+  // Position indices
+  #define LEFT_EYE_POS 0
+  #define RIGHT_EYE_POS 1
+  #define EYES_CENTER_POS 2
+  #define CHIN_POS 3
+  #define NOSE_POS 4
+
+  // Width indices
+  #define LEFT_EAR_WIDTH 0
+  #define RIGHT_EAR_WIDTH 1
+  #define EYES_WIDTH 2
+  #define CHIN_WIDTH 3
+
+  // Universal data
   varying vec2 v_texCoord;
-  uniform sampler2D u_image;
-
-  // Universal face data
-  uniform int u_faceCount;
-  uniform vec2 u_headRotationAngles[MAX_FACES];
-
-  // Effects
-  struct EffectData {
-    bool enabled;
-    sampler2D image;
-    vec2 position[MAX_FACES];
-    vec2 imageOffset[MAX_FACES];
-    float aspectRatio[MAX_FACES];
-    float width[MAX_FACES];
-  };
-
-  uniform EffectData u_effects[4]; // Maximum number of effects
-
-  // Blur
-  uniform float u_blurRadius;
+  uniform sampler2D u_liveVideoImage;
   uniform vec2 u_textureSize;
+  uniform int u_faceCount;
+  uniform float u_headRotationAngles[MAX_FACES]; 
+
+  // Effect flags packed into an integer
+  uniform int u_effectFlags;
 
   // Tint
   uniform vec3 u_tintColor;
 
+  // Effect images and their aspect ratios packed into arrays
+  uniform sampler2D u_effectImages[MAX_EFFECTS];
+  uniform float u_effectAspectRatios[MAX_EFFECTS];
+
+  // Effect offsets, positions, and widths
+  uniform vec2 u_imageOffsets[MAX_FACES * MAX_EFFECTS];
+  uniform sampler2D u_positionsTexture;
+  uniform float u_widths[MAX_FACES * MAX_WIDTHS];
+
+  // Function to get the rotation matrix
   mat2 getRotationMatrix(float angle) {
     float cosA = cos(angle);
     float sinA = sin(angle);
     return mat2(cosA, -sinA, sinA, cosA);
   }
 
-  void applyEffect(inout vec4 color, vec2 texCoord, EffectData effect, float headRotationAngle) {
-    if (effect.enabled) {
-      for (int i = 0; i < MAX_FACES; i++) {
-        if (i < u_faceCount) {
-          mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
-          vec2 imageTexCoord = (rotationMatrix * (texCoord - effect.position[i] + effect.imageOffset[i]) * u_textureSize / vec2(effect.width[i], effect.width[i] / effect.aspectRatio[i])) + 0.5;
-          vec4 effectColor = texture2D(effect.image, imageTexCoord);
-          if (effectColor.a > 0.0) {
-            color = mix(color, effectColor, effectColor.a);
-          }
-        }
-      }
+  // Function to apply an effect
+  void applyEffect(inout vec4 color, vec2 texCoord, sampler2D effectImage, vec2 position, vec2 imageOffset, float width, float aspectRatio, float headRotationAngle) {
+    float height = width / aspectRatio;
+    vec2 size = vec2(width, height);
+  
+    mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
+
+    vec2 effectTexCoord = (rotationMatrix * (texCoord - position - imageOffset) * u_textureSize / size) + 0.5;
+    vec4 effectColor = texture2D(effectImage, effectTexCoord);
+    if (effectColor.a > 0.0) {
+      color = mix(color, effectColor, effectColor.a);
     }
   }
 
+  vec2 getPosition(int positionIndex, int faceIndex) {
+    vec2 texCoord = vec2(float(faceIndex) / float(MAX_FACES), float(positionIndex) / float(MAX_POSITIONS));
+    return texture2D(u_positionsTexture, texCoord).xy;
+  }
+
   void main() {
-    vec4 color = texture2D(u_image, v_texCoord);
+    vec4 color = texture2D(u_liveVideoImage, v_texCoord);
     float total = 0.0;
 
-    // Apply effects
-    for (int j = 0; j < 4; j++) {
-      applyEffect(color, v_texCoord, u_effects[j], u_headRotationAngles[0].x); // Use the first face's rotation angle
+    if (u_faceCount > 0) {
+      // Ears
+      if (mod(float(u_effectFlags / int(pow(2.0, float(LEFT_EAR)))), 2.0) >= 1.0) {
+        applyEffect(color, v_texCoord, u_effectImages[0], getPosition(LEFT_EYE_POS, 0), u_imageOffsets[0], u_widths[0], u_effectAspectRatios[LEFT_EAR], u_headRotationAngles[0]);
+        applyEffect(color, v_texCoord, u_effectImages[1], getPosition(RIGHT_EYE_POS, 0), u_imageOffsets[8], u_widths[8], u_effectAspectRatios[RIGHT_EAR], u_headRotationAngles[0]);
+      }
+
+      // Glasses
+      if (mod(float(u_effectFlags / int(pow(2.0, float(GLASSES)))), 2.0) >= 1.0) {
+        applyEffect(color, v_texCoord, u_effectImages[2], getPosition(EYES_CENTER_POS, 0), vec2(0.0), u_widths[16], u_effectAspectRatios[GLASSES], u_headRotationAngles[0]);
+      }
+
+      // Beards
+      if (mod(float(u_effectFlags / int(pow(2.0, float(BEARDS)))), 2.0) >= 1.0) {
+        applyEffect(color, v_texCoord, u_effectImages[3], getPosition(CHIN_POS, 0), u_imageOffsets[24], u_widths[24], u_effectAspectRatios[BEARDS], u_headRotationAngles[0]);
+      }
+
+      // Mustaches
+      if (mod(float(u_effectFlags / int(pow(2.0, float(MUSTACHES)))), 2.0) >= 1.0) {
+        applyEffect(color, v_texCoord, u_effectImages[4], getPosition(NOSE_POS, 0), u_imageOffsets[32], u_widths[16], u_effectAspectRatios[MUSTACHES], u_headRotationAngles[0]);
+      }
     }
 
-    const int MAX_RADIUS = 32;
+    if (u_faceCount > 1) {  
+      // Ears
+      if (mod(float(u_effectFlags / int(pow(2.0, float(LEFT_EAR)))), 2.0) >= 1.0) {
+        applyEffect(color, v_texCoord, u_effectImages[0], getPosition(LEFT_EYE_POS, 1), u_imageOffsets[1], u_widths[1], u_effectAspectRatios[LEFT_EAR], u_headRotationAngles[1]);
+        applyEffect(color, v_texCoord, u_effectImages[1], getPosition(RIGHT_EYE_POS, 1), u_imageOffsets[9], u_widths[9], u_effectAspectRatios[RIGHT_EAR], u_headRotationAngles[1]);
+      }
+  
+      // Glasses
+      if (mod(float(u_effectFlags / int(pow(2.0, float(GLASSES)))), 2.0) >= 1.0) {
+        applyEffect(color, v_texCoord, u_effectImages[2], getPosition(EYES_CENTER_POS, 1), vec2(0.0), u_widths[17], u_effectAspectRatios[GLASSES], u_headRotationAngles[1]);
+      }
+  
+      // Beards
+      if (mod(float(u_effectFlags / int(pow(2.0, float(BEARDS)))), 2.0) >= 1.0) {
+        applyEffect(color, v_texCoord, u_effectImages[3], getPosition(CHIN_POS, 1), u_imageOffsets[25], u_widths[25], u_effectAspectRatios[BEARDS], u_headRotationAngles[1]);
+      }
+  
+      // Mustaches
+      if (mod(float(u_effectFlags / int(pow(2.0, float(MUSTACHES)))), 2.0) >= 1.0) {
+        applyEffect(color, v_texCoord, u_effectImages[4], getPosition(NOSE_POS, 1), u_imageOffsets[33], u_widths[17], u_effectAspectRatios[MUSTACHES], u_headRotationAngles[1]);
+      }
+    }
 
     // Apply blur effect
-    for (int x = -MAX_RADIUS; x <= MAX_RADIUS; x++) {
-      for (int y = -MAX_RADIUS; y <= MAX_RADIUS; y++) {
-        if (abs(float(x)) <= u_blurRadius && abs(float(y)) <= u_blurRadius) {
+    if (mod(float(u_effectFlags / int(pow(2.0, float(BLUR)))), 2.0) >= 1.0) {
+      for (int x = -8; x <= 8; x++) {
+        for (int y = -8; y <= 8; y++) {
           vec2 offset = vec2(float(x), float(y)) / u_textureSize;
-          color += texture2D(u_image, v_texCoord + offset);
+          color += texture2D(u_liveVideoImage, v_texCoord + offset);
           total += 1.0;
         }
       }
+      color /= total;
     }
-    color /= total;
 
     // Apply tint effect
-    float luminance = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
-    vec3 tintedColor = mix(color.rgb, u_tintColor, 0.75);
-    vec3 finalColor = mix(color.rgb, tintedColor, luminance);
-    color = vec4(finalColor, color.a);
+    if (mod(float(u_effectFlags / int(pow(2.0, float(TINT)))), 2.0) >= 1.0) {
+      vec4 texColor = color;
+      float luminance = dot(texColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+      vec3 tintedColor = mix(texColor.rgb, u_tintColor, 0.75);
+      vec3 finalColor = mix(texColor.rgb, tintedColor, luminance);
+      color = vec4(finalColor, texColor.a);
+    }
 
     gl_FragColor = color;
   }

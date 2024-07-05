@@ -6,7 +6,10 @@ import {
 } from "./lib/baseFragmentShader";
 import triangleVertexShaderSource from "./lib/triangleVertexShader";
 import triangleFragmentShaderSource from "./lib/triangleFragmentShader";
-import initializeBaseUniforms from "./lib/initializeBaseUniforms";
+import {
+  initializeBaseUniforms,
+  initializeBaseUniforms2,
+} from "./lib/initializeBaseUniforms";
 import createShader from "./lib/createShader";
 import createAndSetupTexture from "./lib/createAndSetupTexture";
 import render from "./lib/render";
@@ -22,11 +25,10 @@ import { createBaseBuffers, createTriangleBuffers } from "./lib/createBuffers";
 import initializeTriangleUniforms from "./lib/initializeTriangleUniforms";
 import initializeTriangleAttributes from "./lib/initializeTriangleAttributes";
 import { releaseAllTexturePositions } from "./lib/handleTexturePosition";
+import { updateLastPositionTexturePosition } from "./lib/updateBaseUniforms";
 
 export type FaceLandmarks =
   | "headRotationAngles"
-  | "leftEarPositions"
-  | "rightEarPositions"
   | "leftEarWidths"
   | "rightEarWidths"
   | "leftEyePositions"
@@ -65,6 +67,7 @@ const handleEffectWebGL = async (
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
   releaseAllTexturePositions();
+  updateLastPositionTexturePosition(undefined);
 
   // Setup WebGL context
   const canvas = document.createElement("canvas");
@@ -85,7 +88,7 @@ const handleEffectWebGL = async (
   const baseFragmentShader = createShader(
     gl,
     gl.FRAGMENT_SHADER,
-    baseFragmentShaderSource
+    baseFragmentShaderSource2
   );
   if (baseFragmentShader instanceof Error) {
     return new Error("No base fragment shader: ", baseFragmentShader);
@@ -234,7 +237,7 @@ const handleEffectWebGL = async (
   }
 
   // Set up the uniforms in the base fragment shader
-  const baseUniformsLocations = initializeBaseUniforms(
+  const baseUniformsLocations = initializeBaseUniforms2(
     gl,
     baseProgram,
     canvas,
@@ -328,8 +331,6 @@ const handleEffectWebGL = async (
 
   const faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean } = {
     headRotationAngles: false,
-    leftEarPositions: false,
-    rightEarPositions: false,
     leftEarWidths: false,
     rightEarWidths: false,
     leftEyePositions: false,
@@ -343,8 +344,8 @@ const handleEffectWebGL = async (
 
   if (effects.ears) {
     faceLandmarks.headRotationAngles = true;
-    faceLandmarks.leftEarPositions = true;
-    faceLandmarks.rightEarPositions = true;
+    faceLandmarks.leftEyePositions = true;
+    faceLandmarks.rightEyePositions = true;
     faceLandmarks.leftEarWidths = true;
     faceLandmarks.rightEarWidths = true;
   }

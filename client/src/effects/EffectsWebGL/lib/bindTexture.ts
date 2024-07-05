@@ -16,4 +16,22 @@ const bindTexture = (
   gl.uniform1i(uLocation, texturePosition);
 };
 
-export default bindTexture;
+const bindTexture2 = (
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  texture: WebGLTexture | null | undefined
+) => {
+  if (texture) {
+    const position = getNextTexturePosition();
+    if (position instanceof Error) {
+      return position;
+    }
+    gl.activeTexture(gl.TEXTURE0 + position);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    return position;
+  } else {
+    // Return -1 for unused textures
+    return 16;
+  }
+};
+
+export { bindTexture, bindTexture2 };

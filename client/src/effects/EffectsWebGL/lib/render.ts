@@ -1,6 +1,9 @@
 import { EffectTypes } from "src/context/StreamsContext";
 import updateBaseVideoTexture from "./updateBaseVideoTexture";
-import { BaseUniformsLocations } from "./initializeBaseUniforms";
+import {
+  BaseUniformsLocations,
+  BaseUniformsLocations2,
+} from "./initializeBaseUniforms";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateFaceLandmarks from "./updateFaceLandmarks";
@@ -25,7 +28,7 @@ const render = async (
     [effectType in EffectTypes]?: boolean | undefined;
   },
   baseUniformLocations: {
-    [uniform in BaseUniformsLocations]: WebGLUniformLocation | null | undefined;
+    [uniform in BaseUniformsLocations2]: WebGLUniformLocation;
   },
   triangleUniformLocations: {
     [uniform in TriangleUniformsLocations]:
@@ -111,7 +114,6 @@ const render = async (
         drawMustacheMesh(
           gl,
           triangleProgram,
-          smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
           triangleAttributeLocations,
           trianglePositionBuffer,
           triangleTexCoordBuffer,

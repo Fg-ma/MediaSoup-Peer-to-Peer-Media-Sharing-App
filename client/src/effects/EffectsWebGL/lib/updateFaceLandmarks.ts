@@ -1,10 +1,13 @@
-import { BaseUniformsLocations } from "./initializeBaseUniforms";
+import {
+  BaseUniformsLocations,
+  BaseUniformsLocations2,
+} from "./initializeBaseUniforms";
 import { EffectTypes } from "src/context/StreamsContext";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import directionalShift from "./directionalShift";
 import updateOneDimensionalSmoothVariables from "./updateOneDimensionalSmoothVariables";
-import updateBaseUniforms from "./updateBaseUniforms";
+import { updateBaseUniforms, updateBaseUniforms2 } from "./updateBaseUniforms";
 import toggleFaceTrackedEffects from "./toggleFaceTrackedEffects";
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
 
@@ -47,7 +50,7 @@ const updateFaceLandmarks = async (
   baseProgram: WebGLProgram,
   canvas: HTMLCanvasElement,
   baseUniformLocations: {
-    [uniform in BaseUniformsLocations]: WebGLUniformLocation | null | undefined;
+    [uniform in BaseUniformsLocations2]: WebGLUniformLocation;
   },
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
@@ -58,20 +61,18 @@ const updateFaceLandmarks = async (
   const faceCount = smoothedFaceIdLandmarksPairs.length;
 
   const headRotationAngles: number[] = [];
-  const leftEarPositions: number[][] = [];
-  const rightEarPositions: number[][] = [];
   const leftEarWidths: number[] = [];
   const rightEarWidths: number[] = [];
-  const leftEyePositions: number[][] = [];
-  const rightEyePositions: number[][] = [];
-  const eyesCenterPositions: number[][] = [];
+  const leftEyePositions: [number, number][] = [];
+  const rightEyePositions: [number, number][] = [];
+  const eyesCenterPositions: [number, number][] = [];
   const eyesWidths: number[] = [];
-  const chinPositions: number[][] = [];
-  const nosePositions: number[][] = [];
+  const chinPositions: [number, number][] = [];
+  const nosePositions: [number, number][] = [];
   const chinWidths: number[] = [];
-  const earsImageOffset: number[][] = [];
-  const beardImageOffset: number[][] = [];
-  const mustacheImageOffset: number[][] = [];
+  const earsImageOffset: [number, number][] = [];
+  const beardImageOffset: [number, number][] = [];
+  const mustacheImageOffset: [number, number][] = [];
 
   // Handle case of no dections
   if (detectionTimedout && faceCount !== 0) {
@@ -102,7 +103,7 @@ const updateFaceLandmarks = async (
 
     let updatedSmoothInterocularDistance = false;
 
-    const eyesCenterPosition = [
+    const eyesCenterPosition: [number, number] = [
       (leftEye.x + rightEye.x) / 2,
       (leftEye.y + rightEye.y) / 2,
     ];
@@ -128,12 +129,6 @@ const updateFaceLandmarks = async (
     if (faceLandmarks.leftEyePositions || faceLandmarks.leftEyePositions) {
       leftEyePositions.push([leftEye.x, leftEye.y]);
       rightEyePositions.push([rightEye.x, rightEye.y]);
-    }
-
-    // Set leftEarPositions and rightEarPositions
-    if (faceLandmarks.leftEarPositions || faceLandmarks.rightEarPositions) {
-      leftEarPositions.push([leftEye.x, leftEye.y]);
-      rightEarPositions.push([rightEye.x, rightEye.y]);
     }
 
     // Set left and right ear widths
@@ -251,7 +246,7 @@ const updateFaceLandmarks = async (
         smoothedOneDimensionalVariables.headRotationAngle[faceId]
       );
 
-      earsImageOffset.push([shiftX, shiftY]);
+      earsImageOffset.push([shiftX * -1, shiftY * -1]);
     }
 
     if (effects.beards) {
@@ -279,7 +274,7 @@ const updateFaceLandmarks = async (
 
   // Update uniforms
   if (faceCount > 0) {
-    updateBaseUniforms(
+    updateBaseUniforms2(
       gl,
       baseProgram,
       baseUniformLocations,
@@ -287,8 +282,6 @@ const updateFaceLandmarks = async (
       effects,
       faceCount,
       headRotationAngles,
-      leftEarPositions,
-      rightEarPositions,
       leftEarWidths,
       rightEarWidths,
       leftEyePositions,

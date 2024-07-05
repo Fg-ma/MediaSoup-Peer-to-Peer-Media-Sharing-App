@@ -11,6 +11,7 @@ const createShader = (
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     const infoLog = gl.getShaderInfoLog(shader);
+    console.error("An error occurred compiling the shaders:", infoLog);
     gl.deleteShader(shader);
     return new Error("Shader compile failed with: " + infoLog);
   }

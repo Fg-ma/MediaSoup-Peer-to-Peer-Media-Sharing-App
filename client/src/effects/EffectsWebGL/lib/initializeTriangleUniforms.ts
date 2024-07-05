@@ -1,5 +1,5 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import bindTexture from "./bindTexture";
+import { bindTexture } from "./bindTexture";
 
 export type TriangleUniformsLocations = "uTriangleTextureLocation";
 

@@ -1,5 +1,6 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import bindTexture from "./bindTexture";
+import { bindTexture, bindTexture2 } from "./bindTexture";
+import { getNextTexturePosition } from "./handleTexturePosition";
 
 export type BaseUniformsLocations =
   | "uImageLocation"
@@ -382,4 +383,198 @@ const initializeBaseUniforms = (
   return baseUniformLocations;
 };
 
-export default initializeBaseUniforms;
+const initializeBaseUniforms2 = (
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  baseProgram: WebGLProgram,
+  canvas: HTMLCanvasElement,
+  effects: {
+    [effectType in EffectTypes]?: boolean | undefined;
+  },
+  tintColor: React.MutableRefObject<string>,
+  leftEarImageTexture: WebGLTexture | null | undefined,
+  leftEarImageAspectRatio: number | undefined,
+  rightEarImageTexture: WebGLTexture | null | undefined,
+  rightEarImageAspectRatio: number | undefined,
+  glassesImageTexture: WebGLTexture | null | undefined,
+  glassesImageAspectRatio: number | undefined,
+  beardImageTexture: WebGLTexture | null | undefined,
+  beardImageAspectRatio: number | undefined,
+  mustacheImageTexture: WebGLTexture | null | undefined,
+  mustacheImageAspectRatio: number | undefined
+) => {
+  gl.useProgram(baseProgram);
+
+  const uLiveVideoImageLocation = gl.getUniformLocation(
+    baseProgram,
+    "u_liveVideoImage"
+  );
+  const uTextureSizeLocation = gl.getUniformLocation(
+    baseProgram,
+    "u_textureSize"
+  );
+  const uFaceCountLocation = gl.getUniformLocation(baseProgram, "u_faceCount");
+  const uHeadRotationAnglesLocation = gl.getUniformLocation(
+    baseProgram,
+    "u_headRotationAngles"
+  );
+  const uEffectFlagsLocation = gl.getUniformLocation(
+    baseProgram,
+    "u_effectFlags"
+  );
+  const uTintColorLocation = gl.getUniformLocation(baseProgram, "u_tintColor");
+  const uEffectImagesLocation = gl.getUniformLocation(
+    baseProgram,
+    "u_effectImages"
+  );
+  const uEffectAspectRatiosLocation = gl.getUniformLocation(
+    baseProgram,
+    "u_effectAspectRatios"
+  );
+  const uImageOffsetsLocation = gl.getUniformLocation(
+    baseProgram,
+    "u_imageOffsets"
+  );
+  const uPositionsTextureLocation = gl.getUniformLocation(
+    baseProgram,
+    "u_positionsTexture"
+  );
+  const uWidthsLocation = gl.getUniformLocation(baseProgram, "u_widths");
+
+  if (!uLiveVideoImageLocation) {
+    return new Error("No uLiveVideoImageLocation");
+  }
+  if (!uTextureSizeLocation) {
+    return new Error("No uTextureSizeLocation");
+  }
+  if (!uFaceCountLocation) {
+    return new Error("No uFaceCountLocation");
+  }
+  if (!uHeadRotationAnglesLocation) {
+    return new Error("No uHeadRotationAnglesLocation");
+  }
+  if (!uTintColorLocation) {
+    return new Error("No uTintColorLocation");
+  }
+  if (!uEffectFlagsLocation) {
+    return new Error("No uEffectFlagsLocation");
+  }
+  if (!uEffectImagesLocation) {
+    return new Error("No uEffectImagesLocation");
+  }
+  if (!uEffectAspectRatiosLocation) {
+    return new Error("No uEffectAspectRatiosLocation");
+  }
+  if (!uImageOffsetsLocation) {
+    return new Error("No uImageOffsetsLocation");
+  }
+  if (!uPositionsTextureLocation) {
+    return new Error("No uPositionsTextureLocation");
+  }
+  if (!uWidthsLocation) {
+    return new Error("No uWidthsLocation");
+  }
+
+  gl.uniform2f(uTextureSizeLocation, canvas.width, canvas.height);
+
+  // blur tint
+  if (effects.tint) {
+    const tintColorVector = hexToRgb(tintColor.current);
+    gl.uniform3fv(uTintColorLocation, tintColorVector);
+  }
+
+  let leftEarTexturePosition = bindTexture2(gl, leftEarImageTexture);
+  if (leftEarTexturePosition instanceof Error) {
+    return leftEarTexturePosition;
+  }
+
+  let rightEarTexturePosition = bindTexture2(gl, rightEarImageTexture);
+  if (rightEarTexturePosition instanceof Error) {
+    return rightEarTexturePosition;
+  }
+
+  let glassesTexturePosition = bindTexture2(gl, glassesImageTexture);
+  if (glassesTexturePosition instanceof Error) {
+    return glassesTexturePosition;
+  }
+
+  let beardTexturePosition = bindTexture2(gl, beardImageTexture);
+  if (beardTexturePosition instanceof Error) {
+    return beardTexturePosition;
+  }
+
+  let mustacheTexturePosition = bindTexture2(gl, mustacheImageTexture);
+  if (mustacheTexturePosition instanceof Error) {
+    return mustacheTexturePosition;
+  }
+
+  gl.uniform1iv(uEffectImagesLocation, [
+    leftEarTexturePosition,
+    rightEarTexturePosition,
+    glassesTexturePosition,
+    beardTexturePosition,
+    mustacheTexturePosition,
+  ]);
+
+  gl.uniform1fv(uEffectAspectRatiosLocation, [
+    leftEarImageAspectRatio ?? 0,
+    rightEarImageAspectRatio ?? 0,
+    glassesImageAspectRatio ?? 0,
+    beardImageAspectRatio ?? 0,
+    mustacheImageAspectRatio ?? 0,
+  ]);
+
+  let effectFlags = 0;
+
+  // Set the corresponding bits based on the active effects
+  if (effects.ears) effectFlags |= 1 << LEFT_EAR_EFFECT;
+  if (effects.ears) effectFlags |= 1 << RIGHT_EAR_EFFECT;
+  if (effects.glasses) effectFlags |= 1 << GLASSES_EFFECT;
+  if (effects.beards) effectFlags |= 1 << BEARD_EFFECT;
+  if (effects.mustaches) effectFlags |= 1 << MUSTACHE_EFFECT;
+  if (effects.blur) effectFlags |= 1 << BLUR_EFFECT;
+  if (effects.tint) effectFlags |= 1 << TINT_EFFECT;
+
+  // Set the uniform value
+  gl.uniform1i(uEffectFlagsLocation, effectFlags);
+
+  const baseUniformLocations: {
+    [uniform in BaseUniformsLocations2]: WebGLUniformLocation;
+  } = {
+    uLiveVideoImageLocation: uLiveVideoImageLocation,
+    uTextureSizeLocation: uTextureSizeLocation,
+    uFaceCountLocation: uFaceCountLocation,
+    uHeadRotationAnglesLocation: uHeadRotationAnglesLocation,
+    uEffectFlagsLocation: uEffectFlagsLocation,
+    uTintColorLocation: uTintColorLocation,
+    uEffectImagesLocation: uEffectImagesLocation,
+    uEffectAspectRatiosLocation: uEffectAspectRatiosLocation,
+    uImageOffsetsLocation: uImageOffsetsLocation,
+    uPositionsTextureLocation: uPositionsTextureLocation,
+    uWidthsLocation: uWidthsLocation,
+  };
+
+  return baseUniformLocations;
+};
+
+export { initializeBaseUniforms, initializeBaseUniforms2 };
+
+const LEFT_EAR_EFFECT = 0;
+const RIGHT_EAR_EFFECT = 1;
+const GLASSES_EFFECT = 2;
+const BEARD_EFFECT = 3;
+const MUSTACHE_EFFECT = 4;
+const BLUR_EFFECT = 5;
+const TINT_EFFECT = 6;
+
+export type BaseUniformsLocations2 =
+  | "uLiveVideoImageLocation"
+  | "uFaceCountLocation"
+  | "uTextureSizeLocation"
+  | "uHeadRotationAnglesLocation"
+  | "uEffectFlagsLocation"
+  | "uTintColorLocation"
+  | "uEffectImagesLocation"
+  | "uEffectAspectRatiosLocation"
+  | "uImageOffsetsLocation"
+  | "uPositionsTextureLocation"
+  | "uWidthsLocation";
