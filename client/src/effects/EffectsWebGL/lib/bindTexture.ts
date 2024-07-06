@@ -41,7 +41,7 @@ const bindTexture2 = (
     return position;
   } else {
     // Return 17 for unused textures
-    return 9;
+    return 17;
   }
 };
 

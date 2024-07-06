@@ -241,6 +241,10 @@ const baseFragmentShaderSource2 = `
   uniform sampler2D u_positionsOffsetsTexture;
   uniform sampler2D u_widthsHeadRotationAnglesTexture;
 
+  vec2 getDataTexCoord(int dataIndex1, int maxDataIndexSize1, int dataIndex2, int maxDataIndexSize2) {
+    return vec2(float(dataIndex2) / float(maxDataIndexSize2), float(dataIndex1) / float(maxDataIndexSize1));
+  }
+
   // Function to get the rotation matrix
   mat2 getRotationMatrix(float angle) {
     float cosA = cos(angle);
@@ -264,9 +268,9 @@ const baseFragmentShaderSource2 = `
     }
   }
 
-  vec2 getDataTexCoord(int dataIndex1, int maxDataIndexSize1, int dataIndex2, int maxDataIndexSize2) {
-    return vec2(float(dataIndex2) / float(maxDataIndexSize2), float(dataIndex1) / float(maxDataIndexSize1));
-  }
+  vec2 atlasSize = vec2(1024.0, 1024.0);
+  vec2 textureOffset = vec2(512.0, 0.0);
+  vec2 textureSize = vec2(512.0, 512.0);
 
   void main() {
     vec4 color = texture2D(u_liveVideoImage, v_texCoord);

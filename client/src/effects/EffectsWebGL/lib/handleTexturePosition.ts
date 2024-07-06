@@ -1,4 +1,4 @@
-const maxTexturePosition = 8;
+const maxTexturePosition = 16;
 
 let texturePositionsInUse: number[] = [0];
 
