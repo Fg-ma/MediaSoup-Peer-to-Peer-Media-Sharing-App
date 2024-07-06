@@ -6,14 +6,22 @@ import {
 } from "./initializeBaseUniforms";
 import { EffectTypes } from "src/context/StreamsContext";
 import { bindTexture2 } from "./bindTexture";
-import { releaseTexturePosition } from "./handleTexturePosition";
+import { getNextTexturePosition } from "./handleTexturePosition";
 
-let lastPositionTexturePosition: number | undefined;
+let currentPositionsOffsetsTexturePosition: number | undefined;
 
-export const updateLastPositionTexturePosition = (
+export const updateCurrentPositionsOffsetsTexturePosition = (
   position: number | undefined
 ) => {
-  lastPositionTexturePosition = position;
+  currentPositionsOffsetsTexturePosition = position;
+};
+
+let currentWidthsHeadRotationAnglesTexturePosition: number | undefined;
+
+export const updateCurrentWidthsHeadRotationAnglesTexturePosition = (
+  position: number | undefined
+) => {
+  currentWidthsHeadRotationAnglesTexturePosition = position;
 };
 
 const maxFaces = 8;
@@ -168,29 +176,6 @@ const updateBaseUniforms = (
   }
 };
 
-const flatten2fvArrays = (
-  array: [number, number][][],
-  maxFaces: number,
-  maxPositions: number
-) => {
-  const flattened = new Float32Array(maxFaces * maxPositions * 2);
-  let index = 0;
-
-  for (let i = 0; i < maxPositions; i++) {
-    for (let j = 0; j < maxFaces; j++) {
-      if (array[i] && array[i][j]) {
-        flattened[index++] = array[i][j][0];
-        flattened[index++] = array[i][j][1];
-      } else {
-        flattened[index++] = 0;
-        flattened[index++] = 0;
-      }
-    }
-  }
-
-  return flattened;
-};
-
 const flatten1fvArrays = (
   array: number[][],
   maxFaces: number,
@@ -209,20 +194,34 @@ const flatten1fvArrays = (
 
 const createDataTexture = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  positions: [number, number][][],
-  maxFaces: number,
-  maxDataTypes: number
+  dataSet1: [number, number][][],
+  dataSet2: [number, number][][],
+  firstMaxDataDimension: number,
+  secondMaxDataDimension: number,
+  texturePosition?: number
 ) => {
-  const data = new Float32Array(maxFaces * maxDataTypes * 4);
+  const data = new Float32Array(
+    firstMaxDataDimension * secondMaxDataDimension * 4
+  );
 
   let index = 0;
-  for (let i = 0; i < maxDataTypes; i++) {
-    for (let j = 0; j < maxFaces; j++) {
-      if (positions[i] && positions[i][j]) {
-        data[index++] = positions[i][j][0]; // R
-        data[index++] = positions[i][j][1]; // G
+  for (let i = 0; i < secondMaxDataDimension; i++) {
+    for (let j = 0; j < firstMaxDataDimension; j++) {
+      if (dataSet1[i] && dataSet1[i][j] && dataSet2[i] && dataSet2[i][j]) {
+        data[index++] = dataSet1[i][j][0]; // R
+        data[index++] = dataSet1[i][j][1]; // G
+        data[index++] = dataSet2[i][j][0]; // B
+        data[index++] = dataSet2[i][j][1]; // A
+      } else if (dataSet1[i] && dataSet1[i][j]) {
+        data[index++] = dataSet1[i][j][0]; // R
+        data[index++] = dataSet1[i][j][1]; // G
         data[index++] = 0; // B
         data[index++] = 0; // A
+      } else if (dataSet2[i] && dataSet2[i][j]) {
+        data[index++] = 0; // R
+        data[index++] = 0; // G
+        data[index++] = dataSet2[i][j][0]; // B
+        data[index++] = dataSet2[i][j][1]; // A
       } else {
         data[index++] = 0;
         data[index++] = 0;
@@ -233,6 +232,18 @@ const createDataTexture = (
   }
 
   const texture = gl.createTexture();
+  let position: number | Error;
+  if (!texturePosition) {
+    position = getNextTexturePosition();
+  } else {
+    position = texturePosition;
+  }
+
+  if (position instanceof Error) {
+    return position;
+  }
+
+  gl.activeTexture(gl.TEXTURE0 + position);
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
   if (gl instanceof WebGL2RenderingContext) {
@@ -240,8 +251,8 @@ const createDataTexture = (
       gl.TEXTURE_2D,
       0,
       gl.RGBA32F,
-      maxFaces,
-      maxDataTypes,
+      firstMaxDataDimension,
+      secondMaxDataDimension,
       0,
       gl.RGBA,
       gl.FLOAT,
@@ -256,8 +267,8 @@ const createDataTexture = (
       gl.TEXTURE_2D,
       0,
       gl.RGBA,
-      maxFaces,
-      maxDataTypes,
+      firstMaxDataDimension,
+      secondMaxDataDimension,
       0,
       gl.RGBA,
       gl.FLOAT,
@@ -268,7 +279,97 @@ const createDataTexture = (
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-  return texture;
+  return position;
+};
+
+const createDataTexture2 = (
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  dataSet1: number[][],
+  dataSet2: number[],
+  firstMaxDataDimension: number,
+  secondMaxDataDimension: number,
+  texturePosition?: number
+) => {
+  const data = new Float32Array(
+    firstMaxDataDimension * secondMaxDataDimension * 4
+  );
+
+  let index = 0;
+  for (let i = 0; i < secondMaxDataDimension; i++) {
+    for (let j = 0; j < firstMaxDataDimension; j++) {
+      if (i === 0 && dataSet1[i] && dataSet1[i][j] && dataSet2[j]) {
+        data[index++] = dataSet1[i][j]; // R
+        data[index++] = dataSet2[j]; // G
+        data[index++] = 0; // B
+        data[index++] = 0; // A
+      } else if (dataSet1[i] && dataSet1[i][j]) {
+        data[index++] = dataSet1[i][j]; // R
+        data[index++] = 0; // G
+        data[index++] = 0; // B
+        data[index++] = 0; // A
+      } else if (i === 0 && dataSet2[j]) {
+        data[index++] = 0; // R
+        data[index++] = dataSet2[j]; // G
+        data[index++] = 0; // B
+        data[index++] = 0; // A
+      } else {
+        data[index++] = 0;
+        data[index++] = 0;
+        data[index++] = 0;
+        data[index++] = 0;
+      }
+    }
+  }
+
+  const texture = gl.createTexture();
+  let position: number | Error;
+  if (!texturePosition) {
+    position = getNextTexturePosition();
+  } else {
+    position = texturePosition;
+  }
+
+  if (position instanceof Error) {
+    return position;
+  }
+
+  gl.activeTexture(gl.TEXTURE0 + position);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  if (gl instanceof WebGL2RenderingContext) {
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA32F,
+      firstMaxDataDimension,
+      secondMaxDataDimension,
+      0,
+      gl.RGBA,
+      gl.FLOAT,
+      data
+    );
+  } else {
+    const ext = gl.getExtension("OES_texture_float");
+    if (!ext) {
+      throw new Error("OES_texture_float not supported");
+    }
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      firstMaxDataDimension,
+      secondMaxDataDimension,
+      0,
+      gl.RGBA,
+      gl.FLOAT,
+      data
+    );
+  }
+
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+  return position;
 };
 
 const updateBaseUniforms2 = (
@@ -300,61 +401,53 @@ const updateBaseUniforms2 = (
 
   gl.uniform1i(baseUniformLocations.uFaceCountLocation, faceCount);
 
-  gl.uniform1fv(
-    baseUniformLocations.uHeadRotationAnglesLocation,
-    new Float32Array(headRotationAngles.length !== 0 ? headRotationAngles : [0])
-  );
-
-  if (lastPositionTexturePosition) {
-    releaseTexturePosition(lastPositionTexturePosition);
-  }
-  const positionTexturePosition = bindTexture2(
+  const positionsOffsetsTexturePosition = createDataTexture(
     gl,
-    createDataTexture(
-      gl,
-      [
-        leftEyePositions,
-        rightEyePositions,
-        eyesCenterPositions,
-        chinPositions,
-        nosePositions,
-      ],
-      maxFaces,
-      maxPositions
-    )
+    [
+      leftEyePositions,
+      rightEyePositions,
+      eyesCenterPositions,
+      chinPositions,
+      nosePositions,
+    ],
+    [
+      earsImageOffset,
+      earsImageOffset,
+      [],
+      beardImageOffset,
+      mustacheImageOffset,
+    ],
+    maxFaces,
+    maxPositions,
+    currentPositionsOffsetsTexturePosition
   );
-  if (positionTexturePosition instanceof Error) {
-    return positionTexturePosition;
+  if (positionsOffsetsTexturePosition instanceof Error) {
+    return positionsOffsetsTexturePosition;
   }
-  lastPositionTexturePosition = positionTexturePosition;
+  currentPositionsOffsetsTexturePosition = positionsOffsetsTexturePosition;
 
   gl.uniform1i(
-    baseUniformLocations.uPositionsTextureLocation,
-    positionTexturePosition
+    baseUniformLocations.uPositionsOffsetsTextureLocation,
+    positionsOffsetsTexturePosition
   );
 
-  gl.uniform1fv(
-    baseUniformLocations.uWidthsLocation,
-    flatten1fvArrays(
-      [leftEarWidths, rightEarWidths, eyesWidths, chinWidths],
-      maxFaces,
-      maxWidths
-    )
+  const widthsHeadRotationAnglesTexturePosition = createDataTexture2(
+    gl,
+    [leftEarWidths, rightEarWidths, eyesWidths, chinWidths],
+    headRotationAngles,
+    maxFaces,
+    maxWidths,
+    currentWidthsHeadRotationAnglesTexturePosition
   );
+  if (widthsHeadRotationAnglesTexturePosition instanceof Error) {
+    return widthsHeadRotationAnglesTexturePosition;
+  }
+  currentWidthsHeadRotationAnglesTexturePosition =
+    widthsHeadRotationAnglesTexturePosition;
 
-  gl.uniform2fv(
-    baseUniformLocations.uImageOffsetsLocation,
-    flatten2fvArrays(
-      [
-        earsImageOffset,
-        earsImageOffset,
-        [],
-        beardImageOffset,
-        mustacheImageOffset,
-      ],
-      maxFaces,
-      5
-    )
+  gl.uniform1i(
+    baseUniformLocations.uWidthsHeadRotationAnglesTexture,
+    widthsHeadRotationAnglesTexturePosition
   );
 };
 

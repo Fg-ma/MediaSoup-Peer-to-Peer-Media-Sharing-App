@@ -413,10 +413,6 @@ const initializeBaseUniforms2 = (
     "u_textureSize"
   );
   const uFaceCountLocation = gl.getUniformLocation(baseProgram, "u_faceCount");
-  const uHeadRotationAnglesLocation = gl.getUniformLocation(
-    baseProgram,
-    "u_headRotationAngles"
-  );
   const uEffectFlagsLocation = gl.getUniformLocation(
     baseProgram,
     "u_effectFlags"
@@ -430,15 +426,14 @@ const initializeBaseUniforms2 = (
     baseProgram,
     "u_effectAspectRatios"
   );
-  const uImageOffsetsLocation = gl.getUniformLocation(
+  const uPositionsOffsetsTextureLocation = gl.getUniformLocation(
     baseProgram,
-    "u_imageOffsets"
+    "u_positionsOffsetsTexture"
   );
-  const uPositionsTextureLocation = gl.getUniformLocation(
+  const uWidthsHeadRotationAnglesTexture = gl.getUniformLocation(
     baseProgram,
-    "u_positionsTexture"
+    "u_widthsHeadRotationAnglesTexture"
   );
-  const uWidthsLocation = gl.getUniformLocation(baseProgram, "u_widths");
 
   if (!uLiveVideoImageLocation) {
     return new Error("No uLiveVideoImageLocation");
@@ -448,9 +443,6 @@ const initializeBaseUniforms2 = (
   }
   if (!uFaceCountLocation) {
     return new Error("No uFaceCountLocation");
-  }
-  if (!uHeadRotationAnglesLocation) {
-    return new Error("No uHeadRotationAnglesLocation");
   }
   if (!uTintColorLocation) {
     return new Error("No uTintColorLocation");
@@ -464,14 +456,11 @@ const initializeBaseUniforms2 = (
   if (!uEffectAspectRatiosLocation) {
     return new Error("No uEffectAspectRatiosLocation");
   }
-  if (!uImageOffsetsLocation) {
-    return new Error("No uImageOffsetsLocation");
+  if (!uPositionsOffsetsTextureLocation) {
+    return new Error("No uPositionsOffsetsTextureLocation");
   }
-  if (!uPositionsTextureLocation) {
-    return new Error("No uPositionsTextureLocation");
-  }
-  if (!uWidthsLocation) {
-    return new Error("No uWidthsLocation");
+  if (!uWidthsHeadRotationAnglesTexture) {
+    return new Error("No uWidthsHeadRotationAnglesTexture");
   }
 
   gl.uniform2f(uTextureSizeLocation, canvas.width, canvas.height);
@@ -543,14 +532,12 @@ const initializeBaseUniforms2 = (
     uLiveVideoImageLocation: uLiveVideoImageLocation,
     uTextureSizeLocation: uTextureSizeLocation,
     uFaceCountLocation: uFaceCountLocation,
-    uHeadRotationAnglesLocation: uHeadRotationAnglesLocation,
     uEffectFlagsLocation: uEffectFlagsLocation,
     uTintColorLocation: uTintColorLocation,
     uEffectImagesLocation: uEffectImagesLocation,
     uEffectAspectRatiosLocation: uEffectAspectRatiosLocation,
-    uImageOffsetsLocation: uImageOffsetsLocation,
-    uPositionsTextureLocation: uPositionsTextureLocation,
-    uWidthsLocation: uWidthsLocation,
+    uPositionsOffsetsTextureLocation: uPositionsOffsetsTextureLocation,
+    uWidthsHeadRotationAnglesTexture: uWidthsHeadRotationAnglesTexture,
   };
 
   return baseUniformLocations;
@@ -570,11 +557,9 @@ export type BaseUniformsLocations2 =
   | "uLiveVideoImageLocation"
   | "uFaceCountLocation"
   | "uTextureSizeLocation"
-  | "uHeadRotationAnglesLocation"
   | "uEffectFlagsLocation"
   | "uTintColorLocation"
   | "uEffectImagesLocation"
   | "uEffectAspectRatiosLocation"
-  | "uImageOffsetsLocation"
-  | "uPositionsTextureLocation"
-  | "uWidthsLocation";
+  | "uPositionsOffsetsTextureLocation"
+  | "uWidthsHeadRotationAnglesTexture";

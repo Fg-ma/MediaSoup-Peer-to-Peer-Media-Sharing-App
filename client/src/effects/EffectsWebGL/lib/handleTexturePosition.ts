@@ -1,4 +1,4 @@
-const maxTexturePosition = 16;
+const maxTexturePosition = 8;
 
 let texturePositionsInUse: number[] = [0];
 
@@ -10,6 +10,14 @@ const getNextTexturePosition = (): number | Error => {
     }
   }
   return new Error("All textures allocated");
+};
+
+const checkTexturePositionInUse = (texturePosition: number): number | Error => {
+  if (texturePositionsInUse.includes(texturePosition)) {
+    return new Error("Texture position already in use");
+  } else {
+    return texturePosition;
+  }
 };
 
 const releaseTexturePosition = (texturePosition: number): void => {
@@ -25,6 +33,7 @@ const releaseAllTexturePositions = (): void => {
 
 export {
   getNextTexturePosition,
+  checkTexturePositionInUse,
   releaseTexturePosition,
   releaseAllTexturePositions,
 };

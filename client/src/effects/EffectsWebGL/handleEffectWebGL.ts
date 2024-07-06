@@ -25,7 +25,10 @@ import { createBaseBuffers, createTriangleBuffers } from "./lib/createBuffers";
 import initializeTriangleUniforms from "./lib/initializeTriangleUniforms";
 import initializeTriangleAttributes from "./lib/initializeTriangleAttributes";
 import { releaseAllTexturePositions } from "./lib/handleTexturePosition";
-import { updateLastPositionTexturePosition } from "./lib/updateBaseUniforms";
+import {
+  updateCurrentPositionsOffsetsTexturePosition,
+  updateCurrentWidthsHeadRotationAnglesTexturePosition,
+} from "./lib/updateBaseUniforms";
 
 export type FaceLandmarks =
   | "headRotationAngles"
@@ -67,7 +70,8 @@ const handleEffectWebGL = async (
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
   releaseAllTexturePositions();
-  updateLastPositionTexturePosition(undefined);
+  updateCurrentPositionsOffsetsTexturePosition(undefined);
+  updateCurrentWidthsHeadRotationAnglesTexturePosition(undefined);
 
   // Setup WebGL context
   const canvas = document.createElement("canvas");
