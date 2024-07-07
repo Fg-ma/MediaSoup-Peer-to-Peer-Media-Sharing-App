@@ -383,7 +383,74 @@ const initializeBaseUniforms = (
   return baseUniformLocations;
 };
 
-const initializeBaseUniforms2 = (
+const createAtlasTexture = async (
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+  urls: string[]
+): Promise<WebGLTexture | null> => {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+  const textureSize = 512;
+  const textureCount = urls.length;
+  const atlasSide = Math.ceil(Math.sqrt(textureCount));
+  const atlasSize = Math.pow(2, Math.ceil(Math.log2(atlasSide * textureSize)));
+
+  const atlasCanvas = document.createElement("canvas");
+  atlasCanvas.width = atlasSize;
+  atlasCanvas.height = atlasSize;
+  const atlasContext = atlasCanvas.getContext("2d");
+
+  if (!atlasContext) {
+    throw new Error("Unable to create canvas 2D context.");
+  }
+
+  const loadImage = (url: string): Promise<HTMLImageElement> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = (error) => reject(error);
+      img.src = url;
+    });
+  };
+
+  const images = await Promise.all(urls.map(loadImage));
+
+  images.forEach((image, index) => {
+    const row = Math.floor(index / atlasSide);
+    const col = index % atlasSide;
+    atlasContext.drawImage(
+      image,
+      col * textureSize,
+      row * textureSize,
+      textureSize,
+      textureSize
+    );
+  });
+
+  const atlasImage = atlasContext.getImageData(0, 0, atlasSize, atlasSize);
+
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    atlasSize,
+    atlasSize,
+    0,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    atlasImage.data
+  );
+
+  return texture;
+};
+
+const initializeBaseUniforms2 = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseProgram: WebGLProgram,
   canvas: HTMLCanvasElement,
@@ -391,16 +458,12 @@ const initializeBaseUniforms2 = (
     [effectType in EffectTypes]?: boolean | undefined;
   },
   tintColor: React.MutableRefObject<string>,
-  leftEarImageTexture: WebGLTexture | null | undefined,
   leftEarImageAspectRatio: number | undefined,
-  rightEarImageTexture: WebGLTexture | null | undefined,
   rightEarImageAspectRatio: number | undefined,
-  glassesImageTexture: WebGLTexture | null | undefined,
   glassesImageAspectRatio: number | undefined,
-  beardImageTexture: WebGLTexture | null | undefined,
   beardImageAspectRatio: number | undefined,
-  mustacheImageTexture: WebGLTexture | null | undefined,
-  mustacheImageAspectRatio: number | undefined
+  mustacheImageAspectRatio: number | undefined,
+  urls: string[]
 ) => {
   gl.useProgram(baseProgram);
 
@@ -418,9 +481,9 @@ const initializeBaseUniforms2 = (
     "u_effectFlags"
   );
   const uTintColorLocation = gl.getUniformLocation(baseProgram, "u_tintColor");
-  const uEffectImagesLocation = gl.getUniformLocation(
+  const uEffectTextureAtlasLocation = gl.getUniformLocation(
     baseProgram,
-    "u_effectImages"
+    "u_effectTextureAtlas"
   );
   const uEffectAspectRatiosLocation = gl.getUniformLocation(
     baseProgram,
@@ -450,8 +513,8 @@ const initializeBaseUniforms2 = (
   if (!uEffectFlagsLocation) {
     return new Error("No uEffectFlagsLocation");
   }
-  if (!uEffectImagesLocation) {
-    return new Error("No uEffectImagesLocation");
+  if (!uEffectTextureAtlasLocation) {
+    return new Error("No uEffectTextureAtlasLocation");
   }
   if (!uEffectAspectRatiosLocation) {
     return new Error("No uEffectAspectRatiosLocation");
@@ -471,38 +534,15 @@ const initializeBaseUniforms2 = (
     gl.uniform3fv(uTintColorLocation, tintColorVector);
   }
 
-  let leftEarTexturePosition = bindTexture2(gl, leftEarImageTexture);
-  if (leftEarTexturePosition instanceof Error) {
-    return leftEarTexturePosition;
+  let atlasTexturePosition = bindTexture2(
+    gl,
+    await createAtlasTexture(gl, urls)
+  );
+  if (atlasTexturePosition instanceof Error) {
+    return atlasTexturePosition;
   }
 
-  let rightEarTexturePosition = bindTexture2(gl, rightEarImageTexture);
-  if (rightEarTexturePosition instanceof Error) {
-    return rightEarTexturePosition;
-  }
-
-  let glassesTexturePosition = bindTexture2(gl, glassesImageTexture);
-  if (glassesTexturePosition instanceof Error) {
-    return glassesTexturePosition;
-  }
-
-  let beardTexturePosition = bindTexture2(gl, beardImageTexture);
-  if (beardTexturePosition instanceof Error) {
-    return beardTexturePosition;
-  }
-
-  let mustacheTexturePosition = bindTexture2(gl, mustacheImageTexture);
-  if (mustacheTexturePosition instanceof Error) {
-    return mustacheTexturePosition;
-  }
-
-  gl.uniform1iv(uEffectImagesLocation, [
-    leftEarTexturePosition,
-    rightEarTexturePosition,
-    glassesTexturePosition,
-    beardTexturePosition,
-    mustacheTexturePosition,
-  ]);
+  gl.uniform1i(uEffectTextureAtlasLocation, atlasTexturePosition);
 
   gl.uniform1fv(uEffectAspectRatiosLocation, [
     leftEarImageAspectRatio ?? 0,
@@ -534,7 +574,7 @@ const initializeBaseUniforms2 = (
     uFaceCountLocation: uFaceCountLocation,
     uEffectFlagsLocation: uEffectFlagsLocation,
     uTintColorLocation: uTintColorLocation,
-    uEffectImagesLocation: uEffectImagesLocation,
+    uEffectTextureAtlasLocation: uEffectTextureAtlasLocation,
     uEffectAspectRatiosLocation: uEffectAspectRatiosLocation,
     uPositionsOffsetsTextureLocation: uPositionsOffsetsTextureLocation,
     uWidthsHeadRotationAnglesTexture: uWidthsHeadRotationAnglesTexture,
@@ -559,7 +599,7 @@ export type BaseUniformsLocations2 =
   | "uTextureSizeLocation"
   | "uEffectFlagsLocation"
   | "uTintColorLocation"
-  | "uEffectImagesLocation"
+  | "uEffectTextureAtlasLocation"
   | "uEffectAspectRatiosLocation"
   | "uPositionsOffsetsTextureLocation"
   | "uWidthsHeadRotationAnglesTexture";

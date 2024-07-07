@@ -234,16 +234,12 @@ const baseFragmentShaderSource2 = `
   uniform vec3 u_tintColor;
 
   // Effect images and their aspect ratios packed into arrays
-  uniform sampler2D u_effectImages[MAX_EFFECTS];
+  uniform sampler2D u_effectTextureAtlas;
   uniform float u_effectAspectRatios[MAX_EFFECTS];
 
   // Effect positions, offsets, widths, and headRotationAngles
   uniform sampler2D u_positionsOffsetsTexture;
   uniform sampler2D u_widthsHeadRotationAnglesTexture;
-
-  vec2 getDataTexCoord(int dataIndex1, int maxDataIndexSize1, int dataIndex2, int maxDataIndexSize2) {
-    return vec2(float(dataIndex2) / float(maxDataIndexSize2), float(dataIndex1) / float(maxDataIndexSize1));
-  }
 
   // Function to get the rotation matrix
   mat2 getRotationMatrix(float angle) {
@@ -252,8 +248,61 @@ const baseFragmentShaderSource2 = `
     return mat2(cosA, -sinA, sinA, cosA);
   }
 
+  vec2 getDataTexCoord(int dataIndex1, int maxDataIndexSize1, int dataIndex2, int maxDataIndexSize2) {
+    return vec2(float(dataIndex2) / float(maxDataIndexSize2), float(dataIndex1) / float(maxDataIndexSize1));
+  }
+
+  vec2 calculateAtlasSize() {
+    int activeTextureCount = 0;
+    vec2 textureSize = vec2(512.0, 512.0);
+
+    // Ears
+    if (mod(float(u_effectFlags / int(pow(2.0, float(LEFT_EAR)))), 2.0) >= 1.0) {
+      activeTextureCount += 2;
+    }
+
+    // Glasses
+    if (mod(float(u_effectFlags / int(pow(2.0, float(GLASSES)))), 2.0) >= 1.0) {
+      activeTextureCount += 1;
+    }
+
+    // Beards
+    if (mod(float(u_effectFlags / int(pow(2.0, float(BEARDS)))), 2.0) >= 1.0) {
+      activeTextureCount += 1;
+    }
+
+    // Mustaches
+    if (mod(float(u_effectFlags / int(pow(2.0, float(MUSTACHES)))), 2.0) >= 1.0) {
+      activeTextureCount += 1;
+    }
+
+    float sqrtActiveTextures = sqrt(float(activeTextureCount));
+    int atlasWidth = int(ceil(sqrtActiveTextures));
+    int atlasHeight = int(ceil(float(activeTextureCount) / float(atlasWidth)));
+
+    return vec2(float(atlasWidth) * textureSize.x, float(atlasHeight) * textureSize.y);
+  }
+
+  vec2 getAltasTextureUVs(int textureIndex, vec2 atlasSize) {
+    vec2 textureSize = vec2(512.0, 512.0);
+
+    // Calculate row and column indices
+    int numTexturesPerRow = int(atlasSize.x / textureSize.x);
+    int rowIndex = textureIndex / numTexturesPerRow;
+    int colIndex = textureIndex - rowIndex * numTexturesPerRow;
+
+    // Calculate UV coordinates for the texture in the atlas
+    return vec2(
+      float(colIndex) * textureSize.x / atlasSize.x,
+      float(rowIndex) * textureSize.y / atlasSize.y
+    );
+  }
+
   // Function to apply an effect
-  void applyEffect(inout vec4 color, vec2 texCoord, sampler2D effectImage, vec2 positionOffsetTexCoord, vec2 widthTexCoord, vec2 headRotationAngleTexCoord, float aspectRatio) {
+  void applyEffect(inout vec4 color, vec2 texCoord, vec2 positionOffsetTexCoord, vec2 widthTexCoord, vec2 headRotationAngleTexCoord, float aspectRatio) {
+    vec2 atlasSize = calculateAtlasSize();
+    vec2 effectImageUVs = getAltasTextureUVs(1, atlasSize);
+  
     float width = texture2D(u_widthsHeadRotationAnglesTexture, widthTexCoord).r;
     float height = width / aspectRatio;
     vec2 size = vec2(width, height);
@@ -261,17 +310,15 @@ const baseFragmentShaderSource2 = `
     float headRotationAngle = texture2D(u_widthsHeadRotationAnglesTexture, headRotationAngleTexCoord).g;
     mat2 rotationMatrix = getRotationMatrix(headRotationAngle);
 
-    vec2 effectTexCoord = (rotationMatrix * (texCoord - texture2D(u_positionsOffsetsTexture, positionOffsetTexCoord).rg - texture2D(u_positionsOffsetsTexture, positionOffsetTexCoord).ba) * u_textureSize / size) + 0.5;
-    vec4 effectColor = texture2D(effectImage, effectTexCoord);
+    vec2 position = texture2D(u_positionsOffsetsTexture, positionOffsetTexCoord).rg;
+    vec2 offset = texture2D(u_positionsOffsetsTexture, positionOffsetTexCoord).ba;
+    vec2 effectTexCoord = effectImageUVs + (rotationMatrix * (texCoord - position - offset) * u_textureSize / size) + 0.5;
+    vec4 effectColor = texture2D(u_effectTextureAtlas, effectTexCoord);
     if (effectColor.a > 0.0) {
       color = mix(color, effectColor, effectColor.a);
     }
   }
-
-  vec2 atlasSize = vec2(1024.0, 1024.0);
-  vec2 textureOffset = vec2(512.0, 0.0);
-  vec2 textureSize = vec2(512.0, 512.0);
-
+  
   void main() {
     vec4 color = texture2D(u_liveVideoImage, v_texCoord);
     float total = 0.0;
@@ -279,46 +326,46 @@ const baseFragmentShaderSource2 = `
     if (u_faceCount > 0) {
       // Ears
       if (mod(float(u_effectFlags / int(pow(2.0, float(LEFT_EAR)))), 2.0) >= 1.0) {
-        applyEffect(color, v_texCoord, u_effectImages[0], getDataTexCoord(LEFT_EYE_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(LEFT_EAR_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[LEFT_EAR]);
-        applyEffect(color, v_texCoord, u_effectImages[1], getDataTexCoord(RIGHT_EYE_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(RIGHT_EAR_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[RIGHT_EAR]);
+        applyEffect(color, v_texCoord, getDataTexCoord(LEFT_EYE_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(LEFT_EAR_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[LEFT_EAR]);
+        applyEffect(color, v_texCoord, getDataTexCoord(RIGHT_EYE_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(RIGHT_EAR_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[RIGHT_EAR]);
       }
 
       // Glasses
       if (mod(float(u_effectFlags / int(pow(2.0, float(GLASSES)))), 2.0) >= 1.0) {
-        applyEffect(color, v_texCoord, u_effectImages[2], getDataTexCoord(EYES_CENTER_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(EYES_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[GLASSES]);
+        applyEffect(color, v_texCoord, getDataTexCoord(EYES_CENTER_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(EYES_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[GLASSES]);
       }
 
       // Beards
       if (mod(float(u_effectFlags / int(pow(2.0, float(BEARDS)))), 2.0) >= 1.0) {
-        applyEffect(color, v_texCoord, u_effectImages[3], getDataTexCoord(CHIN_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(CHIN_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[BEARDS]);
+        applyEffect(color, v_texCoord, getDataTexCoord(CHIN_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(CHIN_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[BEARDS]);
       }
 
       // Mustaches
       if (mod(float(u_effectFlags / int(pow(2.0, float(MUSTACHES)))), 2.0) >= 1.0) {
-        applyEffect(color, v_texCoord, u_effectImages[4], getDataTexCoord(NOSE_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(EYES_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[MUSTACHES]);
+        applyEffect(color, v_texCoord, getDataTexCoord(NOSE_POS, MAX_POSITIONS, 0, MAX_FACES), getDataTexCoord(EYES_WIDTH, MAX_WIDTHS, 0, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 0, MAX_FACES), u_effectAspectRatios[MUSTACHES]);
       }
     }
 
     if (u_faceCount > 1) {  
       // Ears
       if (mod(float(u_effectFlags / int(pow(2.0, float(LEFT_EAR)))), 2.0) >= 1.0) {
-        applyEffect(color, v_texCoord, u_effectImages[0], getDataTexCoord(LEFT_EYE_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(LEFT_EAR_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[LEFT_EAR]);
-        applyEffect(color, v_texCoord, u_effectImages[1], getDataTexCoord(RIGHT_EYE_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(RIGHT_EAR_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[RIGHT_EAR]);
+        applyEffect(color, v_texCoord, getDataTexCoord(LEFT_EYE_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(LEFT_EAR_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[LEFT_EAR]);
+        applyEffect(color, v_texCoord, getDataTexCoord(RIGHT_EYE_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(RIGHT_EAR_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[RIGHT_EAR]);
       }
   
       // Glasses
       if (mod(float(u_effectFlags / int(pow(2.0, float(GLASSES)))), 2.0) >= 1.0) {
-        applyEffect(color, v_texCoord, u_effectImages[2], getDataTexCoord(EYES_CENTER_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(EYES_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[GLASSES]);
+        applyEffect(color, v_texCoord, getDataTexCoord(EYES_CENTER_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(EYES_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[GLASSES]);
       }
   
       // Beards
       if (mod(float(u_effectFlags / int(pow(2.0, float(BEARDS)))), 2.0) >= 1.0) {
-        applyEffect(color, v_texCoord, u_effectImages[3], getDataTexCoord(CHIN_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(CHIN_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[BEARDS]);
+        applyEffect(color, v_texCoord, getDataTexCoord(CHIN_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(CHIN_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[BEARDS]);
       }
   
       // Mustaches
       if (mod(float(u_effectFlags / int(pow(2.0, float(MUSTACHES)))), 2.0) >= 1.0) {
-        applyEffect(color, v_texCoord, u_effectImages[4], getDataTexCoord(NOSE_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(EYES_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[MUSTACHES]);
+        applyEffect(color, v_texCoord, getDataTexCoord(NOSE_POS, MAX_POSITIONS, 1, MAX_FACES), getDataTexCoord(EYES_WIDTH, MAX_WIDTHS, 1, MAX_FACES), getDataTexCoord(0, MAX_WIDTHS, 1, MAX_FACES), u_effectAspectRatios[MUSTACHES]);
       }
     }
 

@@ -240,23 +240,37 @@ const handleEffectWebGL = async (
     }
   }
 
+  const urls = [
+    effects.ears
+      ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Left.png`
+      : null,
+    effects.ears
+      ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Right.png`
+      : null,
+    effects.glasses
+      ? `/2DAssets/glasses/${currentEffectsStyles.current.glasses.style}.png`
+      : null,
+    effects.beards
+      ? `/2DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
+      : null,
+    effects.mustaches
+      ? `/2DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
+      : null,
+  ].filter((url) => url !== null);
+
   // Set up the uniforms in the base fragment shader
-  const baseUniformsLocations = initializeBaseUniforms2(
+  const baseUniformsLocations = await initializeBaseUniforms2(
     gl,
     baseProgram,
     canvas,
     effects,
     tintColor,
-    leftEarImageTexture,
     leftEarImageAspectRatio,
-    rightEarImageTexture,
     rightEarImageAspectRatio,
-    glassesImageTexture,
     glassesImageAspectRatio,
-    beardImageTexture,
     beardImageAspectRatio,
-    mustacheImageTexture,
-    mustacheImageAspectRatio
+    mustacheImageAspectRatio,
+    urls
   );
 
   if (baseUniformsLocations instanceof Error) {
