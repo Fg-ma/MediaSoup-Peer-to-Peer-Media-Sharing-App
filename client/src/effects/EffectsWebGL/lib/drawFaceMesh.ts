@@ -1,8 +1,8 @@
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
 import { getTriangles } from "./getTriangles";
-import { TriangleAttributesLocations } from "./initializeTriangleAttributes";
 import updateTrianglesBuffers from "./updateTrianglesBuffers";
 import { uvPoints } from "./uvPoints";
+import TriangleShader from "./createTriangleShader";
 
 export interface Point2D {
   x: number;
@@ -17,16 +17,10 @@ export interface Point3D {
 
 export const drawFaceMesh = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  triangleProgram: WebGLProgram,
   liveLandmarks: NormalizedLandmarkList,
-  triangleAttributeLocations: {
-    [uniform in TriangleAttributesLocations]: number | null | undefined;
-  },
-  trianglePositionBuffer: WebGLBuffer,
-  triangleTexCoordBuffer: WebGLBuffer,
-  triangleIndexBuffer: WebGLBuffer
+  triangleShader: TriangleShader
 ) => {
-  gl.useProgram(triangleProgram);
+  triangleShader.use();
 
   // Get the triangles
   const { overlayTriangles, liveTriangles } = getTriangles(
@@ -38,10 +32,7 @@ export const drawFaceMesh = (
     gl,
     overlayTriangles,
     liveTriangles,
-    triangleAttributeLocations,
-    trianglePositionBuffer,
-    triangleTexCoordBuffer,
-    triangleIndexBuffer
+    triangleShader
   );
 
   if (!indexCount) {

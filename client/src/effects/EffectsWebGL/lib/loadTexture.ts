@@ -1,7 +1,12 @@
+import bindTexture from "./bindTexture";
+
 export const loadTexture = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   url: string
-): Promise<{ texture: WebGLTexture | null; aspectRatio: number }> => {
+): Promise<{
+  texture: WebGLTexture | null;
+  aspectRatio: number;
+}> => {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);

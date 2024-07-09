@@ -1,19 +1,13 @@
+import BaseShader from "./createBaseShader";
+import TriangleShader from "./createTriangleShader";
+
 const createStopFunction = (
   animationFrameId: number[],
   video: HTMLVideoElement,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseVideoTexture: WebGLTexture,
-  baseProgram: WebGLProgram,
-  baseVertexShader: WebGLShader,
-  baseFragmentShader: WebGLShader,
-  basePositionBuffer: WebGLBuffer,
-  baseTexCoordBuffer: WebGLBuffer,
-  triangleProgram: WebGLProgram,
-  triangleVertexShader: WebGLShader,
-  triangleFragmentShader: WebGLShader,
-  trianglePositionBuffer: WebGLBuffer,
-  triangleTexCoordBuffer: WebGLBuffer,
-  triangleIndexBuffer: WebGLBuffer,
+  baseShader: BaseShader,
+  triangleShader: TriangleShader,
   canvas: HTMLCanvasElement,
   type: "webcam" | "screen" | "audio",
   id: string,
@@ -39,6 +33,9 @@ const createStopFunction = (
     video.pause();
     video.srcObject = null;
 
+    baseShader.deconstructor();
+    triangleShader.deconstructor();
+
     gl.deleteTexture(baseVideoTexture);
     if (leftEarImageTexture) {
       gl.deleteTexture(leftEarImageTexture);
@@ -55,19 +52,6 @@ const createStopFunction = (
     if (mustacheImageTexture) {
       gl.deleteTexture(mustacheImageTexture);
     }
-    gl.deleteProgram(baseProgram);
-    gl.deleteProgram(triangleProgram);
-
-    gl.deleteShader(baseVertexShader);
-    gl.deleteShader(baseFragmentShader);
-    gl.deleteShader(triangleVertexShader);
-    gl.deleteShader(triangleFragmentShader);
-
-    gl.deleteBuffer(basePositionBuffer);
-    gl.deleteBuffer(baseTexCoordBuffer);
-    gl.deleteBuffer(trianglePositionBuffer);
-    gl.deleteBuffer(triangleTexCoordBuffer);
-    gl.deleteBuffer(triangleIndexBuffer);
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 

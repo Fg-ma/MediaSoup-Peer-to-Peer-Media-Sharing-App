@@ -1,34 +1,21 @@
 import { EffectTypes } from "../../context/StreamsContext";
-import baseVertexShaderSource from "./lib/baseVertexShader";
-import {
-  baseFragmentShaderSource,
-  baseFragmentShaderSource2,
-} from "./lib/baseFragmentShader";
-import triangleVertexShaderSource from "./lib/triangleVertexShader";
-import triangleFragmentShaderSource from "./lib/triangleFragmentShader";
-import {
-  initializeBaseUniforms,
-  initializeBaseUniforms2,
-} from "./lib/initializeBaseUniforms";
-import createShader from "./lib/createShader";
+import initializeBaseUniforms from "./lib/initializeBaseUniforms";
 import createAndSetupTexture from "./lib/createAndSetupTexture";
 import render from "./lib/render";
-import createProgram from "./lib/createProgram";
 import createStopFunction from "./lib/createStopFunction";
 import { loadTexture } from "./lib/loadTexture";
 import loadModels from "../lib/loadModels";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
-import initializeBaseAttributes from "./lib/initializeBaseAttributes";
-import { createBaseBuffers, createTriangleBuffers } from "./lib/createBuffers";
 import initializeTriangleUniforms from "./lib/initializeTriangleUniforms";
-import initializeTriangleAttributes from "./lib/initializeTriangleAttributes";
 import { releaseAllTexturePositions } from "./lib/handleTexturePosition";
 import {
   updateCurrentPositionsOffsetsTexturePosition,
   updateCurrentWidthsHeadRotationAnglesTexturePosition,
 } from "./lib/updateBaseUniforms";
+import { BaseShader, BaseShader2 } from "./lib/createBaseShader";
+import TriangleShader from "./lib/createTriangleShader";
 
 export type FaceLandmarks =
   | "headRotationAngles"
@@ -81,53 +68,8 @@ const handleEffectWebGL = async (
     return new Error("WebGL not supported");
   }
 
-  const baseVertexShader = createShader(
-    gl,
-    gl.VERTEX_SHADER,
-    baseVertexShaderSource
-  );
-  if (baseVertexShader instanceof Error) {
-    return new Error("No base vertex shader: ", baseVertexShader);
-  }
-  const baseFragmentShader = createShader(
-    gl,
-    gl.FRAGMENT_SHADER,
-    baseFragmentShaderSource2
-  );
-  if (baseFragmentShader instanceof Error) {
-    return new Error("No base fragment shader: ", baseFragmentShader);
-  }
-
-  const triangleVertexShader = createShader(
-    gl,
-    gl.VERTEX_SHADER,
-    triangleVertexShaderSource
-  );
-  if (triangleVertexShader instanceof Error) {
-    return new Error("No triangle vertex shader: ", triangleVertexShader);
-  }
-  const triangleFragmentShader = createShader(
-    gl,
-    gl.FRAGMENT_SHADER,
-    triangleFragmentShaderSource
-  );
-  if (triangleFragmentShader instanceof Error) {
-    return new Error("No triangle fragment shader: ", triangleFragmentShader);
-  }
-
-  const baseProgram = createProgram(gl, baseVertexShader, baseFragmentShader);
-  if (baseProgram instanceof Error) {
-    return new Error("No base program");
-  }
-
-  const triangleProgram = createProgram(
-    gl,
-    triangleVertexShader,
-    triangleFragmentShader
-  );
-  if (triangleProgram instanceof Error) {
-    return new Error("No triangle program");
-  }
+  const baseShader = new BaseShader2(gl);
+  const triangleShader = new TriangleShader(gl);
 
   // Create base video texture
   const baseVideoTexture = createAndSetupTexture(gl);
@@ -241,111 +183,40 @@ const handleEffectWebGL = async (
   }
 
   const urls = [
-    effects.ears
+    effects.ears || true
       ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Left.png`
       : null,
-    effects.ears
+    effects.ears || true
       ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Right.png`
       : null,
-    effects.glasses
+    effects.glasses || true
       ? `/2DAssets/glasses/${currentEffectsStyles.current.glasses.style}.png`
       : null,
-    effects.beards
+    effects.beards || true
       ? `/2DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
       : null,
-    effects.mustaches
+    effects.mustaches || true
       ? `/2DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
       : null,
   ].filter((url) => url !== null);
 
   // Set up the uniforms in the base fragment shader
-  const baseUniformsLocations = await initializeBaseUniforms2(
-    gl,
-    baseProgram,
-    canvas,
-    effects,
-    tintColor,
-    leftEarImageAspectRatio,
-    rightEarImageAspectRatio,
-    glassesImageAspectRatio,
-    beardImageAspectRatio,
-    mustacheImageAspectRatio,
-    urls
-  );
-
-  if (baseUniformsLocations instanceof Error) {
-    return new Error("Error setting base uniforms: ", baseUniformsLocations);
-  }
+  // await initializeBaseUniforms(
+  //   gl,
+  //   baseShader,
+  //   canvas,
+  //   effects,
+  //   tintColor,
+  //   leftEarImageAspectRatio,
+  //   rightEarImageAspectRatio,
+  //   glassesImageAspectRatio,
+  //   beardImageAspectRatio,
+  //   mustacheImageAspectRatio,
+  //   urls
+  // );
 
   // Set up the uniforms in the triangle fragment shader
-  const triangleUniformsLocations = initializeTriangleUniforms(
-    gl,
-    triangleProgram,
-    effects,
-    triangleTexture
-  );
-
-  if (triangleUniformsLocations instanceof Error) {
-    return new Error(
-      "Error setting triangle uniforms: ",
-      triangleUniformsLocations
-    );
-  }
-
-  const baseAttributesLocations = initializeBaseAttributes(gl, baseProgram);
-
-  if (baseAttributesLocations instanceof Error) {
-    return new Error(
-      "Error setting base attributes: ",
-      baseAttributesLocations
-    );
-  }
-
-  const triangleAttributesLocations = initializeTriangleAttributes(
-    gl,
-    triangleProgram
-  );
-
-  if (triangleAttributesLocations instanceof Error) {
-    return new Error(
-      "Error setting triangle attributes: ",
-      triangleAttributesLocations
-    );
-  }
-
-  // Create buffers
-  const baseBuffers = createBaseBuffers(
-    gl,
-    baseProgram,
-    baseAttributesLocations
-  );
-  if (
-    !baseBuffers ||
-    baseBuffers.basePositionBuffer === null ||
-    baseBuffers.baseTexCoordBuffer === null
-  ) {
-    return new Error("Failed to create base buffers");
-  }
-  const { basePositionBuffer, baseTexCoordBuffer } = baseBuffers;
-
-  const triangleBuffers = createTriangleBuffers(
-    gl,
-    triangleProgram,
-    triangleAttributesLocations
-  );
-  if (
-    !triangleBuffers ||
-    triangleBuffers.trianglePositionBuffer === null ||
-    triangleBuffers.triangleTexCoordBuffer === null ||
-    triangleBuffers.triangleIndexBuffer === null
-  ) {
-    return new Error("Failed to create triangle buffers");
-  }
-  const {
-    trianglePositionBuffer,
-    triangleTexCoordBuffer,
-    triangleIndexBuffer,
-  } = triangleBuffers;
+  initializeTriangleUniforms(gl, triangleShader, effects, triangleTexture);
 
   const faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean } = {
     headRotationAngles: false,
@@ -401,6 +272,8 @@ const handleEffectWebGL = async (
     faceMeshResults[0] = results;
   });
 
+  baseShader.createAtlasTexture(urls);
+
   // Start video and render loop
   let animationFrameId: number[] = [];
   const video = document.createElement("video");
@@ -420,27 +293,19 @@ const handleEffectWebGL = async (
   video.addEventListener("play", () => {
     render(
       gl,
-      baseProgram,
-      triangleProgram,
+      baseShader,
+      triangleShader,
       baseVideoTexture,
       video,
       canvas,
       animationFrameId,
       effects,
-      baseUniformsLocations,
-      triangleUniformsLocations,
-      baseAttributesLocations,
-      triangleAttributesLocations,
       faceLandmarks,
       currentEffectsStyles,
       faceMesh,
       faceMeshResults,
       triangleTexture,
-      basePositionBuffer,
-      baseTexCoordBuffer,
-      trianglePositionBuffer,
-      triangleTexCoordBuffer,
-      triangleIndexBuffer
+      urls
     );
   });
   video.onloadedmetadata = () => {
@@ -456,17 +321,8 @@ const handleEffectWebGL = async (
     video,
     gl,
     baseVideoTexture,
-    baseProgram,
-    baseVertexShader,
-    baseFragmentShader,
-    basePositionBuffer,
-    baseTexCoordBuffer,
-    triangleProgram,
-    triangleVertexShader,
-    triangleFragmentShader,
-    trianglePositionBuffer,
-    triangleTexCoordBuffer,
-    triangleIndexBuffer,
+    baseShader,
+    triangleShader,
     canvas,
     type,
     id,

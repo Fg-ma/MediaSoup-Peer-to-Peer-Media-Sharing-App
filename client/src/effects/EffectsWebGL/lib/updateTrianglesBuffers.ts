@@ -1,22 +1,15 @@
+import TriangleShader from "./createTriangleShader";
 import { Point2D, Point3D } from "./drawFaceMesh";
-import { TriangleAttributesLocations } from "./initializeTriangleAttributes";
 
 const updateTrianglesBuffers = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   srcTrianglesArray: [Point2D, Point2D, Point2D][],
   destTrianglesArray: [Point3D, Point3D, Point3D][],
-  triangleAttributeLocations: {
-    [attribute in TriangleAttributesLocations]: number | null | undefined;
-  },
-  trianglePositionBuffer: WebGLBuffer,
-  triangleTexCoordBuffer: WebGLBuffer,
-  triangleIndexBuffer: WebGLBuffer
+  triangleShader: TriangleShader
 ) => {
   if (
-    triangleAttributeLocations.aPositionLocation === undefined ||
-    triangleAttributeLocations.aPositionLocation === null ||
-    triangleAttributeLocations.aTexCoordLocation === undefined ||
-    triangleAttributeLocations.aTexCoordLocation === null
+    triangleShader.positionLocation === null ||
+    triangleShader.texCoordLocation === null
   ) {
     return;
   }
@@ -56,10 +49,10 @@ const updateTrianglesBuffers = (
   });
 
   // Create or reuse buffers
-  gl.bindBuffer(gl.ARRAY_BUFFER, trianglePositionBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, triangleShader.getPositionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.DYNAMIC_DRAW);
   gl.vertexAttribPointer(
-    triangleAttributeLocations.aPositionLocation,
+    triangleShader.positionLocation,
     3,
     gl.FLOAT,
     false,
@@ -67,10 +60,10 @@ const updateTrianglesBuffers = (
     0
   );
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, triangleTexCoordBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, triangleShader.getTexCoordBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.DYNAMIC_DRAW);
   gl.vertexAttribPointer(
-    triangleAttributeLocations.aTexCoordLocation,
+    triangleShader.texCoordLocation,
     2,
     gl.FLOAT,
     false,
@@ -78,7 +71,7 @@ const updateTrianglesBuffers = (
     0
   );
 
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleIndexBuffer);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleShader.getIndexBuffer);
   gl.bufferData(
     gl.ELEMENT_ARRAY_BUFFER,
     new Uint16Array(indices),

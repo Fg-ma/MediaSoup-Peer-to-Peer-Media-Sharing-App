@@ -1,28 +1,33 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import { BaseUniforms } from "./initializeBaseUniforms";
+import BaseShader from "./createBaseShader";
+import {
+  BEARD_EFFECT,
+  BLUR_EFFECT,
+  GLASSES_EFFECT,
+  LEFT_EAR_EFFECT,
+  MUSTACHE_EFFECT,
+  RIGHT_EAR_EFFECT,
+  TINT_EFFECT,
+} from "./initializeBaseUniforms";
 
 const toggleFaceTrackedEffects = (
   toggleValue: 0 | 1,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  baseUniformLocations: {
-    [uniform in BaseUniforms]: WebGLUniformLocation | null | undefined;
-  },
-  effects: {
-    [effectType in EffectTypes]?: boolean | undefined;
-  }
+  baseShader: BaseShader
 ) => {
-  if (effects.ears && baseUniformLocations.uEarsEffectLocation) {
-    gl.uniform1i(baseUniformLocations.uEarsEffectLocation, toggleValue);
-  }
-  if (effects.glasses && baseUniformLocations.uGlassesEffectLocation) {
-    gl.uniform1i(baseUniformLocations.uGlassesEffectLocation, toggleValue);
-  }
-  if (effects.beards && baseUniformLocations.uBeardEffectLocation) {
-    gl.uniform1i(baseUniformLocations.uBeardEffectLocation, toggleValue);
-  }
-  if (effects.mustaches && baseUniformLocations.uMustacheEffectLocation) {
-    gl.uniform1i(baseUniformLocations.uMustacheEffectLocation, toggleValue);
-  }
+  let effectFlags = 0;
+
+  // Set the corresponding bits based on the active effects
+  if (toggleValue) effectFlags |= 1 << LEFT_EAR_EFFECT;
+  if (toggleValue) effectFlags |= 1 << RIGHT_EAR_EFFECT;
+  if (toggleValue) effectFlags |= 1 << GLASSES_EFFECT;
+  if (toggleValue) effectFlags |= 1 << BEARD_EFFECT;
+  if (toggleValue) effectFlags |= 1 << MUSTACHE_EFFECT;
+  if (toggleValue) effectFlags |= 1 << BLUR_EFFECT;
+  if (toggleValue) effectFlags |= 1 << TINT_EFFECT;
+
+  // Set the uniform value
+  gl.uniform1i(baseShader.effectFlagsLocation, effectFlags);
 };
 
 export default toggleFaceTrackedEffects;

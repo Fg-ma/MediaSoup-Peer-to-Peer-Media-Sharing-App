@@ -1,15 +1,12 @@
-import {
-  BaseUniformsLocations,
-  BaseUniformsLocations2,
-} from "./initializeBaseUniforms";
 import { EffectTypes } from "src/context/StreamsContext";
 import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import directionalShift from "./directionalShift";
 import updateOneDimensionalSmoothVariables from "./updateOneDimensionalSmoothVariables";
-import { updateBaseUniforms, updateBaseUniforms2 } from "./updateBaseUniforms";
+import updateBaseUniforms from "./updateBaseUniforms";
 import toggleFaceTrackedEffects from "./toggleFaceTrackedEffects";
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
+import { BaseShader } from "./createBaseShader";
 
 export type OneDimensionalVariableTypes =
   | "leftEarWidth"
@@ -47,11 +44,8 @@ const updateFaceLandmarks = async (
     landmarks: NormalizedLandmarkList;
   }[],
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  baseProgram: WebGLProgram,
+  baseShader: BaseShader,
   canvas: HTMLCanvasElement,
-  baseUniformLocations: {
-    [uniform in BaseUniformsLocations2]: WebGLUniformLocation;
-  },
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   },
@@ -77,12 +71,12 @@ const updateFaceLandmarks = async (
   // Handle case of no dections
   if (detectionTimedout && faceCount !== 0) {
     detectionTimedout = false;
-    toggleFaceTrackedEffects(1, gl, baseUniformLocations, effects);
+    toggleFaceTrackedEffects(1, gl, baseShader);
   }
   if (faceCount === 0 && !detectTimeout) {
     detectTimeout = setTimeout(() => {
       detectionTimedout = true;
-      toggleFaceTrackedEffects(0, gl, baseUniformLocations, effects);
+      toggleFaceTrackedEffects(0, gl, baseShader);
       detectTimeout = undefined;
     }, detectionTimeout);
   }
@@ -274,12 +268,9 @@ const updateFaceLandmarks = async (
 
   // Update uniforms
   if (faceCount > 0) {
-    updateBaseUniforms2(
+    updateBaseUniforms(
       gl,
-      baseProgram,
-      baseUniformLocations,
-      faceLandmarks,
-      effects,
+      baseShader,
       faceCount,
       headRotationAngles,
       leftEarWidths,

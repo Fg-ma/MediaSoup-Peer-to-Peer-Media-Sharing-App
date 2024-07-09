@@ -5,7 +5,6 @@ import {
 import { Point2D } from "./drawFaceMesh";
 import {
   OneDimensionalVariableTypes,
-  TwoDimensionalVariableTypes,
   smoothedOneDimensionalVariables,
 } from "./updateFaceLandmarks";
 
@@ -74,10 +73,6 @@ const applyFaceTracker = (multiFaceLandmarks: NormalizedLandmarkListList) => {
     if (!newFaceTrackers[id]) {
       tracker.lastSeen++;
       if (tracker.lastSeen > maxFaceTrackerAge) {
-        // Object.keys(smoothedTwoDimensionalVariables).forEach((featureType) => {
-        //   const feature = featureType as TwoDimensionalVariableTypes;
-        //   delete smoothedTwoDimensionalVariables[feature][id];
-        // });
         Object.keys(smoothedOneDimensionalVariables).forEach((featureType) => {
           const feature = featureType as OneDimensionalVariableTypes;
           delete smoothedOneDimensionalVariables[feature][id];

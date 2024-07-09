@@ -1,6 +1,6 @@
-import { TriangleAttributesLocations } from "./initializeTriangleAttributes";
 import updateTrianglesBuffers2 from "./updateTrianglesBuffers2";
 import mustaches from "../../../../public/3DAssests/mustaches/mustacheData.json";
+import TriangleShader from "./createTriangleShader";
 
 export interface PointUV {
   u: number;
@@ -9,24 +9,15 @@ export interface PointUV {
 
 export const drawMustacheMesh = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  triangleProgram: WebGLProgram,
-  triangleAttributeLocations: {
-    [uniform in TriangleAttributesLocations]: number | null | undefined;
-  },
-  trianglePositionBuffer: WebGLBuffer,
-  triangleTexCoordBuffer: WebGLBuffer,
-  triangleIndexBuffer: WebGLBuffer
+  triangleShader: TriangleShader
 ) => {
-  gl.useProgram(triangleProgram);
+  triangleShader.use();
 
   const indexCount = updateTrianglesBuffers2(
     gl,
     mustaches.uv_faces,
     mustaches.vertex_faces,
-    triangleAttributeLocations,
-    trianglePositionBuffer,
-    triangleTexCoordBuffer,
-    triangleIndexBuffer
+    triangleShader
   );
 
   if (!indexCount) {

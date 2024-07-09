@@ -1,46 +1,25 @@
-import { BaseAttributesLocations } from "./initializeBaseAttributes";
+import BaseShader from "./createBaseShader";
 
 const updateBaseVideoTexture = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseVideoTexture: WebGLTexture,
   video: HTMLVideoElement,
-  baseProgram: WebGLProgram,
-  basePositionBuffer: WebGLBuffer,
-  baseTexCoordBuffer: WebGLBuffer,
-  baseAttributeLocations: {
-    [uniform in BaseAttributesLocations]: number | null | undefined;
-  }
+  baseShader: BaseShader
 ) => {
   if (
-    baseAttributeLocations.aPositionLocation === null ||
-    baseAttributeLocations.aPositionLocation === undefined ||
-    baseAttributeLocations.aTexCoordLocation === null ||
-    baseAttributeLocations.aTexCoordLocation === undefined
+    baseShader.positionLocation === null ||
+    baseShader.texCoordLocation == null
   ) {
     return;
   }
 
-  gl.useProgram(baseProgram);
+  baseShader.use();
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, basePositionBuffer);
-  gl.vertexAttribPointer(
-    baseAttributeLocations.aPositionLocation,
-    2,
-    gl.FLOAT,
-    false,
-    0,
-    0
-  );
+  gl.bindBuffer(gl.ARRAY_BUFFER, baseShader.getPositionBuffer);
+  gl.vertexAttribPointer(baseShader.positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, baseTexCoordBuffer);
-  gl.vertexAttribPointer(
-    baseAttributeLocations.aTexCoordLocation,
-    2,
-    gl.FLOAT,
-    false,
-    0,
-    0
-  );
+  gl.bindBuffer(gl.ARRAY_BUFFER, baseShader.getTexCoordBuffer);
+  gl.vertexAttribPointer(baseShader.texCoordLocation, 2, gl.FLOAT, false, 0, 0);
 
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, baseVideoTexture);
