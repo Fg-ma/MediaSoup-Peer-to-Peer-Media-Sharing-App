@@ -1,4 +1,4 @@
-import TriangleShader from "./createTriangleShader";
+import TriangleShader from "./TriangleShader";
 import { Point2D, Point3D } from "./drawFaceMesh";
 
 const updateTrianglesBuffers = (

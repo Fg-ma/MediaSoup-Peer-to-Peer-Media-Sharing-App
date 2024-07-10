@@ -2,7 +2,7 @@ import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
 import { getTriangles } from "./getTriangles";
 import updateTrianglesBuffers from "./updateTrianglesBuffers";
 import { uvPoints } from "./uvPoints";
-import TriangleShader from "./createTriangleShader";
+import TriangleShader from "./TriangleShader";
 
 export interface Point2D {
   x: number;

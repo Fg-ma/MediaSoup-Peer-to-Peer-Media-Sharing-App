@@ -1,296 +1,13 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import {
-  baseFragmentShaderSource,
-  baseFragmentShaderSource2,
-} from "./baseFragmentShader";
-import {
-  baseVertexShaderSource,
-  baseVertexShaderSource2,
-} from "./baseVertexShader";
+import baseFragmentShaderSource from "./baseFragmentShader";
+import baseVertexShaderSource from "./baseVertexShader";
 
 class BaseShader {
   private gl: WebGL2RenderingContext | WebGLRenderingContext;
   private program: WebGLProgram | null = null;
 
-  private positionBuffer: WebGLBuffer | null = null;
-  private texCoordBuffer: WebGLBuffer | null = null;
-
   private VERTEX_SHADER = baseVertexShaderSource;
   private FRAGMENT_SHADER = baseFragmentShaderSource;
-
-  // Uniform locations
-  private uLiveVideoImageLocation: WebGLUniformLocation | null = null;
-  private uTextureSizeLocation: WebGLUniformLocation | null = null;
-  private uFaceCountLocation: WebGLUniformLocation | null = null;
-  private uEffectFlagsLocation: WebGLUniformLocation | null = null;
-  private uTintColorLocation: WebGLUniformLocation | null = null;
-  private uEffectTextureAtlasLocation: WebGLUniformLocation | null = null;
-  private uEffectAspectRatiosLocation: WebGLUniformLocation | null = null;
-  private uPositionsOffsetsTextureLocation: WebGLUniformLocation | null = null;
-  private uWidthsHeadRotationAnglesTextureLocation: WebGLUniformLocation | null =
-    null;
-
-  // Attribute locations
-  private aPositionLocation: number | null = null;
-  private aTexCoordLocation: number | null = null;
-
-  constructor(gl: WebGL2RenderingContext | WebGLRenderingContext) {
-    this.gl = gl;
-    this.initShaderProgram();
-    this.initUniformLocations();
-    this.initAttributeLocations();
-    this.initBuffers();
-  }
-
-  deconstructor() {
-    if (this.program) {
-      const attachedShaders = this.gl.getAttachedShaders(this.program);
-      if (attachedShaders) {
-        for (const shader of attachedShaders) {
-          this.gl.detachShader(this.program, shader);
-          this.gl.deleteShader(shader);
-        }
-      }
-      this.gl.deleteProgram(this.program);
-      this.program = null;
-    }
-
-    if (this.positionBuffer) {
-      this.gl.deleteBuffer(this.positionBuffer);
-      this.positionBuffer = null;
-    }
-
-    if (this.texCoordBuffer) {
-      this.gl.deleteBuffer(this.texCoordBuffer);
-      this.texCoordBuffer = null;
-    }
-
-    // Clear uniform and attribute locations
-    this.uLiveVideoImageLocation = null;
-    this.uTextureSizeLocation = null;
-    this.uFaceCountLocation = null;
-    this.uEffectFlagsLocation = null;
-    this.uTintColorLocation = null;
-    this.uEffectTextureAtlasLocation = null;
-    this.uEffectAspectRatiosLocation = null;
-    this.uPositionsOffsetsTextureLocation = null;
-    this.uWidthsHeadRotationAnglesTextureLocation = null;
-    this.aPositionLocation = null;
-    this.aTexCoordLocation = null;
-  }
-
-  private initShaderProgram() {
-    const vertexShader = this.loadShader(
-      this.gl.VERTEX_SHADER,
-      this.VERTEX_SHADER
-    );
-    const fragmentShader = this.loadShader(
-      this.gl.FRAGMENT_SHADER,
-      this.FRAGMENT_SHADER
-    );
-
-    if (vertexShader && fragmentShader) {
-      this.program = this.gl.createProgram();
-      if (this.program) {
-        this.gl.attachShader(this.program, vertexShader);
-        this.gl.attachShader(this.program, fragmentShader);
-        this.gl.linkProgram(this.program);
-
-        if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
-          console.error(
-            "Unable to initialize the shader program: " +
-              this.gl.getProgramInfoLog(this.program)
-          );
-          this.program = null;
-        }
-      }
-    }
-  }
-
-  private loadShader(type: number, source: string): WebGLShader | null {
-    const shader = this.gl.createShader(type);
-    if (shader) {
-      this.gl.shaderSource(shader, source);
-      this.gl.compileShader(shader);
-
-      if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-        console.error(
-          "An error occurred compiling the shaders: " +
-            this.gl.getShaderInfoLog(shader)
-        );
-        this.gl.deleteShader(shader);
-        return null;
-      }
-    }
-    return shader;
-  }
-
-  private initUniformLocations() {
-    if (this.program) {
-      this.uLiveVideoImageLocation = this.gl.getUniformLocation(
-        this.program,
-        "u_liveVideoImage"
-      );
-      this.uTextureSizeLocation = this.gl.getUniformLocation(
-        this.program,
-        "u_textureSize"
-      );
-      this.uFaceCountLocation = this.gl.getUniformLocation(
-        this.program,
-        "u_faceCount"
-      );
-      this.uEffectFlagsLocation = this.gl.getUniformLocation(
-        this.program,
-        "u_effectFlags"
-      );
-      this.uTintColorLocation = this.gl.getUniformLocation(
-        this.program,
-        "u_tintColor"
-      );
-      this.uEffectTextureAtlasLocation = this.gl.getUniformLocation(
-        this.program,
-        "u_effectTextureAtlas"
-      );
-      this.uEffectAspectRatiosLocation = this.gl.getUniformLocation(
-        this.program,
-        "u_effectAspectRatios"
-      );
-      this.uPositionsOffsetsTextureLocation = this.gl.getUniformLocation(
-        this.program,
-        "u_positionsOffsetsTexture"
-      );
-      this.uWidthsHeadRotationAnglesTextureLocation =
-        this.gl.getUniformLocation(
-          this.program,
-          "u_widthsHeadRotationAnglesTexture"
-        );
-    }
-  }
-
-  private initAttributeLocations() {
-    if (this.program) {
-      this.aPositionLocation = this.gl.getAttribLocation(
-        this.program,
-        "a_position"
-      );
-      this.aTexCoordLocation = this.gl.getAttribLocation(
-        this.program,
-        "a_texCoord"
-      );
-    }
-  }
-
-  private initBuffers() {
-    if (this.aPositionLocation === null || this.aTexCoordLocation == null) {
-      console.error("An error occurred while initializing the buffers");
-      return;
-    }
-
-    this.positionBuffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-    this.gl.bufferData(
-      this.gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
-      this.gl.STATIC_DRAW
-    );
-    this.gl.vertexAttribPointer(
-      this.aPositionLocation,
-      2,
-      this.gl.FLOAT,
-      false,
-      0,
-      0
-    );
-    this.gl.enableVertexAttribArray(this.aPositionLocation);
-
-    this.texCoordBuffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
-    this.gl.bufferData(
-      this.gl.ARRAY_BUFFER,
-      new Float32Array([0, 1, 1, 1, 0, 0, 1, 0]),
-      this.gl.STATIC_DRAW
-    );
-    this.gl.vertexAttribPointer(
-      this.aTexCoordLocation,
-      2,
-      this.gl.FLOAT,
-      false,
-      0,
-      0
-    );
-    this.gl.enableVertexAttribArray(this.aTexCoordLocation);
-  }
-
-  // Method to use the shader program
-  use() {
-    if (this.program) {
-      this.gl.useProgram(this.program);
-    }
-  }
-
-  // Method to create a blank plane
-  drawBlankPlanes() {}
-
-  // Getter methods for uniform locations (if needed)
-  get liveVideoImageLocation() {
-    return this.uLiveVideoImageLocation;
-  }
-
-  get textureSizeLocation() {
-    return this.uTextureSizeLocation;
-  }
-
-  get faceCountLocation() {
-    return this.uFaceCountLocation;
-  }
-
-  get effectFlagsLocation() {
-    return this.uEffectFlagsLocation;
-  }
-
-  get tintColorLocation() {
-    return this.uTintColorLocation;
-  }
-
-  get effectTextureAtlasLocation() {
-    return this.uEffectTextureAtlasLocation;
-  }
-
-  get effectAspectRatiosLocation() {
-    return this.uEffectAspectRatiosLocation;
-  }
-
-  get positionsOffsetsTextureLocation() {
-    return this.uPositionsOffsetsTextureLocation;
-  }
-
-  get widthsHeadRotationAnglesTextureLocation() {
-    return this.uWidthsHeadRotationAnglesTextureLocation;
-  }
-
-  get positionLocation() {
-    return this.aPositionLocation;
-  }
-
-  get texCoordLocation() {
-    return this.aTexCoordLocation;
-  }
-
-  get getPositionBuffer() {
-    return this.positionBuffer;
-  }
-
-  get getTexCoordBuffer() {
-    return this.texCoordBuffer;
-  }
-}
-
-class BaseShader2 {
-  private gl: WebGL2RenderingContext | WebGLRenderingContext;
-  private program: WebGLProgram | null = null;
-
-  private VERTEX_SHADER = baseVertexShaderSource2;
-  private FRAGMENT_SHADER = baseFragmentShaderSource2;
 
   private positionBuffer: WebGLBuffer | null = null;
   private texCoordBuffer: WebGLBuffer | null = null;
@@ -308,10 +25,10 @@ class BaseShader2 {
   private twoDimensionalEffectsTextureSize: number = 512;
 
   // Uniform Locations
+  private uTexSize: WebGLUniformLocation | null = null;
   private uTwoDimensionalEffectAtlasTextureLocation: WebGLUniformLocation | null =
     null;
   private uVideoTextureLocation: WebGLUniformLocation | null = null;
-  private uUseVideoTextureLocation: WebGLUniformLocation | null = null;
   private uEffectFlagsLocation: WebGLUniformLocation | null = null;
   private uTintColorLocation: WebGLUniformLocation | null = null;
 
@@ -319,8 +36,10 @@ class BaseShader2 {
   private aPositionLocation: number | null = null;
   private aTexCoordLocation: number | null = null;
 
-  private BLUR_EFFECT = 0;
-  private TINT_EFFECT = 1;
+  private effectFlags: number = 0;
+  private VIDEO_BIT = 0;
+  private BLUR_BIT = 1;
+  private TINT_BIT = 2;
 
   constructor(
     gl: WebGL2RenderingContext | WebGLRenderingContext,
@@ -338,10 +57,12 @@ class BaseShader2 {
 
     let effectFlags = 0;
 
-    if (effects.blur) effectFlags |= 1 << this.BLUR_EFFECT;
-    if (effects.tint) effectFlags |= 1 << this.TINT_EFFECT;
+    if (effects.blur) effectFlags |= 1 << this.BLUR_BIT;
+    if (effects.tint) effectFlags |= 1 << this.TINT_BIT;
 
-    gl.uniform1i(this.uEffectFlagsLocation, effectFlags);
+    this.effectFlags = effectFlags;
+
+    gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
 
     const tintColorVector = this.hexToRgb(tintColor);
     gl.uniform3fv(this.uTintColorLocation, tintColorVector);
@@ -419,6 +140,7 @@ class BaseShader2 {
       return;
     }
 
+    this.uTexSize = this.gl.getUniformLocation(this.program, "u_texSize");
     this.uTwoDimensionalEffectAtlasTextureLocation = this.gl.getUniformLocation(
       this.program,
       "u_twoDimensionalEffectAtlasTexture"
@@ -426,10 +148,6 @@ class BaseShader2 {
     this.uVideoTextureLocation = this.gl.getUniformLocation(
       this.program,
       "u_videoTexture"
-    );
-    this.uUseVideoTextureLocation = this.gl.getUniformLocation(
-      this.program,
-      "u_useVideoTexture"
     );
     this.uEffectFlagsLocation = this.gl.getUniformLocation(
       this.program,
@@ -630,13 +348,24 @@ class BaseShader2 {
     scale: number,
     headRotationAngle: number
   ) {
-    if (this.aPositionLocation === null || this.aTexCoordLocation === null) {
+    if (
+      this.aPositionLocation === null ||
+      this.aTexCoordLocation === null ||
+      this.twoDimensionalEffectsAtlasSize === null
+    ) {
       return;
     }
 
     this.use();
 
-    this.gl.uniform1i(this.uUseVideoTextureLocation, 0);
+    this.effectFlags &= ~(1 << this.VIDEO_BIT);
+    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
+
+    this.gl.uniform2f(
+      this.uTexSize,
+      this.twoDimensionalEffectsAtlasSize,
+      this.twoDimensionalEffectsAtlasSize
+    );
 
     const texture = this.twoDimensionalAltasURLMap.find(
       (entry) => entry.url === url
@@ -750,7 +479,14 @@ class BaseShader2 {
 
     this.use();
 
-    this.gl.uniform1i(this.uUseVideoTextureLocation, 1);
+    this.effectFlags |= 1 << this.VIDEO_BIT;
+    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
+
+    this.gl.uniform2f(
+      this.uTexSize,
+      this.gl.canvas.width,
+      this.gl.canvas.height
+    );
 
     const positions = new Float32Array([
       -1.0, 1.0, 0.99, -1.0, -1.0, 0.99, 1.0, 1.0, 0.99, 1.0, -1.0, 0.99,
@@ -795,4 +531,4 @@ class BaseShader2 {
   }
 }
 
-export { BaseShader, BaseShader2 };
+export default BaseShader;

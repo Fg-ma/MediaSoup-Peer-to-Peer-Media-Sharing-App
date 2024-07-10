@@ -1,23 +1,17 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import updateBaseVideoTexture from "./updateBaseVideoTexture";
-// import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
-import updateFaceLandmarks from "./updateFaceLandmarks";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import drawFaceMesh from "./drawFaceMesh";
-import applyFaceTracker from "./applyFaceTracker";
-import landmarksSmoothWithDeadbanding from "./landmarksSmoothWithDeadbanding";
 import drawMustacheMesh from "./drawMustacheMesh";
-import { BaseShader, BaseShader2 } from "./createBaseShader";
-import TriangleShader from "./createTriangleShader";
+import BaseShader from "./BaseShader";
+import TriangleShader from "./TriangleShader";
 import FaceLandmarks from "./FaceLandmarks";
 
 const render = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  baseShader: BaseShader2,
+  baseShader: BaseShader,
   triangleShader: TriangleShader,
   faceLandmarks: FaceLandmarks,
-  baseVideoTexture: WebGLTexture,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
   animationFrameId: number[],
@@ -37,8 +31,6 @@ const render = async (
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  // updateBaseVideoTexture(gl, baseVideoTexture, video, baseShader);
-
   baseShader.updateVideoTexture(video);
 
   if (
@@ -49,21 +41,24 @@ const render = async (
     effects.faceMask
   ) {
     await faceMesh.send({ image: video });
-    if (!faceMeshResults[0]) {
-      return;
-    }
     const multiFaceLandmarks = faceMeshResults[0].multiFaceLandmarks;
-    if (!multiFaceLandmarks) {
-      return;
-    }
 
-    if (
-      effects.ears ||
-      effects.glasses ||
-      effects.beards ||
-      effects.mustaches
-    ) {
+    const detectionTimedOut = faceLandmarks.getTimedOut();
+
+    // Update landmarks based on state of dection timeout
+    if (multiFaceLandmarks.length > 0) {
+      if (detectionTimedOut) {
+        faceLandmarks.setTimedOut(false);
+      }
       faceLandmarks.update(multiFaceLandmarks);
+    } else {
+      if (!detectionTimedOut) {
+        if (faceLandmarks.getTimeoutTimer() === undefined) {
+          faceLandmarks.startTimeout();
+        }
+      } else {
+        faceLandmarks.update(multiFaceLandmarks);
+      }
     }
 
     for (const {
@@ -163,7 +158,7 @@ const render = async (
     if (effects.faceMask && triangleTexture) {
       faceLandmarks
         .getFaceIdLandmarksPairs()
-        .forEach((smoothedFaceIdLandmarksPair) => {
+        .forEach(({ faceId, landmarks }) => {
           // drawFaceMesh(
           //   gl,
           //   smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
@@ -180,12 +175,10 @@ const render = async (
       baseShader,
       triangleShader,
       faceLandmarks,
-      baseVideoTexture,
       video,
       canvas,
       animationFrameId,
       effects,
-      // faceLandmarks,
       currentEffectsStyles,
       faceMesh,
       faceMeshResults,

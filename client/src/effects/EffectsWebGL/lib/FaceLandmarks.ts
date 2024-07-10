@@ -6,18 +6,6 @@ import { Point2D } from "./drawFaceMesh";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import { oneDimensionalDeadbandingMap } from "./updateDeadbandingMaps";
 
-type CalculatedLandmarkTypes =
-  | "headRotationAngles"
-  | "interocularDistances"
-  | "eyesCenterPositions"
-  | "leftEarWidths"
-  | "rightEarWidths"
-  | "eyesWidths"
-  | "chinWidths"
-  | "earsImageOffsets"
-  | "beardImageOffsets"
-  | "mustacheImageOffsets";
-
 export type OneDimensionalLandmarkTypes =
   | "headRotationAngles"
   | "interocularDistances"
@@ -53,8 +41,6 @@ class FaceLandmarks {
     landmarks: NormalizedLandmarkList;
   }[] = [];
 
-  private faceCount = 0;
-
   private calculatedLandmarks: CalculatedLandmarkInterface = {
     headRotationAngles: {},
 
@@ -71,6 +57,11 @@ class FaceLandmarks {
     beardImageOffsets: {},
     mustacheImageOffsets: {},
   };
+
+  private faceCount = 0;
+  private detectionTimeoutDuration = 50;
+  private detectTimeout: NodeJS.Timeout | undefined = undefined;
+  private detectionTimedOut = false;
 
   LEFT_EYE_INDEX = 468;
   RIGHT_EYE_INDEX = 473;
@@ -417,12 +408,35 @@ class FaceLandmarks {
     this.faceCount = this.faceIdLandmarksPairs.length;
   }
 
+  startTimeout() {
+    this.detectTimeout = setTimeout(() => {
+      this.detectionTimedOut = true;
+      this.detectTimeout = undefined;
+    }, this.detectionTimeoutDuration);
+  }
+
   getFaceIdLandmarksPairs() {
     return this.faceIdLandmarksPairs;
   }
 
   getCalculatedLandmarks() {
     return this.calculatedLandmarks;
+  }
+
+  getFaceCount() {
+    return this.faceCount;
+  }
+
+  getTimedOut() {
+    return this.detectionTimedOut;
+  }
+
+  getTimeoutTimer() {
+    return this.detectTimeout;
+  }
+
+  setTimedOut(timedOut: boolean) {
+    this.detectionTimedOut = timedOut;
   }
 }
 

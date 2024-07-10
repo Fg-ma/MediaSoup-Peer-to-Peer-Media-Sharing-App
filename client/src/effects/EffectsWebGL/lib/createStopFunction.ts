@@ -1,12 +1,11 @@
-import { BaseShader2 } from "./createBaseShader";
-import TriangleShader from "./createTriangleShader";
+import BaseShader from "./BaseShader";
+import TriangleShader from "./TriangleShader";
 
 const createStopFunction = (
   animationFrameId: number[],
   video: HTMLVideoElement,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
-  baseVideoTexture: WebGLTexture,
-  baseShader: BaseShader2,
+  baseShader: BaseShader,
   triangleShader: TriangleShader,
   canvas: HTMLCanvasElement,
   type: "webcam" | "screen" | "audio",
@@ -19,12 +18,7 @@ const createStopFunction = (
       [screenId: string]: () => void;
     };
     audio: (() => void) | undefined;
-  }>,
-  leftEarImageTexture: WebGLTexture | null | undefined,
-  rightEarImageTexture: WebGLTexture | null | undefined,
-  glassesImageTexture: WebGLTexture | null | undefined,
-  beardImageTexture: WebGLTexture | null | undefined,
-  mustacheImageTexture: WebGLTexture | null | undefined
+  }>
 ) => {
   const stopFunction = () => {
     if (animationFrameId[0]) {
@@ -35,23 +29,6 @@ const createStopFunction = (
 
     baseShader.deconstructor();
     triangleShader.deconstructor();
-
-    gl.deleteTexture(baseVideoTexture);
-    if (leftEarImageTexture) {
-      gl.deleteTexture(leftEarImageTexture);
-    }
-    if (rightEarImageTexture) {
-      gl.deleteTexture(rightEarImageTexture);
-    }
-    if (glassesImageTexture) {
-      gl.deleteTexture(glassesImageTexture);
-    }
-    if (beardImageTexture) {
-      gl.deleteTexture(beardImageTexture);
-    }
-    if (mustacheImageTexture) {
-      gl.deleteTexture(mustacheImageTexture);
-    }
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 

@@ -1,6 +1,6 @@
 import updateTrianglesBuffers2 from "./updateTrianglesBuffers2";
 import mustaches from "../../../../public/3DAssests/mustaches/mustacheData.json";
-import TriangleShader from "./createTriangleShader";
+import TriangleShader from "./TriangleShader";
 
 export interface PointUV {
   u: number;

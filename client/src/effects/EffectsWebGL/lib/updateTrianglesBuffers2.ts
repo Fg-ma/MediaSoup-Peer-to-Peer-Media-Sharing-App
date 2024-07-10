@@ -1,4 +1,4 @@
-import TriangleShader from "./createTriangleShader";
+import TriangleShader from "./TriangleShader";
 
 const updateTrianglesBuffers2 = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
