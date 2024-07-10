@@ -192,17 +192,56 @@ const baseFragmentShaderSource2 = `
   precision mediump float;
   #endif
 
+  #define BLUR 0
+  #define TINT 1
+
   varying vec2 v_texCoord;
   uniform sampler2D u_twoDimensionalEffectAtlasTexture;
   uniform sampler2D u_videoTexture;
   uniform bool u_useVideoTexture;
+  uniform int u_effectFlags;
+  uniform vec3 u_tintColor;
+
+  vec4 applyBlur(sampler2D textureSampler, vec2 texCoord) {
+    vec4 blurColor = vec4(0.0);
+
+    // Gaussian blur kernel
+    for (float x = -8.0; x <= 8.0; x++) {
+      for (float y = -8.0; y <= 8.0; y++) {
+        float offsetX = x / 8.0;
+        float offsetY = y / 8.0;
+        blurColor += texture2D(textureSampler, texCoord + vec2(offsetX, offsetY));
+      }
+    }
+
+    blurColor /= (2.0 * 8.0 + 1.0) * (2.0 * 8.0 + 1.0);
+    return blurColor;
+  }
 
   void main() {
+    vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
+
     if (u_useVideoTexture) {
-      gl_FragColor = texture2D(u_videoTexture, v_texCoord);
+      color = texture2D(u_videoTexture, v_texCoord);
     } else {
-      gl_FragColor = texture2D(u_twoDimensionalEffectAtlasTexture, v_texCoord);
+      color = texture2D(u_twoDimensionalEffectAtlasTexture, v_texCoord);
     }
+
+    // Apply blur effect
+    if (mod(float(u_effectFlags / int(pow(2.0, float(BLUR)))), 2.0) >= 1.0) {
+      color = applyBlur(u_twoDimensionalEffectAtlasTexture, v_texCoord);
+    }
+
+    // Apply tint effect
+    if (mod(float(u_effectFlags / int(pow(2.0, float(TINT)))), 2.0) >= 1.0) {
+      vec4 texColor = color;
+      float luminance = dot(texColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+      vec3 tintedColor = mix(texColor.rgb, u_tintColor, 0.75);
+      vec3 finalColor = mix(texColor.rgb, tintedColor, luminance);
+      color = vec4(finalColor, texColor.a);
+    }
+
+    gl_FragColor = color;
   }
 `;
 

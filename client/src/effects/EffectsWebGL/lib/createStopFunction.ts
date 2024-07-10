@@ -1,4 +1,4 @@
-import BaseShader from "./createBaseShader";
+import { BaseShader2 } from "./createBaseShader";
 import TriangleShader from "./createTriangleShader";
 
 const createStopFunction = (
@@ -6,7 +6,7 @@ const createStopFunction = (
   video: HTMLVideoElement,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseVideoTexture: WebGLTexture,
-  baseShader: BaseShader,
+  baseShader: BaseShader2,
   triangleShader: TriangleShader,
   canvas: HTMLCanvasElement,
   type: "webcam" | "screen" | "audio",

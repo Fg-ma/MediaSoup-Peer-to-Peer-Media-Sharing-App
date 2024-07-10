@@ -69,7 +69,7 @@ const handleEffectWebGL = async (
     return new Error("WebGL not supported");
   }
 
-  const baseShader = new BaseShader2(gl);
+  const baseShader = new BaseShader2(gl, effects, tintColor.current);
   const triangleShader = new TriangleShader(gl);
   const faceLandmarks = new FaceLandmarks(currentEffectsStyles);
 

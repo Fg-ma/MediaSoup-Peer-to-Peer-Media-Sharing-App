@@ -1,3 +1,4 @@
+import { EffectTypes } from "src/context/StreamsContext";
 import {
   baseFragmentShaderSource,
   baseFragmentShaderSource2,
@@ -311,18 +312,39 @@ class BaseShader2 {
     null;
   private uVideoTextureLocation: WebGLUniformLocation | null = null;
   private uUseVideoTextureLocation: WebGLUniformLocation | null = null;
+  private uEffectFlagsLocation: WebGLUniformLocation | null = null;
+  private uTintColorLocation: WebGLUniformLocation | null = null;
 
   // Attribute locations
   private aPositionLocation: number | null = null;
   private aTexCoordLocation: number | null = null;
 
-  constructor(gl: WebGL2RenderingContext | WebGLRenderingContext) {
+  private BLUR_EFFECT = 0;
+  private TINT_EFFECT = 1;
+
+  constructor(
+    gl: WebGL2RenderingContext | WebGLRenderingContext,
+    effects: {
+      [effectType in EffectTypes]?: boolean | undefined;
+    },
+    tintColor: string
+  ) {
     this.gl = gl;
     this.initShaderProgram();
     this.initUniformLocations();
     this.initAttributeLocations();
     this.initBuffers();
     this.initVideoTexture();
+
+    let effectFlags = 0;
+
+    if (effects.blur) effectFlags |= 1 << this.BLUR_EFFECT;
+    if (effects.tint) effectFlags |= 1 << this.TINT_EFFECT;
+
+    gl.uniform1i(this.uEffectFlagsLocation, effectFlags);
+
+    const tintColorVector = this.hexToRgb(tintColor);
+    gl.uniform3fv(this.uTintColorLocation, tintColorVector);
   }
 
   deconstructor() {
@@ -409,6 +431,14 @@ class BaseShader2 {
       this.program,
       "u_useVideoTexture"
     );
+    this.uEffectFlagsLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_effectFlags"
+    );
+    this.uTintColorLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_tintColor"
+    );
   }
 
   private initAttributeLocations() {
@@ -463,6 +493,16 @@ class BaseShader2 {
     );
 
     this.gl.uniform1i(this.uVideoTextureLocation, 0);
+  }
+
+  private hexToRgb(hex: string) {
+    hex = hex.replace(/^#/, "");
+
+    let r = parseInt(hex.substring(0, 2), 16) / 255;
+    let g = parseInt(hex.substring(2, 4), 16) / 255;
+    let b = parseInt(hex.substring(4, 6), 16) / 255;
+
+    return [r, g, b];
   }
 
   // Method to use the shader program
@@ -583,7 +623,13 @@ class BaseShader2 {
     this.gl.uniform1i(this.uTwoDimensionalEffectAtlasTextureLocation, 1);
   };
 
-  drawEffect(url: string, position: { x: number; y: number }, scale: number) {
+  drawEffect(
+    url: string,
+    position: { x: number; y: number },
+    offset: { x: number; y: number },
+    scale: number,
+    headRotationAngle: number
+  ) {
     if (this.aPositionLocation === null || this.aTexCoordLocation === null) {
       return;
     }
@@ -646,21 +692,35 @@ class BaseShader2 {
       this.gl.STATIC_DRAW
     );
 
-    // Define vertices for a square with random position and size
-    const vertices = new Float32Array([
-      -0.5 * scale + position.x,
-      0.5 * scale + position.y,
+    // Define vertices for a square before applying rotation
+    const baseVertices = new Float32Array([
+      -scale * 2,
+      scale * 3,
       0.0, // Vertex 1
-      -0.5 * scale + position.x,
-      -0.5 * scale + position.y,
+      -scale * 2,
+      -scale * 3,
       0.0, // Vertex 2
-      0.5 * scale + position.x,
-      0.5 * scale + position.y,
+      scale * 2,
+      scale * 3,
       0.0, // Vertex 3
-      0.5 * scale + position.x,
-      -0.5 * scale + position.y,
+      scale * 2,
+      -scale * 3,
       0.0, // Vertex 4
     ]);
+
+    // Calculate the rotation matrix
+    const cosAngle = Math.cos(headRotationAngle);
+    const sinAngle = Math.sin(headRotationAngle);
+
+    // Apply the rotation matrix to the vertices
+    const vertices = new Float32Array(12); // 4 vertices * 3 components (x, y, z)
+    for (let i = 0; i < 4; i++) {
+      const x = baseVertices[i * 3];
+      const y = baseVertices[i * 3 + 1];
+      vertices[i * 3] = cosAngle * x - sinAngle * y + position.x + offset.x;
+      vertices[i * 3 + 1] = sinAngle * x + cosAngle * y + position.y + offset.y;
+      vertices[i * 3 + 2] = baseVertices[i * 3 + 2]; // z remains unchanged
+    }
 
     // Bind the position buffer
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);

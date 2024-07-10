@@ -1,5 +1,5 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import { OneDimensionalVariableTypes } from "./updateFaceLandmarks";
+import { OneDimensionalLandmarkTypes } from "./FaceLandmarks";
 import {
   BeardsEffectTypes,
   EarsEffectTypes,
@@ -10,75 +10,75 @@ import {
 
 const glassesDeadbandingMap: {
   [glassesEffectType in GlassesEffectTypes]: {
-    [oneDimensionalVariableType in OneDimensionalVariableTypes]?: number;
+    [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
   };
 } = {
   defaultGlasses: {
-    headRotationAngle: 0.05,
-    eyesWidth: 0.025,
+    headRotationAngles: 0.05,
+    eyesWidths: 0.025,
   },
   memeGlasses: {
-    headRotationAngle: 0.05,
-    eyesWidth: 0.025,
+    headRotationAngles: 0.05,
+    eyesWidths: 0.025,
   },
   americaGlasses: {
-    headRotationAngle: 0.05,
-    eyesWidth: 0.05,
+    headRotationAngles: 0.05,
+    eyesWidths: 0.05,
   },
   threeDGlasses: {
-    headRotationAngle: 0.05,
-    eyesWidth: 0.025,
+    headRotationAngles: 0.05,
+    eyesWidths: 0.025,
   },
   shades: {
-    headRotationAngle: 0.05,
-    eyesWidth: 0.05,
+    headRotationAngles: 0.05,
+    eyesWidths: 0.05,
   },
 };
 
 const earsDeadbandingMap: {
   [earsEffectType in EarsEffectTypes]: {
-    [oneDimensionalVariableType in OneDimensionalVariableTypes]?: number;
+    [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
   };
 } = {
   dogEars: {
-    headRotationAngle: 0.05,
-    leftEarWidth: 0.2,
-    rightEarWidth: 0.2,
+    headRotationAngles: 0.05,
+    leftEarWidths: 0.02,
+    rightEarWidths: 0.02,
   },
 };
 
 const beardsDeadbandingMap: {
   [beardsEffectType in BeardsEffectTypes]: {
-    [oneDimensionalVariableType in OneDimensionalVariableTypes]?: number;
+    [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
   };
 } = {
   classicalCurlyBeard: {
-    headRotationAngle: 0.05,
-    chinWidth: 1.0,
+    headRotationAngles: 0.05,
+    chinWidths: 1.0,
   },
 };
 
 const mustachesDeadbandingMap: {
   [mustachesEffectType in MustachesEffectTypes]: {
-    [oneDimensionalVariableType in OneDimensionalVariableTypes]?: number;
+    [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
   };
 } = {
-  mustache1: { headRotationAngle: 0.05, eyesWidth: 0.4 },
-  mustache2: { headRotationAngle: 0.05, eyesWidth: 0.4 },
-  mustache3: { headRotationAngle: 0.05, eyesWidth: 0.4 },
-  mustache4: { headRotationAngle: 0.05, eyesWidth: 0.4 },
-  disguiseMustache: { headRotationAngle: 0.05, eyesWidth: 0.4 },
+  mustache1: { headRotationAngles: 0.05, eyesWidths: 0.4 },
+  mustache2: { headRotationAngles: 0.05, eyesWidths: 0.4 },
+  mustache3: { headRotationAngles: 0.05, eyesWidths: 0.4 },
+  mustache4: { headRotationAngles: 0.05, eyesWidths: 0.4 },
+  disguiseMustache: { headRotationAngles: 0.05, eyesWidths: 0.4 },
 };
 
 export const oneDimensionalDeadbandingMap: {
-  [oneDimensionalVariableType in OneDimensionalVariableTypes]: number;
+  [oneDimensionalVariableType in OneDimensionalLandmarkTypes]: number;
 } = {
-  leftEarWidth: 0.0,
-  rightEarWidth: 0.0,
-  eyesWidth: 0.0,
-  chinWidth: 0.0,
-  headRotationAngle: 0.0,
-  interocularDistance: 0.0,
+  leftEarWidths: 0.0,
+  rightEarWidths: 0.0,
+  eyesWidths: 0.0,
+  chinWidths: 0.0,
+  headRotationAngles: 0.0,
+  interocularDistances: 0.0,
 };
 
 const updateDeadbandingMaps = (
@@ -91,7 +91,7 @@ const updateDeadbandingMaps = (
     for (const deadbanding in earsDeadbandingMap[
       currentEffectsStyles.current.ears.style
     ]) {
-      const deadbandingType = deadbanding as OneDimensionalVariableTypes;
+      const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
 
       const earsDeadbandingValue =
         earsDeadbandingMap[currentEffectsStyles.current.ears.style][
@@ -101,12 +101,12 @@ const updateDeadbandingMaps = (
       if (earsDeadbandingValue) {
         const oneDimensionalDeadbandingValue =
           oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalVariableTypes
+            deadbandingType as OneDimensionalLandmarkTypes
           ] ?? 0;
 
         if (oneDimensionalDeadbandingValue < earsDeadbandingValue) {
           oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalVariableTypes
+            deadbandingType as OneDimensionalLandmarkTypes
           ] = earsDeadbandingValue;
         }
       }
@@ -116,7 +116,7 @@ const updateDeadbandingMaps = (
     for (const deadbanding in glassesDeadbandingMap[
       currentEffectsStyles.current.glasses.style
     ]) {
-      const deadbandingType = deadbanding as OneDimensionalVariableTypes;
+      const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
 
       const glassesDeadbandingValue =
         glassesDeadbandingMap[currentEffectsStyles.current.glasses.style][
@@ -126,12 +126,12 @@ const updateDeadbandingMaps = (
       if (glassesDeadbandingValue) {
         const oneDimensionalDeadbandingValue =
           oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalVariableTypes
+            deadbandingType as OneDimensionalLandmarkTypes
           ] ?? 0;
 
         if (oneDimensionalDeadbandingValue < glassesDeadbandingValue) {
           oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalVariableTypes
+            deadbandingType as OneDimensionalLandmarkTypes
           ] = glassesDeadbandingValue;
         }
       }
@@ -141,7 +141,7 @@ const updateDeadbandingMaps = (
     for (const deadbanding in beardsDeadbandingMap[
       currentEffectsStyles.current.beards.style
     ]) {
-      const deadbandingType = deadbanding as OneDimensionalVariableTypes;
+      const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
 
       const beardsDeadbandingValue =
         beardsDeadbandingMap[currentEffectsStyles.current.beards.style][
@@ -151,12 +151,12 @@ const updateDeadbandingMaps = (
       if (beardsDeadbandingValue) {
         const oneDimensionalDeadbandingValue =
           oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalVariableTypes
+            deadbandingType as OneDimensionalLandmarkTypes
           ] ?? 0;
 
         if (oneDimensionalDeadbandingValue < beardsDeadbandingValue) {
           oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalVariableTypes
+            deadbandingType as OneDimensionalLandmarkTypes
           ] = beardsDeadbandingValue;
         }
       }
@@ -166,7 +166,7 @@ const updateDeadbandingMaps = (
     for (const deadbanding in mustachesDeadbandingMap[
       currentEffectsStyles.current.mustaches.style
     ]) {
-      const deadbandingType = deadbanding as OneDimensionalVariableTypes;
+      const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
 
       const mustachesDeadbandingValue =
         mustachesDeadbandingMap[currentEffectsStyles.current.mustaches.style][
@@ -176,12 +176,12 @@ const updateDeadbandingMaps = (
       if (mustachesDeadbandingValue) {
         const oneDimensionalDeadbandingValue =
           oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalVariableTypes
+            deadbandingType as OneDimensionalLandmarkTypes
           ] ?? 0;
 
         if (oneDimensionalDeadbandingValue < mustachesDeadbandingValue) {
           oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalVariableTypes
+            deadbandingType as OneDimensionalLandmarkTypes
           ] = mustachesDeadbandingValue;
         }
       }

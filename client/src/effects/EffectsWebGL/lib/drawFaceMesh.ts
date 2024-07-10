@@ -39,13 +39,8 @@ export const drawFaceMesh = (
     return;
   }
 
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
   // Draw the mesh
   gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
-
-  gl.disable(gl.BLEND);
 };
 
 export default drawFaceMesh;

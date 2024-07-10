@@ -31,7 +31,6 @@ const render = async (
   triangleTexture: WebGLTexture | null | undefined,
   urls: string[]
 ) => {
-  gl.enable(gl.DEPTH_TEST);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.CULL_FACE);
   gl.cullFace(gl.BACK);
@@ -58,33 +57,107 @@ const render = async (
       return;
     }
 
-    faceLandmarks.update(multiFaceLandmarks);
-
-    // await updateFaceLandmarks(
-    //   smoothedFaceIdLandmarksPairs,
-    //   gl,
-    //   baseShader,
-    //   canvas,
-    //   effects,
-    //   faceLandmarks,
-    //   currentEffectsStyles
-    // );
-
     if (
-      faceLandmarks.getFaceIdLandmarksPairs()[0] &&
-      faceLandmarks.getRightEarWidths()[0]
+      effects.ears ||
+      effects.glasses ||
+      effects.beards ||
+      effects.mustaches
     ) {
-      baseShader.drawEffect(
-        urls[1],
-        {
-          x:
-            2 * faceLandmarks.getFaceIdLandmarksPairs()[0].landmarks[473].x - 1,
-          y:
-            -2 * faceLandmarks.getFaceIdLandmarksPairs()[0].landmarks[473].y +
-            1,
-        },
-        faceLandmarks.getRightEarWidths()[0]
-      );
+      faceLandmarks.update(multiFaceLandmarks);
+    }
+
+    for (const {
+      faceId,
+      landmarks,
+    } of faceLandmarks.getFaceIdLandmarksPairs()) {
+      if (effects.ears) {
+        const earsImageOffset =
+          faceLandmarks.getCalculatedLandmarks().earsImageOffsets[faceId];
+
+        baseShader.drawEffect(
+          urls[1],
+          {
+            x: 2 * landmarks[faceLandmarks.RIGHT_EAR_INDEX].x - 1,
+            y: -2 * landmarks[faceLandmarks.RIGHT_EAR_INDEX].y + 1,
+          },
+          {
+            x: earsImageOffset[0],
+            y: earsImageOffset[1],
+          },
+          faceLandmarks.getCalculatedLandmarks().rightEarWidths[faceId],
+          faceLandmarks.getCalculatedLandmarks().headRotationAngles[faceId]
+        );
+
+        baseShader.drawEffect(
+          urls[0],
+          {
+            x: 2 * landmarks[faceLandmarks.LEFT_EAR_INDEX].x - 1,
+            y: -2 * landmarks[faceLandmarks.LEFT_EAR_INDEX].y + 1,
+          },
+          {
+            x: earsImageOffset[0],
+            y: earsImageOffset[1],
+          },
+          faceLandmarks.getCalculatedLandmarks().leftEarWidths[faceId],
+          faceLandmarks.getCalculatedLandmarks().headRotationAngles[faceId]
+        );
+      }
+      if (effects.glasses) {
+        const eyesCenterPosition =
+          faceLandmarks.getCalculatedLandmarks().eyesCenterPositions[faceId];
+
+        baseShader.drawEffect(
+          urls[2],
+          {
+            x: 2 * eyesCenterPosition[0] - 1,
+            y: -2 * eyesCenterPosition[1] + 1,
+          },
+          {
+            x: 0,
+            y: 0,
+          },
+          faceLandmarks.getCalculatedLandmarks().eyesWidths[faceId],
+          faceLandmarks.getCalculatedLandmarks().headRotationAngles[faceId]
+        );
+      }
+      if (effects.beards) {
+        baseShader.drawEffect(
+          urls[3],
+          {
+            x: 2 * landmarks[faceLandmarks.JAW_MID_POINT_INDEX].x - 1,
+            y: -2 * landmarks[faceLandmarks.JAW_MID_POINT_INDEX].y + 1,
+          },
+          {
+            x: faceLandmarks.getCalculatedLandmarks().beardImageOffsets[
+              faceId
+            ][0],
+            y: faceLandmarks.getCalculatedLandmarks().beardImageOffsets[
+              faceId
+            ][1],
+          },
+          faceLandmarks.getCalculatedLandmarks().chinWidths[faceId],
+          faceLandmarks.getCalculatedLandmarks().headRotationAngles[faceId]
+        );
+      }
+      if (effects.mustaches) {
+        baseShader.drawEffect(
+          urls[4],
+          {
+            x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
+            y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
+          },
+          {
+            x: faceLandmarks.getCalculatedLandmarks().mustacheImageOffsets[
+              faceId
+            ][0],
+            y: faceLandmarks.getCalculatedLandmarks().mustacheImageOffsets[
+              faceId
+            ][1],
+          },
+          faceLandmarks.getCalculatedLandmarks().eyesWidths[faceId],
+          faceLandmarks.getCalculatedLandmarks().headRotationAngles[faceId]
+        );
+      }
     }
 
     if (effects.faceMask && triangleTexture) {

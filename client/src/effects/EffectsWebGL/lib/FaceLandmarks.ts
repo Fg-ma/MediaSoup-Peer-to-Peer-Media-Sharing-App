@@ -6,13 +6,46 @@ import { Point2D } from "./drawFaceMesh";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import { oneDimensionalDeadbandingMap } from "./updateDeadbandingMaps";
 
-type OneDimensionalVariableTypes =
-  | "leftEarWidth"
-  | "rightEarWidth"
-  | "eyesWidth"
-  | "chinWidth"
-  | "headRotationAngle"
-  | "interocularDistance";
+type CalculatedLandmarkTypes =
+  | "headRotationAngles"
+  | "interocularDistances"
+  | "eyesCenterPositions"
+  | "leftEarWidths"
+  | "rightEarWidths"
+  | "eyesWidths"
+  | "chinWidths"
+  | "earsImageOffsets"
+  | "beardImageOffsets"
+  | "mustacheImageOffsets";
+
+export type OneDimensionalLandmarkTypes =
+  | "headRotationAngles"
+  | "interocularDistances"
+  | "leftEarWidths"
+  | "rightEarWidths"
+  | "eyesWidths"
+  | "chinWidths";
+
+interface OneDimensionalLandmarks {
+  [id: string]: number;
+}
+
+interface TwoDimensionalLandmarks {
+  [id: string]: [number, number];
+}
+
+interface CalculatedLandmarkInterface {
+  headRotationAngles: OneDimensionalLandmarks;
+  interocularDistances: OneDimensionalLandmarks;
+  eyesCenterPositions: TwoDimensionalLandmarks;
+  leftEarWidths: OneDimensionalLandmarks;
+  rightEarWidths: OneDimensionalLandmarks;
+  eyesWidths: OneDimensionalLandmarks;
+  chinWidths: OneDimensionalLandmarks;
+  earsImageOffsets: TwoDimensionalLandmarks;
+  beardImageOffsets: TwoDimensionalLandmarks;
+  mustacheImageOffsets: TwoDimensionalLandmarks;
+}
 
 class FaceLandmarks {
   private faceIdLandmarksPairs: {
@@ -22,33 +55,31 @@ class FaceLandmarks {
 
   private faceCount = 0;
 
-  private headRotationAngles: number[] = [];
-  private leftEarWidths: number[] = [];
-  private rightEarWidths: number[] = [];
-  private eyesCenterPositions: [number, number][] = [];
-  private eyesWidths: number[] = [];
-  private chinWidths: number[] = [];
-  private earsImageOffset: [number, number][] = [];
-  private beardImageOffset: [number, number][] = [];
-  private mustacheImageOffset: [number, number][] = [];
+  private calculatedLandmarks: CalculatedLandmarkInterface = {
+    headRotationAngles: {},
 
-  private smoothedOneDimensionalVariables: {
-    [featureType in OneDimensionalVariableTypes]: { [id: string]: number };
-  } = {
-    leftEarWidth: {},
-    rightEarWidth: {},
-    eyesWidth: {},
-    chinWidth: {},
-    headRotationAngle: {},
-    interocularDistance: {},
+    interocularDistances: {},
+
+    eyesCenterPositions: {},
+
+    leftEarWidths: {},
+    rightEarWidths: {},
+    eyesWidths: {},
+    chinWidths: {},
+
+    earsImageOffsets: {},
+    beardImageOffsets: {},
+    mustacheImageOffsets: {},
   };
 
-  private LEFT_EYE_INDEX = 468;
-  private RIGHT_EYE_INDEX = 473;
-  private NOSE_INDEX = 1;
-  private JAW_MID_POINT_INDEX = 152;
-  private LEFT_JAW_POINT = 172;
-  private RIGHT_JAW_POINT = 397;
+  LEFT_EYE_INDEX = 468;
+  RIGHT_EYE_INDEX = 473;
+  NOSE_INDEX = 1;
+  JAW_MID_POINT_INDEX = 152;
+  LEFT_JAW_POINT = 172;
+  RIGHT_JAW_POINT = 397;
+  RIGHT_EAR_INDEX = 332;
+  LEFT_EAR_INDEX = 103;
 
   private currentEffectsStyles;
 
@@ -200,12 +231,10 @@ class FaceLandmarks {
       if (!newFaceTrackers[id]) {
         tracker.lastSeen++;
         if (tracker.lastSeen > this.maxFaceTrackerAge) {
-          Object.keys(this.smoothedOneDimensionalVariables).forEach(
-            (featureType) => {
-              const feature = featureType as OneDimensionalVariableTypes;
-              delete this.smoothedOneDimensionalVariables[feature][id];
-            }
-          );
+          Object.keys(this.calculatedLandmarks).forEach((featureType) => {
+            const feature = featureType as OneDimensionalLandmarkTypes;
+            delete this.calculatedLandmarks[feature][id];
+          });
         } else {
           newFaceTrackers[id] = tracker;
         }
@@ -217,7 +246,7 @@ class FaceLandmarks {
   }
 
   private smoothOneDimensionalVariableWithDeadbanding(
-    featureType: OneDimensionalVariableTypes,
+    featureType: OneDimensionalLandmarkTypes,
     previousValue: number,
     currentValue: number,
     smoothingFactor: number
@@ -234,28 +263,32 @@ class FaceLandmarks {
   }
 
   private updateOneDimensionalSmoothVariables(
-    featureType: OneDimensionalVariableTypes,
+    featureType: OneDimensionalLandmarkTypes,
     faceId: string,
     value: number
   ) {
+    if (Array.isArray(this.calculatedLandmarks[featureType][faceId])) {
+      return;
+    }
+
     // Initialize smoothed width if not already initialized
-    if (!this.smoothedOneDimensionalVariables[featureType][faceId]) {
-      this.smoothedOneDimensionalVariables[featureType][faceId] = value;
+    if (!this.calculatedLandmarks[featureType][faceId]) {
+      this.calculatedLandmarks[featureType][faceId] = value;
     }
 
     // Calculate distance (in this case, difference in width values)
     const deltaWidth = Math.abs(
-      value - this.smoothedOneDimensionalVariables[featureType][faceId]
+      value - this.calculatedLandmarks[featureType][faceId]
     );
 
     // Adaptive smoothing factor calculation based on deltaWidth
     const smoothingFactor = this.adaptiveSmoothingFactor(deltaWidth);
 
     // Apply smoothing with deadbanding
-    this.smoothedOneDimensionalVariables[featureType][faceId] =
+    this.calculatedLandmarks[featureType][faceId] =
       this.smoothOneDimensionalVariableWithDeadbanding(
         featureType,
-        this.smoothedOneDimensionalVariables[featureType][faceId],
+        this.calculatedLandmarks[featureType][faceId],
         value,
         smoothingFactor
       );
@@ -284,7 +317,7 @@ class FaceLandmarks {
         (leftEye.x + rightEye.x) / 2,
         (leftEye.y + rightEye.y) / 2,
       ];
-      this.eyesCenterPositions.push(eyesCenterPosition);
+      this.calculatedLandmarks.eyesCenterPositions[faceId] = eyesCenterPosition;
 
       // Calculate the difference in coordinated of eyes
       const dx = rightEye.x - leftEye.x;
@@ -293,52 +326,39 @@ class FaceLandmarks {
 
       // Calculate head angle in plane
       this.updateOneDimensionalSmoothVariables(
-        "headRotationAngle",
+        "headRotationAngles",
         faceId,
-        Math.atan2(dy, dx)
-      );
-      this.headRotationAngles.push(
-        this.smoothedOneDimensionalVariables.headRotationAngle[faceId]
+        -Math.atan2(dy, dx)
       );
 
       // Set left and right ear widths
       // Update InterocularDistance
       this.updateOneDimensionalSmoothVariables(
-        "interocularDistance",
+        "interocularDistances",
         faceId,
         Math.sqrt(dx * dx + dy * dy)
       );
 
       // Calculate ear size based on interocular distance
       this.updateOneDimensionalSmoothVariables(
-        "leftEarWidth",
+        "leftEarWidths",
         faceId,
-        this.smoothedOneDimensionalVariables.interocularDistance[faceId] *
+        this.calculatedLandmarks.interocularDistances[faceId] *
           this.currentEffectsStyles.current.ears.leftEarWidthFactor
       );
       this.updateOneDimensionalSmoothVariables(
-        "rightEarWidth",
+        "rightEarWidths",
         faceId,
-        this.smoothedOneDimensionalVariables.interocularDistance[faceId] *
+        this.calculatedLandmarks.interocularDistances[faceId] *
           this.currentEffectsStyles.current.ears.rightEarWidthFactor
-      );
-
-      this.leftEarWidths.push(
-        this.smoothedOneDimensionalVariables.leftEarWidth[faceId]
-      );
-      this.rightEarWidths.push(
-        this.smoothedOneDimensionalVariables.rightEarWidth[faceId]
       );
 
       // Set eye widths
       // Calculate eyes width based on interocular distance
       this.updateOneDimensionalSmoothVariables(
-        "eyesWidth",
+        "eyesWidths",
         faceId,
-        this.smoothedOneDimensionalVariables.interocularDistance[faceId]
-      );
-      this.eyesWidths.push(
-        this.smoothedOneDimensionalVariables.eyesWidth[faceId]
+        this.calculatedLandmarks.interocularDistances[faceId]
       );
 
       // Set chin widths
@@ -348,41 +368,45 @@ class FaceLandmarks {
       const dyJaw = rightJawPoint.y - leftJawPoint.y;
 
       this.updateOneDimensionalSmoothVariables(
-        "chinWidth",
+        "chinWidths",
         faceId,
         Math.sqrt(dxJaw * dxJaw + dyJaw * dyJaw) * chinWidthFactor
       );
 
-      this.chinWidths.push(
-        this.smoothedOneDimensionalVariables.chinWidth[faceId]
-      );
-
       // Calculate the shift distance for the ear position taking into account
       // headAngle for direction of shift and interocularDistance for scaling
-      const earsShiftFactor = 2;
+      const earsShiftFactor = 1.75;
       const { shiftX: earsShiftX, shiftY: earsShiftY } = this.directionalShift(
-        this.smoothedOneDimensionalVariables.interocularDistance[faceId] *
-          earsShiftFactor,
-        this.smoothedOneDimensionalVariables.headRotationAngle[faceId]
+        this.calculatedLandmarks.interocularDistances[faceId] * earsShiftFactor,
+        this.calculatedLandmarks.headRotationAngles[faceId]
       );
-      this.earsImageOffset.push([earsShiftX * -1, earsShiftY * -1]);
+      this.calculatedLandmarks.earsImageOffsets[faceId] = [
+        earsShiftX,
+        earsShiftY,
+      ];
 
       // Calculate the shift distance for the chin position taking into account
       // headAngle for direction of shift
       const { shiftX: beardShiftX, shiftY: beardShiftY } =
         this.directionalShift(
           this.currentEffectsStyles.current.beards.chinOffset,
-          this.smoothedOneDimensionalVariables.headRotationAngle[faceId]
+          this.calculatedLandmarks.headRotationAngles[faceId]
         );
-      this.beardImageOffset.push([beardShiftX, beardShiftY]);
+      this.calculatedLandmarks.beardImageOffsets[faceId] = [
+        beardShiftX,
+        beardShiftY,
+      ];
 
       // Calculate the shift distance for the nose position taking into account
       // headAngle for direction of shift
       const { shiftX: noseShiftX, shiftY: noseShiftY } = this.directionalShift(
         this.currentEffectsStyles.current.mustaches.noseOffset,
-        this.smoothedOneDimensionalVariables.headRotationAngle[faceId]
+        this.calculatedLandmarks.headRotationAngles[faceId]
       );
-      this.mustacheImageOffset.push([noseShiftX, noseShiftY]);
+      this.calculatedLandmarks.mustacheImageOffsets[faceId] = [
+        noseShiftX,
+        noseShiftY,
+      ];
     });
   }
 
@@ -397,32 +421,8 @@ class FaceLandmarks {
     return this.faceIdLandmarksPairs;
   }
 
-  getHeadRotationAngles() {
-    return this.headRotationAngles;
-  }
-  getLeftEarWidths() {
-    return this.leftEarWidths;
-  }
-  getRightEarWidths() {
-    return this.rightEarWidths;
-  }
-  getEyesCenterPositions() {
-    return this.eyesCenterPositions;
-  }
-  getEyesWidths() {
-    return this.eyesWidths;
-  }
-  getChinWidths() {
-    return this.chinWidths;
-  }
-  getEarsImageOffset() {
-    return this.earsImageOffset;
-  }
-  getBeardImageOffset() {
-    return this.beardImageOffset;
-  }
-  getMustacheImageOffset() {
-    return this.mustacheImageOffset;
+  getCalculatedLandmarks() {
+    return this.calculatedLandmarks;
   }
 }
 

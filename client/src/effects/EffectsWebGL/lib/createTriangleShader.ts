@@ -57,6 +57,8 @@ class TriangleShader {
   }
 
   private initShaderProgram() {
+    this.use();
+
     const vertexShader = this.loadShader(
       this.gl.VERTEX_SHADER,
       this.VERTEX_SHADER
@@ -103,6 +105,8 @@ class TriangleShader {
   }
 
   private initUniformLocations() {
+    this.use();
+
     if (this.program) {
       this.uTriangleTextureLocation = this.gl.getUniformLocation(
         this.program,
@@ -112,6 +116,8 @@ class TriangleShader {
   }
 
   private initAttributeLocations() {
+    this.use();
+
     if (this.program) {
       this.aPositionLocation = this.gl.getAttribLocation(
         this.program,
@@ -125,6 +131,8 @@ class TriangleShader {
   }
 
   private initBuffers() {
+    this.use();
+
     if (this.aPositionLocation === null || this.aTexCoordLocation == null) {
       console.error("An error occurred while initializing the buffers");
       return;
