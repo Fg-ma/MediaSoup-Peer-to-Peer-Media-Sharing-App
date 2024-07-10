@@ -1,5 +1,5 @@
 import { EffectTypes } from "src/context/StreamsContext";
-import { FaceLandmarks } from "../handleEffectWebGL";
+// import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import directionalShift from "./directionalShift";
 import updateOneDimensionalSmoothVariables from "./updateOneDimensionalSmoothVariables";

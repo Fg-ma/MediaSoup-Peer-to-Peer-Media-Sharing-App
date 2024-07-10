@@ -1,6 +1,6 @@
 import { EffectTypes } from "src/context/StreamsContext";
 import updateBaseVideoTexture from "./updateBaseVideoTexture";
-import { FaceLandmarks } from "../handleEffectWebGL";
+// import { FaceLandmarks } from "../handleEffectWebGL";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateFaceLandmarks from "./updateFaceLandmarks";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
@@ -10,11 +10,13 @@ import landmarksSmoothWithDeadbanding from "./landmarksSmoothWithDeadbanding";
 import drawMustacheMesh from "./drawMustacheMesh";
 import { BaseShader, BaseShader2 } from "./createBaseShader";
 import TriangleShader from "./createTriangleShader";
+import FaceLandmarks from "./FaceLandmarks";
 
 const render = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseShader: BaseShader2,
   triangleShader: TriangleShader,
+  faceLandmarks: FaceLandmarks,
   baseVideoTexture: WebGLTexture,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
@@ -22,7 +24,7 @@ const render = async (
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   },
-  faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
+  // faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
   faceMesh: FaceMesh,
   faceMeshResults: Results[],
@@ -39,7 +41,6 @@ const render = async (
   // updateBaseVideoTexture(gl, baseVideoTexture, video, baseShader);
 
   baseShader.updateVideoTexture(video);
-  baseShader.drawEffect(urls[1], { x: 0, y: 0 }, 1);
 
   if (
     effects.ears ||
@@ -57,10 +58,7 @@ const render = async (
       return;
     }
 
-    const faceIdLandmarksPairs = applyFaceTracker(multiFaceLandmarks);
-
-    const smoothedFaceIdLandmarksPairs =
-      landmarksSmoothWithDeadbanding(faceIdLandmarksPairs);
+    faceLandmarks.update(multiFaceLandmarks);
 
     // await updateFaceLandmarks(
     //   smoothedFaceIdLandmarksPairs,
@@ -72,15 +70,34 @@ const render = async (
     //   currentEffectsStyles
     // );
 
+    if (
+      faceLandmarks.getFaceIdLandmarksPairs()[0] &&
+      faceLandmarks.getRightEarWidths()[0]
+    ) {
+      baseShader.drawEffect(
+        urls[1],
+        {
+          x:
+            2 * faceLandmarks.getFaceIdLandmarksPairs()[0].landmarks[473].x - 1,
+          y:
+            -2 * faceLandmarks.getFaceIdLandmarksPairs()[0].landmarks[473].y +
+            1,
+        },
+        faceLandmarks.getRightEarWidths()[0]
+      );
+    }
+
     if (effects.faceMask && triangleTexture) {
-      smoothedFaceIdLandmarksPairs.forEach((smoothedFaceIdLandmarksPair) => {
-        // drawFaceMesh(
-        //   gl,
-        //   smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
-        //   triangleShader
-        // );
-        drawMustacheMesh(gl, triangleShader);
-      });
+      faceLandmarks
+        .getFaceIdLandmarksPairs()
+        .forEach((smoothedFaceIdLandmarksPair) => {
+          // drawFaceMesh(
+          //   gl,
+          //   smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
+          //   triangleShader
+          // );
+          drawMustacheMesh(gl, triangleShader);
+        });
     }
   }
 
@@ -89,12 +106,13 @@ const render = async (
       gl,
       baseShader,
       triangleShader,
+      faceLandmarks,
       baseVideoTexture,
       video,
       canvas,
       animationFrameId,
       effects,
-      faceLandmarks,
+      // faceLandmarks,
       currentEffectsStyles,
       faceMesh,
       faceMeshResults,

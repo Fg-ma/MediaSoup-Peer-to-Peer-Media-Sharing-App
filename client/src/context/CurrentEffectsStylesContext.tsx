@@ -15,7 +15,7 @@ export const earsWidthFactorMap: {
     rightEarWidthFactor: number;
   };
 } = {
-  dogEars: { leftEarWidthFactor: 325, rightEarWidthFactor: 325 },
+  dogEars: { leftEarWidthFactor: 4, rightEarWidthFactor: 4 },
 };
 
 export type BeardsEffectTypes = "classicalCurlyBeard";

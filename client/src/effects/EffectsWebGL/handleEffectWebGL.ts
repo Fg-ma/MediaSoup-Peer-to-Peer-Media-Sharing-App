@@ -16,18 +16,19 @@ import {
 } from "./lib/updateBaseUniforms";
 import { BaseShader, BaseShader2 } from "./lib/createBaseShader";
 import TriangleShader from "./lib/createTriangleShader";
+import FaceLandmarks from "./lib/FaceLandmarks";
 
-export type FaceLandmarks =
-  | "headRotationAngles"
-  | "leftEarWidths"
-  | "rightEarWidths"
-  | "leftEyePositions"
-  | "rightEyePositions"
-  | "eyesCenterPositions"
-  | "eyesWidths"
-  | "chinPositions"
-  | "chinWidths"
-  | "nosePositions";
+// export type FaceLandmarks =
+//   | "headRotationAngles"
+//   | "leftEarWidths"
+//   | "rightEarWidths"
+//   | "leftEyePositions"
+//   | "rightEyePositions"
+//   | "eyesCenterPositions"
+//   | "eyesWidths"
+//   | "chinPositions"
+//   | "chinWidths"
+//   | "nosePositions";
 
 const handleEffectWebGL = async (
   type: "webcam" | "screen" | "audio",
@@ -70,6 +71,7 @@ const handleEffectWebGL = async (
 
   const baseShader = new BaseShader2(gl);
   const triangleShader = new TriangleShader(gl);
+  const faceLandmarks = new FaceLandmarks(currentEffectsStyles);
 
   // Create base video texture
   const baseVideoTexture = createAndSetupTexture(gl);
@@ -216,43 +218,43 @@ const handleEffectWebGL = async (
   // );
 
   // Set up the uniforms in the triangle fragment shader
-  initializeTriangleUniforms(gl, triangleShader, effects, triangleTexture);
+  // initializeTriangleUniforms(gl, triangleShader, effects, triangleTexture);
 
-  const faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean } = {
-    headRotationAngles: false,
-    leftEarWidths: false,
-    rightEarWidths: false,
-    leftEyePositions: false,
-    rightEyePositions: false,
-    eyesCenterPositions: false,
-    eyesWidths: false,
-    chinPositions: false,
-    chinWidths: false,
-    nosePositions: false,
-  };
+  // const faceLandmarks: { [faceLandmark in FaceLandmarks]: boolean } = {
+  //   headRotationAngles: false,
+  //   leftEarWidths: false,
+  //   rightEarWidths: false,
+  //   leftEyePositions: false,
+  //   rightEyePositions: false,
+  //   eyesCenterPositions: false,
+  //   eyesWidths: false,
+  //   chinPositions: false,
+  //   chinWidths: false,
+  //   nosePositions: false,
+  // };
 
-  if (effects.ears) {
-    faceLandmarks.headRotationAngles = true;
-    faceLandmarks.leftEyePositions = true;
-    faceLandmarks.rightEyePositions = true;
-    faceLandmarks.leftEarWidths = true;
-    faceLandmarks.rightEarWidths = true;
-  }
-  if (effects.glasses) {
-    faceLandmarks.headRotationAngles = true;
-    faceLandmarks.eyesCenterPositions = true;
-    faceLandmarks.eyesWidths = true;
-  }
-  if (effects.beards) {
-    faceLandmarks.headRotationAngles = true;
-    faceLandmarks.chinPositions = true;
-    faceLandmarks.chinWidths = true;
-  }
-  if (effects.mustaches) {
-    faceLandmarks.headRotationAngles = true;
-    faceLandmarks.nosePositions = true;
-    faceLandmarks.eyesWidths = true;
-  }
+  // if (effects.ears) {
+  //   faceLandmarks.headRotationAngles = true;
+  //   faceLandmarks.leftEyePositions = true;
+  //   faceLandmarks.rightEyePositions = true;
+  //   faceLandmarks.leftEarWidths = true;
+  //   faceLandmarks.rightEarWidths = true;
+  // }
+  // if (effects.glasses) {
+  //   faceLandmarks.headRotationAngles = true;
+  //   faceLandmarks.eyesCenterPositions = true;
+  //   faceLandmarks.eyesWidths = true;
+  // }
+  // if (effects.beards) {
+  //   faceLandmarks.headRotationAngles = true;
+  //   faceLandmarks.chinPositions = true;
+  //   faceLandmarks.chinWidths = true;
+  // }
+  // if (effects.mustaches) {
+  //   faceLandmarks.headRotationAngles = true;
+  //   faceLandmarks.nosePositions = true;
+  //   faceLandmarks.eyesWidths = true;
+  // }
 
   updateDeadbandingMaps(effects, currentEffectsStyles);
 
@@ -295,12 +297,13 @@ const handleEffectWebGL = async (
       gl,
       baseShader,
       triangleShader,
+      faceLandmarks,
       baseVideoTexture,
       video,
       canvas,
       animationFrameId,
       effects,
-      faceLandmarks,
+      // faceLandmarks,
       currentEffectsStyles,
       faceMesh,
       faceMeshResults,
