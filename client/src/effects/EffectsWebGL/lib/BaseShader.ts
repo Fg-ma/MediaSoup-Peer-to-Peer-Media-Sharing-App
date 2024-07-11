@@ -1,6 +1,7 @@
 import { EffectTypes } from "src/context/StreamsContext";
 import baseFragmentShaderSource from "./baseFragmentShader";
 import baseVertexShaderSource from "./baseVertexShader";
+import mustaches from "../../../../public/3DAssests/mustaches/mustacheData.json";
 
 class BaseShader {
   private gl: WebGL2RenderingContext | WebGLRenderingContext;
@@ -14,8 +15,9 @@ class BaseShader {
   private indexBuffer: WebGLBuffer | null = null;
 
   private videoTexture: WebGLTexture | null = null;
-
   private twoDimensionalEffectsAtlasTexture: WebGLTexture | null = null;
+  private meshTexture: WebGLTexture | null = null;
+
   private twoDimensionalAltasURLMap: {
     url: string;
     row: number;
@@ -24,11 +26,14 @@ class BaseShader {
   private twoDimensionalEffectsAtlasSize: number | null = null;
   private twoDimensionalEffectsTextureSize: number = 512;
 
+  private meshTextureSize: number = 1024;
+
   // Uniform Locations
   private uTexSize: WebGLUniformLocation | null = null;
+  private uVideoTextureLocation: WebGLUniformLocation | null = null;
   private uTwoDimensionalEffectAtlasTextureLocation: WebGLUniformLocation | null =
     null;
-  private uVideoTextureLocation: WebGLUniformLocation | null = null;
+  private uMeshTextureLocation: WebGLUniformLocation | null = null;
   private uEffectFlagsLocation: WebGLUniformLocation | null = null;
   private uTintColorLocation: WebGLUniformLocation | null = null;
 
@@ -38,15 +43,17 @@ class BaseShader {
 
   private effectFlags: number = 0;
   private VIDEO_BIT = 0;
-  private BLUR_BIT = 1;
-  private TINT_BIT = 2;
+  private TWO_DIMENSIONAL_EFFECTS_BIT = 1;
+  private MESH_BIT = 2;
+  private BLUR_BIT = 3;
+  private TINT_BIT = 4;
 
   constructor(
     gl: WebGL2RenderingContext | WebGLRenderingContext,
     effects: {
       [effectType in EffectTypes]?: boolean | undefined;
     },
-    tintColor: string
+    triangleTextureURL: string
   ) {
     this.gl = gl;
     this.initShaderProgram();
@@ -54,6 +61,7 @@ class BaseShader {
     this.initAttributeLocations();
     this.initBuffers();
     this.initVideoTexture();
+    this.initTriangleTexture(triangleTextureURL);
 
     let effectFlags = 0;
 
@@ -63,9 +71,6 @@ class BaseShader {
     this.effectFlags = effectFlags;
 
     gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
-
-    const tintColorVector = this.hexToRgb(tintColor);
-    gl.uniform3fv(this.uTintColorLocation, tintColorVector);
   }
 
   deconstructor() {
@@ -141,13 +146,17 @@ class BaseShader {
     }
 
     this.uTexSize = this.gl.getUniformLocation(this.program, "u_texSize");
+    this.uVideoTextureLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_videoTexture"
+    );
     this.uTwoDimensionalEffectAtlasTextureLocation = this.gl.getUniformLocation(
       this.program,
       "u_twoDimensionalEffectAtlasTexture"
     );
-    this.uVideoTextureLocation = this.gl.getUniformLocation(
+    this.uMeshTextureLocation = this.gl.getUniformLocation(
       this.program,
-      "u_videoTexture"
+      "u_meshTexture"
     );
     this.uEffectFlagsLocation = this.gl.getUniformLocation(
       this.program,
@@ -211,6 +220,73 @@ class BaseShader {
     );
 
     this.gl.uniform1i(this.uVideoTextureLocation, 0);
+  }
+
+  private initTriangleTexture(triangleTextureURL: string) {
+    this.use();
+
+    this.meshTexture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.meshTexture);
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_S,
+      this.gl.CLAMP_TO_EDGE
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_T,
+      this.gl.CLAMP_TO_EDGE
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MIN_FILTER,
+      this.gl.LINEAR
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MAG_FILTER,
+      this.gl.LINEAR
+    );
+
+    const image = new Image();
+    image.onload = () => {
+      this.meshTextureSize = image.width;
+
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.meshTexture);
+      this.gl.texImage2D(
+        this.gl.TEXTURE_2D,
+        0,
+        this.gl.RGBA,
+        this.gl.RGBA,
+        this.gl.UNSIGNED_BYTE,
+        image
+      );
+    };
+    image.src = triangleTextureURL;
+
+    this.gl.activeTexture(this.gl.TEXTURE2);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.meshTexture);
+    this.gl.uniform1i(this.uMeshTextureLocation, 2);
+  }
+
+  private switchTextureFlag(textureBit: number) {
+    if (textureBit === this.VIDEO_BIT) {
+      this.effectFlags |= 1 << this.VIDEO_BIT;
+    } else {
+      this.effectFlags &= ~(1 << this.VIDEO_BIT);
+    }
+    if (textureBit === this.TWO_DIMENSIONAL_EFFECTS_BIT) {
+      this.effectFlags |= 1 << this.TWO_DIMENSIONAL_EFFECTS_BIT;
+    } else {
+      this.effectFlags &= ~(1 << this.TWO_DIMENSIONAL_EFFECTS_BIT);
+    }
+    if (textureBit === this.MESH_BIT) {
+      this.effectFlags |= 1 << this.MESH_BIT;
+    } else {
+      this.effectFlags &= ~(1 << this.MESH_BIT);
+    }
+
+    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
   }
 
   private hexToRgb(hex: string) {
@@ -358,8 +434,7 @@ class BaseShader {
 
     this.use();
 
-    this.effectFlags &= ~(1 << this.VIDEO_BIT);
-    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
+    this.switchTextureFlag(this.TWO_DIMENSIONAL_EFFECTS_BIT);
 
     this.gl.uniform2f(
       this.uTexSize,
@@ -479,8 +554,7 @@ class BaseShader {
 
     this.use();
 
-    this.effectFlags |= 1 << this.VIDEO_BIT;
-    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
+    this.switchTextureFlag(this.VIDEO_BIT);
 
     this.gl.uniform2f(
       this.uTexSize,
@@ -528,6 +602,76 @@ class BaseShader {
     );
 
     this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  drawMesh() {
+    if (this.aPositionLocation === null || this.aTexCoordLocation === null) {
+      return;
+    }
+
+    this.use();
+
+    this.switchTextureFlag(this.MESH_BIT);
+
+    this.gl.uniform2f(
+      this.uTexSize,
+      this.meshTextureSize,
+      this.meshTextureSize
+    );
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(mustaches.vertex_faces),
+      this.gl.STATIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      this.aPositionLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(mustaches.uv_faces),
+      this.gl.STATIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      this.aTexCoordLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    let indices = [];
+    for (let i = 0; i < mustaches.uv_faces.length / 2; i++) {
+      indices.push(i);
+    }
+
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.gl.bufferData(
+      this.gl.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(indices),
+      this.gl.STATIC_DRAW
+    );
+
+    // Draw the mesh
+    this.gl.drawElements(
+      this.gl.TRIANGLES,
+      indices.length,
+      this.gl.UNSIGNED_SHORT,
+      0
+    );
+  }
+
+  setTintColor(tintColor: string) {
+    this.gl.uniform3fv(this.uTintColorLocation, this.hexToRgb(tintColor));
   }
 }
 

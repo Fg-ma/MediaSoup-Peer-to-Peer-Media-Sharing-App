@@ -22,7 +22,6 @@ const render = async (
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
   faceMesh: FaceMesh,
   faceMeshResults: Results[],
-  triangleTexture: WebGLTexture | null | undefined,
   urls: string[]
 ) => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -155,16 +154,17 @@ const render = async (
       }
     }
 
-    if (effects.faceMask && triangleTexture) {
+    if (effects.faceMask) {
       faceLandmarks
         .getFaceIdLandmarksPairs()
         .forEach(({ faceId, landmarks }) => {
           // drawFaceMesh(
           //   gl,
-          //   smoothedFaceIdLandmarksPair.landmarks.slice(0, -10),
+          //   faceLandmarks.getFaceIdLandmarksPairs()[0].landmarks.slice(0, -10),
           //   triangleShader
           // );
-          drawMustacheMesh(gl, triangleShader);
+          // drawMustacheMesh(gl, triangleShader);
+          baseShader.drawMesh();
         });
     }
   }
@@ -182,7 +182,6 @@ const render = async (
       currentEffectsStyles,
       faceMesh,
       faceMeshResults,
-      triangleTexture,
       urls
     )
   );

@@ -1,7 +1,6 @@
 import { EffectTypes } from "../../context/StreamsContext";
 import render from "./lib/render";
 import createStopFunction from "./lib/createStopFunction";
-import { loadTexture } from "./lib/loadTexture";
 import loadModels from "../lib/loadModels";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
@@ -48,8 +47,18 @@ const handleEffectWebGL = async (
     return new Error("WebGL not supported");
   }
 
-  const baseShader = new BaseShader(gl, effects, tintColor.current);
-  const triangleShader = new TriangleShader(gl);
+  const baseShader = new BaseShader(
+    gl,
+    effects,
+    `/2DAssets/mustacheTexture.png`
+  );
+  if (tintColor.current) {
+    baseShader.setTintColor(tintColor.current);
+  }
+  const triangleShader = new TriangleShader(
+    gl,
+    `/2DAssets/mustacheTexture.png`
+  );
   const faceLandmarks = new FaceLandmarks(currentEffectsStyles);
 
   if (
@@ -60,21 +69,6 @@ const handleEffectWebGL = async (
     effects.faceMask
   ) {
     await loadModels();
-  }
-
-  // Load triangle image as textures
-  let triangleTexture: WebGLTexture | null | undefined;
-  if (effects.faceMask) {
-    const loadedTriangleTexture = await loadTexture(
-      gl,
-      `/2DAssets/mustacheTexture.png`
-      // `/2DAssets/james2.png`
-    );
-    triangleTexture = loadedTriangleTexture.texture;
-
-    if (!triangleTexture) {
-      return new Error("No triangleTexture or triangleAspectRatio");
-    }
   }
 
   const urls = [
@@ -95,6 +89,8 @@ const handleEffectWebGL = async (
       : null,
   ].filter((url) => url !== null);
 
+  baseShader.createAtlasTexture(urls);
+
   updateDeadbandingMaps(effects, currentEffectsStyles);
 
   let faceMeshResults: Results[] = [];
@@ -112,8 +108,6 @@ const handleEffectWebGL = async (
   faceMesh.onResults((results) => {
     faceMeshResults[0] = results;
   });
-
-  baseShader.createAtlasTexture(urls);
 
   // Start video and render loop
   let animationFrameId: number[] = [];
@@ -144,7 +138,6 @@ const handleEffectWebGL = async (
       currentEffectsStyles,
       faceMesh,
       faceMeshResults,
-      triangleTexture,
       urls
     );
   });

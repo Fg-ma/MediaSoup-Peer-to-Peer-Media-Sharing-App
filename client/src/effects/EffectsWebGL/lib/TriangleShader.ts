@@ -1,16 +1,19 @@
 import triangleFragmentShaderSource from "./triangleFragmentShader";
 import triangleVertexShaderSource from "./triangleVertexShader";
+import mustaches from "../../../../public/3DAssests/mustaches/mustacheData.json";
 
 class TriangleShader {
   private gl: WebGL2RenderingContext | WebGLRenderingContext;
   private program: WebGLProgram | null = null;
 
+  private VERTEX_SHADER = triangleVertexShaderSource;
+  private FRAGMENT_SHADER = triangleFragmentShaderSource;
+
   private positionBuffer: WebGLBuffer | null = null;
   private texCoordBuffer: WebGLBuffer | null = null;
   private indexBuffer: WebGLBuffer | null = null;
 
-  private VERTEX_SHADER = triangleVertexShaderSource;
-  private FRAGMENT_SHADER = triangleFragmentShaderSource;
+  private triangleTexture: WebGLTexture | null = null;
 
   // Uniform locations
   private uTriangleTextureLocation: WebGLUniformLocation | null = null;
@@ -19,12 +22,16 @@ class TriangleShader {
   private aPositionLocation: number | null = null;
   private aTexCoordLocation: number | null = null;
 
-  constructor(gl: WebGL2RenderingContext | WebGLRenderingContext) {
+  constructor(
+    gl: WebGL2RenderingContext | WebGLRenderingContext,
+    triangleTextureURL: string
+  ) {
     this.gl = gl;
     this.initShaderProgram();
     this.initUniformLocations();
     this.initAttributeLocations();
     this.initBuffers();
+    this.initTriangleTexture(triangleTextureURL);
   }
 
   deconstructor() {
@@ -186,6 +193,129 @@ class TriangleShader {
     if (this.program) {
       this.gl.useProgram(this.program);
     }
+  }
+
+  updateTrianglesBuffers(
+    srcTrianglesArray: number[],
+    destTrianglesArray: number[]
+  ) {
+    if (this.aPositionLocation === null || this.aTexCoordLocation === null) {
+      return;
+    }
+
+    this.use();
+
+    // Create or reuse buffers
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(destTrianglesArray),
+      this.gl.STATIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      this.aPositionLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(srcTrianglesArray),
+      this.gl.STATIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      this.aTexCoordLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    let indices = [];
+    for (let i = 0; i < srcTrianglesArray.length / 2; i++) {
+      indices.push(i);
+    }
+
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.gl.bufferData(
+      this.gl.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(indices),
+      this.gl.STATIC_DRAW
+    );
+
+    return indices.length;
+  }
+
+  drawMesh() {
+    this.use();
+
+    const indexCount = this.updateTrianglesBuffers(
+      mustaches.uv_faces,
+      mustaches.vertex_faces
+    );
+
+    if (!indexCount) {
+      return;
+    }
+
+    // Draw the mesh
+    this.gl.drawElements(
+      this.gl.TRIANGLES,
+      indexCount,
+      this.gl.UNSIGNED_SHORT,
+      0
+    );
+  }
+
+  initTriangleTexture(triangleTextureURL: string) {
+    this.use();
+
+    const texture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_S,
+      this.gl.CLAMP_TO_EDGE
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_T,
+      this.gl.CLAMP_TO_EDGE
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MIN_FILTER,
+      this.gl.LINEAR
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MAG_FILTER,
+      this.gl.LINEAR
+    );
+
+    const image = new Image();
+    image.onload = () => {
+      this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+      this.gl.texImage2D(
+        this.gl.TEXTURE_2D,
+        0,
+        this.gl.RGBA,
+        this.gl.RGBA,
+        this.gl.UNSIGNED_BYTE,
+        image
+      );
+    };
+    image.src = triangleTextureURL;
+
+    this.triangleTexture = texture;
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    this.gl.uniform1i(this.uTriangleTextureLocation, 0);
   }
 
   // Getter methods for uniform locations (if needed)

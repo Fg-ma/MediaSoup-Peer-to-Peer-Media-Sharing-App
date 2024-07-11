@@ -1,6 +1,7 @@
 const triangleVertexShaderSource = `
   attribute vec3 a_position;
   attribute vec2 a_texCoord;
+
   varying vec2 v_texCoord;
 
   // Function to rotate a 3D vector by angles in radians
@@ -24,9 +25,11 @@ const triangleVertexShaderSource = `
   }
 
   void main() {
+      v_texCoord = a_texCoord;
+
       // Convert angles from degrees to radians
-      float angleXRadians = radians(180.0); 
-      float angleYRadians = radians(1800.0);
+      float angleXRadians = radians(0.0); 
+      float angleYRadians = radians(0.0);
 
       // Rotate the position a_position
       vec3 rotatedPosition = rotate(a_position, angleXRadians, angleYRadians);
@@ -35,9 +38,6 @@ const triangleVertexShaderSource = `
       rotatedPosition *= 1.0;
 
       gl_Position = vec4(rotatedPosition, 1.0);
-
-      // Pass through the texture coordinates a_texCoord
-      v_texCoord = a_texCoord;
   }
 `;
 

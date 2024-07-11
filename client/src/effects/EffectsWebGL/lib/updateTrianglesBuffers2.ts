@@ -13,6 +13,8 @@ const updateTrianglesBuffers2 = (
     return;
   }
 
+  triangleShader.use();
+
   // Create or reuse buffers
   gl.bindBuffer(gl.ARRAY_BUFFER, triangleShader.getPositionBuffer);
   gl.bufferData(

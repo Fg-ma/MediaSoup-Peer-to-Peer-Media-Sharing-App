@@ -1,6 +1,6 @@
 import updateTrianglesBuffers2 from "./updateTrianglesBuffers2";
-import mustaches from "../../../../public/3DAssests/mustaches/mustacheData.json";
 import TriangleShader from "./TriangleShader";
+import mustaches from "../../../../public/3DAssests/mustaches/mustacheData.json";
 
 export interface PointUV {
   u: number;
@@ -24,13 +24,8 @@ export const drawMustacheMesh = (
     return;
   }
 
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
   // Draw the mesh
   gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
-
-  gl.disable(gl.BLEND);
 };
 
 export default drawMustacheMesh;
