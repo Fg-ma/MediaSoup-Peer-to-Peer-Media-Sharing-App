@@ -16,6 +16,6 @@
     "jsx": "react",
     "noEmit": true
   },
-  "include": ["src", "types"],
+  "include": ["src", "types", "public"],
   "exclude": ["node_modules"]
 }

@@ -6,6 +6,7 @@ export default function HoldButton({
   clickFunction,
   holdFunction,
   contentFunction,
+  doubleClickFunction,
   holdContent,
   styles,
   defaultDataValue,
@@ -13,6 +14,7 @@ export default function HoldButton({
   clickFunction: () => void;
   holdFunction: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction: () => React.ReactElement;
+  doubleClickFunction?: () => void;
   holdContent: React.ReactElement;
   styles: string;
   defaultDataValue: string;
@@ -52,6 +54,12 @@ export default function HoldButton({
     }
   };
 
+  const handleDoubleClick = () => {
+    if (doubleClickFunction) {
+      doubleClickFunction();
+    }
+  };
+
   useEffect(() => {
     const handleWindowMouseUp = (event: MouseEvent) =>
       handleMouseUp(event as unknown as React.MouseEvent<Element, MouseEvent>);
@@ -70,6 +78,7 @@ export default function HoldButton({
         onMouseDown={(event) => handleMouseDown(event)}
         className={styles}
         data-value={defaultDataValue}
+        onDoubleClick={handleDoubleClick}
       >
         {contentFunction()}
       </button>

@@ -1,7 +1,6 @@
 import { EffectTypes } from "../../context/StreamsContext";
 import render from "./lib/render";
 import createStopFunction from "./lib/createStopFunction";
-import loadModels from "../lib/loadModels";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
@@ -9,6 +8,13 @@ import { releaseAllTexturePositions } from "./lib/handleTexturePosition";
 import BaseShader from "./lib/BaseShader";
 import TriangleShader from "./lib/TriangleShader";
 import FaceLandmarks from "./lib/FaceLandmarks";
+
+export type URLsTypes =
+  | "leftEar"
+  | "rightEar"
+  | "glasses"
+  | "beards"
+  | "mustaches";
 
 const handleEffectWebGL = async (
   type: "webcam" | "screen" | "audio",
@@ -50,46 +56,41 @@ const handleEffectWebGL = async (
   const baseShader = new BaseShader(
     gl,
     effects,
-    `/2DAssets/mustacheTexture.png`
+    `/3DAssets/mustaches/miniMustacheTexture.png`
   );
   if (tintColor.current) {
     baseShader.setTintColor(tintColor.current);
   }
   const triangleShader = new TriangleShader(
     gl,
-    `/2DAssets/mustacheTexture.png`
+    `/3DAssets/mustaches/mustacheTexture.png`
   );
   const faceLandmarks = new FaceLandmarks(currentEffectsStyles);
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
-  if (
-    effects.ears ||
-    effects.glasses ||
-    effects.beards ||
-    effects.mustaches ||
-    effects.faceMask
-  ) {
-    await loadModels();
-  }
-
-  const urls = [
-    effects.ears || true
+  const urls = {
+    leftEar: effects.ears
       ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Left.png`
       : null,
-    effects.ears || true
+    rightEar: effects.ears
       ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Right.png`
       : null,
-    effects.glasses || true
+    glasses: effects.glasses
       ? `/2DAssets/glasses/${currentEffectsStyles.current.glasses.style}.png`
       : null,
-    effects.beards || true
+    beards: effects.beards
       ? `/2DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
       : null,
-    effects.mustaches || true
+    mustaches: effects.mustaches
       ? `/2DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
       : null,
-  ].filter((url) => url !== null);
+  };
 
-  baseShader.createAtlasTexture(urls);
+  const filteredUrls: { [URLType in URLsTypes]?: string } = Object.fromEntries(
+    Object.entries(urls).filter(([key, value]) => value !== null)
+  );
+
+  await baseShader.createAtlasTexture(filteredUrls);
 
   updateDeadbandingMaps(effects, currentEffectsStyles);
 

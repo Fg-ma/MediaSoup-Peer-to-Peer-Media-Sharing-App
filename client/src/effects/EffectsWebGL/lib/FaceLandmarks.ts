@@ -8,6 +8,7 @@ import { oneDimensionalDeadbandingMap } from "./updateDeadbandingMaps";
 
 export type OneDimensionalLandmarkTypes =
   | "headRotationAngles"
+  | "headYawAngles"
   | "interocularDistances"
   | "leftEarWidths"
   | "rightEarWidths"
@@ -24,15 +25,19 @@ interface TwoDimensionalLandmarks {
 
 interface CalculatedLandmarkInterface {
   headRotationAngles: OneDimensionalLandmarks;
+  headYawAngles: OneDimensionalLandmarks;
   interocularDistances: OneDimensionalLandmarks;
   eyesCenterPositions: TwoDimensionalLandmarks;
   leftEarWidths: OneDimensionalLandmarks;
   rightEarWidths: OneDimensionalLandmarks;
   eyesWidths: OneDimensionalLandmarks;
   chinWidths: OneDimensionalLandmarks;
-  earsImageOffsets: TwoDimensionalLandmarks;
-  beardImageOffsets: TwoDimensionalLandmarks;
-  mustacheImageOffsets: TwoDimensionalLandmarks;
+  twoDimEarsOffsets: TwoDimensionalLandmarks;
+  twoDimBeardOffsets: TwoDimensionalLandmarks;
+  twoDimMustacheOffsets: TwoDimensionalLandmarks;
+  threeDimEarsOffsets: TwoDimensionalLandmarks;
+  threeDimBeardOffsets: TwoDimensionalLandmarks;
+  threeDimMustacheOffsets: TwoDimensionalLandmarks;
 }
 
 class FaceLandmarks {
@@ -43,6 +48,7 @@ class FaceLandmarks {
 
   private calculatedLandmarks: CalculatedLandmarkInterface = {
     headRotationAngles: {},
+    headYawAngles: {},
 
     interocularDistances: {},
 
@@ -53,9 +59,13 @@ class FaceLandmarks {
     eyesWidths: {},
     chinWidths: {},
 
-    earsImageOffsets: {},
-    beardImageOffsets: {},
-    mustacheImageOffsets: {},
+    twoDimEarsOffsets: {},
+    twoDimBeardOffsets: {},
+    twoDimMustacheOffsets: {},
+
+    threeDimEarsOffsets: {},
+    threeDimBeardOffsets: {},
+    threeDimMustacheOffsets: {},
   };
 
   private faceCount = 0;
@@ -322,6 +332,13 @@ class FaceLandmarks {
         -Math.atan2(dy, dx)
       );
 
+      // Calculate head angle in plane
+      this.updateOneDimensionalSmoothVariables(
+        "headYawAngles",
+        faceId,
+        Math.atan2(dz, dx)
+      );
+
       // Set left and right ear widths
       // Update InterocularDistance
       this.updateOneDimensionalSmoothVariables(
@@ -371,7 +388,7 @@ class FaceLandmarks {
         this.calculatedLandmarks.interocularDistances[faceId] * earsShiftFactor,
         this.calculatedLandmarks.headRotationAngles[faceId]
       );
-      this.calculatedLandmarks.earsImageOffsets[faceId] = [
+      this.calculatedLandmarks.twoDimEarsOffsets[faceId] = [
         earsShiftX,
         earsShiftY,
       ];
@@ -383,20 +400,31 @@ class FaceLandmarks {
           this.currentEffectsStyles.current.beards.chinOffset,
           this.calculatedLandmarks.headRotationAngles[faceId]
         );
-      this.calculatedLandmarks.beardImageOffsets[faceId] = [
+      this.calculatedLandmarks.twoDimBeardOffsets[faceId] = [
         beardShiftX,
         beardShiftY,
       ];
 
       // Calculate the shift distance for the nose position taking into account
       // headAngle for direction of shift
-      const { shiftX: noseShiftX, shiftY: noseShiftY } = this.directionalShift(
-        this.currentEffectsStyles.current.mustaches.noseOffset,
-        this.calculatedLandmarks.headRotationAngles[faceId]
-      );
-      this.calculatedLandmarks.mustacheImageOffsets[faceId] = [
-        noseShiftX,
-        noseShiftY,
+      const { shiftX: twoDimNoseShiftX, shiftY: twoDimNoseShiftY } =
+        this.directionalShift(
+          this.currentEffectsStyles.current.mustaches.noseOffset.twoDim,
+          this.calculatedLandmarks.headRotationAngles[faceId]
+        );
+      this.calculatedLandmarks.twoDimMustacheOffsets[faceId] = [
+        twoDimNoseShiftX,
+        twoDimNoseShiftY,
+      ];
+
+      const { shiftX: threeDimNoseShiftX, shiftY: threeDimNoseShiftY } =
+        this.directionalShift(
+          this.currentEffectsStyles.current.mustaches.noseOffset.threeDim,
+          this.calculatedLandmarks.headRotationAngles[faceId]
+        );
+      this.calculatedLandmarks.threeDimMustacheOffsets[faceId] = [
+        threeDimNoseShiftX,
+        threeDimNoseShiftY,
       ];
     });
   }

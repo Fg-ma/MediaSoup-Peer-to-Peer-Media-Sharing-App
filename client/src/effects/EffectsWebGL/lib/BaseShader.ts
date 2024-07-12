@@ -1,7 +1,15 @@
 import { EffectTypes } from "src/context/StreamsContext";
 import baseFragmentShaderSource from "./baseFragmentShader";
 import baseVertexShaderSource from "./baseVertexShader";
-import mustaches from "../../../../public/3DAssests/mustaches/mustacheData.json";
+import { mat4, vec3 } from "gl-matrix";
+import { URLsTypes } from "../handleEffectWebGL";
+
+type MeshTypes = "mustache1";
+
+interface MeshJSON {
+  vertex_faces: number[];
+  uv_faces: number[];
+}
 
 class BaseShader {
   private gl: WebGL2RenderingContext | WebGLRenderingContext;
@@ -14,10 +22,15 @@ class BaseShader {
   private texCoordBuffer: WebGLBuffer | null = null;
   private indexBuffer: WebGLBuffer | null = null;
 
-  private videoTexture: WebGLTexture | null = null;
-  private twoDimensionalEffectsAtlasTexture: WebGLTexture | null = null;
-  private meshTexture: WebGLTexture | null = null;
+  private meshes: {
+    [MeshType in MeshTypes]: { meshData?: MeshJSON; meshURL: string };
+  } = { mustache1: { meshURL: "/3DAssets/mustaches/mustacheData.json" } };
 
+  private videoTexture: WebGLTexture | null = null;
+  private videoTextureZPosition = 0.99;
+
+  private twoDimensionalEffectsAtlasTexture: WebGLTexture | null = null;
+  private twoDimensionalEffectsAtlasTextureZPosition = 0.5;
   private twoDimensionalAltasURLMap: {
     url: string;
     row: number;
@@ -26,6 +39,7 @@ class BaseShader {
   private twoDimensionalEffectsAtlasSize: number | null = null;
   private twoDimensionalEffectsTextureSize: number = 512;
 
+  private meshTexture: WebGLTexture | null = null;
   private meshTextureSize: number = 1024;
 
   // Uniform Locations
@@ -61,16 +75,8 @@ class BaseShader {
     this.initAttributeLocations();
     this.initBuffers();
     this.initVideoTexture();
+    this.initEffectFlags(effects);
     this.initTriangleTexture(triangleTextureURL);
-
-    let effectFlags = 0;
-
-    if (effects.blur) effectFlags |= 1 << this.BLUR_BIT;
-    if (effects.tint) effectFlags |= 1 << this.TINT_BIT;
-
-    this.effectFlags = effectFlags;
-
-    gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
   }
 
   deconstructor() {
@@ -222,6 +228,15 @@ class BaseShader {
     this.gl.uniform1i(this.uVideoTextureLocation, 0);
   }
 
+  private initEffectFlags(effects: {
+    [effectType in EffectTypes]?: boolean | undefined;
+  }) {
+    if (effects.blur) this.effectFlags |= 1 << this.BLUR_BIT;
+    if (effects.tint) this.effectFlags |= 1 << this.TINT_BIT;
+
+    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
+  }
+
   private initTriangleTexture(triangleTextureURL: string) {
     this.use();
 
@@ -289,6 +304,22 @@ class BaseShader {
     this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
   }
 
+  private async loadMeshJSON(url: string): Promise<MeshJSON | undefined> {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Network response was not ok " + response.statusText);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(
+        "There has been a problem with your fetch operation:",
+        error
+      );
+      return undefined;
+    }
+  }
+
   private hexToRgb(hex: string) {
     hex = hex.replace(/^#/, "");
 
@@ -306,7 +337,16 @@ class BaseShader {
     }
   }
 
-  createAtlasTexture = async (urls: string[], textureSize?: number) => {
+  createAtlasTexture = async (
+    urls: { [URLType in URLsTypes]?: string },
+    textureSize?: number
+  ) => {
+    const textureCount = Object.keys(urls).length;
+
+    if (textureCount === 0) {
+      return;
+    }
+
     this.use();
 
     this.twoDimensionalAltasURLMap = [];
@@ -341,7 +381,6 @@ class BaseShader {
       this.gl.LINEAR
     );
 
-    const textureCount = urls.length;
     let atlasSide = Math.ceil(Math.sqrt(textureCount));
     this.twoDimensionalEffectsAtlasSize = Math.pow(
       2,
@@ -372,7 +411,7 @@ class BaseShader {
       });
     };
 
-    const images = await Promise.all(urls.map(loadImage));
+    const images = await Promise.all(Object.values(urls).map(loadImage));
     images.forEach((image, index) => {
       const row = Math.floor(index / atlasSide);
       const col = index % atlasSide;
@@ -496,20 +535,20 @@ class BaseShader {
       this.gl.STATIC_DRAW
     );
 
-    // Define vertices for a square before applying rotation
+    // Define vertices for a square plane before applying rotation
     const baseVertices = new Float32Array([
       -scale * 2,
       scale * 3,
-      0.0, // Vertex 1
+      this.twoDimensionalEffectsAtlasTextureZPosition, // Vertex 1
       -scale * 2,
       -scale * 3,
-      0.0, // Vertex 2
+      this.twoDimensionalEffectsAtlasTextureZPosition, // Vertex 2
       scale * 2,
       scale * 3,
-      0.0, // Vertex 3
+      this.twoDimensionalEffectsAtlasTextureZPosition, // Vertex 3
       scale * 2,
       -scale * 3,
-      0.0, // Vertex 4
+      this.twoDimensionalEffectsAtlasTextureZPosition, // Vertex 4
     ]);
 
     // Calculate the rotation matrix
@@ -563,7 +602,18 @@ class BaseShader {
     );
 
     const positions = new Float32Array([
-      -1.0, 1.0, 0.99, -1.0, -1.0, 0.99, 1.0, 1.0, 0.99, 1.0, -1.0, 0.99,
+      -1.0,
+      1.0,
+      this.videoTextureZPosition, // vertex 1
+      -1.0,
+      -1.0,
+      this.videoTextureZPosition, // vertex 2
+      1.0,
+      1.0,
+      this.videoTextureZPosition, // vertex 3
+      1.0,
+      -1.0,
+      this.videoTextureZPosition, // vertex 4
     ]);
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
@@ -604,9 +654,22 @@ class BaseShader {
     this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
   }
 
-  drawMesh() {
+  async drawMesh(
+    meshType: MeshTypes,
+    position: { x: number; y: number },
+    offset: { x: number; y: number },
+    scale: number,
+    headRotationAngle: number,
+    headYawAngle: number
+  ) {
     if (this.aPositionLocation === null || this.aTexCoordLocation === null) {
       return;
+    }
+
+    if (!this.meshes[meshType].meshData) {
+      this.meshes[meshType].meshData = await this.loadMeshJSON(
+        this.meshes[meshType].meshURL
+      );
     }
 
     this.use();
@@ -619,10 +682,39 @@ class BaseShader {
       this.meshTextureSize
     );
 
+    // Create 3D rotation matrix
+    const rotationMatrix = mat4.create();
+    mat4.fromYRotation(rotationMatrix, headYawAngle); // Rotation about the y-axis (yaw)
+    mat4.rotateZ(rotationMatrix, rotationMatrix, headRotationAngle); // Rotation about the z-axis
+
+    const vertices = [];
+    const meshData = this.meshes[meshType].meshData;
+
+    if (!meshData) {
+      return;
+    }
+
+    // Apply the rotation matrix to the vertices
+    for (let i = 0; i < meshData.vertex_faces.length / 3; i++) {
+      const x = meshData.vertex_faces[i * 3];
+      const y = meshData.vertex_faces[i * 3 + 1];
+      const z = meshData.vertex_faces[i * 3 + 2];
+
+      const rotated = vec3.create();
+      vec3.transformMat4(rotated, [x, y, z], rotationMatrix);
+
+      // Apply scale and translation
+      const finalX = rotated[0] * scale + position.x + offset.x;
+      const finalY = rotated[1] * scale + position.y + offset.y;
+      const finalZ = rotated[2]; // Z-coordinate remains unchanged
+
+      vertices.push(finalX, finalY, finalZ);
+    }
+
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
-      new Float32Array(mustaches.vertex_faces),
+      new Float32Array(vertices),
       this.gl.STATIC_DRAW
     );
     this.gl.vertexAttribPointer(
@@ -637,7 +729,7 @@ class BaseShader {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
-      new Float32Array(mustaches.uv_faces),
+      new Float32Array(meshData.uv_faces),
       this.gl.STATIC_DRAW
     );
     this.gl.vertexAttribPointer(
@@ -650,7 +742,7 @@ class BaseShader {
     );
 
     let indices = [];
-    for (let i = 0; i < mustaches.uv_faces.length / 2; i++) {
+    for (let i = 0; i < meshData.uv_faces.length / 2; i++) {
       indices.push(i);
     }
 

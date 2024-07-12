@@ -3,7 +3,6 @@ import { EffectTypes } from "../../context/StreamsContext";
 import applyBoxBlur from "./lib/applyBoxBlur";
 import applyTint from "./lib/applyTint";
 import setStopFunction from "./lib/setStopFunction";
-import loadModels from "../lib/loadModels";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 
 function hexToRgb(hex: string) {
@@ -16,7 +15,7 @@ function hexToRgb(hex: string) {
   return [r, g, b];
 }
 
-const EffectSectionCPU = async (
+const handleEffectCPU = async (
   type: "webcam" | "screen" | "audio",
   id: string,
   userUneffectedStreams: React.MutableRefObject<{
@@ -118,7 +117,7 @@ const EffectSectionCPU = async (
   return canvas.captureStream().getVideoTracks()[0];
 };
 
-export default EffectSectionCPU;
+export default handleEffectCPU;
 
 const detectFaces = async (
   video: HTMLVideoElement,

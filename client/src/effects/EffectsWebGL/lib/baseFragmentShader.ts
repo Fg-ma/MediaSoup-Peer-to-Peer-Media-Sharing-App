@@ -9,7 +9,7 @@ const baseFragmentShaderSource = `
   #define BLUR_BIT 3
   #define TINT_BIT 4
 
-  #define VIDEO_BLUR_RADIUS 14
+  #define VIDEO_BLUR_RADIUS 12
   #define EFFECT_BLUR_RADIUS 8
   #define MESH_BLUR_RADIUS 8
 

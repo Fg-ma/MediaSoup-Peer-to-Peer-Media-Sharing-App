@@ -29,6 +29,7 @@ import handleEffect from "../effects/handleEffect";
 import effectIcon from "../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../public/svgs/effectOffIcon.svg";
 import handleEffects from "./lib/handleEffects";
+import Effects from "../effects/Effects";
 
 export default function FgVideo({
   type,
@@ -153,6 +154,7 @@ export default function FgVideo({
   const captions = useRef<TextTrack | undefined>();
   const thumbnails = useRef<string[]>([]);
   const tintColor = useRef("#F56114");
+  const effects = useRef<Effects>();
 
   const init = () => {
     // Set videoStream as srcObject
@@ -229,6 +231,19 @@ export default function FgVideo({
   useEffect(() => {
     // Set up initial conditions
     init();
+
+    // Set up effects
+    effects.current = new Effects(
+      type,
+      videoId,
+      userStreams,
+      userUneffectedStreams,
+      userStreamEffects,
+      userStopStreamEffects,
+      currentEffectsStyles,
+      producerTransport,
+      tintColor.current
+    );
 
     document.addEventListener("fullscreenchange", () =>
       handleFullscreenChange(videoContainerRef)
@@ -487,19 +502,20 @@ export default function FgVideo({
     blockStateChange?: boolean
   ) => {
     if (isUser) {
-      await handleEffect(
-        effect,
-        type,
-        videoId,
-        userStreams,
-        userUneffectedStreams,
-        userStreamEffects,
-        userStopStreamEffects,
-        producerTransport,
-        tintColor,
-        blockStateChange,
-        currentEffectsStyles
-      );
+      effects.current?.changeEffect(effect, tintColor, blockStateChange);
+      // await handleEffect(
+      //   effect,
+      //   type,
+      //   videoId,
+      //   userStreams,
+      //   userUneffectedStreams,
+      //   userStreamEffects,
+      //   userStopStreamEffects,
+      //   producerTransport,
+      //   tintColor,
+      //   blockStateChange,
+      //   currentEffectsStyles
+      // );
     } else {
       const msg = {
         type: "requestEffect",
