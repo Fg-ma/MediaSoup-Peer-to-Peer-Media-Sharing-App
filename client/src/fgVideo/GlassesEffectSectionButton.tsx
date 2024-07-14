@@ -1,5 +1,5 @@
 import React from "react";
-import HoldButton from "./HoldButton";
+import HoldButton from "./FgButton";
 import {
   useCurrentEffectsStylesContext,
   GlassesEffectTypes,
@@ -11,14 +11,24 @@ import threeDGlasses from "../../public/2DAssets/glasses/threeDGlasses.png";
 import shades from "../../public/2DAssets/glasses/shades.png";
 import defaultGlassesIcon from "../../public/svgs/glasses/defaultGlassesIcon.svg";
 import defaultGlassesOffIcon from "../../public/svgs/glasses/defaultGlassesOffIcon.svg";
+import threeDim_defaultGlassesIcon from "../../public/svgs/glasses/threeDim_defaultGlassesIcon.svg";
+import threeDim_defaultGlassesOffIcon from "../../public/svgs/glasses/threeDim_defaultGlassesOffIcon.svg";
 import memeGlassesIcon from "../../public/svgs/glasses/memeGlassesIcon.svg";
 import memeGlassesOffIcon from "../../public/svgs/glasses/memeGlassesOffIcon.svg";
+import threeDim_memeGlassesIcon from "../../public/svgs/glasses/threeDim_memeGlassesIcon.svg";
+import threeDim_memeGlassesOffIcon from "../../public/svgs/glasses/threeDim_memeGlassesOffIcon.svg";
 import americaGlassesIcon from "../../public/svgs/glasses/americaGlassesIcon.svg";
 import americaGlassesOffIcon from "../../public/svgs/glasses/americaGlassesOffIcon.svg";
+import threeDim_americaGlassesIcon from "../../public/svgs/glasses/threeDim_americaGlassesIcon.svg";
+import threeDim_americaGlassesOffIcon from "../../public/svgs/glasses/threeDim_americaGlassesOffIcon.svg";
 import threeDGlassesIcon from "../../public/svgs/glasses/threeDGlassesIcon.svg";
 import threeDGlassesOffIcon from "../../public/svgs/glasses/threeDGlassesOffIcon.svg";
+import threeDim_threeDGlassesIcon from "../../public/svgs/glasses/threeDim_threeDGlassesIcon.svg";
+import threeDim_threeDGlassesOffIcon from "../../public/svgs/glasses/threeDim_threeDGlassesOffIcon.svg";
 import shadesIcon from "../../public/svgs/glasses/shadesIcon.svg";
 import shadesOffIcon from "../../public/svgs/glasses/shadesOffIcon.svg";
+import threeDim_shadesIcon from "../../public/svgs/glasses/threeDim_shadesIcon.svg";
+import threeDim_shadesOffIcon from "../../public/svgs/glasses/threeDim_shadesOffIcon.svg";
 import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
 
 export default function GlassesEffectSectionButton({
@@ -38,6 +48,8 @@ export default function GlassesEffectSectionButton({
       image: string;
       icon: string;
       offIcon: string;
+      threeDimIcon: string;
+      threeDimOffIcon: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -46,6 +58,8 @@ export default function GlassesEffectSectionButton({
       image: defaultGlasses,
       icon: defaultGlassesIcon,
       offIcon: defaultGlassesOffIcon,
+      threeDimIcon: threeDim_defaultGlassesIcon,
+      threeDimOffIcon: threeDim_defaultGlassesOffIcon,
       flipped: false,
       bgColor: "white",
     },
@@ -53,6 +67,8 @@ export default function GlassesEffectSectionButton({
       image: memeGlasses,
       icon: memeGlassesIcon,
       offIcon: memeGlassesOffIcon,
+      threeDimIcon: threeDim_memeGlassesIcon,
+      threeDimOffIcon: threeDim_memeGlassesOffIcon,
       flipped: true,
       bgColor: "white",
     },
@@ -60,6 +76,8 @@ export default function GlassesEffectSectionButton({
       image: americaGlasses,
       icon: americaGlassesIcon,
       offIcon: americaGlassesOffIcon,
+      threeDimIcon: threeDim_americaGlassesIcon,
+      threeDimOffIcon: threeDim_americaGlassesOffIcon,
       flipped: true,
       bgColor: "white",
     },
@@ -67,6 +85,8 @@ export default function GlassesEffectSectionButton({
       image: threeDGlasses,
       icon: threeDGlassesIcon,
       offIcon: threeDGlassesOffIcon,
+      threeDimIcon: threeDim_threeDGlassesIcon,
+      threeDimOffIcon: threeDim_threeDGlassesOffIcon,
       flipped: false,
       bgColor: "black",
     },
@@ -75,6 +95,8 @@ export default function GlassesEffectSectionButton({
       flipped: false,
       icon: shadesIcon,
       offIcon: shadesOffIcon,
+      threeDimIcon: threeDim_shadesIcon,
+      threeDimOffIcon: threeDim_shadesOffIcon,
       bgColor: "white",
     },
   };
@@ -102,7 +124,11 @@ export default function GlassesEffectSectionButton({
       contentFunction={() => {
         const iconSrc =
           glassesEffects[currentEffectsStyles.current.glasses.style][
-            userStreamEffects.current.glasses[type]?.[videoId]
+            currentEffectsStyles.current.glasses.threeDim
+              ? userStreamEffects.current.glasses[type]?.[videoId]
+                ? "threeDimOffIcon"
+                : "threeDimIcon"
+              : userStreamEffects.current.glasses[type]?.[videoId]
               ? "offIcon"
               : "icon"
           ];
@@ -114,6 +140,14 @@ export default function GlassesEffectSectionButton({
             style={{ width: "90%", height: "90%" }}
             data-value={currentEffectsStyles.current.glasses.style}
           />
+        );
+      }}
+      doubleClickFunction={() => {
+        currentEffectsStyles.current.glasses.threeDim =
+          !currentEffectsStyles.current.glasses.threeDim;
+        handleEffectChange(
+          "glasses",
+          userStreamEffects.current.glasses[type]?.[videoId]
         );
       }}
       holdContent={

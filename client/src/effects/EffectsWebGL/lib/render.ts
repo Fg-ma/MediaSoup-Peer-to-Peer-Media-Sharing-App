@@ -209,7 +209,6 @@ const render = async (
         }
       }
       if (effects.mustaches) {
-        console.log(!currentEffectsStyles.current.mustaches.threeDim);
         if (!currentEffectsStyles.current.mustaches.threeDim) {
           const twoDimMustacheOffset =
             calculatedLandmarks.twoDimMustacheOffsets[faceId];

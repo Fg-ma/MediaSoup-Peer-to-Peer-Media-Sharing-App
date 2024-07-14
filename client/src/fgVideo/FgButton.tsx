@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 
-export default function HoldButton({
+export default function FgButton({
   clickFunction,
   holdFunction,
   contentFunction,
@@ -24,22 +24,33 @@ export default function HoldButton({
   const holdTimeout = useRef<NodeJS.Timeout>();
   const holdButtonRef = useRef<HTMLButtonElement>(null);
   const isClicked = useRef(false);
+  const clickTimeout = useRef<NodeJS.Timeout | null>(null);
+  const holdTimeoutDuration = 500;
+  const doubleClickTimeoutDuration = 250;
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    holdTimeout.current = setTimeout(() => {
-      isHeldRef.current = true;
-      setIsHeld(true);
-    }, 500);
-    isClicked.current = true;
+    if (clickTimeout.current === null) {
+      holdTimeout.current = setTimeout(() => {
+        isHeldRef.current = true;
+        setIsHeld(true);
+      }, holdTimeoutDuration);
+      isClicked.current = true;
+    }
   };
 
   const handleMouseUp = (event: React.MouseEvent<Element, MouseEvent>) => {
-    if (isClicked.current) {
+    if (isClicked.current && clickTimeout.current === null) {
       if (!isHeldRef.current) {
-        clickFunction();
+        clickTimeout.current = setTimeout(() => {
+          clickFunction();
+          if (clickTimeout.current !== null) {
+            clearTimeout(clickTimeout.current);
+            clickTimeout.current = null;
+          }
+        }, doubleClickTimeoutDuration);
       } else {
         holdFunction(event);
       }
@@ -55,6 +66,10 @@ export default function HoldButton({
   };
 
   const handleDoubleClick = () => {
+    if (clickTimeout.current) {
+      clearTimeout(clickTimeout.current);
+      clickTimeout.current = null;
+    }
     if (doubleClickFunction) {
       doubleClickFunction();
     }

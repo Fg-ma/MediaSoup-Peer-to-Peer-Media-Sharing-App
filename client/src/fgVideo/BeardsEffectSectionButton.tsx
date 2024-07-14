@@ -1,5 +1,5 @@
 import React from "react";
-import HoldButton from "./HoldButton";
+import HoldButton from "./FgButton";
 import {
   useCurrentEffectsStylesContext,
   BeardsEffectTypes,
@@ -8,6 +8,8 @@ import {
 import classicalCurlyBeard from "../../public/2DAssets/beards/classicalCurlyBeard.png";
 import classicalCurlyBeardIcon from "../../public/svgs/beards/classicalCurlyBeardIcon.svg";
 import classicalCurlyBeardOffIcon from "../../public/svgs/beards/classicalCurlyBeardOffIcon.svg";
+import threeDim_classicalCurlyBeardIcon from "../../public/svgs/beards/threeDim_classicalCurlyBeardIcon.svg";
+import threeDim_classicalCurlyBeardOffIcon from "../../public/svgs/beards/threeDim_classicalCurlyBeardOffIcon.svg";
 import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
 
 export default function BeardsEffectSectionButton({
@@ -27,6 +29,8 @@ export default function BeardsEffectSectionButton({
       image: string;
       icon: string;
       offIcon: string;
+      threeDimIcon: string;
+      threeDimOffIcon: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -35,6 +39,8 @@ export default function BeardsEffectSectionButton({
       image: classicalCurlyBeard,
       icon: classicalCurlyBeardIcon,
       offIcon: classicalCurlyBeardOffIcon,
+      threeDimIcon: threeDim_classicalCurlyBeardIcon,
+      threeDimOffIcon: threeDim_classicalCurlyBeardOffIcon,
       flipped: true,
       bgColor: "black",
     },
@@ -65,7 +71,11 @@ export default function BeardsEffectSectionButton({
       contentFunction={() => {
         const iconSrc =
           beardsEffects[currentEffectsStyles.current.beards.style][
-            userStreamEffects.current.beards[type]?.[videoId]
+            currentEffectsStyles.current.beards.threeDim
+              ? userStreamEffects.current.beards[type]?.[videoId]
+                ? "threeDimOffIcon"
+                : "threeDimIcon"
+              : userStreamEffects.current.beards[type]?.[videoId]
               ? "offIcon"
               : "icon"
           ];
@@ -77,6 +87,14 @@ export default function BeardsEffectSectionButton({
             style={{ width: "90%", height: "90%" }}
             data-value={currentEffectsStyles.current.beards.style}
           />
+        );
+      }}
+      doubleClickFunction={() => {
+        currentEffectsStyles.current.beards.threeDim =
+          !currentEffectsStyles.current.beards.threeDim;
+        handleEffectChange(
+          "beards",
+          userStreamEffects.current.beards[type]?.[videoId]
         );
       }}
       holdContent={

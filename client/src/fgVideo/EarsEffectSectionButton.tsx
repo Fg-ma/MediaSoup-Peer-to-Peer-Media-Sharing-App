@@ -1,5 +1,5 @@
 import React from "react";
-import HoldButton from "./HoldButton";
+import HoldButton from "./FgButton";
 import {
   useCurrentEffectsStylesContext,
   EarsEffectTypes,
@@ -8,6 +8,8 @@ import {
 import dogEars from "../../public/2DAssets/ears/dogEars.png";
 import dogEarsIcon from "../../public/svgs/ears/dogEarsIcon.svg";
 import dogEarsOffIcon from "../../public/svgs/ears/dogEarsOffIcon.svg";
+import threeDim_dogEarsIcon from "../../public/svgs/ears/threeDim_dogEarsIcon.svg";
+import threeDim_dogEarsOffIcon from "../../public/svgs/ears/threeDim_dogEarsOffIcon.svg";
 import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
 
 export default function EarsEffectSectionButton({
@@ -27,6 +29,8 @@ export default function EarsEffectSectionButton({
       image: string;
       icon: string;
       offIcon: string;
+      threeDimIcon: string;
+      threeDimOffIcon: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -35,6 +39,8 @@ export default function EarsEffectSectionButton({
       image: dogEars,
       icon: dogEarsIcon,
       offIcon: dogEarsOffIcon,
+      threeDimIcon: threeDim_dogEarsIcon,
+      threeDimOffIcon: threeDim_dogEarsOffIcon,
       flipped: false,
       bgColor: "white",
     },
@@ -67,7 +73,13 @@ export default function EarsEffectSectionButton({
       contentFunction={() => {
         const iconSrc =
           earsEffects[currentEffectsStyles.current.ears.style][
-            userStreamEffects.current.ears[type]?.[videoId] ? "offIcon" : "icon"
+            currentEffectsStyles.current.ears.threeDim
+              ? userStreamEffects.current.ears[type]?.[videoId]
+                ? "threeDimOffIcon"
+                : "threeDimIcon"
+              : userStreamEffects.current.ears[type]?.[videoId]
+              ? "offIcon"
+              : "icon"
           ];
 
         return (
@@ -77,6 +89,14 @@ export default function EarsEffectSectionButton({
             style={{ width: "90%", height: "90%" }}
             data-value={currentEffectsStyles.current.ears.style}
           />
+        );
+      }}
+      doubleClickFunction={() => {
+        currentEffectsStyles.current.ears.threeDim =
+          !currentEffectsStyles.current.ears.threeDim;
+        handleEffectChange(
+          "ears",
+          userStreamEffects.current.ears[type]?.[videoId]
         );
       }}
       holdContent={

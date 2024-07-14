@@ -43,7 +43,7 @@ export const mustacheNoseOffsetsMap: {
   mustache2: { twoDim: -0.07, threeDim: 0.0 },
   mustache3: { twoDim: -0.09, threeDim: 0.0 },
   mustache4: { twoDim: -0.07, threeDim: 0.0 },
-  disguiseMustache: { twoDim: -0.075, threeDim: 0.0 },
+  disguiseMustache: { twoDim: 0.075, threeDim: 0.0 },
 };
 
 export type EffectStylesType = {

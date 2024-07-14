@@ -1,5 +1,5 @@
 import React from "react";
-import HoldButton from "./HoldButton";
+import FgButton from "./FgButton";
 import {
   useCurrentEffectsStylesContext,
   MustachesEffectTypes,
@@ -12,14 +12,24 @@ import mustache4 from "../../public/2DAssets/mustaches/mustache4.png";
 import disguiseMustache from "../../public/2DAssets/mustaches/disguiseMustache.png";
 import mustacheIcon1 from "../../public/svgs/mustaches/mustacheIcon1.svg";
 import mustacheOffIcon1 from "../../public/svgs/mustaches/mustacheOffIcon1.svg";
+import threeDim_mustacheIcon1 from "../../public/svgs/mustaches/threeDim_mustacheIcon1.svg";
+import threeDim_mustacheOffIcon1 from "../../public/svgs/mustaches/threeDim_mustacheOffIcon1.svg";
 import mustacheIcon2 from "../../public/svgs/mustaches/mustacheIcon2.svg";
 import mustacheOffIcon2 from "../../public/svgs/mustaches/mustacheOffIcon2.svg";
+import threeDim_mustacheIcon2 from "../../public/svgs/mustaches/threeDim_mustacheIcon2.svg";
+import threeDim_mustacheOffIcon2 from "../../public/svgs/mustaches/threeDim_mustacheOffIcon2.svg";
 import mustacheIcon3 from "../../public/svgs/mustaches/mustacheIcon3.svg";
 import mustacheOffIcon3 from "../../public/svgs/mustaches/mustacheOffIcon3.svg";
+import threeDim_mustacheIcon3 from "../../public/svgs/mustaches/threeDim_mustacheIcon3.svg";
+import threeDim_mustacheOffIcon3 from "../../public/svgs/mustaches/threeDim_mustacheOffIcon3.svg";
 import mustacheIcon4 from "../../public/svgs/mustaches/mustacheIcon4.svg";
 import mustacheOffIcon4 from "../../public/svgs/mustaches/mustacheOffIcon4.svg";
+import threeDim_mustacheIcon4 from "../../public/svgs/mustaches/threeDim_mustacheIcon4.svg";
+import threeDim_mustacheOffIcon4 from "../../public/svgs/mustaches/threeDim_mustacheOffIcon4.svg";
 import disguiseMustacheIcon from "../../public/svgs/mustaches/disguiseMustacheIcon.svg";
 import disguiseMustacheOffIcon from "../../public/svgs/mustaches/disguiseMustacheOffIcon.svg";
+import threeDim_disguiseMustacheIcon from "../../public/svgs/mustaches/threeDim_disguiseMustacheIcon.svg";
+import threeDim_disguiseMustacheOffIcon from "../../public/svgs/mustaches/threeDim_disguiseMustacheOffIcon.svg";
 import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
 
 export default function MustachesEffectSectionButton({
@@ -39,6 +49,8 @@ export default function MustachesEffectSectionButton({
       image: string;
       icon: string;
       offIcon: string;
+      threeDimIcon: string;
+      threeDimOffIcon: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -47,6 +59,8 @@ export default function MustachesEffectSectionButton({
       image: mustache1,
       icon: mustacheIcon1,
       offIcon: mustacheOffIcon1,
+      threeDimIcon: threeDim_mustacheIcon1,
+      threeDimOffIcon: threeDim_mustacheOffIcon1,
       flipped: false,
       bgColor: "white",
     },
@@ -54,6 +68,8 @@ export default function MustachesEffectSectionButton({
       image: mustache2,
       icon: mustacheIcon2,
       offIcon: mustacheOffIcon2,
+      threeDimIcon: threeDim_mustacheIcon2,
+      threeDimOffIcon: threeDim_mustacheOffIcon2,
       flipped: false,
       bgColor: "white",
     },
@@ -61,6 +77,8 @@ export default function MustachesEffectSectionButton({
       image: mustache3,
       icon: mustacheIcon3,
       offIcon: mustacheOffIcon3,
+      threeDimIcon: threeDim_mustacheIcon3,
+      threeDimOffIcon: threeDim_mustacheOffIcon3,
       flipped: false,
       bgColor: "white",
     },
@@ -68,6 +86,8 @@ export default function MustachesEffectSectionButton({
       image: mustache4,
       icon: mustacheIcon4,
       offIcon: mustacheOffIcon4,
+      threeDimIcon: threeDim_mustacheIcon4,
+      threeDimOffIcon: threeDim_mustacheOffIcon4,
       flipped: false,
       bgColor: "white",
     },
@@ -75,13 +95,15 @@ export default function MustachesEffectSectionButton({
       image: disguiseMustache,
       icon: disguiseMustacheIcon,
       offIcon: disguiseMustacheOffIcon,
+      threeDimIcon: threeDim_disguiseMustacheIcon,
+      threeDimOffIcon: threeDim_disguiseMustacheOffIcon,
       flipped: false,
       bgColor: "white",
     },
   };
 
   return (
-    <HoldButton
+    <FgButton
       clickFunction={() => handleEffectChange("mustaches")}
       holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
@@ -107,7 +129,11 @@ export default function MustachesEffectSectionButton({
       contentFunction={() => {
         const iconSrc =
           mustachesEffects[currentEffectsStyles.current.mustaches.style][
-            userStreamEffects.current.mustaches[type]?.[videoId]
+            currentEffectsStyles.current.mustaches.threeDim
+              ? userStreamEffects.current.mustaches[type]?.[videoId]
+                ? "threeDimOffIcon"
+                : "threeDimIcon"
+              : userStreamEffects.current.mustaches[type]?.[videoId]
               ? "offIcon"
               : "icon"
           ];
@@ -126,7 +152,7 @@ export default function MustachesEffectSectionButton({
           !currentEffectsStyles.current.mustaches.threeDim;
         handleEffectChange(
           "mustaches",
-          userStreamEffects.current.mustaches[type]?.[videoId] ? true : false
+          userStreamEffects.current.mustaches[type]?.[videoId]
         );
       }}
       holdContent={
