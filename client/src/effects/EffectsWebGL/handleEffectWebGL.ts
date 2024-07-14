@@ -53,11 +53,7 @@ const handleEffectWebGL = async (
     return new Error("WebGL not supported");
   }
 
-  const baseShader = new BaseShader(
-    gl,
-    effects,
-    `/3DAssets/mustaches/miniMustacheTexture.png`
-  );
+  const baseShader = new BaseShader(gl, effects);
   if (tintColor.current) {
     baseShader.setTintColor(tintColor.current);
   }
@@ -90,7 +86,10 @@ const handleEffectWebGL = async (
     Object.entries(urls).filter(([key, value]) => value !== null)
   );
 
-  await baseShader.createAtlasTexture(filteredUrls);
+  await baseShader.createAtlasTexture("twoDim", filteredUrls);
+  await baseShader.createAtlasTexture("threeDim", {
+    mustaches: `/3DAssets/mustaches/colorMustacheTex.png`,
+  });
 
   updateDeadbandingMaps(effects, currentEffectsStyles);
 

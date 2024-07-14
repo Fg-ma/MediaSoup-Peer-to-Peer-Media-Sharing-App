@@ -182,7 +182,8 @@ const render = async (
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
           baseShader.drawMesh(
-            "mustache1",
+            "/3DAssets/mustaches/colorMustacheTex.png",
+            "/3DAssets/mustaches/mustacheData.json",
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,

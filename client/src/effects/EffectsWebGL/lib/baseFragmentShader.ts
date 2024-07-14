@@ -16,8 +16,8 @@ const baseFragmentShaderSource = `
   varying vec2 v_texCoord;
   uniform vec2 u_texSize;
   uniform sampler2D u_videoTexture;
-  uniform sampler2D u_twoDimensionalEffectAtlasTexture;
-  uniform sampler2D u_meshTexture;
+  uniform sampler2D u_twoDimEffectAtlasTexture;
+  uniform sampler2D u_threeDimEffectAtlasTexture;
   uniform int u_effectFlags;
   uniform vec3 u_tintColor;
 
@@ -28,9 +28,9 @@ const baseFragmentShaderSource = `
     if (mod(float(u_effectFlags / int(pow(2.0, float(VIDEO_BIT)))), 2.0) >= 1.0) {
       color = texture2D(u_videoTexture, v_texCoord);
     } else if (mod(float(u_effectFlags / int(pow(2.0, float(TWO_DIMENSIONAL_EFFECTS_BIT)))), 2.0) >= 1.0) {
-      color = texture2D(u_twoDimensionalEffectAtlasTexture, v_texCoord);
+      color = texture2D(u_twoDimEffectAtlasTexture, v_texCoord);
     } else if (mod(float(u_effectFlags / int(pow(2.0, float(MESH_BIT)))), 2.0) >= 1.0) {
-      color = texture2D(u_meshTexture, v_texCoord);
+      color = texture2D(u_threeDimEffectAtlasTexture, v_texCoord);
     }
 
     // Apply blur effect
@@ -47,7 +47,7 @@ const baseFragmentShaderSource = `
         for (int x = -EFFECT_BLUR_RADIUS; x <= EFFECT_BLUR_RADIUS; x++) {
           for (int y = -EFFECT_BLUR_RADIUS; y <= EFFECT_BLUR_RADIUS; y++) {
             vec2 offset = vec2(float(x), float(y)) / u_texSize;
-            color += texture2D(u_twoDimensionalEffectAtlasTexture, v_texCoord + offset);
+            color += texture2D(u_twoDimEffectAtlasTexture, v_texCoord + offset);
             total += 1.0;
           }
         }
@@ -55,7 +55,7 @@ const baseFragmentShaderSource = `
         for (int x = -MESH_BLUR_RADIUS; x <= MESH_BLUR_RADIUS; x++) {
           for (int y = -MESH_BLUR_RADIUS; y <= MESH_BLUR_RADIUS; y++) {
             vec2 offset = vec2(float(x), float(y)) / u_texSize;
-            color += texture2D(u_meshTexture, v_texCoord + offset);
+            color += texture2D(u_threeDimEffectAtlasTexture, v_texCoord + offset);
             total += 1.0;
           }
         }
