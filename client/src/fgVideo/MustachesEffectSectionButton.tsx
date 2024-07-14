@@ -121,7 +121,14 @@ export default function MustachesEffectSectionButton({
           />
         );
       }}
-      doubleClickFunction={() => {}}
+      doubleClickFunction={() => {
+        currentEffectsStyles.current.mustaches.threeDim =
+          !currentEffectsStyles.current.mustaches.threeDim;
+        handleEffectChange(
+          "mustaches",
+          userStreamEffects.current.mustaches[type]?.[videoId] ? true : false
+        );
+      }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
           {Object.entries(mustachesEffects).map(([mustaches, effect]) => (
