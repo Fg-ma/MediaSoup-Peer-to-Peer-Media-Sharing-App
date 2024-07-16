@@ -4,6 +4,7 @@ import baseVertexShaderSource from "./baseVertexShader";
 import { mat4, vec3 } from "gl-matrix";
 import { URLsTypes } from "../handleEffectWebGL";
 import Atlas from "./Atlas";
+import { MustachesEffectTypes } from "src/context/CurrentEffectsStylesContext";
 
 interface MeshJSON {
   vertex_faces: number[];
@@ -21,9 +22,19 @@ class BaseShader {
   private texCoordBuffer: WebGLBuffer | null = null;
   private indexBuffer: WebGLBuffer | null = null;
 
-  private meshes: { meshData?: MeshJSON; meshURL: string }[] = [
-    { meshURL: "/3DAssets/mustaches/mustacheData.json" },
-  ];
+  private meshes:
+    | {
+        [meshes: string]: {
+          meshData?: MeshJSON;
+          meshURL: string;
+        };
+      }
+    | undefined;
+
+  private twoDimAltasTexMap: { [tex: string]: string } | undefined = undefined;
+
+  private threeDimAltasTexMap: { [tex: string]: string } | undefined =
+    undefined;
 
   private videoTexture: WebGLTexture | null = null;
   private videoTextureZPosition = 0.99;
@@ -55,9 +66,16 @@ class BaseShader {
     gl: WebGL2RenderingContext | WebGLRenderingContext,
     effects: {
       [effectType in EffectTypes]?: boolean | undefined;
+    },
+    meshes?: {
+      [meshes: string]: {
+        meshData?: MeshJSON;
+        meshURL: string;
+      };
     }
   ) {
     this.gl = gl;
+    this.meshes = meshes;
     this.initShaderProgram();
     this.initUniformLocations();
     this.initAttributeLocations();
@@ -279,17 +297,19 @@ class BaseShader {
 
   async createAtlasTexture(
     type: "twoDim" | "threeDim",
-    atlasImages: { [URLType in URLsTypes]?: string }
+    atlasImages: { [URLType: string]: string }
   ) {
     this.use();
 
     if (type === "twoDim") {
+      this.twoDimAltasTexMap = atlasImages;
       this.twoDimAtlas = new Atlas(this.gl);
       await this.twoDimAtlas.createAtlas(
         atlasImages,
         this.uTwoDimEffectAtlasTextureLocation
       );
     } else if (type === "threeDim") {
+      this.threeDimAltasTexMap = atlasImages;
       this.threeDimAtlas = new Atlas(this.gl);
       await this.threeDimAtlas.createAtlas(
         atlasImages,
@@ -299,7 +319,7 @@ class BaseShader {
   }
 
   drawEffect(
-    url: string,
+    effectType: string,
     position: { x: number; y: number },
     offset: { x: number; y: number },
     scale: number,
@@ -328,21 +348,30 @@ class BaseShader {
 
     this.gl.uniform2f(this.uTexSize, atlasSize, atlasSize);
 
-    const texture = this.twoDimAtlas.getTextureByURL(url);
+    let tex: { url: string; row: number; col: number } | undefined;
+    if (this.twoDimAltasTexMap && this.twoDimAltasTexMap[effectType]) {
+      tex = this.twoDimAtlas.getTextureByURL(
+        this.twoDimAltasTexMap[effectType]
+      );
+
+      if (!tex) {
+        return;
+      }
+    } else {
+      return;
+    }
 
     let texCoords;
-    if (texture) {
-      texCoords = new Float32Array([
-        (texture.col * atlasImagesSize) / atlasSize,
-        (texture.row * atlasImagesSize) / atlasSize,
-        (texture.col * atlasImagesSize) / atlasSize,
-        ((texture.row + 1) * atlasImagesSize) / atlasSize,
-        ((texture.col + 1) * atlasImagesSize) / atlasSize,
-        (texture.row * atlasImagesSize) / atlasSize,
-        ((texture.col + 1) * atlasImagesSize) / atlasSize,
-        ((texture.row + 1) * atlasImagesSize) / atlasSize,
-      ]);
-    }
+    texCoords = new Float32Array([
+      (tex.col * atlasImagesSize) / atlasSize,
+      (tex.row * atlasImagesSize) / atlasSize,
+      (tex.col * atlasImagesSize) / atlasSize,
+      ((tex.row + 1) * atlasImagesSize) / atlasSize,
+      ((tex.col + 1) * atlasImagesSize) / atlasSize,
+      (tex.row * atlasImagesSize) / atlasSize,
+      ((tex.col + 1) * atlasImagesSize) / atlasSize,
+      ((tex.row + 1) * atlasImagesSize) / atlasSize,
+    ]);
 
     if (!texCoords) {
       console.error("Failed to get texCoords");
@@ -492,8 +521,7 @@ class BaseShader {
   }
 
   async drawMesh(
-    texUrl: string,
-    jsonUrl: string,
+    meshType: string,
     position: { x: number; y: number },
     offset: { x: number; y: number },
     scale: number,
@@ -510,16 +538,15 @@ class BaseShader {
 
     this.use();
 
-    let currentMeshData: MeshJSON | undefined = undefined;
-    for (let i = 0; i < this.meshes.length; i++) {
-      const mesh = this.meshes[i];
-      if (mesh.meshURL === jsonUrl) {
-        if (!mesh.meshData) {
-          this.meshes[i].meshData = await this.loadMeshJSON(mesh.meshURL);
-        }
-        currentMeshData = this.meshes[i].meshData;
-        break;
+    // Load mesh if it has already been load and return if no mesh url is found
+    if (this.meshes && this.meshes[meshType]) {
+      if (!this.meshes[meshType].meshData) {
+        this.meshes[meshType].meshData = await this.loadMeshJSON(
+          this.meshes[meshType].meshURL
+        );
       }
+    } else {
+      return;
     }
 
     // Switch the texture used in the fragment shader
@@ -534,8 +561,15 @@ class BaseShader {
 
     this.gl.uniform2f(this.uTexSize, atlasSize, atlasSize);
 
-    const texture = this.threeDimAtlas.getTextureByURL(texUrl);
-    if (texture === undefined) {
+    let tex: { url: string; row: number; col: number } | undefined;
+    if (this.threeDimAltasTexMap && this.threeDimAltasTexMap[meshType]) {
+      tex = this.threeDimAtlas.getTextureByURL(
+        this.threeDimAltasTexMap[meshType]
+      );
+      if (tex === undefined) {
+        return;
+      }
+    } else {
       return;
     }
 
@@ -545,7 +579,7 @@ class BaseShader {
     mat4.rotateZ(rotationMatrix, rotationMatrix, headRotationAngle); // Rotation about the z-axis
 
     const vertices = [];
-    const meshData = currentMeshData;
+    const meshData = this.meshes[meshType].meshData;
 
     if (!meshData) {
       return;
@@ -589,9 +623,9 @@ class BaseShader {
       const v = meshData.uv_faces[i * 2 + 1];
 
       const transformedU =
-        u * (atlasImagesSize / atlasSize) + texture.col * atlasImagesSize;
+        u * (atlasImagesSize / atlasSize) + tex.col * atlasImagesSize;
       const transformedV =
-        v * (atlasImagesSize / atlasSize) + texture.col * atlasImagesSize;
+        v * (atlasImagesSize / atlasSize) + tex.col * atlasImagesSize;
 
       atlasUVs.push(transformedU, transformedV);
     }

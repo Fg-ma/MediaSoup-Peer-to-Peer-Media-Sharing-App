@@ -53,43 +53,73 @@ const handleEffectWebGL = async (
     return new Error("WebGL not supported");
   }
 
-  const baseShader = new BaseShader(gl, effects);
+  const meshes = {
+    mustache1: { meshURL: "/3DAssets/mustaches/mustache1.json" },
+    mustache2: { meshURL: "/3DAssets/mustaches/mustache2.json" },
+    mustache3: { meshURL: "/3DAssets/mustaches/mustache3.json" },
+    mustache4: { meshURL: "/3DAssets/mustaches/mustache4.json" },
+    disguiseMustache: { meshURL: "/3DAssets/mustaches/mustache1.json" },
+  };
+
+  const baseShader = new BaseShader(gl, effects, meshes);
   if (tintColor.current) {
     baseShader.setTintColor(tintColor.current);
   }
   const triangleShader = new TriangleShader(
     gl,
-    `/3DAssets/mustaches/mustacheTexture.png`
+    `/3DAssets/mustaches/mustacheBase.png`
   );
   const faceLandmarks = new FaceLandmarks(currentEffectsStyles);
   await new Promise((resolve) => setTimeout(resolve, 100));
 
-  const urls = {
-    leftEar: effects.ears
+  const twoDimUrls = {
+    [`${currentEffectsStyles.current.ears.style}Left`]: effects.ears
       ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Left.png`
       : null,
-    rightEar: effects.ears
+    [`${currentEffectsStyles.current.ears.style}Right`]: effects.ears
       ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Right.png`
       : null,
-    glasses: effects.glasses
+    [currentEffectsStyles.current.glasses.style]: effects.glasses
       ? `/2DAssets/glasses/${currentEffectsStyles.current.glasses.style}.png`
       : null,
-    beards: effects.beards
+    [currentEffectsStyles.current.beards.style]: effects.beards
       ? `/2DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
       : null,
-    mustaches: effects.mustaches
+    [currentEffectsStyles.current.mustaches.style]: effects.mustaches
       ? `/2DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
       : null,
   };
 
-  const filteredUrls: { [URLType in URLsTypes]?: string } = Object.fromEntries(
-    Object.entries(urls).filter(([key, value]) => value !== null)
-  );
+  const filteredTwoDimUrls: { [URLType in URLsTypes]?: string } =
+    Object.fromEntries(
+      Object.entries(twoDimUrls).filter(([key, value]) => value !== null)
+    );
 
-  await baseShader.createAtlasTexture("twoDim", filteredUrls);
-  await baseShader.createAtlasTexture("threeDim", {
-    mustaches: `/3DAssets/mustaches/colorMustacheTex.png`,
-  });
+  const threeDimUrls = {
+    // [`${currentEffectsStyles.current.ears.style}Left`]: effects.ears
+    //   ? `/3DAssets/ears/${currentEffectsStyles.current.ears.style}Left.png`
+    //   : null,
+    // [`${currentEffectsStyles.current.ears.style}Right`]: effects.ears
+    //   ? `/3DAssets/ears/${currentEffectsStyles.current.ears.style}Right.png`
+    //   : null,
+    // [currentEffectsStyles.current.glasses.style]: effects.glasses
+    //   ? `/3DAssets/glasses/${currentEffectsStyles.current.glasses.style}.png`
+    //   : null,
+    // [currentEffectsStyles.current.beards.style]: effects.beards
+    //   ? `/3DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
+    //   : null,
+    [currentEffectsStyles.current.mustaches.style]: effects.mustaches
+      ? `/3DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
+      : null,
+  };
+
+  const filteredThreeDimUrls: { [URLType in URLsTypes]?: string } =
+    Object.fromEntries(
+      Object.entries(threeDimUrls).filter(([key, value]) => value !== null)
+    );
+
+  await baseShader.createAtlasTexture("twoDim", filteredTwoDimUrls);
+  await baseShader.createAtlasTexture("threeDim", filteredThreeDimUrls);
 
   updateDeadbandingMaps(effects, currentEffectsStyles);
 
@@ -137,8 +167,7 @@ const handleEffectWebGL = async (
       effects,
       currentEffectsStyles,
       faceMesh,
-      faceMeshResults,
-      urls
+      faceMeshResults
     );
   });
   video.onloadedmetadata = () => {

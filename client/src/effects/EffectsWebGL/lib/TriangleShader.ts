@@ -1,6 +1,6 @@
 import triangleFragmentShaderSource from "./triangleFragmentShader";
 import triangleVertexShaderSource from "./triangleVertexShader";
-import mustaches from "../../../../public/3DAssets/mustaches/mustacheData.json";
+import mustaches from "../../../../public/3DAssets/mustaches/mustacheBase.json";
 
 class TriangleShader {
   private gl: WebGL2RenderingContext | WebGLRenderingContext;
