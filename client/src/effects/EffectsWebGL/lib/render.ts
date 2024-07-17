@@ -1,15 +1,12 @@
+import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { EffectTypes } from "src/context/StreamsContext";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
-import { FaceMesh, Results } from "@mediapipe/face_mesh";
-import drawFaceMesh from "./drawFaceMesh";
 import BaseShader from "./BaseShader";
-import TriangleShader from "./TriangleShader";
 import FaceLandmarks from "./FaceLandmarks";
 
 const render = async (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseShader: BaseShader,
-  triangleShader: TriangleShader,
   faceLandmarks: FaceLandmarks,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
@@ -102,7 +99,7 @@ const render = async (
           const threeDimMustacheOffset =
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
-          baseShader.drawMesh(
+          await baseShader.drawMesh(
             currentEffectsStyles.current.mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
@@ -140,7 +137,7 @@ const render = async (
           const threeDimMustacheOffset =
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
-          baseShader.drawMesh(
+          await baseShader.drawMesh(
             currentEffectsStyles.current.mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
@@ -178,7 +175,7 @@ const render = async (
           const threeDimMustacheOffset =
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
-          baseShader.drawMesh(
+          await baseShader.drawMesh(
             currentEffectsStyles.current.mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
@@ -216,7 +213,7 @@ const render = async (
           const threeDimMustacheOffset =
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
-          baseShader.drawMesh(
+          await baseShader.drawMesh(
             currentEffectsStyles.current.mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
@@ -232,37 +229,9 @@ const render = async (
           );
         }
       }
-    }
-
-    if (effects.faceMask) {
-      faceLandmarks
-        .getFaceIdLandmarksPairs()
-        .forEach(({ faceId, landmarks }) => {
-          // drawFaceMesh(
-          //   gl,
-          //   faceLandmarks.getFaceIdLandmarksPairs()[0].landmarks.slice(0, -10),
-          //   triangleShader
-          // );
-          // drawMustacheMesh(gl, triangleShader);
-
-          const threeDimMustacheOffset =
-            calculatedLandmarks.threeDimMustacheOffsets[faceId];
-
-          baseShader.drawMesh(
-            "mustache1",
-            {
-              x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
-              y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
-            },
-            {
-              x: threeDimMustacheOffset[0],
-              y: threeDimMustacheOffset[1],
-            },
-            0.4,
-            calculatedLandmarks.headRotationAngles[faceId],
-            calculatedLandmarks.headYawAngles[faceId]
-          );
-        });
+      if (effects.faceMask) {
+        await baseShader.drawFaceMesh("faceMask1", landmarks.slice(0, -10));
+      }
     }
   }
 
@@ -270,7 +239,6 @@ const render = async (
     render(
       gl,
       baseShader,
-      triangleShader,
       faceLandmarks,
       video,
       canvas,

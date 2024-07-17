@@ -2,9 +2,9 @@ import {
   NormalizedLandmarkList,
   NormalizedLandmarkListList,
 } from "@mediapipe/face_mesh";
-import { Point2D } from "./drawFaceMesh";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import { oneDimensionalDeadbandingMap } from "./updateDeadbandingMaps";
+import { Point2D } from "./BaseShader";
 
 export type OneDimensionalLandmarkTypes =
   | "headRotationAngles"

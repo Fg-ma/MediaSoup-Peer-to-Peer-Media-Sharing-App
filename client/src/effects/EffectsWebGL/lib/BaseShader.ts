@@ -1,14 +1,26 @@
+import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
+import { mat4, vec3 } from "gl-matrix";
+import { Delaunay } from "d3-delaunay";
 import { EffectTypes } from "src/context/StreamsContext";
 import baseFragmentShaderSource from "./baseFragmentShader";
 import baseVertexShaderSource from "./baseVertexShader";
-import { mat4, vec3 } from "gl-matrix";
-import { URLsTypes } from "../handleEffectWebGL";
 import Atlas from "./Atlas";
-import { MustachesEffectTypes } from "src/context/CurrentEffectsStylesContext";
 
 interface MeshJSON {
   vertex_faces: number[];
   uv_faces: number[];
+  normals: number[];
+}
+
+export interface Point2D {
+  x: number;
+  y: number;
+}
+
+export interface Point3D {
+  x: number;
+  y: number;
+  z: number;
 }
 
 class BaseShader {
@@ -54,6 +66,7 @@ class BaseShader {
   // Attribute locations
   private aPositionLocation: number | null = null;
   private aTexCoordLocation: number | null = null;
+  private aNormalLocation: number | null = null;
 
   private effectFlags: number = 0;
   private VIDEO_BIT = 0;
@@ -131,6 +144,8 @@ class BaseShader {
         }
       }
     }
+
+    this.use();
   }
 
   private loadShader(type: number, source: string): WebGLShader | null {
@@ -192,13 +207,38 @@ class BaseShader {
       this.program,
       "a_texCoord"
     );
+    this.aNormalLocation = this.gl.getAttribLocation(this.program, "a_normal");
   }
 
   private initBuffers() {
+    if (this.aPositionLocation === null || this.aTexCoordLocation === null) {
+      return;
+    }
+
     // Setup static buffers for position and texCoord and index
     this.positionBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+    this.gl.vertexAttribPointer(
+      this.aPositionLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+    this.gl.enableVertexAttribArray(this.aPositionLocation);
 
     this.texCoordBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
+    this.gl.vertexAttribPointer(
+      this.aTexCoordLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+    this.gl.enableVertexAttribArray(this.aTexCoordLocation);
 
     this.indexBuffer = this.gl.createBuffer();
   }
@@ -278,6 +318,56 @@ class BaseShader {
     }
   }
 
+  private getTriangles(geometryPoints: Point3D[], uvPoints: number[]) {
+    const geometryDelaunay = Delaunay.from(
+      geometryPoints,
+      (p) => p.x,
+      (p) => p.y
+    );
+    const geometryTrianglesIndices = geometryDelaunay.triangles;
+
+    const uvTriangles: number[] = [];
+    const geometryTriangles: number[] = [];
+
+    for (let i = 0; i < geometryTrianglesIndices.length; i += 3) {
+      if (
+        uvPoints[geometryTrianglesIndices[i]] &&
+        uvPoints[geometryTrianglesIndices[i + 1]] &&
+        uvPoints[geometryTrianglesIndices[i + 2]]
+      ) {
+        uvTriangles.push(
+          uvPoints[geometryTrianglesIndices[i] * 2],
+          uvPoints[geometryTrianglesIndices[i] * 2 + 1],
+
+          uvPoints[geometryTrianglesIndices[i + 1] * 2],
+          uvPoints[geometryTrianglesIndices[i + 1] * 2 + 1],
+
+          uvPoints[geometryTrianglesIndices[i + 2] * 2],
+          uvPoints[geometryTrianglesIndices[i + 2] * 2 + 1]
+        );
+      }
+      if (
+        geometryPoints[geometryTrianglesIndices[i]] &&
+        geometryPoints[geometryTrianglesIndices[i + 1]] &&
+        geometryPoints[geometryTrianglesIndices[i + 2]]
+      ) {
+        geometryTriangles.push(
+          geometryPoints[geometryTrianglesIndices[i]].x,
+          geometryPoints[geometryTrianglesIndices[i]].y,
+          geometryPoints[geometryTrianglesIndices[i]].z,
+          geometryPoints[geometryTrianglesIndices[i + 1]].x,
+          geometryPoints[geometryTrianglesIndices[i + 1]].y,
+          geometryPoints[geometryTrianglesIndices[i + 1]].z,
+          geometryPoints[geometryTrianglesIndices[i + 2]].x,
+          geometryPoints[geometryTrianglesIndices[i + 2]].y,
+          geometryPoints[geometryTrianglesIndices[i + 2]].z
+        );
+      }
+    }
+
+    return { uvTriangles, geometryTriangles };
+  }
+
   private hexToRgb(hex: string) {
     hex = hex.replace(/^#/, "");
 
@@ -303,7 +393,7 @@ class BaseShader {
 
     if (type === "twoDim") {
       this.twoDimAltasTexMap = atlasImages;
-      this.twoDimAtlas = new Atlas(this.gl);
+      this.twoDimAtlas = new Atlas(this.gl, 0.98);
       await this.twoDimAtlas.createAtlas(
         atlasImages,
         this.uTwoDimEffectAtlasTextureLocation
@@ -380,7 +470,7 @@ class BaseShader {
 
     // Bind the texCoord buffer
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, texCoords, this.gl.STATIC_DRAW);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, texCoords, this.gl.DYNAMIC_DRAW);
     this.gl.vertexAttribPointer(
       this.aTexCoordLocation,
       2,
@@ -398,7 +488,7 @@ class BaseShader {
     this.gl.bufferData(
       this.gl.ELEMENT_ARRAY_BUFFER,
       indices,
-      this.gl.STATIC_DRAW
+      this.gl.DYNAMIC_DRAW
     );
 
     // Define vertices for a square plane before applying rotation
@@ -433,7 +523,7 @@ class BaseShader {
 
     // Bind the position buffer
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.DYNAMIC_DRAW);
     this.gl.vertexAttribPointer(
       this.aPositionLocation,
       3,
@@ -483,7 +573,7 @@ class BaseShader {
     ]);
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, positions, this.gl.STATIC_DRAW);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, positions, this.gl.DYNAMIC_DRAW);
     this.gl.vertexAttribPointer(
       this.aPositionLocation,
       3,
@@ -496,7 +586,7 @@ class BaseShader {
     const texCoords = new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]);
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, texCoords, this.gl.STATIC_DRAW);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, texCoords, this.gl.DYNAMIC_DRAW);
     this.gl.vertexAttribPointer(
       this.aTexCoordLocation,
       2,
@@ -531,6 +621,7 @@ class BaseShader {
     if (
       this.aPositionLocation === null ||
       this.aTexCoordLocation === null ||
+      this.aNormalLocation === null ||
       this.threeDimAtlas === null
     ) {
       return;
@@ -578,38 +669,62 @@ class BaseShader {
     mat4.fromYRotation(rotationMatrix, headYawAngle); // Rotation about the y-axis (yaw)
     mat4.rotateZ(rotationMatrix, rotationMatrix, headRotationAngle); // Rotation about the z-axis
 
-    const vertices = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
     const meshData = this.meshes[meshType].meshData;
 
     if (!meshData) {
       return;
     }
 
-    // Apply the rotation matrix to the vertices
+    // Apply the rotation matrix to the vertices and normals
     for (let i = 0; i < meshData.vertex_faces.length / 3; i++) {
       const x = meshData.vertex_faces[i * 3];
       const y = meshData.vertex_faces[i * 3 + 1];
       const z = meshData.vertex_faces[i * 3 + 2];
 
-      const rotated = vec3.create();
-      vec3.transformMat4(rotated, [x, y, z], rotationMatrix);
+      const nx = meshData.normals[i * 3];
+      const ny = meshData.normals[i * 3 + 1];
+      const nz = meshData.normals[i * 3 + 2];
+
+      const rotatedVertex = vec3.create();
+      vec3.transformMat4(rotatedVertex, [x, y, z], rotationMatrix);
+
+      const rotatedNormal = vec3.create();
+      vec3.transformMat4(rotatedNormal, [nx, ny, nz], rotationMatrix);
 
       // Apply scale and translation
-      const finalX = rotated[0] * scale + position.x + offset.x;
-      const finalY = rotated[1] * scale + position.y + offset.y;
-      const finalZ = rotated[2]; // Z-coordinate remains unchanged
+      const finalX = rotatedVertex[0] * scale + position.x + offset.x;
+      const finalY = rotatedVertex[1] * scale + position.y + offset.y;
+      const finalZ = rotatedVertex[2]; // Z-coordinate remains unchanged
 
       vertices.push(finalX, finalY, finalZ);
+      normals.push(rotatedNormal[0], rotatedNormal[1], rotatedNormal[2]);
     }
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
       new Float32Array(vertices),
-      this.gl.STATIC_DRAW
+      this.gl.DYNAMIC_DRAW
     );
     this.gl.vertexAttribPointer(
       this.aPositionLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer); // Bind normal buffer
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(normals),
+      this.gl.DYNAMIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      this.aNormalLocation,
       3,
       this.gl.FLOAT,
       false,
@@ -634,7 +749,7 @@ class BaseShader {
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
       new Float32Array(atlasUVs),
-      this.gl.STATIC_DRAW
+      this.gl.DYNAMIC_DRAW
     );
     this.gl.vertexAttribPointer(
       this.aTexCoordLocation,
@@ -654,7 +769,7 @@ class BaseShader {
     this.gl.bufferData(
       this.gl.ELEMENT_ARRAY_BUFFER,
       new Uint16Array(indices),
-      this.gl.STATIC_DRAW
+      this.gl.DYNAMIC_DRAW
     );
 
     // Draw the mesh
@@ -664,6 +779,131 @@ class BaseShader {
       this.gl.UNSIGNED_SHORT,
       0
     );
+  }
+
+  async drawFaceMesh(meshType: string, liveLandmarks: NormalizedLandmarkList) {
+    if (
+      this.aPositionLocation === null ||
+      this.aTexCoordLocation === null ||
+      this.threeDimAtlas === null
+    ) {
+      return;
+    }
+
+    this.use();
+
+    // Load uv mesh data
+    if (this.meshes && this.meshes[meshType]) {
+      if (!this.meshes[meshType].meshData) {
+        this.meshes[meshType].meshData = await this.loadMeshJSON(
+          this.meshes[meshType].meshURL
+        );
+      }
+    } else {
+      return;
+    }
+
+    // Switch the texture used in the fragment shader
+    this.switchTextureFlag(this.MESH_BIT);
+
+    // Get atlas attributes
+    const atlasSize = this.threeDimAtlas.getAtlasSize();
+    const atlasImagesSize = this.threeDimAtlas.getAtlasImagesSize();
+    if (atlasSize === null) {
+      return;
+    }
+
+    this.gl.uniform2f(this.uTexSize, atlasSize, atlasSize);
+
+    let tex: { url: string; row: number; col: number } | undefined;
+    if (this.threeDimAltasTexMap && this.threeDimAltasTexMap[meshType]) {
+      tex = this.threeDimAtlas.getTextureByURL(
+        this.threeDimAltasTexMap[meshType]
+      );
+      if (tex === undefined) {
+        return;
+      }
+    } else {
+      return;
+    }
+
+    // Get the triangles
+    const { uvTriangles, geometryTriangles } = this.getTriangles(
+      liveLandmarks,
+      this.meshes[meshType].meshData!.uv_faces
+    );
+
+    let index = 0;
+    const positions: number[] = [];
+
+    for (let i = 0; i < geometryTriangles.length; i += 9) {
+      positions.push(
+        geometryTriangles[i] * 2 - 1, // first x coord
+        (1 - geometryTriangles[i + 1]) * 2 - 1, // first y coord
+        geometryTriangles[i + 2], // first z coord
+        geometryTriangles[i + 3] * 2 - 1, // second x coord
+        (1 - geometryTriangles[i + 4]) * 2 - 1, // second y coord
+        geometryTriangles[i + 5], // second z coord
+        geometryTriangles[i + 6] * 2 - 1, // third x coord
+        (1 - geometryTriangles[i + 7]) * 2 - 1, // third y coord
+        geometryTriangles[i + 8] // third z coord
+      );
+
+      index += 3;
+    }
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(positions),
+      this.gl.DYNAMIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      this.aPositionLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    const atlasUVs = [];
+    for (let i = 0; i < uvTriangles.length / 2; i++) {
+      const u = uvTriangles[i * 2];
+      const v = uvTriangles[i * 2 + 1];
+
+      const transformedU =
+        u * (atlasImagesSize / atlasSize) + tex.col * atlasImagesSize;
+      const transformedV =
+        v * (atlasImagesSize / atlasSize) + tex.col * atlasImagesSize;
+
+      atlasUVs.push(transformedU, transformedV);
+    }
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(atlasUVs),
+      this.gl.DYNAMIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      this.aTexCoordLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.gl.bufferData(
+      this.gl.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(Array.from({ length: index }, (_, i) => i)),
+      this.gl.DYNAMIC_DRAW
+    );
+
+    // Draw the mesh
+    this.gl.drawElements(this.gl.TRIANGLES, index, this.gl.UNSIGNED_SHORT, 0);
   }
 
   setTintColor(tintColor: string) {

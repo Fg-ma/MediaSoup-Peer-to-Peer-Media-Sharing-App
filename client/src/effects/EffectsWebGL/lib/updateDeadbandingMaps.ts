@@ -78,6 +78,7 @@ export const oneDimensionalDeadbandingMap: {
   eyesWidths: 0.0,
   chinWidths: 0.0,
   headRotationAngles: 0.0,
+  headYawAngles: 0.0,
   interocularDistances: 0.0,
 };
 

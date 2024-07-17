@@ -1,12 +1,5 @@
 import React, { createContext, useContext, useRef } from "react";
 
-export type GlassesEffectTypes =
-  | "defaultGlasses"
-  | "memeGlasses"
-  | "americaGlasses"
-  | "threeDGlasses"
-  | "shades";
-
 export type EarsEffectTypes = "dogEars";
 
 export const earsWidthFactorMap: {
@@ -26,6 +19,13 @@ export const beardChinOffsetsMap: {
   classicalCurlyBeard: 0.05,
 };
 
+export type GlassesEffectTypes =
+  | "defaultGlasses"
+  | "memeGlasses"
+  | "americaGlasses"
+  | "threeDGlasses"
+  | "shades";
+
 export type MustachesEffectTypes =
   | "mustache1"
   | "mustache2"
@@ -39,12 +39,14 @@ export const mustacheNoseOffsetsMap: {
     threeDim: number;
   };
 } = {
-  mustache1: { twoDim: -0.09, threeDim: -0.05 },
-  mustache2: { twoDim: -0.07, threeDim: 0.0 },
-  mustache3: { twoDim: -0.09, threeDim: 0.0 },
-  mustache4: { twoDim: -0.07, threeDim: 0.0 },
+  mustache1: { twoDim: -0.09, threeDim: -0.08 },
+  mustache2: { twoDim: -0.07, threeDim: -0.11 },
+  mustache3: { twoDim: -0.09, threeDim: -0.11 },
+  mustache4: { twoDim: -0.07, threeDim: -0.05 },
   disguiseMustache: { twoDim: 0.075, threeDim: 0.0 },
 };
+
+export type FaceMasksEffectTypes = "faceMask1";
 
 export type EffectStylesType = {
   glasses: { style: GlassesEffectTypes; threeDim: boolean };
@@ -59,6 +61,10 @@ export type EffectStylesType = {
     style: MustachesEffectTypes;
     threeDim: boolean;
     noseOffset: { twoDim: number; threeDim: number };
+  };
+  faceMask: {
+    style: FaceMasksEffectTypes;
+    threeDim: true;
   };
 };
 
@@ -87,10 +93,11 @@ export const useCurrentEffectsStylesContext = () => {
 export function CurrentEffectsStylesContextProvider({
   children,
 }: CurrentEffectsStylesContextProviderProps) {
-  const defaultGlasses = "defaultGlasses";
-  const defaultBeard = "classicalCurlyBeard";
-  const defaultMustache = "mustache1";
   const defaultEars = "dogEars";
+  const defaultBeard = "classicalCurlyBeard";
+  const defaultGlasses = "defaultGlasses";
+  const defaultMustache = "mustache1";
+  const defaultFaceMask = "faceMask1";
 
   const currentEffectsStyles = useRef<EffectStylesType>({
     glasses: { style: defaultGlasses, threeDim: false },
@@ -109,6 +116,10 @@ export function CurrentEffectsStylesContextProvider({
       style: defaultMustache,
       threeDim: false,
       noseOffset: mustacheNoseOffsetsMap[defaultMustache],
+    },
+    faceMask: {
+      style: defaultFaceMask,
+      threeDim: true,
     },
   });
 

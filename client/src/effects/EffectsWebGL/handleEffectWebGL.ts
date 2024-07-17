@@ -6,7 +6,6 @@ import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { releaseAllTexturePositions } from "./lib/handleTexturePosition";
 import BaseShader from "./lib/BaseShader";
-import TriangleShader from "./lib/TriangleShader";
 import FaceLandmarks from "./lib/FaceLandmarks";
 
 export type URLsTypes =
@@ -59,16 +58,13 @@ const handleEffectWebGL = async (
     mustache3: { meshURL: "/3DAssets/mustaches/mustache3.json" },
     mustache4: { meshURL: "/3DAssets/mustaches/mustache4.json" },
     disguiseMustache: { meshURL: "/3DAssets/mustaches/mustache1.json" },
+    faceMask1: { meshURL: "/3DAssets/faceMasks/faceMask1.json" },
   };
 
   const baseShader = new BaseShader(gl, effects, meshes);
   if (tintColor.current) {
     baseShader.setTintColor(tintColor.current);
   }
-  const triangleShader = new TriangleShader(
-    gl,
-    `/3DAssets/mustaches/mustacheBase.png`
-  );
   const faceLandmarks = new FaceLandmarks(currentEffectsStyles);
   await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -110,6 +106,9 @@ const handleEffectWebGL = async (
     //   : null,
     [currentEffectsStyles.current.mustaches.style]: effects.mustaches
       ? `/3DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
+      : null,
+    [currentEffectsStyles.current.faceMask.style]: effects.faceMask
+      ? `/3DAssets/faceMasks/${currentEffectsStyles.current.faceMask.style}.png`
       : null,
   };
 
@@ -159,7 +158,6 @@ const handleEffectWebGL = async (
     render(
       gl,
       baseShader,
-      triangleShader,
       faceLandmarks,
       video,
       canvas,
@@ -183,7 +181,6 @@ const handleEffectWebGL = async (
     video,
     gl,
     baseShader,
-    triangleShader,
     canvas,
     type,
     id,

@@ -1,12 +1,10 @@
 import BaseShader from "./BaseShader";
-import TriangleShader from "./TriangleShader";
 
 const createStopFunction = (
   animationFrameId: number[],
   video: HTMLVideoElement,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseShader: BaseShader,
-  triangleShader: TriangleShader,
   canvas: HTMLCanvasElement,
   type: "webcam" | "screen" | "audio",
   id: string,
@@ -28,7 +26,6 @@ const createStopFunction = (
     video.srcObject = null;
 
     baseShader.deconstructor();
-    triangleShader.deconstructor();
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
