@@ -55,13 +55,13 @@ export default function EarsEffectSectionButton({
           const effectType = target.dataset.value as EarsEffectTypes;
           if (
             effectType in earsEffects &&
-            (currentEffectsStyles.current.ears.style !== effectType ||
+            (currentEffectsStyles.current[videoId].ears.style !== effectType ||
               !userStreamEffects.current.ears[type]?.[videoId])
           ) {
-            currentEffectsStyles.current.ears.style = effectType;
-            currentEffectsStyles.current.ears.leftEarWidthFactor =
+            currentEffectsStyles.current[videoId].ears.style = effectType;
+            currentEffectsStyles.current[videoId].ears.leftEarWidthFactor =
               earsWidthFactorMap[effectType].leftEarWidthFactor;
-            currentEffectsStyles.current.ears.rightEarWidthFactor =
+            currentEffectsStyles.current[videoId].ears.rightEarWidthFactor =
               earsWidthFactorMap[effectType].rightEarWidthFactor;
             handleEffectChange(
               "ears",
@@ -72,8 +72,8 @@ export default function EarsEffectSectionButton({
       }}
       contentFunction={() => {
         const iconSrc =
-          earsEffects[currentEffectsStyles.current.ears.style][
-            currentEffectsStyles.current.ears.threeDim
+          earsEffects[currentEffectsStyles.current[videoId].ears.style][
+            currentEffectsStyles.current[videoId].ears.threeDim
               ? userStreamEffects.current.ears[type]?.[videoId]
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
@@ -87,13 +87,13 @@ export default function EarsEffectSectionButton({
             src={iconSrc}
             alt='icon'
             style={{ width: "90%", height: "90%" }}
-            data-value={currentEffectsStyles.current.ears.style}
+            data-value={currentEffectsStyles.current[videoId].ears.style}
           />
         );
       }}
       doubleClickFunction={() => {
-        currentEffectsStyles.current.ears.threeDim =
-          !currentEffectsStyles.current.ears.threeDim;
+        currentEffectsStyles.current[videoId].ears.threeDim =
+          !currentEffectsStyles.current[videoId].ears.threeDim;
         handleEffectChange(
           "ears",
           userStreamEffects.current.ears[type]?.[videoId]
@@ -122,7 +122,7 @@ export default function EarsEffectSectionButton({
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}
-      defaultDataValue={currentEffectsStyles.current.ears.style}
+      defaultDataValue={currentEffectsStyles.current[videoId].ears.style}
     />
   );
 }

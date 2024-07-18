@@ -111,11 +111,12 @@ export default function MustachesEffectSectionButton({
           const effectType = target.dataset.value as MustachesEffectTypes;
           if (
             effectType in mustachesEffects &&
-            (currentEffectsStyles.current.mustaches.style !== effectType ||
+            (currentEffectsStyles.current[videoId].mustaches.style !==
+              effectType ||
               !userStreamEffects.current.mustaches[type]?.[videoId])
           ) {
-            currentEffectsStyles.current.mustaches.style = effectType;
-            currentEffectsStyles.current.mustaches.noseOffset =
+            currentEffectsStyles.current[videoId].mustaches.style = effectType;
+            currentEffectsStyles.current[videoId].mustaches.noseOffset =
               mustacheNoseOffsetsMap[effectType];
             handleEffectChange(
               "mustaches",
@@ -128,8 +129,10 @@ export default function MustachesEffectSectionButton({
       }}
       contentFunction={() => {
         const iconSrc =
-          mustachesEffects[currentEffectsStyles.current.mustaches.style][
-            currentEffectsStyles.current.mustaches.threeDim
+          mustachesEffects[
+            currentEffectsStyles.current[videoId].mustaches.style
+          ][
+            currentEffectsStyles.current[videoId].mustaches.threeDim
               ? userStreamEffects.current.mustaches[type]?.[videoId]
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
@@ -143,13 +146,13 @@ export default function MustachesEffectSectionButton({
             src={iconSrc}
             alt='icon'
             style={{ width: "90%", height: "90%" }}
-            data-value={currentEffectsStyles.current.mustaches.style}
+            data-value={currentEffectsStyles.current[videoId].mustaches.style}
           />
         );
       }}
       doubleClickFunction={() => {
-        currentEffectsStyles.current.mustaches.threeDim =
-          !currentEffectsStyles.current.mustaches.threeDim;
+        currentEffectsStyles.current[videoId].mustaches.threeDim =
+          !currentEffectsStyles.current[videoId].mustaches.threeDim;
         handleEffectChange(
           "mustaches",
           userStreamEffects.current.mustaches[type]?.[videoId]
@@ -178,7 +181,7 @@ export default function MustachesEffectSectionButton({
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}
-      defaultDataValue={currentEffectsStyles.current.mustaches.style}
+      defaultDataValue={currentEffectsStyles.current[videoId].mustaches.style}
     />
   );
 }

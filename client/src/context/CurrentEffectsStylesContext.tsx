@@ -48,25 +48,27 @@ export const mustacheNoseOffsetsMap: {
 
 export type FaceMasksEffectTypes = "faceMask1";
 
-export type EffectStylesType = {
-  glasses: { style: GlassesEffectTypes; threeDim: boolean };
-  ears: {
-    style: EarsEffectTypes;
-    threeDim: boolean;
-    leftEarWidthFactor: number;
-    rightEarWidthFactor: number;
+export interface EffectStylesType {
+  [id: string]: {
+    glasses: { style: GlassesEffectTypes; threeDim: boolean };
+    ears: {
+      style: EarsEffectTypes;
+      threeDim: boolean;
+      leftEarWidthFactor: number;
+      rightEarWidthFactor: number;
+    };
+    beards: { style: BeardsEffectTypes; threeDim: boolean; chinOffset: number };
+    mustaches: {
+      style: MustachesEffectTypes;
+      threeDim: boolean;
+      noseOffset: { twoDim: number; threeDim: number };
+    };
+    faceMasks: {
+      style: FaceMasksEffectTypes;
+      threeDim: true;
+    };
   };
-  beards: { style: BeardsEffectTypes; threeDim: boolean; chinOffset: number };
-  mustaches: {
-    style: MustachesEffectTypes;
-    threeDim: boolean;
-    noseOffset: { twoDim: number; threeDim: number };
-  };
-  faceMask: {
-    style: FaceMasksEffectTypes;
-    threeDim: true;
-  };
-};
+}
 
 export interface CurrentEffectsStylesContextProviderProps {
   children: React.ReactNode;
@@ -100,27 +102,27 @@ export function CurrentEffectsStylesContextProvider({
   const defaultFaceMask = "faceMask1";
 
   const currentEffectsStyles = useRef<EffectStylesType>({
-    glasses: { style: defaultGlasses, threeDim: false },
-    ears: {
-      style: defaultEars,
-      threeDim: false,
-      leftEarWidthFactor: earsWidthFactorMap[defaultEars].leftEarWidthFactor,
-      rightEarWidthFactor: earsWidthFactorMap[defaultEars].rightEarWidthFactor,
-    },
-    beards: {
-      style: defaultBeard,
-      threeDim: false,
-      chinOffset: beardChinOffsetsMap[defaultBeard],
-    },
-    mustaches: {
-      style: defaultMustache,
-      threeDim: false,
-      noseOffset: mustacheNoseOffsetsMap[defaultMustache],
-    },
-    faceMask: {
-      style: defaultFaceMask,
-      threeDim: true,
-    },
+    // glasses: { style: defaultGlasses, threeDim: false },
+    // ears: {
+    //   style: defaultEars,
+    //   threeDim: false,
+    //   leftEarWidthFactor: earsWidthFactorMap[defaultEars].leftEarWidthFactor,
+    //   rightEarWidthFactor: earsWidthFactorMap[defaultEars].rightEarWidthFactor,
+    // },
+    // beards: {
+    //   style: defaultBeard,
+    //   threeDim: false,
+    //   chinOffset: beardChinOffsetsMap[defaultBeard],
+    // },
+    // mustaches: {
+    //   style: defaultMustache,
+    //   threeDim: false,
+    //   noseOffset: mustacheNoseOffsetsMap[defaultMustache],
+    // },
+    // faceMasks: {
+    //   style: defaultFaceMask,
+    //   threeDim: true,
+    // },
   });
 
   return (

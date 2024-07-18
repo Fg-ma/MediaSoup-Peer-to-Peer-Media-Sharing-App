@@ -4,7 +4,12 @@ import { Socket } from "socket.io-client";
 import { AnimatePresence } from "framer-motion";
 import "./FgVideoStyles.css";
 import { useStreamsContext, EffectTypes } from "../context/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
+import {
+  beardChinOffsetsMap,
+  earsWidthFactorMap,
+  mustacheNoseOffsetsMap,
+  useCurrentEffectsStylesContext,
+} from "../context/CurrentEffectsStylesContext";
 import VolumeSection from "./VolumeSection";
 import handleFullscreenChange from "./lib/handleFullscreenChange";
 import handlePictureInPicture from "./lib/handlePictureInPicture";
@@ -155,6 +160,39 @@ export default function FgVideo({
   const tintColor = useRef("#F56114");
 
   const init = () => {
+    if (!currentEffectsStyles.current[videoId]) {
+      const defaultEars = "dogEars";
+      const defaultBeard = "classicalCurlyBeard";
+      const defaultGlasses = "defaultGlasses";
+      const defaultMustache = "mustache1";
+      const defaultFaceMask = "faceMask1";
+      currentEffectsStyles.current[videoId] = {
+        glasses: { style: defaultGlasses, threeDim: false },
+        ears: {
+          style: defaultEars,
+          threeDim: false,
+          leftEarWidthFactor:
+            earsWidthFactorMap[defaultEars].leftEarWidthFactor,
+          rightEarWidthFactor:
+            earsWidthFactorMap[defaultEars].rightEarWidthFactor,
+        },
+        beards: {
+          style: defaultBeard,
+          threeDim: false,
+          chinOffset: beardChinOffsetsMap[defaultBeard],
+        },
+        mustaches: {
+          style: defaultMustache,
+          threeDim: false,
+          noseOffset: mustacheNoseOffsetsMap[defaultMustache],
+        },
+        faceMasks: {
+          style: defaultFaceMask,
+          threeDim: true,
+        },
+      };
+    }
+
     // Set videoStream as srcObject
     if (videoRef.current && isStream && videoStream) {
       videoRef.current.srcObject = videoStream;

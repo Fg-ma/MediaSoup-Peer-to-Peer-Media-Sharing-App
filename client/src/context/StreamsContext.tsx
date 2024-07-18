@@ -7,7 +7,7 @@ export type EffectTypes =
   | "glasses"
   | "beards"
   | "mustaches"
-  | "faceMask";
+  | "faceMasks";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;
@@ -119,7 +119,7 @@ export function StreamsContextProvider({
     glasses: { webcam: {} },
     beards: { webcam: {} },
     mustaches: { webcam: {} },
-    faceMask: {
+    faceMasks: {
       webcam: {},
     },
   });

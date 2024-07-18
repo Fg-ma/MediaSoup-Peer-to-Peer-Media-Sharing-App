@@ -55,11 +55,12 @@ export default function BeardsEffectSectionButton({
           const effectType = target.dataset.value as BeardsEffectTypes;
           if (
             effectType in beardsEffects &&
-            (currentEffectsStyles.current.beards.style !== effectType ||
+            (currentEffectsStyles.current[videoId].beards.style !==
+              effectType ||
               !userStreamEffects.current.beards[type]?.[videoId])
           ) {
-            currentEffectsStyles.current.beards.style = effectType;
-            currentEffectsStyles.current.beards.chinOffset =
+            currentEffectsStyles.current[videoId].beards.style = effectType;
+            currentEffectsStyles.current[videoId].beards.chinOffset =
               beardChinOffsetsMap[effectType];
             handleEffectChange(
               "beards",
@@ -70,8 +71,8 @@ export default function BeardsEffectSectionButton({
       }}
       contentFunction={() => {
         const iconSrc =
-          beardsEffects[currentEffectsStyles.current.beards.style][
-            currentEffectsStyles.current.beards.threeDim
+          beardsEffects[currentEffectsStyles.current[videoId].beards.style][
+            currentEffectsStyles.current[videoId].beards.threeDim
               ? userStreamEffects.current.beards[type]?.[videoId]
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
@@ -85,13 +86,13 @@ export default function BeardsEffectSectionButton({
             src={iconSrc}
             alt='icon'
             style={{ width: "90%", height: "90%" }}
-            data-value={currentEffectsStyles.current.beards.style}
+            data-value={currentEffectsStyles.current[videoId].beards.style}
           />
         );
       }}
       doubleClickFunction={() => {
-        currentEffectsStyles.current.beards.threeDim =
-          !currentEffectsStyles.current.beards.threeDim;
+        currentEffectsStyles.current[videoId].beards.threeDim =
+          !currentEffectsStyles.current[videoId].beards.threeDim;
         handleEffectChange(
           "beards",
           userStreamEffects.current.beards[type]?.[videoId]
@@ -120,7 +121,7 @@ export default function BeardsEffectSectionButton({
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}
-      defaultDataValue={currentEffectsStyles.current.beards.style}
+      defaultDataValue={currentEffectsStyles.current[videoId].beards.style}
     />
   );
 }

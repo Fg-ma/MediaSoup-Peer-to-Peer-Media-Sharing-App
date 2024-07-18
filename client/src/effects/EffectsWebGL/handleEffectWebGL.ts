@@ -1,7 +1,12 @@
 import { EffectTypes } from "../../context/StreamsContext";
 import render from "./lib/render";
 import createStopFunction from "./lib/createStopFunction";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import {
+  beardChinOffsetsMap,
+  earsWidthFactorMap,
+  EffectStylesType,
+  mustacheNoseOffsetsMap,
+} from "../../context/CurrentEffectsStylesContext";
 import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { releaseAllTexturePositions } from "./lib/handleTexturePosition";
@@ -65,24 +70,24 @@ const handleEffectWebGL = async (
   if (tintColor.current) {
     baseShader.setTintColor(tintColor.current);
   }
-  const faceLandmarks = new FaceLandmarks(currentEffectsStyles);
+  const faceLandmarks = new FaceLandmarks(id, currentEffectsStyles);
   await new Promise((resolve) => setTimeout(resolve, 100));
 
   const twoDimUrls = {
-    [`${currentEffectsStyles.current.ears.style}Left`]: effects.ears
-      ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Left.png`
+    [`${currentEffectsStyles.current[id].ears.style}Left`]: effects.ears
+      ? `/2DAssets/ears/${currentEffectsStyles.current[id].ears.style}Left.png`
       : null,
-    [`${currentEffectsStyles.current.ears.style}Right`]: effects.ears
-      ? `/2DAssets/ears/${currentEffectsStyles.current.ears.style}Right.png`
+    [`${currentEffectsStyles.current[id].ears.style}Right`]: effects.ears
+      ? `/2DAssets/ears/${currentEffectsStyles.current[id].ears.style}Right.png`
       : null,
-    [currentEffectsStyles.current.glasses.style]: effects.glasses
-      ? `/2DAssets/glasses/${currentEffectsStyles.current.glasses.style}.png`
+    [currentEffectsStyles.current[id].glasses.style]: effects.glasses
+      ? `/2DAssets/glasses/${currentEffectsStyles.current[id].glasses.style}.png`
       : null,
-    [currentEffectsStyles.current.beards.style]: effects.beards
-      ? `/2DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
+    [currentEffectsStyles.current[id].beards.style]: effects.beards
+      ? `/2DAssets/beards/${currentEffectsStyles.current[id].beards.style}.png`
       : null,
-    [currentEffectsStyles.current.mustaches.style]: effects.mustaches
-      ? `/2DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
+    [currentEffectsStyles.current[id].mustaches.style]: effects.mustaches
+      ? `/2DAssets/mustaches/${currentEffectsStyles.current[id].mustaches.style}.png`
       : null,
   };
 
@@ -104,13 +109,13 @@ const handleEffectWebGL = async (
     // [currentEffectsStyles.current.beards.style]: effects.beards
     //   ? `/3DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
     //   : null,
-    [currentEffectsStyles.current.mustaches.style]:
-      effects.mustaches && currentEffectsStyles.current.mustaches.threeDim
-        ? `/3DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
+    [currentEffectsStyles.current[id].mustaches.style]:
+      effects.mustaches && currentEffectsStyles.current[id].mustaches.threeDim
+        ? `/3DAssets/mustaches/${currentEffectsStyles.current[id].mustaches.style}.png`
         : null,
-    [currentEffectsStyles.current.faceMask.style]:
-      effects.faceMask && currentEffectsStyles.current.faceMask.threeDim
-        ? `/3DAssets/faceMasks/${currentEffectsStyles.current.faceMask.style}.png`
+    [currentEffectsStyles.current[id].faceMasks.style]:
+      effects.faceMasks && currentEffectsStyles.current[id].faceMasks.threeDim
+        ? `/3DAssets/faceMasks/${currentEffectsStyles.current[id].faceMasks.style}.png`
         : null,
   };
 
@@ -122,7 +127,7 @@ const handleEffectWebGL = async (
   await baseShader.createAtlasTexture("twoDim", filteredTwoDimUrls);
   await baseShader.createAtlasTexture("threeDim", filteredThreeDimUrls);
 
-  updateDeadbandingMaps(effects, currentEffectsStyles);
+  updateDeadbandingMaps(id, effects, currentEffectsStyles);
 
   let faceMeshResults: Results[] = [];
   const faceMesh = new FaceMesh({
@@ -158,6 +163,7 @@ const handleEffectWebGL = async (
   }
   video.addEventListener("play", () => {
     render(
+      id,
       gl,
       baseShader,
       faceLandmarks,

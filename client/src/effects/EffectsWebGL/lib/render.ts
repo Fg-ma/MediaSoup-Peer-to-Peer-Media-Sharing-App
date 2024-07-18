@@ -5,6 +5,7 @@ import BaseShader from "./BaseShader";
 import FaceLandmarks from "./FaceLandmarks";
 
 const render = async (
+  id: string,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseShader: BaseShader,
   faceLandmarks: FaceLandmarks,
@@ -31,7 +32,7 @@ const render = async (
     effects.glasses ||
     effects.beards ||
     effects.mustaches ||
-    effects.faceMask
+    effects.faceMasks
   ) {
     await faceMesh.send({ image: video });
     if (faceMeshResults.length === 0) {
@@ -64,12 +65,12 @@ const render = async (
       landmarks,
     } of faceLandmarks.getFaceIdLandmarksPairs()) {
       if (effects.ears) {
-        if (!currentEffectsStyles.current.ears.threeDim) {
+        if (!currentEffectsStyles.current[id].ears.threeDim) {
           const twoDimEarsOffset =
             calculatedLandmarks.twoDimEarsOffsets[faceId];
 
           baseShader.drawEffect(
-            `${currentEffectsStyles.current.ears.style}Right`,
+            `${currentEffectsStyles.current[id].ears.style}Right`,
             {
               x: 2 * landmarks[faceLandmarks.RIGHT_EAR_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.RIGHT_EAR_INDEX].y + 1,
@@ -85,7 +86,7 @@ const render = async (
           );
 
           baseShader.drawEffect(
-            `${currentEffectsStyles.current.ears.style}Left`,
+            `${currentEffectsStyles.current[id].ears.style}Left`,
             {
               x: 2 * landmarks[faceLandmarks.LEFT_EAR_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.LEFT_EAR_INDEX].y + 1,
@@ -104,7 +105,7 @@ const render = async (
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
           await baseShader.drawMesh(
-            currentEffectsStyles.current.mustaches.style,
+            currentEffectsStyles.current[id].mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
@@ -121,12 +122,12 @@ const render = async (
         }
       }
       if (effects.glasses) {
-        if (!currentEffectsStyles.current.glasses.threeDim) {
+        if (!currentEffectsStyles.current[id].glasses.threeDim) {
           const eyesCenterPosition =
             calculatedLandmarks.eyesCenterPositions[faceId];
 
           baseShader.drawEffect(
-            currentEffectsStyles.current.glasses.style,
+            currentEffectsStyles.current[id].glasses.style,
             {
               x: 2 * eyesCenterPosition[0] - 1,
               y: -2 * eyesCenterPosition[1] + 1,
@@ -145,7 +146,7 @@ const render = async (
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
           await baseShader.drawMesh(
-            currentEffectsStyles.current.mustaches.style,
+            currentEffectsStyles.current[id].mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
@@ -162,12 +163,12 @@ const render = async (
         }
       }
       if (effects.beards) {
-        if (!currentEffectsStyles.current.beards.threeDim) {
+        if (!currentEffectsStyles.current[id].beards.threeDim) {
           const twoDimBeardOffset =
             calculatedLandmarks.twoDimBeardOffsets[faceId];
 
           baseShader.drawEffect(
-            currentEffectsStyles.current.beards.style,
+            currentEffectsStyles.current[id].beards.style,
             {
               x: 2 * landmarks[faceLandmarks.JAW_MID_POINT_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.JAW_MID_POINT_INDEX].y + 1,
@@ -186,7 +187,7 @@ const render = async (
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
           await baseShader.drawMesh(
-            currentEffectsStyles.current.mustaches.style,
+            currentEffectsStyles.current[id].mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
@@ -203,12 +204,12 @@ const render = async (
         }
       }
       if (effects.mustaches) {
-        if (!currentEffectsStyles.current.mustaches.threeDim) {
+        if (!currentEffectsStyles.current[id].mustaches.threeDim) {
           const twoDimMustacheOffset =
             calculatedLandmarks.twoDimMustacheOffsets[faceId];
 
           baseShader.drawEffect(
-            currentEffectsStyles.current.mustaches.style,
+            currentEffectsStyles.current[id].mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
@@ -227,7 +228,7 @@ const render = async (
             calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
           await baseShader.drawMesh(
-            currentEffectsStyles.current.mustaches.style,
+            currentEffectsStyles.current[id].mustaches.style,
             {
               x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
               y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
@@ -243,7 +244,7 @@ const render = async (
           );
         }
       }
-      if (effects.faceMask) {
+      if (effects.faceMasks) {
         await baseShader.drawFaceMesh("faceMask1", landmarks.slice(0, -10));
       }
     }
@@ -251,6 +252,7 @@ const render = async (
 
   animationFrameId[0] = requestAnimationFrame(() =>
     render(
+      id,
       gl,
       baseShader,
       faceLandmarks,

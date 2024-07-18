@@ -110,10 +110,11 @@ export default function GlassesEffectSectionButton({
           const effectType = target.dataset.value as GlassesEffectTypes;
           if (
             effectType in glassesEffects &&
-            (currentEffectsStyles.current.glasses.style !== effectType ||
+            (currentEffectsStyles.current[videoId].glasses.style !==
+              effectType ||
               !userStreamEffects.current.glasses[type]?.[videoId])
           ) {
-            currentEffectsStyles.current.glasses.style = effectType;
+            currentEffectsStyles.current[videoId].glasses.style = effectType;
             handleEffectChange(
               "glasses",
               userStreamEffects.current.glasses[type]?.[videoId] ? true : false
@@ -123,8 +124,8 @@ export default function GlassesEffectSectionButton({
       }}
       contentFunction={() => {
         const iconSrc =
-          glassesEffects[currentEffectsStyles.current.glasses.style][
-            currentEffectsStyles.current.glasses.threeDim
+          glassesEffects[currentEffectsStyles.current[videoId].glasses.style][
+            currentEffectsStyles.current[videoId].glasses.threeDim
               ? userStreamEffects.current.glasses[type]?.[videoId]
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
@@ -138,13 +139,13 @@ export default function GlassesEffectSectionButton({
             src={iconSrc}
             alt='icon'
             style={{ width: "90%", height: "90%" }}
-            data-value={currentEffectsStyles.current.glasses.style}
+            data-value={currentEffectsStyles.current[videoId].glasses.style}
           />
         );
       }}
       doubleClickFunction={() => {
-        currentEffectsStyles.current.glasses.threeDim =
-          !currentEffectsStyles.current.glasses.threeDim;
+        currentEffectsStyles.current[videoId].glasses.threeDim =
+          !currentEffectsStyles.current[videoId].glasses.threeDim;
         handleEffectChange(
           "glasses",
           userStreamEffects.current.glasses[type]?.[videoId]
@@ -173,7 +174,7 @@ export default function GlassesEffectSectionButton({
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}
-      defaultDataValue={currentEffectsStyles.current.glasses.style}
+      defaultDataValue={currentEffectsStyles.current[videoId].glasses.style}
     />
   );
 }

@@ -7,6 +7,7 @@ import GlassesEffectSectionButton from "./GlassesEffectSectionButton";
 import EarsEffectSectionButton from "./EarsEffectSectionButton";
 import BeardsEffectSectionButton from "./BeardsEffectSectionButton";
 import MustachesEffectSectionButton from "./MustachesEffectSectionButton";
+import FaceMasksEffectSectionButton from "./FaceMasksEffectSectionButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -248,11 +249,11 @@ export default function EffectSection({
         videoId={videoId}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <button onClick={() => handleEffectChange("faceMask")}>
-        {userStreamEffects.current.faceMask[type]?.[videoId]
-          ? "remove mask"
-          : "add mask"}
-      </button>
+      <FaceMasksEffectSectionButton
+        handleEffectChange={handleEffectChange}
+        type={type}
+        videoId={videoId}
+      />
     </motion.div>
   );
 }

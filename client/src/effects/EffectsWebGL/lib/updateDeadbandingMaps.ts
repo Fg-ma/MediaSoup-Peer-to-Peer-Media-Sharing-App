@@ -121,6 +121,7 @@ export const oneDimensionalDeadbandingMap: {
 };
 
 const updateDeadbandingMaps = (
+  id: string,
   effects: {
     [effectType in EffectTypes]?: boolean | undefined;
   },
@@ -128,12 +129,12 @@ const updateDeadbandingMaps = (
 ) => {
   if (effects.ears) {
     for (const deadbanding in earsDeadbandingMap[
-      currentEffectsStyles.current.ears.style
+      currentEffectsStyles.current[id].ears.style
     ]) {
       const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
 
       const earsDeadbandingValue =
-        earsDeadbandingMap[currentEffectsStyles.current.ears.style][
+        earsDeadbandingMap[currentEffectsStyles.current[id].ears.style][
           deadbandingType
         ];
 
@@ -153,12 +154,12 @@ const updateDeadbandingMaps = (
   }
   if (effects.glasses) {
     for (const deadbanding in glassesDeadbandingMap[
-      currentEffectsStyles.current.glasses.style
+      currentEffectsStyles.current[id].glasses.style
     ]) {
       const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
 
       const glassesDeadbandingValue =
-        glassesDeadbandingMap[currentEffectsStyles.current.glasses.style][
+        glassesDeadbandingMap[currentEffectsStyles.current[id].glasses.style][
           deadbandingType
         ];
 
@@ -178,12 +179,12 @@ const updateDeadbandingMaps = (
   }
   if (effects.beards) {
     for (const deadbanding in beardsDeadbandingMap[
-      currentEffectsStyles.current.beards.style
+      currentEffectsStyles.current[id].beards.style
     ]) {
       const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
 
       const beardsDeadbandingValue =
-        beardsDeadbandingMap[currentEffectsStyles.current.beards.style][
+        beardsDeadbandingMap[currentEffectsStyles.current[id].beards.style][
           deadbandingType
         ];
 
@@ -203,14 +204,14 @@ const updateDeadbandingMaps = (
   }
   if (effects.mustaches) {
     for (const deadbanding in mustachesDeadbandingMap[
-      currentEffectsStyles.current.mustaches.style
+      currentEffectsStyles.current[id].mustaches.style
     ]) {
       const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
 
       const mustachesDeadbandingValue =
-        mustachesDeadbandingMap[currentEffectsStyles.current.mustaches.style][
-          deadbandingType
-        ];
+        mustachesDeadbandingMap[
+          currentEffectsStyles.current[id].mustaches.style
+        ][deadbandingType];
 
       if (mustachesDeadbandingValue) {
         const oneDimensionalDeadbandingValue =

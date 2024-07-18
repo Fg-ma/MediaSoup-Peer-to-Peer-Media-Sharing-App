@@ -44,6 +44,8 @@ interface CalculatedLandmarkInterface {
 }
 
 class FaceLandmarks {
+  private id: string;
+
   private faceIdLandmarksPairs: {
     faceId: string;
     landmarks: NormalizedLandmarkList;
@@ -106,7 +108,11 @@ class FaceLandmarks {
   } = {};
   private maxFaceTrackerAge = 5;
 
-  constructor(currentEffectsStyles: React.MutableRefObject<EffectStylesType>) {
+  constructor(
+    id: string,
+    currentEffectsStyles: React.MutableRefObject<EffectStylesType>
+  ) {
+    this.id = id;
     this.currentEffectsStyles = currentEffectsStyles;
   }
 
@@ -380,13 +386,13 @@ class FaceLandmarks {
         "leftEarWidths",
         faceId,
         this.calculatedLandmarks.interocularDistances[faceId] *
-          this.currentEffectsStyles.current.ears.leftEarWidthFactor
+          this.currentEffectsStyles.current[this.id].ears.leftEarWidthFactor
       );
       this.updateOneDimensionalSmoothVariables(
         "rightEarWidths",
         faceId,
         this.calculatedLandmarks.interocularDistances[faceId] *
-          this.currentEffectsStyles.current.ears.rightEarWidthFactor
+          this.currentEffectsStyles.current[this.id].ears.rightEarWidthFactor
       );
 
       // Set eye widths
@@ -425,7 +431,7 @@ class FaceLandmarks {
       // headAngle for direction of shift
       const { shiftX: beardShiftX, shiftY: beardShiftY } =
         this.directionalShift(
-          this.currentEffectsStyles.current.beards.chinOffset,
+          this.currentEffectsStyles.current[this.id].beards.chinOffset,
           this.calculatedLandmarks.headRotationAngles[faceId]
         );
       this.calculatedLandmarks.twoDimBeardOffsets[faceId] = [
@@ -437,7 +443,8 @@ class FaceLandmarks {
       // headAngle for direction of shift
       const { shiftX: twoDimNoseShiftX, shiftY: twoDimNoseShiftY } =
         this.directionalShift(
-          this.currentEffectsStyles.current.mustaches.noseOffset.twoDim,
+          this.currentEffectsStyles.current[this.id].mustaches.noseOffset
+            .twoDim,
           this.calculatedLandmarks.headRotationAngles[faceId]
         );
       this.calculatedLandmarks.twoDimMustacheOffsets[faceId] = [
@@ -447,7 +454,8 @@ class FaceLandmarks {
 
       const { shiftX: threeDimNoseShiftX, shiftY: threeDimNoseShiftY } =
         this.directionalShift(
-          this.currentEffectsStyles.current.mustaches.noseOffset.threeDim,
+          this.currentEffectsStyles.current[this.id].mustaches.noseOffset
+            .threeDim,
           this.calculatedLandmarks.headRotationAngles[faceId]
         );
       this.calculatedLandmarks.threeDimMustacheOffsets[faceId] = [
