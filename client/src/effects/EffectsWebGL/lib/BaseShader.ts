@@ -489,7 +489,7 @@ class BaseShader {
 
     if (type === "twoDim") {
       this.twoDimAltasTexMap = atlasImages;
-      this.twoDimAtlas = new Atlas(this.gl, 0.98);
+      this.twoDimAtlas = new Atlas(this.gl, -0.1);
       await this.twoDimAtlas.createAtlas(
         atlasImages,
         this.uTwoDimEffectAtlasTextureLocation
@@ -509,7 +509,9 @@ class BaseShader {
     position: { x: number; y: number },
     offset: { x: number; y: number },
     scale: number,
-    headRotationAngle: number
+    headRotationAngle: number,
+    headYawAngle: number,
+    headPitchAngle: number
   ) {
     if (
       this.aPositionLocation === null ||
@@ -576,47 +578,37 @@ class BaseShader {
       0
     );
 
-    // Define indices for the square (two triangles)
-    const indices = new Uint16Array([0, 1, 2, 2, 1, 3]);
-
-    // Bind the index buffer
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    this.gl.bufferData(
-      this.gl.ELEMENT_ARRAY_BUFFER,
-      indices,
-      this.gl.DYNAMIC_DRAW
-    );
-
-    // Define vertices for a square plane before applying rotation
+    // Define vertices for a square plane
     const baseVertices = new Float32Array([
-      -scale * 2,
-      scale * 3,
-      atlasTextureZPosition, // Vertex 1
-      -scale * 2,
-      -scale * 3,
-      atlasTextureZPosition, // Vertex 2
-      scale * 2,
-      scale * 3,
-      atlasTextureZPosition, // Vertex 3
-      scale * 2,
-      -scale * 3,
-      atlasTextureZPosition, // Vertex 4
+      -1, 1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0,
     ]);
 
-    // Calculate the rotation matrix
-    const cosAngle = Math.cos(headRotationAngle);
-    const sinAngle = Math.sin(headRotationAngle);
+    // Create 3D transformation matrix
+    const transformMatrix = mat4.create();
+    mat4.translate(transformMatrix, transformMatrix, [
+      position.x + offset.x,
+      position.y + offset.y,
+      atlasTextureZPosition,
+    ]); // Translate to position
+    mat4.scale(transformMatrix, transformMatrix, [scale * 2, scale * 3, 1]); // Scale
+    mat4.rotateX(transformMatrix, transformMatrix, headPitchAngle); // Rotation about the x-axis (pitch)
+    mat4.rotateY(transformMatrix, transformMatrix, headYawAngle); // Rotation about the y-axis (yaw)
+    mat4.rotateZ(transformMatrix, transformMatrix, headRotationAngle); // Rotation about the z-axis
 
-    // Apply the rotation matrix to the vertices
+    // Apply the transformation matrix to the vertices
     const vertices = new Float32Array(12); // 4 vertices * 3 components (x, y, z)
     for (let i = 0; i < 4; i++) {
       const x = baseVertices[i * 3];
       const y = baseVertices[i * 3 + 1];
-      vertices[i * 3] = cosAngle * x - sinAngle * y + position.x + offset.x;
-      vertices[i * 3 + 1] = sinAngle * x + cosAngle * y + position.y + offset.y;
-      vertices[i * 3 + 2] = baseVertices[i * 3 + 2]; // z remains unchanged
-    }
+      const z = baseVertices[i * 3 + 2];
 
+      const transformedVertex = vec3.create();
+      vec3.transformMat4(transformedVertex, [x, y, z], transformMatrix);
+
+      vertices[i * 3] = transformedVertex[0];
+      vertices[i * 3 + 1] = transformedVertex[1];
+      vertices[i * 3 + 2] = transformedVertex[2];
+    }
     // Bind the position buffer
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.DYNAMIC_DRAW);
@@ -627,6 +619,17 @@ class BaseShader {
       false,
       0,
       0
+    );
+
+    // Define indices for the square (two triangles)
+    const indices = new Uint16Array([0, 1, 2, 2, 1, 3]);
+
+    // Bind the index buffer
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.gl.bufferData(
+      this.gl.ELEMENT_ARRAY_BUFFER,
+      indices,
+      this.gl.DYNAMIC_DRAW
     );
 
     // Draw the square using the element array buffer

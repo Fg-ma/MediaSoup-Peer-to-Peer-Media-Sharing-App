@@ -104,12 +104,14 @@ const handleEffectWebGL = async (
     // [currentEffectsStyles.current.beards.style]: effects.beards
     //   ? `/3DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
     //   : null,
-    [currentEffectsStyles.current.mustaches.style]: effects.mustaches
-      ? `/3DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
-      : null,
-    [currentEffectsStyles.current.faceMask.style]: effects.faceMask
-      ? `/3DAssets/faceMasks/${currentEffectsStyles.current.faceMask.style}.png`
-      : null,
+    [currentEffectsStyles.current.mustaches.style]:
+      effects.mustaches && currentEffectsStyles.current.mustaches.threeDim
+        ? `/3DAssets/mustaches/${currentEffectsStyles.current.mustaches.style}.png`
+        : null,
+    [currentEffectsStyles.current.faceMask.style]:
+      effects.faceMask && currentEffectsStyles.current.faceMask.threeDim
+        ? `/3DAssets/faceMasks/${currentEffectsStyles.current.faceMask.style}.png`
+        : null,
   };
 
   const filteredThreeDimUrls: { [URLType in URLsTypes]?: string } =

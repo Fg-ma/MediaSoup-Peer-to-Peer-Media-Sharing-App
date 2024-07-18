@@ -79,7 +79,9 @@ const render = async (
               y: twoDimEarsOffset[1],
             },
             calculatedLandmarks.rightEarWidths[faceId],
-            calculatedLandmarks.headRotationAngles[faceId]
+            calculatedLandmarks.headRotationAngles[faceId],
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
 
           baseShader.drawEffect(
@@ -93,7 +95,9 @@ const render = async (
               y: twoDimEarsOffset[1],
             },
             calculatedLandmarks.leftEarWidths[faceId],
-            calculatedLandmarks.headRotationAngles[faceId]
+            calculatedLandmarks.headRotationAngles[faceId],
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
         } else {
           const threeDimMustacheOffset =
@@ -132,7 +136,9 @@ const render = async (
               y: 0,
             },
             calculatedLandmarks.eyesWidths[faceId],
-            calculatedLandmarks.headRotationAngles[faceId]
+            calculatedLandmarks.headRotationAngles[faceId],
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
         } else {
           const threeDimMustacheOffset =
@@ -171,7 +177,9 @@ const render = async (
               y: twoDimBeardOffset[1],
             },
             calculatedLandmarks.chinWidths[faceId],
-            calculatedLandmarks.headRotationAngles[faceId]
+            calculatedLandmarks.headRotationAngles[faceId],
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
         } else {
           const threeDimMustacheOffset =
@@ -210,7 +218,9 @@ const render = async (
               y: twoDimMustacheOffset[1],
             },
             calculatedLandmarks.eyesWidths[faceId],
-            calculatedLandmarks.headRotationAngles[faceId]
+            calculatedLandmarks.headRotationAngles[faceId],
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
         } else {
           const threeDimMustacheOffset =

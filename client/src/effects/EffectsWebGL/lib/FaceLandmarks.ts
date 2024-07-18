@@ -25,108 +25,6 @@ interface TwoDimensionalLandmarks {
   [id: string]: [number, number];
 }
 
-async function estimateHeadPose(
-  landmarks: NormalizedLandmarkList,
-  canvas: HTMLCanvasElement
-) {
-  // Define the 3D model points of the facial landmarks
-  const modelPoints = cv.matFromArray(6, 3, cv.CV_64FC1, [
-    0.0,
-    0.0,
-    0.0, // Nose tip
-    0.0,
-    -330.0,
-    -65.0, // Chin
-    -225.0,
-    170.0,
-    -135.0, // Left eye left corner
-    225.0,
-    170.0,
-    -135.0, // Right eye right corner
-    -150.0,
-    -150.0,
-    -125.0, // Left Mouth corner
-    150.0,
-    -150.0,
-    -125.0, // Right Mouth corner
-  ]);
-
-  // Define the 2D image points of the facial landmarks
-  const imagePoints = cv.matFromArray(6, 2, cv.CV_64FC1, [
-    landmarks[1].x,
-    landmarks[1].y, // Nose tip
-    landmarks[152].x,
-    landmarks[152].y, // Chin
-    landmarks[263].x,
-    landmarks[263].y, // Right eye right corner
-    landmarks[33].x,
-    landmarks[33].y, // Left eye left corner
-    landmarks[291].x,
-    landmarks[291].y, // Right Mouth corner
-    landmarks[61].x,
-    landmarks[61].y, // Left Mouth corner
-  ]);
-
-  // Define the camera matrix
-  const size = { width: canvas.width, height: canvas.height };
-  const focalLength = size.width;
-  const center = [size.width / 2, size.height / 2];
-  const cameraMatrix = cv.matFromArray(3, 3, cv.CV_64FC1, [
-    focalLength,
-    0,
-    center[0],
-    0,
-    focalLength,
-    center[1],
-    0,
-    0,
-    1,
-  ]);
-
-  // Define the distortion coefficients
-  const distCoeffs = cv.Mat.zeros(4, 1, cv.CV_64FC1);
-
-  // Create matrices to hold the rotation and translation vectors
-  const rotationVector = new cv.Mat();
-  const translationVector = new cv.Mat();
-
-  // Use solvePnP to find the rotation and translation vectors
-  cv.solvePnP(
-    modelPoints,
-    imagePoints,
-    cameraMatrix,
-    distCoeffs,
-    rotationVector,
-    translationVector
-  );
-
-  // Convert the rotation vector to a rotation matrix
-  const rotationMatrix = new cv.Mat();
-  cv.Rodrigues(rotationVector, rotationMatrix);
-
-  // Extract the head pose angles (yaw, pitch, roll) from the rotation matrix
-  const rmat = rotationMatrix.data64F;
-  const sy = Math.sqrt(rmat[0] * rmat[0] + rmat[3] * rmat[3]);
-  const singular = sy < 1e-6;
-
-  const pitch = singular
-    ? Math.atan2(-rmat[7], rmat[4])
-    : Math.atan2(rmat[6], rmat[8]);
-  const yaw = Math.atan2(-rmat[6], sy);
-  const roll = Math.atan2(-rmat[3], rmat[0]);
-
-  // Clean up
-  modelPoints.delete();
-  imagePoints.delete();
-  cameraMatrix.delete();
-  distCoeffs.delete();
-  rotationVector.delete();
-  translationVector.delete();
-  rotationMatrix.delete();
-
-  return { yaw, pitch, roll };
-}
-
 interface CalculatedLandmarkInterface {
   headRotationAngles: OneDimensionalLandmarks;
   headYawAngles: OneDimensionalLandmarks;
@@ -187,6 +85,9 @@ class FaceLandmarks {
   RIGHT_JAW_POINT = 397;
   RIGHT_EAR_INDEX = 332;
   LEFT_EAR_INDEX = 103;
+  NOSE_BRIDGE = 6;
+  LEFT_NOSE_BASE = 219;
+  RIGHT_NOSE_BASE = 439;
 
   private currentEffectsStyles;
 
@@ -414,10 +315,11 @@ class FaceLandmarks {
 
       const leftEye = landmarks[this.LEFT_EYE_INDEX];
       const rightEye = landmarks[this.RIGHT_EYE_INDEX];
-      const nose = landmarks[this.NOSE_INDEX];
-      const jawMidPoint = landmarks[this.JAW_MID_POINT_INDEX];
       const leftJawPoint = landmarks[this.LEFT_JAW_POINT];
       const rightJawPoint = landmarks[this.RIGHT_JAW_POINT];
+      const noseBridge = landmarks[this.NOSE_BRIDGE];
+      const leftNoseBase = landmarks[this.LEFT_NOSE_BASE];
+      const rightNoseBase = landmarks[this.RIGHT_NOSE_BASE];
 
       // Set eye center positions
       const eyesCenterPosition: [number, number] = [
@@ -431,7 +333,6 @@ class FaceLandmarks {
       const dy = rightEye.y - leftEye.y;
       const dz = rightEye.z - leftEye.z;
 
-      const headPose = await estimateHeadPose(landmarks, canvas);
       // Calculate head angle in plane
       this.updateOneDimensionalSmoothVariables(
         "headRotationAngles",
@@ -446,15 +347,27 @@ class FaceLandmarks {
         Math.atan2(dz, dx)
       );
 
-      console.log(headPose.yaw, Math.atan2(dz, dx), headPose.pitch);
-      // Calculate head angle up and down
-      // this.updateOneDimensionalSmoothVariables(
-      //   "headPitchAngles",
-      //   faceId,
-      //   pitch
-      // );
+      // Calculate the pitch using the distances between points
+      const depthDistance =
+        noseBridge.z - (leftNoseBase.z + rightNoseBase.z) / 2;
+      const verticalDistance = Math.abs(
+        noseBridge.y - (leftNoseBase.y + rightNoseBase.y) / 2
+      );
 
-      // Set left and right ear widths
+      let pitchAngle;
+      if (depthDistance < 0) {
+        pitchAngle = Math.atan2(-depthDistance, verticalDistance);
+      } else {
+        pitchAngle = -Math.atan2(depthDistance, verticalDistance);
+      }
+
+      // Calculate head angle up and down
+      this.updateOneDimensionalSmoothVariables(
+        "headPitchAngles",
+        faceId,
+        pitchAngle
+      );
+
       // Update InterocularDistance
       this.updateOneDimensionalSmoothVariables(
         "interocularDistances",

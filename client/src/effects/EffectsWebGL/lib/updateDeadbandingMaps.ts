@@ -19,18 +19,26 @@ const glassesDeadbandingMap: {
   },
   memeGlasses: {
     headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
     eyesWidths: 0.025,
   },
   americaGlasses: {
     headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
     eyesWidths: 0.05,
   },
   threeDGlasses: {
     headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
     eyesWidths: 0.025,
   },
   shades: {
     headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
     eyesWidths: 0.05,
   },
 };
@@ -42,6 +50,8 @@ const earsDeadbandingMap: {
 } = {
   dogEars: {
     headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
     leftEarWidths: 0.02,
     rightEarWidths: 0.02,
   },
@@ -54,6 +64,8 @@ const beardsDeadbandingMap: {
 } = {
   classicalCurlyBeard: {
     headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
     chinWidths: 1.0,
   },
 };
@@ -63,11 +75,36 @@ const mustachesDeadbandingMap: {
     [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
   };
 } = {
-  mustache1: { headRotationAngles: 0.05, eyesWidths: 0.4 },
-  mustache2: { headRotationAngles: 0.05, eyesWidths: 0.4 },
-  mustache3: { headRotationAngles: 0.05, eyesWidths: 0.4 },
-  mustache4: { headRotationAngles: 0.05, eyesWidths: 0.4 },
-  disguiseMustache: { headRotationAngles: 0.05, eyesWidths: 0.4 },
+  mustache1: {
+    headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
+    eyesWidths: 0.01,
+  },
+  mustache2: {
+    headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
+    eyesWidths: 0.01,
+  },
+  mustache3: {
+    headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
+    eyesWidths: 0.01,
+  },
+  mustache4: {
+    headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
+    eyesWidths: 0.01,
+  },
+  disguiseMustache: {
+    headRotationAngles: 0.05,
+    headYawAngles: 0.05,
+    headPitchAngles: 0.05,
+    eyesWidths: 0.01,
+  },
 };
 
 export const oneDimensionalDeadbandingMap: {
@@ -79,6 +116,7 @@ export const oneDimensionalDeadbandingMap: {
   chinWidths: 0.0,
   headRotationAngles: 0.0,
   headYawAngles: 0.0,
+  headPitchAngles: 0.0,
   interocularDistances: 0.0,
 };
 
