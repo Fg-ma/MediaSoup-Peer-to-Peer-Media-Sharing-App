@@ -40,7 +40,7 @@ export const mustacheNoseOffsetsMap: {
   };
 } = {
   mustache1: { twoDim: -0.09, threeDim: -0.08 },
-  mustache2: { twoDim: -0.07, threeDim: -0.11 },
+  mustache2: { twoDim: -0.07, threeDim: -0.09 },
   mustache3: { twoDim: -0.09, threeDim: -0.11 },
   mustache4: { twoDim: -0.07, threeDim: -0.05 },
   disguiseMustache: { twoDim: 0.075, threeDim: 0.0 },

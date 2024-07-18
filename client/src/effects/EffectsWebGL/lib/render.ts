@@ -46,14 +46,14 @@ const render = async (
       if (detectionTimedOut) {
         faceLandmarks.setTimedOut(false);
       }
-      faceLandmarks.update(multiFaceLandmarks);
+      await faceLandmarks.update(multiFaceLandmarks, canvas);
     } else {
       if (!detectionTimedOut) {
         if (faceLandmarks.getTimeoutTimer() === undefined) {
           faceLandmarks.startTimeout();
         }
       } else {
-        faceLandmarks.update(multiFaceLandmarks);
+        await faceLandmarks.update(multiFaceLandmarks, canvas);
       }
     }
 
@@ -111,7 +111,8 @@ const render = async (
             },
             0.4,
             calculatedLandmarks.headRotationAngles[faceId],
-            calculatedLandmarks.headYawAngles[faceId]
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
         }
       }
@@ -149,7 +150,8 @@ const render = async (
             },
             0.4,
             calculatedLandmarks.headRotationAngles[faceId],
-            calculatedLandmarks.headYawAngles[faceId]
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
         }
       }
@@ -187,7 +189,8 @@ const render = async (
             },
             0.4,
             calculatedLandmarks.headRotationAngles[faceId],
-            calculatedLandmarks.headYawAngles[faceId]
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
         }
       }
@@ -225,7 +228,8 @@ const render = async (
             },
             0.4,
             calculatedLandmarks.headRotationAngles[faceId],
-            calculatedLandmarks.headYawAngles[faceId]
+            calculatedLandmarks.headYawAngles[faceId],
+            calculatedLandmarks.headPitchAngles[faceId]
           );
         }
       }

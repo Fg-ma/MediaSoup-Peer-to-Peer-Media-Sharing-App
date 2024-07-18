@@ -31,6 +31,7 @@ class BaseShader {
   private FRAGMENT_SHADER = baseFragmentShaderSource;
 
   private positionBuffer: WebGLBuffer | null = null;
+  private normalBuffer: WebGLBuffer | null = null;
   private texCoordBuffer: WebGLBuffer | null = null;
   private indexBuffer: WebGLBuffer | null = null;
 
@@ -62,6 +63,7 @@ class BaseShader {
     null;
   private uEffectFlagsLocation: WebGLUniformLocation | null = null;
   private uTintColorLocation: WebGLUniformLocation | null = null;
+  private uLightDirectionLocation: WebGLUniformLocation | null = null;
 
   // Attribute locations
   private aPositionLocation: number | null = null;
@@ -192,6 +194,16 @@ class BaseShader {
       this.program,
       "u_tintColor"
     );
+    this.uLightDirectionLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_lightDirection"
+    );
+    const lightDirection = [-1, -1, -1];
+    const length = Math.sqrt(
+      lightDirection[0] ** 2 + lightDirection[1] ** 2 + lightDirection[2] ** 2
+    );
+    const normalizedLightDirection = lightDirection.map((x) => x / length);
+    this.gl.uniform3fv(this.uLightDirectionLocation, normalizedLightDirection);
   }
 
   private initAttributeLocations() {
@@ -211,7 +223,11 @@ class BaseShader {
   }
 
   private initBuffers() {
-    if (this.aPositionLocation === null || this.aTexCoordLocation === null) {
+    if (
+      this.aPositionLocation === null ||
+      this.aNormalLocation === null ||
+      this.aTexCoordLocation === null
+    ) {
       return;
     }
 
@@ -227,6 +243,18 @@ class BaseShader {
       0
     );
     this.gl.enableVertexAttribArray(this.aPositionLocation);
+
+    this.normalBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+    this.gl.vertexAttribPointer(
+      this.aNormalLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+    this.gl.enableVertexAttribArray(this.aNormalLocation);
 
     this.texCoordBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
@@ -326,46 +354,114 @@ class BaseShader {
     );
     const geometryTrianglesIndices = geometryDelaunay.triangles;
 
-    const uvTriangles: number[] = [];
     const geometryTriangles: number[] = [];
+    const uvTriangles: number[] = [];
+    const normals: number[] = [];
+    const faceNormals: Point3D[] = [];
+    const vertexNormals: Point3D[] = Array(
+      geometryTrianglesIndices.length
+    ).fill({
+      x: 0,
+      y: 0,
+      z: 0,
+    });
 
     for (let i = 0; i < geometryTrianglesIndices.length; i += 3) {
-      if (
-        uvPoints[geometryTrianglesIndices[i]] &&
-        uvPoints[geometryTrianglesIndices[i + 1]] &&
-        uvPoints[geometryTrianglesIndices[i + 2]]
-      ) {
-        uvTriangles.push(
-          uvPoints[geometryTrianglesIndices[i] * 2],
-          uvPoints[geometryTrianglesIndices[i] * 2 + 1],
+      const index0 = geometryTrianglesIndices[i];
+      const index1 = geometryTrianglesIndices[i + 1];
+      const index2 = geometryTrianglesIndices[i + 2];
 
-          uvPoints[geometryTrianglesIndices[i + 1] * 2],
-          uvPoints[geometryTrianglesIndices[i + 1] * 2 + 1],
+      const v0 = geometryPoints[index0];
+      const v1 = geometryPoints[index1];
+      const v2 = geometryPoints[index2];
 
-          uvPoints[geometryTrianglesIndices[i + 2] * 2],
-          uvPoints[geometryTrianglesIndices[i + 2] * 2 + 1]
+      const edge1 = {
+        x: v1.x - v0.x,
+        y: v1.y - v0.y,
+        z: v1.z - v0.z,
+      };
+      const edge2 = {
+        x: v2.x - v0.x,
+        y: v2.y - v0.y,
+        z: v2.z - v0.z,
+      };
+
+      const normal = {
+        x: edge1.y * edge2.z - edge1.z * edge2.y,
+        y: edge1.z * edge2.x - edge1.x * edge2.z,
+        z: edge1.x * edge2.y - edge1.y * edge2.x,
+      };
+
+      const length = Math.sqrt(normal.x ** 2 + normal.y ** 2 + normal.z ** 2);
+      const normalizedNormal = {
+        x: normal.x / length,
+        y: normal.y / length,
+        z: normal.z / length,
+      };
+      faceNormals.push(normalizedNormal);
+
+      // Accumulate the face normals for each vertex
+      vertexNormals[index0].x += normalizedNormal.x;
+      vertexNormals[index0].y += normalizedNormal.y;
+      vertexNormals[index0].z += normalizedNormal.z;
+      vertexNormals[index1].x += normalizedNormal.x;
+      vertexNormals[index1].y += normalizedNormal.y;
+      vertexNormals[index1].z += normalizedNormal.z;
+      vertexNormals[index2].x += normalizedNormal.x;
+      vertexNormals[index2].y += normalizedNormal.y;
+      vertexNormals[index2].z += normalizedNormal.z;
+
+      if (v0 && v1 && v2) {
+        geometryTriangles.push(
+          v0.x,
+          v0.y,
+          v0.z,
+
+          v1.x,
+          v1.y,
+          v1.z,
+
+          v2.x,
+          v2.y,
+          v2.z
         );
       }
       if (
-        geometryPoints[geometryTrianglesIndices[i]] &&
-        geometryPoints[geometryTrianglesIndices[i + 1]] &&
-        geometryPoints[geometryTrianglesIndices[i + 2]]
+        uvPoints[index0] !== undefined &&
+        uvPoints[index1] !== undefined &&
+        uvPoints[index2] !== undefined
       ) {
-        geometryTriangles.push(
-          geometryPoints[geometryTrianglesIndices[i]].x,
-          geometryPoints[geometryTrianglesIndices[i]].y,
-          geometryPoints[geometryTrianglesIndices[i]].z,
-          geometryPoints[geometryTrianglesIndices[i + 1]].x,
-          geometryPoints[geometryTrianglesIndices[i + 1]].y,
-          geometryPoints[geometryTrianglesIndices[i + 1]].z,
-          geometryPoints[geometryTrianglesIndices[i + 2]].x,
-          geometryPoints[geometryTrianglesIndices[i + 2]].y,
-          geometryPoints[geometryTrianglesIndices[i + 2]].z
+        uvTriangles.push(
+          uvPoints[index0 * 2],
+          uvPoints[index0 * 2 + 1],
+
+          uvPoints[index1 * 2],
+          uvPoints[index1 * 2 + 1],
+
+          uvPoints[index2 * 2],
+          uvPoints[index2 * 2 + 1]
         );
       }
     }
 
-    return { uvTriangles, geometryTriangles };
+    // Normalize the accumulated normals for each vertex
+    for (let i = 0; i < geometryPoints.length; i++) {
+      const length = Math.sqrt(
+        vertexNormals[i].x ** 2 +
+          vertexNormals[i].y ** 2 +
+          vertexNormals[i].z ** 2
+      );
+      vertexNormals[i].x /= length;
+      vertexNormals[i].y /= length;
+      vertexNormals[i].z /= length;
+    }
+
+    // Convert vertex normals to normals array
+    for (const normal of vertexNormals) {
+      normals.push(normal.x, normal.y, normal.z);
+    }
+
+    return { geometryTriangles, uvTriangles, normals };
   }
 
   private hexToRgb(hex: string) {
@@ -616,7 +712,8 @@ class BaseShader {
     offset: { x: number; y: number },
     scale: number,
     headRotationAngle: number,
-    headYawAngle: number
+    headYawAngle: number,
+    headPitchAngle: number
   ) {
     if (
       this.aPositionLocation === null ||
@@ -666,7 +763,8 @@ class BaseShader {
 
     // Create 3D rotation matrix
     const rotationMatrix = mat4.create();
-    mat4.fromYRotation(rotationMatrix, headYawAngle); // Rotation about the y-axis (yaw)
+    mat4.rotateX(rotationMatrix, rotationMatrix, headPitchAngle); // Rotation about the x-axis (pitch)
+    mat4.rotateY(rotationMatrix, rotationMatrix, headYawAngle); // Rotation about the y-axis (yaw)
     mat4.rotateZ(rotationMatrix, rotationMatrix, headRotationAngle); // Rotation about the z-axis
 
     const vertices: number[] = [];
@@ -717,7 +815,7 @@ class BaseShader {
       0
     );
 
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer); // Bind normal buffer
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
       new Float32Array(normals),
@@ -784,6 +882,7 @@ class BaseShader {
   async drawFaceMesh(meshType: string, liveLandmarks: NormalizedLandmarkList) {
     if (
       this.aPositionLocation === null ||
+      this.aNormalLocation === null ||
       this.aTexCoordLocation === null ||
       this.threeDimAtlas === null
     ) {
@@ -828,7 +927,7 @@ class BaseShader {
     }
 
     // Get the triangles
-    const { uvTriangles, geometryTriangles } = this.getTriangles(
+    const { geometryTriangles, uvTriangles, normals } = this.getTriangles(
       liveLandmarks,
       this.meshes[meshType].meshData!.uv_faces
     );
@@ -860,6 +959,22 @@ class BaseShader {
     );
     this.gl.vertexAttribPointer(
       this.aPositionLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    // console.log(normalTriangles);
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(normals),
+      this.gl.DYNAMIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      this.aNormalLocation,
       3,
       this.gl.FLOAT,
       false,

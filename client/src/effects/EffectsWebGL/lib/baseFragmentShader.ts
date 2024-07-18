@@ -14,12 +14,15 @@ const baseFragmentShaderSource = `
   #define MESH_BLUR_RADIUS 8
 
   varying vec2 v_texCoord;
+  varying vec3 v_normal;
+
   uniform vec2 u_texSize;
   uniform sampler2D u_videoTexture;
   uniform sampler2D u_twoDimEffectAtlasTexture;
   uniform sampler2D u_threeDimEffectAtlasTexture;
   uniform int u_effectFlags;
   uniform vec3 u_tintColor;
+  uniform vec3 u_lightDirection; 
 
   void main() {
     vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
@@ -61,6 +64,14 @@ const baseFragmentShaderSource = `
         }
       }
       color /= total;
+    }
+
+    // Apply lighting effect using normals only for three dim objects
+    if (mod(float(u_effectFlags / int(pow(2.0, float(MESH_BIT)))), 2.0) >= 1.0) {
+      vec3 lightDir = normalize(u_lightDirection);
+      vec3 norm = normalize(v_normal);
+      float lightIntensity = max(dot(norm, lightDir), 0.0); // * -1.0;
+      color.rgb *= lightIntensity;
     }
 
     // Apply tint effect

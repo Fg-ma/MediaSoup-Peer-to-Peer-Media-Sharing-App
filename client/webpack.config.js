@@ -30,6 +30,8 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
     fallback: {
       fs: false,
+      path: false,
+      crypto: false,
     },
   },
   module: {
