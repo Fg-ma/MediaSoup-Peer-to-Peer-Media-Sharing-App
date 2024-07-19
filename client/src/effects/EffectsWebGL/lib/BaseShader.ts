@@ -352,14 +352,14 @@ class BaseShader {
     );
     const geometryTrianglesIndices = geometryDelaunay.triangles;
 
+    const numVertices = geometryPoints.length;
     const geometryTriangles: number[] = [];
     const uvTriangles: number[] = [];
-    const faceNormals: Point3D[] = [];
-    const vertexNormals: Point3D[] = Array(geometryPoints.length)
-      .fill(null)
-      .map(() => ({ x: 0, y: 0, z: 0 }));
+    const vertexNormals: Float32Array = new Float32Array(numVertices * 3).fill(
+      0
+    );
 
-    // Calculate face normals
+    // Calculate face normals and accumulate them for vertex normals
     for (let i = 0; i < geometryTrianglesIndices.length; i += 3) {
       const index0 = geometryTrianglesIndices[i];
       const index1 = geometryTrianglesIndices[i + 1];
@@ -369,112 +369,83 @@ class BaseShader {
       const v1 = geometryPoints[index1];
       const v2 = geometryPoints[index2];
 
-      const edge1 = {
-        x: v1.x - v0.x,
-        y: v1.y - v0.y,
-        z: v1.z - v0.z,
-      };
-      const edge2 = {
-        x: v2.x - v0.x,
-        y: v2.y - v0.y,
-        z: v2.z - v0.z,
-      };
+      const edge1x = v1.x - v0.x;
+      const edge1y = v1.y - v0.y;
+      const edge1z = v1.z - v0.z;
 
-      const normal = {
-        x: edge1.y * edge2.z - edge1.z * edge2.y,
-        y: edge1.z * edge2.x - edge1.x * edge2.z,
-        z: edge1.x * edge2.y - edge1.y * edge2.x,
-      };
+      const edge2x = v2.x - v0.x;
+      const edge2y = v2.y - v0.y;
+      const edge2z = v2.z - v0.z;
 
-      const length = Math.sqrt(normal.x ** 2 + normal.y ** 2 + normal.z ** 2);
-      const normalizedNormal = {
-        x: normal.x / length,
-        y: normal.y / length,
-        z: normal.z / length,
-      };
+      const normalX = edge1y * edge2z - edge1z * edge2y;
+      const normalY = edge1z * edge2x - edge1x * edge2z;
+      const normalZ = edge1x * edge2y - edge1y * edge2x;
 
-      faceNormals.push(normalizedNormal);
+      const length = Math.sqrt(
+        normalX * normalX + normalY * normalY + normalZ * normalZ
+      );
+      const invLength = 1 / length;
+      const normalizedNormalX = normalX * invLength;
+      const normalizedNormalY = normalY * invLength;
+      const normalizedNormalZ = normalZ * invLength;
 
-      // Accumulate face normals to vertex normals
-      vertexNormals[index0].x += normalizedNormal.x;
-      vertexNormals[index0].y += normalizedNormal.y;
-      vertexNormals[index0].z += normalizedNormal.z;
+      // Accumulate normals for vertices
+      vertexNormals[index0 * 3] += normalizedNormalX;
+      vertexNormals[index0 * 3 + 1] += normalizedNormalY;
+      vertexNormals[index0 * 3 + 2] += normalizedNormalZ;
 
-      vertexNormals[index1].x += normalizedNormal.x;
-      vertexNormals[index1].y += normalizedNormal.y;
-      vertexNormals[index1].z += normalizedNormal.z;
+      vertexNormals[index1 * 3] += normalizedNormalX;
+      vertexNormals[index1 * 3 + 1] += normalizedNormalY;
+      vertexNormals[index1 * 3 + 2] += normalizedNormalZ;
 
-      vertexNormals[index2].x += normalizedNormal.x;
-      vertexNormals[index2].y += normalizedNormal.y;
-      vertexNormals[index2].z += normalizedNormal.z;
+      vertexNormals[index2 * 3] += normalizedNormalX;
+      vertexNormals[index2 * 3 + 1] += normalizedNormalY;
+      vertexNormals[index2 * 3 + 2] += normalizedNormalZ;
 
       // Store vertex positions
-      if (v0 && v1 && v2) {
-        geometryTriangles.push(
-          v0.x,
-          v0.y,
-          v0.z,
-          v1.x,
-          v1.y,
-          v1.z,
-          v2.x,
-          v2.y,
-          v2.z
-        );
-      }
+      geometryTriangles.push(
+        v0.x,
+        v0.y,
+        v0.z,
+        v1.x,
+        v1.y,
+        v1.z,
+        v2.x,
+        v2.y,
+        v2.z
+      );
 
       // Store UV coords
-      if (
-        uvPoints[index0 * 2] !== undefined &&
-        uvPoints[index0 * 2 + 1] !== undefined &&
-        uvPoints[index1 * 2] !== undefined &&
-        uvPoints[index1 * 2 + 1] !== undefined &&
-        uvPoints[index2 * 2] !== undefined &&
-        uvPoints[index2 * 2 + 1] !== undefined
-      ) {
-        uvTriangles.push(
-          uvPoints[index0 * 2],
-          uvPoints[index0 * 2 + 1],
-          uvPoints[index1 * 2],
-          uvPoints[index1 * 2 + 1],
-          uvPoints[index2 * 2],
-          uvPoints[index2 * 2 + 1]
-        );
-      }
+      uvTriangles.push(
+        uvPoints[index0 * 2],
+        uvPoints[index0 * 2 + 1],
+        uvPoints[index1 * 2],
+        uvPoints[index1 * 2 + 1],
+        uvPoints[index2 * 2],
+        uvPoints[index2 * 2 + 1]
+      );
     }
 
     // Normalize vertex normals
-    for (let i = 0; i < vertexNormals.length; i++) {
-      const normal = vertexNormals[i];
-      const length = Math.sqrt(normal.x ** 2 + normal.y ** 2 + normal.z ** 2);
-      vertexNormals[i] = {
-        x: normal.x / length,
-        y: normal.y / length,
-        z: normal.z / length,
-      };
+    for (let i = 0; i < numVertices; i++) {
+      const nx = vertexNormals[i * 3];
+      const ny = vertexNormals[i * 3 + 1];
+      const nz = vertexNormals[i * 3 + 2];
+      const length = Math.sqrt(nx * nx + ny * ny + nz * nz);
+      const invLength = 1 / length;
+      vertexNormals[i * 3] *= invLength;
+      vertexNormals[i * 3 + 1] *= invLength;
+      vertexNormals[i * 3 + 2] *= invLength;
     }
 
     // Flatten vertex normals into an array, repeating for each vertex in each triangle
     const normals: number[] = [];
-    for (let i = 0; i < geometryTrianglesIndices.length; i += 3) {
-      const index0 = geometryTrianglesIndices[i];
-      const index1 = geometryTrianglesIndices[i + 1];
-      const index2 = geometryTrianglesIndices[i + 2];
-
-      const normal0 = vertexNormals[index0];
-      const normal1 = vertexNormals[index1];
-      const normal2 = vertexNormals[index2];
-
+    for (let i = 0; i < geometryTrianglesIndices.length; i++) {
+      const vertexIndex = geometryTrianglesIndices[i];
       normals.push(
-        -normal0.x,
-        -normal0.y,
-        normal0.z,
-        -normal1.x,
-        -normal1.y,
-        normal1.z,
-        -normal2.x,
-        -normal2.y,
-        normal2.z
+        -vertexNormals[vertexIndex * 3],
+        -vertexNormals[vertexIndex * 3 + 1],
+        vertexNormals[vertexIndex * 3 + 2]
       );
     }
 
