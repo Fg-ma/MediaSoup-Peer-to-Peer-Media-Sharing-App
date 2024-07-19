@@ -354,8 +354,12 @@ class BaseShader {
 
     const geometryTriangles: number[] = [];
     const uvTriangles: number[] = [];
-    const normals: number[] = [];
+    const faceNormals: Point3D[] = [];
+    const vertexNormals: Point3D[] = Array(geometryPoints.length)
+      .fill(null)
+      .map(() => ({ x: 0, y: 0, z: 0 }));
 
+    // Calculate face normals
     for (let i = 0; i < geometryTrianglesIndices.length; i += 3) {
       const index0 = geometryTrianglesIndices[i];
       const index1 = geometryTrianglesIndices[i + 1];
@@ -389,18 +393,20 @@ class BaseShader {
         z: normal.z / length,
       };
 
-      // Assign the same face normal to all vertices of the triangle
-      normals.push(
-        -normalizedNormal.x,
-        -normalizedNormal.y,
-        normalizedNormal.z,
-        -normalizedNormal.x,
-        -normalizedNormal.y,
-        normalizedNormal.z,
-        -normalizedNormal.x,
-        -normalizedNormal.y,
-        normalizedNormal.z
-      );
+      faceNormals.push(normalizedNormal);
+
+      // Accumulate face normals to vertex normals
+      vertexNormals[index0].x += normalizedNormal.x;
+      vertexNormals[index0].y += normalizedNormal.y;
+      vertexNormals[index0].z += normalizedNormal.z;
+
+      vertexNormals[index1].x += normalizedNormal.x;
+      vertexNormals[index1].y += normalizedNormal.y;
+      vertexNormals[index1].z += normalizedNormal.z;
+
+      vertexNormals[index2].x += normalizedNormal.x;
+      vertexNormals[index2].y += normalizedNormal.y;
+      vertexNormals[index2].z += normalizedNormal.z;
 
       // Store vertex positions
       if (v0 && v1 && v2) {
@@ -408,11 +414,9 @@ class BaseShader {
           v0.x,
           v0.y,
           v0.z,
-
           v1.x,
           v1.y,
           v1.z,
-
           v2.x,
           v2.y,
           v2.z
@@ -431,14 +435,47 @@ class BaseShader {
         uvTriangles.push(
           uvPoints[index0 * 2],
           uvPoints[index0 * 2 + 1],
-
           uvPoints[index1 * 2],
           uvPoints[index1 * 2 + 1],
-
           uvPoints[index2 * 2],
           uvPoints[index2 * 2 + 1]
         );
       }
+    }
+
+    // Normalize vertex normals
+    for (let i = 0; i < vertexNormals.length; i++) {
+      const normal = vertexNormals[i];
+      const length = Math.sqrt(normal.x ** 2 + normal.y ** 2 + normal.z ** 2);
+      vertexNormals[i] = {
+        x: normal.x / length,
+        y: normal.y / length,
+        z: normal.z / length,
+      };
+    }
+
+    // Flatten vertex normals into an array, repeating for each vertex in each triangle
+    const normals: number[] = [];
+    for (let i = 0; i < geometryTrianglesIndices.length; i += 3) {
+      const index0 = geometryTrianglesIndices[i];
+      const index1 = geometryTrianglesIndices[i + 1];
+      const index2 = geometryTrianglesIndices[i + 2];
+
+      const normal0 = vertexNormals[index0];
+      const normal1 = vertexNormals[index1];
+      const normal2 = vertexNormals[index2];
+
+      normals.push(
+        -normal0.x,
+        -normal0.y,
+        normal0.z,
+        -normal1.x,
+        -normal1.y,
+        normal1.z,
+        -normal2.x,
+        -normal2.y,
+        normal2.z
+      );
     }
 
     return { geometryTriangles, uvTriangles, normals };
