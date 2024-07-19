@@ -272,8 +272,6 @@ class BaseShader {
   }
 
   private initVideoTexture() {
-    this.use();
-
     this.videoTexture = this.gl.createTexture();
     this.gl.activeTexture(this.gl.TEXTURE0);
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.videoTexture);
@@ -357,14 +355,6 @@ class BaseShader {
     const geometryTriangles: number[] = [];
     const uvTriangles: number[] = [];
     const normals: number[] = [];
-    const faceNormals: Point3D[] = [];
-    const vertexNormals: Point3D[] = Array(
-      geometryTrianglesIndices.length
-    ).fill({
-      x: 0,
-      y: 0,
-      z: 0,
-    });
 
     for (let i = 0; i < geometryTrianglesIndices.length; i += 3) {
       const index0 = geometryTrianglesIndices[i];
@@ -398,19 +388,21 @@ class BaseShader {
         y: normal.y / length,
         z: normal.z / length,
       };
-      faceNormals.push(normalizedNormal);
 
-      // Accumulate the face normals for each vertex
-      vertexNormals[index0].x += normalizedNormal.x;
-      vertexNormals[index0].y += normalizedNormal.y;
-      vertexNormals[index0].z += normalizedNormal.z;
-      vertexNormals[index1].x += normalizedNormal.x;
-      vertexNormals[index1].y += normalizedNormal.y;
-      vertexNormals[index1].z += normalizedNormal.z;
-      vertexNormals[index2].x += normalizedNormal.x;
-      vertexNormals[index2].y += normalizedNormal.y;
-      vertexNormals[index2].z += normalizedNormal.z;
+      // Assign the same face normal to all vertices of the triangle
+      normals.push(
+        -normalizedNormal.x,
+        -normalizedNormal.y,
+        normalizedNormal.z,
+        -normalizedNormal.x,
+        -normalizedNormal.y,
+        normalizedNormal.z,
+        -normalizedNormal.x,
+        -normalizedNormal.y,
+        normalizedNormal.z
+      );
 
+      // Store vertex positions
       if (v0 && v1 && v2) {
         geometryTriangles.push(
           v0.x,
@@ -426,10 +418,15 @@ class BaseShader {
           v2.z
         );
       }
+
+      // Store UV coords
       if (
-        uvPoints[index0] !== undefined &&
-        uvPoints[index1] !== undefined &&
-        uvPoints[index2] !== undefined
+        uvPoints[index0 * 2] !== undefined &&
+        uvPoints[index0 * 2 + 1] !== undefined &&
+        uvPoints[index1 * 2] !== undefined &&
+        uvPoints[index1 * 2 + 1] !== undefined &&
+        uvPoints[index2 * 2] !== undefined &&
+        uvPoints[index2 * 2 + 1] !== undefined
       ) {
         uvTriangles.push(
           uvPoints[index0 * 2],
@@ -442,23 +439,6 @@ class BaseShader {
           uvPoints[index2 * 2 + 1]
         );
       }
-    }
-
-    // Normalize the accumulated normals for each vertex
-    for (let i = 0; i < geometryPoints.length; i++) {
-      const length = Math.sqrt(
-        vertexNormals[i].x ** 2 +
-          vertexNormals[i].y ** 2 +
-          vertexNormals[i].z ** 2
-      );
-      vertexNormals[i].x /= length;
-      vertexNormals[i].y /= length;
-      vertexNormals[i].z /= length;
-    }
-
-    // Convert vertex normals to normals array
-    for (const normal of vertexNormals) {
-      normals.push(normal.x, normal.y, normal.z);
     }
 
     return { geometryTriangles, uvTriangles, normals };
@@ -485,8 +465,6 @@ class BaseShader {
     type: "twoDim" | "threeDim",
     atlasImages: { [URLType: string]: string }
   ) {
-    this.use();
-
     if (type === "twoDim") {
       this.twoDimAltasTexMap = atlasImages;
       this.twoDimAtlas = new Atlas(this.gl, -0.1);
@@ -520,8 +498,6 @@ class BaseShader {
     ) {
       return;
     }
-
-    this.use();
 
     // Switch the texture used in the fragment shader
     this.switchTextureFlag(this.TWO_DIMENSIONAL_EFFECTS_BIT);
@@ -646,8 +622,6 @@ class BaseShader {
       return;
     }
 
-    this.use();
-
     this.switchTextureFlag(this.VIDEO_BIT);
 
     this.gl.uniform2f(
@@ -726,8 +700,6 @@ class BaseShader {
     ) {
       return;
     }
-
-    this.use();
 
     // Load mesh if it has already been load and return if no mesh url is found
     if (this.meshes && this.meshes[meshType]) {
@@ -891,8 +863,6 @@ class BaseShader {
     ) {
       return;
     }
-
-    this.use();
 
     // Load uv mesh data
     if (this.meshes && this.meshes[meshType]) {

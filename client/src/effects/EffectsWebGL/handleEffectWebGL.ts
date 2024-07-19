@@ -1,12 +1,7 @@
 import { EffectTypes } from "../../context/StreamsContext";
 import render from "./lib/render";
 import createStopFunction from "./lib/createStopFunction";
-import {
-  beardChinOffsetsMap,
-  earsWidthFactorMap,
-  EffectStylesType,
-  mustacheNoseOffsetsMap,
-} from "../../context/CurrentEffectsStylesContext";
+import { EffectStylesType } from "../../context/CurrentEffectsStylesContext";
 import updateDeadbandingMaps from "./lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { releaseAllTexturePositions } from "./lib/handleTexturePosition";
