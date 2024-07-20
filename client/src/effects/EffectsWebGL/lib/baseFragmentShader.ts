@@ -13,6 +13,9 @@ const baseFragmentShaderSource = `
   #define EFFECT_BLUR_RADIUS 8
   #define MESH_BLUR_RADIUS 8
 
+  #define AMBIENT_COLOR vec3(0.8, 0.85, 1.0)
+  #define AMBIENT_INTENSITY 0.125
+
   varying vec2 v_texCoord;
   varying vec3 v_normal;
 
@@ -72,7 +75,11 @@ const baseFragmentShaderSource = `
       vec3 norm = normalize(v_normal);
       float lightIntensity = max(dot(norm, lightDir), 0.0); // * -1.0;
       color.rgb *= lightIntensity;
+
+      // Apply ambient lighting
+      color.rgb += AMBIENT_COLOR * AMBIENT_INTENSITY; 
     }
+
 
     // Apply tint effect
     if (mod(float(u_effectFlags / int(pow(2.0, float(TINT_BIT)))), 2.0) >= 1.0) {

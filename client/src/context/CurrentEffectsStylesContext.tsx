@@ -16,7 +16,7 @@ export type BeardsEffectTypes = "classicalCurlyBeard";
 export const beardChinOffsetsMap: {
   [beardEffectType in BeardsEffectTypes]: number;
 } = {
-  classicalCurlyBeard: 0.05,
+  classicalCurlyBeard: 0.14,
 };
 
 export type GlassesEffectTypes =
@@ -39,10 +39,10 @@ export const mustacheNoseOffsetsMap: {
     threeDim: number;
   };
 } = {
-  mustache1: { twoDim: -0.09, threeDim: -0.08 },
-  mustache2: { twoDim: -0.07, threeDim: -0.09 },
-  mustache3: { twoDim: -0.09, threeDim: -0.11 },
-  mustache4: { twoDim: -0.07, threeDim: -0.05 },
+  mustache1: { twoDim: -0.05, threeDim: -0.08 },
+  mustache2: { twoDim: -0.05, threeDim: -0.09 },
+  mustache3: { twoDim: -0.05, threeDim: -0.11 },
+  mustache4: { twoDim: -0.05, threeDim: -0.05 },
   disguiseMustache: { twoDim: 0.075, threeDim: 0.0 },
 };
 
@@ -95,35 +95,7 @@ export const useCurrentEffectsStylesContext = () => {
 export function CurrentEffectsStylesContextProvider({
   children,
 }: CurrentEffectsStylesContextProviderProps) {
-  const defaultEars = "dogEars";
-  const defaultBeard = "classicalCurlyBeard";
-  const defaultGlasses = "defaultGlasses";
-  const defaultMustache = "mustache1";
-  const defaultFaceMask = "faceMask1";
-
-  const currentEffectsStyles = useRef<EffectStylesType>({
-    // glasses: { style: defaultGlasses, threeDim: false },
-    // ears: {
-    //   style: defaultEars,
-    //   threeDim: false,
-    //   leftEarWidthFactor: earsWidthFactorMap[defaultEars].leftEarWidthFactor,
-    //   rightEarWidthFactor: earsWidthFactorMap[defaultEars].rightEarWidthFactor,
-    // },
-    // beards: {
-    //   style: defaultBeard,
-    //   threeDim: false,
-    //   chinOffset: beardChinOffsetsMap[defaultBeard],
-    // },
-    // mustaches: {
-    //   style: defaultMustache,
-    //   threeDim: false,
-    //   noseOffset: mustacheNoseOffsetsMap[defaultMustache],
-    // },
-    // faceMasks: {
-    //   style: defaultFaceMask,
-    //   threeDim: true,
-    // },
-  });
+  const currentEffectsStyles = useRef<EffectStylesType>({});
 
   return (
     <CurrentEffectsStylesContext.Provider

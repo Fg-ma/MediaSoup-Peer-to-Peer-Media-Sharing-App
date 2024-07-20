@@ -405,7 +405,7 @@ class FaceLandmarks {
 
       // Set chin widths
       // Calculate chin width based on jawline points
-      const chinWidthFactor = 0.75;
+      const chinWidthFactor = 0.8;
       const dxJaw = rightJawPoint.x - leftJawPoint.x;
       const dyJaw = rightJawPoint.y - leftJawPoint.y;
 

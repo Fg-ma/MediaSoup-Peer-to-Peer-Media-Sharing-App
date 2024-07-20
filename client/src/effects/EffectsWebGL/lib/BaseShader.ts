@@ -1,5 +1,5 @@
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
-import { mat4, vec3 } from "gl-matrix";
+import { mat4, mat3, vec3 } from "gl-matrix";
 import { Delaunay } from "d3-delaunay";
 import { EffectTypes } from "src/context/StreamsContext";
 import baseFragmentShaderSource from "./baseFragmentShader";
@@ -64,6 +64,11 @@ class BaseShader {
   private uEffectFlagsLocation: WebGLUniformLocation | null = null;
   private uTintColorLocation: WebGLUniformLocation | null = null;
   private uLightDirectionLocation: WebGLUniformLocation | null = null;
+
+  private uModelMatrixLocation: WebGLUniformLocation | null = null;
+  private uViewMatrixLocation: WebGLUniformLocation | null = null;
+  private uProjectionMatrixLocation: WebGLUniformLocation | null = null;
+  private uNormalMatrixLocation: WebGLUniformLocation | null = null;
 
   // Attribute locations
   private aPositionLocation: number | null = null;
@@ -204,6 +209,56 @@ class BaseShader {
     );
     const normalizedLightDirection = lightDirection.map((x) => x / length);
     this.gl.uniform3fv(this.uLightDirectionLocation, normalizedLightDirection);
+
+    this.uModelMatrixLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_modelMatrix"
+    );
+    this.uViewMatrixLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_viewMatrix"
+    );
+    this.uProjectionMatrixLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_projectionMatrix"
+    );
+    this.uNormalMatrixLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_normalMatrix"
+    );
+
+    // Create the model matrix
+    const modelMatrix = mat4.create();
+
+    // Create the view matrix
+    const viewMatrix = mat4.create();
+    const cameraPosition = vec3.create().fill(0);
+    const target = vec3.create().fill(0); // Looking at the origin
+    const up = vec3.create().fill(0); // Up direction is positive Y axis
+    up[1] = 1; // Up direction is positive Y axis
+    mat4.lookAt(viewMatrix, cameraPosition, target, up);
+
+    // Create the projection matrix
+    const projectionMatrix = mat4.create();
+    const fov = Math.PI / 4; // 45 degrees field of view
+    const aspect = this.gl.canvas.width / this.gl.canvas.height; // Aspect ratio of the canvas
+    const near = 0.1; // Near clipping plane
+    const far = 100.0; // Far clipping plane
+    mat4.perspective(projectionMatrix, fov, aspect, near, far);
+
+    // Create the normal matrix
+    const normalMatrix = mat3.create();
+    mat3.normalFromMat4(normalMatrix, modelMatrix);
+
+    // Use the matrices in your WebGL program
+    this.gl.uniformMatrix4fv(this.uModelMatrixLocation, false, modelMatrix);
+    this.gl.uniformMatrix4fv(this.uViewMatrixLocation, false, viewMatrix);
+    this.gl.uniformMatrix4fv(
+      this.uProjectionMatrixLocation,
+      false,
+      projectionMatrix
+    );
+    this.gl.uniformMatrix3fv(this.uNormalMatrixLocation, false, normalMatrix);
   }
 
   private initAttributeLocations() {
@@ -567,35 +622,37 @@ class BaseShader {
       -1, 1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0,
     ]);
 
+    const fov = Math.PI / 4; // 45 degrees
+    const planeDistance = 10.0; // Distance from the camera
+
+    // Calculate the plane size based on the perspective projection
+    const planesize = 2.0 * Math.tan(fov / 2) * planeDistance;
+    console.log(planesize);
     // Create 3D transformation matrix
     const transformMatrix = mat4.create();
     mat4.translate(transformMatrix, transformMatrix, [
-      position.x + offset.x,
-      position.y + offset.y,
-      atlasTextureZPosition,
+      (position.x + offset.x) * planesize,
+      (position.y + offset.y) * planesize,
+      -planeDistance,
     ]); // Translate to position
-    mat4.scale(transformMatrix, transformMatrix, [scale * 2, scale * 3, 1]); // Scale
+    mat4.scale(transformMatrix, transformMatrix, [
+      scale * planesize * 2,
+      scale * planesize * 2,
+      1,
+    ]); // Scale
     mat4.rotateX(transformMatrix, transformMatrix, headPitchAngle); // Rotation about the x-axis (pitch)
     mat4.rotateY(transformMatrix, transformMatrix, headYawAngle); // Rotation about the y-axis (yaw)
     mat4.rotateZ(transformMatrix, transformMatrix, headRotationAngle); // Rotation about the z-axis
 
-    // Apply the transformation matrix to the vertices
-    const vertices = new Float32Array(12); // 4 vertices * 3 components (x, y, z)
-    for (let i = 0; i < 4; i++) {
-      const x = baseVertices[i * 3];
-      const y = baseVertices[i * 3 + 1];
-      const z = baseVertices[i * 3 + 2];
+    this.gl.uniformMatrix4fv(this.uModelMatrixLocation, false, transformMatrix);
 
-      const transformedVertex = vec3.create();
-      vec3.transformMat4(transformedVertex, [x, y, z], transformMatrix);
-
-      vertices[i * 3] = transformedVertex[0];
-      vertices[i * 3 + 1] = transformedVertex[1];
-      vertices[i * 3 + 2] = transformedVertex[2];
-    }
     // Bind the position buffer
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.DYNAMIC_DRAW);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      baseVertices,
+      this.gl.DYNAMIC_DRAW
+    );
     this.gl.vertexAttribPointer(
       this.aPositionLocation,
       3,
@@ -638,19 +695,30 @@ class BaseShader {
       this.gl.canvas.height
     );
 
+    this.gl.uniformMatrix4fv(this.uModelMatrixLocation, false, mat4.create());
+
+    // Field of view (FOV) and distance from camera
+    const fov = Math.PI / 4; // 45 degrees
+    const planeDistance = 100.0; // Distance from the camera
+
+    // Calculate the plane size based on the perspective projection
+    const planeHeight = 2.0 * Math.tan(fov / 2) * planeDistance;
+    const planeWidth = planeHeight * 2;
+
+    // Define the plane's vertices in view space
     const positions = new Float32Array([
-      -1.0,
-      1.0,
-      this.videoTextureZPosition, // vertex 1
-      -1.0,
-      -1.0,
-      this.videoTextureZPosition, // vertex 2
-      1.0,
-      1.0,
-      this.videoTextureZPosition, // vertex 3
-      1.0,
-      -1.0,
-      this.videoTextureZPosition, // vertex 4
+      -planeWidth / 2,
+      planeHeight / 2,
+      -planeDistance, // Top-left
+      -planeWidth / 2,
+      -planeHeight / 2,
+      -planeDistance, // Bottom-left
+      planeWidth / 2,
+      planeHeight / 2,
+      -planeDistance, // Top-right
+      planeWidth / 2,
+      -planeHeight / 2,
+      -planeDistance, // Bottom-right
     ]);
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
@@ -744,49 +812,44 @@ class BaseShader {
       return;
     }
 
-    // Create 3D rotation matrix
-    const rotationMatrix = mat4.create();
-    mat4.rotateX(rotationMatrix, rotationMatrix, headPitchAngle); // Rotation about the x-axis (pitch)
-    mat4.rotateY(rotationMatrix, rotationMatrix, headYawAngle); // Rotation about the y-axis (yaw)
-    mat4.rotateZ(rotationMatrix, rotationMatrix, headRotationAngle); // Rotation about the z-axis
-
-    const vertices: number[] = [];
-    const normals: number[] = [];
     const meshData = this.meshes[meshType].meshData;
 
     if (!meshData) {
       return;
     }
 
-    // Apply the rotation matrix to the vertices and normals
-    for (let i = 0; i < meshData.vertex_faces.length / 3; i++) {
-      const x = meshData.vertex_faces[i * 3];
-      const y = meshData.vertex_faces[i * 3 + 1];
-      const z = meshData.vertex_faces[i * 3 + 2];
+    const fov = Math.PI / 4; // 45 degrees
+    const planeDistance = 90.0; // Distance from the camera
 
-      const nx = meshData.normals[i * 3];
-      const ny = meshData.normals[i * 3 + 1];
-      const nz = meshData.normals[i * 3 + 2];
+    // Calculate the plane size based on the perspective projection
+    const planeHeight = 2.0 * Math.tan(fov / 2) * planeDistance;
+    const planeWidth = (planeHeight * 4) / 3;
+    // Create 3D transformation matrix
+    const transformMatrix = mat4.create();
+    mat4.translate(transformMatrix, transformMatrix, [
+      (position.x + offset.x) * planeWidth,
+      (position.y + offset.y) * planeHeight,
+      -planeDistance,
+    ]); // Translate to position
+    mat4.scale(transformMatrix, transformMatrix, [
+      scale * planeWidth,
+      scale * planeHeight,
+      1,
+    ]); // Scale
+    mat4.rotateX(transformMatrix, transformMatrix, headPitchAngle); // Rotation about the x-axis (pitch)
+    mat4.rotateY(transformMatrix, transformMatrix, headYawAngle); // Rotation about the y-axis (yaw)
+    mat4.rotateZ(transformMatrix, transformMatrix, headRotationAngle); // Rotation about the z-axis
 
-      const rotatedVertex = vec3.create();
-      vec3.transformMat4(rotatedVertex, [x, y, z], rotationMatrix);
+    const normalMatrix = mat3.create();
+    mat3.normalFromMat4(normalMatrix, transformMatrix);
 
-      const rotatedNormal = vec3.create();
-      vec3.transformMat4(rotatedNormal, [nx, ny, nz], rotationMatrix);
-
-      // Apply scale and translation
-      const finalX = rotatedVertex[0] * scale + position.x + offset.x;
-      const finalY = rotatedVertex[1] * scale + position.y + offset.y;
-      const finalZ = rotatedVertex[2]; // Z-coordinate remains unchanged
-
-      vertices.push(finalX, finalY, finalZ);
-      normals.push(rotatedNormal[0], rotatedNormal[1], rotatedNormal[2]);
-    }
+    this.gl.uniformMatrix4fv(this.uModelMatrixLocation, false, transformMatrix);
+    this.gl.uniformMatrix3fv(this.uNormalMatrixLocation, false, normalMatrix);
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
-      new Float32Array(vertices),
+      new Float32Array(meshData.vertex_faces),
       this.gl.DYNAMIC_DRAW
     );
     this.gl.vertexAttribPointer(
@@ -801,7 +864,7 @@ class BaseShader {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
-      new Float32Array(normals),
+      new Float32Array(meshData.normals),
       this.gl.DYNAMIC_DRAW
     );
     this.gl.vertexAttribPointer(
@@ -883,6 +946,8 @@ class BaseShader {
       return;
     }
 
+    this.gl.uniformMatrix4fv(this.uModelMatrixLocation, false, mat4.create());
+
     // Switch the texture used in the fragment shader
     this.switchTextureFlag(this.MESH_BIT);
 
@@ -931,6 +996,23 @@ class BaseShader {
 
       index += 3;
     }
+
+    const fov = Math.PI / 4; // 45 degrees
+    const planeDistance = 10.0; // Distance from the camera
+
+    // Calculate the plane size based on the perspective projection
+    const planeHeight = 2.0 * Math.tan(fov / 2) * planeDistance;
+    const planeWidth = (planeHeight * 4) / 3;
+    // Create 3D transformation matrix
+    const transformMatrix = mat4.create();
+    mat4.translate(transformMatrix, transformMatrix, [0, 0, -planeDistance]); // Translate to position
+    mat4.scale(transformMatrix, transformMatrix, [planeWidth, planeHeight, 1]); // Scale
+
+    const normalMatrix = mat3.create();
+    mat3.normalFromMat4(normalMatrix, transformMatrix);
+
+    this.gl.uniformMatrix4fv(this.uModelMatrixLocation, false, transformMatrix);
+    this.gl.uniformMatrix3fv(this.uNormalMatrixLocation, false, normalMatrix);
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
     this.gl.bufferData(
