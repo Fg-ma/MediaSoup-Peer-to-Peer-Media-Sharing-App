@@ -1,6 +1,6 @@
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
-import { EffectTypes } from "src/context/StreamsContext";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import { EffectTypes } from "../../../context/StreamsContext";
+import { EffectStylesType } from "../../../context/CurrentEffectsStylesContext";
 import BaseShader from "./BaseShader";
 import FaceLandmarks from "./FaceLandmarks";
 
@@ -8,7 +8,7 @@ const render = async (
   id: string,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseShader: BaseShader,
-  faceLandmarks: FaceLandmarks,
+  faceLandmarks: FaceLandmarks | undefined,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
   animationFrameId: number[],
@@ -16,8 +16,8 @@ const render = async (
     [effectType in EffectTypes]?: boolean | undefined;
   },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-  faceMesh: FaceMesh,
-  faceMeshResults: Results[]
+  faceMesh: FaceMesh | undefined,
+  faceMeshResults: Results[] | undefined
 ) => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.CULL_FACE);
@@ -28,11 +28,14 @@ const render = async (
   baseShader.updateVideoTexture(video);
 
   if (
-    effects.ears ||
-    effects.glasses ||
-    effects.beards ||
-    effects.mustaches ||
-    effects.faceMasks
+    faceMesh &&
+    faceMeshResults &&
+    faceLandmarks &&
+    (effects.ears ||
+      effects.glasses ||
+      effects.beards ||
+      effects.mustaches ||
+      effects.faceMasks)
   ) {
     await faceMesh.send({ image: video });
     if (faceMeshResults.length === 0) {

@@ -34,9 +34,9 @@ export default function EffectSection({
   tintColor,
 }: {
   videoContainerRef: React.RefObject<HTMLDivElement>;
-  type: "webcam" | "screen";
+  type: "camera" | "screen";
   videoId: string;
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
+  handleEffectChange: (effect: EffectTypes) => void;
   tintColor: React.MutableRefObject<string>;
 }) {
   const { userStreamEffects } = useStreamsContext();
@@ -48,7 +48,7 @@ export default function EffectSection({
 
   useEffect(() => {
     if (userStreamEffects.current.tint[type]?.[videoId]) {
-      handleEffectChange("tint", true);
+      handleEffectChange("tint");
     }
   }, [color]);
 

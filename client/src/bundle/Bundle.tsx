@@ -525,7 +525,7 @@ export default function Bundle({
         Object.entries(cameraStreams).map(([key, cameraStream]) => (
           <FgVideo
             key={key}
-            type='webcam'
+            type='camera'
             username={username}
             table_id={table_id}
             socket={socket}

@@ -13,7 +13,7 @@ const onRemoveProducer = async (
     type: string;
     table_id: string;
     username: string;
-    producerType: "webcam" | "screen" | "audio";
+    producerType: "camera" | "screen" | "audio";
     producerId?: string;
   },
   io: SocketIOServer
@@ -22,7 +22,7 @@ const onRemoveProducer = async (
     // Remove producers
     if (
       event.producerId &&
-      (event.producerType === "webcam" || event.producerType === "screen") &&
+      (event.producerType === "camera" || event.producerType === "screen") &&
       roomProducers[event.table_id]?.[event.username]?.[event.producerType]?.[
         event.producerId
       ]
@@ -30,7 +30,7 @@ const onRemoveProducer = async (
       if (
         Object.keys(
           roomProducers[event.table_id][event.username][
-            event.producerType as "webcam" | "screen"
+            event.producerType as "camera" | "screen"
           ] || {}
         ).length === 1
       ) {
@@ -45,12 +45,12 @@ const onRemoveProducer = async (
           }
         } else {
           delete roomProducers[event.table_id][event.username][
-            event.producerType as "webcam" | "screen"
+            event.producerType as "camera" | "screen"
           ];
         }
       } else {
         delete roomProducers[event.table_id][event.username][
-          event.producerType as "webcam" | "screen"
+          event.producerType as "camera" | "screen"
         ]![event.producerId];
       }
     } else if (
@@ -82,26 +82,26 @@ const onRemoveProducer = async (
           ]) {
             if (
               producerType === event.producerType &&
-              (producerType === "webcam" || producerType === "screen")
+              (producerType === "camera" || producerType === "screen")
             ) {
               for (const producerId in roomConsumers[event.table_id][username][
                 producerUsername
-              ][producerType as "webcam" | "screen"]) {
+              ][producerType as "camera" | "screen"]) {
                 if (producerId === event.producerId) {
                   delete roomConsumers[event.table_id][username][
                     producerUsername
-                  ][producerType as "webcam" | "screen"]![producerId];
+                  ][producerType as "camera" | "screen"]![producerId];
                 }
                 if (
                   Object.keys(
                     roomConsumers[event.table_id][username][producerUsername][
-                      producerType as "webcam" | "screen"
+                      producerType as "camera" | "screen"
                     ] || {}
                   ).length === 0
                 ) {
                   delete roomConsumers[event.table_id][username][
                     producerUsername
-                  ][producerType as "webcam" | "screen" | "audio"];
+                  ][producerType as "camera" | "screen" | "audio"];
                 }
               }
             }

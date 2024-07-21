@@ -17,8 +17,8 @@ export default function EarsEffectSectionButton({
   type,
   videoId,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
-  type: "webcam" | "screen";
+  handleEffectChange: (effect: EffectTypes) => void;
+  type: "camera" | "screen";
   videoId: string;
 }) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -63,10 +63,7 @@ export default function EarsEffectSectionButton({
               earsWidthFactorMap[effectType].leftEarWidthFactor;
             currentEffectsStyles.current[videoId].ears.rightEarWidthFactor =
               earsWidthFactorMap[effectType].rightEarWidthFactor;
-            handleEffectChange(
-              "ears",
-              userStreamEffects.current.ears[type]?.[videoId] ? true : false
-            );
+            handleEffectChange("ears");
           }
         }
       }}
@@ -94,10 +91,7 @@ export default function EarsEffectSectionButton({
       doubleClickFunction={() => {
         currentEffectsStyles.current[videoId].ears.threeDim =
           !currentEffectsStyles.current[videoId].ears.threeDim;
-        handleEffectChange(
-          "ears",
-          userStreamEffects.current.ears[type]?.[videoId]
-        );
+        handleEffectChange("ears");
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>

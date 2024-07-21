@@ -22,7 +22,7 @@ const onConsumerTransportCreated = async (
   >,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?: { [webcamId: string]: MediaStreamTrack };
+      camera?: { [cameraId: string]: MediaStreamTrack };
       screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack | undefined;
     };
@@ -76,12 +76,12 @@ const onConsumerTransportCreated = async (
       case "connected":
         Object.entries(remoteTracksMap.current).forEach(
           ([trackUsername, tracks]) => {
-            let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
-            if (remoteTracksMap.current[trackUsername]?.webcam) {
-              for (const key in remoteTracksMap.current[trackUsername].webcam) {
+            let remoteCameraStreams: { [cameraId: string]: MediaStream } = {};
+            if (remoteTracksMap.current[trackUsername]?.camera) {
+              for (const key in remoteTracksMap.current[trackUsername].camera) {
                 const remoteCameraStream = new MediaStream();
                 remoteCameraStream.addTrack(
-                  remoteTracksMap.current[trackUsername].webcam![key]
+                  remoteTracksMap.current[trackUsername].camera![key]
                 );
                 remoteCameraStreams[key] = remoteCameraStream;
               }

@@ -11,8 +11,8 @@ const publishScreen = (
   username: React.MutableRefObject<string>,
   userScreenCount: React.MutableRefObject<number>,
   userStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
+    camera: {
+      [cameraId: string]: MediaStream;
     };
     screen: {
       [screenId: string]: MediaStream;

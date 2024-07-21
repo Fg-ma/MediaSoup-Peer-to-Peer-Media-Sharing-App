@@ -37,8 +37,8 @@ export default function MustachesEffectSectionButton({
   type,
   videoId,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
-  type: "webcam" | "screen";
+  handleEffectChange: (effect: EffectTypes) => void;
+  type: "camera" | "screen";
   videoId: string;
 }) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -118,12 +118,7 @@ export default function MustachesEffectSectionButton({
             currentEffectsStyles.current[videoId].mustaches.style = effectType;
             currentEffectsStyles.current[videoId].mustaches.noseOffset =
               mustacheNoseOffsetsMap[effectType];
-            handleEffectChange(
-              "mustaches",
-              userStreamEffects.current.mustaches[type]?.[videoId]
-                ? true
-                : false
-            );
+            handleEffectChange("mustaches");
           }
         }
       }}
@@ -153,10 +148,7 @@ export default function MustachesEffectSectionButton({
       doubleClickFunction={() => {
         currentEffectsStyles.current[videoId].mustaches.threeDim =
           !currentEffectsStyles.current[videoId].mustaches.threeDim;
-        handleEffectChange(
-          "mustaches",
-          userStreamEffects.current.mustaches[type]?.[videoId]
-        );
+        handleEffectChange("mustaches");
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>

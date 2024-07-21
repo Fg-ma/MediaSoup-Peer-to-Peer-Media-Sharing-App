@@ -21,12 +21,15 @@ import { useStreamsContext } from "./context/StreamsContext";
 import Bundle from "./bundle/Bundle";
 import onSwapedProducer from "./lib/onSwapedProducer";
 import onSwapedConsumer from "./lib/onSwapedConsumer";
+import Producers from "./lib/Producer";
+import { useCurrentEffectsStylesContext } from "./context/CurrentEffectsStylesContext";
 
 const websocketURL = "http://localhost:8000";
 
 export default function Main() {
   const {
     userStreams,
+    userMedia,
     userUneffectedStreams,
     userCameraCount,
     userScreenCount,
@@ -34,7 +37,8 @@ export default function Main() {
     userStopStreamEffects,
     remoteTracksMap,
   } = useStreamsContext();
-  const webcamBtnRef = useRef<HTMLButtonElement>(null);
+  const { currentEffectsStyles } = useCurrentEffectsStylesContext();
+  const cameraBtnRef = useRef<HTMLButtonElement>(null);
   const newCameraBtnRef = useRef<HTMLButtonElement>(null);
   const newScreenBtnRef = useRef<HTMLButtonElement>(null);
   const screenBtnRef = useRef<HTMLButtonElement>(null);
@@ -54,8 +58,8 @@ export default function Main() {
   const isSubscribed = useRef(false);
   const [isInTable, setIsInTable] = useState(false);
 
-  const isWebcam = useRef(false);
-  const [webcamActive, setWebcamActive] = useState(false);
+  const isCamera = useRef(false);
+  const [cameraActive, setCameraActive] = useState(false);
   const isScreen = useRef(false);
   const [screenActive, setScreenActive] = useState(false);
   const isAudio = useRef(false);
@@ -104,7 +108,7 @@ export default function Main() {
   };
 
   const handleDisableEnableBtns = (disabled: boolean) => {
-    if (webcamBtnRef.current) webcamBtnRef.current!.disabled = disabled;
+    if (cameraBtnRef.current) cameraBtnRef.current!.disabled = disabled;
     if (screenBtnRef.current) screenBtnRef.current!.disabled = disabled;
     if (audioBtnRef.current) audioBtnRef.current!.disabled = disabled;
     if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = disabled;
@@ -117,24 +121,7 @@ export default function Main() {
         onRouterCapabilities(event, device);
         break;
       case "producerTransportCreated":
-        onProducerTransportCreated(
-          event,
-          socket,
-          device,
-          table_id,
-          username,
-          userStreams,
-          userCameraCount,
-          userScreenCount,
-          isWebcam,
-          isScreen,
-          isAudio,
-          handleDisableEnableBtns,
-          producerTransport,
-          setScreenActive,
-          setWebcamActive,
-          createProducerBundle
-        );
+        producers.onProducerTransportCreated(event);
         break;
       case "consumerTransportCreated":
         onConsumerTransportCreated(
@@ -165,32 +152,10 @@ export default function Main() {
         );
         break;
       case "newProducerAvailable":
-        onNewProducerAvailable(
-          event,
-          socket,
-          device,
-          table_id,
-          username,
-          isSubscribed
-        );
+        producers.onNewProducerAvailable(event);
         break;
       case "newProducer":
-        onNewProducer(
-          event,
-          device,
-          username,
-          table_id,
-          socket,
-          userStreams,
-          userCameraCount,
-          userScreenCount,
-          isWebcam,
-          isScreen,
-          handleDisableEnableBtns,
-          producerTransport,
-          setScreenActive,
-          setWebcamActive
-        );
+        producers.onNewProducer(event);
         break;
       case "producerDisconnected":
         onProducerDisconnected(
@@ -200,8 +165,8 @@ export default function Main() {
           handleDisableEnableBtns,
           remoteTracksMap,
           producerTransport,
-          isWebcam,
-          setWebcamActive,
+          isCamera,
+          setCameraActive,
           isScreen,
           setScreenActive,
           setBundles,
@@ -214,14 +179,7 @@ export default function Main() {
         onRequestedMuteLock(event, socket, username, table_id, mutedAudioRef);
         break;
       case "swapedProducer":
-        onSwapedProducer(
-          event,
-          socket,
-          device,
-          table_id,
-          username,
-          isSubscribed
-        );
+        producers.onSwapedProducer(event);
         break;
       case "swapedConsumer":
         onSwapedConsumer(
@@ -280,8 +238,8 @@ export default function Main() {
             table_id={table_id.current}
             socket={socket}
             initCameraStreams={
-              isWebcam.current && userStreams.current.webcam
-                ? userStreams.current.webcam
+              isCamera.current && userStreams.current.camera
+                ? userStreams.current.camera
                 : undefined
             }
             initScreenStreams={
@@ -347,6 +305,28 @@ export default function Main() {
     }));
   };
 
+  const producers = new Producers(
+    socket,
+    device,
+    table_id,
+    username,
+    userStreams,
+    userMedia,
+    currentEffectsStyles,
+    userStreamEffects,
+    userCameraCount,
+    userScreenCount,
+    isCamera,
+    isScreen,
+    isAudio,
+    isSubscribed,
+    handleDisableEnableBtns,
+    producerTransport,
+    setScreenActive,
+    setCameraActive,
+    createProducerBundle
+  );
+
   return (
     <div className='min-w-full min-h-full overflow-x-hidden flex-col'>
       <div className='flex justify-center min-w-full bg-black h-16 text-white items-center mb-10'>
@@ -356,12 +336,12 @@ export default function Main() {
         <div className='flex items-center justify-center'>
           <div className='flex flex-col mx-2'>
             <button
-              ref={webcamBtnRef}
+              ref={cameraBtnRef}
               onClick={() =>
                 publishCamera(
                   handleDisableEnableBtns,
-                  isWebcam,
-                  setWebcamActive,
+                  isCamera,
+                  setCameraActive,
                   socket,
                   device,
                   table_id,
@@ -371,17 +351,17 @@ export default function Main() {
                 )
               }
               className={`${
-                webcamActive
+                cameraActive
                   ? "bg-orange-500 hover:bg-orange-700"
                   : "bg-blue-500 hover:bg-blue-700"
               } text-white font-bold py-2 px-3 disabled:opacity-25`}
             >
-              {webcamActive ? "Remove Camera" : "Publish Camera"}
+              {cameraActive ? "Remove Camera" : "Publish Camera"}
             </button>
           </div>
           <div
             className={`${
-              webcamActive ? "visible" : "hidden"
+              cameraActive ? "visible" : "hidden"
             } flex flex-col mx-2`}
           >
             <button
@@ -544,8 +524,8 @@ export default function Main() {
                 setBundles,
                 consumerTransport,
                 producerTransport,
-                isWebcam,
-                setWebcamActive,
+                isCamera,
+                setCameraActive,
                 isScreen,
                 setScreenActive,
                 isAudio,

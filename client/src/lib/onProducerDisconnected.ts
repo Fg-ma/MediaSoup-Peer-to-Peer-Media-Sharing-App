@@ -11,8 +11,8 @@ const onProducerDisconnected = (
   },
   username: React.MutableRefObject<string>,
   userStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
+    camera: {
+      [cameraId: string]: MediaStream;
     };
     screen: {
       [screenId: string]: MediaStream;
@@ -22,7 +22,7 @@ const onProducerDisconnected = (
   handleDisableEnableBtns: (disabled: boolean) => void,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?: { [webcamId: string]: MediaStreamTrack };
+      camera?: { [cameraId: string]: MediaStreamTrack };
       screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack | undefined;
     };
@@ -30,8 +30,8 @@ const onProducerDisconnected = (
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  isWebcam: React.MutableRefObject<boolean>,
-  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
+  isCamera: React.MutableRefObject<boolean>,
+  setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
   isScreen: React.MutableRefObject<boolean>,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   setBundles: React.Dispatch<
@@ -44,9 +44,9 @@ const onProducerDisconnected = (
   >,
   userStreamEffects: React.MutableRefObject<{
     [effectType in EffectTypes]: {
-      webcam?:
+      camera?:
         | {
-            [webcamId: string]: boolean;
+            [cameraId: string]: boolean;
           }
         | undefined;
       screen?:
@@ -58,8 +58,8 @@ const onProducerDisconnected = (
     };
   }>,
   userStopStreamEffects: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: () => void;
+    camera: {
+      [cameraId: string]: () => void;
     };
     screen: {
       [screenId: string]: () => void;
@@ -67,8 +67,8 @@ const onProducerDisconnected = (
     audio: (() => void) | undefined;
   }>,
   userUneffectedStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
+    camera: {
+      [cameraId: string]: MediaStream;
     };
     screen: {
       [screenId: string]: MediaStream;
@@ -77,15 +77,15 @@ const onProducerDisconnected = (
   }>
 ) => {
   if (event.producerUsername === username.current) {
-    if (event.producerType === "webcam") {
-      userStreams.current.webcam[event.producerId]
+    if (event.producerType === "camera") {
+      userStreams.current.camera[event.producerId]
         ?.getTracks()
         .forEach((track) => track.stop());
-      delete userStreams.current.webcam[event.producerId];
-      userUneffectedStreams.current.webcam[event.producerId]
+      delete userStreams.current.camera[event.producerId];
+      userUneffectedStreams.current.camera[event.producerId]
         ?.getTracks()
         .forEach((track) => track.stop());
-      delete userUneffectedStreams.current.webcam[event.producerId];
+      delete userUneffectedStreams.current.camera[event.producerId];
     } else if (event.producerType === "screen") {
       userStreams.current.screen[event.producerId]
         ?.getTracks()
@@ -105,7 +105,7 @@ const onProducerDisconnected = (
     }
 
     if (
-      (event.producerType === "webcam" || event.producerType === "screen") &&
+      (event.producerType === "camera" || event.producerType === "screen") &&
       userStopStreamEffects.current[event.producerType] &&
       userStopStreamEffects.current[event.producerType]?.[event.producerId] &&
       typeof userStopStreamEffects.current[event.producerType]?.[
@@ -130,7 +130,7 @@ const onProducerDisconnected = (
         effectType as keyof typeof userStreamEffects.current;
 
       if (
-        (event.producerType === "webcam" || event.producerType === "screen") &&
+        (event.producerType === "camera" || event.producerType === "screen") &&
         userStreamEffects.current[typedEffectType][event.producerType]?.[
           event.producerId
         ]
@@ -147,8 +147,8 @@ const onProducerDisconnected = (
     }
 
     if (
-      (!userStreams.current.webcam ||
-        Object.keys(userStreams.current.webcam).length === 0) &&
+      (!userStreams.current.camera ||
+        Object.keys(userStreams.current.camera).length === 0) &&
       (!userStreams.current.screen ||
         Object.keys(userStreams.current.screen).length === 0) &&
       !userStreams.current.audio
@@ -162,12 +162,12 @@ const onProducerDisconnected = (
       });
       producerTransport.current = undefined;
     }
-    if (Object.keys(userStreams.current.webcam).length === 0) {
-      isWebcam.current = false;
-      setWebcamActive(false);
+    if (Object.keys(userStreams.current.camera).length === 0) {
+      isCamera.current = false;
+      setCameraActive(false);
     } else {
-      isWebcam.current = true;
-      setWebcamActive(true);
+      isCamera.current = true;
+      setCameraActive(true);
     }
     if (Object.keys(userStreams.current.screen).length === 0) {
       isScreen.current = false;
@@ -178,7 +178,7 @@ const onProducerDisconnected = (
     }
     handleDisableEnableBtns(false);
   } else {
-    if (event.producerType === "webcam" || event.producerType === "screen") {
+    if (event.producerType === "camera" || event.producerType === "screen") {
       delete remoteTracksMap.current[event.producerUsername]?.[
         event.producerType
       ]?.[event.producerId];

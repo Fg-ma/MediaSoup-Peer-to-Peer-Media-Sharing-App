@@ -36,8 +36,8 @@ export default function GlassesEffectSectionButton({
   type,
   videoId,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
-  type: "webcam" | "screen";
+  handleEffectChange: (effect: EffectTypes) => void;
+  type: "camera" | "screen";
   videoId: string;
 }) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -115,10 +115,7 @@ export default function GlassesEffectSectionButton({
               !userStreamEffects.current.glasses[type]?.[videoId])
           ) {
             currentEffectsStyles.current[videoId].glasses.style = effectType;
-            handleEffectChange(
-              "glasses",
-              userStreamEffects.current.glasses[type]?.[videoId] ? true : false
-            );
+            handleEffectChange("glasses");
           }
         }
       }}
@@ -146,10 +143,7 @@ export default function GlassesEffectSectionButton({
       doubleClickFunction={() => {
         currentEffectsStyles.current[videoId].glasses.threeDim =
           !currentEffectsStyles.current[videoId].glasses.threeDim;
-        handleEffectChange(
-          "glasses",
-          userStreamEffects.current.glasses[type]?.[videoId]
-        );
+        handleEffectChange("glasses");
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>

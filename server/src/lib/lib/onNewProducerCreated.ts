@@ -5,7 +5,7 @@ const onNewProducerCreated = (
     type: string;
     username: string;
     table_id: string;
-    producerType: "webcam" | "screen" | "audio";
+    producerType: "camera" | "screen" | "audio";
     producerId: string | undefined;
   },
   io: SocketIOServer

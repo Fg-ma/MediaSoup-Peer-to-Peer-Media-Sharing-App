@@ -10,8 +10,8 @@ const joinTable = (
   username: React.MutableRefObject<string>,
   setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
   userStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
+    camera: {
+      [cameraId: string]: MediaStream;
     };
     screen: {
       [screenId: string]: MediaStream;
@@ -22,9 +22,9 @@ const joinTable = (
   userScreenCount: React.MutableRefObject<number>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?:
+      camera?:
         | {
-            [webcamId: string]: MediaStreamTrack;
+            [cameraId: string]: MediaStreamTrack;
           }
         | undefined;
       screen?:
@@ -50,8 +50,8 @@ const joinTable = (
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  isWebcam: React.MutableRefObject<boolean>,
-  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
+  isCamera: React.MutableRefObject<boolean>,
+  setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
   isScreen: React.MutableRefObject<boolean>,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   isAudio: React.MutableRefObject<boolean>,
@@ -84,8 +84,8 @@ const joinTable = (
         setBundles,
         consumerTransport,
         producerTransport,
-        isWebcam,
-        setWebcamActive,
+        isCamera,
+        setCameraActive,
         isScreen,
         setScreenActive,
         isAudio,

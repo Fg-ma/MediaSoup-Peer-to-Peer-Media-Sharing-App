@@ -26,10 +26,10 @@ const onCreateNewProducer = async (
   }
 
   if (
-    ((event.producerType === "webcam" || event.producerType === "screen") &&
+    ((event.producerType === "camera" || event.producerType === "screen") &&
       event.producerId &&
       roomProducers[event.table_id]?.[event.username]?.[
-        event.producerType as "webcam" | "screen"
+        event.producerType as "camera" | "screen"
       ]?.[event.producerId]) ||
     (event.producerType === "audio" &&
       roomProducers[event.table_id]?.[event.username]?.[
@@ -54,25 +54,25 @@ const onCreateNewProducer = async (
     roomProducers[event.table_id][event.username] = {};
   }
   if (
-    (event.producerType === "webcam" || event.producerType === "screen") &&
+    (event.producerType === "camera" || event.producerType === "screen") &&
     !roomProducers[event.table_id][event.username][
-      event.producerType as "webcam" | "screen"
+      event.producerType as "camera" | "screen"
     ]
   ) {
     roomProducers[event.table_id][event.username][
-      event.producerType as "webcam" | "screen"
+      event.producerType as "camera" | "screen"
     ] = {};
   }
 
   if (
-    (event.producerType === "webcam" || event.producerType === "screen") &&
+    (event.producerType === "camera" || event.producerType === "screen") &&
     event.producerId &&
     roomProducers[event.table_id][event.username][
-      event.producerType as "webcam" | "screen"
+      event.producerType as "camera" | "screen"
     ]
   ) {
     roomProducers[event.table_id][event.username][
-      event.producerType as "webcam" | "screen"
+      event.producerType as "camera" | "screen"
     ]![event.producerId] = newProducer;
   } else {
     roomProducers[event.table_id][event.username][

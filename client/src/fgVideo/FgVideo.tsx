@@ -81,7 +81,7 @@ export default function FgVideo({
   tracksColorSetter,
   producerTransport,
 }: {
-  type: "webcam" | "screen";
+  type: "camera" | "screen";
   username: string;
   name?: string;
   table_id: string;
@@ -134,6 +134,7 @@ export default function FgVideo({
 }) {
   const {
     userStreams,
+    userMedia,
     userUneffectedStreams,
     userStreamEffects,
     userStopStreamEffects,
@@ -158,6 +159,7 @@ export default function FgVideo({
   const captions = useRef<TextTrack | undefined>();
   const thumbnails = useRef<string[]>([]);
   const tintColor = useRef("#F56114");
+  const stream = userMedia.current.camera[videoId]?.getStream();
 
   const init = () => {
     if (!currentEffectsStyles.current[videoId]) {
@@ -194,8 +196,13 @@ export default function FgVideo({
     }
 
     // Set videoStream as srcObject
-    if (videoRef.current && isStream && videoStream) {
-      videoRef.current.srcObject = videoStream;
+    if (
+      videoRef.current &&
+      isStream &&
+      ((isUser && userMedia.current.camera[videoId]) ||
+        (!isUser && videoStream))
+    ) {
+      videoRef.current.srcObject = isUser ? stream : videoStream!;
     }
 
     // Set initial track statte
@@ -499,7 +506,7 @@ export default function FgVideo({
         handlePictureInPicture("leave", videoContainerRef)
       );
     };
-  }, [videoStream]);
+  }, [isUser ? stream : videoStream]);
 
   useEffect(() => {
     const handleMessage = (event: any) => {
@@ -520,23 +527,15 @@ export default function FgVideo({
     };
   }, []);
 
-  const handleEffectChange = async (
-    effect: EffectTypes,
-    blockStateChange?: boolean
-  ) => {
+  const handleEffectChange = async (effect: EffectTypes) => {
     if (isUser) {
       await handleEffect(
         effect,
         type,
         videoId,
-        userStreams,
-        userUneffectedStreams,
+        userMedia,
         userStreamEffects,
-        userStopStreamEffects,
-        producerTransport,
-        tintColor,
-        blockStateChange,
-        currentEffectsStyles
+        tintColor
       );
     } else {
       const msg = {
@@ -568,7 +567,7 @@ export default function FgVideo({
         autoPlay ? "" : "paused"
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md`}
     >
-      {videoStream && (
+      {((isUser && stream) || (!isUser && videoStream)) && (
         <>
           <video
             ref={videoRef}

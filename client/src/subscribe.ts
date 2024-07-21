@@ -13,7 +13,7 @@ const subscribe = (
   >,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?: { [webcamId: string]: MediaStreamTrack };
+      camera?: { [cameraId: string]: MediaStreamTrack };
       screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack;
     };

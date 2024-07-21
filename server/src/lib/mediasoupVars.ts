@@ -25,7 +25,7 @@ export const roomConsumerTransports: {
 export const roomProducers: {
   [table_id: string]: {
     [username: string]: {
-      webcam?: { [webcamId: string]: Producer };
+      camera?: { [cameraId: string]: Producer };
       screen?: { [screenId: string]: Producer };
       audio?: Producer;
     };
@@ -35,8 +35,8 @@ export const roomConsumers: {
   [table_id: string]: {
     [username: string]: {
       [producerUsername: string]: {
-        webcam?: {
-          [webcamId: string]: {
+        camera?: {
+          [cameraId: string]: {
             consumer: Consumer;
             producerId: string;
             id: string;

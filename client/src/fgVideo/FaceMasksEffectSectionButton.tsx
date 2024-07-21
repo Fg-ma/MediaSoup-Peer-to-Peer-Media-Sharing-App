@@ -16,8 +16,8 @@ export default function FaceMasksEffectSectionButton({
   type,
   videoId,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
-  type: "webcam" | "screen";
+  handleEffectChange: (effect: EffectTypes) => void;
+  type: "camera" | "screen";
   videoId: string;
 }) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -59,12 +59,7 @@ export default function FaceMasksEffectSectionButton({
               !userStreamEffects.current.faceMasks[type]?.[videoId])
           ) {
             currentEffectsStyles.current[videoId].faceMasks.style = effectType;
-            handleEffectChange(
-              "faceMasks",
-              userStreamEffects.current.faceMasks[type]?.[videoId]
-                ? true
-                : false
-            );
+            handleEffectChange("faceMasks");
           }
         }
       }}
@@ -92,10 +87,7 @@ export default function FaceMasksEffectSectionButton({
         );
       }}
       doubleClickFunction={() => {
-        handleEffectChange(
-          "faceMasks",
-          userStreamEffects.current.faceMasks[type]?.[videoId]
-        );
+        handleEffectChange("faceMasks");
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>

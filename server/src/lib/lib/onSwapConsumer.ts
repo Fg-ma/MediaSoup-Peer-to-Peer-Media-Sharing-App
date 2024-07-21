@@ -1,16 +1,10 @@
-import {
-  MediaKind,
-  RtpCapabilities,
-  RtpParameters,
-} from "mediasoup/node/lib/types";
+import { RtpCapabilities } from "mediasoup/node/lib/types";
 import { Server as SocketIOServer } from "socket.io";
 import {
   roomConsumerTransports,
   roomConsumers,
   roomProducers,
-  workersMap,
 } from "../mediasoupVars";
-import { getWorkerByIdx } from "../workerManager";
 
 const onSwapConsumer = async (
   event: {
@@ -23,18 +17,13 @@ const onSwapConsumer = async (
   },
   io: SocketIOServer
 ) => {
-  // Get the worker and router by idx
-  const { router: mediasoupRouter } = getWorkerByIdx(
-    workersMap[event.table_id]
-  );
-
   const consumerTransport =
     roomConsumerTransports[event.table_id][event.username];
   const producer =
-    event.consumerType === "webcam" || event.consumerType === "screen"
+    event.consumerType === "camera" || event.consumerType === "screen"
       ? event.swappingProducerId
         ? roomProducers[event.table_id][event.swappingUsername][
-            event.consumerType as "webcam" | "screen"
+            event.consumerType as "camera" | "screen"
           ]?.[event.swappingProducerId]
         : undefined
       : roomProducers[event.table_id][event.swappingUsername][
@@ -72,17 +61,17 @@ const onSwapConsumer = async (
       ]) {
         if (
           producerType === event.consumerType &&
-          (producerType === "webcam" || producerType === "screen")
+          (producerType === "camera" || producerType === "screen")
         ) {
           for (const producerId in roomConsumers[event.table_id][
             event.username
-          ][producerUsername][producerType as "webcam" | "screen"]) {
+          ][producerUsername][producerType as "camera" | "screen"]) {
             if (producerId === event.swappingProducerId) {
               delete roomConsumers[event.table_id][event.username][
                 producerUsername
-              ][producerType as "webcam" | "screen"]![producerId];
+              ][producerType as "camera" | "screen"]![producerId];
               roomConsumers[event.table_id][event.username][producerUsername][
-                producerType as "webcam" | "screen"
+                producerType as "camera" | "screen"
               ]![producerId] = newConsumer;
             }
           }

@@ -16,11 +16,11 @@ function hexToRgb(hex: string) {
 }
 
 const handleEffectCPU = async (
-  type: "webcam" | "screen" | "audio",
+  type: "camera" | "screen" | "audio",
   id: string,
   userUneffectedStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
+    camera: {
+      [cameraId: string]: MediaStream;
     };
     screen: {
       [screenId: string]: MediaStream;
@@ -28,8 +28,8 @@ const handleEffectCPU = async (
     audio: MediaStream | undefined;
   }>,
   userStopStreamEffects: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: () => void;
+    camera: {
+      [cameraId: string]: () => void;
     };
     screen: {
       [screenId: string]: () => void;
@@ -48,12 +48,12 @@ const handleEffectCPU = async (
   // Create a video element to play the track
   const video = document.createElement("video");
   if (
-    ((type === "webcam" || type === "screen") &&
+    ((type === "camera" || type === "screen") &&
       userUneffectedStreams.current[type][id]) ||
     (type === "audio" && userUneffectedStreams.current[type])
   ) {
     video.srcObject = new MediaStream([
-      type === "webcam" || type === "screen"
+      type === "camera" || type === "screen"
         ? userUneffectedStreams.current[type][id].getVideoTracks()[0]
         : userUneffectedStreams.current[type]!.getVideoTracks()[0],
     ]);
@@ -80,8 +80,6 @@ const handleEffectCPU = async (
     earImageLeft.src = "/assets/ears/dogEarsLeft.png";
     earImageRight = new Image();
     earImageRight.src = "/assets/ears/dogEarsRight.png";
-
-    await loadModels();
   }
 
   const main = async () => {

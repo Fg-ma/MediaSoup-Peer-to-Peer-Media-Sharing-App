@@ -1,5 +1,5 @@
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
-import { mat4, mat3, vec3 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 import { Delaunay } from "d3-delaunay";
 import { EffectTypes } from "src/context/StreamsContext";
 import baseFragmentShaderSource from "./baseFragmentShader";
@@ -50,7 +50,6 @@ class BaseShader {
     undefined;
 
   private videoTexture: WebGLTexture | null = null;
-  private videoTextureZPosition = 0.99;
 
   private twoDimAtlas: Atlas | null = null;
   private threeDimAtlas: Atlas | null = null;

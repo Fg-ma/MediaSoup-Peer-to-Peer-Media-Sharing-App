@@ -4,11 +4,11 @@ const setStopFunction = (
   video: HTMLVideoElement,
   ctx: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
-  type: "webcam" | "screen" | "audio",
+  type: "camera" | "screen" | "audio",
   id: string,
   userStopStreamEffects: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: () => void;
+    camera: {
+      [cameraId: string]: () => void;
     };
     screen: {
       [screenId: string]: () => void;
@@ -23,7 +23,7 @@ const setStopFunction = (
     video.srcObject = null;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
-  if (type === "webcam" || type === "screen") {
+  if (type === "camera" || type === "screen") {
     userStopStreamEffects.current[type][id] = stop;
   } else if (type === "audio") {
     userStopStreamEffects.current[type] = stop;

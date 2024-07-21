@@ -38,10 +38,10 @@ const onNewConsumer = async (
   // Get the consumer transport associated with the user
   const transport = roomConsumerTransports[event.table_id][event.username];
   const producer =
-    event.consumerType === "webcam" || event.consumerType === "screen"
+    event.consumerType === "camera" || event.consumerType === "screen"
       ? event.incomingProducerId
         ? roomProducers[event.table_id][event.producerUsername][
-            event.consumerType as "webcam" | "screen"
+            event.consumerType as "camera" | "screen"
           ]?.[event.incomingProducerId]
         : undefined
       : roomProducers[event.table_id][event.producerUsername][
@@ -84,22 +84,22 @@ const onNewConsumer = async (
     roomConsumers[event.table_id][event.username][event.producerUsername] = {};
   }
   if (
-    (event.consumerType === "webcam" || event.consumerType === "screen") &&
+    (event.consumerType === "camera" || event.consumerType === "screen") &&
     !roomConsumers[event.table_id][event.username][event.producerUsername][
-      event.consumerType as "webcam" | "screen"
+      event.consumerType as "camera" | "screen"
     ]
   ) {
     roomConsumers[event.table_id][event.username][event.producerUsername][
-      event.consumerType as "webcam" | "screen"
+      event.consumerType as "camera" | "screen"
     ] = {};
   }
 
   if (
-    (event.consumerType === "webcam" || event.consumerType === "screen") &&
+    (event.consumerType === "camera" || event.consumerType === "screen") &&
     event.incomingProducerId
   ) {
     roomConsumers[event.table_id][event.username][event.producerUsername][
-      event.consumerType as "webcam" | "screen"
+      event.consumerType as "camera" | "screen"
     ]![event.incomingProducerId] = newConsumer;
   } else {
     roomConsumers[event.table_id][event.username][event.producerUsername][

@@ -25,7 +25,7 @@ const onNewConsumerSubscribed = async (
   >,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?: { [webcamId: string]: MediaStreamTrack };
+      camera?: { [cameraId: string]: MediaStreamTrack };
       screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack | undefined;
     };
@@ -61,13 +61,13 @@ const onNewConsumerSubscribed = async (
   if (!remoteTracksMap.current[event.producerUsername]) {
     remoteTracksMap.current[event.producerUsername] = {};
   }
-  if (event.consumerType === "webcam" || event.consumerType === "screen") {
+  if (event.consumerType === "camera" || event.consumerType === "screen") {
     if (!remoteTracksMap.current[event.producerUsername][event.consumerType]) {
       remoteTracksMap.current[event.producerUsername][event.consumerType] = {};
     }
     if (event.consumerId) {
       remoteTracksMap.current[event.producerUsername][
-        event.consumerType as "webcam" | "screen"
+        event.consumerType as "camera" | "screen"
       ]![event.consumerId] = consumer.track;
     }
   } else {
@@ -77,13 +77,13 @@ const onNewConsumerSubscribed = async (
   if (
     Object.keys(remoteTracksMap.current[event.producerUsername]).length === 1
   ) {
-    let remoteCameraStreams: { [webcamId: string]: MediaStream } = {};
-    if (remoteTracksMap.current[event.producerUsername]?.webcam) {
+    let remoteCameraStreams: { [cameraId: string]: MediaStream } = {};
+    if (remoteTracksMap.current[event.producerUsername]?.camera) {
       for (const key in remoteTracksMap.current[event.producerUsername]
-        .webcam) {
+        .camera) {
         const remoteCameraStream = new MediaStream();
         remoteCameraStream.addTrack(
-          remoteTracksMap.current[event.producerUsername].webcam![key]
+          remoteTracksMap.current[event.producerUsername].camera![key]
         );
         remoteCameraStreams[key] = remoteCameraStream;
       }

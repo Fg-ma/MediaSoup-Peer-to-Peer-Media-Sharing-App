@@ -6,15 +6,15 @@ import getBrowserMedia from "../getBrowserMedia";
 const onNewProducer = async (
   event: {
     type: string;
-    producerType: "webcam" | "screen" | "audio";
+    producerType: "camera" | "screen" | "audio";
   },
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   username: React.MutableRefObject<string>,
   table_id: React.MutableRefObject<string>,
   socket: React.MutableRefObject<Socket>,
   userStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
+    camera: {
+      [cameraId: string]: MediaStream;
     };
     screen: {
       [screenId: string]: MediaStream;
@@ -23,20 +23,20 @@ const onNewProducer = async (
   }>,
   userCameraCount: React.MutableRefObject<number>,
   userScreenCount: React.MutableRefObject<number>,
-  isWebcam: React.MutableRefObject<boolean>,
+  isCamera: React.MutableRefObject<boolean>,
   isScreen: React.MutableRefObject<boolean>,
   handleDisableEnableBtns: (disabled: boolean) => void,
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
-  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>
+  setCameraActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   let producerId: string | undefined;
-  if (event.producerType === "webcam") {
+  if (event.producerType === "camera") {
     producerId = `${username.current}_camera_stream_${userCameraCount.current}`;
     if (
-      userStreams.current.webcam[
+      userStreams.current.camera[
         `${username.current}_camera_stream_${userCameraCount.current}`
       ]
     ) {
@@ -53,8 +53,8 @@ const onNewProducer = async (
       handleDisableEnableBtns,
       isScreen,
       setScreenActive,
-      isWebcam,
-      setWebcamActive,
+      isCamera,
+      setCameraActive,
       userStreams
     );
 
@@ -66,18 +66,18 @@ const onNewProducer = async (
       return;
     }
 
-    userStreams.current.webcam[
+    userStreams.current.camera[
       `${username.current}_camera_stream_${userCameraCount.current}`
     ] = cameraBrowserMedia;
 
     const track =
-      userStreams.current.webcam[
+      userStreams.current.camera[
         `${username.current}_camera_stream_${userCameraCount.current}`
       ].getVideoTracks()[0];
     const params = {
       track: track,
       appData: {
-        producerType: "webcam",
+        producerType: "camera",
       },
     };
 
@@ -107,8 +107,8 @@ const onNewProducer = async (
       handleDisableEnableBtns,
       isScreen,
       setScreenActive,
-      isWebcam,
-      setWebcamActive,
+      isCamera,
+      setCameraActive,
       userStreams
     );
 
@@ -156,8 +156,8 @@ const onNewProducer = async (
       handleDisableEnableBtns,
       isScreen,
       setScreenActive,
-      isWebcam,
-      setWebcamActive,
+      isCamera,
+      setCameraActive,
       userStreams
     );
 

@@ -5,8 +5,8 @@ const onSubscribed = async (
     type: string;
     data: {
       [username: string]: {
-        webcam?: {
-          [webcamId: string]: {
+        camera?: {
+          [cameraId: string]: {
             producerId: string;
             id: string;
             kind: "audio" | "video" | undefined;
@@ -41,7 +41,7 @@ const onSubscribed = async (
   >,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?: { [webcamId: string]: MediaStreamTrack };
+      camera?: { [cameraId: string]: MediaStreamTrack };
       screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack | undefined;
     };
@@ -59,19 +59,19 @@ const onSubscribed = async (
 
   for (const producerUsername in subscriptions) {
     let newRemoteTrack: {
-      webcam?: { [webcamId: string]: MediaStreamTrack };
+      camera?: { [cameraId: string]: MediaStreamTrack };
       screen?: { [screenId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack;
     } = {};
 
-    if (subscriptions[producerUsername].webcam) {
-      if (!newRemoteTrack.webcam) {
-        newRemoteTrack.webcam = {};
+    if (subscriptions[producerUsername].camera) {
+      if (!newRemoteTrack.camera) {
+        newRemoteTrack.camera = {};
       }
-      for (const key in subscriptions[producerUsername].webcam) {
-        const subscriptionWebcamData =
-          subscriptions[producerUsername].webcam![key];
-        const { producerId, id, kind, rtpParameters } = subscriptionWebcamData;
+      for (const key in subscriptions[producerUsername].camera) {
+        const subscriptionCameraData =
+          subscriptions[producerUsername].camera![key];
+        const { producerId, id, kind, rtpParameters } = subscriptionCameraData;
 
         const consumer = await consumerTransport.current.consume({
           id,
@@ -79,7 +79,7 @@ const onSubscribed = async (
           kind,
           rtpParameters,
         });
-        newRemoteTrack.webcam[key] = consumer.track;
+        newRemoteTrack.camera[key] = consumer.track;
       }
     }
 
@@ -88,9 +88,9 @@ const onSubscribed = async (
         newRemoteTrack.screen = {};
       }
       for (const key in subscriptions[producerUsername].screen) {
-        const subscriptionWebcamData =
+        const subscriptionCameraData =
           subscriptions[producerUsername].screen![key];
-        const { producerId, id, kind, rtpParameters } = subscriptionWebcamData;
+        const { producerId, id, kind, rtpParameters } = subscriptionCameraData;
 
         const consumer = await consumerTransport.current.consume({
           id,

@@ -6,11 +6,11 @@ const createStopFunction = (
   gl: WebGLRenderingContext | WebGL2RenderingContext,
   baseShader: BaseShader,
   canvas: HTMLCanvasElement,
-  type: "webcam" | "screen" | "audio",
+  type: "camera" | "screen" | "audio",
   id: string,
   userStopStreamEffects: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: () => void;
+    camera: {
+      [cameraId: string]: () => void;
     };
     screen: {
       [screenId: string]: () => void;
@@ -44,7 +44,7 @@ const createStopFunction = (
     canvas.remove();
   };
 
-  if (type === "webcam" || type === "screen") {
+  if (type === "camera" || type === "screen") {
     userStopStreamEffects.current[type][id] = stopFunction;
   } else if (type === "audio") {
     userStopStreamEffects.current[type] = stopFunction;

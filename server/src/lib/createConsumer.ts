@@ -11,7 +11,7 @@ const createConsumer = async (
   username: string,
   producers: {
     [username: string]: {
-      webcam?: { [webcamId: string]: Producer };
+      camera?: { [cameraId: string]: Producer };
       screen?: { [screenId: string]: Producer };
       audio?: Producer;
     };
@@ -33,8 +33,8 @@ const createConsumer = async (
 
   let consumers: {
     [username: string]: {
-      webcam?: {
-        [webcamId: string]: {
+      camera?: {
+        [cameraId: string]: {
           consumer: Consumer;
           producerId: string;
           id: string;
@@ -73,40 +73,40 @@ const createConsumer = async (
       continue;
     }
 
-    const webcamProducers = producers[producerUsername].webcam;
+    const cameraProducers = producers[producerUsername].camera;
 
-    if (webcamProducers) {
-      for (const webcamProducerId in webcamProducers) {
-        const webcamProducer = webcamProducers[webcamProducerId];
+    if (cameraProducers) {
+      for (const cameraProducerId in cameraProducers) {
+        const cameraProducer = cameraProducers[cameraProducerId];
 
         // Check if consumer transport can consume from this producer
         if (
           !mediasoupRouter.canConsume({
-            producerId: webcamProducer.id,
+            producerId: cameraProducer.id,
             rtpCapabilities,
           })
         ) {
-          console.error(`Cannot consume from producer ${webcamProducer.id}`);
+          console.error(`Cannot consume from producer ${cameraProducer.id}`);
         }
 
         try {
           // Create a consumer for the producer
           const consumer = await transport.consume({
-            producerId: webcamProducer.id,
+            producerId: cameraProducer.id,
             rtpCapabilities,
-            paused: webcamProducer.kind === "video",
+            paused: cameraProducer.kind === "video",
           });
 
           // Store the consumer in the consumers object
           if (!consumers[producerUsername]) {
             consumers[producerUsername] = {};
           }
-          if (!consumers[producerUsername].webcam) {
-            consumers[producerUsername].webcam = {};
+          if (!consumers[producerUsername].camera) {
+            consumers[producerUsername].camera = {};
           }
-          consumers[producerUsername].webcam![webcamProducerId] = {
+          consumers[producerUsername].camera![cameraProducerId] = {
             consumer: consumer,
-            producerId: webcamProducer.id,
+            producerId: cameraProducer.id,
             id: consumer.id,
             kind: consumer.kind,
             rtpParameters: consumer.rtpParameters,

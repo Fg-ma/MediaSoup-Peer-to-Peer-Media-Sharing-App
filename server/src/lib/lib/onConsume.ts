@@ -1,4 +1,4 @@
-import { Router, RtpCapabilities } from "mediasoup/node/lib/types";
+import { RtpCapabilities } from "mediasoup/node/lib/types";
 import { Server as SocketIOServer } from "socket.io";
 import createConsumer from "../createConsumer";
 import { roomProducers, roomConsumers, workersMap } from "../mediasoupVars";
@@ -40,8 +40,8 @@ const onConsume = async (
 
   let newConsumers: {
     [username: string]: {
-      webcam?: {
-        [webcamId: string]: {
+      camera?: {
+        [cameraId: string]: {
           producerId: string;
           id: string;
           kind: string;
@@ -72,24 +72,25 @@ const onConsume = async (
   } = {};
 
   for (const producerUsername in consumers) {
-    if (consumers[producerUsername].webcam) {
+    if (consumers[producerUsername].camera) {
       if (!newConsumers[producerUsername]) {
         newConsumers[producerUsername] = {};
       }
-      if (!newConsumers[producerUsername].webcam) {
-        newConsumers[producerUsername].webcam = {};
+      if (!newConsumers[producerUsername].camera) {
+        newConsumers[producerUsername].camera = {};
       }
-      for (const webcamId in consumers[producerUsername].webcam) {
-        const webcam = consumers[producerUsername].webcam?.[webcamId];
-        if (webcam)
-          newConsumers[producerUsername].webcam![webcamId] = {
-            producerId: webcam.producerId,
-            id: webcam.id,
-            kind: webcam.kind,
-            rtpParameters: webcam.rtpParameters,
-            type: webcam.type,
-            producerPaused: webcam.producerPaused,
+      for (const cameraId in consumers[producerUsername].camera) {
+        const camera = consumers[producerUsername].camera?.[cameraId];
+        if (camera) {
+          newConsumers[producerUsername].camera![cameraId] = {
+            producerId: camera.producerId,
+            id: camera.id,
+            kind: camera.kind,
+            rtpParameters: camera.rtpParameters,
+            type: camera.type,
+            producerPaused: camera.producerPaused,
           };
+        }
       }
     }
 

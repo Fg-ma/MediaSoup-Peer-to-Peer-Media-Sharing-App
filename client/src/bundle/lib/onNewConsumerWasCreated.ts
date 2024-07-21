@@ -25,9 +25,9 @@ const onNewConsumerWasCreated = async (
   setAudioStream: React.Dispatch<React.SetStateAction<MediaStream | undefined>>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?:
+      camera?:
         | {
-            [webcamId: string]: MediaStreamTrack;
+            [cameraId: string]: MediaStreamTrack;
           }
         | undefined;
       screen?:

@@ -1,16 +1,16 @@
 import * as mediasoup from "mediasoup-client";
 
 const getBrowserMedia = async (
-  type: string,
+  type: "camera" | "screen" | "audio",
   device: React.MutableRefObject<mediasoup.types.Device | undefined>,
   handleDisableEnableBtns: (disabled: boolean) => void,
   isScreen: React.MutableRefObject<boolean>,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
-  isWebcam: React.MutableRefObject<boolean>,
-  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
+  isCamera: React.MutableRefObject<boolean>,
+  setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
   userStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
+    camera: {
+      [cameraId: string]: MediaStream;
     };
     screen: {
       [screenId: string]: MediaStream;
@@ -19,7 +19,7 @@ const getBrowserMedia = async (
   }>
 ) => {
   if (
-    type === "webcam" &&
+    type === "camera" &&
     device.current &&
     !device.current.canProduce("video")
   ) {
@@ -37,13 +37,13 @@ const getBrowserMedia = async (
   }
 
   const constraints: MediaStreamConstraints =
-    type === "webcam" || type === "screen"
+    type === "camera" || type === "screen"
       ? { video: true, audio: false }
       : { video: false, audio: true };
 
   try {
     let stream;
-    if (type === "webcam" || type === "audio") {
+    if (type === "camera" || type === "audio") {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
     } else if (type === "screen") {
       stream = await navigator.mediaDevices.getDisplayMedia(constraints);
@@ -55,11 +55,11 @@ const getBrowserMedia = async (
   } catch (error) {
     handleDisableEnableBtns(false);
     if (
-      type === "webcam" &&
-      Object.keys(userStreams.current.webcam).length === 0
+      type === "camera" &&
+      Object.keys(userStreams.current.camera).length === 0
     ) {
-      isWebcam.current = false;
-      setWebcamActive(false);
+      isCamera.current = false;
+      setCameraActive(false);
     }
     if (
       type === "screen" &&

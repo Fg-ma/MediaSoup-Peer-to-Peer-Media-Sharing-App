@@ -24,9 +24,9 @@ const onSwapedConsumer = async (
   isSubscribed: React.MutableRefObject<boolean>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?:
+      camera?:
         | {
-            [webcamId: string]: MediaStreamTrack;
+            [cameraId: string]: MediaStreamTrack;
           }
         | undefined;
       screen?:
@@ -59,17 +59,17 @@ const onSwapedConsumer = async (
   });
 
   if (
-    event.consumerType === "webcam" &&
+    event.consumerType === "camera" &&
     event.swappingProducerId &&
-    remoteTracksMap.current[event.swappingUsername]?.webcam?.[
+    remoteTracksMap.current[event.swappingUsername]?.camera?.[
       event.swappingProducerId
     ]
   ) {
-    delete remoteTracksMap.current[event.swappingUsername].webcam![
+    delete remoteTracksMap.current[event.swappingUsername].camera![
       event.swappingProducerId
     ];
     if (consumer) {
-      remoteTracksMap.current[event.swappingUsername].webcam![
+      remoteTracksMap.current[event.swappingUsername].camera![
         event.swappingProducerId
       ] = consumer.track;
     }

@@ -21,7 +21,7 @@ const publishNewCamera = (
       type: "createProducerTransport",
       forceTcp: false,
       rtpCapabilities: device.current.rtpCapabilities,
-      producerType: "webcam",
+      producerType: "camera",
       table_id: table_id.current,
       username: username.current,
     };

@@ -2,8 +2,8 @@ import * as mediasoup from "mediasoup-client";
 
 const leaveTable = (
   userStreams: React.MutableRefObject<{
-    webcam: {
-      [webcamId: string]: MediaStream;
+    camera: {
+      [cameraId: string]: MediaStream;
     };
     screen: {
       [screenId: string]: MediaStream;
@@ -14,9 +14,9 @@ const leaveTable = (
   userScreenCount: React.MutableRefObject<number>,
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      webcam?:
+      camera?:
         | {
-            [webcamId: string]: MediaStreamTrack;
+            [cameraId: string]: MediaStreamTrack;
           }
         | undefined;
       screen?:
@@ -42,8 +42,8 @@ const leaveTable = (
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
-  isWebcam: React.MutableRefObject<boolean>,
-  setWebcamActive: React.Dispatch<React.SetStateAction<boolean>>,
+  isCamera: React.MutableRefObject<boolean>,
+  setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
   isScreen: React.MutableRefObject<boolean>,
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
   isAudio: React.MutableRefObject<boolean>,
@@ -55,11 +55,11 @@ const leaveTable = (
   setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>
 ) => {
-  for (const webcamId in userStreams.current.webcam) {
-    userStreams.current.webcam[webcamId]
+  for (const cameraId in userStreams.current.camera) {
+    userStreams.current.camera[cameraId]
       ?.getTracks()
       .forEach((track) => track.stop());
-    delete userStreams.current.webcam[webcamId];
+    delete userStreams.current.camera[cameraId];
   }
   userCameraCount.current = 0;
 
@@ -81,8 +81,8 @@ const leaveTable = (
   setBundles({});
   consumerTransport.current = undefined;
   producerTransport.current = undefined;
-  isWebcam.current = false;
-  setWebcamActive(false);
+  isCamera.current = false;
+  setCameraActive(false);
   isScreen.current = false;
   setScreenActive(false);
   isAudio.current = false;

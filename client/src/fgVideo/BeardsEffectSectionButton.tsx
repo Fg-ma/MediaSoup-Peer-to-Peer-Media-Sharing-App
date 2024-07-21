@@ -17,8 +17,8 @@ export default function BeardsEffectSectionButton({
   type,
   videoId,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
-  type: "webcam" | "screen";
+  handleEffectChange: (effect: EffectTypes) => void;
+  type: "camera" | "screen";
   videoId: string;
 }) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -62,10 +62,7 @@ export default function BeardsEffectSectionButton({
             currentEffectsStyles.current[videoId].beards.style = effectType;
             currentEffectsStyles.current[videoId].beards.chinOffset =
               beardChinOffsetsMap[effectType];
-            handleEffectChange(
-              "beards",
-              userStreamEffects.current.beards[type]?.[videoId] ? true : false
-            );
+            handleEffectChange("beards");
           }
         }
       }}
@@ -93,10 +90,7 @@ export default function BeardsEffectSectionButton({
       doubleClickFunction={() => {
         currentEffectsStyles.current[videoId].beards.threeDim =
           !currentEffectsStyles.current[videoId].beards.threeDim;
-        handleEffectChange(
-          "beards",
-          userStreamEffects.current.beards[type]?.[videoId]
-        );
+        handleEffectChange("beards");
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>

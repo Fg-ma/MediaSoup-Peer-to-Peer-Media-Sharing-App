@@ -25,7 +25,7 @@ const onProducerDisconnected = (
   setAudioStream: React.Dispatch<React.SetStateAction<MediaStream | undefined>>
 ) => {
   if (event.producerUsername === username) {
-    if (event.producerType === "webcam") {
+    if (event.producerType === "camera") {
       setCameraStreams((prev) => {
         const newStreams = { ...prev };
         delete newStreams[event.producerId];

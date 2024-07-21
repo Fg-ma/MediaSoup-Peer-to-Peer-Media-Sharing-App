@@ -14,13 +14,13 @@ const onResume = async (
   ]) {
     try {
       if (
-        roomConsumers[event.table_id][event.username][producerUsername].webcam
+        roomConsumers[event.table_id][event.username][producerUsername].camera
       ) {
-        const webcams =
+        const cameras =
           roomConsumers[event.table_id][event.username][producerUsername]
-            .webcam;
-        for (const webcamId in webcams) {
-          await webcams[webcamId].consumer?.resume();
+            .camera;
+        for (const cameraId in cameras) {
+          await cameras[cameraId].consumer?.resume();
         }
       }
       if (
