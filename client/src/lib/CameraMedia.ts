@@ -1,5 +1,10 @@
 import { releaseAllTexturePositions } from "../effects/EffectsWebGL/lib/handleTexturePosition";
-import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
+import {
+  beardChinOffsetsMap,
+  earsWidthFactorMap,
+  EffectStylesType,
+  mustacheNoseOffsetsMap,
+} from "../context/CurrentEffectsStylesContext";
 import BaseShader from "../effects/EffectsWebGL/lib/BaseShader";
 import render from "../effects/EffectsWebGL/lib/render";
 import FaceLandmarks from "../effects/EffectsWebGL/lib/FaceLandmarks";
@@ -100,6 +105,40 @@ class CameraMedia {
     this.gl = gl;
 
     this.initCameraStream = initCameraStream;
+
+    const defaultEars = "dogEars";
+    const defaultBeard = "classicalCurlyBeard";
+    const defaultGlasses = "defaultGlasses";
+    const defaultMustache = "mustache1";
+    const defaultFaceMask = "faceMask1";
+
+    if (!currentEffectsStyles.current[this.cameraId]) {
+      currentEffectsStyles.current[this.cameraId] = {
+        glasses: { style: defaultGlasses, threeDim: false },
+        ears: {
+          style: defaultEars,
+          threeDim: false,
+          leftEarWidthFactor:
+            earsWidthFactorMap[defaultEars].leftEarWidthFactor,
+          rightEarWidthFactor:
+            earsWidthFactorMap[defaultEars].rightEarWidthFactor,
+        },
+        beards: {
+          style: defaultBeard,
+          threeDim: false,
+          chinOffset: beardChinOffsetsMap[defaultBeard],
+        },
+        mustaches: {
+          style: defaultMustache,
+          threeDim: false,
+          noseOffset: mustacheNoseOffsetsMap[defaultMustache],
+        },
+        faceMasks: {
+          style: defaultFaceMask,
+          threeDim: true,
+        },
+      };
+    }
 
     const meshes = {
       mustache1: { meshURL: "/3DAssets/mustaches/mustache1.json" },
@@ -263,12 +302,6 @@ class CameraMedia {
       this.effects[effect] = true;
     }
 
-    // Remove old animation frame
-    if (this.animationFrameId[0]) {
-      cancelAnimationFrame(this.animationFrameId[0]);
-      delete this.animationFrameId[0];
-    }
-
     releaseAllTexturePositions();
 
     await this.updateAtlases();
@@ -281,6 +314,12 @@ class CameraMedia {
 
     if (tintColor) {
       this.setTintColor(tintColor);
+    }
+
+    // Remove old animation frame
+    if (this.animationFrameId[0]) {
+      cancelAnimationFrame(this.animationFrameId[0]);
+      delete this.animationFrameId[0];
     }
 
     render(

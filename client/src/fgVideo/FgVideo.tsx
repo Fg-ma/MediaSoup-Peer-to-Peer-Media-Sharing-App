@@ -162,39 +162,6 @@ export default function FgVideo({
   const stream = userMedia.current.camera[videoId]?.getStream();
 
   const init = () => {
-    if (!currentEffectsStyles.current[videoId]) {
-      const defaultEars = "dogEars";
-      const defaultBeard = "classicalCurlyBeard";
-      const defaultGlasses = "defaultGlasses";
-      const defaultMustache = "mustache1";
-      const defaultFaceMask = "faceMask1";
-      currentEffectsStyles.current[videoId] = {
-        glasses: { style: defaultGlasses, threeDim: false },
-        ears: {
-          style: defaultEars,
-          threeDim: false,
-          leftEarWidthFactor:
-            earsWidthFactorMap[defaultEars].leftEarWidthFactor,
-          rightEarWidthFactor:
-            earsWidthFactorMap[defaultEars].rightEarWidthFactor,
-        },
-        beards: {
-          style: defaultBeard,
-          threeDim: false,
-          chinOffset: beardChinOffsetsMap[defaultBeard],
-        },
-        mustaches: {
-          style: defaultMustache,
-          threeDim: false,
-          noseOffset: mustacheNoseOffsetsMap[defaultMustache],
-        },
-        faceMasks: {
-          style: defaultFaceMask,
-          threeDim: true,
-        },
-      };
-    }
-
     // Set videoStream as srcObject
     if (
       videoRef.current &&
@@ -506,7 +473,7 @@ export default function FgVideo({
         handlePictureInPicture("leave", videoContainerRef)
       );
     };
-  }, [isUser ? stream : videoStream]);
+  }, []);
 
   useEffect(() => {
     const handleMessage = (event: any) => {
@@ -527,10 +494,14 @@ export default function FgVideo({
     };
   }, []);
 
-  const handleEffectChange = async (effect: EffectTypes) => {
+  const handleEffectChange = async (
+    effect: EffectTypes,
+    blockStateChange: boolean = false
+  ) => {
     if (isUser) {
       await handleEffect(
         effect,
+        blockStateChange,
         type,
         videoId,
         userMedia,

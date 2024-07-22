@@ -36,7 +36,7 @@ export default function EffectSection({
   videoContainerRef: React.RefObject<HTMLDivElement>;
   type: "camera" | "screen";
   videoId: string;
-  handleEffectChange: (effect: EffectTypes) => void;
+  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   tintColor: React.MutableRefObject<string>;
 }) {
   const { userStreamEffects } = useStreamsContext();

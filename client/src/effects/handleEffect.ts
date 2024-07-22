@@ -1,12 +1,10 @@
-import * as mediasoup from "mediasoup-client";
-import handleEffectCPU from "./EffectsCPU/handleEffectCPU";
 import { EffectTypes } from "../context/StreamsContext";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";
 
 const handleEffect = async (
   effect: EffectTypes,
+  blockStateChange: boolean,
   type: "camera" | "screen" | "audio",
   id: string,
   userMedia: React.MutableRefObject<{
@@ -35,28 +33,33 @@ const handleEffect = async (
   }>,
   tintColor: React.MutableRefObject<string>
 ) => {
-  if (!userStreamEffects || !userStreamEffects.current) {
-    return new Error("No userStreamEffects, userStreamEffects.current");
+  // Create empty stream effects
+  if (!userStreamEffects.current[effect][type]) {
+    if (type === "camera" || type === "screen") {
+      userStreamEffects.current[effect][type] = {};
+    } else if (type === "audio") {
+      userStreamEffects.current[effect][type] = false;
+    }
   }
-
-  // Set user streams
-  let effects: { [effect in EffectTypes]?: boolean } = {};
-
-  for (const effect in userStreamEffects.current) {
-    const effectType = effect as keyof typeof userStreamEffects.current;
-    for (const kind in userStreamEffects.current[effectType]) {
-      const kindType = kind as "camera" | "screen";
-      for (const kindId in userStreamEffects.current[effectType][kindType]) {
-        if (kindId === id) {
-          if (userStreamEffects.current[effectType][kindType]![id]) {
-            effects[effectType] = true;
-          }
-        }
-      }
+  if (
+    (type === "camera" || type === "screen") &&
+    !userStreamEffects.current[effect][type]
+  ) {
+    userStreamEffects.current[effect][type]![id] = false;
+  }
+  // Fill stream effects
+  if (!blockStateChange) {
+    if (type === "camera" || type === "screen") {
+      userStreamEffects.current[effect][type]![id] =
+        !userStreamEffects.current[effect][type]![id];
+    } else if (type === "audio") {
+      userStreamEffects.current[effect][type] =
+        !userStreamEffects.current[effect][type];
     }
   }
 
-  if (type === "camera" || type === "screen") {
+  if (type === "camera") {
+    // || type === "screen") {
     await userMedia.current[type][id].changeEffects(effect, tintColor.current);
   }
 };

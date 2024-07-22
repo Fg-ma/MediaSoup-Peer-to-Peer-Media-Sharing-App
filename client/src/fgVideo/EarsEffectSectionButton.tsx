@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import HoldButton from "./FgButton";
 import {
   useCurrentEffectsStylesContext,
@@ -17,10 +17,11 @@ export default function EarsEffectSectionButton({
   type,
   videoId,
 }: {
-  handleEffectChange: (effect: EffectTypes) => void;
+  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   type: "camera" | "screen";
   videoId: string;
 }) {
+  const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const { userStreamEffects } = useStreamsContext();
 
@@ -48,7 +49,18 @@ export default function EarsEffectSectionButton({
 
   return (
     <HoldButton
-      clickFunction={() => handleEffectChange("ears")}
+      clickFunction={() => {
+        handleEffectChange("ears");
+        setButtonState(
+          currentEffectsStyles.current[videoId].ears.threeDim
+            ? userStreamEffects.current.ears[type]?.[videoId]
+              ? "threeDimOffIcon"
+              : "threeDimIcon"
+            : userStreamEffects.current.ears[type]?.[videoId]
+            ? "offIcon"
+            : "icon"
+        );
+      }}
       holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (target && target.dataset.value) {
@@ -63,7 +75,10 @@ export default function EarsEffectSectionButton({
               earsWidthFactorMap[effectType].leftEarWidthFactor;
             currentEffectsStyles.current[videoId].ears.rightEarWidthFactor =
               earsWidthFactorMap[effectType].rightEarWidthFactor;
-            handleEffectChange("ears");
+            handleEffectChange(
+              "ears",
+              userStreamEffects.current.ears[type]?.[videoId]
+            );
           }
         }
       }}
@@ -91,7 +106,21 @@ export default function EarsEffectSectionButton({
       doubleClickFunction={() => {
         currentEffectsStyles.current[videoId].ears.threeDim =
           !currentEffectsStyles.current[videoId].ears.threeDim;
-        handleEffectChange("ears");
+
+        handleEffectChange(
+          "ears",
+          userStreamEffects.current.ears[type]?.[videoId]
+        );
+
+        setButtonState(
+          currentEffectsStyles.current[videoId].ears.threeDim
+            ? userStreamEffects.current.ears[type]?.[videoId]
+              ? "threeDimOffIcon"
+              : "threeDimIcon"
+            : userStreamEffects.current.ears[type]?.[videoId]
+            ? "offIcon"
+            : "icon"
+        );
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>

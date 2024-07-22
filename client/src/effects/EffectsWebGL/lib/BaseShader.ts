@@ -571,7 +571,7 @@ class BaseShader {
   ) {
     if (type === "twoDim") {
       this.twoDimAltasTexMap = atlasImages;
-      this.twoDimAtlas = new Atlas(this.gl, -0.1);
+      this.twoDimAtlas = new Atlas(this.gl);
       await this.twoDimAtlas.createAtlas(
         atlasImages,
         this.uTwoDimEffectAtlasTextureLocation

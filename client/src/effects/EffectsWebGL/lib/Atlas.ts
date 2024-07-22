@@ -1,4 +1,4 @@
-import { URLsTypes } from "../handleEffectWebGL";
+import { URLsTypes } from "../../../lib/CameraMedia";
 import { getNextTexturePosition } from "./handleTexturePosition";
 
 class Atlas {
@@ -17,16 +17,44 @@ class Atlas {
   private atlasTexture: WebGLTexture | null = null;
   private atlasSize: number | null = null;
   private atlasImagesSize = 512;
-  private atlasTextureZPosition = 0.5;
 
-  constructor(
-    gl: WebGL2RenderingContext | WebGLRenderingContext,
-    atlasTextureZPosition?: number
-  ) {
+  constructor(gl: WebGL2RenderingContext | WebGLRenderingContext) {
     this.gl = gl;
-    if (atlasTextureZPosition) {
-      this.atlasTextureZPosition = atlasTextureZPosition;
+  }
+
+  private loadImage(
+    url: string
+  ): Promise<{ img: HTMLImageElement; url: string }> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve({ img, url });
+      img.onerror = (error) => reject(error);
+      img.src = url;
+    });
+  }
+
+  private async loadImages(atlasSideLength: number) {
+    if (this.atlasImages === undefined) {
+      return;
     }
+
+    const images = await Promise.all(
+      Object.values(this.atlasImages).map(this.loadImage)
+    );
+
+    images.forEach((image, index) => {
+      const row = Math.floor(index / atlasSideLength);
+      const col = index % atlasSideLength;
+      this.atlasContext?.drawImage(
+        image.img,
+        col * this.atlasImagesSize,
+        row * this.atlasImagesSize,
+        this.atlasImagesSize,
+        this.atlasImagesSize
+      );
+      this.altasImageURLMap.push({ url: image.url, row, col });
+    });
   }
 
   async createAtlas(
@@ -51,7 +79,12 @@ class Atlas {
     }
     this.gl.activeTexture(this.gl.TEXTURE0 + texturePosition);
 
-    // Set up texture
+    // Delete old texture and set up new one
+    if (this.atlasTexture !== undefined) {
+      this.gl.deleteTexture(this.atlasTexture);
+
+      this.atlasTexture = null;
+    }
     this.atlasTexture = this.gl.createTexture();
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.atlasTexture);
     this.gl.texParameteri(
@@ -120,41 +153,6 @@ class Atlas {
     this.gl.uniform1i(uAtlasTextureLocation, texturePosition);
   }
 
-  private loadImage(
-    url: string
-  ): Promise<{ img: HTMLImageElement; url: string }> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => resolve({ img, url });
-      img.onerror = (error) => reject(error);
-      img.src = url;
-    });
-  }
-
-  private async loadImages(atlasSideLength: number) {
-    if (this.atlasImages === undefined) {
-      return;
-    }
-
-    const images = await Promise.all(
-      Object.values(this.atlasImages).map(this.loadImage)
-    );
-
-    images.forEach((image, index) => {
-      const row = Math.floor(index / atlasSideLength);
-      const col = index % atlasSideLength;
-      this.atlasContext?.drawImage(
-        image.img,
-        col * this.atlasImagesSize,
-        row * this.atlasImagesSize,
-        this.atlasImagesSize,
-        this.atlasImagesSize
-      );
-      this.altasImageURLMap.push({ url: image.url, row, col });
-    });
-  }
-
   getAtlasTexture() {
     return this.atlasTexture;
   }
@@ -169,10 +167,6 @@ class Atlas {
 
   getAtlasImagesSize() {
     return this.atlasImagesSize;
-  }
-
-  getAtlasTextureZPosition() {
-    return this.atlasTextureZPosition;
   }
 }
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import HoldButton from "./FgButton";
 import {
   useCurrentEffectsStylesContext,
@@ -36,10 +36,11 @@ export default function GlassesEffectSectionButton({
   type,
   videoId,
 }: {
-  handleEffectChange: (effect: EffectTypes) => void;
+  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   type: "camera" | "screen";
   videoId: string;
 }) {
+  const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const { userStreamEffects } = useStreamsContext();
 
@@ -103,7 +104,18 @@ export default function GlassesEffectSectionButton({
 
   return (
     <HoldButton
-      clickFunction={() => handleEffectChange("glasses")}
+      clickFunction={() => {
+        handleEffectChange("glasses");
+        setButtonState(
+          currentEffectsStyles.current[videoId].glasses.threeDim
+            ? userStreamEffects.current.glasses[type]?.[videoId]
+              ? "threeDimOffIcon"
+              : "threeDimIcon"
+            : userStreamEffects.current.glasses[type]?.[videoId]
+            ? "offIcon"
+            : "icon"
+        );
+      }}
       holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (target && target.dataset.value) {
@@ -115,7 +127,10 @@ export default function GlassesEffectSectionButton({
               !userStreamEffects.current.glasses[type]?.[videoId])
           ) {
             currentEffectsStyles.current[videoId].glasses.style = effectType;
-            handleEffectChange("glasses");
+            handleEffectChange(
+              "glasses",
+              userStreamEffects.current.glasses[type]?.[videoId]
+            );
           }
         }
       }}
@@ -143,7 +158,21 @@ export default function GlassesEffectSectionButton({
       doubleClickFunction={() => {
         currentEffectsStyles.current[videoId].glasses.threeDim =
           !currentEffectsStyles.current[videoId].glasses.threeDim;
-        handleEffectChange("glasses");
+
+        handleEffectChange(
+          "glasses",
+          userStreamEffects.current.glasses[type]?.[videoId]
+        );
+
+        setButtonState(
+          currentEffectsStyles.current[videoId].glasses.threeDim
+            ? userStreamEffects.current.glasses[type]?.[videoId]
+              ? "threeDimOffIcon"
+              : "threeDimIcon"
+            : userStreamEffects.current.glasses[type]?.[videoId]
+            ? "offIcon"
+            : "icon"
+        );
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>

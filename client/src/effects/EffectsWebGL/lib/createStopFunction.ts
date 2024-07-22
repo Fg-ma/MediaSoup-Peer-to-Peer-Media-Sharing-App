@@ -19,29 +19,24 @@ const createStopFunction = (
   }>
 ) => {
   const stopFunction = () => {
-    if (animationFrameId[0]) {
-      cancelAnimationFrame(animationFrameId[0]);
-    }
-    video.pause();
-    video.srcObject = null;
-
-    baseShader.deconstructor();
-
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    if (canvas) {
-      const contextAttributes = gl.getContextAttributes();
-      if (contextAttributes && contextAttributes.preserveDrawingBuffer) {
-        gl.clear(gl.COLOR_BUFFER_BIT);
-      }
-
-      const ext = gl.getExtension("WEBGL_lose_context");
-      if (ext) {
-        ext.loseContext();
-      }
-    }
-
-    canvas.remove();
+    // if (animationFrameId[0]) {
+    //   cancelAnimationFrame(animationFrameId[0]);
+    // }
+    // video.pause();
+    // video.srcObject = null;
+    // // baseShader.deconstructor();
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // if (canvas) {
+    //   const contextAttributes = gl.getContextAttributes();
+    //   if (contextAttributes && contextAttributes.preserveDrawingBuffer) {
+    //     gl.clear(gl.COLOR_BUFFER_BIT);
+    //   }
+    //   const ext = gl.getExtension("WEBGL_lose_context");
+    //   if (ext) {
+    //     ext.loseContext();
+    //   }
+    // }
+    // canvas.remove();
   };
 
   if (type === "camera" || type === "screen") {

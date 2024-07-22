@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import HoldButton from "./FgButton";
 import {
   useCurrentEffectsStylesContext,
@@ -17,10 +17,11 @@ export default function BeardsEffectSectionButton({
   type,
   videoId,
 }: {
-  handleEffectChange: (effect: EffectTypes) => void;
+  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   type: "camera" | "screen";
   videoId: string;
 }) {
+  const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const { userStreamEffects } = useStreamsContext();
 
@@ -48,7 +49,18 @@ export default function BeardsEffectSectionButton({
 
   return (
     <HoldButton
-      clickFunction={() => handleEffectChange("beards")}
+      clickFunction={() => {
+        handleEffectChange("beards");
+        setButtonState(
+          currentEffectsStyles.current[videoId].beards.threeDim
+            ? userStreamEffects.current.beards[type]?.[videoId]
+              ? "threeDimOffIcon"
+              : "threeDimIcon"
+            : userStreamEffects.current.beards[type]?.[videoId]
+            ? "offIcon"
+            : "icon"
+        );
+      }}
       holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (target && target.dataset.value) {
@@ -62,7 +74,10 @@ export default function BeardsEffectSectionButton({
             currentEffectsStyles.current[videoId].beards.style = effectType;
             currentEffectsStyles.current[videoId].beards.chinOffset =
               beardChinOffsetsMap[effectType];
-            handleEffectChange("beards");
+            handleEffectChange(
+              "beards",
+              userStreamEffects.current.beards[type]?.[videoId] ? true : false
+            );
           }
         }
       }}
@@ -90,7 +105,21 @@ export default function BeardsEffectSectionButton({
       doubleClickFunction={() => {
         currentEffectsStyles.current[videoId].beards.threeDim =
           !currentEffectsStyles.current[videoId].beards.threeDim;
-        handleEffectChange("beards");
+
+        handleEffectChange(
+          "beards",
+          userStreamEffects.current.beards[type]?.[videoId]
+        );
+
+        setButtonState(
+          currentEffectsStyles.current[videoId].beards.threeDim
+            ? userStreamEffects.current.beards[type]?.[videoId]
+              ? "threeDimOffIcon"
+              : "threeDimIcon"
+            : userStreamEffects.current.beards[type]?.[videoId]
+            ? "offIcon"
+            : "icon"
+        );
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
