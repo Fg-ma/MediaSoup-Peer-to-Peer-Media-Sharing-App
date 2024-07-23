@@ -148,24 +148,45 @@ class BaseShader {
   }
 
   deconstructor() {
+    // Delete WebGL program
     if (this.program) {
       this.gl.deleteProgram(this.program);
       this.program = null;
     }
 
+    // Delete buffers
     if (this.positionBuffer) {
       this.gl.deleteBuffer(this.positionBuffer);
       this.positionBuffer = null;
     }
-
+    if (this.normalBuffer) {
+      this.gl.deleteBuffer(this.normalBuffer);
+      this.normalBuffer = null;
+    }
     if (this.texCoordBuffer) {
       this.gl.deleteBuffer(this.texCoordBuffer);
       this.texCoordBuffer = null;
     }
+    if (this.indexBuffer) {
+      this.gl.deleteBuffer(this.indexBuffer);
+      this.indexBuffer = null;
+    }
 
-    // Clear attribute locations
-    this.aPositionLocation = null;
-    this.aTexCoordLocation = null;
+    // Delete textures
+    if (this.videoTexture) {
+      this.gl.deleteTexture(this.videoTexture);
+      this.videoTexture = null;
+    }
+
+    // Delete atlases
+    if (this.twoDimAtlas) {
+      this.twoDimAtlas.deconstructor();
+      this.twoDimAtlas = null;
+    }
+    if (this.threeDimAtlas) {
+      this.threeDimAtlas.deconstructor();
+      this.threeDimAtlas = null;
+    }
   }
 
   private initShaderProgram() {
@@ -583,6 +604,19 @@ class BaseShader {
         atlasImages,
         this.uThreeDimEffectAtlasTextureLocation
       );
+    }
+  }
+
+  async updateAtlasTexture(
+    type: "twoDim" | "threeDim",
+    atlasImages: { [URLType: string]: string }
+  ) {
+    if (type === "twoDim") {
+      this.twoDimAltasTexMap = atlasImages;
+      this.twoDimAtlas?.updateAtlas(atlasImages);
+    } else if (type === "threeDim") {
+      this.threeDimAltasTexMap = atlasImages;
+      this.threeDimAtlas?.updateAtlas(atlasImages);
     }
   }
 
@@ -1117,6 +1151,26 @@ class BaseShader {
 
   setTintColor(tintColor: string) {
     this.gl.uniform3fv(this.uTintColorLocation, this.hexToRgb(tintColor));
+  }
+
+  toggleTintEffect() {
+    if (!(this.effectFlags & (1 << this.TINT_BIT))) {
+      this.effectFlags |= 1 << this.TINT_BIT;
+    } else {
+      this.effectFlags &= ~(1 << this.TINT_BIT);
+    }
+
+    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
+  }
+
+  toggleBlurEffect() {
+    if (!(this.effectFlags & (1 << this.BLUR_BIT))) {
+      this.effectFlags |= 1 << this.BLUR_BIT;
+    } else {
+      this.effectFlags &= ~(1 << this.BLUR_BIT);
+    }
+
+    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
   }
 }
 

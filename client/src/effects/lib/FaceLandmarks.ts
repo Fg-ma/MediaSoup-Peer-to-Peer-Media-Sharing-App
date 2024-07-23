@@ -4,8 +4,7 @@ import {
 } from "@mediapipe/face_mesh";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import { oneDimensionalDeadbandingMap } from "./updateDeadbandingMaps";
-import { Point2D, Point3D } from "./BaseShader";
-import cv from "@techstark/opencv-js";
+import { Point2D } from "./BaseShader";
 
 export type OneDimensionalLandmarkTypes =
   | "headRotationAngles"

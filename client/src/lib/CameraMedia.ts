@@ -1,14 +1,14 @@
-import { releaseAllTexturePositions } from "../effects/EffectsWebGL/lib/handleTexturePosition";
+import { releaseAllTexturePositions } from "../effects/lib/handleTexturePosition";
 import {
   beardChinOffsetsMap,
   earsWidthFactorMap,
   EffectStylesType,
   mustacheNoseOffsetsMap,
 } from "../context/CurrentEffectsStylesContext";
-import BaseShader from "../effects/EffectsWebGL/lib/BaseShader";
-import render from "../effects/EffectsWebGL/lib/render";
-import FaceLandmarks from "../effects/EffectsWebGL/lib/FaceLandmarks";
-import updateDeadbandingMaps from "../effects/EffectsWebGL/lib/updateDeadbandingMaps";
+import BaseShader from "../effects/lib/BaseShader";
+import render from "../effects/lib/render";
+import FaceLandmarks from "../effects/lib/FaceLandmarks";
+import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { EffectTypes } from "../context/StreamsContext";
 
@@ -172,6 +172,8 @@ class CameraMedia {
     this.baseShader = new BaseShader(gl, this.effects, meshes);
 
     this.baseShader.setTintColor(this.tintColor);
+    this.baseShader.createAtlasTexture("twoDim", {});
+    this.baseShader.createAtlasTexture("threeDim", {});
 
     this.faceLandmarks = new FaceLandmarks(this.cameraId, currentEffectsStyles);
 
@@ -216,6 +218,38 @@ class CameraMedia {
       gl.viewport(0, 0, this.canvas.width, this.canvas.height);
       this.video.play();
     };
+  }
+
+  deconstructor() {
+    // End render loop
+    if (this.animationFrameId[0]) {
+      cancelAnimationFrame(this.animationFrameId[0]);
+      delete this.animationFrameId[0];
+    }
+
+    // End initial stream
+    this.initCameraStream.getTracks().forEach((track) => track.stop());
+
+    // End video
+    this.video.pause();
+    this.video.srcObject = null;
+
+    // Deconstruct base shader
+    this.baseShader.deconstructor();
+
+    // Clear gl canvas
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    if (this.canvas) {
+      const contextAttributes = this.gl.getContextAttributes();
+      if (contextAttributes && contextAttributes.preserveDrawingBuffer) {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+      }
+      const ext = this.gl.getExtension("WEBGL_lose_context");
+      if (ext) {
+        ext.loseContext();
+      }
+    }
+    this.canvas.remove();
   }
 
   private async updateAtlases() {
@@ -291,18 +325,22 @@ class CameraMedia {
         Object.entries(threeDimUrls).filter(([key, value]) => value !== null)
       );
 
-    await this.baseShader.createAtlasTexture("twoDim", filteredTwoDimUrls);
-    await this.baseShader.createAtlasTexture("threeDim", filteredThreeDimUrls);
+    await this.baseShader.updateAtlasTexture("twoDim", filteredTwoDimUrls);
+    await this.baseShader.updateAtlasTexture("threeDim", filteredThreeDimUrls);
   }
 
-  async changeEffects(effect: EffectTypes, tintColor?: string) {
+  async changeEffects(
+    effect: EffectTypes,
+    tintColor?: string,
+    blockStateChange: boolean = false
+  ) {
     if (this.effects[effect] !== undefined) {
-      this.effects[effect] = !this.effects[effect];
+      if (!blockStateChange) {
+        this.effects[effect] = !this.effects[effect];
+      }
     } else {
       this.effects[effect] = true;
     }
-
-    releaseAllTexturePositions();
 
     await this.updateAtlases();
 
@@ -314,6 +352,13 @@ class CameraMedia {
 
     if (tintColor) {
       this.setTintColor(tintColor);
+    }
+    if (effect === "tint" && !blockStateChange) {
+      this.baseShader.toggleTintEffect();
+    }
+
+    if (effect === "blur") {
+      this.baseShader.toggleBlurEffect();
     }
 
     // Remove old animation frame

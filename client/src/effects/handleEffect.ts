@@ -1,3 +1,4 @@
+import AudioMedia from "src/lib/AudioMedia";
 import { EffectTypes } from "../context/StreamsContext";
 import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";
@@ -14,7 +15,7 @@ const handleEffect = async (
     screen: {
       [screenId: string]: ScreenMedia;
     };
-    audio: string | undefined;
+    audio: AudioMedia | undefined;
   }>,
   userStreamEffects: React.MutableRefObject<{
     [effectType in EffectTypes]: {
@@ -58,9 +59,14 @@ const handleEffect = async (
     }
   }
 
-  if (type === "camera") {
-    // || type === "screen") {
-    await userMedia.current[type][id].changeEffects(effect, tintColor.current);
+  if (type === "camera" || type === "screen") {
+    await userMedia.current[type][id].changeEffects(
+      effect,
+      tintColor.current,
+      blockStateChange
+    );
+  } else if (type === "audio") {
+    userMedia.current[type]?.changeEffects();
   }
 };
 

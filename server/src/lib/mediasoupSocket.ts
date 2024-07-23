@@ -26,8 +26,6 @@ import onNewProducerCreated from "./lib/onNewProducerCreated";
 import onNewConsumerCreated from "./lib/onNewConsumerCreated";
 import onSendMuteRequest from "./lib/onSendMuteRequest";
 import { releaseWorker } from "./workerManager";
-import onSwapProducer from "./lib/onSwapProducer";
-import onSwapConsumer from "./lib/onSwapConsumer";
 import onRequestEffect from "./lib/onRequestEffect";
 
 const SocketIOConnection = async (io: SocketIOServer) => {
@@ -216,12 +214,6 @@ const SocketIOConnection = async (io: SocketIOServer) => {
           break;
         case "sendMuteRequest":
           onSendMuteRequest(event, io);
-          break;
-        case "swapProducer":
-          onSwapProducer(event, io);
-          break;
-        case "swapConsumer":
-          onSwapConsumer(event, io);
           break;
         case "requestEffect":
           onRequestEffect(event, io);

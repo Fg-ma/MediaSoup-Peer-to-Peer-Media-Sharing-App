@@ -4,25 +4,17 @@ import { io, Socket } from "socket.io-client";
 import publishCamera from "./publishCamera";
 import publishScreen from "./publishScreen";
 import onRouterCapabilities from "./lib/onRouterCapabilities";
-import onProducerTransportCreated from "./lib/onProducerTransportCreated";
-import onConsumerTransportCreated from "./lib/onConsumerTransportCreated";
-import onSubscribed from "./lib/onSubscribed";
 import subscribe from "./subscribe";
 import joinTable from "./joinTable";
-import onNewConsumerSubscribed from "./lib/onNewConsumerSubscribed";
-import onNewProducerAvailable from "./lib/onNewProducerAvailable";
-import onNewProducer from "./lib/onNewProducer";
-import onProducerDisconnected from "./lib/onProducerDisconnected";
 import publishAudio from "./publishAudio";
 import onRequestedMuteLock from "./lib/onRequestedMuteLock";
 import publishNewCamera from "./publishNewCamera";
 import publishNewScreen from "./publishNewScreen";
 import { useStreamsContext } from "./context/StreamsContext";
 import Bundle from "./bundle/Bundle";
-import onSwapedProducer from "./lib/onSwapedProducer";
-import onSwapedConsumer from "./lib/onSwapedConsumer";
-import Producers from "./lib/Producer";
+import Producers from "./lib/Producers";
 import { useCurrentEffectsStylesContext } from "./context/CurrentEffectsStylesContext";
+import Consumers from "./lib/Consumers";
 
 const websocketURL = "http://localhost:8000";
 
@@ -34,10 +26,10 @@ export default function Main() {
     userCameraCount,
     userScreenCount,
     userStreamEffects,
-    userStopStreamEffects,
     remoteTracksMap,
   } = useStreamsContext();
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
+
   const cameraBtnRef = useRef<HTMLButtonElement>(null);
   const newCameraBtnRef = useRef<HTMLButtonElement>(null);
   const newScreenBtnRef = useRef<HTMLButtonElement>(null);
@@ -124,32 +116,15 @@ export default function Main() {
         producers.onProducerTransportCreated(event);
         break;
       case "consumerTransportCreated":
-        onConsumerTransportCreated(
-          event,
-          socket,
-          device,
-          table_id,
-          username,
-          consumerTransport,
-          remoteTracksMap,
-          createConsumerBundle
-        );
+        consumers.onConsumerTransportCreated(event);
         break;
       case "resumed":
         break;
       case "subscribed":
-        onSubscribed(event, consumerTransport, remoteTracksMap, subBtnRef);
+        consumers.onSubscribed(event);
         break;
       case "newConsumerSubscribed":
-        onNewConsumerSubscribed(
-          event,
-          socket,
-          table_id,
-          username,
-          consumerTransport,
-          remoteTracksMap,
-          createConsumerBundle
-        );
+        consumers.onNewConsumerSubscribed(event);
         break;
       case "newProducerAvailable":
         producers.onNewProducerAvailable(event);
@@ -158,40 +133,10 @@ export default function Main() {
         producers.onNewProducer(event);
         break;
       case "producerDisconnected":
-        onProducerDisconnected(
-          event,
-          username,
-          userStreams,
-          handleDisableEnableBtns,
-          remoteTracksMap,
-          producerTransport,
-          isCamera,
-          setCameraActive,
-          isScreen,
-          setScreenActive,
-          setBundles,
-          userStreamEffects,
-          userStopStreamEffects,
-          userUneffectedStreams
-        );
+        producers.onProducerDisconnected(event);
         break;
       case "requestedMuteLock":
         onRequestedMuteLock(event, socket, username, table_id, mutedAudioRef);
-        break;
-      case "swapedProducer":
-        producers.onSwapedProducer(event);
-        break;
-      case "swapedConsumer":
-        onSwapedConsumer(
-          event,
-          socket,
-          device,
-          table_id,
-          username,
-          isSubscribed,
-          remoteTracksMap,
-          consumerTransport
-        );
         break;
       default:
         break;
@@ -311,9 +256,11 @@ export default function Main() {
     table_id,
     username,
     userStreams,
+    userUneffectedStreams,
     userMedia,
     currentEffectsStyles,
     userStreamEffects,
+    remoteTracksMap,
     userCameraCount,
     userScreenCount,
     isCamera,
@@ -324,7 +271,19 @@ export default function Main() {
     producerTransport,
     setScreenActive,
     setCameraActive,
-    createProducerBundle
+    createProducerBundle,
+    setBundles
+  );
+
+  const consumers = new Consumers(
+    table_id,
+    username,
+    socket,
+    device,
+    consumerTransport,
+    remoteTracksMap,
+    createConsumerBundle,
+    subBtnRef
   );
 
   return (

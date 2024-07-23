@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useRef } from "react";
 import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";
+import AudioMedia from "src/lib/AudioMedia";
 
 export type EffectTypes =
   | "blur"
@@ -32,7 +33,7 @@ export interface StreamsContextType {
     screen: {
       [screenId: string]: ScreenMedia;
     };
-    audio: string | undefined;
+    audio: AudioMedia | undefined;
   }>;
   userUneffectedStreams: React.MutableRefObject<{
     camera: {
@@ -55,15 +56,6 @@ export interface StreamsContextType {
       };
       audio?: boolean;
     };
-  }>;
-  userStopStreamEffects: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: () => void;
-    };
-    screen: {
-      [screenId: string]: () => void;
-    };
-    audio: (() => void) | undefined;
   }>;
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
@@ -109,7 +101,7 @@ export function StreamsContextProvider({
       [cameraId: string]: CameraMedia;
     };
     screen: { [screenId: string]: ScreenMedia };
-    audio: string | undefined;
+    audio: AudioMedia | undefined;
   }>({ camera: {}, screen: {}, audio: undefined });
   const userUneffectedStreams = useRef<{
     camera: {
@@ -141,15 +133,6 @@ export function StreamsContextProvider({
       camera: {},
     },
   });
-  const userStopStreamEffects = useRef<{
-    camera: {
-      [cameraId: string]: () => void;
-    };
-    screen: {
-      [screenId: string]: () => void;
-    };
-    audio: (() => void) | undefined;
-  }>({ camera: {}, screen: {}, audio: undefined });
   const remoteTracksMap = useRef<{
     [username: string]: {
       camera?: { [cameraId: string]: MediaStreamTrack };
@@ -167,7 +150,6 @@ export function StreamsContextProvider({
         userCameraCount,
         userScreenCount,
         userStreamEffects,
-        userStopStreamEffects,
         remoteTracksMap,
       }}
     >

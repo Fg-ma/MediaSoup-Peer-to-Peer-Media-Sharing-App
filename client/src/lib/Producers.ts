@@ -6,6 +6,7 @@ import CameraMedia from "./CameraMedia";
 import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import ScreenMedia from "./ScreenMedia";
 import { EffectTypes } from "../context/StreamsContext";
+import AudioMedia from "./AudioMedia";
 
 class Producers {
   private socket: React.MutableRefObject<Socket>;
@@ -21,6 +22,15 @@ class Producers {
     };
     audio: MediaStream | undefined;
   }>;
+  private userUneffectedStreams: React.MutableRefObject<{
+    camera: {
+      [cameraId: string]: MediaStream;
+    };
+    screen: {
+      [screenId: string]: MediaStream;
+    };
+    audio: MediaStream | undefined;
+  }>;
   private userMedia: React.MutableRefObject<{
     camera: {
       [cameraId: string]: CameraMedia;
@@ -28,7 +38,7 @@ class Producers {
     screen: {
       [screenId: string]: ScreenMedia;
     };
-    audio: string | undefined;
+    audio: AudioMedia | undefined;
   }>;
   private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private userStreamEffects: React.MutableRefObject<{
@@ -46,6 +56,13 @@ class Producers {
       audio?: boolean;
     };
   }>;
+  private remoteTracksMap: React.MutableRefObject<{
+    [username: string]: {
+      camera?: { [cameraId: string]: MediaStreamTrack };
+      screen?: { [screenId: string]: MediaStreamTrack };
+      audio?: MediaStreamTrack | undefined;
+    };
+  }>;
   private userCameraCount: React.MutableRefObject<number>;
   private userScreenCount: React.MutableRefObject<number>;
   private isCamera: React.MutableRefObject<boolean>;
@@ -59,6 +76,14 @@ class Producers {
   private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>;
   private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
   private createProducerBundle: () => void;
+  private setBundles: React.Dispatch<
+    React.SetStateAction<
+      | {
+          [username: string]: React.JSX.Element;
+        }
+      | undefined
+    >
+  >;
 
   constructor(
     socket: React.MutableRefObject<Socket>,
@@ -74,6 +99,15 @@ class Producers {
       };
       audio: MediaStream | undefined;
     }>,
+    userUneffectedStreams: React.MutableRefObject<{
+      camera: {
+        [cameraId: string]: MediaStream;
+      };
+      screen: {
+        [screenId: string]: MediaStream;
+      };
+      audio: MediaStream | undefined;
+    }>,
     userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
@@ -81,7 +115,7 @@ class Producers {
       screen: {
         [screenId: string]: ScreenMedia;
       };
-      audio: string | undefined;
+      audio: AudioMedia | undefined;
     }>,
     currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     userStreamEffects: React.MutableRefObject<{
@@ -99,6 +133,13 @@ class Producers {
         audio?: boolean;
       };
     }>,
+    remoteTracksMap: React.MutableRefObject<{
+      [username: string]: {
+        camera?: { [cameraId: string]: MediaStreamTrack };
+        screen?: { [screenId: string]: MediaStreamTrack };
+        audio?: MediaStreamTrack | undefined;
+      };
+    }>,
     userCameraCount: React.MutableRefObject<number>,
     userScreenCount: React.MutableRefObject<number>,
     isCamera: React.MutableRefObject<boolean>,
@@ -111,16 +152,26 @@ class Producers {
     >,
     setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
     setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
-    createProducerBundle: () => void
+    createProducerBundle: () => void,
+    setBundles: React.Dispatch<
+      React.SetStateAction<
+        | {
+            [username: string]: React.JSX.Element;
+          }
+        | undefined
+      >
+    >
   ) {
     this.socket = socket;
     this.device = device;
     this.table_id = table_id;
     this.username = username;
     this.userStreams = userStreams;
+    this.userUneffectedStreams = userUneffectedStreams;
     this.userMedia = userMedia;
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
+    this.remoteTracksMap = remoteTracksMap;
     this.userCameraCount = userCameraCount;
     this.userScreenCount = userScreenCount;
     this.isCamera = isCamera;
@@ -132,6 +183,7 @@ class Producers {
     this.setScreenActive = setScreenActive;
     this.setCameraActive = setCameraActive;
     this.createProducerBundle = createProducerBundle;
+    this.setBundles = setBundles;
   }
 
   async onProducerTransportCreated(event: {
@@ -182,39 +234,21 @@ class Producers {
       async (params, callback, errback) => {
         const { kind, rtpParameters, appData } = params;
 
-        let msg;
-        if (
-          appData.producerDirection &&
-          appData.producerDirection === "swap" &&
-          this.device.current
-        ) {
-          msg = {
-            type: "swapProducer",
-            producerType: appData.producerType,
-            transportId: this.producerTransport.current?.id,
-            kind,
-            rtpParameters,
-            table_id: this.table_id.current,
-            username: this.username.current,
-            producerId: appData.producerId,
-          };
-        } else {
-          msg = {
-            type: "createNewProducer",
-            producerType: appData.producerType,
-            transportId: this.producerTransport.current?.id,
-            kind,
-            rtpParameters,
-            table_id: this.table_id.current,
-            username: this.username.current,
-            producerId:
-              appData.producerType === "camera"
-                ? `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-                : appData.producerType === "screen"
-                ? `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-                : undefined,
-          };
-        }
+        let msg = {
+          type: "createNewProducer",
+          producerType: appData.producerType,
+          transportId: this.producerTransport.current?.id,
+          kind,
+          rtpParameters,
+          table_id: this.table_id.current,
+          username: this.username.current,
+          producerId:
+            appData.producerType === "camera"
+              ? `${this.username.current}_camera_stream_${this.userCameraCount.current}`
+              : appData.producerType === "screen"
+              ? `${this.username.current}_screen_stream_${this.userScreenCount.current}`
+              : undefined,
+        };
 
         this.socket.current.emit("message", msg);
 
@@ -646,32 +680,135 @@ class Producers {
     }
   }
 
-  onSwapedProducer = async (event: {
+  onProducerDisconnected = (event: {
     type: string;
     producerUsername: string;
     producerType: string;
     producerId: string;
   }) => {
-    if (
-      event.producerUsername === this.username.current ||
-      !this.isSubscribed.current ||
-      !this.device.current
-    ) {
-      return;
+    if (event.producerUsername === this.username.current) {
+      // End users streams
+      if (event.producerType === "camera") {
+        this.userStreams.current.camera[event.producerId]
+          ?.getTracks()
+          .forEach((track) => track.stop());
+        delete this.userStreams.current.camera[event.producerId];
+        this.userUneffectedStreams.current.camera[event.producerId]
+          ?.getTracks()
+          .forEach((track) => track.stop());
+        delete this.userUneffectedStreams.current.camera[event.producerId];
+      } else if (event.producerType === "screen") {
+        this.userStreams.current.screen[event.producerId]
+          ?.getTracks()
+          .forEach((track) => track.stop());
+        delete this.userStreams.current.screen[event.producerId];
+        this.userUneffectedStreams.current.screen[event.producerId]
+          ?.getTracks()
+          .forEach((track) => track.stop());
+        delete this.userUneffectedStreams.current.screen[event.producerId];
+      } else if (event.producerType === "audio") {
+        this.userStreams.current.audio
+          ?.getTracks()
+          .forEach((track) => track.stop());
+        this.userStreams.current.audio = undefined;
+        this.userUneffectedStreams.current.audio
+          ?.getTracks()
+          .forEach((track) => track.stop());
+        this.userUneffectedStreams.current.audio = undefined;
+      }
+
+      // Call deconstructors then delete userMedia
+      if (event.producerType === "camera" || event.producerType === "screen") {
+        this.userMedia.current[event.producerType][
+          event.producerId
+        ].deconstructor();
+        delete this.userMedia.current[event.producerType][event.producerId];
+      } else if (event.producerType === "audio") {
+        this.userMedia.current[event.producerType]?.deconstructor();
+        this.userMedia.current[event.producerType] = undefined;
+      }
+
+      for (const effectType in this.userStreamEffects.current) {
+        const typedEffectType =
+          effectType as keyof typeof this.userStreamEffects.current;
+
+        if (
+          (event.producerType === "camera" ||
+            event.producerType === "screen") &&
+          this.userStreamEffects.current[typedEffectType][event.producerType]?.[
+            event.producerId
+          ]
+        ) {
+          delete this.userStreamEffects.current[typedEffectType][
+            event.producerType
+          ]?.[event.producerId];
+        } else if (
+          event.producerType === "audio" &&
+          this.userStreamEffects.current[typedEffectType][event.producerType]
+        ) {
+          delete this.userStreamEffects.current[typedEffectType][
+            event.producerType
+          ];
+        }
+      }
+
+      if (
+        (!this.userStreams.current.camera ||
+          Object.keys(this.userStreams.current.camera).length === 0) &&
+        (!this.userStreams.current.screen ||
+          Object.keys(this.userStreams.current.screen).length === 0) &&
+        !this.userStreams.current.audio
+      ) {
+        this.setBundles((prev) => {
+          const newBundles = prev;
+          if (newBundles) {
+            delete newBundles[event.producerUsername];
+          }
+          return newBundles;
+        });
+        this.producerTransport.current = undefined;
+      }
+      if (Object.keys(this.userStreams.current.camera).length === 0) {
+        this.isCamera.current = false;
+        this.setCameraActive(false);
+      } else {
+        this.isCamera.current = true;
+        this.setCameraActive(true);
+      }
+      if (Object.keys(this.userStreams.current.screen).length === 0) {
+        this.isScreen.current = false;
+        this.setScreenActive(false);
+      } else {
+        this.isScreen.current = true;
+        this.setScreenActive(true);
+      }
+      this.handleDisableEnableBtns(false);
+    } else {
+      if (event.producerType === "camera" || event.producerType === "screen") {
+        delete this.remoteTracksMap.current[event.producerUsername]?.[
+          event.producerType
+        ]?.[event.producerId];
+      } else if (event.producerType === "audio") {
+        delete this.remoteTracksMap.current[event.producerUsername]?.[
+          event.producerType
+        ];
+      }
+
+      if (
+        this.remoteTracksMap.current[event.producerUsername] &&
+        Object.keys(this.remoteTracksMap.current[event.producerUsername])
+          .length === 0
+      ) {
+        delete this.remoteTracksMap.current[event.producerUsername];
+        this.setBundles((prev) => {
+          const newBundles = prev;
+          if (newBundles) {
+            delete newBundles[event.producerUsername];
+          }
+          return newBundles;
+        });
+      }
     }
-
-    const { rtpCapabilities } = this.device.current;
-
-    const msg = {
-      type: "swapConsumer",
-      consumerType: event.producerType,
-      swappingProducerId: event.producerId,
-      swappingUsername: event.producerUsername,
-      table_id: this.table_id.current,
-      username: this.username.current,
-      rtpCapabilities: rtpCapabilities,
-    };
-    this.socket.current.emit("message", msg);
   };
 }
 export default Producers;

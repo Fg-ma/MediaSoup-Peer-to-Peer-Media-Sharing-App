@@ -1,6 +1,6 @@
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
-import { EffectTypes } from "../../../context/StreamsContext";
-import { EffectStylesType } from "../../../context/CurrentEffectsStylesContext";
+import { EffectTypes } from "../../context/StreamsContext";
+import { EffectStylesType } from "../../context/CurrentEffectsStylesContext";
 import BaseShader from "./BaseShader";
 import FaceLandmarks from "./FaceLandmarks";
 

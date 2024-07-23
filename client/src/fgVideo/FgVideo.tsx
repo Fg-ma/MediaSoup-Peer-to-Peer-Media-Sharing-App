@@ -132,14 +132,7 @@ export default function FgVideo({
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >;
 }) {
-  const {
-    userStreams,
-    userMedia,
-    userUneffectedStreams,
-    userStreamEffects,
-    userStopStreamEffects,
-  } = useStreamsContext();
-  const { currentEffectsStyles } = useCurrentEffectsStylesContext();
+  const { userMedia, userStreamEffects } = useStreamsContext();
   const [isEffects, setIsEffects] = useState(false);
   const paused = useRef(!autoPlay);
   const theater = useRef(false);

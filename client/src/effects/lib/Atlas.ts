@@ -1,4 +1,4 @@
-import { URLsTypes } from "../../../lib/CameraMedia";
+import { URLsTypes } from "../../lib/CameraMedia";
 import { getNextTexturePosition } from "./handleTexturePosition";
 
 class Atlas {
@@ -15,11 +15,27 @@ class Atlas {
   }[] = [];
 
   private atlasTexture: WebGLTexture | null = null;
+  private uAtlasTextureLocation: WebGLUniformLocation | null = null;
   private atlasSize: number | null = null;
   private atlasImagesSize = 512;
+  private texturePosition: number | undefined = undefined;
 
   constructor(gl: WebGL2RenderingContext | WebGLRenderingContext) {
     this.gl = gl;
+  }
+
+  deconstructor() {
+    // Delete WebGL texture
+    if (this.atlasTexture) {
+      this.gl.deleteTexture(this.atlasTexture);
+      this.atlasTexture = null;
+    }
+
+    // Clear the canvas and its context
+    if (this.atlasCanvas) {
+      this.atlasCanvas.remove();
+    }
+    this.atlasContext = null;
   }
 
   private loadImage(
@@ -35,7 +51,7 @@ class Atlas {
   }
 
   private async loadImages(atlasSideLength: number) {
-    if (this.atlasImages === undefined) {
+    if (this.atlasImages === undefined || this.atlasSize === null) {
       return;
     }
 
@@ -62,6 +78,98 @@ class Atlas {
     uAtlasTextureLocation: WebGLUniformLocation | null
   ) {
     this.atlasImages = atlasImages;
+    this.uAtlasTextureLocation = uAtlasTextureLocation;
+
+    const textureCount = Object.keys(this.atlasImages).length;
+
+    this.altasImageURLMap = [];
+
+    // Activate texture based on position
+    const texturePosition = getNextTexturePosition();
+    if (texturePosition instanceof Error) {
+      console.error(texturePosition);
+      return;
+    }
+    this.texturePosition = texturePosition;
+    this.gl.activeTexture(this.gl.TEXTURE0 + this.texturePosition);
+
+    // Set up texture
+    this.atlasTexture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.atlasTexture);
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_S,
+      this.gl.CLAMP_TO_EDGE
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_T,
+      this.gl.CLAMP_TO_EDGE
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MIN_FILTER,
+      this.gl.LINEAR
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MAG_FILTER,
+      this.gl.LINEAR
+    );
+
+    let atlasSideLength = Math.ceil(Math.sqrt(textureCount));
+    if (atlasSideLength <= 1) {
+      atlasSideLength = 2;
+    }
+    this.atlasSize = Math.pow(
+      2,
+      Math.ceil(Math.log2(atlasSideLength * this.atlasImagesSize))
+    );
+    atlasSideLength = this.atlasSize / this.atlasImagesSize;
+
+    this.atlasCanvas = document.createElement("canvas");
+    this.atlasCanvas.width = this.atlasSize;
+    this.atlasCanvas.height = this.atlasSize;
+    this.atlasContext = this.atlasCanvas.getContext("2d", {
+      willReadFrequently: true,
+    });
+
+    if (!this.atlasContext) {
+      throw new Error("Unable to create canvas 2D context.");
+    }
+
+    // Load images in the atlas
+    await this.loadImages(atlasSideLength);
+
+    const atlasImage = this.atlasContext.getImageData(
+      0,
+      0,
+      this.atlasSize,
+      this.atlasSize
+    );
+
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D,
+      0,
+      this.gl.RGBA,
+      this.atlasSize,
+      this.atlasSize,
+      0,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      atlasImage.data
+    );
+
+    // Set uniform
+    this.gl.uniform1i(this.uAtlasTextureLocation, texturePosition);
+  }
+
+  async updateAtlas(atlasImages: { [URLType in URLsTypes]?: string }) {
+    if (!this.texturePosition || !this.atlasContext || !this.atlasCanvas) {
+      return;
+    }
+
+    this.atlasImages = atlasImages;
 
     const textureCount = Object.keys(this.atlasImages).length;
 
@@ -72,19 +180,16 @@ class Atlas {
     this.altasImageURLMap = [];
 
     // Activate texture based on position
-    const texturePosition = getNextTexturePosition();
-    if (texturePosition instanceof Error) {
-      console.error(texturePosition);
-      return;
-    }
-    this.gl.activeTexture(this.gl.TEXTURE0 + texturePosition);
+    this.gl.activeTexture(this.gl.TEXTURE0 + this.texturePosition);
 
-    // Delete old texture and set up new one
+    // Delete old texture
     if (this.atlasTexture !== undefined) {
       this.gl.deleteTexture(this.atlasTexture);
 
       this.atlasTexture = null;
     }
+
+    // Set new texture
     this.atlasTexture = this.gl.createTexture();
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.atlasTexture);
     this.gl.texParameteri(
@@ -118,14 +223,8 @@ class Atlas {
     );
     atlasSideLength = this.atlasSize / this.atlasImagesSize;
 
-    this.atlasCanvas = document.createElement("canvas");
     this.atlasCanvas.width = this.atlasSize;
     this.atlasCanvas.height = this.atlasSize;
-    this.atlasContext = this.atlasCanvas.getContext("2d");
-
-    if (!this.atlasContext) {
-      throw new Error("Unable to create canvas 2D context.");
-    }
 
     // Load images in the atlas
     await this.loadImages(atlasSideLength);
@@ -137,6 +236,7 @@ class Atlas {
       this.atlasSize
     );
 
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.atlasTexture);
     this.gl.texImage2D(
       this.gl.TEXTURE_2D,
       0,
@@ -150,7 +250,7 @@ class Atlas {
     );
 
     // Set uniform
-    this.gl.uniform1i(uAtlasTextureLocation, texturePosition);
+    this.gl.uniform1i(this.uAtlasTextureLocation, this.texturePosition);
   }
 
   getAtlasTexture() {

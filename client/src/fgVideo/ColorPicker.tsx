@@ -1,26 +1,33 @@
 import React, { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import ReactDOM from "react-dom";
+import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
 
 export default function ColorPicker({
+  videoId,
+  type,
   color,
   setColor,
   tempColor,
   setTempColor,
   setIsColorPicker,
   tintColor,
-  videoId,
   colorPickerBtnRef,
+  handleEffectChange,
 }: {
+  videoId: string;
+  type: "camera" | "screen";
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
   tempColor: string;
   setTempColor: React.Dispatch<React.SetStateAction<string>>;
   setIsColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
   tintColor: React.MutableRefObject<string>;
-  videoId: string;
   colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
+  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
 }) {
+  const { userStreamEffects } = useStreamsContext();
+
   const [hexValue, setHexValue] = useState(color.slice(1));
   const [colorPickerPosition, setColorPickerPosition] = useState<{
     top: number | null;
@@ -81,6 +88,10 @@ export default function ColorPicker({
     setColor(tempColor);
     tintColor.current = tempColor;
     setIsColorPicker(false);
+    if (userStreamEffects.current.tint[type]) {
+      handleEffectChange("tint", userStreamEffects.current.tint[type][videoId]);
+      userStreamEffects.current.tint[type][videoId] = true;
+    }
   };
 
   const handleCancelColor = () => {

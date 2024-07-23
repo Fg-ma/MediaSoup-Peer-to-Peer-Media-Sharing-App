@@ -66,7 +66,7 @@ const beardsDeadbandingMap: {
     headRotationAngles: 0.05,
     headYawAngles: 0.05,
     headPitchAngles: 0.05,
-    chinWidths: 1.0,
+    chinWidths: 0.01,
   },
 };
 
