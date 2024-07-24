@@ -4,9 +4,9 @@ import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
 import { useStreamsContext, EffectTypes } from "../context/StreamsContext";
 import handleEffect from "../effects/handleEffect";
-import ControlsLogic from "./lib/ControlsLogic";
+import Controls from "../fgVideoControls/lib/Controls";
 import Navigation from "./Navigation";
-import Controls from "./Controls";
+import FgVideoControls from "../fgVideoControls/FgVideoControls";
 
 export default function FgVideo({
   type,
@@ -39,6 +39,7 @@ export default function FgVideo({
   isClosedCaptions = true,
   isPictureInPicture = true,
   isTheater = true,
+  isEffects = true,
   isFullScreen = true,
   isTimeLine = true,
   isSkip = true,
@@ -83,6 +84,7 @@ export default function FgVideo({
   isClosedCaptions?: boolean;
   isPictureInPicture?: boolean;
   isTheater?: boolean;
+  isEffects?: boolean;
   isFullScreen?: boolean;
   isTimeLine?: boolean;
   isSkip?: boolean;
@@ -105,7 +107,6 @@ export default function FgVideo({
   >;
 }) {
   const { userMedia, userStreamEffects } = useStreamsContext();
-  const [isEffects, setIsEffects] = useState(false);
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -126,7 +127,7 @@ export default function FgVideo({
   const tintColor = useRef("#F56114");
   const stream = userMedia.current.camera[videoId]?.getStream();
 
-  const controls = new ControlsLogic(
+  const controls = new Controls(
     socket,
     table_id,
     username,
@@ -134,8 +135,6 @@ export default function FgVideo({
     videoId,
     videoContainerRef,
     captions,
-    isEffects,
-    setIsEffects,
     controlPressed,
     shiftPressed,
     isPlayPause,
@@ -250,7 +249,7 @@ export default function FgVideo({
     init();
 
     document.addEventListener("fullscreenchange", () =>
-      controls.handleFullscreenChange()
+      controls.handleFullScreenChange()
     );
 
     document.addEventListener("keydown", (event) =>
@@ -305,7 +304,7 @@ export default function FgVideo({
 
     return () => {
       document.removeEventListener("fullscreenchange", () =>
-        controls.handleFullscreenChange()
+        controls.handleFullScreenChange()
       );
       document.removeEventListener("keydown", (event) =>
         controls.handleKeyDown(event)
@@ -456,7 +455,7 @@ export default function FgVideo({
             isClose={isClose}
             controls={controls}
           />
-          <Controls
+          <FgVideoControls
             videoId={videoId}
             type={type}
             controls={controls}

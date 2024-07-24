@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client";
 
-class ControlsLogic {
+class Controls {
   private socket: React.MutableRefObject<Socket> | undefined;
   private table_id: string;
   private username: string;
@@ -11,8 +11,6 @@ class ControlsLogic {
   private leadingZeroFormatter = new Intl.NumberFormat(undefined, {
     minimumIntegerDigits: 2,
   });
-  private isEffects: boolean;
-  private setIsEffects: React.Dispatch<React.SetStateAction<boolean>>;
   private controlPressed: React.MutableRefObject<boolean>;
   private shiftPressed: React.MutableRefObject<boolean>;
   private isPlayPause: boolean;
@@ -52,8 +50,6 @@ class ControlsLogic {
     videoId: string,
     videoContainerRef: React.RefObject<HTMLDivElement>,
     captions: React.MutableRefObject<TextTrack | undefined>,
-    isEffects: boolean,
-    setIsEffects: React.Dispatch<React.SetStateAction<boolean>>,
     controlPressed: React.MutableRefObject<boolean>,
     shiftPressed: React.MutableRefObject<boolean>,
     isPlayPause: boolean,
@@ -92,8 +88,6 @@ class ControlsLogic {
     this.videoId = videoId;
     this.videoContainerRef = videoContainerRef;
     this.captions = captions;
-    this.isEffects = isEffects;
-    this.setIsEffects = setIsEffects;
     this.controlPressed = controlPressed;
     this.shiftPressed = shiftPressed;
     this.isPlayPause = isPlayPause;
@@ -162,16 +156,14 @@ class ControlsLogic {
   }
 
   handleEffects() {
-    if (!this.isEffects) {
+    if (!this.videoContainerRef.current?.classList.contains("in-effects")) {
       this.videoContainerRef.current?.classList.add("in-effects");
     } else {
       this.videoContainerRef.current?.classList.remove("in-effects");
     }
-
-    this.setIsEffects((prev) => !prev);
   }
 
-  handleFullscreen() {
+  handleFullScreen() {
     if (this.videoContainerRef.current?.classList.contains("full-screen")) {
       document
         .exitFullscreen()
@@ -193,7 +185,7 @@ class ControlsLogic {
     }
   }
 
-  handleFullscreenChange() {
+  handleFullScreenChange() {
     if (!document.fullscreenElement) {
       this.videoContainerRef.current?.classList.remove("full-screen");
     }
@@ -237,7 +229,7 @@ class ControlsLogic {
         break;
       case "f":
         if (this.isFullScreen) {
-          this.handleFullscreen();
+          this.handleFullScreen();
         }
         break;
       case "t":
@@ -536,4 +528,4 @@ class ControlsLogic {
   }
 }
 
-export default ControlsLogic;
+export default Controls;

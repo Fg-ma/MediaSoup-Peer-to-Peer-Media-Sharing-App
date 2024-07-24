@@ -3,23 +3,33 @@ import ReactDOM from "react-dom";
 import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 
 export default function FgButton({
+  externalRef,
   clickFunction,
   holdFunction,
   contentFunction,
   doubleClickFunction,
   holdContent,
   hoverContent,
-  styles,
+  className,
+  style,
   defaultDataValue,
+  holdTimeoutDuration = 500,
+  doubleClickTimeoutDuration = 250,
+  hoverTimeoutDuration = 50,
 }: {
+  externalRef?: React.RefObject<HTMLButtonElement>;
   clickFunction: () => void;
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement;
   doubleClickFunction?: () => void;
   holdContent?: React.ReactElement;
   hoverContent?: React.ReactElement;
-  styles?: string;
+  className?: string;
+  style?: React.CSSProperties;
   defaultDataValue?: string;
+  holdTimeoutDuration?: number;
+  doubleClickTimeoutDuration?: number;
+  hoverTimeoutDuration?: number;
 }) {
   const [isHeld, setIsHeld] = useState(false);
   const [isHover, setIsHover] = useState(false);
@@ -29,20 +39,19 @@ export default function FgButton({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const isClicked = useRef(false);
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
-  const holdTimeoutDuration = 500;
-  const doubleClickTimeoutDuration = 250;
-  const hoverTimeoutDuration = 50;
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
+
+    isClicked.current = true;
+
     if (holdFunction && clickTimeout.current === null) {
       holdTimeout.current = setTimeout(() => {
         isHeldRef.current = true;
         setIsHeld(true);
       }, holdTimeoutDuration);
-      isClicked.current = true;
     }
   };
 
@@ -100,9 +109,10 @@ export default function FgButton({
   return (
     <div>
       <button
-        ref={buttonRef}
+        ref={externalRef ? externalRef : buttonRef}
         onMouseDown={(event) => handleMouseDown(event)}
-        className={styles}
+        className={className}
+        style={style}
         data-value={defaultDataValue}
         onDoubleClick={handleDoubleClick}
         onMouseEnter={() => {
@@ -126,14 +136,20 @@ export default function FgButton({
       {hoverContent && !isHeld && (
         <AnimatePresence>
           {isHover && (
-            <HoverPortal hoverContent={hoverContent} buttonRef={buttonRef} />
+            <HoverPortal
+              hoverContent={hoverContent}
+              buttonRef={externalRef ? externalRef : buttonRef}
+            />
           )}
         </AnimatePresence>
       )}
       {holdFunction && holdContent && (
         <AnimatePresence>
           {isHeld && (
-            <HoldPortal holdContent={holdContent} buttonRef={buttonRef} />
+            <HoldPortal
+              holdContent={holdContent}
+              buttonRef={externalRef ? externalRef : buttonRef}
+            />
           )}
         </AnimatePresence>
       )}
@@ -272,7 +288,7 @@ function HoverPortal({
 
   useEffect(() => {
     getPortalPosition();
-  }, []);
+  }, [hoverContent]);
 
   return ReactDOM.createPortal(
     <motion.div

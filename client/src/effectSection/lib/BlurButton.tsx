@@ -1,7 +1,7 @@
 import React, { useState } from "react";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
 import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
-import { ReactSVG } from "react-svg";
-import FgButton from "../../fgVideo/FgButton";
 import blurIcon from "../../../public/svgs/blurIcon.svg";
 import blurOffIcon from "../../../public/svgs/blurOffIcon.svg";
 
@@ -29,26 +29,27 @@ export default function BlurButton({
       }}
       contentFunction={() => {
         return (
-          <ReactSVG
+          <FgSVG
             src={
               userStreamEffects.current.blur[type]?.[videoId]
                 ? blurOffIcon
                 : blurIcon
             }
-            beforeInjection={(svg) => {
-              svg.setAttribute("style", "fill: white");
-              svg.setAttribute("width", "width: 90%");
-              svg.setAttribute("height", "height: 90%");
-            }}
+            attributes={[
+              { key: "width", value: "95%" },
+              { key: "height", value: "95%" },
+              { key: "fill", value: "white" },
+            ]}
           />
         );
       }}
       hoverContent={
         <div className='mb-4 w-max py-1 px-2 border border-white border-opacity-75 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Blur video
+          Blur
         </div>
       }
-      styles={"flex items-center justify-center w-10 aspect-square"}
+      className='flex items-center justify-center w-10 aspect-square'
+      hoverTimeoutDuration={750}
     />
   );
 }

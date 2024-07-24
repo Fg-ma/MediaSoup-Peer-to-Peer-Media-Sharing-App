@@ -1,5 +1,5 @@
 import React from "react";
-import ControlsLogic from "./lib/ControlsLogic";
+import ControlsLogic from "../fgVideoControls/lib/Controls";
 import closeIcon from "../../public/svgs/close.svg";
 
 export default function Navigation({

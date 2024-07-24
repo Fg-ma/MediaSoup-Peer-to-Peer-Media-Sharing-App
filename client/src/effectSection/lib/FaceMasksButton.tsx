@@ -1,6 +1,6 @@
 import React from "react";
-import { ReactSVG } from "react-svg";
-import FgButton from "../../fgVideo/FgButton";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
 import {
   useCurrentEffectsStylesContext,
   FaceMasksEffectTypes,
@@ -79,13 +79,12 @@ export default function FaceMasksButton({
           ];
 
         return (
-          <ReactSVG
+          <FgSVG
             src={iconSrc}
-            beforeInjection={(svg) => {
-              svg.setAttribute("width", "width: 90%");
-              svg.setAttribute("height", "height: 90%");
-            }}
-            data-value={currentEffectsStyles.current[videoId].faceMasks.style}
+            attributes={[
+              { key: "width", value: "95%" },
+              { key: "height", value: "95%" },
+            ]}
           />
         );
       }}
@@ -116,11 +115,12 @@ export default function FaceMasksButton({
       }
       hoverContent={
         <div className='mb-4 w-max py-1 px-2 border border-white border-opacity-75 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Face mask effects
+          Face mask
         </div>
       }
-      styles={"flex items-center justify-center w-10 aspect-square"}
+      className='flex items-center justify-center w-10 aspect-square'
       defaultDataValue={currentEffectsStyles.current[videoId].faceMasks.style}
+      hoverTimeoutDuration={750}
     />
   );
 }

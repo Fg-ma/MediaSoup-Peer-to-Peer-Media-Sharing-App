@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { ReactSVG } from "react-svg";
-import FgButton from "../../fgVideo/FgButton";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
 import {
   useCurrentEffectsStylesContext,
   EarsEffectTypes,
@@ -96,13 +96,12 @@ export default function EarsButton({
           ];
 
         return (
-          <ReactSVG
+          <FgSVG
             src={iconSrc}
-            beforeInjection={(svg) => {
-              svg.setAttribute("style", "fill: white");
-              svg.setAttribute("width", "width: 90%");
-              svg.setAttribute("height", "height: 90%");
-            }}
+            attributes={[
+              { key: "width", value: "95%" },
+              { key: "height", value: "95%" },
+            ]}
             data-value={currentEffectsStyles.current[videoId].ears.style}
           />
         );
@@ -150,11 +149,12 @@ export default function EarsButton({
       }
       hoverContent={
         <div className='mb-4 w-max py-1 px-2 border border-white border-opacity-75 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Ears effects
+          Ears
         </div>
       }
-      styles={"flex items-center justify-center w-10 aspect-square"}
+      className='flex items-center justify-center w-10 aspect-square'
       defaultDataValue={currentEffectsStyles.current[videoId].ears.style}
+      hoverTimeoutDuration={750}
     />
   );
 }

@@ -1,13 +1,14 @@
 import { AnimatePresence } from "framer-motion";
-import React from "react";
-import EffectSection from "../effectSection/EffectSection";
-import VolumeSection from "./VolumeSection";
-import effectIcon from "../../public/svgs/effectIcon.svg";
-import effectOffIcon from "../../public/svgs/effectOffIcon.svg";
-import ControlsLogic from "./lib/ControlsLogic";
+import React, { useState } from "react";
+import Controls from "./lib/Controls";
 import { EffectTypes } from "../context/StreamsContext";
+import EffectSection from "../effectSection/EffectSection";
+import VolumeSection from "../fgVideo/VolumeSection";
+import FullScreenButton from "./lib/FullScreenButton";
+import PictureInPictureButton from "./lib/PictureInPictureButton";
+import EffectsButton from "./lib/EffectsButton";
 
-export default function Controls({
+export default function FgVideoControls({
   videoId,
   type,
   controls,
@@ -38,7 +39,7 @@ export default function Controls({
 }: {
   videoId: string;
   type: "camera" | "screen";
-  controls: ControlsLogic;
+  controls: Controls;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   audioRef: React.RefObject<HTMLAudioElement>;
   videoIconStateRef: React.MutableRefObject<{
@@ -70,11 +71,13 @@ export default function Controls({
   tintColor: React.MutableRefObject<string>;
   paths: string[][];
 }) {
+  const [effectsActive, setEffectsActive] = useState(false);
+
   return (
     <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
       <div className='relative pointer-events-auto'>
         <AnimatePresence>
-          {isEffects && (
+          {effectsActive && (
             <EffectSection
               videoContainerRef={videoContainerRef}
               type={type}
@@ -132,24 +135,13 @@ export default function Controls({
           {isCurrentTime && isTotalTime && "/"}
           {isTotalTime && <div ref={totalTimeRef} className='total-time'></div>}
         </div>
-        <button
-          onClick={() => controls.handleEffects()}
-          className='flex items-center justify-center w-10 aspect-square relative'
-        >
-          {isEffects ? (
-            <img
-              src={effectOffIcon}
-              alt='icon'
-              style={{ width: "90%", height: "90%" }}
-            />
-          ) : (
-            <img
-              src={effectIcon}
-              alt='icon'
-              style={{ width: "90%", height: "90%" }}
-            />
-          )}
-        </button>
+        {isEffects && (
+          <EffectsButton
+            controls={controls}
+            effectsActive={effectsActive}
+            setEffectsActive={setEffectsActive}
+          />
+        )}
         {isPlaybackSpeed && (
           <button
             ref={playbackSpeedButtonRef}
@@ -176,23 +168,7 @@ export default function Controls({
             <div className='caption-button-underline'></div>
           </button>
         )}
-        {isPictureInPicture && (
-          <button
-            onClick={() => controls.handleMiniPlayer()}
-            className='flex items-center justify-center'
-          >
-            <div className='mini-player-icon h-9 w-9 flex items-center justify-center'>
-              <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-end items-end'>
-                <div className='bg-white w-3 h-2 rounded-sm mr-0.5 mb-0.5'></div>
-              </div>
-            </div>
-            <div className='exit-mini-player-icon h-9 w-9 flex items-center justify-center'>
-              <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-start items-start'>
-                <div className='bg-white w-3 h-2 rounded-sm ml-0.5 mt-0.5'></div>
-              </div>
-            </div>
-          </button>
-        )}
+        {isPictureInPicture && <PictureInPictureButton controls={controls} />}
         {isTheater && (
           <button
             onClick={() => controls.handleTheater()}
@@ -206,33 +182,7 @@ export default function Controls({
             </div>
           </button>
         )}
-        {isFullScreen && (
-          <button
-            onClick={() => controls.handleFullscreen()}
-            className='flex items-center justify-center'
-          >
-            <svg
-              className='full-screen-icon'
-              xmlns='http://www.w3.org/2000/svg'
-              height='36px'
-              viewBox='0 -960 960 960'
-              width='36px'
-              fill='white'
-            >
-              <path d='M200-200h80q17 0 28.5 11.5T320-160q0 17-11.5 28.5T280-120H160q-17 0-28.5-11.5T120-160v-120q0-17 11.5-28.5T160-320q17 0 28.5 11.5T200-280v80Zm560 0v-80q0-17 11.5-28.5T800-320q17 0 28.5 11.5T840-280v120q0 17-11.5 28.5T800-120H680q-17 0-28.5-11.5T640-160q0-17 11.5-28.5T680-200h80ZM200-760v80q0 17-11.5 28.5T160-640q-17 0-28.5-11.5T120-680v-120q0-17 11.5-28.5T160-840h120q17 0 28.5 11.5T320-800q0 17-11.5 28.5T280-760h-80Zm560 0h-80q-17 0-28.5-11.5T640-800q0-17 11.5-28.5T680-840h120q17 0 28.5 11.5T840-800v120q0 17-11.5 28.5T800-640q-17 0-28.5-11.5T760-680v-80Z' />
-            </svg>
-            <svg
-              className='exit-full-screen-icon'
-              xmlns='http://www.w3.org/2000/svg'
-              height='36px'
-              viewBox='0 -960 960 960'
-              width='36px'
-              fill='white'
-            >
-              <path d='M240-240h-80q-17 0-28.5-11.5T120-280q0-17 11.5-28.5T160-320h120q17 0 28.5 11.5T320-280v120q0 17-11.5 28.5T280-120q-17 0-28.5-11.5T240-160v-80Zm480 0v80q0 17-11.5 28.5T680-120q-17 0-28.5-11.5T640-160v-120q0-17 11.5-28.5T680-320h120q17 0 28.5 11.5T840-280q0 17-11.5 28.5T800-240h-80ZM240-720v-80q0-17 11.5-28.5T280-840q17 0 28.5 11.5T320-800v120q0 17-11.5 28.5T280-640H160q-17 0-28.5-11.5T120-680q0-17 11.5-28.5T160-720h80Zm480 0h80q17 0 28.5 11.5T840-680q0 17-11.5 28.5T800-640H680q-17 0-28.5-11.5T640-680v-120q0-17 11.5-28.5T680-840q17 0 28.5 11.5T720-800v80Z' />
-            </svg>
-          </button>
-        )}
+        {isFullScreen && <FullScreenButton controls={controls} />}
       </div>
     </div>
   );
