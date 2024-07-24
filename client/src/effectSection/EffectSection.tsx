@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { EffectTypes } from "../context/StreamsContext";
-import GlassesEffectSectionButton from "./GlassesEffectSectionButton";
-import EarsEffectSectionButton from "./EarsEffectSectionButton";
-import BeardsEffectSectionButton from "./BeardsEffectSectionButton";
-import MustachesEffectSectionButton from "./MustachesEffectSectionButton";
-import FaceMasksEffectSectionButton from "./FaceMasksEffectSectionButton";
-import TintSection from "./TintSection";
-import BlurSection from "./BlurSection";
+import GlassesButton from "./lib/GlassesButton";
+import EarsButton from "./lib/EarsButton";
+import BeardsButton from "./lib/BeardsButton";
+import MustachesButton from "./lib/MustachesButton";
+import FaceMasksButton from "./lib/FaceMasksButton";
+import TintSection from "./lib/TintSection";
+import BlurButtton from "./lib/BlurButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -92,7 +92,7 @@ export default function EffectSection({
       exit='init'
       transition={EffectSectionTransition}
     >
-      <BlurSection
+      <BlurButtton
         videoId={videoId}
         type={type}
         handleEffectChange={handleEffectChange}
@@ -105,31 +105,31 @@ export default function EffectSection({
         tintColor={tintColor}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <EarsEffectSectionButton
+      <EarsButton
         handleEffectChange={handleEffectChange}
         type={type}
         videoId={videoId}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <GlassesEffectSectionButton
+      <GlassesButton
         handleEffectChange={handleEffectChange}
         type={type}
         videoId={videoId}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <BeardsEffectSectionButton
+      <BeardsButton
         handleEffectChange={handleEffectChange}
         type={type}
         videoId={videoId}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <MustachesEffectSectionButton
+      <MustachesButton
         handleEffectChange={handleEffectChange}
         type={type}
         videoId={videoId}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <FaceMasksEffectSectionButton
+      <FaceMasksButton
         handleEffectChange={handleEffectChange}
         type={type}
         videoId={videoId}

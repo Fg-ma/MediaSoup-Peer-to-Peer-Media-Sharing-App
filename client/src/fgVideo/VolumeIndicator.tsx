@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from "react-spring";
-import { colors } from "./colors";
+import { colors } from "./lib/colors";
 
 const VolumeIndicator = ({
   audioStream,

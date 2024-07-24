@@ -44,7 +44,7 @@ import {
   volumeLowOffB2b,
   volumeLowOffB3a,
   volumeLowOffB3b,
-} from "../fgVideo/svgPaths";
+} from "../fgVideo/lib/svgPaths";
 import FgVideo from "../fgVideo/FgVideo";
 import VolumeIndicator from "../fgVideo/VolumeIndicator";
 import { useStreamsContext } from "../context/StreamsContext";
@@ -68,7 +68,6 @@ export default function Bundle({
   muteButtonCallback,
   initialVolume = "high",
   onRendered,
-  producerTransport,
 }: {
   username: string;
   table_id: string;
@@ -84,9 +83,6 @@ export default function Bundle({
   muteButtonCallback?: () => any;
   initialVolume?: string;
   onRendered?: () => any;
-  producerTransport?: React.MutableRefObject<
-    mediasoup.types.Transport<mediasoup.types.AppData> | undefined
-  >;
 }) {
   const { userStreams, remoteTracksMap } = useStreamsContext();
   const [cameraStreams, setCameraStreams] = useState<
@@ -555,7 +551,6 @@ export default function Bundle({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
-            producerTransport={producerTransport}
           />
         ))}
       {screenStreams &&
@@ -593,7 +588,6 @@ export default function Bundle({
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             tracksColorSetter={tracksColorSetter}
-            producerTransport={producerTransport}
           />
         ))}
       {audioStream &&

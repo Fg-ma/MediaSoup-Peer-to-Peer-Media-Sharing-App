@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import HoldButton from "./FgButton";
+import { ReactSVG } from "react-svg";
+import FgButton from "../../fgVideo/FgButton";
 import {
   useCurrentEffectsStylesContext,
   BeardsEffectTypes,
   beardChinOffsetsMap,
-} from "../context/CurrentEffectsStylesContext";
-import classicalCurlyBeard from "../../public/2DAssets/beards/classicalCurlyBeard.png";
-import classicalCurlyBeardIcon from "../../public/svgs/beards/classicalCurlyBeardIcon.svg";
-import classicalCurlyBeardOffIcon from "../../public/svgs/beards/classicalCurlyBeardOffIcon.svg";
-import threeDim_classicalCurlyBeardIcon from "../../public/svgs/beards/threeDim_classicalCurlyBeardIcon.svg";
-import threeDim_classicalCurlyBeardOffIcon from "../../public/svgs/beards/threeDim_classicalCurlyBeardOffIcon.svg";
-import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
+} from "../../context/CurrentEffectsStylesContext";
+import classicalCurlyBeard from "../../../public/2DAssets/beards/classicalCurlyBeard.png";
+import classicalCurlyBeardIcon from "../../../public/svgs/beards/classicalCurlyBeardIcon.svg";
+import classicalCurlyBeardOffIcon from "../../../public/svgs/beards/classicalCurlyBeardOffIcon.svg";
+import threeDim_classicalCurlyBeardIcon from "../../../public/svgs/beards/threeDim_classicalCurlyBeardIcon.svg";
+import threeDim_classicalCurlyBeardOffIcon from "../../../public/svgs/beards/threeDim_classicalCurlyBeardOffIcon.svg";
+import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
-export default function BeardsEffectSectionButton({
+export default function BeardsButton({
   handleEffectChange,
   type,
   videoId,
@@ -48,7 +49,7 @@ export default function BeardsEffectSectionButton({
   };
 
   return (
-    <HoldButton
+    <FgButton
       clickFunction={() => {
         handleEffectChange("beards");
         setButtonState(
@@ -94,10 +95,13 @@ export default function BeardsEffectSectionButton({
           ];
 
         return (
-          <img
+          <ReactSVG
             src={iconSrc}
-            alt='icon'
-            style={{ width: "90%", height: "90%" }}
+            beforeInjection={(svg) => {
+              svg.setAttribute("style", "fill: white");
+              svg.setAttribute("width", "width: 90%");
+              svg.setAttribute("height", "height: 90%");
+            }}
             data-value={currentEffectsStyles.current[videoId].beards.style}
           />
         );
@@ -141,6 +145,11 @@ export default function BeardsEffectSectionButton({
               />
             </div>
           ))}
+        </div>
+      }
+      hoverContent={
+        <div className='mb-4 w-max py-1 px-2 border border-white border-opacity-75 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+          Beard effects
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}

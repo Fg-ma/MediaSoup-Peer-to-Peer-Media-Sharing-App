@@ -1,37 +1,38 @@
 import React, { useState } from "react";
-import HoldButton from "./FgButton";
+import { ReactSVG } from "react-svg";
+import FgButton from "../../fgVideo/FgButton";
 import {
   useCurrentEffectsStylesContext,
   GlassesEffectTypes,
-} from "../context/CurrentEffectsStylesContext";
-import defaultGlasses from "../../public/2DAssets/glasses/defaultGlasses.png";
-import memeGlasses from "../../public/2DAssets/glasses/memeGlasses.png";
-import americaGlasses from "../../public/2DAssets/glasses/americaGlasses.png";
-import threeDGlasses from "../../public/2DAssets/glasses/threeDGlasses.png";
-import shades from "../../public/2DAssets/glasses/shades.png";
-import defaultGlassesIcon from "../../public/svgs/glasses/defaultGlassesIcon.svg";
-import defaultGlassesOffIcon from "../../public/svgs/glasses/defaultGlassesOffIcon.svg";
-import threeDim_defaultGlassesIcon from "../../public/svgs/glasses/threeDim_defaultGlassesIcon.svg";
-import threeDim_defaultGlassesOffIcon from "../../public/svgs/glasses/threeDim_defaultGlassesOffIcon.svg";
-import memeGlassesIcon from "../../public/svgs/glasses/memeGlassesIcon.svg";
-import memeGlassesOffIcon from "../../public/svgs/glasses/memeGlassesOffIcon.svg";
-import threeDim_memeGlassesIcon from "../../public/svgs/glasses/threeDim_memeGlassesIcon.svg";
-import threeDim_memeGlassesOffIcon from "../../public/svgs/glasses/threeDim_memeGlassesOffIcon.svg";
-import americaGlassesIcon from "../../public/svgs/glasses/americaGlassesIcon.svg";
-import americaGlassesOffIcon from "../../public/svgs/glasses/americaGlassesOffIcon.svg";
-import threeDim_americaGlassesIcon from "../../public/svgs/glasses/threeDim_americaGlassesIcon.svg";
-import threeDim_americaGlassesOffIcon from "../../public/svgs/glasses/threeDim_americaGlassesOffIcon.svg";
-import threeDGlassesIcon from "../../public/svgs/glasses/threeDGlassesIcon.svg";
-import threeDGlassesOffIcon from "../../public/svgs/glasses/threeDGlassesOffIcon.svg";
-import threeDim_threeDGlassesIcon from "../../public/svgs/glasses/threeDim_threeDGlassesIcon.svg";
-import threeDim_threeDGlassesOffIcon from "../../public/svgs/glasses/threeDim_threeDGlassesOffIcon.svg";
-import shadesIcon from "../../public/svgs/glasses/shadesIcon.svg";
-import shadesOffIcon from "../../public/svgs/glasses/shadesOffIcon.svg";
-import threeDim_shadesIcon from "../../public/svgs/glasses/threeDim_shadesIcon.svg";
-import threeDim_shadesOffIcon from "../../public/svgs/glasses/threeDim_shadesOffIcon.svg";
-import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
+} from "../../context/CurrentEffectsStylesContext";
+import defaultGlasses from "../../../public/2DAssets/glasses/defaultGlasses.png";
+import memeGlasses from "../../../public/2DAssets/glasses/memeGlasses.png";
+import americaGlasses from "../../../public/2DAssets/glasses/americaGlasses.png";
+import threeDGlasses from "../../../public/2DAssets/glasses/threeDGlasses.png";
+import shades from "../../../public/2DAssets/glasses/shades.png";
+import defaultGlassesIcon from "../../../public/svgs/glasses/defaultGlassesIcon.svg";
+import defaultGlassesOffIcon from "../../../public/svgs/glasses/defaultGlassesOffIcon.svg";
+import threeDim_defaultGlassesIcon from "../../../public/svgs/glasses/threeDim_defaultGlassesIcon.svg";
+import threeDim_defaultGlassesOffIcon from "../../../public/svgs/glasses/threeDim_defaultGlassesOffIcon.svg";
+import memeGlassesIcon from "../../../public/svgs/glasses/memeGlassesIcon.svg";
+import memeGlassesOffIcon from "../../../public/svgs/glasses/memeGlassesOffIcon.svg";
+import threeDim_memeGlassesIcon from "../../../public/svgs/glasses/threeDim_memeGlassesIcon.svg";
+import threeDim_memeGlassesOffIcon from "../../../public/svgs/glasses/threeDim_memeGlassesOffIcon.svg";
+import americaGlassesIcon from "../../../public/svgs/glasses/americaGlassesIcon.svg";
+import americaGlassesOffIcon from "../../../public/svgs/glasses/americaGlassesOffIcon.svg";
+import threeDim_americaGlassesIcon from "../../../public/svgs/glasses/threeDim_americaGlassesIcon.svg";
+import threeDim_americaGlassesOffIcon from "../../../public/svgs/glasses/threeDim_americaGlassesOffIcon.svg";
+import threeDGlassesIcon from "../../../public/svgs/glasses/threeDGlassesIcon.svg";
+import threeDGlassesOffIcon from "../../../public/svgs/glasses/threeDGlassesOffIcon.svg";
+import threeDim_threeDGlassesIcon from "../../../public/svgs/glasses/threeDim_threeDGlassesIcon.svg";
+import threeDim_threeDGlassesOffIcon from "../../../public/svgs/glasses/threeDim_threeDGlassesOffIcon.svg";
+import shadesIcon from "../../../public/svgs/glasses/shadesIcon.svg";
+import shadesOffIcon from "../../../public/svgs/glasses/shadesOffIcon.svg";
+import threeDim_shadesIcon from "../../../public/svgs/glasses/threeDim_shadesIcon.svg";
+import threeDim_shadesOffIcon from "../../../public/svgs/glasses/threeDim_shadesOffIcon.svg";
+import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
-export default function GlassesEffectSectionButton({
+export default function GlassesButton({
   handleEffectChange,
   type,
   videoId,
@@ -103,7 +104,7 @@ export default function GlassesEffectSectionButton({
   };
 
   return (
-    <HoldButton
+    <FgButton
       clickFunction={() => {
         handleEffectChange("glasses");
         setButtonState(
@@ -147,10 +148,13 @@ export default function GlassesEffectSectionButton({
           ];
 
         return (
-          <img
+          <ReactSVG
             src={iconSrc}
-            alt='icon'
-            style={{ width: "90%", height: "90%" }}
+            beforeInjection={(svg) => {
+              svg.setAttribute("style", "fill: white");
+              svg.setAttribute("width", "width: 90%");
+              svg.setAttribute("height", "height: 90%");
+            }}
             data-value={currentEffectsStyles.current[videoId].glasses.style}
           />
         );
@@ -194,6 +198,11 @@ export default function GlassesEffectSectionButton({
               />
             </div>
           ))}
+        </div>
+      }
+      hoverContent={
+        <div className='mb-4 w-max py-1 px-2 border border-white border-opacity-75 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+          Glasses effects
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}

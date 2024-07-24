@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import ReactDOM from "react-dom";
-import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
+import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
 export default function ColorPicker({
   videoId,

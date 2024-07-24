@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useRef } from "react";
 import ColorPicker from "./ColorPicker";
-import tintIcon from "../../public/svgs/tintIcon.svg";
-import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
+import tintIcon from "../../../public/svgs/tintIcon.svg";
+import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
 export default function TintSection({
   videoId,

@@ -199,7 +199,6 @@ export default function Main() {
             }
             isUser={true}
             muteButtonCallback={muteAudio}
-            producerTransport={producerTransport}
           />
         ),
       }));
@@ -244,7 +243,6 @@ export default function Main() {
 
             socket.current.emit("message", msg);
           }}
-          producerTransport={producerTransport}
         />
       ),
     }));

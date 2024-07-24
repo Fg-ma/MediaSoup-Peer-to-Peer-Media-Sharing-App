@@ -1,39 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import { AnimatePresence } from "framer-motion";
 import "./FgVideoStyles.css";
 import { useStreamsContext, EffectTypes } from "../context/StreamsContext";
-import {
-  beardChinOffsetsMap,
-  earsWidthFactorMap,
-  mustacheNoseOffsetsMap,
-  useCurrentEffectsStylesContext,
-} from "../context/CurrentEffectsStylesContext";
-import VolumeSection from "./VolumeSection";
-import handleFullscreenChange from "./lib/handleFullscreenChange";
-import handlePictureInPicture from "./lib/handlePictureInPicture";
-import formatDuration from "./lib/formatDuration";
-import loadedData from "./lib/loadedData";
-import timeUpdate from "./lib/timeUpdate";
-import handleMouseEnter from "./lib/handleMouseEnter";
-import handleMouseLeave from "./lib/handleMouseLeave";
-import handlePausePlay from "./lib/handlePausePlay";
-import handleFullscreen from "./lib/handleFullscreen";
-import handleTheater from "./lib/handleTheater";
-import handleMiniPlayer from "./lib/handleMiniPlayer";
-import handleClosedCaptions from "./lib/handleClosedCaptions";
-import handlePlaybackSpeed from "./lib/handlePlaybackSpeed";
-import handleScrubbing from "./lib/handleScrubbing";
-import handleTimelineUpdate from "./lib/handleTimelineUpdate";
-import handleKeyDown from "./lib/handleKeyDown";
-import handleKeyUp from "./lib/handleKeyUp";
-import handleCloseVideo from "./lib/handleCloseVideo";
-import EffectSection from "./EffectSection";
 import handleEffect from "../effects/handleEffect";
-import effectIcon from "../../public/svgs/effectIcon.svg";
-import effectOffIcon from "../../public/svgs/effectOffIcon.svg";
-import handleEffects from "./lib/handleEffects";
+import ControlsLogic from "./lib/ControlsLogic";
+import Navigation from "./Navigation";
+import Controls from "./Controls";
 
 export default function FgVideo({
   type,
@@ -79,7 +52,6 @@ export default function FgVideo({
   isFinishedRef,
   changedWhileNotFinishedRef,
   tracksColorSetter,
-  producerTransport,
 }: {
   type: "camera" | "screen";
   username: string;
@@ -154,6 +126,48 @@ export default function FgVideo({
   const tintColor = useRef("#F56114");
   const stream = userMedia.current.camera[videoId]?.getStream();
 
+  const controls = new ControlsLogic(
+    socket,
+    table_id,
+    username,
+    type,
+    videoId,
+    videoContainerRef,
+    captions,
+    isEffects,
+    setIsEffects,
+    controlPressed,
+    shiftPressed,
+    isPlayPause,
+    paused,
+    videoRef,
+    isFullScreen,
+    isTheater,
+    theater,
+    isPictureInPicture,
+    isVolume,
+    handleMute,
+    isSkip,
+    skipIncrement,
+    isClosedCaptions,
+    leaveVideoTimer,
+    controlsVanishTime,
+    playbackSpeedButtonRef,
+    timelineContainerRef,
+    currentTimeRef,
+    isScrubbing,
+    wasPaused,
+    previewImgRef,
+    thumbnails,
+    thumbnailImgRef,
+    totalTimeRef,
+    isTimeLine,
+    isPreview,
+    isThumbnail,
+    10,
+    5
+  );
+
   const init = () => {
     // Set videoStream as srcObject
     if (
@@ -195,7 +209,7 @@ export default function FgVideo({
 
     // Set the initial current time
     if (currentTimeRef.current) {
-      currentTimeRef.current.textContent = formatDuration(
+      currentTimeRef.current.textContent = controls.formatDuration(
         initialProgressPosition
       );
     }
@@ -236,234 +250,102 @@ export default function FgVideo({
     init();
 
     document.addEventListener("fullscreenchange", () =>
-      handleFullscreenChange(videoContainerRef)
+      controls.handleFullscreenChange()
     );
 
     document.addEventListener("keydown", (event) =>
-      handleKeyDown(
-        event,
-        videoContainerRef,
-        controlPressed,
-        shiftPressed,
-        isPlayPause,
-        paused,
-        videoRef,
-        isFullScreen,
-        isTheater,
-        theater,
-        isPictureInPicture,
-        isVolume,
-        handleMute,
-        isSkip,
-        skipIncrement,
-        isClosedCaptions,
-        captions
-      )
+      controls.handleKeyDown(event)
     );
 
-    document.addEventListener("keyup", (event) =>
-      handleKeyUp(event, shiftPressed, controlPressed)
-    );
+    document.addEventListener("keyup", (event) => controls.handleKeyUp(event));
 
     videoRef.current?.addEventListener("loadeddata", () =>
-      loadedData(
-        videoRef,
-        totalTimeRef,
-        thumbnails,
-        isTimeLine,
-        isPreview,
-        isThumbnail
-      )
+      controls.loadedData()
     );
 
     videoRef.current?.addEventListener("timeupdate", () =>
-      timeUpdate(videoRef, currentTimeRef, timelineContainerRef)
+      controls.timeUpdate()
     );
 
     videoContainerRef.current?.addEventListener("mouseenter", () =>
-      handleMouseEnter(videoContainerRef, leaveVideoTimer)
+      controls.handleMouseEnter()
     );
 
     videoContainerRef.current?.addEventListener("mouseleave", () =>
-      handleMouseLeave(videoContainerRef, leaveVideoTimer, controlsVanishTime)
+      controls.handleMouseLeave()
     );
 
     timelineContainerRef.current?.addEventListener("mousemove", (event) =>
-      handleTimelineUpdate(
-        event,
-        timelineContainerRef,
-        videoRef,
-        previewImgRef,
-        thumbnails,
-        isScrubbing,
-        thumbnailImgRef,
-        currentTimeRef
-      )
+      controls.handleTimelineUpdate(event)
     );
 
     timelineContainerRef.current?.addEventListener("mousedown", (event) =>
-      handleScrubbing(
-        event,
-        timelineContainerRef,
-        videoRef,
-        currentTimeRef,
-        isScrubbing,
-        videoContainerRef,
-        wasPaused,
-        previewImgRef,
-        thumbnails,
-        thumbnailImgRef
-      )
+      controls.handleScrubbing(event)
     );
 
     document.addEventListener("mouseup", (event) => {
       if (isScrubbing.current) {
-        handleScrubbing(
-          event,
-          timelineContainerRef,
-          videoRef,
-          currentTimeRef,
-          isScrubbing,
-          videoContainerRef,
-          wasPaused,
-          previewImgRef,
-          thumbnails,
-          thumbnailImgRef
-        );
+        controls.handleScrubbing(event);
       }
     });
 
     document.addEventListener("mousemove", (event) => {
       if (isScrubbing.current) {
-        handleTimelineUpdate(
-          event,
-          timelineContainerRef,
-          videoRef,
-          previewImgRef,
-          thumbnails,
-          isScrubbing,
-          thumbnailImgRef,
-          currentTimeRef
-        );
+        controls.handleTimelineUpdate(event);
       }
     });
 
     videoRef.current?.addEventListener("enterpictureinpicture", () =>
-      handlePictureInPicture("enter", videoContainerRef)
+      controls.handlePictureInPicture("enter")
     );
 
     videoRef.current?.addEventListener("leavepictureinpicture", () =>
-      handlePictureInPicture("leave", videoContainerRef)
+      controls.handlePictureInPicture("leave")
     );
 
     return () => {
       document.removeEventListener("fullscreenchange", () =>
-        handleFullscreenChange(videoContainerRef)
+        controls.handleFullscreenChange()
       );
       document.removeEventListener("keydown", (event) =>
-        handleKeyDown(
-          event,
-          videoContainerRef,
-          controlPressed,
-          shiftPressed,
-          isPlayPause,
-          paused,
-          videoRef,
-          isFullScreen,
-          isTheater,
-          theater,
-          isPictureInPicture,
-          isVolume,
-          handleMute,
-          isSkip,
-          skipIncrement,
-          isClosedCaptions,
-          captions
-        )
+        controls.handleKeyDown(event)
       );
       document.removeEventListener("keyup", (event) =>
-        handleKeyUp(event, shiftPressed, controlPressed)
+        controls.handleKeyUp(event)
       );
       videoRef.current?.removeEventListener("loadeddata", () =>
-        loadedData(
-          videoRef,
-          totalTimeRef,
-          thumbnails,
-          isTimeLine,
-          isPreview,
-          isThumbnail
-        )
+        controls.loadedData()
       );
       videoRef.current?.removeEventListener("timeupdate", () =>
-        timeUpdate(videoRef, currentTimeRef, timelineContainerRef)
+        controls.timeUpdate()
       );
       videoContainerRef.current?.removeEventListener("mouseenter", () =>
-        handleMouseEnter(videoContainerRef, leaveVideoTimer)
+        controls.handleMouseEnter()
       );
       videoContainerRef.current?.removeEventListener("mouseleave", () =>
-        handleMouseLeave(videoContainerRef, leaveVideoTimer, controlsVanishTime)
+        controls.handleMouseLeave()
       );
       timelineContainerRef.current?.removeEventListener("mousemove", (event) =>
-        handleTimelineUpdate(
-          event,
-          timelineContainerRef,
-          videoRef,
-          previewImgRef,
-          thumbnails,
-          isScrubbing,
-          thumbnailImgRef,
-          currentTimeRef
-        )
+        controls.handleTimelineUpdate(event)
       );
       timelineContainerRef.current?.removeEventListener("mousedown", (event) =>
-        handleScrubbing(
-          event,
-          timelineContainerRef,
-          videoRef,
-          currentTimeRef,
-          isScrubbing,
-          videoContainerRef,
-          wasPaused,
-          previewImgRef,
-          thumbnails,
-          thumbnailImgRef
-        )
+        controls.handleScrubbing(event)
       );
       document.removeEventListener("mouseup", (event) => {
         if (isScrubbing.current) {
-          handleScrubbing(
-            event,
-            timelineContainerRef,
-            videoRef,
-            currentTimeRef,
-            isScrubbing,
-            videoContainerRef,
-            wasPaused,
-            previewImgRef,
-            thumbnails,
-            thumbnailImgRef
-          );
+          controls.handleScrubbing(event);
         }
       });
       document.removeEventListener("mousemove", (event) => {
         if (isScrubbing.current) {
-          handleTimelineUpdate(
-            event,
-            timelineContainerRef,
-            videoRef,
-            previewImgRef,
-            thumbnails,
-            isScrubbing,
-            thumbnailImgRef,
-            currentTimeRef
-          );
+          controls.handleTimelineUpdate(event);
         }
       });
       videoRef.current?.removeEventListener("enterpictureinpicture", () =>
-        handlePictureInPicture("enter", videoContainerRef)
+        controls.handlePictureInPicture("enter")
       );
       videoRef.current?.removeEventListener("leavepictureinpicture", () =>
-        handlePictureInPicture("leave", videoContainerRef)
+        controls.handlePictureInPicture("leave")
       );
     };
   }, []);
@@ -536,11 +418,11 @@ export default function FgVideo({
           <video
             ref={videoRef}
             id={videoId}
-            onClick={
-              isPlayPause
-                ? () => handlePausePlay(paused, videoRef, videoContainerRef)
-                : () => {}
-            }
+            onClick={() => {
+              if (isPlayPause) {
+                controls.handlePausePlay();
+              }
+            }}
             className='main-video w-full z-0'
             controls={false}
             autoPlay={autoPlay}
@@ -568,203 +450,41 @@ export default function FgVideo({
               </div>
             </div>
           )}
-          <div className='video-navigation-container absolute top-0 w-full h-10 flex items-center justify-center z-20 space-x-2 pl-4 pr-1.5 pt-0.5'>
-            <div className='grow text-lg cursor-pointer'>
-              {name ? name : username}
-            </div>
-            {isClose && (
-              <button
-                onClick={() =>
-                  handleCloseVideo(socket, table_id, username, type, videoId)
-                }
-                className='flex items-center justify-center w-10 aspect-square'
-              >
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  height='36px'
-                  viewBox='0 -960 960 960'
-                  width='36px'
-                  fill='white'
-                >
-                  <path d='M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z' />
-                </svg>
-              </button>
-            )}
-          </div>
-          <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
-            <div className='relative pointer-events-auto'>
-              <AnimatePresence>
-                {isEffects && (
-                  <EffectSection
-                    videoContainerRef={videoContainerRef}
-                    type={type}
-                    videoId={videoId}
-                    handleEffectChange={handleEffectChange}
-                    tintColor={tintColor}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
-            <div className='video-controls w-full h-10 flex items-center space-x-2'>
-              {isPlayPause && (
-                <button
-                  onClick={() =>
-                    handlePausePlay(paused, videoRef, videoContainerRef)
-                  }
-                  className='flex items-center justify-center w-10 aspect-square'
-                >
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    height='36px'
-                    viewBox='0 -960 960 960'
-                    width='36px'
-                    fill='white'
-                    className='play-icon'
-                  >
-                    <path d='M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z' />
-                  </svg>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    height='36px'
-                    viewBox='0 -960 960 960'
-                    width='36px'
-                    fill='white'
-                    className='pause-icon'
-                  >
-                    <path d='M640-200q-33 0-56.5-23.5T560-280v-400q0-33 23.5-56.5T640-760q33 0 56.5 23.5T720-680v400q0 33-23.5 56.5T640-200Zm-320 0q-33 0-56.5-23.5T240-280v-400q0-33 23.5-56.5T320-760q33 0 56.5 23.5T400-680v400q0 33-23.5 56.5T320-200Z' />
-                  </svg>
-                </button>
-              )}
-              {isVolume && (
-                <VolumeSection
-                  isSlider={isSlider}
-                  audioRef={audioRef}
-                  handleVolumeSlider={handleVolumeSlider}
-                  handleMute={handleMute}
-                  paths={paths}
-                  videoIconStateRef={videoIconStateRef}
-                  isFinishedRef={isFinishedRef}
-                  changedWhileNotFinishedRef={changedWhileNotFinishedRef}
-                />
-              )}
-              <div className='duration-container flex items-center gap-1 grow'>
-                {isCurrentTime && (
-                  <div ref={currentTimeRef} className='current-time'></div>
-                )}
-                {isCurrentTime && isTotalTime && "/"}
-                {isTotalTime && (
-                  <div ref={totalTimeRef} className='total-time'></div>
-                )}
-              </div>
-              <button
-                onClick={() =>
-                  handleEffects(isEffects, setIsEffects, videoContainerRef)
-                }
-                className='flex items-center justify-center w-10 aspect-square relative'
-              >
-                {isEffects ? (
-                  <img
-                    src={effectOffIcon}
-                    alt='icon'
-                    style={{ width: "90%", height: "90%" }}
-                  />
-                ) : (
-                  <img
-                    src={effectIcon}
-                    alt='icon'
-                    style={{ width: "90%", height: "90%" }}
-                  />
-                )}
-              </button>
-              {isPlaybackSpeed && (
-                <button
-                  ref={playbackSpeedButtonRef}
-                  onClick={() =>
-                    handlePlaybackSpeed(videoRef, playbackSpeedButtonRef)
-                  }
-                  className='playback-speed-button wide-button text-lg'
-                >
-                  1x
-                </button>
-              )}
-              {isClosedCaptions && (
-                <button
-                  onClick={() =>
-                    handleClosedCaptions(captions, videoContainerRef)
-                  }
-                  className='caption-button flex-col items-center justify-center'
-                >
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    height='36px'
-                    viewBox='0 -960 960 960'
-                    width='36px'
-                    fill='white'
-                  >
-                    <path d='M200-160q-33 0-56.5-23.5T120-240v-480q0-33 23.5-56.5T200-800h560q33 0 56.5 23.5T840-720v480q0 33-23.5 56.5T760-160H200Zm80-200h120q17 0 28.5-11.5T440-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T400-600H280q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm400-240H560q-17 0-28.5 11.5T520-560v160q0 17 11.5 28.5T560-360h120q17 0 28.5-11.5T720-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T680-600Z' />
-                  </svg>
-                  <div className='caption-button-underline'></div>
-                </button>
-              )}
-              {isPictureInPicture && (
-                <button
-                  onClick={() => handleMiniPlayer(videoContainerRef, videoRef)}
-                  className='flex items-center justify-center'
-                >
-                  <div className='mini-player-icon h-9 w-9 flex items-center justify-center'>
-                    <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-end items-end'>
-                      <div className='bg-white w-3 h-2 rounded-sm mr-0.5 mb-0.5'></div>
-                    </div>
-                  </div>
-                  <div className='exit-mini-player-icon h-9 w-9 flex items-center justify-center'>
-                    <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-start items-start'>
-                      <div className='bg-white w-3 h-2 rounded-sm ml-0.5 mt-0.5'></div>
-                    </div>
-                  </div>
-                </button>
-              )}
-              {isTheater && (
-                <button
-                  onClick={() => handleTheater(theater, videoContainerRef)}
-                  className='flex items-center justify-center'
-                >
-                  <div className='theater-icon h-9 w-9 flex items-center justify-center'>
-                    <div className='border-3 border-white w-8 h-6 rounded-md'></div>
-                  </div>
-                  <div className='exit-theater-icon h-9 w-9 flex items-center justify-center'>
-                    <div className='border-3 border-white w-8 h-4 rounded-md'></div>
-                  </div>
-                </button>
-              )}
-              {isFullScreen && (
-                <button
-                  onClick={() => handleFullscreen(videoContainerRef)}
-                  className='flex items-center justify-center'
-                >
-                  <svg
-                    className='full-screen-icon'
-                    xmlns='http://www.w3.org/2000/svg'
-                    height='36px'
-                    viewBox='0 -960 960 960'
-                    width='36px'
-                    fill='white'
-                  >
-                    <path d='M200-200h80q17 0 28.5 11.5T320-160q0 17-11.5 28.5T280-120H160q-17 0-28.5-11.5T120-160v-120q0-17 11.5-28.5T160-320q17 0 28.5 11.5T200-280v80Zm560 0v-80q0-17 11.5-28.5T800-320q17 0 28.5 11.5T840-280v120q0 17-11.5 28.5T800-120H680q-17 0-28.5-11.5T640-160q0-17 11.5-28.5T680-200h80ZM200-760v80q0 17-11.5 28.5T160-640q-17 0-28.5-11.5T120-680v-120q0-17 11.5-28.5T160-840h120q17 0 28.5 11.5T320-800q0 17-11.5 28.5T280-760h-80Zm560 0h-80q-17 0-28.5-11.5T640-800q0-17 11.5-28.5T680-840h120q17 0 28.5 11.5T840-800v120q0 17-11.5 28.5T800-640q-17 0-28.5-11.5T760-680v-80Z' />
-                  </svg>
-                  <svg
-                    className='exit-full-screen-icon'
-                    xmlns='http://www.w3.org/2000/svg'
-                    height='36px'
-                    viewBox='0 -960 960 960'
-                    width='36px'
-                    fill='white'
-                  >
-                    <path d='M240-240h-80q-17 0-28.5-11.5T120-280q0-17 11.5-28.5T160-320h120q17 0 28.5 11.5T320-280v120q0 17-11.5 28.5T280-120q-17 0-28.5-11.5T240-160v-80Zm480 0v80q0 17-11.5 28.5T680-120q-17 0-28.5-11.5T640-160v-120q0-17 11.5-28.5T680-320h120q17 0 28.5 11.5T840-280q0 17-11.5 28.5T800-240h-80ZM240-720v-80q0-17 11.5-28.5T280-840q17 0 28.5 11.5T320-800v120q0 17-11.5 28.5T280-640H160q-17 0-28.5-11.5T120-680q0-17 11.5-28.5T160-720h80Zm480 0h80q17 0 28.5 11.5T840-680q0 17-11.5 28.5T800-640H680q-17 0-28.5-11.5T640-680v-120q0-17 11.5-28.5T680-840q17 0 28.5 11.5T720-800v80Z' />
-                  </svg>
-                </button>
-              )}
-            </div>
-          </div>
+          <Navigation
+            name={name}
+            username={username}
+            isClose={isClose}
+            controls={controls}
+          />
+          <Controls
+            videoId={videoId}
+            type={type}
+            controls={controls}
+            videoContainerRef={videoContainerRef}
+            audioRef={audioRef}
+            videoIconStateRef={videoIconStateRef}
+            currentTimeRef={currentTimeRef}
+            totalTimeRef={totalTimeRef}
+            isFinishedRef={isFinishedRef}
+            playbackSpeedButtonRef={playbackSpeedButtonRef}
+            changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+            handleEffectChange={handleEffectChange}
+            handleVolumeSlider={handleVolumeSlider}
+            handleMute={handleMute}
+            isEffects={isEffects}
+            isPlayPause={isPlayPause}
+            isCurrentTime={isCurrentTime}
+            isVolume={isVolume}
+            isSlider={isSlider}
+            isTotalTime={isTotalTime}
+            isPlaybackSpeed={isPlaybackSpeed}
+            isClosedCaptions={isClosedCaptions}
+            isPictureInPicture={isPictureInPicture}
+            isTheater={isTheater}
+            isFullScreen={isFullScreen}
+            tintColor={tintColor}
+            paths={paths}
+          />
           <div
             className='controls-gradient absolute bottom-0 w-full h-20 z-10'
             style={{

@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import HoldButton from "./FgButton";
+import { ReactSVG } from "react-svg";
+import FgButton from "../../fgVideo/FgButton";
 import {
   useCurrentEffectsStylesContext,
   EarsEffectTypes,
   earsWidthFactorMap,
-} from "../context/CurrentEffectsStylesContext";
-import dogEars from "../../public/2DAssets/ears/dogEars.png";
-import dogEarsIcon from "../../public/svgs/ears/dogEarsIcon.svg";
-import dogEarsOffIcon from "../../public/svgs/ears/dogEarsOffIcon.svg";
-import threeDim_dogEarsIcon from "../../public/svgs/ears/threeDim_dogEarsIcon.svg";
-import threeDim_dogEarsOffIcon from "../../public/svgs/ears/threeDim_dogEarsOffIcon.svg";
-import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
+} from "../../context/CurrentEffectsStylesContext";
+import dogEars from "../../../public/2DAssets/ears/dogEars.png";
+import dogEarsIcon from "../../../public/svgs/ears/dogEarsIcon.svg";
+import dogEarsOffIcon from "../../../public/svgs/ears/dogEarsOffIcon.svg";
+import threeDim_dogEarsIcon from "../../../public/svgs/ears/threeDim_dogEarsIcon.svg";
+import threeDim_dogEarsOffIcon from "../../../public/svgs/ears/threeDim_dogEarsOffIcon.svg";
+import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
-export default function EarsEffectSectionButton({
+export default function EarsButton({
   handleEffectChange,
   type,
   videoId,
@@ -48,7 +49,7 @@ export default function EarsEffectSectionButton({
   };
 
   return (
-    <HoldButton
+    <FgButton
       clickFunction={() => {
         handleEffectChange("ears");
         setButtonState(
@@ -95,10 +96,13 @@ export default function EarsEffectSectionButton({
           ];
 
         return (
-          <img
+          <ReactSVG
             src={iconSrc}
-            alt='icon'
-            style={{ width: "90%", height: "90%" }}
+            beforeInjection={(svg) => {
+              svg.setAttribute("style", "fill: white");
+              svg.setAttribute("width", "width: 90%");
+              svg.setAttribute("height", "height: 90%");
+            }}
             data-value={currentEffectsStyles.current[videoId].ears.style}
           />
         );
@@ -142,6 +146,11 @@ export default function EarsEffectSectionButton({
               />
             </div>
           ))}
+        </div>
+      }
+      hoverContent={
+        <div className='mb-4 w-max py-1 px-2 border border-white border-opacity-75 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+          Ears effects
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}

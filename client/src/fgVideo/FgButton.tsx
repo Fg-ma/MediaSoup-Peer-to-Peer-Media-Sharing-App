@@ -8,31 +8,36 @@ export default function FgButton({
   contentFunction,
   doubleClickFunction,
   holdContent,
+  hoverContent,
   styles,
   defaultDataValue,
 }: {
   clickFunction: () => void;
-  holdFunction: (event: React.MouseEvent<Element, MouseEvent>) => void;
-  contentFunction: () => React.ReactElement;
+  holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
+  contentFunction?: () => React.ReactElement;
   doubleClickFunction?: () => void;
-  holdContent: React.ReactElement;
-  styles: string;
-  defaultDataValue: string;
+  holdContent?: React.ReactElement;
+  hoverContent?: React.ReactElement;
+  styles?: string;
+  defaultDataValue?: string;
 }) {
   const [isHeld, setIsHeld] = useState(false);
+  const [isHover, setIsHover] = useState(false);
   const isHeldRef = useRef(false);
   const holdTimeout = useRef<NodeJS.Timeout>();
-  const holdButtonRef = useRef<HTMLButtonElement>(null);
+  const hoverTimeout = useRef<NodeJS.Timeout>();
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const isClicked = useRef(false);
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
   const holdTimeoutDuration = 500;
   const doubleClickTimeoutDuration = 250;
+  const hoverTimeoutDuration = 50;
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    if (clickTimeout.current === null) {
+    if (holdFunction && clickTimeout.current === null) {
       holdTimeout.current = setTimeout(() => {
         isHeldRef.current = true;
         setIsHeld(true);
@@ -44,15 +49,21 @@ export default function FgButton({
   const handleMouseUp = (event: React.MouseEvent<Element, MouseEvent>) => {
     if (isClicked.current && clickTimeout.current === null) {
       if (!isHeldRef.current) {
-        clickTimeout.current = setTimeout(() => {
+        if (doubleClickFunction) {
+          clickTimeout.current = setTimeout(() => {
+            clickFunction();
+            if (clickTimeout.current !== null) {
+              clearTimeout(clickTimeout.current);
+              clickTimeout.current = null;
+            }
+          }, doubleClickTimeoutDuration);
+        } else {
           clickFunction();
-          if (clickTimeout.current !== null) {
-            clearTimeout(clickTimeout.current);
-            clickTimeout.current = null;
-          }
-        }, doubleClickTimeoutDuration);
+        }
       } else {
-        holdFunction(event);
+        if (holdFunction) {
+          holdFunction(event);
+        }
       }
 
       if (holdTimeout.current !== null) {
@@ -89,27 +100,48 @@ export default function FgButton({
   return (
     <div>
       <button
-        ref={holdButtonRef}
+        ref={buttonRef}
         onMouseDown={(event) => handleMouseDown(event)}
         className={styles}
         data-value={defaultDataValue}
         onDoubleClick={handleDoubleClick}
+        onMouseEnter={() => {
+          if (hoverContent) {
+            hoverTimeout.current = setTimeout(() => {
+              setIsHover(true);
+            }, hoverTimeoutDuration);
+          }
+        }}
+        onMouseLeave={() => {
+          if (hoverContent) {
+            if (hoverTimeout.current !== null) {
+              clearTimeout(hoverTimeout.current);
+            }
+            setIsHover(false);
+          }
+        }}
       >
-        {contentFunction()}
+        {contentFunction && contentFunction()}
       </button>
-      <AnimatePresence>
-        {isHeld && (
-          <HoldButtonPortal
-            holdContent={holdContent}
-            holdButtonRef={holdButtonRef}
-          />
-        )}
-      </AnimatePresence>
+      {hoverContent && !isHeld && (
+        <AnimatePresence>
+          {isHover && (
+            <HoverPortal hoverContent={hoverContent} buttonRef={buttonRef} />
+          )}
+        </AnimatePresence>
+      )}
+      {holdFunction && holdContent && (
+        <AnimatePresence>
+          {isHeld && (
+            <HoldPortal holdContent={holdContent} buttonRef={buttonRef} />
+          )}
+        </AnimatePresence>
+      )}
     </div>
   );
 }
 
-const HoldButtonPortalVar: Variants = {
+const HoldPortalVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
   animate: {
     opacity: 1,
@@ -120,24 +152,24 @@ const HoldButtonPortalVar: Variants = {
   },
 };
 
-const HoldButtonPortalTransition: Transition = {
+const HoldPortalTransition: Transition = {
   transition: {
-    opacity: { duration: 0.15, delay: 0.0 },
+    opacity: { duration: 0.15 },
   },
 };
 
-function HoldButtonPortal({
+function HoldPortal({
   holdContent,
-  holdButtonRef,
+  buttonRef,
 }: {
   holdContent: React.ReactElement;
-  holdButtonRef: React.RefObject<HTMLButtonElement>;
+  buttonRef: React.RefObject<HTMLButtonElement>;
 }) {
   const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
   const portalRef = useRef<HTMLDivElement>(null);
 
   const getPortalPosition = () => {
-    const holdButtonRect = holdButtonRef.current?.getBoundingClientRect();
+    const holdButtonRect = buttonRef.current?.getBoundingClientRect();
     const portalRect = portalRef.current?.getBoundingClientRect();
 
     if (!holdButtonRect || !portalRect) {
@@ -174,13 +206,91 @@ function HoldButtonPortal({
         top: `${portalPosition.top}%`,
         left: `${portalPosition.left}%`,
       }}
-      variants={HoldButtonPortalVar}
+      variants={HoldPortalVar}
       initial='init'
       animate='animate'
       exit='init'
-      transition={HoldButtonPortalTransition}
+      transition={HoldPortalTransition}
     >
       {holdContent}
+    </motion.div>,
+    document.body
+  );
+}
+
+const HoverPortalVar: Variants = {
+  init: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      scale: { type: "spring", stiffness: 100 },
+    },
+  },
+};
+
+const HoverPortalTransition: Transition = {
+  transition: {
+    opacity: { duration: 0.001 },
+    scale: { duration: 0.001 },
+  },
+};
+
+function HoverPortal({
+  hoverContent,
+  buttonRef,
+}: {
+  hoverContent: React.ReactElement;
+  buttonRef: React.RefObject<HTMLButtonElement>;
+}) {
+  const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
+  const portalRef = useRef<HTMLDivElement>(null);
+
+  const getPortalPosition = () => {
+    const holdButtonRect = buttonRef.current?.getBoundingClientRect();
+    const portalRect = portalRef.current?.getBoundingClientRect();
+
+    if (!holdButtonRect || !portalRect) {
+      return;
+    }
+
+    const top = holdButtonRect.top - portalRect.height / 0.8;
+    const left =
+      holdButtonRect.left +
+      holdButtonRect.width / 2 -
+      portalRect.width / 2 / 0.8;
+
+    const bodyRect = document.body.getBoundingClientRect();
+    const topPercent = (top / bodyRect.height) * 100;
+    const leftPercent = (left / bodyRect.width) * 100;
+
+    setPortalPosition({
+      top: topPercent,
+      left: leftPercent,
+    });
+  };
+
+  useEffect(() => {
+    getPortalPosition();
+  }, []);
+
+  return ReactDOM.createPortal(
+    <motion.div
+      ref={portalRef}
+      className={`${
+        !portalPosition.top && !portalPosition.left && "opacity-0"
+      } absolute w-min h-min z-20`}
+      style={{
+        top: `${portalPosition.top}%`,
+        left: `${portalPosition.left}%`,
+      }}
+      variants={HoverPortalVar}
+      initial='init'
+      animate='animate'
+      exit='init'
+      transition={HoverPortalTransition}
+    >
+      {hoverContent}
     </motion.div>,
     document.body
   );

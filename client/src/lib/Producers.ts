@@ -728,10 +728,10 @@ class Producers {
         this.userMedia.current[event.producerType] = undefined;
       }
 
+      // Delete old stream effects
       for (const effectType in this.userStreamEffects.current) {
         const typedEffectType =
           effectType as keyof typeof this.userStreamEffects.current;
-
         if (
           (event.producerType === "camera" ||
             event.producerType === "screen") &&
@@ -752,6 +752,7 @@ class Producers {
         }
       }
 
+      // Clean up bundles and producer transport if necessary
       if (
         (!this.userStreams.current.camera ||
           Object.keys(this.userStreams.current.camera).length === 0) &&
@@ -768,6 +769,8 @@ class Producers {
         });
         this.producerTransport.current = undefined;
       }
+
+      // Clean up camera and screen states
       if (Object.keys(this.userStreams.current.camera).length === 0) {
         this.isCamera.current = false;
         this.setCameraActive(false);
@@ -782,24 +785,52 @@ class Producers {
         this.isScreen.current = true;
         this.setScreenActive(true);
       }
+
+      // Re-enable button
       this.handleDisableEnableBtns(false);
     } else {
+      // Delete remote tracks
       if (event.producerType === "camera" || event.producerType === "screen") {
         delete this.remoteTracksMap.current[event.producerUsername]?.[
           event.producerType
         ]?.[event.producerId];
+
+        if (
+          this.remoteTracksMap.current[event.producerUsername] &&
+          Object.keys(
+            this.remoteTracksMap.current[event.producerUsername][
+              event.producerType
+            ] || {}
+          ).length === 0
+        ) {
+          delete this.remoteTracksMap.current[event.producerUsername]?.[
+            event.producerType
+          ];
+
+          if (
+            this.remoteTracksMap.current[event.producerUsername] &&
+            Object.keys(this.remoteTracksMap.current[event.producerUsername])
+              .length === 0
+          ) {
+            delete this.remoteTracksMap.current[event.producerUsername];
+          }
+        }
       } else if (event.producerType === "audio") {
         delete this.remoteTracksMap.current[event.producerUsername]?.[
           event.producerType
         ];
+
+        if (
+          this.remoteTracksMap.current[event.producerUsername] &&
+          Object.keys(this.remoteTracksMap.current[event.producerUsername])
+            .length === 0
+        ) {
+          delete this.remoteTracksMap.current[event.producerUsername];
+        }
       }
 
-      if (
-        this.remoteTracksMap.current[event.producerUsername] &&
-        Object.keys(this.remoteTracksMap.current[event.producerUsername])
-          .length === 0
-      ) {
-        delete this.remoteTracksMap.current[event.producerUsername];
+      // Clean up bundles
+      if (!this.remoteTracksMap.current[event.producerUsername]) {
         this.setBundles((prev) => {
           const newBundles = prev;
           if (newBundles) {

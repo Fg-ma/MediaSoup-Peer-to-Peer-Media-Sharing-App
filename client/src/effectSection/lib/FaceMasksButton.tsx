@@ -1,17 +1,18 @@
 import React from "react";
-import FgButton from "./FgButton";
+import { ReactSVG } from "react-svg";
+import FgButton from "../../fgVideo/FgButton";
 import {
   useCurrentEffectsStylesContext,
   FaceMasksEffectTypes,
-} from "../context/CurrentEffectsStylesContext";
-import faceMask1 from "../../public/2DAssets/faceMasks/faceMask1.png";
-import faceMaskIcon1 from "../../public/svgs/faceMasks/faceMaskIcon1.svg";
-import faceMaskOffIcon1 from "../../public/svgs/faceMasks/faceMaskOffIcon1.svg";
-import threeDim_faceMaskIcon1 from "../../public/svgs/faceMasks/threeDim_faceMaskIcon1.svg";
-import threeDim_faceMaskOffIcon1 from "../../public/svgs/faceMasks/threeDim_faceMaskOffIcon1.svg";
-import { EffectTypes, useStreamsContext } from "../context/StreamsContext";
+} from "../../context/CurrentEffectsStylesContext";
+import faceMask1 from "../../../public/2DAssets/faceMasks/faceMask1.png";
+import faceMaskIcon1 from "../../../public/svgs/faceMasks/faceMaskIcon1.svg";
+import faceMaskOffIcon1 from "../../../public/svgs/faceMasks/faceMaskOffIcon1.svg";
+import threeDim_faceMaskIcon1 from "../../../public/svgs/faceMasks/threeDim_faceMaskIcon1.svg";
+import threeDim_faceMaskOffIcon1 from "../../../public/svgs/faceMasks/threeDim_faceMaskOffIcon1.svg";
+import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
-export default function FaceMasksEffectSectionButton({
+export default function FaceMasksButton({
   handleEffectChange,
   type,
   videoId,
@@ -78,10 +79,12 @@ export default function FaceMasksEffectSectionButton({
           ];
 
         return (
-          <img
+          <ReactSVG
             src={iconSrc}
-            alt='icon'
-            style={{ width: "90%", height: "90%" }}
+            beforeInjection={(svg) => {
+              svg.setAttribute("width", "width: 90%");
+              svg.setAttribute("height", "height: 90%");
+            }}
             data-value={currentEffectsStyles.current[videoId].faceMasks.style}
           />
         );
@@ -109,6 +112,11 @@ export default function FaceMasksEffectSectionButton({
               />
             </div>
           ))}
+        </div>
+      }
+      hoverContent={
+        <div className='mb-4 w-max py-1 px-2 border border-white border-opacity-75 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+          Face mask effects
         </div>
       }
       styles={"flex items-center justify-center w-10 aspect-square"}

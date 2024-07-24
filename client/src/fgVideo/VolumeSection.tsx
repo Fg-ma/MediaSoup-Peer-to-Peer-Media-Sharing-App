@@ -18,7 +18,7 @@ import {
   volumeLow2b,
   volumeLow3a,
   volumeLow3b,
-} from "./svgPaths";
+} from "./lib/svgPaths";
 import SVGMorpher from "../SVGMorpher/SVGMorpher";
 
 export default function VolumeSection({
