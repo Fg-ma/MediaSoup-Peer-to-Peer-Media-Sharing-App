@@ -2,33 +2,33 @@ import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import Controls from "./Controls";
-import effectIcon from "../../../public/svgs/effectIcon.svg";
-import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
+import playIcon from "../../../public/svgs/play.svg";
+import pauseIcon from "../../../public/svgs/pause.svg";
 
-export default function EffectsButton({
+export default function PlayPauseButton({
   controls,
   effectsActive,
-  setEffectsActive,
 }: {
   controls: Controls;
   effectsActive: boolean;
-  setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const [active, setActive] = useState(true);
+
   return (
     <FgButton
       clickFunction={() => {
-        controls.handleEffects();
-        setEffectsActive((prev) => !prev);
+        controls.handlePausePlay();
+        setActive((prev) => !prev);
       }}
       contentFunction={() => {
-        const iconSrc = effectsActive ? effectOffIcon : effectIcon;
+        const iconSrc = active ? pauseIcon : playIcon;
 
         return (
           <FgSVG
             src={iconSrc}
             attributes={[
-              { key: "width", value: "95%" },
-              { key: "height", value: "95%" },
+              { key: "width", value: "36px" },
+              { key: "height", value: "36px" },
               { key: "fill", value: "white" },
             ]}
           />
@@ -37,11 +37,11 @@ export default function EffectsButton({
       hoverContent={
         !effectsActive ? (
           <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            Effects
+            {active ? "Pause" : "Play"}
           </div>
         ) : undefined
       }
-      className='flex items-center justify-center w-10 aspect-square relative'
+      className='flex items-center justify-center w-10 aspect-square'
     />
   );
 }

@@ -46,7 +46,7 @@ import {
   volumeLowOffB3b,
 } from "../fgVideo/lib/svgPaths";
 import FgVideo from "../fgVideo/FgVideo";
-import VolumeIndicator from "../fgVideo/VolumeIndicator";
+import FgAudioElement from "../fgAudioElement/FgAudioElement";
 import { useStreamsContext } from "../context/StreamsContext";
 import onProducerDisconnected from "./lib/onProducerDisconnected";
 import onNewProducerWasCreated from "./lib/onNewProducerWasCreated";
@@ -531,13 +531,13 @@ export default function Bundle({
             isStream={true}
             flipVideo={true}
             isSlider={!isUser}
-            isPlayPause={false}
+            isPlayPause={true}
             isVolume={audioStream ? true : false}
             isTotalTime={false}
             isPlaybackSpeed={false}
             isClosedCaptions={false}
             isPictureInPicture={true}
-            isTheater={false}
+            isTheater={true}
             isFullScreen={true}
             isTimeLine={false}
             isSkip={false}
@@ -568,13 +568,13 @@ export default function Bundle({
             isStream={true}
             flipVideo={false}
             isSlider={!isUser}
-            isPlayPause={false}
+            isPlayPause={true}
             isVolume={audioStream ? true : false}
             isTotalTime={false}
             isPlaybackSpeed={false}
             isClosedCaptions={false}
             isPictureInPicture={true}
-            isTheater={false}
+            isTheater={true}
             isFullScreen={true}
             isTimeLine={false}
             isSkip={false}
@@ -594,7 +594,7 @@ export default function Bundle({
         Object.keys(cameraStreams || {}).length === 0 &&
         Object.keys(screenStreams || {}).length === 0 && (
           <div id={`${username}_audio_container`} className='relative'>
-            <VolumeIndicator
+            <FgAudioElement
               audioStream={audioStream}
               audioRef={audioRef}
               username={username}

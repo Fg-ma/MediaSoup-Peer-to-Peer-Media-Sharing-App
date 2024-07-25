@@ -3,10 +3,14 @@ import React, { useState } from "react";
 import Controls from "./lib/Controls";
 import { EffectTypes } from "../context/StreamsContext";
 import EffectSection from "../effectSection/EffectSection";
-import VolumeSection from "../fgVideo/VolumeSection";
+import VolumeSection from "./lib/VolumeSection";
 import FullScreenButton from "./lib/FullScreenButton";
 import PictureInPictureButton from "./lib/PictureInPictureButton";
 import EffectsButton from "./lib/EffectsButton";
+import CaptionButton from "./lib/CaptionButton";
+import PlayPauseButton from "./lib/PlayPauseButton";
+import PlaybackSpeedButton from "./lib/PlaybackSpeedButton";
+import TheaterButton from "./lib/TheaterButton";
 
 export default function FgVideoControls({
   videoId,
@@ -90,31 +94,7 @@ export default function FgVideoControls({
       </div>
       <div className='video-controls w-full h-10 flex items-center space-x-2'>
         {isPlayPause && (
-          <button
-            onClick={() => controls.handlePausePlay()}
-            className='flex items-center justify-center w-10 aspect-square'
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              height='36px'
-              viewBox='0 -960 960 960'
-              width='36px'
-              fill='white'
-              className='play-icon'
-            >
-              <path d='M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z' />
-            </svg>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              height='36px'
-              viewBox='0 -960 960 960'
-              width='36px'
-              fill='white'
-              className='pause-icon'
-            >
-              <path d='M640-200q-33 0-56.5-23.5T560-280v-400q0-33 23.5-56.5T640-760q33 0 56.5 23.5T720-680v400q0 33-23.5 56.5T640-200Zm-320 0q-33 0-56.5-23.5T240-280v-400q0-33 23.5-56.5T320-760q33 0 56.5 23.5T400-680v400q0 33-23.5 56.5T320-200Z' />
-            </svg>
-          </button>
+          <PlayPauseButton controls={controls} effectsActive={effectsActive} />
         )}
         {isVolume && (
           <VolumeSection
@@ -126,6 +106,7 @@ export default function FgVideoControls({
             videoIconStateRef={videoIconStateRef}
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+            effectsActive={effectsActive}
           />
         )}
         <div className='duration-container flex items-center gap-1 grow'>
@@ -143,46 +124,27 @@ export default function FgVideoControls({
           />
         )}
         {isPlaybackSpeed && (
-          <button
-            ref={playbackSpeedButtonRef}
-            onClick={() => controls.handlePlaybackSpeed()}
-            className='playback-speed-button wide-button text-lg'
-          >
-            1x
-          </button>
+          <PlaybackSpeedButton
+            controls={controls}
+            effectsActive={effectsActive}
+            playbackSpeedButtonRef={playbackSpeedButtonRef}
+          />
         )}
         {isClosedCaptions && (
-          <button
-            onClick={() => controls.handleClosedCaptions()}
-            className='caption-button flex-col items-center justify-center'
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              height='36px'
-              viewBox='0 -960 960 960'
-              width='36px'
-              fill='white'
-            >
-              <path d='M200-160q-33 0-56.5-23.5T120-240v-480q0-33 23.5-56.5T200-800h560q33 0 56.5 23.5T840-720v480q0 33-23.5 56.5T760-160H200Zm80-200h120q17 0 28.5-11.5T440-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T400-600H280q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm400-240H560q-17 0-28.5 11.5T520-560v160q0 17 11.5 28.5T560-360h120q17 0 28.5-11.5T720-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T680-600Z' />
-            </svg>
-            <div className='caption-button-underline'></div>
-          </button>
+          <CaptionButton controls={controls} effectsActive={effectsActive} />
         )}
-        {isPictureInPicture && <PictureInPictureButton controls={controls} />}
+        {isPictureInPicture && (
+          <PictureInPictureButton
+            controls={controls}
+            effectsActive={effectsActive}
+          />
+        )}
         {isTheater && (
-          <button
-            onClick={() => controls.handleTheater()}
-            className='flex items-center justify-center'
-          >
-            <div className='theater-icon h-9 w-9 flex items-center justify-center'>
-              <div className='border-3 border-white w-8 h-6 rounded-md'></div>
-            </div>
-            <div className='exit-theater-icon h-9 w-9 flex items-center justify-center'>
-              <div className='border-3 border-white w-8 h-4 rounded-md'></div>
-            </div>
-          </button>
+          <TheaterButton controls={controls} effectsActive={effectsActive} />
         )}
-        {isFullScreen && <FullScreenButton controls={controls} />}
+        {isFullScreen && (
+          <FullScreenButton controls={controls} effectsActive={effectsActive} />
+        )}
       </div>
     </div>
   );

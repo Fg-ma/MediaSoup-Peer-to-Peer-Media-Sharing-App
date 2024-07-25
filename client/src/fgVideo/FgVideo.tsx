@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
 import { useStreamsContext, EffectTypes } from "../context/StreamsContext";
 import handleEffect from "../effects/handleEffect";
 import Controls from "../fgVideoControls/lib/Controls";
-import Navigation from "./Navigation";
+import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";
 import FgVideoControls from "../fgVideoControls/FgVideoControls";
 
 export default function FgVideo({
@@ -449,7 +449,7 @@ export default function FgVideo({
               </div>
             </div>
           )}
-          <Navigation
+          <FgVideoNavigation
             name={name}
             username={username}
             isClose={isClose}

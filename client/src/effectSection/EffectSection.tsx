@@ -104,36 +104,56 @@ export default function EffectSection({
         handleEffectChange={handleEffectChange}
         tintColor={tintColor}
       />
-      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <EarsButton
-        handleEffectChange={handleEffectChange}
-        type={type}
-        videoId={videoId}
-      />
-      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <GlassesButton
-        handleEffectChange={handleEffectChange}
-        type={type}
-        videoId={videoId}
-      />
-      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <BeardsButton
-        handleEffectChange={handleEffectChange}
-        type={type}
-        videoId={videoId}
-      />
-      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <MustachesButton
-        handleEffectChange={handleEffectChange}
-        type={type}
-        videoId={videoId}
-      />
-      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <FaceMasksButton
-        handleEffectChange={handleEffectChange}
-        type={type}
-        videoId={videoId}
-      />
+      {type === "camera" && (
+        <>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <EarsButton
+            handleEffectChange={handleEffectChange}
+            type={type}
+            videoId={videoId}
+          />
+        </>
+      )}
+      {type === "camera" && (
+        <>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <GlassesButton
+            handleEffectChange={handleEffectChange}
+            type={type}
+            videoId={videoId}
+          />
+        </>
+      )}
+      {type === "camera" && (
+        <>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <BeardsButton
+            handleEffectChange={handleEffectChange}
+            type={type}
+            videoId={videoId}
+          />
+        </>
+      )}
+      {type === "camera" && (
+        <>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <MustachesButton
+            handleEffectChange={handleEffectChange}
+            type={type}
+            videoId={videoId}
+          />
+        </>
+      )}
+      {type === "camera" && (
+        <>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <FaceMasksButton
+            handleEffectChange={handleEffectChange}
+            type={type}
+            videoId={videoId}
+          />
+        </>
+      )}
     </motion.div>
   );
 }

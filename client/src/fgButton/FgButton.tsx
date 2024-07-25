@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import ReactDOM from "react-dom";
-import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
+import HoverPortal from "./lib/HoverPortal";
+import HoldPortal from "./lib/HoldPortal";
 
 export default function FgButton({
   externalRef,
@@ -16,6 +17,8 @@ export default function FgButton({
   holdTimeoutDuration = 500,
   doubleClickTimeoutDuration = 250,
   hoverTimeoutDuration = 50,
+  hoverType = "above",
+  holdType = "above",
 }: {
   externalRef?: React.RefObject<HTMLButtonElement>;
   clickFunction: () => void;
@@ -30,6 +33,8 @@ export default function FgButton({
   holdTimeoutDuration?: number;
   doubleClickTimeoutDuration?: number;
   hoverTimeoutDuration?: number;
+  hoverType?: "above" | "below";
+  holdType?: "above" | "below";
 }) {
   const [isHeld, setIsHeld] = useState(false);
   const [isHover, setIsHover] = useState(false);
@@ -137,6 +142,7 @@ export default function FgButton({
         <AnimatePresence>
           {isHover && (
             <HoverPortal
+              hoverType={hoverType}
               hoverContent={hoverContent}
               buttonRef={externalRef ? externalRef : buttonRef}
             />
@@ -147,6 +153,7 @@ export default function FgButton({
         <AnimatePresence>
           {isHeld && (
             <HoldPortal
+              holdType={holdType}
               holdContent={holdContent}
               buttonRef={externalRef ? externalRef : buttonRef}
             />
@@ -154,160 +161,5 @@ export default function FgButton({
         </AnimatePresence>
       )}
     </div>
-  );
-}
-
-const HoldPortalVar: Variants = {
-  init: { opacity: 0, scale: 0.8 },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      scale: { type: "spring", stiffness: 100 },
-    },
-  },
-};
-
-const HoldPortalTransition: Transition = {
-  transition: {
-    opacity: { duration: 0.15 },
-  },
-};
-
-function HoldPortal({
-  holdContent,
-  buttonRef,
-}: {
-  holdContent: React.ReactElement;
-  buttonRef: React.RefObject<HTMLButtonElement>;
-}) {
-  const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
-  const portalRef = useRef<HTMLDivElement>(null);
-
-  const getPortalPosition = () => {
-    const holdButtonRect = buttonRef.current?.getBoundingClientRect();
-    const portalRect = portalRef.current?.getBoundingClientRect();
-
-    if (!holdButtonRect || !portalRect) {
-      return;
-    }
-
-    const top = holdButtonRect.top - portalRect.height / 0.8;
-    const left =
-      holdButtonRect.left +
-      holdButtonRect.width / 2 -
-      portalRect.width / 2 / 0.8;
-
-    const bodyRect = document.body.getBoundingClientRect();
-    const topPercent = (top / bodyRect.height) * 100;
-    const leftPercent = (left / bodyRect.width) * 100;
-
-    setPortalPosition({
-      top: topPercent,
-      left: leftPercent,
-    });
-  };
-
-  useEffect(() => {
-    getPortalPosition();
-  }, []);
-
-  return ReactDOM.createPortal(
-    <motion.div
-      ref={portalRef}
-      className={`${
-        !portalPosition.top && !portalPosition.left && "opacity-0"
-      } absolute w-min h-min z-20`}
-      style={{
-        top: `${portalPosition.top}%`,
-        left: `${portalPosition.left}%`,
-      }}
-      variants={HoldPortalVar}
-      initial='init'
-      animate='animate'
-      exit='init'
-      transition={HoldPortalTransition}
-    >
-      {holdContent}
-    </motion.div>,
-    document.body
-  );
-}
-
-const HoverPortalVar: Variants = {
-  init: { opacity: 0, scale: 0.8 },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      scale: { type: "spring", stiffness: 100 },
-    },
-  },
-};
-
-const HoverPortalTransition: Transition = {
-  transition: {
-    opacity: { duration: 0.001 },
-    scale: { duration: 0.001 },
-  },
-};
-
-function HoverPortal({
-  hoverContent,
-  buttonRef,
-}: {
-  hoverContent: React.ReactElement;
-  buttonRef: React.RefObject<HTMLButtonElement>;
-}) {
-  const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
-  const portalRef = useRef<HTMLDivElement>(null);
-
-  const getPortalPosition = () => {
-    const holdButtonRect = buttonRef.current?.getBoundingClientRect();
-    const portalRect = portalRef.current?.getBoundingClientRect();
-
-    if (!holdButtonRect || !portalRect) {
-      return;
-    }
-
-    const top = holdButtonRect.top - portalRect.height / 0.8;
-    const left =
-      holdButtonRect.left +
-      holdButtonRect.width / 2 -
-      portalRect.width / 2 / 0.8;
-
-    const bodyRect = document.body.getBoundingClientRect();
-    const topPercent = (top / bodyRect.height) * 100;
-    const leftPercent = (left / bodyRect.width) * 100;
-
-    setPortalPosition({
-      top: topPercent,
-      left: leftPercent,
-    });
-  };
-
-  useEffect(() => {
-    getPortalPosition();
-  }, [hoverContent]);
-
-  return ReactDOM.createPortal(
-    <motion.div
-      ref={portalRef}
-      className={`${
-        !portalPosition.top && !portalPosition.left && "opacity-0"
-      } absolute w-min h-min z-20`}
-      style={{
-        top: `${portalPosition.top}%`,
-        left: `${portalPosition.left}%`,
-      }}
-      variants={HoverPortalVar}
-      initial='init'
-      animate='animate'
-      exit='init'
-      transition={HoverPortalTransition}
-    >
-      {hoverContent}
-    </motion.div>,
-    document.body
   );
 }

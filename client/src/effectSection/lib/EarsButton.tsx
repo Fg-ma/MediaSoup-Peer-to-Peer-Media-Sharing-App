@@ -148,7 +148,7 @@ export default function EarsButton({
         </div>
       }
       hoverContent={
-        <div className='mb-4 w-max py-1 px-2 border border-white border-opacity-75 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+        <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
           Ears
         </div>
       }

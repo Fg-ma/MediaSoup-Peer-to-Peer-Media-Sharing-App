@@ -75,28 +75,11 @@
   transition-delay: 0s;
 }
 
-/* paused */
-.video-container.paused .pause-icon {
-  display: none;
-}
-
-.video-container:not(.paused) .play-icon {
-  display: none;
-}
-
 /* theater */
 .video-container.theater {
   max-width: initial;
-  width: 100%;
+  width: 100vw;
   max-height: 90vh;
-}
-
-.video-container.theater .theater-icon {
-  display: none;
-}
-
-.video-container:not(.theater) .exit-theater-icon {
-  display: none;
 }
 
 /* full-screen */

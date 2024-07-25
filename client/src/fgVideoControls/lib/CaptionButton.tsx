@@ -1,11 +1,10 @@
 import React, { useState } from "react";
+import Controls from "./Controls";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import Controls from "./Controls";
-import fullScreenIcon from "../../../public/svgs/fullScreenIcon.svg";
-import fullScreenOffIcon from "../../../public/svgs/fullScreenOffIcon.svg";
+import captionsIcon from "../../../public/svgs/captionsIcon.svg";
 
-export default function FullScreenButton({
+export default function CaptionButton({
   controls,
   effectsActive,
 }: {
@@ -17,31 +16,32 @@ export default function FullScreenButton({
   return (
     <FgButton
       clickFunction={() => {
-        controls.handleFullScreen();
+        controls.handleClosedCaptions();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {
-        const iconSrc = active ? fullScreenOffIcon : fullScreenIcon;
-
         return (
-          <FgSVG
-            src={iconSrc}
-            attributes={[
-              { key: "width", value: "36px" },
-              { key: "height", value: "36px" },
-              { key: "fill", value: "white" },
-            ]}
-          />
+          <>
+            <FgSVG
+              src={captionsIcon}
+              attributes={[
+                { key: "width", value: "36px" },
+                { key: "height", value: "36px" },
+                { key: "fill", value: "white" },
+              ]}
+            />
+            {active && <div className='caption-button-underline'></div>}
+          </>
         );
       }}
       hoverContent={
         !effectsActive ? (
           <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            Full screen
+            Captions
           </div>
         ) : undefined
       }
-      className='flex items-center justify-center w-10 aspect-square'
+      className='caption-button flex-col items-center justify-center'
     />
   );
 }

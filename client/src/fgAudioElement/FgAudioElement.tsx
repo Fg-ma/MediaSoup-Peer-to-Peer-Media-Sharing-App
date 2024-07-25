@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from "react-spring";
-import { colors } from "./lib/colors";
+import { colors } from "../fgVideo/lib/colors";
 
-const VolumeIndicator = ({
+export default function FgAudioElement({
   audioStream,
   audioRef,
   username,
@@ -42,7 +42,7 @@ const VolumeIndicator = ({
   primaryMuteColor?: string;
   secondaryMuteColor?: string;
   muteStyleOption?: "morse" | "smile";
-}) => {
+}) {
   const shadowColors = {
     black: "rgba(0, 0, 0, 0.8)",
     red: "rgba(90, 0, 0, 0.8)",
@@ -870,6 +870,4 @@ const VolumeIndicator = ({
       )}
     </div>
   );
-};
-
-export default VolumeIndicator;
+}
