@@ -127,7 +127,7 @@ const updateDeadbandingMaps = (
   },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
-  if (effects.ears) {
+  if (effects.ears && currentEffectsStyles.current[id].ears) {
     for (const deadbanding in earsDeadbandingMap[
       currentEffectsStyles.current[id].ears.style
     ]) {
@@ -152,7 +152,7 @@ const updateDeadbandingMaps = (
       }
     }
   }
-  if (effects.glasses) {
+  if (effects.glasses && currentEffectsStyles.current[id].glasses) {
     for (const deadbanding in glassesDeadbandingMap[
       currentEffectsStyles.current[id].glasses.style
     ]) {
@@ -177,7 +177,7 @@ const updateDeadbandingMaps = (
       }
     }
   }
-  if (effects.beards) {
+  if (effects.beards && currentEffectsStyles.current[id].beards) {
     for (const deadbanding in beardsDeadbandingMap[
       currentEffectsStyles.current[id].beards.style
     ]) {
@@ -202,7 +202,7 @@ const updateDeadbandingMaps = (
       }
     }
   }
-  if (effects.mustaches) {
+  if (effects.mustaches && currentEffectsStyles.current[id].mustaches) {
     for (const deadbanding in mustachesDeadbandingMap[
       currentEffectsStyles.current[id].mustaches.style
     ]) {

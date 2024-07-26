@@ -1,15 +1,21 @@
 import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 import {
   useCurrentEffectsStylesContext,
   GlassesEffectTypes,
 } from "../../context/CurrentEffectsStylesContext";
 import defaultGlasses from "../../../public/2DAssets/glasses/defaultGlasses.png";
+import loading_defaultGlasses from "../../../public/2DAssets/glasses/loading_defaultGlasses.png";
 import memeGlasses from "../../../public/2DAssets/glasses/memeGlasses.png";
+import loading_memeGlasses from "../../../public/2DAssets/glasses/loading_memeGlasses.png";
 import americaGlasses from "../../../public/2DAssets/glasses/americaGlasses.png";
+import loading_americaGlasses from "../../../public/2DAssets/glasses/loading_americaGlasses.png";
 import threeDGlasses from "../../../public/2DAssets/glasses/threeDGlasses.png";
+import loading_threeDGlasses from "../../../public/2DAssets/glasses/loading_threeDGlasses.png";
 import shades from "../../../public/2DAssets/glasses/shades.png";
+import loading_shades from "../../../public/2DAssets/glasses/loading_shades.png";
 import defaultGlassesIcon from "../../../public/svgs/glasses/defaultGlassesIcon.svg";
 import defaultGlassesOffIcon from "../../../public/svgs/glasses/defaultGlassesOffIcon.svg";
 import threeDim_defaultGlassesIcon from "../../../public/svgs/glasses/threeDim_defaultGlassesIcon.svg";
@@ -48,6 +54,7 @@ export default function GlassesButton({
   const glassesEffects: {
     [key in GlassesEffectTypes]: {
       image: string;
+      loading: string;
       icon: string;
       offIcon: string;
       threeDimIcon: string;
@@ -58,6 +65,7 @@ export default function GlassesButton({
   } = {
     defaultGlasses: {
       image: defaultGlasses,
+      loading: loading_defaultGlasses,
       icon: defaultGlassesIcon,
       offIcon: defaultGlassesOffIcon,
       threeDimIcon: threeDim_defaultGlassesIcon,
@@ -67,6 +75,7 @@ export default function GlassesButton({
     },
     memeGlasses: {
       image: memeGlasses,
+      loading: loading_memeGlasses,
       icon: memeGlassesIcon,
       offIcon: memeGlassesOffIcon,
       threeDimIcon: threeDim_memeGlassesIcon,
@@ -76,6 +85,7 @@ export default function GlassesButton({
     },
     americaGlasses: {
       image: americaGlasses,
+      loading: loading_americaGlasses,
       icon: americaGlassesIcon,
       offIcon: americaGlassesOffIcon,
       threeDimIcon: threeDim_americaGlassesIcon,
@@ -85,6 +95,7 @@ export default function GlassesButton({
     },
     threeDGlasses: {
       image: threeDGlasses,
+      loading: loading_threeDGlasses,
       icon: threeDGlassesIcon,
       offIcon: threeDGlassesOffIcon,
       threeDimIcon: threeDim_threeDGlassesIcon,
@@ -94,11 +105,12 @@ export default function GlassesButton({
     },
     shades: {
       image: shades,
-      flipped: false,
+      loading: loading_shades,
       icon: shadesIcon,
       offIcon: shadesOffIcon,
       threeDimIcon: threeDim_shadesIcon,
       threeDimOffIcon: threeDim_shadesOffIcon,
+      flipped: false,
       bgColor: "white",
     },
   };
@@ -108,7 +120,7 @@ export default function GlassesButton({
       clickFunction={() => {
         handleEffectChange("glasses");
         setButtonState(
-          currentEffectsStyles.current[videoId].glasses.threeDim
+          currentEffectsStyles.current[videoId].glasses?.threeDim
             ? userStreamEffects.current.glasses[type]?.[videoId]
               ? "threeDimOffIcon"
               : "threeDimIcon"
@@ -119,23 +131,32 @@ export default function GlassesButton({
       }}
       holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
-        if (target && target.dataset.value) {
-          const effectType = target.dataset.value as GlassesEffectTypes;
-          if (
-            effectType in glassesEffects &&
-            (currentEffectsStyles.current[videoId].glasses.style !==
-              effectType ||
-              !userStreamEffects.current.glasses[type]?.[videoId])
-          ) {
-            currentEffectsStyles.current[videoId].glasses.style = effectType;
-            handleEffectChange(
-              "glasses",
-              userStreamEffects.current.glasses[type]?.[videoId]
-            );
-          }
+        if (
+          !currentEffectsStyles.current[videoId].glasses ||
+          !target ||
+          !target.dataset.value
+        ) {
+          return;
+        }
+
+        const effectType = target.dataset.value as GlassesEffectTypes;
+        if (
+          effectType in glassesEffects &&
+          (currentEffectsStyles.current[videoId].glasses.style !== effectType ||
+            !userStreamEffects.current.glasses[type]?.[videoId])
+        ) {
+          currentEffectsStyles.current[videoId].glasses.style = effectType;
+          handleEffectChange(
+            "glasses",
+            userStreamEffects.current.glasses[type]?.[videoId]
+          );
         }
       }}
       contentFunction={() => {
+        if (!currentEffectsStyles.current[videoId].glasses) {
+          return;
+        }
+
         const iconSrc =
           glassesEffects[currentEffectsStyles.current[videoId].glasses.style][
             currentEffectsStyles.current[videoId].glasses.threeDim
@@ -159,6 +180,10 @@ export default function GlassesButton({
         );
       }}
       doubleClickFunction={() => {
+        if (!currentEffectsStyles.current[videoId].glasses) {
+          return;
+        }
+
         currentEffectsStyles.current[videoId].glasses.threeDim =
           !currentEffectsStyles.current[videoId].glasses.threeDim;
 
@@ -189,10 +214,11 @@ export default function GlassesButton({
               } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
               data-value={glasses}
             >
-              <img
+              <FgImage
                 src={effect.image}
+                srcLoading={effect.loading}
                 alt={glasses}
-                style={{ width: "90%" }}
+                style={{ width: "90%", height: "90%" }}
                 data-value={glasses}
               />
             </div>
@@ -205,7 +231,7 @@ export default function GlassesButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={currentEffectsStyles.current[videoId].glasses.style}
+      defaultDataValue={currentEffectsStyles.current[videoId].glasses?.style}
       hoverTimeoutDuration={750}
     />
   );

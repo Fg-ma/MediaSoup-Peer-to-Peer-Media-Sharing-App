@@ -125,7 +125,7 @@ export default function FgVideo({
   const captions = useRef<TextTrack | undefined>();
   const thumbnails = useRef<string[]>([]);
   const tintColor = useRef("#F56114");
-  const stream = userMedia.current.camera[videoId]?.getStream();
+  const stream = userMedia.current[type][videoId]?.getStream();
 
   const controls = new Controls(
     socket,
@@ -172,8 +172,7 @@ export default function FgVideo({
     if (
       videoRef.current &&
       isStream &&
-      ((isUser && userMedia.current.camera[videoId]) ||
-        (!isUser && videoStream))
+      ((isUser && userMedia.current[type][videoId]) || (!isUser && videoStream))
     ) {
       videoRef.current.srcObject = isUser ? stream : videoStream!;
     }

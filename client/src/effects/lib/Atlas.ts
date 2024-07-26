@@ -1,4 +1,3 @@
-import { URLsTypes } from "../../lib/CameraMedia";
 import { getNextTexturePosition } from "./handleTexturePosition";
 
 class Atlas {
@@ -6,8 +5,7 @@ class Atlas {
   private atlasCanvas: HTMLCanvasElement | null = null;
   private atlasContext: CanvasRenderingContext2D | null = null;
 
-  private atlasImages: { [URLType in URLsTypes]?: string } | undefined =
-    undefined;
+  private atlasImages: { [URLType: string]: string } | undefined = undefined;
   private altasImageURLMap: {
     url: string;
     row: number;
@@ -74,7 +72,7 @@ class Atlas {
   }
 
   async createAtlas(
-    atlasImages: { [URLType in URLsTypes]?: string },
+    atlasImages: { [URLType in string]: string },
     uAtlasTextureLocation: WebGLUniformLocation | null
   ) {
     this.atlasImages = atlasImages;
@@ -164,7 +162,7 @@ class Atlas {
     this.gl.uniform1i(this.uAtlasTextureLocation, texturePosition);
   }
 
-  async updateAtlas(atlasImages: { [URLType in URLsTypes]?: string }) {
+  async updateAtlas(atlasImages: { [URLType in string]: string }) {
     if (!this.texturePosition || !this.atlasContext || !this.atlasCanvas) {
       return;
     }

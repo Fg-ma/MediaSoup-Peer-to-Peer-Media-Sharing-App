@@ -67,7 +67,7 @@ const render = async (
       faceId,
       landmarks,
     } of faceLandmarks.getFaceIdLandmarksPairs()) {
-      if (effects.ears) {
+      if (effects.ears && currentEffectsStyles.current[id].ears) {
         if (!currentEffectsStyles.current[id].ears.threeDim) {
           const twoDimEarsOffset =
             calculatedLandmarks.twoDimEarsOffsets[faceId];
@@ -104,27 +104,29 @@ const render = async (
             calculatedLandmarks.headPitchAngles[faceId]
           );
         } else {
-          const threeDimMustacheOffset =
-            calculatedLandmarks.threeDimMustacheOffsets[faceId];
+          if (currentEffectsStyles.current[id].mustaches) {
+            const threeDimMustacheOffset =
+              calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
-          await baseShader.drawMesh(
-            currentEffectsStyles.current[id].mustaches.style,
-            {
-              x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
-              y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
-            },
-            {
-              x: threeDimMustacheOffset[0],
-              y: threeDimMustacheOffset[1],
-            },
-            0.4,
-            calculatedLandmarks.headRotationAngles[faceId],
-            calculatedLandmarks.headYawAngles[faceId],
-            calculatedLandmarks.headPitchAngles[faceId]
-          );
+            await baseShader.drawMesh(
+              currentEffectsStyles.current[id].mustaches.style,
+              {
+                x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
+                y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
+              },
+              {
+                x: threeDimMustacheOffset[0],
+                y: threeDimMustacheOffset[1],
+              },
+              0.4,
+              calculatedLandmarks.headRotationAngles[faceId],
+              calculatedLandmarks.headYawAngles[faceId],
+              calculatedLandmarks.headPitchAngles[faceId]
+            );
+          }
         }
       }
-      if (effects.glasses) {
+      if (effects.glasses && currentEffectsStyles.current[id].glasses) {
         if (!currentEffectsStyles.current[id].glasses.threeDim) {
           const eyesCenterPosition =
             calculatedLandmarks.eyesCenterPositions[faceId];
@@ -145,27 +147,29 @@ const render = async (
             calculatedLandmarks.headPitchAngles[faceId]
           );
         } else {
-          const threeDimMustacheOffset =
-            calculatedLandmarks.threeDimMustacheOffsets[faceId];
+          if (currentEffectsStyles.current[id].mustaches) {
+            const threeDimMustacheOffset =
+              calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
-          await baseShader.drawMesh(
-            currentEffectsStyles.current[id].mustaches.style,
-            {
-              x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
-              y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
-            },
-            {
-              x: threeDimMustacheOffset[0],
-              y: threeDimMustacheOffset[1],
-            },
-            0.4,
-            calculatedLandmarks.headRotationAngles[faceId],
-            calculatedLandmarks.headYawAngles[faceId],
-            calculatedLandmarks.headPitchAngles[faceId]
-          );
+            await baseShader.drawMesh(
+              currentEffectsStyles.current[id].mustaches.style,
+              {
+                x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
+                y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
+              },
+              {
+                x: threeDimMustacheOffset[0],
+                y: threeDimMustacheOffset[1],
+              },
+              0.4,
+              calculatedLandmarks.headRotationAngles[faceId],
+              calculatedLandmarks.headYawAngles[faceId],
+              calculatedLandmarks.headPitchAngles[faceId]
+            );
+          }
         }
       }
-      if (effects.beards) {
+      if (effects.beards && currentEffectsStyles.current[id].beards) {
         if (!currentEffectsStyles.current[id].beards.threeDim) {
           const twoDimBeardOffset =
             calculatedLandmarks.twoDimBeardOffsets[faceId];
@@ -186,27 +190,29 @@ const render = async (
             calculatedLandmarks.headPitchAngles[faceId]
           );
         } else {
-          const threeDimMustacheOffset =
-            calculatedLandmarks.threeDimMustacheOffsets[faceId];
+          if (currentEffectsStyles.current[id].mustaches) {
+            const threeDimMustacheOffset =
+              calculatedLandmarks.threeDimMustacheOffsets[faceId];
 
-          await baseShader.drawMesh(
-            currentEffectsStyles.current[id].mustaches.style,
-            {
-              x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
-              y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
-            },
-            {
-              x: threeDimMustacheOffset[0],
-              y: threeDimMustacheOffset[1],
-            },
-            0.4,
-            calculatedLandmarks.headRotationAngles[faceId],
-            calculatedLandmarks.headYawAngles[faceId],
-            calculatedLandmarks.headPitchAngles[faceId]
-          );
+            await baseShader.drawMesh(
+              currentEffectsStyles.current[id].mustaches.style,
+              {
+                x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
+                y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
+              },
+              {
+                x: threeDimMustacheOffset[0],
+                y: threeDimMustacheOffset[1],
+              },
+              0.4,
+              calculatedLandmarks.headRotationAngles[faceId],
+              calculatedLandmarks.headYawAngles[faceId],
+              calculatedLandmarks.headPitchAngles[faceId]
+            );
+          }
         }
       }
-      if (effects.mustaches) {
+      if (effects.mustaches && currentEffectsStyles.current[id].mustaches) {
         if (!currentEffectsStyles.current[id].mustaches.threeDim) {
           const twoDimMustacheOffset =
             calculatedLandmarks.twoDimMustacheOffsets[faceId];

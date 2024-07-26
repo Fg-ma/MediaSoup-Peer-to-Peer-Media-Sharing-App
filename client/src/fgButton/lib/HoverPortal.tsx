@@ -68,7 +68,7 @@ export default function HoverPortal({
     <motion.div
       ref={portalRef}
       className={`${
-        !portalPosition.top && !portalPosition.left && "opacity-0"
+        (portalPosition.top === 0 || portalPosition.left === 0) && "opacity-0"
       } absolute z-20`}
       style={{
         top: `${portalPosition.top}%`,

@@ -24,10 +24,17 @@ export default function FgSVG({
         if (attributes) {
           attributes.forEach(({ key, value, id }) => {
             if (id === undefined) {
+              if (svgElement.hasAttribute(key)) {
+                svgElement.removeAttribute(key);
+              }
               svgElement.setAttribute(key, value);
             } else {
               const element = svgDoc.getElementById(id);
+              console.log(value);
               if (element) {
+                if (element.hasAttribute(key)) {
+                  element.removeAttribute(key);
+                }
                 element.setAttribute(key, value);
               }
             }

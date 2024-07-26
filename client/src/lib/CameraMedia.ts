@@ -1,4 +1,3 @@
-import { releaseAllTexturePositions } from "../effects/lib/handleTexturePosition";
 import {
   beardChinOffsetsMap,
   earsWidthFactorMap,
@@ -11,13 +10,6 @@ import FaceLandmarks from "../effects/lib/FaceLandmarks";
 import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { EffectTypes } from "../context/StreamsContext";
-
-export type URLsTypes =
-  | "leftEar"
-  | "rightEar"
-  | "glasses"
-  | "beards"
-  | "mustaches";
 
 class CameraMedia {
   private username: string;
@@ -153,18 +145,12 @@ class CameraMedia {
 
     for (const effect in this.userStreamEffects.current) {
       const effectType = effect as keyof typeof this.userStreamEffects.current;
-      for (const kind in this.userStreamEffects.current[effectType]) {
-        const kindType = kind as "camera" | "screen";
-        for (const kindId in this.userStreamEffects.current[effectType][
-          kindType
-        ]) {
-          if (kindId === this.cameraId) {
-            if (
-              userStreamEffects.current[effectType][kindType]![this.cameraId]
-            ) {
-              this.effects[effectType] = true;
-            }
-          }
+      for (const kindId in this.userStreamEffects.current[effectType].camera) {
+        if (
+          kindId === this.cameraId &&
+          userStreamEffects.current[effectType].camera![this.cameraId]
+        ) {
+          this.effects[effectType] = true;
         }
       }
     }
@@ -253,80 +239,85 @@ class CameraMedia {
   }
 
   private async updateAtlases() {
-    const twoDimUrls = {
-      [`${this.currentEffectsStyles.current[this.cameraId].ears.style}Left`]:
-        this.effects.ears
-          ? `/2DAssets/ears/${
-              this.currentEffectsStyles.current[this.cameraId].ears.style
-            }Left.png`
-          : null,
-      [`${this.currentEffectsStyles.current[this.cameraId].ears.style}Right`]:
-        this.effects.ears
-          ? `/2DAssets/ears/${
-              this.currentEffectsStyles.current[this.cameraId].ears.style
-            }Right.png`
-          : null,
-      [this.currentEffectsStyles.current[this.cameraId].glasses.style]: this
-        .effects.glasses
-        ? `/2DAssets/glasses/${
-            this.currentEffectsStyles.current[this.cameraId].glasses.style
-          }.png`
-        : null,
-      [this.currentEffectsStyles.current[this.cameraId].beards.style]: this
-        .effects.beards
-        ? `/2DAssets/beards/${
-            this.currentEffectsStyles.current[this.cameraId].beards.style
-          }.png`
-        : null,
-      [this.currentEffectsStyles.current[this.cameraId].mustaches.style]: this
-        .effects.mustaches
-        ? `/2DAssets/mustaches/${
-            this.currentEffectsStyles.current[this.cameraId].mustaches.style
-          }.png`
-        : null,
-    };
+    const twoDimUrls: { [key: string]: string } = {};
 
-    const filteredTwoDimUrls: { [URLType in URLsTypes]?: string } =
-      Object.fromEntries(
-        Object.entries(twoDimUrls).filter(([key, value]) => value !== null)
-      );
+    if (
+      this.currentEffectsStyles.current[this.cameraId].ears &&
+      this.effects.ears
+    ) {
+      twoDimUrls[
+        `${this.currentEffectsStyles.current[this.cameraId].ears!.style}Left`
+      ] = `/2DAssets/ears/${
+        this.currentEffectsStyles.current[this.cameraId].ears!.style
+      }Left.png`;
+    }
+    if (
+      this.currentEffectsStyles.current[this.cameraId].ears &&
+      this.effects.ears
+    ) {
+      twoDimUrls[
+        `${this.currentEffectsStyles.current[this.cameraId].ears!.style}Right`
+      ] = `/2DAssets/ears/${
+        this.currentEffectsStyles.current[this.cameraId].ears!.style
+      }Right.png`;
+    }
+    if (
+      this.currentEffectsStyles.current[this.cameraId].glasses &&
+      this.effects.glasses
+    ) {
+      twoDimUrls[
+        this.currentEffectsStyles.current[this.cameraId].glasses!.style
+      ] = `/2DAssets/glasses/${
+        this.currentEffectsStyles.current[this.cameraId].glasses!.style
+      }.png`;
+    }
+    if (
+      this.currentEffectsStyles.current[this.cameraId].beards &&
+      this.effects.beards
+    ) {
+      twoDimUrls[
+        this.currentEffectsStyles.current[this.cameraId].beards!.style
+      ] = `/2DAssets/beards/${
+        this.currentEffectsStyles.current[this.cameraId].beards!.style
+      }.png`;
+    }
+    if (
+      this.currentEffectsStyles.current[this.cameraId].mustaches &&
+      this.effects.mustaches
+    ) {
+      twoDimUrls[
+        this.currentEffectsStyles.current[this.cameraId].mustaches!.style
+      ] = `/2DAssets/mustaches/${
+        this.currentEffectsStyles.current[this.cameraId].mustaches!.style
+      }.png`;
+    }
 
-    const threeDimUrls = {
-      // [`${currentEffectsStyles.current.ears.style}Left`]: effects.ears
-      //   ? `/3DAssets/ears/${currentEffectsStyles.current.ears.style}Left.png`
-      //   : null,
-      // [`${currentEffectsStyles.current.ears.style}Right`]: effects.ears
-      //   ? `/3DAssets/ears/${currentEffectsStyles.current.ears.style}Right.png`
-      //   : null,
-      // [currentEffectsStyles.current.glasses.style]: effects.glasses
-      //   ? `/3DAssets/glasses/${currentEffectsStyles.current.glasses.style}.png`
-      //   : null,
-      // [currentEffectsStyles.current.beards.style]: effects.beards
-      //   ? `/3DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
-      //   : null,
-      [this.currentEffectsStyles.current[this.cameraId].mustaches.style]:
-        this.effects.mustaches &&
-        this.currentEffectsStyles.current[this.cameraId].mustaches.threeDim
-          ? `/3DAssets/mustaches/${
-              this.currentEffectsStyles.current[this.cameraId].mustaches.style
-            }.png`
-          : null,
-      [this.currentEffectsStyles.current[this.cameraId].faceMasks.style]:
-        this.effects.faceMasks &&
-        this.currentEffectsStyles.current[this.cameraId].faceMasks.threeDim
-          ? `/3DAssets/faceMasks/${
-              this.currentEffectsStyles.current[this.cameraId].faceMasks.style
-            }.png`
-          : null,
-    };
+    const threeDimUrls: { [key: string]: string } = {};
 
-    const filteredThreeDimUrls: { [URLType in URLsTypes]?: string } =
-      Object.fromEntries(
-        Object.entries(threeDimUrls).filter(([key, value]) => value !== null)
-      );
+    if (
+      this.currentEffectsStyles.current[this.cameraId].mustaches &&
+      this.currentEffectsStyles.current[this.cameraId].mustaches!.threeDim &&
+      this.effects.mustaches
+    ) {
+      threeDimUrls[
+        this.currentEffectsStyles.current[this.cameraId].mustaches!.style
+      ] = `/3DAssets/mustaches/${
+        this.currentEffectsStyles.current[this.cameraId].mustaches!.style
+      }.png`;
+    }
+    if (
+      this.currentEffectsStyles.current[this.cameraId].faceMasks &&
+      this.effects.faceMasks
+    ) {
+      threeDimUrls[
+        this.currentEffectsStyles.current[this.cameraId].faceMasks!.style
+      ] = `/3DAssets/faceMasks/${
+        this.currentEffectsStyles.current[this.cameraId].faceMasks!.style
+      }.png`;
+    }
 
-    await this.baseShader.updateAtlasTexture("twoDim", filteredTwoDimUrls);
-    await this.baseShader.updateAtlasTexture("threeDim", filteredThreeDimUrls);
+    await this.baseShader.updateAtlasTexture("twoDim", twoDimUrls);
+    await this.baseShader.updateAtlasTexture("threeDim", threeDimUrls);
   }
 
   async changeEffects(

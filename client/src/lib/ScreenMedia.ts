@@ -1,81 +1,117 @@
-import { releaseAllTexturePositions } from "../effects/lib/handleTexturePosition";
 import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import BaseShader from "../effects/lib/BaseShader";
 import render from "../effects/lib/render";
-import FaceLandmarks from "../effects/lib/FaceLandmarks";
 import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
-import { FaceMesh, Results } from "@mediapipe/face_mesh";
-import { URLsTypes } from "./CameraMedia";
+import { EffectTypes } from "../context/StreamsContext";
+
+type ScreenEffects = "blur" | "tint";
 
 class ScreenMedia {
   private username: string;
   private table_id: string;
   private screenId: string;
+
   private canvas: HTMLCanvasElement;
   private video: HTMLVideoElement;
   private gl: WebGLRenderingContext | WebGL2RenderingContext;
   private initScreenStream: MediaStream;
-  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
-  private animationFrameId: number[];
-  private baseShader: BaseShader;
-  private faceLandmarks: FaceLandmarks;
-  private faceMeshResults: Results[];
-  private faceMesh: FaceMesh;
-  private effects: {
-    blur?: boolean | undefined;
-    tint?: boolean | undefined;
-    ears?: boolean | undefined;
-    glasses?: boolean | undefined;
-    beards?: boolean | undefined;
-    mustaches?: boolean | undefined;
-    faceMasks?: boolean | undefined;
-  } = {};
 
-  deconstructor() {}
+  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
+  private userStreamEffects: React.MutableRefObject<{
+    [effectType in EffectTypes]: {
+      camera?:
+        | {
+            [cameraId: string]: boolean;
+          }
+        | undefined;
+      screen?:
+        | {
+            [screenId: string]: boolean;
+          }
+        | undefined;
+      audio?: boolean;
+    };
+  }>;
+
+  private animationFrameId: number[];
+
+  private baseShader: BaseShader;
+
+  private effects: {
+    [ScreenEffect in ScreenEffects]: boolean;
+  };
+
+  private tintColor = "#F56114";
+
   constructor(
     username: string,
     table_id: string,
     screenId: string,
     initScreenStream: MediaStream,
-    currentEffectsStyles: React.MutableRefObject<EffectStylesType>
+    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    userStreamEffects: React.MutableRefObject<{
+      [effectType in EffectTypes]: {
+        camera?:
+          | {
+              [cameraId: string]: boolean;
+            }
+          | undefined;
+        screen?:
+          | {
+              [screenId: string]: boolean;
+            }
+          | undefined;
+        audio?: boolean;
+      };
+    }>
   ) {
     this.username = username;
     this.table_id = table_id;
     this.screenId = screenId;
     this.currentEffectsStyles = currentEffectsStyles;
+    this.userStreamEffects = userStreamEffects;
+
     this.canvas = document.createElement("canvas");
     const gl =
       this.canvas.getContext("webgl2") || this.canvas.getContext("webgl");
+
     if (!gl) {
       throw new Error("WebGL is not supported");
     }
+
     this.gl = gl;
+
     this.initScreenStream = initScreenStream;
-    const meshes = {
-      mustache1: { meshURL: "/3DAssets/mustaches/mustache1.json" },
-      mustache2: { meshURL: "/3DAssets/mustaches/mustache2.json" },
-      mustache3: { meshURL: "/3DAssets/mustaches/mustache3.json" },
-      mustache4: { meshURL: "/3DAssets/mustaches/mustache4.json" },
-      disguiseMustache: { meshURL: "/3DAssets/mustaches/mustache1.json" },
-      faceMask1: { meshURL: "/3DAssets/faceMasks/faceMask1.json" },
-    };
-    this.baseShader = new BaseShader(gl, {}, meshes);
-    this.faceLandmarks = new FaceLandmarks(this.screenId, currentEffectsStyles);
-    this.faceMeshResults = [];
-    this.faceMesh = new FaceMesh({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-      },
-    });
-    this.faceMesh.setOptions({
-      maxNumFaces: 2,
-      refineLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
-    this.faceMesh.onResults((results) => {
-      this.faceMeshResults[0] = results;
-    });
+
+    if (!currentEffectsStyles.current[this.screenId]) {
+      currentEffectsStyles.current[this.screenId] = {};
+    }
+
+    const meshes = {};
+
+    this.effects = { blur: false, tint: false };
+
+    for (const effect in this.userStreamEffects.current) {
+      const effectType = effect as EffectTypes;
+      if (effectType in this.effects) {
+        for (const kindId in this.userStreamEffects.current[effectType]
+          .screen) {
+          if (
+            kindId === this.screenId &&
+            userStreamEffects.current[effectType].screen![this.screenId]
+          ) {
+            this.effects[effectType as ScreenEffects] = true;
+          }
+        }
+      }
+    }
+
+    this.baseShader = new BaseShader(gl, this.effects, meshes);
+
+    this.baseShader.setTintColor(this.tintColor);
+    this.baseShader.createAtlasTexture("twoDim", {});
+    this.baseShader.createAtlasTexture("threeDim", {});
+
     // Start video and render loop
     this.animationFrameId = [];
     this.video = document.createElement("video");
@@ -85,14 +121,14 @@ class ScreenMedia {
         this.screenId,
         this.gl,
         this.baseShader,
-        this.faceLandmarks,
+        undefined,
         this.video,
         this.canvas,
         this.animationFrameId,
         {},
         this.currentEffectsStyles,
-        this.faceMesh,
-        this.faceMeshResults
+        undefined,
+        undefined
       );
     });
     this.video.onloadedmetadata = () => {
@@ -102,119 +138,107 @@ class ScreenMedia {
       this.video.play();
     };
   }
-  getStream() {
-    return this.canvas.captureStream();
-  }
-  getTrack() {
-    return this.canvas.captureStream().getVideoTracks()[0];
-  }
-  async changeEffects(effects: {
-    blur?: boolean | undefined;
-    tint?: boolean | undefined;
-    ears?: boolean | undefined;
-    glasses?: boolean | undefined;
-    beards?: boolean | undefined;
-    mustaches?: boolean | undefined;
-    faceMasks?: boolean | undefined;
-  }) {
-    this.effects = effects;
-    // Remove old animation frame
+
+  deconstructor() {
+    // End render loop
     if (this.animationFrameId[0]) {
       cancelAnimationFrame(this.animationFrameId[0]);
       delete this.animationFrameId[0];
     }
-    releaseAllTexturePositions();
+
+    // End initial stream
+    this.initScreenStream.getTracks().forEach((track) => track.stop());
+
+    // End video
+    this.video.pause();
+    this.video.srcObject = null;
+
+    // Deconstruct base shader
+    this.baseShader.deconstructor();
+
+    // Clear gl canvas
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    if (this.canvas) {
+      const contextAttributes = this.gl.getContextAttributes();
+      if (contextAttributes && contextAttributes.preserveDrawingBuffer) {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+      }
+      const ext = this.gl.getExtension("WEBGL_lose_context");
+      if (ext) {
+        ext.loseContext();
+      }
+    }
+    this.canvas.remove();
+  }
+
+  private async updateAtlases() {
+    const twoDimUrls = {};
+
+    const threeDimUrls = {};
+
+    await this.baseShader.updateAtlasTexture("twoDim", twoDimUrls);
+    await this.baseShader.updateAtlasTexture("threeDim", threeDimUrls);
+  }
+
+  async changeEffects(
+    effect: ScreenEffects,
+    tintColor?: string,
+    blockStateChange: boolean = false
+  ) {
+    if (!blockStateChange) {
+      this.effects[effect] = !this.effects[effect];
+    }
+
     await this.updateAtlases();
+
     updateDeadbandingMaps(
       this.screenId,
       this.effects,
       this.currentEffectsStyles
     );
+
+    if (tintColor) {
+      this.setTintColor(tintColor);
+    }
+    if (effect === "tint" && !blockStateChange) {
+      this.baseShader.toggleTintEffect();
+    }
+
+    if (effect === "blur") {
+      this.baseShader.toggleBlurEffect();
+    }
+
+    // Remove old animation frame
+    if (this.animationFrameId[0]) {
+      cancelAnimationFrame(this.animationFrameId[0]);
+      delete this.animationFrameId[0];
+    }
+
     render(
       this.screenId,
       this.gl,
       this.baseShader,
-      this.faceLandmarks,
+      undefined,
       this.video,
       this.canvas,
       this.animationFrameId,
       this.effects,
       this.currentEffectsStyles,
-      this.faceMesh,
-      this.faceMeshResults
+      undefined,
+      undefined
     );
   }
-  private async updateAtlases() {
-    const twoDimUrls = {
-      [`${this.currentEffectsStyles.current[this.screenId].ears.style}Left`]:
-        this.effects.ears
-          ? `/2DAssets/ears/${
-              this.currentEffectsStyles.current[this.screenId].ears.style
-            }Left.png`
-          : null,
-      [`${this.currentEffectsStyles.current[this.screenId].ears.style}Right`]:
-        this.effects.ears
-          ? `/2DAssets/ears/${
-              this.currentEffectsStyles.current[this.screenId].ears.style
-            }Right.png`
-          : null,
-      [this.currentEffectsStyles.current[this.screenId].glasses.style]: this
-        .effects.glasses
-        ? `/2DAssets/glasses/${
-            this.currentEffectsStyles.current[this.screenId].glasses.style
-          }.png`
-        : null,
-      [this.currentEffectsStyles.current[this.screenId].beards.style]: this
-        .effects.beards
-        ? `/2DAssets/beards/${
-            this.currentEffectsStyles.current[this.screenId].beards.style
-          }.png`
-        : null,
-      [this.currentEffectsStyles.current[this.screenId].mustaches.style]: this
-        .effects.mustaches
-        ? `/2DAssets/mustaches/${
-            this.currentEffectsStyles.current[this.screenId].mustaches.style
-          }.png`
-        : null,
-    };
-    const filteredTwoDimUrls: { [URLType in URLsTypes]?: string } =
-      Object.fromEntries(
-        Object.entries(twoDimUrls).filter(([key, value]) => value !== null)
-      );
-    const threeDimUrls = {
-      // [`${currentEffectsStyles.current.ears.style}Left`]: effects.ears
-      //   ? `/3DAssets/ears/${currentEffectsStyles.current.ears.style}Left.png`
-      //   : null,
-      // [`${currentEffectsStyles.current.ears.style}Right`]: effects.ears
-      //   ? `/3DAssets/ears/${currentEffectsStyles.current.ears.style}Right.png`
-      //   : null,
-      // [currentEffectsStyles.current.glasses.style]: effects.glasses
-      //   ? `/3DAssets/glasses/${currentEffectsStyles.current.glasses.style}.png`
-      //   : null,
-      // [currentEffectsStyles.current.beards.style]: effects.beards
-      //   ? `/3DAssets/beards/${currentEffectsStyles.current.beards.style}.png`
-      //   : null,
-      [this.currentEffectsStyles.current[this.screenId].mustaches.style]:
-        this.effects.mustaches &&
-        this.currentEffectsStyles.current[this.screenId].mustaches.threeDim
-          ? `/3DAssets/mustaches/${
-              this.currentEffectsStyles.current[this.screenId].mustaches.style
-            }.png`
-          : null,
-      [this.currentEffectsStyles.current[this.screenId].faceMasks.style]:
-        this.effects.faceMasks &&
-        this.currentEffectsStyles.current[this.screenId].faceMasks.threeDim
-          ? `/3DAssets/faceMasks/${
-              this.currentEffectsStyles.current[this.screenId].faceMasks.style
-            }.png`
-          : null,
-    };
-    const filteredThreeDimUrls: { [URLType in URLsTypes]?: string } =
-      Object.fromEntries(
-        Object.entries(threeDimUrls).filter(([key, value]) => value !== null)
-      );
-    await this.baseShader.createAtlasTexture("twoDim", filteredTwoDimUrls);
-    await this.baseShader.createAtlasTexture("threeDim", filteredThreeDimUrls);
+
+  getStream() {
+    return this.canvas.captureStream();
+  }
+
+  getTrack() {
+    return this.canvas.captureStream().getVideoTracks()[0];
+  }
+
+  setTintColor(newTintColor: string) {
+    this.baseShader.setTintColor(newTintColor);
   }
 }
 

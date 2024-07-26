@@ -1,11 +1,13 @@
 import React from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 import {
   useCurrentEffectsStylesContext,
   FaceMasksEffectTypes,
 } from "../../context/CurrentEffectsStylesContext";
 import faceMask1 from "../../../public/2DAssets/faceMasks/faceMask1.png";
+import loading_faceMask1 from "../../../public/2DAssets/faceMasks/loading_faceMask1.png";
 import faceMaskIcon1 from "../../../public/svgs/faceMasks/faceMaskIcon1.svg";
 import faceMaskOffIcon1 from "../../../public/svgs/faceMasks/faceMaskOffIcon1.svg";
 import threeDim_faceMaskIcon1 from "../../../public/svgs/faceMasks/threeDim_faceMaskIcon1.svg";
@@ -27,6 +29,7 @@ export default function FaceMasksButton({
   const faceMasksEffects: {
     [key in FaceMasksEffectTypes]: {
       image: string;
+      loading: string;
       icon: string;
       offIcon: string;
       threeDimIcon: string;
@@ -37,6 +40,7 @@ export default function FaceMasksButton({
   } = {
     faceMask1: {
       image: faceMask1,
+      loading: loading_faceMask1,
       icon: faceMaskIcon1,
       offIcon: faceMaskOffIcon1,
       threeDimIcon: threeDim_faceMaskIcon1,
@@ -51,20 +55,30 @@ export default function FaceMasksButton({
       clickFunction={() => handleEffectChange("faceMasks")}
       holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
-        if (target && target.dataset.value) {
-          const effectType = target.dataset.value as FaceMasksEffectTypes;
-          if (
-            effectType in faceMasksEffects &&
-            (currentEffectsStyles.current[videoId].faceMasks.style !==
-              effectType ||
-              !userStreamEffects.current.faceMasks[type]?.[videoId])
-          ) {
-            currentEffectsStyles.current[videoId].faceMasks.style = effectType;
-            handleEffectChange("faceMasks");
-          }
+        if (
+          !currentEffectsStyles.current[videoId].faceMasks ||
+          !target ||
+          !target.dataset.value
+        ) {
+          return;
+        }
+
+        const effectType = target.dataset.value as FaceMasksEffectTypes;
+        if (
+          effectType in faceMasksEffects &&
+          (currentEffectsStyles.current[videoId].faceMasks.style !==
+            effectType ||
+            !userStreamEffects.current.faceMasks[type]?.[videoId])
+        ) {
+          currentEffectsStyles.current[videoId].faceMasks.style = effectType;
+          handleEffectChange("faceMasks");
         }
       }}
       contentFunction={() => {
+        if (!currentEffectsStyles.current[videoId].faceMasks) {
+          return;
+        }
+
         const iconSrc =
           faceMasksEffects[
             currentEffectsStyles.current[videoId].faceMasks.style
@@ -103,10 +117,11 @@ export default function FaceMasksButton({
               } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
               data-value={faceMasks}
             >
-              <img
+              <FgImage
                 src={effect.image}
+                srcLoading={effect.loading}
                 alt={faceMasks}
-                style={{ width: "90%" }}
+                style={{ width: "90%", height: "90%" }}
                 data-value={faceMasks}
               />
             </div>
@@ -119,7 +134,7 @@ export default function FaceMasksButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={currentEffectsStyles.current[videoId].faceMasks.style}
+      defaultDataValue={currentEffectsStyles.current[videoId].faceMasks?.style}
       hoverTimeoutDuration={750}
     />
   );

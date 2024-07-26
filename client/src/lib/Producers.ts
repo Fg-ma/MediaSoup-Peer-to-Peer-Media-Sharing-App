@@ -370,7 +370,8 @@ class Producers {
             this.table_id.current,
             `${this.username.current}_screen_stream_${this.userScreenCount.current}`,
             screenBrowserMedia,
-            this.currentEffectsStyles
+            this.currentEffectsStyles,
+            this.userStreamEffects
           );
 
           this.userMedia.current.screen[
@@ -565,7 +566,8 @@ class Producers {
         this.table_id.current,
         `${this.username.current}_screen_stream_${this.userScreenCount.current}`,
         screenBrowserMedia,
-        this.currentEffectsStyles
+        this.currentEffectsStyles,
+        this.userStreamEffects
       );
 
       this.userMedia.current.screen[

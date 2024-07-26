@@ -20,6 +20,7 @@ export default function TintSection({
   const { userStreamEffects } = useStreamsContext();
 
   const [color, setColor] = useState("#F56114");
+  const colorRef = useRef("#F56114");
   const [buttonState, setButtonState] = useState("");
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
   const [isColorPicker, setIsColorPicker] = useState(false);
@@ -52,7 +53,7 @@ export default function TintSection({
               attributes={[
                 { key: "width", value: "95%" },
                 { key: "height", value: "95%" },
-                { key: "fill", value: color, id: "path1" },
+                { key: "fill", value: color, id: "tintColorPath" },
               ]}
             />
           );

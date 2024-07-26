@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 import {
   useCurrentEffectsStylesContext,
   EarsEffectTypes,
   earsWidthFactorMap,
 } from "../../context/CurrentEffectsStylesContext";
 import dogEars from "../../../public/2DAssets/ears/dogEars.png";
+import loading_dogEars from "../../../public/2DAssets/ears/loading_dogEars.png";
 import dogEarsIcon from "../../../public/svgs/ears/dogEarsIcon.svg";
 import dogEarsOffIcon from "../../../public/svgs/ears/dogEarsOffIcon.svg";
 import threeDim_dogEarsIcon from "../../../public/svgs/ears/threeDim_dogEarsIcon.svg";
@@ -29,6 +31,7 @@ export default function EarsButton({
   const earsEffects: {
     [key in EarsEffectTypes]: {
       image: string;
+      loading: string;
       icon: string;
       offIcon: string;
       threeDimIcon: string;
@@ -39,6 +42,7 @@ export default function EarsButton({
   } = {
     dogEars: {
       image: dogEars,
+      loading: loading_dogEars,
       icon: dogEarsIcon,
       offIcon: dogEarsOffIcon,
       threeDimIcon: threeDim_dogEarsIcon,
@@ -53,7 +57,7 @@ export default function EarsButton({
       clickFunction={() => {
         handleEffectChange("ears");
         setButtonState(
-          currentEffectsStyles.current[videoId].ears.threeDim
+          currentEffectsStyles.current[videoId].ears?.threeDim
             ? userStreamEffects.current.ears[type]?.[videoId]
               ? "threeDimOffIcon"
               : "threeDimIcon"
@@ -64,26 +68,36 @@ export default function EarsButton({
       }}
       holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
-        if (target && target.dataset.value) {
-          const effectType = target.dataset.value as EarsEffectTypes;
-          if (
-            effectType in earsEffects &&
-            (currentEffectsStyles.current[videoId].ears.style !== effectType ||
-              !userStreamEffects.current.ears[type]?.[videoId])
-          ) {
-            currentEffectsStyles.current[videoId].ears.style = effectType;
-            currentEffectsStyles.current[videoId].ears.leftEarWidthFactor =
-              earsWidthFactorMap[effectType].leftEarWidthFactor;
-            currentEffectsStyles.current[videoId].ears.rightEarWidthFactor =
-              earsWidthFactorMap[effectType].rightEarWidthFactor;
-            handleEffectChange(
-              "ears",
-              userStreamEffects.current.ears[type]?.[videoId]
-            );
-          }
+        if (
+          !currentEffectsStyles.current[videoId].ears ||
+          !target ||
+          !target.dataset.value
+        ) {
+          return;
+        }
+
+        const effectType = target.dataset.value as EarsEffectTypes;
+        if (
+          effectType in earsEffects &&
+          (currentEffectsStyles.current[videoId].ears.style !== effectType ||
+            !userStreamEffects.current.ears[type]?.[videoId])
+        ) {
+          currentEffectsStyles.current[videoId].ears.style = effectType;
+          currentEffectsStyles.current[videoId].ears.leftEarWidthFactor =
+            earsWidthFactorMap[effectType].leftEarWidthFactor;
+          currentEffectsStyles.current[videoId].ears.rightEarWidthFactor =
+            earsWidthFactorMap[effectType].rightEarWidthFactor;
+          handleEffectChange(
+            "ears",
+            userStreamEffects.current.ears[type]?.[videoId]
+          );
         }
       }}
       contentFunction={() => {
+        if (!currentEffectsStyles.current[videoId].ears) {
+          return;
+        }
+
         const iconSrc =
           earsEffects[currentEffectsStyles.current[videoId].ears.style][
             currentEffectsStyles.current[videoId].ears.threeDim
@@ -107,6 +121,10 @@ export default function EarsButton({
         );
       }}
       doubleClickFunction={() => {
+        if (!currentEffectsStyles.current[videoId].ears) {
+          return;
+        }
+
         currentEffectsStyles.current[videoId].ears.threeDim =
           !currentEffectsStyles.current[videoId].ears.threeDim;
 
@@ -137,10 +155,11 @@ export default function EarsButton({
               } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
               data-value={ears}
             >
-              <img
+              <FgImage
                 src={effect.image}
+                srcLoading={effect.loading}
                 alt={ears}
-                style={{ width: "90%" }}
+                style={{ width: "90%", height: "90%" }}
                 data-value={ears}
               />
             </div>
@@ -153,7 +172,7 @@ export default function EarsButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={currentEffectsStyles.current[videoId].ears.style}
+      defaultDataValue={currentEffectsStyles.current[videoId].ears?.style}
       hoverTimeoutDuration={750}
     />
   );

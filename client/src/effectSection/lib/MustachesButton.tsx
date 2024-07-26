@@ -1,16 +1,22 @@
 import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 import {
   useCurrentEffectsStylesContext,
   MustachesEffectTypes,
   mustacheNoseOffsetsMap,
 } from "../../context/CurrentEffectsStylesContext";
 import mustache1 from "../../../public/2DAssets/mustaches/mustache1.png";
+import loading_mustache1 from "../../../public/2DAssets/mustaches/loading_mustache1.png";
 import mustache2 from "../../../public/2DAssets/mustaches/mustache2.png";
+import loading_mustache2 from "../../../public/2DAssets/mustaches/loading_mustache2.png";
 import mustache3 from "../../../public/2DAssets/mustaches/mustache3.png";
+import loading_mustache3 from "../../../public/2DAssets/mustaches/loading_mustache3.png";
 import mustache4 from "../../../public/2DAssets/mustaches/mustache4.png";
+import loading_mustache4 from "../../../public/2DAssets/mustaches/loading_mustache4.png";
 import disguiseMustache from "../../../public/2DAssets/mustaches/disguiseMustache.png";
+import loading_disguiseMustache from "../../../public/2DAssets/mustaches/loading_disguiseMustache.png";
 import mustacheIcon1 from "../../../public/svgs/mustaches/mustacheIcon1.svg";
 import mustacheOffIcon1 from "../../../public/svgs/mustaches/mustacheOffIcon1.svg";
 import threeDim_mustacheIcon1 from "../../../public/svgs/mustaches/threeDim_mustacheIcon1.svg";
@@ -49,6 +55,7 @@ export default function MustachesButton({
   const mustachesEffects: {
     [key in MustachesEffectTypes]: {
       image: string;
+      loading: string;
       icon: string;
       offIcon: string;
       threeDimIcon: string;
@@ -59,6 +66,7 @@ export default function MustachesButton({
   } = {
     mustache1: {
       image: mustache1,
+      loading: loading_mustache1,
       icon: mustacheIcon1,
       offIcon: mustacheOffIcon1,
       threeDimIcon: threeDim_mustacheIcon1,
@@ -68,6 +76,7 @@ export default function MustachesButton({
     },
     mustache2: {
       image: mustache2,
+      loading: loading_mustache2,
       icon: mustacheIcon2,
       offIcon: mustacheOffIcon2,
       threeDimIcon: threeDim_mustacheIcon2,
@@ -77,6 +86,7 @@ export default function MustachesButton({
     },
     mustache3: {
       image: mustache3,
+      loading: loading_mustache3,
       icon: mustacheIcon3,
       offIcon: mustacheOffIcon3,
       threeDimIcon: threeDim_mustacheIcon3,
@@ -86,6 +96,7 @@ export default function MustachesButton({
     },
     mustache4: {
       image: mustache4,
+      loading: loading_mustache4,
       icon: mustacheIcon4,
       offIcon: mustacheOffIcon4,
       threeDimIcon: threeDim_mustacheIcon4,
@@ -95,6 +106,7 @@ export default function MustachesButton({
     },
     disguiseMustache: {
       image: disguiseMustache,
+      loading: loading_disguiseMustache,
       icon: disguiseMustacheIcon,
       offIcon: disguiseMustacheOffIcon,
       threeDimIcon: threeDim_disguiseMustacheIcon,
@@ -109,7 +121,7 @@ export default function MustachesButton({
       clickFunction={() => {
         handleEffectChange("mustaches");
         setButtonState(
-          currentEffectsStyles.current[videoId].mustaches.threeDim
+          currentEffectsStyles.current[videoId].mustaches?.threeDim
             ? userStreamEffects.current.mustaches[type]?.[videoId]
               ? "threeDimOffIcon"
               : "threeDimIcon"
@@ -120,25 +132,35 @@ export default function MustachesButton({
       }}
       holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
-        if (target && target.dataset.value) {
-          const effectType = target.dataset.value as MustachesEffectTypes;
-          if (
-            effectType in mustachesEffects &&
-            (currentEffectsStyles.current[videoId].mustaches.style !==
-              effectType ||
-              !userStreamEffects.current.mustaches[type]?.[videoId])
-          ) {
-            currentEffectsStyles.current[videoId].mustaches.style = effectType;
-            currentEffectsStyles.current[videoId].mustaches.noseOffset =
-              mustacheNoseOffsetsMap[effectType];
-            handleEffectChange(
-              "mustaches",
-              userStreamEffects.current.mustaches[type]?.[videoId]
-            );
-          }
+        if (
+          !currentEffectsStyles.current[videoId].mustaches ||
+          !target ||
+          !target.dataset.value
+        ) {
+          return;
+        }
+
+        const effectType = target.dataset.value as MustachesEffectTypes;
+        if (
+          effectType in mustachesEffects &&
+          (currentEffectsStyles.current[videoId].mustaches.style !==
+            effectType ||
+            !userStreamEffects.current.mustaches[type]?.[videoId])
+        ) {
+          currentEffectsStyles.current[videoId].mustaches.style = effectType;
+          currentEffectsStyles.current[videoId].mustaches.noseOffset =
+            mustacheNoseOffsetsMap[effectType];
+          handleEffectChange(
+            "mustaches",
+            userStreamEffects.current.mustaches[type]?.[videoId]
+          );
         }
       }}
       contentFunction={() => {
+        if (!currentEffectsStyles.current[videoId].mustaches) {
+          return;
+        }
+
         const iconSrc =
           mustachesEffects[
             currentEffectsStyles.current[videoId].mustaches.style
@@ -164,6 +186,10 @@ export default function MustachesButton({
         );
       }}
       doubleClickFunction={() => {
+        if (!currentEffectsStyles.current[videoId].mustaches) {
+          return;
+        }
+
         currentEffectsStyles.current[videoId].mustaches.threeDim =
           !currentEffectsStyles.current[videoId].mustaches.threeDim;
 
@@ -191,11 +217,12 @@ export default function MustachesButton({
                 effect.bgColor === "white" && "bg-white border-fg-black-35"
               } ${
                 effect.bgColor === "black" && "border-white"
-              } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+              } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75 relative`}
               data-value={mustaches}
             >
-              <img
+              <FgImage
                 src={effect.image}
+                srcLoading={effect.loading}
                 alt={mustaches}
                 style={{ width: "90%" }}
                 data-value={mustaches}
@@ -210,7 +237,7 @@ export default function MustachesButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={currentEffectsStyles.current[videoId].mustaches.style}
+      defaultDataValue={currentEffectsStyles.current[videoId].mustaches?.style}
       hoverTimeoutDuration={750}
     />
   );

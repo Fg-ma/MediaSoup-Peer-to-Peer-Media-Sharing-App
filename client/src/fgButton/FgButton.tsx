@@ -23,7 +23,7 @@ export default function FgButton({
   externalRef?: React.RefObject<HTMLButtonElement>;
   clickFunction: () => void;
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
-  contentFunction?: () => React.ReactElement;
+  contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: () => void;
   holdContent?: React.ReactElement;
   hoverContent?: React.ReactElement;
