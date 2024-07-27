@@ -36,39 +36,40 @@ export default function ColorPicker({
     top: null,
     left: null,
   });
-
   const [isDragging, setIsDragging] = useState(false);
   const colorPickerRef = useRef<HTMLDivElement>(null);
+  const mousePickerOffset = useRef<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
+
+  const getColorPickerPosition = () => {
+    const rect = colorPickerBtnRef.current?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
+    const bodyRect = document.body.getBoundingClientRect();
+
+    const topPercent = ((rect.top + rect.height + 15) / bodyRect.height) * 100;
+    const leftPercent = ((rect.left + rect.width + 15) / bodyRect.width) * 100;
+
+    setColorPickerPosition({
+      top: topPercent,
+      left: leftPercent,
+    });
+  };
+
+  const handleClick = (event: MouseEvent) => {
+    if (
+      !colorPickerRef.current?.contains(event.target as Node) &&
+      event.target !== colorPickerBtnRef.current
+    ) {
+      setTempColor(color);
+      setIsColorPicker(false);
+    }
+  };
 
   useEffect(() => {
-    const getColorPickerPosition = () => {
-      const rect = colorPickerBtnRef.current?.getBoundingClientRect();
-      if (!rect) {
-        return;
-      }
-      const bodyRect = document.body.getBoundingClientRect();
-
-      const topPercent =
-        ((rect.top + rect.height + 15) / bodyRect.height) * 100;
-      const leftPercent =
-        ((rect.left + rect.width + 15) / bodyRect.width) * 100;
-
-      setColorPickerPosition({
-        top: topPercent,
-        left: leftPercent,
-      });
-    };
-
-    const handleClick = (event: MouseEvent) => {
-      if (
-        !colorPickerRef.current?.contains(event.target as Node) &&
-        event.target !== colorPickerBtnRef.current
-      ) {
-        setTempColor(color);
-        setIsColorPicker(false);
-      }
-    };
-
     getColorPickerPosition();
 
     document.addEventListener("mousedown", handleClick);
@@ -161,11 +162,6 @@ export default function ColorPicker({
 
     return `#${rHex}${gHex}${bHex}`;
   };
-
-  const mousePickerOffset = useRef<{ top: number; left: number }>({
-    top: 0,
-    left: 0,
-  });
 
   const startDrag = (e: React.MouseEvent) => {
     e.preventDefault();

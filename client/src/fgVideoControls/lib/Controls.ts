@@ -1,4 +1,5 @@
 import { Socket } from "socket.io-client";
+import { EffectTypes } from "src/context/StreamsContext";
 
 class Controls {
   private socket: React.MutableRefObject<Socket> | undefined;
@@ -41,6 +42,11 @@ class Controls {
   private isThumbnail: boolean;
   private thumbnailInterval: number;
   private thumbnailClarity: number;
+  private setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
+  private handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
 
   constructor(
     socket: React.MutableRefObject<Socket> | undefined,
@@ -79,7 +85,12 @@ class Controls {
     isPreview: boolean,
     isThumbnail: boolean,
     thumbnailInterval = 10,
-    thumbnailClarity = 5
+    thumbnailClarity = 5,
+    setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>,
+    handleEffectChange: (
+      effect: EffectTypes,
+      blockStateChange?: boolean
+    ) => Promise<void>
   ) {
     this.socket = socket;
     this.table_id = table_id;
@@ -118,6 +129,8 @@ class Controls {
     this.isThumbnail = isThumbnail;
     this.thumbnailInterval = thumbnailInterval;
     this.thumbnailClarity = thumbnailClarity;
+    this.setEffectsActive = setEffectsActive;
+    this.handleEffectChange = handleEffectChange;
   }
 
   formatDuration(time: number) {
@@ -156,6 +169,7 @@ class Controls {
   }
 
   handleEffects() {
+    this.setEffectsActive((prev) => !prev);
     if (!this.videoContainerRef.current?.classList.contains("in-effects")) {
       this.videoContainerRef.current?.classList.add("in-effects");
     } else {
@@ -262,7 +276,7 @@ class Controls {
           this.skip(this.skipIncrement);
         }
         break;
-      case "k":
+      case "l":
         if (this.isSkip) {
           this.skip(this.skipIncrement);
         }
@@ -271,6 +285,15 @@ class Controls {
         if (this.isClosedCaptions) {
           this.handleClosedCaptions();
         }
+        break;
+      case "e":
+        this.handleEffects();
+        break;
+      case "x":
+        this.handleCloseVideo();
+        break;
+      case "delete":
+        this.handleCloseVideo();
         break;
       default:
         break;
@@ -313,19 +336,17 @@ class Controls {
   }
 
   handleMouseLeave() {
-    if (this.videoContainerRef.current?.classList.contains("paused")) return;
     this.leaveVideoTimer.current = setTimeout(() => {
       this.videoContainerRef.current?.classList.remove("in-video");
     }, this.controlsVanishTime);
   }
 
   handlePausePlay() {
+    this.handleEffectChange("pause");
     this.paused.current = !this.paused.current;
     if (this.paused.current) {
-      this.videoRef.current?.pause();
       this.videoContainerRef.current?.classList.add("paused");
     } else {
-      this.videoRef.current?.play();
       this.videoContainerRef.current?.classList.remove("paused");
     }
   }

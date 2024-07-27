@@ -31,7 +31,7 @@ export default function TheaterButton({
       hoverContent={
         !effectsActive ? (
           <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            Theater
+            Theater (t)
           </div>
         ) : undefined
       }

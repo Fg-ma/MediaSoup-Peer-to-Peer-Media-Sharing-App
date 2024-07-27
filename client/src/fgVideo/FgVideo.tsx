@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
@@ -107,6 +107,7 @@ export default function FgVideo({
   >;
 }) {
   const { userMedia, userStreamEffects } = useStreamsContext();
+  const [effectsActive, setEffectsActive] = useState(false);
   const paused = useRef(!autoPlay);
   const theater = useRef(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -126,6 +127,32 @@ export default function FgVideo({
   const thumbnails = useRef<string[]>([]);
   const tintColor = useRef("#F56114");
   const stream = userMedia.current[type][videoId]?.getStream();
+
+  const handleEffectChange = async (
+    effect: EffectTypes,
+    blockStateChange: boolean = false
+  ) => {
+    if (isUser) {
+      await handleEffect(
+        effect,
+        blockStateChange,
+        type,
+        videoId,
+        userMedia,
+        userStreamEffects,
+        tintColor
+      );
+    } else {
+      const msg = {
+        type: "requestEffect",
+        effect: effect,
+        table_id: table_id,
+        username: username,
+        producerId: videoId,
+      };
+      socket?.current.emit("message", msg);
+    }
+  };
 
   const controls = new Controls(
     socket,
@@ -164,7 +191,9 @@ export default function FgVideo({
     isPreview,
     isThumbnail,
     10,
-    5
+    5,
+    setEffectsActive,
+    handleEffectChange
   );
 
   const init = () => {
@@ -301,6 +330,8 @@ export default function FgVideo({
       controls.handlePictureInPicture("leave")
     );
 
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       document.removeEventListener("fullscreenchange", () =>
         controls.handleFullScreenChange()
@@ -345,6 +376,7 @@ export default function FgVideo({
       videoRef.current?.removeEventListener("leavepictureinpicture", () =>
         controls.handlePictureInPicture("leave")
       );
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -367,29 +399,20 @@ export default function FgVideo({
     };
   }, []);
 
-  const handleEffectChange = async (
-    effect: EffectTypes,
-    blockStateChange: boolean = false
-  ) => {
-    if (isUser) {
-      await handleEffect(
-        effect,
-        blockStateChange,
-        type,
-        videoId,
-        userMedia,
-        userStreamEffects,
-        tintColor
-      );
+  const handleVisibilityChange = () => {
+    if (type !== "camera") {
+      return;
+    }
+
+    if (document.hidden) {
+      console.log("wokr");
+      if (!videoContainerRef.current?.classList.contains("paused")) {
+        controls.handlePausePlay();
+      }
     } else {
-      const msg = {
-        type: "requestEffect",
-        effect: effect,
-        table_id: table_id,
-        username: username,
-        producerId: videoId,
-      };
-      socket?.current.emit("message", msg);
+      if (videoContainerRef.current?.classList.contains("paused")) {
+        controls.handlePausePlay();
+      }
     }
   };
 
@@ -482,6 +505,7 @@ export default function FgVideo({
             isFullScreen={isFullScreen}
             tintColor={tintColor}
             paths={paths}
+            effectsActive={effectsActive}
           />
           <div
             className='controls-gradient absolute bottom-0 w-full h-20 z-10'

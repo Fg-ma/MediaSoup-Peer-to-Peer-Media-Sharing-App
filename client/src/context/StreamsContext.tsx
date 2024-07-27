@@ -4,6 +4,7 @@ import ScreenMedia from "../lib/ScreenMedia";
 import AudioMedia from "src/lib/AudioMedia";
 
 export type EffectTypes =
+  | "pause"
   | "blur"
   | "tint"
   | "ears"
@@ -123,6 +124,7 @@ export function StreamsContextProvider({
       audio?: boolean;
     };
   }>({
+    pause: { camera: {}, screen: {} },
     blur: { camera: {}, screen: {} },
     tint: { camera: {}, screen: {} },
     ears: { camera: {} },

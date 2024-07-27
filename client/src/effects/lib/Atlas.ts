@@ -203,7 +203,7 @@ class Atlas {
     this.gl.texParameteri(
       this.gl.TEXTURE_2D,
       this.gl.TEXTURE_MIN_FILTER,
-      this.gl.LINEAR
+      this.gl.LINEAR_MIPMAP_LINEAR
     );
     this.gl.texParameteri(
       this.gl.TEXTURE_2D,
@@ -246,6 +246,9 @@ class Atlas {
       this.gl.UNSIGNED_BYTE,
       atlasImage.data
     );
+
+    // Generate mipmaps
+    this.gl.generateMipmap(this.gl.TEXTURE_2D);
 
     // Set uniform
     this.gl.uniform1i(this.uAtlasTextureLocation, this.texturePosition);

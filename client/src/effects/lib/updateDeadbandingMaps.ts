@@ -1,4 +1,4 @@
-import { EffectTypes } from "src/context/StreamsContext";
+import { EffectTypes } from "../../context/StreamsContext";
 import { OneDimensionalLandmarkTypes } from "./FaceLandmarks";
 import {
   BeardsEffectTypes,
@@ -6,7 +6,7 @@ import {
   EffectStylesType,
   GlassesEffectTypes,
   MustachesEffectTypes,
-} from "src/context/CurrentEffectsStylesContext";
+} from "../../context/CurrentEffectsStylesContext";
 
 const glassesDeadbandingMap: {
   [glassesEffectType in GlassesEffectTypes]: {

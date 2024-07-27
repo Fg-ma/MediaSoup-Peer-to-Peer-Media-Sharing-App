@@ -11,6 +11,16 @@ import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { EffectTypes } from "../context/StreamsContext";
 
+type CameraEffects =
+  | "pause"
+  | "blur"
+  | "tint"
+  | "ears"
+  | "glasses"
+  | "beards"
+  | "mustaches"
+  | "faceMasks";
+
 class CameraMedia {
   private username: string;
   private table_id: string;
@@ -47,13 +57,7 @@ class CameraMedia {
   private faceMesh: FaceMesh;
 
   private effects: {
-    blur?: boolean | undefined;
-    tint?: boolean | undefined;
-    ears?: boolean | undefined;
-    glasses?: boolean | undefined;
-    beards?: boolean | undefined;
-    mustaches?: boolean | undefined;
-    faceMasks?: boolean | undefined;
+    [cameraEffect in CameraEffects]?: boolean;
   };
 
   private tintColor = "#F56114";
@@ -195,7 +199,8 @@ class CameraMedia {
         {},
         this.currentEffectsStyles,
         this.faceMesh,
-        this.faceMeshResults
+        this.faceMeshResults,
+        this.effects.pause
       );
     });
     this.video.onloadedmetadata = () => {
@@ -352,6 +357,10 @@ class CameraMedia {
       this.baseShader.toggleBlurEffect();
     }
 
+    if (effect === "pause") {
+      this.baseShader.setPause(this.effects[effect]);
+    }
+
     // Remove old animation frame
     if (this.animationFrameId[0]) {
       cancelAnimationFrame(this.animationFrameId[0]);
@@ -369,7 +378,9 @@ class CameraMedia {
       this.effects,
       this.currentEffectsStyles,
       this.faceMesh,
-      this.faceMeshResults
+      this.faceMeshResults,
+      this.effects.pause,
+      false
     );
   }
 

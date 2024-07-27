@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   volumeHigh1a,
   volumeHigh1b,
@@ -56,6 +56,7 @@ export default function VolumeSection({
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   effectsActive: boolean;
 }) {
+  const [active, setActive] = useState(false);
   const volumeContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function VolumeSection({
       <FgButton
         clickFunction={() => {
           handleMute();
+          setActive((prev) => !prev);
         }}
         contentFunction={() => {
           return (
@@ -138,7 +140,7 @@ export default function VolumeSection({
         hoverContent={
           !effectsActive ? (
             <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              Volume
+              {active ? "Unmute (m)" : "Mute (m)"}
             </div>
           ) : undefined
         }

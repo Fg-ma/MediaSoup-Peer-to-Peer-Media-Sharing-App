@@ -98,14 +98,13 @@ export default function FgButton({
     if (doubleClickFunction) {
       doubleClickFunction();
     }
+    isClicked.current = false;
   };
 
   useEffect(() => {
     const handleWindowMouseUp = (event: MouseEvent) =>
       handleMouseUp(event as unknown as React.MouseEvent<Element, MouseEvent>);
-
     window.addEventListener("mouseup", handleWindowMouseUp);
-
     return () => {
       window.removeEventListener("mouseup", handleWindowMouseUp);
     };

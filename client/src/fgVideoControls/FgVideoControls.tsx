@@ -40,6 +40,7 @@ export default function FgVideoControls({
   isFullScreen,
   tintColor,
   paths,
+  effectsActive,
 }: {
   videoId: string;
   type: "camera" | "screen";
@@ -74,9 +75,8 @@ export default function FgVideoControls({
   isFullScreen: boolean;
   tintColor: React.MutableRefObject<string>;
   paths: string[][];
+  effectsActive: boolean;
 }) {
-  const [effectsActive, setEffectsActive] = useState(false);
-
   return (
     <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
       <div className='relative pointer-events-auto'>
@@ -117,11 +117,7 @@ export default function FgVideoControls({
           {isTotalTime && <div ref={totalTimeRef} className='total-time'></div>}
         </div>
         {isEffects && (
-          <EffectsButton
-            controls={controls}
-            effectsActive={effectsActive}
-            setEffectsActive={setEffectsActive}
-          />
+          <EffectsButton controls={controls} effectsActive={effectsActive} />
         )}
         {isPlaybackSpeed && (
           <PlaybackSpeedButton

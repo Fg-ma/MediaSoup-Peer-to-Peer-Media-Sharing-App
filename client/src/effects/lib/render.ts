@@ -4,6 +4,9 @@ import { EffectStylesType } from "../../context/CurrentEffectsStylesContext";
 import BaseShader from "./BaseShader";
 import FaceLandmarks from "./FaceLandmarks";
 
+const MAX_FRAME_PROCESSING_TIME = 16; // ~60 FPS
+const MIN_FRAME_INTERVAL = 16; // ~60 FPS
+let frameCounter = 0;
 const render = async (
   id: string,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -17,17 +20,23 @@ const render = async (
   },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
   faceMesh: FaceMesh | undefined,
-  faceMeshResults: Results[] | undefined
+  faceMeshResults: Results[] | undefined,
+  pause = false,
+  flipVideo = false
 ) => {
+  const startTime = performance.now();
+
+  // Clear the canvas and update the video texture
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.CULL_FACE);
   gl.cullFace(gl.BACK);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  baseShader.updateVideoTexture(video);
+  baseShader.updateVideoTexture(video, flipVideo);
 
   if (
+    !pause &&
     faceMesh &&
     faceMeshResults &&
     faceLandmarks &&
@@ -37,27 +46,61 @@ const render = async (
       effects.mustaches ||
       effects.faceMasks)
   ) {
-    await faceMesh.send({ image: video });
-    if (faceMeshResults.length === 0) {
+    // Abort processing if the previous frame took too long
+    if (performance.now() - startTime > MAX_FRAME_PROCESSING_TIME) {
+      animationFrameId[0] = requestAnimationFrame(() =>
+        render(
+          id,
+          gl,
+          baseShader,
+          faceLandmarks,
+          video,
+          canvas,
+          animationFrameId,
+          effects,
+          currentEffectsStyles,
+          faceMesh,
+          faceMeshResults,
+          pause,
+          flipVideo
+        )
+      );
       return;
     }
-    const multiFaceLandmarks = faceMeshResults[0].multiFaceLandmarks;
 
-    const detectionTimedOut = faceLandmarks.getTimedOut();
-
-    // Update landmarks based on state of dection timeout
-    if (multiFaceLandmarks.length > 0) {
-      if (detectionTimedOut) {
-        faceLandmarks.setTimedOut(false);
-      }
-      await faceLandmarks.update(multiFaceLandmarks, canvas);
-    } else {
-      if (!detectionTimedOut) {
-        if (faceLandmarks.getTimeoutTimer() === undefined) {
-          faceLandmarks.startTimeout();
+    // Process every second frame
+    frameCounter++;
+    if (frameCounter % 2 === 0) {
+      const sendVideoFrame = async () => {
+        try {
+          await faceMesh.send({ image: video });
+        } catch (error) {
+          console.error("Error sending video frame to faceMesh:", error);
+          return;
         }
-      } else {
+      };
+
+      await sendVideoFrame();
+      if (faceMeshResults.length === 0) {
+        return;
+      }
+
+      const multiFaceLandmarks = faceMeshResults[0].multiFaceLandmarks;
+      const detectionTimedOut = faceLandmarks.getTimedOut();
+
+      if (multiFaceLandmarks.length > 0) {
+        if (detectionTimedOut) {
+          faceLandmarks.setTimedOut(false);
+        }
         await faceLandmarks.update(multiFaceLandmarks, canvas);
+      } else {
+        if (!detectionTimedOut) {
+          if (faceLandmarks.getTimeoutTimer() === undefined) {
+            faceLandmarks.startTimeout();
+          }
+        } else {
+          await faceLandmarks.update(multiFaceLandmarks, canvas);
+        }
       }
     }
 
@@ -71,7 +114,6 @@ const render = async (
         if (!currentEffectsStyles.current[id].ears.threeDim) {
           const twoDimEarsOffset =
             calculatedLandmarks.twoDimEarsOffsets[faceId];
-
           baseShader.drawEffect(
             `${currentEffectsStyles.current[id].ears.style}Right`,
             {
@@ -126,6 +168,7 @@ const render = async (
           }
         }
       }
+
       if (effects.glasses && currentEffectsStyles.current[id].glasses) {
         if (!currentEffectsStyles.current[id].glasses.threeDim) {
           const eyesCenterPosition =
@@ -169,6 +212,7 @@ const render = async (
           }
         }
       }
+
       if (effects.beards && currentEffectsStyles.current[id].beards) {
         if (!currentEffectsStyles.current[id].beards.threeDim) {
           const twoDimBeardOffset =
@@ -212,6 +256,7 @@ const render = async (
           }
         }
       }
+
       if (effects.mustaches && currentEffectsStyles.current[id].mustaches) {
         if (!currentEffectsStyles.current[id].mustaches.threeDim) {
           const twoDimMustacheOffset =
@@ -253,10 +298,18 @@ const render = async (
           );
         }
       }
+
       if (effects.faceMasks) {
         await baseShader.drawFaceMesh("faceMask1", landmarks.slice(0, -10));
       }
     }
+  }
+
+  // Throttle frame rendering
+  const elapsedTime = performance.now() - startTime;
+  const remainingTime = MIN_FRAME_INTERVAL - elapsedTime;
+  if (remainingTime > 0) {
+    await new Promise((resolve) => setTimeout(resolve, remainingTime));
   }
 
   animationFrameId[0] = requestAnimationFrame(() =>
@@ -271,7 +324,9 @@ const render = async (
       effects,
       currentEffectsStyles,
       faceMesh,
-      faceMeshResults
+      faceMeshResults,
+      pause,
+      flipVideo
     )
   );
 };

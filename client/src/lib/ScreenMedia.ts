@@ -4,7 +4,7 @@ import render from "../effects/lib/render";
 import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
 import { EffectTypes } from "../context/StreamsContext";
 
-type ScreenEffects = "blur" | "tint";
+type ScreenEffects = "pause" | "blur" | "tint";
 
 class ScreenMedia {
   private username: string;
@@ -38,7 +38,7 @@ class ScreenMedia {
   private baseShader: BaseShader;
 
   private effects: {
-    [ScreenEffect in ScreenEffects]: boolean;
+    [screenEffect in ScreenEffects]?: boolean;
   };
 
   private tintColor = "#F56114";
@@ -89,7 +89,7 @@ class ScreenMedia {
 
     const meshes = {};
 
-    this.effects = { blur: false, tint: false };
+    this.effects = {};
 
     for (const effect in this.userStreamEffects.current) {
       const effectType = effect as EffectTypes;
@@ -128,7 +128,8 @@ class ScreenMedia {
         {},
         this.currentEffectsStyles,
         undefined,
-        undefined
+        undefined,
+        this.effects.pause
       );
     });
     this.video.onloadedmetadata = () => {
@@ -185,8 +186,12 @@ class ScreenMedia {
     tintColor?: string,
     blockStateChange: boolean = false
   ) {
-    if (!blockStateChange) {
-      this.effects[effect] = !this.effects[effect];
+    if (this.effects[effect] !== undefined) {
+      if (!blockStateChange) {
+        this.effects[effect] = !this.effects[effect];
+      }
+    } else {
+      this.effects[effect] = true;
     }
 
     await this.updateAtlases();
@@ -208,6 +213,10 @@ class ScreenMedia {
       this.baseShader.toggleBlurEffect();
     }
 
+    if (effect === "pause") {
+      this.baseShader.setPause(this.effects[effect]);
+    }
+
     // Remove old animation frame
     if (this.animationFrameId[0]) {
       cancelAnimationFrame(this.animationFrameId[0]);
@@ -225,7 +234,9 @@ class ScreenMedia {
       this.effects,
       this.currentEffectsStyles,
       undefined,
-      undefined
+      undefined,
+      this.effects.pause,
+      this.effects.pause ? true : false
     );
   }
 

@@ -24,7 +24,7 @@ export default function CloseButton({ controls }: { controls: Controls }) {
       }}
       hoverContent={
         <div className='mt-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Close
+          Close (x)
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'

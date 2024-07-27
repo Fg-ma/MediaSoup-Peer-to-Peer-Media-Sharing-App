@@ -23,12 +23,9 @@
   opacity: 0;
 }
 
+/* .video-container.paused .controls-gradient, */
 .video-container.in-video .controls-gradient,
 .video-container.in-effects .controls-gradient {
-  opacity: 1;
-}
-
-.video-container.paused .controls-gradient {
   opacity: 1;
 }
 
@@ -62,10 +59,10 @@
   padding-bottom: 0.75rem;
 }
 
-.video-container.paused .video-controls-container,
+/* .video-container.paused .video-controls-container,
 .video-container.paused .video-navigation-container {
   opacity: 1;
-}
+} */
 
 .video-container.in-video .video-controls-container,
 .video-container.in-video .video-navigation-container,
@@ -192,7 +189,7 @@
   position: relative;
 }
 
-.video-container.paused .timeline-container,
+/* .video-container.paused .timeline-container, */
 .video-container.in-video .timeline-container,
 .video-container.in-effects .timeline-container {
   opacity: 1;

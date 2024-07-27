@@ -4,6 +4,7 @@ import FgSVG from "../../fgSVG/FgSVG";
 import Controls from "./Controls";
 import playIcon from "../../../public/svgs/play.svg";
 import pauseIcon from "../../../public/svgs/pause.svg";
+import { EffectTypes } from "../../context/StreamsContext";
 
 export default function PlayPauseButton({
   controls,
@@ -37,7 +38,7 @@ export default function PlayPauseButton({
       hoverContent={
         !effectsActive ? (
           <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            {active ? "Pause" : "Play"}
+            {active ? "Pause (k)" : "Play (k)"}
           </div>
         ) : undefined
       }

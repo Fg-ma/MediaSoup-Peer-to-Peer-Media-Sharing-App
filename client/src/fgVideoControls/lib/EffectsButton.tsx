@@ -8,17 +8,14 @@ import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
 export default function EffectsButton({
   controls,
   effectsActive,
-  setEffectsActive,
 }: {
   controls: Controls;
   effectsActive: boolean;
-  setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
         controls.handleEffects();
-        setEffectsActive((prev) => !prev);
       }}
       contentFunction={() => {
         const iconSrc = effectsActive ? effectOffIcon : effectIcon;
@@ -37,7 +34,7 @@ export default function EffectsButton({
       hoverContent={
         !effectsActive ? (
           <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            Effects
+            Effects (e)
           </div>
         ) : undefined
       }

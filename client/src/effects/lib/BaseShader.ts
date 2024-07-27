@@ -5,6 +5,8 @@ import { EffectTypes } from "src/context/StreamsContext";
 import baseFragmentShaderSource from "./baseFragmentShader";
 import baseVertexShaderSource from "./baseVertexShader";
 import Atlas from "./Atlas";
+import videoPaused from "../../../public/2DAssets/videoPaused.png";
+import videoPausedFlipped from "../../../public/2DAssets/videoPausedFlipped.png";
 
 interface MeshJSON {
   vertex_faces: number[];
@@ -44,15 +46,17 @@ class BaseShader {
       }
     | undefined;
 
+  private twoDimAtlas: Atlas | null = null;
   private twoDimAltasTexMap: { [tex: string]: string } | undefined = undefined;
 
+  private threeDimAtlas: Atlas | null = null;
   private threeDimAltasTexMap: { [tex: string]: string } | undefined =
     undefined;
 
   private videoTexture: WebGLTexture | null = null;
-
-  private twoDimAtlas: Atlas | null = null;
-  private threeDimAtlas: Atlas | null = null;
+  private videoPausedImage: HTMLImageElement;
+  private videoPausedFlippedImage: HTMLImageElement;
+  private pause = false;
 
   // Uniform Locations
   private uTexSize: WebGLUniformLocation | null = null;
@@ -109,7 +113,8 @@ class BaseShader {
     cameraUpDir?: vec3,
     cameraFOV?: number,
     nearClipPlane?: number,
-    farClipPlane?: number
+    farClipPlane?: number,
+    pause?: boolean
   ) {
     this.gl = gl;
     this.meshes = meshes;
@@ -136,6 +141,14 @@ class BaseShader {
     if (farClipPlane) {
       this.farClipPlane = farClipPlane;
     }
+    if (pause) {
+      this.pause = pause;
+    }
+
+    this.videoPausedImage = document.createElement("img");
+    this.videoPausedImage.src = videoPaused;
+    this.videoPausedFlippedImage = document.createElement("img");
+    this.videoPausedFlippedImage.src = videoPausedFlipped;
 
     this.initShaderProgram();
     this.initUniformLocations();
@@ -620,7 +633,7 @@ class BaseShader {
     }
   }
 
-  updateVideoTexture(video: HTMLVideoElement) {
+  updateVideoTexture(video: HTMLVideoElement, flip = false) {
     if (this.aPositionLocation === null || this.aTexCoordLocation == null) {
       return;
     }
@@ -689,7 +702,11 @@ class BaseShader {
       this.gl.RGBA,
       this.gl.RGBA,
       this.gl.UNSIGNED_BYTE,
-      video
+      this.pause
+        ? flip
+          ? this.videoPausedImage
+          : this.videoPausedFlippedImage
+        : video
     );
 
     this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
@@ -1171,6 +1188,10 @@ class BaseShader {
     }
 
     this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
+  }
+
+  setPause(pause: boolean) {
+    this.pause = pause;
   }
 }
 
