@@ -26,6 +26,11 @@ class AudioMedia {
     [cameraEffect in AudioEffectTypes]?: boolean;
   };
 
+  private audioContext: AudioContext;
+  private source: MediaStreamAudioSourceNode;
+  private gainNode: GainNode;
+  private delayNode: DelayNode;
+
   constructor(
     username: string,
     table_id: string,
@@ -52,11 +57,24 @@ class AudioMedia {
     if (!currentEffectsStyles.current.audio) {
       currentEffectsStyles.current.audio = {};
     }
+
+    this.audioContext = new AudioContext();
+    this.source = this.audioContext.createMediaStreamSource(
+      this.initAudioStream
+    );
+    this.gainNode = this.audioContext.createGain();
+    this.delayNode = this.audioContext.createDelay();
+
+    this.source.connect(this.gainNode);
+    this.gainNode.connect(this.delayNode);
+    this.delayNode.connect(this.audioContext.destination);
   }
 
   deconstructor() {
     // End initial stream
     this.initAudioStream.getTracks().forEach((track) => track.stop());
+
+    this.audioContext.close();
   }
 
   async changeEffects(
@@ -70,6 +88,38 @@ class AudioMedia {
     } else {
       this.effects[effect] = true;
     }
+
+    if (this.effects[effect]) {
+      this.applyEffect(effect);
+    } else {
+      this.removeEffect(effect);
+    }
+  }
+
+  applyEffect(effect: AudioEffectTypes) {
+    switch (effect) {
+      case "robot":
+        this.applyRoboticEffect();
+        break;
+    }
+  }
+
+  removeEffect(effect: AudioEffectTypes) {
+    switch (effect) {
+      case "robot":
+        this.removeRoboticEffect();
+        break;
+    }
+  }
+
+  applyRoboticEffect() {
+    this.delayNode.delayTime.value = 0.03; // small delay to create robotic effect
+    this.gainNode.gain.value = 1.5; // amplify the audio
+  }
+
+  removeRoboticEffect() {
+    this.delayNode.delayTime.value = 0;
+    this.gainNode.gain.value = 1;
   }
 
   getStream() {

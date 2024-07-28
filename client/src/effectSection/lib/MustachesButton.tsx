@@ -10,7 +10,6 @@ import {
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
 import mustache1 from "../../../public/2DAssets/mustaches/mustache1.png";
@@ -54,7 +53,7 @@ export default function MustachesButton({
   type: "camera";
   videoId: string;
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;

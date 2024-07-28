@@ -16,12 +16,14 @@ import Producers from "./lib/Producers";
 import { useCurrentEffectsStylesContext } from "./context/CurrentEffectsStylesContext";
 import Consumers from "./lib/Consumers";
 import UserDevice from "./UserDevice";
+import Deadbanding from "./effects/visualEffects/lib/Deadbanding";
+import BrowserMedia from "./BrowserMedia";
+import AudioEffectsButton from "./AudioEffectsButton";
 
 const websocketURL = "http://localhost:8000";
 
 export default function Main() {
   const {
-    userStreams,
     userMedia,
     userCameraCount,
     userScreenCount,
@@ -68,10 +70,8 @@ export default function Main() {
   }>({});
 
   const muteAudio = () => {
-    if (userStreams.current.audio) {
-      userStreams.current.audio.getAudioTracks().forEach((track) => {
-        track.enabled = mutedAudioRef.current;
-      });
+    if (userMedia.current.audio) {
+      userMedia.current.audio.getTrack().enabled = mutedAudioRef.current;
     }
 
     setMutedAudio((prev) => !prev);
@@ -187,6 +187,8 @@ export default function Main() {
           userMedia.current.screen[screenId].getStream();
       }
 
+      const initAudioStream = userMedia.current.audio?.getStream();
+
       const newBundle = (
         <Bundle
           username={username.current}
@@ -194,11 +196,7 @@ export default function Main() {
           socket={socket}
           initCameraStreams={isCamera.current ? initCameraStreams : undefined}
           initScreenStreams={isScreen.current ? initScreenStreams : undefined}
-          initAudioStream={
-            isAudio.current && userStreams.current.audio
-              ? userStreams.current.audio
-              : undefined
-          }
+          initAudioStream={isAudio.current ? initAudioStream : undefined}
           isUser={true}
           muteButtonCallback={muteAudio}
         />
@@ -258,12 +256,25 @@ export default function Main() {
 
   const userDevice = new UserDevice();
 
+  const deadbanding = new Deadbanding(currentEffectsStyles);
+
+  const browserMedia = new BrowserMedia(
+    device,
+    userMedia,
+    handleDisableEnableBtns,
+    isCamera,
+    setCameraActive,
+    isScreen,
+    setScreenActive,
+    isAudio,
+    setAudioActive
+  );
+
   const producers = new Producers(
     socket,
     device,
     table_id,
     username,
-    userStreams,
     userMedia,
     currentEffectsStyles,
     userStreamEffects,
@@ -280,7 +291,9 @@ export default function Main() {
     setCameraActive,
     createProducerBundle,
     setBundles,
-    userDevice
+    userDevice,
+    deadbanding,
+    browserMedia
   );
 
   const consumers = new Consumers(
@@ -314,7 +327,7 @@ export default function Main() {
                   table_id,
                   username,
                   userCameraCount,
-                  userStreams
+                  userMedia
                 )
               }
               className={`${
@@ -399,7 +412,7 @@ export default function Main() {
                   table_id,
                   username,
                   userScreenCount,
-                  userStreams
+                  userMedia
                 )
               }
               className={`${
@@ -458,6 +471,7 @@ export default function Main() {
               {subscribedActive ? "Unsubscribe" : "Subscribe"}
             </button>
           </div>
+          <AudioEffectsButton />
         </div>
         <div className='flex justify-center mt-5'>
           <input
@@ -483,7 +497,7 @@ export default function Main() {
                 table_id,
                 username,
                 setIsInTable,
-                userStreams,
+                userMedia,
                 userCameraCount,
                 userScreenCount,
                 remoteTracksMap,

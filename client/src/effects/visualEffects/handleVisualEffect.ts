@@ -1,16 +1,16 @@
-import AudioMedia from "src/lib/AudioMedia";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
   AudioEffectTypes,
-} from "../context/StreamsContext";
-import CameraMedia from "../lib/CameraMedia";
-import ScreenMedia from "../lib/ScreenMedia";
+} from "../../context/StreamsContext";
+import CameraMedia from "../../lib/CameraMedia";
+import ScreenMedia from "../../lib/ScreenMedia";
+import AudioMedia from "../../lib/AudioMedia";
 
-const handleEffect = async (
-  effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+const handleVisualEffect = async (
+  effect: CameraEffectTypes | ScreenEffectTypes,
   blockStateChange: boolean,
-  type: "camera" | "screen" | "audio",
+  type: "camera" | "screen",
   id: string,
   userMedia: React.MutableRefObject<{
     camera: {
@@ -40,9 +40,6 @@ const handleEffect = async (
     } else if (type === "screen") {
       userStreamEffects.current[type][id][effect as ScreenEffectTypes] =
         !userStreamEffects.current[type][id][effect as ScreenEffectTypes];
-    } else if (type === "audio") {
-      userStreamEffects.current[type][effect as AudioEffectTypes] =
-        !userStreamEffects.current[type][effect as AudioEffectTypes];
     }
   }
 
@@ -58,12 +55,7 @@ const handleEffect = async (
       tintColor.current,
       blockStateChange
     );
-  } else if (type === "audio") {
-    userMedia.current[type]?.changeEffects(
-      effect as AudioEffectTypes,
-      blockStateChange
-    );
   }
 };
 
-export default handleEffect;
+export default handleVisualEffect;

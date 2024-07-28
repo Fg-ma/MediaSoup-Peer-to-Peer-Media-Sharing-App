@@ -1,7 +1,6 @@
 import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
-import BaseShader from "../effects/lib/BaseShader";
-import render from "../effects/lib/render";
-import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
+import BaseShader from "../effects/visualEffects/lib/BaseShader";
+import render from "../effects/visualEffects/lib/render";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -185,12 +184,6 @@ class ScreenMedia {
     }
 
     await this.updateAtlases();
-
-    updateDeadbandingMaps(
-      this.screenId,
-      this.effects,
-      this.currentEffectsStyles
-    );
 
     if (tintColor) {
       this.setTintColor(tintColor);

@@ -4,10 +4,9 @@ import {
   EffectStylesType,
   mustacheNoseOffsetsMap,
 } from "../context/CurrentEffectsStylesContext";
-import BaseShader from "../effects/lib/BaseShader";
-import render from "../effects/lib/render";
-import FaceLandmarks from "../effects/lib/FaceLandmarks";
-import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
+import BaseShader from "../effects/visualEffects/lib/BaseShader";
+import render from "../effects/visualEffects/lib/render";
+import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import {
   AudioEffectTypes,
@@ -15,6 +14,7 @@ import {
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
+import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";
 
 class CameraMedia {
   private username: string;
@@ -53,6 +53,8 @@ class CameraMedia {
 
   private userDevice: UserDevice;
 
+  private deadbanding: Deadbanding;
+
   constructor(
     username: string,
     table_id: string,
@@ -68,7 +70,8 @@ class CameraMedia {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
-    userDevice: UserDevice
+    userDevice: UserDevice,
+    deadbanding: Deadbanding
   ) {
     this.username = username;
     this.table_id = table_id;
@@ -76,6 +79,7 @@ class CameraMedia {
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
     this.userDevice = userDevice;
+    this.deadbanding = deadbanding;
 
     this.effects = {};
 
@@ -151,7 +155,11 @@ class CameraMedia {
     this.baseShader.createAtlasTexture("twoDim", {});
     this.baseShader.createAtlasTexture("threeDim", {});
 
-    this.faceLandmarks = new FaceLandmarks(this.cameraId, currentEffectsStyles);
+    this.faceLandmarks = new FaceLandmarks(
+      this.cameraId,
+      this.currentEffectsStyles,
+      this.deadbanding
+    );
 
     this.faceMeshResults = [];
     this.faceMesh = new FaceMesh({
@@ -334,11 +342,7 @@ class CameraMedia {
 
     await this.updateAtlases();
 
-    updateDeadbandingMaps(
-      this.cameraId,
-      this.effects,
-      this.currentEffectsStyles
-    );
+    this.deadbanding.update(this.cameraId, this.effects);
 
     if (tintColor) {
       this.setTintColor(tintColor);

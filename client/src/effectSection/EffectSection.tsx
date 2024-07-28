@@ -3,7 +3,6 @@ import { Transition, Variants, motion } from "framer-motion";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
 } from "../context/StreamsContext";
 import GlassesButton from "./lib/GlassesButton";
 import EarsButton from "./lib/EarsButton";
@@ -41,7 +40,7 @@ export default function EffectSection({
   type: "camera" | "screen";
   videoId: string;
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;

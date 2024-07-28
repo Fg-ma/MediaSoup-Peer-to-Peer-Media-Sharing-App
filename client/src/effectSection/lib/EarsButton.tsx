@@ -16,7 +16,6 @@ import threeDim_dogEarsOffIcon from "../../../public/svgs/ears/threeDim_dogEarsO
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
 
@@ -30,7 +29,7 @@ export default function EarsButton({
   type: "camera";
   videoId: string;
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;

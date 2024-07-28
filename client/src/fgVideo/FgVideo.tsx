@@ -8,7 +8,7 @@ import {
   ScreenEffectTypes,
   AudioEffectTypes,
 } from "../context/StreamsContext";
-import handleEffect from "../effects/handleEffect";
+import handleVisualEffect from "../effects/visualEffects/handleVisualEffect";
 import Controls from "../fgVideoControls/lib/Controls";
 import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";
 import FgVideoControls from "../fgVideoControls/FgVideoControls";
@@ -134,11 +134,11 @@ export default function FgVideo({
   const stream = userMedia.current[type][videoId]?.getStream();
 
   const handleEffectChange = async (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange: boolean = false
   ) => {
     if (isUser) {
-      await handleEffect(
+      await handleVisualEffect(
         effect,
         blockStateChange,
         type,
@@ -423,7 +423,7 @@ export default function FgVideo({
 
   const onAcceptEffect = (event: {
     type: "acceptBlur";
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
+    effect: CameraEffectTypes | ScreenEffectTypes;
     producerId: string;
   }) => {
     if (videoId === event.producerId) {

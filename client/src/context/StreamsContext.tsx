@@ -22,15 +22,8 @@ export interface StreamsContextProviderProps {
 }
 
 export interface StreamsContextType {
-  userStreams: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: MediaStream;
-    };
-    screen: {
-      [screenId: string]: MediaStream;
-    };
-    audio: MediaStream | undefined;
-  }>;
+  userCameraCount: React.MutableRefObject<number>;
+  userScreenCount: React.MutableRefObject<number>;
   userMedia: React.MutableRefObject<{
     camera: {
       [cameraId: string]: CameraMedia;
@@ -40,8 +33,6 @@ export interface StreamsContextType {
     };
     audio: AudioMedia | undefined;
   }>;
-  userCameraCount: React.MutableRefObject<number>;
-  userScreenCount: React.MutableRefObject<number>;
   userStreamEffects: React.MutableRefObject<{
     camera: {
       [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -83,13 +74,8 @@ export const useStreamsContext = () => {
 export function StreamsContextProvider({
   children,
 }: StreamsContextProviderProps) {
-  const userStreams = useRef<{
-    camera: {
-      [camera: string]: MediaStream;
-    };
-    screen: { [screenId: string]: MediaStream };
-    audio: MediaStream | undefined;
-  }>({ camera: {}, screen: {}, audio: undefined });
+  const userCameraCount = useRef(0);
+  const userScreenCount = useRef(0);
   const userMedia = useRef<{
     camera: {
       [cameraId: string]: CameraMedia;
@@ -97,8 +83,6 @@ export function StreamsContextProvider({
     screen: { [screenId: string]: ScreenMedia };
     audio: AudioMedia | undefined;
   }>({ camera: {}, screen: {}, audio: undefined });
-  const userCameraCount = useRef(0);
-  const userScreenCount = useRef(0);
   const userStreamEffects = useRef<{
     camera: {
       [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -123,10 +107,9 @@ export function StreamsContextProvider({
   return (
     <StreamsContext.Provider
       value={{
-        userStreams,
-        userMedia,
         userCameraCount,
         userScreenCount,
+        userMedia,
         userStreamEffects,
         remoteTracksMap,
       }}

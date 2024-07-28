@@ -9,7 +9,6 @@ import {
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
 import defaultGlasses from "../../../public/2DAssets/glasses/defaultGlasses.png";
@@ -53,7 +52,7 @@ export default function GlassesButton({
   type: "camera";
   videoId: string;
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;

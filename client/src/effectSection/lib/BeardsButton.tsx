@@ -10,7 +10,6 @@ import {
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
 import classicalCurlyBeard from "../../../public/2DAssets/beards/classicalCurlyBeard.png";
@@ -30,7 +29,7 @@ export default function BeardsButton({
   type: "camera";
   videoId: string;
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;

@@ -1,7 +1,6 @@
 import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import getBrowserMedia from "../getBrowserMedia";
 import CameraMedia from "./CameraMedia";
 import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import ScreenMedia from "./ScreenMedia";
@@ -12,21 +11,14 @@ import {
 } from "../context/StreamsContext";
 import AudioMedia from "./AudioMedia";
 import UserDevice from "../UserDevice";
+import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";
+import BrowserMedia from "src/BrowserMedia";
 
 class Producers {
   private socket: React.MutableRefObject<Socket>;
   private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
   private table_id: React.MutableRefObject<string>;
   private username: React.MutableRefObject<string>;
-  private userStreams: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: MediaStream;
-    };
-    screen: {
-      [screenId: string]: MediaStream;
-    };
-    audio: MediaStream | undefined;
-  }>;
   private userMedia: React.MutableRefObject<{
     camera: {
       [cameraId: string]: CameraMedia;
@@ -72,21 +64,14 @@ class Producers {
     }>
   >;
   private userDevice: UserDevice;
+  private deadbanding: Deadbanding;
+  private browserMedia: BrowserMedia;
 
   constructor(
     socket: React.MutableRefObject<Socket>,
     device: React.MutableRefObject<mediasoup.types.Device | undefined>,
     table_id: React.MutableRefObject<string>,
     username: React.MutableRefObject<string>,
-    userStreams: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: MediaStream;
-      };
-      screen: {
-        [screenId: string]: MediaStream;
-      };
-      audio: MediaStream | undefined;
-    }>,
     userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
@@ -131,13 +116,14 @@ class Producers {
         [username: string]: React.JSX.Element;
       }>
     >,
-    userDevice: UserDevice
+    userDevice: UserDevice,
+    deadbanding: Deadbanding,
+    browserMedia: BrowserMedia
   ) {
     this.socket = socket;
     this.device = device;
     this.table_id = table_id;
     this.username = username;
-    this.userStreams = userStreams;
     this.userMedia = userMedia;
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
@@ -155,6 +141,8 @@ class Producers {
     this.createProducerBundle = createProducerBundle;
     this.setBundles = setBundles;
     this.userDevice = userDevice;
+    this.deadbanding = deadbanding;
+    this.browserMedia = browserMedia;
   }
 
   async onProducerTransportCreated(event: {
@@ -255,57 +243,18 @@ class Producers {
     try {
       if (this.isCamera.current) {
         if (
-          this.userStreams.current.camera[
+          this.userMedia.current.camera[
             `${this.username.current}_camera_stream_${this.userCameraCount.current}`
           ]
         ) {
           return;
         }
 
-        const cameraBrowserMedia = await getBrowserMedia(
-          "camera",
-          this.device,
-          this.handleDisableEnableBtns,
-          this.isScreen,
-          this.setScreenActive,
-          this.isCamera,
-          this.setCameraActive,
-          this.userStreams
+        const cameraBrowserMedia = await this.browserMedia.getBrowserMedia(
+          "camera"
         );
 
-        if (cameraBrowserMedia) {
-          const newCameraMedia = new CameraMedia(
-            this.username.current,
-            this.table_id.current,
-            `${this.username.current}_camera_stream_${this.userCameraCount.current}`,
-            cameraBrowserMedia,
-            this.currentEffectsStyles,
-            this.userStreamEffects,
-            this.userDevice
-          );
-
-          this.userMedia.current.camera[
-            `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-          ] = newCameraMedia;
-
-          this.userStreams.current.camera[
-            `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-          ] = cameraBrowserMedia;
-
-          const params = {
-            track: newCameraMedia.getTrack(),
-            appData: {
-              producerType: "camera",
-            },
-          };
-
-          try {
-            await this.producerTransport.current?.produce(params);
-          } catch {
-            console.error("Camera new transport failed to produce");
-            return;
-          }
-        } else {
+        if (!cameraBrowserMedia) {
           this.producerTransport.current = undefined;
           this.userCameraCount.current = this.userCameraCount.current - 1;
           const msg = {
@@ -314,65 +263,56 @@ class Producers {
             username: this.username.current,
           };
           this.socket.current.emit("message", msg);
+          return;
+        }
+
+        const newCameraMedia = new CameraMedia(
+          this.username.current,
+          this.table_id.current,
+          `${this.username.current}_camera_stream_${this.userCameraCount.current}`,
+          cameraBrowserMedia,
+          this.currentEffectsStyles,
+          this.userStreamEffects,
+          this.userDevice,
+          this.deadbanding
+        );
+
+        this.userMedia.current.camera[
+          `${this.username.current}_camera_stream_${this.userCameraCount.current}`
+        ] = newCameraMedia;
+
+        const track =
+          this.userMedia.current.camera[
+            `${this.username.current}_camera_stream_${this.userCameraCount.current}`
+          ].getTrack();
+        const params = {
+          track: track,
+          appData: {
+            producerType: "camera",
+          },
+        };
+
+        try {
+          await this.producerTransport.current?.produce(params);
+        } catch {
+          console.error("Camera new transport failed to produce");
+          return;
         }
       }
       if (this.isScreen.current) {
         if (
-          this.userStreams.current.screen[
+          this.userMedia.current.screen[
             `${this.username.current}_screen_stream_${this.userScreenCount.current}`
           ]
         ) {
           return;
         }
 
-        const screenBrowserMedia = await getBrowserMedia(
-          "screen",
-          this.device,
-          this.handleDisableEnableBtns,
-          this.isScreen,
-          this.setScreenActive,
-          this.isCamera,
-          this.setCameraActive,
-          this.userStreams
+        const screenBrowserMedia = await this.browserMedia.getBrowserMedia(
+          "screen"
         );
 
-        if (screenBrowserMedia) {
-          const newScreenMedia = new ScreenMedia(
-            this.username.current,
-            this.table_id.current,
-            `${this.username.current}_screen_stream_${this.userScreenCount.current}`,
-            screenBrowserMedia,
-            this.currentEffectsStyles,
-            this.userStreamEffects,
-            this.userDevice
-          );
-
-          this.userMedia.current.screen[
-            `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-          ] = newScreenMedia;
-
-          this.userStreams.current.screen[
-            `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-          ] = screenBrowserMedia;
-
-          const track =
-            this.userStreams.current.screen[
-              `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-            ].getVideoTracks()[0];
-          const params = {
-            track: track,
-            appData: {
-              producerType: "screen",
-            },
-          };
-
-          try {
-            await this.producerTransport.current?.produce(params);
-          } catch {
-            console.error("Screen new transport failed to produce");
-            return;
-          }
-        } else {
+        if (!screenBrowserMedia) {
           this.producerTransport.current = undefined;
           this.userScreenCount.current = this.userScreenCount.current - 1;
           const msg = {
@@ -381,10 +321,43 @@ class Producers {
             username: this.username.current,
           };
           this.socket.current.emit("message", msg);
+          return;
+        }
+
+        const newScreenMedia = new ScreenMedia(
+          this.username.current,
+          this.table_id.current,
+          `${this.username.current}_screen_stream_${this.userScreenCount.current}`,
+          screenBrowserMedia,
+          this.currentEffectsStyles,
+          this.userStreamEffects,
+          this.userDevice
+        );
+
+        this.userMedia.current.screen[
+          `${this.username.current}_screen_stream_${this.userScreenCount.current}`
+        ] = newScreenMedia;
+
+        const track =
+          this.userMedia.current.screen[
+            `${this.username.current}_screen_stream_${this.userScreenCount.current}`
+          ].getTrack();
+        const params = {
+          track: track,
+          appData: {
+            producerType: "screen",
+          },
+        };
+
+        try {
+          await this.producerTransport.current?.produce(params);
+        } catch {
+          console.error("Screen new transport failed to produce");
+          return;
         }
       }
       if (this.isAudio.current) {
-        if (this.userStreams.current.audio) {
+        if (this.userMedia.current.audio) {
           console.error(
             "Already existing audio stream for: ",
             this.username.current
@@ -392,27 +365,11 @@ class Producers {
           return;
         }
 
-        this.userStreams.current.audio = await getBrowserMedia(
-          "audio",
-          this.device,
-          this.handleDisableEnableBtns,
-          this.isScreen,
-          this.setScreenActive,
-          this.isCamera,
-          this.setCameraActive,
-          this.userStreams
+        const audioBrowserMedia = await this.browserMedia.getBrowserMedia(
+          "audio"
         );
 
-        if (this.userStreams.current.audio) {
-          const audioTrack = this.userStreams.current.audio.getAudioTracks()[0];
-          const audioParams = {
-            track: audioTrack,
-            appData: {
-              producerType: "audio",
-            },
-          };
-          await this.producerTransport.current?.produce(audioParams);
-        } else {
+        if (!audioBrowserMedia) {
           this.producerTransport.current = undefined;
           const msg = {
             type: "deleteProducerTransport",
@@ -420,7 +377,27 @@ class Producers {
             username: this.username.current,
           };
           this.socket.current.emit("message", msg);
+          return;
         }
+
+        const newAudioMedia = new AudioMedia(
+          this.username.current,
+          this.table_id.current,
+          audioBrowserMedia,
+          this.currentEffectsStyles,
+          this.userStreamEffects
+        );
+
+        this.userMedia.current.audio = newAudioMedia;
+
+        const audioTrack = this.userMedia.current.audio.getTrack();
+        const audioParams = {
+          track: audioTrack,
+          appData: {
+            producerType: "audio",
+          },
+        };
+        await this.producerTransport.current?.produce(audioParams);
       }
     } catch (error) {
       console.error(error);
@@ -435,7 +412,7 @@ class Producers {
     if (event.producerType === "camera") {
       producerId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
       if (
-        this.userStreams.current.camera[
+        this.userMedia.current.camera[
           `${this.username.current}_camera_stream_${this.userCameraCount.current}`
         ]
       ) {
@@ -449,15 +426,8 @@ class Producers {
         return;
       }
 
-      const cameraBrowserMedia = await getBrowserMedia(
-        event.producerType,
-        this.device,
-        this.handleDisableEnableBtns,
-        this.isScreen,
-        this.setScreenActive,
-        this.isCamera,
-        this.setCameraActive,
-        this.userStreams
+      const cameraBrowserMedia = await this.browserMedia.getBrowserMedia(
+        event.producerType
       );
 
       if (!cameraBrowserMedia) {
@@ -475,19 +445,20 @@ class Producers {
         cameraBrowserMedia,
         this.currentEffectsStyles,
         this.userStreamEffects,
-        this.userDevice
+        this.userDevice,
+        this.deadbanding
       );
 
       this.userMedia.current.camera[
         `${this.username.current}_camera_stream_${this.userCameraCount.current}`
       ] = newCameraMedia;
 
-      this.userStreams.current.camera[
-        `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-      ] = cameraBrowserMedia;
-
+      const track =
+        this.userMedia.current.camera[
+          `${this.username.current}_camera_stream_${this.userCameraCount.current}`
+        ].getTrack();
       const params = {
-        track: newCameraMedia.getTrack(),
+        track: track,
         appData: {
           producerType: "camera",
         },
@@ -502,7 +473,7 @@ class Producers {
     } else if (event.producerType === "screen") {
       producerId = `${this.username.current}_screen_stream_${this.userCameraCount.current}`;
       if (
-        this.userStreams.current.screen[
+        this.userMedia.current.screen[
           `${this.username.current}_screen_stream_${this.userScreenCount.current}`
         ]
       ) {
@@ -516,15 +487,8 @@ class Producers {
         return;
       }
 
-      const screenBrowserMedia = await getBrowserMedia(
-        event.producerType,
-        this.device,
-        this.handleDisableEnableBtns,
-        this.isScreen,
-        this.setScreenActive,
-        this.isCamera,
-        this.setCameraActive,
-        this.userStreams
+      const screenBrowserMedia = await this.browserMedia.getBrowserMedia(
+        event.producerType
       );
 
       if (!screenBrowserMedia) {
@@ -549,14 +513,10 @@ class Producers {
         `${this.username.current}_screen_stream_${this.userScreenCount.current}`
       ] = newScreenMedia;
 
-      this.userStreams.current.screen[
-        `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-      ] = screenBrowserMedia;
-
       const track =
-        this.userStreams.current.screen[
+        this.userMedia.current.screen[
           `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-        ].getVideoTracks()[0];
+        ].getTrack();
       const params = {
         track: track,
         appData: {
@@ -571,7 +531,7 @@ class Producers {
         return;
       }
     } else if (event.producerType === "audio") {
-      if (this.userStreams.current.audio) {
+      if (this.userMedia.current.audio) {
         // Reenable buttons
         this.handleDisableEnableBtns(false);
 
@@ -582,18 +542,11 @@ class Producers {
         return;
       }
 
-      this.userStreams.current.audio = await getBrowserMedia(
-        event.producerType,
-        this.device,
-        this.handleDisableEnableBtns,
-        this.isScreen,
-        this.setScreenActive,
-        this.isCamera,
-        this.setCameraActive,
-        this.userStreams
+      const audioBrowserMedia = await this.browserMedia.getBrowserMedia(
+        event.producerType
       );
 
-      if (!this.userStreams.current.audio) {
+      if (!audioBrowserMedia) {
         // Reenable buttons
         this.handleDisableEnableBtns(false);
 
@@ -601,7 +554,17 @@ class Producers {
         return;
       }
 
-      const track = this.userStreams.current.audio.getAudioTracks()[0];
+      const newAudioMedia = new AudioMedia(
+        this.username.current,
+        this.table_id.current,
+        audioBrowserMedia,
+        this.currentEffectsStyles,
+        this.userStreamEffects
+      );
+
+      this.userMedia.current.audio = newAudioMedia;
+
+      const track = this.userMedia.current.audio.getTrack();
       const params = {
         track: track,
         appData: {
@@ -664,24 +627,6 @@ class Producers {
     producerId: string;
   }) => {
     if (event.producerUsername === this.username.current) {
-      // End users streams
-      if (event.producerType === "camera") {
-        this.userStreams.current.camera[event.producerId]
-          ?.getTracks()
-          .forEach((track) => track.stop());
-        delete this.userStreams.current.camera[event.producerId];
-      } else if (event.producerType === "screen") {
-        this.userStreams.current.screen[event.producerId]
-          ?.getTracks()
-          .forEach((track) => track.stop());
-        delete this.userStreams.current.screen[event.producerId];
-      } else if (event.producerType === "audio") {
-        this.userStreams.current.audio
-          ?.getTracks()
-          .forEach((track) => track.stop());
-        this.userStreams.current.audio = undefined;
-      }
-
       // Call deconstructors then delete userMedia
       if (event.producerType === "camera" || event.producerType === "screen") {
         this.userMedia.current[event.producerType][
@@ -727,11 +672,11 @@ class Producers {
 
       // Clean up bundles and producer transport if necessary
       if (
-        (!this.userStreams.current.camera ||
-          Object.keys(this.userStreams.current.camera).length === 0) &&
-        (!this.userStreams.current.screen ||
-          Object.keys(this.userStreams.current.screen).length === 0) &&
-        !this.userStreams.current.audio
+        (!this.userMedia.current.camera ||
+          Object.keys(this.userMedia.current.camera).length === 0) &&
+        (!this.userMedia.current.screen ||
+          Object.keys(this.userMedia.current.screen).length === 0) &&
+        !this.userMedia.current.audio
       ) {
         this.setBundles((prev) => {
           const newBundles = prev;
@@ -744,14 +689,14 @@ class Producers {
       }
 
       // Clean up camera and screen states
-      if (Object.keys(this.userStreams.current.camera).length === 0) {
+      if (Object.keys(this.userMedia.current.camera).length === 0) {
         this.isCamera.current = false;
         this.setCameraActive(false);
       } else {
         this.isCamera.current = true;
         this.setCameraActive(true);
       }
-      if (Object.keys(this.userStreams.current.screen).length === 0) {
+      if (Object.keys(this.userMedia.current.screen).length === 0) {
         this.isScreen.current = false;
         this.setScreenActive(false);
       } else {

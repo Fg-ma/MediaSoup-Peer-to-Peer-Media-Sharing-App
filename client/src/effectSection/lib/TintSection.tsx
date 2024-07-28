@@ -5,7 +5,6 @@ import ColorPicker from "./ColorPicker";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
 import tintIcon from "../../../public/svgs/tintIcon.svg";
@@ -22,7 +21,7 @@ export default function TintSection({
   videoId: string;
   type: "camera" | "screen";
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;

@@ -2,9 +2,9 @@ import {
   NormalizedLandmarkList,
   NormalizedLandmarkListList,
 } from "@mediapipe/face_mesh";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
-import { deadbandingMap } from "./updateDeadbandingMaps";
+import { EffectStylesType } from "../../../context/CurrentEffectsStylesContext";
 import { Point2D } from "./BaseShader";
+import Deadbanding from "./Deadbanding";
 
 export type LandmarkTypes =
   | "headRotationAngles"
@@ -107,12 +107,16 @@ class FaceLandmarks {
   } = {};
   private maxFaceTrackerAge = 5;
 
+  private deadbanding: Deadbanding;
+
   constructor(
     id: string,
-    currentEffectsStyles: React.MutableRefObject<EffectStylesType>
+    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    deadbanding: Deadbanding
   ) {
     this.id = id;
     this.currentEffectsStyles = currentEffectsStyles;
+    this.deadbanding = deadbanding;
   }
 
   private adaptiveSmoothingFactor(distance: number) {
@@ -258,7 +262,7 @@ class FaceLandmarks {
     this.faceIdLandmarksPairs = faceIdLandmarksPairs;
   }
 
-  private smoothOneDimensionalVariableWithDeadbanding(
+  private smoothVariableWithDeadbanding(
     featureType: LandmarkTypes,
     previousValue: number,
     currentValue: number,
@@ -266,7 +270,10 @@ class FaceLandmarks {
   ) {
     const deltaValue = currentValue - previousValue;
 
-    if (Math.abs(deltaValue) < deadbandingMap[featureType]) {
+    if (
+      Math.abs(deltaValue) <
+      this.deadbanding.getDeadbandingMapById(this.id)[featureType]
+    ) {
       return previousValue;
     }
 
@@ -275,7 +282,7 @@ class FaceLandmarks {
     );
   }
 
-  private updateOneDimensionalSmoothVariables(
+  private updateSmoothVariables(
     featureType: LandmarkTypes,
     faceId: string,
     value: number
@@ -299,7 +306,7 @@ class FaceLandmarks {
 
     // Apply smoothing with deadbanding
     this.calculatedLandmarks[featureType][faceId] =
-      this.smoothOneDimensionalVariableWithDeadbanding(
+      this.smoothVariableWithDeadbanding(
         featureType,
         this.calculatedLandmarks[featureType][faceId],
         value,
@@ -339,18 +346,14 @@ class FaceLandmarks {
       const dz = rightEye.z - leftEye.z;
 
       // Calculate head angle in plane
-      this.updateOneDimensionalSmoothVariables(
+      this.updateSmoothVariables(
         "headRotationAngles",
         faceId,
         -Math.atan2(dy, dx)
       );
 
       // Calculate head angle left and right
-      this.updateOneDimensionalSmoothVariables(
-        "headYawAngles",
-        faceId,
-        Math.atan2(dz, dx)
-      );
+      this.updateSmoothVariables("headYawAngles", faceId, Math.atan2(dz, dx));
 
       // Calculate the pitch using the distances between points
       const depthDistance =
@@ -367,14 +370,10 @@ class FaceLandmarks {
       }
 
       // Calculate head angle up and down
-      this.updateOneDimensionalSmoothVariables(
-        "headPitchAngles",
-        faceId,
-        pitchAngle
-      );
+      this.updateSmoothVariables("headPitchAngles", faceId, pitchAngle);
 
       // Update InterocularDistance
-      this.updateOneDimensionalSmoothVariables(
+      this.updateSmoothVariables(
         "interocularDistances",
         faceId,
         Math.sqrt(dx * dx + dy * dy)
@@ -382,14 +381,14 @@ class FaceLandmarks {
 
       // Calculate ear size based on interocular distance
       if (this.currentEffectsStyles.current.camera[this.id].ears) {
-        this.updateOneDimensionalSmoothVariables(
+        this.updateSmoothVariables(
           "leftEarWidths",
           faceId,
           this.calculatedLandmarks.interocularDistances[faceId] *
             this.currentEffectsStyles.current.camera[this.id].ears!
               .leftEarWidthFactor
         );
-        this.updateOneDimensionalSmoothVariables(
+        this.updateSmoothVariables(
           "rightEarWidths",
           faceId,
           this.calculatedLandmarks.interocularDistances[faceId] *
@@ -400,7 +399,7 @@ class FaceLandmarks {
 
       // Set eye widths
       // Calculate eyes width based on interocular distance
-      this.updateOneDimensionalSmoothVariables(
+      this.updateSmoothVariables(
         "eyesWidths",
         faceId,
         this.calculatedLandmarks.interocularDistances[faceId]
@@ -412,7 +411,7 @@ class FaceLandmarks {
       const dxJaw = rightJawPoint.x - leftJawPoint.x;
       const dyJaw = rightJawPoint.y - leftJawPoint.y;
 
-      this.updateOneDimensionalSmoothVariables(
+      this.updateSmoothVariables(
         "chinWidths",
         faceId,
         Math.sqrt(dxJaw * dxJaw + dyJaw * dyJaw) * chinWidthFactor

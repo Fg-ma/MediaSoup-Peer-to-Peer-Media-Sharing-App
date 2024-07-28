@@ -4,7 +4,6 @@ import FgSVG from "../../fgSVG/FgSVG";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
 import blurIcon from "../../../public/svgs/blurIcon.svg";
@@ -20,7 +19,7 @@ export default function BlurButton({
   videoId: string;
   type: "camera" | "screen";
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;

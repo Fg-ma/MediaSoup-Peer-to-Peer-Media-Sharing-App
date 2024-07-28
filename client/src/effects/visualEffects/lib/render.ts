@@ -3,8 +3,8 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   AudioEffectTypes,
-} from "../../context/StreamsContext";
-import { EffectStylesType } from "../../context/CurrentEffectsStylesContext";
+} from "../../../context/StreamsContext";
+import { EffectStylesType } from "../../../context/CurrentEffectsStylesContext";
 import BaseShader from "./BaseShader";
 import FaceLandmarks from "./FaceLandmarks";
 

@@ -1,14 +1,17 @@
 import * as mediasoup from "mediasoup-client";
+import CameraMedia from "./lib/CameraMedia";
+import ScreenMedia from "./lib/ScreenMedia";
+import AudioMedia from "./lib/AudioMedia";
 
 const leaveTable = (
-  userStreams: React.MutableRefObject<{
+  userMedia: React.MutableRefObject<{
     camera: {
-      [cameraId: string]: MediaStream;
+      [cameraId: string]: CameraMedia;
     };
     screen: {
-      [screenId: string]: MediaStream;
+      [screenId: string]: ScreenMedia;
     };
-    audio: MediaStream | undefined;
+    audio: AudioMedia | undefined;
   }>,
   userCameraCount: React.MutableRefObject<number>,
   userScreenCount: React.MutableRefObject<number>,
@@ -52,24 +55,22 @@ const leaveTable = (
   setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
   device: React.MutableRefObject<mediasoup.types.Device | undefined>
 ) => {
-  for (const cameraId in userStreams.current.camera) {
-    userStreams.current.camera[cameraId]
-      ?.getTracks()
-      .forEach((track) => track.stop());
-    delete userStreams.current.camera[cameraId];
+  for (const cameraId in userMedia.current.camera) {
+    userMedia.current.camera[cameraId].deconstructor();
+    delete userMedia.current.camera[cameraId];
   }
   userCameraCount.current = 0;
 
-  for (const screenId in userStreams.current.screen) {
-    userStreams.current.screen[screenId]
-      ?.getTracks()
-      .forEach((track) => track.stop());
-    delete userStreams.current.screen[screenId];
+  for (const screenId in userMedia.current.screen) {
+    userMedia.current.screen[screenId].deconstructor();
+    delete userMedia.current.screen[screenId];
   }
   userScreenCount.current = 0;
 
-  userStreams.current.audio?.getTracks().forEach((track) => track.stop());
-  userStreams.current.audio = undefined;
+  if (userMedia.current.audio) {
+    userMedia.current.audio.deconstructor();
+    userMedia.current.audio = undefined;
+  }
 
   remoteTracksMap.current = {};
 

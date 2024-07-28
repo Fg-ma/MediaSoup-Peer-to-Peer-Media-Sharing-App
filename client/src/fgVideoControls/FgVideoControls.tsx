@@ -4,7 +4,6 @@ import Controls from "./lib/Controls";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
 } from "../context/StreamsContext";
 import EffectSection from "../effectSection/EffectSection";
 import VolumeSection from "./lib/VolumeSection";
@@ -61,7 +60,7 @@ export default function FgVideoControls({
   playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;

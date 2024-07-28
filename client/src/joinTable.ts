@@ -1,6 +1,9 @@
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import leaveTable from "./leaveTable";
+import CameraMedia from "./lib/CameraMedia";
+import ScreenMedia from "./lib/ScreenMedia";
+import AudioMedia from "./lib/AudioMedia";
 
 const joinTable = (
   socket: React.MutableRefObject<Socket>,
@@ -9,14 +12,14 @@ const joinTable = (
   table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
   setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
-  userStreams: React.MutableRefObject<{
+  userMedia: React.MutableRefObject<{
     camera: {
-      [cameraId: string]: MediaStream;
+      [cameraId: string]: CameraMedia;
     };
     screen: {
-      [screenId: string]: MediaStream;
+      [screenId: string]: ScreenMedia;
     };
-    audio: MediaStream | undefined;
+    audio: AudioMedia | undefined;
   }>,
   userCameraCount: React.MutableRefObject<number>,
   userScreenCount: React.MutableRefObject<number>,
@@ -73,7 +76,7 @@ const joinTable = (
     if (previousTableId.trim() !== "" && previousUsername.trim() !== "") {
       socket.current.emit("leaveTable", previousTableId, previousUsername);
       leaveTable(
-        userStreams,
+        userMedia,
         userCameraCount,
         userScreenCount,
         remoteTracksMap,

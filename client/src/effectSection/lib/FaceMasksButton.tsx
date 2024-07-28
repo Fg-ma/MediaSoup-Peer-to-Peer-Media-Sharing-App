@@ -15,7 +15,6 @@ import threeDim_faceMaskOffIcon1 from "../../../public/svgs/faceMasks/threeDim_f
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
 
@@ -27,7 +26,7 @@ export default function FaceMasksButton({
   setEffectsDisabled,
 }: {
   handleEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   type: "camera";
