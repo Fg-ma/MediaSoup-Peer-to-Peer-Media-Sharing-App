@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useRef } from "react";
 import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";
-import AudioMedia from "src/lib/AudioMedia";
+import AudioMedia from "../lib/AudioMedia";
 
-export type EffectTypes =
+export type CameraEffectTypes =
   | "pause"
   | "blur"
   | "tint"
@@ -12,6 +12,10 @@ export type EffectTypes =
   | "beards"
   | "mustaches"
   | "faceMasks";
+
+export type ScreenEffectTypes = "pause" | "blur" | "tint";
+
+export type AudioEffectTypes = "mute" | "robot";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;
@@ -39,15 +43,13 @@ export interface StreamsContextType {
   userCameraCount: React.MutableRefObject<number>;
   userScreenCount: React.MutableRefObject<number>;
   userStreamEffects: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      camera?: {
-        [cameraId: string]: boolean;
-      };
-      screen?: {
-        [screenId: string]: boolean;
-      };
-      audio?: boolean;
+    camera: {
+      [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
     };
+    screen: {
+      [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+    };
+    audio: { [effectType in AudioEffectTypes]: boolean };
   }>;
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
@@ -98,26 +100,17 @@ export function StreamsContextProvider({
   const userCameraCount = useRef(0);
   const userScreenCount = useRef(0);
   const userStreamEffects = useRef<{
-    [effectType in EffectTypes]: {
-      camera?: {
-        [cameraId: string]: boolean;
-      };
-      screen?: {
-        [screenId: string]: boolean;
-      };
-      audio?: boolean;
+    camera: {
+      [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
     };
+    screen: {
+      [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+    };
+    audio: { [effectType in AudioEffectTypes]: boolean };
   }>({
-    pause: { camera: {}, screen: {} },
-    blur: { camera: {}, screen: {} },
-    tint: { camera: {}, screen: {} },
-    ears: { camera: {} },
-    glasses: { camera: {} },
-    beards: { camera: {} },
-    mustaches: { camera: {} },
-    faceMasks: {
-      camera: {},
-    },
+    camera: {},
+    screen: {},
+    audio: { mute: false, robot: false },
   });
   const remoteTracksMap = useRef<{
     [username: string]: {

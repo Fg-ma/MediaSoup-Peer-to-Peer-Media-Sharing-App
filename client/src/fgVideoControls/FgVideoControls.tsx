@@ -1,7 +1,11 @@
 import { AnimatePresence } from "framer-motion";
-import React, { useState } from "react";
+import React from "react";
 import Controls from "./lib/Controls";
-import { EffectTypes } from "../context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  AudioEffectTypes,
+} from "../context/StreamsContext";
 import EffectSection from "../effectSection/EffectSection";
 import VolumeSection from "./lib/VolumeSection";
 import FullScreenButton from "./lib/FullScreenButton";
@@ -57,7 +61,7 @@ export default function FgVideoControls({
   playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   handleEffectChange: (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;

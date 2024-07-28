@@ -3,10 +3,10 @@ import {
   NormalizedLandmarkListList,
 } from "@mediapipe/face_mesh";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
-import { oneDimensionalDeadbandingMap } from "./updateDeadbandingMaps";
+import { deadbandingMap } from "./updateDeadbandingMaps";
 import { Point2D } from "./BaseShader";
 
-export type OneDimensionalLandmarkTypes =
+export type LandmarkTypes =
   | "headRotationAngles"
   | "headYawAngles"
   | "headPitchAngles"
@@ -245,7 +245,7 @@ class FaceLandmarks {
         tracker.lastSeen++;
         if (tracker.lastSeen > this.maxFaceTrackerAge) {
           Object.keys(this.calculatedLandmarks).forEach((featureType) => {
-            const feature = featureType as OneDimensionalLandmarkTypes;
+            const feature = featureType as LandmarkTypes;
             delete this.calculatedLandmarks[feature][id];
           });
         } else {
@@ -259,14 +259,14 @@ class FaceLandmarks {
   }
 
   private smoothOneDimensionalVariableWithDeadbanding(
-    featureType: OneDimensionalLandmarkTypes,
+    featureType: LandmarkTypes,
     previousValue: number,
     currentValue: number,
     smoothingFactor: number
   ) {
     const deltaValue = currentValue - previousValue;
 
-    if (Math.abs(deltaValue) < oneDimensionalDeadbandingMap[featureType]) {
+    if (Math.abs(deltaValue) < deadbandingMap[featureType]) {
       return previousValue;
     }
 
@@ -276,7 +276,7 @@ class FaceLandmarks {
   }
 
   private updateOneDimensionalSmoothVariables(
-    featureType: OneDimensionalLandmarkTypes,
+    featureType: LandmarkTypes,
     faceId: string,
     value: number
   ) {
@@ -381,18 +381,22 @@ class FaceLandmarks {
       );
 
       // Calculate ear size based on interocular distance
-      this.updateOneDimensionalSmoothVariables(
-        "leftEarWidths",
-        faceId,
-        this.calculatedLandmarks.interocularDistances[faceId] *
-          this.currentEffectsStyles.current[this.id].ears.leftEarWidthFactor
-      );
-      this.updateOneDimensionalSmoothVariables(
-        "rightEarWidths",
-        faceId,
-        this.calculatedLandmarks.interocularDistances[faceId] *
-          this.currentEffectsStyles.current[this.id].ears.rightEarWidthFactor
-      );
+      if (this.currentEffectsStyles.current.camera[this.id].ears) {
+        this.updateOneDimensionalSmoothVariables(
+          "leftEarWidths",
+          faceId,
+          this.calculatedLandmarks.interocularDistances[faceId] *
+            this.currentEffectsStyles.current.camera[this.id].ears!
+              .leftEarWidthFactor
+        );
+        this.updateOneDimensionalSmoothVariables(
+          "rightEarWidths",
+          faceId,
+          this.calculatedLandmarks.interocularDistances[faceId] *
+            this.currentEffectsStyles.current.camera[this.id].ears!
+              .rightEarWidthFactor
+        );
+      }
 
       // Set eye widths
       // Calculate eyes width based on interocular distance
@@ -428,39 +432,46 @@ class FaceLandmarks {
 
       // Calculate the shift distance for the chin position taking into account
       // headAngle for direction of shift
-      const { shiftX: beardShiftX, shiftY: beardShiftY } =
-        this.directionalShift(
-          this.currentEffectsStyles.current[this.id].beards.chinOffset,
-          this.calculatedLandmarks.headRotationAngles[faceId]
-        );
-      this.calculatedLandmarks.twoDimBeardOffsets[faceId] = [
-        beardShiftX,
-        beardShiftY,
-      ];
+      if (this.currentEffectsStyles.current.camera[this.id].beards) {
+        const { shiftX: beardShiftX, shiftY: beardShiftY } =
+          this.directionalShift(
+            this.currentEffectsStyles.current.camera[this.id].beards!
+              .chinOffset,
+            this.calculatedLandmarks.headRotationAngles[faceId]
+          );
+        this.calculatedLandmarks.twoDimBeardOffsets[faceId] = [
+          beardShiftX,
+          beardShiftY,
+        ];
+      }
 
       // Calculate the shift distance for the nose position taking into account
       // headAngle for direction of shift
-      const { shiftX: twoDimNoseShiftX, shiftY: twoDimNoseShiftY } =
-        this.directionalShift(
-          this.currentEffectsStyles.current[this.id].mustaches.noseOffset
-            .twoDim,
-          this.calculatedLandmarks.headRotationAngles[faceId]
-        );
-      this.calculatedLandmarks.twoDimMustacheOffsets[faceId] = [
-        twoDimNoseShiftX,
-        twoDimNoseShiftY,
-      ];
+      if (this.currentEffectsStyles.current.camera[this.id].mustaches) {
+        const { shiftX: twoDimNoseShiftX, shiftY: twoDimNoseShiftY } =
+          this.directionalShift(
+            this.currentEffectsStyles.current.camera[this.id].mustaches!
+              .noseOffset.twoDim,
+            this.calculatedLandmarks.headRotationAngles[faceId]
+          );
+        this.calculatedLandmarks.twoDimMustacheOffsets[faceId] = [
+          twoDimNoseShiftX,
+          twoDimNoseShiftY,
+        ];
+      }
 
-      const { shiftX: threeDimNoseShiftX, shiftY: threeDimNoseShiftY } =
-        this.directionalShift(
-          this.currentEffectsStyles.current[this.id].mustaches.noseOffset
-            .threeDim,
-          this.calculatedLandmarks.headRotationAngles[faceId]
-        );
-      this.calculatedLandmarks.threeDimMustacheOffsets[faceId] = [
-        threeDimNoseShiftX,
-        threeDimNoseShiftY,
-      ];
+      if (this.currentEffectsStyles.current.camera[this.id].mustaches) {
+        const { shiftX: threeDimNoseShiftX, shiftY: threeDimNoseShiftY } =
+          this.directionalShift(
+            this.currentEffectsStyles.current.camera[this.id].mustaches!
+              .noseOffset.threeDim,
+            this.calculatedLandmarks.headRotationAngles[faceId]
+          );
+        this.calculatedLandmarks.threeDimMustacheOffsets[faceId] = [
+          threeDimNoseShiftX,
+          threeDimNoseShiftY,
+        ];
+      }
     });
   }
 

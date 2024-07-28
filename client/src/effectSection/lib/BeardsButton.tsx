@@ -7,7 +7,12 @@ import {
   BeardsEffectTypes,
   beardChinOffsetsMap,
 } from "../../context/CurrentEffectsStylesContext";
-import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  AudioEffectTypes,
+  useStreamsContext,
+} from "../../context/StreamsContext";
 import classicalCurlyBeard from "../../../public/2DAssets/beards/classicalCurlyBeard.png";
 import loading_classicalCurlyBeard from "../../../public/2DAssets/beards/loading_classicalCurlyBeard.png";
 import classicalCurlyBeardIcon from "../../../public/svgs/beards/classicalCurlyBeardIcon.svg";
@@ -22,18 +27,18 @@ export default function BeardsButton({
   effectsDisabled,
   setEffectsDisabled,
 }: {
-  type: "camera" | "screen";
+  type: "camera";
   videoId: string;
   handleEffectChange: (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const { userStreamEffects } = useStreamsContext();
+  const [buttonState, setButtonState] = useState("");
 
   const beardsEffects: {
     [key in BeardsEffectTypes]: {
@@ -64,11 +69,11 @@ export default function BeardsButton({
       clickFunction={async () => {
         setEffectsDisabled(true);
         setButtonState(
-          currentEffectsStyles.current[videoId].beards?.threeDim
-            ? userStreamEffects.current.beards[type]?.[videoId]
+          currentEffectsStyles.current[type][videoId].beards?.threeDim
+            ? userStreamEffects.current[type][videoId].beards
               ? "threeDimOffIcon"
               : "threeDimIcon"
-            : userStreamEffects.current.beards[type]?.[videoId]
+            : userStreamEffects.current[type][videoId].beards
             ? "offIcon"
             : "icon"
         );
@@ -80,7 +85,7 @@ export default function BeardsButton({
       holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
-          !currentEffectsStyles.current[videoId].beards ||
+          !currentEffectsStyles.current[type][videoId].beards ||
           !target ||
           !target.dataset.value
         ) {
@@ -92,32 +97,35 @@ export default function BeardsButton({
         const effectType = target.dataset.value as BeardsEffectTypes;
         if (
           effectType in beardsEffects &&
-          (currentEffectsStyles.current[videoId].beards.style !== effectType ||
-            !userStreamEffects.current.beards[type]?.[videoId])
+          (currentEffectsStyles.current[type][videoId].beards.style !==
+            effectType ||
+            !userStreamEffects.current[type][videoId].beards)
         ) {
-          currentEffectsStyles.current[videoId].beards.style = effectType;
-          currentEffectsStyles.current[videoId].beards.chinOffset =
+          currentEffectsStyles.current[type][videoId].beards.style = effectType;
+          currentEffectsStyles.current[type][videoId].beards.chinOffset =
             beardChinOffsetsMap[effectType];
           await handleEffectChange(
             "beards",
-            userStreamEffects.current.beards[type]?.[videoId] ? true : false
+            userStreamEffects.current[type][videoId].beards ? true : false
           );
         }
 
         setEffectsDisabled(false);
       }}
       contentFunction={() => {
-        if (!currentEffectsStyles.current[videoId].beards) {
+        if (!currentEffectsStyles.current[type][videoId].beards) {
           return;
         }
 
         const iconSrc =
-          beardsEffects[currentEffectsStyles.current[videoId].beards.style][
-            currentEffectsStyles.current[videoId].beards?.threeDim
-              ? userStreamEffects.current.beards[type]?.[videoId]
+          beardsEffects[
+            currentEffectsStyles.current[type][videoId].beards.style
+          ][
+            currentEffectsStyles.current[type][videoId].beards?.threeDim
+              ? userStreamEffects.current[type][videoId].beards
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
-              : userStreamEffects.current.beards[type]?.[videoId]
+              : userStreamEffects.current[type][videoId].beards
               ? "offIcon"
               : "icon"
           ];
@@ -129,33 +137,35 @@ export default function BeardsButton({
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
             ]}
-            data-value={currentEffectsStyles.current[videoId].beards?.style}
+            data-value={
+              currentEffectsStyles.current[type][videoId].beards?.style
+            }
           />
         );
       }}
       doubleClickFunction={async () => {
-        if (!currentEffectsStyles.current[videoId].beards) {
+        if (!currentEffectsStyles.current[type][videoId].beards) {
           return;
         }
 
         setEffectsDisabled(true);
 
-        currentEffectsStyles.current[videoId].beards.threeDim =
-          !currentEffectsStyles.current[videoId].beards.threeDim;
+        currentEffectsStyles.current[type][videoId].beards.threeDim =
+          !currentEffectsStyles.current[type][videoId].beards.threeDim;
 
         setButtonState(
-          currentEffectsStyles.current[videoId].beards.threeDim
-            ? userStreamEffects.current.beards[type]?.[videoId]
+          currentEffectsStyles.current[type][videoId].beards.threeDim
+            ? userStreamEffects.current[type][videoId].beards
               ? "threeDimOffIcon"
               : "threeDimIcon"
-            : userStreamEffects.current.beards[type]?.[videoId]
+            : userStreamEffects.current[type][videoId].beards
             ? "offIcon"
             : "icon"
         );
 
         await handleEffectChange(
           "beards",
-          userStreamEffects.current.beards[type]?.[videoId]
+          userStreamEffects.current[type][videoId].beards
         );
 
         setEffectsDisabled(false);
@@ -189,7 +199,9 @@ export default function BeardsButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={currentEffectsStyles.current[videoId].beards?.style}
+      defaultDataValue={
+        currentEffectsStyles.current[type][videoId].beards?.style
+      }
       hoverTimeoutDuration={750}
       disabled={effectsDisabled}
     />

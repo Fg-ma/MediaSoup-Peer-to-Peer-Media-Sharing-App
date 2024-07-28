@@ -2,7 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import "./FgVideoStyles.css";
-import { useStreamsContext, EffectTypes } from "../context/StreamsContext";
+import {
+  useStreamsContext,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  AudioEffectTypes,
+} from "../context/StreamsContext";
 import handleEffect from "../effects/handleEffect";
 import Controls from "../fgVideoControls/lib/Controls";
 import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";
@@ -129,7 +134,7 @@ export default function FgVideo({
   const stream = userMedia.current[type][videoId]?.getStream();
 
   const handleEffectChange = async (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
     blockStateChange: boolean = false
   ) => {
     if (isUser) {
@@ -418,7 +423,7 @@ export default function FgVideo({
 
   const onAcceptEffect = (event: {
     type: "acceptBlur";
-    effect: EffectTypes;
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
     producerId: string;
   }) => {
     if (videoId === event.producerId) {

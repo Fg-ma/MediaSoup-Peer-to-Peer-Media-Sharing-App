@@ -49,29 +49,35 @@ export const mustacheNoseOffsetsMap: {
 export type FaceMasksEffectTypes = "faceMask1";
 
 export interface EffectStylesType {
-  [id: string]: {
-    glasses?: { style: GlassesEffectTypes; threeDim: boolean };
-    ears?: {
-      style: EarsEffectTypes;
-      threeDim: boolean;
-      leftEarWidthFactor: number;
-      rightEarWidthFactor: number;
-    };
-    beards?: {
-      style: BeardsEffectTypes;
-      threeDim: boolean;
-      chinOffset: number;
-    };
-    mustaches?: {
-      style: MustachesEffectTypes;
-      threeDim: boolean;
-      noseOffset: { twoDim: number; threeDim: number };
-    };
-    faceMasks?: {
-      style: FaceMasksEffectTypes;
-      threeDim: true;
+  camera: {
+    [id: string]: {
+      glasses?: { style: GlassesEffectTypes; threeDim: boolean };
+      ears?: {
+        style: EarsEffectTypes;
+        threeDim: boolean;
+        leftEarWidthFactor: number;
+        rightEarWidthFactor: number;
+      };
+      beards?: {
+        style: BeardsEffectTypes;
+        threeDim: boolean;
+        chinOffset: number;
+      };
+      mustaches?: {
+        style: MustachesEffectTypes;
+        threeDim: boolean;
+        noseOffset: { twoDim: number; threeDim: number };
+      };
+      faceMasks?: {
+        style: FaceMasksEffectTypes;
+        threeDim: true;
+      };
     };
   };
+  screen: {
+    [id: string]: {};
+  };
+  audio: {};
 }
 
 export interface CurrentEffectsStylesContextProviderProps {
@@ -99,7 +105,11 @@ export const useCurrentEffectsStylesContext = () => {
 export function CurrentEffectsStylesContextProvider({
   children,
 }: CurrentEffectsStylesContextProviderProps) {
-  const currentEffectsStyles = useRef<EffectStylesType>({});
+  const currentEffectsStyles = useRef<EffectStylesType>({
+    camera: {},
+    screen: {},
+    audio: {},
+  });
 
   return (
     <CurrentEffectsStylesContext.Provider

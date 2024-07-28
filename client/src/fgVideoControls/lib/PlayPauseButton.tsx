@@ -4,7 +4,6 @@ import FgSVG from "../../fgSVG/FgSVG";
 import Controls from "./Controls";
 import playIcon from "../../../public/svgs/play.svg";
 import pauseIcon from "../../../public/svgs/pause.svg";
-import { EffectTypes } from "../../context/StreamsContext";
 
 export default function PlayPauseButton({
   controls,

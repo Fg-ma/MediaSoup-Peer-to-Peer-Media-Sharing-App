@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  AudioEffectTypes,
+  useStreamsContext,
+} from "../../context/StreamsContext";
 import blurIcon from "../../../public/svgs/blurIcon.svg";
 import blurOffIcon from "../../../public/svgs/blurOffIcon.svg";
 
@@ -15,7 +20,7 @@ export default function BlurButton({
   videoId: string;
   type: "camera" | "screen";
   handleEffectChange: (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;
@@ -29,9 +34,7 @@ export default function BlurButton({
       clickFunction={async () => {
         setEffectsDisabled(true);
         setButtonState(
-          userStreamEffects.current.blur[type]?.[videoId]
-            ? "inActive"
-            : "active"
+          userStreamEffects.current[type][videoId].blur ? "inActive" : "active"
         );
 
         await handleEffectChange("blur");
@@ -42,7 +45,7 @@ export default function BlurButton({
         return (
           <FgSVG
             src={
-              userStreamEffects.current.blur[type]?.[videoId]
+              userStreamEffects.current[type][videoId].blur
                 ? blurOffIcon
                 : blurIcon
             }

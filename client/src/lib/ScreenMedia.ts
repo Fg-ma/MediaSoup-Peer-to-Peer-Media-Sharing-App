@@ -2,10 +2,12 @@ import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import BaseShader from "../effects/lib/BaseShader";
 import render from "../effects/lib/render";
 import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
-import { EffectTypes } from "../context/StreamsContext";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
-
-type ScreenEffects = "pause" | "blur" | "tint";
 
 class ScreenMedia {
   private username: string;
@@ -19,19 +21,13 @@ class ScreenMedia {
 
   private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private userStreamEffects: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      camera?:
-        | {
-            [cameraId: string]: boolean;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: boolean;
-          }
-        | undefined;
-      audio?: boolean;
+    camera: {
+      [cameraId: string]: { [effectType in CameraEffectTypes]?: boolean };
     };
+    screen: {
+      [screenId: string]: { [effectType in ScreenEffectTypes]?: boolean };
+    };
+    audio: { [effectType in AudioEffectTypes]?: boolean };
   }>;
 
   private animationFrameId: number[];
@@ -39,7 +35,7 @@ class ScreenMedia {
   private baseShader: BaseShader;
 
   private effects: {
-    [screenEffect in ScreenEffects]?: boolean;
+    [screenEffect in ScreenEffectTypes]?: boolean;
   };
 
   private tintColor = "#F56114";
@@ -53,19 +49,13 @@ class ScreenMedia {
     initScreenStream: MediaStream,
     currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     userStreamEffects: React.MutableRefObject<{
-      [effectType in EffectTypes]: {
-        camera?:
-          | {
-              [cameraId: string]: boolean;
-            }
-          | undefined;
-        screen?:
-          | {
-              [screenId: string]: boolean;
-            }
-          | undefined;
-        audio?: boolean;
+      camera: {
+        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
+      screen: {
+        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+      };
+      audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
     userDevice: UserDevice
   ) {
@@ -75,6 +65,14 @@ class ScreenMedia {
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
     this.userDevice = userDevice;
+
+    this.effects = {};
+
+    this.userStreamEffects.current.screen[this.screenId] = {
+      pause: false,
+      blur: false,
+      tint: false,
+    };
 
     this.canvas = document.createElement("canvas");
     const gl =
@@ -88,28 +86,11 @@ class ScreenMedia {
 
     this.initScreenStream = initScreenStream;
 
-    if (!currentEffectsStyles.current[this.screenId]) {
-      currentEffectsStyles.current[this.screenId] = {};
+    if (!currentEffectsStyles.current.screen[this.screenId]) {
+      currentEffectsStyles.current.screen[this.screenId] = {};
     }
 
     const meshes = {};
-
-    this.effects = {};
-
-    for (const effect in this.userStreamEffects.current) {
-      const effectType = effect as EffectTypes;
-      if (effectType in this.effects) {
-        for (const kindId in this.userStreamEffects.current[effectType]
-          .screen) {
-          if (
-            kindId === this.screenId &&
-            userStreamEffects.current[effectType].screen![this.screenId]
-          ) {
-            this.effects[effectType as ScreenEffects] = true;
-          }
-        }
-      }
-    }
 
     this.baseShader = new BaseShader(gl, this.effects, meshes);
 
@@ -191,7 +172,7 @@ class ScreenMedia {
   }
 
   async changeEffects(
-    effect: ScreenEffects,
+    effect: ScreenEffectTypes,
     tintColor?: string,
     blockStateChange: boolean = false
   ) {

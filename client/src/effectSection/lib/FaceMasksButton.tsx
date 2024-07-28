@@ -12,7 +12,12 @@ import faceMaskIcon1 from "../../../public/svgs/faceMasks/faceMaskIcon1.svg";
 import faceMaskOffIcon1 from "../../../public/svgs/faceMasks/faceMaskOffIcon1.svg";
 import threeDim_faceMaskIcon1 from "../../../public/svgs/faceMasks/threeDim_faceMaskIcon1.svg";
 import threeDim_faceMaskOffIcon1 from "../../../public/svgs/faceMasks/threeDim_faceMaskOffIcon1.svg";
-import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  AudioEffectTypes,
+  useStreamsContext,
+} from "../../context/StreamsContext";
 
 export default function FaceMasksButton({
   type,
@@ -22,10 +27,10 @@ export default function FaceMasksButton({
   setEffectsDisabled,
 }: {
   handleEffectChange: (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
-  type: "camera" | "screen";
+  type: "camera";
   videoId: string;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
@@ -69,7 +74,7 @@ export default function FaceMasksButton({
       holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
-          !currentEffectsStyles.current[videoId].faceMasks ||
+          !currentEffectsStyles.current[type][videoId].faceMasks ||
           !target ||
           !target.dataset.value
         ) {
@@ -81,30 +86,31 @@ export default function FaceMasksButton({
         const effectType = target.dataset.value as FaceMasksEffectTypes;
         if (
           effectType in faceMasksEffects &&
-          (currentEffectsStyles.current[videoId].faceMasks.style !==
+          (currentEffectsStyles.current[type][videoId].faceMasks.style !==
             effectType ||
-            !userStreamEffects.current.faceMasks[type]?.[videoId])
+            !userStreamEffects.current[type][videoId].faceMasks)
         ) {
-          currentEffectsStyles.current[videoId].faceMasks.style = effectType;
+          currentEffectsStyles.current[type][videoId].faceMasks.style =
+            effectType;
           await handleEffectChange("faceMasks");
         }
 
         setEffectsDisabled(false);
       }}
       contentFunction={() => {
-        if (!currentEffectsStyles.current[videoId].faceMasks) {
+        if (!currentEffectsStyles.current[type][videoId].faceMasks) {
           return;
         }
 
         const iconSrc =
           faceMasksEffects[
-            currentEffectsStyles.current[videoId].faceMasks.style
+            currentEffectsStyles.current[type][videoId].faceMasks.style
           ][
-            currentEffectsStyles.current[videoId].faceMasks.threeDim
-              ? userStreamEffects.current.faceMasks[type]?.[videoId]
+            currentEffectsStyles.current[type][videoId].faceMasks.threeDim
+              ? userStreamEffects.current[type][videoId].faceMasks
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
-              : userStreamEffects.current.faceMasks[type]?.[videoId]
+              : userStreamEffects.current[type][videoId].faceMasks
               ? "offIcon"
               : "icon"
           ];
@@ -148,7 +154,9 @@ export default function FaceMasksButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={currentEffectsStyles.current[videoId].faceMasks?.style}
+      defaultDataValue={
+        currentEffectsStyles.current[type][videoId].faceMasks?.style
+      }
       hoverTimeoutDuration={750}
       disabled={effectsDisabled}
     />

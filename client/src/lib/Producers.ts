@@ -5,7 +5,11 @@ import getBrowserMedia from "../getBrowserMedia";
 import CameraMedia from "./CameraMedia";
 import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import ScreenMedia from "./ScreenMedia";
-import { EffectTypes } from "../context/StreamsContext";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../context/StreamsContext";
 import AudioMedia from "./AudioMedia";
 import UserDevice from "../UserDevice";
 
@@ -34,19 +38,13 @@ class Producers {
   }>;
   private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private userStreamEffects: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      camera?:
-        | {
-            [cameraId: string]: boolean;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: boolean;
-          }
-        | undefined;
-      audio?: boolean;
+    camera: {
+      [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
     };
+    screen: {
+      [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+    };
+    audio: { [effectType in AudioEffectTypes]: boolean };
   }>;
   private remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
@@ -100,19 +98,13 @@ class Producers {
     }>,
     currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     userStreamEffects: React.MutableRefObject<{
-      [effectType in EffectTypes]: {
-        camera?:
-          | {
-              [cameraId: string]: boolean;
-            }
-          | undefined;
-        screen?:
-          | {
-              [screenId: string]: boolean;
-            }
-          | undefined;
-        audio?: boolean;
+      camera: {
+        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
+      screen: {
+        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+      };
+      audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
     remoteTracksMap: React.MutableRefObject<{
       [username: string]: {
@@ -703,24 +695,32 @@ class Producers {
 
       // Delete old stream effects
       for (const effectType in this.userStreamEffects.current) {
-        const typedEffectType =
-          effectType as keyof typeof this.userStreamEffects.current;
         if (
-          (event.producerType === "camera" ||
-            event.producerType === "screen") &&
-          this.userStreamEffects.current[typedEffectType][event.producerType]?.[
-            event.producerId
+          event.producerType === "camera" &&
+          this.userStreamEffects.current[event.producerType][event.producerId][
+            effectType as CameraEffectTypes
           ]
         ) {
-          delete this.userStreamEffects.current[typedEffectType][
-            event.producerType
-          ]?.[event.producerId];
+          delete this.userStreamEffects.current[event.producerType][
+            event.producerId
+          ];
+        } else if (
+          event.producerType === "screen" &&
+          this.userStreamEffects.current[event.producerType][event.producerId][
+            effectType as ScreenEffectTypes
+          ]
+        ) {
+          delete this.userStreamEffects.current[event.producerType][
+            event.producerId
+          ][effectType as ScreenEffectTypes];
         } else if (
           event.producerType === "audio" &&
-          this.userStreamEffects.current[typedEffectType][event.producerType]
+          this.userStreamEffects.current[event.producerType][
+            effectType as AudioEffectTypes
+          ]
         ) {
-          delete this.userStreamEffects.current[typedEffectType][
-            event.producerType
+          delete this.userStreamEffects.current[event.producerType][
+            effectType as AudioEffectTypes
           ];
         }
       }

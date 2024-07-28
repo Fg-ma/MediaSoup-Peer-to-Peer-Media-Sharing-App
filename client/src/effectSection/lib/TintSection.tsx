@@ -2,7 +2,12 @@ import React, { useState, useRef } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import ColorPicker from "./ColorPicker";
-import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  AudioEffectTypes,
+  useStreamsContext,
+} from "../../context/StreamsContext";
 import tintIcon from "../../../public/svgs/tintIcon.svg";
 import tintOffIcon from "../../../public/svgs/tintOffIcon.svg";
 
@@ -17,7 +22,7 @@ export default function TintSection({
   videoId: string;
   type: "camera" | "screen";
   handleEffectChange: (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
@@ -28,9 +33,9 @@ export default function TintSection({
 
   const [color, setColor] = useState("#F56114");
   const [buttonState, setButtonState] = useState("");
-  const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
+  const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
 
   const handleColorPicker = () => {
     setTempColor(tintColor.current);
@@ -43,7 +48,7 @@ export default function TintSection({
         clickFunction={async () => {
           setEffectsDisabled(true);
           setButtonState(
-            userStreamEffects.current.tint[type]?.[videoId]
+            userStreamEffects.current[type][videoId].tint
               ? "inActive"
               : "active"
           );
@@ -56,7 +61,7 @@ export default function TintSection({
           return (
             <FgSVG
               src={
-                userStreamEffects.current.tint[type]?.[videoId]
+                userStreamEffects.current[type][videoId].tint
                   ? tintOffIcon
                   : tintIcon
               }

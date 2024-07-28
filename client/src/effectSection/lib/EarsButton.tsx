@@ -13,7 +13,12 @@ import dogEarsIcon from "../../../public/svgs/ears/dogEarsIcon.svg";
 import dogEarsOffIcon from "../../../public/svgs/ears/dogEarsOffIcon.svg";
 import threeDim_dogEarsIcon from "../../../public/svgs/ears/threeDim_dogEarsIcon.svg";
 import threeDim_dogEarsOffIcon from "../../../public/svgs/ears/threeDim_dogEarsOffIcon.svg";
-import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  AudioEffectTypes,
+  useStreamsContext,
+} from "../../context/StreamsContext";
 
 export default function EarsButton({
   type,
@@ -22,18 +27,18 @@ export default function EarsButton({
   effectsDisabled,
   setEffectsDisabled,
 }: {
-  type: "camera" | "screen";
+  type: "camera";
   videoId: string;
   handleEffectChange: (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const { userStreamEffects } = useStreamsContext();
+  const [buttonState, setButtonState] = useState("");
 
   const earsEffects: {
     [key in EarsEffectTypes]: {
@@ -64,11 +69,11 @@ export default function EarsButton({
       clickFunction={async () => {
         setEffectsDisabled(true);
         setButtonState(
-          currentEffectsStyles.current[videoId].ears?.threeDim
-            ? userStreamEffects.current.ears[type]?.[videoId]
+          currentEffectsStyles.current[type][videoId].ears?.threeDim
+            ? userStreamEffects.current[type][videoId].ears
               ? "threeDimOffIcon"
               : "threeDimIcon"
-            : userStreamEffects.current.ears[type]?.[videoId]
+            : userStreamEffects.current[type][videoId].ears
             ? "offIcon"
             : "icon"
         );
@@ -80,7 +85,7 @@ export default function EarsButton({
       holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
-          !currentEffectsStyles.current[videoId].ears ||
+          !currentEffectsStyles.current[type][videoId].ears ||
           !target ||
           !target.dataset.value
         ) {
@@ -92,34 +97,35 @@ export default function EarsButton({
         const effectType = target.dataset.value as EarsEffectTypes;
         if (
           effectType in earsEffects &&
-          (currentEffectsStyles.current[videoId].ears.style !== effectType ||
-            !userStreamEffects.current.ears[type]?.[videoId])
+          (currentEffectsStyles.current[type][videoId].ears.style !==
+            effectType ||
+            !userStreamEffects.current[type][videoId].ears)
         ) {
-          currentEffectsStyles.current[videoId].ears.style = effectType;
-          currentEffectsStyles.current[videoId].ears.leftEarWidthFactor =
+          currentEffectsStyles.current[type][videoId].ears.style = effectType;
+          currentEffectsStyles.current[type][videoId].ears.leftEarWidthFactor =
             earsWidthFactorMap[effectType].leftEarWidthFactor;
-          currentEffectsStyles.current[videoId].ears.rightEarWidthFactor =
+          currentEffectsStyles.current[type][videoId].ears.rightEarWidthFactor =
             earsWidthFactorMap[effectType].rightEarWidthFactor;
           await handleEffectChange(
             "ears",
-            userStreamEffects.current.ears[type]?.[videoId]
+            userStreamEffects.current[type][videoId].ears
           );
         }
 
         setEffectsDisabled(false);
       }}
       contentFunction={() => {
-        if (!currentEffectsStyles.current[videoId].ears) {
+        if (!currentEffectsStyles.current[type][videoId].ears) {
           return;
         }
 
         const iconSrc =
-          earsEffects[currentEffectsStyles.current[videoId].ears.style][
-            currentEffectsStyles.current[videoId].ears.threeDim
-              ? userStreamEffects.current.ears[type]?.[videoId]
+          earsEffects[currentEffectsStyles.current[type][videoId].ears.style][
+            currentEffectsStyles.current[type][videoId].ears.threeDim
+              ? userStreamEffects.current[type][videoId].ears
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
-              : userStreamEffects.current.ears[type]?.[videoId]
+              : userStreamEffects.current[type][videoId].ears
               ? "offIcon"
               : "icon"
           ];
@@ -131,33 +137,33 @@ export default function EarsButton({
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
             ]}
-            data-value={currentEffectsStyles.current[videoId].ears.style}
+            data-value={currentEffectsStyles.current[type][videoId].ears.style}
           />
         );
       }}
       doubleClickFunction={async () => {
-        if (!currentEffectsStyles.current[videoId].ears) {
+        if (!currentEffectsStyles.current[type][videoId].ears) {
           return;
         }
 
         setEffectsDisabled(true);
 
-        currentEffectsStyles.current[videoId].ears.threeDim =
-          !currentEffectsStyles.current[videoId].ears.threeDim;
+        currentEffectsStyles.current[type][videoId].ears.threeDim =
+          !currentEffectsStyles.current[type][videoId].ears.threeDim;
 
         setButtonState(
-          currentEffectsStyles.current[videoId].ears.threeDim
-            ? userStreamEffects.current.ears[type]?.[videoId]
+          currentEffectsStyles.current[type][videoId].ears.threeDim
+            ? userStreamEffects.current[type][videoId].ears
               ? "threeDimOffIcon"
               : "threeDimIcon"
-            : userStreamEffects.current.ears[type]?.[videoId]
+            : userStreamEffects.current[type][videoId].ears
             ? "offIcon"
             : "icon"
         );
 
         await handleEffectChange(
           "ears",
-          userStreamEffects.current.ears[type]?.[videoId]
+          userStreamEffects.current[type][videoId].ears
         );
 
         setEffectsDisabled(false);
@@ -191,7 +197,7 @@ export default function EarsButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={currentEffectsStyles.current[videoId].ears?.style}
+      defaultDataValue={currentEffectsStyles.current[type][videoId].ears?.style}
       hoverTimeoutDuration={750}
       disabled={effectsDisabled}
     />

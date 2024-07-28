@@ -9,18 +9,12 @@ import render from "../effects/lib/render";
 import FaceLandmarks from "../effects/lib/FaceLandmarks";
 import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
-import { EffectTypes } from "../context/StreamsContext";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
-
-type CameraEffects =
-  | "pause"
-  | "blur"
-  | "tint"
-  | "ears"
-  | "glasses"
-  | "beards"
-  | "mustaches"
-  | "faceMasks";
 
 class CameraMedia {
   private username: string;
@@ -34,19 +28,13 @@ class CameraMedia {
 
   private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private userStreamEffects: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      camera?:
-        | {
-            [cameraId: string]: boolean;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: boolean;
-          }
-        | undefined;
-      audio?: boolean;
+    camera: {
+      [cameraId: string]: { [effectType in CameraEffectTypes]?: boolean };
     };
+    screen: {
+      [screenId: string]: { [effectType in ScreenEffectTypes]?: boolean };
+    };
+    audio: { [effectType in AudioEffectTypes]?: boolean };
   }>;
 
   private animationFrameId: number[] = [];
@@ -58,7 +46,7 @@ class CameraMedia {
   private faceMesh: FaceMesh;
 
   private effects: {
-    [cameraEffect in CameraEffects]?: boolean;
+    [cameraEffect in CameraEffectTypes]?: boolean;
   };
 
   private tintColor = "#F56114";
@@ -72,19 +60,13 @@ class CameraMedia {
     initCameraStream: MediaStream,
     currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     userStreamEffects: React.MutableRefObject<{
-      [effectType in EffectTypes]: {
-        camera?:
-          | {
-              [cameraId: string]: boolean;
-            }
-          | undefined;
-        screen?:
-          | {
-              [screenId: string]: boolean;
-            }
-          | undefined;
-        audio?: boolean;
+      camera: {
+        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
+      screen: {
+        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+      };
+      audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
     userDevice: UserDevice
   ) {
@@ -94,6 +76,19 @@ class CameraMedia {
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
     this.userDevice = userDevice;
+
+    this.effects = {};
+
+    this.userStreamEffects.current.camera[this.cameraId] = {
+      pause: false,
+      blur: false,
+      tint: false,
+      ears: false,
+      glasses: false,
+      beards: false,
+      mustaches: false,
+      faceMasks: false,
+    };
 
     this.canvas = document.createElement("canvas");
     const gl =
@@ -113,8 +108,8 @@ class CameraMedia {
     const defaultMustache = "mustache1";
     const defaultFaceMask = "faceMask1";
 
-    if (!currentEffectsStyles.current[this.cameraId]) {
-      currentEffectsStyles.current[this.cameraId] = {
+    if (!currentEffectsStyles.current.camera[this.cameraId]) {
+      currentEffectsStyles.current.camera[this.cameraId] = {
         glasses: { style: defaultGlasses, threeDim: false },
         ears: {
           style: defaultEars,
@@ -149,20 +144,6 @@ class CameraMedia {
       disguiseMustache: { meshURL: "/3DAssets/mustaches/mustache1.json" },
       faceMask1: { meshURL: "/3DAssets/faceMasks/faceMask1.json" },
     };
-
-    this.effects = {};
-
-    for (const effect in this.userStreamEffects.current) {
-      const effectType = effect as keyof typeof this.userStreamEffects.current;
-      for (const kindId in this.userStreamEffects.current[effectType].camera) {
-        if (
-          kindId === this.cameraId &&
-          userStreamEffects.current[effectType].camera![this.cameraId]
-        ) {
-          this.effects[effectType] = true;
-        }
-      }
-    }
 
     this.baseShader = new BaseShader(gl, this.effects, meshes);
 
@@ -255,77 +236,82 @@ class CameraMedia {
     const twoDimUrls: { [key: string]: string } = {};
 
     if (
-      this.currentEffectsStyles.current[this.cameraId].ears &&
+      this.currentEffectsStyles.current.camera[this.cameraId].ears &&
       this.effects.ears
     ) {
       twoDimUrls[
-        `${this.currentEffectsStyles.current[this.cameraId].ears!.style}Left`
+        `${
+          this.currentEffectsStyles.current.camera[this.cameraId].ears!.style
+        }Left`
       ] = `/2DAssets/ears/${
-        this.currentEffectsStyles.current[this.cameraId].ears!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].ears!.style
       }Left.png`;
     }
     if (
-      this.currentEffectsStyles.current[this.cameraId].ears &&
+      this.currentEffectsStyles.current.camera[this.cameraId].ears &&
       this.effects.ears
     ) {
       twoDimUrls[
-        `${this.currentEffectsStyles.current[this.cameraId].ears!.style}Right`
+        `${
+          this.currentEffectsStyles.current.camera[this.cameraId].ears!.style
+        }Right`
       ] = `/2DAssets/ears/${
-        this.currentEffectsStyles.current[this.cameraId].ears!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].ears!.style
       }Right.png`;
     }
     if (
-      this.currentEffectsStyles.current[this.cameraId].glasses &&
+      this.currentEffectsStyles.current.camera[this.cameraId].glasses &&
       this.effects.glasses
     ) {
       twoDimUrls[
-        this.currentEffectsStyles.current[this.cameraId].glasses!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].glasses!.style
       ] = `/2DAssets/glasses/${
-        this.currentEffectsStyles.current[this.cameraId].glasses!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].glasses!.style
       }.png`;
     }
     if (
-      this.currentEffectsStyles.current[this.cameraId].beards &&
+      this.currentEffectsStyles.current.camera[this.cameraId].beards &&
       this.effects.beards
     ) {
       twoDimUrls[
-        this.currentEffectsStyles.current[this.cameraId].beards!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
       ] = `/2DAssets/beards/${
-        this.currentEffectsStyles.current[this.cameraId].beards!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
       }.png`;
     }
     if (
-      this.currentEffectsStyles.current[this.cameraId].mustaches &&
+      this.currentEffectsStyles.current.camera[this.cameraId].mustaches &&
       this.effects.mustaches
     ) {
       twoDimUrls[
-        this.currentEffectsStyles.current[this.cameraId].mustaches!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       ] = `/2DAssets/mustaches/${
-        this.currentEffectsStyles.current[this.cameraId].mustaches!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       }.png`;
     }
 
     const threeDimUrls: { [key: string]: string } = {};
 
     if (
-      this.currentEffectsStyles.current[this.cameraId].mustaches &&
-      this.currentEffectsStyles.current[this.cameraId].mustaches!.threeDim &&
+      this.currentEffectsStyles.current.camera[this.cameraId].mustaches &&
+      this.currentEffectsStyles.current.camera[this.cameraId].mustaches!
+        .threeDim &&
       this.effects.mustaches
     ) {
       threeDimUrls[
-        this.currentEffectsStyles.current[this.cameraId].mustaches!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       ] = `/3DAssets/mustaches/${
-        this.currentEffectsStyles.current[this.cameraId].mustaches!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       }.png`;
     }
     if (
-      this.currentEffectsStyles.current[this.cameraId].faceMasks &&
+      this.currentEffectsStyles.current.camera[this.cameraId].faceMasks &&
       this.effects.faceMasks
     ) {
       threeDimUrls[
-        this.currentEffectsStyles.current[this.cameraId].faceMasks!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
       ] = `/3DAssets/faceMasks/${
-        this.currentEffectsStyles.current[this.cameraId].faceMasks!.style
+        this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
       }.png`;
     }
 
@@ -334,7 +320,7 @@ class CameraMedia {
   }
 
   async changeEffects(
-    effect: EffectTypes,
+    effect: CameraEffectTypes,
     tintColor?: string,
     blockStateChange: boolean = false
   ) {

@@ -6,6 +6,12 @@ import {
   useCurrentEffectsStylesContext,
   GlassesEffectTypes,
 } from "../../context/CurrentEffectsStylesContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  AudioEffectTypes,
+  useStreamsContext,
+} from "../../context/StreamsContext";
 import defaultGlasses from "../../../public/2DAssets/glasses/defaultGlasses.png";
 import loading_defaultGlasses from "../../../public/2DAssets/glasses/loading_defaultGlasses.png";
 import memeGlasses from "../../../public/2DAssets/glasses/memeGlasses.png";
@@ -36,7 +42,6 @@ import shadesIcon from "../../../public/svgs/glasses/shadesIcon.svg";
 import shadesOffIcon from "../../../public/svgs/glasses/shadesOffIcon.svg";
 import threeDim_shadesIcon from "../../../public/svgs/glasses/threeDim_shadesIcon.svg";
 import threeDim_shadesOffIcon from "../../../public/svgs/glasses/threeDim_shadesOffIcon.svg";
-import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
 export default function GlassesButton({
   type,
@@ -45,18 +50,18 @@ export default function GlassesButton({
   effectsDisabled,
   setEffectsDisabled,
 }: {
-  type: "camera" | "screen";
+  type: "camera";
   videoId: string;
   handleEffectChange: (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const { userStreamEffects } = useStreamsContext();
+  const [buttonState, setButtonState] = useState("");
 
   const glassesEffects: {
     [key in GlassesEffectTypes]: {
@@ -127,11 +132,11 @@ export default function GlassesButton({
       clickFunction={async () => {
         setEffectsDisabled(true);
         setButtonState(
-          currentEffectsStyles.current[videoId].glasses?.threeDim
-            ? userStreamEffects.current.glasses[type]?.[videoId]
+          currentEffectsStyles.current[type][videoId].glasses?.threeDim
+            ? userStreamEffects.current[type][videoId].glasses
               ? "threeDimOffIcon"
               : "threeDimIcon"
-            : userStreamEffects.current.glasses[type]?.[videoId]
+            : userStreamEffects.current[type][videoId].glasses
             ? "offIcon"
             : "icon"
         );
@@ -143,7 +148,7 @@ export default function GlassesButton({
       holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
-          !currentEffectsStyles.current[videoId].glasses ||
+          !currentEffectsStyles.current[type][videoId].glasses ||
           !target ||
           !target.dataset.value
         ) {
@@ -155,30 +160,34 @@ export default function GlassesButton({
         const effectType = target.dataset.value as GlassesEffectTypes;
         if (
           effectType in glassesEffects &&
-          (currentEffectsStyles.current[videoId].glasses.style !== effectType ||
-            !userStreamEffects.current.glasses[type]?.[videoId])
+          (currentEffectsStyles.current[type][videoId].glasses.style !==
+            effectType ||
+            !userStreamEffects.current[type][videoId].glasses)
         ) {
-          currentEffectsStyles.current[videoId].glasses.style = effectType;
+          currentEffectsStyles.current[type][videoId].glasses.style =
+            effectType;
           await handleEffectChange(
             "glasses",
-            userStreamEffects.current.glasses[type]?.[videoId]
+            userStreamEffects.current[type][videoId].glasses
           );
         }
 
         setEffectsDisabled(false);
       }}
       contentFunction={() => {
-        if (!currentEffectsStyles.current[videoId].glasses) {
+        if (!currentEffectsStyles.current[type][videoId].glasses) {
           return;
         }
 
         const iconSrc =
-          glassesEffects[currentEffectsStyles.current[videoId].glasses.style][
-            currentEffectsStyles.current[videoId].glasses.threeDim
-              ? userStreamEffects.current.glasses[type]?.[videoId]
+          glassesEffects[
+            currentEffectsStyles.current[type][videoId].glasses.style
+          ][
+            currentEffectsStyles.current[type][videoId].glasses.threeDim
+              ? userStreamEffects.current[type][videoId].glasses
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
-              : userStreamEffects.current.glasses[type]?.[videoId]
+              : userStreamEffects.current[type][videoId].glasses
               ? "offIcon"
               : "icon"
           ];
@@ -190,33 +199,35 @@ export default function GlassesButton({
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
             ]}
-            data-value={currentEffectsStyles.current[videoId].glasses.style}
+            data-value={
+              currentEffectsStyles.current[type][videoId].glasses.style
+            }
           />
         );
       }}
       doubleClickFunction={async () => {
-        if (!currentEffectsStyles.current[videoId].glasses) {
+        if (!currentEffectsStyles.current[type][videoId].glasses) {
           return;
         }
 
         setEffectsDisabled(true);
 
-        currentEffectsStyles.current[videoId].glasses.threeDim =
-          !currentEffectsStyles.current[videoId].glasses.threeDim;
+        currentEffectsStyles.current[type][videoId].glasses.threeDim =
+          !currentEffectsStyles.current[type][videoId].glasses.threeDim;
 
         setButtonState(
-          currentEffectsStyles.current[videoId].glasses.threeDim
-            ? userStreamEffects.current.glasses[type]?.[videoId]
+          currentEffectsStyles.current[type][videoId].glasses.threeDim
+            ? userStreamEffects.current[type][videoId].glasses
               ? "threeDimOffIcon"
               : "threeDimIcon"
-            : userStreamEffects.current.glasses[type]?.[videoId]
+            : userStreamEffects.current[type][videoId].glasses
             ? "offIcon"
             : "icon"
         );
 
         await handleEffectChange(
           "glasses",
-          userStreamEffects.current.glasses[type]?.[videoId]
+          userStreamEffects.current[type][videoId].glasses
         );
 
         setEffectsDisabled(false);
@@ -250,7 +261,9 @@ export default function GlassesButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={currentEffectsStyles.current[videoId].glasses?.style}
+      defaultDataValue={
+        currentEffectsStyles.current[type][videoId].glasses?.style
+      }
       hoverTimeoutDuration={750}
       disabled={effectsDisabled}
     />

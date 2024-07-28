@@ -1,7 +1,9 @@
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
-import { EffectTypes } from "src/context/StreamsContext";
-
-type AudioEffects = "robot";
+import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../context/StreamsContext";
 
 class AudioMedia {
   private username: string;
@@ -11,23 +13,17 @@ class AudioMedia {
 
   private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private userStreamEffects: React.MutableRefObject<{
-    [effectType in EffectTypes]: {
-      camera?:
-        | {
-            [cameraId: string]: boolean;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: boolean;
-          }
-        | undefined;
-      audio?: boolean;
+    camera: {
+      [cameraId: string]: { [effectType in CameraEffectTypes]?: boolean };
     };
+    screen: {
+      [screenId: string]: { [effectType in ScreenEffectTypes]?: boolean };
+    };
+    audio: { [effectType in AudioEffectTypes]?: boolean };
   }>;
 
   private effects: {
-    [cameraEffect in AudioEffects]?: boolean;
+    [cameraEffect in AudioEffectTypes]?: boolean;
   };
 
   constructor(
@@ -36,19 +32,13 @@ class AudioMedia {
     initAudioStream: MediaStream,
     currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     userStreamEffects: React.MutableRefObject<{
-      [effectType in EffectTypes]: {
-        camera?:
-          | {
-              [cameraId: string]: boolean;
-            }
-          | undefined;
-        screen?:
-          | {
-              [screenId: string]: boolean;
-            }
-          | undefined;
-        audio?: boolean;
+      camera: {
+        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
+      screen: {
+        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+      };
+      audio: { [effectType in AudioEffectTypes]: boolean };
     }>
   ) {
     this.username = username;
@@ -57,21 +47,10 @@ class AudioMedia {
     this.userStreamEffects = userStreamEffects;
     this.initAudioStream = initAudioStream;
 
-    const defaultAudioEffect = "robot";
+    this.effects = {};
 
     if (!currentEffectsStyles.current.audio) {
       currentEffectsStyles.current.audio = {};
-    }
-
-    this.effects = {};
-
-    for (const effect in this.userStreamEffects.current) {
-      const effectType = effect as keyof typeof this.userStreamEffects.current;
-      if (effectType in this.effects) {
-        if (userStreamEffects.current[effectType].audio) {
-          this.effects[effectType] = true;
-        }
-      }
     }
   }
 
@@ -80,7 +59,10 @@ class AudioMedia {
     this.initAudioStream.getTracks().forEach((track) => track.stop());
   }
 
-  async changeEffects(effect: AudioEffects, blockStateChange: boolean = false) {
+  async changeEffects(
+    effect: AudioEffectTypes,
+    blockStateChange: boolean = false
+  ) {
     if (this.effects[effect] !== undefined) {
       if (!blockStateChange) {
         this.effects[effect] = !this.effects[effect];

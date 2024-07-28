@@ -1,5 +1,5 @@
-import { EffectTypes } from "../../context/StreamsContext";
-import { OneDimensionalLandmarkTypes } from "./FaceLandmarks";
+import { CameraEffectTypes } from "../../context/StreamsContext";
+import { LandmarkTypes } from "./FaceLandmarks";
 import {
   BeardsEffectTypes,
   EarsEffectTypes,
@@ -10,7 +10,7 @@ import {
 
 const glassesDeadbandingMap: {
   [glassesEffectType in GlassesEffectTypes]: {
-    [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
+    [landmarkType in LandmarkTypes]?: number;
   };
 } = {
   defaultGlasses: {
@@ -45,7 +45,7 @@ const glassesDeadbandingMap: {
 
 const earsDeadbandingMap: {
   [earsEffectType in EarsEffectTypes]: {
-    [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
+    [landmarkType in LandmarkTypes]?: number;
   };
 } = {
   dogEars: {
@@ -59,7 +59,7 @@ const earsDeadbandingMap: {
 
 const beardsDeadbandingMap: {
   [beardsEffectType in BeardsEffectTypes]: {
-    [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
+    [landmarkType in LandmarkTypes]?: number;
   };
 } = {
   classicalCurlyBeard: {
@@ -72,7 +72,7 @@ const beardsDeadbandingMap: {
 
 const mustachesDeadbandingMap: {
   [mustachesEffectType in MustachesEffectTypes]: {
-    [oneDimensionalVariableType in OneDimensionalLandmarkTypes]?: number;
+    [landmarkType in LandmarkTypes]?: number;
   };
 } = {
   mustache1: {
@@ -107,8 +107,8 @@ const mustachesDeadbandingMap: {
   },
 };
 
-export const oneDimensionalDeadbandingMap: {
-  [oneDimensionalVariableType in OneDimensionalLandmarkTypes]: number;
+export const deadbandingMap: {
+  [landmarkType in LandmarkTypes]: number;
 } = {
   leftEarWidths: 0.0,
   rightEarWidths: 0.0,
@@ -123,106 +123,94 @@ export const oneDimensionalDeadbandingMap: {
 const updateDeadbandingMaps = (
   id: string,
   effects: {
-    [effectType in EffectTypes]?: boolean | undefined;
+    [effectType in CameraEffectTypes]?: boolean | undefined;
   },
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {
-  if (effects.ears && currentEffectsStyles.current[id].ears) {
+  if (effects.ears && currentEffectsStyles.current.camera[id].ears) {
     for (const deadbanding in earsDeadbandingMap[
-      currentEffectsStyles.current[id].ears.style
+      currentEffectsStyles.current.camera[id].ears.style
     ]) {
-      const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
+      const deadbandingType = deadbanding as LandmarkTypes;
 
       const earsDeadbandingValue =
-        earsDeadbandingMap[currentEffectsStyles.current[id].ears.style][
+        earsDeadbandingMap[currentEffectsStyles.current.camera[id].ears.style][
           deadbandingType
         ];
 
       if (earsDeadbandingValue) {
-        const oneDimensionalDeadbandingValue =
-          oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalLandmarkTypes
-          ] ?? 0;
+        const currentDeadbandingValue =
+          deadbandingMap[deadbandingType as LandmarkTypes] ?? 0;
 
-        if (oneDimensionalDeadbandingValue < earsDeadbandingValue) {
-          oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalLandmarkTypes
-          ] = earsDeadbandingValue;
+        if (currentDeadbandingValue < earsDeadbandingValue) {
+          deadbandingMap[deadbandingType as LandmarkTypes] =
+            earsDeadbandingValue;
         }
       }
     }
   }
-  if (effects.glasses && currentEffectsStyles.current[id].glasses) {
+  if (effects.glasses && currentEffectsStyles.current.camera[id].glasses) {
     for (const deadbanding in glassesDeadbandingMap[
-      currentEffectsStyles.current[id].glasses.style
+      currentEffectsStyles.current.camera[id].glasses.style
     ]) {
-      const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
+      const deadbandingType = deadbanding as LandmarkTypes;
 
       const glassesDeadbandingValue =
-        glassesDeadbandingMap[currentEffectsStyles.current[id].glasses.style][
-          deadbandingType
-        ];
+        glassesDeadbandingMap[
+          currentEffectsStyles.current.camera[id].glasses.style
+        ][deadbandingType];
 
       if (glassesDeadbandingValue) {
-        const oneDimensionalDeadbandingValue =
-          oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalLandmarkTypes
-          ] ?? 0;
+        const currentDeadbandingValue =
+          deadbandingMap[deadbandingType as LandmarkTypes] ?? 0;
 
-        if (oneDimensionalDeadbandingValue < glassesDeadbandingValue) {
-          oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalLandmarkTypes
-          ] = glassesDeadbandingValue;
+        if (currentDeadbandingValue < glassesDeadbandingValue) {
+          deadbandingMap[deadbandingType as LandmarkTypes] =
+            glassesDeadbandingValue;
         }
       }
     }
   }
-  if (effects.beards && currentEffectsStyles.current[id].beards) {
+  if (effects.beards && currentEffectsStyles.current.camera[id].beards) {
     for (const deadbanding in beardsDeadbandingMap[
-      currentEffectsStyles.current[id].beards.style
+      currentEffectsStyles.current.camera[id].beards.style
     ]) {
-      const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
+      const deadbandingType = deadbanding as LandmarkTypes;
 
       const beardsDeadbandingValue =
-        beardsDeadbandingMap[currentEffectsStyles.current[id].beards.style][
-          deadbandingType
-        ];
+        beardsDeadbandingMap[
+          currentEffectsStyles.current.camera[id].beards.style
+        ][deadbandingType];
 
       if (beardsDeadbandingValue) {
-        const oneDimensionalDeadbandingValue =
-          oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalLandmarkTypes
-          ] ?? 0;
+        const currentDeadbandingValue =
+          deadbandingMap[deadbandingType as LandmarkTypes] ?? 0;
 
-        if (oneDimensionalDeadbandingValue < beardsDeadbandingValue) {
-          oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalLandmarkTypes
-          ] = beardsDeadbandingValue;
+        if (currentDeadbandingValue < beardsDeadbandingValue) {
+          deadbandingMap[deadbandingType as LandmarkTypes] =
+            beardsDeadbandingValue;
         }
       }
     }
   }
-  if (effects.mustaches && currentEffectsStyles.current[id].mustaches) {
+  if (effects.mustaches && currentEffectsStyles.current.camera[id].mustaches) {
     for (const deadbanding in mustachesDeadbandingMap[
-      currentEffectsStyles.current[id].mustaches.style
+      currentEffectsStyles.current.camera[id].mustaches.style
     ]) {
-      const deadbandingType = deadbanding as OneDimensionalLandmarkTypes;
+      const deadbandingType = deadbanding as LandmarkTypes;
 
       const mustachesDeadbandingValue =
         mustachesDeadbandingMap[
-          currentEffectsStyles.current[id].mustaches.style
+          currentEffectsStyles.current.camera[id].mustaches.style
         ][deadbandingType];
 
       if (mustachesDeadbandingValue) {
-        const oneDimensionalDeadbandingValue =
-          oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalLandmarkTypes
-          ] ?? 0;
+        const currentDeadbandingValue =
+          deadbandingMap[deadbandingType as LandmarkTypes] ?? 0;
 
-        if (oneDimensionalDeadbandingValue < mustachesDeadbandingValue) {
-          oneDimensionalDeadbandingMap[
-            deadbandingType as OneDimensionalLandmarkTypes
-          ] = mustachesDeadbandingValue;
+        if (currentDeadbandingValue < mustachesDeadbandingValue) {
+          deadbandingMap[deadbandingType as LandmarkTypes] =
+            mustachesDeadbandingValue;
         }
       }
     }
