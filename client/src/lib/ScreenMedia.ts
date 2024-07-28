@@ -3,6 +3,7 @@ import BaseShader from "../effects/lib/BaseShader";
 import render from "../effects/lib/render";
 import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
 import { EffectTypes } from "../context/StreamsContext";
+import UserDevice from "../UserDevice";
 
 type ScreenEffects = "pause" | "blur" | "tint";
 
@@ -43,6 +44,8 @@ class ScreenMedia {
 
   private tintColor = "#F56114";
 
+  private userDevice: UserDevice;
+
   constructor(
     username: string,
     table_id: string,
@@ -63,13 +66,15 @@ class ScreenMedia {
           | undefined;
         audio?: boolean;
       };
-    }>
+    }>,
+    userDevice: UserDevice
   ) {
     this.username = username;
     this.table_id = table_id;
     this.screenId = screenId;
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
+    this.userDevice = userDevice;
 
     this.canvas = document.createElement("canvas");
     const gl =
@@ -129,7 +134,11 @@ class ScreenMedia {
         this.currentEffectsStyles,
         undefined,
         undefined,
-        this.effects.pause
+        this.effects.pause,
+        false,
+        this.userDevice.getMaxFrameProcessingTime(),
+        this.userDevice.getMinFrameInterval(),
+        this.userDevice.getFaceMeshDetectionInterval()
       );
     });
     this.video.onloadedmetadata = () => {
@@ -236,7 +245,10 @@ class ScreenMedia {
       undefined,
       undefined,
       this.effects.pause,
-      this.effects.pause ? true : false
+      this.effects.pause ? true : false,
+      this.userDevice.getMaxFrameProcessingTime(),
+      this.userDevice.getMinFrameInterval(),
+      this.userDevice.getFaceMeshDetectionInterval()
     );
   }
 

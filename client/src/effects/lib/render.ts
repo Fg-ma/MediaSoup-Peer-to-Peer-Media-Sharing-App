@@ -4,9 +4,8 @@ import { EffectStylesType } from "../../context/CurrentEffectsStylesContext";
 import BaseShader from "./BaseShader";
 import FaceLandmarks from "./FaceLandmarks";
 
-const MAX_FRAME_PROCESSING_TIME = 16; // ~60 FPS
-const MIN_FRAME_INTERVAL = 16; // ~60 FPS
 let frameCounter = 0;
+
 const render = async (
   id: string,
   gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -22,7 +21,10 @@ const render = async (
   faceMesh: FaceMesh | undefined,
   faceMeshResults: Results[] | undefined,
   pause = false,
-  flipVideo = false
+  flipVideo = false,
+  MAX_FRAME_PROCESSING_TIME: number,
+  MIN_FRAME_INTERVAL: number,
+  FACE_MESH_DETECTION_INTERVAL: number
 ) => {
   const startTime = performance.now();
 
@@ -62,7 +64,10 @@ const render = async (
           faceMesh,
           faceMeshResults,
           pause,
-          flipVideo
+          flipVideo,
+          MAX_FRAME_PROCESSING_TIME,
+          MIN_FRAME_INTERVAL,
+          FACE_MESH_DETECTION_INTERVAL
         )
       );
       return;
@@ -70,7 +75,12 @@ const render = async (
 
     // Process every second frame
     frameCounter++;
-    if (frameCounter % 2 === 0) {
+    if (
+      FACE_MESH_DETECTION_INTERVAL === 1 ||
+      frameCounter % FACE_MESH_DETECTION_INTERVAL === 0
+    ) {
+      frameCounter = 0;
+
       const sendVideoFrame = async () => {
         try {
           await faceMesh.send({ image: video });
@@ -326,7 +336,10 @@ const render = async (
       faceMesh,
       faceMeshResults,
       pause,
-      flipVideo
+      flipVideo,
+      MAX_FRAME_PROCESSING_TIME,
+      MIN_FRAME_INTERVAL,
+      FACE_MESH_DETECTION_INTERVAL
     )
   );
 };

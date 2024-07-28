@@ -36,10 +36,14 @@ export default function EffectSection({
   videoContainerRef: React.RefObject<HTMLDivElement>;
   type: "camera" | "screen";
   videoId: string;
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
+  handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
 }) {
   const [effectsWidth, setEffectsWidth] = useState(0);
+  const [effectsDisabled, setEffectsDisabled] = useState(false);
 
   const [overflowingXDirection, setOverflowingXDirection] = useState(false);
   const effectsContainerRef = useRef<HTMLDivElement>(null);
@@ -96,6 +100,8 @@ export default function EffectSection({
         videoId={videoId}
         type={type}
         handleEffectChange={handleEffectChange}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <TintSection
@@ -103,6 +109,8 @@ export default function EffectSection({
         type={type}
         handleEffectChange={handleEffectChange}
         tintColor={tintColor}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
       />
       {type === "camera" && (
         <>
@@ -111,6 +119,8 @@ export default function EffectSection({
             handleEffectChange={handleEffectChange}
             type={type}
             videoId={videoId}
+            effectsDisabled={effectsDisabled}
+            setEffectsDisabled={setEffectsDisabled}
           />
         </>
       )}
@@ -121,6 +131,8 @@ export default function EffectSection({
             handleEffectChange={handleEffectChange}
             type={type}
             videoId={videoId}
+            effectsDisabled={effectsDisabled}
+            setEffectsDisabled={setEffectsDisabled}
           />
         </>
       )}
@@ -131,6 +143,8 @@ export default function EffectSection({
             handleEffectChange={handleEffectChange}
             type={type}
             videoId={videoId}
+            effectsDisabled={effectsDisabled}
+            setEffectsDisabled={setEffectsDisabled}
           />
         </>
       )}
@@ -141,6 +155,8 @@ export default function EffectSection({
             handleEffectChange={handleEffectChange}
             type={type}
             videoId={videoId}
+            effectsDisabled={effectsDisabled}
+            setEffectsDisabled={setEffectsDisabled}
           />
         </>
       )}
@@ -151,6 +167,8 @@ export default function EffectSection({
             handleEffectChange={handleEffectChange}
             type={type}
             videoId={videoId}
+            effectsDisabled={effectsDisabled}
+            setEffectsDisabled={setEffectsDisabled}
           />
         </>
       )}

@@ -11,11 +11,18 @@ export default function TintSection({
   type,
   handleEffectChange,
   tintColor,
+  effectsDisabled,
+  setEffectsDisabled,
 }: {
   videoId: string;
   type: "camera" | "screen";
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
+  handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
+  effectsDisabled: boolean;
+  setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userStreamEffects } = useStreamsContext();
 
@@ -33,13 +40,17 @@ export default function TintSection({
   return (
     <div className='w-max flex'>
       <FgButton
-        clickFunction={() => {
-          handleEffectChange("tint");
+        clickFunction={async () => {
+          setEffectsDisabled(true);
           setButtonState(
             userStreamEffects.current.tint[type]?.[videoId]
               ? "inActive"
               : "active"
           );
+
+          await handleEffectChange("tint");
+
+          setEffectsDisabled(false);
         }}
         contentFunction={() => {
           return (
@@ -64,6 +75,7 @@ export default function TintSection({
         }
         className='flex items-center justify-center w-10 aspect-square'
         hoverTimeoutDuration={750}
+        disabled={effectsDisabled}
       />
       <div className='flex items-center justify-center w-10 aspect-square'>
         <FgButton
@@ -77,6 +89,7 @@ export default function TintSection({
           className='w-6 h-6 m-2 border border-white rounded'
           style={{ backgroundColor: tempColor }}
           hoverTimeoutDuration={750}
+          disabled={effectsDisabled}
         />
         {isColorPicker && (
           <ColorPicker

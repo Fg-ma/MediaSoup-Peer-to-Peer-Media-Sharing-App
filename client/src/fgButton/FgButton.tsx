@@ -19,6 +19,7 @@ export default function FgButton({
   hoverTimeoutDuration = 50,
   hoverType = "above",
   holdType = "above",
+  disabled = false,
 }: {
   externalRef?: React.RefObject<HTMLButtonElement>;
   clickFunction: () => void;
@@ -35,6 +36,7 @@ export default function FgButton({
   hoverTimeoutDuration?: number;
   hoverType?: "above" | "below";
   holdType?: "above" | "below";
+  disabled?: boolean;
 }) {
   const [isHeld, setIsHeld] = useState(false);
   const [isHover, setIsHover] = useState(false);
@@ -134,6 +136,7 @@ export default function FgButton({
             setIsHover(false);
           }
         }}
+        disabled={disabled}
       >
         {contentFunction && contentFunction()}
       </button>

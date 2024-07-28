@@ -10,6 +10,7 @@ import FaceLandmarks from "../effects/lib/FaceLandmarks";
 import updateDeadbandingMaps from "../effects/lib/updateDeadbandingMaps";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import { EffectTypes } from "../context/StreamsContext";
+import UserDevice from "../UserDevice";
 
 type CameraEffects =
   | "pause"
@@ -48,7 +49,7 @@ class CameraMedia {
     };
   }>;
 
-  private animationFrameId: number[];
+  private animationFrameId: number[] = [];
 
   private baseShader: BaseShader;
   private faceLandmarks: FaceLandmarks;
@@ -61,6 +62,8 @@ class CameraMedia {
   };
 
   private tintColor = "#F56114";
+
+  private userDevice: UserDevice;
 
   constructor(
     username: string,
@@ -82,13 +85,15 @@ class CameraMedia {
           | undefined;
         audio?: boolean;
       };
-    }>
+    }>,
+    userDevice: UserDevice
   ) {
     this.username = username;
     this.table_id = table_id;
     this.cameraId = cameraId;
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
+    this.userDevice = userDevice;
 
     this.canvas = document.createElement("canvas");
     const gl =
@@ -184,7 +189,6 @@ class CameraMedia {
     });
 
     // Start video and render loop
-    this.animationFrameId = [];
     this.video = document.createElement("video");
     this.video.srcObject = this.initCameraStream;
     this.video.addEventListener("play", () => {
@@ -200,13 +204,17 @@ class CameraMedia {
         this.currentEffectsStyles,
         this.faceMesh,
         this.faceMeshResults,
-        this.effects.pause
+        this.effects.pause,
+        false,
+        this.userDevice.getMaxFrameProcessingTime(),
+        this.userDevice.getMinFrameInterval(),
+        this.userDevice.getFaceMeshDetectionInterval()
       );
     });
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
-      gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+      this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
       this.video.play();
     };
   }
@@ -380,7 +388,10 @@ class CameraMedia {
       this.faceMesh,
       this.faceMeshResults,
       this.effects.pause,
-      false
+      false,
+      this.userDevice.getMaxFrameProcessingTime(),
+      this.userDevice.getMinFrameInterval(),
+      this.userDevice.getFaceMeshDetectionInterval()
     );
   }
 

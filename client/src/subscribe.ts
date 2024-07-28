@@ -18,7 +18,11 @@ const subscribe = (
       audio?: MediaStreamTrack;
     };
   }>,
-  remoteVideosContainerRef: React.RefObject<HTMLDivElement>
+  setBundles: React.Dispatch<
+    React.SetStateAction<{
+      [username: string]: React.JSX.Element;
+    }>
+  >
 ) => {
   if (!table_id.current || !username.current) {
     console.error("Missing table_id or username!");
@@ -39,12 +43,7 @@ const subscribe = (
   } else if (!isSubscribed.current) {
     consumerTransport.current = undefined;
 
-    for (const username in remoteTracksMap.current) {
-      const oldBundle = document.getElementById(`${username}_bundle`);
-      if (oldBundle) {
-        remoteVideosContainerRef.current?.removeChild(oldBundle);
-      }
-    }
+    setBundles({});
     remoteTracksMap.current = {};
 
     const msg = {

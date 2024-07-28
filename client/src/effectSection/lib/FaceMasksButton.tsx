@@ -15,13 +15,20 @@ import threeDim_faceMaskOffIcon1 from "../../../public/svgs/faceMasks/threeDim_f
 import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
 export default function FaceMasksButton({
-  handleEffectChange,
   type,
   videoId,
+  handleEffectChange,
+  effectsDisabled,
+  setEffectsDisabled,
 }: {
-  handleEffectChange: (effect: EffectTypes) => void;
+  handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
   type: "camera" | "screen";
   videoId: string;
+  effectsDisabled: boolean;
+  setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const { userStreamEffects } = useStreamsContext();
@@ -52,8 +59,14 @@ export default function FaceMasksButton({
 
   return (
     <FgButton
-      clickFunction={() => handleEffectChange("faceMasks")}
-      holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
+      clickFunction={async () => {
+        setEffectsDisabled(true);
+
+        await handleEffectChange("faceMasks");
+
+        setEffectsDisabled(false);
+      }}
+      holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
           !currentEffectsStyles.current[videoId].faceMasks ||
@@ -63,6 +76,8 @@ export default function FaceMasksButton({
           return;
         }
 
+        setEffectsDisabled(true);
+
         const effectType = target.dataset.value as FaceMasksEffectTypes;
         if (
           effectType in faceMasksEffects &&
@@ -71,8 +86,10 @@ export default function FaceMasksButton({
             !userStreamEffects.current.faceMasks[type]?.[videoId])
         ) {
           currentEffectsStyles.current[videoId].faceMasks.style = effectType;
-          handleEffectChange("faceMasks");
+          await handleEffectChange("faceMasks");
         }
+
+        setEffectsDisabled(false);
       }}
       contentFunction={() => {
         if (!currentEffectsStyles.current[videoId].faceMasks) {
@@ -101,9 +118,6 @@ export default function FaceMasksButton({
             ]}
           />
         );
-      }}
-      doubleClickFunction={() => {
-        handleEffectChange("faceMasks");
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
@@ -136,6 +150,7 @@ export default function FaceMasksButton({
       className='flex items-center justify-center w-10 aspect-square'
       defaultDataValue={currentEffectsStyles.current[videoId].faceMasks?.style}
       hoverTimeoutDuration={750}
+      disabled={effectsDisabled}
     />
   );
 }

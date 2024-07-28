@@ -15,6 +15,7 @@ import Bundle from "./bundle/Bundle";
 import Producers from "./lib/Producers";
 import { useCurrentEffectsStylesContext } from "./context/CurrentEffectsStylesContext";
 import Consumers from "./lib/Consumers";
+import UserDevice from "./UserDevice";
 
 const websocketURL = "http://localhost:8000";
 
@@ -22,7 +23,6 @@ export default function Main() {
   const {
     userStreams,
     userMedia,
-    userUneffectedStreams,
     userCameraCount,
     userScreenCount,
     userStreamEffects,
@@ -65,7 +65,7 @@ export default function Main() {
 
   const [bundles, setBundles] = useState<{
     [username: string]: React.JSX.Element;
-  }>();
+  }>({});
 
   const muteAudio = () => {
     if (userStreams.current.audio) {
@@ -175,32 +175,38 @@ export default function Main() {
 
   const createProducerBundle = () => {
     if (remoteVideosContainerRef.current) {
+      const initCameraStreams: { [cameraId: string]: MediaStream } = {};
+      for (const cameraId in userMedia.current.camera) {
+        initCameraStreams[cameraId] =
+          userMedia.current.camera[cameraId].getStream();
+      }
+
+      const initScreenStreams: { [screenId: string]: MediaStream } = {};
+      for (const screenId in userMedia.current.screen) {
+        initScreenStreams[screenId] =
+          userMedia.current.screen[screenId].getStream();
+      }
+
+      const newBundle = (
+        <Bundle
+          username={username.current}
+          table_id={table_id.current}
+          socket={socket}
+          initCameraStreams={isCamera.current ? initCameraStreams : undefined}
+          initScreenStreams={isScreen.current ? initScreenStreams : undefined}
+          initAudioStream={
+            isAudio.current && userStreams.current.audio
+              ? userStreams.current.audio
+              : undefined
+          }
+          isUser={true}
+          muteButtonCallback={muteAudio}
+        />
+      );
+
       setBundles((prev) => ({
         ...prev,
-        [username.current]: (
-          <Bundle
-            username={username.current}
-            table_id={table_id.current}
-            socket={socket}
-            initCameraStreams={
-              isCamera.current && userStreams.current.camera
-                ? userStreams.current.camera
-                : undefined
-            }
-            initScreenStreams={
-              isScreen.current && userStreams.current.screen
-                ? userStreams.current.screen
-                : undefined
-            }
-            initAudioStream={
-              isAudio.current && userStreams.current.audio
-                ? userStreams.current.audio
-                : undefined
-            }
-            isUser={true}
-            muteButtonCallback={muteAudio}
-          />
-        ),
+        [username.current]: newBundle,
       }));
     }
   };
@@ -215,38 +221,42 @@ export default function Main() {
     },
     remoteAudioStream: MediaStream | undefined
   ) => {
+    const newBundle = (
+      <Bundle
+        username={trackUsername}
+        table_id={table_id.current}
+        socket={socket}
+        initCameraStreams={
+          Object.keys(remoteCameraStreams).length !== 0
+            ? remoteCameraStreams
+            : undefined
+        }
+        initScreenStreams={
+          Object.keys(remoteScreenStreams).length !== 0
+            ? remoteScreenStreams
+            : undefined
+        }
+        initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
+        onRendered={() => {
+          const msg = {
+            type: "requestMuteLock",
+            table_id: table_id.current,
+            username: username.current,
+            producerUsername: trackUsername,
+          };
+
+          socket.current.emit("message", msg);
+        }}
+      />
+    );
+
     setBundles((prev) => ({
       ...prev,
-      [trackUsername]: (
-        <Bundle
-          username={trackUsername}
-          table_id={table_id.current}
-          socket={socket}
-          initCameraStreams={
-            Object.keys(remoteCameraStreams).length !== 0
-              ? remoteCameraStreams
-              : undefined
-          }
-          initScreenStreams={
-            Object.keys(remoteScreenStreams).length !== 0
-              ? remoteScreenStreams
-              : undefined
-          }
-          initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
-          onRendered={() => {
-            const msg = {
-              type: "requestMuteLock",
-              table_id: table_id.current,
-              username: username.current,
-              producerUsername: trackUsername,
-            };
-
-            socket.current.emit("message", msg);
-          }}
-        />
-      ),
+      [trackUsername]: newBundle,
     }));
   };
+
+  const userDevice = new UserDevice();
 
   const producers = new Producers(
     socket,
@@ -254,7 +264,6 @@ export default function Main() {
     table_id,
     username,
     userStreams,
-    userUneffectedStreams,
     userMedia,
     currentEffectsStyles,
     userStreamEffects,
@@ -270,7 +279,8 @@ export default function Main() {
     setScreenActive,
     setCameraActive,
     createProducerBundle,
-    setBundles
+    setBundles,
+    userDevice
   );
 
   const consumers = new Consumers(
@@ -436,7 +446,7 @@ export default function Main() {
                   username,
                   consumerTransport,
                   remoteTracksMap,
-                  remoteVideosContainerRef
+                  setBundles
                 )
               }
               className={`${

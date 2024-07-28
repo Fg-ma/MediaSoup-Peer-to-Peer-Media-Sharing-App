@@ -43,13 +43,13 @@ const onNewConsumerWasCreated = async (
     return;
   }
 
-  if (event.consumerType === "webcam") {
+  if (event.consumerType === "camera") {
     setCameraStreams((prev) => {
       const newStreams = { ...prev };
       const newStream = new MediaStream();
       if (event.consumerId) {
         const track =
-          remoteTracksMap.current[event.producerUsername].webcam?.[
+          remoteTracksMap.current[event.producerUsername].camera?.[
             event.consumerId
           ];
         if (track) {

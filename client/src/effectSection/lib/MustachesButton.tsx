@@ -40,13 +40,20 @@ import threeDim_disguiseMustacheOffIcon from "../../../public/svgs/mustaches/thr
 import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
 export default function MustachesButton({
-  handleEffectChange,
   type,
   videoId,
+  handleEffectChange,
+  effectsDisabled,
+  setEffectsDisabled,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   type: "camera" | "screen";
   videoId: string;
+  handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
+  effectsDisabled: boolean;
+  setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -118,8 +125,8 @@ export default function MustachesButton({
 
   return (
     <FgButton
-      clickFunction={() => {
-        handleEffectChange("mustaches");
+      clickFunction={async () => {
+        setEffectsDisabled(true);
         setButtonState(
           currentEffectsStyles.current[videoId].mustaches?.threeDim
             ? userStreamEffects.current.mustaches[type]?.[videoId]
@@ -129,8 +136,12 @@ export default function MustachesButton({
             ? "offIcon"
             : "icon"
         );
+
+        await handleEffectChange("mustaches");
+
+        setEffectsDisabled(false);
       }}
-      holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
+      holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
           !currentEffectsStyles.current[videoId].mustaches ||
@@ -139,6 +150,8 @@ export default function MustachesButton({
         ) {
           return;
         }
+
+        setEffectsDisabled(true);
 
         const effectType = target.dataset.value as MustachesEffectTypes;
         if (
@@ -150,11 +163,13 @@ export default function MustachesButton({
           currentEffectsStyles.current[videoId].mustaches.style = effectType;
           currentEffectsStyles.current[videoId].mustaches.noseOffset =
             mustacheNoseOffsetsMap[effectType];
-          handleEffectChange(
+          await handleEffectChange(
             "mustaches",
             userStreamEffects.current.mustaches[type]?.[videoId]
           );
         }
+
+        setEffectsDisabled(false);
       }}
       contentFunction={() => {
         if (!currentEffectsStyles.current[videoId].mustaches) {
@@ -185,18 +200,15 @@ export default function MustachesButton({
           />
         );
       }}
-      doubleClickFunction={() => {
+      doubleClickFunction={async () => {
         if (!currentEffectsStyles.current[videoId].mustaches) {
           return;
         }
 
+        setEffectsDisabled(true);
+
         currentEffectsStyles.current[videoId].mustaches.threeDim =
           !currentEffectsStyles.current[videoId].mustaches.threeDim;
-
-        handleEffectChange(
-          "mustaches",
-          userStreamEffects.current.mustaches[type]?.[videoId]
-        );
 
         setButtonState(
           currentEffectsStyles.current[videoId].mustaches.threeDim
@@ -207,6 +219,13 @@ export default function MustachesButton({
             ? "offIcon"
             : "icon"
         );
+
+        await handleEffectChange(
+          "mustaches",
+          userStreamEffects.current.mustaches[type]?.[videoId]
+        );
+
+        setEffectsDisabled(false);
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
@@ -239,6 +258,7 @@ export default function MustachesButton({
       className='flex items-center justify-center w-10 aspect-square'
       defaultDataValue={currentEffectsStyles.current[videoId].mustaches?.style}
       hoverTimeoutDuration={750}
+      disabled={effectsDisabled}
     />
   );
 }

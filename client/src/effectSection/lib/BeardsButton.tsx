@@ -16,13 +16,20 @@ import threeDim_classicalCurlyBeardIcon from "../../../public/svgs/beards/threeD
 import threeDim_classicalCurlyBeardOffIcon from "../../../public/svgs/beards/threeDim_classicalCurlyBeardOffIcon.svg";
 
 export default function BeardsButton({
-  handleEffectChange,
   type,
   videoId,
+  handleEffectChange,
+  effectsDisabled,
+  setEffectsDisabled,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   type: "camera" | "screen";
   videoId: string;
+  handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
+  effectsDisabled: boolean;
+  setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -54,8 +61,8 @@ export default function BeardsButton({
 
   return (
     <FgButton
-      clickFunction={() => {
-        handleEffectChange("beards");
+      clickFunction={async () => {
+        setEffectsDisabled(true);
         setButtonState(
           currentEffectsStyles.current[videoId].beards?.threeDim
             ? userStreamEffects.current.beards[type]?.[videoId]
@@ -65,8 +72,12 @@ export default function BeardsButton({
             ? "offIcon"
             : "icon"
         );
+
+        await handleEffectChange("beards");
+
+        setEffectsDisabled(false);
       }}
-      holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
+      holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
           !currentEffectsStyles.current[videoId].beards ||
@@ -75,6 +86,8 @@ export default function BeardsButton({
         ) {
           return;
         }
+
+        setEffectsDisabled(true);
 
         const effectType = target.dataset.value as BeardsEffectTypes;
         if (
@@ -85,11 +98,13 @@ export default function BeardsButton({
           currentEffectsStyles.current[videoId].beards.style = effectType;
           currentEffectsStyles.current[videoId].beards.chinOffset =
             beardChinOffsetsMap[effectType];
-          handleEffectChange(
+          await handleEffectChange(
             "beards",
             userStreamEffects.current.beards[type]?.[videoId] ? true : false
           );
         }
+
+        setEffectsDisabled(false);
       }}
       contentFunction={() => {
         if (!currentEffectsStyles.current[videoId].beards) {
@@ -118,18 +133,15 @@ export default function BeardsButton({
           />
         );
       }}
-      doubleClickFunction={() => {
+      doubleClickFunction={async () => {
         if (!currentEffectsStyles.current[videoId].beards) {
           return;
         }
 
+        setEffectsDisabled(true);
+
         currentEffectsStyles.current[videoId].beards.threeDim =
           !currentEffectsStyles.current[videoId].beards.threeDim;
-
-        handleEffectChange(
-          "beards",
-          userStreamEffects.current.beards[type]?.[videoId]
-        );
 
         setButtonState(
           currentEffectsStyles.current[videoId].beards.threeDim
@@ -140,6 +152,13 @@ export default function BeardsButton({
             ? "offIcon"
             : "icon"
         );
+
+        await handleEffectChange(
+          "beards",
+          userStreamEffects.current.beards[type]?.[videoId]
+        );
+
+        setEffectsDisabled(false);
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
@@ -172,6 +191,7 @@ export default function BeardsButton({
       className='flex items-center justify-center w-10 aspect-square'
       defaultDataValue={currentEffectsStyles.current[videoId].beards?.style}
       hoverTimeoutDuration={750}
+      disabled={effectsDisabled}
     />
   );
 }

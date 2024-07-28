@@ -36,15 +36,6 @@ export interface StreamsContextType {
     };
     audio: AudioMedia | undefined;
   }>;
-  userUneffectedStreams: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: MediaStream;
-    };
-    screen: {
-      [screenId: string]: MediaStream;
-    };
-    audio: MediaStream | undefined;
-  }>;
   userCameraCount: React.MutableRefObject<number>;
   userScreenCount: React.MutableRefObject<number>;
   userStreamEffects: React.MutableRefObject<{
@@ -104,13 +95,6 @@ export function StreamsContextProvider({
     screen: { [screenId: string]: ScreenMedia };
     audio: AudioMedia | undefined;
   }>({ camera: {}, screen: {}, audio: undefined });
-  const userUneffectedStreams = useRef<{
-    camera: {
-      [cameraId: string]: MediaStream;
-    };
-    screen: { [screenId: string]: MediaStream };
-    audio: MediaStream | undefined;
-  }>({ camera: {}, screen: {}, audio: undefined });
   const userCameraCount = useRef(0);
   const userScreenCount = useRef(0);
   const userStreamEffects = useRef<{
@@ -148,7 +132,6 @@ export function StreamsContextProvider({
       value={{
         userStreams,
         userMedia,
-        userUneffectedStreams,
         userCameraCount,
         userScreenCount,
         userStreamEffects,

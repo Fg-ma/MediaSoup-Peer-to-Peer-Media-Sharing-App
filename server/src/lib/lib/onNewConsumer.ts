@@ -4,9 +4,7 @@ import {
   roomConsumerTransports,
   roomProducers,
   roomConsumers,
-  workersMap,
 } from "../mediasoupVars";
-import { getWorkerByIdx } from "../workerManager";
 
 const onNewConsumer = async (
   event: {
@@ -20,11 +18,6 @@ const onNewConsumer = async (
   },
   io: SocketIOServer
 ) => {
-  // Get the worker and router by idx
-  const { router: mediasoupRouter } = getWorkerByIdx(
-    workersMap[event.table_id]
-  );
-
   let newConsumer: {
     consumer: Consumer;
     producerId: string;

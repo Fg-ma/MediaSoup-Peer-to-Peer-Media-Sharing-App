@@ -9,23 +9,34 @@ export default function BlurButton({
   videoId,
   type,
   handleEffectChange,
+  effectsDisabled,
+  setEffectsDisabled,
 }: {
   videoId: string;
   type: "camera" | "screen";
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
+  handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
+  effectsDisabled: boolean;
+  setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userStreamEffects } = useStreamsContext();
   const [buttonState, setButtonState] = useState("");
 
   return (
     <FgButton
-      clickFunction={() => {
-        handleEffectChange("blur");
+      clickFunction={async () => {
+        setEffectsDisabled(true);
         setButtonState(
           userStreamEffects.current.blur[type]?.[videoId]
             ? "inActive"
             : "active"
         );
+
+        await handleEffectChange("blur");
+
+        setEffectsDisabled(false);
       }}
       contentFunction={() => {
         return (
@@ -50,6 +61,7 @@ export default function BlurButton({
       }
       className='flex items-center justify-center w-10 aspect-square'
       hoverTimeoutDuration={750}
+      disabled={effectsDisabled}
     />
   );
 }

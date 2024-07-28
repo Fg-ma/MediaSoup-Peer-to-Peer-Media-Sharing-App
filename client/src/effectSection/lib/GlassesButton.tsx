@@ -39,13 +39,20 @@ import threeDim_shadesOffIcon from "../../../public/svgs/glasses/threeDim_shades
 import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
 export default function GlassesButton({
-  handleEffectChange,
   type,
   videoId,
+  handleEffectChange,
+  effectsDisabled,
+  setEffectsDisabled,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   type: "camera" | "screen";
   videoId: string;
+  handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
+  effectsDisabled: boolean;
+  setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -117,8 +124,8 @@ export default function GlassesButton({
 
   return (
     <FgButton
-      clickFunction={() => {
-        handleEffectChange("glasses");
+      clickFunction={async () => {
+        setEffectsDisabled(true);
         setButtonState(
           currentEffectsStyles.current[videoId].glasses?.threeDim
             ? userStreamEffects.current.glasses[type]?.[videoId]
@@ -128,8 +135,12 @@ export default function GlassesButton({
             ? "offIcon"
             : "icon"
         );
+
+        await handleEffectChange("glasses");
+
+        setEffectsDisabled(false);
       }}
-      holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
+      holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
           !currentEffectsStyles.current[videoId].glasses ||
@@ -139,6 +150,8 @@ export default function GlassesButton({
           return;
         }
 
+        setEffectsDisabled(true);
+
         const effectType = target.dataset.value as GlassesEffectTypes;
         if (
           effectType in glassesEffects &&
@@ -146,11 +159,13 @@ export default function GlassesButton({
             !userStreamEffects.current.glasses[type]?.[videoId])
         ) {
           currentEffectsStyles.current[videoId].glasses.style = effectType;
-          handleEffectChange(
+          await handleEffectChange(
             "glasses",
             userStreamEffects.current.glasses[type]?.[videoId]
           );
         }
+
+        setEffectsDisabled(false);
       }}
       contentFunction={() => {
         if (!currentEffectsStyles.current[videoId].glasses) {
@@ -179,18 +194,15 @@ export default function GlassesButton({
           />
         );
       }}
-      doubleClickFunction={() => {
+      doubleClickFunction={async () => {
         if (!currentEffectsStyles.current[videoId].glasses) {
           return;
         }
 
+        setEffectsDisabled(true);
+
         currentEffectsStyles.current[videoId].glasses.threeDim =
           !currentEffectsStyles.current[videoId].glasses.threeDim;
-
-        handleEffectChange(
-          "glasses",
-          userStreamEffects.current.glasses[type]?.[videoId]
-        );
 
         setButtonState(
           currentEffectsStyles.current[videoId].glasses.threeDim
@@ -201,6 +213,13 @@ export default function GlassesButton({
             ? "offIcon"
             : "icon"
         );
+
+        await handleEffectChange(
+          "glasses",
+          userStreamEffects.current.glasses[type]?.[videoId]
+        );
+
+        setEffectsDisabled(false);
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
@@ -233,6 +252,7 @@ export default function GlassesButton({
       className='flex items-center justify-center w-10 aspect-square'
       defaultDataValue={currentEffectsStyles.current[videoId].glasses?.style}
       hoverTimeoutDuration={750}
+      disabled={effectsDisabled}
     />
   );
 }

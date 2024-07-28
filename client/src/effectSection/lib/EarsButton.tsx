@@ -16,13 +16,20 @@ import threeDim_dogEarsOffIcon from "../../../public/svgs/ears/threeDim_dogEarsO
 import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
 
 export default function EarsButton({
-  handleEffectChange,
   type,
   videoId,
+  handleEffectChange,
+  effectsDisabled,
+  setEffectsDisabled,
 }: {
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
   type: "camera" | "screen";
   videoId: string;
+  handleEffectChange: (
+    effect: EffectTypes,
+    blockStateChange?: boolean
+  ) => Promise<void>;
+  effectsDisabled: boolean;
+  setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [buttonState, setButtonState] = useState("");
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
@@ -54,8 +61,8 @@ export default function EarsButton({
 
   return (
     <FgButton
-      clickFunction={() => {
-        handleEffectChange("ears");
+      clickFunction={async () => {
+        setEffectsDisabled(true);
         setButtonState(
           currentEffectsStyles.current[videoId].ears?.threeDim
             ? userStreamEffects.current.ears[type]?.[videoId]
@@ -65,8 +72,12 @@ export default function EarsButton({
             ? "offIcon"
             : "icon"
         );
+
+        await handleEffectChange("ears");
+
+        setEffectsDisabled(false);
       }}
-      holdFunction={(event: React.MouseEvent<Element, MouseEvent>) => {
+      holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
         if (
           !currentEffectsStyles.current[videoId].ears ||
@@ -75,6 +86,8 @@ export default function EarsButton({
         ) {
           return;
         }
+
+        setEffectsDisabled(true);
 
         const effectType = target.dataset.value as EarsEffectTypes;
         if (
@@ -87,11 +100,13 @@ export default function EarsButton({
             earsWidthFactorMap[effectType].leftEarWidthFactor;
           currentEffectsStyles.current[videoId].ears.rightEarWidthFactor =
             earsWidthFactorMap[effectType].rightEarWidthFactor;
-          handleEffectChange(
+          await handleEffectChange(
             "ears",
             userStreamEffects.current.ears[type]?.[videoId]
           );
         }
+
+        setEffectsDisabled(false);
       }}
       contentFunction={() => {
         if (!currentEffectsStyles.current[videoId].ears) {
@@ -120,18 +135,15 @@ export default function EarsButton({
           />
         );
       }}
-      doubleClickFunction={() => {
+      doubleClickFunction={async () => {
         if (!currentEffectsStyles.current[videoId].ears) {
           return;
         }
 
+        setEffectsDisabled(true);
+
         currentEffectsStyles.current[videoId].ears.threeDim =
           !currentEffectsStyles.current[videoId].ears.threeDim;
-
-        handleEffectChange(
-          "ears",
-          userStreamEffects.current.ears[type]?.[videoId]
-        );
 
         setButtonState(
           currentEffectsStyles.current[videoId].ears.threeDim
@@ -142,6 +154,13 @@ export default function EarsButton({
             ? "offIcon"
             : "icon"
         );
+
+        await handleEffectChange(
+          "ears",
+          userStreamEffects.current.ears[type]?.[videoId]
+        );
+
+        setEffectsDisabled(false);
       }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
@@ -174,6 +193,7 @@ export default function EarsButton({
       className='flex items-center justify-center w-10 aspect-square'
       defaultDataValue={currentEffectsStyles.current[videoId].ears?.style}
       hoverTimeoutDuration={750}
+      disabled={effectsDisabled}
     />
   );
 }

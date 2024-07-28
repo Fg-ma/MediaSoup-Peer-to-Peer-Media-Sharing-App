@@ -7,6 +7,7 @@ import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import ScreenMedia from "./ScreenMedia";
 import { EffectTypes } from "../context/StreamsContext";
 import AudioMedia from "./AudioMedia";
+import UserDevice from "../UserDevice";
 
 class Producers {
   private socket: React.MutableRefObject<Socket>;
@@ -14,15 +15,6 @@ class Producers {
   private table_id: React.MutableRefObject<string>;
   private username: React.MutableRefObject<string>;
   private userStreams: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: MediaStream;
-    };
-    screen: {
-      [screenId: string]: MediaStream;
-    };
-    audio: MediaStream | undefined;
-  }>;
-  private userUneffectedStreams: React.MutableRefObject<{
     camera: {
       [cameraId: string]: MediaStream;
     };
@@ -77,13 +69,11 @@ class Producers {
   private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
   private createProducerBundle: () => void;
   private setBundles: React.Dispatch<
-    React.SetStateAction<
-      | {
-          [username: string]: React.JSX.Element;
-        }
-      | undefined
-    >
+    React.SetStateAction<{
+      [username: string]: React.JSX.Element;
+    }>
   >;
+  private userDevice: UserDevice;
 
   constructor(
     socket: React.MutableRefObject<Socket>,
@@ -91,15 +81,6 @@ class Producers {
     table_id: React.MutableRefObject<string>,
     username: React.MutableRefObject<string>,
     userStreams: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: MediaStream;
-      };
-      screen: {
-        [screenId: string]: MediaStream;
-      };
-      audio: MediaStream | undefined;
-    }>,
-    userUneffectedStreams: React.MutableRefObject<{
       camera: {
         [cameraId: string]: MediaStream;
       };
@@ -154,20 +135,17 @@ class Producers {
     setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
     createProducerBundle: () => void,
     setBundles: React.Dispatch<
-      React.SetStateAction<
-        | {
-            [username: string]: React.JSX.Element;
-          }
-        | undefined
-      >
-    >
+      React.SetStateAction<{
+        [username: string]: React.JSX.Element;
+      }>
+    >,
+    userDevice: UserDevice
   ) {
     this.socket = socket;
     this.device = device;
     this.table_id = table_id;
     this.username = username;
     this.userStreams = userStreams;
-    this.userUneffectedStreams = userUneffectedStreams;
     this.userMedia = userMedia;
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
@@ -184,6 +162,7 @@ class Producers {
     this.setCameraActive = setCameraActive;
     this.createProducerBundle = createProducerBundle;
     this.setBundles = setBundles;
+    this.userDevice = userDevice;
   }
 
   async onProducerTransportCreated(event: {
@@ -309,7 +288,8 @@ class Producers {
             `${this.username.current}_camera_stream_${this.userCameraCount.current}`,
             cameraBrowserMedia,
             this.currentEffectsStyles,
-            this.userStreamEffects
+            this.userStreamEffects,
+            this.userDevice
           );
 
           this.userMedia.current.camera[
@@ -371,7 +351,8 @@ class Producers {
             `${this.username.current}_screen_stream_${this.userScreenCount.current}`,
             screenBrowserMedia,
             this.currentEffectsStyles,
-            this.userStreamEffects
+            this.userStreamEffects,
+            this.userDevice
           );
 
           this.userMedia.current.screen[
@@ -501,7 +482,8 @@ class Producers {
         `${this.username.current}_camera_stream_${this.userCameraCount.current}`,
         cameraBrowserMedia,
         this.currentEffectsStyles,
-        this.userStreamEffects
+        this.userStreamEffects,
+        this.userDevice
       );
 
       this.userMedia.current.camera[
@@ -567,7 +549,8 @@ class Producers {
         `${this.username.current}_screen_stream_${this.userScreenCount.current}`,
         screenBrowserMedia,
         this.currentEffectsStyles,
-        this.userStreamEffects
+        this.userStreamEffects,
+        this.userDevice
       );
 
       this.userMedia.current.screen[
@@ -695,28 +678,16 @@ class Producers {
           ?.getTracks()
           .forEach((track) => track.stop());
         delete this.userStreams.current.camera[event.producerId];
-        this.userUneffectedStreams.current.camera[event.producerId]
-          ?.getTracks()
-          .forEach((track) => track.stop());
-        delete this.userUneffectedStreams.current.camera[event.producerId];
       } else if (event.producerType === "screen") {
         this.userStreams.current.screen[event.producerId]
           ?.getTracks()
           .forEach((track) => track.stop());
         delete this.userStreams.current.screen[event.producerId];
-        this.userUneffectedStreams.current.screen[event.producerId]
-          ?.getTracks()
-          .forEach((track) => track.stop());
-        delete this.userUneffectedStreams.current.screen[event.producerId];
       } else if (event.producerType === "audio") {
         this.userStreams.current.audio
           ?.getTracks()
           .forEach((track) => track.stop());
         this.userStreams.current.audio = undefined;
-        this.userUneffectedStreams.current.audio
-          ?.getTracks()
-          .forEach((track) => track.stop());
-        this.userUneffectedStreams.current.audio = undefined;
       }
 
       // Call deconstructors then delete userMedia

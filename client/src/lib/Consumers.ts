@@ -389,13 +389,6 @@ class Consumers {
           this.remoteTracksMap.current[event.producerUsername].audio!
         );
       }
-
-      this.createConsumerBundle(
-        event.producerUsername,
-        remoteCameraStreams,
-        remoteScreenStreams,
-        remoteAudioStream
-      );
     }
 
     const msg = {

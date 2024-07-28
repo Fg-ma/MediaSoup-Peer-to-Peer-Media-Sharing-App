@@ -37,12 +37,9 @@ const joinTable = (
   }>,
   handleDisableEnableBtns: (disabled: boolean) => void,
   setBundles: React.Dispatch<
-    React.SetStateAction<
-      | {
-          [username: string]: React.JSX.Element;
-        }
-      | undefined
-    >
+    React.SetStateAction<{
+      [username: string]: React.JSX.Element;
+    }>
   >,
   consumerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
