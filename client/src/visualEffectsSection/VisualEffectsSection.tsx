@@ -29,7 +29,7 @@ const EffectSectionTransition: Transition = {
   },
 };
 
-export default function EffectSection({
+export default function VisualEffectsSection({
   videoContainerRef,
   type,
   videoId,

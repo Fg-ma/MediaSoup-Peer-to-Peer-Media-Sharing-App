@@ -5,7 +5,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
-import EffectSection from "../effectSection/EffectSection";
+import VisualEffectsSection from "../visualEffectsSection/VisualEffectsSection";
 import VolumeSection from "./lib/VolumeSection";
 import FullScreenButton from "./lib/FullScreenButton";
 import PictureInPictureButton from "./lib/PictureInPictureButton";
@@ -85,7 +85,7 @@ export default function FgVideoControls({
       <div className='relative pointer-events-auto'>
         <AnimatePresence>
           {effectsActive && (
-            <EffectSection
+            <VisualEffectsSection
               videoContainerRef={videoContainerRef}
               type={type}
               videoId={videoId}

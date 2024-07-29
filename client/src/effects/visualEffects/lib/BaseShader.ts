@@ -1,12 +1,15 @@
 import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
 import { mat4, vec3 } from "gl-matrix";
 import { Delaunay } from "d3-delaunay";
-import { EffectTypes } from "src/context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../../../context/StreamsContext";
 import baseFragmentShaderSource from "./baseFragmentShader";
 import baseVertexShaderSource from "./baseVertexShader";
 import Atlas from "./Atlas";
-import videoPaused from "../../../public/2DAssets/videoPaused.png";
-import videoPausedFlipped from "../../../public/2DAssets/videoPausedFlipped.png";
+import videoPaused from "../../../../public/2DAssets/videoPaused.png";
+import videoPausedFlipped from "../../../../public/2DAssets/videoPausedFlipped.png";
 
 interface MeshJSON {
   vertex_faces: number[];
@@ -99,7 +102,9 @@ class BaseShader {
   constructor(
     gl: WebGL2RenderingContext | WebGLRenderingContext,
     effects: {
-      [effectType in EffectTypes]?: boolean | undefined;
+      [effectType in CameraEffectTypes | ScreenEffectTypes]?:
+        | boolean
+        | undefined;
     },
     meshes?: {
       [meshes: string]: {
@@ -430,7 +435,7 @@ class BaseShader {
   }
 
   private initEffectFlags(effects: {
-    [effectType in EffectTypes]?: boolean | undefined;
+    [effectType in CameraEffectTypes | ScreenEffectTypes]?: boolean | undefined;
   }) {
     if (effects.blur) this.effectFlags |= 1 << this.BLUR_BIT;
     if (effects.tint) this.effectFlags |= 1 << this.TINT_BIT;

@@ -18,7 +18,7 @@ import Consumers from "./lib/Consumers";
 import UserDevice from "./UserDevice";
 import Deadbanding from "./effects/visualEffects/lib/Deadbanding";
 import BrowserMedia from "./BrowserMedia";
-import AudioEffectsButton from "./AudioEffectsButton";
+import AudioEffectsButton from "./audioEffectsSection/AudioEffectsButton";
 
 const websocketURL = "http://localhost:8000";
 
