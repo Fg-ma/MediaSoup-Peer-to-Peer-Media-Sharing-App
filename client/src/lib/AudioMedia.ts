@@ -1,15 +1,21 @@
+import * as Tone from "tone";
 import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
+import AudioEffects from "../effects/audioEffects/AudioEffects";
 
 class AudioMedia {
   private username: string;
   private table_id: string;
 
-  private initAudioStream: MediaStream;
+  private audioStream: Tone.UserMedia;
+  private audioContext: Tone.BaseContext;
+  private mediaStreamDestination: MediaStreamAudioDestinationNode;
+
+  private audioEffects: AudioEffects;
 
   private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private userStreamEffects: React.MutableRefObject<{
@@ -26,15 +32,9 @@ class AudioMedia {
     [cameraEffect in AudioEffectTypes]?: boolean;
   };
 
-  private audioContext: AudioContext;
-  private source: MediaStreamAudioSourceNode;
-  private gainNode: GainNode;
-  private delayNode: DelayNode;
-
   constructor(
     username: string,
     table_id: string,
-    initAudioStream: MediaStream,
     currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     userStreamEffects: React.MutableRefObject<{
       camera: {
@@ -44,43 +44,52 @@ class AudioMedia {
         [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
-    }>
+    }>,
+    audioStream: Tone.UserMedia
   ) {
     this.username = username;
     this.table_id = table_id;
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
-    this.initAudioStream = initAudioStream;
+
+    this.audioStream = audioStream;
+
+    this.openMic();
+
+    this.audioEffects = new AudioEffects(audioStream);
+
+    // Create an AudioContext and MediaStreamDestination
+    this.audioContext = Tone.context;
+    this.mediaStreamDestination =
+      this.audioContext.createMediaStreamDestination();
+
+    // Connect the Tone.UserMedia instance to the MediaStreamDestination
+    this.audioStream.connect(this.mediaStreamDestination);
 
     this.effects = {};
 
     if (!currentEffectsStyles.current.audio) {
       currentEffectsStyles.current.audio = {};
     }
+  }
 
-    this.audioContext = new AudioContext();
-    this.source = this.audioContext.createMediaStreamSource(
-      this.initAudioStream
-    );
-    this.gainNode = this.audioContext.createGain();
-    this.delayNode = this.audioContext.createDelay();
-
-    this.source.connect(this.gainNode);
-    this.gainNode.connect(this.delayNode);
-    this.delayNode.connect(this.audioContext.destination);
+  async openMic() {
+    await this.audioStream.open();
   }
 
   deconstructor() {
-    // End initial stream
-    this.initAudioStream.getTracks().forEach((track) => track.stop());
-
-    this.audioContext.close();
+    this.audioStream.close();
   }
 
   async changeEffects(
     effect: AudioEffectTypes,
     blockStateChange: boolean = false
   ) {
+    if (!blockStateChange) {
+      this.userStreamEffects.current.audio[effect as AudioEffectTypes] =
+        !this.userStreamEffects.current.audio[effect as AudioEffectTypes];
+    }
+
     if (this.effects[effect] !== undefined) {
       if (!blockStateChange) {
         this.effects[effect] = !this.effects[effect];
@@ -113,21 +122,19 @@ class AudioMedia {
   }
 
   applyRoboticEffect() {
-    this.delayNode.delayTime.value = 0.03; // small delay to create robotic effect
-    this.gainNode.gain.value = 1.5; // amplify the audio
+    this.audioEffects.applyChorusEffect();
   }
 
   removeRoboticEffect() {
-    this.delayNode.delayTime.value = 0;
-    this.gainNode.gain.value = 1;
+    this.audioEffects.applyChorusEffect();
   }
 
   getStream() {
-    return this.initAudioStream;
+    return this.mediaStreamDestination?.stream;
   }
 
   getTrack() {
-    return this.initAudioStream.getAudioTracks()[0];
+    return this.mediaStreamDestination?.stream.getAudioTracks()[0];
   }
 }
 

@@ -250,9 +250,7 @@ class Producers {
           return;
         }
 
-        const cameraBrowserMedia = await this.browserMedia.getBrowserMedia(
-          "camera"
-        );
+        const cameraBrowserMedia = await this.browserMedia.getCameraMedia();
 
         if (!cameraBrowserMedia) {
           this.producerTransport.current = undefined;
@@ -308,9 +306,7 @@ class Producers {
           return;
         }
 
-        const screenBrowserMedia = await this.browserMedia.getBrowserMedia(
-          "screen"
-        );
+        const screenBrowserMedia = await this.browserMedia.getScreenMedia();
 
         if (!screenBrowserMedia) {
           this.producerTransport.current = undefined;
@@ -365,9 +361,7 @@ class Producers {
           return;
         }
 
-        const audioBrowserMedia = await this.browserMedia.getBrowserMedia(
-          "audio"
-        );
+        const audioBrowserMedia = await this.browserMedia.getAudioMedia();
 
         if (!audioBrowserMedia) {
           this.producerTransport.current = undefined;
@@ -383,9 +377,9 @@ class Producers {
         const newAudioMedia = new AudioMedia(
           this.username.current,
           this.table_id.current,
-          audioBrowserMedia,
           this.currentEffectsStyles,
-          this.userStreamEffects
+          this.userStreamEffects,
+          audioBrowserMedia
         );
 
         this.userMedia.current.audio = newAudioMedia;
@@ -426,9 +420,7 @@ class Producers {
         return;
       }
 
-      const cameraBrowserMedia = await this.browserMedia.getBrowserMedia(
-        event.producerType
-      );
+      const cameraBrowserMedia = await this.browserMedia.getCameraMedia();
 
       if (!cameraBrowserMedia) {
         // Reenable buttons
@@ -487,9 +479,7 @@ class Producers {
         return;
       }
 
-      const screenBrowserMedia = await this.browserMedia.getBrowserMedia(
-        event.producerType
-      );
+      const screenBrowserMedia = await this.browserMedia.getScreenMedia();
 
       if (!screenBrowserMedia) {
         // Reenable buttons
@@ -542,9 +532,7 @@ class Producers {
         return;
       }
 
-      const audioBrowserMedia = await this.browserMedia.getBrowserMedia(
-        event.producerType
-      );
+      const audioBrowserMedia = await this.browserMedia.getAudioMedia();
 
       if (!audioBrowserMedia) {
         // Reenable buttons
@@ -557,9 +545,9 @@ class Producers {
       const newAudioMedia = new AudioMedia(
         this.username.current,
         this.table_id.current,
-        audioBrowserMedia,
         this.currentEffectsStyles,
-        this.userStreamEffects
+        this.userStreamEffects,
+        audioBrowserMedia
       );
 
       this.userMedia.current.audio = newAudioMedia;

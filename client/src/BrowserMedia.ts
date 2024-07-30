@@ -1,4 +1,5 @@
 import * as mediasoup from "mediasoup-client";
+import * as Tone from "tone";
 import CameraMedia from "./lib/CameraMedia";
 import ScreenMedia from "./lib/ScreenMedia";
 import AudioMedia from "./lib/AudioMedia";
@@ -44,58 +45,60 @@ class BrowserMedia {
     this.setAudioActive = setAudioActive;
   }
 
-  getBrowserMedia = async (type: "camera" | "screen" | "audio") => {
-    if (
-      type === "camera" &&
-      this.device.current &&
-      !this.device.current.canProduce("video")
-    ) {
+  getCameraMedia = async () => {
+    if (this.device.current && !this.device.current.canProduce("video")) {
       console.error("Cannot produce video");
       return;
     }
 
-    if (
-      type === "audio" &&
-      this.device.current &&
-      !this.device.current.canProduce("audio")
-    ) {
+    try {
+      return await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false,
+      });
+    } catch (error) {
+      this.handleDisableEnableBtns(false);
+
+      if (Object.keys(this.userMedia.current.camera).length === 0) {
+        this.isCamera.current = false;
+        this.setCameraActive(false);
+      }
+
+      console.error("Error accessing camera device:", error);
+      return;
+    }
+  };
+
+  getScreenMedia = async () => {
+    try {
+      return await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: false,
+      });
+    } catch (error) {
+      this.handleDisableEnableBtns(false);
+
+      if (Object.keys(this.userMedia.current.screen).length === 0) {
+        this.isScreen.current = false;
+        this.setScreenActive(false);
+      }
+
+      console.error("Error accessing media devices:", error);
+      return;
+    }
+  };
+
+  getAudioMedia = async () => {
+    if (this.device.current && !this.device.current.canProduce("audio")) {
       console.error("Cannot produce audio");
       return;
     }
 
-    const constraints: MediaStreamConstraints =
-      type === "camera" || type === "screen"
-        ? { video: true, audio: false }
-        : { video: false, audio: true };
-
     try {
-      let stream;
-      if (type === "camera" || type === "audio") {
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-      } else if (type === "screen") {
-        stream = await navigator.mediaDevices.getDisplayMedia(constraints);
-      } else {
-        throw new Error("Invalid media type");
-      }
-
-      return stream;
+      return new Tone.UserMedia();
     } catch (error) {
       this.handleDisableEnableBtns(false);
-      if (
-        type === "camera" &&
-        Object.keys(this.userMedia.current.camera).length === 0
-      ) {
-        this.isCamera.current = false;
-        this.setCameraActive(false);
-      }
-      if (
-        type === "screen" &&
-        Object.keys(this.userMedia.current.screen).length === 0
-      ) {
-        this.isScreen.current = false;
-        this.setScreenActive(false);
-      }
-      if (type === "audio" && this.userMedia.current.audio === undefined) {
+      if (this.userMedia.current.audio === undefined) {
         this.isAudio.current = false;
         this.setAudioActive(false);
       }

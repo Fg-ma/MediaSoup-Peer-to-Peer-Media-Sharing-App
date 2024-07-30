@@ -1,3 +1,7 @@
+import AudioMedia from "src/lib/AudioMedia";
+import CameraMedia from "src/lib/CameraMedia";
+import ScreenMedia from "src/lib/ScreenMedia";
+
 const onNewProducerWasCreated = (
   event: {
     type: string;
@@ -22,14 +26,14 @@ const onNewProducerWasCreated = (
     >
   >,
   setAudioStream: React.Dispatch<React.SetStateAction<MediaStream | undefined>>,
-  userStreams: React.MutableRefObject<{
+  userMedia: React.MutableRefObject<{
     camera: {
-      [cameraId: string]: MediaStream;
+      [cameraId: string]: CameraMedia;
     };
     screen: {
-      [screenId: string]: MediaStream;
+      [screenId: string]: ScreenMedia;
     };
-    audio: MediaStream | undefined;
+    audio: AudioMedia | undefined;
   }>
 ) => {
   if (!isUser) {
@@ -41,7 +45,7 @@ const onNewProducerWasCreated = (
       const newStreams = { ...prev };
       if (event.producerId) {
         newStreams[event.producerId] =
-          userStreams.current.camera[event.producerId];
+          userMedia.current.camera[event.producerId].getStream();
       }
       return newStreams;
     });
@@ -50,12 +54,12 @@ const onNewProducerWasCreated = (
       const newStreams = { ...prev };
       if (event.producerId) {
         newStreams[event.producerId] =
-          userStreams.current.screen[event.producerId];
+          userMedia.current.screen[event.producerId].getStream();
       }
       return newStreams;
     });
   } else if (event.producerType === "audio") {
-    setAudioStream(userStreams.current.audio);
+    setAudioStream(userMedia.current.audio?.getStream());
   }
 };
 

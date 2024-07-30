@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
 
-const HoverPortalVar: Variants = {
+const AudioEffectsPortalVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
   animate: {
     opacity: 1,
@@ -13,20 +13,20 @@ const HoverPortalVar: Variants = {
   },
 };
 
-const HoverPortalTransition: Transition = {
+const AudioEffectsPortalTransition: Transition = {
   transition: {
     opacity: { duration: 0.001 },
     scale: { duration: 0.001 },
   },
 };
 
-export default function HoverPortal({
-  hoverType,
-  hoverContent,
+export default function AudioEffectsPortal({
+  type,
+  content,
   buttonRef,
 }: {
-  hoverType: "above" | "below";
-  hoverContent: React.ReactElement;
+  type: "above" | "below";
+  content: React.ReactElement;
   buttonRef: React.RefObject<HTMLButtonElement>;
 }) {
   const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
@@ -40,9 +40,9 @@ export default function HoverPortal({
     }
 
     let top: number = 0;
-    if (hoverType === "above") {
+    if (type === "above") {
       top = buttonRect.top - portalRef.current.clientHeight;
-    } else if (hoverType === "below") {
+    } else if (type === "below") {
       top = buttonRect.top + buttonRect.height;
     }
     const left =
@@ -62,7 +62,7 @@ export default function HoverPortal({
 
   useEffect(() => {
     getPortalPosition();
-  }, [hoverContent]);
+  }, [content]);
 
   return ReactDOM.createPortal(
     <motion.div
@@ -74,13 +74,13 @@ export default function HoverPortal({
         top: `${portalPosition.top}%`,
         left: `${portalPosition.left}%`,
       }}
-      variants={HoverPortalVar}
+      variants={AudioEffectsPortalVar}
       initial='init'
       animate='animate'
       exit='init'
-      transition={HoverPortalTransition}
+      transition={AudioEffectsPortalTransition}
     >
-      {hoverContent}
+      {content}
     </motion.div>,
     document.body
   );

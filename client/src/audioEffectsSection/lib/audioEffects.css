@@ -1,0 +1,28 @@
+.vertical-slider-track {
+  position: relative;
+  width: 6px;
+  height: 112px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.vertical-slider-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #333333;
+  cursor: pointer;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tick {
+  position: absolute;
+  width: 10px;
+  height: 2px;
+  background-color: white;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0.5px;
+}

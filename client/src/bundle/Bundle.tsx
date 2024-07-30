@@ -84,7 +84,7 @@ export default function Bundle({
   initialVolume?: string;
   onRendered?: () => any;
 }) {
-  const { userStreams, remoteTracksMap } = useStreamsContext();
+  const { userMedia, remoteTracksMap } = useStreamsContext();
   const [cameraStreams, setCameraStreams] = useState<
     | {
         [screenKey: string]: MediaStream;
@@ -135,7 +135,7 @@ export default function Bundle({
             setCameraStreams,
             setScreenStreams,
             setAudioStream,
-            userStreams
+            userMedia
           );
           break;
         case "newConsumerWasCreated":
