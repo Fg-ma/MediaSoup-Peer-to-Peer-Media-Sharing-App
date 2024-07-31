@@ -22,9 +22,13 @@ const HoldPortalTransition: Transition = {
 export default function SliderValuePortal({
   value,
   handleRef,
+  precision,
+  units,
 }: {
   value: number;
   handleRef: React.RefObject<HTMLDivElement>;
+  precision: number;
+  units?: string;
 }) {
   const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
   const portalRef = useRef<HTMLDivElement>(null);
@@ -52,14 +56,14 @@ export default function SliderValuePortal({
 
   useEffect(() => {
     getPortalPosition();
-  }, [handleRef.current?.getBoundingClientRect()]);
+  }, [handleRef.current?.getBoundingClientRect().top]);
 
   return ReactDOM.createPortal(
     <motion.div
       ref={portalRef}
-      className={`${
+      className={`slider-value-portal ${
         !portalPosition.top && !portalPosition.left && "opacity-0"
-      } absolute w-min h-min z-20 bg-white rounded p-1 font-K2D text-md shadow`}
+      } absolute w-max h-min z-20 bg-white rounded p-1 font-K2D text-md shadow`}
       style={{
         top: `${portalPosition.top}%`,
         left: `${portalPosition.left}%`,
@@ -70,7 +74,7 @@ export default function SliderValuePortal({
       exit='init'
       transition={HoldPortalTransition}
     >
-      {value.toFixed(1)}
+      {value.toFixed(precision)} {units && units}
     </motion.div>,
     document.body
   );

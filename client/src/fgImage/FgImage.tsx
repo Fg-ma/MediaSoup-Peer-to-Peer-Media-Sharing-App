@@ -9,7 +9,7 @@ export default function FgImage({
   ...props
 }: {
   src: string;
-  srcLoading: string;
+  srcLoading?: string;
   alt?: string;
   style?: React.CSSProperties;
 }) {
@@ -24,7 +24,7 @@ export default function FgImage({
   };
 
   useEffect(() => {
-    if (containerRef.current) {
+    if (containerRef.current && srcLoading) {
       containerRef.current.style.setProperty(
         "--background-image",
         `url(${srcLoading})`
@@ -37,7 +37,7 @@ export default function FgImage({
       ref={containerRef}
       className='blurred-img'
       style={{
-        backgroundImage: `url(${srcLoading})`,
+        backgroundImage: `${srcLoading ? `url(${srcLoading})` : ""}`,
         ...style,
       }}
       {...props}

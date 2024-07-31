@@ -17,7 +17,7 @@ class AudioEffects {
 
   applyReverbEffect() {
     this.reverb = new Tone.Reverb({
-      decay: 5, // decay time (0 - 10) seconds
+      decay: 2, // decay time (0 - 10) seconds
       preDelay: 0.05, // pre-delay time (0 - 0.1) seconds
     }).toDestination();
     this.audioStream.connect(this.reverb);
@@ -43,7 +43,7 @@ class AudioEffects {
 
   applyDelayEffect() {
     this.delay = new Tone.FeedbackDelay({
-      delayTime: 0.5, // delay time (0 - 2) seconds
+      delayTime: 0.5, // delay time (0 - 4) seconds
       feedback: 0.5, // amount of feedback (0 - 1) %
     }).toDestination();
     this.audioStream.connect(this.delay);

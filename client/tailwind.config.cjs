@@ -50,10 +50,11 @@ module.exports = {
       },
       spacing: {
         "-3.25": "-0.8125rem",
+        0.125: "0.03125rem",
+        0.25: "0.0625rem",
         3.5: "0.875rem",
         4.5: "1.125rem",
         6.5: "1.625rem",
-        0.25: "0.0625rem",
       },
       maxWidth: {
         "1/4": "25%",
@@ -64,6 +65,12 @@ module.exports = {
       padding: {
         0.75: "0.1875rem",
         30: "6.5rem",
+      },
+      lineHeight: {
+        3.5: "0.875rem",
+      },
+      textUnderlineOffset: {
+        6: "6px",
       },
     },
   },

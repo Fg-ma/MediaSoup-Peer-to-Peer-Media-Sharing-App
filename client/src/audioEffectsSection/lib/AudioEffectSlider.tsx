@@ -1,18 +1,46 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useRef } from "react";
 import SliderValuePortal from "./SliderValuePortal";
+import { motion, AnimatePresence, Variants, Transition } from "framer-motion";
+
+const tickVar: Variants = {
+  init: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      scale: { type: "spring", stiffness: 100 },
+    },
+  },
+};
+
+const tickTransition: Transition = {
+  transition: {
+    opacity: { duration: 0.15 },
+  },
+};
 
 export default function AudioEffectSlider({
+  topLabel,
+  bottomLabel,
   ticks,
   rangeMax,
   rangeMin,
+  precision = 1,
+  units,
 }: {
+  topLabel?: string;
+  bottomLabel?: string;
   ticks: number;
   rangeMax: number;
   rangeMin: number;
+  precision?: number;
+  units?: string;
 }) {
   const [sliding, setSliding] = useState(false);
-  const [value, setValue] = useState(50);
-  const styleValue = useRef(50);
+  const [handleHovering, setHandleHovering] = useState(false);
+  const [tickHovering, setTickHovering] = useState(false);
+  const [value, setValue] = useState((rangeMax - Math.abs(rangeMin)) / 2);
+  const [styleValue, setStyleValue] = useState(50);
   const handleRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const tickPositions = useRef<number[]>(
@@ -60,13 +88,19 @@ export default function AudioEffectSlider({
       const offsetY =
         ((trackRect.bottom - event.clientY) / trackRect.height) * 100;
 
-      styleValue.current = Math.max(0, Math.min(100, offsetY));
-
       const newValue = Math.max(
         0,
         Math.min(100, rescaleValue(offsetY, [5, 95], [0, 100]))
       );
-      setValue(snapPositions(newValue));
+      setStyleValue(
+        Math.max(
+          5,
+          Math.min(95, rescaleValue(snapPositions(newValue), [0, 100], [5, 95]))
+        )
+      );
+      setValue(
+        rescaleValue(snapPositions(newValue), [0, 100], [rangeMin, rangeMax])
+      );
     }
   };
 
@@ -84,32 +118,85 @@ export default function AudioEffectSlider({
     document.addEventListener("mouseup", handleMouseUp);
   };
 
-  useEffect(() => {
-    if (handleRef.current) {
-      handleRef.current.style.bottom = `calc(${styleValue.current}% - 7px)`;
-    }
-    if (trackRef.current) {
-      trackRef.current.style.background = `linear-gradient(to top, #F56114 ${styleValue.current}%, #e6e6e6 ${styleValue.current}%)`;
-    }
-  }, [value]);
-
   return (
-    <div className='col-span-1 row-span-2 flex items-center justify-center'>
-      <div
-        className='vertical-slider-track'
-        ref={trackRef}
-        onMouseDown={handleMouseDown}
-      >
-        {tickPositions.current.map((pos) => (
+    <div className='w-16 h-full flex flex-col items-center justify-center relative'>
+      {topLabel && (
+        <div className='text-black text-base font-K2D w-full text-center max-w-full overflow-wrap-break-word break-words hyphens-auto'>
+          {topLabel}
+        </div>
+      )}
+      <div className='w-full flex items-center justify-center grow'>
+        <div
+          className='vertical-slider-track'
+          style={{
+            background: `linear-gradient(to top, #F56114 ${styleValue}%, #e6e6e6 ${styleValue}%)`,
+            boxShadow: sliding ? "inset 0 0 1.25px rgba(0, 0, 0, 0.3)" : "",
+          }}
+          ref={trackRef}
+          onMouseDown={handleMouseDown}
+        >
+          {tickPositions.current.map((pos, index) => (
+            <div key={pos}>
+              <div
+                className='tick'
+                style={{ bottom: `calc(${pos}% - 2px)` }}
+                onMouseEnter={() => {
+                  setTickHovering(true);
+                }}
+                onMouseLeave={() => {
+                  setTickHovering(false);
+                }}
+              ></div>
+              {tickHovering && !sliding && (
+                <AnimatePresence>
+                  <motion.div
+                    style={{ bottom: `calc(${pos}% - 0.625rem)` }}
+                    className='text-black font-K2D text-sm absolute left-3.5 w-max'
+                    variants={tickVar}
+                    initial='init'
+                    animate='animate'
+                    exit='init'
+                    transition={tickTransition}
+                  >
+                    {units &&
+                    (index === 0 || index === tickPositions.current.length - 1)
+                      ? `${rescaleValue(pos, [5, 95], [rangeMin, rangeMax])
+                          .toFixed(precision)
+                          .replace(/\.?0+$/, "")} ${units}`
+                      : `${rescaleValue(pos, [5, 95], [rangeMin, rangeMax])
+                          .toFixed(precision)
+                          .replace(/\.?0+$/, "")}`}
+                  </motion.div>
+                </AnimatePresence>
+              )}
+            </div>
+          ))}
           <div
-            key={pos}
-            className='tick'
-            style={{ bottom: `calc(${pos}% - 1px)` }}
+            className='vertical-slider-handle'
+            style={{ bottom: `calc(${styleValue}% - 5px)` }}
+            ref={handleRef}
+            onMouseEnter={() => {
+              setHandleHovering(true);
+            }}
+            onMouseLeave={() => {
+              setHandleHovering(false);
+            }}
           ></div>
-        ))}
-        <div className='vertical-slider-handle' ref={handleRef}></div>
-        {sliding && <SliderValuePortal value={value} handleRef={handleRef} />}
+          {(sliding || handleHovering) && (
+            <SliderValuePortal
+              value={value}
+              handleRef={handleRef}
+              precision={precision}
+              units={units}
+            />
+          )}
+        </div>
       </div>
+      {bottomLabel && (
+        <div className='text-black text-base font-K2D w-full text-center max-w-full overflow-wrap-break-word break-words hyphens-auto'>
+          {bottomLabel}
+        </div>
+      )}
     </div>
   );
 }
