@@ -6,7 +6,7 @@ export default function AudioMixEffect({
   labelPlacement,
   orientation = "vertical",
   effectOptions,
-  bgColor,
+  style,
 }: {
   effectLabel: string;
   labelPlacement:
@@ -23,7 +23,7 @@ export default function AudioMixEffect({
     units?: string;
     snapToWholeNum?: boolean;
   }[];
-  bgColor?: string;
+  style?: React.CSSProperties;
 }) {
   return (
     <div
@@ -31,7 +31,7 @@ export default function AudioMixEffect({
         ${orientation === "vertical" ? "h-60" : ""}
         ${orientation === "horizontal" ? "w-60" : ""}  
       `}
-      style={{ backgroundColor: bgColor }}
+      style={style}
     >
       <div
         className={`absolute text-lg bg-white rounded-sm border-2 border-black font-Josefin text-center

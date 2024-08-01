@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
-import { Transition, Variants, motion } from "framer-motion";
+import { Transition, Variants, mix, motion } from "framer-motion";
 import AudioMixEffect from "./AudioMixEffect";
 import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../scrollingContainer/lib/ScrollingContainerButton";
@@ -35,8 +35,10 @@ type MixEffectsType =
 
 interface MixEffect {
   active: boolean;
-  width: number;
-  height: number;
+  possibleSizes: { vertical: [number, number]; horizontal: [number, number] };
+  orientation?: "vertical" | "horizontal";
+  width?: number;
+  height?: number;
   x?: number;
   y?: number;
 }
@@ -53,44 +55,85 @@ export default function AudioMixEffectsPortal({
   }>({
     reverb: {
       active: false,
-      width: 100,
-      height: 100,
+      possibleSizes: {
+        vertical: [172, 240],
+        horizontal: [240, 172],
+      },
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
       x: undefined,
       y: undefined,
     },
     chorus: {
       active: false,
-      width: 200,
-      height: 150,
+      possibleSizes: {
+        horizontal: [240, 236],
+        vertical: [236, 240],
+      },
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
       x: undefined,
       y: undefined,
     },
-    EQ: { active: false, width: 236, height: 240, x: undefined, y: undefined },
+    EQ: {
+      active: false,
+      possibleSizes: {
+        vertical: [236, 240],
+        horizontal: [240, 236],
+      },
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
     delay: {
       active: false,
-      width: 124,
-      height: 100,
+      possibleSizes: {
+        horizontal: [240, 172],
+        vertical: [172, 240],
+      },
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
       x: undefined,
       y: undefined,
     },
     distortion: {
       active: false,
-      width: 345,
-      height: 34,
+      possibleSizes: {
+        horizontal: [240, 172],
+        vertical: [172, 240],
+      },
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
       x: undefined,
       y: undefined,
     },
     pitchShift: {
       active: false,
-      width: 124,
-      height: 235,
+      possibleSizes: {
+        horizontal: [240, 108],
+        vertical: [108, 240],
+      },
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
       x: undefined,
       y: undefined,
     },
     phaser: {
       active: false,
-      width: 236,
-      height: 240,
+      possibleSizes: {
+        vertical: [236, 240],
+        horizontal: [240, 236],
+      },
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
       x: undefined,
       y: undefined,
     },
@@ -122,7 +165,7 @@ export default function AudioMixEffectsPortal({
   useEffect(() => {
     getPortalPosition();
 
-    getPackedPositions(512, 24);
+    getPackedPositions(560, 24);
   }, []);
 
   const getPackedPositions = (containerWidth: number, padding: number) => {
@@ -134,40 +177,72 @@ export default function AudioMixEffectsPortal({
       height: number;
     }[] = [];
 
-    // Filter only active rectangles
     const activeRectangles = Object.entries(mixEffects.current)
       .filter(([, rect]) => rect.active)
       .map(([key, rect]) => ({ key, ...rect }));
 
+    // Sort rectangles by their largest possible size (width * height)
+    activeRectangles.sort((a, b) => {
+      const maxSizeA = Math.max(
+        ...Object.values(a.possibleSizes).map(([w, h]) => w * h)
+      );
+      const maxSizeB = Math.max(
+        ...Object.values(b.possibleSizes).map(([w, h]) => w * h)
+      );
+      return maxSizeB - maxSizeA;
+    });
+
+    const fitsInContainer = (
+      x: number,
+      y: number,
+      width: number,
+      height: number
+    ) => {
+      return (
+        x + width + padding <= containerWidth &&
+        y + height + padding <= Number.MAX_SAFE_INTEGER
+      );
+    };
+
     for (const rect of activeRectangles) {
       let placed = false;
 
-      for (let y = 0; !placed; y++) {
-        for (let x = 0; x + rect.width + padding <= containerWidth; x++) {
-          const doesOverlap = occupiedSpaces.some(
-            (space) =>
-              x < space.x + space.width + padding &&
-              x + rect.width + padding > space.x &&
-              y < space.y + space.height + padding &&
-              y + rect.height + padding > space.y
-          );
+      for (const [orientation, [width, height]] of Object.entries(
+        rect.possibleSizes
+      )) {
+        if (placed) break;
 
-          if (!doesOverlap) {
-            positions.push({ x, y });
-            occupiedSpaces.push({
-              x,
-              y,
-              width: rect.width,
-              height: rect.height,
-            });
-            placed = true;
-            break;
+        for (let y = 0; !placed; y++) {
+          for (let x = 0; x + width + padding <= containerWidth; x++) {
+            if (fitsInContainer(x, y, width, height)) {
+              const doesOverlap = occupiedSpaces.some(
+                (space) =>
+                  x < space.x + space.width + padding &&
+                  x + width + padding > space.x &&
+                  y < space.y + space.height + padding &&
+                  y + height + padding > space.y
+              );
+
+              if (!doesOverlap) {
+                positions.push({ x, y });
+                occupiedSpaces.push({
+                  x,
+                  y,
+                  width,
+                  height,
+                });
+                rect.orientation = orientation as "horizontal" | "vertical";
+                rect.width = width;
+                rect.height = height;
+                placed = true;
+                break;
+              }
+            }
           }
         }
       }
     }
 
-    // Create a new object with the updated positions for active rectangles
     const newMixEffects = { ...mixEffects.current };
     activeRectangles.forEach((rect, index) => {
       if (positions[index]) {
@@ -192,9 +267,56 @@ export default function AudioMixEffectsPortal({
       [id]: { ...mixEffects.current[id as MixEffectsType], active },
     };
 
-    getPackedPositions(512, 24);
+    getPackedPositions(560, 24);
 
     setRerender((prev) => !prev);
+  };
+
+  const eqEffectsOptions = () => {
+    const options = [
+      {
+        bottomLabel: "low",
+        ticks: 9,
+        rangeMax: 24,
+        rangeMin: -24,
+        units: "dB",
+      },
+      {
+        bottomLabel: "mid",
+        ticks: 9,
+        rangeMax: 24,
+        rangeMin: -24,
+        units: "dB",
+      },
+      {
+        topLabel: "high",
+        ticks: 9,
+        rangeMax: 24,
+        rangeMin: -24,
+        units: "dB",
+      },
+    ];
+    if (mixEffects.current.EQ.orientation === "horizontal") {
+      options.reverse();
+    }
+
+    return options;
+  };
+
+  const getMaxDimensions = () => {
+    let maxWidth = 0;
+    let maxHeight = 0;
+
+    Object.values(mixEffects.current).forEach((effect) => {
+      if (effect.x && effect.y && effect.width && effect.height) {
+        const { x, y, width, height } = effect;
+        maxWidth = Math.max(maxWidth, x + width);
+        maxHeight = Math.max(maxHeight, y + height);
+      }
+    });
+
+    console.log({ maxWidth, maxHeight });
+    return { maxWidth, maxHeight };
   };
 
   return ReactDOM.createPortal(
@@ -202,7 +324,7 @@ export default function AudioMixEffectsPortal({
       ref={portalRef}
       className={`${
         !portalPosition.top && !portalPosition.left && "opacity-0"
-      } absolute z-20 bg-white rounded p-3 font-K2D text-md shadow-lg max-w-lg max-h-[38rem] min-h-[20rem]`}
+      } absolute z-20 bg-white rounded p-4 font-K2D text-md shadow-lg max-w-[35rem] h-[24rem] overflow-x-auto`}
       style={{
         top: `${portalPosition.top}%`,
         left: `${portalPosition.left}%`,
@@ -256,11 +378,16 @@ export default function AudioMixEffectsPortal({
           }
         />
       </div>
-      <div className='flex items-center justify-center space-x-6'>
+      <div className='relative'>
         {mixEffects.current.reverb.active && (
           <AudioMixEffect
             effectLabel='Reverb'
-            labelPlacement={{ side: "left", sidePlacement: "bottom" }}
+            labelPlacement={
+              mixEffects.current.reverb.orientation === "vertical"
+                ? { side: "left", sidePlacement: "bottom" }
+                : { side: "bottom", sidePlacement: "left" }
+            }
+            orientation={mixEffects.current.reverb.orientation}
             effectOptions={[
               {
                 topLabel: "decay",
@@ -278,14 +405,31 @@ export default function AudioMixEffectsPortal({
                 units: "sec",
               },
             ]}
-            bgColor='#858585'
+            style={{
+              backgroundColor: "#858585",
+              position: "absolute",
+              left: `${mixEffects.current.reverb.x}px`,
+              top: `${mixEffects.current.reverb.y}px`,
+              width: `${mixEffects.current.reverb.width}px`,
+              height: `${mixEffects.current.reverb.height}px`,
+            }}
           />
         )}
         {mixEffects.current.chorus.active && (
           <AudioMixEffect
             effectLabel='Chorus'
-            labelPlacement={{ side: "bottom", sidePlacement: "right" }}
-            orientation='horizontal'
+            labelPlacement={
+              mixEffects.current.chorus.orientation === "vertical"
+                ? {
+                    side: "right",
+                    sidePlacement: "bottom",
+                  }
+                : {
+                    side: "bottom",
+                    sidePlacement: "right",
+                  }
+            }
+            orientation={mixEffects.current.chorus.orientation}
             effectOptions={[
               {
                 topLabel: "freq",
@@ -310,44 +454,45 @@ export default function AudioMixEffectsPortal({
                 units: "%",
               },
             ]}
-            bgColor='#d8bd9a'
+            style={{
+              backgroundColor: "#d8bd9a",
+              position: "absolute",
+              left: `${mixEffects.current.chorus.x}px`,
+              top: `${mixEffects.current.chorus.y}px`,
+              width: `${mixEffects.current.chorus.width}px`,
+              height: `${mixEffects.current.chorus.height}px`,
+            }}
           />
         )}
         {mixEffects.current.EQ.active && (
           <AudioMixEffect
             effectLabel='EQ'
-            labelPlacement={{ side: "top", sidePlacement: "left" }}
-            effectOptions={[
-              {
-                bottomLabel: "low",
-                ticks: 9,
-                rangeMax: 24,
-                rangeMin: -24,
-                units: "dB",
-              },
-              {
-                bottomLabel: "mid",
-                ticks: 9,
-                rangeMax: 24,
-                rangeMin: -24,
-                units: "dB",
-              },
-              {
-                topLabel: "high",
-                ticks: 9,
-                rangeMax: 24,
-                rangeMin: -24,
-                units: "dB",
-              },
-            ]}
-            bgColor='#888097'
+            labelPlacement={
+              mixEffects.current.EQ.orientation === "vertical"
+                ? { side: "top", sidePlacement: "left" }
+                : { side: "left", sidePlacement: "top" }
+            }
+            orientation={mixEffects.current.EQ.orientation}
+            effectOptions={eqEffectsOptions()}
+            style={{
+              backgroundColor: "#888097",
+              position: "absolute",
+              left: `${mixEffects.current.EQ.x}px`,
+              top: `${mixEffects.current.EQ.y}px`,
+              width: `${mixEffects.current.EQ.width}px`,
+              height: `${mixEffects.current.EQ.height}px`,
+            }}
           />
         )}
         {mixEffects.current.delay.active && (
           <AudioMixEffect
             effectLabel='Delay'
-            labelPlacement={{ side: "right", sidePlacement: "bottom" }}
-            orientation='horizontal'
+            labelPlacement={
+              mixEffects.current.delay.orientation === "vertical"
+                ? { side: "bottom", sidePlacement: "right" }
+                : { side: "right", sidePlacement: "bottom" }
+            }
+            orientation={mixEffects.current.delay.orientation}
             effectOptions={[
               {
                 topLabel: "delay",
@@ -365,14 +510,25 @@ export default function AudioMixEffectsPortal({
                 units: "%",
               },
             ]}
-            bgColor='#c5cfd0'
+            style={{
+              backgroundColor: "#c5cfd0",
+              position: "absolute",
+              left: `${mixEffects.current.delay.x}px`,
+              top: `${mixEffects.current.delay.y}px`,
+              width: `${mixEffects.current.delay.width}px`,
+              height: `${mixEffects.current.delay.height}px`,
+            }}
           />
         )}
         {mixEffects.current.distortion.active && (
           <AudioMixEffect
             effectLabel='Distortion'
-            labelPlacement={{ side: "top", sidePlacement: "right" }}
-            orientation='horizontal'
+            labelPlacement={
+              mixEffects.current.distortion.orientation === "vertical"
+                ? { side: "right", sidePlacement: "top" }
+                : { side: "top", sidePlacement: "right" }
+            }
+            orientation={mixEffects.current.distortion.orientation}
             effectOptions={[
               {
                 topLabel: "dist",
@@ -383,21 +539,32 @@ export default function AudioMixEffectsPortal({
                 units: "%",
               },
               {
-                bottomLabel: "oversample",
+                topLabel: "oversample",
                 ticks: 6,
                 rangeMax: 4,
                 rangeMin: 2,
                 units: "x",
               },
             ]}
-            bgColor='#e7c47d'
+            style={{
+              backgroundColor: "#e7c47d",
+              position: "absolute",
+              left: `${mixEffects.current.distortion.x}px`,
+              top: `${mixEffects.current.distortion.y}px`,
+              width: `${mixEffects.current.distortion.width}px`,
+              height: `${mixEffects.current.distortion.height}px`,
+            }}
           />
         )}
         {mixEffects.current.pitchShift.active && (
           <AudioMixEffect
             effectLabel='Pitch shift'
-            labelPlacement={{ side: "bottom", sidePlacement: "left" }}
-            orientation='horizontal'
+            labelPlacement={
+              mixEffects.current.pitchShift.orientation === "vertical"
+                ? { side: "left", sidePlacement: "bottom" }
+                : { side: "bottom", sidePlacement: "left" }
+            }
+            orientation={mixEffects.current.pitchShift.orientation}
             effectOptions={[
               {
                 topLabel: "pitch",
@@ -408,13 +575,25 @@ export default function AudioMixEffectsPortal({
                 snapToWholeNum: true,
               },
             ]}
-            bgColor='#cacaca'
+            style={{
+              backgroundColor: "#cacaca",
+              position: "absolute",
+              left: `${mixEffects.current.pitchShift.x}px`,
+              top: `${mixEffects.current.pitchShift.y}px`,
+              width: `${mixEffects.current.pitchShift.width}px`,
+              height: `${mixEffects.current.pitchShift.height}px`,
+            }}
           />
         )}
         {mixEffects.current.phaser.active && (
           <AudioMixEffect
             effectLabel='Phaser'
-            labelPlacement={{ side: "left", sidePlacement: "top" }}
+            labelPlacement={
+              mixEffects.current.phaser.orientation === "vertical"
+                ? { side: "left", sidePlacement: "top" }
+                : { side: "top", sidePlacement: "left" }
+            }
+            orientation={mixEffects.current.phaser.orientation}
             effectOptions={[
               {
                 topLabel: "freq",
@@ -439,9 +618,20 @@ export default function AudioMixEffectsPortal({
                 units: "Hz",
               },
             ]}
-            bgColor='#d03818'
+            style={{
+              backgroundColor: "#d03818",
+              position: "absolute",
+              left: `${mixEffects.current.phaser.x}px`,
+              top: `${mixEffects.current.phaser.y}px`,
+              width: `${mixEffects.current.phaser.width}px`,
+              height: `${mixEffects.current.phaser.height}px`,
+            }}
           />
         )}
+        <div
+          className='h-4 w-full absolute'
+          style={{ top: `${getMaxDimensions().maxHeight}px` }}
+        ></div>
       </div>
     </motion.div>,
     document.body
