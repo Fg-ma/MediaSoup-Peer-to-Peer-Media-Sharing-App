@@ -56,7 +56,10 @@ export default function SliderValuePortal({
 
   useEffect(() => {
     getPortalPosition();
-  }, [handleRef.current?.getBoundingClientRect().top]);
+  }, [
+    handleRef.current?.getBoundingClientRect().top,
+    handleRef.current?.getBoundingClientRect().left,
+  ]);
 
   return ReactDOM.createPortal(
     <motion.div

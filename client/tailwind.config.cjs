@@ -68,9 +68,13 @@ module.exports = {
       },
       lineHeight: {
         3.5: "0.875rem",
+        4.5: "1.125rem",
       },
       textUnderlineOffset: {
         6: "6px",
+      },
+      borderRadius: {
+        1.5: "0.09375rem",
       },
     },
   },

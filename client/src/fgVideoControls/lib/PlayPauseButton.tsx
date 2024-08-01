@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import Controls from "./Controls";
-import playIcon from "../../../public/svgs/play.svg";
-import pauseIcon from "../../../public/svgs/pause.svg";
+import playIcon from "../../../public/svgs/playIcon.svg";
+import pauseIcon from "../../../public/svgs/pauseIcon.svg";
 
 export default function PlayPauseButton({
   controls,
