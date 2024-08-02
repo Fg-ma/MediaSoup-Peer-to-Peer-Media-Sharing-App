@@ -144,6 +144,8 @@ export default function AudioEffectSlider({
 
   const handleMouseDown = (event: React.MouseEvent) => {
     event.preventDefault();
+    event.stopPropagation();
+
     setSliding(true);
     handleMouseMove(event);
     document.addEventListener("mousemove", handleMouseMove);

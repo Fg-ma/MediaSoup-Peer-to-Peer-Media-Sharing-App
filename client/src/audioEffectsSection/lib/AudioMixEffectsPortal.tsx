@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import ReactDOM from "react-dom";
-import { Transition, Variants, mix, motion } from "framer-motion";
+import { Transition, Variants, motion } from "framer-motion";
 import AudioMixEffect from "./AudioMixEffect";
 import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../scrollingContainer/lib/ScrollingContainerButton";
-import FgSVG from "../../fgSVG/FgSVG";
-import additionIcon from "../../../public/svgs/additionIcon.svg";
+import FgPanel from "../../fgPanel/FgPanel";
 
 const AudioMixEffectsPortalVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -48,7 +46,6 @@ export default function AudioMixEffectsPortal({
 }: {
   buttonRef: React.RefObject<HTMLButtonElement>;
 }) {
-  const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
   const [rerender, setRerender] = useState(false);
   const mixEffects = useRef<{
     [mixEffect in MixEffectsType]: MixEffect;
@@ -138,35 +135,11 @@ export default function AudioMixEffectsPortal({
       y: undefined,
     },
   });
+  const maxDims = useRef<{ maxWidth: number; maxHeight: number }>({
+    maxWidth: 0,
+    maxHeight: 0,
+  });
   const portalRef = useRef<HTMLDivElement>(null);
-
-  const getPortalPosition = () => {
-    if (!buttonRef.current || !portalRef.current) {
-      return;
-    }
-
-    const buttonRect = buttonRef.current.getBoundingClientRect();
-
-    const top = buttonRect.bottom;
-
-    const left =
-      buttonRect.left - portalRef.current.getBoundingClientRect().width;
-
-    const bodyRect = document.body.getBoundingClientRect();
-    const topPercent = (top / bodyRect.height) * 100;
-    const leftPercent = (left / bodyRect.width) * 100;
-
-    setPortalPosition({
-      top: topPercent,
-      left: leftPercent,
-    });
-  };
-
-  useEffect(() => {
-    getPortalPosition();
-
-    getPackedPositions(560, 24);
-  }, []);
 
   const getPackedPositions = (containerWidth: number, padding: number) => {
     const positions: { x: number; y: number }[] = [];
@@ -248,7 +221,7 @@ export default function AudioMixEffectsPortal({
       if (positions[index]) {
         newMixEffects[rect.key as MixEffectsType] = {
           ...rect,
-          x: positions[index].x,
+          x: positions[index].x + 12,
           y: positions[index].y,
         };
       }
@@ -267,7 +240,11 @@ export default function AudioMixEffectsPortal({
       [id]: { ...mixEffects.current[id as MixEffectsType], active },
     };
 
-    getPackedPositions(560, 24);
+    if (portalRef.current) {
+      getPackedPositions(portalRef.current.getBoundingClientRect().width, 24);
+    }
+
+    getMaxDimensions();
 
     setRerender((prev) => !prev);
   };
@@ -308,332 +285,345 @@ export default function AudioMixEffectsPortal({
     let maxHeight = 0;
 
     Object.values(mixEffects.current).forEach((effect) => {
-      if (effect.x && effect.y && effect.width && effect.height) {
+      if (
+        effect.active &&
+        effect.x !== undefined &&
+        effect.y !== undefined &&
+        effect.width !== undefined &&
+        effect.height !== undefined
+      ) {
         const { x, y, width, height } = effect;
         maxWidth = Math.max(maxWidth, x + width);
         maxHeight = Math.max(maxHeight, y + height);
       }
     });
 
-    console.log({ maxWidth, maxHeight });
-    return { maxWidth, maxHeight };
+    maxDims.current = { maxWidth, maxHeight };
   };
 
-  return ReactDOM.createPortal(
-    <motion.div
-      ref={portalRef}
-      className={`${
-        !portalPosition.top && !portalPosition.left && "opacity-0"
-      } absolute z-20 bg-white rounded p-4 font-K2D text-md shadow-lg max-w-[35rem] h-[24rem] overflow-x-auto`}
-      style={{
-        top: `${portalPosition.top}%`,
-        left: `${portalPosition.left}%`,
+  return (
+    <FgPanel
+      content={
+        <motion.div
+          ref={portalRef}
+          className='bg-white font-K2D text-md min-w-[18rem] min-h-[18.75rem] h-full w-full overflow-x-auto bg-red'
+          variants={AudioMixEffectsPortalVar}
+          initial='init'
+          animate='animate'
+          exit='init'
+          transition={AudioMixEffectsPortalTransition}
+        >
+          <div className='h-max mb-4'>
+            <ScrollingContainer
+              content={
+                <div className='flex items-center justify-start space-x-3'>
+                  <ScrollingContainerButton
+                    content='Reverb'
+                    id='reverb'
+                    callbackFunction={mixEffectChange}
+                  />
+                  <ScrollingContainerButton
+                    content='Chorus'
+                    id='chorus'
+                    callbackFunction={mixEffectChange}
+                  />
+                  <ScrollingContainerButton
+                    content='EQ'
+                    id='EQ'
+                    callbackFunction={mixEffectChange}
+                  />
+                  <ScrollingContainerButton
+                    content='Delay'
+                    id='delay'
+                    callbackFunction={mixEffectChange}
+                  />
+                  <ScrollingContainerButton
+                    content='Distortion'
+                    id='distortion'
+                    callbackFunction={mixEffectChange}
+                  />
+                  <ScrollingContainerButton
+                    content='Pitch shift'
+                    id='pitchShift'
+                    callbackFunction={mixEffectChange}
+                  />
+                  <ScrollingContainerButton
+                    content='Phaser'
+                    id='phaser'
+                    callbackFunction={mixEffectChange}
+                  />
+                </div>
+              }
+            />
+          </div>
+          <div className='relative'>
+            {mixEffects.current.reverb.active && (
+              <AudioMixEffect
+                effectLabel='Reverb'
+                labelPlacement={
+                  mixEffects.current.reverb.orientation === "vertical"
+                    ? { side: "left", sidePlacement: "bottom" }
+                    : { side: "bottom", sidePlacement: "left" }
+                }
+                orientation={mixEffects.current.reverb.orientation}
+                effectOptions={[
+                  {
+                    topLabel: "decay",
+                    ticks: 6,
+                    rangeMax: 10,
+                    rangeMin: 0,
+                    units: "sec",
+                  },
+                  {
+                    bottomLabel: "pre-delay",
+                    ticks: 6,
+                    rangeMax: 0.1,
+                    rangeMin: 0,
+                    precision: 2,
+                    units: "sec",
+                  },
+                ]}
+                style={{
+                  backgroundColor: "#858585",
+                  position: "absolute",
+                  left: `${mixEffects.current.reverb.x}px`,
+                  top: `${mixEffects.current.reverb.y}px`,
+                  width: `${mixEffects.current.reverb.width}px`,
+                  height: `${mixEffects.current.reverb.height}px`,
+                }}
+              />
+            )}
+            {mixEffects.current.chorus.active && (
+              <AudioMixEffect
+                effectLabel='Chorus'
+                labelPlacement={
+                  mixEffects.current.chorus.orientation === "vertical"
+                    ? {
+                        side: "right",
+                        sidePlacement: "bottom",
+                      }
+                    : {
+                        side: "bottom",
+                        sidePlacement: "right",
+                      }
+                }
+                orientation={mixEffects.current.chorus.orientation}
+                effectOptions={[
+                  {
+                    topLabel: "freq",
+                    ticks: 6,
+                    rangeMax: 5,
+                    rangeMin: 0,
+                    units: "Hz",
+                  },
+                  {
+                    bottomLabel: "delay",
+                    ticks: 6,
+                    rangeMax: 20,
+                    rangeMin: 0,
+                    units: "ms",
+                  },
+                  {
+                    bottomLabel: "depth",
+                    ticks: 6,
+                    rangeMax: 1,
+                    rangeMin: 0,
+                    precision: 2,
+                    units: "%",
+                  },
+                ]}
+                style={{
+                  backgroundColor: "#d8bd9a",
+                  position: "absolute",
+                  left: `${mixEffects.current.chorus.x}px`,
+                  top: `${mixEffects.current.chorus.y}px`,
+                  width: `${mixEffects.current.chorus.width}px`,
+                  height: `${mixEffects.current.chorus.height}px`,
+                }}
+              />
+            )}
+            {mixEffects.current.EQ.active && (
+              <AudioMixEffect
+                effectLabel='EQ'
+                labelPlacement={
+                  mixEffects.current.EQ.orientation === "vertical"
+                    ? { side: "top", sidePlacement: "left" }
+                    : { side: "left", sidePlacement: "top" }
+                }
+                orientation={mixEffects.current.EQ.orientation}
+                effectOptions={eqEffectsOptions()}
+                style={{
+                  backgroundColor: "#888097",
+                  position: "absolute",
+                  left: `${mixEffects.current.EQ.x}px`,
+                  top: `${mixEffects.current.EQ.y}px`,
+                  width: `${mixEffects.current.EQ.width}px`,
+                  height: `${mixEffects.current.EQ.height}px`,
+                }}
+              />
+            )}
+            {mixEffects.current.delay.active && (
+              <AudioMixEffect
+                effectLabel='Delay'
+                labelPlacement={
+                  mixEffects.current.delay.orientation === "vertical"
+                    ? { side: "bottom", sidePlacement: "right" }
+                    : { side: "right", sidePlacement: "bottom" }
+                }
+                orientation={mixEffects.current.delay.orientation}
+                effectOptions={[
+                  {
+                    topLabel: "delay",
+                    ticks: 5,
+                    rangeMax: 4,
+                    rangeMin: 0,
+                    units: "sec",
+                  },
+                  {
+                    bottomLabel: "feedback",
+                    ticks: 6,
+                    rangeMax: 1,
+                    rangeMin: 0,
+                    precision: 2,
+                    units: "%",
+                  },
+                ]}
+                style={{
+                  backgroundColor: "#c5cfd0",
+                  position: "absolute",
+                  left: `${mixEffects.current.delay.x}px`,
+                  top: `${mixEffects.current.delay.y}px`,
+                  width: `${mixEffects.current.delay.width}px`,
+                  height: `${mixEffects.current.delay.height}px`,
+                }}
+              />
+            )}
+            {mixEffects.current.distortion.active && (
+              <AudioMixEffect
+                effectLabel='Distortion'
+                labelPlacement={
+                  mixEffects.current.distortion.orientation === "vertical"
+                    ? { side: "right", sidePlacement: "top" }
+                    : { side: "top", sidePlacement: "right" }
+                }
+                orientation={mixEffects.current.distortion.orientation}
+                effectOptions={[
+                  {
+                    topLabel: "dist",
+                    ticks: 6,
+                    rangeMax: 1,
+                    rangeMin: 0,
+                    precision: 2,
+                    units: "%",
+                  },
+                  {
+                    topLabel: "oversample",
+                    ticks: 6,
+                    rangeMax: 4,
+                    rangeMin: 2,
+                    units: "x",
+                  },
+                ]}
+                style={{
+                  backgroundColor: "#e7c47d",
+                  position: "absolute",
+                  left: `${mixEffects.current.distortion.x}px`,
+                  top: `${mixEffects.current.distortion.y}px`,
+                  width: `${mixEffects.current.distortion.width}px`,
+                  height: `${mixEffects.current.distortion.height}px`,
+                }}
+              />
+            )}
+            {mixEffects.current.pitchShift.active && (
+              <AudioMixEffect
+                effectLabel='Pitch shift'
+                labelPlacement={
+                  mixEffects.current.pitchShift.orientation === "vertical"
+                    ? { side: "left", sidePlacement: "bottom" }
+                    : { side: "bottom", sidePlacement: "left" }
+                }
+                orientation={mixEffects.current.pitchShift.orientation}
+                effectOptions={[
+                  {
+                    topLabel: "pitch",
+                    ticks: 9,
+                    rangeMax: 12,
+                    rangeMin: -12,
+                    units: "semitones",
+                    snapToWholeNum: true,
+                  },
+                ]}
+                style={{
+                  backgroundColor: "#cacaca",
+                  position: "absolute",
+                  left: `${mixEffects.current.pitchShift.x}px`,
+                  top: `${mixEffects.current.pitchShift.y}px`,
+                  width: `${mixEffects.current.pitchShift.width}px`,
+                  height: `${mixEffects.current.pitchShift.height}px`,
+                }}
+              />
+            )}
+            {mixEffects.current.phaser.active && (
+              <AudioMixEffect
+                effectLabel='Phaser'
+                labelPlacement={
+                  mixEffects.current.phaser.orientation === "vertical"
+                    ? { side: "left", sidePlacement: "top" }
+                    : { side: "top", sidePlacement: "left" }
+                }
+                orientation={mixEffects.current.phaser.orientation}
+                effectOptions={[
+                  {
+                    topLabel: "freq",
+                    ticks: 6,
+                    rangeMax: 10,
+                    rangeMin: 0,
+                    units: "Hz",
+                  },
+                  {
+                    topLabel: "oct",
+                    ticks: 9,
+                    rangeMax: 8,
+                    rangeMin: 0,
+                    units: "Oct",
+                    snapToWholeNum: true,
+                  },
+                  {
+                    bottomLabel: "base freq",
+                    ticks: 6,
+                    rangeMax: 1000,
+                    rangeMin: 0,
+                    units: "Hz",
+                  },
+                ]}
+                style={{
+                  backgroundColor: "#d03818",
+                  position: "absolute",
+                  left: `${mixEffects.current.phaser.x}px`,
+                  top: `${mixEffects.current.phaser.y}px`,
+                  width: `${mixEffects.current.phaser.width}px`,
+                  height: `${mixEffects.current.phaser.height}px`,
+                }}
+              />
+            )}
+            <div
+              className='h-4 w-full absolute'
+              style={{ top: `${maxDims.current.maxHeight}px` }}
+            ></div>
+          </div>
+        </motion.div>
+      }
+      minWidth={328}
+      minHeight={348}
+      resizeCallback={() => {
+        if (portalRef.current) {
+          getPackedPositions(
+            portalRef.current.getBoundingClientRect().width,
+            24
+          );
+          setRerender((prev) => !prev);
+        }
       }}
-      variants={AudioMixEffectsPortalVar}
-      initial='init'
-      animate='animate'
-      exit='init'
-      transition={AudioMixEffectsPortalTransition}
-    >
-      <div className='h-max mb-4'>
-        <ScrollingContainer
-          content={
-            <div className='flex items-center justify-start space-x-3'>
-              <ScrollingContainerButton
-                content='Reverb'
-                id='reverb'
-                callbackFunction={mixEffectChange}
-              />
-              <ScrollingContainerButton
-                content='Chorus'
-                id='chorus'
-                callbackFunction={mixEffectChange}
-              />
-              <ScrollingContainerButton
-                content='EQ'
-                id='EQ'
-                callbackFunction={mixEffectChange}
-              />
-              <ScrollingContainerButton
-                content='Delay'
-                id='delay'
-                callbackFunction={mixEffectChange}
-              />
-              <ScrollingContainerButton
-                content='Distortion'
-                id='distortion'
-                callbackFunction={mixEffectChange}
-              />
-              <ScrollingContainerButton
-                content='Pitch shift'
-                id='pitchShift'
-                callbackFunction={mixEffectChange}
-              />
-              <ScrollingContainerButton
-                content='Phaser'
-                id='phaser'
-                callbackFunction={mixEffectChange}
-              />
-            </div>
-          }
-        />
-      </div>
-      <div className='relative'>
-        {mixEffects.current.reverb.active && (
-          <AudioMixEffect
-            effectLabel='Reverb'
-            labelPlacement={
-              mixEffects.current.reverb.orientation === "vertical"
-                ? { side: "left", sidePlacement: "bottom" }
-                : { side: "bottom", sidePlacement: "left" }
-            }
-            orientation={mixEffects.current.reverb.orientation}
-            effectOptions={[
-              {
-                topLabel: "decay",
-                ticks: 6,
-                rangeMax: 10,
-                rangeMin: 0,
-                units: "sec",
-              },
-              {
-                bottomLabel: "pre-delay",
-                ticks: 6,
-                rangeMax: 0.1,
-                rangeMin: 0,
-                precision: 2,
-                units: "sec",
-              },
-            ]}
-            style={{
-              backgroundColor: "#858585",
-              position: "absolute",
-              left: `${mixEffects.current.reverb.x}px`,
-              top: `${mixEffects.current.reverb.y}px`,
-              width: `${mixEffects.current.reverb.width}px`,
-              height: `${mixEffects.current.reverb.height}px`,
-            }}
-          />
-        )}
-        {mixEffects.current.chorus.active && (
-          <AudioMixEffect
-            effectLabel='Chorus'
-            labelPlacement={
-              mixEffects.current.chorus.orientation === "vertical"
-                ? {
-                    side: "right",
-                    sidePlacement: "bottom",
-                  }
-                : {
-                    side: "bottom",
-                    sidePlacement: "right",
-                  }
-            }
-            orientation={mixEffects.current.chorus.orientation}
-            effectOptions={[
-              {
-                topLabel: "freq",
-                ticks: 6,
-                rangeMax: 5,
-                rangeMin: 0,
-                units: "Hz",
-              },
-              {
-                bottomLabel: "delay",
-                ticks: 6,
-                rangeMax: 20,
-                rangeMin: 0,
-                units: "ms",
-              },
-              {
-                bottomLabel: "depth",
-                ticks: 6,
-                rangeMax: 1,
-                rangeMin: 0,
-                precision: 2,
-                units: "%",
-              },
-            ]}
-            style={{
-              backgroundColor: "#d8bd9a",
-              position: "absolute",
-              left: `${mixEffects.current.chorus.x}px`,
-              top: `${mixEffects.current.chorus.y}px`,
-              width: `${mixEffects.current.chorus.width}px`,
-              height: `${mixEffects.current.chorus.height}px`,
-            }}
-          />
-        )}
-        {mixEffects.current.EQ.active && (
-          <AudioMixEffect
-            effectLabel='EQ'
-            labelPlacement={
-              mixEffects.current.EQ.orientation === "vertical"
-                ? { side: "top", sidePlacement: "left" }
-                : { side: "left", sidePlacement: "top" }
-            }
-            orientation={mixEffects.current.EQ.orientation}
-            effectOptions={eqEffectsOptions()}
-            style={{
-              backgroundColor: "#888097",
-              position: "absolute",
-              left: `${mixEffects.current.EQ.x}px`,
-              top: `${mixEffects.current.EQ.y}px`,
-              width: `${mixEffects.current.EQ.width}px`,
-              height: `${mixEffects.current.EQ.height}px`,
-            }}
-          />
-        )}
-        {mixEffects.current.delay.active && (
-          <AudioMixEffect
-            effectLabel='Delay'
-            labelPlacement={
-              mixEffects.current.delay.orientation === "vertical"
-                ? { side: "bottom", sidePlacement: "right" }
-                : { side: "right", sidePlacement: "bottom" }
-            }
-            orientation={mixEffects.current.delay.orientation}
-            effectOptions={[
-              {
-                topLabel: "delay",
-                ticks: 5,
-                rangeMax: 4,
-                rangeMin: 0,
-                units: "sec",
-              },
-              {
-                bottomLabel: "feedback",
-                ticks: 6,
-                rangeMax: 1,
-                rangeMin: 0,
-                precision: 2,
-                units: "%",
-              },
-            ]}
-            style={{
-              backgroundColor: "#c5cfd0",
-              position: "absolute",
-              left: `${mixEffects.current.delay.x}px`,
-              top: `${mixEffects.current.delay.y}px`,
-              width: `${mixEffects.current.delay.width}px`,
-              height: `${mixEffects.current.delay.height}px`,
-            }}
-          />
-        )}
-        {mixEffects.current.distortion.active && (
-          <AudioMixEffect
-            effectLabel='Distortion'
-            labelPlacement={
-              mixEffects.current.distortion.orientation === "vertical"
-                ? { side: "right", sidePlacement: "top" }
-                : { side: "top", sidePlacement: "right" }
-            }
-            orientation={mixEffects.current.distortion.orientation}
-            effectOptions={[
-              {
-                topLabel: "dist",
-                ticks: 6,
-                rangeMax: 1,
-                rangeMin: 0,
-                precision: 2,
-                units: "%",
-              },
-              {
-                topLabel: "oversample",
-                ticks: 6,
-                rangeMax: 4,
-                rangeMin: 2,
-                units: "x",
-              },
-            ]}
-            style={{
-              backgroundColor: "#e7c47d",
-              position: "absolute",
-              left: `${mixEffects.current.distortion.x}px`,
-              top: `${mixEffects.current.distortion.y}px`,
-              width: `${mixEffects.current.distortion.width}px`,
-              height: `${mixEffects.current.distortion.height}px`,
-            }}
-          />
-        )}
-        {mixEffects.current.pitchShift.active && (
-          <AudioMixEffect
-            effectLabel='Pitch shift'
-            labelPlacement={
-              mixEffects.current.pitchShift.orientation === "vertical"
-                ? { side: "left", sidePlacement: "bottom" }
-                : { side: "bottom", sidePlacement: "left" }
-            }
-            orientation={mixEffects.current.pitchShift.orientation}
-            effectOptions={[
-              {
-                topLabel: "pitch",
-                ticks: 9,
-                rangeMax: 12,
-                rangeMin: -12,
-                units: "semitones",
-                snapToWholeNum: true,
-              },
-            ]}
-            style={{
-              backgroundColor: "#cacaca",
-              position: "absolute",
-              left: `${mixEffects.current.pitchShift.x}px`,
-              top: `${mixEffects.current.pitchShift.y}px`,
-              width: `${mixEffects.current.pitchShift.width}px`,
-              height: `${mixEffects.current.pitchShift.height}px`,
-            }}
-          />
-        )}
-        {mixEffects.current.phaser.active && (
-          <AudioMixEffect
-            effectLabel='Phaser'
-            labelPlacement={
-              mixEffects.current.phaser.orientation === "vertical"
-                ? { side: "left", sidePlacement: "top" }
-                : { side: "top", sidePlacement: "left" }
-            }
-            orientation={mixEffects.current.phaser.orientation}
-            effectOptions={[
-              {
-                topLabel: "freq",
-                ticks: 6,
-                rangeMax: 10,
-                rangeMin: 0,
-                units: "Hz",
-              },
-              {
-                topLabel: "oct",
-                ticks: 9,
-                rangeMax: 8,
-                rangeMin: 0,
-                units: "Oct",
-                snapToWholeNum: true,
-              },
-              {
-                bottomLabel: "base freq",
-                ticks: 6,
-                rangeMax: 1000,
-                rangeMin: 0,
-                units: "Hz",
-              },
-            ]}
-            style={{
-              backgroundColor: "#d03818",
-              position: "absolute",
-              left: `${mixEffects.current.phaser.x}px`,
-              top: `${mixEffects.current.phaser.y}px`,
-              width: `${mixEffects.current.phaser.width}px`,
-              height: `${mixEffects.current.phaser.height}px`,
-            }}
-          />
-        )}
-        <div
-          className='h-4 w-full absolute'
-          style={{ top: `${getMaxDimensions().maxHeight}px` }}
-        ></div>
-      </div>
-    </motion.div>,
-    document.body
+    />
   );
 }
