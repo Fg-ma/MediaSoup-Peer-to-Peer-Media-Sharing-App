@@ -1,37 +1,37 @@
-import React, { useEffect, useRef, useState } from "react";
-import AudioEffectSlider from "./AudioEffectSlider";
+import React from "react";
+import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
+import { MixEffect } from "./AudioMixEffectsPortal";
+import { AudioMixEffectsType } from "../../effects/audioEffects/AudioEffects";
 
 export default function AudioMixEffect({
+  effect,
+  mixEffect,
   effectLabel,
   labelPlacement,
-  orientation = "vertical",
-  effectOptions,
-  style,
+  updateMixEffectsValues,
 }: {
+  effect: AudioMixEffectsType;
+  mixEffect: MixEffect;
   effectLabel: string;
-  labelPlacement:
-    | { side: "left" | "right"; sidePlacement: "top" | "middle" | "bottom" }
-    | { side: "top" | "bottom"; sidePlacement: "left" | "center" | "right" };
-  orientation?: "vertical" | "horizontal";
-  effectOptions: {
-    topLabel?: string;
-    bottomLabel?: string;
-    ticks: number;
-    rangeMax: number;
-    rangeMin: number;
-    precision?: number;
-    units?: string;
-    snapToWholeNum?: boolean;
-  }[];
-  style?: React.CSSProperties;
+  labelPlacement: {
+    side: string;
+    sidePlacement: string;
+  };
+  updateMixEffectsValues: (event: SliderChangeEvent) => void;
 }) {
   return (
     <div
-      className={`border-2 border-black p-5 relative rounded
-        ${orientation === "vertical" ? "h-60" : ""}
-        ${orientation === "horizontal" ? "w-60" : ""}  
+      className={`border-2 border-black p-5 rounded absolute
+        ${mixEffect.orientation === "vertical" ? "h-60" : ""}
+        ${mixEffect.orientation === "horizontal" ? "w-60" : ""}  
       `}
-      style={style}
+      style={{
+        backgroundColor: mixEffect.backgroundColor,
+        left: `${mixEffect.x}px`,
+        top: `${mixEffect.y}px`,
+        width: `${mixEffect.width}px`,
+        height: `${mixEffect.height}px`,
+      }}
     >
       <div
         className={`absolute text-lg bg-white rounded-sm border-2 border-black font-Josefin text-center
@@ -78,21 +78,23 @@ export default function AudioMixEffect({
       </div>
       <div
         className={`h-full flex items-center justify-center 
-          ${orientation === "horizontal" ? "flex-col" : ""}  
+          ${mixEffect.orientation === "horizontal" ? "flex-col" : ""}  
         `}
       >
-        {effectOptions.map((effectOption, index) => (
-          <AudioEffectSlider
+        {Object.entries(mixEffect.options).map(([key, option], index) => (
+          <FgSlider
             key={index}
-            topLabel={effectOption.topLabel}
-            bottomLabel={effectOption.bottomLabel}
-            ticks={effectOption.ticks}
-            rangeMax={effectOption.rangeMax}
-            rangeMin={effectOption.rangeMin}
-            precision={effectOption.precision}
-            units={effectOption.units}
-            orientation={orientation}
-            snapToWholeNum={effectOption.snapToWholeNum}
+            id={`${effect}_${key}`}
+            topLabel={option.topLabel}
+            bottomLabel={option.bottomLabel}
+            ticks={option.ticks}
+            rangeMax={option.rangeMax}
+            rangeMin={option.rangeMin}
+            precision={option.precision}
+            units={option.units}
+            snapToWholeNum={option.snapToWholeNum}
+            orientation={mixEffect.orientation}
+            onValueChange={updateMixEffectsValues}
           />
         ))}
       </div>

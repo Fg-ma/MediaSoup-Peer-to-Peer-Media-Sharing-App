@@ -15,7 +15,13 @@ export type CameraEffectTypes =
 
 export type ScreenEffectTypes = "pause" | "blur" | "tint";
 
-export type AudioEffectTypes = "mute" | "robot";
+export type AudioEffectTypes =
+  | "mute"
+  | "robot"
+  | "echo"
+  | "alien"
+  | "underwater"
+  | "telephone";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;
@@ -94,7 +100,14 @@ export function StreamsContextProvider({
   }>({
     camera: {},
     screen: {},
-    audio: { mute: false, robot: false },
+    audio: {
+      mute: false,
+      robot: false,
+      echo: false,
+      alien: false,
+      underwater: false,
+      telephone: false,
+    },
   });
   const remoteTracksMap = useRef<{
     [username: string]: {

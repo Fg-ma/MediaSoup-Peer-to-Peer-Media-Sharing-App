@@ -76,6 +76,9 @@ module.exports = {
       borderRadius: {
         1.5: "0.09375rem",
       },
+      boxShadow: {
+        FgSlider: "inset 0 0 2.5px rgba(0, 0, 0, 0.3)",
+      },
     },
   },
 };

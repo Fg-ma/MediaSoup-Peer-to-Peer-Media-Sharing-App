@@ -1,20 +1,53 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
+import { Transition, Variants, motion } from "framer-motion";
+
+const PanelVar: Variants = {
+  init: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      scale: { type: "spring", stiffness: 100 },
+    },
+  },
+};
+
+const PanelTransition: Transition = {
+  transition: {
+    opacity: { duration: 0.15 },
+  },
+};
 
 export default function FgPanel({
   content,
+  initPosition = { x: 0, y: 0 },
+  initWidth = 100,
+  initHeight = 100,
   minWidth = 0,
   minHeight = 0,
   resizeCallback,
 }: {
   content: React.ReactNode;
+  initPosition?: {
+    x?: number;
+    y?: number;
+    referenceElement?: HTMLElement;
+    placement?: "above" | "below" | "left" | "right";
+    padding?: number;
+  };
+  initWidth?: number;
+  initHeight?: number;
   minWidth?: number;
   minHeight?: number;
   resizeCallback?: () => void;
 }) {
   const [rerender, setRerender] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [size, setSize] = useState({ width: 560, height: 384 });
+  const [position, setPosition] = useState<{ x?: number; y?: number }>({
+    x: initPosition.x,
+    y: initPosition.y,
+  });
+  const [size, setSize] = useState({ width: initWidth, height: initHeight });
   const panelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -23,6 +56,64 @@ export default function FgPanel({
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
     undefined
   );
+
+  useEffect(() => {
+    if (
+      !initPosition.referenceElement ||
+      !initPosition.placement ||
+      !panelRef.current
+    ) {
+      return;
+    }
+
+    const referenceRect = initPosition.referenceElement.getBoundingClientRect();
+
+    let top: number;
+    if (initPosition.placement === "above") {
+      top = referenceRect.top - panelRef.current.clientHeight;
+
+      if (initPosition.padding) {
+        top -= initPosition.padding;
+      }
+    } else if (initPosition.placement === "below") {
+      top = referenceRect.bottom;
+
+      if (initPosition.padding) {
+        top += initPosition.padding;
+      }
+    } else {
+      top =
+        referenceRect.top +
+        referenceRect.height / 2 -
+        panelRef.current.clientHeight / 2;
+    }
+
+    let left: number;
+    if (initPosition.placement === "left") {
+      left = referenceRect.left - panelRef.current.clientWidth;
+
+      if (initPosition.padding) {
+        left -= initPosition.padding;
+      }
+    } else if (initPosition.placement === "right") {
+      left = referenceRect.right;
+
+      if (initPosition.padding) {
+        left += initPosition.padding;
+      }
+    } else {
+      left =
+        referenceRect.left +
+        referenceRect.width / 2 -
+        panelRef.current.clientWidth / 2;
+    }
+
+    setPosition({ x: left, y: top });
+  }, [
+    initPosition.referenceElement,
+    initPosition.placement,
+    initPosition.padding,
+  ]);
 
   const handleMouseMove = (event: React.MouseEvent | MouseEvent) => {
     if (isDragging.current && !isResizing.current) {
@@ -166,18 +257,25 @@ export default function FgPanel({
   }, [size]);
 
   return ReactDOM.createPortal(
-    <div
+    <motion.div
       ref={panelRef}
       onMouseDown={handleDragMouseDown}
       onMouseMove={handleCursorMovement}
       className='z-50 shadow-lg rounded absolute p-5 bg-white'
       style={{
+        opacity:
+          position.x === undefined || position.y === undefined ? "0%" : "100%",
         left: position.x,
         top: position.y,
         width: size.width,
         height: size.height,
         cursor: isDragging.current ? "pointer" : "",
       }}
+      variants={PanelVar}
+      initial='init'
+      animate='animate'
+      exit='init'
+      transition={PanelTransition}
     >
       <div
         ref={containerRef}
@@ -201,7 +299,7 @@ export default function FgPanel({
         onMouseDown={(event) => handleResizeMouseDown(event, "ne")}
         className='w-5 aspect-square absolute right-0 top-0 cursor-ne-resize'
       />
-    </div>,
+    </motion.div>,
     document.body
   );
 }

@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import SliderValuePortal from "./SliderValuePortal";
+import React, { useState, useRef, useEffect } from "react";
+import SliderValuePortal from "./lib/SliderValuePortal";
 import { motion, AnimatePresence, Variants, Transition } from "framer-motion";
 
 const tickVar: Variants = {
@@ -27,17 +27,7 @@ const tickTransition: Transition = {
   },
 };
 
-export default function AudioEffectSlider({
-  topLabel,
-  bottomLabel,
-  ticks = 6,
-  rangeMax = 100,
-  rangeMin = 0,
-  precision = 1,
-  units,
-  orientation = "vertical",
-  snapToWholeNum = false,
-}: {
+export interface SliderOptions {
   topLabel?: string;
   bottomLabel?: string;
   ticks?: number;
@@ -45,9 +35,33 @@ export default function AudioEffectSlider({
   rangeMin?: number;
   precision?: number;
   units?: string;
-  orientation?: "vertical" | "horizontal";
   snapToWholeNum?: boolean;
-}) {
+}
+
+export interface SliderChangeEvent {
+  value: number;
+  id: string;
+}
+
+interface SliderProps extends SliderOptions {
+  id?: string;
+  orientation?: "vertical" | "horizontal";
+  onValueChange?: (event: SliderChangeEvent) => void;
+}
+
+export default function FgSlider({
+  id = "default",
+  topLabel,
+  bottomLabel,
+  ticks = 6,
+  rangeMax = 100,
+  rangeMin = 0,
+  precision = 1,
+  units,
+  snapToWholeNum = false,
+  orientation = "vertical",
+  onValueChange,
+}: SliderProps) {
   const [sliding, setSliding] = useState(false);
   const [handleHovering, setHandleHovering] = useState(false);
   const [tickHovering, setTickHovering] = useState(false);
@@ -152,8 +166,15 @@ export default function AudioEffectSlider({
     document.addEventListener("mouseup", handleMouseUp);
   };
 
+  useEffect(() => {
+    if (onValueChange) {
+      onValueChange({ value, id });
+    }
+  }, [value]);
+
   return (
     <div
+      id={id}
       className={`flex items-center justify-center relative flex-col
         ${orientation === "vertical" ? "w-16 h-full" : ""}
         ${orientation === "horizontal" ? "h-16 w-full" : ""}
@@ -190,7 +211,7 @@ export default function AudioEffectSlider({
         `}
       >
         <div
-          className={`vertical-slider-track relative cursor-pointer rounded
+          className={`relative cursor-pointer rounded hover:shadow-FgSlider
             ${orientation === "vertical" ? "w-2.5 h-full" : ""}
             ${orientation === "horizontal" ? "h-2.5 w-full" : ""}
           `}
