@@ -1,163 +1,30 @@
 import { Server as SocketIOServer } from "socket.io";
-import {
-  roomProducerTransports,
-  roomConsumerTransports,
-  roomProducers,
-  roomConsumers,
-  workersMap,
-} from "./mediasoupVars";
 import { MediasoupSocket } from "./mediasoupTypes";
 import onGetRouterRtpCapabilities from "./lib/onGetRouterRtpCapabilities";
-import onCreateProducerTransport from "./lib/onCreateProducerTransport";
-import onConnectProducerTransport from "./lib/onConnectProducerTransport";
-import onCreateConsumerTransport from "./lib/onCreateConsumerTransport";
-import onConnectConsumerTransport from "./lib/onConnectConsumerTransport";
 import onResume from "./lib/onResume";
-import onConsume from "./lib/onConsume";
-import onNewConsumer from "./lib/onNewConsumer";
-import onRemoveProducer from "./lib/onRemoveProducer";
-import onCreateNewProducer from "./lib/onCreateNewProducer";
-import onUnsubscribe from "./lib/onUnsubscribe";
-import onMuteLock from "./lib/onMuteLock";
-import onRequestMuteLock from "./lib/onRequestMuteLock";
-import onAcceptMuteLock from "./lib/onAcceptMuteLock";
-import onDeleteProducerTransport from "./lib/onDeleteProducerTransport";
-import onNewProducerCreated from "./lib/onNewProducerCreated";
-import onNewConsumerCreated from "./lib/onNewConsumerCreated";
-import onSendMuteRequest from "./lib/onSendMuteRequest";
-import { releaseWorker } from "./workerManager";
-import onRequestEffect from "./lib/onRequestEffect";
+import Producers from "./lib/Producers";
+import Consumers from "./lib/Consumers";
+import Mute from "./lib/Mute";
+import Effects from "./lib/Effects";
+import Tables from "./lib/Tables";
 
-const SocketIOConnection = async (io: SocketIOServer) => {
+const mediasoupSocket = async (io: SocketIOServer) => {
   io.on("connection", (socket: MediasoupSocket) => {
-    socket.on("joinTable", (table_id: string, username: string) => {
-      socket.join(table_id);
-      socket.join(`${table_id}_${username}`);
+    const tables = new Tables(socket, io);
+    const producers = new Producers(io);
+    const consumers = new Consumers(io);
+    const mute = new Mute(io);
+    const effects = new Effects(io);
 
-      socket.table_id = table_id;
-      socket.username = username;
-    });
+    socket.on("joinTable", (table_id: string, username: string) =>
+      tables.join(table_id, username)
+    );
 
-    socket.on("leaveTable", (table_id: string, username: string) => {
-      socket.leave(table_id);
-      socket.leave(`${table_id}_${username}`);
+    socket.on("leaveTable", (table_id: string, username: string) =>
+      tables.leave(table_id, username)
+    );
 
-      socket.table_id = "";
-      socket.username = "";
-
-      if (
-        roomProducerTransports[table_id] &&
-        roomProducerTransports[table_id][username]
-      ) {
-        delete roomProducerTransports[table_id][username];
-      }
-
-      if (
-        roomConsumerTransports[table_id] &&
-        roomConsumerTransports[table_id][username]
-      ) {
-        delete roomConsumerTransports[table_id][username];
-      }
-
-      if (
-        (!roomProducerTransports ||
-          (roomProducerTransports[table_id] &&
-            Object.keys(roomProducerTransports[table_id]).length === 0)) &&
-        (!roomConsumerTransports ||
-          (roomConsumerTransports[table_id] &&
-            Object.keys(roomConsumerTransports[table_id]).length === 0))
-      ) {
-        releaseWorker(workersMap[table_id]);
-        delete workersMap[table_id];
-      }
-
-      if (roomProducers[table_id] && roomProducers[table_id][username]) {
-        delete roomProducers[table_id][username];
-      }
-
-      if (roomConsumers[table_id] && roomConsumers[table_id][username]) {
-        delete roomConsumers[table_id][username];
-      }
-
-      for (const username in roomConsumers[table_id]) {
-        for (const producerUsername in roomConsumers[table_id][username]) {
-          if (
-            producerUsername === username &&
-            roomConsumers[table_id] &&
-            roomConsumers[table_id][username]
-          ) {
-            delete roomConsumers[table_id][username][username];
-          }
-        }
-      }
-
-      io.to(table_id).emit("userLeftTable", username);
-    });
-
-    socket.on("disconnect", () => {
-      if (socket.table_id && socket.username) {
-        socket.leave(socket.table_id);
-        socket.leave(`${socket.table_id}_${socket.username}`);
-
-        if (
-          roomProducerTransports[socket.table_id] &&
-          roomProducerTransports[socket.table_id][socket.username]
-        ) {
-          delete roomProducerTransports[socket.table_id][socket.username];
-        }
-
-        if (
-          roomConsumerTransports[socket.table_id] &&
-          roomConsumerTransports[socket.table_id][socket.username]
-        ) {
-          delete roomConsumerTransports[socket.table_id][socket.username];
-        }
-
-        if (
-          (!roomProducerTransports ||
-            (roomProducerTransports[socket.table_id] &&
-              Object.keys(roomProducerTransports[socket.table_id]).length ===
-                0)) &&
-          (!roomConsumerTransports ||
-            (roomConsumerTransports[socket.table_id] &&
-              Object.keys(roomConsumerTransports[socket.table_id]).length ===
-                0))
-        ) {
-          releaseWorker(workersMap[socket.table_id]);
-          delete workersMap[socket.table_id];
-        }
-
-        if (
-          roomProducers[socket.table_id] &&
-          roomProducers[socket.table_id][socket.username]
-        ) {
-          delete roomProducers[socket.table_id][socket.username];
-        }
-
-        if (
-          roomConsumers[socket.table_id] &&
-          roomConsumers[socket.table_id][socket.username]
-        ) {
-          delete roomConsumers[socket.table_id][socket.username];
-        }
-
-        for (const username in roomConsumers[socket.table_id]) {
-          for (const producerUsername in roomConsumers[socket.table_id][
-            username
-          ]) {
-            if (
-              producerUsername === socket.username &&
-              roomConsumers[socket.table_id] &&
-              roomConsumers[socket.table_id][username]
-            ) {
-              delete roomConsumers[socket.table_id][username][socket.username];
-            }
-          }
-        }
-
-        io.to(socket.table_id).emit("userDisconnected", socket.username);
-      }
-    });
+    socket.on("disconnect", () => tables.disconnect());
 
     socket.on("message", (event: any) => {
       switch (event.type) {
@@ -165,58 +32,58 @@ const SocketIOConnection = async (io: SocketIOServer) => {
           onGetRouterRtpCapabilities(event, io);
           break;
         case "createProducerTransport":
-          onCreateProducerTransport(event, io);
+          producers.onCreateProducerTransport(event);
           break;
         case "connectProducerTransport":
-          onConnectProducerTransport(event, io);
+          producers.onConnectProducerTransport(event);
           break;
         case "createNewProducer":
-          onCreateNewProducer(event, socket, io);
+          producers.onCreateNewProducer(event);
           break;
         case "createConsumerTransport":
-          onCreateConsumerTransport(event, io);
+          consumers.onCreateConsumerTransport(event);
           break;
         case "connectConsumerTransport":
-          onConnectConsumerTransport(event, io);
+          consumers.onConnectConsumerTransport(event);
           break;
         case "resume":
           onResume(event, io);
           break;
         case "consume":
-          onConsume(event, io);
+          consumers.onConsume(event);
           break;
         case "newConsumer":
-          onNewConsumer(event, io);
+          consumers.onNewConsumer(event);
           break;
         case "removeProducer":
-          onRemoveProducer(event, io);
+          producers.onRemoveProducer(event);
           break;
         case "unsubscribe":
-          onUnsubscribe(event, io);
+          consumers.onUnsubscribe(event);
           break;
-        case "muteLock":
-          onMuteLock(event, io);
+        case "clientMute":
+          mute.onClientMute(event);
           break;
-        case "requestMuteLock":
-          onRequestMuteLock(event, io);
+        case "requestClientMuteState":
+          mute.onRequestClientMuteState(event);
           break;
-        case "acceptMuteLock":
-          onAcceptMuteLock(event, io);
+        case "clientMuteStateResponse":
+          mute.onClientMuteStateResponse(event);
           break;
         case "deleteProducerTransport":
-          onDeleteProducerTransport(event);
+          producers.onDeleteProducerTransport(event);
           break;
         case "newProducerCreated":
-          onNewProducerCreated(event, io);
+          producers.onNewProducerCreated(event);
           break;
         case "newConsumerCreated":
-          onNewConsumerCreated(event, io);
+          consumers.onNewConsumerCreated(event);
           break;
-        case "sendMuteRequest":
-          onSendMuteRequest(event, io);
+        case "sendLocalMuteChange":
+          mute.onSendLocalMuteChange(event);
           break;
         case "requestEffect":
-          onRequestEffect(event, io);
+          effects.onRequestEffect(event);
           break;
         default:
           break;
@@ -225,4 +92,4 @@ const SocketIOConnection = async (io: SocketIOServer) => {
   });
 };
 
-export default SocketIOConnection;
+export default mediasoupSocket;

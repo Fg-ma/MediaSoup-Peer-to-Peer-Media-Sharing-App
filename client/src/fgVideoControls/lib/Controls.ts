@@ -1,5 +1,9 @@
 import { Socket } from "socket.io-client";
-import { EffectTypes } from "src/context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "src/context/StreamsContext";
+import { defaultFgVideoOptions, FgVideoOptions } from "../../fgVideo/FgVideo";
 
 class Controls {
   private socket: React.MutableRefObject<Socket> | undefined;
@@ -7,6 +11,7 @@ class Controls {
   private username: string;
   private type: string;
   private videoId: string;
+  private fgVideoOptions: FgVideoOptions;
   private videoContainerRef: React.RefObject<HTMLDivElement>;
   private captions: React.MutableRefObject<TextTrack | undefined>;
   private leadingZeroFormatter = new Intl.NumberFormat(undefined, {
@@ -14,20 +19,11 @@ class Controls {
   });
   private controlPressed: React.MutableRefObject<boolean>;
   private shiftPressed: React.MutableRefObject<boolean>;
-  private isPlayPause: boolean;
   private paused: React.MutableRefObject<boolean>;
   private videoRef: React.RefObject<HTMLVideoElement>;
-  private isFullScreen: boolean;
-  private isTheater: boolean;
   private theater: React.MutableRefObject<boolean>;
-  private isPictureInPicture: boolean;
-  private isVolume: boolean;
   private handleMute: () => void;
-  private isSkip: boolean;
-  private skipIncrement: number;
-  private isClosedCaptions: boolean;
   private leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | null>;
-  private controlsVanishTime: number;
   private playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
   private timelineContainerRef: React.RefObject<HTMLDivElement>;
   private currentTimeRef: React.RefObject<HTMLDivElement>;
@@ -37,14 +33,11 @@ class Controls {
   private thumbnails: React.MutableRefObject<string[]>;
   private thumbnailImgRef: React.RefObject<HTMLImageElement>;
   private totalTimeRef: React.RefObject<HTMLDivElement>;
-  private isTimeLine: boolean;
-  private isPreview: boolean;
-  private isThumbnail: boolean;
   private thumbnailInterval: number;
   private thumbnailClarity: number;
   private setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
   private handleEffectChange: (
-    effect: EffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
 
@@ -54,24 +47,16 @@ class Controls {
     username: string,
     type: string,
     videoId: string,
+    fgVideoOptions: FgVideoOptions,
     videoContainerRef: React.RefObject<HTMLDivElement>,
     captions: React.MutableRefObject<TextTrack | undefined>,
     controlPressed: React.MutableRefObject<boolean>,
     shiftPressed: React.MutableRefObject<boolean>,
-    isPlayPause: boolean,
     paused: React.MutableRefObject<boolean>,
     videoRef: React.RefObject<HTMLVideoElement>,
-    isFullScreen: boolean,
-    isTheater: boolean,
     theater: React.MutableRefObject<boolean>,
-    isPictureInPicture: boolean,
-    isVolume: boolean,
     handleMute: () => void,
-    isSkip: boolean,
-    skipIncrement: number,
-    isClosedCaptions: boolean,
     leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | null>,
-    controlsVanishTime: number,
     playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>,
     timelineContainerRef: React.RefObject<HTMLDivElement>,
     currentTimeRef: React.RefObject<HTMLDivElement>,
@@ -81,14 +66,11 @@ class Controls {
     thumbnails: React.MutableRefObject<string[]>,
     thumbnailImgRef: React.RefObject<HTMLImageElement>,
     totalTimeRef: React.RefObject<HTMLDivElement>,
-    isTimeLine: boolean,
-    isPreview: boolean,
-    isThumbnail: boolean,
     thumbnailInterval = 10,
     thumbnailClarity = 5,
     setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>,
     handleEffectChange: (
-      effect: EffectTypes,
+      effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>
   ) {
@@ -97,24 +79,16 @@ class Controls {
     this.username = username;
     this.type = type;
     this.videoId = videoId;
+    this.fgVideoOptions = fgVideoOptions;
     this.videoContainerRef = videoContainerRef;
     this.captions = captions;
     this.controlPressed = controlPressed;
     this.shiftPressed = shiftPressed;
-    this.isPlayPause = isPlayPause;
     this.paused = paused;
     this.videoRef = videoRef;
-    this.isFullScreen = isFullScreen;
-    this.isTheater = isTheater;
     this.theater = theater;
-    this.isPictureInPicture = isPictureInPicture;
-    this.isVolume = isVolume;
     this.handleMute = handleMute;
-    this.isSkip = isSkip;
-    this.skipIncrement = skipIncrement;
-    this.isClosedCaptions = isClosedCaptions;
     this.leaveVideoTimer = leaveVideoTimer;
-    this.controlsVanishTime = controlsVanishTime;
     this.playbackSpeedButtonRef = playbackSpeedButtonRef;
     this.timelineContainerRef = timelineContainerRef;
     this.currentTimeRef = currentTimeRef;
@@ -124,9 +98,6 @@ class Controls {
     this.thumbnails = thumbnails;
     this.thumbnailImgRef = thumbnailImgRef;
     this.totalTimeRef = totalTimeRef;
-    this.isTimeLine = isTimeLine;
-    this.isPreview = isPreview;
-    this.isThumbnail = isThumbnail;
     this.thumbnailInterval = thumbnailInterval;
     this.thumbnailClarity = thumbnailClarity;
     this.setEffectsActive = setEffectsActive;
@@ -227,62 +198,78 @@ class Controls {
         break;
       case " ":
         if (tagName === "button") return;
-        if (this.isPlayPause) {
+        if (this.fgVideoOptions.isPlayPause) {
           this.handlePausePlay();
         }
         break;
       case "mediaplaypause":
-        if (this.isPlayPause) {
+        if (this.fgVideoOptions.isPlayPause) {
           this.handlePausePlay();
         }
         break;
       case "k":
-        if (this.isPlayPause) {
+        if (this.fgVideoOptions.isPlayPause) {
           this.handlePausePlay();
         }
         break;
       case "f":
-        if (this.isFullScreen) {
+        if (this.fgVideoOptions.isFullScreen) {
           this.handleFullScreen();
         }
         break;
       case "t":
-        if (this.isTheater) {
+        if (this.fgVideoOptions.isTheater) {
           this.handleTheater();
         }
         break;
       case "i":
-        if (this.isPictureInPicture) {
+        if (this.fgVideoOptions.isPictureInPicture) {
           this.handleMiniPlayer();
         }
         break;
       case "m":
-        if (this.isVolume) {
+        if (this.fgVideoOptions.isVolume) {
           this.handleMute();
         }
         break;
       case "arrowleft":
-        if (this.isSkip) {
-          this.skip(-this.skipIncrement);
+        if (this.fgVideoOptions.isSkip) {
+          this.skip(
+            -(
+              this.fgVideoOptions.skipIncrement ??
+              defaultFgVideoOptions.skipIncrement
+            )
+          );
         }
         break;
       case "j":
-        if (this.isSkip) {
-          this.skip(-this.skipIncrement);
+        if (this.fgVideoOptions.isSkip) {
+          this.skip(
+            -(
+              this.fgVideoOptions.skipIncrement ??
+              defaultFgVideoOptions.skipIncrement
+            )
+          );
         }
         break;
       case "arrowright":
-        if (this.isSkip) {
-          this.skip(this.skipIncrement);
+        if (this.fgVideoOptions.isSkip) {
+          this.skip(
+            this.fgVideoOptions.skipIncrement ??
+              defaultFgVideoOptions.skipIncrement
+          );
         }
         break;
       case "l":
-        if (this.isSkip) {
-          this.skip(this.skipIncrement);
+        if (this.fgVideoOptions.isSkip) {
+          this.skip(
+            this.fgVideoOptions.skipIncrement ??
+              defaultFgVideoOptions.skipIncrement
+          );
         }
         break;
       case "c":
-        if (this.isClosedCaptions) {
+        if (this.fgVideoOptions.isClosedCaptions) {
           this.handleClosedCaptions();
         }
         break;
@@ -338,7 +325,7 @@ class Controls {
   handleMouseLeave() {
     this.leaveVideoTimer.current = setTimeout(() => {
       this.videoContainerRef.current?.classList.remove("in-video");
-    }, this.controlsVanishTime);
+    }, this.fgVideoOptions.controlsVanishTime);
   }
 
   handlePausePlay() {
@@ -519,7 +506,10 @@ class Controls {
       }
     };
 
-    if (this.isTimeLine && (this.isPreview || this.isThumbnail)) {
+    if (
+      this.fgVideoOptions.isTimeLine &&
+      (this.fgVideoOptions.isPreview || this.fgVideoOptions.isThumbnail)
+    ) {
       loadThumbnails();
     }
   }

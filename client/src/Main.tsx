@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import publishCamera from "./publishCamera";
@@ -7,7 +7,7 @@ import onRouterCapabilities from "./lib/onRouterCapabilities";
 import subscribe from "./subscribe";
 import joinTable from "./joinTable";
 import publishAudio from "./publishAudio";
-import onRequestedMuteLock from "./lib/onRequestedMuteLock";
+import onClientMuteStateRequested from "./lib/onClientMuteStateRequested";
 import publishNewCamera from "./publishNewCamera";
 import publishNewScreen from "./publishNewScreen";
 import { useStreamsContext } from "./context/StreamsContext";
@@ -18,7 +18,7 @@ import Consumers from "./lib/Consumers";
 import UserDevice from "./UserDevice";
 import Deadbanding from "./effects/visualEffects/lib/Deadbanding";
 import BrowserMedia from "./BrowserMedia";
-import AudioEffectsButton from "./audioEffectsSection/AudioEffectsButton";
+import AudioEffectsButton from "./audioEffectsButton/AudioEffectsButton";
 
 const websocketURL = "http://localhost:8000";
 
@@ -78,20 +78,19 @@ export default function Main() {
     mutedAudioRef.current = !mutedAudioRef.current;
 
     const msg = {
-      type: "muteLock",
-      isMuteLock: mutedAudioRef.current,
+      type: "clientMute",
       table_id: table_id.current,
       username: username.current,
+      clientMute: mutedAudioRef.current,
     };
-
     socket.current.emit("message", msg);
   };
 
-  const handleMuteAudioBtn = () => {
+  const handleMuteExternalMute = () => {
     muteAudio();
 
     const msg = {
-      type: "sendMuteRequest",
+      type: "sendLocalMuteChange",
       table_id: table_id.current,
       username: username.current,
     };
@@ -135,8 +134,14 @@ export default function Main() {
       case "producerDisconnected":
         producers.onProducerDisconnected(event);
         break;
-      case "requestedMuteLock":
-        onRequestedMuteLock(event, socket, username, table_id, mutedAudioRef);
+      case "clientMuteStateRequested":
+        onClientMuteStateRequested(
+          event,
+          socket,
+          username,
+          table_id,
+          mutedAudioRef
+        );
         break;
       default:
         break;
@@ -237,7 +242,7 @@ export default function Main() {
         initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
         onRendered={() => {
           const msg = {
-            type: "requestMuteLock",
+            type: "requestClientMuteState",
             table_id: table_id.current,
             username: username.current,
             producerUsername: trackUsername,
@@ -388,7 +393,7 @@ export default function Main() {
             <div className='flex flex-col mx-2'>
               <button
                 ref={muteBtnRef}
-                onClick={handleMuteAudioBtn}
+                onClick={handleMuteExternalMute}
                 className={`${
                   mutedAudioRef.current
                     ? "bg-orange-500 hover:bg-orange-700"
@@ -471,7 +476,7 @@ export default function Main() {
               {subscribedActive ? "Unsubscribe" : "Subscribe"}
             </button>
           </div>
-          <AudioEffectsButton />
+          <AudioEffectsButton handleMuteExternalMute={handleMuteExternalMute} />
         </div>
         <div className='flex justify-center mt-5'>
           <input

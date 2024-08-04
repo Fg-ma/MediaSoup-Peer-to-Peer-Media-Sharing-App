@@ -2,9 +2,9 @@ import express from "express";
 import path from "path";
 import * as http from "http";
 import { Server } from "socket.io";
-import SocketIOConnection from "./lib/mediasoupSocket";
 import cors from "cors";
 import { initializeWorkers } from "./lib/workerManager";
+import mediasoupSocket from "./lib/mediasoupSocket";
 
 const main = async () => {
   const app = express();
@@ -29,7 +29,7 @@ const main = async () => {
 
   try {
     // Establish socket connection
-    SocketIOConnection(io);
+    mediasoupSocket(io);
   } catch (error) {
     console.error("Error establishing socket connection:", error);
   }

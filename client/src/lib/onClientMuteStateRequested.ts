@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client";
 
-const onRequestedMuteLock = (
+const onClientMuteStateRequested = (
   event: { type: string; username: string },
   socket: React.MutableRefObject<Socket>,
   username: React.MutableRefObject<string>,
@@ -9,7 +9,7 @@ const onRequestedMuteLock = (
 ) => {
   if (mutedAudioRef.current) {
     const msg = {
-      type: "acceptMuteLock",
+      type: "clientMuteStateResponse",
       table_id: table_id.current,
       username: event.username,
       producerUsername: username.current,
@@ -19,4 +19,4 @@ const onRequestedMuteLock = (
   }
 };
 
-export default onRequestedMuteLock;
+export default onClientMuteStateRequested;

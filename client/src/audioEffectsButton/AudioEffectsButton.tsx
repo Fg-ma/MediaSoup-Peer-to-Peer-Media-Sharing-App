@@ -7,7 +7,11 @@ import AudioMixEffectsPortal from "./lib/AudioMixEffectsPortal";
 import audioEffectIcon from "../../public/svgs/audioEffectIcon.svg";
 import audioEffectOffIcon from "../../public/svgs/audioEffectOffIcon.svg";
 
-export default function AudioEffectsButton() {
+export default function AudioEffectsButton({
+  handleMuteExternalMute,
+}: {
+  handleMuteExternalMute: () => void;
+}) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const [effectSectionActive, setEffectSectionActive] = useState(false);
   const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
@@ -54,6 +58,7 @@ export default function AudioEffectsButton() {
           audioMixEffectsActive={audioMixEffectsActive}
           setAudioMixEffectsActive={setAudioMixEffectsActive}
           audioMixEffectsButtonRef={audioMixEffectsButtonRef}
+          handleMuteExternalMute={handleMuteExternalMute}
         />
       )}
       {audioMixEffectsActive && (

@@ -6,81 +6,19 @@ import {
   useStreamsContext,
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
 } from "../context/StreamsContext";
 import handleVisualEffect from "../effects/visualEffects/handleVisualEffect";
 import Controls from "../fgVideoControls/lib/Controls";
 import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";
 import FgVideoControls from "../fgVideoControls/FgVideoControls";
+import FgVideoController from "./lib/FgVideoController";
 
-export default function FgVideo({
-  type,
-  username,
-  name,
-  table_id,
-  socket,
-  videoId,
-  handleMute,
-  videoStream,
-  isUser = false,
-  isStream = false,
-  videoStyles,
-  autoPlay = true,
-  flipVideo = false,
-  isSlider = true,
-  skipIncrement = 10,
-  initialProgressPosition = 0,
-  controlsVanishTime = 1250,
-  timelineBackgroundColor = "rgba(150, 150, 150, 0.5)",
-  closedCaptionsCecoratorColor = "rgba(30, 30, 30, 0.6)",
-  timelinePrimaryBackgroundColor = "#f56114",
-  timelineSecondaryBackgroundColor = "rgb(150, 150, 150)",
-  primaryVideoColor = "#f56114",
-  isPlayPause = true,
-  isVolume = true,
-  isCurrentTime = true,
-  isTotalTime = true,
-  isPlaybackSpeed = true,
-  isClosedCaptions = true,
-  isPictureInPicture = true,
-  isTheater = true,
-  isEffects = true,
-  isFullScreen = true,
-  isTimeLine = true,
-  isSkip = true,
-  isThumbnail = true,
-  isPreview = true,
-  isClose = true,
-  audioRef,
-  handleVolumeSlider,
-  paths,
-  videoIconStateRef,
-  isFinishedRef,
-  changedWhileNotFinishedRef,
-  tracksColorSetter,
-}: {
-  type: "camera" | "screen";
-  username: string;
-  name?: string;
-  table_id: string;
-  socket?: React.MutableRefObject<Socket>;
-  videoId: string;
-  handleMute: () => void;
-  videoStream?: MediaStream;
+export interface FgVideoOptions {
   isUser?: boolean;
   isStream?: boolean;
-  videoStyles?: {};
   autoPlay?: boolean;
   flipVideo?: boolean;
   isSlider?: boolean;
-  skipIncrement?: number;
-  initialProgressPosition?: number;
-  controlsVanishTime?: number;
-  timelineBackgroundColor?: string;
-  closedCaptionsCecoratorColor?: string;
-  timelinePrimaryBackgroundColor?: string;
-  timelineSecondaryBackgroundColor?: string;
-  primaryVideoColor?: string;
   isPlayPause?: boolean;
   isVolume?: boolean;
   isCurrentTime?: boolean;
@@ -96,6 +34,76 @@ export default function FgVideo({
   isThumbnail?: boolean;
   isPreview?: boolean;
   isClose?: boolean;
+  skipIncrement?: number;
+  initialProgressPosition?: number;
+  controlsVanishTime?: number;
+  timelineBackgroundColor?: string;
+  closedCaptionsDecoratorColor?: string;
+  timelinePrimaryBackgroundColor?: string;
+  timelineSecondaryBackgroundColor?: string;
+  primaryVideoColor?: string;
+}
+
+export const defaultFgVideoOptions = {
+  isUser: false,
+  isStream: false,
+  autoPlay: true,
+  flipVideo: false,
+  isSlider: true,
+  isPlayPause: true,
+  isVolume: true,
+  isCurrentTime: true,
+  isTotalTime: true,
+  isPlaybackSpeed: true,
+  isClosedCaptions: true,
+  isPictureInPicture: true,
+  isTheater: true,
+  isEffects: true,
+  isFullScreen: true,
+  isTimeLine: true,
+  isSkip: true,
+  isThumbnail: true,
+  isPreview: true,
+  isClose: true,
+  skipIncrement: 10,
+  initialProgressPosition: 0,
+  controlsVanishTime: 1250,
+  timelineBackgroundColor: "rgba(150, 150, 150, 0.5)",
+  closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
+  timelinePrimaryBackgroundColor: "#f56114",
+  timelineSecondaryBackgroundColor: "rgb(150, 150, 150)",
+  primaryVideoColor: "#f56114",
+};
+
+export default function FgVideo({
+  type,
+  username,
+  name,
+  table_id,
+  socket,
+  videoId,
+  fgVideoOptions = defaultFgVideoOptions,
+  handleMute,
+  videoStream,
+  videoStyles,
+  audioRef,
+  handleVolumeSlider,
+  paths,
+  videoIconStateRef,
+  isFinishedRef,
+  changedWhileNotFinishedRef,
+  tracksColorSetter,
+}: {
+  type: "camera" | "screen";
+  username: string;
+  name?: string;
+  table_id: string;
+  socket?: React.MutableRefObject<Socket>;
+  videoId: string;
+  fgVideoOptions?: FgVideoOptions;
+  handleMute: () => void;
+  videoStream?: MediaStream;
+  videoStyles?: React.CSSProperties;
   audioRef: React.RefObject<HTMLAudioElement>;
   handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;
   paths: string[][];
@@ -113,7 +121,7 @@ export default function FgVideo({
 }) {
   const { userMedia, userStreamEffects } = useStreamsContext();
   const [effectsActive, setEffectsActive] = useState(false);
-  const paused = useRef(!autoPlay);
+  const paused = useRef(!fgVideoOptions.autoPlay);
   const theater = useRef(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -131,13 +139,12 @@ export default function FgVideo({
   const captions = useRef<TextTrack | undefined>();
   const thumbnails = useRef<string[]>([]);
   const tintColor = useRef("#F56114");
-  const stream = userMedia.current[type][videoId]?.getStream();
 
   const handleEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange: boolean = false
   ) => {
-    if (isUser) {
+    if (fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser) {
       await handleVisualEffect(
         effect,
         blockStateChange,
@@ -165,24 +172,16 @@ export default function FgVideo({
     username,
     type,
     videoId,
+    fgVideoOptions,
     videoContainerRef,
     captions,
     controlPressed,
     shiftPressed,
-    isPlayPause,
     paused,
     videoRef,
-    isFullScreen,
-    isTheater,
     theater,
-    isPictureInPicture,
-    isVolume,
     handleMute,
-    isSkip,
-    skipIncrement,
-    isClosedCaptions,
     leaveVideoTimer,
-    controlsVanishTime,
     playbackSpeedButtonRef,
     timelineContainerRef,
     currentTimeRef,
@@ -192,94 +191,31 @@ export default function FgVideo({
     thumbnails,
     thumbnailImgRef,
     totalTimeRef,
-    isTimeLine,
-    isPreview,
-    isThumbnail,
     10,
     5,
     setEffectsActive,
     handleEffectChange
   );
 
-  const init = () => {
-    // Set videoStream as srcObject
-    if (
-      videoRef.current &&
-      isStream &&
-      ((isUser && userMedia.current[type][videoId]) || (!isUser && videoStream))
-    ) {
-      videoRef.current.srcObject = isUser ? stream : videoStream!;
-    }
-
-    // Set initial track statte
-    const volumeSliders =
-      videoContainerRef.current?.querySelectorAll(".volume-slider");
-
-    volumeSliders?.forEach((slider) => {
-      const sliderElement = slider as HTMLInputElement;
-      if (audioRef.current) {
-        sliderElement.value = audioRef.current.muted
-          ? "0"
-          : audioRef.current.volume.toString();
-      }
-    });
-    tracksColorSetter();
-
-    // Get captions and set them to hidden initially
-    if (videoRef.current && videoRef.current.textTracks[0]) {
-      captions.current = videoRef.current.textTracks[0];
-      captions.current.mode = "hidden";
-    }
-
-    // Set the initial progress position
-    if (timelineContainerRef.current) {
-      timelineContainerRef.current.style.setProperty(
-        "--progress-position",
-        `${initialProgressPosition}`
-      );
-    }
-
-    // Set the initial current time
-    if (currentTimeRef.current) {
-      currentTimeRef.current.textContent = controls.formatDuration(
-        initialProgressPosition
-      );
-    }
-
-    // Set the video current time
-    if (videoRef.current) {
-      videoRef.current.currentTime = initialProgressPosition;
-    }
-
-    videoContainerRef.current?.style.setProperty(
-      "--timeline-background-color",
-      `${timelineBackgroundColor}`
-    );
-    videoContainerRef.current?.style.setProperty(
-      "--closed-captions-decorator-color",
-      `${closedCaptionsCecoratorColor}`
-    );
-    videoContainerRef.current?.style.setProperty(
-      "--timeline-primary-background-color",
-      `${timelinePrimaryBackgroundColor}`
-    );
-    videoContainerRef.current?.style.setProperty(
-      "--timeline-secondary-background-color",
-      `${timelineSecondaryBackgroundColor}`
-    );
-    videoContainerRef.current?.style.setProperty(
-      "--primary-video-color",
-      `${primaryVideoColor}`
-    );
-    videoContainerRef.current?.style.setProperty(
-      "--flip-video",
-      `${flipVideo ? -1 : 1}`
-    );
-  };
+  const fgVideoController = new FgVideoController(
+    type,
+    videoId,
+    fgVideoOptions,
+    videoRef,
+    videoStream,
+    videoContainerRef,
+    audioRef,
+    captions,
+    controls,
+    tracksColorSetter,
+    timelineContainerRef,
+    currentTimeRef,
+    handleEffectChange
+  );
 
   useEffect(() => {
     // Set up initial conditions
-    init();
+    fgVideoController.init();
 
     document.addEventListener("fullscreenchange", () =>
       controls.handleFullScreenChange()
@@ -335,7 +271,10 @@ export default function FgVideo({
       controls.handlePictureInPicture("leave")
     );
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener(
+      "visibilitychange",
+      fgVideoController.handleVisibilityChange
+    );
 
     return () => {
       document.removeEventListener("fullscreenchange", () =>
@@ -381,95 +320,70 @@ export default function FgVideo({
       videoRef.current?.removeEventListener("leavepictureinpicture", () =>
         controls.handlePictureInPicture("leave")
       );
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener(
+        "visibilitychange",
+        fgVideoController.handleVisibilityChange
+      );
     };
   }, []);
 
   useEffect(() => {
-    const handleMessage = (event: any) => {
-      switch (event.type) {
-        case "acceptEffect":
-          onAcceptEffect(event);
-          break;
-        default:
-          break;
-      }
-    };
-
-    socket?.current.on("message", handleMessage);
+    socket?.current.on("message", fgVideoController.handleMessage);
 
     // Cleanup event listener on unmount
     return () => {
-      socket?.current.off("message", handleMessage);
+      socket?.current.off("message", fgVideoController.handleMessage);
     };
   }, []);
-
-  const handleVisibilityChange = () => {
-    if (type !== "camera") {
-      return;
-    }
-
-    if (document.hidden) {
-      console.log("wokr");
-      if (!videoContainerRef.current?.classList.contains("paused")) {
-        controls.handlePausePlay();
-      }
-    } else {
-      if (videoContainerRef.current?.classList.contains("paused")) {
-        controls.handlePausePlay();
-      }
-    }
-  };
-
-  const onAcceptEffect = (event: {
-    type: "acceptBlur";
-    effect: CameraEffectTypes | ScreenEffectTypes;
-    producerId: string;
-  }) => {
-    if (videoId === event.producerId) {
-      handleEffectChange(event.effect);
-    }
-  };
 
   return (
     <div
       ref={videoContainerRef}
       id={`${videoId}_container`}
       className={`video-container ${
-        autoPlay ? "" : "paused"
+        fgVideoOptions.autoPlay ?? defaultFgVideoOptions.autoPlay
+          ? ""
+          : "paused"
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md`}
     >
-      {((isUser && stream) || (!isUser && videoStream)) && (
+      {videoStream && (
         <>
           <video
             ref={videoRef}
             id={videoId}
             onClick={() => {
-              if (isPlayPause) {
+              if (
+                fgVideoOptions.isPlayPause ??
+                defaultFgVideoOptions.isPlayPause
+              ) {
                 controls.handlePausePlay();
               }
             }}
             className='main-video w-full z-0'
             controls={false}
-            autoPlay={autoPlay}
+            autoPlay={fgVideoOptions.autoPlay ?? defaultFgVideoOptions.autoPlay}
             style={videoStyles}
           >
-            {isClosedCaptions && (
-              <track
-                kind='captions'
-                srcLang='eng'
-                src='./subtitles.vtt'
-                default
-              ></track>
-            )}
+            {fgVideoOptions.isClosedCaptions ??
+              (defaultFgVideoOptions.isClosedCaptions && (
+                <track
+                  kind='captions'
+                  srcLang='eng'
+                  src='./subtitles.vtt'
+                  default
+                ></track>
+              ))}
           </video>
-          {isTimeLine && isThumbnail && (
-            <img ref={thumbnailImgRef} className='thumbnail-img' />
-          )}
-          {isTimeLine && (
+          {(fgVideoOptions.isTimeLine ?? defaultFgVideoOptions.isTimeLine) &&
+            (fgVideoOptions.isThumbnail ??
+              defaultFgVideoOptions.isThumbnail) && (
+              <img ref={thumbnailImgRef} className='thumbnail-img' />
+            )}
+          {(fgVideoOptions.isTimeLine ?? defaultFgVideoOptions.isTimeLine) && (
             <div ref={timelineContainerRef} className='timeline-container z-20'>
               <div className='timeline'>
-                {isPreview && (
+                {(fgVideoOptions.isPreview ??
+                  defaultFgVideoOptions.isPreview) && (
                   <img ref={previewImgRef} className='preview-img shadow-md' />
                 )}
                 <div className='thumb-indicator'></div>
@@ -479,13 +393,14 @@ export default function FgVideo({
           <FgVideoNavigation
             name={name}
             username={username}
-            isClose={isClose}
+            isClose={fgVideoOptions.isClose ?? defaultFgVideoOptions.isClose}
             controls={controls}
           />
           <FgVideoControls
             videoId={videoId}
             type={type}
             controls={controls}
+            fgVideoOptions={fgVideoOptions}
             videoContainerRef={videoContainerRef}
             audioRef={audioRef}
             videoIconStateRef={videoIconStateRef}
@@ -497,17 +412,6 @@ export default function FgVideo({
             handleEffectChange={handleEffectChange}
             handleVolumeSlider={handleVolumeSlider}
             handleMute={handleMute}
-            isEffects={isEffects}
-            isPlayPause={isPlayPause}
-            isCurrentTime={isCurrentTime}
-            isVolume={isVolume}
-            isSlider={isSlider}
-            isTotalTime={isTotalTime}
-            isPlaybackSpeed={isPlaybackSpeed}
-            isClosedCaptions={isClosedCaptions}
-            isPictureInPicture={isPictureInPicture}
-            isTheater={isTheater}
-            isFullScreen={isFullScreen}
             tintColor={tintColor}
             paths={paths}
             effectsActive={effectsActive}

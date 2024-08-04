@@ -42,12 +42,14 @@ export default function AudioEffectsSection({
   audioMixEffectsActive,
   setAudioMixEffectsActive,
   audioMixEffectsButtonRef,
+  handleMuteExternalMute,
 }: {
   type: "above" | "below";
   buttonRef: React.RefObject<HTMLButtonElement>;
   audioMixEffectsActive: boolean;
   setAudioMixEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
   audioMixEffectsButtonRef: React.RefObject<HTMLButtonElement>;
+  handleMuteExternalMute: () => void;
 }) {
   const { userMedia, userStreamEffects } = useStreamsContext();
   const [rerender, setRerender] = useState(false);
@@ -105,7 +107,7 @@ export default function AudioEffectsSection({
       <button
         className='border-white flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75'
         onClick={() => {
-          userMedia.current.audio?.changeEffects("mute", false);
+          handleMuteExternalMute();
         }}
       >
         <FgSVG

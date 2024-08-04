@@ -377,10 +377,10 @@ class Producers {
         const newAudioMedia = new AudioMedia(
           this.username.current,
           this.table_id.current,
-          this.currentEffectsStyles,
           this.userStreamEffects,
           audioBrowserMedia
         );
+        await newAudioMedia.openMic();
 
         this.userMedia.current.audio = newAudioMedia;
 
@@ -545,10 +545,10 @@ class Producers {
       const newAudioMedia = new AudioMedia(
         this.username.current,
         this.table_id.current,
-        this.currentEffectsStyles,
         this.userStreamEffects,
         audioBrowserMedia
       );
+      await newAudioMedia.openMic();
 
       this.userMedia.current.audio = newAudioMedia;
 

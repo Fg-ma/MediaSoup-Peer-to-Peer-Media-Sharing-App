@@ -16,7 +16,6 @@ export type CameraEffectTypes =
 export type ScreenEffectTypes = "pause" | "blur" | "tint";
 
 export type AudioEffectTypes =
-  | "mute"
   | "robot"
   | "echo"
   | "alien"
@@ -101,7 +100,6 @@ export function StreamsContextProvider({
     camera: {},
     screen: {},
     audio: {
-      mute: false,
       robot: false,
       echo: false,
       alien: false,

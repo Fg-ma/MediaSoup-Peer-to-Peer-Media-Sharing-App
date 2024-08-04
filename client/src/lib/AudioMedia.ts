@@ -20,7 +20,6 @@ class AudioMedia {
 
   private audioEffects: AudioEffects;
 
-  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private userStreamEffects: React.MutableRefObject<{
     camera: {
       [cameraId: string]: { [effectType in CameraEffectTypes]?: boolean };
@@ -38,7 +37,6 @@ class AudioMedia {
   constructor(
     username: string,
     table_id: string,
-    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     userStreamEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -52,14 +50,9 @@ class AudioMedia {
   ) {
     this.username = username;
     this.table_id = table_id;
-    this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
 
     this.audioStream = audioStream;
-
-    this.openMic();
-
-    this.audioEffects = new AudioEffects(audioStream);
 
     // Create an AudioContext and MediaStreamDestination
     this.audioContext = Tone.context;
@@ -69,15 +62,17 @@ class AudioMedia {
     // Connect the Tone.UserMedia instance to the MediaStreamDestination
     this.audioStream.connect(this.mediaStreamDestination);
 
-    this.effects = {};
+    this.audioEffects = new AudioEffects(this.audioStream);
 
-    if (!currentEffectsStyles.current.audio) {
-      currentEffectsStyles.current.audio = {};
-    }
+    this.effects = {};
   }
 
   async openMic() {
     await this.audioStream.open();
+
+    // Fix this it is janky way of getting mic started
+    this.audioEffects.applyReverbEffect();
+    this.audioEffects.removeEffects(["reverb"]);
   }
 
   deconstructor() {
@@ -111,7 +106,7 @@ class AudioMedia {
   applyEffect(effect: AudioEffectTypes) {
     switch (effect) {
       case "robot":
-        this.audioEffects.updateEffects([
+        this.audioEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -143,7 +138,7 @@ class AudioMedia {
         ]);
         break;
       case "echo":
-        this.audioEffects.updateEffects([
+        this.audioEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -161,7 +156,7 @@ class AudioMedia {
         ]);
         break;
       case "alien":
-        this.audioEffects.updateEffects([
+        this.audioEffects?.updateEffects([
           {
             type: "pitchShift",
             updates: [
@@ -179,7 +174,7 @@ class AudioMedia {
         ]);
         break;
       case "underwater":
-        this.audioEffects.updateEffects([
+        this.audioEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -196,7 +191,7 @@ class AudioMedia {
         ]);
         break;
       case "telephone":
-        this.audioEffects.updateEffects([
+        this.audioEffects?.updateEffects([
           {
             type: "EQ",
             updates: [
@@ -220,7 +215,7 @@ class AudioMedia {
   removeEffect(effect: AudioEffectTypes) {
     switch (effect) {
       case "robot":
-        this.audioEffects.removeEffects([
+        this.audioEffects?.removeEffects([
           "reverb",
           "distortion",
           "pitchShift",
@@ -228,16 +223,16 @@ class AudioMedia {
         ]);
         break;
       case "echo":
-        this.audioEffects.removeEffects(["reverb", "delay"]);
+        this.audioEffects?.removeEffects(["reverb", "delay"]);
         break;
       case "alien":
-        this.audioEffects.removeEffects(["pitchShift", "phaser"]);
+        this.audioEffects?.removeEffects(["pitchShift", "phaser"]);
         break;
       case "underwater":
-        this.audioEffects.removeEffects(["reverb", "EQ"]);
+        this.audioEffects?.removeEffects(["reverb", "EQ"]);
         break;
       case "telephone":
-        this.audioEffects.removeEffects(["EQ", "distortion"]);
+        this.audioEffects?.removeEffects(["EQ", "distortion"]);
         break;
     }
   }
@@ -248,11 +243,11 @@ class AudioMedia {
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
   ) {
-    this.audioEffects.updateEffects(effects);
+    this.audioEffects?.updateEffects(effects);
   }
 
   removeMixEffects(effects: AudioMixEffectsType[]) {
-    this.audioEffects.removeEffects(effects);
+    this.audioEffects?.removeEffects(effects);
   }
 
   getStream() {

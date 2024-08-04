@@ -14,11 +14,13 @@ import CaptionButton from "./lib/CaptionButton";
 import PlayPauseButton from "./lib/PlayPauseButton";
 import PlaybackSpeedButton from "./lib/PlaybackSpeedButton";
 import TheaterButton from "./lib/TheaterButton";
+import { defaultFgVideoOptions, FgVideoOptions } from "../fgVideo/FgVideo";
 
 export default function FgVideoControls({
   videoId,
   type,
   controls,
+  fgVideoOptions,
   videoContainerRef,
   audioRef,
   videoIconStateRef,
@@ -30,17 +32,6 @@ export default function FgVideoControls({
   handleEffectChange,
   handleVolumeSlider,
   handleMute,
-  isEffects,
-  isPlayPause,
-  isCurrentTime,
-  isVolume,
-  isSlider,
-  isTotalTime,
-  isPlaybackSpeed,
-  isClosedCaptions,
-  isPictureInPicture,
-  isTheater,
-  isFullScreen,
   tintColor,
   paths,
   effectsActive,
@@ -48,6 +39,7 @@ export default function FgVideoControls({
   videoId: string;
   type: "camera" | "screen";
   controls: Controls;
+  fgVideoOptions: FgVideoOptions;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   audioRef: React.RefObject<HTMLAudioElement>;
   videoIconStateRef: React.MutableRefObject<{
@@ -65,17 +57,6 @@ export default function FgVideoControls({
   ) => Promise<void>;
   handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleMute: () => void;
-  isEffects: boolean;
-  isPlayPause: boolean;
-  isCurrentTime: boolean;
-  isVolume: boolean;
-  isSlider: boolean;
-  isTotalTime: boolean;
-  isPlaybackSpeed: boolean;
-  isClosedCaptions: boolean;
-  isPictureInPicture: boolean;
-  isTheater: boolean;
-  isFullScreen: boolean;
   tintColor: React.MutableRefObject<string>;
   paths: string[][];
   effectsActive: boolean;
@@ -96,12 +77,12 @@ export default function FgVideoControls({
         </AnimatePresence>
       </div>
       <div className='video-controls w-full h-10 flex items-center space-x-2'>
-        {isPlayPause && (
+        {(fgVideoOptions.isPlayPause ?? defaultFgVideoOptions.isPlayPause) && (
           <PlayPauseButton controls={controls} effectsActive={effectsActive} />
         )}
-        {isVolume && (
+        {(fgVideoOptions.isVolume ?? defaultFgVideoOptions.isPlayPause) && (
           <VolumeSection
-            isSlider={isSlider}
+            isSlider={fgVideoOptions.isSlider ?? defaultFgVideoOptions.isSlider}
             audioRef={audioRef}
             handleVolumeSlider={handleVolumeSlider}
             handleMute={handleMute}
@@ -113,35 +94,46 @@ export default function FgVideoControls({
           />
         )}
         <div className='duration-container flex items-center gap-1 grow'>
-          {isCurrentTime && (
+          {(fgVideoOptions.isCurrentTime ??
+            defaultFgVideoOptions.isCurrentTime) && (
             <div ref={currentTimeRef} className='current-time'></div>
           )}
-          {isCurrentTime && isTotalTime && "/"}
-          {isTotalTime && <div ref={totalTimeRef} className='total-time'></div>}
+          {(fgVideoOptions.isCurrentTime ??
+            defaultFgVideoOptions.isCurrentTime) &&
+            (fgVideoOptions.isTotalTime ?? defaultFgVideoOptions.isTotalTime) &&
+            "/"}
+          {(fgVideoOptions.isTotalTime ??
+            defaultFgVideoOptions.isTotalTime) && (
+            <div ref={totalTimeRef} className='total-time'></div>
+          )}
         </div>
-        {isEffects && (
+        {(fgVideoOptions.isEffects ?? defaultFgVideoOptions.isEffects) && (
           <EffectsButton controls={controls} effectsActive={effectsActive} />
         )}
-        {isPlaybackSpeed && (
+        {(fgVideoOptions.isPlaybackSpeed ??
+          defaultFgVideoOptions.isPlaybackSpeed) && (
           <PlaybackSpeedButton
             controls={controls}
             effectsActive={effectsActive}
             playbackSpeedButtonRef={playbackSpeedButtonRef}
           />
         )}
-        {isClosedCaptions && (
+        {(fgVideoOptions.isClosedCaptions ??
+          defaultFgVideoOptions.isClosedCaptions) && (
           <CaptionButton controls={controls} effectsActive={effectsActive} />
         )}
-        {isPictureInPicture && (
+        {(fgVideoOptions.isPictureInPicture ??
+          defaultFgVideoOptions.isPictureInPicture) && (
           <PictureInPictureButton
             controls={controls}
             effectsActive={effectsActive}
           />
         )}
-        {isTheater && (
+        {(fgVideoOptions.isTheater ?? defaultFgVideoOptions.isTheater) && (
           <TheaterButton controls={controls} effectsActive={effectsActive} />
         )}
-        {isFullScreen && (
+        {(fgVideoOptions.isFullScreen ??
+          defaultFgVideoOptions.isFullScreen) && (
           <FullScreenButton controls={controls} effectsActive={effectsActive} />
         )}
       </div>

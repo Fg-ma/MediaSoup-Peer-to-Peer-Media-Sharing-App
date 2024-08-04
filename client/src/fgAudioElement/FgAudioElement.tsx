@@ -8,8 +8,8 @@ export default function FgAudioElement({
   username,
   name,
   handleMute,
-  muteLock,
-  localMuted,
+  clientMute,
+  localMute,
   isUser = false,
   springDuration = 250,
   noiseThreshold = 0.2,
@@ -28,8 +28,8 @@ export default function FgAudioElement({
   username: string;
   name?: string;
   handleMute: () => void;
-  muteLock: React.MutableRefObject<boolean>;
-  localMuted: React.MutableRefObject<boolean>;
+  clientMute: React.MutableRefObject<boolean>;
+  localMute: React.MutableRefObject<boolean>;
   isUser?: boolean;
   springDuration?: number;
   noiseThreshold?: number;
@@ -197,7 +197,7 @@ export default function FgAudioElement({
     const onClick = (event: MouseEvent) => {
       const bbox = pathRef.current?.getBBox();
       const svgPoint = svgRef.current?.createSVGPoint();
-      if (!bbox || !svgPoint || muteLock.current) return;
+      if (!bbox || !svgPoint || clientMute.current) return;
 
       svgPoint.x = event.clientX;
       svgPoint.y = event.clientY;
@@ -220,7 +220,7 @@ export default function FgAudioElement({
     const onMouseMove = (event: MouseEvent) => {
       const bbox = pathRef.current?.getBBox();
       const svgPoint = svgRef.current?.createSVGPoint();
-      if (!bbox || !svgPoint || muteLock.current) return;
+      if (!bbox || !svgPoint || clientMute.current) return;
 
       svgPoint.x = event.clientX;
       svgPoint.y = event.clientY;
@@ -370,7 +370,7 @@ export default function FgAudioElement({
     let movingYArray;
     let fixedYArray;
     if (
-      (!localMuted.current && !muteLock.current) ||
+      (!localMute.current && !clientMute.current) ||
       muteStyleOption !== "smile"
     ) {
       movingYArray = bellCurveY.current.map(
@@ -400,7 +400,7 @@ export default function FgAudioElement({
     const path = [`M0 0`];
     path.push(`Q 10 ${leftHandlePosition.y} 20 0`);
     if (
-      (!localMuted.current && !muteLock.current) ||
+      (!localMute.current && !clientMute.current) ||
       muteStyleOption !== "smile"
     ) {
       for (let i = 1; i < fixedPointsX.current.length; i++) {
@@ -825,7 +825,7 @@ export default function FgAudioElement({
             width={svgRef.current?.clientWidth}
             height={svgRef.current?.clientHeight}
             fill={
-              (localMuted.current || muteLock.current) &&
+              (localMute.current || clientMute.current) &&
               muteStyleOption === "morse"
                 ? `url(#${username}_mute_morse_gradient)`
                 : `url(#${username}_background_matrix)`
