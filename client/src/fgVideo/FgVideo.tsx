@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import "./FgVideoStyles.css";
+import "./lib/fgVideoStyles.css";
 import {
   useStreamsContext,
   CameraEffectTypes,
@@ -82,7 +82,7 @@ export default function FgVideo({
   table_id,
   socket,
   videoId,
-  fgVideoOptions = defaultFgVideoOptions,
+  options,
   handleMute,
   videoStream,
   videoStyles,
@@ -100,7 +100,7 @@ export default function FgVideo({
   table_id: string;
   socket?: React.MutableRefObject<Socket>;
   videoId: string;
-  fgVideoOptions?: FgVideoOptions;
+  options?: FgVideoOptions;
   handleMute: () => void;
   videoStream?: MediaStream;
   videoStyles?: React.CSSProperties;
@@ -119,6 +119,11 @@ export default function FgVideo({
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >;
 }) {
+  const fgVideoOptions = {
+    ...defaultFgVideoOptions,
+    ...options,
+  };
+
   const { userMedia, userStreamEffects } = useStreamsContext();
   const [effectsActive, setEffectsActive] = useState(false);
   const paused = useRef(!fgVideoOptions.autoPlay);
@@ -144,7 +149,7 @@ export default function FgVideo({
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange: boolean = false
   ) => {
-    if (fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser) {
+    if (fgVideoOptions.isUser) {
       await handleVisualEffect(
         effect,
         blockStateChange,
@@ -341,9 +346,7 @@ export default function FgVideo({
       ref={videoContainerRef}
       id={`${videoId}_container`}
       className={`video-container ${
-        fgVideoOptions.autoPlay ?? defaultFgVideoOptions.autoPlay
-          ? ""
-          : "paused"
+        fgVideoOptions.autoPlay ? "" : "paused"
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md`}
     >
       {videoStream && (
@@ -352,38 +355,31 @@ export default function FgVideo({
             ref={videoRef}
             id={videoId}
             onClick={() => {
-              if (
-                fgVideoOptions.isPlayPause ??
-                defaultFgVideoOptions.isPlayPause
-              ) {
+              if (fgVideoOptions.isPlayPause) {
                 controls.handlePausePlay();
               }
             }}
             className='main-video w-full z-0'
             controls={false}
-            autoPlay={fgVideoOptions.autoPlay ?? defaultFgVideoOptions.autoPlay}
+            autoPlay={fgVideoOptions.autoPlay}
             style={videoStyles}
           >
-            {fgVideoOptions.isClosedCaptions ??
-              (defaultFgVideoOptions.isClosedCaptions && (
-                <track
-                  kind='captions'
-                  srcLang='eng'
-                  src='./subtitles.vtt'
-                  default
-                ></track>
-              ))}
-          </video>
-          {(fgVideoOptions.isTimeLine ?? defaultFgVideoOptions.isTimeLine) &&
-            (fgVideoOptions.isThumbnail ??
-              defaultFgVideoOptions.isThumbnail) && (
-              <img ref={thumbnailImgRef} className='thumbnail-img' />
+            {fgVideoOptions.isClosedCaptions && (
+              <track
+                kind='captions'
+                srcLang='eng'
+                src='./subtitles.vtt'
+                default
+              ></track>
             )}
-          {(fgVideoOptions.isTimeLine ?? defaultFgVideoOptions.isTimeLine) && (
+          </video>
+          {fgVideoOptions.isTimeLine && fgVideoOptions.isThumbnail && (
+            <img ref={thumbnailImgRef} className='thumbnail-img' />
+          )}
+          {fgVideoOptions.isTimeLine && (
             <div ref={timelineContainerRef} className='timeline-container z-20'>
               <div className='timeline'>
-                {(fgVideoOptions.isPreview ??
-                  defaultFgVideoOptions.isPreview) && (
+                {fgVideoOptions.isPreview && (
                   <img ref={previewImgRef} className='preview-img shadow-md' />
                 )}
                 <div className='thumb-indicator'></div>
@@ -393,7 +389,7 @@ export default function FgVideo({
           <FgVideoNavigation
             name={name}
             username={username}
-            isClose={fgVideoOptions.isClose ?? defaultFgVideoOptions.isClose}
+            isClose={fgVideoOptions.isClose}
             controls={controls}
           />
           <FgVideoControls

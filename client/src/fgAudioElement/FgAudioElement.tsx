@@ -1,6 +1,48 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from "react-spring";
 import { colors } from "../fgVideo/lib/colors";
+import AudioAnalyser from "./lib/AudioAnalyzer";
+import PathGenerator from "./lib/PathGenerator";
+
+const shadowColors = {
+  black: "rgba(0, 0, 0, 0.8)",
+  red: "rgba(90, 0, 0, 0.8)",
+  green: "rgba(0, 90, 0, 0.8)",
+  blue: "rgba(0, 0, 90, 0.8)",
+  purple: "rgba(70, 8, 91, 0.8)",
+  pink: "rgba(95, 23, 71, 0.8)",
+  yellow: "rgba(96, 82, 30, 0.8)",
+  lime: "rgba(67, 96, 30, 0.8)",
+  aqua: "rgba(30, 96, 96, 0.8)",
+  FgPrimary: "rgba(96, 38, 8, 0.8)",
+  FgSecondary: "rgba(17, 57, 96, 0.8)",
+};
+
+const defaultFgAudioElementOptions: {
+  springDuration: number;
+  noiseThreshold: number;
+  numFixedPoints: number;
+  bellCurveAmplitude: number;
+  bellCurveMean: number;
+  bellCurveStdDev: number;
+  shadowColor: string;
+  volumeColor: string;
+  primaryMuteColor: string;
+  secondaryMuteColor: string;
+  muteStyleOption: "morse" | "smile";
+} = {
+  springDuration: 250,
+  noiseThreshold: 0.2,
+  numFixedPoints: 10,
+  bellCurveAmplitude: 1,
+  bellCurveMean: 0.5,
+  bellCurveStdDev: 0.4,
+  shadowColor: "black",
+  volumeColor: "FgPrimary",
+  primaryMuteColor: "FgPrimary",
+  secondaryMuteColor: "black",
+  muteStyleOption: "smile",
+};
 
 export default function FgAudioElement({
   audioStream,
@@ -11,17 +53,7 @@ export default function FgAudioElement({
   clientMute,
   localMute,
   isUser = false,
-  springDuration = 250,
-  noiseThreshold = 0.2,
-  numFixedPoints = 10,
-  bellCurveAmplitude = 1,
-  bellCurveMean = 0.5,
-  bellCurveStdDev = 0.4,
-  shadowColor = "black",
-  volumeColor = "FgPrimary",
-  primaryMuteColor = "FgPrimary",
-  secondaryMuteColor = "black",
-  muteStyleOption = "smile",
+  options,
 }: {
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
@@ -31,38 +63,31 @@ export default function FgAudioElement({
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   isUser?: boolean;
-  springDuration?: number;
-  noiseThreshold?: number;
-  numFixedPoints?: number;
-  bellCurveAmplitude?: number;
-  bellCurveMean?: number;
-  bellCurveStdDev?: number;
-  shadowColor?: string;
-  volumeColor?: string;
-  primaryMuteColor?: string;
-  secondaryMuteColor?: string;
-  muteStyleOption?: "morse" | "smile";
-}) {
-  const shadowColors = {
-    black: "rgba(0, 0, 0, 0.8)",
-    red: "rgba(90, 0, 0, 0.8)",
-    green: "rgba(0, 90, 0, 0.8)",
-    blue: "rgba(0, 0, 90, 0.8)",
-    purple: "rgba(70, 8, 91, 0.8)",
-    pink: "rgba(95, 23, 71, 0.8)",
-    yellow: "rgba(96, 82, 30, 0.8)",
-    lime: "rgba(67, 96, 30, 0.8)",
-    aqua: "rgba(30, 96, 96, 0.8)",
-    FgPrimary: "rgba(96, 38, 8, 0.8)",
-    FgSecondary: "rgba(17, 57, 96, 0.8)",
+  options?: {
+    springDuration?: number;
+    noiseThreshold?: number;
+    numFixedPoints?: number;
+    bellCurveAmplitude?: number;
+    bellCurveMean?: number;
+    bellCurveStdDev?: number;
+    shadowColor?: string;
+    volumeColor?: string;
+    primaryMuteColor?: string;
+    secondaryMuteColor?: string;
+    muteStyleOption?: "morse" | "smile";
   };
+}) {
+  const fgAudioElementOptions = {
+    ...defaultFgAudioElementOptions,
+    ...options,
+  };
+
   const [movingY, setMovingY] = useState<number[]>(
-    Array(numFixedPoints - 1).fill(0)
+    Array(fgAudioElementOptions.numFixedPoints - 1).fill(0)
   );
   const [fixedY, setFixedY] = useState<number[]>(
-    Array(numFixedPoints - 1).fill(0)
+    Array(fgAudioElementOptions.numFixedPoints - 1).fill(0)
   );
-  const [isDragging, setIsDragging] = useState(false);
   const [leftHandlePosition, setLeftHandlePosition] = useState({ x: 10, y: 0 });
   const [rightHandlePosition, setRightHandlePosition] = useState({
     x: 190,
@@ -82,74 +107,46 @@ export default function FgAudioElement({
   const rightHandleRef = useRef<SVGRectElement>(null);
   const sideDragging = useRef<"left" | "right" | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioAnalyzer = useRef<AudioAnalyser | undefined>();
+  const pathGenerator = useRef<PathGenerator | undefined>();
   const patternWidth = 0.18;
   const patternHeight = 0.2;
 
   const springs = useSpring<{ [key: string]: any }>({
     ...Object.fromEntries(movingY.map((y, index) => [`y${index + 1}`, y])),
     ...Object.fromEntries(fixedY.map((y, index) => [`fixed_y${index + 1}`, y])),
-    config: { duration: springDuration },
+    config: { duration: fgAudioElementOptions.springDuration },
   });
 
   const init = () => {
+    if (!pathGenerator.current) {
+      return;
+    }
+
     // X points
     const totalWidth = 200;
     const startOffset = 20;
     const endOffset = 20;
     const usableWidth = totalWidth - startOffset - endOffset;
-    const step = usableWidth / (numFixedPoints - 1);
+    const step = usableWidth / (fgAudioElementOptions.numFixedPoints - 1);
 
     fixedPointsX.current = Array.from(
-      { length: numFixedPoints },
+      { length: fgAudioElementOptions.numFixedPoints },
       (_, i) => startOffset + i * step
     );
 
-    // Bell curve
-    const generateBellCurve = (
-      numPoints: number,
-      amplitude: number,
-      mean: number,
-      stdDev: number
-    ) => {
-      const yCoordinates = [];
-      const step = 1 / (numPoints - 1);
+    sineCurveY.current = pathGenerator.current.generateSineWave(
+      fgAudioElementOptions.numFixedPoints * 2 - 3,
+      1,
+      1,
+      0
+    );
 
-      for (let i = 0; i < numPoints; i++) {
-        const x = i * step;
-        const exponent = -Math.pow((x - mean) / stdDev, 2) / 2;
-        const y = amplitude * Math.exp(exponent);
-        yCoordinates.push(y);
-      }
-
-      return yCoordinates;
-    };
-
-    // Sine curve
-    const generateSineWave = (
-      numPoints: number,
-      amplitude: number,
-      frequency: number,
-      phase: number
-    ) => {
-      const yCoordinates = [];
-      const step = Math.PI / (numPoints - 1);
-
-      for (let i = 0; i < numPoints; i++) {
-        const x = i * step;
-        const y = amplitude * Math.sin(frequency * x + phase);
-        yCoordinates.push(y);
-      }
-
-      return yCoordinates;
-    };
-
-    sineCurveY.current = generateSineWave(numFixedPoints * 2 - 3, 1, 1, 0);
-
-    bellCurveY.current = generateBellCurve(
-      numFixedPoints - 1,
-      bellCurveAmplitude,
-      bellCurveMean,
-      bellCurveStdDev
+    bellCurveY.current = pathGenerator.current.generateBellCurve(
+      fgAudioElementOptions.numFixedPoints - 1,
+      fgAudioElementOptions.bellCurveAmplitude,
+      fgAudioElementOptions.bellCurveMean,
+      fgAudioElementOptions.bellCurveStdDev
     );
   };
 
@@ -162,206 +159,141 @@ export default function FgAudioElement({
     }
   };
 
-  useEffect(() => {
-    const startDrag = (event: MouseEvent, side: "left" | "right") => {
-      event.preventDefault();
-      setIsDragging(true);
-      sideDragging.current = side;
-    };
-
-    const drag = (event: MouseEvent) => {
-      if (!isDragging || !svgRef.current || !sideDragging.current) return;
-
-      const svgPoint = svgRef.current.createSVGPoint();
-      svgPoint.x = event.clientX;
-      svgPoint.y = event.clientY;
-      const cursorPoint = svgPoint.matrixTransform(
-        svgRef.current.getScreenCTM()?.inverse()
-      );
-      const newY = Math.max(-220, Math.min(220, cursorPoint.y));
-      if (sideDragging.current === "left") {
-        setLeftHandlePosition((prevState) => ({ ...prevState, y: newY }));
-      } else if (sideDragging.current === "right") {
-        setRightHandlePosition((prevState) => ({ ...prevState, y: newY }));
-      }
-      handleVolumeSlider(Math.abs(newY / 220));
-    };
-
-    const stopDrag = () => {
-      setIsDragging(false);
-      setLeftHandlePosition((prevState) => ({ ...prevState, y: 0 }));
-      setRightHandlePosition((prevState) => ({ ...prevState, y: 0 }));
-      sideDragging.current = null;
-    };
-
-    const onClick = (event: MouseEvent) => {
-      const bbox = pathRef.current?.getBBox();
-      const svgPoint = svgRef.current?.createSVGPoint();
-      if (!bbox || !svgPoint || clientMute.current) return;
-
-      svgPoint.x = event.clientX;
-      svgPoint.y = event.clientY;
-
-      // Convert client coordinates to SVG coordinates
-      const svgPointTransformed = svgPoint.matrixTransform(
-        svgRef.current?.getScreenCTM()?.inverse()
-      );
-
-      if (
-        svgPointTransformed.x >= bbox.x &&
-        svgPointTransformed.x <= bbox.x + bbox.width &&
-        svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
-        svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
-      ) {
-        handleMute();
-      }
-    };
-
-    const onMouseMove = (event: MouseEvent) => {
-      const bbox = pathRef.current?.getBBox();
-      const svgPoint = svgRef.current?.createSVGPoint();
-      if (!bbox || !svgPoint || clientMute.current) return;
-
-      svgPoint.x = event.clientX;
-      svgPoint.y = event.clientY;
-
-      // Convert client coordinates to SVG coordinates
-      const svgPointTransformed = svgPoint.matrixTransform(
-        svgRef.current?.getScreenCTM()?.inverse()
-      );
-
-      if (
-        svgPointTransformed.x >= bbox.x &&
-        svgPointTransformed.x <= bbox.x + bbox.width &&
-        svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
-        svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
-      ) {
-        setMousePosition({
-          x: event.clientX,
-          y: event.clientY - 192,
-        });
-
-        if (!svgRef.current?.classList.contains("cursor-pointer")) {
-          svgRef.current?.classList.add("cursor-pointer");
-        }
-
-        if (!timerRef.current) {
-          timerRef.current = setTimeout(() => {
-            setPopupVisible(true);
-          }, 2500);
-        }
-      } else {
-        if (svgRef.current?.classList.contains("cursor-pointer")) {
-          svgRef.current?.classList.remove("cursor-pointer");
-        }
-
-        if (timerRef.current) {
-          setPopupVisible(false);
-          clearTimeout(timerRef.current);
-          timerRef.current = null;
-        }
-      }
-    };
-
-    init();
-
-    svgRef.current?.addEventListener("click", (event) => onClick(event));
-    document?.addEventListener("mousemove", (event) => onMouseMove(event));
+  const startDrag = (event: React.MouseEvent, side: "left" | "right") => {
+    event.preventDefault();
 
     if (!isUser) {
-      leftHandleRef.current?.addEventListener("mousedown", (event) =>
-        startDrag(event, "left")
-      );
-      rightHandleRef.current?.addEventListener("mousedown", (event) =>
-        startDrag(event, "right")
-      );
       window.addEventListener("mousemove", drag);
       window.addEventListener("mouseup", stopDrag);
     }
 
-    return () => {
-      svgRef.current?.removeEventListener("click", (event) => onClick(event));
-      document.removeEventListener("mousemove", (event) => onMouseMove(event));
+    sideDragging.current = side;
+  };
 
-      if (!isUser) {
-        leftHandleRef.current?.addEventListener("mousedown", (event) =>
-          startDrag(event, "left")
-        );
-        rightHandleRef.current?.addEventListener("mousedown", (event) =>
-          startDrag(event, "right")
-        );
-        window.removeEventListener("mousemove", drag);
-        window.removeEventListener("mouseup", stopDrag);
+  const drag = (event: MouseEvent) => {
+    if (!svgRef.current || !sideDragging.current) return;
+
+    const svgPoint = svgRef.current.createSVGPoint();
+    svgPoint.x = event.clientX;
+    svgPoint.y = event.clientY;
+    const cursorPoint = svgPoint.matrixTransform(
+      svgRef.current.getScreenCTM()?.inverse()
+    );
+    const newY = Math.max(-220, Math.min(220, cursorPoint.y));
+    if (sideDragging.current === "left") {
+      setLeftHandlePosition((prevState) => ({ ...prevState, y: newY }));
+    } else if (sideDragging.current === "right") {
+      setRightHandlePosition((prevState) => ({ ...prevState, y: newY }));
+    }
+    handleVolumeSlider(Math.abs(newY / 220));
+  };
+
+  const stopDrag = (event: MouseEvent) => {
+    event.stopPropagation();
+
+    if (!isUser) {
+      window.removeEventListener("mousemove", drag);
+      window.removeEventListener("mouseup", stopDrag);
+    }
+
+    setLeftHandlePosition((prevState) => ({ ...prevState, y: 0 }));
+    setRightHandlePosition((prevState) => ({ ...prevState, y: 0 }));
+    sideDragging.current = null;
+  };
+
+  const onClick = (event: React.MouseEvent) => {
+    const bbox = pathRef.current?.getBBox();
+    const svgPoint = svgRef.current?.createSVGPoint();
+    if (!bbox || !svgPoint || clientMute.current) return;
+
+    svgPoint.x = event.clientX;
+    svgPoint.y = event.clientY;
+
+    // Convert client coordinates to SVG coordinates
+    const svgPointTransformed = svgPoint.matrixTransform(
+      svgRef.current?.getScreenCTM()?.inverse()
+    );
+
+    if (
+      svgPointTransformed.x >= bbox.x &&
+      svgPointTransformed.x <= bbox.x + bbox.width &&
+      svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
+      svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
+    ) {
+      handleMute();
+    }
+  };
+
+  const onMouseMove = (event: MouseEvent) => {
+    const bbox = pathRef.current?.getBBox();
+    const svgPoint = svgRef.current?.createSVGPoint();
+    if (!bbox || !svgPoint || clientMute.current) return;
+
+    svgPoint.x = event.clientX;
+    svgPoint.y = event.clientY;
+
+    // Convert client coordinates to SVG coordinates
+    const svgPointTransformed = svgPoint.matrixTransform(
+      svgRef.current?.getScreenCTM()?.inverse()
+    );
+
+    if (
+      svgPointTransformed.x >= bbox.x &&
+      svgPointTransformed.x <= bbox.x + bbox.width &&
+      svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
+      svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
+    ) {
+      setMousePosition({
+        x: event.clientX + 12,
+        y: event.clientY - 240,
+      });
+
+      if (!svgRef.current?.classList.contains("cursor-pointer")) {
+        svgRef.current?.classList.add("cursor-pointer");
       }
+
+      if (!timerRef.current) {
+        timerRef.current = setTimeout(() => {
+          setPopupVisible(true);
+        }, 2500);
+      }
+    } else {
+      if (svgRef.current?.classList.contains("cursor-pointer")) {
+        svgRef.current?.classList.remove("cursor-pointer");
+      }
+
+      if (timerRef.current) {
+        setPopupVisible(false);
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  };
+
+  useEffect(() => {
+    pathGenerator.current = new PathGenerator();
+
+    init();
+
+    window.addEventListener("mousemove", onMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
     };
-  }, [isDragging, svgRef, leftHandleRef, rightHandleRef]);
+  }, []);
 
   // Audio analyser
   useEffect(() => {
-    let audioContext: AudioContext | null = null;
-    let analyser: AnalyserNode | null = null;
+    audioAnalyzer.current = new AudioAnalyser(
+      audioStream,
+      fgAudioElementOptions.noiseThreshold
+    );
 
-    const initAudio = async () => {
-      try {
-        const stream = audioStream;
-
-        if (!stream) {
-          return;
-        }
-
-        // Create audio context
-        audioContext = new AudioContext();
-
-        // Create analyser node
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-
-        // Connect the audio stream to the analyser node
-        const source = audioContext.createMediaStreamSource(stream);
-        source.connect(analyser);
-
-        // Function to update audio levels
-        const updateAudioLevels = () => {
-          if (!analyser) return;
-
-          // Create a buffer for frequency data
-          const bufferLength = analyser.frequencyBinCount;
-          const dataArray = new Uint8Array(bufferLength);
-
-          // Get frequency data
-          analyser.getByteFrequencyData(dataArray);
-
-          // Get the maximum value in the frequency data array
-          const sum = dataArray.reduce((acc, value) => acc + value, 0);
-          const meanVolume = sum / dataArray.length;
-
-          // Do something with the current volume
-          const normalizedVolume = meanVolume / 100;
-
-          updateMovingY(
-            normalizedVolume < noiseThreshold
-              ? 0
-              : Math.min(normalizedVolume, 1)
-          );
-
-          // Call this function again on the next animation frame
-          requestAnimationFrame(updateAudioLevels);
-        };
-
-        // Start updating audio levels
-        updateAudioLevels();
-      } catch (err) {
-        console.error("Error accessing audio stream:", err);
-      }
-    };
-
-    initAudio();
+    audioAnalyzer.current.initAudio(updateMovingY);
 
     // Cleanup on unmount
     return () => {
-      if (audioContext) {
-        audioContext.close();
-      }
+      audioAnalyzer.current?.destructor();
     };
   }, [audioStream]);
 
@@ -371,13 +303,13 @@ export default function FgAudioElement({
     let fixedYArray;
     if (
       (!localMute.current && !clientMute.current) ||
-      muteStyleOption !== "smile"
+      fgAudioElementOptions.muteStyleOption !== "smile"
     ) {
       movingYArray = bellCurveY.current.map(
         (value, index) => value * volumeLevel * 200 * (-1) ** index
       );
-      fixedYArray = Array(numFixedPoints - 1).fill(0);
-    } else if (muteStyleOption === "smile") {
+      fixedYArray = Array(fgAudioElementOptions.numFixedPoints - 1).fill(0);
+    } else if (fgAudioElementOptions.muteStyleOption === "smile") {
       movingYArray = sineCurveY.current
         .filter((_, index) => index % 2 === 0)
         .map((value, index) => value * 20);
@@ -395,47 +327,40 @@ export default function FgAudioElement({
     }
   };
 
-  // Generate the path data using the fixed and moving points
-  const generatePathData = (ySprings: number[]) => {
-    const path = [`M0 0`];
-    path.push(`Q 10 ${leftHandlePosition.y} 20 0`);
-    if (
-      (!localMute.current && !clientMute.current) ||
-      muteStyleOption !== "smile"
-    ) {
-      for (let i = 1; i < fixedPointsX.current.length; i++) {
-        const xMid =
-          fixedPointsX.current[i - 1] +
-          (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
-        path.push(`Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} 0`);
-      }
-    } else if (muteStyleOption === "smile") {
-      for (let i = 1; i < fixedPointsX.current.length; i++) {
-        const xMid =
-          fixedPointsX.current[i - 1] +
-          (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
-        path.push(
-          `Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} ${
-            ySprings[fixedPointsX.current.length + i - 2]
-          }`
-        );
-      }
-    }
-    path.push(`Q 190 ${rightHandlePosition.y} 200 0`);
-
-    return path.join(" ");
-  };
-
   const ySpringsArray = Object.values(springs).map((spring: any) =>
     spring.get()
   );
-  const animatedPathData = springs.y1.to(() => generatePathData(ySpringsArray));
+  const animatedPathData = springs.y1.to(
+    () =>
+      pathGenerator.current?.generatePathData(
+        ySpringsArray,
+        fgAudioElementOptions.muteStyleOption,
+        fixedPointsX,
+        localMute,
+        clientMute,
+        leftHandlePosition,
+        rightHandlePosition
+      ) ?? ""
+  );
 
   return (
-    <div className='w-60 aspect-square'>
+    <div className='w-60 aspect-square relative'>
+      {popupVisible && (
+        <div
+          className='w-max h-max absolute shadow-lg px-4 py-2 z-[1000] rounded-md text-lg font-Josefin'
+          style={
+            mousePosition.x && mousePosition.y
+              ? { left: mousePosition.x, top: mousePosition.y }
+              : {}
+          }
+        >
+          {name ? name : username}
+        </div>
+      )}
       <svg
         ref={svgRef}
-        className='z-50 w-full aspect-square'
+        onClick={onClick}
+        className='z-10 w-full aspect-square'
         viewBox='0 -150 200 300'
       >
         <defs>
@@ -445,7 +370,9 @@ export default function FgAudioElement({
 
             <feFlood
               floodColor={
-                shadowColors[shadowColor as keyof typeof shadowColors]
+                shadowColors[
+                  fgAudioElementOptions.shadowColor as keyof typeof shadowColors
+                ]
               }
               result='colorBlur'
             />
@@ -485,113 +412,217 @@ export default function FgAudioElement({
           >
             <stop
               offset='0%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='10.61%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='11.61%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='14.31%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='15.31%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='25.42%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
 
             <stop
               offset='26.42%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='36.53%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
 
             <stop
               offset='37.53%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='40.23%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='41.23%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='43.93%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='44.93%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='47.63%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='48.63%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='51.33%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='52.33%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='62.44%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
 
             <stop
               offset='63.44%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='73.55%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
 
             <stop
               offset='74.55%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='84.66%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
 
             <stop
               offset='85.66%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='95.77%'
-              stopColor={colors[secondaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                ]
+              }
             />
 
             <stop
               offset='96.77%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
             <stop
               offset='100%'
-              stopColor={colors[primaryMuteColor as keyof typeof colors]}
+              stopColor={
+                colors[
+                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                ]
+              }
             />
           </linearGradient>
 
@@ -604,7 +635,9 @@ export default function FgAudioElement({
           >
             <stop
               offset='45%'
-              stopColor={colors[volumeColor as keyof typeof colors]}
+              stopColor={
+                colors[fgAudioElementOptions.volumeColor as keyof typeof colors]
+              }
             />
             <stop offset='95%' stopColor='black' />
           </linearGradient>
@@ -619,7 +652,9 @@ export default function FgAudioElement({
             <stop offset='5%' stopColor='black' />
             <stop
               offset='55%'
-              stopColor={colors[volumeColor as keyof typeof colors]}
+              stopColor={
+                colors[fgAudioElementOptions.volumeColor as keyof typeof colors]
+              }
             />
           </linearGradient>
 
@@ -826,7 +861,7 @@ export default function FgAudioElement({
             height={svgRef.current?.clientHeight}
             fill={
               (localMute.current || clientMute.current) &&
-              muteStyleOption === "morse"
+              fgAudioElementOptions.muteStyleOption === "morse"
                 ? `url(#${username}_mute_morse_gradient)`
                 : `url(#${username}_background_matrix)`
             }
@@ -836,6 +871,9 @@ export default function FgAudioElement({
         {!isUser && (
           <animated.rect
             ref={leftHandleRef}
+            onMouseDown={(event) => {
+              if (!isUser) startDrag(event, "left");
+            }}
             x={-5.5}
             y={-5.5}
             width={31}
@@ -849,6 +887,9 @@ export default function FgAudioElement({
         {!isUser && (
           <animated.rect
             ref={rightHandleRef}
+            onMouseDown={(event) => {
+              if (!isUser) startDrag(event, "right");
+            }}
             x={174.5}
             y={-5.5}
             width={31}
@@ -860,14 +901,6 @@ export default function FgAudioElement({
           />
         )}
       </svg>
-      {popupVisible && (
-        <div
-          className='w-max h-max absolute shadow-lg px-4 py-2 z-50 rounded-md text-lg font-Josefin'
-          style={{ left: mousePosition.x, top: mousePosition.y }}
-        >
-          {name ? name : username}
-        </div>
-      )}
     </div>
   );
 }

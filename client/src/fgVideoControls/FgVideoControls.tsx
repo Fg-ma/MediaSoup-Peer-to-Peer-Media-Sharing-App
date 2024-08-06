@@ -6,7 +6,7 @@ import {
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import VisualEffectsSection from "../visualEffectsSection/VisualEffectsSection";
-import VolumeSection from "./lib/VolumeSection";
+import FgVolumeElement from "../FgVolumeElement/FgVolumeElement";
 import FullScreenButton from "./lib/FullScreenButton";
 import PictureInPictureButton from "./lib/PictureInPictureButton";
 import EffectsButton from "./lib/EffectsButton";
@@ -81,16 +81,19 @@ export default function FgVideoControls({
           <PlayPauseButton controls={controls} effectsActive={effectsActive} />
         )}
         {(fgVideoOptions.isVolume ?? defaultFgVideoOptions.isPlayPause) && (
-          <VolumeSection
-            isSlider={fgVideoOptions.isSlider ?? defaultFgVideoOptions.isSlider}
+          <FgVolumeElement
             audioRef={audioRef}
-            handleVolumeSlider={handleVolumeSlider}
+            handleVolumeSliderCallback={handleVolumeSlider}
             handleMute={handleMute}
             paths={paths}
             videoIconStateRef={videoIconStateRef}
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
             effectsActive={effectsActive}
+            options={{
+              isSlider:
+                fgVideoOptions.isSlider ?? defaultFgVideoOptions.isSlider,
+            }}
           />
         )}
         <div className='duration-container flex items-center gap-1 grow'>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import "./lib/fgVolumeElement.css";
 import {
   volumeHigh1a,
   volumeHigh1b,
@@ -18,35 +19,35 @@ import {
   volumeLow2b,
   volumeLow3a,
   volumeLow3b,
-} from "../../fgVideo/lib/svgPaths";
-import FgButton from "../../fgButton/FgButton";
-import SVGMorpher from "../../SVGMorpher/SVGMorpher";
+} from "../fgVideo/lib/svgPaths";
+import FgButton from "../fgButton/FgButton";
+import SVGMorpher from "../SVGMorpher/SVGMorpher";
 
-export default function VolumeSection({
+const defaultFgVolumeElementOptions = {
+  iconSize: "2.5rem",
+  volumeSliderHeight: "0.25rem",
+  volumeSliderWidth: "5rem",
+  volumeSliderThumbSize: "0.9375rem",
+  primaryColor: "white",
+  isSlider: true,
+};
+
+export default function FgVolumeElement({
   audioRef,
-  handleVolumeSlider = () => {},
-  iconSize = "2.5rem",
-  volumeSliderHeight = "0.25rem",
-  volumeSliderWidth = "5rem",
-  volumeSliderThumbSize = "0.9375rem",
+  handleVolumeSliderCallback,
   handleMute,
-  primaryColor = "white",
-  isSlider = true,
   paths,
   videoIconStateRef,
   isFinishedRef,
   changedWhileNotFinishedRef,
   effectsActive,
+  options,
 }: {
   audioRef: React.RefObject<HTMLAudioElement>;
-  handleVolumeSlider?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleVolumeSliderCallback: (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => void;
   handleMute: () => void;
-  iconSize?: string;
-  volumeSliderHeight?: string;
-  volumeSliderWidth?: string;
-  volumeSliderThumbSize?: string;
-  primaryColor?: string;
-  isSlider?: boolean;
   paths: string[][];
   videoIconStateRef: React.MutableRefObject<{
     from: string;
@@ -55,30 +56,53 @@ export default function VolumeSection({
   isFinishedRef: React.MutableRefObject<boolean>;
   changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   effectsActive: boolean;
+  options?: {
+    iconSize?: string;
+    volumeSliderHeight?: string;
+    volumeSliderWidth?: string;
+    volumeSliderThumbSize?: string;
+    primaryColor?: string;
+    isSlider?: boolean;
+  };
 }) {
+  const fgVolumeElementOptions = {
+    ...defaultFgVolumeElementOptions,
+    ...options,
+  };
   const [active, setActive] = useState(false);
   const volumeContainer = useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     volumeContainer.current?.style.setProperty(
       "--volume-slider-width",
-      volumeSliderWidth
+      fgVolumeElementOptions.volumeSliderWidth
     );
     volumeContainer.current?.style.setProperty(
       "--volume-slider-height",
-      volumeSliderHeight
+      fgVolumeElementOptions.volumeSliderHeight
     );
     volumeContainer.current?.style.setProperty(
       "--volume-slider-thumb-size",
-      volumeSliderThumbSize
+      fgVolumeElementOptions.volumeSliderThumbSize
     );
-  }, [volumeSliderWidth, volumeSliderHeight, volumeSliderThumbSize]);
+  }, [
+    fgVolumeElementOptions.volumeSliderWidth,
+    fgVolumeElementOptions.volumeSliderHeight,
+    fgVolumeElementOptions.volumeSliderThumbSize,
+  ]);
+
+  const handleVolumeSlider = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (handleVolumeSliderCallback) {
+      handleVolumeSliderCallback(event);
+    }
+  };
 
   return (
     <div
       ref={volumeContainer}
       className='volume-container flex items-center justify-center'
-      style={{ height: `calc(${iconSize} * 2)` }}
+      style={{ height: `calc(${fgVolumeElementOptions.iconSize} * 2)` }}
     >
       <FgButton
         clickFunction={() => {
@@ -89,10 +113,10 @@ export default function VolumeSection({
           return (
             <svg
               xmlns='http://www.w3.org/2000/svg'
-              width={`calc(${iconSize} - 0.25rem)`}
-              height={`calc(${iconSize} - 0.25rem)`}
+              width={`calc(${fgVolumeElementOptions.iconSize} - 0.25rem)`}
+              height={`calc(${fgVolumeElementOptions.iconSize} - 0.25rem)`}
               viewBox='250 250 500 580'
-              fill={primaryColor}
+              fill={fgVolumeElementOptions.primaryColor}
             >
               {videoIconStateRef.current.from &&
               videoIconStateRef.current.to ? (
@@ -101,7 +125,7 @@ export default function VolumeSection({
                   audioRef={audioRef}
                   isFinishedRef={isFinishedRef}
                   changedWhileNotFinishedRef={changedWhileNotFinishedRef}
-                  color={primaryColor}
+                  color={fgVolumeElementOptions.primaryColor}
                 />
               ) : videoIconStateRef.current.from === "" &&
                 videoIconStateRef.current.to === "high" ? (
@@ -145,10 +169,11 @@ export default function VolumeSection({
           ) : undefined
         }
         className='aspect-square flex items-center justify-center relative'
-        style={{ width: iconSize }}
+        style={{ width: fgVolumeElementOptions.iconSize }}
       />
-      {isSlider && (
+      {fgVolumeElementOptions.isSlider && (
         <input
+          ref={sliderRef}
           onInput={handleVolumeSlider}
           className='volume-slider'
           type='range'

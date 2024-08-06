@@ -76,6 +76,20 @@ export default function VisualEffectsSection({
     return () => window.removeEventListener("resize", updateWidth);
   }, [videoContainerRef]);
 
+  useEffect(() => {
+    const handleWheel = (event: WheelEvent) => {
+      if (effectsContainerRef.current) {
+        effectsContainerRef.current.scrollLeft += event.deltaY;
+      }
+    };
+
+    effectsContainerRef.current?.addEventListener("wheel", handleWheel);
+
+    return () => {
+      effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
   return (
     <motion.div
       ref={effectsContainerRef}

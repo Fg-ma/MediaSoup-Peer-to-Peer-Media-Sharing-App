@@ -1,13 +1,8 @@
-import { Socket } from "socket.io-client";
 import {
-  AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../context/StreamsContext";
 import { defaultFgVideoOptions, FgVideoOptions } from "../FgVideo";
-import AudioMedia from "../../lib/AudioMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
-import CameraMedia from "../../lib/CameraMedia";
 import Controls from "src/fgVideoControls/lib/Controls";
 
 class FgVideoController {

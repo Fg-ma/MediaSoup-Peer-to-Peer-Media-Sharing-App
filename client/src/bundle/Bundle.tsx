@@ -111,7 +111,7 @@ export default function Bundle({
   // Initial functions & call onRendered call back if one is availiable
   useEffect(() => {
     // Set initial volume slider
-    bundleController.tracksColorSetter();
+    tracksColorSetter();
 
     if (onRendered) {
       onRendered();
@@ -134,18 +134,246 @@ export default function Bundle({
       audioRef.current.srcObject = audioStream;
     }
 
-    audioRef.current?.addEventListener(
-      "volumechange",
-      bundleController.volumeChangeHandler
-    );
+    audioRef.current?.addEventListener("volumechange", volumeChangeHandler);
 
     return () => {
       audioRef.current?.removeEventListener(
         "volumechange",
-        bundleController.volumeChangeHandler
+        volumeChangeHandler
       );
     };
   }, [audioRef, audioStream]);
+
+  const handleMute = () => {
+    if (muteButtonCallback !== undefined) {
+      muteButtonCallback();
+    }
+
+    if (clientMute.current) {
+      return;
+    }
+
+    localMute.current = !localMute.current;
+
+    if (audioRef.current && !isUser) {
+      audioRef.current.muted = localMute.current;
+    }
+
+    if (localMute.current) {
+      if (!isFinishedRef.current) {
+        if (!changedWhileNotFinishedRef.current) {
+          changedWhileNotFinishedRef.current = true;
+        }
+        return;
+      }
+
+      videoIconStateRef.current = {
+        from: videoIconStateRef.current.to,
+        to: "off",
+      };
+
+      const newPaths = bundleController.getPaths(
+        videoIconStateRef.current.from,
+        "off"
+      );
+      if (newPaths[0]) {
+        setPaths(newPaths);
+      }
+    } else {
+      if (!audioRef.current) {
+        return;
+      }
+
+      const newVolume = audioRef.current.volume;
+      let newVolumeState;
+      if (newVolume === 0) {
+        newVolumeState = "off";
+      } else if (newVolume >= 0.5) {
+        newVolumeState = "high";
+      } else {
+        newVolumeState = "low";
+      }
+
+      if (
+        !isFinishedRef.current &&
+        videoIconStateRef.current.to !== newVolumeState
+      ) {
+        if (!changedWhileNotFinishedRef.current) {
+          changedWhileNotFinishedRef.current = true;
+        }
+        return;
+      }
+
+      videoIconStateRef.current = {
+        from: videoIconStateRef.current.to,
+        to: newVolumeState,
+      };
+
+      const newPaths = bundleController.getPaths(
+        videoIconStateRef.current.from,
+        newVolumeState
+      );
+      if (newPaths[0]) {
+        setPaths(newPaths);
+      }
+    }
+  };
+
+  const volumeChangeHandler = () => {
+    if (!bundleRef.current) {
+      return;
+    }
+
+    const volumeSliders = bundleRef.current.querySelectorAll(".volume-slider");
+
+    volumeSliders.forEach((slider) => {
+      const sliderElement = slider as HTMLInputElement;
+      if (audioRef.current) {
+        sliderElement.value = audioRef.current.muted
+          ? "0"
+          : audioRef.current.volume.toString();
+      }
+    });
+    tracksColorSetter();
+
+    if (!audioRef.current || clientMute.current) {
+      return;
+    }
+
+    const newVolume = audioRef.current.volume;
+    let newVolumeState;
+    if (audioRef.current.muted || newVolume === 0) {
+      newVolumeState = "off";
+    } else if (audioRef.current.volume >= 0.5) {
+      newVolumeState = "high";
+    } else {
+      newVolumeState = "low";
+    }
+
+    if (
+      !isFinishedRef.current &&
+      videoIconStateRef.current.to !== newVolumeState
+    ) {
+      if (!changedWhileNotFinishedRef.current) {
+        changedWhileNotFinishedRef.current = true;
+      }
+      return;
+    }
+
+    if (videoIconStateRef.current.to !== newVolumeState) {
+      const { from, to } = videoIconStateRef.current;
+      videoIconStateRef.current = { from: to, to: newVolumeState };
+
+      if (newVolumeState === "off") {
+        audioRef.current.muted = true;
+
+        if (!isFinishedRef.current) {
+          if (!changedWhileNotFinishedRef.current) {
+            changedWhileNotFinishedRef.current = true;
+          }
+          return;
+        }
+
+        videoIconStateRef.current = {
+          from: videoIconStateRef.current.to,
+          to: "off",
+        };
+
+        const newPaths = bundleController.getPaths(
+          videoIconStateRef.current.from,
+          "off"
+        );
+        if (newPaths[0]) {
+          setPaths(newPaths);
+        }
+      } else {
+        audioRef.current.muted = false;
+
+        const newVolume = audioRef.current.volume;
+        let newVolumeState;
+        if (newVolume === 0) {
+          newVolumeState = "off";
+        } else if (newVolume >= 0.5) {
+          newVolumeState = "high";
+        } else {
+          newVolumeState = "low";
+        }
+
+        if (
+          !isFinishedRef.current &&
+          videoIconStateRef.current.to !== newVolumeState
+        ) {
+          if (!changedWhileNotFinishedRef.current) {
+            changedWhileNotFinishedRef.current = true;
+          }
+          return;
+        }
+
+        videoIconStateRef.current = {
+          from: videoIconStateRef.current.to,
+          to: newVolumeState,
+        };
+
+        const newPaths = bundleController.getPaths(
+          videoIconStateRef.current.from,
+          newVolumeState
+        );
+        if (newPaths[0]) {
+          setPaths(newPaths);
+        }
+      }
+
+      const newPaths = bundleController.getPaths(to, newVolumeState);
+      if (newPaths[0]) {
+        setPaths(newPaths);
+      }
+    }
+  };
+
+  const tracksColorSetter = () => {
+    if (!bundleRef.current || !audioRef.current) {
+      return;
+    }
+
+    const volumeSliders = bundleRef.current.querySelectorAll(".volume-slider");
+
+    let value = audioRef.current.volume;
+    if (audioRef.current.muted) {
+      value = 0;
+    }
+    const min = 0;
+    const max = 1;
+    const percentage = ((value - min) / (max - min)) * 100;
+    const trackColor = `linear-gradient(to right, ${primaryVolumeSliderColor} 0%, ${primaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} 100%)`;
+
+    volumeSliders.forEach((slider) => {
+      const sliderElement = slider as HTMLInputElement;
+      sliderElement.style.background = trackColor;
+    });
+  };
+
+  const handleVolumeSlider = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const volume = parseFloat(event.target.value);
+
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+      if (!clientMute.current) {
+        audioRef.current.muted = volume > 0 ? false : true;
+      }
+    }
+
+    if (bundleRef.current) {
+      const volumeSliders =
+        bundleRef.current.querySelectorAll(".volume-slider");
+
+      volumeSliders.forEach((slider) => {
+        const sliderElement = slider as HTMLInputElement;
+        sliderElement.value = `${volume}`;
+      });
+    }
+
+    tracksColorSetter();
+  };
 
   return (
     <div
@@ -163,7 +391,7 @@ export default function Bundle({
             table_id={table_id}
             socket={socket}
             videoId={key}
-            fgVideoOptions={{
+            options={{
               isUser: isUser,
               isStream: true,
               flipVideo: true,
@@ -177,15 +405,15 @@ export default function Bundle({
               isThumbnail: false,
               isPreview: false,
             }}
-            handleMute={bundleController.handleMute}
+            handleMute={handleMute}
             videoStream={cameraStream}
             audioRef={audioRef}
-            handleVolumeSlider={bundleController.handleVolumeSlider}
+            handleVolumeSlider={handleVolumeSlider}
             paths={paths}
             videoIconStateRef={videoIconStateRef}
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
-            tracksColorSetter={bundleController.tracksColorSetter}
+            tracksColorSetter={tracksColorSetter}
           />
         ))}
       {screenStreams &&
@@ -198,7 +426,7 @@ export default function Bundle({
             table_id={table_id}
             socket={socket}
             videoId={key}
-            fgVideoOptions={{
+            options={{
               isUser: isUser,
               isStream: true,
               isSlider: !isUser,
@@ -211,15 +439,15 @@ export default function Bundle({
               isThumbnail: false,
               isPreview: false,
             }}
-            handleMute={bundleController.handleMute}
+            handleMute={handleMute}
             videoStream={screenStream}
             audioRef={audioRef}
-            handleVolumeSlider={bundleController.handleVolumeSlider}
+            handleVolumeSlider={handleVolumeSlider}
             paths={paths}
             videoIconStateRef={videoIconStateRef}
             isFinishedRef={isFinishedRef}
             changedWhileNotFinishedRef={changedWhileNotFinishedRef}
-            tracksColorSetter={bundleController.tracksColorSetter}
+            tracksColorSetter={tracksColorSetter}
           />
         ))}
       {audioStream &&
@@ -230,7 +458,7 @@ export default function Bundle({
               audioStream={audioStream}
               audioRef={audioRef}
               username={username}
-              handleMute={bundleController.handleMute}
+              handleMute={handleMute}
               localMute={localMute}
               isUser={isUser}
               clientMute={clientMute}
