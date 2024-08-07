@@ -250,6 +250,16 @@ export default function Main() {
 
           socket.current.emit("message", msg);
         }}
+        onNewConsumerWasCreatedCallback={() => {
+          const msg = {
+            type: "requestClientMuteState",
+            table_id: table_id.current,
+            username: username.current,
+            producerUsername: trackUsername,
+          };
+
+          socket.current.emit("message", msg);
+        }}
       />
     );
 

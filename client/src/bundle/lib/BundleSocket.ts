@@ -5,17 +5,6 @@ import ScreenMedia from "../../lib/ScreenMedia";
 class BundleSocket {
   private isUser: boolean;
   private username: string;
-  private clientMute: React.MutableRefObject<boolean>;
-  private videoIconStateRef: React.MutableRefObject<{
-    from: string;
-    to: string;
-  }>;
-  private getPaths: (from: string, to: string) => string[][];
-  private setPaths: React.Dispatch<React.SetStateAction<string[][]>>;
-  private isFinishedRef: React.MutableRefObject<boolean>;
-  private changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
-  private audioRef: React.RefObject<HTMLAudioElement>;
-  private localMuted: React.MutableRefObject<boolean>;
   private setCameraStreams: React.Dispatch<
     React.SetStateAction<
       | {
@@ -59,21 +48,13 @@ class BundleSocket {
     };
     audio: AudioMedia | undefined;
   }>;
+  private clientMute: React.MutableRefObject<boolean>;
+  private localMute: React.MutableRefObject<boolean>;
+  private onNewConsumerWasCreatedCallback?: () => void;
 
   constructor(
     isUser: boolean,
     username: string,
-    clientMute: React.MutableRefObject<boolean>,
-    videoIconStateRef: React.MutableRefObject<{
-      from: string;
-      to: string;
-    }>,
-    getPaths: (from: string, to: string) => string[][],
-    setPaths: React.Dispatch<React.SetStateAction<string[][]>>,
-    isFinishedRef: React.MutableRefObject<boolean>,
-    changedWhileNotFinishedRef: React.MutableRefObject<boolean>,
-    audioRef: React.RefObject<HTMLAudioElement>,
-    localMuted: React.MutableRefObject<boolean>,
     setCameraStreams: React.Dispatch<
       React.SetStateAction<
         | {
@@ -116,192 +97,21 @@ class BundleSocket {
         [screenId: string]: ScreenMedia;
       };
       audio: AudioMedia | undefined;
-    }>
+    }>,
+    clientMute: React.MutableRefObject<boolean>,
+    localMute: React.MutableRefObject<boolean>,
+    onNewConsumerWasCreatedCallback?: () => any
   ) {
     this.isUser = isUser;
     this.username = username;
-    this.clientMute = clientMute;
-    this.videoIconStateRef = videoIconStateRef;
-    this.getPaths = getPaths;
-    this.setPaths = setPaths;
-    this.isFinishedRef = isFinishedRef;
-    this.changedWhileNotFinishedRef = changedWhileNotFinishedRef;
-    this.audioRef = audioRef;
-    this.localMuted = localMuted;
     this.setCameraStreams = setCameraStreams;
     this.setScreenStreams = setScreenStreams;
     this.setAudioStream = setAudioStream;
     this.remoteTracksMap = remoteTracksMap;
     this.userMedia = userMedia;
-  }
-
-  onClientMuteStateResponsed(event: {
-    type: string;
-    producerUsername: string;
-  }) {
-    if (this.isUser || this.username !== event.producerUsername) {
-      return;
-    }
-
-    this.clientMute.current = true;
-
-    if (this.videoIconStateRef.current.to !== "off") {
-      this.videoIconStateRef.current = {
-        from: this.videoIconStateRef.current.to,
-        to: "off",
-      };
-      const newPaths = this.getPaths(
-        this.videoIconStateRef.current.from,
-        "off"
-      );
-      if (newPaths[0]) {
-        this.setPaths(newPaths);
-      }
-    }
-  }
-
-  // Get client mute changes from other users
-  onClientMuteChange(event: {
-    type: string;
-    username: string;
-    clientMute: boolean;
-  }) {
-    if (this.isUser || this.username !== event.username) {
-      return;
-    }
-
-    if (event.clientMute) {
-      if (!this.isFinishedRef.current) {
-        if (!this.changedWhileNotFinishedRef.current) {
-          this.changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      this.clientMute.current = true;
-
-      if (this.videoIconStateRef.current.to !== "off") {
-        this.videoIconStateRef.current = {
-          from: this.videoIconStateRef.current.to,
-          to: "off",
-        };
-        const newPaths = this.getPaths(
-          this.videoIconStateRef.current.from,
-          "off"
-        );
-        if (newPaths[0]) {
-          this.setPaths(newPaths);
-        }
-      }
-    } else {
-      this.clientMute.current = false;
-
-      if (!this.audioRef.current) {
-        return;
-      }
-
-      const newVolume = this.audioRef.current.volume;
-      let newVolumeState;
-      if (newVolume === 0) {
-        newVolumeState = "off";
-      } else if (newVolume >= 0.5) {
-        newVolumeState = "high";
-      } else {
-        newVolumeState = "low";
-      }
-
-      if (
-        !this.isFinishedRef.current &&
-        this.videoIconStateRef.current.to !== newVolumeState
-      ) {
-        if (!this.changedWhileNotFinishedRef.current) {
-          this.changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      if (
-        newVolumeState !== this.videoIconStateRef.current.to &&
-        !this.audioRef.current.muted
-      ) {
-        this.videoIconStateRef.current = {
-          from: this.videoIconStateRef.current.to,
-          to: newVolumeState,
-        };
-
-        const newPaths = this.getPaths(
-          this.videoIconStateRef.current.from,
-          newVolumeState
-        );
-        if (newPaths[0]) {
-          this.setPaths(newPaths);
-        }
-      }
-    }
-  }
-
-  // Handles local mute changes from outside bundle
-  onLocalMuteChange() {
-    this.localMuted.current = !this.localMuted.current;
-
-    if (this.localMuted.current) {
-      if (!this.isFinishedRef.current) {
-        if (!this.changedWhileNotFinishedRef.current) {
-          this.changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      this.videoIconStateRef.current = {
-        from: this.videoIconStateRef.current.to,
-        to: "off",
-      };
-
-      const newPaths = this.getPaths(
-        this.videoIconStateRef.current.from,
-        "off"
-      );
-      if (newPaths[0]) {
-        this.setPaths(newPaths);
-      }
-    } else {
-      if (!this.audioRef.current) {
-        return;
-      }
-
-      const newVolume = this.audioRef.current.volume;
-      let newVolumeState;
-      if (newVolume === 0) {
-        newVolumeState = "off";
-      } else if (newVolume >= 0.5) {
-        newVolumeState = "high";
-      } else {
-        newVolumeState = "low";
-      }
-
-      if (
-        !this.isFinishedRef.current &&
-        this.videoIconStateRef.current.to !== newVolumeState
-      ) {
-        if (!this.changedWhileNotFinishedRef.current) {
-          this.changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      this.videoIconStateRef.current = {
-        from: this.videoIconStateRef.current.to,
-        to: newVolumeState,
-      };
-
-      const newPaths = this.getPaths(
-        this.videoIconStateRef.current.from,
-        newVolumeState
-      );
-      if (newPaths[0]) {
-        this.setPaths(newPaths);
-      }
-    }
+    this.clientMute = clientMute;
+    this.localMute = localMute;
+    this.onNewConsumerWasCreatedCallback = onNewConsumerWasCreatedCallback;
   }
 
   async onNewConsumerWasCreated(event: {
@@ -356,6 +166,10 @@ class BundleSocket {
       }
 
       this.setAudioStream(newStream);
+    }
+
+    if (this.onNewConsumerWasCreatedCallback) {
+      this.onNewConsumerWasCreatedCallback();
     }
   }
 
@@ -414,6 +228,35 @@ class BundleSocket {
         this.setAudioStream(undefined);
       }
     }
+  }
+
+  onClientMuteStateResponsed(event: {
+    type: string;
+    producerUsername: string;
+  }) {
+    if (this.isUser || this.username !== event.producerUsername) {
+      return;
+    }
+
+    this.clientMute.current = true;
+  }
+
+  // Get client mute changes from other users
+  onClientMuteChange(event: {
+    type: string;
+    username: string;
+    clientMute: boolean;
+  }) {
+    if (this.isUser || this.username !== event.username) {
+      return;
+    }
+
+    this.clientMute.current = event.clientMute;
+  }
+
+  // Handles local mute changes from outside bundle
+  onLocalMuteChange() {
+    this.localMute.current = !this.localMute.current;
   }
 }
 

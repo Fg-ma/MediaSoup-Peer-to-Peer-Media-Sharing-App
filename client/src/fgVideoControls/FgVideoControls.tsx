@@ -1,5 +1,6 @@
-import { AnimatePresence } from "framer-motion";
 import React from "react";
+import { Socket } from "socket.io-client";
+import { AnimatePresence } from "framer-motion";
 import Controls from "./lib/Controls";
 import {
   CameraEffectTypes,
@@ -23,18 +24,20 @@ export default function FgVideoControls({
   fgVideoOptions,
   videoContainerRef,
   audioRef,
-  videoIconStateRef,
   currentTimeRef,
   totalTimeRef,
-  isFinishedRef,
   playbackSpeedButtonRef,
-  changedWhileNotFinishedRef,
   handleEffectChange,
   handleVolumeSlider,
   handleMute,
+  tracksColorSetter,
+  volumeChangeHandler,
   tintColor,
-  paths,
   effectsActive,
+  clientMute,
+  isUser,
+  username,
+  socket,
 }: {
   videoId: string;
   type: "camera" | "screen";
@@ -42,24 +45,23 @@ export default function FgVideoControls({
   fgVideoOptions: FgVideoOptions;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   audioRef: React.RefObject<HTMLAudioElement>;
-  videoIconStateRef: React.MutableRefObject<{
-    from: string;
-    to: string;
-  }>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
   totalTimeRef: React.RefObject<HTMLDivElement>;
-  isFinishedRef: React.MutableRefObject<boolean>;
   playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
-  changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleMute: () => void;
+  tracksColorSetter: () => void;
+  volumeChangeHandler: () => void;
   tintColor: React.MutableRefObject<string>;
-  paths: string[][];
   effectsActive: boolean;
+  clientMute: React.MutableRefObject<boolean>;
+  isUser: boolean;
+  username: string;
+  socket: React.MutableRefObject<Socket>;
 }) {
   return (
     <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
@@ -84,16 +86,19 @@ export default function FgVideoControls({
           <FgVolumeElement
             audioRef={audioRef}
             handleVolumeSliderCallback={handleVolumeSlider}
-            handleMute={handleMute}
-            paths={paths}
-            videoIconStateRef={videoIconStateRef}
-            isFinishedRef={isFinishedRef}
-            changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+            handleMuteCallback={handleMute}
+            tracksColorSetterCallback={tracksColorSetter}
+            volumeChangeHandlerCallback={volumeChangeHandler}
             effectsActive={effectsActive}
             options={{
               isSlider:
                 fgVideoOptions.isSlider ?? defaultFgVideoOptions.isSlider,
+              initialVolume: fgVideoOptions.initialVolume ?? "high",
             }}
+            clientMute={clientMute}
+            isUser={isUser}
+            username={username}
+            socket={socket}
           />
         )}
         <div className='duration-container flex items-center gap-1 grow'>
