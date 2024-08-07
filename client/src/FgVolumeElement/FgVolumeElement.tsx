@@ -6,6 +6,18 @@ import FgButton from "../fgButton/FgButton";
 import SVGMorpher from "../SVGMorpher/SVGMorpher";
 import FgVolumeElementController from "./lib/FgVolumeElementController";
 
+interface FgVolumeElementOptions {
+  iconSize?: string;
+  volumeSliderHeight?: string;
+  volumeSliderWidth?: string;
+  volumeSliderThumbSize?: string;
+  primaryColor?: string;
+  isSlider?: boolean;
+  initialVolume?: "low" | "off" | "high";
+  primaryVolumeSliderColor?: string;
+  secondaryVolumeSliderColor?: string;
+}
+
 const defaultFgVolumeElementOptions = {
   iconSize: "2.5rem",
   volumeSliderHeight: "0.25rem",
@@ -39,17 +51,7 @@ export default function FgVolumeElement({
   tracksColorSetterCallback?: () => void;
   volumeChangeHandlerCallback?: () => void;
   effectsActive: boolean;
-  options?: {
-    iconSize?: string;
-    volumeSliderHeight?: string;
-    volumeSliderWidth?: string;
-    volumeSliderThumbSize?: string;
-    primaryColor?: string;
-    isSlider?: boolean;
-    initialVolume?: "low" | "off" | "high";
-    primaryVolumeSliderColor?: string;
-    secondaryVolumeSliderColor?: string;
-  };
+  options?: FgVolumeElementOptions;
   clientMute: React.MutableRefObject<boolean>;
   isUser: boolean;
   username: string;

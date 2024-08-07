@@ -202,7 +202,9 @@ export default function Main() {
           initCameraStreams={isCamera.current ? initCameraStreams : undefined}
           initScreenStreams={isScreen.current ? initScreenStreams : undefined}
           initAudioStream={isAudio.current ? initAudioStream : undefined}
-          isUser={true}
+          options={{
+            isUser: true,
+          }}
           muteButtonCallback={muteAudio}
         />
       );

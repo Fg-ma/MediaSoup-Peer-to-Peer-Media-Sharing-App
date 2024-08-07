@@ -1,10 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import volumeSVGPaths from "../FgVolumeElement/lib/volumeSVGPaths";
 import FgVideo from "../fgVideo/FgVideo";
 import FgAudioElement from "../fgAudioElement/FgAudioElement";
 import { useStreamsContext } from "../context/StreamsContext";
 import BundleController from "./lib/BundleController";
+
+interface BundleOptions {
+  isUser?: boolean;
+  primaryVolumeSliderColor?: string;
+  secondaryVolumeSliderColor?: string;
+  initialVolume?: "off" | "low" | "high";
+}
+
+const defaultBundleOptions = {
+  isUser: false,
+  primaryVolumeSliderColor: "white",
+  secondaryVolumeSliderColor: "rgba(150, 150, 150, 0.5)",
+};
 
 export default function Bundle({
   username,
@@ -13,9 +25,7 @@ export default function Bundle({
   initCameraStreams,
   initScreenStreams,
   initAudioStream,
-  isUser = false,
-  primaryVolumeSliderColor = "white",
-  secondaryVolumeSliderColor = "rgba(150, 150, 150, 0.5)",
+  options,
   muteButtonCallback,
   initialVolume,
   onRendered,
@@ -27,16 +37,17 @@ export default function Bundle({
   initCameraStreams?: { [cameraKey: string]: MediaStream };
   initScreenStreams?: { [screenKey: string]: MediaStream };
   initAudioStream?: MediaStream;
-  isUser?: boolean;
-  primaryVolumeSliderColor?: string;
-  secondaryVolumeSliderColor?: string;
-  tertiaryVolumeSliderColor?: string;
-  quaternaryVolumeSliderColor?: string;
+  options?: BundleOptions;
   muteButtonCallback?: () => any;
   initialVolume?: "off" | "low" | "high";
   onRendered?: () => any;
   onNewConsumerWasCreatedCallback?: () => any;
 }) {
+  const bundleOptions = {
+    ...defaultBundleOptions,
+    ...options,
+  };
+
   const { userMedia, remoteTracksMap } = useStreamsContext();
   const [cameraStreams, setCameraStreams] = useState<
     | {
@@ -60,7 +71,7 @@ export default function Bundle({
   const localMute = useRef(false); // Not user audio mute
 
   const bundleController = new BundleController(
-    isUser,
+    bundleOptions.isUser,
     username,
     setCameraStreams,
     setScreenStreams,
@@ -91,7 +102,7 @@ export default function Bundle({
   }, []);
 
   useEffect(() => {
-    if (audioRef.current && audioStream && !isUser) {
+    if (audioRef.current && audioStream && !bundleOptions.isUser) {
       audioRef.current.srcObject = audioStream;
     }
   }, [audioRef, audioStream]);
@@ -107,7 +118,7 @@ export default function Bundle({
 
     localMute.current = !localMute.current;
 
-    if (audioRef.current && isUser) {
+    if (audioRef.current && bundleOptions.isUser) {
       audioRef.current.muted = true;
     }
   };
@@ -144,7 +155,7 @@ export default function Bundle({
     const min = 0;
     const max = 1;
     const percentage = ((value - min) / (max - min)) * 100;
-    const trackColor = `linear-gradient(to right, ${primaryVolumeSliderColor} 0%, ${primaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} 100%)`;
+    const trackColor = `linear-gradient(to right, ${bundleOptions.primaryVolumeSliderColor} 0%, ${bundleOptions.primaryVolumeSliderColor} ${percentage}%, ${bundleOptions.secondaryVolumeSliderColor} ${percentage}%, ${bundleOptions.secondaryVolumeSliderColor} 100%)`;
 
     volumeSliders.forEach((slider) => {
       const sliderElement = slider as HTMLInputElement;
@@ -185,10 +196,10 @@ export default function Bundle({
             socket={socket}
             videoId={key}
             options={{
-              isUser: isUser,
+              isUser: bundleOptions.isUser,
               isStream: true,
               flipVideo: true,
-              isSlider: !isUser,
+              isSlider: !bundleOptions.isUser,
               isVolume: audioStream ? true : false,
               isTotalTime: false,
               isPlaybackSpeed: false,
@@ -214,7 +225,7 @@ export default function Bundle({
             tracksColorSetter={tracksColorSetter}
             volumeChangeHandler={volumeChangeHandler}
             clientMute={clientMute}
-            isUser={isUser}
+            isUser={bundleOptions.isUser}
           />
         ))}
       {screenStreams &&
@@ -228,9 +239,9 @@ export default function Bundle({
             socket={socket}
             videoId={key}
             options={{
-              isUser: isUser,
+              isUser: bundleOptions.isUser,
               isStream: true,
-              isSlider: !isUser,
+              isSlider: !bundleOptions.isUser,
               isVolume: audioStream ? true : false,
               isTotalTime: false,
               isPlaybackSpeed: false,
@@ -256,7 +267,7 @@ export default function Bundle({
             tracksColorSetter={tracksColorSetter}
             volumeChangeHandler={volumeChangeHandler}
             clientMute={clientMute}
-            isUser={isUser}
+            isUser={bundleOptions.isUser}
           />
         ))}
       {audioStream &&
@@ -269,7 +280,7 @@ export default function Bundle({
               username={username}
               handleMute={handleMute}
               localMute={localMute}
-              isUser={isUser}
+              isUser={bundleOptions.isUser}
               clientMute={clientMute}
             />
           </div>
