@@ -6,12 +6,15 @@ class FgVolumeElementSocket {
     from: string;
     to: string;
   }>;
-  private isFinishedRef: React.MutableRefObject<boolean>;
-  private changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
   private audioRef: React.RefObject<HTMLAudioElement>;
   private localMute: React.MutableRefObject<boolean>;
-  private setPaths: React.Dispatch<React.SetStateAction<string[][]>>;
-  private getPaths: (from: string, to: string) => string[][];
+  private setPaths: React.Dispatch<
+    React.SetStateAction<[string, string, string] | undefined>
+  >;
+  private getPaths: (
+    from: string,
+    to: string
+  ) => [string, string, string] | undefined;
   private setActive: React.Dispatch<React.SetStateAction<boolean>>;
 
   constructor(
@@ -22,20 +25,21 @@ class FgVolumeElementSocket {
       from: string;
       to: string;
     }>,
-    isFinishedRef: React.MutableRefObject<boolean>,
-    changedWhileNotFinishedRef: React.MutableRefObject<boolean>,
     audioRef: React.RefObject<HTMLAudioElement>,
     localMute: React.MutableRefObject<boolean>,
-    setPaths: React.Dispatch<React.SetStateAction<string[][]>>,
-    getPaths: (from: string, to: string) => string[][],
+    setPaths: React.Dispatch<
+      React.SetStateAction<[string, string, string] | undefined>
+    >,
+    getPaths: (
+      from: string,
+      to: string
+    ) => [string, string, string] | undefined,
     setActive: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     this.isUser = isUser;
     this.username = username;
     this.clientMute = clientMute;
     this.videoIconStateRef = videoIconStateRef;
-    this.isFinishedRef = isFinishedRef;
-    this.changedWhileNotFinishedRef = changedWhileNotFinishedRef;
     this.audioRef = audioRef;
     this.localMute = localMute;
     this.setPaths = setPaths;
@@ -66,7 +70,7 @@ class FgVolumeElementSocket {
         this.videoIconStateRef.current.from,
         "off"
       );
-      if (newPaths[0]) {
+      if (newPaths) {
         this.setPaths(newPaths);
       }
     }
@@ -82,20 +86,17 @@ class FgVolumeElementSocket {
       return;
     }
 
-    this.setActive(event.clientMute);
+    if (event.clientMute) {
+      this.setActive(event.clientMute);
+    } else {
+      this.setActive(this.localMute.current);
+    }
 
     if (this.clientMute) {
       this.clientMute.current = event.clientMute;
     }
 
     if (event.clientMute) {
-      if (!this.isFinishedRef.current) {
-        if (!this.changedWhileNotFinishedRef.current) {
-          this.changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
       if (this.videoIconStateRef.current.to !== "off") {
         this.videoIconStateRef.current = {
           from: this.videoIconStateRef.current.to,
@@ -105,7 +106,7 @@ class FgVolumeElementSocket {
           this.videoIconStateRef.current.from,
           "off"
         );
-        if (newPaths[0]) {
+        if (newPaths) {
           this.setPaths(newPaths);
         }
       }
@@ -125,16 +126,6 @@ class FgVolumeElementSocket {
       }
 
       if (
-        !this.isFinishedRef.current &&
-        this.videoIconStateRef.current.to !== newVolumeState
-      ) {
-        if (!this.changedWhileNotFinishedRef.current) {
-          this.changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
-      if (
         newVolumeState !== this.videoIconStateRef.current.to &&
         !this.audioRef.current.muted
       ) {
@@ -147,7 +138,7 @@ class FgVolumeElementSocket {
           this.videoIconStateRef.current.from,
           newVolumeState
         );
-        if (newPaths[0]) {
+        if (newPaths) {
           this.setPaths(newPaths);
         }
       }
@@ -159,13 +150,6 @@ class FgVolumeElementSocket {
     this.localMute.current = !this.localMute.current;
 
     if (this.localMute.current) {
-      if (!this.isFinishedRef.current) {
-        if (!this.changedWhileNotFinishedRef.current) {
-          this.changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
       this.videoIconStateRef.current = {
         from: this.videoIconStateRef.current.to,
         to: "off",
@@ -175,7 +159,7 @@ class FgVolumeElementSocket {
         this.videoIconStateRef.current.from,
         "off"
       );
-      if (newPaths[0]) {
+      if (newPaths) {
         this.setPaths(newPaths);
       }
     } else {
@@ -193,16 +177,6 @@ class FgVolumeElementSocket {
         newVolumeState = "low";
       }
 
-      if (
-        !this.isFinishedRef.current &&
-        this.videoIconStateRef.current.to !== newVolumeState
-      ) {
-        if (!this.changedWhileNotFinishedRef.current) {
-          this.changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
       this.videoIconStateRef.current = {
         from: this.videoIconStateRef.current.to,
         to: newVolumeState,
@@ -212,7 +186,7 @@ class FgVolumeElementSocket {
         this.videoIconStateRef.current.from,
         newVolumeState
       );
-      if (newPaths[0]) {
+      if (newPaths) {
         this.setPaths(newPaths);
       }
     }

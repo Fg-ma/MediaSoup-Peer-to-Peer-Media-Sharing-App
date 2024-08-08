@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import "./lib/fgVolumeElement.css";
-import volumeSVGPaths from "./lib/volumeSVGPaths";
+import volumeSVGPaths, { newVolumeSVGPaths } from "./lib/volumeSVGPaths";
 import FgButton from "../fgButton/FgButton";
 import SVGMorpher from "../SVGMorpher/SVGMorpher";
 import FgVolumeElementController from "./lib/FgVolumeElementController";
+import VolumeSVGMorpher from "./lib/VolumeSVGMorpher";
 
 interface FgVolumeElementOptions {
   iconSize?: string;
@@ -65,46 +66,14 @@ export default function FgVolumeElement({
   const [active, setActive] = useState(
     fgVolumeElementOptions.initialVolume === "off" ? true : false
   );
-  const [paths, setPaths] = useState<string[][]>([
-    [
-      volumeSVGPaths.volumeOff1a,
-      volumeSVGPaths.volumeHighOffIB1a,
-      volumeSVGPaths.volumeHigh1a,
-    ],
-    [
-      volumeSVGPaths.volumeOff1b,
-      volumeSVGPaths.volumeHighOffIB1b,
-      volumeSVGPaths.volumeHigh1b,
-    ],
-    [
-      volumeSVGPaths.volumeOff2a,
-      volumeSVGPaths.volumeHighOffIB2a,
-      volumeSVGPaths.volumeHigh2a,
-    ],
-    [
-      volumeSVGPaths.volumeOff2b,
-      volumeSVGPaths.volumeHighOffIB2b,
-      volumeSVGPaths.volumeHigh2b,
-    ],
-    [
-      volumeSVGPaths.volumeOff3a,
-      volumeSVGPaths.volumeHighOffIB3a,
-      volumeSVGPaths.volumeHigh3a,
-    ],
-    [
-      volumeSVGPaths.volumeOff3b,
-      volumeSVGPaths.volumeHighOffIB3b,
-      volumeSVGPaths.volumeHigh3b,
-    ],
-  ]);
+  const [paths, setPaths] = useState<[string, string, string]>();
+  const [strikePaths, setStrikePaths] = useState<[string, string]>();
   const volumeContainer = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLInputElement>(null);
   const videoIconStateRef = useRef({
     from: "",
     to: fgVolumeElementOptions.initialVolume,
   });
-  const isFinishedRef = useRef(true);
-  const changedWhileNotFinishedRef = useRef(false);
 
   const localMute = useRef(
     fgVolumeElementOptions.initialVolume === "off" ? true : false
@@ -116,14 +85,16 @@ export default function FgVolumeElement({
     clientMute,
     videoIconStateRef,
     setPaths,
-    isFinishedRef,
-    changedWhileNotFinishedRef,
     audioRef,
     localMute,
     setActive
   );
 
+  // Initial functions
   useEffect(() => {
+    // Set initial volume slider
+    tracksColorSetter();
+
     volumeContainer.current?.style.setProperty(
       "--volume-slider-width",
       fgVolumeElementOptions.volumeSliderWidth
@@ -136,16 +107,6 @@ export default function FgVolumeElement({
       "--volume-slider-thumb-size",
       fgVolumeElementOptions.volumeSliderThumbSize
     );
-  }, [
-    fgVolumeElementOptions.volumeSliderWidth,
-    fgVolumeElementOptions.volumeSliderHeight,
-    fgVolumeElementOptions.volumeSliderThumbSize,
-  ]);
-
-  // Initial functions & call onRendered call back if one is availiable
-  useEffect(() => {
-    // Set initial volume slider
-    tracksColorSetter();
 
     socket.current.on("message", (event: any) =>
       fgVolumeElementController.handleMessage(event)
@@ -158,17 +119,6 @@ export default function FgVolumeElement({
       );
     };
   }, []);
-
-  useEffect(() => {
-    audioRef.current?.addEventListener("volumechange", volumeChangeHandler);
-
-    return () => {
-      audioRef.current?.removeEventListener(
-        "volumechange",
-        volumeChangeHandler
-      );
-    };
-  }, [audioRef.current]);
 
   const volumeChangeHandler = () => {
     tracksColorSetter();
@@ -187,16 +137,6 @@ export default function FgVolumeElement({
       newVolumeState = "low";
     }
 
-    if (
-      !isFinishedRef.current &&
-      videoIconStateRef.current.to !== newVolumeState
-    ) {
-      if (!changedWhileNotFinishedRef.current) {
-        changedWhileNotFinishedRef.current = true;
-      }
-      return;
-    }
-
     if (videoIconStateRef.current.to !== newVolumeState) {
       const { from, to } = videoIconStateRef.current;
       videoIconStateRef.current = { from: to, to: newVolumeState };
@@ -204,25 +144,24 @@ export default function FgVolumeElement({
       if (newVolumeState === "off") {
         audioRef.current.muted = true;
 
-        if (!isFinishedRef.current) {
-          if (!changedWhileNotFinishedRef.current) {
-            changedWhileNotFinishedRef.current = true;
-          }
-          return;
-        }
-
         videoIconStateRef.current = {
           from: videoIconStateRef.current.to,
           to: "off",
         };
 
-        const newPaths = fgVolumeElementController.getPaths(
+        const newPaths = fgVolumeElementController.getNewPaths(
           videoIconStateRef.current.from,
           "off"
         );
-        if (newPaths[0]) {
+        if (newPaths) {
           setPaths(newPaths);
         }
+
+        const newStrikePaths = fgVolumeElementController.getStrikePaths(
+          videoIconStateRef.current.from,
+          "off"
+        );
+        setStrikePaths(newStrikePaths);
       } else {
         audioRef.current.muted = false;
 
@@ -236,34 +175,39 @@ export default function FgVolumeElement({
           newVolumeState = "low";
         }
 
-        if (
-          !isFinishedRef.current &&
-          videoIconStateRef.current.to !== newVolumeState
-        ) {
-          if (!changedWhileNotFinishedRef.current) {
-            changedWhileNotFinishedRef.current = true;
-          }
-          return;
-        }
-
         videoIconStateRef.current = {
           from: videoIconStateRef.current.to,
           to: newVolumeState,
         };
 
-        const newPaths = fgVolumeElementController.getPaths(
+        const newPaths = fgVolumeElementController.getNewPaths(
           videoIconStateRef.current.from,
           newVolumeState
         );
-        if (newPaths[0]) {
+        if (newPaths) {
           setPaths(newPaths);
         }
+
+        const newStrikePaths = fgVolumeElementController.getStrikePaths(
+          videoIconStateRef.current.from,
+          newVolumeState
+        );
+        setStrikePaths(newStrikePaths);
       }
 
-      const newPaths = fgVolumeElementController.getPaths(to, newVolumeState);
-      if (newPaths[0]) {
+      const newPaths = fgVolumeElementController.getNewPaths(
+        to,
+        newVolumeState
+      );
+      if (newPaths) {
         setPaths(newPaths);
       }
+
+      const newStrikePaths = fgVolumeElementController.getStrikePaths(
+        to,
+        newVolumeState
+      );
+      setStrikePaths(newStrikePaths);
     }
 
     if (volumeChangeHandlerCallback) {
@@ -308,6 +252,8 @@ export default function FgVolumeElement({
 
     tracksColorSetter();
 
+    volumeChangeHandler();
+
     if (handleVolumeSliderCallback) {
       handleVolumeSliderCallback(event);
     }
@@ -325,25 +271,24 @@ export default function FgVolumeElement({
     }
 
     if (localMute.current) {
-      if (!isFinishedRef.current) {
-        if (!changedWhileNotFinishedRef.current) {
-          changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
       videoIconStateRef.current = {
         from: videoIconStateRef.current.to,
         to: "off",
       };
 
-      const newPaths = fgVolumeElementController.getPaths(
+      const newPaths = fgVolumeElementController.getNewPaths(
         videoIconStateRef.current.from,
         "off"
       );
-      if (newPaths[0]) {
+      if (newPaths) {
         setPaths(newPaths);
       }
+
+      const newStrikePaths = fgVolumeElementController.getStrikePaths(
+        videoIconStateRef.current.from,
+        "off"
+      );
+      setStrikePaths(newStrikePaths);
     } else {
       if (!audioRef.current) {
         return;
@@ -359,29 +304,24 @@ export default function FgVolumeElement({
         newVolumeState = "low";
       }
 
-      if (
-        !isFinishedRef.current &&
-        videoIconStateRef.current.to !== newVolumeState
-      ) {
-        if (!changedWhileNotFinishedRef.current) {
-          changedWhileNotFinishedRef.current = true;
-        }
-        return;
-      }
-
       videoIconStateRef.current = {
         from: videoIconStateRef.current.to,
         to: newVolumeState,
       };
 
-      const newPaths = fgVolumeElementController.getPaths(
+      const newPaths = fgVolumeElementController.getNewPaths(
         videoIconStateRef.current.from,
         videoIconStateRef.current.to
       );
-
-      if (newPaths[0]) {
+      if (newPaths) {
         setPaths(newPaths);
       }
+
+      const newStrikePaths = fgVolumeElementController.getStrikePaths(
+        videoIconStateRef.current.from,
+        videoIconStateRef.current.to
+      );
+      setStrikePaths(newStrikePaths);
     }
 
     if (handleMuteCallback !== undefined) {
@@ -408,16 +348,18 @@ export default function FgVolumeElement({
               xmlns='http://www.w3.org/2000/svg'
               width={`calc(${fgVolumeElementOptions.iconSize} - 0.25rem)`}
               height={`calc(${fgVolumeElementOptions.iconSize} - 0.25rem)`}
-              viewBox='250 250 500 580'
+              viewBox='0 0 100.0001 100.00001'
               fill={fgVolumeElementOptions.primaryColor}
             >
               {videoIconStateRef.current.from &&
               videoIconStateRef.current.to ? (
-                <SVGMorpher
-                  pathsArray={paths}
-                  audioRef={audioRef}
-                  isFinishedRef={isFinishedRef}
-                  changedWhileNotFinishedRef={changedWhileNotFinishedRef}
+                <VolumeSVGMorpher
+                  pathArrays={paths}
+                  stationaryPaths={[
+                    newVolumeSVGPaths.high.left,
+                    newVolumeSVGPaths.high.middle,
+                  ]}
+                  strikePaths={strikePaths}
                   color={fgVolumeElementOptions.primaryColor}
                 />
               ) : videoIconStateRef.current.from === "" &&

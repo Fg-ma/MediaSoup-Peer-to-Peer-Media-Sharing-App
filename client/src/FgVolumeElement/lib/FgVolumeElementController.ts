@@ -1,5 +1,5 @@
 import FgVolumeElementSocket from "./FgVolumeElementSocket";
-import volumeSVGPaths from "../lib/volumeSVGPaths";
+import volumeSVGPaths, { newVolumeSVGPaths } from "../lib/volumeSVGPaths";
 
 class FgVolumeElementController {
   private isUser: boolean;
@@ -9,9 +9,9 @@ class FgVolumeElementController {
     from: string;
     to: string;
   }>;
-  private setPaths: React.Dispatch<React.SetStateAction<string[][]>>;
-  private isFinishedRef: React.MutableRefObject<boolean>;
-  private changedWhileNotFinishedRef: React.MutableRefObject<boolean>;
+  private setPaths: React.Dispatch<
+    React.SetStateAction<[string, string, string] | undefined>
+  >;
   private audioRef: React.RefObject<HTMLAudioElement>;
   private localMute: React.MutableRefObject<boolean>;
   private setActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,9 +26,9 @@ class FgVolumeElementController {
       from: string;
       to: string;
     }>,
-    setPaths: React.Dispatch<React.SetStateAction<string[][]>>,
-    isFinishedRef: React.MutableRefObject<boolean>,
-    changedWhileNotFinishedRef: React.MutableRefObject<boolean>,
+    setPaths: React.Dispatch<
+      React.SetStateAction<[string, string, string] | undefined>
+    >,
     audioRef: React.RefObject<HTMLAudioElement>,
     localMute: React.MutableRefObject<boolean>,
     setActive: React.Dispatch<React.SetStateAction<boolean>>
@@ -38,8 +38,6 @@ class FgVolumeElementController {
     this.clientMute = clientMute;
     this.videoIconStateRef = videoIconStateRef;
     this.setPaths = setPaths;
-    this.isFinishedRef = isFinishedRef;
-    this.changedWhileNotFinishedRef = changedWhileNotFinishedRef;
     this.audioRef = audioRef;
     this.localMute = localMute;
     this.setActive = setActive;
@@ -49,12 +47,10 @@ class FgVolumeElementController {
       this.username,
       this.clientMute,
       this.videoIconStateRef,
-      this.isFinishedRef,
-      this.changedWhileNotFinishedRef,
       this.audioRef,
       this.localMute,
       this.setPaths,
-      this.getPaths,
+      this.getNewPaths,
       this.setActive
     );
   }
@@ -286,6 +282,74 @@ class FgVolumeElementController {
           volumeSVGPaths.volumeHighLowIB3b,
           volumeSVGPaths.volumeHigh3b,
         ],
+      ];
+    }
+    return newPaths;
+  }
+
+  getNewPaths(from: string, to: string) {
+    let newPaths: [string, string, string] | undefined;
+    if (from === "high" && to === "off") {
+      newPaths = [
+        newVolumeSVGPaths.high.right,
+        newVolumeSVGPaths.high.right,
+        newVolumeSVGPaths.high.right,
+      ];
+    } else if (from === "off" && to === "high") {
+      newPaths = [
+        newVolumeSVGPaths.high.right,
+        newVolumeSVGPaths.high.right,
+        newVolumeSVGPaths.high.right,
+      ];
+    } else if (from === "low" && to === "off") {
+      newPaths = [
+        newVolumeSVGPaths.low.right,
+        newVolumeSVGPaths.highLow.right,
+        newVolumeSVGPaths.high.right,
+      ];
+    } else if (from === "off" && to === "low") {
+      newPaths = [
+        newVolumeSVGPaths.high.right,
+        newVolumeSVGPaths.highLow.right,
+        newVolumeSVGPaths.low.right,
+      ];
+    } else if (from === "high" && to === "low") {
+      newPaths = [
+        newVolumeSVGPaths.high.right,
+        newVolumeSVGPaths.highLow.right,
+        newVolumeSVGPaths.low.right,
+      ];
+    } else if (from === "low" && to === "high") {
+      newPaths = [
+        newVolumeSVGPaths.low.right,
+        newVolumeSVGPaths.highLow.right,
+        newVolumeSVGPaths.high.right,
+      ];
+    }
+    return newPaths;
+  }
+
+  getStrikePaths(from: string, to: string) {
+    let newPaths: [string, string] | undefined;
+    if (from === "high" && to === "off") {
+      newPaths = [
+        newVolumeSVGPaths.strike.ball,
+        newVolumeSVGPaths.strike.strike,
+      ];
+    } else if (from === "off" && to === "high") {
+      newPaths = [
+        newVolumeSVGPaths.strike.strike,
+        newVolumeSVGPaths.strike.ball,
+      ];
+    } else if (from === "low" && to === "off") {
+      newPaths = [
+        newVolumeSVGPaths.strike.ball,
+        newVolumeSVGPaths.strike.strike,
+      ];
+    } else if (from === "off" && to === "low") {
+      newPaths = [
+        newVolumeSVGPaths.strike.strike,
+        newVolumeSVGPaths.strike.ball,
       ];
     }
     return newPaths;
