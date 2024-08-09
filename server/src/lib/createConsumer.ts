@@ -24,7 +24,7 @@ const createConsumer = async (
   }
 
   // Get the consumer transport associated with the user
-  const transport = roomConsumerTransports[table_id][username];
+  const transport = roomConsumerTransports[table_id][username].transport;
 
   if (!transport) {
     console.error("No transport found for: ", username);

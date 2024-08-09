@@ -1,49 +1,46 @@
 class FgVolumeElementSocket {
   private isUser: boolean;
   private username: string;
-  private clientMute: React.MutableRefObject<boolean> | undefined;
-  private videoIconStateRef: React.MutableRefObject<{
+  private clientMute: React.MutableRefObject<boolean>;
+  private volumeState: {
     from: string;
     to: string;
-  }>;
+  };
+  private setVolumeState: React.Dispatch<
+    React.SetStateAction<{
+      from: string;
+      to: string;
+    }>
+  >;
   private audioRef: React.RefObject<HTMLAudioElement>;
   private localMute: React.MutableRefObject<boolean>;
-  private setPaths: React.Dispatch<
-    React.SetStateAction<[string, string, string] | undefined>
-  >;
-  private getPaths: (
-    from: string,
-    to: string
-  ) => [string, string, string] | undefined;
   private setActive: React.Dispatch<React.SetStateAction<boolean>>;
 
   constructor(
     isUser: boolean,
     username: string,
-    clientMute: React.MutableRefObject<boolean> | undefined,
-    videoIconStateRef: React.MutableRefObject<{
+    clientMute: React.MutableRefObject<boolean>,
+    volumeState: {
       from: string;
       to: string;
-    }>,
+    },
+    setVolumeState: React.Dispatch<
+      React.SetStateAction<{
+        from: string;
+        to: string;
+      }>
+    >,
     audioRef: React.RefObject<HTMLAudioElement>,
     localMute: React.MutableRefObject<boolean>,
-    setPaths: React.Dispatch<
-      React.SetStateAction<[string, string, string] | undefined>
-    >,
-    getPaths: (
-      from: string,
-      to: string
-    ) => [string, string, string] | undefined,
     setActive: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     this.isUser = isUser;
     this.username = username;
     this.clientMute = clientMute;
-    this.videoIconStateRef = videoIconStateRef;
+    this.volumeState = volumeState;
+    this.setVolumeState = setVolumeState;
     this.audioRef = audioRef;
     this.localMute = localMute;
-    this.setPaths = setPaths;
-    this.getPaths = getPaths;
     this.setActive = setActive;
   }
 
@@ -57,22 +54,10 @@ class FgVolumeElementSocket {
 
     this.setActive(true);
 
-    if (this.clientMute) {
-      this.clientMute.current = true;
-    }
+    this.clientMute.current = true;
 
-    if (this.videoIconStateRef.current.to !== "off") {
-      this.videoIconStateRef.current = {
-        from: this.videoIconStateRef.current.to,
-        to: "off",
-      };
-      const newPaths = this.getPaths(
-        this.videoIconStateRef.current.from,
-        "off"
-      );
-      if (newPaths) {
-        this.setPaths(newPaths);
-      }
+    if (this.volumeState.to !== "off") {
+      this.setVolumeState((prev) => ({ from: prev.to, to: "off" }));
     }
   }
 
@@ -82,114 +67,65 @@ class FgVolumeElementSocket {
     username: string;
     clientMute: boolean;
   }) {
-    if (this.isUser || this.username !== event.username) {
+    if (this.isUser) {
       return;
     }
 
-    if (event.clientMute) {
-      this.setActive(event.clientMute);
+    this.setActive(
+      event.clientMute ? event.clientMute : this.localMute.current
+    );
+
+    this.clientMute.current = event.clientMute;
+
+    if (!this.audioRef.current) {
+      return;
+    }
+
+    const newVolume = this.audioRef.current.volume;
+    let newVolumeState;
+    if (event.clientMute || newVolume === 0) {
+      newVolumeState = "off";
+    } else if (this.audioRef.current.volume >= 0.5) {
+      newVolumeState = "high";
     } else {
-      this.setActive(this.localMute.current);
+      newVolumeState = "low";
     }
 
-    if (this.clientMute) {
-      this.clientMute.current = event.clientMute;
-    }
+    this.audioRef.current.muted = newVolumeState === "off";
 
-    if (event.clientMute) {
-      if (this.videoIconStateRef.current.to !== "off") {
-        this.videoIconStateRef.current = {
-          from: this.videoIconStateRef.current.to,
-          to: "off",
-        };
-        const newPaths = this.getPaths(
-          this.videoIconStateRef.current.from,
-          "off"
-        );
-        if (newPaths) {
-          this.setPaths(newPaths);
-        }
-      }
-    } else {
-      if (!this.audioRef.current) {
-        return;
-      }
-
-      const newVolume = this.audioRef.current.volume;
-      let newVolumeState;
-      if (newVolume === 0) {
-        newVolumeState = "off";
-      } else if (newVolume >= 0.5) {
-        newVolumeState = "high";
-      } else {
-        newVolumeState = "low";
-      }
-
-      if (
-        newVolumeState !== this.videoIconStateRef.current.to &&
-        !this.audioRef.current.muted
-      ) {
-        this.videoIconStateRef.current = {
-          from: this.videoIconStateRef.current.to,
-          to: newVolumeState,
-        };
-
-        const newPaths = this.getPaths(
-          this.videoIconStateRef.current.from,
-          newVolumeState
-        );
-        if (newPaths) {
-          this.setPaths(newPaths);
-        }
-      }
-    }
+    this.setVolumeState((prev) => ({
+      from: prev.to,
+      to: newVolumeState,
+    }));
   }
 
   // Handles local mute changes from outside bundle
   onLocalMuteChange() {
+    if (this.clientMute.current) {
+      return;
+    }
+
     this.localMute.current = !this.localMute.current;
 
-    if (this.localMute.current) {
-      this.videoIconStateRef.current = {
-        from: this.videoIconStateRef.current.to,
-        to: "off",
-      };
-
-      const newPaths = this.getPaths(
-        this.videoIconStateRef.current.from,
-        "off"
-      );
-      if (newPaths) {
-        this.setPaths(newPaths);
-      }
-    } else {
-      if (!this.audioRef.current) {
-        return;
-      }
-
-      const newVolume = this.audioRef.current.volume;
-      let newVolumeState;
-      if (newVolume === 0) {
-        newVolumeState = "off";
-      } else if (newVolume >= 0.5) {
-        newVolumeState = "high";
-      } else {
-        newVolumeState = "low";
-      }
-
-      this.videoIconStateRef.current = {
-        from: this.videoIconStateRef.current.to,
-        to: newVolumeState,
-      };
-
-      const newPaths = this.getPaths(
-        this.videoIconStateRef.current.from,
-        newVolumeState
-      );
-      if (newPaths) {
-        this.setPaths(newPaths);
-      }
+    if (!this.audioRef.current) {
+      return;
     }
+
+    if (!this.isUser) {
+      this.audioRef.current.muted = this.localMute.current;
+    }
+
+    const newVolume = this.audioRef.current.volume;
+    let newVolumeState;
+    if (this.localMute.current || newVolume === 0) {
+      newVolumeState = "off";
+    } else if (newVolume >= 0.5) {
+      newVolumeState = "high";
+    } else {
+      newVolumeState = "low";
+    }
+
+    this.setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
   }
 }
 

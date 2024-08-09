@@ -45,7 +45,10 @@ class Consumers {
         roomConsumerTransports[event.table_id] = {};
       }
 
-      roomConsumerTransports[event.table_id][event.username] = transport;
+      roomConsumerTransports[event.table_id][event.username] = {
+        transport,
+        isConnected: false,
+      };
 
       this.io.to(`${event.table_id}_${event.username}`).emit("message", {
         type: "consumerTransportCreated",
@@ -72,9 +75,14 @@ class Consumers {
       return;
     }
 
-    await roomConsumerTransports[event.table_id][event.username].connect({
-      dtlsParameters: event.dtlsParameters,
-    });
+    if (!roomConsumerTransports[event.table_id][event.username].isConnected) {
+      await roomConsumerTransports[event.table_id][
+        event.username
+      ].transport.connect({
+        dtlsParameters: event.dtlsParameters,
+      });
+      roomConsumerTransports[event.table_id][event.username].isConnected = true;
+    }
 
     this.io.to(`${event.table_id}_${event.username}`).emit("message", {
       type: "consumerTransportConnected",
@@ -233,7 +241,8 @@ class Consumers {
     };
 
     // Get the consumer transport associated with the user
-    const transport = roomConsumerTransports[event.table_id][event.username];
+    const transport =
+      roomConsumerTransports[event.table_id][event.username].transport;
     const producer =
       event.consumerType === "camera" || event.consumerType === "screen"
         ? event.incomingProducerId

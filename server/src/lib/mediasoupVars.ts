@@ -17,10 +17,14 @@ export const workersMap: {
   [table_id: string]: number;
 } = {};
 export const roomProducerTransports: {
-  [table_id: string]: { [username: string]: Transport };
+  [table_id: string]: {
+    [username: string]: { transport: Transport; isConnected: boolean };
+  };
 } = {};
 export const roomConsumerTransports: {
-  [table_id: string]: { [username: string]: Transport };
+  [table_id: string]: {
+    [username: string]: { transport: Transport; isConnected: boolean };
+  };
 } = {};
 export const roomProducers: {
   [table_id: string]: {

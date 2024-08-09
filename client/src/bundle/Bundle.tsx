@@ -19,27 +19,27 @@ const defaultBundleOptions = {
 };
 
 export default function Bundle({
-  username,
-  table_id,
   socket,
+  table_id,
+  username,
+  name,
   initCameraStreams,
   initScreenStreams,
   initAudioStream,
   options,
-  muteButtonCallback,
-  initialVolume,
+  handleMuteCallback,
   onRendered,
   onNewConsumerWasCreatedCallback,
 }: {
-  username: string;
-  table_id: string;
   socket: React.MutableRefObject<Socket>;
+  table_id: string;
+  username: string;
+  name?: string;
   initCameraStreams?: { [cameraKey: string]: MediaStream };
   initScreenStreams?: { [screenKey: string]: MediaStream };
   initAudioStream?: MediaStream;
   options?: BundleOptions;
-  muteButtonCallback?: () => any;
-  initialVolume?: "off" | "low" | "high";
+  handleMuteCallback?: () => any;
   onRendered?: () => any;
   onNewConsumerWasCreatedCallback?: () => any;
 }) {
@@ -49,6 +49,7 @@ export default function Bundle({
   };
 
   const { userMedia, remoteTracksMap } = useStreamsContext();
+
   const [cameraStreams, setCameraStreams] = useState<
     | {
         [screenKey: string]: MediaStream;
@@ -64,6 +65,7 @@ export default function Bundle({
   const [audioStream, setAudioStream] = useState<MediaStream | undefined>(
     initAudioStream
   );
+
   const audioRef = useRef<HTMLAudioElement>(null);
   const bundleRef = useRef<HTMLDivElement>(null);
 
@@ -79,7 +81,6 @@ export default function Bundle({
     remoteTracksMap,
     userMedia,
     clientMute,
-    localMute,
     onNewConsumerWasCreatedCallback
   );
 
@@ -107,41 +108,7 @@ export default function Bundle({
     }
   }, [audioRef, audioStream]);
 
-  const handleMute = () => {
-    if (muteButtonCallback !== undefined) {
-      muteButtonCallback();
-    }
-
-    if (clientMute.current) {
-      return;
-    }
-
-    localMute.current = !localMute.current;
-
-    if (audioRef.current && bundleOptions.isUser) {
-      audioRef.current.muted = true;
-    }
-  };
-
-  const volumeChangeHandler = () => {
-    if (!bundleRef.current) {
-      return;
-    }
-
-    const volumeSliders = bundleRef.current.querySelectorAll(".volume-slider");
-
-    volumeSliders.forEach((slider) => {
-      const sliderElement = slider as HTMLInputElement;
-      if (audioRef.current) {
-        sliderElement.value = audioRef.current.muted
-          ? "0"
-          : audioRef.current.volume.toString();
-      }
-    });
-    tracksColorSetter();
-  };
-
-  const tracksColorSetter = () => {
+  const tracksColorSetterCallback = () => {
     if (!bundleRef.current || !audioRef.current) {
       return;
     }
@@ -149,7 +116,11 @@ export default function Bundle({
     const volumeSliders = bundleRef.current.querySelectorAll(".volume-slider");
 
     let value = audioRef.current.volume;
-    if (audioRef.current.muted) {
+    if (
+      audioRef.current.muted &&
+      !bundleOptions.isUser &&
+      !clientMute.current
+    ) {
       value = 0;
     }
     const min = 0;
@@ -163,7 +134,9 @@ export default function Bundle({
     });
   };
 
-  const handleVolumeSlider = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVolumeSliderCallback = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const volume = parseFloat(event.target.value);
 
     if (bundleRef.current) {
@@ -176,7 +149,23 @@ export default function Bundle({
       });
     }
 
-    tracksColorSetter();
+    tracksColorSetterCallback();
+  };
+
+  const handleMute = () => {
+    if (handleMuteCallback) {
+      handleMuteCallback();
+    }
+
+    if (clientMute.current) {
+      return;
+    }
+
+    localMute.current = !localMute.current;
+
+    if (audioRef.current && bundleOptions.isUser) {
+      audioRef.current.muted = true;
+    }
   };
 
   return (
@@ -190,11 +179,17 @@ export default function Bundle({
         Object.entries(cameraStreams).map(([key, cameraStream]) => (
           <FgVideo
             key={key}
-            type='camera'
-            username={username}
-            table_id={table_id}
             socket={socket}
             videoId={key}
+            table_id={table_id}
+            username={username}
+            name={name}
+            type='camera'
+            isUser={bundleOptions.isUser}
+            clientMute={clientMute}
+            localMute={localMute}
+            videoStream={cameraStream}
+            audioRef={audioRef}
             options={{
               isUser: bundleOptions.isUser,
               isStream: true,
@@ -208,8 +203,8 @@ export default function Bundle({
               isSkip: false,
               isThumbnail: false,
               isPreview: false,
-              initialVolume: initialVolume
-                ? initialVolume
+              initialVolume: bundleOptions.initialVolume
+                ? bundleOptions.initialVolume
                 : audioRef.current
                 ? audioRef.current.muted
                   ? "off"
@@ -219,13 +214,9 @@ export default function Bundle({
                 : "high",
             }}
             handleMute={handleMute}
-            videoStream={cameraStream}
-            audioRef={audioRef}
-            handleVolumeSlider={handleVolumeSlider}
-            tracksColorSetter={tracksColorSetter}
-            volumeChangeHandler={volumeChangeHandler}
-            clientMute={clientMute}
-            isUser={bundleOptions.isUser}
+            handleMuteCallback={handleMuteCallback}
+            handleVolumeSliderCallback={handleVolumeSliderCallback}
+            tracksColorSetterCallback={tracksColorSetterCallback}
           />
         ))}
       {screenStreams &&
@@ -233,11 +224,17 @@ export default function Bundle({
         Object.entries(screenStreams).map(([key, screenStream]) => (
           <FgVideo
             key={key}
-            type='screen'
-            username={username}
-            table_id={table_id}
             socket={socket}
             videoId={key}
+            table_id={table_id}
+            username={username}
+            name={name}
+            type='screen'
+            isUser={bundleOptions.isUser}
+            clientMute={clientMute}
+            localMute={localMute}
+            videoStream={screenStream}
+            audioRef={audioRef}
             options={{
               isUser: bundleOptions.isUser,
               isStream: true,
@@ -250,8 +247,8 @@ export default function Bundle({
               isSkip: false,
               isThumbnail: false,
               isPreview: false,
-              initialVolume: initialVolume
-                ? initialVolume
+              initialVolume: bundleOptions.initialVolume
+                ? bundleOptions.initialVolume
                 : audioRef.current
                 ? audioRef.current.muted
                   ? "off"
@@ -261,13 +258,9 @@ export default function Bundle({
                 : "high",
             }}
             handleMute={handleMute}
-            videoStream={screenStream}
-            audioRef={audioRef}
-            handleVolumeSlider={handleVolumeSlider}
-            tracksColorSetter={tracksColorSetter}
-            volumeChangeHandler={volumeChangeHandler}
-            clientMute={clientMute}
-            isUser={bundleOptions.isUser}
+            handleMuteCallback={handleMuteCallback}
+            handleVolumeSliderCallback={handleVolumeSliderCallback}
+            tracksColorSetterCallback={tracksColorSetterCallback}
           />
         ))}
       {audioStream &&

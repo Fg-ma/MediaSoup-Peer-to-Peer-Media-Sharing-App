@@ -106,14 +106,42 @@ export default function FgButton({
   useEffect(() => {
     const handleWindowMouseUp = (event: MouseEvent) =>
       handleMouseUp(event as unknown as React.MouseEvent<Element, MouseEvent>);
+
     window.addEventListener("mouseup", handleWindowMouseUp);
+
     return () => {
       window.removeEventListener("mouseup", handleWindowMouseUp);
     };
   }, []);
 
+  const handleMouseEnter = () => {
+    if (hoverContent) {
+      hoverTimeout.current = setTimeout(() => {
+        setIsHover(true);
+      }, hoverTimeoutDuration);
+
+      window.addEventListener("mousemove", handleMouseMove);
+    }
+  };
+
+  const handleMouseMove = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const buttonElement = externalRef?.current || buttonRef.current;
+
+    if (!buttonElement || !buttonElement.contains(target)) {
+      window.removeEventListener("mousemove", handleMouseMove);
+
+      if (hoverContent) {
+        if (hoverTimeout.current !== null) {
+          clearTimeout(hoverTimeout.current);
+        }
+        setIsHover(false);
+      }
+    }
+  };
+
   return (
-    <div>
+    <>
       <button
         ref={externalRef ? externalRef : buttonRef}
         onMouseDown={(event) => handleMouseDown(event)}
@@ -121,21 +149,7 @@ export default function FgButton({
         style={style}
         data-value={defaultDataValue}
         onDoubleClick={handleDoubleClick}
-        onMouseEnter={() => {
-          if (hoverContent) {
-            hoverTimeout.current = setTimeout(() => {
-              setIsHover(true);
-            }, hoverTimeoutDuration);
-          }
-        }}
-        onMouseLeave={() => {
-          if (hoverContent) {
-            if (hoverTimeout.current !== null) {
-              clearTimeout(hoverTimeout.current);
-            }
-            setIsHover(false);
-          }
-        }}
+        onMouseEnter={handleMouseEnter}
         disabled={disabled}
       >
         {contentFunction && contentFunction()}
@@ -162,6 +176,6 @@ export default function FgButton({
           )}
         </AnimatePresence>
       )}
-    </div>
+    </>
   );
 }

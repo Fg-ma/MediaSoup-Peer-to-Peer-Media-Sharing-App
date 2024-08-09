@@ -77,43 +77,43 @@ export const defaultFgVideoOptions = {
 };
 
 export default function FgVideo({
-  type,
-  username,
-  name,
-  table_id,
   socket,
   videoId,
+  table_id,
+  username,
+  name,
+  type,
+  isUser,
+  clientMute,
+  localMute,
+  videoStream,
+  audioRef,
+  videoStyles,
   options,
   handleMute,
-  videoStream,
-  videoStyles,
-  audioRef,
-  handleVolumeSlider,
-  tracksColorSetter,
-  volumeChangeHandler,
-  clientMute,
-  isUser,
+  handleMuteCallback,
+  handleVolumeSliderCallback,
+  tracksColorSetterCallback,
 }: {
-  type: "camera" | "screen";
-  username: string;
-  name?: string;
-  table_id: string;
   socket: React.MutableRefObject<Socket>;
   videoId: string;
+  table_id: string;
+  username: string;
+  name?: string;
+  type: "camera" | "screen";
+  isUser: boolean;
+  clientMute: React.MutableRefObject<boolean>;
+  localMute: React.MutableRefObject<boolean>;
+  videoStream?: MediaStream;
+  audioRef: React.RefObject<HTMLAudioElement>;
+  videoStyles?: React.CSSProperties;
   options?: FgVideoOptions;
   handleMute: () => void;
-  videoStream?: MediaStream;
-  videoStyles?: React.CSSProperties;
-  audioRef: React.RefObject<HTMLAudioElement>;
-  handleVolumeSlider: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  tracksColorSetter: () => void;
-  volumeChangeHandler: () => void;
-  blurCameraStream?: (webcamId: string) => Promise<void>;
-  producerTransport?: React.MutableRefObject<
-    mediasoup.types.Transport<mediasoup.types.AppData> | undefined
-  >;
-  clientMute: React.MutableRefObject<boolean>;
-  isUser: boolean;
+  handleMuteCallback: (() => void) | undefined;
+  handleVolumeSliderCallback: (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => void;
+  tracksColorSetterCallback: () => void;
 }) {
   const fgVideoOptions = {
     ...defaultFgVideoOptions,
@@ -199,18 +199,17 @@ export default function FgVideo({
   );
 
   const fgVideoController = new FgVideoController(
-    type,
     videoId,
-    fgVideoOptions,
-    videoRef,
+    type,
+    controls,
     videoStream,
+    videoRef,
     videoContainerRef,
     audioRef,
     captions,
-    controls,
-    tracksColorSetter,
     timelineContainerRef,
     currentTimeRef,
+    fgVideoOptions,
     handleEffectChange
   );
 
@@ -389,26 +388,26 @@ export default function FgVideo({
             controls={controls}
           />
           <FgVideoControls
+            socket={socket}
             videoId={videoId}
+            username={username}
             type={type}
+            isUser={isUser}
             controls={controls}
-            fgVideoOptions={fgVideoOptions}
+            clientMute={clientMute}
+            localMute={localMute}
             videoContainerRef={videoContainerRef}
             audioRef={audioRef}
             currentTimeRef={currentTimeRef}
             totalTimeRef={totalTimeRef}
             playbackSpeedButtonRef={playbackSpeedButtonRef}
-            handleEffectChange={handleEffectChange}
-            handleVolumeSlider={handleVolumeSlider}
-            handleMute={handleMute}
-            tracksColorSetter={tracksColorSetter}
-            volumeChangeHandler={volumeChangeHandler}
             tintColor={tintColor}
             effectsActive={effectsActive}
-            clientMute={clientMute}
-            isUser={isUser}
-            username={username}
-            socket={socket}
+            fgVideoOptions={fgVideoOptions}
+            handleEffectChange={handleEffectChange}
+            handleMuteCallback={handleMuteCallback}
+            handleVolumeSliderCallback={handleVolumeSliderCallback}
+            tracksColorSetterCallback={tracksColorSetterCallback}
           />
           <div
             className='controls-gradient absolute bottom-0 w-full h-20 z-10'

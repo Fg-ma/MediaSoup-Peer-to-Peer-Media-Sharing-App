@@ -1,58 +1,77 @@
+import { FgVolumeElementOptions } from "../FgVolumeElement";
 import FgVolumeElementSocket from "./FgVolumeElementSocket";
-import volumeSVGPaths, { newVolumeSVGPaths } from "../lib/volumeSVGPaths";
 
 class FgVolumeElementController {
-  private isUser: boolean;
   private username: string;
-  private clientMute: React.MutableRefObject<boolean>;
-  private videoIconStateRef: React.MutableRefObject<{
-    from: string;
-    to: string;
-  }>;
-  private setPaths: React.Dispatch<
-    React.SetStateAction<[string, string, string] | undefined>
-  >;
+  private isUser: boolean;
+  private fgVolumeElementOptions: FgVolumeElementOptions;
+
   private audioRef: React.RefObject<HTMLAudioElement>;
+  private sliderRef: React.RefObject<HTMLInputElement>;
+  private clientMute: React.MutableRefObject<boolean>;
   private localMute: React.MutableRefObject<boolean>;
   private setActive: React.Dispatch<React.SetStateAction<boolean>>;
+
+  private volumeState: {
+    from: string;
+    to: string;
+  };
+  private setVolumeState: React.Dispatch<
+    React.SetStateAction<{
+      from: string;
+      to: string;
+    }>
+  >;
+
+  private tracksColorSetterCallback: (() => void) | undefined;
 
   private fgVolumeElementSocket: FgVolumeElementSocket;
 
   constructor(
-    isUser: boolean,
     username: string,
+    isUser: boolean,
+    fgVolumeElementOptions: FgVolumeElementOptions,
+    audioRef: React.RefObject<HTMLAudioElement>,
+    sliderRef: React.RefObject<HTMLInputElement>,
     clientMute: React.MutableRefObject<boolean>,
-    videoIconStateRef: React.MutableRefObject<{
+    localMute: React.MutableRefObject<boolean>,
+    setActive: React.Dispatch<React.SetStateAction<boolean>>,
+    volumeState: {
       from: string;
       to: string;
-    }>,
-    setPaths: React.Dispatch<
-      React.SetStateAction<[string, string, string] | undefined>
+    },
+    setVolumeState: React.Dispatch<
+      React.SetStateAction<{
+        from: string;
+        to: string;
+      }>
     >,
-    audioRef: React.RefObject<HTMLAudioElement>,
-    localMute: React.MutableRefObject<boolean>,
-    setActive: React.Dispatch<React.SetStateAction<boolean>>
+    tracksColorSetterCallback: (() => void) | undefined
   ) {
-    this.isUser = isUser;
     this.username = username;
-    this.clientMute = clientMute;
-    this.videoIconStateRef = videoIconStateRef;
-    this.setPaths = setPaths;
+    this.isUser = isUser;
+    this.fgVolumeElementOptions = fgVolumeElementOptions;
     this.audioRef = audioRef;
+    this.sliderRef = sliderRef;
+    this.clientMute = clientMute;
     this.localMute = localMute;
     this.setActive = setActive;
+    this.volumeState = volumeState;
+    this.setVolumeState = setVolumeState;
+    this.tracksColorSetterCallback = tracksColorSetterCallback;
 
     this.fgVolumeElementSocket = new FgVolumeElementSocket(
       this.isUser,
       this.username,
       this.clientMute,
-      this.videoIconStateRef,
+      this.volumeState,
+      this.setVolumeState,
       this.audioRef,
       this.localMute,
-      this.setPaths,
-      this.getNewPaths,
       this.setActive
     );
+
+    this.volumeSliderChangeHandler.bind(this);
   }
 
   handleMessage(event: any) {
@@ -71,288 +90,52 @@ class FgVolumeElementController {
     }
   }
 
-  getPaths(from: string, to: string) {
-    let newPaths: string[][] = [];
-    if (from === "high" && to === "off") {
-      newPaths = [
-        [
-          volumeSVGPaths.volumeHigh1a,
-          volumeSVGPaths.volumeHighOffIB1a,
-          volumeSVGPaths.volumeOff1a,
-        ],
-        [
-          volumeSVGPaths.volumeHigh1b,
-          volumeSVGPaths.volumeHighOffIB1b,
-          volumeSVGPaths.volumeOff1b,
-        ],
-        [
-          volumeSVGPaths.volumeHigh2a,
-          volumeSVGPaths.volumeHighOffIB2a,
-          volumeSVGPaths.volumeOff2a,
-        ],
-        [
-          volumeSVGPaths.volumeHigh2b,
-          volumeSVGPaths.volumeHighOffIB2b,
-          volumeSVGPaths.volumeOff2b,
-        ],
-        [
-          volumeSVGPaths.volumeHigh3a,
-          volumeSVGPaths.volumeHighOffIB3a,
-          volumeSVGPaths.volumeOff3a,
-        ],
-        [
-          volumeSVGPaths.volumeHigh3b,
-          volumeSVGPaths.volumeHighOffIB3b,
-          volumeSVGPaths.volumeOff3b,
-        ],
-      ];
-    } else if (from === "off" && to === "high") {
-      newPaths = [
-        [
-          volumeSVGPaths.volumeOff1a,
-          volumeSVGPaths.volumeHighOffIB1a,
-          volumeSVGPaths.volumeHigh1a,
-        ],
-        [
-          volumeSVGPaths.volumeOff1b,
-          volumeSVGPaths.volumeHighOffIB1b,
-          volumeSVGPaths.volumeHigh1b,
-        ],
-        [
-          volumeSVGPaths.volumeOff2a,
-          volumeSVGPaths.volumeHighOffIB2a,
-          volumeSVGPaths.volumeHigh2a,
-        ],
-        [
-          volumeSVGPaths.volumeOff2b,
-          volumeSVGPaths.volumeHighOffIB2b,
-          volumeSVGPaths.volumeHigh2b,
-        ],
-        [
-          volumeSVGPaths.volumeOff3a,
-          volumeSVGPaths.volumeHighOffIB3a,
-          volumeSVGPaths.volumeHigh3a,
-        ],
-        [
-          volumeSVGPaths.volumeOff3b,
-          volumeSVGPaths.volumeHighOffIB3b,
-          volumeSVGPaths.volumeHigh3b,
-        ],
-      ];
-    } else if (from === "low" && to === "off") {
-      newPaths = [
-        [
-          volumeSVGPaths.volumeLow1a,
-          volumeSVGPaths.volumeLowOffA1a,
-          volumeSVGPaths.volumeLowOffB1a,
-          volumeSVGPaths.volumeOff1a,
-        ],
-        [
-          volumeSVGPaths.volumeLow1b,
-          volumeSVGPaths.volumeLowOffA1b,
-          volumeSVGPaths.volumeLowOffB1b,
-          volumeSVGPaths.volumeOff1b,
-        ],
-        [
-          volumeSVGPaths.volumeLow2a,
-          volumeSVGPaths.volumeLowOffA2a,
-          volumeSVGPaths.volumeLowOffB2a,
-          volumeSVGPaths.volumeOff2a,
-        ],
-        [
-          volumeSVGPaths.volumeLow2b,
-          volumeSVGPaths.volumeLowOffA2b,
-          volumeSVGPaths.volumeLowOffB2b,
-          volumeSVGPaths.volumeOff2b,
-        ],
-        [
-          volumeSVGPaths.volumeLow3a,
-          volumeSVGPaths.volumeLowOffA3a,
-          volumeSVGPaths.volumeLowOffB3a,
-          volumeSVGPaths.volumeOff3a,
-        ],
-        [
-          volumeSVGPaths.volumeLow3b,
-          volumeSVGPaths.volumeLowOffA3b,
-          volumeSVGPaths.volumeLowOffB3b,
-          volumeSVGPaths.volumeOff3b,
-        ],
-      ];
-    } else if (from === "off" && to === "low") {
-      newPaths = [
-        [
-          volumeSVGPaths.volumeOff1a,
-          volumeSVGPaths.volumeLowOffB1a,
-          volumeSVGPaths.volumeLowOffA1a,
-          volumeSVGPaths.volumeLow1a,
-        ],
-        [
-          volumeSVGPaths.volumeOff1b,
-          volumeSVGPaths.volumeLowOffB1b,
-          volumeSVGPaths.volumeLowOffA1b,
-          volumeSVGPaths.volumeLow1b,
-        ],
-        [
-          volumeSVGPaths.volumeOff2a,
-          volumeSVGPaths.volumeLowOffB2a,
-          volumeSVGPaths.volumeLowOffA2a,
-          volumeSVGPaths.volumeLow2a,
-        ],
-        [
-          volumeSVGPaths.volumeOff2b,
-          volumeSVGPaths.volumeLowOffB2b,
-          volumeSVGPaths.volumeLowOffA2b,
-          volumeSVGPaths.volumeLow2b,
-        ],
-        [
-          volumeSVGPaths.volumeOff3a,
-          volumeSVGPaths.volumeLowOffB3a,
-          volumeSVGPaths.volumeLowOffA3a,
-          volumeSVGPaths.volumeLow3a,
-        ],
-        [
-          volumeSVGPaths.volumeOff3b,
-          volumeSVGPaths.volumeLowOffB3b,
-          volumeSVGPaths.volumeLowOffA3b,
-          volumeSVGPaths.volumeLow3b,
-        ],
-      ];
-    } else if (from === "high" && to === "low") {
-      newPaths = [
-        [
-          volumeSVGPaths.volumeHigh1a,
-          volumeSVGPaths.volumeHighLowIB1a,
-          volumeSVGPaths.volumeLow1a,
-        ],
-        [
-          volumeSVGPaths.volumeHigh1b,
-          volumeSVGPaths.volumeHighLowIB1b,
-          volumeSVGPaths.volumeLow1b,
-        ],
-        [
-          volumeSVGPaths.volumeHigh2a,
-          volumeSVGPaths.volumeHighLowIB2a,
-          volumeSVGPaths.volumeLow2a,
-        ],
-        [
-          volumeSVGPaths.volumeHigh2b,
-          volumeSVGPaths.volumeHighLowIB2b,
-          volumeSVGPaths.volumeLow2b,
-        ],
-        [
-          volumeSVGPaths.volumeHigh3a,
-          volumeSVGPaths.volumeHighLowIB3a,
-          volumeSVGPaths.volumeLow3a,
-        ],
-        [
-          volumeSVGPaths.volumeHigh3b,
-          volumeSVGPaths.volumeHighLowIB3b,
-          volumeSVGPaths.volumeLow3b,
-        ],
-      ];
-    } else if (from === "low" && to === "high") {
-      newPaths = [
-        [
-          volumeSVGPaths.volumeLow1a,
-          volumeSVGPaths.volumeHighLowIB1a,
-          volumeSVGPaths.volumeHigh1a,
-        ],
-        [
-          volumeSVGPaths.volumeLow1b,
-          volumeSVGPaths.volumeHighLowIB1b,
-          volumeSVGPaths.volumeHigh1b,
-        ],
-        [
-          volumeSVGPaths.volumeLow2a,
-          volumeSVGPaths.volumeHighLowIB2a,
-          volumeSVGPaths.volumeHigh2a,
-        ],
-        [
-          volumeSVGPaths.volumeLow2b,
-          volumeSVGPaths.volumeHighLowIB2b,
-          volumeSVGPaths.volumeHigh2b,
-        ],
-        [
-          volumeSVGPaths.volumeLow3a,
-          volumeSVGPaths.volumeHighLowIB3a,
-          volumeSVGPaths.volumeHigh3a,
-        ],
-        [
-          volumeSVGPaths.volumeLow3b,
-          volumeSVGPaths.volumeHighLowIB3b,
-          volumeSVGPaths.volumeHigh3b,
-        ],
-      ];
+  volumeSliderChangeHandler() {
+    this.tracksColorSetter();
+
+    if (!this.audioRef.current || this.clientMute?.current) {
+      return;
     }
-    return newPaths;
+
+    const newVolume = this.audioRef.current.volume;
+    let newVolumeState;
+    if ((this.audioRef.current.muted && !this.isUser) || newVolume === 0) {
+      newVolumeState = "off";
+    } else if (this.audioRef.current.volume >= 0.5) {
+      newVolumeState = "high";
+    } else {
+      newVolumeState = "low";
+    }
+
+    if (this.volumeState.to !== newVolumeState) {
+      this.audioRef.current.muted = newVolumeState === "off";
+
+      this.setVolumeState((prev) => ({
+        from: prev.to,
+        to: newVolumeState,
+      }));
+    }
   }
 
-  getNewPaths(from: string, to: string) {
-    let newPaths: [string, string, string] | undefined;
-    if (from === "high" && to === "off") {
-      newPaths = [
-        newVolumeSVGPaths.high.right,
-        newVolumeSVGPaths.high.right,
-        newVolumeSVGPaths.high.right,
-      ];
-    } else if (from === "off" && to === "high") {
-      newPaths = [
-        newVolumeSVGPaths.high.right,
-        newVolumeSVGPaths.high.right,
-        newVolumeSVGPaths.high.right,
-      ];
-    } else if (from === "low" && to === "off") {
-      newPaths = [
-        newVolumeSVGPaths.low.right,
-        newVolumeSVGPaths.highLow.right,
-        newVolumeSVGPaths.high.right,
-      ];
-    } else if (from === "off" && to === "low") {
-      newPaths = [
-        newVolumeSVGPaths.high.right,
-        newVolumeSVGPaths.highLow.right,
-        newVolumeSVGPaths.low.right,
-      ];
-    } else if (from === "high" && to === "low") {
-      newPaths = [
-        newVolumeSVGPaths.high.right,
-        newVolumeSVGPaths.highLow.right,
-        newVolumeSVGPaths.low.right,
-      ];
-    } else if (from === "low" && to === "high") {
-      newPaths = [
-        newVolumeSVGPaths.low.right,
-        newVolumeSVGPaths.highLow.right,
-        newVolumeSVGPaths.high.right,
-      ];
+  tracksColorSetter() {
+    if (!this.sliderRef.current || !this.audioRef.current) {
+      return;
     }
-    return newPaths;
-  }
 
-  getStrikePaths(from: string, to: string) {
-    let newPaths: [string, string] | undefined;
-    if (from === "high" && to === "off") {
-      newPaths = [
-        newVolumeSVGPaths.strike.ball,
-        newVolumeSVGPaths.strike.strike,
-      ];
-    } else if (from === "off" && to === "high") {
-      newPaths = [
-        newVolumeSVGPaths.strike.strike,
-        newVolumeSVGPaths.strike.ball,
-      ];
-    } else if (from === "low" && to === "off") {
-      newPaths = [
-        newVolumeSVGPaths.strike.ball,
-        newVolumeSVGPaths.strike.strike,
-      ];
-    } else if (from === "off" && to === "low") {
-      newPaths = [
-        newVolumeSVGPaths.strike.strike,
-        newVolumeSVGPaths.strike.ball,
-      ];
+    let value = this.audioRef.current.volume;
+    if (this.audioRef.current.muted && !this.clientMute.current) {
+      value = 0;
     }
-    return newPaths;
+    const min = 0;
+    const max = 1;
+    const percentage = ((value - min) / (max - min)) * 100;
+    const trackColor = `linear-gradient(to right, ${this.fgVolumeElementOptions.primaryVolumeSliderColor} 0%, ${this.fgVolumeElementOptions.primaryVolumeSliderColor} ${percentage}%, ${this.fgVolumeElementOptions.secondaryVolumeSliderColor} ${percentage}%, ${this.fgVolumeElementOptions.secondaryVolumeSliderColor} 100%)`;
+
+    this.sliderRef.current.style.background = trackColor;
+
+    if (this.tracksColorSetterCallback) {
+      this.tracksColorSetterCallback();
+    }
   }
 }
 

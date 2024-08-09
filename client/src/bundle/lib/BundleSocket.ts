@@ -5,6 +5,7 @@ import ScreenMedia from "../../lib/ScreenMedia";
 class BundleSocket {
   private isUser: boolean;
   private username: string;
+
   private setCameraStreams: React.Dispatch<
     React.SetStateAction<
       | {
@@ -24,6 +25,7 @@ class BundleSocket {
   private setAudioStream: React.Dispatch<
     React.SetStateAction<MediaStream | undefined>
   >;
+
   private remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       camera?:
@@ -48,8 +50,9 @@ class BundleSocket {
     };
     audio: AudioMedia | undefined;
   }>;
+
   private clientMute: React.MutableRefObject<boolean>;
-  private localMute: React.MutableRefObject<boolean>;
+
   private onNewConsumerWasCreatedCallback?: () => void;
 
   constructor(
@@ -99,7 +102,6 @@ class BundleSocket {
       audio: AudioMedia | undefined;
     }>,
     clientMute: React.MutableRefObject<boolean>,
-    localMute: React.MutableRefObject<boolean>,
     onNewConsumerWasCreatedCallback?: () => any
   ) {
     this.isUser = isUser;
@@ -110,7 +112,6 @@ class BundleSocket {
     this.remoteTracksMap = remoteTracksMap;
     this.userMedia = userMedia;
     this.clientMute = clientMute;
-    this.localMute = localMute;
     this.onNewConsumerWasCreatedCallback = onNewConsumerWasCreatedCallback;
   }
 
@@ -230,33 +231,17 @@ class BundleSocket {
     }
   }
 
-  onClientMuteStateResponsed(event: {
-    type: string;
-    producerUsername: string;
-  }) {
-    if (this.isUser || this.username !== event.producerUsername) {
-      return;
-    }
-
-    this.clientMute.current = true;
-  }
-
   // Get client mute changes from other users
   onClientMuteChange(event: {
     type: string;
     username: string;
     clientMute: boolean;
   }) {
-    if (this.isUser || this.username !== event.username) {
+    if (this.isUser) {
       return;
     }
 
     this.clientMute.current = event.clientMute;
-  }
-
-  // Handles local mute changes from outside bundle
-  onLocalMuteChange() {
-    this.localMute.current = !this.localMute.current;
   }
 }
 

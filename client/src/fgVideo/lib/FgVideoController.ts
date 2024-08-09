@@ -6,53 +6,54 @@ import { defaultFgVideoOptions, FgVideoOptions } from "../FgVideo";
 import Controls from "src/fgVideoControls/lib/Controls";
 
 class FgVideoController {
-  private type: "camera" | "screen";
   private videoId: string;
-  private fgVideoOptions: FgVideoOptions;
-  private videoRef: React.RefObject<HTMLVideoElement>;
+  private type: "camera" | "screen";
+
+  private controls: Controls;
+
   private videoStream: MediaStream | undefined;
+
+  private videoRef: React.RefObject<HTMLVideoElement>;
   private videoContainerRef: React.RefObject<HTMLDivElement>;
   private audioRef: React.RefObject<HTMLAudioElement>;
   private captions: React.MutableRefObject<TextTrack | undefined>;
-  private controls: Controls;
-  private tracksColorSetter: () => void;
   private timelineContainerRef: React.RefObject<HTMLDivElement>;
   private currentTimeRef: React.RefObject<HTMLDivElement>;
+
+  private fgVideoOptions: FgVideoOptions;
   private handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
 
   constructor(
-    type: "camera" | "screen",
     videoId: string,
-    fgVideoOptions: FgVideoOptions,
-    videoRef: React.RefObject<HTMLVideoElement>,
+    type: "camera" | "screen",
+    controls: Controls,
     videoStream: MediaStream | undefined,
+    videoRef: React.RefObject<HTMLVideoElement>,
     videoContainerRef: React.RefObject<HTMLDivElement>,
     audioRef: React.RefObject<HTMLAudioElement>,
     captions: React.MutableRefObject<TextTrack | undefined>,
-    controls: Controls,
-    tracksColorSetter: () => void,
     timelineContainerRef: React.RefObject<HTMLDivElement>,
     currentTimeRef: React.RefObject<HTMLDivElement>,
+    fgVideoOptions: FgVideoOptions,
     handleEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>
   ) {
-    this.type = type;
     this.videoId = videoId;
-    this.fgVideoOptions = fgVideoOptions;
-    this.videoRef = videoRef;
+    this.type = type;
+    this.controls = controls;
     this.videoStream = videoStream;
+    this.videoRef = videoRef;
     this.videoContainerRef = videoContainerRef;
     this.audioRef = audioRef;
     this.captions = captions;
-    this.controls = controls;
-    this.tracksColorSetter = tracksColorSetter;
     this.timelineContainerRef = timelineContainerRef;
     this.currentTimeRef = currentTimeRef;
+    this.fgVideoOptions = fgVideoOptions;
     this.handleEffectChange = handleEffectChange;
   }
 
@@ -78,7 +79,6 @@ class FgVideoController {
           : this.audioRef.current.volume.toString();
       }
     });
-    this.tracksColorSetter();
 
     // Get captions and set them to hidden initially
     if (this.videoRef.current && this.videoRef.current.textTracks[0]) {

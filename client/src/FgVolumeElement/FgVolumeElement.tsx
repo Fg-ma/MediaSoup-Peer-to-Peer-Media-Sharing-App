@@ -1,20 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import "./lib/fgVolumeElement.css";
-import volumeSVGPaths, { newVolumeSVGPaths } from "./lib/volumeSVGPaths";
+import volumeSVGPaths from "./lib/volumeSVGPaths";
 import FgButton from "../fgButton/FgButton";
-import SVGMorpher from "../SVGMorpher/SVGMorpher";
 import FgVolumeElementController from "./lib/FgVolumeElementController";
-import VolumeSVGMorpher from "./lib/VolumeSVGMorpher";
+import VolumeSVG from "./lib/VolumeSVG";
 
-interface FgVolumeElementOptions {
+export interface FgVolumeElementOptions {
   iconSize?: string;
   volumeSliderHeight?: string;
   volumeSliderWidth?: string;
   volumeSliderThumbSize?: string;
   primaryColor?: string;
   isSlider?: boolean;
-  initialVolume?: "low" | "off" | "high";
+  initialVolume?: string;
   primaryVolumeSliderColor?: string;
   secondaryVolumeSliderColor?: string;
 }
@@ -32,31 +31,31 @@ const defaultFgVolumeElementOptions = {
 };
 
 export default function FgVolumeElement({
+  socket,
+  username,
+  isUser,
   audioRef,
-  handleVolumeSliderCallback,
-  handleMuteCallback,
-  tracksColorSetterCallback,
-  volumeChangeHandlerCallback,
+  clientMute,
+  localMute,
   effectsActive,
   options,
-  clientMute,
-  isUser,
-  username,
-  socket,
+  handleMuteCallback,
+  handleVolumeSliderCallback,
+  tracksColorSetterCallback,
 }: {
+  socket: React.MutableRefObject<Socket>;
+  username: string;
+  isUser: boolean;
   audioRef: React.RefObject<HTMLAudioElement>;
+  clientMute: React.MutableRefObject<boolean>;
+  localMute: React.MutableRefObject<boolean>;
+  effectsActive: boolean;
+  options?: FgVolumeElementOptions;
+  handleMuteCallback?: () => void;
   handleVolumeSliderCallback?: (
     event: React.ChangeEvent<HTMLInputElement>
   ) => void;
-  handleMuteCallback?: () => void;
   tracksColorSetterCallback?: () => void;
-  volumeChangeHandlerCallback?: () => void;
-  effectsActive: boolean;
-  options?: FgVolumeElementOptions;
-  clientMute: React.MutableRefObject<boolean>;
-  isUser: boolean;
-  username: string;
-  socket: React.MutableRefObject<Socket>;
 }) {
   const fgVolumeElementOptions = {
     ...defaultFgVolumeElementOptions,
@@ -66,34 +65,31 @@ export default function FgVolumeElement({
   const [active, setActive] = useState(
     fgVolumeElementOptions.initialVolume === "off" ? true : false
   );
-  const [paths, setPaths] = useState<[string, string, string]>();
-  const [strikePaths, setStrikePaths] = useState<[string, string]>();
-  const volumeContainer = useRef<HTMLDivElement>(null);
-  const sliderRef = useRef<HTMLInputElement>(null);
-  const videoIconStateRef = useRef({
+  const [volumeState, setVolumeState] = useState({
     from: "",
     to: fgVolumeElementOptions.initialVolume,
   });
-
-  const localMute = useRef(
-    fgVolumeElementOptions.initialVolume === "off" ? true : false
-  ); // Not user audio mute
+  const volumeContainer = useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<HTMLInputElement>(null);
 
   const fgVolumeElementController = new FgVolumeElementController(
-    isUser,
     username,
-    clientMute,
-    videoIconStateRef,
-    setPaths,
+    isUser,
+    fgVolumeElementOptions,
     audioRef,
+    sliderRef,
+    clientMute,
     localMute,
-    setActive
+    setActive,
+    volumeState,
+    setVolumeState,
+    tracksColorSetterCallback
   );
 
   // Initial functions
   useEffect(() => {
     // Set initial volume slider
-    tracksColorSetter();
+    fgVolumeElementController.tracksColorSetter();
 
     volumeContainer.current?.style.setProperty(
       "--volume-slider-width",
@@ -120,128 +116,12 @@ export default function FgVolumeElement({
     };
   }, []);
 
-  const volumeChangeHandler = () => {
-    tracksColorSetter();
-
-    if (!audioRef.current || clientMute?.current) {
-      return;
-    }
-
-    const newVolume = audioRef.current.volume;
-    let newVolumeState;
-    if ((audioRef.current.muted && !isUser) || newVolume === 0) {
-      newVolumeState = "off";
-    } else if (audioRef.current.volume >= 0.5) {
-      newVolumeState = "high";
-    } else {
-      newVolumeState = "low";
-    }
-
-    if (videoIconStateRef.current.to !== newVolumeState) {
-      const { from, to } = videoIconStateRef.current;
-      videoIconStateRef.current = { from: to, to: newVolumeState };
-
-      if (newVolumeState === "off") {
-        audioRef.current.muted = true;
-
-        videoIconStateRef.current = {
-          from: videoIconStateRef.current.to,
-          to: "off",
-        };
-
-        const newPaths = fgVolumeElementController.getNewPaths(
-          videoIconStateRef.current.from,
-          "off"
-        );
-        if (newPaths) {
-          setPaths(newPaths);
-        }
-
-        const newStrikePaths = fgVolumeElementController.getStrikePaths(
-          videoIconStateRef.current.from,
-          "off"
-        );
-        setStrikePaths(newStrikePaths);
-      } else {
-        audioRef.current.muted = false;
-
-        const newVolume = audioRef.current.volume;
-        let newVolumeState;
-        if (newVolume === 0) {
-          newVolumeState = "off";
-        } else if (newVolume >= 0.5) {
-          newVolumeState = "high";
-        } else {
-          newVolumeState = "low";
-        }
-
-        videoIconStateRef.current = {
-          from: videoIconStateRef.current.to,
-          to: newVolumeState,
-        };
-
-        const newPaths = fgVolumeElementController.getNewPaths(
-          videoIconStateRef.current.from,
-          newVolumeState
-        );
-        if (newPaths) {
-          setPaths(newPaths);
-        }
-
-        const newStrikePaths = fgVolumeElementController.getStrikePaths(
-          videoIconStateRef.current.from,
-          newVolumeState
-        );
-        setStrikePaths(newStrikePaths);
-      }
-
-      const newPaths = fgVolumeElementController.getNewPaths(
-        to,
-        newVolumeState
-      );
-      if (newPaths) {
-        setPaths(newPaths);
-      }
-
-      const newStrikePaths = fgVolumeElementController.getStrikePaths(
-        to,
-        newVolumeState
-      );
-      setStrikePaths(newStrikePaths);
-    }
-
-    if (volumeChangeHandlerCallback) {
-      volumeChangeHandlerCallback();
-    }
-  };
-
-  const tracksColorSetter = () => {
-    if (!sliderRef.current || !audioRef.current) {
-      return;
-    }
-
-    let value = audioRef.current.volume;
-    if (audioRef.current.muted) {
-      value = 0;
-    }
-    const min = 0;
-    const max = 1;
-    const percentage = ((value - min) / (max - min)) * 100;
-    const trackColor = `linear-gradient(to right, ${fgVolumeElementOptions.primaryVolumeSliderColor} 0%, ${fgVolumeElementOptions.primaryVolumeSliderColor} ${percentage}%, ${fgVolumeElementOptions.secondaryVolumeSliderColor} ${percentage}%, ${fgVolumeElementOptions.secondaryVolumeSliderColor} 100%)`;
-
-    sliderRef.current.style.background = trackColor;
-
-    if (tracksColorSetterCallback) {
-      tracksColorSetterCallback();
-    }
-  };
-
   const handleVolumeSlider = (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
 
     if (audioRef.current) {
       audioRef.current.volume = volume;
-      if (!clientMute?.current) {
+      if (!clientMute?.current && !isUser) {
         audioRef.current.muted = volume > 0 ? false : true;
       }
     }
@@ -250,9 +130,9 @@ export default function FgVolumeElement({
       sliderRef.current.value = `${volume}`;
     }
 
-    tracksColorSetter();
+    fgVolumeElementController.tracksColorSetter();
 
-    volumeChangeHandler();
+    fgVolumeElementController.volumeSliderChangeHandler();
 
     if (handleVolumeSliderCallback) {
       handleVolumeSliderCallback(event);
@@ -260,69 +140,31 @@ export default function FgVolumeElement({
   };
 
   const handleMute = () => {
-    if (clientMute?.current) {
+    if (clientMute.current) {
       return;
     }
 
     localMute.current = !localMute.current;
 
-    if (audioRef.current) {
+    if (!audioRef.current) {
+      return;
+    }
+
+    if (!isUser) {
       audioRef.current.muted = localMute.current;
     }
 
-    if (localMute.current) {
-      videoIconStateRef.current = {
-        from: videoIconStateRef.current.to,
-        to: "off",
-      };
-
-      const newPaths = fgVolumeElementController.getNewPaths(
-        videoIconStateRef.current.from,
-        "off"
-      );
-      if (newPaths) {
-        setPaths(newPaths);
-      }
-
-      const newStrikePaths = fgVolumeElementController.getStrikePaths(
-        videoIconStateRef.current.from,
-        "off"
-      );
-      setStrikePaths(newStrikePaths);
+    const newVolume = audioRef.current.volume;
+    let newVolumeState;
+    if (localMute.current || newVolume === 0) {
+      newVolumeState = "off";
+    } else if (newVolume >= 0.5) {
+      newVolumeState = "high";
     } else {
-      if (!audioRef.current) {
-        return;
-      }
-
-      const newVolume = audioRef.current.volume;
-      let newVolumeState;
-      if (newVolume === 0) {
-        newVolumeState = "off";
-      } else if (newVolume >= 0.5) {
-        newVolumeState = "high";
-      } else {
-        newVolumeState = "low";
-      }
-
-      videoIconStateRef.current = {
-        from: videoIconStateRef.current.to,
-        to: newVolumeState,
-      };
-
-      const newPaths = fgVolumeElementController.getNewPaths(
-        videoIconStateRef.current.from,
-        videoIconStateRef.current.to
-      );
-      if (newPaths) {
-        setPaths(newPaths);
-      }
-
-      const newStrikePaths = fgVolumeElementController.getStrikePaths(
-        videoIconStateRef.current.from,
-        videoIconStateRef.current.to
-      );
-      setStrikePaths(newStrikePaths);
+      newVolumeState = "low";
     }
+
+    setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
 
     if (handleMuteCallback !== undefined) {
       handleMuteCallback();
@@ -346,53 +188,23 @@ export default function FgVolumeElement({
           return (
             <svg
               xmlns='http://www.w3.org/2000/svg'
-              width={`calc(${fgVolumeElementOptions.iconSize} - 0.25rem)`}
-              height={`calc(${fgVolumeElementOptions.iconSize} - 0.25rem)`}
               viewBox='0 0 100.0001 100.00001'
+              width={`calc(${fgVolumeElementOptions.iconSize} - 0.75rem)`}
+              height={`calc(${fgVolumeElementOptions.iconSize} - 0.75rem)`}
               fill={fgVolumeElementOptions.primaryColor}
             >
-              {videoIconStateRef.current.from &&
-              videoIconStateRef.current.to ? (
-                <VolumeSVGMorpher
-                  pathArrays={paths}
-                  stationaryPaths={[
-                    newVolumeSVGPaths.high.left,
-                    newVolumeSVGPaths.high.middle,
-                  ]}
-                  strikePaths={strikePaths}
-                  color={fgVolumeElementOptions.primaryColor}
-                />
-              ) : videoIconStateRef.current.from === "" &&
-                videoIconStateRef.current.to === "high" ? (
-                <>
-                  <path d={volumeSVGPaths.volumeHigh1a} />
-                  <path d={volumeSVGPaths.volumeHigh1b} />
-                  <path d={volumeSVGPaths.volumeHigh2a} />
-                  <path d={volumeSVGPaths.volumeHigh2b} />
-                  <path d={volumeSVGPaths.volumeHigh3a} />
-                  <path d={volumeSVGPaths.volumeHigh3b} />
-                </>
-              ) : videoIconStateRef.current.from === "" &&
-                videoIconStateRef.current.to === "low" ? (
-                <>
-                  <path d={volumeSVGPaths.volumeLow1a} />
-                  <path d={volumeSVGPaths.volumeLow1b} />
-                  <path d={volumeSVGPaths.volumeLow2a} />
-                  <path d={volumeSVGPaths.volumeLow2b} />
-                  <path d={volumeSVGPaths.volumeLow3a} />
-                  <path d={volumeSVGPaths.volumeLow3b} />
-                </>
-              ) : videoIconStateRef.current.from === "" &&
-                videoIconStateRef.current.to === "off" ? (
-                <>
-                  <path d={volumeSVGPaths.volumeOff1a} />
-                  <path d={volumeSVGPaths.volumeOff1b} />
-                  <path d={volumeSVGPaths.volumeOff2a} />
-                  <path d={volumeSVGPaths.volumeOff2b} />
-                  <path d={volumeSVGPaths.volumeOff3a} />
-                  <path d={volumeSVGPaths.volumeOff3b} />
-                </>
-              ) : null}
+              <VolumeSVG
+                volumeState={volumeState}
+                movingPath={volumeSVGPaths.low.right}
+                stationaryPaths={[
+                  volumeSVGPaths.high.left,
+                  volumeSVGPaths.high.middle,
+                ]}
+                color={fgVolumeElementOptions.primaryColor}
+              />
+              {volumeState.from === "" && volumeState.to === "off" && (
+                <path d={volumeSVGPaths.strike} />
+              )}
             </svg>
           );
         }}

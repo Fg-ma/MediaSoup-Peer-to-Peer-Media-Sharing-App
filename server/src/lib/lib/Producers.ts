@@ -53,7 +53,10 @@ class Producers {
           roomProducerTransports[event.table_id] = {};
         }
 
-        roomProducerTransports[event.table_id][event.username] = transport;
+        roomProducerTransports[event.table_id][event.username] = {
+          transport,
+          isConnected: false,
+        };
         this.io.to(`${event.table_id}_${event.username}`).emit("message", {
           type: "producerTransportCreated",
           params: params,
@@ -123,9 +126,15 @@ class Producers {
       return;
     }
 
-    await roomProducerTransports[event.table_id][event.username].connect({
-      dtlsParameters: event.dtlsParameters,
-    });
+    if (!roomProducerTransports[event.table_id][event.username].isConnected) {
+      await roomProducerTransports[event.table_id][
+        event.username
+      ].transport.connect({
+        dtlsParameters: event.dtlsParameters,
+      });
+      roomProducerTransports[event.table_id][event.username].isConnected = true;
+    }
+
     this.io.to(`${event.table_id}_${event.username}`).emit("message", {
       type: "producerConnected",
       data: "producer connected",
@@ -168,7 +177,7 @@ class Producers {
 
     const newProducer = await roomProducerTransports[event.table_id][
       event.username
-    ].produce({
+    ].transport.produce({
       kind,
       rtpParameters,
     });

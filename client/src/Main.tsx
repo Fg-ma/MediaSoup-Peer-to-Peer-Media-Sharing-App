@@ -205,7 +205,7 @@ export default function Main() {
           options={{
             isUser: true,
           }}
-          muteButtonCallback={muteAudio}
+          handleMuteCallback={muteAudio}
         />
       );
 
