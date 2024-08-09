@@ -5,15 +5,23 @@ import ScreenMedia from "./lib/ScreenMedia";
 import AudioMedia from "./lib/AudioMedia";
 
 class BrowserMedia {
-  private device;
-  private userMedia;
-  private handleDisableEnableBtns;
-  private isCamera;
-  private setCameraActive;
-  private isScreen;
-  private setScreenActive;
-  private isAudio;
-  private setAudioActive;
+  private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
+  private userMedia: React.MutableRefObject<{
+    camera: {
+      [cameraId: string]: CameraMedia;
+    };
+    screen: {
+      [screenId: string]: ScreenMedia;
+    };
+    audio: AudioMedia | undefined;
+  }>;
+  private isCamera: React.MutableRefObject<boolean>;
+  private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
+  private isScreen: React.MutableRefObject<boolean>;
+  private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>;
+  private isAudio: React.MutableRefObject<boolean>;
+  private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
+  private handleDisableEnableBtns: (disabled: boolean) => void;
 
   constructor(
     device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -26,23 +34,23 @@ class BrowserMedia {
       };
       audio: AudioMedia | undefined;
     }>,
-    handleDisableEnableBtns: (disabled: boolean) => void,
     isCamera: React.MutableRefObject<boolean>,
     setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
     isScreen: React.MutableRefObject<boolean>,
     setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
     isAudio: React.MutableRefObject<boolean>,
-    setAudioActive: React.Dispatch<React.SetStateAction<boolean>>
+    setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
+    handleDisableEnableBtns: (disabled: boolean) => void
   ) {
     this.device = device;
     this.userMedia = userMedia;
-    this.handleDisableEnableBtns = handleDisableEnableBtns;
     this.isCamera = isCamera;
     this.setCameraActive = setCameraActive;
     this.isScreen = isScreen;
     this.setScreenActive = setScreenActive;
     this.isAudio = isAudio;
     this.setAudioActive = setAudioActive;
+    this.handleDisableEnableBtns = handleDisableEnableBtns;
   }
 
   getCameraMedia = async () => {

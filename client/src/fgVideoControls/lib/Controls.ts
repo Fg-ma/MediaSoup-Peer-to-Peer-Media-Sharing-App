@@ -2,105 +2,144 @@ import { Socket } from "socket.io-client";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "src/context/StreamsContext";
+} from "../../context/StreamsContext";
 import { defaultFgVideoOptions, FgVideoOptions } from "../../fgVideo/FgVideo";
 
 class Controls {
   private socket: React.MutableRefObject<Socket> | undefined;
+  private videoId: string;
   private table_id: string;
   private username: string;
   private type: string;
-  private videoId: string;
+
   private fgVideoOptions: FgVideoOptions;
-  private videoContainerRef: React.RefObject<HTMLDivElement>;
-  private captions: React.MutableRefObject<TextTrack | undefined>;
-  private leadingZeroFormatter = new Intl.NumberFormat(undefined, {
-    minimumIntegerDigits: 2,
-  });
-  private controlPressed: React.MutableRefObject<boolean>;
-  private shiftPressed: React.MutableRefObject<boolean>;
-  private paused: React.MutableRefObject<boolean>;
+
   private videoRef: React.RefObject<HTMLVideoElement>;
-  private theater: React.MutableRefObject<boolean>;
-  private handleMute: () => void;
-  private leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | null>;
-  private playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
-  private timelineContainerRef: React.RefObject<HTMLDivElement>;
-  private currentTimeRef: React.RefObject<HTMLDivElement>;
-  private isScrubbing: React.MutableRefObject<boolean>;
+  private videoContainerRef: React.RefObject<HTMLDivElement>;
+
+  private shiftPressed: React.MutableRefObject<boolean>;
+  private controlPressed: React.MutableRefObject<boolean>;
+
+  private paused: React.MutableRefObject<boolean>;
   private wasPaused: React.MutableRefObject<boolean>;
+
+  private timelineContainerRef: React.RefObject<HTMLDivElement>;
+  private isScrubbing: React.MutableRefObject<boolean>;
+
+  private totalTimeRef: React.RefObject<HTMLDivElement>;
+  private currentTimeRef: React.RefObject<HTMLDivElement>;
+
   private previewImgRef: React.RefObject<HTMLImageElement>;
   private thumbnails: React.MutableRefObject<string[]>;
   private thumbnailImgRef: React.RefObject<HTMLImageElement>;
-  private totalTimeRef: React.RefObject<HTMLDivElement>;
   private thumbnailInterval: number;
   private thumbnailClarity: number;
+
+  private captions: React.MutableRefObject<TextTrack | undefined>;
+
+  private theater: React.MutableRefObject<boolean>;
+
+  private playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
+
+  private leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | null>;
+
   private setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
+
+  private handleMute: () => void;
   private handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
 
+  private leadingZeroFormatter = new Intl.NumberFormat(undefined, {
+    minimumIntegerDigits: 2,
+  });
+
   constructor(
     socket: React.MutableRefObject<Socket> | undefined,
+    videoId: string,
     table_id: string,
     username: string,
     type: string,
-    videoId: string,
+
     fgVideoOptions: FgVideoOptions,
-    videoContainerRef: React.RefObject<HTMLDivElement>,
-    captions: React.MutableRefObject<TextTrack | undefined>,
-    controlPressed: React.MutableRefObject<boolean>,
-    shiftPressed: React.MutableRefObject<boolean>,
-    paused: React.MutableRefObject<boolean>,
+
     videoRef: React.RefObject<HTMLVideoElement>,
-    theater: React.MutableRefObject<boolean>,
-    handleMute: () => void,
-    leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | null>,
-    playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>,
-    timelineContainerRef: React.RefObject<HTMLDivElement>,
-    currentTimeRef: React.RefObject<HTMLDivElement>,
-    isScrubbing: React.MutableRefObject<boolean>,
+    videoContainerRef: React.RefObject<HTMLDivElement>,
+
+    shiftPressed: React.MutableRefObject<boolean>,
+    controlPressed: React.MutableRefObject<boolean>,
+
+    paused: React.MutableRefObject<boolean>,
     wasPaused: React.MutableRefObject<boolean>,
+
+    timelineContainerRef: React.RefObject<HTMLDivElement>,
+    isScrubbing: React.MutableRefObject<boolean>,
+
+    totalTimeRef: React.RefObject<HTMLDivElement>,
+    currentTimeRef: React.RefObject<HTMLDivElement>,
+
     previewImgRef: React.RefObject<HTMLImageElement>,
     thumbnails: React.MutableRefObject<string[]>,
     thumbnailImgRef: React.RefObject<HTMLImageElement>,
-    totalTimeRef: React.RefObject<HTMLDivElement>,
     thumbnailInterval = 10,
     thumbnailClarity = 5,
+
+    captions: React.MutableRefObject<TextTrack | undefined>,
+
+    theater: React.MutableRefObject<boolean>,
+
+    playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>,
+
+    leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | null>,
+
     setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>,
+
+    handleMute: () => void,
     handleEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>
   ) {
     this.socket = socket;
+    this.videoId = videoId;
     this.table_id = table_id;
     this.username = username;
     this.type = type;
-    this.videoId = videoId;
+
     this.fgVideoOptions = fgVideoOptions;
-    this.videoContainerRef = videoContainerRef;
-    this.captions = captions;
-    this.controlPressed = controlPressed;
-    this.shiftPressed = shiftPressed;
-    this.paused = paused;
+
     this.videoRef = videoRef;
-    this.theater = theater;
-    this.handleMute = handleMute;
-    this.leaveVideoTimer = leaveVideoTimer;
-    this.playbackSpeedButtonRef = playbackSpeedButtonRef;
-    this.timelineContainerRef = timelineContainerRef;
-    this.currentTimeRef = currentTimeRef;
-    this.isScrubbing = isScrubbing;
+    this.videoContainerRef = videoContainerRef;
+
+    this.shiftPressed = shiftPressed;
+    this.controlPressed = controlPressed;
+
+    this.paused = paused;
     this.wasPaused = wasPaused;
+
+    this.timelineContainerRef = timelineContainerRef;
+    this.isScrubbing = isScrubbing;
+
+    this.totalTimeRef = totalTimeRef;
+    this.currentTimeRef = currentTimeRef;
+
     this.previewImgRef = previewImgRef;
     this.thumbnails = thumbnails;
     this.thumbnailImgRef = thumbnailImgRef;
-    this.totalTimeRef = totalTimeRef;
     this.thumbnailInterval = thumbnailInterval;
     this.thumbnailClarity = thumbnailClarity;
+
+    this.captions = captions;
+
+    this.theater = theater;
+
+    this.playbackSpeedButtonRef = playbackSpeedButtonRef;
+
+    this.leaveVideoTimer = leaveVideoTimer;
+
     this.setEffectsActive = setEffectsActive;
+    this.handleMute = handleMute;
     this.handleEffectChange = handleEffectChange;
   }
 

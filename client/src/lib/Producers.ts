@@ -463,7 +463,7 @@ class Producers {
         return;
       }
     } else if (event.producerType === "screen") {
-      producerId = `${this.username.current}_screen_stream_${this.userCameraCount.current}`;
+      producerId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
       if (
         this.userMedia.current.screen[
           `${this.username.current}_screen_stream_${this.userScreenCount.current}`

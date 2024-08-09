@@ -22,7 +22,7 @@ export default function FgButton({
   disabled = false,
 }: {
   externalRef?: React.RefObject<HTMLButtonElement>;
-  clickFunction: () => void;
+  clickFunction?: () => void;
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: () => void;
@@ -67,14 +67,14 @@ export default function FgButton({
       if (!isHeldRef.current) {
         if (doubleClickFunction) {
           clickTimeout.current = setTimeout(() => {
-            clickFunction();
+            if (clickFunction) clickFunction();
             if (clickTimeout.current !== null) {
               clearTimeout(clickTimeout.current);
               clickTimeout.current = null;
             }
           }, doubleClickTimeoutDuration);
         } else {
-          clickFunction();
+          if (clickFunction) clickFunction();
         }
       } else {
         if (holdFunction) {

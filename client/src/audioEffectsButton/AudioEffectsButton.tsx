@@ -9,8 +9,10 @@ import audioEffectOffIcon from "../../public/svgs/audioEffectOffIcon.svg";
 
 export default function AudioEffectsButton({
   handleMuteExternalMute,
+  mutedAudioRef,
 }: {
   handleMuteExternalMute: () => void;
+  mutedAudioRef: React.MutableRefObject<boolean>;
 }) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const [effectSectionActive, setEffectSectionActive] = useState(false);
@@ -59,6 +61,7 @@ export default function AudioEffectsButton({
           setAudioMixEffectsActive={setAudioMixEffectsActive}
           audioMixEffectsButtonRef={audioMixEffectsButtonRef}
           handleMuteExternalMute={handleMuteExternalMute}
+          mutedAudioRef={mutedAudioRef}
         />
       )}
       {audioMixEffectsActive && (

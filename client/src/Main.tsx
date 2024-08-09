@@ -1,24 +1,22 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
-import publishCamera from "./publishCamera";
-import publishScreen from "./publishScreen";
-import onRouterCapabilities from "./lib/onRouterCapabilities";
-import subscribe from "./subscribe";
-import joinTable from "./joinTable";
-import publishAudio from "./publishAudio";
-import onClientMuteStateRequested from "./lib/onClientMuteStateRequested";
-import publishNewCamera from "./publishNewCamera";
-import publishNewScreen from "./publishNewScreen";
 import { useStreamsContext } from "./context/StreamsContext";
-import Bundle from "./bundle/Bundle";
-import Producers from "./lib/Producers";
 import { useCurrentEffectsStylesContext } from "./context/CurrentEffectsStylesContext";
+import onRouterCapabilities from "./lib/onRouterCapabilities";
+import Producers from "./lib/Producers";
 import Consumers from "./lib/Consumers";
 import UserDevice from "./UserDevice";
 import Deadbanding from "./effects/visualEffects/lib/Deadbanding";
 import BrowserMedia from "./BrowserMedia";
+import BundlesController from "./bundlesController";
+import onClientMuteStateRequested from "./lib/onClientMuteStateRequested";
+import subscribe from "./subscribe";
+import joinTable from "./joinTable";
 import AudioEffectsButton from "./audioEffectsButton/AudioEffectsButton";
+import CameraSection from "./cameraSection/CameraSection";
+import ScreenSection from "./screenSection/ScreenSection";
+import AudioSection from "./audioSection/AudioSection";
 
 const websocketURL = "http://localhost:8000";
 
@@ -32,42 +30,47 @@ export default function Main() {
   } = useStreamsContext();
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
 
-  const cameraBtnRef = useRef<HTMLButtonElement>(null);
-  const newCameraBtnRef = useRef<HTMLButtonElement>(null);
-  const newScreenBtnRef = useRef<HTMLButtonElement>(null);
-  const screenBtnRef = useRef<HTMLButtonElement>(null);
-  const audioBtnRef = useRef<HTMLButtonElement>(null);
-  const muteBtnRef = useRef<HTMLButtonElement>(null);
-  const subBtnRef = useRef<HTMLButtonElement>(null);
-  const tableIdRef = useRef<HTMLInputElement>(null);
-  const usernameRef = useRef<HTMLInputElement>(null);
-  const remoteVideosContainerRef = useRef<HTMLDivElement>(null);
-  const consumerTransport =
-    useRef<mediasoup.types.Transport<mediasoup.types.AppData>>();
-  const producerTransport =
-    useRef<mediasoup.types.Transport<mediasoup.types.AppData>>();
-  const [mutedAudio, setMutedAudio] = useState(false);
-  const mutedAudioRef = useRef(false);
-  const [subscribedActive, setSubscribedActive] = useState(false);
-  const isSubscribed = useRef(false);
-  const [isInTable, setIsInTable] = useState(false);
-
-  const isCamera = useRef(false);
-  const [cameraActive, setCameraActive] = useState(false);
-  const isScreen = useRef(false);
-  const [screenActive, setScreenActive] = useState(false);
-  const isAudio = useRef(false);
-  const [audioActive, setAudioActive] = useState(false);
+  const socket = useRef<Socket>(io(websocketURL));
+  const device = useRef<mediasoup.Device>();
 
   const table_id = useRef("");
   const username = useRef("");
 
-  const socket = useRef<Socket>(io(websocketURL));
-  const device = useRef<mediasoup.Device>();
-
   const [bundles, setBundles] = useState<{
     [username: string]: React.JSX.Element;
   }>({});
+
+  const consumerTransport =
+    useRef<mediasoup.types.Transport<mediasoup.types.AppData>>();
+  const producerTransport =
+    useRef<mediasoup.types.Transport<mediasoup.types.AppData>>();
+
+  const cameraBtnRef = useRef<HTMLButtonElement>(null);
+  const newCameraBtnRef = useRef<HTMLButtonElement>(null);
+  const isCamera = useRef(false);
+  const [cameraActive, setCameraActive] = useState(false);
+
+  const screenBtnRef = useRef<HTMLButtonElement>(null);
+  const newScreenBtnRef = useRef<HTMLButtonElement>(null);
+  const isScreen = useRef(false);
+  const [screenActive, setScreenActive] = useState(false);
+
+  const audioBtnRef = useRef<HTMLButtonElement>(null);
+  const muteBtnRef = useRef<HTMLButtonElement>(null);
+  const mutedAudioRef = useRef(false);
+  const [mutedAudio, setMutedAudio] = useState(false);
+  const isAudio = useRef(false);
+  const [audioActive, setAudioActive] = useState(false);
+
+  const subBtnRef = useRef<HTMLButtonElement>(null);
+  const [subscribedActive, setSubscribedActive] = useState(false);
+  const isSubscribed = useRef(false);
+
+  const tableIdRef = useRef<HTMLInputElement>(null);
+  const [isInTable, setIsInTable] = useState(false);
+  const usernameRef = useRef<HTMLInputElement>(null);
+
+  const remoteVideosContainerRef = useRef<HTMLDivElement>(null);
 
   const muteAudio = () => {
     if (userMedia.current.audio) {
@@ -99,9 +102,9 @@ export default function Main() {
   };
 
   const handleDisableEnableBtns = (disabled: boolean) => {
-    if (cameraBtnRef.current) cameraBtnRef.current!.disabled = disabled;
-    if (screenBtnRef.current) screenBtnRef.current!.disabled = disabled;
-    if (audioBtnRef.current) audioBtnRef.current!.disabled = disabled;
+    if (cameraBtnRef.current) cameraBtnRef.current.disabled = disabled;
+    if (screenBtnRef.current) screenBtnRef.current.disabled = disabled;
+    if (audioBtnRef.current) audioBtnRef.current.disabled = disabled;
     if (newCameraBtnRef.current) newCameraBtnRef.current.disabled = disabled;
     if (newScreenBtnRef.current) newScreenBtnRef.current.disabled = disabled;
   };
@@ -178,98 +181,18 @@ export default function Main() {
     };
   }, [socket]);
 
-  const createProducerBundle = () => {
-    if (remoteVideosContainerRef.current) {
-      const initCameraStreams: { [cameraId: string]: MediaStream } = {};
-      for (const cameraId in userMedia.current.camera) {
-        initCameraStreams[cameraId] =
-          userMedia.current.camera[cameraId].getStream();
-      }
-
-      const initScreenStreams: { [screenId: string]: MediaStream } = {};
-      for (const screenId in userMedia.current.screen) {
-        initScreenStreams[screenId] =
-          userMedia.current.screen[screenId].getStream();
-      }
-
-      const initAudioStream = userMedia.current.audio?.getStream();
-
-      const newBundle = (
-        <Bundle
-          username={username.current}
-          table_id={table_id.current}
-          socket={socket}
-          initCameraStreams={isCamera.current ? initCameraStreams : undefined}
-          initScreenStreams={isScreen.current ? initScreenStreams : undefined}
-          initAudioStream={isAudio.current ? initAudioStream : undefined}
-          options={{
-            isUser: true,
-          }}
-          handleMuteCallback={muteAudio}
-        />
-      );
-
-      setBundles((prev) => ({
-        ...prev,
-        [username.current]: newBundle,
-      }));
-    }
-  };
-
-  const createConsumerBundle = (
-    trackUsername: string,
-    remoteCameraStreams: {
-      [screenId: string]: MediaStream;
-    },
-    remoteScreenStreams: {
-      [screenId: string]: MediaStream;
-    },
-    remoteAudioStream: MediaStream | undefined
-  ) => {
-    const newBundle = (
-      <Bundle
-        username={trackUsername}
-        table_id={table_id.current}
-        socket={socket}
-        initCameraStreams={
-          Object.keys(remoteCameraStreams).length !== 0
-            ? remoteCameraStreams
-            : undefined
-        }
-        initScreenStreams={
-          Object.keys(remoteScreenStreams).length !== 0
-            ? remoteScreenStreams
-            : undefined
-        }
-        initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
-        onRendered={() => {
-          const msg = {
-            type: "requestClientMuteState",
-            table_id: table_id.current,
-            username: username.current,
-            producerUsername: trackUsername,
-          };
-
-          socket.current.emit("message", msg);
-        }}
-        onNewConsumerWasCreatedCallback={() => {
-          const msg = {
-            type: "requestClientMuteState",
-            table_id: table_id.current,
-            username: username.current,
-            producerUsername: trackUsername,
-          };
-
-          socket.current.emit("message", msg);
-        }}
-      />
-    );
-
-    setBundles((prev) => ({
-      ...prev,
-      [trackUsername]: newBundle,
-    }));
-  };
+  const bundlesController = new BundlesController(
+    socket,
+    table_id,
+    username,
+    userMedia,
+    remoteVideosContainerRef,
+    isCamera,
+    isScreen,
+    isAudio,
+    setBundles,
+    muteAudio
+  );
 
   const userDevice = new UserDevice();
 
@@ -278,13 +201,13 @@ export default function Main() {
   const browserMedia = new BrowserMedia(
     device,
     userMedia,
-    handleDisableEnableBtns,
     isCamera,
     setCameraActive,
     isScreen,
     setScreenActive,
     isAudio,
-    setAudioActive
+    setAudioActive,
+    handleDisableEnableBtns
   );
 
   const producers = new Producers(
@@ -306,7 +229,7 @@ export default function Main() {
     producerTransport,
     setScreenActive,
     setCameraActive,
-    createProducerBundle,
+    bundlesController.createProducerBundle,
     setBundles,
     userDevice,
     deadbanding,
@@ -320,7 +243,7 @@ export default function Main() {
     device,
     consumerTransport,
     remoteTracksMap,
-    createConsumerBundle,
+    bundlesController.createConsumerBundle,
     subBtnRef
   );
 
@@ -331,138 +254,44 @@ export default function Main() {
       </div>
       <div className='flex-col flex-wrap -mx-1 overflow-hidden px-5'>
         <div className='flex items-center justify-center'>
-          <div className='flex flex-col mx-2'>
-            <button
-              ref={cameraBtnRef}
-              onClick={() =>
-                publishCamera(
-                  handleDisableEnableBtns,
-                  isCamera,
-                  setCameraActive,
-                  socket,
-                  device,
-                  table_id,
-                  username,
-                  userCameraCount,
-                  userMedia
-                )
-              }
-              className={`${
-                cameraActive
-                  ? "bg-orange-500 hover:bg-orange-700"
-                  : "bg-blue-500 hover:bg-blue-700"
-              } text-white font-bold py-2 px-3 disabled:opacity-25`}
-            >
-              {cameraActive ? "Remove Camera" : "Publish Camera"}
-            </button>
-          </div>
-          <div
-            className={`${
-              cameraActive ? "visible" : "hidden"
-            } flex flex-col mx-2`}
-          >
-            <button
-              ref={newCameraBtnRef}
-              onClick={() =>
-                publishNewCamera(
-                  handleDisableEnableBtns,
-                  userCameraCount,
-                  socket,
-                  device,
-                  table_id,
-                  username
-                )
-              }
-              className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 disabled:opacity-25'
-            >
-              Publish New Camera
-            </button>
-          </div>
-          <div className='flex flex-col mx-2'>
-            <button
-              ref={audioBtnRef}
-              onClick={() =>
-                publishAudio(
-                  handleDisableEnableBtns,
-                  isAudio,
-                  setAudioActive,
-                  socket,
-                  device,
-                  table_id,
-                  username
-                )
-              }
-              className={`${
-                audioActive
-                  ? "bg-orange-500 hover:bg-orange-700"
-                  : "bg-blue-500 hover:bg-blue-700"
-              } text-white font-bold py-2 px-3 disabled:opacity-25`}
-            >
-              {audioActive ? "Remove Audio" : "Publish Audio"}
-            </button>
-          </div>
-          {audioActive && (
-            <div className='flex flex-col mx-2'>
-              <button
-                ref={muteBtnRef}
-                onClick={handleMuteExternalMute}
-                className={`${
-                  mutedAudioRef.current
-                    ? "bg-orange-500 hover:bg-orange-700"
-                    : "bg-blue-500 hover:bg-blue-700"
-                } text-white font-bold py-2 px-3 disabled:opacity-25`}
-              >
-                {mutedAudioRef.current ? "Unmute" : "Mute"}
-              </button>
-            </div>
-          )}
-          <div className='flex flex-col mx-2'>
-            <button
-              ref={screenBtnRef}
-              onClick={() =>
-                publishScreen(
-                  handleDisableEnableBtns,
-                  isScreen,
-                  setScreenActive,
-                  socket,
-                  device,
-                  table_id,
-                  username,
-                  userScreenCount,
-                  userMedia
-                )
-              }
-              className={`${
-                screenActive
-                  ? "bg-orange-500 hover:bg-orange-700"
-                  : "bg-blue-500 hover:bg-blue-700"
-              } text-white font-bold py-2 px-3 disabled:opacity-25`}
-            >
-              {screenActive ? "Remove Screen" : "Publish Screen"}
-            </button>
-          </div>
-          <div
-            className={`${
-              screenActive ? "visible" : "hidden"
-            } flex flex-col mx-2`}
-          >
-            <button
-              ref={newScreenBtnRef}
-              onClick={() =>
-                publishNewScreen(
-                  handleDisableEnableBtns,
-                  userScreenCount,
-                  socket,
-                  device,
-                  table_id,
-                  username
-                )
-              }
-              className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 disabled:opacity-25'
-            >
-              Publish New Screen
-            </button>
-          </div>
+          <CameraSection
+            socket={socket}
+            device={device}
+            table_id={table_id}
+            username={username}
+            cameraBtnRef={cameraBtnRef}
+            newCameraBtnRef={newCameraBtnRef}
+            isCamera={isCamera}
+            setCameraActive={setCameraActive}
+            cameraActive={cameraActive}
+            handleDisableEnableBtns={handleDisableEnableBtns}
+          />
+          <AudioSection
+            socket={socket}
+            device={device}
+            table_id={table_id}
+            username={username}
+            audioBtnRef={audioBtnRef}
+            muteBtnRef={muteBtnRef}
+            mutedAudioRef={mutedAudioRef}
+            isAudio={isAudio}
+            audioActive={audioActive}
+            setAudioActive={setAudioActive}
+            handleMuteExternalMute={handleMuteExternalMute}
+            handleDisableEnableBtns={handleDisableEnableBtns}
+          />
+          <ScreenSection
+            socket={socket}
+            device={device}
+            table_id={table_id}
+            username={username}
+            screenBtnRef={screenBtnRef}
+            newScreenBtnRef={newScreenBtnRef}
+            isScreen={isScreen}
+            screenActive={screenActive}
+            setScreenActive={setScreenActive}
+            handleDisableEnableBtns={handleDisableEnableBtns}
+          />
           <div className='flex flex-col mx-2'>
             <button
               ref={subBtnRef}
@@ -488,7 +317,10 @@ export default function Main() {
               {subscribedActive ? "Unsubscribe" : "Subscribe"}
             </button>
           </div>
-          <AudioEffectsButton handleMuteExternalMute={handleMuteExternalMute} />
+          <AudioEffectsButton
+            handleMuteExternalMute={handleMuteExternalMute}
+            mutedAudioRef={mutedAudioRef}
+          />
         </div>
         <div className='flex justify-center mt-5'>
           <input
