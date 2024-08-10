@@ -80,7 +80,9 @@ export default function Bundle({
     setAudioStream,
     remoteTracksMap,
     userMedia,
+    audioRef,
     clientMute,
+    localMute,
     onNewConsumerWasCreatedCallback
   );
 

@@ -78,8 +78,10 @@ export default function TintSection({
           </div>
         }
         className='flex items-center justify-center w-10 aspect-square'
-        hoverTimeoutDuration={750}
-        disabled={effectsDisabled}
+        options={{
+          hoverTimeoutDuration: 750,
+          disabled: effectsDisabled,
+        }}
       />
       <div className='flex items-center justify-center w-10 aspect-square'>
         <FgButton
@@ -92,8 +94,10 @@ export default function TintSection({
           }
           className='w-6 h-6 m-2 border border-white rounded'
           style={{ backgroundColor: tempColor }}
-          hoverTimeoutDuration={750}
-          disabled={effectsDisabled}
+          options={{
+            hoverTimeoutDuration: 750,
+            disabled: effectsDisabled,
+          }}
         />
         {isColorPicker && (
           <ColorPicker

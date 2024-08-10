@@ -51,7 +51,10 @@ class BundleSocket {
     audio: AudioMedia | undefined;
   }>;
 
+  private audioRef: React.RefObject<HTMLAudioElement>;
+
   private clientMute: React.MutableRefObject<boolean>;
+  private localMute: React.MutableRefObject<boolean>;
 
   private onNewConsumerWasCreatedCallback?: () => void;
 
@@ -101,7 +104,9 @@ class BundleSocket {
       };
       audio: AudioMedia | undefined;
     }>,
+    audioRef: React.RefObject<HTMLAudioElement>,
     clientMute: React.MutableRefObject<boolean>,
+    localMute: React.MutableRefObject<boolean>,
     onNewConsumerWasCreatedCallback?: () => any
   ) {
     this.isUser = isUser;
@@ -111,7 +116,9 @@ class BundleSocket {
     this.setAudioStream = setAudioStream;
     this.remoteTracksMap = remoteTracksMap;
     this.userMedia = userMedia;
+    this.audioRef = audioRef;
     this.clientMute = clientMute;
+    this.localMute = localMute;
     this.onNewConsumerWasCreatedCallback = onNewConsumerWasCreatedCallback;
   }
 
@@ -231,6 +238,17 @@ class BundleSocket {
     }
   }
 
+  onClientMuteStateResponsed(event: {
+    type: string;
+    producerUsername: string;
+  }) {
+    if (this.isUser || this.username !== event.producerUsername) {
+      return;
+    }
+
+    this.clientMute.current = true;
+  }
+
   // Get client mute changes from other users
   onClientMuteChange(event: {
     type: string;
@@ -242,6 +260,19 @@ class BundleSocket {
     }
 
     this.clientMute.current = event.clientMute;
+  }
+
+  // Handles local mute changes from outside bundle
+  onLocalMuteChange() {
+    if (this.clientMute.current) {
+      return;
+    }
+
+    this.localMute.current = !this.localMute.current;
+
+    if (!this.isUser && this.audioRef.current) {
+      this.audioRef.current.muted = this.localMute.current;
+    }
   }
 }
 

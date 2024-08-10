@@ -52,7 +52,10 @@ class BundleController {
     audio: AudioMedia | undefined;
   }>;
 
+  private audioRef: React.RefObject<HTMLAudioElement>;
+
   private clientMute: React.MutableRefObject<boolean>;
+  private localMute: React.MutableRefObject<boolean>;
 
   private onNewConsumerWasCreatedCallback?: () => void;
 
@@ -104,7 +107,9 @@ class BundleController {
       };
       audio: AudioMedia | undefined;
     }>,
+    audioRef: React.RefObject<HTMLAudioElement>,
     clientMute: React.MutableRefObject<boolean>,
+    localMute: React.MutableRefObject<boolean>,
     onNewConsumerWasCreatedCallback?: () => any
   ) {
     this.isUser = isUser;
@@ -114,7 +119,9 @@ class BundleController {
     this.setAudioStream = setAudioStream;
     this.remoteTracksMap = remoteTracksMap;
     this.userMedia = userMedia;
+    this.audioRef = audioRef;
     this.clientMute = clientMute;
+    this.localMute = localMute;
     this.onNewConsumerWasCreatedCallback = onNewConsumerWasCreatedCallback;
 
     this.bundleSocket = new BundleSocket(
@@ -125,7 +132,9 @@ class BundleController {
       this.setAudioStream,
       this.remoteTracksMap,
       this.userMedia,
+      this.audioRef,
       this.clientMute,
+      this.localMute,
       this.onNewConsumerWasCreatedCallback
     );
   }
@@ -141,8 +150,14 @@ class BundleController {
       case "newConsumerWasCreated":
         this.bundleSocket.onNewConsumerWasCreated(event);
         break;
+      case "clientMuteStateResponsed":
+        this.bundleSocket.onClientMuteStateResponsed(event);
+        break;
       case "clientMuteChange":
         this.bundleSocket.onClientMuteChange(event);
+        break;
+      case "localMuteChange":
+        this.bundleSocket.onLocalMuteChange();
         break;
       default:
         break;

@@ -16,9 +16,7 @@ export default function AudioEffectsButton({
 }) {
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const [effectSectionActive, setEffectSectionActive] = useState(false);
-  const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const audioMixEffectsButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -56,17 +54,10 @@ export default function AudioEffectsButton({
       {effectSectionActive && (
         <AudioEffectsSection
           type='below'
-          buttonRef={buttonRef}
-          audioMixEffectsActive={audioMixEffectsActive}
-          setAudioMixEffectsActive={setAudioMixEffectsActive}
-          audioMixEffectsButtonRef={audioMixEffectsButtonRef}
-          handleMuteExternalMute={handleMuteExternalMute}
-          mutedAudioRef={mutedAudioRef}
-        />
-      )}
-      {audioMixEffectsActive && (
-        <AudioMixEffectsPortal
-          audioMixEffectsButtonRef={audioMixEffectsButtonRef}
+          referenceElement={buttonRef}
+          padding={12}
+          handleMute={handleMuteExternalMute}
+          muteStateRef={mutedAudioRef}
         />
       )}
     </>

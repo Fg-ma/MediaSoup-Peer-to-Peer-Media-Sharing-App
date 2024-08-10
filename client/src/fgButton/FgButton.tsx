@@ -1,7 +1,35 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import HoverPortal from "./lib/HoverPortal";
 import HoldPortal from "./lib/HoldPortal";
+
+interface FgButtonOptions {
+  defaultDataValue?: string;
+  holdTimeoutDuration?: number;
+  doubleClickTimeoutDuration?: number;
+  hoverTimeoutDuration?: number;
+  hoverType?: "above" | "below";
+  holdType?: "above" | "below";
+  disabled?: boolean;
+}
+
+const defaultFgButtonOptions: {
+  defaultDataValue?: string;
+  holdTimeoutDuration: number;
+  doubleClickTimeoutDuration: number;
+  hoverTimeoutDuration: number;
+  hoverType: "above" | "below";
+  holdType: "above" | "below";
+  disabled: boolean;
+} = {
+  defaultDataValue: undefined,
+  holdTimeoutDuration: 500,
+  doubleClickTimeoutDuration: 250,
+  hoverTimeoutDuration: 50,
+  hoverType: "above",
+  holdType: "above",
+  disabled: false,
+};
 
 export default function FgButton({
   externalRef,
@@ -13,16 +41,10 @@ export default function FgButton({
   hoverContent,
   className,
   style,
-  defaultDataValue,
-  holdTimeoutDuration = 500,
-  doubleClickTimeoutDuration = 250,
-  hoverTimeoutDuration = 50,
-  hoverType = "above",
-  holdType = "above",
-  disabled = false,
+  options,
 }: {
   externalRef?: React.RefObject<HTMLButtonElement>;
-  clickFunction?: () => void;
+  clickFunction?: (event: React.MouseEvent) => void;
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: () => void;
@@ -30,21 +52,24 @@ export default function FgButton({
   hoverContent?: React.ReactElement;
   className?: string;
   style?: React.CSSProperties;
-  defaultDataValue?: string;
-  holdTimeoutDuration?: number;
-  doubleClickTimeoutDuration?: number;
-  hoverTimeoutDuration?: number;
-  hoverType?: "above" | "below";
-  holdType?: "above" | "below";
-  disabled?: boolean;
+  options?: FgButtonOptions;
 }) {
-  const [isHeld, setIsHeld] = useState(false);
-  const [isHover, setIsHover] = useState(false);
-  const isHeldRef = useRef(false);
-  const holdTimeout = useRef<NodeJS.Timeout>();
-  const hoverTimeout = useRef<NodeJS.Timeout>();
+  const fgButtonOptions = {
+    ...defaultFgButtonOptions,
+    ...options,
+  };
+
   const buttonRef = useRef<HTMLButtonElement>(null);
+
   const isClicked = useRef(false);
+
+  const holdTimeout = useRef<NodeJS.Timeout>();
+  const [isHeld, setIsHeld] = useState(false);
+  const isHeldRef = useRef(false);
+
+  const hoverTimeout = useRef<NodeJS.Timeout>();
+  const [isHover, setIsHover] = useState(false);
+
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseDown = (
@@ -52,29 +77,37 @@ export default function FgButton({
   ) => {
     event.preventDefault();
 
+    window.addEventListener("mouseup", (event) =>
+      handleMouseUp(event as unknown as React.MouseEvent)
+    );
+
     isClicked.current = true;
 
     if (holdFunction && clickTimeout.current === null) {
       holdTimeout.current = setTimeout(() => {
         isHeldRef.current = true;
         setIsHeld(true);
-      }, holdTimeoutDuration);
+      }, fgButtonOptions.holdTimeoutDuration);
     }
   };
 
-  const handleMouseUp = (event: React.MouseEvent<Element, MouseEvent>) => {
+  const handleMouseUp = (event: React.MouseEvent) => {
+    window.removeEventListener("mouseup", (event) =>
+      handleMouseUp(event as unknown as React.MouseEvent)
+    );
+
     if (isClicked.current && clickTimeout.current === null) {
       if (!isHeldRef.current) {
         if (doubleClickFunction) {
           clickTimeout.current = setTimeout(() => {
-            if (clickFunction) clickFunction();
+            if (clickFunction) clickFunction(event);
             if (clickTimeout.current !== null) {
               clearTimeout(clickTimeout.current);
               clickTimeout.current = null;
             }
-          }, doubleClickTimeoutDuration);
+          }, fgButtonOptions.doubleClickTimeoutDuration);
         } else {
-          if (clickFunction) clickFunction();
+          if (clickFunction) clickFunction(event);
         }
       } else {
         if (holdFunction) {
@@ -103,22 +136,11 @@ export default function FgButton({
     isClicked.current = false;
   };
 
-  useEffect(() => {
-    const handleWindowMouseUp = (event: MouseEvent) =>
-      handleMouseUp(event as unknown as React.MouseEvent<Element, MouseEvent>);
-
-    window.addEventListener("mouseup", handleWindowMouseUp);
-
-    return () => {
-      window.removeEventListener("mouseup", handleWindowMouseUp);
-    };
-  }, []);
-
   const handleMouseEnter = () => {
     if (hoverContent) {
       hoverTimeout.current = setTimeout(() => {
         setIsHover(true);
-      }, hoverTimeoutDuration);
+      }, fgButtonOptions.hoverTimeoutDuration);
 
       window.addEventListener("mousemove", handleMouseMove);
     }
@@ -147,10 +169,10 @@ export default function FgButton({
         onMouseDown={(event) => handleMouseDown(event)}
         className={className}
         style={style}
-        data-value={defaultDataValue}
+        data-value={fgButtonOptions.defaultDataValue}
         onDoubleClick={handleDoubleClick}
         onMouseEnter={handleMouseEnter}
-        disabled={disabled}
+        disabled={fgButtonOptions.disabled}
       >
         {contentFunction && contentFunction()}
       </button>
@@ -158,7 +180,7 @@ export default function FgButton({
         <AnimatePresence>
           {isHover && (
             <HoverPortal
-              hoverType={hoverType}
+              hoverType={fgButtonOptions.hoverType}
               hoverContent={hoverContent}
               buttonRef={externalRef ? externalRef : buttonRef}
             />
@@ -169,7 +191,7 @@ export default function FgButton({
         <AnimatePresence>
           {isHeld && (
             <HoldPortal
-              holdType={holdType}
+              holdType={fgButtonOptions.holdType}
               holdContent={holdContent}
               buttonRef={externalRef ? externalRef : buttonRef}
             />

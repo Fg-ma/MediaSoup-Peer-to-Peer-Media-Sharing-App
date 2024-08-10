@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import AudioSectionController from "./lib/audioSectionController";
@@ -6,6 +6,8 @@ import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import shareAudioIcon from "../../public/svgs/shareAudioIcon.svg";
 import removeAudioIcon from "../../public/svgs/removeAudioIcon.svg";
+import VolumeSVG from "../FgVolumeElement/lib/VolumeSVG";
+import volumeSVGPaths from "../FgVolumeElement/lib/volumeSVGPaths";
 
 export default function AudioSection({
   socket,
@@ -34,6 +36,14 @@ export default function AudioSection({
   handleMuteExternalMute: () => void;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
+  const [volumeState, setVolumeState] = useState<{
+    from: "off" | "low" | "high" | "";
+    to: "off" | "low" | "high";
+  }>({
+    from: "",
+    to: mutedAudioRef.current ? "off" : "high",
+  });
+
   const audioSectionController = new AudioSectionController(
     socket,
     device,
@@ -45,6 +55,14 @@ export default function AudioSection({
 
     handleDisableEnableBtns
   );
+
+  useEffect(() => {
+    const newTo = mutedAudioRef.current ? "off" : "high";
+
+    if (newTo !== volumeState.to) {
+      setVolumeState((prev) => ({ from: prev.to, to: newTo }));
+    }
+  }, [mutedAudioRef.current]);
 
   return (
     <div className='flex space-x-4 mx-2 h-10'>
@@ -92,14 +110,39 @@ export default function AudioSection({
       {audioActive && (
         <FgButton
           externalRef={muteBtnRef}
-          clickFunction={handleMuteExternalMute}
+          clickFunction={() => {
+            setVolumeState((prev) => ({
+              from: prev.to,
+              to: mutedAudioRef.current ? "high" : "off",
+            }));
+            handleMuteExternalMute();
+          }}
           className={`${
             mutedAudioRef.current
               ? "bg-orange-500 hover:bg-orange-700"
               : "bg-blue-500 hover:bg-blue-700"
-          } text-white font-bold py-2 px-3 disabled:opacity-25`}
+          } text-white font-bold p-1 disabled:opacity-25`}
           contentFunction={() => (
-            <>{mutedAudioRef.current ? "Unmute" : "Mute"}</>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 100.0001 100.00001'
+              width='100%'
+              height='100%'
+              fill='white'
+            >
+              <VolumeSVG
+                volumeState={volumeState}
+                movingPath={volumeSVGPaths.low.right}
+                stationaryPaths={[
+                  volumeSVGPaths.high.left,
+                  volumeSVGPaths.high.middle,
+                ]}
+                color='white'
+              />
+              {volumeState.from === "" && volumeState.to === "off" && (
+                <path d={volumeSVGPaths.strike} />
+              )}
+            </svg>
           )}
           hoverContent={
             <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>

@@ -62,8 +62,10 @@ export default function BlurButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      hoverTimeoutDuration={750}
-      disabled={effectsDisabled}
+      options={{
+        hoverTimeoutDuration: 750,
+        disabled: effectsDisabled,
+      }}
     />
   );
 }

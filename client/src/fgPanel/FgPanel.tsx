@@ -27,7 +27,8 @@ export default function FgPanel({
   minWidth = 0,
   minHeight = 0,
   resizeCallback,
-}: {
+}: // close capabilities
+{
   content: React.ReactNode;
   initPosition?: {
     x?: number;

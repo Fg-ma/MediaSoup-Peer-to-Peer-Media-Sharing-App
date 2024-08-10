@@ -198,11 +198,12 @@ export default function BeardsButton({
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      defaultDataValue={
-        currentEffectsStyles.current[type][videoId].beards?.style
-      }
-      hoverTimeoutDuration={750}
-      disabled={effectsDisabled}
+      options={{
+        defaultDataValue:
+          currentEffectsStyles.current[type][videoId].beards?.style,
+        hoverTimeoutDuration: 750,
+        disabled: effectsDisabled,
+      }}
     />
   );
 }

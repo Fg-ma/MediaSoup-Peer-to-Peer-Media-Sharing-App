@@ -3,6 +3,8 @@ import { useSpring, animated } from "react-spring";
 import { colors } from "../fgVideo/lib/colors";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
+import FgButton from "../fgButton/FgButton";
+import AudioEffectsSection from "../audioEffectsButton/lib/AudioEffectsSection";
 
 const shadowColors = {
   black: "rgba(0, 0, 0, 0.8)",
@@ -98,6 +100,8 @@ export default function FgAudioElement({
     x: 0,
     y: 0,
   });
+  const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
+    useState(false);
   const bellCurveY = useRef<number[]>([]);
   const sineCurveY = useRef<number[]>([]);
   const fixedPointsX = useRef<number[]>([]);
@@ -357,550 +361,574 @@ export default function FgAudioElement({
           {name ? name : username}
         </div>
       )}
-      <svg
-        ref={svgRef}
-        onClick={onClick}
-        className='z-10 w-full aspect-square'
-        viewBox='0 -150 200 300'
-      >
-        <defs>
-          <filter id={`${username}_shadow`}>
-            <feGaussianBlur in='SourceAlpha' stdDeviation='2' result='blur' />
-            <feOffset in='blur' dx='1' dy='2' result='offsetBlur' />
-
-            <feFlood
-              floodColor={
-                shadowColors[
-                  fgAudioElementOptions.shadowColor as keyof typeof shadowColors
-                ]
-              }
-              result='colorBlur'
-            />
-            <feComposite
-              in='colorBlur'
-              in2='offsetBlur'
-              operator='in'
-              result='coloredBlur'
-            />
-
-            <feMerge>
-              <feMergeNode in='coloredBlur' />
-              <feMergeNode in='SourceGraphic' />
-            </feMerge>
-          </filter>
-
-          <mask id={`${username}_mask`}>
-            <rect x='-10' y='-150' width='220' height='450' fill='black' />
-            <animated.path
-              ref={pathRef}
-              d={animatedPathData}
-              stroke='white'
-              strokeWidth='7'
-              fill='none'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-          </mask>
-
-          <linearGradient
-            id={`${username}_mute_morse_gradient`}
-            x1='0%'
-            y1='0%'
-            x2='100%'
-            y2='0%'
-            gradientUnits='userSpaceOnUse'
+      <FgButton
+        clickFunction={onClick}
+        contentFunction={() => (
+          <svg
+            className='z-10 w-full aspect-square'
+            ref={svgRef}
+            viewBox='0 -150 200 300'
           >
-            <stop
-              offset='0%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='10.61%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='11.61%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='14.31%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='15.31%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='25.42%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
+            <defs>
+              <filter id={`${username}_shadow`}>
+                <feGaussianBlur
+                  in='SourceAlpha'
+                  stdDeviation='2'
+                  result='blur'
+                />
+                <feOffset in='blur' dx='1' dy='2' result='offsetBlur' />
 
-            <stop
-              offset='26.42%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='36.53%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
+                <feFlood
+                  floodColor={
+                    shadowColors[
+                      fgAudioElementOptions.shadowColor as keyof typeof shadowColors
+                    ]
+                  }
+                  result='colorBlur'
+                />
+                <feComposite
+                  in='colorBlur'
+                  in2='offsetBlur'
+                  operator='in'
+                  result='coloredBlur'
+                />
 
-            <stop
-              offset='37.53%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='40.23%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='41.23%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='43.93%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='44.93%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='47.63%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='48.63%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='51.33%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='52.33%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='62.44%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
+                <feMerge>
+                  <feMergeNode in='coloredBlur' />
+                  <feMergeNode in='SourceGraphic' />
+                </feMerge>
+              </filter>
 
-            <stop
-              offset='63.44%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='73.55%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
+              <mask id={`${username}_mask`}>
+                <rect x='-10' y='-150' width='220' height='450' fill='black' />
+                <animated.path
+                  ref={pathRef}
+                  d={animatedPathData}
+                  stroke='white'
+                  strokeWidth='7'
+                  fill='none'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </mask>
 
-            <stop
-              offset='74.55%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='84.66%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
+              <linearGradient
+                id={`${username}_mute_morse_gradient`}
+                x1='0%'
+                y1='0%'
+                x2='100%'
+                y2='0%'
+                gradientUnits='userSpaceOnUse'
+              >
+                <stop
+                  offset='0%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='10.61%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='11.61%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='14.31%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='15.31%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='25.42%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
 
-            <stop
-              offset='85.66%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='95.77%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
+                <stop
+                  offset='26.42%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='36.53%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
 
-            <stop
-              offset='96.77%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-            <stop
-              offset='100%'
-              stopColor={
-                colors[
-                  fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                ]
-              }
-            />
-          </linearGradient>
+                <stop
+                  offset='37.53%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='40.23%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='41.23%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='43.93%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='44.93%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='47.63%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='48.63%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='51.33%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='52.33%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='62.44%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
 
-          <linearGradient
-            id={`${username}_top_gradient`}
-            x1='0%'
-            y1='0%'
-            x2='0%'
-            y2='100%'
-          >
-            <stop
-              offset='45%'
-              stopColor={
-                colors[fgAudioElementOptions.volumeColor as keyof typeof colors]
-              }
-            />
-            <stop offset='95%' stopColor='black' />
-          </linearGradient>
+                <stop
+                  offset='63.44%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='73.55%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
 
-          <linearGradient
-            id={`${username}_bottom_gradient`}
-            x1='0%'
-            y1='0%'
-            x2='0%'
-            y2='100%'
-          >
-            <stop offset='5%' stopColor='black' />
-            <stop
-              offset='55%'
-              stopColor={
-                colors[fgAudioElementOptions.volumeColor as keyof typeof colors]
-              }
-            />
-          </linearGradient>
+                <stop
+                  offset='74.55%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='84.66%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
 
-          <pattern
-            id={`${username}_background_matrix`}
-            x='-20'
-            y='-120'
-            width={svgRef.current?.clientWidth}
-            height={svgRef.current?.clientHeight}
-            patternUnits='userSpaceOnUse'
-          >
-            <rect
-              x='0'
-              y='0'
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              fill={`url(#${username}_top_gradient)`}
-            ></rect>
-            <rect
-              x={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              y='0'
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              fill='black'
-            ></rect>
-            <rect
-              x={
-                svgRef.current
-                  ? svgRef.current.clientWidth * (1 - patternWidth)
-                  : undefined
-              }
-              y='0'
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              fill={`url(#${username}_top_gradient)`}
-            ></rect>
+                <stop
+                  offset='85.66%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='95.77%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
 
-            <rect
-              x='0'
-              y={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
-                  : undefined
-              }
-              fill='black'
-            ></rect>
-            <rect
-              x={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              y={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
-                  : undefined
-              }
-              fill='black'
-            ></rect>
-            <rect
-              x={
-                svgRef.current
-                  ? svgRef.current.clientWidth * (1 - patternWidth)
-                  : undefined
-              }
-              y={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
-                  : undefined
-              }
-              fill='black'
-            ></rect>
+                <stop
+                  offset='96.77%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='100%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+              </linearGradient>
 
-            <rect
-              x='0'
-              y={
-                svgRef.current
-                  ? svgRef.current.clientHeight * (1 - patternHeight)
-                  : undefined
-              }
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              fill={`url(#${username}_bottom_gradient)`}
-            ></rect>
-            <rect
-              x={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              y={
-                svgRef.current
-                  ? svgRef.current.clientHeight * (1 - patternHeight)
-                  : undefined
-              }
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              fill='black'
-            ></rect>
-            <rect
-              x={
-                svgRef.current
-                  ? svgRef.current.clientWidth * (1 - patternWidth)
-                  : undefined
-              }
-              y={
-                svgRef.current
-                  ? svgRef.current.clientHeight * (1 - patternHeight)
-                  : undefined
-              }
-              width={
-                svgRef.current
-                  ? svgRef.current.clientWidth * patternWidth
-                  : undefined
-              }
-              height={
-                svgRef.current
-                  ? svgRef.current.clientHeight * patternHeight
-                  : undefined
-              }
-              fill={`url(#${username}_bottom_gradient)`}
-            ></rect>
-          </pattern>
-        </defs>
-        <g filter={`url(#${username}_shadow)`}>
-          <rect
-            x='-20'
-            y='-120'
-            width={svgRef.current?.clientWidth}
-            height={svgRef.current?.clientHeight}
-            fill={
-              (localMute.current || clientMute.current) &&
-              fgAudioElementOptions.muteStyleOption === "morse"
-                ? `url(#${username}_mute_morse_gradient)`
-                : `url(#${username}_background_matrix)`
-            }
-            mask={`url(#${username}_mask)`}
-          />
-        </g>
-        {!isUser && (
-          <animated.rect
-            ref={leftHandleRef}
-            onMouseDown={(event) => {
-              if (!isUser) startDrag(event, "left");
-            }}
-            x={-5.5}
-            y={-5.5}
-            width={31}
-            height={11}
-            rx={5.5}
-            ry={5.5}
-            fill='transparent'
-            style={{ cursor: "pointer" }}
-          />
+              <linearGradient
+                id={`${username}_top_gradient`}
+                x1='0%'
+                y1='0%'
+                x2='0%'
+                y2='100%'
+              >
+                <stop
+                  offset='45%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.volumeColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop offset='95%' stopColor='black' />
+              </linearGradient>
+
+              <linearGradient
+                id={`${username}_bottom_gradient`}
+                x1='0%'
+                y1='0%'
+                x2='0%'
+                y2='100%'
+              >
+                <stop offset='5%' stopColor='black' />
+                <stop
+                  offset='55%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.volumeColor as keyof typeof colors
+                    ]
+                  }
+                />
+              </linearGradient>
+
+              <pattern
+                id={`${username}_background_matrix`}
+                x='-20'
+                y='-120'
+                width={svgRef.current?.clientWidth}
+                height={svgRef.current?.clientHeight}
+                patternUnits='userSpaceOnUse'
+              >
+                <rect
+                  x='0'
+                  y='0'
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  fill={`url(#${username}_top_gradient)`}
+                ></rect>
+                <rect
+                  x={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  y='0'
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  fill='black'
+                ></rect>
+                <rect
+                  x={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * (1 - patternWidth)
+                      : undefined
+                  }
+                  y='0'
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  fill={`url(#${username}_top_gradient)`}
+                ></rect>
+
+                <rect
+                  x='0'
+                  y={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
+                      : undefined
+                  }
+                  fill='black'
+                ></rect>
+                <rect
+                  x={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  y={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
+                      : undefined
+                  }
+                  fill='black'
+                ></rect>
+                <rect
+                  x={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * (1 - patternWidth)
+                      : undefined
+                  }
+                  y={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
+                      : undefined
+                  }
+                  fill='black'
+                ></rect>
+
+                <rect
+                  x='0'
+                  y={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * (1 - patternHeight)
+                      : undefined
+                  }
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  fill={`url(#${username}_bottom_gradient)`}
+                ></rect>
+                <rect
+                  x={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  y={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * (1 - patternHeight)
+                      : undefined
+                  }
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  fill='black'
+                ></rect>
+                <rect
+                  x={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * (1 - patternWidth)
+                      : undefined
+                  }
+                  y={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * (1 - patternHeight)
+                      : undefined
+                  }
+                  width={
+                    svgRef.current
+                      ? svgRef.current.clientWidth * patternWidth
+                      : undefined
+                  }
+                  height={
+                    svgRef.current
+                      ? svgRef.current.clientHeight * patternHeight
+                      : undefined
+                  }
+                  fill={`url(#${username}_bottom_gradient)`}
+                ></rect>
+              </pattern>
+            </defs>
+            <g filter={`url(#${username}_shadow)`}>
+              <rect
+                x='-20'
+                y='-120'
+                width={svgRef.current?.clientWidth}
+                height={svgRef.current?.clientHeight}
+                fill={
+                  (localMute.current || clientMute.current) &&
+                  fgAudioElementOptions.muteStyleOption === "morse"
+                    ? `url(#${username}_mute_morse_gradient)`
+                    : `url(#${username}_background_matrix)`
+                }
+                mask={`url(#${username}_mask)`}
+              />
+            </g>
+            {!isUser && (
+              <animated.rect
+                ref={leftHandleRef}
+                onMouseDown={(event) => {
+                  if (!isUser) startDrag(event, "left");
+                }}
+                x={-5.5}
+                y={-5.5}
+                width={31}
+                height={11}
+                rx={5.5}
+                ry={5.5}
+                fill='transparent'
+                style={{ cursor: "pointer" }}
+              />
+            )}
+            {!isUser && (
+              <animated.rect
+                ref={rightHandleRef}
+                onMouseDown={(event) => {
+                  if (!isUser) startDrag(event, "right");
+                }}
+                x={174.5}
+                y={-5.5}
+                width={31}
+                height={11}
+                rx={5.5}
+                ry={5.5}
+                fill='transparent'
+                style={{ cursor: "pointer" }}
+              />
+            )}
+          </svg>
         )}
-        {!isUser && (
-          <animated.rect
-            ref={rightHandleRef}
-            onMouseDown={(event) => {
-              if (!isUser) startDrag(event, "right");
-            }}
-            x={174.5}
-            y={-5.5}
-            width={31}
-            height={11}
-            rx={5.5}
-            ry={5.5}
-            fill='transparent'
-            style={{ cursor: "pointer" }}
-          />
-        )}
-      </svg>
+        doubleClickFunction={() => {
+          setAudioEffectsSectionVisible((prev) => !prev);
+        }}
+      />
+      {audioEffectsSectionVisible && (
+        <AudioEffectsSection
+          type='right'
+          referenceElement={svgRef as unknown as React.RefObject<HTMLElement>}
+          padding={12}
+          handleMute={handleMute}
+          muteStateRef={localMute}
+        />
+      )}
     </div>
   );
 }

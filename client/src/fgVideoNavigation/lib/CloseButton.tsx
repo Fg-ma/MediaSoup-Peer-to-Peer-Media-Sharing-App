@@ -28,7 +28,7 @@ export default function CloseButton({ controls }: { controls: Controls }) {
         </div>
       }
       className='flex items-center justify-center w-10 aspect-square'
-      hoverType='below'
+      options={{ hoverType: "below" }}
     />
   );
 }
