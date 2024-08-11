@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
-import HoverPortal from "./lib/HoverPortal";
-import HoldPortal from "./lib/HoldPortal";
+import FgPortal from "../fgPortal/FgPortal";
 
 interface FgButtonOptions {
   defaultDataValue?: string;
@@ -149,16 +148,13 @@ export default function FgButton({
   const handleMouseMove = (event: MouseEvent) => {
     const target = event.target as HTMLElement;
     const buttonElement = externalRef?.current || buttonRef.current;
-
     if (!buttonElement || !buttonElement.contains(target)) {
       window.removeEventListener("mousemove", handleMouseMove);
 
-      if (hoverContent) {
-        if (hoverTimeout.current !== null) {
-          clearTimeout(hoverTimeout.current);
-        }
-        setIsHover(false);
+      if (hoverTimeout.current !== null) {
+        clearTimeout(hoverTimeout.current);
       }
+      setIsHover(false);
     }
   };
 
@@ -179,9 +175,9 @@ export default function FgButton({
       {hoverContent && !isHeld && (
         <AnimatePresence>
           {isHover && (
-            <HoverPortal
-              hoverType={fgButtonOptions.hoverType}
-              hoverContent={hoverContent}
+            <FgPortal
+              type={fgButtonOptions.hoverType}
+              content={hoverContent}
               buttonRef={externalRef ? externalRef : buttonRef}
             />
           )}
@@ -190,9 +186,9 @@ export default function FgButton({
       {holdFunction && holdContent && (
         <AnimatePresence>
           {isHeld && (
-            <HoldPortal
-              holdType={fgButtonOptions.holdType}
-              holdContent={holdContent}
+            <FgPortal
+              type={fgButtonOptions.holdType}
+              content={holdContent}
               buttonRef={externalRef ? externalRef : buttonRef}
             />
           )}

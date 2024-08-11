@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
-import FgSVG from "../fgSVG/FgSVG";
-import closeIcon from "../../public/svgs/closeIcon.svg";
+import FgButton from "../fgButton/FgButton";
 
 const PanelVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -49,6 +48,7 @@ export default function FgPanel({
   closePosition?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
 }) {
   const [rerender, setRerender] = useState(false);
+  const [isHover, setIsHover] = useState(false);
   const [position, setPosition] = useState<{ x?: number; y?: number }>({
     x: initPosition.x,
     y: initPosition.y,
@@ -56,6 +56,7 @@ export default function FgPanel({
   const [size, setSize] = useState({ width: initWidth, height: initHeight });
   const panelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const isDragging = useRef(false);
   const startPosition = useRef({ x: 0, y: 0 });
   const isResizing = useRef(false);
@@ -213,7 +214,8 @@ export default function FgPanel({
 
     if (
       event.target === containerRef.current ||
-      containerRef.current?.contains(event.target as Node)
+      containerRef.current?.contains(event.target as Node) ||
+      closeButtonRef.current?.contains(event.target as Node)
     ) {
       return;
     }
@@ -262,12 +264,35 @@ export default function FgPanel({
     }
   }, [size]);
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!closeCallback) return;
+
+    const key = event.key.toLowerCase();
+    if (["x", "delete", "escape"].includes(key)) {
+      closeCallback();
+    }
+  };
+
+  useEffect(() => {
+    if (closeCallback && isHover) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      if (closeCallback && isHover) {
+        document.removeEventListener("keydown", handleKeyDown);
+      }
+    };
+  }, [isHover]);
+
   return ReactDOM.createPortal(
     <motion.div
       ref={panelRef}
       onMouseDown={handleDragMouseDown}
       onMouseMove={handleCursorMovement}
-      className='z-50 shadow-lg rounded absolute p-5 bg-white'
+      onHoverEnd={closeCallback && (() => setIsHover(false))}
+      onHoverStart={closeCallback && (() => setIsHover(true))}
+      className='z-50 shadow-lg rounded absolute p-3 bg-white'
       style={{
         opacity:
           position.x === undefined || position.y === undefined ? "0%" : "100%",
@@ -292,31 +317,32 @@ export default function FgPanel({
       {(closePosition !== "bottomLeft" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "se")}
-          className='w-5 aspect-square absolute right-0 bottom-0 cursor-se-resize'
+          className='w-3 aspect-square absolute right-0 bottom-0 cursor-se-resize'
         />
       )}
       {(closePosition !== "bottomRight" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "sw")}
-          className='w-5 aspect-square absolute left-0 bottom-0 cursor-sw-resize'
+          className='w-3 aspect-square absolute left-0 bottom-0 cursor-sw-resize'
         />
       )}
       {(closePosition !== "topLeft" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "nw")}
-          className='w-5 aspect-square absolute left-0 top-0 cursor-nw-resize'
+          className='w-3 aspect-square absolute left-0 top-0 cursor-nw-resize'
         />
       )}
       {(closePosition !== "topRight" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "ne")}
-          className='w-5 aspect-square absolute right-0 top-0 cursor-ne-resize'
+          className='w-3 aspect-square absolute right-0 top-0 cursor-ne-resize'
         />
       )}
       {closeCallback && closePosition && (
-        <div
-          onClick={closeCallback}
-          className={`w-5 aspect-square absolute flex items-center justify-center ${
+        <FgButton
+          externalRef={closeButtonRef}
+          clickFunction={closeCallback}
+          className={`w-3 aspect-square absolute flex items-center justify-center ${
             closePosition === "topRight"
               ? "right-0 top-0"
               : closePosition === "topLeft"
@@ -327,16 +353,12 @@ export default function FgPanel({
               ? "right-0 bottom-0"
               : ""
           }`}
-        >
-          <FgSVG
-            src={closeIcon}
-            attributes={[
-              { key: "width", value: "80%" },
-              { key: "height", value: "80%" },
-              { key: "fill", value: "black" },
-            ]}
-          />
-        </div>
+          hoverContent={
+            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+              Close (x)
+            </div>
+          }
+        />
       )}
     </motion.div>,
     document.body

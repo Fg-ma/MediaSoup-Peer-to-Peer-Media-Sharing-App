@@ -59,11 +59,6 @@
   padding-bottom: 0.75rem;
 }
 
-/* .video-container.paused .video-controls-container,
-.video-container.paused .video-navigation-container {
-  opacity: 1;
-} */
-
 .video-container.in-video .video-controls-container,
 .video-container.in-video .video-navigation-container,
 .video-container.in-effects .video-controls-container,

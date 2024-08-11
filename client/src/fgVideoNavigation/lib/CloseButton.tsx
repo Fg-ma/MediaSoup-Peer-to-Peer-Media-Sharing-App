@@ -15,8 +15,8 @@ export default function CloseButton({ controls }: { controls: Controls }) {
           <FgSVG
             src={closeIcon}
             attributes={[
-              { key: "width", value: "95%" },
-              { key: "height", value: "95%" },
+              { key: "width", value: "60%" },
+              { key: "height", value: "60%" },
               { key: "fill", value: "white" },
             ]}
           />
@@ -27,7 +27,7 @@ export default function CloseButton({ controls }: { controls: Controls }) {
           Close (x)
         </div>
       }
-      className='flex items-center justify-center w-10 aspect-square'
+      className='flex items-center justify-end w-10 aspect-square'
       options={{ hoverType: "below" }}
     />
   );

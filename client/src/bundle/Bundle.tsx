@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import FgVideo from "../fgVideo/FgVideo";
-import FgAudioElement from "../fgAudioElement/FgAudioElement";
 import { useStreamsContext } from "../context/StreamsContext";
 import BundleController from "./lib/BundleController";
+import FgAudioElementContainer from "../fgAudioElement/FgAudioElementContainer";
 
 interface BundleOptions {
   isUser?: boolean;
@@ -269,7 +269,7 @@ export default function Bundle({
         Object.keys(cameraStreams || {}).length === 0 &&
         Object.keys(screenStreams || {}).length === 0 && (
           <div id={`${username}_audio_container`} className='relative'>
-            <FgAudioElement
+            <FgAudioElementContainer
               audioStream={audioStream}
               audioRef={audioRef}
               username={username}

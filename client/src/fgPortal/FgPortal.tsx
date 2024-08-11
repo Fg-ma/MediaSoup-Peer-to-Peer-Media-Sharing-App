@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
 
-const HoverPortalVar: Variants = {
+const FgPortalVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
   animate: {
     opacity: 1,
@@ -13,36 +13,36 @@ const HoverPortalVar: Variants = {
   },
 };
 
-const HoverPortalTransition: Transition = {
+const FgPortalTransition: Transition = {
   transition: {
     opacity: { duration: 0.001 },
     scale: { duration: 0.001 },
   },
 };
 
-export default function HoverPortal({
-  hoverType,
-  hoverContent,
+export default function FgPortal({
+  type,
+  content,
   buttonRef,
 }: {
-  hoverType: "above" | "below";
-  hoverContent: React.ReactElement;
-  buttonRef: React.RefObject<HTMLButtonElement>;
+  type: "above" | "below" | "mouse";
+  content: React.ReactElement;
+  buttonRef?: React.RefObject<HTMLButtonElement>;
 }) {
   const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
   const portalRef = useRef<HTMLDivElement>(null);
 
-  const getPortalPosition = () => {
-    const buttonRect = buttonRef.current?.getBoundingClientRect();
+  const getStaticPortalPosition = () => {
+    const buttonRect = buttonRef?.current?.getBoundingClientRect();
 
     if (!buttonRect || !portalRef.current) {
       return;
     }
 
     let top: number = 0;
-    if (hoverType === "above") {
+    if (type === "above") {
       top = buttonRect.top - portalRef.current.clientHeight;
-    } else if (hoverType === "below") {
+    } else if (type === "below") {
       top = buttonRect.top + buttonRect.height;
     }
     const left =
@@ -50,19 +50,30 @@ export default function HoverPortal({
       buttonRect.width / 2 -
       portalRef.current.clientWidth / 2;
 
-    const bodyRect = document.body.getBoundingClientRect();
-    const topPercent = (top / bodyRect.height) * 100;
-    const leftPercent = (left / bodyRect.width) * 100;
-
     setPortalPosition({
-      top: topPercent,
-      left: leftPercent,
+      top: top,
+      left: left,
+    });
+  };
+
+  const getDynamicPortalPosition = (event: MouseEvent) => {
+    setPortalPosition({
+      top: event.clientY - 40,
+      left: event.clientX + 12,
     });
   };
 
   useEffect(() => {
-    getPortalPosition();
-  }, [hoverContent]);
+    if (type === "above" || type === "below") getStaticPortalPosition();
+
+    if (type === "mouse")
+      window.addEventListener("mousemove", getDynamicPortalPosition);
+
+    return () => {
+      if (type === "mouse")
+        window.removeEventListener("mousemove", getDynamicPortalPosition);
+    };
+  }, [content]);
 
   return ReactDOM.createPortal(
     <motion.div
@@ -71,16 +82,16 @@ export default function HoverPortal({
         (portalPosition.top === 0 || portalPosition.left === 0) && "opacity-0"
       } absolute z-[51]`}
       style={{
-        top: `${portalPosition.top}%`,
-        left: `${portalPosition.left}%`,
+        top: `${portalPosition.top}px`,
+        left: `${portalPosition.left}px`,
       }}
-      variants={HoverPortalVar}
+      variants={FgPortalVar}
       initial='init'
       animate='animate'
       exit='init'
-      transition={HoverPortalTransition}
+      transition={FgPortalTransition}
     >
-      {hoverContent}
+      {content}
     </motion.div>,
     document.body
   );

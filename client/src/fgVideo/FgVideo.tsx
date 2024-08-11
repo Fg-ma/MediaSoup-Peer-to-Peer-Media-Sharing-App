@@ -121,25 +121,35 @@ export default function FgVideo({
   };
 
   const { userMedia, userStreamEffects } = useStreamsContext();
-  const [effectsActive, setEffectsActive] = useState(false);
-  const paused = useRef(fgVideoOptions.autoPlay);
-  const theater = useRef(false);
+
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const currentTimeRef = useRef<HTMLDivElement>(null);
+
+  const paused = useRef(fgVideoOptions.autoPlay);
+  const wasPaused = useRef(false);
+
+  const leaveVideoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const shiftPressed = useRef(false);
+  const controlPressed = useRef(false);
+
+  const [effectsActive, setEffectsActive] = useState(false);
+  const tintColor = useRef("#F56114");
+
+  const theater = useRef(false);
+
+  const captions = useRef<TextTrack | undefined>();
+
+  const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
+
   const totalTimeRef = useRef<HTMLDivElement>(null);
+  const currentTimeRef = useRef<HTMLDivElement>(null);
+
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const previewImgRef = useRef<HTMLImageElement>(null);
   const thumbnailImgRef = useRef<HTMLImageElement>(null);
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
   const isScrubbing = useRef(false);
-  const wasPaused = useRef(false);
-  const leaveVideoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
-  const captions = useRef<TextTrack | undefined>();
   const thumbnails = useRef<string[]>([]);
-  const tintColor = useRef("#F56114");
 
   const handleEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -217,9 +227,11 @@ export default function FgVideo({
     // Set up initial conditions
     fgVideoController.init();
 
-    document.addEventListener("fullscreenchange", () =>
-      controls.handleFullScreenChange()
-    );
+    if (fgVideoOptions.isFullScreen) {
+      document.addEventListener("fullscreenchange", () =>
+        controls.handleFullScreenChange()
+      );
+    }
 
     document.addEventListener("keydown", (event) =>
       controls.handleKeyDown(event)
@@ -227,103 +239,72 @@ export default function FgVideo({
 
     document.addEventListener("keyup", (event) => controls.handleKeyUp(event));
 
-    videoRef.current?.addEventListener("loadeddata", () =>
-      controls.loadedData()
-    );
-
-    videoRef.current?.addEventListener("timeupdate", () =>
-      controls.timeUpdate()
-    );
-
-    videoContainerRef.current?.addEventListener("mouseenter", () =>
-      controls.handleMouseEnter()
-    );
-
-    videoContainerRef.current?.addEventListener("mouseleave", () =>
-      controls.handleMouseLeave()
-    );
-
-    timelineContainerRef.current?.addEventListener("mousemove", (event) =>
-      controls.handleTimelineUpdate(event)
-    );
-
-    timelineContainerRef.current?.addEventListener("mousedown", (event) =>
-      controls.handleScrubbing(event)
-    );
-
-    document.addEventListener("mouseup", (event) => {
-      if (isScrubbing.current) {
-        controls.handleScrubbing(event);
-      }
-    });
-
-    document.addEventListener("mousemove", (event) => {
-      if (isScrubbing.current) {
-        controls.handleTimelineUpdate(event);
-      }
-    });
-
-    videoRef.current?.addEventListener("enterpictureinpicture", () =>
-      controls.handlePictureInPicture("enter")
-    );
-
-    videoRef.current?.addEventListener("leavepictureinpicture", () =>
-      controls.handlePictureInPicture("leave")
-    );
-
     document.addEventListener(
       "visibilitychange",
       fgVideoController.handleVisibilityChange
     );
 
-    return () => {
-      document.removeEventListener("fullscreenchange", () =>
-        controls.handleFullScreenChange()
+    if (fgVideoOptions.isTimeLine) {
+      document.addEventListener("mouseup", (event) => {
+        if (isScrubbing.current) {
+          controls.handleScrubbing(event);
+        }
+      });
+
+      document.addEventListener("mousemove", (event) => {
+        if (isScrubbing.current) {
+          controls.handleTimelineUpdate(event);
+        }
+      });
+    }
+
+    if (fgVideoOptions.isPictureInPicture) {
+      videoRef.current?.addEventListener("enterpictureinpicture", () =>
+        controls.handlePictureInPicture("enter")
       );
+
+      videoRef.current?.addEventListener("leavepictureinpicture", () =>
+        controls.handlePictureInPicture("leave")
+      );
+    }
+
+    return () => {
+      if (fgVideoOptions.isFullScreen) {
+        document.removeEventListener("fullscreenchange", () =>
+          controls.handleFullScreenChange()
+        );
+      }
       document.removeEventListener("keydown", (event) =>
         controls.handleKeyDown(event)
       );
       document.removeEventListener("keyup", (event) =>
         controls.handleKeyUp(event)
       );
-      videoRef.current?.removeEventListener("loadeddata", () =>
-        controls.loadedData()
-      );
-      videoRef.current?.removeEventListener("timeupdate", () =>
-        controls.timeUpdate()
-      );
-      videoContainerRef.current?.removeEventListener("mouseenter", () =>
-        controls.handleMouseEnter()
-      );
-      videoContainerRef.current?.removeEventListener("mouseleave", () =>
-        controls.handleMouseLeave()
-      );
-      timelineContainerRef.current?.removeEventListener("mousemove", (event) =>
-        controls.handleTimelineUpdate(event)
-      );
-      timelineContainerRef.current?.removeEventListener("mousedown", (event) =>
-        controls.handleScrubbing(event)
-      );
-      document.removeEventListener("mouseup", (event) => {
-        if (isScrubbing.current) {
-          controls.handleScrubbing(event);
-        }
-      });
-      document.removeEventListener("mousemove", (event) => {
-        if (isScrubbing.current) {
-          controls.handleTimelineUpdate(event);
-        }
-      });
-      videoRef.current?.removeEventListener("enterpictureinpicture", () =>
-        controls.handlePictureInPicture("enter")
-      );
-      videoRef.current?.removeEventListener("leavepictureinpicture", () =>
-        controls.handlePictureInPicture("leave")
-      );
       document.removeEventListener(
         "visibilitychange",
         fgVideoController.handleVisibilityChange
       );
+      if (fgVideoOptions.isTimeLine) {
+        document.removeEventListener("mouseup", (event) => {
+          if (isScrubbing.current) {
+            controls.handleScrubbing(event);
+          }
+        });
+
+        document.removeEventListener("mousemove", (event) => {
+          if (isScrubbing.current) {
+            controls.handleTimelineUpdate(event);
+          }
+        });
+      }
+      if (fgVideoOptions.isPictureInPicture) {
+        videoRef.current?.removeEventListener("enterpictureinpicture", () =>
+          controls.handlePictureInPicture("enter")
+        );
+        videoRef.current?.removeEventListener("leavepictureinpicture", () =>
+          controls.handlePictureInPicture("leave")
+        );
+      }
     };
   }, []);
 
@@ -343,6 +324,8 @@ export default function FgVideo({
       className={`video-container ${
         fgVideoOptions.autoPlay ? "" : "paused"
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md`}
+      onMouseEnter={() => controls.handleMouseEnter()}
+      onMouseLeave={() => controls.handleMouseLeave()}
     >
       {videoStream && (
         <>
@@ -354,6 +337,8 @@ export default function FgVideo({
                 controls.handlePausePlay();
               }
             }}
+            onLoadedData={() => controls.loadedData()}
+            onTimeUpdate={() => controls.timeUpdate()}
             className='main-video w-full z-0'
             controls={false}
             autoPlay={fgVideoOptions.autoPlay}
@@ -372,7 +357,16 @@ export default function FgVideo({
             <img ref={thumbnailImgRef} className='thumbnail-img' />
           )}
           {fgVideoOptions.isTimeLine && (
-            <div ref={timelineContainerRef} className='timeline-container z-20'>
+            <div
+              ref={timelineContainerRef}
+              className='timeline-container z-20'
+              onMouseMove={(event) =>
+                controls.handleTimelineUpdate(event as unknown as MouseEvent)
+              }
+              onMouseDown={(event) =>
+                controls.handleScrubbing(event as unknown as MouseEvent)
+              }
+            >
               <div className='timeline'>
                 {fgVideoOptions.isPreview && (
                   <img ref={previewImgRef} className='preview-img shadow-md' />

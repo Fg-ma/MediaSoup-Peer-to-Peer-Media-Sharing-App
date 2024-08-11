@@ -532,7 +532,7 @@ class Controls {
   loadedData() {
     if (!this.videoRef.current) return;
 
-    if (this.totalTimeRef.current) {
+    if (this.fgVideoOptions.isTotalTime && this.totalTimeRef.current) {
       this.totalTimeRef.current.textContent = this.formatDuration(
         this.videoRef.current.duration
       );

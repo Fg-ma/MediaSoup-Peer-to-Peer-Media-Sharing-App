@@ -4,7 +4,7 @@ import { colors } from "../fgVideo/lib/colors";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
 import FgButton from "../fgButton/FgButton";
-import AudioEffectsSection from "../audioEffectsButton/lib/AudioEffectsSection";
+import FgPortal from "../fgPortal/FgPortal";
 
 const shadowColors = {
   black: "rgba(0, 0, 0, 0.8)",
@@ -47,6 +47,7 @@ const defaultFgAudioElementOptions: {
 };
 
 export default function FgAudioElement({
+  svgRef,
   audioStream,
   audioRef,
   username,
@@ -55,8 +56,10 @@ export default function FgAudioElement({
   clientMute,
   localMute,
   isUser = false,
+  doubleClickFunction,
   options,
 }: {
+  svgRef: React.RefObject<SVGSVGElement>;
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   username: string;
@@ -65,6 +68,7 @@ export default function FgAudioElement({
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   isUser?: boolean;
+  doubleClickFunction?: (() => void) | undefined;
   options?: {
     springDuration?: number;
     noiseThreshold?: number;
@@ -96,17 +100,10 @@ export default function FgAudioElement({
     y: 0,
   });
   const [popupVisible, setPopupVisible] = useState(false);
-  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
-  const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
-    useState(false);
   const bellCurveY = useRef<number[]>([]);
   const sineCurveY = useRef<number[]>([]);
   const fixedPointsX = useRef<number[]>([]);
   const pathRef = useRef<SVGPathElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
   const leftHandleRef = useRef<SVGRectElement>(null);
   const rightHandleRef = useRef<SVGRectElement>(null);
   const sideDragging = useRef<"left" | "right" | null>(null);
@@ -247,11 +244,6 @@ export default function FgAudioElement({
       svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
       svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
     ) {
-      setMousePosition({
-        x: event.clientX + 12,
-        y: event.clientY - 240,
-      });
-
       if (!svgRef.current?.classList.contains("cursor-pointer")) {
         svgRef.current?.classList.add("cursor-pointer");
       }
@@ -350,22 +342,20 @@ export default function FgAudioElement({
   return (
     <div className='w-60 aspect-square relative'>
       {popupVisible && (
-        <div
-          className='w-max h-max absolute shadow-lg px-4 py-2 z-[1000] rounded-md text-lg font-Josefin'
-          style={
-            mousePosition.x && mousePosition.y
-              ? { left: mousePosition.x, top: mousePosition.y }
-              : {}
+        <FgPortal
+          type='mouse'
+          content={
+            <div className='w-max h-max shadow-lg px-4 py-2 z-auto rounded-md text-lg font-Josefin'>
+              {name ? name : username}
+            </div>
           }
-        >
-          {name ? name : username}
-        </div>
+        />
       )}
       <FgButton
         clickFunction={onClick}
         contentFunction={() => (
           <svg
-            className='z-10 w-full aspect-square'
+            className='w-full aspect-square'
             ref={svgRef}
             viewBox='0 -150 200 300'
           >
@@ -916,20 +906,8 @@ export default function FgAudioElement({
             )}
           </svg>
         )}
-        doubleClickFunction={() => {
-          setAudioEffectsSectionVisible((prev) => !prev);
-        }}
+        doubleClickFunction={doubleClickFunction}
       />
-      {audioEffectsSectionVisible && (
-        <AudioEffectsSection
-          type='right'
-          referenceElement={svgRef as unknown as React.RefObject<HTMLElement>}
-          padding={12}
-          handleMute={handleMute}
-          muteStateRef={localMute}
-          closeCallback={() => setAudioEffectsSectionVisible(false)}
-        />
-      )}
     </div>
   );
 }

@@ -295,10 +295,6 @@ export default function AudioMixEffectsPortal({
       backgroundColor: "#d03818",
     },
   });
-  const maxDims = useRef<{ maxWidth: number; maxHeight: number }>({
-    maxWidth: 0,
-    maxHeight: 0,
-  });
   const portalRef = useRef<HTMLDivElement>(null);
 
   const getPackedPositions = (containerWidth: number, padding: number) => {
@@ -416,30 +412,7 @@ export default function AudioMixEffectsPortal({
       );
     }
 
-    getMaxDimensions();
-
     setRerender((prev) => !prev);
-  };
-
-  const getMaxDimensions = () => {
-    let maxWidth = 0;
-    let maxHeight = 0;
-
-    Object.values(mixEffects.current).forEach((effect) => {
-      if (
-        effect.active &&
-        effect.x !== undefined &&
-        effect.y !== undefined &&
-        effect.width !== undefined &&
-        effect.height !== undefined
-      ) {
-        const { x, y, width, height } = effect;
-        maxWidth = Math.max(maxWidth, x + width);
-        maxHeight = Math.max(maxHeight, y + height);
-      }
-    });
-
-    maxDims.current = { maxWidth, maxHeight };
   };
 
   const updateMixEffectsValues = (event: SliderChangeEvent) => {
@@ -471,7 +444,7 @@ export default function AudioMixEffectsPortal({
       content={
         <div
           ref={portalRef}
-          className='bg-white font-K2D text-md min-w-[18rem] min-h-[18.75rem] h-full w-full'
+          className='bg-white font-K2D text-md min-w-[18rem] min-h-[18.75rem] h-full w-full overflow-y-auto'
         >
           <div className='h-max mb-4'>
             <ScrollingContainer
@@ -614,10 +587,6 @@ export default function AudioMixEffectsPortal({
                 updateMixEffectsValues={updateMixEffectsValues}
               />
             )}
-            <div
-              className='h-4 w-full absolute'
-              style={{ top: `${maxDims.current.maxHeight}px` }}
-            ></div>
           </div>
         </div>
       }
@@ -632,8 +601,8 @@ export default function AudioMixEffectsPortal({
       }}
       initWidth={600}
       initHeight={384}
-      minWidth={328}
-      minHeight={348}
+      minWidth={324}
+      minHeight={326}
       resizeCallback={() => {
         if (portalRef.current) {
           const previous = JSON.parse(JSON.stringify(mixEffects.current));

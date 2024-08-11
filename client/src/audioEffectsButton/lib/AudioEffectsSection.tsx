@@ -81,7 +81,7 @@ export default function AudioEffectsSection({
         content={
           <div
             ref={audioSectionRef}
-            className={`grid gap-x-1 gap-y-1 min-w-[12rem] min-h-[12rem] h-full w-full overflow-y-auto ${
+            className={`grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto ${
               cols === 3
                 ? "grid-cols-3"
                 : cols === 4
@@ -92,7 +92,7 @@ export default function AudioEffectsSection({
             }`}
           >
             <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 setVolumeState((prev) => ({
                   from: prev.to,
@@ -131,7 +131,7 @@ export default function AudioEffectsSection({
             />
             <FgButton
               externalRef={audioMixEffectsButtonRef}
-              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 setAudioMixEffectsActive((prev) => !prev);
               }}
@@ -161,7 +161,7 @@ export default function AudioEffectsSection({
               options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("robot", false);
                 setRerender((prev) => !prev);
@@ -197,7 +197,7 @@ export default function AudioEffectsSection({
               options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("echo", false);
                 setRerender((prev) => !prev);
@@ -235,7 +235,7 @@ export default function AudioEffectsSection({
               options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("alien", false);
                 setRerender((prev) => !prev);
@@ -266,7 +266,7 @@ export default function AudioEffectsSection({
               options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("underwater", false);
                 setRerender((prev) => !prev);
@@ -299,7 +299,7 @@ export default function AudioEffectsSection({
               options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("telephone", false);
                 setRerender((prev) => !prev);
@@ -338,10 +338,10 @@ export default function AudioEffectsSection({
           placement: type,
           padding: padding,
         }}
-        initWidth={232}
-        initHeight={232}
-        minWidth={232}
-        minHeight={232}
+        initWidth={176}
+        initHeight={176}
+        minWidth={176}
+        minHeight={176}
         resizeCallback={() => {
           gridColumnsChange();
         }}
