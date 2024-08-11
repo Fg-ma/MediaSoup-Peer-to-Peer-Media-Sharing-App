@@ -69,7 +69,7 @@ export default function HoverPortal({
       ref={portalRef}
       className={`${
         (portalPosition.top === 0 || portalPosition.left === 0) && "opacity-0"
-      } absolute z-20`}
+      } absolute z-[51]`}
       style={{
         top: `${portalPosition.top}%`,
         left: `${portalPosition.left}%`,

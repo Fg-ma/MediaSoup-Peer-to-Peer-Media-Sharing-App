@@ -28,16 +28,19 @@ export default function AudioEffectsSection({
   padding,
   handleMute,
   muteStateRef,
+  closeCallback,
 }: {
   type: "above" | "below" | "left" | "right";
   referenceElement: React.RefObject<HTMLElement>;
   padding: number;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
+  closeCallback?: () => void;
 }) {
   const { userMedia, userStreamEffects } = useStreamsContext();
 
-  const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
+  const [rerender, setRerender] = useState(false);
+  const [cols, setCols] = useState(3);
   const [volumeState, setVolumeState] = useState<{
     from: "off" | "low" | "high" | "";
     to: "off" | "low" | "high";
@@ -45,7 +48,8 @@ export default function AudioEffectsSection({
     from: "",
     to: muteStateRef.current ? "off" : "high",
   });
-  const [rerender, setRerender] = useState(false);
+  const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
+  const audioSectionRef = useRef<HTMLDivElement>(null);
   const audioMixEffectsButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -56,13 +60,39 @@ export default function AudioEffectsSection({
     }
   }, [muteStateRef.current]);
 
+  const gridColumnsChange = () => {
+    if (!audioSectionRef.current) return;
+
+    const width = audioSectionRef.current.clientWidth;
+    if (width < 300) {
+      if (cols !== 3) setCols(3);
+    } else if (width < 500) {
+      if (cols !== 4) setCols(4);
+    } else if (width < 700) {
+      if (cols !== 5) setCols(5);
+    } else if (width >= 700) {
+      if (cols !== 6) setCols(6);
+    }
+  };
+
   return (
     <>
       <FgPanel
         content={
-          <div className='grid grid-cols-3 gap-x-1 gap-y-1 p-2 min-w-[12rem] min-h-[12rem] h-full w-full'>
+          <div
+            ref={audioSectionRef}
+            className={`grid gap-x-1 gap-y-1 min-w-[12rem] min-h-[12rem] h-full w-full overflow-y-auto ${
+              cols === 3
+                ? "grid-cols-3"
+                : cols === 4
+                ? "grid-cols-4"
+                : cols === 5
+                ? "grid-cols-5"
+                : "grid-cols-6"
+            }`}
+          >
             <FgButton
-              className='border-gray-300 flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 setVolumeState((prev) => ({
                   from: prev.to,
@@ -92,10 +122,16 @@ export default function AudioEffectsSection({
                   )}
                 </svg>
               )}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {muteStateRef.current ? "Unmute" : "Mute"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
               externalRef={audioMixEffectsButtonRef}
-              className='border-gray-300 flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 setAudioMixEffectsActive((prev) => !prev);
               }}
@@ -117,9 +153,15 @@ export default function AudioEffectsSection({
                   />
                 );
               }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {audioMixEffectsActive ? "Close mix effects" : "Mix effects"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("robot", false);
                 setRerender((prev) => !prev);
@@ -145,9 +187,17 @@ export default function AudioEffectsSection({
                   />
                 );
               }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {userStreamEffects.current.audio.robot
+                    ? "Remove robot effect"
+                    : "Robot effect"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("echo", false);
                 setRerender((prev) => !prev);
@@ -175,9 +225,17 @@ export default function AudioEffectsSection({
                   />
                 );
               }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {userStreamEffects.current.audio.echo
+                    ? "Remove echo effect"
+                    : "Echo effect"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("alien", false);
                 setRerender((prev) => !prev);
@@ -198,9 +256,17 @@ export default function AudioEffectsSection({
                   />
                 );
               }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {userStreamEffects.current.audio.alien
+                    ? "Remove alien effect"
+                    : "Alien effect"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("underwater", false);
                 setRerender((prev) => !prev);
@@ -223,9 +289,17 @@ export default function AudioEffectsSection({
                   />
                 );
               }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {userStreamEffects.current.audio.underwater
+                    ? "Remove underwater effect"
+                    : "Underwater effect"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
-              className='border-gray-300 flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              className='border-gray-300 flex items-center justify-center min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 userMedia.current.audio?.changeEffects("telephone", false);
                 setRerender((prev) => !prev);
@@ -248,6 +322,14 @@ export default function AudioEffectsSection({
                   />
                 );
               }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {userStreamEffects.current.audio.telephone
+                    ? "Remove telephone effect"
+                    : "Telephone effect"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
             />
           </div>
         }
@@ -260,10 +342,18 @@ export default function AudioEffectsSection({
         initHeight={232}
         minWidth={232}
         minHeight={232}
+        resizeCallback={() => {
+          gridColumnsChange();
+        }}
+        closeCallback={closeCallback ? () => closeCallback() : undefined}
+        closePosition='topRight'
       />
       {audioMixEffectsActive && (
         <AudioMixEffectsPortal
           audioMixEffectsButtonRef={audioMixEffectsButtonRef}
+          closeCallback={() => {
+            setAudioMixEffectsActive(false);
+          }}
         />
       )}
     </>

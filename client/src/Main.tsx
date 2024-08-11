@@ -317,10 +317,12 @@ export default function Main() {
               {subscribedActive ? "Unsubscribe" : "Subscribe"}
             </button>
           </div>
-          <AudioEffectsButton
-            handleMuteExternalMute={handleMuteExternalMute}
-            mutedAudioRef={mutedAudioRef}
-          />
+          {isAudio.current && (
+            <AudioEffectsButton
+              handleMuteExternalMute={handleMuteExternalMute}
+              mutedAudioRef={mutedAudioRef}
+            />
+          )}
         </div>
         <div className='flex justify-center mt-5'>
           <input

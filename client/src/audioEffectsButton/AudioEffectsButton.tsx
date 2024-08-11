@@ -3,7 +3,6 @@ import FgButton from "../fgButton/FgButton";
 import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
 import FgSVG from "../fgSVG/FgSVG";
 import AudioEffectsSection from "./lib/AudioEffectsSection";
-import AudioMixEffectsPortal from "./lib/AudioMixEffectsPortal";
 import audioEffectIcon from "../../public/svgs/audioEffectIcon.svg";
 import audioEffectOffIcon from "../../public/svgs/audioEffectOffIcon.svg";
 
@@ -58,6 +57,7 @@ export default function AudioEffectsButton({
           padding={12}
           handleMute={handleMuteExternalMute}
           muteStateRef={mutedAudioRef}
+          closeCallback={() => setEffectSectionActive(false)}
         />
       )}
     </>

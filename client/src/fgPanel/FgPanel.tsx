@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
+import FgSVG from "../fgSVG/FgSVG";
+import closeIcon from "../../public/svgs/closeIcon.svg";
 
 const PanelVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -27,8 +29,9 @@ export default function FgPanel({
   minWidth = 0,
   minHeight = 0,
   resizeCallback,
-}: // close capabilities
-{
+  closeCallback,
+  closePosition,
+}: {
   content: React.ReactNode;
   initPosition?: {
     x?: number;
@@ -42,6 +45,8 @@ export default function FgPanel({
   minWidth?: number;
   minHeight?: number;
   resizeCallback?: () => void;
+  closeCallback?: () => void;
+  closePosition?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
 }) {
   const [rerender, setRerender] = useState(false);
   const [position, setPosition] = useState<{ x?: number; y?: number }>({
@@ -284,22 +289,55 @@ export default function FgPanel({
       >
         {content}
       </div>
-      <div
-        onMouseDown={(event) => handleResizeMouseDown(event, "se")}
-        className='w-5 aspect-square absolute right-0 bottom-0 cursor-se-resize'
-      />
-      <div
-        onMouseDown={(event) => handleResizeMouseDown(event, "sw")}
-        className='w-5 aspect-square absolute left-0 bottom-0 cursor-sw-resize'
-      />
-      <div
-        onMouseDown={(event) => handleResizeMouseDown(event, "nw")}
-        className='w-5 aspect-square absolute left-0 top-0 cursor-nw-resize'
-      />
-      <div
-        onMouseDown={(event) => handleResizeMouseDown(event, "ne")}
-        className='w-5 aspect-square absolute right-0 top-0 cursor-ne-resize'
-      />
+      {(closePosition !== "bottomLeft" || !closeCallback) && (
+        <div
+          onMouseDown={(event) => handleResizeMouseDown(event, "se")}
+          className='w-5 aspect-square absolute right-0 bottom-0 cursor-se-resize'
+        />
+      )}
+      {(closePosition !== "bottomRight" || !closeCallback) && (
+        <div
+          onMouseDown={(event) => handleResizeMouseDown(event, "sw")}
+          className='w-5 aspect-square absolute left-0 bottom-0 cursor-sw-resize'
+        />
+      )}
+      {(closePosition !== "topLeft" || !closeCallback) && (
+        <div
+          onMouseDown={(event) => handleResizeMouseDown(event, "nw")}
+          className='w-5 aspect-square absolute left-0 top-0 cursor-nw-resize'
+        />
+      )}
+      {(closePosition !== "topRight" || !closeCallback) && (
+        <div
+          onMouseDown={(event) => handleResizeMouseDown(event, "ne")}
+          className='w-5 aspect-square absolute right-0 top-0 cursor-ne-resize'
+        />
+      )}
+      {closeCallback && closePosition && (
+        <div
+          onClick={closeCallback}
+          className={`w-5 aspect-square absolute flex items-center justify-center ${
+            closePosition === "topRight"
+              ? "right-0 top-0"
+              : closePosition === "topLeft"
+              ? "left-0 top-0"
+              : closePosition === "bottomRight"
+              ? "left-0 bottom-0"
+              : closePosition === "bottomLeft"
+              ? "right-0 bottom-0"
+              : ""
+          }`}
+        >
+          <FgSVG
+            src={closeIcon}
+            attributes={[
+              { key: "width", value: "80%" },
+              { key: "height", value: "80%" },
+              { key: "fill", value: "black" },
+            ]}
+          />
+        </div>
+      )}
     </motion.div>,
     document.body
   );

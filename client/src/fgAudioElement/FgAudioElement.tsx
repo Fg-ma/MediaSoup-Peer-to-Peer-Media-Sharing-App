@@ -927,6 +927,7 @@ export default function FgAudioElement({
           padding={12}
           handleMute={handleMute}
           muteStateRef={localMute}
+          closeCallback={() => setAudioEffectsSectionVisible(false)}
         />
       )}
     </div>

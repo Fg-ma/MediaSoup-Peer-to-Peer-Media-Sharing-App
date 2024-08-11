@@ -30,8 +30,10 @@ export interface MixEffect {
 
 export default function AudioMixEffectsPortal({
   audioMixEffectsButtonRef,
+  closeCallback,
 }: {
   audioMixEffectsButtonRef: React.RefObject<HTMLButtonElement>;
+  closeCallback: () => void;
 }) {
   const { userMedia } = useStreamsContext();
   const [rerender, setRerender] = useState(false);
@@ -644,6 +646,8 @@ export default function AudioMixEffectsPortal({
           }
         }
       }}
+      closeCallback={() => closeCallback()}
+      closePosition='topRight'
     />
   );
 }
