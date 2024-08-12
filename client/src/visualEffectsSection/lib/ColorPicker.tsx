@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import ReactDOM from "react-dom";
-import { EffectTypes, useStreamsContext } from "../../context/StreamsContext";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+  useStreamsContext,
+} from "../../context/StreamsContext";
 
 export default function ColorPicker({
   videoId,
@@ -24,7 +28,10 @@ export default function ColorPicker({
   setIsColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
   tintColor: React.MutableRefObject<string>;
   colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
-  handleEffectChange: (effect: EffectTypes, blockStateChange?: boolean) => void;
+  handleEffectChange: (
+    effect: CameraEffectTypes | ScreenEffectTypes,
+    blockStateChange?: boolean
+  ) => void;
 }) {
   const { userStreamEffects } = useStreamsContext();
 
@@ -89,9 +96,9 @@ export default function ColorPicker({
     setColor(tempColor);
     tintColor.current = tempColor;
     setIsColorPicker(false);
-    if (userStreamEffects.current.tint[type]) {
-      handleEffectChange("tint", userStreamEffects.current.tint[type][videoId]);
-      userStreamEffects.current.tint[type][videoId] = true;
+    if (userStreamEffects.current[type][videoId].tint) {
+      handleEffectChange("tint", userStreamEffects.current[type][videoId].tint);
+      userStreamEffects.current[type][videoId].tint = true;
     }
   };
 

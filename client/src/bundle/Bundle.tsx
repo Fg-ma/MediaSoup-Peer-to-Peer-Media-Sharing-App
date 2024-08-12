@@ -165,8 +165,8 @@ export default function Bundle({
 
     localMute.current = !localMute.current;
 
-    if (audioRef.current && bundleOptions.isUser) {
-      audioRef.current.muted = true;
+    if (audioRef.current && !bundleOptions.isUser) {
+      audioRef.current.muted = localMute.current;
     }
   };
 

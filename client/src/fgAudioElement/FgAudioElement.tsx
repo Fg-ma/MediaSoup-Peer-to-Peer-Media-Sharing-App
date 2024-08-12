@@ -89,15 +89,15 @@ export default function FgAudioElement({
   };
 
   const [movingY, setMovingY] = useState<number[]>(
-    Array(fgAudioElementOptions.numFixedPoints - 1).fill(0)
+    Array(fgAudioElementOptions.numFixedPoints - 1).fill(50)
   );
   const [fixedY, setFixedY] = useState<number[]>(
-    Array(fgAudioElementOptions.numFixedPoints - 1).fill(0)
+    Array(fgAudioElementOptions.numFixedPoints - 1).fill(50)
   );
-  const [leftHandlePosition, setLeftHandlePosition] = useState({ x: 10, y: 0 });
+  const [leftHandlePosition, setLeftHandlePosition] = useState({ x: 4, y: 50 });
   const [rightHandlePosition, setRightHandlePosition] = useState({
-    x: 190,
-    y: 0,
+    x: 96,
+    y: 50,
   });
   const [popupVisible, setPopupVisible] = useState(false);
   const bellCurveY = useRef<number[]>([]);
@@ -110,8 +110,14 @@ export default function FgAudioElement({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioAnalyzer = useRef<AudioAnalyser | undefined>();
   const pathGenerator = useRef<PathGenerator | undefined>();
-  const patternWidth = 0.18;
-  const patternHeight = 0.2;
+  const viewBoxSize = {
+    w: 100,
+    h: 100,
+  };
+  const patternSize = {
+    w: 0.18,
+    h: 0.23,
+  };
 
   const springs = useSpring<{ [key: string]: any }>({
     ...Object.fromEntries(movingY.map((y, index) => [`y${index + 1}`, y])),
@@ -125,9 +131,9 @@ export default function FgAudioElement({
     }
 
     // X points
-    const totalWidth = 200;
-    const startOffset = 20;
-    const endOffset = 20;
+    const totalWidth = 100;
+    const startOffset = 16;
+    const endOffset = 16;
     const usableWidth = totalWidth - startOffset - endOffset;
     const step = usableWidth / (fgAudioElementOptions.numFixedPoints - 1);
 
@@ -162,6 +168,7 @@ export default function FgAudioElement({
 
   const startDrag = (event: React.MouseEvent, side: "left" | "right") => {
     event.preventDefault();
+    event.stopPropagation();
 
     if (!isUser) {
       window.addEventListener("mousemove", drag);
@@ -177,16 +184,22 @@ export default function FgAudioElement({
     const svgPoint = svgRef.current.createSVGPoint();
     svgPoint.x = event.clientX;
     svgPoint.y = event.clientY;
+
     const cursorPoint = svgPoint.matrixTransform(
       svgRef.current.getScreenCTM()?.inverse()
     );
-    const newY = Math.max(-220, Math.min(220, cursorPoint.y));
+
+    const newY = Math.max(-34, Math.min(134, cursorPoint.y));
+
     if (sideDragging.current === "left") {
       setLeftHandlePosition((prevState) => ({ ...prevState, y: newY }));
     } else if (sideDragging.current === "right") {
       setRightHandlePosition((prevState) => ({ ...prevState, y: newY }));
     }
-    handleVolumeSlider(Math.abs(newY / 220));
+
+    const newVol = Math.abs(newY - 50) / 84;
+
+    handleVolumeSlider(newVol);
   };
 
   const stopDrag = (event: MouseEvent) => {
@@ -197,12 +210,12 @@ export default function FgAudioElement({
       window.removeEventListener("mouseup", stopDrag);
     }
 
-    setLeftHandlePosition((prevState) => ({ ...prevState, y: 0 }));
-    setRightHandlePosition((prevState) => ({ ...prevState, y: 0 }));
+    setLeftHandlePosition((prevState) => ({ ...prevState, y: 50 }));
+    setRightHandlePosition((prevState) => ({ ...prevState, y: 50 }));
     sideDragging.current = null;
   };
 
-  const onClick = (event: React.MouseEvent) => {
+  const isOnPath = (event: React.MouseEvent) => {
     const bbox = pathRef.current?.getBBox();
     const svgPoint = svgRef.current?.createSVGPoint();
     if (!bbox || !svgPoint || clientMute.current) return;
@@ -218,32 +231,27 @@ export default function FgAudioElement({
     if (
       svgPointTransformed.x >= bbox.x &&
       svgPointTransformed.x <= bbox.x + bbox.width &&
-      svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
-      svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
+      svgPointTransformed.y >= bbox.y - 10 &&
+      svgPointTransformed.y <= bbox.y + 10
     ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const onClick = (event: React.MouseEvent) => {
+    const validClick = isOnPath(event);
+
+    if (validClick) {
       handleMute();
     }
   };
 
   const onMouseMove = (event: MouseEvent) => {
-    const bbox = pathRef.current?.getBBox();
-    const svgPoint = svgRef.current?.createSVGPoint();
-    if (!bbox || !svgPoint || clientMute.current) return;
+    const validMove = isOnPath(event as unknown as React.MouseEvent);
 
-    svgPoint.x = event.clientX;
-    svgPoint.y = event.clientY;
-
-    // Convert client coordinates to SVG coordinates
-    const svgPointTransformed = svgPoint.matrixTransform(
-      svgRef.current?.getScreenCTM()?.inverse()
-    );
-
-    if (
-      svgPointTransformed.x >= bbox.x &&
-      svgPointTransformed.x <= bbox.x + bbox.width &&
-      svgPointTransformed.y >= Math.min(bbox.y - 20, -20) &&
-      svgPointTransformed.y <= bbox.y + Math.max(bbox.height + 20, 20)
-    ) {
+    if (validMove) {
       if (!svgRef.current?.classList.contains("cursor-pointer")) {
         svgRef.current?.classList.add("cursor-pointer");
       }
@@ -302,17 +310,17 @@ export default function FgAudioElement({
       fgAudioElementOptions.muteStyleOption !== "smile"
     ) {
       movingYArray = bellCurveY.current.map(
-        (value, index) => value * volumeLevel * 200 * (-1) ** index
+        (value, index) => value * volumeLevel * 84 * (-1) ** index + 50
       );
-      fixedYArray = Array(fgAudioElementOptions.numFixedPoints - 1).fill(0);
+      fixedYArray = Array(fgAudioElementOptions.numFixedPoints - 1).fill(50);
     } else if (fgAudioElementOptions.muteStyleOption === "smile") {
       movingYArray = sineCurveY.current
         .filter((_, index) => index % 2 === 0)
-        .map((value, index) => value * 20);
+        .map((value, index) => value * 10 + 50);
       fixedYArray = sineCurveY.current
         .filter((_, index) => index % 2 === 1)
-        .map((value, index) => value * 20);
-      fixedYArray.push(0);
+        .map((value, index) => value * 10 + 50);
+      fixedYArray.push(50);
     }
 
     if (movingYArray) {
@@ -357,7 +365,7 @@ export default function FgAudioElement({
           <svg
             className='w-full aspect-square'
             ref={svgRef}
-            viewBox='0 -150 200 300'
+            viewBox={`0 0 ${viewBoxSize.w} ${viewBoxSize.h}`}
           >
             <defs>
               <filter id={`${username}_shadow`}>
@@ -390,12 +398,18 @@ export default function FgAudioElement({
               </filter>
 
               <mask id={`${username}_mask`}>
-                <rect x='-10' y='-150' width='220' height='450' fill='black' />
+                <rect
+                  x='0'
+                  y='0'
+                  width={viewBoxSize.w}
+                  height={viewBoxSize.h}
+                  fill='black'
+                />
                 <animated.path
                   ref={pathRef}
                   d={animatedPathData}
                   stroke='white'
-                  strokeWidth='7'
+                  strokeWidth='4'
                   fill='none'
                   strokeLinecap='round'
                   strokeLinejoin='round'
@@ -410,8 +424,9 @@ export default function FgAudioElement({
                 y2='0%'
                 gradientUnits='userSpaceOnUse'
               >
+                {/* m */}
                 <stop
-                  offset='0%'
+                  offset='6%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.primaryMuteColor as keyof typeof colors
@@ -419,7 +434,7 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='10.61%'
+                  offset='15.34%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.primaryMuteColor as keyof typeof colors
@@ -427,7 +442,7 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='11.61%'
+                  offset='16.216%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
@@ -435,7 +450,7 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='14.31%'
+                  offset='18.59%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
@@ -443,7 +458,7 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='15.31%'
+                  offset='19.47%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.primaryMuteColor as keyof typeof colors
@@ -451,7 +466,7 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='25.42%'
+                  offset='28.369%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.primaryMuteColor as keyof typeof colors
@@ -460,7 +475,7 @@ export default function FgAudioElement({
                 />
 
                 <stop
-                  offset='26.42%'
+                  offset='29.249%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
@@ -468,105 +483,7 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='36.53%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-
-                <stop
-                  offset='37.53%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='40.23%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='41.23%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='43.93%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='44.93%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='47.63%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='48.63%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='51.33%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='52.33%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='62.44%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-
-                <stop
-                  offset='63.44%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='73.55%'
+                  offset='38.146%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
@@ -574,8 +491,9 @@ export default function FgAudioElement({
                   }
                 />
 
+                {/* u */}
                 <stop
-                  offset='74.55%'
+                  offset='39.026%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.primaryMuteColor as keyof typeof colors
@@ -583,7 +501,71 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='84.66%'
+                  offset='41.40%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='42.28%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='44.658%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='45.538%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='47.91%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='48.79%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='51.17%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='52.05%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='60.947%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.primaryMuteColor as keyof typeof colors
@@ -592,7 +574,7 @@ export default function FgAudioElement({
                 />
 
                 <stop
-                  offset='85.66%'
+                  offset='61.827%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
@@ -600,7 +582,7 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='95.77%'
+                  offset='70.72%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
@@ -608,8 +590,9 @@ export default function FgAudioElement({
                   }
                 />
 
+                {/* t */}
                 <stop
-                  offset='96.77%'
+                  offset='71.60%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.primaryMuteColor as keyof typeof colors
@@ -617,7 +600,42 @@ export default function FgAudioElement({
                   }
                 />
                 <stop
-                  offset='100%'
+                  offset='80.50%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+
+                <stop
+                  offset='81.38%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='90.27%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+
+                {/* e */}
+                <stop
+                  offset='91.16%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='94%'
                   stopColor={
                     colors[
                       fgAudioElementOptions.primaryMuteColor as keyof typeof colors
@@ -664,205 +682,85 @@ export default function FgAudioElement({
 
               <pattern
                 id={`${username}_background_matrix`}
-                x='-20'
-                y='-120'
-                width={svgRef.current?.clientWidth}
-                height={svgRef.current?.clientHeight}
+                x='0'
+                y='0'
+                width={viewBoxSize.w}
+                height={viewBoxSize.h}
                 patternUnits='userSpaceOnUse'
               >
                 <rect
                   x='0'
                   y='0'
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
+                  width={viewBoxSize.w * patternSize.w}
+                  height={viewBoxSize.h * patternSize.h}
                   fill={`url(#${username}_top_gradient)`}
                 ></rect>
                 <rect
-                  x={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
+                  x={viewBoxSize.w * patternSize.w}
                   y='0'
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
+                  width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                  height={viewBoxSize.h * patternSize.h}
                   fill='black'
                 ></rect>
                 <rect
-                  x={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * (1 - patternWidth)
-                      : undefined
-                  }
+                  x={viewBoxSize.w * (1 - patternSize.w)}
                   y='0'
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
+                  width={viewBoxSize.w * patternSize.w}
+                  height={viewBoxSize.h * patternSize.h}
                   fill={`url(#${username}_top_gradient)`}
                 ></rect>
 
                 <rect
                   x='0'
-                  y={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
-                      : undefined
-                  }
+                  y={viewBoxSize.h * patternSize.h}
+                  width={viewBoxSize.w * patternSize.w}
+                  height={viewBoxSize.h * (1 - 2 * patternSize.h)}
                   fill='black'
                 ></rect>
                 <rect
-                  x={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
-                  y={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
-                      : undefined
-                  }
+                  x={viewBoxSize.w * patternSize.w}
+                  y={viewBoxSize.h * patternSize.h}
+                  width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                  height={viewBoxSize.h * (1 - 2 * patternSize.h)}
                   fill='black'
                 ></rect>
                 <rect
-                  x={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * (1 - patternWidth)
-                      : undefined
-                  }
-                  y={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * (1 - 2 * patternHeight)
-                      : undefined
-                  }
+                  x={viewBoxSize.w * (1 - patternSize.w)}
+                  y={viewBoxSize.h * patternSize.h}
+                  width={viewBoxSize.w * patternSize.w}
+                  height={viewBoxSize.h * (1 - 2 * patternSize.h)}
                   fill='black'
                 ></rect>
 
                 <rect
                   x='0'
-                  y={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * (1 - patternHeight)
-                      : undefined
-                  }
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
+                  y={viewBoxSize.h * (1 - patternSize.h)}
+                  width={viewBoxSize.w * patternSize.w}
+                  height={viewBoxSize.h * patternSize.h}
                   fill={`url(#${username}_bottom_gradient)`}
                 ></rect>
                 <rect
-                  x={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
-                  y={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * (1 - patternHeight)
-                      : undefined
-                  }
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * (1 - 2 * patternWidth)
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
+                  x={viewBoxSize.w * patternSize.w}
+                  y={viewBoxSize.h * (1 - patternSize.h)}
+                  width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                  height={viewBoxSize.h * patternSize.h}
                   fill='black'
                 ></rect>
                 <rect
-                  x={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * (1 - patternWidth)
-                      : undefined
-                  }
-                  y={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * (1 - patternHeight)
-                      : undefined
-                  }
-                  width={
-                    svgRef.current
-                      ? svgRef.current.clientWidth * patternWidth
-                      : undefined
-                  }
-                  height={
-                    svgRef.current
-                      ? svgRef.current.clientHeight * patternHeight
-                      : undefined
-                  }
+                  x={viewBoxSize.w * (1 - patternSize.w)}
+                  y={viewBoxSize.h * (1 - patternSize.h)}
+                  width={viewBoxSize.w * patternSize.w}
+                  height={viewBoxSize.h * patternSize.h}
                   fill={`url(#${username}_bottom_gradient)`}
                 ></rect>
               </pattern>
             </defs>
             <g filter={`url(#${username}_shadow)`}>
               <rect
-                x='-20'
-                y='-120'
-                width={svgRef.current?.clientWidth}
-                height={svgRef.current?.clientHeight}
+                x='0'
+                y='0'
+                width={viewBoxSize.w}
+                height={viewBoxSize.h}
                 fill={
                   (localMute.current || clientMute.current) &&
                   fgAudioElementOptions.muteStyleOption === "morse"
@@ -878,12 +776,12 @@ export default function FgAudioElement({
                 onMouseDown={(event) => {
                   if (!isUser) startDrag(event, "left");
                 }}
-                x={-5.5}
-                y={-5.5}
-                width={31}
-                height={11}
-                rx={5.5}
-                ry={5.5}
+                x={4}
+                y={47}
+                width={16}
+                height={6}
+                rx={3}
+                ry={3}
                 fill='transparent'
                 style={{ cursor: "pointer" }}
               />
@@ -894,19 +792,26 @@ export default function FgAudioElement({
                 onMouseDown={(event) => {
                   if (!isUser) startDrag(event, "right");
                 }}
-                x={174.5}
-                y={-5.5}
-                width={31}
-                height={11}
-                rx={5.5}
-                ry={5.5}
+                x={80}
+                y={47}
+                width={16}
+                height={6}
+                rx={3}
+                ry={3}
                 fill='transparent'
                 style={{ cursor: "pointer" }}
               />
             )}
           </svg>
         )}
-        doubleClickFunction={doubleClickFunction}
+        doubleClickFunction={
+          doubleClickFunction &&
+          ((event) => {
+            const validDoubleClick = isOnPath(event);
+
+            if (validDoubleClick) doubleClickFunction();
+          })
+        }
       />
     </div>
   );

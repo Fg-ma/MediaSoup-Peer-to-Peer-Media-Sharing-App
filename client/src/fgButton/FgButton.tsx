@@ -46,7 +46,7 @@ export default function FgButton({
   clickFunction?: (event: React.MouseEvent) => void;
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement | undefined;
-  doubleClickFunction?: () => void;
+  doubleClickFunction?: (event: React.MouseEvent) => void;
   holdContent?: React.ReactElement;
   hoverContent?: React.ReactElement;
   className?: string;
@@ -124,13 +124,13 @@ export default function FgButton({
     }
   };
 
-  const handleDoubleClick = () => {
+  const handleDoubleClick = (event: React.MouseEvent) => {
     if (clickTimeout.current) {
       clearTimeout(clickTimeout.current);
       clickTimeout.current = null;
     }
     if (doubleClickFunction) {
-      doubleClickFunction();
+      doubleClickFunction(event);
     }
     isClicked.current = false;
   };

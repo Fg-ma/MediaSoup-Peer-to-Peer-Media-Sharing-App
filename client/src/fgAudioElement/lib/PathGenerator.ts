@@ -56,8 +56,8 @@ class PathGenerator {
       y: number;
     }
   ) => {
-    const path = [`M0 0`];
-    path.push(`Q 10 ${leftHandlePosition.y} 20 0`);
+    const path = [`M8 50`];
+    path.push(`Q 12 ${leftHandlePosition.y} 16 50`);
     if (
       (!localMute.current && !clientMute.current) ||
       muteStyleOption !== "smile"
@@ -66,7 +66,7 @@ class PathGenerator {
         const xMid =
           fixedPointsX.current[i - 1] +
           (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
-        path.push(`Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} 0`);
+        path.push(`Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} 50`);
       }
     } else if (muteStyleOption === "smile") {
       for (let i = 1; i < fixedPointsX.current.length; i++) {
@@ -80,7 +80,7 @@ class PathGenerator {
         );
       }
     }
-    path.push(`Q 190 ${rightHandlePosition.y} 200 0`);
+    path.push(`Q 88 ${rightHandlePosition.y} 92 50`);
 
     return path.join(" ");
   };
