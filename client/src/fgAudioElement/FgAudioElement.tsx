@@ -51,7 +51,7 @@ export default function FgAudioElement({
   audioStream,
   audioRef,
   username,
-  name,
+  setPopupVisible,
   handleMute,
   clientMute,
   localMute,
@@ -63,7 +63,7 @@ export default function FgAudioElement({
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   username: string;
-  name?: string;
+  setPopupVisible: React.Dispatch<React.SetStateAction<boolean>>;
   handleMute: () => void;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
@@ -99,7 +99,6 @@ export default function FgAudioElement({
     x: 96,
     y: 50,
   });
-  const [popupVisible, setPopupVisible] = useState(false);
   const bellCurveY = useRef<number[]>([]);
   const sineCurveY = useRef<number[]>([]);
   const fixedPointsX = useRef<number[]>([]);
@@ -348,17 +347,7 @@ export default function FgAudioElement({
   );
 
   return (
-    <div className='w-60 aspect-square relative'>
-      {popupVisible && (
-        <FgPortal
-          type='mouse'
-          content={
-            <div className='w-max h-max shadow-lg px-4 py-2 z-auto rounded-md text-lg font-Josefin'>
-              {name ? name : username}
-            </div>
-          }
-        />
-      )}
+    <div className='w-60 aspect-square'>
       <FgButton
         clickFunction={onClick}
         contentFunction={() => (

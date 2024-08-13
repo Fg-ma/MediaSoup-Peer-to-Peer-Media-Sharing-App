@@ -18,12 +18,20 @@ export const workersMap: {
 } = {};
 export const roomProducerTransports: {
   [table_id: string]: {
-    [username: string]: { transport: Transport; isConnected: boolean };
+    [username: string]: {
+      transport: Transport;
+      isConnected: boolean;
+      instances: 0;
+    };
   };
 } = {};
 export const roomConsumerTransports: {
   [table_id: string]: {
-    [username: string]: { transport: Transport; isConnected: boolean };
+    [username: string]: {
+      transport: Transport;
+      isConnected: boolean;
+      instances: 0;
+    };
   };
 } = {};
 export const roomProducers: {

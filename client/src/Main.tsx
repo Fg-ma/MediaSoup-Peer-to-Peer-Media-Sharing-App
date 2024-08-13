@@ -17,6 +17,7 @@ import AudioEffectsButton from "./audioEffectsButton/AudioEffectsButton";
 import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
+import FgPortal from "./fgPortal/FgPortal";
 
 const websocketURL = "http://localhost:8000";
 

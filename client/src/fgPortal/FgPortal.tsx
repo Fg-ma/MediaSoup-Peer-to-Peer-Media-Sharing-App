@@ -22,15 +22,26 @@ const FgPortalTransition: Transition = {
 
 export default function FgPortal({
   type,
+  mouseType = "topRight",
   content,
   buttonRef,
 }: {
   type: "above" | "below" | "mouse";
+  mouseType?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
   content: React.ReactElement;
   buttonRef?: React.RefObject<HTMLButtonElement>;
 }) {
-  const [portalPosition, setPortalPosition] = useState({ top: 0, left: 0 });
+  const [portalPosition, setPortalPosition] = useState<{
+    left: number;
+    top: number;
+  } | null>(null);
   const portalRef = useRef<HTMLDivElement>(null);
+  const mouseOffsets = {
+    topLeft: { left: -8, top: -40 },
+    topRight: { left: 12, top: -40 },
+    bottomLeft: { left: -8, top: 0 },
+    bottomRight: { left: 16, top: 0 },
+  };
 
   const getStaticPortalPosition = () => {
     const buttonRect = buttonRef?.current?.getBoundingClientRect();
@@ -58,8 +69,13 @@ export default function FgPortal({
 
   const getDynamicPortalPosition = (event: MouseEvent) => {
     setPortalPosition({
-      top: event.clientY - 40,
-      left: event.clientX + 12,
+      left:
+        event.clientX +
+        mouseOffsets[mouseType].left -
+        (mouseType === "bottomLeft" || mouseType === "topLeft"
+          ? portalRef.current?.clientWidth ?? 0
+          : 0),
+      top: event.clientY + mouseOffsets[mouseType].top,
     });
   };
 
@@ -75,15 +91,15 @@ export default function FgPortal({
     };
   }, [content]);
 
+  if (type === "mouse" && portalPosition === null) return;
+
   return ReactDOM.createPortal(
     <motion.div
       ref={portalRef}
-      className={`${
-        (portalPosition.top === 0 || portalPosition.left === 0) && "opacity-0"
-      } absolute z-[51]`}
+      className='absolute z-[51]'
       style={{
-        top: `${portalPosition.top}px`,
-        left: `${portalPosition.left}px`,
+        top: `${portalPosition?.top}px`,
+        left: `${portalPosition?.left}px`,
       }}
       variants={FgPortalVar}
       initial='init'

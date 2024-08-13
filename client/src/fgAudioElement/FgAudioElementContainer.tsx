@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import FgAudioElement from "./FgAudioElement";
 import AudioEffectsSection from "../audioEffectsButton/lib/AudioEffectsSection";
+import FgPortal from "../fgPortal/FgPortal";
 
 export default function FgAudioElementContainer({
   audioStream,
@@ -35,9 +36,10 @@ export default function FgAudioElementContainer({
     muteStyleOption?: "morse" | "smile";
   };
 }) {
-  const audioElementSVGRef = useRef<SVGSVGElement>(null);
+  const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
     useState(false);
+  const audioElementSVGRef = useRef<SVGSVGElement>(null);
 
   return (
     <>
@@ -46,7 +48,7 @@ export default function FgAudioElementContainer({
         audioStream={audioStream}
         audioRef={audioRef}
         username={username}
-        name={name}
+        setPopupVisible={setPopupVisible}
         handleMute={handleMute}
         clientMute={clientMute}
         localMute={localMute}
@@ -56,6 +58,16 @@ export default function FgAudioElementContainer({
         }}
         options={options}
       />
+      {popupVisible && (
+        <FgPortal
+          type='mouse'
+          content={
+            <div className='w-max h-max shadow-lg px-4 py-2 rounded-md text-lg font-Josefin relative z-[50] bg-white'>
+              {name ? name : username}
+            </div>
+          }
+        />
+      )}
       {audioEffectsSectionVisible && (
         <AudioEffectsSection
           type='right'
