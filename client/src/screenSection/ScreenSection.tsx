@@ -7,28 +7,33 @@ import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import removeScreenIcon from "../../public/svgs/removeScreenIcon.svg";
 import shareScreenIcon from "../../public/svgs/shareScreenIcon.svg";
+import Producers from "src/lib/Producers";
 
 export default function ScreenSection({
   socket,
   device,
   table_id,
   username,
+  instance,
   screenBtnRef,
   newScreenBtnRef,
   isScreen,
   screenActive,
   setScreenActive,
+  producers,
   handleDisableEnableBtns,
 }: {
   socket: React.MutableRefObject<Socket>;
   device: React.MutableRefObject<mediasoup.types.Device | undefined>;
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
+  instance: React.MutableRefObject<string>;
   screenBtnRef: React.RefObject<HTMLButtonElement>;
   newScreenBtnRef: React.RefObject<HTMLButtonElement>;
   isScreen: React.MutableRefObject<boolean>;
   screenActive: boolean;
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>;
+  producers: Producers;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { userMedia, userScreenCount } = useStreamsContext();
@@ -38,12 +43,15 @@ export default function ScreenSection({
     device,
     table_id,
     username,
+    instance,
 
     isScreen,
     setScreenActive,
 
     userMedia,
     userScreenCount,
+
+    producers,
 
     handleDisableEnableBtns
   );

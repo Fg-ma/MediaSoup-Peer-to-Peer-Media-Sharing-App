@@ -33,7 +33,7 @@ const leaveTable = (
   handleDisableEnableBtns: (disabled: boolean) => void,
   setBundles: React.Dispatch<
     React.SetStateAction<{
-      [username: string]: React.JSX.Element;
+      [username: string]: { [instance: string]: React.JSX.Element };
     }>
   >,
   consumerTransport: React.MutableRefObject<

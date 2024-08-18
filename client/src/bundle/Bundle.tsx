@@ -22,6 +22,7 @@ export default function Bundle({
   socket,
   table_id,
   username,
+  instance,
   name,
   initCameraStreams,
   initScreenStreams,
@@ -34,6 +35,7 @@ export default function Bundle({
   socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
+  instance: string;
   name?: string;
   initCameraStreams?: { [cameraKey: string]: MediaStream };
   initScreenStreams?: { [screenKey: string]: MediaStream };
@@ -75,6 +77,7 @@ export default function Bundle({
   const bundleController = new BundleController(
     bundleOptions.isUser,
     username,
+    instance,
     setCameraStreams,
     setScreenStreams,
     setAudioStream,
@@ -185,6 +188,7 @@ export default function Bundle({
             videoId={key}
             table_id={table_id}
             username={username}
+            instance={instance}
             name={name}
             type='camera'
             isUser={bundleOptions.isUser}
@@ -230,6 +234,7 @@ export default function Bundle({
             videoId={key}
             table_id={table_id}
             username={username}
+            instance={instance}
             name={name}
             type='screen'
             isUser={bundleOptions.isUser}

@@ -33,6 +33,7 @@ const defaultFgVolumeElementOptions = {
 export default function FgVolumeElement({
   socket,
   username,
+  instance,
   isUser,
   audioRef,
   clientMute,
@@ -45,6 +46,7 @@ export default function FgVolumeElement({
 }: {
   socket: React.MutableRefObject<Socket>;
   username: string;
+  instance: string;
   isUser: boolean;
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
@@ -74,6 +76,7 @@ export default function FgVolumeElement({
 
   const fgVolumeElementController = new FgVolumeElementController(
     username,
+    instance,
     isUser,
     fgVolumeElementOptions,
     audioRef,

@@ -6,20 +6,21 @@ import {
   RtpParameters,
 } from "mediasoup/node/lib/types";
 import {
-  roomProducerTransports,
-  roomConsumerTransports,
-  roomProducers,
-  roomConsumers,
+  tableProducerTransports,
+  tableProducers,
   workersMap,
 } from "../mediasoupVars";
 import createWebRtcTransport from "../createWebRtcTransport";
-import { getNextWorker, getWorkerByIdx, releaseWorker } from "../workerManager";
+import { getNextWorker, getWorkerByIdx } from "../workerManager";
+import MediasoupCleanup from "./MediasoupCleanup";
 
 class Producers {
   private io: SocketIOServer;
+  private mediasoupCleanup: MediasoupCleanup;
 
   constructor(io: SocketIOServer) {
     this.io = io;
+    this.mediasoupCleanup = new MediasoupCleanup();
   }
 
   async onCreateProducerTransport(event: {
@@ -29,6 +30,7 @@ class Producers {
     producerType: string;
     table_id: string;
     username: string;
+    instance: number;
   }) {
     try {
       // Get the next available worker and router if one doesn't already exist
@@ -43,40 +45,55 @@ class Producers {
       }
 
       if (
-        !roomProducerTransports[event.table_id] ||
-        !roomProducerTransports[event.table_id][event.username]
+        !tableProducerTransports[event.table_id] ||
+        !tableProducerTransports[event.table_id][event.username] ||
+        !tableProducerTransports[event.table_id][event.username][event.instance]
       ) {
         const { transport, params } = await createWebRtcTransport(
           mediasoupRouter
         );
-        if (!roomProducerTransports[event.table_id]) {
-          roomProducerTransports[event.table_id] = {};
+
+        if (!tableProducerTransports[event.table_id]) {
+          tableProducerTransports[event.table_id] = {};
+        }
+        if (!tableProducerTransports[event.table_id][event.username]) {
+          tableProducerTransports[event.table_id][event.username] = {};
         }
 
-        roomProducerTransports[event.table_id][event.username] = {
+        tableProducerTransports[event.table_id][event.username][
+          event.instance
+        ] = {
           transport,
           isConnected: false,
         };
-        this.io.to(`${event.table_id}_${event.username}`).emit("message", {
-          type: "producerTransportCreated",
-          params: params,
-        });
+
+        this.io
+          .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+          .emit("message", {
+            type: "producerTransportCreated",
+            params: params,
+          });
       } else if (
-        roomProducerTransports[event.table_id] &&
-        roomProducerTransports[event.table_id][event.username]
+        tableProducerTransports[event.table_id] &&
+        tableProducerTransports[event.table_id][event.username] &&
+        tableProducerTransports[event.table_id][event.username][event.instance]
       ) {
         const msg = {
           type: "newProducer",
           producerType: event.producerType,
         };
-        this.io.to(`${event.table_id}_${event.username}`).emit("message", msg);
+        this.io
+          .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+          .emit("message", msg);
       }
     } catch (error) {
       console.error(error);
-      this.io.to(`${event.table_id}_${event.username}`).emit("message", {
-        type: "producerTransportCreated",
-        error,
-      });
+      this.io
+        .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+        .emit("message", {
+          type: "producerTransportCreated",
+          error,
+        });
     }
   }
 
@@ -84,32 +101,15 @@ class Producers {
     type: string;
     table_id: string;
     username: string;
+    instance: string;
   }) {
-    try {
-      if (
-        roomProducerTransports[event.table_id] &&
-        roomProducerTransports[event.table_id][event.username]
-      ) {
-        delete roomProducerTransports[event.table_id][event.username];
-      }
-      if (Object.keys(roomProducerTransports[event.table_id]).length === 0) {
-        delete roomProducerTransports[event.table_id];
-      }
-      if (
-        (!roomProducerTransports ||
-          (roomProducerTransports[event.table_id] &&
-            Object.keys(roomProducerTransports[event.table_id]).length ===
-              0)) &&
-        (!roomConsumerTransports ||
-          (roomConsumerTransports[event.table_id] &&
-            Object.keys(roomConsumerTransports[event.table_id]).length === 0))
-      ) {
-        releaseWorker(workersMap[event.table_id]);
-        delete workersMap[event.table_id];
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    this.mediasoupCleanup.deleteProducerTransports(
+      event.table_id,
+      event.username,
+      event.instance
+    );
+
+    this.mediasoupCleanup.releaseWorkers(event.table_id);
   }
 
   async onConnectProducerTransport(event: {
@@ -117,113 +117,123 @@ class Producers {
     dtlsParameters: DtlsParameters;
     table_id: "string";
     username: "string";
+    instance: "string";
   }) {
     if (
-      !roomProducerTransports[event.table_id] ||
-      !roomProducerTransports[event.table_id][event.username]
+      !tableProducerTransports[event.table_id] ||
+      !tableProducerTransports[event.table_id][event.username] ||
+      !tableProducerTransports[event.table_id][event.username][event.instance]
     ) {
-      console.error("No producer transport found for: ", event.username);
       return;
     }
 
-    if (!roomProducerTransports[event.table_id][event.username].isConnected) {
-      await roomProducerTransports[event.table_id][
-        event.username
+    if (
+      !tableProducerTransports[event.table_id][event.username][event.instance]
+        .isConnected
+    ) {
+      await tableProducerTransports[event.table_id][event.username][
+        event.instance
       ].transport.connect({
         dtlsParameters: event.dtlsParameters,
       });
-      roomProducerTransports[event.table_id][event.username].isConnected = true;
+      tableProducerTransports[event.table_id][event.username][
+        event.instance
+      ].isConnected = true;
     }
 
-    this.io.to(`${event.table_id}_${event.username}`).emit("message", {
-      type: "producerConnected",
-      data: "producer connected",
-    });
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", {
+        type: "producerConnected",
+        data: "producer connected",
+      });
   }
 
   onCreateNewProducer = async (event: {
-    producerType: string;
+    type: string;
+    producerType: "camera" | "screen" | "audio";
     transportId: string;
     kind: MediaKind;
     rtpParameters: RtpParameters;
     table_id: string;
     username: string;
+    instance: string;
     producerId?: string;
   }) => {
     const { kind, rtpParameters } = event;
 
     if (
-      !roomProducerTransports[event.table_id] ||
-      !roomProducerTransports[event.table_id][event.username]
+      !tableProducerTransports[event.table_id] ||
+      !tableProducerTransports[event.table_id][event.username] ||
+      !tableProducerTransports[event.table_id][event.username][event.instance]
     ) {
-      console.error("No producer transport found for: ", event.username);
       return;
     }
 
     if (
       ((event.producerType === "camera" || event.producerType === "screen") &&
         event.producerId &&
-        roomProducers[event.table_id]?.[event.username]?.[
-          event.producerType as "camera" | "screen"
+        tableProducers[event.table_id]?.[event.username]?.[event.instance]?.[
+          event.producerType
         ]?.[event.producerId]) ||
       (event.producerType === "audio" &&
-        roomProducers[event.table_id]?.[event.username]?.[
-          event.producerType as "audio"
+        tableProducers[event.table_id]?.[event.username]?.[event.instance]?.[
+          event.producerType
         ])
     ) {
-      console.error("Producer already created for: ", event.username);
+      console.log("Producer already exists");
       return;
     }
 
-    const newProducer = await roomProducerTransports[event.table_id][
+    const newProducer = await tableProducerTransports[event.table_id][
       event.username
-    ].transport.produce({
+    ][event.instance].transport.produce({
       kind,
       rtpParameters,
     });
 
-    if (!roomProducers[event.table_id]) {
-      roomProducers[event.table_id] = {};
+    if (!tableProducers[event.table_id]) {
+      tableProducers[event.table_id] = {};
     }
-    if (!roomProducers[event.table_id][event.username]) {
-      roomProducers[event.table_id][event.username] = {};
+    if (!tableProducers[event.table_id][event.username]) {
+      tableProducers[event.table_id][event.username] = {};
+    }
+    if (!tableProducers[event.table_id][event.username][event.instance]) {
+      tableProducers[event.table_id][event.username][event.instance] = {};
     }
     if (
       (event.producerType === "camera" || event.producerType === "screen") &&
-      !roomProducers[event.table_id][event.username][
-        event.producerType as "camera" | "screen"
+      !tableProducers[event.table_id][event.username][event.instance][
+        event.producerType
       ]
     ) {
-      roomProducers[event.table_id][event.username][
-        event.producerType as "camera" | "screen"
+      tableProducers[event.table_id][event.username][event.instance][
+        event.producerType
       ] = {};
     }
 
-    if (
-      (event.producerType === "camera" || event.producerType === "screen") &&
-      event.producerId &&
-      roomProducers[event.table_id][event.username][
-        event.producerType as "camera" | "screen"
-      ]
-    ) {
-      roomProducers[event.table_id][event.username][
-        event.producerType as "camera" | "screen"
-      ]![event.producerId] = newProducer;
+    if (event.producerType === "camera" || event.producerType === "screen") {
+      if (event.producerId) {
+        tableProducers[event.table_id][event.username][event.instance][
+          event.producerType
+        ]![event.producerId] = newProducer;
+      }
     } else {
-      roomProducers[event.table_id][event.username][
-        event.producerType as "audio"
+      tableProducers[event.table_id][event.username][event.instance][
+        event.producerType
       ] = newProducer;
     }
 
     const msg = {
       type: "newProducerAvailable",
       producerUsername: event.username,
+      producerInstance: event.instance,
       producerType: event.producerType,
       producerId: event.producerId,
     };
-    this.io.to(event.table_id).emit("message", msg);
+    this.io.to(`table_${event.table_id}`).emit("message", msg);
     this.io
-      .to(`${event.table_id}_${event.username}`)
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
       .emit("newProducerCallback", {
         id: newProducer.id,
       });
@@ -231,8 +241,9 @@ class Producers {
 
   onNewProducerCreated(event: {
     type: string;
-    username: string;
     table_id: string;
+    username: string;
+    instance: string;
     producerType: "camera" | "screen" | "audio";
     producerId: string | undefined;
   }) {
@@ -241,176 +252,61 @@ class Producers {
       producerType: event.producerType,
       producerId: event.producerId,
     };
-    this.io.to(`${event.table_id}_${event.username}`).emit("message", msg);
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", msg);
   }
 
   async onRemoveProducer(event: {
     type: string;
     table_id: string;
     username: string;
+    instance: string;
     producerType: "camera" | "screen" | "audio";
     producerId?: string;
   }) {
     try {
-      // Remove producers
-      if (
-        event.producerId &&
-        (event.producerType === "camera" || event.producerType === "screen") &&
-        roomProducers[event.table_id]?.[event.username]?.[event.producerType]?.[
-          event.producerId
-        ]
-      ) {
-        if (
-          Object.keys(
-            roomProducers[event.table_id][event.username][
-              event.producerType as "camera" | "screen"
-            ] || {}
-          ).length === 1
-        ) {
-          if (
-            Object.keys(roomProducers[event.table_id][event.username] || {})
-              .length === 1
-          ) {
-            if (Object.keys(roomProducers[event.table_id] || {}).length === 1) {
-              delete roomProducers[event.table_id];
-            } else {
-              delete roomProducers[event.table_id][event.username];
-            }
-          } else {
-            delete roomProducers[event.table_id][event.username][
-              event.producerType as "camera" | "screen"
-            ];
-          }
-        } else {
-          delete roomProducers[event.table_id][event.username][
-            event.producerType as "camera" | "screen"
-          ]![event.producerId];
-        }
-      } else if (
-        event.producerType === "audio" &&
-        roomProducers[event.table_id]?.[event.username]?.[event.producerType]
-      ) {
-        if (
-          Object.keys(roomProducers[event.table_id][event.username] || {})
-            .length === 1
-        ) {
-          if (Object.keys(roomProducers[event.table_id] || {}).length === 1) {
-            delete roomProducers[event.table_id];
-          } else {
-            delete roomProducers[event.table_id][event.username];
-          }
-        } else {
-          delete roomProducers[event.table_id][event.username][
-            event.producerType as "audio"
-          ];
-        }
-      }
+      this.mediasoupCleanup.removeProducer(
+        event.table_id,
+        event.username,
+        event.instance,
+        event.producerType,
+        event.producerId
+      );
 
       // Remove consumers
-      for (const username in roomConsumers[event.table_id]) {
-        for (const producerUsername in roomConsumers[event.table_id][
-          username
-        ]) {
-          if (producerUsername === event.username) {
-            for (const producerType in roomConsumers[event.table_id][username][
-              producerUsername
-            ]) {
-              if (
-                producerType === event.producerType &&
-                (producerType === "camera" || producerType === "screen")
-              ) {
-                for (const producerId in roomConsumers[event.table_id][
-                  username
-                ][producerUsername][producerType as "camera" | "screen"]) {
-                  if (producerId === event.producerId) {
-                    delete roomConsumers[event.table_id][username][
-                      producerUsername
-                    ][producerType as "camera" | "screen"]![producerId];
-                  }
-                  if (
-                    Object.keys(
-                      roomConsumers[event.table_id][username][producerUsername][
-                        producerType as "camera" | "screen"
-                      ] || {}
-                    ).length === 0
-                  ) {
-                    delete roomConsumers[event.table_id][username][
-                      producerUsername
-                    ][producerType as "camera" | "screen" | "audio"];
-                  }
-                }
-              }
-              if (
-                producerType === event.producerType &&
-                producerType === "audio"
-              ) {
-                delete roomConsumers[event.table_id][username][
-                  producerUsername
-                ][producerType as "audio"];
-              }
-              if (
-                Object.keys(
-                  roomConsumers[event.table_id][username][producerUsername]
-                ).length === 0
-              ) {
-                delete roomConsumers[event.table_id][username][
-                  producerUsername
-                ];
-              }
-            }
-          }
-          if (
-            Object.keys(roomConsumers[event.table_id][username]).length === 0
-          ) {
-            delete roomConsumers[event.table_id][username];
-          }
-        }
-        if (Object.keys(roomConsumers[event.table_id]).length === 0) {
-          delete roomConsumers[event.table_id];
-        }
-      }
+      this.mediasoupCleanup.removeConsumer(
+        event.table_id,
+        event.username,
+        event.instance,
+        event.producerType,
+        event.producerId
+      );
 
       // Remove producer transports
       if (
-        (roomProducerTransports[event.table_id] &&
-          roomProducerTransports[event.table_id][event.username] &&
-          roomProducers[event.table_id] &&
-          roomProducers[event.table_id][event.username] &&
-          Object.keys(roomProducers[event.table_id][event.username]).length ===
-            0) ||
-        !roomProducers[event.table_id] ||
-        !roomProducers[event.table_id][event.username]
+        !tableProducers[event.table_id] ||
+        !tableProducers[event.table_id][event.username] ||
+        !tableProducers[event.table_id][event.username][event.instance]
       ) {
-        delete roomProducerTransports[event.table_id][event.username];
-      }
-      if (
-        roomProducerTransports[event.table_id] &&
-        Object.keys(roomProducerTransports[event.table_id]).length == 0
-      ) {
-        delete roomProducerTransports[event.table_id];
+        this.mediasoupCleanup.deleteProducerTransports(
+          event.table_id,
+          event.username,
+          event.instance
+        );
       }
 
-      // Release workers
-      if (
-        (!roomProducerTransports ||
-          (roomProducerTransports[event.table_id] &&
-            Object.keys(roomProducerTransports[event.table_id]).length ===
-              0)) &&
-        (!roomConsumerTransports ||
-          (roomConsumerTransports[event.table_id] &&
-            Object.keys(roomConsumerTransports[event.table_id]).length === 0))
-      ) {
-        releaseWorker(workersMap[event.table_id]);
-        delete workersMap[event.table_id];
-      }
+      this.mediasoupCleanup.releaseWorkers(event.table_id);
 
       const msg = {
         type: "producerDisconnected",
         producerUsername: event.username,
+        producerInstance: event.instance,
         producerType: event.producerType,
         producerId: event.producerId,
       };
-      this.io.to(event.table_id).emit("message", msg);
+
+      this.io.to(`table_${event.table_id}`).emit("message", msg);
     } catch (error) {
       console.error(error);
     }

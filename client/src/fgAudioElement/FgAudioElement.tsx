@@ -287,12 +287,19 @@ export default function FgAudioElement({
 
   // Audio analyser
   useEffect(() => {
+    if (
+      audioStream === undefined ||
+      audioStream.getAudioTracks().length === 0
+    ) {
+      return;
+    }
+
     audioAnalyzer.current = new AudioAnalyser(
       audioStream,
       fgAudioElementOptions.noiseThreshold
     );
 
-    audioAnalyzer.current.initAudio(updateMovingY);
+    audioAnalyzer.current.initAudio(updateMovingY, audioStream);
 
     // Cleanup on unmount
     return () => {

@@ -11,6 +11,7 @@ const joinTable = (
   usernameRef: React.RefObject<HTMLInputElement>,
   table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
+  instance: React.MutableRefObject<string>,
   setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
   userMedia: React.MutableRefObject<{
     camera: {
@@ -41,7 +42,7 @@ const joinTable = (
   handleDisableEnableBtns: (disabled: boolean) => void,
   setBundles: React.Dispatch<
     React.SetStateAction<{
-      [username: string]: React.JSX.Element;
+      [username: string]: { [instance: string]: React.JSX.Element };
     }>
   >,
   consumerTransport: React.MutableRefObject<
@@ -74,7 +75,12 @@ const joinTable = (
   if (table_id.current.trim() !== "" && username.current.trim() !== "") {
     // Leave previous table if there is one
     if (previousTableId.trim() !== "" && previousUsername.trim() !== "") {
-      socket.current.emit("leaveTable", previousTableId, previousUsername);
+      socket.current.emit(
+        "leaveTable",
+        previousTableId,
+        previousUsername,
+        instance.current
+      );
       leaveTable(
         userMedia,
         userCameraCount,
@@ -100,7 +106,12 @@ const joinTable = (
     }
 
     // Join new table
-    socket.current.emit("joinTable", table_id.current, username.current);
+    socket.current.emit(
+      "joinTable",
+      table_id.current,
+      username.current,
+      instance.current
+    );
     setIsInTable(true);
   }
 };

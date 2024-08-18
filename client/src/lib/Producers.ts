@@ -13,12 +13,16 @@ import AudioMedia from "./AudioMedia";
 import UserDevice from "../UserDevice";
 import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";
 import BrowserMedia from "src/BrowserMedia";
+import { UserMedia } from "tone";
 
 class Producers {
   private socket: React.MutableRefObject<Socket>;
   private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
+
   private table_id: React.MutableRefObject<string>;
   private username: React.MutableRefObject<string>;
+  private instance: React.MutableRefObject<string>;
+
   private userMedia: React.MutableRefObject<{
     camera: {
       [cameraId: string]: CameraMedia;
@@ -40,17 +44,22 @@ class Producers {
   }>;
   private remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      camera?: { [cameraId: string]: MediaStreamTrack };
-      screen?: { [screenId: string]: MediaStreamTrack };
-      audio?: MediaStreamTrack | undefined;
+      [instance: string]: {
+        camera?: { [cameraId: string]: MediaStreamTrack };
+        screen?: { [screenId: string]: MediaStreamTrack };
+        audio?: MediaStreamTrack | undefined;
+      };
     };
   }>;
+
   private userCameraCount: React.MutableRefObject<number>;
   private userScreenCount: React.MutableRefObject<number>;
+
   private isCamera: React.MutableRefObject<boolean>;
   private isScreen: React.MutableRefObject<boolean>;
   private isAudio: React.MutableRefObject<boolean>;
   private isSubscribed: React.MutableRefObject<boolean>;
+
   private handleDisableEnableBtns: (disabled: boolean) => void;
   private producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
@@ -60,9 +69,10 @@ class Producers {
   private createProducerBundle: () => void;
   private setBundles: React.Dispatch<
     React.SetStateAction<{
-      [username: string]: React.JSX.Element;
+      [username: string]: { [instance: string]: React.JSX.Element };
     }>
   >;
+
   private userDevice: UserDevice;
   private deadbanding: Deadbanding;
   private browserMedia: BrowserMedia;
@@ -70,8 +80,11 @@ class Producers {
   constructor(
     socket: React.MutableRefObject<Socket>,
     device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+
     table_id: React.MutableRefObject<string>,
     username: React.MutableRefObject<string>,
+    instance: React.MutableRefObject<string>,
+
     userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
@@ -93,17 +106,22 @@ class Producers {
     }>,
     remoteTracksMap: React.MutableRefObject<{
       [username: string]: {
-        camera?: { [cameraId: string]: MediaStreamTrack };
-        screen?: { [screenId: string]: MediaStreamTrack };
-        audio?: MediaStreamTrack | undefined;
+        [instance: string]: {
+          camera?: { [cameraId: string]: MediaStreamTrack };
+          screen?: { [screenId: string]: MediaStreamTrack };
+          audio?: MediaStreamTrack | undefined;
+        };
       };
     }>,
+
     userCameraCount: React.MutableRefObject<number>,
     userScreenCount: React.MutableRefObject<number>,
+
     isCamera: React.MutableRefObject<boolean>,
     isScreen: React.MutableRefObject<boolean>,
     isAudio: React.MutableRefObject<boolean>,
     isSubscribed: React.MutableRefObject<boolean>,
+
     handleDisableEnableBtns: (disabled: boolean) => void,
     producerTransport: React.MutableRefObject<
       mediasoup.types.Transport<mediasoup.types.AppData> | undefined
@@ -113,9 +131,10 @@ class Producers {
     createProducerBundle: () => void,
     setBundles: React.Dispatch<
       React.SetStateAction<{
-        [username: string]: React.JSX.Element;
+        [username: string]: { [instance: string]: React.JSX.Element };
       }>
     >,
+
     userDevice: UserDevice,
     deadbanding: Deadbanding,
     browserMedia: BrowserMedia
@@ -124,6 +143,7 @@ class Producers {
     this.device = device;
     this.table_id = table_id;
     this.username = username;
+    this.instance = instance;
     this.userMedia = userMedia;
     this.currentEffectsStyles = currentEffectsStyles;
     this.userStreamEffects = userStreamEffects;
@@ -145,6 +165,91 @@ class Producers {
     this.browserMedia = browserMedia;
   }
 
+  private async createCameraProducer(cameraBrowserMedia: MediaStream) {
+    const cameraId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
+    const newCameraMedia = new CameraMedia(
+      this.username.current,
+      this.table_id.current,
+      cameraId,
+      cameraBrowserMedia,
+      this.currentEffectsStyles,
+      this.userStreamEffects,
+      this.userDevice,
+      this.deadbanding
+    );
+
+    this.userMedia.current.camera[cameraId] = newCameraMedia;
+
+    const track = this.userMedia.current.camera[cameraId].getTrack();
+    const params = {
+      track: track,
+      appData: {
+        producerType: "camera",
+        producerId: cameraId,
+      },
+    };
+
+    try {
+      await this.producerTransport.current?.produce(params);
+    } catch {
+      console.error("Camera new transport failed to produce");
+      return;
+    }
+  }
+
+  private async createScreenProducer(screenBrowserMedia: MediaStream) {
+    const screenId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
+    const newScreenMedia = new ScreenMedia(
+      this.username.current,
+      this.table_id.current,
+      screenId,
+      screenBrowserMedia,
+      this.currentEffectsStyles,
+      this.userStreamEffects,
+      this.userDevice
+    );
+
+    this.userMedia.current.screen[screenId] = newScreenMedia;
+
+    const track = this.userMedia.current.screen[screenId].getTrack();
+    const params = {
+      track: track,
+      appData: {
+        producerType: "screen",
+        producerId: screenId,
+      },
+    };
+
+    try {
+      await this.producerTransport.current?.produce(params);
+    } catch {
+      console.error("Screen new transport failed to produce");
+      return;
+    }
+  }
+
+  private async createAudioProducer(audioBrowserMedia: UserMedia) {
+    const newAudioMedia = new AudioMedia(
+      this.username.current,
+      this.table_id.current,
+      this.userStreamEffects,
+      audioBrowserMedia
+    );
+    await newAudioMedia.openMic();
+
+    this.userMedia.current.audio = newAudioMedia;
+
+    const audioTrack = this.userMedia.current.audio.getTrack();
+    const audioParams = {
+      track: audioTrack,
+      appData: {
+        producerType: "audio",
+      },
+    };
+
+    await this.producerTransport.current?.produce(audioParams);
+  }
+
   async onProducerTransportCreated(event: {
     type: string;
     params: {
@@ -164,10 +269,10 @@ class Producers {
       console.error("No device found");
       return;
     }
-
     this.producerTransport.current = this.device.current.createSendTransport(
       event.params
     );
+
     this.producerTransport.current.on(
       "connect",
       async ({ dtlsParameters }, callback, errback) => {
@@ -176,6 +281,7 @@ class Producers {
           dtlsParameters,
           table_id: this.table_id.current,
           username: this.username.current,
+          instance: this.instance.current,
         };
 
         this.socket.current.send(msg);
@@ -201,6 +307,7 @@ class Producers {
           rtpParameters,
           table_id: this.table_id.current,
           username: this.username.current,
+          instance: this.instance.current,
           producerId:
             appData.producerType === "camera"
               ? `${this.username.current}_camera_stream_${this.userCameraCount.current}`
@@ -259,6 +366,7 @@ class Producers {
             type: "deleteProducerTransport",
             table_id: this.table_id.current,
             username: this.username.current,
+            instance: this.instance.current,
           };
           this.socket.current.emit("message", msg);
           return;
@@ -315,6 +423,7 @@ class Producers {
             type: "deleteProducerTransport",
             table_id: this.table_id.current,
             username: this.username.current,
+            instance: this.instance.current,
           };
           this.socket.current.emit("message", msg);
           return;
@@ -369,6 +478,7 @@ class Producers {
             type: "deleteProducerTransport",
             table_id: this.table_id.current,
             username: this.username.current,
+            instance: this.instance.current,
           };
           this.socket.current.emit("message", msg);
           return;
@@ -398,12 +508,9 @@ class Producers {
     }
   }
 
-  async onNewProducer(event: {
-    type: string;
-    producerType: "camera" | "screen" | "audio";
-  }) {
+  async createNewProducer(producerType: "camera" | "screen" | "audio") {
     let producerId: string | undefined;
-    if (event.producerType === "camera") {
+    if (producerType === "camera") {
       producerId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
       if (
         this.userMedia.current.camera[
@@ -445,10 +552,7 @@ class Producers {
         `${this.username.current}_camera_stream_${this.userCameraCount.current}`
       ] = newCameraMedia;
 
-      const track =
-        this.userMedia.current.camera[
-          `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-        ].getTrack();
+      const track = newCameraMedia.getTrack();
       const params = {
         track: track,
         appData: {
@@ -462,7 +566,7 @@ class Producers {
         console.error("Camera new transport failed to produce");
         return;
       }
-    } else if (event.producerType === "screen") {
+    } else if (producerType === "screen") {
       producerId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
       if (
         this.userMedia.current.screen[
@@ -520,7 +624,7 @@ class Producers {
         console.error("Screen new transport failed to produce");
         return;
       }
-    } else if (event.producerType === "audio") {
+    } else if (producerType === "audio") {
       if (this.userMedia.current.audio) {
         // Reenable buttons
         this.handleDisableEnableBtns(false);
@@ -573,18 +677,20 @@ class Producers {
 
     const msg = {
       type: "newProducerCreated",
-      username: this.username.current,
       table_id: this.table_id.current,
-      producerType: event.producerType,
+      username: this.username.current,
+      instance: this.instance.current,
+      producerType: producerType,
       producerId: producerId,
     };
-
+    console.log(msg);
     this.socket.current.emit("message", msg);
   }
 
   onNewProducerAvailable(event: {
-    type: string;
+    type: "newProducerAvailable";
     producerUsername: string;
+    producerInstance: string;
     producerType: string;
     producerId?: string;
   }) {
@@ -600,8 +706,10 @@ class Producers {
         consumerType: event.producerType,
         rtpCapabilities: rtpCapabilities,
         producerUsername: event.producerUsername,
+        producerInstance: event.producerInstance,
         table_id: this.table_id.current,
         username: this.username.current,
+        instance: this.instance.current,
         incomingProducerId: event.producerId,
       };
       this.socket.current.emit("message", msg);
@@ -611,10 +719,14 @@ class Producers {
   onProducerDisconnected = (event: {
     type: string;
     producerUsername: string;
+    producerInstance: string;
     producerType: string;
     producerId: string;
   }) => {
-    if (event.producerUsername === this.username.current) {
+    if (
+      event.producerUsername === this.username.current &&
+      event.producerInstance === this.instance.current
+    ) {
       // Call deconstructors then delete userMedia
       if (event.producerType === "camera" || event.producerType === "screen") {
         this.userMedia.current[event.producerType][
@@ -667,10 +779,19 @@ class Producers {
         !this.userMedia.current.audio
       ) {
         this.setBundles((prev) => {
-          const newBundles = prev;
-          if (newBundles) {
-            delete newBundles[event.producerUsername];
+          const newBundles = { ...prev };
+
+          if (
+            newBundles[event.producerUsername] &&
+            newBundles[event.producerUsername][event.producerInstance]
+          ) {
+            delete newBundles[event.producerUsername][event.producerInstance];
+
+            if (Object.keys(newBundles[event.producerUsername]).length === 0) {
+              delete newBundles[event.producerUsername];
+            }
           }
+
           return newBundles;
         });
         this.producerTransport.current = undefined;
@@ -697,51 +818,124 @@ class Producers {
     } else {
       // Delete remote tracks
       if (event.producerType === "camera" || event.producerType === "screen") {
-        delete this.remoteTracksMap.current[event.producerUsername]?.[
-          event.producerType
-        ]?.[event.producerId];
-
         if (
           this.remoteTracksMap.current[event.producerUsername] &&
-          Object.keys(
-            this.remoteTracksMap.current[event.producerUsername][
-              event.producerType
-            ] || {}
-          ).length === 0
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ] &&
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ][event.producerType] &&
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ][event.producerType]![event.producerId]
         ) {
-          delete this.remoteTracksMap.current[event.producerUsername]?.[
-            event.producerType
-          ];
+          delete this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ]?.[event.producerType]?.[event.producerId];
 
           if (
-            this.remoteTracksMap.current[event.producerUsername] &&
-            Object.keys(this.remoteTracksMap.current[event.producerUsername])
-              .length === 0
+            Object.keys(
+              this.remoteTracksMap.current[event.producerUsername][
+                event.producerInstance
+              ][event.producerType] || { break: true }
+            ).length === 0
           ) {
-            delete this.remoteTracksMap.current[event.producerUsername];
+            delete this.remoteTracksMap.current[event.producerUsername][
+              event.producerInstance
+            ]?.[event.producerType];
+
+            if (
+              Object.keys(
+                this.remoteTracksMap.current[event.producerUsername][
+                  event.producerInstance
+                ] || { break: true }
+              ).length === 0
+            ) {
+              delete this.remoteTracksMap.current[event.producerUsername][
+                event.producerInstance
+              ];
+
+              if (
+                Object.keys(
+                  this.remoteTracksMap.current[event.producerUsername] || {
+                    break: true,
+                  }
+                ).length === 0
+              ) {
+                delete this.remoteTracksMap.current[event.producerUsername];
+              }
+            }
           }
         }
       } else if (event.producerType === "audio") {
-        delete this.remoteTracksMap.current[event.producerUsername]?.[
-          event.producerType
-        ];
-
         if (
           this.remoteTracksMap.current[event.producerUsername] &&
-          Object.keys(this.remoteTracksMap.current[event.producerUsername])
-            .length === 0
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ] &&
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ][event.producerType]
         ) {
-          delete this.remoteTracksMap.current[event.producerUsername];
+          delete this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ][event.producerType];
+
+          if (
+            Object.keys(
+              this.remoteTracksMap.current[event.producerUsername][
+                event.producerInstance
+              ] || { break: true }
+            ).length === 0
+          ) {
+            delete this.remoteTracksMap.current[event.producerUsername][
+              event.producerInstance
+            ];
+
+            if (
+              Object.keys(
+                this.remoteTracksMap.current[event.producerUsername] || {
+                  break: true,
+                }
+              ).length === 0
+            ) {
+              delete this.remoteTracksMap.current[event.producerUsername];
+            }
+          }
         }
       }
 
       // Clean up bundles
       if (!this.remoteTracksMap.current[event.producerUsername]) {
         this.setBundles((prev) => {
-          const newBundles = prev;
-          if (newBundles) {
+          const newBundles = { ...prev };
+
+          if (newBundles[event.producerUsername]) {
             delete newBundles[event.producerUsername];
           }
+
+          return newBundles;
+        });
+      } else if (
+        !this.remoteTracksMap.current[event.producerUsername][
+          event.producerInstance
+        ]
+      ) {
+        this.setBundles((prev) => {
+          const newBundles = { ...prev };
+
+          if (
+            newBundles[event.producerUsername] &&
+            newBundles[event.producerUsername][event.producerInstance]
+          ) {
+            delete newBundles[event.producerUsername][event.producerInstance];
+
+            if (Object.keys(newBundles[event.producerUsername]).length === 0) {
+              delete newBundles[event.producerUsername];
+            }
+          }
+
           return newBundles;
         });
       }

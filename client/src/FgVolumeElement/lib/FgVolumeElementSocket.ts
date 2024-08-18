@@ -1,7 +1,15 @@
 class FgVolumeElementSocket {
-  private isUser: boolean;
   private username: string;
+  private instance: string;
+
+  private isUser: boolean;
+
+  private audioRef: React.RefObject<HTMLAudioElement>;
+
   private clientMute: React.MutableRefObject<boolean>;
+  private localMute: React.MutableRefObject<boolean>;
+  private setActive: React.Dispatch<React.SetStateAction<boolean>>;
+
   private volumeState: {
     from: string;
     to: string;
@@ -12,14 +20,19 @@ class FgVolumeElementSocket {
       to: string;
     }>
   >;
-  private audioRef: React.RefObject<HTMLAudioElement>;
-  private localMute: React.MutableRefObject<boolean>;
-  private setActive: React.Dispatch<React.SetStateAction<boolean>>;
 
   constructor(
-    isUser: boolean,
     username: string,
+    instance: string,
+
+    isUser: boolean,
+
+    audioRef: React.RefObject<HTMLAudioElement>,
+
     clientMute: React.MutableRefObject<boolean>,
+    localMute: React.MutableRefObject<boolean>,
+    setActive: React.Dispatch<React.SetStateAction<boolean>>,
+
     volumeState: {
       from: string;
       to: string;
@@ -29,26 +42,29 @@ class FgVolumeElementSocket {
         from: string;
         to: string;
       }>
-    >,
-    audioRef: React.RefObject<HTMLAudioElement>,
-    localMute: React.MutableRefObject<boolean>,
-    setActive: React.Dispatch<React.SetStateAction<boolean>>
+    >
   ) {
-    this.isUser = isUser;
     this.username = username;
-    this.clientMute = clientMute;
-    this.volumeState = volumeState;
-    this.setVolumeState = setVolumeState;
+    this.instance = instance;
+    this.isUser = isUser;
     this.audioRef = audioRef;
+    this.clientMute = clientMute;
     this.localMute = localMute;
     this.setActive = setActive;
+    this.volumeState = volumeState;
+    this.setVolumeState = setVolumeState;
   }
 
   onClientMuteStateResponsed(event: {
     type: string;
     producerUsername: string;
+    producerInstance: string;
   }) {
-    if (this.isUser || this.username !== event.producerUsername) {
+    if (
+      this.isUser ||
+      (this.username !== event.producerUsername &&
+        this.instance !== event.producerInstance)
+    ) {
       return;
     }
 

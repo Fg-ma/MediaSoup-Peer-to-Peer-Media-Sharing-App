@@ -5,6 +5,7 @@ import ScreenMedia from "../../lib/ScreenMedia";
 class BundleSocket {
   private isUser: boolean;
   private username: string;
+  private instance: string;
 
   private setCameraStreams: React.Dispatch<
     React.SetStateAction<
@@ -28,17 +29,19 @@ class BundleSocket {
 
   private remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      camera?:
-        | {
-            [cameraId: string]: MediaStreamTrack;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: MediaStreamTrack;
-          }
-        | undefined;
-      audio?: MediaStreamTrack | undefined;
+      [instance: string]: {
+        camera?:
+          | {
+              [cameraId: string]: MediaStreamTrack;
+            }
+          | undefined;
+        screen?:
+          | {
+              [screenId: string]: MediaStreamTrack;
+            }
+          | undefined;
+        audio?: MediaStreamTrack | undefined;
+      };
     };
   }>;
   private userMedia: React.MutableRefObject<{
@@ -61,6 +64,7 @@ class BundleSocket {
   constructor(
     isUser: boolean,
     username: string,
+    instance: string,
     setCameraStreams: React.Dispatch<
       React.SetStateAction<
         | {
@@ -82,17 +86,19 @@ class BundleSocket {
     >,
     remoteTracksMap: React.MutableRefObject<{
       [username: string]: {
-        camera?:
-          | {
-              [cameraId: string]: MediaStreamTrack;
-            }
-          | undefined;
-        screen?:
-          | {
-              [screenId: string]: MediaStreamTrack;
-            }
-          | undefined;
-        audio?: MediaStreamTrack | undefined;
+        [instance: string]: {
+          camera?:
+            | {
+                [cameraId: string]: MediaStreamTrack;
+              }
+            | undefined;
+          screen?:
+            | {
+                [screenId: string]: MediaStreamTrack;
+              }
+            | undefined;
+          audio?: MediaStreamTrack | undefined;
+        };
       };
     }>,
     userMedia: React.MutableRefObject<{
@@ -111,6 +117,7 @@ class BundleSocket {
   ) {
     this.isUser = isUser;
     this.username = username;
+    this.instance = instance;
     this.setCameraStreams = setCameraStreams;
     this.setScreenStreams = setScreenStreams;
     this.setAudioStream = setAudioStream;
@@ -125,10 +132,14 @@ class BundleSocket {
   async onNewConsumerWasCreated(event: {
     type: string;
     producerUsername: string;
+    producerInstance: string;
     consumerId?: string;
     consumerType: string;
   }) {
-    if (this.username !== event.producerUsername) {
+    if (
+      this.username !== event.producerUsername &&
+      this.instance !== event.producerInstance
+    ) {
       return;
     }
 
@@ -138,9 +149,9 @@ class BundleSocket {
         const newStream = new MediaStream();
         if (event.consumerId) {
           const track =
-            this.remoteTracksMap.current[event.producerUsername].camera?.[
-              event.consumerId
-            ];
+            this.remoteTracksMap.current[event.producerUsername][
+              event.producerInstance
+            ].camera?.[event.consumerId];
           if (track) {
             newStream.addTrack(track);
           }
@@ -155,9 +166,9 @@ class BundleSocket {
         const newStream = new MediaStream();
         if (event.consumerId) {
           const track =
-            this.remoteTracksMap.current[event.producerUsername].screen?.[
-              event.consumerId
-            ];
+            this.remoteTracksMap.current[event.producerUsername][
+              event.producerInstance
+            ].screen?.[event.consumerId];
           if (track) {
             newStream.addTrack(track);
           }
@@ -168,7 +179,10 @@ class BundleSocket {
       });
     } else if (event.consumerType === "audio") {
       const newStream = new MediaStream();
-      const track = this.remoteTracksMap.current[event.producerUsername].audio;
+      const track =
+        this.remoteTracksMap.current[event.producerUsername][
+          event.producerInstance
+        ].audio;
       if (track) {
         newStream.addTrack(track);
       }
@@ -241,8 +255,13 @@ class BundleSocket {
   onClientMuteStateResponsed(event: {
     type: string;
     producerUsername: string;
+    producerInstance: string;
   }) {
-    if (this.isUser || this.username !== event.producerUsername) {
+    if (
+      this.isUser ||
+      (this.username !== event.producerUsername &&
+        this.instance !== event.producerInstance)
+    ) {
       return;
     }
 

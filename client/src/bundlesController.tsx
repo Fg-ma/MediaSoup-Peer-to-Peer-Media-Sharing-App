@@ -6,11 +6,12 @@ import ScreenMedia from "./lib/ScreenMedia";
 import AudioMedia from "./lib/AudioMedia";
 
 class BundlesController {
-  socket: React.MutableRefObject<Socket>;
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
+  private socket: React.MutableRefObject<Socket>;
+  private table_id: React.MutableRefObject<string>;
+  private username: React.MutableRefObject<string>;
+  private instance: React.MutableRefObject<string>;
 
-  userMedia: React.MutableRefObject<{
+  private userMedia: React.MutableRefObject<{
     camera: {
       [cameraId: string]: CameraMedia;
     };
@@ -20,24 +21,28 @@ class BundlesController {
     audio: AudioMedia | undefined;
   }>;
 
-  remoteVideosContainerRef: React.RefObject<HTMLDivElement>;
+  private remoteVideosContainerRef: React.RefObject<HTMLDivElement>;
 
-  isCamera: React.MutableRefObject<boolean>;
-  isScreen: React.MutableRefObject<boolean>;
-  isAudio: React.MutableRefObject<boolean>;
+  private isCamera: React.MutableRefObject<boolean>;
+  private isScreen: React.MutableRefObject<boolean>;
+  private isAudio: React.MutableRefObject<boolean>;
 
-  setBundles: React.Dispatch<
+  private bundles: {
+    [username: string]: { [instance: string]: React.JSX.Element };
+  };
+  private setBundles: React.Dispatch<
     React.SetStateAction<{
-      [username: string]: React.JSX.Element;
+      [username: string]: { [instance: string]: React.JSX.Element };
     }>
   >;
 
-  muteAudio: () => void;
+  private muteAudio: () => void;
 
   constructor(
     socket: React.MutableRefObject<Socket>,
     table_id: React.MutableRefObject<string>,
     username: React.MutableRefObject<string>,
+    instance: React.MutableRefObject<string>,
     userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
@@ -51,9 +56,12 @@ class BundlesController {
     isCamera: React.MutableRefObject<boolean>,
     isScreen: React.MutableRefObject<boolean>,
     isAudio: React.MutableRefObject<boolean>,
+    bundles: {
+      [username: string]: { [instance: string]: React.JSX.Element };
+    },
     setBundles: React.Dispatch<
       React.SetStateAction<{
-        [username: string]: React.JSX.Element;
+        [username: string]: { [instance: string]: React.JSX.Element };
       }>
     >,
     muteAudio: () => void
@@ -61,11 +69,13 @@ class BundlesController {
     this.socket = socket;
     this.table_id = table_id;
     this.username = username;
+    this.instance = instance;
     this.userMedia = userMedia;
     this.remoteVideosContainerRef = remoteVideosContainerRef;
     this.isCamera = isCamera;
     this.isScreen = isScreen;
     this.isAudio = isAudio;
+    this.bundles = bundles;
     this.setBundles = setBundles;
     this.muteAudio = muteAudio;
   }
@@ -88,8 +98,9 @@ class BundlesController {
 
       const newBundle = (
         <Bundle
-          username={this.username.current}
           table_id={this.table_id.current}
+          username={this.username.current}
+          instance={this.instance.current}
           socket={this.socket}
           initCameraStreams={
             this.isCamera.current ? initCameraStreams : undefined
@@ -105,15 +116,22 @@ class BundlesController {
         />
       );
 
-      this.setBundles((prev) => ({
-        ...prev,
-        [this.username.current]: newBundle,
-      }));
+      this.setBundles((prev) => {
+        const newBundles = {
+          ...prev,
+          [this.username.current]: {
+            ...prev[this.username.current],
+            [this.instance.current]: newBundle,
+          },
+        };
+        return newBundles;
+      });
     }
   };
 
   createConsumerBundle = (
     trackUsername: string,
+    trackInstance: string,
     remoteCameraStreams: {
       [screenId: string]: MediaStream;
     },
@@ -122,49 +140,65 @@ class BundlesController {
     },
     remoteAudioStream: MediaStream | undefined
   ) => {
-    const newBundle = (
-      <Bundle
-        username={trackUsername}
-        table_id={this.table_id.current}
-        socket={this.socket}
-        initCameraStreams={
-          Object.keys(remoteCameraStreams).length !== 0
-            ? remoteCameraStreams
-            : undefined
-        }
-        initScreenStreams={
-          Object.keys(remoteScreenStreams).length !== 0
-            ? remoteScreenStreams
-            : undefined
-        }
-        initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
-        onRendered={() => {
-          const msg = {
-            type: "requestClientMuteState",
-            table_id: this.table_id.current,
-            username: this.username.current,
-            producerUsername: trackUsername,
-          };
+    if (
+      !this.bundles[trackUsername] ||
+      !this.bundles[trackUsername][trackInstance]
+    ) {
+      const newBundle = (
+        <Bundle
+          socket={this.socket}
+          table_id={this.table_id.current}
+          username={trackUsername}
+          instance={trackInstance}
+          initCameraStreams={
+            Object.keys(remoteCameraStreams).length !== 0
+              ? remoteCameraStreams
+              : undefined
+          }
+          initScreenStreams={
+            Object.keys(remoteScreenStreams).length !== 0
+              ? remoteScreenStreams
+              : undefined
+          }
+          initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
+          onRendered={() => {
+            const msg = {
+              type: "requestClientMuteState",
+              table_id: this.table_id.current,
+              username: this.username.current,
+              instance: this.instance.current,
+              producerUsername: trackUsername,
+              producerInstance: trackInstance,
+            };
 
-          this.socket.current.emit("message", msg);
-        }}
-        onNewConsumerWasCreatedCallback={() => {
-          const msg = {
-            type: "requestClientMuteState",
-            table_id: this.table_id.current,
-            username: this.username.current,
-            producerUsername: trackUsername,
-          };
+            this.socket.current.emit("message", msg);
+          }}
+          onNewConsumerWasCreatedCallback={() => {
+            const msg = {
+              type: "requestClientMuteState",
+              table_id: this.table_id.current,
+              username: this.username.current,
+              instance: this.instance.current,
+              producerUsername: trackUsername,
+              producerInstance: trackInstance,
+            };
 
-          this.socket.current.emit("message", msg);
-        }}
-      />
-    );
+            this.socket.current.emit("message", msg);
+          }}
+        />
+      );
 
-    this.setBundles((prev) => ({
-      ...prev,
-      [trackUsername]: newBundle,
-    }));
+      this.setBundles((prev) => {
+        const newBundles = {
+          ...prev,
+          [trackUsername]: {
+            ...prev[trackUsername],
+            [trackInstance]: newBundle,
+          },
+        };
+        return newBundles;
+      });
+    }
   };
 }
 

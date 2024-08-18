@@ -8,6 +8,7 @@ const subscribe = (
   socket: React.MutableRefObject<Socket>,
   table_id: React.MutableRefObject<string>,
   username: React.MutableRefObject<string>,
+  instance: React.MutableRefObject<string>,
   consumerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >,
@@ -20,7 +21,7 @@ const subscribe = (
   }>,
   setBundles: React.Dispatch<
     React.SetStateAction<{
-      [username: string]: React.JSX.Element;
+      [username: string]: { [instance: string]: React.JSX.Element };
     }>
   >
 ) => {
@@ -38,7 +39,9 @@ const subscribe = (
       forceTcp: false,
       table_id: table_id.current,
       username: username.current,
+      instance: instance.current,
     };
+
     socket.current.send(msg);
   } else if (!isSubscribed.current) {
     consumerTransport.current = undefined;
@@ -50,6 +53,7 @@ const subscribe = (
       type: "unsubscribe",
       table_id: table_id.current,
       username: username.current,
+      instance: instance.current,
     };
     socket.current.emit("message", msg);
     socket.current.on("message", (event) => {

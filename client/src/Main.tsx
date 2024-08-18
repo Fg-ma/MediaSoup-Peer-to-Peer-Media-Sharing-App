@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
 import { useStreamsContext } from "./context/StreamsContext";
 import { useCurrentEffectsStylesContext } from "./context/CurrentEffectsStylesContext";
 import onRouterCapabilities from "./lib/onRouterCapabilities";
@@ -17,9 +18,103 @@ import AudioEffectsButton from "./audioEffectsButton/AudioEffectsButton";
 import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
-import FgPortal from "./fgPortal/FgPortal";
 
 const websocketURL = "http://localhost:8000";
+
+type MediasoupSocketEvents =
+  | {
+      type: "routerCapabilities";
+      rtpCapabilities: mediasoup.types.RtpCapabilities;
+    }
+  | {
+      type: "producerTransportCreated";
+      params: {
+        id: string;
+        iceParameters: mediasoup.types.IceParameters;
+        iceCandidates: mediasoup.types.IceCandidate[];
+        dtlsParameters: mediasoup.types.DtlsParameters;
+      };
+      error?: unknown;
+    }
+  | {
+      type: "consumerTransportCreated";
+      params: {
+        id: string;
+        iceParameters: mediasoup.types.IceParameters;
+        iceCandidates: mediasoup.types.IceCandidate[];
+        dtlsParameters: mediasoup.types.DtlsParameters;
+      };
+      error?: unknown;
+    }
+  | { type: "resumed" }
+  | {
+      type: "subscribed";
+      data: {
+        [username: string]: {
+          [instance: string]: {
+            camera?: {
+              [cameraId: string]: {
+                producerId: string;
+                id: string;
+                kind: "audio" | "video" | undefined;
+                rtpParameters: any;
+                type: string;
+                producerPaused: boolean;
+              };
+            };
+            screen?: {
+              [screenId: string]: {
+                producerId: string;
+                id: string;
+                kind: "audio" | "video" | undefined;
+                rtpParameters: any;
+                type: string;
+                producerPaused: boolean;
+              };
+            };
+            audio?: {
+              producerId: string;
+              id: string;
+              kind: "audio" | "video" | undefined;
+              rtpParameters: any;
+              type: string;
+              producerPaused: boolean;
+            };
+          };
+        };
+      };
+    }
+  | {
+      type: "newConsumerSubscribed";
+      producerUsername: string;
+      producerInstance: string;
+      consumerId?: string;
+      consumerType: "camera" | "screen" | "audio";
+      data: {
+        producerId: string;
+        id: string;
+        kind: "audio" | "video" | undefined;
+        rtpParameters: mediasoup.types.RtpParameters;
+        type: string;
+        producerPaused: boolean;
+      };
+    }
+  | { type: "newProducer"; producerType: "camera" | "screen" | "audio" }
+  | {
+      type: "newProducerAvailable";
+      producerUsername: string;
+      producerInstance: string;
+      producerType: string;
+      producerId?: string;
+    }
+  | {
+      type: "producerDisconnected";
+      producerUsername: string;
+      producerInstance: string;
+      producerType: string;
+      producerId: string;
+    }
+  | { type: "clientMuteStateRequested"; username: string; instance: string };
 
 export default function Main() {
   const {
@@ -36,9 +131,10 @@ export default function Main() {
 
   const table_id = useRef("");
   const username = useRef("");
+  const instance = useRef(uuidv4());
 
   const [bundles, setBundles] = useState<{
-    [username: string]: React.JSX.Element;
+    [username: string]: { [instance: string]: React.JSX.Element };
   }>({});
 
   const consumerTransport =
@@ -85,6 +181,7 @@ export default function Main() {
       type: "clientMute",
       table_id: table_id.current,
       username: username.current,
+      instance: instance.current,
       clientMute: mutedAudioRef.current,
     };
     socket.current.emit("message", msg);
@@ -97,6 +194,7 @@ export default function Main() {
       type: "sendLocalMuteChange",
       table_id: table_id.current,
       username: username.current,
+      instance: instance.current,
     };
 
     socket.current.emit("message", msg);
@@ -110,7 +208,7 @@ export default function Main() {
     if (newScreenBtnRef.current) newScreenBtnRef.current.disabled = disabled;
   };
 
-  const handleMessage = (event: any) => {
+  const handleMessage = (event: MediasoupSocketEvents) => {
     switch (event.type) {
       case "routerCapabilities":
         onRouterCapabilities(event, device);
@@ -129,11 +227,11 @@ export default function Main() {
       case "newConsumerSubscribed":
         consumers.onNewConsumerSubscribed(event);
         break;
+      case "newProducer":
+        producers.createNewProducer(event.producerType);
+        break;
       case "newProducerAvailable":
         producers.onNewProducerAvailable(event);
-        break;
-      case "newProducer":
-        producers.onNewProducer(event);
         break;
       case "producerDisconnected":
         producers.onProducerDisconnected(event);
@@ -142,8 +240,9 @@ export default function Main() {
         onClientMuteStateRequested(
           event,
           socket,
-          username,
           table_id,
+          username,
+          instance,
           mutedAudioRef
         );
         break;
@@ -156,24 +255,45 @@ export default function Main() {
     socket.current.on("message", handleMessage);
 
     // Handle user disconnect
-    socket.current.on("userDisconnected", (disconnectedUsername: string) => {
-      setBundles((prev) => {
-        const updatedBundles = { ...prev };
-        delete updatedBundles[disconnectedUsername];
-        return updatedBundles;
-      });
-      delete remoteTracksMap.current[disconnectedUsername];
-    });
+    socket.current.on(
+      "userDisconnected",
+      (disconnectedUsername: string, disconnectedInstance: string) => {
+        setBundles((prev) => {
+          const updatedBundles = { ...prev };
+          if (updatedBundles[disconnectedUsername]) {
+            delete updatedBundles[disconnectedUsername][disconnectedInstance];
+          }
+          return updatedBundles;
+        });
+        if (
+          remoteTracksMap.current[disconnectedUsername] &&
+          remoteTracksMap.current[disconnectedUsername][disconnectedInstance]
+        ) {
+          delete remoteTracksMap.current[disconnectedUsername][
+            disconnectedInstance
+          ];
+        }
+      }
+    );
 
     // Handle user left table
-    socket.current.on("userLeftTable", (leftUsername: string) => {
-      setBundles((prev) => {
-        const updatedBundles = { ...prev };
-        delete updatedBundles[leftUsername];
-        return updatedBundles;
-      });
-      delete remoteTracksMap.current[leftUsername];
-    });
+    socket.current.on(
+      "userLeftTable",
+      (leftUsername: string, leftInstance: string) => {
+        setBundles((prev) => {
+          const updatedBundles = { ...prev };
+          if (updatedBundles[leftUsername]) {
+            delete updatedBundles[leftUsername][leftInstance];
+          }
+          return updatedBundles;
+        });
+        if (
+          remoteTracksMap.current[leftUsername] &&
+          remoteTracksMap.current[leftUsername][leftInstance]
+        )
+          delete remoteTracksMap.current[leftUsername][leftInstance];
+      }
+    );
 
     return () => {
       socket.current.off("connect");
@@ -186,11 +306,13 @@ export default function Main() {
     socket,
     table_id,
     username,
+    instance,
     userMedia,
     remoteVideosContainerRef,
     isCamera,
     isScreen,
     isAudio,
+    bundles,
     setBundles,
     muteAudio
   );
@@ -216,6 +338,7 @@ export default function Main() {
     device,
     table_id,
     username,
+    instance,
     userMedia,
     currentEffectsStyles,
     userStreamEffects,
@@ -238,14 +361,15 @@ export default function Main() {
   );
 
   const consumers = new Consumers(
-    table_id,
-    username,
     socket,
     device,
+    table_id,
+    username,
+    instance,
+    subBtnRef,
     consumerTransport,
     remoteTracksMap,
-    bundlesController.createConsumerBundle,
-    subBtnRef
+    bundlesController.createConsumerBundle
   );
 
   return (
@@ -260,11 +384,13 @@ export default function Main() {
             device={device}
             table_id={table_id}
             username={username}
+            instance={instance}
             cameraBtnRef={cameraBtnRef}
             newCameraBtnRef={newCameraBtnRef}
             isCamera={isCamera}
             setCameraActive={setCameraActive}
             cameraActive={cameraActive}
+            producers={producers}
             handleDisableEnableBtns={handleDisableEnableBtns}
           />
           <AudioSection
@@ -272,6 +398,7 @@ export default function Main() {
             device={device}
             table_id={table_id}
             username={username}
+            instance={instance}
             audioBtnRef={audioBtnRef}
             muteBtnRef={muteBtnRef}
             mutedAudioRef={mutedAudioRef}
@@ -286,11 +413,13 @@ export default function Main() {
             device={device}
             table_id={table_id}
             username={username}
+            instance={instance}
             screenBtnRef={screenBtnRef}
             newScreenBtnRef={newScreenBtnRef}
             isScreen={isScreen}
             screenActive={screenActive}
             setScreenActive={setScreenActive}
+            producers={producers}
             handleDisableEnableBtns={handleDisableEnableBtns}
           />
           <div className='flex flex-col mx-2'>
@@ -304,6 +433,7 @@ export default function Main() {
                   socket,
                   table_id,
                   username,
+                  instance,
                   consumerTransport,
                   remoteTracksMap,
                   setBundles
@@ -348,6 +478,7 @@ export default function Main() {
                 usernameRef,
                 table_id,
                 username,
+                instance,
                 setIsInTable,
                 userMedia,
                 userCameraCount,
@@ -371,8 +502,9 @@ export default function Main() {
               );
               const msg = {
                 type: "getRouterRtpCapabilities",
-                username: username.current,
                 table_id: table_id.current,
+                username: username.current,
+                instance: instance.current,
               };
               socket.current.emit("message", msg);
             }}
@@ -388,11 +520,18 @@ export default function Main() {
         <div ref={remoteVideosContainerRef} className='w-full grid grid-cols-3'>
           {bundles &&
             Object.keys(bundles).length !== 0 &&
-            Object.entries(bundles).map(([key, bundle]) => (
-              <div key={key} id={`${key}_bundle`}>
-                {bundle}
-              </div>
-            ))}
+            Object.keys(bundles).map(
+              (username) =>
+                Object.keys(bundles[username]).length !== 0 &&
+                Object.entries(bundles[username]).map(([key, bundle]) => (
+                  <div
+                    key={key}
+                    id={`${key}_${userCameraCount.current}_bundle`}
+                  >
+                    {bundle}
+                  </div>
+                ))
+            )}
         </div>
       </div>
     </div>

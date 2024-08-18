@@ -5,6 +5,12 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { initializeWorkers } from "./lib/workerManager";
 import mediasoupSocket from "./lib/mediasoupSocket";
+import {
+  tableConsumers,
+  tableConsumerTransports,
+  tableProducers,
+  tableProducerTransports,
+} from "./lib/mediasoupVars";
 
 const main = async () => {
   const app = express();
@@ -39,6 +45,14 @@ const main = async () => {
   server.listen(port, () => {
     console.log("Server started on port ", port);
   });
+  setInterval(() => {
+    console.log(
+      tableConsumerTransports,
+      tableConsumers,
+      tableProducerTransports,
+      tableProducers
+    );
+  }, 5000);
 };
 
 main();

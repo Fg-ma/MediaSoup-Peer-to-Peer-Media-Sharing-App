@@ -7,9 +7,12 @@ class AudioAnalyzer {
   constructor(audioStream: MediaStream | undefined, noiseThreshold: number) {
     this.audioStream = audioStream;
     this.noiseThreshold = noiseThreshold;
+
+    this.initAudio.bind(this);
   }
 
   destructor() {
+    this.audioStream = undefined;
     if (!this.audioContext) {
       return;
     }
@@ -48,9 +51,12 @@ class AudioAnalyzer {
     );
   }
 
-  initAudio(updateMovingY: (volumeLevel: number) => void) {
+  initAudio(
+    updateMovingY: (volumeLevel: number) => void,
+    audioStream: MediaStream | undefined
+  ) {
     try {
-      const stream = this.audioStream;
+      const stream = audioStream;
 
       if (!stream) {
         return;

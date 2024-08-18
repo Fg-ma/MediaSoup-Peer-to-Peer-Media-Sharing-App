@@ -10,6 +10,7 @@ class Controls {
   private videoId: string;
   private table_id: string;
   private username: string;
+  private instance: string;
   private type: string;
 
   private fgVideoOptions: FgVideoOptions;
@@ -60,6 +61,7 @@ class Controls {
     videoId: string,
     table_id: string,
     username: string,
+    instance: string,
     type: string,
 
     fgVideoOptions: FgVideoOptions,
@@ -105,6 +107,7 @@ class Controls {
     this.videoId = videoId;
     this.table_id = table_id;
     this.username = username;
+    this.instance = instance;
     this.type = type;
 
     this.fgVideoOptions = fgVideoOptions;
@@ -170,6 +173,7 @@ class Controls {
         type: "removeProducer",
         table_id: this.table_id,
         username: this.username,
+        instance: this.instance,
         producerType: this.type,
         producerId: this.videoId,
       };

@@ -2,21 +2,23 @@ import { Server as SocketIOServer } from "socket.io";
 import { DtlsParameters } from "mediasoup/node/lib/types";
 import { RtpCapabilities, Consumer } from "mediasoup/node/lib/types";
 import {
-  roomConsumerTransports,
-  roomProducerTransports,
-  roomConsumers,
-  roomProducers,
+  tableConsumerTransports,
+  tableConsumers,
+  tableProducers,
   workersMap,
 } from "../mediasoupVars";
 import createWebRtcTransport from "../createWebRtcTransport";
 import createConsumer from "../createConsumer";
-import { getNextWorker, getWorkerByIdx, releaseWorker } from "../workerManager";
+import { getNextWorker, getWorkerByIdx } from "../workerManager";
+import MediasoupCleanup from "./MediasoupCleanup";
 
 class Consumers {
   private io: SocketIOServer;
+  private mediasoupCleanup: MediasoupCleanup;
 
   constructor(io: SocketIOServer) {
     this.io = io;
+    this.mediasoupCleanup = new MediasoupCleanup();
   }
 
   async onCreateConsumerTransport(event: {
@@ -24,6 +26,7 @@ class Consumers {
     forceTcp: boolean;
     table_id: string;
     username: string;
+    instance: string;
   }) {
     try {
       // Get the next available worker and router if one doesn't already exist
@@ -41,22 +44,30 @@ class Consumers {
         mediasoupRouter
       );
 
-      if (!roomConsumerTransports[event.table_id]) {
-        roomConsumerTransports[event.table_id] = {};
+      if (!tableConsumerTransports[event.table_id]) {
+        tableConsumerTransports[event.table_id] = {};
+      }
+      if (!tableConsumerTransports[event.table_id][event.username]) {
+        tableConsumerTransports[event.table_id][event.username] = {};
       }
 
-      roomConsumerTransports[event.table_id][event.username] = {
-        transport,
-        isConnected: false,
-      };
+      tableConsumerTransports[event.table_id][event.username][event.instance] =
+        {
+          transport,
+          isConnected: false,
+        };
 
-      this.io.to(`${event.table_id}_${event.username}`).emit("message", {
-        type: "consumerTransportCreated",
-        params: params,
-      });
+      this.io
+        .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+        .emit("message", {
+          type: "consumerTransportCreated",
+          params: params,
+        });
     } catch (error) {
       console.error(error);
-      this.io.to(`${event.table_id}_${event.username}`).emit("error", error);
+      this.io
+        .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+        .emit("error", error);
     }
   }
 
@@ -66,28 +77,36 @@ class Consumers {
     dtlsParameters: DtlsParameters;
     table_id: string;
     username: string;
+    instance: string;
   }) {
     if (
-      !roomConsumerTransports[event.table_id] ||
-      !roomConsumerTransports[event.table_id][event.username]
+      !tableConsumerTransports[event.table_id] ||
+      !tableConsumerTransports[event.table_id][event.username] ||
+      !tableConsumerTransports[event.table_id][event.username][event.instance]
     ) {
-      console.error("No consumer transport found for: ", event.username);
       return;
     }
 
-    if (!roomConsumerTransports[event.table_id][event.username].isConnected) {
-      await roomConsumerTransports[event.table_id][
-        event.username
+    if (
+      !tableConsumerTransports[event.table_id][event.username][event.instance]
+        .isConnected
+    ) {
+      await tableConsumerTransports[event.table_id][event.username][
+        event.instance
       ].transport.connect({
         dtlsParameters: event.dtlsParameters,
       });
-      roomConsumerTransports[event.table_id][event.username].isConnected = true;
+      tableConsumerTransports[event.table_id][event.username][
+        event.instance
+      ].isConnected = true;
     }
 
-    this.io.to(`${event.table_id}_${event.username}`).emit("message", {
-      type: "consumerTransportConnected",
-      data: "consumer transport connected",
-    });
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", {
+        type: "consumerTransportConnected",
+        data: "consumer transport connected",
+      });
   }
 
   async onConsume(event: {
@@ -95,6 +114,7 @@ class Consumers {
     rtpCapabilities: RtpCapabilities;
     table_id: string;
     username: string;
+    instance: string;
     producerId?: string;
   }) {
     // Get the next available worker and router
@@ -105,26 +125,59 @@ class Consumers {
     const consumers = await createConsumer(
       event.table_id,
       event.username,
-      roomProducers[event.table_id],
+      event.instance,
+      tableProducers[event.table_id],
       event.rtpCapabilities,
       mediasoupRouter
     );
 
-    if (!roomConsumers[event.table_id]) {
-      roomConsumers[event.table_id] = {};
+    if (!tableConsumers[event.table_id]) {
+      tableConsumers[event.table_id] = {};
+    }
+    if (!tableConsumers[event.table_id][event.username]) {
+      tableConsumers[event.table_id][event.username] = {};
+    }
+    if (!tableConsumers[event.table_id][event.username][event.instance]) {
+      tableConsumers[event.table_id][event.username][event.instance] = {};
+    }
+    if (!tableConsumers[event.table_id][event.username][event.instance]) {
+      tableConsumers[event.table_id][event.username][event.instance] = {};
     }
     if (consumers) {
-      roomConsumers[event.table_id][event.username] = consumers;
+      tableConsumers[event.table_id][event.username][event.instance] =
+        consumers;
     } else {
-      if (roomConsumers[event.table_id][event.username]) {
-        delete roomConsumers[event.table_id][event.username];
-      }
+      this.mediasoupCleanup.clearTableConsumers(
+        event.table_id,
+        event.username,
+        event.instance
+      );
     }
 
     let newConsumers: {
-      [username: string]: {
-        camera?: {
-          [cameraId: string]: {
+      [producerUsername: string]: {
+        [producerInstance: string]: {
+          camera?: {
+            [cameraId: string]: {
+              producerId: string;
+              id: string;
+              kind: string;
+              rtpParameters: any;
+              type: string;
+              producerPaused: boolean;
+            };
+          };
+          screen?: {
+            [screenId: string]: {
+              producerId: string;
+              id: string;
+              kind: string;
+              rtpParameters: any;
+              type: string;
+              producerPaused: boolean;
+            };
+          };
+          audio?: {
             producerId: string;
             id: string;
             kind: string;
@@ -132,103 +185,124 @@ class Consumers {
             type: string;
             producerPaused: boolean;
           };
-        };
-        screen?: {
-          [screenId: string]: {
-            producerId: string;
-            id: string;
-            kind: string;
-            rtpParameters: any;
-            type: string;
-            producerPaused: boolean;
-          };
-        };
-        audio?: {
-          producerId: string;
-          id: string;
-          kind: string;
-          rtpParameters: any;
-          type: string;
-          producerPaused: boolean;
         };
       };
     } = {};
 
     for (const producerUsername in consumers) {
-      if (consumers[producerUsername].camera) {
-        if (!newConsumers[producerUsername]) {
-          newConsumers[producerUsername] = {};
-        }
-        if (!newConsumers[producerUsername].camera) {
-          newConsumers[producerUsername].camera = {};
-        }
-        for (const cameraId in consumers[producerUsername].camera) {
-          const camera = consumers[producerUsername].camera?.[cameraId];
-          if (camera) {
-            newConsumers[producerUsername].camera![cameraId] = {
-              producerId: camera.producerId,
-              id: camera.id,
-              kind: camera.kind,
-              rtpParameters: camera.rtpParameters,
-              type: camera.type,
-              producerPaused: camera.producerPaused,
-            };
+      for (const producerInstance in consumers[producerUsername]) {
+        if (
+          consumers[producerUsername] &&
+          consumers[producerUsername][producerInstance] &&
+          consumers[producerUsername][producerInstance].camera
+        ) {
+          if (!newConsumers[producerUsername]) {
+            newConsumers[producerUsername] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance]) {
+            newConsumers[producerUsername][producerInstance] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance].camera) {
+            newConsumers[producerUsername][producerInstance].camera = {};
+          }
+          for (const cameraId in consumers[producerUsername][producerInstance]
+            .camera) {
+            const camera =
+              consumers[producerUsername][producerInstance].camera?.[cameraId];
+
+            if (camera) {
+              newConsumers[producerUsername][producerInstance].camera![
+                cameraId
+              ] = {
+                producerId: camera.producerId,
+                id: camera.id,
+                kind: camera.kind,
+                rtpParameters: camera.rtpParameters,
+                type: camera.type,
+                producerPaused: camera.producerPaused,
+              };
+            }
           }
         }
-      }
 
-      if (consumers[producerUsername].screen) {
-        if (!newConsumers[producerUsername]) {
-          newConsumers[producerUsername] = {};
-        }
-        if (!newConsumers[producerUsername].screen) {
-          newConsumers[producerUsername].screen = {};
-        }
-        for (const screenId in consumers[producerUsername].screen) {
-          const screen = consumers[producerUsername].screen?.[screenId];
-          if (screen)
-            newConsumers[producerUsername].screen![screenId] = {
-              producerId: screen.producerId,
-              id: screen.id,
-              kind: screen.kind,
-              rtpParameters: screen.rtpParameters,
-              type: screen.type,
-              producerPaused: screen.producerPaused,
-            };
-        }
-      }
+        if (
+          consumers[producerUsername] &&
+          consumers[producerUsername][producerInstance] &&
+          consumers[producerUsername][producerInstance].screen
+        ) {
+          if (!newConsumers[producerUsername]) {
+            newConsumers[producerUsername] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance]) {
+            newConsumers[producerUsername][producerInstance] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance].screen) {
+            newConsumers[producerUsername][producerInstance].screen = {};
+          }
+          for (const screenId in consumers[producerUsername][producerInstance]
+            .screen) {
+            const screen =
+              consumers[producerUsername][producerInstance].screen?.[screenId];
 
-      if (consumers[producerUsername].audio) {
-        const audioConsumerData = consumers[producerUsername].audio;
-
-        if (!newConsumers[producerUsername]) {
-          newConsumers[producerUsername] = {};
+            if (screen)
+              newConsumers[producerUsername][producerInstance].screen![
+                screenId
+              ] = {
+                producerId: screen.producerId,
+                id: screen.id,
+                kind: screen.kind,
+                rtpParameters: screen.rtpParameters,
+                type: screen.type,
+                producerPaused: screen.producerPaused,
+              };
+          }
         }
-        newConsumers[producerUsername].audio = {
-          producerId: audioConsumerData!.producerId,
-          id: audioConsumerData!.id,
-          kind: audioConsumerData!.kind,
-          rtpParameters: audioConsumerData!.rtpParameters,
-          type: audioConsumerData!.type,
-          producerPaused: audioConsumerData!.producerPaused,
-        };
+
+        if (
+          consumers[producerUsername] &&
+          consumers[producerUsername][producerInstance] &&
+          consumers[producerUsername][producerInstance].audio
+        ) {
+          if (!newConsumers[producerUsername]) {
+            newConsumers[producerUsername] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance]) {
+            newConsumers[producerUsername][producerInstance] = {};
+          }
+
+          const audioConsumerData =
+            consumers[producerUsername][producerInstance].audio;
+
+          newConsumers[producerUsername][producerInstance].audio = {
+            producerId: audioConsumerData!.producerId,
+            id: audioConsumerData!.id,
+            kind: audioConsumerData!.kind,
+            rtpParameters: audioConsumerData!.rtpParameters,
+            type: audioConsumerData!.type,
+            producerPaused: audioConsumerData!.producerPaused,
+          };
+        }
       }
     }
 
-    this.io.to(`${event.table_id}_${event.username}`).emit("message", {
-      type: "subscribed",
-      data: newConsumers,
-    });
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", {
+        type: "subscribed",
+        data: newConsumers,
+      });
   }
 
   async onNewConsumer(event: {
     type: string;
-    consumerType: string;
+    consumerType: "camera" | "screen" | "audio";
     rtpCapabilities: RtpCapabilities;
     producerUsername: string;
+    producerInstance: string;
     incomingProducerId?: string;
     table_id: string;
     username: string;
+    instance: string;
   }) {
     let newConsumer: {
       consumer: Consumer;
@@ -242,17 +316,19 @@ class Consumers {
 
     // Get the consumer transport associated with the user
     const transport =
-      roomConsumerTransports[event.table_id][event.username].transport;
+      tableConsumerTransports[event.table_id][event.username][event.instance]
+        .transport;
+
     const producer =
       event.consumerType === "camera" || event.consumerType === "screen"
         ? event.incomingProducerId
-          ? roomProducers[event.table_id][event.producerUsername][
-              event.consumerType as "camera" | "screen"
-            ]?.[event.incomingProducerId]
+          ? tableProducers[event.table_id][event.producerUsername][
+              event.producerInstance
+            ]?.[event.consumerType]?.[event.incomingProducerId]
           : undefined
-        : roomProducers[event.table_id][event.producerUsername][
-            event.consumerType as "audio"
-          ];
+        : tableProducers[event.table_id][event.producerUsername][
+            event.producerInstance
+          ][event.consumerType];
 
     if (!producer) {
       console.error(`No producer found`);
@@ -276,110 +352,136 @@ class Consumers {
         producerPaused: consumer.producerPaused,
       };
     } catch (error) {
-      console.error("consume failed: ", error);
       return;
     }
 
-    if (!roomConsumers[event.table_id]) {
-      roomConsumers[event.table_id] = {};
+    if (!tableConsumers[event.table_id]) {
+      tableConsumers[event.table_id] = {};
     }
-    if (!roomConsumers[event.table_id][event.username]) {
-      roomConsumers[event.table_id][event.username] = {};
+    if (!tableConsumers[event.table_id][event.username]) {
+      tableConsumers[event.table_id][event.username] = {};
     }
-    if (
-      !roomConsumers[event.table_id][event.username][event.producerUsername]
-    ) {
-      roomConsumers[event.table_id][event.username][event.producerUsername] =
-        {};
+    if (!tableConsumers[event.table_id][event.username][event.instance]) {
+      tableConsumers[event.table_id][event.username][event.instance] = {};
     }
     if (
-      (event.consumerType === "camera" || event.consumerType === "screen") &&
-      !roomConsumers[event.table_id][event.username][event.producerUsername][
-        event.consumerType as "camera" | "screen"
+      !tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
       ]
     ) {
-      roomConsumers[event.table_id][event.username][event.producerUsername][
-        event.consumerType as "camera" | "screen"
+      tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
       ] = {};
     }
-
+    if (
+      !tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.producerInstance]
+    ) {
+      tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.producerInstance] = {};
+    }
     if (
       (event.consumerType === "camera" || event.consumerType === "screen") &&
-      event.incomingProducerId
+      !tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.consumerType as "camera" | "screen"]
     ) {
-      roomConsumers[event.table_id][event.username][event.producerUsername][
-        event.consumerType as "camera" | "screen"
-      ]![event.incomingProducerId] = newConsumer;
-    } else {
-      roomConsumers[event.table_id][event.username][event.producerUsername][
-        event.consumerType as "audio"
-      ] = newConsumer;
+      tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.producerInstance][event.consumerType as "camera" | "screen"] = {};
     }
 
-    this.io.to(`${event.table_id}_${event.username}`).emit("message", {
-      type: "newConsumerSubscribed",
-      producerUsername: event.producerUsername,
-      consumerId: event.incomingProducerId,
-      consumerType: event.consumerType,
-      data: {
-        producerId: newConsumer.producerId,
-        id: newConsumer.id,
-        kind: newConsumer.kind,
-        rtpParameters: newConsumer.rtpParameters,
-        type: newConsumer.type,
-        producerPaused: newConsumer.producerPaused,
-      },
-    });
+    if (event.consumerType === "camera" || event.consumerType === "screen") {
+      if (event.incomingProducerId) {
+        tableConsumers[event.table_id][event.username][event.instance][
+          event.producerUsername
+        ][event.producerInstance][event.consumerType]![
+          event.incomingProducerId
+        ] = newConsumer;
+      }
+    } else {
+      tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.producerInstance][event.consumerType] = newConsumer;
+    }
+
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", {
+        type: "newConsumerSubscribed",
+        producerUsername: event.producerUsername,
+        producerInstance: event.producerInstance,
+        consumerId: event.incomingProducerId,
+        consumerType: event.consumerType,
+        data: {
+          producerId: newConsumer.producerId,
+          id: newConsumer.id,
+          kind: newConsumer.kind,
+          rtpParameters: newConsumer.rtpParameters,
+          type: newConsumer.type,
+          producerPaused: newConsumer.producerPaused,
+        },
+      });
   }
 
   onNewConsumerCreated(event: {
     type: string;
-    username: string;
     table_id: string;
+    username: string;
+    instance: string;
     producerUsername: string;
+    producerInstance: string;
     consumerId?: string;
     consumerType: string;
   }) {
     const msg = {
       type: "newConsumerWasCreated",
       producerUsername: event.producerUsername,
+      producerInstance: event.producerInstance,
       consumerId: event.consumerId,
       consumerType: event.consumerType,
     };
-    this.io.to(`${event.table_id}_${event.username}`).emit("message", msg);
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", msg);
   }
 
-  onUnsubscribe(event: { type: string; table_id: string; username: string }) {
-    if (
-      roomConsumerTransports[event.table_id] &&
-      roomConsumerTransports[event.table_id][event.username]
-    ) {
-      delete roomConsumerTransports[event.table_id][event.username];
-    }
+  onUnsubscribe(event: {
+    type: string;
+    table_id: string;
+    username: string;
+    instance: string;
+  }) {
+    this.mediasoupCleanup.deleteConsumerTransport(
+      event.table_id,
+      event.username,
+      event.instance
+    );
+
+    this.mediasoupCleanup.releaseWorkers(event.table_id);
 
     if (
-      (!roomProducerTransports ||
-        (roomProducerTransports[event.table_id] &&
-          Object.keys(roomProducerTransports[event.table_id]).length === 0)) &&
-      (!roomConsumerTransports ||
-        (roomConsumerTransports[event.table_id] &&
-          Object.keys(roomConsumerTransports[event.table_id]).length === 0))
+      tableConsumers[event.table_id] &&
+      tableConsumers[event.table_id][event.username] &&
+      tableConsumers[event.table_id][event.username][event.instance]
     ) {
-      releaseWorker(workersMap[event.table_id]);
-      delete workersMap[event.table_id];
-    }
+      delete tableConsumers[event.table_id][event.username][event.instance];
 
-    if (
-      roomConsumers[event.table_id] &&
-      roomConsumers[event.table_id][event.username]
-    ) {
-      delete roomConsumers[event.table_id][event.username];
+      this.mediasoupCleanup.clearTableConsumers(
+        event.table_id,
+        event.username,
+        event.instance
+      );
     }
 
     const msg = {
       type: "unsubscribed",
     };
-    this.io.to(`${event.table_id}_${event.username}`).emit("message", msg);
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", msg);
   }
 }
 

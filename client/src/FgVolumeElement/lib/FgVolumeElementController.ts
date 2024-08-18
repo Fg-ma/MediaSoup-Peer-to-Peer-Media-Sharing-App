@@ -3,6 +3,7 @@ import FgVolumeElementSocket from "./FgVolumeElementSocket";
 
 class FgVolumeElementController {
   private username: string;
+  private instance: string;
   private isUser: boolean;
   private fgVolumeElementOptions: FgVolumeElementOptions;
 
@@ -29,6 +30,7 @@ class FgVolumeElementController {
 
   constructor(
     username: string,
+    instance: string,
     isUser: boolean,
     fgVolumeElementOptions: FgVolumeElementOptions,
     audioRef: React.RefObject<HTMLAudioElement>,
@@ -49,6 +51,7 @@ class FgVolumeElementController {
     tracksColorSetterCallback: (() => void) | undefined
   ) {
     this.username = username;
+    this.instance = instance;
     this.isUser = isUser;
     this.fgVolumeElementOptions = fgVolumeElementOptions;
     this.audioRef = audioRef;
@@ -61,14 +64,15 @@ class FgVolumeElementController {
     this.tracksColorSetterCallback = tracksColorSetterCallback;
 
     this.fgVolumeElementSocket = new FgVolumeElementSocket(
-      this.isUser,
       this.username,
-      this.clientMute,
-      this.volumeState,
-      this.setVolumeState,
+      this.instance,
+      this.isUser,
       this.audioRef,
+      this.clientMute,
       this.localMute,
-      this.setActive
+      this.setActive,
+      this.volumeState,
+      this.setVolumeState
     );
 
     this.volumeSliderChangeHandler.bind(this);

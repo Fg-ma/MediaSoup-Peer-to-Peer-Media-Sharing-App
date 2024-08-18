@@ -1,14 +1,12 @@
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import CameraMedia from "../../lib/CameraMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
-import AudioMedia from "../../lib/AudioMedia";
 
 class AudioSectionController {
   private socket: React.MutableRefObject<Socket>;
   private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
   private table_id: React.MutableRefObject<string>;
   private username: React.MutableRefObject<string>;
+  private instance: React.MutableRefObject<string>;
 
   private isAudio: React.MutableRefObject<boolean>;
   private setAudioActive: (value: React.SetStateAction<boolean>) => void;
@@ -20,6 +18,7 @@ class AudioSectionController {
     device: React.MutableRefObject<mediasoup.types.Device | undefined>,
     table_id: React.MutableRefObject<string>,
     username: React.MutableRefObject<string>,
+    instance: React.MutableRefObject<string>,
 
     isAudio: React.MutableRefObject<boolean>,
     setAudioActive: (value: React.SetStateAction<boolean>) => void,
@@ -30,6 +29,7 @@ class AudioSectionController {
     this.device = device;
     this.table_id = table_id;
     this.username = username;
+    this.instance = instance;
     this.isAudio = isAudio;
     this.setAudioActive = setAudioActive;
     this.handleDisableEnableBtns = handleDisableEnableBtns;
@@ -53,6 +53,7 @@ class AudioSectionController {
           producerType: "audio",
           table_id: this.table_id.current,
           username: this.username.current,
+          instance: this.instance.current,
         };
         this.socket.current.emit("message", msg);
       }
@@ -61,6 +62,7 @@ class AudioSectionController {
         type: "removeProducer",
         table_id: this.table_id.current,
         username: this.username.current,
+        instance: this.instance.current,
         producerType: "audio",
       };
       this.socket.current.emit("message", msg);

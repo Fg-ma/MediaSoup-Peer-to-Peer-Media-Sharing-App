@@ -49,17 +49,19 @@ export interface StreamsContextType {
   }>;
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      camera?:
-        | {
-            [cameraId: string]: MediaStreamTrack;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: MediaStreamTrack;
-          }
-        | undefined;
-      audio?: MediaStreamTrack | undefined;
+      [instance: string]: {
+        camera?:
+          | {
+              [cameraId: string]: MediaStreamTrack;
+            }
+          | undefined;
+        screen?:
+          | {
+              [screenId: string]: MediaStreamTrack;
+            }
+          | undefined;
+        audio?: MediaStreamTrack | undefined;
+      };
     };
   }>;
 }
@@ -109,9 +111,11 @@ export function StreamsContextProvider({
   });
   const remoteTracksMap = useRef<{
     [username: string]: {
-      camera?: { [cameraId: string]: MediaStreamTrack };
-      screen?: { [screenId: string]: MediaStreamTrack };
-      audio?: MediaStreamTrack;
+      [instance: string]: {
+        camera?: { [cameraId: string]: MediaStreamTrack };
+        screen?: { [screenId: string]: MediaStreamTrack };
+        audio?: MediaStreamTrack;
+      };
     };
   }>({});
 

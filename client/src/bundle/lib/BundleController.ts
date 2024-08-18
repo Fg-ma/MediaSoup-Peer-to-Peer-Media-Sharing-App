@@ -6,6 +6,7 @@ import AudioMedia from "../../lib/AudioMedia";
 class BundleController {
   private isUser: boolean;
   private username: string;
+  private instance: string;
 
   private setCameraStreams: React.Dispatch<
     React.SetStateAction<
@@ -29,17 +30,19 @@ class BundleController {
 
   private remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
-      camera?:
-        | {
-            [cameraId: string]: MediaStreamTrack;
-          }
-        | undefined;
-      screen?:
-        | {
-            [screenId: string]: MediaStreamTrack;
-          }
-        | undefined;
-      audio?: MediaStreamTrack | undefined;
+      [instance: string]: {
+        camera?:
+          | {
+              [cameraId: string]: MediaStreamTrack;
+            }
+          | undefined;
+        screen?:
+          | {
+              [screenId: string]: MediaStreamTrack;
+            }
+          | undefined;
+        audio?: MediaStreamTrack | undefined;
+      };
     };
   }>;
   private userMedia: React.MutableRefObject<{
@@ -64,6 +67,7 @@ class BundleController {
   constructor(
     isUser: boolean,
     username: string,
+    instance: string,
     setCameraStreams: React.Dispatch<
       React.SetStateAction<
         | {
@@ -85,17 +89,19 @@ class BundleController {
     >,
     remoteTracksMap: React.MutableRefObject<{
       [username: string]: {
-        camera?:
-          | {
-              [cameraId: string]: MediaStreamTrack;
-            }
-          | undefined;
-        screen?:
-          | {
-              [screenId: string]: MediaStreamTrack;
-            }
-          | undefined;
-        audio?: MediaStreamTrack | undefined;
+        [instance: string]: {
+          camera?:
+            | {
+                [cameraId: string]: MediaStreamTrack;
+              }
+            | undefined;
+          screen?:
+            | {
+                [screenId: string]: MediaStreamTrack;
+              }
+            | undefined;
+          audio?: MediaStreamTrack | undefined;
+        };
       };
     }>,
     userMedia: React.MutableRefObject<{
@@ -114,6 +120,7 @@ class BundleController {
   ) {
     this.isUser = isUser;
     this.username = username;
+    this.instance = instance;
     this.setCameraStreams = setCameraStreams;
     this.setScreenStreams = setScreenStreams;
     this.setAudioStream = setAudioStream;
@@ -127,6 +134,7 @@ class BundleController {
     this.bundleSocket = new BundleSocket(
       this.isUser,
       this.username,
+      this.instance,
       this.setCameraStreams,
       this.setScreenStreams,
       this.setAudioStream,

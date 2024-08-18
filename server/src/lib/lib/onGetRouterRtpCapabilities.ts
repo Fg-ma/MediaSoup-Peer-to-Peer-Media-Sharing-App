@@ -4,7 +4,7 @@ import { workersMap } from "../mediasoupVars";
 import { getNextWorker, getWorkerByIdx } from "../workerManager";
 
 const onGetRouterRtpCapabilities = (
-  event: { type: string; username: string; table_id: string },
+  event: { type: string; table_id: string; username: string; instance: string },
   io: SocketIOServer
 ) => {
   // Get the next available worker and router if one doesn't already exist
@@ -23,7 +23,10 @@ const onGetRouterRtpCapabilities = (
     rtpCapabilities: mediasoupRouter.rtpCapabilities,
   };
 
-  io.to(`${event.table_id}_${event.username}`).emit("message", msg);
+  io.to(`instance_${event.table_id}_${event.username}_${event.instance}`).emit(
+    "message",
+    msg
+  );
 };
 
 export default onGetRouterRtpCapabilities;

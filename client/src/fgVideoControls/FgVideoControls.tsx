@@ -21,6 +21,7 @@ export default function FgVideoControls({
   socket,
   videoId,
   username,
+  instance,
   type,
   isUser,
   controls,
@@ -42,6 +43,7 @@ export default function FgVideoControls({
   socket: React.MutableRefObject<Socket>;
   videoId: string;
   username: string;
+  instance: string;
   type: "camera" | "screen";
   isUser: boolean;
   controls: Controls;
@@ -88,6 +90,7 @@ export default function FgVideoControls({
           <FgVolumeElement
             socket={socket}
             username={username}
+            instance={instance}
             isUser={isUser}
             audioRef={audioRef}
             clientMute={clientMute}

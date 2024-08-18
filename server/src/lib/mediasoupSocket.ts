@@ -16,12 +16,16 @@ const mediasoupSocket = async (io: SocketIOServer) => {
     const mute = new Mute(io);
     const effects = new Effects(io);
 
-    socket.on("joinTable", (table_id: string, username: string) =>
-      tables.join(table_id, username)
+    socket.on(
+      "joinTable",
+      (table_id: string, username: string, instance: string) =>
+        tables.join(table_id, username, instance)
     );
 
-    socket.on("leaveTable", (table_id: string, username: string) =>
-      tables.leave(table_id, username)
+    socket.on(
+      "leaveTable",
+      (table_id: string, username: string, instance: string) =>
+        tables.leave(table_id, username, instance)
     );
 
     socket.on("disconnect", () => tables.disconnect());

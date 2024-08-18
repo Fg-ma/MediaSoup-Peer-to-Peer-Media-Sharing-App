@@ -16,67 +16,77 @@ export const workers: MediasoupWorker[] = [];
 export const workersMap: {
   [table_id: string]: number;
 } = {};
-export const roomProducerTransports: {
+
+export const tableProducerTransports: {
   [table_id: string]: {
     [username: string]: {
-      transport: Transport;
-      isConnected: boolean;
-      instances: 0;
+      [instance: string]: {
+        transport: Transport;
+        isConnected: boolean;
+      };
     };
   };
 } = {};
-export const roomConsumerTransports: {
+export const tableConsumerTransports: {
   [table_id: string]: {
     [username: string]: {
-      transport: Transport;
-      isConnected: boolean;
-      instances: 0;
+      [instance: string]: {
+        transport: Transport;
+        isConnected: boolean;
+      };
     };
   };
 } = {};
-export const roomProducers: {
+
+export const tableProducers: {
   [table_id: string]: {
     [username: string]: {
-      camera?: { [cameraId: string]: Producer };
-      screen?: { [screenId: string]: Producer };
-      audio?: Producer;
+      [instance: string]: {
+        camera?: { [cameraId: string]: Producer };
+        screen?: { [screenId: string]: Producer };
+        audio?: Producer;
+      };
     };
   };
 } = {};
-export const roomConsumers: {
+export const tableConsumers: {
   [table_id: string]: {
     [username: string]: {
-      [producerUsername: string]: {
-        camera?: {
-          [cameraId: string]: {
-            consumer: Consumer;
-            producerId: string;
-            id: string;
-            kind: string;
-            rtpParameters: any;
-            type: string;
-            producerPaused: boolean;
+      [instance: string]: {
+        [producerUsername: string]: {
+          [producerInstance: string]: {
+            camera?: {
+              [cameraId: string]: {
+                consumer: Consumer;
+                producerId: string;
+                id: string;
+                kind: string;
+                rtpParameters: any;
+                type: string;
+                producerPaused: boolean;
+              };
+            };
+            screen?: {
+              [screenId: string]: {
+                consumer: Consumer;
+                producerId: string;
+                id: string;
+                kind: string;
+                rtpParameters: any;
+                type: string;
+                producerPaused: boolean;
+              };
+            };
+            audio?: {
+              consumer: Consumer;
+              producerId: string;
+              id: string;
+              kind: string;
+              rtpParameters: any;
+              type: string;
+              producerPaused: boolean;
+            };
           };
-        };
-        screen?: {
-          [screenId: string]: {
-            consumer: Consumer;
-            producerId: string;
-            id: string;
-            kind: string;
-            rtpParameters: any;
-            type: string;
-            producerPaused: boolean;
-          };
-        };
-        audio?: {
-          consumer: Consumer;
-          producerId: string;
-          id: string;
-          kind: string;
-          rtpParameters: any;
-          type: string;
-          producerPaused: boolean;
         };
       };
     };

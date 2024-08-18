@@ -14,6 +14,7 @@ export default function AudioSection({
   device,
   table_id,
   username,
+  instance,
   audioBtnRef,
   muteBtnRef,
   mutedAudioRef,
@@ -27,6 +28,7 @@ export default function AudioSection({
   device: React.MutableRefObject<mediasoup.types.Device | undefined>;
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
+  instance: React.MutableRefObject<string>;
   audioBtnRef: React.RefObject<HTMLButtonElement>;
   muteBtnRef: React.RefObject<HTMLButtonElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
@@ -49,6 +51,7 @@ export default function AudioSection({
     device,
     table_id,
     username,
+    instance,
 
     isAudio,
     setAudioActive,

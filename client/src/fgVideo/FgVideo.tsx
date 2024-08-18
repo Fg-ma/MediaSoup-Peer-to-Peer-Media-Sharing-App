@@ -81,6 +81,7 @@ export default function FgVideo({
   videoId,
   table_id,
   username,
+  instance,
   name,
   type,
   isUser,
@@ -99,6 +100,7 @@ export default function FgVideo({
   videoId: string;
   table_id: string;
   username: string;
+  instance: string;
   name?: string;
   type: "camera" | "screen";
   isUser: boolean;
@@ -182,6 +184,7 @@ export default function FgVideo({
     videoId,
     table_id,
     username,
+    instance,
     type,
     fgVideoOptions,
     videoRef,
@@ -385,6 +388,7 @@ export default function FgVideo({
             socket={socket}
             videoId={videoId}
             username={username}
+            instance={instance}
             type={type}
             isUser={isUser}
             controls={controls}

@@ -19,7 +19,7 @@ class Effects {
       effect: event.effect,
       producerId: event.producerId,
     };
-    this.io.to(`${event.table_id}_${event.username}`).emit("message", msg);
+    this.io.to(`user_${event.table_id}_${event.username}`).emit("message", msg);
   }
 }
 
