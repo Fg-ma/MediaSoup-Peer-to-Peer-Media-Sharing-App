@@ -57,7 +57,9 @@ const getNextWorker = () => {
 
 // Decrement active connections count when a connection is closed
 const releaseWorker = (workerIdx: number) => {
-  workers[workerIdx].activeConnections -= 1;
+  if (workers[workerIdx]) {
+    workers[workerIdx].activeConnections -= 1;
+  }
 };
 
 const getWorkerByIdx = (idx: number) => {

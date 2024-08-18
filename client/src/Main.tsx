@@ -265,6 +265,7 @@ export default function Main() {
           }
           return updatedBundles;
         });
+
         if (
           remoteTracksMap.current[disconnectedUsername] &&
           remoteTracksMap.current[disconnectedUsername][disconnectedInstance]
@@ -272,6 +273,13 @@ export default function Main() {
           delete remoteTracksMap.current[disconnectedUsername][
             disconnectedInstance
           ];
+
+          if (
+            Object.keys(remoteTracksMap.current[disconnectedUsername])
+              .length === 0
+          ) {
+            delete remoteTracksMap.current[disconnectedUsername];
+          }
         }
       }
     );
@@ -287,11 +295,17 @@ export default function Main() {
           }
           return updatedBundles;
         });
+
         if (
           remoteTracksMap.current[leftUsername] &&
           remoteTracksMap.current[leftUsername][leftInstance]
-        )
+        ) {
           delete remoteTracksMap.current[leftUsername][leftInstance];
+
+          if (Object.keys(remoteTracksMap.current[leftUsername]).length === 0) {
+            delete remoteTracksMap.current[leftUsername];
+          }
+        }
       }
     );
 
@@ -524,10 +538,7 @@ export default function Main() {
               (username) =>
                 Object.keys(bundles[username]).length !== 0 &&
                 Object.entries(bundles[username]).map(([key, bundle]) => (
-                  <div
-                    key={key}
-                    id={`${key}_${userCameraCount.current}_bundle`}
-                  >
+                  <div key={key} id={`${key}_bundle`}>
                     {bundle}
                   </div>
                 ))

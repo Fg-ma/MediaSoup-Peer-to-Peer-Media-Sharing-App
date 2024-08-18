@@ -350,7 +350,7 @@ class Consumers {
       producerPaused: boolean;
     };
   }) {
-    if (event.producerUsername === this.username.current) {
+    if (event.producerInstance === this.instance.current) {
       return;
     }
 
@@ -446,8 +446,9 @@ class Consumers {
           event.producerInstance
         ]?.screen
       ) {
-        for (const key in this.remoteTracksMap.current[event.producerUsername]
-          .screen) {
+        for (const key in this.remoteTracksMap.current[event.producerUsername][
+          event.producerInstance
+        ].screen) {
           const remoteScreenStream = new MediaStream();
           remoteScreenStream.addTrack(
             this.remoteTracksMap.current[event.producerUsername][

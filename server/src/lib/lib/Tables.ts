@@ -92,7 +92,7 @@ class Tables {
 
     this.io
       .to(`table_${this.socket.table_id}`)
-      .emit("userDisconnected", this.socket.username);
+      .emit("userDisconnected", this.socket.username, this.socket.instance);
   }
 }
 

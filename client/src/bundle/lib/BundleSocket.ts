@@ -137,7 +137,7 @@ class BundleSocket {
     consumerType: string;
   }) {
     if (
-      this.username !== event.producerUsername &&
+      this.username !== event.producerUsername ||
       this.instance !== event.producerInstance
     ) {
       return;
@@ -200,9 +200,11 @@ class BundleSocket {
     producerType: "camera" | "screen" | "audio";
     producerId: string | undefined;
   }) {
+    console.log("1");
     if (!this.isUser) {
       return;
     }
+    console.log("2");
 
     if (event.producerType === "camera") {
       this.setCameraStreams((prev) => {
@@ -230,10 +232,14 @@ class BundleSocket {
   onProducerDisconnected(event: {
     type: string;
     producerUsername: string;
+    producerInstance: string;
     producerType: string;
     producerId: string;
   }) {
-    if (event.producerUsername === this.username) {
+    if (
+      event.producerUsername === this.username &&
+      event.producerInstance === this.instance
+    ) {
       if (event.producerType === "camera") {
         this.setCameraStreams((prev) => {
           const newStreams = { ...prev };

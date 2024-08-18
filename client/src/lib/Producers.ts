@@ -308,12 +308,7 @@ class Producers {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
-          producerId:
-            appData.producerType === "camera"
-              ? `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-              : appData.producerType === "screen"
-              ? `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-              : undefined,
+          producerId: appData.producerId,
         };
 
         this.socket.current.emit("message", msg);
@@ -372,38 +367,7 @@ class Producers {
           return;
         }
 
-        const newCameraMedia = new CameraMedia(
-          this.username.current,
-          this.table_id.current,
-          `${this.username.current}_camera_stream_${this.userCameraCount.current}`,
-          cameraBrowserMedia,
-          this.currentEffectsStyles,
-          this.userStreamEffects,
-          this.userDevice,
-          this.deadbanding
-        );
-
-        this.userMedia.current.camera[
-          `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-        ] = newCameraMedia;
-
-        const track =
-          this.userMedia.current.camera[
-            `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-          ].getTrack();
-        const params = {
-          track: track,
-          appData: {
-            producerType: "camera",
-          },
-        };
-
-        try {
-          await this.producerTransport.current?.produce(params);
-        } catch {
-          console.error("Camera new transport failed to produce");
-          return;
-        }
+        await this.createCameraProducer(cameraBrowserMedia);
       }
       if (this.isScreen.current) {
         if (
@@ -429,37 +393,7 @@ class Producers {
           return;
         }
 
-        const newScreenMedia = new ScreenMedia(
-          this.username.current,
-          this.table_id.current,
-          `${this.username.current}_screen_stream_${this.userScreenCount.current}`,
-          screenBrowserMedia,
-          this.currentEffectsStyles,
-          this.userStreamEffects,
-          this.userDevice
-        );
-
-        this.userMedia.current.screen[
-          `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-        ] = newScreenMedia;
-
-        const track =
-          this.userMedia.current.screen[
-            `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-          ].getTrack();
-        const params = {
-          track: track,
-          appData: {
-            producerType: "screen",
-          },
-        };
-
-        try {
-          await this.producerTransport.current?.produce(params);
-        } catch {
-          console.error("Screen new transport failed to produce");
-          return;
-        }
+        await this.createScreenProducer(screenBrowserMedia);
       }
       if (this.isAudio.current) {
         if (this.userMedia.current.audio) {
@@ -484,24 +418,7 @@ class Producers {
           return;
         }
 
-        const newAudioMedia = new AudioMedia(
-          this.username.current,
-          this.table_id.current,
-          this.userStreamEffects,
-          audioBrowserMedia
-        );
-        await newAudioMedia.openMic();
-
-        this.userMedia.current.audio = newAudioMedia;
-
-        const audioTrack = this.userMedia.current.audio.getTrack();
-        const audioParams = {
-          track: audioTrack,
-          appData: {
-            producerType: "audio",
-          },
-        };
-        await this.producerTransport.current?.produce(audioParams);
+        await this.createAudioProducer(audioBrowserMedia);
       }
     } catch (error) {
       console.error(error);
@@ -537,35 +454,7 @@ class Producers {
         return;
       }
 
-      const newCameraMedia = new CameraMedia(
-        this.username.current,
-        this.table_id.current,
-        `${this.username.current}_camera_stream_${this.userCameraCount.current}`,
-        cameraBrowserMedia,
-        this.currentEffectsStyles,
-        this.userStreamEffects,
-        this.userDevice,
-        this.deadbanding
-      );
-
-      this.userMedia.current.camera[
-        `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-      ] = newCameraMedia;
-
-      const track = newCameraMedia.getTrack();
-      const params = {
-        track: track,
-        appData: {
-          producerType: "camera",
-        },
-      };
-
-      try {
-        await this.producerTransport.current?.produce(params);
-      } catch {
-        console.error("Camera new transport failed to produce");
-        return;
-      }
+      await this.createCameraProducer(cameraBrowserMedia);
     } else if (producerType === "screen") {
       producerId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
       if (
@@ -593,37 +482,7 @@ class Producers {
         return;
       }
 
-      const newScreenMedia = new ScreenMedia(
-        this.username.current,
-        this.table_id.current,
-        `${this.username.current}_screen_stream_${this.userScreenCount.current}`,
-        screenBrowserMedia,
-        this.currentEffectsStyles,
-        this.userStreamEffects,
-        this.userDevice
-      );
-
-      this.userMedia.current.screen[
-        `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-      ] = newScreenMedia;
-
-      const track =
-        this.userMedia.current.screen[
-          `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-        ].getTrack();
-      const params = {
-        track: track,
-        appData: {
-          producerType: "screen",
-        },
-      };
-
-      try {
-        await this.producerTransport.current?.produce(params);
-      } catch {
-        console.error("Screen new transport failed to produce");
-        return;
-      }
+      await this.createScreenProducer(screenBrowserMedia);
     } else if (producerType === "audio") {
       if (this.userMedia.current.audio) {
         // Reenable buttons
@@ -646,30 +505,7 @@ class Producers {
         return;
       }
 
-      const newAudioMedia = new AudioMedia(
-        this.username.current,
-        this.table_id.current,
-        this.userStreamEffects,
-        audioBrowserMedia
-      );
-      await newAudioMedia.openMic();
-
-      this.userMedia.current.audio = newAudioMedia;
-
-      const track = this.userMedia.current.audio.getTrack();
-      const params = {
-        track: track,
-        appData: {
-          producerType: "audio",
-        },
-      };
-
-      try {
-        await this.producerTransport.current?.produce(params);
-      } catch {
-        console.error("Audio new transport failed to produce");
-        return;
-      }
+      await this.createAudioProducer(audioBrowserMedia);
     }
 
     // Reenable buttons
@@ -683,7 +519,7 @@ class Producers {
       producerType: producerType,
       producerId: producerId,
     };
-    console.log(msg);
+
     this.socket.current.emit("message", msg);
   }
 
@@ -695,7 +531,7 @@ class Producers {
     producerId?: string;
   }) {
     if (
-      event.producerUsername !== this.username.current &&
+      event.producerInstance !== this.instance.current &&
       this.isSubscribed.current &&
       this.device.current
     ) {
@@ -816,6 +652,7 @@ class Producers {
       // Re-enable button
       this.handleDisableEnableBtns(false);
     } else {
+      console.log("2");
       // Delete remote tracks
       if (event.producerType === "camera" || event.producerType === "screen") {
         if (
@@ -907,17 +744,8 @@ class Producers {
       }
 
       // Clean up bundles
-      if (!this.remoteTracksMap.current[event.producerUsername]) {
-        this.setBundles((prev) => {
-          const newBundles = { ...prev };
-
-          if (newBundles[event.producerUsername]) {
-            delete newBundles[event.producerUsername];
-          }
-
-          return newBundles;
-        });
-      } else if (
+      if (
+        !this.remoteTracksMap.current[event.producerUsername] ||
         !this.remoteTracksMap.current[event.producerUsername][
           event.producerInstance
         ]
