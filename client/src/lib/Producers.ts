@@ -652,7 +652,6 @@ class Producers {
       // Re-enable button
       this.handleDisableEnableBtns(false);
     } else {
-      console.log("2");
       // Delete remote tracks
       if (event.producerType === "camera" || event.producerType === "screen") {
         if (

@@ -169,6 +169,10 @@ export default function Main() {
 
   const remoteVideosContainerRef = useRef<HTMLDivElement>(null);
 
+  const acceptCameraEffects = true;
+  const acceptScreenEffects = true;
+  const acceptAudioEffects = true;
+
   const muteAudio = () => {
     if (userMedia.current.audio) {
       userMedia.current.audio.getTrack().enabled = mutedAudioRef.current;
@@ -328,7 +332,10 @@ export default function Main() {
     isAudio,
     bundles,
     setBundles,
-    muteAudio
+    muteAudio,
+    acceptCameraEffects,
+    acceptScreenEffects,
+    acceptAudioEffects
   );
 
   const userDevice = new UserDevice();

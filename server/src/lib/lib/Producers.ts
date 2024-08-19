@@ -181,7 +181,6 @@ class Producers {
           event.producerType
         ])
     ) {
-      console.log("Producer already exists");
       return;
     }
 

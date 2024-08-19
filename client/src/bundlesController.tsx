@@ -38,6 +38,10 @@ class BundlesController {
 
   private muteAudio: () => void;
 
+  private acceptCameraEffects: boolean;
+  private acceptScreenEffects: boolean;
+  private acceptAudioEffects: boolean;
+
   constructor(
     socket: React.MutableRefObject<Socket>,
     table_id: React.MutableRefObject<string>,
@@ -64,7 +68,10 @@ class BundlesController {
         [username: string]: { [instance: string]: React.JSX.Element };
       }>
     >,
-    muteAudio: () => void
+    muteAudio: () => void,
+    acceptCameraEffects: boolean,
+    acceptScreenEffects: boolean,
+    acceptAudioEffects: boolean
   ) {
     this.socket = socket;
     this.table_id = table_id;
@@ -78,6 +85,9 @@ class BundlesController {
     this.bundles = bundles;
     this.setBundles = setBundles;
     this.muteAudio = muteAudio;
+    this.acceptCameraEffects = acceptCameraEffects;
+    this.acceptScreenEffects = acceptScreenEffects;
+    this.acceptAudioEffects = acceptAudioEffects;
   }
 
   createProducerBundle = () => {
@@ -111,6 +121,9 @@ class BundlesController {
           initAudioStream={this.isAudio.current ? initAudioStream : undefined}
           options={{
             isUser: true,
+            acceptsCameraEffects: this.acceptCameraEffects,
+            acceptsScreenEffects: this.acceptScreenEffects,
+            acceptsAudioEffects: this.acceptAudioEffects,
           }}
           handleMuteCallback={this.muteAudio}
         />
@@ -172,6 +185,17 @@ class BundlesController {
             };
 
             this.socket.current.emit("message", msg);
+
+            const message = {
+              type: "requestEffectPermissions",
+              table_id: this.table_id.current,
+              username: this.username.current,
+              instance: this.instance.current,
+              producerUsername: trackUsername,
+              producerInstance: trackInstance,
+            };
+
+            this.socket.current.emit("message", message);
           }}
           onNewConsumerWasCreatedCallback={() => {
             const msg = {

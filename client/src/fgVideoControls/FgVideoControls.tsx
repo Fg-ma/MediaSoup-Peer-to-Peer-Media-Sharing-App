@@ -23,7 +23,6 @@ export default function FgVideoControls({
   username,
   instance,
   type,
-  isUser,
   controls,
   clientMute,
   localMute,
@@ -45,7 +44,6 @@ export default function FgVideoControls({
   username: string;
   instance: string;
   type: "camera" | "screen";
-  isUser: boolean;
   controls: Controls;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
@@ -91,7 +89,7 @@ export default function FgVideoControls({
             socket={socket}
             username={username}
             instance={instance}
-            isUser={isUser}
+            isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
             audioRef={audioRef}
             clientMute={clientMute}
             localMute={localMute}
@@ -120,9 +118,10 @@ export default function FgVideoControls({
             <div ref={totalTimeRef} className='total-time'></div>
           )}
         </div>
-        {(fgVideoOptions.isEffects ?? defaultFgVideoOptions.isEffects) && (
-          <EffectsButton controls={controls} effectsActive={effectsActive} />
-        )}
+        {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
+          (fgVideoOptions.isEffects ?? defaultFgVideoOptions.isEffects) && (
+            <EffectsButton controls={controls} effectsActive={effectsActive} />
+          )}
         {(fgVideoOptions.isPlaybackSpeed ??
           defaultFgVideoOptions.isPlaybackSpeed) && (
           <PlaybackSpeedButton

@@ -15,6 +15,8 @@ import FgVideoController from "./lib/FgVideoController";
 
 export interface FgVideoOptions {
   isUser?: boolean;
+  acceptsVisualEffects?: boolean;
+  acceptsAudioEffects?: boolean;
   isStream?: boolean;
   autoPlay?: boolean;
   flipVideo?: boolean;
@@ -47,6 +49,8 @@ export interface FgVideoOptions {
 
 export const defaultFgVideoOptions = {
   isUser: false,
+  acceptsVisualEffects: false,
+  acceptsAudioEffects: false,
   isStream: false,
   autoPlay: true,
   flipVideo: false,
@@ -84,7 +88,6 @@ export default function FgVideo({
   instance,
   name,
   type,
-  isUser,
   clientMute,
   localMute,
   videoStream,
@@ -103,7 +106,6 @@ export default function FgVideo({
   instance: string;
   name?: string;
   type: "camera" | "screen";
-  isUser: boolean;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   videoStream?: MediaStream;
@@ -390,7 +392,6 @@ export default function FgVideo({
             username={username}
             instance={instance}
             type={type}
-            isUser={isUser}
             controls={controls}
             clientMute={clientMute}
             localMute={localMute}

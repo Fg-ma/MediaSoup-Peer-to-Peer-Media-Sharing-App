@@ -7,6 +7,9 @@ import FgAudioElementContainer from "../fgAudioElement/FgAudioElementContainer";
 
 interface BundleOptions {
   isUser?: boolean;
+  acceptsCameraEffects?: boolean;
+  acceptsScreenEffects?: boolean;
+  acceptsAudioEffects?: boolean;
   primaryVolumeSliderColor?: string;
   secondaryVolumeSliderColor?: string;
   initialVolume?: "off" | "low" | "high";
@@ -14,6 +17,9 @@ interface BundleOptions {
 
 const defaultBundleOptions = {
   isUser: false,
+  acceptsCameraEffects: false,
+  acceptsScreenEffects: false,
+  acceptsAudioEffects: false,
   primaryVolumeSliderColor: "white",
   secondaryVolumeSliderColor: "rgba(150, 150, 150, 0.5)",
 };
@@ -73,6 +79,10 @@ export default function Bundle({
 
   const clientMute = useRef(false); // User audio mute
   const localMute = useRef(false); // Not user audio mute
+
+  const acceptsCameraEffects = useRef(bundleOptions.acceptsCameraEffects);
+  const acceptsScreenEffects = useRef(bundleOptions.acceptsScreenEffects);
+  const acceptsAudioEffects = useRef(bundleOptions.acceptsAudioEffects);
 
   const bundleController = new BundleController(
     bundleOptions.isUser,
@@ -191,13 +201,14 @@ export default function Bundle({
             instance={instance}
             name={name}
             type='camera'
-            isUser={bundleOptions.isUser}
             clientMute={clientMute}
             localMute={localMute}
             videoStream={cameraStream}
             audioRef={audioRef}
             options={{
               isUser: bundleOptions.isUser,
+              acceptsVisualEffects: acceptsCameraEffects.current,
+              acceptsAudioEffects: acceptsAudioEffects.current,
               isStream: true,
               flipVideo: true,
               isSlider: !bundleOptions.isUser,
@@ -237,13 +248,14 @@ export default function Bundle({
             instance={instance}
             name={name}
             type='screen'
-            isUser={bundleOptions.isUser}
             clientMute={clientMute}
             localMute={localMute}
             videoStream={screenStream}
             audioRef={audioRef}
             options={{
               isUser: bundleOptions.isUser,
+              acceptsVisualEffects: acceptsScreenEffects.current,
+              acceptsAudioEffects: acceptsAudioEffects.current,
               isStream: true,
               isSlider: !bundleOptions.isUser,
               isVolume: audioStream ? true : false,

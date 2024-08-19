@@ -89,6 +89,9 @@ const mediasoupSocket = async (io: SocketIOServer) => {
         case "requestEffect":
           effects.onRequestEffect(event);
           break;
+        case "requestEffectPermissions":
+          effects.onRequestEffectPermissions(event);
+          break;
         default:
           break;
       }
