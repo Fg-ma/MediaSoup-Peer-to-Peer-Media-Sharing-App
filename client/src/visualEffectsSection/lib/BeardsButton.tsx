@@ -25,7 +25,7 @@ export default function BeardsButton({
   type,
   videoId,
   isUser,
-  handleEffectChange,
+  handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
@@ -34,7 +34,7 @@ export default function BeardsButton({
   type: "camera";
   videoId: string;
   isUser: boolean;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -85,7 +85,7 @@ export default function BeardsButton({
         setEffectsDisabled(true);
         setRerender((prev) => prev + 1);
 
-        await handleEffectChange("beards");
+        await handleVisualEffectChange("beards");
 
         setEffectsDisabled(false);
       }}
@@ -100,12 +100,37 @@ export default function BeardsButton({
         const effectType = target.dataset.value as BeardsEffectTypes;
         if (
           effectType in beardsEffects &&
-          effectsStyles &&
           (effectsStyles.style !== effectType || !streamEffects)
         ) {
-          effectsStyles.style = effectType;
-          effectsStyles.chinOffset = beardChinOffsetsMap[effectType];
-          await handleEffectChange("beards", streamEffects);
+          if (isUser) {
+            if (currentEffectsStyles.current[type][videoId].beards) {
+              currentEffectsStyles.current[type][videoId].beards.style =
+                effectType;
+              currentEffectsStyles.current[type][videoId].beards.chinOffset =
+                beardChinOffsetsMap[effectType];
+            }
+          } else {
+            if (
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].beards
+            ) {
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].beards.style = effectType;
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].beards.chinOffset = beardChinOffsetsMap[effectType];
+            }
+          }
+
+          await handleVisualEffectChange(
+            "beards",
+            isUser
+              ? userStreamEffects.current[type][videoId].beards
+              : remoteStreamEffects.current[username][instance][type][videoId]
+                  .beards
+          );
         }
 
         setEffectsDisabled(false);
@@ -148,7 +173,7 @@ export default function BeardsButton({
 
         setRerender((prev) => prev + 1);
 
-        await handleEffectChange("beards", streamEffects);
+        await handleVisualEffectChange("beards", streamEffects);
 
         setEffectsDisabled(false);
       }}

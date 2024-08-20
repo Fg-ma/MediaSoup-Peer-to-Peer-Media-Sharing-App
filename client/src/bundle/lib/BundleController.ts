@@ -66,6 +66,7 @@ class BundleController {
       };
     };
   }>;
+  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private remoteCurrentEffectsStyles: React.MutableRefObject<{
     [username: string]: {
       [instance: string]: EffectStylesType;
@@ -86,9 +87,15 @@ class BundleController {
   private clientMute: React.MutableRefObject<boolean>;
   private localMute: React.MutableRefObject<boolean>;
 
-  private acceptsCameraEffects: React.Dispatch<React.SetStateAction<boolean>>;
-  private acceptsScreenEffects: React.Dispatch<React.SetStateAction<boolean>>;
-  private acceptsAudioEffects: React.Dispatch<React.SetStateAction<boolean>>;
+  private acceptsAudioEffects: boolean;
+  private setAcceptsCameraEffects: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+  private setAcceptsScreenEffects: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+  private setAcceptsAudioEffects: React.Dispatch<React.SetStateAction<boolean>>;
+  private handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
 
   private onNewConsumerWasCreatedCallback?: () => void;
 
@@ -149,6 +156,7 @@ class BundleController {
         };
       };
     }>,
+    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     remoteCurrentEffectsStyles: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: EffectStylesType;
@@ -166,9 +174,11 @@ class BundleController {
     audioRef: React.RefObject<HTMLAudioElement>,
     clientMute: React.MutableRefObject<boolean>,
     localMute: React.MutableRefObject<boolean>,
-    acceptsCameraEffects: React.Dispatch<React.SetStateAction<boolean>>,
-    acceptsScreenEffects: React.Dispatch<React.SetStateAction<boolean>>,
-    acceptsAudioEffects: React.Dispatch<React.SetStateAction<boolean>>,
+    acceptsAudioEffects: boolean,
+    setAcceptsCameraEffects: React.Dispatch<React.SetStateAction<boolean>>,
+    setAcceptsScreenEffects: React.Dispatch<React.SetStateAction<boolean>>,
+    setAcceptsAudioEffects: React.Dispatch<React.SetStateAction<boolean>>,
+    handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>,
     onNewConsumerWasCreatedCallback?: () => any
   ) {
     this.isUser = isUser;
@@ -179,14 +189,17 @@ class BundleController {
     this.setAudioStream = setAudioStream;
     this.remoteTracksMap = remoteTracksMap;
     this.remoteStreamEffects = remoteStreamEffects;
+    this.currentEffectsStyles = currentEffectsStyles;
     this.remoteCurrentEffectsStyles = remoteCurrentEffectsStyles;
     this.userMedia = userMedia;
     this.audioRef = audioRef;
     this.clientMute = clientMute;
     this.localMute = localMute;
-    this.acceptsCameraEffects = acceptsCameraEffects;
-    this.acceptsScreenEffects = acceptsScreenEffects;
     this.acceptsAudioEffects = acceptsAudioEffects;
+    this.setAcceptsCameraEffects = setAcceptsCameraEffects;
+    this.setAcceptsScreenEffects = setAcceptsScreenEffects;
+    this.setAcceptsAudioEffects = setAcceptsAudioEffects;
+    this.handleAudioEffectChange = handleAudioEffectChange;
     this.onNewConsumerWasCreatedCallback = onNewConsumerWasCreatedCallback;
 
     this.bundleSocket = new BundleSocket(
@@ -198,14 +211,17 @@ class BundleController {
       this.setAudioStream,
       this.remoteTracksMap,
       this.remoteStreamEffects,
+      this.currentEffectsStyles,
       this.remoteCurrentEffectsStyles,
       this.userMedia,
       this.audioRef,
       this.clientMute,
       this.localMute,
-      this.acceptsCameraEffects,
-      this.acceptsScreenEffects,
       this.acceptsAudioEffects,
+      this.setAcceptsCameraEffects,
+      this.setAcceptsScreenEffects,
+      this.setAcceptsAudioEffects,
+      this.handleAudioEffectChange,
       this.onNewConsumerWasCreatedCallback
     );
   }
@@ -229,6 +245,12 @@ class BundleController {
         break;
       case "statesPermissionsResponsed":
         this.bundleSocket.onStatesPermissionsResponsed(event);
+        break;
+      case "effectChangeRequested":
+        this.bundleSocket.onEffectChangeRequested(event);
+        break;
+      case "clientEffectChanged":
+        this.bundleSocket.onClientEffectChanged(event);
         break;
       default:
         break;

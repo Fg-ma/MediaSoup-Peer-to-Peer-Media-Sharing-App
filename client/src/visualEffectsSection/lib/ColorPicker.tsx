@@ -20,7 +20,7 @@ export default function ColorPicker({
   setIsColorPicker,
   tintColor,
   colorPickerBtnRef,
-  handleEffectChange,
+  handleVisualEffectChange,
 }: {
   username: string;
   instance: string;
@@ -34,7 +34,7 @@ export default function ColorPicker({
   setIsColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
   tintColor: React.MutableRefObject<string>;
   colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => void;
@@ -107,7 +107,7 @@ export default function ColorPicker({
     tintColor.current = tempColor;
     setIsColorPicker(false);
     if (streamEffects) {
-      handleEffectChange("tint", streamEffects);
+      handleVisualEffectChange("tint", streamEffects);
       if (isUser) {
         userStreamEffects.current[type][videoId].tint = true;
       } else {

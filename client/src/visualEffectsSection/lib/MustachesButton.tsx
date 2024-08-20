@@ -49,7 +49,7 @@ export default function MustachesButton({
   type,
   videoId,
   isUser,
-  handleEffectChange,
+  handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
@@ -58,7 +58,7 @@ export default function MustachesButton({
   type: "camera";
   videoId: string;
   isUser: boolean;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -149,7 +149,7 @@ export default function MustachesButton({
         setEffectsDisabled(true);
         setRerender((prev) => prev + 1);
 
-        await handleEffectChange("mustaches");
+        await handleVisualEffectChange("mustaches");
 
         setEffectsDisabled(false);
       }}
@@ -166,10 +166,35 @@ export default function MustachesButton({
           effectType in mustachesEffects &&
           (effectsStyles.style !== effectType || !streamEffects)
         ) {
-          effectsStyles.style = effectType;
-          effectsStyles.noseOffset = mustacheNoseOffsetsMap[effectType];
+          if (isUser) {
+            if (currentEffectsStyles.current[type][videoId].mustaches) {
+              currentEffectsStyles.current[type][videoId].mustaches.style =
+                effectType;
+              currentEffectsStyles.current[type][videoId].mustaches.noseOffset =
+                mustacheNoseOffsetsMap[effectType];
+            }
+          } else {
+            if (
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].mustaches
+            ) {
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].mustaches.style = effectType;
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].mustaches.noseOffset = mustacheNoseOffsetsMap[effectType];
+            }
+          }
 
-          await handleEffectChange("mustaches", streamEffects);
+          await handleVisualEffectChange(
+            "mustaches",
+            isUser
+              ? userStreamEffects.current[type][videoId].mustaches
+              : remoteStreamEffects.current[username][instance][type][videoId]
+                  .mustaches
+          );
         }
 
         setEffectsDisabled(false);
@@ -210,9 +235,9 @@ export default function MustachesButton({
 
         effectsStyles.threeDim = !effectsStyles.threeDim;
 
-        setRerender((prev) => prev + 1);
+        await handleVisualEffectChange("mustaches", streamEffects);
 
-        await handleEffectChange("mustaches", streamEffects);
+        setRerender((prev) => prev + 1);
 
         setEffectsDisabled(false);
       }}

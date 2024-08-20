@@ -21,7 +21,7 @@ export default function AudioSection({
   isAudio,
   audioActive,
   setAudioActive,
-  handleMuteExternalMute,
+  handleExternalMute,
   handleDisableEnableBtns,
 }: {
   socket: React.MutableRefObject<Socket>;
@@ -35,7 +35,7 @@ export default function AudioSection({
   isAudio: React.MutableRefObject<boolean>;
   audioActive: boolean;
   setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
-  handleMuteExternalMute: () => void;
+  handleExternalMute: () => void;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const [volumeState, setVolumeState] = useState<{
@@ -118,7 +118,7 @@ export default function AudioSection({
               from: prev.to,
               to: mutedAudioRef.current ? "high" : "off",
             }));
-            handleMuteExternalMute();
+            handleExternalMute();
           }}
           className={`${
             mutedAudioRef.current

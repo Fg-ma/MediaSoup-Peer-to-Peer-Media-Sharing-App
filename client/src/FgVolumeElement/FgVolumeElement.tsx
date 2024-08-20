@@ -174,6 +174,26 @@ export default function FgVolumeElement({
     }
   };
 
+  useEffect(() => {
+    if (!audioRef.current) {
+      return;
+    }
+
+    const newVolume = audioRef.current.volume;
+    let newVolumeState;
+    if (localMute.current || newVolume === 0) {
+      newVolumeState = "off";
+    } else if (newVolume >= 0.5) {
+      newVolumeState = "high";
+    } else {
+      newVolumeState = "low";
+    }
+
+    if (volumeState.to !== newVolumeState) {
+      setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
+    }
+  }, [localMute.current]);
+
   return (
     <div
       ref={volumeContainer}

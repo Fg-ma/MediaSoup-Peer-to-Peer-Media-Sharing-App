@@ -99,29 +99,29 @@ export default function ScreenSection({
           </div>
         }
       />
-      {screenActive && (
-        <FgButton
-          externalRef={newScreenBtnRef}
-          clickFunction={() => screenSectionController.shareNewScreen()}
-          className='bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25'
-          contentFunction={() => (
-            <FgSVG
-              src={shareScreenIcon}
-              className='h-full aspect-square'
-              attributes={[
-                { key: "width", value: "100%" },
-                { key: "height", value: "100%" },
-                { key: "fill", value: "white" },
-              ]}
-            />
-          )}
-          hoverContent={
-            <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              Share a new screen
-            </div>
-          }
-        />
-      )}
+      <FgButton
+        externalRef={newScreenBtnRef}
+        clickFunction={() => screenSectionController.shareNewScreen()}
+        className={`${
+          screenActive ? "visible" : "hidden"
+        } bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25`}
+        contentFunction={() => (
+          <FgSVG
+            src={shareScreenIcon}
+            className='h-full aspect-square'
+            attributes={[
+              { key: "width", value: "100%" },
+              { key: "height", value: "100%" },
+              { key: "fill", value: "white" },
+            ]}
+          />
+        )}
+        hoverContent={
+          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+            Share a new screen
+          </div>
+        }
+      />
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function FgVideoNavigation({
   controls: ControlsLogic;
 }) {
   return (
-    <div className='video-navigation-container absolute top-0 w-full h-10 flex items-center justify-center z-20 space-x-2 pl-4 pr-0.5 pt-0.5'>
+    <div className='video-navigation-container absolute top-0 w-full h-10 flex items-center justify-center z-20 space-x-2'>
       <div className='grow text-lg cursor-default select-none'>
         {name ? name : username}
       </div>

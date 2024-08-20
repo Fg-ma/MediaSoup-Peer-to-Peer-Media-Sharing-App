@@ -24,7 +24,7 @@ export default function FaceMasksButton({
   type,
   videoId,
   isUser,
-  handleEffectChange,
+  handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
@@ -33,7 +33,7 @@ export default function FaceMasksButton({
   type: "camera";
   videoId: string;
   isUser: boolean;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -81,7 +81,7 @@ export default function FaceMasksButton({
       clickFunction={async () => {
         setEffectsDisabled(true);
 
-        await handleEffectChange("faceMasks");
+        await handleVisualEffectChange("faceMasks");
 
         setEffectsDisabled(false);
       }}
@@ -98,8 +98,30 @@ export default function FaceMasksButton({
           effectType in faceMasksEffects &&
           (effectsStyles.style !== effectType || !streamEffects)
         ) {
-          effectsStyles.style = effectType;
-          await handleEffectChange("faceMasks");
+          if (isUser) {
+            if (currentEffectsStyles.current[type][videoId].faceMasks) {
+              currentEffectsStyles.current[type][videoId].faceMasks.style =
+                effectType;
+            }
+          } else {
+            if (
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].faceMasks
+            ) {
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].faceMasks.style = effectType;
+            }
+          }
+
+          await handleVisualEffectChange(
+            "faceMasks",
+            isUser
+              ? userStreamEffects.current[type][videoId].faceMasks
+              : remoteStreamEffects.current[username][instance][type][videoId]
+                  .faceMasks
+          );
         }
 
         setEffectsDisabled(false);

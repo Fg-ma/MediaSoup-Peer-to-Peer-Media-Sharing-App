@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
-import { useStreamsContext } from "./context/StreamsContext";
+import { AudioEffectTypes, useStreamsContext } from "./context/StreamsContext";
 import { useCurrentEffectsStylesContext } from "./context/CurrentEffectsStylesContext";
 import onRouterCapabilities from "./lib/onRouterCapabilities";
 import Producers from "./lib/Producers";
@@ -197,7 +197,7 @@ export default function Main() {
     socket.current.emit("message", msg);
   };
 
-  const handleMuteExternalMute = () => {
+  const handleExternalMute = () => {
     muteAudio();
 
     const msg = {
@@ -406,6 +406,27 @@ export default function Main() {
     bundlesController.createConsumerBundle
   );
 
+  const handleExternalAudioEffectChange = async (effect: AudioEffectTypes) => {
+    await userMedia.current.audio?.changeEffects(effect, false);
+
+    if (acceptAudioEffects) {
+      const msg = {
+        type: "clientEffectChange",
+        table_id: table_id.current,
+        username: username.current,
+        instance: instance.current,
+        producerType: "audio",
+        producerId: undefined,
+        effect: effect,
+        // @ts-ignore
+        effectStyle: currentEffectsStyles.current.audio[effect],
+        blockStateChange: false,
+      };
+
+      socket.current.emit("message", msg);
+    }
+  };
+
   return (
     <div className='min-w-full min-h-full overflow-x-hidden flex-col'>
       <div className='flex justify-center min-w-full bg-black h-16 text-white items-center mb-10'>
@@ -439,7 +460,7 @@ export default function Main() {
             isAudio={isAudio}
             audioActive={audioActive}
             setAudioActive={setAudioActive}
-            handleMuteExternalMute={handleMuteExternalMute}
+            handleExternalMute={handleExternalMute}
             handleDisableEnableBtns={handleDisableEnableBtns}
           />
           <ScreenSection
@@ -484,8 +505,14 @@ export default function Main() {
           </div>
           {isAudio.current && (
             <AudioEffectsButton
-              handleMuteExternalMute={handleMuteExternalMute}
-              mutedAudioRef={mutedAudioRef}
+              socket={socket}
+              username={username.current}
+              instance={instance.current}
+              isUser={true}
+              handleAudioEffectChange={handleExternalAudioEffectChange}
+              handleMute={handleExternalMute}
+              muteStateRef={mutedAudioRef}
+              options={{ color: "black", placement: "below" }}
             />
           )}
         </div>

@@ -10,17 +10,21 @@ import Controls from "../../fgVideoControls/lib/Controls";
 type FgVideoMessageEvents =
   | {
       type: "effectChangeRequested";
+      requestedProducerType: "camera" | "screen" | "audio";
       requestedProducerId: string;
       effect: CameraEffectTypes | ScreenEffectTypes;
       effectStyle: any;
+      blockStateChange: boolean;
     }
   | {
       type: "clientEffectChanged";
       username: string;
       instance: string;
+      producerType: "camera" | "screen" | "audio";
       producerId: string;
       effect: CameraEffectTypes | ScreenEffectTypes;
       effectStyle: any;
+      blockStateChange: boolean;
     };
 
 class FgVideoController {
@@ -62,7 +66,7 @@ class FgVideoController {
 
   private fgVideoOptions: FgVideoOptions;
 
-  private handleEffectChange: (
+  private handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -100,7 +104,7 @@ class FgVideoController {
     timelineContainerRef: React.RefObject<HTMLDivElement>,
     currentTimeRef: React.RefObject<HTMLDivElement>,
     fgVideoOptions: FgVideoOptions,
-    handleEffectChange: (
+    handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>
@@ -121,7 +125,7 @@ class FgVideoController {
     this.timelineContainerRef = timelineContainerRef;
     this.currentTimeRef = currentTimeRef;
     this.fgVideoOptions = fgVideoOptions;
-    this.handleEffectChange = handleEffectChange;
+    this.handleVisualEffectChange = handleVisualEffectChange;
   }
 
   init = () => {
@@ -226,19 +230,23 @@ class FgVideoController {
 
   onEffectChangeRequested = (event: {
     type: "effectChangeRequested";
-    requestedProducerId: string;
-    effect: CameraEffectTypes | ScreenEffectTypes;
+    requestedProducerType: "camera" | "screen" | "audio";
+    requestedProducerId: string | undefined;
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
     effectStyle: any;
+    blockStateChange: boolean;
   }) => {
     if (
-      this.videoId === event.requestedProducerId &&
-      this.fgVideoOptions.acceptsVisualEffects
+      this.fgVideoOptions.acceptsVisualEffects &&
+      this.type === event.requestedProducerType &&
+      this.videoId === event.requestedProducerId
     ) {
       // @ts-ignore
       this.currentEffectsStyles.current[this.type][this.videoId][event.effect] =
         event.effectStyle;
 
-      this.handleEffectChange(event.effect);
+      // @ts-ignore
+      this.handleVisualEffectChange(event.effect, event.blockStateChange);
     }
   };
 
@@ -246,24 +254,29 @@ class FgVideoController {
     type: "clientEffectChanged";
     username: string;
     instance: string;
-    producerId: string;
-    effect: CameraEffectTypes | ScreenEffectTypes;
+    producerType: "camera" | "screen" | "audio";
+    producerId: string | undefined;
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
     effectStyle: any;
+    blockStateChange: boolean;
   }) => {
     if (
       !this.fgVideoOptions.isUser &&
       this.username === event.username &&
       this.instance === event.instance &&
+      this.type === event.producerType &&
       this.videoId === event.producerId
     ) {
-      // @ts-ignore
-      this.remoteStreamEffects.current[this.username][this.instance][this.type][
-        this.videoId
-      ][event.effect] =
+      if (!event.blockStateChange) {
         // @ts-ignore
-        !this.remoteStreamEffects.current[this.username][this.instance][
+        this.remoteStreamEffects.current[this.username][this.instance][
           this.type
-        ][this.videoId][event.effect];
+        ][this.videoId][event.effect] =
+          // @ts-ignore
+          !this.remoteStreamEffects.current[this.username][this.instance][
+            this.type
+          ][this.videoId][event.effect];
+      }
 
       // @ts-ignore
       this.remoteCurrentEffectsStyles.current[this.username][this.instance][

@@ -140,18 +140,22 @@ type MediasoupSocketEvents =
       table_id: string;
       requestedUsername: string;
       requestedInstance: string;
-      requestedProducerId: string;
+      requestedProducerType: "camera" | "screen" | "audio";
+      requestedProducerId: string | undefined;
       effect: string;
       effectStyle: any;
+      blockStateChange: boolean;
     }
   | {
       type: "clientEffectChange";
       table_id: string;
       username: string;
       instance: string;
-      producerId: string;
+      producerType: "camera" | "screen" | "audio";
+      producerId: string | undefined;
       effect: string;
       effectStyle: any;
+      blockStateChange: boolean;
     }
   | {
       type: "requestStatesPermissions";

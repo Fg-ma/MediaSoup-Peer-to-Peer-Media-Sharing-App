@@ -48,7 +48,7 @@ export default function GlassesButton({
   type,
   videoId,
   isUser,
-  handleEffectChange,
+  handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
@@ -57,7 +57,7 @@ export default function GlassesButton({
   type: "camera";
   videoId: string;
   isUser: boolean;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -148,7 +148,7 @@ export default function GlassesButton({
         setEffectsDisabled(true);
         setRerender((prev) => prev + 1);
 
-        await handleEffectChange("glasses");
+        await handleVisualEffectChange("glasses");
 
         setEffectsDisabled(false);
       }}
@@ -165,8 +165,30 @@ export default function GlassesButton({
           effectType in glassesEffects &&
           (effectsStyles.style !== effectType || !streamEffects)
         ) {
-          effectsStyles.style = effectType;
-          await handleEffectChange("glasses", streamEffects);
+          if (isUser) {
+            if (currentEffectsStyles.current[type][videoId].glasses) {
+              currentEffectsStyles.current[type][videoId].glasses.style =
+                effectType;
+            }
+          } else {
+            if (
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].glasses
+            ) {
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].glasses.style = effectType;
+            }
+          }
+
+          await handleVisualEffectChange(
+            "glasses",
+            isUser
+              ? userStreamEffects.current[type][videoId].glasses
+              : remoteStreamEffects.current[username][instance][type][videoId]
+                  .glasses
+          );
         }
 
         setEffectsDisabled(false);
@@ -209,7 +231,7 @@ export default function GlassesButton({
 
         setRerender((prev) => prev + 1);
 
-        await handleEffectChange("glasses", streamEffects);
+        await handleVisualEffectChange("glasses", streamEffects);
 
         setEffectsDisabled(false);
       }}

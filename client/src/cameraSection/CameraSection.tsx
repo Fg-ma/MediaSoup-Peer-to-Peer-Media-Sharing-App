@@ -108,29 +108,29 @@ export default function CameraSection({
           </div>
         }
       />
-      {cameraActive && (
-        <FgButton
-          externalRef={newCameraBtnRef}
-          clickFunction={() => cameraSectionController.shareNewCamera()}
-          className='bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25'
-          contentFunction={() => (
-            <FgSVG
-              src={shareCameraIcon}
-              className='h-full aspect-square'
-              attributes={[
-                { key: "width", value: "100%" },
-                { key: "height", value: "100%" },
-                { key: "fill", value: "white" },
-              ]}
-            />
-          )}
-          hoverContent={
-            <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              Publish a new camera
-            </div>
-          }
-        />
-      )}
+      <FgButton
+        externalRef={newCameraBtnRef}
+        clickFunction={() => cameraSectionController.shareNewCamera()}
+        className={`${
+          cameraActive ? "visible" : "hidden"
+        } bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25`}
+        contentFunction={() => (
+          <FgSVG
+            src={shareCameraIcon}
+            className='h-full aspect-square'
+            attributes={[
+              { key: "width", value: "100%" },
+              { key: "height", value: "100%" },
+              { key: "fill", value: "white" },
+            ]}
+          />
+        )}
+        hoverContent={
+          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+            Publish a new camera
+          </div>
+        }
+      />
     </div>
   );
 }

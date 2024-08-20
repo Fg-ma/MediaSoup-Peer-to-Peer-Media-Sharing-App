@@ -2,26 +2,36 @@ import React, { useRef, useState } from "react";
 import FgAudioElement from "./FgAudioElement";
 import AudioEffectsSection from "../audioEffectsButton/lib/AudioEffectsSection";
 import FgPortal from "../fgPortal/FgPortal";
+import { Socket } from "socket.io-client";
+import { AudioEffectTypes } from "src/context/StreamsContext";
 
 export default function FgAudioElementContainer({
+  socket,
+  table_id,
+  username,
+  instance,
+  name,
   audioStream,
   audioRef,
-  username,
-  name,
+  handleAudioEffectChange,
   handleMute,
   clientMute,
   localMute,
   isUser,
   options,
 }: {
+  socket: React.MutableRefObject<Socket>;
+  table_id: string;
+  username: string;
+  instance: string;
+  name?: string;
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
-  username: string;
-  name?: string;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
   handleMute: () => void;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
-  isUser?: boolean;
+  isUser: boolean;
   options?: {
     springDuration?: number;
     noiseThreshold?: number;
@@ -70,7 +80,12 @@ export default function FgAudioElementContainer({
       )}
       {audioEffectsSectionVisible && (
         <AudioEffectsSection
-          type='right'
+          socket={socket}
+          username={username}
+          instance={instance}
+          isUser={isUser}
+          handleAudioEffectChange={handleAudioEffectChange}
+          placement='right'
           referenceElement={
             audioElementSVGRef as unknown as React.RefObject<HTMLElement>
           }

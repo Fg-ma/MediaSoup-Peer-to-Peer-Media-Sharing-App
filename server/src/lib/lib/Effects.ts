@@ -12,15 +12,19 @@ class Effects {
     table_id: string;
     requestedUsername: string;
     requestedInstance: string;
-    requestedProducerId: string;
+    requestedProducerType: "camera" | "screen" | "audio";
+    requestedProducerId: string | undefined;
     effect: string;
     effectStyle: any;
+    blockStateChange: boolean;
   }) {
     const msg = {
       type: "effectChangeRequested",
+      requestedProducerType: event.requestedProducerType,
       requestedProducerId: event.requestedProducerId,
       effect: event.effect,
       effectStyle: event.effectStyle,
+      blockStateChange: event.blockStateChange,
     };
 
     this.io
@@ -35,17 +39,21 @@ class Effects {
     table_id: string;
     username: string;
     instance: string;
-    producerId: string;
+    producerType: "camera" | "screen" | "audio";
+    producerId: string | undefined;
     effect: string;
     effectStyle: any;
+    blockStateChange: boolean;
   }) {
     const msg = {
       type: "clientEffectChanged",
       username: event.username,
       instance: event.instance,
+      producerType: event.producerType,
       producerId: event.producerId,
       effect: event.effect,
       effectStyle: event.effectStyle,
+      blockStateChange: event.blockStateChange,
     };
 
     this.io.to(`table_${event.table_id}`).emit("message", msg);

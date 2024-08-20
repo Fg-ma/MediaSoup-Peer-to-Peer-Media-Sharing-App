@@ -4,6 +4,7 @@ import {
   useStreamsContext,
   CameraEffectTypes,
   ScreenEffectTypes,
+  AudioEffectTypes,
 } from "../context/StreamsContext";
 import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
 import "./lib/fgVideoStyles.css";
@@ -94,6 +95,7 @@ export default function FgVideo({
   audioRef,
   videoStyles,
   options,
+  handleAudioEffectChange,
   handleMute,
   handleMuteCallback,
   handleVolumeSliderCallback,
@@ -112,6 +114,7 @@ export default function FgVideo({
   audioRef: React.RefObject<HTMLAudioElement>;
   videoStyles?: React.CSSProperties;
   options?: FgVideoOptions;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
   handleMute: () => void;
   handleMuteCallback: (() => void) | undefined;
   handleVolumeSliderCallback: (
@@ -158,7 +161,7 @@ export default function FgVideo({
   const isScrubbing = useRef(false);
   const thumbnails = useRef<string[]>([]);
 
-  const handleEffectChange = async (
+  const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange: boolean = false
   ) => {
@@ -179,10 +182,12 @@ export default function FgVideo({
           table_id: table_id,
           username: username,
           instance: instance,
+          producerType: type,
           producerId: videoId,
           effect: effect,
           // @ts-ignore
           effectStyle: currentEffectsStyles.current[type][videoId][effect],
+          blockStateChange: blockStateChange,
         };
         socket?.current.emit("message", msg);
       }
@@ -192,6 +197,7 @@ export default function FgVideo({
         table_id: table_id,
         requestedUsername: username,
         requestedInstance: instance,
+        requestedProducerType: type,
         requestedProducerId: videoId,
         effect: effect,
         effectStyle:
@@ -199,7 +205,9 @@ export default function FgVideo({
           remoteCurrentEffectsStyles.current[username][instance][type][videoId][
             effect
           ],
+        blockStateChange: blockStateChange,
       };
+
       socket?.current.emit("message", msg);
     }
   };
@@ -233,7 +241,7 @@ export default function FgVideo({
     leaveVideoTimer,
     setEffectsActive,
     handleMute,
-    handleEffectChange
+    handleVisualEffectChange
   );
 
   const fgVideoController = new FgVideoController(
@@ -253,12 +261,14 @@ export default function FgVideo({
     timelineContainerRef,
     currentTimeRef,
     fgVideoOptions,
-    handleEffectChange
+    handleVisualEffectChange
   );
 
   useEffect(() => {
     // Set up initial conditions
     fgVideoController.init();
+
+    socket.current.on("message", fgVideoController.handleMessage);
 
     if (fgVideoOptions.isFullScreen) {
       document.addEventListener("fullscreenchange", () =>
@@ -302,6 +312,7 @@ export default function FgVideo({
     }
 
     return () => {
+      socket.current.off("message", fgVideoController.handleMessage);
       if (fgVideoOptions.isFullScreen) {
         document.removeEventListener("fullscreenchange", () =>
           controls.handleFullScreenChange()
@@ -338,15 +349,6 @@ export default function FgVideo({
           controls.handlePictureInPicture("leave")
         );
       }
-    };
-  }, []);
-
-  useEffect(() => {
-    socket.current.on("message", fgVideoController.handleMessage);
-
-    // Cleanup event listener on unmount
-    return () => {
-      socket.current.off("message", fgVideoController.handleMessage);
     };
   }, []);
 
@@ -416,10 +418,11 @@ export default function FgVideo({
           />
           <FgVideoControls
             socket={socket}
-            videoId={videoId}
+            table_id={table_id}
             username={username}
             instance={instance}
             type={type}
+            videoId={videoId}
             controls={controls}
             clientMute={clientMute}
             localMute={localMute}
@@ -431,7 +434,8 @@ export default function FgVideo({
             tintColor={tintColor}
             effectsActive={effectsActive}
             fgVideoOptions={fgVideoOptions}
-            handleEffectChange={handleEffectChange}
+            handleVisualEffectChange={handleVisualEffectChange}
+            handleAudioEffectChange={handleAudioEffectChange}
             handleMuteCallback={handleMuteCallback}
             handleVolumeSliderCallback={handleVolumeSliderCallback}
             tracksColorSetterCallback={tracksColorSetterCallback}

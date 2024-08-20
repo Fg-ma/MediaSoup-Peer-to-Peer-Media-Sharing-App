@@ -39,7 +39,7 @@ export default function VisualEffectsSection({
   isUser,
   acceptsVisualEffects,
   videoContainerRef,
-  handleEffectChange,
+  handleVisualEffectChange,
   tintColor,
 }: {
   username: string;
@@ -50,7 +50,7 @@ export default function VisualEffectsSection({
   isUser: boolean;
   acceptsVisualEffects: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -157,7 +157,7 @@ export default function VisualEffectsSection({
         type={type}
         videoId={videoId}
         isUser={isUser}
-        handleEffectChange={handleEffectChange}
+        handleVisualEffectChange={handleVisualEffectChange}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
       />
@@ -168,7 +168,7 @@ export default function VisualEffectsSection({
         type={type}
         videoId={videoId}
         isUser={isUser}
-        handleEffectChange={handleEffectChange}
+        handleVisualEffectChange={handleVisualEffectChange}
         tintColor={tintColor}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
@@ -179,7 +179,7 @@ export default function VisualEffectsSection({
           <EarsButton
             username={username}
             instance={instance}
-            handleEffectChange={handleEffectChange}
+            handleVisualEffectChange={handleVisualEffectChange}
             type={type}
             videoId={videoId}
             isUser={isUser}
@@ -197,7 +197,7 @@ export default function VisualEffectsSection({
             type={type}
             videoId={videoId}
             isUser={isUser}
-            handleEffectChange={handleEffectChange}
+            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
@@ -209,7 +209,7 @@ export default function VisualEffectsSection({
           <BeardsButton
             username={username}
             instance={instance}
-            handleEffectChange={handleEffectChange}
+            handleVisualEffectChange={handleVisualEffectChange}
             type={type}
             videoId={videoId}
             isUser={isUser}
@@ -227,7 +227,7 @@ export default function VisualEffectsSection({
             type={type}
             videoId={videoId}
             isUser={isUser}
-            handleEffectChange={handleEffectChange}
+            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
@@ -242,7 +242,7 @@ export default function VisualEffectsSection({
             type={type}
             videoId={videoId}
             isUser={isUser}
-            handleEffectChange={handleEffectChange}
+            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />

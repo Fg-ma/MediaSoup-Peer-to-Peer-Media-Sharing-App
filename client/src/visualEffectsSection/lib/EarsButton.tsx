@@ -25,7 +25,7 @@ export default function EarsButton({
   type,
   videoId,
   isUser,
-  handleEffectChange,
+  handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
@@ -34,7 +34,7 @@ export default function EarsButton({
   type: "camera";
   videoId: string;
   isUser: boolean;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -85,7 +85,7 @@ export default function EarsButton({
         setEffectsDisabled(true);
         setRerender((prev) => prev + 1);
 
-        await handleEffectChange("ears");
+        await handleVisualEffectChange("ears");
 
         setEffectsDisabled(false);
       }}
@@ -100,15 +100,48 @@ export default function EarsButton({
         const effectType = target.dataset.value as EarsEffectTypes;
         if (
           effectType in earsEffects &&
-          effectsStyles &&
           (effectsStyles.style !== effectType || !streamEffects)
         ) {
-          effectsStyles.style = effectType;
-          effectsStyles.leftEarWidthFactor =
-            earsWidthFactorMap[effectType].leftEarWidthFactor;
-          effectsStyles.rightEarWidthFactor =
-            earsWidthFactorMap[effectType].rightEarWidthFactor;
-          await handleEffectChange("ears", streamEffects);
+          if (isUser) {
+            if (currentEffectsStyles.current[type][videoId].ears) {
+              currentEffectsStyles.current[type][videoId].ears.style =
+                effectType;
+              currentEffectsStyles.current[type][
+                videoId
+              ].ears.leftEarWidthFactor =
+                earsWidthFactorMap[effectType].leftEarWidthFactor;
+              currentEffectsStyles.current[type][
+                videoId
+              ].ears.rightEarWidthFactor =
+                earsWidthFactorMap[effectType].rightEarWidthFactor;
+            }
+          } else {
+            if (
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].ears
+            ) {
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].ears.style = effectType;
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].ears.leftEarWidthFactor =
+                earsWidthFactorMap[effectType].leftEarWidthFactor;
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].ears.rightEarWidthFactor =
+                earsWidthFactorMap[effectType].rightEarWidthFactor;
+            }
+          }
+
+          await handleVisualEffectChange(
+            "ears",
+            isUser
+              ? userStreamEffects.current[type][videoId].ears
+              : remoteStreamEffects.current[username][instance][type][videoId]
+                  .ears
+          );
         }
 
         setEffectsDisabled(false);
@@ -151,7 +184,7 @@ export default function EarsButton({
 
         setRerender((prev) => prev + 1);
 
-        await handleEffectChange("beards", streamEffects);
+        await handleVisualEffectChange("beards", streamEffects);
 
         setEffectsDisabled(false);
       }}

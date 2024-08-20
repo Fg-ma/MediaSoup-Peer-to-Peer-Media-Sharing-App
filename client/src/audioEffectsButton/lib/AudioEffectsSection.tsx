@@ -1,45 +1,50 @@
 import React, { useState, useEffect, useRef } from "react";
-import ReactDOM from "react-dom";
-import { Transition, Variants, motion } from "framer-motion";
-import { useStreamsContext } from "../../context/StreamsContext";
+import { Socket } from "socket.io-client";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../../context/StreamsContext";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import muteIcon from "../../../public/svgs/audio/muteIcon.svg";
 import mixAudioEffectsIcon from "../../../public/svgs/mixAudioEffectsIcon.svg";
 import mixAudioEffectsOffIcon from "../../../public/svgs/mixAudioEffectsOffIcon.svg";
-import robotIcon from "../../../public/svgs/audio/robotIcon.svg";
-import robotOffIcon from "../../../public/svgs/audio/robotOffIcon.svg";
-import echoIcon from "../../../public/svgs/audio/echoIcon.svg";
-import echoOffIcon from "../../../public/svgs/audio/echoOffIcon.svg";
-import alienIcon from "../../../public/svgs/audio/alienIcon.svg";
-import alienOffIcon from "../../../public/svgs/audio/alienOffIcon.svg";
-import underwaterIcon from "../../../public/svgs/audio/underwaterIcon.svg";
-import underwaterOffIcon from "../../../public/svgs/audio/underwaterOffIcon.svg";
-import telephoneIcon from "../../../public/svgs/audio/telephoneIcon.svg";
-import telephoneOffIcon from "../../../public/svgs/audio/telephoneOffIcon.svg";
 import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
 import FgPanel from "../../fgPanel/FgPanel";
 import AudioMixEffectsPortal from "./AudioMixEffectsPortal";
+import RobotEffect from "./RobotEffect";
+import EchoEffect from "./EchoEffect";
+import AlienEffect from "./AlienEffect";
+import UnderwaterEffect from "./UnderwaterEffect";
+import TelephoneEffect from "./TelephoneEffect";
 
 export default function AudioEffectsSection({
-  type,
+  socket,
+  username,
+  instance,
+  isUser,
+  handleAudioEffectChange,
+  placement,
   referenceElement,
   padding,
   handleMute,
   muteStateRef,
   closeCallback,
 }: {
-  type: "above" | "below" | "left" | "right";
+  socket: React.MutableRefObject<Socket>;
+  username: string;
+  instance: string;
+  isUser: boolean;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  placement: "above" | "below" | "left" | "right";
   referenceElement: React.RefObject<HTMLElement>;
   padding: number;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
   closeCallback?: () => void;
 }) {
-  const { userMedia, userStreamEffects } = useStreamsContext();
-
-  const [rerender, setRerender] = useState(false);
+  const [rerender, setRerender] = useState(0);
   const [cols, setCols] = useState(3);
   const [volumeState, setVolumeState] = useState<{
     from: "off" | "low" | "high" | "";
@@ -74,6 +79,28 @@ export default function AudioEffectsSection({
       if (cols !== 6) setCols(6);
     }
   };
+
+  const handleMessage = (event: any) => {
+    switch (event.type) {
+      case "effectChangeRequested":
+        setRerender((prev) => prev + 1);
+        break;
+      case "clientEffectChanged":
+        setRerender((prev) => prev + 1);
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    socket.current.on("message", handleMessage);
+
+    // Cleanup event listener on unmount
+    return () => {
+      socket.current.off("message", handleMessage);
+    };
+  }, []);
 
   return (
     <>
@@ -160,182 +187,41 @@ export default function AudioEffectsSection({
               }
               options={{ hoverTimeoutDuration: 350 }}
             />
-            <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                userMedia.current.audio?.changeEffects("robot", false);
-                setRerender((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={
-                      userStreamEffects.current.audio.robot
-                        ? robotOffIcon
-                        : robotIcon
-                    }
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                      { key: "fill", value: "white" },
-                      { key: "stroke", value: "white" },
-                      ...(userStreamEffects.current.audio.robot
-                        ? [{ key: "fill", value: "red", id: "eyes" }]
-                        : []),
-                    ]}
-                  />
-                );
-              }}
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {userStreamEffects.current.audio.robot
-                    ? "Remove robot effect"
-                    : "Robot effect"}
-                </div>
-              }
-              options={{ hoverTimeoutDuration: 350 }}
+            <RobotEffect
+              username={username}
+              instance={instance}
+              isUser={isUser}
+              handleAudioEffectChange={handleAudioEffectChange}
             />
-            <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                userMedia.current.audio?.changeEffects("echo", false);
-                setRerender((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={
-                      userStreamEffects.current.audio.echo
-                        ? echoOffIcon
-                        : echoIcon
-                    }
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                      {
-                        key: "fill",
-                        value: userStreamEffects.current.audio.echo
-                          ? "white"
-                          : "none",
-                      },
-                      { key: "stroke", value: "white" },
-                    ]}
-                  />
-                );
-              }}
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {userStreamEffects.current.audio.echo
-                    ? "Remove echo effect"
-                    : "Echo effect"}
-                </div>
-              }
-              options={{ hoverTimeoutDuration: 350 }}
+            <EchoEffect
+              username={username}
+              instance={instance}
+              isUser={isUser}
+              handleAudioEffectChange={handleAudioEffectChange}
             />
-            <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                userMedia.current.audio?.changeEffects("alien", false);
-                setRerender((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={
-                      userStreamEffects.current.audio.alien
-                        ? alienOffIcon
-                        : alienIcon
-                    }
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                    ]}
-                  />
-                );
-              }}
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {userStreamEffects.current.audio.alien
-                    ? "Remove alien effect"
-                    : "Alien effect"}
-                </div>
-              }
-              options={{ hoverTimeoutDuration: 350 }}
+            <AlienEffect
+              username={username}
+              instance={instance}
+              isUser={isUser}
+              handleAudioEffectChange={handleAudioEffectChange}
             />
-            <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                userMedia.current.audio?.changeEffects("underwater", false);
-                setRerender((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={
-                      userStreamEffects.current.audio.underwater
-                        ? underwaterOffIcon
-                        : underwaterIcon
-                    }
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                      { key: "fill", value: "white" },
-                      { key: "stroke", value: "white" },
-                    ]}
-                  />
-                );
-              }}
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {userStreamEffects.current.audio.underwater
-                    ? "Remove underwater effect"
-                    : "Underwater effect"}
-                </div>
-              }
-              options={{ hoverTimeoutDuration: 350 }}
+            <UnderwaterEffect
+              username={username}
+              instance={instance}
+              isUser={isUser}
+              handleAudioEffectChange={handleAudioEffectChange}
             />
-            <FgButton
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                userMedia.current.audio?.changeEffects("telephone", false);
-                setRerender((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={
-                      userStreamEffects.current.audio.telephone
-                        ? telephoneOffIcon
-                        : telephoneIcon
-                    }
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                      { key: "fill", value: "white" },
-                      { key: "stroke", value: "white" },
-                    ]}
-                  />
-                );
-              }}
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {userStreamEffects.current.audio.telephone
-                    ? "Remove telephone effect"
-                    : "Telephone effect"}
-                </div>
-              }
-              options={{ hoverTimeoutDuration: 350 }}
+            <TelephoneEffect
+              username={username}
+              instance={instance}
+              isUser={isUser}
+              handleAudioEffectChange={handleAudioEffectChange}
             />
           </div>
         }
         initPosition={{
           referenceElement: referenceElement.current ?? undefined,
-          placement: type,
+          placement: placement,
           padding: padding,
         }}
         initWidth={176}

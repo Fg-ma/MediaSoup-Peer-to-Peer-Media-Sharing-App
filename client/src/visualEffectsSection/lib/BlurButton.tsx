@@ -15,7 +15,7 @@ export default function BlurButton({
   type,
   videoId,
   isUser,
-  handleEffectChange,
+  handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
@@ -24,7 +24,7 @@ export default function BlurButton({
   type: "camera" | "screen";
   videoId: string;
   isUser: boolean;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -45,7 +45,7 @@ export default function BlurButton({
         setEffectsDisabled(true);
         setRerender((prev) => prev + 1);
 
-        await handleEffectChange("blur");
+        await handleVisualEffectChange("blur");
 
         setEffectsDisabled(false);
       }}

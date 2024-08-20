@@ -1,18 +1,45 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../fgButton/FgButton";
+import { Socket } from "socket.io-client";
+import { AudioEffectTypes } from "../context/StreamsContext";
 import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
+import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import AudioEffectsSection from "./lib/AudioEffectsSection";
 import audioEffectIcon from "../../public/svgs/audioEffectIcon.svg";
 import audioEffectOffIcon from "../../public/svgs/audioEffectOffIcon.svg";
 
+const defaultAudioEffectsButtonOptions: {
+  color: string;
+  placement: "above" | "below" | "left" | "right";
+} = { color: "white", placement: "above" };
+
 export default function AudioEffectsButton({
-  handleMuteExternalMute,
-  mutedAudioRef,
+  socket,
+  username,
+  instance,
+  isUser,
+  handleAudioEffectChange,
+  handleMute,
+  muteStateRef,
+  options,
 }: {
-  handleMuteExternalMute: () => void;
-  mutedAudioRef: React.MutableRefObject<boolean>;
+  socket: React.MutableRefObject<Socket>;
+  username: string;
+  instance: string;
+  isUser: boolean;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  handleMute: () => void;
+  muteStateRef: React.MutableRefObject<boolean>;
+  options?: {
+    color?: string;
+    placement?: "above" | "below" | "left" | "right";
+  };
 }) {
+  const audioEffectsButtonOptions = {
+    ...defaultAudioEffectsButtonOptions,
+    ...options,
+  };
+
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const [effectSectionActive, setEffectSectionActive] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -35,6 +62,7 @@ export default function AudioEffectsButton({
               attributes={[
                 { key: "width", value: "95%" },
                 { key: "height", value: "95%" },
+                { key: "fill", value: audioEffectsButtonOptions.color },
               ]}
             />
           );
@@ -48,15 +76,20 @@ export default function AudioEffectsButton({
             <></>
           )
         }
-        className='flex items-center justify-center w-10 aspect-square'
+        className='flex items-center justify-center w-10 min-w-10 aspect-square'
       />
       {effectSectionActive && (
         <AudioEffectsSection
-          type='below'
+          socket={socket}
+          username={username}
+          instance={instance}
+          isUser={isUser}
+          handleAudioEffectChange={handleAudioEffectChange}
+          placement={audioEffectsButtonOptions.placement}
           referenceElement={buttonRef}
           padding={12}
-          handleMute={handleMuteExternalMute}
-          muteStateRef={mutedAudioRef}
+          handleMute={handleMute}
+          muteStateRef={muteStateRef}
           closeCallback={() => setEffectSectionActive(false)}
         />
       )}

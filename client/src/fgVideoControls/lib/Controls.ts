@@ -47,7 +47,7 @@ class Controls {
   private setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
 
   private handleMute: () => void;
-  private handleEffectChange: (
+  private handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -98,7 +98,7 @@ class Controls {
     setEffectsActive: React.Dispatch<React.SetStateAction<boolean>>,
 
     handleMute: () => void,
-    handleEffectChange: (
+    handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>
@@ -143,7 +143,7 @@ class Controls {
 
     this.setEffectsActive = setEffectsActive;
     this.handleMute = handleMute;
-    this.handleEffectChange = handleEffectChange;
+    this.handleVisualEffectChange = handleVisualEffectChange;
   }
 
   formatDuration(time: number) {
@@ -372,7 +372,7 @@ class Controls {
   }
 
   handlePausePlay() {
-    this.handleEffectChange("pause");
+    this.handleVisualEffectChange("pause");
     this.paused.current = !this.paused.current;
     if (this.paused.current) {
       this.videoContainerRef.current?.classList.add("paused");

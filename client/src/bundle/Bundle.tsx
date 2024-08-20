@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import FgVideo from "../fgVideo/FgVideo";
-import { useStreamsContext } from "../context/StreamsContext";
+import { AudioEffectTypes, useStreamsContext } from "../context/StreamsContext";
 import BundleController from "./lib/BundleController";
 import FgAudioElementContainer from "../fgAudioElement/FgAudioElementContainer";
 import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
@@ -59,7 +59,8 @@ export default function Bundle({
 
   const { userMedia, remoteTracksMap, remoteStreamEffects } =
     useStreamsContext();
-  const { remoteCurrentEffectsStyles } = useCurrentEffectsStylesContext();
+  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
+    useCurrentEffectsStylesContext();
 
   const [cameraStreams, setCameraStreams] = useState<
     | {
@@ -93,6 +94,44 @@ export default function Bundle({
     bundleOptions.acceptsAudioEffects
   );
 
+  const handleAudioEffectChange = async (effect: AudioEffectTypes) => {
+    if (bundleOptions.isUser) {
+      await userMedia.current.audio?.changeEffects(effect, false);
+
+      if (acceptsAudioEffects) {
+        const msg = {
+          type: "clientEffectChange",
+          table_id: table_id,
+          username: username,
+          instance: instance,
+          producerType: "audio",
+          producerId: undefined,
+          effect: effect,
+          // @ts-ignore
+          effectStyle: currentEffectsStyles.current.audio[effect],
+          blockStateChange: false,
+        };
+        socket.current.emit("message", msg);
+      }
+    } else if (acceptsAudioEffects) {
+      const msg = {
+        type: "requestEffectChange",
+        table_id: table_id,
+        requestedUsername: username,
+        requestedInstance: instance,
+        requestedProducerType: "audio",
+        requestedProducerId: undefined,
+        effect: effect,
+        effectStyle:
+          // @ts-ignore
+          remoteCurrentEffectsStyles.current[username][instance].audio[effect],
+        blockStateChange: false,
+      };
+
+      socket.current.emit("message", msg);
+    }
+  };
+
   const bundleController = new BundleController(
     bundleOptions.isUser,
     username,
@@ -102,14 +141,17 @@ export default function Bundle({
     setAudioStream,
     remoteTracksMap,
     remoteStreamEffects,
+    currentEffectsStyles,
     remoteCurrentEffectsStyles,
     userMedia,
     audioRef,
     clientMute,
     localMute,
+    acceptsAudioEffects,
     setAcceptsCameraEffects,
     setAcceptsScreenEffects,
     setAcceptsAudioEffects,
+    handleAudioEffectChange,
     onNewConsumerWasCreatedCallback
   );
 
@@ -215,6 +257,7 @@ export default function Bundle({
             instance={instance}
             name={name}
             type='camera'
+            handleAudioEffectChange={handleAudioEffectChange}
             clientMute={clientMute}
             localMute={localMute}
             videoStream={cameraStream}
@@ -262,6 +305,7 @@ export default function Bundle({
             instance={instance}
             name={name}
             type='screen'
+            handleAudioEffectChange={handleAudioEffectChange}
             clientMute={clientMute}
             localMute={localMute}
             videoStream={screenStream}
@@ -301,9 +345,14 @@ export default function Bundle({
         Object.keys(screenStreams || {}).length === 0 && (
           <div id={`${username}_audio_container`} className='relative'>
             <FgAudioElementContainer
+              socket={socket}
+              table_id={table_id}
+              username={username}
+              instance={instance}
+              name={name}
               audioStream={audioStream}
               audioRef={audioRef}
-              username={username}
+              handleAudioEffectChange={handleAudioEffectChange}
               handleMute={handleMute}
               localMute={localMute}
               isUser={bundleOptions.isUser}

@@ -16,7 +16,7 @@ export default function TintSection({
   videoId,
   type,
   isUser,
-  handleEffectChange,
+  handleVisualEffectChange,
   tintColor,
   effectsDisabled,
   setEffectsDisabled,
@@ -26,7 +26,7 @@ export default function TintSection({
   videoId: string;
   type: "camera" | "screen";
   isUser: boolean;
-  handleEffectChange: (
+  handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -64,7 +64,7 @@ export default function TintSection({
           setEffectsDisabled(true);
           setRerender((prev) => prev + 1);
 
-          await handleEffectChange("tint");
+          await handleVisualEffectChange("tint");
 
           setEffectsDisabled(false);
         }}
@@ -121,7 +121,7 @@ export default function TintSection({
             setIsColorPicker={setIsColorPicker}
             tintColor={tintColor}
             colorPickerBtnRef={colorPickerBtnRef}
-            handleEffectChange={handleEffectChange}
+            handleVisualEffectChange={handleVisualEffectChange}
           />
         )}
       </div>
