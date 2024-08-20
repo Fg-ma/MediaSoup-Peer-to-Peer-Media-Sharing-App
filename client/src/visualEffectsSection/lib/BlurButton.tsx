@@ -10,14 +10,20 @@ import blurIcon from "../../../public/svgs/blurIcon.svg";
 import blurOffIcon from "../../../public/svgs/blurOffIcon.svg";
 
 export default function BlurButton({
-  videoId,
+  username,
+  instance,
   type,
+  videoId,
+  isUser,
   handleEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
-  videoId: string;
+  username: string;
+  instance: string;
   type: "camera" | "screen";
+  videoId: string;
+  isUser: boolean;
   handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
@@ -25,16 +31,19 @@ export default function BlurButton({
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { userStreamEffects } = useStreamsContext();
-  const [buttonState, setButtonState] = useState("");
+  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
+
+  const [rerender, setRerender] = useState(0);
+
+  const streamEffects = isUser
+    ? userStreamEffects.current[type][videoId].blur
+    : remoteStreamEffects.current[username][instance][type][videoId].blur;
 
   return (
     <FgButton
       clickFunction={async () => {
         setEffectsDisabled(true);
-        setButtonState(
-          userStreamEffects.current[type][videoId].blur ? "inActive" : "active"
-        );
+        setRerender((prev) => prev + 1);
 
         await handleEffectChange("blur");
 
@@ -43,11 +52,7 @@ export default function BlurButton({
       contentFunction={() => {
         return (
           <FgSVG
-            src={
-              userStreamEffects.current[type][videoId].blur
-                ? blurOffIcon
-                : blurIcon
-            }
+            src={streamEffects ? blurOffIcon : blurIcon}
             attributes={[
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
@@ -61,7 +66,7 @@ export default function BlurButton({
           Blur
         </div>
       }
-      className='flex items-center justify-center w-10 aspect-square'
+      className='flex items-center justify-center min-w-10 w-10 aspect-square'
       options={{
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,

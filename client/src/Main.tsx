@@ -11,13 +11,13 @@ import UserDevice from "./UserDevice";
 import Deadbanding from "./effects/visualEffects/lib/Deadbanding";
 import BrowserMedia from "./BrowserMedia";
 import BundlesController from "./bundlesController";
-import onClientMuteStateRequested from "./lib/onClientMuteStateRequested";
 import subscribe from "./subscribe";
 import joinTable from "./joinTable";
 import AudioEffectsButton from "./audioEffectsButton/AudioEffectsButton";
 import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
+import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
 
 const websocketURL = "http://localhost:8000";
 
@@ -114,7 +114,11 @@ type MediasoupSocketEvents =
       producerType: string;
       producerId: string;
     }
-  | { type: "clientMuteStateRequested"; username: string; instance: string };
+  | {
+      type: "statesPermissionsRequested";
+      inquiringUsername: string;
+      inquiringInstance: string;
+    };
 
 export default function Main() {
   const {
@@ -122,9 +126,11 @@ export default function Main() {
     userCameraCount,
     userScreenCount,
     userStreamEffects,
+    remoteStreamEffects,
     remoteTracksMap,
   } = useStreamsContext();
-  const { currentEffectsStyles } = useCurrentEffectsStylesContext();
+  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
+    useCurrentEffectsStylesContext();
 
   const socket = useRef<Socket>(io(websocketURL));
   const device = useRef<mediasoup.Device>();
@@ -240,14 +246,19 @@ export default function Main() {
       case "producerDisconnected":
         producers.onProducerDisconnected(event);
         break;
-      case "clientMuteStateRequested":
-        onClientMuteStateRequested(
+      case "statesPermissionsRequested":
+        onStatesPermissionsRequested(
           event,
           socket,
           table_id,
           username,
           instance,
-          mutedAudioRef
+          mutedAudioRef,
+          acceptCameraEffects,
+          acceptScreenEffects,
+          acceptAudioEffects,
+          userStreamEffects,
+          currentEffectsStyles
         );
         break;
       default:
@@ -327,6 +338,8 @@ export default function Main() {
     instance,
     userMedia,
     remoteVideosContainerRef,
+    remoteStreamEffects,
+    remoteCurrentEffectsStyles,
     isCamera,
     isScreen,
     isAudio,

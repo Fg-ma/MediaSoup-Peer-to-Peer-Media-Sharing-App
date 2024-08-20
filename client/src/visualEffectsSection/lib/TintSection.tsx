@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import ColorPicker from "./ColorPicker";
@@ -11,15 +11,21 @@ import tintIcon from "../../../public/svgs/tintIcon.svg";
 import tintOffIcon from "../../../public/svgs/tintOffIcon.svg";
 
 export default function TintSection({
+  username,
+  instance,
   videoId,
   type,
+  isUser,
   handleEffectChange,
   tintColor,
   effectsDisabled,
   setEffectsDisabled,
 }: {
+  username: string;
+  instance: string;
   videoId: string;
   type: "camera" | "screen";
+  isUser: boolean;
   handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
@@ -28,29 +34,35 @@ export default function TintSection({
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { userStreamEffects } = useStreamsContext();
+  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [color, setColor] = useState("#F56114");
-  const [buttonState, setButtonState] = useState("");
+  const [rerender, setRerender] = useState(0);
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
+
+  const streamEffects = isUser
+    ? userStreamEffects.current[type][videoId].tint
+    : remoteStreamEffects.current[username][instance][type][videoId].tint;
 
   const handleColorPicker = () => {
     setTempColor(tintColor.current);
     setIsColorPicker((prev) => !prev);
   };
 
+  if (isUser) {
+    useEffect(() => {
+      setRerender((prev) => prev + 1);
+    }, [userStreamEffects.current[type][videoId].tint]);
+  }
+
   return (
     <div className='w-max flex'>
       <FgButton
         clickFunction={async () => {
           setEffectsDisabled(true);
-          setButtonState(
-            userStreamEffects.current[type][videoId].tint
-              ? "inActive"
-              : "active"
-          );
+          setRerender((prev) => prev + 1);
 
           await handleEffectChange("tint");
 
@@ -59,11 +71,7 @@ export default function TintSection({
         contentFunction={() => {
           return (
             <FgSVG
-              src={
-                userStreamEffects.current[type][videoId].tint
-                  ? tintOffIcon
-                  : tintIcon
-              }
+              src={streamEffects ? tintOffIcon : tintIcon}
               attributes={[
                 { key: "width", value: "95%" },
                 { key: "height", value: "95%" },
@@ -77,13 +85,13 @@ export default function TintSection({
             Tint
           </div>
         }
-        className='flex items-center justify-center w-10 aspect-square'
+        className='flex items-center justify-center min-w-10 w-10 aspect-square'
         options={{
           hoverTimeoutDuration: 750,
           disabled: effectsDisabled,
         }}
       />
-      <div className='flex items-center justify-center w-10 aspect-square'>
+      <div className='flex items-center justify-center min-w-10 w-10 aspect-square'>
         <FgButton
           externalRef={colorPickerBtnRef}
           clickFunction={() => handleColorPicker()}
@@ -101,8 +109,11 @@ export default function TintSection({
         />
         {isColorPicker && (
           <ColorPicker
-            videoId={videoId}
+            username={username}
+            instance={instance}
             type={type}
+            videoId={videoId}
+            isUser={isUser}
             color={color}
             setColor={setColor}
             tempColor={tempColor}

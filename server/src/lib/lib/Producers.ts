@@ -1,4 +1,4 @@
-import { Server as SocketIOServer, Socket } from "socket.io";
+import { Server as SocketIOServer } from "socket.io";
 import {
   DtlsParameters,
   RtpCapabilities,
@@ -115,9 +115,9 @@ class Producers {
   async onConnectProducerTransport(event: {
     type: string;
     dtlsParameters: DtlsParameters;
-    table_id: "string";
-    username: "string";
-    instance: "string";
+    table_id: string;
+    username: string;
+    instance: string;
   }) {
     if (
       !tableProducerTransports[event.table_id] ||

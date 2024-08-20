@@ -43,14 +43,20 @@ import threeDim_shadesIcon from "../../../public/svgs/glasses/threeDim_shadesIco
 import threeDim_shadesOffIcon from "../../../public/svgs/glasses/threeDim_shadesOffIcon.svg";
 
 export default function GlassesButton({
+  username,
+  instance,
   type,
   videoId,
+  isUser,
   handleEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
+  username: string;
+  instance: string;
   type: "camera";
   videoId: string;
+  isUser: boolean;
   handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
@@ -58,9 +64,19 @@ export default function GlassesButton({
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { currentEffectsStyles } = useCurrentEffectsStylesContext();
-  const { userStreamEffects } = useStreamsContext();
-  const [buttonState, setButtonState] = useState("");
+  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
+    useCurrentEffectsStylesContext();
+  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
+
+  const [rerender, setRerender] = useState(0);
+
+  const streamEffects = isUser
+    ? userStreamEffects.current[type][videoId].glasses
+    : remoteStreamEffects.current[username][instance][type][videoId].glasses;
+  const effectsStyles = isUser
+    ? currentEffectsStyles.current[type][videoId].glasses
+    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
+        .glasses;
 
   const glassesEffects: {
     [key in GlassesEffectTypes]: {
@@ -130,15 +146,7 @@ export default function GlassesButton({
     <FgButton
       clickFunction={async () => {
         setEffectsDisabled(true);
-        setButtonState(
-          currentEffectsStyles.current[type][videoId].glasses?.threeDim
-            ? userStreamEffects.current[type][videoId].glasses
-              ? "threeDimOffIcon"
-              : "threeDimIcon"
-            : userStreamEffects.current[type][videoId].glasses
-            ? "offIcon"
-            : "icon"
-        );
+        setRerender((prev) => prev + 1);
 
         await handleEffectChange("glasses");
 
@@ -146,11 +154,7 @@ export default function GlassesButton({
       }}
       holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
-        if (
-          !currentEffectsStyles.current[type][videoId].glasses ||
-          !target ||
-          !target.dataset.value
-        ) {
+        if (!effectsStyles || !target || !target.dataset.value) {
           return;
         }
 
@@ -159,34 +163,26 @@ export default function GlassesButton({
         const effectType = target.dataset.value as GlassesEffectTypes;
         if (
           effectType in glassesEffects &&
-          (currentEffectsStyles.current[type][videoId].glasses.style !==
-            effectType ||
-            !userStreamEffects.current[type][videoId].glasses)
+          (effectsStyles.style !== effectType || !streamEffects)
         ) {
-          currentEffectsStyles.current[type][videoId].glasses.style =
-            effectType;
-          await handleEffectChange(
-            "glasses",
-            userStreamEffects.current[type][videoId].glasses
-          );
+          effectsStyles.style = effectType;
+          await handleEffectChange("glasses", streamEffects);
         }
 
         setEffectsDisabled(false);
       }}
       contentFunction={() => {
-        if (!currentEffectsStyles.current[type][videoId].glasses) {
+        if (!effectsStyles) {
           return;
         }
 
         const iconSrc =
-          glassesEffects[
-            currentEffectsStyles.current[type][videoId].glasses.style
-          ][
-            currentEffectsStyles.current[type][videoId].glasses.threeDim
-              ? userStreamEffects.current[type][videoId].glasses
+          glassesEffects[effectsStyles.style][
+            effectsStyles.threeDim
+              ? streamEffects
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
-              : userStreamEffects.current[type][videoId].glasses
+              : streamEffects
               ? "offIcon"
               : "icon"
           ];
@@ -198,36 +194,22 @@ export default function GlassesButton({
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
             ]}
-            data-value={
-              currentEffectsStyles.current[type][videoId].glasses.style
-            }
+            data-value={effectsStyles.style}
           />
         );
       }}
       doubleClickFunction={async () => {
-        if (!currentEffectsStyles.current[type][videoId].glasses) {
+        if (!effectsStyles) {
           return;
         }
 
         setEffectsDisabled(true);
 
-        currentEffectsStyles.current[type][videoId].glasses.threeDim =
-          !currentEffectsStyles.current[type][videoId].glasses.threeDim;
+        effectsStyles.threeDim = !effectsStyles.threeDim;
 
-        setButtonState(
-          currentEffectsStyles.current[type][videoId].glasses.threeDim
-            ? userStreamEffects.current[type][videoId].glasses
-              ? "threeDimOffIcon"
-              : "threeDimIcon"
-            : userStreamEffects.current[type][videoId].glasses
-            ? "offIcon"
-            : "icon"
-        );
+        setRerender((prev) => prev + 1);
 
-        await handleEffectChange(
-          "glasses",
-          userStreamEffects.current[type][videoId].glasses
-        );
+        await handleEffectChange("glasses", streamEffects);
 
         setEffectsDisabled(false);
       }}
@@ -259,10 +241,9 @@ export default function GlassesButton({
           Glasses
         </div>
       }
-      className='flex items-center justify-center w-10 aspect-square'
+      className='flex items-center justify-center min-w-10 w-10 aspect-square'
       options={{
-        defaultDataValue:
-          currentEffectsStyles.current[type][videoId].glasses?.style,
+        defaultDataValue: effectsStyles?.style,
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,
       }}

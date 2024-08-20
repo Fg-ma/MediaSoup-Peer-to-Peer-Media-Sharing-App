@@ -44,14 +44,20 @@ import threeDim_disguiseMustacheIcon from "../../../public/svgs/mustaches/threeD
 import threeDim_disguiseMustacheOffIcon from "../../../public/svgs/mustaches/threeDim_disguiseMustacheOffIcon.svg";
 
 export default function MustachesButton({
+  username,
+  instance,
   type,
   videoId,
+  isUser,
   handleEffectChange,
   effectsDisabled,
   setEffectsDisabled,
 }: {
+  username: string;
+  instance: string;
   type: "camera";
   videoId: string;
+  isUser: boolean;
   handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
@@ -59,9 +65,19 @@ export default function MustachesButton({
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { currentEffectsStyles } = useCurrentEffectsStylesContext();
-  const { userStreamEffects } = useStreamsContext();
-  const [buttonState, setButtonState] = useState("");
+  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
+    useCurrentEffectsStylesContext();
+  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
+
+  const [rerender, setRerender] = useState(0);
+
+  const streamEffects = isUser
+    ? userStreamEffects.current[type][videoId].mustaches
+    : remoteStreamEffects.current[username][instance][type][videoId].mustaches;
+  const effectsStyles = isUser
+    ? currentEffectsStyles.current[type][videoId].mustaches
+    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
+        .mustaches;
 
   const mustachesEffects: {
     [key in MustachesEffectTypes]: {
@@ -131,15 +147,7 @@ export default function MustachesButton({
     <FgButton
       clickFunction={async () => {
         setEffectsDisabled(true);
-        setButtonState(
-          currentEffectsStyles.current[type][videoId].mustaches?.threeDim
-            ? userStreamEffects.current[type][videoId].mustaches
-              ? "threeDimOffIcon"
-              : "threeDimIcon"
-            : userStreamEffects.current[type][videoId].mustaches
-            ? "offIcon"
-            : "icon"
-        );
+        setRerender((prev) => prev + 1);
 
         await handleEffectChange("mustaches");
 
@@ -147,11 +155,7 @@ export default function MustachesButton({
       }}
       holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
         const target = event.target as HTMLElement;
-        if (
-          !currentEffectsStyles.current[type][videoId].mustaches ||
-          !target ||
-          !target.dataset.value
-        ) {
+        if (!effectsStyles || !target || !target.dataset.value) {
           return;
         }
 
@@ -160,36 +164,28 @@ export default function MustachesButton({
         const effectType = target.dataset.value as MustachesEffectTypes;
         if (
           effectType in mustachesEffects &&
-          (currentEffectsStyles.current[type][videoId].mustaches.style !==
-            effectType ||
-            !userStreamEffects.current[type][videoId].mustaches)
+          (effectsStyles.style !== effectType || !streamEffects)
         ) {
-          currentEffectsStyles.current[type][videoId].mustaches.style =
-            effectType;
-          currentEffectsStyles.current[type][videoId].mustaches.noseOffset =
-            mustacheNoseOffsetsMap[effectType];
-          await handleEffectChange(
-            "mustaches",
-            userStreamEffects.current[type][videoId].mustaches
-          );
+          effectsStyles.style = effectType;
+          effectsStyles.noseOffset = mustacheNoseOffsetsMap[effectType];
+
+          await handleEffectChange("mustaches", streamEffects);
         }
 
         setEffectsDisabled(false);
       }}
       contentFunction={() => {
-        if (!currentEffectsStyles.current[type][videoId].mustaches) {
+        if (!effectsStyles) {
           return;
         }
 
         const iconSrc =
-          mustachesEffects[
-            currentEffectsStyles.current[type][videoId].mustaches.style
-          ][
-            currentEffectsStyles.current[type][videoId].mustaches.threeDim
-              ? userStreamEffects.current[type][videoId].mustaches
+          mustachesEffects[effectsStyles.style][
+            effectsStyles.threeDim
+              ? streamEffects
                 ? "threeDimOffIcon"
                 : "threeDimIcon"
-              : userStreamEffects.current[type][videoId].mustaches
+              : streamEffects
               ? "offIcon"
               : "icon"
           ];
@@ -201,36 +197,22 @@ export default function MustachesButton({
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
             ]}
-            data-value={
-              currentEffectsStyles.current[type][videoId].mustaches.style
-            }
+            data-value={effectsStyles.style}
           />
         );
       }}
       doubleClickFunction={async () => {
-        if (!currentEffectsStyles.current[type][videoId].mustaches) {
+        if (!effectsStyles) {
           return;
         }
 
         setEffectsDisabled(true);
 
-        currentEffectsStyles.current[type][videoId].mustaches.threeDim =
-          !currentEffectsStyles.current[type][videoId].mustaches.threeDim;
+        effectsStyles.threeDim = !effectsStyles.threeDim;
 
-        setButtonState(
-          currentEffectsStyles.current[type][videoId].mustaches.threeDim
-            ? userStreamEffects.current[type][videoId].mustaches
-              ? "threeDimOffIcon"
-              : "threeDimIcon"
-            : userStreamEffects.current[type][videoId].mustaches
-            ? "offIcon"
-            : "icon"
-        );
+        setRerender((prev) => prev + 1);
 
-        await handleEffectChange(
-          "mustaches",
-          userStreamEffects.current[type][videoId].mustaches
-        );
+        await handleEffectChange("mustaches", streamEffects);
 
         setEffectsDisabled(false);
       }}
@@ -262,10 +244,9 @@ export default function MustachesButton({
           Mustache
         </div>
       }
-      className='flex items-center justify-center w-10 aspect-square'
+      className='flex items-center justify-center min-w-10 w-10 aspect-square'
       options={{
-        defaultDataValue:
-          currentEffectsStyles.current[type][videoId].mustaches?.style,
+        defaultDataValue: effectsStyles?.style,
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,
       }}

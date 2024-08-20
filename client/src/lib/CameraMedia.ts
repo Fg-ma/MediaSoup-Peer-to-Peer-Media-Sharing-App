@@ -1,5 +1,10 @@
 import {
   beardChinOffsetsMap,
+  defaultBeard,
+  defaultEars,
+  defaultFaceMask,
+  defaultGlasses,
+  defaultMustache,
   earsWidthFactorMap,
   EffectStylesType,
   mustacheNoseOffsetsMap,
@@ -105,12 +110,6 @@ class CameraMedia {
     this.gl = gl;
 
     this.initCameraStream = initCameraStream;
-
-    const defaultEars = "dogEars";
-    const defaultBeard = "classicalCurlyBeard";
-    const defaultGlasses = "defaultGlasses";
-    const defaultMustache = "mustache1";
-    const defaultFaceMask = "faceMask1";
 
     if (!currentEffectsStyles.current.camera[this.cameraId]) {
       currentEffectsStyles.current.camera[this.cameraId] = {

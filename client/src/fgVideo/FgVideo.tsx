@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import "./lib/fgVideoStyles.css";
 import {
   useStreamsContext,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
+import "./lib/fgVideoStyles.css";
 import handleVisualEffect from "../effects/visualEffects/handleVisualEffect";
 import Controls from "../fgVideoControls/lib/Controls";
 import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";
@@ -124,7 +124,10 @@ export default function FgVideo({
     ...options,
   };
 
-  const { userMedia, userStreamEffects } = useStreamsContext();
+  const { userMedia, userStreamEffects, remoteStreamEffects } =
+    useStreamsContext();
+  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
+    useCurrentEffectsStylesContext();
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -169,13 +172,33 @@ export default function FgVideo({
         userStreamEffects,
         tintColor
       );
-    } else {
+
+      if (fgVideoOptions.acceptsVisualEffects) {
+        const msg = {
+          type: "clientEffectChange",
+          table_id: table_id,
+          username: username,
+          instance: instance,
+          producerId: videoId,
+          effect: effect,
+          // @ts-ignore
+          effectStyle: currentEffectsStyles.current[type][videoId][effect],
+        };
+        socket?.current.emit("message", msg);
+      }
+    } else if (fgVideoOptions.acceptsVisualEffects) {
       const msg = {
-        type: "requestEffect",
-        effect: effect,
+        type: "requestEffectChange",
         table_id: table_id,
-        username: username,
-        producerId: videoId,
+        requestedUsername: username,
+        requestedInstance: instance,
+        requestedProducerId: videoId,
+        effect: effect,
+        effectStyle:
+          // @ts-ignore
+          remoteCurrentEffectsStyles.current[username][instance][type][videoId][
+            effect
+          ],
       };
       socket?.current.emit("message", msg);
     }
@@ -214,10 +237,15 @@ export default function FgVideo({
   );
 
   const fgVideoController = new FgVideoController(
-    videoId,
+    username,
+    instance,
     type,
+    videoId,
     controls,
     videoStream,
+    remoteStreamEffects,
+    currentEffectsStyles,
+    remoteCurrentEffectsStyles,
     videoRef,
     videoContainerRef,
     audioRef,
@@ -314,11 +342,11 @@ export default function FgVideo({
   }, []);
 
   useEffect(() => {
-    socket?.current.on("message", fgVideoController.handleMessage);
+    socket.current.on("message", fgVideoController.handleMessage);
 
     // Cleanup event listener on unmount
     return () => {
-      socket?.current.off("message", fgVideoController.handleMessage);
+      socket.current.off("message", fgVideoController.handleMessage);
     };
   }, []);
 

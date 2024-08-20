@@ -7,39 +7,48 @@ class Effects {
     this.io = io;
   }
 
-  onRequestEffect(event: {
-    type: "requestEffect";
-    effect: string;
+  onRequestEffectChange(event: {
+    type: "requestEffectChange";
     table_id: string;
-    username: string;
-    producerId: string;
+    requestedUsername: string;
+    requestedInstance: string;
+    requestedProducerId: string;
+    effect: string;
+    effectStyle: any;
   }) {
     const msg = {
-      type: "acceptEffect",
+      type: "effectChangeRequested",
+      requestedProducerId: event.requestedProducerId,
       effect: event.effect,
-      producerId: event.producerId,
+      effectStyle: event.effectStyle,
     };
-    this.io.to(`user_${event.table_id}_${event.username}`).emit("message", msg);
+
+    this.io
+      .to(
+        `instance_${event.table_id}_${event.requestedUsername}_${event.requestedInstance}`
+      )
+      .emit("message", msg);
   }
 
-  onRequestEffectPermissions(event: {
-    type: "requestEffectPermissions";
+  onClientEffectChange(event: {
+    type: "clientEffectChange";
     table_id: string;
     username: string;
     instance: string;
-    producerUsername: string;
-    producerInstance: string;
+    producerId: string;
+    effect: string;
+    effectStyle: any;
   }) {
     const msg = {
-      type: "effectPermissionRequest",
+      type: "clientEffectChanged",
       username: event.username,
       instance: event.instance,
+      producerId: event.producerId,
+      effect: event.effect,
+      effectStyle: event.effectStyle,
     };
-    this.io
-      .to(
-        `instance_${event.table_id}_${event.producerUsername}_${event.producerInstance}`
-      )
-      .emit("message", msg);
+
+    this.io.to(`table_${event.table_id}`).emit("message", msg);
   }
 }
 

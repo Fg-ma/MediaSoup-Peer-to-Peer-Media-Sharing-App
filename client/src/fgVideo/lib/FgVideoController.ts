@@ -1,17 +1,57 @@
+import { EffectStylesType } from "../../context/CurrentEffectsStylesContext";
 import {
+  AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../context/StreamsContext";
 import { defaultFgVideoOptions, FgVideoOptions } from "../FgVideo";
-import Controls from "src/fgVideoControls/lib/Controls";
+import Controls from "../../fgVideoControls/lib/Controls";
+
+type FgVideoMessageEvents =
+  | {
+      type: "effectChangeRequested";
+      requestedProducerId: string;
+      effect: CameraEffectTypes | ScreenEffectTypes;
+      effectStyle: any;
+    }
+  | {
+      type: "clientEffectChanged";
+      username: string;
+      instance: string;
+      producerId: string;
+      effect: CameraEffectTypes | ScreenEffectTypes;
+      effectStyle: any;
+    };
 
 class FgVideoController {
-  private videoId: string;
+  private username: string;
+  private instance: string;
   private type: "camera" | "screen";
+  private videoId: string;
 
   private controls: Controls;
 
   private videoStream: MediaStream | undefined;
+
+  private remoteStreamEffects: React.MutableRefObject<{
+    [username: string]: {
+      [instance: string]: {
+        camera: {
+          [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+        };
+        screen: {
+          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+        };
+        audio: { [effectType in AudioEffectTypes]: boolean };
+      };
+    };
+  }>;
+  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
+  private remoteCurrentEffectsStyles: React.MutableRefObject<{
+    [username: string]: {
+      [instance: string]: EffectStylesType;
+    };
+  }>;
 
   private videoRef: React.RefObject<HTMLVideoElement>;
   private videoContainerRef: React.RefObject<HTMLDivElement>;
@@ -21,16 +61,38 @@ class FgVideoController {
   private currentTimeRef: React.RefObject<HTMLDivElement>;
 
   private fgVideoOptions: FgVideoOptions;
+
   private handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
 
   constructor(
-    videoId: string,
+    username: string,
+    instance: string,
     type: "camera" | "screen",
+    videoId: string,
     controls: Controls,
     videoStream: MediaStream | undefined,
+    remoteStreamEffects: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: {
+          camera: {
+            [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+          };
+          screen: {
+            [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+          };
+          audio: { [effectType in AudioEffectTypes]: boolean };
+        };
+      };
+    }>,
+    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    remoteCurrentEffectsStyles: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: EffectStylesType;
+      };
+    }>,
     videoRef: React.RefObject<HTMLVideoElement>,
     videoContainerRef: React.RefObject<HTMLDivElement>,
     audioRef: React.RefObject<HTMLAudioElement>,
@@ -43,10 +105,15 @@ class FgVideoController {
       blockStateChange?: boolean
     ) => Promise<void>
   ) {
-    this.videoId = videoId;
+    this.username = username;
+    this.instance = instance;
     this.type = type;
+    this.videoId = videoId;
     this.controls = controls;
     this.videoStream = videoStream;
+    this.remoteStreamEffects = remoteStreamEffects;
+    this.currentEffectsStyles = currentEffectsStyles;
+    this.remoteCurrentEffectsStyles = remoteCurrentEffectsStyles;
     this.videoRef = videoRef;
     this.videoContainerRef = videoContainerRef;
     this.audioRef = audioRef;
@@ -57,7 +124,7 @@ class FgVideoController {
     this.handleEffectChange = handleEffectChange;
   }
 
-  init() {
+  init = () => {
     // Set videoStream as srcObject
     if (
       this.videoRef.current &&
@@ -155,17 +222,68 @@ class FgVideoController {
           : 1
       }`
     );
-  }
+  };
 
-  handleMessage(event: any) {
+  onEffectChangeRequested = (event: {
+    type: "effectChangeRequested";
+    requestedProducerId: string;
+    effect: CameraEffectTypes | ScreenEffectTypes;
+    effectStyle: any;
+  }) => {
+    if (
+      this.videoId === event.requestedProducerId &&
+      this.fgVideoOptions.acceptsVisualEffects
+    ) {
+      // @ts-ignore
+      this.currentEffectsStyles.current[this.type][this.videoId][event.effect] =
+        event.effectStyle;
+
+      this.handleEffectChange(event.effect);
+    }
+  };
+
+  onClientEffectChanged = (event: {
+    type: "clientEffectChanged";
+    username: string;
+    instance: string;
+    producerId: string;
+    effect: CameraEffectTypes | ScreenEffectTypes;
+    effectStyle: any;
+  }) => {
+    if (
+      !this.fgVideoOptions.isUser &&
+      this.username === event.username &&
+      this.instance === event.instance &&
+      this.videoId === event.producerId
+    ) {
+      // @ts-ignore
+      this.remoteStreamEffects.current[this.username][this.instance][this.type][
+        this.videoId
+      ][event.effect] =
+        // @ts-ignore
+        !this.remoteStreamEffects.current[this.username][this.instance][
+          this.type
+        ][this.videoId][event.effect];
+
+      // @ts-ignore
+      this.remoteCurrentEffectsStyles.current[this.username][this.instance][
+        this.type
+      ][this.videoId][event.effect] = event.effectStyle;
+    }
+  };
+
+  handleMessage = (event: FgVideoMessageEvents) => {
     switch (event.type) {
-      case "acceptEffect":
-        this.onAcceptEffect(event);
+      case "effectChangeRequested":
+        this.onEffectChangeRequested(event);
+        break;
+      case "clientEffectChanged":
+        this.onClientEffectChanged(event);
         break;
       default:
         break;
     }
-  }
+  };
 
   handleVisibilityChange() {
     if (this.type !== "camera") {
@@ -180,16 +298,6 @@ class FgVideoController {
       if (this.videoContainerRef.current?.classList.contains("paused")) {
         this.controls.handlePausePlay();
       }
-    }
-  }
-
-  onAcceptEffect(event: {
-    type: "acceptBlur";
-    effect: CameraEffectTypes | ScreenEffectTypes;
-    producerId: string;
-  }) {
-    if (this.videoId === event.producerId) {
-      this.handleEffectChange(event.effect);
     }
   }
 }

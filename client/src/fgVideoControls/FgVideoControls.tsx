@@ -71,9 +71,17 @@ export default function FgVideoControls({
         <AnimatePresence>
           {effectsActive && (
             <VisualEffectsSection
-              videoContainerRef={videoContainerRef}
+              username={username}
+              instance={instance}
               type={type}
               videoId={videoId}
+              socket={socket}
+              isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
+              acceptsVisualEffects={
+                fgVideoOptions.acceptsVisualEffects ??
+                defaultFgVideoOptions.acceptsVisualEffects
+              }
+              videoContainerRef={videoContainerRef}
               handleEffectChange={handleEffectChange}
               tintColor={tintColor}
             />

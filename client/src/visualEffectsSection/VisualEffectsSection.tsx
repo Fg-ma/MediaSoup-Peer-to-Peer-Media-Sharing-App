@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Socket } from "socket.io-client";
 import { Transition, Variants, motion } from "framer-motion";
 import {
   CameraEffectTypes,
@@ -30,21 +31,32 @@ const EffectSectionTransition: Transition = {
 };
 
 export default function VisualEffectsSection({
-  videoContainerRef,
+  username,
+  instance,
   type,
   videoId,
+  socket,
+  isUser,
+  acceptsVisualEffects,
+  videoContainerRef,
   handleEffectChange,
   tintColor,
 }: {
-  videoContainerRef: React.RefObject<HTMLDivElement>;
+  username: string;
+  instance: string;
   type: "camera" | "screen";
   videoId: string;
+  socket: React.MutableRefObject<Socket>;
+  isUser: boolean;
+  acceptsVisualEffects: boolean;
+  videoContainerRef: React.RefObject<HTMLDivElement>;
   handleEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
 }) {
+  const [rerender, setRerender] = useState(0);
   const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
 
@@ -83,12 +95,38 @@ export default function VisualEffectsSection({
       }
     };
 
+    socket.current.on("message", handleMessage);
+
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
+      socket.current.off("message", handleMessage);
+
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
     };
   }, []);
+
+  const handleMessage = (event: any) => {
+    switch (event.type) {
+      case "effectChangeRequested":
+        if (videoId === event.requestedProducerId && acceptsVisualEffects) {
+          setRerender((prev) => prev + 1);
+        }
+        break;
+      case "clientEffectChanged":
+        if (
+          !isUser &&
+          username === event.username &&
+          instance === event.instance &&
+          videoId === event.producerId
+        ) {
+          setRerender((prev) => prev + 1);
+        }
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <motion.div
@@ -114,16 +152,22 @@ export default function VisualEffectsSection({
       transition={EffectSectionTransition}
     >
       <BlurButtton
-        videoId={videoId}
+        username={username}
+        instance={instance}
         type={type}
+        videoId={videoId}
+        isUser={isUser}
         handleEffectChange={handleEffectChange}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <TintSection
-        videoId={videoId}
+        username={username}
+        instance={instance}
         type={type}
+        videoId={videoId}
+        isUser={isUser}
         handleEffectChange={handleEffectChange}
         tintColor={tintColor}
         effectsDisabled={effectsDisabled}
@@ -133,9 +177,12 @@ export default function VisualEffectsSection({
         <>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <EarsButton
+            username={username}
+            instance={instance}
             handleEffectChange={handleEffectChange}
             type={type}
             videoId={videoId}
+            isUser={isUser}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
@@ -145,9 +192,12 @@ export default function VisualEffectsSection({
         <>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <GlassesButton
-            handleEffectChange={handleEffectChange}
+            username={username}
+            instance={instance}
             type={type}
             videoId={videoId}
+            isUser={isUser}
+            handleEffectChange={handleEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
@@ -157,9 +207,12 @@ export default function VisualEffectsSection({
         <>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <BeardsButton
+            username={username}
+            instance={instance}
             handleEffectChange={handleEffectChange}
             type={type}
             videoId={videoId}
+            isUser={isUser}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
@@ -169,9 +222,12 @@ export default function VisualEffectsSection({
         <>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <MustachesButton
-            handleEffectChange={handleEffectChange}
+            username={username}
+            instance={instance}
             type={type}
             videoId={videoId}
+            isUser={isUser}
+            handleEffectChange={handleEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
@@ -181,9 +237,12 @@ export default function VisualEffectsSection({
         <>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <FaceMasksButton
-            handleEffectChange={handleEffectChange}
+            username={username}
+            instance={instance}
             type={type}
             videoId={videoId}
+            isUser={isUser}
+            handleEffectChange={handleEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />

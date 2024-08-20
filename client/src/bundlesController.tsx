@@ -4,6 +4,22 @@ import Bundle from "./bundle/Bundle";
 import CameraMedia from "./lib/CameraMedia";
 import ScreenMedia from "./lib/ScreenMedia";
 import AudioMedia from "./lib/AudioMedia";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "./context/StreamsContext";
+import {
+  beardChinOffsetsMap,
+  defaultBeard,
+  defaultEars,
+  defaultFaceMask,
+  defaultGlasses,
+  defaultMustache,
+  earsWidthFactorMap,
+  EffectStylesType,
+  mustacheNoseOffsetsMap,
+} from "./context/CurrentEffectsStylesContext";
 
 class BundlesController {
   private socket: React.MutableRefObject<Socket>;
@@ -22,6 +38,24 @@ class BundlesController {
   }>;
 
   private remoteVideosContainerRef: React.RefObject<HTMLDivElement>;
+  private remoteStreamEffects: React.MutableRefObject<{
+    [username: string]: {
+      [instance: string]: {
+        camera: {
+          [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+        };
+        screen: {
+          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+        };
+        audio: { [effectType in AudioEffectTypes]: boolean };
+      };
+    };
+  }>;
+  private remoteCurrentEffectsStyles: React.MutableRefObject<{
+    [username: string]: {
+      [instance: string]: EffectStylesType;
+    };
+  }>;
 
   private isCamera: React.MutableRefObject<boolean>;
   private isScreen: React.MutableRefObject<boolean>;
@@ -57,6 +91,24 @@ class BundlesController {
       audio: AudioMedia | undefined;
     }>,
     remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
+    remoteStreamEffects: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: {
+          camera: {
+            [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+          };
+          screen: {
+            [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+          };
+          audio: { [effectType in AudioEffectTypes]: boolean };
+        };
+      };
+    }>,
+    remoteCurrentEffectsStyles: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: EffectStylesType;
+      };
+    }>,
     isCamera: React.MutableRefObject<boolean>,
     isScreen: React.MutableRefObject<boolean>,
     isAudio: React.MutableRefObject<boolean>,
@@ -79,6 +131,8 @@ class BundlesController {
     this.instance = instance;
     this.userMedia = userMedia;
     this.remoteVideosContainerRef = remoteVideosContainerRef;
+    this.remoteStreamEffects = remoteStreamEffects;
+    this.remoteCurrentEffectsStyles = remoteCurrentEffectsStyles;
     this.isCamera = isCamera;
     this.isScreen = isScreen;
     this.isAudio = isAudio;
@@ -157,6 +211,99 @@ class BundlesController {
       !this.bundles[trackUsername] ||
       !this.bundles[trackUsername][trackInstance]
     ) {
+      if (!this.remoteStreamEffects.current[trackUsername]) {
+        this.remoteStreamEffects.current[trackUsername] = {};
+      }
+      if (!this.remoteStreamEffects.current[trackUsername][trackInstance]) {
+        this.remoteStreamEffects.current[trackUsername][trackInstance] = {
+          camera: {},
+          screen: {},
+          audio: {
+            robot: false,
+            echo: false,
+            alien: false,
+            underwater: false,
+            telephone: false,
+          },
+        };
+      }
+
+      if (!this.remoteCurrentEffectsStyles.current[trackUsername]) {
+        this.remoteCurrentEffectsStyles.current[trackUsername] = {};
+      }
+      if (
+        !this.remoteCurrentEffectsStyles.current[trackUsername][trackInstance]
+      ) {
+        this.remoteCurrentEffectsStyles.current[trackUsername][trackInstance] =
+          { camera: {}, screen: {}, audio: {} };
+      }
+
+      for (const cameraId in remoteCameraStreams) {
+        this.remoteStreamEffects.current[trackUsername][trackInstance].camera[
+          cameraId
+        ] = {
+          pause: false,
+          blur: false,
+          tint: false,
+          ears: false,
+          glasses: false,
+          beards: false,
+          mustaches: false,
+          faceMasks: false,
+        };
+
+        if (
+          !this.remoteCurrentEffectsStyles.current[trackUsername][trackInstance]
+            .camera[cameraId]
+        ) {
+          this.remoteCurrentEffectsStyles.current[trackUsername][
+            trackInstance
+          ].camera[cameraId] = {
+            glasses: { style: defaultGlasses, threeDim: false },
+            ears: {
+              style: defaultEars,
+              threeDim: false,
+              leftEarWidthFactor:
+                earsWidthFactorMap[defaultEars].leftEarWidthFactor,
+              rightEarWidthFactor:
+                earsWidthFactorMap[defaultEars].rightEarWidthFactor,
+            },
+            beards: {
+              style: defaultBeard,
+              threeDim: false,
+              chinOffset: beardChinOffsetsMap[defaultBeard],
+            },
+            mustaches: {
+              style: defaultMustache,
+              threeDim: false,
+              noseOffset: mustacheNoseOffsetsMap[defaultMustache],
+            },
+            faceMasks: {
+              style: defaultFaceMask,
+              threeDim: true,
+            },
+          };
+        }
+      }
+      for (const screenId in remoteScreenStreams) {
+        this.remoteStreamEffects.current[trackUsername][trackInstance].screen[
+          screenId
+        ] = {
+          pause: false,
+          blur: false,
+          tint: false,
+        };
+
+        if (
+          !this.remoteCurrentEffectsStyles.current[trackUsername][trackInstance]
+            .screen[screenId]
+        ) {
+          this.remoteCurrentEffectsStyles.current[trackUsername][
+            trackInstance
+          ].screen[screenId] = {};
+        }
+      }
+
       const newBundle = (
         <Bundle
           socket={this.socket}
@@ -176,26 +323,15 @@ class BundlesController {
           initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
           onRendered={() => {
             const msg = {
-              type: "requestClientMuteState",
+              type: "requestStatesPermissions",
               table_id: this.table_id.current,
-              username: this.username.current,
-              instance: this.instance.current,
-              producerUsername: trackUsername,
-              producerInstance: trackInstance,
+              inquiringUsername: this.username.current,
+              inquiringInstance: this.instance.current,
+              inquiredUsername: trackUsername,
+              inquiredInstance: trackInstance,
             };
 
             this.socket.current.emit("message", msg);
-
-            const message = {
-              type: "requestEffectPermissions",
-              table_id: this.table_id.current,
-              username: this.username.current,
-              instance: this.instance.current,
-              producerUsername: trackUsername,
-              producerInstance: trackInstance,
-            };
-
-            this.socket.current.emit("message", message);
           }}
           onNewConsumerWasCreatedCallback={() => {
             const msg = {

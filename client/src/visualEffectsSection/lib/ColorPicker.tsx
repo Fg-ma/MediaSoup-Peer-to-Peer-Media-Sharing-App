@@ -8,8 +8,11 @@ import {
 } from "../../context/StreamsContext";
 
 export default function ColorPicker({
-  videoId,
+  username,
+  instance,
   type,
+  videoId,
+  isUser,
   color,
   setColor,
   tempColor,
@@ -19,8 +22,11 @@ export default function ColorPicker({
   colorPickerBtnRef,
   handleEffectChange,
 }: {
-  videoId: string;
+  username: string;
+  instance: string;
   type: "camera" | "screen";
+  videoId: string;
+  isUser: boolean;
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
   tempColor: string;
@@ -33,7 +39,7 @@ export default function ColorPicker({
     blockStateChange?: boolean
   ) => void;
 }) {
-  const { userStreamEffects } = useStreamsContext();
+  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [hexValue, setHexValue] = useState(color.slice(1));
   const [colorPickerPosition, setColorPickerPosition] = useState<{
@@ -49,6 +55,10 @@ export default function ColorPicker({
     top: 0,
     left: 0,
   });
+
+  const streamEffects = isUser
+    ? userStreamEffects.current[type][videoId].tint
+    : remoteStreamEffects.current[username][instance][type][videoId].tint;
 
   const getColorPickerPosition = () => {
     const rect = colorPickerBtnRef.current?.getBoundingClientRect();
@@ -96,9 +106,14 @@ export default function ColorPicker({
     setColor(tempColor);
     tintColor.current = tempColor;
     setIsColorPicker(false);
-    if (userStreamEffects.current[type][videoId].tint) {
-      handleEffectChange("tint", userStreamEffects.current[type][videoId].tint);
-      userStreamEffects.current[type][videoId].tint = true;
+    if (streamEffects) {
+      handleEffectChange("tint", streamEffects);
+      if (isUser) {
+        userStreamEffects.current[type][videoId].tint = true;
+      } else {
+        remoteStreamEffects.current[username][instance][type][videoId].tint =
+          true;
+      }
     }
   };
 

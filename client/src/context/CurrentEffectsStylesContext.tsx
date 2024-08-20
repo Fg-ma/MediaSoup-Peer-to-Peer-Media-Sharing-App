@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useRef } from "react";
 
+export const defaultEars = "dogEars";
+export const defaultBeard = "classicalCurlyBeard";
+export const defaultGlasses = "defaultGlasses";
+export const defaultMustache = "mustache1";
+export const defaultFaceMask = "faceMask1";
+
 export type EarsEffectTypes = "dogEars";
 
 export const earsWidthFactorMap: {
@@ -86,6 +92,11 @@ export interface CurrentEffectsStylesContextProviderProps {
 
 export interface CurrentEffectsStylesContextType {
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
+  remoteCurrentEffectsStyles: React.MutableRefObject<{
+    [username: string]: {
+      [instance: string]: EffectStylesType;
+    };
+  }>;
 }
 
 const CurrentEffectsStylesContext = createContext<
@@ -110,11 +121,17 @@ export function CurrentEffectsStylesContextProvider({
     screen: {},
     audio: {},
   });
+  const remoteCurrentEffectsStyles = useRef<{
+    [username: string]: {
+      [instance: string]: EffectStylesType;
+    };
+  }>({});
 
   return (
     <CurrentEffectsStylesContext.Provider
       value={{
         currentEffectsStyles,
+        remoteCurrentEffectsStyles,
       }}
     >
       {children}

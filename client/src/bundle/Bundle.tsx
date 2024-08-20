@@ -4,6 +4,7 @@ import FgVideo from "../fgVideo/FgVideo";
 import { useStreamsContext } from "../context/StreamsContext";
 import BundleController from "./lib/BundleController";
 import FgAudioElementContainer from "../fgAudioElement/FgAudioElementContainer";
+import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
 
 interface BundleOptions {
   isUser?: boolean;
@@ -56,7 +57,9 @@ export default function Bundle({
     ...options,
   };
 
-  const { userMedia, remoteTracksMap } = useStreamsContext();
+  const { userMedia, remoteTracksMap, remoteStreamEffects } =
+    useStreamsContext();
+  const { remoteCurrentEffectsStyles } = useCurrentEffectsStylesContext();
 
   const [cameraStreams, setCameraStreams] = useState<
     | {
@@ -80,9 +83,15 @@ export default function Bundle({
   const clientMute = useRef(false); // User audio mute
   const localMute = useRef(false); // Not user audio mute
 
-  const acceptsCameraEffects = useRef(bundleOptions.acceptsCameraEffects);
-  const acceptsScreenEffects = useRef(bundleOptions.acceptsScreenEffects);
-  const acceptsAudioEffects = useRef(bundleOptions.acceptsAudioEffects);
+  const [acceptsCameraEffects, setAcceptsCameraEffects] = useState(
+    bundleOptions.acceptsCameraEffects
+  );
+  const [acceptsScreenEffects, setAcceptsScreenEffects] = useState(
+    bundleOptions.acceptsScreenEffects
+  );
+  const [acceptsAudioEffects, setAcceptsAudioEffects] = useState(
+    bundleOptions.acceptsAudioEffects
+  );
 
   const bundleController = new BundleController(
     bundleOptions.isUser,
@@ -92,10 +101,15 @@ export default function Bundle({
     setScreenStreams,
     setAudioStream,
     remoteTracksMap,
+    remoteStreamEffects,
+    remoteCurrentEffectsStyles,
     userMedia,
     audioRef,
     clientMute,
     localMute,
+    setAcceptsCameraEffects,
+    setAcceptsScreenEffects,
+    setAcceptsAudioEffects,
     onNewConsumerWasCreatedCallback
   );
 
@@ -207,8 +221,8 @@ export default function Bundle({
             audioRef={audioRef}
             options={{
               isUser: bundleOptions.isUser,
-              acceptsVisualEffects: acceptsCameraEffects.current,
-              acceptsAudioEffects: acceptsAudioEffects.current,
+              acceptsVisualEffects: acceptsCameraEffects,
+              acceptsAudioEffects: acceptsAudioEffects,
               isStream: true,
               flipVideo: true,
               isSlider: !bundleOptions.isUser,
@@ -254,8 +268,8 @@ export default function Bundle({
             audioRef={audioRef}
             options={{
               isUser: bundleOptions.isUser,
-              acceptsVisualEffects: acceptsScreenEffects.current,
-              acceptsAudioEffects: acceptsAudioEffects.current,
+              acceptsVisualEffects: acceptsScreenEffects,
+              acceptsAudioEffects: acceptsAudioEffects,
               isStream: true,
               isSlider: !bundleOptions.isUser,
               isVolume: audioStream ? true : false,

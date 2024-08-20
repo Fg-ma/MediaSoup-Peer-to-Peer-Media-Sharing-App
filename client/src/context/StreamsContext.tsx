@@ -47,6 +47,19 @@ export interface StreamsContextType {
     };
     audio: { [effectType in AudioEffectTypes]: boolean };
   }>;
+  remoteStreamEffects: React.MutableRefObject<{
+    [username: string]: {
+      [instance: string]: {
+        camera: {
+          [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+        };
+        screen: {
+          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+        };
+        audio: { [effectType in AudioEffectTypes]: boolean };
+      };
+    };
+  }>;
   remoteTracksMap: React.MutableRefObject<{
     [username: string]: {
       [instance: string]: {
@@ -109,6 +122,19 @@ export function StreamsContextProvider({
       telephone: false,
     },
   });
+  const remoteStreamEffects = useRef<{
+    [username: string]: {
+      [instance: string]: {
+        camera: {
+          [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+        };
+        screen: {
+          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+        };
+        audio: { [effectType in AudioEffectTypes]: boolean };
+      };
+    };
+  }>({});
   const remoteTracksMap = useRef<{
     [username: string]: {
       [instance: string]: {
@@ -126,6 +152,7 @@ export function StreamsContextProvider({
         userScreenCount,
         userMedia,
         userStreamEffects,
+        remoteStreamEffects,
         remoteTracksMap,
       }}
     >
