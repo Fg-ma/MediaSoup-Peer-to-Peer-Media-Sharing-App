@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
@@ -13,11 +13,14 @@ import BrowserMedia from "./BrowserMedia";
 import BundlesController from "./bundlesController";
 import subscribe from "./subscribe";
 import joinTable from "./joinTable";
-import AudioEffectsButton from "./audioEffectsButton/AudioEffectsButton";
 import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
+
+const AudioEffectsButton = React.lazy(
+  () => import("./audioEffectsButton/AudioEffectsButton")
+);
 
 const websocketURL = "http://localhost:8000";
 
@@ -504,16 +507,18 @@ export default function Main() {
             </button>
           </div>
           {isAudio.current && (
-            <AudioEffectsButton
-              socket={socket}
-              username={username.current}
-              instance={instance.current}
-              isUser={true}
-              handleAudioEffectChange={handleExternalAudioEffectChange}
-              handleMute={handleExternalMute}
-              muteStateRef={mutedAudioRef}
-              options={{ color: "black", placement: "below" }}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <AudioEffectsButton
+                socket={socket}
+                username={username.current}
+                instance={instance.current}
+                isUser={true}
+                handleAudioEffectChange={handleExternalAudioEffectChange}
+                handleMute={handleExternalMute}
+                muteStateRef={mutedAudioRef}
+                options={{ color: "black", placement: "below" }}
+              />
+            </Suspense>
           )}
         </div>
         <div className='flex justify-center mt-5'>

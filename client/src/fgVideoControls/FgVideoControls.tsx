@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { AnimatePresence } from "framer-motion";
 import Controls from "./lib/Controls";
@@ -71,6 +71,7 @@ export default function FgVideoControls({
   ) => void;
   tracksColorSetterCallback: () => void;
 }) {
+  const rightVideoControlsRef = useRef<HTMLDivElement>(null);
   const [rerender, setRerender] = useState(0);
 
   const handleMessage = (event: any) => {
@@ -79,12 +80,22 @@ export default function FgVideoControls({
     }
   };
 
+  const handleWheel = (event: WheelEvent) => {
+    if (rightVideoControlsRef.current) {
+      rightVideoControlsRef.current.scrollLeft += event.deltaY;
+    }
+  };
+
   useEffect(() => {
     socket.current.on("message", (event) => handleMessage(event));
+
+    rightVideoControlsRef.current?.addEventListener("wheel", handleWheel);
 
     // Cleanup event listener on unmount
     return () => {
       socket.current.off("message", (event) => handleMessage(event));
+
+      rightVideoControlsRef.current?.removeEventListener("wheel", handleWheel);
     };
   }, []);
 
@@ -112,7 +123,10 @@ export default function FgVideoControls({
         </AnimatePresence>
       </div>
       <div className='video-controls w-full h-10 flex justify-between'>
-        <div className='w-max h-10 z-20 flex items-center space-x-2'>
+        <div
+          className='w-max h-10 z-20 flex items-center space-x-2'
+          style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
+        >
           {(fgVideoOptions.isPlayPause ??
             defaultFgVideoOptions.isPlayPause) && (
             <PlayPauseButton
@@ -146,7 +160,7 @@ export default function FgVideoControls({
               tracksColorSetterCallback={tracksColorSetterCallback}
             />
           )}
-          <div className='duration-container flex items-center gap-1 grow'>
+          <div className='duration-container flex items-center gap-1 px-1'>
             {(fgVideoOptions.isCurrentTime ??
               defaultFgVideoOptions.isCurrentTime) && (
               <div ref={currentTimeRef} className='current-time'></div>
@@ -162,7 +176,10 @@ export default function FgVideoControls({
             )}
           </div>
         </div>
-        <div className='grow h-10 overflow-x-auto z-10 flex items-center space-x-2 justify-end'>
+        <div
+          ref={rightVideoControlsRef}
+          className='w-max h-10 overflow-x-auto z-10 flex items-center space-x-2'
+        >
           {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
             fgVideoOptions.isVolume && (
               <AudioEffectsButton
