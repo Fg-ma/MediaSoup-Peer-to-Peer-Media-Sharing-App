@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
-import SliderValuePortal from "./lib/SliderValuePortal";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import { motion, AnimatePresence, Variants, Transition } from "framer-motion";
+
+const SliderValuePortal = React.lazy(() => import("./lib/SliderValuePortal"));
 
 const tickVar: Variants = {
   horizontalInit: {
@@ -331,12 +332,14 @@ export default function FgSlider({
             }}
           ></div>
           {(sliding || handleHovering) && (
-            <SliderValuePortal
-              value={value}
-              handleRef={handleRef}
-              precision={precision}
-              units={units}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <SliderValuePortal
+                value={value}
+                handleRef={handleRef}
+                precision={precision}
+                units={units}
+              />
+            </Suspense>
           )}
         </div>
       </div>

@@ -41,7 +41,7 @@ export default function CaptionButton({
           </div>
         ) : undefined
       }
-      className='caption-button flex-col items-center justify-center'
+      className='caption-button flex-col items-center justify-center scale-x-[-1]'
     />
   );
 }

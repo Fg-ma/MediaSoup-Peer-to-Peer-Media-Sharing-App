@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, Suspense } from "react";
 import { AnimatePresence } from "framer-motion";
-import FgPortal from "../fgPortal/FgPortal";
+
+const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));
 
 interface FgButtonOptions {
   defaultDataValue?: string;
@@ -175,22 +176,26 @@ export default function FgButton({
       {hoverContent && !isHeld && (
         <AnimatePresence>
           {isHover && (
-            <FgPortal
-              type={fgButtonOptions.hoverType}
-              content={hoverContent}
-              buttonRef={externalRef ? externalRef : buttonRef}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <FgPortal
+                type={fgButtonOptions.hoverType}
+                content={hoverContent}
+                buttonRef={externalRef ? externalRef : buttonRef}
+              />
+            </Suspense>
           )}
         </AnimatePresence>
       )}
       {holdFunction && holdContent && (
         <AnimatePresence>
           {isHeld && (
-            <FgPortal
-              type={fgButtonOptions.holdType}
-              content={holdContent}
-              buttonRef={externalRef ? externalRef : buttonRef}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <FgPortal
+                type={fgButtonOptions.holdType}
+                content={holdContent}
+                buttonRef={externalRef ? externalRef : buttonRef}
+              />
+            </Suspense>
           )}
         </AnimatePresence>
       )}

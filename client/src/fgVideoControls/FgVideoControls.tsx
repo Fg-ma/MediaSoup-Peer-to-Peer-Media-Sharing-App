@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { AnimatePresence } from "framer-motion";
 import Controls from "./lib/Controls";
@@ -7,21 +7,31 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
-import VisualEffectsSection from "../visualEffectsSection/VisualEffectsSection";
-import FgVolumeElement from "../FgVolumeElement/FgVolumeElement";
-import FullScreenButton from "./lib/FullScreenButton";
-import PictureInPictureButton from "./lib/PictureInPictureButton";
-import EffectsButton from "./lib/EffectsButton";
-import CaptionButton from "./lib/CaptionButton";
-import PlayPauseButton from "./lib/PlayPauseButton";
-import PlaybackSpeedButton from "./lib/PlaybackSpeedButton";
-import TheaterButton from "./lib/TheaterButton";
 import { defaultFgVideoOptions, FgVideoOptions } from "../fgVideo/FgVideo";
-import AudioEffectsButton from "../audioEffectsButton/AudioEffectsButton";
+
+const PlayPauseButton = React.lazy(() => import("./lib/PlayPauseButton"));
+const FgVolumeElement = React.lazy(
+  () => import("../FgVolumeElement/FgVolumeElement")
+);
+const FullScreenButton = React.lazy(() => import("./lib/FullScreenButton"));
+const TheaterButton = React.lazy(() => import("./lib/TheaterButton"));
+const PictureInPictureButton = React.lazy(
+  () => import("./lib/PictureInPictureButton")
+);
+const CaptionButton = React.lazy(() => import("./lib/CaptionButton"));
+const PlaybackSpeedButton = React.lazy(
+  () => import("./lib/PlaybackSpeedButton")
+);
+const EffectsButton = React.lazy(() => import("./lib/EffectsButton"));
+const VisualEffectsSection = React.lazy(
+  () => import("../visualEffectsSection/VisualEffectsSection")
+);
+const AudioEffectsButton = React.lazy(
+  () => import("../audioEffectsButton/AudioEffectsButton")
+);
 
 export default function FgVideoControls({
   socket,
-  table_id,
   username,
   instance,
   type,
@@ -44,7 +54,6 @@ export default function FgVideoControls({
   tracksColorSetterCallback,
 }: {
   socket: React.MutableRefObject<Socket>;
-  table_id: string;
   username: string;
   instance: string;
   type: "camera" | "screen";
@@ -82,7 +91,7 @@ export default function FgVideoControls({
 
   const handleWheel = (event: WheelEvent) => {
     if (rightVideoControlsRef.current) {
-      rightVideoControlsRef.current.scrollLeft += event.deltaY;
+      rightVideoControlsRef.current.scrollLeft += event.deltaY / 2;
     }
   };
 
@@ -104,21 +113,23 @@ export default function FgVideoControls({
       <div className='relative pointer-events-auto'>
         <AnimatePresence>
           {effectsActive && (
-            <VisualEffectsSection
-              username={username}
-              instance={instance}
-              type={type}
-              videoId={videoId}
-              socket={socket}
-              isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
-              acceptsVisualEffects={
-                fgVideoOptions.acceptsVisualEffects ??
-                defaultFgVideoOptions.acceptsVisualEffects
-              }
-              videoContainerRef={videoContainerRef}
-              handleVisualEffectChange={handleVisualEffectChange}
-              tintColor={tintColor}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <VisualEffectsSection
+                username={username}
+                instance={instance}
+                type={type}
+                videoId={videoId}
+                socket={socket}
+                isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
+                acceptsVisualEffects={
+                  fgVideoOptions.acceptsVisualEffects ??
+                  defaultFgVideoOptions.acceptsVisualEffects
+                }
+                videoContainerRef={videoContainerRef}
+                handleVisualEffectChange={handleVisualEffectChange}
+                tintColor={tintColor}
+              />
+            </Suspense>
           )}
         </AnimatePresence>
       </div>
@@ -129,36 +140,40 @@ export default function FgVideoControls({
         >
           {(fgVideoOptions.isPlayPause ??
             defaultFgVideoOptions.isPlayPause) && (
-            <PlayPauseButton
-              controls={controls}
-              effectsActive={effectsActive}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <PlayPauseButton
+                controls={controls}
+                effectsActive={effectsActive}
+              />
+            </Suspense>
           )}
           {(fgVideoOptions.isVolume ?? defaultFgVideoOptions.isPlayPause) && (
-            <FgVolumeElement
-              socket={socket}
-              username={username}
-              instance={instance}
-              isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
-              audioRef={audioRef}
-              clientMute={clientMute}
-              localMute={localMute}
-              effectsActive={effectsActive}
-              options={{
-                isSlider:
-                  fgVideoOptions.isSlider ?? defaultFgVideoOptions.isSlider,
-                initialVolume: fgVideoOptions.initialVolume ?? "high",
-              }}
-              handleMuteCallback={() => {
-                if (handleMuteCallback !== undefined) {
-                  handleMuteCallback();
-                }
+            <Suspense fallback={<div>Loading...</div>}>
+              <FgVolumeElement
+                socket={socket}
+                username={username}
+                instance={instance}
+                isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
+                audioRef={audioRef}
+                clientMute={clientMute}
+                localMute={localMute}
+                effectsActive={effectsActive}
+                options={{
+                  isSlider:
+                    fgVideoOptions.isSlider ?? defaultFgVideoOptions.isSlider,
+                  initialVolume: fgVideoOptions.initialVolume ?? "high",
+                }}
+                handleMuteCallback={() => {
+                  if (handleMuteCallback !== undefined) {
+                    handleMuteCallback();
+                  }
 
-                setRerender((prev) => prev + 1);
-              }}
-              handleVolumeSliderCallback={handleVolumeSliderCallback}
-              tracksColorSetterCallback={tracksColorSetterCallback}
-            />
+                  setRerender((prev) => prev + 1);
+                }}
+                handleVolumeSliderCallback={handleVolumeSliderCallback}
+                tracksColorSetterCallback={tracksColorSetterCallback}
+              />
+            </Suspense>
           )}
           <div className='duration-container flex items-center gap-1 px-1'>
             {(fgVideoOptions.isCurrentTime ??
@@ -178,76 +193,97 @@ export default function FgVideoControls({
         </div>
         <div
           ref={rightVideoControlsRef}
-          className='w-max h-10 overflow-x-auto z-10 flex items-center space-x-2'
+          className='w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
         >
-          {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
-            fgVideoOptions.isVolume && (
-              <AudioEffectsButton
-                socket={socket}
-                username={username}
-                instance={instance}
-                isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
-                handleAudioEffectChange={handleAudioEffectChange}
-                handleMute={() => {
-                  if (clientMute.current) {
-                    return;
-                  }
-
-                  localMute.current = !localMute.current;
-
-                  if (!audioRef.current) {
-                    return;
-                  }
-
-                  if (!fgVideoOptions.isUser) {
-                    audioRef.current.muted = localMute.current;
-                  }
-
-                  if (handleMuteCallback !== undefined) {
-                    handleMuteCallback();
-                  }
-
-                  setRerender((prev) => prev + 1);
-                }}
-                muteStateRef={localMute}
-              />
-            )}
-          {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
-            (fgVideoOptions.isEffects ?? defaultFgVideoOptions.isEffects) && (
-              <EffectsButton
+          {(fgVideoOptions.isFullScreen ??
+            defaultFgVideoOptions.isFullScreen) && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <FullScreenButton
                 controls={controls}
                 effectsActive={effectsActive}
               />
-            )}
-          {(fgVideoOptions.isPlaybackSpeed ??
-            defaultFgVideoOptions.isPlaybackSpeed) && (
-            <PlaybackSpeedButton
-              controls={controls}
-              effectsActive={effectsActive}
-              playbackSpeedButtonRef={playbackSpeedButtonRef}
-            />
+            </Suspense>
           )}
-          {(fgVideoOptions.isClosedCaptions ??
-            defaultFgVideoOptions.isClosedCaptions) && (
-            <CaptionButton controls={controls} effectsActive={effectsActive} />
+          {(fgVideoOptions.isTheater ?? defaultFgVideoOptions.isTheater) && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <TheaterButton
+                controls={controls}
+                effectsActive={effectsActive}
+              />
+            </Suspense>
           )}
           {(fgVideoOptions.isPictureInPicture ??
             defaultFgVideoOptions.isPictureInPicture) && (
-            <PictureInPictureButton
-              controls={controls}
-              effectsActive={effectsActive}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <PictureInPictureButton
+                controls={controls}
+                effectsActive={effectsActive}
+              />
+            </Suspense>
           )}
-          {(fgVideoOptions.isTheater ?? defaultFgVideoOptions.isTheater) && (
-            <TheaterButton controls={controls} effectsActive={effectsActive} />
+          {(fgVideoOptions.isClosedCaptions ??
+            defaultFgVideoOptions.isClosedCaptions) && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <CaptionButton
+                controls={controls}
+                effectsActive={effectsActive}
+              />
+            </Suspense>
           )}
-          {(fgVideoOptions.isFullScreen ??
-            defaultFgVideoOptions.isFullScreen) && (
-            <FullScreenButton
-              controls={controls}
-              effectsActive={effectsActive}
-            />
+          {(fgVideoOptions.isPlaybackSpeed ??
+            defaultFgVideoOptions.isPlaybackSpeed) && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <PlaybackSpeedButton
+                controls={controls}
+                effectsActive={effectsActive}
+                playbackSpeedButtonRef={playbackSpeedButtonRef}
+              />
+            </Suspense>
           )}
+          {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
+            (fgVideoOptions.isEffects ?? defaultFgVideoOptions.isEffects) && (
+              <Suspense fallback={<div>Loading...</div>}>
+                <EffectsButton
+                  controls={controls}
+                  effectsActive={effectsActive}
+                />
+              </Suspense>
+            )}
+          {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
+            fgVideoOptions.isVolume && (
+              <Suspense fallback={<div>Loading...</div>}>
+                <AudioEffectsButton
+                  socket={socket}
+                  username={username}
+                  instance={instance}
+                  isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
+                  handleAudioEffectChange={handleAudioEffectChange}
+                  handleMute={() => {
+                    if (clientMute.current) {
+                      return;
+                    }
+
+                    localMute.current = !localMute.current;
+
+                    if (!audioRef.current) {
+                      return;
+                    }
+
+                    if (!fgVideoOptions.isUser) {
+                      audioRef.current.muted = localMute.current;
+                    }
+
+                    if (handleMuteCallback !== undefined) {
+                      handleMuteCallback();
+                    }
+
+                    setRerender((prev) => prev + 1);
+                  }}
+                  muteStateRef={localMute}
+                  style={{ transform: "scaleX(-1)" }}
+                />
+              </Suspense>
+            )}
         </div>
       </div>
     </div>

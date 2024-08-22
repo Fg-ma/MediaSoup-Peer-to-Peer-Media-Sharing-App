@@ -1,36 +1,39 @@
 import React from "react";
 import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
-import { MixEffect } from "./AudioMixEffectsPortal";
+import {
+  DynamicMixEffect,
+  LabelPlacementType,
+  StaticMixEffect,
+} from "./AudioMixEffectsPortal";
 import { AudioMixEffectsType } from "../../effects/audioEffects/AudioEffects";
 
 export default function AudioMixEffect({
   effect,
-  mixEffect,
+  staticMixEffect,
+  dynamicMixEffect,
   effectLabel,
   labelPlacement,
   updateMixEffectsValues,
 }: {
   effect: AudioMixEffectsType;
-  mixEffect: MixEffect;
+  staticMixEffect: StaticMixEffect;
+  dynamicMixEffect: DynamicMixEffect;
   effectLabel: string;
-  labelPlacement: {
-    side: string;
-    sidePlacement: string;
-  };
+  labelPlacement: LabelPlacementType;
   updateMixEffectsValues: (event: SliderChangeEvent) => void;
 }) {
   return (
     <div
       className={`border-2 border-black p-5 rounded absolute
-        ${mixEffect.orientation === "vertical" ? "h-60" : ""}
-        ${mixEffect.orientation === "horizontal" ? "w-60" : ""}  
+        ${dynamicMixEffect.orientation === "vertical" ? "h-60" : ""}
+        ${dynamicMixEffect.orientation === "horizontal" ? "w-60" : ""}  
       `}
       style={{
-        backgroundColor: mixEffect.backgroundColor,
-        left: `${mixEffect.x}px`,
-        top: `${mixEffect.y}px`,
-        width: `${mixEffect.width}px`,
-        height: `${mixEffect.height}px`,
+        backgroundColor: staticMixEffect.backgroundColor,
+        left: `${dynamicMixEffect.x}px`,
+        top: `${dynamicMixEffect.y}px`,
+        width: `${dynamicMixEffect.width}px`,
+        height: `${dynamicMixEffect.height}px`,
       }}
     >
       <div
@@ -78,10 +81,10 @@ export default function AudioMixEffect({
       </div>
       <div
         className={`h-full flex items-center justify-center 
-          ${mixEffect.orientation === "horizontal" ? "flex-col" : ""}  
+          ${dynamicMixEffect.orientation === "horizontal" ? "flex-col" : ""}  
         `}
       >
-        {Object.entries(mixEffect.options).map(([key, option], index) => (
+        {Object.entries(staticMixEffect.options).map(([key, option], index) => (
           <FgSlider
             key={index}
             id={`${effect}_${key}`}
@@ -93,7 +96,7 @@ export default function AudioMixEffect({
             precision={option.precision}
             units={option.units}
             snapToWholeNum={option.snapToWholeNum}
-            orientation={mixEffect.orientation}
+            orientation={dynamicMixEffect.orientation}
             onValueChange={updateMixEffectsValues}
           />
         ))}

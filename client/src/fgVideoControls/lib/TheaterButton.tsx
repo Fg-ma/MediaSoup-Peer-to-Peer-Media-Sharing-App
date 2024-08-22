@@ -35,7 +35,7 @@ export default function TheaterButton({
           </div>
         ) : undefined
       }
-      className='flex items-center justify-center'
+      className='flex items-center justify-center scale-x-[-1]'
     />
   );
 }

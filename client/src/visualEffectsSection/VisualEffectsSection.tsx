@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Socket } from "socket.io-client";
 import { Transition, Variants, motion } from "framer-motion";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
-import GlassesButton from "./lib/GlassesButton";
-import EarsButton from "./lib/EarsButton";
-import BeardsButton from "./lib/BeardsButton";
-import MustachesButton from "./lib/MustachesButton";
-import FaceMasksButton from "./lib/FaceMasksButton";
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
+
+const EarsButton = React.lazy(() => import("./lib/EarsButton"));
+const GlassesButton = React.lazy(() => import("./lib/GlassesButton"));
+const BeardsButton = React.lazy(() => import("./lib/BeardsButton"));
+const MustachesButton = React.lazy(() => import("./lib/MustachesButton"));
+const FaceMasksButton = React.lazy(() => import("./lib/FaceMasksButton"));
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -174,7 +175,7 @@ export default function VisualEffectsSection({
         setEffectsDisabled={setEffectsDisabled}
       />
       {type === "camera" && (
-        <>
+        <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <EarsButton
             username={username}
@@ -186,10 +187,10 @@ export default function VisualEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
-        </>
+        </Suspense>
       )}
       {type === "camera" && (
-        <>
+        <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <GlassesButton
             username={username}
@@ -201,10 +202,10 @@ export default function VisualEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
-        </>
+        </Suspense>
       )}
       {type === "camera" && (
-        <>
+        <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <BeardsButton
             username={username}
@@ -216,10 +217,10 @@ export default function VisualEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
-        </>
+        </Suspense>
       )}
       {type === "camera" && (
-        <>
+        <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <MustachesButton
             username={username}
@@ -231,10 +232,10 @@ export default function VisualEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
-        </>
+        </Suspense>
       )}
       {type === "camera" && (
-        <>
+        <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <FaceMasksButton
             username={username}
@@ -246,7 +247,7 @@ export default function VisualEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
           />
-        </>
+        </Suspense>
       )}
     </motion.div>
   );

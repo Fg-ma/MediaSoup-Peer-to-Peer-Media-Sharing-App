@@ -7,6 +7,7 @@ import ScreenMedia from "./ScreenMedia";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
+  defaultAudioStreamEffects,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import AudioMedia from "./AudioMedia";
@@ -165,7 +166,7 @@ class Producers {
     this.browserMedia = browserMedia;
   }
 
-  private async createCameraProducer(cameraBrowserMedia: MediaStream) {
+  private createCameraProducer = async (cameraBrowserMedia: MediaStream) => {
     const cameraId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
     const newCameraMedia = new CameraMedia(
       this.username.current,
@@ -195,9 +196,9 @@ class Producers {
       console.error("Camera new transport failed to produce");
       return;
     }
-  }
+  };
 
-  private async createScreenProducer(screenBrowserMedia: MediaStream) {
+  private createScreenProducer = async (screenBrowserMedia: MediaStream) => {
     const screenId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
     const newScreenMedia = new ScreenMedia(
       this.username.current,
@@ -226,9 +227,9 @@ class Producers {
       console.error("Screen new transport failed to produce");
       return;
     }
-  }
+  };
 
-  private async createAudioProducer(audioBrowserMedia: UserMedia) {
+  private createAudioProducer = async (audioBrowserMedia: UserMedia) => {
     const newAudioMedia = new AudioMedia(
       this.username.current,
       this.table_id.current,
@@ -248,9 +249,9 @@ class Producers {
     };
 
     await this.producerTransport.current?.produce(audioParams);
-  }
+  };
 
-  async onProducerTransportCreated(event: {
+  onProducerTransportCreated = async (event: {
     type: string;
     params: {
       id: string;
@@ -259,7 +260,7 @@ class Producers {
       dtlsParameters: mediasoup.types.DtlsParameters;
     };
     error?: unknown;
-  }) {
+  }) => {
     if (event.error) {
       console.error("Producer transport create error: ", event.error);
       return;
@@ -423,9 +424,9 @@ class Producers {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  async createNewProducer(producerType: "camera" | "screen" | "audio") {
+  createNewProducer = async (producerType: "camera" | "screen" | "audio") => {
     let producerId: string | undefined;
     if (producerType === "camera") {
       producerId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
@@ -521,15 +522,15 @@ class Producers {
     };
 
     this.socket.current.emit("message", msg);
-  }
+  };
 
-  onNewProducerAvailable(event: {
+  onNewProducerAvailable = (event: {
     type: "newProducerAvailable";
     producerUsername: string;
     producerInstance: string;
     producerType: string;
     producerId?: string;
-  }) {
+  }) => {
     if (
       event.producerInstance !== this.instance.current &&
       this.isSubscribed.current &&
@@ -550,13 +551,13 @@ class Producers {
       };
       this.socket.current.emit("message", msg);
     }
-  }
+  };
 
   onProducerDisconnected = (event: {
     type: string;
     producerUsername: string;
     producerInstance: string;
-    producerType: string;
+    producerType: "camera" | "screen" | "audio";
     producerId: string;
   }) => {
     if (
@@ -575,34 +576,44 @@ class Producers {
       }
 
       // Delete old stream effects
-      for (const effectType in this.userStreamEffects.current) {
-        if (
-          event.producerType === "camera" &&
-          this.userStreamEffects.current[event.producerType][event.producerId][
-            effectType as CameraEffectTypes
-          ]
-        ) {
-          delete this.userStreamEffects.current[event.producerType][
-            event.producerId
-          ];
+      const streamEffects = this.userStreamEffects.current[event.producerType];
+
+      if (streamEffects) {
+        if (event.producerType === "audio") {
+          this.userStreamEffects.current.audio = Object.keys(
+            this.userStreamEffects.current.audio
+          ).reduce((acc, key) => {
+            acc[key as keyof typeof acc] = false;
+            return acc;
+          }, {} as typeof this.userStreamEffects.current.audio);
         } else if (
-          event.producerType === "screen" &&
-          this.userStreamEffects.current[event.producerType][event.producerId][
-            effectType as ScreenEffectTypes
-          ]
+          event.producerType === "camera" ||
+          event.producerType === "screen"
         ) {
-          delete this.userStreamEffects.current[event.producerType][
-            event.producerId
-          ][effectType as ScreenEffectTypes];
+          if (event.producerId && event.producerId in streamEffects) {
+            delete streamEffects[
+              event.producerId as keyof typeof currentEffects
+            ];
+          }
+        }
+      }
+
+      // Delete old effects styles
+      const currentEffects =
+        this.currentEffectsStyles.current[event.producerType];
+
+      if (currentEffects) {
+        if (event.producerType === "audio") {
+          this.currentEffectsStyles.current.audio = {};
         } else if (
-          event.producerType === "audio" &&
-          this.userStreamEffects.current[event.producerType][
-            effectType as AudioEffectTypes
-          ]
+          event.producerType === "camera" ||
+          event.producerType === "screen"
         ) {
-          delete this.userStreamEffects.current[event.producerType][
-            effectType as AudioEffectTypes
-          ];
+          if (event.producerId && event.producerId in currentEffects) {
+            delete currentEffects[
+              event.producerId as keyof typeof currentEffects
+            ];
+          }
         }
       }
 

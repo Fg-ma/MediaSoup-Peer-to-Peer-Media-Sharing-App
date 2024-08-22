@@ -3,6 +3,14 @@ import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";
 import AudioMedia from "../lib/AudioMedia";
 
+export const defaultAudioStreamEffects = {
+  robot: false,
+  echo: false,
+  alien: false,
+  underwater: false,
+  telephone: false,
+};
+
 export type CameraEffectTypes =
   | "pause"
   | "blur"
@@ -114,13 +122,7 @@ export function StreamsContextProvider({
   }>({
     camera: {},
     screen: {},
-    audio: {
-      robot: false,
-      echo: false,
-      alien: false,
-      underwater: false,
-      telephone: false,
-    },
+    audio: defaultAudioStreamEffects,
   });
   const remoteStreamEffects = useRef<{
     [username: string]: {

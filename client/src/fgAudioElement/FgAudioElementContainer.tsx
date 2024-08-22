@@ -1,13 +1,15 @@
-import React, { useRef, useState } from "react";
-import FgAudioElement from "./FgAudioElement";
-import AudioEffectsSection from "../audioEffectsButton/lib/AudioEffectsSection";
-import FgPortal from "../fgPortal/FgPortal";
+import React, { Suspense, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import { AudioEffectTypes } from "src/context/StreamsContext";
+import { AudioEffectTypes } from "../context/StreamsContext";
+import FgAudioElement from "./FgAudioElement";
+
+const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));
+const AudioEffectsSection = React.lazy(
+  () => import("../audioEffectsButton/lib/AudioEffectsSection")
+);
 
 export default function FgAudioElementContainer({
   socket,
-  table_id,
   username,
   instance,
   name,
@@ -21,7 +23,6 @@ export default function FgAudioElementContainer({
   options,
 }: {
   socket: React.MutableRefObject<Socket>;
-  table_id: string;
   username: string;
   instance: string;
   name?: string;
@@ -69,31 +70,35 @@ export default function FgAudioElementContainer({
         options={options}
       />
       {popupVisible && (
-        <FgPortal
-          type='mouse'
-          content={
-            <div className='w-max h-max shadow-lg px-4 py-2 rounded-md text-lg font-Josefin relative z-[50] bg-white'>
-              {name ? name : username}
-            </div>
-          }
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <FgPortal
+            type='mouse'
+            content={
+              <div className='w-max h-max shadow-lg px-4 py-2 rounded-md text-lg font-Josefin relative z-[50] bg-white'>
+                {name ? name : username}
+              </div>
+            }
+          />
+        </Suspense>
       )}
       {audioEffectsSectionVisible && (
-        <AudioEffectsSection
-          socket={socket}
-          username={username}
-          instance={instance}
-          isUser={isUser}
-          handleAudioEffectChange={handleAudioEffectChange}
-          placement='right'
-          referenceElement={
-            audioElementSVGRef as unknown as React.RefObject<HTMLElement>
-          }
-          padding={12}
-          handleMute={handleMute}
-          muteStateRef={localMute}
-          closeCallback={() => setAudioEffectsSectionVisible(false)}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <AudioEffectsSection
+            socket={socket}
+            username={username}
+            instance={instance}
+            isUser={isUser}
+            handleAudioEffectChange={handleAudioEffectChange}
+            placement='right'
+            referenceElement={
+              audioElementSVGRef as unknown as React.RefObject<HTMLElement>
+            }
+            padding={12}
+            handleMute={handleMute}
+            muteStateRef={localMute}
+            closeCallback={() => setAudioEffectsSectionVisible(false)}
+          />
+        </Suspense>
       )}
     </>
   );

@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import ColorPicker from "./ColorPicker";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -9,6 +8,8 @@ import {
 } from "../../context/StreamsContext";
 import tintIcon from "../../../public/svgs/tintIcon.svg";
 import tintOffIcon from "../../../public/svgs/tintOffIcon.svg";
+
+const ColorPicker = React.lazy(() => import("./ColorPicker"));
 
 export default function TintSection({
   username,
@@ -108,21 +109,23 @@ export default function TintSection({
           }}
         />
         {isColorPicker && (
-          <ColorPicker
-            username={username}
-            instance={instance}
-            type={type}
-            videoId={videoId}
-            isUser={isUser}
-            color={color}
-            setColor={setColor}
-            tempColor={tempColor}
-            setTempColor={setTempColor}
-            setIsColorPicker={setIsColorPicker}
-            tintColor={tintColor}
-            colorPickerBtnRef={colorPickerBtnRef}
-            handleVisualEffectChange={handleVisualEffectChange}
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <ColorPicker
+              username={username}
+              instance={instance}
+              type={type}
+              videoId={videoId}
+              isUser={isUser}
+              color={color}
+              setColor={setColor}
+              tempColor={tempColor}
+              setTempColor={setTempColor}
+              setIsColorPicker={setIsColorPicker}
+              tintColor={tintColor}
+              colorPickerBtnRef={colorPickerBtnRef}
+              handleVisualEffectChange={handleVisualEffectChange}
+            />
+          </Suspense>
         )}
       </div>
     </div>

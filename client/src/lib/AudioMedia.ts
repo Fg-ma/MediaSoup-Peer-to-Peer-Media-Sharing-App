@@ -62,7 +62,10 @@ class AudioMedia {
     // Connect the Tone.UserMedia instance to the MediaStreamDestination
     this.audioStream.connect(this.mediaStreamDestination);
 
-    this.audioEffects = new AudioEffects(this.audioStream);
+    this.audioEffects = new AudioEffects(
+      this.audioStream,
+      this.mediaStreamDestination
+    );
 
     this.effects = {};
   }
@@ -71,7 +74,15 @@ class AudioMedia {
     await this.audioStream.open();
 
     // Fix this it is janky way of getting mic started
-    this.audioEffects.applyReverbEffect();
+    this.audioEffects.updateEffects([
+      {
+        type: "reverb",
+        updates: [
+          { option: "decay", value: 1 },
+          { option: "preDelay", value: 1 },
+        ],
+      },
+    ]);
     this.audioEffects.removeEffects(["reverb"]);
   }
 
@@ -147,7 +158,7 @@ class AudioMedia {
             ],
           },
           {
-            type: "delay",
+            type: "feedbackDelay",
             updates: [
               { option: "delayTime", value: 0.5 },
               { option: "feedback", value: 0.4 },
@@ -223,7 +234,7 @@ class AudioMedia {
         ]);
         break;
       case "echo":
-        this.audioEffects?.removeEffects(["reverb", "delay"]);
+        this.audioEffects?.removeEffects(["reverb", "feedbackDelay"]);
         break;
       case "alien":
         this.audioEffects?.removeEffects(["pitchShift", "phaser"]);

@@ -11,22 +11,647 @@ import {
   MixEffectsOptionsType,
 } from "../../effects/audioEffects/AudioEffects";
 
-export interface MixEffect {
-  values: {
-    [option in MixEffectsOptionsType]?: number;
-  };
-  active: boolean;
+const oneSliderPossibleSizes: PossibleSizesType = {
+  vertical: [108, 240],
+  horizontal: [240, 108],
+};
+
+const twoSlidersPossibleSizes: PossibleSizesType = {
+  vertical: [172, 240],
+  horizontal: [240, 172],
+};
+
+const threeSlidersPossibleSizes: PossibleSizesType = {
+  vertical: [236, 240],
+  horizontal: [240, 236],
+};
+
+type PossibleSizesType = {
+  vertical: [number, number];
+  horizontal: [number, number];
+};
+
+export type LabelPlacementType =
+  | {
+      side: "left" | "right";
+      sidePlacement: "top" | "middle" | "bottom";
+    }
+  | {
+      side: "top" | "bottom";
+      sidePlacement: "left" | "center" | "right";
+    };
+
+export interface StaticMixEffect {
   possibleSizes: { vertical: [number, number]; horizontal: [number, number] };
   options: {
     [option in MixEffectsOptionsType]?: SliderOptions;
   };
+  backgroundColor: string;
+  effectLabel: string;
+  labelPlacement: {
+    vertical: LabelPlacementType;
+    horizontal: LabelPlacementType;
+  };
+}
+
+export interface DynamicMixEffect {
+  values: {
+    [option in MixEffectsOptionsType]?: number;
+  };
+  active: boolean;
   orientation?: "vertical" | "horizontal";
   width?: number;
   height?: number;
   x?: number;
   y?: number;
-  backgroundColor?: string;
 }
+
+const staticMixEffects: {
+  [mixEffect in AudioMixEffectsType]: StaticMixEffect;
+} = {
+  autoFilter: {
+    possibleSizes: {
+      horizontal: threeSlidersPossibleSizes.horizontal,
+      vertical: threeSlidersPossibleSizes.vertical,
+    },
+    options: {
+      frequency: {
+        topLabel: "freq",
+        ticks: 6,
+        rangeMax: 10,
+        rangeMin: 0,
+        units: "Hz",
+      },
+      baseFrequency: {
+        bottomLabel: "base freq",
+        ticks: 6,
+        rangeMax: 10000,
+        rangeMin: 0,
+        units: "Hz",
+      },
+      octaves: {
+        bottomLabel: "oct",
+        ticks: 5,
+        rangeMax: 8,
+        rangeMin: 0,
+        units: "oct",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Auto filter",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+    },
+  },
+  autoPanner: {
+    possibleSizes: {
+      horizontal: oneSliderPossibleSizes.horizontal,
+      vertical: oneSliderPossibleSizes.vertical,
+    },
+    options: {
+      frequency: {
+        topLabel: "freq",
+        ticks: 6,
+        rangeMax: 10,
+        rangeMin: 0,
+        units: "Hz",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Auto panner",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  autoWah: {
+    possibleSizes: {
+      horizontal: threeSlidersPossibleSizes.horizontal,
+      vertical: threeSlidersPossibleSizes.vertical,
+    },
+    options: {
+      baseFrequency: {
+        topLabel: "base freq",
+        ticks: 6,
+        rangeMax: 10000,
+        rangeMin: 0,
+        units: "Hz",
+      },
+      octaves: {
+        bottomLabel: "oct",
+        ticks: 5,
+        rangeMax: 8,
+        rangeMin: 0,
+        units: "octaves",
+      },
+      sensitivity: {
+        bottomLabel: "sensitivity",
+        ticks: 6,
+        rangeMax: 0,
+        rangeMin: -40,
+        units: "dB",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Auto wah",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  bitCrusher: {
+    possibleSizes: {
+      horizontal: oneSliderPossibleSizes.horizontal,
+      vertical: oneSliderPossibleSizes.vertical,
+    },
+    options: {
+      bits: {
+        topLabel: "bits",
+        ticks: 8,
+        rangeMax: 8,
+        rangeMin: 1,
+        units: "bits",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Bit crusher",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  chebyshev: {
+    possibleSizes: {
+      horizontal: oneSliderPossibleSizes.horizontal,
+      vertical: oneSliderPossibleSizes.vertical,
+    },
+    options: {
+      order: {
+        topLabel: "order",
+        ticks: 6,
+        rangeMax: 100,
+        rangeMin: 0,
+        units: "order",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Chebyshev",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  chorus: {
+    possibleSizes: {
+      horizontal: threeSlidersPossibleSizes.horizontal,
+      vertical: threeSlidersPossibleSizes.vertical,
+    },
+    options: {
+      frequency: {
+        topLabel: "freq",
+        ticks: 6,
+        rangeMax: 10,
+        rangeMin: 0,
+        units: "Hz",
+      },
+      delayTime: {
+        bottomLabel: "delay",
+        ticks: 6,
+        rangeMax: 20,
+        rangeMin: 0,
+        units: "ms",
+      },
+      depth: {
+        bottomLabel: "depth",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "%",
+      },
+    },
+    effectLabel: "Chorus",
+    backgroundColor: "#d8bd9a",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  distortion: {
+    possibleSizes: {
+      horizontal: twoSlidersPossibleSizes.horizontal,
+      vertical: twoSlidersPossibleSizes.vertical,
+    },
+    options: {
+      distortion: {
+        topLabel: "dist",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "%",
+      },
+      oversample: {
+        topLabel: "oversample",
+        ticks: 6,
+        rangeMax: 4,
+        rangeMin: 2,
+        units: "x",
+      },
+    },
+    backgroundColor: "#e7c47d",
+    effectLabel: "Distortion",
+    labelPlacement: {
+      vertical: { side: "right", sidePlacement: "top" },
+      horizontal: { side: "top", sidePlacement: "right" },
+    },
+  },
+  EQ: {
+    possibleSizes: {
+      vertical: threeSlidersPossibleSizes.vertical,
+      horizontal: threeSlidersPossibleSizes.horizontal,
+    },
+    options: {
+      high: {
+        topLabel: "high",
+        ticks: 9,
+        rangeMax: 24,
+        rangeMin: -24,
+        units: "dB",
+      },
+      mid: {
+        bottomLabel: "mid",
+        ticks: 9,
+        rangeMax: 24,
+        rangeMin: -24,
+        units: "dB",
+      },
+      low: {
+        bottomLabel: "low",
+        ticks: 9,
+        rangeMax: 24,
+        rangeMin: -24,
+        units: "dB",
+      },
+    },
+    backgroundColor: "#888097",
+    effectLabel: "EQ",
+    labelPlacement: {
+      vertical: { side: "top", sidePlacement: "left" },
+      horizontal: { side: "left", sidePlacement: "top" },
+    },
+  },
+  feedbackDelay: {
+    possibleSizes: {
+      horizontal: twoSlidersPossibleSizes.horizontal,
+      vertical: twoSlidersPossibleSizes.vertical,
+    },
+    options: {
+      delayTime: {
+        topLabel: "delay",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "sec",
+      },
+      feedback: {
+        bottomLabel: "feedback",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "%",
+      },
+    },
+    backgroundColor: "#c5cfd0",
+    effectLabel: "Feedback delay",
+    labelPlacement: {
+      vertical: { side: "bottom", sidePlacement: "right" },
+      horizontal: { side: "right", sidePlacement: "bottom" },
+    },
+  },
+  freeverb: {
+    possibleSizes: {
+      horizontal: twoSlidersPossibleSizes.horizontal,
+      vertical: twoSlidersPossibleSizes.vertical,
+    },
+    options: {
+      roomSize: {
+        topLabel: "room size",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "size",
+      },
+      dampening: {
+        bottomLabel: "dampening",
+        ticks: 6,
+        rangeMax: 10000,
+        rangeMin: 0,
+        units: "Hz",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Freeverb",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  JCReverb: {
+    possibleSizes: {
+      horizontal: oneSliderPossibleSizes.horizontal,
+      vertical: oneSliderPossibleSizes.vertical,
+    },
+    options: {
+      roomSize: {
+        topLabel: "room size",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "size",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "JC reverb",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  phaser: {
+    possibleSizes: {
+      vertical: threeSlidersPossibleSizes.vertical,
+      horizontal: threeSlidersPossibleSizes.horizontal,
+    },
+    options: {
+      frequency: {
+        topLabel: "freq",
+        ticks: 6,
+        rangeMax: 10,
+        rangeMin: 0,
+        units: "Hz",
+      },
+      octaves: {
+        topLabel: "oct",
+        ticks: 9,
+        rangeMax: 8,
+        rangeMin: 0,
+        units: "Oct",
+        snapToWholeNum: true,
+      },
+      baseFrequency: {
+        bottomLabel: "base freq",
+        ticks: 6,
+        rangeMax: 10000,
+        rangeMin: 0,
+        units: "Hz",
+      },
+    },
+    backgroundColor: "#d03818",
+    effectLabel: "Phaser",
+    labelPlacement: {
+      vertical: { side: "left", sidePlacement: "top" },
+      horizontal: { side: "top", sidePlacement: "left" },
+    },
+  },
+  pingPongDelay: {
+    possibleSizes: {
+      horizontal: twoSlidersPossibleSizes.horizontal,
+      vertical: twoSlidersPossibleSizes.vertical,
+    },
+    options: {
+      delayTime: {
+        topLabel: "delay",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "sec",
+      },
+      feedback: {
+        bottomLabel: "feedback",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "%",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Ping pong delay",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  pitchShift: {
+    possibleSizes: {
+      horizontal: oneSliderPossibleSizes.horizontal,
+      vertical: oneSliderPossibleSizes.vertical,
+    },
+    options: {
+      pitch: {
+        topLabel: "pitch",
+        ticks: 9,
+        rangeMax: 12,
+        rangeMin: -12,
+        units: "semitones",
+        snapToWholeNum: true,
+      },
+    },
+    backgroundColor: "#cacaca",
+    effectLabel: "Pitch shift",
+    labelPlacement: {
+      vertical: { side: "left", sidePlacement: "bottom" },
+      horizontal: { side: "bottom", sidePlacement: "left" },
+    },
+  },
+  reverb: {
+    possibleSizes: {
+      vertical: twoSlidersPossibleSizes.vertical,
+      horizontal: twoSlidersPossibleSizes.horizontal,
+    },
+    options: {
+      decay: {
+        topLabel: "decay",
+        ticks: 4,
+        rangeMax: 10,
+        rangeMin: 1,
+        units: "sec",
+      },
+      preDelay: {
+        bottomLabel: "pre-delay",
+        ticks: 6,
+        rangeMax: 0.1,
+        rangeMin: 0,
+        precision: 3,
+        units: "sec",
+      },
+    },
+    backgroundColor: "#858585",
+    effectLabel: "Reverb",
+    labelPlacement: {
+      vertical: { side: "left", sidePlacement: "bottom" },
+      horizontal: { side: "bottom", sidePlacement: "left" },
+    },
+  },
+  stereoWidener: {
+    possibleSizes: {
+      horizontal: oneSliderPossibleSizes.horizontal,
+      vertical: oneSliderPossibleSizes.vertical,
+    },
+    options: {
+      width: {
+        topLabel: "width",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "width",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Stereo widener",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  tremolo: {
+    possibleSizes: {
+      horizontal: twoSlidersPossibleSizes.horizontal,
+      vertical: twoSlidersPossibleSizes.vertical,
+    },
+    options: {
+      frequency: {
+        topLabel: "freq",
+        ticks: 6,
+        rangeMax: 10,
+        rangeMin: 0,
+        units: "Hz",
+      },
+      depth: {
+        bottomLabel: "depth",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        precision: 2,
+        units: "%",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Tremolo",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+  vibrato: {
+    possibleSizes: {
+      horizontal: twoSlidersPossibleSizes.horizontal,
+      vertical: twoSlidersPossibleSizes.vertical,
+    },
+    options: {
+      frequency: {
+        topLabel: "freq",
+        ticks: 6,
+        rangeMax: 10,
+        rangeMin: 0,
+        units: "Hz",
+      },
+      depth: {
+        bottomLabel: "depth",
+        ticks: 6,
+        rangeMax: 1,
+        rangeMin: 0,
+        units: "%",
+      },
+    },
+    backgroundColor: "#d8bd9a",
+    effectLabel: "Vibrato",
+    labelPlacement: {
+      vertical: {
+        side: "right",
+        sidePlacement: "bottom",
+      },
+      horizontal: {
+        side: "bottom",
+        sidePlacement: "right",
+      },
+    },
+  },
+};
 
 export default function AudioMixEffectsPortal({
   audioMixEffectsButtonRef,
@@ -37,42 +662,67 @@ export default function AudioMixEffectsPortal({
 }) {
   const { userMedia } = useStreamsContext();
   const [rerender, setRerender] = useState(false);
-  const mixEffects = useRef<{
-    [mixEffect in AudioMixEffectsType]: MixEffect;
+  const dynamicMixEffects = useRef<{
+    [mixEffect in AudioMixEffectsType]: DynamicMixEffect;
   }>({
-    reverb: {
+    autoFilter: {
       values: {
-        decay: 1,
-        preDelay: 0,
+        frequency: 0,
+        baseFrequency: 0,
+        octaves: 0,
       },
       active: false,
-      possibleSizes: {
-        vertical: [172, 240],
-        horizontal: [240, 172],
-      },
-      options: {
-        decay: {
-          topLabel: "decay",
-          ticks: 4,
-          rangeMax: 10,
-          rangeMin: 1,
-          units: "sec",
-        },
-        preDelay: {
-          bottomLabel: "pre-delay",
-          ticks: 6,
-          rangeMax: 0.1,
-          rangeMin: 0,
-          precision: 2,
-          units: "sec",
-        },
-      },
       orientation: undefined,
       width: undefined,
       height: undefined,
       x: undefined,
       y: undefined,
-      backgroundColor: "#858585",
+    },
+    autoPanner: {
+      values: {
+        frequency: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    autoWah: {
+      values: {
+        baseFrequency: 0,
+        octaves: 0,
+        sensitivity: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    bitCrusher: {
+      values: {
+        bits: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    chebyshev: {
+      values: {
+        order: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
     },
     chorus: {
       values: {
@@ -81,40 +731,93 @@ export default function AudioMixEffectsPortal({
         depth: 0,
       },
       active: false,
-      possibleSizes: {
-        horizontal: [240, 236],
-        vertical: [236, 240],
-      },
-      options: {
-        frequency: {
-          topLabel: "freq",
-          ticks: 6,
-          rangeMax: 5,
-          rangeMin: 0,
-          units: "Hz",
-        },
-        delayTime: {
-          bottomLabel: "delay",
-          ticks: 6,
-          rangeMax: 20,
-          rangeMin: 0,
-          units: "ms",
-        },
-        depth: {
-          bottomLabel: "depth",
-          ticks: 6,
-          rangeMax: 1,
-          rangeMin: 0,
-          precision: 2,
-          units: "%",
-        },
-      },
       orientation: undefined,
       width: undefined,
       height: undefined,
       x: undefined,
       y: undefined,
-      backgroundColor: "#d8bd9a",
+    },
+    freeverb: {
+      values: {
+        roomSize: 0,
+        dampening: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    JCReverb: {
+      values: {
+        roomSize: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    pingPongDelay: {
+      values: {
+        delayTime: 0,
+        feedback: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    stereoWidener: {
+      values: {
+        width: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    tremolo: {
+      values: {
+        frequency: 0,
+        depth: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    vibrato: {
+      values: {
+        frequency: 0,
+        depth: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    distortion: {
+      values: {
+        distortion: 0,
+        oversample: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
     },
     EQ: {
       values: {
@@ -123,134 +826,23 @@ export default function AudioMixEffectsPortal({
         low: 0,
       },
       active: false,
-      possibleSizes: {
-        vertical: [236, 240],
-        horizontal: [240, 236],
-      },
-      options: {
-        high: {
-          topLabel: "high",
-          ticks: 9,
-          rangeMax: 24,
-          rangeMin: -24,
-          units: "dB",
-        },
-        mid: {
-          bottomLabel: "mid",
-          ticks: 9,
-          rangeMax: 24,
-          rangeMin: -24,
-          units: "dB",
-        },
-        low: {
-          bottomLabel: "low",
-          ticks: 9,
-          rangeMax: 24,
-          rangeMin: -24,
-          units: "dB",
-        },
-      },
       orientation: undefined,
       width: undefined,
       height: undefined,
       x: undefined,
       y: undefined,
-      backgroundColor: "#888097",
     },
-    delay: {
+    feedbackDelay: {
       values: {
         delayTime: 0,
         feedback: 0,
       },
       active: false,
-      possibleSizes: {
-        horizontal: [240, 172],
-        vertical: [172, 240],
-      },
-      options: {
-        delayTime: {
-          topLabel: "delay",
-          ticks: 6,
-          rangeMax: 1,
-          rangeMin: 0,
-          precision: 2,
-          units: "sec",
-        },
-        feedback: {
-          bottomLabel: "feedback",
-          ticks: 6,
-          rangeMax: 1,
-          rangeMin: 0,
-          precision: 2,
-          units: "%",
-        },
-      },
       orientation: undefined,
       width: undefined,
       height: undefined,
       x: undefined,
       y: undefined,
-      backgroundColor: "#c5cfd0",
-    },
-    distortion: {
-      values: {
-        distortion: 0,
-        oversample: 0,
-      },
-      active: false,
-      possibleSizes: {
-        horizontal: [240, 172],
-        vertical: [172, 240],
-      },
-      options: {
-        distortion: {
-          topLabel: "dist",
-          ticks: 6,
-          rangeMax: 1,
-          rangeMin: 0,
-          precision: 2,
-          units: "%",
-        },
-        oversample: {
-          topLabel: "oversample",
-          ticks: 6,
-          rangeMax: 4,
-          rangeMin: 2,
-          units: "x",
-        },
-      },
-      orientation: undefined,
-      width: undefined,
-      height: undefined,
-      x: undefined,
-      y: undefined,
-      backgroundColor: "#e7c47d",
-    },
-    pitchShift: {
-      values: {
-        pitch: 0,
-      },
-      active: false,
-      possibleSizes: {
-        horizontal: [240, 108],
-        vertical: [108, 240],
-      },
-      options: {
-        pitch: {
-          topLabel: "pitch",
-          ticks: 9,
-          rangeMax: 12,
-          rangeMin: -12,
-          units: "semitones",
-          snapToWholeNum: true,
-        },
-      },
-      orientation: undefined,
-      width: undefined,
-      height: undefined,
-      x: undefined,
-      y: undefined,
-      backgroundColor: "#cacaca",
     },
     phaser: {
       values: {
@@ -259,40 +851,34 @@ export default function AudioMixEffectsPortal({
         baseFrequency: 0,
       },
       active: false,
-      possibleSizes: {
-        vertical: [236, 240],
-        horizontal: [240, 236],
-      },
-      options: {
-        frequency: {
-          topLabel: "freq",
-          ticks: 6,
-          rangeMax: 10,
-          rangeMin: 0,
-          units: "Hz",
-        },
-        octaves: {
-          topLabel: "oct",
-          ticks: 9,
-          rangeMax: 8,
-          rangeMin: 0,
-          units: "Oct",
-          snapToWholeNum: true,
-        },
-        baseFrequency: {
-          bottomLabel: "base freq",
-          ticks: 6,
-          rangeMax: 1000,
-          rangeMin: 0,
-          units: "Hz",
-        },
-      },
       orientation: undefined,
       width: undefined,
       height: undefined,
       x: undefined,
       y: undefined,
-      backgroundColor: "#d03818",
+    },
+    pitchShift: {
+      values: {
+        pitch: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
+    },
+    reverb: {
+      values: {
+        decay: 1,
+        preDelay: 0,
+      },
+      active: false,
+      orientation: undefined,
+      width: undefined,
+      height: undefined,
+      x: undefined,
+      y: undefined,
     },
   });
   const portalRef = useRef<HTMLDivElement>(null);
@@ -306,9 +892,14 @@ export default function AudioMixEffectsPortal({
       height: number;
     }[] = [];
 
-    const activeRectangles = Object.entries(mixEffects.current)
+    const activeRectangles = Object.entries(dynamicMixEffects.current)
       .filter(([, rect]) => rect.active)
-      .map(([key, rect]) => ({ key, ...rect }));
+      .map(([key, rect]) => ({
+        key,
+        ...rect,
+        possibleSizes:
+          staticMixEffects[key as AudioMixEffectsType].possibleSizes,
+      }));
 
     // Sort rectangles by their largest possible size (width * height)
     activeRectangles.sort((a, b) => {
@@ -372,10 +963,10 @@ export default function AudioMixEffectsPortal({
       }
     }
 
-    const newMixEffects = { ...mixEffects.current };
+    const newDynamicMixEffects = { ...dynamicMixEffects.current };
     activeRectangles.forEach((rect, index) => {
       if (positions[index]) {
-        newMixEffects[rect.key as AudioMixEffectsType] = {
+        newDynamicMixEffects[rect.key as AudioMixEffectsType] = {
           ...rect,
           x: positions[index].x + 12,
           y: positions[index].y,
@@ -383,23 +974,23 @@ export default function AudioMixEffectsPortal({
       }
     });
 
-    mixEffects.current = newMixEffects;
+    dynamicMixEffects.current = newDynamicMixEffects;
   };
 
   const mixEffectChange = (active: boolean, effect?: string) => {
-    if (!effect || !(effect in mixEffects.current)) {
+    if (!effect) {
       return;
     }
 
-    mixEffects.current = {
-      ...mixEffects.current,
+    dynamicMixEffects.current = {
+      ...dynamicMixEffects.current,
       [effect]: {
-        ...mixEffects.current[effect as AudioMixEffectsType],
+        ...dynamicMixEffects.current[effect as AudioMixEffectsType],
         active,
       },
     };
 
-    if (!mixEffects.current[effect as AudioMixEffectsType].active) {
+    if (!dynamicMixEffects.current[effect as AudioMixEffectsType].active) {
       userMedia.current.audio?.removeMixEffects([
         effect as AudioMixEffectsType,
       ]);
@@ -419,10 +1010,10 @@ export default function AudioMixEffectsPortal({
     const [effect, option] = event.id.split("_");
 
     if (
-      mixEffects.current[effect as AudioMixEffectsType] &&
-      mixEffects.current[effect as AudioMixEffectsType].values
+      dynamicMixEffects.current[effect as AudioMixEffectsType] &&
+      dynamicMixEffects.current[effect as AudioMixEffectsType].values
     ) {
-      mixEffects.current[effect as AudioMixEffectsType].values[
+      dynamicMixEffects.current[effect as AudioMixEffectsType].values[
         option as MixEffectsOptionsType
       ] = event.value;
     }
@@ -449,143 +1040,50 @@ export default function AudioMixEffectsPortal({
           <div className='h-max mb-4'>
             <ScrollingContainer
               content={
-                <div className='flex items-center justify-start space-x-3'>
-                  <ScrollingContainerButton
-                    content='Reverb'
-                    id='reverb'
-                    callbackFunction={mixEffectChange}
-                  />
-                  <ScrollingContainerButton
-                    content='Chorus'
-                    id='chorus'
-                    callbackFunction={mixEffectChange}
-                  />
-                  <ScrollingContainerButton
-                    content='EQ'
-                    id='EQ'
-                    callbackFunction={mixEffectChange}
-                  />
-                  <ScrollingContainerButton
-                    content='Delay'
-                    id='delay'
-                    callbackFunction={mixEffectChange}
-                  />
-                  <ScrollingContainerButton
-                    content='Distortion'
-                    id='distortion'
-                    callbackFunction={mixEffectChange}
-                  />
-                  <ScrollingContainerButton
-                    content='Pitch shift'
-                    id='pitchShift'
-                    callbackFunction={mixEffectChange}
-                  />
-                  <ScrollingContainerButton
-                    content='Phaser'
-                    id='phaser'
-                    callbackFunction={mixEffectChange}
-                  />
+                <div className='flex items-center justify-start space-x-3 p-1'>
+                  {Object.entries(staticMixEffects).map(
+                    ([effect, staticMixEffect]) => {
+                      return (
+                        <ScrollingContainerButton
+                          key={effect}
+                          content={staticMixEffect.effectLabel}
+                          id={effect}
+                          callbackFunction={mixEffectChange}
+                        />
+                      );
+                    }
+                  )}
                 </div>
               }
             />
           </div>
           <div className='relative'>
-            {mixEffects.current.reverb.active && (
-              <AudioMixEffect
-                effect='reverb'
-                mixEffect={mixEffects.current.reverb}
-                effectLabel='Reverb'
-                labelPlacement={
-                  mixEffects.current.reverb.orientation === "vertical"
-                    ? { side: "left", sidePlacement: "bottom" }
-                    : { side: "bottom", sidePlacement: "left" }
-                }
-                updateMixEffectsValues={updateMixEffectsValues}
-              />
-            )}
-            {mixEffects.current.chorus.active && (
-              <AudioMixEffect
-                effect='chorus'
-                mixEffect={mixEffects.current.chorus}
-                effectLabel='Chorus'
-                labelPlacement={
-                  mixEffects.current.chorus.orientation === "vertical"
-                    ? {
-                        side: "right",
-                        sidePlacement: "bottom",
+            {Object.entries(dynamicMixEffects.current).map(
+              ([effect, dynamicMixEffect]) => {
+                if (dynamicMixEffect.active) {
+                  return (
+                    <AudioMixEffect
+                      key={effect}
+                      effect={effect as AudioMixEffectsType}
+                      staticMixEffect={
+                        staticMixEffects[effect as AudioMixEffectsType]
                       }
-                    : {
-                        side: "bottom",
-                        sidePlacement: "right",
+                      dynamicMixEffect={dynamicMixEffect}
+                      effectLabel={
+                        staticMixEffects[effect as AudioMixEffectsType]
+                          .effectLabel
                       }
+                      labelPlacement={
+                        staticMixEffects[effect as AudioMixEffectsType]
+                          .labelPlacement[
+                          dynamicMixEffect.orientation ?? "vertical"
+                        ]
+                      }
+                      updateMixEffectsValues={updateMixEffectsValues}
+                    />
+                  );
                 }
-                updateMixEffectsValues={updateMixEffectsValues}
-              />
-            )}
-            {mixEffects.current.EQ.active && (
-              <AudioMixEffect
-                effect='EQ'
-                mixEffect={mixEffects.current.EQ}
-                effectLabel='EQ'
-                labelPlacement={
-                  mixEffects.current.EQ.orientation === "vertical"
-                    ? { side: "top", sidePlacement: "left" }
-                    : { side: "left", sidePlacement: "top" }
-                }
-                updateMixEffectsValues={updateMixEffectsValues}
-              />
-            )}
-            {mixEffects.current.delay.active && (
-              <AudioMixEffect
-                effect='delay'
-                mixEffect={mixEffects.current.delay}
-                effectLabel='Delay'
-                labelPlacement={
-                  mixEffects.current.delay.orientation === "vertical"
-                    ? { side: "bottom", sidePlacement: "right" }
-                    : { side: "right", sidePlacement: "bottom" }
-                }
-                updateMixEffectsValues={updateMixEffectsValues}
-              />
-            )}
-            {mixEffects.current.distortion.active && (
-              <AudioMixEffect
-                effect='distortion'
-                mixEffect={mixEffects.current.distortion}
-                effectLabel='Distortion'
-                labelPlacement={
-                  mixEffects.current.distortion.orientation === "vertical"
-                    ? { side: "right", sidePlacement: "top" }
-                    : { side: "top", sidePlacement: "right" }
-                }
-                updateMixEffectsValues={updateMixEffectsValues}
-              />
-            )}
-            {mixEffects.current.pitchShift.active && (
-              <AudioMixEffect
-                effect='pitchShift'
-                mixEffect={mixEffects.current.pitchShift}
-                effectLabel='Pitch shift'
-                labelPlacement={
-                  mixEffects.current.pitchShift.orientation === "vertical"
-                    ? { side: "left", sidePlacement: "bottom" }
-                    : { side: "bottom", sidePlacement: "left" }
-                }
-                updateMixEffectsValues={updateMixEffectsValues}
-              />
-            )}
-            {mixEffects.current.phaser.active && (
-              <AudioMixEffect
-                effect='phaser'
-                mixEffect={mixEffects.current.phaser}
-                effectLabel='Phaser'
-                labelPlacement={
-                  mixEffects.current.phaser.orientation === "vertical"
-                    ? { side: "left", sidePlacement: "top" }
-                    : { side: "top", sidePlacement: "left" }
-                }
-                updateMixEffectsValues={updateMixEffectsValues}
-              />
+              }
             )}
           </div>
         </div>
@@ -602,15 +1100,17 @@ export default function AudioMixEffectsPortal({
       initWidth={600}
       initHeight={384}
       minWidth={324}
-      minHeight={326}
+      minHeight={334}
       resizeCallback={() => {
         if (portalRef.current) {
-          const previous = JSON.parse(JSON.stringify(mixEffects.current));
+          const previous = JSON.parse(
+            JSON.stringify(dynamicMixEffects.current)
+          );
           getPackedPositions(
             portalRef.current.getBoundingClientRect().width - 24,
             24
           );
-          if (!isEqual(mixEffects.current, previous)) {
+          if (!isEqual(dynamicMixEffects.current, previous)) {
             setRerender((prev) => !prev);
           }
         }

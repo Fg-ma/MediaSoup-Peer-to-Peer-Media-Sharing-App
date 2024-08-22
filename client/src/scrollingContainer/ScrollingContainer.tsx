@@ -48,6 +48,8 @@ export default function ScrollingContainer({
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (scrollingContainerRef.current) {
         scrollingContainerRef.current.scrollLeft += event.deltaY;
         updateVisibleScroll();

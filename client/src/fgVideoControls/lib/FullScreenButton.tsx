@@ -41,7 +41,7 @@ export default function FullScreenButton({
           </div>
         ) : undefined
       }
-      className='flex items-center justify-center w-10 aspect-square'
+      className='flex items-center justify-center w-10 aspect-square scale-x-[-1]'
     />
   );
 }

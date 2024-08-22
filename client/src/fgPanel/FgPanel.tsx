@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
-import FgButton from "../fgButton/FgButton";
+
+const FgButton = React.lazy(() => import("../fgButton/FgButton"));
 
 const PanelVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -339,26 +340,28 @@ export default function FgPanel({
         />
       )}
       {closeCallback && closePosition && (
-        <FgButton
-          externalRef={closeButtonRef}
-          clickFunction={closeCallback}
-          className={`w-3 aspect-square absolute flex items-center justify-center ${
-            closePosition === "topRight"
-              ? "right-0 top-0"
-              : closePosition === "topLeft"
-              ? "left-0 top-0"
-              : closePosition === "bottomRight"
-              ? "left-0 bottom-0"
-              : closePosition === "bottomLeft"
-              ? "right-0 bottom-0"
-              : ""
-          }`}
-          hoverContent={
-            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-              Close (x)
-            </div>
-          }
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <FgButton
+            externalRef={closeButtonRef}
+            clickFunction={closeCallback}
+            className={`w-3 aspect-square absolute flex items-center justify-center ${
+              closePosition === "topRight"
+                ? "right-0 top-0"
+                : closePosition === "topLeft"
+                ? "left-0 top-0"
+                : closePosition === "bottomRight"
+                ? "left-0 bottom-0"
+                : closePosition === "bottomLeft"
+                ? "right-0 bottom-0"
+                : ""
+            }`}
+            hoverContent={
+              <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                Close (x)
+              </div>
+            }
+          />
+        </Suspense>
       )}
     </motion.div>,
     document.body

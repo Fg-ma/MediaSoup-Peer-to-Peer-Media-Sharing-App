@@ -27,7 +27,7 @@ export default function PlaybackSpeedButton({
           </div>
         ) : undefined
       }
-      className='playback-speed-button wide-button text-lg'
+      className='playback-speed-button wide-button text-lg scale-x-[-1]'
     />
   );
 }

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ControlsLogic from "../fgVideoControls/lib/Controls";
-import CloseButton from "./lib/CloseButton";
+
+const CloseButton = React.lazy(() => import("./lib/CloseButton"));
 
 export default function FgVideoNavigation({
   name,
@@ -18,7 +19,11 @@ export default function FgVideoNavigation({
       <div className='grow text-lg cursor-default select-none'>
         {name ? name : username}
       </div>
-      {isClose && <CloseButton controls={controls} />}
+      {isClose && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <CloseButton controls={controls} />
+        </Suspense>
+      )}
     </div>
   );
 }

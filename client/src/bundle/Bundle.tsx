@@ -1,10 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import FgVideo from "../fgVideo/FgVideo";
+import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
 import { AudioEffectTypes, useStreamsContext } from "../context/StreamsContext";
 import BundleController from "./lib/BundleController";
-import FgAudioElementContainer from "../fgAudioElement/FgAudioElementContainer";
-import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
+
+const FgVideo = React.lazy(() => import("../fgVideo/FgVideo"));
+const FgAudioElementContainer = React.lazy(
+  () => import("../fgAudioElement/FgAudioElementContainer")
+);
 
 interface BundleOptions {
   isUser?: boolean;
@@ -248,105 +251,106 @@ export default function Bundle({
       {cameraStreams &&
         Object.keys(cameraStreams).length !== 0 &&
         Object.entries(cameraStreams).map(([key, cameraStream]) => (
-          <FgVideo
-            key={key}
-            socket={socket}
-            videoId={key}
-            table_id={table_id}
-            username={username}
-            instance={instance}
-            name={name}
-            type='camera'
-            handleAudioEffectChange={handleAudioEffectChange}
-            clientMute={clientMute}
-            localMute={localMute}
-            videoStream={cameraStream}
-            audioRef={audioRef}
-            options={{
-              isUser: bundleOptions.isUser,
-              acceptsVisualEffects: acceptsCameraEffects,
-              acceptsAudioEffects: acceptsAudioEffects,
-              isStream: true,
-              flipVideo: true,
-              isSlider: !bundleOptions.isUser,
-              isVolume: audioStream ? true : false,
-              isTotalTime: false,
-              isPlaybackSpeed: false,
-              isClosedCaptions: false,
-              isTimeLine: false,
-              isSkip: false,
-              isThumbnail: false,
-              isPreview: false,
-              initialVolume: bundleOptions.initialVolume
-                ? bundleOptions.initialVolume
-                : audioRef.current
-                ? audioRef.current.muted
-                  ? "off"
-                  : audioRef.current.volume > 0.5
-                  ? "high"
-                  : "low"
-                : "high",
-            }}
-            handleMute={handleMute}
-            handleMuteCallback={handleMuteCallback}
-            handleVolumeSliderCallback={handleVolumeSliderCallback}
-            tracksColorSetterCallback={tracksColorSetterCallback}
-          />
+          <Suspense key={key} fallback={<div>Loading...</div>}>
+            <FgVideo
+              socket={socket}
+              videoId={key}
+              table_id={table_id}
+              username={username}
+              instance={instance}
+              name={name}
+              type='camera'
+              handleAudioEffectChange={handleAudioEffectChange}
+              clientMute={clientMute}
+              localMute={localMute}
+              videoStream={cameraStream}
+              audioRef={audioRef}
+              options={{
+                isUser: bundleOptions.isUser,
+                acceptsVisualEffects: acceptsCameraEffects,
+                acceptsAudioEffects: acceptsAudioEffects,
+                isStream: true,
+                flipVideo: true,
+                isSlider: !bundleOptions.isUser,
+                isVolume: audioStream ? true : false,
+                isTotalTime: false,
+                isPlaybackSpeed: false,
+                isClosedCaptions: false,
+                isTimeLine: false,
+                isSkip: false,
+                isThumbnail: false,
+                isPreview: false,
+                initialVolume: bundleOptions.initialVolume
+                  ? bundleOptions.initialVolume
+                  : audioRef.current
+                  ? audioRef.current.muted
+                    ? "off"
+                    : audioRef.current.volume > 0.5
+                    ? "high"
+                    : "low"
+                  : "high",
+              }}
+              handleMute={handleMute}
+              handleMuteCallback={handleMuteCallback}
+              handleVolumeSliderCallback={handleVolumeSliderCallback}
+              tracksColorSetterCallback={tracksColorSetterCallback}
+            />
+          </Suspense>
         ))}
       {screenStreams &&
         Object.keys(screenStreams).length !== 0 &&
         Object.entries(screenStreams).map(([key, screenStream]) => (
-          <FgVideo
-            key={key}
-            socket={socket}
-            videoId={key}
-            table_id={table_id}
-            username={username}
-            instance={instance}
-            name={name}
-            type='screen'
-            handleAudioEffectChange={handleAudioEffectChange}
-            clientMute={clientMute}
-            localMute={localMute}
-            videoStream={screenStream}
-            audioRef={audioRef}
-            options={{
-              isUser: bundleOptions.isUser,
-              acceptsVisualEffects: acceptsScreenEffects,
-              acceptsAudioEffects: acceptsAudioEffects,
-              isStream: true,
-              isSlider: !bundleOptions.isUser,
-              isVolume: audioStream ? true : false,
-              isTotalTime: false,
-              isPlaybackSpeed: false,
-              isClosedCaptions: false,
-              isTimeLine: false,
-              isSkip: false,
-              isThumbnail: false,
-              isPreview: false,
-              initialVolume: bundleOptions.initialVolume
-                ? bundleOptions.initialVolume
-                : audioRef.current
-                ? audioRef.current.muted
-                  ? "off"
-                  : audioRef.current.volume > 0.5
-                  ? "high"
-                  : "low"
-                : "high",
-            }}
-            handleMute={handleMute}
-            handleMuteCallback={handleMuteCallback}
-            handleVolumeSliderCallback={handleVolumeSliderCallback}
-            tracksColorSetterCallback={tracksColorSetterCallback}
-          />
+          <Suspense key={key} fallback={<div>Loading...</div>}>
+            <FgVideo
+              socket={socket}
+              videoId={key}
+              table_id={table_id}
+              username={username}
+              instance={instance}
+              name={name}
+              type='screen'
+              handleAudioEffectChange={handleAudioEffectChange}
+              clientMute={clientMute}
+              localMute={localMute}
+              videoStream={screenStream}
+              audioRef={audioRef}
+              options={{
+                isUser: bundleOptions.isUser,
+                acceptsVisualEffects: acceptsScreenEffects,
+                acceptsAudioEffects: acceptsAudioEffects,
+                isStream: true,
+                isSlider: !bundleOptions.isUser,
+                isVolume: audioStream ? true : false,
+                isTotalTime: false,
+                isPlaybackSpeed: false,
+                isClosedCaptions: false,
+                isTimeLine: false,
+                isSkip: false,
+                isThumbnail: false,
+                isPreview: false,
+                initialVolume: bundleOptions.initialVolume
+                  ? bundleOptions.initialVolume
+                  : audioRef.current
+                  ? audioRef.current.muted
+                    ? "off"
+                    : audioRef.current.volume > 0.5
+                    ? "high"
+                    : "low"
+                  : "high",
+              }}
+              handleMute={handleMute}
+              handleMuteCallback={handleMuteCallback}
+              handleVolumeSliderCallback={handleVolumeSliderCallback}
+              tracksColorSetterCallback={tracksColorSetterCallback}
+            />
+          </Suspense>
         ))}
       {audioStream &&
         Object.keys(cameraStreams || {}).length === 0 &&
         Object.keys(screenStreams || {}).length === 0 && (
-          <div id={`${username}_audio_container`} className='relative'>
+          <Suspense fallback={<div>Loading...</div>}>
             <FgAudioElementContainer
               socket={socket}
-              table_id={table_id}
               username={username}
               instance={instance}
               name={name}
@@ -358,9 +362,9 @@ export default function Bundle({
               isUser={bundleOptions.isUser}
               clientMute={clientMute}
             />
-          </div>
+          </Suspense>
         )}
-      {audioStream && (
+      {audioStream && !bundleOptions.isUser && (
         <audio
           ref={audioRef}
           id={`${username}_audio_stream`}

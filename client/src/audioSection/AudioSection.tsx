@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import AudioSectionController from "./lib/audioSectionController";
-import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import shareAudioIcon from "../../public/svgs/shareAudioIcon.svg";
 import removeAudioIcon from "../../public/svgs/removeAudioIcon.svg";
-import VolumeSVG from "../FgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../FgVolumeElement/lib/volumeSVGPaths";
+
+const FgButton = React.lazy(() => import("../fgButton/FgButton"));
+const VolumeSVG = React.lazy(() => import("../FgVolumeElement/lib/VolumeSVG"));
 
 export default function AudioSection({
   socket,
@@ -111,48 +112,50 @@ export default function AudioSection({
         }
       />
       {audioActive && (
-        <FgButton
-          externalRef={muteBtnRef}
-          clickFunction={() => {
-            setVolumeState((prev) => ({
-              from: prev.to,
-              to: mutedAudioRef.current ? "high" : "off",
-            }));
-            handleExternalMute();
-          }}
-          className={`${
-            mutedAudioRef.current
-              ? "bg-orange-500 hover:bg-orange-700"
-              : "bg-blue-500 hover:bg-blue-700"
-          } text-white font-bold p-1 disabled:opacity-25`}
-          contentFunction={() => (
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              viewBox='0 0 100.0001 100.00001'
-              width='100%'
-              height='100%'
-              fill='white'
-            >
-              <VolumeSVG
-                volumeState={volumeState}
-                movingPath={volumeSVGPaths.low.right}
-                stationaryPaths={[
-                  volumeSVGPaths.high.left,
-                  volumeSVGPaths.high.middle,
-                ]}
-                color='white'
-              />
-              {volumeState.from === "" && volumeState.to === "off" && (
-                <path d={volumeSVGPaths.strike} />
-              )}
-            </svg>
-          )}
-          hoverContent={
-            <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              {mutedAudioRef.current ? "Unmute" : "Mute"}
-            </div>
-          }
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <FgButton
+            externalRef={muteBtnRef}
+            clickFunction={() => {
+              setVolumeState((prev) => ({
+                from: prev.to,
+                to: mutedAudioRef.current ? "high" : "off",
+              }));
+              handleExternalMute();
+            }}
+            className={`${
+              mutedAudioRef.current
+                ? "bg-orange-500 hover:bg-orange-700"
+                : "bg-blue-500 hover:bg-blue-700"
+            } text-white font-bold p-1 disabled:opacity-25`}
+            contentFunction={() => (
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                viewBox='0 0 100.0001 100.00001'
+                width='100%'
+                height='100%'
+                fill='white'
+              >
+                <VolumeSVG
+                  volumeState={volumeState}
+                  movingPath={volumeSVGPaths.low.right}
+                  stationaryPaths={[
+                    volumeSVGPaths.high.left,
+                    volumeSVGPaths.high.middle,
+                  ]}
+                  color='white'
+                />
+                {volumeState.from === "" && volumeState.to === "off" && (
+                  <path d={volumeSVGPaths.strike} />
+                )}
+              </svg>
+            )}
+            hoverContent={
+              <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+                {mutedAudioRef.current ? "Unmute" : "Mute"}
+              </div>
+            }
+          />
+        </Suspense>
       )}
     </div>
   );

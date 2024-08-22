@@ -114,7 +114,7 @@ type MediasoupSocketEvents =
       type: "producerDisconnected";
       producerUsername: string;
       producerInstance: string;
-      producerType: string;
+      producerType: "camera" | "screen" | "audio";
       producerId: string;
     }
   | {

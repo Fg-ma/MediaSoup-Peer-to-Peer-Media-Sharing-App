@@ -1,23 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Socket } from "socket.io-client";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../context/StreamsContext";
+import { AudioEffectTypes } from "../../context/StreamsContext";
+import FgPanel from "../../fgPanel/FgPanel";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import mixAudioEffectsIcon from "../../../public/svgs/mixAudioEffectsIcon.svg";
 import mixAudioEffectsOffIcon from "../../../public/svgs/mixAudioEffectsOffIcon.svg";
 import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
-import FgPanel from "../../fgPanel/FgPanel";
-import AudioMixEffectsPortal from "./AudioMixEffectsPortal";
 import RobotEffect from "./RobotEffect";
 import EchoEffect from "./EchoEffect";
 import AlienEffect from "./AlienEffect";
 import UnderwaterEffect from "./UnderwaterEffect";
 import TelephoneEffect from "./TelephoneEffect";
+
+const AudioMixEffectsPortal = React.lazy(
+  () => import("./AudioMixEffectsPortal")
+);
 
 export default function AudioEffectsSection({
   socket,
@@ -235,12 +234,14 @@ export default function AudioEffectsSection({
         closePosition='topRight'
       />
       {audioMixEffectsActive && (
-        <AudioMixEffectsPortal
-          audioMixEffectsButtonRef={audioMixEffectsButtonRef}
-          closeCallback={() => {
-            setAudioMixEffectsActive(false);
-          }}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <AudioMixEffectsPortal
+            audioMixEffectsButtonRef={audioMixEffectsButtonRef}
+            closeCallback={() => {
+              setAudioMixEffectsActive(false);
+            }}
+          />
+        </Suspense>
       )}
     </>
   );
