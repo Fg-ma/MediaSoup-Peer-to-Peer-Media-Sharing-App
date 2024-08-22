@@ -45,14 +45,6 @@ const main = async () => {
   server.listen(port, () => {
     console.log("Server started on port ", port);
   });
-  setInterval(() => {
-    console.log(
-      tableConsumerTransports,
-      tableConsumers,
-      tableProducerTransports,
-      tableProducers
-    );
-  }, 5000);
 };
 
 main();
