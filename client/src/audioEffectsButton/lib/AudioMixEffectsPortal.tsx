@@ -97,7 +97,7 @@ const staticMixEffects: {
         units: "oct",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#8076b7",
     effectLabel: "Auto filter",
     labelPlacement: {
       vertical: {
@@ -124,7 +124,7 @@ const staticMixEffects: {
         units: "Hz",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#a53f57",
     effectLabel: "Auto panner",
     labelPlacement: {
       vertical: {
@@ -165,7 +165,7 @@ const staticMixEffects: {
         units: "dB",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#aed0f6",
     effectLabel: "Auto wah",
     labelPlacement: {
       vertical: {
@@ -192,7 +192,7 @@ const staticMixEffects: {
         units: "bits",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#fa7453",
     effectLabel: "Bit crusher",
     labelPlacement: {
       vertical: {
@@ -219,7 +219,7 @@ const staticMixEffects: {
         units: "order",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#02e5aa",
     effectLabel: "Chebyshev",
     labelPlacement: {
       vertical: {
@@ -390,7 +390,7 @@ const staticMixEffects: {
         units: "Hz",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#fe7b88",
     effectLabel: "Freeverb",
     labelPlacement: {
       vertical: {
@@ -418,7 +418,7 @@ const staticMixEffects: {
         units: "size",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#6b76fe",
     effectLabel: "JC reverb",
     labelPlacement: {
       vertical: {
@@ -490,7 +490,7 @@ const staticMixEffects: {
         units: "%",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#733f87",
     effectLabel: "Ping pong delay",
     labelPlacement: {
       vertical: {
@@ -569,7 +569,7 @@ const staticMixEffects: {
         units: "width",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#f9d8e9",
     effectLabel: "Stereo widener",
     labelPlacement: {
       vertical: {
@@ -604,7 +604,7 @@ const staticMixEffects: {
         units: "%",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#d1cdc7",
     effectLabel: "Tremolo",
     labelPlacement: {
       vertical: {
@@ -638,7 +638,7 @@ const staticMixEffects: {
         units: "%",
       },
     },
-    backgroundColor: "#d8bd9a",
+    backgroundColor: "#c09f76",
     effectLabel: "Vibrato",
     labelPlacement: {
       vertical: {
