@@ -28,7 +28,21 @@ const tickTransition: Transition = {
   },
 };
 
+const defaultFgSliderOptions = {
+  tickHoveringTimeoutDuration: 75,
+  id: "",
+  ticks: 6,
+  rangeMax: 100,
+  rangeMin: 0,
+  precision: 1,
+  snapToWholeNum: false,
+  snapToNearestTick: false,
+  orientation: "vertical",
+};
+
 export interface SliderOptions {
+  id?: string;
+  initValue?: number;
   topLabel?: string;
   bottomLabel?: string;
   ticks?: number;
@@ -37,6 +51,8 @@ export interface SliderOptions {
   precision?: number;
   units?: string;
   snapToWholeNum?: boolean;
+  snapToNearestTick?: boolean;
+  orientation?: "vertical" | "horizontal";
 }
 
 export interface SliderChangeEvent {
@@ -45,40 +61,31 @@ export interface SliderChangeEvent {
 }
 
 interface SliderProps extends SliderOptions {
-  id?: string;
-  orientation?: "vertical" | "horizontal";
+  options: SliderOptions;
   onValueChange?: (event: SliderChangeEvent) => void;
 }
 
-export default function FgSlider({
-  id = "default",
-  topLabel,
-  bottomLabel,
-  ticks = 6,
-  rangeMax = 100,
-  rangeMin = 0,
-  precision = 1,
-  units,
-  snapToWholeNum = false,
-  orientation = "vertical",
-  onValueChange,
-}: SliderProps) {
+export default function FgSlider({ options, onValueChange }: SliderProps) {
+  const fgSliderOptions = {
+    ...defaultFgSliderOptions,
+    ...options,
+  };
+
   const [sliding, setSliding] = useState(false);
   const [handleHovering, setHandleHovering] = useState(false);
   const [tickHovering, setTickHovering] = useState(false);
-  const [value, setValue] = useState((rangeMax - Math.abs(rangeMin)) / 2);
-  const [styleValue, setStyleValue] = useState(50);
+  const tickHoveringTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const handleRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const tickPositions = useRef<number[]>(
-    Array.from({ length: ticks }, (_, i) => {
-      const positionPercent = (i / (ticks - 1)) * 90 + 5;
+    Array.from({ length: fgSliderOptions.ticks }, (_, i) => {
+      const positionPercent = (i / (fgSliderOptions.ticks - 1)) * 90 + 5;
       return positionPercent;
     })
   );
   const snapValues = useRef<number[]>(
-    Array.from({ length: ticks }, (_, i) => {
-      const positionPercent = (i / (ticks - 1)) * 100;
+    Array.from({ length: fgSliderOptions.ticks }, (_, i) => {
+      const positionPercent = (i / (fgSliderOptions.ticks - 1)) * 100;
       return positionPercent;
     })
   );
@@ -99,7 +106,10 @@ export default function FgSlider({
   };
 
   const snapPositions = (value: number): number => {
-    const threshold = 2;
+    const threshold = fgSliderOptions.snapToNearestTick
+      ? (snapValues.current[1] - Math.abs(snapValues.current[0])) / 2
+      : 2;
+
     for (let i = 0; i < snapValues.current.length; i++) {
       if (Math.abs(value - snapValues.current[i]) <= threshold) {
         return snapValues.current[i];
@@ -109,6 +119,43 @@ export default function FgSlider({
     return value;
   };
 
+  const [value, setValue] = useState(
+    rescaleValue(
+      snapPositions(
+        rescaleValue(
+          fgSliderOptions.initValue
+            ? fgSliderOptions.initValue
+            : (fgSliderOptions.rangeMax - fgSliderOptions.rangeMin) / 2,
+          [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
+          [0, 100]
+        )
+      ),
+      [0, 100],
+      [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax]
+    )
+  );
+  const [styleValue, setStyleValue] = useState(
+    Math.max(
+      5,
+      Math.min(
+        95,
+        rescaleValue(
+          snapPositions(
+            rescaleValue(
+              fgSliderOptions.initValue
+                ? fgSliderOptions.initValue
+                : (fgSliderOptions.rangeMax - fgSliderOptions.rangeMin) / 2,
+              [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
+              [0, 100]
+            )
+          ),
+          [0, 100],
+          [5, 95]
+        )
+      )
+    )
+  );
+
   const handleMouseMove = (event: React.MouseEvent | MouseEvent) => {
     if (!trackRef.current) {
       return;
@@ -117,9 +164,9 @@ export default function FgSlider({
     const trackRect = trackRef.current.getBoundingClientRect();
 
     let offset: number | undefined;
-    if (orientation === "vertical") {
+    if (fgSliderOptions.orientation === "vertical") {
       offset = ((trackRect.bottom - event.clientY) / trackRect.height) * 100;
-    } else if (orientation === "horizontal") {
+    } else if (fgSliderOptions.orientation === "horizontal") {
       offset = ((event.clientX - trackRect.left) / trackRect.width) * 100;
     }
 
@@ -134,11 +181,11 @@ export default function FgSlider({
     let newValueState = rescaleValue(
       snapPositions(newValue),
       [0, 100],
-      [rangeMin, rangeMax]
+      [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax]
     );
 
     // Snap to whole number if enabled
-    if (snapToWholeNum) {
+    if (fgSliderOptions.snapToWholeNum) {
       newValueState = Math.round(newValueState);
     }
 
@@ -146,7 +193,14 @@ export default function FgSlider({
     setStyleValue(
       Math.max(
         5,
-        Math.min(95, rescaleValue(newValueState, [rangeMin, rangeMax], [5, 95]))
+        Math.min(
+          95,
+          rescaleValue(
+            newValueState,
+            [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
+            [5, 95]
+          )
+        )
       )
     );
   };
@@ -169,58 +223,66 @@ export default function FgSlider({
 
   useEffect(() => {
     if (onValueChange) {
-      onValueChange({ value, id });
+      onValueChange({ value, id: fgSliderOptions.id });
     }
   }, [value]);
 
   return (
     <div
-      id={id}
+      id={fgSliderOptions.id}
       className={`flex items-center justify-center relative flex-col
-        ${orientation === "vertical" ? "w-16 h-full" : ""}
-        ${orientation === "horizontal" ? "h-16 w-full" : ""}
+        ${fgSliderOptions.orientation === "vertical" ? "w-16 h-full" : ""}
+        ${fgSliderOptions.orientation === "horizontal" ? "h-16 w-full" : ""}
       `}
     >
-      {topLabel && (
+      {fgSliderOptions.topLabel && (
         <div
           className={`text-black text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
-            ${orientation === "vertical" ? "text-center" : ""}
-            ${orientation === "horizontal" ? "text-start absolute top-0.5" : ""}
+            ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
+            ${
+              fgSliderOptions.orientation === "horizontal"
+                ? "text-start absolute top-0.5"
+                : ""
+            }
           `}
         >
-          <div className='grow'>{topLabel}</div>
-          {tickHovering && units && orientation === "horizontal" && (
-            <AnimatePresence>
-              <motion.div
-                className='w-max'
-                variants={tickVar}
-                initial='init'
-                animate='animate'
-                exit='init'
-                transition={tickTransition}
-              >
-                {units}
-              </motion.div>
-            </AnimatePresence>
-          )}
+          <div className='grow'>{fgSliderOptions.topLabel}</div>
+          {tickHovering &&
+            fgSliderOptions.units &&
+            fgSliderOptions.orientation === "horizontal" && (
+              <AnimatePresence>
+                <motion.div
+                  className='w-max'
+                  variants={tickVar}
+                  initial='init'
+                  animate='animate'
+                  exit='init'
+                  transition={tickTransition}
+                >
+                  {fgSliderOptions.units}
+                </motion.div>
+              </AnimatePresence>
+            )}
         </div>
       )}
       <div
         className={`flex items-center justify-center
-          ${orientation === "vertical" ? "w-full grow" : ""}
-          ${orientation === "horizontal" ? "py-1 w-full" : ""}
+          ${fgSliderOptions.orientation === "vertical" ? "w-full grow" : ""}
+          ${fgSliderOptions.orientation === "horizontal" ? "py-1 w-full" : ""}
         `}
       >
         <div
           className={`relative cursor-pointer rounded hover:shadow-FgSlider
-            ${orientation === "vertical" ? "w-2.5 h-full" : ""}
-            ${orientation === "horizontal" ? "h-2.5 w-full" : ""}
+            ${fgSliderOptions.orientation === "vertical" ? "w-2.5 h-full" : ""}
+            ${
+              fgSliderOptions.orientation === "horizontal" ? "h-2.5 w-full" : ""
+            }
           `}
           style={{
             background: `linear-gradient(to ${
-              orientation === "vertical"
+              fgSliderOptions.orientation === "vertical"
                 ? "top"
-                : orientation === "horizontal"
+                : fgSliderOptions.orientation === "horizontal"
                 ? "right"
                 : "top"
             }, #F56114 ${styleValue}%, #e6e6e6 ${styleValue}%)`,
@@ -234,27 +296,32 @@ export default function FgSlider({
               <div
                 className={`absolute bg-black rounded-1.5
                   ${
-                    orientation === "vertical"
+                    fgSliderOptions.orientation === "vertical"
                       ? "w-3.5 h-1 left-1/2 -translate-x-1/2"
                       : ""
                   }
                   ${
-                    orientation === "horizontal"
+                    fgSliderOptions.orientation === "horizontal"
                       ? "w-1 h-3.5 top-1/2 -translate-y-1/2"
                       : ""
                   }
                 `}
                 style={{
-                  [orientation === "vertical"
+                  [fgSliderOptions.orientation === "vertical"
                     ? "bottom"
-                    : orientation === "horizontal"
+                    : fgSliderOptions.orientation === "horizontal"
                     ? "left"
                     : "bottom"]: `calc(${pos}% - 2px)`,
                 }}
                 onMouseEnter={() => {
-                  setTickHovering(true);
+                  tickHoveringTimeout.current = setTimeout(() => {
+                    setTickHovering(true);
+                  }, fgSliderOptions.tickHoveringTimeoutDuration);
                 }}
                 onMouseLeave={() => {
+                  if (tickHoveringTimeout.current) {
+                    clearTimeout(tickHoveringTimeout.current);
+                  }
                   setTickHovering(false);
                 }}
               ></div>
@@ -262,16 +329,22 @@ export default function FgSlider({
                 <AnimatePresence>
                   <motion.div
                     style={{
-                      [orientation === "vertical"
+                      [fgSliderOptions.orientation === "vertical"
                         ? "bottom"
                         : ""]: `calc(${pos}% - 0.625rem)`,
-                      [orientation === "horizontal" ? "left" : ""]: `${pos}%`,
+                      [fgSliderOptions.orientation === "horizontal"
+                        ? "left"
+                        : ""]: `${pos}%`,
                     }}
                     className={`text-black font-K2D text-sm absolute w-max flex justify-center items-center
-                      ${orientation === "vertical" ? "left-3.5" : ""}
                       ${
-                        orientation === "horizontal"
-                          ? bottomLabel
+                        fgSliderOptions.orientation === "vertical"
+                          ? "left-3.5"
+                          : ""
+                      }
+                      ${
+                        fgSliderOptions.orientation === "horizontal"
+                          ? fgSliderOptions.bottomLabel
                             ? "bottom-3"
                             : "top-2.5"
                           : ""
@@ -279,9 +352,9 @@ export default function FgSlider({
                     `}
                     variants={tickVar}
                     initial={
-                      orientation === "vertical"
+                      fgSliderOptions.orientation === "vertical"
                         ? "verticalInit"
-                        : orientation === "horizontal"
+                        : fgSliderOptions.orientation === "horizontal"
                         ? "horizontalInit"
                         : "verticalInit"
                     }
@@ -289,15 +362,23 @@ export default function FgSlider({
                     exit='init'
                     transition={tickTransition}
                   >
-                    {units &&
-                    orientation === "vertical" &&
+                    {fgSliderOptions.units &&
+                    fgSliderOptions.orientation === "vertical" &&
                     (index === 0 || index === tickPositions.current.length - 1)
-                      ? `${rescaleValue(pos, [5, 95], [rangeMin, rangeMax])
-                          .toFixed(precision)
-                          .replace(/\.?0+$/, "")} ${units}`
-                      : `${rescaleValue(pos, [5, 95], [rangeMin, rangeMax])
-                          .toFixed(precision)
-                          .replace(/\.?0+$/, "")}`}
+                      ? `${rescaleValue(
+                          pos,
+                          [5, 95],
+                          [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax]
+                        ).toFixed(fgSliderOptions.precision)} ${
+                          fgSliderOptions.units
+                        }`
+                      : `${parseFloat(
+                          rescaleValue(
+                            pos,
+                            [5, 95],
+                            [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax]
+                          ).toFixed(fgSliderOptions.precision)
+                        )}`}
                   </motion.div>
                 </AnimatePresence>
               )}
@@ -306,20 +387,20 @@ export default function FgSlider({
           <div
             className={`absolute rounded bg-[#333333] cursor-pointer
               ${
-                orientation === "vertical"
+                fgSliderOptions.orientation === "vertical"
                   ? "w-4.5 h-2.5 left-1/2 -translate-x-1/2"
                   : ""
               }
               ${
-                orientation === "horizontal"
+                fgSliderOptions.orientation === "horizontal"
                   ? "w-2.5 h-4.5 top-1/2 -translate-y-1/2 "
                   : ""
               }
             `}
             style={{
-              [orientation === "vertical"
+              [fgSliderOptions.orientation === "vertical"
                 ? "bottom"
-                : orientation === "horizontal"
+                : fgSliderOptions.orientation === "horizontal"
                 ? "left"
                 : "bottom"]: `calc(${styleValue}% - 5px)`,
             }}
@@ -336,39 +417,41 @@ export default function FgSlider({
               <SliderValuePortal
                 value={value}
                 handleRef={handleRef}
-                precision={precision}
-                units={units}
+                precision={fgSliderOptions.precision}
+                units={fgSliderOptions.units}
               />
             </Suspense>
           )}
         </div>
       </div>
-      {bottomLabel && (
+      {fgSliderOptions.bottomLabel && (
         <div
           className={`text-black text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
-            ${orientation === "vertical" ? "text-center" : ""}
+            ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
             ${
-              orientation === "horizontal"
+              fgSliderOptions.orientation === "horizontal"
                 ? "text-start absolute bottom-0.5"
                 : ""
             }
           `}
         >
-          <div className='grow'>{bottomLabel}</div>
-          {tickHovering && units && orientation === "horizontal" && (
-            <AnimatePresence>
-              <motion.div
-                className='w-max'
-                variants={tickVar}
-                initial='init'
-                animate='animate'
-                exit='init'
-                transition={tickTransition}
-              >
-                {units}
-              </motion.div>
-            </AnimatePresence>
-          )}
+          <div className='grow'>{fgSliderOptions.bottomLabel}</div>
+          {tickHovering &&
+            fgSliderOptions.units &&
+            fgSliderOptions.orientation === "horizontal" && (
+              <AnimatePresence>
+                <motion.div
+                  className='w-max'
+                  variants={tickVar}
+                  initial='init'
+                  animate='animate'
+                  exit='init'
+                  transition={tickTransition}
+                >
+                  {fgSliderOptions.units}
+                </motion.div>
+              </AnimatePresence>
+            )}
         </div>
       )}
     </div>

@@ -11,6 +11,14 @@ import {
   MixEffectsOptionsType,
 } from "../../effects/audioEffects/AudioEffects";
 
+import texture1 from "../../../public/textures/1.jpg";
+import texture2 from "../../../public/textures/2.png";
+import texture3 from "../../../public/textures/3.jpg";
+import texture4 from "../../../public/textures/4.png";
+import texture5 from "../../../public/textures/5.jpg";
+import texture6 from "../../../public/textures/6.jpg";
+import texture7 from "../../../public/textures/7.png";
+
 const oneSliderPossibleSizes: PossibleSizesType = {
   vertical: [108, 240],
   horizontal: [240, 108],
@@ -47,6 +55,7 @@ export interface StaticMixEffect {
     [option in MixEffectsOptionsType]?: SliderOptions;
   };
   backgroundColor: string;
+  backgroundImage?: string;
   effectLabel: string;
   labelPlacement: {
     vertical: LabelPlacementType;
@@ -98,6 +107,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#8076b7",
+    backgroundImage: texture1,
     effectLabel: "Auto filter",
     labelPlacement: {
       vertical: {
@@ -125,6 +135,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#a53f57",
+    backgroundImage: texture2,
     effectLabel: "Auto panner",
     labelPlacement: {
       vertical: {
@@ -166,6 +177,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#aed0f6",
+    backgroundImage: texture3,
     effectLabel: "Auto wah",
     labelPlacement: {
       vertical: {
@@ -193,6 +205,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#fa7453",
+    backgroundImage: texture4,
     effectLabel: "Bit crusher",
     labelPlacement: {
       vertical: {
@@ -220,6 +233,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#02e5aa",
+    backgroundImage: texture5,
     effectLabel: "Chebyshev",
     labelPlacement: {
       vertical: {
@@ -261,8 +275,9 @@ const staticMixEffects: {
         units: "%",
       },
     },
-    effectLabel: "Chorus",
     backgroundColor: "#d8bd9a",
+    backgroundImage: texture6,
+    effectLabel: "Chorus",
     labelPlacement: {
       vertical: {
         side: "right",
@@ -290,13 +305,15 @@ const staticMixEffects: {
       },
       oversample: {
         topLabel: "oversample",
-        ticks: 6,
+        ticks: 2,
         rangeMax: 4,
         rangeMin: 2,
         units: "x",
+        snapToNearestTick: true,
       },
     },
     backgroundColor: "#e7c47d",
+    backgroundImage: texture7,
     effectLabel: "Distortion",
     labelPlacement: {
       vertical: { side: "right", sidePlacement: "top" },
@@ -998,8 +1015,8 @@ export default function AudioMixEffectsPortal({
 
     if (portalRef.current) {
       getPackedPositions(
-        portalRef.current.getBoundingClientRect().width - 24,
-        24
+        portalRef.current.getBoundingClientRect().width - 28,
+        28
       );
     }
 
@@ -1099,16 +1116,16 @@ export default function AudioMixEffectsPortal({
       }}
       initWidth={600}
       initHeight={384}
-      minWidth={324}
-      minHeight={334}
+      minWidth={340}
+      minHeight={350}
       resizeCallback={() => {
         if (portalRef.current) {
           const previous = JSON.parse(
             JSON.stringify(dynamicMixEffects.current)
           );
           getPackedPositions(
-            portalRef.current.getBoundingClientRect().width - 24,
-            24
+            portalRef.current.getBoundingClientRect().width - 28,
+            28
           );
           if (!isEqual(dynamicMixEffects.current, previous)) {
             setRerender((prev) => !prev);

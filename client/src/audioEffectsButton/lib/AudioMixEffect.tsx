@@ -29,11 +29,17 @@ export default function AudioMixEffect({
         ${dynamicMixEffect.orientation === "horizontal" ? "w-60" : ""}  
       `}
       style={{
-        backgroundColor: staticMixEffect.backgroundColor,
         left: `${dynamicMixEffect.x}px`,
         top: `${dynamicMixEffect.y}px`,
         width: `${dynamicMixEffect.width}px`,
         height: `${dynamicMixEffect.height}px`,
+        backgroundColor: staticMixEffect.backgroundColor,
+        ...(staticMixEffect.backgroundImage && {
+          backgroundImage: `url(${staticMixEffect.backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundBlendMode: "overlay",
+          backgroundRepeat: "no-repeat",
+        }),
       }}
     >
       <div
@@ -87,16 +93,20 @@ export default function AudioMixEffect({
         {Object.entries(staticMixEffect.options).map(([key, option], index) => (
           <FgSlider
             key={index}
-            id={`${effect}_${key}`}
-            topLabel={option.topLabel}
-            bottomLabel={option.bottomLabel}
-            ticks={option.ticks}
-            rangeMax={option.rangeMax}
-            rangeMin={option.rangeMin}
-            precision={option.precision}
-            units={option.units}
-            snapToWholeNum={option.snapToWholeNum}
-            orientation={dynamicMixEffect.orientation}
+            options={{
+              id: `${effect}_${key}`,
+              initValue: option.initValue,
+              topLabel: option.topLabel,
+              bottomLabel: option.bottomLabel,
+              ticks: option.ticks,
+              rangeMax: option.rangeMax,
+              rangeMin: option.rangeMin,
+              precision: option.precision,
+              units: option.units,
+              snapToWholeNum: option.snapToWholeNum,
+              snapToNearestTick: option.snapToNearestTick,
+              orientation: dynamicMixEffect.orientation,
+            }}
             onValueChange={updateMixEffectsValues}
           />
         ))}
