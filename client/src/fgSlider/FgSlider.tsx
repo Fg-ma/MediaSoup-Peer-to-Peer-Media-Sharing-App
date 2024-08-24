@@ -125,7 +125,7 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
         rescaleValue(
           fgSliderOptions.initValue
             ? fgSliderOptions.initValue
-            : (fgSliderOptions.rangeMax - fgSliderOptions.rangeMin) / 2,
+            : (fgSliderOptions.rangeMax + fgSliderOptions.rangeMin) / 2,
           [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
           [0, 100]
         )
@@ -144,7 +144,7 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
             rescaleValue(
               fgSliderOptions.initValue
                 ? fgSliderOptions.initValue
-                : (fgSliderOptions.rangeMax - fgSliderOptions.rangeMin) / 2,
+                : (fgSliderOptions.rangeMax + fgSliderOptions.rangeMin) / 2,
               [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
               [0, 100]
             )

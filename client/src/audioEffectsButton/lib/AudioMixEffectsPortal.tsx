@@ -11,13 +11,13 @@ import {
   MixEffectsOptionsType,
 } from "../../effects/audioEffects/AudioEffects";
 
-import texture1 from "../../../public/textures/1.jpg";
-import texture2 from "../../../public/textures/2.png";
-import texture3 from "../../../public/textures/3.jpg";
-import texture4 from "../../../public/textures/4.png";
-import texture5 from "../../../public/textures/5.jpg";
-import texture6 from "../../../public/textures/6.jpg";
-import texture7 from "../../../public/textures/7.png";
+import backgroundTex1 from "../../../public/backgroundTexs/backgroundTex1.jpg";
+import backgroundTex2 from "../../../public/backgroundTexs/backgroundTex2.jpg";
+import backgroundTex3 from "../../../public/backgroundTexs/backgroundTex3.jpg";
+import backgroundTex4 from "../../../public/backgroundTexs/backgroundTex4.jpg";
+import backgroundTex5 from "../../../public/backgroundTexs/backgroundTex5.jpg";
+import backgroundTex6 from "../../../public/backgroundTexs/backgroundTex6.jpg";
+import backgroundTex7 from "../../../public/backgroundTexs/backgroundTex7.jpg";
 
 const oneSliderPossibleSizes: PossibleSizesType = {
   vertical: [108, 240],
@@ -80,8 +80,8 @@ const staticMixEffects: {
 } = {
   autoFilter: {
     possibleSizes: {
-      horizontal: threeSlidersPossibleSizes.horizontal,
       vertical: threeSlidersPossibleSizes.vertical,
+      horizontal: threeSlidersPossibleSizes.horizontal,
     },
     options: {
       frequency: {
@@ -107,23 +107,23 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#8076b7",
-    backgroundImage: texture1,
+    backgroundImage: backgroundTex1,
     effectLabel: "Auto filter",
     labelPlacement: {
       vertical: {
-        side: "right",
-        sidePlacement: "bottom",
+        side: "left",
+        sidePlacement: "top",
       },
       horizontal: {
-        side: "right",
-        sidePlacement: "bottom",
+        side: "bottom",
+        sidePlacement: "center",
       },
     },
   },
   autoPanner: {
     possibleSizes: {
-      horizontal: oneSliderPossibleSizes.horizontal,
       vertical: oneSliderPossibleSizes.vertical,
+      horizontal: oneSliderPossibleSizes.horizontal,
     },
     options: {
       frequency: {
@@ -135,16 +135,16 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#a53f57",
-    backgroundImage: texture2,
+    backgroundImage: backgroundTex4,
     effectLabel: "Auto panner",
     labelPlacement: {
       vertical: {
         side: "right",
-        sidePlacement: "bottom",
+        sidePlacement: "top",
       },
       horizontal: {
         side: "bottom",
-        sidePlacement: "right",
+        sidePlacement: "left",
       },
     },
   },
@@ -177,23 +177,23 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#aed0f6",
-    backgroundImage: texture3,
+    backgroundImage: backgroundTex7,
     effectLabel: "Auto wah",
     labelPlacement: {
       vertical: {
-        side: "right",
-        sidePlacement: "bottom",
+        side: "top",
+        sidePlacement: "right",
       },
       horizontal: {
         side: "bottom",
-        sidePlacement: "right",
+        sidePlacement: "left",
       },
     },
   },
   bitCrusher: {
     possibleSizes: {
-      horizontal: oneSliderPossibleSizes.horizontal,
       vertical: oneSliderPossibleSizes.vertical,
+      horizontal: oneSliderPossibleSizes.horizontal,
     },
     options: {
       bits: {
@@ -205,16 +205,16 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#fa7453",
-    backgroundImage: texture4,
+    backgroundImage: backgroundTex3,
     effectLabel: "Bit crusher",
     labelPlacement: {
       vertical: {
         side: "right",
-        sidePlacement: "bottom",
+        sidePlacement: "middle",
       },
       horizontal: {
-        side: "bottom",
-        sidePlacement: "right",
+        side: "top",
+        sidePlacement: "center",
       },
     },
   },
@@ -233,15 +233,15 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#02e5aa",
-    backgroundImage: texture5,
+    backgroundImage: backgroundTex2,
     effectLabel: "Chebyshev",
     labelPlacement: {
       vertical: {
-        side: "right",
+        side: "left",
         sidePlacement: "bottom",
       },
       horizontal: {
-        side: "bottom",
+        side: "top",
         sidePlacement: "right",
       },
     },
@@ -276,7 +276,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#d8bd9a",
-    backgroundImage: texture6,
+    backgroundImage: backgroundTex6,
     effectLabel: "Chorus",
     labelPlacement: {
       vertical: {
@@ -313,7 +313,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#e7c47d",
-    backgroundImage: texture7,
+    backgroundImage: backgroundTex5,
     effectLabel: "Distortion",
     labelPlacement: {
       vertical: { side: "right", sidePlacement: "top" },
@@ -349,6 +349,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#888097",
+    backgroundImage: backgroundTex2,
     effectLabel: "EQ",
     labelPlacement: {
       vertical: { side: "top", sidePlacement: "left" },
@@ -379,10 +380,11 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#c5cfd0",
+    backgroundImage: backgroundTex2,
     effectLabel: "Feedback delay",
     labelPlacement: {
       vertical: { side: "bottom", sidePlacement: "right" },
-      horizontal: { side: "right", sidePlacement: "bottom" },
+      horizontal: { side: "top", sidePlacement: "left" },
     },
   },
   freeverb: {
@@ -408,15 +410,16 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#fe7b88",
+    backgroundImage: backgroundTex1,
     effectLabel: "Freeverb",
     labelPlacement: {
       vertical: {
-        side: "right",
-        sidePlacement: "bottom",
+        side: "left",
+        sidePlacement: "middle",
       },
       horizontal: {
         side: "bottom",
-        sidePlacement: "right",
+        sidePlacement: "left",
       },
     },
   },
@@ -436,15 +439,16 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#6b76fe",
+    backgroundImage: backgroundTex6,
     effectLabel: "JC reverb",
     labelPlacement: {
       vertical: {
-        side: "right",
-        sidePlacement: "bottom",
+        side: "left",
+        sidePlacement: "top",
       },
       horizontal: {
         side: "bottom",
-        sidePlacement: "right",
+        sidePlacement: "center",
       },
     },
   },
@@ -478,6 +482,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#d03818",
+    backgroundImage: backgroundTex3,
     effectLabel: "Phaser",
     labelPlacement: {
       vertical: { side: "left", sidePlacement: "top" },
@@ -486,8 +491,8 @@ const staticMixEffects: {
   },
   pingPongDelay: {
     possibleSizes: {
-      horizontal: twoSlidersPossibleSizes.horizontal,
       vertical: twoSlidersPossibleSizes.vertical,
+      horizontal: twoSlidersPossibleSizes.horizontal,
     },
     options: {
       delayTime: {
@@ -508,15 +513,16 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#733f87",
-    effectLabel: "Ping pong delay",
+    backgroundImage: backgroundTex4,
+    effectLabel: "Ping pong",
     labelPlacement: {
       vertical: {
-        side: "right",
-        sidePlacement: "bottom",
+        side: "left",
+        sidePlacement: "top",
       },
       horizontal: {
-        side: "bottom",
-        sidePlacement: "right",
+        side: "top",
+        sidePlacement: "left",
       },
     },
   },
@@ -536,6 +542,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#cacaca",
+    backgroundImage: backgroundTex5,
     effectLabel: "Pitch shift",
     labelPlacement: {
       vertical: { side: "left", sidePlacement: "bottom" },
@@ -565,6 +572,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#858585",
+    backgroundImage: backgroundTex7,
     effectLabel: "Reverb",
     labelPlacement: {
       vertical: { side: "left", sidePlacement: "bottom" },
@@ -573,8 +581,8 @@ const staticMixEffects: {
   },
   stereoWidener: {
     possibleSizes: {
-      horizontal: oneSliderPossibleSizes.horizontal,
       vertical: oneSliderPossibleSizes.vertical,
+      horizontal: oneSliderPossibleSizes.horizontal,
     },
     options: {
       width: {
@@ -587,7 +595,8 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#f9d8e9",
-    effectLabel: "Stereo widener",
+    backgroundImage: backgroundTex4,
+    effectLabel: "Stereo wide",
     labelPlacement: {
       vertical: {
         side: "right",
@@ -601,8 +610,8 @@ const staticMixEffects: {
   },
   tremolo: {
     possibleSizes: {
-      horizontal: twoSlidersPossibleSizes.horizontal,
       vertical: twoSlidersPossibleSizes.vertical,
+      horizontal: twoSlidersPossibleSizes.horizontal,
     },
     options: {
       frequency: {
@@ -622,15 +631,16 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#d1cdc7",
+    backgroundImage: backgroundTex5,
     effectLabel: "Tremolo",
     labelPlacement: {
       vertical: {
         side: "right",
-        sidePlacement: "bottom",
+        sidePlacement: "middle",
       },
       horizontal: {
-        side: "bottom",
-        sidePlacement: "right",
+        side: "left",
+        sidePlacement: "middle",
       },
     },
   },
@@ -656,6 +666,7 @@ const staticMixEffects: {
       },
     },
     backgroundColor: "#c09f76",
+    backgroundImage: backgroundTex7,
     effectLabel: "Vibrato",
     labelPlacement: {
       vertical: {
@@ -663,8 +674,8 @@ const staticMixEffects: {
         sidePlacement: "bottom",
       },
       horizontal: {
-        side: "bottom",
-        sidePlacement: "right",
+        side: "left",
+        sidePlacement: "top",
       },
     },
   },
