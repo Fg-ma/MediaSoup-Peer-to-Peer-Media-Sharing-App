@@ -3,15 +3,27 @@ import Scale from "./Scale";
 
 export default function ScaleSection({
   externalRef,
+  getVisibleOctave,
+  visibleOctave,
 }: {
-  externalRef?: React.RefObject<HTMLDivElement>;
+  externalRef: React.RefObject<HTMLDivElement>;
+  getVisibleOctave: () => void;
+  visibleOctave: number;
 }) {
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
       event.stopPropagation();
+
+      getVisibleOctave();
+
       if (externalRef && externalRef.current) {
-        externalRef.current.scrollLeft += event.deltaY;
+        // If horizontal scroll is dominant, scroll horizontally.
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+          externalRef.current.scrollLeft += event.deltaX;
+        } else {
+          externalRef.current.scrollLeft += event.deltaY;
+        }
       }
     };
 
@@ -24,10 +36,13 @@ export default function ScaleSection({
 
   return (
     <div ref={externalRef} className='scale-section space-x-0.25'>
-      <Scale />
-      <Scale />
-      <Scale />
-      <Scale />
+      <Scale octave={0} visibleOctave={visibleOctave} />
+      <Scale octave={1} visibleOctave={visibleOctave} />
+      <Scale octave={2} visibleOctave={visibleOctave} />
+      <Scale octave={3} visibleOctave={visibleOctave} />
+      <Scale octave={4} visibleOctave={visibleOctave} />
+      <Scale octave={5} visibleOctave={visibleOctave} />
+      <Scale octave={6} visibleOctave={visibleOctave} />
     </div>
   );
 }

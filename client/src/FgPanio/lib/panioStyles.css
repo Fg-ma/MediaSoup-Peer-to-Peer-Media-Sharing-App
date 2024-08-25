@@ -4,13 +4,14 @@
 }
 
 .scale-section {
-  --key-width: 1px;
+  --key-width: 0px;
+  --key-border-style: solid;
   padding: 1px;
   height: 100%;
   width: 100%;
   display: flex;
   overflow-x: auto;
-  background-color: black;
+  background-color: #b3b3b3;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
 }
@@ -26,16 +27,84 @@
   position: absolute;
   height: 100%;
   width: var(--key-width);
-  background-color: white;
+  background-color: #f3f3f3;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
+  font-size: calc(var(--key-width) - (0.7 * var(--key-width)));
+  line-height: calc(var(--key-width) - (0.7 * var(--key-width)));
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  font-family: K2D, sans;
+  color: #4d4d4d;
+  user-select: none;
+}
+
+.natural-key.pressed .natural-key-accent {
+  height: 97.5%;
+}
+
+.natural-key-accent {
+  position: absolute;
+  height: 96%;
+  width: var(--key-width);
+  background: linear-gradient(0deg, white, #f3f3f3);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.natural-key-acivation-key {
+  position: absolute;
+  bottom: 1.5%;
+  left: 50%;
+  transform: translate(-50%);
+  width: calc(var(--key-width) - (0.575 * var(--key-width)));
+  aspect-ratio: 1 / 1;
+  border-width: calc(var(--key-width) - (0.95 * var(--key-width)));
+  border-radius: calc(var(--key-width) - (0.925 * var(--key-width)));
+  border-color: #999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: var(--key-border-style);
+}
+
+.natural-key.pressed .natural-key-acivation-key {
+  bottom: 3%;
+}
+
+.natural-key-c {
+  position: absolute;
+  bottom: calc(0.6 * var(--key-width));
+  left: 10%;
+  text-align: left;
+  color: #f56114;
+}
+
+.natural-key.pressed .natural-key-c {
+  bottom: calc(0.6 * var(--key-width) + 1.6%);
 }
 
 .accidental-key {
   position: absolute;
   height: 67.5%;
   width: calc(0.75 * var(--key-width));
-  background-color: black;
+  background-color: #1a1a1a;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  display: flex;
+  justify-content: center;
+  user-select: none;
+}
+
+.accidental-key:hover .accidental-key-accent {
+  height: 90%;
+}
+
+.accidental-key-accent {
+  height: 87.5%;
+  width: calc(0.45 * var(--key-width));
+  background: linear-gradient(0deg, #4d4d4d, #1a1a1a);
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }

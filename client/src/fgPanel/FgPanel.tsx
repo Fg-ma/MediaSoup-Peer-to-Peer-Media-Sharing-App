@@ -199,7 +199,6 @@ export default function FgPanel({
     event: React.MouseEvent,
     direction: "se" | "sw" | "ne" | "nw"
   ) => {
-    event.stopPropagation();
     event.preventDefault();
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -210,7 +209,6 @@ export default function FgPanel({
   };
 
   const handleDragMouseDown = (event: React.MouseEvent) => {
-    event.stopPropagation();
     event.preventDefault();
 
     if (
@@ -243,22 +241,6 @@ export default function FgPanel({
     }
   }, [isResizing.current]);
 
-  const handleCursorMovement = (event: React.MouseEvent) => {
-    if (
-      event.target === containerRef.current ||
-      containerRef.current?.contains(event.target as Node)
-    ) {
-      if (panelRef.current && panelRef.current.style.cursor !== "") {
-        panelRef.current.style.cursor = "";
-      }
-      return;
-    }
-
-    if (panelRef.current) {
-      panelRef.current.style.cursor = "pointer";
-    }
-  };
-
   useEffect(() => {
     if (resizeCallback) {
       resizeCallback();
@@ -286,14 +268,41 @@ export default function FgPanel({
     };
   }, [isHover]);
 
+  const [focus, setFocus] = useState(true);
+  const [focusClicked, setFocusClicked] = useState(false);
+
+  useEffect(() => {
+    const handlePanelClick = (event: MouseEvent) => {
+      if (panelRef.current) {
+        setFocus(panelRef.current.contains(event.target as Node));
+        setFocusClicked(panelRef.current.contains(event.target as Node));
+      }
+    };
+
+    document.addEventListener("mousedown", handlePanelClick);
+    return () => {
+      document.removeEventListener("mousedown", handlePanelClick);
+    };
+  }, []);
+
   return ReactDOM.createPortal(
     <motion.div
       ref={panelRef}
-      onMouseDown={handleDragMouseDown}
-      onMouseMove={handleCursorMovement}
+      onMouseEnter={() => {
+        setFocus(true);
+      }}
+      onMouseLeave={() => {
+        if (!focusClicked) {
+          setFocus(false);
+        }
+      }}
       onHoverEnd={closeCallback && (() => setIsHover(false))}
       onHoverStart={closeCallback && (() => setIsHover(true))}
-      className='z-50 shadow-lg rounded absolute p-3 bg-white'
+      className={`${
+        focus
+          ? `bg-white ${focusClicked ? "z-[50]" : "z-[49]"}`
+          : "bg-fg-white-95 z-0"
+      } shadow-lg rounded absolute p-3`}
       style={{
         opacity:
           position.x === undefined || position.y === undefined ? "0%" : "100%",
@@ -315,6 +324,26 @@ export default function FgPanel({
       >
         {content}
       </div>
+      <div
+        onMouseDown={handleDragMouseDown}
+        className='h-3 absolute left-3 top-0 cursor-pointer'
+        style={{ width: "calc(100% - 1.5rem)" }}
+      />
+      <div
+        onMouseDown={handleDragMouseDown}
+        className='h-3 absolute left-3 bottom-0 cursor-pointer'
+        style={{ width: "calc(100% - 1.5rem)" }}
+      />
+      <div
+        onMouseDown={handleDragMouseDown}
+        className='w-3 absolute left-0 top-3 cursor-pointer'
+        style={{ height: "calc(100% - 1.5rem)" }}
+      />
+      <div
+        onMouseDown={handleDragMouseDown}
+        className='w-3 absolute right-0 top-3 cursor-pointer'
+        style={{ height: "calc(100% - 1.5rem)" }}
+      />
       {(closePosition !== "bottomLeft" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "se")}

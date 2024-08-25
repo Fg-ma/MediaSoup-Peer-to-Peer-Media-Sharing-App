@@ -137,25 +137,25 @@ export default function FgButton({
   };
 
   const handleMouseEnter = () => {
-    if (hoverContent) {
+    if (hoverContent && !hoverTimeout.current) {
       hoverTimeout.current = setTimeout(() => {
         setIsHover(true);
       }, fgButtonOptions.hoverTimeoutDuration);
 
-      window.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mousemove", handleMouseMove);
     }
   };
 
   const handleMouseMove = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
     const buttonElement = externalRef?.current || buttonRef.current;
-    if (!buttonElement || !buttonElement.contains(target)) {
-      window.removeEventListener("mousemove", handleMouseMove);
 
+    if (buttonElement && !buttonElement.contains(event.target as Node)) {
+      setIsHover(false);
       if (hoverTimeout.current !== null) {
         clearTimeout(hoverTimeout.current);
       }
-      setIsHover(false);
+
+      document.removeEventListener("mousemove", handleMouseMove);
     }
   };
 
