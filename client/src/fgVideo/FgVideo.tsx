@@ -271,16 +271,15 @@ export default function FgVideo({
     socket.current.on("message", fgVideoController.handleMessage);
 
     if (fgVideoOptions.isFullScreen) {
-      document.addEventListener("fullscreenchange", () =>
-        controls.handleFullScreenChange()
+      document.addEventListener(
+        "fullscreenchange",
+        controls.handleFullScreenChange
       );
     }
 
-    document.addEventListener("keydown", (event) =>
-      controls.handleKeyDown(event)
-    );
+    document.addEventListener("keydown", controls.handleKeyDown);
 
-    document.addEventListener("keyup", (event) => controls.handleKeyUp(event));
+    document.addEventListener("keyup", controls.handleKeyUp);
 
     document.addEventListener(
       "visibilitychange",
@@ -314,16 +313,13 @@ export default function FgVideo({
     return () => {
       socket.current.off("message", fgVideoController.handleMessage);
       if (fgVideoOptions.isFullScreen) {
-        document.removeEventListener("fullscreenchange", () =>
-          controls.handleFullScreenChange()
+        document.removeEventListener(
+          "fullscreenchange",
+          controls.handleFullScreenChange
         );
       }
-      document.removeEventListener("keydown", (event) =>
-        controls.handleKeyDown(event)
-      );
-      document.removeEventListener("keyup", (event) =>
-        controls.handleKeyUp(event)
-      );
+      document.removeEventListener("keydown", controls.handleKeyDown);
+      document.removeEventListener("keyup", controls.handleKeyUp);
       document.removeEventListener(
         "visibilitychange",
         fgVideoController.handleVisibilityChange

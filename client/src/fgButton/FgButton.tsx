@@ -32,8 +32,11 @@ const defaultFgButtonOptions: {
 };
 
 export default function FgButton({
+  externalId,
   externalRef,
   clickFunction,
+  mouseDownFunction,
+  mouseUpFunction,
   holdFunction,
   contentFunction,
   doubleClickFunction,
@@ -43,8 +46,11 @@ export default function FgButton({
   style,
   options,
 }: {
+  externalId?: string;
   externalRef?: React.RefObject<HTMLButtonElement>;
   clickFunction?: (event: React.MouseEvent) => void;
+  mouseDownFunction?: (event: React.MouseEvent) => void;
+  mouseUpFunction?: (event: MouseEvent) => void;
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: (event: React.MouseEvent) => void;
@@ -77,11 +83,13 @@ export default function FgButton({
   ) => {
     event.preventDefault();
 
-    window.addEventListener("mouseup", (event) =>
-      handleMouseUp(event as unknown as React.MouseEvent)
-    );
+    window.addEventListener("mouseup", handleMouseUp);
 
     isClicked.current = true;
+
+    if (mouseDownFunction) {
+      mouseDownFunction(event);
+    }
 
     if (holdFunction && clickTimeout.current === null) {
       holdTimeout.current = setTimeout(() => {
@@ -91,27 +99,31 @@ export default function FgButton({
     }
   };
 
-  const handleMouseUp = (event: React.MouseEvent) => {
-    window.removeEventListener("mouseup", (event) =>
-      handleMouseUp(event as unknown as React.MouseEvent)
-    );
+  const handleMouseUp = (event: MouseEvent) => {
+    window.removeEventListener("mouseup", handleMouseUp);
+
+    if (mouseUpFunction) {
+      mouseUpFunction(event);
+    }
 
     if (isClicked.current && clickTimeout.current === null) {
       if (!isHeldRef.current) {
         if (doubleClickFunction) {
           clickTimeout.current = setTimeout(() => {
-            if (clickFunction) clickFunction(event);
+            if (clickFunction)
+              clickFunction(event as unknown as React.MouseEvent);
             if (clickTimeout.current !== null) {
               clearTimeout(clickTimeout.current);
               clickTimeout.current = null;
             }
           }, fgButtonOptions.doubleClickTimeoutDuration);
         } else {
-          if (clickFunction) clickFunction(event);
+          if (clickFunction)
+            clickFunction(event as unknown as React.MouseEvent);
         }
       } else {
         if (holdFunction) {
-          holdFunction(event);
+          holdFunction(event as unknown as React.MouseEvent);
         }
       }
 
@@ -162,6 +174,7 @@ export default function FgButton({
   return (
     <>
       <button
+        id={externalId}
         ref={externalRef ? externalRef : buttonRef}
         onMouseDown={(event) => handleMouseDown(event)}
         className={className}

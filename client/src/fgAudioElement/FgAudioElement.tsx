@@ -412,233 +412,235 @@ export default function FgAudioElement({
                 />
               </mask>
 
-              <linearGradient
-                id={`${username}_mute_morse_gradient`}
-                x1='0%'
-                y1='0%'
-                x2='100%'
-                y2='0%'
-                gradientUnits='userSpaceOnUse'
-              >
-                {/* m */}
-                <stop
-                  offset='6%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='15.34%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='16.216%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='18.59%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='19.47%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='28.369%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
+              {fgAudioElementOptions.muteStyleOption === "morse" && (
+                <linearGradient
+                  id={`${username}_mute_morse_gradient`}
+                  x1='0%'
+                  y1='0%'
+                  x2='100%'
+                  y2='0%'
+                  gradientUnits='userSpaceOnUse'
+                >
+                  {/* m */}
+                  <stop
+                    offset='6%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='15.34%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='16.216%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='18.59%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='19.47%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='28.369%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
 
-                <stop
-                  offset='29.249%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='38.146%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
+                  <stop
+                    offset='29.249%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='38.146%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
 
-                {/* u */}
-                <stop
-                  offset='39.026%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='41.40%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='42.28%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='44.658%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='45.538%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='47.91%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='48.79%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='51.17%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='52.05%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='60.947%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
+                  {/* u */}
+                  <stop
+                    offset='39.026%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='41.40%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='42.28%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='44.658%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='45.538%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='47.91%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='48.79%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='51.17%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='52.05%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='60.947%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
 
-                <stop
-                  offset='61.827%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='70.72%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
+                  <stop
+                    offset='61.827%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='70.72%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
 
-                {/* t */}
-                <stop
-                  offset='71.60%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='80.50%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
+                  {/* t */}
+                  <stop
+                    offset='71.60%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='80.50%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
 
-                <stop
-                  offset='81.38%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='90.27%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
+                  <stop
+                    offset='81.38%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='90.27%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
 
-                {/* e */}
-                <stop
-                  offset='91.16%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop
-                  offset='94%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                    ]
-                  }
-                />
-              </linearGradient>
+                  {/* e */}
+                  <stop
+                    offset='91.16%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                  <stop
+                    offset='94%'
+                    stopColor={
+                      colors[
+                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      ]
+                    }
+                  />
+                </linearGradient>
+              )}
 
               <linearGradient
                 id={`${username}_top_gradient`}
@@ -808,6 +810,7 @@ export default function FgAudioElement({
             if (validDoubleClick) doubleClickFunction();
           })
         }
+        style={{ cursor: "default" }}
       />
     </div>
   );

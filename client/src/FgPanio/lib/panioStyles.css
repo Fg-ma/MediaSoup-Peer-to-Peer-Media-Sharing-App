@@ -32,16 +32,11 @@
   border-bottom-right-radius: 3px;
   font-size: calc(var(--key-width) - (0.7 * var(--key-width)));
   line-height: calc(var(--key-width) - (0.7 * var(--key-width)));
-  overflow-y: hidden;
   display: flex;
   justify-content: center;
   font-family: K2D, sans;
   color: #4d4d4d;
   user-select: none;
-}
-
-.natural-key.pressed .natural-key-accent {
-  height: 97.5%;
 }
 
 .natural-key-accent {
@@ -51,11 +46,16 @@
   background: linear-gradient(0deg, white, #f3f3f3);
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
+  transition: height 0.025s ease;
+}
+
+.natural-key.pressed .natural-key-accent {
+  height: 97.5%;
 }
 
 .natural-key-acivation-key {
+  z-index: 2;
   position: absolute;
-  bottom: 1.5%;
   left: 50%;
   transform: translate(-50%);
   width: calc(var(--key-width) - (0.575 * var(--key-width)));
@@ -69,20 +69,18 @@
   border-style: var(--key-border-style);
 }
 
-.natural-key.pressed .natural-key-acivation-key {
-  bottom: 3%;
-}
-
 .natural-key-c {
+  z-index: 2;
   position: absolute;
-  bottom: calc(0.6 * var(--key-width));
+  bottom: 5%;
   left: 10%;
   text-align: left;
   color: #f56114;
+  transition: bottom 0.05s ease;
 }
 
-.natural-key.pressed .natural-key-c {
-  bottom: calc(0.6 * var(--key-width) + 1.6%);
+.natural-key.active-octave .natural-key-c {
+  bottom: calc(var(--key-width) - (0.575 * var(--key-width)) + 6.25%);
 }
 
 .accidental-key {
@@ -92,21 +90,40 @@
   background-color: #1a1a1a;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
+  font-size: calc(var(--key-width) - (0.75 * var(--key-width)));
+  line-height: calc(var(--key-width) - (0.75 * var(--key-width)));
   display: flex;
   justify-content: center;
   user-select: none;
-}
-
-.accidental-key:hover .accidental-key-accent {
-  height: 90%;
+  color: #f3f3f3;
 }
 
 .accidental-key-accent {
-  height: 87.5%;
-  width: calc(0.45 * var(--key-width));
+  height: 90%;
+  width: calc(0.5 * var(--key-width));
   background: linear-gradient(0deg, #4d4d4d, #1a1a1a);
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
+  transition: height 0.025s ease;
+}
+
+.accidental-key.pressed .accidental-key-accent {
+  height: 91.5%;
+}
+
+.accidental-key-acivation-key {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  width: calc(var(--key-width) - (0.6 * var(--key-width)));
+  aspect-ratio: 1 / 1;
+  border-width: calc(var(--key-width) - (0.96 * var(--key-width)));
+  border-radius: calc(var(--key-width) - (0.925 * var(--key-width)));
+  border-color: #d9d9d9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: var(--key-border-style);
 }
 
 .panio-C {
@@ -115,7 +132,7 @@
   z-index: 0;
 }
 
-.panio-C\#-Db {
+.panio-CSharpDb {
   top: 0px;
   left: calc(var(--key-width) + 0.5px);
   transform: translate(-50%);
@@ -128,7 +145,7 @@
   z-index: 0;
 }
 
-.panio-D\#-Eb {
+.panio-DSharpEb {
   top: 0px;
   left: calc(var(--key-width) * 2 + 1.5px);
   transform: translate(-50%);
@@ -147,7 +164,7 @@
   z-index: 0;
 }
 
-.panio-F\#-Gb {
+.panio-FSharpGb {
   top: 0px;
   left: calc(var(--key-width) * 4 + 4.5px);
   transform: translate(-50%);
@@ -160,7 +177,7 @@
   z-index: 0;
 }
 
-.panio-G\#-Ab {
+.panio-GSharpAb {
   top: 0px;
   left: calc(var(--key-width) * 5 + 5.5px);
   transform: translate(-50%);
@@ -173,7 +190,7 @@
   z-index: 0;
 }
 
-.panio-A\#-Bb {
+.panio-ASharpBb {
   top: 0px;
   left: 0px;
   left: calc(var(--key-width) * 6 + 6.5px);

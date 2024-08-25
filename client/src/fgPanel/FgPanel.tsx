@@ -29,6 +29,7 @@ export default function FgPanel({
   minWidth = 0,
   minHeight = 0,
   resizeCallback,
+  focusCallback,
   closeCallback,
   closePosition,
 }: {
@@ -45,6 +46,7 @@ export default function FgPanel({
   minWidth?: number;
   minHeight?: number;
   resizeCallback?: () => void;
+  focusCallback?: (focus: boolean) => void;
   closeCallback?: () => void;
   closePosition?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
 }) {
@@ -55,6 +57,8 @@ export default function FgPanel({
     y: initPosition.y,
   });
   const [size, setSize] = useState({ width: initWidth, height: initHeight });
+  const [focus, setFocus] = useState(true);
+  const [focusClicked, setFocusClicked] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -268,22 +272,27 @@ export default function FgPanel({
     };
   }, [isHover]);
 
-  const [focus, setFocus] = useState(true);
-  const [focusClicked, setFocusClicked] = useState(false);
+  const handlePanelClick = (event: MouseEvent) => {
+    if (panelRef.current) {
+      const value = panelRef.current.contains(event.target as Node);
+      setFocus(value);
+      setFocusClicked(value);
+    }
+  };
 
   useEffect(() => {
-    const handlePanelClick = (event: MouseEvent) => {
-      if (panelRef.current) {
-        setFocus(panelRef.current.contains(event.target as Node));
-        setFocusClicked(panelRef.current.contains(event.target as Node));
-      }
-    };
-
     document.addEventListener("mousedown", handlePanelClick);
+
     return () => {
       document.removeEventListener("mousedown", handlePanelClick);
     };
   }, []);
+
+  if (focusCallback) {
+    useEffect(() => {
+      focusCallback(focus);
+    }, [focus]);
+  }
 
   return ReactDOM.createPortal(
     <motion.div

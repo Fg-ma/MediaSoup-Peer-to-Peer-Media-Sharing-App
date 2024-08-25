@@ -2,7 +2,7 @@ import React from "react";
 import NaturalKey from "./NaturalKey";
 import AccidentalKey from "./AccidentalKey";
 
-const activationKeys = {
+export const keys = {
   naturalKeys: {
     C: "S",
     D: "D",
@@ -35,17 +35,15 @@ export default function Scale({
         value='C'
         octave={octave}
         activationKey={
-          octave === visibleOctave ? activationKeys.naturalKeys.C : undefined
+          octave === visibleOctave ? keys.naturalKeys.C : undefined
         }
       />
       <AccidentalKey
-        classname='panio-C#-Db'
-        value='C#-Db'
+        classname='panio-CSharpDb'
+        value='CSharpDb'
         octave={octave}
         activationKey={
-          octave === visibleOctave
-            ? activationKeys.accidentalKeys.CSharpDb
-            : undefined
+          octave === visibleOctave ? keys.accidentalKeys.CSharpDb : undefined
         }
       />
       <NaturalKey
@@ -53,17 +51,15 @@ export default function Scale({
         value='D'
         octave={octave}
         activationKey={
-          octave === visibleOctave ? activationKeys.naturalKeys.D : undefined
+          octave === visibleOctave ? keys.naturalKeys.D : undefined
         }
       />
       <AccidentalKey
-        classname='panio-D#-Eb'
-        value='D#-Eb'
+        classname='panio-DSharpEb'
+        value='DSharpEb'
         octave={octave}
         activationKey={
-          octave === visibleOctave
-            ? activationKeys.accidentalKeys.DSharpEb
-            : undefined
+          octave === visibleOctave ? keys.accidentalKeys.DSharpEb : undefined
         }
       />
       <NaturalKey
@@ -71,7 +67,7 @@ export default function Scale({
         value='E'
         octave={octave}
         activationKey={
-          octave === visibleOctave ? activationKeys.naturalKeys.E : undefined
+          octave === visibleOctave ? keys.naturalKeys.E : undefined
         }
       />
       <NaturalKey
@@ -79,17 +75,15 @@ export default function Scale({
         value='F'
         octave={octave}
         activationKey={
-          octave === visibleOctave ? activationKeys.naturalKeys.F : undefined
+          octave === visibleOctave ? keys.naturalKeys.F : undefined
         }
       />
       <AccidentalKey
-        classname='panio-F#-Gb'
-        value='F#-Gb'
+        classname='panio-FSharpGb'
+        value='FSharpGb'
         octave={octave}
         activationKey={
-          octave === visibleOctave
-            ? activationKeys.accidentalKeys.FSharpGb
-            : undefined
+          octave === visibleOctave ? keys.accidentalKeys.FSharpGb : undefined
         }
       />
       <NaturalKey
@@ -97,17 +91,15 @@ export default function Scale({
         value='G'
         octave={octave}
         activationKey={
-          octave === visibleOctave ? activationKeys.naturalKeys.G : undefined
+          octave === visibleOctave ? keys.naturalKeys.G : undefined
         }
       />
       <AccidentalKey
-        classname='panio-G#-Ab'
-        value='G#-Ab'
+        classname='panio-GSharpAb'
+        value='GSharpAb'
         octave={octave}
         activationKey={
-          octave === visibleOctave
-            ? activationKeys.accidentalKeys.GSharpAb
-            : undefined
+          octave === visibleOctave ? keys.accidentalKeys.GSharpAb : undefined
         }
       />
       <NaturalKey
@@ -115,17 +107,15 @@ export default function Scale({
         value='A'
         octave={octave}
         activationKey={
-          octave === visibleOctave ? activationKeys.naturalKeys.A : undefined
+          octave === visibleOctave ? keys.naturalKeys.A : undefined
         }
       />
       <AccidentalKey
-        classname='panio-A#-Bb'
-        value='A#-Bb'
+        classname='panio-ASharpBb'
+        value='ASharpBb'
         octave={octave}
         activationKey={
-          octave === visibleOctave
-            ? activationKeys.accidentalKeys.ASharpBb
-            : undefined
+          octave === visibleOctave ? keys.accidentalKeys.ASharpBb : undefined
         }
       />
       <NaturalKey
@@ -133,7 +123,7 @@ export default function Scale({
         value='B'
         octave={octave}
         activationKey={
-          octave === visibleOctave ? activationKeys.naturalKeys.B : undefined
+          octave === visibleOctave ? keys.naturalKeys.B : undefined
         }
       />
     </div>

@@ -325,6 +325,10 @@ class Controls {
       case "delete":
         this.handleCloseVideo();
         break;
+      case "arrowup":
+        break;
+      case "arrowdown":
+        break;
       default:
         break;
     }
