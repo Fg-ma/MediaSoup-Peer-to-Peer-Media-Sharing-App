@@ -4,8 +4,8 @@ import { AudioEffectTypes } from "../context/StreamsContext";
 import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
-import audioEffectIcon from "../../public/svgs/audioEffectIcon.svg";
-import audioEffectOffIcon from "../../public/svgs/audioEffectOffIcon.svg";
+import audioEffectIcon from "../../public/svgs/audio/audioEffectIcon.svg";
+import audioEffectOffIcon from "../../public/svgs/audio/audioEffectOffIcon.svg";
 
 const AudioEffectsSection = React.lazy(
   () => import("./lib/AudioEffectsSection")

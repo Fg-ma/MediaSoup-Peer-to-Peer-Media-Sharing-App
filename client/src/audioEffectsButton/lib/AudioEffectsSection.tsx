@@ -4,8 +4,10 @@ import { AudioEffectTypes } from "../../context/StreamsContext";
 import FgPanel from "../../fgPanel/FgPanel";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import mixAudioEffectsIcon from "../../../public/svgs/mixAudioEffectsIcon.svg";
-import mixAudioEffectsOffIcon from "../../../public/svgs/mixAudioEffectsOffIcon.svg";
+import mixAudioEffectsIcon from "../../../public/svgs/audio/mixAudioEffectsIcon.svg";
+import mixAudioEffectsOffIcon from "../../../public/svgs/audio/mixAudioEffectsOffIcon.svg";
+import panioIcon from "../../../public/svgs/audio/panioIcon.svg";
+import panioOffIcon from "../../../public/svgs/audio/panioOffIcon.svg";
 import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
 import RobotEffect from "./RobotEffect";
@@ -13,6 +15,7 @@ import EchoEffect from "./EchoEffect";
 import AlienEffect from "./AlienEffect";
 import UnderwaterEffect from "./UnderwaterEffect";
 import TelephoneEffect from "./TelephoneEffect";
+import FgPanio from "../../FgPanio/FgPanio";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
@@ -53,6 +56,7 @@ export default function AudioEffectsSection({
     to: muteStateRef.current ? "off" : "high",
   });
   const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
+  const [panioActive, setPanioActive] = useState(false);
   const audioSectionRef = useRef<HTMLDivElement>(null);
   const audioMixEffectsButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -186,6 +190,32 @@ export default function AudioEffectsSection({
               }
               options={{ hoverTimeoutDuration: 350 }}
             />
+            <FgButton
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              clickFunction={() => {
+                setPanioActive((prev) => !prev);
+              }}
+              contentFunction={() => {
+                return (
+                  <FgSVG
+                    src={panioActive ? panioOffIcon : panioIcon}
+                    className='flex items-center justify-center'
+                    attributes={[
+                      { key: "width", value: "90%" },
+                      { key: "height", value: "90%" },
+                      { key: "fill", value: "white" },
+                      { key: "stroke", value: "white" },
+                    ]}
+                  />
+                );
+              }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {panioActive ? "Close synth" : "Synth"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
+            />
             <RobotEffect
               username={username}
               instance={instance}
@@ -241,6 +271,11 @@ export default function AudioEffectsSection({
               setAudioMixEffectsActive(false);
             }}
           />
+        </Suspense>
+      )}
+      {panioActive && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <FgPanio isUser={isUser} />
         </Suspense>
       )}
     </>

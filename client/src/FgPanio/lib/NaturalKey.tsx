@@ -19,19 +19,23 @@ const NaturalKeyTransition: Transition = {
 
 export default function NaturalKey({
   classname,
-  value,
+  note,
   octave,
+  playNote,
   activationKey,
 }: {
   classname?: string;
-  value: string;
+  note: string;
   octave: number;
+  playNote: (note: string, octave: number) => void;
   activationKey?: string;
 }) {
   const naturalKeyRef = useRef<HTMLButtonElement>(null);
 
   const handleMouseDown = () => {
     naturalKeyRef.current?.classList.add("pressed");
+
+    playNote(note, octave);
   };
 
   const handleMouseUp = () => {
@@ -40,7 +44,7 @@ export default function NaturalKey({
 
   return (
     <FgButton
-      externalId={`paino_key_${octave}_${value}`}
+      externalId={`paino_key_${octave}_${note}`}
       externalRef={naturalKeyRef}
       className={`natural-key ${classname}`}
       contentFunction={() => (
@@ -59,8 +63,8 @@ export default function NaturalKey({
               </motion.div>
             )}
           </AnimatePresence>
-          {value === "C" && (
-            <div className='natural-key-c'>{value + `${octave}` ?? ""}</div>
+          {note === "C" && (
+            <div className='natural-key-c'>{note + `${octave}` ?? ""}</div>
           )}
           <div className='natural-key-accent'></div>
         </>

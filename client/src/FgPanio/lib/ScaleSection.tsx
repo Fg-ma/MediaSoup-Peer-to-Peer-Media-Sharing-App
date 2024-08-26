@@ -3,12 +3,14 @@ import Scale from "./Scale";
 
 export default function ScaleSection({
   externalRef,
-  getVisibleOctave,
+  playNote,
   visibleOctave,
+  getVisibleOctave,
 }: {
   externalRef: React.RefObject<HTMLDivElement>;
-  getVisibleOctave: () => void;
+  playNote: (note: string, octave: number) => void;
   visibleOctave: number;
+  getVisibleOctave: () => void;
 }) {
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -36,13 +38,13 @@ export default function ScaleSection({
 
   return (
     <div ref={externalRef} className='scale-section space-x-0.25'>
-      <Scale octave={0} visibleOctave={visibleOctave} />
-      <Scale octave={1} visibleOctave={visibleOctave} />
-      <Scale octave={2} visibleOctave={visibleOctave} />
-      <Scale octave={3} visibleOctave={visibleOctave} />
-      <Scale octave={4} visibleOctave={visibleOctave} />
-      <Scale octave={5} visibleOctave={visibleOctave} />
-      <Scale octave={6} visibleOctave={visibleOctave} />
+      <Scale octave={0} playNote={playNote} visibleOctave={visibleOctave} />
+      <Scale octave={1} playNote={playNote} visibleOctave={visibleOctave} />
+      <Scale octave={2} playNote={playNote} visibleOctave={visibleOctave} />
+      <Scale octave={3} playNote={playNote} visibleOctave={visibleOctave} />
+      <Scale octave={4} playNote={playNote} visibleOctave={visibleOctave} />
+      <Scale octave={5} playNote={playNote} visibleOctave={visibleOctave} />
+      <Scale octave={6} playNote={playNote} visibleOctave={visibleOctave} />
     </div>
   );
 }

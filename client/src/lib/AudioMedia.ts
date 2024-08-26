@@ -70,7 +70,7 @@ class AudioMedia {
     this.effects = {};
   }
 
-  async openMic() {
+  openMic = async () => {
     await this.audioStream.open();
 
     // Fix this it is janky way of getting mic started
@@ -84,16 +84,16 @@ class AudioMedia {
       },
     ]);
     this.audioEffects.removeEffects(["reverb"]);
-  }
+  };
 
-  deconstructor() {
+  deconstructor = () => {
     this.audioStream.close();
-  }
+  };
 
-  async changeEffects(
+  changeEffects = async (
     effect: AudioEffectTypes,
     blockStateChange: boolean = false
-  ) {
+  ) => {
     if (!blockStateChange) {
       this.userStreamEffects.current.audio[effect as AudioEffectTypes] =
         !this.userStreamEffects.current.audio[effect as AudioEffectTypes];
@@ -112,9 +112,9 @@ class AudioMedia {
     } else {
       this.removeEffect(effect);
     }
-  }
+  };
 
-  applyEffect(effect: AudioEffectTypes) {
+  applyEffect = (effect: AudioEffectTypes) => {
     switch (effect) {
       case "robot":
         this.audioEffects?.updateEffects([
@@ -129,14 +129,12 @@ class AudioMedia {
             type: "distortion",
             updates: [
               { option: "distortion", value: 0.8 },
-              { option: "oversample", value: 4 }, // 4x oversampling
+              { option: "oversample", value: 4 },
             ],
           },
           {
             type: "pitchShift",
-            updates: [
-              { option: "pitch", value: -6 }, // Lower pitch for a robotic tone
-            ],
+            updates: [{ option: "pitch", value: -6 }],
           },
           {
             type: "phaser",
@@ -144,6 +142,12 @@ class AudioMedia {
               { option: "frequency", value: 5 },
               { option: "octaves", value: 3 },
               { option: "baseFrequency", value: 500 },
+            ],
+          },
+          {
+            type: "bitCrusher",
+            updates: [
+              { option: "bits", value: 4 }, // Reducing bit depth for a more robotic sound
             ],
           },
         ]);
@@ -164,15 +168,20 @@ class AudioMedia {
               { option: "feedback", value: 0.4 },
             ],
           },
+          {
+            type: "chorus",
+            updates: [
+              { option: "frequency", value: 1.5 },
+              { option: "depth", value: 0.7 },
+            ],
+          },
         ]);
         break;
       case "alien":
         this.audioEffects?.updateEffects([
           {
             type: "pitchShift",
-            updates: [
-              { option: "pitch", value: 12 }, // High pitch
-            ],
+            updates: [{ option: "pitch", value: 12 }],
           },
           {
             type: "phaser",
@@ -180,6 +189,13 @@ class AudioMedia {
               { option: "frequency", value: 10 },
               { option: "octaves", value: 3 },
               { option: "baseFrequency", value: 1000 },
+            ],
+          },
+          {
+            type: "vibrato",
+            updates: [
+              { option: "frequency", value: 8 },
+              { option: "depth", value: 0.8 },
             ],
           },
         ]);
@@ -195,8 +211,14 @@ class AudioMedia {
           },
           {
             type: "EQ",
+            updates: [{ option: "high", value: -12 }],
+          },
+          {
+            type: "autoFilter",
             updates: [
-              { option: "high", value: -12 }, // Reduce high frequencies
+              { option: "frequency", value: 0.3 },
+              { option: "baseFrequency", value: 200 },
+              { option: "octaves", value: 2 },
             ],
           },
         ]);
@@ -218,12 +240,16 @@ class AudioMedia {
               { option: "oversample", value: 2 },
             ],
           },
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 6 }],
+          },
         ]);
         break;
     }
-  }
+  };
 
-  removeEffect(effect: AudioEffectTypes) {
+  removeEffect = (effect: AudioEffectTypes) => {
     switch (effect) {
       case "robot":
         this.audioEffects?.removeEffects([
@@ -231,43 +257,48 @@ class AudioMedia {
           "distortion",
           "pitchShift",
           "phaser",
+          "bitCrusher",
         ]);
         break;
       case "echo":
-        this.audioEffects?.removeEffects(["reverb", "feedbackDelay"]);
+        this.audioEffects?.removeEffects(["reverb", "feedbackDelay", "chorus"]);
         break;
       case "alien":
-        this.audioEffects?.removeEffects(["pitchShift", "phaser"]);
+        this.audioEffects?.removeEffects(["pitchShift", "phaser", "vibrato"]);
         break;
       case "underwater":
-        this.audioEffects?.removeEffects(["reverb", "EQ"]);
+        this.audioEffects?.removeEffects(["reverb", "EQ", "autoFilter"]);
         break;
       case "telephone":
-        this.audioEffects?.removeEffects(["EQ", "distortion"]);
+        this.audioEffects?.removeEffects(["EQ", "distortion", "bitCrusher"]);
         break;
     }
-  }
+  };
 
-  mixEffects(
+  mixEffects = (
     effects: {
       type: AudioMixEffectsType;
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
-  ) {
+  ) => {
     this.audioEffects?.updateEffects(effects);
-  }
+  };
 
-  removeMixEffects(effects: AudioMixEffectsType[]) {
+  removeMixEffects = (effects: AudioMixEffectsType[]) => {
     this.audioEffects?.removeEffects(effects);
-  }
+  };
 
-  getStream() {
+  playNote = (note: string, duration: string) => {
+    this.audioEffects.playNote(note, duration);
+  };
+
+  getStream = () => {
     return this.mediaStreamDestination?.stream;
-  }
+  };
 
-  getTrack() {
+  getTrack = () => {
     return this.mediaStreamDestination?.stream.getAudioTracks()[0];
-  }
+  };
 }
 
 export default AudioMedia;

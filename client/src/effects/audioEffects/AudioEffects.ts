@@ -63,6 +63,8 @@ class AudioEffects {
   private audioStream: Tone.UserMedia;
   private mediaStreamDestination: MediaStreamAudioDestinationNode;
 
+  private synth: Tone.Synth;
+
   private autoFilter: Tone.AutoFilter | undefined;
   private autoPanner: Tone.AutoPanner | undefined;
   private autoWah: Tone.AutoWah | undefined;
@@ -402,6 +404,10 @@ class AudioEffects {
   ) {
     this.audioStream = audioStream;
     this.mediaStreamDestination = mediaStreamDestination;
+
+    this.synth = new Tone.Synth();
+    this.audioStream.connect(this.synth);
+    this.synth.connect(this.mediaStreamDestination);
   }
 
   updateEffects = (
@@ -460,6 +466,10 @@ class AudioEffects {
           break;
       }
     });
+  };
+
+  playNote = (note: string, duration: string) => {
+    this.synth.triggerAttackRelease(note, duration);
   };
 
   /* 

@@ -27,7 +27,6 @@ import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
-import FgPanio from "./FgPanio/FgPanio";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")
@@ -592,11 +591,6 @@ export default function Main() {
                 muteStateRef={mutedAudioRef}
                 options={{ color: "black", placement: "below" }}
               />
-            </Suspense>
-          )}
-          {isAudio.current && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <FgPanio />
             </Suspense>
           )}
         </div>

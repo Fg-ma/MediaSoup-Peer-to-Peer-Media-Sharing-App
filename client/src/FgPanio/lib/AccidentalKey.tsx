@@ -19,19 +19,23 @@ const AccidentalKeyTransition: Transition = {
 
 export default function AccidentalKey({
   classname,
-  value,
+  note,
   octave,
+  playNote,
   activationKey,
 }: {
   classname?: string;
-  value: string;
+  note: string;
   octave: number;
+  playNote: (note: string, octave: number) => void;
   activationKey?: string;
 }) {
   const accidentalKeyRef = useRef<HTMLButtonElement>(null);
 
   const handleMouseDown = () => {
     accidentalKeyRef.current?.classList.add("pressed");
+
+    playNote(note, octave);
   };
 
   const handleMouseUp = () => {
@@ -40,7 +44,7 @@ export default function AccidentalKey({
 
   return (
     <FgButton
-      externalId={`paino_key_${octave}_${value}`}
+      externalId={`paino_key_${octave}_${note}`}
       externalRef={accidentalKeyRef}
       className={`accidental-key ${classname}`}
       contentFunction={() => (

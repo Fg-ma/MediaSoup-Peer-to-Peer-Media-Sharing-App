@@ -2,10 +2,12 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import FgPanel from "../fgPanel/FgPanel";
 import "./lib/panioStyles.css";
 import ScaleSection from "./lib/ScaleSection";
-import { keys } from "./lib/Scale";
 import FgPanioController from "./lib/FgPanioController";
+import { useStreamsContext } from "../context/StreamsContext";
 
-export default function FgPanio() {
+export default function FgPanio({ isUser }: { isUser: boolean }) {
+  const { userMedia } = useStreamsContext();
+
   const scaleSectionRef = useRef<HTMLDivElement>(null);
   const keyWidth = useRef(0);
   const [visibleOctave, setVisibleOctave] = useState(0);
@@ -123,7 +125,11 @@ export default function FgPanio() {
     activeKey?.classList.add("active-octave");
   }, [visibleOctave]);
 
-  const playNote = (note: string, octave: number) => {};
+  const playNote = (note: string, octave: number) => {
+    if (isUser) {
+      userMedia.current.audio?.playNote(`${note}${octave}`, "8n");
+    }
+  };
 
   return (
     <FgPanel
@@ -131,8 +137,9 @@ export default function FgPanio() {
         <div className='panio'>
           <ScaleSection
             externalRef={scaleSectionRef}
-            getVisibleOctave={fgPanioController.getVisibleOctave}
+            playNote={playNote}
             visibleOctave={visibleOctave}
+            getVisibleOctave={fgPanioController.getVisibleOctave}
           />
         </div>
       }
