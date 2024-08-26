@@ -11,6 +11,23 @@ export const defaultAudioStreamEffects = {
   telephone: false,
 };
 
+export const defaultCameraStreamEffects = {
+  pause: false,
+  blur: false,
+  tint: false,
+  ears: false,
+  glasses: false,
+  beards: false,
+  mustaches: false,
+  faceMasks: false,
+};
+
+export const defaultScreenStreamEffects = {
+  pause: false,
+  blur: false,
+  tint: false,
+};
+
 export type CameraEffectTypes =
   | "pause"
   | "blur"

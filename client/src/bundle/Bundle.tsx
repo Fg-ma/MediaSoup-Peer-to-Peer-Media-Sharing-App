@@ -260,11 +260,12 @@ export default function Bundle({
               instance={instance}
               name={name}
               type='camera'
+              bundleRef={bundleRef}
+              videoStream={cameraStream}
+              audioRef={audioRef}
               handleAudioEffectChange={handleAudioEffectChange}
               clientMute={clientMute}
               localMute={localMute}
-              videoStream={cameraStream}
-              audioRef={audioRef}
               options={{
                 isUser: bundleOptions.isUser,
                 acceptsVisualEffects: acceptsCameraEffects,
@@ -309,11 +310,12 @@ export default function Bundle({
               instance={instance}
               name={name}
               type='screen'
+              bundleRef={bundleRef}
+              videoStream={screenStream}
+              audioRef={audioRef}
               handleAudioEffectChange={handleAudioEffectChange}
               clientMute={clientMute}
               localMute={localMute}
-              videoStream={screenStream}
-              audioRef={audioRef}
               options={{
                 isUser: bundleOptions.isUser,
                 acceptsVisualEffects: acceptsScreenEffects,

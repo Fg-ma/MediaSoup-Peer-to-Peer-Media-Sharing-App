@@ -15,7 +15,9 @@ class Controls {
 
   private fgVideoOptions: FgVideoOptions;
 
+  private bundleRef: React.RefObject<HTMLDivElement>;
   private videoRef: React.RefObject<HTMLVideoElement>;
+  private audioRef: React.RefObject<HTMLAudioElement>;
   private videoContainerRef: React.RefObject<HTMLDivElement>;
 
   private shiftPressed: React.MutableRefObject<boolean>;
@@ -51,6 +53,7 @@ class Controls {
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
+  private tracksColorSetterCallback: () => void;
 
   private leadingZeroFormatter = new Intl.NumberFormat(undefined, {
     minimumIntegerDigits: 2,
@@ -66,7 +69,9 @@ class Controls {
 
     fgVideoOptions: FgVideoOptions,
 
+    bundleRef: React.RefObject<HTMLDivElement>,
     videoRef: React.RefObject<HTMLVideoElement>,
+    audioRef: React.RefObject<HTMLAudioElement>,
     videoContainerRef: React.RefObject<HTMLDivElement>,
 
     shiftPressed: React.MutableRefObject<boolean>,
@@ -101,7 +106,8 @@ class Controls {
     handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
-    ) => Promise<void>
+    ) => Promise<void>,
+    tracksColorSetterCallback: () => void
   ) {
     this.socket = socket;
     this.videoId = videoId;
@@ -112,7 +118,9 @@ class Controls {
 
     this.fgVideoOptions = fgVideoOptions;
 
+    this.bundleRef = bundleRef;
     this.videoRef = videoRef;
+    this.audioRef = audioRef;
     this.videoContainerRef = videoContainerRef;
 
     this.shiftPressed = shiftPressed;
@@ -144,6 +152,7 @@ class Controls {
     this.setEffectsActive = setEffectsActive;
     this.handleMute = handleMute;
     this.handleVisualEffectChange = handleVisualEffectChange;
+    this.tracksColorSetterCallback = tracksColorSetterCallback;
   }
 
   formatDuration(time: number) {
@@ -219,7 +228,7 @@ class Controls {
     }
   }
 
-  handleKeyDown(event: KeyboardEvent) {
+  handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
       !this.videoContainerRef.current?.classList.contains("in-video") ||
@@ -326,15 +335,53 @@ class Controls {
         this.handleCloseVideo();
         break;
       case "arrowup":
+        if (!this.audioRef.current) {
+          return;
+        }
+
+        const upVolume = Math.min(1, this.audioRef.current.volume + 0.05);
+
+        this.audioRef.current.volume = upVolume;
+
+        if (this.bundleRef.current) {
+          const volumeSliders =
+            this.bundleRef.current.querySelectorAll(".volume-slider");
+
+          volumeSliders.forEach((slider) => {
+            const sliderElement = slider as HTMLInputElement;
+            sliderElement.value = `${upVolume}`;
+          });
+        }
+
+        this.tracksColorSetterCallback();
         break;
       case "arrowdown":
+        if (!this.audioRef.current) {
+          return;
+        }
+
+        const downVolume = Math.max(0, this.audioRef.current.volume - 0.05);
+
+        this.audioRef.current.volume = downVolume;
+
+        if (this.bundleRef.current) {
+          const volumeSliders =
+            this.bundleRef.current.querySelectorAll(".volume-slider");
+
+          volumeSliders.forEach((slider) => {
+            const sliderElement = slider as HTMLInputElement;
+            sliderElement.value = `${downVolume}`;
+          });
+        }
+
+        this.tracksColorSetterCallback();
         break;
       default:
         break;
     }
-  }
+  };
 
-  handleKeyUp(event: KeyboardEvent) {
+  handleKeyUp = (event: KeyboardEvent) => {
     if (!event.key) {
       return;
     }
@@ -347,7 +394,7 @@ class Controls {
         this.controlPressed.current = false;
         break;
     }
-  }
+  };
 
   handleMiniPlayer() {
     if (this.videoContainerRef.current?.classList.contains("mini-player")) {

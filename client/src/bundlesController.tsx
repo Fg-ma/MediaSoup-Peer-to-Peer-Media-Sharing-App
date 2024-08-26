@@ -4,22 +4,6 @@ import Bundle from "./bundle/Bundle";
 import CameraMedia from "./lib/CameraMedia";
 import ScreenMedia from "./lib/ScreenMedia";
 import AudioMedia from "./lib/AudioMedia";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "./context/StreamsContext";
-import {
-  beardChinOffsetsMap,
-  defaultBeard,
-  defaultEars,
-  defaultFaceMask,
-  defaultGlasses,
-  defaultMustache,
-  earsWidthFactorMap,
-  EffectStylesType,
-  mustacheNoseOffsetsMap,
-} from "./context/CurrentEffectsStylesContext";
 
 class BundlesController {
   private socket: React.MutableRefObject<Socket>;
@@ -38,24 +22,6 @@ class BundlesController {
   }>;
 
   private remoteVideosContainerRef: React.RefObject<HTMLDivElement>;
-  private remoteStreamEffects: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: {
-        camera: {
-          [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-        };
-        screen: {
-          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-        };
-        audio: { [effectType in AudioEffectTypes]: boolean };
-      };
-    };
-  }>;
-  private remoteCurrentEffectsStyles: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: EffectStylesType;
-    };
-  }>;
 
   private isCamera: React.MutableRefObject<boolean>;
   private isScreen: React.MutableRefObject<boolean>;
@@ -72,6 +38,13 @@ class BundlesController {
 
   private muteAudio: () => void;
 
+  private setUpEffectContext: (
+    username: string,
+    instance: string,
+    cameraIds: (string | undefined)[],
+    screenIds: (string | undefined)[]
+  ) => void;
+
   private acceptCameraEffects: boolean;
   private acceptScreenEffects: boolean;
   private acceptAudioEffects: boolean;
@@ -81,6 +54,7 @@ class BundlesController {
     table_id: React.MutableRefObject<string>,
     username: React.MutableRefObject<string>,
     instance: React.MutableRefObject<string>,
+
     userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
@@ -90,28 +64,13 @@ class BundlesController {
       };
       audio: AudioMedia | undefined;
     }>,
+
     remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
-    remoteStreamEffects: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera: {
-            [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-          };
-          screen: {
-            [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-          };
-          audio: { [effectType in AudioEffectTypes]: boolean };
-        };
-      };
-    }>,
-    remoteCurrentEffectsStyles: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: EffectStylesType;
-      };
-    }>,
+
     isCamera: React.MutableRefObject<boolean>,
     isScreen: React.MutableRefObject<boolean>,
     isAudio: React.MutableRefObject<boolean>,
+
     bundles: {
       [username: string]: { [instance: string]: React.JSX.Element };
     },
@@ -120,7 +79,16 @@ class BundlesController {
         [username: string]: { [instance: string]: React.JSX.Element };
       }>
     >,
+
     muteAudio: () => void,
+
+    setUpEffectContext: (
+      username: string,
+      instance: string,
+      cameraIds: (string | undefined)[],
+      screenIds: (string | undefined)[]
+    ) => void,
+
     acceptCameraEffects: boolean,
     acceptScreenEffects: boolean,
     acceptAudioEffects: boolean
@@ -131,14 +99,13 @@ class BundlesController {
     this.instance = instance;
     this.userMedia = userMedia;
     this.remoteVideosContainerRef = remoteVideosContainerRef;
-    this.remoteStreamEffects = remoteStreamEffects;
-    this.remoteCurrentEffectsStyles = remoteCurrentEffectsStyles;
     this.isCamera = isCamera;
     this.isScreen = isScreen;
     this.isAudio = isAudio;
     this.bundles = bundles;
     this.setBundles = setBundles;
     this.muteAudio = muteAudio;
+    this.setUpEffectContext = setUpEffectContext;
     this.acceptCameraEffects = acceptCameraEffects;
     this.acceptScreenEffects = acceptScreenEffects;
     this.acceptAudioEffects = acceptAudioEffects;
@@ -200,7 +167,7 @@ class BundlesController {
     trackUsername: string,
     trackInstance: string,
     remoteCameraStreams: {
-      [screenId: string]: MediaStream;
+      [cameraId: string]: MediaStream;
     },
     remoteScreenStreams: {
       [screenId: string]: MediaStream;
@@ -211,98 +178,12 @@ class BundlesController {
       !this.bundles[trackUsername] ||
       !this.bundles[trackUsername][trackInstance]
     ) {
-      if (!this.remoteStreamEffects.current[trackUsername]) {
-        this.remoteStreamEffects.current[trackUsername] = {};
-      }
-      if (!this.remoteStreamEffects.current[trackUsername][trackInstance]) {
-        this.remoteStreamEffects.current[trackUsername][trackInstance] = {
-          camera: {},
-          screen: {},
-          audio: {
-            robot: false,
-            echo: false,
-            alien: false,
-            underwater: false,
-            telephone: false,
-          },
-        };
-      }
-
-      if (!this.remoteCurrentEffectsStyles.current[trackUsername]) {
-        this.remoteCurrentEffectsStyles.current[trackUsername] = {};
-      }
-      if (
-        !this.remoteCurrentEffectsStyles.current[trackUsername][trackInstance]
-      ) {
-        this.remoteCurrentEffectsStyles.current[trackUsername][trackInstance] =
-          { camera: {}, screen: {}, audio: {} };
-      }
-
-      for (const cameraId in remoteCameraStreams) {
-        this.remoteStreamEffects.current[trackUsername][trackInstance].camera[
-          cameraId
-        ] = {
-          pause: false,
-          blur: false,
-          tint: false,
-          ears: false,
-          glasses: false,
-          beards: false,
-          mustaches: false,
-          faceMasks: false,
-        };
-
-        if (
-          !this.remoteCurrentEffectsStyles.current[trackUsername][trackInstance]
-            .camera[cameraId]
-        ) {
-          this.remoteCurrentEffectsStyles.current[trackUsername][
-            trackInstance
-          ].camera[cameraId] = {
-            glasses: { style: defaultGlasses, threeDim: false },
-            ears: {
-              style: defaultEars,
-              threeDim: false,
-              leftEarWidthFactor:
-                earsWidthFactorMap[defaultEars].leftEarWidthFactor,
-              rightEarWidthFactor:
-                earsWidthFactorMap[defaultEars].rightEarWidthFactor,
-            },
-            beards: {
-              style: defaultBeard,
-              threeDim: false,
-              chinOffset: beardChinOffsetsMap[defaultBeard],
-            },
-            mustaches: {
-              style: defaultMustache,
-              threeDim: false,
-              noseOffset: mustacheNoseOffsetsMap[defaultMustache],
-            },
-            faceMasks: {
-              style: defaultFaceMask,
-              threeDim: true,
-            },
-          };
-        }
-      }
-      for (const screenId in remoteScreenStreams) {
-        this.remoteStreamEffects.current[trackUsername][trackInstance].screen[
-          screenId
-        ] = {
-          pause: false,
-          blur: false,
-          tint: false,
-        };
-
-        if (
-          !this.remoteCurrentEffectsStyles.current[trackUsername][trackInstance]
-            .screen[screenId]
-        ) {
-          this.remoteCurrentEffectsStyles.current[trackUsername][
-            trackInstance
-          ].screen[screenId] = {};
-        }
-      }
+      this.setUpEffectContext(
+        trackUsername,
+        trackInstance,
+        Object.keys(remoteCameraStreams),
+        Object.keys(remoteScreenStreams)
+      );
 
       const newBundle = (
         <Bundle

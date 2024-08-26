@@ -1,6 +1,16 @@
 import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
+import {
+  defaultAudioCurrentEffectsStyles,
+  defaultCameraCurrentEffectsStyles,
+  defaultScreenCurrentEffectsStyles,
+} from "src/context/CurrentEffectsStylesContext";
+import {
+  defaultAudioStreamEffects,
+  defaultCameraStreamEffects,
+  defaultScreenStreamEffects,
+} from "src/context/StreamsContext";
 
 class Consumers {
   private socket: React.MutableRefObject<Socket>;
@@ -25,6 +35,13 @@ class Consumers {
       };
     };
   }>;
+
+  private setUpEffectContext: (
+    username: string,
+    instance: string,
+    cameraIds: (string | undefined)[],
+    screenIds: (string | undefined)[]
+  ) => void;
 
   private createConsumerBundle: (
     trackUsername: string,
@@ -62,6 +79,13 @@ class Consumers {
       };
     }>,
 
+    setUpEffectContext: (
+      username: string,
+      instance: string,
+      cameraIds: (string | undefined)[],
+      screenIds: (string | undefined)[]
+    ) => void,
+
     createConsumerBundle: (
       trackUsername: string,
       trackInstance: string,
@@ -82,6 +106,7 @@ class Consumers {
     this.subBtnRef = subBtnRef;
     this.consumerTransport = consumerTransport;
     this.remoteTracksMap = remoteTracksMap;
+    this.setUpEffectContext = setUpEffectContext;
     this.createConsumerBundle = createConsumerBundle;
   }
 
@@ -400,6 +425,13 @@ class Consumers {
         event.producerInstance
       ].audio = consumer.track;
     }
+
+    this.setUpEffectContext(
+      event.producerUsername,
+      event.producerInstance,
+      event.consumerType === "camera" ? [event.consumerId] : [],
+      event.consumerType === "screen" ? [event.consumerId] : []
+    );
 
     if (
       Object.keys(

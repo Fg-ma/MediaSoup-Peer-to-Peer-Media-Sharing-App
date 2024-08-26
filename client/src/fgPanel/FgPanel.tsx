@@ -6,13 +6,15 @@ const FgButton = React.lazy(() => import("../fgButton/FgButton"));
 
 const PanelVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
-  animate: {
+  animate: (focus: boolean) => ({
     opacity: 1,
     scale: 1,
+    backgroundColor: focus ? "#ffffff" : "#f3f3f3",
     transition: {
       scale: { type: "spring", stiffness: 100 },
+      backgroundColor: { duration: 0.3 },
     },
-  },
+  }),
 };
 
 const PanelTransition: Transition = {
@@ -308,9 +310,7 @@ export default function FgPanel({
       onHoverEnd={closeCallback && (() => setIsHover(false))}
       onHoverStart={closeCallback && (() => setIsHover(true))}
       className={`${
-        focus
-          ? `bg-white ${focusClicked ? "z-[50]" : "z-[49]"}`
-          : "bg-fg-white-95 z-0"
+        focusClicked ? "z-[50]" : focus ? "z-[49]" : "z-0"
       } shadow-lg rounded absolute p-3`}
       style={{
         opacity:
@@ -321,6 +321,7 @@ export default function FgPanel({
         height: size.height,
         cursor: isDragging.current ? "pointer" : "",
       }}
+      custom={focus}
       variants={PanelVar}
       initial='init'
       animate='animate'

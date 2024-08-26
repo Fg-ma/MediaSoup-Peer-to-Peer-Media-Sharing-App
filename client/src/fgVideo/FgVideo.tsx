@@ -89,10 +89,11 @@ export default function FgVideo({
   instance,
   name,
   type,
-  clientMute,
-  localMute,
+  bundleRef,
   videoStream,
   audioRef,
+  clientMute,
+  localMute,
   videoStyles,
   options,
   handleAudioEffectChange,
@@ -108,10 +109,11 @@ export default function FgVideo({
   instance: string;
   name?: string;
   type: "camera" | "screen";
-  clientMute: React.MutableRefObject<boolean>;
-  localMute: React.MutableRefObject<boolean>;
+  bundleRef: React.RefObject<HTMLDivElement>;
   videoStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
+  clientMute: React.MutableRefObject<boolean>;
+  localMute: React.MutableRefObject<boolean>;
   videoStyles?: React.CSSProperties;
   options?: FgVideoOptions;
   handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
@@ -220,7 +222,9 @@ export default function FgVideo({
     instance,
     type,
     fgVideoOptions,
+    bundleRef,
     videoRef,
+    audioRef,
     videoContainerRef,
     shiftPressed,
     controlPressed,
@@ -241,7 +245,8 @@ export default function FgVideo({
     leaveVideoTimer,
     setEffectsActive,
     handleMute,
-    handleVisualEffectChange
+    handleVisualEffectChange,
+    tracksColorSetterCallback
   );
 
   const fgVideoController = new FgVideoController(

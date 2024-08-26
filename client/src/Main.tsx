@@ -2,8 +2,18 @@ import React, { useState, useRef, useEffect, Suspense } from "react";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
-import { AudioEffectTypes, useStreamsContext } from "./context/StreamsContext";
-import { useCurrentEffectsStylesContext } from "./context/CurrentEffectsStylesContext";
+import {
+  AudioEffectTypes,
+  defaultAudioStreamEffects,
+  defaultCameraStreamEffects,
+  defaultScreenStreamEffects,
+  useStreamsContext,
+} from "./context/StreamsContext";
+import {
+  defaultCameraCurrentEffectsStyles,
+  defaultScreenCurrentEffectsStyles,
+  useCurrentEffectsStylesContext,
+} from "./context/CurrentEffectsStylesContext";
 import onRouterCapabilities from "./lib/onRouterCapabilities";
 import Producers from "./lib/Producers";
 import Consumers from "./lib/Consumers";
@@ -270,6 +280,69 @@ export default function Main() {
     }
   };
 
+  const setUpEffectContext = (
+    username: string,
+    instance: string,
+    cameraIds: (string | undefined)[],
+    screenIds: (string | undefined)[]
+  ) => {
+    if (!remoteStreamEffects.current[username]) {
+      remoteStreamEffects.current[username] = {};
+    }
+    if (!remoteStreamEffects.current[username][instance]) {
+      remoteStreamEffects.current[username][instance] = {
+        camera: {},
+        screen: {},
+        audio: defaultAudioStreamEffects,
+      };
+    }
+
+    if (!remoteCurrentEffectsStyles.current[username]) {
+      remoteCurrentEffectsStyles.current[username] = {};
+    }
+    if (!remoteCurrentEffectsStyles.current[username][instance]) {
+      remoteCurrentEffectsStyles.current[username][instance] = {
+        camera: {},
+        screen: {},
+        audio: {},
+      };
+    }
+
+    for (const cameraId of cameraIds) {
+      if (!cameraId) {
+        return;
+      }
+
+      remoteStreamEffects.current[username][instance].camera[cameraId] =
+        defaultCameraStreamEffects;
+
+      if (
+        !remoteCurrentEffectsStyles.current[username][instance].camera[cameraId]
+      ) {
+        remoteCurrentEffectsStyles.current[username][instance].camera[
+          cameraId
+        ] = defaultCameraCurrentEffectsStyles;
+      }
+    }
+
+    for (const screenId of screenIds) {
+      if (!screenId) {
+        return;
+      }
+
+      remoteStreamEffects.current[username][instance].screen[screenId] =
+        defaultScreenStreamEffects;
+
+      if (
+        !remoteCurrentEffectsStyles.current[username][instance].screen[screenId]
+      ) {
+        remoteCurrentEffectsStyles.current[username][instance].screen[
+          screenId
+        ] = defaultScreenCurrentEffectsStyles;
+      }
+    }
+  };
+
   useEffect(() => {
     socket.current.on("message", handleMessage);
 
@@ -342,14 +415,13 @@ export default function Main() {
     instance,
     userMedia,
     remoteVideosContainerRef,
-    remoteStreamEffects,
-    remoteCurrentEffectsStyles,
     isCamera,
     isScreen,
     isAudio,
     bundles,
     setBundles,
     muteAudio,
+    setUpEffectContext,
     acceptCameraEffects,
     acceptScreenEffects,
     acceptAudioEffects
@@ -407,6 +479,7 @@ export default function Main() {
     subBtnRef,
     consumerTransport,
     remoteTracksMap,
+    setUpEffectContext,
     bundlesController.createConsumerBundle
   );
 
