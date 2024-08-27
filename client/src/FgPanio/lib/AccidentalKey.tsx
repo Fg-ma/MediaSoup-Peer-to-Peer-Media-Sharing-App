@@ -27,7 +27,7 @@ export default function AccidentalKey({
   classname?: string;
   note: string;
   octave: number;
-  playNote: (note: string, octave: number) => void;
+  playNote: (note: string, octave: number, isPress: boolean) => void;
   activationKey?: string;
 }) {
   const accidentalKeyRef = useRef<HTMLButtonElement>(null);
@@ -35,16 +35,18 @@ export default function AccidentalKey({
   const handleMouseDown = () => {
     accidentalKeyRef.current?.classList.add("pressed");
 
-    playNote(note, octave);
+    playNote(`${note[0]}#`, octave, true);
   };
 
   const handleMouseUp = () => {
     accidentalKeyRef.current?.classList.remove("pressed");
+
+    playNote(`${note[0]}#`, octave, false);
   };
 
   return (
     <FgButton
-      externalId={`paino_key_${octave}_${note}`}
+      externalId={`piano_key_${octave}_${note}`}
       externalRef={accidentalKeyRef}
       className={`accidental-key ${classname}`}
       contentFunction={() => (
@@ -64,6 +66,8 @@ export default function AccidentalKey({
             )}
           </AnimatePresence>
           <div className='accidental-key-accent'></div>
+          <div className='accidental-key-hint accidental-key-hint-upper'>{`${note[0]}#`}</div>
+          <div className='accidental-key-hint accidental-key-hint-lower'>{`${note[6]}b`}</div>
         </>
       )}
       mouseDownFunction={handleMouseDown}

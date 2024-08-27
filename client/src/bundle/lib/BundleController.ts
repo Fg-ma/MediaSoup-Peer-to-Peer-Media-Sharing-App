@@ -99,7 +99,7 @@ class BundleController {
 
   private onNewConsumerWasCreatedCallback?: () => void;
 
-  private bundleSocket: BundleSocket;
+  bundleSocket: BundleSocket;
 
   constructor(
     isUser: boolean,
@@ -239,9 +239,6 @@ class BundleController {
         break;
       case "clientMuteChange":
         this.bundleSocket.onClientMuteChange(event);
-        break;
-      case "localMuteChange":
-        this.bundleSocket.onLocalMuteChange();
         break;
       case "statesPermissionsResponsed":
         this.bundleSocket.onStatesPermissionsResponsed(event);

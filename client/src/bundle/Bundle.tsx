@@ -3,6 +3,7 @@ import { Socket } from "socket.io-client";
 import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
 import { AudioEffectTypes, useStreamsContext } from "../context/StreamsContext";
 import BundleController from "./lib/BundleController";
+import { useSignalContext } from "../context/SignalContext";
 
 const FgVideo = React.lazy(() => import("../fgVideo/FgVideo"));
 const FgAudioElementContainer = React.lazy(
@@ -64,6 +65,7 @@ export default function Bundle({
     useStreamsContext();
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
+  const { signal } = useSignalContext();
 
   const [cameraStreams, setCameraStreams] = useState<
     | {
@@ -241,6 +243,26 @@ export default function Bundle({
       audioRef.current.muted = localMute.current;
     }
   };
+
+  useEffect(() => {
+    if (!signal) {
+      return;
+    }
+
+    switch (signal.type) {
+      case "localMuteChange":
+        if (
+          signal.table_id === table_id &&
+          signal.username === username &&
+          signal.instance === instance
+        ) {
+          bundleController.bundleSocket.onLocalMuteChange();
+        }
+        break;
+      default:
+        break;
+    }
+  }, [signal]);
 
   return (
     <div

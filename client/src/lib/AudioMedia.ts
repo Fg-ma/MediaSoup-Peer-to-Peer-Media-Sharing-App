@@ -84,6 +84,8 @@ class AudioMedia {
       },
     ]);
     this.audioEffects.removeEffects(["reverb"]);
+
+    this.audioEffects.createSampler();
   };
 
   deconstructor = () => {
@@ -288,8 +290,8 @@ class AudioMedia {
     this.audioEffects?.removeEffects(effects);
   };
 
-  playNote = (note: string, duration: string) => {
-    this.audioEffects.playNote(note, duration);
+  playNote = (note: string, isPress: boolean) => {
+    this.audioEffects.playNote(note, isPress);
   };
 
   getStream = () => {

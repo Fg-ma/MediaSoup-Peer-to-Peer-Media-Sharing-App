@@ -419,6 +419,7 @@ export default function FgVideo({
           />
           <FgVideoControls
             socket={socket}
+            table_id={table_id}
             username={username}
             instance={instance}
             type={type}

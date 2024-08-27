@@ -15,7 +15,7 @@ import EchoEffect from "./EchoEffect";
 import AlienEffect from "./AlienEffect";
 import UnderwaterEffect from "./UnderwaterEffect";
 import TelephoneEffect from "./TelephoneEffect";
-import FgPanio from "../../FgPanio/FgPanio";
+import FgPiano from "../../FgPanio/FgPiano";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
@@ -57,8 +57,10 @@ export default function AudioEffectsSection({
   });
   const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
   const [panioActive, setPanioActive] = useState(false);
+
   const audioSectionRef = useRef<HTMLDivElement>(null);
   const audioMixEffectsButtonRef = useRef<HTMLButtonElement>(null);
+  const pianoRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const newTo = muteStateRef.current ? "off" : "high";
@@ -191,6 +193,7 @@ export default function AudioEffectsSection({
               options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
+              externalRef={pianoRef}
               className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 setPanioActive((prev) => !prev);
@@ -275,7 +278,13 @@ export default function AudioEffectsSection({
       )}
       {panioActive && (
         <Suspense fallback={<div>Loading...</div>}>
-          <FgPanio isUser={isUser} />
+          <FgPiano
+            isUser={isUser}
+            closeCallback={() => {
+              setPanioActive(false);
+            }}
+            referenceElement={pianoRef.current as HTMLElement}
+          />
         </Suspense>
       )}
     </>

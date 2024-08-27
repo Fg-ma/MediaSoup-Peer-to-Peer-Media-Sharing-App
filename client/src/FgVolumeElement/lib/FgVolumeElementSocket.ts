@@ -112,23 +112,22 @@ class FgVolumeElementSocket {
   }
 
   // Handles local mute changes from outside bundle
-  onLocalMuteChange() {
-    if (this.clientMute.current || !this.audioRef.current) {
+  onLocalMuteChange = () => {
+    if (this.clientMute.current) {
       return;
     }
 
-    const newVolume = this.audioRef.current.volume;
     let newVolumeState;
-    if (this.localMute.current || newVolume === 0) {
+    if (this.localMute.current) {
       newVolumeState = "off";
-    } else if (newVolume >= 0.5) {
-      newVolumeState = "high";
     } else {
-      newVolumeState = "low";
+      newVolumeState = "high";
     }
 
-    this.setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
-  }
+    if (newVolumeState !== this.volumeState.to) {
+      this.setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
+    }
+  };
 }
 
 export default FgVolumeElementSocket;

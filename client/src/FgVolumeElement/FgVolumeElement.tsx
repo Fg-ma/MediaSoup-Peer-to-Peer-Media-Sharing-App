@@ -5,6 +5,7 @@ import volumeSVGPaths from "./lib/volumeSVGPaths";
 import FgButton from "../fgButton/FgButton";
 import FgVolumeElementController from "./lib/FgVolumeElementController";
 import VolumeSVG from "./lib/VolumeSVG";
+import { useSignalContext } from "../context/SignalContext";
 
 export interface FgVolumeElementOptions {
   iconSize?: string;
@@ -32,6 +33,7 @@ const defaultFgVolumeElementOptions = {
 
 export default function FgVolumeElement({
   socket,
+  table_id,
   username,
   instance,
   isUser,
@@ -45,6 +47,7 @@ export default function FgVolumeElement({
   tracksColorSetterCallback,
 }: {
   socket: React.MutableRefObject<Socket>;
+  table_id: string;
   username: string;
   instance: string;
   isUser: boolean;
@@ -63,6 +66,8 @@ export default function FgVolumeElement({
     ...defaultFgVolumeElementOptions,
     ...options,
   };
+
+  const { signal } = useSignalContext();
 
   const [active, setActive] = useState(
     fgVolumeElementOptions.initialVolume === "off" ? true : false
@@ -193,6 +198,28 @@ export default function FgVolumeElement({
       setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
     }
   }, [localMute.current]);
+
+  useEffect(() => {
+    if (!signal) {
+      return;
+    }
+
+    switch (signal.type) {
+      case "localMuteChange":
+        if (
+          signal.table_id === table_id &&
+          signal.username === username &&
+          signal.instance === instance
+        ) {
+          setTimeout(() => {
+            fgVolumeElementController.fgVolumeElementSocket.onLocalMuteChange();
+          }, 0);
+        }
+        break;
+      default:
+        break;
+    }
+  }, [signal]);
 
   return (
     <div

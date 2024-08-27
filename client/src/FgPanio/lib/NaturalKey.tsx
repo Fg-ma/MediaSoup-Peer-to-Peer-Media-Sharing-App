@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
 
@@ -27,7 +27,7 @@ export default function NaturalKey({
   classname?: string;
   note: string;
   octave: number;
-  playNote: (note: string, octave: number) => void;
+  playNote: (note: string, octave: number, isPress: boolean) => void;
   activationKey?: string;
 }) {
   const naturalKeyRef = useRef<HTMLButtonElement>(null);
@@ -35,16 +35,18 @@ export default function NaturalKey({
   const handleMouseDown = () => {
     naturalKeyRef.current?.classList.add("pressed");
 
-    playNote(note, octave);
+    playNote(note, octave, true);
   };
 
   const handleMouseUp = () => {
     naturalKeyRef.current?.classList.remove("pressed");
+
+    playNote(note, octave, false);
   };
 
   return (
     <FgButton
-      externalId={`paino_key_${octave}_${note}`}
+      externalId={`piano_key_${octave}_${note}`}
       externalRef={naturalKeyRef}
       className={`natural-key ${classname}`}
       contentFunction={() => (
@@ -64,8 +66,9 @@ export default function NaturalKey({
             )}
           </AnimatePresence>
           {note === "C" && (
-            <div className='natural-key-c'>{note + `${octave}` ?? ""}</div>
-          )}
+            <div className='natural-key-c'>{note + `${octave}`}</div>
+          )}{" "}
+          {note !== "C" && <div className='natural-key-hint'>{note}</div>}
           <div className='natural-key-accent'></div>
         </>
       )}

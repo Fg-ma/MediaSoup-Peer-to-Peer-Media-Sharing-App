@@ -17,8 +17,6 @@ export default function ScaleSection({
       event.preventDefault();
       event.stopPropagation();
 
-      getVisibleOctave();
-
       if (externalRef && externalRef.current) {
         // If horizontal scroll is dominant, scroll horizontally.
         if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
@@ -27,6 +25,8 @@ export default function ScaleSection({
           externalRef.current.scrollLeft += event.deltaY;
         }
       }
+
+      getVisibleOctave();
     };
 
     externalRef?.current?.addEventListener("wheel", handleWheel);

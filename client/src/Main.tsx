@@ -14,6 +14,7 @@ import {
   defaultScreenCurrentEffectsStyles,
   useCurrentEffectsStylesContext,
 } from "./context/CurrentEffectsStylesContext";
+import { useSignalContext } from "./context/SignalContext";
 import onRouterCapabilities from "./lib/onRouterCapabilities";
 import Producers from "./lib/Producers";
 import Consumers from "./lib/Consumers";
@@ -144,6 +145,7 @@ export default function Main() {
   } = useStreamsContext();
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
+  const { setSignal } = useSignalContext();
 
   const socket = useRef<Socket>(io(websocketURL));
   const device = useRef<mediasoup.Device>();
@@ -213,14 +215,19 @@ export default function Main() {
   const handleExternalMute = () => {
     muteAudio();
 
-    const msg = {
-      type: "sendLocalMuteChange",
+    const msg: {
+      type: "localMuteChange";
+      table_id: string;
+      username: string;
+      instance: string;
+    } = {
+      type: "localMuteChange",
       table_id: table_id.current,
       username: username.current,
       instance: instance.current,
     };
 
-    socket.current.emit("message", msg);
+    setSignal(msg);
   };
 
   const handleDisableEnableBtns = (disabled: boolean) => {

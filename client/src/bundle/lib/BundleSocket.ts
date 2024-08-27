@@ -347,7 +347,7 @@ class BundleSocket {
     }
 
     this.localMute.current = !this.localMute.current;
-
+    console.log(this.localMute.current);
     if (!this.isUser && this.audioRef.current) {
       this.audioRef.current.muted = this.localMute.current;
     }

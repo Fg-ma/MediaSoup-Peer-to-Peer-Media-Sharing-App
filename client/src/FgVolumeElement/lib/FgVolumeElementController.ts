@@ -26,7 +26,7 @@ class FgVolumeElementController {
 
   private tracksColorSetterCallback: (() => void) | undefined;
 
-  private fgVolumeElementSocket: FgVolumeElementSocket;
+  fgVolumeElementSocket: FgVolumeElementSocket;
 
   constructor(
     username: string,
@@ -85,9 +85,6 @@ class FgVolumeElementController {
         break;
       case "clientMuteChange":
         this.fgVolumeElementSocket.onClientMuteChange(event);
-        break;
-      case "localMuteChange":
-        this.fgVolumeElementSocket.onLocalMuteChange();
         break;
       default:
         break;

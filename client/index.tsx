@@ -5,6 +5,7 @@ import "./index.css";
 import "./scrollbar.css";
 import { StreamsContextProvider } from "./src/context/StreamsContext";
 import { CurrentEffectsStylesContextProvider } from "./src/context/CurrentEffectsStylesContext";
+import { SignalContextProvider } from "./src/context/SignalContext";
 
 const container = document.getElementById("root");
 const root = createRoot(container as HTMLElement);
@@ -15,7 +16,9 @@ function App() {
   return (
     <StreamsContextProvider>
       <CurrentEffectsStylesContextProvider>
-        <Main />
+        <SignalContextProvider>
+          <Main />
+        </SignalContextProvider>
       </CurrentEffectsStylesContextProvider>
     </StreamsContextProvider>
   );

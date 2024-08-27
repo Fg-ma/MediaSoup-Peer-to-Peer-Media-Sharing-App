@@ -130,12 +130,6 @@ type MediasoupSocketEvents =
       consumerType: string;
     }
   | {
-      type: "sendLocalMuteChange";
-      table_id: string;
-      username: string;
-      instance: string;
-    }
-  | {
       type: "requestEffectChange";
       table_id: string;
       requestedUsername: string;
@@ -249,9 +243,6 @@ const mediasoupSocket = async (io: SocketIOServer) => {
           break;
         case "newConsumerCreated":
           consumers.onNewConsumerCreated(event);
-          break;
-        case "sendLocalMuteChange":
-          mute.onSendLocalMuteChange(event);
           break;
         case "requestEffectChange":
           effects.onRequestEffectChange(event);

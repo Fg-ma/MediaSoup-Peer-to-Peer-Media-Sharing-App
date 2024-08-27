@@ -32,6 +32,7 @@ const AudioEffectsButton = React.lazy(
 
 export default function FgVideoControls({
   socket,
+  table_id,
   username,
   instance,
   type,
@@ -54,6 +55,7 @@ export default function FgVideoControls({
   tracksColorSetterCallback,
 }: {
   socket: React.MutableRefObject<Socket>;
+  table_id: string;
   username: string;
   instance: string;
   type: "camera" | "screen";
@@ -151,6 +153,7 @@ export default function FgVideoControls({
             <Suspense fallback={<div>Loading...</div>}>
               <FgVolumeElement
                 socket={socket}
+                table_id={table_id}
                 username={username}
                 instance={instance}
                 isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}

@@ -1,23 +1,37 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import FgPanel from "../fgPanel/FgPanel";
-import "./lib/panioStyles.css";
+import "./lib/pianoStyles.css";
 import ScaleSection from "./lib/ScaleSection";
-import FgPanioController from "./lib/FgPanioController";
+import FgPianoController from "./lib/FgPianoController";
 import { useStreamsContext } from "../context/StreamsContext";
 
-export default function FgPanio({ isUser }: { isUser: boolean }) {
+export type Octaves = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+export default function FgPiano({
+  isUser,
+  initialOctave = 3,
+  closeCallback,
+  referenceElement,
+}: {
+  isUser: boolean;
+  initialOctave?: Octaves;
+  closeCallback?: () => void;
+  referenceElement?: HTMLElement;
+}) {
   const { userMedia } = useStreamsContext();
 
   const scaleSectionRef = useRef<HTMLDivElement>(null);
   const keyWidth = useRef(0);
-  const [visibleOctave, setVisibleOctave] = useState(0);
-  const visibleOctaveRef = useRef(0);
+  const [visibleOctave, setVisibleOctave] = useState<Octaves>(initialOctave);
+  const visibleOctaveRef = useRef<Octaves>(initialOctave);
   const isKeydownListenerAdded = useRef(false);
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
   const keysPressed = useRef<string[]>([]);
 
-  const fgPanioController = new FgPanioController(
+  const fgPianoController = new FgPianoController(
+    isUser,
+    userMedia,
     scaleSectionRef,
     keyWidth,
     setVisibleOctave,
@@ -27,40 +41,20 @@ export default function FgPanio({ isUser }: { isUser: boolean }) {
     controlPressed
   );
 
-  const resize = () => {
-    if (!scaleSectionRef.current) {
-      return;
-    }
-
-    const heightInPixels = scaleSectionRef.current.offsetHeight;
-    const newWidth = heightInPixels * 0.15;
-
-    keyWidth.current = newWidth;
-
-    scaleSectionRef.current.style.setProperty("--key-width", `${newWidth}px`);
-    scaleSectionRef.current.style.setProperty(
-      "--key-border-style",
-      newWidth > 32 ? "solid" : "none"
-    );
-
-    fgPanioController.getVisibleOctave();
-  };
-
   const handleKeyUp = (event: KeyboardEvent) => {
     if (!event.key) {
       return;
     }
 
-    let octave = visibleOctaveRef.current;
+    let octave: number = visibleOctaveRef.current;
     if (shiftPressed.current) {
       octave = Math.min(6, octave + 1);
     }
     if (controlPressed.current) {
       octave = Math.max(0, octave - 1);
     }
-    let key;
 
-    fgPanioController.handleKeyUp(event.key.toLowerCase(), octave);
+    fgPianoController.handleKeyUp(event.key.toLowerCase(), octave as Octaves);
 
     if (keysPressed.current.length === 0) {
       document.removeEventListener("keyup", handleKeyUp);
@@ -77,20 +71,19 @@ export default function FgPanio({ isUser }: { isUser: boolean }) {
     const tagName = document.activeElement?.tagName.toLowerCase();
     if (tagName === "input") return;
 
-    let octave = visibleOctaveRef.current;
+    let octave: number = visibleOctaveRef.current;
     if (shiftPressed.current) {
       octave = Math.min(6, octave + 1);
     }
     if (controlPressed.current) {
       octave = Math.max(0, octave - 1);
     }
-    let key;
 
     if (keysPressed.current.length === 0) {
       document.addEventListener("keyup", handleKeyUp);
     }
 
-    fgPanioController.handleKeyDown(event.key.toLowerCase(), octave);
+    fgPianoController.handleKeyDown(event.key.toLowerCase(), octave as Octaves);
   }, []);
 
   const handleKeyStrokes = (focus: boolean) => {
@@ -108,7 +101,9 @@ export default function FgPanio({ isUser }: { isUser: boolean }) {
   };
 
   useEffect(() => {
-    resize();
+    fgPianoController.resize();
+
+    fgPianoController.scrollToOctave(initialOctave);
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -117,34 +112,34 @@ export default function FgPanio({ isUser }: { isUser: boolean }) {
 
   useEffect(() => {
     for (let octave = 0; octave <= 6; octave++) {
-      const key = document.getElementById(`paino_key_${octave}_C`);
-      key?.classList.remove("active-octave");
+      const scale = document.getElementById(`piano_scale_${octave}`);
+      scale?.classList.remove("active-octave");
     }
 
-    const activeKey = document.getElementById(`paino_key_${visibleOctave}_C`);
-    activeKey?.classList.add("active-octave");
+    const activeScale = document.getElementById(`piano_scale_${visibleOctave}`);
+    activeScale?.classList.add("active-octave");
   }, [visibleOctave]);
-
-  const playNote = (note: string, octave: number) => {
-    if (isUser) {
-      userMedia.current.audio?.playNote(`${note}${octave}`, "8n");
-    }
-  };
 
   return (
     <FgPanel
       content={
-        <div className='panio'>
+        <div className='piano'>
           <ScaleSection
             externalRef={scaleSectionRef}
-            playNote={playNote}
+            playNote={fgPianoController.playNote}
             visibleOctave={visibleOctave}
-            getVisibleOctave={fgPanioController.getVisibleOctave}
+            getVisibleOctave={fgPianoController.getVisibleOctave}
           />
         </div>
       }
-      resizeCallback={resize}
+      resizeCallback={fgPianoController.resize}
       focusCallback={handleKeyStrokes}
+      closeCallback={closeCallback}
+      closePosition='topRight'
+      initPosition={{
+        referenceElement,
+        placement: "below",
+      }}
       initHeight={300}
       initWidth={400}
       minWidth={285}

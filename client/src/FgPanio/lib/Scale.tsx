@@ -31,9 +31,9 @@ export default function Scale({
   visibleOctave: number;
 }) {
   return (
-    <div className='panio-scale'>
+    <div id={`piano_scale_${octave}`} className='piano-scale'>
       <NaturalKey
-        classname='panio-C'
+        classname='piano-C'
         note='C'
         octave={octave}
         playNote={playNote}
@@ -42,7 +42,7 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='panio-CSharpDb'
+        classname='piano-CSharpDb'
         note='CSharpDb'
         octave={octave}
         playNote={playNote}
@@ -51,7 +51,7 @@ export default function Scale({
         }
       />
       <NaturalKey
-        classname='panio-D'
+        classname='piano-D'
         note='D'
         octave={octave}
         playNote={playNote}
@@ -60,7 +60,7 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='panio-DSharpEb'
+        classname='piano-DSharpEb'
         note='DSharpEb'
         octave={octave}
         playNote={playNote}
@@ -69,7 +69,7 @@ export default function Scale({
         }
       />
       <NaturalKey
-        classname='panio-E'
+        classname='piano-E'
         note='E'
         octave={octave}
         playNote={playNote}
@@ -78,7 +78,7 @@ export default function Scale({
         }
       />
       <NaturalKey
-        classname='panio-F'
+        classname='piano-F'
         note='F'
         octave={octave}
         playNote={playNote}
@@ -87,7 +87,7 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='panio-FSharpGb'
+        classname='piano-FSharpGb'
         note='FSharpGb'
         octave={octave}
         playNote={playNote}
@@ -96,7 +96,7 @@ export default function Scale({
         }
       />
       <NaturalKey
-        classname='panio-G'
+        classname='piano-G'
         note='G'
         octave={octave}
         playNote={playNote}
@@ -105,7 +105,7 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='panio-GSharpAb'
+        classname='piano-GSharpAb'
         note='GSharpAb'
         octave={octave}
         playNote={playNote}
@@ -114,7 +114,7 @@ export default function Scale({
         }
       />
       <NaturalKey
-        classname='panio-A'
+        classname='piano-A'
         note='A'
         octave={octave}
         playNote={playNote}
@@ -123,7 +123,7 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='panio-ASharpBb'
+        classname='piano-ASharpBb'
         note='ASharpBb'
         octave={octave}
         playNote={playNote}
@@ -132,7 +132,7 @@ export default function Scale({
         }
       />
       <NaturalKey
-        classname='panio-B'
+        classname='piano-B'
         note='B'
         octave={octave}
         playNote={playNote}
