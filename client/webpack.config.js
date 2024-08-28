@@ -82,6 +82,17 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.wav$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "audio/[name].[ext]",
+            },
+          },
+        ],
+      },
     ],
   },
   plugins: [
