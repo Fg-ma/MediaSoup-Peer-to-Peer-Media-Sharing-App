@@ -1,13 +1,15 @@
 .piano {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .scale-section {
   --key-width: 0px;
   --key-border-style: solid;
   padding: 1px;
-  height: 100%;
+  flex-grow: 1;
   width: 100%;
   display: flex;
   overflow-x: auto;

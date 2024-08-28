@@ -19,6 +19,18 @@ import backgroundTex5 from "../../../public/backgroundTexs/backgroundTex5.jpg";
 import backgroundTex6 from "../../../public/backgroundTexs/backgroundTex6.jpg";
 import backgroundTex7 from "../../../public/backgroundTexs/backgroundTex7.jpg";
 
+import autoFilterIcon from "../../../public/svgs/audio/autoFilterIcon.svg";
+import autoPannerIcon from "../../../public/svgs/audio/autoPannerIcon.svg";
+import bitCrusherIcon from "../../../public/svgs/audio/bitCrusherIcon.svg";
+import chorusIcon from "../../../public/svgs/audio/chorusIcon.svg";
+import delayIcon from "../../../public/svgs/audio/delayIcon.svg";
+import distortionIcon from "../../../public/svgs/audio/distortionIcon.svg";
+import EQIcon from "../../../public/svgs/audio/EQIcon.svg";
+import phaserIcon from "../../../public/svgs/audio/phaserIcon.svg";
+import pitchShiftIcon from "../../../public/svgs/audio/pitchShiftIcon.svg";
+import reverbIcon from "../../../public/svgs/audio/reverbIcon.svg";
+import stereoWidenerIcon from "../../../public/svgs/audio/stereoWidenerIcon.svg";
+
 const oneSliderPossibleSizes: PossibleSizesType = {
   vertical: [108, 240],
   horizontal: [240, 108],
@@ -56,6 +68,7 @@ export interface StaticMixEffect {
   };
   backgroundColor: string;
   backgroundImage?: string;
+  labelIcon?: string;
   effectLabel: string;
   labelPlacement: {
     vertical: LabelPlacementType;
@@ -108,6 +121,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#8076b7",
     backgroundImage: backgroundTex1,
+    labelIcon: autoFilterIcon,
     effectLabel: "Auto filter",
     labelPlacement: {
       vertical: {
@@ -136,6 +150,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#a53f57",
     backgroundImage: backgroundTex4,
+    labelIcon: autoPannerIcon,
     effectLabel: "Auto panner",
     labelPlacement: {
       vertical: {
@@ -206,6 +221,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#fa7453",
     backgroundImage: backgroundTex3,
+    labelIcon: bitCrusherIcon,
     effectLabel: "Bit crusher",
     labelPlacement: {
       vertical: {
@@ -277,6 +293,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#d8bd9a",
     backgroundImage: backgroundTex6,
+    labelIcon: chorusIcon,
     effectLabel: "Chorus",
     labelPlacement: {
       vertical: {
@@ -314,6 +331,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#e7c47d",
     backgroundImage: backgroundTex5,
+    labelIcon: distortionIcon,
     effectLabel: "Distortion",
     labelPlacement: {
       vertical: { side: "right", sidePlacement: "top" },
@@ -350,6 +368,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#888097",
     backgroundImage: backgroundTex2,
+    labelIcon: EQIcon,
     effectLabel: "EQ",
     labelPlacement: {
       vertical: { side: "top", sidePlacement: "left" },
@@ -381,6 +400,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#c5cfd0",
     backgroundImage: backgroundTex2,
+    labelIcon: delayIcon,
     effectLabel: "Feedback delay",
     labelPlacement: {
       vertical: { side: "bottom", sidePlacement: "right" },
@@ -440,6 +460,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#6b76fe",
     backgroundImage: backgroundTex6,
+    labelIcon: reverbIcon,
     effectLabel: "JC reverb",
     labelPlacement: {
       vertical: {
@@ -483,6 +504,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#d03818",
     backgroundImage: backgroundTex3,
+    labelIcon: phaserIcon,
     effectLabel: "Phaser",
     labelPlacement: {
       vertical: { side: "left", sidePlacement: "top" },
@@ -514,6 +536,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#733f87",
     backgroundImage: backgroundTex4,
+    labelIcon: delayIcon,
     effectLabel: "Ping pong",
     labelPlacement: {
       vertical: {
@@ -543,6 +566,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#cacaca",
     backgroundImage: backgroundTex5,
+    labelIcon: pitchShiftIcon,
     effectLabel: "Pitch shift",
     labelPlacement: {
       vertical: { side: "left", sidePlacement: "bottom" },
@@ -573,6 +597,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#858585",
     backgroundImage: backgroundTex7,
+    labelIcon: reverbIcon,
     effectLabel: "Reverb",
     labelPlacement: {
       vertical: { side: "left", sidePlacement: "bottom" },
@@ -596,6 +621,7 @@ const staticMixEffects: {
     },
     backgroundColor: "#f9d8e9",
     backgroundImage: backgroundTex4,
+    labelIcon: stereoWidenerIcon,
     effectLabel: "Stereo wide",
     labelPlacement: {
       vertical: {
@@ -689,7 +715,9 @@ export default function AudioMixEffectsPortal({
   closeCallback: () => void;
 }) {
   const { userMedia } = useStreamsContext();
+
   const [rerender, setRerender] = useState(false);
+  const [focus, setFocus] = useState(true);
   const dynamicMixEffects = useRef<{
     [mixEffect in AudioMixEffectsType]: DynamicMixEffect;
   }>({
@@ -1063,9 +1091,9 @@ export default function AudioMixEffectsPortal({
       content={
         <div
           ref={portalRef}
-          className='bg-white font-K2D text-md min-w-[18rem] min-h-[18.75rem] h-full w-full overflow-y-auto'
+          className='font-K2D text-md min-w-[18rem] min-h-[18.75rem] h-full w-full overflow-y-auto'
         >
-          <div className='h-max mb-4'>
+          <div className='h-max mb-4 mt-1'>
             <ScrollingContainer
               content={
                 <div className='flex items-center justify-start space-x-3 p-1'>
@@ -1082,6 +1110,9 @@ export default function AudioMixEffectsPortal({
                     }
                   )}
                 </div>
+              }
+              buttonBackgroundColor={
+                focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"
               }
             />
           </div>
@@ -1145,6 +1176,8 @@ export default function AudioMixEffectsPortal({
       }}
       closeCallback={() => closeCallback()}
       closePosition='topRight'
+      focusCallback={(newFocus) => setFocus(newFocus)}
+      shadow={{ top: true, bottom: true }}
     />
   );
 }

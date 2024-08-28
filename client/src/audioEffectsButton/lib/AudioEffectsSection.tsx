@@ -15,11 +15,11 @@ import EchoEffect from "./EchoEffect";
 import AlienEffect from "./AlienEffect";
 import UnderwaterEffect from "./UnderwaterEffect";
 import TelephoneEffect from "./TelephoneEffect";
-import FgPiano from "../../FgPanio/FgPiano";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
 );
+const FgPiano = React.lazy(() => import("../../FgPanio/FgPiano"));
 
 export default function AudioEffectsSection({
   socket,

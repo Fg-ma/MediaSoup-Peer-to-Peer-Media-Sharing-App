@@ -24,12 +24,12 @@ export default function FgPortal({
   type,
   mouseType = "topRight",
   content,
-  buttonRef,
+  externalRef,
 }: {
   type: "above" | "below" | "mouse";
   mouseType?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
   content: React.ReactElement;
-  buttonRef?: React.RefObject<HTMLButtonElement>;
+  externalRef?: React.RefObject<HTMLElement>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -44,21 +44,21 @@ export default function FgPortal({
   };
 
   const getStaticPortalPosition = () => {
-    const buttonRect = buttonRef?.current?.getBoundingClientRect();
+    const externalRect = externalRef?.current?.getBoundingClientRect();
 
-    if (!buttonRect || !portalRef.current) {
+    if (!externalRect || !portalRef.current) {
       return;
     }
 
     let top: number = 0;
     if (type === "above") {
-      top = buttonRect.top - portalRef.current.clientHeight;
+      top = externalRect.top - portalRef.current.clientHeight;
     } else if (type === "below") {
-      top = buttonRect.top + buttonRect.height;
+      top = externalRect.top + externalRect.height;
     }
     const left =
-      buttonRect.left +
-      buttonRect.width / 2 -
+      externalRect.left +
+      externalRect.width / 2 -
       portalRef.current.clientWidth / 2;
 
     setPortalPosition({

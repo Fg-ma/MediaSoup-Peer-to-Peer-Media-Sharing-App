@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef, ReactNode } from "react";
-import { Transition, Variants, motion } from "framer-motion";
+import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 import "./lib/scrollingContainer.css";
+import FgButton from "../fgButton/FgButton";
+import FgSVG from "../fgSVG/FgSVG";
+import navigateForward from "../../public/svgs/navigateForward.svg";
+import navigateBack from "../../public/svgs/navigateBack.svg";
 
 const scrollButtonsVar: Variants = {
   leftInit: { opacity: 0, x: -20 },
@@ -16,17 +20,33 @@ const scrollButtonsVar: Variants = {
   hover: { backgroundColor: "rgb(64 64 64)", fill: "rgb(255, 255, 255)" },
 };
 
-const transition: Transition = {
+const scrollButtonsTransition: Transition = {
   transition: {
-    duration: 0.3,
-    ease: "easeOut",
+    opacity: {
+      duration: 0.15,
+      ease: "linear",
+    },
+    x: {
+      duration: 0.15,
+      ease: "linear",
+    },
   },
 };
 
 export default function ScrollingContainer({
   content,
+  buttonBackgroundColor = "rbga(255, 255, 255, 1)",
+  buttonBackgroundColorTransition = {
+    backgroundColor: { duration: 0.3, ease: "linear" },
+    boxShadow: {
+      duration: 0.3,
+      ease: "linear",
+    },
+  },
 }: {
   content: ReactNode;
+  buttonBackgroundColor?: string;
+  buttonBackgroundColorTransition?: Transition;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftScroll, setShowLeftScroll] = useState(false);
@@ -96,34 +116,44 @@ export default function ScrollingContainer({
 
   return (
     <div className='flex w-full items-center justify-start overflow-hidden'>
-      {showLeftScroll && (
-        <motion.div
-          className='w-8 h-full bg-white flex items-center justify-center z-10'
-          style={{
-            boxShadow: "1px 0 6px 8px rgba(255, 255, 255, 1)",
-          }}
-          variants={scrollButtonsVar}
-          initial='leftInit'
-          animate={showLeftScroll ? "leftAnimate" : "leftInit"}
-          transition={transition}
-        >
-          <motion.button
-            className='w-8 aspect-square rounded-full'
+      <AnimatePresence>
+        {showLeftScroll && (
+          <motion.div
+            className='w-8 h-full bg-white flex items-center justify-center z-10'
             variants={scrollButtonsVar}
-            whileHover='hover'
-            onClick={scrollToLeft}
+            initial='leftInit'
+            exit='leftInit'
+            animate={{
+              ...scrollButtonsVar.leftAnimate,
+              backgroundColor: buttonBackgroundColor,
+              boxShadow: `1px 0 6px 8px ${buttonBackgroundColor}`,
+            }}
+            transition={{
+              ...buttonBackgroundColorTransition,
+              ...scrollButtonsTransition,
+            }}
           >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              height='32'
-              viewBox='0 -960 960 960'
-              width='32'
-            >
-              <path d='m432-480 156 156q11 11 11 28t-11 28q-11 11-28 11t-28-11L348-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 28-11t28 11q11 11 11 28t-11 28L432-480Z' />
-            </svg>
-          </motion.button>
-        </motion.div>
-      )}
+            <FgButton
+              className='w-8 aspect-square rounded-full flex items-center justify-center pr-0.5'
+              contentFunction={() => (
+                <FgSVG
+                  src={navigateBack}
+                  attributes={[
+                    { key: "height", value: "1.25rem" },
+                    { key: "width", value: "1.25rem" },
+                  ]}
+                />
+              )}
+              animationOptions={{
+                variants: scrollButtonsVar,
+                transition: scrollButtonsTransition,
+                whileHover: "hover",
+              }}
+              clickFunction={() => scrollToLeft()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div
         ref={scrollingContainerRef}
         className='grow flex items-center justify-start overflow-x-auto w-full'
@@ -131,35 +161,47 @@ export default function ScrollingContainer({
       >
         {content}
       </div>
-      {showRightScroll && (
-        <motion.div
-          className='w-8 h-full bg-white flex items-center justify-center z-10'
-          style={{
-            boxShadow: "-1px 0 6px 8px rgba(255, 255, 255, 1)",
-          }}
-          variants={scrollButtonsVar}
-          initial='rightInit'
-          animate={showRightScroll ? "rightAnimate" : "rightInit"}
-          transition={transition}
-        >
-          <motion.button
-            className='w-8 aspect-square rounded-full'
+      <AnimatePresence>
+        {showRightScroll && (
+          <motion.div
+            className='w-8 h-full bg-white flex items-center justify-center z-10'
+            style={{
+              boxShadow: "-1px 0 6px 8px rgba(255, 255, 255, 1)",
+            }}
             variants={scrollButtonsVar}
-            whileHover='hover'
-            onClick={scrollToRight}
+            initial='rightInit'
+            exit='rightInit'
+            animate={{
+              ...scrollButtonsVar.rightAnimate,
+              backgroundColor: buttonBackgroundColor,
+              boxShadow: `1px 0 6px 8px ${buttonBackgroundColor}`,
+            }}
+            transition={{
+              ...buttonBackgroundColorTransition,
+              ...scrollButtonsTransition,
+            }}
           >
-            <svg
-              className='ml-0.5'
-              xmlns='http://www.w3.org/2000/svg'
-              height='32'
-              viewBox='0 -960 960 960'
-              width='32'
-            >
-              <path d='M504-480 348-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L404-268q-11 11-28 11t-28-11q-11-11-11-28t11-28l156-156Z' />
-            </svg>
-          </motion.button>
-        </motion.div>
-      )}
+            <FgButton
+              className='w-8 aspect-square rounded-full flex items-center justify-center pl-0.5'
+              contentFunction={() => (
+                <FgSVG
+                  src={navigateForward}
+                  attributes={[
+                    { key: "height", value: "1.25rem" },
+                    { key: "width", value: "1.25rem" },
+                  ]}
+                />
+              )}
+              animationOptions={{
+                variants: scrollButtonsVar,
+                transition: scrollButtonsTransition,
+                whileHover: "hover",
+              }}
+              clickFunction={() => scrollToRight()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

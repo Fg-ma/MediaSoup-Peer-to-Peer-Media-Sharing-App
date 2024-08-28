@@ -1,15 +1,67 @@
-import React, { useEffect, useRef } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import { AnimatePresence } from "framer-motion";
+
+const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));
+
+interface FgSVGOptions {
+  hoverTimeoutDuration?: number;
+  hoverType?: "above" | "below";
+}
+
+const defaultFgSVGOptions: {
+  hoverTimeoutDuration: number;
+  hoverType: "above" | "below";
+} = {
+  hoverTimeoutDuration: 50,
+  hoverType: "above",
+};
 
 export default function FgSVG({
   src,
   attributes,
   className,
+  hoverContent,
+  options,
 }: {
   src: string;
   attributes?: { key: string; value: string; id?: string }[];
   className?: string;
+  hoverContent?: React.ReactElement;
+  options?: FgSVGOptions;
 }) {
+  const fgSVGOptions = {
+    ...defaultFgSVGOptions,
+    ...options,
+  };
+
+  const hoverTimeout = useRef<NodeJS.Timeout>();
+  const [isHover, setIsHover] = useState(false);
+
   const svgContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = () => {
+    if (hoverContent && !hoverTimeout.current) {
+      hoverTimeout.current = setTimeout(() => {
+        setIsHover(true);
+      }, fgSVGOptions.hoverTimeoutDuration);
+
+      document.addEventListener("mousemove", handleMouseMove);
+    }
+  };
+
+  const handleMouseMove = (event: MouseEvent) => {
+    const svgElement = svgContainerRef.current;
+
+    if (svgElement && !svgElement.contains(event.target as Node)) {
+      setIsHover(false);
+      if (hoverTimeout.current !== undefined) {
+        clearTimeout(hoverTimeout.current);
+        hoverTimeout.current = undefined;
+      }
+
+      document.removeEventListener("mousemove", handleMouseMove);
+    }
+  };
 
   useEffect(() => {
     const fetchSVG = async () => {
@@ -46,5 +98,25 @@ export default function FgSVG({
     fetchSVG();
   }, [src, attributes]);
 
-  return <div className={className} ref={svgContainerRef} />;
+  return (
+    <div
+      className={className}
+      ref={svgContainerRef}
+      {...(hoverContent && { onMouseEnter: handleMouseEnter })}
+    >
+      {hoverContent && (
+        <AnimatePresence>
+          {isHover && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <FgPortal
+                type={fgSVGOptions.hoverType}
+                content={hoverContent}
+                externalRef={svgContainerRef}
+              />
+            </Suspense>
+          )}
+        </AnimatePresence>
+      )}
+    </div>
+  );
 }

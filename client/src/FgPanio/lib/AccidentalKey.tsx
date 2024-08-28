@@ -60,19 +60,35 @@ export default function AccidentalKey({
                 animate='animate'
                 exit='init'
                 transition={AccidentalKeyTransition}
+                data-note={note}
+                data-octave={octave}
               >
                 {activationKey}
               </motion.div>
             )}
           </AnimatePresence>
-          <div className='accidental-key-accent'></div>
-          <div className='accidental-key-hint accidental-key-hint-upper'>{`${note[0]}#`}</div>
-          <div className='accidental-key-hint accidental-key-hint-lower'>{`${note[6]}b`}</div>
+          <div
+            className='accidental-key-accent'
+            data-note={note}
+            data-octave={octave}
+          ></div>
+          <div
+            className='accidental-key-hint accidental-key-hint-upper'
+            data-note={note}
+            data-octave={octave}
+          >{`${note[0]}#`}</div>
+          <div
+            className='accidental-key-hint accidental-key-hint-lower'
+            data-note={note}
+            data-octave={octave}
+          >{`${note[6]}b`}</div>
         </>
       )}
       mouseDownFunction={handleMouseDown}
       mouseUpFunction={handleMouseUp}
       style={{ cursor: "default" }}
+      data-note={note}
+      data-octave={octave}
     />
   );
 }

@@ -4,6 +4,7 @@ import "./lib/pianoStyles.css";
 import ScaleSection from "./lib/ScaleSection";
 import FgPianoController from "./lib/FgPianoController";
 import { useStreamsContext } from "../context/StreamsContext";
+import ScaleSectionToolbar from "./lib/ScaleSectionToolbar";
 
 export type Octaves = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -20,10 +21,10 @@ export default function FgPiano({
 }) {
   const { userMedia } = useStreamsContext();
 
-  const scaleSectionRef = useRef<HTMLDivElement>(null);
-  const keyWidth = useRef(0);
   const [visibleOctave, setVisibleOctave] = useState<Octaves>(initialOctave);
   const visibleOctaveRef = useRef<Octaves>(initialOctave);
+  const scaleSectionRef = useRef<HTMLDivElement>(null);
+  const keyWidth = useRef(0);
   const isKeydownListenerAdded = useRef(false);
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -124,6 +125,10 @@ export default function FgPiano({
     <FgPanel
       content={
         <div className='piano'>
+          <ScaleSectionToolbar
+            visibleOctaveRef={visibleOctaveRef}
+            scrollToOctave={fgPianoController.scrollToOctave}
+          />
           <ScaleSection
             externalRef={scaleSectionRef}
             playNote={fgPianoController.playNote}
@@ -144,6 +149,10 @@ export default function FgPiano({
       initWidth={400}
       minWidth={285}
       minHeight={190}
+      shadow={{
+        left: true,
+        right: true,
+      }}
     />
   );
 }

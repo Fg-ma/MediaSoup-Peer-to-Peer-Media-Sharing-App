@@ -12,7 +12,7 @@ const PanelVar: Variants = {
     backgroundColor: focus ? "#ffffff" : "#f3f3f3",
     transition: {
       scale: { type: "spring", stiffness: 100 },
-      backgroundColor: { duration: 0.3 },
+      backgroundColor: { duration: 0.3, ease: "linear" },
     },
   }),
 };
@@ -34,6 +34,12 @@ export default function FgPanel({
   focusCallback,
   closeCallback,
   closePosition,
+  shadow = {
+    left: false,
+    right: false,
+    bottom: false,
+    top: false,
+  },
 }: {
   content: React.ReactNode;
   initPosition?: {
@@ -51,6 +57,12 @@ export default function FgPanel({
   focusCallback?: (focus: boolean) => void;
   closeCallback?: () => void;
   closePosition?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+  shadow?: {
+    left?: boolean;
+    right?: boolean;
+    bottom?: boolean;
+    top?: boolean;
+  };
 }) {
   const [rerender, setRerender] = useState(false);
   const [isHover, setIsHover] = useState(false);
@@ -311,7 +323,7 @@ export default function FgPanel({
       onHoverStart={closeCallback && (() => setIsHover(true))}
       className={`${
         focusClicked ? "z-[50]" : focus ? "z-[49]" : "z-0"
-      } shadow-lg rounded absolute p-3`}
+      } shadow-lg rounded absolute p-3 overflow-hidden`}
       style={{
         opacity:
           position.x === undefined || position.y === undefined ? "0%" : "100%",
@@ -402,6 +414,20 @@ export default function FgPanel({
           />
         </Suspense>
       )}
+      <motion.div
+        className='z-10 absolute left-3 top-3 pointer-events-none'
+        style={{
+          width: "calc(100% - 1.5rem)",
+          height: "calc(100% - 1.5rem)",
+        }}
+        animate={{
+          // prettier-ignore
+          boxShadow: `${shadow.left ? `inset 10px 0px 5px -5px ${focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"}` : ""}${(shadow.left && shadow.right) || (shadow.left && shadow.bottom) || (shadow.left && shadow.top) ? ", " : ""}${shadow.right ? `inset -10px 0px 5px -5px ${focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"}` : ""}${(shadow.right && shadow.top) || (shadow.right && shadow.bottom) ? ", " : ""}${shadow.top ? `inset 0px 10px 5px -5px ${focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"}` : ""}${(shadow.top && shadow.bottom) ? ", " : ""}${shadow.bottom ? `inset 0px -10px 5px -5px ${focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"}` : ""}`,
+        }}
+        transition={{
+          boxShadow: { duration: 0.3, ease: "linear" },
+        }}
+      />
     </motion.div>,
     document.body
   );

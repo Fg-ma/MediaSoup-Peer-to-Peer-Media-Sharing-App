@@ -60,21 +60,43 @@ export default function NaturalKey({
                 animate='animate'
                 exit='init'
                 transition={NaturalKeyTransition}
+                data-note={note}
+                data-octave={octave}
               >
                 {activationKey}
               </motion.div>
             )}
           </AnimatePresence>
           {note === "C" && (
-            <div className='natural-key-c'>{note + `${octave}`}</div>
+            <div
+              className='natural-key-c'
+              data-note={note}
+              data-octave={octave}
+            >
+              {note + `${octave}`}
+            </div>
           )}{" "}
-          {note !== "C" && <div className='natural-key-hint'>{note}</div>}
-          <div className='natural-key-accent'></div>
+          {note !== "C" && (
+            <div
+              className='natural-key-hint'
+              data-note={note}
+              data-octave={octave}
+            >
+              {note}
+            </div>
+          )}
+          <div
+            className='natural-key-accent'
+            data-note={note}
+            data-octave={octave}
+          ></div>
         </>
       )}
       mouseDownFunction={handleMouseDown}
       mouseUpFunction={handleMouseUp}
       style={{ cursor: "default" }}
+      data-note={note}
+      data-octave={octave}
     />
   );
 }

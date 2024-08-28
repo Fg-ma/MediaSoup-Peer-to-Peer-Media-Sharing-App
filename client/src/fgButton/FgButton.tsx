@@ -1,5 +1,5 @@
 import React, { useState, useRef, Suspense } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 
 const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));
 
@@ -45,6 +45,8 @@ export default function FgButton({
   className,
   style,
   options,
+  animationOptions,
+  ...rest
 }: {
   externalId?: string;
   externalRef?: React.RefObject<HTMLButtonElement>;
@@ -59,6 +61,14 @@ export default function FgButton({
   className?: string;
   style?: React.CSSProperties;
   options?: FgButtonOptions;
+  animationOptions?: {
+    variants: Variants;
+    transition: Transition;
+    initial?: string;
+    animate?: string;
+    exit?: string;
+    whileHover?: string;
+  };
 }) {
   const fgButtonOptions = {
     ...defaultFgButtonOptions,
@@ -163,17 +173,20 @@ export default function FgButton({
 
     if (buttonElement && !buttonElement.contains(event.target as Node)) {
       setIsHover(false);
-      if (hoverTimeout.current !== null) {
+      if (hoverTimeout.current !== undefined) {
         clearTimeout(hoverTimeout.current);
+        hoverTimeout.current = undefined;
       }
 
       document.removeEventListener("mousemove", handleMouseMove);
     }
   };
 
+  const ButtonComponent = animationOptions ? motion.button : "button";
+
   return (
     <>
-      <button
+      <ButtonComponent
         id={externalId}
         ref={externalRef ? externalRef : buttonRef}
         onMouseDown={(event) => handleMouseDown(event)}
@@ -183,9 +196,18 @@ export default function FgButton({
         onDoubleClick={handleDoubleClick}
         onMouseEnter={handleMouseEnter}
         disabled={fgButtonOptions.disabled}
+        {...(animationOptions && {
+          variants: animationOptions.variants,
+          transition: animationOptions.transition,
+          initial: animationOptions.initial,
+          animate: animationOptions.animate,
+          exit: animationOptions.exit,
+          whileHover: animationOptions.whileHover,
+        })}
+        {...rest}
       >
         {contentFunction && contentFunction()}
-      </button>
+      </ButtonComponent>
       {hoverContent && !isHeld && (
         <AnimatePresence>
           {isHover && (
@@ -193,7 +215,7 @@ export default function FgButton({
               <FgPortal
                 type={fgButtonOptions.hoverType}
                 content={hoverContent}
-                buttonRef={externalRef ? externalRef : buttonRef}
+                externalRef={externalRef ? externalRef : buttonRef}
               />
             </Suspense>
           )}
@@ -206,7 +228,7 @@ export default function FgButton({
               <FgPortal
                 type={fgButtonOptions.holdType}
                 content={holdContent}
-                buttonRef={externalRef ? externalRef : buttonRef}
+                externalRef={externalRef ? externalRef : buttonRef}
               />
             </Suspense>
           )}

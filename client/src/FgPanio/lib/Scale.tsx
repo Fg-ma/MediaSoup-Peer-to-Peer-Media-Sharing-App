@@ -27,7 +27,7 @@ export default function Scale({
   visibleOctave,
 }: {
   octave: number;
-  playNote: (note: string, octave: number) => void;
+  playNote: (note: string, octave: number, isPressed: boolean) => void;
   visibleOctave: number;
 }) {
   return (

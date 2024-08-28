@@ -6,6 +6,7 @@ import {
   StaticMixEffect,
 } from "./AudioMixEffectsPortal";
 import { AudioMixEffectsType } from "../../effects/audioEffects/AudioEffects";
+import FgSVG from "../../fgSVG/FgSVG";
 
 export default function AudioMixEffect({
   effect,
@@ -43,25 +44,29 @@ export default function AudioMixEffect({
       }}
     >
       <div
-        className={`absolute text-lg bg-white rounded-sm border-2 border-black font-Josefin text-center
+        className={`justify-center items-center absolute text-lg bg-white rounded-sm border-2 border-black font-Josefin text-center
         ${
           labelPlacement.side === "top"
-            ? "top-0 -translate-y-1/2 px-1 w-max leading-4.5 pt-1.5"
+            ? "top-0 -translate-y-1/2 px-1 py-0.5 w-max leading-4.5 flex space-x-2"
             : ""
         } 
         ${
           labelPlacement.side === "bottom"
-            ? "bottom-0 translate-y-1/2 px-1 w-max leading-4.5 pt-1.5"
+            ? "bottom-0 translate-y-1/2 px-1 py-0.5 w-max leading-4.5 flex space-x-2"
             : ""
         } 
         ${
           labelPlacement.side === "left"
-            ? "whitespace-pre-line leading-4 left-0 -translate-x-1/2 p-1"
+            ? `whitespace-pre-line leading-4 left-0 -translate-x-1/2 py-1 flex flex-col space-y-2 ${
+                staticMixEffect.labelIcon ? "px-0.5" : "px-1"
+              }`
             : ""
         }
         ${
           labelPlacement.side === "right"
-            ? "whitespace-pre-line leading-4 right-0 translate-x-1/2 p-1"
+            ? `whitespace-pre-line leading-4 right-0 translate-x-1/2 py-1 flex flex-col space-y-2 ${
+                staticMixEffect.labelIcon ? "px-0.5" : "px-1"
+              }`
             : ""
         }
 
@@ -81,9 +86,32 @@ export default function AudioMixEffect({
         ${labelPlacement.sidePlacement === "right" ? "right-4" : ""}
         `}
       >
-        {labelPlacement.side === "right" || labelPlacement.side === "left"
-          ? effectLabel.split("").join("\n")
-          : effectLabel}
+        {staticMixEffect.labelIcon && (
+          <FgSVG
+            src={staticMixEffect.labelIcon}
+            attributes={[
+              { key: "width", value: "1.25rem" },
+              { key: "height", value: "1.25rem" },
+            ]}
+            hoverContent={
+              <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                {staticMixEffect.effectLabel}
+              </div>
+            }
+            options={{ hoverTimeoutDuration: 1500 }}
+          />
+        )}
+        <div
+          className={`${
+            labelPlacement.side === "top" || labelPlacement.side === "bottom"
+              ? "pt-1.25"
+              : ""
+          }`}
+        >
+          {labelPlacement.side === "right" || labelPlacement.side === "left"
+            ? effectLabel.split("").join("\n")
+            : effectLabel}
+        </div>
       </div>
       <div
         className={`h-full flex items-center justify-center 
