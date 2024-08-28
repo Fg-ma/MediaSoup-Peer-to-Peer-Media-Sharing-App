@@ -149,20 +149,21 @@ const samplers = {
   },
   dragonMagicOldPiano: {
     urls: {
-      C0: "C0.wav",
-      G0: "G0.wav",
-      C1: "C0.wav",
-      G1: "G0.wav",
-      C2: "C0.wav",
-      G2: "G0.wav",
-      C3: "C0.wav",
-      G3: "G0.wav",
-      C4: "C0.wav",
-      G4: "G0.wav",
-      C5: "C0.wav",
-      G5: "G0.wav",
-      C6: "C0.wav",
-      G6: "G0.wav",
+      C1: "C1.wav",
+      G1: "G1.wav",
+      C2: "C2.wav",
+      G2: "G2.wav",
+      C3: "C3.wav",
+      G3: "G3.wav",
+      C4: "C4.wav",
+      G4: "G4.wav",
+      C5: "C5.wav",
+      G5: "G5.wav",
+      C6: "C6.wav",
+      G6: "G6.wav",
+      C7: "C7.wav",
+      G7: "G7.wav",
+      C8: "C8.wav",
     },
     release: 1,
     baseUrl: "/audioSamples/dragonMagicOldPiano/",
@@ -576,7 +577,7 @@ class AudioEffects {
   };
 
   createSampler = () => {
-    this.sampler = new Tone.Sampler(samplers.brokenCassettePiano);
+    this.sampler = new Tone.Sampler(samplers.softSteinway);
     this.sampler.connect(this.mediaStreamDestination);
   };
 
