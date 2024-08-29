@@ -59,114 +59,211 @@ export type MixEffectsOptionsType =
   | TremoloOptionsType
   | VibratoOptionsType;
 
+export type Samplers =
+  | {
+      category: "pianos";
+      kind:
+        | "default"
+        | "brokenCassette"
+        | "curlyElectric"
+        | "dragonMagicOld"
+        | "softSteinway";
+      label:
+        | "Default"
+        | "Broken cassette"
+        | "Curly electric"
+        | "Dragon magic"
+        | "Soft steinway";
+    }
+  | {
+      category: "strings";
+      kind: "brokenCello" | "uncleJohns5StringBanjo";
+      label: "Broken cello" | "Uncle John's five string banjo";
+    };
+
 const samplers = {
-  basePiano: {
-    urls: {
-      A0: "A0.mp3",
-      C1: "C1.mp3",
-      "D#1": "Ds1.mp3",
-      "F#1": "Fs1.mp3",
-      A1: "A1.mp3",
-      C2: "C2.mp3",
-      "D#2": "Ds2.mp3",
-      "F#2": "Fs2.mp3",
-      A2: "A2.mp3",
-      C3: "C3.mp3",
-      "D#3": "Ds3.mp3",
-      "F#3": "Fs3.mp3",
-      A3: "A3.mp3",
-      C4: "C4.mp3",
-      "D#4": "Ds4.mp3",
-      "F#4": "Fs4.mp3",
-      A4: "A4.mp3",
-      C5: "C5.mp3",
-      "D#5": "Ds5.mp3",
-      "F#5": "Fs5.mp3",
-      A5: "A5.mp3",
-      C6: "C6.mp3",
-      "D#6": "Ds6.mp3",
-      "F#6": "Fs6.mp3",
-      A6: "A6.mp3",
-      C7: "C7.mp3",
-      "D#7": "Ds7.mp3",
-      "F#7": "Fs7.mp3",
-      A7: "A7.mp3",
-      C8: "C8.mp3",
+  pianos: {
+    default: {
+      sampler: {
+        urls: {
+          A0: "A0.mp3",
+          C1: "C1.mp3",
+          "D#1": "Ds1.mp3",
+          "F#1": "Fs1.mp3",
+          A1: "A1.mp3",
+          C2: "C2.mp3",
+          "D#2": "Ds2.mp3",
+          "F#2": "Fs2.mp3",
+          A2: "A2.mp3",
+          C3: "C3.mp3",
+          "D#3": "Ds3.mp3",
+          "F#3": "Fs3.mp3",
+          A3: "A3.mp3",
+          C4: "C4.mp3",
+          "D#4": "Ds4.mp3",
+          "F#4": "Fs4.mp3",
+          A4: "A4.mp3",
+          C5: "C5.mp3",
+          "D#5": "Ds5.mp3",
+          "F#5": "Fs5.mp3",
+          A5: "A5.mp3",
+          C6: "C6.mp3",
+          "D#6": "Ds6.mp3",
+          "F#6": "Fs6.mp3",
+          A6: "A6.mp3",
+          C7: "C7.mp3",
+          "D#7": "Ds7.mp3",
+          "F#7": "Fs7.mp3",
+          A7: "A7.mp3",
+          C8: "C8.mp3",
+        },
+        release: 1,
+        baseUrl: "https://tonejs.github.io/audio/salamander/",
+      },
+      label: "Default",
     },
-    release: 1,
-    baseUrl: "https://tonejs.github.io/audio/salamander/",
+    brokenCassette: {
+      sampler: {
+        urls: {
+          A0: "A0.wav",
+          C1: "C1.wav",
+          "D#1": "D#1.wav",
+          "F#1": "F#1.wav",
+          A1: "A1.wav",
+          C2: "C2.wav",
+          "D#2": "D#2.wav",
+          "F#2": "F#2.wav",
+          A2: "A2.wav",
+          C3: "C3.wav",
+          "D#3": "D#3.wav",
+          "F#3": "F#3.wav",
+          A3: "A3.wav",
+          C4: "C4.wav",
+          "D#4": "D#4.wav",
+          "F#4": "F#4.wav",
+          A4: "A4.wav",
+          C5: "C5.wav",
+          "D#5": "D#5.wav",
+          "F#5": "F#5.wav",
+          A5: "A5.wav",
+          C6: "C6.wav",
+          "D#6": "D#6.wav",
+          "F#6": "F#6.wav",
+          A6: "A6.wav",
+          "A#6": "A#6.wav",
+          B6: "B6.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/brokenCassettePiano/",
+      },
+      label: "Broken cassette",
+    },
+    curlyElectric: {
+      sampler: {
+        urls: {
+          C1: "C1.wav",
+          "F#1": "F#1.wav",
+          C2: "C2.wav",
+          "F#2": "F#2.wav",
+          C3: "C3.wav",
+          "F#3": "F#3.wav",
+          C4: "C4.wav",
+          "F#4": "F#4.wav",
+          C5: "C5.wav",
+          "F#5": "F#5.wav",
+          B5: "B5.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/curlyElectricPiano/",
+      },
+      label: "Curly electric",
+    },
+    dragonMagicOld: {
+      sampler: {
+        urls: {
+          C1: "C1.wav",
+          G1: "G1.wav",
+          C2: "C2.wav",
+          G2: "G2.wav",
+          C3: "C3.wav",
+          G3: "G3.wav",
+          C4: "C4.wav",
+          G4: "G4.wav",
+          C5: "C5.wav",
+          G5: "G5.wav",
+          C6: "C6.wav",
+          G6: "G6.wav",
+          C7: "C7.wav",
+          G7: "G7.wav",
+          C8: "C8.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/dragonMagicOldPiano/",
+      },
+      label: "Dragon magic",
+    },
+    softSteinway: {
+      sampler: {
+        urls: {
+          C0: "C0.wav",
+          G0: "G0.wav",
+          D1: "D1.wav",
+          A1: "A1.wav",
+          E2: "E2.wav",
+          B2: "B2.wav",
+          "F#3": "F#3.wav",
+          "C#4": "C#4.wav",
+          "G#4": "G#4.wav",
+          "D#5": "D#5.wav",
+          "A#5": "A#5.wav",
+          F6: "F6.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/softSteinway/",
+      },
+      label: "Soft Steinway",
+    },
   },
-  brokenCassettePiano: {
-    urls: {
-      A0: "A0.wav",
-      C1: "C1.wav",
-      "D#1": "D#1.wav",
-      "F#1": "F#1.wav",
-      A1: "A1.wav",
-      C2: "C2.wav",
-      "D#2": "D#2.wav",
-      "F#2": "F#2.wav",
-      A2: "A2.wav",
-      C3: "C3.wav",
-      "D#3": "D#3.wav",
-      "F#3": "F#3.wav",
-      A3: "A3.wav",
-      C4: "C4.wav",
-      "D#4": "D#4.wav",
-      "F#4": "F#4.wav",
-      A4: "A4.wav",
-      C5: "C5.wav",
-      "D#5": "D#5.wav",
-      "F#5": "F#5.wav",
-      A5: "A5.wav",
-      C6: "C6.wav",
-      "D#6": "D#6.wav",
-      "F#6": "F#6.wav",
-      A6: "A6.wav",
-      "A#6": "A#6.wav",
-      B6: "B6.wav",
+  strings: {
+    brokenCello: {
+      sampler: {
+        urls: {
+          "C#1": "C#1.wav",
+          E1: "E1.wav",
+          G1: "G1.wav",
+          "A#1": "A#1.wav",
+          "C#2": "C#2.wav",
+          E2: "E2.wav",
+          G2: "G2.wav",
+          "A#2": "A#2.wav",
+          E3: "E3.wav",
+          G3: "G3.wav",
+          "A#3": "A#3.wav",
+          "C#3": "C#3.wav",
+          "C#4": "C#4.wav",
+          E4: "E4.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/brokenCello/",
+      },
+      label: "Broken cello",
     },
-    release: 1,
-    baseUrl: "/audioSamples/brokenCassettePiano/",
-  },
-  softSteinway: {
-    urls: {
-      C0: "C0.wav",
-      G0: "G0.wav",
-      D1: "D1.wav",
-      A1: "A1.wav",
-      E2: "E2.wav",
-      B2: "B2.wav",
-      "F#3": "F#3.wav",
-      "C#4": "C#4.wav",
-      "G#4": "G#4.wav",
-      "D#5": "D#5.wav",
-      "A#5": "A#5.wav",
-      F6: "F6.wav",
+    uncleJohns5StringBanjo: {
+      sampler: {
+        urls: {
+          C3: "C3.wav",
+          D3: "D3.wav",
+          G3: "G3.wav",
+          B3: "B3.wav",
+          D4: "D4.wav",
+          G4: "G4.wav",
+          D5: "D5.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/uncleJohns5StringBanjo/",
+      },
+      label: "Uncle John's five string banjo",
     },
-    release: 1,
-    baseUrl: "/audioSamples/softSteinway/",
-  },
-  dragonMagicOldPiano: {
-    urls: {
-      C1: "C1.wav",
-      G1: "G1.wav",
-      C2: "C2.wav",
-      G2: "G2.wav",
-      C3: "C3.wav",
-      G3: "G3.wav",
-      C4: "C4.wav",
-      G4: "G4.wav",
-      C5: "C5.wav",
-      G5: "G5.wav",
-      C6: "C6.wav",
-      G6: "G6.wav",
-      C7: "C7.wav",
-      G7: "G7.wav",
-      C8: "C8.wav",
-    },
-    release: 1,
-    baseUrl: "/audioSamples/dragonMagicOldPiano/",
   },
 };
 
@@ -577,8 +674,55 @@ class AudioEffects {
   };
 
   createSampler = () => {
-    this.sampler = new Tone.Sampler(samplers.softSteinway);
+    this.sampler = new Tone.Sampler(samplers.pianos.default.sampler);
     this.sampler.connect(this.mediaStreamDestination);
+  };
+
+  swapSampler = (sampler: Samplers, increment?: number): Samplers => {
+    // Disconnect and dispose of the current sampler if it exists
+    if (this.sampler) {
+      this.sampler.disconnect();
+      this.sampler.dispose();
+    }
+
+    if (increment === undefined) {
+      this.sampler = new Tone.Sampler(
+        // @ts-ignore
+        samplers[sampler.category][sampler.kind].sampler
+      );
+      this.sampler.connect(this.mediaStreamDestination);
+
+      return {
+        category: sampler.category,
+        kind: sampler.kind,
+        // @ts-ignore
+        label: samplers[sampler.category][sampler.kind].label,
+      } as Samplers;
+    } else {
+      // Get an array of sampler kinds in the category
+      const kinds = Object.keys(samplers[sampler.category]);
+
+      // Find the index of the current kind
+      const currentIndex = kinds.indexOf(sampler.kind);
+      if (currentIndex === -1) throw new Error("Invalid sampler kind");
+
+      // Calculate the new index, wrapping around if necessary
+      const newIndex = (currentIndex + increment + kinds.length) % kinds.length;
+      const newKind = kinds[newIndex];
+
+      this.sampler = new Tone.Sampler(
+        // @ts-ignore
+        samplers[sampler.category][newKind].sampler
+      );
+      this.sampler.connect(this.mediaStreamDestination);
+
+      return {
+        category: sampler.category,
+        kind: newKind as any,
+        // @ts-ignore
+        label: samplers[sampler.category][newKind].label,
+      };
+    }
   };
 
   // Trigger a note when a key is pressed

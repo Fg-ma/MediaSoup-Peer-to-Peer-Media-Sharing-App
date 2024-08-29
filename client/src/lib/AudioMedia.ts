@@ -8,6 +8,7 @@ import {
 import AudioEffects, {
   AudioMixEffectsType,
   MixEffectsOptionsType,
+  Samplers,
 } from "../effects/audioEffects/AudioEffects";
 
 class AudioMedia {
@@ -292,6 +293,10 @@ class AudioMedia {
 
   playNote = (note: string, isPress: boolean) => {
     this.audioEffects.playNote(note, isPress);
+  };
+
+  swapSampler = (sampler: Samplers, increment?: number): Samplers => {
+    return this.audioEffects.swapSampler(sampler, increment);
   };
 
   getStream = () => {

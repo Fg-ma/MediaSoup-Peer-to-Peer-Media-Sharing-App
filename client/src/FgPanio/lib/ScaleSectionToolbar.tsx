@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import { Octaves } from "../FgPiano";
 import navigateForward from "../../../public/svgs/navigateForward.svg";
 import navigateBack from "../../../public/svgs/navigateBack.svg";
+import { useStreamsContext } from "../../context/StreamsContext";
+import { Samplers } from "../../effects/audioEffects/AudioEffects";
+import FgSelectionButton from "../../fgSelectionButton/FgSelectionButton";
 
 const navVar: Variants = {
   leftInit: { opacity: 0, x: -20 },
@@ -34,8 +37,16 @@ export default function ScaleSectionToolbar({
   visibleOctaveRef: React.MutableRefObject<Octaves>;
   scrollToOctave: (octave: Octaves) => void;
 }) {
+  const { userMedia } = useStreamsContext();
+
+  const [sampler, setSampler] = useState<Samplers>({
+    category: "pianos",
+    kind: "default",
+    label: "Default",
+  });
+
   return (
-    <div className='w-full h-8 flex mb-1 space-x-2 px-2'>
+    <div className='w-full h-8 flex space-x-2 px-2 my-20'>
       <div className='font-K2D text-lg flex items-center justify-center space-x-1'>
         <AnimatePresence>
           {visibleOctaveRef.current !== 0 && (
@@ -115,13 +126,41 @@ export default function ScaleSectionToolbar({
               ]}
             />
           )}
+          clickFunction={() => {
+            const newSampler = userMedia.current.audio?.swapSampler(
+              sampler,
+              -1
+            );
+            if (newSampler) {
+              setSampler(newSampler);
+            }
+          }}
           animationOptions={{
             variants: navVar,
             transition: navTransition,
             whileHover: "hover",
           }}
         />
-        <FgButton contentFunction={() => <div className='mb-0.5'>Panio</div>} />
+        <FgButton
+          contentFunction={() => <div className='mb-0.5'>{sampler.label}</div>}
+        />
+        <FgSelectionButton
+          content={<>sampler.label</>}
+          selections={{
+            pianos: {
+              ["Default"]: "default",
+              ["Broken cassette"]: "brokenCassette",
+              ["Curly electric"]: "curlyElectric",
+              ["Dragon magic"]: "dragonMagicOld",
+              ["Soft Steinway"]: "softSteinway",
+            },
+            strings: {
+              ["Broken cello"]: "brokenCello",
+              ["Uncle John's five string banjo"]: "uncleJohns5StringBanjo",
+            },
+          }}
+          valueSelectionFunction={() => {}}
+        />
         <FgButton
           className='w-6 aspect-square rounded-full flex items-center justify-center pl-0.5'
           contentFunction={() => (
@@ -133,6 +172,12 @@ export default function ScaleSectionToolbar({
               ]}
             />
           )}
+          clickFunction={() => {
+            const newSampler = userMedia.current.audio?.swapSampler(sampler, 1);
+            if (newSampler) {
+              setSampler(newSampler);
+            }
+          }}
           animationOptions={{
             variants: navVar,
             transition: navTransition,
