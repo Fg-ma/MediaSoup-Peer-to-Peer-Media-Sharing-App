@@ -185,6 +185,29 @@ const samplers = {
     },
   },
   strings: {
+    acousticGuitar: {
+      sampler: {
+        urls: {
+          "C#1": "C#1.wav",
+          E1: "E1.wav",
+          G1: "G1.wav",
+          "A#1": "A#1.wav",
+          "C#2": "C#2.wav",
+          E2: "E2.wav",
+          G2: "G2.wav",
+          "A#2": "A#2.wav",
+          E3: "E3.wav",
+          G3: "G3.wav",
+          "A#3": "A#3.wav",
+          "C#3": "C#3.wav",
+          "C#4": "C#4.wav",
+          E4: "E4.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/strings/brokenCello/",
+      },
+      label: "Broken cello",
+    },
     brokenCello: {
       sampler: {
         urls: {
