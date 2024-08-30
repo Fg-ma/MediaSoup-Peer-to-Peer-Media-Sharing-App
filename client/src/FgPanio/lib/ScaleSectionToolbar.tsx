@@ -272,7 +272,16 @@ export default function ScaleSectionToolbar({
             },
             Strings: {
               value: "strings",
+              ["Acoustic guitar"]: "acousticGuitar",
+              ["AXA fifths bounce guitar"]: "AXAFifthsBounceGuitar",
+              ["AXA voodoo vibe guitar"]: "AXAVoodooVibeGuitar",
               ["Broken cello"]: "brokenCello",
+              ["Clanky amp metal guitar"]: "clankyAmpMetalGuitar",
+              ["Clanky metal bass guitar"]: "clankyMetalBassGuitar",
+              ["Ferrum iron guitar"]: "ferrumIronGuitar",
+              ["Fresh guitar"]: "freshGuitar",
+              ["Mexican guitarron"]: "MexicanGuitarron",
+              ["RJS guitar"]: "RJSGuitar",
               ["Uncle John's five string banjo"]: "uncleJohns5StringBanjo",
             },
             Winds: {
