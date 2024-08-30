@@ -1,5 +1,4 @@
 import * as Tone from "tone";
-import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -8,8 +7,8 @@ import {
 import AudioEffects, {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-  Samplers,
 } from "../effects/audioEffects/AudioEffects";
+import { Samplers } from "../effects/audioEffects/FgSampler";
 
 class AudioMedia {
   private username: string;
@@ -85,8 +84,6 @@ class AudioMedia {
       },
     ]);
     this.audioEffects.removeEffects(["reverb"]);
-
-    this.audioEffects.createSampler();
   };
 
   deconstructor = () => {
@@ -292,11 +289,19 @@ class AudioMedia {
   };
 
   playNote = (note: string, isPress: boolean) => {
-    this.audioEffects.playNote(note, isPress);
+    this.audioEffects.fgSampler.playNote(note, isPress);
   };
 
-  swapSampler = (sampler: Samplers, increment?: number): Samplers => {
-    return this.audioEffects.swapSampler(sampler, increment);
+  swapSampler = (
+    sampler: { category: string; kind: string },
+    increment?: number
+  ): Samplers => {
+    return this.audioEffects.fgSampler.swapSampler(sampler, increment);
+  };
+
+  // Set volume (in decibels)
+  setSamplerVolume = (volume: number) => {
+    this.audioEffects.fgSampler.setVolume(volume);
   };
 
   getStream = () => {

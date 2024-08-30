@@ -69,9 +69,6 @@ export default function FgPiano({
       return;
     }
 
-    const tagName = document.activeElement?.tagName.toLowerCase();
-    if (tagName === "input") return;
-
     let octave: number = visibleOctaveRef.current;
     if (shiftPressed.current) {
       octave = Math.min(6, octave + 1);
