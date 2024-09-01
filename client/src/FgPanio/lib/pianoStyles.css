@@ -179,10 +179,18 @@
 }
 
 .accidental-key-hint-upper {
-  bottom: 30%;
+  bottom: 21%;
 }
 
 .accidental-key-hint-lower {
+  bottom: 14%;
+}
+
+.piano-scale.active-octave .accidental-key-hint-upper {
+  bottom: 30%;
+}
+
+.piano-scale.active-octave .accidental-key-hint-lower {
   bottom: 23%;
 }
 

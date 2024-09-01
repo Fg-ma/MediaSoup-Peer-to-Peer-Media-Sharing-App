@@ -187,42 +187,42 @@ class FgPianoController {
         this.playNote("B", octave, false);
         break;
       case "e":
-        key = document.getElementById(`piano_key_${octave}_CSharpDb`);
+        key = document.getElementById(`piano_key_${octave}_C#`);
         key?.classList.remove("pressed");
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "CSharpDb"
+          (k) => k !== "C#"
         );
         this.playNote("C#", octave, false);
         break;
       case "r":
-        key = document.getElementById(`piano_key_${octave}_DSharpEb`);
+        key = document.getElementById(`piano_key_${octave}_D#`);
         key?.classList.remove("pressed");
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "DSharpEb"
+          (k) => k !== "D#"
         );
         this.playNote("D#", octave, false);
         break;
       case "i":
-        key = document.getElementById(`piano_key_${octave}_FSharpGb`);
+        key = document.getElementById(`piano_key_${octave}_F#`);
         key?.classList.remove("pressed");
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "FSharpGb"
+          (k) => k !== "F#"
         );
         this.playNote("F#", octave, false);
         break;
       case "o":
-        key = document.getElementById(`piano_key_${octave}_GSharpAb`);
+        key = document.getElementById(`piano_key_${octave}_G#`);
         key?.classList.remove("pressed");
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "GSharpAb"
+          (k) => k !== "G#"
         );
         this.playNote("G#", octave, false);
         break;
       case "p":
-        key = document.getElementById(`piano_key_${octave}_ASharpBb`);
+        key = document.getElementById(`piano_key_${octave}_A#`);
         key?.classList.remove("pressed");
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "ASharpBb"
+          (k) => k !== "A#"
         );
         this.playNote("A#", octave, false);
         break;
@@ -302,42 +302,42 @@ class FgPianoController {
         }
         break;
       case "e":
-        if (!this.keysPressed.current.includes("CSharpDb")) {
-          key = document.getElementById(`piano_key_${octave}_CSharpDb`);
+        if (!this.keysPressed.current.includes("C#")) {
+          key = document.getElementById(`piano_key_${octave}_C#`);
           key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "CSharpDb"];
+          this.keysPressed.current = [...this.keysPressed.current, "C#"];
           this.playNote("C#", octave, true);
         }
         break;
       case "r":
-        if (!this.keysPressed.current.includes("DSharpEb")) {
-          key = document.getElementById(`piano_key_${octave}_DSharpEb`);
+        if (!this.keysPressed.current.includes("D#")) {
+          key = document.getElementById(`piano_key_${octave}_D#`);
           key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "DSharpEb"];
+          this.keysPressed.current = [...this.keysPressed.current, "D#"];
           this.playNote("D#", octave, true);
         }
         break;
       case "i":
-        if (!this.keysPressed.current.includes("FSharpGb")) {
-          key = document.getElementById(`piano_key_${octave}_FSharpGb`);
+        if (!this.keysPressed.current.includes("F#")) {
+          key = document.getElementById(`piano_key_${octave}_F#`);
           key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "FSharpGb"];
+          this.keysPressed.current = [...this.keysPressed.current, "F#"];
           this.playNote("F#", octave, true);
         }
         break;
       case "o":
-        if (!this.keysPressed.current.includes("GSharpAb")) {
-          key = document.getElementById(`piano_key_${octave}_GSharpAb`);
+        if (!this.keysPressed.current.includes("G#")) {
+          key = document.getElementById(`piano_key_${octave}_G#`);
           key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "GSharpAb"];
+          this.keysPressed.current = [...this.keysPressed.current, "G#"];
           this.playNote("G#", octave, true);
         }
         break;
       case "p":
-        if (!this.keysPressed.current.includes("ASharpBb")) {
-          key = document.getElementById(`piano_key_${octave}_ASharpBb`);
+        if (!this.keysPressed.current.includes("A#")) {
+          key = document.getElementById(`piano_key_${octave}_A#`);
           key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "ASharpBb"];
+          this.keysPressed.current = [...this.keysPressed.current, "A#"];
           this.playNote("A#", octave, true);
         }
         break;

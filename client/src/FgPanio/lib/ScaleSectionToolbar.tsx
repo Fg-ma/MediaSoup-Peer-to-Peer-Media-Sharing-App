@@ -34,13 +34,15 @@ export default function ScaleSectionToolbar({
   scrollToOctave: (octave: Octaves) => void;
 }) {
   return (
-    <div className='w-full h-8 flex space-x-2 px-2 mb-1 overflow-hidden'>
-      <OctaveSelection
-        visibleOctaveRef={visibleOctaveRef}
-        scrollToOctave={scrollToOctave}
-      />
-      <SelectSampler />
+    <div className='w-full h-8 flex justify-between px-2 mb-1 overflow-hidden'>
       <SamplerVolume />
+      <div className='flex space-x-2'>
+        <OctaveSelection
+          visibleOctaveRef={visibleOctaveRef}
+          scrollToOctave={scrollToOctave}
+        />
+        <SelectSampler />
+      </div>
     </div>
   );
 }

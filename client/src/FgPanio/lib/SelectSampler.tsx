@@ -288,6 +288,16 @@ export default function SelectSampler() {
           Drums: {
             value: "drums",
             ["Bottle organ"]: "bottleOrgan",
+            ["Broken splash cymbal gong"]: "brokenSplashCymbalGong",
+            ["Clave frog"]: "claveFrog",
+            ["Garage sale drum kit"]: "garageSaleDrumKit",
+            ["Hand bells"]: "handBells",
+            ["Jon's cajons"]: "JonsCajons",
+            ["Kitchen drum kit"]: "kitchenDrumKit",
+            ["Metallophon"]: "metallophon",
+            ["Slit log drum"]: "slitLogDrum",
+            ["Solar winds"]: "solarWinds",
+            ["Tin can drums"]: "tinCanDrums",
           },
         }}
         valueSelectionFunction={(selection) => {
