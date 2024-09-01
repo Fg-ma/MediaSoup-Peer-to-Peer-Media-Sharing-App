@@ -35,13 +35,26 @@ export default function AccidentalKey({
   const handleMouseDown = () => {
     accidentalKeyRef.current?.classList.add("pressed");
 
-    playNote(`${note[0]}#`, octave, true);
+    playNote(note, octave, true);
   };
 
   const handleMouseUp = () => {
     accidentalKeyRef.current?.classList.remove("pressed");
 
-    playNote(`${note[0]}#`, octave, false);
+    playNote(note, octave, false);
+  };
+
+  const getNextNote = (note: string) => {
+    const notes = ["C", "D", "E", "F", "G", "A", "B"];
+    const index = notes.indexOf(note);
+
+    if (index === -1) {
+      return "";
+    }
+
+    // Get the next note index and wrap around if needed
+    const nextIndex = (index + 1) % notes.length;
+    return notes[nextIndex];
   };
 
   return (
@@ -76,12 +89,14 @@ export default function AccidentalKey({
             className='accidental-key-hint accidental-key-hint-upper'
             data-note={note}
             data-octave={octave}
-          >{`${note[0]}#`}</div>
+          >
+            {note}
+          </div>
           <div
             className='accidental-key-hint accidental-key-hint-lower'
             data-note={note}
             data-octave={octave}
-          >{`${note[6]}b`}</div>
+          >{`${getNextNote(note[0])}b`}</div>
         </>
       )}
       mouseDownFunction={handleMouseDown}

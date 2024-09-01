@@ -366,6 +366,36 @@ class FgPianoController {
     );
 
     this.getVisibleOctave();
+
+    const piano: HTMLElement | null = document.querySelector(".piano");
+    const octaveLabel = document.querySelector(".octave-label");
+    const octaveContainer = document.querySelector(".octave-container");
+
+    if (piano) {
+      if (piano.offsetWidth > 390) {
+        octaveLabel?.classList.remove("hidden");
+        octaveContainer?.classList.add("space-x-1");
+      } else {
+        octaveLabel?.classList.add("hidden");
+        octaveContainer?.classList.remove("space-x-1");
+      }
+    }
+
+    const selectSamplerLabel: HTMLElement | null = document.querySelector(
+      ".select-sampler-label"
+    );
+
+    if (piano && selectSamplerLabel) {
+      selectSamplerLabel.classList.remove("truncate", "w-max");
+      selectSamplerLabel.style.width = "";
+
+      if (selectSamplerLabel.clientWidth > piano.clientWidth / 4) {
+        selectSamplerLabel.classList.add("truncate");
+        selectSamplerLabel.style.width = `${piano.clientWidth / 4}px`;
+      } else {
+        selectSamplerLabel.classList.add("w-max");
+      }
+    }
   };
 }
 

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import FgButton from "../../fgButton/FgButton";
 import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
 
@@ -75,7 +75,7 @@ export default function NaturalKey({
             >
               {note + `${octave}`}
             </div>
-          )}{" "}
+          )}
           {note !== "C" && (
             <div
               className='natural-key-hint'

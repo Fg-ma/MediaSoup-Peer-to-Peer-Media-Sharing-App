@@ -9,21 +9,25 @@ import { navTransition, navVar } from "./ScaleSectionToolbar";
 import FgPortal from "../../fgPortal/FgPortal";
 
 export default function OctaveSelection({
-  toolbarRef,
   visibleOctaveRef,
   scrollToOctave,
 }: {
-  toolbarRef: React.RefObject<HTMLDivElement>;
   visibleOctaveRef: React.MutableRefObject<Octaves>;
   scrollToOctave: (octave: Octaves) => void;
 }) {
   const [hover, setHover] = useState(false);
+  const hoverTimeout = useRef<NodeJS.Timeout>();
   const octaveDivRef = useRef<HTMLDivElement>(null);
+  const octaveLabelRef = useRef<HTMLDivElement>(null);
 
   const handleMouseEnter = () => {
-    document.addEventListener("mousemove", handleMouseMove);
+    if (octaveLabelRef.current?.classList.contains("hidden")) {
+      document.addEventListener("mousemove", handleMouseMove);
 
-    setHover(true);
+      hoverTimeout.current = setTimeout(() => {
+        setHover(true);
+      }, 750);
+    }
   };
 
   const handleMouseMove = (event: MouseEvent) => {
@@ -34,6 +38,10 @@ export default function OctaveSelection({
       document.removeEventListener("mousemove", handleMouseMove);
 
       setHover(false);
+      if (hoverTimeout.current !== undefined) {
+        clearTimeout(hoverTimeout.current);
+        hoverTimeout.current = undefined;
+      }
     }
   };
 
@@ -73,17 +81,19 @@ export default function OctaveSelection({
       </AnimatePresence>
       <div
         ref={octaveDivRef}
-        className='mb-0.5 cursor-default select-none truncate grow'
+        className='octave-container mb-0.5 cursor-default select-none truncate grow flex'
         onMouseEnter={handleMouseEnter}
       >
-        {toolbarRef.current && toolbarRef.current.clientWidth > 400 && "Octave"}{" "}
-        {visibleOctaveRef.current}
+        <div ref={octaveLabelRef} className='octave-label'>
+          Octave
+        </div>
+        <div>{visibleOctaveRef.current}</div>
       </div>
       {hover && (
         <FgPortal
           type='below'
           content={
-            <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+            <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-md bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
               Octave
             </div>
           }

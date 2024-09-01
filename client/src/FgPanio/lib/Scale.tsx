@@ -13,11 +13,11 @@ export const keys = {
     B: ";",
   },
   accidentalKeys: {
-    CSharpDb: "E",
-    DSharpEb: "R",
-    FSharpGb: "I",
-    GSharpAb: "O",
-    ASharpBb: "P",
+    ["C#"]: "E",
+    ["D#"]: "R",
+    ["F#"]: "I",
+    ["G#"]: "O",
+    ["A#"]: "P",
   },
 };
 
@@ -42,12 +42,12 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='piano-CSharpDb'
-        note='CSharpDb'
+        classname='piano-C#'
+        note='C#'
         octave={octave}
         playNote={playNote}
         activationKey={
-          octave === visibleOctave ? keys.accidentalKeys.CSharpDb : undefined
+          octave === visibleOctave ? keys.accidentalKeys["C#"] : undefined
         }
       />
       <NaturalKey
@@ -60,12 +60,12 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='piano-DSharpEb'
-        note='DSharpEb'
+        classname='piano-D#'
+        note='D#'
         octave={octave}
         playNote={playNote}
         activationKey={
-          octave === visibleOctave ? keys.accidentalKeys.DSharpEb : undefined
+          octave === visibleOctave ? keys.accidentalKeys["D#"] : undefined
         }
       />
       <NaturalKey
@@ -87,12 +87,12 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='piano-FSharpGb'
-        note='FSharpGb'
+        classname='piano-F#'
+        note='F#'
         octave={octave}
         playNote={playNote}
         activationKey={
-          octave === visibleOctave ? keys.accidentalKeys.FSharpGb : undefined
+          octave === visibleOctave ? keys.accidentalKeys["F#"] : undefined
         }
       />
       <NaturalKey
@@ -105,12 +105,12 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='piano-GSharpAb'
-        note='GSharpAb'
+        classname='piano-G#'
+        note='G#'
         octave={octave}
         playNote={playNote}
         activationKey={
-          octave === visibleOctave ? keys.accidentalKeys.GSharpAb : undefined
+          octave === visibleOctave ? keys.accidentalKeys["G#"] : undefined
         }
       />
       <NaturalKey
@@ -123,12 +123,12 @@ export default function Scale({
         }
       />
       <AccidentalKey
-        classname='piano-ASharpBb'
-        note='ASharpBb'
+        classname='piano-A#'
+        note='A#'
         octave={octave}
         playNote={playNote}
         activationKey={
-          octave === visibleOctave ? keys.accidentalKeys.ASharpBb : undefined
+          octave === visibleOctave ? keys.accidentalKeys["A#"] : undefined
         }
       />
       <NaturalKey

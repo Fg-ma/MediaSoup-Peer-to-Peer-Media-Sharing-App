@@ -31,7 +31,7 @@ export default function ExpandingSelectionPanelButton({
   return (
     <div
       ref={buttonRef}
-      className='cursor-default relative px-2 w-full h-8 hover:bg-fg-white-80'
+      className='cursor-default relative px-2 w-full h-8 hover:bg-fg-white-80 rounded'
       onMouseEnter={() => {
         previousPanels.current.push(selections.value);
         setExpanded(true);

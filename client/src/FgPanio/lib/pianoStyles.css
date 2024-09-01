@@ -8,7 +8,6 @@
 .scale-section {
   --key-width: 0px;
   --key-border-style: solid;
-  padding: 1px;
   flex-grow: 1;
   width: 100%;
   display: flex;
@@ -41,6 +40,14 @@
   user-select: none;
 }
 
+.natural-key:disabled {
+  background: #d9d9d9;
+}
+
+.natural-key:disabled .natural-key-accent {
+  background: linear-gradient(0deg, #e6e6e6, #d9d9d9);
+}
+
 .natural-key-accent {
   position: absolute;
   height: 96%;
@@ -51,7 +58,7 @@
   transition: height 0.025s ease;
 }
 
-.natural-key.pressed .natural-key-accent {
+.natural-key.pressed:not(:disabled) .natural-key-accent {
   height: 97.5%;
 }
 
@@ -71,6 +78,10 @@
   border-style: var(--key-border-style);
 }
 
+.natural-key:disabled .natural-key-acivation-key {
+  visibility: hidden;
+}
+
 .natural-key-c {
   z-index: 2;
   position: absolute;
@@ -81,7 +92,7 @@
   transition: bottom 0.05s ease;
 }
 
-.piano-scale.active-octave .natural-key-c {
+.piano-scale.active-octave .natural-key:not(:disabled) .natural-key-c {
   bottom: calc(var(--key-width) - (0.575 * var(--key-width)) + 6.25%);
 }
 
@@ -99,7 +110,7 @@
   bottom: calc(var(--key-width) - (0.575 * var(--key-width)) + 6.25%);
 }
 
-.natural-key.pressed .natural-key-hint {
+.natural-key.pressed:not(:disabled) .natural-key-hint {
   opacity: 100%;
 }
 
@@ -118,6 +129,14 @@
   color: #f3f3f3;
 }
 
+.accidental-key:disabled {
+  background: #333333;
+}
+
+.accidental-key-accent:disabled .natural-key-accent {
+  background: linear-gradient(0deg, #404040, #333333);
+}
+
 .accidental-key-accent {
   height: 90%;
   width: calc(0.5 * var(--key-width));
@@ -127,7 +146,7 @@
   transition: height 0.025s ease;
 }
 
-.accidental-key.pressed .accidental-key-accent {
+.accidental-key.pressed:not(:disabled) .accidental-key-accent {
   height: 91.5%;
 }
 
@@ -144,6 +163,10 @@
   align-items: center;
   justify-content: center;
   border-style: var(--key-border-style);
+}
+
+.accidental-key:disabled .accidental-key-acivation-key {
+  visibility: hidden;
 }
 
 .accidental-key-hint {
@@ -163,7 +186,7 @@
   bottom: 23%;
 }
 
-.accidental-key.pressed .accidental-key-hint {
+.accidental-key.pressed:not(:disabled) .accidental-key-hint {
   opacity: 100%;
 }
 
@@ -173,7 +196,7 @@
   z-index: 0;
 }
 
-.piano-CSharpDb {
+.piano-C\# {
   top: 0px;
   left: calc(var(--key-width) + 0.5px);
   transform: translate(-50%);
@@ -186,7 +209,7 @@
   z-index: 0;
 }
 
-.piano-DSharpEb {
+.piano-D\# {
   top: 0px;
   left: calc(var(--key-width) * 2 + 1.5px);
   transform: translate(-50%);
@@ -205,7 +228,7 @@
   z-index: 0;
 }
 
-.piano-FSharpGb {
+.piano-F\# {
   top: 0px;
   left: calc(var(--key-width) * 4 + 4.5px);
   transform: translate(-50%);
@@ -218,7 +241,7 @@
   z-index: 0;
 }
 
-.piano-GSharpAb {
+.piano-G\# {
   top: 0px;
   left: calc(var(--key-width) * 5 + 5.5px);
   transform: translate(-50%);
@@ -231,7 +254,7 @@
   z-index: 0;
 }
 
-.piano-ASharpBb {
+.piano-A\# {
   top: 0px;
   left: 0px;
   left: calc(var(--key-width) * 6 + 6.5px);

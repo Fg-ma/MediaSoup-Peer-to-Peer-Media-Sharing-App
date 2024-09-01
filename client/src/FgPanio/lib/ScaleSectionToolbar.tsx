@@ -33,19 +33,13 @@ export default function ScaleSectionToolbar({
   visibleOctaveRef: React.MutableRefObject<Octaves>;
   scrollToOctave: (octave: Octaves) => void;
 }) {
-  const toolbarRef = useRef<HTMLDivElement>(null);
-
   return (
-    <div
-      ref={toolbarRef}
-      className='w-full h-8 flex space-x-2 px-2 mb-1 overflow-hidden'
-    >
+    <div className='w-full h-8 flex space-x-2 px-2 mb-1 overflow-hidden'>
       <OctaveSelection
-        toolbarRef={toolbarRef}
         visibleOctaveRef={visibleOctaveRef}
         scrollToOctave={scrollToOctave}
       />
-      <SelectSampler toolbarRef={toolbarRef} />
+      <SelectSampler />
       <SamplerVolume />
     </div>
   );

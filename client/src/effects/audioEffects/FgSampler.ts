@@ -15,11 +15,15 @@ export type Samplers =
         | "Curly electric"
         | "Dragon magic"
         | "Soft steinway";
+      playOnlyDefined: boolean;
+      definedNotes: string[];
     }
   | {
       category: "strings";
       kind: "brokenCello" | "uncleJohns5StringBanjo";
       label: "Broken cello" | "Uncle John's five string banjo";
+      playOnlyDefined: boolean;
+      definedNotes: string[];
     }
   | {
       category: "winds";
@@ -39,6 +43,8 @@ export type Samplers =
         | "Classic slide whistle"
         | "Forest flute"
         | "Oboe";
+      playOnlyDefined: boolean;
+      definedNotes: string[];
     };
 
 const samplers = {
@@ -81,6 +87,7 @@ const samplers = {
         baseUrl: "https://tonejs.github.io/audio/salamander/",
       },
       label: "Default",
+      playOnlyDefined: false,
     },
     brokenCassette: {
       sampler: {
@@ -117,6 +124,7 @@ const samplers = {
         baseUrl: "/audioSamples/pianos/brokenCassette/",
       },
       label: "Broken cassette",
+      playOnlyDefined: false,
     },
     curlyElectric: {
       sampler: {
@@ -137,6 +145,7 @@ const samplers = {
         baseUrl: "/audioSamples/pianos/curlyElectric/",
       },
       label: "Curly electric",
+      playOnlyDefined: false,
     },
     dragonMagicOld: {
       sampler: {
@@ -161,6 +170,7 @@ const samplers = {
         baseUrl: "/audioSamples/pianos/dragonMagicOld/",
       },
       label: "Dragon magic",
+      playOnlyDefined: false,
     },
     softSteinway: {
       sampler: {
@@ -182,6 +192,7 @@ const samplers = {
         baseUrl: "/audioSamples/pianos/softSteinway/",
       },
       label: "Soft Steinway",
+      playOnlyDefined: false,
     },
   },
   strings: {
@@ -216,6 +227,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/acousticGuitar/",
       },
       label: "Acoustic guitar",
+      playOnlyDefined: false,
     },
     AXAFifthsBounceGuitar: {
       sampler: {
@@ -279,6 +291,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/AXAFifthsBounceGuitar/",
       },
       label: "AXA fifths bounce guitar",
+      playOnlyDefined: false,
     },
     AXAVoodooVibeGuitar: {
       sampler: {
@@ -342,6 +355,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/AXAVoodooVibeGuitar/",
       },
       label: "AXA voodoo vibe guitar",
+      playOnlyDefined: false,
     },
     brokenCello: {
       sampler: {
@@ -365,6 +379,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/brokenCello/",
       },
       label: "Broken cello",
+      playOnlyDefined: false,
     },
     clankyAmpMetalGuitar: {
       sampler: {
@@ -403,6 +418,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/clankyAmpMetalGuitar/",
       },
       label: "Clanky amp metal guitar",
+      playOnlyDefined: false,
     },
     clankyMetalBassGuitar: {
       sampler: {
@@ -441,6 +457,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/clankyMetalBassGuitar/",
       },
       label: "Clanky metal bass guitar",
+      playOnlyDefined: false,
     },
     ferrumIronGuitar: {
       sampler: {
@@ -462,6 +479,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/ferrumIronGuitar/",
       },
       label: "Ferrum iron guitar",
+      playOnlyDefined: false,
     },
     freshGuitar: {
       sampler: {
@@ -482,6 +500,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/freshGuitar/",
       },
       label: "Fresh guitar",
+      playOnlyDefined: false,
     },
     MexicanGuitarron: {
       sampler: {
@@ -528,6 +547,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/MexicanGuitarron/",
       },
       label: "Mexican guitarron",
+      playOnlyDefined: false,
     },
     RJSGuitar: {
       sampler: {
@@ -545,6 +565,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/RJSGuitar/",
       },
       label: "RJS guitar",
+      playOnlyDefined: false,
     },
     uncleJohns5StringBanjo: {
       sampler: {
@@ -561,6 +582,7 @@ const samplers = {
         baseUrl: "/audioSamples/strings/uncleJohns5StringBanjo/",
       },
       label: "Uncle John's five string banjo",
+      playOnlyDefined: false,
     },
   },
   winds: {
@@ -812,12 +834,38 @@ const samplers = {
       label: "Oboe",
     },
   },
+  drums: {
+    bottleOrgan: {
+      sampler: {
+        urls: {
+          "C#2": "C#2.wav",
+          "C#3": "C#3.wav",
+          C2: "C2.wav",
+          C3: "C3.wav",
+          "D#2": "D#2.wav",
+          "D#3": "D#3.wav",
+          D2: "D2.wav",
+          D3: "D3.wav",
+          E3: "E3.wav",
+          "F#3": "F#3.wav",
+          F3: "F3.wav",
+          G3: "G3.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/drums/bottleOrgan/",
+      },
+      label: "Bottle organ",
+      playOnlyDefined: true,
+    },
+  },
 };
 
 class FgSampler {
   private mediaStreamDestination: MediaStreamAudioDestinationNode;
 
   private sampler: Tone.Sampler | undefined;
+  private playOnlyDefined: boolean;
+  private definedNotes: string[] = [];
 
   private playingNotes: Set<string> = new Set();
 
@@ -829,6 +877,7 @@ class FgSampler {
     this.volumeNode = new Tone.Volume(0); // 0 dB by default
 
     this.sampler = new Tone.Sampler(samplers.pianos.default.sampler);
+    this.playOnlyDefined = samplers.pianos.default.playOnlyDefined;
 
     this.sampler.connect(this.volumeNode);
 
@@ -851,12 +900,24 @@ class FgSampler {
         samplers[sampler.category][sampler.kind].sampler
       );
       this.sampler.connect(this.volumeNode);
+      this.playOnlyDefined =
+        // @ts-ignore
+        samplers[sampler.category][sampler.kind].playOnlyDefined;
+
+      if (this.playOnlyDefined) {
+        this.definedNotes = Object.keys(
+          // @ts-ignore
+          samplers[sampler.category][sampler.kind].sampler.urls
+        );
+      }
 
       return {
         category: sampler.category,
         kind: sampler.kind,
         // @ts-ignore
         label: samplers[sampler.category][sampler.kind].label,
+        playOnlyDefined: this.playOnlyDefined,
+        definedNotes: this.definedNotes,
       } as Samplers;
     } else {
       // Get an array of sampler kinds in the category
@@ -876,6 +937,15 @@ class FgSampler {
         samplers[sampler.category][newKind].sampler
       );
       this.sampler.connect(this.volumeNode);
+      this.playOnlyDefined =
+        // @ts-ignore
+        samplers[sampler.category][newKind].playOnlyDefined;
+      if (this.playOnlyDefined) {
+        this.definedNotes = Object.keys(
+          // @ts-ignore
+          samplers[sampler.category][newKind].sampler.urls
+        );
+      }
 
       return {
         // @ts-ignore
@@ -883,21 +953,33 @@ class FgSampler {
         kind: newKind as any,
         // @ts-ignore
         label: samplers[sampler.category][newKind].label,
+        playOnlyDefined: this.playOnlyDefined,
+        definedNotes: this.definedNotes,
       };
     }
   };
 
   // Trigger a note when a key is pressed
   playNote = (note: string, isPress: boolean) => {
+    if (!this.sampler?.loaded) {
+      return;
+    }
+
     if (isPress) {
       if (!this.playingNotes.has(note)) {
-        this.sampler?.triggerAttack(note);
         this.playingNotes.add(note);
+        if (this.playOnlyDefined) {
+          if (this.definedNotes.includes(note)) {
+            this.sampler?.triggerAttack(note);
+          }
+        } else {
+          this.sampler?.triggerAttack(note);
+        }
       }
     } else {
       if (this.playingNotes.has(note)) {
-        this.sampler?.triggerRelease(note);
         this.playingNotes.delete(note);
+        this.sampler?.triggerRelease(note);
       }
     }
   };

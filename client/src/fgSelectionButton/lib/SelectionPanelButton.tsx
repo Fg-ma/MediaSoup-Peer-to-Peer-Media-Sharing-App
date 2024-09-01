@@ -11,7 +11,7 @@ export default function SelectionPanelButton({
 }) {
   return (
     <div
-      className='cursor-default px-2 w-full hover:bg-fg-white-80'
+      className='cursor-default px-2 w-full hover:bg-fg-white-80 rounded'
       data-selection-value={previousPanels.current
         .concat(selectionValue)
         .join("-fg-")}

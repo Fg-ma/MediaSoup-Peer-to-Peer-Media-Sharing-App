@@ -41,8 +41,8 @@ export default function ScaleSection({
   }, []);
 
   const handleMouseUp = () => {
-    document.removeEventListener("mouseup", handleMouseUp);
-    document.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("pointerup", handleMouseUp);
+    window.removeEventListener("pointermove", handleMouseMove);
 
     if (
       currentPress.current &&
@@ -55,9 +55,7 @@ export default function ScaleSection({
       key?.classList.remove("pressed");
 
       playNote(
-        currentPress.current.note.length === 1
-          ? currentPress.current.note
-          : `${currentPress.current.note[0]}#`,
+        currentPress.current.note,
         parseInt(currentPress.current.octave),
         false
       );
@@ -67,8 +65,8 @@ export default function ScaleSection({
   };
 
   const handleMouseDown = (event: React.MouseEvent) => {
-    document.addEventListener("mouseup", handleMouseUp);
-    document.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("pointerup", handleMouseUp);
+    window.addEventListener("pointermove", handleMouseMove);
 
     const targetElement = event.target as HTMLElement;
     currentPress.current = {
@@ -78,7 +76,11 @@ export default function ScaleSection({
   };
 
   const handleMouseMove = (event: MouseEvent) => {
-    const targetElement = event.target as HTMLElement;
+    const targetElement = event.target as HTMLButtonElement;
+
+    if (targetElement.disabled) {
+      return;
+    }
 
     const targetValues = {
       note: targetElement.getAttribute("data-note"),
@@ -116,13 +118,7 @@ export default function ScaleSection({
         );
         key?.classList.add("pressed");
 
-        playNote(
-          targetValues.note.length === 1
-            ? targetValues.note
-            : `${targetValues.note[0]}#`,
-          parseInt(targetValues.octave),
-          true
-        );
+        playNote(targetValues.note, parseInt(targetValues.octave), true);
 
         currentPress.current = targetValues;
       }
@@ -132,7 +128,7 @@ export default function ScaleSection({
   return (
     <div
       ref={externalRef}
-      className='scale-section space-x-0.25'
+      className='scale-section space-x-0.25 py-0.25 px-2'
       onMouseDown={handleMouseDown}
     >
       <Scale octave={0} playNote={playNote} visibleOctave={visibleOctave} />
