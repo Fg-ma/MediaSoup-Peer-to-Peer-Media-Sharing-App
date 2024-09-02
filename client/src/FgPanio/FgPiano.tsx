@@ -5,6 +5,7 @@ import ScaleSection from "./lib/ScaleSection";
 import FgPianoController from "./lib/FgPianoController";
 import { useStreamsContext } from "../context/StreamsContext";
 import ScaleSectionToolbar from "./lib/ScaleSectionToolbar";
+import SamplerEffectsToolbar from "./lib/SamplerEffectsToolbar";
 
 export type Octaves = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -126,6 +127,7 @@ export default function FgPiano({
             visibleOctaveRef={visibleOctaveRef}
             scrollToOctave={fgPianoController.scrollToOctave}
           />
+          <SamplerEffectsToolbar />
           <ScaleSection
             externalRef={scaleSectionRef}
             playNote={fgPianoController.playNote}

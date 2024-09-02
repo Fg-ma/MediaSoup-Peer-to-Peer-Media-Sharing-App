@@ -374,10 +374,10 @@ class FgPianoController {
     if (piano) {
       if (piano.offsetWidth > 390) {
         octaveLabel?.classList.remove("hidden");
-        octaveContainer?.classList.add("space-x-1");
+        octaveContainer?.classList.add("space-x-2");
       } else {
         octaveLabel?.classList.add("hidden");
-        octaveContainer?.classList.remove("space-x-1");
+        octaveContainer?.classList.remove("space-x-2");
       }
     }
 

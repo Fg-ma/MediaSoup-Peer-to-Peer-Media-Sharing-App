@@ -93,7 +93,7 @@ export default function FgVideoControls({
 
   const handleWheel = (event: WheelEvent) => {
     if (rightVideoControlsRef.current) {
-      rightVideoControlsRef.current.scrollLeft += event.deltaY / 2;
+      rightVideoControlsRef.current.scrollLeft -= event.deltaY / 2;
     }
   };
 

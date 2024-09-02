@@ -288,6 +288,19 @@ class AudioMedia {
     this.audioEffects?.removeEffects(effects);
   };
 
+  samplerEffectsChange = (
+    effects: {
+      type: AudioMixEffectsType;
+      updates: { option: MixEffectsOptionsType; value: number }[];
+    }[]
+  ) => {
+    this.audioEffects?.fgSampler.updateEffects(effects);
+  };
+
+  removeSamplerEffects = (effects: AudioMixEffectsType[]) => {
+    this.audioEffects?.fgSampler.removeEffects(effects);
+  };
+
   playNote = (note: string, isPress: boolean) => {
     this.audioEffects.fgSampler.playNote(note, isPress);
   };

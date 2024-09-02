@@ -428,15 +428,40 @@ class AudioEffects {
   removeEffects = (effects: AudioMixEffectsType[]) => {
     effects.map((effect) => {
       switch (effect) {
-        case "reverb":
-          this.reverb?.disconnect();
-          this.reverb?.dispose();
-          this.reverb = undefined;
+        case "autoFilter":
+          this.autoFilter?.disconnect();
+          this.autoFilter?.dispose();
+          this.autoFilter = undefined;
+          break;
+        case "autoPanner":
+          this.autoPanner?.disconnect();
+          this.autoPanner?.dispose();
+          this.autoPanner = undefined;
+          break;
+        case "autoWah":
+          this.autoWah?.disconnect();
+          this.autoWah?.dispose();
+          this.autoWah = undefined;
+          break;
+        case "bitCrusher":
+          this.bitCrusher?.disconnect();
+          this.bitCrusher?.dispose();
+          this.bitCrusher = undefined;
+          break;
+        case "chebyshev":
+          this.chebyshev?.disconnect();
+          this.chebyshev?.dispose();
+          this.chebyshev = undefined;
           break;
         case "chorus":
           this.chorus?.disconnect();
           this.chorus?.dispose();
           this.chorus = undefined;
+          break;
+        case "distortion":
+          this.distortion?.disconnect();
+          this.distortion?.dispose();
+          this.distortion = undefined;
           break;
         case "EQ":
           this.eq3?.disconnect();
@@ -448,20 +473,50 @@ class AudioEffects {
           this.feedbackDelay?.dispose();
           this.feedbackDelay = undefined;
           break;
-        case "distortion":
-          this.distortion?.disconnect();
-          this.distortion?.dispose();
-          this.distortion = undefined;
+        case "freeverb":
+          this.freeverb?.disconnect();
+          this.freeverb?.dispose();
+          this.freeverb = undefined;
           break;
-        case "pitchShift":
-          this.pitchShift?.disconnect();
-          this.pitchShift?.dispose();
-          this.pitchShift = undefined;
+        case "JCReverb":
+          this.JCReverb?.disconnect();
+          this.JCReverb?.dispose();
+          this.JCReverb = undefined;
           break;
         case "phaser":
           this.phaser?.disconnect();
           this.phaser?.dispose();
           this.phaser = undefined;
+          break;
+        case "pingPongDelay":
+          this.pingPongDelay?.disconnect();
+          this.pingPongDelay?.dispose();
+          this.pingPongDelay = undefined;
+          break;
+        case "pitchShift":
+          this.reverb?.disconnect();
+          this.reverb?.dispose();
+          this.reverb = undefined;
+          break;
+        case "reverb":
+          this.reverb?.disconnect();
+          this.reverb?.dispose();
+          this.reverb = undefined;
+          break;
+        case "stereoWidener":
+          this.stereoWidener?.disconnect();
+          this.stereoWidener?.dispose();
+          this.stereoWidener = undefined;
+          break;
+        case "tremolo":
+          this.tremolo?.disconnect();
+          this.tremolo?.dispose();
+          this.tremolo = undefined;
+          break;
+        case "vibrato":
+          this.vibrato?.disconnect();
+          this.vibrato?.dispose();
+          this.vibrato = undefined;
           break;
       }
     });

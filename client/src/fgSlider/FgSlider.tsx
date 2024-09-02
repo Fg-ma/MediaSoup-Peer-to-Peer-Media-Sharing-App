@@ -385,7 +385,7 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
             </div>
           ))}
           <div
-            className={`absolute rounded bg-[#333333] cursor-pointer
+            className={`absolute rounded bg-fg-black-20 cursor-pointer
               ${
                 fgSliderOptions.orientation === "vertical"
                   ? "w-4.5 h-2.5 left-1/2 -translate-x-1/2"
