@@ -288,7 +288,6 @@ export default function SelectSampler() {
           },
           Drums: {
             value: "drums",
-            ["Bottle organ"]: "bottleOrgan",
             ["Broken splash cymbal gong"]: "brokenSplashCymbalGong",
             ["Clave frog"]: "claveFrog",
             ["Garage sale drum kit"]: "garageSaleDrumKit",
@@ -300,6 +299,7 @@ export default function SelectSampler() {
             ["Solar winds"]: "solarWinds",
             ["Tin can drums"]: "tinCanDrums",
           },
+          Organs: { value: "organs", ["Bottle organ"]: "bottleOrgan" },
         }}
         valueSelectionFunction={(selection) => {
           const newSampler = userMedia.current.audio?.swapSampler({

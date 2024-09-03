@@ -870,28 +870,6 @@ const samplers = {
     },
   },
   drums: {
-    bottleOrgan: {
-      sampler: {
-        urls: {
-          "C#2": "C#2.wav",
-          "C#3": "C#3.wav",
-          C2: "C2.wav",
-          C3: "C3.wav",
-          "D#2": "D#2.wav",
-          "D#3": "D#3.wav",
-          D2: "D2.wav",
-          D3: "D3.wav",
-          E3: "E3.wav",
-          "F#3": "F#3.wav",
-          F3: "F3.wav",
-          G3: "G3.wav",
-        },
-        release: 1,
-        baseUrl: "/audioSamples/drums/bottleOrgan/",
-      },
-      label: "Bottle organ",
-      playOnlyDefined: true,
-    },
     brokenSplashCymbalGong: {
       sampler: {
         urls: {
@@ -1402,6 +1380,30 @@ const samplers = {
         baseUrl: "/audioSamples/drums/tinCanDrums/",
       },
       label: "Tin can drums",
+      playOnlyDefined: true,
+    },
+  },
+  organs: {
+    bottleOrgan: {
+      sampler: {
+        urls: {
+          "C#2": "C#2.wav",
+          "C#3": "C#3.wav",
+          C2: "C2.wav",
+          C3: "C3.wav",
+          "D#2": "D#2.wav",
+          "D#3": "D#3.wav",
+          D2: "D2.wav",
+          D3: "D3.wav",
+          E3: "E3.wav",
+          "F#3": "F#3.wav",
+          F3: "F3.wav",
+          G3: "G3.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/drums/bottleOrgan/",
+      },
+      label: "Bottle organ",
       playOnlyDefined: true,
     },
   },
