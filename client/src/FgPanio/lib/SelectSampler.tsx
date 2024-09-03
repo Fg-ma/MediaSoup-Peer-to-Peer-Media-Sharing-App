@@ -281,6 +281,7 @@ export default function SelectSampler() {
             ["Brass trombone"]: "brassTrombone",
             ["Brass trumpet"]: "brassTrumpet",
             ["Brass tuba"]: "brassTuba",
+            ["Clarinet"]: "clarinet",
             ["Classic slide whistle"]: "classicSlideWhistle",
             ["Forest flute"]: "forestFlute",
             ["Oboe"]: "oboe",

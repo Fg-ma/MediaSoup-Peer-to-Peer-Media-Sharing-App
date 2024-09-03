@@ -1,16 +1,6 @@
 import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import {
-  defaultAudioCurrentEffectsStyles,
-  defaultCameraCurrentEffectsStyles,
-  defaultScreenCurrentEffectsStyles,
-} from "src/context/CurrentEffectsStylesContext";
-import {
-  defaultAudioStreamEffects,
-  defaultCameraStreamEffects,
-  defaultScreenStreamEffects,
-} from "src/context/StreamsContext";
 
 class Consumers {
   private socket: React.MutableRefObject<Socket>;

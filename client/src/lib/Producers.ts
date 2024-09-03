@@ -7,7 +7,6 @@ import ScreenMedia from "./ScreenMedia";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
-  defaultAudioStreamEffects,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import AudioMedia from "./AudioMedia";

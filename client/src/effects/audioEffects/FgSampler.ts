@@ -639,6 +639,7 @@ const samplers = {
         baseUrl: "/audioSamples/winds/brassFrenchHorn/",
       },
       label: "Brass French horn",
+      playOnlyDefined: false,
     },
     brassTrombone: {
       sampler: {
@@ -685,6 +686,7 @@ const samplers = {
         baseUrl: "/audioSamples/winds/brassTrombone/",
       },
       label: "Brass trombone",
+      playOnlyDefined: false,
     },
     brassTrumpet: {
       sampler: {
@@ -728,6 +730,7 @@ const samplers = {
         baseUrl: "/audioSamples/winds/brassTrumpet/",
       },
       label: "Brass trumpet",
+      playOnlyDefined: false,
     },
     brassTuba: {
       sampler: {
@@ -763,6 +766,34 @@ const samplers = {
         baseUrl: "/audioSamples/winds/brassTuba/",
       },
       label: "Brass tuba",
+      playOnlyDefined: false,
+    },
+    clarinet: {
+      sampler: {
+        urls: {
+          C1: "C1.wav",
+          "D#1": "D#1.wav",
+          "F#1": "F#1.wav",
+          A1: "A1.wav",
+          C2: "C2.wav",
+          "D#2": "D#2.wav",
+          "F#2": "F#2.wav",
+          A2: "A2.wav",
+          C3: "C3.wav",
+          "D#3": "D#3.wav",
+          "F#3": "F#3.wav",
+          A3: "A3.wav",
+          C4: "C4.wav",
+          "D#4": "D#4.wav",
+          "F#4": "F#4.wav",
+          A4: "A4.wav",
+          C5: "C5.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/winds/clarinet/",
+      },
+      label: "Clarinet",
+      playOnlyDefined: false,
     },
     classicSlideWhistle: {
       sampler: {
@@ -782,6 +813,7 @@ const samplers = {
         baseUrl: "/audioSamples/winds/classicSlideWhistle/",
       },
       label: "Classic slide whistle",
+      playOnlyDefined: false,
     },
     forestFlute: {
       sampler: {
@@ -798,6 +830,7 @@ const samplers = {
         baseUrl: "/audioSamples/winds/forestFlute/",
       },
       label: "Forest flute",
+      playOnlyDefined: false,
     },
     oboe: {
       sampler: {
@@ -833,6 +866,7 @@ const samplers = {
         baseUrl: "/audioSamples/winds/oboe/",
       },
       label: "Oboe",
+      playOnlyDefined: false,
     },
   },
   drums: {

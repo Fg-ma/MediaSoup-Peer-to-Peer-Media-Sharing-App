@@ -627,7 +627,10 @@ export default function SamplerEffectsToolbar({ focus }: { focus: boolean }) {
         content={
           <div className='h-[7.25rem] flex px-3 items-center justify-center'>
             {Object.entries(samplerEffects).map((effect) => (
-              <div key={effect[0]}>
+              <div
+                key={effect[0]}
+                className='flex items-center justify-center h-full'
+              >
                 <SamplerEffect
                   effectValue={effect[0] as AudioMixEffectsType}
                   effect={effect[1]}
