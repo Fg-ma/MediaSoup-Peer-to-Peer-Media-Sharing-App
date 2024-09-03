@@ -1,15 +1,20 @@
 import React, { useEffect, useRef } from "react";
 import Scale from "./Scale";
+import { Octaves } from "../FgPiano";
 
 export default function ScaleSection({
   externalRef,
   playNote,
   visibleOctave,
+  setVisibleOctave,
+  visibleOctaveRef,
   getVisibleOctave,
 }: {
   externalRef: React.RefObject<HTMLDivElement>;
   playNote: (note: string, octave: number, isPressed: boolean) => void;
-  visibleOctave: number;
+  visibleOctave: Octaves;
+  setVisibleOctave: React.Dispatch<React.SetStateAction<Octaves>>;
+  visibleOctaveRef: React.MutableRefObject<Octaves>;
   getVisibleOctave: () => void;
 }) {
   const currentPress = useRef<
@@ -28,9 +33,20 @@ export default function ScaleSection({
         } else {
           externalRef.current.scrollLeft += event.deltaY;
         }
-      }
 
-      getVisibleOctave();
+        if (externalRef.current.scrollLeft === 0) {
+          visibleOctaveRef.current = 0;
+          setVisibleOctave(0);
+        } else if (
+          externalRef.current.scrollLeft + externalRef.current.clientWidth ===
+          externalRef.current.scrollWidth
+        ) {
+          visibleOctaveRef.current = 6;
+          setVisibleOctave(6);
+        } else {
+          getVisibleOctave();
+        }
+      }
     };
 
     externalRef?.current?.addEventListener("wheel", handleWheel);

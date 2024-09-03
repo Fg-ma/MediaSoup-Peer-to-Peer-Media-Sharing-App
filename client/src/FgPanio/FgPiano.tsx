@@ -4,7 +4,7 @@ import "./lib/pianoStyles.css";
 import ScaleSection from "./lib/ScaleSection";
 import FgPianoController from "./lib/FgPianoController";
 import { useStreamsContext } from "../context/StreamsContext";
-import ScaleSectionToolbar from "./lib/ScaleSectionToolbar";
+import SamplerToolbar from "./lib/SamplerToolbar";
 import SamplerEffectsToolbar from "./lib/SamplerEffectsToolbar";
 
 export type Octaves = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -23,6 +23,7 @@ export default function FgPiano({
   const { userMedia } = useStreamsContext();
 
   const [visibleOctave, setVisibleOctave] = useState<Octaves>(initialOctave);
+  const [focus, setFocus] = useState(false);
   const visibleOctaveRef = useRef<Octaves>(initialOctave);
   const scaleSectionRef = useRef<HTMLDivElement>(null);
   const keyWidth = useRef(0);
@@ -85,7 +86,9 @@ export default function FgPiano({
     fgPianoController.handleKeyDown(event.key.toLowerCase(), octave as Octaves);
   }, []);
 
-  const handleKeyStrokes = (focus: boolean) => {
+  const focusCallback = (focus: boolean) => {
+    setFocus(focus);
+
     if (focus) {
       if (!isKeydownListenerAdded.current) {
         isKeydownListenerAdded.current = true;
@@ -123,21 +126,24 @@ export default function FgPiano({
     <FgPanel
       content={
         <div className='piano'>
-          <ScaleSectionToolbar
+          <SamplerToolbar
+            focus={focus}
             visibleOctaveRef={visibleOctaveRef}
             scrollToOctave={fgPianoController.scrollToOctave}
           />
-          <SamplerEffectsToolbar />
+          <SamplerEffectsToolbar focus={focus} />
           <ScaleSection
             externalRef={scaleSectionRef}
             playNote={fgPianoController.playNote}
             visibleOctave={visibleOctave}
+            setVisibleOctave={setVisibleOctave}
+            visibleOctaveRef={visibleOctaveRef}
             getVisibleOctave={fgPianoController.getVisibleOctave}
           />
         </div>
       }
       resizeCallback={fgPianoController.resize}
-      focusCallback={handleKeyStrokes}
+      focusCallback={focusCallback}
       closeCallback={closeCallback}
       closePosition='topRight'
       initPosition={{

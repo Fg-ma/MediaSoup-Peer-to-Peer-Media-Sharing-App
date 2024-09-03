@@ -1380,6 +1380,9 @@ class FgSampler {
   private playOnlyDefined: boolean;
   private definedNotes: string[] = [];
 
+  private effectChain: Tone.Gain;
+  private effects: any[] = [];
+
   private playingNotes: Set<string> = new Set();
 
   private volumeNode: Tone.Volume;
@@ -1411,7 +1414,6 @@ class FgSampler {
       if (!this.autoFilter) {
         this.applyAutoFilter();
       }
-
       updates.map((update) => {
         switch (update.option) {
           case "frequency":
@@ -1724,9 +1726,12 @@ class FgSampler {
     this.sampler = new Tone.Sampler(samplers.pianos.default.sampler);
     this.playOnlyDefined = samplers.pianos.default.playOnlyDefined;
 
-    this.sampler.connect(this.volumeNode);
+    this.effectChain = new Tone.Gain(); // Create a Gain node for the effects chain
 
-    this.volumeNode.connect(this.mediaStreamDestination);
+    // Set up the initial connections
+    this.sampler.connect(this.volumeNode);
+    this.volumeNode.connect(this.effectChain); // Connect volumeNode to the effects chain
+    this.effectChain.connect(this.mediaStreamDestination); // Connect effects chain to mediaStreamDestination
   }
 
   swapSampler = (
@@ -1854,98 +1859,132 @@ class FgSampler {
     effects.map((effect) => {
       switch (effect) {
         case "autoFilter":
-          this.autoFilter?.disconnect();
-          this.autoFilter?.dispose();
+          this.removeEffect(this.autoFilter);
           this.autoFilter = undefined;
           break;
         case "autoPanner":
-          this.autoPanner?.disconnect();
-          this.autoPanner?.dispose();
+          this.removeEffect(this.autoPanner);
           this.autoPanner = undefined;
           break;
         case "autoWah":
-          this.autoWah?.disconnect();
-          this.autoWah?.dispose();
+          this.removeEffect(this.autoWah);
           this.autoWah = undefined;
           break;
         case "bitCrusher":
-          this.bitCrusher?.disconnect();
-          this.bitCrusher?.dispose();
+          this.removeEffect(this.bitCrusher);
           this.bitCrusher = undefined;
           break;
         case "chebyshev":
-          this.chebyshev?.disconnect();
-          this.chebyshev?.dispose();
+          this.removeEffect(this.chebyshev);
           this.chebyshev = undefined;
           break;
         case "chorus":
-          this.chorus?.disconnect();
-          this.chorus?.dispose();
+          this.removeEffect(this.chorus);
           this.chorus = undefined;
           break;
         case "distortion":
-          this.distortion?.disconnect();
-          this.distortion?.dispose();
+          this.removeEffect(this.distortion);
           this.distortion = undefined;
           break;
         case "EQ":
-          this.eq3?.disconnect();
-          this.eq3?.dispose();
+          this.removeEffect(this.eq3);
           this.eq3 = undefined;
           break;
         case "feedbackDelay":
-          this.feedbackDelay?.disconnect();
-          this.feedbackDelay?.dispose();
+          this.removeEffect(this.feedbackDelay);
           this.feedbackDelay = undefined;
           break;
         case "freeverb":
-          this.freeverb?.disconnect();
-          this.freeverb?.dispose();
+          this.removeEffect(this.freeverb);
           this.freeverb = undefined;
           break;
         case "JCReverb":
-          this.JCReverb?.disconnect();
-          this.JCReverb?.dispose();
+          this.removeEffect(this.JCReverb);
           this.JCReverb = undefined;
           break;
         case "phaser":
-          this.phaser?.disconnect();
-          this.phaser?.dispose();
+          this.removeEffect(this.phaser);
           this.phaser = undefined;
           break;
         case "pingPongDelay":
-          this.pingPongDelay?.disconnect();
-          this.pingPongDelay?.dispose();
+          this.removeEffect(this.pingPongDelay);
           this.pingPongDelay = undefined;
           break;
         case "pitchShift":
-          this.reverb?.disconnect();
-          this.reverb?.dispose();
+          this.removeEffect(this.reverb);
           this.reverb = undefined;
           break;
         case "reverb":
-          this.reverb?.disconnect();
-          this.reverb?.dispose();
+          this.removeEffect(this.reverb);
           this.reverb = undefined;
           break;
         case "stereoWidener":
-          this.stereoWidener?.disconnect();
-          this.stereoWidener?.dispose();
+          this.removeEffect(this.stereoWidener);
           this.stereoWidener = undefined;
           break;
         case "tremolo":
-          this.tremolo?.disconnect();
-          this.tremolo?.dispose();
+          this.removeEffect(this.tremolo);
           this.tremolo = undefined;
           break;
         case "vibrato":
-          this.vibrato?.disconnect();
-          this.vibrato?.dispose();
+          this.removeEffect(this.vibrato);
           this.vibrato = undefined;
           break;
       }
     });
   };
+
+  private removeEffect(effect: any | undefined) {
+    if (!effect) return;
+
+    const effectIndex = this.effects.indexOf(effect);
+
+    if (effectIndex !== -1) {
+      // Disconnect the effect from the chain
+      effect.disconnect();
+
+      // Reconnect the previous effect in the chain to the next one
+      if (effectIndex > 0) {
+        this.effects[effectIndex - 1].disconnect();
+        if (effectIndex < this.effects.length - 1) {
+          this.effects[effectIndex - 1].connect(this.effects[effectIndex + 1]);
+        } else {
+          this.effects[effectIndex - 1].connect(this.mediaStreamDestination);
+        }
+      } else {
+        // If it's the first effect, reconnect the effectChain to the next effect or mediaStreamDestination
+        this.effectChain.disconnect();
+        if (this.effects.length > 1) {
+          this.effectChain.connect(this.effects[1]);
+        } else {
+          this.effectChain.connect(this.mediaStreamDestination);
+        }
+      }
+
+      // Remove the effect from the array
+      this.effects.splice(effectIndex, 1);
+
+      // Dispose of the effect
+      effect.dispose();
+    }
+  }
+
+  private addEffect(effect: any) {
+    // Disconnect the last effect in the chain from the mediaStreamDestination
+    if (this.effects.length > 0) {
+      this.effects[this.effects.length - 1].disconnect();
+      this.effects[this.effects.length - 1].connect(effect);
+    } else {
+      this.effectChain.disconnect();
+      this.effectChain.connect(effect);
+    }
+
+    // Add the new effect to the chain
+    this.effects.push(effect);
+
+    // Connect the new effect to the mediaStreamDestination
+    effect.connect(this.mediaStreamDestination);
+  }
 
   /* 
     frequency: (0 - 10) Hz
@@ -1953,16 +1992,16 @@ class FgSampler {
     octaves: (0 - 8) octaves
   */
   private applyAutoFilter = () => {
-    this.autoFilter = new Tone.AutoFilter();
-    this.volumeNode.connect(this.autoFilter);
+    this.autoFilter = new Tone.AutoFilter().start();
+    this.addEffect(this.autoFilter);
   };
 
   /* 
     frequency: (0 - 10) Hz
   */
   private applyAutoPanner = () => {
-    this.autoPanner = new Tone.AutoPanner();
-    this.volumeNode.connect(this.autoPanner);
+    this.autoPanner = new Tone.AutoPanner().start();
+    this.addEffect(this.autoPanner);
   };
 
   /* 
@@ -1972,7 +2011,7 @@ class FgSampler {
   */
   private applyAutoWah = () => {
     this.autoWah = new Tone.AutoWah();
-    this.volumeNode.connect(this.autoWah);
+    this.addEffect(this.autoWah);
   };
 
   /* 
@@ -1980,7 +2019,7 @@ class FgSampler {
   */
   private applyBitCrusher = () => {
     this.bitCrusher = new Tone.BitCrusher();
-    this.volumeNode.connect(this.bitCrusher);
+    this.addEffect(this.bitCrusher);
   };
 
   /* 
@@ -1988,7 +2027,7 @@ class FgSampler {
   */
   private applyChebyshev = () => {
     this.chebyshev = new Tone.Chebyshev();
-    this.volumeNode.connect(this.chebyshev);
+    this.addEffect(this.chebyshev);
   };
 
   /* 
@@ -1997,8 +2036,8 @@ class FgSampler {
     depth: (0 - 1) %
   */
   private applyChorus = () => {
-    this.chorus = new Tone.Chorus();
-    this.volumeNode.connect(this.chorus);
+    this.chorus = new Tone.Chorus().start();
+    this.addEffect(this.chorus);
   };
 
   /* 
@@ -2007,7 +2046,7 @@ class FgSampler {
   */
   private applyDistortion = () => {
     this.distortion = new Tone.Distortion();
-    this.volumeNode.connect(this.distortion);
+    this.addEffect(this.distortion);
   };
 
   /* 
@@ -2017,7 +2056,7 @@ class FgSampler {
   */
   private applyEQ = () => {
     this.eq3 = new Tone.EQ3();
-    this.volumeNode.connect(this.eq3);
+    this.addEffect(this.eq3);
   };
 
   /* 
@@ -2026,7 +2065,7 @@ class FgSampler {
   */
   private applyFeedbackDelay = () => {
     this.feedbackDelay = new Tone.FeedbackDelay();
-    this.volumeNode.connect(this.feedbackDelay);
+    this.addEffect(this.feedbackDelay);
   };
 
   /* 
@@ -2035,7 +2074,7 @@ class FgSampler {
   */
   private applyFreeverb = () => {
     this.freeverb = new Tone.Freeverb();
-    this.volumeNode.connect(this.freeverb);
+    this.addEffect(this.freeverb);
   };
 
   /* 
@@ -2043,7 +2082,7 @@ class FgSampler {
   */
   private applyJCReverb = () => {
     this.JCReverb = new Tone.JCReverb();
-    this.volumeNode.connect(this.JCReverb);
+    this.addEffect(this.JCReverb);
   };
 
   /* 
@@ -2053,7 +2092,7 @@ class FgSampler {
   */
   private applyPhaser = () => {
     this.phaser = new Tone.Phaser();
-    this.volumeNode.connect(this.phaser);
+    this.addEffect(this.phaser);
   };
 
   /* 
@@ -2062,7 +2101,7 @@ class FgSampler {
   */
   private applyPingPongDelay = () => {
     this.pingPongDelay = new Tone.PingPongDelay();
-    this.volumeNode.connect(this.pingPongDelay);
+    this.addEffect(this.pingPongDelay);
   };
 
   /* 
@@ -2070,7 +2109,7 @@ class FgSampler {
   */
   private applyPitchShift = () => {
     this.pitchShift = new Tone.PitchShift();
-    this.volumeNode.connect(this.pitchShift);
+    this.addEffect(this.pitchShift);
   };
 
   /* 
@@ -2079,7 +2118,7 @@ class FgSampler {
   */
   private applyReverb = () => {
     this.reverb = new Tone.Reverb();
-    this.volumeNode.connect(this.reverb);
+    this.addEffect(this.reverb);
   };
 
   /* 
@@ -2087,7 +2126,7 @@ class FgSampler {
   */
   private applyStereoWidener = () => {
     this.stereoWidener = new Tone.StereoWidener();
-    this.volumeNode.connect(this.stereoWidener);
+    this.addEffect(this.stereoWidener);
   };
 
   /* 
@@ -2095,8 +2134,8 @@ class FgSampler {
     depth: (0 - 1) %
   */
   private applyTremolo = () => {
-    this.tremolo = new Tone.Tremolo();
-    this.volumeNode.connect(this.tremolo);
+    this.tremolo = new Tone.Tremolo().start();
+    this.addEffect(this.tremolo);
   };
 
   /* 
@@ -2105,7 +2144,7 @@ class FgSampler {
   */
   private applyVibrato = () => {
     this.vibrato = new Tone.Vibrato();
-    this.volumeNode.connect(this.vibrato);
+    this.addEffect(this.vibrato);
   };
 }
 

@@ -109,7 +109,8 @@ class FgPianoController {
       behavior: "instant",
     });
 
-    this.getVisibleOctave();
+    this.setVisibleOctave(octave);
+    this.visibleOctaveRef.current = octave;
   };
 
   handleKeyUp = (eventKey: string, octave: Octaves) => {

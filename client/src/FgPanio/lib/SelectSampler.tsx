@@ -4,7 +4,7 @@ import FgButton from "../../fgButton/FgButton";
 import FgSelectionButton from "../../fgSelectionButton/FgSelectionButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import { Samplers } from "../../effects/audioEffects/FgSampler";
-import { navTransition, navVar } from "./ScaleSectionToolbar";
+import { navTransition, navVar } from "./SamplerToolbar";
 import navigateForward from "../../../public/svgs/navigateForward.svg";
 import navigateBack from "../../../public/svgs/navigateBack.svg";
 import FgPortal from "../../fgPortal/FgPortal";

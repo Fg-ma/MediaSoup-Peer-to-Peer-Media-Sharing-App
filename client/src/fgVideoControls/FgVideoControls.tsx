@@ -92,8 +92,15 @@ export default function FgVideoControls({
   };
 
   const handleWheel = (event: WheelEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
     if (rightVideoControlsRef.current) {
-      rightVideoControlsRef.current.scrollLeft -= event.deltaY / 2;
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        rightVideoControlsRef.current.scrollLeft -= event.deltaX / 2;
+      } else {
+        rightVideoControlsRef.current.scrollLeft -= event.deltaY / 2;
+      }
     }
   };
 

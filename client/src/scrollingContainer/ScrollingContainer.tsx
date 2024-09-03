@@ -70,8 +70,13 @@ export default function ScrollingContainer({
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
       event.stopPropagation();
+
       if (scrollingContainerRef.current) {
-        scrollingContainerRef.current.scrollLeft += event.deltaY;
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+          scrollingContainerRef.current.scrollLeft += event.deltaX;
+        } else {
+          scrollingContainerRef.current.scrollLeft += event.deltaY;
+        }
         updateVisibleScroll();
       }
     };
@@ -126,7 +131,10 @@ export default function ScrollingContainer({
             animate={{
               ...scrollButtonsVar.leftAnimate,
               backgroundColor: buttonBackgroundColor,
-              boxShadow: `1px 0 6px 8px ${buttonBackgroundColor}`,
+              boxShadow: scrollingContainerRef.current
+                ? // prettier-ignore
+                  `${-scrollingContainerRef.current.clientHeight / 3}px 0 ${scrollingContainerRef.current.clientHeight / 4}px ${scrollingContainerRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
+                : `1px 0 6px 8px ${buttonBackgroundColor}`,
             }}
             transition={{
               ...buttonBackgroundColorTransition,
@@ -174,7 +182,10 @@ export default function ScrollingContainer({
             animate={{
               ...scrollButtonsVar.rightAnimate,
               backgroundColor: buttonBackgroundColor,
-              boxShadow: `1px 0 6px 8px ${buttonBackgroundColor}`,
+              boxShadow: scrollingContainerRef.current
+                ? // prettier-ignore
+                  `${scrollingContainerRef.current.clientHeight / 3}px 0 ${scrollingContainerRef.current.clientHeight / 4}px ${scrollingContainerRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
+                : `1px 0 6px 8px ${buttonBackgroundColor}`,
             }}
             transition={{
               ...buttonBackgroundColorTransition,

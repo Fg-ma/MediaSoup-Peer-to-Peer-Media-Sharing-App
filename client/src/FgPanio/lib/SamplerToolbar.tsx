@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Transition, Variants } from "framer-motion";
+import { Transition, Variants, motion } from "framer-motion";
 import { Octaves } from "../FgPiano";
 import SelectSampler from "./SelectSampler";
 import SamplerVolume from "./SamplerVolume";
@@ -26,18 +26,27 @@ export const navTransition: Transition = {
   },
 };
 
-export default function ScaleSectionToolbar({
+export default function SamplerToolbar({
+  focus,
   visibleOctaveRef,
   scrollToOctave,
 }: {
+  focus: boolean;
   visibleOctaveRef: React.MutableRefObject<Octaves>;
   scrollToOctave: (octave: Octaves) => void;
 }) {
   const rightScaleSectionToolbarRef = useRef<HTMLDivElement>(null);
 
   const handleWheel = (event: WheelEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
     if (rightScaleSectionToolbarRef.current) {
-      rightScaleSectionToolbarRef.current.scrollLeft -= event.deltaY / 2;
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        rightScaleSectionToolbarRef.current.scrollLeft -= event.deltaX / 2;
+      } else {
+        rightScaleSectionToolbarRef.current.scrollLeft -= event.deltaY / 2;
+      }
     }
   };
 
@@ -55,12 +64,19 @@ export default function ScaleSectionToolbar({
 
   return (
     <div className='w-full h-8 flex justify-between px-2 mb-1 overflow-hidden'>
-      <div
+      <motion.div
         className='w-max h-8 z-20 flex items-center space-x-2 pr-2'
-        style={{ boxShadow: "8px 0 4px -3px rgba(255, 255, 255, 1)" }}
+        animate={{
+          boxShadow: `8px 0 4px -3px  ${
+            focus ? "rgb(255, 255, 255)" : "rgba(243, 243, 243)"
+          }`,
+        }}
+        transition={{
+          boxShadow: { duration: 0.3, ease: "linear" },
+        }}
       >
         <SamplerVolume />
-      </div>
+      </motion.div>
       <div
         ref={rightScaleSectionToolbarRef}
         className='w-max h-8 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'

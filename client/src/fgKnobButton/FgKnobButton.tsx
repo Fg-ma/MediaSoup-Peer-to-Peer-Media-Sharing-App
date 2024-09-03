@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const defaultKnobButtonOptions = {
@@ -42,9 +42,13 @@ const sweepFlag = (start: number, end: number) => {
 };
 
 export default function FgKnobButton({
+  height,
   options,
+  onValueChange,
 }: {
+  height: number;
   options?: KnobButtonOptions;
+  onValueChange?: (value: number, id?: string) => void;
 }) {
   const fgKnobButtonOptions = {
     ...defaultKnobButtonOptions,
@@ -59,7 +63,9 @@ export default function FgKnobButton({
   };
 
   const [value, setValue] = useState<number>(
-    fgKnobButtonOptions.initValue ? fgKnobButtonOptions.initValue : 0
+    fgKnobButtonOptions.initValue !== undefined
+      ? fgKnobButtonOptions.initValue
+      : (fgKnobButtonOptions.rangeMax + fgKnobButtonOptions.rangeMin) / 2
   );
   const [angle, setAngle] = useState<number>(getAngleFromValue(value));
   const [clicked, setClicked] = useState(false);
@@ -144,20 +150,33 @@ export default function FgKnobButton({
     setClicked(true);
   };
 
+  useEffect(() => {
+    if (onValueChange) {
+      onValueChange(value, fgKnobButtonOptions.id);
+    }
+  }, [value]);
+
   return (
     <div
       id={fgKnobButtonOptions.id}
-      className='flex flex-col items-center justify-center h-full w-min'
+      className={`flex flex-col items-center justify-center aspect-square`}
+      style={{
+        // prettier-ignore
+        width: `calc(${height}rem - ${fgKnobButtonOptions.topLabel ? "1rem" : "0rem"} - ${fgKnobButtonOptions.bottomLabel ? "1rem" : "0rem"})`,
+        height: `${height}rem`,
+      }}
     >
       {fgKnobButtonOptions.topLabel && (
-        <div className='font-K2D text-md'>{fgKnobButtonOptions.topLabel}</div>
+        <div className='font-K2D text-base leading-4 cursor-default select-none'>
+          {fgKnobButtonOptions.topLabel}
+        </div>
       )}
       <div
         ref={knobButtonRef}
         className='grow aspect-square cursor-pointer relative'
         onMouseDown={handleMouseDown}
       >
-        <svg className='w-full h-full' viewBox='0 0 100 100'>
+        <svg className='w-max h-full' viewBox='0 0 100 100'>
           {/* after path round*/}
           <circle
             cx={x(endAngleSecondArc, radius)}
@@ -242,13 +261,13 @@ export default function FgKnobButton({
             strokeLinecap='round'
           />
         </svg>
-        <div className='font-K2D text-md absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center'>
+        <div className='font-K2D text-sm leading-4 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center z-[-1] cursor-default select-none'>
           <div>{value}</div>
           {fgKnobButtonOptions.units && <div>{fgKnobButtonOptions.units}</div>}
         </div>
       </div>
       {fgKnobButtonOptions.bottomLabel && (
-        <div className='font-K2D text-md'>
+        <div className='font-K2D text-base leading-4 cursor-default select-none'>
           {fgKnobButtonOptions.bottomLabel}
         </div>
       )}

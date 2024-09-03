@@ -5,7 +5,7 @@ import FgSVG from "../../fgSVG/FgSVG";
 import { Octaves } from "../FgPiano";
 import navigateForward from "../../../public/svgs/navigateForward.svg";
 import navigateBack from "../../../public/svgs/navigateBack.svg";
-import { navTransition, navVar } from "./ScaleSectionToolbar";
+import { navTransition, navVar } from "./SamplerToolbar";
 import FgPortal from "../../fgPortal/FgPortal";
 
 export default function OctaveSelection({
