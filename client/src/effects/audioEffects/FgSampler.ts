@@ -587,7 +587,7 @@ const samplers = {
     },
   },
   winds: {
-    brassFrenchHorn: {
+    bassFrenchHorn: {
       sampler: {
         urls: {
           "A#1": "A#1.wav",
@@ -638,10 +638,10 @@ const samplers = {
         release: 1,
         baseUrl: "/audioSamples/winds/brassFrenchHorn/",
       },
-      label: "Brass French horn",
+      label: "Bass French horn",
       playOnlyDefined: false,
     },
-    brassTrombone: {
+    bassTrombone: {
       sampler: {
         urls: {
           A1: "A1.wav",
@@ -685,10 +685,10 @@ const samplers = {
         release: 1,
         baseUrl: "/audioSamples/winds/brassTrombone/",
       },
-      label: "Brass trombone",
+      label: "Bass trombone",
       playOnlyDefined: false,
     },
-    brassTrumpet: {
+    bassTrumpet: {
       sampler: {
         urls: {
           A3: "A3.wav",
@@ -729,10 +729,10 @@ const samplers = {
         release: 1,
         baseUrl: "/audioSamples/winds/brassTrumpet/",
       },
-      label: "Brass trumpet",
+      label: "Bass trumpet",
       playOnlyDefined: false,
     },
-    brassTuba: {
+    bassTuba: {
       sampler: {
         urls: {
           D1: "D1.wav",
@@ -765,7 +765,7 @@ const samplers = {
         release: 1,
         baseUrl: "/audioSamples/winds/brassTuba/",
       },
-      label: "Brass tuba",
+      label: "Bass tuba",
       playOnlyDefined: false,
     },
     clarinet: {
