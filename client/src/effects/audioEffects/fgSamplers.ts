@@ -87,7 +87,7 @@ const fgSamplers = {
       label: "Default",
       playOnlyDefined: false,
     },
-    acPiano1: {
+    ac1: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -108,12 +108,12 @@ const fgSamplers = {
           A4: "A4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/acPiano1/",
+        baseUrl: "/audioSamples/pianos/ac1/",
       },
-      label: "AC piano 1",
+      label: "AC 1",
       playOnlyDefined: false,
     },
-    acPiano2: {
+    ac2: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -134,12 +134,12 @@ const fgSamplers = {
           A4: "A4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/acPiano2/",
+        baseUrl: "/audioSamples/pianos/ac2/",
       },
-      label: "AC piano 2",
+      label: "AC 2",
       playOnlyDefined: false,
     },
-    bellPiano: {
+    bell: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -159,9 +159,9 @@ const fgSamplers = {
           "F#4": "F#4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/bellPiano/",
+        baseUrl: "/audioSamples/pianos/bell/",
       },
-      label: "Bell piano",
+      label: "Bell",
       playOnlyDefined: false,
     },
     brokenCassette: {
@@ -427,7 +427,7 @@ const fgSamplers = {
       label: "Soft Steinway",
       playOnlyDefined: false,
     },
-    toyPiano: {
+    toy: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -449,9 +449,9 @@ const fgSamplers = {
           C5: "C5.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/toyPiano/",
+        baseUrl: "/audioSamples/pianos/toy/",
       },
-      label: "Toy piano",
+      label: "Toy",
       playOnlyDefined: false,
     },
   },
