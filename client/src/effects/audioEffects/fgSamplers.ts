@@ -274,7 +274,7 @@ const fgSamplers = {
       label: "Dragon magic",
       playOnlyDefined: false,
     },
-    electricPiano1: {
+    electric1: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -296,12 +296,12 @@ const fgSamplers = {
           C5: "C5.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/electricPiano1/",
+        baseUrl: "/audioSamples/pianos/electric1/",
       },
-      label: "Electric piano 1",
+      label: "Electric 1",
       playOnlyDefined: false,
     },
-    electricPiano2: {
+    electric2: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -322,12 +322,12 @@ const fgSamplers = {
           A4: "A4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/electricPiano2/",
+        baseUrl: "/audioSamples/pianos/electric2/",
       },
-      label: "Electric piano 2",
+      label: "Electric 2",
       playOnlyDefined: false,
     },
-    electricPiano3: {
+    electric3: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -348,12 +348,12 @@ const fgSamplers = {
           A4: "A4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/electricPiano3/",
+        baseUrl: "/audioSamples/pianos/electric3/",
       },
-      label: "Electric piano 3",
+      label: "Electric 3",
       playOnlyDefined: false,
     },
-    electricPiano4: {
+    electric4: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -375,12 +375,12 @@ const fgSamplers = {
           C5: "C5.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/electricPiano4/",
+        baseUrl: "/audioSamples/pianos/electric4/",
       },
-      label: "Electric piano 4",
+      label: "Electric 4",
       playOnlyDefined: false,
     },
-    electricPiano5: {
+    electric5: {
       sampler: {
         urls: {
           A0: "A0.wav",
@@ -400,9 +400,9 @@ const fgSamplers = {
           "F#4": "F#4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/electricPiano5/",
+        baseUrl: "/audioSamples/pianos/electric5/",
       },
-      label: "Electric piano 5",
+      label: "Electric 5",
       playOnlyDefined: false,
     },
     softSteinway: {
