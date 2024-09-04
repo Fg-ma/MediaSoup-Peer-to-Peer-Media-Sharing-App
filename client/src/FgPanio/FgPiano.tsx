@@ -24,6 +24,7 @@ export default function FgPiano({
 
   const [visibleOctave, setVisibleOctave] = useState<Octaves>(initialOctave);
   const [focus, setFocus] = useState(false);
+  const [samplerEffectsActive, setSamplerEffectsActive] = useState(false);
   const visibleOctaveRef = useRef<Octaves>(initialOctave);
   const scaleSectionRef = useRef<HTMLDivElement>(null);
   const keyWidth = useRef(0);
@@ -130,8 +131,10 @@ export default function FgPiano({
             focus={focus}
             visibleOctaveRef={visibleOctaveRef}
             scrollToOctave={fgPianoController.scrollToOctave}
+            samplerEffectsActive={samplerEffectsActive}
+            setSamplerEffectsActive={setSamplerEffectsActive}
           />
-          <SamplerEffectsToolbar focus={focus} />
+          {samplerEffectsActive && <SamplerEffectsToolbar focus={focus} />}
           <ScaleSection
             externalRef={scaleSectionRef}
             playNote={fgPianoController.playNote}

@@ -4,6 +4,10 @@ import { Octaves } from "../FgPiano";
 import SelectSampler from "./SelectSampler";
 import SamplerVolume from "./SamplerVolume";
 import OctaveSelection from "./OctaveSelection";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
+import effectIcon from "../../../public/svgs/effectIcon.svg";
+import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
 
 export const navVar: Variants = {
   leftInit: { opacity: 0, x: -20 },
@@ -30,10 +34,14 @@ export default function SamplerToolbar({
   focus,
   visibleOctaveRef,
   scrollToOctave,
+  samplerEffectsActive,
+  setSamplerEffectsActive,
 }: {
   focus: boolean;
   visibleOctaveRef: React.MutableRefObject<Octaves>;
   scrollToOctave: (octave: Octaves) => void;
+  samplerEffectsActive: boolean;
+  setSamplerEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const rightScaleSectionToolbarRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +73,7 @@ export default function SamplerToolbar({
   return (
     <div className='w-full h-8 flex justify-between px-2 mb-1 overflow-hidden'>
       <motion.div
-        className='w-max h-8 z-20 flex items-center space-x-2 pr-2'
+        className='w-max h-8 z-20 flex items-center space-x-2 pr-2 asp'
         animate={{
           boxShadow: `8px 0 4px -3px  ${
             focus ? "rgb(255, 255, 255)" : "rgba(243, 243, 243)"
@@ -75,6 +83,33 @@ export default function SamplerToolbar({
           boxShadow: { duration: 0.3, ease: "linear" },
         }}
       >
+        <FgButton
+          contentFunction={() => {
+            const iconSrc = samplerEffectsActive ? effectOffIcon : effectIcon;
+
+            return (
+              <FgSVG
+                src={iconSrc}
+                attributes={[
+                  { key: "height", value: "95%" },
+                  { key: "width", value: "95%" },
+                  { key: "fill", value: "black" },
+                  { key: "stroke", value: "black" },
+                ]}
+              />
+            );
+          }}
+          clickFunction={() => {
+            setSamplerEffectsActive((prev) => !prev);
+          }}
+          hoverContent={
+            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+              {samplerEffectsActive ? "Close effects" : "Effects"}
+            </div>
+          }
+          className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
+          options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
+        />
         <SamplerVolume />
       </motion.div>
       <div

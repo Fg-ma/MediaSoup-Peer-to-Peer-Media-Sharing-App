@@ -242,7 +242,7 @@ export default function SelectSampler() {
               <FgPortal
                 type='below'
                 content={
-                  <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-md bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
                     {sampler.label}
                   </div>
                 }

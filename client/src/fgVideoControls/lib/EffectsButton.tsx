@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import Controls from "./Controls";
@@ -27,6 +27,7 @@ export default function EffectsButton({
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
               { key: "fill", value: "white" },
+              { key: "stroke", value: "white" },
             ]}
           />
         );
