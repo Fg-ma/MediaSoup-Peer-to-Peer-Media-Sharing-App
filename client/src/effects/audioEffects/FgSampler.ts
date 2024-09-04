@@ -376,17 +376,17 @@ class FgSampler {
     if (increment === undefined) {
       this.sampler = new Tone.Sampler(
         // @ts-ignore
-        samplers[sampler.category][sampler.kind].sampler
+        fgSamplers[sampler.category][sampler.kind].sampler
       );
       this.sampler.connect(this.volumeNode);
       this.playOnlyDefined =
         // @ts-ignore
-        samplers[sampler.category][sampler.kind].playOnlyDefined;
+        fgSamplers[sampler.category][sampler.kind].playOnlyDefined;
 
       if (this.playOnlyDefined) {
         this.definedNotes = Object.keys(
           // @ts-ignore
-          samplers[sampler.category][sampler.kind].sampler.urls
+          fgSamplers[sampler.category][sampler.kind].sampler.urls
         );
       }
 
@@ -394,14 +394,14 @@ class FgSampler {
         category: sampler.category,
         kind: sampler.kind,
         // @ts-ignore
-        label: samplers[sampler.category][sampler.kind].label,
+        label: fgSamplers[sampler.category][sampler.kind].label,
         playOnlyDefined: this.playOnlyDefined,
         definedNotes: this.definedNotes,
       } as FgSamplers;
     } else {
       // Get an array of sampler kinds in the category
       // @ts-ignore
-      const kinds = Object.keys(samplers[sampler.category]);
+      const kinds = Object.keys(fgSamplers[sampler.category]);
 
       // Find the index of the current kind
       const currentIndex = kinds.indexOf(sampler.kind);
@@ -413,16 +413,16 @@ class FgSampler {
 
       this.sampler = new Tone.Sampler(
         // @ts-ignore
-        samplers[sampler.category][newKind].sampler
+        fgSamplers[sampler.category][newKind].sampler
       );
       this.sampler.connect(this.volumeNode);
       this.playOnlyDefined =
         // @ts-ignore
-        samplers[sampler.category][newKind].playOnlyDefined;
+        fgSamplers[sampler.category][newKind].playOnlyDefined;
       if (this.playOnlyDefined) {
         this.definedNotes = Object.keys(
           // @ts-ignore
-          samplers[sampler.category][newKind].sampler.urls
+          fgSamplers[sampler.category][newKind].sampler.urls
         );
       }
 
@@ -431,7 +431,7 @@ class FgSampler {
         category: sampler.category,
         kind: newKind as any,
         // @ts-ignore
-        label: samplers[sampler.category][newKind].label,
+        label: fgSamplers[sampler.category][newKind].label,
         playOnlyDefined: this.playOnlyDefined,
         definedNotes: this.definedNotes,
       };

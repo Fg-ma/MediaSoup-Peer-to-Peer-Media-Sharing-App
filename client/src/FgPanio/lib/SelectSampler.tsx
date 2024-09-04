@@ -234,7 +234,28 @@ const samplerSelections = {
     },
     ["Spooky"]: "spooky",
   },
-  misc: { value: "misc" },
+  misc: {
+    value: "misc",
+    ["Accordion"]: "accordion",
+    ["Bells"]: {
+      value: "bells",
+      ["Bells 1"]: "bells1",
+      ["Bells 2"]: "bells2",
+    },
+    ["Clavichord"]: "clavichord",
+    ["Cosmos"]: "cosmos",
+    ["Gong"]: "gong",
+    ["Harmonica"]: "harmonica",
+    ["Marimba"]: "marimba",
+    ["Mechanised choir"]: "mechanisedChoir",
+    ["Micah's choir"]: "MicahsChoir",
+    ["Orchestra"]: "orchestra",
+    ["Plasma drive kalimba"]: "plasmaDriveKalimba",
+    ["Spell singer"]: "spellSinger",
+    ["Street bounty xylophone"]: "streetBountyXylophone",
+    ["Vibraphone"]: "vibraphone",
+    ["Xylophone"]: "xylophone",
+  },
 };
 
 export default function SelectSampler() {

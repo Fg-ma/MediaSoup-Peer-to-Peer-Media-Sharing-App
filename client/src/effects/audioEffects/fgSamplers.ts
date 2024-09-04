@@ -2383,7 +2383,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/leadSynth1/",
       },
       label: "Lead synth 1",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
     leadSynth2: {
       sampler: {
@@ -2410,7 +2410,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/leadSynth2/",
       },
       label: "Lead synth 2",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
     leadSynth3: {
       sampler: {
@@ -2432,7 +2432,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/leadSynth3/",
       },
       label: "Lead synth 3",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
     leadSynth4: {
       sampler: {
@@ -2458,7 +2458,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/leadSynth4/",
       },
       label: "Lead synth 4",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
     leadSynth5: {
       sampler: {
@@ -2481,7 +2481,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/leadSynth5/",
       },
       label: "Lead synth 5",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
     leadSynth6: {
       sampler: {
@@ -2505,7 +2505,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/leadSynth6/",
       },
       label: "Lead synth 6",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
     leadSynth7: {
       sampler: {
@@ -2529,7 +2529,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/leadSynth7/",
       },
       label: "Lead synth 7",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
     padSynth1: {
       sampler: {
@@ -2556,7 +2556,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/padSynth1/",
       },
       label: "Pad synth 1",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
     padSynth2: {
       sampler: {
@@ -2582,7 +2582,7 @@ const fgSamplers = {
         baseUrl: "/audioSamples/synths/padSynth2/",
       },
       label: "Pad synth 2",
-      playOnlyDefined: true,
+      playOnlyDefined: false,
     },
   },
   organs: {
@@ -2614,19 +2614,19 @@ const fgSamplers = {
           C3: "C3.wav",
           "C#3": "C#3.wav",
           D3: "D3.wav",
-          "D#3": "#3.wav",
+          "D#3": "D#3.wav",
           E3: "E3.wav",
           F3: "F3.wav",
           "F#3": "F#3.wav",
           G3: "G3.wav",
           "G#3": "G#3.wav",
-          "A#3": "A#3.wav",
           A3: "A3.wav",
+          "A#3": "A#3.wav",
           B3: "B3.wav",
           C4: "C4.wav",
           "C#4": "C#4.wav",
           D4: "D4.wav",
-          "D#4": "#4.wav",
+          "D#4": "D#4.wav",
           E4: "E4.wav",
           F4: "F4.wav",
           "F#4": "F#4.wav",
