@@ -17,10 +17,11 @@ export default function ExpandingSelectionPanelButton({
 
   const handleMouseMove = (event: MouseEvent) => {
     if (
-      buttonRef.current &&
-      !buttonRef.current.contains(event.target as Node) &&
+      !buttonRef.current?.contains(event.target as Node) &&
       !panelRef.current?.contains(event.target as Node)
     ) {
+      document.removeEventListener("mousemove", handleMouseMove);
+
       previousPanels.current = previousPanels.current.filter(
         (panel) => panel !== selections.value
       );
@@ -33,9 +34,10 @@ export default function ExpandingSelectionPanelButton({
       ref={buttonRef}
       className='cursor-default relative px-2 w-full h-8 hover:bg-fg-white-80 rounded'
       onMouseEnter={() => {
+        document.addEventListener("mousemove", handleMouseMove);
+
         previousPanels.current.push(selections.value);
         setExpanded(true);
-        document.addEventListener("mousemove", handleMouseMove);
       }}
     >
       {content}
