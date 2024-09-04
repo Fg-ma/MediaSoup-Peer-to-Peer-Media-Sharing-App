@@ -217,20 +217,22 @@ const samplerSelections = {
   },
   Organs: {
     value: "organs",
-    ["Bottle organ"]: "bottleOrgan",
-    ["Cassette tape organ"]: "cassetteTapeOrgan",
-    ["Pad synth"]: {
-      value: "padSynth",
-      ["Pad synth 1"]: "padSynth1",
-      ["Pad synth 2"]: "padSynth2",
+    ["Bottle"]: "bottle",
+    ["Cassette tape"]: "cassetteTape",
+    ["Electric"]: {
+      value: "electric",
+      ["Electric 1"]: "electric1",
+      ["Electric 2"]: "electric2",
+      ["Electric 3"]: "electric3",
     },
-    ["Little red organ"]: "littleRedOrgan",
-    ["Pad synth"]: {
-      value: "padSynth",
-      ["Pad synth 1"]: "padSynth1",
-      ["Pad synth 2"]: "padSynth2",
+    ["Little red"]: "littleRed",
+    ["Pipe"]: {
+      value: "pipe",
+      ["Pipe 1"]: "pipe1",
+      ["Pipe 2"]: "pipe2",
+      ["Pipe 3"]: "pipe3",
     },
-    ["Spooky organ"]: "spookyOrgan",
+    ["Spooky"]: "spooky",
   },
   misc: { value: "misc" },
 };

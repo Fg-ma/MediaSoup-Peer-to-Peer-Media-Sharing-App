@@ -2586,7 +2586,7 @@ const fgSamplers = {
     },
   },
   organs: {
-    bottleOrgan: {
+    bottle: {
       sampler: {
         urls: {
           "C#2": "C#2.wav",
@@ -2603,12 +2603,12 @@ const fgSamplers = {
           G3: "G3.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/bottleOrgan/",
+        baseUrl: "/audioSamples/organs/bottle/",
       },
-      label: "Bottle organ",
+      label: "Bottle",
       playOnlyDefined: true,
     },
-    cassetteTapeOrgan: {
+    cassetteTape: {
       sampler: {
         urls: {
           C3: "C3.wav",
@@ -2632,12 +2632,12 @@ const fgSamplers = {
           "F#4": "F#4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/cassetteTapeOrgan/",
+        baseUrl: "/audioSamples/organs/cassetteTape/",
       },
-      label: "Cassette tape organ",
+      label: "Cassette tape",
       playOnlyDefined: false,
     },
-    electricOrgan1: {
+    electric1: {
       sampler: {
         urls: {
           A0: "A0.wav",
@@ -2659,12 +2659,12 @@ const fgSamplers = {
           A4: "A4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/electricOrgan1/",
+        baseUrl: "/audioSamples/organs/electric1/",
       },
-      label: "Electric organ 1",
+      label: "Electric 1",
       playOnlyDefined: false,
     },
-    electricOrgan2: {
+    electric2: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -2685,12 +2685,12 @@ const fgSamplers = {
           A4: "A4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/electricOrgan2/",
+        baseUrl: "/audioSamples/organs/electric2/",
       },
-      label: "Electric organ 2",
+      label: "Electric 2",
       playOnlyDefined: false,
     },
-    electricOrgan3: {
+    electric3: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -2712,12 +2712,12 @@ const fgSamplers = {
           C5: "C5.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/electricOrgan3/",
+        baseUrl: "/audioSamples/organs/electric3/",
       },
-      label: "Electric organ 3",
+      label: "Electric 3",
       playOnlyDefined: false,
     },
-    littleRedOrgan: {
+    littleRed: {
       sampler: {
         urls: {
           "C#2": "C#2.wav",
@@ -2746,12 +2746,12 @@ const fgSamplers = {
           B5: "B5.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/littleRedOrgan/",
+        baseUrl: "/audioSamples/organs/littleRed/",
       },
-      label: "Little red organ",
+      label: "Little red",
       playOnlyDefined: false,
     },
-    pipeOrgan1: {
+    pipe1: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -2773,12 +2773,12 @@ const fgSamplers = {
           C5: "C5.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/pipeOrgan1/",
+        baseUrl: "/audioSamples/organs/pipe1/",
       },
-      label: "Pipe organ 1",
+      label: "Pipe 1",
       playOnlyDefined: false,
     },
-    pipeOrgan2: {
+    pipe2: {
       sampler: {
         urls: {
           C1: "C1.wav",
@@ -2800,12 +2800,12 @@ const fgSamplers = {
           C5: "C5.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/pipeOrgan2/",
+        baseUrl: "/audioSamples/organs/pipe2/",
       },
-      label: "Pipe organ 2",
+      label: "Pipe 2",
       playOnlyDefined: false,
     },
-    pipeOrgan3: {
+    pipe3: {
       sampler: {
         urls: {
           A0: "A0.wav",
@@ -2828,12 +2828,12 @@ const fgSamplers = {
           C5: "C5.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/pipeOrgan3/",
+        baseUrl: "/audioSamples/organs/pipe3/",
       },
-      label: "Pipe organ 3",
+      label: "Pipe 3",
       playOnlyDefined: false,
     },
-    spookyOrgan: {
+    spooky: {
       sampler: {
         urls: {
           A3: "A3.wav",
@@ -2846,9 +2846,9 @@ const fgSamplers = {
           G2: "G2.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/organs/spookyOrgan/",
+        baseUrl: "/audioSamples/organs/spooky/",
       },
-      label: "Spooky organ",
+      label: "Spooky",
       playOnlyDefined: false,
     },
   },
