@@ -90,6 +90,83 @@ const samplers = {
       label: "Default",
       playOnlyDefined: false,
     },
+    acPiano1: {
+      sampler: {
+        urls: {
+          C1: "C1.wav",
+          "D#1": "D#1.wav",
+          "F#1": "F#1.wav",
+          A1: "A1.wav",
+          C2: "C2.wav",
+          "D#2": "D#2.wav",
+          "F#2": "F#2.wav",
+          A2: "A2.wav",
+          C3: "C3.wav",
+          "D#3": "D#3.wav",
+          "F#3": "F#3.wav",
+          A3: "A3.wav",
+          C4: "C4.wav",
+          "D#4": "D#4.wav",
+          "F#4": "F#4.wav",
+          A4: "A4.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/pianos/acPiano1/",
+      },
+      label: "AC piano 1",
+      playOnlyDefined: false,
+    },
+    acPiano2: {
+      sampler: {
+        urls: {
+          C1: "C1.wav",
+          "D#1": "D#1.wav",
+          "F#1": "F#1.wav",
+          A1: "A1.wav",
+          C2: "C2.wav",
+          "D#2": "D#2.wav",
+          "F#2": "F#2.wav",
+          A2: "A2.wav",
+          C3: "C3.wav",
+          "D#3": "D#3.wav",
+          "F#3": "F#3.wav",
+          A3: "A3.wav",
+          C4: "C4.wav",
+          "D#4": "D#4.wav",
+          "F#4": "F#4.wav",
+          A4: "A4.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/pianos/acPiano2/",
+      },
+      label: "AC piano 2",
+      playOnlyDefined: false,
+    },
+    bellPiano: {
+      sampler: {
+        urls: {
+          C1: "C1.wav",
+          "D#1": "D#1.wav",
+          "F#1": "F#1.wav",
+          A1: "A1.wav",
+          C2: "C2.wav",
+          "D#2": "D#2.wav",
+          "F#2": "F#2.wav",
+          A2: "A2.wav",
+          C3: "C3.wav",
+          "D#3": "D#3.wav",
+          "F#3": "F#3.wav",
+          A3: "A3.wav",
+          C4: "C4.wav",
+          "D#4": "D#4.wav",
+          "F#4": "F#4.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/pianos/bellPiano/",
+      },
+      label: "Bell piano",
+      playOnlyDefined: false,
+    },
     brokenCassette: {
       sampler: {
         urls: {
@@ -125,6 +202,33 @@ const samplers = {
         baseUrl: "/audioSamples/pianos/brokenCassette/",
       },
       label: "Broken cassette",
+      playOnlyDefined: false,
+    },
+    claviPiano: {
+      sampler: {
+        urls: {
+          A0: "A0.wav",
+          C1: "C1.wav",
+          "D#1": "D#1.wav",
+          "F#1": "F#1.wav",
+          A1: "A1.wav",
+          C2: "C2.wav",
+          "D#2": "D#2.wav",
+          "F#2": "F#2.wav",
+          A2: "A2.wav",
+          C3: "C3.wav",
+          "D#3": "D#3.wav",
+          "F#3": "F#3.wav",
+          A3: "A3.wav",
+          C4: "C4.wav",
+          "D#4": "D#4.wav",
+          "F#4": "F#4.wav",
+          A4: "A4.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/pianos/claviPiano/",
+      },
+      label: "Clavi Piano",
       playOnlyDefined: false,
     },
     curlyElectric: {
@@ -171,6 +275,17 @@ const samplers = {
         baseUrl: "/audioSamples/pianos/dragonMagicOld/",
       },
       label: "Dragon magic",
+      playOnlyDefined: false,
+    },
+    electricPiano1: {
+      sampler: {
+        urls: {
+          "": ".wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/pianos/electricPiano1/",
+      },
+      label: "Electric piano 1",
       playOnlyDefined: false,
     },
     softSteinway: {
@@ -1383,6 +1498,7 @@ const samplers = {
       playOnlyDefined: true,
     },
   },
+  sythns: {},
   organs: {
     bottleOrgan: {
       sampler: {
@@ -1407,6 +1523,7 @@ const samplers = {
       playOnlyDefined: true,
     },
   },
+  misc: {},
 };
 
 class FgSampler {
