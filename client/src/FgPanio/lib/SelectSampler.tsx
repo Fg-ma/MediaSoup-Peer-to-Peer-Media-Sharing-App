@@ -3,11 +3,11 @@ import { useStreamsContext } from "../../context/StreamsContext";
 import FgButton from "../../fgButton/FgButton";
 import FgSelectionButton from "../../fgSelectionButton/FgSelectionButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import { Samplers } from "../../effects/audioEffects/FgSampler";
 import { navTransition, navVar } from "./SamplerToolbar";
 import navigateForward from "../../../public/svgs/navigateForward.svg";
 import navigateBack from "../../../public/svgs/navigateBack.svg";
 import FgPortal from "../../fgPortal/FgPortal";
+import { FgSamplers } from "../../effects/audioEffects/fgSamplers";
 
 const notes = [
   "C0",
@@ -99,7 +99,7 @@ const notes = [
 export default function SelectSampler() {
   const { userMedia } = useStreamsContext();
 
-  const [sampler, setSampler] = useState<Samplers>({
+  const [sampler, setSampler] = useState<FgSamplers>({
     category: "pianos",
     kind: "default",
     label: "Default",
