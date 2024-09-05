@@ -24,6 +24,7 @@ export default function FgSelectionButton({
   const [selectionPanelActive, setSelectionPanelActive] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const previousPanels = useRef<string[]>([]);
+  const panelRefs = useRef<React.RefObject<HTMLDivElement>[]>([]);
 
   const handleMouseDown = (event: React.MouseEvent) => {
     previousPanels.current = [];
@@ -67,8 +68,8 @@ export default function FgSelectionButton({
           {content}
           {selectionPanelActive && (
             <SelectionPanel
+              panelRefs={panelRefs}
               previousPanels={previousPanels}
-              portal={true}
               position='right'
               selections={selections}
               externalRef={buttonRef}

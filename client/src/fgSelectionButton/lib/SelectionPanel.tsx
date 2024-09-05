@@ -17,28 +17,53 @@ const SelectionPanelTransition: Transition = {
 };
 
 export default function SelectionPanel({
+  panelRefs,
   previousPanels,
-  portal,
   position,
   selections,
   externalRef,
   externalPanelRef,
+  onRendered,
 }: {
+  panelRefs: React.MutableRefObject<React.RefObject<HTMLDivElement>[]>;
   previousPanels: React.MutableRefObject<string[]>;
-  portal: boolean;
   position: "left" | "right";
   selections: RecursiveSelections;
   externalRef?: React.RefObject<HTMLElement>;
   externalPanelRef?: React.RefObject<HTMLDivElement>;
+  onRendered?: () => void;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     position: "left" | "right";
     left: number;
     top: number;
   } | null>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
   const [panelElements, setPanelElements] = useState<React.ReactElement[]>([]);
+  const [scrollingAvailable, setScrollingAvailable] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const scrollingContainerRef = useRef<HTMLDivElement>(null);
+  const scrollUpButtonRef = useRef<HTMLDivElement>(null);
+  const scrollDownButtonRef = useRef<HTMLDivElement>(null);
+  const scrollInterval = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  useEffect(() => {
+    if (onRendered) onRendered();
+  }, []);
+
+  useEffect(() => {
+    if (
+      scrollingContainerRef.current &&
+      scrollingContainerRef.current.clientHeight !==
+        scrollingContainerRef.current.scrollHeight
+    ) {
+      setScrollingAvailable(true);
+    } else {
+      setScrollingAvailable(false);
+    }
+  }, [
+    scrollingContainerRef.current?.clientHeight,
+    scrollingContainerRef.current?.scrollHeight,
+  ]);
 
   useEffect(() => {
     setPanelElements([]);
@@ -65,6 +90,7 @@ export default function SelectionPanel({
           ...prev,
           <ExpandingSelectionPanelButton
             key={selection}
+            panelRefs={panelRefs}
             previousPanels={previousPanels}
             content={selection}
             selections={selectionValue}
@@ -82,15 +108,28 @@ export default function SelectionPanel({
     const externalRect = externalRef?.current?.getBoundingClientRect();
     const portalRef = externalPanelRef ? externalPanelRef : panelRef;
     const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
     if (!externalRect || !portalRef.current) {
       return;
     }
 
-    const top =
+    let top =
       externalRect.top +
       externalRect.height / 2 -
       portalRef.current.clientHeight / 2;
+
+    // Check if the panel overflows the top of the viewport
+    if (top < 0) {
+      top = 0; // Adjust to fit within the top boundary of the viewport
+    }
+
+    // Check if the panel overflows the bottom of the viewport
+    const panelBottom = top + portalRef.current.clientHeight;
+    if (panelBottom > viewportHeight) {
+      // Adjust to fit within the bottom boundary of the viewport
+      top = viewportHeight - portalRef.current.clientHeight;
+    }
 
     let left: number = 0;
     let currentPosition = position;
@@ -117,62 +156,126 @@ export default function SelectionPanel({
     });
   };
 
-  if (portal) {
-    return ReactDOM.createPortal(
-      <motion.div
-        ref={externalPanelRef ? externalPanelRef : panelRef}
-        className='max-h-80 w-max absolute z-[99999999999999] p-2 m-2 shadow-md rounded bg-white font-K2D text-lg'
-        style={{
-          top: `${portalPosition?.top}px`,
-          left: `${portalPosition?.left}px`,
-        }}
-        variants={SelectionPanelVar}
-        initial='init'
-        animate='animate'
-        exit='init'
-        transition={SelectionPanelTransition}
-      >
-        {panelElements}
+  const handleHoverScrollUpMouseMove = (event: MouseEvent) => {
+    if (!scrollUpButtonRef.current?.contains(event.target as Node)) {
+      document.removeEventListener("mousemove", handleHoverScrollUpMouseMove);
+
+      if (scrollInterval.current) {
+        clearInterval(scrollInterval.current);
+        scrollInterval.current = undefined;
+      }
+    }
+  };
+
+  const handleHoverScrollUp = () => {
+    document.addEventListener("mousemove", handleHoverScrollUpMouseMove);
+
+    if (!scrollInterval.current) {
+      scrollInterval.current = setInterval(() => {
+        if (scrollingContainerRef.current) {
+          scrollingContainerRef.current.scrollTop -= 1; // Scroll upwards
+        }
+      }, 2);
+    }
+  };
+
+  const handleHoverScrollDownMouseMove = (event: MouseEvent) => {
+    if (!scrollDownButtonRef.current?.contains(event.target as Node)) {
+      document.removeEventListener("mousemove", handleHoverScrollDownMouseMove);
+
+      if (scrollInterval.current) {
+        clearInterval(scrollInterval.current);
+        scrollInterval.current = undefined;
+      }
+    }
+  };
+
+  const handleHoverScrollDown = () => {
+    document.addEventListener("mousemove", handleHoverScrollDownMouseMove);
+
+    if (!scrollInterval.current) {
+      scrollInterval.current = setInterval(() => {
+        if (scrollingContainerRef.current) {
+          scrollingContainerRef.current.scrollTop += 1; // Scroll downwards
+        }
+      }, 2);
+    }
+  };
+
+  return ReactDOM.createPortal(
+    <div
+      ref={externalPanelRef ? externalPanelRef : panelRef}
+      className='max-h-80 w-max absolute z-[99999999999999] flex'
+      style={{
+        top: `${portalPosition?.top}px`,
+        left: `${portalPosition?.left}px`,
+      }}
+    >
+      {portalPosition?.position === "right" && (
+        <div className='flex flex-col'>
+          <div className='w-4 grow'></div>
+        </div>
+      )}
+      {scrollingAvailable && (
         <div
-          className={`h-full w-2 absolute ${
-            portalPosition?.position === "right" ? "right-full" : "left-full"
-          } top-0`}
+          ref={scrollUpButtonRef}
+          className={`absolute top-0 h-4 z-[999999999999999] ${
+            portalPosition?.position === "right" ? "left-4" : "left-0"
+          }`}
+          style={{ width: "calc(100% - 3.5rem)" }}
+          onMouseEnter={handleHoverScrollUp}
         ></div>
-      </motion.div>,
-      document.body
-    );
-  } else {
-    return (
+      )}
       <div
-        ref={externalPanelRef ? externalPanelRef : panelRef}
-        className='max-h-80 w-max absolute top-1/2 -translate-y-1/2 m-2 z-[99999999999999]'
-        style={{
-          left:
-            portalPosition?.position === "right"
-              ? `calc(100% + 0.5rem)`
-              : undefined,
-          right:
-            portalPosition?.position !== "right"
-              ? `calc(100% + 0.5rem)`
-              : undefined,
-        }}
+        className={`px-2 max-h-80 h-max w-full shadow-md rounded bg-white ${
+          scrollingAvailable ? "py-4" : "py-2"
+        }`}
       >
+        {scrollingAvailable && (
+          <div
+            className={`absolute top-4 pointer-events-none z-[999999999999999] ${
+              portalPosition?.position === "right" ? "left-6" : "left-1"
+            }`}
+            style={{
+              width: "calc(100% - 3.5rem)",
+              height: "calc(100% - 2rem)",
+              // prettier-ignore
+              boxShadow: "inset 0px 10px 8px -4px rgba(255, 255, 255, 1), inset 0px -10px 8px -4px rgba(255, 255, 255, 1)",
+            }}
+          />
+        )}
         <motion.div
-          className='max-h-80 h-full w-full overflow-y-auto p-2 shadow-md rounded bg-white font-K2D text-lg flex flex-col space-y-1'
+          ref={scrollingContainerRef}
+          className='max-h-[18rem] h-max w-full overflow-y-auto font-K2D text-lg flex flex-col space-y-1'
           variants={SelectionPanelVar}
           initial='init'
           animate='animate'
           exit='init'
           transition={SelectionPanelTransition}
         >
+          {scrollingAvailable && <div className='w-full min-h-1.5'></div>}
           {panelElements}
+          {scrollingAvailable && <div className='w-full min-h-1.5'></div>}
         </motion.div>
-        <div
-          className={`h-full w-4 absolute ${
-            portalPosition?.position === "right" ? "right-full" : "left-full"
-          } top-0`}
-        ></div>
       </div>
-    );
-  }
+      {scrollingAvailable && (
+        <div
+          ref={scrollDownButtonRef}
+          className={`absolute bottom-0 h-4 z-[999999999999999] ${
+            portalPosition?.position === "right" ? "left-4" : "left-0"
+          }`}
+          style={{
+            width: "calc(100% - 3.5rem)",
+          }}
+          onMouseEnter={handleHoverScrollDown}
+        ></div>
+      )}
+      {portalPosition?.position === "left" && (
+        <div className='flex flex-col'>
+          <div className='w-4 grow'></div>
+        </div>
+      )}
+    </div>,
+    document.body
+  );
 }

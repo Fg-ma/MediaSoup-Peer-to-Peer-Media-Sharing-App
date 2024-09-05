@@ -26,10 +26,12 @@ const PanelTransition: Transition = {
 export default function FgPanel({
   content,
   initPosition = { x: 0, y: 0 },
-  initWidth = 100,
-  initHeight = 100,
+  initWidth = "100px",
+  initHeight = "100px",
   minWidth = 0,
   minHeight = 0,
+  resizeable = true,
+  moveable = true,
   resizeCallback,
   focusCallback,
   closeCallback,
@@ -49,10 +51,12 @@ export default function FgPanel({
     placement?: "above" | "below" | "left" | "right";
     padding?: number;
   };
-  initWidth?: number;
-  initHeight?: number;
+  initWidth?: string;
+  initHeight?: string;
   minWidth?: number;
   minHeight?: number;
+  resizeable?: boolean;
+  moveable?: boolean;
   resizeCallback?: () => void;
   focusCallback?: (focus: boolean) => void;
   closeCallback?: () => void;
@@ -70,7 +74,10 @@ export default function FgPanel({
     x: initPosition.x,
     y: initPosition.y,
   });
-  const [size, setSize] = useState({ width: initWidth, height: initHeight });
+  const [size, setSize] = useState<{ width: string; height: string }>({
+    width: initWidth,
+    height: initHeight,
+  });
   const [focus, setFocus] = useState(true);
   const [focusClicked, setFocusClicked] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -157,19 +164,22 @@ export default function FgPanel({
 
       switch (resizingDirection.current) {
         case "se":
-          newSize.width = Math.max(minWidth, event.clientX - rect.left);
-          newSize.height = Math.max(minHeight, event.clientY - rect.top);
+          newSize.width = `${Math.max(minWidth, event.clientX - rect.left)}px`;
+          newSize.height = `${Math.max(minHeight, event.clientY - rect.top)}px`;
           break;
         case "sw":
-          newSize.width = Math.max(minWidth, rect.right - event.clientX);
-          newSize.height = Math.max(minHeight, event.clientY - rect.top);
+          newSize.width = `${Math.max(minWidth, rect.right - event.clientX)}px`;
+          newSize.height = `${Math.max(minHeight, event.clientY - rect.top)}px`;
           if (minWidth < rect.right - event.clientX) {
             setPosition((prev) => ({ ...prev, x: event.clientX }));
           }
           break;
         case "nw":
-          newSize.width = Math.max(minWidth, rect.right - event.clientX);
-          newSize.height = Math.max(minHeight, rect.bottom - event.clientY);
+          newSize.width = `${Math.max(minWidth, rect.right - event.clientX)}px`;
+          newSize.height = `${Math.max(
+            minHeight,
+            rect.bottom - event.clientY
+          )}px`;
           if (
             minWidth < rect.right - event.clientX ||
             minHeight < rect.bottom - event.clientY
@@ -191,8 +201,9 @@ export default function FgPanel({
           }
           break;
         case "ne":
-          newSize.width = Math.max(minWidth, event.clientX - rect.left);
-          newSize.height = Math.max(minHeight, rect.bottom - event.clientY);
+          newSize.width = `${Math.max(minWidth, event.clientX - rect.left)}px`;
+          // prettier-ignore
+          newSize.height = `${Math.max(minHeight, rect.bottom - event.clientY)}px`;
           if (minHeight < rect.bottom - event.clientY) {
             setPosition((prev) => ({ ...prev, y: event.clientY }));
           }
@@ -346,45 +357,65 @@ export default function FgPanel({
       >
         {content}
       </div>
-      <div
-        onMouseDown={handleDragMouseDown}
-        className='h-3 absolute left-3 top-0 cursor-pointer'
-        style={{ width: "calc(100% - 1.5rem)" }}
-      />
-      <div
-        onMouseDown={handleDragMouseDown}
-        className='h-3 absolute left-3 bottom-0 cursor-pointer'
-        style={{ width: "calc(100% - 1.5rem)" }}
-      />
-      <div
-        onMouseDown={handleDragMouseDown}
-        className='w-3 absolute left-0 top-3 cursor-pointer'
-        style={{ height: "calc(100% - 1.5rem)" }}
-      />
-      <div
-        onMouseDown={handleDragMouseDown}
-        className='w-3 absolute right-0 top-3 cursor-pointer'
-        style={{ height: "calc(100% - 1.5rem)" }}
-      />
-      {(closePosition !== "bottomLeft" || !closeCallback) && (
+      {moveable && (
+        <div
+          onMouseDown={handleDragMouseDown}
+          className='h-3 absolute top-0 cursor-pointer'
+          style={{
+            width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
+            left: `${resizeable ? "0.75rem" : "0rem"}`,
+          }}
+        />
+      )}
+      {moveable && (
+        <div
+          onMouseDown={handleDragMouseDown}
+          className='h-3 absolute bottom-0 cursor-pointer'
+          style={{
+            width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
+            left: `${resizeable ? "0.75rem" : "0rem"}`,
+          }}
+        />
+      )}
+      {moveable && (
+        <div
+          onMouseDown={handleDragMouseDown}
+          className='w-3 absolute left-0 cursor-pointer'
+          style={{
+            height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
+            top: `${resizeable ? "0.75rem" : "0rem"}`,
+          }}
+        />
+      )}
+      {moveable && (
+        <div
+          onMouseDown={handleDragMouseDown}
+          className='w-3 absolute right-0 cursor-pointer'
+          style={{
+            height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
+            top: `${resizeable ? "0.75rem" : "0rem"}`,
+          }}
+        />
+      )}
+      {resizeable && (closePosition !== "bottomLeft" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "se")}
           className='w-3 aspect-square absolute right-0 bottom-0 cursor-se-resize'
         />
       )}
-      {(closePosition !== "bottomRight" || !closeCallback) && (
+      {resizeable && (closePosition !== "bottomRight" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "sw")}
           className='w-3 aspect-square absolute left-0 bottom-0 cursor-sw-resize'
         />
       )}
-      {(closePosition !== "topLeft" || !closeCallback) && (
+      {resizeable && (closePosition !== "topLeft" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "nw")}
           className='w-3 aspect-square absolute left-0 top-0 cursor-nw-resize'
         />
       )}
-      {(closePosition !== "topRight" || !closeCallback) && (
+      {resizeable && (closePosition !== "topRight" || !closeCallback) && (
         <div
           onMouseDown={(event) => handleResizeMouseDown(event, "ne")}
           className='w-3 aspect-square absolute right-0 top-0 cursor-ne-resize'
