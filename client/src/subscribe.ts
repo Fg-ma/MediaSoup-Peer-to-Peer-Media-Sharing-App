@@ -46,7 +46,22 @@ const subscribe = (
   } else if (!isSubscribed.current) {
     consumerTransport.current = undefined;
 
-    setBundles({});
+    setBundles((prev) => {
+      const previousBundles = { ...prev };
+
+      for (const bundleUsername in previousBundles) {
+        if (bundleUsername !== username.current) {
+          delete previousBundles[bundleUsername];
+        } else {
+          for (const bundleInstance in previousBundles[bundleUsername]) {
+            if (bundleInstance !== instance.current) {
+              delete previousBundles[bundleUsername][bundleInstance];
+            }
+          }
+        }
+      }
+      return previousBundles;
+    });
     remoteTracksMap.current = {};
 
     const msg = {

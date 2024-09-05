@@ -121,7 +121,7 @@ export default function SelectionPanel({
     return ReactDOM.createPortal(
       <motion.div
         ref={externalPanelRef ? externalPanelRef : panelRef}
-        className='w-max absolute z-[99999999999999] p-2 m-2 shadow-md rounded bg-white font-K2D text-lg'
+        className='max-h-80 w-max absolute z-[99999999999999] p-2 m-2 shadow-md rounded bg-white font-K2D text-lg'
         style={{
           top: `${portalPosition?.top}px`,
           left: `${portalPosition?.left}px`,
@@ -143,9 +143,9 @@ export default function SelectionPanel({
     );
   } else {
     return (
-      <motion.div
+      <div
         ref={externalPanelRef ? externalPanelRef : panelRef}
-        className={`w-max absolute top-1/2 -translate-y-1/2 m-2 z-[99999999999999] p-2 shadow-md rounded bg-white font-K2D text-lg`}
+        className='max-h-80 w-max absolute top-1/2 -translate-y-1/2 m-2 z-[99999999999999]'
         style={{
           left:
             portalPosition?.position === "right"
@@ -156,19 +156,23 @@ export default function SelectionPanel({
               ? `calc(100% + 0.5rem)`
               : undefined,
         }}
-        variants={SelectionPanelVar}
-        initial='init'
-        animate='animate'
-        exit='init'
-        transition={SelectionPanelTransition}
       >
-        {panelElements}
+        <motion.div
+          className='max-h-80 h-full w-full overflow-y-auto p-2 shadow-md rounded bg-white font-K2D text-lg flex flex-col space-y-1'
+          variants={SelectionPanelVar}
+          initial='init'
+          animate='animate'
+          exit='init'
+          transition={SelectionPanelTransition}
+        >
+          {panelElements}
+        </motion.div>
         <div
           className={`h-full w-4 absolute ${
             portalPosition?.position === "right" ? "right-full" : "left-full"
           } top-0`}
         ></div>
-      </motion.div>
+      </div>
     );
   }
 }
