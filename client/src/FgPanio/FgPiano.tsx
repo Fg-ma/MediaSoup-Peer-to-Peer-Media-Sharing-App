@@ -6,6 +6,7 @@ import FgPianoController from "./lib/FgPianoController";
 import { useStreamsContext } from "../context/StreamsContext";
 import SamplerToolbar from "./lib/SamplerToolbar";
 import SamplerEffectsToolbar from "./lib/SamplerEffectsToolbar";
+import KeyVisualizer from "./lib/KeyVisualizer";
 
 export type Octaves = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -135,6 +136,7 @@ export default function FgPiano({
             setSamplerEffectsActive={setSamplerEffectsActive}
           />
           {samplerEffectsActive && <SamplerEffectsToolbar focus={focus} />}
+          <KeyVisualizer />
           <ScaleSection
             externalRef={scaleSectionRef}
             playNote={fgPianoController.playNote}

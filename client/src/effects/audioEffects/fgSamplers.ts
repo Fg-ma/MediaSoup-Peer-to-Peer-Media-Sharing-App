@@ -3,46 +3,272 @@ export type FgSamplers =
       category: "pianos";
       kind:
         | "default"
+        | "ac1"
+        | "ac2"
+        | "bell"
         | "brokenCassette"
+        | "claviPiano"
         | "curlyElectric"
         | "dragonMagicOld"
-        | "softSteinway";
+        | "electric1"
+        | "electric2"
+        | "electric3"
+        | "electric4"
+        | "electric5"
+        | "softSteinway"
+        | "toy";
       label:
         | "Default"
+        | "AC 1"
+        | "AC 2"
+        | "Bell"
         | "Broken cassette"
+        | "Clavi piano"
         | "Curly electric"
-        | "Dragon magic"
-        | "Soft steinway";
+        | "Dragon magic old"
+        | "Electric 1"
+        | "Electric 2"
+        | "Electric 3"
+        | "Electric 4"
+        | "Electric 5"
+        | "Soft Steinway"
+        | "Toy";
       playOnlyDefined: boolean;
-      definedNotes: string[];
+      definedNotes?: string[];
+    }
+  | {
+      category: "guitars";
+      kind:
+        | "acGuitar"
+        | "acousticGuitar"
+        | "AXAFifthsBounceGuitar"
+        | "AXAVoodooVibeGuitar"
+        | "brightGuitar"
+        | "clankyAmpMetalGuitar"
+        | "clankyMetalBassGuitar"
+        | "ferrumIronGuitar"
+        | "freshGuitar"
+        | "fretlessGuitar"
+        | "fuzzGuitar"
+        | "MexicanGuitarron"
+        | "mutedGuitar"
+        | "RJSGuitar";
+
+      label:
+        | "AC Guitar"
+        | "Acoustic guitar"
+        | "AXA fifths bounce guitar"
+        | "AXA voodoo vibe guitar"
+        | "Bright guitar"
+        | "Clanky amp metal guitar"
+        | "Clanky metal bass guitar"
+        | "Ferrum iron guitar"
+        | "Fresh guitar"
+        | "Fretless guitar"
+        | "Fuzz guitar"
+        | "Mexican guitarron"
+        | "Muted guitar"
+        | "RJS guitar";
+      playOnlyDefined: boolean;
+      definedNotes?: string[];
     }
   | {
       category: "strings";
-      kind: "brokenCello" | "uncleJohns5StringBanjo";
-      label: "Broken cello" | "Uncle John's five string banjo";
+      kind:
+        | "acBass"
+        | "anaBass"
+        | "beyondBowCello"
+        | "brokenCello"
+        | "cello"
+        | "electricBass1"
+        | "electricBass2"
+        | "jarreBass"
+        | "longFMBass"
+        | "moogBass"
+        | "shortFMBass"
+        | "strings1"
+        | "strings2"
+        | "sweepBass"
+        | "synthBass"
+        | "uncleJohns5StringBanjo"
+        | "violin";
+      label:
+        | "AC bass"
+        | "Ana Bass"
+        | "Beyond bow cello"
+        | "Broken cello"
+        | "Cello"
+        | "Electric bass 1"
+        | "Electric bass 2"
+        | "Jarre bass"
+        | "Long FM bass"
+        | "Moog bass"
+        | "Short FM bass"
+        | "Strings 1"
+        | "Strings 2"
+        | "Sweep bass"
+        | "Synth bass"
+        | "Uncle John's five string banjo"
+        | "Violin";
       playOnlyDefined: boolean;
-      definedNotes: string[];
+      definedNotes?: string[];
     }
   | {
       category: "winds";
       kind:
-        | "brassFrenchHorn"
-        | "brassTrombone"
-        | "brassTrumpet"
-        | "brassTuba"
+        | "bassFrenchHorn"
+        | "bassTrombone"
+        | "bassTrumpet"
+        | "bassTuba"
+        | "clarinet"
         | "classicSlideWhistle"
+        | "flugelhorn"
+        | "flute"
         | "forestFlute"
-        | "oboe";
+        | "hoverFlute"
+        | "oboe1"
+        | "oboe2"
+        | "recorder"
+        | "saxophone"
+        | "tenorSaxophone"
+        | "whistle";
       label:
-        | "Brass French horn"
-        | "Brass trombone"
-        | "Brass trumpet"
-        | "Brass tuba"
+        | "Bass French horn"
+        | "Bass trombone"
+        | "Brss trumpet"
+        | "Bass tuba"
+        | "Clarinet"
         | "Classic slide whistle"
+        | "Flugelhorn"
+        | "Flute"
         | "Forest flute"
-        | "Oboe";
+        | "Hover flute"
+        | "Oboe 1"
+        | "Oboe 2"
+        | "Recorder"
+        | "Saxophone"
+        | "Tenor saxophone"
+        | "Whistle";
       playOnlyDefined: boolean;
-      definedNotes: string[];
+      definedNotes?: string[];
+    }
+  | {
+      category: "drums";
+      kind:
+        | "claveFrog"
+        | "garageSaleDrumKit"
+        | "handBells"
+        | "JonsCajons"
+        | "kitchenDrumKit"
+        | "metallophon"
+        | "slitLogDrum"
+        | "solarWinds"
+        | "tinCanDrums";
+      label:
+        | "Clave frog"
+        | "Garage sale drum kit"
+        | "Hand bells"
+        | "Jon's cajons"
+        | "Kitchen drum kit"
+        | "Metallophon"
+        | "Slit log drum"
+        | "Solar winds"
+        | "Tin can drums";
+      playOnlyDefined: boolean;
+      definedNotes?: string[];
+    }
+  | {
+      category: "synths";
+      kind:
+        | "leadSynth1"
+        | "leadSynth2"
+        | "leadSynth3"
+        | "leadSynth4"
+        | "leadSynth5"
+        | "leadSynth6"
+        | "leadSynth7"
+        | "padSynth1"
+        | "padSynth2";
+      label:
+        | "Lead synth 1"
+        | "Lead synth 2"
+        | "Lead synth 3"
+        | "Lead synth 4"
+        | "Lead synth 5"
+        | "Lead synth 6"
+        | "Lead synth 7"
+        | "Pad synth 1"
+        | "Pad synth 2";
+      playOnlyDefined: boolean;
+      definedNotes?: string[];
+    }
+  | {
+      category: "organs";
+      kind:
+        | "bottle"
+        | "cassetteTape"
+        | "electric1"
+        | "electric2"
+        | "electric3"
+        | "littleRed"
+        | "pipe1"
+        | "pipe2"
+        | "pipe3"
+        | "spooky";
+      label:
+        | "Bottle"
+        | "Cassette tape"
+        | "Electric 1"
+        | "Electric 2"
+        | "Electric 3"
+        | "Little red"
+        | "Pipe 1"
+        | "Pipe 2"
+        | "Pipe 3"
+        | "Spooky";
+      playOnlyDefined: boolean;
+      definedNotes?: string[];
+    }
+  | {
+      category: "organs";
+      kind:
+        | "accordion"
+        | "bells1"
+        | "bells2"
+        | "brokenSplashCymbalGong"
+        | "clavichord"
+        | "cosmos"
+        | "gong"
+        | "harmonica"
+        | "marimba"
+        | "mechanisedChoir"
+        | "MicahsChoir"
+        | "orchestra"
+        | "plasmaDriveKalimba"
+        | "spellSinger"
+        | "streetBountyXylophone"
+        | "vibraphone"
+        | "xylophone";
+      label:
+        | "Accordion"
+        | "Bells 1"
+        | "Bells 2"
+        | "Broken splash cymbal gong"
+        | "Clavichord"
+        | "Cosmos"
+        | "Gong"
+        | "Harmonica"
+        | "Marimba"
+        | "Mechanised choir"
+        | "Micah's choir"
+        | "Orchestra"
+        | "Plasma drive kalimba"
+        | "Spell singer"
+        | "Street bounty xylophone"
+        | "Vibraphone"
+        | "Xylophone";
+      playOnlyDefined: boolean;
+      definedNotes?: string[];
     };
 
 const fgSamplers = {

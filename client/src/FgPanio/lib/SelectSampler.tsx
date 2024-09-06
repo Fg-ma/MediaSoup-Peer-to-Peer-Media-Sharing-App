@@ -357,13 +357,13 @@ export default function SelectSampler() {
       if (
         noteElement &&
         sampler.playOnlyDefined &&
-        !sampler.definedNotes.includes(note)
+        !sampler.definedNotes?.includes(note)
       ) {
         noteElement.disabled = true;
       }
       if (
         noteElement &&
-        (!sampler.playOnlyDefined || sampler.definedNotes.includes(note))
+        (!sampler.playOnlyDefined || sampler.definedNotes?.includes(note))
       ) {
         noteElement.disabled = false;
       }
