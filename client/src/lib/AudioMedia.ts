@@ -8,7 +8,7 @@ import AudioEffects, {
   AudioMixEffectsType,
   MixEffectsOptionsType,
 } from "../effects/audioEffects/AudioEffects";
-import { Samplers } from "../effects/audioEffects/FgSampler";
+import { FgSamplers } from "../effects/audioEffects/fgSamplers";
 
 class AudioMedia {
   private username: string;
@@ -308,7 +308,7 @@ class AudioMedia {
   swapSampler = (
     sampler: { category: string; kind: string },
     increment?: number
-  ): Samplers => {
+  ): FgSamplers => {
     return this.audioEffects.fgSampler.swapSampler(sampler, increment);
   };
 

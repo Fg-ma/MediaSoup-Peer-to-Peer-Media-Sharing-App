@@ -9,7 +9,7 @@ class FgSampler {
   private playOnlyDefined: boolean;
   private definedNotes: string[] = [];
 
-  private effectChain: Tone.Gain;
+  private samplerChain: Tone.Gain;
   private effects: any[] = [];
 
   private playingNotes: Set<string> = new Set();
@@ -347,7 +347,10 @@ class FgSampler {
     },
   };
 
-  constructor(mediaStreamDestination: MediaStreamAudioDestinationNode) {
+  constructor(
+    mediaStreamDestination: MediaStreamAudioDestinationNode,
+    samplerChain: Tone.Gain
+  ) {
     this.mediaStreamDestination = mediaStreamDestination;
 
     this.volumeNode = new Tone.Volume(0); // 0 dB by default
@@ -355,12 +358,12 @@ class FgSampler {
     this.sampler = new Tone.Sampler(fgSamplers.pianos.default.sampler);
     this.playOnlyDefined = fgSamplers.pianos.default.playOnlyDefined;
 
-    this.effectChain = new Tone.Gain(); // Create a Gain node for the effects chain
+    this.samplerChain = samplerChain; // Create a Gain node for the effects chain
 
     // Set up the initial connections
     this.sampler.connect(this.volumeNode);
-    this.volumeNode.connect(this.effectChain); // Connect volumeNode to the effects chain
-    this.effectChain.connect(this.mediaStreamDestination); // Connect effects chain to mediaStreamDestination
+    this.volumeNode.connect(this.samplerChain); // Connect volumeNode to the effects chain
+    this.samplerChain.connect(this.mediaStreamDestination); // Connect effects chain to mediaStreamDestination
   }
 
   swapSampler = (
@@ -582,11 +585,11 @@ class FgSampler {
         }
       } else {
         // If it's the first effect, reconnect the effectChain to the next effect or mediaStreamDestination
-        this.effectChain.disconnect();
+        this.samplerChain.disconnect();
         if (this.effects.length > 1) {
-          this.effectChain.connect(this.effects[1]);
+          this.samplerChain.connect(this.effects[1]);
         } else {
-          this.effectChain.connect(this.mediaStreamDestination);
+          this.samplerChain.connect(this.mediaStreamDestination);
         }
       }
 
@@ -604,8 +607,8 @@ class FgSampler {
       this.effects[this.effects.length - 1].disconnect();
       this.effects[this.effects.length - 1].connect(effect);
     } else {
-      this.effectChain.disconnect();
-      this.effectChain.connect(effect);
+      this.samplerChain.disconnect();
+      this.samplerChain.connect(effect);
     }
 
     // Add the new effect to the chain

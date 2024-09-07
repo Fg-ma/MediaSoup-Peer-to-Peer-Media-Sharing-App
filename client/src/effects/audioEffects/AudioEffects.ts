@@ -64,8 +64,11 @@ class AudioEffects {
   private audioStream: Tone.UserMedia;
   private mediaStreamDestination: MediaStreamAudioDestinationNode;
 
-  private effectChain: Tone.Gain;
-  private effects: any[] = [];
+  private mainChain: Tone.Gain;
+  private micChain: Tone.Gain;
+  private samplerChain: Tone.Gain;
+
+  private micEffects: any[] = [];
 
   private autoFilter: Tone.AutoFilter | undefined;
   private autoPanner: Tone.AutoPanner | undefined;
@@ -409,11 +412,37 @@ class AudioEffects {
     this.audioStream = audioStream;
     this.mediaStreamDestination = mediaStreamDestination;
 
-    this.fgSampler = new FgSampler(this.mediaStreamDestination);
+    this.micChain = new Tone.Gain(); // Create a Gain node for the mic chain
 
-    this.effectChain = new Tone.Gain(); // Create a Gain node for the effects chain
+    this.samplerChain = new Tone.Gain(); // Create a Gain node for the sampler chain
 
-    this.effectChain.connect(this.mediaStreamDestination); // Connect effects chain to mediaStreamDestination
+    this.mainChain = new Tone.Gain(); // Create a Gain node for the main chain
+
+    // Connect the micChain and samplerChain to the mainchain
+    this.mainChain.connect(this.micChain);
+    this.mainChain.connect(this.samplerChain);
+
+    this.mainChain.connect(this.mediaStreamDestination);
+
+    this.fgSampler = new FgSampler(
+      this.mediaStreamDestination,
+      this.samplerChain
+    );
+  }
+
+  // Method to mute/unmute the main chain
+  setMainChainMute(isMuted: boolean) {
+    this.mainChain.gain.value = isMuted ? 0 : 1;
+  }
+
+  // Method to mute/unmute the mic chain
+  setMicChainMute(isMuted: boolean) {
+    this.micChain.gain.value = isMuted ? 0 : 1;
+  }
+
+  // Method to mute/unmute the sampler chain
+  setSamplerChainMute(isMuted: boolean) {
+    this.samplerChain.gain.value = isMuted ? 0 : 1;
   }
 
   updateEffects = (
@@ -514,43 +543,45 @@ class AudioEffects {
   private removeEffect(effect: any | undefined) {
     if (!effect) return;
 
-    const effectIndex = this.effects.indexOf(effect);
+    const effectIndex = this.micEffects.indexOf(effect);
 
     if (effectIndex !== -1) {
       effect.disconnect();
 
       if (effectIndex > 0) {
-        this.effects[effectIndex - 1].disconnect();
-        if (effectIndex < this.effects.length - 1) {
-          this.effects[effectIndex - 1].connect(this.effects[effectIndex + 1]);
+        this.micEffects[effectIndex - 1].disconnect();
+        if (effectIndex < this.micEffects.length - 1) {
+          this.micEffects[effectIndex - 1].connect(
+            this.micEffects[effectIndex + 1]
+          );
         } else {
-          this.effects[effectIndex - 1].connect(this.mediaStreamDestination);
+          this.micEffects[effectIndex - 1].connect(this.mediaStreamDestination);
         }
       } else {
-        this.effectChain.disconnect();
-        if (this.effects.length > 1) {
-          this.effectChain.connect(this.effects[1]);
+        this.micChain.disconnect();
+        if (this.micEffects.length > 1) {
+          this.micChain.connect(this.micEffects[1]);
         } else {
-          this.effectChain.connect(this.mediaStreamDestination);
+          this.micChain.connect(this.mediaStreamDestination);
         }
       }
 
-      this.effects.splice(effectIndex, 1);
+      this.micEffects.splice(effectIndex, 1);
       effect.dispose();
     }
   }
 
   private addEffect(effect: any) {
-    if (this.effects.length > 0) {
-      this.effects[this.effects.length - 1].disconnect();
-      this.effects[this.effects.length - 1].connect(effect);
+    if (this.micEffects.length > 0) {
+      this.micEffects[this.micEffects.length - 1].disconnect();
+      this.micEffects[this.micEffects.length - 1].connect(effect);
     } else {
-      this.effectChain.disconnect();
-      this.effectChain.connect(effect);
+      this.micChain.disconnect();
+      this.micChain.connect(effect);
     }
     this.audioStream.connect(effect);
 
-    this.effects.push(effect);
+    this.micEffects.push(effect);
 
     effect.connect(this.mediaStreamDestination);
   }
