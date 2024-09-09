@@ -7,7 +7,7 @@ import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import { AudioEffectTemplate } from "./AudioEffectsSection";
 
-export default function TelephoneEffect({
+export default function AudioEffectButton({
   username,
   instance,
   isUser,
