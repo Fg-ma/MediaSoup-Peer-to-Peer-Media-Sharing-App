@@ -61,7 +61,7 @@ const KeyVisualizer: React.FC = () => {
   }, [disappearedKeys]);
 
   return (
-    <div className='w-full h-64 bg-gray-200 relative overflow-hidden'>
+    <div className='w-full h-20 bg-gray-200 relative overflow-hidden'>
       {[...keyPresses.entries()].map(
         ([key, { startTime, duration }], index) => {
           const currentDuration = Date.now() - startTime;

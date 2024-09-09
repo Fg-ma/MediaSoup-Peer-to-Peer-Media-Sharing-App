@@ -34,6 +34,7 @@ const scrollButtonsTransition: Transition = {
 };
 
 export default function ScrollingContainer({
+  externalRef,
   content,
   buttonBackgroundColor = "rbga(255, 255, 255, 1)",
   buttonBackgroundColorTransition = {
@@ -44,6 +45,7 @@ export default function ScrollingContainer({
     },
   },
 }: {
+  externalRef: React.RefObject<HTMLDivElement>;
   content: ReactNode;
   buttonBackgroundColor?: string;
   buttonBackgroundColorTransition?: Transition;
@@ -53,9 +55,10 @@ export default function ScrollingContainer({
   const [showRightScroll, setShowRightScroll] = useState(true);
 
   const updateVisibleScroll = () => {
-    if (scrollingContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } =
-        scrollingContainerRef.current;
+    const scrollRef = externalRef ? externalRef : scrollingContainerRef;
+
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
 
       setShowLeftScroll(scrollLeft > 0);
       setShowRightScroll(scrollLeft + clientWidth < scrollWidth - 1);
@@ -66,25 +69,29 @@ export default function ScrollingContainer({
     updateVisibleScroll();
   }, [content]);
 
-  useEffect(() => {
-    const handleWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
+  const handleWheel = (event: WheelEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-      if (scrollingContainerRef.current) {
-        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-          scrollingContainerRef.current.scrollLeft += event.deltaX;
-        } else {
-          scrollingContainerRef.current.scrollLeft += event.deltaY;
-        }
-        updateVisibleScroll();
+    const scrollRef = externalRef ? externalRef : scrollingContainerRef;
+
+    if (scrollRef.current) {
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        scrollRef.current.scrollLeft += event.deltaX;
+      } else {
+        scrollRef.current.scrollLeft += event.deltaY;
       }
-    };
+      updateVisibleScroll();
+    }
+  };
 
-    scrollingContainerRef.current?.addEventListener("wheel", handleWheel);
+  useEffect(() => {
+    const scrollRef = externalRef ? externalRef : scrollingContainerRef;
+
+    scrollRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
-      scrollingContainerRef.current?.removeEventListener("wheel", handleWheel);
+      scrollRef.current?.removeEventListener("wheel", handleWheel);
     };
   }, []);
 
@@ -93,29 +100,33 @@ export default function ScrollingContainer({
   };
 
   const scrollToRight = () => {
-    if (scrollingContainerRef.current) {
-      const scrollWidth = scrollingContainerRef.current.scrollWidth;
-      const clientWidth = scrollingContainerRef.current.clientWidth;
+    const scrollRef = externalRef ? externalRef : scrollingContainerRef;
+
+    if (scrollRef.current) {
+      const scrollWidth = scrollRef.current.scrollWidth;
+      const clientWidth = scrollRef.current.clientWidth;
       const maxScroll = scrollWidth - clientWidth;
       const scrollStep = clientWidth;
 
-      let newScrollLeft = scrollingContainerRef.current.scrollLeft + scrollStep;
+      let newScrollLeft = scrollRef.current.scrollLeft + scrollStep;
 
       newScrollLeft = Math.min(newScrollLeft, maxScroll);
 
-      scrollingContainerRef.current.scrollLeft = newScrollLeft;
+      scrollRef.current.scrollLeft = newScrollLeft;
     }
   };
 
   const scrollToLeft = () => {
-    if (scrollingContainerRef.current) {
-      const scrollStep = scrollingContainerRef.current.clientWidth;
+    const scrollRef = externalRef ? externalRef : scrollingContainerRef;
 
-      let newScrollLeft = scrollingContainerRef.current.scrollLeft - scrollStep;
+    if (scrollRef.current) {
+      const scrollStep = scrollRef.current.clientWidth;
+
+      let newScrollLeft = scrollRef.current.scrollLeft - scrollStep;
 
       newScrollLeft = Math.max(newScrollLeft, 0);
 
-      scrollingContainerRef.current.scrollLeft = newScrollLeft;
+      scrollRef.current.scrollLeft = newScrollLeft;
     }
   };
 
@@ -131,7 +142,10 @@ export default function ScrollingContainer({
             animate={{
               ...scrollButtonsVar.leftAnimate,
               backgroundColor: buttonBackgroundColor,
-              boxShadow: scrollingContainerRef.current
+              boxShadow: externalRef.current
+                ? // prettier-ignore
+                  `${-externalRef.current.clientHeight / 3}px 0 ${externalRef.current.clientHeight / 4}px ${externalRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
+                : scrollingContainerRef.current
                 ? // prettier-ignore
                   `${-scrollingContainerRef.current.clientHeight / 3}px 0 ${scrollingContainerRef.current.clientHeight / 4}px ${scrollingContainerRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
                 : `1px 0 6px 8px ${buttonBackgroundColor}`,
@@ -163,7 +177,7 @@ export default function ScrollingContainer({
         )}
       </AnimatePresence>
       <div
-        ref={scrollingContainerRef}
+        ref={externalRef ? externalRef : scrollingContainerRef}
         className='grow flex items-center justify-start overflow-x-auto w-full'
         onScroll={handleScroll}
       >
@@ -182,7 +196,10 @@ export default function ScrollingContainer({
             animate={{
               ...scrollButtonsVar.rightAnimate,
               backgroundColor: buttonBackgroundColor,
-              boxShadow: scrollingContainerRef.current
+              boxShadow: externalRef.current
+                ? // prettier-ignore
+                  `${externalRef.current.clientHeight / 3}px 0 ${externalRef.current.clientHeight / 4}px ${externalRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
+                : scrollingContainerRef.current
                 ? // prettier-ignore
                   `${scrollingContainerRef.current.clientHeight / 3}px 0 ${scrollingContainerRef.current.clientHeight / 4}px ${scrollingContainerRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
                 : `1px 0 6px 8px ${buttonBackgroundColor}`,

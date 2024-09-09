@@ -66,6 +66,13 @@ const joinTable = (
   const previousTableId = table_id.current;
   const previousUsername = username.current;
 
+  if (
+    table_id.current === tableIdRef.current?.value &&
+    username.current === usernameRef.current?.value
+  ) {
+    return;
+  }
+
   if (tableIdRef.current) {
     table_id.current = tableIdRef.current?.value;
   }

@@ -229,22 +229,19 @@ class Producers {
   };
 
   private createAudioProducer = async (audioBrowserMedia: UserMedia) => {
-    console.log("Wokr2");
     const newAudioMedia = new AudioMedia(
       this.username.current,
       this.table_id.current,
       this.userStreamEffects,
       audioBrowserMedia
     );
-    console.log("Wokr3");
     await newAudioMedia.openMic();
-    console.log("Wokr");
 
     this.userMedia.current.audio = newAudioMedia;
 
-    const audioTrack = this.userMedia.current.audio.getTrack();
+    const audioTracks = this.userMedia.current.audio.getMasterTrack();
     const audioParams = {
-      track: audioTrack,
+      track: audioTracks,
       appData: {
         producerType: "audio",
       },

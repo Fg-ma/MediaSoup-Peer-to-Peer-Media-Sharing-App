@@ -62,9 +62,12 @@ export type MixEffectsOptionsType =
 
 class AudioEffects {
   private audioStream: Tone.UserMedia;
-  private mediaStreamDestination: MediaStreamAudioDestinationNode;
 
-  private mainChain: Tone.Gain;
+  private masterMediaStreamDestination: MediaStreamAudioDestinationNode;
+  private micMediaStreamDestination: MediaStreamAudioDestinationNode;
+  private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
+
+  private masterChain: Tone.Gain;
   private micChain: Tone.Gain;
   private samplerChain: Tone.Gain;
 
@@ -407,32 +410,34 @@ class AudioEffects {
 
   constructor(
     audioStream: Tone.UserMedia,
-    mediaStreamDestination: MediaStreamAudioDestinationNode
+    masterMediaStreamDestination: MediaStreamAudioDestinationNode,
+    micMediaStreamDestination: MediaStreamAudioDestinationNode,
+    samplerMediaStreamDestination: MediaStreamAudioDestinationNode
   ) {
     this.audioStream = audioStream;
-    this.mediaStreamDestination = mediaStreamDestination;
+    this.masterMediaStreamDestination = masterMediaStreamDestination;
+    this.micMediaStreamDestination = micMediaStreamDestination;
+    this.samplerMediaStreamDestination = samplerMediaStreamDestination;
+
+    this.masterChain = new Tone.Gain(); // Create a Gain node for the master chain
 
     this.micChain = new Tone.Gain(); // Create a Gain node for the mic chain
 
     this.samplerChain = new Tone.Gain(); // Create a Gain node for the sampler chain
 
-    this.mainChain = new Tone.Gain(); // Create a Gain node for the main chain
+    // Connect micChain and samplerChain to the masterChain
+    this.micChain.connect(this.masterChain);
+    this.samplerChain.connect(this.masterChain);
+    this.masterChain.connect(this.masterMediaStreamDestination);
 
-    // Connect the micChain and samplerChain to the mainchain
-    this.mainChain.connect(this.micChain);
-    this.mainChain.connect(this.samplerChain);
-
-    this.mainChain.connect(this.mediaStreamDestination);
+    this.micChain.connect(this.micMediaStreamDestination);
+    this.samplerChain.connect(this.samplerMediaStreamDestination);
 
     this.fgSampler = new FgSampler(
-      this.mediaStreamDestination,
+      this.samplerMediaStreamDestination,
+      this.masterChain,
       this.samplerChain
     );
-  }
-
-  // Method to mute/unmute the main chain
-  setMainChainMute(isMuted: boolean) {
-    this.mainChain.gain.value = isMuted ? 0 : 1;
   }
 
   // Method to mute/unmute the mic chain
@@ -555,15 +560,22 @@ class AudioEffects {
             this.micEffects[effectIndex + 1]
           );
         } else {
-          this.micEffects[effectIndex - 1].connect(this.mediaStreamDestination);
+          this.micEffects[effectIndex - 1].connect(
+            this.micMediaStreamDestination
+          );
         }
       } else {
         this.micChain.disconnect();
         if (this.micEffects.length > 1) {
           this.micChain.connect(this.micEffects[1]);
         } else {
-          this.micChain.connect(this.mediaStreamDestination);
+          this.micChain.connect(this.micMediaStreamDestination);
         }
+      }
+
+      // Ensure the master chain is properly updated
+      if (this.micEffects.length === 1) {
+        this.micEffects[0].connect(this.masterChain);
       }
 
       this.micEffects.splice(effectIndex, 1);
@@ -579,11 +591,12 @@ class AudioEffects {
       this.micChain.disconnect();
       this.micChain.connect(effect);
     }
-    this.audioStream.connect(effect);
 
+    this.audioStream.connect(effect);
     this.micEffects.push(effect);
 
-    effect.connect(this.mediaStreamDestination);
+    effect.connect(this.micMediaStreamDestination);
+    effect.connect(this.masterChain);
   }
 
   /* 

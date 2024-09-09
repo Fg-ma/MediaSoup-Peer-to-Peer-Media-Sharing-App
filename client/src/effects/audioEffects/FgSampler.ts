@@ -3,14 +3,15 @@ import { AudioMixEffectsType, MixEffectsOptionsType } from "./AudioEffects";
 import fgSamplers, { FgSamplers } from "./fgSamplers";
 
 class FgSampler {
-  private mediaStreamDestination: MediaStreamAudioDestinationNode;
+  private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
 
   private sampler: Tone.Sampler | undefined;
   private playOnlyDefined: boolean;
   private definedNotes: string[] = [];
 
+  private masterChain: Tone.Gain;
   private samplerChain: Tone.Gain;
-  private effects: any[] = [];
+  private samplerEffects: any[] = [];
 
   private playingNotes: Set<string> = new Set();
 
@@ -348,22 +349,23 @@ class FgSampler {
   };
 
   constructor(
-    mediaStreamDestination: MediaStreamAudioDestinationNode,
+    samplerMediaStreamDestination: MediaStreamAudioDestinationNode,
+    masterChain: Tone.Gain,
     samplerChain: Tone.Gain
   ) {
-    this.mediaStreamDestination = mediaStreamDestination;
+    this.samplerMediaStreamDestination = samplerMediaStreamDestination;
+    this.masterChain = masterChain;
+    this.samplerChain = samplerChain;
 
     this.volumeNode = new Tone.Volume(0); // 0 dB by default
 
     this.sampler = new Tone.Sampler(fgSamplers.pianos.default.sampler);
     this.playOnlyDefined = fgSamplers.pianos.default.playOnlyDefined;
 
-    this.samplerChain = samplerChain; // Create a Gain node for the effects chain
-
     // Set up the initial connections
     this.sampler.connect(this.volumeNode);
     this.volumeNode.connect(this.samplerChain); // Connect volumeNode to the effects chain
-    this.samplerChain.connect(this.mediaStreamDestination); // Connect effects chain to mediaStreamDestination
+    this.samplerChain.connect(this.samplerMediaStreamDestination); // Connect effects chain to mediaStreamDestination
   }
 
   swapSampler = (
@@ -569,7 +571,7 @@ class FgSampler {
   private removeEffect(effect: any | undefined) {
     if (!effect) return;
 
-    const effectIndex = this.effects.indexOf(effect);
+    const effectIndex = this.samplerEffects.indexOf(effect);
 
     if (effectIndex !== -1) {
       // Disconnect the effect from the chain
@@ -577,24 +579,33 @@ class FgSampler {
 
       // Reconnect the previous effect in the chain to the next one
       if (effectIndex > 0) {
-        this.effects[effectIndex - 1].disconnect();
-        if (effectIndex < this.effects.length - 1) {
-          this.effects[effectIndex - 1].connect(this.effects[effectIndex + 1]);
+        this.samplerEffects[effectIndex - 1].disconnect();
+        if (effectIndex < this.samplerEffects.length - 1) {
+          this.samplerEffects[effectIndex - 1].connect(
+            this.samplerEffects[effectIndex + 1]
+          );
         } else {
-          this.effects[effectIndex - 1].connect(this.mediaStreamDestination);
+          this.samplerEffects[effectIndex - 1].connect(
+            this.samplerMediaStreamDestination
+          );
         }
       } else {
         // If it's the first effect, reconnect the effectChain to the next effect or mediaStreamDestination
         this.samplerChain.disconnect();
-        if (this.effects.length > 1) {
-          this.samplerChain.connect(this.effects[1]);
+        if (this.samplerEffects.length > 1) {
+          this.samplerChain.connect(this.samplerEffects[1]);
         } else {
-          this.samplerChain.connect(this.mediaStreamDestination);
+          this.samplerChain.connect(this.samplerMediaStreamDestination);
         }
       }
 
+      // Ensure the master chain is properly updated
+      if (this.samplerEffects.length === 1) {
+        this.samplerEffects[0].connect(this.masterChain);
+      }
+
       // Remove the effect from the array
-      this.effects.splice(effectIndex, 1);
+      this.samplerEffects.splice(effectIndex, 1);
 
       // Dispose of the effect
       effect.dispose();
@@ -603,19 +614,20 @@ class FgSampler {
 
   private addEffect(effect: any) {
     // Disconnect the last effect in the chain from the mediaStreamDestination
-    if (this.effects.length > 0) {
-      this.effects[this.effects.length - 1].disconnect();
-      this.effects[this.effects.length - 1].connect(effect);
+    if (this.samplerEffects.length > 0) {
+      this.samplerEffects[this.samplerEffects.length - 1].disconnect();
+      this.samplerEffects[this.samplerEffects.length - 1].connect(effect);
     } else {
       this.samplerChain.disconnect();
       this.samplerChain.connect(effect);
     }
 
     // Add the new effect to the chain
-    this.effects.push(effect);
+    this.samplerEffects.push(effect);
 
     // Connect the new effect to the mediaStreamDestination
-    effect.connect(this.mediaStreamDestination);
+    effect.connect(this.samplerMediaStreamDestination);
+    effect.connect(this.masterChain);
   }
 
   /* 

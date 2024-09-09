@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import FgKnobButton, {
-  KnobButtonOptions,
-} from "../../fgKnobButton/FgKnobButton";
+import React, { useRef, useState } from "react";
+import { KnobButtonOptions } from "../../fgKnobButton/FgKnobButton";
 import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
 } from "../../effects/audioEffects/AudioEffects";
+import SamplerEffect from "./SamplerEffect";
 
 import autoFilterIcon from "../../../public/svgs/audio/autoFilterIcon.svg";
 import autoPannerIcon from "../../../public/svgs/audio/autoPannerIcon.svg";
@@ -19,7 +18,6 @@ import phaserIcon from "../../../public/svgs/audio/phaserIcon.svg";
 import pitchShiftIcon from "../../../public/svgs/audio/pitchShiftIcon.svg";
 import reverbIcon from "../../../public/svgs/audio/reverbIcon.svg";
 import stereoWidenerIcon from "../../../public/svgs/audio/stereoWidenerIcon.svg";
-import SamplerEffect from "./SamplerEffect";
 
 export interface SamplerEffectType {
   labelIcon?: string;
@@ -419,7 +417,7 @@ const samplerEffects: {
   },
   stereoWidener: {
     labelIcon: stereoWidenerIcon,
-    effectLabel: "Stereo wide",
+    effectLabel: "Stereo w",
     labelPlacement: "top",
     options: {
       width: {
@@ -620,18 +618,21 @@ export default function SamplerEffectsToolbar({ focus }: { focus: boolean }) {
       },
     },
   });
+  const samplerEffectsToolbarRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className='px-2 mb-1'>
       <ScrollingContainer
+        externalRef={samplerEffectsToolbarRef}
         content={
-          <div className='h-[7.25rem] flex px-3 items-center justify-center'>
+          <div className='h-[7.5rem] flex px-3 items-center justify-center'>
             {Object.entries(samplerEffects).map((effect) => (
               <div
                 key={effect[0]}
                 className='flex items-center justify-center h-full'
               >
                 <SamplerEffect
+                  samplerEffectsToolbarRef={samplerEffectsToolbarRef}
                   effectValue={effect[0] as AudioMixEffectsType}
                   effect={effect[1]}
                   effects={effects}

@@ -181,6 +181,15 @@ export default function Bundle({
   useEffect(() => {
     if (audioRef.current && audioStream && !bundleOptions.isUser) {
       audioRef.current.srcObject = audioStream;
+    } else if (
+      audioRef.current &&
+      userMedia.current.audio &&
+      bundleOptions.isUser
+    ) {
+      const samplerStream = new MediaStream([
+        userMedia.current.audio.getSamplerTrack(),
+      ]);
+      audioRef.current.srcObject = samplerStream;
     }
   }, [audioRef, audioStream]);
 
@@ -388,14 +397,12 @@ export default function Bundle({
             />
           </Suspense>
         )}
-      {audioStream && !bundleOptions.isUser && (
-        <audio
-          ref={audioRef}
-          id={`${username}_audio_stream`}
-          className='w-0 z-0'
-          autoPlay={true}
-        ></audio>
-      )}
+      <audio
+        ref={audioRef}
+        id={`${username}_audio_stream`}
+        className='w-0 z-0'
+        autoPlay={true}
+      ></audio>
     </div>
   );
 }

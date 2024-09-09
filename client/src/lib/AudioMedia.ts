@@ -16,7 +16,12 @@ class AudioMedia {
 
   private audioStream: Tone.UserMedia;
   private audioContext: Tone.BaseContext;
-  private mediaStreamDestination: MediaStreamAudioDestinationNode;
+  private mediaStream: MediaStream;
+  private masterMediaStream: MediaStream;
+
+  private masterMediaStreamDestination: MediaStreamAudioDestinationNode;
+  private micMediaStreamDestination: MediaStreamAudioDestinationNode;
+  private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
 
   private audioEffects: AudioEffects;
 
@@ -56,44 +61,74 @@ class AudioMedia {
 
     // Create an AudioContext and MediaStreamDestination
     this.audioContext = Tone.context;
-    this.mediaStreamDestination =
+    this.masterMediaStreamDestination =
+      this.audioContext.createMediaStreamDestination();
+    this.micMediaStreamDestination =
+      this.audioContext.createMediaStreamDestination();
+    this.samplerMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
 
     // Connect the Tone.UserMedia instance to the MediaStreamDestination
-    this.audioStream.connect(this.mediaStreamDestination);
+    this.audioStream.connect(this.masterMediaStreamDestination);
+    this.audioStream.connect(this.micMediaStreamDestination);
 
     this.audioEffects = new AudioEffects(
       this.audioStream,
-      this.mediaStreamDestination
+      this.masterMediaStreamDestination,
+      this.micMediaStreamDestination,
+      this.samplerMediaStreamDestination
     );
 
     this.effects = {};
+
+    // Combine both MediaStreamDestinations into a single MediaStream
+    this.mediaStream = new MediaStream();
+
+    // Add the master track (from masterMediaStreamDestination) to combined stream
+    this.mediaStream.addTrack(
+      this.masterMediaStreamDestination.stream.getAudioTracks()[0]
+    );
+
+    // Add the mic track (from micMediaStreamDestination) to combined stream
+    this.mediaStream.addTrack(
+      this.micMediaStreamDestination.stream.getAudioTracks()[0]
+    );
+
+    // Add the sampler track (from samplerMediaStreamDestination) to combined stream
+    this.mediaStream.addTrack(
+      this.samplerMediaStreamDestination.stream.getAudioTracks()[0]
+    );
+
+    // Make master media stream
+    this.masterMediaStream = new MediaStream();
+
+    // Add the master track (from masterMediaStreamDestination) to combined stream
+    this.masterMediaStream.addTrack(
+      this.masterMediaStreamDestination.stream.getAudioTracks()[0]
+    );
   }
 
-  openMic = async () => {
+  async openMic() {
     await this.audioStream.open();
 
     // Fix this it is janky way of getting mic started
     this.audioEffects.updateEffects([
       {
         type: "reverb",
-        updates: [
-          { option: "decay", value: 1 },
-          { option: "preDelay", value: 1 },
-        ],
+        updates: [{ option: "decay", value: 1 }],
       },
     ]);
     this.audioEffects.removeEffects(["reverb"]);
-  };
+  }
 
-  deconstructor = () => {
+  deconstructor() {
     this.audioStream.close();
-  };
+  }
 
-  changeEffects = async (
+  async changeEffects(
     effect: AudioEffectTypes,
     blockStateChange: boolean = false
-  ) => {
+  ) {
     if (!blockStateChange) {
       this.userStreamEffects.current.audio[effect as AudioEffectTypes] =
         !this.userStreamEffects.current.audio[effect as AudioEffectTypes];
@@ -112,9 +147,9 @@ class AudioMedia {
     } else {
       this.removeEffect(effect);
     }
-  };
+  }
 
-  applyEffect = (effect: AudioEffectTypes) => {
+  applyEffect(effect: AudioEffectTypes) {
     switch (effect) {
       case "robot":
         this.audioEffects?.updateEffects([
@@ -247,9 +282,9 @@ class AudioMedia {
         ]);
         break;
     }
-  };
+  }
 
-  removeEffect = (effect: AudioEffectTypes) => {
+  removeEffect(effect: AudioEffectTypes) {
     switch (effect) {
       case "robot":
         this.audioEffects?.removeEffects([
@@ -273,57 +308,77 @@ class AudioMedia {
         this.audioEffects?.removeEffects(["EQ", "distortion", "bitCrusher"]);
         break;
     }
-  };
+  }
 
-  mixEffects = (
+  mixEffects(
     effects: {
       type: AudioMixEffectsType;
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
-  ) => {
+  ) {
     this.audioEffects?.updateEffects(effects);
-  };
+  }
 
-  removeMixEffects = (effects: AudioMixEffectsType[]) => {
+  removeMixEffects(effects: AudioMixEffectsType[]) {
     this.audioEffects?.removeEffects(effects);
-  };
+  }
 
-  samplerEffectsChange = (
+  samplerEffectsChange(
     effects: {
       type: AudioMixEffectsType;
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
-  ) => {
+  ) {
     this.audioEffects?.fgSampler.updateEffects(effects);
-  };
+  }
 
-  removeSamplerEffects = (effects: AudioMixEffectsType[]) => {
+  removeSamplerEffects(effects: AudioMixEffectsType[]) {
     this.audioEffects?.fgSampler.removeEffects(effects);
-  };
+  }
 
-  playNote = (note: string, isPress: boolean) => {
+  playNote(note: string, isPress: boolean) {
     this.audioEffects.fgSampler.playNote(note, isPress);
-  };
+  }
 
-  swapSampler = (
+  swapSampler(
     sampler: { category: string; kind: string },
     increment?: number
-  ): FgSamplers => {
+  ): FgSamplers {
     return this.audioEffects.fgSampler.swapSampler(sampler, increment);
-  };
+  }
+
+  muteMic(isMuted: boolean) {
+    this.audioEffects.setMicChainMute(isMuted);
+  }
 
   // Set volume (in decibels)
-  setSamplerVolume = (volume: number) => {
+  setSamplerVolume(volume: number) {
     this.audioEffects.fgSampler.setVolume(volume);
-  };
+  }
 
-  getStream = () => {
-    return this.mediaStreamDestination?.stream;
-  };
+  getStream() {
+    return this.mediaStream;
+  }
 
-  getTrack = () => {
-    return this.mediaStreamDestination?.stream.getAudioTracks()[0];
-  };
+  getTracks() {
+    return this.mediaStream.getAudioTracks();
+  }
+
+  getMasterTrack() {
+    return this.masterMediaStreamDestination.stream.getAudioTracks()[0];
+  }
+
+  getMasterStream() {
+    return this.masterMediaStream;
+  }
+
+  getMicTrack() {
+    return this.micMediaStreamDestination.stream.getAudioTracks()[0];
+  }
+
+  getSamplerTrack() {
+    return this.samplerMediaStreamDestination.stream.getAudioTracks()[0];
+  }
 }
 
 export default AudioMedia;

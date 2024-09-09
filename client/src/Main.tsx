@@ -196,12 +196,12 @@ export default function Main() {
   const acceptAudioEffects = true;
 
   const muteAudio = () => {
-    if (userMedia.current.audio) {
-      userMedia.current.audio.getTrack().enabled = mutedAudioRef.current;
-    }
-
     setMutedAudio((prev) => !prev);
     mutedAudioRef.current = !mutedAudioRef.current;
+
+    if (userMedia.current.audio) {
+      userMedia.current.audio.muteMic(mutedAudioRef.current);
+    }
 
     const msg = {
       type: "clientMute",

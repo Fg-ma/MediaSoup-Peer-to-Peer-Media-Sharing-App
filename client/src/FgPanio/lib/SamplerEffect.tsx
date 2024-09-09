@@ -3,18 +3,20 @@ import { useStreamsContext } from "../../context/StreamsContext";
 import { SamplerEffectType } from "./SamplerEffectsToolbar";
 import FgKnobButton from "../../fgKnobButton/FgKnobButton";
 import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
 } from "../../effects/audioEffects/AudioEffects";
-import { values } from "lodash";
 
 export default function SamplerEffect({
+  samplerEffectsToolbarRef,
   effectValue,
   effect,
   effects,
   setEffects,
 }: {
+  samplerEffectsToolbarRef: React.RefObject<HTMLDivElement>;
   effectValue: AudioMixEffectsType;
   effect: SamplerEffectType;
   effects: {
@@ -121,10 +123,32 @@ export default function SamplerEffect({
             }`}
           ></div>
         )}
+        {Object.keys(effect.options).length > 1 && effect.labelIcon && (
+          <FgSVG
+            src={effect.labelIcon}
+            attributes={[
+              { key: "width", value: "1rem" },
+              { key: "height", value: "1rem" },
+              {
+                key: "fill",
+                value: effects[effectValue].active
+                  ? "black"
+                  : "rgb(204 204 204)",
+              },
+              {
+                key: "stroke",
+                value: effects[effectValue].active
+                  ? "black"
+                  : "rgb(204 204 204)",
+              },
+            ]}
+          />
+        )}
         <FgButton
+          scrollingContainerRef={samplerEffectsToolbarRef}
           contentFunction={() => (
             <div
-              className={`text-base leading-4 font-K2D ${
+              className={`h-5 text-base leading-4 font-K2D ${
                 effects[effectValue].active ? "text-black" : "text-fg-white-80"
               }`}
             >

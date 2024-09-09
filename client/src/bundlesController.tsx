@@ -125,7 +125,7 @@ class BundlesController {
           this.userMedia.current.screen[screenId].getStream();
       }
 
-      const initAudioStream = this.userMedia.current.audio?.getStream();
+      const initAudioStream = this.userMedia.current.audio?.getMasterStream();
 
       const newBundle = (
         <Bundle

@@ -34,6 +34,7 @@ const defaultFgButtonOptions: {
 export default function FgButton({
   externalId,
   externalRef,
+  scrollingContainerRef,
   clickFunction,
   mouseDownFunction,
   mouseUpFunction,
@@ -50,6 +51,7 @@ export default function FgButton({
 }: {
   externalId?: string;
   externalRef?: React.RefObject<HTMLButtonElement>;
+  scrollingContainerRef?: React.RefObject<HTMLDivElement>;
   clickFunction?: (event: React.MouseEvent) => void;
   mouseDownFunction?: (event: React.MouseEvent) => void;
   mouseUpFunction?: (event: MouseEvent) => void;
@@ -165,6 +167,11 @@ export default function FgButton({
       }, fgButtonOptions.hoverTimeoutDuration);
 
       document.addEventListener("mousemove", handleMouseMove);
+      if (scrollingContainerRef && scrollingContainerRef.current) {
+        scrollingContainerRef.current.addEventListener("scroll", (event) =>
+          handleMouseMove(event as unknown as MouseEvent)
+        );
+      }
     }
   };
 
@@ -179,6 +186,11 @@ export default function FgButton({
       }
 
       document.removeEventListener("mousemove", handleMouseMove);
+      if (scrollingContainerRef && scrollingContainerRef.current) {
+        scrollingContainerRef.current.removeEventListener("scroll", (event) =>
+          handleMouseMove(event as unknown as MouseEvent)
+        );
+      }
     }
   };
 
