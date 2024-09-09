@@ -21,6 +21,7 @@ export default function SelectionPanel({
   previousPanels,
   position,
   selections,
+  isParentScrolling,
   externalRef,
   externalPanelRef,
   onRendered,
@@ -29,6 +30,7 @@ export default function SelectionPanel({
   previousPanels: React.MutableRefObject<string[]>;
   position: "left" | "right";
   selections: RecursiveSelections;
+  isParentScrolling: boolean;
   externalRef?: React.RefObject<HTMLElement>;
   externalPanelRef?: React.RefObject<HTMLDivElement>;
   onRendered?: () => void;
@@ -92,13 +94,14 @@ export default function SelectionPanel({
             key={selection}
             panelRefs={panelRefs}
             previousPanels={previousPanels}
+            isParentScrolling={scrollingAvailable}
             content={selection}
             selections={selectionValue}
           />,
         ]);
       }
     }
-  }, [selections]);
+  }, [selections, scrollingAvailable]);
 
   useEffect(() => {
     getStaticPanelPosition();
@@ -212,17 +215,26 @@ export default function SelectionPanel({
       }}
     >
       {portalPosition?.position === "right" && (
-        <div className='flex flex-col'>
-          <div className='w-4 grow'></div>
+        <div className='flex flex-col bg-red-500'>
+          <div
+            className={`${isParentScrolling ? "w-[3.1875rem]" : "w-4"} grow`}
+          ></div>
         </div>
       )}
       {scrollingAvailable && (
         <div
           ref={scrollUpButtonRef}
-          className={`absolute top-0 h-4 z-[999999999999999] ${
-            portalPosition?.position === "right" ? "left-4" : "left-0"
+          className={`absolute top-0 h-4 z-[999999999999999] bg-purple-500 ${
+            portalPosition?.position === "right"
+              ? isParentScrolling
+                ? "left-[3.1875rem]"
+                : "left-4"
+              : "left-0"
           }`}
-          style={{ width: "calc(100% - 3.5rem)" }}
+          style={{
+            // prettier-ignore
+            width: `calc(100% - ${isParentScrolling && portalPosition?.position === "right" ? "5.75rem" : "3.5rem"})`,
+          }}
           onMouseEnter={handleHoverScrollUp}
         ></div>
       )}
@@ -234,10 +246,15 @@ export default function SelectionPanel({
         {scrollingAvailable && (
           <div
             className={`absolute top-4 pointer-events-none z-[999999999999999] ${
-              portalPosition?.position === "right" ? "left-6" : "left-1"
+              portalPosition?.position === "right"
+                ? isParentScrolling
+                  ? "left-[3.6875rem]"
+                  : "left-6"
+                : "left-1"
             }`}
             style={{
-              width: "calc(100% - 3.5rem)",
+              // prettier-ignore
+              width: `calc(100% - ${isParentScrolling && portalPosition?.position === "right" ? "5.75rem" : "3.5rem"})`,
               height: "calc(100% - 2rem)",
               // prettier-ignore
               boxShadow: "inset 0px 10px 8px -4px rgba(255, 255, 255, 1), inset 0px -10px 8px -4px rgba(255, 255, 255, 1)",
@@ -261,17 +278,22 @@ export default function SelectionPanel({
       {scrollingAvailable && (
         <div
           ref={scrollDownButtonRef}
-          className={`absolute bottom-0 h-4 z-[999999999999999] ${
-            portalPosition?.position === "right" ? "left-4" : "left-0"
+          className={`absolute bottom-0 h-4 z-[999999999999999] bg-purple-500 ${
+            portalPosition?.position === "right"
+              ? isParentScrolling
+                ? "left-[3.1875rem]"
+                : "left-4"
+              : "left-0"
           }`}
           style={{
-            width: "calc(100% - 3.5rem)",
+            // prettier-ignore
+            width: `calc(100% - ${isParentScrolling && portalPosition?.position === "right" ? "5.75rem" : "3.5rem"})`,
           }}
           onMouseEnter={handleHoverScrollDown}
         ></div>
       )}
       {portalPosition?.position === "left" && (
-        <div className='flex flex-col'>
+        <div className='flex flex-col bg-blue-500'>
           <div className='w-4 grow'></div>
         </div>
       )}

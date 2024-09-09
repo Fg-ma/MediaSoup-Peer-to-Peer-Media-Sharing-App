@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
 import SelectionPanel from "./lib/SelectionPanel";
-import { AnimatePresence } from "framer-motion";
 
 export type RecursiveSelections = {
   value: string;
@@ -72,6 +71,7 @@ export default function FgSelectionButton({
               previousPanels={previousPanels}
               position='right'
               selections={selections}
+              isParentScrolling={false}
               externalRef={buttonRef}
             />
           )}

@@ -5,11 +5,13 @@ import SelectionPanel from "./SelectionPanel";
 export default function ExpandingSelectionPanelButton({
   panelRefs,
   previousPanels,
+  isParentScrolling,
   content,
   selections,
 }: {
   panelRefs: React.MutableRefObject<React.RefObject<HTMLDivElement>[]>;
   previousPanels: React.MutableRefObject<string[]>;
+  isParentScrolling: boolean;
   content: string;
   selections: RecursiveSelections;
 }) {
@@ -70,6 +72,7 @@ export default function ExpandingSelectionPanelButton({
           previousPanels={previousPanels}
           position='right'
           selections={selections}
+          isParentScrolling={isParentScrolling}
           externalRef={buttonRef}
           externalPanelRef={panelRef}
           onRendered={() => {
