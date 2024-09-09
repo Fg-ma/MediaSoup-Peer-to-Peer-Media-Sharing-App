@@ -105,7 +105,11 @@ export default function SelectionPanel({
 
   useEffect(() => {
     getStaticPanelPosition();
-  }, [panelElements]);
+  }, [
+    panelElements,
+    externalPanelRef?.current?.clientWidth,
+    panelRef.current?.clientWidth,
+  ]);
 
   const getStaticPanelPosition = () => {
     const externalRect = externalRef?.current?.getBoundingClientRect();
