@@ -9,6 +9,9 @@ export const defaultAudioStreamEffects = {
   alien: false,
   underwater: false,
   telephone: false,
+  space: false,
+  distortion: false,
+  vintage: false,
 };
 
 export const defaultCameraStreamEffects = {
@@ -45,7 +48,10 @@ export type AudioEffectTypes =
   | "echo"
   | "alien"
   | "underwater"
-  | "telephone";
+  | "telephone"
+  | "space"
+  | "distortion"
+  | "vintage";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;

@@ -10,16 +10,171 @@ import panioIcon from "../../../public/svgs/audio/panioIcon.svg";
 import panioOffIcon from "../../../public/svgs/audio/panioOffIcon.svg";
 import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
-import RobotEffect from "./RobotEffect";
-import EchoEffect from "./EchoEffect";
-import AlienEffect from "./AlienEffect";
-import UnderwaterEffect from "./UnderwaterEffect";
-import TelephoneEffect from "./TelephoneEffect";
+import AudioEffectButton from "./AudioEffectButton";
+
+import robotIcon from "../../../public/svgs/audio/robotIcon.svg";
+import robotOffIcon from "../../../public/svgs/audio/robotOffIcon.svg";
+import echoIcon from "../../../public/svgs/audio/echoIcon.svg";
+import echoOffIcon from "../../../public/svgs/audio/echoOffIcon.svg";
+import alienIcon from "../../../public/svgs/audio/alienIcon.svg";
+import alienOffIcon from "../../../public/svgs/audio/alienOffIcon.svg";
+import underwaterIcon from "../../../public/svgs/audio/underwaterIcon.svg";
+import underwaterOffIcon from "../../../public/svgs/audio/underwaterOffIcon.svg";
+import telephoneIcon from "../../../public/svgs/audio/telephoneIcon.svg";
+import telephoneOffIcon from "../../../public/svgs/audio/telephoneOffIcon.svg";
+import spaceIcon from "../../../public/svgs/audio/spaceIcon.svg";
+import spaceOffIcon from "../../../public/svgs/audio/spaceOffIcon.svg";
+import distortionIcon from "../../../public/svgs/audio/distortionIcon.svg";
+import distortionOffIcon from "../../../public/svgs/audio/distortionOffIcon.svg";
+import vintageIcon from "../../../public/svgs/audio/vintageIcon.svg";
+import VintageOffIcon from "../../../public/svgs/audio/vintageOffIcon.svg";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
 );
 const FgPiano = React.lazy(() => import("../../FgPanio/FgPiano"));
+
+export type AudioEffectTemplate = {
+  icon: string;
+  offIcon: string;
+  attributes: {
+    key: string;
+    value: string;
+    activityDependentValue?: {
+      active: string;
+      deactive: string;
+    };
+    id?: string;
+  }[];
+  hoverContent: {
+    active: string;
+    deactive: string;
+  };
+};
+
+export type AudioEffectTemplates = {
+  [audioEffectType in AudioEffectTypes]: AudioEffectTemplate;
+};
+
+const audioEffectTemplates: AudioEffectTemplates = {
+  robot: {
+    icon: robotIcon,
+    offIcon: robotOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+      {
+        key: "fill",
+        id: "eyes",
+        value: "red",
+        activityDependentValue: { active: "", deactive: "red" },
+      },
+    ],
+    hoverContent: { active: "Robot effect", deactive: "Remove robot effect" },
+  },
+  echo: {
+    icon: echoIcon,
+    offIcon: echoOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "stroke", value: "white" },
+      {
+        key: "fill",
+        value: "white",
+        activityDependentValue: { active: "none", deactive: "white" },
+      },
+    ],
+    hoverContent: { active: "Echo effect", deactive: "Remove echo effect" },
+  },
+  alien: {
+    icon: alienIcon,
+    offIcon: alienOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: { active: "Alien effect", deactive: "Remove alien effect" },
+  },
+  underwater: {
+    icon: underwaterIcon,
+    offIcon: underwaterOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "Underwater effect",
+      deactive: "Remove underwater effect",
+    },
+  },
+  telephone: {
+    icon: telephoneIcon,
+    offIcon: telephoneOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "Telephone effect",
+      deactive: "Remove telephone effect",
+    },
+  },
+  space: {
+    icon: spaceIcon,
+    offIcon: spaceOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "Space effect",
+      deactive: "Remove space effect",
+    },
+  },
+  distortion: {
+    icon: distortionIcon,
+    offIcon: distortionOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "Distortion effect",
+      deactive: "Remove distortion effect",
+    },
+  },
+  vintage: {
+    icon: vintageIcon,
+    offIcon: VintageOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+      {
+        key: "fill",
+        id: "center",
+        value: "#f56114",
+        activityDependentValue: { active: "none", deactive: "#f56114" },
+      },
+    ],
+    hoverContent: {
+      active: "Vintage effect",
+      deactive: "Remove vintage effect",
+    },
+  },
+};
 
 export default function AudioEffectsSection({
   socket,
@@ -113,7 +268,7 @@ export default function AudioEffectsSection({
         content={
           <div
             ref={audioSectionRef}
-            className={`grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto ${
+            className={`smallScrollbar grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto py-2 ${
               cols === 3
                 ? "grid-cols-3"
                 : cols === 4
@@ -124,6 +279,7 @@ export default function AudioEffectsSection({
             }`}
           >
             <FgButton
+              scrollingContainerRef={audioSectionRef}
               className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
                 setVolumeState((prev) => ({
@@ -162,6 +318,7 @@ export default function AudioEffectsSection({
               options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
+              scrollingContainerRef={audioSectionRef}
               externalRef={audioMixEffectsButtonRef}
               className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
@@ -193,6 +350,7 @@ export default function AudioEffectsSection({
               options={{ hoverTimeoutDuration: 350 }}
             />
             <FgButton
+              scrollingContainerRef={audioSectionRef}
               externalRef={pianoRef}
               className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
@@ -219,36 +377,19 @@ export default function AudioEffectsSection({
               }
               options={{ hoverTimeoutDuration: 350 }}
             />
-            <RobotEffect
-              username={username}
-              instance={instance}
-              isUser={isUser}
-              handleAudioEffectChange={handleAudioEffectChange}
-            />
-            <EchoEffect
-              username={username}
-              instance={instance}
-              isUser={isUser}
-              handleAudioEffectChange={handleAudioEffectChange}
-            />
-            <AlienEffect
-              username={username}
-              instance={instance}
-              isUser={isUser}
-              handleAudioEffectChange={handleAudioEffectChange}
-            />
-            <UnderwaterEffect
-              username={username}
-              instance={instance}
-              isUser={isUser}
-              handleAudioEffectChange={handleAudioEffectChange}
-            />
-            <TelephoneEffect
-              username={username}
-              instance={instance}
-              isUser={isUser}
-              handleAudioEffectChange={handleAudioEffectChange}
-            />
+            {Object.entries(audioEffectTemplates).map((effect) => {
+              return (
+                <AudioEffectButton
+                  username={username}
+                  instance={instance}
+                  isUser={isUser}
+                  audioEffect={effect[0] as AudioEffectTypes}
+                  audioEffectTemplate={effect[1]}
+                  scrollingContainerRef={audioSectionRef}
+                  handleAudioEffectChange={handleAudioEffectChange}
+                />
+              );
+            })}
           </div>
         }
         initPosition={{
@@ -256,15 +397,16 @@ export default function AudioEffectsSection({
           placement: placement,
           padding: padding,
         }}
-        initWidth={176}
-        initHeight={176}
-        minWidth={176}
-        minHeight={176}
+        initWidth={"204px"}
+        initHeight={"190px"}
+        minWidth={204}
+        minHeight={190}
         resizeCallback={() => {
           gridColumnsChange();
         }}
         closeCallback={closeCallback ? () => closeCallback() : undefined}
         closePosition='topRight'
+        shadow={{ top: true, bottom: true }}
       />
       {audioMixEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>

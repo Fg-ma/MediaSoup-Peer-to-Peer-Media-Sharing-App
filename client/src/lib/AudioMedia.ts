@@ -281,6 +281,79 @@ class AudioMedia {
           },
         ]);
         break;
+      case "space":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 8 },
+              { option: "preDelay", value: 0.5 },
+            ],
+          },
+          {
+            type: "feedbackDelay",
+            updates: [
+              { option: "delayTime", value: 0.8 },
+              { option: "feedback", value: 0.7 },
+            ],
+          },
+          {
+            type: "chorus",
+            updates: [
+              { option: "frequency", value: 1.2 },
+              { option: "depth", value: 0.6 },
+            ],
+          },
+          {
+            type: "stereoWidener",
+            updates: [{ option: "width", value: 0.9 }],
+          },
+        ]);
+        break;
+      case "distortion":
+        this.audioEffects?.updateEffects([
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 1 },
+              { option: "oversample", value: 4 },
+            ],
+          },
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 3 }],
+          },
+          {
+            type: "chebyshev",
+            updates: [{ option: "order", value: 50 }],
+          },
+        ]);
+        break;
+      case "vintage":
+        this.audioEffects?.updateEffects([
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 6 }],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 4 },
+              { option: "preDelay", value: 0.3 },
+            ],
+          },
+          {
+            type: "EQ",
+            updates: [
+              { option: "low", value: -8 },
+              { option: "mid", value: 5 },
+              { option: "high", value: -6 },
+            ],
+          },
+        ]);
+        break;
+      default:
+        break;
     }
   }
 

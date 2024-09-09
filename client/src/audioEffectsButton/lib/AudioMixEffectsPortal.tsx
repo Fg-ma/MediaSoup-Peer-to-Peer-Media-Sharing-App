@@ -1156,8 +1156,8 @@ export default function AudioMixEffectsPortal({
         placement: "below",
         padding: 12,
       }}
-      initWidth={600}
-      initHeight={384}
+      initWidth={"600px"}
+      initHeight={"384px"}
       minWidth={340}
       minHeight={350}
       resizeCallback={() => {

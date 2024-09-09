@@ -45,7 +45,7 @@ export default function ScrollingContainer({
     },
   },
 }: {
-  externalRef: React.RefObject<HTMLDivElement>;
+  externalRef?: React.RefObject<HTMLDivElement>;
   content: ReactNode;
   buttonBackgroundColor?: string;
   buttonBackgroundColorTransition?: Transition;
@@ -142,7 +142,7 @@ export default function ScrollingContainer({
             animate={{
               ...scrollButtonsVar.leftAnimate,
               backgroundColor: buttonBackgroundColor,
-              boxShadow: externalRef.current
+              boxShadow: externalRef?.current
                 ? // prettier-ignore
                   `${-externalRef.current.clientHeight / 3}px 0 ${externalRef.current.clientHeight / 4}px ${externalRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
                 : scrollingContainerRef.current
@@ -196,7 +196,7 @@ export default function ScrollingContainer({
             animate={{
               ...scrollButtonsVar.rightAnimate,
               backgroundColor: buttonBackgroundColor,
-              boxShadow: externalRef.current
+              boxShadow: externalRef?.current
                 ? // prettier-ignore
                   `${externalRef.current.clientHeight / 3}px 0 ${externalRef.current.clientHeight / 4}px ${externalRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
                 : scrollingContainerRef.current
