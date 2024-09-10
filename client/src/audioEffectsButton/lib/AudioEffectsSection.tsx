@@ -174,6 +174,76 @@ const audioEffectTemplates: AudioEffectTemplates = {
       deactive: "Remove vintage effect",
     },
   },
+  psychedelic: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "Psychedelic effect",
+      deactive: "Remove psychedelic effect",
+    },
+  },
+  deepBass: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "Deep bass effect",
+      deactive: "Remove deep bass effect",
+    },
+  },
+  highEnergy: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "High energy effect",
+      deactive: "Remove high energy effect",
+    },
+  },
+  ambient: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "Ambient effect",
+      deactive: "Remove ambient effect",
+    },
+  },
+  glitch: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
+    ],
+    hoverContent: {
+      active: "Glitch effect",
+      deactive: "Remove glitch effect",
+    },
+  },
 };
 
 export default function AudioEffectsSection({

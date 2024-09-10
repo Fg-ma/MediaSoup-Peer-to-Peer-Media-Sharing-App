@@ -136,7 +136,11 @@ export default function FgPiano({
             setSamplerEffectsActive={setSamplerEffectsActive}
           />
           {samplerEffectsActive && <SamplerEffectsToolbar focus={focus} />}
-          <KeyVisualizer />
+          <KeyVisualizer
+            visibleOctaveRef={visibleOctaveRef}
+            shiftPressed={shiftPressed}
+            controlPressed={controlPressed}
+          />
           <ScaleSection
             externalRef={scaleSectionRef}
             playNote={fgPianoController.playNote}

@@ -12,6 +12,11 @@ export const defaultAudioStreamEffects = {
   space: false,
   distortion: false,
   vintage: false,
+  psychedelic: false,
+  deepBass: false,
+  highEnergy: false,
+  ambient: false,
+  glitch: false,
 };
 
 export const defaultCameraStreamEffects = {
@@ -51,7 +56,12 @@ export type AudioEffectTypes =
   | "telephone"
   | "space"
   | "distortion"
-  | "vintage";
+  | "vintage"
+  | "psychedelic"
+  | "deepBass"
+  | "highEnergy"
+  | "ambient"
+  | "glitch";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;

@@ -352,6 +352,143 @@ class AudioMedia {
           },
         ]);
         break;
+      case "psychedelic":
+        this.audioEffects?.updateEffects([
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.5 },
+              { option: "baseFrequency", value: 800 },
+              { option: "octaves", value: 4 },
+            ],
+          },
+          {
+            type: "chorus",
+            updates: [
+              { option: "frequency", value: 4 },
+              { option: "depth", value: 0.8 },
+            ],
+          },
+          {
+            type: "vibrato",
+            updates: [
+              { option: "frequency", value: 5 },
+              { option: "depth", value: 0.9 },
+            ],
+          },
+          {
+            type: "pingPongDelay",
+            updates: [
+              { option: "delayTime", value: 0.3 },
+              { option: "feedback", value: 0.6 },
+            ],
+          },
+        ]);
+        break;
+      case "deepBass":
+        this.audioEffects?.updateEffects([
+          {
+            type: "EQ",
+            updates: [
+              { option: "low", value: 10 },
+              { option: "mid", value: -6 },
+              { option: "high", value: -12 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 6 },
+              { option: "preDelay", value: 0.4 },
+            ],
+          },
+          {
+            type: "stereoWidener",
+            updates: [{ option: "width", value: 0.5 }],
+          },
+        ]);
+        break;
+      case "highEnergy":
+        this.audioEffects?.updateEffects([
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.9 },
+              { option: "oversample", value: 4 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 5 },
+              { option: "preDelay", value: 0.3 },
+            ],
+          },
+          {
+            type: "autoWah",
+            updates: [
+              { option: "baseFrequency", value: 1000 },
+              { option: "octaves", value: 3 },
+              { option: "sensitivity", value: -20 },
+            ],
+          },
+        ]);
+        break;
+      case "ambient":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 8 },
+              { option: "preDelay", value: 0.6 },
+            ],
+          },
+          {
+            type: "feedbackDelay",
+            updates: [
+              { option: "delayTime", value: 0.6 },
+              { option: "feedback", value: 0.5 },
+            ],
+          },
+          {
+            type: "freeverb",
+            updates: [
+              { option: "roomSize", value: 0.8 },
+              { option: "dampening", value: 6000 },
+            ],
+          },
+          {
+            type: "stereoWidener",
+            updates: [{ option: "width", value: 0.8 }],
+          },
+        ]);
+        break;
+      case "glitch":
+        this.audioEffects?.updateEffects([
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 2 }],
+          },
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.7 },
+              { option: "oversample", value: 2 },
+            ],
+          },
+          {
+            type: "feedbackDelay",
+            updates: [
+              { option: "delayTime", value: 0.05 },
+              { option: "feedback", value: 0.3 },
+            ],
+          },
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: 3 }],
+          },
+        ]);
+        break;
       default:
         break;
     }
@@ -379,6 +516,56 @@ class AudioMedia {
         break;
       case "telephone":
         this.audioEffects?.removeEffects(["EQ", "distortion", "bitCrusher"]);
+        break;
+      case "space":
+        this.audioEffects?.removeEffects([
+          "reverb",
+          "feedbackDelay",
+          "chorus",
+          "stereoWidener",
+        ]);
+        break;
+      case "distortion":
+        this.audioEffects?.removeEffects([
+          "distortion",
+          "bitCrusher",
+          "chebyshev",
+        ]);
+        break;
+      case "vintage":
+        this.audioEffects?.removeEffects(["bitCrusher", "reverb", "EQ"]);
+        break;
+      case "psychedelic":
+        this.audioEffects?.removeEffects([
+          "autoFilter",
+          "chorus",
+          "vibrato",
+          "pingPongDelay",
+        ]);
+        break;
+      case "deepBass":
+        this.audioEffects?.removeEffects(["EQ", "reverb", "stereoWidener"]);
+        break;
+      case "highEnergy":
+        this.audioEffects?.removeEffects(["distortion", "reverb", "autoWah"]);
+        break;
+      case "ambient":
+        this.audioEffects?.removeEffects([
+          "reverb",
+          "feedbackDelay",
+          "freeverb",
+          "stereoWidener",
+        ]);
+        break;
+      case "glitch":
+        this.audioEffects?.removeEffects([
+          "bitCrusher",
+          "distortion",
+          "feedbackDelay",
+          "pitchShift",
+        ]);
+        break;
+      default:
         break;
     }
   }
