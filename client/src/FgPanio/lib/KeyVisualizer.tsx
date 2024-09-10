@@ -369,8 +369,6 @@ export default function KeyVisualizer({
     }, 10);
   }, []);
 
-  console.log(keyPresses);
-
   return (
     <div className='w-full h-20 bg-gray-200 relative overflow-hidden'>
       {Object.entries(keyPresses).map(

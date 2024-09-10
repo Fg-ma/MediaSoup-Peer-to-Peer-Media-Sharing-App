@@ -17,6 +17,19 @@ export const defaultAudioStreamEffects = {
   highEnergy: false,
   ambient: false,
   glitch: false,
+  muffled: false,
+  crystal: false,
+  heavyMetal: false,
+  dreamy: false,
+  horror: false,
+  sciFi: false,
+  dystopian: false,
+  retroGame: false,
+  ghostly: false,
+  metallic: false,
+  hypnotic: false,
+  cyberpunk: false,
+  windy: false,
 };
 
 export const defaultCameraStreamEffects = {
@@ -61,7 +74,20 @@ export type AudioEffectTypes =
   | "deepBass"
   | "highEnergy"
   | "ambient"
-  | "glitch";
+  | "glitch"
+  | "muffled"
+  | "crystal"
+  | "heavyMetal"
+  | "dreamy"
+  | "horror"
+  | "sciFi"
+  | "dystopian"
+  | "retroGame"
+  | "ghostly"
+  | "metallic"
+  | "hypnotic"
+  | "cyberpunk"
+  | "windy";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;

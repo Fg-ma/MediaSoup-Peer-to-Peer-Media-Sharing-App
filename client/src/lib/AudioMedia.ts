@@ -489,6 +489,345 @@ class AudioMedia {
           },
         ]);
         break;
+      case "muffled":
+        this.audioEffects?.updateEffects([
+          {
+            type: "EQ",
+            updates: [
+              { option: "high", value: -24 },
+              { option: "mid", value: -6 },
+              { option: "low", value: 0 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 2 },
+              { option: "preDelay", value: 0.1 },
+            ],
+          },
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.1 },
+              { option: "baseFrequency", value: 300 },
+            ],
+          },
+        ]);
+        break;
+      case "crystal":
+        this.audioEffects?.updateEffects([
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: 7 }],
+          },
+          {
+            type: "chorus",
+            updates: [
+              { option: "frequency", value: 3 },
+              { option: "depth", value: 0.7 },
+            ],
+          },
+          {
+            type: "feedbackDelay",
+            updates: [
+              { option: "delayTime", value: 0.5 },
+              { option: "feedback", value: 0.6 },
+            ],
+          },
+          {
+            type: "autoWah",
+            updates: [
+              { option: "baseFrequency", value: 600 },
+              { option: "octaves", value: 4 },
+            ],
+          },
+        ]);
+        break;
+      case "heavyMetal":
+        this.audioEffects?.updateEffects([
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 1 },
+              { option: "oversample", value: 4 },
+            ],
+          },
+          {
+            type: "EQ",
+            updates: [
+              { option: "low", value: 10 },
+              { option: "mid", value: 4 },
+              { option: "high", value: -6 },
+            ],
+          },
+          {
+            type: "chebyshev",
+            updates: [{ option: "order", value: 50 }],
+          },
+        ]);
+        break;
+      case "dreamy":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 8 },
+              { option: "preDelay", value: 0.6 },
+            ],
+          },
+          {
+            type: "stereoWidener",
+            updates: [{ option: "width", value: 0.9 }],
+          },
+          {
+            type: "vibrato",
+            updates: [
+              { option: "frequency", value: 3 },
+              { option: "depth", value: 0.5 },
+            ],
+          },
+          {
+            type: "chorus",
+            updates: [
+              { option: "frequency", value: 1.5 },
+              { option: "depth", value: 0.5 },
+            ],
+          },
+        ]);
+        break;
+      case "horror":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 9 },
+              { option: "preDelay", value: 0.8 },
+            ],
+          },
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: -12 }],
+          },
+          {
+            type: "phaser",
+            updates: [
+              { option: "frequency", value: 5 },
+              { option: "octaves", value: 3 },
+              { option: "baseFrequency", value: 400 },
+            ],
+          },
+        ]);
+        break;
+      case "sciFi":
+        this.audioEffects?.updateEffects([
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.5 },
+              { option: "baseFrequency", value: 600 },
+              { option: "octaves", value: 3 },
+            ],
+          },
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: 5 }],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 6 },
+              { option: "preDelay", value: 0.4 },
+            ],
+          },
+          {
+            type: "stereoWidener",
+            updates: [{ option: "width", value: 0.8 }],
+          },
+        ]);
+        break;
+      case "dystopian":
+        this.audioEffects?.updateEffects([
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.9 },
+              { option: "oversample", value: 4 },
+            ],
+          },
+          {
+            type: "phaser",
+            updates: [
+              { option: "frequency", value: 4 },
+              { option: "octaves", value: 2 },
+              { option: "baseFrequency", value: 500 },
+            ],
+          },
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 3 }],
+          },
+        ]);
+        break;
+      case "retroGame":
+        this.audioEffects?.updateEffects([
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 2 }],
+          },
+          {
+            type: "feedbackDelay",
+            updates: [
+              { option: "delayTime", value: 0.1 },
+              { option: "feedback", value: 0.6 },
+            ],
+          },
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.5 },
+              { option: "oversample", value: 2 },
+            ],
+          },
+          {
+            type: "autoPanner",
+            updates: [{ option: "frequency", value: 3 }],
+          },
+        ]);
+        break;
+      case "ghostly":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 9 },
+              { option: "preDelay", value: 0.7 },
+            ],
+          },
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: -4 }],
+          },
+          {
+            type: "vibrato",
+            updates: [
+              { option: "frequency", value: 2 },
+              { option: "depth", value: 0.5 },
+            ],
+          },
+          {
+            type: "tremolo",
+            updates: [
+              { option: "frequency", value: 1 },
+              { option: "depth", value: 0.7 },
+            ],
+          },
+        ]);
+        break;
+      case "metallic":
+        this.audioEffects?.updateEffects([
+          {
+            type: "phaser",
+            updates: [
+              { option: "frequency", value: 8 },
+              { option: "octaves", value: 3 },
+              { option: "baseFrequency", value: 1000 },
+            ],
+          },
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.6 },
+              { option: "oversample", value: 2 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 5 },
+              { option: "preDelay", value: 0.3 },
+            ],
+          },
+          {
+            type: "chebyshev",
+            updates: [{ option: "order", value: 30 }],
+          },
+        ]);
+        break;
+      case "hypnotic":
+        this.audioEffects?.updateEffects([
+          {
+            type: "tremolo",
+            updates: [
+              { option: "frequency", value: 4 },
+              { option: "depth", value: 0.8 },
+            ],
+          },
+          {
+            type: "feedbackDelay",
+            updates: [
+              { option: "delayTime", value: 0.4 },
+              { option: "feedback", value: 0.6 },
+            ],
+          },
+          {
+            type: "chorus",
+            updates: [
+              { option: "frequency", value: 1.5 },
+              { option: "depth", value: 0.5 },
+            ],
+          },
+        ]);
+        break;
+      case "cyberpunk":
+        this.audioEffects?.updateEffects([
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.9 },
+              { option: "oversample", value: 4 },
+            ],
+          },
+          {
+            type: "autoWah",
+            updates: [
+              { option: "baseFrequency", value: 1000 },
+              { option: "octaves", value: 3 },
+              { option: "sensitivity", value: -20 },
+            ],
+          },
+          {
+            type: "stereoWidener",
+            updates: [{ option: "width", value: 0.9 }],
+          },
+        ]);
+        break;
+      case "windy":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 7 },
+              { option: "preDelay", value: 0.4 },
+            ],
+          },
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.3 },
+              { option: "baseFrequency", value: 300 },
+              { option: "octaves", value: 2 },
+            ],
+          },
+          {
+            type: "vibrato",
+            updates: [
+              { option: "frequency", value: 2 },
+              { option: "depth", value: 0.4 },
+            ],
+          },
+        ]);
+        break;
       default:
         break;
     }
@@ -564,6 +903,87 @@ class AudioMedia {
           "feedbackDelay",
           "pitchShift",
         ]);
+        break;
+      case "muffled":
+        this.audioEffects?.removeEffects(["EQ", "reverb", "autoFilter"]);
+        break;
+      case "crystal":
+        this.audioEffects?.removeEffects([
+          "pitchShift",
+          "chorus",
+          "feedbackDelay",
+          "autoWah",
+        ]);
+        break;
+      case "heavyMetal":
+        this.audioEffects?.removeEffects(["distortion", "EQ", "chebyshev"]);
+        break;
+      case "dreamy":
+        this.audioEffects?.removeEffects([
+          "reverb",
+          "stereoWidener",
+          "vibrato",
+          "chorus",
+        ]);
+        break;
+      case "horror":
+        this.audioEffects?.removeEffects(["reverb", "pitchShift", "phaser"]);
+        break;
+      case "sciFi":
+        this.audioEffects?.removeEffects([
+          "autoFilter",
+          "pitchShift",
+          "reverb",
+          "stereoWidener",
+        ]);
+        break;
+      case "dystopian":
+        this.audioEffects?.removeEffects([
+          "distortion",
+          "phaser",
+          "bitCrusher",
+        ]);
+        break;
+      case "retroGame":
+        this.audioEffects?.removeEffects([
+          "bitCrusher",
+          "feedbackDelay",
+          "distortion",
+          "autoPanner",
+        ]);
+        break;
+      case "ghostly":
+        this.audioEffects?.removeEffects([
+          "reverb",
+          "pitchShift",
+          "vibrato",
+          "tremolo",
+        ]);
+        break;
+      case "metallic":
+        this.audioEffects?.removeEffects([
+          "phaser",
+          "distortion",
+          "reverb",
+          "chebyshev",
+        ]);
+        break;
+      case "hypnotic":
+        this.audioEffects?.removeEffects([
+          "tremolo",
+          "feedbackDelay",
+          "chorus",
+        ]);
+        break;
+      case "cyberpunk":
+        this.audioEffects?.removeEffects([
+          "distortion",
+          "autoWah",
+          "stereoWidener",
+        ]);
+        break;
+      case "windy":
+        this.audioEffects?.removeEffects(["reverb", "autoFilter", "vibrato"]);
         break;
       default:
         break;

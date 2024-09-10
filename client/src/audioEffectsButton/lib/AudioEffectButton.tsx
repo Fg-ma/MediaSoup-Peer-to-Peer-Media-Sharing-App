@@ -42,7 +42,7 @@ export default function AudioEffectButton({
           ? streamEffects
             ? attribute.activityDependentValue.deactive
             : attribute.activityDependentValue.active
-          : audioEffectTemplate.attributes[i].value,
+          : attribute.value,
     });
   }
 

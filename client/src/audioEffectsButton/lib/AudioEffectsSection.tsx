@@ -27,7 +27,17 @@ import spaceOffIcon from "../../../public/svgs/audio/spaceOffIcon.svg";
 import distortionIcon from "../../../public/svgs/audio/distortionIcon.svg";
 import distortionOffIcon from "../../../public/svgs/audio/distortionOffIcon.svg";
 import vintageIcon from "../../../public/svgs/audio/vintageIcon.svg";
-import VintageOffIcon from "../../../public/svgs/audio/vintageOffIcon.svg";
+import vintageOffIcon from "../../../public/svgs/audio/vintageOffIcon.svg";
+import psychedelicIcon from "../../../public/svgs/audio/psychedelicIcon.svg";
+import psychedelicOffIcon from "../../../public/svgs/audio/psychedelicOffIcon.svg";
+import deepBassIcon from "../../../public/svgs/audio/deepBassIcon.svg";
+import deepBassOffIcon from "../../../public/svgs/audio/deepBassOffIcon.svg";
+import highEnergyIcon from "../../../public/svgs/audio/highEnergyIcon.svg";
+import highEnergyOffIcon from "../../../public/svgs/audio/highEnergyOffIcon.svg";
+import ambientIcon from "../../../public/svgs/audio/ambientIcon.svg";
+import ambientOffIcon from "../../../public/svgs/audio/ambientOffIcon.svg";
+import glitchIcon from "../../../public/svgs/audio/glitchIcon.svg";
+import glitchOffIcon from "../../../public/svgs/audio/glitchOffIcon.svg";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
@@ -156,7 +166,7 @@ const audioEffectTemplates: AudioEffectTemplates = {
   },
   vintage: {
     icon: vintageIcon,
-    offIcon: VintageOffIcon,
+    offIcon: vintageOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -175,13 +185,11 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   psychedelic: {
-    icon: "",
-    offIcon: "",
+    icon: psychedelicIcon,
+    offIcon: psychedelicOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Psychedelic effect",
@@ -189,13 +197,18 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   deepBass: {
-    icon: "",
-    offIcon: "",
+    icon: deepBassIcon,
+    offIcon: deepBassOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
       { key: "stroke", value: "white" },
+      {
+        id: "innerEllipse",
+        key: "fill",
+        value: "white",
+        activityDependentValue: { active: "white", deactive: "white" },
+      },
     ],
     hoverContent: {
       active: "Deep bass effect",
@@ -203,8 +216,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   highEnergy: {
-    icon: "",
-    offIcon: "",
+    icon: highEnergyIcon,
+    offIcon: highEnergyOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -217,8 +230,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   ambient: {
-    icon: "",
-    offIcon: "",
+    icon: ambientIcon,
+    offIcon: ambientOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -231,17 +244,171 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   glitch: {
+    icon: glitchIcon,
+    offIcon: glitchOffIcon,
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Glitch effect",
+      deactive: "Remove glitch effect",
+    },
+  },
+  muffled: {
     icon: "",
     offIcon: "",
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
     ],
     hoverContent: {
-      active: "Glitch effect",
-      deactive: "Remove glitch effect",
+      active: "Muffled effect",
+      deactive: "Remove muffled effect",
+    },
+  },
+  crystal: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Crystal effect",
+      deactive: "Remove crystal effect",
+    },
+  },
+  heavyMetal: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Heavy metal effect",
+      deactive: "Remove heavy metal effect",
+    },
+  },
+  dreamy: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Dreamy effect",
+      deactive: "Remove dreamy effect",
+    },
+  },
+  horror: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Horror effect",
+      deactive: "Remove horror effect",
+    },
+  },
+  sciFi: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Sci-fi effect",
+      deactive: "Remove sci-fi effect",
+    },
+  },
+  dystopian: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Dystopian effect",
+      deactive: "Remove dystopian effect",
+    },
+  },
+  retroGame: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Retro game effect",
+      deactive: "Remove retro game effect",
+    },
+  },
+  ghostly: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Ghostly effect",
+      deactive: "Remove ghostly effect",
+    },
+  },
+  metallic: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Metallic effect",
+      deactive: "Remove metallic effect",
+    },
+  },
+  hypnotic: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Hypnotic effect",
+      deactive: "Remove hypnotic effect",
+    },
+  },
+  cyberpunk: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Cyberpunk effect",
+      deactive: "Remove cyberpunk effect",
+    },
+  },
+  windy: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Windy effect",
+      deactive: "Remove windy effect",
     },
   },
 };
@@ -450,6 +617,7 @@ export default function AudioEffectsSection({
             {Object.entries(audioEffectTemplates).map((effect) => {
               return (
                 <AudioEffectButton
+                  key={effect[0]}
                   username={username}
                   instance={instance}
                   isUser={isUser}
