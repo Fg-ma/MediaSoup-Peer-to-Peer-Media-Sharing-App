@@ -30,6 +30,21 @@ export const defaultAudioStreamEffects = {
   hypnotic: false,
   cyberpunk: false,
   windy: false,
+  radio: false,
+  explosion: false,
+  whisper: false,
+  submarine: false,
+  windTunnel: false,
+  crushedBass: false,
+  ethereal: false,
+  electroSting: false,
+  heartbeat: false,
+  underworld: false,
+  sizzling: false,
+  staticNoise: false,
+  bubbly: false,
+  thunder: false,
+  echosOfThePast: false,
 };
 
 export const defaultCameraStreamEffects = {
@@ -87,7 +102,22 @@ export type AudioEffectTypes =
   | "metallic"
   | "hypnotic"
   | "cyberpunk"
-  | "windy";
+  | "windy"
+  | "radio"
+  | "explosion"
+  | "whisper"
+  | "submarine"
+  | "windTunnel"
+  | "crushedBass"
+  | "ethereal"
+  | "electroSting"
+  | "heartbeat"
+  | "underworld"
+  | "sizzling"
+  | "staticNoise"
+  | "bubbly"
+  | "thunder"
+  | "echosOfThePast";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;

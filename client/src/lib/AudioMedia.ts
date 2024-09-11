@@ -828,6 +828,348 @@ class AudioMedia {
           },
         ]);
         break;
+      case "radio":
+        this.audioEffects?.updateEffects([
+          {
+            type: "EQ",
+            updates: [
+              { option: "low", value: -18 },
+              { option: "mid", value: -9 },
+              { option: "high", value: -6 },
+            ],
+          },
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.4 },
+              { option: "oversample", value: 2 },
+            ],
+          },
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.4 },
+              { option: "baseFrequency", value: 550 },
+              { option: "octaves", value: 1 },
+            ],
+          },
+        ]);
+        break;
+      case "explosion":
+        this.audioEffects?.updateEffects([
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 1 },
+              { option: "oversample", value: 4 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 10 },
+              { option: "preDelay", value: 0.7 },
+            ],
+          },
+          {
+            type: "EQ",
+            updates: [
+              { option: "low", value: 14 },
+              { option: "mid", value: -8 },
+              { option: "high", value: -15 },
+            ],
+          },
+        ]);
+        break;
+      case "whisper":
+        this.audioEffects?.updateEffects([
+          {
+            type: "EQ",
+            updates: [
+              { option: "low", value: -12 },
+              { option: "mid", value: -15 },
+              { option: "high", value: -24 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 8 },
+              { option: "preDelay", value: 0.3 },
+            ],
+          },
+          {
+            type: "stereoWidener",
+            updates: [{ option: "width", value: 0.9 }],
+          },
+        ]);
+        break;
+      case "submarine":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 5 },
+              { option: "preDelay", value: 0.4 },
+            ],
+          },
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.2 }, // Low frequency for underwater resonance
+              { option: "baseFrequency", value: 200 }, // Deep underwater resonance
+              { option: "octaves", value: 1.5 },
+            ],
+          },
+          {
+            type: "EQ",
+            updates: [{ option: "low", value: 10 }],
+          },
+        ]);
+        break;
+      case "windTunnel":
+        this.audioEffects?.updateEffects([
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.6 },
+              { option: "baseFrequency", value: 1200 },
+              { option: "octaves", value: 2.5 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 6 },
+              { option: "preDelay", value: 0.3 },
+            ],
+          },
+          {
+            type: "vibrato",
+            updates: [
+              { option: "frequency", value: 4 },
+              { option: "depth", value: 0.6 },
+            ],
+          },
+        ]);
+        break;
+      case "crushedBass":
+        this.audioEffects?.updateEffects([
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 2 }],
+          },
+          {
+            type: "EQ",
+            updates: [{ option: "low", value: 14 }],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 4 },
+              { option: "preDelay", value: 0.2 },
+            ],
+          },
+        ]);
+        break;
+      case "ethereal":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 12 },
+              { option: "preDelay", value: 0.8 },
+            ],
+          },
+          {
+            type: "stereoWidener",
+            updates: [{ option: "width", value: 1 }],
+          },
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: 7 }],
+          },
+        ]);
+        break;
+      case "electroSting":
+        this.audioEffects?.updateEffects([
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.7 },
+              { option: "baseFrequency", value: 2200 },
+              { option: "octaves", value: 4.5 },
+            ],
+          },
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.8 },
+              { option: "oversample", value: 4 },
+            ],
+          },
+        ]);
+        break;
+      case "heartbeat":
+        this.audioEffects?.updateEffects([
+          {
+            type: "tremolo",
+            updates: [
+              { option: "frequency", value: 1.2 },
+              { option: "depth", value: 0.9 },
+            ],
+          },
+          {
+            type: "EQ",
+            updates: [{ option: "low", value: 12 }],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 4 },
+              { option: "preDelay", value: 0.1 },
+            ],
+          },
+        ]);
+        break;
+      case "underworld":
+        this.audioEffects?.updateEffects([
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 9 },
+              { option: "preDelay", value: 0.6 },
+            ],
+          },
+          {
+            type: "phaser",
+            updates: [
+              { option: "frequency", value: 3.5 },
+              { option: "octaves", value: 2.5 },
+              { option: "baseFrequency", value: 250 },
+            ],
+          },
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: -5 }],
+          },
+        ]);
+        break;
+      case "sizzling":
+        this.audioEffects?.updateEffects([
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 0.6 },
+              { option: "oversample", value: 2 },
+            ],
+          },
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 3 }],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 5 },
+              { option: "preDelay", value: 0.3 },
+            ],
+          },
+        ]);
+        break;
+      case "staticNoise":
+        this.audioEffects?.updateEffects([
+          {
+            type: "bitCrusher",
+            updates: [{ option: "bits", value: 2 }],
+          },
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.8 },
+              { option: "baseFrequency", value: 500 },
+              { option: "octaves", value: 2 },
+            ],
+          },
+          {
+            type: "feedbackDelay",
+            updates: [
+              { option: "delayTime", value: 0.02 },
+              { option: "feedback", value: 0.7 },
+            ],
+          },
+        ]);
+        break;
+      case "bubbly":
+        this.audioEffects?.updateEffects([
+          {
+            type: "autoFilter",
+            updates: [
+              { option: "frequency", value: 0.5 },
+              { option: "baseFrequency", value: 250 },
+              { option: "octaves", value: 2 },
+            ],
+          },
+          {
+            type: "pingPongDelay",
+            updates: [
+              { option: "delayTime", value: 0.2 },
+              { option: "feedback", value: 0.6 },
+            ],
+          },
+          {
+            type: "chorus",
+            updates: [
+              { option: "frequency", value: 4 },
+              { option: "depth", value: 0.6 },
+            ],
+          },
+        ]);
+        break;
+      case "thunder":
+        this.audioEffects?.updateEffects([
+          {
+            type: "distortion",
+            updates: [
+              { option: "distortion", value: 1 },
+              { option: "oversample", value: 4 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 10 },
+              { option: "preDelay", value: 0.8 },
+            ],
+          },
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: -2 }],
+          },
+        ]);
+        break;
+      case "echosOfThePast":
+        this.audioEffects?.updateEffects([
+          {
+            type: "feedbackDelay",
+            updates: [
+              { option: "delayTime", value: 0.8 },
+              { option: "feedback", value: 0.7 },
+            ],
+          },
+          {
+            type: "reverb",
+            updates: [
+              { option: "decay", value: 9 },
+              { option: "preDelay", value: 0.7 },
+            ],
+          },
+          {
+            type: "pitchShift",
+            updates: [{ option: "pitch", value: -3 }],
+          },
+        ]);
+        break;
       default:
         break;
     }
@@ -984,6 +1326,75 @@ class AudioMedia {
         break;
       case "windy":
         this.audioEffects?.removeEffects(["reverb", "autoFilter", "vibrato"]);
+        break;
+      case "radio":
+        this.audioEffects?.removeEffects(["EQ", "distortion", "autoFilter"]);
+        break;
+      case "explosion":
+        this.audioEffects?.removeEffects(["distortion", "reverb", "EQ"]);
+        break;
+      case "whisper":
+        this.audioEffects?.removeEffects(["EQ", "reverb", "stereoWidener"]);
+        break;
+      case "submarine":
+        this.audioEffects?.removeEffects(["reverb", "autoFilter", "EQ"]);
+        break;
+      case "windTunnel":
+        this.audioEffects?.removeEffects(["autoFilter", "reverb", "vibrato"]);
+        break;
+      case "crushedBass":
+        this.audioEffects?.removeEffects(["bitCrusher", "EQ", "reverb"]);
+        break;
+      case "ethereal":
+        this.audioEffects?.removeEffects([
+          "reverb",
+          "stereoWidener",
+          "pitchShift",
+        ]);
+        break;
+      case "electroSting":
+        this.audioEffects?.removeEffects(["autoFilter", "distortion"]);
+        break;
+      case "heartbeat":
+        this.audioEffects?.removeEffects(["tremolo", "EQ", "reverb"]);
+        break;
+      case "underworld":
+        this.audioEffects?.removeEffects(["reverb", "phaser", "pitchShift"]);
+        break;
+      case "sizzling":
+        this.audioEffects?.removeEffects([
+          "distortion",
+          "bitCrusher",
+          "reverb",
+        ]);
+        break;
+      case "staticNoise":
+        this.audioEffects?.removeEffects([
+          "bitCrusher",
+          "autoFilter",
+          "feedbackDelay",
+        ]);
+        break;
+      case "bubbly":
+        this.audioEffects?.removeEffects([
+          "autoFilter",
+          "pingPongDelay",
+          "chorus",
+        ]);
+        break;
+      case "thunder":
+        this.audioEffects?.removeEffects([
+          "distortion",
+          "reverb",
+          "pitchShift",
+        ]);
+        break;
+      case "echosOfThePast":
+        this.audioEffects?.removeEffects([
+          "feedbackDelay",
+          "reverb",
+          "pitchShift",
+        ]);
         break;
       default:
         break;

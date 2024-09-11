@@ -448,6 +448,186 @@ const audioEffectTemplates: AudioEffectTemplates = {
       deactive: "Remove windy effect",
     },
   },
+  radio: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Radio effect",
+      deactive: "Remove radio effect",
+    },
+  },
+  explosion: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Explosion effect",
+      deactive: "Remove explosion effect",
+    },
+  },
+  whisper: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Whisper effect",
+      deactive: "Remove whisper effect",
+    },
+  },
+  submarine: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Submarine effect",
+      deactive: "Remove submarine effect",
+    },
+  },
+  windTunnel: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Wind tunnel effect",
+      deactive: "Remove wind tunnel effect",
+    },
+  },
+  crushedBass: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Crushed bass effect",
+      deactive: "Remove crushed bass effect",
+    },
+  },
+  ethereal: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Ethereal effect",
+      deactive: "Remove ethereal effect",
+    },
+  },
+  electroSting: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Electro sting effect",
+      deactive: "Remove electro sting effect",
+    },
+  },
+  heartbeat: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Heartbeat effect",
+      deactive: "Remove heartbeat effect",
+    },
+  },
+  underworld: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Underworld effect",
+      deactive: "Remove underworld effect",
+    },
+  },
+  sizzling: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Sizzling effect",
+      deactive: "Remove sizzling effect",
+    },
+  },
+  staticNoise: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Static noise effect",
+      deactive: "Remove static noise effect",
+    },
+  },
+  bubbly: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Bubbly effect",
+      deactive: "Remove bubbly effect",
+    },
+  },
+  thunder: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Thunder effect",
+      deactive: "Remove thunder effect",
+    },
+  },
+  echosOfThePast: {
+    icon: "",
+    offIcon: "",
+    attributes: [
+      { key: "width", value: "90%" },
+      { key: "height", value: "90%" },
+    ],
+    hoverContent: {
+      active: "Echos of the past effect",
+      deactive: "Remove echos of the past effect",
+    },
+  },
 };
 
 export default function AudioEffectsSection({
