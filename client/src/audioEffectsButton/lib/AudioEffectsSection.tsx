@@ -38,6 +38,32 @@ import ambientIcon from "../../../public/svgs/audio/ambientIcon.svg";
 import ambientOffIcon from "../../../public/svgs/audio/ambientOffIcon.svg";
 import glitchIcon from "../../../public/svgs/audio/glitchIcon.svg";
 import glitchOffIcon from "../../../public/svgs/audio/glitchOffIcon.svg";
+import muffledIcon from "../../../public/svgs/audio/muffledIcon.svg";
+import muffledOffIcon from "../../../public/svgs/audio/muffledOffIcon.svg";
+import crystalIcon from "../../../public/svgs/audio/crystalIcon.svg";
+import crystalOffIcon from "../../../public/svgs/audio/crystalOffIcon.svg";
+import heavyMetalIcon from "../../../public/svgs/audio/heavyMetalIcon.svg";
+import heavyMetalOffIcon from "../../../public/svgs/audio/heavyMetalOffIcon.svg";
+import dreamyIcon from "../../../public/svgs/audio/dreamyIcon.svg";
+import dreamyOffIcon from "../../../public/svgs/audio/dreamyOffIcon.svg";
+import horrorIcon from "../../../public/svgs/audio/horrorIcon.svg";
+import horrorOffIcon from "../../../public/svgs/audio/horrorOffIcon.svg";
+import sciFiIcon from "../../../public/svgs/audio/sciFiIcon.svg";
+import sciFiOffIcon from "../../../public/svgs/audio/sciFiOffIcon.svg";
+import dystopianIcon from "../../../public/svgs/audio/dystopianIcon.svg";
+import dystopianOffIcon from "../../../public/svgs/audio/dystopianOffIcon.svg";
+import retroGameIcon from "../../../public/svgs/audio/retroGameIcon.svg";
+import retroGameOffIcon from "../../../public/svgs/audio/retroGameOffIcon.svg";
+import ghostlyIcon from "../../../public/svgs/audio/ghostlyIcon.svg";
+import ghostlyOffIcon from "../../../public/svgs/audio/ghostlyOffIcon.svg";
+import metallicIcon from "../../../public/svgs/audio/metallicIcon.svg";
+import metallicOffIcon from "../../../public/svgs/audio/metallicOffIcon.svg";
+import hypnoticIcon from "../../../public/svgs/audio/hypnoticIcon.svg";
+import hypnoticOffIcon from "../../../public/svgs/audio/hypnoticOffIcon.svg";
+import cyberpunkIcon from "../../../public/svgs/audio/cyberpunkIcon.svg";
+import cyberpunkOffIcon from "../../../public/svgs/audio/cyberpunkOffIcon.svg";
+import windyIcon from "../../../public/svgs/audio/windyIcon.svg";
+import windyOffIcon from "../../../public/svgs/audio/windyOffIcon.svg";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
@@ -256,11 +282,12 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   muffled: {
-    icon: "",
-    offIcon: "",
+    icon: muffledIcon,
+    offIcon: muffledOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Muffled effect",
@@ -268,8 +295,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   crystal: {
-    icon: "",
-    offIcon: "",
+    icon: crystalIcon,
+    offIcon: crystalOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -280,11 +307,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   heavyMetal: {
-    icon: "",
-    offIcon: "",
+    icon: heavyMetalIcon,
+    offIcon: heavyMetalOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Heavy metal effect",
@@ -292,11 +321,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   dreamy: {
-    icon: "",
-    offIcon: "",
+    icon: dreamyIcon,
+    offIcon: dreamyOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Dreamy effect",
@@ -304,8 +335,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   horror: {
-    icon: "",
-    offIcon: "",
+    icon: horrorIcon,
+    offIcon: horrorOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -316,11 +347,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   sciFi: {
-    icon: "",
-    offIcon: "",
+    icon: sciFiIcon,
+    offIcon: sciFiOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Sci-fi effect",
@@ -328,8 +361,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   dystopian: {
-    icon: "",
-    offIcon: "",
+    icon: dystopianIcon,
+    offIcon: dystopianOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -340,11 +373,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   retroGame: {
-    icon: "",
-    offIcon: "",
+    icon: retroGameIcon,
+    offIcon: retroGameOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Retro game effect",
@@ -352,8 +387,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   ghostly: {
-    icon: "",
-    offIcon: "",
+    icon: ghostlyIcon,
+    offIcon: ghostlyOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -364,8 +399,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   metallic: {
-    icon: "",
-    offIcon: "",
+    icon: metallicIcon,
+    offIcon: metallicOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -376,8 +411,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   hypnotic: {
-    icon: "",
-    offIcon: "",
+    icon: hypnoticIcon,
+    offIcon: hypnoticOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -388,8 +423,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   cyberpunk: {
-    icon: "",
-    offIcon: "",
+    icon: cyberpunkIcon,
+    offIcon: cyberpunkOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -400,11 +435,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   windy: {
-    icon: "",
-    offIcon: "",
+    icon: windyIcon,
+    offIcon: windyOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Windy effect",
