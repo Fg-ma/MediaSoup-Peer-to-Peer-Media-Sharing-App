@@ -64,6 +64,36 @@ import cyberpunkIcon from "../../../public/svgs/audio/cyberpunkIcon.svg";
 import cyberpunkOffIcon from "../../../public/svgs/audio/cyberpunkOffIcon.svg";
 import windyIcon from "../../../public/svgs/audio/windyIcon.svg";
 import windyOffIcon from "../../../public/svgs/audio/windyOffIcon.svg";
+import radioIcon from "../../../public/svgs/audio/radioIcon.svg";
+import radioOffIcon from "../../../public/svgs/audio/radioOffIcon.svg";
+import explosionIcon from "../../../public/svgs/audio/explosionIcon.svg";
+import explosionOffIcon from "../../../public/svgs/audio/explosionOffIcon.svg";
+import whisperIcon from "../../../public/svgs/audio/whisperIcon.svg";
+import whisperOffIcon from "../../../public/svgs/audio/whisperOffIcon.svg";
+import submarineIcon from "../../../public/svgs/audio/submarineIcon.svg";
+import submarineOffIcon from "../../../public/svgs/audio/submarineOffIcon.svg";
+import windTunnelIcon from "../../../public/svgs/audio/windTunnelIcon.svg";
+import windTunnelOffIcon from "../../../public/svgs/audio/windTunnelOffIcon.svg";
+import crushedBassIcon from "../../../public/svgs/audio/crushedBassIcon.svg";
+import crushedBassOffIcon from "../../../public/svgs/audio/crushedBassOffIcon.svg";
+import etherealIcon from "../../../public/svgs/audio/etherealIcon.svg";
+import etherealOffIcon from "../../../public/svgs/audio/etherealOffIcon.svg";
+import electroStingIcon from "../../../public/svgs/audio/electroStingIcon.svg";
+import electroStingOffIcon from "../../../public/svgs/audio/electroStingOffIcon.svg";
+import heartbeatIcon from "../../../public/svgs/audio/heartbeatIcon.svg";
+import heartbeatOffIcon from "../../../public/svgs/audio/heartbeatOffIcon.svg";
+import underworldIcon from "../../../public/svgs/audio/underworldIcon.svg";
+import underworldOffIcon from "../../../public/svgs/audio/underworldOffIcon.svg";
+import sizzlingIcon from "../../../public/svgs/audio/sizzlingIcon.svg";
+import sizzlingOffIcon from "../../../public/svgs/audio/sizzlingOffIcon.svg";
+import staticNoiseIcon from "../../../public/svgs/audio/staticNoiseIcon.svg";
+import staticNoiseOffIcon from "../../../public/svgs/audio/staticNoiseOffIcon.svg";
+import bubblyIcon from "../../../public/svgs/audio/bubblyIcon.svg";
+import bubblyOffIcon from "../../../public/svgs/audio/bubblyOffIcon.svg";
+import thunderIcon from "../../../public/svgs/audio/thunderIcon.svg";
+import thunderOffIcon from "../../../public/svgs/audio/thunderOffIcon.svg";
+import echosOfThePastIcon from "../../../public/svgs/audio/echosOfThePastIcon.svg";
+import echosOfThePastOffIcon from "../../../public/svgs/audio/echosOfThePastOffIcon.svg";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
@@ -214,8 +244,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     icon: psychedelicIcon,
     offIcon: psychedelicOffIcon,
     attributes: [
-      { key: "width", value: "90%" },
-      { key: "height", value: "90%" },
+      { key: "width", value: "100%" },
+      { key: "height", value: "100%" },
     ],
     hoverContent: {
       active: "Psychedelic effect",
@@ -338,8 +368,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     icon: horrorIcon,
     offIcon: horrorOffIcon,
     attributes: [
-      { key: "width", value: "90%" },
-      { key: "height", value: "90%" },
+      { key: "width", value: "100%" },
+      { key: "height", value: "100%" },
     ],
     hoverContent: {
       active: "Horror effect",
@@ -449,11 +479,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   radio: {
-    icon: "",
-    offIcon: "",
+    icon: radioIcon,
+    offIcon: radioOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Radio effect",
@@ -461,11 +493,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   explosion: {
-    icon: "",
-    offIcon: "",
+    icon: explosionIcon,
+    offIcon: explosionOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Explosion effect",
@@ -473,8 +507,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   whisper: {
-    icon: "",
-    offIcon: "",
+    icon: whisperIcon,
+    offIcon: whisperOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -485,8 +519,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   submarine: {
-    icon: "",
-    offIcon: "",
+    icon: submarineIcon,
+    offIcon: submarineOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -497,11 +531,11 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   windTunnel: {
-    icon: "",
-    offIcon: "",
+    icon: windTunnelIcon,
+    offIcon: windTunnelOffIcon,
     attributes: [
-      { key: "width", value: "90%" },
-      { key: "height", value: "90%" },
+      { key: "width", value: "100%" },
+      { key: "height", value: "100%" },
     ],
     hoverContent: {
       active: "Wind tunnel effect",
@@ -509,8 +543,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   crushedBass: {
-    icon: "",
-    offIcon: "",
+    icon: crushedBassIcon,
+    offIcon: crushedBassOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -521,8 +555,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   ethereal: {
-    icon: "",
-    offIcon: "",
+    icon: etherealIcon,
+    offIcon: etherealOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -533,8 +567,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   electroSting: {
-    icon: "",
-    offIcon: "",
+    icon: electroStingIcon,
+    offIcon: electroStingOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -545,11 +579,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   heartbeat: {
-    icon: "",
-    offIcon: "",
+    icon: heartbeatIcon,
+    offIcon: heartbeatOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Heartbeat effect",
@@ -557,11 +593,11 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   underworld: {
-    icon: "",
-    offIcon: "",
+    icon: underworldIcon,
+    offIcon: underworldOffIcon,
     attributes: [
-      { key: "width", value: "90%" },
-      { key: "height", value: "90%" },
+      { key: "width", value: "100%" },
+      { key: "height", value: "100%" },
     ],
     hoverContent: {
       active: "Underworld effect",
@@ -569,8 +605,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   sizzling: {
-    icon: "",
-    offIcon: "",
+    icon: sizzlingIcon,
+    offIcon: sizzlingOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -581,8 +617,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   staticNoise: {
-    icon: "",
-    offIcon: "",
+    icon: staticNoiseIcon,
+    offIcon: staticNoiseOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
@@ -593,11 +629,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   bubbly: {
-    icon: "",
-    offIcon: "",
+    icon: bubblyIcon,
+    offIcon: bubblyOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Bubbly effect",
@@ -605,11 +643,13 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   thunder: {
-    icon: "",
-    offIcon: "",
+    icon: thunderIcon,
+    offIcon: thunderOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
+      { key: "fill", value: "white" },
+      { key: "stroke", value: "white" },
     ],
     hoverContent: {
       active: "Thunder effect",
@@ -617,8 +657,8 @@ const audioEffectTemplates: AudioEffectTemplates = {
     },
   },
   echosOfThePast: {
-    icon: "",
-    offIcon: "",
+    icon: echosOfThePastIcon,
+    offIcon: echosOfThePastOffIcon,
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
