@@ -136,11 +136,6 @@ export default function FgPiano({
             setSamplerEffectsActive={setSamplerEffectsActive}
           />
           {samplerEffectsActive && <SamplerEffectsToolbar focus={focus} />}
-          <KeyVisualizer
-            visibleOctaveRef={visibleOctaveRef}
-            shiftPressed={shiftPressed}
-            controlPressed={controlPressed}
-          />
           <ScaleSection
             externalRef={scaleSectionRef}
             playNote={fgPianoController.playNote}
@@ -148,6 +143,8 @@ export default function FgPiano({
             setVisibleOctave={setVisibleOctave}
             visibleOctaveRef={visibleOctaveRef}
             getVisibleOctave={fgPianoController.getVisibleOctave}
+            shiftPressed={shiftPressed}
+            controlPressed={controlPressed}
           />
         </div>
       }

@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Octaves } from "../FgPiano";
 
-const keyColors: { [key: string]: string } = {
-  a: "red",
-  s: "orange",
-  d: "yellow",
-  f: "green",
-  g: "blue",
-  h: "indigo",
-  j: "violet",
+const keyMap: { [key: string]: string } = {
+  s: "C",
+  d: "D",
+  f: "E",
+  j: "F",
+  k: "G",
+  l: "A",
+  ";": "B",
+  e: "C#",
+  r: "D#",
+  i: "F#",
+  o: "G#",
+  p: "A#",
 };
 
 export default function KeyVisualizer({
@@ -23,18 +28,61 @@ export default function KeyVisualizer({
   const [keyPresses, setKeyPresses] = useState<{
     [key: string]: {
       currentlyPressed: boolean;
-      keyDownTime: number;
       height: number;
       bottom: number;
-    };
+    }[];
   }>({});
-  const keyCount = useRef(0);
-  const heightGrowFactor = 0.1;
-  const bottomGrowFactor = 0.01;
+
+  const keyVisualizerRef = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number | null>(null);
+
+  const heightGrowFactor = 1.5; // Height growth factor for pressed key
+  const bottomGrowFactor = 1.5; // Bottom movement factor for released key
+
+  const updateAnimations = () => {
+    setKeyPresses((prevKeyPresses) => {
+      const updatedKeyPresses: typeof prevKeyPresses = {};
+
+      Object.entries(prevKeyPresses).forEach(([key, keyPresses]) => {
+        updatedKeyPresses[key] = updatedKeyPresses[key] || [];
+
+        keyPresses.forEach((instance, index) => {
+          if (!instance) return;
+
+          let newHeight = instance.height;
+          let newBottom = instance.bottom;
+
+          if (instance.currentlyPressed) {
+            newHeight += heightGrowFactor; // Grow height when pressed
+          } else {
+            newBottom += bottomGrowFactor; // Move upwards when released
+          }
+
+          // Only keep updating if it's within the bounds of the visualizer
+          if (newBottom <= (keyVisualizerRef.current?.clientHeight ?? 0)) {
+            updatedKeyPresses[key][index] = {
+              ...keyPresses[index],
+              height: newHeight,
+              bottom: newBottom,
+            };
+          }
+        });
+      });
+
+      return updatedKeyPresses;
+    });
+
+    // Continue updating using requestAnimationFrame for smooth animation
+    animationFrameRef.current = requestAnimationFrame(updateAnimations);
+  };
 
   const handleKeyUp = (event: KeyboardEvent) => {
     const eventKey = event.key;
 
+    if (!(eventKey in keyMap)) {
+      return;
+    }
+
     let octave: number = visibleOctaveRef.current;
     if (shiftPressed.current) {
       octave = Math.min(6, octave + 1);
@@ -43,196 +91,36 @@ export default function KeyVisualizer({
       octave = Math.max(0, octave - 1);
     }
 
-    switch (eventKey) {
-      case "s":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`C-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
+    // On key release, stop growing and start flying up
+    setKeyPresses((prevKeyPresses) => {
+      const key = `${keyMap[eventKey]}-fg-${octave}`;
 
-          prevKeyPresses[`C-fg-${octave}`] = {
-            ...prevKeyPresses[`C-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "d":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`D-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
+      const updatedKeyPressArray = prevKeyPresses[key]
+        ? [...prevKeyPresses[key]]
+        : [];
 
-          prevKeyPresses[`D-fg-${octave}`] = {
-            ...prevKeyPresses[`D-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "f":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`E-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
+      const lastEntry = updatedKeyPressArray.pop();
+      if (lastEntry) {
+        lastEntry.currentlyPressed = false;
 
-          prevKeyPresses[`E-fg-${octave}`] = {
-            ...prevKeyPresses[`E-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "j":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`F-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
+        const newKeyPresses = {
+          ...prevKeyPresses,
+          [key]: [...updatedKeyPressArray, lastEntry],
+        };
 
-          prevKeyPresses[`F-fg-${octave}`] = {
-            ...prevKeyPresses[`F-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "k":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`G-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
-
-          prevKeyPresses[`G-fg-${octave}`] = {
-            ...prevKeyPresses[`G-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "l":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`A-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
-
-          prevKeyPresses[`A-fg-${octave}`] = {
-            ...prevKeyPresses[`A-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case ";":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`B-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
-
-          prevKeyPresses[`B-fg-${octave}`] = {
-            ...prevKeyPresses[`B-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "e":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`C#-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
-
-          prevKeyPresses[`C#-fg-${octave}`] = {
-            ...prevKeyPresses[`C#-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "r":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`D#-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
-
-          prevKeyPresses[`D#-fg-${octave}`] = {
-            ...prevKeyPresses[`D#-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "i":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`F#-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
-
-          prevKeyPresses[`F#-fg-${octave}`] = {
-            ...prevKeyPresses[`F#-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "o":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`G#-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
-
-          prevKeyPresses[`G#-fg-${octave}`] = {
-            ...prevKeyPresses[`G#-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      case "p":
-        setKeyPresses((prev) => {
-          const prevKeyPresses = { ...prev };
-          const height =
-            (Date.now() - prevKeyPresses[`A#-fg-${octave}`].keyDownTime) *
-            heightGrowFactor;
-
-          prevKeyPresses[`A#-fg-${octave}`] = {
-            ...prevKeyPresses[`A#-fg-${octave}`],
-            currentlyPressed: false,
-            height,
-          };
-          return prevKeyPresses;
-        });
-        break;
-      default:
-        break;
-    }
+        return newKeyPresses;
+      } else {
+        return prevKeyPresses;
+      }
+    });
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    keyCount.current += 1;
-
     const eventKey = event.key;
+
+    if (!(eventKey in keyMap)) {
+      return;
+    }
 
     let octave: number = visibleOctaveRef.current;
     if (shiftPressed.current) {
@@ -242,151 +130,60 @@ export default function KeyVisualizer({
       octave = Math.max(0, octave - 1);
     }
 
-    const keyPressInfo = {
-      currentlyPressed: true,
-      keyDownTime: Date.now(),
-      height: 0,
-      bottom: 0,
-    };
+    setKeyPresses((prevKeyPresses) => {
+      const key = `${keyMap[eventKey]}-fg-${octave}`;
 
-    switch (eventKey) {
-      case "s":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`C-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "d":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`D-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "f":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`E-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "j":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`F-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "k":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`G-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "l":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`A-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case ";":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`B-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "e":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`C#-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "r":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`D#-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "i":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`F#-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "o":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`G#-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      case "p":
-        setKeyPresses((prev) => ({
-          ...prev,
-          [`A#-fg-${octave}`]: keyPressInfo,
-        }));
-        break;
-      default:
-        break;
-    }
+      const currentKeyPresses = prevKeyPresses[key] || [];
+
+      const newKeyPresses = {
+        ...prevKeyPresses,
+        [key]: [
+          ...currentKeyPresses,
+          {
+            currentlyPressed: true,
+            height: 0,
+            bottom: 0,
+          },
+        ],
+      };
+
+      return newKeyPresses;
+    });
   };
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
+    // Start the animation loop to update continuously
+    animationFrameRef.current = requestAnimationFrame(updateAnimations);
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-  }, [keyPresses]);
-
-  useEffect(() => {
-    setInterval(() => {
-      setKeyPresses((prev) => {
-        let newKeyPresses: {
-          [key: string]: {
-            currentlyPressed: boolean;
-            keyDownTime: number;
-            height: number;
-            bottom: number;
-          };
-        } = {};
-        for (const keyPress in prev) {
-          let newHeight = prev[keyPress].height;
-          let newbottom = prev[keyPress].bottom;
-          if (prev[keyPress].currentlyPressed) {
-            newHeight += heightGrowFactor;
-          } else {
-            newbottom += bottomGrowFactor;
-          }
-
-          newKeyPresses[keyPress] = {
-            ...prev[keyPress],
-            height: newHeight,
-            bottom: newbottom,
-          };
-        }
-
-        return newKeyPresses;
-      });
-    }, 10);
   }, []);
 
   return (
-    <div className='w-full h-20 bg-gray-200 relative overflow-hidden'>
-      {Object.entries(keyPresses).map(
-        ([key, { currentlyPressed, keyDownTime, height, bottom }], index) => {
+    <div ref={keyVisualizerRef} className='key-visualizer'>
+      {Object.entries(keyPresses).map(([key, keyPressArray]) =>
+        keyPressArray.map((instance, index) => {
           return (
             <div
-              key={key}
-              className={`absolute w-6 bg-fg-secondary`}
+              key={`${key}_${index}`}
+              className={`key-visualizer-key ${key}`}
               style={{
-                backgroundColor: keyColors[key],
-                left: `${index * 24}px`,
-                bottom: `${bottom}px`,
-                height: `${height}px`,
-                transition: "height 0.1s linear, bottom 0.1s linear",
+                backgroundColor: "orange",
+                bottom: instance && instance.bottom && `${instance.bottom}px`,
+                height: instance && instance.height && `${instance.height}px`,
               }}
             />
           );
-        }
+        })
       )}
     </div>
   );

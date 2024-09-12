@@ -73,7 +73,9 @@ export default function OctaveSelection({
                 whileHover: "hover",
               }}
               clickFunction={() =>
-                scrollToOctave((visibleOctaveRef.current - 1) as Octaves)
+                scrollToOctave(
+                  Math.max(0, visibleOctaveRef.current - 1) as Octaves
+                )
               }
             />
           </motion.div>
@@ -121,7 +123,9 @@ export default function OctaveSelection({
                 />
               )}
               clickFunction={() =>
-                scrollToOctave((visibleOctaveRef.current + 1) as Octaves)
+                scrollToOctave(
+                  Math.min(6, visibleOctaveRef.current + 1) as Octaves
+                )
               }
               animationOptions={{
                 variants: navVar,

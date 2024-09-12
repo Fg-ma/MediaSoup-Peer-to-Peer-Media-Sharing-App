@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   AudioEffectTypes,
   useStreamsContext,
@@ -26,7 +26,10 @@ export default function AudioEffectButton({
 }) {
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
+  const [isVisible, setIsVisible] = useState(false);
+  const buttonRef = useRef<HTMLDivElement>(null);
   const attributes = useRef<{ key: string; value: string; id?: string }[]>([]);
+
   const streamEffects = isUser
     ? userStreamEffects.current.audio[audioEffect]
     : remoteStreamEffects.current[username][instance].audio[audioEffect];
@@ -46,34 +49,67 @@ export default function AudioEffectButton({
     });
   }
 
-  return (
-    <FgButton
-      className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75 overflow-clip relative'
-      scrollingContainerRef={scrollingContainerRef}
-      clickFunction={() => {
-        handleAudioEffectChange(audioEffect);
-      }}
-      contentFunction={() => {
-        return (
-          <FgSVG
-            src={
-              streamEffects
-                ? audioEffectTemplate.offIcon
-                : audioEffectTemplate.icon
-            }
-            className='flex items-center justify-center'
-            attributes={attributes.current}
-          />
-        );
-      }}
-      hoverContent={
-        <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-          {streamEffects
-            ? audioEffectTemplate.hoverContent.deactive
-            : audioEffectTemplate.hoverContent.active}
-        </div>
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true); // Load the button when it's visible
+            observer.unobserve(entry.target); // Stop observing once it's loaded
+          }
+        });
+      },
+      {
+        root: scrollingContainerRef.current, // Container to observe within
+        threshold: 0.1, // Trigger when 10% of the button is visible
       }
-      options={{ hoverTimeoutDuration: 750 }}
-    />
+    );
+
+    if (buttonRef.current) {
+      observer.observe(buttonRef.current); // Start observing the button
+    }
+
+    return () => {
+      if (buttonRef.current) {
+        observer.unobserve(buttonRef.current); // Clean up observer on unmount
+      }
+    };
+  }, [scrollingContainerRef]);
+
+  return (
+    <div ref={buttonRef} className='min-w-12 max-w-24 aspect-square'>
+      {isVisible ? (
+        <FgButton
+          className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75 overflow-clip relative'
+          scrollingContainerRef={scrollingContainerRef}
+          clickFunction={() => {
+            handleAudioEffectChange(audioEffect);
+          }}
+          contentFunction={() => {
+            return (
+              <FgSVG
+                src={
+                  streamEffects
+                    ? audioEffectTemplate.offIcon
+                    : audioEffectTemplate.icon
+                }
+                className='flex items-center justify-center'
+                attributes={attributes.current}
+              />
+            );
+          }}
+          hoverContent={
+            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+              {streamEffects
+                ? audioEffectTemplate.hoverContent.deactive
+                : audioEffectTemplate.hoverContent.active}
+            </div>
+          }
+          options={{ hoverTimeoutDuration: 750 }}
+        />
+      ) : (
+        <div className='bg-gray-300 w-full h-full animate-pulse rounded'></div> // Placeholder while loading
+      )}
+    </div>
   );
 }

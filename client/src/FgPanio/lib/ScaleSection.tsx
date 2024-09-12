@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import Scale from "./Scale";
 import { Octaves } from "../FgPiano";
+import KeyVisualizer from "./KeyVisualizer";
 
 export default function ScaleSection({
   externalRef,
@@ -9,6 +10,8 @@ export default function ScaleSection({
   setVisibleOctave,
   visibleOctaveRef,
   getVisibleOctave,
+  shiftPressed,
+  controlPressed,
 }: {
   externalRef: React.RefObject<HTMLDivElement>;
   playNote: (note: string, octave: number, isPressed: boolean) => void;
@@ -16,6 +19,8 @@ export default function ScaleSection({
   setVisibleOctave: React.Dispatch<React.SetStateAction<Octaves>>;
   visibleOctaveRef: React.MutableRefObject<Octaves>;
   getVisibleOctave: () => void;
+  shiftPressed: React.MutableRefObject<boolean>;
+  controlPressed: React.MutableRefObject<boolean>;
 }) {
   const currentPress = useRef<
     { note: string | null; octave: string | null } | undefined
@@ -144,16 +149,23 @@ export default function ScaleSection({
   return (
     <div
       ref={externalRef}
-      className='scale-section space-x-0.25 py-0.25 px-2'
+      className='scale-section-container'
       onMouseDown={handleMouseDown}
     >
-      <Scale octave={0} playNote={playNote} visibleOctave={visibleOctave} />
-      <Scale octave={1} playNote={playNote} visibleOctave={visibleOctave} />
-      <Scale octave={2} playNote={playNote} visibleOctave={visibleOctave} />
-      <Scale octave={3} playNote={playNote} visibleOctave={visibleOctave} />
-      <Scale octave={4} playNote={playNote} visibleOctave={visibleOctave} />
-      <Scale octave={5} playNote={playNote} visibleOctave={visibleOctave} />
-      <Scale octave={6} playNote={playNote} visibleOctave={visibleOctave} />
+      <KeyVisualizer
+        visibleOctaveRef={visibleOctaveRef}
+        shiftPressed={shiftPressed}
+        controlPressed={controlPressed}
+      />
+      <div className='scale-section space-x-0.25 py-0.25 px-2'>
+        <Scale octave={0} playNote={playNote} visibleOctave={visibleOctave} />
+        <Scale octave={1} playNote={playNote} visibleOctave={visibleOctave} />
+        <Scale octave={2} playNote={playNote} visibleOctave={visibleOctave} />
+        <Scale octave={3} playNote={playNote} visibleOctave={visibleOctave} />
+        <Scale octave={4} playNote={playNote} visibleOctave={visibleOctave} />
+        <Scale octave={5} playNote={playNote} visibleOctave={visibleOctave} />
+        <Scale octave={6} playNote={playNote} visibleOctave={visibleOctave} />
+      </div>
     </div>
   );
 }
