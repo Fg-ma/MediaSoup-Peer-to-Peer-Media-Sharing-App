@@ -8,6 +8,9 @@ import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import effectIcon from "../../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
+import keyVisualizerIcon from "../../../public/svgs/audio/keyVisualizerIcon.svg";
+import keyVisualizerOffIcon from "../../../public/svgs/audio/keyVisualizerOffIcon.svg";
+import FgPianoController from "./FgPianoController";
 
 export const navVar: Variants = {
   leftInit: { opacity: 0, x: -20 },
@@ -32,16 +35,22 @@ export const navTransition: Transition = {
 
 export default function SamplerToolbar({
   focus,
+  fgPianoController,
   visibleOctaveRef,
-  scrollToOctave,
   samplerEffectsActive,
   setSamplerEffectsActive,
+  keyVisualizerActive,
+  setKeyVisualizerActive,
+  keyVisualizerActiveRef,
 }: {
   focus: boolean;
+  fgPianoController: FgPianoController;
   visibleOctaveRef: React.MutableRefObject<Octaves>;
-  scrollToOctave: (octave: Octaves) => void;
   samplerEffectsActive: boolean;
   setSamplerEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
+  keyVisualizerActive: boolean;
+  setKeyVisualizerActive: React.Dispatch<React.SetStateAction<boolean>>;
+  keyVisualizerActiveRef: React.MutableRefObject<boolean>;
 }) {
   const rightScaleSectionToolbarRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +94,36 @@ export default function SamplerToolbar({
       >
         <FgButton
           contentFunction={() => {
+            const iconSrc = keyVisualizerActive
+              ? keyVisualizerOffIcon
+              : keyVisualizerIcon;
+
+            return (
+              <FgSVG
+                src={iconSrc}
+                attributes={[
+                  { key: "height", value: "95%" },
+                  { key: "width", value: "95%" },
+                  { key: "fill", value: "black" },
+                  { key: "stroke", value: "black" },
+                ]}
+              />
+            );
+          }}
+          clickFunction={() => {
+            setKeyVisualizerActive((prev) => !prev);
+            keyVisualizerActiveRef.current = !keyVisualizerActiveRef.current;
+          }}
+          hoverContent={
+            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+              {samplerEffectsActive ? "Close key visualizer" : "Key visualizer"}
+            </div>
+          }
+          className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
+          options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
+        />
+        <FgButton
+          contentFunction={() => {
             const iconSrc = samplerEffectsActive ? effectOffIcon : effectIcon;
 
             return (
@@ -119,7 +158,7 @@ export default function SamplerToolbar({
         <div className='scale-x-[-1] flex space-x-2 items-center'>
           <OctaveSelection
             visibleOctaveRef={visibleOctaveRef}
-            scrollToOctave={scrollToOctave}
+            scrollToOctave={fgPianoController.scrollToOctave}
           />
           <SelectSampler />
         </div>

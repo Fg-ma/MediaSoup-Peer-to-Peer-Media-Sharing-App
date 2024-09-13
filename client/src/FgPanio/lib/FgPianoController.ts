@@ -4,6 +4,23 @@ import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
 import { Octaves } from "../FgPiano";
 
+export const keysMap: { [key: string]: string } = {
+  s: "C",
+  d: "D",
+  f: "E",
+  j: "F",
+  k: "G",
+  l: "A",
+  ";": "B",
+  e: "C#",
+  r: "D#",
+  i: "F#",
+  o: "G#",
+  p: "A#",
+  shift: "shift",
+  control: "control",
+};
+
 class FgPianoController {
   private isUser: boolean;
 
@@ -17,6 +34,7 @@ class FgPianoController {
     audio: AudioMedia | undefined;
   }>;
 
+  private scaleSectionContainerRef: React.RefObject<HTMLDivElement>;
   private scaleSectionRef: React.RefObject<HTMLDivElement>;
 
   private keyWidth: React.MutableRefObject<number>;
@@ -25,8 +43,25 @@ class FgPianoController {
   private visibleOctaveRef: React.MutableRefObject<Octaves>;
 
   private keysPressed: React.MutableRefObject<string[]>;
+  private setKeyPresses: React.Dispatch<
+    React.SetStateAction<{
+      [key: string]: {
+        currentlyPressed: boolean;
+        height: number;
+        bottom: number;
+      }[];
+    }>
+  >;
   private shiftPressed: React.MutableRefObject<boolean>;
   private controlPressed: React.MutableRefObject<boolean>;
+
+  private keyVisualizerRef: React.RefObject<HTMLDivElement>;
+  private visualizerAnimationFrameRef: React.MutableRefObject<
+    number | undefined
+  >;
+
+  private heightGrowFactor = 1.5; // Height growth factor for pressed key
+  private bottomGrowFactor = 1.5; // Bottom movement factor for released key
 
   constructor(
     isUser: boolean,
@@ -41,6 +76,7 @@ class FgPianoController {
       audio: AudioMedia | undefined;
     }>,
 
+    scaleSectionContainerRef: React.RefObject<HTMLDivElement>,
     scaleSectionRef: React.RefObject<HTMLDivElement>,
 
     keyWidth: React.MutableRefObject<number>,
@@ -49,18 +85,34 @@ class FgPianoController {
     visibleOctaveRef: React.MutableRefObject<Octaves>,
 
     keysPressed: React.MutableRefObject<string[]>,
+    setKeyPresses: React.Dispatch<
+      React.SetStateAction<{
+        [key: string]: {
+          currentlyPressed: boolean;
+          height: number;
+          bottom: number;
+        }[];
+      }>
+    >,
     shiftPressed: React.MutableRefObject<boolean>,
-    controlPressed: React.MutableRefObject<boolean>
+    controlPressed: React.MutableRefObject<boolean>,
+
+    keyVisualizerRef: React.RefObject<HTMLDivElement>,
+    visualizerAnimationFrameRef: React.MutableRefObject<number | undefined>
   ) {
     this.isUser = isUser;
     this.userMedia = userMedia;
+    this.scaleSectionContainerRef = scaleSectionContainerRef;
     this.scaleSectionRef = scaleSectionRef;
     this.keyWidth = keyWidth;
     this.setVisibleOctave = setVisibleOctave;
     this.visibleOctaveRef = visibleOctaveRef;
     this.keysPressed = keysPressed;
+    this.setKeyPresses = setKeyPresses;
     this.shiftPressed = shiftPressed;
     this.controlPressed = controlPressed;
+    this.keyVisualizerRef = keyVisualizerRef;
+    this.visualizerAnimationFrameRef = visualizerAnimationFrameRef;
   }
 
   playNote = (note: string, octave: number, isPress: boolean) => {
@@ -70,15 +122,15 @@ class FgPianoController {
   };
 
   getVisibleOctave = () => {
-    if (!this.scaleSectionRef.current) {
+    if (!this.scaleSectionContainerRef.current) {
       return;
     }
 
     const octaveWidth = this.keyWidth.current * 7 + 6;
-    const left = this.scaleSectionRef.current.scrollLeft;
-    const halfWidth = this.scaleSectionRef.current.clientWidth / 4;
+    const left = this.scaleSectionContainerRef.current.scrollLeft;
+    const quarterWidth = this.scaleSectionContainerRef.current.clientWidth / 4;
 
-    const octave = Math.round((left + halfWidth) / octaveWidth);
+    const octave = Math.round((left + quarterWidth) / octaveWidth);
 
     this.setVisibleOctave(octave as Octaves);
     this.visibleOctaveRef.current = octave as Octaves;
@@ -97,14 +149,14 @@ class FgPianoController {
   };
 
   scrollToOctave = (octave: Octaves) => {
-    if (!this.scaleSectionRef.current) {
+    if (!this.scaleSectionContainerRef.current) {
       return;
     }
 
     const octaveWidth = this.keyWidth.current * 7 + 6;
     const octaveLeftPosition = octaveWidth * octave;
 
-    this.scaleSectionRef.current.scrollTo({
+    this.scaleSectionContainerRef.current.scrollTo({
       left: octaveLeftPosition,
       behavior: "instant",
     });
@@ -114,241 +166,62 @@ class FgPianoController {
   };
 
   handleKeyUp = (eventKey: string, octave: Octaves) => {
-    let key;
+    const pianoKey = keysMap[eventKey];
 
-    switch (eventKey) {
-      case "shift":
+    if (pianoKey) {
+      if (pianoKey === "shift") {
         this.unpressOctave(octave);
         this.shiftPressed.current = false;
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "shift"
+          (key) => key !== pianoKey
         );
-        break;
-      case "control":
+      } else if (pianoKey === "control") {
         this.unpressOctave(octave);
         this.controlPressed.current = false;
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "control"
+          (key) => key !== pianoKey
         );
-        break;
-      case "s":
-        key = document.getElementById(`piano_key_${octave}_C`);
+      } else {
+        const key = document.getElementById(`piano_key_${octave}_${pianoKey}`);
         key?.classList.remove("pressed");
+
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "C"
+          (k) => k !== pianoKey
         );
-        this.playNote("C", octave, false);
-        break;
-      case "d":
-        key = document.getElementById(`piano_key_${octave}_D`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "D"
-        );
-        this.playNote("D", octave, false);
-        break;
-      case "f":
-        key = document.getElementById(`piano_key_${octave}_E`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "E"
-        );
-        this.playNote("E", octave, false);
-        break;
-      case "j":
-        key = document.getElementById(`piano_key_${octave}_F`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "F"
-        );
-        this.playNote("F", octave, false);
-        break;
-      case "k":
-        key = document.getElementById(`piano_key_${octave}_G`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "G"
-        );
-        this.playNote("G", octave, false);
-        break;
-      case "l":
-        key = document.getElementById(`piano_key_${octave}_A`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "A"
-        );
-        this.playNote("A", octave, false);
-        break;
-      case ";":
-        key = document.getElementById(`piano_key_${octave}_B`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "B"
-        );
-        this.playNote("B", octave, false);
-        break;
-      case "e":
-        key = document.getElementById(`piano_key_${octave}_C#`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "C#"
-        );
-        this.playNote("C#", octave, false);
-        break;
-      case "r":
-        key = document.getElementById(`piano_key_${octave}_D#`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "D#"
-        );
-        this.playNote("D#", octave, false);
-        break;
-      case "i":
-        key = document.getElementById(`piano_key_${octave}_F#`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "F#"
-        );
-        this.playNote("F#", octave, false);
-        break;
-      case "o":
-        key = document.getElementById(`piano_key_${octave}_G#`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "G#"
-        );
-        this.playNote("G#", octave, false);
-        break;
-      case "p":
-        key = document.getElementById(`piano_key_${octave}_A#`);
-        key?.classList.remove("pressed");
-        this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== "A#"
-        );
-        this.playNote("A#", octave, false);
-        break;
-      default:
-        break;
+
+        this.playNote(pianoKey, octave, false);
+      }
     }
   };
 
   handleKeyDown = (eventKey: string, octave: Octaves) => {
-    let key;
+    const pianoKey = keysMap[eventKey];
 
-    switch (eventKey) {
-      case "shift":
+    if (pianoKey && !this.keysPressed.current.includes(pianoKey)) {
+      if (pianoKey === "shift") {
         this.unpressOctave(octave);
         this.shiftPressed.current = true;
-        this.keysPressed.current = [...this.keysPressed.current, "shift"];
-        break;
-      case "control":
+        this.keysPressed.current = [...this.keysPressed.current, pianoKey];
+      } else if (pianoKey === "control") {
         this.unpressOctave(octave);
         this.controlPressed.current = true;
-        this.keysPressed.current = [...this.keysPressed.current, "control"];
-        break;
-      case "s":
-        if (!this.keysPressed.current.includes("C")) {
-          key = document.getElementById(`piano_key_${octave}_C`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "C"];
-          this.playNote("C", octave, true);
-        }
-        break;
-      case "d":
-        if (!this.keysPressed.current.includes("D")) {
-          key = document.getElementById(`piano_key_${octave}_D`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "D"];
-          this.playNote("D", octave, true);
-        }
-        break;
-      case "f":
-        if (!this.keysPressed.current.includes("E")) {
-          key = document.getElementById(`piano_key_${octave}_E`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "E"];
-          this.playNote("E", octave, true);
-        }
-        break;
-      case "j":
-        if (!this.keysPressed.current.includes("F")) {
-          key = document.getElementById(`piano_key_${octave}_F`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "F"];
-          this.playNote("F", octave, true);
-        }
-        break;
-      case "k":
-        if (!this.keysPressed.current.includes("G")) {
-          key = document.getElementById(`piano_key_${octave}_G`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "G"];
-          this.playNote("G", octave, true);
-        }
-        break;
-      case "l":
-        if (!this.keysPressed.current.includes("A")) {
-          key = document.getElementById(`piano_key_${octave}_A`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "A"];
-          this.playNote("A", octave, true);
-        }
-        break;
-      case ";":
-        if (!this.keysPressed.current.includes("B")) {
-          key = document.getElementById(`piano_key_${octave}_B`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "B"];
-          this.playNote("B", octave, true);
-        }
-        break;
-      case "e":
-        if (!this.keysPressed.current.includes("C#")) {
-          key = document.getElementById(`piano_key_${octave}_C#`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "C#"];
-          this.playNote("C#", octave, true);
-        }
-        break;
-      case "r":
-        if (!this.keysPressed.current.includes("D#")) {
-          key = document.getElementById(`piano_key_${octave}_D#`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "D#"];
-          this.playNote("D#", octave, true);
-        }
-        break;
-      case "i":
-        if (!this.keysPressed.current.includes("F#")) {
-          key = document.getElementById(`piano_key_${octave}_F#`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "F#"];
-          this.playNote("F#", octave, true);
-        }
-        break;
-      case "o":
-        if (!this.keysPressed.current.includes("G#")) {
-          key = document.getElementById(`piano_key_${octave}_G#`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "G#"];
-          this.playNote("G#", octave, true);
-        }
-        break;
-      case "p":
-        if (!this.keysPressed.current.includes("A#")) {
-          key = document.getElementById(`piano_key_${octave}_A#`);
-          key?.classList.add("pressed");
-          this.keysPressed.current = [...this.keysPressed.current, "A#"];
-          this.playNote("A#", octave, true);
-        }
-        break;
-      default:
-        break;
+        this.keysPressed.current = [...this.keysPressed.current, pianoKey];
+      } else {
+        const key = document.getElementById(`piano_key_${octave}_${pianoKey}`);
+        key?.classList.add("pressed");
+
+        this.keysPressed.current = [...this.keysPressed.current, pianoKey];
+
+        this.playNote(pianoKey, octave, true);
+      }
     }
   };
 
   resize = () => {
-    if (!this.scaleSectionRef.current) {
+    if (
+      !this.scaleSectionRef.current ||
+      !this.scaleSectionContainerRef.current
+    ) {
       return;
     }
 
@@ -357,13 +230,17 @@ class FgPianoController {
 
     this.keyWidth.current = newKeyWidth;
 
-    this.scaleSectionRef.current.style.setProperty(
+    this.scaleSectionContainerRef.current.style.setProperty(
       "--key-width",
       `${this.keyWidth.current}px`
     );
-    this.scaleSectionRef.current.style.setProperty(
+    this.scaleSectionContainerRef.current.style.setProperty(
       "--key-border-style",
       this.keyWidth.current > 32 ? "solid" : "none"
+    );
+    this.scaleSectionContainerRef.current.style.setProperty(
+      "--scale-section-container-width",
+      `${this.scaleSectionContainerRef.current.clientWidth}px`
     );
 
     this.getVisibleOctave();
@@ -397,6 +274,50 @@ class FgPianoController {
         selectSamplerLabel.classList.add("w-max");
       }
     }
+  };
+
+  updateVisualizerAnimations = () => {
+    this.setKeyPresses((prevKeyPresses) => {
+      const updatedKeyPresses: typeof prevKeyPresses = {};
+
+      Object.entries(prevKeyPresses).forEach(([key, keyPresses]) => {
+        updatedKeyPresses[key] = updatedKeyPresses[key] || [];
+
+        keyPresses.forEach((instance, index) => {
+          if (!instance) return;
+
+          let newHeight = instance.height;
+          let newBottom = instance.bottom;
+
+          if (instance.currentlyPressed) {
+            newHeight += this.heightGrowFactor; // Grow height when pressed
+          } else {
+            newBottom += this.bottomGrowFactor; // Move upwards when released
+          }
+
+          // Only keep updating if it's within the bounds of the visualizer
+          if (newBottom <= (this.keyVisualizerRef.current?.clientHeight ?? 0)) {
+            updatedKeyPresses[key][index] = {
+              ...keyPresses[index],
+              height: newHeight,
+              bottom: newBottom,
+            };
+          }
+        });
+
+        // Delete any empty keyPresses
+        if (updatedKeyPresses[key].length === 0) {
+          delete updatedKeyPresses[key];
+        }
+      });
+
+      return updatedKeyPresses;
+    });
+
+    // Continue updating using requestAnimationFrame for smooth animation
+    this.visualizerAnimationFrameRef.current = requestAnimationFrame(
+      this.updateVisualizerAnimations
+    );
   };
 }
 

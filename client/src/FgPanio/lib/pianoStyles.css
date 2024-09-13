@@ -8,27 +8,34 @@
 .scale-section-container {
   --key-width: 0px;
   --key-border-style: solid;
+  --scale-section-container-width: 0px;
   flex-grow: 1;
   width: 100%;
   overflow-x: auto;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
+  overflow-y: hidden;
   position: relative;
   display: flex;
-  flex-direction: column;
 }
 
 .scale-section {
   display: flex;
-  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
   background-color: #b3b3b3;
-  width: calc((var(--key-width) * 7 + 6px) * 7 + 24px);
-  min-width: calc((var(--key-width) * 7 + 6px) * 7 + 24px);
+  width: max(
+    calc((var(--key-width) * 7 + 6px) * 7 + 24px),
+    (var(--scale-section-container-width))
+  );
+  min-width: max(
+    calc((var(--key-width) * 7 + 6px) * 7 + 24px),
+    (var(--scale-section-container-width))
+  );
 }
 
 .key-visualizer {
-  height: 5rem;
-  background-color: #e5e7eb;
+  height: 100%;
+  background-color: #e6e6e6;
   overflow: hidden;
   position: relative;
   width: calc((var(--key-width) * 7 + 6px) * 7 + 24px);

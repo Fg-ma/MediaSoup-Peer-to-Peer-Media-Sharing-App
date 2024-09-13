@@ -1,26 +1,41 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, Suspense } from "react";
 import Scale from "./Scale";
 import { Octaves } from "../FgPiano";
-import KeyVisualizer from "./KeyVisualizer";
+import VerticalSplitPanes from "../../verticalSplitPane/VerticalSplitPanes";
+import FgPianoController from "./FgPianoController";
+
+const KeyVisualizer = React.lazy(() => import("./KeyVisualizer"));
 
 export default function ScaleSection({
-  externalRef,
-  playNote,
+  fgPianoController,
+  scaleSectionContainerRef,
+  scaleSectionRef,
   visibleOctave,
   setVisibleOctave,
   visibleOctaveRef,
-  getVisibleOctave,
-  shiftPressed,
-  controlPressed,
+  keyVisualizerActive,
+  setKeyVisualizerActive,
+  keyVisualizerActiveRef,
+  keyVisualizerRef,
+  keyPresses,
 }: {
-  externalRef: React.RefObject<HTMLDivElement>;
-  playNote: (note: string, octave: number, isPressed: boolean) => void;
+  fgPianoController: FgPianoController;
+  scaleSectionContainerRef: React.RefObject<HTMLDivElement>;
+  scaleSectionRef: React.RefObject<HTMLDivElement>;
   visibleOctave: Octaves;
   setVisibleOctave: React.Dispatch<React.SetStateAction<Octaves>>;
   visibleOctaveRef: React.MutableRefObject<Octaves>;
-  getVisibleOctave: () => void;
-  shiftPressed: React.MutableRefObject<boolean>;
-  controlPressed: React.MutableRefObject<boolean>;
+  keyVisualizerActive: boolean;
+  setKeyVisualizerActive: React.Dispatch<React.SetStateAction<boolean>>;
+  keyVisualizerActiveRef: React.MutableRefObject<boolean>;
+  keyVisualizerRef: React.RefObject<HTMLDivElement>;
+  keyPresses: {
+    [key: string]: {
+      currentlyPressed: boolean;
+      height: number;
+      bottom: number;
+    }[];
+  };
 }) {
   const currentPress = useRef<
     { note: string | null; octave: string | null } | undefined
@@ -31,35 +46,45 @@ export default function ScaleSection({
       event.preventDefault();
       event.stopPropagation();
 
-      if (externalRef && externalRef.current) {
+      if (scaleSectionContainerRef && scaleSectionContainerRef.current) {
         // If horizontal scroll is dominant, scroll horizontally.
         if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-          externalRef.current.scrollLeft += event.deltaX;
+          scaleSectionContainerRef.current.scrollLeft += event.deltaX;
         } else {
-          externalRef.current.scrollLeft += event.deltaY;
+          scaleSectionContainerRef.current.scrollLeft += event.deltaY;
         }
 
-        if (externalRef.current.scrollLeft === 0) {
+        if (scaleSectionContainerRef.current.scrollLeft === 0) {
           visibleOctaveRef.current = 0;
           setVisibleOctave(0);
         } else if (
-          externalRef.current.scrollLeft + externalRef.current.clientWidth ===
-          externalRef.current.scrollWidth
+          scaleSectionContainerRef.current.scrollLeft +
+            scaleSectionContainerRef.current.clientWidth ===
+          scaleSectionContainerRef.current.scrollWidth
         ) {
           visibleOctaveRef.current = 6;
           setVisibleOctave(6);
         } else {
-          getVisibleOctave();
+          fgPianoController.getVisibleOctave();
         }
       }
     };
 
-    externalRef?.current?.addEventListener("wheel", handleWheel);
+    scaleSectionContainerRef?.current?.addEventListener("wheel", handleWheel);
 
     return () => {
-      externalRef?.current?.removeEventListener("wheel", handleWheel);
+      scaleSectionContainerRef?.current?.removeEventListener(
+        "wheel",
+        handleWheel
+      );
     };
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      fgPianoController.resize();
+    }, 0);
+  }, [keyVisualizerActive]);
 
   const handleMouseUp = () => {
     window.removeEventListener("pointerup", handleMouseUp);
@@ -75,7 +100,7 @@ export default function ScaleSection({
       );
       key?.classList.remove("pressed");
 
-      playNote(
+      fgPianoController.playNote(
         currentPress.current.note,
         parseInt(currentPress.current.octave),
         false
@@ -123,7 +148,7 @@ export default function ScaleSection({
         );
         key?.classList.remove("pressed");
 
-        playNote(
+        fgPianoController.playNote(
           currentPress.current.note.length === 1
             ? currentPress.current.note
             : `${currentPress.current.note[0]}#`,
@@ -139,7 +164,11 @@ export default function ScaleSection({
         );
         key?.classList.add("pressed");
 
-        playNote(targetValues.note, parseInt(targetValues.octave), true);
+        fgPianoController.playNote(
+          targetValues.note,
+          parseInt(targetValues.octave),
+          true
+        );
 
         currentPress.current = targetValues;
       }
@@ -148,24 +177,75 @@ export default function ScaleSection({
 
   return (
     <div
-      ref={externalRef}
+      ref={scaleSectionContainerRef}
       className='scale-section-container'
       onMouseDown={handleMouseDown}
     >
-      <KeyVisualizer
-        visibleOctaveRef={visibleOctaveRef}
-        shiftPressed={shiftPressed}
-        controlPressed={controlPressed}
+      <VerticalSplitPanes
+        topContent={
+          keyVisualizerActive ? (
+            <Suspense fallback={<div>Loading...</div>}>
+              <KeyVisualizer
+                keyVisualizerRef={keyVisualizerRef}
+                keyPresses={keyPresses}
+              />
+            </Suspense>
+          ) : undefined
+        }
+        bottomContent={
+          <div
+            ref={scaleSectionRef}
+            className='scale-section space-x-0.25 py-0.25 px-2'
+          >
+            <Scale
+              octave={0}
+              playNote={fgPianoController.playNote}
+              visibleOctave={visibleOctave}
+            />
+            <Scale
+              octave={1}
+              playNote={fgPianoController.playNote}
+              visibleOctave={visibleOctave}
+            />
+            <Scale
+              octave={2}
+              playNote={fgPianoController.playNote}
+              visibleOctave={visibleOctave}
+            />
+            <Scale
+              octave={3}
+              playNote={fgPianoController.playNote}
+              visibleOctave={visibleOctave}
+            />
+            <Scale
+              octave={4}
+              playNote={fgPianoController.playNote}
+              visibleOctave={visibleOctave}
+            />
+            <Scale
+              octave={5}
+              playNote={fgPianoController.playNote}
+              visibleOctave={visibleOctave}
+            />
+            <Scale
+              octave={6}
+              playNote={fgPianoController.playNote}
+              visibleOctave={visibleOctave}
+            />
+          </div>
+        }
+        panelSizeChangeCallback={fgPianoController.resize}
+        minPaneHeightCallback={() => {
+          setKeyVisualizerActive(false);
+          keyVisualizerActiveRef.current = false;
+        }}
+        options={{
+          initialPaneHeight: "20%",
+          minPaneHeight: 0,
+          maxPaneHeight: 65,
+          dividerButton: false,
+        }}
       />
-      <div className='scale-section space-x-0.25 py-0.25 px-2'>
-        <Scale octave={0} playNote={playNote} visibleOctave={visibleOctave} />
-        <Scale octave={1} playNote={playNote} visibleOctave={visibleOctave} />
-        <Scale octave={2} playNote={playNote} visibleOctave={visibleOctave} />
-        <Scale octave={3} playNote={playNote} visibleOctave={visibleOctave} />
-        <Scale octave={4} playNote={playNote} visibleOctave={visibleOctave} />
-        <Scale octave={5} playNote={playNote} visibleOctave={visibleOctave} />
-        <Scale octave={6} playNote={playNote} visibleOctave={visibleOctave} />
-      </div>
     </div>
   );
 }

@@ -1,12 +1,20 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  Suspense,
+} from "react";
 import FgPanel from "../fgPanel/FgPanel";
 import "./lib/pianoStyles.css";
 import ScaleSection from "./lib/ScaleSection";
-import FgPianoController from "./lib/FgPianoController";
+import FgPianoController, { keysMap } from "./lib/FgPianoController";
 import { useStreamsContext } from "../context/StreamsContext";
 import SamplerToolbar from "./lib/SamplerToolbar";
-import SamplerEffectsToolbar from "./lib/SamplerEffectsToolbar";
-import KeyVisualizer from "./lib/KeyVisualizer";
+
+const SamplerEffectsToolbar = React.lazy(
+  () => import("./lib/SamplerEffectsToolbar")
+);
 
 export type Octaves = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -26,28 +34,46 @@ export default function FgPiano({
   const [visibleOctave, setVisibleOctave] = useState<Octaves>(initialOctave);
   const [focus, setFocus] = useState(false);
   const [samplerEffectsActive, setSamplerEffectsActive] = useState(false);
+  const [keyVisualizerActive, setKeyVisualizerActive] = useState(false);
+  const [keyPresses, setKeyPresses] = useState<{
+    [key: string]: {
+      currentlyPressed: boolean;
+      height: number;
+      bottom: number;
+    }[];
+  }>({});
+  const keyVisualizerActiveRef = useRef(false);
   const visibleOctaveRef = useRef<Octaves>(initialOctave);
+  const scaleSectionContainerRef = useRef<HTMLDivElement>(null);
   const scaleSectionRef = useRef<HTMLDivElement>(null);
   const keyWidth = useRef(0);
   const isKeydownListenerAdded = useRef(false);
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
   const keysPressed = useRef<string[]>([]);
+  const keyVisualizerRef = useRef<HTMLDivElement>(null);
+  const visualizerAnimationFrameRef = useRef<number | undefined>(undefined);
 
   const fgPianoController = new FgPianoController(
     isUser,
     userMedia,
+    scaleSectionContainerRef,
     scaleSectionRef,
     keyWidth,
     setVisibleOctave,
     visibleOctaveRef,
     keysPressed,
+    setKeyPresses,
     shiftPressed,
-    controlPressed
+    controlPressed,
+    keyVisualizerRef,
+    visualizerAnimationFrameRef
   );
 
   const handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
+    const eventKey = event.key.toLowerCase();
+
+    if (!(eventKey in keysMap)) {
       return;
     }
 
@@ -59,17 +85,76 @@ export default function FgPiano({
       octave = Math.max(0, octave - 1);
     }
 
-    fgPianoController.handleKeyUp(event.key.toLowerCase(), octave as Octaves);
+    fgPianoController.handleKeyUp(eventKey, octave as Octaves);
+
+    if (keyVisualizerActiveRef.current) {
+      if (keysMap[eventKey] === "shift" || keysMap[eventKey] === "control") {
+        setKeyPresses((prevKeyPresses) => {
+          const newKeyPresses = { ...prevKeyPresses };
+
+          for (const keyPress in newKeyPresses) {
+            const keyPressStringArray = keyPress.split("-fg-");
+            const keyPressOctave =
+              keyPressStringArray[keyPressStringArray.length - 1];
+
+            if (parseInt(keyPressOctave) === octave) {
+              for (let i = 0; i < newKeyPresses[keyPress].length; i++) {
+                newKeyPresses[keyPress][i] = {
+                  ...newKeyPresses[keyPress][i],
+                  currentlyPressed: false,
+                };
+              }
+            }
+          }
+
+          return newKeyPresses;
+        });
+      } else {
+        setKeyPresses((prevKeyPresses) => {
+          const key = `${keysMap[eventKey]}-fg-${octave}`;
+
+          const updatedKeyPressArray = prevKeyPresses[key]
+            ? [...prevKeyPresses[key]]
+            : [];
+
+          const lastEntry = updatedKeyPressArray.pop();
+          if (lastEntry) {
+            lastEntry.currentlyPressed = false;
+
+            const newKeyPresses = {
+              ...prevKeyPresses,
+              [key]: [...updatedKeyPressArray, lastEntry],
+            };
+
+            return newKeyPresses;
+          } else {
+            return prevKeyPresses;
+          }
+        });
+      }
+    }
 
     if (keysPressed.current.length === 0) {
       document.removeEventListener("keyup", handleKeyUp);
     }
   };
 
+  useEffect(() => {
+    if (
+      Object.keys(keyPresses).length === 0 &&
+      visualizerAnimationFrameRef.current
+    ) {
+      cancelAnimationFrame(visualizerAnimationFrameRef.current);
+      visualizerAnimationFrameRef.current = undefined;
+    }
+  }, [Object.keys(keyPresses).length]);
+
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     event.preventDefault();
 
-    if (!event.key) {
+    const eventKey = event.key.toLowerCase();
+
+    if (!(eventKey in keysMap)) {
       return;
     }
 
@@ -85,7 +170,62 @@ export default function FgPiano({
       document.addEventListener("keyup", handleKeyUp);
     }
 
-    fgPianoController.handleKeyDown(event.key.toLowerCase(), octave as Octaves);
+    if (
+      keyVisualizerActiveRef.current &&
+      !keysPressed.current.includes(keysMap[eventKey])
+    ) {
+      if (visualizerAnimationFrameRef.current === undefined) {
+        // Start the animation loop to update continuously
+        visualizerAnimationFrameRef.current = requestAnimationFrame(
+          fgPianoController.updateVisualizerAnimations
+        );
+      }
+
+      if (keysMap[eventKey] === "shift" || keysMap[eventKey] === "control") {
+        setKeyPresses((prevKeyPresses) => {
+          const newKeyPresses = { ...prevKeyPresses };
+
+          for (const keyPress in newKeyPresses) {
+            const keyPressStringArray = keyPress.split("-fg-");
+            const keyPressOctave =
+              keyPressStringArray[keyPressStringArray.length - 1];
+
+            if (parseInt(keyPressOctave) === visibleOctaveRef.current) {
+              for (let i = 0; i < newKeyPresses[keyPress].length; i++) {
+                newKeyPresses[keyPress][i] = {
+                  ...newKeyPresses[keyPress][i],
+                  currentlyPressed: false,
+                };
+              }
+            }
+          }
+
+          return newKeyPresses;
+        });
+      } else {
+        setKeyPresses((prevKeyPresses) => {
+          const key = `${keysMap[eventKey]}-fg-${octave}`;
+
+          const currentKeyPresses = prevKeyPresses[key] || [];
+
+          const newKeyPresses = {
+            ...prevKeyPresses,
+            [key]: [
+              ...currentKeyPresses,
+              {
+                currentlyPressed: true,
+                height: 0,
+                bottom: 0,
+              },
+            ],
+          };
+
+          return newKeyPresses;
+        });
+      }
+    }
+
+    fgPianoController.handleKeyDown(eventKey, octave as Octaves);
   }, []);
 
   const focusCallback = (focus: boolean) => {
@@ -110,7 +250,10 @@ export default function FgPiano({
     fgPianoController.scrollToOctave(initialOctave);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      if (isKeydownListenerAdded.current) {
+        isKeydownListenerAdded.current = false;
+        document.removeEventListener("keydown", handleKeyDown);
+      }
     };
   }, []);
 
@@ -130,21 +273,31 @@ export default function FgPiano({
         <div className='piano'>
           <SamplerToolbar
             focus={focus}
+            fgPianoController={fgPianoController}
             visibleOctaveRef={visibleOctaveRef}
-            scrollToOctave={fgPianoController.scrollToOctave}
             samplerEffectsActive={samplerEffectsActive}
             setSamplerEffectsActive={setSamplerEffectsActive}
+            keyVisualizerActive={keyVisualizerActive}
+            setKeyVisualizerActive={setKeyVisualizerActive}
+            keyVisualizerActiveRef={keyVisualizerActiveRef}
           />
-          {samplerEffectsActive && <SamplerEffectsToolbar focus={focus} />}
+          {samplerEffectsActive && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <SamplerEffectsToolbar focus={focus} />{" "}
+            </Suspense>
+          )}
           <ScaleSection
-            externalRef={scaleSectionRef}
-            playNote={fgPianoController.playNote}
+            fgPianoController={fgPianoController}
+            scaleSectionContainerRef={scaleSectionContainerRef}
+            scaleSectionRef={scaleSectionRef}
             visibleOctave={visibleOctave}
             setVisibleOctave={setVisibleOctave}
             visibleOctaveRef={visibleOctaveRef}
-            getVisibleOctave={fgPianoController.getVisibleOctave}
-            shiftPressed={shiftPressed}
-            controlPressed={controlPressed}
+            keyVisualizerActive={keyVisualizerActive}
+            setKeyVisualizerActive={setKeyVisualizerActive}
+            keyVisualizerActiveRef={keyVisualizerActiveRef}
+            keyVisualizerRef={keyVisualizerRef}
+            keyPresses={keyPresses}
           />
         </div>
       }
