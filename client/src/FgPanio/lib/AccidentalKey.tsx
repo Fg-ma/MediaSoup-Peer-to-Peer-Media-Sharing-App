@@ -22,110 +22,13 @@ export default function AccidentalKey({
   classname,
   note,
   octave,
-  playNote,
   activationKey,
-  fgPianoController,
-  keyVisualizerActiveRef,
-  visualizerAnimationFrameRef,
-  keysPressed,
-  setKeyPresses,
 }: {
   classname?: string;
   note: string;
   octave: number;
-  playNote: (note: string, octave: number, isPress: boolean) => void;
   activationKey?: string;
-  fgPianoController: FgPianoController;
-  keyVisualizerActiveRef: React.MutableRefObject<boolean>;
-  visualizerAnimationFrameRef: React.MutableRefObject<number | undefined>;
-  keysPressed: React.MutableRefObject<string[]>;
-  setKeyPresses: React.Dispatch<
-    React.SetStateAction<{
-      [key: string]: {
-        currentlyPressed: boolean;
-        height: number;
-        bottom: number;
-      }[];
-    }>
-  >;
 }) {
-  const accidentalKeyRef = useRef<HTMLButtonElement>(null);
-
-  const handleMouseDown = () => {
-    if (!keysPressed.current.includes(note)) {
-      accidentalKeyRef.current?.classList.add("pressed");
-      playNote(note, octave, true);
-    }
-
-    if (keyVisualizerActiveRef.current && !keysPressed.current.includes(note)) {
-      if (visualizerAnimationFrameRef.current === undefined) {
-        // Start the animation loop to update continuously
-        visualizerAnimationFrameRef.current = requestAnimationFrame(
-          fgPianoController.updateVisualizerAnimations
-        );
-      }
-
-      setKeyPresses((prevKeyPresses) => {
-        const key = `${note}-fg-${octave}`;
-
-        const currentKeyPresses = prevKeyPresses[key] || [];
-
-        const newKeyPresses = {
-          ...prevKeyPresses,
-          [key]: [
-            ...currentKeyPresses,
-            {
-              currentlyPressed: true,
-              height: 0,
-              bottom: 0,
-            },
-          ],
-        };
-
-        return newKeyPresses;
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    accidentalKeyRef.current?.classList.remove("pressed");
-    playNote(note, octave, false);
-
-    if (keyVisualizerActiveRef.current) {
-      setKeyPresses((prevKeyPresses) => {
-        const key = `${note}-fg-${octave}`;
-
-        const updatedKeyPressArray = prevKeyPresses[key]
-          ? [...prevKeyPresses[key]]
-          : [];
-
-        if (keyVisualizerActiveRef.current) {
-          const lastEntry = updatedKeyPressArray.pop();
-          if (lastEntry) {
-            lastEntry.currentlyPressed = false;
-
-            const newKeyPresses = {
-              ...prevKeyPresses,
-              [key]: [...updatedKeyPressArray, lastEntry],
-            };
-
-            return newKeyPresses;
-          } else {
-            return prevKeyPresses;
-          }
-        } else {
-          const newKeyPresses = {
-            ...prevKeyPresses,
-          };
-
-          delete newKeyPresses[key];
-
-          return newKeyPresses;
-        }
-      });
-    }
-  };
-
   const getNextNote = (note: string) => {
     const notes = ["C", "D", "E", "F", "G", "A", "B"];
     const index = notes.indexOf(note);
@@ -142,7 +45,6 @@ export default function AccidentalKey({
   return (
     <FgButton
       externalId={`piano_key_${octave}_${note}`}
-      externalRef={accidentalKeyRef}
       className={`accidental-key ${classname}`}
       contentFunction={() => (
         <>
@@ -181,8 +83,6 @@ export default function AccidentalKey({
           >{`${getNextNote(note[0])}b`}</div>
         </>
       )}
-      mouseDownFunction={handleMouseDown}
-      mouseUpFunction={handleMouseUp}
       style={{ cursor: "default" }}
       data-note={note}
       data-octave={octave}

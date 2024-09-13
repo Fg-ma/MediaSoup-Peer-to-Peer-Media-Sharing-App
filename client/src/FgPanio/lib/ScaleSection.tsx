@@ -121,13 +121,15 @@ export default function ScaleSection({
             ? [...prevKeyPresses[key].filter((item) => item !== undefined)]
             : [];
 
-          if (updatedKeyPressArray.length > 0) {
-            const lastEntry = updatedKeyPressArray.pop();
-            if (lastEntry) {
-              lastEntry.currentlyPressed = false;
+          for (let i = 0; i < updatedKeyPressArray.length; i++) {
+            updatedKeyPressArray[i] = {
+              ...updatedKeyPressArray[i],
+              currentlyPressed: false,
+            };
+          }
 
-              newKeyPresses[key] = [...updatedKeyPressArray, lastEntry];
-            }
+          if (updatedKeyPressArray.length > 0) {
+            newKeyPresses[key] = updatedKeyPressArray;
           } else {
             delete newKeyPresses[key];
           }
@@ -175,10 +177,59 @@ export default function ScaleSection({
     window.addEventListener("pointermove", handleMouseMove);
 
     const targetElement = event.target as HTMLElement;
+    const note = targetElement.getAttribute("data-note");
+    const octave = targetElement.getAttribute("data-octave");
+
+    if (!note || !octave) {
+      return;
+    }
+
     currentPress.current = {
-      note: targetElement.getAttribute("data-note"),
-      octave: targetElement.getAttribute("data-octave"),
+      note: note,
+      octave: octave,
     };
+
+    if (!keysPressed.current.includes(note)) {
+      const keyElement = document.getElementById(`piano_key_${octave}_${note}`);
+      keyElement?.classList.add("pressed");
+      fgPianoController.playNote(note, parseInt(octave), true);
+    }
+
+    if (keyVisualizerActiveRef.current && !keysPressed.current.includes(note)) {
+      if (visualizerAnimationFrameRef.current === undefined) {
+        // Start the animation loop to update continuously
+        visualizerAnimationFrameRef.current = requestAnimationFrame(
+          fgPianoController.updateVisualizerAnimations
+        );
+      }
+
+      setKeyPresses((prevKeyPresses) => {
+        const key = `${note}-fg-${octave}`;
+
+        const currentKeyPresses = prevKeyPresses[key] || [];
+
+        for (let i = 0; i < currentKeyPresses.length; i++) {
+          currentKeyPresses[i] = {
+            ...currentKeyPresses[i],
+            currentlyPressed: false,
+          };
+        }
+
+        const newKeyPresses = {
+          ...prevKeyPresses,
+          [key]: [
+            ...currentKeyPresses,
+            {
+              currentlyPressed: true,
+              height: 0,
+              bottom: 0,
+            },
+          ],
+        };
+
+        return newKeyPresses;
+      });
+    }
   };
 
   const handleMouseMove = (event: MouseEvent) => {
@@ -351,76 +402,13 @@ export default function ScaleSection({
             ref={scaleSectionRef}
             className='scale-section space-x-0.25 py-0.25 px-2'
           >
-            <Scale
-              octave={0}
-              playNote={fgPianoController.playNote}
-              visibleOctave={visibleOctave}
-              fgPianoController={fgPianoController}
-              keyVisualizerActiveRef={keyVisualizerActiveRef}
-              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
-              keysPressed={keysPressed}
-              setKeyPresses={setKeyPresses}
-            />
-            <Scale
-              octave={1}
-              playNote={fgPianoController.playNote}
-              visibleOctave={visibleOctave}
-              fgPianoController={fgPianoController}
-              keyVisualizerActiveRef={keyVisualizerActiveRef}
-              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
-              keysPressed={keysPressed}
-              setKeyPresses={setKeyPresses}
-            />
-            <Scale
-              octave={2}
-              playNote={fgPianoController.playNote}
-              visibleOctave={visibleOctave}
-              fgPianoController={fgPianoController}
-              keyVisualizerActiveRef={keyVisualizerActiveRef}
-              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
-              keysPressed={keysPressed}
-              setKeyPresses={setKeyPresses}
-            />
-            <Scale
-              octave={3}
-              playNote={fgPianoController.playNote}
-              visibleOctave={visibleOctave}
-              fgPianoController={fgPianoController}
-              keyVisualizerActiveRef={keyVisualizerActiveRef}
-              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
-              keysPressed={keysPressed}
-              setKeyPresses={setKeyPresses}
-            />
-            <Scale
-              octave={4}
-              playNote={fgPianoController.playNote}
-              visibleOctave={visibleOctave}
-              fgPianoController={fgPianoController}
-              keyVisualizerActiveRef={keyVisualizerActiveRef}
-              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
-              keysPressed={keysPressed}
-              setKeyPresses={setKeyPresses}
-            />
-            <Scale
-              octave={5}
-              playNote={fgPianoController.playNote}
-              visibleOctave={visibleOctave}
-              fgPianoController={fgPianoController}
-              keyVisualizerActiveRef={keyVisualizerActiveRef}
-              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
-              keysPressed={keysPressed}
-              setKeyPresses={setKeyPresses}
-            />
-            <Scale
-              octave={6}
-              playNote={fgPianoController.playNote}
-              visibleOctave={visibleOctave}
-              fgPianoController={fgPianoController}
-              keyVisualizerActiveRef={keyVisualizerActiveRef}
-              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
-              keysPressed={keysPressed}
-              setKeyPresses={setKeyPresses}
-            />
+            <Scale octave={0} visibleOctave={visibleOctave} />
+            <Scale octave={1} visibleOctave={visibleOctave} />
+            <Scale octave={2} visibleOctave={visibleOctave} />
+            <Scale octave={3} visibleOctave={visibleOctave} />
+            <Scale octave={4} visibleOctave={visibleOctave} />
+            <Scale octave={5} visibleOctave={visibleOctave} />
+            <Scale octave={6} visibleOctave={visibleOctave} />
           </div>
         }
         panelSizeChangeCallback={fgPianoController.resize}
