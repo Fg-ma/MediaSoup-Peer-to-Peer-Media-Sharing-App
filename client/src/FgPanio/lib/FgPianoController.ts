@@ -55,6 +55,7 @@ class FgPianoController {
   private shiftPressed: React.MutableRefObject<boolean>;
   private controlPressed: React.MutableRefObject<boolean>;
 
+  private keyVisualizerActiveRef: React.MutableRefObject<boolean>;
   private keyVisualizerRef: React.RefObject<HTMLDivElement>;
   private visualizerAnimationFrameRef: React.MutableRefObject<
     number | undefined
@@ -97,6 +98,7 @@ class FgPianoController {
     shiftPressed: React.MutableRefObject<boolean>,
     controlPressed: React.MutableRefObject<boolean>,
 
+    keyVisualizerActiveRef: React.MutableRefObject<boolean>,
     keyVisualizerRef: React.RefObject<HTMLDivElement>,
     visualizerAnimationFrameRef: React.MutableRefObject<number | undefined>
   ) {
@@ -111,6 +113,7 @@ class FgPianoController {
     this.setKeyPresses = setKeyPresses;
     this.shiftPressed = shiftPressed;
     this.controlPressed = controlPressed;
+    this.keyVisualizerActiveRef = keyVisualizerActiveRef;
     this.keyVisualizerRef = keyVisualizerRef;
     this.visualizerAnimationFrameRef = visualizerAnimationFrameRef;
   }
@@ -168,6 +171,53 @@ class FgPianoController {
   handleKeyUp = (eventKey: string, octave: Octaves) => {
     const pianoKey = keysMap[eventKey];
 
+    if (this.keyVisualizerActiveRef.current) {
+      if (pianoKey === "shift" || pianoKey === "control") {
+        this.setKeyPresses((prevKeyPresses) => {
+          const newKeyPresses = { ...prevKeyPresses };
+
+          for (const keyPress in newKeyPresses) {
+            const keyPressStringArray = keyPress.split("-fg-");
+            const keyPressOctave =
+              keyPressStringArray[keyPressStringArray.length - 1];
+
+            if (parseInt(keyPressOctave) === octave) {
+              for (let i = 0; i < newKeyPresses[keyPress].length; i++) {
+                newKeyPresses[keyPress][i] = {
+                  ...newKeyPresses[keyPress][i],
+                  currentlyPressed: false,
+                };
+              }
+            }
+          }
+
+          return newKeyPresses;
+        });
+      } else {
+        this.setKeyPresses((prevKeyPresses) => {
+          const key = `${pianoKey}-fg-${octave}`;
+
+          const updatedKeyPressArray = prevKeyPresses[key]
+            ? [...prevKeyPresses[key]]
+            : [];
+
+          const lastEntry = updatedKeyPressArray.pop();
+          if (lastEntry) {
+            lastEntry.currentlyPressed = false;
+
+            const newKeyPresses = {
+              ...prevKeyPresses,
+              [key]: [...updatedKeyPressArray, lastEntry],
+            };
+
+            return newKeyPresses;
+          } else {
+            return prevKeyPresses;
+          }
+        });
+      }
+    }
+
     if (pianoKey) {
       if (pianoKey === "shift") {
         this.unpressOctave(octave);
@@ -196,6 +246,61 @@ class FgPianoController {
 
   handleKeyDown = (eventKey: string, octave: Octaves) => {
     const pianoKey = keysMap[eventKey];
+
+    if (
+      this.keyVisualizerActiveRef.current &&
+      !this.keysPressed.current.includes(pianoKey)
+    ) {
+      if (this.visualizerAnimationFrameRef.current === undefined) {
+        // Start the animation loop to update continuously
+        this.visualizerAnimationFrameRef.current = requestAnimationFrame(
+          this.updateVisualizerAnimations
+        );
+      }
+
+      if (pianoKey === "shift" || pianoKey === "control") {
+        this.setKeyPresses((prevKeyPresses) => {
+          const newKeyPresses = { ...prevKeyPresses };
+
+          for (const keyPress in newKeyPresses) {
+            const keyPressStringArray = keyPress.split("-fg-");
+            const keyPressOctave =
+              keyPressStringArray[keyPressStringArray.length - 1];
+
+            if (parseInt(keyPressOctave) === this.visibleOctaveRef.current) {
+              for (let i = 0; i < newKeyPresses[keyPress].length; i++) {
+                newKeyPresses[keyPress][i] = {
+                  ...newKeyPresses[keyPress][i],
+                  currentlyPressed: false,
+                };
+              }
+            }
+          }
+
+          return newKeyPresses;
+        });
+      } else {
+        this.setKeyPresses((prevKeyPresses) => {
+          const key = `${pianoKey}-fg-${octave}`;
+
+          const currentKeyPresses = prevKeyPresses[key] || [];
+
+          const newKeyPresses = {
+            ...prevKeyPresses,
+            [key]: [
+              ...currentKeyPresses,
+              {
+                currentlyPressed: true,
+                height: 0,
+                bottom: 0,
+              },
+            ],
+          };
+
+          return newKeyPresses;
+        });
+      }
+    }
 
     if (pianoKey && !this.keysPressed.current.includes(pianoKey)) {
       if (pianoKey === "shift") {
