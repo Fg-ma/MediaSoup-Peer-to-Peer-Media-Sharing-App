@@ -104,23 +104,69 @@ export default function ScaleSection({
     window.removeEventListener("pointerup", handleMouseUp);
     window.removeEventListener("pointermove", handleMouseMove);
 
-    if (
-      currentPress.current &&
-      currentPress.current.note &&
-      currentPress.current.octave
-    ) {
-      const key = document.getElementById(
-        `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
-      );
-      key?.classList.remove("pressed");
+    if (keyVisualizerActive) {
+      setKeyPresses((prevKeyPresses) => {
+        const newKeyPresses = {
+          ...prevKeyPresses,
+        };
 
-      fgPianoController.playNote(
-        currentPress.current.note,
-        parseInt(currentPress.current.octave),
-        false
-      );
+        if (
+          currentPress.current &&
+          currentPress.current.note &&
+          currentPress.current.octave
+        ) {
+          const key = `${currentPress.current.note}-fg-${currentPress.current.octave}`;
 
-      currentPress.current = undefined;
+          const updatedKeyPressArray = prevKeyPresses[key]
+            ? [...prevKeyPresses[key].filter((item) => item !== undefined)]
+            : [];
+
+          if (updatedKeyPressArray.length > 0) {
+            const lastEntry = updatedKeyPressArray.pop();
+            if (lastEntry) {
+              lastEntry.currentlyPressed = false;
+
+              newKeyPresses[key] = [...updatedKeyPressArray, lastEntry];
+            }
+          } else {
+            delete newKeyPresses[key];
+          }
+
+          const keyElement = document.getElementById(
+            `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
+          );
+          keyElement?.classList.remove("pressed");
+
+          fgPianoController.playNote(
+            currentPress.current.note,
+            parseInt(currentPress.current.octave),
+            false
+          );
+
+          currentPress.current = undefined;
+        }
+
+        return newKeyPresses;
+      });
+    } else {
+      if (
+        currentPress.current &&
+        currentPress.current.note &&
+        currentPress.current.octave
+      ) {
+        const keyElement = document.getElementById(
+          `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
+        );
+        keyElement?.classList.remove("pressed");
+
+        fgPianoController.playNote(
+          currentPress.current.note,
+          parseInt(currentPress.current.octave),
+          false
+        );
+
+        currentPress.current = undefined;
+      }
     }
   };
 
@@ -152,41 +198,6 @@ export default function ScaleSection({
       targetValues.note !== currentPress.current.note ||
       targetValues.octave !== currentPress.current.octave
     ) {
-      if (
-        currentPress.current &&
-        currentPress.current.note &&
-        currentPress.current.octave
-      ) {
-        const key = document.getElementById(
-          `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
-        );
-        key?.classList.remove("pressed");
-
-        fgPianoController.playNote(
-          currentPress.current.note.length === 1
-            ? currentPress.current.note
-            : `${currentPress.current.note[0]}#`,
-          parseInt(currentPress.current.octave),
-          false
-        );
-        currentPress.current = undefined;
-      }
-
-      if (targetValues.note && targetValues.octave) {
-        const key = document.getElementById(
-          `piano_key_${targetValues.octave}_${targetValues.note}`
-        );
-        key?.classList.add("pressed");
-
-        fgPianoController.playNote(
-          targetValues.note,
-          parseInt(targetValues.octave),
-          true
-        );
-
-        currentPress.current = targetValues;
-      }
-
       if (keyVisualizerActiveRef.current) {
         if (visualizerAnimationFrameRef.current === undefined) {
           // Start the animation loop to update continuously
@@ -242,8 +253,78 @@ export default function ScaleSection({
             ];
           }
 
+          if (
+            currentPress.current &&
+            currentPress.current.note &&
+            currentPress.current.octave
+          ) {
+            const key = document.getElementById(
+              `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
+            );
+            key?.classList.remove("pressed");
+
+            fgPianoController.playNote(
+              currentPress.current.note.length === 1
+                ? currentPress.current.note
+                : `${currentPress.current.note[0]}#`,
+              parseInt(currentPress.current.octave),
+              false
+            );
+            currentPress.current = undefined;
+          }
+
+          if (targetValues.note && targetValues.octave) {
+            const key = document.getElementById(
+              `piano_key_${targetValues.octave}_${targetValues.note}`
+            );
+            key?.classList.add("pressed");
+
+            fgPianoController.playNote(
+              targetValues.note,
+              parseInt(targetValues.octave),
+              true
+            );
+
+            currentPress.current = targetValues;
+          }
+
           return newKeyPresses;
         });
+      } else {
+        if (
+          currentPress.current &&
+          currentPress.current.note &&
+          currentPress.current.octave
+        ) {
+          const key = document.getElementById(
+            `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
+          );
+          key?.classList.remove("pressed");
+
+          fgPianoController.playNote(
+            currentPress.current.note.length === 1
+              ? currentPress.current.note
+              : `${currentPress.current.note[0]}#`,
+            parseInt(currentPress.current.octave),
+            false
+          );
+          currentPress.current = undefined;
+        }
+
+        if (targetValues.note && targetValues.octave) {
+          const key = document.getElementById(
+            `piano_key_${targetValues.octave}_${targetValues.note}`
+          );
+          key?.classList.add("pressed");
+
+          fgPianoController.playNote(
+            targetValues.note,
+            parseInt(targetValues.octave),
+            true
+          );
+
+          currentPress.current = targetValues;
+        }
       }
     }
   };
