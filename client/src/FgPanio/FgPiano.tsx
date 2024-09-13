@@ -197,6 +197,9 @@ export default function FgPiano({
             keyVisualizerActiveRef={keyVisualizerActiveRef}
             keyVisualizerRef={keyVisualizerRef}
             keyPresses={keyPresses}
+            visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+            keysPressed={keysPressed}
+            setKeyPresses={setKeyPresses}
           />
         </div>
       }

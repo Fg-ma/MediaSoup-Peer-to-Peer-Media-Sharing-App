@@ -18,6 +18,9 @@ export default function ScaleSection({
   keyVisualizerActiveRef,
   keyVisualizerRef,
   keyPresses,
+  visualizerAnimationFrameRef,
+  keysPressed,
+  setKeyPresses,
 }: {
   fgPianoController: FgPianoController;
   scaleSectionContainerRef: React.RefObject<HTMLDivElement>;
@@ -36,6 +39,17 @@ export default function ScaleSection({
       bottom: number;
     }[];
   };
+  visualizerAnimationFrameRef: React.MutableRefObject<number | undefined>;
+  keysPressed: React.MutableRefObject<string[]>;
+  setKeyPresses: React.Dispatch<
+    React.SetStateAction<{
+      [key: string]: {
+        currentlyPressed: boolean;
+        height: number;
+        bottom: number;
+      }[];
+    }>
+  >;
 }) {
   const currentPress = useRef<
     { note: string | null; octave: string | null } | undefined
@@ -155,9 +169,9 @@ export default function ScaleSection({
           parseInt(currentPress.current.octave),
           false
         );
-
         currentPress.current = undefined;
       }
+
       if (targetValues.note && targetValues.octave) {
         const key = document.getElementById(
           `piano_key_${targetValues.octave}_${targetValues.note}`
@@ -171,6 +185,65 @@ export default function ScaleSection({
         );
 
         currentPress.current = targetValues;
+      }
+
+      if (keyVisualizerActiveRef.current) {
+        if (visualizerAnimationFrameRef.current === undefined) {
+          // Start the animation loop to update continuously
+          visualizerAnimationFrameRef.current = requestAnimationFrame(
+            fgPianoController.updateVisualizerAnimations
+          );
+        }
+
+        setKeyPresses((prevKeyPresses) => {
+          const newKeyPresses = {
+            ...prevKeyPresses,
+          };
+
+          if (
+            currentPress.current &&
+            currentPress.current.note &&
+            currentPress.current.octave
+          ) {
+            const key = `${currentPress.current.note}-fg-${currentPress.current.octave}`;
+
+            const updatedKeyPressArray = prevKeyPresses[key]
+              ? [...prevKeyPresses[key].filter((item) => item !== undefined)]
+              : [];
+
+            if (updatedKeyPressArray.length > 0) {
+              const lastEntry = updatedKeyPressArray.pop();
+              if (lastEntry) {
+                lastEntry.currentlyPressed = false;
+
+                newKeyPresses[key] = [...updatedKeyPressArray, lastEntry];
+              }
+            } else {
+              delete newKeyPresses[key];
+            }
+          }
+
+          if (
+            targetValues.note &&
+            targetValues.octave &&
+            !keysPressed.current.includes(targetValues.note)
+          ) {
+            const key = `${targetValues.note}-fg-${targetValues.octave}`;
+
+            const currentKeyPresses = prevKeyPresses[key] || [];
+
+            newKeyPresses[key] = [
+              ...currentKeyPresses,
+              {
+                currentlyPressed: true,
+                height: 0,
+                bottom: 0,
+              },
+            ];
+          }
+
+          return newKeyPresses;
+        });
       }
     }
   };
@@ -201,36 +274,71 @@ export default function ScaleSection({
               octave={0}
               playNote={fgPianoController.playNote}
               visibleOctave={visibleOctave}
+              fgPianoController={fgPianoController}
+              keyVisualizerActiveRef={keyVisualizerActiveRef}
+              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+              keysPressed={keysPressed}
+              setKeyPresses={setKeyPresses}
             />
             <Scale
               octave={1}
               playNote={fgPianoController.playNote}
               visibleOctave={visibleOctave}
+              fgPianoController={fgPianoController}
+              keyVisualizerActiveRef={keyVisualizerActiveRef}
+              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+              keysPressed={keysPressed}
+              setKeyPresses={setKeyPresses}
             />
             <Scale
               octave={2}
               playNote={fgPianoController.playNote}
               visibleOctave={visibleOctave}
+              fgPianoController={fgPianoController}
+              keyVisualizerActiveRef={keyVisualizerActiveRef}
+              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+              keysPressed={keysPressed}
+              setKeyPresses={setKeyPresses}
             />
             <Scale
               octave={3}
               playNote={fgPianoController.playNote}
               visibleOctave={visibleOctave}
+              fgPianoController={fgPianoController}
+              keyVisualizerActiveRef={keyVisualizerActiveRef}
+              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+              keysPressed={keysPressed}
+              setKeyPresses={setKeyPresses}
             />
             <Scale
               octave={4}
               playNote={fgPianoController.playNote}
               visibleOctave={visibleOctave}
+              fgPianoController={fgPianoController}
+              keyVisualizerActiveRef={keyVisualizerActiveRef}
+              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+              keysPressed={keysPressed}
+              setKeyPresses={setKeyPresses}
             />
             <Scale
               octave={5}
               playNote={fgPianoController.playNote}
               visibleOctave={visibleOctave}
+              fgPianoController={fgPianoController}
+              keyVisualizerActiveRef={keyVisualizerActiveRef}
+              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+              keysPressed={keysPressed}
+              setKeyPresses={setKeyPresses}
             />
             <Scale
               octave={6}
               playNote={fgPianoController.playNote}
               visibleOctave={visibleOctave}
+              fgPianoController={fgPianoController}
+              keyVisualizerActiveRef={keyVisualizerActiveRef}
+              visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+              keysPressed={keysPressed}
+              setKeyPresses={setKeyPresses}
             />
           </div>
         }

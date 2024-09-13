@@ -201,18 +201,28 @@ class FgPianoController {
             ? [...prevKeyPresses[key]]
             : [];
 
-          const lastEntry = updatedKeyPressArray.pop();
-          if (lastEntry) {
-            lastEntry.currentlyPressed = false;
+          if (updatedKeyPressArray.length > 0) {
+            const lastEntry = updatedKeyPressArray.pop();
+            if (lastEntry) {
+              lastEntry.currentlyPressed = false;
 
+              const newKeyPresses = {
+                ...prevKeyPresses,
+                [key]: [...updatedKeyPressArray, lastEntry],
+              };
+
+              return newKeyPresses;
+            } else {
+              return prevKeyPresses;
+            }
+          } else {
             const newKeyPresses = {
               ...prevKeyPresses,
-              [key]: [...updatedKeyPressArray, lastEntry],
             };
 
+            delete newKeyPresses[key];
+
             return newKeyPresses;
-          } else {
-            return prevKeyPresses;
           }
         });
       }
