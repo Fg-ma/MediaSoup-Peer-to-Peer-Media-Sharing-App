@@ -219,7 +219,7 @@ export default function SelectionPanel({
       }}
     >
       {portalPosition?.position === "right" && (
-        <div className='flex flex-col bg-red-500'>
+        <div className='flex flex-col'>
           <div
             className={`${isParentScrolling ? "w-[3.1875rem]" : "w-4"} grow`}
           ></div>
@@ -228,7 +228,7 @@ export default function SelectionPanel({
       {scrollingAvailable && (
         <div
           ref={scrollUpButtonRef}
-          className={`absolute top-0 h-4 z-[999999999999999] bg-purple-500 ${
+          className={`absolute top-0 h-4 z-[999999999999999] ${
             portalPosition?.position === "right"
               ? isParentScrolling
                 ? "left-[3.1875rem]"
@@ -282,7 +282,7 @@ export default function SelectionPanel({
       {scrollingAvailable && (
         <div
           ref={scrollDownButtonRef}
-          className={`absolute bottom-0 h-4 z-[999999999999999] bg-purple-500 ${
+          className={`absolute bottom-0 h-4 z-[999999999999999] ${
             portalPosition?.position === "right"
               ? isParentScrolling
                 ? "left-[3.1875rem]"
@@ -297,7 +297,7 @@ export default function SelectionPanel({
         ></div>
       )}
       {portalPosition?.position === "left" && (
-        <div className='flex flex-col bg-blue-500'>
+        <div className='flex flex-col'>
           <div className='w-4 grow'></div>
         </div>
       )}

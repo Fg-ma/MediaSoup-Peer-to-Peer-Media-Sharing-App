@@ -46,11 +46,7 @@
   position: absolute;
   width: var(--key-width);
   border-radius: 0.375rem;
-}
-
-.key-visualizer-key {
-  position: absolute;
-  width: var(--key-width);
+  background-color: #f57e41;
 }
 
 .key-visualizer .C-fg-0 {

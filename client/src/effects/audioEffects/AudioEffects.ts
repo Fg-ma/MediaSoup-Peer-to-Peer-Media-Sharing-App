@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import FgSampler from "./FgSampler";
+import FgSampler from "./fgSampler";
 
 export type AudioMixEffectsType =
   | "autoFilter"

@@ -1447,6 +1447,22 @@ class AudioMedia {
     this.audioEffects.fgSampler.setVolume(volume);
   }
 
+  startMetronome = () => {
+    this.audioEffects.fgSampler.fgMetronome.startMetronome();
+  };
+
+  stopMetronome = () => {
+    this.audioEffects.fgSampler.fgMetronome.stopMetronome();
+  };
+
+  setMetronomeBPM = (bpm: number) => {
+    this.audioEffects.fgSampler.fgMetronome.setMetronomeBPM(bpm);
+  };
+
+  setMetronomeVolume = (volume: number) => {
+    this.audioEffects.fgSampler.fgMetronome.setMetronomeVolume(volume);
+  };
+
   getStream() {
     return this.mediaStream;
   }

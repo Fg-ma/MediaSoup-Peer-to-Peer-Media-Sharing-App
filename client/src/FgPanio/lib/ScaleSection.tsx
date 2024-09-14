@@ -2,7 +2,7 @@ import React, { useEffect, useRef, Suspense } from "react";
 import Scale from "./Scale";
 import { Octaves } from "../FgPiano";
 import VerticalSplitPanes from "../../verticalSplitPane/VerticalSplitPanes";
-import FgPianoController from "./FgPianoController";
+import FgPianoController, { keysMap } from "./FgPianoController";
 
 const KeyVisualizer = React.lazy(() => import("./KeyVisualizer"));
 
@@ -60,6 +60,56 @@ export default function ScaleSection({
       event.preventDefault();
       event.stopPropagation();
 
+      if (keyVisualizerActive) {
+        setKeyPresses((prevKeyPresses) => {
+          const newKeyPresses = {
+            ...prevKeyPresses,
+          };
+
+          for (const keyPress in newKeyPresses) {
+            for (let i = 0; i < newKeyPresses[keyPress].length; i++) {
+              newKeyPresses[keyPress][i] = {
+                ...newKeyPresses[keyPress][i],
+                currentlyPressed: false,
+              };
+            }
+
+            const [note, octave] = keyPress.split("-fg-");
+
+            const keyElement = document.getElementById(
+              `piano_key_${octave}_${note}`
+            );
+
+            if (keyElement?.classList.contains("pressed")) {
+              keyElement?.classList.remove("pressed");
+              fgPianoController.playNote(note, parseInt(octave), false);
+            }
+          }
+
+          currentPress.current = undefined;
+
+          return newKeyPresses;
+        });
+      } else {
+        for (const keyPress in keysMap) {
+          const keyElement = document.getElementById(
+            `piano_key_${visibleOctaveRef.current}_${keysMap[keyPress]}`
+          );
+
+          if (keyElement?.classList.contains("pressed")) {
+            keyElement?.classList.remove("pressed");
+
+            fgPianoController.playNote(
+              keysMap[keyPress],
+              visibleOctaveRef.current,
+              false
+            );
+          }
+        }
+
+        currentPress.current = undefined;
+      }
+
       if (scaleSectionContainerRef && scaleSectionContainerRef.current) {
         // If horizontal scroll is dominant, scroll horizontally.
         if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
@@ -92,7 +142,7 @@ export default function ScaleSection({
         handleWheel
       );
     };
-  }, []);
+  }, [keyVisualizerActive]);
 
   useEffect(() => {
     setTimeout(() => {

@@ -1,6 +1,7 @@
 import * as Tone from "tone";
 import { AudioMixEffectsType, MixEffectsOptionsType } from "./AudioEffects";
 import fgSamplers, { FgSamplers } from "./fgSamplers";
+import FgMetronome from "./fgMetronome";
 
 class FgSampler {
   private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
@@ -34,6 +35,8 @@ class FgSampler {
   private stereoWidener: Tone.StereoWidener | undefined;
   private tremolo: Tone.Tremolo | undefined;
   private vibrato: Tone.Vibrato | undefined;
+
+  fgMetronome: FgMetronome;
 
   private effectUpdaters: {
     [key in AudioMixEffectsType]: (
@@ -364,8 +367,11 @@ class FgSampler {
 
     // Set up the initial connections
     this.sampler.connect(this.volumeNode);
-    this.volumeNode.connect(this.samplerChain); // Connect volumeNode to the effects chain
-    this.samplerChain.connect(this.samplerMediaStreamDestination); // Connect effects chain to mediaStreamDestination
+    this.volumeNode.connect(this.samplerChain); // Connect volumeNode to the sampler chain
+    this.samplerChain.connect(this.samplerMediaStreamDestination); // Connect sampler chain to mediaStreamDestination
+
+    this.fgMetronome = new FgMetronome();
+    this.fgMetronome.startMetronome();
   }
 
   swapSampler = (

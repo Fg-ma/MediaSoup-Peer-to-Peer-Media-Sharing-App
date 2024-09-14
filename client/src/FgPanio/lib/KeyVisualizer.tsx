@@ -23,7 +23,6 @@ export default function KeyVisualizer({
                 key={`${key}_${index}`}
                 className={`key-visualizer-key ${key}`}
                 style={{
-                  backgroundColor: "orange",
                   bottom: instance && instance.bottom && `${instance.bottom}px`,
                   height: instance && instance.height && `${instance.height}px`,
                 }}
