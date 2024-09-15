@@ -277,7 +277,7 @@ export default function FgPanel({
   }, [size]);
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (!closeCallback) return;
+    if (!closeCallback || event.target instanceof HTMLInputElement) return;
 
     const key = event.key.toLowerCase();
     if (["x", "delete", "escape"].includes(key)) {

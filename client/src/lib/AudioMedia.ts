@@ -1448,11 +1448,11 @@ class AudioMedia {
   }
 
   startMetronome = () => {
-    this.audioEffects.fgSampler.fgMetronome.startMetronome();
+    return this.audioEffects.fgSampler.fgMetronome.startMetronome();
   };
 
   stopMetronome = () => {
-    this.audioEffects.fgSampler.fgMetronome.stopMetronome();
+    return this.audioEffects.fgSampler.fgMetronome.stopMetronome();
   };
 
   setMetronomeBPM = (bpm: number) => {

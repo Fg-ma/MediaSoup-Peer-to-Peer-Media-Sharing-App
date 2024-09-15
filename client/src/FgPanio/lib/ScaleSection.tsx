@@ -167,20 +167,14 @@ export default function ScaleSection({
         ) {
           const key = `${currentPress.current.note}-fg-${currentPress.current.octave}`;
 
-          const updatedKeyPressArray = prevKeyPresses[key]
-            ? [...prevKeyPresses[key].filter((item) => item !== undefined)]
-            : [];
-
-          for (let i = 0; i < updatedKeyPressArray.length; i++) {
-            updatedKeyPressArray[i] = {
-              ...updatedKeyPressArray[i],
+          for (let i = 0; i < newKeyPresses[key].length; i++) {
+            newKeyPresses[key][i] = {
+              ...newKeyPresses[key][i],
               currentlyPressed: false,
             };
           }
 
-          if (updatedKeyPressArray.length > 0) {
-            newKeyPresses[key] = updatedKeyPressArray;
-          } else {
+          if (prevKeyPresses[key].length === 0) {
             delete newKeyPresses[key];
           }
 

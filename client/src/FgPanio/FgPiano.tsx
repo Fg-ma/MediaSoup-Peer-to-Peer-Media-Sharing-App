@@ -94,13 +94,17 @@ export default function FgPiano({
   };
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    event.preventDefault();
-
     const eventKey = event.key.toLowerCase();
+
+    if (event.target instanceof HTMLInputElement) {
+      return;
+    }
 
     if (!(eventKey in keysMap)) {
       return;
     }
+
+    event.preventDefault();
 
     let octave: number = visibleOctaveRef.current;
     if (shiftPressed.current) {

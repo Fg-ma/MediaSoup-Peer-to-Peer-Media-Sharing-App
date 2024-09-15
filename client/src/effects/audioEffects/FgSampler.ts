@@ -371,7 +371,6 @@ class FgSampler {
     this.samplerChain.connect(this.samplerMediaStreamDestination); // Connect sampler chain to mediaStreamDestination
 
     this.fgMetronome = new FgMetronome();
-    this.fgMetronome.startMetronome();
   }
 
   swapSampler = (

@@ -6,11 +6,13 @@ import SamplerVolume from "./SamplerVolume";
 import OctaveSelection from "./OctaveSelection";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
+import FgPianoController from "./FgPianoController";
+
 import effectIcon from "../../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
 import keyVisualizerIcon from "../../../public/svgs/audio/keyVisualizerIcon.svg";
 import keyVisualizerOffIcon from "../../../public/svgs/audio/keyVisualizerOffIcon.svg";
-import FgPianoController from "./FgPianoController";
+import SamplerMetronome from "./SamplerMetronome";
 
 export const navVar: Variants = {
   leftInit: { opacity: 0, x: -20 },
@@ -80,7 +82,7 @@ export default function SamplerToolbar({
   }, []);
 
   return (
-    <div className='w-full h-8 flex justify-between px-2 mb-1 overflow-hidden'>
+    <div className='w-full h-8 flex justify-between px-2 mb-1'>
       <motion.div
         className='w-max h-8 z-20 flex items-center space-x-2 pr-2 asp'
         animate={{
@@ -149,6 +151,7 @@ export default function SamplerToolbar({
           className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         />
+        <SamplerMetronome />
         <SamplerVolume />
       </motion.div>
       <div

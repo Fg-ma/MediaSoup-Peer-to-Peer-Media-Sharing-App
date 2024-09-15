@@ -34,7 +34,6 @@ export default function SamplerVolume() {
       volumeDb = (maxDb - minDb) * volume + minDb;
     }
 
-    // Assuming `fgSampler` is accessible in this scope:
     userMedia.current.audio?.setSamplerVolume(volumeDb);
   };
 
@@ -79,12 +78,8 @@ export default function SamplerVolume() {
       return;
     }
 
-    const min = 0;
-    const max = 1;
-    const percentage = ((value - min) / (max - min)) * 100;
-    const trackColor = `linear-gradient(to right, ${primaryVolumeSliderColor} 0%, ${primaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} 100%)`;
-
-    sliderRef.current.style.background = trackColor;
+    const percentage = value * 100;
+    sliderRef.current.style.background = `linear-gradient(to right, ${primaryVolumeSliderColor} 0%, ${primaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} ${percentage}%, ${secondaryVolumeSliderColor} 100%)`;
   };
 
   useEffect(() => {

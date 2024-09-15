@@ -41,6 +41,8 @@ export default function FgButton({
   holdFunction,
   contentFunction,
   doubleClickFunction,
+  focusFunction,
+  blurFunction,
   holdContent,
   hoverContent,
   className,
@@ -58,6 +60,8 @@ export default function FgButton({
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: (event: React.MouseEvent) => void;
+  focusFunction?: (event: React.FocusEvent) => void;
+  blurFunction?: (event: React.FocusEvent) => void;
   holdContent?: React.ReactElement;
   hoverContent?: React.ReactElement;
   className?: string;
@@ -207,6 +211,8 @@ export default function FgButton({
         data-value={fgButtonOptions.defaultDataValue}
         onDoubleClick={handleDoubleClick}
         onMouseEnter={handleMouseEnter}
+        onFocus={focusFunction}
+        onBlur={blurFunction}
         disabled={fgButtonOptions.disabled}
         {...(animationOptions && {
           variants: animationOptions.variants,

@@ -38,11 +38,21 @@ class FgMetronome {
   }
 
   startMetronome = () => {
-    this.transport.start(); // Start the transport
+    if (this.metronome.loaded) {
+      this.transport.start();
+      return true;
+    } else {
+      return false;
+    }
   };
 
   stopMetronome = () => {
-    this.transport.stop(); // Stop the transport
+    if (this.metronome.loaded) {
+      this.transport.stop();
+      return true;
+    } else {
+      return false;
+    }
   };
 
   setMetronomeBPM = (bpm: number) => {
