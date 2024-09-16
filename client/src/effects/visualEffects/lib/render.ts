@@ -126,7 +126,11 @@ const render = async (
       faceId,
       landmarks,
     } of faceLandmarks.getFaceIdLandmarksPairs()) {
-      if (effects.ears && currentEffectsStyles.current.camera[id].ears) {
+      if (
+        effects.ears &&
+        currentEffectsStyles.current.camera[id] &&
+        currentEffectsStyles.current.camera[id].ears
+      ) {
         if (!currentEffectsStyles.current.camera[id].ears.threeDim) {
           const twoDimEarsOffset =
             calculatedLandmarks.twoDimEarsOffsets[faceId];
@@ -185,7 +189,11 @@ const render = async (
         }
       }
 
-      if (effects.glasses && currentEffectsStyles.current.camera[id].glasses) {
+      if (
+        effects.glasses &&
+        currentEffectsStyles.current.camera[id] &&
+        currentEffectsStyles.current.camera[id].glasses
+      ) {
         if (!currentEffectsStyles.current.camera[id].glasses.threeDim) {
           const eyesCenterPosition =
             calculatedLandmarks.eyesCenterPositions[faceId];
@@ -229,7 +237,11 @@ const render = async (
         }
       }
 
-      if (effects.beards && currentEffectsStyles.current.camera[id].beards) {
+      if (
+        effects.beards &&
+        currentEffectsStyles.current.camera[id] &&
+        currentEffectsStyles.current.camera[id].beards
+      ) {
         if (!currentEffectsStyles.current.camera[id].beards.threeDim) {
           const twoDimBeardOffset =
             calculatedLandmarks.twoDimBeardOffsets[faceId];
@@ -250,21 +262,20 @@ const render = async (
             calculatedLandmarks.headPitchAngles[faceId]
           );
         } else {
-          if (currentEffectsStyles.current.camera[id].mustaches) {
-            const threeDimMustacheOffset =
-              calculatedLandmarks.threeDimMustacheOffsets[faceId];
-
+          if (currentEffectsStyles.current.camera[id].beards) {
+            const threeDimBeardOffset =
+              calculatedLandmarks.threeDimBeardOffsets[faceId];
             await baseShader.drawMesh(
-              currentEffectsStyles.current.camera[id].mustaches.style,
+              currentEffectsStyles.current.camera[id].beards.style,
               {
-                x: 2 * landmarks[faceLandmarks.NOSE_INDEX].x - 1,
-                y: -2 * landmarks[faceLandmarks.NOSE_INDEX].y + 1,
+                x: 2 * landmarks[faceLandmarks.JAW_MID_POINT_INDEX].x - 1,
+                y: -2 * landmarks[faceLandmarks.JAW_MID_POINT_INDEX].y + 1,
               },
               {
-                x: threeDimMustacheOffset[0],
-                y: threeDimMustacheOffset[1],
+                x: threeDimBeardOffset[0],
+                y: threeDimBeardOffset[1],
               },
-              0.4,
+              0.7,
               calculatedLandmarks.headRotationAngles[faceId],
               calculatedLandmarks.headYawAngles[faceId],
               calculatedLandmarks.headPitchAngles[faceId]
@@ -275,6 +286,7 @@ const render = async (
 
       if (
         effects.mustaches &&
+        currentEffectsStyles.current.camera[id] &&
         currentEffectsStyles.current.camera[id].mustaches
       ) {
         if (!currentEffectsStyles.current.camera[id].mustaches.threeDim) {

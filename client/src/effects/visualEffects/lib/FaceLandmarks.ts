@@ -432,15 +432,28 @@ class FaceLandmarks {
       // Calculate the shift distance for the chin position taking into account
       // headAngle for direction of shift
       if (this.currentEffectsStyles.current.camera[this.id].beards) {
-        const { shiftX: beardShiftX, shiftY: beardShiftY } =
+        const { shiftX: twoDimBeardShiftX, shiftY: twoDimBeardShiftY } =
           this.directionalShift(
-            this.currentEffectsStyles.current.camera[this.id].beards!
-              .chinOffset,
+            this.currentEffectsStyles.current.camera[this.id].beards!.chinOffset
+              .twoDim,
             this.calculatedLandmarks.headRotationAngles[faceId]
           );
         this.calculatedLandmarks.twoDimBeardOffsets[faceId] = [
-          beardShiftX,
-          beardShiftY,
+          twoDimBeardShiftX,
+          twoDimBeardShiftY,
+        ];
+      }
+
+      if (this.currentEffectsStyles.current.camera[this.id].beards) {
+        const { shiftX: threeDimBeardShiftX, shiftY: threeDimBeardShiftY } =
+          this.directionalShift(
+            this.currentEffectsStyles.current.camera[this.id].beards!.chinOffset
+              .threeDim,
+            this.calculatedLandmarks.headRotationAngles[faceId]
+          );
+        this.calculatedLandmarks.threeDimBeardOffsets[faceId] = [
+          threeDimBeardShiftX,
+          threeDimBeardShiftY,
         ];
       }
 

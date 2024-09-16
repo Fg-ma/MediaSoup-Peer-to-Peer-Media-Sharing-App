@@ -17,12 +17,16 @@ export const earsWidthFactorMap: {
   dogEars: { leftEarWidthFactor: 0.6, rightEarWidthFactor: 0.6 },
 };
 
-export type BeardsEffectTypes = "classicalCurlyBeard";
+export type BeardsEffectTypes = "classicalCurlyBeard" | "chinBeard";
 
 export const beardChinOffsetsMap: {
-  [beardEffectType in BeardsEffectTypes]: number;
+  [beardEffectType in BeardsEffectTypes]: {
+    twoDim: number;
+    threeDim: number;
+  };
 } = {
-  classicalCurlyBeard: 0.0,
+  classicalCurlyBeard: { twoDim: 0.0, threeDim: -0.35 },
+  chinBeard: { twoDim: -0.3, threeDim: -0.28 },
 };
 
 export type GlassesEffectTypes =
@@ -65,7 +69,7 @@ export interface CameraEffectStylesType {
   beards?: {
     style: BeardsEffectTypes;
     threeDim: boolean;
-    chinOffset: number;
+    chinOffset: { twoDim: number; threeDim: number };
   };
   mustaches?: {
     style: MustachesEffectTypes;

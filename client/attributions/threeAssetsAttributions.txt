@@ -1,0 +1,29 @@
+Beards:
+  - 3D Model "Chin beard" This work is based on "Beard 1" (https://sketchfab.com/3d-models/beard-1-f4f8c69fc44242b698ebfcc50c8255f0) by POLYTRICITY (https://sketchfab.com/PolytricityLtd) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+  - 3D Model "Classical curly beard" This work is based on "SculptJanuary 2022 008 Beard" (https://sketchfab.com/3d-models/sculptjanuary-2022-008-beard-fcbf8829e4bf481ba0538d8ca5814758) by Chaitanya Krishnan (https://sketchfab.com/chaitanyak) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model 
+  - 3D Model 
+  - 3D Model 
+  - 3D Model 
+
+Glasses:
+  - 3D Model "Glasses1" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-bd1104e5ad1e4a1b9e1793a606c5be82) by drydoctoregg (https://sketchfab.com/drydoctoregg) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+  - 3D Model "Glasses2" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-6167fb73abe94fbda810020123d0dbdc) by Anthony Yanez (https://sketchfab.com/paulyanez) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+  - 3D Model "Glasses3" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-007651a9450746a5b6c5a126d484cd52) by Marius.Eder (https://sketchfab.com/Marius.Eder) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+  - 3D Model "Heart-shaped glasses" This work is based on "Heart-shaped glasses" (https://sketchfab.com/3d-models/heart-shaped-glasses-97cbff16eec648fdb211ea58159bd9ba) by Felix Yadomi (https://sketchfab.com/felixyadomi) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+  - 3D Model 
+  - 3D Model 
+  - 3D Model 
+  - 3D Model 
+  - 3D Model 
+  - 3D Model 
+
+Hats: 
+  - 3D Model "Super Mario Odyssey Hat" This work is based on "Super Mario Odyssey Hat" (https://sketchfab.com/3d-models/super-mario-odyssey-hat-bb6687a4a25c435682faea7094227f7e) by marvelmaster (https://sketchfab.com/marvelmaster) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+  - 3D Model "Hat 2"
+  - 3D Model "Hat 3"
+  - 3D Model "Hat 4"
+  - 3D Model "Hat 5"
+  - 3D Model "Hat 6"
+  - 3D Model "Hat 7"
+  - 3D Model "Hat 8"

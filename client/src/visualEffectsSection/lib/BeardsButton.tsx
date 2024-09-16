@@ -12,12 +12,19 @@ import {
   ScreenEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
+
 import classicalCurlyBeard from "../../../public/2DAssets/beards/classicalCurlyBeard.png";
 import loading_classicalCurlyBeard from "../../../public/2DAssets/beards/loading_classicalCurlyBeard.png";
 import classicalCurlyBeardIcon from "../../../public/svgs/beards/classicalCurlyBeardIcon.svg";
 import classicalCurlyBeardOffIcon from "../../../public/svgs/beards/classicalCurlyBeardOffIcon.svg";
 import threeDim_classicalCurlyBeardIcon from "../../../public/svgs/beards/threeDim_classicalCurlyBeardIcon.svg";
 import threeDim_classicalCurlyBeardOffIcon from "../../../public/svgs/beards/threeDim_classicalCurlyBeardOffIcon.svg";
+import chinBeard from "../../../public/2DAssets/beards/chinBeard.png";
+import loading_chinBeard from "../../../public/2DAssets/beards/loading_chinBeard.png";
+import chinBeardOff from "../../../public/2DAssets/beards/chinBeardOff.png";
+import loading_chinBeardOff from "../../../public/2DAssets/beards/loading_chinBeardOff.png";
+import threeDim_chinBeard from "../../../public/2DAssets/beards/threeDim_chinBeard.png";
+import threeDim_loading_chinBeard from "../../../public/2DAssets/beards/threeDim_loading_chinBeard.png";
 
 export default function BeardsButton({
   username,
@@ -59,10 +66,16 @@ export default function BeardsButton({
     [key in BeardsEffectTypes]: {
       image: string;
       loading: string;
-      icon: string;
-      offIcon: string;
-      threeDimIcon: string;
-      threeDimOffIcon: string;
+      icon?: string;
+      offIcon?: string;
+      offImage?: string;
+      loadingOffImage?: string;
+      threeDimIcon?: string;
+      threeDimImage?: string;
+      threeDimLoadingImage?: string;
+      threeDimOffIcon?: string;
+      threeDimOffImage?: string;
+      threeDimLoadingOffImage?: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -75,6 +88,18 @@ export default function BeardsButton({
       threeDimIcon: threeDim_classicalCurlyBeardIcon,
       threeDimOffIcon: threeDim_classicalCurlyBeardOffIcon,
       flipped: true,
+      bgColor: "black",
+    },
+    chinBeard: {
+      image: chinBeard,
+      loading: loading_chinBeard,
+      offImage: chinBeardOff,
+      loadingOffImage: loading_chinBeardOff,
+      threeDimImage: threeDim_chinBeard,
+      threeDimLoadingImage: threeDim_loading_chinBeard,
+      threeDimOffImage: threeDim_chinBeard,
+      threeDimLoadingOffImage: threeDim_loading_chinBeard,
+      flipped: false,
       bgColor: "black",
     },
   };
@@ -140,27 +165,65 @@ export default function BeardsButton({
           return;
         }
 
-        const iconSrc =
-          beardsEffects[effectsStyles?.style ?? "classicalCurlyBeard"][
-            effectsStyles?.threeDim
-              ? streamEffects
-                ? "threeDimOffIcon"
-                : "threeDimIcon"
-              : streamEffects
-              ? "offIcon"
-              : "icon"
-          ];
+        if (beardsEffects[effectsStyles?.style ?? "classicalCurlyBeard"].icon) {
+          const iconSrc =
+            beardsEffects[effectsStyles?.style ?? "classicalCurlyBeard"][
+              effectsStyles?.threeDim
+                ? streamEffects
+                  ? "threeDimOffIcon"
+                  : "threeDimIcon"
+                : streamEffects
+                ? "offIcon"
+                : "icon"
+            ];
 
-        return (
-          <FgSVG
-            src={iconSrc}
-            attributes={[
-              { key: "width", value: "95%" },
-              { key: "height", value: "95%" },
-            ]}
-            data-value={effectsStyles?.style}
-          />
-        );
+          if (iconSrc) {
+            return (
+              <FgSVG
+                src={iconSrc}
+                attributes={[
+                  { key: "width", value: "95%" },
+                  { key: "height", value: "95%" },
+                ]}
+                data-value={effectsStyles?.style}
+              />
+            );
+          }
+        } else {
+          const imageSrc =
+            beardsEffects[effectsStyles?.style ?? "classicalCurlyBeard"][
+              effectsStyles?.threeDim
+                ? streamEffects
+                  ? "threeDimOffImage"
+                  : "threeDimImage"
+                : streamEffects
+                ? "offImage"
+                : "image"
+            ];
+
+          const imageLoadingSrc =
+            beardsEffects[effectsStyles?.style ?? "classicalCurlyBeard"][
+              effectsStyles?.threeDim
+                ? streamEffects
+                  ? "threeDimLoadingOffImage"
+                  : "threeDimLoadingImage"
+                : streamEffects
+                ? "loadingOffImage"
+                : "loading"
+            ];
+
+          if (imageSrc) {
+            return (
+              <FgImage
+                src={imageSrc}
+                srcLoading={imageLoadingSrc}
+                alt={effectsStyles?.style}
+                style={{ width: "90%", height: "90%" }}
+                data-value={effectsStyles?.style}
+              />
+            );
+          }
+        }
       }}
       doubleClickFunction={async () => {
         if (!effectsStyles) {
