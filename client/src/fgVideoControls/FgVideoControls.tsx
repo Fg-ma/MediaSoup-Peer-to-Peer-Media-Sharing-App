@@ -19,6 +19,9 @@ const PictureInPictureButton = React.lazy(
   () => import("./lib/PictureInPictureButton")
 );
 const CaptionButton = React.lazy(() => import("./lib/CaptionButton"));
+const FgSettingsButton = React.lazy(
+  () => import("../fgSettingsButton/FgSettingsButton")
+);
 const PlaybackSpeedButton = React.lazy(
   () => import("./lib/PlaybackSpeedButton")
 );
@@ -232,14 +235,20 @@ export default function FgVideoControls({
             </Suspense>
           )}
           {(fgVideoOptions.isClosedCaptions ??
-            defaultFgVideoOptions.isClosedCaptions) && (
+            defaultFgVideoOptions.isClosedCaptions) &&
+            fgVideoOptions.isVolume && (
+              <Suspense fallback={<div>Loading...</div>}>
+                <CaptionButton
+                  controls={controls}
+                  effectsActive={effectsActive}
+                />
+              </Suspense>
+            )}
+          {
             <Suspense fallback={<div>Loading...</div>}>
-              <CaptionButton
-                controls={controls}
-                effectsActive={effectsActive}
-              />
+              <FgSettingsButton effectsActive={effectsActive} />
             </Suspense>
-          )}
+          }
           {(fgVideoOptions.isPlaybackSpeed ??
             defaultFgVideoOptions.isPlaybackSpeed) && (
             <Suspense fallback={<div>Loading...</div>}>

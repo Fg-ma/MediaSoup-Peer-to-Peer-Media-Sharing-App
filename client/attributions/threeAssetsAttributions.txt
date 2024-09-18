@@ -8,13 +8,16 @@ Beards:
 
 Glasses:
   - 3D Model "Aviator Goggles" This work is based on "Aviator Helmet With Goggles" (https://sketchfab.com/3d-models/aviator-helmet-with-goggles-1e32e931ffc34fd5a4e839cb6131347c) by Enaphets (https://sketchfab.com/enaphets) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
+  - 3D Model "Toy Glasses" This work is based on "Toy glasses draft" (https://sketchfab.com/3d-models/toy-glasses-draft-b7bbecaa844b427db3c605b44ad0d1a3) by Nikita Kravchenko (https://sketchfab.com/NicKravchenko) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Steampunk Glasses" This work is based on "Steampunk Glasses Free" (https://sketchfab.com/3d-models/steampunk-glasses-free-fe196e7903434f22b0cb8561c21aa6cd) by Dядя Jеня (https://sketchfab.com/yarick360kabicin) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Glasses 1" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-bd1104e5ad1e4a1b9e1793a606c5be82) by drydoctoregg (https://sketchfab.com/drydoctoregg) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Glasses 2" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-6167fb73abe94fbda810020123d0dbdc) by Anthony Yanez (https://sketchfab.com/paulyanez) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Glasses 3" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-007651a9450746a5b6c5a126d484cd52) by Marius.Eder (https://sketchfab.com/Marius.Eder) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Glasses 4" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-007651a9450746a5b6c5a126d484cd52) by Marius.Eder (https://sketchfab.com/Marius.Eder) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Glasses 5" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-007651a9450746a5b6c5a126d484cd52) by Marius.Eder (https://sketchfab.com/Marius.Eder) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "VR Glasses" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-007651a9450746a5b6c5a126d484cd52) by Marius.Eder (https://sketchfab.com/Marius.Eder) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Glasses 6" This work is based on "Glasses" (https://sketchfab.com/3d-models/glasses-13c99a031fd84cf7aa756006e7e18a3b) by em_kei (https://sketchfab.com/em_kei) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Gun Glasses" This work is based on "Gun glasses" (https://sketchfab.com/3d-models/gun-glasses-e8af6e88ecac4201857c933fb4df3aac) by Dominatorko (https://sketchfab.com/dominatorko) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model . Changes were made to the original model.
   - 3D Model . Changes were made to the original model.
 

@@ -24,7 +24,12 @@ export default function FgSVG({
   options,
 }: {
   src: string;
-  attributes?: { key: string; value: string; id?: string }[];
+  attributes?: {
+    key: string;
+    value: string;
+    id?: string;
+    transition?: string;
+  }[];
   className?: string;
   hoverContent?: React.ReactElement;
   options?: FgSVGOptions;
@@ -74,7 +79,7 @@ export default function FgSVG({
 
         // Apply attributes from props
         if (attributes) {
-          attributes.forEach(({ key, value, id }) => {
+          attributes.forEach(({ key, value, id, transition }) => {
             if (id === undefined) {
               svgElement.setAttribute(key, value);
             } else {
@@ -82,6 +87,9 @@ export default function FgSVG({
               if (element) {
                 element.setAttribute(key, value);
               }
+            }
+            if (transition) {
+              svgElement.style.transition = transition;
             }
           });
         }

@@ -98,7 +98,7 @@ import echosOfThePastOffIcon from "../../../public/svgs/audio/echosOfThePastOffI
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
 );
-const FgPiano = React.lazy(() => import("../../FgPanio/FgPiano"));
+const FgPiano = React.lazy(() => import("../../FgPiano/FgPiano"));
 
 export type AudioEffectTemplate = {
   icon: string;
