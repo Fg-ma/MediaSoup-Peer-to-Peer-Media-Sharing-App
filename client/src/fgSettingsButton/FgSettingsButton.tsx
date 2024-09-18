@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
 import SettingsPanel from "./lib/SettingsPanel";
 
@@ -7,17 +7,45 @@ export default function FgSettingsButton({
 }: {
   effectsActive: boolean;
 }) {
-  const [selectionPanelActive, setSelectionPanelActive] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [settingsPanelActive, setSettingsPanelActive] = useState(false);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  const settingsPanelRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = () => {
-    setSelectionPanelActive((prev) => !prev);
+    setSettingsPanelActive((prev) => !prev);
   };
+
+  const handleCloseSettings = (event: MouseEvent) => {
+    const target = event.target;
+    console.log(
+      settingsPanelRef.current,
+      event.target,
+      settingsPanelRef.current?.contains(target as Node)
+    );
+    if (
+      !settingsButtonRef.current?.contains(target as Node) &&
+      !settingsPanelRef.current?.contains(target as Node)
+    ) {
+      setSettingsPanelActive(false);
+    }
+  };
+
+  useEffect(() => {
+    if (settingsPanelActive) {
+      document.addEventListener("mousedown", handleCloseSettings);
+    }
+
+    return () => {
+      if (settingsPanelActive) {
+        document.removeEventListener("mousedown", handleCloseSettings);
+      }
+    };
+  }, [settingsPanelActive]);
 
   return (
     <>
       <FgButton
-        externalRef={buttonRef}
+        externalRef={settingsButtonRef}
         className='relative flex-col items-center justify-center'
         mouseDownFunction={handleMouseDown}
         contentFunction={() => (
@@ -27,7 +55,7 @@ export default function FgSettingsButton({
             height='32'
             width='32'
             style={{
-              transform: selectionPanelActive
+              transform: settingsPanelActive
                 ? "rotate(-30deg)"
                 : "rotate(0deg)",
               transition: "transform 0.2s linear",
@@ -48,7 +76,12 @@ export default function FgSettingsButton({
           ) : undefined
         }
       />
-      {selectionPanelActive && <SettingsPanel externalRef={buttonRef} />}
+      {settingsPanelActive && (
+        <SettingsPanel
+          settingsPanelRef={settingsPanelRef}
+          settingsButtonRef={settingsButtonRef}
+        />
+      )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import navigateBackIcon from "../../../public/svgs/navigateBack.svg";
@@ -30,6 +30,9 @@ export default function ClosedCaptionsPage({
   >;
   setClosedCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const [closedCaptionOptionsActive, setClosedCaptionOptionsActive] =
+    useState(false);
+
   const setClosedCaptionsLang = (
     newLang: keyof typeof closedCaptionsSelections
   ) => {
@@ -38,6 +41,10 @@ export default function ClosedCaptionsPage({
 
   const handleCloseClosedCaptionPage = () => {
     setClosedCaptionsActive((prev) => !prev);
+  };
+
+  const handleClosedCaptionOptionsActive = () => {
+    setClosedCaptionOptionsActive((prev) => !prev);
   };
 
   return (
@@ -58,7 +65,12 @@ export default function ClosedCaptionsPage({
           )}
           mouseDownFunction={handleCloseClosedCaptionPage}
         />
-        <FgButton />
+        <FgButton
+          contentFunction={() => (
+            <div className='px-2 bg-white hover:bg-opacity-75'>Options</div>
+          )}
+          mouseDownFunction={handleClosedCaptionOptionsActive}
+        />
       </div>
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
       <div

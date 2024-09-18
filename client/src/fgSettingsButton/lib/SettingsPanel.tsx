@@ -18,15 +18,16 @@ const SelectionPanelTransition: Transition = {
 };
 
 export default function SettingsPanel({
-  externalRef,
+  settingsPanelRef,
+  settingsButtonRef,
 }: {
-  externalRef: React.RefObject<HTMLElement>;
+  settingsPanelRef: React.RefObject<HTMLDivElement>;
+  settingsButtonRef: React.RefObject<HTMLButtonElement>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
     top: number;
   } | null>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
   const [closedCaptionsActive, setClosedCaptionsActive] = useState(false);
   const [currentCaptionLanguage, setCurrentCaptionLanguage] =
     useState<keyof typeof closedCaptionsSelections>("English");
@@ -36,15 +37,15 @@ export default function SettingsPanel({
   }, [closedCaptionsActive]);
 
   const getStaticPanelPosition = () => {
-    const externalRect = externalRef?.current?.getBoundingClientRect();
+    const externalRect = settingsButtonRef?.current?.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    if (!externalRect || !panelRef.current) {
+    if (!externalRect || !settingsPanelRef.current) {
       return;
     }
 
-    let top = externalRect.top - panelRef.current?.clientHeight - 8;
+    let top = externalRect.top - settingsPanelRef.current?.clientHeight - 8;
 
     // Check if the panel overflows the top of the viewport
     if (top < 0) {
@@ -52,16 +53,16 @@ export default function SettingsPanel({
     }
 
     // Check if the panel overflows the bottom of the viewport
-    const panelBottom = top + panelRef.current.clientHeight;
+    const panelBottom = top + settingsPanelRef.current.clientHeight;
     if (panelBottom > viewportHeight) {
       // Adjust to fit within the bottom boundary of the viewport
-      top = viewportHeight - panelRef.current.clientHeight;
+      top = viewportHeight - settingsPanelRef.current.clientHeight;
     }
 
     let left =
       externalRect.left +
       externalRect.width / 2 -
-      panelRef.current.clientWidth / 2;
+      settingsPanelRef.current.clientWidth / 2;
 
     // Check if the panel overflows the left of the viewport
     if (left < 0) {
@@ -69,10 +70,10 @@ export default function SettingsPanel({
     }
 
     // Check if the panel overflows the bottom of the viewport
-    const panelRight = left + panelRef.current.clientWidth;
+    const panelRight = left + settingsPanelRef.current.clientWidth;
     if (panelRight > viewportWidth) {
       // Adjust to fit within the bottom boundary of the viewport
-      left = viewportWidth - panelRef.current.clientWidth;
+      left = viewportWidth - settingsPanelRef.current.clientWidth;
     }
 
     setPortalPosition({
@@ -87,7 +88,7 @@ export default function SettingsPanel({
 
   return ReactDOM.createPortal(
     <motion.div
-      ref={panelRef}
+      ref={settingsPanelRef}
       className='max-h-60 w-max absolute z-[99999999999999] flex p-2 h-max shadow-md rounded bg-black bg-opacity-75 font-K2D text-lg text-white'
       style={{
         top: `${portalPosition?.top}px`,
