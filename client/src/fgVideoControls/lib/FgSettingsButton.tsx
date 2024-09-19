@@ -25,22 +25,20 @@ export default function FgSettingsButton({
     }
   };
 
-  const handleCloseSettings = (event: MouseEvent) => {
-    const target = event.target;
-    // console.log(
-    //   settingsPanelRef.current,
-    //   event.target,
-    //   settingsPanelRef.current?.contains(target as Node)
-    // );
-    if (
-      !settingsButtonRef.current?.contains(target as Node) &&
-      !settingsPanelRef.current?.contains(target as Node)
-    ) {
-      // setSettingsActive(false);
-    }
-  };
-
   useEffect(() => {
+    const handleCloseSettings = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (
+        settingsButtonRef.current?.contains(target) ||
+        settingsPanelRef.current?.contains(target)
+      ) {
+        setSettingsActive(true);
+      } else {
+        setSettingsActive(false);
+      }
+    };
+
     if (settingsActive) {
       document.addEventListener("mousedown", handleCloseSettings);
     }
@@ -53,7 +51,7 @@ export default function FgSettingsButton({
   }, [settingsActive]);
 
   return (
-    <div>
+    <>
       <FgButton
         externalRef={settingsButtonRef}
         className='flex items-center justify-center overflow-clip'
@@ -90,6 +88,6 @@ export default function FgSettingsButton({
           settingsButtonRef={settingsButtonRef}
         />
       )}
-    </div>
+    </>
   );
 }

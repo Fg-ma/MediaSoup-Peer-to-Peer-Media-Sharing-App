@@ -208,7 +208,7 @@ export default function SettingsPanel({
           <FgButton
             contentFunction={() => (
               <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between space-x-4 px-2 rounded items-center'>
-                <div>Subtitles/cc</div>
+                <div>CC</div>
                 <div>
                   {closedCaptionsSelections[activePages.closedCaption.value]}
                 </div>
