@@ -155,7 +155,7 @@ class Controls {
     this.tracksColorSetterCallback = tracksColorSetterCallback;
   }
 
-  formatDuration(time: number) {
+  formatDuration = (time: number) => {
     const seconds = Math.floor(time % 60);
     const minutes = Math.floor(time / 60) % 60;
     const hours = Math.floor(time / 3600);
@@ -166,17 +166,17 @@ class Controls {
         minutes
       )}:${this.leadingZeroFormatter.format(seconds)}`;
     }
-  }
+  };
 
-  handleClosedCaptions() {
+  handleClosedCaptions = () => {
     if (this.captions.current && this.videoContainerRef.current) {
       const isHidden = this.captions.current.mode === "hidden";
       this.captions.current.mode = isHidden ? "showing" : "hidden";
       this.videoContainerRef.current.classList.toggle("captions", isHidden);
     }
-  }
+  };
 
-  handleCloseVideo() {
+  handleCloseVideo = () => {
     if (this.socket) {
       const msg = {
         type: "removeProducer",
@@ -189,18 +189,18 @@ class Controls {
 
       this.socket.current.emit("message", msg);
     }
-  }
+  };
 
-  handleEffects() {
+  handleEffects = () => {
     this.setEffectsActive((prev) => !prev);
     if (!this.videoContainerRef.current?.classList.contains("in-effects")) {
       this.videoContainerRef.current?.classList.add("in-effects");
     } else {
       this.videoContainerRef.current?.classList.remove("in-effects");
     }
-  }
+  };
 
-  handleFullScreen() {
+  handleFullScreen = () => {
     if (this.videoContainerRef.current?.classList.contains("full-screen")) {
       document
         .exitFullscreen()
@@ -220,18 +220,19 @@ class Controls {
           console.error("Failed to request full screen:", error);
         });
     }
-  }
+  };
 
-  handleFullScreenChange() {
+  handleFullScreenChange = () => {
     if (!document.fullscreenElement) {
       this.videoContainerRef.current?.classList.remove("full-screen");
     }
-  }
+  };
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
       !this.videoContainerRef.current?.classList.contains("in-video") ||
+      this.videoContainerRef.current?.classList.contains("in-piano") ||
       this.controlPressed.current ||
       this.shiftPressed.current
     ) {
@@ -396,7 +397,7 @@ class Controls {
     }
   };
 
-  handleMiniPlayer() {
+  handleMiniPlayer = () => {
     if (this.videoContainerRef.current?.classList.contains("mini-player")) {
       document.exitPictureInPicture().catch((error) => {
         console.error("Failed to exit picture in picture:", error);
@@ -406,23 +407,23 @@ class Controls {
         console.error("Failed to request picture in picture:", error);
       });
     }
-  }
+  };
 
-  handleMouseEnter() {
+  handleMouseEnter = () => {
     this.videoContainerRef.current?.classList.add("in-video");
     if (this.leaveVideoTimer.current) {
       clearTimeout(this.leaveVideoTimer.current);
       this.leaveVideoTimer.current = null;
     }
-  }
+  };
 
-  handleMouseLeave() {
+  handleMouseLeave = () => {
     this.leaveVideoTimer.current = setTimeout(() => {
       this.videoContainerRef.current?.classList.remove("in-video");
     }, this.fgVideoOptions.controlsVanishTime);
-  }
+  };
 
-  handlePausePlay() {
+  handlePausePlay = () => {
     this.handleVisualEffectChange("pause");
     this.paused.current = !this.paused.current;
     if (this.paused.current) {
@@ -430,17 +431,17 @@ class Controls {
     } else {
       this.videoContainerRef.current?.classList.remove("paused");
     }
-  }
+  };
 
-  handlePictureInPicture(action: string) {
+  handlePictureInPicture = (action: string) => {
     if (action === "enter") {
       this.videoContainerRef.current?.classList.add("mini-player");
     } else if (action === "leave") {
       this.videoContainerRef.current?.classList.remove("mini-player");
     }
-  }
+  };
 
-  handlePlaybackSpeed() {
+  handlePlaybackSpeed = () => {
     if (!this.videoRef.current || !this.playbackSpeedButtonRef.current) return;
 
     const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
@@ -453,9 +454,9 @@ class Controls {
 
     this.videoRef.current.playbackRate = playbackRates[nextPlaybackRateIndex];
     this.playbackSpeedButtonRef.current.textContent = `${playbackRates[nextPlaybackRateIndex]}x`;
-  }
+  };
 
-  handleScrubbing(event: MouseEvent) {
+  handleScrubbing = (event: MouseEvent) => {
     if (
       !this.timelineContainerRef.current ||
       !this.videoRef.current ||
@@ -484,18 +485,18 @@ class Controls {
     }
 
     this.handleTimelineUpdate(event);
-  }
+  };
 
-  handleTheater() {
+  handleTheater = () => {
     this.theater.current = !this.theater.current;
     if (this.theater.current) {
       this.videoContainerRef.current?.classList.add("theater");
     } else {
       this.videoContainerRef.current?.classList.remove("theater");
     }
-  }
+  };
 
-  handleTimelineUpdate(event: MouseEvent) {
+  handleTimelineUpdate = (event: MouseEvent) => {
     if (
       !this.timelineContainerRef.current ||
       !this.videoRef.current ||
@@ -533,9 +534,9 @@ class Controls {
         percent * this.videoRef.current.duration
       );
     }
-  }
+  };
 
-  async extractThumbnails(): Promise<string[]> {
+  extractThumbnails = async (): Promise<string[]> => {
     if (!this.videoRef.current) {
       return [];
     }
@@ -582,9 +583,9 @@ class Controls {
     }
 
     return thumbnails;
-  }
+  };
 
-  loadedData() {
+  loadedData = () => {
     if (!this.videoRef.current) return;
 
     if (this.fgVideoOptions.isTotalTime && this.totalTimeRef.current) {
@@ -606,7 +607,7 @@ class Controls {
     ) {
       loadThumbnails();
     }
-  }
+  };
 
   skip(duration: number) {
     if (this.videoRef.current) {
@@ -614,7 +615,7 @@ class Controls {
     }
   }
 
-  timeUpdate() {
+  timeUpdate = () => {
     if (!this.videoRef.current) return;
 
     if (this.currentTimeRef.current) {
@@ -630,7 +631,7 @@ class Controls {
         `${percent}`
       );
     }
-  }
+  };
 }
 
 export default Controls;

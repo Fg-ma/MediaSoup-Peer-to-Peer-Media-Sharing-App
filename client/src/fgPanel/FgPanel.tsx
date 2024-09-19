@@ -4,19 +4,6 @@ import { Transition, Variants, motion } from "framer-motion";
 
 const FgButton = React.lazy(() => import("../fgButton/FgButton"));
 
-const PanelVar: Variants = {
-  init: { opacity: 0, scale: 0.8 },
-  animate: (focus: boolean) => ({
-    opacity: 1,
-    scale: 1,
-    backgroundColor: focus ? "#ffffff" : "#f3f3f3",
-    transition: {
-      scale: { type: "spring", stiffness: 100 },
-      backgroundColor: { duration: 0.3, ease: "linear" },
-    },
-  }),
-};
-
 const PanelTransition: Transition = {
   transition: {
     opacity: { duration: 0.15 },
@@ -42,6 +29,8 @@ export default function FgPanel({
     bottom: false,
     top: false,
   },
+  backgroundColor = "#ffffff",
+  secondaryBackgroundColor = "#f3f3f3",
 }: {
   content: React.ReactNode;
   initPosition?: {
@@ -67,7 +56,22 @@ export default function FgPanel({
     bottom?: boolean;
     top?: boolean;
   };
+  backgroundColor?: string;
+  secondaryBackgroundColor?: string;
 }) {
+  const PanelVar: Variants = {
+    init: { opacity: 0, scale: 0.8 },
+    animate: (focus: boolean) => ({
+      opacity: 1,
+      scale: 1,
+      backgroundColor: focus ? backgroundColor : secondaryBackgroundColor,
+      transition: {
+        scale: { type: "spring", stiffness: 100 },
+        backgroundColor: { duration: 0.3, ease: "linear" },
+      },
+    }),
+  };
+
   const [rerender, setRerender] = useState(false);
   const [isHover, setIsHover] = useState(false);
   const [position, setPosition] = useState<{ x?: number; y?: number }>({
@@ -438,7 +442,10 @@ export default function FgPanel({
                 : ""
             }`}
             hoverContent={
-              <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+              <div
+                className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0'
+                style={{ backgroundColor: backgroundColor }}
+              >
                 Close (x)
               </div>
             }
@@ -453,7 +460,7 @@ export default function FgPanel({
         }}
         animate={{
           // prettier-ignore
-          boxShadow: `${shadow.left ? `inset 10px 0px 5px -5px ${focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"}` : ""}${(shadow.left && shadow.right) || (shadow.left && shadow.bottom) || (shadow.left && shadow.top) ? ", " : ""}${shadow.right ? `inset -10px 0px 5px -5px ${focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"}` : ""}${(shadow.right && shadow.top) || (shadow.right && shadow.bottom) ? ", " : ""}${shadow.top ? `inset 0px 10px 5px -5px ${focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"}` : ""}${(shadow.top && shadow.bottom) ? ", " : ""}${shadow.bottom ? `inset 0px -10px 5px -5px ${focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"}` : ""}`,
+          boxShadow: `${shadow.left ? `inset 10px 0px 5px -5px ${focus ? backgroundColor : secondaryBackgroundColor}` : ""}${(shadow.left && shadow.right) || (shadow.left && shadow.bottom) || (shadow.left && shadow.top) ? ", " : ""}${shadow.right ? `inset -10px 0px 5px -5px ${focus ? backgroundColor : secondaryBackgroundColor}` : ""}${(shadow.right && shadow.top) || (shadow.right && shadow.bottom) ? ", " : ""}${shadow.top ? `inset 0px 10px 5px -5px ${focus ? backgroundColor : secondaryBackgroundColor}` : ""}${(shadow.top && shadow.bottom) ? ", " : ""}${shadow.bottom ? `inset 0px -10px 5px -5px ${focus ? backgroundColor : secondaryBackgroundColor}` : ""}`,
         }}
         transition={{
           boxShadow: { duration: 0.3, ease: "linear" },

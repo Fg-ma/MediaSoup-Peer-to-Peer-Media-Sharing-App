@@ -19,9 +19,7 @@ const PictureInPictureButton = React.lazy(
   () => import("./lib/PictureInPictureButton")
 );
 const CaptionButton = React.lazy(() => import("./lib/CaptionButton"));
-const FgSettingsButton = React.lazy(
-  () => import("../fgSettingsButton/FgSettingsButton")
-);
+const FgSettingsButton = React.lazy(() => import("./lib/FgSettingsButton"));
 const PlaybackSpeedButton = React.lazy(
   () => import("./lib/PlaybackSpeedButton")
 );
@@ -85,8 +83,9 @@ export default function FgVideoControls({
   ) => void;
   tracksColorSetterCallback: () => void;
 }) {
-  const rightVideoControlsRef = useRef<HTMLDivElement>(null);
+  const [settingsActive, setSettingsActive] = useState(false);
   const [rerender, setRerender] = useState(0);
+  const rightVideoControlsRef = useRef<HTMLDivElement>(null);
 
   const handleMessage = (event: any) => {
     if (event.type === "localMuteChange") {
@@ -156,6 +155,7 @@ export default function FgVideoControls({
               <PlayPauseButton
                 controls={controls}
                 effectsActive={effectsActive}
+                settingsActive={settingsActive}
               />
             </Suspense>
           )}
@@ -171,6 +171,7 @@ export default function FgVideoControls({
                 clientMute={clientMute}
                 localMute={localMute}
                 effectsActive={effectsActive}
+                settingsActive={settingsActive}
                 options={{
                   isSlider:
                     fgVideoOptions.isSlider ?? defaultFgVideoOptions.isSlider,
@@ -214,6 +215,7 @@ export default function FgVideoControls({
               <FullScreenButton
                 controls={controls}
                 effectsActive={effectsActive}
+                settingsActive={settingsActive}
               />
             </Suspense>
           )}
@@ -222,6 +224,7 @@ export default function FgVideoControls({
               <TheaterButton
                 controls={controls}
                 effectsActive={effectsActive}
+                settingsActive={settingsActive}
               />
             </Suspense>
           )}
@@ -231,6 +234,7 @@ export default function FgVideoControls({
               <PictureInPictureButton
                 controls={controls}
                 effectsActive={effectsActive}
+                settingsActive={settingsActive}
               />
             </Suspense>
           )}
@@ -241,12 +245,18 @@ export default function FgVideoControls({
                 <CaptionButton
                   controls={controls}
                   effectsActive={effectsActive}
+                  settingsActive={settingsActive}
                 />
               </Suspense>
             )}
           {
             <Suspense fallback={<div>Loading...</div>}>
-              <FgSettingsButton effectsActive={effectsActive} />
+              <FgSettingsButton
+                effectsActive={effectsActive}
+                videoContainerRef={videoContainerRef}
+                settingsActive={settingsActive}
+                setSettingsActive={setSettingsActive}
+              />
             </Suspense>
           }
           {(fgVideoOptions.isPlaybackSpeed ??
@@ -255,6 +265,7 @@ export default function FgVideoControls({
               <PlaybackSpeedButton
                 controls={controls}
                 effectsActive={effectsActive}
+                settingsActive={settingsActive}
                 playbackSpeedButtonRef={playbackSpeedButtonRef}
               />
             </Suspense>
@@ -265,6 +276,7 @@ export default function FgVideoControls({
                 <EffectsButton
                   controls={controls}
                   effectsActive={effectsActive}
+                  settingsActive={settingsActive}
                 />
               </Suspense>
             )}
@@ -299,7 +311,12 @@ export default function FgVideoControls({
                     setRerender((prev) => prev + 1);
                   }}
                   muteStateRef={localMute}
+                  videoContainerRef={videoContainerRef}
                   style={{ transform: "scaleX(-1)" }}
+                  options={{
+                    backgroundColor: "rgba(10, 10, 10, 1)",
+                    secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
+                  }}
                 />
               </Suspense>
             )}

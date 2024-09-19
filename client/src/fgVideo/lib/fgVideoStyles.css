@@ -68,7 +68,9 @@
 .video-container.in-video .video-controls-container,
 .video-container.in-video .video-navigation-container,
 .video-container.in-effects .video-controls-container,
-.video-container.in-effects .video-navigation-container {
+.video-container.in-effects .video-navigation-container,
+.video-container.in-settings .video-controls-container,
+.video-container.in-settings .video-navigation-container {
   opacity: 1;
   transition-delay: 0s;
 }

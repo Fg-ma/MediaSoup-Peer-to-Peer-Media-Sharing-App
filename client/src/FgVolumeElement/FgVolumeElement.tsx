@@ -41,6 +41,7 @@ export default function FgVolumeElement({
   clientMute,
   localMute,
   effectsActive,
+  settingsActive,
   options,
   handleMuteCallback,
   handleVolumeSliderCallback,
@@ -55,6 +56,7 @@ export default function FgVolumeElement({
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   effectsActive: boolean;
+  settingsActive: boolean;
   options?: FgVolumeElementOptions;
   handleMuteCallback?: () => void;
   handleVolumeSliderCallback?: (
@@ -259,7 +261,7 @@ export default function FgVolumeElement({
           );
         }}
         hoverContent={
-          !effectsActive ? (
+          !effectsActive && !settingsActive ? (
             <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
               {active ? "Unmute (m)" : "Mute (m)"}
             </div>

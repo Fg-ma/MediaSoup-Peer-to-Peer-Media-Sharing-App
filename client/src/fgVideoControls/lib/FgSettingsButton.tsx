@@ -1,53 +1,63 @@
-import React, { useEffect, useRef, useState } from "react";
-import FgButton from "../fgButton/FgButton";
-import SettingsPanel from "./lib/SettingsPanel";
+import React, { useEffect, useRef } from "react";
+import FgButton from "../../fgButton/FgButton";
+import SettingsPanel from "./SettingsPanel";
 
 export default function FgSettingsButton({
   effectsActive,
+  videoContainerRef,
+  settingsActive,
+  setSettingsActive,
 }: {
   effectsActive: boolean;
+  videoContainerRef: React.RefObject<HTMLDivElement>;
+  settingsActive: boolean;
+  setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [settingsPanelActive, setSettingsPanelActive] = useState(false);
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = () => {
-    setSettingsPanelActive((prev) => !prev);
+  const toggleSettings = () => {
+    setSettingsActive((prev) => !prev);
+    if (!videoContainerRef.current?.classList.contains("in-settings")) {
+      videoContainerRef.current?.classList.add("in-settings");
+    } else {
+      videoContainerRef.current?.classList.remove("in-settings");
+    }
   };
 
   const handleCloseSettings = (event: MouseEvent) => {
     const target = event.target;
-    console.log(
-      settingsPanelRef.current,
-      event.target,
-      settingsPanelRef.current?.contains(target as Node)
-    );
+    // console.log(
+    //   settingsPanelRef.current,
+    //   event.target,
+    //   settingsPanelRef.current?.contains(target as Node)
+    // );
     if (
       !settingsButtonRef.current?.contains(target as Node) &&
       !settingsPanelRef.current?.contains(target as Node)
     ) {
-      setSettingsPanelActive(false);
+      // setSettingsActive(false);
     }
   };
 
   useEffect(() => {
-    if (settingsPanelActive) {
+    if (settingsActive) {
       document.addEventListener("mousedown", handleCloseSettings);
     }
 
     return () => {
-      if (settingsPanelActive) {
+      if (settingsActive) {
         document.removeEventListener("mousedown", handleCloseSettings);
       }
     };
-  }, [settingsPanelActive]);
+  }, [settingsActive]);
 
   return (
-    <>
+    <div>
       <FgButton
         externalRef={settingsButtonRef}
-        className='relative flex-col items-center justify-center'
-        mouseDownFunction={handleMouseDown}
+        className='flex items-center justify-center overflow-clip'
+        mouseDownFunction={toggleSettings}
         contentFunction={() => (
           <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -55,9 +65,7 @@ export default function FgSettingsButton({
             height='32'
             width='32'
             style={{
-              transform: settingsPanelActive
-                ? "rotate(-30deg)"
-                : "rotate(0deg)",
+              transform: settingsActive ? "rotate(-30deg)" : "rotate(0deg)",
               transition: "transform 0.2s linear",
             }}
             fill='white'
@@ -69,19 +77,19 @@ export default function FgSettingsButton({
           </svg>
         )}
         hoverContent={
-          !effectsActive ? (
+          !effectsActive && !settingsActive ? (
             <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
               Settings
             </div>
           ) : undefined
         }
       />
-      {settingsPanelActive && (
+      {settingsActive && (
         <SettingsPanel
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
         />
       )}
-    </>
+    </div>
   );
 }

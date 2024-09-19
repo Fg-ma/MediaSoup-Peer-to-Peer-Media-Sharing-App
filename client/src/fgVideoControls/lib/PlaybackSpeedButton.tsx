@@ -5,10 +5,12 @@ import Controls from "./Controls";
 export default function PlaybackSpeedButton({
   controls,
   effectsActive,
+  settingsActive,
   playbackSpeedButtonRef,
 }: {
   controls: Controls;
   effectsActive: boolean;
+  settingsActive: boolean;
   playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
 }) {
   return (
@@ -21,7 +23,7 @@ export default function PlaybackSpeedButton({
         return <>1x</>;
       }}
       hoverContent={
-        !effectsActive ? (
+        !effectsActive && !settingsActive ? (
           <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
             Playback speed
           </div>

@@ -24,6 +24,7 @@ export default function AudioEffectsButton({
   handleAudioEffectChange,
   handleMute,
   muteStateRef,
+  videoContainerRef,
   options,
   style,
 }: {
@@ -34,9 +35,12 @@ export default function AudioEffectsButton({
   handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
+  videoContainerRef?: React.RefObject<HTMLDivElement>;
   options?: {
     color?: string;
     placement?: "above" | "below" | "left" | "right";
+    backgroundColor?: string;
+    secondaryBackgroundColor?: string;
   };
   style?: React.CSSProperties;
 }) {
@@ -97,7 +101,12 @@ export default function AudioEffectsButton({
             padding={12}
             handleMute={handleMute}
             muteStateRef={muteStateRef}
+            videoContainerRef={videoContainerRef}
             closeCallback={() => setEffectSectionActive(false)}
+            backgroundColor={audioEffectsButtonOptions.backgroundColor}
+            secondaryBackgroundColor={
+              audioEffectsButtonOptions.secondaryBackgroundColor
+            }
           />
         </Suspense>
       )}

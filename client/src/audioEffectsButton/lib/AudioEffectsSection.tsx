@@ -681,7 +681,10 @@ export default function AudioEffectsSection({
   padding,
   handleMute,
   muteStateRef,
+  videoContainerRef,
   closeCallback,
+  backgroundColor,
+  secondaryBackgroundColor,
 }: {
   socket: React.MutableRefObject<Socket>;
   username: string;
@@ -693,7 +696,10 @@ export default function AudioEffectsSection({
   padding: number;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
+  videoContainerRef?: React.RefObject<HTMLDivElement>;
   closeCallback?: () => void;
+  backgroundColor?: string;
+  secondaryBackgroundColor?: string;
 }) {
   const [rerender, setRerender] = useState(0);
   const [cols, setCols] = useState(3);
@@ -848,6 +854,15 @@ export default function AudioEffectsSection({
               externalRef={pianoRef}
               className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
+                if (videoContainerRef?.current) {
+                  if (
+                    videoContainerRef.current.classList.contains("in-piano")
+                  ) {
+                    videoContainerRef.current.classList.remove("in-piano");
+                  } else {
+                    videoContainerRef.current.classList.add("in-piano");
+                  }
+                }
                 setPanioActive((prev) => !prev);
               }}
               contentFunction={() => {
@@ -902,6 +917,8 @@ export default function AudioEffectsSection({
         closeCallback={closeCallback ? () => closeCallback() : undefined}
         closePosition='topRight'
         shadow={{ top: true, bottom: true }}
+        backgroundColor={backgroundColor}
+        secondaryBackgroundColor={secondaryBackgroundColor}
       />
       {audioMixEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>
