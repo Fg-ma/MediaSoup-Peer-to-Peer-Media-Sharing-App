@@ -65,7 +65,7 @@ export default function ClosedCaptionsPage({
   return (
     <div className='w-full h-full flex flex-col justify-center items-center space-y-2'>
       <div className='h-6 w-full flex justify-between'>
-        <div className='flex space-x-1'>
+        <div className='w-full flex space-x-1'>
           <FgButton
             className='h-full aspect-square'
             contentFunction={() => (
@@ -85,7 +85,7 @@ export default function ClosedCaptionsPage({
             className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
             onClick={handleCloseClosedCaptionPage}
           >
-            Subtitles/CC
+            Subtitles
           </div>
         </div>
         <FgButton
@@ -100,27 +100,49 @@ export default function ClosedCaptionsPage({
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
       <div className='w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem]'>
         {Object.entries(closedCaptionsSelections).map(([key, lang]) => (
-          <FgButton
-            key={key}
-            className='w-full flex items-center justify-center'
-            contentFunction={() => (
-              <div
-                className={`w-full text-nowrap bg-opacity-75 flex px-2 rounded justify-between space-x-4 ${
-                  key === activePages.closedCaption.value
-                    ? "bg-gray-400"
-                    : "hover:bg-gray-400"
-                }`}
-              >
-                <div>{lang}</div>
-                <div>(auto generated)</div>
-              </div>
-            )}
-            mouseDownFunction={() =>
-              setClosedCaptionsLang(
-                key as keyof typeof closedCaptionsSelections
-              )
-            }
-          />
+          <div
+            className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center ${
+              key === activePages.closedCaption.value
+                ? "bg-gray-400"
+                : "hover:bg-gray-400"
+            }`}
+          >
+            <FgButton
+              key={key}
+              className='flex items-center justify-center grow'
+              contentFunction={() => (
+                <div className='w-full bg-opacity-75 px-2 flex items-start'>
+                  {lang}
+                </div>
+              )}
+              mouseDownFunction={() =>
+                setClosedCaptionsLang(
+                  key as keyof typeof closedCaptionsSelections
+                )
+              }
+            />
+            <FgButton
+              key={key}
+              className='w-max flex items-center justify-center'
+              contentFunction={() => (
+                <div className='w-full bg-opacity-75 px-2'>(AG)</div>
+              )}
+              mouseDownFunction={() =>
+                setClosedCaptionsLang(
+                  key as keyof typeof closedCaptionsSelections
+                )
+              }
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                  Auto generated
+                </div>
+              }
+              options={{
+                hoverTimeoutDuration: 2000,
+                hoverZValue: 999999999999999,
+              }}
+            />
+          </div>
         ))}
       </div>
     </div>

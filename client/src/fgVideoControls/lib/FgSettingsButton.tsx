@@ -1,17 +1,21 @@
 import React, { useEffect, useRef } from "react";
 import FgButton from "../../fgButton/FgButton";
-import SettingsPanel from "./SettingsPanel";
+import SettingsPanel, { ActivePages } from "./SettingsPanel";
 
 export default function FgSettingsButton({
   effectsActive,
   videoContainerRef,
   settingsActive,
   setSettingsActive,
+  activePages,
+  setActivePages,
 }: {
   effectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
+  activePages: ActivePages;
+  setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -30,12 +34,10 @@ export default function FgSettingsButton({
       const target = event.target as Node;
 
       if (
-        settingsButtonRef.current?.contains(target) ||
-        settingsPanelRef.current?.contains(target)
+        !settingsButtonRef.current?.contains(target) &&
+        !settingsPanelRef.current?.contains(target)
       ) {
-        setSettingsActive(true);
-      } else {
-        setSettingsActive(false);
+        toggleSettings();
       }
     };
 
@@ -86,6 +88,8 @@ export default function FgSettingsButton({
         <SettingsPanel
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
+          activePages={activePages}
+          setActivePages={setActivePages}
         />
       )}
     </>

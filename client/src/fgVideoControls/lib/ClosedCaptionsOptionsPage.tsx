@@ -49,7 +49,7 @@ export type BackgroundOpacities = "25%" | "50%" | "75%" | "100%";
 
 export type CharacterEdgeStyles =
   | "None"
-  | "Drop shadow"
+  | "Shadow"
   | "Raised"
   | "Depressed"
   | "Outline";
@@ -97,7 +97,7 @@ export const closedCaptionsOptionsArrays: {
     "cyan",
   ],
   backgroundOpacity: ["25%", "50%", "75%", "100%"],
-  characterEdgeStyle: ["None", "Drop shadow", "Raised", "Depressed", "Outline"],
+  characterEdgeStyle: ["None", "Shadow", "Raised", "Depressed", "Outline"],
 };
 
 const closedCaptionsOptionsTitles = {
@@ -105,9 +105,9 @@ const closedCaptionsOptionsTitles = {
   fontColor: "Font color",
   fontOpacity: "Font opacity",
   fontSize: "Font size",
-  backgroundColor: "Background color",
-  backgroundOpacity: "Background opacity",
-  characterEdgeStyle: "Character edge style",
+  backgroundColor: "BG color",
+  backgroundOpacity: "BG opacity",
+  characterEdgeStyle: "Edge style",
 };
 
 const defaultClosedCaptionOptions: ClosedCaptionsOptions = {
@@ -187,7 +187,7 @@ export default function ClosedCaptionsOptionsPage({
               )
             }
             contentFunction={() => (
-              <div className='flex w-full justify-between space-x-4 px-2 bg-opacity-75 hover:bg-gray-400 rounded'>
+              <div className='flex w-full justify-between space-x-4 px-2 bg-opacity-75 hover:bg-gray-400 rounded text-nowrap'>
                 <div>
                   {
                     closedCaptionsOptionsTitles[

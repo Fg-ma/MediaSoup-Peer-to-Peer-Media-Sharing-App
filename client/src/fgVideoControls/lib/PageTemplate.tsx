@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 
@@ -14,7 +14,7 @@ export default function PageTemplate({
   backFunction?: (event: React.MouseEvent) => void;
 }) {
   return (
-    <div className='w-max h-full flex flex-col justify-center items-center space-y-2'>
+    <div className='w-full h-full flex flex-col justify-center items-center space-y-2'>
       <div
         className={`h-6 w-full flex items-start ${
           pageTitle ? "space-x-1" : ""
@@ -33,7 +33,8 @@ export default function PageTemplate({
               ]}
             />
           )}
-          mouseDownFunction={backFunction}
+          // @ts-ignore
+          mouseUpFunction={backFunction}
         />
         {pageTitle && (
           <div

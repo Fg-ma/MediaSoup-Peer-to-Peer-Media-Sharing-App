@@ -8,6 +8,7 @@ import {
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import { defaultFgVideoOptions, FgVideoOptions } from "../fgVideo/FgVideo";
+import { ActivePages } from "./lib/SettingsPanel";
 
 const PlayPauseButton = React.lazy(() => import("./lib/PlayPauseButton"));
 const FgVolumeElement = React.lazy(
@@ -84,6 +85,23 @@ export default function FgVideoControls({
   tracksColorSetterCallback: () => void;
 }) {
   const [settingsActive, setSettingsActive] = useState(false);
+  const [activePages, setActivePages] = useState<ActivePages>({
+    closedCaption: {
+      active: false,
+      value: "English",
+      closedCaptionOptionsActive: {
+        active: false,
+        value: "",
+        fontFamily: { active: false, value: "K2D" },
+        fontColor: { active: false, value: "white" },
+        fontOpacity: { active: false, value: "75%" },
+        fontSize: { active: false, value: "Base" },
+        backgroundColor: { active: false, value: "white" },
+        backgroundOpacity: { active: false, value: "75%" },
+        characterEdgeStyle: { active: false, value: "None" },
+      },
+    },
+  });
   const [rerender, setRerender] = useState(0);
   const rightVideoControlsRef = useRef<HTMLDivElement>(null);
 
@@ -246,6 +264,7 @@ export default function FgVideoControls({
                   controls={controls}
                   effectsActive={effectsActive}
                   settingsActive={settingsActive}
+                  activePages={activePages}
                 />
               </Suspense>
             )}
@@ -256,6 +275,8 @@ export default function FgVideoControls({
                 videoContainerRef={videoContainerRef}
                 settingsActive={settingsActive}
                 setSettingsActive={setSettingsActive}
+                activePages={activePages}
+                setActivePages={setActivePages}
               />
             </Suspense>
           }

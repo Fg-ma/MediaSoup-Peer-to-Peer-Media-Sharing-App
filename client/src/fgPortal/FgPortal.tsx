@@ -25,11 +25,13 @@ export default function FgPortal({
   mouseType = "topRight",
   content,
   externalRef,
+  zValue = 51,
 }: {
   type: "above" | "below" | "mouse";
   mouseType?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
   content: React.ReactElement;
   externalRef?: React.RefObject<HTMLElement>;
+  zValue?: number;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -96,7 +98,7 @@ export default function FgPortal({
   return ReactDOM.createPortal(
     <motion.div
       ref={portalRef}
-      className='absolute z-[51]'
+      className={`absolute z-[${zValue}]`}
       style={{
         top: `${portalPosition?.top}px`,
         left: `${portalPosition?.left}px`,

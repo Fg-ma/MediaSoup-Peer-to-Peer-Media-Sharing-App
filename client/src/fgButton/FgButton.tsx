@@ -8,6 +8,7 @@ interface FgButtonOptions {
   holdTimeoutDuration?: number;
   doubleClickTimeoutDuration?: number;
   hoverTimeoutDuration?: number;
+  hoverZValue?: number;
   hoverType?: "above" | "below";
   holdType?: "above" | "below";
   disabled?: boolean;
@@ -234,6 +235,7 @@ export default function FgButton({
                 type={fgButtonOptions.hoverType}
                 content={hoverContent}
                 externalRef={externalRef ? externalRef : buttonRef}
+                zValue={fgButtonOptions.hoverZValue}
               />
             </Suspense>
           )}

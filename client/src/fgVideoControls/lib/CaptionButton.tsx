@@ -3,15 +3,18 @@ import Controls from "./Controls";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import captionsIcon from "../../../public/svgs/captionsIcon.svg";
+import { ActivePages } from "./SettingsPanel";
 
 export default function CaptionButton({
   controls,
   effectsActive,
   settingsActive,
+  activePages,
 }: {
   controls: Controls;
   effectsActive: boolean;
   settingsActive: boolean;
+  activePages: ActivePages;
 }) {
   const [active, setActive] = useState(false);
 

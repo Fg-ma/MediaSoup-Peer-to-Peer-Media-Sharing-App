@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { motion, Transition, Variants } from "framer-motion";
+import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
 import FgButton from "../../fgButton/FgButton";
 import ClosedCaptionsPage, {
   closedCaptionsSelections,
@@ -25,6 +25,32 @@ const SelectionPanelVar: Variants = {
 const SelectionPanelTransition: Transition = {
   transition: {
     opacity: { duration: 0.025 },
+  },
+};
+
+const panelVariants: Variants = {
+  init: {
+    x: "10%", // Start from the right
+    opacity: 0,
+    position: "absolute",
+  },
+  animate: {
+    x: 0, // Move to the center
+    opacity: 1,
+    position: "relative",
+    transition: {
+      x: { type: "spring", stiffness: 300, damping: 30 },
+      opacity: { duration: 0.05 },
+    },
+  },
+  exit: {
+    x: "-10%", // Move to the left when exiting
+    opacity: 0,
+    position: "absolute",
+    transition: {
+      x: { type: "spring", stiffness: 300, damping: 30 },
+      opacity: { duration: 0 },
+    },
   },
 };
 
@@ -78,31 +104,18 @@ export interface ActivePages {
 export default function SettingsPanel({
   settingsPanelRef,
   settingsButtonRef,
+  activePages,
+  setActivePages,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
+  activePages: ActivePages;
+  setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
-    top: number;
+    bottom: number;
   } | null>(null);
-  const [activePages, setActivePages] = useState<ActivePages>({
-    closedCaption: {
-      active: false,
-      value: "English",
-      closedCaptionOptionsActive: {
-        active: false,
-        value: "",
-        fontFamily: { active: false, value: "K2D" },
-        fontColor: { active: false, value: "white" },
-        fontOpacity: { active: false, value: "75%" },
-        fontSize: { active: false, value: "Base" },
-        backgroundColor: { active: false, value: "white" },
-        backgroundOpacity: { active: false, value: "75%" },
-        characterEdgeStyle: { active: false, value: "None" },
-      },
-    },
-  });
 
   // Function to check if a key or its descendants are active
   const isDescendantActive = (
@@ -129,8 +142,8 @@ export default function SettingsPanel({
   };
 
   useEffect(() => {
-    getStaticPanelPosition();
-  }, [activePages]);
+    setTimeout(() => getStaticPanelPosition(), 100);
+  }, []);
 
   const getStaticPanelPosition = () => {
     const externalRect = settingsButtonRef?.current?.getBoundingClientRect();
@@ -141,18 +154,11 @@ export default function SettingsPanel({
       return;
     }
 
-    let top = externalRect.top - settingsPanelRef.current?.clientHeight - 8;
+    let bottom = viewportHeight - externalRect.top + 8;
 
     // Check if the panel overflows the top of the viewport
-    if (top < 0) {
-      top = 0; // Adjust to fit within the top boundary of the viewport
-    }
-
-    // Check if the panel overflows the bottom of the viewport
-    const panelBottom = top + settingsPanelRef.current.clientHeight;
-    if (panelBottom > viewportHeight) {
-      // Adjust to fit within the bottom boundary of the viewport
-      top = viewportHeight - settingsPanelRef.current.clientHeight;
+    if (bottom - settingsPanelRef.current.clientHeight < 0) {
+      bottom = settingsPanelRef.current.clientHeight; // Adjust to fit within the top boundary of the viewport
     }
 
     let left =
@@ -173,7 +179,7 @@ export default function SettingsPanel({
     }
 
     setPortalPosition({
-      top,
+      bottom,
       left,
     });
   };
@@ -192,9 +198,9 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-60 w-max absolute z-[99999999999999] flex p-2 h-max shadow-md rounded bg-black bg-opacity-75 font-K2D text-base text-white'
+      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-black bg-opacity-75 font-K2D text-base text-white'
       style={{
-        top: `${portalPosition?.top}px`,
+        bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
       }}
       variants={SelectionPanelVar}
@@ -203,99 +209,141 @@ export default function SettingsPanel({
       exit='init'
       transition={SelectionPanelTransition}
     >
-      {!isDescendantActive(activePages) && (
-        <div className='w-full h-full flex flex-col justify-center items-center space-y-1 px-1'>
-          <FgButton
-            contentFunction={() => (
-              <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between space-x-4 px-2 rounded items-center'>
-                <div>CC</div>
-                <div>
-                  {closedCaptionsSelections[activePages.closedCaption.value]}
+      <AnimatePresence>
+        {!isDescendantActive(activePages) && (
+          <motion.div
+            className='w-full h-full flex flex-col justify-center items-center space-y-1 px-1'
+            variants={panelVariants}
+            initial='init'
+            animate='animate'
+            exit='exit'
+          >
+            <FgButton
+              className='w-full'
+              contentFunction={() => (
+                <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between px-2 rounded items-center'>
+                  <div>Subtitles</div>
+                  <div>
+                    {closedCaptionsSelections[activePages.closedCaption.value]}
+                  </div>
                 </div>
-              </div>
-            )}
-            mouseDownFunction={handleClosedCaptionsActive}
-          />
-        </div>
-      )}
-      {activePages.closedCaption.active &&
-        !isDescendantActive(activePages.closedCaption) && (
-          <ClosedCaptionsPage
-            activePages={activePages}
-            setActivePages={setActivePages}
-          />
+              )}
+              mouseDownFunction={handleClosedCaptionsActive}
+            />
+          </motion.div>
         )}
-      {activePages.closedCaption.active &&
-        activePages.closedCaption.closedCaptionOptionsActive.active &&
-        !isDescendantActive(
-          activePages.closedCaption.closedCaptionOptionsActive
-        ) && (
-          <ClosedCaptionsOptionsPage
-            activePages={activePages}
-            setActivePages={setActivePages}
-          />
-        )}
-      {activePages.closedCaption.active &&
-        activePages.closedCaption.closedCaptionOptionsActive.active &&
-        closedCaptionOptions.map((option) => {
-          const activePage =
-            activePages.closedCaption.closedCaptionOptionsActive[
-              option as ClosedCaptionOptions
-            ];
-
-          return (
-            activePage.active && (
-              <PageTemplate
-                key={option}
-                content={closedCaptionsOptionsArrays[
-                  option as ClosedCaptionOptions
-                ].map((type) => (
-                  <FgButton
-                    key={type}
-                    className={`w-full rounded bg-opacity-75 min-w-32 px-2 ${
-                      type === activePage.value
-                        ? "bg-gray-400"
-                        : "hover:bg-gray-400"
-                    }`}
-                    contentFunction={() => (
-                      <div className='flex justify-start items-start'>
-                        {type}
-                      </div>
-                    )}
-                    clickFunction={() => {
-                      setActivePages((prev) => {
-                        const newActivePages = { ...prev };
-
-                        newActivePages.closedCaption.closedCaptionOptionsActive[
-                          option as ClosedCaptionOptions
-                        ].value = type;
-
-                        return newActivePages;
-                      });
-                    }}
-                  />
-                ))}
-                pageTitle={
-                  closedCaptionOptionsPageTitles[option as ClosedCaptionOptions]
-                }
-                backFunction={() => {
-                  setActivePages((prev) => {
-                    const newActivePages = { ...prev };
-
-                    newActivePages.closedCaption.closedCaptionOptionsActive[
-                      option as ClosedCaptionOptions
-                    ].active =
-                      !newActivePages.closedCaption.closedCaptionOptionsActive[
-                        option as ClosedCaptionOptions
-                      ].active;
-
-                    return newActivePages;
-                  });
-                }}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.closedCaption.active &&
+          !isDescendantActive(activePages.closedCaption) && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <ClosedCaptionsPage
+                activePages={activePages}
+                setActivePages={setActivePages}
               />
-            )
-          );
-        })}
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.closedCaption.active &&
+          activePages.closedCaption.closedCaptionOptionsActive.active &&
+          !isDescendantActive(
+            activePages.closedCaption.closedCaptionOptionsActive
+          ) && (
+            <motion.div
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <ClosedCaptionsOptionsPage
+                activePages={activePages}
+                setActivePages={setActivePages}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.closedCaption.active &&
+          activePages.closedCaption.closedCaptionOptionsActive.active && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              {closedCaptionOptions.map((option) => {
+                const activePage =
+                  activePages.closedCaption.closedCaptionOptionsActive[
+                    option as ClosedCaptionOptions
+                  ];
+
+                return (
+                  activePage.active && (
+                    <PageTemplate
+                      key={option}
+                      content={closedCaptionsOptionsArrays[
+                        option as ClosedCaptionOptions
+                      ].map((type) => (
+                        <FgButton
+                          key={type}
+                          className={`w-full rounded bg-opacity-75 min-w-32 px-2 ${
+                            type === activePage.value
+                              ? "bg-gray-400"
+                              : "hover:bg-gray-400"
+                          }`}
+                          contentFunction={() => (
+                            <div className='flex justify-start items-start'>
+                              {type}
+                            </div>
+                          )}
+                          clickFunction={() => {
+                            setActivePages((prev) => {
+                              const newActivePages = { ...prev };
+
+                              newActivePages.closedCaption.closedCaptionOptionsActive[
+                                option as ClosedCaptionOptions
+                              ].value = type;
+
+                              return newActivePages;
+                            });
+                          }}
+                        />
+                      ))}
+                      pageTitle={
+                        closedCaptionOptionsPageTitles[
+                          option as ClosedCaptionOptions
+                        ]
+                      }
+                      backFunction={() => {
+                        setActivePages((prev) => {
+                          const newActivePages = { ...prev };
+
+                          newActivePages.closedCaption.closedCaptionOptionsActive[
+                            option as ClosedCaptionOptions
+                          ].active =
+                            !newActivePages.closedCaption
+                              .closedCaptionOptionsActive[
+                              option as ClosedCaptionOptions
+                            ].active;
+
+                          return newActivePages;
+                        });
+                      }}
+                    />
+                  )
+                );
+              })}
+            </motion.div>
+          )}
+      </AnimatePresence>
     </motion.div>,
     document.body
   );
