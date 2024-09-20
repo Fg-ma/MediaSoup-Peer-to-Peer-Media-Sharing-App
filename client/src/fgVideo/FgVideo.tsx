@@ -11,8 +11,18 @@ import "./lib/fgVideoStyles.css";
 import handleVisualEffect from "../effects/visualEffects/handleVisualEffect";
 import Controls from "../fgVideoControls/lib/Controls";
 import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";
-import FgVideoControls from "../fgVideoControls/FgVideoControls";
+import FgVideoControls, {
+  BackgroundColors,
+  BackgroundOpacities,
+  CharacterEdgeStyles,
+  FontColors,
+  FontFamilies,
+  FontOpacities,
+  FontSizes,
+} from "../fgVideoControls/FgVideoControls";
 import FgVideoController from "./lib/FgVideoController";
+import FgVideoCaptions from "../fgVideoCaptions/FgVideoCaptions";
+import { closedCaptionsSelections } from "src/fgVideoControls/lib/ClosedCaptionsPage";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -46,6 +56,22 @@ export interface FgVideoOptions {
   timelineSecondaryBackgroundColor?: string;
   primaryVideoColor?: string;
   initialVolume?: "high" | "low" | "off";
+}
+
+export interface Settings {
+  closedCaption: {
+    value: keyof typeof closedCaptionsSelections;
+    closedCaptionOptionsActive: {
+      value: "";
+      fontFamily: { value: FontFamilies };
+      fontColor: { value: FontColors };
+      fontOpacity: { value: FontOpacities };
+      fontSize: { value: FontSizes };
+      backgroundColor: { value: BackgroundColors };
+      backgroundOpacity: { value: BackgroundOpacities };
+      characterEdgeStyle: { value: CharacterEdgeStyles };
+    };
+  };
 }
 
 export const defaultFgVideoOptions = {
@@ -91,6 +117,7 @@ export default function FgVideo({
   type,
   bundleRef,
   videoStream,
+  audioStream,
   audioRef,
   clientMute,
   localMute,
@@ -111,6 +138,7 @@ export default function FgVideo({
   type: "camera" | "screen";
   bundleRef: React.RefObject<HTMLDivElement>;
   videoStream?: MediaStream;
+  audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
@@ -150,18 +178,39 @@ export default function FgVideo({
 
   const theater = useRef(false);
 
-  const captions = useRef<TextTrack | undefined>();
-
   const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
 
   const totalTimeRef = useRef<HTMLDivElement>(null);
   const currentTimeRef = useRef<HTMLDivElement>(null);
+
+  const [captionsActive, setCaptionsActive] = useState(false);
+  const captionsRef = useRef<HTMLDivElement>(null);
 
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const previewImgRef = useRef<HTMLImageElement>(null);
   const thumbnailImgRef = useRef<HTMLImageElement>(null);
   const isScrubbing = useRef(false);
   const thumbnails = useRef<string[]>([]);
+
+  const [settings, setSettings] = useState<Settings>({
+    closedCaption: {
+      value: "English",
+      closedCaptionOptionsActive: {
+        value: "",
+        fontFamily: { value: "K2D" },
+        fontColor: { value: "white" },
+        fontOpacity: { value: "100%" },
+        fontSize: { value: "base" },
+        backgroundColor: { value: "black" },
+        backgroundOpacity: { value: "75%" },
+        characterEdgeStyle: { value: "None" },
+      },
+    },
+  });
+
+  useEffect(() => {
+    controls.updateCaptionsStyles();
+  }, [settings]);
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -230,6 +279,10 @@ export default function FgVideo({
     controlPressed,
     paused,
     wasPaused,
+    captionsActive,
+    setCaptionsActive,
+    settings,
+    setSettings,
     timelineContainerRef,
     isScrubbing,
     totalTimeRef,
@@ -239,7 +292,6 @@ export default function FgVideo({
     thumbnailImgRef,
     10,
     5,
-    captions,
     theater,
     playbackSpeedButtonRef,
     leaveVideoTimer,
@@ -262,7 +314,6 @@ export default function FgVideo({
     videoRef,
     videoContainerRef,
     audioRef,
-    captions,
     timelineContainerRef,
     currentTimeRef,
     fgVideoOptions,
@@ -379,16 +430,7 @@ export default function FgVideo({
             controls={false}
             autoPlay={fgVideoOptions.autoPlay}
             style={videoStyles}
-          >
-            {fgVideoOptions.isClosedCaptions && (
-              <track
-                kind='captions'
-                srcLang='eng'
-                src='./subtitles.vtt'
-                default
-              ></track>
-            )}
-          </video>
+          ></video>
           {fgVideoOptions.isTimeLine && fgVideoOptions.isThumbnail && (
             <img ref={thumbnailImgRef} className='thumbnail-img' />
           )}
@@ -411,6 +453,9 @@ export default function FgVideo({
               </div>
             </div>
           )}
+          {captionsActive && fgVideoOptions.isClosedCaptions && (
+            <FgVideoCaptions captionsRef={captionsRef} />
+          )}
           <FgVideoNavigation
             name={name}
             username={username}
@@ -428,12 +473,15 @@ export default function FgVideo({
             clientMute={clientMute}
             localMute={localMute}
             videoContainerRef={videoContainerRef}
+            audioStream={audioStream}
             audioRef={audioRef}
             currentTimeRef={currentTimeRef}
             totalTimeRef={totalTimeRef}
             playbackSpeedButtonRef={playbackSpeedButtonRef}
             tintColor={tintColor}
             effectsActive={effectsActive}
+            settings={settings}
+            setSettings={setSettings}
             fgVideoOptions={fgVideoOptions}
             handleVisualEffectChange={handleVisualEffectChange}
             handleAudioEffectChange={handleAudioEffectChange}

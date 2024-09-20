@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import FgButton from "../../fgButton/FgButton";
-import SettingsPanel, { ActivePages } from "./SettingsPanel";
+import SettingsPanel from "./SettingsPanel";
+import { ActivePages } from "../FgVideoControls";
+import { Settings } from "src/fgVideo/FgVideo";
 
 export default function FgSettingsButton({
   effectsActive,
@@ -9,6 +11,8 @@ export default function FgSettingsButton({
   setSettingsActive,
   activePages,
   setActivePages,
+  settings,
+  setSettings,
 }: {
   effectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
@@ -16,12 +20,41 @@ export default function FgSettingsButton({
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
+  settings: Settings;
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
 
+  const deactivateAll = (obj: Record<string, any>) => {
+    // Check if the current object has an 'active' property and if it's true
+    if (obj.active === true) {
+      obj.active = false;
+    }
+
+    // Iterate over all keys in the object
+    for (const key in obj) {
+      // Check if the value is an object, and if so, recurse into it
+      if (typeof obj[key] === "object" && obj[key] !== null) {
+        obj[key] = deactivateAll(obj[key]);
+      }
+    }
+
+    // Return false if no 'active' property is true in the current object or its descendants
+    return obj;
+  };
+
   const toggleSettings = () => {
     setSettingsActive((prev) => !prev);
+
+    setActivePages((prev) => {
+      const newActivePages = { ...prev };
+
+      const deactivePages = deactivateAll(newActivePages);
+
+      return deactivePages as ActivePages;
+    });
+
     if (!videoContainerRef.current?.classList.contains("in-settings")) {
       videoContainerRef.current?.classList.add("in-settings");
     } else {
@@ -90,6 +123,8 @@ export default function FgSettingsButton({
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}
           setActivePages={setActivePages}
+          settings={settings}
+          setSettings={setSettings}
         />
       )}
     </>

@@ -1,9 +1,10 @@
 import React from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import { ActivePages } from "./SettingsPanel";
 
 import navigateBackIcon from "../../../public/svgs/navigateBack.svg";
+import { ActivePages } from "../FgVideoControls";
+import { Settings } from "src/fgVideo/FgVideo";
 
 export const closedCaptionsSelections = {
   ["Catalan"]: "Catalan",
@@ -24,19 +25,23 @@ export const closedCaptionsSelections = {
 export default function ClosedCaptionsPage({
   activePages,
   setActivePages,
+  settings,
+  setSettings,
 }: {
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
+  settings: Settings;
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
   const setClosedCaptionsLang = (
     newLang: keyof typeof closedCaptionsSelections
   ) => {
-    setActivePages((prev) => {
-      const newActivePages = { ...prev };
+    setSettings((prev) => {
+      const newSettings = { ...prev };
 
-      newActivePages.closedCaption.value = newLang;
+      newSettings.closedCaption.value = newLang;
 
-      return newActivePages;
+      return newSettings;
     });
   };
 
@@ -98,11 +103,11 @@ export default function ClosedCaptionsPage({
         />
       </div>
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
-      <div className='w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem]'>
+      <div className='smallScrollbar w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem]'>
         {Object.entries(closedCaptionsSelections).map(([key, lang]) => (
           <div
             className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center ${
-              key === activePages.closedCaption.value
+              key === settings.closedCaption.value
                 ? "bg-gray-400"
                 : "hover:bg-gray-400"
             }`}

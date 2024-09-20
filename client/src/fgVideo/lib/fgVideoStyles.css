@@ -2,13 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-.main-video::cue {
-  background: var(--closed-captions-decorator-color);
-  color: white;
-  font-size: 1.25rem;
-  line-height: 3rem;
-  font-family: "K2D";
+.video-container .captions {
+  font-family: var(--closed-captions-font-family);
+  color: var(--closed-captions-font-color);
+  font-size: var(--closed-captions-font-size);
+  line-height: calc(var(--closed-captions-font-size) + 0.5rem);
+  background-color: var(--closed-captions-background-color);
+  opacity: var(--closed-captions-background-opacity);
+  text-shadow: var(--closed-captions-character-edge-style);
   transition: line-height 150ms ease-in-out;
+  transform: translateX(-50%);
+  position: absolute;
+  bottom: 4rem;
+  left: 50%;
+  padding-right: 0.625rem;
+  padding-left: 0.625rem;
+  border-radius: 0.125rem;
 }
 
 .main-video {
@@ -36,11 +45,16 @@
 
 .video-container {
   --timeline-background-color: rgba(150, 150, 150, 0.5);
-  --closed-captions-decorator-color: rgba(30, 30, 30, 0.6);
   --timeline-primary-background-color: #f56114;
   --timeline-secondary-background-color: rgb(150, 150, 150);
   --primary-video-color: #f56114;
   --flip-video: "1";
+  --closed-captions-font-family: "K2D";
+  --closed-captions-font-color: white;
+  --closed-captions-font-size: 2rem;
+  --closed-captions-background-color: black;
+  --closed-captions-background-opacity: 75%;
+  --closed-captions-character-edge-style: none;
 }
 
 .video-controls-container,

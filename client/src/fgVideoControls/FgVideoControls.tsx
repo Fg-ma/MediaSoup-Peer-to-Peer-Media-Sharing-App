@@ -7,8 +7,11 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
-import { defaultFgVideoOptions, FgVideoOptions } from "../fgVideo/FgVideo";
-import { ActivePages } from "./lib/SettingsPanel";
+import {
+  defaultFgVideoOptions,
+  FgVideoOptions,
+  Settings,
+} from "../fgVideo/FgVideo";
 
 const PlayPauseButton = React.lazy(() => import("./lib/PlayPauseButton"));
 const FgVolumeElement = React.lazy(
@@ -32,6 +35,70 @@ const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
 );
 
+export type FontFamilies =
+  | "K2D"
+  | "Josephin"
+  | "mono"
+  | "sans"
+  | "serif"
+  | "thin"
+  | "bold";
+
+export type FontColors =
+  | "white"
+  | "black"
+  | "red"
+  | "green"
+  | "blue"
+  | "magenta"
+  | "orange"
+  | "cyan";
+
+export type FontOpacities = "25%" | "50%" | "75%" | "100%";
+
+export type FontSizes =
+  | "xsmall"
+  | "small"
+  | "base"
+  | "medium"
+  | "large"
+  | "xlarge";
+
+export type BackgroundColors =
+  | "white"
+  | "black"
+  | "red"
+  | "green"
+  | "blue"
+  | "magenta"
+  | "orange"
+  | "cyan";
+
+export type BackgroundOpacities = "25%" | "50%" | "75%" | "100%";
+
+export type CharacterEdgeStyles =
+  | "None"
+  | "Shadow"
+  | "Raised"
+  | "Inset"
+  | "Outline";
+
+export interface ActivePages {
+  closedCaption: {
+    active: boolean;
+    closedCaptionOptionsActive: {
+      active: boolean;
+      fontFamily: { active: boolean };
+      fontColor: { active: boolean };
+      fontOpacity: { active: boolean };
+      fontSize: { active: boolean };
+      backgroundColor: { active: boolean };
+      backgroundOpacity: { active: boolean };
+      characterEdgeStyle: { active: boolean };
+    };
+  };
+}
+
 export default function FgVideoControls({
   socket,
   table_id,
@@ -43,12 +110,15 @@ export default function FgVideoControls({
   clientMute,
   localMute,
   videoContainerRef,
+  audioStream,
   audioRef,
   currentTimeRef,
   totalTimeRef,
   playbackSpeedButtonRef,
   tintColor,
   effectsActive,
+  settings,
+  setSettings,
   fgVideoOptions,
   handleVisualEffectChange,
   handleAudioEffectChange,
@@ -66,12 +136,15 @@ export default function FgVideoControls({
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   videoContainerRef: React.RefObject<HTMLDivElement>;
+  audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
   totalTimeRef: React.RefObject<HTMLDivElement>;
   playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
   tintColor: React.MutableRefObject<string>;
   effectsActive: boolean;
+  settings: Settings;
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   fgVideoOptions: FgVideoOptions;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -88,17 +161,15 @@ export default function FgVideoControls({
   const [activePages, setActivePages] = useState<ActivePages>({
     closedCaption: {
       active: false,
-      value: "English",
       closedCaptionOptionsActive: {
         active: false,
-        value: "",
-        fontFamily: { active: false, value: "K2D" },
-        fontColor: { active: false, value: "white" },
-        fontOpacity: { active: false, value: "75%" },
-        fontSize: { active: false, value: "Base" },
-        backgroundColor: { active: false, value: "white" },
-        backgroundOpacity: { active: false, value: "75%" },
-        characterEdgeStyle: { active: false, value: "None" },
+        fontFamily: { active: false },
+        fontColor: { active: false },
+        fontOpacity: { active: false },
+        fontSize: { active: false },
+        backgroundColor: { active: false },
+        backgroundOpacity: { active: false },
+        characterEdgeStyle: { active: false },
       },
     },
   });
@@ -258,13 +329,15 @@ export default function FgVideoControls({
           )}
           {(fgVideoOptions.isClosedCaptions ??
             defaultFgVideoOptions.isClosedCaptions) &&
-            fgVideoOptions.isVolume && (
+            fgVideoOptions.isVolume &&
+            audioStream && (
               <Suspense fallback={<div>Loading...</div>}>
                 <CaptionButton
                   controls={controls}
                   effectsActive={effectsActive}
                   settingsActive={settingsActive}
-                  activePages={activePages}
+                  settings={settings}
+                  audioStream={audioStream}
                 />
               </Suspense>
             )}
@@ -277,6 +350,8 @@ export default function FgVideoControls({
                 setSettingsActive={setSettingsActive}
                 activePages={activePages}
                 setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
               />
             </Suspense>
           }

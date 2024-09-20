@@ -81,6 +81,12 @@ class Deadbanding {
         headPitchAngles: 0.05,
         chinWidths: 0.01,
       },
+      chinBeard: {
+        headRotationAngles: 0.05,
+        headYawAngles: 0.05,
+        headPitchAngles: 0.05,
+        chinWidths: 0.01,
+      },
     },
     mustaches: {
       mustache1: {

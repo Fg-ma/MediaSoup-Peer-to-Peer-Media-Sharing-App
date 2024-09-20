@@ -3,7 +3,58 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../context/StreamsContext";
-import { defaultFgVideoOptions, FgVideoOptions } from "../../fgVideo/FgVideo";
+import {
+  defaultFgVideoOptions,
+  FgVideoOptions,
+  Settings,
+} from "../../fgVideo/FgVideo";
+
+const fontSizeMap = {
+  xsmall: "0.75rem",
+  small: "1.25rem",
+  base: "1.5rem",
+  medium: "2rem",
+  large: "2.5rem",
+  xlarge: "3rem",
+};
+
+const opacityMap = {
+  "25%": "0.25",
+  "50%": "0.5",
+  "75%": "0.75",
+  "100%": "1",
+};
+
+const colorMap = {
+  white: "rgba(255, 255, 255,",
+  black: "rgba(0, 0, 0,",
+  red: "rgba(255, 0, 0,",
+  green: "rgba(0, 255, 0,",
+  blue: "rgba(0, 0, 255,",
+  magenta: "rgba(255, 0, 255,",
+  orange: "rgba(255, 165, 0,",
+  cyan: "rgba(0, 255, 255,",
+};
+
+const fontFamilyMap = {
+  K2D: "'K2D', sans-serif",
+  Josephin: "'Josefin Sans', sans-serif",
+  mono: "'Courier New', monospace",
+  sans: "'Arial', sans-serif",
+  serif: "'Times New Roman', serif",
+  thin: "'Montserrat Thin', sans-serif",
+  bold: "'Noto Sans', sans-serif",
+};
+
+const characterEdgeStyleMap = {
+  None: "none",
+  Shadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
+  Raised: "1px 1px 2px rgba(0, 0, 0, 0.4)",
+  Inset:
+    "1px 1px 2px rgba(255, 255, 255, 0.5), -1px -1px 2px rgba(0, 0, 0, 0.4)",
+  Outline:
+    "-1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black, 1px 1px 0px black",
+};
 
 class Controls {
   private socket: React.MutableRefObject<Socket> | undefined;
@@ -26,6 +77,12 @@ class Controls {
   private paused: React.MutableRefObject<boolean>;
   private wasPaused: React.MutableRefObject<boolean>;
 
+  private captionsActive: boolean;
+  private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>;
+
+  private settings: Settings;
+  private setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+
   private timelineContainerRef: React.RefObject<HTMLDivElement>;
   private isScrubbing: React.MutableRefObject<boolean>;
 
@@ -37,8 +94,6 @@ class Controls {
   private thumbnailImgRef: React.RefObject<HTMLImageElement>;
   private thumbnailInterval: number;
   private thumbnailClarity: number;
-
-  private captions: React.MutableRefObject<TextTrack | undefined>;
 
   private theater: React.MutableRefObject<boolean>;
 
@@ -80,6 +135,12 @@ class Controls {
     paused: React.MutableRefObject<boolean>,
     wasPaused: React.MutableRefObject<boolean>,
 
+    captionsActive: boolean,
+    setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
+
+    settings: Settings,
+    setSettings: React.Dispatch<React.SetStateAction<Settings>>,
+
     timelineContainerRef: React.RefObject<HTMLDivElement>,
     isScrubbing: React.MutableRefObject<boolean>,
 
@@ -91,8 +152,6 @@ class Controls {
     thumbnailImgRef: React.RefObject<HTMLImageElement>,
     thumbnailInterval = 10,
     thumbnailClarity = 5,
-
-    captions: React.MutableRefObject<TextTrack | undefined>,
 
     theater: React.MutableRefObject<boolean>,
 
@@ -129,6 +188,12 @@ class Controls {
     this.paused = paused;
     this.wasPaused = wasPaused;
 
+    this.captionsActive = captionsActive;
+    this.setCaptionsActive = setCaptionsActive;
+
+    this.settings = settings;
+    this.setSettings = setSettings;
+
     this.timelineContainerRef = timelineContainerRef;
     this.isScrubbing = isScrubbing;
 
@@ -141,8 +206,6 @@ class Controls {
     this.thumbnailInterval = thumbnailInterval;
     this.thumbnailClarity = thumbnailClarity;
 
-    this.captions = captions;
-
     this.theater = theater;
 
     this.playbackSpeedButtonRef = playbackSpeedButtonRef;
@@ -150,6 +213,7 @@ class Controls {
     this.leaveVideoTimer = leaveVideoTimer;
 
     this.setEffectsActive = setEffectsActive;
+
     this.handleMute = handleMute;
     this.handleVisualEffectChange = handleVisualEffectChange;
     this.tracksColorSetterCallback = tracksColorSetterCallback;
@@ -169,10 +233,9 @@ class Controls {
   };
 
   handleClosedCaptions = () => {
-    if (this.captions.current && this.videoContainerRef.current) {
-      const isHidden = this.captions.current.mode === "hidden";
-      this.captions.current.mode = isHidden ? "showing" : "hidden";
-      this.videoContainerRef.current.classList.toggle("captions", isHidden);
+    if (this.videoContainerRef.current) {
+      this.videoContainerRef.current.classList.toggle("captions");
+      this.setCaptionsActive((prev) => !prev);
     }
   };
 
@@ -631,6 +694,43 @@ class Controls {
         `${percent}`
       );
     }
+  };
+
+  updateCaptionsStyles = () => {
+    if (!this.videoContainerRef.current) {
+      return;
+    }
+
+    const style = this.videoContainerRef.current.style;
+    const captionOptions =
+      this.settings.closedCaption.closedCaptionOptionsActive;
+
+    style.setProperty(
+      "--closed-captions-font-family",
+      fontFamilyMap[captionOptions.fontFamily.value]
+    );
+    style.setProperty(
+      "--closed-captions-font-color",
+      `${colorMap[captionOptions.fontColor.value]} ${
+        opacityMap[captionOptions.fontOpacity.value]
+      }`
+    );
+    style.setProperty(
+      "--closed-captions-font-size",
+      fontSizeMap[captionOptions.fontSize.value]
+    );
+    style.setProperty(
+      "--closed-captions-background-color",
+      captionOptions.backgroundColor.value
+    );
+    style.setProperty(
+      "--closed-captions-background-opacity",
+      opacityMap[captionOptions.backgroundOpacity.value]
+    );
+    style.setProperty(
+      "--closed-captions-character-edge-style",
+      characterEdgeStyleMap[captionOptions.characterEdgeStyle.value]
+    );
   };
 }
 

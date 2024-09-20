@@ -293,6 +293,7 @@ export default function Bundle({
               type='camera'
               bundleRef={bundleRef}
               videoStream={cameraStream}
+              audioStream={audioStream}
               audioRef={audioRef}
               handleAudioEffectChange={handleAudioEffectChange}
               clientMute={clientMute}
@@ -343,6 +344,7 @@ export default function Bundle({
               type='screen'
               bundleRef={bundleRef}
               videoStream={screenStream}
+              audioStream={audioStream}
               audioRef={audioRef}
               handleAudioEffectChange={handleAudioEffectChange}
               clientMute={clientMute}

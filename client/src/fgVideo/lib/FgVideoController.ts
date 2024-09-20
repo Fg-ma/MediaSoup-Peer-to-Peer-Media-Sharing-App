@@ -60,7 +60,6 @@ class FgVideoController {
   private videoRef: React.RefObject<HTMLVideoElement>;
   private videoContainerRef: React.RefObject<HTMLDivElement>;
   private audioRef: React.RefObject<HTMLAudioElement>;
-  private captions: React.MutableRefObject<TextTrack | undefined>;
   private timelineContainerRef: React.RefObject<HTMLDivElement>;
   private currentTimeRef: React.RefObject<HTMLDivElement>;
 
@@ -100,7 +99,6 @@ class FgVideoController {
     videoRef: React.RefObject<HTMLVideoElement>,
     videoContainerRef: React.RefObject<HTMLDivElement>,
     audioRef: React.RefObject<HTMLAudioElement>,
-    captions: React.MutableRefObject<TextTrack | undefined>,
     timelineContainerRef: React.RefObject<HTMLDivElement>,
     currentTimeRef: React.RefObject<HTMLDivElement>,
     fgVideoOptions: FgVideoOptions,
@@ -121,7 +119,6 @@ class FgVideoController {
     this.videoRef = videoRef;
     this.videoContainerRef = videoContainerRef;
     this.audioRef = audioRef;
-    this.captions = captions;
     this.timelineContainerRef = timelineContainerRef;
     this.currentTimeRef = currentTimeRef;
     this.fgVideoOptions = fgVideoOptions;
@@ -150,12 +147,6 @@ class FgVideoController {
           : this.audioRef.current.volume.toString();
       }
     });
-
-    // Get captions and set them to hidden initially
-    if (this.videoRef.current && this.videoRef.current.textTracks[0]) {
-      this.captions.current = this.videoRef.current.textTracks[0];
-      this.captions.current.mode = "hidden";
-    }
 
     // Set the initial progress position
     if (this.timelineContainerRef.current) {
@@ -188,13 +179,6 @@ class FgVideoController {
       `${
         this.fgVideoOptions.timelineBackgroundColor ??
         defaultFgVideoOptions.timelineBackgroundColor
-      }`
-    );
-    this.videoContainerRef.current?.style.setProperty(
-      "--closed-captions-decorator-color",
-      `${
-        this.fgVideoOptions.closedCaptionsDecoratorColor ??
-        defaultFgVideoOptions.closedCaptionsDecoratorColor
       }`
     );
     this.videoContainerRef.current?.style.setProperty(

@@ -6,16 +6,11 @@ import ClosedCaptionsPage, {
   closedCaptionsSelections,
 } from "./ClosedCaptionsPage";
 import ClosedCaptionsOptionsPage, {
-  BackgroundColors,
-  BackgroundOpacities,
-  CharacterEdgeStyles,
   closedCaptionsOptionsArrays,
-  FontColors,
-  FontFamilies,
-  FontOpacities,
-  FontSizes,
 } from "./ClosedCaptionsOptionsPage";
 import PageTemplate from "./PageTemplate";
+import { ActivePages } from "../FgVideoControls";
+import { Settings } from "src/fgVideo/FgVideo";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -83,34 +78,20 @@ const closedCaptionOptionsPageTitles = {
   characterEdgeStyle: "Character edge style",
 };
 
-export interface ActivePages {
-  closedCaption: {
-    active: boolean;
-    value: keyof typeof closedCaptionsSelections;
-    closedCaptionOptionsActive: {
-      active: boolean;
-      value: "";
-      fontFamily: { active: boolean; value: FontFamilies };
-      fontColor: { active: boolean; value: FontColors };
-      fontOpacity: { active: boolean; value: FontOpacities };
-      fontSize: { active: boolean; value: FontSizes };
-      backgroundColor: { active: boolean; value: BackgroundColors };
-      backgroundOpacity: { active: boolean; value: BackgroundOpacities };
-      characterEdgeStyle: { active: boolean; value: CharacterEdgeStyles };
-    };
-  };
-}
-
 export default function SettingsPanel({
   settingsPanelRef,
   settingsButtonRef,
   activePages,
   setActivePages,
+  settings,
+  setSettings,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
+  settings: Settings;
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -224,7 +205,7 @@ export default function SettingsPanel({
                 <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between px-2 rounded items-center'>
                   <div>Subtitles</div>
                   <div>
-                    {closedCaptionsSelections[activePages.closedCaption.value]}
+                    {closedCaptionsSelections[settings.closedCaption.value]}
                   </div>
                 </div>
               )}
@@ -246,6 +227,8 @@ export default function SettingsPanel({
               <ClosedCaptionsPage
                 activePages={activePages}
                 setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
               />
             </motion.div>
           )}
@@ -257,21 +240,25 @@ export default function SettingsPanel({
             activePages.closedCaption.closedCaptionOptionsActive
           ) && (
             <motion.div
+              className='w-full'
               variants={panelVariants}
               initial='init'
               animate='animate'
               exit='exit'
             >
               <ClosedCaptionsOptionsPage
-                activePages={activePages}
                 setActivePages={setActivePages}
+                settings={settings}
               />
             </motion.div>
           )}
       </AnimatePresence>
       <AnimatePresence>
         {activePages.closedCaption.active &&
-          activePages.closedCaption.closedCaptionOptionsActive.active && (
+          activePages.closedCaption.closedCaptionOptionsActive.active &&
+          isDescendantActive(
+            activePages.closedCaption.closedCaptionOptionsActive
+          ) && (
             <motion.div
               className='w-full'
               variants={panelVariants}
@@ -282,6 +269,10 @@ export default function SettingsPanel({
               {closedCaptionOptions.map((option) => {
                 const activePage =
                   activePages.closedCaption.closedCaptionOptionsActive[
+                    option as ClosedCaptionOptions
+                  ];
+                const activeSetting =
+                  settings.closedCaption.closedCaptionOptionsActive[
                     option as ClosedCaptionOptions
                   ];
 
@@ -295,7 +286,7 @@ export default function SettingsPanel({
                         <FgButton
                           key={type}
                           className={`w-full rounded bg-opacity-75 min-w-32 px-2 ${
-                            type === activePage.value
+                            type === activeSetting.value
                               ? "bg-gray-400"
                               : "hover:bg-gray-400"
                           }`}
@@ -305,14 +296,14 @@ export default function SettingsPanel({
                             </div>
                           )}
                           clickFunction={() => {
-                            setActivePages((prev) => {
-                              const newActivePages = { ...prev };
+                            setSettings((prev) => {
+                              const newSettings = { ...prev };
 
-                              newActivePages.closedCaption.closedCaptionOptionsActive[
+                              newSettings.closedCaption.closedCaptionOptionsActive[
                                 option as ClosedCaptionOptions
                               ].value = type;
 
-                              return newActivePages;
+                              return newSettings;
                             });
                           }}
                         />

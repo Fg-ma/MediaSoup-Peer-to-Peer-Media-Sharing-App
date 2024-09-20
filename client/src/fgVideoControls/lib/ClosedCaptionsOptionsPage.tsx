@@ -2,57 +2,19 @@ import React from "react";
 import navigateBackIcon from "../../../public/svgs/navigateBack.svg";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import { ActivePages } from "./SettingsPanel";
+import {
+  ActivePages,
+  BackgroundColors,
+  BackgroundOpacities,
+  CharacterEdgeStyles,
+  FontColors,
+  FontFamilies,
+  FontOpacities,
+  FontSizes,
+} from "../FgVideoControls";
 
 import navigateForwardIcon from "../../../public/svgs/navigateForward.svg";
-
-export type FontFamilies =
-  | "K2D"
-  | "Josephin"
-  | "mono"
-  | "sans"
-  | "serif"
-  | "thin"
-  | "bold";
-
-export type FontColors =
-  | "white"
-  | "black"
-  | "red"
-  | "green"
-  | "blue"
-  | "magenta"
-  | "orange"
-  | "cyan";
-
-export type FontOpacities = "25%" | "50%" | "75%" | "100%";
-
-export type FontSizes =
-  | "XSmall"
-  | "Small"
-  | "Base"
-  | "Medium"
-  | "Large"
-  | "XLarge";
-
-export type BackgroundColors =
-  | "white"
-  | "black"
-  | "red"
-  | "green"
-  | "blue"
-  | "magenta"
-  | "orange"
-  | "cyan";
-
-export type BackgroundOpacities = "25%" | "50%" | "75%" | "100%";
-
-export type CharacterEdgeStyles =
-  | "None"
-  | "Shadow"
-  | "Raised"
-  | "Depressed"
-  | "Outline";
+import { Settings } from "src/fgVideo/FgVideo";
 
 export interface ClosedCaptionsOptions {
   fontFamily: FontFamilies;
@@ -85,7 +47,7 @@ export const closedCaptionsOptionsArrays: {
     "cyan",
   ],
   fontOpacity: ["25%", "50%", "75%", "100%"],
-  fontSize: ["XSmall", "Small", "Base", "Medium", "Large", "XLarge"],
+  fontSize: ["xsmall", "small", "base", "medium", "large", "xlarge"],
   backgroundColor: [
     "white",
     "black",
@@ -97,7 +59,7 @@ export const closedCaptionsOptionsArrays: {
     "cyan",
   ],
   backgroundOpacity: ["25%", "50%", "75%", "100%"],
-  characterEdgeStyle: ["None", "Shadow", "Raised", "Depressed", "Outline"],
+  characterEdgeStyle: ["None", "Shadow", "Raised", "Inset", "Outline"],
 };
 
 const closedCaptionsOptionsTitles = {
@@ -110,22 +72,12 @@ const closedCaptionsOptionsTitles = {
   characterEdgeStyle: "Edge style",
 };
 
-const defaultClosedCaptionOptions: ClosedCaptionsOptions = {
-  fontFamily: "K2D",
-  fontColor: "white",
-  fontOpacity: "75%",
-  fontSize: "Base",
-  backgroundColor: "white",
-  backgroundOpacity: "75%",
-  characterEdgeStyle: "None",
-};
-
 export default function ClosedCaptionsOptionsPage({
-  activePages,
   setActivePages,
+  settings,
 }: {
-  activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
+  settings: Settings;
 }) {
   const handleClosedCaptionOptionsActive = () => {
     setActivePages((prev) => {
@@ -139,7 +91,7 @@ export default function ClosedCaptionsOptionsPage({
   };
 
   const handleOptionSelect = (
-    option: keyof typeof defaultClosedCaptionOptions
+    option: keyof typeof closedCaptionsOptionsTitles
   ) => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
@@ -177,7 +129,7 @@ export default function ClosedCaptionsOptionsPage({
         </div>
       </div>
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
-      <div className='w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem]'>
+      <div className='smallScrollbar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem]'>
         {Object.keys(closedCaptionsOptionsArrays).map((option) => (
           <FgButton
             className='w-full h-8'
@@ -198,7 +150,7 @@ export default function ClosedCaptionsOptionsPage({
                 <div className='flex space-x-1 items-center justify-center'>
                   <div>
                     {
-                      activePages.closedCaption.closedCaptionOptionsActive[
+                      settings.closedCaption.closedCaptionOptionsActive[
                         option as keyof typeof closedCaptionsOptionsArrays
                       ].value
                     }
