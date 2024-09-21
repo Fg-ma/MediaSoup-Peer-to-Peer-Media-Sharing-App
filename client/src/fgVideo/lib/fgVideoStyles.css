@@ -7,16 +7,35 @@
   color: var(--closed-captions-font-color);
   font-size: var(--closed-captions-font-size);
   line-height: calc(var(--closed-captions-font-size) + 0.5rem);
-  background-color: var(--closed-captions-background-color);
   opacity: var(--closed-captions-background-opacity);
   text-shadow: var(--closed-captions-character-edge-style);
   transition: line-height 150ms ease-in-out;
   transform: translateX(-50%);
   position: absolute;
-  bottom: 4rem;
   left: 50%;
   padding-right: 0.625rem;
   padding-left: 0.625rem;
+  width: max-content;
+  max-width: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  bottom: 1rem;
+}
+
+.video-container.in-video .captions,
+.video-container.in-effects .captions,
+.video-container.in-settings .captions {
+  bottom: 4rem;
+}
+
+.video-container .caption-text {
+  background-color: var(--closed-captions-background-color);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  text-align: center;
+  whitespace: normal;
   border-radius: 0.125rem;
 }
 
@@ -28,21 +47,7 @@
   transform: scaleX(1);
 }
 
-.controls-gradient {
-  opacity: 0;
-}
-
 /* .video-container.paused .controls-gradient, */
-.video-container.in-video .controls-gradient,
-.video-container.in-effects .controls-gradient {
-  opacity: 1;
-}
-
-.video-container.in-video .main-video::cue,
-.video-container.in-effects .main-video::cue {
-  line-height: 8rem;
-}
-
 .video-container {
   --timeline-background-color: rgba(150, 150, 150, 0.5);
   --timeline-primary-background-color: #f56114;
@@ -57,8 +62,9 @@
   --closed-captions-character-edge-style: none;
 }
 
-.video-controls-container,
-.video-navigation-container {
+.video-container .video-controls-container,
+.video-container .video-navigation-container,
+.video-container .controls-gradient {
   opacity: 0;
   transition: opacity 150ms ease-in-out;
 }
@@ -81,10 +87,13 @@
 
 .video-container.in-video .video-controls-container,
 .video-container.in-video .video-navigation-container,
+.video-container.in-video .controls-gradient,
 .video-container.in-effects .video-controls-container,
 .video-container.in-effects .video-navigation-container,
+.video-container.in-effects .controls-gradient,
 .video-container.in-settings .video-controls-container,
-.video-container.in-settings .video-navigation-container {
+.video-container.in-settings .video-navigation-container,
+.video-container.in-settings .controls-gradient {
   opacity: 1;
   transition-delay: 0s;
 }

@@ -21,8 +21,11 @@ import FgVideoControls, {
   FontSizes,
 } from "../fgVideoControls/FgVideoControls";
 import FgVideoController from "./lib/FgVideoController";
-import FgVideoCaptions from "../fgVideoCaptions/FgVideoCaptions";
-import { closedCaptionsSelections } from "src/fgVideoControls/lib/ClosedCaptionsPage";
+import {
+  closedCaptionsSelections,
+  expandedClosedCaptionsBrowserSelections,
+  expandedClosedCaptionsVoskSelections,
+} from "../fgVideoControls/lib/ClosedCaptionsPage";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -60,7 +63,10 @@ export interface FgVideoOptions {
 
 export interface Settings {
   closedCaption: {
-    value: keyof typeof closedCaptionsSelections;
+    value:
+      | keyof typeof closedCaptionsSelections
+      | keyof typeof expandedClosedCaptionsVoskSelections
+      | keyof typeof expandedClosedCaptionsBrowserSelections;
     closedCaptionOptionsActive: {
       value: "";
       fontFamily: { value: FontFamilies };
@@ -184,7 +190,6 @@ export default function FgVideo({
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
   const [captionsActive, setCaptionsActive] = useState(false);
-  const captionsRef = useRef<HTMLDivElement>(null);
 
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const previewImgRef = useRef<HTMLImageElement>(null);
@@ -194,7 +199,7 @@ export default function FgVideo({
 
   const [settings, setSettings] = useState<Settings>({
     closedCaption: {
-      value: "English",
+      value: "en-US",
       closedCaptionOptionsActive: {
         value: "",
         fontFamily: { value: "K2D" },
@@ -452,9 +457,6 @@ export default function FgVideo({
                 <div className='thumb-indicator'></div>
               </div>
             </div>
-          )}
-          {captionsActive && fgVideoOptions.isClosedCaptions && (
-            <FgVideoCaptions captionsRef={captionsRef} />
           )}
           <FgVideoNavigation
             name={name}

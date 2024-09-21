@@ -13,6 +13,7 @@ export default function FgSettingsButton({
   setActivePages,
   settings,
   setSettings,
+  browserStandardSpeechRecognitionAvailable,
 }: {
   effectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
@@ -22,6 +23,7 @@ export default function FgSettingsButton({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -125,6 +127,9 @@ export default function FgSettingsButton({
           setActivePages={setActivePages}
           settings={settings}
           setSettings={setSettings}
+          browserStandardSpeechRecognitionAvailable={
+            browserStandardSpeechRecognitionAvailable
+          }
         />
       )}
     </>

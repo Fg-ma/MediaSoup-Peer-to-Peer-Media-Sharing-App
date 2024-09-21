@@ -132,6 +132,7 @@ export default function ClosedCaptionsOptionsPage({
       <div className='smallScrollbar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem]'>
         {Object.keys(closedCaptionsOptionsArrays).map((option) => (
           <FgButton
+            key={option}
             className='w-full h-8'
             clickFunction={() =>
               handleOptionSelect(

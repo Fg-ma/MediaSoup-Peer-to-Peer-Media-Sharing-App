@@ -175,6 +175,7 @@ export default function FgVideoControls({
   });
   const [rerender, setRerender] = useState(0);
   const rightVideoControlsRef = useRef<HTMLDivElement>(null);
+  const browserStandardSpeechRecognitionAvailable = useRef(true);
 
   const handleMessage = (event: any) => {
     if (event.type === "localMuteChange") {
@@ -338,6 +339,10 @@ export default function FgVideoControls({
                   settingsActive={settingsActive}
                   settings={settings}
                   audioStream={audioStream}
+                  videoContainerRef={videoContainerRef}
+                  browserStandardSpeechRecognitionAvailable={
+                    browserStandardSpeechRecognitionAvailable
+                  }
                 />
               </Suspense>
             )}
@@ -352,6 +357,9 @@ export default function FgVideoControls({
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}
+                browserStandardSpeechRecognitionAvailable={
+                  browserStandardSpeechRecognitionAvailable
+                }
               />
             </Suspense>
           }

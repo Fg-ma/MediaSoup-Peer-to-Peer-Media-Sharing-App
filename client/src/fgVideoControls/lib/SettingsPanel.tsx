@@ -4,6 +4,8 @@ import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
 import FgButton from "../../fgButton/FgButton";
 import ClosedCaptionsPage, {
   closedCaptionsSelections,
+  expandedClosedCaptionsBrowserSelections,
+  expandedClosedCaptionsVoskSelections,
 } from "./ClosedCaptionsPage";
 import ClosedCaptionsOptionsPage, {
   closedCaptionsOptionsArrays,
@@ -85,6 +87,7 @@ export default function SettingsPanel({
   setActivePages,
   settings,
   setSettings,
+  browserStandardSpeechRecognitionAvailable,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -92,6 +95,7 @@ export default function SettingsPanel({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -205,7 +209,28 @@ export default function SettingsPanel({
                 <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between px-2 rounded items-center'>
                   <div>Subtitles</div>
                   <div>
-                    {closedCaptionsSelections[settings.closedCaption.value]}
+                    {closedCaptionsSelections.hasOwnProperty(
+                      settings.closedCaption.value
+                    ) ? (
+                      // @ts-ignore
+                      closedCaptionsSelections[settings.closedCaption.value]
+                    ) : expandedClosedCaptionsBrowserSelections.hasOwnProperty(
+                        settings.closedCaption.value
+                      ) ? (
+                      // @ts-ignore
+                      expandedClosedCaptionsBrowserSelections[
+                        settings.closedCaption.value
+                      ]
+                    ) : expandedClosedCaptionsVoskSelections.hasOwnProperty(
+                        settings.closedCaption.value
+                      ) ? (
+                      // @ts-ignore
+                      expandedClosedCaptionsVoskSelections[
+                        settings.closedCaption.value
+                      ]
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 </div>
               )}
@@ -225,10 +250,12 @@ export default function SettingsPanel({
               exit='exit'
             >
               <ClosedCaptionsPage
-                activePages={activePages}
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}
+                browserStandardSpeechRecognitionAvailable={
+                  browserStandardSpeechRecognitionAvailable
+                }
               />
             </motion.div>
           )}
