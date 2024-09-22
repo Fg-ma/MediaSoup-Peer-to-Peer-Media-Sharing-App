@@ -7,7 +7,7 @@ import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import removeScreenIcon from "../../public/svgs/removeScreenIcon.svg";
 import shareScreenIcon from "../../public/svgs/shareScreenIcon.svg";
-import Producers from "src/lib/Producers";
+import Producers from "../lib/Producers";
 
 export default function ScreenSection({
   socket,

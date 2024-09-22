@@ -3,16 +3,7 @@ import { Socket } from "socket.io-client";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
-import Producers from "src/lib/Producers";
-import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";
-import UserDevice from "src/UserDevice";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "src/context/StreamsContext";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
-import BrowserMedia from "src/BrowserMedia";
+import Producers from "../../lib/Producers";
 
 class CameraSectionController {
   private socket: React.MutableRefObject<Socket>;

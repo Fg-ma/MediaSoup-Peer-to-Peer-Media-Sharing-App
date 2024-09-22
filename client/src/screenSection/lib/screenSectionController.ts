@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
-import Producers from "src/lib/Producers";
+import Producers from "../../lib/Producers";
 
 class ScreenSectionController {
   private socket: React.MutableRefObject<Socket>;

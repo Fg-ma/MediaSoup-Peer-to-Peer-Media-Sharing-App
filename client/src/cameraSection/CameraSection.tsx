@@ -1,22 +1,13 @@
 import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-  useStreamsContext,
-} from "../context/StreamsContext";
+import { useStreamsContext } from "../context/StreamsContext";
 import CameraSectionController from "./lib/cameraSectionController";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import shareCameraIcon from "../../public/svgs/shareCameraIcon.svg";
 import removeCameraIcon from "../../public/svgs/removeCameraIcon.svg";
-import Producers from "src/lib/Producers";
-import BrowserMedia from "src/BrowserMedia";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
-import UserDevice from "src/UserDevice";
-import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";
+import Producers from "../lib/Producers";
 
 export default function CameraSection({
   socket,

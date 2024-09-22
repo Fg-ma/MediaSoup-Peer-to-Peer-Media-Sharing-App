@@ -1,10 +1,8 @@
+  - 3D Model "" . Changes were made to the original model.
+
 Beards:
-  - 3D Model "Chin beard" This work is based on "Beard 1" (https://sketchfab.com/3d-models/beard-1-f4f8c69fc44242b698ebfcc50c8255f0) by POLYTRICITY (https://sketchfab.com/PolytricityLtd) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+  - 3D Model "Chin beard" This work is based on "Beard 1" (https://sketchfab.com/3d-models/beard-1-f4f8c69fc44242b698ebfcc50c8255f0) by POLYTRICITY (https://sketchfab.com/PolytricityLtd) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Classical curly beard" This work is based on "SculptJanuary 2022 008 Beard" (https://sketchfab.com/3d-models/sculptjanuary-2022-008-beard-fcbf8829e4bf481ba0538d8ca5814758) by Chaitanya Krishnan (https://sketchfab.com/chaitanyak) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
-  - 3D Model . Changes were made to the original model.
 
 Glasses:
   - 3D Model "Aviator Goggles" This work is based on "Aviator Helmet With Goggles" (https://sketchfab.com/3d-models/aviator-helmet-with-goggles-1e32e931ffc34fd5a4e839cb6131347c) by Enaphets (https://sketchfab.com/enaphets) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
@@ -42,7 +40,28 @@ Hats:
   - 3D Model "Chicken Hat" "This work is based on "Chicken Hat" (https://sketchfab.com/3d-models/chicken-hat-b0c2423e8c5f41a586193b1e25ad7610) by mickeymoose1204 (https://sketchfab.com/mickeymoose1204) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)". Changes were made to the original model.
   - 3D Model "Chef Hat" This work is based on "Chef Hat (Toon)" (https://sketchfab.com/3d-models/chef-hat-toon-0fe884ae9a734e22b6d1eb41127f1cc6) by shimtimultimedia (https://sketchfab.com/shimtimultimedia) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Santa Hat" This work is based on "Christmas Hat" (https://sketchfab.com/3d-models/christmas-hat-b44d66b16ba543c9825af6f95bd3d678) by shedmon (https://sketchfab.com/shedmon) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
-
+  - 3D Model "Round Ears Hat" This work is based on "Mickey Mouse Ear Hat" (https://sketchfab.com/3d-models/mickey-mouse-ear-hat-ce82825b2da14c4bb36f146aa71669ce) by liamandnico (https://sketchfab.com/liamandnico) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
 Mustaches:
   - 3D Model "SpongeBob Mustache" This work is based on "SpongeBob Mustache (mg) GameCube" (https://sketchfab.com/3d-models/spongebob-mustache-mg-gamecube-1102cef515ae4455ace944b8bf3245d3) by Sajin Mickey Firey fan 1342 from Cheryl hill (https://sketchfab.com/cherylhill28) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Nicodemus" This work is based on "Nicodemus" (https://sketchfab.com/3d-models/nicodemus-15fda9e154434cbc8a66bee0ccf71c65) by Brad Groatman (https://sketchfab.com/groatman) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+
+Pets: 
+  - 3D Model "Angry Hamster" This work is based on "Never Mechanically Augment your Pet Hamster!" (https://sketchfab.com/3d-models/never-mechanically-augment-your-pet-hamster-369f723e27ad44fca0f261419734a6e5) by Weta (https://sketchfab.com/claysmodels) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Brain" This work is based on "Never Mechanically Augment your Pet Hamster!" (https://sketchfab.com/3d-models/never-mechanically-augment-your-pet-hamster-369f723e27ad44fca0f261419734a6e5) by Weta (https://sketchfab.com/claysmodels) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Axolotl" This work is based on "Pet Axolotl" (https://sketchfab.com/3d-models/pet-axolotl-a770545d3fd04afdb9649a03bb0f173e) by I'mAiden (https://sketchfab.com/aideniscrossing) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Pet Rock" This work is based on "Pet Rock" (https://sketchfab.com/3d-models/pet-rock-1da2916d9ee74c239eb681d344017f5a) by normajanethmr (https://sketchfab.com/normajanethmr) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Pig" This work is based on "Mr Waddles (Gravity Falls) *__*" (https://sketchfab.com/3d-models/mr-waddles-gravity-falls-03de8e908cbd4c138f210ddecc10555c) by Snicks (https://sketchfab.com/snicks) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Robo Dog" This work is based on "illusion of the future / AIBO ERS type-110" (https://sketchfab.com/3d-models/illusion-of-the-future-aibo-ers-type-110-c7e78f0320294da5937da6322fce3bdf) by mozyapene (https://sketchfab.com/mozyapene) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Happy Hamster" This work is based on "Happy Hamster" (https://sketchfab.com/3d-models/happy-hamster-58d0dec062bd4687aa24f40199a6069b) by ChrisLee (https://sketchfab.com/chrisleeX) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Buddy Hamster" This work is based on "Happy Hamster" (https://sketchfab.com/3d-models/happy-hamster-58d0dec062bd4687aa24f40199a6069b) by ChrisLee (https://sketchfab.com/chrisleeX) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Mechanical Grasshopper" This work is based on "Game ready Mechanical-Grasshopper" (https://sketchfab.com/3d-models/game-ready-mechanical-grasshopper-f444f857d9bc4d929ce7ea22dfe97cef) by VaFlee (https://sketchfab.com/VaFlee) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Baby Dragon" This work is based on "Cute Pet Dragon Baby" (https://sketchfab.com/3d-models/cute-pet-dragon-baby-17c80b80927044a4bf95c15ed8407bcb) by outcast945 (https://sketchfab.com/outcast945) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Bearded Dragon" This work is based on "Bearded Dragon" (https://sketchfab.com/3d-models/bearded-dragon-d76dc0e063b242f8bde9a072a2f0b855) by RISD Nature Lab (https://sketchfab.com/RISDNaturelab) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "" . Changes were made to the original model.
+  - 3D Model "" . Changes were made to the original model.
+  - 3D Model "" . Changes were made to the original model.
+  - 3D Model "" . Changes were made to the original model.
+  - 3D Model "" . Changes were made to the original model.
+  - 3D Model "" . Changes were made to the original model.
+  - 3D Model "" . Changes were made to the original model.
+  - 3D Model "" . Changes were made to the original model.

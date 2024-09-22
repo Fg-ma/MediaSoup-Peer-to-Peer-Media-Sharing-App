@@ -48,7 +48,7 @@ const onResume = async (
             producerUsername
           ][producerInstance].audio
         ) {
-          await tableConsumers[event.table_id][event.instance][event.username][
+          await tableConsumers[event.table_id][event.username][event.instance][
             producerUsername
           ][producerInstance].audio!.consumer?.resume();
         }
