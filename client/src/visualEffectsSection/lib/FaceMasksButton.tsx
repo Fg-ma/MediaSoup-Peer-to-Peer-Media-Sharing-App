@@ -6,12 +6,12 @@ import {
   useCurrentEffectsStylesContext,
   FaceMasksEffectTypes,
 } from "../../context/CurrentEffectsStylesContext";
-import faceMask1 from "../../../public/2DAssets/faceMasks/faceMask1.png";
-import loading_faceMask1 from "../../../public/2DAssets/faceMasks/loading_faceMask1.png";
-import faceMaskIcon1 from "../../../public/svgs/faceMasks/faceMaskIcon1.svg";
-import faceMaskOffIcon1 from "../../../public/svgs/faceMasks/faceMaskOffIcon1.svg";
-import threeDim_faceMaskIcon1 from "../../../public/svgs/faceMasks/threeDim_faceMaskIcon1.svg";
-import threeDim_faceMaskOffIcon1 from "../../../public/svgs/faceMasks/threeDim_faceMaskOffIcon1.svg";
+import baseFaceMask from "../../../public/2DAssets/faceMasks/baseFaceMask.png";
+import loading_baseFaceMask from "../../../public/2DAssets/faceMasks/loading_baseFaceMask.png";
+import baseFaceMaskIcon from "../../../public/svgs/faceMasks/baseFaceMaskIcon.svg";
+import baseFaceMaskOffIcon from "../../../public/svgs/faceMasks/baseFaceMaskOffIcon.svg";
+import threeDim_baseFaceMaskIcon from "../../../public/svgs/faceMasks/threeDim_baseFaceMaskIcon.svg";
+import threeDim_baseFaceMaskOffIcon from "../../../public/svgs/faceMasks/threeDim_baseFaceMaskOffIcon.svg";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -64,13 +64,13 @@ export default function FaceMasksButton({
       bgColor: "white" | "black";
     };
   } = {
-    faceMask1: {
-      image: faceMask1,
-      loading: loading_faceMask1,
-      icon: faceMaskIcon1,
-      offIcon: faceMaskOffIcon1,
-      threeDimIcon: threeDim_faceMaskIcon1,
-      threeDimOffIcon: threeDim_faceMaskOffIcon1,
+    baseFaceMask: {
+      image: baseFaceMask,
+      loading: loading_baseFaceMask,
+      icon: baseFaceMaskIcon,
+      offIcon: baseFaceMaskOffIcon,
+      threeDimIcon: threeDim_baseFaceMaskIcon,
+      threeDimOffIcon: threeDim_baseFaceMaskOffIcon,
       flipped: false,
       bgColor: "white",
     },

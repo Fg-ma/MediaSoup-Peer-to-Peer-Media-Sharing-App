@@ -140,16 +140,21 @@ class CameraMedia {
     }
 
     const meshes = {
-      mustache1: { meshURL: "/3DAssets/mustaches/mustache1.json" },
-      mustache2: { meshURL: "/3DAssets/mustaches/mustache2.json" },
-      mustache3: { meshURL: "/3DAssets/mustaches/mustache3.json" },
-      mustache4: { meshURL: "/3DAssets/mustaches/mustache4.json" },
-      disguiseMustache: { meshURL: "/3DAssets/mustaches/mustache1.json" },
-      classicalCurlyBeard: {
-        meshURL: "/3DAssets/beards/classicalCurlyBeard.json",
+      mustache1: { meshURL: "/3DAssets/mustaches/mustache1/mustache1.json" },
+      mustache2: { meshURL: "/3DAssets/mustaches/mustache2/mustache2.json" },
+      mustache3: { meshURL: "/3DAssets/mustaches/mustache3/mustache3.json" },
+      mustache4: { meshURL: "/3DAssets/mustaches/mustache4/mustache4.json" },
+      disguiseMustache: {
+        meshURL: "/3DAssets/mustaches/mustache1/mustache1.json",
       },
-      chinBeard: { meshURL: "/3DAssets/beards/chinBeard.json" },
-      faceMask1: { meshURL: "/3DAssets/faceMasks/faceMask1.json" },
+      classicalCurlyBeard: {
+        meshURL:
+          "/3DAssets/beards/classicalCurlyBeard/classicalCurlyBeard.json",
+      },
+      chinBeard: { meshURL: "/3DAssets/beards/chinBeard/chinBeard.json" },
+      faceMask1: {
+        meshURL: "/3DAssets/faceMasks/baseFaceMask/baseFaceMask.json",
+      },
     };
 
     this.baseShader = new BaseShader(gl, this.effects, meshes);
@@ -313,6 +318,8 @@ class CameraMedia {
         this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       ] = `/3DAssets/mustaches/${
         this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
+      }/${
+        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       }.png`;
     }
     if (
@@ -325,6 +332,8 @@ class CameraMedia {
         this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
       ] = `/3DAssets/beards/${
         this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
+      }/${
+        this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
       }.png`;
     }
     if (
@@ -334,6 +343,8 @@ class CameraMedia {
       threeDimUrls[
         this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
       ] = `/3DAssets/faceMasks/${
+        this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
+      }/${
         this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
       }.png`;
     }

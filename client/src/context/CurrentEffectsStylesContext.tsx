@@ -4,7 +4,7 @@ export const defaultEars = "dogEars";
 export const defaultBeard = "classicalCurlyBeard";
 export const defaultGlasses = "defaultGlasses";
 export const defaultMustache = "mustache1";
-export const defaultFaceMask = "faceMask1";
+export const defaultFaceMask = "baseFaceMask";
 
 export type EarsEffectTypes = "dogEars";
 
@@ -56,7 +56,7 @@ export const mustacheNoseOffsetsMap: {
   disguiseMustache: { twoDim: 0.075, threeDim: 0.0 },
 };
 
-export type FaceMasksEffectTypes = "faceMask1";
+export type FaceMasksEffectTypes = "baseFaceMask";
 
 export interface CameraEffectStylesType {
   glasses?: { style: GlassesEffectTypes; threeDim: boolean };
