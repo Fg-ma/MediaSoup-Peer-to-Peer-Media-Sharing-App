@@ -114,17 +114,14 @@ class ScreenMedia {
       this.effects,
       this.currentEffectsStyles,
       undefined,
-      undefined
+      undefined,
+      this.userDevice,
+      false
     );
 
     this.video.srcObject = this.initScreenStream;
     this.video.addEventListener("play", () => {
-      this.render.loop(
-        false,
-        this.userDevice.getMaxFrameProcessingTime(),
-        this.userDevice.getMinFrameInterval(),
-        this.userDevice.getFaceMeshDetectionInterval()
-      );
+      this.render.loop();
     });
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
@@ -211,12 +208,8 @@ class ScreenMedia {
       delete this.animationFrameId[0];
     }
 
-    this.render.loop(
-      this.effects.pause ? true : false,
-      this.userDevice.getMaxFrameProcessingTime(),
-      this.userDevice.getMinFrameInterval(),
-      this.userDevice.getFaceMeshDetectionInterval()
-    );
+    this.render.updateFlipVideo(this.effects.pause ? true : false);
+    this.render.loop();
   }
 
   getStream() {

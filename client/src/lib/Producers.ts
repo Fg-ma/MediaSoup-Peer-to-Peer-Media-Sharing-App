@@ -565,13 +565,17 @@ class Producers {
     ) {
       // Call deconstructors then delete userMedia
       if (event.producerType === "camera" || event.producerType === "screen") {
-        this.userMedia.current[event.producerType][
-          event.producerId
-        ].deconstructor();
-        delete this.userMedia.current[event.producerType][event.producerId];
+        if (this.userMedia.current[event.producerType][event.producerId]) {
+          this.userMedia.current[event.producerType][
+            event.producerId
+          ].deconstructor();
+          delete this.userMedia.current[event.producerType][event.producerId];
+        }
       } else if (event.producerType === "audio") {
-        this.userMedia.current[event.producerType]?.deconstructor();
-        this.userMedia.current[event.producerType] = undefined;
+        if (this.userMedia.current[event.producerType]) {
+          this.userMedia.current[event.producerType]?.deconstructor();
+          this.userMedia.current[event.producerType] = undefined;
+        }
       }
 
       // Delete old stream effects

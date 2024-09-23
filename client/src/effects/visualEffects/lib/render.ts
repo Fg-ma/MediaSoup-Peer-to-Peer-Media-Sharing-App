@@ -14,10 +14,15 @@ import {
 } from "../../../context/CurrentEffectsStylesContext";
 import BaseShader from "./BaseShader";
 import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
+import UserDevice from "src/UserDevice";
 
 let frameCounter = 0;
 
 class Render {
+  private MAX_FRAME_PROCESSING_TIME: number;
+  private MIN_FRAME_INTERVAL: number;
+  private FACE_MESH_DETECTION_INTERVAL: number;
+
   constructor(
     private id: string,
     private gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -34,8 +39,16 @@ class Render {
     },
     private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     private faceMesh: FaceMesh | undefined,
-    private faceMeshResults: Results[] | undefined
-  ) {}
+    private faceMeshResults: Results[] | undefined,
+    private userDevice: UserDevice,
+    private flipVideo: boolean
+  ) {
+    this.MAX_FRAME_PROCESSING_TIME =
+      this.userDevice.getMaxFrameProcessingTime();
+    this.MIN_FRAME_INTERVAL = this.userDevice.getMinFrameInterval();
+    this.FACE_MESH_DETECTION_INTERVAL =
+      this.userDevice.getFaceMeshDetectionInterval();
+  }
 
   private detectFaces = async () => {
     if (!this.faceMeshResults || !this.faceLandmarks) {
@@ -300,12 +313,7 @@ class Render {
     }
   };
 
-  loop = async (
-    flipVideo = false,
-    MAX_FRAME_PROCESSING_TIME: number,
-    MIN_FRAME_INTERVAL: number,
-    FACE_MESH_DETECTION_INTERVAL: number
-  ) => {
+  loop = async () => {
     const startTime = performance.now();
 
     // Clear the canvas and update the video texture
@@ -315,18 +323,11 @@ class Render {
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
-    this.baseShader.updateVideoTexture(this.video, flipVideo);
+    this.baseShader.updateVideoTexture(this.video, this.flipVideo);
 
     // Abort processing if the previous frame took too long
-    if (performance.now() - startTime > MAX_FRAME_PROCESSING_TIME) {
-      this.animationFrameId[0] = requestAnimationFrame(() =>
-        this.loop(
-          flipVideo,
-          MAX_FRAME_PROCESSING_TIME,
-          MIN_FRAME_INTERVAL,
-          FACE_MESH_DETECTION_INTERVAL
-        )
-      );
+    if (performance.now() - startTime > this.MAX_FRAME_PROCESSING_TIME) {
+      this.animationFrameId[0] = requestAnimationFrame(() => this.loop());
       return;
     }
 
@@ -344,8 +345,8 @@ class Render {
       // Process every FACE_MESH_DETECTION_INTERVAL frame
       frameCounter++;
       if (
-        FACE_MESH_DETECTION_INTERVAL === 1 ||
-        frameCounter % FACE_MESH_DETECTION_INTERVAL === 0
+        this.FACE_MESH_DETECTION_INTERVAL === 1 ||
+        frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
       ) {
         await this.detectFaces();
       }
@@ -409,19 +410,16 @@ class Render {
 
     // Throttle frame rendering
     const elapsedTime = performance.now() - startTime;
-    const remainingTime = MIN_FRAME_INTERVAL - elapsedTime;
+    const remainingTime = this.MIN_FRAME_INTERVAL - elapsedTime;
     if (remainingTime > 0) {
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
     }
 
-    this.animationFrameId[0] = requestAnimationFrame(() =>
-      this.loop(
-        flipVideo,
-        MAX_FRAME_PROCESSING_TIME,
-        MIN_FRAME_INTERVAL,
-        FACE_MESH_DETECTION_INTERVAL
-      )
-    );
+    this.animationFrameId[0] = requestAnimationFrame(() => this.loop());
+  };
+
+  updateFlipVideo = (newFlipVideo: boolean) => {
+    this.flipVideo = newFlipVideo;
   };
 }
 

@@ -202,17 +202,14 @@ class CameraMedia {
       this.effects,
       this.currentEffectsStyles,
       this.faceMesh,
-      this.faceMeshResults
+      this.faceMeshResults,
+      this.userDevice,
+      false
     );
 
     this.video.srcObject = this.initCameraStream;
     this.video.addEventListener("play", () => {
-      this.render.loop(
-        false,
-        this.userDevice.getMaxFrameProcessingTime(),
-        this.userDevice.getMinFrameInterval(),
-        this.userDevice.getFaceMeshDetectionInterval()
-      );
+      this.render.loop();
     });
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
@@ -397,12 +394,7 @@ class CameraMedia {
       delete this.animationFrameId[0];
     }
 
-    this.render.loop(
-      false,
-      this.userDevice.getMaxFrameProcessingTime(),
-      this.userDevice.getMinFrameInterval(),
-      this.userDevice.getFaceMeshDetectionInterval()
-    );
+    this.render.loop();
   }
 
   getStream() {
