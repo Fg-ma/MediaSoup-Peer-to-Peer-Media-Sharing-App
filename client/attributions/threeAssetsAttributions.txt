@@ -57,11 +57,9 @@ Pets:
   - 3D Model "Mechanical Grasshopper" This work is based on "Game ready Mechanical-Grasshopper" (https://sketchfab.com/3d-models/game-ready-mechanical-grasshopper-f444f857d9bc4d929ce7ea22dfe97cef) by VaFlee (https://sketchfab.com/VaFlee) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Baby Dragon" This work is based on "Cute Pet Dragon Baby" (https://sketchfab.com/3d-models/cute-pet-dragon-baby-17c80b80927044a4bf95c15ed8407bcb) by outcast945 (https://sketchfab.com/outcast945) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Bearded Dragon" This work is based on "Bearded Dragon" (https://sketchfab.com/3d-models/bearded-dragon-d76dc0e063b242f8bde9a072a2f0b855) by RISD Nature Lab (https://sketchfab.com/RISDNaturelab) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
+  - 3D Model "Cat 1" This work is based on "cute pets" (https://sketchfab.com/3d-models/cute-pets-ae27fd1884884cc19f3f86525ef8bf95) by wissemridj (https://sketchfab.com/wissemridj) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Cat 2" This work is based on "cute pets" (https://sketchfab.com/3d-models/cute-pets-ae27fd1884884cc19f3f86525ef8bf95) by wissemridj (https://sketchfab.com/wissemridj) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Red Fox 1" This work is based on "cute pets" (https://sketchfab.com/3d-models/cute-pets-ae27fd1884884cc19f3f86525ef8bf95) by wissemridj (https://sketchfab.com/wissemridj) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Red Fox 2" This work is based on "cute pets" (https://sketchfab.com/3d-models/cute-pets-ae27fd1884884cc19f3f86525ef8bf95) by wissemridj (https://sketchfab.com/wissemridj) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Panda 1" This work is based on "cute pets" (https://sketchfab.com/3d-models/cute-pets-ae27fd1884884cc19f3f86525ef8bf95) by wissemridj (https://sketchfab.com/wissemridj) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Panda 2" This work is based on "cute pets" (https://sketchfab.com/3d-models/cute-pets-ae27fd1884884cc19f3f86525ef8bf95) by wissemridj (https://sketchfab.com/wissemridj) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
