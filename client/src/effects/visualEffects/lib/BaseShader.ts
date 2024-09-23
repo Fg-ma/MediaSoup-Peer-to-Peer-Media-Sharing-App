@@ -99,6 +99,9 @@ class BaseShader {
   private nearClipPlane = 0.1;
   private farClipPlane = 100.0;
 
+  private videoPositions: Float32Array;
+  private videoTexCoords: Float32Array;
+
   constructor(
     gl: WebGL2RenderingContext | WebGLRenderingContext,
     effects: {
@@ -163,6 +166,31 @@ class BaseShader {
     this.initBuffers();
     this.initVideoTexture();
     this.initEffectFlags(effects);
+
+    const videoZDistance = 100.0;
+
+    // Calculate the plane size based on the perspective projection
+    const videoPlaneHeight =
+      2.0 * Math.tan(this.cameraFOV / 2) * videoZDistance;
+    const videoPlaneWidth = videoPlaneHeight * 2;
+
+    // Define the plane's vertices in view space
+    this.videoPositions = new Float32Array([
+      -videoPlaneWidth / 2,
+      videoPlaneHeight / 2,
+      -videoZDistance, // Top-left
+      -videoPlaneWidth / 2,
+      -videoPlaneHeight / 2,
+      -videoZDistance, // Bottom-left
+      videoPlaneWidth / 2,
+      videoPlaneHeight / 2,
+      -videoZDistance, // Top-right
+      videoPlaneWidth / 2,
+      -videoPlaneHeight / 2,
+      -videoZDistance, // Bottom-right
+    ]);
+
+    this.videoTexCoords = new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]);
   }
 
   deconstructor() {
@@ -653,30 +681,12 @@ class BaseShader {
 
     this.gl.uniformMatrix4fv(this.uModelMatrixLocation, false, mat4.create());
 
-    const zDistance = 100.0;
-
-    // Calculate the plane size based on the perspective projection
-    const planeHeight = 2.0 * Math.tan(this.cameraFOV / 2) * zDistance;
-    const planeWidth = planeHeight * 2;
-
-    // Define the plane's vertices in view space
-    const positions = new Float32Array([
-      -planeWidth / 2,
-      planeHeight / 2,
-      -zDistance, // Top-left
-      -planeWidth / 2,
-      -planeHeight / 2,
-      -zDistance, // Bottom-left
-      planeWidth / 2,
-      planeHeight / 2,
-      -zDistance, // Top-right
-      planeWidth / 2,
-      -planeHeight / 2,
-      -zDistance, // Bottom-right
-    ]);
-
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, positions, this.gl.DYNAMIC_DRAW);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      this.videoPositions,
+      this.gl.DYNAMIC_DRAW
+    );
     this.gl.vertexAttribPointer(
       this.aPositionLocation,
       3,
@@ -686,10 +696,12 @@ class BaseShader {
       0
     );
 
-    const texCoords = new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]);
-
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, texCoords, this.gl.DYNAMIC_DRAW);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      this.videoTexCoords,
+      this.gl.DYNAMIC_DRAW
+    );
     this.gl.vertexAttribPointer(
       this.aTexCoordLocation,
       2,

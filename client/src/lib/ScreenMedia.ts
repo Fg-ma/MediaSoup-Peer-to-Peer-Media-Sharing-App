@@ -7,6 +7,7 @@ import {
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
+import Render from "../effects/visualEffects/lib/render";
 
 class ScreenMedia {
   private username: string;
@@ -29,7 +30,7 @@ class ScreenMedia {
     audio: { [effectType in AudioEffectTypes]?: boolean };
   }>;
 
-  private animationFrameId: number[];
+  private animationFrameId: number[] = [];
 
   private baseShader: BaseShader;
 
@@ -40,6 +41,8 @@ class ScreenMedia {
   private tintColor = "#F56114";
 
   private userDevice: UserDevice;
+
+  private render: Render;
 
   constructor(
     username: string,
@@ -98,23 +101,25 @@ class ScreenMedia {
     this.baseShader.createAtlasTexture("threeDim", {});
 
     // Start video and render loop
-    this.animationFrameId = [];
     this.video = document.createElement("video");
+
+    this.render = new Render(
+      this.screenId,
+      this.gl,
+      this.baseShader,
+      undefined,
+      this.video,
+      this.canvas,
+      this.animationFrameId,
+      this.effects,
+      this.currentEffectsStyles,
+      undefined,
+      undefined
+    );
+
     this.video.srcObject = this.initScreenStream;
     this.video.addEventListener("play", () => {
-      render(
-        this.screenId,
-        this.gl,
-        this.baseShader,
-        undefined,
-        this.video,
-        this.canvas,
-        this.animationFrameId,
-        {},
-        this.currentEffectsStyles,
-        undefined,
-        undefined,
-        this.effects.pause,
+      this.render.loop(
         false,
         this.userDevice.getMaxFrameProcessingTime(),
         this.userDevice.getMinFrameInterval(),
@@ -206,19 +211,7 @@ class ScreenMedia {
       delete this.animationFrameId[0];
     }
 
-    render(
-      this.screenId,
-      this.gl,
-      this.baseShader,
-      undefined,
-      this.video,
-      this.canvas,
-      this.animationFrameId,
-      this.effects,
-      this.currentEffectsStyles,
-      undefined,
-      undefined,
-      this.effects.pause,
+    this.render.loop(
       this.effects.pause ? true : false,
       this.userDevice.getMaxFrameProcessingTime(),
       this.userDevice.getMinFrameInterval(),

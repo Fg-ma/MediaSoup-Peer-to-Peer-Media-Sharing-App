@@ -20,6 +20,7 @@ import {
 } from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
 import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";
+import Render from "../effects/visualEffects/lib/render";
 
 class CameraMedia {
   private username: string;
@@ -59,6 +60,8 @@ class CameraMedia {
   private userDevice: UserDevice;
 
   private deadbanding: Deadbanding;
+
+  private render: Render;
 
   constructor(
     username: string,
@@ -152,7 +155,7 @@ class CameraMedia {
           "/3DAssets/beards/classicalCurlyBeard/classicalCurlyBeard.json",
       },
       chinBeard: { meshURL: "/3DAssets/beards/chinBeard/chinBeard.json" },
-      faceMask1: {
+      baseFaceMask: {
         meshURL: "/3DAssets/faceMasks/baseFaceMask/baseFaceMask.json",
       },
     };
@@ -187,21 +190,24 @@ class CameraMedia {
 
     // Start video and render loop
     this.video = document.createElement("video");
+
+    this.render = new Render(
+      this.cameraId,
+      this.gl,
+      this.baseShader,
+      this.faceLandmarks,
+      this.video,
+      this.canvas,
+      this.animationFrameId,
+      this.effects,
+      this.currentEffectsStyles,
+      this.faceMesh,
+      this.faceMeshResults
+    );
+
     this.video.srcObject = this.initCameraStream;
     this.video.addEventListener("play", () => {
-      render(
-        this.cameraId,
-        this.gl,
-        this.baseShader,
-        this.faceLandmarks,
-        this.video,
-        this.canvas,
-        this.animationFrameId,
-        {},
-        this.currentEffectsStyles,
-        this.faceMesh,
-        this.faceMeshResults,
-        this.effects.pause,
+      this.render.loop(
         false,
         this.userDevice.getMaxFrameProcessingTime(),
         this.userDevice.getMinFrameInterval(),
@@ -318,7 +324,7 @@ class CameraMedia {
         this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       ] = `/3DAssets/mustaches/${
         this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
-      }/${
+      }/texs/${
         this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       }.png`;
     }
@@ -332,7 +338,7 @@ class CameraMedia {
         this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
       ] = `/3DAssets/beards/${
         this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
-      }/${
+      }/texs/${
         this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
       }.png`;
     }
@@ -344,7 +350,7 @@ class CameraMedia {
         this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
       ] = `/3DAssets/faceMasks/${
         this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
-      }/${
+      }/texs/${
         this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
       }.png`;
     }
@@ -391,19 +397,7 @@ class CameraMedia {
       delete this.animationFrameId[0];
     }
 
-    render(
-      this.cameraId,
-      this.gl,
-      this.baseShader,
-      this.faceLandmarks,
-      this.video,
-      this.canvas,
-      this.animationFrameId,
-      this.effects,
-      this.currentEffectsStyles,
-      this.faceMesh,
-      this.faceMeshResults,
-      this.effects.pause,
+    this.render.loop(
       false,
       this.userDevice.getMaxFrameProcessingTime(),
       this.userDevice.getMinFrameInterval(),
