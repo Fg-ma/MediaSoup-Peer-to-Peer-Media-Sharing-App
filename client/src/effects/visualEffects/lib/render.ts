@@ -92,10 +92,6 @@ class Render {
     }
   };
 
-  updateVideo = (newVideo: HTMLVideoElement) => {
-    this.video = newVideo;
-  };
-
   private drawEars = async (
     faceId: string,
     effectsStyles: CameraEffectStylesType,
