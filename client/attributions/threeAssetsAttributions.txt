@@ -74,36 +74,19 @@ Face Masks:
   - 3D Model "Three Face Mask" This work is based on "-Three Face Mask-" (https://sketchfab.com/3d-models/three-face-mask-0ef60297b45548dbb84f74d79f040e51) by zammon (https://sketchfab.com/zammon) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Tengu Mask" This work is based on "Tengu Mask" (https://sketchfab.com/3d-models/tengu-mask-1389125573c747b6a3dc405efc6e412e) by zeki.kalagoglu (https://sketchfab.com/zeki.kalagoglu) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Demon Mask" This work is based on "Mask" (https://sketchfab.com/3d-models/mask-c5ad926ade6e44da88fa83a6c838c61c) by Muru (https://sketchfab.com/muru) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-  - 3D Model "" . Changes were made to the original model.
-v
+  - 3D Model "Gas Mask 1" This work is based on "Gas masks" (https://sketchfab.com/3d-models/gas-masks-8d4ac12671a0459b889a7ab631d9501e) by stayalivedudexxx (https://sketchfab.com/stayalivedudexxx) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Gas Mask 2" This work is based on "Gas masks" (https://sketchfab.com/3d-models/gas-masks-8d4ac12671a0459b889a7ab631d9501e) by stayalivedudexxx (https://sketchfab.com/stayalivedudexxx) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Gas Mask 3" This work is based on "Gas masks" (https://sketchfab.com/3d-models/gas-masks-8d4ac12671a0459b889a7ab631d9501e) by stayalivedudexxx (https://sketchfab.com/stayalivedudexxx) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Gas Mask 4" This work is based on "Gas masks" (https://sketchfab.com/3d-models/gas-masks-8d4ac12671a0459b889a7ab631d9501e) by stayalivedudexxx (https://sketchfab.com/stayalivedudexxx) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Clown Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Woodland Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Wood Painted Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Plague Doctor Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Alien Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Masquerade Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Dark Knight Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Zombie Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Creature Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Six Eyes Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Cyber Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Metal Man Mask" This work is based on "Masks pack 2" (https://sketchfab.com/3d-models/masks-pack-2-5308392d4a9f4535883d2f6d477ee9de) by Dmitriy Dryzhak (https://sketchfab.com/arvart.lit) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.

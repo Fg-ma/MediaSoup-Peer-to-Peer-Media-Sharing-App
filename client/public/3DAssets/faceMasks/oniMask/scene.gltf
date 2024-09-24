@@ -1,0 +1,406 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 8183,
+      "max": [
+        11.730130195617676,
+        25.73390007019043,
+        12.826395034790039
+      ],
+      "min": [
+        -11.730130195617676,
+        -14.75223159790039,
+        -33.79595184326172
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 98196,
+      "componentType": 5126,
+      "count": 8183,
+      "max": [
+        0.9999557733535767,
+        0.9999299645423889,
+        0.9998458027839661
+      ],
+      "min": [
+        -0.9999556541442871,
+        -1.0,
+        -0.999813973903656
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 8183,
+      "max": [
+        1.0,
+        0.9999836683273315,
+        0.999862551689148,
+        1.0
+      ],
+      "min": [
+        -0.999986469745636,
+        -0.9999681115150452,
+        -0.9999339580535889,
+        1.0
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 8183,
+      "max": [
+        0.9974597692489624,
+        0.9915186166763306
+      ],
+      "min": [
+        0.0025350546929985285,
+        0.0025363238528370857
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 37740,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 196392,
+      "componentType": 5126,
+      "count": 4,
+      "max": [
+        49.841487884521484,
+        49.841487884521484,
+        2.178640443162294e-06
+      ],
+      "min": [
+        -49.841487884521484,
+        -49.841487884521484,
+        -2.178640443162294e-06
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 196440,
+      "componentType": 5126,
+      "count": 4,
+      "max": [
+        0.0,
+        -4.371138828673793e-08,
+        1.0
+      ],
+      "min": [
+        0.0,
+        -4.371138828673793e-08,
+        1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 65464,
+      "componentType": 5126,
+      "count": 4,
+      "max": [
+        1.0,
+        1.0
+      ],
+      "min": [
+        0.0,
+        0.0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 150960,
+      "componentType": 5125,
+      "count": 6,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "Batuhan13 (https://sketchfab.com/Batuhan13)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/oni-mask-3da3c69ba3f946febda92a3610238d6b",
+      "title": "Oni Mask"
+    },
+    "generator": "Sketchfab-12.65.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 150984,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 65496,
+      "byteOffset": 150984,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 196488,
+      "byteOffset": 216480,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 130928,
+      "byteOffset": 412968,
+      "byteStride": 16,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 543896,
+      "uri": "scene.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "textures/OniMask_baseColor.png"
+    },
+    {
+      "uri": "textures/OniMask_metallicRoughness.png"
+    },
+    {
+      "uri": "textures/OniMask_normal.png"
+    },
+    {
+      "uri": "textures/BackGround_baseColor.png"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "OniMask",
+      "normalTexture": {
+        "index": 2
+      },
+      "occlusionTexture": {
+        "index": 1
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 1
+        }
+      }
+    },
+    {
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "name": "BackGround",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 3
+        },
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8211145618000169
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "HeadLow_OniMask_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 4,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Plane_BackGround_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 6,
+            "POSITION": 5,
+            "TEXCOORD_0": 7
+          },
+          "indices": 8,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "matrix": [
+        1.0,
+        3.5707495248565405e-32,
+        -1.6081226229577292e-16,
+        0.0,
+        -1.6081226229577292e-16,
+        2.220446049250313e-16,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        2.220446049250313e-16,
+        0.0,
+        3.6379048645035494e-15,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Sketchfab_model"
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "bbdfe62b3179471a8aa0d14a6c2497bd.fbx"
+    },
+    {
+      "children": [
+        3,
+        5
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        4
+      ],
+      "matrix": [
+        0.8742691702207844,
+        0.0,
+        0.48544134433747504,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        -0.48544134433747504,
+        0.0,
+        0.8742691702207844,
+        0.0,
+        0.0,
+        15.896113395690918,
+        5.115260601043701,
+        1.0
+      ],
+      "name": "HeadLow"
+    },
+    {
+      "mesh": 0,
+      "name": "HeadLow_OniMask_0"
+    },
+    {
+      "children": [
+        6
+      ],
+      "matrix": [
+        0.616003692150116,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.616003692150116,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.616003692150116,
+        0.0,
+        0.0,
+        19.007831573486328,
+        -63.18558883666992,
+        1.0
+      ],
+      "name": "Plane"
+    },
+    {
+      "mesh": 1,
+      "name": "Plane_BackGround_0"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    }
+  ]
+}
