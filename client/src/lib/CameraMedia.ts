@@ -394,6 +394,7 @@ class CameraMedia {
       delete this.animationFrameId[0];
     }
 
+    this.render.updateVideo(this.video);
     this.render.loop();
   }
 

@@ -193,7 +193,7 @@ class BaseShader {
     this.videoTexCoords = new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]);
   }
 
-  deconstructor() {
+  deconstructor = () => {
     // Delete WebGL program
     if (this.program) {
       this.gl.deleteProgram(this.program);
@@ -233,9 +233,9 @@ class BaseShader {
       this.threeDimAtlas.deconstructor();
       this.threeDimAtlas = null;
     }
-  }
+  };
 
-  private initShaderProgram() {
+  private initShaderProgram = () => {
     const vertexShader = this.loadShader(
       this.gl.VERTEX_SHADER,
       this.VERTEX_SHADER
@@ -263,9 +263,9 @@ class BaseShader {
     }
 
     this.use();
-  }
+  };
 
-  private loadShader(type: number, source: string): WebGLShader | null {
+  private loadShader = (type: number, source: string): WebGLShader | null => {
     const shader = this.gl.createShader(type);
     if (shader) {
       this.gl.shaderSource(shader, source);
@@ -281,9 +281,9 @@ class BaseShader {
       }
     }
     return shader;
-  }
+  };
 
-  private initUniformLocations() {
+  private initUniformLocations = () => {
     if (!this.program) {
       return;
     }
@@ -328,9 +328,9 @@ class BaseShader {
       this.program,
       "u_projectionMatrix"
     );
-  }
+  };
 
-  private initLighting() {
+  private initLighting = () => {
     const length = Math.sqrt(
       this.lightDirection[0] ** 2 +
         this.lightDirection[1] ** 2 +
@@ -338,9 +338,9 @@ class BaseShader {
     );
     const normalizedLightDirection = this.lightDirection.map((x) => x / length);
     this.gl.uniform3fv(this.uLightDirectionLocation, normalizedLightDirection);
-  }
+  };
 
-  private initCamera() {
+  private initCamera = () => {
     // Create the view matrix
     const viewMatrix = mat4.create();
     mat4.lookAt(
@@ -367,9 +367,9 @@ class BaseShader {
       false,
       projectionMatrix
     );
-  }
+  };
 
-  private initAttributeLocations() {
+  private initAttributeLocations = () => {
     if (!this.program) {
       return;
     }
@@ -383,9 +383,9 @@ class BaseShader {
       "a_texCoord"
     );
     this.aNormalLocation = this.gl.getAttribLocation(this.program, "a_normal");
-  }
+  };
 
-  private initBuffers() {
+  private initBuffers = () => {
     if (
       this.aPositionLocation === null ||
       this.aNormalLocation === null ||
@@ -432,9 +432,9 @@ class BaseShader {
     this.gl.enableVertexAttribArray(this.aTexCoordLocation);
 
     this.indexBuffer = this.gl.createBuffer();
-  }
+  };
 
-  private initVideoTexture() {
+  private initVideoTexture = () => {
     this.videoTexture = this.gl.createTexture();
     this.gl.activeTexture(this.gl.TEXTURE0);
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.videoTexture);
@@ -460,18 +460,18 @@ class BaseShader {
     );
 
     this.gl.uniform1i(this.uVideoTextureLocation, 0);
-  }
+  };
 
-  private initEffectFlags(effects: {
+  private initEffectFlags = (effects: {
     [effectType in CameraEffectTypes | ScreenEffectTypes]?: boolean | undefined;
-  }) {
+  }) => {
     if (effects.blur) this.effectFlags |= 1 << this.BLUR_BIT;
     if (effects.tint) this.effectFlags |= 1 << this.TINT_BIT;
 
     this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
-  }
+  };
 
-  private switchTextureFlag(textureBit: number) {
+  private switchTextureFlag = (textureBit: number) => {
     if (textureBit === this.VIDEO_BIT) {
       this.effectFlags |= 1 << this.VIDEO_BIT;
     } else {
@@ -489,9 +489,9 @@ class BaseShader {
     }
 
     this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
-  }
+  };
 
-  private async loadMeshJSON(url: string): Promise<MeshJSON | undefined> {
+  private loadMeshJSON = async (url: string): Promise<MeshJSON | undefined> => {
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -505,9 +505,9 @@ class BaseShader {
       );
       return undefined;
     }
-  }
+  };
 
-  private getTriangles(geometryPoints: Point3D[], uvPoints: number[]) {
+  private getTriangles = (geometryPoints: Point3D[], uvPoints: number[]) => {
     const geometryDelaunay = Delaunay.from(
       geometryPoints,
       (p) => p.x,
@@ -613,9 +613,9 @@ class BaseShader {
     }
 
     return { geometryTriangles, uvTriangles, normals };
-  }
+  };
 
-  private hexToRgb(hex: string) {
+  private hexToRgb = (hex: string) => {
     hex = hex.replace(/^#/, "");
 
     let r = parseInt(hex.substring(0, 2), 16) / 255;
@@ -623,19 +623,19 @@ class BaseShader {
     let b = parseInt(hex.substring(4, 6), 16) / 255;
 
     return [r, g, b];
-  }
+  };
 
   // Method to use the shader program
-  use() {
+  use = () => {
     if (this.program) {
       this.gl.useProgram(this.program);
     }
-  }
+  };
 
-  async createAtlasTexture(
+  createAtlasTexture = async (
     type: "twoDim" | "threeDim",
     atlasImages: { [URLType: string]: string }
-  ) {
+  ) => {
     if (type === "twoDim") {
       this.twoDimAltasTexMap = atlasImages;
       this.twoDimAtlas = new Atlas(this.gl);
@@ -651,12 +651,12 @@ class BaseShader {
         this.uThreeDimEffectAtlasTextureLocation
       );
     }
-  }
+  };
 
-  async updateAtlasTexture(
+  updateAtlasTexture = async (
     type: "twoDim" | "threeDim",
     atlasImages: { [URLType: string]: string }
-  ) {
+  ) => {
     if (type === "twoDim") {
       this.twoDimAltasTexMap = atlasImages;
       this.twoDimAtlas?.updateAtlas(atlasImages);
@@ -664,9 +664,9 @@ class BaseShader {
       this.threeDimAltasTexMap = atlasImages;
       this.threeDimAtlas?.updateAtlas(atlasImages);
     }
-  }
+  };
 
-  updateVideoTexture(video: HTMLVideoElement, flip = false) {
+  updateVideoTexture = (video: HTMLVideoElement, flip = false) => {
     if (this.aPositionLocation === null || this.aTexCoordLocation == null) {
       return;
     }
@@ -727,9 +727,9 @@ class BaseShader {
     );
 
     this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
-  }
+  };
 
-  drawEffect(
+  drawEffect = (
     effectType: string,
     position: { x: number; y: number },
     offset: { x: number; y: number },
@@ -737,7 +737,7 @@ class BaseShader {
     headRotationAngle: number,
     headYawAngle: number,
     headPitchAngle: number
-  ) {
+  ) => {
     if (
       this.aPositionLocation === null ||
       this.aTexCoordLocation === null ||
@@ -862,9 +862,9 @@ class BaseShader {
       this.gl.UNSIGNED_SHORT,
       0
     );
-  }
+  };
 
-  async drawMesh(
+  drawMesh = async (
     meshType: string,
     position: { x: number; y: number },
     offset: { x: number; y: number },
@@ -872,7 +872,7 @@ class BaseShader {
     headRotationAngle: number,
     headYawAngle: number,
     headPitchAngle: number
-  ) {
+  ) => {
     if (
       this.aPositionLocation === null ||
       this.aTexCoordLocation === null ||
@@ -1023,9 +1023,12 @@ class BaseShader {
       this.gl.UNSIGNED_SHORT,
       0
     );
-  }
+  };
 
-  async drawFaceMesh(meshType: string, liveLandmarks: NormalizedLandmarkList) {
+  drawFaceMesh = async (
+    meshType: string,
+    liveLandmarks: NormalizedLandmarkList
+  ) => {
     if (
       this.aPositionLocation === null ||
       this.aNormalLocation === null ||
@@ -1181,13 +1184,13 @@ class BaseShader {
 
     // Draw the mesh
     this.gl.drawElements(this.gl.TRIANGLES, index, this.gl.UNSIGNED_SHORT, 0);
-  }
+  };
 
-  setTintColor(tintColor: string) {
+  setTintColor = (tintColor: string) => {
     this.gl.uniform3fv(this.uTintColorLocation, this.hexToRgb(tintColor));
-  }
+  };
 
-  toggleTintEffect() {
+  toggleTintEffect = () => {
     if (!(this.effectFlags & (1 << this.TINT_BIT))) {
       this.effectFlags |= 1 << this.TINT_BIT;
     } else {
@@ -1195,9 +1198,9 @@ class BaseShader {
     }
 
     this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
-  }
+  };
 
-  toggleBlurEffect() {
+  toggleBlurEffect = () => {
     if (!(this.effectFlags & (1 << this.BLUR_BIT))) {
       this.effectFlags |= 1 << this.BLUR_BIT;
     } else {
@@ -1205,11 +1208,11 @@ class BaseShader {
     }
 
     this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
-  }
+  };
 
-  setPause(pause: boolean) {
+  setPause = (pause: boolean) => {
     this.pause = pause;
-  }
+  };
 }
 
 export default BaseShader;

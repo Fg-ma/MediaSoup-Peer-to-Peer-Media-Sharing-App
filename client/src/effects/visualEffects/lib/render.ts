@@ -20,8 +20,9 @@ let frameCounter = 0;
 
 class Render {
   private MAX_FRAME_PROCESSING_TIME: number;
-  private MIN_FRAME_INTERVAL: number;
   private FACE_MESH_DETECTION_INTERVAL: number;
+
+  private finishedProcessingEffects = true;
 
   constructor(
     private id: string,
@@ -45,28 +46,28 @@ class Render {
   ) {
     this.MAX_FRAME_PROCESSING_TIME =
       this.userDevice.getMaxFrameProcessingTime();
-    this.MIN_FRAME_INTERVAL = this.userDevice.getMinFrameInterval();
     this.FACE_MESH_DETECTION_INTERVAL =
       this.userDevice.getFaceMeshDetectionInterval();
+
+    this.gl.enable(this.gl.CULL_FACE);
+    this.gl.cullFace(this.gl.BACK);
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
   }
 
   private detectFaces = async () => {
-    if (!this.faceMeshResults || !this.faceLandmarks) {
+    if (!this.faceMeshResults || !this.faceLandmarks || !this.video) {
       return;
     }
 
     frameCounter = 0;
 
-    const sendVideoFrame = async () => {
-      try {
-        if (this.faceMesh) await this.faceMesh.send({ image: this.video });
-      } catch (error) {
-        console.error("Error sending video frame to faceMesh:", error);
-        return;
-      }
-    };
-
-    await sendVideoFrame();
+    try {
+      if (this.faceMesh) await this.faceMesh.send({ image: this.video });
+    } catch (error) {
+      console.error("Error sending video frame to faceMesh:", error);
+      return;
+    }
 
     if (this.faceMeshResults.length === 0) {
       return;
@@ -89,6 +90,10 @@ class Render {
         this.faceLandmarks.update(multiFaceLandmarks, this.canvas);
       }
     }
+  };
+
+  updateVideo = (newVideo: HTMLVideoElement) => {
+    this.video = newVideo;
   };
 
   private drawEars = async (
@@ -313,109 +318,108 @@ class Render {
     }
   };
 
-  loop = async () => {
+  loop = () => {
     const startTime = performance.now();
 
     // Clear the canvas and update the video texture
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.gl.enable(this.gl.CULL_FACE);
-    this.gl.cullFace(this.gl.BACK);
-    this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
     this.baseShader.updateVideoTexture(this.video, this.flipVideo);
 
     // Abort processing if the previous frame took too long
     if (performance.now() - startTime > this.MAX_FRAME_PROCESSING_TIME) {
-      this.animationFrameId[0] = requestAnimationFrame(() => this.loop());
+      this.animationFrameId[0] = requestAnimationFrame(this.loop);
       return;
     }
 
+    if (!this.effects.pause && this.finishedProcessingEffects) {
+      this.finishedProcessingEffects = false;
+      this.processEffects();
+    }
+
+    this.animationFrameId[0] = requestAnimationFrame(this.loop);
+  };
+
+  // Separate the heavier, async operations to keep the render loop light
+  processEffects = async () => {
     if (
-      !this.effects.pause &&
-      this.faceMesh &&
-      this.faceMeshResults &&
-      this.faceLandmarks &&
-      (this.effects.ears ||
+      !this.faceMesh ||
+      !this.faceMeshResults ||
+      !this.faceLandmarks ||
+      !(
+        this.effects.ears ||
         this.effects.glasses ||
         this.effects.beards ||
         this.effects.mustaches ||
-        this.effects.faceMasks)
+        this.effects.faceMasks
+      )
     ) {
-      // Process every FACE_MESH_DETECTION_INTERVAL frame
-      frameCounter++;
-      if (
-        this.FACE_MESH_DETECTION_INTERVAL === 1 ||
-        frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
-      ) {
-        await this.detectFaces();
+      this.finishedProcessingEffects = true;
+      return;
+    }
+
+    frameCounter++;
+
+    if (
+      this.FACE_MESH_DETECTION_INTERVAL === 1 ||
+      frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
+    ) {
+      await this.detectFaces();
+    }
+
+    const calculatedLandmarks = this.faceLandmarks.getCalculatedLandmarks();
+
+    for (const {
+      faceId,
+      landmarks,
+    } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
+      const effectsStyles = this.currentEffectsStyles.current.camera[this.id];
+
+      if (this.effects.ears && effectsStyles && effectsStyles.ears) {
+        await this.drawEars(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
       }
 
-      const calculatedLandmarks = this.faceLandmarks.getCalculatedLandmarks();
+      if (this.effects.glasses && effectsStyles && effectsStyles.glasses) {
+        await this.drawGlasses(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
+      }
 
-      for (const {
-        faceId,
-        landmarks,
-      } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
-        const effectsStyles = this.currentEffectsStyles.current.camera[this.id];
+      if (this.effects.beards && effectsStyles && effectsStyles.beards) {
+        await this.drawBeards(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
+      }
 
-        if (this.effects.ears && effectsStyles && effectsStyles.ears) {
-          await this.drawEars(
-            faceId,
-            effectsStyles,
-            calculatedLandmarks,
-            landmarks
-          );
-        }
+      if (this.effects.mustaches && effectsStyles && effectsStyles.mustaches) {
+        await this.drawMustaches(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
+      }
 
-        if (this.effects.glasses && effectsStyles && effectsStyles.glasses) {
-          await this.drawGlasses(
-            faceId,
-            effectsStyles,
-            calculatedLandmarks,
-            landmarks
-          );
-        }
-
-        if (this.effects.beards && effectsStyles && effectsStyles.beards) {
-          await this.drawBeards(
-            faceId,
-            effectsStyles,
-            calculatedLandmarks,
-            landmarks
-          );
-        }
-
-        if (
-          this.effects.mustaches &&
-          effectsStyles &&
-          effectsStyles.mustaches
-        ) {
-          await this.drawMustaches(
-            faceId,
-            effectsStyles,
-            calculatedLandmarks,
-            landmarks
-          );
-        }
-
-        if (this.effects.faceMasks) {
-          await this.baseShader.drawFaceMesh(
-            "baseFaceMask",
-            landmarks.slice(0, -10)
-          );
-        }
+      if (this.effects.faceMasks) {
+        await this.baseShader.drawFaceMesh(
+          "baseFaceMask",
+          landmarks.slice(0, -10)
+        );
       }
     }
 
-    // Throttle frame rendering
-    const elapsedTime = performance.now() - startTime;
-    const remainingTime = this.MIN_FRAME_INTERVAL - elapsedTime;
-    if (remainingTime > 0) {
-      await new Promise((resolve) => setTimeout(resolve, remainingTime));
-    }
-
-    this.animationFrameId[0] = requestAnimationFrame(() => this.loop());
+    this.finishedProcessingEffects = true;
   };
 
   updateFlipVideo = (newFlipVideo: boolean) => {
