@@ -1,6 +1,5 @@
 import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import BaseShader from "../effects/visualEffects/lib/BaseShader";
-import render from "../effects/visualEffects/lib/render";
 import {
   AudioEffectTypes,
   CameraEffectTypes,

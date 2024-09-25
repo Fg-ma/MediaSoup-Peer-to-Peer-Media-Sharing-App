@@ -51,7 +51,6 @@ export const defaultCameraStreamEffects = {
   pause: false,
   blur: false,
   tint: false,
-  ears: false,
   glasses: false,
   beards: false,
   mustaches: false,

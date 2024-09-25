@@ -1,21 +1,19 @@
 import {
   beardChinOffsetsMap,
   defaultBeard,
-  defaultEars,
   defaultFaceMask,
   defaultGlasses,
   defaultMustache,
-  earsWidthFactorMap,
   EffectStylesType,
   mustacheNoseOffsetsMap,
 } from "../context/CurrentEffectsStylesContext";
 import BaseShader from "../effects/visualEffects/lib/BaseShader";
-import render from "../effects/visualEffects/lib/render";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import { FaceMesh, Results } from "@mediapipe/face_mesh";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
+  defaultCameraStreamEffects,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
@@ -91,16 +89,8 @@ class CameraMedia {
 
     this.effects = {};
 
-    this.userStreamEffects.current.camera[this.cameraId] = {
-      pause: false,
-      blur: false,
-      tint: false,
-      ears: false,
-      glasses: false,
-      beards: false,
-      mustaches: false,
-      faceMasks: false,
-    };
+    this.userStreamEffects.current.camera[this.cameraId] =
+      defaultCameraStreamEffects;
 
     this.canvas = document.createElement("canvas");
     const gl =
@@ -117,14 +107,6 @@ class CameraMedia {
     if (!currentEffectsStyles.current.camera[this.cameraId]) {
       currentEffectsStyles.current.camera[this.cameraId] = {
         glasses: { style: defaultGlasses, threeDim: false },
-        ears: {
-          style: defaultEars,
-          threeDim: false,
-          leftEarWidthFactor:
-            earsWidthFactorMap[defaultEars].leftEarWidthFactor,
-          rightEarWidthFactor:
-            earsWidthFactorMap[defaultEars].rightEarWidthFactor,
-        },
         beards: {
           style: defaultBeard,
           threeDim: false,
@@ -253,91 +235,81 @@ class CameraMedia {
 
   private async updateAtlases() {
     const twoDimUrls: { [key: string]: string } = {};
+    const glassesStyles =
+      this.currentEffectsStyles.current.camera[this.cameraId].glasses;
+    const beardStyles =
+      this.currentEffectsStyles.current.camera[this.cameraId].beards;
+    const mustacheStyles =
+      this.currentEffectsStyles.current.camera[this.cameraId].mustaches;
+    const faceMaskStyles =
+      this.currentEffectsStyles.current.camera[this.cameraId].faceMasks;
+    const hatStyles =
+      this.currentEffectsStyles.current.camera[this.cameraId].hats;
+    const petStyles =
+      this.currentEffectsStyles.current.camera[this.cameraId].pets;
 
-    if (
-      this.currentEffectsStyles.current.camera[this.cameraId].glasses &&
-      this.effects.glasses
-    ) {
+    if (glassesStyles && this.effects.glasses) {
       twoDimUrls[
-        this.currentEffectsStyles.current.camera[this.cameraId].glasses!.style
-      ] = `/2DAssets/glasses/${
-        this.currentEffectsStyles.current.camera[this.cameraId].glasses!.style
-      }.png`;
+        glassesStyles.style
+      ] = `/2DAssets/glasses/${glassesStyles.style}/${glassesStyles.style}.png`;
     }
-    if (
-      this.currentEffectsStyles.current.camera[this.cameraId].beards &&
-      this.effects.beards
-    ) {
+    if (beardStyles && this.effects.beards) {
       twoDimUrls[
-        this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
-      ] = `/2DAssets/beards/${
-        this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
-      }.png`;
+        beardStyles.style
+      ] = `/2DAssets/beards/${beardStyles.style}/${beardStyles.style}.png`;
     }
-    if (
-      this.currentEffectsStyles.current.camera[this.cameraId].mustaches &&
-      this.effects.mustaches
-    ) {
+    if (mustacheStyles && this.effects.mustaches) {
       twoDimUrls[
-        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
-      ] = `/2DAssets/mustaches/${
-        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
-      }.png`;
+        mustacheStyles.style
+      ] = `/2DAssets/mustaches/${mustacheStyles.style}/${mustacheStyles.style}.png`;
     }
-    if (
-      this.currentEffectsStyles.current.camera[this.cameraId].hats &&
-      this.effects.hats
-    ) {
+    if (faceMaskStyles && this.effects.faceMasks) {
       twoDimUrls[
-        this.currentEffectsStyles.current.camera[this.cameraId].hats!.style
-      ] = `/2DAssets/hats/${
-        this.currentEffectsStyles.current.camera[this.cameraId].hats!.style
-      }/${
-        this.currentEffectsStyles.current.camera[this.cameraId].hats!.style
-      }.png`;
+        faceMaskStyles.style
+      ] = `/2DAssets/faceMasks/${faceMaskStyles.style}/${faceMaskStyles.style}.png`;
+    }
+    if (hatStyles && this.effects.hats) {
+      twoDimUrls[
+        hatStyles.style
+      ] = `/2DAssets/hats/${hatStyles.style}/${hatStyles.style}.png`;
+    }
+    if (petStyles && this.effects.pets) {
+      twoDimUrls[
+        petStyles.style
+      ] = `/2DAssets/pets/${petStyles.style}/${petStyles.style}.png`;
     }
 
     const threeDimUrls: { [key: string]: string } = {};
 
-    if (
-      this.currentEffectsStyles.current.camera[this.cameraId].mustaches &&
-      this.currentEffectsStyles.current.camera[this.cameraId].mustaches!
-        .threeDim &&
-      this.effects.mustaches
-    ) {
+    if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
       threeDimUrls[
-        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
-      ] = `/3DAssets/mustaches/${
-        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
-      }/texs/${
-        this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
-      }.png`;
+        glassesStyles.style
+      ] = `/3DAssets/glasses/${glassesStyles.style}/texs/${glassesStyles.style}_diff.png`;
     }
-    if (
-      this.currentEffectsStyles.current.camera[this.cameraId].beards &&
-      this.currentEffectsStyles.current.camera[this.cameraId].beards!
-        .threeDim &&
-      this.effects.beards
-    ) {
+    if (beardStyles && beardStyles.threeDim && this.effects.beards) {
       threeDimUrls[
-        this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
-      ] = `/3DAssets/beards/${
-        this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
-      }/texs/${
-        this.currentEffectsStyles.current.camera[this.cameraId].beards!.style
-      }.png`;
+        beardStyles.style
+      ] = `/3DAssets/beards/${beardStyles.style}/texs/${beardStyles.style}_diff.png`;
     }
-    if (
-      this.currentEffectsStyles.current.camera[this.cameraId].faceMasks &&
-      this.effects.faceMasks
-    ) {
+    if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
       threeDimUrls[
-        this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
-      ] = `/3DAssets/faceMasks/${
-        this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
-      }/texs/${
-        this.currentEffectsStyles.current.camera[this.cameraId].faceMasks!.style
-      }.png`;
+        mustacheStyles.style
+      ] = `/3DAssets/mustaches/${mustacheStyles.style}/texs/${mustacheStyles.style}_diff.png`;
+    }
+    if (faceMaskStyles && this.effects.faceMasks) {
+      threeDimUrls[
+        faceMaskStyles.style
+      ] = `/3DAssets/faceMasks/${faceMaskStyles.style}/texs/${faceMaskStyles.style}_diff.png`;
+    }
+    if (hatStyles && this.effects.hats) {
+      threeDimUrls[
+        hatStyles.style
+      ] = `/3DAssets/hats/${hatStyles.style}/texs/${hatStyles.style}_diff.png`;
+    }
+    if (petStyles && this.effects.pets) {
+      threeDimUrls[
+        petStyles.style
+      ] = `/3DAssets/pets/${petStyles.style}/texs/${petStyles.style}_diff.png`;
     }
 
     await this.baseShader.updateAtlasTexture("twoDim", twoDimUrls);

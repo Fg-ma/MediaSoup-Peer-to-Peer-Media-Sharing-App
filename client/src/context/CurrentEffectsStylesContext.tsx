@@ -117,7 +117,7 @@ export type HatsEffectTypes =
   | "AsianConicalHat"
   | "aviatorHelmet"
   | "bicornHat"
-  | "bicycleHat"
+  | "bicycleHelmet"
   | "captainsHat"
   | "chefHat"
   | "chickenHat"
