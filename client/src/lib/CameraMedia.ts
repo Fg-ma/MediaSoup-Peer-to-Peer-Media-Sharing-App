@@ -255,30 +255,6 @@ class CameraMedia {
     const twoDimUrls: { [key: string]: string } = {};
 
     if (
-      this.currentEffectsStyles.current.camera[this.cameraId].ears &&
-      this.effects.ears
-    ) {
-      twoDimUrls[
-        `${
-          this.currentEffectsStyles.current.camera[this.cameraId].ears!.style
-        }Left`
-      ] = `/2DAssets/ears/${
-        this.currentEffectsStyles.current.camera[this.cameraId].ears!.style
-      }Left.png`;
-    }
-    if (
-      this.currentEffectsStyles.current.camera[this.cameraId].ears &&
-      this.effects.ears
-    ) {
-      twoDimUrls[
-        `${
-          this.currentEffectsStyles.current.camera[this.cameraId].ears!.style
-        }Right`
-      ] = `/2DAssets/ears/${
-        this.currentEffectsStyles.current.camera[this.cameraId].ears!.style
-      }Right.png`;
-    }
-    if (
       this.currentEffectsStyles.current.camera[this.cameraId].glasses &&
       this.effects.glasses
     ) {
@@ -306,6 +282,18 @@ class CameraMedia {
         this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
       ] = `/2DAssets/mustaches/${
         this.currentEffectsStyles.current.camera[this.cameraId].mustaches!.style
+      }.png`;
+    }
+    if (
+      this.currentEffectsStyles.current.camera[this.cameraId].hats &&
+      this.effects.hats
+    ) {
+      twoDimUrls[
+        this.currentEffectsStyles.current.camera[this.cameraId].hats!.style
+      ] = `/2DAssets/hats/${
+        this.currentEffectsStyles.current.camera[this.cameraId].hats!.style
+      }/${
+        this.currentEffectsStyles.current.camera[this.cameraId].hats!.style
       }.png`;
     }
 

@@ -68,11 +68,12 @@ export type CameraEffectTypes =
   | "pause"
   | "blur"
   | "tint"
-  | "ears"
   | "glasses"
   | "beards"
   | "mustaches"
-  | "faceMasks";
+  | "faceMasks"
+  | "hats"
+  | "pets";
 
 export type ScreenEffectTypes = "pause" | "blur" | "tint";
 

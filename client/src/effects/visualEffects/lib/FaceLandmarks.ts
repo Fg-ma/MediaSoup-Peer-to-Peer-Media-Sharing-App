@@ -450,7 +450,7 @@ class FaceLandmarks {
     ];
   };
 
-  private updateCalculatedLandmarks = (canvas: HTMLCanvasElement) => {
+  private updateCalculatedLandmarks = () => {
     this.faceIdLandmarksPairs.forEach((faceIdLandmarksPair) => {
       const { faceId, landmarks } = faceIdLandmarksPair;
 
@@ -483,12 +483,9 @@ class FaceLandmarks {
     });
   };
 
-  update = (
-    faceLandmarks: NormalizedLandmarkListList,
-    canvas: HTMLCanvasElement
-  ) => {
+  update = (faceLandmarks: NormalizedLandmarkListList) => {
     this.applyFaceTracker(faceLandmarks);
-    this.updateCalculatedLandmarks(canvas);
+    this.updateCalculatedLandmarks();
     this.faceCount = this.faceIdLandmarksPairs.length;
   };
 

@@ -80,14 +80,14 @@ class Render {
       if (detectionTimedOut) {
         this.faceLandmarks.setTimedOut(false);
       }
-      this.faceLandmarks.update(multiFaceLandmarks, this.canvas);
+      this.faceLandmarks.update(multiFaceLandmarks);
     } else {
       if (!detectionTimedOut) {
         if (this.faceLandmarks.getTimeoutTimer() === undefined) {
           this.faceLandmarks.startTimeout();
         }
       } else {
-        this.faceLandmarks.update(multiFaceLandmarks, this.canvas);
+        this.faceLandmarks.update(multiFaceLandmarks);
       }
     }
   };

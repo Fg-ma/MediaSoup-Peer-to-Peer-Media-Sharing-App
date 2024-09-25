@@ -101,6 +101,7 @@ class BaseShader {
 
   private videoPositions: Float32Array;
   private videoTexCoords: Float32Array;
+  private identityMatrix = mat4.create();
 
   constructor(
     gl: WebGL2RenderingContext | WebGLRenderingContext,
@@ -679,7 +680,11 @@ class BaseShader {
       this.gl.canvas.height
     );
 
-    this.gl.uniformMatrix4fv(this.uModelMatrixLocation, false, mat4.create());
+    this.gl.uniformMatrix4fv(
+      this.uModelMatrixLocation,
+      false,
+      this.identityMatrix
+    );
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
     this.gl.bufferData(
@@ -1131,7 +1136,6 @@ class BaseShader {
       0
     );
 
-    // console.log(normalTriangles);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,

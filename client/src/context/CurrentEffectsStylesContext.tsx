@@ -1,23 +1,11 @@
 import React, { createContext, useContext, useRef } from "react";
 
-export const defaultEars = "dogEars";
 export const defaultBeard = "classicalCurlyBeard";
 export const defaultGlasses = "defaultGlasses";
 export const defaultMustache = "mustache1";
 export const defaultFaceMask = "baseFaceMask";
-
-export type EarsEffectTypes = "dogEars";
-
-export const earsWidthFactorMap: {
-  [earEffectType in EarsEffectTypes]: {
-    leftEarWidthFactor: number;
-    rightEarWidthFactor: number;
-  };
-} = {
-  dogEars: { leftEarWidthFactor: 0.6, rightEarWidthFactor: 0.6 },
-};
-
-export type BeardsEffectTypes = "classicalCurlyBeard" | "chinBeard";
+export const defaultHat = "stylishHat";
+export const defaultPet = "beardedDragon";
 
 export const beardChinOffsetsMap: {
   [beardEffectType in BeardsEffectTypes]: {
@@ -28,20 +16,6 @@ export const beardChinOffsetsMap: {
   classicalCurlyBeard: { twoDim: 0.0, threeDim: -0.35 },
   chinBeard: { twoDim: -0.3, threeDim: -0.28 },
 };
-
-export type GlassesEffectTypes =
-  | "defaultGlasses"
-  | "memeGlasses"
-  | "americaGlasses"
-  | "threeDGlasses"
-  | "shades";
-
-export type MustachesEffectTypes =
-  | "mustache1"
-  | "mustache2"
-  | "mustache3"
-  | "mustache4"
-  | "disguiseMustache";
 
 export const mustacheNoseOffsetsMap: {
   [mustacheEffectType in MustachesEffectTypes]: {
@@ -54,18 +28,14 @@ export const mustacheNoseOffsetsMap: {
   mustache3: { twoDim: -0.15, threeDim: -0.11 },
   mustache4: { twoDim: -0.1, threeDim: -0.05 },
   disguiseMustache: { twoDim: 0.075, threeDim: 0.0 },
+  nicodemusMustache: { twoDim: 0.0, threeDim: 0.0 },
+  pencilMustache: { twoDim: 0.0, threeDim: 0.0 },
+  spongebobMustache: { twoDim: 0.0, threeDim: 0.0 },
+  tinyMustache: { twoDim: 0.0, threeDim: 0.0 },
 };
-
-export type FaceMasksEffectTypes = "baseFaceMask";
 
 export interface CameraEffectStylesType {
   glasses?: { style: GlassesEffectTypes; threeDim: boolean };
-  ears?: {
-    style: EarsEffectTypes;
-    threeDim: boolean;
-    leftEarWidthFactor: number;
-    rightEarWidthFactor: number;
-  };
   beards?: {
     style: BeardsEffectTypes;
     threeDim: boolean;
@@ -80,7 +50,110 @@ export interface CameraEffectStylesType {
     style: FaceMasksEffectTypes;
     threeDim: true;
   };
+  hats?: {
+    style: HatsEffectTypes;
+    threeDim: boolean;
+  };
+  pets?: {
+    style: PetsEffectTypes;
+    threeDim: boolean;
+  };
 }
+
+export type BeardsEffectTypes = "classicalCurlyBeard" | "chinBeard";
+export type GlassesEffectTypes =
+  | "defaultGlasses"
+  | "americaGlasses"
+  | "aviatorGoggles"
+  | "bloodyGlasses"
+  | "eyeProtectionGlasses"
+  | "glasses1"
+  | "glasses2"
+  | "glasses3"
+  | "glasses4"
+  | "glasses5"
+  | "glasses6"
+  | "memeGlasses"
+  | "militaryTacticalGlasses"
+  | "steampunkGlasses"
+  | "threeDGlasses"
+  | "toyGlasses"
+  | "shades"
+  | "VRGlasses";
+export type MustachesEffectTypes =
+  | "mustache1"
+  | "mustache2"
+  | "mustache3"
+  | "mustache4"
+  | "disguiseMustache"
+  | "nicodemusMustache"
+  | "pencilMustache"
+  | "spongebobMustache"
+  | "tinyMustache";
+export type FaceMasksEffectTypes =
+  | "baseFaceMask"
+  | "alienFaceMask"
+  | "clownFaceMask"
+  | "creatureFaceMask"
+  | "cyberFaceMask"
+  | "darkKnightFaceMask"
+  | "demonFaceMask"
+  | "gasMask1"
+  | "gasMask2"
+  | "gasMask3"
+  | "gasMask4"
+  | "masqueradeFaceMask"
+  | "metalManFaceMask"
+  | "oniMask"
+  | "plagueDoctorFaceMask"
+  | "sixEyesFaceMask"
+  | "tenguMask"
+  | "threeFaceMask"
+  | "weldingMask"
+  | "woodlandFaceMask"
+  | "woodPaintedFaceMask"
+  | "zombieFaceMask";
+export type HatsEffectTypes =
+  | "AsianConicalHat"
+  | "aviatorHelmet"
+  | "bicornHat"
+  | "bicycleHat"
+  | "captainsHat"
+  | "chefHat"
+  | "chickenHat"
+  | "deadManHat"
+  | "dogEars"
+  | "flatCap"
+  | "hardHat"
+  | "hopliteHelmet"
+  | "militaryHat"
+  | "rabbitEars"
+  | "roundEarsHat"
+  | "santaHat"
+  | "seamanHat"
+  | "stylishHat"
+  | "superMarioOdysseyHat"
+  | "ushankaHat"
+  | "vikingHelmet";
+export type PetsEffectTypes =
+  | "angryHamster"
+  | "axolotl"
+  | "babyDragon"
+  | "beardedDragon"
+  | "boxer"
+  | "brain"
+  | "buddyHamster"
+  | "cat1"
+  | "cat2"
+  | "happyHamster"
+  | "mechanicalGrasshopper"
+  | "panda1"
+  | "panda2"
+  | "petRock"
+  | "pig"
+  | "redFox1"
+  | "redFox2"
+  | "roboDog";
 
 export interface ScreenEffectStylesType {}
 
@@ -98,12 +171,6 @@ export interface EffectStylesType {
 
 export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
   glasses: { style: defaultGlasses, threeDim: false },
-  ears: {
-    style: defaultEars,
-    threeDim: false,
-    leftEarWidthFactor: earsWidthFactorMap[defaultEars].leftEarWidthFactor,
-    rightEarWidthFactor: earsWidthFactorMap[defaultEars].rightEarWidthFactor,
-  },
   beards: {
     style: defaultBeard,
     threeDim: false,
@@ -117,6 +184,14 @@ export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
   faceMasks: {
     style: defaultFaceMask,
     threeDim: true,
+  },
+  hats: {
+    style: defaultHat,
+    threeDim: false,
+  },
+  pets: {
+    style: defaultPet,
+    threeDim: false,
   },
 };
 
