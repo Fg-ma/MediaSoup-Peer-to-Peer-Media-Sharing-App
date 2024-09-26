@@ -140,11 +140,14 @@ export type PetsEffectTypes =
   | "axolotl"
   | "babyDragon"
   | "beardedDragon"
+  | "bird1"
+  | "bird2"
   | "boxer"
   | "brain"
   | "buddyHamster"
   | "cat1"
   | "cat2"
+  | "dodoBird"
   | "happyHamster"
   | "mechanicalGrasshopper"
   | "panda1"
@@ -153,7 +156,11 @@ export type PetsEffectTypes =
   | "pig"
   | "redFox1"
   | "redFox2"
-  | "roboDog";
+  | "roboDog"
+  | "skeletonTRex"
+  | "snail"
+  | "spinosaurus"
+  | "TRex";
 
 export interface ScreenEffectStylesType {}
 
