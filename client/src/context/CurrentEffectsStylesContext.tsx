@@ -3,7 +3,7 @@ import React, { createContext, useContext, useRef } from "react";
 export const defaultBeard = "classicalCurlyBeard";
 export const defaultGlasses = "defaultGlasses";
 export const defaultMustache = "mustache1";
-export const defaultFaceMask = "baseFaceMask";
+export const defaultMask = "baseMask";
 export const defaultHat = "stylishHat";
 export const defaultPet = "beardedDragon";
 
@@ -15,6 +15,7 @@ export const beardChinOffsetsMap: {
 } = {
   classicalCurlyBeard: { twoDim: 0.0, threeDim: -0.35 },
   chinBeard: { twoDim: -0.3, threeDim: -0.28 },
+  fullBeard: { twoDim: 0.0, threeDim: 0.0 },
 };
 
 export const mustacheNoseOffsetsMap: {
@@ -23,6 +24,7 @@ export const mustacheNoseOffsetsMap: {
     threeDim: number;
   };
 } = {
+  fullMustache: { twoDim: 0.0, threeDim: 0.0 },
   mustache1: { twoDim: -0.14, threeDim: -0.08 },
   mustache2: { twoDim: -0.1, threeDim: -0.1 },
   mustache3: { twoDim: -0.15, threeDim: -0.11 },
@@ -32,6 +34,7 @@ export const mustacheNoseOffsetsMap: {
   pencilMustache: { twoDim: 0.0, threeDim: 0.0 },
   spongebobMustache: { twoDim: 0.0, threeDim: 0.0 },
   tinyMustache: { twoDim: 0.0, threeDim: 0.0 },
+  wingedMustache: { twoDim: 0.0, threeDim: 0.0 },
 };
 
 export interface CameraEffectStylesType {
@@ -46,8 +49,8 @@ export interface CameraEffectStylesType {
     threeDim: boolean;
     noseOffset: { twoDim: number; threeDim: number };
   };
-  faceMasks?: {
-    style: FaceMasksEffectTypes;
+  masks?: {
+    style: MasksEffectTypes;
     threeDim: true;
   };
   hats?: {
@@ -95,29 +98,29 @@ export type MustachesEffectTypes =
   | "spongebobMustache"
   | "tinyMustache"
   | "wingedMustache";
-export type FaceMasksEffectTypes =
-  | "baseFaceMask"
-  | "alienFaceMask"
-  | "clownFaceMask"
-  | "creatureFaceMask"
-  | "cyberFaceMask"
-  | "darkKnightFaceMask"
-  | "demonFaceMask"
+export type MasksEffectTypes =
+  | "baseMask"
+  | "alienMask"
+  | "clownMask"
+  | "creatureMask"
+  | "cyberMask"
+  | "darkKnightMask"
+  | "demonMask"
   | "gasMask1"
   | "gasMask2"
   | "gasMask3"
   | "gasMask4"
-  | "masqueradeFaceMask"
-  | "metalManFaceMask"
+  | "masqueradeMask"
+  | "metalManMask"
   | "oniMask"
-  | "plagueDoctorFaceMask"
-  | "sixEyesFaceMask"
+  | "plagueDoctorMask"
+  | "sixEyesMask"
   | "tenguMask"
-  | "threeFaceMask"
+  | "threeMask"
   | "weldingMask"
-  | "woodlandFaceMask"
-  | "woodPaintedFaceMask"
-  | "zombieFaceMask";
+  | "woodlandMask"
+  | "woodPaintedMask"
+  | "zombieMask";
 export type HatsEffectTypes =
   | "AsianConicalHat"
   | "aviatorHelmet"
@@ -193,8 +196,8 @@ export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
     threeDim: false,
     noseOffset: mustacheNoseOffsetsMap[defaultMustache],
   },
-  faceMasks: {
-    style: defaultFaceMask,
+  masks: {
+    style: defaultMask,
     threeDim: true,
   },
   hats: {

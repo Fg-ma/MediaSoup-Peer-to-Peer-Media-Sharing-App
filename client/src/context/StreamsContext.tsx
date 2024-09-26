@@ -54,7 +54,7 @@ export const defaultCameraStreamEffects = {
   glasses: false,
   beards: false,
   mustaches: false,
-  faceMasks: false,
+  masks: false,
 };
 
 export const defaultScreenStreamEffects = {
@@ -70,7 +70,7 @@ export type CameraEffectTypes =
   | "glasses"
   | "beards"
   | "mustaches"
-  | "faceMasks"
+  | "masks"
   | "hats"
   | "pets";
 
