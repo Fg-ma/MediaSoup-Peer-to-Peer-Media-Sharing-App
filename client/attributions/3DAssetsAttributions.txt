@@ -3,6 +3,7 @@
 Beards:
   - 3D Model "Chin beard" This work is based on "Beard 1" (https://sketchfab.com/3d-models/beard-1-f4f8c69fc44242b698ebfcc50c8255f0) by POLYTRICITY (https://sketchfab.com/PolytricityLtd) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Classical curly beard" This work is based on "SculptJanuary 2022 008 Beard" (https://sketchfab.com/3d-models/sculptjanuary-2022-008-beard-fcbf8829e4bf481ba0538d8ca5814758) by Chaitanya Krishnan (https://sketchfab.com/chaitanyak) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Full Beard" This work is based on "Dwarf" (https://sketchfab.com/3d-models/dwarf-419053b0d03d4f78bc9aa6b667350d7c) by Benoit Gagnier (https://sketchfab.com/BenoitGagnier) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
 
 Glasses:
   - 3D Model "Aviator Goggles" This work is based on "Aviator Helmet With Goggles" (https://sketchfab.com/3d-models/aviator-helmet-with-goggles-1e32e931ffc34fd5a4e839cb6131347c) by Enaphets (https://sketchfab.com/enaphets) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
@@ -47,6 +48,8 @@ Mustaches:
   - 3D Model "Nicodemus Mustache" This work is based on "Nicodemus" (https://sketchfab.com/3d-models/nicodemus-15fda9e154434cbc8a66bee0ccf71c65) by Brad Groatman (https://sketchfab.com/groatman) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Tiny Mustache" This work is based on "Mr. Lunt (2000's)" (https://sketchfab.com/3d-models/mr-lunt-2000s-6b6f384685074aaaa649d9057a4ec33f) by Janice Emmons 1990-present (https://sketchfab.com/JaniceEmmons1990) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Pencil Mustache" This work is based on "Mister Mustache | 3D Illustration" (https://sketchfab.com/3d-models/mister-mustache-3d-illustration-92b8e860aaad4d759f2058827e39b21d) by Naweed Hesan (https://sketchfab.com/naweedhesan) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "fullMustache" This work is based on "Dwarf" (https://sketchfab.com/3d-models/dwarf-419053b0d03d4f78bc9aa6b667350d7c) by Benoit Gagnier (https://sketchfab.com/BenoitGagnier) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
+  - 3D Model "Winged Mustache" This work is based on "Ernest GRABSTEIN, the Undertaker" (https://sketchfab.com/3d-models/ernest-grabstein-the-undertaker-72205ff7e36b4db0a249f89012322468) by Hadrien59 (https://sketchfab.com/Hadrien59) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
 
 Pets: 
   - 3D Model "Angry Hamster" This work is based on "Never Mechanically Augment your Pet Hamster!" (https://sketchfab.com/3d-models/never-mechanically-augment-your-pet-hamster-369f723e27ad44fca0f261419734a6e5) by Weta (https://sketchfab.com/claysmodels) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.

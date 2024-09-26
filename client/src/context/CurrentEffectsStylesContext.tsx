@@ -60,7 +60,10 @@ export interface CameraEffectStylesType {
   };
 }
 
-export type BeardsEffectTypes = "classicalCurlyBeard" | "chinBeard";
+export type BeardsEffectTypes =
+  | "classicalCurlyBeard"
+  | "chinBeard"
+  | "fullBeard";
 export type GlassesEffectTypes =
   | "defaultGlasses"
   | "americaGlasses"
@@ -81,6 +84,7 @@ export type GlassesEffectTypes =
   | "shades"
   | "VRGlasses";
 export type MustachesEffectTypes =
+  | "fullMustache"
   | "mustache1"
   | "mustache2"
   | "mustache3"
@@ -89,7 +93,8 @@ export type MustachesEffectTypes =
   | "nicodemusMustache"
   | "pencilMustache"
   | "spongebobMustache"
-  | "tinyMustache";
+  | "tinyMustache"
+  | "wingedMustache";
 export type FaceMasksEffectTypes =
   | "baseFaceMask"
   | "alienFaceMask"
