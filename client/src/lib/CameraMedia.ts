@@ -23,62 +23,147 @@ import Render from "../effects/visualEffects/lib/render";
 export const mustachesDataURLs = {
   diff: {
     disguiseMustache: {
-      meshURL: "/2DAssets/mustaches/disguiseMustache/disguiseMustache.json",
+      meshURL:
+        "/3DAssets/mustaches/disguiseMustache/texs/disguiseMustache_diff.png",
     },
     fullMustache: {
-      meshURL: "/2DAssets/mustaches/fullMustache/fullMustache.json",
+      meshURL: "/3DAssets/mustaches/fullMustache/texs/fullMustache_diff.png",
     },
-    mustache1: { meshURL: "/3DAssets/mustaches/mustache1/mustache1.json" },
-    mustache2: { meshURL: "/3DAssets/mustaches/mustache2/mustache2.json" },
-    mustache3: { meshURL: "/3DAssets/mustaches/mustache3/mustache3.json" },
-    mustache4: { meshURL: "/3DAssets/mustaches/mustache4/mustache4.json" },
+    mustache1: {
+      meshURL: "/3DAssets/mustaches/mustache1/texs/mustache1_diff.png",
+    },
+    mustache2: {
+      meshURL: "/3DAssets/mustaches/mustache2/texs/mustache2_diff.png",
+    },
+    mustache3: {
+      meshURL: "/3DAssets/mustaches/mustache3/texs/mustache3_diff.png",
+    },
+    mustache4: {
+      meshURL: "/3DAssets/mustaches/mustache4/texs/mustache4_diff.png",
+    },
     nicodemusMustache: {
-      meshURL: "/3DAssets/mustaches/nicodemusMustache/nicodemusMustache.json",
+      meshURL:
+        "/3DAssets/mustaches/nicodemusMustache/texs/nicodemusMustache_diff.png",
     },
     pencilMustache: {
-      meshURL: "/3DAssets/mustaches/pencilMustache/pencilMustache.json",
+      meshURL:
+        "/3DAssets/mustaches/pencilMustache/texs/pencilMustache_diff.png",
     },
     spongebobMustache: {
-      meshURL: "/3DAssets/mustaches/spongebobMustache/spongebobMustache.json",
+      meshURL:
+        "/3DAssets/mustaches/spongebobMustache/texs/spongebobMustache_diff.png",
     },
     tinyMustache: {
-      meshURL: "/3DAssets/mustaches/tinyMustache/tinyMustache.json",
+      meshURL: "/3DAssets/mustaches/tinyMustache/texs/tinyMustache_diff.png",
     },
     wingedMustache: {
-      meshURL: "/3DAssets/mustaches/wingedMustache/wingedMustache.json",
+      meshURL:
+        "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_diff.png",
     },
   },
-  meshes: {
-    disguiseMustache: {
-      meshURL: "/3DAssets/mustaches/disguiseMustache/disguiseMustache.json",
-    },
+  nor: {
     fullMustache: {
-      meshURL: "/3DAssets/mustaches/fullMustache/fullMustache.json",
-    },
-    mustache1: { meshURL: "/3DAssets/mustaches/mustache1/mustache1.json" },
-    mustache2: { meshURL: "/3DAssets/mustaches/mustache2/mustache2.json" },
-    mustache3: { meshURL: "/3DAssets/mustaches/mustache3/mustache3.json" },
-    mustache4: { meshURL: "/3DAssets/mustaches/mustache4/mustache4.json" },
-    nicodemusMustache: {
-      meshURL: "/3DAssets/mustaches/nicodemusMustache/nicodemusMustache.json",
-    },
-    pencilMustache: {
-      meshURL: "/3DAssets/mustaches/pencilMustache/pencilMustache.json",
-    },
-    spongebobMustache: {
-      meshURL: "/3DAssets/mustaches/spongebobMustache/spongebobMustache.json",
-    },
-    tinyMustache: {
-      meshURL: "/3DAssets/mustaches/tinyMustache/tinyMustache.json",
+      meshURL: "/3DAssets/mustaches/fullMustache/texs/fullMustache_nor.png",
     },
     wingedMustache: {
-      meshURL: "/3DAssets/mustaches/wingedMustache/wingedMustache.json",
+      meshURL: "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_nor.png",
+    },
+  },
+  disp: {},
+  metalRough: {
+    fullMustache: {
+      meshURL:
+        "/3DAssets/mustaches/fullMustache/texs/fullMustache_metalRough.png",
+    },
+    wingedMustache: {
+      meshURL:
+        "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_metalRough.png",
+    },
+  },
+  spec: {},
+  emiss: {},
+  meshes: {
+    disguiseMustache: {
+      meshURL:
+        "/3DAssets/mustaches/disguiseMustache/texs/disguiseMustache_diff.png",
+    },
+    fullMustache: {
+      meshURL: "/3DAssets/mustaches/fullMustache/texs/fullMustache_diff.png",
+    },
+    mustache1: {
+      meshURL: "/3DAssets/mustaches/mustache1/texs/mustache1_diff.png",
+    },
+    mustache2: {
+      meshURL: "/3DAssets/mustaches/mustache2/texs/mustache2_diff.png",
+    },
+    mustache3: {
+      meshURL: "/3DAssets/mustaches/mustache3/texs/mustache3_diff.png",
+    },
+    mustache4: {
+      meshURL: "/3DAssets/mustaches/mustache4/texs/mustache4_diff.png",
+    },
+    nicodemusMustache: {
+      meshURL:
+        "/3DAssets/mustaches/nicodemusMustache/texs/nicodemusMustache_diff.png",
+    },
+    pencilMustache: {
+      meshURL:
+        "/3DAssets/mustaches/pencilMustache/texs/pencilMustache_diff.png",
+    },
+    spongebobMustache: {
+      meshURL:
+        "/3DAssets/mustaches/spongebobMustache/texs/spongebobMustache_diff.png",
+    },
+    tinyMustache: {
+      meshURL: "/3DAssets/mustaches/tinyMustache/texs/tinyMustache_diff.png",
+    },
+    wingedMustache: {
+      meshURL:
+        "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_diff.png",
     },
   },
 };
 
 export const beardsDataURLs = {
-  diff: {},
+  diff: {
+    chinBeard: {
+      meshURL: "/3DAssets/beards/chinBeard/texs/chinBeard_diff.png",
+    },
+    classicalCurlyBeard: {
+      meshURL:
+        "/3DAssets/beards/classicalCurlyBeard/texs/classicalCurlyBeard_diff.png",
+    },
+    fullBeard: {
+      meshURL: "/3DAssets/beards/fullBeard/texs/fullBeard_diff.png",
+    },
+  },
+  nor: {
+    chinBeard: { meshURL: "/3DAssets/beards/chinBeard/texs/chinBeard_nor.png" },
+    fullBeard: { meshURL: "/3DAssets/beards/fullBeard/texs/fullBeard_nor.png" },
+  },
+  disp: {
+    chinBeard: {
+      meshURL: "/3DAssets/beards/chinBeard/texs/chinBeard_disp.png",
+    },
+  },
+  metalRough: {
+    chinBeard: {
+      meshURL: "/3DAssets/beards/chinBeard/texs/chinBeard_metalRough.png",
+    },
+    fullBeard: {
+      meshURL: "/3DAssets/beards/fullBeard/texs/fullBeard_metalRough.png",
+    },
+  },
+  spec: {
+    chinBeard: {
+      meshURL: "/3DAssets/beards/chinBeard/texs/chinBeard_spec.png",
+    },
+  },
+  emiss: {
+    chinBeard: {
+      meshURL: "/3DAssets/beards/chinBeard/texs/chinBeard_emiss.png",
+    },
+  },
   meshes: {
     chinBeard: { meshURL: "/3DAssets/beards/chinBeard/chinBeard.json" },
     classicalCurlyBeard: {
@@ -89,7 +174,214 @@ export const beardsDataURLs = {
 };
 
 export const masksDataURLs = {
-  diff: {},
+  diff: {
+    alienMask: {
+      meshURL: "/3DAssets/masks/alienMask/texs/alienMask_diff.png",
+    },
+    baseMask: {
+      meshURL: "/3DAssets/masks/baseMask/texs/baseMask_diff.png",
+    },
+    clownMask: {
+      meshURL: "/3DAssets/masks/clownMask/texs/clownMask_diff.png",
+    },
+    creatureMask: {
+      meshURL: "/3DAssets/masks/creatureMask/texs/creatureMask_diff.png",
+    },
+    cyberMask: {
+      meshURL: "/3DAssets/masks/cyberMask/texs/cyberMask_diff.png",
+    },
+    darkKnightMask: {
+      meshURL: "/3DAssets/masks/darkKnightMask/texs/darkKnightMask_diff.png",
+    },
+    demonMask: {
+      meshURL: "/3DAssets/masks/demonMask/texs/demonMask_diff.png",
+    },
+    gasMask1: {
+      meshURL: "/3DAssets/masks/gasMask1/texs/gasMask1_diff.png",
+    },
+    gasMask2: {
+      meshURL: "/3DAssets/masks/gasMask2/texs/gasMask2_diff.png",
+    },
+    gasMask3: {
+      meshURL: "/3DAssets/masks/gasMask3/texs/gasMask3_diff.png",
+    },
+    gasMask4: {
+      meshURL: "/3DAssets/masks/gasMask4/texs/gasMask4_diff.png",
+    },
+    masqueradeMask: {
+      meshURL: "/3DAssets/masks/masqueradeMask/texs/masqueradeMask_diff.png",
+    },
+    metalManMask: {
+      meshURL: "/3DAssets/masks/metalManMask/texs/metalManMask_diff.png",
+    },
+    oniMask: {
+      meshURL: "/3DAssets/masks/oniMask/texs/oniMask_diff.png",
+    },
+    plagueDoctorMask: {
+      meshURL:
+        "/3DAssets/masks/plagueDoctorMask/texs/plagueDoctorMask_diff.png",
+    },
+    sixEyesMask: {
+      meshURL: "/3DAssets/masks/sixEyesMask/texs/sixEyesMask_diff.png",
+    },
+    tenguMask: {
+      meshURL: "/3DAssets/masks/tenguMask/texs/tenguMask_diff.png",
+    },
+    threeMask: {
+      meshURL: "/3DAssets/masks/threeMask/texs/threeMask_diff.png",
+    },
+    weldingMask: {
+      meshURL: "/3DAssets/masks/weldingMask/texs/weldingMask_diff.png",
+    },
+    woodlandMask: {
+      meshURL: "/3DAssets/masks/woodlandMask/texs/woodlandMask_diff.png",
+    },
+    woodPaintedMask: {
+      meshURL: "/3DAssets/masks/woodPaintedMask/texs/woodPaintedMask_diff.png",
+    },
+    zombieMask: {
+      meshURL: "/3DAssets/masks/zombieMask/texs/zombieMask_diff.png",
+    },
+  },
+  nor: {
+    alienMask: {
+      meshURL: "/3DAssets/masks/alienMask/texs/alienMask_diff.png",
+    },
+    clownMask: {
+      meshURL: "/3DAssets/masks/clownMask/texs/clownMask_diff.png",
+    },
+    creatureMask: {
+      meshURL: "/3DAssets/masks/creatureMask/texs/creatureMask_diff.png",
+    },
+    cyberMask: {
+      meshURL: "/3DAssets/masks/cyberMask/texs/cyberMask_diff.png",
+    },
+    darkKnightMask: {
+      meshURL: "/3DAssets/masks/darkKnightMask/texs/darkKnightMask_diff.png",
+    },
+    demonMask: {
+      meshURL: "/3DAssets/masks/demonMask/texs/demonMask_diff.png",
+    },
+    gasMask1: {
+      meshURL: "/3DAssets/masks/gasMask1/texs/gasMask1_diff.png",
+    },
+    gasMask2: {
+      meshURL: "/3DAssets/masks/gasMask2/texs/gasMask2_diff.png",
+    },
+    gasMask3: {
+      meshURL: "/3DAssets/masks/gasMask3/texs/gasMask3_diff.png",
+    },
+    gasMask4: {
+      meshURL: "/3DAssets/masks/gasMask4/texs/gasMask4_diff.png",
+    },
+    masqueradeMask: {
+      meshURL: "/3DAssets/masks/masqueradeMask/texs/masqueradeMask_diff.png",
+    },
+    metalManMask: {
+      meshURL: "/3DAssets/masks/metalManMask/texs/metalManMask_diff.png",
+    },
+    oniMask: {
+      meshURL: "/3DAssets/masks/oniMask/texs/oniMask_diff.png",
+    },
+    plagueDoctorMask: {
+      meshURL:
+        "/3DAssets/masks/plagueDoctorMask/texs/plagueDoctorMask_diff.png",
+    },
+    sixEyesMask: {
+      meshURL: "/3DAssets/masks/sixEyesMask/texs/sixEyesMask_diff.png",
+    },
+    tenguMask: {
+      meshURL: "/3DAssets/masks/tenguMask/texs/tenguMask_diff.png",
+    },
+    threeMask: {
+      meshURL: "/3DAssets/masks/threeMask/texs/threeMask_diff.png",
+    },
+    woodlandMask: {
+      meshURL: "/3DAssets/masks/woodlandMask/texs/woodlandMask_diff.png",
+    },
+    woodPaintedMask: {
+      meshURL: "/3DAssets/masks/woodPaintedMask/texs/woodPaintedMask_diff.png",
+    },
+    zombieMask: {
+      meshURL: "/3DAssets/masks/zombieMask/texs/zombieMask_diff.png",
+    },
+  },
+  disp: {},
+  metalRough: {
+    alienMask: {
+      meshURL: "/3DAssets/masks/alienMask/texs/alienMask_diff.png",
+    },
+    clownMask: {
+      meshURL: "/3DAssets/masks/clownMask/texs/clownMask_diff.png",
+    },
+    creatureMask: {
+      meshURL: "/3DAssets/masks/creatureMask/texs/creatureMask_diff.png",
+    },
+    cyberMask: {
+      meshURL: "/3DAssets/masks/cyberMask/texs/cyberMask_diff.png",
+    },
+    darkKnightMask: {
+      meshURL: "/3DAssets/masks/darkKnightMask/texs/darkKnightMask_diff.png",
+    },
+    demonMask: {
+      meshURL: "/3DAssets/masks/demonMask/texs/demonMask_diff.png",
+    },
+    gasMask1: {
+      meshURL: "/3DAssets/masks/gasMask1/texs/gasMask1_diff.png",
+    },
+    gasMask2: {
+      meshURL: "/3DAssets/masks/gasMask2/texs/gasMask2_diff.png",
+    },
+    gasMask3: {
+      meshURL: "/3DAssets/masks/gasMask3/texs/gasMask3_diff.png",
+    },
+    gasMask4: {
+      meshURL: "/3DAssets/masks/gasMask4/texs/gasMask4_diff.png",
+    },
+    masqueradeMask: {
+      meshURL: "/3DAssets/masks/masqueradeMask/texs/masqueradeMask_diff.png",
+    },
+    metalManMask: {
+      meshURL: "/3DAssets/masks/metalManMask/texs/metalManMask_diff.png",
+    },
+    oniMask: {
+      meshURL: "/3DAssets/masks/oniMask/texs/oniMask_diff.png",
+    },
+    plagueDoctorMask: {
+      meshURL:
+        "/3DAssets/masks/plagueDoctorMask/texs/plagueDoctorMask_diff.png",
+    },
+    sixEyesMask: {
+      meshURL: "/3DAssets/masks/sixEyesMask/texs/sixEyesMask_diff.png",
+    },
+    tenguMask: {
+      meshURL: "/3DAssets/masks/tenguMask/texs/tenguMask_diff.png",
+    },
+    threeMask: {
+      meshURL: "/3DAssets/masks/threeMask/texs/threeMask_diff.png",
+    },
+    woodlandMask: {
+      meshURL: "/3DAssets/masks/woodlandMask/texs/woodlandMask_diff.png",
+    },
+    woodPaintedMask: {
+      meshURL: "/3DAssets/masks/woodPaintedMask/texs/woodPaintedMask_diff.png",
+    },
+    zombieMask: {
+      meshURL: "/3DAssets/masks/zombieMask/texs/zombieMask_diff.png",
+    },
+  },
+  spec: {},
+  emiss: {
+    alienMask: {
+      meshURL: "/3DAssets/masks/alienMask/texs/alienMask_diff.png",
+    },
+    cyberMask: {
+      meshURL: "/3DAssets/masks/cyberMask/texs/cyberMask_diff.png",
+    },
+    zombieMask: {
+      meshURL: "/3DAssets/masks/zombieMask/texs/zombieMask_diff.png",
+    },
+  },
   meshes: {
     alienMask: {
       meshURL: "/3DAssets/masks/alienMask/alienMask.json",
@@ -161,7 +453,56 @@ export const masksDataURLs = {
 };
 
 export const glassesDataURLs = {
-  diff: {},
+  diff: {
+    defaultGlasses: {
+      meshURL: "/3DAssets/glasses/defaultGlasses/texs/defaultGlasses_diff.png",
+    },
+    americaGlasses: {
+      meshURL: "/3DAssets/glasses/americaGlasses/texs/americaGlasses_diff.png",
+    },
+    aviatorGoggles: {
+      meshURL: "/3DAssets/glasses/aviatorGoggles/texs/aviatorGoggles_diff.png",
+    },
+    bloodyGlasses: {
+      meshURL: "/3DAssets/glasses/bloodyGlasses/texs/bloodyGlasses_diff.png",
+    },
+    eyeProtectionGlasses: {
+      meshURL:
+        "/3DAssets/glasses/eyeProtectionGlasses/texs/eyeProtectionGlasses_diff.png",
+    },
+    glasses1: { meshURL: "/3DAssets/glasses/glasses1/texs/glasses1_diff.png" },
+    glasses2: { meshURL: "/3DAssets/glasses/glasses2/texs/glasses2_diff.png" },
+    glasses3: { meshURL: "/3DAssets/glasses/glasses3/texs/glasses3_diff.png" },
+    glasses4: { meshURL: "/3DAssets/glasses/glasses4/texs/glasses4_diff.png" },
+    glasses5: { meshURL: "/3DAssets/glasses/glasses5/texs/glasses5_diff.png" },
+    glasses6: { meshURL: "/3DAssets/glasses/glasses6/texs/glasses6_diff.png" },
+    memeGlasses: {
+      meshURL: "/3DAssets/glasses/memeGlasses/texs/memeGlasses_diff.png",
+    },
+    militaryTacticalGlasses: {
+      meshURL:
+        "/3DAssets/glasses/militaryTacticalGlasses/texs/militaryTacticalGlasses_diff.png",
+    },
+    steampunkGlasses: {
+      meshURL:
+        "/3DAssets/glasses/steampunkGlasses/texs/steampunkGlasses_diff.png",
+    },
+    threeDGlasses: {
+      meshURL: "/3DAssets/glasses/threeDGlasses/texs/threeDGlasses_diff.png",
+    },
+    toyGlasses: {
+      meshURL: "/3DAssets/glasses/toyGlasses/texs/toyGlasses_diff.png",
+    },
+    shades: { meshURL: "/3DAssets/glasses/shades/texs/shades_diff.png" },
+    VRGlasses: {
+      meshURL: "/3DAssets/glasses/VRGlasses/texs/VRGlasses_diff.png",
+    },
+  },
+  nor: {},
+  disp: {},
+  metalRough: {},
+  spec: {},
+  emiss: {},
   meshes: {
     defaultGlasses: {
       meshURL: "/3DAssets/glasses/defaultGlasses/defaultGlasses.json",
@@ -203,7 +544,63 @@ export const glassesDataURLs = {
 };
 
 export const hatsDataURLs = {
-  diff: {},
+  diff: {
+    AsianConicalHat: {
+      meshURL: "/3DAssets/hats/AsianConicalHat/texs/AsianConicalHat_diff.png",
+    },
+    aviatorHelmet: {
+      meshURL: "/3DAssets/hats/aviatorHelmet/texs/aviatorHelmet_diff.png",
+    },
+    bicornHat: { meshURL: "/3DAssets/hats/bicornHat/texs/bicornHat_diff.png" },
+    bicycleHelmet: {
+      meshURL: "/3DAssets/hats/bicycleHelmet/texs/bicycleHelmet_diff.png",
+    },
+    captainsHat: {
+      meshURL: "/3DAssets/hats/captainsHat/texs/captainsHat_diff.png",
+    },
+    chefHat: { meshURL: "/3DAssets/hats/chefHat/texs/chefHat_diff.png" },
+    chickenHat: {
+      meshURL: "/3DAssets/hats/chickenHat/texs/chickenHat_diff.png",
+    },
+    deadManHat: {
+      meshURL: "/3DAssets/hats/deadManHat/texs/deadManHat_diff.png",
+    },
+    dogEars: { meshURL: "/3DAssets/hats/dogEars/texs/dogEars_diff.png" },
+    flatCap: { meshURL: "/3DAssets/hats/flatCap/texs/flatCap_diff.png" },
+    hardHat: { meshURL: "/3DAssets/hats/hardHat/texs/hardHat_diff.png" },
+    hopliteHelmet: {
+      meshURL: "/3DAssets/hats/hopliteHelmet/texs/hopliteHelmet_diff.png",
+    },
+    militaryHat: {
+      meshURL: "/3DAssets/hats/militaryHat/texs/militaryHat_diff.png",
+    },
+    rabbitEars: {
+      meshURL: "/3DAssets/hats/rabbitEars/texs/rabbitEars_diff.png",
+    },
+    roundEarsHat: {
+      meshURL: "/3DAssets/hats/roundEarsHat/texs/roundEarsHat_diff.png",
+    },
+    santaHat: { meshURL: "/3DAssets/hats/santaHat/texs/santaHat_diff.png" },
+    seamanHat: { meshURL: "/3DAssets/hats/seamanHat/texs/seamanHat_diff.png" },
+    stylishHat: {
+      meshURL: "/3DAssets/hats/stylishHat/texs/stylishHat_diff.png",
+    },
+    superMarioOdysseyHat: {
+      meshURL:
+        "/3DAssets/hats/superMarioOdysseyHat/texs/superMarioOdysseyHat_diff.png",
+    },
+    ushankaHat: {
+      meshURL: "/3DAssets/hats/ushankaHat/texs/ushankaHat_diff.png",
+    },
+    vikingHelmet: {
+      meshURL: "/3DAssets/hats/vikingHelmet/texs/vikingHelmet_diff.png",
+    },
+  },
+  nor: {},
+  disp: {},
+  metalRough: {},
+  spec: {},
+  emiss: {},
   meshes: {
     AsianConicalHat: {
       meshURL: "/3DAssets/hats/AsianConicalHat/AsianConicalHat.json",
@@ -240,7 +637,55 @@ export const hatsDataURLs = {
 };
 
 export const petsDataURLs = {
-  diff: {},
+  diff: {
+    angryHamster: {
+      meshURL: "/3DAssets/pets/angryHamster/texs/angryHamster_diff.png",
+    },
+    axolotl: { meshURL: "/3DAssets/pets/axolotl/texs/axolotl_diff.png" },
+    babyDragon: {
+      meshURL: "/3DAssets/pets/babyDragon/texs/babyDragon_diff.png",
+    },
+    beardedDragon: {
+      meshURL: "/3DAssets/pets/babyDragon/texs/babyDragon_diff.png",
+    },
+    bird1: { meshURL: "/3DAssets/pets/bird1/texs/bird1_diff.png" },
+    bird2: { meshURL: "/3DAssets/pets/bird2/texs/bird2_diff.png" },
+    boxer: { meshURL: "/3DAssets/pets/boxer/texs/boxer_diff.png" },
+    brain: { meshURL: "/3DAssets/pets/brain/texs/brain_diff.png" },
+    buddyHamster: {
+      meshURL: "/3DAssets/pets/buddyHamster/texs/buddyHamster_diff.png",
+    },
+    cat1: { meshURL: "/3DAssets/pets/cat1/texs/cat1_diff.png" },
+    cat2: { meshURL: "/3DAssets/pets/cat2/texs/cat2_diff.png" },
+    dodoBird: { meshURL: "/3DAssets/pets/dodoBird/texs/dodoBird_diff.png" },
+    happyHamster: {
+      meshURL: "/3DAssets/pets/happyHamster/texs/happyHamster_diff.png",
+    },
+    mechanicalGrasshopper: {
+      meshURL:
+        "/3DAssets/pets/mechanicalGrasshopper/texs/mechanicalGrasshopper_diff.png",
+    },
+    panda1: { meshURL: "/3DAssets/pets/panda1/texs/panda1_diff.png" },
+    panda2: { meshURL: "/3DAssets/pets/panda2/texs/panda2_diff.png" },
+    petRock: { meshURL: "/3DAssets/pets/petRock/texs/petRock_diff.png" },
+    pig: { meshURL: "/3DAssets/pets/pig/texs/pig_diff.png" },
+    redFox1: { meshURL: "/3DAssets/pets/redFox1/texs/redFox1_diff.png" },
+    redFox2: { meshURL: "/3DAssets/pets/redFox2/texs/redFox2_diff.png" },
+    roboDog: { meshURL: "/3DAssets/pets/roboDog/texs/roboDog_diff.png" },
+    skeletonTRex: {
+      meshURL: "/3DAssets/pets/skeletonTRex/texs/skeletonTRex_diff.png",
+    },
+    snail: { meshURL: "/3DAssets/pets/snail/texs/snail_diff.png" },
+    spinosaurus: {
+      meshURL: "/3DAssets/pets/spinosaurus/texs/spinosaurus_diff.png",
+    },
+    TRex: { meshURL: "/3DAssets/pets/TRex/texs/TRex_diff.png" },
+  },
+  nor: {},
+  disp: {},
+  metalRough: {},
+  spec: {},
+  emiss: {},
   meshes: {
     angryHamster: { meshURL: "/3DAssets/pets/angryHamster/angryHamster.json" },
     axolotl: { meshURL: "/3DAssets/pets/axolotl/axolotl.json" },
