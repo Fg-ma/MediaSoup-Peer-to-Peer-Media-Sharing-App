@@ -12,15 +12,16 @@ import {
   ScreenEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
-import mustache1 from "../../../public/2DAssets/mustaches/mustache1.png";
-import loading_mustache1 from "../../../public/2DAssets/mustaches/loading_mustache1.png";
-import mustache2 from "../../../public/2DAssets/mustaches/mustache2.png";
-import loading_mustache2 from "../../../public/2DAssets/mustaches/loading_mustache2.png";
-import mustache3 from "../../../public/2DAssets/mustaches/mustache3.png";
-import loading_mustache3 from "../../../public/2DAssets/mustaches/loading_mustache3.png";
-import mustache4 from "../../../public/2DAssets/mustaches/mustache4.png";
-import loading_mustache4 from "../../../public/2DAssets/mustaches/loading_mustache4.png";
-import disguiseMustache from "../../../public/2DAssets/mustaches/disguiseMustache.png";
+
+import mustache1 from "../../../public/2DAssets/mustaches/mustache1/mustache1.png";
+import loading_mustache1 from "../../../public/2DAssets/mustaches/mustache1/loading_mustache1.png";
+import mustache2 from "../../../public/2DAssets/mustaches/mustache2/mustache2.png";
+import loading_mustache2 from "../../../public/2DAssets/mustaches/mustache2/loading_mustache2.png";
+import mustache3 from "../../../public/2DAssets/mustaches/mustache3/mustache3.png";
+import loading_mustache3 from "../../../public/2DAssets/mustaches/mustache3/loading_mustache3.png";
+import mustache4 from "../../../public/2DAssets/mustaches/mustache4/mustache4.png";
+import loading_mustache4 from "../../../public/2DAssets/mustaches/mustache4/loading_mustache4.png";
+import disguiseMustache from "../../../public/2DAssets/mustaches/disguiseMustache/disguiseMustache.png";
 import loading_disguiseMustache from "../../../public/2DAssets/mustaches/loading_disguiseMustache.png";
 import mustacheIcon1 from "../../../public/svgs/mustaches/mustacheIcon1.svg";
 import mustacheOffIcon1 from "../../../public/svgs/mustaches/mustacheOffIcon1.svg";

@@ -69,7 +69,7 @@ export type BeardsEffectTypes =
   | "fullBeard";
 export type GlassesEffectTypes =
   | "defaultGlasses"
-  | "americaGlasses"
+  | "AmericaGlasses"
   | "aviatorGoggles"
   | "bloodyGlasses"
   | "eyeProtectionGlasses"

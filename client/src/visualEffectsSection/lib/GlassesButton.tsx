@@ -11,16 +11,17 @@ import {
   ScreenEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
-import defaultGlasses from "../../../public/2DAssets/glasses/defaultGlasses.png";
-import loading_defaultGlasses from "../../../public/2DAssets/glasses/loading_defaultGlasses.png";
-import memeGlasses from "../../../public/2DAssets/glasses/memeGlasses.png";
-import loading_memeGlasses from "../../../public/2DAssets/glasses/loading_memeGlasses.png";
-import americaGlasses from "../../../public/2DAssets/glasses/americaGlasses.png";
-import loading_americaGlasses from "../../../public/2DAssets/glasses/loading_americaGlasses.png";
-import threeDGlasses from "../../../public/2DAssets/glasses/threeDGlasses.png";
-import loading_threeDGlasses from "../../../public/2DAssets/glasses/loading_threeDGlasses.png";
-import shades from "../../../public/2DAssets/glasses/shades.png";
-import loading_shades from "../../../public/2DAssets/glasses/loading_shades.png";
+
+import defaultGlasses from "../../../public/2DAssets/glasses/defaultGlasses/defaultGlasses.png";
+import loading_defaultGlasses from "../../../public/2DAssets/glasses/defaultGlasses/loading_defaultGlasses.png";
+import memeGlasses from "../../../public/2DAssets/glasses/memeGlasses/memeGlasses.png";
+import loading_memeGlasses from "../../../public/2DAssets/glasses/memeGlasses/loading_memeGlasses.png";
+import AmericaGlasses from "../../../public/2DAssets/glasses/AmericaGlasses/AmericaGlasses.png";
+import loading_AmericaGlasses from "../../../public/2DAssets/glasses/AmericaGlasses/loading_AmericaGlasses.png";
+import threeDGlasses from "../../../public/2DAssets/glasses/threeDGlasses/threeDGlasses.png";
+import loading_threeDGlasses from "../../../public/2DAssets/glasses/threeDGlasses/loading_threeDGlasses.png";
+import shades from "../../../public/2DAssets/glasses/shades/shades.png";
+import loading_shades from "../../../public/2DAssets/glasses/shades/loading_shades.png";
 import defaultGlassesIcon from "../../../public/svgs/glasses/defaultGlassesIcon.svg";
 import defaultGlassesOffIcon from "../../../public/svgs/glasses/defaultGlassesOffIcon.svg";
 import threeDim_defaultGlassesIcon from "../../../public/svgs/glasses/threeDim_defaultGlassesIcon.svg";
@@ -29,10 +30,10 @@ import memeGlassesIcon from "../../../public/svgs/glasses/memeGlassesIcon.svg";
 import memeGlassesOffIcon from "../../../public/svgs/glasses/memeGlassesOffIcon.svg";
 import threeDim_memeGlassesIcon from "../../../public/svgs/glasses/threeDim_memeGlassesIcon.svg";
 import threeDim_memeGlassesOffIcon from "../../../public/svgs/glasses/threeDim_memeGlassesOffIcon.svg";
-import americaGlassesIcon from "../../../public/svgs/glasses/americaGlassesIcon.svg";
-import americaGlassesOffIcon from "../../../public/svgs/glasses/americaGlassesOffIcon.svg";
-import threeDim_americaGlassesIcon from "../../../public/svgs/glasses/threeDim_americaGlassesIcon.svg";
-import threeDim_americaGlassesOffIcon from "../../../public/svgs/glasses/threeDim_americaGlassesOffIcon.svg";
+import AmericaGlassesIcon from "../../../public/svgs/glasses/AmericaGlassesIcon.svg";
+import AmericaGlassesOffIcon from "../../../public/svgs/glasses/AmericaGlassesOffIcon.svg";
+import threeDim_AmericaGlassesIcon from "../../../public/svgs/glasses/threeDim_AmericaGlassesIcon.svg";
+import threeDim_AmericaGlassesOffIcon from "../../../public/svgs/glasses/threeDim_AmericaGlassesOffIcon.svg";
 import threeDGlassesIcon from "../../../public/svgs/glasses/threeDGlassesIcon.svg";
 import threeDGlassesOffIcon from "../../../public/svgs/glasses/threeDGlassesOffIcon.svg";
 import threeDim_threeDGlassesIcon from "../../../public/svgs/glasses/threeDim_threeDGlassesIcon.svg";
@@ -110,13 +111,13 @@ export default function GlassesButton({
       flipped: true,
       bgColor: "white",
     },
-    americaGlasses: {
-      image: americaGlasses,
-      loading: loading_americaGlasses,
-      icon: americaGlassesIcon,
-      offIcon: americaGlassesOffIcon,
-      threeDimIcon: threeDim_americaGlassesIcon,
-      threeDimOffIcon: threeDim_americaGlassesOffIcon,
+    AmericaGlasses: {
+      image: AmericaGlasses,
+      loading: loading_AmericaGlasses,
+      icon: AmericaGlassesIcon,
+      offIcon: AmericaGlassesOffIcon,
+      threeDimIcon: threeDim_AmericaGlassesIcon,
+      threeDimOffIcon: threeDim_AmericaGlassesOffIcon,
       flipped: true,
       bgColor: "white",
     },

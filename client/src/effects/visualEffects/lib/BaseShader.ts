@@ -10,7 +10,7 @@ import baseVertexShaderSource from "./baseVertexShader";
 import Atlas from "./Atlas";
 import videoPaused from "../../../../public/2DAssets/videoPaused.png";
 import videoPausedFlipped from "../../../../public/2DAssets/videoPausedFlipped.png";
-import { threeDData } from "src/lib/CameraMedia";
+import { threeDData } from "../../../lib/CameraMedia";
 import {
   BeardsEffectTypes,
   GlassesEffectTypes,
@@ -18,7 +18,7 @@ import {
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-} from "src/context/CurrentEffectsStylesContext";
+} from "../../../context/CurrentEffectsStylesContext";
 
 export interface MeshJSON {
   vertex_faces: number[];

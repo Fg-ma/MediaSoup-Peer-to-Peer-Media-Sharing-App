@@ -23,7 +23,7 @@ import {
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
-import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";
+import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
 import Render from "../effects/visualEffects/lib/render";
 
 export type ThreeDTexsData = {
@@ -494,8 +494,8 @@ export const glassesDataURLs: ThreeDData = {
     defaultGlasses: {
       url: "/3DAssets/glasses/defaultGlasses/texs/defaultGlasses_diff_256x256.png",
     },
-    americaGlasses: {
-      url: "/3DAssets/glasses/americaGlasses/texs/americaGlasses_diff_256x256.png",
+    AmericaGlasses: {
+      url: "/3DAssets/glasses/AmericaGlasses/texs/AmericaGlasses_diff_256x256.png",
     },
     aviatorGoggles: {
       url: "/3DAssets/glasses/aviatorGoggles/texs/aviatorGoggles_diff_256x256.png",
@@ -622,8 +622,8 @@ export const glassesDataURLs: ThreeDData = {
     defaultGlasses: {
       url: "/3DAssets/glasses/defaultGlasses/defaultGlasses.json",
     },
-    americaGlasses: {
-      url: "/3DAssets/glasses/americaGlasses/americaGlasses.json",
+    AmericaGlasses: {
+      url: "/3DAssets/glasses/AmericaGlasses/AmericaGlasses.json",
     },
     aviatorGoggles: {
       url: "/3DAssets/glasses/aviatorGoggles/aviatorGoggles.json",
