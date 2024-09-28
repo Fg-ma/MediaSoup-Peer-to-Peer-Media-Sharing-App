@@ -264,8 +264,8 @@ export const masksDataURLs: ThreeDData = {
     tenguMask: {
       url: "/3DAssets/masks/tenguMask/texs/tenguMask_diff_256x256.png",
     },
-    threeMask: {
-      url: "/3DAssets/masks/threeMask/texs/threeMask_diff_256x256.png",
+    threeFaceMask: {
+      url: "/3DAssets/masks/threeFaceMask/texs/threeFaceMask_diff_256x256.png",
     },
     weldingMask: {
       url: "/3DAssets/masks/weldingMask/texs/weldingMask_diff_256x256.png",
@@ -329,8 +329,8 @@ export const masksDataURLs: ThreeDData = {
     tenguMask: {
       url: "/3DAssets/masks/tenguMask/texs/tenguMask_nor_256x256.png",
     },
-    threeMask: {
-      url: "/3DAssets/masks/threeMask/texs/threeMask_nor_256x256.png",
+    threeFaceMask: {
+      url: "/3DAssets/masks/threeFaceMask/texs/threeFaceMask_nor_256x256.png",
     },
     woodlandMask: {
       url: "/3DAssets/masks/woodlandMask/texs/woodlandMask_nor_256x256.png",
@@ -392,8 +392,8 @@ export const masksDataURLs: ThreeDData = {
     tenguMask: {
       url: "/3DAssets/masks/tenguMask/texs/tenguMask_metalRough_256x256.png",
     },
-    threeMask: {
-      url: "/3DAssets/masks/threeMask/texs/threeMask_metalRough_256x256.png",
+    threeFaceMask: {
+      url: "/3DAssets/masks/threeFaceMask/texs/threeFaceMask_metalRough_256x256.png",
     },
     woodlandMask: {
       url: "/3DAssets/masks/woodlandMask/texs/woodlandMask_metalRough_256x256.png",
@@ -471,8 +471,8 @@ export const masksDataURLs: ThreeDData = {
     tenguMask: {
       url: "/3DAssets/masks/tenguMask/tenguMask.json",
     },
-    threeMask: {
-      url: "/3DAssets/masks/threeMask/threeMask.json",
+    threeFaceMask: {
+      url: "/3DAssets/masks/threeFaceMask/threeFaceMask.json",
     },
     weldingMask: {
       url: "/3DAssets/masks/weldingMask/weldingMask.json",

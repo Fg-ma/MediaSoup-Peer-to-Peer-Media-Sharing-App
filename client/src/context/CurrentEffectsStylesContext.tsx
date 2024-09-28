@@ -116,7 +116,7 @@ export type MasksEffectTypes =
   | "plagueDoctorMask"
   | "sixEyesMask"
   | "tenguMask"
-  | "threeMask"
+  | "threeFaceMask"
   | "weldingMask"
   | "woodlandMask"
   | "woodPaintedMask"
