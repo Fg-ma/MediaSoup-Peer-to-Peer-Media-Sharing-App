@@ -92,73 +92,6 @@ class Render {
     }
   };
 
-  private drawEars = async (
-    faceId: string,
-    effectsStyles: CameraEffectStylesType,
-    calculatedLandmarks: CalculatedLandmarkInterface,
-    landmarks: NormalizedLandmarkList
-  ) => {
-    if (!this.faceLandmarks || !effectsStyles.ears) {
-      return;
-    }
-
-    if (!effectsStyles.ears.threeDim) {
-      const twoDimEarsOffset = calculatedLandmarks.twoDimEarsOffsets[faceId];
-      this.baseShader.drawEffect(
-        `${effectsStyles.ears.style}Right`,
-        {
-          x: 2 * landmarks[this.faceLandmarks.RIGHT_EAR_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.RIGHT_EAR_INDEX].y + 1,
-        },
-        {
-          x: twoDimEarsOffset[0],
-          y: twoDimEarsOffset[1],
-        },
-        calculatedLandmarks.rightEarWidths[faceId],
-        calculatedLandmarks.headRotationAngles[faceId],
-        calculatedLandmarks.headYawAngles[faceId],
-        calculatedLandmarks.headPitchAngles[faceId]
-      );
-
-      this.baseShader.drawEffect(
-        `${effectsStyles.ears.style}Left`,
-        {
-          x: 2 * landmarks[this.faceLandmarks.LEFT_EAR_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.LEFT_EAR_INDEX].y + 1,
-        },
-        {
-          x: twoDimEarsOffset[0],
-          y: twoDimEarsOffset[1],
-        },
-        calculatedLandmarks.leftEarWidths[faceId],
-        calculatedLandmarks.headRotationAngles[faceId],
-        calculatedLandmarks.headYawAngles[faceId],
-        calculatedLandmarks.headPitchAngles[faceId]
-      );
-    } else {
-      if (effectsStyles.mustaches) {
-        const threeDimMustacheOffset =
-          calculatedLandmarks.threeDimMustacheOffsets[faceId];
-
-        await this.baseShader.drawMesh(
-          effectsStyles.mustaches.style,
-          {
-            x: 2 * landmarks[this.faceLandmarks.NOSE_INDEX].x - 1,
-            y: -2 * landmarks[this.faceLandmarks.NOSE_INDEX].y + 1,
-          },
-          {
-            x: threeDimMustacheOffset[0],
-            y: threeDimMustacheOffset[1],
-          },
-          0.4,
-          calculatedLandmarks.headRotationAngles[faceId],
-          calculatedLandmarks.headYawAngles[faceId],
-          calculatedLandmarks.headPitchAngles[faceId]
-        );
-      }
-    }
-  };
-
   private drawGlasses = async (
     faceId: string,
     effectsStyles: CameraEffectStylesType,
@@ -343,11 +276,10 @@ class Render {
       !this.faceMeshResults ||
       !this.faceLandmarks ||
       !(
-        this.effects.ears ||
         this.effects.glasses ||
         this.effects.beards ||
         this.effects.mustaches ||
-        this.effects.faceMasks
+        this.effects.masks
       )
     ) {
       this.finishedProcessingEffects = true;
@@ -370,15 +302,6 @@ class Render {
       landmarks,
     } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
       const effectsStyles = this.currentEffectsStyles.current.camera[this.id];
-
-      if (this.effects.ears && effectsStyles && effectsStyles.ears) {
-        await this.drawEars(
-          faceId,
-          effectsStyles,
-          calculatedLandmarks,
-          landmarks
-        );
-      }
 
       if (this.effects.glasses && effectsStyles && effectsStyles.glasses) {
         await this.drawGlasses(
@@ -407,11 +330,8 @@ class Render {
         );
       }
 
-      if (this.effects.faceMasks) {
-        await this.baseShader.drawFaceMesh(
-          "baseFaceMask",
-          landmarks.slice(0, -10)
-        );
+      if (this.effects.masks) {
+        await this.baseShader.drawFaceMesh("baseMask", landmarks.slice(0, -10));
       }
     }
 

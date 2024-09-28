@@ -38,10 +38,8 @@ export interface CalculatedLandmarkInterface {
   rightEarWidths: OneDimensionalLandmarks;
   eyesWidths: OneDimensionalLandmarks;
   chinWidths: OneDimensionalLandmarks;
-  twoDimEarsOffsets: TwoDimensionalLandmarks;
   twoDimBeardOffsets: TwoDimensionalLandmarks;
   twoDimMustacheOffsets: TwoDimensionalLandmarks;
-  threeDimEarsOffsets: TwoDimensionalLandmarks;
   threeDimBeardOffsets: TwoDimensionalLandmarks;
   threeDimMustacheOffsets: TwoDimensionalLandmarks;
 }
@@ -68,11 +66,9 @@ class FaceLandmarks {
     eyesWidths: {},
     chinWidths: {},
 
-    twoDimEarsOffsets: {},
     twoDimBeardOffsets: {},
     twoDimMustacheOffsets: {},
 
-    threeDimEarsOffsets: {},
     threeDimBeardOffsets: {},
     threeDimMustacheOffsets: {},
   };
@@ -342,39 +338,6 @@ class FaceLandmarks {
     );
   };
 
-  private updateEars = (
-    faceId: string,
-    effectsStyles: CameraEffectStylesType
-  ) => {
-    // Calculate ear size based on interocular distance
-    if (effectsStyles && effectsStyles.ears) {
-      this.updateSmoothVariables(
-        "leftEarWidths",
-        faceId,
-        this.calculatedLandmarks.interocularDistances[faceId] *
-          effectsStyles.ears!.leftEarWidthFactor
-      );
-      this.updateSmoothVariables(
-        "rightEarWidths",
-        faceId,
-        this.calculatedLandmarks.interocularDistances[faceId] *
-          effectsStyles.ears!.rightEarWidthFactor
-      );
-    }
-
-    // Calculate the shift distance for the ear position taking into account
-    // headAngle for direction of shift and interocularDistance for scaling
-    const earsShiftFactor = 1.75;
-    const { shiftX: earsShiftX, shiftY: earsShiftY } = this.directionalShift(
-      this.calculatedLandmarks.interocularDistances[faceId] * earsShiftFactor,
-      this.calculatedLandmarks.headRotationAngles[faceId]
-    );
-    this.calculatedLandmarks.twoDimEarsOffsets[faceId] = [
-      earsShiftX,
-      earsShiftY,
-    ];
-  };
-
   private updateChin = (
     faceId: string,
     effectsStyles: CameraEffectStylesType,
@@ -474,8 +437,6 @@ class FaceLandmarks {
       );
 
       this.updateEyes(faceId, rightEye, leftEye, dxEyes, dyEyes);
-
-      this.updateEars(faceId, effectsStyles);
 
       this.updateChin(faceId, effectsStyles, leftJawPoint, rightJawPoint);
 

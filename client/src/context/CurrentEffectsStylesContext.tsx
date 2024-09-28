@@ -87,12 +87,12 @@ export type GlassesEffectTypes =
   | "shades"
   | "VRGlasses";
 export type MustachesEffectTypes =
+  | "disguiseMustache"
   | "fullMustache"
   | "mustache1"
   | "mustache2"
   | "mustache3"
   | "mustache4"
-  | "disguiseMustache"
   | "nicodemusMustache"
   | "pencilMustache"
   | "spongebobMustache"

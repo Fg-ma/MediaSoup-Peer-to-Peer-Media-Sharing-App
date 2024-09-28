@@ -10,8 +10,17 @@ import baseVertexShaderSource from "./baseVertexShader";
 import Atlas from "./Atlas";
 import videoPaused from "../../../../public/2DAssets/videoPaused.png";
 import videoPausedFlipped from "../../../../public/2DAssets/videoPausedFlipped.png";
+import { threeDData } from "src/lib/CameraMedia";
+import {
+  BeardsEffectTypes,
+  GlassesEffectTypes,
+  HatsEffectTypes,
+  MasksEffectTypes,
+  MustachesEffectTypes,
+  PetsEffectTypes,
+} from "src/context/CurrentEffectsStylesContext";
 
-interface MeshJSON {
+export interface MeshJSON {
   vertex_faces: number[];
   uv_faces: number[];
   normals: number[];
@@ -39,15 +48,6 @@ class BaseShader {
   private normalBuffer: WebGLBuffer | null = null;
   private texCoordBuffer: WebGLBuffer | null = null;
   private indexBuffer: WebGLBuffer | null = null;
-
-  private meshes:
-    | {
-        [meshes: string]: {
-          meshData?: MeshJSON;
-          meshURL: string;
-        };
-      }
-    | undefined;
 
   private twoDimAtlas: Atlas | null = null;
   private twoDimAltasTexMap: { [tex: string]: string } | undefined = undefined;
@@ -110,12 +110,6 @@ class BaseShader {
         | boolean
         | undefined;
     },
-    meshes?: {
-      [meshes: string]: {
-        meshData?: MeshJSON;
-        meshURL: string;
-      };
-    },
     lightDirection?: [number, number, number],
     cameraPosition?: vec3,
     cameraTarget?: vec3,
@@ -126,7 +120,6 @@ class BaseShader {
     pause?: boolean
   ) {
     this.gl = gl;
-    this.meshes = meshes;
     this.cameraAspect = this.gl.canvas.width / this.gl.canvas.height;
 
     if (lightDirection) {
@@ -870,7 +863,13 @@ class BaseShader {
   };
 
   drawMesh = async (
-    meshType: string,
+    meshType:
+      | BeardsEffectTypes
+      | GlassesEffectTypes
+      | MustachesEffectTypes
+      | MasksEffectTypes
+      | HatsEffectTypes
+      | PetsEffectTypes,
     position: { x: number; y: number },
     offset: { x: number; y: number },
     scale: number,
@@ -888,10 +887,10 @@ class BaseShader {
     }
 
     // Load mesh if it has already been load and return if no mesh url is found
-    if (this.meshes && this.meshes[meshType]) {
-      if (!this.meshes[meshType].meshData) {
-        this.meshes[meshType].meshData = await this.loadMeshJSON(
-          this.meshes[meshType].meshURL
+    if (threeDData.meshes[meshType]) {
+      if (!threeDData.meshes[meshType].data) {
+        threeDData.meshes[meshType].data = await this.loadMeshJSON(
+          threeDData.meshes[meshType].url
         );
       }
     } else {
@@ -922,7 +921,7 @@ class BaseShader {
       return;
     }
 
-    const meshData = this.meshes[meshType].meshData;
+    const meshData = threeDData.meshes[meshType].data;
 
     if (!meshData) {
       return;
@@ -1031,7 +1030,13 @@ class BaseShader {
   };
 
   drawFaceMesh = async (
-    meshType: string,
+    meshType:
+      | BeardsEffectTypes
+      | GlassesEffectTypes
+      | MustachesEffectTypes
+      | MasksEffectTypes
+      | HatsEffectTypes
+      | PetsEffectTypes,
     liveLandmarks: NormalizedLandmarkList
   ) => {
     if (
@@ -1044,10 +1049,10 @@ class BaseShader {
     }
 
     // Load uv mesh data
-    if (this.meshes && this.meshes[meshType]) {
-      if (!this.meshes[meshType].meshData) {
-        this.meshes[meshType].meshData = await this.loadMeshJSON(
-          this.meshes[meshType].meshURL
+    if (threeDData.meshes[meshType]) {
+      if (!threeDData.meshes[meshType].data) {
+        threeDData.meshes[meshType].data = await this.loadMeshJSON(
+          threeDData.meshes[meshType].url
         );
       }
     } else {
@@ -1083,7 +1088,7 @@ class BaseShader {
     // Get the triangles
     const { geometryTriangles, uvTriangles, normals } = this.getTriangles(
       liveLandmarks,
-      this.meshes[meshType].meshData!.uv_faces
+      threeDData.meshes[meshType].data!.uv_faces
     );
 
     let index = 0;
