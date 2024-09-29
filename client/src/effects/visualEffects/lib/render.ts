@@ -122,21 +122,21 @@ class Render {
         calculatedLandmarks.headPitchAngles[faceId]
       );
     } else {
-      if (effectsStyles.mustaches) {
-        const threeDimMustacheOffset =
-          calculatedLandmarks.threeDimMustacheOffsets[faceId];
+      if (effectsStyles.glasses) {
+        const eyesCenterPosition =
+          calculatedLandmarks.eyesCenterPositions[faceId];
 
         await this.baseShader.drawMesh(
-          effectsStyles.mustaches.style,
+          effectsStyles.glasses.style,
           {
-            x: 2 * landmarks[this.faceLandmarks.NOSE_INDEX].x - 1,
-            y: -2 * landmarks[this.faceLandmarks.NOSE_INDEX].y + 1,
+            x: 2 * eyesCenterPosition[0] - 1,
+            y: -2 * eyesCenterPosition[1] + 1,
           },
           {
-            x: threeDimMustacheOffset[0],
-            y: threeDimMustacheOffset[1],
+            x: 0,
+            y: 0,
           },
-          0.4,
+          calculatedLandmarks.eyesWidths[faceId],
           calculatedLandmarks.headRotationAngles[faceId],
           calculatedLandmarks.headYawAngles[faceId],
           calculatedLandmarks.headPitchAngles[faceId]
@@ -239,7 +239,60 @@ class Render {
           x: threeDimMustacheOffset[0],
           y: threeDimMustacheOffset[1],
         },
-        0.4,
+        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.headRotationAngles[faceId],
+        calculatedLandmarks.headYawAngles[faceId],
+        calculatedLandmarks.headPitchAngles[faceId]
+      );
+    }
+  };
+
+  private drawMasks = async (
+    faceId: string,
+    effectsStyles: CameraEffectStylesType,
+    calculatedLandmarks: CalculatedLandmarkInterface,
+    landmarks: NormalizedLandmarkList
+  ) => {
+    if (!this.faceLandmarks || !effectsStyles.masks) {
+      return;
+    }
+
+    if (effectsStyles.masks.style === "baseMask") {
+      await this.baseShader.drawFaceMesh("baseMask", landmarks.slice(0, -10));
+      return;
+    }
+
+    if (!effectsStyles.masks.threeDim) {
+      this.baseShader.drawEffect(
+        effectsStyles.masks.style,
+        {
+          x: 2 * landmarks[this.faceLandmarks.NOSE_INDEX].x - 1,
+          y: -2 * landmarks[this.faceLandmarks.NOSE_INDEX].y + 1,
+        },
+        {
+          x: 0,
+          y: 0,
+        },
+        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.headRotationAngles[faceId],
+        calculatedLandmarks.headYawAngles[faceId],
+        calculatedLandmarks.headPitchAngles[faceId]
+      );
+    } else {
+      const threeDimMustacheOffset =
+        calculatedLandmarks.threeDimMustacheOffsets[faceId];
+
+      await this.baseShader.drawMesh(
+        effectsStyles.masks.style,
+        {
+          x: 2 * landmarks[this.faceLandmarks.NOSE_INDEX].x - 1,
+          y: -2 * landmarks[this.faceLandmarks.NOSE_INDEX].y + 1,
+        },
+        {
+          x: 0,
+          y: 0,
+        },
+        calculatedLandmarks.eyesWidths[faceId],
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
@@ -303,7 +356,7 @@ class Render {
     } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
       const effectsStyles = this.currentEffectsStyles.current.camera[this.id];
 
-      if (this.effects.glasses && effectsStyles && effectsStyles.glasses) {
+      if (this.effects.glasses && effectsStyles.glasses) {
         await this.drawGlasses(
           faceId,
           effectsStyles,
@@ -312,7 +365,7 @@ class Render {
         );
       }
 
-      if (this.effects.beards && effectsStyles && effectsStyles.beards) {
+      if (this.effects.beards && effectsStyles.beards) {
         await this.drawBeards(
           faceId,
           effectsStyles,
@@ -321,7 +374,7 @@ class Render {
         );
       }
 
-      if (this.effects.mustaches && effectsStyles && effectsStyles.mustaches) {
+      if (this.effects.mustaches && effectsStyles.mustaches) {
         await this.drawMustaches(
           faceId,
           effectsStyles,
@@ -331,7 +384,12 @@ class Render {
       }
 
       if (this.effects.masks) {
-        await this.baseShader.drawFaceMesh("baseMask", landmarks.slice(0, -10));
+        await this.drawMasks(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
       }
     }
 

@@ -91,9 +91,7 @@ class ScreenMedia {
       currentEffectsStyles.current.screen[this.screenId] = {};
     }
 
-    const meshes = {};
-
-    this.baseShader = new BaseShader(gl, this.effects, meshes);
+    this.baseShader = new BaseShader(gl, this.effects);
 
     this.baseShader.setTintColor(this.tintColor);
     this.baseShader.createAtlasTexture("twoDim", {});

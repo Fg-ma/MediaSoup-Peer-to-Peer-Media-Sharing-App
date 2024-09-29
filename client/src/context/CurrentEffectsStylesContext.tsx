@@ -81,10 +81,10 @@ export type GlassesEffectTypes =
   | "glasses6"
   | "memeGlasses"
   | "militaryTacticalGlasses"
+  | "shades"
   | "steampunkGlasses"
   | "threeDGlasses"
   | "toyGlasses"
-  | "shades"
   | "VRGlasses";
 export type MustachesEffectTypes =
   | "disguiseMustache"

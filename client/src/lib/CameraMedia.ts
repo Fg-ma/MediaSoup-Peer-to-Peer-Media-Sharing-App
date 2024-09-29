@@ -67,37 +67,37 @@ export interface AssetData {
 export const mustachesDataURLs: AssetData = {
   image: {
     disguiseMustache: {
-      url: "/2DAssets/mustaches/disguiseMustache/disguiseMustache.png",
+      url: "/2DAssets/mustaches/disguiseMustache/disguiseMustache_512x512.png",
     },
     fullMustache: {
-      url: "/2DAssets/mustaches/fullMustache/fullMustache.png",
+      url: "/2DAssets/mustaches/fullMustache/fullMustache_512x512.png",
     },
     mustache1: {
-      url: "/2DAssets/mustaches/mustache1/mustache1.png",
+      url: "/2DAssets/mustaches/mustache1/mustache1_512x512.png",
     },
     mustache2: {
-      url: "/2DAssets/mustaches/mustache2/mustache2.png",
+      url: "/2DAssets/mustaches/mustache2/mustache2_512x512.png",
     },
     mustache3: {
-      url: "/2DAssets/mustaches/mustache3/mustache3.png",
+      url: "/2DAssets/mustaches/mustache3/mustache3_512x512.png",
     },
     mustache4: {
-      url: "/2DAssets/mustaches/mustache4/mustache4.png",
+      url: "/2DAssets/mustaches/mustache4/mustache4_512x512.png",
     },
     nicodemusMustache: {
-      url: "/2DAssets/mustaches/nicodemusMustache/nicodemusMustache.png",
+      url: "/2DAssets/mustaches/nicodemusMustache/nicodemusMustache_512x512.png",
     },
     pencilMustache: {
-      url: "/2DAssets/mustaches/pencilMustache/pencilMustache.png",
+      url: "/2DAssets/mustaches/pencilMustache/pencilMustache_512x512.png",
     },
     spongebobMustache: {
-      url: "/2DAssets/mustaches/spongebobMustache/spongebobMustache.png",
+      url: "/2DAssets/mustaches/spongebobMustache/spongebobMustache_512x512.png",
     },
     tinyMustache: {
-      url: "/2DAssets/mustaches/tinyMustache/tinyMustache.png",
+      url: "/2DAssets/mustaches/tinyMustache/tinyMustache_512x512.png",
     },
     wingedMustache: {
-      url: "/2DAssets/mustaches/wingedMustache/wingedMustache.png",
+      url: "/2DAssets/mustaches/wingedMustache/wingedMustache_512x512.png",
     },
   },
   diff: {
@@ -196,13 +196,13 @@ export const mustachesDataURLs: AssetData = {
 export const beardsDataURLs: AssetData = {
   image: {
     chinBeard: {
-      url: "/2DAssets/beards/chinBeard/chinBeard.png",
+      url: "/2DAssets/beards/chinBeard/chinBeard_512x512.png",
     },
     classicalCurlyBeard: {
-      url: "/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard.png",
+      url: "/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_512x512.png",
     },
     fullBeard: {
-      url: "/2DAssets/beards/fullBeard/fullBeard.png",
+      url: "/2DAssets/beards/fullBeard/fullBeard_512x512.png",
     },
   },
   diff: {
@@ -261,70 +261,70 @@ export const beardsDataURLs: AssetData = {
 export const masksDataURLs: AssetData = {
   image: {
     alienMask: {
-      url: "/2DAssets/masks/alienMask/alienMask.png",
+      url: "/2DAssets/masks/alienMask/alienMask_512x512.png",
     },
     baseMask: {
-      url: "/2DAssets/masks/baseMask/baseMask.png",
+      url: "/2DAssets/masks/baseMask/baseMask_512x512.png",
     },
     clownMask: {
-      url: "/2DAssets/masks/clownMask/clownMask.png",
+      url: "/2DAssets/masks/clownMask/clownMask_512x512.png",
     },
     creatureMask: {
-      url: "/2DAssets/masks/creatureMask/creatureMask.png",
+      url: "/2DAssets/masks/creatureMask/creatureMask_512x512.png",
     },
     cyberMask: {
-      url: "/2DAssets/masks/cyberMask/cyberMask.png",
+      url: "/2DAssets/masks/cyberMask/cyberMask_512x512.png",
     },
     darkKnightMask: {
-      url: "/2DAssets/masks/darkKnightMask/darkKnightMask.png",
+      url: "/2DAssets/masks/darkKnightMask/darkKnightMask_512x512.png",
     },
     demonMask: {
-      url: "/2DAssets/masks/demonMask/demonMask.png",
+      url: "/2DAssets/masks/demonMask/demonMask_512x512.png",
     },
     gasMask1: {
-      url: "/2DAssets/masks/gasMask1/gasMask1.png",
+      url: "/2DAssets/masks/gasMask1/gasMask1_512x512.png",
     },
     gasMask2: {
-      url: "/2DAssets/masks/gasMask2/gasMask2.png",
+      url: "/2DAssets/masks/gasMask2/gasMask2_512x512.png",
     },
     gasMask3: {
-      url: "/2DAssets/masks/gasMask3/gasMask3.png",
+      url: "/2DAssets/masks/gasMask3/gasMask3_512x512.png",
     },
     gasMask4: {
-      url: "/2DAssets/masks/gasMask4/gasMask4.png",
+      url: "/2DAssets/masks/gasMask4/gasMask4_512x512.png",
     },
     masqueradeMask: {
-      url: "/2DAssets/masks/masqueradeMask/masqueradeMask.png",
+      url: "/2DAssets/masks/masqueradeMask/masqueradeMask_512x512.png",
     },
     metalManMask: {
-      url: "/2DAssets/masks/metalManMask/metalManMask.png",
+      url: "/2DAssets/masks/metalManMask/metalManMask_512x512.png",
     },
     oniMask: {
-      url: "/2DAssets/masks/oniMask/oniMask.png",
+      url: "/2DAssets/masks/oniMask/oniMask_512x512.png",
     },
     plagueDoctorMask: {
-      url: "/2DAssets/masks/plagueDoctorMask/plagueDoctorMask.png",
+      url: "/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_512x512.png",
     },
     sixEyesMask: {
-      url: "/2DAssets/masks/sixEyesMask/sixEyesMask.png",
+      url: "/2DAssets/masks/sixEyesMask/sixEyesMask_512x512.png",
     },
     tenguMask: {
-      url: "/2DAssets/masks/tenguMask/tenguMask.png",
+      url: "/2DAssets/masks/tenguMask/tenguMask_512x512.png",
     },
     threeFaceMask: {
-      url: "/2DAssets/masks/threeFaceMask/threeFaceMask.png",
+      url: "/2DAssets/masks/threeFaceMask/threeFaceMask_512x512.png",
     },
     weldingMask: {
-      url: "/2DAssets/masks/weldingMask/weldingMask.png",
+      url: "/2DAssets/masks/weldingMask/weldingMask_512x512.png",
     },
     woodlandMask: {
-      url: "/2DAssets/masks/woodlandMask/woodlandMask.png",
+      url: "/2DAssets/masks/woodlandMask/woodlandMask_512x512.png",
     },
     woodPaintedMask: {
-      url: "/2DAssets/masks/woodPaintedMask/woodPaintedMask.png",
+      url: "/2DAssets/masks/woodPaintedMask/woodPaintedMask_512x512.png",
     },
     zombieMask: {
-      url: "/2DAssets/masks/zombieMask/zombieMask.png",
+      url: "/2DAssets/masks/zombieMask/zombieMask_512x512.png",
     },
   },
   diff: {
@@ -607,58 +607,58 @@ export const masksDataURLs: AssetData = {
 export const glassesDataURLs: AssetData = {
   image: {
     defaultGlasses: {
-      url: "/2DAssets/glasses/defaultGlasses/defaultGlasses.png",
+      url: "/2DAssets/glasses/defaultGlasses/defaultGlasses_512x512.png",
     },
     AmericaGlasses: {
-      url: "/2DAssets/glasses/AmericaGlasses/AmericaGlasses.png",
+      url: "/2DAssets/glasses/AmericaGlasses/AmericaGlasses_512x512.png",
     },
     aviatorGoggles: {
-      url: "/2DAssets/glasses/aviatorGoggles/aviatorGoggles.png",
+      url: "/2DAssets/glasses/aviatorGoggles/aviatorGoggles_512x512.png",
     },
     bloodyGlasses: {
-      url: "/2DAssets/glasses/bloodyGlasses/bloodyGlasses.png",
+      url: "/2DAssets/glasses/bloodyGlasses/bloodyGlasses_512x512.png",
     },
     eyeProtectionGlasses: {
-      url: "/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses.png",
+      url: "/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_512x512.png",
     },
     glasses1: {
-      url: "/2DAssets/glasses/glasses1/glasses1.png",
+      url: "/2DAssets/glasses/glasses1/glasses1_512x512.png",
     },
     glasses2: {
-      url: "/2DAssets/glasses/glasses2/glasses2.png",
+      url: "/2DAssets/glasses/glasses2/glasses2_512x512.png",
     },
     glasses3: {
-      url: "/2DAssets/glasses/glasses3/glasses3.png",
+      url: "/2DAssets/glasses/glasses3/glasses3_512x512.png",
     },
     glasses4: {
-      url: "/2DAssets/glasses/glasses4/glasses4.png",
+      url: "/2DAssets/glasses/glasses4/glasses4_512x512.png",
     },
     glasses5: {
-      url: "/2DAssets/glasses/glasses5/glasses5.png",
+      url: "/2DAssets/glasses/glasses5/glasses5_512x512.png",
     },
     glasses6: {
-      url: "/2DAssets/glasses/glasses6/glasses6.png",
+      url: "/2DAssets/glasses/glasses6/glasses6_512x512.png",
     },
     memeGlasses: {
-      url: "/2DAssets/glasses/memeGlasses/memeGlasses.png",
+      url: "/2DAssets/glasses/memeGlasses/memeGlasses_512x512.png",
     },
     militaryTacticalGlasses: {
-      url: "/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses.png",
+      url: "/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_512x512.png",
     },
     steampunkGlasses: {
-      url: "/2DAssets/glasses/steampunkGlasses/steampunkGlasses.png",
+      url: "/2DAssets/glasses/steampunkGlasses/steampunkGlasses_512x512.png",
     },
     threeDGlasses: {
-      url: "/2DAssets/glasses/threeDGlasses/threeDGlasses.png",
+      url: "/2DAssets/glasses/threeDGlasses/threeDGlasses_512x512.png",
     },
     toyGlasses: {
-      url: "/2DAssets/glasses/toyGlasses/toyGlasses.png",
+      url: "/2DAssets/glasses/toyGlasses/toyGlasses_512x512.png",
     },
     shades: {
-      url: "/2DAssets/glasses/shades/shades.png",
+      url: "/2DAssets/glasses/shades/shades_512x512.png",
     },
     VRGlasses: {
-      url: "/2DAssets/glasses/VRGlasses/VRGlasses.png",
+      url: "/2DAssets/glasses/VRGlasses/VRGlasses_512x512.png",
     },
   },
   diff: {
@@ -830,67 +830,67 @@ export const glassesDataURLs: AssetData = {
 export const hatsDataURLs: AssetData = {
   image: {
     AsianConicalHat: {
-      url: "/2DAssets/hats/AsianConicalHat/AsianConicalHat.png",
+      url: "/2DAssets/hats/AsianConicalHat/AsianConicalHat_512x512.png",
     },
     aviatorHelmet: {
-      url: "/2DAssets/hats/aviatorHelmet/aviatorHelmet.png",
+      url: "/2DAssets/hats/aviatorHelmet/aviatorHelmet_512x512.png",
     },
     bicornHat: {
-      url: "/2DAssets/hats/bicornHat/bicornHat.png",
+      url: "/2DAssets/hats/bicornHat/bicornHat_512x512.png",
     },
     bicycleHelmet: {
-      url: "/2DAssets/hats/bicycleHelmet/bicycleHelmet.png",
+      url: "/2DAssets/hats/bicycleHelmet/bicycleHelmet_512x512.png",
     },
     captainsHat: {
-      url: "/2DAssets/hats/captainsHat/captainsHat.png",
+      url: "/2DAssets/hats/captainsHat/captainsHat_512x512.png",
     },
     chefHat: {
-      url: "/2DAssets/hats/chefHat/chefHat.png",
+      url: "/2DAssets/hats/chefHat/chefHat_512x512.png",
     },
     chickenHat: {
-      url: "/2DAssets/hats/chickenHat/chickenHat.png",
+      url: "/2DAssets/hats/chickenHat/chickenHat_512x512.png",
     },
     deadManHat: {
-      url: "/2DAssets/hats/deadManHat/deadManHat.png",
+      url: "/2DAssets/hats/deadManHat/deadManHat_512x512.png",
     },
     dogEars: {
-      url: "/2DAssets/hats/dogEars/dogEars.png",
+      url: "/2DAssets/hats/dogEars/dogEars_512x512.png",
     },
     flatCap: {
-      url: "/2DAssets/hats/flatCap/flatCap.png",
+      url: "/2DAssets/hats/flatCap/flatCap_512x512.png",
     },
     hardHat: {
-      url: "/2DAssets/hats/hardHat/hardHat.png",
+      url: "/2DAssets/hats/hardHat/hardHat_512x512.png",
     },
     hopliteHelmet: {
-      url: "/2DAssets/hats/hopliteHelmet/hopliteHelmet.png",
+      url: "/2DAssets/hats/hopliteHelmet/hopliteHelmet_512x512.png",
     },
     militaryHat: {
-      url: "/2DAssets/hats/militaryHat/militaryHat.png",
+      url: "/2DAssets/hats/militaryHat/militaryHat_512x512.png",
     },
     rabbitEars: {
-      url: "/2DAssets/hats/rabbitEars/rabbitEars.png",
+      url: "/2DAssets/hats/rabbitEars/rabbitEars_512x512.png",
     },
     roundEarsHat: {
-      url: "/2DAssets/hats/roundEarsHat/roundEarsHat.png",
+      url: "/2DAssets/hats/roundEarsHat/roundEarsHat_512x512.png",
     },
     santaHat: {
-      url: "/2DAssets/hats/santaHat/santaHat.png",
+      url: "/2DAssets/hats/santaHat/santaHat_512x512.png",
     },
     seamanHat: {
-      url: "/2DAssets/hats/seamanHat/seamanHat.png",
+      url: "/2DAssets/hats/seamanHat/seamanHat_512x512.png",
     },
     stylishHat: {
-      url: "/2DAssets/hats/stylishHat/stylishHat.png",
+      url: "/2DAssets/hats/stylishHat/stylishHat_512x512.png",
     },
     superMarioOdysseyHat: {
-      url: "/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat.png",
+      url: "/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat_512x512.png",
     },
     ushankaHat: {
-      url: "/2DAssets/hats/ushankaHat/ushankaHat.png",
+      url: "/2DAssets/hats/ushankaHat/ushankaHat_512x512.png",
     },
     vikingHelmet: {
-      url: "/2DAssets/hats/vikingHelmet/vikingHelmet.png",
+      url: "/2DAssets/hats/vikingHelmet/vikingHelmet_512x512.png",
     },
   },
   diff: {
@@ -1082,58 +1082,58 @@ export const hatsDataURLs: AssetData = {
 export const petsDataURLs: AssetData = {
   image: {
     angryHamster: {
-      url: "/2DAssets/pets/angryHamster/angryHamster.png",
+      url: "/2DAssets/pets/angryHamster/angryHamster_512x512.png",
     },
     axolotl: {
-      url: "/2DAssets/pets/axolotl/axolotl.png",
+      url: "/2DAssets/pets/axolotl/axolotl_512x512.png",
     },
     babyDragon: {
-      url: "/2DAssets/pets/babyDragon/babyDragon.png",
+      url: "/2DAssets/pets/babyDragon/babyDragon_512x512.png",
     },
     beardedDragon: {
-      url: "/2DAssets/pets/babyDragon/babyDragon.png",
+      url: "/2DAssets/pets/babyDragon/babyDragon_512x512.png",
     },
-    bird1: { url: "/2DAssets/pets/bird1/bird1.png" },
-    bird2: { url: "/2DAssets/pets/bird2/bird2.png" },
-    boxer: { url: "/2DAssets/pets/boxer/boxer.png" },
-    brain: { url: "/2DAssets/pets/brain/brain.png" },
+    bird1: { url: "/2DAssets/pets/bird1/bird1_512x512.png" },
+    bird2: { url: "/2DAssets/pets/bird2/bird2_512x512.png" },
+    boxer: { url: "/2DAssets/pets/boxer/boxer_512x512.png" },
+    brain: { url: "/2DAssets/pets/brain/brain_512x512.png" },
     buddyHamster: {
-      url: "/2DAssets/pets/buddyHamster/buddyHamster.png",
+      url: "/2DAssets/pets/buddyHamster/buddyHamster_512x512.png",
     },
-    cat1: { url: "/2DAssets/pets/cat1/cat1.png" },
-    cat2: { url: "/2DAssets/pets/cat2/cat2.png" },
+    cat1: { url: "/2DAssets/pets/cat1/cat1_512x512.png" },
+    cat2: { url: "/2DAssets/pets/cat2/cat2_512x512.png" },
     dodoBird: {
-      url: "/2DAssets/pets/dodoBird/dodoBird.png",
+      url: "/2DAssets/pets/dodoBird/dodoBird_512x512.png",
     },
     happyHamster: {
-      url: "/2DAssets/pets/happyHamster/happyHamster.png",
+      url: "/2DAssets/pets/happyHamster/happyHamster_512x512.png",
     },
     mechanicalGrasshopper: {
-      url: "/2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper.png",
+      url: "/2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_512x512.png",
     },
-    panda1: { url: "/2DAssets/pets/panda1/panda1.png" },
-    panda2: { url: "/2DAssets/pets/panda2/panda2.png" },
+    panda1: { url: "/2DAssets/pets/panda1/panda1_512x512.png" },
+    panda2: { url: "/2DAssets/pets/panda2/panda2_512x512.png" },
     petRock: {
-      url: "/2DAssets/pets/petRock/petRock.png",
+      url: "/2DAssets/pets/petRock/petRock_512x512.png",
     },
-    pig: { url: "/2DAssets/pets/pig/pig.png" },
+    pig: { url: "/2DAssets/pets/pig/pig_512x512.png" },
     redFox1: {
-      url: "/2DAssets/pets/redFox1/redFox1.png",
+      url: "/2DAssets/pets/redFox1/redFox1_512x512.png",
     },
     redFox2: {
-      url: "/2DAssets/pets/redFox2/redFox2.png",
+      url: "/2DAssets/pets/redFox2/redFox2_512x512.png",
     },
     roboDog: {
-      url: "/2DAssets/pets/roboDog/roboDog.png",
+      url: "/2DAssets/pets/roboDog/roboDog_512x512.png",
     },
     skeletonTRex: {
-      url: "/2DAssets/pets/skeletonTRex/skeletonTRex.png",
+      url: "/2DAssets/pets/skeletonTRex/skeletonTRex_512x512.png",
     },
-    snail: { url: "/2DAssets/pets/snail/snail.png" },
+    snail: { url: "/2DAssets/pets/snail/snail_512x512.png" },
     spinosaurus: {
-      url: "/2DAssets/pets/spinosaurus/spinosaurus.png",
+      url: "/2DAssets/pets/spinosaurus/spinosaurus_512x512.png",
     },
-    TRex: { url: "/2DAssets/pets/TRex/TRex.png" },
+    TRex: { url: "/2DAssets/pets/TRex/TRex_512x512.png" },
   },
   diff: {
     angryHamster: {
