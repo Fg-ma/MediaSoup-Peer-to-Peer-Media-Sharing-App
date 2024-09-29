@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
@@ -171,6 +171,8 @@ export default function MasksButton({
     useCurrentEffectsStylesContext();
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
+  const [rerender, setRerender] = useState(false);
+
   const streamEffects = isUser
     ? userStreamEffects.current[type][videoId].masks
     : remoteStreamEffects.current[username][instance][type][videoId].masks;
@@ -217,7 +219,7 @@ export default function MasksButton({
       imageThreeDimOff: alienMask_512x512,
       imageThreeDimOffSmall: alienMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     clownMask: {
       image: clownMask_512x512,
@@ -229,7 +231,7 @@ export default function MasksButton({
       imageThreeDimOff: clownMask_512x512,
       imageThreeDimOffSmall: clownMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     creatureMask: {
       image: creatureMask_512x512,
@@ -241,7 +243,7 @@ export default function MasksButton({
       imageThreeDimOff: creatureMask_512x512,
       imageThreeDimOffSmall: creatureMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     cyberMask: {
       image: cyberMask_512x512,
@@ -253,7 +255,7 @@ export default function MasksButton({
       imageThreeDimOff: cyberMask_512x512,
       imageThreeDimOffSmall: cyberMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     darkKnightMask: {
       image: darkKnightMask_512x512,
@@ -265,7 +267,7 @@ export default function MasksButton({
       imageThreeDimOff: darkKnightMask_512x512,
       imageThreeDimOffSmall: darkKnightMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     demonMask: {
       image: demonMask_512x512,
@@ -277,7 +279,7 @@ export default function MasksButton({
       imageThreeDimOff: demonMask_512x512,
       imageThreeDimOffSmall: demonMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     gasMask1: {
       image: gasMask1_512x512,
@@ -289,7 +291,7 @@ export default function MasksButton({
       imageThreeDimOff: gasMask1_512x512,
       imageThreeDimOffSmall: gasMask1_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     gasMask2: {
       image: gasMask2_512x512,
@@ -301,7 +303,7 @@ export default function MasksButton({
       imageThreeDimOff: gasMask2_512x512,
       imageThreeDimOffSmall: gasMask2_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     gasMask3: {
       image: gasMask3_512x512,
@@ -313,7 +315,7 @@ export default function MasksButton({
       imageThreeDimOff: gasMask3_512x512,
       imageThreeDimOffSmall: gasMask3_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     gasMask4: {
       image: gasMask4_512x512,
@@ -325,7 +327,7 @@ export default function MasksButton({
       imageThreeDimOff: gasMask4_512x512,
       imageThreeDimOffSmall: gasMask4_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     masqueradeMask: {
       image: masqueradeMask_512x512,
@@ -337,7 +339,7 @@ export default function MasksButton({
       imageThreeDimOff: masqueradeMask_512x512,
       imageThreeDimOffSmall: masqueradeMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     metalManMask: {
       image: metalManMask_512x512,
@@ -349,7 +351,7 @@ export default function MasksButton({
       imageThreeDimOff: metalManMask_512x512,
       imageThreeDimOffSmall: metalManMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     oniMask: {
       image: oniMask_512x512,
@@ -361,7 +363,7 @@ export default function MasksButton({
       imageThreeDimOff: oniMask_512x512,
       imageThreeDimOffSmall: oniMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     plagueDoctorMask: {
       image: plagueDoctorMask_512x512,
@@ -373,7 +375,7 @@ export default function MasksButton({
       imageThreeDimOff: plagueDoctorMask_512x512,
       imageThreeDimOffSmall: plagueDoctorMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     sixEyesMask: {
       image: sixEyesMask_512x512,
@@ -385,7 +387,7 @@ export default function MasksButton({
       imageThreeDimOff: sixEyesMask_512x512,
       imageThreeDimOffSmall: sixEyesMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     tenguMask: {
       image: tenguMask_512x512,
@@ -397,7 +399,7 @@ export default function MasksButton({
       imageThreeDimOff: tenguMask_512x512,
       imageThreeDimOffSmall: tenguMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     threeFaceMask: {
       image: threeFaceMask_512x512,
@@ -409,7 +411,7 @@ export default function MasksButton({
       imageThreeDimOff: threeFaceMask_512x512,
       imageThreeDimOffSmall: threeFaceMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     weldingMask: {
       image: weldingMask_512x512,
@@ -421,7 +423,7 @@ export default function MasksButton({
       imageThreeDimOff: weldingMask_512x512,
       imageThreeDimOffSmall: weldingMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     woodlandMask: {
       image: woodlandMask_512x512,
@@ -433,7 +435,7 @@ export default function MasksButton({
       imageThreeDimOff: woodlandMask_512x512,
       imageThreeDimOffSmall: woodlandMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     woodPaintedMask: {
       image: woodPaintedMask_512x512,
@@ -445,7 +447,7 @@ export default function MasksButton({
       imageThreeDimOff: woodPaintedMask_512x512,
       imageThreeDimOffSmall: woodPaintedMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     zombieMask: {
       image: zombieMask_512x512,
@@ -457,7 +459,7 @@ export default function MasksButton({
       imageThreeDimOff: zombieMask_512x512,
       imageThreeDimOffSmall: zombieMask_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
   };
 
@@ -465,6 +467,7 @@ export default function MasksButton({
     <FgButton
       clickFunction={async () => {
         setEffectsDisabled(true);
+        setRerender((prev) => !prev);
 
         await handleVisualEffectChange("masks");
 
@@ -576,6 +579,21 @@ export default function MasksButton({
           }
         }
       }}
+      doubleClickFunction={async () => {
+        if (!effectsStyles) {
+          return;
+        }
+
+        setEffectsDisabled(true);
+
+        effectsStyles.threeDim = !effectsStyles.threeDim;
+
+        setRerender((prev) => !prev);
+
+        await handleVisualEffectChange("masks", streamEffects);
+
+        setEffectsDisabled(false);
+      }}
       holdContent={
         <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
           {Object.entries(masksEffects).map(([masks, effect]) => (
@@ -601,7 +619,7 @@ export default function MasksButton({
       }
       hoverContent={
         <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Face mask
+          Masks
         </div>
       }
       className='flex items-center justify-center min-w-10 w-10 aspect-square'

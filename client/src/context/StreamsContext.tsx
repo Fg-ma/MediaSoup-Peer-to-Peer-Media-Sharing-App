@@ -3,7 +3,9 @@ import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";
 import AudioMedia from "../lib/AudioMedia";
 
-export const defaultAudioStreamEffects = {
+export const defaultAudioStreamEffects: {
+  [effect in AudioEffectTypes]: boolean;
+} = {
   robot: false,
   echo: false,
   alien: false,
@@ -47,7 +49,9 @@ export const defaultAudioStreamEffects = {
   echosOfThePast: false,
 };
 
-export const defaultCameraStreamEffects = {
+export const defaultCameraStreamEffects: {
+  [effect in CameraEffectTypes]: boolean;
+} = {
   pause: false,
   blur: false,
   tint: false,
@@ -55,9 +59,13 @@ export const defaultCameraStreamEffects = {
   beards: false,
   mustaches: false,
   masks: false,
+  hats: false,
+  pets: false,
 };
 
-export const defaultScreenStreamEffects = {
+export const defaultScreenStreamEffects: {
+  [effect in ScreenEffectTypes]: boolean;
+} = {
   pause: false,
   blur: false,
   tint: false,

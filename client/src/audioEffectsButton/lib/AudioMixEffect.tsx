@@ -1,5 +1,4 @@
 import React from "react";
-import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
 import {
   DynamicMixEffect,
   LabelPlacementType,
@@ -7,6 +6,7 @@ import {
 } from "./AudioMixEffectsPortal";
 import { AudioMixEffectsType } from "../../effects/audioEffects/AudioEffects";
 import FgSVG from "../../fgSVG/FgSVG";
+import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
 
 export default function AudioMixEffect({
   effect,
@@ -102,7 +102,7 @@ export default function AudioMixEffect({
           />
         )}
         <div
-          className={`${
+          className={`select-none ${
             labelPlacement.side === "top" || labelPlacement.side === "bottom"
               ? "pt-1.25"
               : ""

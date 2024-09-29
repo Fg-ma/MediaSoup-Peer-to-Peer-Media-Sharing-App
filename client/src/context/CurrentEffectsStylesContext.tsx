@@ -51,7 +51,7 @@ export interface CameraEffectStylesType {
   };
   masks?: {
     style: MasksEffectTypes;
-    threeDim: true;
+    threeDim: boolean;
   };
   hats?: {
     style: HatsEffectTypes;
@@ -198,7 +198,7 @@ export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
   },
   masks: {
     style: defaultMask,
-    threeDim: true,
+    threeDim: false,
   },
   hats: {
     style: defaultHat,

@@ -118,7 +118,7 @@ export default function BeardsButton({
       imageThreeDimOff: fullBeard_512x512,
       imageThreeDimOffSmall: fullBeard_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
   };
 
@@ -283,7 +283,7 @@ export default function BeardsButton({
       }
       hoverContent={
         <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Beard
+          Beards
         </div>
       }
       className='flex items-center justify-center min-w-10 w-10 aspect-square'

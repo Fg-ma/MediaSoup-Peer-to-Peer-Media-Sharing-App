@@ -246,7 +246,7 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
             }
           `}
         >
-          <div className='grow'>{fgSliderOptions.topLabel}</div>
+          <div className='select-none grow'>{fgSliderOptions.topLabel}</div>
           {tickHovering &&
             fgSliderOptions.units &&
             fgSliderOptions.orientation === "horizontal" && (
@@ -435,7 +435,7 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
             }
           `}
         >
-          <div className='grow'>{fgSliderOptions.bottomLabel}</div>
+          <div className='select-none grow'>{fgSliderOptions.bottomLabel}</div>
           {tickHovering &&
             fgSliderOptions.units &&
             fgSliderOptions.orientation === "horizontal" && (

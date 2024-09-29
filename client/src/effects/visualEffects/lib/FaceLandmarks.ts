@@ -89,6 +89,7 @@ class FaceLandmarks {
   NOSE_BRIDGE_INDEX = 6;
   LEFT_NOSE_BASE_INDEX = 219;
   RIGHT_NOSE_BASE_INDEX = 439;
+  FOREHEAD_INDEX = 10;
 
   private currentEffectsStyles;
 

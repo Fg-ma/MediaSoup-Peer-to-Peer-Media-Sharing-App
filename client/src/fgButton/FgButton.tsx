@@ -249,7 +249,7 @@ export default function FgButton({
                 type={fgButtonOptions.holdType}
                 content={holdContent}
                 externalRef={externalRef ? externalRef : buttonRef}
-                zValue={99999999999999}
+                zValue={9999999999}
               />
             </Suspense>
           )}

@@ -1,8 +1,12 @@
-import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
+import {
+  defaultScreenCurrentEffectsStyles,
+  EffectStylesType,
+} from "../context/CurrentEffectsStylesContext";
 import BaseShader from "../effects/visualEffects/lib/BaseShader";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
+  defaultScreenStreamEffects,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
@@ -69,11 +73,8 @@ class ScreenMedia {
 
     this.effects = {};
 
-    this.userStreamEffects.current.screen[this.screenId] = {
-      pause: false,
-      blur: false,
-      tint: false,
-    };
+    this.userStreamEffects.current.screen[this.screenId] =
+      defaultScreenStreamEffects;
 
     this.canvas = document.createElement("canvas");
     const gl =
@@ -88,7 +89,8 @@ class ScreenMedia {
     this.initScreenStream = initScreenStream;
 
     if (!currentEffectsStyles.current.screen[this.screenId]) {
-      currentEffectsStyles.current.screen[this.screenId] = {};
+      currentEffectsStyles.current.screen[this.screenId] =
+        defaultScreenCurrentEffectsStyles;
     }
 
     this.baseShader = new BaseShader(gl, this.effects);

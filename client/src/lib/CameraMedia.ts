@@ -1,17 +1,12 @@
 import {
-  beardChinOffsetsMap,
-  defaultBeard,
-  defaultMask,
-  defaultGlasses,
-  defaultMustache,
   EffectStylesType,
-  mustacheNoseOffsetsMap,
   PetsEffectTypes,
   HatsEffectTypes,
   MasksEffectTypes,
   MustachesEffectTypes,
   GlassesEffectTypes,
   BeardsEffectTypes,
+  defaultCameraCurrentEffectsStyles,
 } from "../context/CurrentEffectsStylesContext";
 import BaseShader, { MeshJSON } from "../effects/visualEffects/lib/BaseShader";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
@@ -1182,7 +1177,7 @@ export const petsDataURLs: AssetData = {
       url: "/3DAssets/pets/roboDog/texs/roboDog_diff_256x256.png",
     },
     skeletonTRex: {
-      url: "/3DAssets/pets/skeletonTRex/texs/skeletonTRex_diff_256x256.png",
+      url: "/3DAssets/pets/skeletonTRex/texs/skeletonTRex_diff_64x64.png",
     },
     snail: { url: "/3DAssets/pets/snail/texs/snail_diff_256x256.png" },
     spinosaurus: {
@@ -1457,23 +1452,8 @@ class CameraMedia {
     this.initCameraStream = initCameraStream;
 
     if (!currentEffectsStyles.current.camera[this.cameraId]) {
-      currentEffectsStyles.current.camera[this.cameraId] = {
-        glasses: { style: defaultGlasses, threeDim: false },
-        beards: {
-          style: defaultBeard,
-          threeDim: false,
-          chinOffset: beardChinOffsetsMap[defaultBeard],
-        },
-        mustaches: {
-          style: defaultMustache,
-          threeDim: false,
-          noseOffset: mustacheNoseOffsetsMap[defaultMustache],
-        },
-        masks: {
-          style: defaultMask,
-          threeDim: true,
-        },
-      };
+      currentEffectsStyles.current.camera[this.cameraId] =
+        defaultCameraCurrentEffectsStyles;
     }
 
     this.baseShader = new BaseShader(gl, this.effects);

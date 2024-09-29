@@ -98,10 +98,11 @@ export default function FgPortal({
   return ReactDOM.createPortal(
     <motion.div
       ref={portalRef}
-      className={`absolute z-[${zValue}]`}
+      className={`absolute`}
       style={{
         top: `${portalPosition?.top}px`,
         left: `${portalPosition?.left}px`,
+        zIndex: zValue,
       }}
       variants={FgPortalVar}
       initial='init'

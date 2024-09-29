@@ -12,6 +12,8 @@ const GlassesButton = React.lazy(() => import("./lib/GlassesButton"));
 const BeardsButton = React.lazy(() => import("./lib/BeardsButton"));
 const MustachesButton = React.lazy(() => import("./lib/MustachesButton"));
 const MasksButton = React.lazy(() => import("./lib/MasksButton"));
+const HatsButton = React.lazy(() => import("./lib/HatsButton"));
+const PetsButton = React.lazy(() => import("./lib/PetsButton"));
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -222,6 +224,36 @@ export default function VisualEffectsSection({
         <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <MasksButton
+            username={username}
+            instance={instance}
+            type={type}
+            videoId={videoId}
+            isUser={isUser}
+            handleVisualEffectChange={handleVisualEffectChange}
+            effectsDisabled={effectsDisabled}
+            setEffectsDisabled={setEffectsDisabled}
+          />
+        </Suspense>
+      )}
+      {type === "camera" && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <HatsButton
+            username={username}
+            instance={instance}
+            type={type}
+            videoId={videoId}
+            isUser={isUser}
+            handleVisualEffectChange={handleVisualEffectChange}
+            effectsDisabled={effectsDisabled}
+            setEffectsDisabled={setEffectsDisabled}
+          />
+        </Suspense>
+      )}
+      {type === "camera" && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+          <PetsButton
             username={username}
             instance={instance}
             type={type}

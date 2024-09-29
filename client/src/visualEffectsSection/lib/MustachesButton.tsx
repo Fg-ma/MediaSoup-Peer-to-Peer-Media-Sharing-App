@@ -154,7 +154,7 @@ export default function MustachesButton({
       imageThreeDimOff: fullMustache_512x512,
       imageThreeDimOffSmall: fullMustache_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     mustache1: {
       image: mustache1_512x512,
@@ -218,7 +218,7 @@ export default function MustachesButton({
       imageThreeDimOff: pencilMustache_512x512,
       imageThreeDimOffSmall: pencilMustache_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     spongebobMustache: {
       image: spongebobMustache_512x512,
@@ -230,7 +230,7 @@ export default function MustachesButton({
       imageThreeDimOff: spongebobMustache_512x512,
       imageThreeDimOffSmall: spongebobMustache_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     tinyMustache: {
       image: tinyMustache_512x512,
@@ -242,7 +242,7 @@ export default function MustachesButton({
       imageThreeDimOff: tinyMustache_512x512,
       imageThreeDimOffSmall: tinyMustache_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     wingedMustache: {
       image: wingedMustache_512x512,
@@ -419,7 +419,7 @@ export default function MustachesButton({
       }
       hoverContent={
         <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Mustache
+          Mustaches
         </div>
       }
       className='flex items-center justify-center min-w-10 w-10 aspect-square'

@@ -105,7 +105,9 @@ export default function AudioEffectButton({
                 : audioEffectTemplate.hoverContent.active}
             </div>
           }
-          options={{ hoverTimeoutDuration: 750 }}
+          options={{
+            hoverTimeoutDuration: 750,
+          }}
         />
       ) : (
         <div className='bg-gray-300 w-full h-full animate-pulse rounded'></div> // Placeholder while loading

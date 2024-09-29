@@ -205,7 +205,7 @@ export default function GlassesButton({
       imageThreeDimOff: aviatorGoggles_512x512,
       imageThreeDimOffSmall: aviatorGoggles_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     bloodyGlasses: {
       image: bloodyGlasses_512x512,
@@ -217,7 +217,7 @@ export default function GlassesButton({
       imageThreeDimOff: bloodyGlasses_512x512,
       imageThreeDimOffSmall: bloodyGlasses_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     eyeProtectionGlasses: {
       image: eyeProtectionGlasses_512x512,
@@ -229,7 +229,7 @@ export default function GlassesButton({
       imageThreeDimOff: eyeProtectionGlasses_512x512,
       imageThreeDimOffSmall: eyeProtectionGlasses_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     glasses1: {
       image: glasses1_512x512,
@@ -241,7 +241,7 @@ export default function GlassesButton({
       imageThreeDimOff: glasses1_512x512,
       imageThreeDimOffSmall: glasses1_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     glasses2: {
       image: glasses2_512x512,
@@ -253,7 +253,7 @@ export default function GlassesButton({
       imageThreeDimOff: glasses2_512x512,
       imageThreeDimOffSmall: glasses2_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     glasses3: {
       image: glasses3_512x512,
@@ -265,7 +265,7 @@ export default function GlassesButton({
       imageThreeDimOff: glasses3_512x512,
       imageThreeDimOffSmall: glasses3_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     glasses4: {
       image: glasses4_512x512,
@@ -277,7 +277,7 @@ export default function GlassesButton({
       imageThreeDimOff: glasses4_512x512,
       imageThreeDimOffSmall: glasses4_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     glasses5: {
       image: glasses5_512x512,
@@ -289,7 +289,7 @@ export default function GlassesButton({
       imageThreeDimOff: glasses5_512x512,
       imageThreeDimOffSmall: glasses5_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     glasses6: {
       image: glasses6_512x512,
@@ -301,7 +301,7 @@ export default function GlassesButton({
       imageThreeDimOff: glasses6_512x512,
       imageThreeDimOffSmall: glasses6_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     memeGlasses: {
       image: memeGlasses_512x512,
@@ -323,7 +323,7 @@ export default function GlassesButton({
       imageThreeDimOff: militaryTacticalGlasses_512x512,
       imageThreeDimOffSmall: militaryTacticalGlasses_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     shades: {
       image: shades_512x512,
@@ -345,7 +345,7 @@ export default function GlassesButton({
       imageThreeDimOff: steampunkGlasses_512x512,
       imageThreeDimOffSmall: steampunkGlasses_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     threeDGlasses: {
       image: threeDGlasses_512x512,
@@ -367,7 +367,7 @@ export default function GlassesButton({
       imageThreeDimOff: toyGlasses_512x512,
       imageThreeDimOffSmall: toyGlasses_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     VRGlasses: {
       image: VRGlasses_512x512,
@@ -379,7 +379,7 @@ export default function GlassesButton({
       imageThreeDimOff: VRGlasses_512x512,
       imageThreeDimOffSmall: VRGlasses_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
   };
 
