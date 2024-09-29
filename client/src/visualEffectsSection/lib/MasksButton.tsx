@@ -14,10 +14,10 @@ import {
 
 import baseMask from "../../../public/2DAssets/masks/baseMask/baseMask.png";
 import loading_baseMask from "../../../public/2DAssets/masks/baseMask/loading_baseMask.png";
-import baseMaskIcon from "../../../public/svgs/masks/baseMaskIcon.svg";
-import baseMaskOffIcon from "../../../public/svgs/masks/baseMaskOffIcon.svg";
-import threeDim_baseMaskIcon from "../../../public/svgs/masks/threeDim_baseMaskIcon.svg";
-import threeDim_baseMaskOffIcon from "../../../public/svgs/masks/threeDim_baseMaskOffIcon.svg";
+import baseMaskIcon from "../../../public/svgs/masks/baseMask/baseMaskIcon.svg";
+import baseMaskOffIcon from "../../../public/svgs/masks/baseMask/baseMaskOffIcon.svg";
+import threeDim_baseMaskIcon from "../../../public/svgs/masks/baseMask/threeDim_baseMaskIcon.svg";
+import threeDim_baseMaskOffIcon from "../../../public/svgs/masks/baseMask/threeDim_baseMaskOffIcon.svg";
 
 export default function MasksButton({
   username,

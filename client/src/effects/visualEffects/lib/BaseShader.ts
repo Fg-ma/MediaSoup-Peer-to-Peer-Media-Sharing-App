@@ -10,7 +10,7 @@ import baseVertexShaderSource from "./baseVertexShader";
 import Atlas from "./Atlas";
 import videoPaused from "../../../../public/2DAssets/videoPaused.png";
 import videoPausedFlipped from "../../../../public/2DAssets/videoPausedFlipped.png";
-import { threeDData } from "../../../lib/CameraMedia";
+import { assetData } from "../../../lib/CameraMedia";
 import {
   BeardsEffectTypes,
   GlassesEffectTypes,
@@ -887,10 +887,10 @@ class BaseShader {
     }
 
     // Load mesh if it has already been load and return if no mesh url is found
-    if (threeDData.meshes[meshType]) {
-      if (!threeDData.meshes[meshType].data) {
-        threeDData.meshes[meshType].data = await this.loadMeshJSON(
-          threeDData.meshes[meshType].url
+    if (assetData.meshes[meshType]) {
+      if (!assetData.meshes[meshType].data) {
+        assetData.meshes[meshType].data = await this.loadMeshJSON(
+          assetData.meshes[meshType].url
         );
       }
     } else {
@@ -921,7 +921,7 @@ class BaseShader {
       return;
     }
 
-    const meshData = threeDData.meshes[meshType].data;
+    const meshData = assetData.meshes[meshType].data;
 
     if (!meshData) {
       return;
@@ -1049,10 +1049,10 @@ class BaseShader {
     }
 
     // Load uv mesh data
-    if (threeDData.meshes[meshType]) {
-      if (!threeDData.meshes[meshType].data) {
-        threeDData.meshes[meshType].data = await this.loadMeshJSON(
-          threeDData.meshes[meshType].url
+    if (assetData.meshes[meshType]) {
+      if (!assetData.meshes[meshType].data) {
+        assetData.meshes[meshType].data = await this.loadMeshJSON(
+          assetData.meshes[meshType].url
         );
       }
     } else {
@@ -1088,7 +1088,7 @@ class BaseShader {
     // Get the triangles
     const { geometryTriangles, uvTriangles, normals } = this.getTriangles(
       liveLandmarks,
-      threeDData.meshes[meshType].data!.uv_faces
+      assetData.meshes[meshType].data!.uv_faces
     );
 
     let index = 0;

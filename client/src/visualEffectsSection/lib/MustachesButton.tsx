@@ -22,27 +22,27 @@ import loading_mustache3 from "../../../public/2DAssets/mustaches/mustache3/load
 import mustache4 from "../../../public/2DAssets/mustaches/mustache4/mustache4.png";
 import loading_mustache4 from "../../../public/2DAssets/mustaches/mustache4/loading_mustache4.png";
 import disguiseMustache from "../../../public/2DAssets/mustaches/disguiseMustache/disguiseMustache.png";
-import loading_disguiseMustache from "../../../public/2DAssets/mustaches/loading_disguiseMustache.png";
-import mustacheIcon1 from "../../../public/svgs/mustaches/mustacheIcon1.svg";
-import mustacheOffIcon1 from "../../../public/svgs/mustaches/mustacheOffIcon1.svg";
-import threeDim_mustacheIcon1 from "../../../public/svgs/mustaches/threeDim_mustacheIcon1.svg";
-import threeDim_mustacheOffIcon1 from "../../../public/svgs/mustaches/threeDim_mustacheOffIcon1.svg";
-import mustacheIcon2 from "../../../public/svgs/mustaches/mustacheIcon2.svg";
-import mustacheOffIcon2 from "../../../public/svgs/mustaches/mustacheOffIcon2.svg";
-import threeDim_mustacheIcon2 from "../../../public/svgs/mustaches/threeDim_mustacheIcon2.svg";
-import threeDim_mustacheOffIcon2 from "../../../public/svgs/mustaches/threeDim_mustacheOffIcon2.svg";
-import mustacheIcon3 from "../../../public/svgs/mustaches/mustacheIcon3.svg";
-import mustacheOffIcon3 from "../../../public/svgs/mustaches/mustacheOffIcon3.svg";
-import threeDim_mustacheIcon3 from "../../../public/svgs/mustaches/threeDim_mustacheIcon3.svg";
-import threeDim_mustacheOffIcon3 from "../../../public/svgs/mustaches/threeDim_mustacheOffIcon3.svg";
-import mustacheIcon4 from "../../../public/svgs/mustaches/mustacheIcon4.svg";
-import mustacheOffIcon4 from "../../../public/svgs/mustaches/mustacheOffIcon4.svg";
-import threeDim_mustacheIcon4 from "../../../public/svgs/mustaches/threeDim_mustacheIcon4.svg";
-import threeDim_mustacheOffIcon4 from "../../../public/svgs/mustaches/threeDim_mustacheOffIcon4.svg";
-import disguiseMustacheIcon from "../../../public/svgs/mustaches/disguiseMustacheIcon.svg";
-import disguiseMustacheOffIcon from "../../../public/svgs/mustaches/disguiseMustacheOffIcon.svg";
-import threeDim_disguiseMustacheIcon from "../../../public/svgs/mustaches/threeDim_disguiseMustacheIcon.svg";
-import threeDim_disguiseMustacheOffIcon from "../../../public/svgs/mustaches/threeDim_disguiseMustacheOffIcon.svg";
+import loading_disguiseMustache from "../../../public/2DAssets/mustaches/disguiseMustache/loading_disguiseMustache.png";
+import mustache1Icon from "../../../public/svgs/mustaches/mustache1/mustache1Icon.svg";
+import mustache1OffIcon from "../../../public/svgs/mustaches/mustache1/mustache1OffIcon.svg";
+import threeDim_mustache1Icon from "../../../public/svgs/mustaches/mustache1/threeDim_mustache1Icon.svg";
+import threeDim_mustache1OffIcon from "../../../public/svgs/mustaches/mustache1/threeDim_mustache1OffIcon.svg";
+import mustache2Icon from "../../../public/svgs/mustaches/mustache2/mustache2Icon.svg";
+import mustache2OffIcon from "../../../public/svgs/mustaches/mustache2/mustache2OffIcon.svg";
+import threeDim_mustache2Icon from "../../../public/svgs/mustaches/mustache2/threeDim_mustache2Icon.svg";
+import threeDim_mustache2OffIcon from "../../../public/svgs/mustaches/mustache2/threeDim_mustache2OffIcon.svg";
+import mustache3Icon from "../../../public/svgs/mustaches/mustache3/mustache3Icon.svg";
+import mustache3OffIcon from "../../../public/svgs/mustaches/mustache3/mustache3OffIcon.svg";
+import threeDim_mustache3Icon from "../../../public/svgs/mustaches/mustache3/threeDim_mustache3Icon.svg";
+import threeDim_mustache3OffIcon from "../../../public/svgs/mustaches/mustache3/threeDim_mustache3OffIcon.svg";
+import mustache4Icon from "../../../public/svgs/mustaches/mustache4/mustache4Icon.svg";
+import mustache4OffIcon from "../../../public/svgs/mustaches/mustache4/mustache4OffIcon.svg";
+import threeDim_mustache4Icon from "../../../public/svgs/mustaches/mustache4/threeDim_mustache4Icon.svg";
+import threeDim_mustache4OffIcon from "../../../public/svgs/mustaches/mustache4/threeDim_mustache4OffIcon.svg";
+import disguiseMustacheIcon from "../../../public/svgs/mustaches/disguiseMustache/disguiseMustacheIcon.svg";
+import disguiseMustacheOffIcon from "../../../public/svgs/mustaches/disguiseMustache/disguiseMustacheOffIcon.svg";
+import threeDim_disguiseMustacheIcon from "../../../public/svgs/mustaches/disguiseMustache/threeDim_disguiseMustacheIcon.svg";
+import threeDim_disguiseMustacheOffIcon from "../../../public/svgs/mustaches/disguiseMustache/threeDim_disguiseMustacheOffIcon.svg";
 
 export default function MustachesButton({
   username,
@@ -95,40 +95,40 @@ export default function MustachesButton({
     mustache1: {
       image: mustache1,
       loading: loading_mustache1,
-      icon: mustacheIcon1,
-      offIcon: mustacheOffIcon1,
-      threeDimIcon: threeDim_mustacheIcon1,
-      threeDimOffIcon: threeDim_mustacheOffIcon1,
+      icon: mustache1Icon,
+      offIcon: mustache1OffIcon,
+      threeDimIcon: threeDim_mustache1Icon,
+      threeDimOffIcon: threeDim_mustache1OffIcon,
       flipped: false,
       bgColor: "white",
     },
     mustache2: {
       image: mustache2,
       loading: loading_mustache2,
-      icon: mustacheIcon2,
-      offIcon: mustacheOffIcon2,
-      threeDimIcon: threeDim_mustacheIcon2,
-      threeDimOffIcon: threeDim_mustacheOffIcon2,
+      icon: mustache2Icon,
+      offIcon: mustache2OffIcon,
+      threeDimIcon: threeDim_mustache2Icon,
+      threeDimOffIcon: threeDim_mustache2OffIcon,
       flipped: false,
       bgColor: "white",
     },
     mustache3: {
       image: mustache3,
       loading: loading_mustache3,
-      icon: mustacheIcon3,
-      offIcon: mustacheOffIcon3,
-      threeDimIcon: threeDim_mustacheIcon3,
-      threeDimOffIcon: threeDim_mustacheOffIcon3,
+      icon: mustache3Icon,
+      offIcon: mustache3OffIcon,
+      threeDimIcon: threeDim_mustache3Icon,
+      threeDimOffIcon: threeDim_mustache3OffIcon,
       flipped: false,
       bgColor: "white",
     },
     mustache4: {
       image: mustache4,
       loading: loading_mustache4,
-      icon: mustacheIcon4,
-      offIcon: mustacheOffIcon4,
-      threeDimIcon: threeDim_mustacheIcon4,
-      threeDimOffIcon: threeDim_mustacheOffIcon4,
+      icon: mustache4Icon,
+      offIcon: mustache4OffIcon,
+      threeDimIcon: threeDim_mustache4Icon,
+      threeDimOffIcon: threeDim_mustache4OffIcon,
       flipped: false,
       bgColor: "white",
     },

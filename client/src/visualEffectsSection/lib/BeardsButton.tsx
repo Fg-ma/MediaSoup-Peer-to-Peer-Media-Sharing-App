@@ -15,10 +15,10 @@ import {
 
 import classicalCurlyBeard from "../../../public/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard.png";
 import loading_classicalCurlyBeard from "../../../public/2DAssets/beards/classicalCurlyBeard/loading_classicalCurlyBeard.png";
-import classicalCurlyBeardIcon from "../../../public/svgs/beards/classicalCurlyBeardIcon.svg";
-import classicalCurlyBeardOffIcon from "../../../public/svgs/beards/classicalCurlyBeardOffIcon.svg";
-import threeDim_classicalCurlyBeardIcon from "../../../public/svgs/beards/threeDim_classicalCurlyBeardIcon.svg";
-import threeDim_classicalCurlyBeardOffIcon from "../../../public/svgs/beards/threeDim_classicalCurlyBeardOffIcon.svg";
+import classicalCurlyBeardIcon from "../../../public/svgs/beards/classicalCurlyBeard/classicalCurlyBeardIcon.svg";
+import classicalCurlyBeardOffIcon from "../../../public/svgs/beards/classicalCurlyBeard/classicalCurlyBeardOffIcon.svg";
+import threeDim_classicalCurlyBeardIcon from "../../../public/svgs/beards/classicalCurlyBeard/threeDim_classicalCurlyBeardIcon.svg";
+import threeDim_classicalCurlyBeardOffIcon from "../../../public/svgs/beards/classicalCurlyBeard/threeDim_classicalCurlyBeardOffIcon.svg";
 import chinBeard from "../../../public/2DAssets/beards/chinBeard/chinBeard.png";
 import loading_chinBeard from "../../../public/2DAssets/beards/chinBeard/loading_chinBeard.png";
 import chinBeardOff from "../../../public/2DAssets/beards/chinBeard/chinBeardOff.png";
@@ -97,6 +97,18 @@ export default function BeardsButton({
       loadingOffImage: loading_chinBeardOff,
       threeDimImage: threeDim_chinBeard,
       threeDimLoadingImage: threeDim_loading_chinBeard,
+      threeDimOffImage: threeDim_chinBeard,
+      threeDimLoadingOffImage: threeDim_loading_chinBeard,
+      flipped: false,
+      bgColor: "black",
+    },
+    fullBeard: {
+      image: fullBeard,
+      loading: loading_fullBeard,
+      offImage: fullBeardOff,
+      loadingOffImage: loading_fullBeardOff,
+      threeDimImage: threeDim_fullBeard,
+      threeDimLoadingImage: threeDim_loading_fullBeard,
       threeDimOffImage: threeDim_chinBeard,
       threeDimLoadingOffImage: threeDim_loading_chinBeard,
       flipped: false,

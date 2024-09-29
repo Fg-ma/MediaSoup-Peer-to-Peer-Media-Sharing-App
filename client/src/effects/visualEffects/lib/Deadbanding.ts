@@ -59,7 +59,7 @@ const deadbandingValues: DeadbandingValues = {
       headPitchAngles: 0.05,
       eyesWidths: 0.025,
     },
-    americaGlasses: {
+    AmericaGlasses: {
       headRotationAngles: 0.05,
       headYawAngles: 0.05,
       headPitchAngles: 0.05,
@@ -336,7 +336,7 @@ const deadbandingValues: DeadbandingValues = {
       headYawAngles: 0.05,
       headPitchAngles: 0.05,
     },
-    threeMask: {
+    threeFaceMask: {
       headRotationAngles: 0.05,
       headYawAngles: 0.05,
       headPitchAngles: 0.05,
@@ -640,12 +640,12 @@ class Deadbanding {
           this.currentEffectsStyles.current.camera[id][effectType].style;
 
         // @ts-ignore
-        for (const deadbanding in this.deadbandingValues[effectType][style]) {
+        for (const deadbanding in deadbandingValues[effectType][style]) {
           const deadbandingType = deadbanding as LandmarkTypes;
 
           const newDeadbandingValue =
             // @ts-ignore
-            this.deadbandingValues[effectType][style][deadbandingType];
+            deadbandingValues[effectType][style][deadbandingType];
 
           if (newDeadbandingValue) {
             const currentDeadbandingValue =
