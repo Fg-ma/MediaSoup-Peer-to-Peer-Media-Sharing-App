@@ -9,6 +9,7 @@ import {
   AudioEffectTypes,
 } from "../../../context/StreamsContext";
 import {
+  assetSizePositionMap,
   CameraEffectStylesType,
   EffectStylesType,
 } from "../../../context/CurrentEffectsStylesContext";
@@ -30,7 +31,6 @@ class Render {
     private baseShader: BaseShader,
     private faceLandmarks: FaceLandmarks | undefined,
     private video: HTMLVideoElement,
-    private canvas: HTMLCanvasElement,
     private animationFrameId: number[],
     private effects: {
       [effectType in
@@ -95,17 +95,15 @@ class Render {
   private drawGlasses = async (
     faceId: string,
     effectsStyles: CameraEffectStylesType,
-    calculatedLandmarks: CalculatedLandmarkInterface,
-    landmarks: NormalizedLandmarkList
+    calculatedLandmarks: CalculatedLandmarkInterface
   ) => {
     if (!this.faceLandmarks || !effectsStyles.glasses) {
       return;
     }
 
-    if (!effectsStyles.glasses.threeDim) {
-      const eyesCenterPosition =
-        calculatedLandmarks.eyesCenterPositions[faceId];
+    const eyesCenterPosition = calculatedLandmarks.eyesCenterPositions[faceId];
 
+    if (!effectsStyles.glasses.threeDim) {
       this.baseShader.drawEffect(
         effectsStyles.glasses.style,
         {
@@ -116,16 +114,16 @@ class Render {
           x: 0,
           y: 0,
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.glasses[
+            this.currentEffectsStyles.current.camera[this.id].glasses.style
+          ].twoDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
       );
     } else {
       if (effectsStyles.glasses) {
-        const eyesCenterPosition =
-          calculatedLandmarks.eyesCenterPositions[faceId];
-
         await this.baseShader.drawMesh(
           effectsStyles.glasses.style,
           {
@@ -136,7 +134,10 @@ class Render {
             x: 0,
             y: 0,
           },
-          calculatedLandmarks.eyesWidths[faceId],
+          calculatedLandmarks.interocularDistances[faceId] *
+            assetSizePositionMap.glasses[
+              this.currentEffectsStyles.current.camera[this.id].glasses.style
+            ].threeDimScale,
           calculatedLandmarks.headRotationAngles[faceId],
           calculatedLandmarks.headYawAngles[faceId],
           calculatedLandmarks.headPitchAngles[faceId]
@@ -155,20 +156,25 @@ class Render {
       return;
     }
 
+    const chinPosition = landmarks[this.faceLandmarks.JAW_MID_POINT_INDEX];
+
     if (!effectsStyles.beards.threeDim) {
       const twoDimBeardOffset = calculatedLandmarks.twoDimBeardOffsets[faceId];
 
       this.baseShader.drawEffect(
         effectsStyles.beards.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.JAW_MID_POINT_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.JAW_MID_POINT_INDEX].y + 1,
+          x: 2 * chinPosition.x - 1,
+          y: -2 * chinPosition.y + 1,
         },
         {
           x: twoDimBeardOffset[0],
           y: twoDimBeardOffset[1],
         },
-        calculatedLandmarks.chinWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.beards[
+            this.currentEffectsStyles.current.camera[this.id].beards.style
+          ].twoDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
@@ -180,14 +186,17 @@ class Render {
         await this.baseShader.drawMesh(
           effectsStyles.beards.style,
           {
-            x: 2 * landmarks[this.faceLandmarks.JAW_MID_POINT_INDEX].x - 1,
-            y: -2 * landmarks[this.faceLandmarks.JAW_MID_POINT_INDEX].y + 1,
+            x: 2 * chinPosition.x - 1,
+            y: -2 * chinPosition.y + 1,
           },
           {
             x: threeDimBeardOffset[0],
             y: threeDimBeardOffset[1],
           },
-          0.7,
+          calculatedLandmarks.interocularDistances[faceId] *
+            assetSizePositionMap.beards[
+              this.currentEffectsStyles.current.camera[this.id].beards.style
+            ].threeDimScale,
           calculatedLandmarks.headRotationAngles[faceId],
           calculatedLandmarks.headYawAngles[faceId],
           calculatedLandmarks.headPitchAngles[faceId]
@@ -206,6 +215,8 @@ class Render {
       return;
     }
 
+    const nosePosition = landmarks[this.faceLandmarks.NOSE_INDEX];
+
     if (!effectsStyles.mustaches.threeDim) {
       const twoDimMustacheOffset =
         calculatedLandmarks.twoDimMustacheOffsets[faceId];
@@ -213,14 +224,17 @@ class Render {
       this.baseShader.drawEffect(
         effectsStyles.mustaches.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.NOSE_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.NOSE_INDEX].y + 1,
+          x: 2 * nosePosition.x - 1,
+          y: -2 * nosePosition.y + 1,
         },
         {
           x: twoDimMustacheOffset[0],
           y: twoDimMustacheOffset[1],
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.mustaches[
+            this.currentEffectsStyles.current.camera[this.id].mustaches.style
+          ].twoDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
@@ -232,14 +246,17 @@ class Render {
       await this.baseShader.drawMesh(
         effectsStyles.mustaches.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.NOSE_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.NOSE_INDEX].y + 1,
+          x: 2 * nosePosition.x - 1,
+          y: -2 * nosePosition.y + 1,
         },
         {
           x: threeDimMustacheOffset[0],
           y: threeDimMustacheOffset[1],
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.mustaches[
+            this.currentEffectsStyles.current.camera[this.id].mustaches.style
+          ].threeDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
@@ -257,6 +274,8 @@ class Render {
       return;
     }
 
+    const nosePosition = landmarks[this.faceLandmarks.NOSE_INDEX];
+
     if (effectsStyles.masks.style === "baseMask") {
       await this.baseShader.drawFaceMesh("baseMask", landmarks.slice(0, -10));
       return;
@@ -266,33 +285,36 @@ class Render {
       this.baseShader.drawEffect(
         effectsStyles.masks.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.NOSE_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.NOSE_INDEX].y + 1,
+          x: 2 * nosePosition.x - 1,
+          y: -2 * nosePosition.y + 1,
         },
         {
           x: 0,
           y: 0,
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.masks[
+            this.currentEffectsStyles.current.camera[this.id].masks.style
+          ].twoDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
       );
     } else {
-      const threeDimMustacheOffset =
-        calculatedLandmarks.threeDimMustacheOffsets[faceId];
-
       await this.baseShader.drawMesh(
         effectsStyles.masks.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.NOSE_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.NOSE_INDEX].y + 1,
+          x: 2 * nosePosition.x - 1,
+          y: -2 * nosePosition.y + 1,
         },
         {
           x: 0,
           y: 0,
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.masks[
+            this.currentEffectsStyles.current.camera[this.id].masks.style
+          ].threeDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
@@ -310,37 +332,42 @@ class Render {
       return;
     }
 
+    const foreheadPosition = landmarks[this.faceLandmarks.FOREHEAD_INDEX];
+
     if (!effectsStyles.hats.threeDim) {
       this.baseShader.drawEffect(
         effectsStyles.hats.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.FOREHEAD_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.FOREHEAD_INDEX].y + 1,
+          x: 2 * foreheadPosition.x - 1,
+          y: -2 * foreheadPosition.y + 1,
         },
         {
           x: 0,
           y: 0,
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.hats[
+            this.currentEffectsStyles.current.camera[this.id].hats.style
+          ].twoDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
       );
     } else {
-      const threeDimMustacheOffset =
-        calculatedLandmarks.threeDimMustacheOffsets[faceId];
-
       await this.baseShader.drawMesh(
         effectsStyles.hats.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.FOREHEAD_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.FOREHEAD_INDEX].y + 1,
+          x: 2 * foreheadPosition.x - 1,
+          y: -2 * foreheadPosition.y + 1,
         },
         {
           x: 0,
           y: 0,
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.hats[
+            this.currentEffectsStyles.current.camera[this.id].hats.style
+          ].threeDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
@@ -358,40 +385,42 @@ class Render {
       return;
     }
 
-    if (!effectsStyles.pets.threeDim) {
-      const twoDimMustacheOffset =
-        calculatedLandmarks.twoDimMustacheOffsets[faceId];
+    const foreheadPosition = landmarks[this.faceLandmarks.FOREHEAD_INDEX];
 
+    if (!effectsStyles.pets.threeDim) {
       this.baseShader.drawEffect(
         effectsStyles.pets.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.FOREHEAD_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.FOREHEAD_INDEX].y + 1,
+          x: 2 * foreheadPosition.x - 1,
+          y: -2 * foreheadPosition.y + 1,
         },
         {
           x: 0,
           y: 0,
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.pets[
+            this.currentEffectsStyles.current.camera[this.id].pets.style
+          ].twoDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
       );
     } else {
-      const threeDimMustacheOffset =
-        calculatedLandmarks.threeDimMustacheOffsets[faceId];
-
       await this.baseShader.drawMesh(
         effectsStyles.pets.style,
         {
-          x: 2 * landmarks[this.faceLandmarks.FOREHEAD_INDEX].x - 1,
-          y: -2 * landmarks[this.faceLandmarks.FOREHEAD_INDEX].y + 1,
+          x: 2 * foreheadPosition.x - 1,
+          y: -2 * foreheadPosition.y + 1,
         },
         {
           x: 0,
           y: 0,
         },
-        calculatedLandmarks.eyesWidths[faceId],
+        calculatedLandmarks.interocularDistances[faceId] *
+          assetSizePositionMap.pets[
+            this.currentEffectsStyles.current.camera[this.id].pets.style
+          ].threeDimScale,
         calculatedLandmarks.headRotationAngles[faceId],
         calculatedLandmarks.headYawAngles[faceId],
         calculatedLandmarks.headPitchAngles[faceId]
@@ -458,12 +487,7 @@ class Render {
       const effectsStyles = this.currentEffectsStyles.current.camera[this.id];
 
       if (this.effects.glasses && effectsStyles.glasses) {
-        await this.drawGlasses(
-          faceId,
-          effectsStyles,
-          calculatedLandmarks,
-          landmarks
-        );
+        await this.drawGlasses(faceId, effectsStyles, calculatedLandmarks);
       }
 
       if (this.effects.beards && effectsStyles.beards) {

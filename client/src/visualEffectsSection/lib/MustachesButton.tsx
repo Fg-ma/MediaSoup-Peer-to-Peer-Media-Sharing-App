@@ -5,7 +5,7 @@ import FgImage from "../../fgImage/FgImage";
 import {
   useCurrentEffectsStylesContext,
   MustachesEffectTypes,
-  mustacheNoseOffsetsMap,
+  assetSizePositionMap,
 } from "../../context/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
@@ -285,8 +285,8 @@ export default function MustachesButton({
             if (currentEffectsStyles.current[type][videoId].mustaches) {
               currentEffectsStyles.current[type][videoId].mustaches.style =
                 effectType;
-              currentEffectsStyles.current[type][videoId].mustaches.noseOffset =
-                mustacheNoseOffsetsMap[effectType];
+              currentEffectsStyles.current[type][videoId].mustaches.transforms =
+                assetSizePositionMap.mustaches[effectType];
             }
           } else {
             if (
@@ -299,7 +299,8 @@ export default function MustachesButton({
               ].mustaches.style = effectType;
               remoteCurrentEffectsStyles.current[username][instance][type][
                 videoId
-              ].mustaches.noseOffset = mustacheNoseOffsetsMap[effectType];
+              ].mustaches.transforms =
+                assetSizePositionMap.mustaches[effectType];
             }
           }
 

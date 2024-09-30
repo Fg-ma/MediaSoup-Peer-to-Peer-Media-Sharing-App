@@ -108,7 +108,6 @@ class ScreenMedia {
       this.baseShader,
       undefined,
       this.video,
-      this.canvas,
       this.animationFrameId,
       this.effects,
       this.currentEffectsStyles,

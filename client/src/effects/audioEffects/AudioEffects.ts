@@ -92,6 +92,27 @@ class AudioEffects {
   private tremolo: Tone.Tremolo | undefined;
   private vibrato: Tone.Vibrato | undefined;
 
+  effects: AudioMixEffectsType[] = [
+    "autoFilter",
+    "autoPanner",
+    "autoWah",
+    "bitCrusher",
+    "chebyshev",
+    "chorus",
+    "distortion",
+    "EQ",
+    "feedbackDelay",
+    "freeverb",
+    "JCReverb",
+    "phaser",
+    "pingPongDelay",
+    "pitchShift",
+    "reverb",
+    "stereoWidener",
+    "tremolo",
+    "vibrato",
+  ];
+
   fgSampler: FgSampler;
 
   private effectUpdaters: {

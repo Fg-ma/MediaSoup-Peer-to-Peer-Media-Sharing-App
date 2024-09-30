@@ -3,6 +3,7 @@ import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
 import {
+  assetSizePositionMap,
   HatsEffectTypes,
   useCurrentEffectsStylesContext,
 } from "../../context/CurrentEffectsStylesContext";
@@ -472,6 +473,8 @@ export default function HatsButton({
             if (currentEffectsStyles.current[type][videoId].hats) {
               currentEffectsStyles.current[type][videoId].hats.style =
                 effectType;
+              currentEffectsStyles.current[type][videoId].hats.transforms =
+                assetSizePositionMap.hats[effectType];
             }
           } else {
             if (
@@ -482,6 +485,9 @@ export default function HatsButton({
               remoteCurrentEffectsStyles.current[username][instance][type][
                 videoId
               ].hats.style = effectType;
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].hats.transforms = assetSizePositionMap.hats[effectType];
             }
           }
 

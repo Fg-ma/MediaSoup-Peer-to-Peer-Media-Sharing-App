@@ -929,7 +929,7 @@ export const hatsDataURLs: AssetData = {
       url: "/3DAssets/hats/militaryHat/texs/militaryHat_diff_256x256.png",
     },
     rabbitEars: {
-      url: "/3DAssets/hats/rabbitEars/texs/rabbitEars_diff_256x256.png",
+      url: "/3DAssets/hats/rabbitEars/texs/rabbitEars_diff_128x128.png",
     },
     roundEarsHat: {
       url: "/3DAssets/hats/roundEarsHat/texs/roundEarsHat_diff_256x256.png",
@@ -1493,7 +1493,6 @@ class CameraMedia {
       this.baseShader,
       this.faceLandmarks,
       this.video,
-      this.canvas,
       this.animationFrameId,
       this.effects,
       this.currentEffectsStyles,

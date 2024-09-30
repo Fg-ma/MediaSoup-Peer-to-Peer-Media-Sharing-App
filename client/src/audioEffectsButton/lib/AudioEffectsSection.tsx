@@ -701,7 +701,7 @@ export default function AudioEffectsSection({
   backgroundColor?: string;
   secondaryBackgroundColor?: string;
 }) {
-  const [rerender, setRerender] = useState(0);
+  const [rerender, setRerender] = useState(false);
   const [cols, setCols] = useState(3);
   const [volumeState, setVolumeState] = useState<{
     from: "off" | "low" | "high" | "";
@@ -743,10 +743,10 @@ export default function AudioEffectsSection({
   const handleMessage = (event: any) => {
     switch (event.type) {
       case "effectChangeRequested":
-        setRerender((prev) => prev + 1);
+        setRerender((prev) => !prev);
         break;
       case "clientEffectChanged":
-        setRerender((prev) => prev + 1);
+        setRerender((prev) => !prev);
         break;
       default:
         break;
@@ -762,6 +762,12 @@ export default function AudioEffectsSection({
     };
   }, []);
 
+  const audioEffectChange = async (effect: AudioEffectTypes) => {
+    await handleAudioEffectChange(effect);
+
+    setRerender((prev) => !prev);
+  };
+  console.log();
   return (
     <>
       <FgPanel
@@ -896,7 +902,7 @@ export default function AudioEffectsSection({
                   audioEffect={effect[0] as AudioEffectTypes}
                   audioEffectTemplate={effect[1]}
                   scrollingContainerRef={audioSectionRef}
-                  handleAudioEffectChange={handleAudioEffectChange}
+                  handleAudioEffectChange={audioEffectChange}
                 />
               );
             })}

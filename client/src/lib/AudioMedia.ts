@@ -2,6 +2,7 @@ import * as Tone from "tone";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
+  defaultAudioStreamEffects,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import AudioEffects, {
@@ -108,7 +109,7 @@ class AudioMedia {
     );
   }
 
-  async openMic() {
+  openMic = async () => {
     await this.audioStream.open();
 
     // Fix this it is janky way of getting mic started
@@ -119,17 +120,23 @@ class AudioMedia {
       },
     ]);
     this.audioEffects.removeEffects(["reverb"]);
-  }
+  };
 
-  deconstructor() {
+  deconstructor = () => {
     this.audioStream.close();
-  }
+  };
 
-  async changeEffects(
+  changeEffects = (
     effect: AudioEffectTypes,
     blockStateChange: boolean = false
-  ) {
+  ) => {
     if (!blockStateChange) {
+      if (!this.userStreamEffects.current.audio[effect as AudioEffectTypes]) {
+        for (const oldEffect in this.userStreamEffects.current.audio) {
+          this.userStreamEffects.current.audio[oldEffect as AudioEffectTypes] =
+            false;
+        }
+      }
       this.userStreamEffects.current.audio[effect as AudioEffectTypes] =
         !this.userStreamEffects.current.audio[effect as AudioEffectTypes];
     }
@@ -143,13 +150,14 @@ class AudioMedia {
     }
 
     if (this.effects[effect]) {
+      this.removeMixEffects(this.audioEffects.effects);
       this.applyEffect(effect);
     } else {
       this.removeEffect(effect);
     }
-  }
+  };
 
-  applyEffect(effect: AudioEffectTypes) {
+  applyEffect = (effect: AudioEffectTypes) => {
     switch (effect) {
       case "robot":
         this.audioEffects?.updateEffects([
@@ -1173,9 +1181,9 @@ class AudioMedia {
       default:
         break;
     }
-  }
+  };
 
-  removeEffect(effect: AudioEffectTypes) {
+  removeEffect = (effect: AudioEffectTypes) => {
     switch (effect) {
       case "robot":
         this.audioEffects?.removeEffects([
@@ -1399,53 +1407,53 @@ class AudioMedia {
       default:
         break;
     }
-  }
+  };
 
-  mixEffects(
+  mixEffects = (
     effects: {
       type: AudioMixEffectsType;
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
-  ) {
+  ) => {
     this.audioEffects?.updateEffects(effects);
-  }
+  };
 
-  removeMixEffects(effects: AudioMixEffectsType[]) {
+  removeMixEffects = (effects: AudioMixEffectsType[]) => {
     this.audioEffects?.removeEffects(effects);
-  }
+  };
 
-  samplerEffectsChange(
+  samplerEffectsChange = (
     effects: {
       type: AudioMixEffectsType;
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
-  ) {
+  ) => {
     this.audioEffects?.fgSampler.updateEffects(effects);
-  }
+  };
 
-  removeSamplerEffects(effects: AudioMixEffectsType[]) {
+  removeSamplerEffects = (effects: AudioMixEffectsType[]) => {
     this.audioEffects?.fgSampler.removeEffects(effects);
-  }
+  };
 
-  playNote(note: string, isPress: boolean) {
+  playNote = (note: string, isPress: boolean) => {
     this.audioEffects.fgSampler.playNote(note, isPress);
-  }
+  };
 
-  swapSampler(
+  swapSampler = (
     sampler: { category: string; kind: string },
     increment?: number
-  ): FgSamplers {
+  ): FgSamplers => {
     return this.audioEffects.fgSampler.swapSampler(sampler, increment);
-  }
+  };
 
-  muteMic(isMuted: boolean) {
+  muteMic = (isMuted: boolean) => {
     this.audioEffects.setMicChainMute(isMuted);
-  }
+  };
 
   // Set volume (in decibels)
-  setSamplerVolume(volume: number) {
+  setSamplerVolume = (volume: number) => {
     this.audioEffects.fgSampler.setVolume(volume);
-  }
+  };
 
   startMetronome = () => {
     return this.audioEffects.fgSampler.fgMetronome.startMetronome();
@@ -1463,29 +1471,29 @@ class AudioMedia {
     this.audioEffects.fgSampler.fgMetronome.setMetronomeVolume(volume);
   };
 
-  getStream() {
+  getStream = () => {
     return this.mediaStream;
-  }
+  };
 
-  getTracks() {
+  getTracks = () => {
     return this.mediaStream.getAudioTracks();
-  }
+  };
 
-  getMasterTrack() {
+  getMasterTrack = () => {
     return this.masterMediaStreamDestination.stream.getAudioTracks()[0];
-  }
+  };
 
-  getMasterStream() {
+  getMasterStream = () => {
     return this.masterMediaStream;
-  }
+  };
 
-  getMicTrack() {
+  getMicTrack = () => {
     return this.micMediaStreamDestination.stream.getAudioTracks()[0];
-  }
+  };
 
-  getSamplerTrack() {
+  getSamplerTrack = () => {
     return this.samplerMediaStreamDestination.stream.getAudioTracks()[0];
-  }
+  };
 }
 
 export default AudioMedia;

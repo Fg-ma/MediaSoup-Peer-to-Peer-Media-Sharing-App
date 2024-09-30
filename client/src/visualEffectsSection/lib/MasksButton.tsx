@@ -5,6 +5,7 @@ import FgImage from "../../fgImage/FgImage";
 import {
   useCurrentEffectsStylesContext,
   MasksEffectTypes,
+  assetSizePositionMap,
 } from "../../context/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
@@ -490,6 +491,8 @@ export default function MasksButton({
             if (currentEffectsStyles.current[type][videoId].masks) {
               currentEffectsStyles.current[type][videoId].masks.style =
                 effectType;
+              currentEffectsStyles.current[type][videoId].masks.transforms =
+                assetSizePositionMap.masks[effectType];
             }
           } else {
             if (
@@ -500,6 +503,9 @@ export default function MasksButton({
               remoteCurrentEffectsStyles.current[username][instance][type][
                 videoId
               ].masks.style = effectType;
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].masks.transforms = assetSizePositionMap.masks[effectType];
             }
           }
 

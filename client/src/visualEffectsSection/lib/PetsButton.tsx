@@ -3,6 +3,7 @@ import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
 import {
+  assetSizePositionMap,
   PetsEffectTypes,
   useCurrentEffectsStylesContext,
 } from "../../context/CurrentEffectsStylesContext";
@@ -546,6 +547,8 @@ export default function PetsButton({
             if (currentEffectsStyles.current[type][videoId].pets) {
               currentEffectsStyles.current[type][videoId].pets.style =
                 effectType;
+              currentEffectsStyles.current[type][videoId].pets.transforms =
+                assetSizePositionMap.pets[effectType];
             }
           } else {
             if (
@@ -556,6 +559,9 @@ export default function PetsButton({
               remoteCurrentEffectsStyles.current[username][instance][type][
                 videoId
               ].pets.style = effectType;
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].pets.transforms = assetSizePositionMap.pets[effectType];
             }
           }
 

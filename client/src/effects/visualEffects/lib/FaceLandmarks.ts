@@ -14,11 +14,7 @@ export type LandmarkTypes =
   | "headRotationAngles"
   | "headYawAngles"
   | "headPitchAngles"
-  | "interocularDistances"
-  | "leftEarWidths"
-  | "rightEarWidths"
-  | "eyesWidths"
-  | "chinWidths";
+  | "interocularDistances";
 
 interface OneDimensionalLandmarks {
   [id: string]: number;
@@ -34,10 +30,6 @@ export interface CalculatedLandmarkInterface {
   headPitchAngles: OneDimensionalLandmarks;
   interocularDistances: OneDimensionalLandmarks;
   eyesCenterPositions: TwoDimensionalLandmarks;
-  leftEarWidths: OneDimensionalLandmarks;
-  rightEarWidths: OneDimensionalLandmarks;
-  eyesWidths: OneDimensionalLandmarks;
-  chinWidths: OneDimensionalLandmarks;
   twoDimBeardOffsets: TwoDimensionalLandmarks;
   twoDimMustacheOffsets: TwoDimensionalLandmarks;
   threeDimBeardOffsets: TwoDimensionalLandmarks;
@@ -60,11 +52,6 @@ class FaceLandmarks {
     interocularDistances: {},
 
     eyesCenterPositions: {},
-
-    leftEarWidths: {},
-    rightEarWidths: {},
-    eyesWidths: {},
-    chinWidths: {},
 
     twoDimBeardOffsets: {},
     twoDimMustacheOffsets: {},
@@ -94,10 +81,6 @@ class FaceLandmarks {
   private currentEffectsStyles;
 
   // Smoothing and deadbanding
-  private legacySmoothedLandmarks: {
-    [faceId: string]: NormalizedLandmarkList;
-  } = {};
-  private deadbandThreshold = 0.001;
   private minSmoothingFactor = 0.7;
   private maxSmoothingFactor = 0.3;
   private smoothingFactorThreshold = 0.001;
@@ -329,33 +312,12 @@ class FaceLandmarks {
       faceId,
       Math.sqrt(dxEyes * dxEyes + dyEyes * dyEyes)
     );
-
-    // Set eye widths
-    // Calculate eyes width based on interocular distance
-    this.updateSmoothVariables(
-      "eyesWidths",
-      faceId,
-      this.calculatedLandmarks.interocularDistances[faceId]
-    );
   };
 
   private updateChin = (
     faceId: string,
-    effectsStyles: CameraEffectStylesType,
-    leftJawPoint: NormalizedLandmark,
-    rightJawPoint: NormalizedLandmark
+    effectsStyles: CameraEffectStylesType
   ) => {
-    // Set chin widths calculate chin width based on jawline points
-    const chinWidthFactor = 0.8;
-    const dxJaw = rightJawPoint.x - leftJawPoint.x;
-    const dyJaw = rightJawPoint.y - leftJawPoint.y;
-
-    this.updateSmoothVariables(
-      "chinWidths",
-      faceId,
-      Math.sqrt(dxJaw * dxJaw + dyJaw * dyJaw) * chinWidthFactor
-    );
-
     // Calculate the shift distance for the chin position taking into account
     // headAngle for direction of shift
     if (!effectsStyles || !effectsStyles.beards) {
@@ -364,7 +326,7 @@ class FaceLandmarks {
 
     const { shiftX: twoDimBeardShiftX, shiftY: twoDimBeardShiftY } =
       this.directionalShift(
-        effectsStyles.beards!.chinOffset.twoDim,
+        effectsStyles.beards.transforms.twoDimOffset,
         this.calculatedLandmarks.headRotationAngles[faceId]
       );
     this.calculatedLandmarks.twoDimBeardOffsets[faceId] = [
@@ -374,7 +336,7 @@ class FaceLandmarks {
 
     const { shiftX: threeDimBeardShiftX, shiftY: threeDimBeardShiftY } =
       this.directionalShift(
-        effectsStyles.beards!.chinOffset.threeDim,
+        effectsStyles.beards.transforms.threeDimOffset,
         this.calculatedLandmarks.headRotationAngles[faceId]
       );
     this.calculatedLandmarks.threeDimBeardOffsets[faceId] = [
@@ -395,7 +357,7 @@ class FaceLandmarks {
 
     const { shiftX: twoDimNoseShiftX, shiftY: twoDimNoseShiftY } =
       this.directionalShift(
-        effectsStyles.mustaches!.noseOffset.twoDim,
+        effectsStyles.mustaches!.transforms.twoDimOffset,
         this.calculatedLandmarks.headRotationAngles[faceId]
       );
     this.calculatedLandmarks.twoDimMustacheOffsets[faceId] = [
@@ -405,7 +367,7 @@ class FaceLandmarks {
 
     const { shiftX: threeDimNoseShiftX, shiftY: threeDimNoseShiftY } =
       this.directionalShift(
-        effectsStyles.mustaches!.noseOffset.threeDim,
+        effectsStyles.mustaches!.transforms.threeDimOffset,
         this.calculatedLandmarks.headRotationAngles[faceId]
       );
     this.calculatedLandmarks.threeDimMustacheOffsets[faceId] = [
@@ -422,8 +384,6 @@ class FaceLandmarks {
 
       const leftEye = landmarks[this.LEFT_EYE_INDEX];
       const rightEye = landmarks[this.RIGHT_EYE_INDEX];
-      const leftJawPoint = landmarks[this.LEFT_JAW_INDEX];
-      const rightJawPoint = landmarks[this.RIGHT_JAW_INDEX];
       const noseBridge = landmarks[this.NOSE_BRIDGE_INDEX];
       const leftNoseBase = landmarks[this.LEFT_NOSE_BASE_INDEX];
       const rightNoseBase = landmarks[this.RIGHT_NOSE_BASE_INDEX];
@@ -439,7 +399,7 @@ class FaceLandmarks {
 
       this.updateEyes(faceId, rightEye, leftEye, dxEyes, dyEyes);
 
-      this.updateChin(faceId, effectsStyles, leftJawPoint, rightJawPoint);
+      this.updateChin(faceId, effectsStyles);
 
       this.updateNose(faceId, effectsStyles);
     });

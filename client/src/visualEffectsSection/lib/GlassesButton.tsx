@@ -5,6 +5,7 @@ import FgImage from "../../fgImage/FgImage";
 import {
   useCurrentEffectsStylesContext,
   GlassesEffectTypes,
+  assetSizePositionMap,
 } from "../../context/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
@@ -410,6 +411,8 @@ export default function GlassesButton({
             if (currentEffectsStyles.current[type][videoId].glasses) {
               currentEffectsStyles.current[type][videoId].glasses.style =
                 effectType;
+              currentEffectsStyles.current[type][videoId].glasses.transforms =
+                assetSizePositionMap.glasses[effectType];
             }
           } else {
             if (
@@ -420,6 +423,9 @@ export default function GlassesButton({
               remoteCurrentEffectsStyles.current[username][instance][type][
                 videoId
               ].glasses.style = effectType;
+              remoteCurrentEffectsStyles.current[username][instance][type][
+                videoId
+              ].glasses.transforms = assetSizePositionMap.glasses[effectType];
             }
           }
 

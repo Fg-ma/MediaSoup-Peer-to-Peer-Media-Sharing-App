@@ -5,7 +5,7 @@ import FgImage from "../../fgImage/FgImage";
 import {
   useCurrentEffectsStylesContext,
   BeardsEffectTypes,
-  beardChinOffsetsMap,
+  assetSizePositionMap,
 } from "../../context/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
@@ -149,8 +149,8 @@ export default function BeardsButton({
             if (currentEffectsStyles.current[type][videoId].beards) {
               currentEffectsStyles.current[type][videoId].beards.style =
                 effectType;
-              currentEffectsStyles.current[type][videoId].beards.chinOffset =
-                beardChinOffsetsMap[effectType];
+              currentEffectsStyles.current[type][videoId].beards.transforms =
+                assetSizePositionMap.beards[effectType];
             }
           } else {
             if (
@@ -163,7 +163,7 @@ export default function BeardsButton({
               ].beards.style = effectType;
               remoteCurrentEffectsStyles.current[username][instance][type][
                 videoId
-              ].beards.chinOffset = beardChinOffsetsMap[effectType];
+              ].beards.transforms = assetSizePositionMap.beards[effectType];
             }
           }
 
