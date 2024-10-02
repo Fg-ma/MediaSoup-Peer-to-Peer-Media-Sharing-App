@@ -1086,7 +1086,7 @@ export const petsDataURLs: AssetData = {
       url: "/2DAssets/pets/babyDragon/babyDragon_512x512.png",
     },
     beardedDragon: {
-      url: "/2DAssets/pets/babyDragon/babyDragon_512x512.png",
+      url: "/2DAssets/pets/beardedDragon/beardedDragon_512x512.png",
     },
     bird1: { url: "/2DAssets/pets/bird1/bird1_512x512.png" },
     bird2: { url: "/2DAssets/pets/bird2/bird2_512x512.png" },
@@ -1395,6 +1395,7 @@ class CameraMedia {
 
   private faceMeshResults: Results[];
   private faceMesh: FaceMesh;
+  private faceCounter: FaceMesh;
 
   private effects: {
     [cameraEffect in CameraEffectTypes]?: boolean;
@@ -1474,14 +1475,37 @@ class CameraMedia {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       },
     });
+
+    let maxNumFaces = 1;
     this.faceMesh.setOptions({
-      maxNumFaces: 2,
+      maxNumFaces: maxNumFaces,
       refineLandmarks: true,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
+
     this.faceMesh.onResults((results) => {
       this.faceMeshResults[0] = results;
+    });
+
+    this.faceCounter = new FaceMesh({
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+      },
+    });
+    this.faceCounter.setOptions({
+      maxNumFaces: 10,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    this.faceCounter.onResults((results) => {
+      if (maxNumFaces !== results.multiFaceLandmarks.length) {
+        maxNumFaces = results.multiFaceLandmarks.length;
+        this.faceMesh.setOptions({
+          maxNumFaces: results.multiFaceLandmarks.length,
+        });
+      }
     });
 
     // Start video and render loop
@@ -1498,6 +1522,7 @@ class CameraMedia {
       this.currentEffectsStyles,
       this.faceMesh,
       this.faceMeshResults,
+      this.faceCounter,
       this.userDevice,
       false
     );

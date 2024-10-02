@@ -690,7 +690,7 @@ export default function AudioEffectsSection({
   username: string;
   instance: string;
   isUser: boolean;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   placement: "above" | "below" | "left" | "right";
   referenceElement: React.RefObject<HTMLElement>;
   padding: number;

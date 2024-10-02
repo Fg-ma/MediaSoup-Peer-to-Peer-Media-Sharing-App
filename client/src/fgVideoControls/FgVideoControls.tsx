@@ -150,7 +150,7 @@ export default function FgVideoControls({
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMuteCallback: (() => void) | undefined;
   handleVolumeSliderCallback: (
     event: React.ChangeEvent<HTMLInputElement>

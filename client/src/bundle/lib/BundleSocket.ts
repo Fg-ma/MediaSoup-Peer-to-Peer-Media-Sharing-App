@@ -94,7 +94,7 @@ class BundleSocket {
     React.SetStateAction<boolean>
   >;
   private setAcceptsAudioEffects: React.Dispatch<React.SetStateAction<boolean>>;
-  private handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  private handleAudioEffectChange: (effect: AudioEffectTypes) => void;
 
   private onNewConsumerWasCreatedCallback?: () => void;
 
@@ -175,7 +175,7 @@ class BundleSocket {
     setAcceptsCameraEffects: React.Dispatch<React.SetStateAction<boolean>>,
     setAcceptsScreenEffects: React.Dispatch<React.SetStateAction<boolean>>,
     setAcceptsAudioEffects: React.Dispatch<React.SetStateAction<boolean>>,
-    handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>,
+    handleAudioEffectChange: (effect: AudioEffectTypes) => void,
     onNewConsumerWasCreatedCallback?: () => any
   ) {
     this.isUser = isUser;

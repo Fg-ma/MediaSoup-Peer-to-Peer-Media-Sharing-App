@@ -32,7 +32,7 @@ export default function AudioEffectsButton({
   username: string;
   instance: string;
   isUser: boolean;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
   videoContainerRef?: React.RefObject<HTMLDivElement>;

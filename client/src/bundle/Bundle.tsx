@@ -99,9 +99,9 @@ export default function Bundle({
     bundleOptions.acceptsAudioEffects
   );
 
-  const handleAudioEffectChange = async (effect: AudioEffectTypes) => {
+  const handleAudioEffectChange = (effect: AudioEffectTypes) => {
     if (bundleOptions.isUser) {
-      await userMedia.current.audio?.changeEffects(effect, false);
+      userMedia.current.audio?.changeEffects(effect, false);
 
       if (acceptsAudioEffects) {
         const msg = {

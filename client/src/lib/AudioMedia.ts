@@ -130,12 +130,14 @@ class AudioMedia {
     effect: AudioEffectTypes,
     blockStateChange: boolean = false
   ) => {
+    // Clear all old effects
+    this.audioEffects.removeEffects(this.audioEffects.effects);
+
     if (!blockStateChange) {
-      if (!this.userStreamEffects.current.audio[effect as AudioEffectTypes]) {
-        for (const oldEffect in this.userStreamEffects.current.audio) {
+      for (const oldEffect in this.userStreamEffects.current.audio) {
+        if (oldEffect !== effect)
           this.userStreamEffects.current.audio[oldEffect as AudioEffectTypes] =
             false;
-        }
       }
       this.userStreamEffects.current.audio[effect as AudioEffectTypes] =
         !this.userStreamEffects.current.audio[effect as AudioEffectTypes];
@@ -150,10 +152,9 @@ class AudioMedia {
     }
 
     if (this.effects[effect]) {
-      this.removeMixEffects(this.audioEffects.effects);
-      this.applyEffect(effect);
-    } else {
-      this.removeEffect(effect);
+      setTimeout(() => {
+        this.applyEffect(effect);
+      }, 0);
     }
   };
 
@@ -1415,11 +1416,11 @@ class AudioMedia {
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
   ) => {
-    this.audioEffects?.updateEffects(effects);
+    this.audioEffects.updateEffects(effects);
   };
 
   removeMixEffects = (effects: AudioMixEffectsType[]) => {
-    this.audioEffects?.removeEffects(effects);
+    this.audioEffects.removeEffects(effects);
   };
 
   samplerEffectsChange = (
@@ -1428,11 +1429,11 @@ class AudioMedia {
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
   ) => {
-    this.audioEffects?.fgSampler.updateEffects(effects);
+    this.audioEffects.fgSampler.updateEffects(effects);
   };
 
   removeSamplerEffects = (effects: AudioMixEffectsType[]) => {
-    this.audioEffects?.fgSampler.removeEffects(effects);
+    this.audioEffects.fgSampler.removeEffects(effects);
   };
 
   playNote = (note: string, isPress: boolean) => {

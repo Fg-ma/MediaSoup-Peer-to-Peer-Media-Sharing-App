@@ -748,8 +748,8 @@ class BaseShader {
     this.switchTextureFlag(this.TWO_DIMENSIONAL_EFFECTS_BIT);
 
     // Get atlas attributes
-    const atlasSize = this.twoDimAtlas.getAtlasSize();
-    const atlasImagesSize = this.twoDimAtlas.getAtlasImagesSize();
+    const atlasSize = this.twoDimAtlas?.getAtlasSize();
+    const atlasImagesSize = this.twoDimAtlas?.getAtlasImagesSize();
     if (atlasSize === null) {
       return;
     }
@@ -901,8 +901,8 @@ class BaseShader {
     this.switchTextureFlag(this.MESH_BIT);
 
     // Get atlas attributes
-    const atlasSize = this.threeDimAtlas.getAtlasSize();
-    const atlasImagesSize = this.threeDimAtlas.getAtlasImagesSize();
+    const atlasSize = this.threeDimAtlas?.getAtlasSize();
+    const atlasImagesSize = this.threeDimAtlas?.getAtlasImagesSize();
     if (atlasSize === null) {
       return;
     }
@@ -1065,8 +1065,8 @@ class BaseShader {
     this.switchTextureFlag(this.MESH_BIT);
 
     // Get atlas attributes
-    const atlasSize = this.threeDimAtlas.getAtlasSize();
-    const atlasImagesSize = this.threeDimAtlas.getAtlasImagesSize();
+    const atlasSize = this.threeDimAtlas?.getAtlasSize();
+    const atlasImagesSize = this.threeDimAtlas?.getAtlasImagesSize();
     if (atlasSize === null) {
       return;
     }

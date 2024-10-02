@@ -25,19 +25,22 @@ export default function FgPortal({
   mouseType = "topRight",
   content,
   externalRef,
+  externalPortalRef,
   zValue = 51,
 }: {
   type: "above" | "below" | "mouse";
   mouseType?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
   content: React.ReactElement;
   externalRef?: React.RefObject<HTMLElement>;
+  externalPortalRef?: React.RefObject<HTMLDivElement>;
   zValue?: number;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
     top: number;
   } | null>(null);
-  const portalRef = useRef<HTMLDivElement>(null);
+  const internalPortalRef = useRef<HTMLDivElement>(null);
+  const portalRef = externalPortalRef ?? internalPortalRef;
   const mouseOffsets = {
     topLeft: { left: -8, top: -40 },
     topRight: { left: 12, top: -40 },

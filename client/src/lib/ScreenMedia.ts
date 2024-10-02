@@ -113,6 +113,7 @@ class ScreenMedia {
       this.currentEffectsStyles,
       undefined,
       undefined,
+      undefined,
       this.userDevice,
       false
     );

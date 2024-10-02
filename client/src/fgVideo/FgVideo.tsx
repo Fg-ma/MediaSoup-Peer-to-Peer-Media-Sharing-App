@@ -150,7 +150,7 @@ export default function FgVideo({
   localMute: React.MutableRefObject<boolean>;
   videoStyles?: React.CSSProperties;
   options?: FgVideoOptions;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMute: () => void;
   handleMuteCallback: (() => void) | undefined;
   handleVolumeSliderCallback: (

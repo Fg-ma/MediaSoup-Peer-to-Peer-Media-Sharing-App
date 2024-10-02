@@ -106,6 +106,7 @@ export default function MustachesButton({
     useCurrentEffectsStylesContext();
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
+  const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [rerender, setRerender] = useState(0);
 
   const streamEffects = isUser
@@ -258,63 +259,83 @@ export default function MustachesButton({
     },
   };
 
+  const clickFunction = async () => {
+    setEffectsDisabled(true);
+    setRerender((prev) => prev + 1);
+
+    await handleVisualEffectChange("mustaches");
+
+    setEffectsDisabled(false);
+  };
+
+  const holdFunction = async (event: React.MouseEvent<Element, MouseEvent>) => {
+    const target = event.target as HTMLElement;
+    if (!effectsStyles || !target || !target.dataset.visualEffectsButtonValue) {
+      return;
+    }
+
+    setEffectsDisabled(true);
+
+    const effectType = target.dataset
+      .visualEffectsButtonValue as MustachesEffectTypes;
+    if (
+      effectType in mustachesEffects &&
+      (effectsStyles.style !== effectType || !streamEffects)
+    ) {
+      if (isUser) {
+        if (currentEffectsStyles.current[type][videoId].mustaches) {
+          currentEffectsStyles.current[type][videoId].mustaches.style =
+            effectType;
+          currentEffectsStyles.current[type][videoId].mustaches.transforms =
+            assetSizePositionMap.mustaches[effectType];
+        }
+      } else {
+        if (
+          remoteCurrentEffectsStyles.current[username][instance][type][videoId]
+            .mustaches
+        ) {
+          remoteCurrentEffectsStyles.current[username][instance][type][
+            videoId
+          ].mustaches.style = effectType;
+          remoteCurrentEffectsStyles.current[username][instance][type][
+            videoId
+          ].mustaches.transforms = assetSizePositionMap.mustaches[effectType];
+        }
+      }
+
+      await handleVisualEffectChange(
+        "mustaches",
+        isUser
+          ? userStreamEffects.current[type][videoId].mustaches
+          : remoteStreamEffects.current[username][instance][type][videoId]
+              .mustaches
+      );
+    }
+
+    setEffectsDisabled(false);
+    setCloseHoldToggle(true);
+  };
+
+  const doubleClickFunction = async () => {
+    if (!effectsStyles) {
+      return;
+    }
+
+    setEffectsDisabled(true);
+
+    effectsStyles.threeDim = !effectsStyles.threeDim;
+
+    await handleVisualEffectChange("mustaches", streamEffects);
+
+    setRerender((prev) => prev + 1);
+
+    setEffectsDisabled(false);
+  };
+
   return (
     <FgButton
-      clickFunction={async () => {
-        setEffectsDisabled(true);
-        setRerender((prev) => prev + 1);
-
-        await handleVisualEffectChange("mustaches");
-
-        setEffectsDisabled(false);
-      }}
-      holdFunction={async (event: React.MouseEvent<Element, MouseEvent>) => {
-        const target = event.target as HTMLElement;
-        if (!effectsStyles || !target || !target.dataset.value) {
-          return;
-        }
-
-        setEffectsDisabled(true);
-
-        const effectType = target.dataset.value as MustachesEffectTypes;
-        if (
-          effectType in mustachesEffects &&
-          (effectsStyles.style !== effectType || !streamEffects)
-        ) {
-          if (isUser) {
-            if (currentEffectsStyles.current[type][videoId].mustaches) {
-              currentEffectsStyles.current[type][videoId].mustaches.style =
-                effectType;
-              currentEffectsStyles.current[type][videoId].mustaches.transforms =
-                assetSizePositionMap.mustaches[effectType];
-            }
-          } else {
-            if (
-              remoteCurrentEffectsStyles.current[username][instance][type][
-                videoId
-              ].mustaches
-            ) {
-              remoteCurrentEffectsStyles.current[username][instance][type][
-                videoId
-              ].mustaches.style = effectType;
-              remoteCurrentEffectsStyles.current[username][instance][type][
-                videoId
-              ].mustaches.transforms =
-                assetSizePositionMap.mustaches[effectType];
-            }
-          }
-
-          await handleVisualEffectChange(
-            "mustaches",
-            isUser
-              ? userStreamEffects.current[type][videoId].mustaches
-              : remoteStreamEffects.current[username][instance][type][videoId]
-                  .mustaches
-          );
-        }
-
-        setEffectsDisabled(false);
-      }}
+      clickFunction={clickFunction}
+      holdFunction={holdFunction}
       contentFunction={() => {
         if (!effectsStyles) {
           return;
@@ -340,7 +361,7 @@ export default function MustachesButton({
                   { key: "width", value: "95%" },
                   { key: "height", value: "95%" },
                 ]}
-                data-value={effectsStyles.style}
+                data-visual-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -374,29 +395,15 @@ export default function MustachesButton({
                 srcLoading={imageLoadingSrc}
                 alt={effectsStyles.style}
                 style={{ width: "90%", height: "90%" }}
-                data-value={effectsStyles.style}
+                data-visual-effects-button-value={effectsStyles.style}
               />
             );
           }
         }
       }}
-      doubleClickFunction={async () => {
-        if (!effectsStyles) {
-          return;
-        }
-
-        setEffectsDisabled(true);
-
-        effectsStyles.threeDim = !effectsStyles.threeDim;
-
-        await handleVisualEffectChange("mustaches", streamEffects);
-
-        setRerender((prev) => prev + 1);
-
-        setEffectsDisabled(false);
-      }}
+      doubleClickFunction={doubleClickFunction}
       holdContent={
-        <div className='mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
+        <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
           {Object.entries(mustachesEffects).map(([mustaches, effect]) => (
             <div
               key={mustaches}
@@ -405,14 +412,15 @@ export default function MustachesButton({
               } ${
                 effect.bgColor === "black" && "border-white"
               } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75 relative`}
-              data-value={mustaches}
+              onClick={holdFunction}
+              data-visual-effects-button-value={mustaches}
             >
               <FgImage
                 src={effect.image}
                 srcLoading={effect.imageSmall}
                 alt={mustaches}
                 style={{ width: "90%" }}
-                data-value={mustaches}
+                data-visual-effects-button-value={mustaches}
               />
             </div>
           ))}
@@ -423,11 +431,14 @@ export default function MustachesButton({
           Mustaches
         </div>
       }
+      closeHoldToggle={closeHoldToggle}
+      setCloseHoldToggle={setCloseHoldToggle}
       className='flex items-center justify-center min-w-10 w-10 aspect-square'
       options={{
         defaultDataValue: effectsStyles?.style,
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,
+        holdKind: "toggle",
       }}
     />
   );

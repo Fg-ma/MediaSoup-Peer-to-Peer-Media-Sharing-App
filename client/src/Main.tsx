@@ -490,8 +490,8 @@ export default function Main() {
     bundlesController.createConsumerBundle
   );
 
-  const handleExternalAudioEffectChange = async (effect: AudioEffectTypes) => {
-    await userMedia.current.audio?.changeEffects(effect, false);
+  const handleExternalAudioEffectChange = (effect: AudioEffectTypes) => {
+    userMedia.current.audio?.changeEffects(effect, false);
 
     if (acceptAudioEffects) {
       const msg = {

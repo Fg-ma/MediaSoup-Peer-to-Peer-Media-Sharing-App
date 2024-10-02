@@ -25,6 +25,11 @@ class Render {
 
   private finishedProcessingEffects = true;
 
+  private offscreenCanvas: HTMLCanvasElement;
+  private offscreenContext: CanvasRenderingContext2D | null;
+
+  private lastFaceCountCheck: number;
+
   constructor(
     private id: string,
     private gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -41,6 +46,7 @@ class Render {
     private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     private faceMesh: FaceMesh | undefined,
     private faceMeshResults: Results[] | undefined,
+    private faceCounter: FaceMesh | undefined,
     private userDevice: UserDevice,
     private flipVideo: boolean
   ) {
@@ -49,10 +55,15 @@ class Render {
     this.FACE_MESH_DETECTION_INTERVAL =
       this.userDevice.getFaceMeshDetectionInterval();
 
+    this.offscreenCanvas = document.createElement("canvas");
+    this.offscreenContext = this.offscreenCanvas.getContext("2d");
+
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.cullFace(this.gl.BACK);
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+
+    this.lastFaceCountCheck = performance.now();
   }
 
   private detectFaces = async () => {
@@ -63,7 +74,31 @@ class Render {
     frameCounter = 0;
 
     try {
-      if (this.faceMesh) await this.faceMesh.send({ image: this.video });
+      // Set the dimensions of the offscreen canvas to a lower resolution
+      const scaleFactor = 0.25; // Scale down to 25% of the original size
+      this.offscreenCanvas.width = this.video.videoWidth * scaleFactor;
+      this.offscreenCanvas.height = this.video.videoHeight * scaleFactor;
+
+      // Draw the video frame onto the offscreen canvas at the lower resolution
+      this.offscreenContext?.drawImage(
+        this.video,
+        0,
+        0,
+        this.offscreenCanvas.width,
+        this.offscreenCanvas.height
+      );
+
+      // Send the offscreen canvas to FaceMesh
+      if (this.faceMesh) {
+        await this.faceMesh.send({ image: this.offscreenCanvas });
+      }
+      if (
+        performance.now() - this.lastFaceCountCheck > 5000 &&
+        this.faceCounter
+      ) {
+        this.lastFaceCountCheck = performance.now();
+        await this.faceCounter.send({ image: this.offscreenCanvas });
+      }
     } catch (error) {
       console.error("Error sending video frame to faceMesh:", error);
       return;

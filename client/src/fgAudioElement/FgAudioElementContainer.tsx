@@ -28,7 +28,7 @@ export default function FgAudioElementContainer({
   name?: string;
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMute: () => void;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;

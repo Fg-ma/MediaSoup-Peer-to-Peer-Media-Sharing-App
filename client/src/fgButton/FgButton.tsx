@@ -1,4 +1,10 @@
-import React, { useState, useRef, Suspense } from "react";
+import React, {
+  useState,
+  useRef,
+  Suspense,
+  useEffect,
+  useCallback,
+} from "react";
 import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 
 const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));
@@ -11,6 +17,7 @@ interface FgButtonOptions {
   hoverZValue?: number;
   hoverType?: "above" | "below";
   holdType?: "above" | "below";
+  holdKind?: "disappear" | "toggle";
   disabled?: boolean;
 }
 
@@ -21,6 +28,7 @@ const defaultFgButtonOptions: {
   hoverTimeoutDuration: number;
   hoverType: "above" | "below";
   holdType: "above" | "below";
+  holdKind: "disappear" | "toggle";
   disabled: boolean;
 } = {
   defaultDataValue: undefined,
@@ -29,6 +37,7 @@ const defaultFgButtonOptions: {
   hoverTimeoutDuration: 50,
   hoverType: "above",
   holdType: "above",
+  holdKind: "disappear",
   disabled: false,
 };
 
@@ -46,6 +55,11 @@ export default function FgButton({
   blurFunction,
   holdContent,
   hoverContent,
+  toggleClickContent,
+  closeHoldToggle,
+  setCloseHoldToggle,
+  closeClickToggle,
+  setCloseClickToggle,
   className,
   style,
   options,
@@ -65,6 +79,11 @@ export default function FgButton({
   blurFunction?: (event: React.FocusEvent) => void;
   holdContent?: React.ReactElement;
   hoverContent?: React.ReactElement;
+  toggleClickContent?: React.ReactElement;
+  closeHoldToggle?: boolean;
+  setCloseHoldToggle?: React.Dispatch<React.SetStateAction<boolean>>;
+  closeClickToggle?: boolean;
+  setCloseClickToggle?: React.Dispatch<React.SetStateAction<boolean>>;
   className?: string;
   style?: React.CSSProperties;
   options?: FgButtonOptions;
@@ -88,12 +107,45 @@ export default function FgButton({
 
   const holdTimeout = useRef<NodeJS.Timeout>();
   const [isHeld, setIsHeld] = useState(false);
+  const [isHeldToggle, setIsHeldToggle] = useState(false);
   const isHeldRef = useRef(false);
+  const holdContentRef = useRef<HTMLDivElement>(null);
 
   const hoverTimeout = useRef<NodeJS.Timeout>();
   const [isHover, setIsHover] = useState(false);
 
+  const [isClickToggle, setIsClickToggle] = useState(false);
+  const toggleClickContentRef = useRef<HTMLDivElement>(null);
+
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Use useCallback to memoize the toggleHold function
+  const toggleHold = useCallback(
+    (event: MouseEvent) => {
+      if (
+        !holdContentRef.current ||
+        !holdContentRef.current.contains(event.target as Node)
+      ) {
+        window.removeEventListener("mousedown", toggleHold);
+        setIsHeldToggle(false);
+      }
+    },
+    [holdContentRef, setIsHeldToggle]
+  );
+
+  // Use useCallback to memoize the togglePopup function
+  const togglePopup = useCallback(
+    (event: MouseEvent) => {
+      if (
+        !toggleClickContentRef.current ||
+        !toggleClickContentRef.current.contains(event.target as Node)
+      ) {
+        window.removeEventListener("mouseup", togglePopup);
+        setIsClickToggle(false);
+      }
+    },
+    [toggleClickContentRef, setIsClickToggle]
+  );
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -112,12 +164,23 @@ export default function FgButton({
       holdTimeout.current = setTimeout(() => {
         isHeldRef.current = true;
         setIsHeld(true);
+        if (fgButtonOptions.holdKind === "toggle") {
+          setIsHeldToggle(true);
+          window.addEventListener("mousedown", toggleHold);
+        }
       }, fgButtonOptions.holdTimeoutDuration);
     }
   };
 
   const handleMouseUp = (event: MouseEvent) => {
     window.removeEventListener("mouseup", handleMouseUp);
+
+    if (toggleClickContent) {
+      if (!isClickToggle) {
+        window.addEventListener("mouseup", togglePopup);
+      }
+      setIsClickToggle((prev) => !prev);
+    }
 
     if (mouseUpFunction) {
       mouseUpFunction(event);
@@ -199,6 +262,22 @@ export default function FgButton({
     }
   };
 
+  useEffect(() => {
+    if (closeHoldToggle) {
+      window.removeEventListener("mousedown", toggleHold);
+      setIsHeldToggle(false);
+      if (setCloseHoldToggle) setCloseHoldToggle(false);
+    }
+  }, [closeHoldToggle]);
+
+  useEffect(() => {
+    if (closeClickToggle) {
+      window.removeEventListener("mouseup", togglePopup);
+      setIsClickToggle(false);
+      if (setCloseClickToggle) setCloseClickToggle(false);
+    }
+  }, [closeClickToggle]);
+
   const ButtonComponent = animationOptions ? motion.button : "button";
 
   return (
@@ -241,14 +320,30 @@ export default function FgButton({
           )}
         </AnimatePresence>
       )}
+      {toggleClickContent && (
+        <AnimatePresence>
+          {isClickToggle && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <FgPortal
+                type={fgButtonOptions.hoverType}
+                content={toggleClickContent}
+                externalRef={externalRef ? externalRef : buttonRef}
+                externalPortalRef={toggleClickContentRef}
+                zValue={fgButtonOptions.hoverZValue}
+              />
+            </Suspense>
+          )}
+        </AnimatePresence>
+      )}
       {holdFunction && holdContent && (
         <AnimatePresence>
-          {isHeld && (
+          {(isHeld || isHeldToggle) && (
             <Suspense fallback={<div>Loading...</div>}>
               <FgPortal
                 type={fgButtonOptions.holdType}
                 content={holdContent}
                 externalRef={externalRef ? externalRef : buttonRef}
+                externalPortalRef={holdContentRef}
                 zValue={9999999999}
               />
             </Suspense>
