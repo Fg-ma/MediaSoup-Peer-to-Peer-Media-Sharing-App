@@ -506,14 +506,8 @@ export const masksDataURLs: AssetData = {
   },
   spec: {},
   emiss: {
-    alienMask: {
-      url: "/3DAssets/masks/alienMask/texs/alienMask_emiss_256x256.png",
-    },
     cyberMask: {
       url: "/3DAssets/masks/cyberMask/texs/cyberMask_emiss_256x256.png",
-    },
-    zombieMask: {
-      url: "/3DAssets/masks/zombieMask/texs/zombieMask_emiss_256x256.png",
     },
   },
   trans: {},
@@ -1430,6 +1424,7 @@ class CameraMedia {
     this.baseShader.createAtlasTexture("metallicRoughness", {});
     this.baseShader.createAtlasTexture("specular", {});
     this.baseShader.createAtlasTexture("transmission", {});
+    this.baseShader.createAtlasTexture("emission", {});
 
     this.faceLandmarks = new FaceLandmarks(
       this.cameraId,
@@ -1823,6 +1818,51 @@ class CameraMedia {
       }
     }
 
+    const emissionUrls: { [key: string]: string } = {};
+
+    if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
+      const glassesURL = glassesDataURLs.emiss[glassesStyles.style]?.url;
+
+      if (glassesURL) {
+        emissionUrls[glassesStyles.style] = glassesURL;
+      }
+    }
+    if (beardStyles && beardStyles.threeDim && this.effects.beards) {
+      const beardURL = beardsDataURLs.emiss[beardStyles.style]?.url;
+
+      if (beardURL) {
+        emissionUrls[beardStyles.style] = beardURL;
+      }
+    }
+    if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
+      const mustacheURL = mustachesDataURLs.emiss[mustacheStyles.style]?.url;
+
+      if (mustacheURL) {
+        emissionUrls[mustacheStyles.style] = mustacheURL;
+      }
+    }
+    if (maskStyles && maskStyles.threeDim && this.effects.masks) {
+      const maskURL = masksDataURLs.emiss[maskStyles.style]?.url;
+
+      if (maskURL) {
+        emissionUrls[maskStyles.style] = maskURL;
+      }
+    }
+    if (hatStyles && hatStyles.threeDim && this.effects.hats) {
+      const hatURL = hatsDataURLs.emiss[hatStyles.style]?.url;
+
+      if (hatURL) {
+        emissionUrls[hatStyles.style] = hatURL;
+      }
+    }
+    if (petStyles && petStyles.threeDim && this.effects.pets) {
+      const petURL = petsDataURLs.emiss[petStyles.style]?.url;
+
+      if (petURL) {
+        emissionUrls[petStyles.style] = petURL;
+      }
+    }
+
     await this.baseShader.updateAtlasTexture("twoDim", twoDimUrls);
     await this.baseShader.updateAtlasTexture("threeDim", threeDimUrls);
     await this.baseShader.updateAtlasTexture("normal", normalUrls);
@@ -1832,6 +1872,7 @@ class CameraMedia {
     );
     await this.baseShader.updateAtlasTexture("specular", specularUrls);
     await this.baseShader.updateAtlasTexture("transmission", transmissionUrls);
+    await this.baseShader.updateAtlasTexture("emission", emissionUrls);
   }
 
   async changeEffects(

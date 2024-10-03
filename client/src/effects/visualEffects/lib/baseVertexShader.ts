@@ -10,12 +10,13 @@ const baseVertexShaderSource = `
   attribute vec2 a_metallicRoughnessTexCoord;
   attribute vec2 a_specularTexCoord;
   attribute vec2 a_transmissionTexCoord;
+  attribute vec2 a_emissionTexCoord;
 
   varying vec2 v_normalTexCoord;
   varying vec2 v_metallicRoughnessTexCoord;
   varying vec2 v_specularTexCoord;
   varying vec2 v_transmissionTexCoord;
-
+  varying vec2 v_emissionTexCoord;
 
   uniform mat4 u_modelMatrix;
   uniform mat4 u_viewMatrix;
@@ -33,6 +34,7 @@ const baseVertexShaderSource = `
     v_metallicRoughnessTexCoord = a_metallicRoughnessTexCoord; 
     v_specularTexCoord = a_specularTexCoord;
     v_transmissionTexCoord = a_transmissionTexCoord;
+    v_emissionTexCoord = a_emissionTexCoord;
   }
 `;
 
