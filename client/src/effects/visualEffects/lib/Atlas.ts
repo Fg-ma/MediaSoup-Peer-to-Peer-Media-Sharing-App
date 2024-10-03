@@ -211,6 +211,9 @@ class Atlas {
       this.gl.LINEAR
     );
 
+    // Enable pre-multiplied alpha
+    this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+
     let atlasSideLength = Math.ceil(Math.sqrt(textureCount));
     if (atlasSideLength === 1) {
       atlasSideLength = 2;
