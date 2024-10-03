@@ -50,12 +50,10 @@ export interface AssetData {
   image: AssetTexsData;
   diff: AssetTexsData;
   nor: AssetTexsData;
-  disp: AssetTexsData;
   metalRough: AssetTexsData;
   spec: AssetTexsData;
   emiss: AssetTexsData;
   trans: AssetTexsData;
-  occ: AssetTexsData;
   meshes: AssetMeshesData;
 }
 
@@ -138,7 +136,6 @@ export const mustachesDataURLs: AssetData = {
       url: "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_nor_256x256.png",
     },
   },
-  disp: {},
   metalRough: {
     fullMustache: {
       url: "/3DAssets/mustaches/fullMustache/texs/fullMustache_metalRough_256x256.png",
@@ -150,7 +147,6 @@ export const mustachesDataURLs: AssetData = {
   spec: {},
   emiss: {},
   trans: {},
-  occ: {},
   meshes: {
     disguiseMustache: {
       url: "/3DAssets/mustaches/disguiseMustache/disguiseMustache.json",
@@ -219,11 +215,6 @@ export const beardsDataURLs: AssetData = {
       url: "/3DAssets/beards/fullBeard/texs/fullBeard_nor_256x256.png",
     },
   },
-  disp: {
-    chinBeard: {
-      url: "/3DAssets/beards/chinBeard/texs/chinBeard_disp_256x256.png",
-    },
-  },
   metalRough: {
     chinBeard: {
       url: "/3DAssets/beards/chinBeard/texs/chinBeard_metalRough_256x256.png",
@@ -243,7 +234,6 @@ export const beardsDataURLs: AssetData = {
     },
   },
   trans: {},
-  occ: {},
   meshes: {
     chinBeard: { url: "/3DAssets/beards/chinBeard/chinBeard.json" },
     classicalCurlyBeard: {
@@ -452,7 +442,6 @@ export const masksDataURLs: AssetData = {
       url: "/3DAssets/masks/zombieMask/texs/zombieMask_nor_256x256.png",
     },
   },
-  disp: {},
   metalRough: {
     alienMask: {
       url: "/3DAssets/masks/alienMask/texs/alienMask_metalRough_256x256.png",
@@ -528,7 +517,6 @@ export const masksDataURLs: AssetData = {
     },
   },
   trans: {},
-  occ: {},
   meshes: {
     alienMask: {
       url: "/3DAssets/masks/alienMask/alienMask.json",
@@ -738,7 +726,6 @@ export const glassesDataURLs: AssetData = {
       url: "/3DAssets/glasses/toyGlasses/texs/toyGlasses_nor_256x256.png",
     },
   },
-  disp: {},
   metalRough: {
     aviatorGoggles: {
       url: "/3DAssets/glasses/aviatorGoggles/texs/aviatorGoggles_metalRough_256x256.png",
@@ -783,7 +770,6 @@ export const glassesDataURLs: AssetData = {
       url: "/3DAssets/glasses/glasses6/texs/glasses6_trans_256x256.png",
     },
   },
-  occ: {},
   meshes: {
     defaultGlasses: {
       url: "/3DAssets/glasses/defaultGlasses/defaultGlasses.json",
@@ -989,7 +975,6 @@ export const hatsDataURLs: AssetData = {
       url: "/3DAssets/hats/vikingHelmet/texs/vikingHelmet_nor_256x256.png",
     },
   },
-  disp: {},
   metalRough: {
     AsianConicalHat: {
       url: "/3DAssets/hats/AsianConicalHat/texs/AsianConicalHat_metalRough_256x256.png",
@@ -1038,7 +1023,6 @@ export const hatsDataURLs: AssetData = {
   },
   emiss: {},
   trans: {},
-  occ: {},
   meshes: {
     AsianConicalHat: {
       url: "/3DAssets/hats/AsianConicalHat/AsianConicalHat.json",
@@ -1141,7 +1125,7 @@ export const petsDataURLs: AssetData = {
       url: "/3DAssets/pets/babyDragon/texs/babyDragon_diff_256x256.png",
     },
     beardedDragon: {
-      url: "/3DAssets/pets/babyDragon/texs/babyDragon_diff_256x256.png",
+      url: "/3DAssets/pets/beardedDragon/texs/beardedDragon_diff_256x256.png",
     },
     bird1: { url: "/3DAssets/pets/bird1/texs/bird1_diff_256x256.png" },
     bird2: { url: "/3DAssets/pets/bird2/texs/bird2_diff_256x256.png" },
@@ -1206,7 +1190,6 @@ export const petsDataURLs: AssetData = {
     snail: { url: "/3DAssets/pets/snail/texs/snail_nor_256x256.png" },
     TRex: { url: "/3DAssets/pets/TRex/texs/TRex_nor_256x256.png" },
   },
-  disp: {},
   metalRough: {
     axolotl: {
       url: "/3DAssets/pets/axolotl/texs/axolotl_metalRough_256x256.png",
@@ -1250,14 +1233,11 @@ export const petsDataURLs: AssetData = {
     },
   },
   trans: {},
-  occ: {
-    TRex: { url: "/3DAssets/pets/TRex/texs/TRex_occ_256x256.png" },
-  },
   meshes: {
     angryHamster: { url: "/3DAssets/pets/angryHamster/angryHamster.json" },
     axolotl: { url: "/3DAssets/pets/axolotl/axolotl.json" },
     babyDragon: { url: "/3DAssets/pets/babyDragon/babyDragon.json" },
-    beardedDragon: { url: "/3DAssets/pets/babyDragon/babyDragon.json" },
+    beardedDragon: { url: "/3DAssets/pets/beardedDragon/beardedDragon.json" },
     bird1: { url: "/3DAssets/pets/bird1/bird1.json" },
     bird2: { url: "/3DAssets/pets/bird2/bird2.json" },
     boxer: { url: "/3DAssets/pets/boxer/boxer.json" },
@@ -1309,14 +1289,6 @@ export const assetData: AssetData = {
     ...hatsDataURLs.nor,
     ...petsDataURLs.nor,
   },
-  disp: {
-    ...mustachesDataURLs.disp,
-    ...beardsDataURLs.disp,
-    ...masksDataURLs.disp,
-    ...glassesDataURLs.disp,
-    ...hatsDataURLs.disp,
-    ...petsDataURLs.disp,
-  },
   metalRough: {
     ...mustachesDataURLs.metalRough,
     ...beardsDataURLs.metalRough,
@@ -1348,14 +1320,6 @@ export const assetData: AssetData = {
     ...glassesDataURLs.trans,
     ...hatsDataURLs.trans,
     ...petsDataURLs.trans,
-  },
-  occ: {
-    ...mustachesDataURLs.occ,
-    ...beardsDataURLs.occ,
-    ...masksDataURLs.occ,
-    ...glassesDataURLs.occ,
-    ...hatsDataURLs.occ,
-    ...petsDataURLs.occ,
   },
   meshes: {
     ...mustachesDataURLs.meshes,
@@ -1462,6 +1426,10 @@ class CameraMedia {
     this.baseShader.setTintColor(this.tintColor);
     this.baseShader.createAtlasTexture("twoDim", {});
     this.baseShader.createAtlasTexture("threeDim", {});
+    this.baseShader.createAtlasTexture("normal", {});
+    this.baseShader.createAtlasTexture("metallicRoughness", {});
+    this.baseShader.createAtlasTexture("specular", {});
+    this.baseShader.createAtlasTexture("transmission", {});
 
     this.faceLandmarks = new FaceLandmarks(
       this.cameraId,
@@ -1652,21 +1620,21 @@ class CameraMedia {
         threeDimUrls[mustacheStyles.style] = mustacheURL;
       }
     }
-    if (maskStyles && this.effects.masks) {
+    if (maskStyles && maskStyles.threeDim && this.effects.masks) {
       const maskURL = masksDataURLs.diff[maskStyles.style]?.url;
 
       if (maskURL) {
         threeDimUrls[maskStyles.style] = maskURL;
       }
     }
-    if (hatStyles && this.effects.hats) {
+    if (hatStyles && hatStyles.threeDim && this.effects.hats) {
       const hatURL = hatsDataURLs.diff[hatStyles.style]?.url;
 
       if (hatURL) {
         threeDimUrls[hatStyles.style] = hatURL;
       }
     }
-    if (petStyles && this.effects.pets) {
+    if (petStyles && petStyles.threeDim && this.effects.pets) {
       const petURL = petsDataURLs.diff[petStyles.style]?.url;
 
       if (petURL) {
@@ -1674,8 +1642,196 @@ class CameraMedia {
       }
     }
 
+    const normalUrls: { [key: string]: string } = {};
+
+    if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
+      const glassesURL = glassesDataURLs.nor[glassesStyles.style]?.url;
+
+      if (glassesURL) {
+        normalUrls[glassesStyles.style] = glassesURL;
+      }
+    }
+    if (beardStyles && beardStyles.threeDim && this.effects.beards) {
+      const beardURL = beardsDataURLs.nor[beardStyles.style]?.url;
+
+      if (beardURL) {
+        normalUrls[beardStyles.style] = beardURL;
+      }
+    }
+    if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
+      const mustacheURL = mustachesDataURLs.nor[mustacheStyles.style]?.url;
+
+      if (mustacheURL) {
+        normalUrls[mustacheStyles.style] = mustacheURL;
+      }
+    }
+    if (maskStyles && maskStyles.threeDim && this.effects.masks) {
+      const maskURL = masksDataURLs.nor[maskStyles.style]?.url;
+
+      if (maskURL) {
+        normalUrls[maskStyles.style] = maskURL;
+      }
+    }
+    if (hatStyles && hatStyles.threeDim && this.effects.hats) {
+      const hatURL = hatsDataURLs.nor[hatStyles.style]?.url;
+
+      if (hatURL) {
+        normalUrls[hatStyles.style] = hatURL;
+      }
+    }
+    if (petStyles && petStyles.threeDim && this.effects.pets) {
+      const petURL = petsDataURLs.nor[petStyles.style]?.url;
+
+      if (petURL) {
+        normalUrls[petStyles.style] = petURL;
+      }
+    }
+
+    const metallicRoughnessUrls: { [key: string]: string } = {};
+
+    if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
+      const glassesURL = glassesDataURLs.metalRough[glassesStyles.style]?.url;
+
+      if (glassesURL) {
+        metallicRoughnessUrls[glassesStyles.style] = glassesURL;
+      }
+    }
+    if (beardStyles && beardStyles.threeDim && this.effects.beards) {
+      const beardURL = beardsDataURLs.metalRough[beardStyles.style]?.url;
+
+      if (beardURL) {
+        metallicRoughnessUrls[beardStyles.style] = beardURL;
+      }
+    }
+    if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
+      const mustacheURL =
+        mustachesDataURLs.metalRough[mustacheStyles.style]?.url;
+
+      if (mustacheURL) {
+        metallicRoughnessUrls[mustacheStyles.style] = mustacheURL;
+      }
+    }
+    if (maskStyles && maskStyles.threeDim && this.effects.masks) {
+      const maskURL = masksDataURLs.metalRough[maskStyles.style]?.url;
+
+      if (maskURL) {
+        metallicRoughnessUrls[maskStyles.style] = maskURL;
+      }
+    }
+    if (hatStyles && hatStyles.threeDim && this.effects.hats) {
+      const hatURL = hatsDataURLs.metalRough[hatStyles.style]?.url;
+
+      if (hatURL) {
+        metallicRoughnessUrls[hatStyles.style] = hatURL;
+      }
+    }
+    if (petStyles && petStyles.threeDim && this.effects.pets) {
+      const petURL = petsDataURLs.metalRough[petStyles.style]?.url;
+
+      if (petURL) {
+        metallicRoughnessUrls[petStyles.style] = petURL;
+      }
+    }
+
+    const specularUrls: { [key: string]: string } = {};
+
+    if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
+      const glassesURL = glassesDataURLs.spec[glassesStyles.style]?.url;
+
+      if (glassesURL) {
+        specularUrls[glassesStyles.style] = glassesURL;
+      }
+    }
+    if (beardStyles && beardStyles.threeDim && this.effects.beards) {
+      const beardURL = beardsDataURLs.spec[beardStyles.style]?.url;
+
+      if (beardURL) {
+        specularUrls[beardStyles.style] = beardURL;
+      }
+    }
+    if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
+      const mustacheURL = mustachesDataURLs.spec[mustacheStyles.style]?.url;
+
+      if (mustacheURL) {
+        specularUrls[mustacheStyles.style] = mustacheURL;
+      }
+    }
+    if (maskStyles && maskStyles.threeDim && this.effects.masks) {
+      const maskURL = masksDataURLs.spec[maskStyles.style]?.url;
+
+      if (maskURL) {
+        specularUrls[maskStyles.style] = maskURL;
+      }
+    }
+    if (hatStyles && hatStyles.threeDim && this.effects.hats) {
+      const hatURL = hatsDataURLs.spec[hatStyles.style]?.url;
+
+      if (hatURL) {
+        specularUrls[hatStyles.style] = hatURL;
+      }
+    }
+    if (petStyles && petStyles.threeDim && this.effects.pets) {
+      const petURL = petsDataURLs.spec[petStyles.style]?.url;
+
+      if (petURL) {
+        specularUrls[petStyles.style] = petURL;
+      }
+    }
+
+    const transmissionUrls: { [key: string]: string } = {};
+
+    if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
+      const glassesURL = glassesDataURLs.trans[glassesStyles.style]?.url;
+
+      if (glassesURL) {
+        transmissionUrls[glassesStyles.style] = glassesURL;
+      }
+    }
+    if (beardStyles && beardStyles.threeDim && this.effects.beards) {
+      const beardURL = beardsDataURLs.trans[beardStyles.style]?.url;
+
+      if (beardURL) {
+        transmissionUrls[beardStyles.style] = beardURL;
+      }
+    }
+    if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
+      const mustacheURL = mustachesDataURLs.trans[mustacheStyles.style]?.url;
+
+      if (mustacheURL) {
+        transmissionUrls[mustacheStyles.style] = mustacheURL;
+      }
+    }
+    if (maskStyles && maskStyles.threeDim && this.effects.masks) {
+      const maskURL = masksDataURLs.trans[maskStyles.style]?.url;
+
+      if (maskURL) {
+        transmissionUrls[maskStyles.style] = maskURL;
+      }
+    }
+    if (hatStyles && hatStyles.threeDim && this.effects.hats) {
+      const hatURL = hatsDataURLs.trans[hatStyles.style]?.url;
+
+      if (hatURL) {
+        transmissionUrls[hatStyles.style] = hatURL;
+      }
+    }
+    if (petStyles && petStyles.threeDim && this.effects.pets) {
+      const petURL = petsDataURLs.trans[petStyles.style]?.url;
+
+      if (petURL) {
+        transmissionUrls[petStyles.style] = petURL;
+      }
+    }
+
     await this.baseShader.updateAtlasTexture("twoDim", twoDimUrls);
     await this.baseShader.updateAtlasTexture("threeDim", threeDimUrls);
+    await this.baseShader.updateAtlasTexture("normal", normalUrls);
+    await this.baseShader.updateAtlasTexture(
+      "metallicRoughness",
+      metallicRoughnessUrls
+    );
+    await this.baseShader.updateAtlasTexture("specular", specularUrls);
+    await this.baseShader.updateAtlasTexture("transmission", transmissionUrls);
   }
 
   async changeEffects(
