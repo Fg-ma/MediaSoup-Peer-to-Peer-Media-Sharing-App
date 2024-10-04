@@ -30,6 +30,7 @@ export type AssetTexsData = {
     | HatsEffectTypes
     | PetsEffectTypes]?: {
     url: string;
+    size: number;
   };
 };
 
@@ -50,10 +51,9 @@ export interface AssetData {
   image: AssetTexsData;
   diff: AssetTexsData;
   nor: AssetTexsData;
-  metalRough: AssetTexsData;
+  transmissionRoughnessMetallic: AssetTexsData;
   spec: AssetTexsData;
   emiss: AssetTexsData;
-  trans: AssetTexsData;
   meshes: AssetMeshesData;
 }
 
@@ -61,92 +61,117 @@ export const mustachesDataURLs: AssetData = {
   image: {
     disguiseMustache: {
       url: "/2DAssets/mustaches/disguiseMustache/disguiseMustache_512x512.png",
+      size: 512,
     },
     fullMustache: {
       url: "/2DAssets/mustaches/fullMustache/fullMustache_512x512.png",
+      size: 512,
     },
     mustache1: {
       url: "/2DAssets/mustaches/mustache1/mustache1_512x512.png",
+      size: 512,
     },
     mustache2: {
       url: "/2DAssets/mustaches/mustache2/mustache2_512x512.png",
+      size: 512,
     },
     mustache3: {
       url: "/2DAssets/mustaches/mustache3/mustache3_512x512.png",
+      size: 512,
     },
     mustache4: {
       url: "/2DAssets/mustaches/mustache4/mustache4_512x512.png",
+      size: 512,
     },
     nicodemusMustache: {
       url: "/2DAssets/mustaches/nicodemusMustache/nicodemusMustache_512x512.png",
+      size: 512,
     },
     pencilMustache: {
       url: "/2DAssets/mustaches/pencilMustache/pencilMustache_512x512.png",
+      size: 512,
     },
     spongebobMustache: {
       url: "/2DAssets/mustaches/spongebobMustache/spongebobMustache_512x512.png",
+      size: 512,
     },
     tinyMustache: {
       url: "/2DAssets/mustaches/tinyMustache/tinyMustache_512x512.png",
+      size: 512,
     },
     wingedMustache: {
       url: "/2DAssets/mustaches/wingedMustache/wingedMustache_512x512.png",
+      size: 512,
     },
   },
   diff: {
     disguiseMustache: {
       url: "/3DAssets/mustaches/disguiseMustache/texs/disguiseMustache_diff_256x256.png",
+      size: 256,
     },
     fullMustache: {
       url: "/3DAssets/mustaches/fullMustache/texs/fullMustache_diff_256x256.png",
+      size: 256,
     },
     mustache1: {
       url: "/3DAssets/mustaches/mustache1/texs/mustache1_diff_256x256.png",
+      size: 256,
     },
     mustache2: {
       url: "/3DAssets/mustaches/mustache2/texs/mustache2_diff_256x256.png",
+      size: 256,
     },
     mustache3: {
       url: "/3DAssets/mustaches/mustache3/texs/mustache3_diff_256x256.png",
+      size: 256,
     },
     mustache4: {
       url: "/3DAssets/mustaches/mustache4/texs/mustache4_diff_256x256.png",
+      size: 256,
     },
     nicodemusMustache: {
       url: "/3DAssets/mustaches/nicodemusMustache/texs/nicodemusMustache_diff_256x256.png",
+      size: 256,
     },
     pencilMustache: {
       url: "/3DAssets/mustaches/pencilMustache/texs/pencilMustache_diff_256x256.png",
+      size: 256,
     },
     spongebobMustache: {
       url: "/3DAssets/mustaches/spongebobMustache/texs/spongebobMustache_diff_256x256.png",
+      size: 256,
     },
     tinyMustache: {
       url: "/3DAssets/mustaches/tinyMustache/texs/tinyMustache_diff_256x256.png",
+      size: 256,
     },
     wingedMustache: {
       url: "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_diff_256x256.png",
+      size: 256,
     },
   },
   nor: {
     fullMustache: {
       url: "/3DAssets/mustaches/fullMustache/texs/fullMustache_nor_256x256.png",
+      size: 256,
     },
     wingedMustache: {
       url: "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_nor_256x256.png",
+      size: 256,
     },
   },
-  metalRough: {
+  transmissionRoughnessMetallic: {
     fullMustache: {
-      url: "/3DAssets/mustaches/fullMustache/texs/fullMustache_metalRough_256x256.png",
+      url: "/3DAssets/mustaches/fullMustache/texs/fullMustache_transRoughMetal_256x256.png",
+      size: 256,
     },
     wingedMustache: {
-      url: "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_metalRough_256x256.png",
+      url: "/3DAssets/mustaches/wingedMustache/texs/wingedMustache_transRoughMetal_256x256.png",
+      size: 256,
     },
   },
   spec: {},
   emiss: {},
-  trans: {},
   meshes: {
     disguiseMustache: {
       url: "/3DAssets/mustaches/disguiseMustache/disguiseMustache.json",
@@ -188,52 +213,63 @@ export const beardsDataURLs: AssetData = {
   image: {
     chinBeard: {
       url: "/2DAssets/beards/chinBeard/chinBeard_512x512.png",
+      size: 512,
     },
     classicalCurlyBeard: {
       url: "/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_512x512.png",
+      size: 512,
     },
     fullBeard: {
       url: "/2DAssets/beards/fullBeard/fullBeard_512x512.png",
+      size: 512,
     },
   },
   diff: {
     chinBeard: {
       url: "/3DAssets/beards/chinBeard/texs/chinBeard_diff_256x256.png",
+      size: 256,
     },
     classicalCurlyBeard: {
       url: "/3DAssets/beards/classicalCurlyBeard/texs/classicalCurlyBeard_diff_256x256.png",
+      size: 256,
     },
     fullBeard: {
       url: "/3DAssets/beards/fullBeard/texs/fullBeard_diff_256x256.png",
+      size: 256,
     },
   },
   nor: {
     chinBeard: {
       url: "/3DAssets/beards/chinBeard/texs/chinBeard_nor_256x256.png",
+      size: 256,
     },
     fullBeard: {
       url: "/3DAssets/beards/fullBeard/texs/fullBeard_nor_256x256.png",
+      size: 256,
     },
   },
-  metalRough: {
+  transmissionRoughnessMetallic: {
     chinBeard: {
-      url: "/3DAssets/beards/chinBeard/texs/chinBeard_metalRough_256x256.png",
+      url: "/3DAssets/beards/chinBeard/texs/chinBeard_transRoughMetal_256x256.png",
+      size: 256,
     },
     fullBeard: {
-      url: "/3DAssets/beards/fullBeard/texs/fullBeard_metalRough_256x256.png",
+      url: "/3DAssets/beards/fullBeard/texs/fullBeard_transRoughMetal_256x256.png",
+      size: 256,
     },
   },
   spec: {
     chinBeard: {
       url: "/3DAssets/beards/chinBeard/texs/chinBeard_spec_256x256.png",
+      size: 256,
     },
   },
   emiss: {
     chinBeard: {
       url: "/3DAssets/beards/chinBeard/texs/chinBeard_emiss_256x256.png",
+      size: 256,
     },
   },
-  trans: {},
   meshes: {
     chinBeard: { url: "/3DAssets/beards/chinBeard/chinBeard.json" },
     classicalCurlyBeard: {
@@ -247,270 +283,354 @@ export const masksDataURLs: AssetData = {
   image: {
     alienMask: {
       url: "/2DAssets/masks/alienMask/alienMask_512x512.png",
+      size: 512,
     },
     baseMask: {
       url: "/2DAssets/masks/baseMask/baseMask_512x512.png",
+      size: 512,
     },
     clownMask: {
       url: "/2DAssets/masks/clownMask/clownMask_512x512.png",
+      size: 512,
     },
     creatureMask: {
       url: "/2DAssets/masks/creatureMask/creatureMask_512x512.png",
+      size: 512,
     },
     cyberMask: {
       url: "/2DAssets/masks/cyberMask/cyberMask_512x512.png",
+      size: 512,
     },
     darkKnightMask: {
       url: "/2DAssets/masks/darkKnightMask/darkKnightMask_512x512.png",
+      size: 512,
     },
     demonMask: {
       url: "/2DAssets/masks/demonMask/demonMask_512x512.png",
+      size: 512,
     },
     gasMask1: {
       url: "/2DAssets/masks/gasMask1/gasMask1_512x512.png",
+      size: 512,
     },
     gasMask2: {
       url: "/2DAssets/masks/gasMask2/gasMask2_512x512.png",
+      size: 512,
     },
     gasMask3: {
       url: "/2DAssets/masks/gasMask3/gasMask3_512x512.png",
+      size: 512,
     },
     gasMask4: {
       url: "/2DAssets/masks/gasMask4/gasMask4_512x512.png",
+      size: 512,
     },
     masqueradeMask: {
       url: "/2DAssets/masks/masqueradeMask/masqueradeMask_512x512.png",
+      size: 512,
     },
     metalManMask: {
       url: "/2DAssets/masks/metalManMask/metalManMask_512x512.png",
+      size: 512,
     },
     oniMask: {
       url: "/2DAssets/masks/oniMask/oniMask_512x512.png",
+      size: 512,
     },
     plagueDoctorMask: {
       url: "/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_512x512.png",
+      size: 512,
     },
     sixEyesMask: {
       url: "/2DAssets/masks/sixEyesMask/sixEyesMask_512x512.png",
+      size: 512,
     },
     tenguMask: {
       url: "/2DAssets/masks/tenguMask/tenguMask_512x512.png",
+      size: 512,
     },
     threeFaceMask: {
       url: "/2DAssets/masks/threeFaceMask/threeFaceMask_512x512.png",
+      size: 512,
     },
     weldingMask: {
       url: "/2DAssets/masks/weldingMask/weldingMask_512x512.png",
+      size: 512,
     },
     woodlandMask: {
       url: "/2DAssets/masks/woodlandMask/woodlandMask_512x512.png",
+      size: 512,
     },
     woodPaintedMask: {
       url: "/2DAssets/masks/woodPaintedMask/woodPaintedMask_512x512.png",
+      size: 512,
     },
     zombieMask: {
       url: "/2DAssets/masks/zombieMask/zombieMask_512x512.png",
+      size: 512,
     },
   },
   diff: {
     alienMask: {
       url: "/3DAssets/masks/alienMask/texs/alienMask_diff_256x256.png",
+      size: 256,
     },
     baseMask: {
       url: "/3DAssets/masks/baseMask/texs/baseMask_diff_256x256.png",
+      size: 256,
     },
     clownMask: {
       url: "/3DAssets/masks/clownMask/texs/clownMask_diff_256x256.png",
+      size: 256,
     },
     creatureMask: {
       url: "/3DAssets/masks/creatureMask/texs/creatureMask_diff_256x256.png",
+      size: 256,
     },
     cyberMask: {
       url: "/3DAssets/masks/cyberMask/texs/cyberMask_diff_256x256.png",
+      size: 256,
     },
     darkKnightMask: {
       url: "/3DAssets/masks/darkKnightMask/texs/darkKnightMask_diff_256x256.png",
+      size: 256,
     },
     demonMask: {
       url: "/3DAssets/masks/demonMask/texs/demonMask_diff_256x256.png",
+      size: 256,
     },
     gasMask1: {
       url: "/3DAssets/masks/gasMask1/texs/gasMask1_diff_256x256.png",
+      size: 256,
     },
     gasMask2: {
       url: "/3DAssets/masks/gasMask2/texs/gasMask2_diff_256x256.png",
+      size: 256,
     },
     gasMask3: {
       url: "/3DAssets/masks/gasMask3/texs/gasMask3_diff_256x256.png",
+      size: 256,
     },
     gasMask4: {
       url: "/3DAssets/masks/gasMask4/texs/gasMask4_diff_256x256.png",
+      size: 256,
     },
     masqueradeMask: {
       url: "/3DAssets/masks/masqueradeMask/texs/masqueradeMask_diff_256x256.png",
+      size: 256,
     },
     metalManMask: {
       url: "/3DAssets/masks/metalManMask/texs/metalManMask_diff_256x256.png",
+      size: 256,
     },
     oniMask: {
       url: "/3DAssets/masks/oniMask/texs/oniMask_diff_256x256.png",
+      size: 256,
     },
     plagueDoctorMask: {
       url: "/3DAssets/masks/plagueDoctorMask/texs/plagueDoctorMask_diff_256x256.png",
+      size: 256,
     },
     sixEyesMask: {
       url: "/3DAssets/masks/sixEyesMask/texs/sixEyesMask_diff_256x256.png",
+      size: 256,
     },
     tenguMask: {
       url: "/3DAssets/masks/tenguMask/texs/tenguMask_diff_256x256.png",
+      size: 256,
     },
     threeFaceMask: {
       url: "/3DAssets/masks/threeFaceMask/texs/threeFaceMask_diff_256x256.png",
+      size: 256,
     },
     weldingMask: {
       url: "/3DAssets/masks/weldingMask/texs/weldingMask_diff_256x256.png",
+      size: 256,
     },
     woodlandMask: {
       url: "/3DAssets/masks/woodlandMask/texs/woodlandMask_diff_256x256.png",
+      size: 256,
     },
     woodPaintedMask: {
       url: "/3DAssets/masks/woodPaintedMask/texs/woodPaintedMask_diff_256x256.png",
+      size: 256,
     },
     zombieMask: {
       url: "/3DAssets/masks/zombieMask/texs/zombieMask_diff_256x256.png",
+      size: 256,
     },
   },
   nor: {
     alienMask: {
       url: "/3DAssets/masks/alienMask/texs/alienMask_nor_256x256.png",
+      size: 256,
     },
     clownMask: {
       url: "/3DAssets/masks/clownMask/texs/clownMask_nor_256x256.png",
+      size: 256,
     },
     creatureMask: {
       url: "/3DAssets/masks/creatureMask/texs/creatureMask_nor_256x256.png",
+      size: 256,
     },
     cyberMask: {
       url: "/3DAssets/masks/cyberMask/texs/cyberMask_nor_256x256.png",
+      size: 256,
     },
     darkKnightMask: {
       url: "/3DAssets/masks/darkKnightMask/texs/darkKnightMask_nor_256x256.png",
+      size: 256,
     },
     demonMask: {
       url: "/3DAssets/masks/demonMask/texs/demonMask_nor_256x256.png",
+      size: 256,
     },
     gasMask1: {
       url: "/3DAssets/masks/gasMask1/texs/gasMask1_nor_256x256.png",
+      size: 256,
     },
     gasMask2: {
       url: "/3DAssets/masks/gasMask2/texs/gasMask2_nor_256x256.png",
+      size: 256,
     },
     gasMask3: {
       url: "/3DAssets/masks/gasMask3/texs/gasMask3_nor_256x256.png",
+      size: 256,
     },
     gasMask4: {
       url: "/3DAssets/masks/gasMask4/texs/gasMask4_nor_256x256.png",
+      size: 256,
     },
     masqueradeMask: {
       url: "/3DAssets/masks/masqueradeMask/texs/masqueradeMask_nor_256x256.png",
+      size: 256,
     },
     metalManMask: {
       url: "/3DAssets/masks/metalManMask/texs/metalManMask_nor_256x256.png",
+      size: 256,
     },
     oniMask: {
       url: "/3DAssets/masks/oniMask/texs/oniMask_nor_256x256.png",
+      size: 256,
     },
     plagueDoctorMask: {
       url: "/3DAssets/masks/plagueDoctorMask/texs/plagueDoctorMask_nor_256x256.png",
+      size: 256,
     },
     sixEyesMask: {
       url: "/3DAssets/masks/sixEyesMask/texs/sixEyesMask_nor_256x256.png",
+      size: 256,
     },
     tenguMask: {
       url: "/3DAssets/masks/tenguMask/texs/tenguMask_nor_256x256.png",
+      size: 256,
     },
     threeFaceMask: {
       url: "/3DAssets/masks/threeFaceMask/texs/threeFaceMask_nor_256x256.png",
+      size: 256,
     },
     woodlandMask: {
       url: "/3DAssets/masks/woodlandMask/texs/woodlandMask_nor_256x256.png",
+      size: 256,
     },
     woodPaintedMask: {
       url: "/3DAssets/masks/woodPaintedMask/texs/woodPaintedMask_nor_256x256.png",
+      size: 256,
     },
     zombieMask: {
       url: "/3DAssets/masks/zombieMask/texs/zombieMask_nor_256x256.png",
+      size: 256,
     },
   },
-  metalRough: {
+  transmissionRoughnessMetallic: {
     alienMask: {
-      url: "/3DAssets/masks/alienMask/texs/alienMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/alienMask/texs/alienMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     clownMask: {
-      url: "/3DAssets/masks/clownMask/texs/clownMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/clownMask/texs/clownMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     creatureMask: {
-      url: "/3DAssets/masks/creatureMask/texs/creatureMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/creatureMask/texs/creatureMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     cyberMask: {
-      url: "/3DAssets/masks/cyberMask/texs/cyberMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/cyberMask/texs/cyberMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     darkKnightMask: {
-      url: "/3DAssets/masks/darkKnightMask/texs/darkKnightMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/darkKnightMask/texs/darkKnightMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     demonMask: {
-      url: "/3DAssets/masks/demonMask/texs/demonMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/demonMask/texs/demonMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     gasMask1: {
-      url: "/3DAssets/masks/gasMask1/texs/gasMask1_metalRough_256x256.png",
+      url: "/3DAssets/masks/gasMask1/texs/gasMask1_transRoughMetal_256x256.png",
+      size: 256,
     },
     gasMask2: {
-      url: "/3DAssets/masks/gasMask2/texs/gasMask2_metalRough_256x256.png",
+      url: "/3DAssets/masks/gasMask2/texs/gasMask2_transRoughMetal_256x256.png",
+      size: 256,
     },
     gasMask3: {
-      url: "/3DAssets/masks/gasMask3/texs/gasMask3_metalRough_256x256.png",
+      url: "/3DAssets/masks/gasMask3/texs/gasMask3_transRoughMetal_256x256.png",
+      size: 256,
     },
     gasMask4: {
-      url: "/3DAssets/masks/gasMask4/texs/gasMask4_metalRough_256x256.png",
+      url: "/3DAssets/masks/gasMask4/texs/gasMask4_transRoughMetal_256x256.png",
+      size: 256,
     },
     masqueradeMask: {
-      url: "/3DAssets/masks/masqueradeMask/texs/masqueradeMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/masqueradeMask/texs/masqueradeMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     metalManMask: {
-      url: "/3DAssets/masks/metalManMask/texs/metalManMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/metalManMask/texs/metalManMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     oniMask: {
-      url: "/3DAssets/masks/oniMask/texs/oniMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/oniMask/texs/oniMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     plagueDoctorMask: {
-      url: "/3DAssets/masks/plagueDoctorMask/texs/plagueDoctorMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/plagueDoctorMask/texs/plagueDoctorMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     sixEyesMask: {
-      url: "/3DAssets/masks/sixEyesMask/texs/sixEyesMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/sixEyesMask/texs/sixEyesMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     tenguMask: {
-      url: "/3DAssets/masks/tenguMask/texs/tenguMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/tenguMask/texs/tenguMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     threeFaceMask: {
-      url: "/3DAssets/masks/threeFaceMask/texs/threeFaceMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/threeFaceMask/texs/threeFaceMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     woodlandMask: {
-      url: "/3DAssets/masks/woodlandMask/texs/woodlandMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/woodlandMask/texs/woodlandMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     woodPaintedMask: {
-      url: "/3DAssets/masks/woodPaintedMask/texs/woodPaintedMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/woodPaintedMask/texs/woodPaintedMask_transRoughMetal_256x256.png",
+      size: 256,
     },
     zombieMask: {
-      url: "/3DAssets/masks/zombieMask/texs/zombieMask_metalRough_256x256.png",
+      url: "/3DAssets/masks/zombieMask/texs/zombieMask_transRoughMetal_256x256.png",
+      size: 256,
     },
   },
   spec: {},
   emiss: {
     cyberMask: {
       url: "/3DAssets/masks/cyberMask/texs/cyberMask_emiss_256x256.png",
+      size: 256,
     },
   },
-  trans: {},
   meshes: {
     alienMask: {
       url: "/3DAssets/masks/alienMask/alienMask.json",
@@ -585,183 +705,229 @@ export const glassesDataURLs: AssetData = {
   image: {
     defaultGlasses: {
       url: "/2DAssets/glasses/defaultGlasses/defaultGlasses_512x512.png",
+      size: 512,
     },
     AmericaGlasses: {
       url: "/2DAssets/glasses/AmericaGlasses/AmericaGlasses_512x512.png",
+      size: 512,
     },
     aviatorGoggles: {
       url: "/2DAssets/glasses/aviatorGoggles/aviatorGoggles_512x512.png",
+      size: 512,
     },
     bloodyGlasses: {
       url: "/2DAssets/glasses/bloodyGlasses/bloodyGlasses_512x512.png",
+      size: 512,
     },
     eyeProtectionGlasses: {
       url: "/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_512x512.png",
+      size: 512,
     },
     glasses1: {
       url: "/2DAssets/glasses/glasses1/glasses1_512x512.png",
+      size: 512,
     },
     glasses2: {
       url: "/2DAssets/glasses/glasses2/glasses2_512x512.png",
+      size: 512,
     },
     glasses3: {
       url: "/2DAssets/glasses/glasses3/glasses3_512x512.png",
+      size: 512,
     },
     glasses4: {
       url: "/2DAssets/glasses/glasses4/glasses4_512x512.png",
+      size: 512,
     },
     glasses5: {
       url: "/2DAssets/glasses/glasses5/glasses5_512x512.png",
+      size: 512,
     },
     glasses6: {
       url: "/2DAssets/glasses/glasses6/glasses6_512x512.png",
+      size: 512,
     },
     memeGlasses: {
       url: "/2DAssets/glasses/memeGlasses/memeGlasses_512x512.png",
+      size: 512,
     },
     militaryTacticalGlasses: {
       url: "/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_512x512.png",
+      size: 512,
     },
     steampunkGlasses: {
       url: "/2DAssets/glasses/steampunkGlasses/steampunkGlasses_512x512.png",
+      size: 512,
     },
     threeDGlasses: {
       url: "/2DAssets/glasses/threeDGlasses/threeDGlasses_512x512.png",
+      size: 512,
     },
     toyGlasses: {
       url: "/2DAssets/glasses/toyGlasses/toyGlasses_512x512.png",
+      size: 512,
     },
     shades: {
       url: "/2DAssets/glasses/shades/shades_512x512.png",
+      size: 512,
     },
     VRGlasses: {
       url: "/2DAssets/glasses/VRGlasses/VRGlasses_512x512.png",
+      size: 512,
     },
   },
   diff: {
     defaultGlasses: {
       url: "/3DAssets/glasses/defaultGlasses/texs/defaultGlasses_diff_256x256.png",
+      size: 256,
     },
     AmericaGlasses: {
       url: "/3DAssets/glasses/AmericaGlasses/texs/AmericaGlasses_diff_256x256.png",
+      size: 256,
     },
     aviatorGoggles: {
       url: "/3DAssets/glasses/aviatorGoggles/texs/aviatorGoggles_diff_256x256.png",
+      size: 256,
     },
     bloodyGlasses: {
       url: "/3DAssets/glasses/bloodyGlasses/texs/bloodyGlasses_diff_256x256.png",
+      size: 256,
     },
     eyeProtectionGlasses: {
       url: "/3DAssets/glasses/eyeProtectionGlasses/texs/eyeProtectionGlasses_diff_256x256.png",
+      size: 256,
     },
     glasses1: {
       url: "/3DAssets/glasses/glasses1/texs/glasses1_diff_256x256.png",
+      size: 256,
     },
     glasses2: {
       url: "/3DAssets/glasses/glasses2/texs/glasses2_diff_256x256.png",
+      size: 256,
     },
     glasses3: {
       url: "/3DAssets/glasses/glasses3/texs/glasses3_diff_256x256.png",
+      size: 256,
     },
     glasses4: {
       url: "/3DAssets/glasses/glasses4/texs/glasses4_diff_256x256.png",
+      size: 256,
     },
     glasses5: {
       url: "/3DAssets/glasses/glasses5/texs/glasses5_diff_256x256.png",
+      size: 256,
     },
     glasses6: {
       url: "/3DAssets/glasses/glasses6/texs/glasses6_diff_256x256.png",
+      size: 256,
     },
     memeGlasses: {
       url: "/3DAssets/glasses/memeGlasses/texs/memeGlasses_diff_32x32.png",
+      size: 32,
     },
     militaryTacticalGlasses: {
       url: "/3DAssets/glasses/militaryTacticalGlasses/texs/militaryTacticalGlasses_diff_256x256.png",
+      size: 256,
     },
     steampunkGlasses: {
       url: "/3DAssets/glasses/steampunkGlasses/texs/steampunkGlasses_diff_256x256.png",
+      size: 256,
     },
     threeDGlasses: {
       url: "/3DAssets/glasses/threeDGlasses/texs/threeDGlasses_diff_256x256.png",
+      size: 256,
     },
     toyGlasses: {
       url: "/3DAssets/glasses/toyGlasses/texs/toyGlasses_diff_256x256.png",
+      size: 256,
     },
     shades: {
       url: "/3DAssets/glasses/shades/texs/shades_diff_256x256.png",
+      size: 256,
     },
     VRGlasses: {
       url: "/3DAssets/glasses/VRGlasses/texs/VRGlasses_diff_256x256.png",
+      size: 256,
     },
   },
   nor: {
     aviatorGoggles: {
       url: "/3DAssets/glasses/aviatorGoggles/texs/aviatorGoggles_nor_256x256.png",
+      size: 256,
     },
     bloodyGlasses: {
       url: "/3DAssets/glasses/bloodyGlasses/texs/bloodyGlasses_nor_256x256.png",
+      size: 256,
     },
     eyeProtectionGlasses: {
       url: "/3DAssets/glasses/eyeProtectionGlasses/texs/eyeProtectionGlasses_nor_256x256.png",
+      size: 256,
     },
     glasses1: {
       url: "/3DAssets/glasses/glasses1/texs/glasses1_nor_256x256.png",
+      size: 256,
     },
     glasses6: {
       url: "/3DAssets/glasses/glasses6/texs/glasses6_nor_256x256.png",
+      size: 256,
     },
     militaryTacticalGlasses: {
       url: "/3DAssets/glasses/militaryTacticalGlasses/texs/militaryTacticalGlasses_nor_256x256.png",
+      size: 256,
     },
     steampunkGlasses: {
       url: "/3DAssets/glasses/steampunkGlasses/texs/steampunkGlasses_nor_256x256.png",
+      size: 256,
     },
     toyGlasses: {
       url: "/3DAssets/glasses/toyGlasses/texs/toyGlasses_nor_256x256.png",
+      size: 256,
     },
   },
-  metalRough: {
+  transmissionRoughnessMetallic: {
     aviatorGoggles: {
-      url: "/3DAssets/glasses/aviatorGoggles/texs/aviatorGoggles_metalRough_256x256.png",
+      url: "/3DAssets/glasses/aviatorGoggles/texs/aviatorGoggles_transRoughMetal_256x256.png",
+      size: 256,
     },
     bloodyGlasses: {
-      url: "/3DAssets/glasses/bloodyGlasses/texs/bloodyGlasses_metalRough_256x256.png",
+      url: "/3DAssets/glasses/bloodyGlasses/texs/bloodyGlasses_transRoughMetal_256x256.png",
+      size: 256,
     },
     eyeProtectionGlasses: {
-      url: "/3DAssets/glasses/eyeProtectionGlasses/texs/eyeProtectionGlasses_metalRough_256x256.png",
+      url: "/3DAssets/glasses/eyeProtectionGlasses/texs/eyeProtectionGlasses_transRoughMetal_256x256.png",
+      size: 256,
     },
     glasses1: {
-      url: "/3DAssets/glasses/glasses1/texs/glasses1_metalRough_256x256.png",
+      url: "/3DAssets/glasses/glasses1/texs/glasses1_transRoughMetal_256x256.png",
+      size: 256,
     },
     glasses6: {
-      url: "/3DAssets/glasses/glasses6/texs/glasses6_metalRough_256x256.png",
+      url: "/3DAssets/glasses/glasses6/texs/glasses6_transRoughMetal_256x256.png",
+      size: 256,
     },
     militaryTacticalGlasses: {
-      url: "/3DAssets/glasses/militaryTacticalGlasses/texs/militaryTacticalGlasses_metalRough_256x256.png",
+      url: "/3DAssets/glasses/militaryTacticalGlasses/texs/militaryTacticalGlasses_transRoughMetal_256x256.png",
+      size: 256,
     },
     steampunkGlasses: {
-      url: "/3DAssets/glasses/steampunkGlasses/texs/steampunkGlasses_metalRough_256x256.png",
+      url: "/3DAssets/glasses/steampunkGlasses/texs/steampunkGlasses_transRoughMetal_256x256.png",
+      size: 256,
     },
     toyGlasses: {
-      url: "/3DAssets/glasses/toyGlasses/texs/toyGlasses_metalRough_256x256.png",
+      url: "/3DAssets/glasses/toyGlasses/texs/toyGlasses_transRoughMetal_256x256.png",
+      size: 256,
     },
   },
   spec: {
     militaryTacticalGlasses: {
       url: "/3DAssets/glasses/militaryTacticalGlasses/texs/militaryTacticalGlasses_spec_256x256.png",
+      size: 256,
     },
   },
   emiss: {
     glasses1: {
       url: "/3DAssets/glasses/glasses1/texs/glasses1_emiss_256x256.png",
-    },
-  },
-  trans: {
-    bloodyGlasses: {
-      url: "/3DAssets/glasses/bloodyGlasses/texs/bloodyGlasses_trans_256x256.png",
-    },
-    glasses6: {
-      url: "/3DAssets/glasses/glasses6/texs/glasses6_trans_256x256.png",
+      size: 256,
     },
   },
   meshes: {
@@ -806,217 +972,286 @@ export const hatsDataURLs: AssetData = {
   image: {
     AsianConicalHat: {
       url: "/2DAssets/hats/AsianConicalHat/AsianConicalHat_512x512.png",
+      size: 512,
     },
     aviatorHelmet: {
       url: "/2DAssets/hats/aviatorHelmet/aviatorHelmet_512x512.png",
+      size: 512,
     },
     bicornHat: {
       url: "/2DAssets/hats/bicornHat/bicornHat_512x512.png",
+      size: 512,
     },
     bicycleHelmet: {
       url: "/2DAssets/hats/bicycleHelmet/bicycleHelmet_512x512.png",
+      size: 512,
     },
     captainsHat: {
       url: "/2DAssets/hats/captainsHat/captainsHat_512x512.png",
+      size: 512,
     },
     chefHat: {
       url: "/2DAssets/hats/chefHat/chefHat_512x512.png",
+      size: 512,
     },
     chickenHat: {
       url: "/2DAssets/hats/chickenHat/chickenHat_512x512.png",
+      size: 512,
     },
     deadManHat: {
       url: "/2DAssets/hats/deadManHat/deadManHat_512x512.png",
+      size: 512,
     },
     dogEars: {
       url: "/2DAssets/hats/dogEars/dogEars_512x512.png",
+      size: 512,
     },
     flatCap: {
       url: "/2DAssets/hats/flatCap/flatCap_512x512.png",
+      size: 512,
     },
     hardHat: {
       url: "/2DAssets/hats/hardHat/hardHat_512x512.png",
+      size: 512,
     },
     hopliteHelmet: {
       url: "/2DAssets/hats/hopliteHelmet/hopliteHelmet_512x512.png",
+      size: 512,
     },
     militaryHat: {
       url: "/2DAssets/hats/militaryHat/militaryHat_512x512.png",
+      size: 512,
     },
     rabbitEars: {
       url: "/2DAssets/hats/rabbitEars/rabbitEars_512x512.png",
+      size: 512,
     },
     roundEarsHat: {
       url: "/2DAssets/hats/roundEarsHat/roundEarsHat_512x512.png",
+      size: 512,
     },
     santaHat: {
       url: "/2DAssets/hats/santaHat/santaHat_512x512.png",
+      size: 512,
     },
     seamanHat: {
       url: "/2DAssets/hats/seamanHat/seamanHat_512x512.png",
+      size: 512,
     },
     stylishHat: {
       url: "/2DAssets/hats/stylishHat/stylishHat_512x512.png",
+      size: 512,
     },
     superMarioOdysseyHat: {
       url: "/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat_512x512.png",
+      size: 512,
     },
     ushankaHat: {
       url: "/2DAssets/hats/ushankaHat/ushankaHat_512x512.png",
+      size: 512,
     },
     vikingHelmet: {
       url: "/2DAssets/hats/vikingHelmet/vikingHelmet_512x512.png",
+      size: 512,
     },
   },
   diff: {
     AsianConicalHat: {
       url: "/3DAssets/hats/AsianConicalHat/texs/AsianConicalHat_diff_256x256.png",
+      size: 256,
     },
     aviatorHelmet: {
       url: "/3DAssets/hats/aviatorHelmet/texs/aviatorHelmet_diff_256x256.png",
+      size: 256,
     },
     bicornHat: {
       url: "/3DAssets/hats/bicornHat/texs/bicornHat_diff_256x256.png",
+      size: 256,
     },
     bicycleHelmet: {
       url: "/3DAssets/hats/bicycleHelmet/texs/bicycleHelmet_diff_256x256.png",
+      size: 256,
     },
     captainsHat: {
       url: "/3DAssets/hats/captainsHat/texs/captainsHat_diff_256x256.png",
+      size: 256,
     },
     chefHat: {
       url: "/3DAssets/hats/chefHat/texs/chefHat_diff_256x256.png",
+      size: 256,
     },
     chickenHat: {
       url: "/3DAssets/hats/chickenHat/texs/chickenHat_diff_256x256.png",
+      size: 256,
     },
     deadManHat: {
       url: "/3DAssets/hats/deadManHat/texs/deadManHat_diff_256x256.png",
+      size: 256,
     },
     dogEars: {
       url: "/3DAssets/hats/dogEars/texs/dogEars_diff_256x256.png",
+      size: 256,
     },
     flatCap: {
       url: "/3DAssets/hats/flatCap/texs/flatCap_diff_256x256.png",
+      size: 256,
     },
     hardHat: {
       url: "/3DAssets/hats/hardHat/texs/hardHat_diff_256x256.png",
+      size: 256,
     },
     hopliteHelmet: {
       url: "/3DAssets/hats/hopliteHelmet/texs/hopliteHelmet_diff_256x256.png",
+      size: 256,
     },
     militaryHat: {
       url: "/3DAssets/hats/militaryHat/texs/militaryHat_diff_256x256.png",
+      size: 256,
     },
     rabbitEars: {
       url: "/3DAssets/hats/rabbitEars/texs/rabbitEars_diff_128x128.png",
+      size: 128,
     },
     roundEarsHat: {
       url: "/3DAssets/hats/roundEarsHat/texs/roundEarsHat_diff_256x256.png",
+      size: 256,
     },
     santaHat: {
       url: "/3DAssets/hats/santaHat/texs/santaHat_diff_256x256.png",
+      size: 256,
     },
     seamanHat: {
       url: "/3DAssets/hats/seamanHat/texs/seamanHat_diff_256x256.png",
+      size: 256,
     },
     stylishHat: {
       url: "/3DAssets/hats/stylishHat/texs/stylishHat_diff_256x256.png",
+      size: 256,
     },
     superMarioOdysseyHat: {
       url: "/3DAssets/hats/superMarioOdysseyHat/texs/superMarioOdysseyHat_diff_256x256.png",
+      size: 256,
     },
     ushankaHat: {
       url: "/3DAssets/hats/ushankaHat/texs/ushankaHat_diff_256x256.png",
+      size: 256,
     },
     vikingHelmet: {
       url: "/3DAssets/hats/vikingHelmet/texs/vikingHelmet_diff_256x256.png",
+      size: 256,
     },
   },
   nor: {
     AsianConicalHat: {
       url: "/3DAssets/hats/AsianConicalHat/texs/AsianConicalHat_nor_256x256.png",
+      size: 256,
     },
     aviatorHelmet: {
       url: "/3DAssets/hats/aviatorHelmet/texs/aviatorHelmet_nor_256x256.png",
+      size: 256,
     },
     bicycleHelmet: {
       url: "/3DAssets/hats/bicycleHelmet/texs/bicycleHelmet_nor_256x256.png",
+      size: 256,
     },
     chickenHat: {
       url: "/3DAssets/hats/chickenHat/texs/chickenHat_nor_256x256.png",
+      size: 256,
     },
     deadManHat: {
       url: "/3DAssets/hats/deadManHat/texs/deadManHat_nor_256x256.png",
+      size: 256,
     },
-    hardHat: { url: "/3DAssets/hats/hardHat/texs/hardHat_nor_256x256.png" },
+    hardHat: {
+      url: "/3DAssets/hats/hardHat/texs/hardHat_nor_256x256.png",
+      size: 256,
+    },
     hopliteHelmet: {
       url: "/3DAssets/hats/hopliteHelmet/texs/hopliteHelmet_nor_256x256.png",
+      size: 256,
     },
     militaryHat: {
       url: "/3DAssets/hats/militaryHat/texs/militaryHat_nor_256x256.png",
+      size: 256,
     },
     santaHat: {
       url: "/3DAssets/hats/santaHat/texs/santaHat_nor_256x256.png",
+      size: 256,
     },
     seamanHat: {
       url: "/3DAssets/hats/seamanHat/texs/seamanHat_nor_256x256.png",
+      size: 256,
     },
     superMarioOdysseyHat: {
       url: "/3DAssets/hats/superMarioOdysseyHat/texs/superMarioOdysseyHat_nor_256x256.png",
+      size: 256,
     },
     vikingHelmet: {
       url: "/3DAssets/hats/vikingHelmet/texs/vikingHelmet_nor_256x256.png",
+      size: 256,
     },
   },
-  metalRough: {
+  transmissionRoughnessMetallic: {
     AsianConicalHat: {
-      url: "/3DAssets/hats/AsianConicalHat/texs/AsianConicalHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/AsianConicalHat/texs/AsianConicalHat_transRoughMetal_256x256.png",
+      size: 256,
     },
     bicornHat: {
-      url: "/3DAssets/hats/bicornHat/texs/bicornHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/bicornHat/texs/bicornHat_transRoughMetal_256x256.png",
+      size: 256,
     },
     bicycleHelmet: {
-      url: "/3DAssets/hats/bicycleHelmet/texs/bicycleHelmet_metalRough_256x256.png",
+      url: "/3DAssets/hats/bicycleHelmet/texs/bicycleHelmet_transRoughMetal_256x256.png",
+      size: 256,
     },
     chickenHat: {
-      url: "/3DAssets/hats/chickenHat/texs/chickenHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/chickenHat/texs/chickenHat_transRoughMetal_256x256.png",
+      size: 256,
     },
     deadManHat: {
-      url: "/3DAssets/hats/deadManHat/texs/deadManHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/deadManHat/texs/deadManHat_transRoughMetal_256x256.png",
+      size: 256,
     },
     flatCap: {
-      url: "/3DAssets/hats/flatCap/texs/flatCap_metalRough_256x256.png",
+      url: "/3DAssets/hats/flatCap/texs/flatCap_transRoughMetal_256x256.png",
+      size: 256,
     },
     hardHat: {
-      url: "/3DAssets/hats/hardHat/texs/hardHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/hardHat/texs/hardHat_transRoughMetal_256x256.png",
+      size: 256,
     },
     hopliteHelmet: {
-      url: "/3DAssets/hats/hopliteHelmet/texs/hopliteHelmet_metalRough_256x256.png",
+      url: "/3DAssets/hats/hopliteHelmet/texs/hopliteHelmet_transRoughMetal_256x256.png",
+      size: 256,
     },
     militaryHat: {
-      url: "/3DAssets/hats/militaryHat/texs/militaryHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/militaryHat/texs/militaryHat_transRoughMetal_256x256.png",
+      size: 256,
     },
     santaHat: {
-      url: "/3DAssets/hats/santaHat/texs/santaHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/santaHat/texs/santaHat_transRoughMetal_256x256.png",
+      size: 256,
     },
     seamanHat: {
-      url: "/3DAssets/hats/seamanHat/texs/seamanHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/seamanHat/texs/seamanHat_transRoughMetal_256x256.png",
+      size: 256,
     },
     superMarioOdysseyHat: {
-      url: "/3DAssets/hats/superMarioOdysseyHat/texs/superMarioOdysseyHat_metalRough_256x256.png",
+      url: "/3DAssets/hats/superMarioOdysseyHat/texs/superMarioOdysseyHat_transRoughMetal_256x256.png",
+      size: 256,
     },
   },
   spec: {
     hardHat: {
       url: "/3DAssets/hats/hardHat/texs/hardHat_spec_256x256.png",
+      size: 256,
     },
     seamanHat: {
       url: "/3DAssets/hats/seamanHat/texs/seamanHat_spec_256x256.png",
+      size: 256,
     },
   },
   emiss: {},
-  trans: {},
   meshes: {
     AsianConicalHat: {
       url: "/3DAssets/hats/AsianConicalHat/AsianConicalHat.json",
@@ -1056,177 +1291,256 @@ export const petsDataURLs: AssetData = {
   image: {
     angryHamster: {
       url: "/2DAssets/pets/angryHamster/angryHamster_512x512.png",
+      size: 512,
     },
     axolotl: {
       url: "/2DAssets/pets/axolotl/axolotl_512x512.png",
+      size: 512,
     },
     babyDragon: {
       url: "/2DAssets/pets/babyDragon/babyDragon_512x512.png",
+      size: 512,
     },
     beardedDragon: {
       url: "/2DAssets/pets/beardedDragon/beardedDragon_512x512.png",
+      size: 512,
     },
-    bird1: { url: "/2DAssets/pets/bird1/bird1_512x512.png" },
-    bird2: { url: "/2DAssets/pets/bird2/bird2_512x512.png" },
-    boxer: { url: "/2DAssets/pets/boxer/boxer_512x512.png" },
-    brain: { url: "/2DAssets/pets/brain/brain_512x512.png" },
+    bird1: { url: "/2DAssets/pets/bird1/bird1_512x512.png", size: 512 },
+    bird2: { url: "/2DAssets/pets/bird2/bird2_512x512.png", size: 512 },
+    boxer: { url: "/2DAssets/pets/boxer/boxer_512x512.png", size: 512 },
+    brain: { url: "/2DAssets/pets/brain/brain_512x512.png", size: 512 },
     buddyHamster: {
       url: "/2DAssets/pets/buddyHamster/buddyHamster_512x512.png",
+      size: 512,
     },
-    cat1: { url: "/2DAssets/pets/cat1/cat1_512x512.png" },
-    cat2: { url: "/2DAssets/pets/cat2/cat2_512x512.png" },
+    cat1: { url: "/2DAssets/pets/cat1/cat1_512x512.png", size: 512 },
+    cat2: { url: "/2DAssets/pets/cat2/cat2_512x512.png", size: 512 },
     dodoBird: {
       url: "/2DAssets/pets/dodoBird/dodoBird_512x512.png",
+      size: 512,
     },
     happyHamster: {
       url: "/2DAssets/pets/happyHamster/happyHamster_512x512.png",
+      size: 512,
     },
     mechanicalGrasshopper: {
       url: "/2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_512x512.png",
+      size: 512,
     },
-    panda1: { url: "/2DAssets/pets/panda1/panda1_512x512.png" },
-    panda2: { url: "/2DAssets/pets/panda2/panda2_512x512.png" },
+    panda1: { url: "/2DAssets/pets/panda1/panda1_512x512.png", size: 512 },
+    panda2: { url: "/2DAssets/pets/panda2/panda2_512x512.png", size: 512 },
     petRock: {
       url: "/2DAssets/pets/petRock/petRock_512x512.png",
+      size: 512,
     },
-    pig: { url: "/2DAssets/pets/pig/pig_512x512.png" },
+    pig: { url: "/2DAssets/pets/pig/pig_512x512.png", size: 512 },
     redFox1: {
       url: "/2DAssets/pets/redFox1/redFox1_512x512.png",
+      size: 512,
     },
     redFox2: {
       url: "/2DAssets/pets/redFox2/redFox2_512x512.png",
+      size: 512,
     },
     roboDog: {
       url: "/2DAssets/pets/roboDog/roboDog_512x512.png",
+      size: 512,
     },
     skeletonTRex: {
       url: "/2DAssets/pets/skeletonTRex/skeletonTRex_512x512.png",
+      size: 512,
     },
-    snail: { url: "/2DAssets/pets/snail/snail_512x512.png" },
+    snail: { url: "/2DAssets/pets/snail/snail_512x512.png", size: 512 },
     spinosaurus: {
       url: "/2DAssets/pets/spinosaurus/spinosaurus_512x512.png",
+      size: 512,
     },
-    TRex: { url: "/2DAssets/pets/TRex/TRex_512x512.png" },
+    TRex: { url: "/2DAssets/pets/TRex/TRex_512x512.png", size: 512 },
   },
   diff: {
     angryHamster: {
       url: "/3DAssets/pets/angryHamster/texs/angryHamster_diff_256x256.png",
+      size: 256,
     },
     axolotl: {
       url: "/3DAssets/pets/axolotl/texs/axolotl_diff_256x256.png",
+      size: 256,
     },
     babyDragon: {
       url: "/3DAssets/pets/babyDragon/texs/babyDragon_diff_256x256.png",
+      size: 256,
     },
     beardedDragon: {
       url: "/3DAssets/pets/beardedDragon/texs/beardedDragon_diff_256x256.png",
+      size: 256,
     },
-    bird1: { url: "/3DAssets/pets/bird1/texs/bird1_diff_256x256.png" },
-    bird2: { url: "/3DAssets/pets/bird2/texs/bird2_diff_256x256.png" },
-    boxer: { url: "/3DAssets/pets/boxer/texs/boxer_diff_256x256.png" },
-    brain: { url: "/3DAssets/pets/brain/texs/brain_diff_256x256.png" },
+    bird1: {
+      url: "/3DAssets/pets/bird1/texs/bird1_diff_256x256.png",
+      size: 256,
+    },
+    bird2: {
+      url: "/3DAssets/pets/bird2/texs/bird2_diff_256x256.png",
+      size: 256,
+    },
+    boxer: {
+      url: "/3DAssets/pets/boxer/texs/boxer_diff_256x256.png",
+      size: 256,
+    },
+    brain: {
+      url: "/3DAssets/pets/brain/texs/brain_diff_256x256.png",
+      size: 256,
+    },
     buddyHamster: {
       url: "/3DAssets/pets/buddyHamster/texs/buddyHamster_diff_256x256.png",
+      size: 256,
     },
-    cat1: { url: "/3DAssets/pets/cat1/texs/cat1_diff_256x256.png" },
-    cat2: { url: "/3DAssets/pets/cat2/texs/cat2_diff_256x256.png" },
+    cat1: { url: "/3DAssets/pets/cat1/texs/cat1_diff_256x256.png", size: 256 },
+    cat2: { url: "/3DAssets/pets/cat2/texs/cat2_diff_256x256.png", size: 256 },
     dodoBird: {
       url: "/3DAssets/pets/dodoBird/texs/dodoBird_diff_256x256.png",
+      size: 256,
     },
     happyHamster: {
       url: "/3DAssets/pets/happyHamster/texs/happyHamster_diff_256x256.png",
+      size: 256,
     },
     mechanicalGrasshopper: {
       url: "/3DAssets/pets/mechanicalGrasshopper/texs/mechanicalGrasshopper_diff_256x256.png",
+      size: 256,
     },
-    panda1: { url: "/3DAssets/pets/panda1/texs/panda1_diff_256x256.png" },
-    panda2: { url: "/3DAssets/pets/panda2/texs/panda2_diff_256x256.png" },
+    panda1: {
+      url: "/3DAssets/pets/panda1/texs/panda1_diff_256x256.png",
+      size: 256,
+    },
+    panda2: {
+      url: "/3DAssets/pets/panda2/texs/panda2_diff_256x256.png",
+      size: 256,
+    },
     petRock: {
       url: "/3DAssets/pets/petRock/texs/petRock_diff_256x256.png",
+      size: 256,
     },
-    pig: { url: "/3DAssets/pets/pig/texs/pig_diff_256x256.png" },
+    pig: { url: "/3DAssets/pets/pig/texs/pig_diff_256x256.png", size: 256 },
     redFox1: {
       url: "/3DAssets/pets/redFox1/texs/redFox1_diff_256x256.png",
+      size: 256,
     },
     redFox2: {
       url: "/3DAssets/pets/redFox2/texs/redFox2_diff_256x256.png",
+      size: 256,
     },
     roboDog: {
       url: "/3DAssets/pets/roboDog/texs/roboDog_diff_256x256.png",
+      size: 256,
     },
     skeletonTRex: {
       url: "/3DAssets/pets/skeletonTRex/texs/skeletonTRex_diff_64x64.png",
+      size: 64,
     },
-    snail: { url: "/3DAssets/pets/snail/texs/snail_diff_256x256.png" },
+    snail: {
+      url: "/3DAssets/pets/snail/texs/snail_diff_256x256.png",
+      size: 256,
+    },
     spinosaurus: {
       url: "/3DAssets/pets/spinosaurus/texs/spinosaurus_diff_256x256.png",
+      size: 256,
     },
-    TRex: { url: "/3DAssets/pets/TRex/texs/TRex_diff_256x256.png" },
+    TRex: { url: "/3DAssets/pets/TRex/texs/TRex_diff_256x256.png", size: 256 },
   },
   nor: {
     angryHamster: {
       url: "/3DAssets/pets/angryHamster/texs/angryHamster_nor_256x256.png",
+      size: 256,
     },
-    axolotl: { url: "/3DAssets/pets/axolotl/texs/axolotl_nor_256x256.png" },
+    axolotl: {
+      url: "/3DAssets/pets/axolotl/texs/axolotl_nor_256x256.png",
+      size: 256,
+    },
     babyDragon: {
       url: "/3DAssets/pets/babyDragon/texs/babyDragon_nor_256x256.png",
+      size: 256,
     },
-    brain: { url: "/3DAssets/pets/brain/texs/brain_nor_256x256.png" },
+    brain: {
+      url: "/3DAssets/pets/brain/texs/brain_nor_256x256.png",
+      size: 256,
+    },
     buddyHamster: {
       url: "/3DAssets/pets/buddyHamster/texs/buddyHamster_nor_256x256.png",
+      size: 256,
     },
     happyHamster: {
       url: "/3DAssets/pets/happyHamster/texs/happyHamster_nor_256x256.png",
+      size: 256,
     },
     mechanicalGrasshopper: {
       url: "/3DAssets/pets/mechanicalGrasshopper/texs/mechanicalGrasshopper_nor_256x256.png",
-    },
-    snail: { url: "/3DAssets/pets/snail/texs/snail_nor_256x256.png" },
-    TRex: { url: "/3DAssets/pets/TRex/texs/TRex_nor_256x256.png" },
-  },
-  metalRough: {
-    axolotl: {
-      url: "/3DAssets/pets/axolotl/texs/axolotl_metalRough_256x256.png",
-    },
-    babyDragon: {
-      url: "/3DAssets/pets/babyDragon/texs/babyDragon_metalRough_256x256.png",
-    },
-    boxer: {
-      url: "/3DAssets/pets/boxer/texs/boxer_metalRough_256x256.png",
-    },
-    buddyHamster: {
-      url: "/3DAssets/pets/buddyHamster/texs/buddyHamster_metalRough_256x256.png",
-    },
-    dodoBird: {
-      url: "/3DAssets/pets/dodoBird/texs/dodoBird_metalRough_256x256.png",
-    },
-    happyHamster: {
-      url: "/3DAssets/pets/happyHamster/texs/happyHamster_metalRough_256x256.png",
-    },
-    mechanicalGrasshopper: {
-      url: "/3DAssets/pets/mechanicalGrasshopper/texs/mechanicalGrasshopper_metalRough_256x256.png",
-    },
-    roboDog: {
-      url: "/3DAssets/pets/roboDog/texs/roboDog_metalRough_256x256.png",
+      size: 256,
     },
     snail: {
-      url: "/3DAssets/pets/snail/texs/snail_metalRough_256x256.png",
+      url: "/3DAssets/pets/snail/texs/snail_nor_256x256.png",
+      size: 256,
+    },
+    TRex: { url: "/3DAssets/pets/TRex/texs/TRex_nor_256x256.png", size: 256 },
+  },
+  transmissionRoughnessMetallic: {
+    axolotl: {
+      url: "/3DAssets/pets/axolotl/texs/axolotl_transRoughMetal_256x256.png",
+      size: 256,
+    },
+    babyDragon: {
+      url: "/3DAssets/pets/babyDragon/texs/babyDragon_transRoughMetal_256x256.png",
+      size: 256,
+    },
+    boxer: {
+      url: "/3DAssets/pets/boxer/texs/boxer_transRoughMetal_256x256.png",
+      size: 256,
+    },
+    buddyHamster: {
+      url: "/3DAssets/pets/buddyHamster/texs/buddyHamster_transRoughMetal_256x256.png",
+      size: 256,
+    },
+    dodoBird: {
+      url: "/3DAssets/pets/dodoBird/texs/dodoBird_transRoughMetal_256x256.png",
+      size: 256,
+    },
+    happyHamster: {
+      url: "/3DAssets/pets/happyHamster/texs/happyHamster_transRoughMetal_256x256.png",
+      size: 256,
+    },
+    mechanicalGrasshopper: {
+      url: "/3DAssets/pets/mechanicalGrasshopper/texs/mechanicalGrasshopper_transRoughMetal_256x256.png",
+      size: 256,
+    },
+    roboDog: {
+      url: "/3DAssets/pets/roboDog/texs/roboDog_transRoughMetal_256x256.png",
+      size: 256,
+    },
+    snail: {
+      url: "/3DAssets/pets/snail/texs/snail_transRoughMetal_256x256.png",
+      size: 256,
     },
   },
   spec: {
     angryHamster: {
       url: "/3DAssets/pets/angryHamster/texs/angryHamster_spec_256x256.png",
+      size: 256,
     },
-    boxer: { url: "/3DAssets/pets/boxer/texs/boxer_spec_256x256.png" },
-    brain: { url: "/3DAssets/pets/brain/texs/brain_spec_256x256.png" },
-    TRex: { url: "/3DAssets/pets/TRex/texs/TRex_spec_256x256.png" },
+    boxer: {
+      url: "/3DAssets/pets/boxer/texs/boxer_spec_256x256.png",
+      size: 256,
+    },
+    brain: {
+      url: "/3DAssets/pets/brain/texs/brain_spec_256x256.png",
+      size: 256,
+    },
+    TRex: { url: "/3DAssets/pets/TRex/texs/TRex_spec_256x256.png", size: 256 },
   },
   emiss: {
     mechanicalGrasshopper: {
       url: "/3DAssets/pets/mechanicalGrasshopper/texs/mechanicalGrasshopper_emiss_256x256.png",
+      size: 256,
     },
   },
-  trans: {},
   meshes: {
     angryHamster: { url: "/3DAssets/pets/angryHamster/angryHamster.json" },
     axolotl: { url: "/3DAssets/pets/axolotl/axolotl.json" },
@@ -1283,13 +1597,13 @@ export const assetData: AssetData = {
     ...hatsDataURLs.nor,
     ...petsDataURLs.nor,
   },
-  metalRough: {
-    ...mustachesDataURLs.metalRough,
-    ...beardsDataURLs.metalRough,
-    ...masksDataURLs.metalRough,
-    ...glassesDataURLs.metalRough,
-    ...hatsDataURLs.metalRough,
-    ...petsDataURLs.metalRough,
+  transmissionRoughnessMetallic: {
+    ...mustachesDataURLs.transmissionRoughnessMetallic,
+    ...beardsDataURLs.transmissionRoughnessMetallic,
+    ...masksDataURLs.transmissionRoughnessMetallic,
+    ...glassesDataURLs.transmissionRoughnessMetallic,
+    ...hatsDataURLs.transmissionRoughnessMetallic,
+    ...petsDataURLs.transmissionRoughnessMetallic,
   },
   spec: {
     ...mustachesDataURLs.spec,
@@ -1306,14 +1620,6 @@ export const assetData: AssetData = {
     ...glassesDataURLs.emiss,
     ...hatsDataURLs.emiss,
     ...petsDataURLs.emiss,
-  },
-  trans: {
-    ...mustachesDataURLs.trans,
-    ...beardsDataURLs.trans,
-    ...masksDataURLs.trans,
-    ...glassesDataURLs.trans,
-    ...hatsDataURLs.trans,
-    ...petsDataURLs.trans,
   },
   meshes: {
     ...mustachesDataURLs.meshes,
@@ -1421,9 +1727,8 @@ class CameraMedia {
     this.baseShader.createAtlasTexture("twoDim", {});
     this.baseShader.createAtlasTexture("threeDim", {});
     this.baseShader.createAtlasTexture("normal", {});
-    this.baseShader.createAtlasTexture("metallicRoughness", {});
+    this.baseShader.createAtlasTexture("transmissionRoughnessMetallic", {});
     this.baseShader.createAtlasTexture("specular", {});
-    this.baseShader.createAtlasTexture("transmission", {});
     this.baseShader.createAtlasTexture("emission", {});
 
     this.faceLandmarks = new FaceLandmarks(
@@ -1535,7 +1840,6 @@ class CameraMedia {
   }
 
   private async updateAtlases() {
-    const twoDimUrls: { [key: string]: string } = {};
     const glassesStyles =
       this.currentEffectsStyles.current.camera[this.cameraId].glasses;
     const beardStyles =
@@ -1549,330 +1853,301 @@ class CameraMedia {
     const petStyles =
       this.currentEffectsStyles.current.camera[this.cameraId].pets;
 
-    if (glassesStyles && this.effects.glasses) {
-      const glassesURL = glassesDataURLs.image[glassesStyles.style]?.url;
+    const twoDimAtlasImages: { [key: string]: { url: string; size: number } } =
+      {};
 
-      if (glassesURL) {
-        twoDimUrls[glassesStyles.style] = glassesURL;
+    if (glassesStyles && this.effects.glasses) {
+      const glassesImage = glassesDataURLs.image[glassesStyles.style];
+
+      if (glassesImage) {
+        twoDimAtlasImages[glassesStyles.style] = glassesImage;
       }
     }
     if (beardStyles && this.effects.beards) {
-      const beardURL = beardsDataURLs.image[beardStyles.style]?.url;
+      const beardImage = beardsDataURLs.image[beardStyles.style];
 
-      if (beardURL) {
-        twoDimUrls[beardStyles.style] = beardURL;
+      if (beardImage) {
+        twoDimAtlasImages[beardStyles.style] = beardImage;
       }
     }
     if (mustacheStyles && this.effects.mustaches) {
-      const mustacheURL = mustachesDataURLs.image[mustacheStyles.style]?.url;
+      const mustacheImage = mustachesDataURLs.image[mustacheStyles.style];
 
-      if (mustacheURL) {
-        twoDimUrls[mustacheStyles.style] = mustacheURL;
+      if (mustacheImage) {
+        twoDimAtlasImages[mustacheStyles.style] = mustacheImage;
       }
     }
     if (maskStyles && this.effects.masks) {
-      const maskURL = masksDataURLs.image[maskStyles.style]?.url;
+      const maskImage = masksDataURLs.image[maskStyles.style];
 
-      if (maskURL) {
-        twoDimUrls[maskStyles.style] = maskURL;
+      if (maskImage) {
+        twoDimAtlasImages[maskStyles.style] = maskImage;
       }
     }
     if (hatStyles && this.effects.hats) {
-      const hatURL = hatsDataURLs.image[hatStyles.style]?.url;
+      const hatImage = hatsDataURLs.image[hatStyles.style];
 
-      if (hatURL) {
-        twoDimUrls[hatStyles.style] = hatURL;
+      if (hatImage) {
+        twoDimAtlasImages[hatStyles.style] = hatImage;
       }
     }
     if (petStyles && this.effects.pets) {
-      const petURL = petsDataURLs.image[petStyles.style]?.url;
+      const petImage = petsDataURLs.image[petStyles.style];
 
-      if (petURL) {
-        twoDimUrls[petStyles.style] = petURL;
+      if (petImage) {
+        twoDimAtlasImages[petStyles.style] = petImage;
       }
     }
 
-    const threeDimUrls: { [key: string]: string } = {};
+    const threeDimAtlasImages: {
+      [key: string]: { url: string; size: number };
+    } = {};
 
     if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
-      const glassesURL = glassesDataURLs.diff[glassesStyles.style]?.url;
+      const glassesImage = glassesDataURLs.diff[glassesStyles.style];
 
-      if (glassesURL) {
-        threeDimUrls[glassesStyles.style] = glassesURL;
+      if (glassesImage) {
+        threeDimAtlasImages[glassesStyles.style] = glassesImage;
       }
     }
     if (beardStyles && beardStyles.threeDim && this.effects.beards) {
-      const beardURL = beardsDataURLs.diff[beardStyles.style]?.url;
+      const beardImage = beardsDataURLs.diff[beardStyles.style];
 
-      if (beardURL) {
-        threeDimUrls[beardStyles.style] = beardURL;
+      if (beardImage) {
+        threeDimAtlasImages[beardStyles.style] = beardImage;
       }
     }
     if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
-      const mustacheURL = mustachesDataURLs.diff[mustacheStyles.style]?.url;
+      const mustacheImage = mustachesDataURLs.diff[mustacheStyles.style];
 
-      if (mustacheURL) {
-        threeDimUrls[mustacheStyles.style] = mustacheURL;
+      if (mustacheImage) {
+        threeDimAtlasImages[mustacheStyles.style] = mustacheImage;
       }
     }
     if (maskStyles && maskStyles.threeDim && this.effects.masks) {
-      const maskURL = masksDataURLs.diff[maskStyles.style]?.url;
+      const maskImage = masksDataURLs.diff[maskStyles.style];
 
-      if (maskURL) {
-        threeDimUrls[maskStyles.style] = maskURL;
+      if (maskImage) {
+        threeDimAtlasImages[maskStyles.style] = maskImage;
       }
     }
     if (hatStyles && hatStyles.threeDim && this.effects.hats) {
-      const hatURL = hatsDataURLs.diff[hatStyles.style]?.url;
+      const hatImage = hatsDataURLs.diff[hatStyles.style];
 
-      if (hatURL) {
-        threeDimUrls[hatStyles.style] = hatURL;
+      if (hatImage) {
+        threeDimAtlasImages[hatStyles.style] = hatImage;
       }
     }
     if (petStyles && petStyles.threeDim && this.effects.pets) {
-      const petURL = petsDataURLs.diff[petStyles.style]?.url;
+      const petImage = petsDataURLs.diff[petStyles.style];
 
-      if (petURL) {
-        threeDimUrls[petStyles.style] = petURL;
+      if (petImage) {
+        threeDimAtlasImages[petStyles.style] = petImage;
       }
     }
 
-    const normalUrls: { [key: string]: string } = {};
+    const normalAtlasImages: { [key: string]: { url: string; size: number } } =
+      {};
 
     if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
-      const glassesURL = glassesDataURLs.nor[glassesStyles.style]?.url;
+      const glassesImage = glassesDataURLs.nor[glassesStyles.style];
 
-      if (glassesURL) {
-        normalUrls[glassesStyles.style] = glassesURL;
+      if (glassesImage) {
+        normalAtlasImages[glassesStyles.style] = glassesImage;
       }
     }
     if (beardStyles && beardStyles.threeDim && this.effects.beards) {
-      const beardURL = beardsDataURLs.nor[beardStyles.style]?.url;
+      const beardImage = beardsDataURLs.nor[beardStyles.style];
 
-      if (beardURL) {
-        normalUrls[beardStyles.style] = beardURL;
+      if (beardImage) {
+        normalAtlasImages[beardStyles.style] = beardImage;
       }
     }
     if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
-      const mustacheURL = mustachesDataURLs.nor[mustacheStyles.style]?.url;
+      const mustacheImage = mustachesDataURLs.nor[mustacheStyles.style];
 
-      if (mustacheURL) {
-        normalUrls[mustacheStyles.style] = mustacheURL;
+      if (mustacheImage) {
+        normalAtlasImages[mustacheStyles.style] = mustacheImage;
       }
     }
     if (maskStyles && maskStyles.threeDim && this.effects.masks) {
-      const maskURL = masksDataURLs.nor[maskStyles.style]?.url;
+      const maskImage = masksDataURLs.nor[maskStyles.style];
 
-      if (maskURL) {
-        normalUrls[maskStyles.style] = maskURL;
+      if (maskImage) {
+        normalAtlasImages[maskStyles.style] = maskImage;
       }
     }
     if (hatStyles && hatStyles.threeDim && this.effects.hats) {
-      const hatURL = hatsDataURLs.nor[hatStyles.style]?.url;
+      const hatImage = hatsDataURLs.nor[hatStyles.style];
 
-      if (hatURL) {
-        normalUrls[hatStyles.style] = hatURL;
+      if (hatImage) {
+        normalAtlasImages[hatStyles.style] = hatImage;
       }
     }
     if (petStyles && petStyles.threeDim && this.effects.pets) {
-      const petURL = petsDataURLs.nor[petStyles.style]?.url;
+      const petImage = petsDataURLs.nor[petStyles.style];
 
-      if (petURL) {
-        normalUrls[petStyles.style] = petURL;
+      if (petImage) {
+        normalAtlasImages[petStyles.style] = petImage;
       }
     }
 
-    const metallicRoughnessUrls: { [key: string]: string } = {};
+    const transmissionRoughnessMetallicUrls: {
+      [key: string]: { url: string; size: number };
+    } = {};
 
     if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
-      const glassesURL = glassesDataURLs.metalRough[glassesStyles.style]?.url;
+      const glassesImage =
+        glassesDataURLs.transmissionRoughnessMetallic[glassesStyles.style];
 
-      if (glassesURL) {
-        metallicRoughnessUrls[glassesStyles.style] = glassesURL;
+      if (glassesImage) {
+        transmissionRoughnessMetallicUrls[glassesStyles.style] = glassesImage;
       }
     }
     if (beardStyles && beardStyles.threeDim && this.effects.beards) {
-      const beardURL = beardsDataURLs.metalRough[beardStyles.style]?.url;
+      const beardImage =
+        beardsDataURLs.transmissionRoughnessMetallic[beardStyles.style];
 
-      if (beardURL) {
-        metallicRoughnessUrls[beardStyles.style] = beardURL;
+      if (beardImage) {
+        transmissionRoughnessMetallicUrls[beardStyles.style] = beardImage;
       }
     }
     if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
-      const mustacheURL =
-        mustachesDataURLs.metalRough[mustacheStyles.style]?.url;
+      const mustacheImage =
+        mustachesDataURLs.transmissionRoughnessMetallic[mustacheStyles.style];
 
-      if (mustacheURL) {
-        metallicRoughnessUrls[mustacheStyles.style] = mustacheURL;
+      if (mustacheImage) {
+        transmissionRoughnessMetallicUrls[mustacheStyles.style] = mustacheImage;
       }
     }
     if (maskStyles && maskStyles.threeDim && this.effects.masks) {
-      const maskURL = masksDataURLs.metalRough[maskStyles.style]?.url;
+      const maskImage =
+        masksDataURLs.transmissionRoughnessMetallic[maskStyles.style];
 
-      if (maskURL) {
-        metallicRoughnessUrls[maskStyles.style] = maskURL;
+      if (maskImage) {
+        transmissionRoughnessMetallicUrls[maskStyles.style] = maskImage;
       }
     }
     if (hatStyles && hatStyles.threeDim && this.effects.hats) {
-      const hatURL = hatsDataURLs.metalRough[hatStyles.style]?.url;
+      const hatImage =
+        hatsDataURLs.transmissionRoughnessMetallic[hatStyles.style];
 
-      if (hatURL) {
-        metallicRoughnessUrls[hatStyles.style] = hatURL;
+      if (hatImage) {
+        transmissionRoughnessMetallicUrls[hatStyles.style] = hatImage;
       }
     }
     if (petStyles && petStyles.threeDim && this.effects.pets) {
-      const petURL = petsDataURLs.metalRough[petStyles.style]?.url;
+      const petImage =
+        petsDataURLs.transmissionRoughnessMetallic[petStyles.style];
 
-      if (petURL) {
-        metallicRoughnessUrls[petStyles.style] = petURL;
+      if (petImage) {
+        transmissionRoughnessMetallicUrls[petStyles.style] = petImage;
       }
     }
 
-    const specularUrls: { [key: string]: string } = {};
+    const specularAtlasImages: {
+      [key: string]: { url: string; size: number };
+    } = {};
 
     if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
-      const glassesURL = glassesDataURLs.spec[glassesStyles.style]?.url;
+      const glassesImage = glassesDataURLs.spec[glassesStyles.style];
 
-      if (glassesURL) {
-        specularUrls[glassesStyles.style] = glassesURL;
+      if (glassesImage) {
+        specularAtlasImages[glassesStyles.style] = glassesImage;
       }
     }
     if (beardStyles && beardStyles.threeDim && this.effects.beards) {
-      const beardURL = beardsDataURLs.spec[beardStyles.style]?.url;
+      const beardImage = beardsDataURLs.spec[beardStyles.style];
 
-      if (beardURL) {
-        specularUrls[beardStyles.style] = beardURL;
+      if (beardImage) {
+        specularAtlasImages[beardStyles.style] = beardImage;
       }
     }
     if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
-      const mustacheURL = mustachesDataURLs.spec[mustacheStyles.style]?.url;
+      const mustacheImage = mustachesDataURLs.spec[mustacheStyles.style];
 
-      if (mustacheURL) {
-        specularUrls[mustacheStyles.style] = mustacheURL;
+      if (mustacheImage) {
+        specularAtlasImages[mustacheStyles.style] = mustacheImage;
       }
     }
     if (maskStyles && maskStyles.threeDim && this.effects.masks) {
-      const maskURL = masksDataURLs.spec[maskStyles.style]?.url;
+      const maskImage = masksDataURLs.spec[maskStyles.style];
 
-      if (maskURL) {
-        specularUrls[maskStyles.style] = maskURL;
+      if (maskImage) {
+        specularAtlasImages[maskStyles.style] = maskImage;
       }
     }
     if (hatStyles && hatStyles.threeDim && this.effects.hats) {
-      const hatURL = hatsDataURLs.spec[hatStyles.style]?.url;
+      const hatImage = hatsDataURLs.spec[hatStyles.style];
 
-      if (hatURL) {
-        specularUrls[hatStyles.style] = hatURL;
+      if (hatImage) {
+        specularAtlasImages[hatStyles.style] = hatImage;
       }
     }
     if (petStyles && petStyles.threeDim && this.effects.pets) {
-      const petURL = petsDataURLs.spec[petStyles.style]?.url;
+      const petImage = petsDataURLs.spec[petStyles.style];
 
-      if (petURL) {
-        specularUrls[petStyles.style] = petURL;
+      if (petImage) {
+        specularAtlasImages[petStyles.style] = petImage;
       }
     }
 
-    const transmissionUrls: { [key: string]: string } = {};
+    const emissionAtlasImages: {
+      [key: string]: { url: string; size: number };
+    } = {};
 
     if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
-      const glassesURL = glassesDataURLs.trans[glassesStyles.style]?.url;
+      const glassesImage = glassesDataURLs.emiss[glassesStyles.style];
 
-      if (glassesURL) {
-        transmissionUrls[glassesStyles.style] = glassesURL;
+      if (glassesImage) {
+        emissionAtlasImages[glassesStyles.style] = glassesImage;
       }
     }
     if (beardStyles && beardStyles.threeDim && this.effects.beards) {
-      const beardURL = beardsDataURLs.trans[beardStyles.style]?.url;
+      const beardImage = beardsDataURLs.emiss[beardStyles.style];
 
-      if (beardURL) {
-        transmissionUrls[beardStyles.style] = beardURL;
+      if (beardImage) {
+        emissionAtlasImages[beardStyles.style] = beardImage;
       }
     }
     if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
-      const mustacheURL = mustachesDataURLs.trans[mustacheStyles.style]?.url;
+      const mustacheImage = mustachesDataURLs.emiss[mustacheStyles.style];
 
-      if (mustacheURL) {
-        transmissionUrls[mustacheStyles.style] = mustacheURL;
+      if (mustacheImage) {
+        emissionAtlasImages[mustacheStyles.style] = mustacheImage;
       }
     }
     if (maskStyles && maskStyles.threeDim && this.effects.masks) {
-      const maskURL = masksDataURLs.trans[maskStyles.style]?.url;
+      const maskImage = masksDataURLs.emiss[maskStyles.style];
 
-      if (maskURL) {
-        transmissionUrls[maskStyles.style] = maskURL;
+      if (maskImage) {
+        emissionAtlasImages[maskStyles.style] = maskImage;
       }
     }
     if (hatStyles && hatStyles.threeDim && this.effects.hats) {
-      const hatURL = hatsDataURLs.trans[hatStyles.style]?.url;
+      const hatImage = hatsDataURLs.emiss[hatStyles.style];
 
-      if (hatURL) {
-        transmissionUrls[hatStyles.style] = hatURL;
+      if (hatImage) {
+        emissionAtlasImages[hatStyles.style] = hatImage;
       }
     }
     if (petStyles && petStyles.threeDim && this.effects.pets) {
-      const petURL = petsDataURLs.trans[petStyles.style]?.url;
+      const petImage = petsDataURLs.emiss[petStyles.style];
 
-      if (petURL) {
-        transmissionUrls[petStyles.style] = petURL;
+      if (petImage) {
+        emissionAtlasImages[petStyles.style] = petImage;
       }
     }
 
-    const emissionUrls: { [key: string]: string } = {};
-
-    if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
-      const glassesURL = glassesDataURLs.emiss[glassesStyles.style]?.url;
-
-      if (glassesURL) {
-        emissionUrls[glassesStyles.style] = glassesURL;
-      }
-    }
-    if (beardStyles && beardStyles.threeDim && this.effects.beards) {
-      const beardURL = beardsDataURLs.emiss[beardStyles.style]?.url;
-
-      if (beardURL) {
-        emissionUrls[beardStyles.style] = beardURL;
-      }
-    }
-    if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
-      const mustacheURL = mustachesDataURLs.emiss[mustacheStyles.style]?.url;
-
-      if (mustacheURL) {
-        emissionUrls[mustacheStyles.style] = mustacheURL;
-      }
-    }
-    if (maskStyles && maskStyles.threeDim && this.effects.masks) {
-      const maskURL = masksDataURLs.emiss[maskStyles.style]?.url;
-
-      if (maskURL) {
-        emissionUrls[maskStyles.style] = maskURL;
-      }
-    }
-    if (hatStyles && hatStyles.threeDim && this.effects.hats) {
-      const hatURL = hatsDataURLs.emiss[hatStyles.style]?.url;
-
-      if (hatURL) {
-        emissionUrls[hatStyles.style] = hatURL;
-      }
-    }
-    if (petStyles && petStyles.threeDim && this.effects.pets) {
-      const petURL = petsDataURLs.emiss[petStyles.style]?.url;
-
-      if (petURL) {
-        emissionUrls[petStyles.style] = petURL;
-      }
-    }
-
-    await this.baseShader.updateAtlasTexture("twoDim", twoDimUrls);
-    await this.baseShader.updateAtlasTexture("threeDim", threeDimUrls);
-    await this.baseShader.updateAtlasTexture("normal", normalUrls);
+    await this.baseShader.updateAtlasTexture("twoDim", twoDimAtlasImages);
+    await this.baseShader.updateAtlasTexture("threeDim", threeDimAtlasImages);
+    await this.baseShader.updateAtlasTexture("normal", normalAtlasImages);
     await this.baseShader.updateAtlasTexture(
-      "metallicRoughness",
-      metallicRoughnessUrls
+      "transmissionRoughnessMetallic",
+      transmissionRoughnessMetallicUrls
     );
-    await this.baseShader.updateAtlasTexture("specular", specularUrls);
-    await this.baseShader.updateAtlasTexture("transmission", transmissionUrls);
-    await this.baseShader.updateAtlasTexture("emission", emissionUrls);
+    await this.baseShader.updateAtlasTexture("specular", specularAtlasImages);
+    await this.baseShader.updateAtlasTexture("emission", emissionAtlasImages);
   }
 
   async changeEffects(
