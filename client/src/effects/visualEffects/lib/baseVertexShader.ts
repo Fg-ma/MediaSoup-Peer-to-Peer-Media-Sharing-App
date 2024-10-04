@@ -2,9 +2,11 @@ const baseVertexShaderSource = `
   attribute vec3 a_position;
   attribute vec2 a_texCoord;
   attribute vec3 a_normal;
+  attribute vec3 a_materialTexCoord;
 
   varying vec2 v_texCoord;
   varying vec3 v_normal;
+  varying vec3 v_materialTexCoord;
 
   attribute vec2 a_normalTexCoord;
   attribute vec2 a_transmissionRoughnessMetallicTexCoord;
@@ -27,6 +29,7 @@ const baseVertexShaderSource = `
     // Pass to fragment shader
     v_texCoord = a_texCoord;
     v_normal = a_normal;
+    v_materialTexCoord = a_materialTexCoord;
 
     v_normalTexCoord = a_normalTexCoord;
     v_transmissionRoughnessMetallicTexCoord = a_transmissionRoughnessMetallicTexCoord; 

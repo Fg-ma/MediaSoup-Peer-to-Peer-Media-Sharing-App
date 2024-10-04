@@ -1,12 +1,19 @@
 import { getNextTexturePosition } from "./handleTexturePosition";
 
-class Atlas {
+class MaterialAtlas {
   private gl: WebGL2RenderingContext | WebGLRenderingContext;
   private atlasCanvas: HTMLCanvasElement | null = null;
   private atlasContext: CanvasRenderingContext2D | null = null;
 
   private atlasImages:
-    | { [URLType: string]: { url: string; size: number } }
+    | {
+        [key: string]: {
+          normal?: { url: string; size: number };
+          transmissionRoughnessMetallic?: { url: string; size: number };
+          specular?: { url: string; size: number };
+          emission?: { url: string; size: number };
+        };
+      }
     | undefined = undefined;
   private altasImageURLMap: {
     url: string;
@@ -55,46 +62,77 @@ class Atlas {
       return;
     }
 
-    // Calculate total width and height needed for the atlas
-    let currentHeight = 0;
-    let currentWidth = 0;
+    const textureSize = 256; // All textures are 256x256
+    let currentWidth = 0; // To track the horizontal position in the atlas
 
-    // Load images and calculate their placement in the atlas
-    for (const [key, { url, size }] of Object.entries(this.atlasImages)) {
-      const image = await this.loadImage(url);
-      const img = image.img;
+    // Iterate through each key in the atlasImages
+    for (const [key, textures] of Object.entries(this.atlasImages)) {
+      let currentHeight = 0; // Reset height for each new column (key)
 
-      // Ensure the current width + the image width doesn't exceed the atlas size
-      if (currentWidth + size > this.atlasSize) {
-        // Move to the next row
-        currentHeight += size;
-        currentWidth = 0;
+      // Define the order in which the textures will be drawn
+      const textureOrder = [
+        "normal",
+        "transmissionRoughnessMetallic",
+        "specular",
+        "emission",
+      ];
+
+      // Loop through each texture type (normal, transmissionRoughnessMetallic, etc.)
+      for (const textureType of textureOrder) {
+        const texture = textures[textureType as keyof typeof textures];
+
+        if (texture && texture.url) {
+          const { url, size } = texture;
+
+          // Load the image
+          const image = await this.loadImage(url);
+          const img = image.img;
+
+          // Ensure the current width + the image width doesn't exceed the atlas size
+          if (currentWidth + textureSize > this.atlasSize) {
+            // Move to the next row (horizontally)
+            currentWidth += textureSize;
+            currentHeight = 0; // Reset height for the new column
+          }
+
+          // Draw the image on the canvas at the current position (stacked vertically)
+          this.atlasContext?.drawImage(
+            img,
+            currentWidth,
+            currentHeight,
+            textureSize,
+            textureSize
+          );
+
+          // Store the image position in the map
+          if (textureType === "normal") {
+            this.altasImageURLMap.push({
+              url: url,
+              top: currentHeight,
+              left: currentWidth,
+              size: textureSize,
+            });
+          }
+        }
+
+        // Move the height down by 256 pixels, even if the texture wasn't defined
+        currentHeight += textureSize;
       }
 
-      // Draw the image on the canvas at the current position
-      this.atlasContext?.drawImage(
-        img,
-        currentWidth,
-        currentHeight,
-        size,
-        size // Keep the aspect ratio
-      );
-
-      // Store the image position
-      this.altasImageURLMap.push({
-        url: url,
-        top: currentHeight,
-        left: currentWidth,
-        size,
-      });
-
-      // Update current width for the next image
-      currentWidth += size;
+      // After processing all textures for the current key, move to the next column
+      currentWidth += textureSize;
     }
   }
 
   async createAtlas(
-    atlasImages: { [URLType in string]: { url: string; size: number } },
+    atlasImages: {
+      [key: string]: {
+        normal?: { url: string; size: number };
+        transmissionRoughnessMetallic?: { url: string; size: number };
+        specular?: { url: string; size: number };
+        emission?: { url: string; size: number };
+      };
+    },
     uAtlasTextureLocation: WebGLUniformLocation | null
   ) {
     this.atlasImages = atlasImages;
@@ -135,20 +173,29 @@ class Atlas {
       this.gl.LINEAR
     );
 
-    // Calculate the required atlas size based on total images size
-    let totalWidth = 256;
-    let totalHeight = 256;
+    // Calculate the required atlas size based on total image size
+    let totalWidth = 1024; // Start with a base size
+    let totalHeight = 1024; // Start with a base size
     if (Object.keys(this.atlasImages).length > 0) {
       totalWidth = Math.max(
-        ...Object.values(this.atlasImages).map((img) => img.size)
+        ...Object.values(this.atlasImages).map((textures) =>
+          Math.max(
+            textures.normal?.size || 0,
+            textures.transmissionRoughnessMetallic?.size || 0,
+            textures.specular?.size || 0,
+            textures.emission?.size || 0
+          )
+        )
       );
-      totalHeight = Object.values(this.atlasImages).length * totalWidth; // This might need to be adjusted based on your layout requirements.
+      totalHeight = Object.keys(this.atlasImages).length * totalWidth;
     }
 
-    // Ensure the atlas size is a power of two
-    this.atlasSize = Math.pow(
-      2,
-      Math.ceil(Math.log2(Math.max(totalWidth, totalHeight)))
+    // Ensure the atlas size is the next multiple of 1024
+    const nextMultipleOf1024 = (size: number) => Math.ceil(size / 1024) * 1024;
+
+    this.atlasSize = Math.max(
+      nextMultipleOf1024(totalWidth),
+      nextMultipleOf1024(totalHeight)
     );
 
     this.atlasCanvas = document.createElement("canvas");
@@ -157,6 +204,7 @@ class Atlas {
     this.atlasContext = this.atlasCanvas.getContext("2d", {
       willReadFrequently: true,
     });
+    document.getElementById("root")?.appendChild(this.atlasCanvas);
 
     if (!this.atlasContext) {
       throw new Error("Unable to create canvas 2D context.");
@@ -189,7 +237,14 @@ class Atlas {
   }
 
   async updateAtlas(atlasImages: {
-    [URLType in string]: { url: string; size: number };
+    [URLType in string]: {
+      [key: string]: {
+        normal?: { url: string; size: number };
+        transmissionRoughnessMetallic?: { url: string; size: number };
+        specular?: { url: string; size: number };
+        emission?: { url: string; size: number };
+      };
+    };
   }) {
     if (!this.texturePosition || !this.atlasContext || !this.atlasCanvas) {
       return;
@@ -245,22 +300,35 @@ class Atlas {
     let currentWidth = 0;
     let maxHeight = 0; // Keep track of the tallest image in the current row
 
+    // Helper function to ensure the size is a multiple of 1024
+    const nextMultipleOf1024 = (size: number) => Math.ceil(size / 1024) * 1024;
+
     // Calculate the size of the atlas and placement of images
-    for (const { size } of Object.values(this.atlasImages)) {
-      currentWidth += size;
-      maxHeight = Math.max(maxHeight, size);
-      // If the current width exceeds the atlas size, move to the next row
-      if (currentWidth > (this.atlasSize ?? 0)) {
-        currentHeight += maxHeight; // Move down by the tallest image
-        currentWidth = size; // Start new row with the current image
-        maxHeight = size; // Reset maxHeight for the new row
+    for (const textures of Object.values(this.atlasImages)) {
+      const maxTextureSize = Math.max(
+        textures.normal?.size || 0,
+        textures.transmissionRoughnessMetallic?.size || 0,
+        textures.specular?.size || 0,
+        textures.emission?.size || 0
+      );
+
+      if (maxTextureSize > 0) {
+        currentWidth += maxTextureSize;
+        maxHeight = Math.max(maxHeight, maxTextureSize);
+
+        // If the current width exceeds the atlas size, move to the next row
+        if (currentWidth > (this.atlasSize ?? 0)) {
+          currentHeight += maxHeight; // Move down by the tallest image
+          currentWidth = maxTextureSize; // Start new row with the current image
+          maxHeight = maxTextureSize; // Reset maxHeight for the new row
+        }
       }
     }
 
-    // Update the atlasSize to ensure it fits all images
-    this.atlasSize = Math.pow(
-      2,
-      Math.ceil(Math.log2(currentHeight + maxHeight))
+    // Update the atlasSize to the next multiple of 1024
+    this.atlasSize = Math.max(
+      nextMultipleOf1024(currentWidth),
+      nextMultipleOf1024(currentHeight + maxHeight)
     );
 
     // Set the new canvas dimensions
@@ -312,4 +380,4 @@ class Atlas {
   }
 }
 
-export default Atlas;
+export default MaterialAtlas;

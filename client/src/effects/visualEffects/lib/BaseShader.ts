@@ -19,6 +19,7 @@ import {
   MustachesEffectTypes,
   PetsEffectTypes,
 } from "../../../context/CurrentEffectsStylesContext";
+import MaterialAtlas from "./MaterialAtlas";
 
 export interface MeshJSON {
   vertex_faces: number[];
@@ -47,6 +48,7 @@ class BaseShader {
   private positionBuffer: WebGLBuffer | null = null;
   private normalBuffer: WebGLBuffer | null = null;
   private texCoordBuffer: WebGLBuffer | null = null;
+  private materialTexCoordBuffer: WebGLBuffer | null = null;
   private normalTexCoordBuffer: WebGLBuffer | null = null;
   private transmissionRoughnessMetallicTexCoordBuffer: WebGLBuffer | null =
     null;
@@ -55,17 +57,22 @@ class BaseShader {
   private indexBuffer: WebGLBuffer | null = null;
 
   private twoDimAtlas: Atlas | null = null;
-  private twoDimAltasTexMap:
+  private twoDimAtlasTexMap:
     | { [tex: string]: { url: string; size: number } }
     | undefined = undefined;
 
   private threeDimAtlas: Atlas | null = null;
-  private threeDimAltasTexMap:
+  private threeDimAtlasTexMap:
     | { [tex: string]: { url: string; size: number } }
     | undefined = undefined;
 
-  private normalAltas: Atlas | null = null;
-  private normalAltasTexMap:
+  private materialAtlas: MaterialAtlas | null = null;
+  private materialAtlasTexMap:
+    | { [tex: string]: { url: string; size: number } }
+    | undefined = undefined;
+
+  private normalAtlas: Atlas | null = null;
+  private normalAtlasTexMap:
     | { [tex: string]: { url: string; size: number } }
     | undefined = undefined;
 
@@ -95,6 +102,7 @@ class BaseShader {
   private uTwoDimEffectAtlasTextureLocation: WebGLUniformLocation | null = null;
   private uThreeDimEffectAtlasTextureLocation: WebGLUniformLocation | null =
     null;
+  private uMaterialAtlasTextureLocation: WebGLUniformLocation | null = null;
   private uNormalMapTexture: WebGLUniformLocation | null = null;
   private uTransmissionRoughnessMetallicMapTexture: WebGLUniformLocation | null =
     null;
@@ -111,6 +119,7 @@ class BaseShader {
   // Attribute locations
   private aPositionLocation: number | null = null;
   private aTexCoordLocation: number | null = null;
+  private aMaterialTexCoordLocation: number | null = null;
   private aNormalLocation: number | null = null;
   private aNormalTexCoordLocation: number | null = null;
   private aTransmissionRoughnessMetallicTexCoordLocation: number | null = null;
@@ -268,9 +277,13 @@ class BaseShader {
       this.threeDimAtlas.deconstructor();
       this.threeDimAtlas = null;
     }
-    if (this.normalAltas) {
-      this.normalAltas.deconstructor();
-      this.normalAltas = null;
+    if (this.materialAtlas) {
+      this.materialAtlas.deconstructor();
+      this.materialAtlas = null;
+    }
+    if (this.normalAtlas) {
+      this.normalAtlas.deconstructor();
+      this.normalAtlas = null;
     }
     if (this.transmissionRoughnessMetallicAtlas) {
       this.transmissionRoughnessMetallicAtlas.deconstructor();
@@ -352,6 +365,10 @@ class BaseShader {
     this.uThreeDimEffectAtlasTextureLocation = this.gl.getUniformLocation(
       this.program,
       "u_threeDimEffectAtlasTexture"
+    );
+    this.uMaterialAtlasTextureLocation = this.gl.getUniformLocation(
+      this.program,
+      "u_materialAtlasTexture"
     );
     this.uNormalMapTexture = this.gl.getUniformLocation(
       this.program,
@@ -449,6 +466,10 @@ class BaseShader {
       this.program,
       "a_texCoord"
     );
+    this.aMaterialTexCoordLocation = this.gl.getAttribLocation(
+      this.program,
+      "a_materialTexCoord"
+    );
     this.aNormalLocation = this.gl.getAttribLocation(this.program, "a_normal");
     this.aNormalTexCoordLocation = this.gl.getAttribLocation(
       this.program,
@@ -474,6 +495,7 @@ class BaseShader {
       this.aPositionLocation === null ||
       this.aNormalLocation === null ||
       this.aTexCoordLocation === null ||
+      this.aMaterialTexCoordLocation === null ||
       this.aNormalTexCoordLocation === null ||
       this.aTransmissionRoughnessMetallicTexCoordLocation === null ||
       this.aSpecularTexCoordLocation === null ||
@@ -518,6 +540,18 @@ class BaseShader {
       0
     );
     this.gl.enableVertexAttribArray(this.aTexCoordLocation);
+
+    this.materialTexCoordBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.materialTexCoordBuffer);
+    this.gl.vertexAttribPointer(
+      this.aMaterialTexCoordLocation,
+      2,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+    this.gl.enableVertexAttribArray(this.aMaterialTexCoordLocation);
 
     this.normalTexCoordBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalTexCoordBuffer);
@@ -804,48 +838,82 @@ class BaseShader {
     type:
       | "twoDim"
       | "threeDim"
+      | "material"
       | "normal"
       | "transmissionRoughnessMetallic"
       | "specular"
       | "emission",
-    atlasImages: { [URLType: string]: { url: string; size: number } }
+    atlasImages:
+      | { [URLType: string]: { url: string; size: number } }
+      | {
+          [key: string]: {
+            normal?: { url: string; size: number };
+            transmissionRoughnessMetallic?: { url: string; size: number };
+            specular?: { url: string; size: number };
+            emission?: { url: string; size: number };
+          };
+        }
   ) => {
     if (type === "twoDim") {
-      this.twoDimAltasTexMap = atlasImages;
+      // @ts-ignore
+      this.twoDimAtlasTexMap = atlasImages;
       this.twoDimAtlas = new Atlas(this.gl);
       await this.twoDimAtlas.createAtlas(
+        // @ts-ignore
         atlasImages,
         this.uTwoDimEffectAtlasTextureLocation
       );
     } else if (type === "threeDim") {
-      this.threeDimAltasTexMap = atlasImages;
+      // @ts-ignore
+      this.threeDimAtlasTexMap = atlasImages;
       this.threeDimAtlas = new Atlas(this.gl);
       await this.threeDimAtlas.createAtlas(
+        // @ts-ignore
         atlasImages,
         this.uThreeDimEffectAtlasTextureLocation
       );
+    } else if (type === "material") {
+      // @ts-ignore
+      this.materialAtlasTexMap = atlasImages;
+      this.materialAtlas = new MaterialAtlas(this.gl);
+      await this.materialAtlas.createAtlas(
+        // @ts-ignore
+        atlasImages,
+        this.uMaterialAtlasTextureLocation
+      );
     } else if (type === "normal") {
-      this.normalAltasTexMap = atlasImages;
-      this.normalAltas = new Atlas(this.gl);
-      await this.normalAltas.createAtlas(atlasImages, this.uNormalMapTexture);
+      // @ts-ignore
+      this.normalAtlasTexMap = atlasImages;
+      this.normalAtlas = new Atlas(this.gl);
+      await this.normalAtlas.createAtlas(
+        // @ts-ignore
+        atlasImages,
+        this.uNormalMapTexture
+      );
     } else if (type === "transmissionRoughnessMetallic") {
+      // @ts-ignore
       this.transmissionRoughnessMetallicAtlasTexMap = atlasImages;
       this.transmissionRoughnessMetallicAtlas = new Atlas(this.gl);
       await this.transmissionRoughnessMetallicAtlas.createAtlas(
+        // @ts-ignore
         atlasImages,
         this.uTransmissionRoughnessMetallicMapTexture
       );
     } else if (type === "specular") {
+      // @ts-ignore
       this.specularAtlasTexMap = atlasImages;
       this.specularAtlas = new Atlas(this.gl);
       await this.specularAtlas.createAtlas(
+        // @ts-ignore
         atlasImages,
         this.uSpecularMapTexture
       );
     } else if (type === "emission") {
+      // @ts-ignore
       this.emissionAtlasTexMap = atlasImages;
       this.emissionAtlas = new Atlas(this.gl);
       await this.emissionAtlas.createAtlas(
+        // @ts-ignore
         atlasImages,
         this.uEmissionMapTexture
       );
@@ -856,29 +924,56 @@ class BaseShader {
     type:
       | "twoDim"
       | "threeDim"
+      | "material"
       | "normal"
       | "transmissionRoughnessMetallic"
       | "specular"
       | "emission",
-    atlasImages: { [URLType: string]: { url: string; size: number } }
+    atlasImages:
+      | { [URLType: string]: { url: string; size: number } }
+      | {
+          [key: string]: {
+            normal?: { url: string; size: number };
+            transmissionRoughnessMetallic?: { url: string; size: number };
+            specular?: { url: string; size: number };
+            emission?: { url: string; size: number };
+          };
+        }
   ) => {
     if (type === "twoDim") {
-      this.twoDimAltasTexMap = atlasImages;
+      // @ts-ignore
+      this.twoDimAtlasTexMap = atlasImages;
+      // @ts-ignore
       await this.twoDimAtlas?.updateAtlas(atlasImages);
     } else if (type === "threeDim") {
-      this.threeDimAltasTexMap = atlasImages;
+      // @ts-ignore
+      this.threeDimAtlasTexMap = atlasImages;
+      // @ts-ignore
       await this.threeDimAtlas?.updateAtlas(atlasImages);
+    } else if (type === "material") {
+      // @ts-ignore
+      this.materialAtlasTexMap = atlasImages;
+      // @ts-ignore
+      await this.materialAtlas?.updateAtlas(atlasImages);
     } else if (type === "normal") {
-      this.normalAltasTexMap = atlasImages;
-      await this.normalAltas?.updateAtlas(atlasImages);
+      // @ts-ignore
+      this.normalAtlasTexMap = atlasImages;
+      // @ts-ignore
+      await this.normalAtlas?.updateAtlas(atlasImages);
     } else if (type === "transmissionRoughnessMetallic") {
+      // @ts-ignore
       this.transmissionRoughnessMetallicAtlasTexMap = atlasImages;
+      // @ts-ignore
       await this.transmissionRoughnessMetallicAtlas?.updateAtlas(atlasImages);
     } else if (type === "specular") {
+      // @ts-ignore
       this.specularAtlasTexMap = atlasImages;
+      // @ts-ignore
       await this.transmissionRoughnessMetallicAtlas?.updateAtlas(atlasImages);
     } else if (type === "emission") {
+      // @ts-ignore
       this.emissionAtlasTexMap = atlasImages;
+      // @ts-ignore
       await this.emissionAtlas?.updateAtlas(atlasImages);
     }
   };
@@ -983,9 +1078,9 @@ class BaseShader {
     let tex:
       | { url: string; top: number; left: number; size: number }
       | undefined;
-    if (this.twoDimAltasTexMap && this.twoDimAltasTexMap[effectType]) {
+    if (this.twoDimAtlasTexMap && this.twoDimAtlasTexMap[effectType]) {
       tex = this.twoDimAtlas.getTextureByURL(
-        this.twoDimAltasTexMap[effectType].url
+        this.twoDimAtlasTexMap[effectType].url
       );
 
       if (!tex) {
@@ -1139,9 +1234,9 @@ class BaseShader {
     let tex:
       | { url: string; top: number; left: number; size: number }
       | undefined;
-    if (this.threeDimAltasTexMap && this.threeDimAltasTexMap[meshType]) {
+    if (this.threeDimAtlasTexMap && this.threeDimAtlasTexMap[meshType]) {
       tex = this.threeDimAtlas.getTextureByURL(
-        this.threeDimAltasTexMap[meshType].url
+        this.threeDimAtlasTexMap[meshType].url
       );
 
       if (tex === undefined) {
@@ -1236,29 +1331,81 @@ class BaseShader {
       0
     );
 
+    let materialTex:
+      | { url: string; top: number; left: number; size: number }
+      | undefined;
+    if (
+      this.materialAtlas &&
+      this.materialAtlasTexMap &&
+      this.materialAtlasTexMap[meshType]
+    ) {
+      materialTex = this.materialAtlas.getTextureByURL(
+        this.materialAtlasTexMap[meshType].url
+      );
+    }
+
+    const materialAtlasSize = this.materialAtlas?.getAtlasSize();
+
+    if (
+      materialTex &&
+      this.aMaterialTexCoordLocation &&
+      this.materialAtlas &&
+      materialAtlasSize
+    ) {
+      const materialAtlasUVs = [];
+      for (let i = 0; i < meshData.uv_faces.length / 2; i++) {
+        const u = meshData.uv_faces[i * 2];
+        const v = meshData.uv_faces[i * 2 + 1];
+
+        const transformedU =
+          u * (materialTex.size / materialAtlasSize) +
+          materialTex.left / materialAtlasSize;
+        const transformedV =
+          v * (materialTex.size / materialAtlasSize) +
+          materialTex.top / materialAtlasSize;
+
+        materialAtlasUVs.push(transformedU, transformedV);
+      }
+
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.materialTexCoordBuffer);
+      this.gl.bufferData(
+        this.gl.ARRAY_BUFFER,
+        new Float32Array(materialAtlasUVs),
+        this.gl.DYNAMIC_DRAW
+      );
+      this.gl.vertexAttribPointer(
+        this.aMaterialTexCoordLocation,
+        2,
+        this.gl.FLOAT,
+        false,
+        0,
+        0
+      );
+    }
+
     const materialPropertiesBits = [];
-    if (assetData.nor[meshType]) {
+    if (assetData.normal[meshType]) {
       materialPropertiesBits.push(this.NORMAL_MAP_BIT);
 
       let normalTex:
         | { url: string; top: number; left: number; size: number }
         | undefined;
       if (
-        this.normalAltas &&
-        this.normalAltasTexMap &&
-        this.normalAltasTexMap[meshType]
+        this.normalAtlas &&
+        this.normalAtlasTexMap &&
+        this.normalAtlasTexMap[meshType]
       ) {
-        normalTex = this.normalAltas.getTextureByURL(
-          this.normalAltasTexMap[meshType].url
+        normalTex = this.normalAtlas.getTextureByURL(
+          this.normalAtlasTexMap[meshType].url
         );
       }
 
-      const normalAtlasSize = this.normalAltas?.getAtlasSize();
+      const normalAtlasSize = this.normalAtlas?.getAtlasSize();
 
       if (
         normalTex &&
         this.aNormalTexCoordLocation &&
-        this.normalAltas &&
+        this.normalAtlas &&
         normalAtlasSize
       ) {
         const normalAtlasUVs = [];
@@ -1361,7 +1508,7 @@ class BaseShader {
         );
       }
     }
-    if (assetData.spec[meshType]) {
+    if (assetData.specular[meshType]) {
       materialPropertiesBits.push(this.SPECULAR_MAP_BIT);
 
       let specularTex:
@@ -1416,7 +1563,7 @@ class BaseShader {
         );
       }
     }
-    if (assetData.emiss[meshType]) {
+    if (assetData.emission[meshType]) {
       materialPropertiesBits.push(this.EMISSION_MAP_BIT);
 
       let emissionTex:
@@ -1541,9 +1688,9 @@ class BaseShader {
     let tex:
       | { url: string; top: number; left: number; size: number }
       | undefined;
-    if (this.threeDimAltasTexMap && this.threeDimAltasTexMap[meshType]) {
+    if (this.threeDimAtlasTexMap && this.threeDimAtlasTexMap[meshType]) {
       tex = this.threeDimAtlas.getTextureByURL(
-        this.threeDimAltasTexMap[meshType].url
+        this.threeDimAtlasTexMap[meshType].url
       );
       if (tex === undefined) {
         return;

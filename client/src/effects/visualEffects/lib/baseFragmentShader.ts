@@ -26,6 +26,7 @@ const baseFragmentShaderSource = `
 
   varying vec2 v_texCoord;
   varying vec3 v_normal;
+  varying vec2 v_materialTexCoord;
   
   varying vec2 v_normalTexCoord;
   varying vec2 v_transmissionRoughnessMetallicTexCoord;
@@ -37,6 +38,7 @@ const baseFragmentShaderSource = `
   uniform sampler2D u_videoTexture;
   uniform sampler2D u_twoDimEffectAtlasTexture;
   uniform sampler2D u_threeDimEffectAtlasTexture;
+  uniform sampler2D u_materialAtlasTexture;
 
   uniform sampler2D u_normalMapTexture;
   uniform sampler2D u_transmissionRoughnessMetallicMapTexture;
