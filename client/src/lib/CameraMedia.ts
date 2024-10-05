@@ -1196,10 +1196,6 @@ export const hatsDataURLs: AssetData = {
       url: "/3DAssets/hats/AsianConicalHat/texs/AsianConicalHat_transRoughMetal_256x256.png",
       size: 256,
     },
-    bicornHat: {
-      url: "/3DAssets/hats/bicornHat/texs/bicornHat_transRoughMetal_256x256.png",
-      size: 256,
-    },
     bicycleHelmet: {
       url: "/3DAssets/hats/bicycleHelmet/texs/bicycleHelmet_transRoughMetal_256x256.png",
       size: 256,
