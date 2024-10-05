@@ -9,7 +9,7 @@ const baseFragmentShaderSource = `
   #define BLUR_BIT 3
   #define TINT_BIT 4
   #define NORMAL_MAP_BIT 5
-  #define METALLIC_ROUGHNESS_MAP_BIT 6
+  #define TRANSMISSION_ROUGHNESS_METALLIC_MAP_BIT 6
   #define SPECULAR_MAP_BIT 7
   #define EMISSION_MAP_BIT 8
 
@@ -24,15 +24,12 @@ const baseFragmentShaderSource = `
   
   const vec3 cameraViewDir = vec3(0.0, 0.0, -1.0);
 
-  varying vec2 v_texCoord;
-  varying vec3 v_normal;
-  varying vec2 v_materialTexCoord;
-  
-  varying vec2 v_normalTexCoord;
-  varying vec2 v_transmissionRoughnessMetallicTexCoord;
-  varying vec2 v_specularTexCoord;
-  varying vec2 v_emissionTexCoord;
+  const vec3 lightDirection = vec3(-0.1736, 0.0, -0.9848);
 
+  varying vec2 v_texCoord;
+  varying vec2 v_materialTexCoord;
+  varying vec3 v_normal;
+  
   uniform vec2 u_texSize;
 
   uniform sampler2D u_videoTexture;
@@ -40,50 +37,35 @@ const baseFragmentShaderSource = `
   uniform sampler2D u_threeDimEffectAtlasTexture;
   uniform sampler2D u_materialAtlasTexture;
 
-  uniform sampler2D u_normalMapTexture;
-  uniform sampler2D u_transmissionRoughnessMetallicMapTexture;
-  uniform sampler2D u_specularMapTexture;
-  uniform sampler2D u_emissionMapTexture;
-
   uniform int u_effectFlags;
   uniform vec3 u_tintColor;
-  uniform vec3 u_lightDirection; 
 
   // Fresnel Schlick approximation function
   vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
   }
 
- vec3 computeMaterialColor(vec3 baseColor, float metallic, float roughness, vec3 lightDir, vec3 finalNormal, vec3 specularColor, float transmission) {
-    vec3 F0 = mix(vec3(0.04), baseColor, metallic); // Base reflection for dielectrics
+  // Material color computation (metallic, roughness, specular, etc.)
+  vec3 computeMaterialColor(vec3 baseColor, float metallic, float roughness, vec3 lightDir, vec3 finalNormal, vec3 specularColor, float transmission) {
+    vec3 F0 = mix(vec3(0.04), baseColor, metallic);
 
-    // Reflectance
     vec3 reflectedLight = reflect(-cameraViewDir, finalNormal);
-
-    // Calculate the Fresnel term
     float cosTheta = max(dot(finalNormal, cameraViewDir), 0.0);
     vec3 F = fresnelSchlick(cosTheta, F0);
 
-    // Calculate D using a GGX distribution
     float roughnessSquared = roughness * roughness;
     float alpha = roughnessSquared * roughnessSquared;
     float D = max(0.0, dot(finalNormal, lightDir));
     D = alpha / (M_PI * pow((D * D * (alpha - 1.0) + 1.0), 2.0));
 
-    // Calculate the geometry term
     float G = min(1.0, min(2.0 * dot(finalNormal, lightDir) * dot(finalNormal, cameraViewDir) / dot(cameraViewDir, lightDir), 1.0));
 
-    // Combine components to get the final specular color
     vec3 specular = (D * F * G) / (4.0 * dot(finalNormal, cameraViewDir) * dot(finalNormal, lightDir));
 
-    // Blend the base color with the specular contribution more strongly for metallics
-    vec3 metallicColor = mix(baseColor, specularColor * specular, metallic); // Blend based on metallic value
-
-    // Add ambient light to soften shadows
+    vec3 metallicColor = mix(baseColor, specularColor * specular, metallic);
     vec3 finalColor = metallicColor + AMBIENT_COLOR * AMBIENT_INTENSITY;
 
-    // Apply transmission (if needed, you can multiply by a factor)
-    finalColor = mix(finalColor, vec3(1.0), transmission); // Modify this as per your transmission handling
+    finalColor = mix(finalColor, vec3(1.0), transmission);
 
     return finalColor;
   }
@@ -100,48 +82,67 @@ const baseFragmentShaderSource = `
       color = texture2D(u_threeDimEffectAtlasTexture, v_texCoord);
     }
 
-    // Apply additional maps if MESH_BIT is active
+    // If MESH_BIT is active, calculate additional material properties
     if (mod(float(u_effectFlags / int(pow(2.0, float(MESH_BIT)))), 2.0) >= 1.0) {
-      // Sample normal map if available
-      vec3 normalMap = vec3(0.0);
+      float materialAtlasTexCoordOffset = 0.0;
+
+      // Normal map (only if present)
+      vec3 finalNormal = v_normal; // Default to vertex normal
       if (mod(float(u_effectFlags / int(pow(2.0, float(NORMAL_MAP_BIT)))), 2.0) >= 1.0) {
-        normalMap = texture2D(u_normalMapTexture, v_normalTexCoord).rgb * 2.0 - 1.0;
+        vec2 normalMapTexCoord = v_materialTexCoord;
+        vec3 normalMap = texture2D(u_materialAtlasTexture, normalMapTexCoord).rgb * 2.0 - 1.0;
+        finalNormal = normalize(v_normal + normalMap * vec3(1.0, 1.0, -1.0)); // Only add if normal map is present
+        materialAtlasTexCoordOffset += 1.0;
       }
-      vec3 finalNormal = normalize(v_normal + normalMap); // Combine with vertex normal
 
-      // Sample metallic and roughness maps if available
-      vec3 transmissionRoughnessMetallic = vec3(0.0);
-      float transmission = 0.0; // Default transmission value (0.0 means opaque)
-      float roughness = 1.0; // Default roughness value (1.0 means smooth)
+      // Transmission, roughness, and metallic (if available)
+      float transmission = 0.0;
+      float roughness = 1.0;
       float metallic = 0.0;
-      if (mod(float(u_effectFlags / int(pow(2.0, float(METALLIC_ROUGHNESS_MAP_BIT)))), 2.0) >= 1.0) {
-        transmissionRoughnessMetallic = texture2D(u_transmissionRoughnessMetallicMapTexture, v_transmissionRoughnessMetallicTexCoord).rgb;
-        transmission = transmissionRoughnessMetallic.r; // B channel for metallic
-        roughness = transmissionRoughnessMetallic.g; // G channel for roughness
-        metallic = transmissionRoughnessMetallic.b; // B channel for metallic
+      if (mod(float(u_effectFlags / int(pow(2.0, float(TRANSMISSION_ROUGHNESS_METALLIC_MAP_BIT)))), 2.0) >= 1.0) {
+        vec2 texCoord = vec2(v_materialTexCoord.x + (materialAtlasTexCoordOffset * 0.25), v_materialTexCoord.y);
+        vec3 trmMap = texture2D(u_materialAtlasTexture, texCoord).rgb;
+        transmission = trmMap.r;
+        roughness = trmMap.g;
+        metallic = trmMap.b;
+        materialAtlasTexCoordOffset += 1.0;
       }
 
-      // Sample specular map if available
-      vec3 specularColor = vec3(1.0); // Default specular color (white)
+      // Specular map (if present)
+      vec3 specularColor = vec3(0.0);
+      bool hasSpecular = false;
       if (mod(float(u_effectFlags / int(pow(2.0, float(SPECULAR_MAP_BIT)))), 2.0) >= 1.0) {
-        specularColor = texture2D(u_specularMapTexture, v_specularTexCoord).rgb;
+        vec2 texCoord = vec2(v_materialTexCoord.x + (materialAtlasTexCoordOffset * 0.25), v_materialTexCoord.y);
+        specularColor = texture2D(u_materialAtlasTexture, texCoord).rgb;
+        hasSpecular = true;
+        materialAtlasTexCoordOffset += 1.0;
       }
 
-      // Sample emission map if available
-      vec3 emissionColor = vec3(0.0); // Default emission color (black)
+      // Emission map (if present)
+      vec3 emissionColor = vec3(0.0);
+      bool hasEmission = false;
       if (mod(float(u_effectFlags / int(pow(2.0, float(EMISSION_MAP_BIT)))), 2.0) >= 1.0) {
-        emissionColor = texture2D(u_emissionMapTexture, v_emissionTexCoord).rgb; // Sample emission map
+        vec2 texCoord = vec2(v_materialTexCoord.x + (materialAtlasTexCoordOffset * 0.25), v_materialTexCoord.y);
+        emissionColor = texture2D(u_materialAtlasTexture, texCoord).rgb;
+        hasEmission = true;
+        materialAtlasTexCoordOffset += 1.0;
       }
 
-      // Apply lighting using the combined normal and properties
-      vec3 lightDir = normalize(u_lightDirection);
-      float lightIntensity = max(dot(finalNormal, lightDir), 0.0) * 2.0;
+      // Lighting calculations
+      vec3 lightDir = lightDirection;
+      float lightIntensity = max(dot(finalNormal, lightDir), 0.0) * 1.5;
 
-      // Combine color based on metallic, roughness, specular, and transmission
-      color.rgb *= computeMaterialColor(color.rgb, metallic, roughness, lightDir, finalNormal, specularColor, transmission) * lightIntensity;
-    
-      // Add emission color
-      color.rgb += emissionColor;
+      // Compute material color if metallic/roughness maps exist
+      if (mod(float(u_effectFlags / int(pow(2.0, float(TRANSMISSION_ROUGHNESS_METALLIC_MAP_BIT)))), 2.0) >= 1.0) {
+        color.rgb *= computeMaterialColor(color.rgb, metallic, roughness, lightDir, finalNormal, hasSpecular ? specularColor : vec3(0.0), transmission) * lightIntensity;
+      } else {
+        color.rgb *= lightIntensity; // Basic lighting when no maps exist
+      }
+
+      // Apply emission if present
+      if (hasEmission) {
+        color.rgb += emissionColor;
+      }
     }
 
     // Apply blur effect
