@@ -17,7 +17,7 @@ class EXRLoader {
     }
 
     // Version field (4 bytes)
-    const version = dataView.getUint32(offset, true); // Corrected to read as Uint32
+    const version = dataView.getUint32(offset, true); // Changed to getUint32 for version
     offset += 4;
     if (version !== 2) {
       throw new Error("Unsupported EXR version.");
@@ -27,7 +27,6 @@ class EXRLoader {
     let width = 0,
       height = 0;
     let channels = [];
-
     while (true) {
       const key = this.readNullTerminatedString(dataView, offset);
       offset += key.length + 1;
@@ -71,11 +70,12 @@ class EXRLoader {
 
     // Move to pixel data (assuming scanline storage, no compression)
     for (let y = 0; y < height; y++) {
-      // Check if the offset is within bounds before reading scanline y coordinate
+      // Check if the offset is still within bounds
       if (offset + 4 > buffer.byteLength) {
         throw new Error("Offset exceeds buffer length while reading scanline.");
       }
 
+      // Read the scanline y coordinate
       const scanlineY = dataView.getInt32(offset, true);
       offset += 4;
 
@@ -86,7 +86,6 @@ class EXRLoader {
         channelIndex++
       ) {
         for (let x = 0; x < width; x++) {
-          // Check the offset before reading pixel data
           if (offset + 4 > buffer.byteLength) {
             throw new Error(
               "Offset exceeds buffer length while reading pixel data."
