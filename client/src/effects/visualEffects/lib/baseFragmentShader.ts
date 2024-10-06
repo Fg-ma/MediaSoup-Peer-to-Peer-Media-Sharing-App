@@ -25,8 +25,6 @@ const baseFragmentShaderSource = `
   const vec3 cameraViewDir = vec3(0.0, 0.0, -1.0);  
   const vec3 lightDirection = vec3(-0.1736, 0.0, -0.9848);
   const float lightMultiplicity = 1.5;
-  const vec3 ambientColor = vec3(1.0, 1.0, 1.0);
-  const float ambientIntensity = 0.125;
 
   varying vec2 v_texCoord;
   varying vec2 v_materialTexCoord;
@@ -36,6 +34,7 @@ const baseFragmentShaderSource = `
   uniform sampler2D u_twoDimEffectAtlasTexture;
   uniform sampler2D u_threeDimEffectAtlasTexture;
   uniform sampler2D u_materialAtlasTexture;
+  uniform sampler2D u_hdriTexture;
 
   uniform int u_effectFlags;
   uniform vec3 u_tintColor;
@@ -114,6 +113,9 @@ const baseFragmentShaderSource = `
         materialAtlasTexCoordOffset += 1.0;
       }
 
+      // HDRI Texture
+      vec3 hdriColor = texture2D(u_hdriTexture, finalNormal.xy * 0.5 + 0.5).rgb;
+
       // Lighting calculations
       float lightIntensity = max(dot(finalNormal, lightDirection), 0.0) * lightMultiplicity;
 
@@ -134,12 +136,13 @@ const baseFragmentShaderSource = `
         vec3 specular = (D * F * G) / (4.0 * dot(finalNormal, cameraViewDir) * dot(finalNormal, lightDirection));
 
         vec3 metallicColor = mix(color.rgb, hasSpecular ? specularColor * specular : vec3(0.0), metallic);
-        vec3 finalColor = metallicColor + ambientColor * ambientIntensity;
-
-        finalColor = mix(finalColor, vec3(1.0), transmission);
+        
+        vec3 finalColor = mix(metallicColor, vec3(1.0), transmission);
         color.rgb *= finalColor;
       }
         
+      // Combine HDRI lighting with the light intensity
+      color.rgb = mix(color.rgb, hdriColor, 0.5);
       color.rgb *= lightIntensity;
 
       // Apply emission if present

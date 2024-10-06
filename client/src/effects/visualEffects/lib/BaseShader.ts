@@ -76,6 +76,7 @@ class BaseShader {
   private uTwoDimEffectAtlasTextureLocation: WebGLUniformLocation | null = null;
   private uThreeDimEffectAtlasTextureLocation: WebGLUniformLocation | null =
     null;
+  private uHDRITextureLocation: WebGLUniformLocation | null = null;
   private uMaterialAtlasTextureLocation: WebGLUniformLocation | null = null;
   private uEffectFlagsLocation: WebGLUniformLocation | null = null;
   private uTintColorLocation: WebGLUniformLocation | null = null;
