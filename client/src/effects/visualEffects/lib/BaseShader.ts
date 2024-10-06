@@ -100,6 +100,8 @@ class BaseShader {
   private METALLIC_ROUGHNESS_MAP_BIT = 6;
   private SPECULAR_MAP_BIT = 7;
   private EMISSION_MAP_BIT = 8;
+  private MATERIAL_ATLAS_SIZE_BIT_START = 9;
+  private MATERIAL_ATLAS_SIZE_BIT_LENGTH = 5;
 
   // Camera settings
   private cameraPosition = vec3.fromValues(0, 0, 0);
@@ -528,6 +530,20 @@ class BaseShader {
     this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
   };
 
+  private setMaterialAtlasSize = (size: number) => {
+    // Create a mask to clear the current material atlas size bits
+    const mask = (1 << this.MATERIAL_ATLAS_SIZE_BIT_LENGTH) - 1; // Create a mask for the size bits
+    const clearedEffectFlags =
+      this.effectFlags & ~(mask << this.MATERIAL_ATLAS_SIZE_BIT_START); // Clear the size bits
+
+    // Set the new size in the appropriate bits
+    this.effectFlags =
+      clearedEffectFlags |
+      ((Math.log2(size) & mask) << this.MATERIAL_ATLAS_SIZE_BIT_START);
+
+    this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
+  };
+
   private loadMeshJSON = async (url: string): Promise<MeshJSON | undefined> => {
     try {
       const response = await fetch(url);
@@ -708,7 +724,10 @@ class BaseShader {
     } else if (type === "material") {
       // @ts-ignore
       this.materialAtlasTexMap = atlasImages;
-      this.materialAtlas = new MaterialAtlas(this.gl);
+      this.materialAtlas = new MaterialAtlas(
+        this.gl,
+        this.setMaterialAtlasSize
+      );
       await this.materialAtlas.createAtlas(
         // @ts-ignore
         atlasImages,
@@ -1128,7 +1147,6 @@ class BaseShader {
       this.materialAtlas &&
       materialAtlasSize !== undefined
     ) {
-      console.log(materialTex.size, materialTex.left, materialTex.top);
       const materialAtlasUVs = [];
       for (let i = 0; i < meshData.uv_faces.length / 2; i++) {
         const u = meshData.uv_faces[i * 2];

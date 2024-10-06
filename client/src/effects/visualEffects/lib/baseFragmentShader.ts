@@ -13,6 +13,9 @@ const baseFragmentShaderSource = `
   #define SPECULAR_MAP_BIT 7
   #define EMISSION_MAP_BIT 8
 
+  #define MATERIAL_ATLAS_SIZE_BIT_START 9
+  #define MATERIAL_ATLAS_SIZE_BIT_LENGTH 5
+
   #define VIDEO_BLUR_RADIUS 12
   #define EFFECT_BLUR_RADIUS 8
   #define MESH_BLUR_RADIUS 8
@@ -41,29 +44,16 @@ const baseFragmentShaderSource = `
   vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
   }
+    
+  int decodeMaterialAtlasSize() {
+    // Calculate the multiplier for the starting position
+    int shiftMultiplier = 512; // This is 2^9, to shift bits to position 9
 
-  // Material color computation (metallic, roughness, specular, etc.)
-  vec3 computeMaterialColor(vec3 baseColor, float metallic, float roughness, vec3 lightDir, vec3 finalNormal, vec3 specularColor, float transmission) {
-    vec3 F0 = mix(vec3(0.04), baseColor, metallic);
+    // Shift down by dividing by shiftMultiplier
+    int temp = u_effectFlags / shiftMultiplier; 
 
-    vec3 reflectedLight = reflect(-cameraViewDir, finalNormal);
-    float cosTheta = max(dot(finalNormal, cameraViewDir), 0.0);
-    vec3 F = fresnelSchlick(cosTheta, F0);
-
-    float alpha = roughness * roughness * roughness * roughness;
-    float D = max(0.0, dot(finalNormal, lightDir));
-    D = alpha / (M_PI * pow((D * D * (alpha - 1.0) + 1.0), 2.0));
-
-    float G = min(1.0, min(2.0 * dot(finalNormal, lightDir) * dot(finalNormal, cameraViewDir) / dot(cameraViewDir, lightDir), 1.0));
-
-    vec3 specular = (D * F * G) / (4.0 * dot(finalNormal, cameraViewDir) * dot(finalNormal, lightDir));
-
-    vec3 metallicColor = mix(baseColor, specularColor * specular, metallic);
-    vec3 finalColor = metallicColor + ambientColor * ambientIntensity;
-
-    finalColor = mix(finalColor, vec3(1.0), transmission);
-
-    return finalColor;
+    // Isolate the 14 bits
+    return temp - (temp / 4096) * 4096; // 4096 is 2^12 to isolate the 14 bits
   }
 
   void main() {
@@ -85,9 +75,10 @@ const baseFragmentShaderSource = `
     // If meshActive, calculate additional material properties
     if (meshActive) {
       float materialAtlasTexCoordOffset = 0.0;
+      float materialAtlasTexCoordOffsetIncrement = 256.0 / pow(2.0, float(decodeMaterialAtlasSize()));
       vec3 finalNormal = v_normal;
 
-      // Normal map (only available)
+      // Normal map (if available)
       if (mod(float(u_effectFlags / int(pow(2.0, float(NORMAL_MAP_BIT)))), 2.0) >= 1.0) {
         vec3 normalMap = texture2D(u_materialAtlasTexture, v_materialTexCoord).rgb * 2.0 - 1.0;
         finalNormal = normalize(v_normal + normalMap * vec3(1.0, 1.0, -1.0)); 
@@ -97,7 +88,7 @@ const baseFragmentShaderSource = `
       // Transmission, roughness, and metallic (if available)
       float transmission = 0.0, roughness = 1.0, metallic = 0.0;
       if (mod(float(u_effectFlags / int(pow(2.0, float(TRANSMISSION_ROUGHNESS_METALLIC_MAP_BIT)))), 2.0) >= 1.0) {
-        vec2 texCoord = v_materialTexCoord + vec2(materialAtlasTexCoordOffset * 0.25, 0.0);
+        vec2 texCoord = v_materialTexCoord + vec2(materialAtlasTexCoordOffset * materialAtlasTexCoordOffsetIncrement, 0.0);
         vec3 trmMap = texture2D(u_materialAtlasTexture, texCoord).rgb;
         transmission = trmMap.r;
         roughness = trmMap.g;
@@ -109,7 +100,7 @@ const baseFragmentShaderSource = `
       vec3 specularColor = vec3(0.0);
       bool hasSpecular = mod(float(u_effectFlags / int(pow(2.0, float(SPECULAR_MAP_BIT)))), 2.0) >= 1.0;
       if (hasSpecular) {
-        vec2 texCoord = v_materialTexCoord + vec2(materialAtlasTexCoordOffset * 0.25, 0.0);
+        vec2 texCoord = v_materialTexCoord + vec2(materialAtlasTexCoordOffset * materialAtlasTexCoordOffsetIncrement, 0.0);
         specularColor = texture2D(u_materialAtlasTexture, texCoord).rgb;
         materialAtlasTexCoordOffset += 1.0;
       }
@@ -118,7 +109,7 @@ const baseFragmentShaderSource = `
       vec3 emissionColor = vec3(0.0);
       bool hasEmission = mod(float(u_effectFlags / int(pow(2.0, float(EMISSION_MAP_BIT)))), 2.0) >= 1.0;
       if (hasEmission) {
-        vec2 texCoord = v_materialTexCoord + vec2(0.50, 0.0);
+        vec2 texCoord = v_materialTexCoord + vec2(materialAtlasTexCoordOffset * materialAtlasTexCoordOffsetIncrement, 0.0);
         emissionColor = texture2D(u_materialAtlasTexture, texCoord).rgb;
         materialAtlasTexCoordOffset += 1.0;
       }
@@ -128,10 +119,28 @@ const baseFragmentShaderSource = `
 
       // Compute material color if metallic/roughness maps exist
       if (mod(float(u_effectFlags / int(pow(2.0, float(TRANSMISSION_ROUGHNESS_METALLIC_MAP_BIT)))), 2.0) >= 1.0) {
-        color.rgb *= computeMaterialColor(color.rgb, metallic, roughness, lightDirection, finalNormal, hasSpecular ? specularColor : vec3(0.0), transmission) * lightIntensity;
-      } else {
-        color.rgb *= lightIntensity; // Basic lighting when no maps exist
+        vec3 F0 = mix(vec3(0.04), color.rgb, metallic);
+
+        vec3 reflectedLight = reflect(-cameraViewDir, finalNormal);
+        float cosTheta = max(dot(finalNormal, cameraViewDir), 0.0);
+        vec3 F = fresnelSchlick(cosTheta, F0);
+
+        float alpha = roughness * roughness * roughness * roughness;
+        float D = max(0.0, dot(finalNormal, lightDirection));
+        D = alpha / (M_PI * pow((D * D * (alpha - 1.0) + 1.0), 2.0));
+
+        float G = min(1.0, min(2.0 * dot(finalNormal, lightDirection) * dot(finalNormal, cameraViewDir) / dot(cameraViewDir, lightDirection), 1.0));
+
+        vec3 specular = (D * F * G) / (4.0 * dot(finalNormal, cameraViewDir) * dot(finalNormal, lightDirection));
+
+        vec3 metallicColor = mix(color.rgb, hasSpecular ? specularColor * specular : vec3(0.0), metallic);
+        vec3 finalColor = metallicColor + ambientColor * ambientIntensity;
+
+        finalColor = mix(finalColor, vec3(1.0), transmission);
+        color.rgb *= finalColor;
       }
+        
+      color.rgb *= lightIntensity;
 
       // Apply emission if present
       if (hasEmission) {

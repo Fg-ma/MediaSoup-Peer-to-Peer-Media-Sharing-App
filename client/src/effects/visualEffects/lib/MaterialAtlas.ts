@@ -1,7 +1,6 @@
 import { getNextTexturePosition } from "./handleTexturePosition";
 
 class MaterialAtlas {
-  private gl: WebGL2RenderingContext | WebGLRenderingContext;
   private atlasCanvas: HTMLCanvasElement | null = null;
   private atlasContext: CanvasRenderingContext2D | null = null;
 
@@ -26,9 +25,10 @@ class MaterialAtlas {
   private atlasSize: number = 1024;
   private texturePosition: number | undefined = undefined;
 
-  constructor(gl: WebGL2RenderingContext | WebGLRenderingContext) {
-    this.gl = gl;
-  }
+  constructor(
+    private gl: WebGL2RenderingContext | WebGLRenderingContext,
+    private setMaterialAtlasSize: (size: number) => void
+  ) {}
 
   deconstructor() {
     // Delete WebGL texture
@@ -230,6 +230,8 @@ class MaterialAtlas {
 
     // Set uniform
     this.gl.uniform1i(this.uAtlasTextureLocation, texturePosition);
+
+    this.setMaterialAtlasSize(this.atlasSize);
   }
 
   async updateAtlas(atlasImages: {
@@ -317,6 +319,8 @@ class MaterialAtlas {
 
     // Set the uniform to bind the texture to the shader
     this.gl.uniform1i(this.uAtlasTextureLocation, this.texturePosition);
+
+    this.setMaterialAtlasSize(this.atlasSize);
   }
 
   getAtlasTexture() {
