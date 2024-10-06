@@ -72,7 +72,6 @@ class BaseShader {
   private pause = false;
 
   // Uniform Locations
-  private uTexSize: WebGLUniformLocation | null = null;
   private uVideoTextureLocation: WebGLUniformLocation | null = null;
   private uTwoDimEffectAtlasTextureLocation: WebGLUniformLocation | null = null;
   private uThreeDimEffectAtlasTextureLocation: WebGLUniformLocation | null =
@@ -294,7 +293,6 @@ class BaseShader {
     }
 
     // Fragment shader uniforms
-    this.uTexSize = this.gl.getUniformLocation(this.program, "u_texSize");
     this.uVideoTextureLocation = this.gl.getUniformLocation(
       this.program,
       "u_videoTexture"
@@ -762,12 +760,6 @@ class BaseShader {
 
     this.switchTextureFlag(this.VIDEO_BIT);
 
-    this.gl.uniform2f(
-      this.uTexSize,
-      this.gl.canvas.width,
-      this.gl.canvas.height
-    );
-
     this.gl.uniformMatrix4fv(
       this.uModelMatrixLocation,
       false,
@@ -849,8 +841,6 @@ class BaseShader {
     if (atlasSize === null) {
       return;
     }
-
-    this.gl.uniform2f(this.uTexSize, atlasSize, atlasSize);
 
     let tex:
       | { url: string; top: number; left: number; size: number }
@@ -1006,8 +996,6 @@ class BaseShader {
       return;
     }
 
-    this.gl.uniform2f(this.uTexSize, atlasSize, atlasSize);
-
     let tex:
       | { url: string; top: number; left: number; size: number }
       | undefined;
@@ -1133,24 +1121,23 @@ class BaseShader {
 
     if (
       materialTex &&
-      materialTex.size &&
-      materialTex.left &&
-      materialTex.top &&
-      this.aMaterialTexCoordLocation &&
+      materialTex.size !== undefined &&
+      materialTex.left !== undefined &&
+      materialTex.top !== undefined &&
+      this.aMaterialTexCoordLocation !== null &&
       this.materialAtlas &&
-      materialAtlasSize
+      materialAtlasSize !== undefined
     ) {
+      console.log(materialTex.size, materialTex.left, materialTex.top);
       const materialAtlasUVs = [];
       for (let i = 0; i < meshData.uv_faces.length / 2; i++) {
         const u = meshData.uv_faces[i * 2];
         const v = meshData.uv_faces[i * 2 + 1];
 
         const transformedU =
-          u * (materialTex.size / materialAtlasSize) +
-          materialTex.left / materialAtlasSize;
+          u * (256 / materialAtlasSize) + materialTex.left / materialAtlasSize;
         const transformedV =
-          v * (materialTex.size / materialAtlasSize) +
-          materialTex.top / materialAtlasSize;
+          v * (256 / materialAtlasSize) + materialTex.top / materialAtlasSize;
 
         materialAtlasUVs.push(transformedU, transformedV);
       }
@@ -1248,8 +1235,6 @@ class BaseShader {
     if (atlasSize === null) {
       return;
     }
-
-    this.gl.uniform2f(this.uTexSize, atlasSize, atlasSize);
 
     let tex:
       | { url: string; top: number; left: number; size: number }

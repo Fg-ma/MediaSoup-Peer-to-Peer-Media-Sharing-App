@@ -863,10 +863,6 @@ export const glassesDataURLs: AssetData = {
       url: "/3DAssets/glasses/eyeProtectionGlasses/texs/eyeProtectionGlasses_nor_256x256.png",
       size: 256,
     },
-    glasses1: {
-      url: "/3DAssets/glasses/glasses1/texs/glasses1_nor_256x256.png",
-      size: 256,
-    },
     glasses6: {
       url: "/3DAssets/glasses/glasses6/texs/glasses6_nor_256x256.png",
       size: 256,

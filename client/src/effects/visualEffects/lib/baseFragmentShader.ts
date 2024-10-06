@@ -29,8 +29,6 @@ const baseFragmentShaderSource = `
   varying vec2 v_materialTexCoord;
   varying vec3 v_normal;
   
-  uniform vec2 u_texSize;
-
   uniform sampler2D u_videoTexture;
   uniform sampler2D u_twoDimEffectAtlasTexture;
   uniform sampler2D u_threeDimEffectAtlasTexture;
@@ -73,30 +71,33 @@ const baseFragmentShaderSource = `
     float total = 0.0;
 
     // Determine base color based on effect flags
-    if (mod(float(u_effectFlags / int(pow(2.0, float(VIDEO_BIT)))), 2.0) >= 1.0) {
+    bool videoActive = mod(float(u_effectFlags / int(pow(2.0, float(VIDEO_BIT)))), 2.0) >= 1.0;
+    bool twoDimEffectActive = mod(float(u_effectFlags / int(pow(2.0, float(TWO_DIMENSIONAL_EFFECTS_BIT)))), 2.0) >= 1.0;
+    bool meshActive = mod(float(u_effectFlags / int(pow(2.0, float(MESH_BIT)))), 2.0) >= 1.0;
+    if (videoActive) {
       color = texture2D(u_videoTexture, v_texCoord);
-    } else if (mod(float(u_effectFlags / int(pow(2.0, float(TWO_DIMENSIONAL_EFFECTS_BIT)))), 2.0) >= 1.0) {
+    } else if (twoDimEffectActive) {
       color = texture2D(u_twoDimEffectAtlasTexture, v_texCoord);
-    } else if (mod(float(u_effectFlags / int(pow(2.0, float(MESH_BIT)))), 2.0) >= 1.0) {
+    } else if (meshActive) {
       color = texture2D(u_threeDimEffectAtlasTexture, v_texCoord);
     }
 
-    // If MESH_BIT is active, calculate additional material properties
-    if (mod(float(u_effectFlags / int(pow(2.0, float(MESH_BIT)))), 2.0) >= 1.0) {
+    // If meshActive, calculate additional material properties
+    if (meshActive) {
       float materialAtlasTexCoordOffset = 0.0;
       vec3 finalNormal = v_normal;
 
       // Normal map (only available)
       if (mod(float(u_effectFlags / int(pow(2.0, float(NORMAL_MAP_BIT)))), 2.0) >= 1.0) {
         vec3 normalMap = texture2D(u_materialAtlasTexture, v_materialTexCoord).rgb * 2.0 - 1.0;
-        finalNormal = normalize(v_normal + normalMap * vec3(1.0, 1.0, -1.0)); // Only add if normal map is present
+        finalNormal = normalize(v_normal + normalMap * vec3(1.0, 1.0, -1.0)); 
         materialAtlasTexCoordOffset += 1.0;
       }
 
       // Transmission, roughness, and metallic (if available)
       float transmission = 0.0, roughness = 1.0, metallic = 0.0;
       if (mod(float(u_effectFlags / int(pow(2.0, float(TRANSMISSION_ROUGHNESS_METALLIC_MAP_BIT)))), 2.0) >= 1.0) {
-        vec2 texCoord = v_materialTexCoord * vec2(materialAtlasTexCoordOffset * 0.25, 1);
+        vec2 texCoord = v_materialTexCoord + vec2(materialAtlasTexCoordOffset * 0.25, 0.0);
         vec3 trmMap = texture2D(u_materialAtlasTexture, texCoord).rgb;
         transmission = trmMap.r;
         roughness = trmMap.g;
@@ -108,7 +109,7 @@ const baseFragmentShaderSource = `
       vec3 specularColor = vec3(0.0);
       bool hasSpecular = mod(float(u_effectFlags / int(pow(2.0, float(SPECULAR_MAP_BIT)))), 2.0) >= 1.0;
       if (hasSpecular) {
-        vec2 texCoord = v_materialTexCoord * vec2(materialAtlasTexCoordOffset * 0.25, 1);
+        vec2 texCoord = v_materialTexCoord + vec2(materialAtlasTexCoordOffset * 0.25, 0.0);
         specularColor = texture2D(u_materialAtlasTexture, texCoord).rgb;
         materialAtlasTexCoordOffset += 1.0;
       }
@@ -117,9 +118,8 @@ const baseFragmentShaderSource = `
       vec3 emissionColor = vec3(0.0);
       bool hasEmission = mod(float(u_effectFlags / int(pow(2.0, float(EMISSION_MAP_BIT)))), 2.0) >= 1.0;
       if (hasEmission) {
-        vec2 texCoord = v_materialTexCoord * vec2(materialAtlasTexCoordOffset * 0.25, 1);
+        vec2 texCoord = v_materialTexCoord + vec2(0.50, 0.0);
         emissionColor = texture2D(u_materialAtlasTexture, texCoord).rgb;
-        hasEmission = true;
         materialAtlasTexCoordOffset += 1.0;
       }
 
@@ -141,32 +141,19 @@ const baseFragmentShaderSource = `
 
     // Apply blur effect
     if (mod(float(u_effectFlags / int(pow(2.0, float(BLUR_BIT)))), 2.0) >= 1.0) {
-      if (mod(float(u_effectFlags / int(pow(2.0, float(VIDEO_BIT)))), 2.0) >= 1.0) {
-        for (int x = -VIDEO_BLUR_RADIUS; x <= VIDEO_BLUR_RADIUS; x++) {
-          for (int y = -VIDEO_BLUR_RADIUS; y <= VIDEO_BLUR_RADIUS; y++) {
-            vec2 offset = vec2(float(x), float(y)) / u_texSize;
+      if (videoActive) {
+        const float blurScale = 0.005; // This value can be adjusted based on the desired blur strength
+        const int blurRadius = 8; // The blur radius can be adjusted as needed
+  
+        for (int x = -blurRadius; x <= blurRadius; x++) {
+          for (int y = -blurRadius; y <= blurRadius; y++) {
+            vec2 offset = vec2(float(x), float(y)) * blurScale; // Scale by the fixed blur scale
             color += texture2D(u_videoTexture, v_texCoord + offset);
             total += 1.0;
           }
         }
-      } else if (mod(float(u_effectFlags / int(pow(2.0, float(TWO_DIMENSIONAL_EFFECTS_BIT)))), 2.0) >= 1.0) {
-        for (int x = -EFFECT_BLUR_RADIUS; x <= EFFECT_BLUR_RADIUS; x++) {
-          for (int y = -EFFECT_BLUR_RADIUS; y <= EFFECT_BLUR_RADIUS; y++) {
-            vec2 offset = vec2(float(x), float(y)) / u_texSize;
-            color += texture2D(u_twoDimEffectAtlasTexture, v_texCoord + offset);
-            total += 1.0;
-          }
-        }
-      } else if (mod(float(u_effectFlags / int(pow(2.0, float(MESH_BIT)))), 2.0) >= 1.0) {
-        for (int x = -MESH_BLUR_RADIUS; x <= MESH_BLUR_RADIUS; x++) {
-          for (int y = -MESH_BLUR_RADIUS; y <= MESH_BLUR_RADIUS; y++) {
-            vec2 offset = vec2(float(x), float(y)) / u_texSize;
-            color += texture2D(u_threeDimEffectAtlasTexture, v_texCoord + offset);
-            total += 1.0;
-          }
-        }
+        color /= total; // Average the colors for blur
       }
-      color /= total;
     }
 
     // Apply tint effect
