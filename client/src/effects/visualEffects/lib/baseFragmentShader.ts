@@ -88,38 +88,44 @@ const baseFragmentShaderSource = `
     vec3 resultColor = vec3(1.0); // Start with white, meaning no modification yet
 
     if (hasTRM) {
-      vec3 F0 = mix(vec3(0.04), vec3(1.0), metallic); // Assuming base color as white for now
+      // Make metallic response more pronounced by modifying F0
+      vec3 F0 = mix(vec3(0.02), vec3(1.0), metallic); 
 
       vec3 reflectedLight = reflect(-cameraViewDir, finalNormal);
       float cosTheta = max(dot(finalNormal, cameraViewDir), 0.0);
       vec3 F = fresnelSchlick(cosTheta, F0);
 
-      float alpha = roughness * roughness * roughness * roughness;
+      // Adjust roughness to create sharper/softer highlights
+      float alpha = roughness * roughness;
       float D = max(0.0, dot(finalNormal, frontLightDir));
       D = alpha / (M_PI * pow((D * D * (alpha - 1.0) + 1.0), 2.0));
 
+      // Adjust specular contribution for a sharper appearance when metallic
       float G = min(1.0, min(2.0 * dot(finalNormal, frontLightDir) * dot(finalNormal, cameraViewDir) / dot(cameraViewDir, frontLightDir), 1.0));
 
+      // Calculate specular reflection
       vec3 specular = (D * F * G) / (4.0 * dot(finalNormal, cameraViewDir) * dot(finalNormal, frontLightDir));
 
+      // Amplify the metallic effect by blending based on the metallic factor
       vec3 metallicColor = mix(resultColor, hasSpecular ? specularColor * specular : vec3(0.0), metallic);
 
-      resultColor = mix(metallicColor, vec3(1.0), transmission); // Mix based on transmission
+      // Adjust transmission to smoothly blend between metallic and non-metallic materials
+      resultColor = mix(metallicColor, vec3(1.0), transmission); 
     }
 
-    // Apply scene lights
+    // Apply lights (same as before)
     resultColor *= lightCalculations(finalNormal);
 
-    // Apply ambient light
+    // Apply ambient lighting (same as before)
     resultColor = ambientLightCalculations(vec4(resultColor, 1.0));
 
+    // If emission is present, add it to the result color
     if (hasEmission) {
-      resultColor += emissionColor; // Add emission if available
+      resultColor += emissionColor;
     }
 
     return resultColor;
   }
-
 
   void main() {
     vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
