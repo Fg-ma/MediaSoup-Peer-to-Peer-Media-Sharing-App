@@ -20,8 +20,6 @@ import {
   PetsEffectTypes,
 } from "../../../context/CurrentEffectsStylesContext";
 import MaterialAtlas from "./MaterialAtlas";
-import { getNextTexturePosition } from "./handleTexturePosition";
-import EXRLoader from "../../../utils/exrLoader";
 
 export interface MeshJSON {
   vertex_faces: number[];
@@ -78,7 +76,6 @@ class BaseShader {
   private uTwoDimEffectAtlasTextureLocation: WebGLUniformLocation | null = null;
   private uThreeDimEffectAtlasTextureLocation: WebGLUniformLocation | null =
     null;
-  private uHDRITextureLocation: WebGLUniformLocation | null = null;
   private uMaterialAtlasTextureLocation: WebGLUniformLocation | null = null;
   private uEffectFlagsLocation: WebGLUniformLocation | null = null;
   private uTintColorLocation: WebGLUniformLocation | null = null;
@@ -118,9 +115,6 @@ class BaseShader {
   private videoPositions: Float32Array;
   private videoTexCoords: Float32Array;
   private identityMatrix = mat4.create();
-
-  private hdriTexture: WebGLTexture | null = null;
-  private hdriTexturePosition: number | undefined;
 
   constructor(
     gl: WebGL2RenderingContext | WebGLRenderingContext,
@@ -174,7 +168,6 @@ class BaseShader {
     this.initBuffers();
     this.initVideoTexture();
     this.initEffectFlags(effects);
-    this.initHDRITexture();
 
     const videoZDistance = 100.0;
 
@@ -317,10 +310,6 @@ class BaseShader {
     this.uMaterialAtlasTextureLocation = this.gl.getUniformLocation(
       this.program,
       "u_materialAtlasTexture"
-    );
-    this.uHDRITextureLocation = this.gl.getUniformLocation(
-      this.program,
-      "u_hdriTexture"
     );
     this.uEffectFlagsLocation = this.gl.getUniformLocation(
       this.program,
@@ -492,71 +481,6 @@ class BaseShader {
     if (effects.tint) this.effectFlags |= 1 << this.TINT_BIT;
 
     this.gl.uniform1i(this.uEffectFlagsLocation, this.effectFlags);
-  };
-
-  private initHDRITexture = async () => {
-    // Activate texture based on position
-    const texturePosition = getNextTexturePosition();
-    if (texturePosition instanceof Error) {
-      console.error(texturePosition);
-      return;
-    }
-    this.hdriTexturePosition = texturePosition;
-    this.gl.activeTexture(this.gl.TEXTURE0 + this.hdriTexturePosition);
-
-    // Set up texture
-    this.hdriTexture = this.gl.createTexture();
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.hdriTexture);
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_S,
-      this.gl.CLAMP_TO_EDGE
-    );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_T,
-      this.gl.CLAMP_TO_EDGE
-    );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_MIN_FILTER,
-      this.gl.LINEAR
-    );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_MAG_FILTER,
-      this.gl.LINEAR
-    );
-
-    // Load HDRI image data (.exr format)
-    try {
-      const exrLoader = new EXRLoader();
-      const atlasImage = await exrLoader.load(
-        "/hdri/aerodynamicsWorkshop_2048x1024.exr"
-      );
-
-      const textureData = new Uint8Array(
-        atlasImage.width * atlasImage.height * 4
-      );
-
-      // Upload the texture data to WebGL as a floating-point texture (since HDR)
-      this.gl.texImage2D(
-        this.gl.TEXTURE_2D,
-        0,
-        this.gl.RGBA, // Use RGBA16F for HDR data
-        atlasImage.width,
-        atlasImage.height,
-        0,
-        this.gl.RGBA,
-        this.gl.FLOAT, // Use floating-point data type for HDR
-        textureData // Image data from EXR file
-      );
-
-      // Set uniform to point to the correct texture unit
-      this.gl.uniform1i(this.uHDRITextureLocation, this.hdriTexturePosition);
-    } catch (error) {
-      console.error("Failed to load HDRI texture:", error);
-    }
   };
 
   private switchTextureFlag = (textureBit: number) => {
