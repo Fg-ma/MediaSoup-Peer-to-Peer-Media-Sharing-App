@@ -6,8 +6,8 @@ import {
   ScreenEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
-import tintIcon from "../../../public/svgs/tintIcon.svg";
-import tintOffIcon from "../../../public/svgs/tintOffIcon.svg";
+import tintIcon from "../../../public/svgs/visualEffects/tintIcon.svg";
+import tintOffIcon from "../../../public/svgs/visualEffects/tintOffIcon.svg";
 
 const ColorPicker = React.lazy(() => import("./ColorPicker"));
 

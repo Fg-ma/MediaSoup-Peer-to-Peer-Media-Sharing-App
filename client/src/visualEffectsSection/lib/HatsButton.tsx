@@ -63,10 +63,10 @@ import deadManHat_threeDim_512x512 from "../../../public/2DAssets/hats/deadManHa
 import deadManHat_threeDim_32x32 from "../../../public/2DAssets/hats/deadManHat/deadManHat_threeDim_32x32.png";
 import dogEars_512x512 from "../../../public/2DAssets/hats/dogEars/dogEars_512x512.png";
 import dogEars_32x32 from "../../../public/2DAssets/hats/dogEars/dogEars_32x32.png";
-import dogEarsIcon from "../../../public/svgs/hats/dogEars/dogEarsIcon.svg";
-import dogEarsOffIcon from "../../../public/svgs/hats/dogEars/dogEarsOffIcon.svg";
-import threeDim_dogEarsIcon from "../../../public/svgs/hats/dogEars/threeDim_dogEarsIcon.svg";
-import threeDim_dogEarsOffIcon from "../../../public/svgs/hats/dogEars/threeDim_dogEarsOffIcon.svg";
+import dogEarsIcon from "../../../public/svgs/visualEffects/hats/dogEars/dogEarsIcon.svg";
+import dogEarsOffIcon from "../../../public/svgs/visualEffects/hats/dogEars/dogEarsOffIcon.svg";
+import threeDim_dogEarsIcon from "../../../public/svgs/visualEffects/hats/dogEars/threeDim_dogEarsIcon.svg";
+import threeDim_dogEarsOffIcon from "../../../public/svgs/visualEffects/hats/dogEars/threeDim_dogEarsOffIcon.svg";
 import flatCap_512x512 from "../../../public/2DAssets/hats/flatCap/flatCap_512x512.png";
 import flatCap_32x32 from "../../../public/2DAssets/hats/flatCap/flatCap_32x32.png";
 import flatCap_off_512x512 from "../../../public/2DAssets/hats/flatCap/flatCap_off_512x512.png";

@@ -7,17 +7,17 @@ import {
 } from "../../effects/audioEffects/AudioEffects";
 import SamplerEffect from "./SamplerEffect";
 
-import autoFilterIcon from "../../../public/svgs/audio/autoFilterIcon.svg";
-import autoPannerIcon from "../../../public/svgs/audio/autoPannerIcon.svg";
-import bitCrusherIcon from "../../../public/svgs/audio/bitCrusherIcon.svg";
-import chorusIcon from "../../../public/svgs/audio/chorusIcon.svg";
-import delayIcon from "../../../public/svgs/audio/delayIcon.svg";
-import distortionIcon from "../../../public/svgs/audio/distortionIcon.svg";
-import EQIcon from "../../../public/svgs/audio/EQIcon.svg";
-import phaserIcon from "../../../public/svgs/audio/phaserIcon.svg";
-import pitchShiftIcon from "../../../public/svgs/audio/pitchShiftIcon.svg";
-import reverbIcon from "../../../public/svgs/audio/reverbIcon.svg";
-import stereoWidenerIcon from "../../../public/svgs/audio/stereoWidenerIcon.svg";
+import autoFilterIcon from "../../../public/svgs/audioEffects/autoFilterIcon.svg";
+import autoPannerIcon from "../../../public/svgs/audioEffects/autoPannerIcon.svg";
+import bitCrusherIcon from "../../../public/svgs/audioEffects/bitCrusherIcon.svg";
+import chorusIcon from "../../../public/svgs/audioEffects/chorusIcon.svg";
+import delayIcon from "../../../public/svgs/audioEffects/delayIcon.svg";
+import distortionIcon from "../../../public/svgs/audioEffects/distortionIcon.svg";
+import EQIcon from "../../../public/svgs/audioEffects/EQIcon.svg";
+import phaserIcon from "../../../public/svgs/audioEffects/phaserIcon.svg";
+import pitchShiftIcon from "../../../public/svgs/audioEffects/pitchShiftIcon.svg";
+import reverbIcon from "../../../public/svgs/audioEffects/reverbIcon.svg";
+import stereoWidenerIcon from "../../../public/svgs/audioEffects/stereoWidenerIcon.svg";
 
 export interface SamplerEffectType {
   labelIcon?: string;

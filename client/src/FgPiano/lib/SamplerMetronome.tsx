@@ -4,8 +4,8 @@ import { useStreamsContext } from "../../context/StreamsContext";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 
-import metronomeIcon from "../../../public/svgs/audio/metronomeIcon.svg";
-import metronomeOffIcon from "../../../public/svgs/audio/metronomeOffIcon.svg";
+import metronomeIcon from "../../../public/svgs/audioEffects/metronomeIcon.svg";
+import metronomeOffIcon from "../../../public/svgs/audioEffects/metronomeOffIcon.svg";
 import SamplerMetronomeVolume from "./SamplerMetronomeVolume";
 
 export const bpmInputVar: Variants = {

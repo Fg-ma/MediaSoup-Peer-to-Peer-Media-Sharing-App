@@ -10,8 +10,8 @@ import FgPianoController from "./FgPianoController";
 
 import effectIcon from "../../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
-import keyVisualizerIcon from "../../../public/svgs/audio/keyVisualizerIcon.svg";
-import keyVisualizerOffIcon from "../../../public/svgs/audio/keyVisualizerOffIcon.svg";
+import keyVisualizerIcon from "../../../public/svgs/audioEffects/keyVisualizerIcon.svg";
+import keyVisualizerOffIcon from "../../../public/svgs/audioEffects/keyVisualizerOffIcon.svg";
 import SamplerMetronome from "./SamplerMetronome";
 
 export const navVar: Variants = {

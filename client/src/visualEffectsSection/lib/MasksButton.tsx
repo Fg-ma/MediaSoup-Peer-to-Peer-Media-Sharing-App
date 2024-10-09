@@ -15,10 +15,10 @@ import {
 
 import baseMask_512x512 from "../../../public/2DAssets/masks/baseMask/baseMask_512x512.png";
 import baseMask_32x32 from "../../../public/2DAssets/masks/baseMask/baseMask_32x32.png";
-import baseMaskIcon from "../../../public/svgs/masks/baseMask/baseMaskIcon.svg";
-import baseMaskOffIcon from "../../../public/svgs/masks/baseMask/baseMaskOffIcon.svg";
-import threeDim_baseMaskIcon from "../../../public/svgs/masks/baseMask/threeDim_baseMaskIcon.svg";
-import threeDim_baseMaskOffIcon from "../../../public/svgs/masks/baseMask/threeDim_baseMaskOffIcon.svg";
+import baseMaskIcon from "../../../public/svgs/visualEffects/masks/baseMask/baseMaskIcon.svg";
+import baseMaskOffIcon from "../../../public/svgs/visualEffects/masks/baseMask/baseMaskOffIcon.svg";
+import threeDim_baseMaskIcon from "../../../public/svgs/visualEffects/masks/baseMask/threeDim_baseMaskIcon.svg";
+import threeDim_baseMaskOffIcon from "../../../public/svgs/visualEffects/masks/baseMask/threeDim_baseMaskOffIcon.svg";
 import alienMask_512x512 from "../../../public/2DAssets/masks/alienMask/alienMask_512x512.png";
 import alienMask_32x32 from "../../../public/2DAssets/masks/alienMask/alienMask_32x32.png";
 import alienMask_off_512x512 from "../../../public/2DAssets/masks/alienMask/alienMask_off_512x512.png";

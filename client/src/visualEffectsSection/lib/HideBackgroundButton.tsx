@@ -6,10 +6,10 @@ import {
   ScreenEffectTypes,
   useStreamsContext,
 } from "../../context/StreamsContext";
-import blurIcon from "../../../public/svgs/visualEffects/blurIcon.svg";
-import blurOffIcon from "../../../public/svgs/visualEffects/blurOffIcon.svg";
+import hideBackgroundIcon from "../../../public/svgs/visualEffects/hideBackgroundIcon.svg";
+import hideBackgroundOffIcon from "../../../public/svgs/visualEffects/hideBackgroundOffIcon.svg";
 
-export default function BlurButton({
+export default function HideBackgroundButton({
   username,
   instance,
   type,
@@ -21,7 +21,7 @@ export default function BlurButton({
 }: {
   username: string;
   instance: string;
-  type: "camera" | "screen";
+  type: "camera";
   videoId: string;
   isUser: boolean;
   handleVisualEffectChange: (
@@ -36,8 +36,9 @@ export default function BlurButton({
   const [rerender, setRerender] = useState(0);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].blur
-    : remoteStreamEffects.current[username][instance][type][videoId].blur;
+    ? userStreamEffects.current.camera[videoId].hideBackground
+    : remoteStreamEffects.current[username][instance].camera[videoId]
+        .hideBackground;
 
   return (
     <FgButton
@@ -45,14 +46,14 @@ export default function BlurButton({
         setEffectsDisabled(true);
         setRerender((prev) => prev + 1);
 
-        await handleVisualEffectChange("blur");
+        await handleVisualEffectChange("hideBackground");
 
         setEffectsDisabled(false);
       }}
       contentFunction={() => {
         return (
           <FgSVG
-            src={streamEffects ? blurOffIcon : blurIcon}
+            src={streamEffects ? hideBackgroundOffIcon : hideBackgroundIcon}
             attributes={[
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
@@ -63,7 +64,7 @@ export default function BlurButton({
       }}
       hoverContent={
         <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Blur
+          {streamEffects ? "Reveal background" : "Hide background"}
         </div>
       }
       className='flex items-center justify-center min-w-10 w-10 aspect-square'

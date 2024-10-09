@@ -8,6 +8,9 @@ import {
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
 
+const HideBackgroundButton = React.lazy(
+  () => import("./lib/HideBackgroundButton")
+);
 const GlassesButton = React.lazy(() => import("./lib/GlassesButton"));
 const BeardsButton = React.lazy(() => import("./lib/BeardsButton"));
 const MustachesButton = React.lazy(() => import("./lib/MustachesButton"));
@@ -153,6 +156,21 @@ export default function VisualEffectsSection({
       exit='init'
       transition={EffectSectionTransition}
     >
+      {type === "camera" && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <HideBackgroundButton
+            username={username}
+            instance={instance}
+            type={type}
+            videoId={videoId}
+            isUser={isUser}
+            handleVisualEffectChange={handleVisualEffectChange}
+            effectsDisabled={effectsDisabled}
+            setEffectsDisabled={setEffectsDisabled}
+          />
+          <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+        </Suspense>
+      )}
       <BlurButtton
         username={username}
         instance={instance}

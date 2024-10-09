@@ -15,10 +15,10 @@ import {
 
 import classicalCurlyBeard_512x512 from "../../../public/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_512x512.png";
 import classicalCurlyBeard_32x32 from "../../../public/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_32x32.png";
-import classicalCurlyBeardIcon from "../../../public/svgs/beards/classicalCurlyBeard/classicalCurlyBeardIcon.svg";
-import classicalCurlyBeardOffIcon from "../../../public/svgs/beards/classicalCurlyBeard/classicalCurlyBeardOffIcon.svg";
-import threeDim_classicalCurlyBeardIcon from "../../../public/svgs/beards/classicalCurlyBeard/threeDim_classicalCurlyBeardIcon.svg";
-import threeDim_classicalCurlyBeardOffIcon from "../../../public/svgs/beards/classicalCurlyBeard/threeDim_classicalCurlyBeardOffIcon.svg";
+import classicalCurlyBeardIcon from "../../../public/svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardIcon.svg";
+import classicalCurlyBeardOffIcon from "../../../public/svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardOffIcon.svg";
+import threeDim_classicalCurlyBeardIcon from "../../../public/svgs/visualEffects/beards/classicalCurlyBeard/threeDim_classicalCurlyBeardIcon.svg";
+import threeDim_classicalCurlyBeardOffIcon from "../../../public/svgs/visualEffects/beards/classicalCurlyBeard/threeDim_classicalCurlyBeardOffIcon.svg";
 import chinBeard_512x512 from "../../../public/2DAssets/beards/chinBeard/chinBeard_512x512.png";
 import chinBeard_32x32 from "../../../public/2DAssets/beards/chinBeard/chinBeard_32x32.png";
 import chinBeard_off_512x512 from "../../../public/2DAssets/beards/chinBeard/chinBeard_off_512x512.png";
