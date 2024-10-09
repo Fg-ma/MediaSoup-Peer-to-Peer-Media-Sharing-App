@@ -16,7 +16,7 @@ import {
 } from "../../../context/CurrentEffectsStylesContext";
 import BaseShader from "./BaseShader";
 import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
-import UserDevice from "src/UserDevice";
+import UserDevice from "../../../UserDevice";
 
 class Render {
   private MAX_FRAME_PROCESSING_TIME: number;
@@ -481,7 +481,7 @@ class Render {
     }
   };
 
-  loadSegmenter = async () => {
+  private loadSegmenter = async () => {
     this.greenScreenCanvas = document.createElement("canvas");
     this.greenScreenCtx = this.greenScreenCanvas.getContext("2d");
 
@@ -513,7 +513,7 @@ class Render {
     });
   };
 
-  greenScreenEffect = async () => {
+  private greenScreenEffect = async () => {
     if (this.segmenter === undefined) {
       await this.loadSegmenter();
     }
@@ -552,7 +552,7 @@ class Render {
     }
   };
 
-  updateGreenScreenCanvas = () => {
+  private updateGreenScreenCanvas = () => {
     if (
       !this.greenScreenCanvas ||
       !this.greenScreenCtx ||
@@ -600,8 +600,7 @@ class Render {
     // Clear the canvas and update the video texture
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    // if (!this.effects.hideBackground) {
-    if (false) {
+    if (!this.effects.hideBackground) {
       this.baseShader.updateVideoTexture(this.video, this.flipVideo);
     } else {
       this.greenScreenEffect();

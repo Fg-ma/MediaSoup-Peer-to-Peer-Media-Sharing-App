@@ -2,7 +2,12 @@ import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import CameraMedia from "./CameraMedia";
-import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
+import {
+  AudioEffectStylesType,
+  CameraEffectStylesType,
+  EffectStylesType,
+  ScreenEffectStylesType,
+} from "../context/CurrentEffectsStylesContext";
 import ScreenMedia from "./ScreenMedia";
 import {
   AudioEffectTypes,
@@ -595,27 +600,28 @@ class Producers {
         ) {
           if (event.producerId && event.producerId in streamEffects) {
             delete streamEffects[
-              event.producerId as keyof typeof currentEffects
+              event.producerId as keyof typeof streamEffects
             ];
           }
         }
       }
 
       // Delete old effects styles
-      const currentEffects =
-        this.currentEffectsStyles.current[event.producerType];
-
-      if (currentEffects) {
+      if (this.currentEffectsStyles.current[event.producerType]) {
         if (event.producerType === "audio") {
           this.currentEffectsStyles.current.audio = {};
         } else if (
           event.producerType === "camera" ||
           event.producerType === "screen"
         ) {
-          if (event.producerId && event.producerId in currentEffects) {
-            delete currentEffects[
-              event.producerId as keyof typeof currentEffects
-            ];
+          const updatedEffects = {
+            ...this.currentEffectsStyles.current[event.producerType],
+          };
+          if (event.producerId && event.producerId in updatedEffects) {
+            delete updatedEffects[event.producerId];
+            // @ts-ignore
+            this.currentEffectsStyles.current[event.producerType] =
+              updatedEffects;
           }
         }
       }
