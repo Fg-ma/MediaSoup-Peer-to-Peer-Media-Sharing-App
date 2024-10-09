@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useRef } from "react";
 
+export const defaultHideBackground = "beach";
 export const defaultBeard = "classicalCurlyBeard";
 export const defaultGlasses = "defaultGlasses";
 export const defaultMustache = "mustache1";
@@ -583,6 +584,9 @@ export const assetSizePositionMap: {
 };
 
 export interface CameraEffectStylesType {
+  hideBackground: {
+    style: HideBackgroundEffectTypes;
+  };
   glasses: {
     style: GlassesEffectTypes;
     threeDim: boolean;
@@ -643,6 +647,31 @@ export interface CameraEffectStylesType {
   };
 }
 
+export type HideBackgroundEffectTypes =
+  | "beach"
+  | "brickWall"
+  | "butterflies"
+  | "cafe"
+  | "chalkBoard"
+  | "citySkyLine"
+  | "cliffPalace"
+  | "eveningMcDonaldLake"
+  | "forest"
+  | "halfDomeAppleOrchard"
+  | "lake"
+  | "library"
+  | "milkyWay"
+  | "mountains"
+  | "ocean"
+  | "oldFaithfulGeyser"
+  | "railroad"
+  | "rollingHills"
+  | "seaSideHouses"
+  | "snowCoveredMoutains"
+  | "sunflowers"
+  | "sunset"
+  | "trees"
+  | "windingRoad";
 export type BeardsEffectTypes =
   | "classicalCurlyBeard"
   | "chinBeard"
@@ -765,6 +794,9 @@ export interface EffectStylesType {
 }
 
 export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
+  hideBackground: {
+    style: defaultHideBackground,
+  },
   glasses: {
     style: defaultGlasses,
     threeDim: false,
