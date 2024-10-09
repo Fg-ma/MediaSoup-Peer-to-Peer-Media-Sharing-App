@@ -53,6 +53,7 @@ export const defaultCameraStreamEffects: {
   [effect in CameraEffectTypes]: boolean;
 } = {
   pause: false,
+  hideBackground: false,
   blur: false,
   tint: false,
   glasses: false,
@@ -73,6 +74,7 @@ export const defaultScreenStreamEffects: {
 
 export type CameraEffectTypes =
   | "pause"
+  | "hideBackground"
   | "blur"
   | "tint"
   | "glasses"

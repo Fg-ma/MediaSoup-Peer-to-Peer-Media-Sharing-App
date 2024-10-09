@@ -3,6 +3,7 @@ import {
   NormalizedLandmarkList,
   Results,
 } from "@mediapipe/face_mesh";
+import * as selfieSegmentation from "@mediapipe/selfie_segmentation";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -17,18 +18,25 @@ import BaseShader from "./BaseShader";
 import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
 import UserDevice from "src/UserDevice";
 
-let frameCounter = 0;
-
 class Render {
   private MAX_FRAME_PROCESSING_TIME: number;
   private FACE_MESH_DETECTION_INTERVAL: number;
 
   private finishedProcessingEffects = true;
 
+  private frameCounter = 0;
+
   private offscreenCanvas: HTMLCanvasElement;
   private offscreenContext: CanvasRenderingContext2D | null;
 
   private lastFaceCountCheck: number;
+
+  private segmenter: selfieSegmentation.SelfieSegmentation | undefined;
+  private segmenterInitialized = false;
+  private segmenterResults: selfieSegmentation.Results | undefined;
+
+  private greenScreenCanvas: HTMLCanvasElement | null = null;
+  private greenScreenCtx: CanvasRenderingContext2D | null = null;
 
   constructor(
     private id: string,
@@ -73,13 +81,21 @@ class Render {
       return;
     }
 
-    frameCounter = 0;
+    this.frameCounter = 0;
 
     try {
       // Set the dimensions of the offscreen canvas to a lower resolution
       const scaleFactor = 0.25; // Scale down to 25% of the original size
       this.offscreenCanvas.width = this.video.videoWidth * scaleFactor;
       this.offscreenCanvas.height = this.video.videoHeight * scaleFactor;
+
+      // Clear the offscreen canvas before drawing
+      this.offscreenContext?.clearRect(
+        0,
+        0,
+        this.offscreenCanvas.width,
+        this.offscreenCanvas.height
+      );
 
       // Draw the video frame onto the offscreen canvas at the lower resolution
       this.offscreenContext?.drawImage(
@@ -465,13 +481,138 @@ class Render {
     }
   };
 
+  loadSegmenter = async () => {
+    this.greenScreenCanvas = document.createElement("canvas");
+    this.greenScreenCtx = this.greenScreenCanvas.getContext("2d");
+
+    this.greenScreenCanvas.width = this.video.videoWidth;
+    this.greenScreenCanvas.height = this.video.videoHeight;
+
+    this.segmenter = new selfieSegmentation.SelfieSegmentation({
+      locateFile: (path: string) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${path}`,
+    });
+
+    // Initialize the segmenter and set options
+    try {
+      await this.segmenter.initialize().then(() => {
+        this.segmenterInitialized = true;
+      });
+    } catch (error) {
+      console.error("Error initializing segmenter:", error);
+      return;
+    }
+    this.segmenter.setOptions({
+      modelSelection: 1, // Use the landscape model (0 for general)
+      selfieMode: false,
+    });
+
+    // Attach the onResults callback
+    this.segmenter.onResults((results) => {
+      this.segmenterResults = results;
+    });
+  };
+
+  greenScreenEffect = async () => {
+    if (this.segmenter === undefined) {
+      await this.loadSegmenter();
+    }
+
+    if (this.segmenter === undefined || !this.segmenterInitialized) {
+      return;
+    }
+
+    // Set the dimensions of the offscreen canvas to a lower resolution
+    const scaleFactor = 0.25; // Scale down to 25% of the original size
+    this.offscreenCanvas.width = this.video.videoWidth * scaleFactor;
+    this.offscreenCanvas.height = this.video.videoHeight * scaleFactor;
+
+    // Clear the offscreen canvas before drawing
+    this.offscreenContext?.clearRect(
+      0,
+      0,
+      this.offscreenCanvas.width,
+      this.offscreenCanvas.height
+    );
+
+    // Draw the video frame onto the offscreen canvas at the lower resolution
+    this.offscreenContext?.drawImage(
+      this.video,
+      0,
+      0,
+      this.offscreenCanvas.width,
+      this.offscreenCanvas.height
+    );
+
+    // Send the image data to the segmenter
+    try {
+      await this.segmenter.send({ image: this.offscreenCanvas });
+    } catch (error) {
+      console.error("Error sending image to segmenter:", error);
+    }
+  };
+
+  updateGreenScreenCanvas = () => {
+    if (
+      !this.greenScreenCanvas ||
+      !this.greenScreenCtx ||
+      !this.segmenterResults
+    ) {
+      return;
+    }
+
+    this.greenScreenCtx.clearRect(
+      0,
+      0,
+      this.greenScreenCanvas.width,
+      this.greenScreenCanvas.height
+    );
+
+    this.greenScreenCtx.drawImage(
+      this.segmenterResults.segmentationMask,
+      0,
+      0,
+      this.greenScreenCanvas.width,
+      this.greenScreenCanvas.height
+    );
+    this.greenScreenCtx.globalCompositeOperation = "source-in";
+    this.greenScreenCtx.drawImage(
+      this.video,
+      0,
+      0,
+      this.greenScreenCanvas.width,
+      this.greenScreenCanvas.height
+    );
+
+    this.greenScreenCtx.globalCompositeOperation = "destination-over";
+    this.greenScreenCtx.fillStyle = "green";
+    this.greenScreenCtx.fillRect(
+      0,
+      0,
+      this.greenScreenCanvas.width,
+      this.greenScreenCanvas.height
+    );
+  };
+
   loop = () => {
     const startTime = performance.now();
 
     // Clear the canvas and update the video texture
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    this.baseShader.updateVideoTexture(this.video, this.flipVideo);
+    // if (!this.effects.hideBackground) {
+    if (false) {
+      this.baseShader.updateVideoTexture(this.video, this.flipVideo);
+    } else {
+      this.greenScreenEffect();
+      this.updateGreenScreenCanvas();
+      if (this.greenScreenCanvas) {
+        this.baseShader.updateVideoTexture(
+          this.greenScreenCanvas,
+          this.flipVideo
+        );
+      }
+    }
 
     // Abort processing if the previous frame took too long
     if (performance.now() - startTime > this.MAX_FRAME_PROCESSING_TIME) {
@@ -506,11 +647,11 @@ class Render {
       return;
     }
 
-    frameCounter++;
+    this.frameCounter++;
 
     if (
       this.FACE_MESH_DETECTION_INTERVAL === 1 ||
-      frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
+      this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
     ) {
       await this.detectFaces();
     }

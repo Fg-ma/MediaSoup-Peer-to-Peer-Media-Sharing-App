@@ -772,7 +772,10 @@ class BaseShader {
     }
   };
 
-  updateVideoTexture = (video: HTMLVideoElement, flip = false) => {
+  updateVideoTexture = (
+    video: HTMLVideoElement | HTMLCanvasElement,
+    flip = false
+  ) => {
     if (this.aPositionLocation === null || this.aTexCoordLocation == null) {
       return;
     }
