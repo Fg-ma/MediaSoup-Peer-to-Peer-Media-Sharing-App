@@ -1,18 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import ReactDOM from "react-dom";
-import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-  useStreamsContext,
-} from "../../context/StreamsContext";
+import FgPanel from "../../fgPanel/FgPanel";
 
 export default function ColorPicker({
-  username,
-  instance,
-  type,
-  videoId,
-  isUser,
   color,
   setColor,
   tempColor,
@@ -20,14 +10,8 @@ export default function ColorPicker({
   setIsColorPicker,
   colorRef,
   colorPickerBtnRef,
-  handleVisualEffectChange,
   handleAcceptColorCallback,
 }: {
-  username: string;
-  instance: string;
-  type: "camera" | "screen";
-  videoId: string;
-  isUser: boolean;
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
   tempColor: string;
@@ -35,64 +19,10 @@ export default function ColorPicker({
   setIsColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
   colorRef: React.MutableRefObject<string>;
   colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
-  handleVisualEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => void;
   handleAcceptColorCallback?: () => void;
 }) {
   const [hexValue, setHexValue] = useState(color.slice(1));
-  const [colorPickerPosition, setColorPickerPosition] = useState<{
-    top: number | null;
-    left: number | null;
-  }>({
-    top: null,
-    left: null,
-  });
-  const [isDragging, setIsDragging] = useState(false);
   const colorPickerRef = useRef<HTMLDivElement>(null);
-  const mousePickerOffset = useRef<{ top: number; left: number }>({
-    top: 0,
-    left: 0,
-  });
-
-  const getColorPickerPosition = () => {
-    const rect = colorPickerBtnRef.current?.getBoundingClientRect();
-    if (!rect) {
-      return;
-    }
-    const bodyRect = document.body.getBoundingClientRect();
-
-    const topPercent = ((rect.top + rect.height + 15) / bodyRect.height) * 100;
-    const leftPercent = ((rect.left + rect.width + 15) / bodyRect.width) * 100;
-
-    setColorPickerPosition({
-      top: topPercent,
-      left: leftPercent,
-    });
-  };
-
-  const handleClick = (event: MouseEvent) => {
-    if (
-      !colorPickerRef.current?.contains(event.target as Node) &&
-      event.target !== colorPickerBtnRef.current
-    ) {
-      setTempColor(color);
-      setIsColorPicker(false);
-    }
-  };
-
-  useEffect(() => {
-    getColorPickerPosition();
-
-    document.addEventListener("mousedown", handleClick);
-    window.addEventListener("resize", getColorPickerPosition);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-      window.removeEventListener("resize", getColorPickerPosition);
-    };
-  }, []);
 
   const handleChangeComplete = (color: string) => {
     setTempColor(color);
@@ -175,159 +105,62 @@ export default function ColorPicker({
     return `#${rHex}${gHex}${bHex}`;
   };
 
-  const startDrag = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const excludedElements = [
-      "input",
-      "button",
-      ".react-colorful",
-      "svg",
-      "label",
-    ];
-
-    const isExcluded = excludedElements.some((selector) => {
-      if (selector.startsWith(".")) {
-        return (e.target as Element).closest(selector);
-      }
-      return (e.target as Element).tagName.toLowerCase() === selector;
-    });
-
-    if (isExcluded) {
-      return;
-    }
-
-    setIsDragging(true);
-    const rect = colorPickerRef.current?.getBoundingClientRect();
-    if (!rect) {
-      return;
-    }
-    const bodyRect = document.body.getBoundingClientRect();
-
-    const topColorPickerPercent = (rect.top / bodyRect.height) * 100;
-    const leftColorPickerPercent = (rect.left / bodyRect.width) * 100;
-
-    const topMousePercent = (e.clientY / bodyRect.height) * 100;
-    const leftMousePercent = (e.clientX / bodyRect.width) * 100;
-
-    mousePickerOffset.current = {
-      top: topMousePercent - topColorPickerPercent,
-      left: leftMousePercent - leftColorPickerPercent,
-    };
-  };
-
-  const onDrag = (e: MouseEvent) => {
-    e.preventDefault();
-    if (!isDragging) return;
-    const bodyRect = document.body.getBoundingClientRect();
-    const topPercent = (e.clientY / bodyRect.height) * 100;
-    const leftPercent = (e.clientX / bodyRect.width) * 100;
-
-    setColorPickerPosition({
-      top: topPercent - mousePickerOffset.current.top,
-      left: leftPercent - mousePickerOffset.current.left,
-    });
-  };
-
-  const stopDrag = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", onDrag);
-      document.addEventListener("mouseup", stopDrag);
-    } else {
-      document.removeEventListener("mousemove", onDrag);
-      document.removeEventListener("mouseup", stopDrag);
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", onDrag);
-      document.removeEventListener("mouseup", stopDrag);
-    };
-  }, [isDragging]);
-
-  return ReactDOM.createPortal(
-    <>
-      {colorPickerPosition.top && colorPickerPosition.left && (
-        <div
-          ref={colorPickerRef}
-          className='absolute bg-white rounded-lg shadow-md p-3 flex flex-col space-y-2 z-50'
-          style={{
-            top: `${colorPickerPosition.top}%`,
-            left: `${colorPickerPosition.left}%`,
-            cursor: isDragging ? "grabbing" : "",
-          }}
-          onMouseDown={startDrag}
-        >
+  return (
+    <FgPanel
+      content={
+        <div ref={colorPickerRef} className='flex flex-col space-y-2'>
           <HexColorPicker color={tempColor} onChange={handleChangeComplete} />
           <div className='flex space-x-1'>
             <div className='flex flex-col space-y-1 items-center justify-center w-16'>
-              <input
-                type='text'
-                id={`effect_section_hex_${videoId}`}
-                className='w-16 bg-white h-8 rounded-md text-sm text-black pl-1 pr-0.5 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
-                onChange={handleHexColorChanges}
-                autoComplete='off'
-                value={hexValue}
-              ></input>
-              <label
-                htmlFor={`effect_section_hex_${videoId}`}
-                className='text-base text-black cursor-pointer'
-              >
+              <label className='text-base text-black cursor-pointer flex flex-col items-center justify-center'>
+                <input
+                  type='text'
+                  className='w-16 bg-white h-8 rounded-md text-sm text-black pl-1 pr-0.5 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                  onChange={handleHexColorChanges}
+                  autoComplete='off'
+                  value={hexValue}
+                ></input>
                 Hex
               </label>
             </div>
             <div className='flex flex-col space-y-1 items-center justify-center w-10'>
-              <input
-                type='text'
-                id={`effect_section_r_${videoId}`}
-                className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
-                onChange={(event) => handleRGBColorChanges(event, "r")}
-                autoComplete='off'
-                value={hexToRgb(tempColor).r ? hexToRgb(tempColor).r : 0}
-              ></input>
-              <label
-                htmlFor={`effect_section_r_${videoId}`}
-                className='text-base text-black cursor-pointer'
-              >
+              <label className='text-base text-black cursor-pointer flex flex-col items-center justify-center'>
+                <input
+                  type='text'
+                  className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                  onChange={(event) => handleRGBColorChanges(event, "r")}
+                  autoComplete='off'
+                  value={hexToRgb(tempColor).r ? hexToRgb(tempColor).r : 0}
+                ></input>
                 R
               </label>
             </div>
             <div className='flex flex-col space-y-1 items-center justify-center w-10'>
-              <input
-                type='text'
-                id={`effect_section_g_${videoId}`}
-                className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
-                onChange={(event) => handleRGBColorChanges(event, "g")}
-                autoComplete='off'
-                value={hexToRgb(tempColor).g ? hexToRgb(tempColor).g : 0}
-              ></input>
-              <label
-                htmlFor={`effect_section_g_${videoId}`}
-                className='text-base text-black cursor-pointer'
-              >
+              <label className='text-base text-black cursor-pointer flex flex-col items-center justify-center'>
+                <input
+                  type='text'
+                  className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                  onChange={(event) => handleRGBColorChanges(event, "g")}
+                  autoComplete='off'
+                  value={hexToRgb(tempColor).g ? hexToRgb(tempColor).g : 0}
+                ></input>
                 G
               </label>
             </div>
             <div className='flex flex-col space-y-1 items-center justify-center w-10'>
-              <input
-                type='text'
-                id={`effect_section_b_${videoId}`}
-                className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
-                onChange={(event) => handleRGBColorChanges(event, "b")}
-                autoComplete='off'
-                value={hexToRgb(tempColor).b ? hexToRgb(tempColor).b : 0}
-              ></input>
-              <label
-                htmlFor={`effect_section_b_${videoId}`}
-                className='text-base text-black cursor-pointer'
-              >
+              <label className='text-base text-black cursor-pointer flex flex-col items-center justify-center'>
+                <input
+                  type='text'
+                  className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                  onChange={(event) => handleRGBColorChanges(event, "b")}
+                  autoComplete='off'
+                  value={hexToRgb(tempColor).b ? hexToRgb(tempColor).b : 0}
+                ></input>
                 B
               </label>
             </div>
           </div>
-          <div className='flex space-x-2 w-max'>
+          <div className='flex space-x-2 w-full items-center justify-center'>
             <button
               className='px-4 w-max h-max bg-fg-primary rounded'
               onClick={handleAcceptColor}
@@ -358,8 +191,14 @@ export default function ColorPicker({
             </button>
           </div>
         </div>
-      )}
-    </>,
-    document.body
+      }
+      initPosition={{
+        referenceElement: colorPickerBtnRef.current ?? undefined,
+        placement: "above",
+      }}
+      resizeable={false}
+      initHeight='max-content'
+      initWidth='max-content'
+    />
   );
 }

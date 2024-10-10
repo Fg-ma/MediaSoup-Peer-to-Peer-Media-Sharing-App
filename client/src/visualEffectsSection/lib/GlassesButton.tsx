@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
@@ -122,6 +122,29 @@ import VRGlasses_off_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGl
 import VRGlasses_threeDim_512x512 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_threeDim_512x512.png";
 import VRGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_threeDim_32x32.png";
 
+const glassesLabels: {
+  [glassesEffectType in GlassesEffectTypes]: string;
+} = {
+  defaultGlasses: "Default",
+  AmericaGlasses: "America",
+  aviatorGoggles: "Aviator",
+  bloodyGlasses: "Bloody",
+  eyeProtectionGlasses: "Eye protection",
+  glasses1: "Glasses 1",
+  glasses2: "Glasses 2",
+  glasses3: "Glasses 3",
+  glasses4: "Glasses 4",
+  glasses5: "Glasses 5",
+  glasses6: "Glasses 6",
+  memeGlasses: "Meme",
+  militaryTacticalGlasses: "Military tactical",
+  shades: "Shades",
+  steampunkGlasses: "Steampunk",
+  threeDGlasses: "3D",
+  toyGlasses: "Toy",
+  VRGlasses: "VR",
+};
+
 export default function GlassesButton({
   username,
   instance,
@@ -150,6 +173,7 @@ export default function GlassesButton({
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [rerender, setRerender] = useState(0);
+  const glassesContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
     ? userStreamEffects.current[type][videoId].glasses
@@ -529,30 +553,47 @@ export default function GlassesButton({
       }}
       doubleClickFunction={doubleClickFunction}
       holdContent={
-        <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
+        <div
+          ref={glassesContainerRef}
+          className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+        >
           {Object.entries(glassesEffects).map(([glasses, effect]) => (
-            <div
+            <FgButton
               key={glasses}
-              className={`${
-                glasses === effectsStyles.style
-                  ? "border-fg-secondary border-3 border-opacity-100"
-                  : ""
-              } ${effect.flipped && "scale-x-[-1]"} ${
-                effect.bgColor === "white" && "bg-white border-fg-black-35"
-              } ${
-                effect.bgColor === "black" && "border-white"
-              } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-              onClick={holdFunction}
-              data-visual-effects-button-value={glasses}
-            >
-              <FgImage
-                src={effect.image}
-                srcLoading={effect.imageSmall}
-                alt={glasses}
-                style={{ width: "2.75rem", height: "2.75rem" }}
-                data-visual-effects-button-value={glasses}
-              />
-            </div>
+              contentFunction={() => (
+                <div
+                  className={`${
+                    glasses === effectsStyles.style
+                      ? "border-fg-secondary border-3 border-opacity-100"
+                      : ""
+                  } ${effect.flipped && "scale-x-[-1]"} ${
+                    effect.bgColor === "white" && "bg-white border-fg-black-35"
+                  } ${
+                    effect.bgColor === "black" && "border-white"
+                  } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                  onClick={holdFunction}
+                  data-visual-effects-button-value={glasses}
+                >
+                  <FgImage
+                    src={effect.image}
+                    srcLoading={effect.imageSmall}
+                    alt={glasses}
+                    style={{ width: "2.75rem", height: "2.75rem" }}
+                    data-visual-effects-button-value={glasses}
+                  />
+                </div>
+              )}
+              hoverContent={
+                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                  {glassesLabels[glasses as GlassesEffectTypes]}
+                </div>
+              }
+              scrollingContainerRef={glassesContainerRef}
+              options={{
+                hoverZValue: 999999999999999,
+                hoverTimeoutDuration: 750,
+              }}
+            />
           ))}
         </div>
       }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
@@ -140,6 +140,32 @@ import vikingHelmet_off_32x32 from "../../../public/2DAssets/hats/vikingHelmet/v
 import vikingHelmet_threeDim_512x512 from "../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_threeDim_512x512.png";
 import vikingHelmet_threeDim_32x32 from "../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_threeDim_32x32.png";
 
+const hatsLabels: {
+  [hatsEffectType in HatsEffectTypes]: string;
+} = {
+  AsianConicalHat: "Asian conical",
+  aviatorHelmet: "Aviator helmet",
+  bicornHat: "Bicorn",
+  bicycleHelmet: "Bicycle helmet",
+  captainsHat: "Captain",
+  chefHat: "Chef",
+  chickenHat: "Chicken",
+  deadManHat: "Dead man",
+  dogEars: "Dog ears",
+  flatCap: "Flat cap",
+  hardHat: "Hard hat",
+  hopliteHelmet: "Hoplite helmet",
+  militaryHat: "Military",
+  rabbitEars: "Rabbit ears",
+  roundEarsHat: "Round ears",
+  santaHat: "Santa",
+  seamanHat: "Seaman",
+  stylishHat: "Stylish",
+  superMarioOdysseyHat: "Mario",
+  ushankaHat: "Ushanka",
+  vikingHelmet: "Viking Helmet",
+};
+
 export default function HatsButton({
   username,
   instance,
@@ -168,6 +194,7 @@ export default function HatsButton({
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [rerender, setRerender] = useState(0);
+  const hatsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
     ? userStreamEffects.current[type][videoId].hats
@@ -589,30 +616,47 @@ export default function HatsButton({
       }}
       doubleClickFunction={doubleClickFunction}
       holdContent={
-        <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
-          {Object.entries(hatsEffects).map(([hats, effect]) => (
-            <div
-              key={hats}
-              className={`${
-                hats === effectsStyles.style
-                  ? "border-fg-secondary border-3 border-opacity-100"
-                  : ""
-              } ${effect.flipped && "scale-x-[-1]"} ${
-                effect.bgColor === "white" && "bg-white border-fg-black-35"
-              } ${
-                effect.bgColor === "black" && "border-white"
-              } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-              onClick={holdFunction}
-              data-visual-effects-button-value={hats}
-            >
-              <FgImage
-                src={effect.image}
-                srcLoading={effect.imageSmall}
-                alt={hats}
-                style={{ width: "2.75rem", height: "2.75rem" }}
-                data-visual-effects-button-value={hats}
-              />
-            </div>
+        <div
+          ref={hatsContainerRef}
+          className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+        >
+          {Object.entries(hatsEffects).map(([hat, effect]) => (
+            <FgButton
+              key={hat}
+              contentFunction={() => (
+                <div
+                  className={`${
+                    hat === effectsStyles.style
+                      ? "border-fg-secondary border-3 border-opacity-100"
+                      : ""
+                  } ${effect.flipped && "scale-x-[-1]"} ${
+                    effect.bgColor === "white" && "bg-white border-fg-black-35"
+                  } ${
+                    effect.bgColor === "black" && "border-white"
+                  } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                  onClick={holdFunction}
+                  data-visual-effects-button-value={hat}
+                >
+                  <FgImage
+                    src={effect.image}
+                    srcLoading={effect.imageSmall}
+                    alt={hat}
+                    style={{ width: "2.75rem", height: "2.75rem" }}
+                    data-visual-effects-button-value={hat}
+                  />
+                </div>
+              )}
+              hoverContent={
+                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                  {hatsLabels[hat as HatsEffectTypes]}
+                </div>
+              }
+              scrollingContainerRef={hatsContainerRef}
+              options={{
+                hoverZValue: 999999999999999,
+                hoverTimeoutDuration: 750,
+              }}
+            />
           ))}
         </div>
       }

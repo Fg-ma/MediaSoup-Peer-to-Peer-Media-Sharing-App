@@ -111,11 +111,6 @@ export default function TintSection({
         {isColorPicker && (
           <Suspense fallback={<div>Loading...</div>}>
             <ColorPicker
-              username={username}
-              instance={instance}
-              type={type}
-              videoId={videoId}
-              isUser={isUser}
               color={color}
               setColor={setColor}
               tempColor={tempColor}
@@ -123,18 +118,8 @@ export default function TintSection({
               setIsColorPicker={setIsColorPicker}
               colorRef={tintColor}
               colorPickerBtnRef={colorPickerBtnRef}
-              handleVisualEffectChange={handleVisualEffectChange}
               handleAcceptColorCallback={() => {
-                if (streamEffects) {
-                  handleVisualEffectChange("tint", streamEffects);
-                  if (isUser) {
-                    userStreamEffects.current[type][videoId].tint = true;
-                  } else {
-                    remoteStreamEffects.current[username][instance][type][
-                      videoId
-                    ].tint = true;
-                  }
-                }
+                handleVisualEffectChange("tint", streamEffects);
               }}
             />
           </Suspense>

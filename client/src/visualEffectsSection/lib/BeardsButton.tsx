@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
@@ -32,6 +32,14 @@ import fullBeard_off_32x32 from "../../../public/2DAssets/beards/fullBeard/fullB
 import fullBeard_threeDim_512x512 from "../../../public/2DAssets/beards/fullBeard/fullBeard_threeDim_512x512.png";
 import fullBeard_threeDim_32x32 from "../../../public/2DAssets/beards/fullBeard/fullBeard_threeDim_32x32.png";
 
+const beardsLabels: {
+  [beardsEffectType in BeardsEffectTypes]: string;
+} = {
+  classicalCurlyBeard: "Classical curly",
+  chinBeard: "Chin",
+  fullBeard: "Full",
+};
+
 export default function BeardsButton({
   username,
   instance,
@@ -60,6 +68,7 @@ export default function BeardsButton({
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [rerender, setRerender] = useState(0);
+  const beardsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
     ? userStreamEffects.current[type][videoId].beards
@@ -266,30 +275,47 @@ export default function BeardsButton({
       }}
       doubleClickFunction={doubleClickFunction}
       holdContent={
-        <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
-          {Object.entries(beardsEffects).map(([beards, effect]) => (
-            <div
-              key={beards}
-              className={`${
-                beards === effectsStyles.style
-                  ? "border-fg-secondary border-3 border-opacity-100"
-                  : ""
-              } ${effect.flipped && "scale-x-[-1]"} ${
-                effect.bgColor === "white" && "bg-white border-fg-black-35"
-              } ${
-                effect.bgColor === "black" && "border-white"
-              } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-              onClick={holdFunction}
-              data-visual-effects-button-value={beards}
-            >
-              <FgImage
-                src={effect.image}
-                srcLoading={effect.imageSmall}
-                alt={beards}
-                style={{ width: "2.75rem", height: "2.75rem" }}
-                data-visual-effects-button-value={beards}
-              />
-            </div>
+        <div
+          ref={beardsContainerRef}
+          className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+        >
+          {Object.entries(beardsEffects).map(([beard, effect]) => (
+            <FgButton
+              key={beard}
+              contentFunction={() => (
+                <div
+                  className={`${
+                    beard === effectsStyles.style
+                      ? "border-fg-secondary border-3 border-opacity-100"
+                      : ""
+                  } ${effect.flipped && "scale-x-[-1]"} ${
+                    effect.bgColor === "white" && "bg-white border-fg-black-35"
+                  } ${
+                    effect.bgColor === "black" && "border-white"
+                  } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                  onClick={holdFunction}
+                  data-visual-effects-button-value={beard}
+                >
+                  <FgImage
+                    src={effect.image}
+                    srcLoading={effect.imageSmall}
+                    alt={beard}
+                    style={{ width: "2.75rem", height: "2.75rem" }}
+                    data-visual-effects-button-value={beard}
+                  />
+                </div>
+              )}
+              hoverContent={
+                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                  {beardsLabels[beard as BeardsEffectTypes]}
+                </div>
+              }
+              scrollingContainerRef={beardsContainerRef}
+              options={{
+                hoverZValue: 999999999999999,
+                hoverTimeoutDuration: 750,
+              }}
+            />
           ))}
         </div>
       }

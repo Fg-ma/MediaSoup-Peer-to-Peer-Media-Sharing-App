@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
@@ -164,6 +164,36 @@ import TRex_off_32x32 from "../../../public/2DAssets/pets/TRex/TRex_off_32x32.pn
 import TRex_threeDim_512x512 from "../../../public/2DAssets/pets/TRex/TRex_threeDim_512x512.png";
 import TRex_threeDim_32x32 from "../../../public/2DAssets/pets/TRex/TRex_threeDim_32x32.png";
 
+const petsLabels: {
+  [petsEffectType in PetsEffectTypes]: string;
+} = {
+  angryHamster: "Angry hamster",
+  axolotl: "Axolotl",
+  babyDragon: "Baby dragon",
+  beardedDragon: "Bearded dragon",
+  bird1: "Bird 1",
+  bird2: "Bird 2",
+  boxer: "Boxer",
+  brain: "Brain",
+  buddyHamster: "Buddy hamster",
+  cat1: "Cat 1",
+  cat2: "Cat 2",
+  dodoBird: "Dodo bird",
+  happyHamster: "Happy hamster",
+  mechanicalGrasshopper: "Mechanical grasshopper",
+  panda1: "Panda 1",
+  panda2: "Panda 2",
+  petRock: "Pet rock",
+  pig: "Pig",
+  redFox1: "Red fox 1",
+  redFox2: "Red fox 2",
+  roboDog: "Robo dog",
+  skeletonTRex: "Skeleton T-Rex",
+  snail: "Snail",
+  spinosaurus: "Spinosaurus",
+  TRex: "T-Rex",
+};
+
 export default function PetsButton({
   username,
   instance,
@@ -192,6 +222,7 @@ export default function PetsButton({
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [rerender, setRerender] = useState(false);
+  const petsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
     ? userStreamEffects.current[type][videoId].pets
@@ -663,30 +694,47 @@ export default function PetsButton({
       }}
       doubleClickFunction={doubleClickFunction}
       holdContent={
-        <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
-          {Object.entries(petsEffects).map(([pets, effect]) => (
-            <div
-              key={pets}
-              className={`${
-                pets === effectsStyles.style
-                  ? "border-fg-secondary border-3 border-opacity-100"
-                  : ""
-              } ${effect.flipped && "scale-x-[-1]"} ${
-                effect.bgColor === "white" && "bg-white border-fg-black-35"
-              } ${
-                effect.bgColor === "black" && "border-white"
-              } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-              onClick={holdFunction}
-              data-visual-effects-button-value={pets}
-            >
-              <FgImage
-                src={effect.image}
-                srcLoading={effect.imageSmall}
-                alt={pets}
-                style={{ width: "2.75rem", height: "2.75rem" }}
-                data-visual-effects-button-value={pets}
-              />
-            </div>
+        <div
+          ref={petsContainerRef}
+          className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+        >
+          {Object.entries(petsEffects).map(([pet, effect]) => (
+            <FgButton
+              key={pet}
+              contentFunction={() => (
+                <div
+                  className={`${
+                    pet === effectsStyles.style
+                      ? "border-fg-secondary border-3 border-opacity-100"
+                      : ""
+                  } ${effect.flipped && "scale-x-[-1]"} ${
+                    effect.bgColor === "white" && "bg-white border-fg-black-35"
+                  } ${
+                    effect.bgColor === "black" && "border-white"
+                  } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                  onClick={holdFunction}
+                  data-visual-effects-button-value={pet}
+                >
+                  <FgImage
+                    src={effect.image}
+                    srcLoading={effect.imageSmall}
+                    alt={pet}
+                    style={{ width: "2.75rem", height: "2.75rem" }}
+                    data-visual-effects-button-value={pet}
+                  />
+                </div>
+              )}
+              hoverContent={
+                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                  {petsLabels[pet as PetsEffectTypes]}
+                </div>
+              }
+              scrollingContainerRef={petsContainerRef}
+              options={{
+                hoverZValue: 999999999999999,
+                hoverTimeoutDuration: 750,
+              }}
+            />
           ))}
         </div>
       }

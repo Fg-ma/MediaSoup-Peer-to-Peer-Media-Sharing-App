@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
@@ -146,6 +146,33 @@ import zombieMask_off_32x32 from "../../../public/2DAssets/masks/zombieMask/zomb
 import zombieMask_threeDim_512x512 from "../../../public/2DAssets/masks/zombieMask/zombieMask_threeDim_512x512.png";
 import zombieMask_threeDim_32x32 from "../../../public/2DAssets/masks/zombieMask/zombieMask_threeDim_32x32.png";
 
+const masksLabels: {
+  [masksEffectType in MasksEffectTypes]: string;
+} = {
+  baseMask: "Skin mask",
+  alienMask: "Alien",
+  clownMask: "Clown",
+  creatureMask: "Creature",
+  cyberMask: "Cyber",
+  darkKnightMask: "Dark knight",
+  demonMask: "Demon",
+  gasMask1: "Gas mask 1",
+  gasMask2: "Gas mask 2",
+  gasMask3: "Gas mask 3",
+  gasMask4: "Gas mask 4",
+  masqueradeMask: "Masquerade",
+  metalManMask: "Metal man",
+  oniMask: "Oni",
+  plagueDoctorMask: "Plague doctor",
+  sixEyesMask: "Six eyes",
+  tenguMask: "Tengu",
+  threeFaceMask: "Three face",
+  weldingMask: "Welding",
+  woodlandMask: "Woodland",
+  woodPaintedMask: "Wood painted",
+  zombieMask: "Zombie",
+};
+
 export default function MasksButton({
   username,
   instance,
@@ -174,6 +201,7 @@ export default function MasksButton({
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [rerender, setRerender] = useState(false);
+  const masksContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
     ? userStreamEffects.current[type][videoId].masks
@@ -607,30 +635,47 @@ export default function MasksButton({
       }}
       doubleClickFunction={doubleClickFunction}
       holdContent={
-        <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
-          {Object.entries(masksEffects).map(([masks, effect]) => (
-            <div
-              key={masks}
-              className={`${
-                masks === effectsStyles.style
-                  ? "border-fg-secondary border-3 border-opacity-100"
-                  : ""
-              } ${effect.flipped && "scale-x-[-1]"} ${
-                effect.bgColor === "white" && "bg-white border-fg-black-35"
-              } ${
-                effect.bgColor === "black" && "border-white"
-              } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-              onClick={holdFunction}
-              data-visual-effects-button-value={masks}
-            >
-              <FgImage
-                src={effect.image}
-                srcLoading={effect.imageSmall}
-                alt={masks}
-                style={{ width: "2.75rem", height: "2.75rem" }}
-                data-visual-effects-button-value={masks}
-              />
-            </div>
+        <div
+          ref={masksContainerRef}
+          className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+        >
+          {Object.entries(masksEffects).map(([mask, effect]) => (
+            <FgButton
+              key={mask}
+              contentFunction={() => (
+                <div
+                  className={`${
+                    mask === effectsStyles.style
+                      ? "border-fg-secondary border-3 border-opacity-100"
+                      : ""
+                  } ${effect.flipped && "scale-x-[-1]"} ${
+                    effect.bgColor === "white" && "bg-white border-fg-black-35"
+                  } ${
+                    effect.bgColor === "black" && "border-white"
+                  } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                  onClick={holdFunction}
+                  data-visual-effects-button-value={mask}
+                >
+                  <FgImage
+                    src={effect.image}
+                    srcLoading={effect.imageSmall}
+                    alt={mask}
+                    style={{ width: "2.75rem", height: "2.75rem" }}
+                    data-visual-effects-button-value={mask}
+                  />
+                </div>
+              )}
+              hoverContent={
+                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                  {masksLabels[mask as MasksEffectTypes]}
+                </div>
+              }
+              scrollingContainerRef={masksContainerRef}
+              options={{
+                hoverZValue: 999999999999999,
+                hoverTimeoutDuration: 750,
+              }}
+            />
           ))}
         </div>
       }

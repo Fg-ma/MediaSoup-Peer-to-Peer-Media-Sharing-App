@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
@@ -80,6 +80,22 @@ import wingedMustache_off_32x32 from "../../../public/2DAssets/mustaches/wingedM
 import wingedMustache_threeDim_512x512 from "../../../public/2DAssets/mustaches/wingedMustache/wingedMustache_threeDim_512x512.png";
 import wingedMustache_threeDim_32x32 from "../../../public/2DAssets/mustaches/wingedMustache/wingedMustache_threeDim_32x32.png";
 
+const mustachesLabels: {
+  [beardsEffectType in MustachesEffectTypes]: string;
+} = {
+  disguiseMustache: "Disguise",
+  fullMustache: "Full",
+  mustache1: "Mustache 1",
+  mustache2: "Mustache 2",
+  mustache3: "Mustache 3",
+  mustache4: "Mustache 4",
+  nicodemusMustache: "Nicodemus",
+  pencilMustache: "Pencil",
+  spongebobMustache: "Squiggly",
+  tinyMustache: "Tiny",
+  wingedMustache: "Winged",
+};
+
 export default function MustachesButton({
   username,
   instance,
@@ -108,6 +124,7 @@ export default function MustachesButton({
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [rerender, setRerender] = useState(0);
+  const mustachesContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
     ? userStreamEffects.current[type][videoId].mustaches
@@ -403,30 +420,47 @@ export default function MustachesButton({
       }}
       doubleClickFunction={doubleClickFunction}
       holdContent={
-        <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
-          {Object.entries(mustachesEffects).map(([mustaches, effect]) => (
-            <div
-              key={mustaches}
-              className={`${
-                mustaches === effectsStyles.style
-                  ? "border-fg-secondary border-3 border-opacity-100"
-                  : ""
-              } ${effect.flipped && "scale-x-[-1]"} ${
-                effect.bgColor === "white" && "bg-white border-fg-black-35"
-              } ${
-                effect.bgColor === "black" && "border-white"
-              } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75 relative`}
-              onClick={holdFunction}
-              data-visual-effects-button-value={mustaches}
-            >
-              <FgImage
-                src={effect.image}
-                srcLoading={effect.imageSmall}
-                alt={mustaches}
-                style={{ width: "2.75rem", height: "2.75rem" }}
-                data-visual-effects-button-value={mustaches}
-              />
-            </div>
+        <div
+          ref={mustachesContainerRef}
+          className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+        >
+          {Object.entries(mustachesEffects).map(([mustache, effect]) => (
+            <FgButton
+              key={mustache}
+              contentFunction={() => (
+                <div
+                  className={`${
+                    mustache === effectsStyles.style
+                      ? "border-fg-secondary border-3 border-opacity-100"
+                      : ""
+                  } ${effect.flipped && "scale-x-[-1]"} ${
+                    effect.bgColor === "white" && "bg-white border-fg-black-35"
+                  } ${
+                    effect.bgColor === "black" && "border-white"
+                  } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75 relative`}
+                  onClick={holdFunction}
+                  data-visual-effects-button-value={mustache}
+                >
+                  <FgImage
+                    src={effect.image}
+                    srcLoading={effect.imageSmall}
+                    alt={mustache}
+                    style={{ width: "2.75rem", height: "2.75rem" }}
+                    data-visual-effects-button-value={mustache}
+                  />
+                </div>
+              )}
+              hoverContent={
+                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                  {mustachesLabels[mustache as MustachesEffectTypes]}
+                </div>
+              }
+              scrollingContainerRef={mustachesContainerRef}
+              options={{
+                hoverZValue: 999999999999999,
+                hoverTimeoutDuration: 750,
+              }}
+            />
           ))}
         </div>
       }

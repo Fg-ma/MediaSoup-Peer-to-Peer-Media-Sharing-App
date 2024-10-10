@@ -66,8 +66,8 @@ import treesBackgroundSmall from "../../../public/videoBackgrounds/trees_64x43.j
 import windingRoadBackground from "../../../public/videoBackgrounds/windingRoad_640x427.jpg";
 import windingRoadBackgroundSmall from "../../../public/videoBackgrounds/windingRoad_64x43.jpg";
 
-const hideBackgroundLables: {
-  [hideBackgroundEffect in HideBackgroundEffectTypes]: string;
+const hideBackgroundLabels: {
+  [hideBackgroundEffectType in HideBackgroundEffectTypes]: string;
 } = {
   color: "Solid color",
   beach: "Beach",
@@ -127,10 +127,10 @@ export default function HideBackgroundButton({
   const [color, setColor] = useState("#F56114");
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
+  const [rerender, setRerender] = useState(0);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
   const hideBackgroundContainerRef = useRef<HTMLDivElement>(null);
   const colorRef = useRef("#F56114");
-  const [rerender, setRerender] = useState(0);
 
   const streamEffects = isUser
     ? userStreamEffects.current.camera[videoId].hideBackground
@@ -303,7 +303,10 @@ export default function HideBackgroundButton({
         }
         holdFunction={holdFunction}
         holdContent={
-          <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
+          <div
+            ref={hideBackgroundContainerRef}
+            className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+          >
             <div className='w-full h-full flex items-center justify-center'>
               <div
                 className='border-3 border-white border-opacity-75 rounded'
@@ -317,19 +320,18 @@ export default function HideBackgroundButton({
               ></div>
             </div>
             {Object.entries(backgroundChoices).map(([background, choice]) => (
-              <div
+              <FgButton
                 key={background}
-                ref={hideBackgroundContainerRef}
-                className={`${
-                  background === effectsStyles.style
-                    ? "border-fg-secondary border-3 border-opacity-100"
-                    : ""
-                } border-white flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-                onClick={holdFunction}
-                data-visual-effects-button-value={background}
-              >
-                <FgButton
-                  contentFunction={() => (
+                contentFunction={() => (
+                  <div
+                    className={`${
+                      background === effectsStyles.style
+                        ? "border-fg-secondary border-3 border-opacity-100"
+                        : ""
+                    } border-white flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                    onClick={holdFunction}
+                    data-visual-effects-button-value={background}
+                  >
                     <FgImage
                       src={choice.image}
                       srcLoading={choice.imageSmall}
@@ -341,20 +343,23 @@ export default function HideBackgroundButton({
                       }}
                       data-visual-effects-button-value={background}
                     />
-                  )}
-                  hoverContent={
-                    <div className='mb-3.5 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                      {
-                        hideBackgroundLables[
-                          background as HideBackgroundEffectTypes
-                        ]
-                      }
-                    </div>
-                  }
-                  scrollingContainerRef={hideBackgroundContainerRef}
-                  options={{ hoverZValue: 999999999999999 }}
-                />
-              </div>
+                  </div>
+                )}
+                hoverContent={
+                  <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                    {
+                      hideBackgroundLabels[
+                        background as HideBackgroundEffectTypes
+                      ]
+                    }
+                  </div>
+                }
+                scrollingContainerRef={hideBackgroundContainerRef}
+                options={{
+                  hoverZValue: 999999999999999,
+                  hoverTimeoutDuration: 750,
+                }}
+              />
             ))}
           </div>
         }
@@ -387,11 +392,6 @@ export default function HideBackgroundButton({
         {isColorPicker && (
           <Suspense fallback={<div>Loading...</div>}>
             <ColorPicker
-              username={username}
-              instance={instance}
-              type={type}
-              videoId={videoId}
-              isUser={isUser}
               color={color}
               setColor={setColor}
               tempColor={tempColor}
@@ -399,7 +399,6 @@ export default function HideBackgroundButton({
               setIsColorPicker={setIsColorPicker}
               colorRef={colorRef}
               colorPickerBtnRef={colorPickerBtnRef}
-              handleVisualEffectChange={handleVisualEffectChange}
               handleAcceptColorCallback={handleAcceptColorCallback}
             />
           </Suspense>
