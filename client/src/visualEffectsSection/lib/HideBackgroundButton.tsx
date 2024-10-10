@@ -27,8 +27,8 @@ import cafeBackground from "../../../public/videoBackgrounds/cafe_427x640.jpg";
 import cafeBackgroundSmall from "../../../public/videoBackgrounds/cafe_43x64.jpg";
 import chalkBoardBackground from "../../../public/videoBackgrounds/chalkBoard_640x427.jpg";
 import chalkBoardBackgroundSmall from "../../../public/videoBackgrounds/chalkBoard_64x43.jpg";
-import citySkyLineBackground from "../../../public/videoBackgrounds/citySkyLine_640x331.jpg";
-import citySkyLineBackgroundSmall from "../../../public/videoBackgrounds/citySkyLine_64x33.jpg";
+import citySkylineBackground from "../../../public/videoBackgrounds/citySkyline_640x331.jpg";
+import citySkylineBackgroundSmall from "../../../public/videoBackgrounds/citySkyline_64x33.jpg";
 import cliffPalaceBackground from "../../../public/videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_608x750.jpg";
 import cliffPalaceBackgroundSmall from "../../../public/videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_52x64.jpg";
 import eveningMcDonaldLakeBackground from "../../../public/videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_750x569.jpg";
@@ -66,6 +66,36 @@ import treesBackgroundSmall from "../../../public/videoBackgrounds/trees_64x43.j
 import windingRoadBackground from "../../../public/videoBackgrounds/windingRoad_640x427.jpg";
 import windingRoadBackgroundSmall from "../../../public/videoBackgrounds/windingRoad_64x43.jpg";
 
+const hideBackgroundLables: {
+  [hideBackgroundEffect in HideBackgroundEffectTypes]: string;
+} = {
+  color: "Solid color",
+  beach: "Beach",
+  brickWall: "Brick wall",
+  butterflies: "Neon butterflies",
+  cafe: "Cafe",
+  chalkBoard: "Chalk board",
+  citySkyline: "City skyline",
+  cliffPalace: "Cliff Palace by Ansel Adams",
+  eveningMcDonaldLake: "Evening McDonald Lake by Ansel Adams",
+  forest: "Forest",
+  halfDomeAppleOrchard: "Half Dome Apple Orchard by Ansel Adams",
+  lake: "Lake",
+  library: "Library",
+  milkyWay: "Milky Way",
+  mountains: "Mountains",
+  ocean: "Ocean",
+  oldFaithfulGeyser: "Old Faithful Geyser by Ansel Adams",
+  railroad: "Railroad",
+  rollingHills: "Rolling hills",
+  seaSideHouses: "Sea side house",
+  snowCoveredMoutains: "Snow covered mountains",
+  sunflowers: "Sunflowers",
+  sunset: "Sunset",
+  trees: "Trees",
+  windingRoad: "Winding road",
+};
+
 export default function HideBackgroundButton({
   username,
   instance,
@@ -98,6 +128,7 @@ export default function HideBackgroundButton({
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
+  const hideBackgroundContainerRef = useRef<HTMLDivElement>(null);
   const colorRef = useRef("#F56114");
   const [rerender, setRerender] = useState(0);
 
@@ -130,9 +161,9 @@ export default function HideBackgroundButton({
       image: chalkBoardBackground,
       imageSmall: chalkBoardBackgroundSmall,
     },
-    citySkyLine: {
-      image: citySkyLineBackground,
-      imageSmall: citySkyLineBackgroundSmall,
+    citySkyline: {
+      image: citySkylineBackground,
+      imageSmall: citySkylineBackgroundSmall,
     },
     cliffPalace: {
       image: cliffPalaceBackground,
@@ -218,10 +249,8 @@ export default function HideBackgroundButton({
 
     const effectType = target.dataset
       .visualEffectsButtonValue as HideBackgroundEffectTypes;
-    if (
-      effectType in backgroundChoices &&
-      (effectsStyles.style !== effectType || !streamEffects)
-    ) {
+
+    if (effectsStyles.style !== effectType || !streamEffects) {
       effectsStyles.style = effectType;
       userMedia.current.camera[videoId].render.swapHideBackgroundEffectImage(
         effectType
@@ -275,9 +304,22 @@ export default function HideBackgroundButton({
         holdFunction={holdFunction}
         holdContent={
           <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
+            <div className='w-full h-full flex items-center justify-center'>
+              <div
+                className='border-3 border-white border-opacity-75 rounded'
+                style={{
+                  backgroundColor: colorRef.current,
+                  width: "100%",
+                  height: "100%",
+                }}
+                onClick={holdFunction}
+                data-visual-effects-button-value={"color"}
+              ></div>
+            </div>
             {Object.entries(backgroundChoices).map(([background, choice]) => (
               <div
                 key={background}
+                ref={hideBackgroundContainerRef}
                 className={`${
                   background === effectsStyles.style
                     ? "border-fg-secondary border-3 border-opacity-100"
@@ -286,16 +328,31 @@ export default function HideBackgroundButton({
                 onClick={holdFunction}
                 data-visual-effects-button-value={background}
               >
-                <FgImage
-                  src={choice.image}
-                  srcLoading={choice.imageSmall}
-                  alt={background}
-                  style={{
-                    width: "2.75rem",
-                    height: "2.75rem",
-                    objectFit: "contain",
-                  }}
-                  data-visual-effects-button-value={background}
+                <FgButton
+                  contentFunction={() => (
+                    <FgImage
+                      src={choice.image}
+                      srcLoading={choice.imageSmall}
+                      alt={background}
+                      style={{
+                        width: "2.75rem",
+                        height: "2.75rem",
+                        objectFit: "contain",
+                      }}
+                      data-visual-effects-button-value={background}
+                    />
+                  )}
+                  hoverContent={
+                    <div className='mb-3.5 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                      {
+                        hideBackgroundLables[
+                          background as HideBackgroundEffectTypes
+                        ]
+                      }
+                    </div>
+                  }
+                  scrollingContainerRef={hideBackgroundContainerRef}
+                  options={{ hoverZValue: 999999999999999 }}
                 />
               </div>
             ))}

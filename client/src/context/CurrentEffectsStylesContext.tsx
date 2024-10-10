@@ -656,7 +656,7 @@ export type HideBackgroundEffectTypes =
   | "butterflies"
   | "cafe"
   | "chalkBoard"
-  | "citySkyLine"
+  | "citySkyline"
   | "cliffPalace"
   | "eveningMcDonaldLake"
   | "forest"

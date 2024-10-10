@@ -27,7 +27,7 @@ const hideBackgroundEffectImagesMap: {
   butterflies: "/videoBackgrounds/butterflies_640x360.jpg",
   cafe: "/videoBackgrounds/cafe_427x640.jpg",
   chalkBoard: "/videoBackgrounds/chalkBoard_640x427.jpg",
-  citySkyLine: "/videoBackgrounds/citySkyLine_640x331.jpg",
+  citySkyline: "/videoBackgrounds/citySkyline_640x331.jpg",
   cliffPalace:
     "/videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_608x750.jpg",
   eveningMcDonaldLake:
