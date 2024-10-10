@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useRef } from "react";
 
 export const defaultHideBackground = "beach";
+export const defaultHideBackgroundColor = "#F56114";
 export const defaultBeard = "classicalCurlyBeard";
 export const defaultGlasses = "defaultGlasses";
 export const defaultMustache = "mustache1";
@@ -586,6 +587,7 @@ export const assetSizePositionMap: {
 export interface CameraEffectStylesType {
   hideBackground: {
     style: HideBackgroundEffectTypes;
+    color: string;
   };
   glasses: {
     style: GlassesEffectTypes;
@@ -648,6 +650,7 @@ export interface CameraEffectStylesType {
 }
 
 export type HideBackgroundEffectTypes =
+  | "color"
   | "beach"
   | "brickWall"
   | "butterflies"
@@ -796,6 +799,7 @@ export interface EffectStylesType {
 export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
   hideBackground: {
     style: defaultHideBackground,
+    color: defaultHideBackgroundColor,
   },
   glasses: {
     style: defaultGlasses,

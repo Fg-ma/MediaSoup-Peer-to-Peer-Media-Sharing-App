@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState, Suspense } from "react";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -11,6 +11,8 @@ import {
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
+
+const ColorPicker = React.lazy(() => import("./ColorPicker"));
 
 import hideBackgroundIcon from "../../../public/svgs/visualEffects/hideBackgroundIcon.svg";
 import hideBackgroundOffIcon from "../../../public/svgs/visualEffects/hideBackgroundOffIcon.svg";
@@ -86,10 +88,17 @@ export default function HideBackgroundButton({
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
+  const { userMedia, userStreamEffects, remoteStreamEffects } =
+    useStreamsContext();
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
 
+  const [closeHoldToggle, setCloseHoldToggle] = useState(false);
+  const [color, setColor] = useState("#F56114");
+  const [isColorPicker, setIsColorPicker] = useState(false);
+  const [tempColor, setTempColor] = useState(color);
+  const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
+  const colorRef = useRef("#F56114");
   const [rerender, setRerender] = useState(0);
 
   const streamEffects = isUser
@@ -102,7 +111,7 @@ export default function HideBackgroundButton({
         .hideBackground;
 
   const backgroundChoices: {
-    [hideBackgroundEffect in HideBackgroundEffectTypes]: {
+    [hideBackgroundEffect in HideBackgroundEffectTypes]?: {
       image: string;
       imageSmall: string;
     };
@@ -181,9 +190,18 @@ export default function HideBackgroundButton({
     },
   };
 
+  const handleColorPicker = () => {
+    setTempColor(colorRef.current);
+    setIsColorPicker((prev) => !prev);
+  };
+
   const clickFunction = async () => {
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
+
+    userMedia.current.camera[videoId].render.swapHideBackgroundEffectImage(
+      effectsStyles.style
+    );
 
     await handleVisualEffectChange("hideBackground");
 
@@ -204,80 +222,132 @@ export default function HideBackgroundButton({
       effectType in backgroundChoices &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
-      if (isUser) {
-        if (currentEffectsStyles.current[type][videoId].hideBackground) {
-          currentEffectsStyles.current[type][videoId].hideBackground.style =
-            effectType;
-        }
-      } else {
-        if (
-          remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-            .hideBackground
-        ) {
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
-          ].hideBackground.style = effectType;
-        }
-      }
-
-      await handleVisualEffectChange(
-        "hideBackground",
-        isUser
-          ? userStreamEffects.current[type][videoId].hideBackground
-          : remoteStreamEffects.current[username][instance][type][videoId]
-              .hideBackground
+      effectsStyles.style = effectType;
+      userMedia.current.camera[videoId].render.swapHideBackgroundEffectImage(
+        effectType
       );
+
+      await handleVisualEffectChange("hideBackground", streamEffects);
     }
+
+    setEffectsDisabled(false);
+    setCloseHoldToggle(true);
+  };
+
+  const handleAcceptColorCallback = async () => {
+    setEffectsDisabled(true);
+
+    userMedia.current.camera[videoId].render.swapHideBackgroundContextFillColor(
+      colorRef.current
+    );
+
+    if (effectsStyles.style !== "color" || !streamEffects) {
+      effectsStyles.style = "color";
+      effectsStyles.color = colorRef.current;
+
+      await handleVisualEffectChange("hideBackground", streamEffects);
+    }
+
+    setEffectsDisabled(false);
   };
 
   return (
-    <FgButton
-      clickFunction={clickFunction}
-      contentFunction={() => {
-        return (
-          <FgSVG
-            src={streamEffects ? hideBackgroundOffIcon : hideBackgroundIcon}
-            attributes={[
-              { key: "width", value: "95%" },
-              { key: "height", value: "95%" },
-              { key: "fill", value: "white" },
-            ]}
-          />
-        );
-      }}
-      hoverContent={
-        <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          {streamEffects ? "Reveal background" : "Hide background"}
-        </div>
-      }
-      holdFunction={holdFunction}
-      holdContent={
-        <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
-          {Object.entries(backgroundChoices).map(([background, choice]) => (
-            <div
-              key={background}
-              className='border-white flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75'
-              onClick={holdFunction}
-              data-visual-effects-button-value={background}
-            >
-              <FgImage
-                src={choice.image}
-                srcLoading={choice.imageSmall}
-                alt={background}
-                style={{ width: "90%", height: "90%" }}
+    <div className='w-max flex items-center justify-center'>
+      <FgButton
+        clickFunction={clickFunction}
+        contentFunction={() => {
+          return (
+            <FgSVG
+              src={streamEffects ? hideBackgroundOffIcon : hideBackgroundIcon}
+              attributes={[
+                { key: "width", value: "95%" },
+                { key: "height", value: "95%" },
+                { key: "fill", value: "white" },
+              ]}
+            />
+          );
+        }}
+        hoverContent={
+          <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+            {streamEffects ? "Reveal background" : "Hide background"}
+          </div>
+        }
+        holdFunction={holdFunction}
+        holdContent={
+          <div className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'>
+            {Object.entries(backgroundChoices).map(([background, choice]) => (
+              <div
+                key={background}
+                className={`${
+                  background === effectsStyles.style
+                    ? "border-fg-secondary border-3 border-opacity-100"
+                    : ""
+                } border-white flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                onClick={holdFunction}
                 data-visual-effects-button-value={background}
-              />
+              >
+                <FgImage
+                  src={choice.image}
+                  srcLoading={choice.imageSmall}
+                  alt={background}
+                  style={{
+                    width: "2.75rem",
+                    height: "2.75rem",
+                    objectFit: "contain",
+                  }}
+                  data-visual-effects-button-value={background}
+                />
+              </div>
+            ))}
+          </div>
+        }
+        closeHoldToggle={closeHoldToggle}
+        setCloseHoldToggle={setCloseHoldToggle}
+        className='flex items-center justify-center min-w-10 w-10 aspect-square'
+        options={{
+          defaultDataValue: effectsStyles?.style,
+          hoverTimeoutDuration: 750,
+          disabled: effectsDisabled,
+          holdKind: "toggle",
+        }}
+      />
+      <div className='flex items-center justify-center min-w-10 w-10 aspect-square'>
+        <FgButton
+          externalRef={colorPickerBtnRef}
+          clickFunction={() => handleColorPicker()}
+          hoverContent={
+            <div className='mb-6 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+              Color picker
             </div>
-          ))}
-        </div>
-      }
-      className='flex items-center justify-center min-w-10 w-10 aspect-square'
-      options={{
-        defaultDataValue: effectsStyles?.style,
-        hoverTimeoutDuration: 750,
-        disabled: effectsDisabled,
-        holdKind: "toggle",
-      }}
-    />
+          }
+          className='w-6 h-6 m-2 border border-white rounded'
+          style={{ backgroundColor: tempColor }}
+          options={{
+            hoverTimeoutDuration: 750,
+            disabled: effectsDisabled,
+          }}
+        />
+        {isColorPicker && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <ColorPicker
+              username={username}
+              instance={instance}
+              type={type}
+              videoId={videoId}
+              isUser={isUser}
+              color={color}
+              setColor={setColor}
+              tempColor={tempColor}
+              setTempColor={setTempColor}
+              setIsColorPicker={setIsColorPicker}
+              colorRef={colorRef}
+              colorPickerBtnRef={colorPickerBtnRef}
+              handleVisualEffectChange={handleVisualEffectChange}
+              handleAcceptColorCallback={handleAcceptColorCallback}
+            />
+          </Suspense>
+        )}
+      </div>
+    </div>
   );
 }

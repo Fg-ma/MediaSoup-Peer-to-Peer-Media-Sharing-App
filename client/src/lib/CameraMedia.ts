@@ -1663,7 +1663,7 @@ class CameraMedia {
 
   private deadbanding: Deadbanding;
 
-  private render: Render;
+  render: Render;
 
   constructor(
     username: string,

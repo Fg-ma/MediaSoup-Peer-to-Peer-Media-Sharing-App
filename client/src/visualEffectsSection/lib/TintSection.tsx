@@ -121,9 +121,21 @@ export default function TintSection({
               tempColor={tempColor}
               setTempColor={setTempColor}
               setIsColorPicker={setIsColorPicker}
-              tintColor={tintColor}
+              colorRef={tintColor}
               colorPickerBtnRef={colorPickerBtnRef}
               handleVisualEffectChange={handleVisualEffectChange}
+              handleAcceptColorCallback={() => {
+                if (streamEffects) {
+                  handleVisualEffectChange("tint", streamEffects);
+                  if (isUser) {
+                    userStreamEffects.current[type][videoId].tint = true;
+                  } else {
+                    remoteStreamEffects.current[username][instance][type][
+                      videoId
+                    ].tint = true;
+                  }
+                }
+              }}
             />
           </Suspense>
         )}

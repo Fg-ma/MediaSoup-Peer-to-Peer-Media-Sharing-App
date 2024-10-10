@@ -270,7 +270,11 @@ export default function BeardsButton({
           {Object.entries(beardsEffects).map(([beards, effect]) => (
             <div
               key={beards}
-              className={`${effect.flipped && "scale-x-[-1]"} ${
+              className={`${
+                beards === effectsStyles.style
+                  ? "border-fg-secondary border-3 border-opacity-100"
+                  : ""
+              } ${effect.flipped && "scale-x-[-1]"} ${
                 effect.bgColor === "white" && "bg-white border-fg-black-35"
               } ${
                 effect.bgColor === "black" && "border-white"
@@ -282,7 +286,7 @@ export default function BeardsButton({
                 src={effect.image}
                 srcLoading={effect.imageSmall}
                 alt={beards}
-                style={{ width: "90%", height: "90%" }}
+                style={{ width: "2.75rem", height: "2.75rem" }}
                 data-visual-effects-button-value={beards}
               />
             </div>

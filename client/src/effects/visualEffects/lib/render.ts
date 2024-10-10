@@ -13,10 +13,44 @@ import {
   assetSizePositionMap,
   CameraEffectStylesType,
   EffectStylesType,
+  HideBackgroundEffectTypes,
 } from "../../../context/CurrentEffectsStylesContext";
 import BaseShader from "./BaseShader";
 import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
 import UserDevice from "../../../UserDevice";
+
+const hideBackgroundEffectImagesMap: {
+  [hideBackgroundEffectType in HideBackgroundEffectTypes]?: string;
+} = {
+  beach: "/videoBackgrounds/beach_640x427.jpg",
+  brickWall: "/videoBackgrounds/brickWall_640x427.jpg",
+  butterflies: "/videoBackgrounds/butterflies_640x360.jpg",
+  cafe: "/videoBackgrounds/cafe_427x640.jpg",
+  chalkBoard: "/videoBackgrounds/chalkBoard_640x427.jpg",
+  citySkyLine: "/videoBackgrounds/citySkyLine_640x331.jpg",
+  cliffPalace:
+    "/videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_608x750.jpg",
+  eveningMcDonaldLake:
+    "/videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_750x569.jpg",
+  forest: "/videoBackgrounds/forest_640x427.jpg",
+  halfDomeAppleOrchard:
+    "/videoBackgrounds/halfDomeAppleOrchardYosemiteCaliforniaByAnselAdams_750x575.jpg",
+  lake: "/videoBackgrounds/lake_640x457.jpg",
+  library: "/videoBackgrounds/library_640x427.jpg",
+  milkyWay: "/videoBackgrounds/milkyWay_640x349.jpg",
+  mountains: "/videoBackgrounds/mountains_640x425.jpg",
+  ocean: "/videoBackgrounds/ocean_640x427.jpg",
+  oldFaithfulGeyser:
+    "/videoBackgrounds/oldFaithfulGeyserYellowstoneNationalParkWyomingByAnselAdams_532x750.jpg",
+  railroad: "/videoBackgrounds/railroad_640x414.jpg",
+  rollingHills: "/videoBackgrounds/rollingHills_640x417.jpg",
+  seaSideHouses: "/videoBackgrounds/seaSideHouses_640x390.jpg",
+  snowCoveredMoutains: "/videoBackgrounds/snowCoveredMoutains_640x360.jpg",
+  sunflowers: "/videoBackgrounds/sunflowers_640x427.jpg",
+  sunset: "/videoBackgrounds/sunset_640x427.jpg",
+  trees: "/videoBackgrounds/trees_640x426.jpg",
+  windingRoad: "/videoBackgrounds/windingRoad_640x427.jpg",
+};
 
 class Render {
   private MAX_FRAME_PROCESSING_TIME: number;
@@ -35,8 +69,10 @@ class Render {
   private segmenterInitialized = false;
   private segmenterResults: selfieSegmentation.Results | undefined;
 
-  private greenScreenCanvas: HTMLCanvasElement | null = null;
-  private greenScreenCtx: CanvasRenderingContext2D | null = null;
+  private hideBackgroundCanvas: HTMLCanvasElement;
+  private hideBackgroundCtx: CanvasRenderingContext2D | null;
+  private hideBackgroundEffectImage: HTMLImageElement;
+  private hideBackgroundCtxFillStyle = "#F56114";
 
   constructor(
     private id: string,
@@ -74,7 +110,100 @@ class Render {
     this.gl.depthFunc(this.gl.LEQUAL);
 
     this.lastFaceCountCheck = performance.now();
+
+    this.hideBackgroundEffectImage = new Image();
+
+    this.hideBackgroundCanvas = document.createElement("canvas");
+    this.hideBackgroundCtx = this.hideBackgroundCanvas.getContext("2d");
   }
+
+  private processEffects = async () => {
+    if (
+      !this.faceMesh ||
+      !this.faceMeshResults ||
+      !this.faceLandmarks ||
+      !(
+        this.effects.glasses ||
+        this.effects.beards ||
+        this.effects.mustaches ||
+        this.effects.masks ||
+        this.effects.hats ||
+        this.effects.pets
+      )
+    ) {
+      this.finishedProcessingEffects = true;
+      return;
+    }
+
+    this.frameCounter++;
+
+    if (
+      this.FACE_MESH_DETECTION_INTERVAL === 1 ||
+      this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
+    ) {
+      await this.detectFaces();
+    }
+
+    const calculatedLandmarks = this.faceLandmarks.getCalculatedLandmarks();
+
+    for (const {
+      faceId,
+      landmarks,
+    } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
+      const effectsStyles = this.currentEffectsStyles.current.camera[this.id];
+
+      if (this.effects.glasses && effectsStyles.glasses) {
+        await this.drawGlasses(faceId, effectsStyles, calculatedLandmarks);
+      }
+
+      if (this.effects.beards && effectsStyles.beards) {
+        await this.drawBeards(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
+      }
+
+      if (this.effects.mustaches && effectsStyles.mustaches) {
+        await this.drawMustaches(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
+      }
+
+      if (this.effects.masks) {
+        await this.drawMasks(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
+      }
+
+      if (this.effects.hats) {
+        await this.drawHats(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
+      }
+
+      if (this.effects.pets) {
+        await this.drawPets(
+          faceId,
+          effectsStyles,
+          calculatedLandmarks,
+          landmarks
+        );
+      }
+    }
+
+    this.finishedProcessingEffects = true;
+  };
 
   private detectFaces = async () => {
     if (!this.faceMeshResults || !this.faceLandmarks || !this.video) {
@@ -482,11 +611,8 @@ class Render {
   };
 
   private loadSegmenter = async () => {
-    this.greenScreenCanvas = document.createElement("canvas");
-    this.greenScreenCtx = this.greenScreenCanvas.getContext("2d");
-
-    this.greenScreenCanvas.width = this.video.videoWidth;
-    this.greenScreenCanvas.height = this.video.videoHeight;
+    this.hideBackgroundCanvas.width = this.video.videoWidth;
+    this.hideBackgroundCanvas.height = this.video.videoHeight;
 
     this.segmenter = new selfieSegmentation.SelfieSegmentation({
       locateFile: (path: string) =>
@@ -513,7 +639,7 @@ class Render {
     });
   };
 
-  private greenScreenEffect = async () => {
+  private hideBackgroundEffect = async () => {
     if (this.segmenter === undefined) {
       await this.loadSegmenter();
     }
@@ -552,46 +678,65 @@ class Render {
     }
   };
 
-  private updateGreenScreenCanvas = () => {
+  private updateHideBackgroundCanvas = () => {
     if (
-      !this.greenScreenCanvas ||
-      !this.greenScreenCtx ||
+      !this.hideBackgroundCanvas ||
+      !this.hideBackgroundCtx ||
       !this.segmenterResults
     ) {
       return;
     }
 
-    this.greenScreenCtx.clearRect(
+    this.hideBackgroundCtx.clearRect(
       0,
       0,
-      this.greenScreenCanvas.width,
-      this.greenScreenCanvas.height
+      this.hideBackgroundCanvas.width,
+      this.hideBackgroundCanvas.height
     );
 
-    this.greenScreenCtx.drawImage(
+    this.hideBackgroundCtx.drawImage(
       this.segmenterResults.segmentationMask,
       0,
       0,
-      this.greenScreenCanvas.width,
-      this.greenScreenCanvas.height
+      this.hideBackgroundCanvas.width,
+      this.hideBackgroundCanvas.height
     );
-    this.greenScreenCtx.globalCompositeOperation = "source-in";
-    this.greenScreenCtx.drawImage(
+    this.hideBackgroundCtx.globalCompositeOperation = "source-in";
+    this.hideBackgroundCtx.drawImage(
       this.video,
       0,
       0,
-      this.greenScreenCanvas.width,
-      this.greenScreenCanvas.height
+      this.hideBackgroundCanvas.width,
+      this.hideBackgroundCanvas.height
     );
 
-    this.greenScreenCtx.globalCompositeOperation = "destination-over";
-    this.greenScreenCtx.fillStyle = "green";
-    this.greenScreenCtx.fillRect(
-      0,
-      0,
-      this.greenScreenCanvas.width,
-      this.greenScreenCanvas.height
-    );
+    this.hideBackgroundCtx.globalCompositeOperation = "destination-over";
+
+    if (
+      this.currentEffectsStyles.current.camera[this.id].hideBackground.style !==
+      "color"
+    ) {
+      this.hideBackgroundCtx.drawImage(
+        this.hideBackgroundEffectImage,
+        0,
+        0,
+        this.hideBackgroundCanvas.width,
+        this.hideBackgroundCanvas.height
+      );
+    } else {
+      if (
+        this.hideBackgroundCtx.fillStyle !== this.hideBackgroundCtxFillStyle
+      ) {
+        this.hideBackgroundCtx.fillStyle = this.hideBackgroundCtxFillStyle;
+      }
+
+      this.hideBackgroundCtx.fillRect(
+        0,
+        0,
+        this.hideBackgroundCanvas.width,
+        this.hideBackgroundCanvas.height
+      );
+    }
   };
 
   loop = () => {
@@ -603,11 +748,11 @@ class Render {
     if (!this.effects.hideBackground) {
       this.baseShader.updateVideoTexture(this.video, this.flipVideo);
     } else {
-      this.greenScreenEffect();
-      this.updateGreenScreenCanvas();
-      if (this.greenScreenCanvas) {
+      this.hideBackgroundEffect();
+      this.updateHideBackgroundCanvas();
+      if (this.hideBackgroundCanvas) {
         this.baseShader.updateVideoTexture(
-          this.greenScreenCanvas,
+          this.hideBackgroundCanvas,
           this.flipVideo
         );
       }
@@ -627,97 +772,22 @@ class Render {
     this.animationFrameId[0] = requestAnimationFrame(this.loop);
   };
 
-  // Separate the heavier, async operations to keep the render loop light
-  processEffects = async () => {
-    if (
-      !this.faceMesh ||
-      !this.faceMeshResults ||
-      !this.faceLandmarks ||
-      !(
-        this.effects.glasses ||
-        this.effects.beards ||
-        this.effects.mustaches ||
-        this.effects.masks ||
-        this.effects.hats ||
-        this.effects.pets
-      )
-    ) {
-      this.finishedProcessingEffects = true;
-      return;
-    }
-
-    this.frameCounter++;
-
-    if (
-      this.FACE_MESH_DETECTION_INTERVAL === 1 ||
-      this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
-    ) {
-      await this.detectFaces();
-    }
-
-    const calculatedLandmarks = this.faceLandmarks.getCalculatedLandmarks();
-
-    for (const {
-      faceId,
-      landmarks,
-    } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
-      const effectsStyles = this.currentEffectsStyles.current.camera[this.id];
-
-      if (this.effects.glasses && effectsStyles.glasses) {
-        await this.drawGlasses(faceId, effectsStyles, calculatedLandmarks);
-      }
-
-      if (this.effects.beards && effectsStyles.beards) {
-        await this.drawBeards(
-          faceId,
-          effectsStyles,
-          calculatedLandmarks,
-          landmarks
-        );
-      }
-
-      if (this.effects.mustaches && effectsStyles.mustaches) {
-        await this.drawMustaches(
-          faceId,
-          effectsStyles,
-          calculatedLandmarks,
-          landmarks
-        );
-      }
-
-      if (this.effects.masks) {
-        await this.drawMasks(
-          faceId,
-          effectsStyles,
-          calculatedLandmarks,
-          landmarks
-        );
-      }
-
-      if (this.effects.hats) {
-        await this.drawHats(
-          faceId,
-          effectsStyles,
-          calculatedLandmarks,
-          landmarks
-        );
-      }
-
-      if (this.effects.pets) {
-        await this.drawPets(
-          faceId,
-          effectsStyles,
-          calculatedLandmarks,
-          landmarks
-        );
-      }
-    }
-
-    this.finishedProcessingEffects = true;
-  };
-
   updateFlipVideo = (newFlipVideo: boolean) => {
     this.flipVideo = newFlipVideo;
+  };
+
+  swapHideBackgroundEffectImage = (
+    hideBackgroundEffect: HideBackgroundEffectTypes
+  ) => {
+    const src = hideBackgroundEffectImagesMap[hideBackgroundEffect];
+    if (src) this.hideBackgroundEffectImage.src = src;
+  };
+
+  swapHideBackgroundContextFillColor = (color: string) => {
+    if (this.hideBackgroundCtx) {
+      this.hideBackgroundCtx.fillStyle = color;
+      this.hideBackgroundCtxFillStyle = color;
+    }
   };
 }
 

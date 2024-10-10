@@ -611,7 +611,11 @@ export default function MasksButton({
           {Object.entries(masksEffects).map(([masks, effect]) => (
             <div
               key={masks}
-              className={`${effect.flipped && "scale-x-[-1]"} ${
+              className={`${
+                masks === effectsStyles.style
+                  ? "border-fg-secondary border-3 border-opacity-100"
+                  : ""
+              } ${effect.flipped && "scale-x-[-1]"} ${
                 effect.bgColor === "white" && "bg-white border-fg-black-35"
               } ${
                 effect.bgColor === "black" && "border-white"
@@ -623,7 +627,7 @@ export default function MasksButton({
                 src={effect.image}
                 srcLoading={effect.imageSmall}
                 alt={masks}
-                style={{ width: "90%", height: "90%" }}
+                style={{ width: "2.75rem", height: "2.75rem" }}
                 data-visual-effects-button-value={masks}
               />
             </div>

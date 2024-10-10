@@ -45,7 +45,7 @@ class ScreenMedia {
 
   private userDevice: UserDevice;
 
-  private render: Render;
+  render: Render;
 
   constructor(
     username: string,

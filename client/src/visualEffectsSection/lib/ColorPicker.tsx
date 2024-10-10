@@ -18,9 +18,10 @@ export default function ColorPicker({
   tempColor,
   setTempColor,
   setIsColorPicker,
-  tintColor,
+  colorRef,
   colorPickerBtnRef,
   handleVisualEffectChange,
+  handleAcceptColorCallback,
 }: {
   username: string;
   instance: string;
@@ -32,15 +33,14 @@ export default function ColorPicker({
   tempColor: string;
   setTempColor: React.Dispatch<React.SetStateAction<string>>;
   setIsColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
-  tintColor: React.MutableRefObject<string>;
+  colorRef: React.MutableRefObject<string>;
   colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => void;
+  handleAcceptColorCallback?: () => void;
 }) {
-  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
-
   const [hexValue, setHexValue] = useState(color.slice(1));
   const [colorPickerPosition, setColorPickerPosition] = useState<{
     top: number | null;
@@ -55,10 +55,6 @@ export default function ColorPicker({
     top: 0,
     left: 0,
   });
-
-  const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].tint
-    : remoteStreamEffects.current[username][instance][type][videoId].tint;
 
   const getColorPickerPosition = () => {
     const rect = colorPickerBtnRef.current?.getBoundingClientRect();
@@ -104,16 +100,10 @@ export default function ColorPicker({
 
   const handleAcceptColor = () => {
     setColor(tempColor);
-    tintColor.current = tempColor;
+    colorRef.current = tempColor;
     setIsColorPicker(false);
-    if (streamEffects) {
-      handleVisualEffectChange("tint", streamEffects);
-      if (isUser) {
-        userStreamEffects.current[type][videoId].tint = true;
-      } else {
-        remoteStreamEffects.current[username][instance][type][videoId].tint =
-          true;
-      }
+    if (handleAcceptColorCallback) {
+      handleAcceptColorCallback();
     }
   };
 
@@ -122,7 +112,7 @@ export default function ColorPicker({
     setIsColorPicker(false);
   };
 
-  const handleTintHexColorChanges = (
+  const handleHexColorChanges = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setHexValue((prev) =>
@@ -133,7 +123,7 @@ export default function ColorPicker({
     }
   };
 
-  const handleTintRGBColorChanges = (
+  const handleRGBColorChanges = (
     event: React.ChangeEvent<HTMLInputElement>,
     type: "r" | "g" | "b"
   ) => {
@@ -277,7 +267,7 @@ export default function ColorPicker({
                 type='text'
                 id={`effect_section_hex_${videoId}`}
                 className='w-16 bg-white h-8 rounded-md text-sm text-black pl-1 pr-0.5 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
-                onChange={handleTintHexColorChanges}
+                onChange={handleHexColorChanges}
                 autoComplete='off'
                 value={hexValue}
               ></input>
@@ -293,7 +283,7 @@ export default function ColorPicker({
                 type='text'
                 id={`effect_section_r_${videoId}`}
                 className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
-                onChange={(event) => handleTintRGBColorChanges(event, "r")}
+                onChange={(event) => handleRGBColorChanges(event, "r")}
                 autoComplete='off'
                 value={hexToRgb(tempColor).r ? hexToRgb(tempColor).r : 0}
               ></input>
@@ -309,7 +299,7 @@ export default function ColorPicker({
                 type='text'
                 id={`effect_section_g_${videoId}`}
                 className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
-                onChange={(event) => handleTintRGBColorChanges(event, "g")}
+                onChange={(event) => handleRGBColorChanges(event, "g")}
                 autoComplete='off'
                 value={hexToRgb(tempColor).g ? hexToRgb(tempColor).g : 0}
               ></input>
@@ -325,7 +315,7 @@ export default function ColorPicker({
                 type='text'
                 id={`effect_section_b_${videoId}`}
                 className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
-                onChange={(event) => handleTintRGBColorChanges(event, "b")}
+                onChange={(event) => handleRGBColorChanges(event, "b")}
                 autoComplete='off'
                 value={hexToRgb(tempColor).b ? hexToRgb(tempColor).b : 0}
               ></input>

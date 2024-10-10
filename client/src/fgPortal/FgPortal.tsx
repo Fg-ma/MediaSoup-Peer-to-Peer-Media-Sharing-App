@@ -55,16 +55,50 @@ export default function FgPortal({
       return;
     }
 
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    const portalWidth = portalRef.current.clientWidth;
+    const portalHeight = portalRef.current.clientHeight;
+
     let top: number = 0;
     if (type === "above") {
-      top = externalRect.top - portalRef.current.clientHeight;
+      top = externalRect.top - portalHeight;
+
+      // Check if it goes off the screen above, then switch to below
+      if (top < 0) {
+        top = externalRect.top + externalRect.height;
+
+        // Check if it goes off screen and set to bottom of screen if so
+        if (top + portalRef.current.clientHeight > viewportHeight) {
+          top = viewportHeight - portalHeight;
+        }
+      }
     } else if (type === "below") {
       top = externalRect.top + externalRect.height;
+
+      // Check if it goes off the screen below, then switch to above
+      if (top + portalRef.current.clientHeight > viewportHeight) {
+        top = externalRect.top - portalHeight;
+
+        // Check if it goes off screen and set to zero if so
+        if (top < 0) {
+          top = 0;
+        }
+      }
     }
-    const left =
-      externalRect.left +
-      externalRect.width / 2 -
-      portalRef.current.clientWidth / 2;
+
+    let left = externalRect.left + externalRect.width / 2 - portalWidth / 2;
+
+    // Adjust left to prevent going off the left side of the screen
+    if (left < 0) {
+      left = 0;
+    }
+
+    // Adjust left to prevent going off the right side of the screen
+    if (left + portalWidth > viewportWidth) {
+      left = viewportWidth - portalWidth;
+    }
 
     setPortalPosition({
       top: top,

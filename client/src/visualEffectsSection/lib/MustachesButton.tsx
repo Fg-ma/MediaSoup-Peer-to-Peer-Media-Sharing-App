@@ -407,7 +407,11 @@ export default function MustachesButton({
           {Object.entries(mustachesEffects).map(([mustaches, effect]) => (
             <div
               key={mustaches}
-              className={`${effect.flipped && "scale-x-[-1]"} ${
+              className={`${
+                mustaches === effectsStyles.style
+                  ? "border-fg-secondary border-3 border-opacity-100"
+                  : ""
+              } ${effect.flipped && "scale-x-[-1]"} ${
                 effect.bgColor === "white" && "bg-white border-fg-black-35"
               } ${
                 effect.bgColor === "black" && "border-white"
@@ -419,7 +423,7 @@ export default function MustachesButton({
                 src={effect.image}
                 srcLoading={effect.imageSmall}
                 alt={mustaches}
-                style={{ width: "90%" }}
+                style={{ width: "2.75rem", height: "2.75rem" }}
                 data-visual-effects-button-value={mustaches}
               />
             </div>
