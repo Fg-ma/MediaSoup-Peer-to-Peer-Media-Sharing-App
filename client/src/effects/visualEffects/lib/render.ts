@@ -1,7 +1,7 @@
 import {
   FaceMesh,
   NormalizedLandmarkList,
-  Results,
+  NormalizedLandmarkListList,
 } from "@mediapipe/face_mesh";
 import * as selfieSegmentation from "@mediapipe/selfie_segmentation";
 import {
@@ -88,9 +88,9 @@ class Render {
         | AudioEffectTypes]?: boolean | undefined;
     },
     private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-    private faceMesh: FaceMesh | undefined,
-    private faceMeshResults: Results[] | undefined,
-    private faceCounter: FaceMesh | undefined,
+    private faceMeshWorker: Worker | undefined,
+    private faceMeshResults: NormalizedLandmarkListList[] | undefined,
+    private faceDetectionWorker: Worker | undefined,
     private userDevice: UserDevice,
     private flipVideo: boolean
   ) {
@@ -119,7 +119,7 @@ class Render {
 
   private processEffects = async () => {
     if (
-      !this.faceMesh ||
+      !this.faceMeshWorker ||
       !this.faceMeshResults ||
       !this.faceLandmarks ||
       !(
@@ -206,7 +206,12 @@ class Render {
   };
 
   private detectFaces = async () => {
-    if (!this.faceMeshResults || !this.faceLandmarks || !this.video) {
+    if (
+      !this.faceMeshResults ||
+      !this.faceLandmarks ||
+      !this.video ||
+      !this.offscreenContext
+    ) {
       return;
     }
 
@@ -235,16 +240,39 @@ class Render {
         this.offscreenCanvas.height
       );
 
-      // Send the offscreen canvas to FaceMesh
-      if (this.faceMesh) {
-        await this.faceMesh.send({ image: this.offscreenCanvas });
-      }
+      // Get ImageData from the offscreen canvas
+      const imageData = this.offscreenContext.getImageData(
+        0,
+        0,
+        this.offscreenCanvas.width,
+        this.offscreenCanvas.height
+      );
+
+      // Create a new ArrayBuffer
+      const buffer = new ArrayBuffer(imageData.data.length);
+      const uint8Array = new Uint8Array(buffer);
+
+      // Copy the pixel data into the ArrayBuffer
+      uint8Array.set(imageData.data);
+
+      // Send video frames to the worker for processing
+      this.faceMeshWorker?.postMessage({
+        message: "FRAME",
+        data: buffer, // Send the ArrayBuffer
+        width: this.offscreenCanvas.width,
+        height: this.offscreenCanvas.height,
+      });
       if (
-        performance.now() - this.lastFaceCountCheck > 5000 &&
-        this.faceCounter
+        performance.now() - this.lastFaceCountCheck > 2000 &&
+        this.faceDetectionWorker
       ) {
         this.lastFaceCountCheck = performance.now();
-        await this.faceCounter.send({ image: this.offscreenCanvas });
+        this.faceDetectionWorker?.postMessage({
+          message: "FRAME",
+          data: buffer, // Send the ArrayBuffer
+          width: this.offscreenCanvas.width,
+          height: this.offscreenCanvas.height,
+        });
       }
     } catch (error) {
       console.error("Error sending video frame to faceMesh:", error);
@@ -255,7 +283,7 @@ class Render {
       return;
     }
 
-    const multiFaceLandmarks = this.faceMeshResults[0].multiFaceLandmarks;
+    const multiFaceLandmarks = this.faceMeshResults[0];
     const detectionTimedOut = this.faceLandmarks.getTimedOut();
 
     if (multiFaceLandmarks.length > 0) {
@@ -289,8 +317,8 @@ class Render {
       this.baseShader.drawEffect(
         effectsStyles.glasses.style,
         {
-          x: 2 * eyesCenterPosition[0] - 1,
-          y: -2 * eyesCenterPosition[1] + 1,
+          x: eyesCenterPosition[0],
+          y: eyesCenterPosition[1],
         },
         {
           x: 0,
@@ -309,8 +337,8 @@ class Render {
         await this.baseShader.drawMesh(
           effectsStyles.glasses.style,
           {
-            x: 2 * eyesCenterPosition[0] - 1,
-            y: -2 * eyesCenterPosition[1] + 1,
+            x: eyesCenterPosition[0],
+            y: eyesCenterPosition[1],
           },
           {
             x: 0,
@@ -346,8 +374,8 @@ class Render {
       this.baseShader.drawEffect(
         effectsStyles.beards.style,
         {
-          x: 2 * chinPosition.x - 1,
-          y: -2 * chinPosition.y + 1,
+          x: chinPosition.x,
+          y: chinPosition.y,
         },
         {
           x: twoDimBeardOffset[0],
@@ -368,8 +396,8 @@ class Render {
         await this.baseShader.drawMesh(
           effectsStyles.beards.style,
           {
-            x: 2 * chinPosition.x - 1,
-            y: -2 * chinPosition.y + 1,
+            x: chinPosition.x,
+            y: chinPosition.y,
           },
           {
             x: threeDimBeardOffset[0],
@@ -406,8 +434,8 @@ class Render {
       this.baseShader.drawEffect(
         effectsStyles.mustaches.style,
         {
-          x: 2 * nosePosition.x - 1,
-          y: -2 * nosePosition.y + 1,
+          x: nosePosition.x,
+          y: nosePosition.y,
         },
         {
           x: twoDimMustacheOffset[0],
@@ -428,8 +456,8 @@ class Render {
       await this.baseShader.drawMesh(
         effectsStyles.mustaches.style,
         {
-          x: 2 * nosePosition.x - 1,
-          y: -2 * nosePosition.y + 1,
+          x: nosePosition.x,
+          y: nosePosition.y,
         },
         {
           x: threeDimMustacheOffset[0],
@@ -467,8 +495,8 @@ class Render {
       this.baseShader.drawEffect(
         effectsStyles.masks.style,
         {
-          x: 2 * nosePosition.x - 1,
-          y: -2 * nosePosition.y + 1,
+          x: nosePosition.x,
+          y: nosePosition.y,
         },
         {
           x: 0,
@@ -486,8 +514,8 @@ class Render {
       await this.baseShader.drawMesh(
         effectsStyles.masks.style,
         {
-          x: 2 * nosePosition.x - 1,
-          y: -2 * nosePosition.y + 1,
+          x: nosePosition.x,
+          y: nosePosition.y,
         },
         {
           x: 0,
@@ -520,8 +548,8 @@ class Render {
       this.baseShader.drawEffect(
         effectsStyles.hats.style,
         {
-          x: 2 * foreheadPosition.x - 1,
-          y: -2 * foreheadPosition.y + 1,
+          x: foreheadPosition.x,
+          y: foreheadPosition.y,
         },
         {
           x: 0,
@@ -539,8 +567,8 @@ class Render {
       await this.baseShader.drawMesh(
         effectsStyles.hats.style,
         {
-          x: 2 * foreheadPosition.x - 1,
-          y: -2 * foreheadPosition.y + 1,
+          x: foreheadPosition.x,
+          y: foreheadPosition.y,
         },
         {
           x: 0,
@@ -573,8 +601,8 @@ class Render {
       this.baseShader.drawEffect(
         effectsStyles.pets.style,
         {
-          x: 2 * foreheadPosition.x - 1,
-          y: -2 * foreheadPosition.y + 1,
+          x: foreheadPosition.x,
+          y: foreheadPosition.y,
         },
         {
           x: 0,
@@ -592,8 +620,8 @@ class Render {
       await this.baseShader.drawMesh(
         effectsStyles.pets.style,
         {
-          x: 2 * foreheadPosition.x - 1,
-          y: -2 * foreheadPosition.y + 1,
+          x: foreheadPosition.x,
+          y: foreheadPosition.y,
         },
         {
           x: 0,

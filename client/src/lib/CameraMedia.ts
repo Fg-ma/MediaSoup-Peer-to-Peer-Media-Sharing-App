@@ -10,7 +10,7 @@ import {
 } from "../context/CurrentEffectsStylesContext";
 import BaseShader, { MeshJSON } from "../effects/visualEffects/lib/BaseShader";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
-import { FaceMesh, Results } from "@mediapipe/face_mesh";
+import { FaceMesh, NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -1649,9 +1649,9 @@ class CameraMedia {
   private baseShader: BaseShader;
   private faceLandmarks: FaceLandmarks;
 
-  private faceMeshResults: Results[];
-  private faceMesh: FaceMesh;
-  private faceCounter: FaceMesh;
+  private faceMeshWorker: Worker;
+  private faceMeshResults: NormalizedLandmarkListList[] = [];
+  private faceDetectionWorker: Worker;
 
   private effects: {
     [cameraEffect in CameraEffectTypes]?: boolean;
@@ -1726,44 +1726,53 @@ class CameraMedia {
       this.deadbanding
     );
 
-    this.faceMeshResults = [];
-    this.faceMesh = new FaceMesh({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-      },
-    });
-
-    let maxNumFaces = 1;
-    this.faceMesh.setOptions({
-      maxNumFaces: maxNumFaces,
-      refineLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
-
-    this.faceMesh.onResults((results) => {
-      this.faceMeshResults[0] = results;
-    });
-
-    this.faceCounter = new FaceMesh({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-      },
-    });
-    this.faceCounter.setOptions({
-      maxNumFaces: 10,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
-
-    this.faceCounter.onResults((results) => {
-      if (maxNumFaces !== results.multiFaceLandmarks.length) {
-        maxNumFaces = results.multiFaceLandmarks.length;
-        this.faceMesh.setOptions({
-          maxNumFaces: results.multiFaceLandmarks.length,
-        });
+    this.faceMeshWorker = new Worker(
+      new URL("./../webWorkers/faceMeshWebWorker.worker", import.meta.url),
+      {
+        type: "module",
       }
-    });
+    );
+
+    this.faceMeshWorker.onmessage = (event) => {
+      switch (event.data.message) {
+        case "PROCESSED_FRAME":
+          if (event.data.results) {
+            const multiFaceLandmarks = [];
+            for (const result of event.data.results) {
+              multiFaceLandmarks.push(result.scaledMesh);
+            }
+            if (!this.faceMeshResults) {
+              this.faceMeshResults = [];
+            }
+            this.faceMeshResults[0] = multiFaceLandmarks;
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    this.faceDetectionWorker = new Worker(
+      new URL("./../webWorkers/faceDetectionWebWorker.worker", import.meta.url),
+      {
+        type: "module",
+      }
+    );
+
+    this.faceDetectionWorker.onmessage = (event) => {
+      switch (event.data.message) {
+        case "FACES_DETECTED":
+          if (event.data.numFacesDetected) {
+            this.faceMeshWorker.postMessage({
+              message: "CHANGE_MAX_FACES",
+              newMaxFace: event.data.numFacesDetected,
+            });
+          }
+          break;
+        default:
+          break;
+      }
+    };
 
     // Start video and render loop
     this.video = document.createElement("video");
@@ -1777,9 +1786,9 @@ class CameraMedia {
       this.animationFrameId,
       this.effects,
       this.currentEffectsStyles,
-      this.faceMesh,
+      this.faceMeshWorker,
       this.faceMeshResults,
-      this.faceCounter,
+      this.faceDetectionWorker,
       this.userDevice,
       false
     );

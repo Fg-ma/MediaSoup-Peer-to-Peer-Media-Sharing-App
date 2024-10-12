@@ -160,11 +160,11 @@ class FaceLandmarks {
         faceId = this.generateUniqueFaceId(existingIds, faceIndex);
         existingIds.add(faceId);
       }
-
       newFaceTrackers[faceId] = {
         position: nosePosition as Point2D,
         lastSeen: 0,
       };
+
       faceIdLandmarksPairs.push({ faceId, landmarks });
     });
 
@@ -255,9 +255,9 @@ class FaceLandmarks {
     rightNoseBase: NormalizedLandmark
   ) => {
     // Calculate the difference in coordinated of eyes
-    const dxEyes = rightEye.x - leftEye.x;
+    const dxEyes = -1 * (rightEye.x - leftEye.x);
     const dyEyes = rightEye.y - leftEye.y;
-    const dzEyes = rightEye.z - leftEye.z;
+    const dzEyes = -1 * (rightEye.z - leftEye.z);
 
     // Calculate head angle z axis
     this.updateSmoothVariables(

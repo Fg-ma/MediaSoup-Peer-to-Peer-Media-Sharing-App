@@ -5,18 +5,16 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { initializeWorkers } from "./lib/workerManager";
 import mediasoupSocket from "./lib/mediasoupSocket";
-import {
-  tableConsumers,
-  tableConsumerTransports,
-  tableProducers,
-  tableProducerTransports,
-} from "./lib/mediasoupVars";
 
 const main = async () => {
   const app = express();
   app.use(cors());
 
   app.use(express.static(path.join(__dirname, "../client")));
+  app.use(
+    "/node_modules",
+    express.static(path.join(__dirname, "../client/node_modules"))
+  );
 
   const server = http.createServer(app);
   const io = new Server(server, {

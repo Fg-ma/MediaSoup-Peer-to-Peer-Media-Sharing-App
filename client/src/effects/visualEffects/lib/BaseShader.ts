@@ -1279,17 +1279,17 @@ class BaseShader {
 
     let index = 0;
     const positions: number[] = [];
-
+    console.log(liveLandmarks);
     for (let i = 0; i < geometryTriangles.length; i += 9) {
       positions.push(
-        geometryTriangles[i] * 2 - 1, // first x coord
-        (1 - geometryTriangles[i + 1]) * 2 - 1, // first y coord
+        geometryTriangles[i], // first x coord
+        geometryTriangles[i + 1], // first y coord
         geometryTriangles[i + 2], // first z coord
-        geometryTriangles[i + 3] * 2 - 1, // second x coord
-        (1 - geometryTriangles[i + 4]) * 2 - 1, // second y coord
+        geometryTriangles[i + 3], // second x coord
+        geometryTriangles[i + 4], // second y coord
         geometryTriangles[i + 5], // second z coord
-        geometryTriangles[i + 6] * 2 - 1, // third x coord
-        (1 - geometryTriangles[i + 7]) * 2 - 1, // third y coord
+        geometryTriangles[i + 6], // third x coord
+        geometryTriangles[i + 7], // third y coord
         geometryTriangles[i + 8] // third z coord
       );
 
