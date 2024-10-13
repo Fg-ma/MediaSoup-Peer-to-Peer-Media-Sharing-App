@@ -114,6 +114,11 @@ class ScreenMedia {
       undefined,
       undefined,
       undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
       this.userDevice,
       false
     );

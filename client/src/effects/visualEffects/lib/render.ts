@@ -1,5 +1,4 @@
 import {
-  FaceMesh,
   NormalizedLandmarkList,
   NormalizedLandmarkListList,
 } from "@mediapipe/face_mesh";
@@ -67,7 +66,6 @@ class Render {
 
   private segmenter: selfieSegmentation.SelfieSegmentation | undefined;
   private segmenterInitialized = false;
-  private segmenterResults: selfieSegmentation.Results | undefined;
 
   private hideBackgroundCanvas: HTMLCanvasElement;
   private hideBackgroundCtx: CanvasRenderingContext2D | null;
@@ -90,7 +88,12 @@ class Render {
     private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     private faceMeshWorker: Worker | undefined,
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
+    private faceMeshProcessing: boolean[] | undefined,
     private faceDetectionWorker: Worker | undefined,
+    private faceDetectionProcessing: boolean[] | undefined,
+    private selfieSegmentationWorker: Worker | undefined,
+    private selfieSegmentationResults: selfieSegmentation.Results[] | undefined,
+    private selfieSegmentationProcessing: boolean[] | undefined,
     private userDevice: UserDevice,
     private flipVideo: boolean
   ) {
@@ -251,22 +254,27 @@ class Render {
       // Create a new ArrayBuffer
       const buffer = new ArrayBuffer(imageData.data.length);
       const uint8Array = new Uint8Array(buffer);
-
-      // Copy the pixel data into the ArrayBuffer
       uint8Array.set(imageData.data);
 
       // Send video frames to the worker for processing
-      this.faceMeshWorker?.postMessage({
-        message: "FRAME",
-        data: buffer, // Send the ArrayBuffer
-        width: this.offscreenCanvas.width,
-        height: this.offscreenCanvas.height,
-      });
+      if (this.faceMeshProcessing && !this.faceMeshProcessing[0]) {
+        this.faceMeshProcessing[0] = true;
+        this.faceMeshWorker?.postMessage({
+          message: "FRAME",
+          data: buffer, // Send the ArrayBuffer
+          width: this.offscreenCanvas.width,
+          height: this.offscreenCanvas.height,
+        });
+      }
       if (
         performance.now() - this.lastFaceCountCheck > 2000 &&
+        this.faceDetectionProcessing &&
+        !this.faceDetectionProcessing[0] &&
         this.faceDetectionWorker
       ) {
+        this.faceDetectionProcessing[0] = true;
         this.lastFaceCountCheck = performance.now();
+
         this.faceDetectionWorker?.postMessage({
           message: "FRAME",
           data: buffer, // Send the ArrayBuffer
@@ -663,7 +671,9 @@ class Render {
 
     // Attach the onResults callback
     this.segmenter.onResults((results) => {
-      this.segmenterResults = results;
+      if (this.selfieSegmentationResults) {
+        // this.selfieSegmentationResults[0] = results;
+      }
     });
   };
 
@@ -672,7 +682,11 @@ class Render {
       await this.loadSegmenter();
     }
 
-    if (this.segmenter === undefined || !this.segmenterInitialized) {
+    if (
+      this.segmenter === undefined ||
+      !this.segmenterInitialized ||
+      !this.offscreenContext
+    ) {
       return;
     }
 
@@ -682,7 +696,7 @@ class Render {
     this.offscreenCanvas.height = this.video.videoHeight * scaleFactor;
 
     // Clear the offscreen canvas before drawing
-    this.offscreenContext?.clearRect(
+    this.offscreenContext.clearRect(
       0,
       0,
       this.offscreenCanvas.width,
@@ -690,13 +704,40 @@ class Render {
     );
 
     // Draw the video frame onto the offscreen canvas at the lower resolution
-    this.offscreenContext?.drawImage(
+    this.offscreenContext.drawImage(
       this.video,
       0,
       0,
       this.offscreenCanvas.width,
       this.offscreenCanvas.height
     );
+
+    // Get ImageData from the offscreen canvas
+    const imageData = this.offscreenContext.getImageData(
+      0,
+      0,
+      this.offscreenCanvas.width,
+      this.offscreenCanvas.height
+    );
+
+    // Create a new ArrayBuffer
+    const buffer = new ArrayBuffer(imageData.data.length);
+    const uint8Array = new Uint8Array(buffer);
+    uint8Array.set(imageData.data);
+
+    // Send video frames to the worker for processing
+    if (
+      this.selfieSegmentationProcessing &&
+      !this.selfieSegmentationProcessing[0]
+    ) {
+      this.selfieSegmentationProcessing[0] = true;
+      this.selfieSegmentationWorker?.postMessage({
+        message: "FRAME",
+        data: buffer, // Send the ArrayBuffer
+        width: this.offscreenCanvas.width,
+        height: this.offscreenCanvas.height,
+      });
+    }
 
     // Send the image data to the segmenter
     try {
@@ -710,7 +751,8 @@ class Render {
     if (
       !this.hideBackgroundCanvas ||
       !this.hideBackgroundCtx ||
-      !this.segmenterResults
+      !this.selfieSegmentationResults ||
+      !this.selfieSegmentationResults[0]
     ) {
       return;
     }
@@ -723,7 +765,7 @@ class Render {
     );
 
     this.hideBackgroundCtx.drawImage(
-      this.segmenterResults.segmentationMask,
+      this.selfieSegmentationResults[0].segmentationMask,
       0,
       0,
       this.hideBackgroundCanvas.width,

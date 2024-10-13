@@ -43,24 +43,25 @@ class FaceMeshWebWorker {
       predictIrises: true,
     });
 
+    const multiFaceLandmarks = [];
+
     // Normalize predictions between -1 and 1
-    const normalizedPredictions = predictions.map((face) => {
+    predictions.map((face) => {
       const zValues = face.scaledMesh.map(([, , z]) => z);
       const zMin = Math.min(...zValues) * 3;
       const zMax = Math.max(...zValues) * 3;
 
-      return {
-        ...face,
-        scaledMesh: face.scaledMesh.map(([x, y, z]) => {
+      multiFaceLandmarks.push(
+        face.scaledMesh.map(([x, y, z]) => {
           const normX = (x / event.data.width) * 2 - 1; // Normalize X
           const normY = ((y / event.data.height) * 2 - 1) * -1; // Normalize Y
           const normZ = ((z - zMin) / (zMax - zMin)) * 2 - 1; // Normalize Z
           return { x: normX, y: normY, z: normZ };
-        }),
-      };
+        })
+      );
     });
 
-    return normalizedPredictions;
+    return multiFaceLandmarks;
   };
 
   changeMaxFaces = async (newMaxFaces) => {

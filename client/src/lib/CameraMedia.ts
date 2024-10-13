@@ -10,7 +10,7 @@ import {
 } from "../context/CurrentEffectsStylesContext";
 import BaseShader, { MeshJSON } from "../effects/visualEffects/lib/BaseShader";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
-import { FaceMesh, NormalizedLandmarkListList } from "@mediapipe/face_mesh";
+import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -20,6 +20,7 @@ import {
 import UserDevice from "../UserDevice";
 import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
 import Render from "../effects/visualEffects/lib/render";
+import * as selfieSegmentation from "@mediapipe/selfie_segmentation";
 
 export type AssetTexsData = {
   [effectType in
@@ -1651,7 +1652,12 @@ class CameraMedia {
 
   private faceMeshWorker: Worker;
   private faceMeshResults: NormalizedLandmarkListList[] = [];
+  private faceMeshProcessing = [false];
   private faceDetectionWorker: Worker;
+  private faceDetectionProcessing = [false];
+  private selfieSegmentationWorker: Worker;
+  private selfieSegmentationResults: selfieSegmentation.Results[] = [];
+  private selfieSegmentationProcessing = [false];
 
   private effects: {
     [cameraEffect in CameraEffectTypes]?: boolean;
@@ -1736,15 +1742,12 @@ class CameraMedia {
     this.faceMeshWorker.onmessage = (event) => {
       switch (event.data.message) {
         case "PROCESSED_FRAME":
+          this.faceMeshProcessing[0] = false;
           if (event.data.results) {
-            const multiFaceLandmarks = [];
-            for (const result of event.data.results) {
-              multiFaceLandmarks.push(result.scaledMesh);
-            }
             if (!this.faceMeshResults) {
               this.faceMeshResults = [];
             }
-            this.faceMeshResults[0] = multiFaceLandmarks;
+            this.faceMeshResults[0] = event.data.results;
           }
           break;
         default:
@@ -1762,11 +1765,35 @@ class CameraMedia {
     this.faceDetectionWorker.onmessage = (event) => {
       switch (event.data.message) {
         case "FACES_DETECTED":
+          this.faceDetectionProcessing[0] = false;
           if (event.data.numFacesDetected) {
             this.faceMeshWorker.postMessage({
               message: "CHANGE_MAX_FACES",
               newMaxFace: event.data.numFacesDetected,
             });
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    this.selfieSegmentationWorker = new Worker(
+      new URL(
+        "./../webWorkers/selfieSegmentationWebWorker.worker",
+        import.meta.url
+      ),
+      {
+        type: "module",
+      }
+    );
+
+    this.selfieSegmentationWorker.onmessage = (event) => {
+      switch (event.data.message) {
+        case "PROCESSED_FRAME":
+          this.selfieSegmentationProcessing[0] = false;
+          if (event.data.results) {
+            this.selfieSegmentationResults = event.data.results;
           }
           break;
         default:
@@ -1788,7 +1815,12 @@ class CameraMedia {
       this.currentEffectsStyles,
       this.faceMeshWorker,
       this.faceMeshResults,
+      this.faceMeshProcessing,
       this.faceDetectionWorker,
+      this.faceDetectionProcessing,
+      this.selfieSegmentationWorker,
+      this.selfieSegmentationResults,
+      this.selfieSegmentationProcessing,
       this.userDevice,
       false
     );

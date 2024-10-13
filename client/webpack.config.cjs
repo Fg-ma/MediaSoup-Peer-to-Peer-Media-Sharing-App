@@ -25,24 +25,6 @@ module.exports = {
     open: true,
     hot: true,
     liveReload: true,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-    },
-    setupMiddlewares: (middlewares, devServer) => {
-      if (!devServer) return middlewares;
-
-      // Redirect requests for .data files
-      devServer.app.get(
-        "/face_mesh_solution_packed_assets.data",
-        (req, res, next) => {
-          res.redirect(
-            "/@mediapipe/face_mesh/face_mesh_solution_packed_assets.data"
-          );
-        }
-      );
-
-      return middlewares;
-    },
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
