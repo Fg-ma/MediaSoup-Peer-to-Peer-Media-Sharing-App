@@ -68,9 +68,9 @@ class SelfieSegmentationWebWorker {
     for (let i = 0; i < maskData.length; i++) {
       const value = maskData[i];
       const rgbaIndex = i * 4;
-      rgbaData[rgbaIndex] = value;
-      rgbaData[rgbaIndex + 1] = value;
-      rgbaData[rgbaIndex + 2] = value;
+      rgbaData[rgbaIndex] = 255;
+      rgbaData[rgbaIndex + 1] = 255;
+      rgbaData[rgbaIndex + 2] = 255;
       rgbaData[rgbaIndex + 3] = value * 255;
     }
 

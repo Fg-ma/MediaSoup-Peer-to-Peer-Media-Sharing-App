@@ -227,7 +227,7 @@ class Render {
 
     try {
       // Set the dimensions of the offscreen canvas to a lower resolution
-      const scaleFactor = 0.25; // Scale down to 25% of the original size
+      const scaleFactor = 0.1; // Scale down to 25% of the original size
       this.offscreenCanvas.width = this.video.videoWidth * scaleFactor;
       this.offscreenCanvas.height = this.video.videoHeight * scaleFactor;
 
