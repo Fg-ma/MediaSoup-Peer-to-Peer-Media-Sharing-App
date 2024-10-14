@@ -64,13 +64,13 @@ class Render {
 
   private lastFaceCountCheck: number;
 
-  private segmenter: selfieSegmentation.SelfieSegmentation | undefined;
-  private segmenterInitialized = false;
-
   private hideBackgroundCanvas: HTMLCanvasElement;
   private hideBackgroundCtx: CanvasRenderingContext2D | null;
   private hideBackgroundEffectImage: HTMLImageElement;
   private hideBackgroundCtxFillStyle = "#F56114";
+
+  private tempHideBackgroundCanvas: OffscreenCanvas;
+  private tempHideBackgroundCtx: OffscreenCanvasRenderingContext2D | null;
 
   constructor(
     private id: string,
@@ -92,7 +92,7 @@ class Render {
     private faceDetectionWorker: Worker | undefined,
     private faceDetectionProcessing: boolean[] | undefined,
     private selfieSegmentationWorker: Worker | undefined,
-    private selfieSegmentationResults: selfieSegmentation.Results[] | undefined,
+    private selfieSegmentationResults: ImageData[] | undefined,
     private selfieSegmentationProcessing: boolean[] | undefined,
     private userDevice: UserDevice,
     private flipVideo: boolean
@@ -103,7 +103,9 @@ class Render {
       this.userDevice.getFaceMeshDetectionInterval();
 
     this.offscreenCanvas = document.createElement("canvas");
-    this.offscreenContext = this.offscreenCanvas.getContext("2d");
+    this.offscreenContext = this.offscreenCanvas.getContext("2d", {
+      willReadFrequently: true,
+    });
 
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.cullFace(this.gl.BACK);
@@ -118,6 +120,9 @@ class Render {
 
     this.hideBackgroundCanvas = document.createElement("canvas");
     this.hideBackgroundCtx = this.hideBackgroundCanvas.getContext("2d");
+
+    this.tempHideBackgroundCanvas = new OffscreenCanvas(160, 120);
+    this.tempHideBackgroundCtx = this.tempHideBackgroundCanvas.getContext("2d");
   }
 
   private processEffects = async () => {
@@ -646,47 +651,8 @@ class Render {
     }
   };
 
-  private loadSegmenter = async () => {
-    this.hideBackgroundCanvas.width = this.video.videoWidth;
-    this.hideBackgroundCanvas.height = this.video.videoHeight;
-
-    this.segmenter = new selfieSegmentation.SelfieSegmentation({
-      locateFile: (path: string) =>
-        `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${path}`,
-    });
-
-    // Initialize the segmenter and set options
-    try {
-      await this.segmenter.initialize().then(() => {
-        this.segmenterInitialized = true;
-      });
-    } catch (error) {
-      console.error("Error initializing segmenter:", error);
-      return;
-    }
-    this.segmenter.setOptions({
-      modelSelection: 1, // Use the landscape model (0 for general)
-      selfieMode: false,
-    });
-
-    // Attach the onResults callback
-    this.segmenter.onResults((results) => {
-      if (this.selfieSegmentationResults) {
-        // this.selfieSegmentationResults[0] = results;
-      }
-    });
-  };
-
   private hideBackgroundEffect = async () => {
-    if (this.segmenter === undefined) {
-      await this.loadSegmenter();
-    }
-
-    if (
-      this.segmenter === undefined ||
-      !this.segmenterInitialized ||
-      !this.offscreenContext
-    ) {
+    if (!this.offscreenContext || !this.selfieSegmentationWorker) {
       return;
     }
 
@@ -731,19 +697,12 @@ class Render {
       !this.selfieSegmentationProcessing[0]
     ) {
       this.selfieSegmentationProcessing[0] = true;
-      this.selfieSegmentationWorker?.postMessage({
+      this.selfieSegmentationWorker.postMessage({
         message: "FRAME",
         data: buffer, // Send the ArrayBuffer
         width: this.offscreenCanvas.width,
         height: this.offscreenCanvas.height,
       });
-    }
-
-    // Send the image data to the segmenter
-    try {
-      await this.segmenter.send({ image: this.offscreenCanvas });
-    } catch (error) {
-      console.error("Error sending image to segmenter:", error);
     }
   };
 
@@ -751,10 +710,19 @@ class Render {
     if (
       !this.hideBackgroundCanvas ||
       !this.hideBackgroundCtx ||
+      !this.tempHideBackgroundCtx ||
       !this.selfieSegmentationResults ||
       !this.selfieSegmentationResults[0]
     ) {
       return;
+    }
+
+    if (
+      this.hideBackgroundCanvas.width === 0 ||
+      this.hideBackgroundCanvas.height === 0
+    ) {
+      this.hideBackgroundCanvas.width = this.video.videoWidth;
+      this.hideBackgroundCanvas.height = this.video.videoHeight;
     }
 
     this.hideBackgroundCtx.clearRect(
@@ -764,8 +732,27 @@ class Render {
       this.hideBackgroundCanvas.height
     );
 
+    this.tempHideBackgroundCtx.clearRect(
+      0,
+      0,
+      this.tempHideBackgroundCanvas.width,
+      this.tempHideBackgroundCanvas.height
+    );
+
+    // Step 1: Draw the ImageData onto the canvas at its original size (at 0,0)
+    this.tempHideBackgroundCtx.putImageData(
+      this.selfieSegmentationResults[0],
+      0,
+      0
+    );
+
+    // Step 2: Scale the canvas content to fit the full canvas using drawImage
     this.hideBackgroundCtx.drawImage(
-      this.selfieSegmentationResults[0].segmentationMask,
+      this.tempHideBackgroundCanvas, // Draw the entire canvas content as an image
+      0,
+      0,
+      this.tempHideBackgroundCanvas.width,
+      this.tempHideBackgroundCanvas.height,
       0,
       0,
       this.hideBackgroundCanvas.width,

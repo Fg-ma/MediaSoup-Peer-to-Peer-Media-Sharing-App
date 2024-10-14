@@ -1,72 +1,99 @@
-import "../../public/selfieSegmentationModel/tf-core.js";
-import "../../public/selfieSegmentationModel/tf-converter.js";
-import "../../public/selfieSegmentationModel/tf-backend-wasm.js";
-import "../../public/selfieSegmentationModel/selfie_segmentation.js";
-import * as bodySegmentation from "@tensorflow-models/body-segmentation"; // Import the body segmentation library
+import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
 
 class SelfieSegmentationWebWorker {
-  segmenter;
-  modelType = "general"; // Default model type
+  selfieSegmenter = null;
+  isInitialized = false;
+  isInitializing = false;
 
   constructor() {
-    this.loadModel();
+    this.initializeModel();
   }
 
-  loadModel = async () => {
-    tf.wasm.setWasmPaths("/selfieSegmentationModel/"); // Set local WASM path for TensorFlow.js
-    await tf.ready(); // Ensure TensorFlow.js is ready
+  initializeModel = async () => {
+    if (!this.isInitialized && !this.isInitializing) {
+      this.isInitializing = true;
 
-    const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation; // Model type
-    this.segmenter = await bodySegmentation.createSegmenter(model, {
-      runtime: "mediapipe", // Using MediaPipe runtime
-      solutionPath: "/selfieSegmentationModel/", // Local path to MediaPipe assets
-      modelType: this.modelType, // Model type: 'general' or 'landscape'
-    });
+      try {
+        // Load the vision tasks WASM files
+        const vision = await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+        );
+
+        // Define options for the ImageSegmenter
+        const options = {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite",
+            delegate: "CPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: false,
+          outputConfidenceMasks: true,
+          outputQualityScores: true,
+        };
+
+        // Create the ImageSegmenter
+        this.selfieSegmenter = await ImageSegmenter.createFromOptions(
+          vision,
+          options
+        );
+        this.isInitialized = true;
+      } catch (error) {
+        console.error("Failed to initialize the model:", error);
+      } finally {
+        this.isInitializing = false;
+      }
+    }
   };
 
   processFrame = async (event) => {
-    if (!this.segmenter) {
+    if (!this.selfieSegmenter || !this.isInitialized) {
       return;
     }
 
-    // Parse passed ArrayBuffer into image data
     const buffer = event.data.data;
     const array = new Uint8ClampedArray(buffer);
     const imData = new ImageData(array, event.data.width, event.data.height);
 
-    // Make segmentation predictions
-    const predictions = await this.segmenter.segmentPeople({
-      input: imData,
-      returnTensors: false, // Return processed image data
-      flipHorizontal: false,
-      predictIrises: false,
-    });
+    // Run the segmentation model on the input frame
+    const segmentationResult = await this.selfieSegmenter.segment(imData);
 
-    return predictions;
-  };
+    const confidenceMask = segmentationResult.confidenceMasks[0];
+    const maskData = confidenceMask.g[0]; // Extract grayscale mask (Uint8Array)
+    const width = confidenceMask.width;
+    const height = confidenceMask.height;
 
-  changeModelType = async (newModelType) => {
-    if (this.modelType !== newModelType) {
-      this.modelType = newModelType;
-      await this.loadModel(); // Reload the model with the new type
+    const rgbaData = new Uint8ClampedArray(width * height * 4);
+
+    for (let i = 0; i < maskData.length; i++) {
+      const value = maskData[i];
+      const rgbaIndex = i * 4;
+      rgbaData[rgbaIndex] = value;
+      rgbaData[rgbaIndex + 1] = value;
+      rgbaData[rgbaIndex + 2] = value;
+      rgbaData[rgbaIndex + 3] = value * 255;
     }
+
+    // Return ImageData directly instead of drawing it to a canvas
+    return new ImageData(rgbaData, width, height);
   };
 }
 
+// Create an instance of the worker
 const selfieSegmentationWebWorker = new SelfieSegmentationWebWorker();
 
+// Handle messages from the main thread
 onmessage = (event) => {
   switch (event.data.message) {
     case "FRAME":
+      // Ensure the model is initialized before processing the frame
       selfieSegmentationWebWorker.processFrame(event).then((results) => {
+        // Transfer the OffscreenCanvas back to the main thread
         postMessage({
           message: "PROCESSED_FRAME",
           results,
         });
       });
-      break;
-    case "CHANGE_MODEL_TYPE":
-      selfieSegmentationWebWorker.changeModelType(event.data.newModelType);
       break;
     default:
       break;

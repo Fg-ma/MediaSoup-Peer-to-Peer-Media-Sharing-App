@@ -1656,7 +1656,7 @@ class CameraMedia {
   private faceDetectionWorker: Worker;
   private faceDetectionProcessing = [false];
   private selfieSegmentationWorker: Worker;
-  private selfieSegmentationResults: selfieSegmentation.Results[] = [];
+  private selfieSegmentationResults: ImageData[] = [];
   private selfieSegmentationProcessing = [false];
 
   private effects: {
@@ -1793,7 +1793,7 @@ class CameraMedia {
         case "PROCESSED_FRAME":
           this.selfieSegmentationProcessing[0] = false;
           if (event.data.results) {
-            this.selfieSegmentationResults = event.data.results;
+            this.selfieSegmentationResults[0] = event.data.results;
           }
           break;
         default:

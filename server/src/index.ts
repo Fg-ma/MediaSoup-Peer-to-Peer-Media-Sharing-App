@@ -11,10 +11,6 @@ const main = async () => {
   app.use(cors());
 
   app.use(express.static(path.join(__dirname, "../client")));
-  app.use(
-    "/node_modules",
-    express.static(path.join(__dirname, "../client/node_modules"))
-  );
 
   const server = http.createServer(app);
   const io = new Server(server, {

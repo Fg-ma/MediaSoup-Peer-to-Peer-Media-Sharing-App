@@ -1279,7 +1279,7 @@ class BaseShader {
 
     let index = 0;
     const positions: number[] = [];
-    console.log(liveLandmarks);
+
     for (let i = 0; i < geometryTriangles.length; i += 9) {
       positions.push(
         geometryTriangles[i], // first x coord
