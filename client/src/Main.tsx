@@ -28,7 +28,7 @@ import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
-import FgKnobButton from "./fgKnobButton/FgKnobButton";
+import BabylonCanvas from "./babylon/BabylonCanvas";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")
@@ -678,6 +678,7 @@ export default function Main() {
             )}
         </div>
       </div>
+      <BabylonCanvas />
     </div>
   );
 }
