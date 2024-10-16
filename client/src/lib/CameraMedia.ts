@@ -8,7 +8,7 @@ import {
   BeardsEffectTypes,
   defaultCameraCurrentEffectsStyles,
 } from "../context/CurrentEffectsStylesContext";
-import BaseShader, { MeshJSON } from "../effects/visualEffects/lib/BaseShader";
+import { MeshJSON } from "../effects/visualEffects/lib/BaseShader";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
@@ -20,7 +20,7 @@ import {
 import UserDevice from "../UserDevice";
 import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
 import Render from "../effects/visualEffects/lib/render";
-import * as selfieSegmentation from "@mediapipe/selfie_segmentation";
+import BabylonScene from "../babylon/BabylonScene";
 
 export type AssetTexsData = {
   [effectType in
@@ -1624,30 +1624,386 @@ export const assetData: AssetData = {
   },
 };
 
+export type MeshesData = {
+  [effectType in
+    | BeardsEffectTypes
+    | GlassesEffectTypes
+    | MustachesEffectTypes
+    | MasksEffectTypes
+    | HatsEffectTypes
+    | PetsEffectTypes]?: {
+    planeMesh: {
+      meshLabel: string;
+      meshPath: string;
+      meshFile: string;
+      size: number;
+    };
+    mesh: {
+      meshType: string;
+      meshLabel: string;
+      meshPath: string;
+      meshFile: string;
+    };
+  };
+};
+
+export const petMeshes: MeshesData = {
+  angryHamster: {
+    planeMesh: {
+      meshLabel: "angryHamster_2D",
+      meshPath: "/2DAssets/pets/angryHamster/",
+      meshFile: "angryHamster_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "angryHamster_gltf",
+      meshPath: "/3DAssets/pets/angryHamster/",
+      meshFile: "angryHamster.gltf",
+    },
+  },
+  axolotl: {
+    planeMesh: {
+      meshLabel: "axolotl_2D",
+      meshPath: "/2DAssets/pets/axolotl/",
+      meshFile: "axolotl_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "axolotl_gltf",
+      meshPath: "/3DAssets/pets/axolotl/",
+      meshFile: "axolotl.gltf",
+    },
+  },
+  babyDragon: {
+    planeMesh: {
+      meshLabel: "babyDragon_2D",
+      meshPath: "/2DAssets/pets/babyDragon/",
+      meshFile: "babyDragon_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "babyDragon_gltf",
+      meshPath: "/3DAssets/pets/babyDragon/",
+      meshFile: "babyDragon.gltf",
+    },
+  },
+  beardedDragon: {
+    planeMesh: {
+      meshLabel: "beardedDragon_2D",
+      meshPath: "/2DAssets/pets/beardedDragon/",
+      meshFile: "beardedDragon_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "beardedDragon_gltf",
+      meshPath: "/3DAssets/pets/beardedDragon/",
+      meshFile: "beardedDragon.gltf",
+    },
+  },
+  bird1: {
+    planeMesh: {
+      meshLabel: "bird1_2D",
+      meshPath: "/2DAssets/pets/bird1/",
+      meshFile: "bird1_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "bird1_gltf",
+      meshPath: "/3DAssets/pets/bird1/",
+      meshFile: "bird1.gltf",
+    },
+  },
+  bird2: {
+    planeMesh: {
+      meshLabel: "bird2_2D",
+      meshPath: "/2DAssets/pets/bird2/",
+      meshFile: "bird2_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "bird2_gltf",
+      meshPath: "/3DAssets/pets/bird2/",
+      meshFile: "bird2.gltf",
+    },
+  },
+  boxer: {
+    planeMesh: {
+      meshLabel: "boxer_2D",
+      meshPath: "/2DAssets/pets/boxer/",
+      meshFile: "boxer_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "boxer_gltf",
+      meshPath: "/3DAssets/pets/boxer/",
+      meshFile: "boxer.gltf",
+    },
+  },
+  brain: {
+    planeMesh: {
+      meshLabel: "brain_2D",
+      meshPath: "/2DAssets/pets/brain/",
+      meshFile: "brain_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "brain_gltf",
+      meshPath: "/3DAssets/pets/brain/",
+      meshFile: "brain.gltf",
+    },
+  },
+  buddyHamster: {
+    planeMesh: {
+      meshLabel: "buddyHamster_2D",
+      meshPath: "/2DAssets/pets/buddyHamster/",
+      meshFile: "buddyHamster_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "buddyHamster_gltf",
+      meshPath: "/3DAssets/pets/buddyHamster/",
+      meshFile: "buddyHamster.gltf",
+    },
+  },
+  cat1: {
+    planeMesh: {
+      meshLabel: "cat1_2D",
+      meshPath: "/2DAssets/pets/cat1/",
+      meshFile: "cat1_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "cat1_gltf",
+      meshPath: "/3DAssets/pets/cat1/",
+      meshFile: "cat1.gltf",
+    },
+  },
+  cat2: {
+    planeMesh: {
+      meshLabel: "cat2_2D",
+      meshPath: "/2DAssets/pets/cat2/",
+      meshFile: "cat2_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "cat2_gltf",
+      meshPath: "/3DAssets/pets/cat2/",
+      meshFile: "cat2.gltf",
+    },
+  },
+  dodoBird: {
+    planeMesh: {
+      meshLabel: "dodoBird_2D",
+      meshPath: "/2DAssets/pets/dodoBird/",
+      meshFile: "dodoBird_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "dodoBird_gltf",
+      meshPath: "/3DAssets/pets/dodoBird/",
+      meshFile: "dodoBird.gltf",
+    },
+  },
+  happyHamster: {
+    planeMesh: {
+      meshLabel: "happyHamster_2D",
+      meshPath: "/2DAssets/pets/happyHamster/",
+      meshFile: "happyHamster_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "happyHamster_gltf",
+      meshPath: "/3DAssets/pets/happyHamster/",
+      meshFile: "happyHamster.gltf",
+    },
+  },
+  mechanicalGrasshopper: {
+    planeMesh: {
+      meshLabel: "mechanicalGrasshopper_2D",
+      meshPath: "/2DAssets/pets/mechanicalGrasshopper/",
+      meshFile: "mechanicalGrasshopper_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "mechanicalGrasshopper_gltf",
+      meshPath: "/3DAssets/pets/mechanicalGrasshopper/",
+      meshFile: "mechanicalGrasshopper.gltf",
+    },
+  },
+  panda1: {
+    planeMesh: {
+      meshLabel: "panda1_2D",
+      meshPath: "/2DAssets/pets/panda1/",
+      meshFile: "panda1_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "panda1_gltf",
+      meshPath: "/3DAssets/pets/panda1/",
+      meshFile: "panda1.gltf",
+    },
+  },
+  panda2: {
+    planeMesh: {
+      meshLabel: "panda2_2D",
+      meshPath: "/2DAssets/pets/panda2/",
+      meshFile: "panda2_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "panda2_gltf",
+      meshPath: "/3DAssets/pets/panda2/",
+      meshFile: "panda2.gltf",
+    },
+  },
+  petRock: {
+    planeMesh: {
+      meshLabel: "petRock_2D",
+      meshPath: "/2DAssets/pets/petRock/",
+      meshFile: "petRock_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "petRock_gltf",
+      meshPath: "/3DAssets/pets/petRock/",
+      meshFile: "petRock.gltf",
+    },
+  },
+  pig: {
+    planeMesh: {
+      meshLabel: "pig_2D",
+      meshPath: "/2DAssets/pets/pig/",
+      meshFile: "pig_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "pig_gltf",
+      meshPath: "/3DAssets/pets/pig/",
+      meshFile: "pig.gltf",
+    },
+  },
+  redFox1: {
+    planeMesh: {
+      meshLabel: "redFox1_2D",
+      meshPath: "/2DAssets/pets/redFox1/",
+      meshFile: "redFox1_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "redFox1_gltf",
+      meshPath: "/3DAssets/pets/redFox1/",
+      meshFile: "redFox1.gltf",
+    },
+  },
+  redFox2: {
+    planeMesh: {
+      meshLabel: "redFox2_2D",
+      meshPath: "/2DAssets/pets/redFox2/",
+      meshFile: "redFox2_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "redFox2_gltf",
+      meshPath: "/3DAssets/pets/redFox2/",
+      meshFile: "redFox2.gltf",
+    },
+  },
+  roboDog: {
+    planeMesh: {
+      meshLabel: "roboDog_2D",
+      meshPath: "/2DAssets/pets/roboDog/",
+      meshFile: "roboDog_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "roboDog_gltf",
+      meshPath: "/3DAssets/pets/roboDog/",
+      meshFile: "roboDog.gltf",
+    },
+  },
+  skeletonTRex: {
+    planeMesh: {
+      meshLabel: "skeletonTRex_2D",
+      meshPath: "/2DAssets/pets/skeletonTRex/",
+      meshFile: "skeletonTRex_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "skeletonTRex_gltf",
+      meshPath: "/3DAssets/pets/skeletonTRex/",
+      meshFile: "skeletonTRex.gltf",
+    },
+  },
+  snail: {
+    planeMesh: {
+      meshLabel: "snail_2D",
+      meshPath: "/2DAssets/pets/snail/",
+      meshFile: "snail_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "snail_gltf",
+      meshPath: "/3DAssets/pets/snail/",
+      meshFile: "snail.gltf",
+    },
+  },
+  spinosaurus: {
+    planeMesh: {
+      meshLabel: "spinosaurus_2D",
+      meshPath: "/2DAssets/pets/spinosaurus/",
+      meshFile: "spinosaurus_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "spinosaurus_gltf",
+      meshPath: "/3DAssets/pets/spinosaurus/",
+      meshFile: "spinosaurus.gltf",
+    },
+  },
+  TRex: {
+    planeMesh: {
+      meshLabel: "TRex_2D",
+      meshPath: "/2DAssets/pets/TRex/",
+      meshFile: "TRex_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "TRex_gltf",
+      meshPath: "/3DAssets/pets/TRex/",
+      meshFile: "TRex2.gltf",
+    },
+  },
+};
+
 class CameraMedia {
-  private username: string;
-  private table_id: string;
-  private cameraId: string;
-
-  private canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement;
   private video: HTMLVideoElement;
-  private gl: WebGLRenderingContext | WebGL2RenderingContext;
-  private initCameraStream: MediaStream;
 
-  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
-  private userStreamEffects: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: { [effectType in CameraEffectTypes]?: boolean };
-    };
-    screen: {
-      [screenId: string]: { [effectType in ScreenEffectTypes]?: boolean };
-    };
-    audio: { [effectType in AudioEffectTypes]?: boolean };
-  }>;
-
-  private animationFrameId: number[] = [];
-
-  private baseShader: BaseShader;
   private faceLandmarks: FaceLandmarks;
 
   private faceMeshWorker: Worker;
@@ -1665,19 +2021,17 @@ class CameraMedia {
 
   private tintColor = "#F56114";
 
-  private userDevice: UserDevice;
+  private babylonScene: BabylonScene;
 
-  private deadbanding: Deadbanding;
-
-  render: Render;
+  render: Render | undefined;
 
   constructor(
-    username: string,
-    table_id: string,
-    cameraId: string,
-    initCameraStream: MediaStream,
-    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-    userStreamEffects: React.MutableRefObject<{
+    private username: string,
+    private table_id: string,
+    private cameraId: string,
+    private initCameraStream: MediaStream,
+    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private userStreamEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
@@ -1686,8 +2040,8 @@ class CameraMedia {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
-    userDevice: UserDevice,
-    deadbanding: Deadbanding
+    private userDevice: UserDevice,
+    private deadbanding: Deadbanding
   ) {
     this.username = username;
     this.table_id = table_id;
@@ -1703,14 +2057,6 @@ class CameraMedia {
       defaultCameraStreamEffects;
 
     this.canvas = document.createElement("canvas");
-    const gl =
-      this.canvas.getContext("webgl2") || this.canvas.getContext("webgl");
-
-    if (!gl) {
-      throw new Error("WebGL is not supported");
-    }
-
-    this.gl = gl;
 
     this.initCameraStream = initCameraStream;
 
@@ -1718,13 +2064,6 @@ class CameraMedia {
       currentEffectsStyles.current.camera[this.cameraId] =
         defaultCameraCurrentEffectsStyles;
     }
-
-    this.baseShader = new BaseShader(gl, this.effects);
-
-    this.baseShader.setTintColor(this.tintColor);
-    this.baseShader.createAtlasTexture("twoDim", {});
-    this.baseShader.createAtlasTexture("threeDim", {});
-    this.baseShader.createAtlasTexture("material", {});
 
     this.faceLandmarks = new FaceLandmarks(
       this.cameraId,
@@ -1804,46 +2143,17 @@ class CameraMedia {
     // Start video and render loop
     this.video = document.createElement("video");
 
-    this.render = new Render(
-      this.cameraId,
-      this.gl,
-      this.baseShader,
-      this.faceLandmarks,
-      this.video,
-      this.animationFrameId,
-      this.effects,
-      this.currentEffectsStyles,
-      this.faceMeshWorker,
-      this.faceMeshResults,
-      this.faceMeshProcessing,
-      this.faceDetectionWorker,
-      this.faceDetectionProcessing,
-      this.selfieSegmentationWorker,
-      this.selfieSegmentationResults,
-      this.selfieSegmentationProcessing,
-      this.userDevice,
-      false
-    );
+    this.babylonScene = new BabylonScene(this.canvas, this.video);
 
     this.video.srcObject = this.initCameraStream;
-    this.video.addEventListener("play", () => {
-      this.render.loop();
-    });
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
-      this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
       this.video.play();
     };
   }
 
   deconstructor() {
-    // End render loop
-    if (this.animationFrameId[0]) {
-      cancelAnimationFrame(this.animationFrameId[0]);
-      delete this.animationFrameId[0];
-    }
-
     // End initial stream
     this.initCameraStream.getTracks().forEach((track) => track.stop());
 
@@ -1851,304 +2161,17 @@ class CameraMedia {
     this.video.pause();
     this.video.srcObject = null;
 
-    // Deconstruct base shader
-    this.baseShader.deconstructor();
-
-    // Clear gl canvas
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    if (this.canvas) {
-      const contextAttributes = this.gl.getContextAttributes();
-      if (contextAttributes && contextAttributes.preserveDrawingBuffer) {
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-      }
-      const ext = this.gl.getExtension("WEBGL_lose_context");
-      if (ext) {
-        ext.loseContext();
-      }
-    }
     this.canvas.remove();
   }
 
-  private async updateAtlases() {
-    const glassesStyles =
-      this.currentEffectsStyles.current.camera[this.cameraId].glasses;
-    const beardStyles =
-      this.currentEffectsStyles.current.camera[this.cameraId].beards;
-    const mustacheStyles =
-      this.currentEffectsStyles.current.camera[this.cameraId].mustaches;
-    const maskStyles =
-      this.currentEffectsStyles.current.camera[this.cameraId].masks;
-    const hatStyles =
-      this.currentEffectsStyles.current.camera[this.cameraId].hats;
-    const petStyles =
-      this.currentEffectsStyles.current.camera[this.cameraId].pets;
-
-    const twoDimAtlasImages: { [key: string]: { url: string; size: number } } =
-      {};
-
-    if (glassesStyles && this.effects.glasses) {
-      const glassesImage = glassesDataURLs.image[glassesStyles.style];
-
-      if (glassesImage) {
-        twoDimAtlasImages[glassesStyles.style] = glassesImage;
-      }
-    }
-    if (beardStyles && this.effects.beards) {
-      const beardImage = beardsDataURLs.image[beardStyles.style];
-
-      if (beardImage) {
-        twoDimAtlasImages[beardStyles.style] = beardImage;
-      }
-    }
-    if (mustacheStyles && this.effects.mustaches) {
-      const mustacheImage = mustachesDataURLs.image[mustacheStyles.style];
-
-      if (mustacheImage) {
-        twoDimAtlasImages[mustacheStyles.style] = mustacheImage;
-      }
-    }
-    if (maskStyles && this.effects.masks) {
-      const maskImage = masksDataURLs.image[maskStyles.style];
-
-      if (maskImage) {
-        twoDimAtlasImages[maskStyles.style] = maskImage;
-      }
-    }
-    if (hatStyles && this.effects.hats) {
-      const hatImage = hatsDataURLs.image[hatStyles.style];
-
-      if (hatImage) {
-        twoDimAtlasImages[hatStyles.style] = hatImage;
-      }
-    }
-    if (petStyles && this.effects.pets) {
-      const petImage = petsDataURLs.image[petStyles.style];
-
-      if (petImage) {
-        twoDimAtlasImages[petStyles.style] = petImage;
-      }
-    }
-
-    const threeDimAtlasImages: {
-      [key: string]: { url: string; size: number };
-    } = {};
-    const materialAtlasImages: {
-      [key: string]: {
-        texs: {
-          normal?: { url: string; size: number };
-          transmissionRoughnessMetallic?: { url: string; size: number };
-          specular?: { url: string; size: number };
-          emission?: { url: string; size: number };
-        };
-        size?: number;
-        top?: number;
-        left?: number;
-      };
-    } = {};
-
-    if (glassesStyles && glassesStyles.threeDim && this.effects.glasses) {
-      const glassesImage = glassesDataURLs.diffuse[glassesStyles.style];
-
-      if (glassesImage) {
-        threeDimAtlasImages[glassesStyles.style] = glassesImage;
-      }
-
-      const normalImage = glassesDataURLs.normal[glassesStyles.style];
-      const transmissionRoughnessMetallicImage =
-        glassesDataURLs.transmissionRoughnessMetallic[glassesStyles.style];
-      const specularImage = glassesDataURLs.specular[glassesStyles.style];
-      const emissionImage = glassesDataURLs.emission[glassesStyles.style];
-
-      if (!materialAtlasImages[glassesStyles.style]) {
-        materialAtlasImages[glassesStyles.style] = { texs: {} };
-      }
-
-      if (normalImage) {
-        materialAtlasImages[glassesStyles.style].texs.normal = normalImage;
-      }
-      if (transmissionRoughnessMetallicImage) {
-        materialAtlasImages[
-          glassesStyles.style
-        ].texs.transmissionRoughnessMetallic =
-          transmissionRoughnessMetallicImage;
-      }
-      if (specularImage) {
-        materialAtlasImages[glassesStyles.style].texs.specular = specularImage;
-      }
-      if (emissionImage) {
-        materialAtlasImages[glassesStyles.style].texs.emission = emissionImage;
-      }
-    }
-    if (beardStyles && beardStyles.threeDim && this.effects.beards) {
-      const beardImage = beardsDataURLs.diffuse[beardStyles.style];
-
-      if (beardImage) {
-        threeDimAtlasImages[beardStyles.style] = beardImage;
-      }
-
-      const normalImage = beardsDataURLs.normal[beardStyles.style];
-      const transmissionRoughnessMetallicImage =
-        beardsDataURLs.transmissionRoughnessMetallic[beardStyles.style];
-      const specularImage = beardsDataURLs.specular[beardStyles.style];
-      const emissionImage = beardsDataURLs.emission[beardStyles.style];
-
-      if (!materialAtlasImages[beardStyles.style]) {
-        materialAtlasImages[beardStyles.style] = { texs: {} };
-      }
-
-      if (normalImage) {
-        materialAtlasImages[beardStyles.style].texs.normal = normalImage;
-      }
-      if (transmissionRoughnessMetallicImage) {
-        materialAtlasImages[
-          beardStyles.style
-        ].texs.transmissionRoughnessMetallic =
-          transmissionRoughnessMetallicImage;
-      }
-      if (specularImage) {
-        materialAtlasImages[beardStyles.style].texs.specular = specularImage;
-      }
-      if (emissionImage) {
-        materialAtlasImages[beardStyles.style].texs.emission = emissionImage;
-      }
-    }
-    if (mustacheStyles && mustacheStyles.threeDim && this.effects.mustaches) {
-      const mustacheImage = mustachesDataURLs.diffuse[mustacheStyles.style];
-
-      if (mustacheImage) {
-        threeDimAtlasImages[mustacheStyles.style] = mustacheImage;
-      }
-
-      const normalImage = mustachesDataURLs.normal[mustacheStyles.style];
-      const transmissionRoughnessMetallicImage =
-        mustachesDataURLs.transmissionRoughnessMetallic[mustacheStyles.style];
-      const specularImage = mustachesDataURLs.specular[mustacheStyles.style];
-      const emissionImage = mustachesDataURLs.emission[mustacheStyles.style];
-
-      if (!materialAtlasImages[mustacheStyles.style]) {
-        materialAtlasImages[mustacheStyles.style] = { texs: {} };
-      }
-
-      if (normalImage) {
-        materialAtlasImages[mustacheStyles.style].texs.normal = normalImage;
-      }
-      if (transmissionRoughnessMetallicImage) {
-        materialAtlasImages[
-          mustacheStyles.style
-        ].texs.transmissionRoughnessMetallic =
-          transmissionRoughnessMetallicImage;
-      }
-      if (specularImage) {
-        materialAtlasImages[mustacheStyles.style].texs.specular = specularImage;
-      }
-      if (emissionImage) {
-        materialAtlasImages[mustacheStyles.style].texs.emission = emissionImage;
-      }
-    }
-    if (maskStyles && maskStyles.threeDim && this.effects.masks) {
-      const maskImage = masksDataURLs.diffuse[maskStyles.style];
-
-      if (maskImage) {
-        threeDimAtlasImages[maskStyles.style] = maskImage;
-      }
-
-      const normalImage = masksDataURLs.normal[maskStyles.style];
-      const transmissionRoughnessMetallicImage =
-        masksDataURLs.transmissionRoughnessMetallic[maskStyles.style];
-      const specularImage = masksDataURLs.specular[maskStyles.style];
-      const emissionImage = masksDataURLs.emission[maskStyles.style];
-
-      if (!materialAtlasImages[maskStyles.style]) {
-        materialAtlasImages[maskStyles.style] = { texs: {} };
-      }
-
-      if (normalImage) {
-        materialAtlasImages[maskStyles.style].texs.normal = normalImage;
-      }
-      if (transmissionRoughnessMetallicImage) {
-        materialAtlasImages[
-          maskStyles.style
-        ].texs.transmissionRoughnessMetallic =
-          transmissionRoughnessMetallicImage;
-      }
-      if (specularImage) {
-        materialAtlasImages[maskStyles.style].texs.specular = specularImage;
-      }
-      if (emissionImage) {
-        materialAtlasImages[maskStyles.style].texs.emission = emissionImage;
-      }
-    }
-    if (hatStyles && hatStyles.threeDim && this.effects.hats) {
-      const hatImage = hatsDataURLs.diffuse[hatStyles.style];
-
-      if (hatImage) {
-        threeDimAtlasImages[hatStyles.style] = hatImage;
-      }
-
-      const normalImage = hatsDataURLs.normal[hatStyles.style];
-      const transmissionRoughnessMetallicImage =
-        hatsDataURLs.transmissionRoughnessMetallic[hatStyles.style];
-      const specularImage = hatsDataURLs.specular[hatStyles.style];
-      const emissionImage = hatsDataURLs.emission[hatStyles.style];
-
-      if (!materialAtlasImages[hatStyles.style]) {
-        materialAtlasImages[hatStyles.style] = { texs: {} };
-      }
-
-      if (normalImage) {
-        materialAtlasImages[hatStyles.style].texs.normal = normalImage;
-      }
-      if (transmissionRoughnessMetallicImage) {
-        materialAtlasImages[
-          hatStyles.style
-        ].texs.transmissionRoughnessMetallic =
-          transmissionRoughnessMetallicImage;
-      }
-      if (specularImage) {
-        materialAtlasImages[hatStyles.style].texs.specular = specularImage;
-      }
-      if (emissionImage) {
-        materialAtlasImages[hatStyles.style].texs.emission = emissionImage;
-      }
-    }
-    if (petStyles && petStyles.threeDim && this.effects.pets) {
-      const petImage = petsDataURLs.diffuse[petStyles.style];
-
-      if (petImage) {
-        threeDimAtlasImages[petStyles.style] = petImage;
-      }
-
-      const normalImage = petsDataURLs.normal[petStyles.style];
-      const transmissionRoughnessMetallicImage =
-        petsDataURLs.transmissionRoughnessMetallic[petStyles.style];
-      const specularImage = petsDataURLs.specular[petStyles.style];
-      const emissionImage = petsDataURLs.emission[petStyles.style];
-
-      if (!materialAtlasImages[petStyles.style]) {
-        materialAtlasImages[petStyles.style] = { texs: {} };
-      }
-
-      if (normalImage) {
-        materialAtlasImages[petStyles.style].texs.normal = normalImage;
-      }
-      if (transmissionRoughnessMetallicImage) {
-        materialAtlasImages[
-          petStyles.style
-        ].texs.transmissionRoughnessMetallic =
-          transmissionRoughnessMetallicImage;
-      }
-      if (specularImage) {
-        materialAtlasImages[petStyles.style].texs.specular = specularImage;
-      }
-      if (emissionImage) {
-        materialAtlasImages[petStyles.style].texs.emission = emissionImage;
-      }
-    }
-
-    await this.baseShader.updateAtlasTexture("twoDim", twoDimAtlasImages);
-    await this.baseShader.updateAtlasTexture("threeDim", threeDimAtlasImages);
-    await this.baseShader.updateAtlasTexture("material", materialAtlasImages);
-  }
+  private lastMeshes = {
+    glasses: "",
+    beards: "",
+    mustaches: "",
+    masks: "",
+    hats: "",
+    pets: "",
+  };
 
   async changeEffects(
     effect: CameraEffectTypes,
@@ -2163,7 +2186,7 @@ class CameraMedia {
       this.effects[effect] = true;
     }
 
-    await this.updateAtlases();
+    this.drawNewEffect(effect);
 
     this.deadbanding.update(this.cameraId, this.effects);
 
@@ -2171,25 +2194,75 @@ class CameraMedia {
       this.setTintColor(tintColor);
     }
     if (effect === "tint" && !blockStateChange) {
-      this.baseShader.toggleTintEffect();
     }
 
     if (effect === "blur") {
-      this.baseShader.toggleBlurEffect();
     }
 
     if (effect === "pause") {
-      this.baseShader.setPause(this.effects[effect]);
     }
-
-    // Remove old animation frame
-    if (this.animationFrameId[0]) {
-      cancelAnimationFrame(this.animationFrameId[0]);
-      delete this.animationFrameId[0];
-    }
-
-    this.render.loop();
   }
+
+  drawNewEffect = (effect: CameraEffectTypes) => {
+    const currentStyle =
+      this.currentEffectsStyles.current.camera[this.cameraId][effect];
+
+    // @ts-ignore
+    const lastMesh: string = this.lastMeshes[effect];
+
+    if (currentStyle.style === "" || !(currentStyle.style in petMeshes)) {
+      return;
+    }
+
+    // @ts-ignore
+    const meshData2D = petMeshes[currentStyle.style].planeMesh;
+    // @ts-ignore
+    const meshData3D = petMeshes[currentStyle.style].mesh;
+
+    // Delete old meshes
+    if (lastMesh) {
+      this.babylonScene.deleteMesh(
+        "2D",
+        // @ts-ignore
+        petMeshes[lastMesh].planeMesh.meshLabel
+      );
+      this.babylonScene.deleteMesh(
+        meshData3D.meshType,
+        // @ts-ignore
+        petMeshes[lastMesh].mesh.meshLabel
+      );
+    }
+
+    if (this.effects[effect]) {
+      if (!currentStyle.threeDim) {
+        this.babylonScene.createMesh(
+          "2D",
+          meshData2D.meshLabel,
+          "",
+          meshData2D.meshPath,
+          meshData2D.meshFile,
+          [0, 0, 100],
+          [10, 10, 10],
+          [0, 0, 0]
+        );
+      }
+      if (currentStyle.threeDim) {
+        this.babylonScene.createMesh(
+          meshData3D.meshType,
+          meshData3D.meshLabel,
+          "",
+          meshData3D.meshPath,
+          meshData3D.meshFile,
+          [0, 0, 90],
+          [1, 1, 1],
+          [0, 0, 0]
+        );
+      }
+    }
+
+    // @ts-ignore
+    this.lastMeshes[effect] = currentStyle.style;
+  };
 
   getStream() {
     return this.canvas.captureStream();
@@ -2200,7 +2273,7 @@ class CameraMedia {
   }
 
   setTintColor(newTintColor: string) {
-    this.baseShader.setTintColor(newTintColor);
+    // this.baseShader.setTintColor(newTintColor);
   }
 }
 

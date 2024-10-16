@@ -4,6 +4,7 @@ import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesC
 import { AudioEffectTypes, useStreamsContext } from "../context/StreamsContext";
 import BundleController from "./lib/BundleController";
 import { useSignalContext } from "../context/SignalContext";
+import FgBabylonCanvas from "../FgBabylonCanvas/FgBabylonCanvas";
 
 const FgVideo = React.lazy(() => import("../fgVideo/FgVideo"));
 const FgAudioElementContainer = React.lazy(
@@ -283,51 +284,98 @@ export default function Bundle({
         Object.keys(cameraStreams).length !== 0 &&
         Object.entries(cameraStreams).map(([key, cameraStream]) => (
           <Suspense key={key} fallback={<div>Loading...</div>}>
-            <FgVideo
-              socket={socket}
-              videoId={key}
-              table_id={table_id}
-              username={username}
-              instance={instance}
-              name={name}
-              type='camera'
-              bundleRef={bundleRef}
-              videoStream={cameraStream}
-              audioStream={audioStream}
-              audioRef={audioRef}
-              handleAudioEffectChange={handleAudioEffectChange}
-              clientMute={clientMute}
-              localMute={localMute}
-              options={{
-                isUser: bundleOptions.isUser,
-                acceptsVisualEffects: acceptsCameraEffects,
-                acceptsAudioEffects: acceptsAudioEffects,
-                isStream: true,
-                flipVideo: true,
-                isSlider: !bundleOptions.isUser,
-                isVolume: audioStream ? true : false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: true,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-                initialVolume: bundleOptions.initialVolume
-                  ? bundleOptions.initialVolume
-                  : audioRef.current
-                  ? audioRef.current.muted
-                    ? "off"
-                    : audioRef.current.volume > 0.5
-                    ? "high"
-                    : "low"
-                  : "high",
-              }}
-              handleMute={handleMute}
-              handleMuteCallback={handleMuteCallback}
-              handleVolumeSliderCallback={handleVolumeSliderCallback}
-              tracksColorSetterCallback={tracksColorSetterCallback}
-            />
+            {bundleOptions.isUser ? (
+              <FgBabylonCanvas
+                socket={socket}
+                videoId={key}
+                table_id={table_id}
+                username={username}
+                instance={instance}
+                name={name}
+                type='camera'
+                bundleRef={bundleRef}
+                audioStream={audioStream}
+                audioRef={audioRef}
+                handleAudioEffectChange={handleAudioEffectChange}
+                clientMute={clientMute}
+                localMute={localMute}
+                options={{
+                  isUser: bundleOptions.isUser,
+                  acceptsVisualEffects: acceptsCameraEffects,
+                  acceptsAudioEffects: acceptsAudioEffects,
+                  isStream: true,
+                  flipVideo: true,
+                  isSlider: !bundleOptions.isUser,
+                  isVolume: audioStream ? true : false,
+                  isTotalTime: false,
+                  isPlaybackSpeed: false,
+                  isClosedCaptions: true,
+                  isTimeLine: false,
+                  isSkip: false,
+                  isThumbnail: false,
+                  isPreview: false,
+                  initialVolume: bundleOptions.initialVolume
+                    ? bundleOptions.initialVolume
+                    : audioRef.current
+                    ? audioRef.current.muted
+                      ? "off"
+                      : audioRef.current.volume > 0.5
+                      ? "high"
+                      : "low"
+                    : "high",
+                }}
+                handleMute={handleMute}
+                handleMuteCallback={handleMuteCallback}
+                handleVolumeSliderCallback={handleVolumeSliderCallback}
+                tracksColorSetterCallback={tracksColorSetterCallback}
+              />
+            ) : (
+              <FgVideo
+                socket={socket}
+                videoId={key}
+                table_id={table_id}
+                username={username}
+                instance={instance}
+                name={name}
+                type='camera'
+                bundleRef={bundleRef}
+                videoStream={cameraStream}
+                audioStream={audioStream}
+                audioRef={audioRef}
+                handleAudioEffectChange={handleAudioEffectChange}
+                clientMute={clientMute}
+                localMute={localMute}
+                options={{
+                  isUser: bundleOptions.isUser,
+                  acceptsVisualEffects: acceptsCameraEffects,
+                  acceptsAudioEffects: acceptsAudioEffects,
+                  isStream: true,
+                  flipVideo: true,
+                  isSlider: !bundleOptions.isUser,
+                  isVolume: audioStream ? true : false,
+                  isTotalTime: false,
+                  isPlaybackSpeed: false,
+                  isClosedCaptions: true,
+                  isTimeLine: false,
+                  isSkip: false,
+                  isThumbnail: false,
+                  isPreview: false,
+                  initialVolume: bundleOptions.initialVolume
+                    ? bundleOptions.initialVolume
+                    : audioRef.current
+                    ? audioRef.current.muted
+                      ? "off"
+                      : audioRef.current.volume > 0.5
+                      ? "high"
+                      : "low"
+                    : "high",
+                }}
+                handleMute={handleMute}
+                handleMuteCallback={handleMuteCallback}
+                handleVolumeSliderCallback={handleVolumeSliderCallback}
+                tracksColorSetterCallback={tracksColorSetterCallback}
+              />
+            )}
           </Suspense>
         ))}
       {screenStreams &&

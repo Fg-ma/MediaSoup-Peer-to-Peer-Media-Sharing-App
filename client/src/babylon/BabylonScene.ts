@@ -9,11 +9,9 @@ import {
   UniversalCamera,
   Mesh,
 } from "@babylonjs/core";
-import BabylonMeshes from "./BabylonMeshes";
+import BabylonMeshes, { MeshTypes } from "./BabylonMeshes";
 
 class BabylonScene {
-  private video: HTMLVideoElement;
-
   private engine: Engine;
   private scene: Scene;
   private camera: UniversalCamera;
@@ -24,53 +22,24 @@ class BabylonScene {
 
   private babylonMeshes: BabylonMeshes;
 
-  constructor(private canvas: HTMLCanvasElement | null) {
-    this.engine = new Engine(canvas, true);
+  constructor(
+    private canvas: HTMLCanvasElement | null,
+    private video: HTMLVideoElement
+  ) {
+    this.engine = new Engine(this.canvas, true);
     this.scene = new Scene(this.engine);
     this.camera = new UniversalCamera(
       "camera",
       new Vector3(0, 0, -1),
       this.scene
     );
-    this.camera.attachControl(canvas, true);
-    this.video = document.createElement("video");
+    this.camera.attachControl(this.canvas, true);
 
-    this.initVideoStream();
     this.initCamera();
     this.initLighting();
     this.initVideoPlane();
 
     this.babylonMeshes = new BabylonMeshes(this.scene);
-    this.babylonMeshes.loader(
-      "gltf",
-      "babyDragon_gltf",
-      "",
-      "/3DAssets/pets/babyDragon/babyDragon/",
-      "scene.gltf",
-      [0, 0, 90],
-      [10, 10, 10],
-      [-Math.PI / 2, 0, Math.PI]
-    );
-    this.babylonMeshes.loader(
-      "2D",
-      "babyDragon_2D",
-      "",
-      "/2DAssets/pets/babyDragon/",
-      "babyDragon_512x512.png",
-      [0, 0, 100],
-      [10, 10, 10],
-      [0, 0, 0]
-    );
-    this.babylonMeshes.loader(
-      "gltf",
-      "trex_gltf",
-      "",
-      "/3DAssets/pets/TRex/TRex/",
-      "scene.gltf",
-      [0, 0, 90],
-      [0.1, 0.1, 0.1],
-      [Math.PI, 0, Math.PI]
-    );
 
     // Render loop
     this.engine.runRenderLoop(() => {
@@ -84,48 +53,26 @@ class BabylonScene {
     });
   }
 
-  deconstructor() {
+  deconstructor = () => {
     this.engine.dispose();
     window.removeEventListener("resize", () => {
       this.engine.resize();
       this.updateVideoPlaneSize();
     });
-  }
+  };
 
-  private initVideoStream() {
-    // Create a video background
-    this.video.autoplay = true;
-    this.video.muted = true;
-    this.video.loop = true;
-    this.video.width = 640;
-    this.video.height = 480;
-    this.video.style.objectFit = "cover";
-
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then((stream) => {
-        if (this.video) {
-          this.video.srcObject = stream;
-          this.video.play();
-        }
-      })
-      .catch((err) => {
-        console.error("Error accessing webcam: ", err);
-      });
-  }
-
-  private initCamera() {
+  private initCamera = () => {
     this.camera.setTarget(Vector3.Zero());
-  }
+  };
 
-  private initLighting() {
+  private initLighting = () => {
     // Create a light
     this.light = new HemisphericLight(
       "light",
       new Vector3(1, 1, 0),
       this.scene
     );
-  }
+  };
 
   private updateVideoPlaneSize = () => {
     if (!this.videoPlane) {
@@ -149,7 +96,7 @@ class BabylonScene {
     this.videoPlane.position = new Vector3(0, 0, backgroundDistance);
   };
 
-  private initVideoPlane() {
+  private initVideoPlane = () => {
     const videoTexture = new VideoTexture(
       "videoTexture",
       this.video,
@@ -167,7 +114,46 @@ class BabylonScene {
     this.videoPlane.material = this.videoMaterial;
 
     this.updateVideoPlaneSize();
-  }
+  };
+
+  createMesh = (
+    type: MeshTypes,
+    meshLabel: string,
+    meshName: string,
+    meshPath: string,
+    meshFile: string,
+    position?: [number, number, number],
+    scale?: [number, number, number],
+    rotation?: [number, number, number]
+  ) => {
+    this.babylonMeshes.loader(
+      type,
+      meshLabel,
+      meshName,
+      meshPath,
+      meshFile,
+      position,
+      scale,
+      rotation
+    );
+  };
+
+  deleteMesh = (type: MeshTypes, meshLabel: string) => {
+    const meshes =
+      this.babylonMeshes.meshes[type === "2D" ? "2D" : "3D"][meshLabel];
+
+    if (!meshes) {
+      return;
+    }
+
+    if (meshes instanceof Array) {
+      for (const mesh of meshes) {
+        this.babylonMeshes.deleteMesh(mesh);
+      }
+    } else {
+      this.babylonMeshes.deleteMesh(meshes);
+    }
+  };
 }
 
 export default BabylonScene;

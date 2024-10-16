@@ -585,8 +585,21 @@ export const assetSizePositionMap: {
 };
 
 export interface CameraEffectStylesType {
+  pause: {
+    style: "";
+    threeDim: false;
+  };
+  blur: {
+    style: "";
+    threeDim: false;
+  };
+  tint: {
+    style: "";
+    threeDim: false;
+  };
   hideBackground: {
     style: HideBackgroundEffectTypes;
+    threeDim: false;
     color: string;
   };
   glasses: {
@@ -797,8 +810,21 @@ export interface EffectStylesType {
 }
 
 export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
+  pause: {
+    style: "",
+    threeDim: false,
+  },
+  blur: {
+    style: "",
+    threeDim: false,
+  },
+  tint: {
+    style: "",
+    threeDim: false,
+  },
   hideBackground: {
     style: defaultHideBackground,
+    threeDim: false,
     color: defaultHideBackgroundColor,
   },
   glasses: {

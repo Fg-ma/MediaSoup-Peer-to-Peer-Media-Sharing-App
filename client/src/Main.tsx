@@ -28,7 +28,6 @@ import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
-import BabylonCanvas from "./babylon/BabylonCanvas";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")
@@ -664,7 +663,7 @@ export default function Main() {
             {isInTable ? "Join New Room" : "Join Room"}
           </button>
         </div>
-        <div ref={remoteVideosContainerRef} className='w-full grid grid-cols-3'>
+        <div ref={remoteVideosContainerRef} className='w-full grid grid-cols-1'>
           {bundles &&
             Object.keys(bundles).length !== 0 &&
             Object.keys(bundles).map(
@@ -678,7 +677,6 @@ export default function Main() {
             )}
         </div>
       </div>
-      <BabylonCanvas />
     </div>
   );
 }

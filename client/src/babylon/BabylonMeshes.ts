@@ -11,12 +11,12 @@ import {
 } from "@babylonjs/core";
 import MeshLoaders from "./MeshLoaders";
 
-type MeshTypes = "2D" | "gltf";
+export type MeshTypes = "2D" | "gltf";
 
 type GizmoStateTypes = "position" | "scale" | "rotation" | "none";
 
 class BabylonMeshes {
-  private meshes: {
+  meshes: {
     "2D": { [mesh: string]: AbstractMesh };
     "3D": { [mesh: string]: AbstractMesh | AbstractMesh[] };
   } = { "2D": {}, "3D": {} };
@@ -209,59 +209,6 @@ class BabylonMeshes {
     });
   }
 
-  loader = async (
-    type: MeshTypes,
-    meshLabel: string,
-    meshName: string,
-    meshPath: string,
-    meshFile: string,
-    position?: [number, number, number],
-    scale?: [number, number, number],
-    rotation?: [number, number, number]
-  ) => {
-    if (type === "gltf") {
-      const newMesh = await this.meshLoaders.loadGLTF(
-        meshLabel,
-        meshName,
-        meshPath,
-        meshFile
-      );
-      this.meshes["3D"][meshLabel] = newMesh;
-
-      // Check if the mesh is loaded
-      if (newMesh) {
-        if (newMesh instanceof Array) {
-          this.applyMeshAttributes(newMesh[0], position, scale, rotation);
-          for (const mesh of newMesh) {
-            this.applyMeshActions(type, mesh, newMesh[0]);
-          }
-        } else {
-          this.applyMeshAttributes(newMesh, position, scale, rotation);
-          this.applyMeshActions(type, newMesh);
-        }
-      } else {
-        console.error(`Mesh ${meshName} not found after loading.`);
-      }
-    }
-    if (type === "2D") {
-      const newMesh = await this.meshLoaders.load2D(
-        meshLabel,
-        meshName,
-        meshPath,
-        meshFile
-      );
-      this.meshes["2D"][meshLabel] = newMesh;
-
-      // Check if the mesh is loaded
-      if (newMesh) {
-        this.applyMeshAttributes(newMesh, position, scale, rotation);
-        this.applyMeshActions(type, newMesh);
-      } else {
-        console.error(`Mesh ${meshName} not found after loading.`);
-      }
-    }
-  };
-
   private applyMeshAttributes = (
     mesh: AbstractMesh,
     position?: [number, number, number],
@@ -385,55 +332,6 @@ class BabylonMeshes {
         }
       }
     });
-  };
-
-  private deleteMesh = (mesh: AbstractMesh) => {
-    // Remove the mesh from the collection
-    if (mesh.metadata) {
-      const meshLabel = mesh.metadata.meshLabel;
-      if (meshLabel in this.meshes["3D"]) {
-        delete this.meshes["3D"][meshLabel];
-      } else if (meshLabel in this.meshes["2D"]) {
-        delete this.meshes["2D"][meshLabel];
-      }
-    }
-
-    this.disableGizmo(mesh);
-
-    // Stop animations associated with the mesh
-    const animationGroups = this.scene.animationGroups;
-    animationGroups.forEach((animGroup) => {
-      animGroup.targetedAnimations.forEach((targetedAnim) => {
-        if (mesh) {
-          // Compare the final node with the targeted animation's target
-          if (
-            mesh.metadata.meshLabel !== undefined &&
-            mesh.metadata.meshLabel === targetedAnim.target.metadata.meshLabel
-          ) {
-            animGroup.stop(); // Stop the animation before removing the mesh
-          }
-        }
-      });
-    });
-
-    // Check if the selected mesh has a parent
-    const parentMesh = mesh.parent;
-
-    if (parentMesh) {
-      // Remove all child meshes of the parent
-      parentMesh.getChildMeshes().forEach((childMesh) => {
-        childMesh.dispose(); // Dispose the child mesh
-      });
-
-      // Remove the parent mesh itself
-      parentMesh.dispose(); // Dispose the parent mesh
-    }
-
-    // Remove the selected mesh if it has no parent
-    mesh.dispose(); // Dispose the selected mesh
-
-    // Clear the selected mesh reference
-    this.selectedMesh = null;
   };
 
   private escapeMesh = (mesh: AbstractMesh) => {
@@ -620,7 +518,13 @@ class BabylonMeshes {
 
   // Function to disable the position gizmo for a mesh
   private disableGizmo = (mesh: AbstractMesh) => {
-    const gizmoManager = mesh.metadata.gizmoManager;
+    const meshMetaData = mesh.metadata;
+
+    if (!meshMetaData) {
+      return;
+    }
+
+    const gizmoManager = meshMetaData.gizmoManager;
     if (gizmoManager) {
       // Detach the gizmo from the mesh and disable it
       gizmoManager.attachToMesh(null);
@@ -628,10 +532,133 @@ class BabylonMeshes {
     }
 
     // Remove the drag behavior
-    const dragBehavior = mesh.metadata.dragBehavior;
+    const dragBehavior = meshMetaData.dragBehavior;
     if (dragBehavior) {
       mesh.removeBehavior(dragBehavior);
     }
+  };
+
+  loader = async (
+    type: MeshTypes,
+    meshLabel: string,
+    meshName: string,
+    meshPath: string,
+    meshFile: string,
+    position?: [number, number, number],
+    scale?: [number, number, number],
+    rotation?: [number, number, number]
+  ) => {
+    if (type === "2D") {
+      if (this.meshes["2D"][meshLabel]) {
+        this.deleteMesh(this.meshes["2D"][meshLabel]);
+      }
+    } else {
+      if (this.meshes["3D"][meshLabel]) {
+        const meshes = this.meshes["3D"][meshLabel];
+        if (meshes instanceof Array) {
+          for (const mesh of meshes) {
+            this.deleteMesh(mesh);
+          }
+        } else {
+          this.deleteMesh(meshes);
+        }
+      }
+    }
+
+    if (type === "gltf") {
+      const newMesh = await this.meshLoaders.loadGLTF(
+        meshLabel,
+        meshName,
+        meshPath,
+        meshFile
+      );
+      this.meshes["3D"][meshLabel] = newMesh;
+
+      // Check if the mesh is loaded
+      if (newMesh) {
+        if (newMesh instanceof Array) {
+          this.applyMeshAttributes(newMesh[0], position, scale, rotation);
+          for (const mesh of newMesh) {
+            this.applyMeshActions(type, mesh, newMesh[0]);
+          }
+        } else {
+          this.applyMeshAttributes(newMesh, position, scale, rotation);
+          this.applyMeshActions(type, newMesh);
+        }
+      } else {
+        console.error(`Mesh ${meshName} not found after loading.`);
+      }
+    }
+    if (type === "2D") {
+      const newMesh = await this.meshLoaders.load2D(
+        meshLabel,
+        meshName,
+        meshPath,
+        meshFile
+      );
+      this.meshes["2D"][meshLabel] = newMesh;
+
+      // Check if the mesh is loaded
+      if (newMesh) {
+        this.applyMeshAttributes(newMesh, position, scale, rotation);
+        this.applyMeshActions(type, newMesh);
+      } else {
+        console.error(`Mesh ${meshName} not found after loading.`);
+      }
+    }
+  };
+
+  deleteMesh = (mesh: AbstractMesh) => {
+    const meshMetaData = mesh.metadata;
+
+    if (!meshMetaData || !mesh) {
+      return;
+    }
+
+    this.disableGizmo(mesh);
+
+    // Remove the mesh from the collection
+    if (meshMetaData) {
+      const meshLabel = meshMetaData.meshLabel;
+      if (meshLabel in this.meshes["3D"]) {
+        delete this.meshes["3D"][meshLabel];
+      } else if (meshLabel in this.meshes["2D"]) {
+        delete this.meshes["2D"][meshLabel];
+      }
+    }
+
+    // Stop animations associated with the mesh
+    const animationGroups = this.scene.animationGroups;
+    animationGroups.forEach((animGroup) => {
+      animGroup.targetedAnimations.forEach((targetedAnim) => {
+        if (
+          targetedAnim.target.metadata &&
+          meshMetaData.meshLabel !== undefined &&
+          meshMetaData.meshLabel === targetedAnim.target.metadata.meshLabel
+        ) {
+          animGroup.stop(); // Stop the animation before removing the mesh
+        }
+      });
+    });
+
+    // Check if the selected mesh has a parent
+    const parentMesh = mesh.parent;
+
+    if (parentMesh) {
+      // Remove all child meshes of the parent
+      parentMesh.getChildMeshes().forEach((childMesh) => {
+        childMesh.dispose(); // Dispose the child mesh
+      });
+
+      // Remove the parent mesh itself
+      parentMesh.dispose(); // Dispose the parent mesh
+    }
+
+    // Remove the selected mesh if it has no parent
+    mesh.dispose(); // Dispose the selected mesh
+
+    // Clear the selected mesh reference
+    this.selectedMesh = null;
   };
 }
 

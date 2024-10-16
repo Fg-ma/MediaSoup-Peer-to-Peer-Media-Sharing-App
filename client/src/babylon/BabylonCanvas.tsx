@@ -5,7 +5,7 @@ export default function BabylonCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    new BabylonScene(canvasRef.current);
+    // new BabylonScene(canvasRef.current);
   }, []);
 
   return <canvas ref={canvasRef} style={{ width: "640px", height: "480px" }} />;
