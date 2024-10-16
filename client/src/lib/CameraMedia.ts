@@ -1647,6 +1647,1071 @@ export type MeshesData = {
   };
 };
 
+export const mustachesMeshes: MeshesData = {
+  disguiseMustache: {
+    planeMesh: {
+      meshLabel: "disguiseMustache_2D",
+      meshPath: "/2DAssets/hats/disguiseMustache/",
+      meshFile: "disguiseMustache_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "disguiseMustache_gltf",
+      meshPath: "/3DAssets/hats/disguiseMustache/",
+      meshFile: "disguiseMustache.gltf",
+    },
+  },
+  fullMustache: {
+    planeMesh: {
+      meshLabel: "fullMustache_2D",
+      meshPath: "/2DAssets/hats/fullMustache/",
+      meshFile: "fullMustache_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "fullMustache_gltf",
+      meshPath: "/3DAssets/hats/fullMustache/",
+      meshFile: "fullMustache.gltf",
+    },
+  },
+  mustache1: {
+    planeMesh: {
+      meshLabel: "mustache1_2D",
+      meshPath: "/2DAssets/hats/mustache1/",
+      meshFile: "mustache1_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "mustache1_gltf",
+      meshPath: "/3DAssets/hats/mustache1/",
+      meshFile: "mustache1.gltf",
+    },
+  },
+  mustache2: {
+    planeMesh: {
+      meshLabel: "mustache2_2D",
+      meshPath: "/2DAssets/hats/mustache2/",
+      meshFile: "mustache2_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "mustache2_gltf",
+      meshPath: "/3DAssets/hats/mustache2/",
+      meshFile: "mustache2.gltf",
+    },
+  },
+  mustache3: {
+    planeMesh: {
+      meshLabel: "mustache3_2D",
+      meshPath: "/2DAssets/hats/mustache3/",
+      meshFile: "mustache3_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "mustache3_gltf",
+      meshPath: "/3DAssets/hats/mustache3/",
+      meshFile: "mustache3.gltf",
+    },
+  },
+  mustache4: {
+    planeMesh: {
+      meshLabel: "mustache4_2D",
+      meshPath: "/2DAssets/hats/mustache4/",
+      meshFile: "mustache4_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "mustache4_gltf",
+      meshPath: "/3DAssets/hats/mustache4/",
+      meshFile: "mustache4.gltf",
+    },
+  },
+  nicodemusMustache: {
+    planeMesh: {
+      meshLabel: "nicodemusMustache_2D",
+      meshPath: "/2DAssets/hats/nicodemusMustache/",
+      meshFile: "nicodemusMustache_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "nicodemusMustache_gltf",
+      meshPath: "/3DAssets/hats/nicodemusMustache/",
+      meshFile: "nicodemusMustache.gltf",
+    },
+  },
+  pencilMustache: {
+    planeMesh: {
+      meshLabel: "pencilMustache_2D",
+      meshPath: "/2DAssets/hats/pencilMustache/",
+      meshFile: "pencilMustache_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "pencilMustache_gltf",
+      meshPath: "/3DAssets/hats/pencilMustache/",
+      meshFile: "pencilMustache.gltf",
+    },
+  },
+  spongebobMustache: {
+    planeMesh: {
+      meshLabel: "spongebobMustache_2D",
+      meshPath: "/2DAssets/hats/spongebobMustache/",
+      meshFile: "spongebobMustache_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "spongebobMustache_gltf",
+      meshPath: "/3DAssets/hats/spongebobMustache/",
+      meshFile: "spongebobMustache.gltf",
+    },
+  },
+  tinyMustache: {
+    planeMesh: {
+      meshLabel: "tinyMustache_2D",
+      meshPath: "/2DAssets/hats/tinyMustache/",
+      meshFile: "tinyMustache_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "tinyMustache_gltf",
+      meshPath: "/3DAssets/hats/tinyMustache/",
+      meshFile: "tinyMustache.gltf",
+    },
+  },
+  wingedMustache: {
+    planeMesh: {
+      meshLabel: "wingedMustache_2D",
+      meshPath: "/2DAssets/hats/wingedMustache/",
+      meshFile: "wingedMustache_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "wingedMustache_gltf",
+      meshPath: "/3DAssets/hats/wingedMustache/",
+      meshFile: "wingedMustache.gltf",
+    },
+  },
+};
+
+export const beardsMeshes: MeshesData = {
+  chinBeard: {
+    planeMesh: {
+      meshLabel: "chinBeard_2D",
+      meshPath: "/2DAssets/hats/chinBeard/",
+      meshFile: "chinBeard_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "chinBeard_gltf",
+      meshPath: "/3DAssets/hats/chinBeard/",
+      meshFile: "chinBeard.gltf",
+    },
+  },
+  classicalCurlyBeard: {
+    planeMesh: {
+      meshLabel: "classicalCurlyBeard_2D",
+      meshPath: "/2DAssets/hats/classicalCurlyBeard/",
+      meshFile: "classicalCurlyBeard_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "classicalCurlyBeard_gltf",
+      meshPath: "/3DAssets/hats/classicalCurlyBeard/",
+      meshFile: "classicalCurlyBeard.gltf",
+    },
+  },
+  fullBeard: {
+    planeMesh: {
+      meshLabel: "fullBeard_2D",
+      meshPath: "/2DAssets/hats/fullBeard/",
+      meshFile: "fullBeard_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "fullBeard_gltf",
+      meshPath: "/3DAssets/hats/fullBeard/",
+      meshFile: "fullBeard.gltf",
+    },
+  },
+};
+
+export const masksMeshes: MeshesData = {
+  alienMask: {
+    planeMesh: {
+      meshLabel: "alienMask_2D",
+      meshPath: "/2DAssets/hats/alienMask/",
+      meshFile: "alienMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "alienMask_gltf",
+      meshPath: "/3DAssets/hats/alienMask/",
+      meshFile: "alienMask.gltf",
+    },
+  },
+  baseMask: {
+    planeMesh: {
+      meshLabel: "baseMask_2D",
+      meshPath: "/2DAssets/hats/baseMask/",
+      meshFile: "baseMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "baseMask_gltf",
+      meshPath: "/3DAssets/hats/baseMask/",
+      meshFile: "baseMask.gltf",
+    },
+  },
+  clownMask: {
+    planeMesh: {
+      meshLabel: "clownMask_2D",
+      meshPath: "/2DAssets/hats/clownMask/",
+      meshFile: "clownMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "clownMask_gltf",
+      meshPath: "/3DAssets/hats/clownMask/",
+      meshFile: "clownMask.gltf",
+    },
+  },
+  creatureMask: {
+    planeMesh: {
+      meshLabel: "creatureMask_2D",
+      meshPath: "/2DAssets/hats/creatureMask/",
+      meshFile: "creatureMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "creatureMask_gltf",
+      meshPath: "/3DAssets/hats/creatureMask/",
+      meshFile: "creatureMask.gltf",
+    },
+  },
+  cyberMask: {
+    planeMesh: {
+      meshLabel: "cyberMask_2D",
+      meshPath: "/2DAssets/hats/cyberMask/",
+      meshFile: "cyberMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "cyberMask_gltf",
+      meshPath: "/3DAssets/hats/cyberMask/",
+      meshFile: "cyberMask.gltf",
+    },
+  },
+  darkKnightMask: {
+    planeMesh: {
+      meshLabel: "darkKnightMask_2D",
+      meshPath: "/2DAssets/hats/darkKnightMask/",
+      meshFile: "darkKnightMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "darkKnightMask_gltf",
+      meshPath: "/3DAssets/hats/darkKnightMask/",
+      meshFile: "darkKnightMask.gltf",
+    },
+  },
+  demonMask: {
+    planeMesh: {
+      meshLabel: "demonMask_2D",
+      meshPath: "/2DAssets/hats/demonMask/",
+      meshFile: "demonMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "demonMask_gltf",
+      meshPath: "/3DAssets/hats/demonMask/",
+      meshFile: "demonMask.gltf",
+    },
+  },
+  gasMask1: {
+    planeMesh: {
+      meshLabel: "gasMask1_2D",
+      meshPath: "/2DAssets/hats/gasMask1/",
+      meshFile: "gasMask1_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "gasMask1_gltf",
+      meshPath: "/3DAssets/hats/gasMask1/",
+      meshFile: "gasMask1.gltf",
+    },
+  },
+  gasMask2: {
+    planeMesh: {
+      meshLabel: "gasMask2_2D",
+      meshPath: "/2DAssets/hats/gasMask2/",
+      meshFile: "gasMask2_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "gasMask2_gltf",
+      meshPath: "/3DAssets/hats/gasMask2/",
+      meshFile: "gasMask2.gltf",
+    },
+  },
+  gasMask3: {
+    planeMesh: {
+      meshLabel: "gasMask3_2D",
+      meshPath: "/2DAssets/hats/gasMask3/",
+      meshFile: "gasMask3_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "gasMask3_gltf",
+      meshPath: "/3DAssets/hats/gasMask3/",
+      meshFile: "gasMask3.gltf",
+    },
+  },
+  gasMask4: {
+    planeMesh: {
+      meshLabel: "gasMask4_2D",
+      meshPath: "/2DAssets/hats/gasMask4/",
+      meshFile: "gasMask4_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "gasMask4_gltf",
+      meshPath: "/3DAssets/hats/gasMask4/",
+      meshFile: "gasMask4.gltf",
+    },
+  },
+  masqueradeMask: {
+    planeMesh: {
+      meshLabel: "masqueradeMask_2D",
+      meshPath: "/2DAssets/hats/masqueradeMask/",
+      meshFile: "masqueradeMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "masqueradeMask_gltf",
+      meshPath: "/3DAssets/hats/masqueradeMask/",
+      meshFile: "masqueradeMask.gltf",
+    },
+  },
+  metalManMask: {
+    planeMesh: {
+      meshLabel: "metalManMask_2D",
+      meshPath: "/2DAssets/hats/metalManMask/",
+      meshFile: "metalManMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "metalManMask_gltf",
+      meshPath: "/3DAssets/hats/metalManMask/",
+      meshFile: "metalManMask.gltf",
+    },
+  },
+  oniMask: {
+    planeMesh: {
+      meshLabel: "oniMask_2D",
+      meshPath: "/2DAssets/hats/oniMask/",
+      meshFile: "oniMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "oniMask_gltf",
+      meshPath: "/3DAssets/hats/oniMask/",
+      meshFile: "oniMask.gltf",
+    },
+  },
+  plagueDoctorMask: {
+    planeMesh: {
+      meshLabel: "plagueDoctorMask_2D",
+      meshPath: "/2DAssets/hats/plagueDoctorMask/",
+      meshFile: "plagueDoctorMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "plagueDoctorMask_gltf",
+      meshPath: "/3DAssets/hats/plagueDoctorMask/",
+      meshFile: "plagueDoctorMask.gltf",
+    },
+  },
+  sixEyesMask: {
+    planeMesh: {
+      meshLabel: "sixEyesMask_2D",
+      meshPath: "/2DAssets/hats/sixEyesMask/",
+      meshFile: "sixEyesMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "sixEyesMask_gltf",
+      meshPath: "/3DAssets/hats/sixEyesMask/",
+      meshFile: "sixEyesMask.gltf",
+    },
+  },
+  tenguMask: {
+    planeMesh: {
+      meshLabel: "tenguMask_2D",
+      meshPath: "/2DAssets/hats/tenguMask/",
+      meshFile: "tenguMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "tenguMask_gltf",
+      meshPath: "/3DAssets/hats/tenguMask/",
+      meshFile: "tenguMask.gltf",
+    },
+  },
+  threeFaceMask: {
+    planeMesh: {
+      meshLabel: "threeFaceMask_2D",
+      meshPath: "/2DAssets/hats/threeFaceMask/",
+      meshFile: "threeFaceMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "threeFaceMask_gltf",
+      meshPath: "/3DAssets/hats/threeFaceMask/",
+      meshFile: "threeFaceMask.gltf",
+    },
+  },
+  weldingMask: {
+    planeMesh: {
+      meshLabel: "weldingMask_2D",
+      meshPath: "/2DAssets/hats/weldingMask/",
+      meshFile: "weldingMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "weldingMask_gltf",
+      meshPath: "/3DAssets/hats/weldingMask/",
+      meshFile: "weldingMask.gltf",
+    },
+  },
+  woodlandMask: {
+    planeMesh: {
+      meshLabel: "woodlandMask_2D",
+      meshPath: "/2DAssets/hats/woodlandMask/",
+      meshFile: "woodlandMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "woodlandMask_gltf",
+      meshPath: "/3DAssets/hats/woodlandMask/",
+      meshFile: "woodlandMask.gltf",
+    },
+  },
+  woodPaintedMask: {
+    planeMesh: {
+      meshLabel: "woodPaintedMask_2D",
+      meshPath: "/2DAssets/hats/woodPaintedMask/",
+      meshFile: "woodPaintedMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "woodPaintedMask_gltf",
+      meshPath: "/3DAssets/hats/woodPaintedMask/",
+      meshFile: "woodPaintedMask.gltf",
+    },
+  },
+  zombieMask: {
+    planeMesh: {
+      meshLabel: "zombieMask_2D",
+      meshPath: "/2DAssets/hats/zombieMask/",
+      meshFile: "zombieMask_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "zombieMask_gltf",
+      meshPath: "/3DAssets/hats/zombieMask/",
+      meshFile: "zombieMask.gltf",
+    },
+  },
+};
+
+export const glassesMeshes: MeshesData = {
+  defaultGlasses: {
+    planeMesh: {
+      meshLabel: "defaultGlasses_2D",
+      meshPath: "/2DAssets/hats/defaultGlasses/",
+      meshFile: "defaultGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "defaultGlasses_gltf",
+      meshPath: "/3DAssets/hats/defaultGlasses/",
+      meshFile: "defaultGlasses.gltf",
+    },
+  },
+  AmericaGlasses: {
+    planeMesh: {
+      meshLabel: "AmericaGlasses_2D",
+      meshPath: "/2DAssets/hats/AmericaGlasses/",
+      meshFile: "AmericaGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "AmericaGlasses_gltf",
+      meshPath: "/3DAssets/hats/AmericaGlasses/",
+      meshFile: "AmericaGlasses.gltf",
+    },
+  },
+  aviatorGoggles: {
+    planeMesh: {
+      meshLabel: "aviatorGoggles_2D",
+      meshPath: "/2DAssets/hats/aviatorGoggles/",
+      meshFile: "aviatorGoggles_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "aviatorGoggles_gltf",
+      meshPath: "/3DAssets/hats/aviatorGoggles/",
+      meshFile: "aviatorGoggles.gltf",
+    },
+  },
+  bloodyGlasses: {
+    planeMesh: {
+      meshLabel: "bloodyGlasses_2D",
+      meshPath: "/2DAssets/hats/bloodyGlasses/",
+      meshFile: "bloodyGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "bloodyGlasses_gltf",
+      meshPath: "/3DAssets/hats/bloodyGlasses/",
+      meshFile: "bloodyGlasses.gltf",
+    },
+  },
+  eyeProtectionGlasses: {
+    planeMesh: {
+      meshLabel: "eyeProtectionGlasses_2D",
+      meshPath: "/2DAssets/hats/eyeProtectionGlasses/",
+      meshFile: "eyeProtectionGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "eyeProtectionGlasses_gltf",
+      meshPath: "/3DAssets/hats/eyeProtectionGlasses/",
+      meshFile: "eyeProtectionGlasses.gltf",
+    },
+  },
+  glasses1: {
+    planeMesh: {
+      meshLabel: "glasses1_2D",
+      meshPath: "/2DAssets/hats/glasses1/",
+      meshFile: "glasses1_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "glasses1_gltf",
+      meshPath: "/3DAssets/hats/glasses1/",
+      meshFile: "glasses1.gltf",
+    },
+  },
+  glasses2: {
+    planeMesh: {
+      meshLabel: "glasses2_2D",
+      meshPath: "/2DAssets/hats/glasses2/",
+      meshFile: "glasses2_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "glasses2_gltf",
+      meshPath: "/3DAssets/hats/glasses2/",
+      meshFile: "glasses2.gltf",
+    },
+  },
+  glasses3: {
+    planeMesh: {
+      meshLabel: "glasses3_2D",
+      meshPath: "/2DAssets/hats/glasses3/",
+      meshFile: "glasses3_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "glasses3_gltf",
+      meshPath: "/3DAssets/hats/glasses3/",
+      meshFile: "glasses3.gltf",
+    },
+  },
+  glasses4: {
+    planeMesh: {
+      meshLabel: "glasses4_2D",
+      meshPath: "/2DAssets/hats/glasses4/",
+      meshFile: "glasses4_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "glasses4_gltf",
+      meshPath: "/3DAssets/hats/glasses4/",
+      meshFile: "glasses4.gltf",
+    },
+  },
+  glasses5: {
+    planeMesh: {
+      meshLabel: "glasses5_2D",
+      meshPath: "/2DAssets/hats/glasses5/",
+      meshFile: "glasses5_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "glasses5_gltf",
+      meshPath: "/3DAssets/hats/glasses5/",
+      meshFile: "glasses5.gltf",
+    },
+  },
+  glasses6: {
+    planeMesh: {
+      meshLabel: "glasses6_2D",
+      meshPath: "/2DAssets/hats/glasses6/",
+      meshFile: "glasses6_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "glasses6_gltf",
+      meshPath: "/3DAssets/hats/glasses6/",
+      meshFile: "glasses6.gltf",
+    },
+  },
+  memeGlasses: {
+    planeMesh: {
+      meshLabel: "memeGlasses_2D",
+      meshPath: "/2DAssets/hats/memeGlasses/",
+      meshFile: "memeGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "memeGlasses_gltf",
+      meshPath: "/3DAssets/hats/memeGlasses/",
+      meshFile: "memeGlasses.gltf",
+    },
+  },
+  militaryTacticalGlasses: {
+    planeMesh: {
+      meshLabel: "militaryTacticalGlasses_2D",
+      meshPath: "/2DAssets/hats/militaryTacticalGlasses/",
+      meshFile: "militaryTacticalGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "militaryTacticalGlasses_gltf",
+      meshPath: "/3DAssets/hats/militaryTacticalGlasses/",
+      meshFile: "militaryTacticalGlasses.gltf",
+    },
+  },
+  steampunkGlasses: {
+    planeMesh: {
+      meshLabel: "steampunkGlasses_2D",
+      meshPath: "/2DAssets/hats/steampunkGlasses/",
+      meshFile: "steampunkGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "steampunkGlasses_gltf",
+      meshPath: "/3DAssets/hats/steampunkGlasses/",
+      meshFile: "steampunkGlasses.gltf",
+    },
+  },
+  threeDGlasses: {
+    planeMesh: {
+      meshLabel: "threeDGlasses_2D",
+      meshPath: "/2DAssets/hats/threeDGlasses/",
+      meshFile: "threeDGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "threeDGlasses_gltf",
+      meshPath: "/3DAssets/hats/threeDGlasses/",
+      meshFile: "threeDGlasses.gltf",
+    },
+  },
+  toyGlasses: {
+    planeMesh: {
+      meshLabel: "toyGlasses_2D",
+      meshPath: "/2DAssets/hats/toyGlasses/",
+      meshFile: "toyGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "toyGlasses_gltf",
+      meshPath: "/3DAssets/hats/toyGlasses/",
+      meshFile: "toyGlasses.gltf",
+    },
+  },
+  shades: {
+    planeMesh: {
+      meshLabel: "shades_2D",
+      meshPath: "/2DAssets/hats/shades/",
+      meshFile: "shades_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "shades_gltf",
+      meshPath: "/3DAssets/hats/shades/",
+      meshFile: "shades.gltf",
+    },
+  },
+  VRGlasses: {
+    planeMesh: {
+      meshLabel: "VRGlasses_2D",
+      meshPath: "/2DAssets/hats/VRGlasses/",
+      meshFile: "VRGlasses_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "VRGlasses_gltf",
+      meshPath: "/3DAssets/hats/VRGlasses/",
+      meshFile: "VRGlasses.gltf",
+    },
+  },
+};
+
+export const hatMeshes: MeshesData = {
+  AsianConicalHat: {
+    planeMesh: {
+      meshLabel: "AsianConicalHat_2D",
+      meshPath: "/2DAssets/hats/AsianConicalHat/",
+      meshFile: "AsianConicalHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "AsianConicalHat_gltf",
+      meshPath: "/3DAssets/hats/AsianConicalHat/",
+      meshFile: "AsianConicalHat.gltf",
+    },
+  },
+  aviatorHelmet: {
+    planeMesh: {
+      meshLabel: "aviatorHelmet_2D",
+      meshPath: "/2DAssets/hats/aviatorHelmet/",
+      meshFile: "aviatorHelmet_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "aviatorHelmet_gltf",
+      meshPath: "/3DAssets/hats/aviatorHelmet/",
+      meshFile: "aviatorHelmet.gltf",
+    },
+  },
+  bicornHat: {
+    planeMesh: {
+      meshLabel: "bicornHat_2D",
+      meshPath: "/2DAssets/hats/bicornHat/",
+      meshFile: "bicornHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "bicornHat_gltf",
+      meshPath: "/3DAssets/hats/bicornHat/",
+      meshFile: "bicornHat.gltf",
+    },
+  },
+  bicycleHelmet: {
+    planeMesh: {
+      meshLabel: "bicycleHelmet_2D",
+      meshPath: "/2DAssets/hats/bicycleHelmet/",
+      meshFile: "bicycleHelmet_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "bicycleHelmet_gltf",
+      meshPath: "/3DAssets/hats/bicycleHelmet/",
+      meshFile: "bicycleHelmet.gltf",
+    },
+  },
+  captainsHat: {
+    planeMesh: {
+      meshLabel: "captainsHat_2D",
+      meshPath: "/2DAssets/hats/captainsHat/",
+      meshFile: "captainsHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "captainsHat_gltf",
+      meshPath: "/3DAssets/hats/captainsHat/",
+      meshFile: "captainsHat.gltf",
+    },
+  },
+  chefHat: {
+    planeMesh: {
+      meshLabel: "chefHat_2D",
+      meshPath: "/2DAssets/hats/chefHat/",
+      meshFile: "chefHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "chefHat_gltf",
+      meshPath: "/3DAssets/hats/chefHat/",
+      meshFile: "chefHat.gltf",
+    },
+  },
+  chickenHat: {
+    planeMesh: {
+      meshLabel: "chickenHat_2D",
+      meshPath: "/2DAssets/hats/chickenHat/",
+      meshFile: "chickenHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "chickenHat_gltf",
+      meshPath: "/3DAssets/hats/chickenHat/",
+      meshFile: "chickenHat.gltf",
+    },
+  },
+  deadManHat: {
+    planeMesh: {
+      meshLabel: "deadManHat_2D",
+      meshPath: "/2DAssets/hats/deadManHat/",
+      meshFile: "deadManHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "deadManHat_gltf",
+      meshPath: "/3DAssets/hats/deadManHat/",
+      meshFile: "deadManHat.gltf",
+    },
+  },
+  dogEars: {
+    planeMesh: {
+      meshLabel: "dogEars_2D",
+      meshPath: "/2DAssets/hats/dogEars/",
+      meshFile: "dogEars_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "dogEars_gltf",
+      meshPath: "/3DAssets/hats/dogEars/",
+      meshFile: "dogEars.gltf",
+    },
+  },
+  flatCap: {
+    planeMesh: {
+      meshLabel: "flatCap_2D",
+      meshPath: "/2DAssets/hats/flatCap/",
+      meshFile: "flatCap_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "flatCap_gltf",
+      meshPath: "/3DAssets/hats/flatCap/",
+      meshFile: "flatCap.gltf",
+    },
+  },
+  hardHat: {
+    planeMesh: {
+      meshLabel: "hardHat_2D",
+      meshPath: "/2DAssets/hats/hardHat/",
+      meshFile: "hardHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "hardHat_gltf",
+      meshPath: "/3DAssets/hats/hardHat/",
+      meshFile: "hardHat.gltf",
+    },
+  },
+  hopliteHelmet: {
+    planeMesh: {
+      meshLabel: "hopliteHelmet_2D",
+      meshPath: "/2DAssets/hats/hopliteHelmet/",
+      meshFile: "hopliteHelmet_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "hopliteHelmet_gltf",
+      meshPath: "/3DAssets/hats/hopliteHelmet/",
+      meshFile: "hopliteHelmet.gltf",
+    },
+  },
+  militaryHat: {
+    planeMesh: {
+      meshLabel: "militaryHat_2D",
+      meshPath: "/2DAssets/hats/militaryHat/",
+      meshFile: "militaryHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "militaryHat_gltf",
+      meshPath: "/3DAssets/hats/militaryHat/",
+      meshFile: "militaryHat.gltf",
+    },
+  },
+  rabbitEars: {
+    planeMesh: {
+      meshLabel: "rabbitEars_2D",
+      meshPath: "/2DAssets/hats/rabbitEars/",
+      meshFile: "rabbitEars_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "rabbitEars_gltf",
+      meshPath: "/3DAssets/hats/rabbitEars/",
+      meshFile: "rabbitEars.gltf",
+    },
+  },
+  roundEarsHat: {
+    planeMesh: {
+      meshLabel: "roundEarsHat_2D",
+      meshPath: "/2DAssets/hats/roundEarsHat/",
+      meshFile: "roundEarsHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "roundEarsHat_gltf",
+      meshPath: "/3DAssets/hats/roundEarsHat/",
+      meshFile: "roundEarsHat.gltf",
+    },
+  },
+  santaHat: {
+    planeMesh: {
+      meshLabel: "santaHat_2D",
+      meshPath: "/2DAssets/hats/santaHat/",
+      meshFile: "santaHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "santaHat_gltf",
+      meshPath: "/3DAssets/hats/santaHat/",
+      meshFile: "santaHat.gltf",
+    },
+  },
+  seamanHat: {
+    planeMesh: {
+      meshLabel: "seamanHat_2D",
+      meshPath: "/2DAssets/hats/seamanHat/",
+      meshFile: "seamanHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "seamanHat_gltf",
+      meshPath: "/3DAssets/hats/seamanHat/",
+      meshFile: "seamanHat.gltf",
+    },
+  },
+  stylishHat: {
+    planeMesh: {
+      meshLabel: "stylishHat_2D",
+      meshPath: "/2DAssets/hats/stylishHat/",
+      meshFile: "stylishHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "stylishHat_gltf",
+      meshPath: "/3DAssets/hats/stylishHat/",
+      meshFile: "stylishHat.gltf",
+    },
+  },
+  superMarioOdysseyHat: {
+    planeMesh: {
+      meshLabel: "superMarioOdysseyHat_2D",
+      meshPath: "/2DAssets/hats/superMarioOdysseyHat/",
+      meshFile: "superMarioOdysseyHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "superMarioOdysseyHat_gltf",
+      meshPath: "/3DAssets/hats/superMarioOdysseyHat/",
+      meshFile: "superMarioOdysseyHat.gltf",
+    },
+  },
+  ushankaHat: {
+    planeMesh: {
+      meshLabel: "ushankaHat_2D",
+      meshPath: "/2DAssets/hats/ushankaHat/",
+      meshFile: "ushankaHat_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "ushankaHat_gltf",
+      meshPath: "/3DAssets/hats/ushankaHat/",
+      meshFile: "ushankaHat.gltf",
+    },
+  },
+  vikingHelmet: {
+    planeMesh: {
+      meshLabel: "vikingHelmet_2D",
+      meshPath: "/2DAssets/hats/vikingHelmet/",
+      meshFile: "vikingHelmet_512x512.png",
+      size: 512,
+    },
+    mesh: {
+      meshType: "gltf",
+      meshLabel: "vikingHelmet_gltf",
+      meshPath: "/3DAssets/hats/vikingHelmet/",
+      meshFile: "vikingHelmet.gltf",
+    },
+  },
+};
+
 export const petMeshes: MeshesData = {
   angryHamster: {
     planeMesh: {
