@@ -8,6 +8,8 @@ import {
   Color3,
   PointerDragBehavior,
   KeyboardEventTypes,
+  PointerEventTypes,
+  UniversalCamera,
 } from "@babylonjs/core";
 import MeshLoaders from "./MeshLoaders";
 
@@ -240,6 +242,9 @@ class BabylonMeshes {
     let clickTimeout: NodeJS.Timeout; // To hold the timeout for single click
     let doubleClickRegistered = false; // To check if double click was triggered
 
+    mesh.isPickable = true;
+    mesh.getBoundingInfo().boundingBox.extendSizeWorld.scaleInPlace(1.1);
+
     this.scene.onBeforeRenderObservable.add(() => {
       mesh.refreshBoundingInfo({ applySkeleton: true }); // Update the bounding box of the mesh each frame
     });
@@ -276,9 +281,9 @@ class BabylonMeshes {
     // Handle double-clicks to toggle gizmo
     mesh.actionManager.registerAction(
       new ExecuteCodeAction(ActionManager.OnDoublePickTrigger, () => {
+        console.log("wokr");
         // Mark double click as registered
         doubleClickRegistered = true;
-
         // Clear the single click timeout to prevent single-click action
         clearTimeout(clickTimeout);
 
@@ -387,7 +392,7 @@ class BabylonMeshes {
 
   // Helper function to determine the next gizmo state
   private getNextGizmoState = (
-    currentState: GizmoStateTypes
+    currentState?: GizmoStateTypes
   ): GizmoStateTypes => {
     switch (currentState) {
       case "none":
@@ -398,6 +403,8 @@ class BabylonMeshes {
         return "scale";
       case "scale":
         return "none";
+      case undefined:
+        return "position";
       default:
         return "none";
     }

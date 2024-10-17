@@ -147,7 +147,7 @@ class BabylonScene {
       { width: 1, height: 1 },
       this.scene
     );
-
+    this.tintPlane.isPickable = false;
     this.tintMaterial = new StandardMaterial("tintMaterial", this.scene);
     this.tintMaterial.diffuseColor = new Color3(0, 0, 0);
     this.tintMaterial.alpha = 0.0;
