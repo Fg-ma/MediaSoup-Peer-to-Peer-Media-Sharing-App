@@ -2948,7 +2948,7 @@ export const petMeshes: MeshesData = {
       meshType: "gltf",
       meshLabel: "petRock_gltf",
       meshPath: "/3DAssets/pets/petRock/",
-      meshFile: "petRock.gltf",
+      meshFile: "petRock2.gltf",
     },
   },
   pig: {
@@ -3347,7 +3347,7 @@ class CameraMedia {
           meshData3D.meshPath,
           meshData3D.meshFile,
           [0, 0, 90],
-          [1, 1, 1],
+          [10, 10, 10],
           [0, 0, 0]
         );
       }
