@@ -278,7 +278,7 @@ export default function Bundle({
     <div
       ref={bundleRef}
       id={`${username}_bundle_container`}
-      className='bundle-container'
+      className='bundle-container w-max h-max'
     >
       {cameraStreams &&
         Object.keys(cameraStreams).length !== 0 &&

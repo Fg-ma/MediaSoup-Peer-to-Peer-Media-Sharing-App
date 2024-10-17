@@ -8,6 +8,12 @@ import {
   VideoTexture,
   UniversalCamera,
   Mesh,
+  Color3,
+  BlurPostProcess,
+  Vector2,
+  ImageProcessingPostProcess,
+  Layer,
+  Texture,
 } from "@babylonjs/core";
 import BabylonMeshes, { MeshTypes } from "./BabylonMeshes";
 
@@ -19,6 +25,15 @@ class BabylonScene {
 
   private videoPlane: Mesh | undefined;
   private videoMaterial: StandardMaterial | undefined;
+
+  private tintPlane: Mesh | undefined;
+  private tintMaterial: StandardMaterial | undefined;
+
+  private pausePostProcess: ImageProcessingPostProcess | undefined;
+  private pauseLayer: Layer | undefined;
+
+  private blurPostProcessX: BlurPostProcess | undefined;
+  private blurPostProcessY: BlurPostProcess | undefined;
 
   private babylonMeshes: BabylonMeshes;
 
@@ -38,6 +53,7 @@ class BabylonScene {
     this.initCamera();
     this.initLighting();
     this.initVideoPlane();
+    this.initTintPlane();
 
     this.babylonMeshes = new BabylonMeshes(this.scene);
 
@@ -116,6 +132,31 @@ class BabylonScene {
     this.updateVideoPlaneSize();
   };
 
+  private updateTintPlaneSize = () => {
+    if (!this.tintPlane) return;
+
+    const foregroundDistance = this.camera.minZ;
+
+    this.tintPlane.scaling = new Vector3(-1000, 1000, 1);
+    this.tintPlane.position = new Vector3(0, 0, foregroundDistance);
+  };
+
+  private initTintPlane = () => {
+    this.tintPlane = MeshBuilder.CreatePlane(
+      "tintPlane",
+      { width: 1, height: 1 },
+      this.scene
+    );
+
+    this.tintMaterial = new StandardMaterial("tintMaterial", this.scene);
+    this.tintMaterial.diffuseColor = new Color3(0, 0, 0);
+    this.tintMaterial.alpha = 0.0;
+
+    this.tintPlane.material = this.tintMaterial;
+
+    this.updateTintPlaneSize();
+  };
+
   createMesh = (
     type: MeshTypes,
     meshLabel: string,
@@ -152,6 +193,95 @@ class BabylonScene {
       }
     } else {
       this.babylonMeshes.deleteMesh(meshes);
+    }
+  };
+
+  toggleTintPlane = (active: boolean, tintColor?: [number, number, number]) => {
+    if (!this.tintMaterial) {
+      return;
+    }
+
+    if (active) {
+      if (tintColor) {
+        this.tintMaterial.diffuseColor = new Color3(...tintColor);
+        this.tintMaterial.alpha = 0.35;
+      }
+    } else {
+      this.tintMaterial.alpha = 0.0;
+    }
+  };
+
+  setTintColor = (tintColor: [number, number, number]) => {
+    if (!this.tintMaterial) {
+      return;
+    }
+
+    this.tintMaterial.diffuseColor = new Color3(...tintColor);
+  };
+
+  toggleBlurEffect = (active: boolean) => {
+    if (active) {
+      if (!this.blurPostProcessX && !this.blurPostProcessX) {
+        this.blurPostProcessX = new BlurPostProcess(
+          "blurEffect", // Name of the effect
+          new Vector2(1.0, 0.0), // Direction of the blur
+          80.0, // Blur kernel size (affects intensity)
+          1.0, // Ratio (resolution scaling factor)
+          this.camera // Apply blur to the camera
+        );
+
+        this.blurPostProcessY = new BlurPostProcess(
+          "blurEffect", // Name of the effect
+          new Vector2(0.0, 1.0), // Direction of the blur
+          80.0, // Blur kernel size (affects intensity)
+          0.5, // Ratio (resolution scaling factor)
+          this.camera // Apply blur to the camera
+        );
+      }
+    } else {
+      // Dispose the blur post-process if the effect is disabled
+      if (this.blurPostProcessX) {
+        this.blurPostProcessX.dispose();
+        this.blurPostProcessX = undefined;
+      }
+      if (this.blurPostProcessY) {
+        this.blurPostProcessY.dispose();
+        this.blurPostProcessY = undefined;
+      }
+    }
+  };
+
+  togglePauseEffect = (active: boolean) => {
+    if (active) {
+      if (!this.pausePostProcess) {
+        // Create the ImageProcessingPostProcess for darkened overlay
+        this.pausePostProcess = new ImageProcessingPostProcess(
+          "pauseEffect",
+          1.0,
+          this.camera
+        );
+      }
+
+      if (!this.pauseLayer) {
+        // Create a full-screen layer for the pause image
+        this.pauseLayer = new Layer(
+          "pauseLayer",
+          "/2DAssets/videoPaused.png",
+          this.scene,
+          false
+        );
+      }
+    } else {
+      // Remove the post-process effect and image overlay
+      if (this.pausePostProcess) {
+        this.pausePostProcess.dispose();
+        this.pausePostProcess = undefined;
+      }
+
+      if (this.pauseLayer) {
+        this.pauseLayer.dispose();
+        this.pauseLayer = undefined;
+      }
     }
   };
 }
