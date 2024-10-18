@@ -19,7 +19,6 @@ import {
 } from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
 import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
-import Render from "../effects/visualEffects/lib/render";
 import BabylonScene from "../babylon/BabylonScene";
 
 export type AssetTexsData = {
@@ -1632,6 +1631,7 @@ export type MeshesData = {
     | MasksEffectTypes
     | HatsEffectTypes
     | PetsEffectTypes]?: {
+    defaultMeshPlacement: "forehead" | "eyesCenter" | "nose" | "chin";
     planeMesh: {
       meshLabel: string;
       meshPath: string;
@@ -1649,6 +1649,7 @@ export type MeshesData = {
 
 export const mustachesMeshes: MeshesData = {
   disguiseMustache: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "disguiseMustache_2D",
       meshPath: "/2DAssets/mustaches/disguiseMustache/",
@@ -1663,6 +1664,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   fullMustache: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "fullMustache_2D",
       meshPath: "/2DAssets/mustaches/fullMustache/",
@@ -1677,6 +1679,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   mustache1: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "mustache1_2D",
       meshPath: "/2DAssets/mustaches/mustache1/",
@@ -1691,6 +1694,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   mustache2: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "mustache2_2D",
       meshPath: "/2DAssets/mustaches/mustache2/",
@@ -1705,6 +1709,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   mustache3: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "mustache3_2D",
       meshPath: "/2DAssets/mustaches/mustache3/",
@@ -1719,6 +1724,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   mustache4: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "mustache4_2D",
       meshPath: "/2DAssets/mustaches/mustache4/",
@@ -1733,6 +1739,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   nicodemusMustache: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "nicodemusMustache_2D",
       meshPath: "/2DAssets/mustaches/nicodemusMustache/",
@@ -1747,6 +1754,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   pencilMustache: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "pencilMustache_2D",
       meshPath: "/2DAssets/mustaches/pencilMustache/",
@@ -1761,6 +1769,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   spongebobMustache: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "spongebobMustache_2D",
       meshPath: "/2DAssets/mustaches/spongebobMustache/",
@@ -1775,6 +1784,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   tinyMustache: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "tinyMustache_2D",
       meshPath: "/2DAssets/mustaches/tinyMustache/",
@@ -1789,6 +1799,7 @@ export const mustachesMeshes: MeshesData = {
     },
   },
   wingedMustache: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "wingedMustache_2D",
       meshPath: "/2DAssets/mustaches/wingedMustache/",
@@ -1806,6 +1817,7 @@ export const mustachesMeshes: MeshesData = {
 
 export const beardsMeshes: MeshesData = {
   chinBeard: {
+    defaultMeshPlacement: "chin",
     planeMesh: {
       meshLabel: "chinBeard_2D",
       meshPath: "/2DAssets/beards/chinBeard/",
@@ -1820,6 +1832,7 @@ export const beardsMeshes: MeshesData = {
     },
   },
   classicalCurlyBeard: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "classicalCurlyBeard_2D",
       meshPath: "/2DAssets/beards/classicalCurlyBeard/",
@@ -1834,6 +1847,7 @@ export const beardsMeshes: MeshesData = {
     },
   },
   fullBeard: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "fullBeard_2D",
       meshPath: "/2DAssets/beards/fullBeard/",
@@ -1851,6 +1865,7 @@ export const beardsMeshes: MeshesData = {
 
 export const masksMeshes: MeshesData = {
   alienMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "alienMask_2D",
       meshPath: "/2DAssets/masks/alienMask/",
@@ -1865,6 +1880,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   baseMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "baseMask_2D",
       meshPath: "/2DAssets/masks/baseMask/",
@@ -1879,6 +1895,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   clownMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "clownMask_2D",
       meshPath: "/2DAssets/masks/clownMask/",
@@ -1893,6 +1910,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   creatureMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "creatureMask_2D",
       meshPath: "/2DAssets/masks/creatureMask/",
@@ -1907,6 +1925,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   cyberMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "cyberMask_2D",
       meshPath: "/2DAssets/masks/cyberMask/",
@@ -1921,6 +1940,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   darkKnightMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "darkKnightMask_2D",
       meshPath: "/2DAssets/masks/darkKnightMask/",
@@ -1935,6 +1955,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   demonMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "demonMask_2D",
       meshPath: "/2DAssets/masks/demonMask/",
@@ -1949,6 +1970,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   gasMask1: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "gasMask1_2D",
       meshPath: "/2DAssets/masks/gasMask1/",
@@ -1963,6 +1985,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   gasMask2: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "gasMask2_2D",
       meshPath: "/2DAssets/masks/gasMask2/",
@@ -1977,6 +2000,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   gasMask3: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "gasMask3_2D",
       meshPath: "/2DAssets/masks/gasMask3/",
@@ -1991,6 +2015,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   gasMask4: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "gasMask4_2D",
       meshPath: "/2DAssets/masks/gasMask4/",
@@ -2005,6 +2030,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   masqueradeMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "masqueradeMask_2D",
       meshPath: "/2DAssets/masks/masqueradeMask/",
@@ -2019,6 +2045,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   metalManMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "metalManMask_2D",
       meshPath: "/2DAssets/masks/metalManMask/",
@@ -2033,6 +2060,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   oniMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "oniMask_2D",
       meshPath: "/2DAssets/masks/oniMask/",
@@ -2047,6 +2075,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   plagueDoctorMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "plagueDoctorMask_2D",
       meshPath: "/2DAssets/masks/plagueDoctorMask/",
@@ -2061,6 +2090,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   sixEyesMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "sixEyesMask_2D",
       meshPath: "/2DAssets/masks/sixEyesMask/",
@@ -2075,6 +2105,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   tenguMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "tenguMask_2D",
       meshPath: "/2DAssets/masks/tenguMask/",
@@ -2089,6 +2120,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   threeFaceMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "threeFaceMask_2D",
       meshPath: "/2DAssets/masks/threeFaceMask/",
@@ -2103,6 +2135,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   weldingMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "weldingMask_2D",
       meshPath: "/2DAssets/masks/weldingMask/",
@@ -2117,6 +2150,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   woodlandMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "woodlandMask_2D",
       meshPath: "/2DAssets/masks/woodlandMask/",
@@ -2131,6 +2165,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   woodPaintedMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "woodPaintedMask_2D",
       meshPath: "/2DAssets/masks/woodPaintedMask/",
@@ -2145,6 +2180,7 @@ export const masksMeshes: MeshesData = {
     },
   },
   zombieMask: {
+    defaultMeshPlacement: "nose",
     planeMesh: {
       meshLabel: "zombieMask_2D",
       meshPath: "/2DAssets/masks/zombieMask/",
@@ -2162,6 +2198,7 @@ export const masksMeshes: MeshesData = {
 
 export const glassesMeshes: MeshesData = {
   defaultGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "defaultGlasses_2D",
       meshPath: "/2DAssets/glasses/defaultGlasses/",
@@ -2176,6 +2213,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   AmericaGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "AmericaGlasses_2D",
       meshPath: "/2DAssets/glasses/AmericaGlasses/",
@@ -2190,6 +2228,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   aviatorGoggles: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "aviatorGoggles_2D",
       meshPath: "/2DAssets/glasses/aviatorGoggles/",
@@ -2204,6 +2243,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   bloodyGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "bloodyGlasses_2D",
       meshPath: "/2DAssets/glasses/bloodyGlasses/",
@@ -2218,6 +2258,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   eyeProtectionGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "eyeProtectionGlasses_2D",
       meshPath: "/2DAssets/glasses/eyeProtectionGlasses/",
@@ -2232,6 +2273,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   glasses1: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "glasses1_2D",
       meshPath: "/2DAssets/glasses/glasses1/",
@@ -2246,6 +2288,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   glasses2: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "glasses2_2D",
       meshPath: "/2DAssets/glasses/glasses2/",
@@ -2260,6 +2303,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   glasses3: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "glasses3_2D",
       meshPath: "/2DAssets/glasses/glasses3/",
@@ -2274,6 +2318,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   glasses4: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "glasses4_2D",
       meshPath: "/2DAssets/glasses/glasses4/",
@@ -2288,6 +2333,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   glasses5: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "glasses5_2D",
       meshPath: "/2DAssets/glasses/glasses5/",
@@ -2302,6 +2348,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   glasses6: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "glasses6_2D",
       meshPath: "/2DAssets/glasses/glasses6/",
@@ -2316,6 +2363,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   memeGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "memeGlasses_2D",
       meshPath: "/2DAssets/glasses/memeGlasses/",
@@ -2330,6 +2378,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   militaryTacticalGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "militaryTacticalGlasses_2D",
       meshPath: "/2DAssets/glasses/militaryTacticalGlasses/",
@@ -2344,6 +2393,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   steampunkGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "steampunkGlasses_2D",
       meshPath: "/2DAssets/glasses/steampunkGlasses/",
@@ -2358,6 +2408,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   threeDGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "threeDGlasses_2D",
       meshPath: "/2DAssets/glasses/threeDGlasses/",
@@ -2372,6 +2423,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   toyGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "toyGlasses_2D",
       meshPath: "/2DAssets/glasses/toyGlasses/",
@@ -2386,6 +2438,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   shades: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "shades_2D",
       meshPath: "/2DAssets/glasses/shades/",
@@ -2400,6 +2453,7 @@ export const glassesMeshes: MeshesData = {
     },
   },
   VRGlasses: {
+    defaultMeshPlacement: "eyesCenter",
     planeMesh: {
       meshLabel: "VRGlasses_2D",
       meshPath: "/2DAssets/glasses/VRGlasses/",
@@ -2417,6 +2471,7 @@ export const glassesMeshes: MeshesData = {
 
 export const hatMeshes: MeshesData = {
   AsianConicalHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "AsianConicalHat_2D",
       meshPath: "/2DAssets/hats/AsianConicalHat/",
@@ -2431,6 +2486,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   aviatorHelmet: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "aviatorHelmet_2D",
       meshPath: "/2DAssets/hats/aviatorHelmet/",
@@ -2445,6 +2501,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   bicornHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "bicornHat_2D",
       meshPath: "/2DAssets/hats/bicornHat/",
@@ -2459,6 +2516,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   bicycleHelmet: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "bicycleHelmet_2D",
       meshPath: "/2DAssets/hats/bicycleHelmet/",
@@ -2473,6 +2531,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   captainsHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "captainsHat_2D",
       meshPath: "/2DAssets/hats/captainsHat/",
@@ -2487,6 +2546,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   chefHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "chefHat_2D",
       meshPath: "/2DAssets/hats/chefHat/",
@@ -2501,6 +2561,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   chickenHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "chickenHat_2D",
       meshPath: "/2DAssets/hats/chickenHat/",
@@ -2515,6 +2576,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   deadManHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "deadManHat_2D",
       meshPath: "/2DAssets/hats/deadManHat/",
@@ -2529,6 +2591,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   dogEars: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "dogEars_2D",
       meshPath: "/2DAssets/hats/dogEars/",
@@ -2543,6 +2606,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   flatCap: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "flatCap_2D",
       meshPath: "/2DAssets/hats/flatCap/",
@@ -2557,6 +2621,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   hardHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "hardHat_2D",
       meshPath: "/2DAssets/hats/hardHat/",
@@ -2571,6 +2636,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   hopliteHelmet: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "hopliteHelmet_2D",
       meshPath: "/2DAssets/hats/hopliteHelmet/",
@@ -2585,6 +2651,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   militaryHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "militaryHat_2D",
       meshPath: "/2DAssets/hats/militaryHat/",
@@ -2599,6 +2666,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   rabbitEars: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "rabbitEars_2D",
       meshPath: "/2DAssets/hats/rabbitEars/",
@@ -2613,6 +2681,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   roundEarsHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "roundEarsHat_2D",
       meshPath: "/2DAssets/hats/roundEarsHat/",
@@ -2627,6 +2696,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   santaHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "santaHat_2D",
       meshPath: "/2DAssets/hats/santaHat/",
@@ -2641,6 +2711,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   seamanHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "seamanHat_2D",
       meshPath: "/2DAssets/hats/seamanHat/",
@@ -2655,6 +2726,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   stylishHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "stylishHat_2D",
       meshPath: "/2DAssets/hats/stylishHat/",
@@ -2669,6 +2741,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   superMarioOdysseyHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "superMarioOdysseyHat_2D",
       meshPath: "/2DAssets/hats/superMarioOdysseyHat/",
@@ -2683,6 +2756,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   ushankaHat: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "ushankaHat_2D",
       meshPath: "/2DAssets/hats/ushankaHat/",
@@ -2697,6 +2771,7 @@ export const hatMeshes: MeshesData = {
     },
   },
   vikingHelmet: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "vikingHelmet_2D",
       meshPath: "/2DAssets/hats/vikingHelmet/",
@@ -2714,6 +2789,7 @@ export const hatMeshes: MeshesData = {
 
 export const petMeshes: MeshesData = {
   angryHamster: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "angryHamster_2D",
       meshPath: "/2DAssets/pets/angryHamster/",
@@ -2728,6 +2804,7 @@ export const petMeshes: MeshesData = {
     },
   },
   axolotl: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "axolotl_2D",
       meshPath: "/2DAssets/pets/axolotl/",
@@ -2742,6 +2819,7 @@ export const petMeshes: MeshesData = {
     },
   },
   babyDragon: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "babyDragon_2D",
       meshPath: "/2DAssets/pets/babyDragon/",
@@ -2756,6 +2834,7 @@ export const petMeshes: MeshesData = {
     },
   },
   beardedDragon: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "beardedDragon_2D",
       meshPath: "/2DAssets/pets/beardedDragon/",
@@ -2770,6 +2849,7 @@ export const petMeshes: MeshesData = {
     },
   },
   bird1: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "bird1_2D",
       meshPath: "/2DAssets/pets/bird1/",
@@ -2784,6 +2864,7 @@ export const petMeshes: MeshesData = {
     },
   },
   bird2: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "bird2_2D",
       meshPath: "/2DAssets/pets/bird2/",
@@ -2798,6 +2879,7 @@ export const petMeshes: MeshesData = {
     },
   },
   boxer: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "boxer_2D",
       meshPath: "/2DAssets/pets/boxer/",
@@ -2812,6 +2894,7 @@ export const petMeshes: MeshesData = {
     },
   },
   brain: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "brain_2D",
       meshPath: "/2DAssets/pets/brain/",
@@ -2826,6 +2909,7 @@ export const petMeshes: MeshesData = {
     },
   },
   buddyHamster: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "buddyHamster_2D",
       meshPath: "/2DAssets/pets/buddyHamster/",
@@ -2840,6 +2924,7 @@ export const petMeshes: MeshesData = {
     },
   },
   cat1: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "cat1_2D",
       meshPath: "/2DAssets/pets/cat1/",
@@ -2854,6 +2939,7 @@ export const petMeshes: MeshesData = {
     },
   },
   cat2: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "cat2_2D",
       meshPath: "/2DAssets/pets/cat2/",
@@ -2868,6 +2954,7 @@ export const petMeshes: MeshesData = {
     },
   },
   dodoBird: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "dodoBird_2D",
       meshPath: "/2DAssets/pets/dodoBird/",
@@ -2882,6 +2969,7 @@ export const petMeshes: MeshesData = {
     },
   },
   happyHamster: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "happyHamster_2D",
       meshPath: "/2DAssets/pets/happyHamster/",
@@ -2896,6 +2984,7 @@ export const petMeshes: MeshesData = {
     },
   },
   mechanicalGrasshopper: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "mechanicalGrasshopper_2D",
       meshPath: "/2DAssets/pets/mechanicalGrasshopper/",
@@ -2910,6 +2999,7 @@ export const petMeshes: MeshesData = {
     },
   },
   panda1: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "panda1_2D",
       meshPath: "/2DAssets/pets/panda1/",
@@ -2924,6 +3014,7 @@ export const petMeshes: MeshesData = {
     },
   },
   panda2: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "panda2_2D",
       meshPath: "/2DAssets/pets/panda2/",
@@ -2938,6 +3029,7 @@ export const petMeshes: MeshesData = {
     },
   },
   petRock: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "petRock_2D",
       meshPath: "/2DAssets/pets/petRock/",
@@ -2952,6 +3044,7 @@ export const petMeshes: MeshesData = {
     },
   },
   pig: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "pig_2D",
       meshPath: "/2DAssets/pets/pig/",
@@ -2966,6 +3059,7 @@ export const petMeshes: MeshesData = {
     },
   },
   redFox1: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "redFox1_2D",
       meshPath: "/2DAssets/pets/redFox1/",
@@ -2980,6 +3074,7 @@ export const petMeshes: MeshesData = {
     },
   },
   redFox2: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "redFox2_2D",
       meshPath: "/2DAssets/pets/redFox2/",
@@ -2994,6 +3089,7 @@ export const petMeshes: MeshesData = {
     },
   },
   roboDog: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "roboDog_2D",
       meshPath: "/2DAssets/pets/roboDog/",
@@ -3008,6 +3104,7 @@ export const petMeshes: MeshesData = {
     },
   },
   skeletonTRex: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "skeletonTRex_2D",
       meshPath: "/2DAssets/pets/skeletonTRex/",
@@ -3022,6 +3119,7 @@ export const petMeshes: MeshesData = {
     },
   },
   snail: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "snail_2D",
       meshPath: "/2DAssets/pets/snail/",
@@ -3036,6 +3134,7 @@ export const petMeshes: MeshesData = {
     },
   },
   spinosaurus: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "spinosaurus_2D",
       meshPath: "/2DAssets/pets/spinosaurus/",
@@ -3050,6 +3149,7 @@ export const petMeshes: MeshesData = {
     },
   },
   TRex: {
+    defaultMeshPlacement: "forehead",
     planeMesh: {
       meshLabel: "TRex_2D",
       meshPath: "/2DAssets/pets/TRex/",
@@ -3093,11 +3193,16 @@ class CameraMedia {
     [cameraEffect in CameraEffectTypes]?: boolean;
   };
 
-  private tintColor = "#F56114";
+  private lastMeshes = {
+    glasses: "",
+    beards: "",
+    mustaches: "",
+    masks: "",
+    hats: "",
+    pets: "",
+  };
 
   private babylonScene: BabylonScene;
-
-  render: Render | undefined;
 
   constructor(
     private username: string,
@@ -3217,7 +3322,23 @@ class CameraMedia {
     // Start video and render loop
     this.video = document.createElement("video");
 
-    this.babylonScene = new BabylonScene(this.canvas, this.video);
+    this.babylonScene = new BabylonScene(
+      this.cameraId,
+      this.canvas,
+      this.video,
+      this.faceLandmarks,
+      this.effects,
+      this.currentEffectsStyles,
+      this.faceMeshWorker,
+      this.faceMeshResults,
+      this.faceMeshProcessing,
+      this.faceDetectionWorker,
+      this.faceDetectionProcessing,
+      this.selfieSegmentationWorker,
+      this.selfieSegmentationResults,
+      this.selfieSegmentationProcessing,
+      this.userDevice
+    );
 
     this.video.srcObject = this.initCameraStream;
     this.video.onloadedmetadata = () => {
@@ -3236,16 +3357,9 @@ class CameraMedia {
     this.video.srcObject = null;
 
     this.canvas.remove();
-  }
 
-  private lastMeshes = {
-    glasses: "",
-    beards: "",
-    mustaches: "",
-    masks: "",
-    hats: "",
-    pets: "",
-  };
+    this.babylonScene.deconstructor();
+  }
 
   private hexToNormalizedRgb = (hex: string): [number, number, number] => {
     // Remove the leading '#' if present
@@ -3328,25 +3442,29 @@ class CameraMedia {
 
     if (this.effects[effect]) {
       if (!currentStyle.threeDim) {
-        this.babylonScene.createMesh(
+        this.babylonScene.createEffectMesh(
           "2D",
           meshData2D.meshLabel,
           "",
+          // @ts-ignore
+          assetMeshes[currentStyle.style].defaultMeshPlacement,
           meshData2D.meshPath,
           meshData2D.meshFile,
-          [0, 0, 100],
+          [0, 0, this.babylonScene.threeDimMeshesPlane],
           [10, 10, 10],
           [0, 0, 0]
         );
       }
       if (currentStyle.threeDim) {
-        this.babylonScene.createMesh(
+        this.babylonScene.createEffectMesh(
           meshData3D.meshType,
           meshData3D.meshLabel,
           "",
+          // @ts-ignore
+          assetMeshes[currentStyle.style].defaultMeshPlacement,
           meshData3D.meshPath,
           meshData3D.meshFile,
-          [0, 0, 90],
+          [0, 0, this.babylonScene.twoDimMeshesPlane],
           [10, 10, 10],
           [0, 0, 0]
         );

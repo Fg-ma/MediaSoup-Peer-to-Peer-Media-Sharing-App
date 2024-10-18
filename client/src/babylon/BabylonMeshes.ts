@@ -549,8 +549,10 @@ class BabylonMeshes {
     type: MeshTypes,
     meshLabel: string,
     meshName: string,
+    defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
+    faceId?: string,
     position?: [number, number, number],
     scale?: [number, number, number],
     rotation?: [number, number, number]
@@ -576,8 +578,10 @@ class BabylonMeshes {
       const newMesh = await this.meshLoaders.loadGLTF(
         meshLabel,
         meshName,
+        defaultMeshPlacement,
         meshPath,
-        meshFile
+        meshFile,
+        faceId
       );
       this.meshes["3D"][meshLabel] = newMesh;
 
@@ -600,8 +604,10 @@ class BabylonMeshes {
       const newMesh = await this.meshLoaders.load2D(
         meshLabel,
         meshName,
+        defaultMeshPlacement,
         meshPath,
-        meshFile
+        meshFile,
+        faceId
       );
       this.meshes["2D"][meshLabel] = newMesh;
 

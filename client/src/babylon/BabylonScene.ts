@@ -16,6 +16,16 @@ import {
   Texture,
 } from "@babylonjs/core";
 import BabylonMeshes, { MeshTypes } from "./BabylonMeshes";
+import BabylonRenderLoop from "./BabylonRenderLoop";
+import FaceLandmarks from "src/effects/visualEffects/lib/FaceLandmarks";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "src/context/StreamsContext";
+import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
+import UserDevice from "src/UserDevice";
 
 class BabylonScene {
   private engine: Engine;
@@ -37,9 +47,32 @@ class BabylonScene {
 
   private babylonMeshes: BabylonMeshes;
 
+  private babylonRenderLoop: BabylonRenderLoop;
+
+  twoDimMeshesPlane = 90;
+  threeDimMeshesPlane = 100;
+
   constructor(
-    private canvas: HTMLCanvasElement | null,
-    private video: HTMLVideoElement
+    private id: string,
+    private canvas: HTMLCanvasElement,
+    private video: HTMLVideoElement,
+    private faceLandmarks: FaceLandmarks | undefined,
+    private effects: {
+      [effectType in
+        | CameraEffectTypes
+        | ScreenEffectTypes
+        | AudioEffectTypes]?: boolean | undefined;
+    },
+    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private faceMeshWorker: Worker | undefined,
+    private faceMeshResults: NormalizedLandmarkListList[] | undefined,
+    private faceMeshProcessing: boolean[] | undefined,
+    private faceDetectionWorker: Worker | undefined,
+    private faceDetectionProcessing: boolean[] | undefined,
+    private selfieSegmentationWorker: Worker | undefined,
+    private selfieSegmentationResults: ImageData[] | undefined,
+    private selfieSegmentationProcessing: boolean[] | undefined,
+    private userDevice: UserDevice
   ) {
     this.engine = new Engine(this.canvas, true);
     this.scene = new Scene(this.engine);
@@ -57,8 +90,29 @@ class BabylonScene {
 
     this.babylonMeshes = new BabylonMeshes(this.scene);
 
+    this.babylonRenderLoop = new BabylonRenderLoop(
+      this.id,
+      this.scene,
+      this.camera,
+      this.faceLandmarks,
+      this.canvas,
+      this.video,
+      this.effects,
+      this.currentEffectsStyles,
+      this.faceMeshWorker,
+      this.faceMeshResults,
+      this.faceMeshProcessing,
+      this.faceDetectionWorker,
+      this.faceDetectionProcessing,
+      this.selfieSegmentationWorker,
+      this.selfieSegmentationResults,
+      this.selfieSegmentationProcessing,
+      this.userDevice
+    );
+
     // Render loop
     this.engine.runRenderLoop(() => {
+      this.babylonRenderLoop.renderLoop();
       this.scene.render();
     });
 
@@ -71,6 +125,7 @@ class BabylonScene {
 
   deconstructor = () => {
     this.engine.dispose();
+    this.engine.stopRenderLoop();
     window.removeEventListener("resize", () => {
       this.engine.resize();
       this.updateVideoPlaneSize();
@@ -161,6 +216,7 @@ class BabylonScene {
     type: MeshTypes,
     meshLabel: string,
     meshName: string,
+    deafultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
     position?: [number, number, number],
@@ -171,12 +227,48 @@ class BabylonScene {
       type,
       meshLabel,
       meshName,
+      deafultMeshPlacement,
       meshPath,
       meshFile,
+      undefined,
       position,
       scale,
       rotation
     );
+  };
+
+  createEffectMesh = (
+    type: MeshTypes,
+    meshLabel: string,
+    meshName: string,
+    defaultMeshPlacement: string,
+    meshPath: string,
+    meshFile: string,
+    position?: [number, number, number],
+    scale?: [number, number, number],
+    rotation?: [number, number, number]
+  ) => {
+    if (!this.faceLandmarks) {
+      return;
+    }
+
+    for (const {
+      faceId,
+      landmarks,
+    } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
+      this.babylonMeshes.loader(
+        type,
+        meshLabel,
+        meshName,
+        defaultMeshPlacement,
+        meshPath,
+        meshFile,
+        faceId,
+        position,
+        scale,
+        rotation
+      );
+    }
   };
 
   deleteMesh = (type: MeshTypes, meshLabel: string) => {

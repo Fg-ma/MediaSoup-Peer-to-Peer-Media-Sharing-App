@@ -15,8 +15,10 @@ class MeshLoaders {
   loadGLTF = (
     meshLabel: string,
     meshName: string,
+    defaultMeshPlacement: string,
     meshPath: string,
-    meshFile: string
+    meshFile: string,
+    faceId?: string
   ) => {
     return new Promise<AbstractMesh[]>((resolve, reject) => {
       // Load the GLTF file
@@ -30,7 +32,12 @@ class MeshLoaders {
             animationGroups.forEach((animationGroup) => {
               animationGroup.pause(); // Pause the animation by default
 
-              animationGroup.metadata = { meshLabel, meshType: "gltf" };
+              animationGroup.metadata = {
+                meshLabel,
+                meshType: "gltf",
+                defaultMeshPlacement,
+                faceId,
+              };
             });
 
             const parentMesh = MeshBuilder.CreateBox(
@@ -70,8 +77,10 @@ class MeshLoaders {
   load2D = async (
     meshLabel: string,
     meshName: string,
+    defaultMeshPlacement: string,
     meshPath: string,
-    meshFile: string
+    meshFile: string,
+    faceId?: string
   ) => {
     return new Promise<AbstractMesh>((resolve) => {
       // Create a plane for the 2D texture
@@ -85,6 +94,8 @@ class MeshLoaders {
         isGizmoEnabled: false,
         gizmoState: "none",
         meshType: "2D",
+        defaultMeshPlacement,
+        faceId,
       };
 
       // Create the material with alpha
