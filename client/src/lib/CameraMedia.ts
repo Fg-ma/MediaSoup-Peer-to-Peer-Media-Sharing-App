@@ -2801,7 +2801,7 @@ export const petMeshes: MeshesData = {
       meshType: "gltf",
       meshLabel: "angryHamster_gltf",
       meshPath: "/3DAssets/pets/angryHamster/",
-      meshFile: "angryHamster2.gltf",
+      meshFile: "angryHamster.gltf",
     },
   },
   axolotl: {

@@ -78,7 +78,7 @@ Pets:
   - 3D Model "Bird 1" This work is based on "Bird 3ds" (https://sketchfab.com/3d-models/bird-3ds-d4e05c6b66844b219c194f5feaa4c302) by gustavopujadas (https://sketchfab.com/gustavopujadas) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Bird 2" This work is based on "Bird" (https://sketchfab.com/3d-models/bird-702f93b8e9ea46b6a8e97eb1c1534b53) by Xenio (https://sketchfab.com/xenio3d) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   
-Face Masks:
+Masks:
   - 3D Model "Welding Mask" This work is based on "Welding mask" (https://sketchfab.com/3d-models/welding-mask-4f0462e1c43e4c1db947b8eb9d37b746) by guss67 (https://sketchfab.com/guss67) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Oni Mask" This work is based on "Oni Mask" (https://sketchfab.com/3d-models/oni-mask-3da3c69ba3f946febda92a3610238d6b) by Batuhan13 (https://sketchfab.com/Batuhan13) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
   - 3D Model "Three Face Mask" This work is based on "-Three Face Mask-" (https://sketchfab.com/3d-models/three-face-mask-0ef60297b45548dbb84f74d79f040e51) by zammon (https://sketchfab.com/zammon) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes were made to the original model.
