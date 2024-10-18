@@ -7,6 +7,7 @@ import {
   GlassesEffectTypes,
   BeardsEffectTypes,
   defaultCameraCurrentEffectsStyles,
+  HideBackgroundEffectTypes,
 } from "../context/CurrentEffectsStylesContext";
 import { MeshJSON } from "../effects/visualEffects/lib/BaseShader";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
@@ -3174,6 +3175,39 @@ export const assetMeshes: MeshesData = {
   ...petMeshes,
 };
 
+export const hideBackgroundEffectImagesMap: {
+  [hideBackgroundEffectType in HideBackgroundEffectTypes]?: string;
+} = {
+  beach: "/videoBackgrounds/beach_640x427.jpg",
+  brickWall: "/videoBackgrounds/brickWall_640x427.jpg",
+  butterflies: "/videoBackgrounds/butterflies_640x360.jpg",
+  cafe: "/videoBackgrounds/cafe_427x640.jpg",
+  chalkBoard: "/videoBackgrounds/chalkBoard_640x427.jpg",
+  citySkyline: "/videoBackgrounds/citySkyline_640x331.jpg",
+  cliffPalace:
+    "/videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_608x750.jpg",
+  eveningMcDonaldLake:
+    "/videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_750x569.jpg",
+  forest: "/videoBackgrounds/forest_640x427.jpg",
+  halfDomeAppleOrchard:
+    "/videoBackgrounds/halfDomeAppleOrchardYosemiteCaliforniaByAnselAdams_750x575.jpg",
+  lake: "/videoBackgrounds/lake_640x457.jpg",
+  library: "/videoBackgrounds/library_640x427.jpg",
+  milkyWay: "/videoBackgrounds/milkyWay_640x349.jpg",
+  mountains: "/videoBackgrounds/mountains_640x425.jpg",
+  ocean: "/videoBackgrounds/ocean_640x427.jpg",
+  oldFaithfulGeyser:
+    "/videoBackgrounds/oldFaithfulGeyserYellowstoneNationalParkWyomingByAnselAdams_532x750.jpg",
+  railroad: "/videoBackgrounds/railroad_640x414.jpg",
+  rollingHills: "/videoBackgrounds/rollingHills_640x417.jpg",
+  seaSideHouses: "/videoBackgrounds/seaSideHouses_640x390.jpg",
+  snowCoveredMoutains: "/videoBackgrounds/snowCoveredMoutains_640x360.jpg",
+  sunflowers: "/videoBackgrounds/sunflowers_640x427.jpg",
+  sunset: "/videoBackgrounds/sunset_640x427.jpg",
+  trees: "/videoBackgrounds/trees_640x426.jpg",
+  windingRoad: "/videoBackgrounds/windingRoad_640x427.jpg",
+};
+
 class CameraMedia {
   canvas: HTMLCanvasElement;
   private video: HTMLVideoElement;
@@ -3202,7 +3236,7 @@ class CameraMedia {
     pets: "",
   };
 
-  private babylonScene: BabylonScene;
+  babylonScene: BabylonScene;
 
   constructor(
     private username: string,
@@ -3222,14 +3256,6 @@ class CameraMedia {
     private userDevice: UserDevice,
     private deadbanding: Deadbanding
   ) {
-    this.username = username;
-    this.table_id = table_id;
-    this.cameraId = cameraId;
-    this.currentEffectsStyles = currentEffectsStyles;
-    this.userStreamEffects = userStreamEffects;
-    this.userDevice = userDevice;
-    this.deadbanding = deadbanding;
-
     this.effects = {};
 
     this.userStreamEffects.current.camera[this.cameraId] =

@@ -34,9 +34,6 @@ class MeshLoaders {
 
               animationGroup.metadata = {
                 meshLabel,
-                meshType: "gltf",
-                defaultMeshPlacement,
-                faceId,
               };
             });
 
@@ -51,6 +48,9 @@ class MeshLoaders {
               meshLabel,
               isGizmoEnabled: false,
               gizmoState: "none",
+              meshType: "gltf",
+              defaultMeshPlacement,
+              faceId,
             };
 
             // Set each loaded mesh as a child of the parent

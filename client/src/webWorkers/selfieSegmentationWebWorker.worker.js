@@ -71,7 +71,7 @@ class SelfieSegmentationWebWorker {
       rgbaData[rgbaIndex] = 255;
       rgbaData[rgbaIndex + 1] = 255;
       rgbaData[rgbaIndex + 2] = 255;
-      rgbaData[rgbaIndex + 3] = value * 255;
+      rgbaData[rgbaIndex + 3] = (1 - value) * 255;
     }
 
     // Return ImageData directly instead of drawing it to a canvas

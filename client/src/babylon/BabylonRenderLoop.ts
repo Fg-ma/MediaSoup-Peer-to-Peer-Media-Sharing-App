@@ -1,13 +1,25 @@
-import { AbstractMesh, Scene, UniversalCamera, Vector3 } from "@babylonjs/core";
+import {
+  AbstractMesh,
+  Scene,
+  UniversalCamera,
+  Vector3,
+  StandardMaterial,
+  DynamicTexture,
+  Material,
+} from "@babylonjs/core";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import {
+  EffectStylesType,
+  HideBackgroundEffectTypes,
+} from "src/context/CurrentEffectsStylesContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "src/context/StreamsContext";
 import FaceLandmarks from "src/effects/visualEffects/lib/FaceLandmarks";
-import UserDevice from "src/UserDevice";
+import { hideBackgroundEffectImagesMap } from "../lib/CameraMedia";
+import UserDevice from "../UserDevice";
 
 class BabylonRenderLoop {
   private FACE_MESH_DETECTION_INTERVAL: number;
@@ -21,7 +33,7 @@ class BabylonRenderLoop {
 
   private lastFaceCountCheck: number;
 
-  private hideBackgroundCanvas: HTMLCanvasElement;
+  hideBackgroundCanvas: HTMLCanvasElement;
   private hideBackgroundCtx: CanvasRenderingContext2D | null;
   private hideBackgroundEffectImage: HTMLImageElement;
   private hideBackgroundCtxFillStyle = "#F56114";
@@ -51,13 +63,16 @@ class BabylonRenderLoop {
     private selfieSegmentationWorker: Worker | undefined,
     private selfieSegmentationResults: ImageData[] | undefined,
     private selfieSegmentationProcessing: boolean[] | undefined,
-    private userDevice: UserDevice
+    private userDevice: UserDevice,
+    private hideBackgroundTexture: DynamicTexture | undefined,
+    private hideBackgroundMaterial: StandardMaterial | undefined
   ) {
     this.FACE_MESH_DETECTION_INTERVAL =
       this.userDevice.getFaceMeshDetectionInterval();
 
     this.offscreenCanvas = document.createElement("canvas");
     this.offscreenContext = this.offscreenCanvas.getContext("2d", {
+      alpha: true,
       willReadFrequently: true,
     });
 
@@ -66,10 +81,15 @@ class BabylonRenderLoop {
     this.hideBackgroundEffectImage = new Image();
 
     this.hideBackgroundCanvas = document.createElement("canvas");
-    this.hideBackgroundCtx = this.hideBackgroundCanvas.getContext("2d");
+    this.hideBackgroundCtx = this.hideBackgroundCanvas.getContext("2d", {
+      alpha: true,
+    });
 
     this.tempHideBackgroundCanvas = new OffscreenCanvas(160, 120);
-    this.tempHideBackgroundCtx = this.tempHideBackgroundCanvas.getContext("2d");
+    this.tempHideBackgroundCtx = this.tempHideBackgroundCanvas.getContext(
+      "2d",
+      { alpha: true }
+    );
   }
 
   renderLoop = () => {
@@ -307,6 +327,7 @@ class BabylonRenderLoop {
     );
 
     // Step 1: Draw the ImageData onto the canvas at its original size (at 0,0)
+    this.hideBackgroundCtx.globalCompositeOperation = "source-over";
     this.tempHideBackgroundCtx.putImageData(
       this.selfieSegmentationResults[0],
       0,
@@ -325,16 +346,8 @@ class BabylonRenderLoop {
       this.hideBackgroundCanvas.width,
       this.hideBackgroundCanvas.height
     );
-    this.hideBackgroundCtx.globalCompositeOperation = "source-in";
-    this.hideBackgroundCtx.drawImage(
-      this.video,
-      0,
-      0,
-      this.hideBackgroundCanvas.width,
-      this.hideBackgroundCanvas.height
-    );
 
-    this.hideBackgroundCtx.globalCompositeOperation = "destination-over";
+    this.hideBackgroundCtx.globalCompositeOperation = "source-atop";
 
     if (
       this.currentEffectsStyles.current.camera[this.id].hideBackground.style !==
@@ -360,6 +373,48 @@ class BabylonRenderLoop {
         this.hideBackgroundCanvas.width,
         this.hideBackgroundCanvas.height
       );
+    }
+
+    // Step 3: Update the texture of the background plane material
+    if (this.hideBackgroundTexture && this.hideBackgroundMaterial) {
+      const textureCtx = this.hideBackgroundTexture.getContext();
+      if (textureCtx) {
+        textureCtx.clearRect(
+          0,
+          0,
+          this.hideBackgroundCanvas.width,
+          this.hideBackgroundCanvas.height
+        );
+
+        // Transfer the content of the canvas to the texture
+        textureCtx.drawImage(
+          this.hideBackgroundCanvas,
+          0,
+          0,
+          this.hideBackgroundCanvas.width,
+          this.hideBackgroundCanvas.height
+        );
+
+        // Mark texture as dirty to trigger an update in the rendering engine
+        this.hideBackgroundTexture.update();
+      }
+
+      // Assign the updated texture to the material
+      this.hideBackgroundMaterial.diffuseTexture = this.hideBackgroundTexture;
+    }
+  };
+
+  swapHideBackgroundEffectImage = (
+    hideBackgroundEffect: HideBackgroundEffectTypes
+  ) => {
+    const src = hideBackgroundEffectImagesMap[hideBackgroundEffect];
+    if (src) this.hideBackgroundEffectImage.src = src;
+  };
+
+  swapHideBackgroundContextFillColor = (color: string) => {
+    if (this.hideBackgroundCtx) {
+      this.hideBackgroundCtx.fillStyle = color;
+      this.hideBackgroundCtxFillStyle = color;
     }
   };
 

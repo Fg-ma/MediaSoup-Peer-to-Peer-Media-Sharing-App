@@ -13,7 +13,8 @@ import {
   Vector2,
   ImageProcessingPostProcess,
   Layer,
-  Texture,
+  DynamicTexture,
+  Material,
 } from "@babylonjs/core";
 import BabylonMeshes, { MeshTypes } from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
@@ -34,7 +35,12 @@ class BabylonScene {
   private light: HemisphericLight | undefined;
 
   private videoPlane: Mesh | undefined;
+  private videoTexture: VideoTexture | undefined;
   private videoMaterial: StandardMaterial | undefined;
+
+  private hideBackgroundPlane: Mesh | undefined;
+  private hideBackgroundTexture: DynamicTexture | undefined;
+  private hideBackgroundMaterial: StandardMaterial | undefined;
 
   private tintPlane: Mesh | undefined;
   private tintMaterial: StandardMaterial | undefined;
@@ -47,7 +53,7 @@ class BabylonScene {
 
   private babylonMeshes: BabylonMeshes;
 
-  private babylonRenderLoop: BabylonRenderLoop;
+  babylonRenderLoop: BabylonRenderLoop;
 
   twoDimMeshesPlane = 90;
   threeDimMeshesPlane = 100;
@@ -86,6 +92,7 @@ class BabylonScene {
     this.initCamera();
     this.initLighting();
     this.initVideoPlane();
+    this.initHideBackgroundPlane();
     this.initTintPlane();
 
     this.babylonMeshes = new BabylonMeshes(this.scene);
@@ -107,7 +114,9 @@ class BabylonScene {
       this.selfieSegmentationWorker,
       this.selfieSegmentationResults,
       this.selfieSegmentationProcessing,
-      this.userDevice
+      this.userDevice,
+      this.hideBackgroundTexture,
+      this.hideBackgroundMaterial
     );
 
     // Render loop
@@ -119,16 +128,21 @@ class BabylonScene {
     // Resize
     window.addEventListener("resize", () => {
       this.engine.resize();
-      this.updateVideoPlaneSize();
+      if (this.videoPlane) this.updateBackgroundPlaneSize(this.videoPlane);
+      if (this.hideBackgroundPlane)
+        this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.01);
     });
   }
 
   deconstructor = () => {
     this.engine.dispose();
     this.engine.stopRenderLoop();
+
     window.removeEventListener("resize", () => {
       this.engine.resize();
-      this.updateVideoPlaneSize();
+      if (this.videoPlane) this.updateBackgroundPlaneSize(this.videoPlane);
+      if (this.hideBackgroundPlane)
+        this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.01);
     });
   };
 
@@ -145,12 +159,8 @@ class BabylonScene {
     );
   };
 
-  private updateVideoPlaneSize = () => {
-    if (!this.videoPlane) {
-      return;
-    }
-
-    const backgroundDistance = this.camera.maxZ;
+  private updateBackgroundPlaneSize = (plane: Mesh, zOffset?: number) => {
+    const backgroundDistance = this.camera.maxZ - (zOffset ?? 0);
 
     // Calculate the plane's height based on FOV and distance
     const verticalFOV = this.camera.fov;
@@ -163,12 +173,12 @@ class BabylonScene {
     const planeWidth = planeHeight * aspectRatio;
 
     // Update the plane's scaling and position
-    this.videoPlane.scaling = new Vector3(-planeWidth, planeHeight, 1);
-    this.videoPlane.position = new Vector3(0, 0, backgroundDistance);
+    plane.scaling = new Vector3(-planeWidth, planeHeight, 1);
+    plane.position = new Vector3(0, 0, backgroundDistance);
   };
 
   private initVideoPlane = () => {
-    const videoTexture = new VideoTexture(
+    this.videoTexture = new VideoTexture(
       "videoTexture",
       this.video,
       this.scene,
@@ -181,10 +191,41 @@ class BabylonScene {
       this.scene
     );
     this.videoMaterial = new StandardMaterial("videoMaterial", this.scene);
-    this.videoMaterial.diffuseTexture = videoTexture;
+    this.videoMaterial.diffuseTexture = this.videoTexture;
     this.videoPlane.material = this.videoMaterial;
 
-    this.updateVideoPlaneSize();
+    this.updateBackgroundPlaneSize(this.videoPlane);
+  };
+
+  private initHideBackgroundPlane = () => {
+    this.hideBackgroundTexture = new DynamicTexture(
+      "hideBackgroundTexture",
+      {
+        width: this.canvas.width,
+        height: this.canvas.height,
+      },
+      this.scene
+    );
+
+    this.hideBackgroundTexture.hasAlpha = true;
+
+    this.hideBackgroundPlane = MeshBuilder.CreatePlane(
+      "hideBackgroundPlane",
+      { width: 1, height: 1 },
+      this.scene
+    );
+    this.hideBackgroundMaterial = new StandardMaterial(
+      "hideBackgroundMaterial",
+      this.scene
+    );
+
+    this.hideBackgroundMaterial.useAlphaFromDiffuseTexture = true; // Use the alpha channel from the diffuse texture
+    this.hideBackgroundMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND; // Set transparency mode to alpha test
+
+    this.hideBackgroundMaterial.diffuseTexture = this.hideBackgroundTexture;
+    this.hideBackgroundPlane.material = this.hideBackgroundMaterial;
+
+    this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.01);
   };
 
   private updateTintPlaneSize = () => {

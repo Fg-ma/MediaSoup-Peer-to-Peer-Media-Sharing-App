@@ -230,7 +230,9 @@ export default function HideBackgroundButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    userMedia.current.camera[videoId].render.swapHideBackgroundEffectImage(
+    userMedia.current.camera[
+      videoId
+    ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
       effectsStyles.style
     );
 
@@ -252,7 +254,9 @@ export default function HideBackgroundButton({
 
     if (effectsStyles.style !== effectType || !streamEffects) {
       effectsStyles.style = effectType;
-      userMedia.current.camera[videoId].render.swapHideBackgroundEffectImage(
+      userMedia.current.camera[
+        videoId
+      ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
         effectType
       );
 
@@ -266,7 +270,9 @@ export default function HideBackgroundButton({
   const handleAcceptColorCallback = async () => {
     setEffectsDisabled(true);
 
-    userMedia.current.camera[videoId].render.swapHideBackgroundContextFillColor(
+    userMedia.current.camera[
+      videoId
+    ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
       colorRef.current
     );
 
