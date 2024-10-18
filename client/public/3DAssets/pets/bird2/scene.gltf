@@ -1,191 +1,148 @@
 {
-  "accessors": [
-    {
-      "bufferView": 2,
-      "componentType": 5126,
-      "count": 40783,
-      "max": [
-        11.928449630737305,
-        7.170921802520752,
-        22.332990646362305
-      ],
-      "min": [
-        -12.971232414245605,
-        -13.84097671508789,
-        -6.664585113525391
-      ],
-      "type": "VEC3"
-    },
-    {
-      "bufferView": 2,
-      "byteOffset": 489396,
-      "componentType": 5126,
-      "count": 40783,
-      "max": [
-        0.999815821647644,
-        0.9999629259109497,
-        0.999983012676239
-      ],
-      "min": [
-        -0.9999683499336243,
-        -0.999981701374054,
-        -0.9994735717773438
-      ],
-      "type": "VEC3"
-    },
-    {
-      "bufferView": 1,
-      "componentType": 5126,
-      "count": 40783,
-      "max": [
-        0.9978700280189514,
-        0.9994609951972961
-      ],
-      "min": [
-        0.002145000034943223,
-        0.001972000114619732
-      ],
-      "type": "VEC2"
-    },
-    {
-      "bufferView": 0,
-      "componentType": 5125,
-      "count": 214326,
-      "type": "SCALAR"
-    }
-  ],
-  "asset": {
-    "extras": {
-      "author": "Xenio (https://sketchfab.com/xenio3d)",
-      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
-      "source": "https://sketchfab.com/3d-models/bird-702f93b8e9ea46b6a8e97eb1c1534b53",
-      "title": "Bird"
-    },
-    "generator": "Sketchfab-12.63.0",
-    "version": "2.0"
-  },
-  "bufferViews": [
-    {
-      "buffer": 0,
-      "byteLength": 857304,
-      "name": "floatBufferViews",
-      "target": 34963
-    },
-    {
-      "buffer": 0,
-      "byteLength": 326264,
-      "byteOffset": 857304,
-      "byteStride": 8,
-      "name": "floatBufferViews",
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteLength": 978792,
-      "byteOffset": 1183568,
-      "byteStride": 12,
-      "name": "floatBufferViews",
-      "target": 34962
-    }
-  ],
-  "buffers": [
-    {
-      "byteLength": 2162360,
-      "uri": "scene.bin"
-    }
-  ],
-  "images": [
-    {
-      "uri": "textures/bird2_baseColor.jpeg"
-    }
-  ],
-  "materials": [
-    {
-      "doubleSided": true,
-      "name": "bird2",
-      "pbrMetallicRoughness": {
-        "baseColorTexture": {
-          "index": 0
-        },
-        "metallicFactor": 0.0,
-        "roughnessFactor": 0.6
-      }
-    }
-  ],
-  "meshes": [
-    {
-      "name": "Object_0",
-      "primitives": [
-        {
-          "attributes": {
-            "NORMAL": 1,
-            "POSITION": 0,
-            "TEXCOORD_0": 2
-          },
-          "indices": 3,
-          "material": 0,
-          "mode": 4
-        }
-      ]
-    }
-  ],
-  "nodes": [
-    {
-      "children": [
-        1
-      ],
-      "matrix": [
-        1.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        2.220446049250313e-16,
-        -1.0,
-        0.0,
-        0.0,
-        1.0,
-        2.220446049250313e-16,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        1.0
-      ],
-      "name": "Sketchfab_model"
-    },
-    {
-      "children": [
-        2
-      ],
-      "name": "Bird03.obj.cleaner"
-    },
-    {
-      "mesh": 0,
-      "name": "Object_2"
-    }
-  ],
-  "samplers": [
-    {
-      "magFilter": 9729,
-      "minFilter": 9987,
-      "wrapS": 10497,
-      "wrapT": 10497
-    }
-  ],
-  "scene": 0,
-  "scenes": [
-    {
-      "name": "Sketchfab_Scene",
-      "nodes": [
-        0
-      ]
-    }
-  ],
-  "textures": [
-    {
-      "sampler": 0,
-      "source": 0
-    }
-  ]
+	"asset":{
+		"generator":"Khronos glTF Blender I/O v3.6.27",
+		"version":"2.0"
+	},
+	"scene":0,
+	"scenes":[
+		{
+			"name":"Scene",
+			"nodes":[
+				0
+			]
+		}
+	],
+	"nodes":[
+		{
+			"mesh":0,
+			"name":"bird2",
+			"rotation":[
+				-0.100055992603302,
+				-0.7146360278129578,
+				-0.6766541004180908,
+				0.14636759459972382
+			],
+			"scale":[
+				0.06646338850259781,
+				0.06646338105201721,
+				0.06646338105201721
+			]
+		}
+	],
+	"materials":[
+		{
+			"doubleSided":true,
+			"name":"bird2.001",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":0
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.6000000238418579
+			}
+		}
+	],
+	"meshes":[
+		{
+			"name":"Object_0.003",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2
+					},
+					"indices":3,
+					"material":0
+				}
+			]
+		}
+	],
+	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		}
+	],
+	"images":[
+		{
+			"mimeType":"image/jpeg",
+			"name":"bird2_baseColor",
+			"uri":"texs2/bird2_baseColor.jpg"
+		}
+	],
+	"accessors":[
+		{
+			"bufferView":0,
+			"componentType":5126,
+			"count":40808,
+			"max":[
+				13.010619163513184,
+				9.823668479919434,
+				18.408945083618164
+			],
+			"min":[
+				-11.889062881469727,
+				-11.188230514526367,
+				-10.588630676269531
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":1,
+			"componentType":5126,
+			"count":40808,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":2,
+			"componentType":5126,
+			"count":40808,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":3,
+			"componentType":5123,
+			"count":214326,
+			"type":"SCALAR"
+		}
+	],
+	"bufferViews":[
+		{
+			"buffer":0,
+			"byteLength":489696,
+			"byteOffset":0,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":489696,
+			"byteOffset":489696,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":326464,
+			"byteOffset":979392,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":428652,
+			"byteOffset":1305856,
+			"target":34963
+		}
+	],
+	"samplers":[
+		{
+			"magFilter":9729,
+			"minFilter":9987
+		}
+	],
+	"buffers":[
+		{
+			"byteLength":1734508,
+			"uri":"scene.bin"
+		}
+	]
 }
