@@ -281,7 +281,6 @@ class BabylonMeshes {
     // Handle double-clicks to toggle gizmo
     mesh.actionManager.registerAction(
       new ExecuteCodeAction(ActionManager.OnDoublePickTrigger, () => {
-        console.log("wokr");
         // Mark double click as registered
         doubleClickRegistered = true;
         // Clear the single click timeout to prevent single-click action
@@ -553,9 +552,9 @@ class BabylonMeshes {
     meshPath: string,
     meshFile: string,
     faceId?: string,
-    position?: [number, number, number],
-    scale?: [number, number, number],
-    rotation?: [number, number, number]
+    initPosition?: [number, number, number],
+    initScale?: [number, number, number],
+    initRotation?: [number, number, number]
   ) => {
     if (type === "2D") {
       if (this.meshes["2D"][meshLabel]) {
@@ -583,23 +582,36 @@ class BabylonMeshes {
         meshFile,
         faceId
       );
+      newMesh[0].metadata.initScale = initScale;
       this.meshes["3D"][meshLabel] = newMesh;
 
       // Check if the mesh is loaded
       if (newMesh) {
-        if (newMesh instanceof Array) {
-          this.applyMeshAttributes(newMesh[0], position, scale, rotation);
-          for (const mesh of newMesh) {
-            this.applyMeshActions(type, mesh, newMesh[0]);
-          }
-        } else {
-          this.applyMeshAttributes(newMesh, position, scale, rotation);
-          this.applyMeshActions(type, newMesh);
+        this.applyMeshAttributes(
+          newMesh[0],
+          initPosition,
+          initScale,
+          initRotation
+        );
+        for (const mesh of newMesh) {
+          this.applyMeshActions(type, mesh, newMesh[0]);
         }
       } else {
         console.error(`Mesh ${meshName} not found after loading.`);
       }
     }
+    console.log(
+      type,
+      meshLabel,
+      meshName,
+      defaultMeshPlacement,
+      meshPath,
+      meshFile,
+      faceId,
+      initPosition,
+      initScale,
+      initRotation
+    );
     if (type === "2D") {
       const newMesh = await this.meshLoaders.load2D(
         meshLabel,
@@ -609,11 +621,17 @@ class BabylonMeshes {
         meshFile,
         faceId
       );
+      newMesh.metadata.initScale = initScale;
       this.meshes["2D"][meshLabel] = newMesh;
 
       // Check if the mesh is loaded
       if (newMesh) {
-        this.applyMeshAttributes(newMesh, position, scale, rotation);
+        this.applyMeshAttributes(
+          newMesh,
+          initPosition,
+          initScale,
+          initRotation
+        );
         this.applyMeshActions(type, newMesh);
       } else {
         console.error(`Mesh ${meshName} not found after loading.`);

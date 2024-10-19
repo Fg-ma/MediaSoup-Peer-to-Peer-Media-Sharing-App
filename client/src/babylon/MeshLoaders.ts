@@ -82,6 +82,14 @@ class MeshLoaders {
     meshFile: string,
     faceId?: string
   ) => {
+    console.log(
+      meshLabel,
+      meshName,
+      defaultMeshPlacement,
+      meshPath,
+      meshFile,
+      faceId
+    );
     return new Promise<AbstractMesh>((resolve) => {
       // Create a plane for the 2D texture
       const plane = MeshBuilder.CreatePlane(

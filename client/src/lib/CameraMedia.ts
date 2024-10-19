@@ -275,6 +275,7 @@ class CameraMedia {
 
     if (this.effects[effect]) {
       if (!currentStyle.threeDim) {
+        console.log("wokr", this.babylonScene);
         this.babylonScene.createEffectMesh(
           "2D",
           meshData2D.meshLabel,
@@ -283,9 +284,9 @@ class CameraMedia {
           assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
           meshData2D.meshPath,
           meshData2D.meshFile,
-          [0, 0, this.babylonScene.threeDimMeshesPlane],
-          [10, 10, 10],
-          [0, 0, 0]
+          [0, 0, this.babylonScene.twoDimMeshesZCoord],
+          meshData2D.initScale,
+          meshData2D.initRotation
         );
       }
       if (currentStyle.threeDim) {
@@ -297,9 +298,9 @@ class CameraMedia {
           assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
           meshData3D.meshPath,
           meshData3D.meshFile,
-          [0, 0, this.babylonScene.twoDimMeshesPlane],
-          [10, 10, 10],
-          [0, 0, 0]
+          [0, 0, this.babylonScene.threeDimMeshesZCoord],
+          meshData3D.initScale,
+          meshData3D.initRotation
         );
       }
     }

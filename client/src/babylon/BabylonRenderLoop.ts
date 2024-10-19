@@ -224,14 +224,14 @@ class BabylonRenderLoop {
         this.faceLandmarks.setTimedOut(false);
       }
       this.faceLandmarks.update(multiFaceLandmarks);
-      this.updateMeshPositions();
+      this.updateMeshPositionsScaleRotation();
     } else {
       if (!detectionTimedOut) {
         if (this.faceLandmarks.getTimeoutTimer() === undefined) {
           this.faceLandmarks.startTimeout();
         }
       } else {
-        this.updateMeshPositions();
+        this.updateMeshPositionsScaleRotation();
         this.faceLandmarks.update(multiFaceLandmarks);
       }
     }
@@ -243,7 +243,6 @@ class BabylonRenderLoop {
     }
 
     // Set the dimensions of the offscreen canvas to a lower resolution
-    const scaleFactor = 0.25; // Scale down to 25% of the original size
     this.offscreenCanvas.width = 256;
     this.offscreenCanvas.height = 256;
 
@@ -417,7 +416,7 @@ class BabylonRenderLoop {
     }
   };
 
-  private screenSpaceToSceenSpace = (
+  private positionsScreenSpaceToSceneSpace = (
     mesh: AbstractMesh,
     position: [number, number]
   ) => {
@@ -437,7 +436,23 @@ class BabylonRenderLoop {
     ];
   };
 
-  private updateMeshPositions = () => {
+  private scaleScreenSpaceToSceneSpace = (
+    mesh: AbstractMesh,
+    scale: number
+  ) => {
+    const zPosition = mesh.position.z; // distance from camera
+    const cameraFOV = this.camera.fov; // FOV in radians
+    const aspectRatio = this.canvas.width / this.canvas.height;
+
+    // Calculate the vertical and horizontal extents at the current zPosition
+    const verticalExtent = Math.tan(cameraFOV / 2) * (Math.abs(zPosition) + 1);
+    const horizontalExtent = verticalExtent * aspectRatio;
+
+    // Convert normalized screen coordinates to world coordinates
+    return scale * Math.max(verticalExtent, horizontalExtent);
+  };
+
+  private updateMeshPositionsScaleRotation = () => {
     if (!this.faceLandmarks) {
       return;
     }
@@ -452,7 +467,7 @@ class BabylonRenderLoop {
         const meshMetadata = mesh.metadata;
         if (meshMetadata && meshMetadata.faceId === faceId) {
           if (meshMetadata.defaultMeshPlacement === "forehead") {
-            const foreheadPosition = this.screenSpaceToSceenSpace(
+            const foreheadPosition = this.positionsScreenSpaceToSceneSpace(
               mesh,
               calculatedLandmarks.foreheadPositions[faceId]
             );
@@ -469,12 +484,22 @@ class BabylonRenderLoop {
             );
 
             mesh.rotation = new Vector3(
-              calculatedLandmarks.headPitchAngles[faceId] * -1,
+              calculatedLandmarks.headPitchAngles[faceId],
               calculatedLandmarks.headYawAngles[faceId],
-              calculatedLandmarks.headRotationAngles[faceId] * -1
+              calculatedLandmarks.headRotationAngles[faceId]
+            );
+
+            const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+              mesh,
+              calculatedLandmarks.interocularDistances[faceId]
+            );
+            mesh.scaling = new Vector3(
+              mesh.metadata.initScale[0] * interocularDistance,
+              mesh.metadata.initScale[1] * interocularDistance,
+              mesh.metadata.initScale[2] * interocularDistance
             );
           } else if (meshMetadata.defaultMeshPlacement === "nose") {
-            const nosePosition = this.screenSpaceToSceenSpace(
+            const nosePosition = this.positionsScreenSpaceToSceneSpace(
               mesh,
               calculatedLandmarks.nosePositions[faceId]
             );
@@ -489,8 +514,24 @@ class BabylonRenderLoop {
               nosePosition[1],
               nosePosition[2]
             );
+
+            mesh.rotation = new Vector3(
+              calculatedLandmarks.headPitchAngles[faceId],
+              calculatedLandmarks.headYawAngles[faceId],
+              calculatedLandmarks.headRotationAngles[faceId]
+            );
+
+            const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+              mesh,
+              calculatedLandmarks.interocularDistances[faceId]
+            );
+            mesh.scaling = new Vector3(
+              mesh.metadata.initScale[0] * interocularDistance,
+              mesh.metadata.initScale[1] * interocularDistance,
+              mesh.metadata.initScale[2] * interocularDistance
+            );
           } else if (meshMetadata.defaultMeshPlacement === "chin") {
-            const chinPosition = this.screenSpaceToSceenSpace(
+            const chinPosition = this.positionsScreenSpaceToSceneSpace(
               mesh,
               calculatedLandmarks.chinPositions[faceId]
             );
@@ -505,8 +546,24 @@ class BabylonRenderLoop {
               chinPosition[1],
               chinPosition[2]
             );
+
+            mesh.rotation = new Vector3(
+              calculatedLandmarks.headPitchAngles[faceId],
+              calculatedLandmarks.headYawAngles[faceId],
+              calculatedLandmarks.headRotationAngles[faceId]
+            );
+
+            const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+              mesh,
+              calculatedLandmarks.interocularDistances[faceId]
+            );
+            mesh.scaling = new Vector3(
+              mesh.metadata.initScale[0] * interocularDistance,
+              mesh.metadata.initScale[1] * interocularDistance,
+              mesh.metadata.initScale[2] * interocularDistance
+            );
           } else if (meshMetadata.defaultMeshPlacement === "eyesCenter") {
-            const eyesCenterPosition = this.screenSpaceToSceenSpace(
+            const eyesCenterPosition = this.positionsScreenSpaceToSceneSpace(
               mesh,
               calculatedLandmarks.eyesCenterPositions[faceId]
             );
@@ -520,6 +577,22 @@ class BabylonRenderLoop {
               eyesCenterPosition[0],
               eyesCenterPosition[1],
               eyesCenterPosition[2]
+            );
+
+            mesh.rotation = new Vector3(
+              calculatedLandmarks.headPitchAngles[faceId],
+              calculatedLandmarks.headYawAngles[faceId],
+              calculatedLandmarks.headRotationAngles[faceId]
+            );
+
+            const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+              mesh,
+              calculatedLandmarks.interocularDistances[faceId]
+            );
+            mesh.scaling = new Vector3(
+              mesh.metadata.initScale[0] * interocularDistance,
+              mesh.metadata.initScale[1] * interocularDistance,
+              mesh.metadata.initScale[2] * interocularDistance
             );
           }
         }

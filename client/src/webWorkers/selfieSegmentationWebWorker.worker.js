@@ -20,8 +20,7 @@ class SelfieSegmentationWebWorker {
         // Define options for the ImageSegmenter
         const options = {
           baseOptions: {
-            modelAssetPath: "/selfie_segmenter.tflite",
-            delegate: "CPU",
+            modelAssetPath: "/tasks-vision/selfie_segmenter.tflite",
           },
           runningMode: "IMAGE",
           outputCategoryMask: false,

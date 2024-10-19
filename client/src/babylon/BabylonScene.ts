@@ -55,8 +55,8 @@ class BabylonScene {
 
   babylonRenderLoop: BabylonRenderLoop;
 
-  twoDimMeshesPlane = 90;
-  threeDimMeshesPlane = 100;
+  twoDimMeshesZCoord = 90;
+  threeDimMeshesZCoord = 100;
 
   constructor(
     private id: string,
@@ -211,11 +211,6 @@ class BabylonScene {
 
     this.hideBackgroundTexture.hasAlpha = true;
 
-    this.hideBackgroundPlane = MeshBuilder.CreatePlane(
-      "hideBackgroundPlane",
-      { width: 1, height: 1 },
-      this.scene
-    );
     this.hideBackgroundMaterial = new StandardMaterial(
       "hideBackgroundMaterial",
       this.scene
@@ -225,9 +220,29 @@ class BabylonScene {
     this.hideBackgroundMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND; // Set transparency mode to alpha test
 
     this.hideBackgroundMaterial.diffuseTexture = this.hideBackgroundTexture;
+  };
+
+  private createHideBackgroundPlane = () => {
+    if (!this.hideBackgroundMaterial) {
+      return;
+    }
+
+    this.hideBackgroundPlane = MeshBuilder.CreatePlane(
+      "hideBackgroundPlane",
+      { width: 1, height: 1 },
+      this.scene
+    );
+
     this.hideBackgroundPlane.material = this.hideBackgroundMaterial;
 
     this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.01);
+  };
+
+  private deleteHideBackgroundPlane = () => {
+    if (this.hideBackgroundPlane) {
+      this.hideBackgroundPlane.dispose();
+      this.hideBackgroundPlane = undefined;
+    }
   };
 
   private updateTintPlaneSize = () => {
@@ -259,18 +274,29 @@ class BabylonScene {
     type: MeshTypes,
     meshLabel: string,
     meshName: string,
-    deafultMeshPlacement: string,
+    defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
     position?: [number, number, number],
     scale?: [number, number, number],
     rotation?: [number, number, number]
   ) => {
+    console.log(
+      type,
+      meshLabel,
+      meshName,
+      defaultMeshPlacement,
+      meshPath,
+      meshFile,
+      position,
+      scale,
+      rotation
+    );
     this.babylonMeshes.loader(
       type,
       meshLabel,
       meshName,
-      deafultMeshPlacement,
+      defaultMeshPlacement,
       meshPath,
       meshFile,
       undefined,
@@ -328,6 +354,14 @@ class BabylonScene {
       }
     } else {
       this.babylonMeshes.deleteMesh(meshes);
+    }
+  };
+
+  toggleHideBackgroundPlane = (active: boolean) => {
+    if (active && !this.hideBackgroundPlane) {
+      this.createHideBackgroundPlane();
+    } else if (!active && this.hideBackgroundPlane) {
+      this.deleteHideBackgroundPlane();
     }
   };
 

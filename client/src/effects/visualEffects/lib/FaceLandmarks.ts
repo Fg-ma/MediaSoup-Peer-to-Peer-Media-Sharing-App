@@ -222,15 +222,15 @@ class FaceLandmarks {
     rightNoseBase: NormalizedLandmark
   ) => {
     // Calculate the difference in coordinated of eyes
-    const dxEyes = -1 * (rightEye.x - leftEye.x);
+    const dxEyes = leftEye.x - rightEye.x;
     const dyEyes = rightEye.y - leftEye.y;
-    const dzEyes = -1 * (rightEye.z - leftEye.z);
+    const dzEyes = leftEye.z - rightEye.z;
 
     // Calculate head angle z axis
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headRotationAngles",
       faceId,
-      -Math.atan2(dyEyes, dxEyes)
+      Math.atan2(dyEyes, dxEyes)
     );
 
     // Calculate head angle y axis
@@ -246,18 +246,11 @@ class FaceLandmarks {
       noseBridge.y - (leftNoseBase.y + rightNoseBase.y) / 2
     );
 
-    let pitchAngle;
-    if (depthDistance < 0) {
-      pitchAngle = Math.atan2(-depthDistance, verticalDistance);
-    } else {
-      pitchAngle = -Math.atan2(depthDistance, verticalDistance);
-    }
-
     // Calculate head angle x axis
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headPitchAngles",
       faceId,
-      pitchAngle
+      Math.atan2(depthDistance, verticalDistance)
     );
 
     return [dxEyes, dyEyes, dzEyes];

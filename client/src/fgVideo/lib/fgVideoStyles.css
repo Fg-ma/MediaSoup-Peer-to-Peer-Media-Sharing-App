@@ -44,7 +44,6 @@
   transform: scaleX(1);
 }
 
-/* .video-container.paused .controls-gradient, */
 .video-container {
   --timeline-background-color: rgba(150, 150, 150, 0.5);
   --timeline-primary-background-color: #f56114;
