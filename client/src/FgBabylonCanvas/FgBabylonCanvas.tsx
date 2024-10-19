@@ -423,7 +423,7 @@ export default function FgBabylonCanvas({
         fgVideoOptions.autoPlay ? "" : "paused"
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md h-[${
         userMedia.current.camera[videoId].canvas.height
-      }px] w-[${userMedia.current.camera[videoId].canvas.width}px]`}
+      }px] w-[${userMedia.current.camera[videoId].canvas.width - 500}px]`}
       onMouseEnter={() => controls.handleMouseEnter()}
       onMouseLeave={() => controls.handleMouseLeave()}
     >

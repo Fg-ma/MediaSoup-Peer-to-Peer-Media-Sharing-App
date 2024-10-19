@@ -15,15 +15,12 @@ class SelfieSegmentationWebWorker {
 
       try {
         // Load the vision tasks WASM files
-        const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
-        );
+        const vision = await FilesetResolver.forVisionTasks("/tasks-vision");
 
         // Define options for the ImageSegmenter
         const options = {
           baseOptions: {
-            modelAssetPath:
-              "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite",
+            modelAssetPath: "/selfie_segmenter.tflite",
             delegate: "CPU",
           },
           runningMode: "IMAGE",

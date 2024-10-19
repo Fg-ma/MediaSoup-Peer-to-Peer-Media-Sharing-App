@@ -5,21 +5,20 @@ import {
   Vector3,
   StandardMaterial,
   DynamicTexture,
-  Material,
 } from "@babylonjs/core";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   EffectStylesType,
   HideBackgroundEffectTypes,
-} from "src/context/CurrentEffectsStylesContext";
+} from "../context/CurrentEffectsStylesContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "src/context/StreamsContext";
-import FaceLandmarks from "src/effects/visualEffects/lib/FaceLandmarks";
-import { hideBackgroundEffectImagesMap } from "../lib/CameraMedia";
+} from "../context/StreamsContext";
+import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import UserDevice from "../UserDevice";
+import { hideBackgroundEffectImagesMap } from "./meshes";
 
 class BabylonRenderLoop {
   private FACE_MESH_DETECTION_INTERVAL: number;
@@ -85,7 +84,7 @@ class BabylonRenderLoop {
       alpha: true,
     });
 
-    this.tempHideBackgroundCanvas = new OffscreenCanvas(160, 120);
+    this.tempHideBackgroundCanvas = new OffscreenCanvas(256, 256);
     this.tempHideBackgroundCtx = this.tempHideBackgroundCanvas.getContext(
       "2d",
       { alpha: true }
@@ -245,8 +244,8 @@ class BabylonRenderLoop {
 
     // Set the dimensions of the offscreen canvas to a lower resolution
     const scaleFactor = 0.25; // Scale down to 25% of the original size
-    this.offscreenCanvas.width = this.video.videoWidth * scaleFactor;
-    this.offscreenCanvas.height = this.video.videoHeight * scaleFactor;
+    this.offscreenCanvas.width = 256;
+    this.offscreenCanvas.height = 256;
 
     // Clear the offscreen canvas before drawing
     this.offscreenContext.clearRect(
@@ -467,6 +466,12 @@ class BabylonRenderLoop {
               foreheadPosition[0],
               foreheadPosition[1],
               foreheadPosition[2]
+            );
+
+            mesh.rotation = new Vector3(
+              calculatedLandmarks.headPitchAngles[faceId] * -1,
+              calculatedLandmarks.headYawAngles[faceId],
+              calculatedLandmarks.headRotationAngles[faceId] * -1
             );
           } else if (meshMetadata.defaultMeshPlacement === "nose") {
             const nosePosition = this.screenSpaceToSceenSpace(

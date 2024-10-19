@@ -10,7 +10,6 @@ import baseVertexShaderSource from "./baseVertexShader";
 import Atlas from "./Atlas";
 import videoPaused from "../../../../public/2DAssets/videoPaused.png";
 import videoPausedFlipped from "../../../../public/2DAssets/videoPausedFlipped.png";
-import { assetData } from "../../../lib/CameraMedia";
 import {
   BeardsEffectTypes,
   GlassesEffectTypes,
@@ -20,6 +19,7 @@ import {
   PetsEffectTypes,
 } from "../../../context/CurrentEffectsStylesContext";
 import MaterialAtlas from "./MaterialAtlas";
+import { assetData } from "../../../babylon/meshes";
 
 export interface MeshJSON {
   vertex_faces: number[];

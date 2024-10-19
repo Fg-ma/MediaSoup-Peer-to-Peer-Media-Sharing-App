@@ -81,7 +81,9 @@ class BabylonScene {
     private userDevice: UserDevice
   ) {
     this.engine = new Engine(this.canvas, true);
+
     this.scene = new Scene(this.engine);
+
     this.camera = new UniversalCamera(
       "camera",
       new Vector3(0, 0, -1),

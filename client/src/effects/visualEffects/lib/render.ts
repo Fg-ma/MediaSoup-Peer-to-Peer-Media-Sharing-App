@@ -16,7 +16,7 @@ import {
 import BaseShader from "./BaseShader";
 import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
 import UserDevice from "../../../UserDevice";
-import { hideBackgroundEffectImagesMap } from "../../../lib/CameraMedia";
+import { hideBackgroundEffectImagesMap } from "../../../babylon/meshes";
 
 class Render {
   private MAX_FRAME_PROCESSING_TIME: number;
