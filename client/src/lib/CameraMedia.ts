@@ -14,6 +14,8 @@ import UserDevice from "../UserDevice";
 import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
 import BabylonScene from "../babylon/BabylonScene";
 import assetMeshes from "../babylon/meshes";
+import { MeshTypes } from "src/babylon/BabylonMeshes";
+import { AbstractMesh } from "@babylonjs/core";
 
 class CameraMedia {
   canvas: HTMLCanvasElement;
@@ -42,6 +44,8 @@ class CameraMedia {
     hats: "",
     pets: "",
   };
+
+  private maxFaces = Infinity;
 
   babylonScene: BabylonScene;
 
@@ -117,7 +121,10 @@ class CameraMedia {
       switch (event.data.message) {
         case "FACES_DETECTED":
           this.faceDetectionProcessing[0] = false;
-          if (event.data.numFacesDetected) {
+          const detectedFaces = event.data.numFacesDetected;
+          if (detectedFaces !== this.maxFaces) {
+            this.maxFaces = detectedFaces;
+
             this.faceMeshWorker.postMessage({
               message: "CHANGE_MAX_FACES",
               newMaxFace: event.data.numFacesDetected,
@@ -180,6 +187,49 @@ class CameraMedia {
       this.video.play();
     };
   }
+
+  private checkMeshesExistence = () => {
+    if (!this.faceLandmarks) {
+      return;
+    }
+
+    const faceIds: string[] = [];
+    for (const {
+      faceId,
+      landmarks,
+    } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
+      faceIds.push(faceId);
+
+      const meshes: { [effect: string]: AbstractMesh } = {};
+      for (const mesh of this.babylonScene.scene.meshes) {
+        if (mesh.metadata && mesh.metadata.faceId === faceId) {
+          meshes[mesh.metadata.effectType] = mesh;
+        }
+      }
+      for (const effect of Object.keys(this.effects)) {
+        if (
+          this.effects[effect as CameraEffectTypes] &&
+          !Object.keys(meshes).includes(effect)
+        ) {
+          this.drawNewEffect(effect as CameraEffectTypes);
+        }
+      }
+    }
+
+    // console.log(this.faceLandmarks.getFaceIdLandmarksPairs());
+    for (const mesh of this.babylonScene.scene.meshes) {
+      if (
+        mesh.metadata &&
+        mesh.metadata.faceId &&
+        !faceIds.includes(mesh.metadata.faceId)
+      ) {
+        this.babylonScene.deleteMesh(
+          mesh.metadata.meshType,
+          mesh.metadata.meshLabel
+        );
+      }
+    }
+  };
 
   deconstructor() {
     // End initial stream
@@ -245,12 +295,16 @@ class CameraMedia {
 
   drawNewEffect = (effect: CameraEffectTypes) => {
     const currentStyle =
-      this.currentEffectsStyles.current.camera[this.cameraId][effect];
+      this.currentEffectsStyles.current.camera?.[this.cameraId]?.[effect];
 
     // @ts-ignore
     const lastMesh: string = this.lastMeshes[effect];
 
-    if (currentStyle.style === "" || !(effect in assetMeshes)) {
+    if (
+      !currentStyle ||
+      currentStyle.style === "" ||
+      !(effect in assetMeshes)
+    ) {
       return;
     }
 
@@ -275,8 +329,7 @@ class CameraMedia {
 
     if (this.effects[effect]) {
       if (!currentStyle.threeDim) {
-        console.log("wokr", this.babylonScene);
-        this.babylonScene.createEffectMesh(
+        this.babylonScene.createEffectMeshes(
           "2D",
           meshData2D.meshLabel,
           "",
@@ -284,13 +337,14 @@ class CameraMedia {
           assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
           meshData2D.meshPath,
           meshData2D.meshFile,
+          effect,
           [0, 0, this.babylonScene.twoDimMeshesZCoord],
           meshData2D.initScale,
           meshData2D.initRotation
         );
       }
       if (currentStyle.threeDim) {
-        this.babylonScene.createEffectMesh(
+        this.babylonScene.createEffectMeshes(
           meshData3D.meshType,
           meshData3D.meshLabel,
           "",
@@ -298,6 +352,7 @@ class CameraMedia {
           assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
           meshData3D.meshPath,
           meshData3D.meshFile,
+          effect,
           [0, 0, this.babylonScene.threeDimMeshesZCoord],
           meshData3D.initScale,
           meshData3D.initRotation

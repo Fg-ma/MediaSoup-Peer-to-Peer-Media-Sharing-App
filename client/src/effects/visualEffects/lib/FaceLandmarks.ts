@@ -110,13 +110,13 @@ class FaceLandmarks {
   RIGHT_NOSE_BASE_INDEX = 439;
   FOREHEAD_INDEX = 10;
 
+  private smoothLandmarksUtils: SmoothLandmarksUtils;
+
   // Face tracking
   private faceTrackers: {
     [id: string]: { position: Point2D; lastSeen: number };
   } = {};
-  private maxFaceTrackerAge = 5;
-
-  private smoothLandmarksUtils: SmoothLandmarksUtils;
+  private maxFaceTrackerAge = 20;
 
   constructor(
     private id: string,
@@ -130,7 +130,7 @@ class FaceLandmarks {
     );
   }
 
-  private generateUniqueFaceId = (existingIds: Set<string>, baseId: number) => {
+  generateUniqueFaceId = (existingIds: Set<string>, baseId: number) => {
     let newId = baseId.toString();
     while (existingIds.has(newId)) {
       baseId++;
@@ -139,9 +139,7 @@ class FaceLandmarks {
     return newId;
   };
 
-  private applyFaceTracker = (
-    multiFaceLandmarks: NormalizedLandmarkListList
-  ) => {
+  applyFaceTracker = (multiFaceLandmarks: NormalizedLandmarkListList) => {
     const faceIdLandmarksPairs: {
       faceId: string;
       landmarks: NormalizedLandmarkList;
@@ -408,6 +406,7 @@ class FaceLandmarks {
   };
 
   getFaceIdLandmarksPairs = () => {
+    console.log(this.faceIdLandmarksPairs);
     return this.faceIdLandmarksPairs;
   };
 

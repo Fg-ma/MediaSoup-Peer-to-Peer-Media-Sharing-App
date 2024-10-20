@@ -18,7 +18,8 @@ class MeshLoaders {
     defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
-    faceId?: string
+    faceId?: string,
+    effectType?: string
   ) => {
     return new Promise<AbstractMesh[]>((resolve, reject) => {
       // Load the GLTF file
@@ -51,6 +52,7 @@ class MeshLoaders {
               meshType: "gltf",
               defaultMeshPlacement,
               faceId,
+              effectType,
             };
 
             // Set each loaded mesh as a child of the parent
@@ -80,16 +82,9 @@ class MeshLoaders {
     defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
-    faceId?: string
+    faceId?: string,
+    effectType?: string
   ) => {
-    console.log(
-      meshLabel,
-      meshName,
-      defaultMeshPlacement,
-      meshPath,
-      meshFile,
-      faceId
-    );
     return new Promise<AbstractMesh>((resolve) => {
       // Create a plane for the 2D texture
       const plane = MeshBuilder.CreatePlane(
@@ -104,6 +99,7 @@ class MeshLoaders {
         meshType: "2D",
         defaultMeshPlacement,
         faceId,
+        effectType,
       };
 
       // Create the material with alpha

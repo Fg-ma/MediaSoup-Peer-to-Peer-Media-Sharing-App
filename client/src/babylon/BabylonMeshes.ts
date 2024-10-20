@@ -552,6 +552,7 @@ class BabylonMeshes {
     meshPath: string,
     meshFile: string,
     faceId?: string,
+    effectType?: string,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
     initRotation?: [number, number, number]
@@ -580,7 +581,8 @@ class BabylonMeshes {
         defaultMeshPlacement,
         meshPath,
         meshFile,
-        faceId
+        faceId,
+        effectType
       );
       newMesh[0].metadata.initScale = initScale;
       this.meshes["3D"][meshLabel] = newMesh;
@@ -600,18 +602,6 @@ class BabylonMeshes {
         console.error(`Mesh ${meshName} not found after loading.`);
       }
     }
-    console.log(
-      type,
-      meshLabel,
-      meshName,
-      defaultMeshPlacement,
-      meshPath,
-      meshFile,
-      faceId,
-      initPosition,
-      initScale,
-      initRotation
-    );
     if (type === "2D") {
       const newMesh = await this.meshLoaders.load2D(
         meshLabel,
@@ -619,7 +609,8 @@ class BabylonMeshes {
         defaultMeshPlacement,
         meshPath,
         meshFile,
-        faceId
+        faceId,
+        effectType
       );
       newMesh.metadata.initScale = initScale;
       this.meshes["2D"][meshLabel] = newMesh;

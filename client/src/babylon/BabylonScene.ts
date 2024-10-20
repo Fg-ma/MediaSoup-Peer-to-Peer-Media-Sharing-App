@@ -30,7 +30,7 @@ import UserDevice from "src/UserDevice";
 
 class BabylonScene {
   private engine: Engine;
-  private scene: Scene;
+  scene: Scene;
   private camera: UniversalCamera;
   private light: HemisphericLight | undefined;
 
@@ -64,10 +64,7 @@ class BabylonScene {
     private video: HTMLVideoElement,
     private faceLandmarks: FaceLandmarks | undefined,
     private effects: {
-      [effectType in
-        | CameraEffectTypes
-        | ScreenEffectTypes
-        | AudioEffectTypes]?: boolean | undefined;
+      [effectType in CameraEffectTypes]?: boolean | undefined;
     },
     private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     private faceMeshWorker: Worker | undefined,
@@ -281,17 +278,6 @@ class BabylonScene {
     scale?: [number, number, number],
     rotation?: [number, number, number]
   ) => {
-    console.log(
-      type,
-      meshLabel,
-      meshName,
-      defaultMeshPlacement,
-      meshPath,
-      meshFile,
-      position,
-      scale,
-      rotation
-    );
     this.babylonMeshes.loader(
       type,
       meshLabel,
@@ -300,31 +286,48 @@ class BabylonScene {
       meshPath,
       meshFile,
       undefined,
+      undefined,
       position,
       scale,
       rotation
     );
   };
 
-  createEffectMesh = (
+  createEffectMeshes = (
     type: MeshTypes,
     meshLabel: string,
     meshName: string,
     defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
-    position?: [number, number, number],
-    scale?: [number, number, number],
-    rotation?: [number, number, number]
+    effectType?: string,
+    initPosition?: [number, number, number],
+    initScale?: [number, number, number],
+    initRotation?: [number, number, number]
   ) => {
     if (!this.faceLandmarks) {
       return;
     }
 
-    for (const {
-      faceId,
-      landmarks,
-    } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
+    const faceIdLandmarksPairs = this.faceLandmarks.getFaceIdLandmarksPairs();
+
+    if (faceIdLandmarksPairs.length > 0) {
+      for (const { faceId, landmarks } of faceIdLandmarksPairs) {
+        this.babylonMeshes.loader(
+          type,
+          meshLabel,
+          meshName,
+          defaultMeshPlacement,
+          meshPath,
+          meshFile,
+          faceId,
+          effectType,
+          initPosition,
+          initScale,
+          initRotation
+        );
+      }
+    } else {
       this.babylonMeshes.loader(
         type,
         meshLabel,
@@ -332,10 +335,11 @@ class BabylonScene {
         defaultMeshPlacement,
         meshPath,
         meshFile,
-        faceId,
-        position,
-        scale,
-        rotation
+        "0",
+        effectType,
+        initPosition,
+        initScale,
+        initRotation
       );
     }
   };

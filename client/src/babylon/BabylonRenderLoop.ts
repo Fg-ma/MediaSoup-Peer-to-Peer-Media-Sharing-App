@@ -18,7 +18,7 @@ import {
 } from "../context/StreamsContext";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import UserDevice from "../UserDevice";
-import { hideBackgroundEffectImagesMap } from "./meshes";
+import assetMeshes, { hideBackgroundEffectImagesMap } from "./meshes";
 
 class BabylonRenderLoop {
   private FACE_MESH_DETECTION_INTERVAL: number;
@@ -48,10 +48,7 @@ class BabylonRenderLoop {
     private canvas: HTMLCanvasElement,
     private video: HTMLVideoElement,
     private effects: {
-      [effectType in
-        | CameraEffectTypes
-        | ScreenEffectTypes
-        | AudioEffectTypes]?: boolean | undefined;
+      [effectType in CameraEffectTypes]?: boolean | undefined;
     },
     private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     private faceMeshWorker: Worker | undefined,
@@ -192,7 +189,7 @@ class BabylonRenderLoop {
         });
       }
       if (
-        performance.now() - this.lastFaceCountCheck > 2000 &&
+        performance.now() - this.lastFaceCountCheck > 4000 &&
         this.faceDetectionProcessing &&
         !this.faceDetectionProcessing[0] &&
         this.faceDetectionWorker
