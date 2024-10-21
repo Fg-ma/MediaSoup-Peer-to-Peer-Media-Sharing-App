@@ -469,15 +469,33 @@ class BabylonRenderLoop {
 
     const calculatedLandmarks = this.faceLandmarks.getCalculatedLandmarks();
 
-    const usedTrackers: string[] = [];
+    const usedTrackers: {
+      beards: string[];
+      glasses: string[];
+      hats: string[];
+      masks: string[];
+      mustaches: string[];
+      pets: string[];
+    } = {
+      beards: [],
+      glasses: [],
+      hats: [],
+      masks: [],
+      mustaches: [],
+      pets: [],
+    };
 
     for (const mesh of this.scene.meshes) {
       const meshMetadata = mesh.metadata;
-      if (meshMetadata && meshMetadata.faceId) {
-        const meshPosition = this.sceneSpaceToPositionsScreenSpace(mesh);
-        let closestTrackerId: string | null = null;
-        let closestDistance = Infinity;
 
+      if (
+        meshMetadata &&
+        meshMetadata?.faceId !== undefined &&
+        meshMetadata?.effectType
+      ) {
+        const meshPosition = this.sceneSpaceToPositionsScreenSpace(mesh);
+        let closestTrackerId: number | null = null;
+        let closestDistance = Infinity;
         for (const {
           faceId,
           landmarks,
@@ -488,17 +506,22 @@ class BabylonRenderLoop {
             Math.pow(nosePosition.x - meshPosition[0], 2) +
               Math.pow(nosePosition.y - meshPosition[1], 2)
           );
-          if (!usedTrackers.includes(faceId) && distance < closestDistance) {
+          if (
+            // @ts-ignore
+            !usedTrackers[meshMetadata.effectType].includes(faceId) &&
+            distance < closestDistance
+          ) {
             closestDistance = distance;
             closestTrackerId = faceId;
           }
         }
 
-        if (!closestTrackerId) {
+        if (closestTrackerId === null) {
           continue;
         }
 
-        usedTrackers.push(closestTrackerId);
+        // @ts-ignore
+        usedTrackers[meshMetadata.effectType].push(closestTrackerId);
 
         if (meshMetadata.defaultMeshPlacement === "forehead") {
           const foreheadPosition = this.positionsScreenSpaceToSceneSpace(

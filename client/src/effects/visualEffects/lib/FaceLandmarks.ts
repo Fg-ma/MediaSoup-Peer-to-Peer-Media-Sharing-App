@@ -66,7 +66,7 @@ export interface CalculatedLandmarkInterface {
 
 class FaceLandmarks {
   private faceIdLandmarksPairs: {
-    faceId: string;
+    faceId: number;
     landmarks: NormalizedLandmarkList;
   }[] = [];
 
@@ -113,10 +113,7 @@ class FaceLandmarks {
   private smoothLandmarksUtils: SmoothLandmarksUtils;
 
   // Face tracking
-  private faceTrackers: {
-    [id: string]: { position: Point2D; lastSeen: number };
-  } = {};
-  private maxFaceTrackerAge = 20;
+  private faceTrackers: Point2D[] = [{ x: 0, y: 0 }];
 
   constructor(
     private id: string,
@@ -130,25 +127,18 @@ class FaceLandmarks {
     );
   }
 
-  generateUniqueFaceId = (existingIds: Set<string>, baseId: number) => {
-    let newId = baseId.toString();
-    while (existingIds.has(newId)) {
-      baseId++;
-      newId = baseId.toString();
-    }
-    return newId;
+  addTracker = () => {
+    this.faceTrackers.push({ x: 0, y: 0 });
   };
 
   applyFaceTracker = (multiFaceLandmarks: NormalizedLandmarkListList) => {
     const faceIdLandmarksPairs: {
-      faceId: string;
+      faceId: number;
       landmarks: NormalizedLandmarkList;
     }[] = [];
-    const newFaceTrackers: {
-      [id: string]: { position: Point2D; lastSeen: number };
-    } = {};
 
-    const existingIds = new Set(Object.keys(this.faceTrackers));
+    const disconnectedFaces: number[] = [];
+    const foundFaces: number[] = [];
 
     multiFaceLandmarks.forEach((landmarks, faceIndex) => {
       if (!landmarks[1]) {
@@ -156,50 +146,65 @@ class FaceLandmarks {
       }
       const nosePosition = { x: landmarks[1].x, y: landmarks[1].y };
 
-      let closestTrackerId: string | null = null;
+      let closestTrackerIndex: number | null = null;
       let closestDistance = Infinity;
 
-      for (const [id, tracker] of Object.entries(this.faceTrackers)) {
+      for (const tracker of this.faceTrackers) {
         const distance = Math.sqrt(
-          Math.pow(nosePosition.x - tracker.position.x, 2) +
-            Math.pow(nosePosition.y - tracker.position.y, 2)
+          Math.pow(nosePosition.x - tracker.x, 2) +
+            Math.pow(nosePosition.y - tracker.y, 2)
         );
         if (distance < closestDistance) {
           closestDistance = distance;
-          closestTrackerId = id;
+          closestTrackerIndex = this.faceTrackers.indexOf(tracker);
         }
       }
 
-      let faceId: string;
-      if (closestDistance < 0.075 && closestTrackerId) {
-        faceId = closestTrackerId;
+      if (closestDistance < 0.075 && closestTrackerIndex) {
+        foundFaces.push(closestTrackerIndex);
+
+        faceIdLandmarksPairs.push({ faceId: closestTrackerIndex, landmarks });
       } else {
-        faceId = this.generateUniqueFaceId(existingIds, faceIndex);
-        existingIds.add(faceId);
+        disconnectedFaces.push(faceIndex);
       }
-      newFaceTrackers[faceId] = {
-        position: nosePosition as Point2D,
-        lastSeen: 0,
-      };
+    });
+
+    // Second pass: Handle disconnected faces
+    disconnectedFaces.forEach((disconnectedFaceIndex) => {
+      const landmarks = multiFaceLandmarks[disconnectedFaceIndex];
+      const nosePosition = { x: landmarks[1].x, y: landmarks[1].y };
+
+      let closestUnclaimedTrackerIndex: number | null = null;
+      let closestDistance = Infinity;
+
+      // Find the closest unclaimed tracker (one that hasn't been assigned to foundFaces)
+      this.faceTrackers.forEach((tracker, trackerIndex) => {
+        if (!foundFaces.includes(this.faceTrackers.indexOf(tracker))) {
+          const distance = Math.sqrt(
+            Math.pow(nosePosition.x - tracker.x, 2) +
+              Math.pow(nosePosition.y - tracker.y, 2)
+          );
+
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestUnclaimedTrackerIndex = trackerIndex;
+          }
+        }
+      });
+
+      let faceId: number;
+      if (closestUnclaimedTrackerIndex !== null) {
+        // Assign the closest unclaimed tracker
+        faceId = closestUnclaimedTrackerIndex;
+        foundFaces.push(faceId);
+      } else {
+        // If no close unclaimed tracker is found, create a new tracker
+        this.addTracker();
+        faceId = this.faceTrackers.length - 1; // The new tracker index
+      }
 
       faceIdLandmarksPairs.push({ faceId, landmarks });
     });
-
-    // Clean up old face trackers
-    for (const [id, tracker] of Object.entries(this.faceTrackers)) {
-      if (!newFaceTrackers[id]) {
-        tracker.lastSeen++;
-        if (tracker.lastSeen > this.maxFaceTrackerAge) {
-          Object.keys(this.calculatedLandmarks).forEach((featureType) => {
-            const feature = featureType as LandmarkTypes;
-            delete this.calculatedLandmarks[feature][id];
-          });
-        } else {
-          newFaceTrackers[id] = tracker;
-        }
-      }
-    }
-    this.faceTrackers = newFaceTrackers;
 
     this.faceIdLandmarksPairs = faceIdLandmarksPairs;
   };
@@ -212,7 +217,7 @@ class FaceLandmarks {
   };
 
   private updateHeadRotations = (
-    faceId: string,
+    faceId: number,
     rightEye: NormalizedLandmark,
     leftEye: NormalizedLandmark,
     noseBridge: NormalizedLandmark,
@@ -255,7 +260,7 @@ class FaceLandmarks {
   };
 
   private updateEyes = (
-    faceId: string,
+    faceId: number,
     leftEye: NormalizedLandmark,
     rightEye: NormalizedLandmark,
     dxEyes: number,
@@ -281,7 +286,7 @@ class FaceLandmarks {
   };
 
   private updateChin = (
-    faceId: string,
+    faceId: number,
     effectsStyles: CameraEffectStylesType,
     chin: NormalizedLandmark
   ) => {
@@ -316,7 +321,7 @@ class FaceLandmarks {
   };
 
   private updateNose = (
-    faceId: string,
+    faceId: number,
     effectsStyles: CameraEffectStylesType,
     nose: NormalizedLandmark
   ) => {
@@ -350,7 +355,7 @@ class FaceLandmarks {
     }
   };
 
-  private updateForehead = (faceId: string, forehead: NormalizedLandmark) => {
+  private updateForehead = (faceId: number, forehead: NormalizedLandmark) => {
     this.smoothLandmarksUtils.smoothTwoDimVariables(
       "foreheadPositions",
       faceId,

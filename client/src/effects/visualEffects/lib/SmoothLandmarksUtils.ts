@@ -48,7 +48,7 @@ class SmoothLandmarksUtils {
 
   smoothOneDimVariables = (
     featureType: OneDimLandmarkTypes,
-    faceId: string,
+    faceId: number,
     value: number
   ) => {
     if (Array.isArray(this.calculatedLandmarks[featureType][faceId])) {
@@ -79,7 +79,7 @@ class SmoothLandmarksUtils {
 
   smoothTwoDimVariables = (
     featureType: TwoDimLandmarkTypes,
-    faceId: string,
+    faceId: number,
     value: [number, number]
   ) => {
     // Initialize smoothed width if not already initialized

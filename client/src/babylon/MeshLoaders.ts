@@ -18,7 +18,7 @@ class MeshLoaders {
     defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
-    faceId?: string,
+    faceId?: number,
     effectType?: string
   ) => {
     return new Promise<AbstractMesh[]>((resolve, reject) => {
@@ -82,7 +82,7 @@ class MeshLoaders {
     defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
-    faceId?: string,
+    faceId?: number,
     effectType?: string
   ) => {
     return new Promise<AbstractMesh>((resolve) => {

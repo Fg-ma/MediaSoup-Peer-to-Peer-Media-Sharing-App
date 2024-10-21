@@ -271,7 +271,7 @@ class BabylonScene {
     defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
-    faceId?: string,
+    faceId?: number,
     effectType?: string,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
@@ -314,7 +314,7 @@ class BabylonScene {
       for (const { faceId, landmarks } of faceIdLandmarksPairs) {
         this.babylonMeshes.loader(
           type,
-          meshLabel,
+          meshLabel + "." + Math.random().toString(),
           meshName,
           defaultMeshPlacement,
           meshPath,
@@ -334,7 +334,7 @@ class BabylonScene {
         defaultMeshPlacement,
         meshPath,
         meshFile,
-        "0",
+        0,
         effectType,
         initPosition,
         initScale,

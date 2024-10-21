@@ -119,7 +119,7 @@ class CameraMedia {
               newMaxFace: detectedFaces,
             });
 
-            this.checkMeshesExistence();
+            // this.checkMeshesExistence();
           }
           break;
         default:
@@ -295,7 +295,7 @@ class CameraMedia {
             assetMeshes[effect][currentEffectStyle.style].defaultMeshPlacement,
             meshData.meshPath,
             meshData.meshFile,
-            "42",
+            42,
             effect,
             [
               0,
@@ -413,7 +413,7 @@ class CameraMedia {
       if (!currentStyle.threeDim) {
         this.babylonScene.createEffectMeshes(
           "2D",
-          meshData2D.meshLabel + "." + Math.random().toString(),
+          meshData2D.meshLabel,
           "",
           // @ts-ignore
           assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
@@ -428,7 +428,7 @@ class CameraMedia {
       if (currentStyle.threeDim) {
         this.babylonScene.createEffectMeshes(
           meshData3D.meshType,
-          meshData3D.meshLabel + "." + Math.random().toString(),
+          meshData3D.meshLabel,
           "",
           // @ts-ignore
           assetMeshes[effect][currentStyle.style].defaultMeshPlacement,

@@ -8,8 +8,6 @@ import {
   Color3,
   PointerDragBehavior,
   KeyboardEventTypes,
-  PointerEventTypes,
-  UniversalCamera,
 } from "@babylonjs/core";
 import MeshLoaders from "./MeshLoaders";
 
@@ -561,7 +559,7 @@ class BabylonMeshes {
     defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
-    faceId?: string,
+    faceId?: number,
     effectType?: string,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
