@@ -586,13 +586,19 @@ class BabylonMeshes {
       const newMesh = await this.meshLoaders.loadGLTF(
         meshLabel,
         meshName,
-        defaultMeshPlacement,
         meshPath,
-        meshFile,
-        faceId,
-        effectType
+        meshFile
       );
-      newMesh[0].metadata.initScale = initScale;
+      newMesh[0].metadata = {
+        meshLabel,
+        isGizmoEnabled: false,
+        gizmoState: "none",
+        meshType: "gltf",
+        defaultMeshPlacement,
+        faceId,
+        effectType,
+        initScale,
+      };
       this.meshes["3D"][meshLabel] = newMesh;
 
       // Check if the mesh is loaded
@@ -613,14 +619,19 @@ class BabylonMeshes {
     if (type === "2D") {
       const newMesh = await this.meshLoaders.load2D(
         meshLabel,
-        meshName,
-        defaultMeshPlacement,
         meshPath,
-        meshFile,
-        faceId,
-        effectType
+        meshFile
       );
-      newMesh.metadata.initScale = initScale;
+      newMesh.metadata = {
+        meshLabel,
+        isGizmoEnabled: false,
+        gizmoState: "none",
+        meshType: "2D",
+        defaultMeshPlacement,
+        faceId,
+        effectType,
+        initScale,
+      };
       this.meshes["2D"][meshLabel] = newMesh;
 
       // Check if the mesh is loaded

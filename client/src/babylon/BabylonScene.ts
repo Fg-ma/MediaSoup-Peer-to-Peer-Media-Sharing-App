@@ -72,7 +72,8 @@ class BabylonScene {
     private selfieSegmentationWorker: Worker | undefined,
     private selfieSegmentationResults: ImageData[] | undefined,
     private selfieSegmentationProcessing: boolean[] | undefined,
-    private userDevice: UserDevice
+    private userDevice: UserDevice,
+    private maxFaces: [number]
   ) {
     this.engine = new Engine(this.canvas, true);
 
@@ -304,37 +305,15 @@ class BabylonScene {
     initScale?: [number, number, number],
     initRotation?: [number, number, number]
   ) => {
-    if (!this.faceLandmarks) {
-      return;
-    }
-
-    const faceIdLandmarksPairs = this.faceLandmarks.getFaceIdLandmarksPairs();
-
-    if (faceIdLandmarksPairs.length > 0) {
-      for (const { faceId, landmarks } of faceIdLandmarksPairs) {
-        this.babylonMeshes.loader(
-          type,
-          meshLabel + "." + Math.random().toString(),
-          meshName,
-          defaultMeshPlacement,
-          meshPath,
-          meshFile,
-          faceId,
-          effectType,
-          initPosition,
-          initScale,
-          initRotation
-        );
-      }
-    } else {
+    for (let i = 0; i < this.maxFaces[0]; i++) {
       this.babylonMeshes.loader(
         type,
-        meshLabel,
+        meshLabel + "." + i,
         meshName,
         defaultMeshPlacement,
         meshPath,
         meshFile,
-        0,
+        i,
         effectType,
         initPosition,
         initScale,

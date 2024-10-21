@@ -15,11 +15,8 @@ class MeshLoaders {
   loadGLTF = (
     meshLabel: string,
     meshName: string,
-    defaultMeshPlacement: string,
     meshPath: string,
-    meshFile: string,
-    faceId?: number,
-    effectType?: string
+    meshFile: string
   ) => {
     return new Promise<AbstractMesh[]>((resolve, reject) => {
       // Load the GLTF file
@@ -45,15 +42,6 @@ class MeshLoaders {
             );
             parentMesh.isVisible = false; // Optionally make the parent mesh invisible
             parentMesh.isPickable = false; // Prevent direct interaction with the parent
-            parentMesh.metadata = {
-              meshLabel,
-              isGizmoEnabled: false,
-              gizmoState: "none",
-              meshType: "gltf",
-              defaultMeshPlacement,
-              faceId,
-              effectType,
-            };
 
             // Set each loaded mesh as a child of the parent
             meshes.forEach((mesh) => {
@@ -76,34 +64,20 @@ class MeshLoaders {
     });
   };
 
-  load2D = async (
-    meshLabel: string,
-    meshName: string,
-    defaultMeshPlacement: string,
-    meshPath: string,
-    meshFile: string,
-    faceId?: number,
-    effectType?: string
-  ) => {
+  load2D = async (meshLabel: string, meshPath: string, meshFile: string) => {
     return new Promise<AbstractMesh>((resolve) => {
       // Create a plane for the 2D texture
       const plane = MeshBuilder.CreatePlane(
-        meshName,
+        meshLabel,
         { width: 1, height: 1 },
         this.scene
       );
-      plane.metadata = {
-        meshLabel,
-        isGizmoEnabled: false,
-        gizmoState: "none",
-        meshType: "2D",
-        defaultMeshPlacement,
-        faceId,
-        effectType,
-      };
 
       // Create the material with alpha
-      const material = new StandardMaterial(`${meshName}-material`, this.scene);
+      const material = new StandardMaterial(
+        `${meshLabel}-material`,
+        this.scene
+      );
 
       // Load the texture with transparency
       const texture = new Texture(`${meshPath}${meshFile}`, this.scene);

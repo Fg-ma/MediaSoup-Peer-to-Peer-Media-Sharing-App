@@ -34,7 +34,7 @@ class CameraMedia {
     [cameraEffect in CameraEffectTypes]?: boolean;
   };
 
-  private maxFaces = 1;
+  private maxFaces: [number] = [1];
 
   babylonScene: BabylonScene;
 
@@ -111,14 +111,14 @@ class CameraMedia {
         case "FACES_DETECTED":
           this.faceDetectionProcessing[0] = false;
           const detectedFaces = event.data.numFacesDetected;
-          if (detectedFaces !== this.maxFaces) {
-            this.maxFaces = detectedFaces;
+          if (detectedFaces !== this.maxFaces[0]) {
+            this.maxFaces[0] = detectedFaces;
 
             this.faceMeshWorker.postMessage({
               message: "CHANGE_MAX_FACES",
               newMaxFace: detectedFaces,
             });
-
+            console.log(this.maxFaces[0]);
             // this.checkMeshesExistence();
           }
           break;
@@ -168,7 +168,8 @@ class CameraMedia {
       this.selfieSegmentationWorker,
       this.selfieSegmentationResults,
       this.selfieSegmentationProcessing,
-      this.userDevice
+      this.userDevice,
+      this.maxFaces
     );
 
     this.video.srcObject = this.initCameraStream;
@@ -275,8 +276,8 @@ class CameraMedia {
         }
       }
 
-      if (count < this.maxFaces) {
-        for (let i = 0; i < this.maxFaces - count; i++) {
+      if (count < this.maxFaces[0]) {
+        for (let i = 0; i < this.maxFaces[0] - count; i++) {
           const currentEffectStyle =
             this.currentEffectsStyles.current.camera[this.cameraId][
               effect as CameraEffectTypes
@@ -308,8 +309,8 @@ class CameraMedia {
             meshData.initRotation
           );
         }
-      } else if (count > this.maxFaces) {
-        const deleteNum = count - this.maxFaces;
+      } else if (count > this.maxFaces[0]) {
+        const deleteNum = count - this.maxFaces[0];
         let deletedNum = 0;
 
         for (const mesh of this.babylonScene.scene.meshes) {
