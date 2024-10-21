@@ -19,14 +19,11 @@ import {
 import BabylonMeshes, { MeshTypes } from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import FaceLandmarks from "src/effects/visualEffects/lib/FaceLandmarks";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "src/context/StreamsContext";
+import { CameraEffectTypes } from "src/context/StreamsContext";
 import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import UserDevice from "src/UserDevice";
+import "@babylonjs/inspector";
 
 class BabylonScene {
   private engine: Engine;
@@ -51,7 +48,7 @@ class BabylonScene {
   private blurPostProcessX: BlurPostProcess | undefined;
   private blurPostProcessY: BlurPostProcess | undefined;
 
-  private babylonMeshes: BabylonMeshes;
+  babylonMeshes: BabylonMeshes;
 
   babylonRenderLoop: BabylonRenderLoop;
 
@@ -274,9 +271,11 @@ class BabylonScene {
     defaultMeshPlacement: string,
     meshPath: string,
     meshFile: string,
-    position?: [number, number, number],
-    scale?: [number, number, number],
-    rotation?: [number, number, number]
+    faceId?: string,
+    effectType?: string,
+    initPosition?: [number, number, number],
+    initScale?: [number, number, number],
+    initRotation?: [number, number, number]
   ) => {
     this.babylonMeshes.loader(
       type,
@@ -285,11 +284,11 @@ class BabylonScene {
       defaultMeshPlacement,
       meshPath,
       meshFile,
-      undefined,
-      undefined,
-      position,
-      scale,
-      rotation
+      faceId,
+      effectType,
+      initPosition,
+      initScale,
+      initRotation
     );
   };
 
@@ -358,6 +357,14 @@ class BabylonScene {
       }
     } else {
       this.babylonMeshes.deleteMesh(meshes);
+    }
+  };
+
+  deleteEffectMeshes = (effect: string) => {
+    for (const mesh of this.scene.meshes) {
+      if (mesh.metadata && mesh.metadata.effectType === effect) {
+        this.babylonMeshes.deleteMesh(mesh);
+      }
     }
   };
 

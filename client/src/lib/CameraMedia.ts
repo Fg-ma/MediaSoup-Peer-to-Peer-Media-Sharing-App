@@ -14,8 +14,6 @@ import UserDevice from "../UserDevice";
 import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
 import BabylonScene from "../babylon/BabylonScene";
 import assetMeshes from "../babylon/meshes";
-import { MeshTypes } from "src/babylon/BabylonMeshes";
-import { AbstractMesh } from "@babylonjs/core";
 
 class CameraMedia {
   canvas: HTMLCanvasElement;
@@ -36,16 +34,7 @@ class CameraMedia {
     [cameraEffect in CameraEffectTypes]?: boolean;
   };
 
-  private lastMeshes = {
-    glasses: "",
-    beards: "",
-    mustaches: "",
-    masks: "",
-    hats: "",
-    pets: "",
-  };
-
-  private maxFaces = Infinity;
+  private maxFaces = 1;
 
   babylonScene: BabylonScene;
 
@@ -127,8 +116,10 @@ class CameraMedia {
 
             this.faceMeshWorker.postMessage({
               message: "CHANGE_MAX_FACES",
-              newMaxFace: event.data.numFacesDetected,
+              newMaxFace: detectedFaces,
             });
+
+            this.checkMeshesExistence();
           }
           break;
         default:
@@ -192,41 +183,146 @@ class CameraMedia {
     if (!this.faceLandmarks) {
       return;
     }
+    this.faceLandmarks.getFaceIdLandmarksPairs();
+    const landmarksPairs = this.faceLandmarks.getFaceIdLandmarksPairs();
 
-    const faceIds: string[] = [];
-    for (const {
-      faceId,
-      landmarks,
-    } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
-      faceIds.push(faceId);
+    // if (this.maxFaces > landmarksPairs.length) {
+    //   for (const effect in this.effects) {
+    //     for (let i = 0; i < this.maxFaces - landmarksPairs.length; i++) {
+    //       const currentEffectStyle =
+    //         this.currentEffectsStyles.current.camera[this.cameraId][
+    //           effect as CameraEffectTypes
+    //         ];
+    //       const meshData =
+    //         // @ts-ignore
+    //         assetMeshes[effect][currentEffectStyle.style][
+    //           currentEffectStyle.threeDim ? "mesh" : "planeMesh"
+    //         ];
 
-      const meshes: { [effect: string]: AbstractMesh } = {};
+    //       this.babylonScene.createMesh(
+    //         meshData.meshType ?? "2D",
+    //         meshData.meshLabel + "." + Math.random().toString(),
+    //         "",
+    //         // @ts-ignore
+    //         assetMeshes[effect][currentEffectStyle.style].defaultMeshPlacement,
+    //         meshData.meshPath,
+    //         meshData.meshFile,
+    //         "42",
+    //         effect,
+    //         [
+    //           0,
+    //           0,
+    //           currentEffectStyle.threeDim
+    //             ? this.babylonScene.threeDimMeshesZCoord
+    //             : this.babylonScene.twoDimMeshesZCoord,
+    //         ],
+    //         meshData.initScale,
+    //         meshData.initRotation
+    //       );
+    //     }
+    //   }
+    // } else {
+    //   for (const effect in this.effects) {
+    //     if (!this.effects[effect as CameraEffectTypes]) {
+    //       continue;
+    //     }
+
+    //     let count = 0;
+
+    //     const currentEffectStyle =
+    //       this.currentEffectsStyles.current.camera[this.cameraId][
+    //         effect as CameraEffectTypes
+    //       ];
+
+    //     for (const mesh of this.babylonScene.scene.meshes) {
+    //       if (mesh.metadata && mesh.metadata.effectType === effect) {
+    //         count++;
+    //       }
+    //     }
+
+    //     const deleteNum = count - landmarksPairs.length;
+    //     let deletedNum = 0;
+
+    //     for (const mesh of this.babylonScene.scene.meshes) {
+    //       if (
+    //         deleteNum > deletedNum &&
+    //         mesh.metadata &&
+    //         mesh.metadata.effectType === effect &&
+    //         mesh.metadata.faceId
+    //       ) {
+    //         deletedNum++;
+    //         this.babylonScene.babylonMeshes.deleteMesh(mesh);
+    //       }
+    //     }
+    //   }
+    // }
+
+    for (const effect in this.effects) {
+      if (!this.effects[effect as CameraEffectTypes]) {
+        continue;
+      }
+
+      let count = 0;
+
+      const currentEffectStyle =
+        this.currentEffectsStyles.current.camera[this.cameraId][
+          effect as CameraEffectTypes
+        ];
+
       for (const mesh of this.babylonScene.scene.meshes) {
-        if (mesh.metadata && mesh.metadata.faceId === faceId) {
-          meshes[mesh.metadata.effectType] = mesh;
+        if (mesh.metadata && mesh.metadata.effectType === effect) {
+          count++;
         }
       }
-      for (const effect of Object.keys(this.effects)) {
-        if (
-          this.effects[effect as CameraEffectTypes] &&
-          !Object.keys(meshes).includes(effect)
-        ) {
-          this.drawNewEffect(effect as CameraEffectTypes);
-        }
-      }
-    }
 
-    // console.log(this.faceLandmarks.getFaceIdLandmarksPairs());
-    for (const mesh of this.babylonScene.scene.meshes) {
-      if (
-        mesh.metadata &&
-        mesh.metadata.faceId &&
-        !faceIds.includes(mesh.metadata.faceId)
-      ) {
-        this.babylonScene.deleteMesh(
-          mesh.metadata.meshType,
-          mesh.metadata.meshLabel
-        );
+      if (count < this.maxFaces) {
+        for (let i = 0; i < this.maxFaces - count; i++) {
+          const currentEffectStyle =
+            this.currentEffectsStyles.current.camera[this.cameraId][
+              effect as CameraEffectTypes
+            ];
+          const meshData =
+            // @ts-ignore
+            assetMeshes[effect][currentEffectStyle.style][
+              currentEffectStyle.threeDim ? "mesh" : "planeMesh"
+            ];
+
+          this.babylonScene.createMesh(
+            meshData.meshType ?? "2D",
+            meshData.meshLabel + "." + Math.random().toString(),
+            "",
+            // @ts-ignore
+            assetMeshes[effect][currentEffectStyle.style].defaultMeshPlacement,
+            meshData.meshPath,
+            meshData.meshFile,
+            "42",
+            effect,
+            [
+              0,
+              0,
+              currentEffectStyle.threeDim
+                ? this.babylonScene.threeDimMeshesZCoord
+                : this.babylonScene.twoDimMeshesZCoord,
+            ],
+            meshData.initScale,
+            meshData.initRotation
+          );
+        }
+      } else if (count > this.maxFaces) {
+        const deleteNum = count - this.maxFaces;
+        let deletedNum = 0;
+
+        for (const mesh of this.babylonScene.scene.meshes) {
+          if (
+            deleteNum > deletedNum &&
+            mesh.metadata &&
+            mesh.metadata.effectType === effect &&
+            mesh.metadata.faceId
+          ) {
+            deletedNum++;
+            this.babylonScene.babylonMeshes.deleteMesh(mesh);
+          }
+        }
       }
     }
   };
@@ -297,9 +393,6 @@ class CameraMedia {
     const currentStyle =
       this.currentEffectsStyles.current.camera?.[this.cameraId]?.[effect];
 
-    // @ts-ignore
-    const lastMesh: string = this.lastMeshes[effect];
-
     if (
       !currentStyle ||
       currentStyle.style === "" ||
@@ -314,24 +407,13 @@ class CameraMedia {
     const meshData3D = assetMeshes[effect][currentStyle.style].mesh;
 
     // Delete old meshes
-    if (lastMesh) {
-      this.babylonScene.deleteMesh(
-        "2D",
-        // @ts-ignore
-        assetMeshes[effect][lastMesh].planeMesh.meshLabel
-      );
-      this.babylonScene.deleteMesh(
-        meshData3D.meshType,
-        // @ts-ignore
-        assetMeshes[effect][lastMesh].mesh.meshLabel
-      );
-    }
+    this.babylonScene.deleteEffectMeshes(effect);
 
     if (this.effects[effect]) {
       if (!currentStyle.threeDim) {
         this.babylonScene.createEffectMeshes(
           "2D",
-          meshData2D.meshLabel,
+          meshData2D.meshLabel + "." + Math.random().toString(),
           "",
           // @ts-ignore
           assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
@@ -346,7 +428,7 @@ class CameraMedia {
       if (currentStyle.threeDim) {
         this.babylonScene.createEffectMeshes(
           meshData3D.meshType,
-          meshData3D.meshLabel,
+          meshData3D.meshLabel + "." + Math.random().toString(),
           "",
           // @ts-ignore
           assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
@@ -359,9 +441,6 @@ class CameraMedia {
         );
       }
     }
-
-    // @ts-ignore
-    this.lastMeshes[effect] = currentStyle.style;
   };
 
   getStream() {

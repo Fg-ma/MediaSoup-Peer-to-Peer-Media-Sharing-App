@@ -406,7 +406,6 @@ class FaceLandmarks {
   };
 
   getFaceIdLandmarksPairs = () => {
-    console.log(this.faceIdLandmarksPairs);
     return this.faceIdLandmarksPairs;
   };
 

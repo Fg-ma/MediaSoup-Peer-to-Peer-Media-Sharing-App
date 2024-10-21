@@ -71,6 +71,8 @@ class BabylonRenderLoop {
       alpha: true,
       willReadFrequently: true,
     });
+    this.offscreenCanvas.width = 128;
+    this.offscreenCanvas.height = 128;
 
     this.lastFaceCountCheck = performance.now();
 
@@ -143,11 +145,6 @@ class BabylonRenderLoop {
     this.frameCounter = 0;
 
     try {
-      // Set the dimensions of the offscreen canvas to a lower resolution
-      const scaleFactor = 0.1; // Scale down to 25% of the original size
-      this.offscreenCanvas.width = this.video.videoWidth * scaleFactor;
-      this.offscreenCanvas.height = this.video.videoHeight * scaleFactor;
-
       // Clear the offscreen canvas before drawing
       this.offscreenContext?.clearRect(
         0,
@@ -189,7 +186,7 @@ class BabylonRenderLoop {
         });
       }
       if (
-        performance.now() - this.lastFaceCountCheck > 4000 &&
+        performance.now() - this.lastFaceCountCheck > 1000 &&
         this.faceDetectionProcessing &&
         !this.faceDetectionProcessing[0] &&
         this.faceDetectionWorker
@@ -433,6 +430,22 @@ class BabylonRenderLoop {
     ];
   };
 
+  private sceneSpaceToPositionsScreenSpace = (mesh: AbstractMesh) => {
+    const zPosition = mesh.position.z;
+    const cameraFOV = this.camera.fov;
+    const aspectRatio = this.canvas.width / this.canvas.height;
+
+    // Calculate the vertical and horizontal extents at the current zPosition
+    const verticalExtent = Math.tan(cameraFOV / 2) * (Math.abs(zPosition) + 1);
+    const horizontalExtent = verticalExtent * aspectRatio;
+
+    // Reverse the conversion from world coordinates to normalized screen coordinates
+    const screenX = (mesh.position.x / horizontalExtent) * -1;
+    const screenY = mesh.position.y / verticalExtent;
+
+    return [screenX, screenY];
+  };
+
   private scaleScreenSpaceToSceneSpace = (
     mesh: AbstractMesh,
     scale: number
@@ -456,142 +469,165 @@ class BabylonRenderLoop {
 
     const calculatedLandmarks = this.faceLandmarks.getCalculatedLandmarks();
 
-    for (const {
-      faceId,
-      landmarks,
-    } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
-      for (const mesh of this.scene.meshes) {
-        const meshMetadata = mesh.metadata;
-        if (meshMetadata && meshMetadata.faceId === faceId) {
-          if (meshMetadata.defaultMeshPlacement === "forehead") {
-            const foreheadPosition = this.positionsScreenSpaceToSceneSpace(
-              mesh,
-              calculatedLandmarks.foreheadPositions[faceId]
-            );
+    const usedTrackers: string[] = [];
 
-            if (!foreheadPosition) {
-              continue;
-            }
+    for (const mesh of this.scene.meshes) {
+      const meshMetadata = mesh.metadata;
+      if (meshMetadata && meshMetadata.faceId) {
+        const meshPosition = this.sceneSpaceToPositionsScreenSpace(mesh);
+        let closestTrackerId: string | null = null;
+        let closestDistance = Infinity;
 
-            // Set the mesh position in world space
-            mesh.position = new Vector3(
-              foreheadPosition[0],
-              foreheadPosition[1],
-              foreheadPosition[2]
-            );
+        for (const {
+          faceId,
+          landmarks,
+        } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
+          const nosePosition = { x: landmarks[1].x, y: landmarks[1].y };
 
-            mesh.rotation = new Vector3(
-              calculatedLandmarks.headPitchAngles[faceId],
-              calculatedLandmarks.headYawAngles[faceId],
-              calculatedLandmarks.headRotationAngles[faceId]
-            );
-
-            const interocularDistance = this.scaleScreenSpaceToSceneSpace(
-              mesh,
-              calculatedLandmarks.interocularDistances[faceId]
-            );
-            mesh.scaling = new Vector3(
-              mesh.metadata.initScale[0] * interocularDistance,
-              mesh.metadata.initScale[1] * interocularDistance,
-              mesh.metadata.initScale[2] * interocularDistance
-            );
-          } else if (meshMetadata.defaultMeshPlacement === "nose") {
-            const nosePosition = this.positionsScreenSpaceToSceneSpace(
-              mesh,
-              calculatedLandmarks.nosePositions[faceId]
-            );
-
-            if (!nosePosition) {
-              continue;
-            }
-
-            // Set the mesh position in world space
-            mesh.position = new Vector3(
-              nosePosition[0],
-              nosePosition[1],
-              nosePosition[2]
-            );
-
-            mesh.rotation = new Vector3(
-              calculatedLandmarks.headPitchAngles[faceId],
-              calculatedLandmarks.headYawAngles[faceId],
-              calculatedLandmarks.headRotationAngles[faceId]
-            );
-
-            const interocularDistance = this.scaleScreenSpaceToSceneSpace(
-              mesh,
-              calculatedLandmarks.interocularDistances[faceId]
-            );
-            mesh.scaling = new Vector3(
-              mesh.metadata.initScale[0] * interocularDistance,
-              mesh.metadata.initScale[1] * interocularDistance,
-              mesh.metadata.initScale[2] * interocularDistance
-            );
-          } else if (meshMetadata.defaultMeshPlacement === "chin") {
-            const chinPosition = this.positionsScreenSpaceToSceneSpace(
-              mesh,
-              calculatedLandmarks.chinPositions[faceId]
-            );
-
-            if (!chinPosition) {
-              continue;
-            }
-
-            // Set the mesh position in world space
-            mesh.position = new Vector3(
-              chinPosition[0],
-              chinPosition[1],
-              chinPosition[2]
-            );
-
-            mesh.rotation = new Vector3(
-              calculatedLandmarks.headPitchAngles[faceId],
-              calculatedLandmarks.headYawAngles[faceId],
-              calculatedLandmarks.headRotationAngles[faceId]
-            );
-
-            const interocularDistance = this.scaleScreenSpaceToSceneSpace(
-              mesh,
-              calculatedLandmarks.interocularDistances[faceId]
-            );
-            mesh.scaling = new Vector3(
-              mesh.metadata.initScale[0] * interocularDistance,
-              mesh.metadata.initScale[1] * interocularDistance,
-              mesh.metadata.initScale[2] * interocularDistance
-            );
-          } else if (meshMetadata.defaultMeshPlacement === "eyesCenter") {
-            const eyesCenterPosition = this.positionsScreenSpaceToSceneSpace(
-              mesh,
-              calculatedLandmarks.eyesCenterPositions[faceId]
-            );
-
-            if (!eyesCenterPosition) {
-              continue;
-            }
-
-            // Set the mesh position in world space
-            mesh.position = new Vector3(
-              eyesCenterPosition[0],
-              eyesCenterPosition[1],
-              eyesCenterPosition[2]
-            );
-
-            mesh.rotation = new Vector3(
-              calculatedLandmarks.headPitchAngles[faceId],
-              calculatedLandmarks.headYawAngles[faceId],
-              calculatedLandmarks.headRotationAngles[faceId]
-            );
-
-            const interocularDistance = this.scaleScreenSpaceToSceneSpace(
-              mesh,
-              calculatedLandmarks.interocularDistances[faceId]
-            );
-            mesh.scaling = new Vector3(
-              mesh.metadata.initScale[0] * interocularDistance,
-              mesh.metadata.initScale[1] * interocularDistance,
-              mesh.metadata.initScale[2] * interocularDistance
-            );
+          const distance = Math.sqrt(
+            Math.pow(nosePosition.x - meshPosition[0], 2) +
+              Math.pow(nosePosition.y - meshPosition[1], 2)
+          );
+          if (!usedTrackers.includes(faceId) && distance < closestDistance) {
+            closestDistance = distance;
+            closestTrackerId = faceId;
           }
+        }
+
+        if (!closestTrackerId) {
+          continue;
+        }
+
+        usedTrackers.push(closestTrackerId);
+
+        if (meshMetadata.defaultMeshPlacement === "forehead") {
+          const foreheadPosition = this.positionsScreenSpaceToSceneSpace(
+            mesh,
+            calculatedLandmarks.foreheadPositions[closestTrackerId]
+          );
+
+          if (!foreheadPosition) {
+            continue;
+          }
+
+          // Set the mesh position in world space
+          mesh.position = new Vector3(
+            foreheadPosition[0],
+            foreheadPosition[1],
+            foreheadPosition[2]
+          );
+
+          mesh.rotation = new Vector3(
+            calculatedLandmarks.headPitchAngles[closestTrackerId],
+            calculatedLandmarks.headYawAngles[closestTrackerId],
+            calculatedLandmarks.headRotationAngles[closestTrackerId]
+          );
+
+          const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+            mesh,
+            calculatedLandmarks.interocularDistances[closestTrackerId]
+          );
+          mesh.scaling = new Vector3(
+            mesh.metadata.initScale[0] * interocularDistance,
+            mesh.metadata.initScale[1] * interocularDistance,
+            mesh.metadata.initScale[2] * interocularDistance
+          );
+        } else if (meshMetadata.defaultMeshPlacement === "nose") {
+          const nosePosition = this.positionsScreenSpaceToSceneSpace(
+            mesh,
+            calculatedLandmarks.nosePositions[closestTrackerId]
+          );
+
+          if (!nosePosition) {
+            continue;
+          }
+
+          // Set the mesh position in world space
+          mesh.position = new Vector3(
+            nosePosition[0],
+            nosePosition[1],
+            nosePosition[2]
+          );
+
+          mesh.rotation = new Vector3(
+            calculatedLandmarks.headPitchAngles[closestTrackerId],
+            calculatedLandmarks.headYawAngles[closestTrackerId],
+            calculatedLandmarks.headRotationAngles[closestTrackerId]
+          );
+
+          const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+            mesh,
+            calculatedLandmarks.interocularDistances[closestTrackerId]
+          );
+          mesh.scaling = new Vector3(
+            mesh.metadata.initScale[0] * interocularDistance,
+            mesh.metadata.initScale[1] * interocularDistance,
+            mesh.metadata.initScale[2] * interocularDistance
+          );
+        } else if (meshMetadata.defaultMeshPlacement === "chin") {
+          const chinPosition = this.positionsScreenSpaceToSceneSpace(
+            mesh,
+            calculatedLandmarks.chinPositions[closestTrackerId]
+          );
+
+          if (!chinPosition) {
+            continue;
+          }
+
+          // Set the mesh position in world space
+          mesh.position = new Vector3(
+            chinPosition[0],
+            chinPosition[1],
+            chinPosition[2]
+          );
+
+          mesh.rotation = new Vector3(
+            calculatedLandmarks.headPitchAngles[closestTrackerId],
+            calculatedLandmarks.headYawAngles[closestTrackerId],
+            calculatedLandmarks.headRotationAngles[closestTrackerId]
+          );
+
+          const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+            mesh,
+            calculatedLandmarks.interocularDistances[closestTrackerId]
+          );
+          mesh.scaling = new Vector3(
+            mesh.metadata.initScale[0] * interocularDistance,
+            mesh.metadata.initScale[1] * interocularDistance,
+            mesh.metadata.initScale[2] * interocularDistance
+          );
+        } else if (meshMetadata.defaultMeshPlacement === "eyesCenter") {
+          const eyesCenterPosition = this.positionsScreenSpaceToSceneSpace(
+            mesh,
+            calculatedLandmarks.eyesCenterPositions[closestTrackerId]
+          );
+
+          if (!eyesCenterPosition) {
+            continue;
+          }
+
+          // Set the mesh position in world space
+          mesh.position = new Vector3(
+            eyesCenterPosition[0],
+            eyesCenterPosition[1],
+            eyesCenterPosition[2]
+          );
+
+          mesh.rotation = new Vector3(
+            calculatedLandmarks.headPitchAngles[closestTrackerId],
+            calculatedLandmarks.headYawAngles[closestTrackerId],
+            calculatedLandmarks.headRotationAngles[closestTrackerId]
+          );
+
+          const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+            mesh,
+            calculatedLandmarks.interocularDistances[closestTrackerId]
+          );
+          mesh.scaling = new Vector3(
+            mesh.metadata.initScale[0] * interocularDistance,
+            mesh.metadata.initScale[1] * interocularDistance,
+            mesh.metadata.initScale[2] * interocularDistance
+          );
         }
       }
     }

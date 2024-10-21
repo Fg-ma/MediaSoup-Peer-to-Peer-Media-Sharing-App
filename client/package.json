@@ -15,6 +15,7 @@
     "@babel/preset-typescript": "^7.24.1",
     "@babylonjs/core": "^7.29.0",
     "@babylonjs/gui": "^7.29.0",
+    "@babylonjs/inspector": "^7.30.0",
     "@babylonjs/loaders": "^7.29.0",
     "@emotion/babel-preset-css-prop": "^11.11.0",
     "@mediapipe/face_mesh": "^0.4.1633559619",

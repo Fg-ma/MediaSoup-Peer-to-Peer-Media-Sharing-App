@@ -39,6 +39,13 @@ class BabylonMeshes {
         case KeyboardEventTypes.KEYDOWN:
           const keyDown = kbInfo.event.key.toLowerCase();
           switch (keyDown) {
+            case "1":
+              if (this.scene.debugLayer.isVisible()) {
+                this.scene.debugLayer.hide();
+              } else {
+                this.scene.debugLayer.show();
+              }
+              break;
             case " ":
               if (this.selectedMesh) {
                 this.togglePlayAnimationOnMesh(this.selectedMesh);
@@ -50,7 +57,10 @@ class BabylonMeshes {
               if (this.selectedMesh) {
                 this.deleteMesh(this.selectedMesh);
               } else {
-                console.error("No mesh selected");
+                const meshUnderPointer = this.scene.meshUnderPointer;
+                if (meshUnderPointer) {
+                  this.deleteMesh(meshUnderPointer);
+                }
               }
               break;
             case "escape":
