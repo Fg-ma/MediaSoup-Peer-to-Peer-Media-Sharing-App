@@ -8,6 +8,7 @@ import {
   Color3,
   PointerDragBehavior,
   KeyboardEventTypes,
+  HemisphericLight,
 } from "@babylonjs/core";
 import MeshLoaders from "./MeshLoaders";
 
@@ -27,7 +28,11 @@ class BabylonMeshes {
 
   private meshLoaders: MeshLoaders;
 
-  constructor(private scene: Scene) {
+  constructor(
+    private scene: Scene,
+    private ambientLightThreeDimMeshes: HemisphericLight | undefined,
+    private ambientLightTwoDimMeshes: HemisphericLight | undefined
+  ) {
     this.meshLoaders = new MeshLoaders(this.scene);
 
     this.scene.onKeyboardObservable.add((kbInfo) => {
@@ -589,6 +594,11 @@ class BabylonMeshes {
         meshPath,
         meshFile
       );
+
+      for (const mesh of newMesh) {
+        this.ambientLightThreeDimMeshes?.includedOnlyMeshes.push(mesh);
+      }
+
       newMesh[0].metadata = {
         meshLabel,
         isGizmoEnabled: false,
@@ -622,6 +632,9 @@ class BabylonMeshes {
         meshPath,
         meshFile
       );
+
+      this.ambientLightTwoDimMeshes?.includedOnlyMeshes.push(newMesh);
+
       newMesh.metadata = {
         meshLabel,
         isGizmoEnabled: false,

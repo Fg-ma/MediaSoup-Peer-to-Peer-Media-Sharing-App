@@ -230,10 +230,6 @@ export default function HideBackgroundButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    userMedia.current.camera[videoId].babylonScene.toggleHideBackgroundPlane(
-      !streamEffects
-    );
-
     userMedia.current.camera[
       videoId
     ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(

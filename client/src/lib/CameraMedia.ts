@@ -118,8 +118,8 @@ class CameraMedia {
               message: "CHANGE_MAX_FACES",
               newMaxFace: detectedFaces,
             });
-            console.log(this.maxFaces[0]);
-            // this.checkMeshesExistence();
+
+            this.rectifyEffectMeshCount();
           }
           break;
         default:
@@ -180,95 +180,26 @@ class CameraMedia {
     };
   }
 
-  private checkMeshesExistence = () => {
-    if (!this.faceLandmarks) {
-      return;
-    }
-    this.faceLandmarks.getFaceIdLandmarksPairs();
-    const landmarksPairs = this.faceLandmarks.getFaceIdLandmarksPairs();
+  deconstructor() {
+    // End initial stream
+    this.initCameraStream.getTracks().forEach((track) => track.stop());
 
-    // if (this.maxFaces > landmarksPairs.length) {
-    //   for (const effect in this.effects) {
-    //     for (let i = 0; i < this.maxFaces - landmarksPairs.length; i++) {
-    //       const currentEffectStyle =
-    //         this.currentEffectsStyles.current.camera[this.cameraId][
-    //           effect as CameraEffectTypes
-    //         ];
-    //       const meshData =
-    //         // @ts-ignore
-    //         assetMeshes[effect][currentEffectStyle.style][
-    //           currentEffectStyle.threeDim ? "mesh" : "planeMesh"
-    //         ];
+    // End video
+    this.video.pause();
+    this.video.srcObject = null;
 
-    //       this.babylonScene.createMesh(
-    //         meshData.meshType ?? "2D",
-    //         meshData.meshLabel + "." + Math.random().toString(),
-    //         "",
-    //         // @ts-ignore
-    //         assetMeshes[effect][currentEffectStyle.style].defaultMeshPlacement,
-    //         meshData.meshPath,
-    //         meshData.meshFile,
-    //         "42",
-    //         effect,
-    //         [
-    //           0,
-    //           0,
-    //           currentEffectStyle.threeDim
-    //             ? this.babylonScene.threeDimMeshesZCoord
-    //             : this.babylonScene.twoDimMeshesZCoord,
-    //         ],
-    //         meshData.initScale,
-    //         meshData.initRotation
-    //       );
-    //     }
-    //   }
-    // } else {
-    //   for (const effect in this.effects) {
-    //     if (!this.effects[effect as CameraEffectTypes]) {
-    //       continue;
-    //     }
+    this.canvas.remove();
 
-    //     let count = 0;
+    this.babylonScene.deconstructor();
+  }
 
-    //     const currentEffectStyle =
-    //       this.currentEffectsStyles.current.camera[this.cameraId][
-    //         effect as CameraEffectTypes
-    //       ];
-
-    //     for (const mesh of this.babylonScene.scene.meshes) {
-    //       if (mesh.metadata && mesh.metadata.effectType === effect) {
-    //         count++;
-    //       }
-    //     }
-
-    //     const deleteNum = count - landmarksPairs.length;
-    //     let deletedNum = 0;
-
-    //     for (const mesh of this.babylonScene.scene.meshes) {
-    //       if (
-    //         deleteNum > deletedNum &&
-    //         mesh.metadata &&
-    //         mesh.metadata.effectType === effect &&
-    //         mesh.metadata.faceId
-    //       ) {
-    //         deletedNum++;
-    //         this.babylonScene.babylonMeshes.deleteMesh(mesh);
-    //       }
-    //     }
-    //   }
-    // }
-
+  private rectifyEffectMeshCount = () => {
     for (const effect in this.effects) {
       if (!this.effects[effect as CameraEffectTypes]) {
         continue;
       }
 
       let count = 0;
-
-      const currentEffectStyle =
-        this.currentEffectsStyles.current.camera[this.cameraId][
-          effect as CameraEffectTypes
-        ];
 
       for (const mesh of this.babylonScene.scene.meshes) {
         if (mesh.metadata && mesh.metadata.effectType === effect) {
@@ -277,7 +208,7 @@ class CameraMedia {
       }
 
       if (count < this.maxFaces[0]) {
-        for (let i = 0; i < this.maxFaces[0] - count; i++) {
+        for (let i = count; i < this.maxFaces[0]; i++) {
           const currentEffectStyle =
             this.currentEffectsStyles.current.camera[this.cameraId][
               effect as CameraEffectTypes
@@ -290,13 +221,13 @@ class CameraMedia {
 
           this.babylonScene.createMesh(
             meshData.meshType ?? "2D",
-            meshData.meshLabel + "." + Math.random().toString(),
+            meshData.meshLabel + "." + i,
             "",
             // @ts-ignore
             assetMeshes[effect][currentEffectStyle.style].defaultMeshPlacement,
             meshData.meshPath,
             meshData.meshFile,
-            42,
+            i,
             effect,
             [
               0,
@@ -310,36 +241,20 @@ class CameraMedia {
           );
         }
       } else if (count > this.maxFaces[0]) {
-        const deleteNum = count - this.maxFaces[0];
-        let deletedNum = 0;
-
-        for (const mesh of this.babylonScene.scene.meshes) {
-          if (
-            deleteNum > deletedNum &&
-            mesh.metadata &&
-            mesh.metadata.effectType === effect &&
-            mesh.metadata.faceId
-          ) {
-            deletedNum++;
-            this.babylonScene.babylonMeshes.deleteMesh(mesh);
+        for (let i = this.maxFaces[0]; i < count; i++) {
+          for (const mesh of this.babylonScene.scene.meshes) {
+            if (
+              mesh.metadata &&
+              mesh.metadata.effectType === effect &&
+              mesh.metadata.faceId === i
+            ) {
+              this.babylonScene.babylonMeshes.deleteMesh(mesh);
+            }
           }
         }
       }
     }
   };
-
-  deconstructor() {
-    // End initial stream
-    this.initCameraStream.getTracks().forEach((track) => track.stop());
-
-    // End video
-    this.video.pause();
-    this.video.srcObject = null;
-
-    this.canvas.remove();
-
-    this.babylonScene.deconstructor();
-  }
 
   private hexToNormalizedRgb = (hex: string): [number, number, number] => {
     // Remove the leading '#' if present
@@ -387,6 +302,10 @@ class CameraMedia {
 
     if (effect === "pause") {
       this.babylonScene.togglePauseEffect(this.effects[effect]);
+    }
+
+    if (effect === "hideBackground") {
+      this.babylonScene.toggleHideBackgroundPlane(this.effects[effect]);
     }
   }
 

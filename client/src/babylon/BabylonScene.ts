@@ -29,7 +29,10 @@ class BabylonScene {
   private engine: Engine;
   scene: Scene;
   private camera: UniversalCamera;
-  private light: HemisphericLight | undefined;
+
+  private backgroundLight: HemisphericLight | undefined;
+  private ambientLightThreeDimMeshes: HemisphericLight | undefined;
+  private ambientLightTwoDimMeshes: HemisphericLight | undefined;
 
   private videoPlane: Mesh | undefined;
   private videoTexture: VideoTexture | undefined;
@@ -87,12 +90,16 @@ class BabylonScene {
     this.camera.attachControl(this.canvas, true);
 
     this.initCamera();
-    this.initLighting();
     this.initVideoPlane();
     this.initHideBackgroundPlane();
     this.initTintPlane();
+    this.initLighting();
 
-    this.babylonMeshes = new BabylonMeshes(this.scene);
+    this.babylonMeshes = new BabylonMeshes(
+      this.scene,
+      this.ambientLightThreeDimMeshes,
+      this.ambientLightTwoDimMeshes
+    );
 
     this.babylonRenderLoop = new BabylonRenderLoop(
       this.id,
@@ -148,12 +155,45 @@ class BabylonScene {
   };
 
   private initLighting = () => {
-    // Create a light
-    this.light = new HemisphericLight(
-      "light",
-      new Vector3(1, 1, 0),
+    const dummyMesh3D = MeshBuilder.CreateBox(
+      "dummyMesh3D",
+      { size: 1 },
       this.scene
     );
+    dummyMesh3D.scaling = new Vector3(0, 0, 0);
+
+    // Create a light
+    this.backgroundLight = new HemisphericLight(
+      "backgroundLight",
+      new Vector3(-1, 1, 0),
+      this.scene
+    );
+    this.backgroundLight.intensity = 1.0;
+    this.backgroundLight.diffuse = new Color3(1, 1, 1);
+    this.backgroundLight.includedOnlyMeshes.push(dummyMesh3D);
+    if (this.videoPlane) {
+      this.backgroundLight.includedOnlyMeshes.push(this.videoPlane);
+    }
+    if (this.tintPlane) {
+      this.backgroundLight.includedOnlyMeshes.push(this.tintPlane);
+    }
+
+    this.ambientLightThreeDimMeshes = new HemisphericLight(
+      "ambientLightThreeDimMeshes",
+      new Vector3(-0.4, 0.3, -0.15),
+      this.scene
+    );
+    this.ambientLightThreeDimMeshes.intensity = 0.8;
+    this.ambientLightThreeDimMeshes.includedOnlyMeshes.push(dummyMesh3D);
+
+    this.ambientLightTwoDimMeshes = new HemisphericLight(
+      "ambientLightTwoDimMeshes",
+      new Vector3(1, 1, -1),
+      this.scene
+    );
+    this.ambientLightTwoDimMeshes.intensity = 2;
+    this.ambientLightTwoDimMeshes.specular = new Color3(0, 0, 0);
+    this.ambientLightTwoDimMeshes.includedOnlyMeshes.push(dummyMesh3D);
   };
 
   private updateBackgroundPlaneSize = (plane: Mesh, zOffset?: number) => {
@@ -227,6 +267,7 @@ class BabylonScene {
       { width: 1, height: 1 },
       this.scene
     );
+    this.backgroundLight?.includedOnlyMeshes.push(this.hideBackgroundPlane);
 
     this.hideBackgroundPlane.material = this.hideBackgroundMaterial;
 
@@ -341,7 +382,8 @@ class BabylonScene {
 
   deleteEffectMeshes = (effect: string) => {
     for (const mesh of this.scene.meshes) {
-      if (mesh.metadata && mesh.metadata.effectType === effect) {
+      const meshMetaData = mesh.metadata;
+      if (meshMetaData && meshMetaData.effectType === effect) {
         this.babylonMeshes.deleteMesh(mesh);
       }
     }

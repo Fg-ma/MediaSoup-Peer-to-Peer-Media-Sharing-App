@@ -36,6 +36,8 @@ class BabylonRenderLoop {
   private tempHideBackgroundCanvas: OffscreenCanvas;
   private tempHideBackgroundCtx: OffscreenCanvasRenderingContext2D | null;
 
+  private detectFacesTimeout = 1000;
+
   constructor(
     private id: string,
     private scene: Scene,
@@ -182,7 +184,7 @@ class BabylonRenderLoop {
         });
       }
       if (
-        performance.now() - this.lastFaceCountCheck > 1000 &&
+        performance.now() - this.lastFaceCountCheck > this.detectFacesTimeout &&
         this.faceDetectionProcessing &&
         !this.faceDetectionProcessing[0] &&
         this.faceDetectionWorker
