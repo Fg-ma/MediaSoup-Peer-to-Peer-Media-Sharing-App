@@ -11,6 +11,11 @@ import {
   HemisphericLight,
 } from "@babylonjs/core";
 import MeshLoaders from "./MeshLoaders";
+import {
+  DefaultMeshPlacementType,
+  EffectType,
+  PositionStyle,
+} from "./BabylonScene";
 
 export type MeshTypes = "2D" | "gltf";
 
@@ -110,11 +115,7 @@ class BabylonMeshes {
                     }
                   }
 
-                  this.enableGizmo(
-                    "position",
-                    this.selectedMesh.metadata.meshType,
-                    this.selectedMesh
-                  );
+                  this.enableGizmo("position", this.selectedMesh);
                 } else {
                   console.error("No mesh selected");
                 }
@@ -151,11 +152,7 @@ class BabylonMeshes {
                     }
                   }
 
-                  this.enableGizmo(
-                    "rotation",
-                    this.selectedMesh.metadata.meshType,
-                    this.selectedMesh
-                  );
+                  this.enableGizmo("rotation", this.selectedMesh);
                 } else {
                   console.error("No mesh selected");
                 }
@@ -192,11 +189,7 @@ class BabylonMeshes {
                     }
                   }
 
-                  this.enableGizmo(
-                    "scale",
-                    this.selectedMesh.metadata.meshType,
-                    this.selectedMesh
-                  );
+                  this.enableGizmo("scale", this.selectedMesh);
                 } else {
                   console.error("No mesh selected");
                 }
@@ -248,15 +241,14 @@ class BabylonMeshes {
   };
 
   private applyMeshActions = (
-    type: MeshTypes,
     mesh: AbstractMesh,
     parentMesh?: AbstractMesh
   ) => {
-    let clickTimeout: NodeJS.Timeout; // To hold the timeout for single click
+    let clickTimeout: NodeJS.Timeout | undefined; // To hold the timeout for single click
     let doubleClickRegistered = false; // To check if double click was triggered
+    let holdTimeout: NodeJS.Timeout | undefined = undefined;
 
     mesh.isPickable = true;
-    mesh.getBoundingInfo().boundingBox.extendSizeWorld.scaleInPlace(1.1);
 
     this.scene.onBeforeRenderObservable.add(() => {
       mesh.refreshBoundingInfo({ applySkeleton: true }); // Update the bounding box of the mesh each frame
@@ -296,8 +288,10 @@ class BabylonMeshes {
       new ExecuteCodeAction(ActionManager.OnDoublePickTrigger, () => {
         // Mark double click as registered
         doubleClickRegistered = true;
+
         // Clear the single click timeout to prevent single-click action
         clearTimeout(clickTimeout);
+        clickTimeout = undefined;
 
         if (
           !this.selectedMesh ||
@@ -310,9 +304,23 @@ class BabylonMeshes {
           }
         }
 
+        const meshMetaData = this.selectedMesh.metadata;
+
         // Handle gizmo toggle on double click
-        const nextState = this.getNextGizmoState(mesh.metadata.gizmoState);
-        mesh.metadata.gizmoState = nextState;
+        const nextState = this.getNextGizmoState(meshMetaData.gizmoState);
+        this.selectedMesh.metadata.gizmoState = nextState;
+
+        if (
+          meshMetaData &&
+          meshMetaData.positionStyle !== undefined &&
+          meshMetaData.manuallyTransformed !== undefined
+        ) {
+          if (nextState === "none" && !meshMetaData.manuallyTransformed) {
+            meshMetaData.positionStyle = "faceTrack";
+          } else {
+            meshMetaData.positionStyle = "free";
+          }
+        }
 
         // Toggle gizmo state
         if (parentMesh) {
@@ -324,10 +332,39 @@ class BabylonMeshes {
         if (nextState !== "none") {
           // Enable gizmo
           if (parentMesh) {
-            this.enableGizmo(nextState, type, parentMesh);
+            this.enableGizmo(nextState, parentMesh);
           } else {
-            this.enableGizmo(nextState, type, mesh);
+            this.enableGizmo(nextState, mesh);
           }
+        }
+      })
+    );
+
+    // Handle hold event (3 seconds)
+    mesh.actionManager.registerAction(
+      new ExecuteCodeAction(ActionManager.OnPickDownTrigger, () => {
+        const meshMetaData = parentMesh ? parentMesh.metadata : mesh.metadata;
+        if (
+          meshMetaData &&
+          meshMetaData.positionStyle !== undefined &&
+          meshMetaData.manuallyTransformed !== undefined &&
+          meshMetaData.gizmoState !== "position"
+        ) {
+          holdTimeout = setTimeout(() => {
+            meshMetaData.gizmoState = "none";
+            meshMetaData.positionStyle = "faceTrack";
+            meshMetaData.manuallyTransformed = false;
+            this.disableGizmo(parentMesh ? parentMesh : mesh);
+          }, 2000);
+        }
+      })
+    );
+
+    mesh.actionManager.registerAction(
+      new ExecuteCodeAction(ActionManager.OnPickUpTrigger, () => {
+        if (holdTimeout) {
+          clearTimeout(holdTimeout);
+          holdTimeout = undefined;
         }
       })
     );
@@ -352,36 +389,18 @@ class BabylonMeshes {
   };
 
   private escapeMesh = (mesh: AbstractMesh) => {
+    const meshMetaData = mesh.metadata;
+
+    if (!meshMetaData) {
+      return;
+    }
+
     // Disable gizmo
     this.disableGizmo(mesh);
 
     // Reset gizmo state
-    if (mesh.metadata) {
-      mesh.metadata.gizmoState = "none";
-
-      const meshLabel = mesh.metadata.meshLabel;
-      if (meshLabel in this.meshes["3D"]) {
-        if (this.meshes["3D"][meshLabel] instanceof Array) {
-          for (const mesh of this.meshes["3D"][meshLabel]) {
-            if (mesh.metadata) {
-              mesh.metadata.gizmoState = "none";
-            }
-          }
-        } else {
-          this.meshes["3D"][meshLabel].metadata.gizmoState = "none";
-        }
-      } else if (meshLabel in this.meshes["2D"]) {
-        if (this.meshes["2D"][meshLabel] instanceof Array) {
-          for (const mesh of this.meshes["2D"][meshLabel]) {
-            if (mesh.metadata) {
-              mesh.metadata.gizmoState = "none";
-            }
-          }
-        } else {
-          this.meshes["2D"][meshLabel].metadata.gizmoState = "none";
-        }
-      }
-    }
+    meshMetaData.gizmoState = "none";
+    const meshLabel = meshMetaData.meshLabel;
 
     // Stop animations associated with the mesh
     const animationGroups = this.scene.animationGroups;
@@ -390,8 +409,8 @@ class BabylonMeshes {
         if (mesh) {
           // Compare the final node with the targeted animation's target
           if (
-            mesh.metadata.meshLabel !== undefined &&
-            mesh.metadata.meshLabel === targetedAnim.target.metadata.meshLabel
+            meshMetaData.meshLabel !== undefined &&
+            meshMetaData.meshLabel === targetedAnim.target.metadata.meshLabel
           ) {
             animGroup.stop(); // Stop the animation before removing the mesh
           }
@@ -422,12 +441,25 @@ class BabylonMeshes {
     }
   };
 
+  // Helper function to register observables for any gizmo type
+  private registerGizmoInteraction = (mesh: AbstractMesh, gizmo: any) => {
+    gizmo.dragBehavior?.onDragObservable.add(() => {
+      const meshMetaData = mesh.metadata;
+
+      if (
+        meshMetaData &&
+        !meshMetaData.manuallyTransformed &&
+        meshMetaData.manuallyTransformed !== undefined
+      ) {
+        meshMetaData.manuallyTransformed = true;
+      }
+    });
+  };
+
   // Function to enable the position gizmo for a mesh
-  private enableGizmo = (
-    gizmoType: GizmoStateTypes,
-    type: MeshTypes,
-    mesh: AbstractMesh
-  ) => {
+  private enableGizmo = (gizmoType: GizmoStateTypes, mesh: AbstractMesh) => {
+    const meshMetaData = mesh.metadata;
+
     // Create a GizmoManager to manage gizmos in the scene
     const gizmoManager = new GizmoManager(this.scene);
 
@@ -452,6 +484,16 @@ class BabylonMeshes {
             0.6666666666666666,
             0.5333333333333333
           ); // Blue for Z axis
+
+          if (
+            meshMetaData &&
+            !meshMetaData.manuallyTransformed &&
+            meshMetaData.manuallyTransformed !== undefined
+          ) {
+            this.registerGizmoInteraction(mesh, positionGizmo.xGizmo);
+            this.registerGizmoInteraction(mesh, positionGizmo.yGizmo);
+            this.registerGizmoInteraction(mesh, positionGizmo.zGizmo);
+          }
         }
 
         // Set the gizmo to use world space (fixed axes) instead of local space
@@ -461,21 +503,15 @@ class BabylonMeshes {
 
         // Add dragging behavior along a specific plane (Y-axis constrained)
         let dragBehavior: PointerDragBehavior;
-        if (type === "2D") {
-          dragBehavior = new PointerDragBehavior({
-            dragPlaneNormal: new Vector3(0, 0, 1), // Dragging plane: XZ plane
-          });
-        } else {
-          dragBehavior = new PointerDragBehavior({
-            dragPlaneNormal: new Vector3(0, 1, 0), // Dragging plane: XZ plane
-          });
-        }
+        dragBehavior = new PointerDragBehavior({
+          dragPlaneNormal: new Vector3(0, 0, 1),
+        });
 
         // Attach the drag behavior to the mesh
         mesh.addBehavior(dragBehavior);
 
         // Store the drag behavior in the mesh's metadata for later access
-        mesh.metadata.dragBehavior = dragBehavior;
+        meshMetaData.dragBehavior = dragBehavior;
         break;
       case "rotation":
         gizmoManager.rotationGizmoEnabled = true;
@@ -497,6 +533,16 @@ class BabylonMeshes {
             0.6666666666666666,
             0.5333333333333333
           ); // Blue for Z axis
+
+          if (
+            meshMetaData &&
+            !meshMetaData.manuallyTransformed &&
+            meshMetaData.manuallyTransformed !== undefined
+          ) {
+            this.registerGizmoInteraction(mesh, rotationGizmo.xGizmo);
+            this.registerGizmoInteraction(mesh, rotationGizmo.yGizmo);
+            this.registerGizmoInteraction(mesh, rotationGizmo.zGizmo);
+          }
         }
 
         // Set the gizmo to use world space (fixed axes) instead of local space
@@ -524,6 +570,16 @@ class BabylonMeshes {
             0.6666666666666666,
             0.5333333333333333
           ); // Blue for Z axis
+
+          if (
+            meshMetaData &&
+            !meshMetaData.manuallyTransformed &&
+            meshMetaData.manuallyTransformed !== undefined
+          ) {
+            this.registerGizmoInteraction(mesh, scaleGizmo.xGizmo);
+            this.registerGizmoInteraction(mesh, scaleGizmo.yGizmo);
+            this.registerGizmoInteraction(mesh, scaleGizmo.zGizmo);
+          }
         }
         break;
     }
@@ -543,29 +599,46 @@ class BabylonMeshes {
       return;
     }
 
+    // Remove the drag behavior
+    const dragBehavior = meshMetaData.dragBehavior;
+    if (dragBehavior) {
+      mesh.removeBehavior(dragBehavior);
+    }
+
     const gizmoManager = meshMetaData.gizmoManager;
+
+    const gizmos = ["xGizmo", "yGizmo", "zGizmo"];
+    for (const gizmo of gizmos) {
+      const currentGizmo =
+        meshMetaData?.gizmoManager?.gizmos?.positionGizmo?.[gizmo];
+      if (currentGizmo) {
+        currentGizmo.dragBehavior?.onDragObservable.clear();
+        currentGizmo.dragBehavior?.onDragStartObservable.clear();
+        currentGizmo.dragBehavior?.onDragEndObservable.clear();
+      }
+    }
+
     if (gizmoManager) {
       // Detach the gizmo from the mesh and disable it
       gizmoManager.attachToMesh(null);
       gizmoManager.dispose(); // Clean up the gizmo manager
     }
 
-    // Remove the drag behavior
-    const dragBehavior = meshMetaData.dragBehavior;
-    if (dragBehavior) {
-      mesh.removeBehavior(dragBehavior);
-    }
+    // Remove gizmo metadata to avoid memory leaks
+    meshMetaData.gizmoManager = undefined;
+    meshMetaData.dragBehavior = undefined;
   };
 
   loader = async (
     type: MeshTypes,
     meshLabel: string,
     meshName: string,
-    defaultMeshPlacement: string,
+    defaultMeshPlacement: DefaultMeshPlacementType,
     meshPath: string,
     meshFile: string,
     faceId?: number,
-    effectType?: string,
+    effectType?: EffectType,
+    positionStyle?: PositionStyle,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
     initRotation?: [number, number, number]
@@ -608,6 +681,8 @@ class BabylonMeshes {
         faceId,
         effectType,
         initScale,
+        positionStyle,
+        manuallyTransformed: false,
       };
       this.meshes["3D"][meshLabel] = newMesh;
 
@@ -620,7 +695,7 @@ class BabylonMeshes {
           initRotation
         );
         for (const mesh of newMesh) {
-          this.applyMeshActions(type, mesh, newMesh[0]);
+          this.applyMeshActions(mesh, newMesh[0]);
         }
       } else {
         console.error(`Mesh ${meshName} not found after loading.`);
@@ -644,6 +719,8 @@ class BabylonMeshes {
         faceId,
         effectType,
         initScale,
+        positionStyle,
+        manuallyTransformed: false,
       };
       this.meshes["2D"][meshLabel] = newMesh;
 
@@ -655,7 +732,7 @@ class BabylonMeshes {
           initScale,
           initRotation
         );
-        this.applyMeshActions(type, newMesh);
+        this.applyMeshActions(newMesh);
       } else {
         console.error(`Mesh ${meshName} not found after loading.`);
       }

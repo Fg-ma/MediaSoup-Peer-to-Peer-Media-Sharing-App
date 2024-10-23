@@ -12,7 +12,10 @@ import {
 } from "../context/StreamsContext";
 import UserDevice from "../UserDevice";
 import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
-import BabylonScene from "../babylon/BabylonScene";
+import BabylonScene, {
+  EffectType,
+  validEffectTypes,
+} from "../babylon/BabylonScene";
 import assetMeshes from "../babylon/meshes";
 
 class CameraMedia {
@@ -118,7 +121,6 @@ class CameraMedia {
               message: "CHANGE_MAX_FACES",
               newMaxFace: detectedFaces,
             });
-
             this.rectifyEffectMeshCount();
           }
           break;
@@ -195,7 +197,10 @@ class CameraMedia {
 
   private rectifyEffectMeshCount = () => {
     for (const effect in this.effects) {
-      if (!this.effects[effect as CameraEffectTypes]) {
+      if (
+        !this.effects[effect as CameraEffectTypes] ||
+        !validEffectTypes.includes(effect as EffectType)
+      ) {
         continue;
       }
 
@@ -211,7 +216,7 @@ class CameraMedia {
         for (let i = count; i < this.maxFaces[0]; i++) {
           const currentEffectStyle =
             this.currentEffectsStyles.current.camera[this.cameraId][
-              effect as CameraEffectTypes
+              effect as EffectType
             ];
           const meshData =
             // @ts-ignore
@@ -228,7 +233,8 @@ class CameraMedia {
             meshData.meshPath,
             meshData.meshFile,
             i,
-            effect,
+            effect as EffectType,
+            "faceTrack",
             [
               0,
               0,
@@ -282,8 +288,9 @@ class CameraMedia {
       this.effects[effect] = true;
     }
 
-    this.drawNewEffect(effect);
-
+    if (validEffectTypes.includes(effect as EffectType)) {
+      this.drawNewEffect(effect as EffectType);
+    }
     this.deadbanding.update(this.cameraId, this.effects);
 
     if (tintColor) {
@@ -309,15 +316,11 @@ class CameraMedia {
     }
   }
 
-  drawNewEffect = (effect: CameraEffectTypes) => {
+  drawNewEffect = (effect: EffectType) => {
     const currentStyle =
       this.currentEffectsStyles.current.camera?.[this.cameraId]?.[effect];
 
-    if (
-      !currentStyle ||
-      currentStyle.style === "" ||
-      !(effect in assetMeshes)
-    ) {
+    if (!currentStyle) {
       return;
     }
 
@@ -340,6 +343,7 @@ class CameraMedia {
           meshData2D.meshPath,
           meshData2D.meshFile,
           effect,
+          "faceTrack",
           [0, 0, this.babylonScene.twoDimMeshesZCoord],
           meshData2D.initScale,
           meshData2D.initRotation
@@ -355,6 +359,7 @@ class CameraMedia {
           meshData3D.meshPath,
           meshData3D.meshFile,
           effect,
+          "faceTrack",
           [0, 0, this.babylonScene.threeDimMeshesZCoord],
           meshData3D.initScale,
           meshData3D.initRotation

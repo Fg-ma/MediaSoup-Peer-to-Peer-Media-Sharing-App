@@ -15,15 +15,44 @@ import {
   Layer,
   DynamicTexture,
   Material,
+  MotionBlurPostProcess,
+  BlackAndWhitePostProcess,
+  ChromaticAberrationPostProcess,
+  SharpenPostProcess,
+  TonemapPostProcess,
+  TonemappingOperator,
 } from "@babylonjs/core";
 import BabylonMeshes, { MeshTypes } from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
-import FaceLandmarks from "src/effects/visualEffects/lib/FaceLandmarks";
-import { CameraEffectTypes } from "src/context/StreamsContext";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
+import { CameraEffectTypes } from "../context/StreamsContext";
+import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
-import UserDevice from "src/UserDevice";
+import UserDevice from "../UserDevice";
 import "@babylonjs/inspector";
+
+export type DefaultMeshPlacementType =
+  | "forehead"
+  | "chin"
+  | "eyesCenter"
+  | "nose";
+export type EffectType =
+  | "glasses"
+  | "beards"
+  | "mustaches"
+  | "masks"
+  | "pets"
+  | "hats";
+export type PositionStyle = "faceTrack" | "free";
+
+export const validEffectTypes: EffectType[] = [
+  "glasses",
+  "beards",
+  "mustaches",
+  "masks",
+  "pets",
+  "hats",
+];
 
 class BabylonScene {
   private engine: Engine;
@@ -88,6 +117,44 @@ class BabylonScene {
       this.scene
     );
     this.camera.attachControl(this.canvas, true);
+    // const motionblur = new MotionBlurPostProcess(
+    //   "mb", // The name of the effect.
+    //   this.scene, // The scene containing the objects to blur according to their velocity.
+    //   1.0, // The required width/height ratio to downsize to before computing the render pass.
+    //   this.camera // The camera to apply the render pass to.
+    // );
+    // const blackAndWhite = new BlackAndWhitePostProcess(
+    //   "bw",
+    //   1.0,
+    //   this.camera,
+    //   undefined,
+    //   this.engine,
+    //   false
+    // );
+    // const chromaticAberrationPostProcess = new ChromaticAberrationPostProcess(
+    //   "ca",
+    //   this.canvas.width,
+    //   this.canvas.height,
+    //   1,
+    //   this.camera,
+    //   undefined,
+    //   this.engine,
+    //   false
+    // );
+    // const sharpenPostProcess = new SharpenPostProcess(
+    //   "s",
+    //   1,
+    //   this.camera,
+    //   undefined,
+    //   this.engine,
+    //   false
+    // );
+    // const tonemapPostProcess = new TonemapPostProcess(
+    //   "tonemap",
+    //   TonemappingOperator.HejiDawson, // You can switch between Hable, Reinhard, or HejiDawson
+    //   1.0, // Exposure adjustment
+    //   this.camera // Attach it to your camera
+    // );
 
     this.initCamera();
     this.initVideoPlane();
@@ -310,11 +377,12 @@ class BabylonScene {
     type: MeshTypes,
     meshLabel: string,
     meshName: string,
-    defaultMeshPlacement: string,
+    defaultMeshPlacement: DefaultMeshPlacementType,
     meshPath: string,
     meshFile: string,
     faceId?: number,
-    effectType?: string,
+    effectType?: EffectType,
+    positionStyle?: PositionStyle,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
     initRotation?: [number, number, number]
@@ -328,6 +396,7 @@ class BabylonScene {
       meshFile,
       faceId,
       effectType,
+      positionStyle,
       initPosition,
       initScale,
       initRotation
@@ -338,10 +407,11 @@ class BabylonScene {
     type: MeshTypes,
     meshLabel: string,
     meshName: string,
-    defaultMeshPlacement: string,
+    defaultMeshPlacement: DefaultMeshPlacementType,
     meshPath: string,
     meshFile: string,
-    effectType?: string,
+    effectType?: EffectType,
+    positionStyle?: PositionStyle,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
     initRotation?: [number, number, number]
@@ -356,6 +426,7 @@ class BabylonScene {
         meshFile,
         i,
         effectType,
+        positionStyle,
         initPosition,
         initScale,
         initRotation
@@ -381,11 +452,19 @@ class BabylonScene {
   };
 
   deleteEffectMeshes = (effect: string) => {
+    const meshesToDelete = [];
+
+    // First, collect meshes to be deleted
     for (const mesh of this.scene.meshes) {
       const meshMetaData = mesh.metadata;
       if (meshMetaData && meshMetaData.effectType === effect) {
-        this.babylonMeshes.deleteMesh(mesh);
+        meshesToDelete.push(mesh);
       }
+    }
+
+    // Now, delete them after iteration
+    for (const mesh of meshesToDelete) {
+      this.babylonMeshes.deleteMesh(mesh);
     }
   };
 
