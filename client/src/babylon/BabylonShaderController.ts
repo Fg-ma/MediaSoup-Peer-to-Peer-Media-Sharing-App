@@ -35,6 +35,8 @@ class BabylonShaderController {
   private tiltShiftPostProcess: PostProcess | undefined;
   private fisheyePostProcess: PostProcess | undefined;
   private prismaColorsPostProcess: PostProcess | undefined;
+  private oldPostProcess: PostProcess | undefined;
+  private colorSplashPostProcess: PostProcess | undefined;
 
   private glitchActive = false;
   private minGlitchInterval = 2000; // 2 seconds in milliseconds
@@ -142,9 +144,9 @@ class BabylonShaderController {
     //   this.tiltShiftPostProcess = new PostProcess(
     //     "tiltShift",
     //     "tiltShift",
-    //     ["focusHeight", "focusWidth", "blurStrength"], // Shader uniforms
-    //     null, // No texture required
-    //     1.0, // Ratio for the render target size
+    //     ["focusHeight", "focusWidth", "blurStrength"],
+    //     null,
+    //     1.0,
     //     this.camera
     //   );
     // });
@@ -152,9 +154,9 @@ class BabylonShaderController {
     //   Effect.ShadersStore["fisheyePixelShader"] = shaderCode;
     //   this.fisheyePostProcess = new PostProcess(
     //     "fisheye",
-    //     "fisheye", // shader name (to be defined later)
+    //     "fisheye",
     //     null,
-    //     ["distortionStrength", "fadeStart"], // uniforms and samplers
+    //     ["distortionStrength", "fadeStart"],
     //     1.0,
     //     this.camera
     //   );
@@ -168,14 +170,61 @@ class BabylonShaderController {
     //     Effect.ShadersStore["prismaColorsPixelShader"] = shaderCode;
     //     this.prismaColorsPostProcess = new PostProcess(
     //       "prismaColors",
-    //       "prismaColors", // shader name (to be defined later)
+    //       "prismaColors",
     //       null,
-    //       ["time"], // uniforms and samplers
+    //       ["time"],
     //       1.0,
     //       this.camera
     //     );
     //   }
     // );
+    // this.loadShader("./src/babylon/cartoonShader.glsl").then((shaderCode) => {
+    //   Effect.ShadersStore["cartoonPixelShader"] = shaderCode;
+    //   this.prismaColorsPostProcess = new PostProcess(
+    //     "cartoon",
+    //     "cartoon",
+    //     null,
+    //     null,
+    //     1.0,
+    //     this.camera
+    //   );
+    // });
+    // this.loadShader("./src/babylon/oldShader.glsl").then((shaderCode) => {
+    //   Effect.ShadersStore["oldPixelShader"] = shaderCode;
+    //   this.oldPostProcess = new PostProcess(
+    //     "old",
+    //     "old",
+    //     null,
+    //     ["resolution", "time"],
+    //     1.0,
+    //     this.camera
+    //   );
+    // });
+
+    this.loadShader("./src/babylon/colorSplashShader.glsl").then(
+      (shaderCode) => {
+        Effect.ShadersStore["colorSplashPixelShader"] = shaderCode;
+        this.colorSplashPostProcess = new PostProcess(
+          "colorSplash",
+          "colorSplash",
+          null,
+          ["resolution", "targetColor"],
+          1.0,
+          this.camera
+        );
+
+        this.colorSplashPostProcess.onApply = (effect) => {
+          effect.setVector2(
+            "resolution",
+            new Vector2(
+              this.engine.getRenderWidth(),
+              this.engine.getRenderHeight()
+            )
+          );
+          effect.setVector3("resolution", new Vector3(1, 0.1, 0.1));
+        };
+      }
+    );
   }
 
   private loadShader = async (url: string) => {
@@ -261,6 +310,19 @@ class BabylonShaderController {
     if (this.prismaColorsPostProcess) {
       this.prismaColorsPostProcess.onApply = (effect) => {
         effect.setFloat("time", this.time);
+      };
+    }
+
+    if (this.oldPostProcess) {
+      this.oldPostProcess.onApply = (effect) => {
+        effect.setFloat("time", this.time);
+        effect.setVector2(
+          "resolution",
+          new Vector2(
+            this.engine.getRenderWidth(),
+            this.engine.getRenderHeight()
+          )
+        );
       };
     }
   };
