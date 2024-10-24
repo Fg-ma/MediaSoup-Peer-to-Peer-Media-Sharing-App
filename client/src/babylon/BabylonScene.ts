@@ -87,7 +87,7 @@ class BabylonScene {
 
   babylonRenderLoop: BabylonRenderLoop;
 
-  private babylonShaderController: BabylonShaderController;
+  babylonShaderController: BabylonShaderController;
 
   twoDimMeshesZCoord = 90;
   threeDimMeshesZCoord = 100;

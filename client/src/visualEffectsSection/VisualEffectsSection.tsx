@@ -8,6 +8,10 @@ import {
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
 
+const BabylonPostProcessEffectsButton = React.lazy(
+  () =>
+    import("../babylonPostProcessEffectsButton/BabylonPostProcessEffectsButton")
+);
 const HideBackgroundButton = React.lazy(
   () => import("./lib/HideBackgroundButton")
 );
@@ -156,6 +160,19 @@ export default function VisualEffectsSection({
       exit='init'
       transition={EffectSectionTransition}
     >
+      <Suspense fallback={<div>Loading...</div>}>
+        <BabylonPostProcessEffectsButton
+          username={username}
+          instance={instance}
+          type={type}
+          videoId={videoId}
+          isUser={isUser}
+          handleVisualEffectChange={handleVisualEffectChange}
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+        />
+        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      </Suspense>
       {type === "camera" && (
         <Suspense fallback={<div>Loading...</div>}>
           <HideBackgroundButton

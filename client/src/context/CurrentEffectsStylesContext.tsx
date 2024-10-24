@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useRef } from "react";
 
-export const defaultHideBackground = "beach";
+export const defaultPostProcess: PostProcessEffects = "prismaColors";
+export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
 export const defaultHideBackgroundColor = "#F56114";
-export const defaultBeard = "classicalCurlyBeard";
-export const defaultGlasses = "defaultGlasses";
-export const defaultMustache = "mustache1";
-export const defaultMask = "baseMask";
-export const defaultHat = "stylishHat";
-export const defaultPet = "beardedDragon";
+export const defaultBeard: BeardsEffectTypes = "classicalCurlyBeard";
+export const defaultGlasses: GlassesEffectTypes = "defaultGlasses";
+export const defaultMustache: MustachesEffectTypes = "mustache1";
+export const defaultMask: MasksEffectTypes = "baseMask";
+export const defaultHat: HatsEffectTypes = "stylishHat";
+export const defaultPet: PetsEffectTypes = "beardedDragon";
 
 export const assetSizePositionMap: {
   beards: {
@@ -597,6 +598,10 @@ export interface CameraEffectStylesType {
     style: "";
     threeDim: false;
   };
+  postProcess: {
+    style: PostProcessEffects;
+    threeDim: false;
+  };
   hideBackground: {
     style: HideBackgroundEffectTypes;
     threeDim: false;
@@ -662,6 +667,23 @@ export interface CameraEffectStylesType {
   };
 }
 
+export type PostProcessEffects =
+  | "prismaColors"
+  | "blackAndWhite"
+  | "bubbleChromatic"
+  | "fisheye"
+  | "nightVision"
+  | "vintageTV"
+  | "motionblur"
+  | "pixelation"
+  | "old"
+  | "chromaticAberration"
+  | "colorSplash"
+  | "tonemap"
+  | "rays"
+  | "sharpen"
+  | "tiltShift"
+  | "cartoon";
 export type HideBackgroundEffectTypes =
   | "color"
   | "beach"
@@ -795,7 +817,12 @@ export type PetsEffectTypes =
   | "spinosaurus"
   | "TRex";
 
-export interface ScreenEffectStylesType {}
+export interface ScreenEffectStylesType {
+  postProcess: {
+    style: PostProcessEffects;
+    threeDim: false;
+  };
+}
 
 export interface AudioEffectStylesType {}
 
@@ -820,6 +847,10 @@ export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
   },
   tint: {
     style: "",
+    threeDim: false,
+  },
+  postProcess: {
+    style: defaultPostProcess,
     threeDim: false,
   },
   hideBackground: {
@@ -859,7 +890,12 @@ export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
   },
 };
 
-export const defaultScreenCurrentEffectsStyles: ScreenEffectStylesType = {};
+export const defaultScreenCurrentEffectsStyles: ScreenEffectStylesType = {
+  postProcess: {
+    style: defaultPostProcess,
+    threeDim: false,
+  },
+};
 
 export const defaultAudioCurrentEffectsStyles: AudioEffectStylesType = {};
 

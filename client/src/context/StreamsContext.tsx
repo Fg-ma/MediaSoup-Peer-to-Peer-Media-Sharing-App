@@ -53,6 +53,7 @@ export const defaultCameraStreamEffects: {
   [effect in CameraEffectTypes]: boolean;
 } = {
   pause: false,
+  postProcess: false,
   hideBackground: false,
   blur: false,
   tint: false,
@@ -67,6 +68,7 @@ export const defaultCameraStreamEffects: {
 export const defaultScreenStreamEffects: {
   [effect in ScreenEffectTypes]: boolean;
 } = {
+  postProcess: false,
   pause: false,
   blur: false,
   tint: false,
@@ -74,6 +76,7 @@ export const defaultScreenStreamEffects: {
 
 export type CameraEffectTypes =
   | "pause"
+  | "postProcess"
   | "hideBackground"
   | "blur"
   | "tint"
@@ -84,7 +87,7 @@ export type CameraEffectTypes =
   | "hats"
   | "pets";
 
-export type ScreenEffectTypes = "pause" | "blur" | "tint";
+export type ScreenEffectTypes = "pause" | "postProcess" | "blur" | "tint";
 
 export type AudioEffectTypes =
   | "robot"

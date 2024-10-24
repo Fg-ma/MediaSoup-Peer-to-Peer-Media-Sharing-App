@@ -314,6 +314,12 @@ class CameraMedia {
     if (effect === "hideBackground") {
       this.babylonScene.toggleHideBackgroundPlane(this.effects[effect]);
     }
+
+    if (effect === "postProcess") {
+      this.babylonScene.babylonShaderController.togglePostProcessEffectsActive(
+        this.effects[effect]
+      );
+    }
   }
 
   drawNewEffect = (effect: EffectType) => {
