@@ -4,7 +4,7 @@ uniform sampler2D textureSampler;  // Input texture
 uniform vec2 resolution;            // Resolution of the viewport
 uniform vec3 targetColor;           // Color to keep (in RGB)
 
-const float tolerance = 0.2;            // Tolerance for color matching
+const float tolerance = 0.5;            // Tolerance for color matching
 
 void main() {
     vec2 uv = gl_FragCoord.xy / resolution.xy;

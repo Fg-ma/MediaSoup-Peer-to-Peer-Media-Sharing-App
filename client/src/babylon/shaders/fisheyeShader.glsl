@@ -1,8 +1,9 @@
 precision highp float;
 varying vec2 vUV;
 uniform sampler2D textureSampler;
-uniform float distortionStrength;
-uniform float fadeStart;  // Controls where the fade starts
+
+const float distortionStrength = 0.3;
+const float fadeStart = 0.95;  // Controls where the fade starts
 
 void main(void) {
   // Move UV range from [0,1] to [-1,1], centering the distortion
