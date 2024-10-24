@@ -33,6 +33,8 @@ class BabylonShaderController {
   private vintageTVPostProcess: PostProcess | undefined;
   private pixelationPostProcess: PostProcess | undefined;
   private tiltShiftPostProcess: PostProcess | undefined;
+  private fisheyePostProcess: PostProcess | undefined;
+  private prismaColorsPostProcess: PostProcess | undefined;
 
   private glitchActive = false;
   private minGlitchInterval = 2000; // 2 seconds in milliseconds
@@ -146,6 +148,34 @@ class BabylonShaderController {
     //     this.camera
     //   );
     // });
+    // this.loadShader("./src/babylon/fisheyeShader.glsl").then((shaderCode) => {
+    //   Effect.ShadersStore["fisheyePixelShader"] = shaderCode;
+    //   this.fisheyePostProcess = new PostProcess(
+    //     "fisheye",
+    //     "fisheye", // shader name (to be defined later)
+    //     null,
+    //     ["distortionStrength", "fadeStart"], // uniforms and samplers
+    //     1.0,
+    //     this.camera
+    //   );
+    //   this.fisheyePostProcess.onApply = (effect) => {
+    //     effect.setFloat("distortionStrength", 0.3);
+    //     effect.setFloat("fadeStart", 0.95);
+    //   };
+    // });
+    // this.loadShader("./src/babylon/prismaColorsShader.glsl").then(
+    //   (shaderCode) => {
+    //     Effect.ShadersStore["prismaColorsPixelShader"] = shaderCode;
+    //     this.prismaColorsPostProcess = new PostProcess(
+    //       "prismaColors",
+    //       "prismaColors", // shader name (to be defined later)
+    //       null,
+    //       ["time"], // uniforms and samplers
+    //       1.0,
+    //       this.camera
+    //     );
+    //   }
+    // );
   }
 
   private loadShader = async (url: string) => {
@@ -225,6 +255,12 @@ class BabylonShaderController {
             this.engine.getRenderHeight()
           )
         );
+      };
+    }
+
+    if (this.prismaColorsPostProcess) {
+      this.prismaColorsPostProcess.onApply = (effect) => {
+        effect.setFloat("time", this.time);
       };
     }
   };
