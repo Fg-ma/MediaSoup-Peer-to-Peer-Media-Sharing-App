@@ -11,7 +11,7 @@ export default function FgSoundBoard() {
         path: string;
         audio: HTMLAudioElement | undefined;
         playing: boolean;
-        active: boolean;
+        pressed: boolean;
       }
     >
   >({
@@ -19,151 +19,151 @@ export default function FgSoundBoard() {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     2: {
       path: "/backgroundMusic/backgroundMusic2.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     3: {
       path: "/backgroundMusic/backgroundMusic3.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     4: {
       path: "/backgroundMusic/backgroundMusic4.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     5: {
-      path: "/backgroundMusic/backgroundMusic1.mp3",
+      path: "/backgroundMusic/backgroundMusic5.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     6: {
-      path: "/backgroundMusic/backgroundMusic1.mp3",
+      path: "/backgroundMusic/backgroundMusic6.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     7: {
-      path: "/backgroundMusic/backgroundMusic1.mp3",
+      path: "/backgroundMusic/backgroundMusic7.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     8: {
-      path: "/backgroundMusic/backgroundMusic1.mp3",
+      path: "/backgroundMusic/backgroundMusic8.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     9: {
-      path: "/backgroundMusic/backgroundMusic1.mp3",
+      path: "/backgroundMusic/backgroundMusic9.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     10: {
-      path: "/backgroundMusic/backgroundMusic1.mp3",
+      path: "/backgroundMusic/backgroundMusic10.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     11: {
-      path: "/backgroundMusic/backgroundMusic1.mp3",
+      path: "/backgroundMusic/backgroundMusic11.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     12: {
-      path: "/backgroundMusic/backgroundMusic1.mp3",
+      path: "/backgroundMusic/backgroundMusic12.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     13: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     14: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     15: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     16: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     17: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     18: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     19: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     20: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     21: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     22: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     23: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     24: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
     25: {
       path: "/backgroundMusic/backgroundMusic1.mp3",
       audio: undefined,
       playing: false,
-      active: false,
+      pressed: false,
     },
   });
 
@@ -172,7 +172,7 @@ export default function FgSoundBoard() {
       ...prevEffects,
       [key]: {
         ...prevEffects[key],
-        active: !prevEffects[key].active,
+        pressed: !prevEffects[key].pressed,
       },
     }));
   };
@@ -229,7 +229,7 @@ export default function FgSoundBoard() {
             {Object.entries(soundEffects).map(([key, effect]) => (
               <FgButton
                 key={key}
-                className={`sound-board-btn ${effect.active ? "active" : ""}`}
+                className={`sound-board-btn ${effect.pressed ? "pressed" : ""}`}
                 mouseDownFunction={() => clickDown(parseInt(key))}
                 mouseUpFunction={() => clickUp(parseInt(key))}
                 touchStartFunction={() => clickDown(parseInt(key))}

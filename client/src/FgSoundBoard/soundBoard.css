@@ -43,12 +43,12 @@
   transition: all 0.05s linear;
 }
 
-.sound-board-btn.active:after {
+.sound-board-btn.pressed:after {
   top: -2.5%;
   right: 2.5%;
 }
 
-.sound-board-btn.active .sound-board-btn-alt-1 {
+.sound-board-btn.pressed .sound-board-btn-alt-1 {
   bottom: 98%;
   left: 93%;
   height: 4%;
@@ -57,7 +57,7 @@
   transform: skewX(36deg);
 }
 
-.sound-board-btn.active .sound-board-btn-alt-2 {
+.sound-board-btn.pressed .sound-board-btn-alt-2 {
   bottom: 1%;
   left: -1%;
   height: 4%;
