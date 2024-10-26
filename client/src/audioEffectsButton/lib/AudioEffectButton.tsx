@@ -22,7 +22,7 @@ export default function AudioEffectButton({
   audioEffect: AudioEffectTypes;
   audioEffectTemplate: AudioEffectTemplate;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => Promise<void>;
+  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
 }) {
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 

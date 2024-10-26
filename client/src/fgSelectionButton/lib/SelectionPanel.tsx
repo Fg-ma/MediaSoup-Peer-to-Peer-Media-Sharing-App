@@ -267,7 +267,7 @@ export default function SelectionPanel({
         )}
         <motion.div
           ref={scrollingContainerRef}
-          className='max-h-[18rem] h-max w-full overflow-y-auto font-K2D text-lg flex flex-col space-y-1'
+          className='small-vertical-scroll-bar max-h-[18rem] h-max w-full overflow-y-auto font-K2D text-lg flex flex-col space-y-1'
           variants={SelectionPanelVar}
           initial='init'
           animate='animate'

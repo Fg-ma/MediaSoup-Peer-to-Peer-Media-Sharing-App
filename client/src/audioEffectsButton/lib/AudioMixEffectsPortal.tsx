@@ -1091,7 +1091,7 @@ export default function AudioMixEffectsPortal({
       content={
         <div
           ref={portalRef}
-          className='font-K2D text-md min-w-[18rem] min-h-[18.75rem] h-full w-full overflow-y-auto'
+          className='vertical-scroll-bar font-K2D text-md min-w-[18rem] min-h-[18.75rem] h-full w-full overflow-y-auto'
         >
           <div className='h-max mb-4 mt-1'>
             <ScrollingContainer

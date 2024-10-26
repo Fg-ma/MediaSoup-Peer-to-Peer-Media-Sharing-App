@@ -48,6 +48,8 @@ export default function FgButton({
   clickFunction,
   mouseDownFunction,
   mouseUpFunction,
+  touchStartFunction,
+  touchEndFunction,
   holdFunction,
   contentFunction,
   doubleClickFunction,
@@ -72,6 +74,8 @@ export default function FgButton({
   clickFunction?: (event: React.MouseEvent) => void;
   mouseDownFunction?: (event: React.MouseEvent) => void;
   mouseUpFunction?: (event: MouseEvent) => void;
+  touchStartFunction?: (event: React.TouchEvent) => void;
+  touchEndFunction?: (event: React.TouchEvent) => void;
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: (event: React.MouseEvent) => void;
@@ -286,6 +290,8 @@ export default function FgButton({
         id={externalId}
         ref={externalRef ? externalRef : buttonRef}
         onMouseDown={(event) => handleMouseDown(event)}
+        onTouchStart={touchStartFunction}
+        onTouchEnd={touchEndFunction}
         className={className}
         style={style}
         data-value={fgButtonOptions.defaultDataValue}

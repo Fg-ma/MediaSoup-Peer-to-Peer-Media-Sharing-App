@@ -1,4 +1,4 @@
-.button-60 {
+.sound-board-btn {
   position: relative;
   width: 100px;
   height: 100px;
@@ -6,7 +6,7 @@
   background-color: rgb(217 217 217);
 }
 
-.button-60:after {
+.sound-board-btn:after {
   content: "";
   position: absolute;
   top: -5%;
@@ -15,9 +15,10 @@
   height: 100%;
   border-radius: 4px;
   background-color: rgb(255 255 255);
+  transition: all 0.05s linear;
 }
 
-.button-60-alt {
+.sound-board-btn-alt-1 {
   position: absolute;
   bottom: 99%;
   left: 91%;
@@ -26,9 +27,10 @@
   transform: skewX(43deg);
   background-color: rgb(217 217 217);
   border-top-right-radius: 3px;
+  transition: all 0.05s linear;
 }
 
-.button-60-alt-2 {
+.sound-board-btn-alt-2 {
   position: absolute;
   bottom: 0%;
   left: -2%;
@@ -38,17 +40,15 @@
   background-color: rgb(217 217 217);
   border-top-left-radius: 4px;
   border-bottom-left-radius: 2px;
+  transition: all 0.05s linear;
 }
 
-.button-60.active {
-}
-
-.button-60.active:after {
+.sound-board-btn.active:after {
   top: -2.5%;
   right: 2.5%;
 }
 
-.button-60.active .button-60-alt {
+.sound-board-btn.active .sound-board-btn-alt-1 {
   bottom: 98%;
   left: 93%;
   height: 4%;
@@ -57,7 +57,7 @@
   transform: skewX(36deg);
 }
 
-.button-60.active .button-60-alt-2 {
+.sound-board-btn.active .sound-board-btn-alt-2 {
   bottom: 1%;
   left: -1%;
   height: 4%;

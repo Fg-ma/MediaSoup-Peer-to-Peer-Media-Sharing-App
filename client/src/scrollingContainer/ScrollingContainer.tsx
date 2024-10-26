@@ -178,7 +178,7 @@ export default function ScrollingContainer({
       </AnimatePresence>
       <div
         ref={externalRef ? externalRef : scrollingContainerRef}
-        className='grow flex items-center justify-start overflow-x-auto w-full'
+        className='hide-scroll-bar grow flex items-center justify-start overflow-x-auto w-full'
         onScroll={handleScroll}
       >
         {content}

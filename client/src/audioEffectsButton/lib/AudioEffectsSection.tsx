@@ -762,19 +762,19 @@ export default function AudioEffectsSection({
     };
   }, []);
 
-  const audioEffectChange = async (effect: AudioEffectTypes) => {
-    await handleAudioEffectChange(effect);
+  const audioEffectChange = (effect: AudioEffectTypes) => {
+    handleAudioEffectChange(effect);
 
     setRerender((prev) => !prev);
   };
-  console.log();
+
   return (
     <>
       <FgPanel
         content={
           <div
             ref={audioSectionRef}
-            className={`smallScrollbar grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto py-2 ${
+            className={`small-vertical-scroll-bar grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto py-2 ${
               cols === 3
                 ? "grid-cols-3"
                 : cols === 4

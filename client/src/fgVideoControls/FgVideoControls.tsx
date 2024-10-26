@@ -297,7 +297,7 @@ export default function FgVideoControls({
         </div>
         <div
           ref={rightVideoControlsRef}
-          className='w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
+          className='hide-scroll-bar w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
         >
           {(fgVideoOptions.isFullScreen ??
             defaultFgVideoOptions.isFullScreen) && (

@@ -555,7 +555,7 @@ export default function GlassesButton({
       holdContent={
         <div
           ref={glassesContainerRef}
-          className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+          className='overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
         >
           {Object.entries(glassesEffects).map(([glasses, effect]) => (
             <FgButton

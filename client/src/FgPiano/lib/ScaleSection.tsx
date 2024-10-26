@@ -427,7 +427,7 @@ export default function ScaleSection({
   return (
     <div
       ref={scaleSectionContainerRef}
-      className='scale-section-container'
+      className='scale-section-container hide-scroll-bar'
       onMouseDown={handleMouseDown}
     >
       <VerticalSplitPanes

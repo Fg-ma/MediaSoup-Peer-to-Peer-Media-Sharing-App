@@ -216,7 +216,7 @@ export default function FgPiano({
         placement: "below",
       }}
       initHeight={"300px"}
-      initWidth={"400px"}
+      initWidth={"401px"}
       minWidth={285}
       minHeight={190}
       shadow={{

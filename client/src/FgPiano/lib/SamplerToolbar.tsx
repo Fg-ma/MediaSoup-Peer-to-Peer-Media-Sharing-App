@@ -156,7 +156,7 @@ export default function SamplerToolbar({
       </motion.div>
       <div
         ref={rightScaleSectionToolbarRef}
-        className='w-max h-8 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
+        className='hide-scroll-bar w-max h-8 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
       >
         <div className='scale-x-[-1] flex space-x-2 items-center'>
           <OctaveSelection

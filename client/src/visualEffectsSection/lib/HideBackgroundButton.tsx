@@ -311,7 +311,7 @@ export default function HideBackgroundButton({
         holdContent={
           <div
             ref={hideBackgroundContainerRef}
-            className='overflow-y-auto smallScrollbar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+            className='overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
           >
             <div className='w-full h-full flex items-center justify-center'>
               <div
