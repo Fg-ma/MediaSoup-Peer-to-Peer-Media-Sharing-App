@@ -4,13 +4,16 @@ import { AudioEffectTypes } from "../../context/StreamsContext";
 import FgPanel from "../../fgPanel/FgPanel";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
+import AudioEffectButton from "./AudioEffectButton";
+
+import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
+import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
 import mixAudioEffectsIcon from "../../../public/svgs/audioEffects/mixAudioEffectsIcon.svg";
 import mixAudioEffectsOffIcon from "../../../public/svgs/audioEffects/mixAudioEffectsOffIcon.svg";
 import panioIcon from "../../../public/svgs/audioEffects/panioIcon.svg";
 import panioOffIcon from "../../../public/svgs/audioEffects/panioOffIcon.svg";
-import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
-import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
-import AudioEffectButton from "./AudioEffectButton";
+import soundBoardIcon from "../../../public/svgs/audioEffects/soundBoardIcon.svg";
+import soundBoardOffIcon from "../../../public/svgs/audioEffects/soundBoardOffIcon.svg";
 
 import robotIcon from "../../../public/svgs/audioEffects/robotIcon.svg";
 import robotOffIcon from "../../../public/svgs/audioEffects/robotOffIcon.svg";
@@ -99,6 +102,9 @@ const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
 );
 const FgPiano = React.lazy(() => import("../../FgPiano/FgPiano"));
+const FgSoundBoard = React.lazy(
+  () => import("../../FgSoundBoard/FgSoundBoard")
+);
 
 export type AudioEffectTemplate = {
   icon: string;
@@ -712,10 +718,12 @@ export default function AudioEffectsSection({
   });
   const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
   const [panioActive, setPanioActive] = useState(false);
+  const [soundBoardActive, setSoundBoardActive] = useState(false);
 
   const audioSectionRef = useRef<HTMLDivElement>(null);
   const audioMixEffectsButtonRef = useRef<HTMLButtonElement>(null);
   const pianoRef = useRef<HTMLButtonElement>(null);
+  const soundBoardButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const newTo = muteStateRef.current ? "off" : "high";
@@ -766,6 +774,10 @@ export default function AudioEffectsSection({
     handleAudioEffectChange(effect);
 
     setRerender((prev) => !prev);
+  };
+
+  const closeSoundBoardCallback = () => {
+    setSoundBoardActive(false);
   };
 
   return (
@@ -892,6 +904,34 @@ export default function AudioEffectsSection({
               }
               options={{ hoverTimeoutDuration: 350 }}
             />
+            <FgButton
+              scrollingContainerRef={audioSectionRef}
+              externalRef={soundBoardButtonRef}
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              clickFunction={() => {
+                setSoundBoardActive((prev) => !prev);
+              }}
+              contentFunction={() => {
+                return (
+                  <FgSVG
+                    src={soundBoardActive ? soundBoardOffIcon : soundBoardIcon}
+                    className='flex items-center justify-center'
+                    attributes={[
+                      { key: "width", value: "90%" },
+                      { key: "height", value: "90%" },
+                      { key: "fill", value: "white" },
+                      { key: "stroke", value: "white" },
+                    ]}
+                  />
+                );
+              }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {soundBoardActive ? "Close sound board" : "Sound board"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
+            />
             {Object.entries(audioEffectTemplates).map((effect) => {
               return (
                 <AudioEffectButton
@@ -944,6 +984,14 @@ export default function AudioEffectsSection({
               setPanioActive(false);
             }}
             referenceElement={pianoRef.current as HTMLElement}
+          />
+        </Suspense>
+      )}
+      {soundBoardActive && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <FgSoundBoard
+            soundBoardButtonRef={soundBoardButtonRef.current ?? undefined}
+            closeCallback={closeSoundBoardCallback}
           />
         </Suspense>
       )}

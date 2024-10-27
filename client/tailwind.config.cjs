@@ -9,6 +9,7 @@ module.exports = {
         "fg-primary": "#F56114",
         "fg-primary-desaturated": "#F57E41",
         "fg-primary-desaturated-2": "#EF9668",
+        "fg-primary-desaturated-3": "#FFF5EF",
         "fg-secondary": "#2C92F5",
         "fg-white-95": "#F3F3F3",
         "fg-white-90": "#E6E6E6",

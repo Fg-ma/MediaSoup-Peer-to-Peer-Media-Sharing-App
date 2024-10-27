@@ -83,7 +83,7 @@ export default function FgPanel({
     height: initHeight,
   });
   const [focus, setFocus] = useState(true);
-  const [focusClicked, setFocusClicked] = useState(false);
+  const [focusClicked, setFocusClicked] = useState(true);
   const panelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);

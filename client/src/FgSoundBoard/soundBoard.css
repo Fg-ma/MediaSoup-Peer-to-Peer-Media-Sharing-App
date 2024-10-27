@@ -3,63 +3,94 @@
   width: 100px;
   height: 100px;
   border-radius: 4px;
-  background-color: rgb(217 217 217);
+  background-color: #cccccc;
 }
 
-.sound-board-btn:after {
-  content: "";
+.sound-board-btn-alt-1 {
   position: absolute;
   top: -5%;
   right: 5%;
   width: 100%;
   height: 100%;
   border-radius: 4px;
-  background-color: rgb(255 255 255);
-  transition: all 0.05s linear;
+  transition: top 0.05s linear, right 0.05s linear;
+  z-index: 1;
+  background-color: white;
+  border: 4px solid #cccccc;
 }
 
-.sound-board-btn-alt-1 {
+.sound-board-btn-alt-2 {
   position: absolute;
   bottom: 99%;
   left: 91%;
   width: 5%;
   height: 6%;
   transform: skewX(43deg);
-  background-color: rgb(217 217 217);
   border-top-right-radius: 3px;
-  transition: all 0.05s linear;
+  transition: bottom 0.05s linear, left 0.05s linear, height 0.05s linear,
+    border-top-right-radius 0.05s linear,
+    border-bottom-right-radius 0.05s linear, transform 0.05s linear;
+  z-index: 0;
+  background-color: #cccccc;
 }
 
-.sound-board-btn-alt-2 {
+.sound-board-btn-alt-3 {
   position: absolute;
   bottom: 0%;
   left: -2%;
   width: 5%;
   height: 8%;
   transform: skewX(49deg);
-  background-color: rgb(217 217 217);
   border-top-left-radius: 4px;
   border-bottom-left-radius: 2px;
-  transition: all 0.05s linear;
+  transition: bottom 0.05s linear, left 0.05s linear, height 0.05s linear,
+    border-top-left-radius 0.05s linear;
+  z-index: 0;
+  background-color: #cccccc;
 }
 
-.sound-board-btn.pressed:after {
-  top: -2.5%;
-  right: 2.5%;
+.sound-board-btn.pressed {
+  background-color: #f57e41;
 }
 
 .sound-board-btn.pressed .sound-board-btn-alt-1 {
+  top: -2.5%;
+  right: 2.5%;
+  border: 4px solid #f57e41;
+  background-color: #fff5ef;
+}
+
+.sound-board-btn.pressed .sound-board-btn-alt-2 {
   bottom: 98%;
   left: 93%;
   height: 4%;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 1px;
   transform: skewX(36deg);
+  background-color: #f57e41;
 }
 
-.sound-board-btn.pressed .sound-board-btn-alt-2 {
+.sound-board-btn.pressed .sound-board-btn-alt-3 {
   bottom: 1%;
   left: -1%;
   height: 4%;
   border-top-left-radius: 5px;
+  background-color: #f57e41;
+}
+
+.sound-board-btn.active:not(.pressed) {
+  background-color: #2c92f5;
+}
+
+.sound-board-btn.active:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #2c92f5;
+  background-color: #eff7ff;
+}
+
+.sound-board-btn.active:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #2c92f5;
+}
+
+.sound-board-btn.active:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #2c92f5;
 }
