@@ -50,7 +50,9 @@ export default function FgSoundBoard({
 
   const fileSelectorRef = useRef<HTMLInputElement>(null);
 
-  const [importedFiles, setImportedFiles] = useState<Record<number, File>>({});
+  const [importedFiles, setImportedFiles] = useState<
+    Record<number, { file: File; path: string }>
+  >({});
 
   const tempImportedFiles = useRef<FileList | undefined>(undefined);
 

@@ -16,10 +16,20 @@ class FgSoundEffects {
   }
 
   // Initialize a sound effect player for each sound effect
-  loadSoundEffect = (key: number, url: string) => {
-    const player = new Tone.Player(url).toDestination();
-    player.connect(this.volumeNode);
-    this.players[key] = { player, url };
+  loadSoundEffect = (key: number, url: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      try {
+        const player = new Tone.Player(url, () => {
+          resolve(); // Resolve the promise once the sound is loaded
+        });
+
+        player.connect(this.volumeNode);
+        this.players[key] = { player, url };
+      } catch (error) {
+        console.error(`Failed to load sound effect ${key}:`, error);
+        reject(error); // Reject the promise if there's an error
+      }
+    });
   };
 
   // Swap the sound effect URL for a given key
@@ -33,6 +43,8 @@ class FgSoundEffects {
       // Disconnect and dispose of the existing player
       existingPlayerData.player.disconnect();
       existingPlayerData.player.dispose();
+
+      delete this.players[key];
     }
 
     // Create a new player with the updated URL
@@ -50,18 +62,21 @@ class FgSoundEffects {
 
   // Play or stop a sound effect based on the current state
   toggleAudio = (key: number, playing: boolean) => {
-    const player = this.players[key].player;
-    if (!player) return;
+    if (!this.players[key].player) return;
+
+    if (!this.players[key].player.loaded) {
+      console.warn(`Sound effect ${key} is not loaded yet.`);
+      return; // Exit if not loaded
+    }
 
     if (playing) {
-      player.stop();
-    } else {
-      // Check if the player's buffer is loaded
-      if (!player.loaded) {
-        console.warn(`Sound effect ${key} is not loaded yet.`);
-        return; // Exit if not loaded
+      if (this.players[key].player.state === "started") {
+        this.players[key].player.stop();
       }
-      player.start();
+    } else {
+      if (this.players[key].player.state !== "started") {
+        this.players[key].player.start();
+      }
     }
   };
 }

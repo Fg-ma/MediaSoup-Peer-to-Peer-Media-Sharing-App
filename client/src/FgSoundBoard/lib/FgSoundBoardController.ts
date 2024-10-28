@@ -40,9 +40,9 @@ class FgSoundBoardController {
       }>
     >,
     private fileSelectorRef: React.RefObject<HTMLInputElement>,
-    private importedFiles: Record<number, File>,
+    private importedFiles: Record<number, { file: File; path: string }>,
     private setImportedFiles: React.Dispatch<
-      React.SetStateAction<Record<number, File>>
+      React.SetStateAction<Record<number, { file: File; path: string }>>
     >,
     private tempImportedFiles: React.MutableRefObject<FileList | undefined>,
     private userMedia: React.MutableRefObject<{
@@ -57,7 +57,14 @@ class FgSoundBoardController {
     private audioEndTimeouts: React.MutableRefObject<
       Record<number, NodeJS.Timeout | undefined>
     >
-  ) {}
+  ) {
+    // for (const effect of Object.entries(this.soundEffects)) {
+    //   this.userMedia.current.audio?.audioEffects.fgSoundEffects.loadSoundEffect(
+    //     parseInt(effect[0]),
+    //     effect[1].path
+    //   );
+    // }
+  }
 
   toggleButton = (key: number) => {
     this.setSoundEffects((prevEffects) => ({
@@ -271,6 +278,42 @@ class FgSoundBoardController {
     }
   };
 
+  private playAudio = async (key: number, path: string) => {
+    const url = this.importedFiles[key] ? this.importedFiles[key].path : path;
+
+    // Start playback with Tone.js and load the sound if it hasn't been loaded
+    if (
+      !this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[key]
+    ) {
+      await this.userMedia.current.audio?.audioEffects.fgSoundEffects.loadSoundEffect(
+        key,
+        url
+      );
+    } else if (
+      this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[key]
+        .url !== url
+    ) {
+      this.userMedia.current.audio?.audioEffects.fgSoundEffects.swapPlayer(
+        key,
+        url
+      );
+    }
+
+    if (
+      this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[key]
+        .player.buffer.duration
+    ) {
+      this.audioEndTimeouts.current[key] = setTimeout(() => {
+        this.audioEnded(key);
+      }, this.userMedia.current.audio.audioEffects.fgSoundEffects.players[key].player.buffer.duration * 1000);
+    }
+
+    this.userMedia.current.audio?.audioEffects.fgSoundEffects.toggleAudio(
+      key,
+      false
+    );
+  };
+
   private toggleAudio = (key: number) => {
     this.setSoundEffects((prevEffects) => {
       const soundEffect = prevEffects[key];
@@ -290,38 +333,7 @@ class FgSoundBoardController {
           },
         };
       } else {
-        const url = this.importedFiles[key]
-          ? URL.createObjectURL(this.importedFiles[key])
-          : path;
-
-        // Start playback with Tone.js and load the sound if it hasn't been loaded
-        if (
-          !this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[
-            key
-          ]
-        ) {
-          this.userMedia.current.audio?.audioEffects.fgSoundEffects.loadSoundEffect(
-            key,
-            url
-          );
-        } else if (
-          this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[key]
-            .url !== url
-        ) {
-          this.userMedia.current.audio?.audioEffects.fgSoundEffects.swapPlayer(
-            key,
-            url
-          );
-        } else {
-          this.audioEndTimeouts.current[key] = setTimeout(() => {
-            this.audioEnded(key);
-          }, this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[key].player.buffer.duration * 1000);
-        }
-
-        this.userMedia.current.audio?.audioEffects.fgSoundEffects.toggleAudio(
-          key,
-          false
-        );
+        this.playAudio(key, path);
         return {
           ...prevEffects,
           [key]: {
@@ -354,7 +366,10 @@ class FgSoundBoardController {
         if (this.tempImportedFiles.current) {
           // Convert FileList to an array and process the first file
           const filesArray = Array.from(this.tempImportedFiles.current);
-          newImportedFiles[key] = filesArray[0];
+          newImportedFiles[key] = {
+            file: filesArray[0],
+            path: URL.createObjectURL(filesArray[0]),
+          };
 
           // Update tempImportedFiles to remove the first element
           this.tempImportedFiles.current = filesArray.slice(
