@@ -54,6 +54,10 @@ export default function FgSoundBoard({
 
   const tempImportedFiles = useRef<FileList | undefined>(undefined);
 
+  const audioEndTimeouts = useRef<Record<number, NodeJS.Timeout | undefined>>(
+    {}
+  );
+
   const fgSoundBoardController = new FgSoundBoardController(
     soundEffects,
     setSoundEffects,
@@ -68,7 +72,8 @@ export default function FgSoundBoard({
     importedFiles,
     setImportedFiles,
     tempImportedFiles,
-    userMedia
+    userMedia,
+    audioEndTimeouts
   );
 
   useEffect(() => {

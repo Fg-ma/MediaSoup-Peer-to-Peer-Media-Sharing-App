@@ -2,7 +2,7 @@ import * as Tone from "tone";
 
 class FgSoundEffects {
   private volumeNode: Tone.Volume;
-  players: { [key: number]: Tone.Player } = {};
+  players: { [key: number]: { player: Tone.Player; url: string } } = {};
 
   constructor(
     private soundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode,
@@ -19,7 +19,28 @@ class FgSoundEffects {
   loadSoundEffect = (key: number, url: string) => {
     const player = new Tone.Player(url).toDestination();
     player.connect(this.volumeNode);
-    this.players[key] = player;
+    this.players[key] = { player, url };
+  };
+
+  // Swap the sound effect URL for a given key
+  swapPlayer = (key: number, url: string) => {
+    const existingPlayerData = this.players[key];
+
+    if (existingPlayerData) {
+      // Stop the existing player if it’s playing
+      existingPlayerData.player.stop();
+
+      // Disconnect and dispose of the existing player
+      existingPlayerData.player.disconnect();
+      existingPlayerData.player.dispose();
+    }
+
+    // Create a new player with the updated URL
+    const newPlayer = new Tone.Player(url).toDestination();
+    newPlayer.connect(this.volumeNode);
+
+    // Update the player entry with the new player and URL
+    this.players[key] = { player: newPlayer, url };
   };
 
   // Set volume (in decibels)
@@ -29,7 +50,7 @@ class FgSoundEffects {
 
   // Play or stop a sound effect based on the current state
   toggleAudio = (key: number, playing: boolean) => {
-    const player = this.players[key];
+    const player = this.players[key].player;
     if (!player) return;
 
     if (playing) {
@@ -41,10 +62,6 @@ class FgSoundEffects {
         return; // Exit if not loaded
       }
       player.start();
-
-      player.onended = () => {
-        onPlaybackComplete(); // Run the provided callback when playback finishes
-      };
     }
   };
 }

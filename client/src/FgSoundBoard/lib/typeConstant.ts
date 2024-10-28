@@ -35,7 +35,15 @@ export type CrazyBoardEffects =
   | "bottomSmile"
   | "leftSmile"
   | "rightSmile"
-  | "spiral";
+  | "spiral"
+  | "vTop"
+  | "vBottom"
+  | "vLeft"
+  | "vRight"
+  | "topRightDiagonalRays"
+  | "topLeftDiagonalRays"
+  | "bottomRightDiagonalRays"
+  | "bottomLeftDiagonalRays";
 
 export type BoardModes = "standard" | "crazy" | "seizure";
 
@@ -612,6 +620,74 @@ export const crazyBoardEffects: {
       [13],
       [],
     ],
+    running: false,
+  },
+  vTop: {
+    sequence: [
+      [3],
+      [2, 4, 8],
+      [1, 7, 13, 9, 5],
+      [6, 12, 18, 14, 10],
+      [11, 17, 23, 19, 15],
+      [16, 22, 24, 20],
+      [21, 25],
+      [],
+    ],
+    running: false,
+  },
+  vBottom: {
+    sequence: [
+      [23],
+      [22, 24, 18],
+      [21, 17, 13, 19, 25],
+      [16, 12, 8, 14, 20],
+      [11, 7, 3, 9, 15],
+      [6, 2, 4, 10],
+      [1, 5],
+      [],
+    ],
+    running: false,
+  },
+  vLeft: {
+    sequence: [
+      [11],
+      [12, 6, 16],
+      [1, 7, 13, 17, 21],
+      [14, 8, 2, 18, 22],
+      [3, 9, 15, 19, 23],
+      [4, 10, 20, 24],
+      [5, 25],
+      [],
+    ],
+    running: false,
+  },
+  vRight: {
+    sequence: [
+      [15],
+      [10, 14, 20],
+      [5, 9, 13, 19, 25],
+      [4, 8, 12, 18, 24],
+      [3, 7, 11, 17, 23],
+      [2, 6, 16, 22],
+      [1, 21],
+      [],
+    ],
+    running: false,
+  },
+  topRightDiagonalRays: {
+    sequence: [[5], [3, 9, 15], [1, 7, 13, 19, 25], [11, 17, 23], [21], []],
+    running: false,
+  },
+  topLeftDiagonalRays: {
+    sequence: [[1], [3, 7, 11], [5, 9, 13, 17, 21], [23, 19, 15], [25], []],
+    running: false,
+  },
+  bottomRightDiagonalRays: {
+    sequence: [[21], [11, 17, 23], [1, 7, 13, 19, 25], [3, 9, 15], [5], []],
+    running: false,
+  },
+  bottomLeftDiagonalRays: {
+    sequence: [[25], [23, 19, 15], [5, 9, 13, 17, 21], [3, 7, 11], [1], []],
     running: false,
   },
 };

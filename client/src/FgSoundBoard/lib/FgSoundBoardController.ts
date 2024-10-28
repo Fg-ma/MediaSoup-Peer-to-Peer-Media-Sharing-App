@@ -1,4 +1,3 @@
-import CameraMedia from "src/lib/CameraMedia";
 import {
   boardEffectColors,
   BoardEffectColors,
@@ -8,8 +7,9 @@ import {
   SoundEffects,
   SoundEffectsMetaData,
 } from "./typeConstant";
-import ScreenMedia from "src/lib/ScreenMedia";
-import AudioMedia from "src/lib/AudioMedia";
+import CameraMedia from "../../lib/CameraMedia";
+import ScreenMedia from "../../lib/ScreenMedia";
+import AudioMedia from "../../lib/AudioMedia";
 
 class FgSoundBoardController {
   crazyBoardEffectInterval = 75;
@@ -53,7 +53,10 @@ class FgSoundBoardController {
         [screenId: string]: ScreenMedia;
       };
       audio: AudioMedia | undefined;
-    }>
+    }>,
+    private audioEndTimeouts: React.MutableRefObject<
+      Record<number, NodeJS.Timeout | undefined>
+    >
   ) {}
 
   toggleButton = (key: number) => {
@@ -241,6 +244,33 @@ class FgSoundBoardController {
     }
   };
 
+  private audioEnded = (key: number) => {
+    if (this.seizureBoardEffectIntevalRef.current) {
+      clearInterval(this.seizureBoardEffectIntevalRef.current);
+      this.seizureBoardEffectIntevalRef.current = undefined;
+    }
+    if (this.seizureBoardEffectTimeoutRef.current) {
+      clearTimeout(this.seizureBoardEffectTimeoutRef.current);
+      this.seizureBoardEffectTimeoutRef.current = undefined;
+    }
+    this.clearSeizureBoardEffect();
+
+    this.setSoundEffects((prev) => {
+      return {
+        ...prev,
+        [key]: {
+          ...prev[key],
+          playing: false,
+        },
+      };
+    });
+
+    if (this.audioEndTimeouts.current[key]) {
+      clearTimeout(this.audioEndTimeouts.current[key]);
+      this.audioEndTimeouts.current[key] = undefined;
+    }
+  };
+
   private toggleAudio = (key: number) => {
     this.setSoundEffects((prevEffects) => {
       const soundEffect = prevEffects[key];
@@ -260,19 +290,32 @@ class FgSoundBoardController {
           },
         };
       } else {
+        const url = this.importedFiles[key]
+          ? URL.createObjectURL(this.importedFiles[key])
+          : path;
+
         // Start playback with Tone.js and load the sound if it hasn't been loaded
         if (
           !this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[
             key
           ]
         ) {
-          const url = this.importedFiles[key]
-            ? URL.createObjectURL(this.importedFiles[key])
-            : path;
           this.userMedia.current.audio?.audioEffects.fgSoundEffects.loadSoundEffect(
             key,
             url
           );
+        } else if (
+          this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[key]
+            .url !== url
+        ) {
+          this.userMedia.current.audio?.audioEffects.fgSoundEffects.swapPlayer(
+            key,
+            url
+          );
+        } else {
+          this.audioEndTimeouts.current[key] = setTimeout(() => {
+            this.audioEnded(key);
+          }, this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[key].player.buffer.duration * 1000);
         }
 
         this.userMedia.current.audio?.audioEffects.fgSoundEffects.toggleAudio(
