@@ -2,13 +2,10 @@ export type SoundEffects = Record<
   number,
   {
     path: string;
-    audio: HTMLAudioElement | undefined;
     playing: boolean;
     pressed: boolean;
     seizureColor: BoardEffectColors | undefined;
     classes: string[];
-    audioEndedListener: (() => void) | undefined;
-    metadataLoadedListener: (() => void) | undefined;
   }
 >;
 
@@ -40,6 +37,8 @@ export type CrazyBoardEffects =
   | "rightSmile"
   | "spiral";
 
+export type BoardModes = "standard" | "crazy" | "seizure";
+
 export type BoardEffectColors =
   | "green"
   | "pink"
@@ -55,256 +54,180 @@ export type BoardEffectColors =
   | "red"
   | "gold";
 
+export const defaultImportButton = {
+  pressed: false,
+  seizureColor: undefined,
+  classes: [],
+};
+
 export const defaultSoundEffects: SoundEffects = {
-  1: {
-    path: "/soundEffects/airRaidSiren.mp3",
-    audio: undefined,
-    playing: false,
-    pressed: false,
-    seizureColor: undefined,
-    classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
-  },
   2: {
     path: "/soundEffects/applause.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   3: {
     path: "/soundEffects/attentionWhistle.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   4: {
     path: "/soundEffects/cameraFlash.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   5: {
     path: "/soundEffects/clockTicking.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   6: {
     path: "/soundEffects/coins.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   7: {
     path: "/soundEffects/doorCreak.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   8: {
     path: "/soundEffects/glassBreak.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   9: {
     path: "/soundEffects/gunLoading.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   10: {
     path: "/soundEffects/happyWhistle.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   11: {
     path: "/soundEffects/laugh1.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   12: {
     path: "/soundEffects/laugh2.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   13: {
     path: "/soundEffects/laugh3.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   14: {
     path: "/soundEffects/laugh4.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   15: {
     path: "/soundEffects/laugh5.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   16: {
     path: "/soundEffects/laugh6.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   17: {
     path: "/soundEffects/laugh7.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   18: {
     path: "/soundEffects/laughTrack.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   19: {
     path: "/soundEffects/mouseClick.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   20: {
     path: "/soundEffects/musicBox.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   21: {
     path: "/soundEffects/police.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   22: {
     path: "/soundEffects/slideWhistle1.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   23: {
     path: "/soundEffects/slideWhistle2.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   24: {
     path: "/soundEffects/slideWhistle3.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
   25: {
     path: "/soundEffects/slideWhistle4.mp3",
-    audio: undefined,
     playing: false,
     pressed: false,
     seizureColor: undefined,
     classes: [],
-    audioEndedListener: undefined,
-    metadataLoadedListener: undefined,
   },
 };
 

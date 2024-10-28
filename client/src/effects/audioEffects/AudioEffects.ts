@@ -1,5 +1,6 @@
 import * as Tone from "tone";
 import FgSampler from "./fgSampler";
+import FgSoundEffects from "./fgSoundEffects";
 
 export type AudioMixEffectsType =
   | "autoFilter"
@@ -61,15 +62,10 @@ export type MixEffectsOptionsType =
   | VibratoOptionsType;
 
 class AudioEffects {
-  private audioStream: Tone.UserMedia;
-
-  private masterMediaStreamDestination: MediaStreamAudioDestinationNode;
-  private micMediaStreamDestination: MediaStreamAudioDestinationNode;
-  private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
-
   private masterChain: Tone.Gain;
   private micChain: Tone.Gain;
   private samplerChain: Tone.Gain;
+  private soundEffectsChain: Tone.Gain;
 
   private micEffects: any[] = [];
 
@@ -114,6 +110,8 @@ class AudioEffects {
   ];
 
   fgSampler: FgSampler;
+
+  fgSoundEffects: FgSoundEffects;
 
   private effectUpdaters: {
     [key in AudioMixEffectsType]: (
@@ -430,33 +428,38 @@ class AudioEffects {
   };
 
   constructor(
-    audioStream: Tone.UserMedia,
-    masterMediaStreamDestination: MediaStreamAudioDestinationNode,
-    micMediaStreamDestination: MediaStreamAudioDestinationNode,
-    samplerMediaStreamDestination: MediaStreamAudioDestinationNode
+    private audioStream: Tone.UserMedia,
+    private masterMediaStreamDestination: MediaStreamAudioDestinationNode,
+    private micMediaStreamDestination: MediaStreamAudioDestinationNode,
+    private samplerMediaStreamDestination: MediaStreamAudioDestinationNode,
+    private soundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode
   ) {
-    this.audioStream = audioStream;
-    this.masterMediaStreamDestination = masterMediaStreamDestination;
-    this.micMediaStreamDestination = micMediaStreamDestination;
-    this.samplerMediaStreamDestination = samplerMediaStreamDestination;
-
     this.masterChain = new Tone.Gain(); // Create a Gain node for the master chain
 
     this.micChain = new Tone.Gain(); // Create a Gain node for the mic chain
 
     this.samplerChain = new Tone.Gain(); // Create a Gain node for the sampler chain
 
+    this.soundEffectsChain = new Tone.Gain(); // Create a Gain node for the sampler chain
+
     // Connect micChain and samplerChain to the masterChain
     this.micChain.connect(this.masterChain);
     this.samplerChain.connect(this.masterChain);
+    this.soundEffectsChain.connect(this.masterChain);
     this.masterChain.connect(this.masterMediaStreamDestination);
 
     this.micChain.connect(this.micMediaStreamDestination);
     this.samplerChain.connect(this.samplerMediaStreamDestination);
+    this.soundEffectsChain.connect(this.soundEffectsMediaStreamDestination);
 
     this.fgSampler = new FgSampler(
       this.samplerMediaStreamDestination,
       this.masterChain,
+      this.samplerChain
+    );
+
+    this.fgSoundEffects = new FgSoundEffects(
+      this.samplerMediaStreamDestination,
       this.samplerChain
     );
   }

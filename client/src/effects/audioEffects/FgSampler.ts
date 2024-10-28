@@ -4,14 +4,10 @@ import fgSamplers, { FgSamplers } from "./fgSamplers";
 import FgMetronome from "./fgMetronome";
 
 class FgSampler {
-  private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
-
   private sampler: Tone.Sampler | undefined;
   private playOnlyDefined: boolean;
   private definedNotes: string[] = [];
 
-  private masterChain: Tone.Gain;
-  private samplerChain: Tone.Gain;
   private samplerEffects: any[] = [];
 
   private playingNotes: Set<string> = new Set();
@@ -352,14 +348,10 @@ class FgSampler {
   };
 
   constructor(
-    samplerMediaStreamDestination: MediaStreamAudioDestinationNode,
-    masterChain: Tone.Gain,
-    samplerChain: Tone.Gain
+    private samplerMediaStreamDestination: MediaStreamAudioDestinationNode,
+    private masterChain: Tone.Gain,
+    private samplerChain: Tone.Gain
   ) {
-    this.samplerMediaStreamDestination = samplerMediaStreamDestination;
-    this.masterChain = masterChain;
-    this.samplerChain = samplerChain;
-
     this.volumeNode = new Tone.Volume(0); // 0 dB by default
 
     this.sampler = new Tone.Sampler(fgSamplers.pianos.default.sampler);

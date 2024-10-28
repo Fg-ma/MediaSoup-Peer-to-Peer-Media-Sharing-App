@@ -1,18 +1,22 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useStreamsContext } from "../context/StreamsContext";
 import FgPanel from "../fgPanel/FgPanel";
 import FgButton from "../fgButton/FgButton";
 import "./lib/soundBoard.css";
 import FgTriToggleButton from "../fgTriToggleButton/FgTriToggleButton";
 import FgSoundBoardController from "./lib/FgSoundBoardController";
 import {
+  BoardModes,
+  defaultImportButton,
   defaultSoundEffects,
   defaultSoundEffectsMetaData,
   SoundEffects,
   SoundEffectsMetaData,
-} from "./lib/typeConstants";
+} from "./lib/typeConstant";
+import FgSVG from "../fgSVG/FgSVG";
 
-export type BoardModes = "standard" | "crazy" | "seizure";
+import additionIcon from "../../public/svgs/additionIcon.svg";
 
 export default function FgSoundBoard({
   soundBoardButtonRef,
@@ -21,11 +25,18 @@ export default function FgSoundBoard({
   soundBoardButtonRef?: HTMLButtonElement;
   closeCallback?: () => void;
 }) {
+  const { userMedia } = useStreamsContext();
+
   const [soundEffects, setSoundEffects] =
     useState<SoundEffects>(defaultSoundEffects);
   const soundEffectsMetaDataRef = useRef<SoundEffectsMetaData>(
     defaultSoundEffectsMetaData
   );
+  const [importButton, setImportButton] = useState<{
+    pressed: boolean;
+    seizureColor: string | undefined;
+    classes: string[];
+  }>(defaultImportButton);
 
   const [boardMode, setBoardMode] = useState<BoardModes>("standard");
   const seizureBoardEffectIntevalRef = useRef<NodeJS.Timeout | undefined>(
@@ -37,6 +48,12 @@ export default function FgSoundBoard({
 
   const [focus, setFocus] = useState(true);
 
+  const fileSelectorRef = useRef<HTMLInputElement>(null);
+
+  const [importedFiles, setImportedFiles] = useState<Record<number, File>>({});
+
+  const tempImportedFiles = useRef<FileList | undefined>(undefined);
+
   const fgSoundBoardController = new FgSoundBoardController(
     soundEffects,
     setSoundEffects,
@@ -44,15 +61,62 @@ export default function FgSoundBoard({
     boardMode,
     setBoardMode,
     seizureBoardEffectIntevalRef,
-    seizureBoardEffectTimeoutRef
+    seizureBoardEffectTimeoutRef,
+    importButton,
+    setImportButton,
+    fileSelectorRef,
+    importedFiles,
+    setImportedFiles,
+    tempImportedFiles,
+    userMedia
   );
+
+  useEffect(() => {
+    if (tempImportedFiles.current === undefined) {
+      setSoundEffects((prevEffects) => {
+        const newEffects = { ...prevEffects };
+
+        for (const key in newEffects) {
+          const updatedClasses = [...newEffects[key].classes];
+
+          newEffects[key].classes = updatedClasses.filter(
+            (cls) => cls !== "assignment"
+          );
+        }
+
+        return newEffects;
+      });
+    } else {
+      setSoundEffects((prevEffects) => {
+        const newEffects = { ...prevEffects };
+
+        for (const key in newEffects) {
+          const updatedClasses = [...newEffects[key].classes];
+
+          if (!updatedClasses.includes("assignment")) {
+            updatedClasses.push("assignment");
+            newEffects[key].classes = updatedClasses;
+          }
+        }
+
+        return newEffects;
+      });
+    }
+  }, [tempImportedFiles.current]);
 
   return (
     <FgPanel
       content={
         <div className='flex flex-col w-full h-full'>
+          <input
+            ref={fileSelectorRef}
+            className='hidden'
+            type='file'
+            onChange={fgSoundBoardController.handleFileInput}
+            multiple
+          />
           <motion.div
-            className='w-full min-h-10 h-10 z-[2] px-4 flex items-center'
+            className='w-full min-h-10 h-10 z-[2] px-4 flex items-center justify-between'
             style={{
               // prettier-ignore
               boxShadow: `0px 10px 5px -5px ${focus ? "#ffffff" : "#f3f3f3"}`,
@@ -69,9 +133,55 @@ export default function FgSoundBoard({
                 btnLabels={["Standard", "Crazy", "Seizure"]}
               />
             </div>
+            <div className='select-none font-K2D text-xl truncate'>
+              {tempImportedFiles.current &&
+                tempImportedFiles.current[0] &&
+                tempImportedFiles.current[0].name}
+            </div>
           </motion.div>
           <div className='small-multidirectional-scroll-bar p-4 overflow-auto w-full grow relative'>
             <div className='w-full h-full min-h-max min-w-max grid grid-cols-5 gap-3 items-center justify-center justify-items-center place-items-center'>
+              <FgButton
+                className={`sound-board-btn ${
+                  importButton.pressed ? "pressed" : ""
+                } ${importButton.classes.join(" ")}`}
+                mouseDownFunction={
+                  fgSoundBoardController.handleImportEffectClickDown
+                }
+                mouseUpFunction={
+                  fgSoundBoardController.handleImportEffectClickUp
+                }
+                touchStartFunction={
+                  fgSoundBoardController.handleImportEffectClickDown
+                }
+                touchEndFunction={
+                  fgSoundBoardController.handleImportEffectClickUp
+                }
+                contentFunction={() => (
+                  <>
+                    <div className='sound-board-btn-alt-1'>
+                      <FgSVG
+                        src={additionIcon}
+                        attributes={[
+                          { key: "width", value: "90%" },
+                          { key: "height", value: "90%" },
+                          {
+                            key: "fill",
+                            value: importButton.pressed ? "#f57e41" : "#cccccc",
+                          },
+                          {
+                            key: "stroke",
+                            value: importButton.pressed ? "#f57e41" : "#cccccc",
+                          },
+                        ]}
+                        className='w-full h-full flex items-center justify-center z-[2]'
+                      />
+                    </div>
+                    <div className='sound-board-btn-alt-2'></div>
+                    <div className='sound-board-btn-alt-3'></div>
+                  </>
+                )}
+              />
               {Object.entries(soundEffects).map(([key, effect]) => (
                 <FgButton
                   key={key}

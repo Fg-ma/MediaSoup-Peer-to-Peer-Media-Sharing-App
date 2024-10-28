@@ -95,6 +95,50 @@
   background-color: #2c92f5;
 }
 
+.sound-board-btn.assignment {
+  animation: flashColorBackground1 1s infinite alternate;
+}
+
+.sound-board-btn.assignment .sound-board-btn-alt-1 {
+  animation: flashColorBorder 1s infinite alternate,
+    flashColorBackground2 1s infinite alternate;
+}
+
+.sound-board-btn.assignment .sound-board-btn-alt-2 {
+  animation: flashColorBackground1 1s infinite alternate;
+}
+
+.sound-board-btn.assignment .sound-board-btn-alt-3 {
+  animation: flashColorBackground1 1s infinite alternate;
+}
+
+@keyframes flashColorBorder {
+  0% {
+    border: 4px solid #cccccc;
+  }
+  100% {
+    border: 4px solid #2c92f5;
+  }
+}
+
+@keyframes flashColorBackground1 {
+  0% {
+    background-color: #cccccc;
+  }
+  100% {
+    background-color: #2c92f5;
+  }
+}
+
+@keyframes flashColorBackground2 {
+  0% {
+    background-color: white;
+  }
+  100% {
+    background-color: #eff7ff;
+  }
+}
+
 /* Neon Green */
 .sound-board-btn.active-green:not(.pressed):not(.active) {
   background-color: #2cf55b;

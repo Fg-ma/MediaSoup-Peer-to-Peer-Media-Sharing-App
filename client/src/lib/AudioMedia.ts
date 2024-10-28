@@ -2,7 +2,6 @@ import * as Tone from "tone";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
-  defaultAudioStreamEffects,
   ScreenEffectTypes,
 } from "../context/StreamsContext";
 import AudioEffects, {
@@ -23,8 +22,9 @@ class AudioMedia {
   private masterMediaStreamDestination: MediaStreamAudioDestinationNode;
   private micMediaStreamDestination: MediaStreamAudioDestinationNode;
   private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
+  private soundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode;
 
-  private audioEffects: AudioEffects;
+  audioEffects: AudioEffects;
 
   private userStreamEffects: React.MutableRefObject<{
     camera: {
@@ -68,6 +68,8 @@ class AudioMedia {
       this.audioContext.createMediaStreamDestination();
     this.samplerMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
+    this.soundEffectsMediaStreamDestination =
+      this.audioContext.createMediaStreamDestination();
 
     // Connect the Tone.UserMedia instance to the MediaStreamDestination
     this.audioStream.connect(this.masterMediaStreamDestination);
@@ -77,7 +79,8 @@ class AudioMedia {
       this.audioStream,
       this.masterMediaStreamDestination,
       this.micMediaStreamDestination,
-      this.samplerMediaStreamDestination
+      this.samplerMediaStreamDestination,
+      this.soundEffectsMediaStreamDestination
     );
 
     this.effects = {};
@@ -98,6 +101,11 @@ class AudioMedia {
     // Add the sampler track (from samplerMediaStreamDestination) to combined stream
     this.mediaStream.addTrack(
       this.samplerMediaStreamDestination.stream.getAudioTracks()[0]
+    );
+
+    // Add the sampler track (from samplerMediaStreamDestination) to combined stream
+    this.mediaStream.addTrack(
+      this.soundEffectsMediaStreamDestination.stream.getAudioTracks()[0]
     );
 
     // Make master media stream

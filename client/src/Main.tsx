@@ -28,7 +28,6 @@ import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
-import FgSoundBoard from "./FgSoundBoard/FgSoundBoard";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")
@@ -678,7 +677,6 @@ export default function Main() {
             )}
         </div>
       </div>
-      <FgSoundBoard />
     </div>
   );
 }
