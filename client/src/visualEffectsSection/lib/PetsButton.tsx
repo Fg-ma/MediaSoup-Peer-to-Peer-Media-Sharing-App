@@ -1,17 +1,17 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
-import FgImage from "../../fgImage/FgImage";
-import {
-  assetSizePositionMap,
-  PetsEffectTypes,
-  useCurrentEffectsStylesContext,
-} from "../../context/CurrentEffectsStylesContext";
+import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
+import {
+  assetSizePositionMap,
+  PetsEffectTypes,
+} from "../../context/currentEffectsStylesContext/typeConstant";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 
 import angryHamster_512x512 from "../../../public/2DAssets/pets/angryHamster/angryHamster_512x512.png";
 import angryHamster_32x32 from "../../../public/2DAssets/pets/angryHamster/angryHamster_32x32.png";

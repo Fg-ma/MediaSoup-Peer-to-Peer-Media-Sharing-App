@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { useStreamsContext } from "../context/StreamsContext";
+import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import FgPanel from "../fgPanel/FgPanel";
 import FgButton from "../fgButton/FgButton";
 import "./lib/soundBoard.css";

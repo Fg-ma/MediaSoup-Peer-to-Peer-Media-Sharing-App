@@ -6,8 +6,8 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "src/context/StreamsContext";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+} from "src/context/streamsContext/StreamsContext";
+import { EffectStylesType } from "src/context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 
 class BundleController {
   private isUser: boolean;

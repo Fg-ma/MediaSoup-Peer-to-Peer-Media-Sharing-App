@@ -1,5 +1,5 @@
 import React from "react";
-import { useStreamsContext } from "../../context/StreamsContext";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import { SamplerEffectType } from "./SamplerEffectsToolbar";
 import FgKnobButton from "../../fgKnobButton/FgKnobButton";
 import FgButton from "../../fgButton/FgButton";

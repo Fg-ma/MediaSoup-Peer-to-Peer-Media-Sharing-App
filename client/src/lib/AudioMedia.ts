@@ -3,7 +3,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../context/StreamsContext";
+} from "../context/streamsContext/StreamsContext";
 import AudioEffects, {
   AudioMixEffectsType,
   MixEffectsOptionsType,

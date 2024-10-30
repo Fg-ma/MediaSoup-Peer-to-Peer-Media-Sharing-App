@@ -1,7 +1,3 @@
-import {
-  EffectStylesType,
-  defaultCameraCurrentEffectsStyles,
-} from "../context/CurrentEffectsStylesContext";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
@@ -9,7 +5,7 @@ import {
   CameraEffectTypes,
   defaultCameraStreamEffects,
   ScreenEffectTypes,
-} from "../context/StreamsContext";
+} from "../context/streamsContext/StreamsContext";
 import UserDevice from "../UserDevice";
 import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
 import BabylonScene, {
@@ -17,6 +13,10 @@ import BabylonScene, {
   validEffectTypes,
 } from "../babylon/BabylonScene";
 import assetMeshes from "../babylon/meshes";
+import {
+  defaultCameraCurrentEffectsStyles,
+  EffectStylesType,
+} from "../context/currentEffectsStylesContext/typeConstant";
 
 class CameraMedia {
   canvas: HTMLCanvasElement;

@@ -1,7 +1,7 @@
 import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import { useStreamsContext } from "../context/StreamsContext";
+import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import CameraSectionController from "./lib/cameraSectionController";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";

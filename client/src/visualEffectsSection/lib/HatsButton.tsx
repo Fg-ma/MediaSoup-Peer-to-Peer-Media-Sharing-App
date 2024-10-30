@@ -1,17 +1,17 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
-import FgImage from "../../fgImage/FgImage";
-import {
-  assetSizePositionMap,
-  HatsEffectTypes,
-  useCurrentEffectsStylesContext,
-} from "../../context/CurrentEffectsStylesContext";
+import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
+import {
+  assetSizePositionMap,
+  HatsEffectTypes,
+} from "../../context/currentEffectsStylesContext/typeConstant";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 
 import AsianConicalHat_512x512 from "../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_512x512.png";
 import AsianConicalHat_32x32 from "../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_32x32.png";

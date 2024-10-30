@@ -5,7 +5,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
 import tintIcon from "../../../public/svgs/visualEffects/tintIcon.svg";
 import tintOffIcon from "../../../public/svgs/visualEffects/tintOffIcon.svg";
 

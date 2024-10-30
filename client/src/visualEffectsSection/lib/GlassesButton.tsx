@@ -1,17 +1,17 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
-import FgImage from "../../fgImage/FgImage";
-import {
-  useCurrentEffectsStylesContext,
-  GlassesEffectTypes,
-  assetSizePositionMap,
-} from "../../context/CurrentEffectsStylesContext";
+import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
+import {
+  assetSizePositionMap,
+  GlassesEffectTypes,
+} from "../../context/currentEffectsStylesContext/typeConstant";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 
 import defaultGlasses_512x512 from "../../../public/2DAssets/glasses/defaultGlasses/defaultGlasses_512x512.png";
 import defaultGlasses_32x32 from "../../../public/2DAssets/glasses/defaultGlasses/defaultGlasses_32x32.png";

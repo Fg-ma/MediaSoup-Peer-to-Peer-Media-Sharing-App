@@ -3,9 +3,9 @@ import { createRoot } from "react-dom/client";
 import Main from "./src/Main";
 import "./index.css";
 import "./scrollbar.css";
-import { StreamsContextProvider } from "./src/context/StreamsContext";
-import { CurrentEffectsStylesContextProvider } from "./src/context/CurrentEffectsStylesContext";
-import { SignalContextProvider } from "./src/context/SignalContext";
+import { StreamsContextProvider } from "./src/context/streamsContext/StreamsContext";
+import { SignalContextProvider } from "./src/context/signalContext/SignalContext";
+import { CurrentEffectsStylesContextProvider } from "./src/context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 
 const container = document.getElementById("root");
 const root = createRoot(container as HTMLElement);

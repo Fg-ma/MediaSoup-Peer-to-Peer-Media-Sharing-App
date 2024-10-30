@@ -3,11 +3,9 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
-import {
-  HideBackgroundEffectTypes,
-  useCurrentEffectsStylesContext,
-} from "../../context/CurrentEffectsStylesContext";
+} from "../../context/streamsContext/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { HideBackgroundEffectTypes } from "../../context/currentEffectsStylesContext/typeConstant";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";

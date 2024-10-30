@@ -1,9 +1,9 @@
-import { EffectStylesType } from "../../context/CurrentEffectsStylesContext";
+import { EffectStylesType } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
 import { defaultFgVideoOptions, FgVideoOptions } from "../FgVideo";
 import Controls from "../../fgVideoControls/lib/Controls";
 

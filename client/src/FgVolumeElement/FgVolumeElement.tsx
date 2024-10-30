@@ -5,7 +5,7 @@ import volumeSVGPaths from "./lib/volumeSVGPaths";
 import FgButton from "../fgButton/FgButton";
 import FgVolumeElementController from "./lib/FgVolumeElementController";
 import VolumeSVG from "./lib/VolumeSVG";
-import { useSignalContext } from "../context/SignalContext";
+import { useSignalContext } from "../context/signalContext/SignalContext";
 
 export interface FgVolumeElementOptions {
   iconSize?: string;

@@ -5,8 +5,8 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   AudioEffectTypes,
-} from "../context/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../context/CurrentEffectsStylesContext";
+} from "../context/streamsContext/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import "./lib/fgVideoStyles.css";
 import handleVisualEffect from "../effects/visualEffects/handleVisualEffect";
 import Controls from "../fgVideoControls/lib/Controls";

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import isEqual from "lodash/isEqual";
-import { useStreamsContext } from "../../context/StreamsContext";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import AudioMixEffect from "./AudioMixEffect";
 import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../scrollingContainer/lib/ScrollingContainerButton";

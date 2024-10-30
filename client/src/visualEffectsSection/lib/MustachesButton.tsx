@@ -1,17 +1,17 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
-import FgImage from "../../fgImage/FgImage";
-import {
-  useCurrentEffectsStylesContext,
-  MustachesEffectTypes,
-  assetSizePositionMap,
-} from "../../context/CurrentEffectsStylesContext";
+import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
+import {
+  assetSizePositionMap,
+  MustachesEffectTypes,
+} from "../../context/currentEffectsStylesContext/typeConstant";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 
 import disguiseMustache_512x512 from "../../../public/2DAssets/mustaches/disguiseMustache/disguiseMustache_512x512.png";
 import disguiseMustache_32x32 from "../../../public/2DAssets/mustaches/disguiseMustache/disguiseMustache_32x32.png";

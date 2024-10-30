@@ -2,7 +2,7 @@ import { Socket } from "socket.io-client";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
 import {
   defaultFgVideoOptions,
   FgVideoOptions,

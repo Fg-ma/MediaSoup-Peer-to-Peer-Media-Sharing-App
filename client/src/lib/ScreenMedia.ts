@@ -1,16 +1,16 @@
-import {
-  defaultScreenCurrentEffectsStyles,
-  EffectStylesType,
-} from "../context/CurrentEffectsStylesContext";
 import BaseShader from "../effects/visualEffects/lib/BaseShader";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   defaultScreenStreamEffects,
   ScreenEffectTypes,
-} from "../context/StreamsContext";
+} from "../context/streamsContext/StreamsContext";
 import UserDevice from "../UserDevice";
 import Render from "../effects/visualEffects/lib/render";
+import {
+  defaultScreenCurrentEffectsStyles,
+  EffectStylesType,
+} from "../context/currentEffectsStylesContext/typeConstant";
 
 class ScreenMedia {
   private username: string;

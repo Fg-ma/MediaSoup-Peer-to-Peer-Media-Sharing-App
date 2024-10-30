@@ -13,7 +13,7 @@ import {
   Effect,
   PostProcess,
 } from "@babylonjs/core";
-import { PostProcessEffects } from "../context/CurrentEffectsStylesContext";
+import { PostProcessEffects } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 
 class BabylonShaderController {
   private time = 0;

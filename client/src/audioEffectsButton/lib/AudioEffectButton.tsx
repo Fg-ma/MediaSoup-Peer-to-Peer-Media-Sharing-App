@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   AudioEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import { AudioEffectTemplate } from "./AudioEffectsSection";

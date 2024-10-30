@@ -4,11 +4,11 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../context/StreamsContext";
+} from "../context/streamsContext/StreamsContext";
 import {
   PostProcessEffects,
   useCurrentEffectsStylesContext,
-} from "../context/CurrentEffectsStylesContext";
+} from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import FgImage from "../fgImage/FgImage";
 
 import prismaColors from "../../public/2DAssets/postProcess/prismaColors_512x512.jpg";

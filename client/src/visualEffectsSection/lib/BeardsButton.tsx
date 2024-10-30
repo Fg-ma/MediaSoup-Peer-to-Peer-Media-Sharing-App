@@ -1,17 +1,17 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
-import FgImage from "../../fgImage/FgImage";
-import {
-  useCurrentEffectsStylesContext,
-  BeardsEffectTypes,
-  assetSizePositionMap,
-} from "../../context/CurrentEffectsStylesContext";
+import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
+import {
+  assetSizePositionMap,
+  BeardsEffectTypes,
+} from "../../context/currentEffectsStylesContext/typeConstant";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
+import FgImage from "../../fgImage/FgImage";
 
 import classicalCurlyBeard_512x512 from "../../../public/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_512x512.png";
 import classicalCurlyBeard_32x32 from "../../../public/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_32x32.png";

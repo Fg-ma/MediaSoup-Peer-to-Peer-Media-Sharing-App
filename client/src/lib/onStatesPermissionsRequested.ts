@@ -1,10 +1,10 @@
 import { Socket } from "socket.io-client";
-import { EffectStylesType } from "src/context/CurrentEffectsStylesContext";
+import { EffectStylesType } from "src/context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "src/context/StreamsContext";
+} from "src/context/streamsContext/StreamsContext";
 
 const onStatesPermissionsRequested = (
   event: {

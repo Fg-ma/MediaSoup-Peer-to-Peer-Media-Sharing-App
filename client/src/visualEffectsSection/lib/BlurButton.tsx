@@ -5,7 +5,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   useStreamsContext,
-} from "../../context/StreamsContext";
+} from "../../context/streamsContext/StreamsContext";
 import blurIcon from "../../../public/svgs/visualEffects/blurIcon.svg";
 import blurOffIcon from "../../../public/svgs/visualEffects/blurOffIcon.svg";
 

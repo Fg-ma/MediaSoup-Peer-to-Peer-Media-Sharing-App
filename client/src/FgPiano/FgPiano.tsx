@@ -9,7 +9,7 @@ import FgPanel from "../fgPanel/FgPanel";
 import "./lib/pianoStyles.css";
 import ScaleSection from "./lib/ScaleSection";
 import FgPianoController, { keysMap } from "./lib/FgPianoController";
-import { useStreamsContext } from "../context/StreamsContext";
+import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import SamplerToolbar from "./lib/SamplerToolbar";
 
 const SamplerEffectsToolbar = React.lazy(

@@ -6,17 +6,17 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   AudioEffectTypes,
-} from "../../../context/StreamsContext";
+} from "../../../context/streamsContext/StreamsContext";
+import BaseShader from "./BaseShader";
+import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
+import UserDevice from "../../../UserDevice";
+import { hideBackgroundEffectImagesMap } from "../../../babylon/meshes";
 import {
   assetSizePositionMap,
   CameraEffectStylesType,
   EffectStylesType,
   HideBackgroundEffectTypes,
-} from "../../../context/CurrentEffectsStylesContext";
-import BaseShader from "./BaseShader";
-import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
-import UserDevice from "../../../UserDevice";
-import { hideBackgroundEffectImagesMap } from "../../../babylon/meshes";
+} from "../../../context/currentEffectsStylesContext/typeConstant";
 
 class Render {
   private MAX_FRAME_PROCESSING_TIME: number;

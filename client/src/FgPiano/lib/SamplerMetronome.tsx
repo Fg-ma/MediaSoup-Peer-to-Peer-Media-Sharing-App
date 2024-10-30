@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Transition, Variants, motion, AnimatePresence } from "framer-motion";
-import { useStreamsContext } from "../../context/StreamsContext";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 

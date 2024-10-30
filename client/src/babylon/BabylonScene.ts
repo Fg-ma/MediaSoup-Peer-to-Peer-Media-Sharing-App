@@ -1,3 +1,4 @@
+import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   Engine,
   Scene,
@@ -16,16 +17,15 @@ import {
   DynamicTexture,
   Material,
 } from "@babylonjs/core";
+import "@babylonjs/inspector";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
-import { CameraEffectTypes } from "../context/StreamsContext";
-import { EffectStylesType } from "../context/CurrentEffectsStylesContext";
-import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
+import { CameraEffectTypes } from "../context/streamsContext/StreamsContext";
 import UserDevice from "../UserDevice";
-import "@babylonjs/inspector";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
+import { EffectStylesType } from "../context/currentEffectsStylesContext/typeConstant";
 
 export type DefaultMeshPlacementType =
   | "forehead"

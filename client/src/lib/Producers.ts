@@ -7,13 +7,13 @@ import {
   CameraEffectStylesType,
   EffectStylesType,
   ScreenEffectStylesType,
-} from "../context/CurrentEffectsStylesContext";
+} from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import ScreenMedia from "./ScreenMedia";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../context/StreamsContext";
+} from "../context/streamsContext/StreamsContext";
 import AudioMedia from "./AudioMedia";
 import UserDevice from "../UserDevice";
 import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";

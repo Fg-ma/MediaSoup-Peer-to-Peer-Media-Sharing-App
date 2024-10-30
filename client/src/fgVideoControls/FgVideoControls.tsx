@@ -6,7 +6,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../context/StreamsContext";
+} from "../context/streamsContext/StreamsContext";
 import {
   defaultFgVideoOptions,
   FgVideoOptions,

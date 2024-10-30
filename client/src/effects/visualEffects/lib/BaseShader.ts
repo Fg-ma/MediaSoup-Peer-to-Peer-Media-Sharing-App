@@ -4,7 +4,7 @@ import { Delaunay } from "d3-delaunay";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../context/StreamsContext";
+} from "../../../context/streamsContext/StreamsContext";
 import baseFragmentShaderSource from "./baseFragmentShader";
 import baseVertexShaderSource from "./baseVertexShader";
 import Atlas from "./Atlas";
@@ -17,7 +17,7 @@ import {
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-} from "../../../context/CurrentEffectsStylesContext";
+} from "../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import MaterialAtlas from "./MaterialAtlas";
 
 export interface MeshJSON {

@@ -7,11 +7,11 @@ import {
   DynamicTexture,
 } from "@babylonjs/core";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
+import { CameraEffectTypes } from "../context/streamsContext/StreamsContext";
 import {
   EffectStylesType,
   HideBackgroundEffectTypes,
-} from "../context/CurrentEffectsStylesContext";
-import { CameraEffectTypes } from "../context/StreamsContext";
+} from "../context/currentEffectsStylesContext/typeConstant";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import UserDevice from "../UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
