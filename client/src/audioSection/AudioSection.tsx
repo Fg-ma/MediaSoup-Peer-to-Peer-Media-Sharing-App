@@ -5,7 +5,7 @@ import AudioSectionController from "./lib/audioSectionController";
 import FgSVG from "../fgSVG/FgSVG";
 import shareAudioIcon from "../../public/svgs/shareAudioIcon.svg";
 import removeAudioIcon from "../../public/svgs/removeAudioIcon.svg";
-import volumeSVGPaths from "../FgVolumeElement/lib/volumeSVGPaths";
+import volumeSVGPaths from "../fgVolumeElement/lib/volumeSVGPaths";
 
 const FgButton = React.lazy(() => import("../fgButton/FgButton"));
 const VolumeSVG = React.lazy(() => import("../fgVolumeElement/lib/VolumeSVG"));

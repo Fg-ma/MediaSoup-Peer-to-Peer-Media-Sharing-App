@@ -2,10 +2,7 @@ import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { UserMedia } from "tone";
-import {
-  defaultAudioCurrentEffectsStyles,
-  EffectStylesType,
-} from "../context/currentEffectsStylesContext/typeConstant";
+import { EffectStylesType } from "../context/currentEffectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
