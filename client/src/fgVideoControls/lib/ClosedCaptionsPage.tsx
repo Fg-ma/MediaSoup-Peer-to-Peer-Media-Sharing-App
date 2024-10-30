@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-
-import navigateBackIcon from "../../../public/svgs/navigateBack.svg";
 import { ActivePages } from "../FgVideoControls";
 import { Settings } from "../../fgVideo/FgVideo";
+
+import navigateBackIcon from "../../../public/svgs/navigateBack.svg";
 
 export const closedCaptionsSelections = {
   "ca-ES": "Catalan",

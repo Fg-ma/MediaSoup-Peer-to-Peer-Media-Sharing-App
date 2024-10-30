@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, animate, useMotionValue, useTransform } from "framer-motion";
-import volumeSVGPaths from "./volumeSVGPaths";
+import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
 
 const scaleStart = 1;
 const scaleEnd = 2.5;

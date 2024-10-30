@@ -1,5 +1,3 @@
-import { CameraEffectTypes } from "../../../context/streamsContext/StreamsContext";
-import { LandmarkTypes } from "./FaceLandmarks";
 import {
   BeardsEffectTypes,
   EffectStylesType,
@@ -8,7 +6,9 @@ import {
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-} from "../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+} from "../../../context/currentEffectsStylesContext/typeConstant";
+import { CameraEffectTypes } from "../../../context/streamsContext/typeConstant";
+import { LandmarkTypes } from "./FaceLandmarks";
 
 type DeadbandingTypes =
   | "glasses"

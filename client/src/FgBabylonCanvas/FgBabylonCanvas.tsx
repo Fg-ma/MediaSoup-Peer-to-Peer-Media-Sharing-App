@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
+import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
-  useStreamsContext,
+  AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
-} from "../context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+} from "../context/streamsContext/typeConstant";
 import handleVisualEffect from "../effects/visualEffects/handleVisualEffect";
 import Controls from "../fgVideoControls/lib/Controls";
 import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";

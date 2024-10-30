@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  useStreamsContext,
-} from "../../context/streamsContext/StreamsContext";
+} from "../../context/streamsContext/typeConstant";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
 import tintIcon from "../../../public/svgs/visualEffects/tintIcon.svg";
 import tintOffIcon from "../../../public/svgs/visualEffects/tintOffIcon.svg";
 

@@ -1,13 +1,11 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import {
-  AudioEffectTypes,
-  useStreamsContext,
-} from "../context/streamsContext/StreamsContext";
+import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import BundleController from "./lib/BundleController";
 import { useSignalContext } from "../context/signalContext/SignalContext";
-import FgBabylonCanvas from "../FgBabylonCanvas/FgBabylonCanvas";
+import FgBabylonCanvas from "../fgBabylonCanvas/FgBabylonCanvas";
 
 const FgVideo = React.lazy(() => import("../fgVideo/FgVideo"));
 const FgAudioElementContainer = React.lazy(

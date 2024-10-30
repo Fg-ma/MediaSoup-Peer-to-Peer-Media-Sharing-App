@@ -1,5 +1,5 @@
-import { FgVolumeElementOptions } from "../FgVolumeElement";
-import FgVolumeElementSocket from "./FgVolumeElementSocket";
+import { FgVolumeElementOptions } from "../../fgVolumeElement/FgVolumeElement";
+import FgVolumeElementSocket from "../../fgVolumeElement/lib/FgVolumeElementSocket";
 
 class FgVolumeElementController {
   private username: string;

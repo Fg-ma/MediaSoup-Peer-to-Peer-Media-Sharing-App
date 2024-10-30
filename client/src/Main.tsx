@@ -2,15 +2,19 @@ import React, { useState, useRef, useEffect, Suspense } from "react";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
+import { useStreamsContext } from "./context/streamsContext/StreamsContext";
+import { useCurrentEffectsStylesContext } from "./context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useSignalContext } from "./context/signalContext/SignalContext";
+import {
+  defaultCameraCurrentEffectsStyles,
+  defaultScreenCurrentEffectsStyles,
+} from "./context/currentEffectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
   defaultAudioStreamEffects,
   defaultCameraStreamEffects,
   defaultScreenStreamEffects,
-  useStreamsContext,
-} from "./context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "./context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import { useSignalContext } from "./context/signalContext/SignalContext";
+} from "./context/streamsContext/typeConstant";
 import onRouterCapabilities from "./lib/onRouterCapabilities";
 import Producers from "./lib/Producers";
 import Consumers from "./lib/Consumers";
@@ -24,10 +28,6 @@ import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
-import {
-  defaultCameraCurrentEffectsStyles,
-  defaultScreenCurrentEffectsStyles,
-} from "./context/currentEffectsStylesContext/typeConstant";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")

@@ -1,24 +1,23 @@
 import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import CameraMedia from "./CameraMedia";
+import { UserMedia } from "tone";
 import {
-  AudioEffectStylesType,
-  CameraEffectStylesType,
+  defaultAudioCurrentEffectsStyles,
   EffectStylesType,
-  ScreenEffectStylesType,
-} from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import ScreenMedia from "./ScreenMedia";
+} from "../context/currentEffectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
+  defaultAudioStreamEffects,
   ScreenEffectTypes,
-} from "../context/streamsContext/StreamsContext";
+} from "../context/streamsContext/typeConstant";
+import CameraMedia from "./CameraMedia";
+import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
 import UserDevice from "../UserDevice";
-import Deadbanding from "src/effects/visualEffects/lib/Deadbanding";
+import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
 import BrowserMedia from "src/BrowserMedia";
-import { UserMedia } from "tone";
 
 class Producers {
   private socket: React.MutableRefObject<Socket>;
@@ -588,18 +587,13 @@ class Producers {
 
       if (streamEffects) {
         if (event.producerType === "audio") {
-          this.userStreamEffects.current.audio = Object.keys(
-            this.userStreamEffects.current.audio
-          ).reduce((acc, key) => {
-            acc[key as keyof typeof acc] = false;
-            return acc;
-          }, {} as typeof this.userStreamEffects.current.audio);
+          this.userStreamEffects.current.audio = defaultAudioStreamEffects;
         } else if (
           event.producerType === "camera" ||
           event.producerType === "screen"
         ) {
           if (event.producerId && event.producerId in streamEffects) {
-            delete streamEffects[
+            delete this.userStreamEffects.current[event.producerType][
               event.producerId as keyof typeof streamEffects
             ];
           }
@@ -614,14 +608,14 @@ class Producers {
           event.producerType === "camera" ||
           event.producerType === "screen"
         ) {
-          const updatedEffects = {
-            ...this.currentEffectsStyles.current[event.producerType],
-          };
-          if (event.producerId && event.producerId in updatedEffects) {
-            delete updatedEffects[event.producerId];
-            // @ts-ignore
-            this.currentEffectsStyles.current[event.producerType] =
-              updatedEffects;
+          if (
+            event.producerId &&
+            event.producerId in
+              this.currentEffectsStyles.current[event.producerType]
+          ) {
+            delete this.currentEffectsStyles.current[event.producerType][
+              event.producerId
+            ];
           }
         }
       }

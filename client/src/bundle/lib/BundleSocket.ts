@@ -2,11 +2,11 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "src/context/streamsContext/StreamsContext";
+} from "../../context/streamsContext/typeConstant";
+import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
 import AudioMedia from "../../lib/AudioMedia";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
-import { EffectStylesType } from "src/context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 
 class BundleSocket {
   private isUser: boolean;

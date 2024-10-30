@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
 import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  useStreamsContext,
-} from "../../context/streamsContext/StreamsContext";
+} from "../../context/streamsContext/typeConstant";
 import {
   assetSizePositionMap,
   PetsEffectTypes,

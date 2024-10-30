@@ -1,14 +1,14 @@
 import * as Tone from "tone";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../context/streamsContext/StreamsContext";
 import AudioEffects, {
   AudioMixEffectsType,
   MixEffectsOptionsType,
 } from "../effects/audioEffects/AudioEffects";
 import { FgSamplers } from "../effects/audioEffects/fgSamplers";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../context/streamsContext/typeConstant";
 
 class AudioMedia {
   private username: string;
@@ -28,7 +28,9 @@ class AudioMedia {
 
   private userStreamEffects: React.MutableRefObject<{
     camera: {
-      [cameraId: string]: { [effectType in CameraEffectTypes]?: boolean };
+      [cameraId: string]: {
+        [effectType in CameraEffectTypes]?: boolean;
+      };
     };
     screen: {
       [screenId: string]: { [effectType in ScreenEffectTypes]?: boolean };

@@ -3,20 +3,20 @@ import {
   NormalizedLandmarkListList,
 } from "@mediapipe/face_mesh";
 import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-  AudioEffectTypes,
-} from "../../../context/streamsContext/StreamsContext";
-import BaseShader from "./BaseShader";
-import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
-import UserDevice from "../../../UserDevice";
-import { hideBackgroundEffectImagesMap } from "../../../babylon/meshes";
-import {
   assetSizePositionMap,
   CameraEffectStylesType,
   EffectStylesType,
   HideBackgroundEffectTypes,
 } from "../../../context/currentEffectsStylesContext/typeConstant";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../../../context/streamsContext/typeConstant";
+import BaseShader from "./BaseShader";
+import FaceLandmarks, { CalculatedLandmarkInterface } from "./FaceLandmarks";
+import UserDevice from "../../../UserDevice";
+import { hideBackgroundEffectImagesMap } from "../../../babylon/meshes";
 
 class Render {
   private MAX_FRAME_PROCESSING_TIME: number;

@@ -6,7 +6,7 @@ import {
 import {
   CameraEffectStylesType,
   EffectStylesType,
-} from "../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+} from "../../../context/currentEffectsStylesContext/typeConstant";
 import { Point2D } from "./BaseShader";
 import Deadbanding from "./Deadbanding";
 import SmoothLandmarksUtils from "./SmoothLandmarksUtils";

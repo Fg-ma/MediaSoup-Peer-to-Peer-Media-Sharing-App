@@ -4,7 +4,7 @@ import { Transition, Variants, motion } from "framer-motion";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../context/streamsContext/StreamsContext";
+} from "../context/streamsContext/typeConstant";
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
 

@@ -1,18 +1,12 @@
 class AudioAnalyzer {
-  private audioStream: MediaStream | undefined;
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
-  private noiseThreshold: number;
 
-  constructor(audioStream: MediaStream | undefined, noiseThreshold: number) {
-    this.audioStream = audioStream;
-    this.noiseThreshold = noiseThreshold;
-
+  constructor(private noiseThreshold: number) {
     this.initAudio.bind(this);
   }
 
   destructor() {
-    this.audioStream = undefined;
     if (!this.audioContext) {
       return;
     }

@@ -1,14 +1,7 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
-import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-  useStreamsContext,
-} from "../context/streamsContext/StreamsContext";
-import {
-  PostProcessEffects,
-  useCurrentEffectsStylesContext,
-} from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import FgImage from "../fgImage/FgImage";
 
 import prismaColors from "../../public/2DAssets/postProcess/prismaColors_512x512.jpg";
@@ -43,6 +36,11 @@ import tiltShift from "../../public/2DAssets/postProcess/tiltShift_512x512.jpg";
 import tiltShiftSmall from "../../public/2DAssets/postProcess/tiltShift_32x32.jpg";
 import cartoon from "../../public/2DAssets/postProcess/cartoon_512x512.png";
 import cartoonSmall from "../../public/2DAssets/postProcess/cartoon_32x32.png";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "src/context/streamsContext/typeConstant";
+import { PostProcessEffects } from "src/context/currentEffectsStylesContext/typeConstant";
 
 export default function BabylonPostProcessEffectsButton({
   username,

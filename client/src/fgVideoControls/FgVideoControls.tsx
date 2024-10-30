@@ -1,12 +1,12 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { AnimatePresence } from "framer-motion";
-import Controls from "./lib/Controls";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../context/streamsContext/StreamsContext";
+} from "../context/streamsContext/typeConstant";
+import Controls from "./lib/Controls";
 import {
   defaultFgVideoOptions,
   FgVideoOptions,
@@ -15,7 +15,7 @@ import {
 
 const PlayPauseButton = React.lazy(() => import("./lib/PlayPauseButton"));
 const FgVolumeElement = React.lazy(
-  () => import("../FgVolumeElement/FgVolumeElement")
+  () => import("../fgVolumeElement/FgVolumeElement")
 );
 const FullScreenButton = React.lazy(() => import("./lib/FullScreenButton"));
 const TheaterButton = React.lazy(() => import("./lib/TheaterButton"));

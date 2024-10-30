@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  useStreamsContext,
-} from "../../context/streamsContext/StreamsContext";
+} from "../../context/streamsContext/typeConstant";
 import blurIcon from "../../../public/svgs/visualEffects/blurIcon.svg";
 import blurOffIcon from "../../../public/svgs/visualEffects/blurOffIcon.svg";
 

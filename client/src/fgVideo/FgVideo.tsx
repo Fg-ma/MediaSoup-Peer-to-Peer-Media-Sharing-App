@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
+import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
-  useStreamsContext,
+  AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
-} from "../context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import "./lib/fgVideoStyles.css";
+} from "../context/streamsContext/typeConstant";
 import handleVisualEffect from "../effects/visualEffects/handleVisualEffect";
 import Controls from "../fgVideoControls/lib/Controls";
 import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";
@@ -26,6 +25,7 @@ import {
   expandedClosedCaptionsBrowserSelections,
   expandedClosedCaptionsVoskSelections,
 } from "../fgVideoControls/lib/ClosedCaptionsPage";
+import "./lib/fgVideoStyles.css";
 
 export interface FgVideoOptions {
   isUser?: boolean;

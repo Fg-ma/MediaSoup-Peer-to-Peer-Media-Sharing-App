@@ -834,65 +834,66 @@ export const defaultMask: MasksEffectTypes = "baseMask";
 export const defaultHat: HatsEffectTypes = "stylishHat";
 export const defaultPet: PetsEffectTypes = "beardedDragon";
 
-export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType = {
-  pause: {
+export const defaultCameraCurrentEffectsStyles = Object.freeze({
+  pause: Object.freeze({
     style: "",
     threeDim: false,
-  },
-  blur: {
+  }),
+  blur: Object.freeze({
     style: "",
     threeDim: false,
-  },
-  tint: {
+  }),
+  tint: Object.freeze({
     style: "",
     threeDim: false,
-  },
-  postProcess: {
+  }),
+  postProcess: Object.freeze({
     style: defaultPostProcess,
     threeDim: false,
-  },
-  hideBackground: {
+  }),
+  hideBackground: Object.freeze({
     style: defaultHideBackground,
     threeDim: false,
     color: defaultHideBackgroundColor,
-  },
-  glasses: {
+  }),
+  glasses: Object.freeze({
     style: defaultGlasses,
     threeDim: false,
     transforms: assetSizePositionMap.glasses[defaultGlasses],
-  },
-  beards: {
+  }),
+  beards: Object.freeze({
     style: defaultBeard,
     threeDim: false,
     transforms: assetSizePositionMap.beards[defaultBeard],
-  },
-  mustaches: {
+  }),
+  mustaches: Object.freeze({
     style: defaultMustache,
     threeDim: false,
     transforms: assetSizePositionMap.mustaches[defaultMustache],
-  },
-  masks: {
+  }),
+  masks: Object.freeze({
     style: defaultMask,
     threeDim: false,
     transforms: assetSizePositionMap.masks[defaultMask],
-  },
-  hats: {
+  }),
+  hats: Object.freeze({
     style: defaultHat,
     threeDim: false,
     transforms: assetSizePositionMap.hats[defaultHat],
-  },
-  pets: {
+  }),
+  pets: Object.freeze({
     style: defaultPet,
     threeDim: false,
     transforms: assetSizePositionMap.pets[defaultPet],
-  },
-};
+  }),
+});
 
-export const defaultScreenCurrentEffectsStyles: ScreenEffectStylesType = {
-  postProcess: {
-    style: defaultPostProcess,
-    threeDim: false,
-  },
-};
+export const defaultScreenCurrentEffectsStyles: ScreenEffectStylesType =
+  Object.freeze({
+    postProcess: Object.freeze({
+      style: defaultPostProcess,
+      threeDim: false,
+    }),
+  });
 
 export const defaultAudioCurrentEffectsStyles: AudioEffectStylesType = {};

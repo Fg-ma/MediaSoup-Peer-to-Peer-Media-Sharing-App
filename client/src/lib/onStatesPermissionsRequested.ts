@@ -1,10 +1,10 @@
 import { Socket } from "socket.io-client";
-import { EffectStylesType } from "src/context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { EffectStylesType } from "../context/currentEffectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "src/context/streamsContext/StreamsContext";
+} from "../context/streamsContext/typeConstant";
 
 const onStatesPermissionsRequested = (
   event: {
@@ -27,7 +27,9 @@ const onStatesPermissionsRequested = (
     screen: {
       [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
     };
-    audio: { [effectType in AudioEffectTypes]: boolean };
+    audio: {
+      [effectType in AudioEffectTypes]: boolean;
+    };
   }>,
   currentEffectsStyles: React.MutableRefObject<EffectStylesType>
 ) => {

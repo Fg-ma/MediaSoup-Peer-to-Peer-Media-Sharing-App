@@ -1,5 +1,4 @@
 import React from "react";
-import navigateBackIcon from "../../../public/svgs/navigateBack.svg";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import {
@@ -12,9 +11,10 @@ import {
   FontOpacities,
   FontSizes,
 } from "../FgVideoControls";
+import { Settings } from "../../fgVideo/FgVideo";
 
+import navigateBackIcon from "../../../public/svgs/navigateBack.svg";
 import navigateForwardIcon from "../../../public/svgs/navigateForward.svg";
-import { Settings } from "src/fgVideo/FgVideo";
 
 export interface ClosedCaptionsOptions {
   fontFamily: FontFamilies;

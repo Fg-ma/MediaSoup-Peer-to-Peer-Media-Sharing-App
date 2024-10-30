@@ -1,13 +1,13 @@
-import BundleSocket from "./BundleSocket";
-import CameraMedia from "../../lib/CameraMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
-import AudioMedia from "../../lib/AudioMedia";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "src/context/streamsContext/StreamsContext";
-import { EffectStylesType } from "src/context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+} from "../../context/streamsContext/typeConstant";
+import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
+import BundleSocket from "./BundleSocket";
+import CameraMedia from "../../lib/CameraMedia";
+import ScreenMedia from "../../lib/ScreenMedia";
+import AudioMedia from "../../lib/AudioMedia";
 
 class BundleController {
   private isUser: boolean;

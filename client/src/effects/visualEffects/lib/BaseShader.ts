@@ -4,12 +4,7 @@ import { Delaunay } from "d3-delaunay";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../context/streamsContext/StreamsContext";
-import baseFragmentShaderSource from "./baseFragmentShader";
-import baseVertexShaderSource from "./baseVertexShader";
-import Atlas from "./Atlas";
-import videoPaused from "../../../../public/2DAssets/videoPaused.png";
-import videoPausedFlipped from "../../../../public/2DAssets/videoPausedFlipped.png";
+} from "../../../context/streamsContext/typeConstant";
 import {
   BeardsEffectTypes,
   GlassesEffectTypes,
@@ -17,7 +12,12 @@ import {
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-} from "../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+} from "../../../context/currentEffectsStylesContext/typeConstant";
+import baseFragmentShaderSource from "./baseFragmentShader";
+import baseVertexShaderSource from "./baseVertexShader";
+import Atlas from "./Atlas";
+import videoPaused from "../../../../public/2DAssets/videoPaused.png";
+import videoPausedFlipped from "../../../../public/2DAssets/videoPausedFlipped.png";
 import MaterialAtlas from "./MaterialAtlas";
 
 export interface MeshJSON {

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import "./lib/fgVolumeElement.css";
-import volumeSVGPaths from "./lib/volumeSVGPaths";
+import volumeSVGPaths from "../fgVolumeElement/lib/volumeSVGPaths";
 import FgButton from "../fgButton/FgButton";
-import FgVolumeElementController from "./lib/FgVolumeElementController";
-import VolumeSVG from "./lib/VolumeSVG";
+import FgVolumeElementController from "../fgVolumeElement/lib/FgVolumeElementController";
+import VolumeSVG from "../fgVolumeElement/lib/VolumeSVG";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 
 export interface FgVolumeElementOptions {

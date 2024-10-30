@@ -1,6 +1,6 @@
 import React, { Suspense, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import { AudioEffectTypes } from "../context/streamsContext/StreamsContext";
+import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import FgAudioElement from "./FgAudioElement";
 
 const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));

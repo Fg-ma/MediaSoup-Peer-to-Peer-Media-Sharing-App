@@ -1,13 +1,13 @@
 import { Socket } from "socket.io-client";
 import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../context/streamsContext/StreamsContext";
-import {
   defaultFgVideoOptions,
   FgVideoOptions,
   Settings,
 } from "../../fgVideo/FgVideo";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../../context/streamsContext/typeConstant";
 
 const fontSizeMap = {
   xsmall: "0.75rem",

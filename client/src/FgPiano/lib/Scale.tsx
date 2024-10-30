@@ -1,7 +1,6 @@
 import React from "react";
 import NaturalKey from "./NaturalKey";
 import AccidentalKey from "./AccidentalKey";
-import FgPianoController from "./FgPianoController";
 
 export const keys = {
   naturalKeys: {

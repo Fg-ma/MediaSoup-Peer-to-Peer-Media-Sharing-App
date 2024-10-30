@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
 import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-  useStreamsContext,
-} from "../../context/streamsContext/StreamsContext";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import {
   assetSizePositionMap,
   GlassesEffectTypes,
 } from "../../context/currentEffectsStylesContext/typeConstant";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../../context/streamsContext/typeConstant";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";
@@ -21,6 +21,7 @@ import threeDim_defaultGlassesIcon from "../../../public/svgs/visualEffects/glas
 import threeDim_defaultGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/defaultGlasses/threeDim_defaultGlassesOffIcon.svg";
 import AmericaGlasses_512x512 from "../../../public/2DAssets/glasses/AmericaGlasses/AmericaGlasses_512x512.png";
 import AmericaGlasses_32x32 from "../../../public/2DAssets/glasses/AmericaGlasses/AmericaGlasses_32x32.png";
+import VRGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_threeDim_32x32.png";
 import AmericaGlassesIcon from "../../../public/svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesIcon.svg";
 import AmericaGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesOffIcon.svg";
 import threeDim_AmericaGlassesIcon from "../../../public/svgs/visualEffects/glasses/AmericaGlasses/threeDim_AmericaGlassesIcon.svg";
@@ -120,7 +121,6 @@ import VRGlasses_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasse
 import VRGlasses_off_512x512 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_off_512x512.png";
 import VRGlasses_off_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_off_32x32.png";
 import VRGlasses_threeDim_512x512 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_threeDim_512x512.png";
-import VRGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_threeDim_32x32.png";
 
 const glassesLabels: {
   [glassesEffectType in GlassesEffectTypes]: string;

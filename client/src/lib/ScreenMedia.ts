@@ -1,16 +1,16 @@
 import BaseShader from "../effects/visualEffects/lib/BaseShader";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  defaultScreenStreamEffects,
-  ScreenEffectTypes,
-} from "../context/streamsContext/StreamsContext";
 import UserDevice from "../UserDevice";
 import Render from "../effects/visualEffects/lib/render";
 import {
   defaultScreenCurrentEffectsStyles,
   EffectStylesType,
 } from "../context/currentEffectsStylesContext/typeConstant";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  defaultScreenStreamEffects,
+  ScreenEffectTypes,
+} from "../context/streamsContext/typeConstant";
 
 class ScreenMedia {
   private username: string;
@@ -25,7 +25,9 @@ class ScreenMedia {
   private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
   private userStreamEffects: React.MutableRefObject<{
     camera: {
-      [cameraId: string]: { [effectType in CameraEffectTypes]?: boolean };
+      [cameraId: string]: {
+        [effectType in CameraEffectTypes]?: boolean;
+      };
     };
     screen: {
       [screenId: string]: { [effectType in ScreenEffectTypes]?: boolean };
@@ -73,8 +75,9 @@ class ScreenMedia {
 
     this.effects = {};
 
-    this.userStreamEffects.current.screen[this.screenId] =
-      defaultScreenStreamEffects;
+    this.userStreamEffects.current.screen[this.screenId] = structuredClone(
+      defaultScreenStreamEffects
+    );
 
     this.canvas = document.createElement("canvas");
     const gl =
@@ -89,8 +92,9 @@ class ScreenMedia {
     this.initScreenStream = initScreenStream;
 
     if (!currentEffectsStyles.current.screen[this.screenId]) {
-      currentEffectsStyles.current.screen[this.screenId] =
-        defaultScreenCurrentEffectsStyles;
+      currentEffectsStyles.current.screen[this.screenId] = structuredClone(
+        defaultScreenCurrentEffectsStyles
+      );
     }
 
     this.baseShader = new BaseShader(gl, this.effects);

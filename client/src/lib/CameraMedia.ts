@@ -1,11 +1,15 @@
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
+  defaultCameraCurrentEffectsStyles,
+  EffectStylesType,
+} from "../context/currentEffectsStylesContext/typeConstant";
+import {
   AudioEffectTypes,
   CameraEffectTypes,
   defaultCameraStreamEffects,
   ScreenEffectTypes,
-} from "../context/streamsContext/StreamsContext";
+} from "../context/streamsContext/typeConstant";
 import UserDevice from "../UserDevice";
 import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
 import BabylonScene, {
@@ -13,10 +17,6 @@ import BabylonScene, {
   validEffectTypes,
 } from "../babylon/BabylonScene";
 import assetMeshes from "../babylon/meshes";
-import {
-  defaultCameraCurrentEffectsStyles,
-  EffectStylesType,
-} from "../context/currentEffectsStylesContext/typeConstant";
 
 class CameraMedia {
   canvas: HTMLCanvasElement;
@@ -61,16 +61,18 @@ class CameraMedia {
   ) {
     this.effects = {};
 
-    this.userStreamEffects.current.camera[this.cameraId] =
-      defaultCameraStreamEffects;
+    this.userStreamEffects.current.camera[this.cameraId] = structuredClone(
+      defaultCameraStreamEffects
+    );
 
     this.canvas = document.createElement("canvas");
 
     this.initCameraStream = initCameraStream;
 
     if (!currentEffectsStyles.current.camera[this.cameraId]) {
-      currentEffectsStyles.current.camera[this.cameraId] =
-        defaultCameraCurrentEffectsStyles;
+      currentEffectsStyles.current.camera[this.cameraId] = structuredClone(
+        defaultCameraCurrentEffectsStyles
+      );
     }
 
     this.faceLandmarks = new FaceLandmarks(

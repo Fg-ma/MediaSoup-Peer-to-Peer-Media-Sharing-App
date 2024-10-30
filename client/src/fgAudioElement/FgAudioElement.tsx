@@ -290,7 +290,6 @@ export default function FgAudioElement({
     }
 
     audioAnalyzer.current = new AudioAnalyser(
-      audioStream,
       fgAudioElementOptions.noiseThreshold
     );
 

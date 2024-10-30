@@ -2,6 +2,7 @@ import React from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import Controls from "./Controls";
+
 import effectIcon from "../../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
 

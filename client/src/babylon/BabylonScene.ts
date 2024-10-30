@@ -18,10 +18,10 @@ import {
   Material,
 } from "@babylonjs/core";
 import "@babylonjs/inspector";
+import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
-import { CameraEffectTypes } from "../context/streamsContext/StreamsContext";
 import UserDevice from "../UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";

@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
 import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-  useStreamsContext,
-} from "../../context/streamsContext/StreamsContext";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import {
   assetSizePositionMap,
   MasksEffectTypes,
 } from "../../context/currentEffectsStylesContext/typeConstant";
+import {
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../../context/streamsContext/typeConstant";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";

@@ -1,8 +1,8 @@
 import {
+  AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-  AudioEffectTypes,
-} from "../../context/streamsContext/StreamsContext";
+} from "../../context/streamsContext/typeConstant";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";

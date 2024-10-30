@@ -1,7 +1,6 @@
-import React, { useRef } from "react";
+import React from "react";
 import FgButton from "../../fgButton/FgButton";
 import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
-import FgPianoController from "./FgPianoController";
 
 const AccidentalKeyVar: Variants = {
   init: { opacity: 0, bottom: "9.5%" },

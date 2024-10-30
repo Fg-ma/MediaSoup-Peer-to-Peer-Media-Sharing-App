@@ -1,11 +1,11 @@
 import React, { useRef, useState, Suspense } from "react";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { HideBackgroundEffectTypes } from "../../context/currentEffectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-  useStreamsContext,
-} from "../../context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import { HideBackgroundEffectTypes } from "../../context/currentEffectsStylesContext/typeConstant";
+} from "../../context/streamsContext/typeConstant";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgImage from "../../fgImage/FgImage";

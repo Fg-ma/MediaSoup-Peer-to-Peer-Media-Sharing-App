@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Socket } from "socket.io-client";
-import { AudioEffectTypes } from "../../context/streamsContext/StreamsContext";
+import { AudioEffectTypes } from "../../context/streamsContext/typeConstant";
 import FgPanel from "../../fgPanel/FgPanel";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import AudioEffectButton from "./AudioEffectButton";
 
-import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
+import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
 import mixAudioEffectsIcon from "../../../public/svgs/audioEffects/mixAudioEffectsIcon.svg";
 import mixAudioEffectsOffIcon from "../../../public/svgs/audioEffects/mixAudioEffectsOffIcon.svg";
@@ -101,9 +101,9 @@ import echosOfThePastOffIcon from "../../../public/svgs/audioEffects/echosOfTheP
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
 );
-const FgPiano = React.lazy(() => import("../../FgPiano/FgPiano"));
+const FgPiano = React.lazy(() => import("../../fgPiano/FgPiano"));
 const FgSoundBoard = React.lazy(
-  () => import("../../FgSoundBoard/FgSoundBoard")
+  () => import("../../fgSoundBoard/FgSoundBoard")
 );
 
 export type AudioEffectTemplate = {

@@ -8,7 +8,7 @@ import removeAudioIcon from "../../public/svgs/removeAudioIcon.svg";
 import volumeSVGPaths from "../FgVolumeElement/lib/volumeSVGPaths";
 
 const FgButton = React.lazy(() => import("../fgButton/FgButton"));
-const VolumeSVG = React.lazy(() => import("../FgVolumeElement/lib/VolumeSVG"));
+const VolumeSVG = React.lazy(() => import("../fgVolumeElement/lib/VolumeSVG"));
 
 export default function AudioSection({
   socket,
