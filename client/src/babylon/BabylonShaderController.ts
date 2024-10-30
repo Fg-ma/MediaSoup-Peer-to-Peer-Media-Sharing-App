@@ -39,7 +39,7 @@ class BabylonShaderController {
 
   private glitchActive = false;
   private minGlitchInterval = 2000; // 2 seconds in milliseconds
-  private maxGlitchInterval = 10000; // 10 seconds in milliseconds
+  private maxGlitchInterval = 20000; // 10 seconds in milliseconds
   private vintageTVGlitchTimeout: NodeJS.Timeout | undefined;
   private vintageTVGlitchActiveTimeout: NodeJS.Timeout | undefined;
 

@@ -22,6 +22,7 @@ export default function FgPanel({
   resizeCallback,
   focusCallback,
   closeCallback,
+  closeLabelElement,
   closePosition,
   shadow = {
     left: false,
@@ -49,6 +50,7 @@ export default function FgPanel({
   resizeCallback?: () => void;
   focusCallback?: (focus: boolean) => void;
   closeCallback?: () => void;
+  closeLabelElement?: React.ReactElement;
   closePosition?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
   shadow?: {
     left?: boolean;
@@ -442,12 +444,16 @@ export default function FgPanel({
                 : ""
             }`}
             hoverContent={
-              <div
-                className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0'
-                style={{ backgroundColor: backgroundColor }}
-              >
-                Close (x)
-              </div>
+              closeLabelElement ? (
+                closeLabelElement
+              ) : (
+                <div
+                  className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0'
+                  style={{ backgroundColor: backgroundColor }}
+                >
+                  Close (x)
+                </div>
+              )
             }
           />
         </Suspense>

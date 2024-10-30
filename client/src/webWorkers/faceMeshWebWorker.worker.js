@@ -6,6 +6,9 @@ import "../../public/faceMeshModel/face-landmarks-detection.js";
 class FaceMeshWebWorker {
   faceMesh;
   maxFaces = 1;
+  smoothingData = []; // Store previous landmarks for smoothing
+  smoothingFactor = 0.9; // Smoothing factor for EMA
+  deadbandThreshold = 0.001; // Minimum change threshold to register movement
 
   constructor() {
     this.loadModel();
@@ -31,7 +34,7 @@ class FaceMeshWebWorker {
       return;
     }
 
-    // Parse passed ArrayBuffer
+    // Parse ArrayBuffer
     const buffer = event.data.data;
     const array = new Uint8ClampedArray(buffer);
     const imData = new ImageData(array, event.data.width, event.data.height);
@@ -45,18 +48,66 @@ class FaceMeshWebWorker {
 
     const multiFaceLandmarks = [];
 
-    // Normalize predictions between -1 and 1
-    predictions.map((face) => {
+    predictions.map((face, faceIndex) => {
       const zValues = face.scaledMesh.map(([, , z]) => z);
-      const zMin = Math.min(...zValues) * 3;
-      const zMax = Math.max(...zValues) * 3;
+      const zRange = Math.max(...zValues) - Math.min(...zValues);
+
+      // Initialize smoothing data if empty
+      if (!this.smoothingData[faceIndex]) {
+        this.smoothingData[faceIndex] = face.scaledMesh.map(([x, y, z]) => ({
+          x,
+          y,
+          z,
+        }));
+      }
 
       multiFaceLandmarks.push(
-        face.scaledMesh.map(([x, y, z]) => {
-          const normX = (x / event.data.width) * 2 - 1; // Normalize X
-          const normY = ((y / event.data.height) * 2 - 1) * -1; // Normalize Y
-          const normZ = ((z - zMin) / (zMax - zMin)) * 2 - 1; // Normalize Z
-          return { x: normX, y: normY, z: normZ };
+        face.scaledMesh.map(([x, y, z], landmarkIndex) => {
+          // Normalize coordinates
+          const normX = (x / event.data.width) * 2 - 1;
+          const normY = ((y / event.data.height) * 2 - 1) * -1;
+          const adjustedZ = (z - Math.min(...zValues)) / (zRange || 1);
+
+          if (!event.data.smooth) {
+            // If smoothing is not enabled, return raw normalized values
+            return { x: normX, y: normY, z: adjustedZ };
+          }
+
+          // Retrieve previous values for smoothing
+          const prevLandmark = this.smoothingData[faceIndex][landmarkIndex];
+
+          // Apply exponential smoothing
+          const smoothedX =
+            this.smoothingFactor * normX +
+            (1 - this.smoothingFactor) * prevLandmark.x;
+          const smoothedY =
+            this.smoothingFactor * normY +
+            (1 - this.smoothingFactor) * prevLandmark.y;
+          const smoothedZ =
+            this.smoothingFactor * adjustedZ +
+            (1 - this.smoothingFactor) * prevLandmark.z;
+
+          // Deadbanding: Only update if change exceeds the threshold
+          const deltaX = Math.abs(smoothedX - prevLandmark.x);
+          const deltaY = Math.abs(smoothedY - prevLandmark.y);
+          const deltaZ = Math.abs(smoothedZ - prevLandmark.z);
+
+          if (
+            deltaX > this.deadbandThreshold ||
+            deltaY > this.deadbandThreshold ||
+            deltaZ > this.deadbandThreshold
+          ) {
+            // Update the stored smoothing data
+            this.smoothingData[faceIndex][landmarkIndex] = {
+              x: smoothedX,
+              y: smoothedY,
+              z: smoothedZ,
+            };
+            return { x: smoothedX, y: smoothedY, z: smoothedZ };
+          } else {
+            // Return the previous position if within deadband threshold
+            return prevLandmark;
+          }
         })
       );
     });

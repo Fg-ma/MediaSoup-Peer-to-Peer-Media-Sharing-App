@@ -19,7 +19,6 @@ import {
   PetsEffectTypes,
 } from "../../../context/CurrentEffectsStylesContext";
 import MaterialAtlas from "./MaterialAtlas";
-import { assetData } from "../../../babylon/meshes";
 
 export interface MeshJSON {
   vertex_faces: number[];

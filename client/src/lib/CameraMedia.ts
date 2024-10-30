@@ -213,38 +213,46 @@ class CameraMedia {
       }
 
       if (count < this.maxFaces[0]) {
-        for (let i = count; i < this.maxFaces[0]; i++) {
-          const currentEffectStyle =
-            this.currentEffectsStyles.current.camera[this.cameraId][
-              effect as EffectType
-            ];
-          const meshData =
-            // @ts-ignore
-            assetMeshes[effect][currentEffectStyle.style][
-              currentEffectStyle.threeDim ? "mesh" : "planeMesh"
-            ];
+        const currentEffectStyle =
+          this.currentEffectsStyles.current.camera[this.cameraId][
+            effect as EffectType
+          ];
 
-          this.babylonScene.createMesh(
-            meshData.meshType ?? "2D",
-            meshData.meshLabel + "." + i,
-            "",
-            // @ts-ignore
-            assetMeshes[effect][currentEffectStyle.style].defaultMeshPlacement,
-            meshData.meshPath,
-            meshData.meshFile,
-            i,
-            effect as EffectType,
-            "faceTrack",
-            [
-              0,
-              0,
-              currentEffectStyle.threeDim
-                ? this.babylonScene.threeDimMeshesZCoord
-                : this.babylonScene.twoDimMeshesZCoord,
-            ],
-            meshData.initScale,
-            meshData.initRotation
-          );
+        if (effect === "masks" && currentEffectStyle.style === "baseMask") {
+          for (let i = count; i < this.maxFaces[0]; i++) {
+            this.babylonScene.babylonMeshes.createFaceMesh(i, []);
+          }
+        } else {
+          for (let i = count; i < this.maxFaces[0]; i++) {
+            const meshData =
+              // @ts-ignore
+              assetMeshes[effect][currentEffectStyle.style][
+                currentEffectStyle.threeDim ? "mesh" : "planeMesh"
+              ];
+
+            this.babylonScene.createMesh(
+              meshData.meshType ?? "2D",
+              meshData.meshLabel + "." + i,
+              "",
+              // @ts-ignore
+              assetMeshes[effect][currentEffectStyle.style]
+                .defaultMeshPlacement,
+              meshData.meshPath,
+              meshData.meshFile,
+              i,
+              effect as EffectType,
+              "faceTrack",
+              [
+                0,
+                0,
+                currentEffectStyle.threeDim
+                  ? this.babylonScene.threeDimMeshesZCoord
+                  : this.babylonScene.twoDimMeshesZCoord,
+              ],
+              meshData.initScale,
+              meshData.initRotation
+            );
+          }
         }
       } else if (count > this.maxFaces[0]) {
         for (let i = this.maxFaces[0]; i < count; i++) {
@@ -289,7 +297,22 @@ class CameraMedia {
     }
 
     if (validEffectTypes.includes(effect as EffectType)) {
-      this.drawNewEffect(effect as EffectType);
+      if (
+        effect !== "masks" ||
+        this.currentEffectsStyles.current.camera[this.cameraId].masks.style !==
+          "baseMask" ||
+        !this.currentEffectsStyles.current.camera[this.cameraId].masks.threeDim
+      ) {
+        this.drawNewEffect(effect as EffectType);
+      } else {
+        this.babylonScene.deleteEffectMeshes(effect);
+
+        if (this.effects[effect]) {
+          for (let i = 0; i < this.maxFaces[0]; i++) {
+            this.babylonScene.babylonMeshes.createFaceMesh(i, []);
+          }
+        }
+      }
     }
     this.deadbanding.update(this.cameraId, this.effects);
 

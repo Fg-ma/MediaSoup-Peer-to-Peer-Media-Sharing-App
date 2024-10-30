@@ -15,6 +15,7 @@ import { CameraEffectTypes } from "../context/StreamsContext";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import UserDevice from "../UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
+import BabylonMeshes from "./BabylonMeshes";
 
 class BabylonRenderLoop {
   private FACE_MESH_DETECTION_INTERVAL: number;
@@ -59,7 +60,8 @@ class BabylonRenderLoop {
     private selfieSegmentationProcessing: boolean[] | undefined,
     private userDevice: UserDevice,
     private hideBackgroundTexture: DynamicTexture | undefined,
-    private hideBackgroundMaterial: StandardMaterial | undefined
+    private hideBackgroundMaterial: StandardMaterial | undefined,
+    private babylonMeshes: BabylonMeshes
   ) {
     this.FACE_MESH_DETECTION_INTERVAL =
       this.userDevice.getFaceMeshDetectionInterval();
@@ -69,8 +71,8 @@ class BabylonRenderLoop {
       alpha: true,
       willReadFrequently: true,
     });
-    this.offscreenCanvas.width = 128;
-    this.offscreenCanvas.height = 128;
+    this.offscreenCanvas.width = 320;
+    this.offscreenCanvas.height = 180;
 
     this.lastFaceCountCheck = performance.now();
 
@@ -181,6 +183,12 @@ class BabylonRenderLoop {
           data: buffer, // Send the ArrayBuffer
           width: this.offscreenCanvas.width,
           height: this.offscreenCanvas.height,
+          smooth:
+            this.effects.masks &&
+            this.currentEffectsStyles.current.camera[this.id].masks.style ===
+              "baseMask"
+              ? true
+              : false,
         });
       }
       if (
@@ -486,7 +494,11 @@ class BabylonRenderLoop {
     for (const mesh of this.scene.meshes) {
       const meshMetadata = mesh.metadata;
 
-      if (meshMetadata === null || meshMetadata.positionStyle !== "faceTrack") {
+      if (
+        meshMetadata === null ||
+        (meshMetadata.positionStyle !== "faceTrack" &&
+          meshMetadata.positionStyle !== "landmarks")
+      ) {
         continue;
       }
 
@@ -521,59 +533,68 @@ class BabylonRenderLoop {
       // @ts-ignore
       usedTrackers[meshMetadata.effectType].push(closestTrackerId);
 
-      let position: number[] | undefined;
+      if (meshMetadata.positionStyle === "faceTrack") {
+        let position: number[] | undefined;
 
-      switch (meshMetadata.defaultMeshPlacement) {
-        case "forehead":
-          position = this.positionsScreenSpaceToSceneSpace(
-            mesh,
-            calculatedLandmarks.foreheadPositions[closestTrackerId]
-          );
-          break;
-        case "nose":
-          position = this.positionsScreenSpaceToSceneSpace(
-            mesh,
-            calculatedLandmarks.nosePositions[closestTrackerId]
-          );
-          break;
-        case "chin":
-          position = this.positionsScreenSpaceToSceneSpace(
-            mesh,
-            calculatedLandmarks.chinPositions[closestTrackerId]
-          );
-          break;
-        case "eyesCenter":
-          position = this.positionsScreenSpaceToSceneSpace(
-            mesh,
-            calculatedLandmarks.eyesCenterPositions[closestTrackerId]
-          );
-          break;
-        default:
-          break;
+        switch (meshMetadata.defaultMeshPlacement) {
+          case "forehead":
+            position = this.positionsScreenSpaceToSceneSpace(
+              mesh,
+              calculatedLandmarks.foreheadPositions[closestTrackerId]
+            );
+            break;
+          case "nose":
+            position = this.positionsScreenSpaceToSceneSpace(
+              mesh,
+              calculatedLandmarks.nosePositions[closestTrackerId]
+            );
+            break;
+          case "chin":
+            position = this.positionsScreenSpaceToSceneSpace(
+              mesh,
+              calculatedLandmarks.chinPositions[closestTrackerId]
+            );
+            break;
+          case "eyesCenter":
+            position = this.positionsScreenSpaceToSceneSpace(
+              mesh,
+              calculatedLandmarks.eyesCenterPositions[closestTrackerId]
+            );
+            break;
+          default:
+            break;
+        }
+
+        if (!position) {
+          continue;
+        }
+
+        // Set the mesh position in world space
+        mesh.position = new Vector3(position[0], position[1], position[2]);
+
+        mesh.rotation = new Vector3(
+          calculatedLandmarks.headPitchAngles[closestTrackerId],
+          calculatedLandmarks.headYawAngles[closestTrackerId],
+          calculatedLandmarks.headRotationAngles[closestTrackerId]
+        );
+
+        const interocularDistance = this.scaleScreenSpaceToSceneSpace(
+          mesh,
+          calculatedLandmarks.interocularDistances[closestTrackerId]
+        );
+        mesh.scaling = new Vector3(
+          mesh.metadata.initScale[0] * interocularDistance,
+          mesh.metadata.initScale[1] * interocularDistance,
+          mesh.metadata.initScale[2] * interocularDistance
+        );
+      } else if (meshMetadata.positionStyle === "landmarks") {
+        this.babylonMeshes.updateFaceMesh(
+          mesh,
+          this.faceLandmarks
+            .getFaceIdLandmarksPairs()
+            [closestTrackerId].landmarks.slice(0, -10)
+        );
       }
-
-      if (!position) {
-        continue;
-      }
-
-      // Set the mesh position in world space
-      mesh.position = new Vector3(position[0], position[1], position[2]);
-
-      mesh.rotation = new Vector3(
-        calculatedLandmarks.headPitchAngles[closestTrackerId],
-        calculatedLandmarks.headYawAngles[closestTrackerId],
-        calculatedLandmarks.headRotationAngles[closestTrackerId]
-      );
-
-      const interocularDistance = this.scaleScreenSpaceToSceneSpace(
-        mesh,
-        calculatedLandmarks.interocularDistances[closestTrackerId]
-      );
-      mesh.scaling = new Vector3(
-        mesh.metadata.initScale[0] * interocularDistance,
-        mesh.metadata.initScale[1] * interocularDistance,
-        mesh.metadata.initScale[2] * interocularDistance
-      );
     }
 
     for (const mesh of this.scene.meshes) {

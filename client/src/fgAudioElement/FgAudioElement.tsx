@@ -215,28 +215,23 @@ export default function FgAudioElement({
   };
 
   const isOnPath = (event: React.MouseEvent) => {
-    const bbox = pathRef.current?.getBBox();
-    const svgPoint = svgRef.current?.createSVGPoint();
-    if (!bbox || !svgPoint || clientMute.current) return;
+    const pathElement = pathRef.current;
+    const svgElement = svgRef.current;
 
+    if (!pathElement || !svgElement || clientMute.current) return false;
+
+    // Create an SVG point in client coordinates
+    const svgPoint = svgElement.createSVGPoint();
     svgPoint.x = event.clientX;
     svgPoint.y = event.clientY;
 
-    // Convert client coordinates to SVG coordinates
+    // Transform the client point to SVG coordinates
     const svgPointTransformed = svgPoint.matrixTransform(
-      svgRef.current?.getScreenCTM()?.inverse()
+      svgElement.getScreenCTM()?.inverse()
     );
 
-    if (
-      svgPointTransformed.x >= bbox.x &&
-      svgPointTransformed.x <= bbox.x + bbox.width &&
-      svgPointTransformed.y >= bbox.y - 10 &&
-      svgPointTransformed.y <= bbox.y + 10
-    ) {
-      return true;
-    }
-
-    return false;
+    // Check if the point is on the stroke of the path
+    return pathElement.isPointInStroke(svgPointTransformed);
   };
 
   const onClick = (event: React.MouseEvent) => {

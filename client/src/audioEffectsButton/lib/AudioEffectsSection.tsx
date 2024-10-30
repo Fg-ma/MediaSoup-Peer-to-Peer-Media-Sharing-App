@@ -688,6 +688,7 @@ export default function AudioEffectsSection({
   handleMute,
   muteStateRef,
   videoContainerRef,
+  closeLabelElement,
   closeCallback,
   backgroundColor,
   secondaryBackgroundColor,
@@ -703,6 +704,7 @@ export default function AudioEffectsSection({
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
   videoContainerRef?: React.RefObject<HTMLDivElement>;
+  closeLabelElement?: React.ReactElement;
   closeCallback?: () => void;
   backgroundColor?: string;
   secondaryBackgroundColor?: string;
@@ -961,6 +963,7 @@ export default function AudioEffectsSection({
           gridColumnsChange();
         }}
         closeCallback={closeCallback ? () => closeCallback() : undefined}
+        closeLabelElement={closeLabelElement}
         closePosition='topRight'
         shadow={{ top: true, bottom: true }}
         backgroundColor={backgroundColor}

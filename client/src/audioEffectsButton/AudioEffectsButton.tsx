@@ -25,6 +25,7 @@ export default function AudioEffectsButton({
   handleMute,
   muteStateRef,
   videoContainerRef,
+  closeLabelElement,
   options,
   style,
 }: {
@@ -36,6 +37,7 @@ export default function AudioEffectsButton({
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
   videoContainerRef?: React.RefObject<HTMLDivElement>;
+  closeLabelElement?: React.ReactElement;
   options?: {
     color?: string;
     placement?: "above" | "below" | "left" | "right";
@@ -102,6 +104,7 @@ export default function AudioEffectsButton({
             handleMute={handleMute}
             muteStateRef={muteStateRef}
             videoContainerRef={videoContainerRef}
+            closeLabelElement={closeLabelElement}
             closeCallback={() => setEffectSectionActive(false)}
             backgroundColor={audioEffectsButtonOptions.backgroundColor}
             secondaryBackgroundColor={

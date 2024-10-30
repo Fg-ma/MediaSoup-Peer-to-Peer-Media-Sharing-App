@@ -416,6 +416,11 @@ export default function FgVideoControls({
                   }}
                   muteStateRef={localMute}
                   videoContainerRef={videoContainerRef}
+                  closeLabelElement={
+                    <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0 bg-white'>
+                      Close (x)
+                    </div>
+                  }
                   style={{ transform: "scaleX(-1)" }}
                   options={{
                     backgroundColor: "rgba(10, 10, 10, 1)",

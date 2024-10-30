@@ -1,3 +1,4 @@
+import { NormalizedLandmarkList } from "@mediapipe/face_mesh";
 import {
   Scene,
   Vector3,
@@ -9,17 +10,21 @@ import {
   PointerDragBehavior,
   KeyboardEventTypes,
   HemisphericLight,
+  Texture,
+  VertexData,
+  Mesh,
+  StandardMaterial,
+  UniversalCamera,
 } from "@babylonjs/core";
+import { Delaunay } from "d3-delaunay";
 import MeshLoaders from "./MeshLoaders";
 import {
   DefaultMeshPlacementType,
   EffectType,
   PositionStyle,
 } from "./BabylonScene";
-
-export type MeshTypes = "2D" | "gltf";
-
-type GizmoStateTypes = "position" | "scale" | "rotation" | "none";
+import { baseMaskData } from "./meshes";
+import { GizmoStateTypes, MeshJSON, MeshTypes, Point3D } from "./typeContant";
 
 class BabylonMeshes {
   meshes: {
@@ -35,8 +40,11 @@ class BabylonMeshes {
 
   constructor(
     private scene: Scene,
+    private camera: UniversalCamera,
+    private canvas: HTMLCanvasElement,
     private ambientLightThreeDimMeshes: HemisphericLight | undefined,
-    private ambientLightTwoDimMeshes: HemisphericLight | undefined
+    private ambientLightTwoDimMeshes: HemisphericLight | undefined,
+    private threeDimMeshesZCoord: number
   ) {
     this.meshLoaders = new MeshLoaders(this.scene);
 
@@ -790,6 +798,259 @@ class BabylonMeshes {
 
     // Clear the selected mesh reference
     this.selectedMesh = null;
+  };
+
+  private loadMeshJSON = async (url: string): Promise<MeshJSON | undefined> => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Network response was not ok " + response.statusText);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(
+        "There has been a problem with your fetch operation:",
+        error
+      );
+      return undefined;
+    }
+  };
+
+  private getTriangles = (
+    geometryPoints: Point3D[],
+    uvPoints: number[],
+    zPosition: number
+  ) => {
+    const geometryDelaunay = Delaunay.from(
+      geometryPoints,
+      (p) => p.x,
+      (p) => p.y
+    );
+    const geometryTrianglesIndices = geometryDelaunay.triangles;
+
+    const numVertices = geometryPoints.length;
+    const geometryTriangles: number[][] = []; // Changed to 2D array
+    const uvTriangles: number[] = [];
+    const vertexNormals: Float32Array = new Float32Array(numVertices * 3).fill(
+      0
+    );
+    const indices: number[] = [];
+
+    // Calculate face normals and accumulate them for vertex normals
+    for (let i = 0; i < geometryTrianglesIndices.length; i += 3) {
+      const index0 = geometryTrianglesIndices[i];
+      const index1 = geometryTrianglesIndices[i + 1];
+      const index2 = geometryTrianglesIndices[i + 2];
+
+      indices.push(i, i + 1, i + 2);
+
+      const v0 = geometryPoints[index0];
+      const v1 = geometryPoints[index1];
+      const v2 = geometryPoints[index2];
+
+      const edge1x = v1.x - v0.x;
+      const edge1y = v1.y - v0.y;
+      const edge1z = v1.z - v0.z;
+
+      const edge2x = v2.x - v0.x;
+      const edge2y = v2.y - v0.y;
+      const edge2z = v2.z - v0.z;
+
+      const normalX = edge1y * edge2z - edge1z * edge2y;
+      const normalY = edge1z * edge2x - edge1x * edge2z;
+      const normalZ = edge1x * edge2y - edge1y * edge2x;
+
+      const length = Math.sqrt(
+        normalX * normalX + normalY * normalY + normalZ * normalZ
+      );
+      const invLength = 1 / length;
+      const normalizedNormalX = normalX * invLength;
+      const normalizedNormalY = normalY * invLength;
+      const normalizedNormalZ = normalZ * invLength;
+
+      // Accumulate normals for vertices
+      vertexNormals[index0 * 3] += normalizedNormalX;
+      vertexNormals[index0 * 3 + 1] += normalizedNormalY;
+      vertexNormals[index0 * 3 + 2] += normalizedNormalZ;
+
+      vertexNormals[index1 * 3] += normalizedNormalX;
+      vertexNormals[index1 * 3 + 1] += normalizedNormalY;
+      vertexNormals[index1 * 3 + 2] += normalizedNormalZ;
+
+      vertexNormals[index2 * 3] += normalizedNormalX;
+      vertexNormals[index2 * 3 + 1] += normalizedNormalY;
+      vertexNormals[index2 * 3 + 2] += normalizedNormalZ;
+
+      // Store vertex positions in triangles as 2D arrays
+      geometryTriangles.push(
+        [
+          -this.screenSpaceToSceneSpaceX(zPosition, v0.x),
+          this.screenSpaceToSceneSpaceY(zPosition, v0.y),
+          v0.z,
+        ],
+        [
+          -this.screenSpaceToSceneSpaceX(zPosition, v1.x),
+          this.screenSpaceToSceneSpaceY(zPosition, v1.y),
+          v1.z,
+        ],
+        [
+          -this.screenSpaceToSceneSpaceX(zPosition, v2.x),
+          this.screenSpaceToSceneSpaceY(zPosition, v2.y),
+          v2.z,
+        ]
+      );
+
+      // Store UV coords
+      uvTriangles.push(
+        uvPoints[index0 * 2],
+        -uvPoints[index0 * 2 + 1],
+        uvPoints[index1 * 2],
+        -uvPoints[index1 * 2 + 1],
+        uvPoints[index2 * 2],
+        -uvPoints[index2 * 2 + 1]
+      );
+    }
+
+    // Normalize vertex normals
+    for (let i = 0; i < numVertices; i++) {
+      const nx = vertexNormals[i * 3];
+      const ny = vertexNormals[i * 3 + 1];
+      const nz = vertexNormals[i * 3 + 2];
+      const length = Math.sqrt(nx * nx + ny * ny + nz * nz);
+      const invLength = 1 / length;
+      vertexNormals[i * 3] *= invLength;
+      vertexNormals[i * 3 + 1] *= invLength;
+      vertexNormals[i * 3 + 2] *= invLength;
+    }
+
+    // Flatten vertex normals into an array, repeating for each vertex in each triangle
+    const normals: number[] = [];
+    for (let i = 0; i < geometryTrianglesIndices.length; i++) {
+      const vertexIndex = geometryTrianglesIndices[i];
+      normals.push(
+        -vertexNormals[vertexIndex * 3],
+        -vertexNormals[vertexIndex * 3 + 1],
+        vertexNormals[vertexIndex * 3 + 2]
+      );
+    }
+
+    return { geometryTriangles, uvTriangles, normals, indices };
+  };
+
+  // Transform X coordinate from screen space to scene space
+  private screenSpaceToSceneSpaceX = (zPosition: number, value: number) => {
+    const cameraFOV = this.camera.fov; // FOV in radians
+    const aspectRatio = this.canvas.width / this.canvas.height;
+
+    // Calculate the vertical extent at the current zPosition
+    const verticalExtent = Math.tan(cameraFOV / 2) * Math.abs(zPosition);
+
+    // Calculate horizontal extent based on aspect ratio
+    const horizontalExtent = verticalExtent * aspectRatio;
+
+    // Convert normalized screen X coordinate to world X coordinate
+    return value * horizontalExtent;
+  };
+
+  // Transform Y coordinate from screen space to scene space
+  private screenSpaceToSceneSpaceY = (zPosition: number, value: number) => {
+    const cameraFOV = this.camera.fov; // FOV in radians
+
+    // Calculate the vertical extent at the current zPosition
+    const verticalExtent = Math.tan(cameraFOV / 2) * Math.abs(zPosition);
+
+    // Convert normalized screen Y coordinate to world Y coordinate
+    return value * verticalExtent;
+  };
+
+  createFaceMesh = async (
+    faceId: number,
+    liveLandmarks: NormalizedLandmarkList
+  ) => {
+    // Load uv mesh data
+    if (!baseMaskData.data) {
+      baseMaskData.data = await this.loadMeshJSON(baseMaskData["3Durl"]);
+    }
+
+    // Get the triangles
+    const { geometryTriangles, uvTriangles, normals, indices } =
+      this.getTriangles(
+        liveLandmarks,
+        baseMaskData.data!.uv_faces,
+        this.threeDimMeshesZCoord
+      );
+
+    // Flatten the geometry data for Babylon.js
+    const vertices = geometryTriangles.flat();
+    const uvs = uvTriangles.flat();
+    const normalData = normals.flat();
+
+    // Create Babylon.js Mesh
+    const faceMesh = new Mesh("faceMesh", this.scene);
+    faceMesh.position = new Vector3(0, 0, this.threeDimMeshesZCoord);
+
+    faceMesh.metadata = {
+      meshLabel: `baseMask.${faceId}`,
+      isGizmoEnabled: false,
+      gizmoState: "none",
+      meshType: "3D",
+      faceId,
+      effectType: "masks",
+      positionStyle: "landmarks",
+      manuallyTransformed: false,
+    };
+
+    // Define vertex data
+    const vertexData = new VertexData();
+    vertexData.positions = vertices;
+    vertexData.indices = indices;
+    vertexData.uvs = uvs;
+    vertexData.normals = normalData;
+
+    // Apply vertex data to the mesh
+    vertexData.applyToMesh(faceMesh);
+
+    // Create material with texture
+    const material = new StandardMaterial("faceMaterial", this.scene);
+    material.diffuseTexture = new Texture(baseMaskData["2Durl"], this.scene);
+    material.diffuseTexture.hasAlpha = true;
+    material.backFaceCulling = false; // Disable back-face culling
+    faceMesh.material = material;
+
+    this.ambientLightTwoDimMeshes?.includedOnlyMeshes.push(faceMesh);
+  };
+
+  updateFaceMesh = async (
+    mesh: AbstractMesh,
+    liveLandmarks: NormalizedLandmarkList
+  ) => {
+    // Load uv mesh data
+    if (!baseMaskData.data) {
+      baseMaskData.data = await this.loadMeshJSON(baseMaskData["3Durl"]);
+    }
+
+    // Get the triangles
+    const { geometryTriangles, uvTriangles, normals, indices } =
+      this.getTriangles(
+        liveLandmarks,
+        baseMaskData.data!.uv_faces,
+        mesh.position.z
+      );
+
+    // Flatten the geometry data for Babylon.js
+    const vertices = geometryTriangles.flat();
+    const uvs = uvTriangles.flat();
+    const normalData = normals.flat();
+
+    // Define vertex data
+    const vertexData = new VertexData();
+    vertexData.positions = vertices;
+    vertexData.indices = indices;
+    vertexData.uvs = uvs;
+    vertexData.normals = normalData;
+
+    // Apply vertex data to the mesh
+    vertexData.applyToMesh(mesh as Mesh);
   };
 }
 

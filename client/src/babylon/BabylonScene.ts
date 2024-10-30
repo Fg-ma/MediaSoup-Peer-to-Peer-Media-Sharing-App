@@ -15,16 +15,8 @@ import {
   Layer,
   DynamicTexture,
   Material,
-  MotionBlurPostProcess,
-  BlackAndWhitePostProcess,
-  ChromaticAberrationPostProcess,
-  SharpenPostProcess,
-  TonemapPostProcess,
-  TonemappingOperator,
-  Effect,
-  PostProcess,
 } from "@babylonjs/core";
-import BabylonMeshes, { MeshTypes } from "./BabylonMeshes";
+import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
 import { CameraEffectTypes } from "../context/StreamsContext";
@@ -33,6 +25,7 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import UserDevice from "../UserDevice";
 import "@babylonjs/inspector";
 import BabylonShaderController from "./BabylonShaderController";
+import { MeshTypes } from "./typeContant";
 
 export type DefaultMeshPlacementType =
   | "forehead"
@@ -46,7 +39,7 @@ export type EffectType =
   | "masks"
   | "pets"
   | "hats";
-export type PositionStyle = "faceTrack" | "free";
+export type PositionStyle = "faceTrack" | "free" | "landmarks";
 
 export const validEffectTypes: EffectType[] = [
   "glasses",
@@ -131,8 +124,11 @@ class BabylonScene {
 
     this.babylonMeshes = new BabylonMeshes(
       this.scene,
+      this.camera,
+      this.canvas,
       this.ambientLightThreeDimMeshes,
-      this.ambientLightTwoDimMeshes
+      this.ambientLightTwoDimMeshes,
+      this.threeDimMeshesZCoord
     );
 
     this.babylonRenderLoop = new BabylonRenderLoop(
@@ -154,7 +150,8 @@ class BabylonScene {
       this.selfieSegmentationProcessing,
       this.userDevice,
       this.hideBackgroundTexture,
-      this.hideBackgroundMaterial
+      this.hideBackgroundMaterial,
+      this.babylonMeshes
     );
 
     this.babylonShaderController = new BabylonShaderController(
@@ -180,8 +177,8 @@ class BabylonScene {
   }
 
   deconstructor = () => {
-    this.engine.dispose();
     this.engine.stopRenderLoop();
+    this.engine.dispose();
 
     window.removeEventListener("resize", () => {
       this.engine.resize();
