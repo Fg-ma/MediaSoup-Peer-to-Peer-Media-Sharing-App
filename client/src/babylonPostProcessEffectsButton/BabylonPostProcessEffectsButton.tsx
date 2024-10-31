@@ -74,8 +74,8 @@ export default function BabylonPostProcessEffectsButton({
   const postProcessEffectsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
-    ? userStreamEffects.current.camera[videoId].postProcess
-    : remoteStreamEffects.current[username][instance].camera[videoId]
+    ? userStreamEffects.current[type][videoId].postProcess
+    : remoteStreamEffects.current[username][instance][type][videoId]
         .postProcess;
   const effectsStyles = isUser
     ? currentEffectsStyles.current[type][videoId].postProcess
@@ -151,7 +151,7 @@ export default function BabylonPostProcessEffectsButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    userMedia.current.camera[
+    userMedia.current[type][
       videoId
     ].babylonScene.babylonShaderController.swapPostProcessEffects(
       effectsStyles.style
@@ -179,7 +179,7 @@ export default function BabylonPostProcessEffectsButton({
 
     if (effectsStyles.style !== effectType || !streamEffects) {
       effectsStyles.style = effectType;
-      userMedia.current.camera[
+      userMedia.current[type][
         videoId
       ].babylonScene.babylonShaderController.swapPostProcessEffects(effectType);
 

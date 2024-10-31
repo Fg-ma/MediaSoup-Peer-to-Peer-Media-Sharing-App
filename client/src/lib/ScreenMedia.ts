@@ -1,6 +1,3 @@
-import BaseShader from "../effects/visualEffects/lib/BaseShader";
-import UserDevice from "../UserDevice";
-import Render from "../effects/visualEffects/lib/render";
 import {
   defaultScreenCurrentEffectsStyles,
   EffectStylesType,
@@ -11,51 +8,31 @@ import {
   defaultScreenStreamEffects,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
+import UserDevice from "../UserDevice";
+import BabylonScene, {
+  EffectType,
+  validEffectTypes,
+} from "../babylon/BabylonScene";
 
 class ScreenMedia {
-  private username: string;
-  private table_id: string;
-  private screenId: string;
-
   private canvas: HTMLCanvasElement;
   private video: HTMLVideoElement;
-  private gl: WebGLRenderingContext | WebGL2RenderingContext;
-  private initScreenStream: MediaStream;
-
-  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
-  private userStreamEffects: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: {
-        [effectType in CameraEffectTypes]?: boolean;
-      };
-    };
-    screen: {
-      [screenId: string]: { [effectType in ScreenEffectTypes]?: boolean };
-    };
-    audio: { [effectType in AudioEffectTypes]?: boolean };
-  }>;
-
-  private animationFrameId: number[] = [];
-
-  private baseShader: BaseShader;
 
   private effects: {
     [screenEffect in ScreenEffectTypes]?: boolean;
   };
 
-  private tintColor = "#F56114";
+  private maxFaces: [number] = [1];
 
-  private userDevice: UserDevice;
-
-  render: Render;
+  babylonScene: BabylonScene;
 
   constructor(
-    username: string,
-    table_id: string,
-    screenId: string,
-    initScreenStream: MediaStream,
-    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-    userStreamEffects: React.MutableRefObject<{
+    private username: string,
+    private table_id: string,
+    private screenId: string,
+    private initScreenStream: MediaStream,
+    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private userStreamEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
@@ -64,15 +41,8 @@ class ScreenMedia {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
-    userDevice: UserDevice
+    private userDevice: UserDevice
   ) {
-    this.username = username;
-    this.table_id = table_id;
-    this.screenId = screenId;
-    this.currentEffectsStyles = currentEffectsStyles;
-    this.userStreamEffects = userStreamEffects;
-    this.userDevice = userDevice;
-
     this.effects = {};
 
     this.userStreamEffects.current.screen[this.screenId] = structuredClone(
@@ -80,16 +50,6 @@ class ScreenMedia {
     );
 
     this.canvas = document.createElement("canvas");
-    const gl =
-      this.canvas.getContext("webgl2") || this.canvas.getContext("webgl");
-
-    if (!gl) {
-      throw new Error("WebGL is not supported");
-    }
-
-    this.gl = gl;
-
-    this.initScreenStream = initScreenStream;
 
     if (!currentEffectsStyles.current.screen[this.screenId]) {
       currentEffectsStyles.current.screen[this.screenId] = structuredClone(
@@ -97,22 +57,15 @@ class ScreenMedia {
       );
     }
 
-    this.baseShader = new BaseShader(gl, this.effects);
-
-    this.baseShader.setTintColor(this.tintColor);
-    this.baseShader.createAtlasTexture("twoDim", {});
-    this.baseShader.createAtlasTexture("threeDim", {});
-
     // Start video and render loop
     this.video = document.createElement("video");
 
-    this.render = new Render(
+    this.babylonScene = new BabylonScene(
       this.screenId,
-      this.gl,
-      this.baseShader,
-      undefined,
+      "screen",
+      this.canvas,
       this.video,
-      this.animationFrameId,
+      undefined,
       this.effects,
       this.currentEffectsStyles,
       undefined,
@@ -124,28 +77,18 @@ class ScreenMedia {
       undefined,
       undefined,
       this.userDevice,
-      false
+      this.maxFaces
     );
 
     this.video.srcObject = this.initScreenStream;
-    this.video.addEventListener("play", () => {
-      this.render.loop();
-    });
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
-      gl.viewport(0, 0, this.canvas.width, this.canvas.height);
       this.video.play();
     };
   }
 
   deconstructor() {
-    // End render loop
-    if (this.animationFrameId[0]) {
-      cancelAnimationFrame(this.animationFrameId[0]);
-      delete this.animationFrameId[0];
-    }
-
     // End initial stream
     this.initScreenStream.getTracks().forEach((track) => track.stop());
 
@@ -153,32 +96,24 @@ class ScreenMedia {
     this.video.pause();
     this.video.srcObject = null;
 
-    // Deconstruct base shader
-    this.baseShader.deconstructor();
-
-    // Clear gl canvas
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    if (this.canvas) {
-      const contextAttributes = this.gl.getContextAttributes();
-      if (contextAttributes && contextAttributes.preserveDrawingBuffer) {
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-      }
-      const ext = this.gl.getExtension("WEBGL_lose_context");
-      if (ext) {
-        ext.loseContext();
-      }
-    }
     this.canvas.remove();
+
+    // Deconstruct base shader
+    this.babylonScene.deconstructor();
   }
 
-  private async updateAtlases() {
-    const twoDimUrls = {};
+  private hexToNormalizedRgb = (hex: string): [number, number, number] => {
+    // Remove the leading '#' if present
+    hex = hex.replace(/^#/, "");
 
-    const threeDimUrls = {};
+    // Parse the r, g, b values from the hex string
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
 
-    await this.baseShader.updateAtlasTexture("twoDim", twoDimUrls);
-    await this.baseShader.updateAtlasTexture("threeDim", threeDimUrls);
-  }
+    return [r / 255, g / 255, b / 255];
+  };
 
   async changeEffects(
     effect: ScreenEffectTypes,
@@ -193,32 +128,86 @@ class ScreenMedia {
       this.effects[effect] = true;
     }
 
-    await this.updateAtlases();
+    if (validEffectTypes.includes(effect as EffectType)) {
+      this.drawNewEffect(effect as EffectType);
+    }
 
     if (tintColor) {
       this.setTintColor(tintColor);
     }
-    if (effect === "tint" && !blockStateChange) {
-      this.baseShader.toggleTintEffect();
+    if (effect === "tint" && tintColor) {
+      this.babylonScene.toggleTintPlane(
+        this.effects[effect],
+        this.hexToNormalizedRgb(tintColor)
+      );
     }
 
     if (effect === "blur") {
-      this.baseShader.toggleBlurEffect();
+      this.babylonScene.toggleBlurEffect(this.effects[effect]);
     }
 
     if (effect === "pause") {
-      this.baseShader.setPause(this.effects[effect]);
+      this.babylonScene.togglePauseEffect(this.effects[effect]);
     }
 
-    // Remove old animation frame
-    if (this.animationFrameId[0]) {
-      cancelAnimationFrame(this.animationFrameId[0]);
-      delete this.animationFrameId[0];
+    if (effect === "postProcess") {
+      this.babylonScene.babylonShaderController.togglePostProcessEffectsActive(
+        this.effects[effect]
+      );
     }
-
-    this.render.updateFlipVideo(this.effects.pause ? true : false);
-    this.render.loop();
   }
+
+  drawNewEffect = (effect: EffectType) => {
+    const currentStyle =
+      this.currentEffectsStyles.current.camera?.[this.screenId]?.[effect];
+
+    if (!currentStyle) {
+      return;
+    }
+
+    // @ts-ignore
+    const meshData2D = assetMeshes[effect][currentStyle.style].planeMesh;
+    // @ts-ignore
+    const meshData3D = assetMeshes[effect][currentStyle.style].mesh;
+
+    // Delete old meshes
+    this.babylonScene.deleteEffectMeshes(effect);
+
+    if (this.effects[effect as ScreenEffectTypes]) {
+      if (!currentStyle.threeDim) {
+        this.babylonScene.createEffectMeshes(
+          "2D",
+          meshData2D.meshLabel,
+          "",
+          // @ts-ignore
+          assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
+          meshData2D.meshPath,
+          meshData2D.meshFile,
+          effect,
+          "free",
+          [0, 0, this.babylonScene.twoDimMeshesZCoord],
+          meshData2D.initScale,
+          meshData2D.initRotation
+        );
+      }
+      if (currentStyle.threeDim) {
+        this.babylonScene.createEffectMeshes(
+          meshData3D.meshType,
+          meshData3D.meshLabel,
+          "",
+          // @ts-ignore
+          assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
+          meshData3D.meshPath,
+          meshData3D.meshFile,
+          effect,
+          "faceTrack",
+          [0, 0, this.babylonScene.threeDimMeshesZCoord],
+          meshData3D.initScale,
+          meshData3D.initRotation
+        );
+      }
+    }
+  };
 
   getStream() {
     return this.canvas.captureStream();
@@ -229,7 +218,7 @@ class ScreenMedia {
   }
 
   setTintColor(newTintColor: string) {
-    this.baseShader.setTintColor(newTintColor);
+    this.babylonScene.setTintColor(this.hexToNormalizedRgb(newTintColor));
   }
 }
 

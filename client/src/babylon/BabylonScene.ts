@@ -87,6 +87,7 @@ class BabylonScene {
 
   constructor(
     private id: string,
+    private type: "camera" | "screen",
     private canvas: HTMLCanvasElement,
     private video: HTMLVideoElement,
     private faceLandmarks: FaceLandmarks | undefined,
@@ -117,10 +118,10 @@ class BabylonScene {
     this.camera.attachControl(this.canvas, true);
 
     this.initCamera();
+    this.initLighting();
     this.initVideoPlane();
     this.initHideBackgroundPlane();
     this.initTintPlane();
-    this.initLighting();
 
     this.babylonMeshes = new BabylonMeshes(
       this.scene,
@@ -206,15 +207,9 @@ class BabylonScene {
       new Vector3(-1, 1, 0),
       this.scene
     );
-    this.backgroundLight.intensity = 1.0;
+    this.backgroundLight.intensity = 2.0;
     this.backgroundLight.diffuse = new Color3(1, 1, 1);
     this.backgroundLight.includedOnlyMeshes.push(dummyMesh3D);
-    if (this.videoPlane) {
-      this.backgroundLight.includedOnlyMeshes.push(this.videoPlane);
-    }
-    if (this.tintPlane) {
-      this.backgroundLight.includedOnlyMeshes.push(this.tintPlane);
-    }
 
     this.ambientLightThreeDimMeshes = new HemisphericLight(
       "ambientLightThreeDimMeshes",
@@ -248,7 +243,11 @@ class BabylonScene {
     const planeWidth = planeHeight * aspectRatio;
 
     // Update the plane's scaling and position
-    plane.scaling = new Vector3(-planeWidth, planeHeight, 1);
+    plane.scaling = new Vector3(
+      (this.type === "camera" ? -1 : 1) * planeWidth,
+      planeHeight,
+      1
+    );
     plane.position = new Vector3(0, 0, backgroundDistance);
   };
 
@@ -256,8 +255,7 @@ class BabylonScene {
     this.videoTexture = new VideoTexture(
       "videoTexture",
       this.video,
-      this.scene,
-      true
+      this.scene
     );
 
     this.videoPlane = MeshBuilder.CreatePlane(
@@ -270,6 +268,10 @@ class BabylonScene {
     this.videoPlane.material = this.videoMaterial;
 
     this.updateBackgroundPlaneSize(this.videoPlane);
+
+    if (this.backgroundLight) {
+      this.backgroundLight.includedOnlyMeshes.push(this.videoPlane);
+    }
   };
 
   private initHideBackgroundPlane = () => {
@@ -309,7 +311,7 @@ class BabylonScene {
 
     this.hideBackgroundPlane.material = this.hideBackgroundMaterial;
 
-    this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.01);
+    this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.00000001);
   };
 
   private deleteHideBackgroundPlane = () => {
@@ -342,6 +344,10 @@ class BabylonScene {
     this.tintPlane.material = this.tintMaterial;
 
     this.updateTintPlaneSize();
+
+    if (this.backgroundLight) {
+      this.backgroundLight.includedOnlyMeshes.push(this.tintPlane);
+    }
   };
 
   createMesh = (

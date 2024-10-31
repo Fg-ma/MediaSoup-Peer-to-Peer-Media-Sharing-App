@@ -67,8 +67,6 @@ class CameraMedia {
 
     this.canvas = document.createElement("canvas");
 
-    this.initCameraStream = initCameraStream;
-
     if (!currentEffectsStyles.current.camera[this.cameraId]) {
       currentEffectsStyles.current.camera[this.cameraId] = structuredClone(
         defaultCameraCurrentEffectsStyles
@@ -159,6 +157,7 @@ class CameraMedia {
 
     this.babylonScene = new BabylonScene(
       this.cameraId,
+      "camera",
       this.canvas,
       this.video,
       this.faceLandmarks,

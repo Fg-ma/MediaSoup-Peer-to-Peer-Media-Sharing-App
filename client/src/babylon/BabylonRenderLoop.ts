@@ -35,7 +35,6 @@ class BabylonRenderLoop {
   private hideBackgroundCtx: CanvasRenderingContext2D | null;
   private hideBackgroundEffectImage: HTMLImageElement;
   private hideBackgroundCtxFillStyle = "#F56114";
-
   private tempHideBackgroundCanvas: OffscreenCanvas;
   private tempHideBackgroundCtx: OffscreenCanvasRenderingContext2D | null;
 

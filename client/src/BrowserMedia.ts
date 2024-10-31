@@ -83,7 +83,10 @@ class BrowserMedia {
   getScreenMedia = async () => {
     try {
       return await navigator.mediaDevices.getDisplayMedia({
-        video: true,
+        video: {
+          width: 1280,
+          height: 720,
+        },
         audio: false,
       });
     } catch (error) {

@@ -64,15 +64,14 @@ class SelfieSegmentationWebWorker {
     const rgbaData = new Uint8ClampedArray(width * height * 4);
 
     for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        // Calculate the index in maskData
-        const originalIndex = y * width + x;
+      let firstFilledIndex = -1;
+      let lastFilledIndex = -1;
 
-        // Scale the x-coordinate
+      for (let x = 0; x < width; x++) {
+        const originalIndex = y * width + x;
         const scaledX = centerX + Math.round((x - centerX) * scaleFactor);
 
         if (scaledX >= 0 && scaledX < width) {
-          // Set RGBA values based on scaled x-coordinate
           const value = maskData[originalIndex];
           const rgbaIndex = (y * width + scaledX) * 4;
 
@@ -81,19 +80,50 @@ class SelfieSegmentationWebWorker {
           rgbaData[rgbaIndex + 2] = 255;
           rgbaData[rgbaIndex + 3] = (1 - value) * 255;
 
-          // Fill gaps by blending adjacent pixels
-          if (scaleFactor > 1 && scaledX + 1 < width) {
-            const nextRgbaIndex = (y * width + scaledX + 1) * 4;
-            rgbaData[nextRgbaIndex] = 255;
-            rgbaData[nextRgbaIndex + 1] = 255;
-            rgbaData[nextRgbaIndex + 2] = 255;
-            rgbaData[nextRgbaIndex + 3] = (1 - value) * 255;
+          // Fill any gaps up to the current scaledX position
+          if (lastFilledIndex >= 0 && scaledX > lastFilledIndex + 1) {
+            for (let fillX = lastFilledIndex + 1; fillX < scaledX; fillX++) {
+              const fillIndex = (y * width + fillX) * 4;
+              rgbaData[fillIndex] = 255;
+              rgbaData[fillIndex + 1] = 255;
+              rgbaData[fillIndex + 2] = 255;
+              rgbaData[fillIndex + 3] = (1 - value) * 255;
+            }
           }
+
+          // Track the first and last filled indices for edge filling
+          if (firstFilledIndex === -1) firstFilledIndex = scaledX;
+          lastFilledIndex = scaledX;
+        }
+      }
+
+      // Fill any remaining gaps on the far left up to the first filled pixel
+      if (firstFilledIndex > 0) {
+        for (let x = 0; x < firstFilledIndex; x++) {
+          const rgbaIndex = (y * width + x) * 4;
+          const fillIndex = (y * width + firstFilledIndex) * 4;
+
+          rgbaData[rgbaIndex] = rgbaData[fillIndex];
+          rgbaData[rgbaIndex + 1] = rgbaData[fillIndex + 1];
+          rgbaData[rgbaIndex + 2] = rgbaData[fillIndex + 2];
+          rgbaData[rgbaIndex + 3] = rgbaData[fillIndex + 3];
+        }
+      }
+
+      // Fill any remaining gaps on the far right based on the last filled pixel
+      if (lastFilledIndex >= 0) {
+        for (let x = lastFilledIndex + 1; x < width; x++) {
+          const rgbaIndex = (y * width + x) * 4;
+          const fillIndex = (y * width + lastFilledIndex) * 4;
+
+          rgbaData[rgbaIndex] = rgbaData[fillIndex];
+          rgbaData[rgbaIndex + 1] = rgbaData[fillIndex + 1];
+          rgbaData[rgbaIndex + 2] = rgbaData[fillIndex + 2];
+          rgbaData[rgbaIndex + 3] = rgbaData[fillIndex + 3];
         }
       }
     }
 
-    // Return ImageData with the smoothed x-direction
     return new ImageData(rgbaData, width, height);
   };
 }
