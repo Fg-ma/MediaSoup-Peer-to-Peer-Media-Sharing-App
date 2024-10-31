@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useRef } from "react";
-import { EffectStylesType } from "./typeConstant";
+import {
+  defaultAudioCurrentEffectsStyles,
+  EffectStylesType,
+} from "./typeConstant";
 
 export interface CurrentEffectsStylesContextProviderProps {
   children: React.ReactNode;
@@ -34,7 +37,7 @@ export function CurrentEffectsStylesContextProvider({
   const currentEffectsStyles = useRef<EffectStylesType>({
     camera: {},
     screen: {},
-    audio: {},
+    audio: structuredClone(defaultAudioCurrentEffectsStyles),
   });
   const remoteCurrentEffectsStyles = useRef<{
     [username: string]: {

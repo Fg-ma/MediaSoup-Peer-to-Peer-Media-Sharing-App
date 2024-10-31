@@ -42,6 +42,7 @@ export const defaultAudioStreamEffects: {
   bubbly: false,
   thunder: false,
   echosOfThePast: false,
+  backgroundMusic: false,
 });
 
 export const defaultCameraStreamEffects: {
@@ -125,4 +126,5 @@ export type AudioEffectTypes =
   | "staticNoise"
   | "bubbly"
   | "thunder"
-  | "echosOfThePast";
+  | "echosOfThePast"
+  | "backgroundMusic";

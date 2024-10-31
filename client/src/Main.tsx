@@ -6,6 +6,7 @@ import { useStreamsContext } from "./context/streamsContext/StreamsContext";
 import { useCurrentEffectsStylesContext } from "./context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { useSignalContext } from "./context/signalContext/SignalContext";
 import {
+  defaultAudioCurrentEffectsStyles,
   defaultCameraCurrentEffectsStyles,
   defaultScreenCurrentEffectsStyles,
 } from "./context/currentEffectsStylesContext/typeConstant";
@@ -312,7 +313,7 @@ export default function Main() {
       remoteCurrentEffectsStyles.current[username][instance] = {
         camera: {},
         screen: {},
-        audio: {},
+        audio: structuredClone(defaultAudioCurrentEffectsStyles),
       };
     }
 

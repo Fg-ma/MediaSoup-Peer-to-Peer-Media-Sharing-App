@@ -5,6 +5,8 @@ import FgPanel from "../../fgPanel/FgPanel";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import AudioEffectButton from "./AudioEffectButton";
+import { audioEffectTemplates } from "./typeConstant";
+import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
 
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
@@ -14,7 +16,8 @@ import panioIcon from "../../../public/svgs/audioEffects/panioIcon.svg";
 import panioOffIcon from "../../../public/svgs/audioEffects/panioOffIcon.svg";
 import soundBoardIcon from "../../../public/svgs/audioEffects/soundBoardIcon.svg";
 import soundBoardOffIcon from "../../../public/svgs/audioEffects/soundBoardOffIcon.svg";
-import { audioEffectTemplates } from "./typeConstant";
+import backgroundMusicIcon from "../../../public/svgs/audioEffects/backgroundMusicIcon.svg";
+import backgroundMusicOffIcon from "../../../public/svgs/audioEffects/backgroundMusicOffIcon.svg";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
@@ -69,11 +72,13 @@ export default function AudioEffectsSection({
   const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
   const [panioActive, setPanioActive] = useState(false);
   const [soundBoardActive, setSoundBoardActive] = useState(false);
+  const [backgroundMusicActive, setBackgroundMusicActive] = useState(false);
 
   const audioSectionRef = useRef<HTMLDivElement>(null);
   const audioMixEffectsButtonRef = useRef<HTMLButtonElement>(null);
   const pianoRef = useRef<HTMLButtonElement>(null);
   const soundBoardButtonRef = useRef<HTMLButtonElement>(null);
+  const backgroundMusicButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const newTo = muteStateRef.current ? "off" : "high";
@@ -128,6 +133,10 @@ export default function AudioEffectsSection({
 
   const closeSoundBoardCallback = () => {
     setSoundBoardActive(false);
+  };
+
+  const closeBackgroundMusicCallback = () => {
+    setBackgroundMusicActive(false);
   };
 
   return (
@@ -282,6 +291,40 @@ export default function AudioEffectsSection({
               }
               options={{ hoverTimeoutDuration: 350 }}
             />
+            <FgButton
+              scrollingContainerRef={audioSectionRef}
+              externalRef={backgroundMusicButtonRef}
+              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+              clickFunction={() => {
+                setBackgroundMusicActive((prev) => !prev);
+              }}
+              contentFunction={() => {
+                return (
+                  <FgSVG
+                    src={
+                      backgroundMusicActive
+                        ? backgroundMusicOffIcon
+                        : backgroundMusicIcon
+                    }
+                    className='flex items-center justify-center'
+                    attributes={[
+                      { key: "width", value: "90%" },
+                      { key: "height", value: "90%" },
+                      { key: "fill", value: "white" },
+                      { key: "stroke", value: "white" },
+                    ]}
+                  />
+                );
+              }}
+              hoverContent={
+                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                  {backgroundMusicActive
+                    ? "Close background music"
+                    : "Background music"}
+                </div>
+              }
+              options={{ hoverTimeoutDuration: 350 }}
+            />
             {Object.entries(audioEffectTemplates).map((effect) => {
               return (
                 <AudioEffectButton
@@ -343,6 +386,17 @@ export default function AudioEffectsSection({
           <FgSoundBoard
             soundBoardButtonRef={soundBoardButtonRef.current ?? undefined}
             closeCallback={closeSoundBoardCallback}
+          />
+        </Suspense>
+      )}
+      {backgroundMusicActive && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <FgBackgroundMusicPortal
+            username={username}
+            instance={instance}
+            isUser={isUser}
+            closeCallback={closeBackgroundMusicCallback}
+            backgroundMusicButtonRef={backgroundMusicButtonRef}
           />
         </Suspense>
       )}

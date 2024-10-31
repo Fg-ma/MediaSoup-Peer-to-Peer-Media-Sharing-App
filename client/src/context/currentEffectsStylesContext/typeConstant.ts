@@ -237,7 +237,24 @@ export interface ScreenEffectStylesType {
   };
 }
 
-export interface AudioEffectStylesType {}
+export interface AudioEffectStylesType {
+  backgroundMusic: { style: BackgroundMusicTypes };
+}
+
+export type BackgroundMusicTypes =
+  | "adventureTime"
+  | "cacophony"
+  | "drumBeat"
+  | "funk"
+  | "harmonica"
+  | "mischief"
+  | "outWest"
+  | "piano"
+  | "retroGame"
+  | "royalProcession"
+  | "space"
+  | "ukulele"
+  | "wacky";
 
 export interface EffectStylesType {
   camera: {
@@ -834,6 +851,8 @@ export const defaultMask: MasksEffectTypes = "baseMask";
 export const defaultHat: HatsEffectTypes = "stylishHat";
 export const defaultPet: PetsEffectTypes = "beardedDragon";
 
+export const defaultBackgroundMusic: BackgroundMusicTypes = "mischief";
+
 export const defaultCameraCurrentEffectsStyles = Object.freeze({
   pause: Object.freeze({
     style: "",
@@ -896,4 +915,7 @@ export const defaultScreenCurrentEffectsStyles: ScreenEffectStylesType =
     }),
   });
 
-export const defaultAudioCurrentEffectsStyles: AudioEffectStylesType = {};
+export const defaultAudioCurrentEffectsStyles: AudioEffectStylesType =
+  Object.freeze({
+    backgroundMusic: Object.freeze({ style: defaultBackgroundMusic }),
+  });

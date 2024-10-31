@@ -2,7 +2,10 @@ import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { UserMedia } from "tone";
-import { EffectStylesType } from "../context/currentEffectsStylesContext/typeConstant";
+import {
+  defaultAudioCurrentEffectsStyles,
+  EffectStylesType,
+} from "../context/currentEffectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -516,7 +519,9 @@ class Producers {
       // Delete old effects styles
       if (this.currentEffectsStyles.current[event.producerType]) {
         if (event.producerType === "audio") {
-          this.currentEffectsStyles.current.audio = {};
+          this.currentEffectsStyles.current.audio = structuredClone(
+            defaultAudioCurrentEffectsStyles
+          );
         } else if (
           event.producerType === "camera" ||
           event.producerType === "screen"
