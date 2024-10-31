@@ -84,8 +84,8 @@ class BrowserMedia {
     try {
       return await navigator.mediaDevices.getDisplayMedia({
         video: {
-          width: 1280,
-          height: 720,
+          height: { max: screen.height * 0.75 },
+          width: { max: screen.width * 0.75 },
         },
         audio: false,
       });

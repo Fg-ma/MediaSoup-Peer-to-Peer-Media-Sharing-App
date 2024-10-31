@@ -15,7 +15,7 @@ import BabylonScene, {
 } from "../babylon/BabylonScene";
 
 class ScreenMedia {
-  private canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement;
   private video: HTMLVideoElement;
 
   private effects: {

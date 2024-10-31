@@ -211,10 +211,10 @@ export default function FgBabylonCanvas({
   useEffect(() => {
     if (
       canvasContainerRef.current &&
-      userMedia.current.camera[videoId]?.canvas
+      userMedia.current[type][videoId]?.canvas
     ) {
       canvasContainerRef.current.appendChild(
-        userMedia.current.camera[videoId].canvas
+        userMedia.current[type][videoId].canvas
       );
     }
   }, [videoId, userMedia]);
@@ -422,8 +422,8 @@ export default function FgBabylonCanvas({
       className={`video-container ${
         fgVideoOptions.autoPlay ? "" : "paused"
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md h-[${
-        userMedia.current.camera[videoId].canvas.height
-      }px] w-[${userMedia.current.camera[videoId].canvas.width - 500}px]`}
+        userMedia.current[type][videoId].canvas.height
+      }px] w-[${userMedia.current[type][videoId].canvas.width - 500}px]`}
       onMouseEnter={() => controls.handleMouseEnter()}
       onMouseLeave={() => controls.handleMouseLeave()}
     >

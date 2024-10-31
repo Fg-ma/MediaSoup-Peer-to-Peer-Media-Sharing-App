@@ -383,50 +383,97 @@ export default function Bundle({
         Object.keys(screenStreams).length !== 0 &&
         Object.entries(screenStreams).map(([key, screenStream]) => (
           <Suspense key={key} fallback={<div>Loading...</div>}>
-            <FgVideo
-              socket={socket}
-              videoId={key}
-              table_id={table_id}
-              username={username}
-              instance={instance}
-              name={name}
-              type='screen'
-              bundleRef={bundleRef}
-              videoStream={screenStream}
-              audioStream={audioStream}
-              audioRef={audioRef}
-              handleAudioEffectChange={handleAudioEffectChange}
-              clientMute={clientMute}
-              localMute={localMute}
-              options={{
-                isUser: bundleOptions.isUser,
-                acceptsVisualEffects: acceptsScreenEffects,
-                acceptsAudioEffects: acceptsAudioEffects,
-                isStream: true,
-                isSlider: !bundleOptions.isUser,
-                isVolume: audioStream ? true : false,
-                isTotalTime: false,
-                isPlaybackSpeed: false,
-                isClosedCaptions: true,
-                isTimeLine: false,
-                isSkip: false,
-                isThumbnail: false,
-                isPreview: false,
-                initialVolume: bundleOptions.initialVolume
-                  ? bundleOptions.initialVolume
-                  : audioRef.current
-                  ? audioRef.current.muted
-                    ? "off"
-                    : audioRef.current.volume > 0.5
-                    ? "high"
-                    : "low"
-                  : "high",
-              }}
-              handleMute={handleMute}
-              handleMuteCallback={handleMuteCallback}
-              handleVolumeSliderCallback={handleVolumeSliderCallback}
-              tracksColorSetterCallback={tracksColorSetterCallback}
-            />
+            {bundleOptions.isUser ? (
+              <FgBabylonCanvas
+                socket={socket}
+                videoId={key}
+                table_id={table_id}
+                username={username}
+                instance={instance}
+                name={name}
+                type='screen'
+                bundleRef={bundleRef}
+                audioStream={audioStream}
+                audioRef={audioRef}
+                handleAudioEffectChange={handleAudioEffectChange}
+                clientMute={clientMute}
+                localMute={localMute}
+                options={{
+                  isUser: bundleOptions.isUser,
+                  acceptsVisualEffects: acceptsScreenEffects,
+                  acceptsAudioEffects: acceptsAudioEffects,
+                  isStream: true,
+                  flipVideo: true,
+                  isSlider: !bundleOptions.isUser,
+                  isVolume: audioStream ? true : false,
+                  isTotalTime: false,
+                  isPlaybackSpeed: false,
+                  isClosedCaptions: true,
+                  isTimeLine: false,
+                  isSkip: false,
+                  isThumbnail: false,
+                  isPreview: false,
+                  initialVolume: bundleOptions.initialVolume
+                    ? bundleOptions.initialVolume
+                    : audioRef.current
+                    ? audioRef.current.muted
+                      ? "off"
+                      : audioRef.current.volume > 0.5
+                      ? "high"
+                      : "low"
+                    : "high",
+                }}
+                handleMute={handleMute}
+                handleMuteCallback={handleMuteCallback}
+                handleVolumeSliderCallback={handleVolumeSliderCallback}
+                tracksColorSetterCallback={tracksColorSetterCallback}
+              />
+            ) : (
+              <FgVideo
+                socket={socket}
+                videoId={key}
+                table_id={table_id}
+                username={username}
+                instance={instance}
+                name={name}
+                type='screen'
+                bundleRef={bundleRef}
+                videoStream={screenStream}
+                audioStream={audioStream}
+                audioRef={audioRef}
+                handleAudioEffectChange={handleAudioEffectChange}
+                clientMute={clientMute}
+                localMute={localMute}
+                options={{
+                  isUser: bundleOptions.isUser,
+                  acceptsVisualEffects: acceptsScreenEffects,
+                  acceptsAudioEffects: acceptsAudioEffects,
+                  isStream: true,
+                  isSlider: !bundleOptions.isUser,
+                  isVolume: audioStream ? true : false,
+                  isTotalTime: false,
+                  isPlaybackSpeed: false,
+                  isClosedCaptions: true,
+                  isTimeLine: false,
+                  isSkip: false,
+                  isThumbnail: false,
+                  isPreview: false,
+                  initialVolume: bundleOptions.initialVolume
+                    ? bundleOptions.initialVolume
+                    : audioRef.current
+                    ? audioRef.current.muted
+                      ? "off"
+                      : audioRef.current.volume > 0.5
+                      ? "high"
+                      : "low"
+                    : "high",
+                }}
+                handleMute={handleMute}
+                handleMuteCallback={handleMuteCallback}
+                handleVolumeSliderCallback={handleVolumeSliderCallback}
+                tracksColorSetterCallback={tracksColorSetterCallback}
+              />
+            )}
           </Suspense>
         ))}
       {audioStream &&
