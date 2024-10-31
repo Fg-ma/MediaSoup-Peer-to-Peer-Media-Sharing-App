@@ -194,6 +194,8 @@ export default function Main() {
   const acceptScreenEffects = true;
   const acceptAudioEffects = true;
 
+  const [audioEffectsActive, setAudioEffectsActive] = useState(false);
+
   const muteAudio = () => {
     setMutedAudio((prev) => !prev);
     mutedAudioRef.current = !mutedAudioRef.current;
@@ -593,6 +595,8 @@ export default function Main() {
                 username={username.current}
                 instance={instance.current}
                 isUser={true}
+                audioEffectsActive={audioEffectsActive}
+                setAudioEffectsActive={setAudioEffectsActive}
                 handleAudioEffectChange={handleExternalAudioEffectChange}
                 handleMute={handleExternalMute}
                 muteStateRef={mutedAudioRef}

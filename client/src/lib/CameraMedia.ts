@@ -66,6 +66,7 @@ class CameraMedia {
     );
 
     this.canvas = document.createElement("canvas");
+    this.canvas.classList.add("babylonJS-canvas");
 
     if (!currentEffectsStyles.current.camera[this.cameraId]) {
       currentEffectsStyles.current.camera[this.cameraId] = structuredClone(

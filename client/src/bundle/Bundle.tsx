@@ -354,13 +354,7 @@ export default function Bundle({
                   flipVideo: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,
-                  isTotalTime: false,
-                  isPlaybackSpeed: false,
                   isClosedCaptions: true,
-                  isTimeLine: false,
-                  isSkip: false,
-                  isThumbnail: false,
-                  isPreview: false,
                   initialVolume: bundleOptions.initialVolume
                     ? bundleOptions.initialVolume
                     : audioRef.current
@@ -451,13 +445,7 @@ export default function Bundle({
                   isStream: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,
-                  isTotalTime: false,
-                  isPlaybackSpeed: false,
                   isClosedCaptions: true,
-                  isTimeLine: false,
-                  isSkip: false,
-                  isThumbnail: false,
-                  isPreview: false,
                   initialVolume: bundleOptions.initialVolume
                     ? bundleOptions.initialVolume
                     : audioRef.current

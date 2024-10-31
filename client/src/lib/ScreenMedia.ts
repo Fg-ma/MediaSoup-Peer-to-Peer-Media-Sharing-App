@@ -50,6 +50,7 @@ class ScreenMedia {
     );
 
     this.canvas = document.createElement("canvas");
+    this.canvas.classList.add("babylonJS-canvas");
 
     if (!currentEffectsStyles.current.screen[this.screenId]) {
       currentEffectsStyles.current.screen[this.screenId] = structuredClone(

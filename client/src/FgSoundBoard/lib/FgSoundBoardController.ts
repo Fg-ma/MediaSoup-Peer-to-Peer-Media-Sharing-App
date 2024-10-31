@@ -57,14 +57,7 @@ class FgSoundBoardController {
     private audioEndTimeouts: React.MutableRefObject<
       Record<number, NodeJS.Timeout | undefined>
     >
-  ) {
-    // for (const effect of Object.entries(this.soundEffects)) {
-    //   this.userMedia.current.audio?.audioEffects.fgSoundEffects.loadSoundEffect(
-    //     parseInt(effect[0]),
-    //     effect[1].path
-    //   );
-    // }
-  }
+  ) {}
 
   toggleButton = (key: number) => {
     this.setSoundEffects((prevEffects) => ({
@@ -278,7 +271,7 @@ class FgSoundBoardController {
     }
   };
 
-  private playAudio = async (key: number, path: string) => {
+  private playAudio = async (key: number, path: string): Promise<boolean> => {
     const url = this.importedFiles[key] ? this.importedFiles[key].path : path;
 
     // Start playback with Tone.js and load the sound if it hasn't been loaded
@@ -308,55 +301,104 @@ class FgSoundBoardController {
       }, this.userMedia.current.audio.audioEffects.fgSoundEffects.players[key].player.buffer.duration * 1000);
     }
 
-    this.userMedia.current.audio?.audioEffects.fgSoundEffects.toggleAudio(
-      key,
-      false
+    return (
+      this.userMedia.current.audio?.audioEffects.fgSoundEffects.toggleAudio(
+        key,
+        false
+      ) ?? false
     );
   };
 
-  private toggleAudio = (key: number) => {
-    this.setSoundEffects((prevEffects) => {
-      const soundEffect = prevEffects[key];
-      const { playing, path } = soundEffect;
+  private toggleAudio = async (key: number): Promise<boolean> => {
+    let succeeded = false;
 
-      if (playing) {
-        // Stop playback
+    const { playing, path } = this.soundEffects[key];
+    if (playing) {
+      // Stop playback
+      succeeded =
         this.userMedia.current.audio?.audioEffects.fgSoundEffects.toggleAudio(
           key,
           true
-        );
+        ) ?? false;
+    } else {
+      succeeded = await this.playAudio(key, path);
+    }
+
+    if (succeeded) {
+      this.setSoundEffects((prevEffects) => {
+        const soundEffect = prevEffects[key];
+        const { playing, classes } = soundEffect;
+
+        const newClasses = classes.includes("failed")
+          ? classes.filter((cls) => cls !== "failed")
+          : [...classes];
+
+        if (playing) {
+          return {
+            ...prevEffects,
+            [key]: {
+              ...soundEffect,
+              playing: false,
+              classes: newClasses,
+            },
+          };
+        } else {
+          return {
+            ...prevEffects,
+            [key]: {
+              ...soundEffect,
+              playing: true,
+              classes: newClasses,
+            },
+          };
+        }
+      });
+    } else if (!this.soundEffects[key].classes.includes("failed")) {
+      this.setSoundEffects((prevEffects) => {
+        const soundEffect = prevEffects[key];
         return {
           ...prevEffects,
           [key]: {
             ...soundEffect,
-            playing: false,
+            classes: [...soundEffect.classes, "failed"],
           },
         };
-      } else {
-        this.playAudio(key, path);
-        return {
-          ...prevEffects,
-          [key]: {
-            ...soundEffect,
-            playing: true,
-          },
-        };
-      }
-    });
+      });
+    }
+
+    return succeeded;
   };
 
-  clickDown = (key: number) => {
+  private toggleSeizureMode = (key: number) => {
+    if (!this.soundEffects[key].playing && this.boardMode === "seizure") {
+      this.startCrazyBoardEffect();
+      this.startSeizureBoardEffect(key);
+    } else if (this.soundEffects[key].playing && this.boardMode === "seizure") {
+      if (this.seizureBoardEffectIntevalRef.current) {
+        clearInterval(this.seizureBoardEffectIntevalRef.current);
+        this.seizureBoardEffectIntevalRef.current = undefined;
+      }
+      if (this.seizureBoardEffectTimeoutRef.current) {
+        clearTimeout(this.seizureBoardEffectTimeoutRef.current);
+        this.seizureBoardEffectTimeoutRef.current = undefined;
+      }
+      this.clearSeizureBoardEffect();
+    }
+  };
+
+  clickDown = async (key: number) => {
     if (this.tempImportedFiles.current === undefined) {
-      this.toggleAudio(key);
       this.toggleButton(key);
+      const succeeded = await this.toggleAudio(key);
+
+      if (!succeeded) {
+        return;
+      }
 
       if (!this.soundEffects[key].playing && this.boardMode === "crazy") {
         this.startCrazyBoardEffect();
       }
-      if (!this.soundEffects[key].playing && this.boardMode === "seizure") {
-        this.startCrazyBoardEffect();
-        this.startSeizureBoardEffect(key);
-      }
+      this.toggleSeizureMode(key);
     } else {
       this.toggleButton(key);
 

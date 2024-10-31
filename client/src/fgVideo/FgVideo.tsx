@@ -38,25 +38,13 @@ export interface FgVideoOptions {
   isPlayPause?: boolean;
   isVolume?: boolean;
   isCurrentTime?: boolean;
-  isTotalTime?: boolean;
-  isPlaybackSpeed?: boolean;
   isClosedCaptions?: boolean;
   isPictureInPicture?: boolean;
-  isTheater?: boolean;
   isEffects?: boolean;
   isFullScreen?: boolean;
-  isTimeLine?: boolean;
-  isSkip?: boolean;
-  isThumbnail?: boolean;
-  isPreview?: boolean;
   isClose?: boolean;
-  skipIncrement?: number;
-  initialProgressPosition?: number;
   controlsVanishTime?: number;
-  timelineBackgroundColor?: string;
   closedCaptionsDecoratorColor?: string;
-  timelinePrimaryBackgroundColor?: string;
-  timelineSecondaryBackgroundColor?: string;
   primaryVideoColor?: string;
   initialVolume?: "high" | "low" | "off";
 }
@@ -91,25 +79,13 @@ export const defaultFgVideoOptions = {
   isPlayPause: true,
   isVolume: true,
   isCurrentTime: true,
-  isTotalTime: true,
-  isPlaybackSpeed: true,
   isClosedCaptions: true,
   isPictureInPicture: true,
-  isTheater: true,
   isEffects: true,
   isFullScreen: true,
-  isTimeLine: true,
-  isSkip: true,
-  isThumbnail: true,
-  isPreview: true,
   isClose: true,
-  skipIncrement: 10,
-  initialProgressPosition: 0,
   controlsVanishTime: 1250,
-  timelineBackgroundColor: "rgba(150, 150, 150, 0.5)",
   closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
-  timelinePrimaryBackgroundColor: "#f56114",
-  timelineSecondaryBackgroundColor: "rgb(150, 150, 150)",
   primaryVideoColor: "#f56114",
 };
 
@@ -171,18 +147,20 @@ export default function FgVideo({
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const paused = useRef(fgVideoOptions.autoPlay);
-  const wasPaused = useRef(false);
+  const [inVideo, setInVideo] = useState(true);
 
-  const leaveVideoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const paused = useRef(fgVideoOptions.autoPlay);
+
+  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
 
   const [effectsActive, setEffectsActive] = useState(false);
-  const tintColor = useRef("#F56114");
 
-  const theater = useRef(false);
+  const [audioEffectsActive, setAudioEffectsActive] = useState(false);
+
+  const tintColor = useRef("#F56114");
 
   const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -192,10 +170,6 @@ export default function FgVideo({
   const [captionsActive, setCaptionsActive] = useState(false);
 
   const timelineContainerRef = useRef<HTMLDivElement>(null);
-  const previewImgRef = useRef<HTMLImageElement>(null);
-  const thumbnailImgRef = useRef<HTMLImageElement>(null);
-  const isScrubbing = useRef(false);
-  const thumbnails = useRef<string[]>([]);
 
   const [settings, setSettings] = useState<Settings>({
     closedCaption: {
@@ -280,27 +254,17 @@ export default function FgVideo({
     videoRef,
     audioRef,
     videoContainerRef,
+    inVideo,
+    setInVideo,
     shiftPressed,
     controlPressed,
     paused,
-    wasPaused,
-    captionsActive,
     setCaptionsActive,
     settings,
-    setSettings,
-    timelineContainerRef,
-    isScrubbing,
-    totalTimeRef,
     currentTimeRef,
-    previewImgRef,
-    thumbnails,
-    thumbnailImgRef,
-    10,
-    5,
-    theater,
-    playbackSpeedButtonRef,
     leaveVideoTimer,
     setEffectsActive,
+    setAudioEffectsActive,
     handleMute,
     handleVisualEffectChange,
     tracksColorSetterCallback
@@ -347,20 +311,6 @@ export default function FgVideo({
       fgVideoController.handleVisibilityChange
     );
 
-    if (fgVideoOptions.isTimeLine) {
-      document.addEventListener("mouseup", (event) => {
-        if (isScrubbing.current) {
-          controls.handleScrubbing(event);
-        }
-      });
-
-      document.addEventListener("mousemove", (event) => {
-        if (isScrubbing.current) {
-          controls.handleTimelineUpdate(event);
-        }
-      });
-    }
-
     if (fgVideoOptions.isPictureInPicture) {
       videoRef.current?.addEventListener("enterpictureinpicture", () =>
         controls.handlePictureInPicture("enter")
@@ -385,19 +335,6 @@ export default function FgVideo({
         "visibilitychange",
         fgVideoController.handleVisibilityChange
       );
-      if (fgVideoOptions.isTimeLine) {
-        document.removeEventListener("mouseup", (event) => {
-          if (isScrubbing.current) {
-            controls.handleScrubbing(event);
-          }
-        });
-
-        document.removeEventListener("mousemove", (event) => {
-          if (isScrubbing.current) {
-            controls.handleTimelineUpdate(event);
-          }
-        });
-      }
       if (fgVideoOptions.isPictureInPicture) {
         videoRef.current?.removeEventListener("enterpictureinpicture", () =>
           controls.handlePictureInPicture("enter")
@@ -413,8 +350,10 @@ export default function FgVideo({
     <div
       ref={videoContainerRef}
       id={`${videoId}_container`}
-      className={`video-container ${
-        fgVideoOptions.autoPlay ? "" : "paused"
+      className={`video-container ${fgVideoOptions.autoPlay ? "" : "paused"} ${
+        effectsActive ? "in-effects" : ""
+      } ${audioEffectsActive ? "in-effects" : ""} ${
+        inVideo ? "in-video" : ""
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md`}
       onMouseEnter={() => controls.handleMouseEnter()}
       onMouseLeave={() => controls.handleMouseLeave()}
@@ -429,35 +368,12 @@ export default function FgVideo({
                 controls.handlePausePlay();
               }
             }}
-            onLoadedData={() => controls.loadedData()}
             onTimeUpdate={() => controls.timeUpdate()}
             className='main-video w-full z-0'
             controls={false}
             autoPlay={fgVideoOptions.autoPlay}
             style={videoStyles}
           ></video>
-          {fgVideoOptions.isTimeLine && fgVideoOptions.isThumbnail && (
-            <img ref={thumbnailImgRef} className='thumbnail-img' />
-          )}
-          {fgVideoOptions.isTimeLine && (
-            <div
-              ref={timelineContainerRef}
-              className='timeline-container z-20'
-              onMouseMove={(event) =>
-                controls.handleTimelineUpdate(event as unknown as MouseEvent)
-              }
-              onMouseDown={(event) =>
-                controls.handleScrubbing(event as unknown as MouseEvent)
-              }
-            >
-              <div className='timeline'>
-                {fgVideoOptions.isPreview && (
-                  <img ref={previewImgRef} className='preview-img shadow-md' />
-                )}
-                <div className='thumb-indicator'></div>
-              </div>
-            </div>
-          )}
           <FgVideoNavigation
             name={name}
             username={username}
@@ -482,6 +398,8 @@ export default function FgVideo({
             playbackSpeedButtonRef={playbackSpeedButtonRef}
             tintColor={tintColor}
             effectsActive={effectsActive}
+            audioEffectsActive={audioEffectsActive}
+            setAudioEffectsActive={setAudioEffectsActive}
             settings={settings}
             setSettings={setSettings}
             fgVideoOptions={fgVideoOptions}

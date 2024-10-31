@@ -166,18 +166,20 @@ export default function FgBabylonCanvas({
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const paused = useRef(fgVideoOptions.autoPlay);
-  const wasPaused = useRef(false);
+  const [inVideo, setInVideo] = useState(true);
 
-  const leaveVideoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const paused = useRef(fgVideoOptions.autoPlay);
+
+  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
 
   const [effectsActive, setEffectsActive] = useState(false);
-  const tintColor = useRef("#F56114");
 
-  const theater = useRef(false);
+  const [audioEffectsActive, setAudioEffectsActive] = useState(false);
+
+  const tintColor = useRef("#F56114");
 
   const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -187,10 +189,8 @@ export default function FgBabylonCanvas({
   const [captionsActive, setCaptionsActive] = useState(false);
 
   const timelineContainerRef = useRef<HTMLDivElement>(null);
-  const previewImgRef = useRef<HTMLImageElement>(null);
-  const thumbnailImgRef = useRef<HTMLImageElement>(null);
-  const isScrubbing = useRef(false);
-  const thumbnails = useRef<string[]>([]);
+
+  const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [settings, setSettings] = useState<Settings>({
     closedCaption: {
@@ -216,6 +216,7 @@ export default function FgBabylonCanvas({
       canvasContainerRef.current.appendChild(
         userMedia.current[type][videoId].canvas
       );
+      userMedia.current[type][videoId].canvas.width;
     }
   }, [videoId, userMedia]);
 
@@ -286,27 +287,17 @@ export default function FgBabylonCanvas({
     videoRef,
     audioRef,
     canvasContainerRef,
+    inVideo,
+    setInVideo,
     shiftPressed,
     controlPressed,
     paused,
-    wasPaused,
-    captionsActive,
     setCaptionsActive,
     settings,
-    setSettings,
-    timelineContainerRef,
-    isScrubbing,
-    totalTimeRef,
     currentTimeRef,
-    previewImgRef,
-    thumbnails,
-    thumbnailImgRef,
-    10,
-    5,
-    theater,
-    playbackSpeedButtonRef,
     leaveVideoTimer,
     setEffectsActive,
+    setAudioEffectsActive,
     handleMute,
     handleVisualEffectChange,
     tracksColorSetterCallback
@@ -337,6 +328,9 @@ export default function FgBabylonCanvas({
 
     socket.current.on("message", fgVideoController.handleMessage);
 
+    controls.timeUpdate();
+    timeUpdateInterval.current = setInterval(controls.timeUpdate, 1000);
+
     if (fgVideoOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
@@ -353,20 +347,6 @@ export default function FgBabylonCanvas({
       fgVideoController.handleVisibilityChange
     );
 
-    if (fgVideoOptions.isTimeLine) {
-      document.addEventListener("mouseup", (event) => {
-        if (isScrubbing.current) {
-          controls.handleScrubbing(event);
-        }
-      });
-
-      document.addEventListener("mousemove", (event) => {
-        if (isScrubbing.current) {
-          controls.handleTimelineUpdate(event);
-        }
-      });
-    }
-
     if (fgVideoOptions.isPictureInPicture) {
       videoRef.current?.addEventListener("enterpictureinpicture", () =>
         controls.handlePictureInPicture("enter")
@@ -379,6 +359,10 @@ export default function FgBabylonCanvas({
 
     return () => {
       socket.current.off("message", fgVideoController.handleMessage);
+      if (timeUpdateInterval.current !== undefined) {
+        clearInterval(timeUpdateInterval.current);
+        timeUpdateInterval.current = undefined;
+      }
       if (fgVideoOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
@@ -391,19 +375,6 @@ export default function FgBabylonCanvas({
         "visibilitychange",
         fgVideoController.handleVisibilityChange
       );
-      if (fgVideoOptions.isTimeLine) {
-        document.removeEventListener("mouseup", (event) => {
-          if (isScrubbing.current) {
-            controls.handleScrubbing(event);
-          }
-        });
-
-        document.removeEventListener("mousemove", (event) => {
-          if (isScrubbing.current) {
-            controls.handleTimelineUpdate(event);
-          }
-        });
-      }
       if (fgVideoOptions.isPictureInPicture) {
         videoRef.current?.removeEventListener("enterpictureinpicture", () =>
           controls.handlePictureInPicture("enter")
@@ -419,11 +390,15 @@ export default function FgBabylonCanvas({
     <div
       ref={canvasContainerRef}
       id={`${videoId}_container`}
-      className={`video-container ${
-        fgVideoOptions.autoPlay ? "" : "paused"
+      className={`video-container ${fgVideoOptions.autoPlay ? "" : "paused"} ${
+        effectsActive ? "in-effects" : ""
+      } ${audioEffectsActive ? "in-effects" : ""} ${
+        inVideo ? "in-video" : ""
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md h-[${
         userMedia.current[type][videoId].canvas.height
-      }px] w-[${userMedia.current[type][videoId].canvas.width - 500}px]`}
+      }px] w-[${
+        userMedia.current[type][videoId].canvas.width
+      }px] max-h-[720px] max-w-[1280px]`}
       onMouseEnter={() => controls.handleMouseEnter()}
       onMouseLeave={() => controls.handleMouseLeave()}
     >
@@ -451,6 +426,8 @@ export default function FgBabylonCanvas({
         playbackSpeedButtonRef={playbackSpeedButtonRef}
         tintColor={tintColor}
         effectsActive={effectsActive}
+        audioEffectsActive={audioEffectsActive}
+        setAudioEffectsActive={setAudioEffectsActive}
         settings={settings}
         setSettings={setSettings}
         fgVideoOptions={fgVideoOptions}

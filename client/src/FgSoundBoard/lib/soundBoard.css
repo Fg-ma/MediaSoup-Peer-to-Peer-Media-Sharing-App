@@ -49,18 +49,18 @@
   background-color: #cccccc;
 }
 
-.sound-board-btn.pressed {
+.sound-board-btn.pressed:not(.failed) {
   background-color: #f57e41;
 }
 
-.sound-board-btn.pressed .sound-board-btn-alt-1 {
+.sound-board-btn.pressed:not(.failed) .sound-board-btn-alt-1 {
   top: -2.5%;
   right: 2.5%;
   border: 4px solid #f57e41;
   background-color: #fff5ef;
 }
 
-.sound-board-btn.pressed .sound-board-btn-alt-2 {
+.sound-board-btn.pressed:not(.failed) .sound-board-btn-alt-2 {
   bottom: 98%;
   left: 93%;
   height: 4%;
@@ -70,12 +70,41 @@
   background-color: #f57e41;
 }
 
-.sound-board-btn.pressed .sound-board-btn-alt-3 {
+.sound-board-btn.pressed:not(.failed) .sound-board-btn-alt-3 {
   bottom: 1%;
   left: -1%;
   height: 4%;
   border-top-left-radius: 5px;
   background-color: #f57e41;
+}
+
+.sound-board-btn.pressed.failed {
+  background-color: #f52c2c;
+}
+
+.sound-board-btn.pressed.failed .sound-board-btn-alt-1 {
+  top: -2.5%;
+  right: 2.5%;
+  border: 4px solid #f52c2c;
+  background-color: #ffe6e6;
+}
+
+.sound-board-btn.pressed.failed .sound-board-btn-alt-2 {
+  bottom: 98%;
+  left: 93%;
+  height: 4%;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 1px;
+  transform: skewX(36deg);
+  background-color: #f52c2c;
+}
+
+.sound-board-btn.pressed.failed .sound-board-btn-alt-3 {
+  bottom: 1%;
+  left: -1%;
+  height: 4%;
+  border-top-left-radius: 5px;
+  background-color: #f52c2c;
 }
 
 .sound-board-btn.active:not(.pressed) {

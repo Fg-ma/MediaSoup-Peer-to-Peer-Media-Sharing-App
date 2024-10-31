@@ -117,6 +117,8 @@ export default function FgVideoControls({
   playbackSpeedButtonRef,
   tintColor,
   effectsActive,
+  audioEffectsActive,
+  setAudioEffectsActive,
   settings,
   setSettings,
   fgVideoOptions,
@@ -143,6 +145,8 @@ export default function FgVideoControls({
   playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
   tintColor: React.MutableRefObject<string>;
   effectsActive: boolean;
+  audioEffectsActive: boolean;
+  setAudioEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   fgVideoOptions: FgVideoOptions;
@@ -282,16 +286,10 @@ export default function FgVideoControls({
           <div className='duration-container flex items-center gap-1 px-1'>
             {(fgVideoOptions.isCurrentTime ??
               defaultFgVideoOptions.isCurrentTime) && (
-              <div ref={currentTimeRef} className='current-time'></div>
-            )}
-            {(fgVideoOptions.isCurrentTime ??
-              defaultFgVideoOptions.isCurrentTime) &&
-              (fgVideoOptions.isTotalTime ??
-                defaultFgVideoOptions.isTotalTime) &&
-              "/"}
-            {(fgVideoOptions.isTotalTime ??
-              defaultFgVideoOptions.isTotalTime) && (
-              <div ref={totalTimeRef} className='total-time'></div>
+              <div
+                ref={currentTimeRef}
+                className='current-time font-K2D text-lg'
+              ></div>
             )}
           </div>
         </div>
@@ -303,15 +301,6 @@ export default function FgVideoControls({
             defaultFgVideoOptions.isFullScreen) && (
             <Suspense fallback={<div>Loading...</div>}>
               <FullScreenButton
-                controls={controls}
-                effectsActive={effectsActive}
-                settingsActive={settingsActive}
-              />
-            </Suspense>
-          )}
-          {(fgVideoOptions.isTheater ?? defaultFgVideoOptions.isTheater) && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <TheaterButton
                 controls={controls}
                 effectsActive={effectsActive}
                 settingsActive={settingsActive}
@@ -363,19 +352,8 @@ export default function FgVideoControls({
               />
             </Suspense>
           }
-          {(fgVideoOptions.isPlaybackSpeed ??
-            defaultFgVideoOptions.isPlaybackSpeed) && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <PlaybackSpeedButton
-                controls={controls}
-                effectsActive={effectsActive}
-                settingsActive={settingsActive}
-                playbackSpeedButtonRef={playbackSpeedButtonRef}
-              />
-            </Suspense>
-          )}
           {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
-            (fgVideoOptions.isEffects ?? defaultFgVideoOptions.isEffects) && (
+            fgVideoOptions.isEffects && (
               <Suspense fallback={<div>Loading...</div>}>
                 <EffectsButton
                   controls={controls}
@@ -392,6 +370,8 @@ export default function FgVideoControls({
                   username={username}
                   instance={instance}
                   isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
+                  audioEffectsActive={audioEffectsActive}
+                  setAudioEffectsActive={setAudioEffectsActive}
                   handleAudioEffectChange={handleAudioEffectChange}
                   handleMute={() => {
                     if (clientMute.current) {
@@ -419,6 +399,11 @@ export default function FgVideoControls({
                   closeLabelElement={
                     <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0 bg-white'>
                       Close (x)
+                    </div>
+                  }
+                  hoverLabelElement={
+                    <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+                      Audio effects (a)
                     </div>
                   }
                   style={{ transform: "scaleX(-1)" }}

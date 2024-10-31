@@ -21,11 +21,14 @@ export default function AudioEffectsButton({
   username,
   instance,
   isUser,
+  audioEffectsActive,
+  setAudioEffectsActive,
   handleAudioEffectChange,
   handleMute,
   muteStateRef,
   videoContainerRef,
   closeLabelElement,
+  hoverLabelElement,
   options,
   style,
 }: {
@@ -33,11 +36,14 @@ export default function AudioEffectsButton({
   username: string;
   instance: string;
   isUser: boolean;
+  audioEffectsActive: boolean;
+  setAudioEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
   handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
   videoContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
+  hoverLabelElement?: React.ReactElement;
   options?: {
     color?: string;
     placement?: "above" | "below" | "left" | "right";
@@ -52,7 +58,6 @@ export default function AudioEffectsButton({
   };
 
   const { currentEffectsStyles } = useCurrentEffectsStylesContext();
-  const [effectSectionActive, setEffectSectionActive] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -60,7 +65,7 @@ export default function AudioEffectsButton({
       <FgButton
         externalRef={buttonRef}
         clickFunction={async () => {
-          setEffectSectionActive((prev) => !prev);
+          setAudioEffectsActive((prev) => !prev);
         }}
         contentFunction={() => {
           if (!currentEffectsStyles.current.audio) {
@@ -69,7 +74,7 @@ export default function AudioEffectsButton({
 
           return (
             <FgSVG
-              src={effectSectionActive ? audioEffectOffIcon : audioEffectIcon}
+              src={audioEffectsActive ? audioEffectOffIcon : audioEffectIcon}
               attributes={[
                 { key: "width", value: "95%" },
                 { key: "height", value: "95%" },
@@ -79,10 +84,16 @@ export default function AudioEffectsButton({
           );
         }}
         hoverContent={
-          !effectSectionActive ? (
-            <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              Audio Effects
-            </div>
+          !audioEffectsActive ? (
+            <>
+              {hoverLabelElement ? (
+                hoverLabelElement
+              ) : (
+                <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+                  Audio effects
+                </div>
+              )}
+            </>
           ) : (
             <></>
           )
@@ -90,7 +101,7 @@ export default function AudioEffectsButton({
         className='flex items-center justify-center w-10 min-w-10 aspect-square'
         style={style}
       />
-      {effectSectionActive && (
+      {audioEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>
           <AudioEffectsSection
             socket={socket}
@@ -105,7 +116,7 @@ export default function AudioEffectsButton({
             muteStateRef={muteStateRef}
             videoContainerRef={videoContainerRef}
             closeLabelElement={closeLabelElement}
-            closeCallback={() => setEffectSectionActive(false)}
+            closeCallback={() => setAudioEffectsActive(false)}
             backgroundColor={audioEffectsButtonOptions.backgroundColor}
             secondaryBackgroundColor={
               audioEffectsButtonOptions.secondaryBackgroundColor

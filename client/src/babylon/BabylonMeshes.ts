@@ -943,7 +943,7 @@ class BabylonMeshes {
     const aspectRatio = this.canvas.width / this.canvas.height;
 
     // Calculate the vertical extent at the current zPosition
-    const verticalExtent = Math.tan(cameraFOV / 2) * (Math.abs(zPosition) + 10);
+    const verticalExtent = Math.tan(cameraFOV / 2) * Math.abs(zPosition);
 
     // Calculate horizontal extent based on aspect ratio
     const horizontalExtent = verticalExtent * aspectRatio;
@@ -957,10 +957,10 @@ class BabylonMeshes {
     const cameraFOV = this.camera.fov; // FOV in radians
 
     // Calculate the vertical extent at the current zPosition
-    const verticalExtent = Math.tan(cameraFOV / 2) * (Math.abs(zPosition) + 10);
+    const verticalExtent = Math.tan(cameraFOV / 2) * (Math.abs(zPosition) + 4);
 
     // Convert normalized screen Y coordinate to world Y coordinate
-    return value * verticalExtent - 1.75;
+    return value * verticalExtent;
   };
 
   createFaceMesh = async (

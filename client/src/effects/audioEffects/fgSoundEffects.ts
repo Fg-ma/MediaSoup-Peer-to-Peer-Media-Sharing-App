@@ -61,12 +61,12 @@ class FgSoundEffects {
   };
 
   // Play or stop a sound effect based on the current state
-  toggleAudio = (key: number, playing: boolean) => {
-    if (!this.players[key].player) return;
+  toggleAudio = (key: number, playing: boolean): boolean => {
+    if (!this.players[key].player) return false;
 
     if (!this.players[key].player.loaded) {
       console.warn(`Sound effect ${key} is not loaded yet.`);
-      return; // Exit if not loaded
+      return false; // Exit if not loaded
     }
 
     if (playing) {
@@ -78,6 +78,8 @@ class FgSoundEffects {
         this.players[key].player.start();
       }
     }
+
+    return true;
   };
 }
 

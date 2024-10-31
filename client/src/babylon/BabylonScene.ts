@@ -168,25 +168,16 @@ class BabylonScene {
       this.scene.render();
     });
 
-    // Resize
-    window.addEventListener("resize", () => {
-      this.engine.resize();
-      if (this.videoPlane) this.updateBackgroundPlaneSize(this.videoPlane);
-      if (this.hideBackgroundPlane)
-        this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.01);
-    });
+    window.addEventListener("resize", this.canvasSizeChange);
+    window.addEventListener("fullscreenchange", this.canvasSizeChange);
   }
 
   deconstructor = () => {
     this.engine.stopRenderLoop();
     this.engine.dispose();
 
-    window.removeEventListener("resize", () => {
-      this.engine.resize();
-      if (this.videoPlane) this.updateBackgroundPlaneSize(this.videoPlane);
-      if (this.hideBackgroundPlane)
-        this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.01);
-    });
+    window.removeEventListener("resize", this.canvasSizeChange);
+    window.removeEventListener("fullscreenchange", this.canvasSizeChange);
   };
 
   private initCamera = () => {
@@ -347,6 +338,16 @@ class BabylonScene {
 
     if (this.backgroundLight) {
       this.backgroundLight.includedOnlyMeshes.push(this.tintPlane);
+    }
+  };
+
+  private canvasSizeChange = () => {
+    this.engine.resize();
+    if (this.videoPlane) {
+      this.updateBackgroundPlaneSize(this.videoPlane);
+    }
+    if (this.hideBackgroundPlane) {
+      this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.000001);
     }
   };
 
