@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import FgButton from "../../fgButton/FgButton";
-import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
-import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
+import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
+import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
 
 export default function SamplerVolume() {
   const { userMedia } = useStreamsContext();

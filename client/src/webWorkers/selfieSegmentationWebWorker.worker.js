@@ -59,18 +59,41 @@ class SelfieSegmentationWebWorker {
     const width = confidenceMask.width;
     const height = confidenceMask.height;
 
+    const scaleFactor = 1.1; // Adjust this value to scale in x-direction
+    const centerX = Math.floor(width / 2); // Calculate the x-center
     const rgbaData = new Uint8ClampedArray(width * height * 4);
 
-    for (let i = 0; i < maskData.length; i++) {
-      const value = maskData[i];
-      const rgbaIndex = i * 4;
-      rgbaData[rgbaIndex] = 255;
-      rgbaData[rgbaIndex + 1] = 255;
-      rgbaData[rgbaIndex + 2] = 255;
-      rgbaData[rgbaIndex + 3] = (1 - value) * 255;
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        // Calculate the index in maskData
+        const originalIndex = y * width + x;
+
+        // Scale the x-coordinate
+        const scaledX = centerX + Math.round((x - centerX) * scaleFactor);
+
+        if (scaledX >= 0 && scaledX < width) {
+          // Set RGBA values based on scaled x-coordinate
+          const value = maskData[originalIndex];
+          const rgbaIndex = (y * width + scaledX) * 4;
+
+          rgbaData[rgbaIndex] = 255;
+          rgbaData[rgbaIndex + 1] = 255;
+          rgbaData[rgbaIndex + 2] = 255;
+          rgbaData[rgbaIndex + 3] = (1 - value) * 255;
+
+          // Fill gaps by blending adjacent pixels
+          if (scaleFactor > 1 && scaledX + 1 < width) {
+            const nextRgbaIndex = (y * width + scaledX + 1) * 4;
+            rgbaData[nextRgbaIndex] = 255;
+            rgbaData[nextRgbaIndex + 1] = 255;
+            rgbaData[nextRgbaIndex + 2] = 255;
+            rgbaData[nextRgbaIndex + 3] = (1 - value) * 255;
+          }
+        }
+      }
     }
 
-    // Return ImageData directly instead of drawing it to a canvas
+    // Return ImageData with the smoothed x-direction
     return new ImageData(rgbaData, width, height);
   };
 }

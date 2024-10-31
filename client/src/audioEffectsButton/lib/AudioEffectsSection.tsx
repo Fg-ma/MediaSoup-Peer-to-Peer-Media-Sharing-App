@@ -7,7 +7,7 @@ import FgSVG from "../../fgSVG/FgSVG";
 import AudioEffectButton from "./AudioEffectButton";
 
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
-import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
+import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
 import mixAudioEffectsIcon from "../../../public/svgs/audioEffects/mixAudioEffectsIcon.svg";
 import mixAudioEffectsOffIcon from "../../../public/svgs/audioEffects/mixAudioEffectsOffIcon.svg";
 import panioIcon from "../../../public/svgs/audioEffects/panioIcon.svg";

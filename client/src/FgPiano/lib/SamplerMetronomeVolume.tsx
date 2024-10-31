@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
 import FgButton from "../../fgButton/FgButton";
-import VolumeSVG from "../../FgVolumeElement/lib/VolumeSVG";
-import volumeSVGPaths from "../../FgVolumeElement/lib/volumeSVGPaths";
+import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
+import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
 
 const samplerMetronomeVolumeVar: Variants = {
   init: { opacity: 0, scale: 0.8 },

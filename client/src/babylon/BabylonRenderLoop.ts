@@ -29,6 +29,8 @@ class BabylonRenderLoop {
 
   private lastFaceCountCheck: number;
 
+  private hideBackgroundOffscreenCanvas: HTMLCanvasElement;
+  private hideBackgroundOffscreenContext: CanvasRenderingContext2D | null;
   hideBackgroundCanvas: HTMLCanvasElement;
   private hideBackgroundCtx: CanvasRenderingContext2D | null;
   private hideBackgroundEffectImage: HTMLImageElement;
@@ -78,15 +80,25 @@ class BabylonRenderLoop {
 
     this.hideBackgroundEffectImage = new Image();
 
+    this.hideBackgroundOffscreenCanvas = document.createElement("canvas");
+    this.hideBackgroundOffscreenContext =
+      this.hideBackgroundOffscreenCanvas.getContext("2d", {
+        alpha: true,
+        willReadFrequently: true,
+      });
+    this.hideBackgroundOffscreenCanvas.width = 320;
+    this.hideBackgroundOffscreenCanvas.height = 180;
+
     this.hideBackgroundCanvas = document.createElement("canvas");
     this.hideBackgroundCtx = this.hideBackgroundCanvas.getContext("2d", {
       alpha: true,
+      willReadFrequently: true,
     });
 
-    this.tempHideBackgroundCanvas = new OffscreenCanvas(256, 256);
+    this.tempHideBackgroundCanvas = new OffscreenCanvas(320, 180);
     this.tempHideBackgroundCtx = this.tempHideBackgroundCanvas.getContext(
       "2d",
-      { alpha: true }
+      { alpha: true, willReadFrequently: true }
     );
   }
 
@@ -238,37 +250,36 @@ class BabylonRenderLoop {
   };
 
   private hideBackgroundEffect = async () => {
-    if (!this.offscreenContext || !this.selfieSegmentationWorker) {
+    if (
+      !this.hideBackgroundOffscreenContext ||
+      !this.selfieSegmentationWorker
+    ) {
       return;
     }
 
-    // Set the dimensions of the offscreen canvas to a lower resolution
-    this.offscreenCanvas.width = 256;
-    this.offscreenCanvas.height = 256;
-
     // Clear the offscreen canvas before drawing
-    this.offscreenContext.clearRect(
+    this.hideBackgroundOffscreenContext.clearRect(
       0,
       0,
-      this.offscreenCanvas.width,
-      this.offscreenCanvas.height
+      this.hideBackgroundOffscreenCanvas.width,
+      this.hideBackgroundOffscreenCanvas.height
     );
 
     // Draw the video frame onto the offscreen canvas at the lower resolution
-    this.offscreenContext.drawImage(
+    this.hideBackgroundOffscreenContext.drawImage(
       this.video,
       0,
       0,
-      this.offscreenCanvas.width,
-      this.offscreenCanvas.height
+      this.hideBackgroundOffscreenCanvas.width,
+      this.hideBackgroundOffscreenCanvas.height
     );
 
     // Get ImageData from the offscreen canvas
-    const imageData = this.offscreenContext.getImageData(
+    const imageData = this.hideBackgroundOffscreenContext.getImageData(
       0,
       0,
-      this.offscreenCanvas.width,
-      this.offscreenCanvas.height
+      this.hideBackgroundOffscreenCanvas.width,
+      this.hideBackgroundOffscreenCanvas.height
     );
 
     // Create a new ArrayBuffer
@@ -285,8 +296,8 @@ class BabylonRenderLoop {
       this.selfieSegmentationWorker.postMessage({
         message: "FRAME",
         data: buffer, // Send the ArrayBuffer
-        width: this.offscreenCanvas.width,
-        height: this.offscreenCanvas.height,
+        width: this.hideBackgroundOffscreenCanvas.width,
+        height: this.hideBackgroundOffscreenCanvas.height,
       });
     }
   };
@@ -334,7 +345,7 @@ class BabylonRenderLoop {
 
     // Step 2: Scale the canvas content to fit the full canvas using drawImage
     this.hideBackgroundCtx.drawImage(
-      this.tempHideBackgroundCanvas, // Draw the entire canvas content as an image
+      this.tempHideBackgroundCanvas,
       0,
       0,
       this.tempHideBackgroundCanvas.width,
