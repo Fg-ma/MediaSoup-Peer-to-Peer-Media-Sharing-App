@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import metronomeUrl from "../../../public/audioSamples/metronome.wav";
+import metronomeUrl from "../../public/audioSamples/metronome.wav";
 
 class FgMetronome {
   private metronome: Tone.Player;

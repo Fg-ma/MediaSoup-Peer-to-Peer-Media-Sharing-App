@@ -5,9 +5,13 @@ import {
   Settings,
 } from "../../fgVideo/FgVideo";
 import {
+  AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../context/streamsContext/typeConstant";
+import CameraMedia from "src/lib/CameraMedia";
+import ScreenMedia from "src/lib/ScreenMedia";
+import AudioMedia from "src/lib/AudioMedia";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -65,7 +69,7 @@ class Controls {
     private table_id: string,
     private username: string,
     private instance: string,
-    private type: string,
+    private type: "camera" | "screen",
     private fgVideoOptions: FgVideoOptions,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private videoRef: React.RefObject<HTMLVideoElement>,
@@ -89,7 +93,26 @@ class Controls {
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>,
-    private tracksColorSetterCallback: () => void
+    private tracksColorSetterCallback: () => void,
+    private tintColor: React.MutableRefObject<string>,
+    private userStreamEffects: React.MutableRefObject<{
+      camera: {
+        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+      };
+      screen: {
+        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+      };
+      audio: { [effectType in AudioEffectTypes]: boolean };
+    }>,
+    private userMedia: React.MutableRefObject<{
+      camera: {
+        [cameraId: string]: CameraMedia;
+      };
+      screen: {
+        [screenId: string]: ScreenMedia;
+      };
+      audio: AudioMedia | undefined;
+    }>
   ) {
     this.initTime = Date.now();
   }
@@ -377,6 +400,44 @@ class Controls {
       "--closed-captions-character-edge-style",
       characterEdgeStyleMap[captionOptions.characterEdgeStyle.value]
     );
+  };
+
+  handleVisualEffect = async (
+    effect: CameraEffectTypes | ScreenEffectTypes,
+    blockStateChange: boolean
+  ) => {
+    // Fill stream effects if state change isn't blocked
+    if (!blockStateChange) {
+      if (this.type === "camera") {
+        this.userStreamEffects.current[this.type][this.videoId][
+          effect as CameraEffectTypes
+        ] =
+          !this.userStreamEffects.current[this.type][this.videoId][
+            effect as CameraEffectTypes
+          ];
+      } else if (this.type === "screen") {
+        this.userStreamEffects.current[this.type][this.videoId][
+          effect as ScreenEffectTypes
+        ] =
+          !this.userStreamEffects.current[this.type][this.videoId][
+            effect as ScreenEffectTypes
+          ];
+      }
+    }
+
+    if (this.type === "camera") {
+      await this.userMedia.current[this.type][this.videoId].changeEffects(
+        effect as CameraEffectTypes,
+        this.tintColor.current,
+        blockStateChange
+      );
+    } else if (this.type === "screen") {
+      await this.userMedia.current[this.type][this.videoId].changeEffects(
+        effect as ScreenEffectTypes,
+        this.tintColor.current,
+        blockStateChange
+      );
+    }
   };
 }
 

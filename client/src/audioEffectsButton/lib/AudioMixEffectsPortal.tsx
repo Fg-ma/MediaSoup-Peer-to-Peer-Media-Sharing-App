@@ -9,7 +9,7 @@ import { SliderChangeEvent, SliderOptions } from "../../fgSlider/FgSlider";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../../effects/audioEffects/AudioEffects";
+} from "../../audioEffects/AudioEffects";
 
 import backgroundTex1 from "../../../public/backgroundTexs/backgroundTex1.jpg";
 import backgroundTex2 from "../../../public/backgroundTexs/backgroundTex2.jpg";

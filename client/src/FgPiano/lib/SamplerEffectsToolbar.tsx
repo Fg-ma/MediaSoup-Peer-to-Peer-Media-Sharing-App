@@ -4,7 +4,7 @@ import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../../effects/audioEffects/AudioEffects";
+} from "../../audioEffects/AudioEffects";
 import SamplerEffect from "./SamplerEffect";
 
 import autoFilterIcon from "../../../public/svgs/audioEffects/autoFilterIcon.svg";

@@ -13,7 +13,7 @@ import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
 import UserDevice from "../UserDevice";
-import Deadbanding from "../effects/visualEffects/lib/Deadbanding";
+import Deadbanding from "../visualEffects/lib/Deadbanding";
 import BrowserMedia from "src/BrowserMedia";
 
 class Producers {

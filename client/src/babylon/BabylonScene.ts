@@ -21,7 +21,7 @@ import "@babylonjs/inspector";
 import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
-import FaceLandmarks from "../effects/visualEffects/lib/FaceLandmarks";
+import FaceLandmarks from "../visualEffects/lib/FaceLandmarks";
 import UserDevice from "../UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";

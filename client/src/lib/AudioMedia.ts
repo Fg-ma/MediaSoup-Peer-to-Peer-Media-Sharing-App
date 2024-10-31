@@ -2,8 +2,8 @@ import * as Tone from "tone";
 import AudioEffects, {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../effects/audioEffects/AudioEffects";
-import { FgSamplers } from "../effects/audioEffects/fgSamplers";
+} from "../audioEffects/AudioEffects";
+import { FgSamplers } from "../audioEffects/fgSamplers";
 import {
   AudioEffectTypes,
   CameraEffectTypes,

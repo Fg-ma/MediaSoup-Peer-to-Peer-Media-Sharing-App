@@ -6,10 +6,10 @@ import {
 import {
   CameraEffectStylesType,
   EffectStylesType,
-} from "../../../context/currentEffectsStylesContext/typeConstant";
-import { Point2D } from "./BaseShader";
+} from "../context/currentEffectsStylesContext/typeConstant";
 import Deadbanding from "./Deadbanding";
 import SmoothLandmarksUtils from "./SmoothLandmarksUtils";
+import { Point2D } from "./typeContant";
 
 export type LandmarkTypes =
   | "headRotationAngles"

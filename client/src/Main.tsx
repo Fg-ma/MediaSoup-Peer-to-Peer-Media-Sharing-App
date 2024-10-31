@@ -19,7 +19,6 @@ import onRouterCapabilities from "./lib/onRouterCapabilities";
 import Producers from "./lib/Producers";
 import Consumers from "./lib/Consumers";
 import UserDevice from "./UserDevice";
-import Deadbanding from "./effects/visualEffects/lib/Deadbanding";
 import BrowserMedia from "./BrowserMedia";
 import BundlesController from "./bundlesController";
 import subscribe from "./subscribe";
@@ -28,6 +27,7 @@ import CameraSection from "./cameraSection/CameraSection";
 import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
+import Deadbanding from "./babylon/Deadbanding";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")

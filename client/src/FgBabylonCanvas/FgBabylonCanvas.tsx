@@ -7,7 +7,6 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
-import handleVisualEffect from "../effects/visualEffects/handleVisualEffect";
 import Controls from "../fgVideoControls/lib/Controls";
 import FgVideoNavigation from "../fgVideoNavigation/FgVideoNavigation";
 import FgVideoControls, {
@@ -229,15 +228,7 @@ export default function FgBabylonCanvas({
     blockStateChange: boolean = false
   ) => {
     if (fgVideoOptions.isUser) {
-      await handleVisualEffect(
-        effect,
-        blockStateChange,
-        type,
-        videoId,
-        userMedia,
-        userStreamEffects,
-        tintColor
-      );
+      controls.handleVisualEffect(effect, blockStateChange);
 
       if (fgVideoOptions.acceptsVisualEffects) {
         const msg = {
@@ -300,7 +291,10 @@ export default function FgBabylonCanvas({
     setAudioEffectsActive,
     handleMute,
     handleVisualEffectChange,
-    tracksColorSetterCallback
+    tracksColorSetterCallback,
+    tintColor,
+    userStreamEffects,
+    userMedia
   );
 
   const fgVideoController = new FgVideoController(

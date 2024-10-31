@@ -4,7 +4,7 @@ import {
   LabelPlacementType,
   StaticMixEffect,
 } from "./AudioMixEffectsPortal";
-import { AudioMixEffectsType } from "../../effects/audioEffects/AudioEffects";
+import { AudioMixEffectsType } from "../../audioEffects/AudioEffects";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
 

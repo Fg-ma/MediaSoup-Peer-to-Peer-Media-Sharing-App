@@ -7,7 +7,7 @@ import FgSVG from "../../fgSVG/FgSVG";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../../effects/audioEffects/AudioEffects";
+} from "../../audioEffects/AudioEffects";
 
 export default function SamplerEffect({
   samplerEffectsToolbarRef,
