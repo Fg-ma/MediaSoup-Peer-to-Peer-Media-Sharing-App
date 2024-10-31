@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import FgButton from "../../fgButton/FgButton";
 import SettingsPanel from "./SettingsPanel";
 import { ActivePages } from "../FgVideoControls";
-import { Settings } from "src/fgVideo/FgVideo";
+import { Settings } from "../../fgVideo/FgVideo";
 
 export default function FgSettingsButton({
   effectsActive,

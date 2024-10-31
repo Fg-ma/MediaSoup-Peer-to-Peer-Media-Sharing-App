@@ -1,20 +1,17 @@
 import * as Tone from "tone";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  defaultAudioStreamEffects,
+  ScreenEffectTypes,
+} from "../context/streamsContext/typeConstant";
 import AudioEffects, {
   AudioMixEffectsType,
   MixEffectsOptionsType,
 } from "../audioEffects/AudioEffects";
-import { FgSamplers } from "../audioEffects/fgSamplers";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../context/streamsContext/typeConstant";
+import { FgSamplers } from "src/audioEffects/fgSamplers";
 
 class AudioMedia {
-  private username: string;
-  private table_id: string;
-
-  private audioStream: Tone.UserMedia;
   private audioContext: Tone.BaseContext;
   private mediaStream: MediaStream;
   private masterMediaStream: MediaStream;
@@ -26,26 +23,14 @@ class AudioMedia {
 
   audioEffects: AudioEffects;
 
-  private userStreamEffects: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: {
-        [effectType in CameraEffectTypes]?: boolean;
-      };
-    };
-    screen: {
-      [screenId: string]: { [effectType in ScreenEffectTypes]?: boolean };
-    };
-    audio: { [effectType in AudioEffectTypes]?: boolean };
-  }>;
-
   private effects: {
     [cameraEffect in AudioEffectTypes]?: boolean;
   };
 
   constructor(
-    username: string,
-    table_id: string,
-    userStreamEffects: React.MutableRefObject<{
+    private username: string,
+    private table_id: string,
+    private userStreamEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
@@ -54,13 +39,9 @@ class AudioMedia {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
-    audioStream: Tone.UserMedia
+    private audioStream: Tone.UserMedia
   ) {
-    this.username = username;
-    this.table_id = table_id;
-    this.userStreamEffects = userStreamEffects;
-
-    this.audioStream = audioStream;
+    this.effects = {};
 
     // Create an AudioContext and MediaStreamDestination
     this.audioContext = Tone.context;
@@ -84,8 +65,6 @@ class AudioMedia {
       this.samplerMediaStreamDestination,
       this.soundEffectsMediaStreamDestination
     );
-
-    this.effects = {};
 
     // Combine both MediaStreamDestinations into a single MediaStream
     this.mediaStream = new MediaStream();

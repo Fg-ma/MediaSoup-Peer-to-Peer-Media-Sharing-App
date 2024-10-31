@@ -18,15 +18,11 @@ const FgVolumeElement = React.lazy(
   () => import("../fgVolumeElement/FgVolumeElement")
 );
 const FullScreenButton = React.lazy(() => import("./lib/FullScreenButton"));
-const TheaterButton = React.lazy(() => import("./lib/TheaterButton"));
 const PictureInPictureButton = React.lazy(
   () => import("./lib/PictureInPictureButton")
 );
 const CaptionButton = React.lazy(() => import("./lib/CaptionButton"));
 const FgSettingsButton = React.lazy(() => import("./lib/FgSettingsButton"));
-const PlaybackSpeedButton = React.lazy(
-  () => import("./lib/PlaybackSpeedButton")
-);
 const EffectsButton = React.lazy(() => import("./lib/EffectsButton"));
 const VisualEffectsSection = React.lazy(
   () => import("../visualEffectsSection/VisualEffectsSection")

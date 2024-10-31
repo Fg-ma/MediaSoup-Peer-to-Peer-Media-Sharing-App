@@ -13,80 +13,19 @@ import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
 import UserDevice from "../UserDevice";
-import Deadbanding from "../visualEffects/lib/Deadbanding";
-import BrowserMedia from "src/BrowserMedia";
+import BrowserMedia from "../BrowserMedia";
+import Deadbanding from "../babylon/Deadbanding";
 
 class Producers {
-  private socket: React.MutableRefObject<Socket>;
-  private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
-
-  private table_id: React.MutableRefObject<string>;
-  private username: React.MutableRefObject<string>;
-  private instance: React.MutableRefObject<string>;
-
-  private userMedia: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: CameraMedia;
-    };
-    screen: {
-      [screenId: string]: ScreenMedia;
-    };
-    audio: AudioMedia | undefined;
-  }>;
-  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
-  private userStreamEffects: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-    };
-    screen: {
-      [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-    };
-    audio: { [effectType in AudioEffectTypes]: boolean };
-  }>;
-  private remoteTracksMap: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: {
-        camera?: { [cameraId: string]: MediaStreamTrack };
-        screen?: { [screenId: string]: MediaStreamTrack };
-        audio?: MediaStreamTrack | undefined;
-      };
-    };
-  }>;
-
-  private userCameraCount: React.MutableRefObject<number>;
-  private userScreenCount: React.MutableRefObject<number>;
-
-  private isCamera: React.MutableRefObject<boolean>;
-  private isScreen: React.MutableRefObject<boolean>;
-  private isAudio: React.MutableRefObject<boolean>;
-  private isSubscribed: React.MutableRefObject<boolean>;
-
-  private handleDisableEnableBtns: (disabled: boolean) => void;
-  private producerTransport: React.MutableRefObject<
-    mediasoup.types.Transport<mediasoup.types.AppData> | undefined
-  >;
-  private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>;
-  private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
-  private createProducerBundle: () => void;
-  private setBundles: React.Dispatch<
-    React.SetStateAction<{
-      [username: string]: { [instance: string]: React.JSX.Element };
-    }>
-  >;
-
-  private userDevice: UserDevice;
-  private deadbanding: Deadbanding;
-  private browserMedia: BrowserMedia;
-
   constructor(
-    socket: React.MutableRefObject<Socket>,
-    device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private socket: React.MutableRefObject<Socket>,
+    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
 
-    table_id: React.MutableRefObject<string>,
-    username: React.MutableRefObject<string>,
-    instance: React.MutableRefObject<string>,
+    private table_id: React.MutableRefObject<string>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
 
-    userMedia: React.MutableRefObject<{
+    private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
       };
@@ -95,8 +34,8 @@ class Producers {
       };
       audio: AudioMedia | undefined;
     }>,
-    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-    userStreamEffects: React.MutableRefObject<{
+    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private userStreamEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
@@ -105,7 +44,7 @@ class Producers {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
-    remoteTracksMap: React.MutableRefObject<{
+    private remoteTracksMap: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
           camera?: { [cameraId: string]: MediaStreamTrack };
@@ -115,56 +54,31 @@ class Producers {
       };
     }>,
 
-    userCameraCount: React.MutableRefObject<number>,
-    userScreenCount: React.MutableRefObject<number>,
+    private userCameraCount: React.MutableRefObject<number>,
+    private userScreenCount: React.MutableRefObject<number>,
 
-    isCamera: React.MutableRefObject<boolean>,
-    isScreen: React.MutableRefObject<boolean>,
-    isAudio: React.MutableRefObject<boolean>,
-    isSubscribed: React.MutableRefObject<boolean>,
+    private isCamera: React.MutableRefObject<boolean>,
+    private isScreen: React.MutableRefObject<boolean>,
+    private isAudio: React.MutableRefObject<boolean>,
+    private isSubscribed: React.MutableRefObject<boolean>,
 
-    handleDisableEnableBtns: (disabled: boolean) => void,
-    producerTransport: React.MutableRefObject<
+    private handleDisableEnableBtns: (disabled: boolean) => void,
+    private producerTransport: React.MutableRefObject<
       mediasoup.types.Transport<mediasoup.types.AppData> | undefined
     >,
-    setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
-    setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
-    createProducerBundle: () => void,
-    setBundles: React.Dispatch<
+    private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private createProducerBundle: () => void,
+    private setBundles: React.Dispatch<
       React.SetStateAction<{
         [username: string]: { [instance: string]: React.JSX.Element };
       }>
     >,
 
-    userDevice: UserDevice,
-    deadbanding: Deadbanding,
-    browserMedia: BrowserMedia
-  ) {
-    this.socket = socket;
-    this.device = device;
-    this.table_id = table_id;
-    this.username = username;
-    this.instance = instance;
-    this.userMedia = userMedia;
-    this.currentEffectsStyles = currentEffectsStyles;
-    this.userStreamEffects = userStreamEffects;
-    this.remoteTracksMap = remoteTracksMap;
-    this.userCameraCount = userCameraCount;
-    this.userScreenCount = userScreenCount;
-    this.isCamera = isCamera;
-    this.isScreen = isScreen;
-    this.isAudio = isAudio;
-    this.isSubscribed = isSubscribed;
-    this.handleDisableEnableBtns = handleDisableEnableBtns;
-    this.producerTransport = producerTransport;
-    this.setScreenActive = setScreenActive;
-    this.setCameraActive = setCameraActive;
-    this.createProducerBundle = createProducerBundle;
-    this.setBundles = setBundles;
-    this.userDevice = userDevice;
-    this.deadbanding = deadbanding;
-    this.browserMedia = browserMedia;
-  }
+    private userDevice: UserDevice,
+    private deadbanding: Deadbanding,
+    private browserMedia: BrowserMedia
+  ) {}
 
   private createCameraProducer = async (cameraBrowserMedia: MediaStream) => {
     const cameraId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
@@ -584,7 +498,9 @@ class Producers {
 
       if (streamEffects) {
         if (event.producerType === "audio") {
-          this.userStreamEffects.current.audio = defaultAudioStreamEffects;
+          this.userStreamEffects.current.audio = structuredClone(
+            defaultAudioStreamEffects
+          );
         } else if (
           event.producerType === "camera" ||
           event.producerType === "screen"

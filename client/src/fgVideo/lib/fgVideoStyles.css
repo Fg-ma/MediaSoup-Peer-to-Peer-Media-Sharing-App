@@ -46,9 +46,6 @@
 }
 
 .video-container {
-  --timeline-background-color: rgba(150, 150, 150, 0.5);
-  --timeline-primary-background-color: #f56114;
-  --timeline-secondary-background-color: rgb(150, 150, 150);
   --primary-video-color: #f56114;
   --flip-video: "1";
   --closed-captions-font-family: "K2D";

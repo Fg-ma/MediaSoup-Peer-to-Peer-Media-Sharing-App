@@ -12,10 +12,10 @@ import {
   HideBackgroundEffectTypes,
 } from "../context/currentEffectsStylesContext/typeConstant";
 import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
-import FaceLandmarks from "../visualEffects/lib/FaceLandmarks";
 import UserDevice from "../UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
 import BabylonMeshes from "./BabylonMeshes";
+import FaceLandmarks from "./FaceLandmarks";
 
 class BabylonRenderLoop {
   private FACE_MESH_DETECTION_INTERVAL: number;

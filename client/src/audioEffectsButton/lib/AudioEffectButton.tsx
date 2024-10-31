@@ -3,7 +3,7 @@ import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import { AudioEffectTypes } from "../../context/streamsContext/typeConstant";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
-import { AudioEffectTemplate } from "./AudioEffectsSection";
+import { AudioEffectTemplate } from "./typeConstant";
 
 export default function AudioEffectButton({
   username,

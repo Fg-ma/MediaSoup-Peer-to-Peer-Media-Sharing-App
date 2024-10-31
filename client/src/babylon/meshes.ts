@@ -1,5 +1,4 @@
-import { MeshesData } from "./typeContant";
-import { MeshJSON } from "../visualEffects/lib/BaseShader";
+import { MeshesData, MeshJSON } from "./typeContant";
 import { HideBackgroundEffectTypes } from "../context/currentEffectsStylesContext/typeConstant";
 
 export const baseMaskData: {

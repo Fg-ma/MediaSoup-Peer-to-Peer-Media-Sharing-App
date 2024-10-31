@@ -148,53 +148,6 @@ class FgVideoController {
       }
     });
 
-    // Set the initial progress position
-    if (this.timelineContainerRef.current) {
-      this.timelineContainerRef.current.style.setProperty(
-        "--progress-position",
-        `${
-          this.fgVideoOptions.initialProgressPosition ??
-          defaultFgVideoOptions.initialProgressPosition
-        }`
-      );
-    }
-
-    // Set the initial current time
-    if (this.currentTimeRef.current) {
-      this.currentTimeRef.current.textContent = this.controls.formatDuration(
-        this.fgVideoOptions.initialProgressPosition ??
-          defaultFgVideoOptions.initialProgressPosition
-      );
-    }
-
-    // Set the video current time
-    if (this.videoRef.current) {
-      this.videoRef.current.currentTime =
-        this.fgVideoOptions.initialProgressPosition ??
-        defaultFgVideoOptions.initialProgressPosition;
-    }
-
-    this.videoContainerRef.current?.style.setProperty(
-      "--timeline-background-color",
-      `${
-        this.fgVideoOptions.timelineBackgroundColor ??
-        defaultFgVideoOptions.timelineBackgroundColor
-      }`
-    );
-    this.videoContainerRef.current?.style.setProperty(
-      "--timeline-primary-background-color",
-      `${
-        this.fgVideoOptions.timelinePrimaryBackgroundColor ??
-        defaultFgVideoOptions.timelinePrimaryBackgroundColor
-      }`
-    );
-    this.videoContainerRef.current?.style.setProperty(
-      "--timeline-secondary-background-color",
-      `${
-        this.fgVideoOptions.timelineSecondaryBackgroundColor ??
-        defaultFgVideoOptions.timelineSecondaryBackgroundColor
-      }`
-    );
     this.videoContainerRef.current?.style.setProperty(
       "--primary-video-color",
       `${

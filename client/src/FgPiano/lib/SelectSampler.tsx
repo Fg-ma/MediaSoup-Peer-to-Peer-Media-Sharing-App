@@ -7,7 +7,7 @@ import { navTransition, navVar } from "./SamplerToolbar";
 import navigateForward from "../../../public/svgs/navigateForward.svg";
 import navigateBack from "../../../public/svgs/navigateBack.svg";
 import FgPortal from "../../fgPortal/FgPortal";
-import { FgSamplers } from "../../audioEffects/fgSamplers";
+import { FgSamplers } from "src/audioEffects/fgSamplers";
 
 const notes = [
   "C0",

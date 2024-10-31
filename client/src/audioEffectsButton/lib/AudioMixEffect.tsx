@@ -1,12 +1,12 @@
 import React from "react";
+import FgSVG from "../../fgSVG/FgSVG";
+import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
+import { AudioMixEffectsType } from "../../audioEffects/AudioEffects";
 import {
   DynamicMixEffect,
   LabelPlacementType,
   StaticMixEffect,
-} from "./AudioMixEffectsPortal";
-import { AudioMixEffectsType } from "../../audioEffects/AudioEffects";
-import FgSVG from "../../fgSVG/FgSVG";
-import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
+} from "./typeConstant";
 
 export default function AudioMixEffect({
   effect,

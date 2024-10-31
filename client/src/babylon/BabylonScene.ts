@@ -21,11 +21,11 @@ import "@babylonjs/inspector";
 import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
-import FaceLandmarks from "../visualEffects/lib/FaceLandmarks";
 import UserDevice from "../UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
 import { EffectStylesType } from "../context/currentEffectsStylesContext/typeConstant";
+import FaceLandmarks from "./FaceLandmarks";
 
 export type DefaultMeshPlacementType =
   | "forehead"

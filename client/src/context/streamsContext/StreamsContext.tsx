@@ -103,7 +103,7 @@ export function StreamsContextProvider({
   }>({
     camera: {},
     screen: {},
-    audio: defaultAudioStreamEffects,
+    audio: structuredClone(defaultAudioStreamEffects),
   });
   const remoteStreamEffects = useRef<{
     [username: string]: {
