@@ -12,8 +12,8 @@ import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
 import mixAudioEffectsIcon from "../../../public/svgs/audioEffects/mixAudioEffectsIcon.svg";
 import mixAudioEffectsOffIcon from "../../../public/svgs/audioEffects/mixAudioEffectsOffIcon.svg";
-import panioIcon from "../../../public/svgs/audioEffects/panioIcon.svg";
-import panioOffIcon from "../../../public/svgs/audioEffects/panioOffIcon.svg";
+import pianoIcon from "../../../public/svgs/audioEffects/pianoIcon.svg";
+import pianoOffIcon from "../../../public/svgs/audioEffects/pianoOffIcon.svg";
 import soundBoardIcon from "../../../public/svgs/audioEffects/soundBoardIcon.svg";
 import soundBoardOffIcon from "../../../public/svgs/audioEffects/soundBoardOffIcon.svg";
 import backgroundMusicIcon from "../../../public/svgs/audioEffects/backgroundMusicIcon.svg";
@@ -245,7 +245,7 @@ export default function AudioEffectsSection({
               contentFunction={() => {
                 return (
                   <FgSVG
-                    src={panioActive ? panioOffIcon : panioIcon}
+                    src={panioActive ? pianoOffIcon : pianoIcon}
                     className='flex items-center justify-center'
                     attributes={[
                       { key: "width", value: "90%" },
