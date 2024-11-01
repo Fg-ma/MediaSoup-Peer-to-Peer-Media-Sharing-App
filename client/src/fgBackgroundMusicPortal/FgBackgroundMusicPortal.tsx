@@ -5,6 +5,23 @@ import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesC
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import { BackgroundMusicTypes } from "../context/currentEffectsStylesContext/typeConstant";
 import FgImage from "../fgImage/FgImage";
+import FgSVG from "../fgSVG/FgSVG";
+
+import adventureTimeIcon from "../../public/svgs/audioEffects/adventureTimeIcon.svg";
+import cacophonyIcon from "../../public/svgs/audioEffects/cacophonyIcon.svg";
+import drumBeatIcon from "../../public/svgs/audioEffects/drumBeatIcon.svg";
+import funkIcon from "../../public/svgs/audioEffects/funkIcon.svg";
+import harmonicIcon from "../../public/svgs/audioEffects/harmonicaIcon.svg";
+import mischiefIcon from "../../public/svgs/audioEffects/mischiefIcon.svg";
+import outWestIcon from "../../public/svgs/audioEffects/outWestIcon.svg";
+import pianoBackgroundMusicIcon from "../../public/svgs/audioEffects/pianoBackgroundMusicIcon.svg";
+import retroGameIcon from "../../public/svgs/audioEffects/retroGameIcon.svg";
+import spaceBackgroundMusicIcon from "../../public/svgs/audioEffects/spaceBackgroundMusicIcon.svg";
+import ukuleleIcon from "../../public/svgs/audioEffects/ukuleleIcon.svg";
+import wackyIcon from "../../public/svgs/audioEffects/wackyIcon.svg";
+
+import royalProcession_512x512 from "../../public/2DAssets/audio/royalProcession_512x512.png";
+import royalProcession_32x32 from "../../public/2DAssets/audio/royalProcession_32x32.png";
 
 const backgroundMusicLabels: {
   [backgroundMusicType in BackgroundMusicTypes]: string;
@@ -59,107 +76,108 @@ export default function FgBackgroundMusicPortal({
     };
   }>({
     adventureTime: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: adventureTimeIcon,
       flipped: false,
       bgColor: "black",
     },
     cacophony: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: cacophonyIcon,
       flipped: false,
       bgColor: "black",
     },
     drumBeat: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: drumBeatIcon,
       flipped: false,
       bgColor: "black",
     },
     funk: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: funkIcon,
       flipped: false,
       bgColor: "black",
     },
     harmonica: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: harmonicIcon,
       flipped: false,
       bgColor: "black",
     },
     mischief: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: mischiefIcon,
       flipped: false,
       bgColor: "black",
     },
     outWest: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: outWestIcon,
       flipped: false,
       bgColor: "black",
     },
     piano: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: pianoBackgroundMusicIcon,
       flipped: false,
       bgColor: "black",
     },
     retroGame: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: retroGameIcon,
       flipped: false,
       bgColor: "black",
     },
     royalProcession: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      image: royalProcession_512x512,
+      imageSmall: royalProcession_32x32,
       flipped: false,
-      bgColor: "black",
+      bgColor: "white",
     },
     space: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: spaceBackgroundMusicIcon,
       flipped: false,
       bgColor: "black",
     },
     ukulele: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: ukuleleIcon,
       flipped: false,
       bgColor: "black",
     },
     wacky: {
-      image: "",
-      imageSmall: "",
-      icon: "",
+      icon: wackyIcon,
       flipped: false,
       bgColor: "black",
     },
   });
+  const [cols, setCols] = useState(3);
   const backgroundMusicContainerRef = useRef<HTMLDivElement>(null);
+
+  const gridColumnsChange = () => {
+    if (!backgroundMusicContainerRef.current) return;
+
+    const width = backgroundMusicContainerRef.current.clientWidth;
+    if (width < 300) {
+      if (cols !== 3) setCols(3);
+    } else if (width < 500) {
+      if (cols !== 4) setCols(4);
+    } else if (width < 700) {
+      if (cols !== 5) setCols(5);
+    } else if (width >= 700) {
+      if (cols !== 6) setCols(6);
+    }
+  };
 
   return (
     <FgPanel
       content={
         <div
           ref={backgroundMusicContainerRef}
-          className='small-vertical-scroll-bar p-4 overflow-auto w-full grow relative'
+          className='small-vertical-scroll-bar overflow-y-auto overflow-x-hidden w-full h-full'
         >
-          <div className='w-full h-full min-h-max min-w-max grid grid-cols-5 gap-3 items-center justify-center justify-items-center place-items-center'>
+          <div
+            className={`pt-2 w-full h-full min-h-max min-w-max grid gap-3 items-center justify-center justify-items-center place-items-center ${
+              cols === 3
+                ? "grid-cols-3"
+                : cols === 4
+                ? "grid-cols-4"
+                : cols === 5
+                ? "grid-cols-5"
+                : "grid-cols-6"
+            }`}
+          >
             {Object.entries(backgroundMusic).map(([key, effect]) => (
               <FgButton
                 key={key}
@@ -173,17 +191,31 @@ export default function FgBackgroundMusicPortal({
                       effect.bgColor === "white" &&
                       "bg-white border-fg-black-35"
                     } ${
-                      effect.bgColor === "black" && "border-white"
+                      effect.bgColor === "black" &&
+                      "bg-black bg-opacity-85 border-white"
                     } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
                     data-background-music-effects-button-value={key}
                   >
-                    <FgImage
-                      src={effect.image ?? ""}
-                      srcLoading={effect.imageSmall}
-                      alt={key}
-                      style={{ width: "2.75rem", height: "2.75rem" }}
-                      data-background-music-effects-button-value={key}
-                    />
+                    {effect.image ? (
+                      <FgImage
+                        src={effect.image}
+                        srcLoading={effect.imageSmall}
+                        alt={key}
+                        style={{ width: "3.25rem", height: "3.25rem" }}
+                        data-background-music-effects-button-value={key}
+                      />
+                    ) : (
+                      <FgSVG
+                        src={effect.icon ?? ""}
+                        attributes={[
+                          { key: "width", value: "100%" },
+                          { key: "height", value: "100%" },
+                          { key: "fill", value: "white" },
+                          { key: "stroke", value: "white" },
+                        ]}
+                        data-background-music-effects-button-value={key}
+                      />
+                    )}
                   </div>
                 )}
                 hoverContent={
@@ -205,13 +237,14 @@ export default function FgBackgroundMusicPortal({
         referenceElement: backgroundMusicButtonRef.current ?? undefined,
         placement: "below",
       }}
-      minHeight={434}
-      minWidth={395}
-      initHeight='434px'
-      initWidth='395px'
+      initWidth={"245px"}
+      initHeight={"235px"}
+      minWidth={245}
+      minHeight={235}
       closeCallback={closeCallback}
       closePosition='topRight'
-      shadow={{ left: false, right: false, bottom: true, top: true }}
+      shadow={{ bottom: true, top: true }}
+      resizeCallback={gridColumnsChange}
     />
   );
 }

@@ -350,9 +350,7 @@ export default function AudioEffectsSection({
         initHeight={"190px"}
         minWidth={204}
         minHeight={190}
-        resizeCallback={() => {
-          gridColumnsChange();
-        }}
+        resizeCallback={gridColumnsChange}
         closeCallback={closeCallback ? () => closeCallback() : undefined}
         closeLabelElement={closeLabelElement}
         closePosition='topRight'
