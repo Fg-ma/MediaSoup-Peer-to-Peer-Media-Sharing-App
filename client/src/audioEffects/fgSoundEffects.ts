@@ -21,7 +21,7 @@ class FgSoundEffects {
       try {
         const player = new Tone.Player(url, () => {
           resolve(); // Resolve the promise once the sound is loaded
-        });
+        }).toDestination();
 
         player.connect(this.volumeNode);
         this.players[key] = { player, url };

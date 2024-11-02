@@ -56,11 +56,8 @@ export default function FgBackgroundMusicPortal({
 }) {
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
-  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
+  const { userMedia } = useStreamsContext();
 
-  const streamEffects = isUser
-    ? userStreamEffects.current.audio.backgroundMusic
-    : remoteStreamEffects.current[username][instance].audio.backgroundMusic;
   const effectsStyles = isUser
     ? currentEffectsStyles.current.audio.backgroundMusic
     : remoteCurrentEffectsStyles.current[username][instance].audio
@@ -71,77 +68,97 @@ export default function FgBackgroundMusicPortal({
       image?: string;
       imageSmall?: string;
       icon?: string;
-      flipped: boolean;
       bgColor: "white" | "black";
+      playing: boolean;
+      path: string;
     };
   }>({
     adventureTime: {
       icon: adventureTimeIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/adventureTime.mp3",
     },
     cacophony: {
       icon: cacophonyIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/cacophony.mp3",
     },
     drumBeat: {
       icon: drumBeatIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/drumBeat.mp3",
     },
     funk: {
       icon: funkIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/funk.mp3",
     },
     harmonica: {
       icon: harmonicIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/harmonica.mp3",
     },
     mischief: {
       icon: mischiefIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/mischief.mp3",
     },
     outWest: {
       icon: outWestIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/outWest.mp3",
     },
     piano: {
       icon: pianoBackgroundMusicIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/piano.mp3",
     },
     retroGame: {
       icon: retroGameIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/retroGame.mp3",
     },
     royalProcession: {
       image: royalProcession_512x512,
       imageSmall: royalProcession_32x32,
-      flipped: false,
       bgColor: "white",
+      playing: false,
+      path: "/backgroundMusic/royalProcession.mp3",
     },
     space: {
       icon: spaceBackgroundMusicIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/space.mp3",
     },
     ukulele: {
       icon: ukuleleIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/ukulele.mp3",
     },
     wacky: {
       icon: wackyIcon,
-      flipped: false,
       bgColor: "black",
+      playing: false,
+      path: "/backgroundMusic/wacky.mp3",
     },
   });
+  const [importedFiles, setImportedFiles] = useState<{
+    [backgroundMusicTypes in BackgroundMusicTypes]?: {
+      file: File;
+      path: string;
+    };
+  }>({});
   const [cols, setCols] = useState(3);
   const backgroundMusicContainerRef = useRef<HTMLDivElement>(null);
 
@@ -160,6 +177,88 @@ export default function FgBackgroundMusicPortal({
     }
   };
 
+  const playAudio = async (
+    backgroundMusicType: BackgroundMusicTypes,
+    path: string
+  ): Promise<boolean> => {
+    const url = importedFiles[backgroundMusicType]
+      ? importedFiles[backgroundMusicType].path
+      : path;
+
+    // Start playback with Tone.js and load the sound if it hasn't been loaded
+    if (
+      !userMedia.current.audio?.audioEffects.fgBackgroundMusic.players[
+        backgroundMusicType
+      ]
+    ) {
+      await userMedia.current.audio?.audioEffects.fgBackgroundMusic.loadBackgroundMusic(
+        backgroundMusicType,
+        url
+      );
+    } else if (
+      userMedia.current.audio?.audioEffects.fgBackgroundMusic.players[
+        backgroundMusicType
+      ].url !== url
+    ) {
+      userMedia.current.audio?.audioEffects.fgBackgroundMusic.swapPlayer(
+        backgroundMusicType,
+        url
+      );
+    }
+
+    return (
+      userMedia.current.audio?.audioEffects.fgBackgroundMusic.toggleAudio(
+        backgroundMusicType,
+        false
+      ) ?? false
+    );
+  };
+
+  const toggleAudio = async (
+    backgroundMusicType: BackgroundMusicTypes
+  ): Promise<boolean> => {
+    let succeeded = false;
+
+    const { playing, path } = backgroundMusic[backgroundMusicType];
+    if (playing) {
+      // Stop playback
+      succeeded =
+        userMedia.current.audio?.audioEffects.fgBackgroundMusic.toggleAudio(
+          backgroundMusicType,
+          true
+        ) ?? false;
+    } else {
+      succeeded = await playAudio(backgroundMusicType, path);
+    }
+
+    if (succeeded) {
+      setBackgroundMusic((prevEffects) => {
+        const backgroundMusic = prevEffects[backgroundMusicType];
+        const { playing } = backgroundMusic;
+
+        if (playing) {
+          return {
+            ...prevEffects,
+            [backgroundMusicType]: {
+              ...backgroundMusic,
+              playing: false,
+            },
+          };
+        } else {
+          return {
+            ...prevEffects,
+            [backgroundMusicType]: {
+              ...backgroundMusic,
+              playing: true,
+            },
+          };
+        }
+      });
+    }
+
+    return succeeded;
+  };
+
   return (
     <FgPanel
       content={
@@ -168,7 +267,7 @@ export default function FgBackgroundMusicPortal({
           className='small-vertical-scroll-bar overflow-y-auto overflow-x-hidden w-full h-full'
         >
           <div
-            className={`pt-2 w-full h-full min-h-max min-w-max grid gap-3 items-center justify-center justify-items-center place-items-center ${
+            className={`py-2 w-full h-full min-h-max min-w-max grid gap-3 items-center justify-center justify-items-center place-items-center ${
               cols === 3
                 ? "grid-cols-3"
                 : cols === 4
@@ -181,18 +280,23 @@ export default function FgBackgroundMusicPortal({
             {Object.entries(backgroundMusic).map(([key, effect]) => (
               <FgButton
                 key={key}
+                clickFunction={() => toggleAudio(key as BackgroundMusicTypes)}
                 contentFunction={() => (
                   <div
                     className={`${
                       key === effectsStyles.style
                         ? "border-fg-secondary border-3 border-opacity-100"
                         : ""
-                    } ${effect.flipped && "scale-x-[-1]"} ${
-                      effect.bgColor === "white" &&
-                      "bg-white border-fg-black-35"
                     } ${
-                      effect.bgColor === "black" &&
-                      "bg-black bg-opacity-85 border-white"
+                      effect.bgColor === "white"
+                        ? "bg-white border-fg-black-35"
+                        : ""
+                    } ${
+                      effect.bgColor === "black"
+                        ? "bg-black bg-opacity-85 border-white"
+                        : ""
+                    } ${
+                      effect.playing ? "border-fg-secondary border-3" : ""
                     } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
                     data-background-music-effects-button-value={key}
                   >

@@ -20,6 +20,7 @@ class AudioMedia {
   private micMediaStreamDestination: MediaStreamAudioDestinationNode;
   private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
   private soundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode;
+  private backgroundMusicMediaStreamDestination: MediaStreamAudioDestinationNode;
 
   audioEffects: AudioEffects;
 
@@ -53,6 +54,8 @@ class AudioMedia {
       this.audioContext.createMediaStreamDestination();
     this.soundEffectsMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
+    this.backgroundMusicMediaStreamDestination =
+      this.audioContext.createMediaStreamDestination();
 
     // Connect the Tone.UserMedia instance to the MediaStreamDestination
     this.audioStream.connect(this.masterMediaStreamDestination);
@@ -63,7 +66,8 @@ class AudioMedia {
       this.masterMediaStreamDestination,
       this.micMediaStreamDestination,
       this.samplerMediaStreamDestination,
-      this.soundEffectsMediaStreamDestination
+      this.soundEffectsMediaStreamDestination,
+      this.backgroundMusicMediaStreamDestination
     );
 
     // Combine both MediaStreamDestinations into a single MediaStream
@@ -84,9 +88,14 @@ class AudioMedia {
       this.samplerMediaStreamDestination.stream.getAudioTracks()[0]
     );
 
-    // Add the sampler track (from samplerMediaStreamDestination) to combined stream
+    // Add the sampler track (from soundEffectsStreamDestination) to combined stream
     this.mediaStream.addTrack(
       this.soundEffectsMediaStreamDestination.stream.getAudioTracks()[0]
+    );
+
+    // Add the sampler track (from backgroundMusicStreamDestination) to combined stream
+    this.mediaStream.addTrack(
+      this.backgroundMusicMediaStreamDestination.stream.getAudioTracks()[0]
     );
 
     // Make master media stream
