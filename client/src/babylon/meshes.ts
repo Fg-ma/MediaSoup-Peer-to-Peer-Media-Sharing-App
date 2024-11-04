@@ -31,6 +31,7 @@ const assetMeshes: MeshesData = {
         meshFile: "disguiseMustache.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     fullMustache: {
@@ -49,6 +50,7 @@ const assetMeshes: MeshesData = {
         meshFile: "fullMustache.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     mustache1: {
@@ -67,6 +69,7 @@ const assetMeshes: MeshesData = {
         meshFile: "mustache1.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     mustache2: {
@@ -85,6 +88,7 @@ const assetMeshes: MeshesData = {
         meshFile: "mustache2.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     mustache3: {
@@ -103,6 +107,7 @@ const assetMeshes: MeshesData = {
         meshFile: "mustache3.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     mustache4: {
@@ -121,6 +126,7 @@ const assetMeshes: MeshesData = {
         meshFile: "mustache4.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     nicodemusMustache: {
@@ -139,6 +145,7 @@ const assetMeshes: MeshesData = {
         meshFile: "nicodemusMustache.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     pencilMustache: {
@@ -157,6 +164,7 @@ const assetMeshes: MeshesData = {
         meshFile: "pencilMustache.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     spongebobMustache: {
@@ -175,6 +183,7 @@ const assetMeshes: MeshesData = {
         meshFile: "spongebobMustache.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     tinyMustache: {
@@ -193,6 +202,7 @@ const assetMeshes: MeshesData = {
         meshFile: "tinyMustache.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     wingedMustache: {
@@ -211,6 +221,7 @@ const assetMeshes: MeshesData = {
         meshFile: "wingedMustache.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
   },
@@ -231,6 +242,7 @@ const assetMeshes: MeshesData = {
         meshFile: "chinBeard.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     classicalCurlyBeard: {
@@ -249,6 +261,7 @@ const assetMeshes: MeshesData = {
         meshFile: "classicalCurlyBeard.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     fullBeard: {
@@ -267,6 +280,7 @@ const assetMeshes: MeshesData = {
         meshFile: "fullBeard.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
   },
@@ -287,6 +301,7 @@ const assetMeshes: MeshesData = {
         meshFile: "alienMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     baseMask: {
@@ -305,6 +320,7 @@ const assetMeshes: MeshesData = {
         meshFile: "baseMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     clownMask: {
@@ -323,6 +339,7 @@ const assetMeshes: MeshesData = {
         meshFile: "clownMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     creatureMask: {
@@ -341,6 +358,7 @@ const assetMeshes: MeshesData = {
         meshFile: "creatureMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     cyberMask: {
@@ -359,6 +377,7 @@ const assetMeshes: MeshesData = {
         meshFile: "cyberMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     darkKnightMask: {
@@ -377,6 +396,7 @@ const assetMeshes: MeshesData = {
         meshFile: "darkKnightMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     demonMask: {
@@ -395,6 +415,7 @@ const assetMeshes: MeshesData = {
         meshFile: "demonMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     gasMask1: {
@@ -413,6 +434,7 @@ const assetMeshes: MeshesData = {
         meshFile: "gasMask1.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     gasMask2: {
@@ -431,6 +453,7 @@ const assetMeshes: MeshesData = {
         meshFile: "gasMask2.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     gasMask3: {
@@ -449,6 +472,7 @@ const assetMeshes: MeshesData = {
         meshFile: "gasMask3.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     gasMask4: {
@@ -467,6 +491,7 @@ const assetMeshes: MeshesData = {
         meshFile: "gasMask4.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     masqueradeMask: {
@@ -485,6 +510,7 @@ const assetMeshes: MeshesData = {
         meshFile: "masqueradeMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     metalManMask: {
@@ -503,6 +529,7 @@ const assetMeshes: MeshesData = {
         meshFile: "metalManMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     oniMask: {
@@ -521,6 +548,7 @@ const assetMeshes: MeshesData = {
         meshFile: "oniMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     plagueDoctorMask: {
@@ -539,6 +567,7 @@ const assetMeshes: MeshesData = {
         meshFile: "plagueDoctorMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     sixEyesMask: {
@@ -557,6 +586,7 @@ const assetMeshes: MeshesData = {
         meshFile: "sixEyesMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     tenguMask: {
@@ -575,6 +605,7 @@ const assetMeshes: MeshesData = {
         meshFile: "tenguMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     threeFaceMask: {
@@ -593,6 +624,7 @@ const assetMeshes: MeshesData = {
         meshFile: "threeFaceMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     weldingMask: {
@@ -611,6 +643,7 @@ const assetMeshes: MeshesData = {
         meshFile: "weldingMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     woodlandMask: {
@@ -629,6 +662,7 @@ const assetMeshes: MeshesData = {
         meshFile: "woodlandMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     woodPaintedMask: {
@@ -647,6 +681,7 @@ const assetMeshes: MeshesData = {
         meshFile: "woodPaintedMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     zombieMask: {
@@ -665,6 +700,7 @@ const assetMeshes: MeshesData = {
         meshFile: "zombieMask.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
   },
@@ -685,6 +721,7 @@ const assetMeshes: MeshesData = {
         meshFile: "defaultGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     AmericaGlasses: {
@@ -703,6 +740,7 @@ const assetMeshes: MeshesData = {
         meshFile: "AmericaGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     aviatorGoggles: {
@@ -721,6 +759,7 @@ const assetMeshes: MeshesData = {
         meshFile: "aviatorGoggles.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     bloodyGlasses: {
@@ -739,6 +778,7 @@ const assetMeshes: MeshesData = {
         meshFile: "bloodyGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     eyeProtectionGlasses: {
@@ -757,6 +797,7 @@ const assetMeshes: MeshesData = {
         meshFile: "eyeProtectionGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     glasses1: {
@@ -775,6 +816,7 @@ const assetMeshes: MeshesData = {
         meshFile: "glasses1.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     glasses2: {
@@ -793,6 +835,7 @@ const assetMeshes: MeshesData = {
         meshFile: "glasses2.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     glasses3: {
@@ -811,6 +854,7 @@ const assetMeshes: MeshesData = {
         meshFile: "glasses3.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     glasses4: {
@@ -829,6 +873,7 @@ const assetMeshes: MeshesData = {
         meshFile: "glasses4.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     glasses5: {
@@ -847,6 +892,7 @@ const assetMeshes: MeshesData = {
         meshFile: "glasses5.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     glasses6: {
@@ -865,6 +911,7 @@ const assetMeshes: MeshesData = {
         meshFile: "glasses6.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     memeGlasses: {
@@ -883,6 +930,7 @@ const assetMeshes: MeshesData = {
         meshFile: "memeGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     militaryTacticalGlasses: {
@@ -901,6 +949,7 @@ const assetMeshes: MeshesData = {
         meshFile: "militaryTacticalGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     steampunkGlasses: {
@@ -919,6 +968,7 @@ const assetMeshes: MeshesData = {
         meshFile: "steampunkGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     threeDGlasses: {
@@ -937,6 +987,7 @@ const assetMeshes: MeshesData = {
         meshFile: "threeDGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     toyGlasses: {
@@ -955,6 +1006,7 @@ const assetMeshes: MeshesData = {
         meshFile: "toyGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     shades: {
@@ -973,6 +1025,7 @@ const assetMeshes: MeshesData = {
         meshFile: "shades.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     VRGlasses: {
@@ -991,6 +1044,7 @@ const assetMeshes: MeshesData = {
         meshFile: "VRGlasses.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
   },
@@ -1011,6 +1065,7 @@ const assetMeshes: MeshesData = {
         meshFile: "AsianConicalHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     aviatorHelmet: {
@@ -1029,6 +1084,7 @@ const assetMeshes: MeshesData = {
         meshFile: "aviatorHelmet.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     bicornHat: {
@@ -1047,6 +1103,7 @@ const assetMeshes: MeshesData = {
         meshFile: "bicornHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     bicycleHelmet: {
@@ -1065,6 +1122,7 @@ const assetMeshes: MeshesData = {
         meshFile: "bicycleHelmet.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     captainsHat: {
@@ -1083,6 +1141,7 @@ const assetMeshes: MeshesData = {
         meshFile: "captainsHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     chefHat: {
@@ -1101,6 +1160,7 @@ const assetMeshes: MeshesData = {
         meshFile: "chefHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     chickenHat: {
@@ -1119,6 +1179,7 @@ const assetMeshes: MeshesData = {
         meshFile: "chickenHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     deadManHat: {
@@ -1137,6 +1198,7 @@ const assetMeshes: MeshesData = {
         meshFile: "deadManHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     dogEars: {
@@ -1155,6 +1217,7 @@ const assetMeshes: MeshesData = {
         meshFile: "dogEars.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     flatCap: {
@@ -1173,6 +1236,7 @@ const assetMeshes: MeshesData = {
         meshFile: "flatCap.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     hardHat: {
@@ -1191,6 +1255,7 @@ const assetMeshes: MeshesData = {
         meshFile: "hardHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     hopliteHelmet: {
@@ -1209,6 +1274,7 @@ const assetMeshes: MeshesData = {
         meshFile: "hopliteHelmet.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     militaryHat: {
@@ -1227,6 +1293,7 @@ const assetMeshes: MeshesData = {
         meshFile: "militaryHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     rabbitEars: {
@@ -1245,24 +1312,7 @@ const assetMeshes: MeshesData = {
         meshFile: "rabbitEars.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
-      },
-    },
-    roundEarsHat: {
-      defaultMeshPlacement: "forehead",
-      planeMesh: {
-        meshLabel: "roundEarsHat_2D",
-        meshPath: "/2DAssets/hats/roundEarsHat/",
-        meshFile: "roundEarsHat_512x512.png",
-        initScale: [1, 1, 1],
-        initRotation: [0, 0, 0],
-      },
-      mesh: {
-        meshType: "gltf",
-        meshLabel: "roundEarsHat_gltf",
-        meshPath: "/3DAssets/hats/roundEarsHat/",
-        meshFile: "roundEarsHat.gltf",
-        initScale: [1, 1, 1],
-        initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     santaHat: {
@@ -1281,6 +1331,7 @@ const assetMeshes: MeshesData = {
         meshFile: "santaHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     seamanHat: {
@@ -1299,6 +1350,7 @@ const assetMeshes: MeshesData = {
         meshFile: "seamanHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     stylishHat: {
@@ -1317,6 +1369,7 @@ const assetMeshes: MeshesData = {
         meshFile: "stylishHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     superMarioOdysseyHat: {
@@ -1335,6 +1388,7 @@ const assetMeshes: MeshesData = {
         meshFile: "superMarioOdysseyHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     ushankaHat: {
@@ -1353,6 +1407,7 @@ const assetMeshes: MeshesData = {
         meshFile: "ushankaHat.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     vikingHelmet: {
@@ -1371,6 +1426,7 @@ const assetMeshes: MeshesData = {
         meshFile: "vikingHelmet.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
   },
@@ -1391,6 +1447,7 @@ const assetMeshes: MeshesData = {
         meshFile: "angryHamster.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     axolotl: {
@@ -1409,6 +1466,7 @@ const assetMeshes: MeshesData = {
         meshFile: "axolotl.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/axolotl.mp3",
       },
     },
     babyDragon: {
@@ -1427,6 +1485,7 @@ const assetMeshes: MeshesData = {
         meshFile: "babyDragon.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/babyDragon.mp3",
       },
     },
     beardedDragon: {
@@ -1445,6 +1504,7 @@ const assetMeshes: MeshesData = {
         meshFile: "beardedDragon.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     bird1: {
@@ -1463,6 +1523,7 @@ const assetMeshes: MeshesData = {
         meshFile: "bird1.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/bird1.mp3",
       },
     },
     bird2: {
@@ -1481,6 +1542,7 @@ const assetMeshes: MeshesData = {
         meshFile: "bird2.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/bird2.mp3",
       },
     },
     boxer: {
@@ -1499,6 +1561,7 @@ const assetMeshes: MeshesData = {
         meshFile: "boxer.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/boxer.mp3",
       },
     },
     brain: {
@@ -1517,6 +1580,7 @@ const assetMeshes: MeshesData = {
         meshFile: "brain.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/brain.mp3",
       },
     },
     buddyHamster: {
@@ -1535,6 +1599,7 @@ const assetMeshes: MeshesData = {
         meshFile: "buddyHamster.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     cat1: {
@@ -1553,6 +1618,7 @@ const assetMeshes: MeshesData = {
         meshFile: "cat1.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/cat1.mp3",
       },
     },
     cat2: {
@@ -1571,6 +1637,7 @@ const assetMeshes: MeshesData = {
         meshFile: "cat2.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/cat2.mp3",
       },
     },
     dodoBird: {
@@ -1589,6 +1656,7 @@ const assetMeshes: MeshesData = {
         meshFile: "dodoBird.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     happyHamster: {
@@ -1607,6 +1675,7 @@ const assetMeshes: MeshesData = {
         meshFile: "happyHamster.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     mechanicalGrasshopper: {
@@ -1625,6 +1694,7 @@ const assetMeshes: MeshesData = {
         meshFile: "mechanicalGrasshopper.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/mechanicalGrasshopper.mp3",
       },
     },
     panda1: {
@@ -1643,6 +1713,7 @@ const assetMeshes: MeshesData = {
         meshFile: "panda1.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     panda2: {
@@ -1661,6 +1732,7 @@ const assetMeshes: MeshesData = {
         meshFile: "panda2.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     petRock: {
@@ -1676,9 +1748,10 @@ const assetMeshes: MeshesData = {
         meshType: "gltf",
         meshLabel: "petRock_gltf",
         meshPath: "/3DAssets/pets/petRock/",
-        meshFile: "petRock2.gltf",
+        meshFile: "petRock.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     pig: {
@@ -1697,6 +1770,7 @@ const assetMeshes: MeshesData = {
         meshFile: "pig.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/pig.mp3",
       },
     },
     redFox1: {
@@ -1715,6 +1789,7 @@ const assetMeshes: MeshesData = {
         meshFile: "redFox1.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/redFox1.mp3",
       },
     },
     redFox2: {
@@ -1733,6 +1808,7 @@ const assetMeshes: MeshesData = {
         meshFile: "redFox2.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/redFox2.mp3",
       },
     },
     roboDog: {
@@ -1751,6 +1827,7 @@ const assetMeshes: MeshesData = {
         meshFile: "roboDog.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/roboDog.mp3",
       },
     },
     skeletonTRex: {
@@ -1769,6 +1846,7 @@ const assetMeshes: MeshesData = {
         meshFile: "skeletonTRex.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: undefined,
       },
     },
     snail: {
@@ -1787,6 +1865,7 @@ const assetMeshes: MeshesData = {
         meshFile: "snail.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/snail.mp3",
       },
     },
     spinosaurus: {
@@ -1805,6 +1884,7 @@ const assetMeshes: MeshesData = {
         meshFile: "spinosaurus.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/spinosaurus.mp3",
       },
     },
     TRex: {
@@ -1820,9 +1900,10 @@ const assetMeshes: MeshesData = {
         meshType: "gltf",
         meshLabel: "TRex_gltf",
         meshPath: "/3DAssets/pets/TRex/",
-        meshFile: "TRex2.gltf",
+        meshFile: "TRex.gltf",
         initScale: [1, 1, 1],
         initRotation: [0, 0, 0],
+        soundEffectPath: "/audioAssets/pets/TRex.mp3",
       },
     },
   },

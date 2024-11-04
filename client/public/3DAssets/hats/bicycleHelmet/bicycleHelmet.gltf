@@ -1,160 +1,150 @@
 {
-	"asset":{
-		"generator":"Khronos glTF Blender I/O v3.6.27",
-		"version":"2.0"
-	},
-	"scene":0,
-	"scenes":[
-		{
-			"name":"Scene",
-			"nodes":[
-				0
-			]
-		}
-	],
-	"nodes":[
-		{
-			"mesh":0,
-			"name":"bicycleHelmet"
-		}
-	],
-	"materials":[
-		{
-			"doubleSided":true,
-			"name":"blinn1SG.001",
-			"normalTexture":{
-				"index":0
-			},
-			"pbrMetallicRoughness":{
-				"baseColorTexture":{
-					"index":1
-				},
-				"metallicRoughnessTexture":{
-					"index":2
-				},
-				"roughnessFactor":0.32488566637039185
-			}
-		}
-	],
-	"meshes":[
-		{
-			"name":"Object_0.002",
-			"primitives":[
-				{
-					"attributes":{
-						"POSITION":0,
-						"NORMAL":1,
-						"TEXCOORD_0":2
-					},
-					"indices":3,
-					"material":0
-				}
-			]
-		}
-	],
-	"textures":[
-		{
-			"sampler":0,
-			"source":0
-		},
-		{
-			"sampler":0,
-			"source":1
-		},
-		{
-			"sampler":0,
-			"source":2
-		}
-	],
-	"images":[
-		{
-			"mimeType":"image/png",
-			"name":"blinn1SG_normal",
-			"uri":"texs2/blinn1SG_normal.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"blinn1SG_baseColor",
-			"uri":"texs2/blinn1SG_baseColor.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"blinn1SG_metallicRoughness",
-			"uri":"texs2/blinn1SG_metallicRoughness.png"
-		}
-	],
-	"accessors":[
-		{
-			"bufferView":0,
-			"componentType":5126,
-			"count":1174,
-			"max":[
-				0.702078104019165,
-				0.4397217631340027,
-				0.7971548438072205
-			],
-			"min":[
-				-0.702078640460968,
-				-1.4901862144470215,
-				-0.8295932412147522
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":1,
-			"componentType":5126,
-			"count":1174,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":2,
-			"componentType":5126,
-			"count":1174,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":3,
-			"componentType":5123,
-			"count":6192,
-			"type":"SCALAR"
-		}
-	],
-	"bufferViews":[
-		{
-			"buffer":0,
-			"byteLength":14088,
-			"byteOffset":0,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":14088,
-			"byteOffset":14088,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":9392,
-			"byteOffset":28176,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":12384,
-			"byteOffset":37568,
-			"target":34963
-		}
-	],
-	"samplers":[
-		{
-			"magFilter":9729,
-			"minFilter":9987
-		}
-	],
-	"buffers":[
-		{
-			"byteLength":49952,
-			"uri":"bicycleHelmet.bin"
-		}
-	]
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v3.6.27",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "bicycleHelmet"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "blinn1SG.001",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        },
+        "roughnessFactor": 0.32488566637039185
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Object_0.002",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/png",
+      "name": "blinn1SG_normal",
+      "uri": "texs/blinn1SG_normal.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "blinn1SG_baseColor",
+      "uri": "texs/blinn1SG_baseColor.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "blinn1SG_metallicRoughness",
+      "uri": "texs/blinn1SG_metallicRoughness.png"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 1174,
+      "max": [0.702078104019165, 0.4397217631340027, 0.7971548438072205],
+      "min": [-0.702078640460968, -1.4901862144470215, -0.8295932412147522],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 1174,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 1174,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 6192,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 14088,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 14088,
+      "byteOffset": 14088,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 9392,
+      "byteOffset": 28176,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 12384,
+      "byteOffset": 37568,
+      "target": 34963
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 49952,
+      "uri": "bicycleHelmet.bin"
+    }
+  ]
 }

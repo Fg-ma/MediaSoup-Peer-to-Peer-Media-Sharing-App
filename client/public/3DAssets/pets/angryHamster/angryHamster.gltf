@@ -32,7 +32,7 @@
 		},
 		{
 			"mesh":3,
-			"name":"brain"
+			"name":"brain.001"
 		},
 		{
 			"mesh":4,
@@ -443,117 +443,117 @@
 		{
 			"mimeType":"image/png",
 			"name":"Image",
-			"uri":"texs2/Image.png"
+			"uri":"texs/Image.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Base_normal",
-			"uri":"texs2/pasted__Base_normal.png"
+			"uri":"texs/pasted__Base_normal.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Base_diffuse",
-			"uri":"texs2/pasted__Base_diffuse.png"
+			"uri":"texs/pasted__Base_diffuse.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Base_specularGlossiness",
-			"uri":"texs2/pasted__Base_specularGlossiness.png"
+			"uri":"texs/pasted__Base_specularGlossiness.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"Image",
-			"uri":"texs2/Image-1.png"
+			"uri":"texs/Image-1.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"FrontColor_normal",
-			"uri":"texs2/FrontColor_normal.png"
+			"uri":"texs/FrontColor_normal.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"FrontColor_occlusion-FrontColor_specularGlossiness",
-			"uri":"texs2/FrontColor_occlusion-FrontColor_specularGlossiness.png"
+			"uri":"texs/FrontColor_occlusion-FrontColor_specularGlossiness.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"FrontColor_diffuse",
-			"uri":"texs2/FrontColor_diffuse.png"
+			"uri":"texs/FrontColor_diffuse.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"Image",
-			"uri":"texs2/Image-2.png"
+			"uri":"texs/Image-2.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"lambert2_normal",
-			"uri":"texs2/lambert2_normal.png"
+			"uri":"texs/lambert2_normal.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"lambert2_diffuse",
-			"uri":"texs2/lambert2_diffuse.png"
+			"uri":"texs/lambert2_diffuse.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"lambert2_specularGlossiness",
-			"uri":"texs2/lambert2_specularGlossiness.png"
+			"uri":"texs/lambert2_specularGlossiness.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"Image",
-			"uri":"texs2/Image-3.png"
+			"uri":"texs/Image-3.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Beefy_Deefy_normal",
-			"uri":"texs2/pasted__Beefy_Deefy_normal.png"
+			"uri":"texs/pasted__Beefy_Deefy_normal.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Beefy_Deefy_diffuse",
-			"uri":"texs2/pasted__Beefy_Deefy_diffuse.png"
+			"uri":"texs/pasted__Beefy_Deefy_diffuse.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Beefy_Deefy_specularGlossiness",
-			"uri":"texs2/pasted__Beefy_Deefy_specularGlossiness.png"
+			"uri":"texs/pasted__Beefy_Deefy_specularGlossiness.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"Image",
-			"uri":"texs2/Image-4.png"
+			"uri":"texs/Image-4.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Rim_normal",
-			"uri":"texs2/pasted__Rim_normal.png"
+			"uri":"texs/pasted__Rim_normal.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Rim_diffuse",
-			"uri":"texs2/pasted__Rim_diffuse.png"
+			"uri":"texs/pasted__Rim_diffuse.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__Rim_specularGlossiness",
-			"uri":"texs2/pasted__Rim_specularGlossiness.png"
+			"uri":"texs/pasted__Rim_specularGlossiness.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"Image",
-			"uri":"texs2/Image-5.png"
+			"uri":"texs/Image-5.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__GLASS_normal",
-			"uri":"texs2/pasted__GLASS_normal.png"
+			"uri":"texs/pasted__GLASS_normal.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pasted__GLASS_specularGlossiness",
-			"uri":"texs2/pasted__GLASS_specularGlossiness.png"
+			"uri":"texs/pasted__GLASS_specularGlossiness.png"
 		}
 	],
 	"accessors":[

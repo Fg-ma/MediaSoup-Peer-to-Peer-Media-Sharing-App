@@ -1,289 +1,268 @@
 {
-	"asset":{
-		"generator":"Khronos glTF Blender I/O v3.6.27",
-		"version":"2.0"
-	},
-	"scene":0,
-	"scenes":[
-		{
-			"name":"Scene",
-			"nodes":[
-				2
-			]
-		}
-	],
-	"nodes":[
-		{
-			"mesh":0,
-			"name":"googles"
-		},
-		{
-			"mesh":1,
-			"name":"helmet"
-		},
-		{
-			"children":[
-				0,
-				1
-			],
-			"name":"aviatorHelmet"
-		}
-	],
-	"materials":[
-		{
-			"doubleSided":true,
-			"emissiveTexture":{
-				"index":0
-			},
-			"name":"goggles",
-			"normalTexture":{
-				"index":1
-			},
-			"pbrMetallicRoughness":{
-				"baseColorTexture":{
-					"index":2
-				},
-				"metallicRoughnessTexture":{
-					"index":3
-				},
-				"roughnessFactor":0.20000000298023224
-			}
-		},
-		{
-			"doubleSided":true,
-			"emissiveTexture":{
-				"index":4
-			},
-			"name":"aviator_hlemet.001",
-			"normalTexture":{
-				"index":5
-			},
-			"pbrMetallicRoughness":{
-				"baseColorTexture":{
-					"index":6
-				},
-				"metallicFactor":0.20999999344348907,
-				"roughnessFactor":0.47999998927116394
-			}
-		}
-	],
-	"meshes":[
-		{
-			"name":"Object_1.001",
-			"primitives":[
-				{
-					"attributes":{
-						"POSITION":0,
-						"NORMAL":1,
-						"TEXCOORD_0":2
-					},
-					"indices":3,
-					"material":0
-				}
-			]
-		},
-		{
-			"name":"Object_0.001",
-			"primitives":[
-				{
-					"attributes":{
-						"POSITION":4,
-						"NORMAL":5,
-						"TEXCOORD_0":6
-					},
-					"indices":7,
-					"material":1
-				}
-			]
-		}
-	],
-	"textures":[
-		{
-			"sampler":0,
-			"source":0
-		},
-		{
-			"sampler":0,
-			"source":1
-		},
-		{
-			"sampler":0,
-			"source":0
-		},
-		{
-			"sampler":0,
-			"source":2
-		},
-		{
-			"sampler":0,
-			"source":3
-		},
-		{
-			"sampler":0,
-			"source":4
-		},
-		{
-			"sampler":0,
-			"source":3
-		}
-	],
-	"images":[
-		{
-			"mimeType":"image/png",
-			"name":"goggles_baseColor",
-			"uri":"texs2/goggles_baseColor.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"goggles_normal",
-			"uri":"texs2/goggles_normal.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"goggles_metallicRoughness",
-			"uri":"texs2/goggles_metallicRoughness.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"aviator_hlemet_baseColor",
-			"uri":"texs2/aviator_hlemet_baseColor.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"aviator_hlemet_normal",
-			"uri":"texs2/aviator_hlemet_normal.png"
-		}
-	],
-	"accessors":[
-		{
-			"bufferView":0,
-			"componentType":5126,
-			"count":2131,
-			"max":[
-				0.9729176163673401,
-				-0.0008201618911698461,
-				1.011618971824646
-			],
-			"min":[
-				-0.9800004363059998,
-				-0.6286666393280029,
-				-1.2318284511566162
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":1,
-			"componentType":5126,
-			"count":2131,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":2,
-			"componentType":5126,
-			"count":2131,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":3,
-			"componentType":5123,
-			"count":7608,
-			"type":"SCALAR"
-		},
-		{
-			"bufferView":4,
-			"componentType":5126,
-			"count":6341,
-			"max":[
-				0.9747769236564636,
-				1.1677674055099487,
-				1.093042016029358
-			],
-			"min":[
-				-0.9790645837783813,
-				-3.2875845432281494,
-				-1.1951985359191895
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":5,
-			"componentType":5126,
-			"count":6341,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":6,
-			"componentType":5126,
-			"count":6341,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":7,
-			"componentType":5123,
-			"count":18630,
-			"type":"SCALAR"
-		}
-	],
-	"bufferViews":[
-		{
-			"buffer":0,
-			"byteLength":25572,
-			"byteOffset":0,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":25572,
-			"byteOffset":25572,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":17048,
-			"byteOffset":51144,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":15216,
-			"byteOffset":68192,
-			"target":34963
-		},
-		{
-			"buffer":0,
-			"byteLength":76092,
-			"byteOffset":83408,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":76092,
-			"byteOffset":159500,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":50728,
-			"byteOffset":235592,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":37260,
-			"byteOffset":286320,
-			"target":34963
-		}
-	],
-	"samplers":[
-		{
-			"magFilter":9729,
-			"minFilter":9987
-		}
-	],
-	"buffers":[
-		{
-			"byteLength":323580,
-			"uri":"aviatorHelmet.bin"
-		}
-	]
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v3.6.27",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [2]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "googles"
+    },
+    {
+      "mesh": 1,
+      "name": "helmet"
+    },
+    {
+      "children": [0, 1],
+      "name": "aviatorHelmet"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "emissiveTexture": {
+        "index": 0
+      },
+      "name": "goggles",
+      "normalTexture": {
+        "index": 1
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 2
+        },
+        "metallicRoughnessTexture": {
+          "index": 3
+        },
+        "roughnessFactor": 0.20000000298023224
+      }
+    },
+    {
+      "doubleSided": true,
+      "emissiveTexture": {
+        "index": 4
+      },
+      "name": "aviator_hlemet.001",
+      "normalTexture": {
+        "index": 5
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 6
+        },
+        "metallicFactor": 0.20999999344348907,
+        "roughnessFactor": 0.47999998927116394
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Object_1.001",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "Object_0.001",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 1
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    },
+    {
+      "sampler": 0,
+      "source": 4
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/png",
+      "name": "goggles_baseColor",
+      "uri": "texs/goggles_baseColor.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "goggles_normal",
+      "uri": "texs/goggles_normal.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "goggles_metallicRoughness",
+      "uri": "texs/goggles_metallicRoughness.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "aviator_hlemet_baseColor",
+      "uri": "texs/aviator_hlemet_baseColor.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "aviator_hlemet_normal",
+      "uri": "texs/aviator_hlemet_normal.png"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 2131,
+      "max": [0.9729176163673401, -0.0008201618911698461, 1.011618971824646],
+      "min": [-0.9800004363059998, -0.6286666393280029, -1.2318284511566162],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 2131,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 2131,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 7608,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 6341,
+      "max": [0.9747769236564636, 1.1677674055099487, 1.093042016029358],
+      "min": [-0.9790645837783813, -3.2875845432281494, -1.1951985359191895],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 6341,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 6341,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 7,
+      "componentType": 5123,
+      "count": 18630,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 25572,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 25572,
+      "byteOffset": 25572,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 17048,
+      "byteOffset": 51144,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 15216,
+      "byteOffset": 68192,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 76092,
+      "byteOffset": 83408,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 76092,
+      "byteOffset": 159500,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 50728,
+      "byteOffset": 235592,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 37260,
+      "byteOffset": 286320,
+      "target": 34963
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 323580,
+      "uri": "aviatorHelmet.bin"
+    }
+  ]
 }

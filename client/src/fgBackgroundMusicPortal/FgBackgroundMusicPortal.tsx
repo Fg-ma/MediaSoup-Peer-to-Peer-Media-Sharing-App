@@ -7,6 +7,7 @@ import { BackgroundMusicTypes } from "../context/currentEffectsStylesContext/typ
 import FgImage from "../fgImage/FgImage";
 import FgSVG from "../fgSVG/FgSVG";
 
+import additionIcon from "../../public/svgs/additionIcon.svg";
 import adventureTimeIcon from "../../public/svgs/audioEffects/adventureTimeIcon.svg";
 import cacophonyIcon from "../../public/svgs/audioEffects/cacophonyIcon.svg";
 import drumBeatIcon from "../../public/svgs/audioEffects/drumBeatIcon.svg";
@@ -57,11 +58,6 @@ export default function FgBackgroundMusicPortal({
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
   const { userMedia } = useStreamsContext();
-
-  const effectsStyles = isUser
-    ? currentEffectsStyles.current.audio.backgroundMusic
-    : remoteCurrentEffectsStyles.current[username][instance].audio
-        .backgroundMusic;
 
   const [backgroundMusic, setBackgroundMusic] = useState<{
     [backgroundMusicType in BackgroundMusicTypes]: {
@@ -153,14 +149,12 @@ export default function FgBackgroundMusicPortal({
       path: "/backgroundMusic/wacky.mp3",
     },
   });
-  const [importedFiles, setImportedFiles] = useState<{
-    [backgroundMusicTypes in BackgroundMusicTypes]?: {
-      file: File;
-      path: string;
-    };
-  }>({});
+  const [importedFiles, setImportedFiles] = useState<
+    Record<number, { file: File; playing: boolean }>
+  >({});
   const [cols, setCols] = useState(3);
   const backgroundMusicContainerRef = useRef<HTMLDivElement>(null);
+  const fileSelectorRef = useRef<HTMLInputElement>(null);
 
   const gridColumnsChange = () => {
     if (!backgroundMusicContainerRef.current) return;
@@ -181,10 +175,6 @@ export default function FgBackgroundMusicPortal({
     backgroundMusicType: BackgroundMusicTypes,
     path: string
   ): Promise<boolean> => {
-    const url = importedFiles[backgroundMusicType]
-      ? importedFiles[backgroundMusicType].path
-      : path;
-
     // Start playback with Tone.js and load the sound if it hasn't been loaded
     if (
       !userMedia.current.audio?.audioEffects.fgBackgroundMusic.players[
@@ -193,16 +183,7 @@ export default function FgBackgroundMusicPortal({
     ) {
       await userMedia.current.audio?.audioEffects.fgBackgroundMusic.loadBackgroundMusic(
         backgroundMusicType,
-        url
-      );
-    } else if (
-      userMedia.current.audio?.audioEffects.fgBackgroundMusic.players[
-        backgroundMusicType
-      ].url !== url
-    ) {
-      userMedia.current.audio?.audioEffects.fgBackgroundMusic.swapPlayer(
-        backgroundMusicType,
-        url
+        path
       );
     }
 
@@ -214,9 +195,7 @@ export default function FgBackgroundMusicPortal({
     );
   };
 
-  const toggleAudio = async (
-    backgroundMusicType: BackgroundMusicTypes
-  ): Promise<boolean> => {
+  const toggleAudio = async (backgroundMusicType: BackgroundMusicTypes) => {
     let succeeded = false;
 
     const { playing, path } = backgroundMusic[backgroundMusicType];
@@ -255,8 +234,96 @@ export default function FgBackgroundMusicPortal({
         }
       });
     }
+  };
 
-    return succeeded;
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      setImportedFiles((prevFiles) => {
+        const nextIndex = Object.keys(prevFiles).length + 1;
+        const newFiles: Record<number, { file: File; playing: boolean }> = {};
+
+        // Convert FileList to an object, incrementing the index for each new file
+        Array.from(files).forEach((file, index) => {
+          newFiles[nextIndex + index] = { file, playing: false };
+        });
+
+        // Append new files to the existing importedFiles state
+        return {
+          ...prevFiles,
+          ...newFiles,
+        };
+      });
+    }
+  };
+
+  const handleImportEffectClickDown = () => {
+    fileSelectorRef.current?.click();
+  };
+
+  const playImportedAudio = async (
+    key: number,
+    file: File
+  ): Promise<boolean> => {
+    // Start playback with Tone.js and load the sound if it hasn't been loaded
+    if (
+      !userMedia.current.audio?.audioEffects.fgBackgroundMusic.importedPlayers[
+        key
+      ]
+    ) {
+      await userMedia.current.audio?.audioEffects.fgBackgroundMusic.loadImportedBackgroundMusic(
+        key,
+        file
+      );
+    }
+
+    return (
+      userMedia.current.audio?.audioEffects.fgBackgroundMusic.toggleImportedAudio(
+        key,
+        false
+      ) ?? false
+    );
+  };
+
+  const toggleImportedAudio = async (key: number) => {
+    let succeeded = false;
+
+    const { file, playing } = importedFiles[key];
+    if (playing) {
+      // Stop playback
+      succeeded =
+        userMedia.current.audio?.audioEffects.fgBackgroundMusic.toggleImportedAudio(
+          key,
+          true
+        ) ?? false;
+    } else {
+      succeeded = await playImportedAudio(key, file);
+    }
+
+    if (succeeded) {
+      setImportedFiles((prevFiles) => {
+        const importedFile = prevFiles[key];
+        const { playing } = importedFile;
+
+        if (playing) {
+          return {
+            ...prevFiles,
+            [key]: {
+              ...importedFile,
+              playing: false,
+            },
+          };
+        } else {
+          return {
+            ...prevFiles,
+            [key]: {
+              ...importedFile,
+              playing: true,
+            },
+          };
+        }
+      });
+    }
   };
 
   return (
@@ -266,6 +333,13 @@ export default function FgBackgroundMusicPortal({
           ref={backgroundMusicContainerRef}
           className='small-vertical-scroll-bar overflow-y-auto overflow-x-hidden w-full h-full'
         >
+          <input
+            ref={fileSelectorRef}
+            className='hidden'
+            type='file'
+            onChange={handleFileInput}
+            multiple
+          />
           <div
             className={`py-2 w-full h-full min-h-max min-w-max grid gap-3 items-center justify-center justify-items-center place-items-center ${
               cols === 3
@@ -277,6 +351,58 @@ export default function FgBackgroundMusicPortal({
                 : "grid-cols-6"
             }`}
           >
+            <FgButton
+              contentFunction={() => (
+                <div className='bg-white flex items-center justify-center w-14 min-w-14 aspect-square rounded border-2 border-fg-black-35 border-opacity-75 hover:border-3 hover:border-fg-secondary hover:border-opacity-100'>
+                  <FgSVG
+                    src={additionIcon}
+                    attributes={[
+                      { key: "width", value: "100%" },
+                      { key: "height", value: "100%" },
+                      { key: "fill", value: "black" },
+                      { key: "stroke", value: "black" },
+                    ]}
+                  />
+                </div>
+              )}
+              mouseDownFunction={handleImportEffectClickDown}
+              touchStartFunction={handleImportEffectClickDown}
+              hoverContent={
+                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                  Import background music
+                </div>
+              }
+            />
+            {Object.entries(importedFiles).map(
+              ([key, file]) =>
+                file && (
+                  <FgButton
+                    key={key}
+                    clickFunction={() => toggleImportedAudio(parseInt(key))}
+                    contentFunction={() => (
+                      <div
+                        className={`${
+                          file.playing
+                            ? "border-3 border-fg-secondary border-opacity-100"
+                            : "border-2 border-fg-black-35 border-opacity-75"
+                        } font-K2D text-3xl bg-white flex items-center justify-center w-14 min-w-14 aspect-square rounded hover:border-3 hover:border-fg-secondary hover:border-opacity-100`}
+                      >
+                        {key}
+                      </div>
+                    )}
+                    hoverContent={
+                      <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
+                        {file.file.name}
+                      </div>
+                    }
+                    scrollingContainerRef={backgroundMusicContainerRef}
+                    options={{
+                      hoverZValue: 999999999999999,
+                      hoverTimeoutDuration: 750,
+                    }}
+                  />
+                )
+            )}
             {Object.entries(backgroundMusic).map(([key, effect]) => (
               <FgButton
                 key={key}
@@ -284,20 +410,14 @@ export default function FgBackgroundMusicPortal({
                 contentFunction={() => (
                   <div
                     className={`${
-                      key === effectsStyles.style
-                        ? "border-fg-secondary border-3 border-opacity-100"
-                        : ""
-                    } ${
-                      effect.bgColor === "white"
-                        ? "bg-white border-fg-black-35"
-                        : ""
-                    } ${
-                      effect.bgColor === "black"
-                        ? "bg-black bg-opacity-85 border-white"
-                        : ""
-                    } ${
-                      effect.playing ? "border-fg-secondary border-3" : ""
-                    } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                      effect.playing
+                        ? "border-3 border-fg-secondary bg-opacity-100"
+                        : effect.bgColor === "white"
+                        ? "border-2 border-fg-black-35 border-opacity-75"
+                        : "border-2 border-white border-opacity-75"
+                    } ${effect.bgColor === "white" ? "bg-white" : ""} ${
+                      effect.bgColor === "black" ? "bg-black" : ""
+                    } flex items-center justify-center w-14 min-w-14 aspect-square rounded hover:border-3 hover:border-fg-secondary hover:bg-opacity-100`}
                     data-background-music-effects-button-value={key}
                   >
                     {effect.image ? (

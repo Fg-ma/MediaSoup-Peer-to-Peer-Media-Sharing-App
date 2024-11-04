@@ -196,7 +196,6 @@ export type HatsEffectTypes =
   | "hopliteHelmet"
   | "militaryHat"
   | "rabbitEars"
-  | "roundEarsHat"
   | "santaHat"
   | "seamanHat"
   | "stylishHat"
@@ -237,9 +236,7 @@ export interface ScreenEffectStylesType {
   };
 }
 
-export interface AudioEffectStylesType {
-  backgroundMusic: { style: BackgroundMusicTypes };
-}
+export interface AudioEffectStylesType {}
 
 export type BackgroundMusicTypes =
   | "adventureTime"
@@ -644,12 +641,6 @@ export const assetSizePositionMap: {
       twoDimScale: 1,
       threeDimScale: 5.75,
     },
-    roundEarsHat: {
-      twoDimOffset: 0.0,
-      threeDimOffset: 0.0,
-      twoDimScale: 1,
-      threeDimScale: 6,
-    },
     santaHat: {
       twoDimOffset: 0.0,
       threeDimOffset: 0.0,
@@ -916,6 +907,4 @@ export const defaultScreenCurrentEffectsStyles: ScreenEffectStylesType =
   });
 
 export const defaultAudioCurrentEffectsStyles: AudioEffectStylesType =
-  Object.freeze({
-    backgroundMusic: Object.freeze({ style: defaultBackgroundMusic }),
-  });
+  Object.freeze({});

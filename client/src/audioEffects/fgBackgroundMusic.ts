@@ -9,6 +9,10 @@ class FgBackgroundMusic {
       url: string;
     };
   } = {};
+  importedPlayers: Record<
+    number,
+    { player: Tone.Player; file: File; path: string }
+  > = {};
 
   constructor(
     private backgroundMusicMediaStreamDestination: MediaStreamAudioDestinationNode,
@@ -47,35 +51,6 @@ class FgBackgroundMusic {
     });
   };
 
-  // Swap the sound effect URL for a given key
-  swapPlayer = (backgroundMusicType: BackgroundMusicTypes, url: string) => {
-    const existingPlayerData = this.players[backgroundMusicType];
-
-    if (existingPlayerData) {
-      // Stop the existing player if it’s playing
-      existingPlayerData.player.stop();
-
-      // Disconnect and dispose of the existing player
-      existingPlayerData.player.disconnect();
-      existingPlayerData.player.dispose();
-
-      delete this.players[backgroundMusicType];
-    }
-
-    // Create a new player with the updated URL
-    const newPlayer = new Tone.Player(url).toDestination();
-    newPlayer.loop = true;
-    newPlayer.connect(this.volumeNode);
-
-    // Update the player entry with the new player and URL
-    this.players[backgroundMusicType] = { player: newPlayer, url };
-  };
-
-  // Set volume (in decibels)
-  setVolume = (volume: number) => {
-    this.volumeNode.volume.value = volume;
-  };
-
   // Play or stop a sound effect based on the current state
   toggleAudio = (
     backgroundMusicType: BackgroundMusicTypes,
@@ -99,6 +74,52 @@ class FgBackgroundMusic {
     }
 
     return true;
+  };
+
+  // Initialize a sound effect player for each sound effect
+  loadImportedBackgroundMusic = (key: number, file: File): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      try {
+        const url = URL.createObjectURL(file);
+
+        const player = new Tone.Player(url, () => {
+          resolve(); // Resolve the promise once the sound is loaded
+        }).toDestination();
+
+        player.connect(this.volumeNode);
+        player.loop = true;
+        this.importedPlayers[key] = { player, file, path: url };
+      } catch (error) {
+        console.error(`Failed to load sound effect ${key}:`, error);
+        reject(error); // Reject the promise if there's an error
+      }
+    });
+  };
+
+  toggleImportedAudio = (key: number, playing: boolean): boolean => {
+    if (!this.importedPlayers[key].player) return false;
+
+    if (!this.importedPlayers[key].player.loaded) {
+      console.warn(`Sound effect ${key} is not loaded yet.`);
+      return false; // Exit if not loaded
+    }
+
+    if (playing) {
+      if (this.importedPlayers[key].player.state === "started") {
+        this.importedPlayers[key].player.stop();
+      }
+    } else {
+      if (this.importedPlayers[key].player.state !== "started") {
+        this.importedPlayers[key].player.start();
+      }
+    }
+
+    return true;
+  };
+
+  // Set volume (in decibels)
+  setVolume = (volume: number) => {
+    this.volumeNode.volume.value = volume;
   };
 }
 

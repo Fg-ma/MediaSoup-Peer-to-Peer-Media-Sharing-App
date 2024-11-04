@@ -1,194 +1,182 @@
 {
-	"asset":{
-		"generator":"Khronos glTF Blender I/O v3.6.27",
-		"version":"2.0"
-	},
-	"extensionsUsed":[
-		"KHR_materials_specular"
-	],
-	"scene":0,
-	"scenes":[
-		{
-			"name":"Scene",
-			"nodes":[
-				0
-			]
-		}
-	],
-	"nodes":[
-		{
-			"mesh":0,
-			"name":"HopliteHelmet"
-		}
-	],
-	"materials":[
-		{
-			"extensions":{
-				"KHR_materials_specular":{
-					"specularColorTexture":{
-						"index":0
-					}
-				}
-			},
-			"name":"HopliteHelmet.001",
-			"normalTexture":{
-				"index":1,
-				"texCoord":1
-			},
-			"occlusionTexture":{
-				"index":2
-			},
-			"pbrMetallicRoughness":{
-				"baseColorTexture":{
-					"index":3
-				},
-				"metallicRoughnessTexture":{
-					"index":2
-				}
-			}
-		}
-	],
-	"meshes":[
-		{
-			"name":"HopliteHelmet_LOD0_HopliteHelmet_0.001",
-			"primitives":[
-				{
-					"attributes":{
-						"POSITION":0,
-						"NORMAL":1,
-						"TEXCOORD_0":2,
-						"TEXCOORD_1":3
-					},
-					"indices":4,
-					"material":0
-				}
-			]
-		}
-	],
-	"textures":[
-		{
-			"sampler":0,
-			"source":0
-		},
-		{
-			"sampler":0,
-			"source":1
-		},
-		{
-			"sampler":0,
-			"source":2
-		},
-		{
-			"sampler":0,
-			"source":3
-		}
-	],
-	"images":[
-		{
-			"mimeType":"image/png",
-			"name":"Image",
-			"uri":"texs2/Image.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"HopliteHelmet_normal",
-			"uri":"texs2/HopliteHelmet_normal.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"HopliteHelmet_metallicRoughness",
-			"uri":"texs2/HopliteHelmet_metallicRoughness.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"HopliteHelmet_baseColor",
-			"uri":"texs2/HopliteHelmet_baseColor.png"
-		}
-	],
-	"accessors":[
-		{
-			"bufferView":0,
-			"componentType":5126,
-			"count":1937,
-			"max":[
-				0.9015988111495972,
-				1.5041382312774658,
-				0.44454944133758545
-			],
-			"min":[
-				-0.9015988111495972,
-				-0.33454516530036926,
-				-0.35571593046188354
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":1,
-			"componentType":5126,
-			"count":1937,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":2,
-			"componentType":5126,
-			"count":1937,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":3,
-			"componentType":5126,
-			"count":1937,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":4,
-			"componentType":5123,
-			"count":8574,
-			"type":"SCALAR"
-		}
-	],
-	"bufferViews":[
-		{
-			"buffer":0,
-			"byteLength":23244,
-			"byteOffset":0,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":23244,
-			"byteOffset":23244,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":15496,
-			"byteOffset":46488,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":15496,
-			"byteOffset":61984,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":17148,
-			"byteOffset":77480,
-			"target":34963
-		}
-	],
-	"samplers":[
-		{
-			"magFilter":9729,
-			"minFilter":9987
-		}
-	],
-	"buffers":[
-		{
-			"byteLength":94628,
-			"uri":"hopliteHelmet.bin"
-		}
-	]
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v3.6.27",
+    "version": "2.0"
+  },
+  "extensionsUsed": ["KHR_materials_specular"],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "HopliteHelmet"
+    }
+  ],
+  "materials": [
+    {
+      "extensions": {
+        "KHR_materials_specular": {
+          "specularColorTexture": {
+            "index": 0
+          }
+        }
+      },
+      "name": "HopliteHelmet.001",
+      "normalTexture": {
+        "index": 1,
+        "texCoord": 1
+      },
+      "occlusionTexture": {
+        "index": 2
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 3
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "HopliteHelmet_LOD0_HopliteHelmet_0.001",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "TEXCOORD_1": 3
+          },
+          "indices": 4,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/png",
+      "name": "Image",
+      "uri": "texs/Image.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "HopliteHelmet_normal",
+      "uri": "texs/HopliteHelmet_normal.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "HopliteHelmet_metallicRoughness",
+      "uri": "texs/HopliteHelmet_metallicRoughness.png"
+    },
+    {
+      "mimeType": "image/png",
+      "name": "HopliteHelmet_baseColor",
+      "uri": "texs/HopliteHelmet_baseColor.png"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 1937,
+      "max": [0.9015988111495972, 1.5041382312774658, 0.44454944133758545],
+      "min": [-0.9015988111495972, -0.33454516530036926, -0.35571593046188354],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 1937,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 1937,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 1937,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5123,
+      "count": 8574,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 23244,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 23244,
+      "byteOffset": 23244,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 15496,
+      "byteOffset": 46488,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 15496,
+      "byteOffset": 61984,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 17148,
+      "byteOffset": 77480,
+      "target": 34963
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 94628,
+      "uri": "hopliteHelmet.bin"
+    }
+  ]
 }

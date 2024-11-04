@@ -44,6 +44,7 @@ export type meshData = {
     meshFile: string;
     initScale: [number, number, number];
     initRotation: [number, number, number];
+    soundEffectPath: string | undefined;
   };
 };
 

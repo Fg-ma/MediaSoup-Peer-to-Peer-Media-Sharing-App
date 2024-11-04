@@ -97,12 +97,6 @@ import rabbitEars_off_512x512 from "../../../public/2DAssets/hats/rabbitEars/rab
 import rabbitEars_off_32x32 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_off_32x32.png";
 import rabbitEars_threeDim_512x512 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_threeDim_512x512.png";
 import rabbitEars_threeDim_32x32 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_threeDim_32x32.png";
-import roundEarsHat_512x512 from "../../../public/2DAssets/hats/roundEarsHat/roundEarsHat_512x512.png";
-import roundEarsHat_32x32 from "../../../public/2DAssets/hats/roundEarsHat/roundEarsHat_32x32.png";
-import roundEarsHat_off_512x512 from "../../../public/2DAssets/hats/roundEarsHat/roundEarsHat_off_512x512.png";
-import roundEarsHat_off_32x32 from "../../../public/2DAssets/hats/roundEarsHat/roundEarsHat_off_32x32.png";
-import roundEarsHat_threeDim_512x512 from "../../../public/2DAssets/hats/roundEarsHat/roundEarsHat_threeDim_512x512.png";
-import roundEarsHat_threeDim_32x32 from "../../../public/2DAssets/hats/roundEarsHat/roundEarsHat_threeDim_32x32.png";
 import santaHat_512x512 from "../../../public/2DAssets/hats/santaHat/santaHat_512x512.png";
 import santaHat_32x32 from "../../../public/2DAssets/hats/santaHat/santaHat_32x32.png";
 import santaHat_off_512x512 from "../../../public/2DAssets/hats/santaHat/santaHat_off_512x512.png";
@@ -157,7 +151,6 @@ const hatsLabels: {
   hopliteHelmet: "Hoplite helmet",
   militaryHat: "Military",
   rabbitEars: "Rabbit ears",
-  roundEarsHat: "Round ears",
   santaHat: "Santa",
   seamanHat: "Seaman",
   stylishHat: "Stylish",
@@ -385,18 +378,6 @@ export default function HatsButton({
       imageThreeDimSmall: rabbitEars_threeDim_32x32,
       imageThreeDimOff: rabbitEars_512x512,
       imageThreeDimOffSmall: rabbitEars_32x32,
-      flipped: false,
-      bgColor: "white",
-    },
-    roundEarsHat: {
-      image: roundEarsHat_512x512,
-      imageSmall: roundEarsHat_32x32,
-      imageOff: roundEarsHat_off_512x512,
-      imageOffSmall: roundEarsHat_off_32x32,
-      imageThreeDim: roundEarsHat_threeDim_512x512,
-      imageThreeDimSmall: roundEarsHat_threeDim_32x32,
-      imageThreeDimOff: roundEarsHat_512x512,
-      imageThreeDimOffSmall: roundEarsHat_32x32,
       flipped: false,
       bgColor: "white",
     },
