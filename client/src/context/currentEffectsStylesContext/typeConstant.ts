@@ -199,7 +199,6 @@ export type HatsEffectTypes =
   | "santaHat"
   | "seamanHat"
   | "stylishHat"
-  | "superMarioOdysseyHat"
   | "ushankaHat"
   | "vikingHelmet";
 export type PetsEffectTypes =
@@ -658,12 +657,6 @@ export const assetSizePositionMap: {
       threeDimOffset: 0.0,
       twoDimScale: 1,
       threeDimScale: 6,
-    },
-    superMarioOdysseyHat: {
-      twoDimOffset: 0.0,
-      threeDimOffset: 0.0,
-      twoDimScale: 1,
-      threeDimScale: 7.5,
     },
     ushankaHat: {
       twoDimOffset: 0.0,

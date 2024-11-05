@@ -115,12 +115,6 @@ import stylishHat_off_512x512 from "../../../public/2DAssets/hats/stylishHat/sty
 import stylishHat_off_32x32 from "../../../public/2DAssets/hats/stylishHat/stylishHat_off_32x32.png";
 import stylishHat_threeDim_512x512 from "../../../public/2DAssets/hats/stylishHat/stylishHat_threeDim_512x512.png";
 import stylishHat_threeDim_32x32 from "../../../public/2DAssets/hats/stylishHat/stylishHat_threeDim_32x32.png";
-import superMarioOdysseyHat_512x512 from "../../../public/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat_512x512.png";
-import superMarioOdysseyHat_32x32 from "../../../public/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat_32x32.png";
-import superMarioOdysseyHat_off_512x512 from "../../../public/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat_off_512x512.png";
-import superMarioOdysseyHat_off_32x32 from "../../../public/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat_off_32x32.png";
-import superMarioOdysseyHat_threeDim_512x512 from "../../../public/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat_threeDim_512x512.png";
-import superMarioOdysseyHat_threeDim_32x32 from "../../../public/2DAssets/hats/superMarioOdysseyHat/superMarioOdysseyHat_threeDim_32x32.png";
 import ushankaHat_512x512 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_512x512.png";
 import ushankaHat_32x32 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_32x32.png";
 import ushankaHat_off_512x512 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_off_512x512.png";
@@ -154,7 +148,6 @@ const hatsLabels: {
   santaHat: "Santa",
   seamanHat: "Seaman",
   stylishHat: "Stylish",
-  superMarioOdysseyHat: "Mario",
   ushankaHat: "Ushanka",
   vikingHelmet: "Viking Helmet",
 };
@@ -414,18 +407,6 @@ export default function HatsButton({
       imageThreeDimSmall: stylishHat_threeDim_32x32,
       imageThreeDimOff: stylishHat_512x512,
       imageThreeDimOffSmall: stylishHat_32x32,
-      flipped: false,
-      bgColor: "white",
-    },
-    superMarioOdysseyHat: {
-      image: superMarioOdysseyHat_512x512,
-      imageSmall: superMarioOdysseyHat_32x32,
-      imageOff: superMarioOdysseyHat_off_512x512,
-      imageOffSmall: superMarioOdysseyHat_off_32x32,
-      imageThreeDim: superMarioOdysseyHat_threeDim_512x512,
-      imageThreeDimSmall: superMarioOdysseyHat_threeDim_32x32,
-      imageThreeDimOff: superMarioOdysseyHat_512x512,
-      imageThreeDimOffSmall: superMarioOdysseyHat_32x32,
       flipped: false,
       bgColor: "white",
     },
