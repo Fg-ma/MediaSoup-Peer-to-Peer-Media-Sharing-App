@@ -17,6 +17,8 @@ import BabylonScene, {
 import assetMeshes from "../babylon/meshes";
 import FaceLandmarks from "../babylon/FaceLandmarks";
 import Deadbanding from "../babylon/Deadbanding";
+import ScreenMedia from "./ScreenMedia";
+import AudioMedia from "./AudioMedia";
 
 class CameraMedia {
   canvas: HTMLCanvasElement;
@@ -57,7 +59,16 @@ class CameraMedia {
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
     private userDevice: UserDevice,
-    private deadbanding: Deadbanding
+    private deadbanding: Deadbanding,
+    private userMedia: React.MutableRefObject<{
+      camera: {
+        [cameraId: string]: CameraMedia;
+      };
+      screen: {
+        [screenId: string]: ScreenMedia;
+      };
+      audio: AudioMedia | undefined;
+    }>
   ) {
     this.effects = {};
 
@@ -173,7 +184,8 @@ class CameraMedia {
       this.selfieSegmentationResults,
       this.selfieSegmentationProcessing,
       this.userDevice,
-      this.maxFaces
+      this.maxFaces,
+      this.userMedia
     );
 
     this.video.srcObject = this.initCameraStream;
@@ -244,6 +256,7 @@ class CameraMedia {
               i,
               effect as EffectType,
               "faceTrack",
+              meshData.soundEffectPath,
               [
                 0,
                 0,
@@ -375,6 +388,7 @@ class CameraMedia {
           meshData2D.meshFile,
           effect,
           "faceTrack",
+          undefined,
           [0, 0, this.babylonScene.twoDimMeshesZCoord],
           meshData2D.initScale,
           meshData2D.initRotation
@@ -391,6 +405,7 @@ class CameraMedia {
           meshData3D.meshFile,
           effect,
           "faceTrack",
+          meshData3D.soundEffectPath,
           [0, 0, this.babylonScene.threeDimMeshesZCoord],
           meshData3D.initScale,
           meshData3D.initRotation

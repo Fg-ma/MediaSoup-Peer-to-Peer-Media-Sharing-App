@@ -19,7 +19,7 @@ class FaceDetectionWebWorker {
       faceLandmarksDetection.SupportedPackages.mediapipeFaceDetector,
       {
         maxFaces: this.maxFaces,
-        minDetectionConfidence: 0.5,
+        minDetectionConfidence: 0.9,
       }
     );
   };

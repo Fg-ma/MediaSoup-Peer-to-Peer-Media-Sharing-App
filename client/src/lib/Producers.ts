@@ -93,7 +93,8 @@ class Producers {
       this.currentEffectsStyles,
       this.userStreamEffects,
       this.userDevice,
-      this.deadbanding
+      this.deadbanding,
+      this.userMedia
     );
 
     this.userMedia.current.camera[cameraId] = newCameraMedia;
@@ -124,7 +125,8 @@ class Producers {
       screenBrowserMedia,
       this.currentEffectsStyles,
       this.userStreamEffects,
-      this.userDevice
+      this.userDevice,
+      this.userMedia
     );
 
     this.userMedia.current.screen[screenId] = newScreenMedia;

@@ -302,7 +302,7 @@ export default function Main() {
       remoteStreamEffects.current[username][instance] = {
         camera: {},
         screen: {},
-        audio: defaultAudioStreamEffects,
+        audio: structuredClone(defaultAudioStreamEffects),
       };
     }
 
@@ -323,14 +323,14 @@ export default function Main() {
       }
 
       remoteStreamEffects.current[username][instance].camera[cameraId] =
-        defaultCameraStreamEffects;
+        structuredClone(defaultCameraStreamEffects);
 
       if (
         !remoteCurrentEffectsStyles.current[username][instance].camera[cameraId]
       ) {
         remoteCurrentEffectsStyles.current[username][instance].camera[
           cameraId
-        ] = defaultCameraCurrentEffectsStyles;
+        ] = structuredClone(defaultCameraCurrentEffectsStyles);
       }
     }
 
@@ -340,14 +340,14 @@ export default function Main() {
       }
 
       remoteStreamEffects.current[username][instance].screen[screenId] =
-        defaultScreenStreamEffects;
+        structuredClone(defaultScreenStreamEffects);
 
       if (
         !remoteCurrentEffectsStyles.current[username][instance].screen[screenId]
       ) {
         remoteCurrentEffectsStyles.current[username][instance].screen[
           screenId
-        ] = defaultScreenCurrentEffectsStyles;
+        ] = structuredClone(defaultScreenCurrentEffectsStyles);
       }
     }
   };

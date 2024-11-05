@@ -469,12 +469,6 @@ const deadbandingValues: DeadbandingValues = {
       headPitchAngles: 0.12,
       interocularDistances: 0.03,
     },
-    roundEarsHat: {
-      headRotationAngles: 0.12,
-      headYawAngles: 0.12,
-      headPitchAngles: 0.12,
-      interocularDistances: 0.03,
-    },
     santaHat: {
       headRotationAngles: 0.12,
       headYawAngles: 0.12,
@@ -488,12 +482,6 @@ const deadbandingValues: DeadbandingValues = {
       interocularDistances: 0.03,
     },
     stylishHat: {
-      headRotationAngles: 0.12,
-      headYawAngles: 0.12,
-      headPitchAngles: 0.12,
-      interocularDistances: 0.03,
-    },
-    superMarioOdysseyHat: {
       headRotationAngles: 0.12,
       headYawAngles: 0.12,
       headPitchAngles: 0.12,

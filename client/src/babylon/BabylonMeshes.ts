@@ -25,6 +25,9 @@ import {
 } from "./BabylonScene";
 import { baseMaskData } from "./meshes";
 import { GizmoStateTypes, MeshJSON, MeshTypes, Point3D } from "./typeContant";
+import CameraMedia from "../lib/CameraMedia";
+import ScreenMedia from "../lib/ScreenMedia";
+import AudioMedia from "../lib/AudioMedia";
 
 class BabylonMeshes {
   meshes: {
@@ -44,7 +47,16 @@ class BabylonMeshes {
     private canvas: HTMLCanvasElement,
     private ambientLightThreeDimMeshes: HemisphericLight | undefined,
     private ambientLightTwoDimMeshes: HemisphericLight | undefined,
-    private threeDimMeshesZCoord: number
+    private threeDimMeshesZCoord: number,
+    private userMedia: React.MutableRefObject<{
+      camera: {
+        [cameraId: string]: CameraMedia;
+      };
+      screen: {
+        [screenId: string]: ScreenMedia;
+      };
+      audio: AudioMedia | undefined;
+    }>
   ) {
     this.meshLoaders = new MeshLoaders(this.scene);
 
@@ -283,6 +295,7 @@ class BabylonMeshes {
             }
 
             this.togglePlayAnimationOnMesh(this.selectedMesh);
+            this.togglePlayAudioOnMesh(this.selectedMesh);
           }
 
           // Reset the double-click registered flag
@@ -394,6 +407,18 @@ class BabylonMeshes {
         }
       }
     });
+  };
+
+  private togglePlayAudioOnMesh = (mesh: AbstractMesh) => {
+    const meshMetaData = mesh.metadata;
+
+    if (meshMetaData.audioURL === undefined) {
+      return;
+    }
+
+    this.userMedia.current.audio?.audioEffects.fgAssetSoundEffects.toggleAudio(
+      meshMetaData.audioURL
+    );
   };
 
   private escapeMesh = (mesh: AbstractMesh) => {
@@ -647,6 +672,7 @@ class BabylonMeshes {
     faceId?: number,
     effectType?: EffectType,
     positionStyle?: PositionStyle,
+    audioURL?: string,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
     initRotation?: [number, number, number]
@@ -691,6 +717,8 @@ class BabylonMeshes {
         initScale,
         positionStyle,
         manuallyTransformed: false,
+        audioURL,
+        audioLoaded: false,
       };
       this.meshes["3D"][meshLabel] = newMesh;
 
@@ -729,6 +757,8 @@ class BabylonMeshes {
         initScale,
         positionStyle,
         manuallyTransformed: false,
+        audioURL,
+        audioLoaded: false,
       };
       this.meshes["2D"][meshLabel] = newMesh;
 

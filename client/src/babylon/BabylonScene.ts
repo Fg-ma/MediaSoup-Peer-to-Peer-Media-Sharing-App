@@ -26,6 +26,9 @@ import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
 import { EffectStylesType } from "../context/currentEffectsStylesContext/typeConstant";
 import FaceLandmarks from "./FaceLandmarks";
+import CameraMedia from "../lib/CameraMedia";
+import ScreenMedia from "../lib/ScreenMedia";
+import AudioMedia from "../lib/AudioMedia";
 
 export type DefaultMeshPlacementType =
   | "forehead"
@@ -104,7 +107,16 @@ class BabylonScene {
     private selfieSegmentationResults: ImageData[] | undefined,
     private selfieSegmentationProcessing: boolean[] | undefined,
     private userDevice: UserDevice,
-    private maxFaces: [number]
+    private maxFaces: [number],
+    private userMedia: React.MutableRefObject<{
+      camera: {
+        [cameraId: string]: CameraMedia;
+      };
+      screen: {
+        [screenId: string]: ScreenMedia;
+      };
+      audio: AudioMedia | undefined;
+    }>
   ) {
     this.engine = new Engine(this.canvas, true);
 
@@ -129,7 +141,8 @@ class BabylonScene {
       this.canvas,
       this.ambientLightThreeDimMeshes,
       this.ambientLightTwoDimMeshes,
-      this.threeDimMeshesZCoord
+      this.threeDimMeshesZCoord,
+      this.userMedia
     );
 
     this.babylonRenderLoop = new BabylonRenderLoop(
@@ -361,6 +374,7 @@ class BabylonScene {
     faceId?: number,
     effectType?: EffectType,
     positionStyle?: PositionStyle,
+    audioURL?: string,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
     initRotation?: [number, number, number]
@@ -375,6 +389,7 @@ class BabylonScene {
       faceId,
       effectType,
       positionStyle,
+      audioURL,
       initPosition,
       initScale,
       initRotation
@@ -390,6 +405,7 @@ class BabylonScene {
     meshFile: string,
     effectType?: EffectType,
     positionStyle?: PositionStyle,
+    audioURL?: string,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
     initRotation?: [number, number, number]
@@ -405,6 +421,7 @@ class BabylonScene {
         i,
         effectType,
         positionStyle,
+        audioURL,
         initPosition,
         initScale,
         initRotation

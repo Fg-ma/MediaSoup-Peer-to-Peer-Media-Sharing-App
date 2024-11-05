@@ -13,6 +13,8 @@ import BabylonScene, {
   EffectType,
   validEffectTypes,
 } from "../babylon/BabylonScene";
+import CameraMedia from "./CameraMedia";
+import AudioMedia from "./AudioMedia";
 
 class ScreenMedia {
   canvas: HTMLCanvasElement;
@@ -41,7 +43,16 @@ class ScreenMedia {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
-    private userDevice: UserDevice
+    private userDevice: UserDevice,
+    private userMedia: React.MutableRefObject<{
+      camera: {
+        [cameraId: string]: CameraMedia;
+      };
+      screen: {
+        [screenId: string]: ScreenMedia;
+      };
+      audio: AudioMedia | undefined;
+    }>
   ) {
     this.effects = {};
 
@@ -78,7 +89,8 @@ class ScreenMedia {
       undefined,
       undefined,
       this.userDevice,
-      this.maxFaces
+      this.maxFaces,
+      this.userMedia
     );
 
     this.video.srcObject = this.initScreenStream;
@@ -186,6 +198,7 @@ class ScreenMedia {
           meshData2D.meshFile,
           effect,
           "free",
+          undefined,
           [0, 0, this.babylonScene.twoDimMeshesZCoord],
           meshData2D.initScale,
           meshData2D.initRotation
@@ -202,6 +215,7 @@ class ScreenMedia {
           meshData3D.meshFile,
           effect,
           "faceTrack",
+          meshData3D.soundEffectPath,
           [0, 0, this.babylonScene.threeDimMeshesZCoord],
           meshData3D.initScale,
           meshData3D.initRotation

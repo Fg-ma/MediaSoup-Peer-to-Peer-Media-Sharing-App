@@ -2,6 +2,7 @@ import * as Tone from "tone";
 import FgSampler from "./fgSampler";
 import FgSoundEffects from "./fgSoundEffects";
 import FgBackgroundMusic from "./fgBackgroundMusic";
+import FgAssetSoundEffects from "./fgAssetSoundEffects";
 
 export type AudioMixEffectsType =
   | "autoFilter"
@@ -68,6 +69,7 @@ class AudioEffects {
   private samplerChain: Tone.Gain;
   private soundEffectsChain: Tone.Gain;
   private backgroundMusicChain: Tone.Gain;
+  private assetSoundEffectsChain: Tone.Gain;
 
   private micEffects: any[] = [];
 
@@ -116,6 +118,8 @@ class AudioEffects {
   fgSoundEffects: FgSoundEffects;
 
   fgBackgroundMusic: FgBackgroundMusic;
+
+  fgAssetSoundEffects: FgAssetSoundEffects;
 
   private effectUpdaters: {
     [key in AudioMixEffectsType]: (
@@ -437,7 +441,8 @@ class AudioEffects {
     private micMediaStreamDestination: MediaStreamAudioDestinationNode,
     private samplerMediaStreamDestination: MediaStreamAudioDestinationNode,
     private soundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode,
-    private backgroundMusicMediaStreamDestination: MediaStreamAudioDestinationNode
+    private backgroundMusicMediaStreamDestination: MediaStreamAudioDestinationNode,
+    private assetSoundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode
   ) {
     this.masterChain = new Tone.Gain(); // Create a Gain node for the master chain
 
@@ -449,11 +454,14 @@ class AudioEffects {
 
     this.backgroundMusicChain = new Tone.Gain(); // Create a Gain node for the background music chain
 
+    this.assetSoundEffectsChain = new Tone.Gain(); // Create a Gain node for the asset sound effects chain
+
     // Connect micChain and samplerChain to the masterChain
     this.micChain.connect(this.masterChain);
     this.samplerChain.connect(this.masterChain);
     this.soundEffectsChain.connect(this.masterChain);
     this.backgroundMusicChain.connect(this.masterChain);
+    this.assetSoundEffectsChain.connect(this.masterChain);
     this.masterChain.connect(this.masterMediaStreamDestination);
 
     this.micChain.connect(this.micMediaStreamDestination);
@@ -461,6 +469,9 @@ class AudioEffects {
     this.soundEffectsChain.connect(this.soundEffectsMediaStreamDestination);
     this.backgroundMusicChain.connect(
       this.backgroundMusicMediaStreamDestination
+    );
+    this.assetSoundEffectsChain.connect(
+      this.assetSoundEffectsMediaStreamDestination
     );
 
     this.fgSampler = new FgSampler(
@@ -477,6 +488,11 @@ class AudioEffects {
     this.fgBackgroundMusic = new FgBackgroundMusic(
       this.backgroundMusicMediaStreamDestination,
       this.backgroundMusicChain
+    );
+
+    this.fgAssetSoundEffects = new FgAssetSoundEffects(
+      this.assetSoundEffectsMediaStreamDestination,
+      this.assetSoundEffectsChain
     );
   }
 
