@@ -30,21 +30,16 @@ export type GizmoStateTypes = "position" | "scale" | "rotation" | "none";
 
 export type meshData = {
   defaultMeshPlacement: "forehead" | "eyesCenter" | "nose" | "chin";
-  planeMesh: {
-    meshLabel: string;
-    meshPath: string;
-    meshFile: string;
-    initScale: [number, number, number];
-    initRotation: [number, number, number];
-  };
-  mesh: {
-    meshType: string;
-    meshLabel: string;
-    meshPath: string;
-    meshFile: string;
-    initScale: [number, number, number];
-    initRotation: [number, number, number];
-    soundEffectPath: string | undefined;
+  meshType: string;
+  meshLabel: string;
+  meshPath: string;
+  meshFile: string;
+  initScale: [number, number, number];
+  initRotation: [number, number, number];
+  soundEffectPath: string | undefined;
+  transforms: {
+    offsetX: number;
+    offsetY: number;
   };
 };
 

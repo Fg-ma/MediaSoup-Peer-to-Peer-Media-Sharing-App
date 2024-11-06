@@ -2,7 +2,6 @@ import * as Tone from "tone";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
-  defaultAudioStreamEffects,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
 import AudioEffects, {

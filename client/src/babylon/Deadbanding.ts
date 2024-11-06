@@ -684,10 +684,6 @@ class Deadbanding {
         chinPositions: 0.0,
         nosePositions: 0.0,
         foreheadPositions: 0.0,
-        twoDimBeardOffsets: 0.0,
-        twoDimMustacheOffsets: 0.0,
-        threeDimBeardOffsets: 0.0,
-        threeDimMustacheOffsets: 0.0,
       };
     }
 

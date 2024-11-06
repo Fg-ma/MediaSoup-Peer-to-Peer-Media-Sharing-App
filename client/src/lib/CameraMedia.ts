@@ -85,11 +85,7 @@ class CameraMedia {
       );
     }
 
-    this.faceLandmarks = new FaceLandmarks(
-      this.cameraId,
-      this.currentEffectsStyles,
-      this.deadbanding
-    );
+    this.faceLandmarks = new FaceLandmarks(this.cameraId, this.deadbanding);
 
     this.faceMeshWorker = new Worker(
       new URL("./../webWorkers/faceMeshWebWorker.worker", import.meta.url),
@@ -240,30 +236,20 @@ class CameraMedia {
           for (let i = count; i < this.maxFaces[0]; i++) {
             const meshData =
               // @ts-ignore
-              assetMeshes[effect][currentEffectStyle.style][
-                currentEffectStyle.threeDim ? "mesh" : "planeMesh"
-              ];
+              assetMeshes[effect as EffectType][currentEffectStyle.style];
 
             this.babylonScene.createMesh(
-              meshData.meshType ?? "2D",
+              meshData.meshType,
               meshData.meshLabel + "." + i,
               "",
-              // @ts-ignore
-              assetMeshes[effect][currentEffectStyle.style]
-                .defaultMeshPlacement,
+              meshData.defaultMeshPlacement,
               meshData.meshPath,
               meshData.meshFile,
               i,
               effect as EffectType,
               "faceTrack",
               meshData.soundEffectPath,
-              [
-                0,
-                0,
-                currentEffectStyle.threeDim
-                  ? this.babylonScene.threeDimMeshesZCoord
-                  : this.babylonScene.twoDimMeshesZCoord,
-              ],
+              [0, 0, this.babylonScene.threeDimMeshesZCoord],
               meshData.initScale,
               meshData.initRotation
             );
@@ -315,8 +301,7 @@ class CameraMedia {
       if (
         effect !== "masks" ||
         this.currentEffectsStyles.current.camera[this.cameraId].masks.style !==
-          "baseMask" ||
-        !this.currentEffectsStyles.current.camera[this.cameraId].masks.threeDim
+          "baseMask"
       ) {
         this.drawNewEffect(effect as EffectType);
       } else {
@@ -369,48 +354,26 @@ class CameraMedia {
     }
 
     // @ts-ignore
-    const meshData2D = assetMeshes[effect][currentStyle.style].planeMesh;
-    // @ts-ignore
-    const meshData3D = assetMeshes[effect][currentStyle.style].mesh;
+    const meshData3D = assetMeshes[effect][currentStyle.style];
 
     // Delete old meshes
     this.babylonScene.deleteEffectMeshes(effect);
 
     if (this.effects[effect]) {
-      if (!currentStyle.threeDim) {
-        this.babylonScene.createEffectMeshes(
-          "2D",
-          meshData2D.meshLabel,
-          "",
-          // @ts-ignore
-          assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
-          meshData2D.meshPath,
-          meshData2D.meshFile,
-          effect,
-          "faceTrack",
-          undefined,
-          [0, 0, this.babylonScene.twoDimMeshesZCoord],
-          meshData2D.initScale,
-          meshData2D.initRotation
-        );
-      }
-      if (currentStyle.threeDim) {
-        this.babylonScene.createEffectMeshes(
-          meshData3D.meshType,
-          meshData3D.meshLabel,
-          "",
-          // @ts-ignore
-          assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
-          meshData3D.meshPath,
-          meshData3D.meshFile,
-          effect,
-          "faceTrack",
-          meshData3D.soundEffectPath,
-          [0, 0, this.babylonScene.threeDimMeshesZCoord],
-          meshData3D.initScale,
-          meshData3D.initRotation
-        );
-      }
+      this.babylonScene.createEffectMeshes(
+        meshData3D.meshType,
+        meshData3D.meshLabel,
+        "",
+        meshData3D.defaultMeshPlacement,
+        meshData3D.meshPath,
+        meshData3D.meshFile,
+        effect,
+        "faceTrack",
+        meshData3D.soundEffectPath,
+        [0, 0, this.babylonScene.threeDimMeshesZCoord],
+        meshData3D.initScale,
+        meshData3D.initRotation
+      );
     }
   };
 

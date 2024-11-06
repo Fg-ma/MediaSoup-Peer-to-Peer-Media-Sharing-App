@@ -1,10 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
-import {
-  assetSizePositionMap,
-  GlassesEffectTypes,
-} from "../../context/currentEffectsStylesContext/typeConstant";
+import { GlassesEffectTypes } from "../../context/currentEffectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -17,110 +14,74 @@ import defaultGlasses_512x512 from "../../../public/2DAssets/glasses/defaultGlas
 import defaultGlasses_32x32 from "../../../public/2DAssets/glasses/defaultGlasses/defaultGlasses_32x32.png";
 import defaultGlassesIcon from "../../../public/svgs/visualEffects/glasses/defaultGlasses/defaultGlassesIcon.svg";
 import defaultGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/defaultGlasses/defaultGlassesOffIcon.svg";
-import threeDim_defaultGlassesIcon from "../../../public/svgs/visualEffects/glasses/defaultGlasses/threeDim_defaultGlassesIcon.svg";
-import threeDim_defaultGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/defaultGlasses/threeDim_defaultGlassesOffIcon.svg";
 import AmericaGlasses_512x512 from "../../../public/2DAssets/glasses/AmericaGlasses/AmericaGlasses_512x512.png";
 import AmericaGlasses_32x32 from "../../../public/2DAssets/glasses/AmericaGlasses/AmericaGlasses_32x32.png";
-import VRGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_threeDim_32x32.png";
 import AmericaGlassesIcon from "../../../public/svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesIcon.svg";
 import AmericaGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesOffIcon.svg";
-import threeDim_AmericaGlassesIcon from "../../../public/svgs/visualEffects/glasses/AmericaGlasses/threeDim_AmericaGlassesIcon.svg";
-import threeDim_AmericaGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/AmericaGlasses/threeDim_AmericaGlassesOffIcon.svg";
 import aviatorGoggles_512x512 from "../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_512x512.png";
 import aviatorGoggles_32x32 from "../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_32x32.png";
 import aviatorGoggles_off_512x512 from "../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_off_512x512.png";
 import aviatorGoggles_off_32x32 from "../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_off_32x32.png";
-import aviatorGoggles_threeDim_512x512 from "../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_threeDim_512x512.png";
-import aviatorGoggles_threeDim_32x32 from "../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_threeDim_32x32.png";
 import bloodyGlasses_512x512 from "../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_512x512.png";
 import bloodyGlasses_32x32 from "../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_32x32.png";
 import bloodyGlasses_off_512x512 from "../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_off_512x512.png";
 import bloodyGlasses_off_32x32 from "../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_off_32x32.png";
-import bloodyGlasses_threeDim_512x512 from "../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_threeDim_512x512.png";
-import bloodyGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_threeDim_32x32.png";
 import eyeProtectionGlasses_512x512 from "../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_512x512.png";
 import eyeProtectionGlasses_32x32 from "../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_32x32.png";
 import eyeProtectionGlasses_off_512x512 from "../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_off_512x512.png";
 import eyeProtectionGlasses_off_32x32 from "../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_off_32x32.png";
-import eyeProtectionGlasses_threeDim_512x512 from "../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_threeDim_512x512.png";
-import eyeProtectionGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_threeDim_32x32.png";
 import glasses1_512x512 from "../../../public/2DAssets/glasses/glasses1/glasses1_512x512.png";
 import glasses1_32x32 from "../../../public/2DAssets/glasses/glasses1/glasses1_32x32.png";
 import glasses1_off_512x512 from "../../../public/2DAssets/glasses/glasses1/glasses1_off_512x512.png";
 import glasses1_off_32x32 from "../../../public/2DAssets/glasses/glasses1/glasses1_off_32x32.png";
-import glasses1_threeDim_512x512 from "../../../public/2DAssets/glasses/glasses1/glasses1_threeDim_512x512.png";
-import glasses1_threeDim_32x32 from "../../../public/2DAssets/glasses/glasses1/glasses1_threeDim_32x32.png";
 import glasses2_512x512 from "../../../public/2DAssets/glasses/glasses2/glasses2_512x512.png";
 import glasses2_32x32 from "../../../public/2DAssets/glasses/glasses2/glasses2_32x32.png";
 import glasses2_off_512x512 from "../../../public/2DAssets/glasses/glasses2/glasses2_off_512x512.png";
 import glasses2_off_32x32 from "../../../public/2DAssets/glasses/glasses2/glasses2_off_32x32.png";
-import glasses2_threeDim_512x512 from "../../../public/2DAssets/glasses/glasses2/glasses2_threeDim_512x512.png";
-import glasses2_threeDim_32x32 from "../../../public/2DAssets/glasses/glasses2/glasses2_threeDim_32x32.png";
 import glasses3_512x512 from "../../../public/2DAssets/glasses/glasses3/glasses3_512x512.png";
 import glasses3_32x32 from "../../../public/2DAssets/glasses/glasses3/glasses3_32x32.png";
 import glasses3_off_512x512 from "../../../public/2DAssets/glasses/glasses3/glasses3_off_512x512.png";
 import glasses3_off_32x32 from "../../../public/2DAssets/glasses/glasses3/glasses3_off_32x32.png";
-import glasses3_threeDim_512x512 from "../../../public/2DAssets/glasses/glasses3/glasses3_threeDim_512x512.png";
-import glasses3_threeDim_32x32 from "../../../public/2DAssets/glasses/glasses3/glasses3_threeDim_32x32.png";
 import glasses4_512x512 from "../../../public/2DAssets/glasses/glasses4/glasses4_512x512.png";
 import glasses4_32x32 from "../../../public/2DAssets/glasses/glasses4/glasses4_32x32.png";
 import glasses4_off_512x512 from "../../../public/2DAssets/glasses/glasses4/glasses4_off_512x512.png";
 import glasses4_off_32x32 from "../../../public/2DAssets/glasses/glasses4/glasses4_off_32x32.png";
-import glasses4_threeDim_512x512 from "../../../public/2DAssets/glasses/glasses4/glasses4_threeDim_512x512.png";
-import glasses4_threeDim_32x32 from "../../../public/2DAssets/glasses/glasses4/glasses4_threeDim_32x32.png";
 import glasses5_512x512 from "../../../public/2DAssets/glasses/glasses5/glasses5_512x512.png";
 import glasses5_32x32 from "../../../public/2DAssets/glasses/glasses5/glasses5_32x32.png";
 import glasses5_off_512x512 from "../../../public/2DAssets/glasses/glasses5/glasses5_off_512x512.png";
 import glasses5_off_32x32 from "../../../public/2DAssets/glasses/glasses5/glasses5_off_32x32.png";
-import glasses5_threeDim_512x512 from "../../../public/2DAssets/glasses/glasses5/glasses5_threeDim_512x512.png";
-import glasses5_threeDim_32x32 from "../../../public/2DAssets/glasses/glasses5/glasses5_threeDim_32x32.png";
 import glasses6_512x512 from "../../../public/2DAssets/glasses/glasses6/glasses6_512x512.png";
 import glasses6_32x32 from "../../../public/2DAssets/glasses/glasses6/glasses6_32x32.png";
 import glasses6_off_512x512 from "../../../public/2DAssets/glasses/glasses6/glasses6_off_512x512.png";
 import glasses6_off_32x32 from "../../../public/2DAssets/glasses/glasses6/glasses6_off_32x32.png";
-import glasses6_threeDim_512x512 from "../../../public/2DAssets/glasses/glasses6/glasses6_threeDim_512x512.png";
-import glasses6_threeDim_32x32 from "../../../public/2DAssets/glasses/glasses6/glasses6_threeDim_32x32.png";
 import memeGlasses_512x512 from "../../../public/2DAssets/glasses/memeGlasses/memeGlasses_512x512.png";
 import memeGlasses_32x32 from "../../../public/2DAssets/glasses/memeGlasses/memeGlasses_32x32.png";
 import memeGlassesIcon from "../../../public/svgs/visualEffects/glasses/memeGlasses/memeGlassesIcon.svg";
 import memeGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/memeGlasses/memeGlassesOffIcon.svg";
-import threeDim_memeGlassesIcon from "../../../public/svgs/visualEffects/glasses/memeGlasses/threeDim_memeGlassesIcon.svg";
-import threeDim_memeGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/memeGlasses/threeDim_memeGlassesOffIcon.svg";
 import militaryTacticalGlasses_512x512 from "../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_512x512.png";
 import militaryTacticalGlasses_32x32 from "../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_32x32.png";
 import militaryTacticalGlasses_off_512x512 from "../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_off_512x512.png";
 import militaryTacticalGlasses_off_32x32 from "../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_off_32x32.png";
-import militaryTacticalGlasses_threeDim_512x512 from "../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_threeDim_512x512.png";
-import militaryTacticalGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_threeDim_32x32.png";
 import shades_512x512 from "../../../public/2DAssets/glasses/shades/shades_512x512.png";
 import shades_32x32 from "../../../public/2DAssets/glasses/shades/shades_32x32.png";
 import shadesIcon from "../../../public/svgs/visualEffects/glasses/shades/shadesIcon.svg";
 import shadesOffIcon from "../../../public/svgs/visualEffects/glasses/shades/shadesOffIcon.svg";
-import threeDim_shadesIcon from "../../../public/svgs/visualEffects/glasses/shades/threeDim_shadesIcon.svg";
-import threeDim_shadesOffIcon from "../../../public/svgs/visualEffects/glasses/shades/threeDim_shadesOffIcon.svg";
 import steampunkGlasses_512x512 from "../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_512x512.png";
 import steampunkGlasses_32x32 from "../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_32x32.png";
 import steampunkGlasses_off_512x512 from "../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_off_512x512.png";
 import steampunkGlasses_off_32x32 from "../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_off_32x32.png";
-import steampunkGlasses_threeDim_512x512 from "../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_threeDim_512x512.png";
-import steampunkGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_threeDim_32x32.png";
 import threeDGlasses_512x512 from "../../../public/2DAssets/glasses/threeDGlasses/threeDGlasses_512x512.png";
 import threeDGlasses_32x32 from "../../../public/2DAssets/glasses/threeDGlasses/threeDGlasses_32x32.png";
 import threeDGlassesIcon from "../../../public/svgs/visualEffects/glasses/threeDGlasses/threeDGlassesIcon.svg";
 import threeDGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/threeDGlasses/threeDGlassesOffIcon.svg";
-import threeDim_threeDGlassesIcon from "../../../public/svgs/visualEffects/glasses/threeDGlasses/threeDim_threeDGlassesIcon.svg";
-import threeDim_threeDGlassesOffIcon from "../../../public/svgs/visualEffects/glasses/threeDGlasses/threeDim_threeDGlassesOffIcon.svg";
 import toyGlasses_512x512 from "../../../public/2DAssets/glasses/toyGlasses/toyGlasses_512x512.png";
 import toyGlasses_32x32 from "../../../public/2DAssets/glasses/toyGlasses/toyGlasses_32x32.png";
 import toyGlasses_off_512x512 from "../../../public/2DAssets/glasses/toyGlasses/toyGlasses_off_512x512.png";
 import toyGlasses_off_32x32 from "../../../public/2DAssets/glasses/toyGlasses/toyGlasses_off_32x32.png";
-import toyGlasses_threeDim_512x512 from "../../../public/2DAssets/glasses/toyGlasses/toyGlasses_threeDim_512x512.png";
-import toyGlasses_threeDim_32x32 from "../../../public/2DAssets/glasses/toyGlasses/toyGlasses_threeDim_32x32.png";
 import VRGlasses_512x512 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_512x512.png";
 import VRGlasses_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_32x32.png";
 import VRGlasses_off_512x512 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_off_512x512.png";
 import VRGlasses_off_32x32 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_off_32x32.png";
-import VRGlasses_threeDim_512x512 from "../../../public/2DAssets/glasses/VRGlasses/VRGlasses_threeDim_512x512.png";
 
 const glassesLabels: {
   [glassesEffectType in GlassesEffectTypes]: string;
@@ -191,12 +152,6 @@ export default function GlassesButton({
       iconOff?: string;
       imageOff?: string;
       imageOffSmall?: string;
-      iconThreeDim?: string;
-      imageThreeDim?: string;
-      imageThreeDimSmall?: string;
-      iconThreeDimOff?: string;
-      imageThreeDimOff?: string;
-      imageThreeDimOffSmall?: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -206,8 +161,6 @@ export default function GlassesButton({
       imageSmall: defaultGlasses_32x32,
       icon: defaultGlassesIcon,
       iconOff: defaultGlassesOffIcon,
-      iconThreeDim: threeDim_defaultGlassesIcon,
-      iconThreeDimOff: threeDim_defaultGlassesOffIcon,
       flipped: false,
       bgColor: "white",
     },
@@ -216,8 +169,6 @@ export default function GlassesButton({
       imageSmall: AmericaGlasses_32x32,
       icon: AmericaGlassesIcon,
       iconOff: AmericaGlassesOffIcon,
-      iconThreeDim: threeDim_AmericaGlassesIcon,
-      iconThreeDimOff: threeDim_AmericaGlassesOffIcon,
       flipped: true,
       bgColor: "white",
     },
@@ -226,10 +177,6 @@ export default function GlassesButton({
       imageSmall: aviatorGoggles_32x32,
       imageOff: aviatorGoggles_off_512x512,
       imageOffSmall: aviatorGoggles_off_32x32,
-      imageThreeDim: aviatorGoggles_threeDim_512x512,
-      imageThreeDimSmall: aviatorGoggles_threeDim_32x32,
-      imageThreeDimOff: aviatorGoggles_512x512,
-      imageThreeDimOffSmall: aviatorGoggles_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -238,10 +185,6 @@ export default function GlassesButton({
       imageSmall: bloodyGlasses_32x32,
       imageOff: bloodyGlasses_off_512x512,
       imageOffSmall: bloodyGlasses_off_32x32,
-      imageThreeDim: bloodyGlasses_threeDim_512x512,
-      imageThreeDimSmall: bloodyGlasses_threeDim_32x32,
-      imageThreeDimOff: bloodyGlasses_512x512,
-      imageThreeDimOffSmall: bloodyGlasses_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -250,10 +193,6 @@ export default function GlassesButton({
       imageSmall: eyeProtectionGlasses_32x32,
       imageOff: eyeProtectionGlasses_off_512x512,
       imageOffSmall: eyeProtectionGlasses_off_32x32,
-      imageThreeDim: eyeProtectionGlasses_threeDim_512x512,
-      imageThreeDimSmall: eyeProtectionGlasses_threeDim_32x32,
-      imageThreeDimOff: eyeProtectionGlasses_512x512,
-      imageThreeDimOffSmall: eyeProtectionGlasses_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -262,10 +201,6 @@ export default function GlassesButton({
       imageSmall: glasses1_32x32,
       imageOff: glasses1_off_512x512,
       imageOffSmall: glasses1_off_32x32,
-      imageThreeDim: glasses1_threeDim_512x512,
-      imageThreeDimSmall: glasses1_threeDim_32x32,
-      imageThreeDimOff: glasses1_512x512,
-      imageThreeDimOffSmall: glasses1_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -274,10 +209,6 @@ export default function GlassesButton({
       imageSmall: glasses2_32x32,
       imageOff: glasses2_off_512x512,
       imageOffSmall: glasses2_off_32x32,
-      imageThreeDim: glasses2_threeDim_512x512,
-      imageThreeDimSmall: glasses2_threeDim_32x32,
-      imageThreeDimOff: glasses2_512x512,
-      imageThreeDimOffSmall: glasses2_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -286,10 +217,6 @@ export default function GlassesButton({
       imageSmall: glasses3_32x32,
       imageOff: glasses3_off_512x512,
       imageOffSmall: glasses3_off_32x32,
-      imageThreeDim: glasses3_threeDim_512x512,
-      imageThreeDimSmall: glasses3_threeDim_32x32,
-      imageThreeDimOff: glasses3_512x512,
-      imageThreeDimOffSmall: glasses3_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -298,10 +225,6 @@ export default function GlassesButton({
       imageSmall: glasses4_32x32,
       imageOff: glasses4_off_512x512,
       imageOffSmall: glasses4_off_32x32,
-      imageThreeDim: glasses4_threeDim_512x512,
-      imageThreeDimSmall: glasses4_threeDim_32x32,
-      imageThreeDimOff: glasses4_512x512,
-      imageThreeDimOffSmall: glasses4_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -310,10 +233,6 @@ export default function GlassesButton({
       imageSmall: glasses5_32x32,
       imageOff: glasses5_off_512x512,
       imageOffSmall: glasses5_off_32x32,
-      imageThreeDim: glasses5_threeDim_512x512,
-      imageThreeDimSmall: glasses5_threeDim_32x32,
-      imageThreeDimOff: glasses5_512x512,
-      imageThreeDimOffSmall: glasses5_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -322,10 +241,6 @@ export default function GlassesButton({
       imageSmall: glasses6_32x32,
       imageOff: glasses6_off_512x512,
       imageOffSmall: glasses6_off_32x32,
-      imageThreeDim: glasses6_threeDim_512x512,
-      imageThreeDimSmall: glasses6_threeDim_32x32,
-      imageThreeDimOff: glasses6_512x512,
-      imageThreeDimOffSmall: glasses6_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -334,8 +249,6 @@ export default function GlassesButton({
       imageSmall: memeGlasses_32x32,
       icon: memeGlassesIcon,
       iconOff: memeGlassesOffIcon,
-      iconThreeDim: threeDim_memeGlassesIcon,
-      iconThreeDimOff: threeDim_memeGlassesOffIcon,
       flipped: true,
       bgColor: "white",
     },
@@ -344,10 +257,6 @@ export default function GlassesButton({
       imageSmall: militaryTacticalGlasses_32x32,
       imageOff: militaryTacticalGlasses_off_512x512,
       imageOffSmall: militaryTacticalGlasses_off_32x32,
-      imageThreeDim: militaryTacticalGlasses_threeDim_512x512,
-      imageThreeDimSmall: militaryTacticalGlasses_threeDim_32x32,
-      imageThreeDimOff: militaryTacticalGlasses_512x512,
-      imageThreeDimOffSmall: militaryTacticalGlasses_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -356,8 +265,6 @@ export default function GlassesButton({
       imageSmall: shades_32x32,
       icon: shadesIcon,
       iconOff: shadesOffIcon,
-      iconThreeDim: threeDim_shadesIcon,
-      iconThreeDimOff: threeDim_shadesOffIcon,
       flipped: false,
       bgColor: "white",
     },
@@ -366,10 +273,6 @@ export default function GlassesButton({
       imageSmall: steampunkGlasses_32x32,
       imageOff: steampunkGlasses_off_512x512,
       imageOffSmall: steampunkGlasses_off_32x32,
-      imageThreeDim: steampunkGlasses_threeDim_512x512,
-      imageThreeDimSmall: steampunkGlasses_threeDim_32x32,
-      imageThreeDimOff: steampunkGlasses_512x512,
-      imageThreeDimOffSmall: steampunkGlasses_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -378,8 +281,6 @@ export default function GlassesButton({
       imageSmall: threeDGlasses_32x32,
       icon: threeDGlassesIcon,
       iconOff: threeDGlassesOffIcon,
-      iconThreeDim: threeDim_threeDGlassesIcon,
-      iconThreeDimOff: threeDim_threeDGlassesOffIcon,
       flipped: false,
       bgColor: "black",
     },
@@ -388,10 +289,6 @@ export default function GlassesButton({
       imageSmall: toyGlasses_32x32,
       imageOff: toyGlasses_off_512x512,
       imageOffSmall: toyGlasses_off_32x32,
-      imageThreeDim: toyGlasses_threeDim_512x512,
-      imageThreeDimSmall: toyGlasses_threeDim_32x32,
-      imageThreeDimOff: toyGlasses_512x512,
-      imageThreeDimOffSmall: toyGlasses_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -400,10 +297,6 @@ export default function GlassesButton({
       imageSmall: VRGlasses_32x32,
       imageOff: VRGlasses_off_512x512,
       imageOffSmall: VRGlasses_off_32x32,
-      imageThreeDim: VRGlasses_threeDim_512x512,
-      imageThreeDimSmall: VRGlasses_threeDim_32x32,
-      imageThreeDimOff: VRGlasses_512x512,
-      imageThreeDimOffSmall: VRGlasses_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -436,8 +329,6 @@ export default function GlassesButton({
         if (currentEffectsStyles.current[type][videoId].glasses) {
           currentEffectsStyles.current[type][videoId].glasses.style =
             effectType;
-          currentEffectsStyles.current[type][videoId].glasses.transforms =
-            assetSizePositionMap.glasses[effectType];
         }
       } else {
         if (
@@ -447,39 +338,14 @@ export default function GlassesButton({
           remoteCurrentEffectsStyles.current[username][instance][type][
             videoId
           ].glasses.style = effectType;
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
-          ].glasses.transforms = assetSizePositionMap.glasses[effectType];
         }
       }
 
-      await handleVisualEffectChange(
-        "glasses",
-        isUser
-          ? userStreamEffects.current[type][videoId].glasses
-          : remoteStreamEffects.current[username][instance][type][videoId]
-              .glasses
-      );
+      await handleVisualEffectChange("glasses", streamEffects);
     }
 
     setEffectsDisabled(false);
     setCloseHoldToggle(true);
-  };
-
-  const doubleClickFunction = async () => {
-    if (!effectsStyles) {
-      return;
-    }
-
-    setEffectsDisabled(true);
-
-    effectsStyles.threeDim = !effectsStyles.threeDim;
-
-    setRerender((prev) => prev + 1);
-
-    await handleVisualEffectChange("glasses", streamEffects);
-
-    setEffectsDisabled(false);
   };
 
   return (
@@ -494,13 +360,7 @@ export default function GlassesButton({
         if (glassesEffects[effectsStyles.style].icon) {
           const iconSrc =
             glassesEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "iconThreeDimOff"
-                  : "iconThreeDim"
-                : streamEffects
-                ? "iconOff"
-                : "icon"
+              streamEffects ? "iconOff" : "icon"
             ];
 
           if (iconSrc) {
@@ -518,24 +378,12 @@ export default function GlassesButton({
         } else {
           const imageSrc =
             glassesEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "imageThreeDimOff"
-                  : "imageThreeDim"
-                : streamEffects
-                ? "imageOff"
-                : "image"
+              streamEffects ? "imageOff" : "image"
             ];
 
           const imageLoadingSrc =
             glassesEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "imageThreeDimOffSmall"
-                  : "imageThreeDimSmall"
-                : streamEffects
-                ? "imageOffSmall"
-                : "imageSmall"
+              streamEffects ? "imageOffSmall" : "imageSmall"
             ];
 
           if (imageSrc) {
@@ -551,7 +399,6 @@ export default function GlassesButton({
           }
         }
       }}
-      doubleClickFunction={doubleClickFunction}
       holdContent={
         <div
           ref={glassesContainerRef}

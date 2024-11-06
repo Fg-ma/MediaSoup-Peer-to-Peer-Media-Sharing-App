@@ -1,10 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
-import {
-  assetSizePositionMap,
-  HatsEffectTypes,
-} from "../../context/currentEffectsStylesContext/typeConstant";
+import { HatsEffectTypes } from "../../context/currentEffectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -17,116 +14,78 @@ import AsianConicalHat_512x512 from "../../../public/2DAssets/hats/AsianConicalH
 import AsianConicalHat_32x32 from "../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_32x32.png";
 import AsianConicalHat_off_512x512 from "../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_off_512x512.png";
 import AsianConicalHat_off_32x32 from "../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_off_32x32.png";
-import AsianConicalHat_threeDim_512x512 from "../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_threeDim_512x512.png";
-import AsianConicalHat_threeDim_32x32 from "../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_threeDim_32x32.png";
 import aviatorHelmet_512x512 from "../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_512x512.png";
 import aviatorHelmet_32x32 from "../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_32x32.png";
 import aviatorHelmet_off_512x512 from "../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_off_512x512.png";
 import aviatorHelmet_off_32x32 from "../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_off_32x32.png";
-import aviatorHelmet_threeDim_512x512 from "../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_threeDim_512x512.png";
-import aviatorHelmet_threeDim_32x32 from "../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_threeDim_32x32.png";
 import bicornHat_512x512 from "../../../public/2DAssets/hats/bicornHat/bicornHat_512x512.png";
 import bicornHat_32x32 from "../../../public/2DAssets/hats/bicornHat/bicornHat_32x32.png";
 import bicornHat_off_512x512 from "../../../public/2DAssets/hats/bicornHat/bicornHat_off_512x512.png";
 import bicornHat_off_32x32 from "../../../public/2DAssets/hats/bicornHat/bicornHat_off_32x32.png";
-import bicornHat_threeDim_512x512 from "../../../public/2DAssets/hats/bicornHat/bicornHat_threeDim_512x512.png";
-import bicornHat_threeDim_32x32 from "../../../public/2DAssets/hats/bicornHat/bicornHat_threeDim_32x32.png";
 import bicycleHelmet_512x512 from "../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_512x512.png";
 import bicycleHelmet_32x32 from "../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_32x32.png";
 import bicycleHelmet_off_512x512 from "../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_off_512x512.png";
 import bicycleHelmet_off_32x32 from "../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_off_32x32.png";
-import bicycleHelmet_threeDim_512x512 from "../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_threeDim_512x512.png";
-import bicycleHelmet_threeDim_32x32 from "../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_threeDim_32x32.png";
 import captainsHat_512x512 from "../../../public/2DAssets/hats/captainsHat/captainsHat_512x512.png";
 import captainsHat_32x32 from "../../../public/2DAssets/hats/captainsHat/captainsHat_32x32.png";
 import captainsHat_off_512x512 from "../../../public/2DAssets/hats/captainsHat/captainsHat_off_512x512.png";
 import captainsHat_off_32x32 from "../../../public/2DAssets/hats/captainsHat/captainsHat_off_32x32.png";
-import captainsHat_threeDim_512x512 from "../../../public/2DAssets/hats/captainsHat/captainsHat_threeDim_512x512.png";
-import captainsHat_threeDim_32x32 from "../../../public/2DAssets/hats/captainsHat/captainsHat_threeDim_32x32.png";
 import chefHat_512x512 from "../../../public/2DAssets/hats/chefHat/chefHat_512x512.png";
 import chefHat_32x32 from "../../../public/2DAssets/hats/chefHat/chefHat_32x32.png";
 import chefHat_off_512x512 from "../../../public/2DAssets/hats/chefHat/chefHat_off_512x512.png";
 import chefHat_off_32x32 from "../../../public/2DAssets/hats/chefHat/chefHat_off_32x32.png";
-import chefHat_threeDim_512x512 from "../../../public/2DAssets/hats/chefHat/chefHat_threeDim_512x512.png";
-import chefHat_threeDim_32x32 from "../../../public/2DAssets/hats/chefHat/chefHat_threeDim_32x32.png";
 import chickenHat_512x512 from "../../../public/2DAssets/hats/chickenHat/chickenHat_512x512.png";
 import chickenHat_32x32 from "../../../public/2DAssets/hats/chickenHat/chickenHat_32x32.png";
 import chickenHat_off_512x512 from "../../../public/2DAssets/hats/chickenHat/chickenHat_off_512x512.png";
 import chickenHat_off_32x32 from "../../../public/2DAssets/hats/chickenHat/chickenHat_off_32x32.png";
-import chickenHat_threeDim_512x512 from "../../../public/2DAssets/hats/chickenHat/chickenHat_threeDim_512x512.png";
-import chickenHat_threeDim_32x32 from "../../../public/2DAssets/hats/chickenHat/chickenHat_threeDim_32x32.png";
 import deadManHat_512x512 from "../../../public/2DAssets/hats/deadManHat/deadManHat_512x512.png";
 import deadManHat_32x32 from "../../../public/2DAssets/hats/deadManHat/deadManHat_32x32.png";
 import deadManHat_off_512x512 from "../../../public/2DAssets/hats/deadManHat/deadManHat_off_512x512.png";
 import deadManHat_off_32x32 from "../../../public/2DAssets/hats/deadManHat/deadManHat_off_32x32.png";
-import deadManHat_threeDim_512x512 from "../../../public/2DAssets/hats/deadManHat/deadManHat_threeDim_512x512.png";
-import deadManHat_threeDim_32x32 from "../../../public/2DAssets/hats/deadManHat/deadManHat_threeDim_32x32.png";
 import dogEars_512x512 from "../../../public/2DAssets/hats/dogEars/dogEars_512x512.png";
 import dogEars_32x32 from "../../../public/2DAssets/hats/dogEars/dogEars_32x32.png";
 import dogEarsIcon from "../../../public/svgs/visualEffects/hats/dogEars/dogEarsIcon.svg";
 import dogEarsOffIcon from "../../../public/svgs/visualEffects/hats/dogEars/dogEarsOffIcon.svg";
-import threeDim_dogEarsIcon from "../../../public/svgs/visualEffects/hats/dogEars/threeDim_dogEarsIcon.svg";
-import threeDim_dogEarsOffIcon from "../../../public/svgs/visualEffects/hats/dogEars/threeDim_dogEarsOffIcon.svg";
 import flatCap_512x512 from "../../../public/2DAssets/hats/flatCap/flatCap_512x512.png";
 import flatCap_32x32 from "../../../public/2DAssets/hats/flatCap/flatCap_32x32.png";
 import flatCap_off_512x512 from "../../../public/2DAssets/hats/flatCap/flatCap_off_512x512.png";
 import flatCap_off_32x32 from "../../../public/2DAssets/hats/flatCap/flatCap_off_32x32.png";
-import flatCap_threeDim_512x512 from "../../../public/2DAssets/hats/flatCap/flatCap_threeDim_512x512.png";
-import flatCap_threeDim_32x32 from "../../../public/2DAssets/hats/flatCap/flatCap_threeDim_32x32.png";
 import hardHat_512x512 from "../../../public/2DAssets/hats/hardHat/hardHat_512x512.png";
 import hardHat_32x32 from "../../../public/2DAssets/hats/hardHat/hardHat_32x32.png";
 import hardHat_off_512x512 from "../../../public/2DAssets/hats/hardHat/hardHat_off_512x512.png";
 import hardHat_off_32x32 from "../../../public/2DAssets/hats/hardHat/hardHat_off_32x32.png";
-import hardHat_threeDim_512x512 from "../../../public/2DAssets/hats/hardHat/hardHat_threeDim_512x512.png";
-import hardHat_threeDim_32x32 from "../../../public/2DAssets/hats/hardHat/hardHat_threeDim_32x32.png";
 import hopliteHelmet_512x512 from "../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_512x512.png";
 import hopliteHelmet_32x32 from "../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_32x32.png";
 import hopliteHelmet_off_512x512 from "../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_off_512x512.png";
 import hopliteHelmet_off_32x32 from "../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_off_32x32.png";
-import hopliteHelmet_threeDim_512x512 from "../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_threeDim_512x512.png";
-import hopliteHelmet_threeDim_32x32 from "../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_threeDim_32x32.png";
 import militaryHat_512x512 from "../../../public/2DAssets/hats/militaryHat/militaryHat_512x512.png";
 import militaryHat_32x32 from "../../../public/2DAssets/hats/militaryHat/militaryHat_32x32.png";
 import militaryHat_off_512x512 from "../../../public/2DAssets/hats/militaryHat/militaryHat_off_512x512.png";
 import militaryHat_off_32x32 from "../../../public/2DAssets/hats/militaryHat/militaryHat_off_32x32.png";
-import militaryHat_threeDim_512x512 from "../../../public/2DAssets/hats/militaryHat/militaryHat_threeDim_512x512.png";
-import militaryHat_threeDim_32x32 from "../../../public/2DAssets/hats/militaryHat/militaryHat_threeDim_32x32.png";
 import rabbitEars_512x512 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_512x512.png";
 import rabbitEars_32x32 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_32x32.png";
 import rabbitEars_off_512x512 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_off_512x512.png";
 import rabbitEars_off_32x32 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_off_32x32.png";
-import rabbitEars_threeDim_512x512 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_threeDim_512x512.png";
-import rabbitEars_threeDim_32x32 from "../../../public/2DAssets/hats/rabbitEars/rabbitEars_threeDim_32x32.png";
 import santaHat_512x512 from "../../../public/2DAssets/hats/santaHat/santaHat_512x512.png";
 import santaHat_32x32 from "../../../public/2DAssets/hats/santaHat/santaHat_32x32.png";
 import santaHat_off_512x512 from "../../../public/2DAssets/hats/santaHat/santaHat_off_512x512.png";
 import santaHat_off_32x32 from "../../../public/2DAssets/hats/santaHat/santaHat_off_32x32.png";
-import santaHat_threeDim_512x512 from "../../../public/2DAssets/hats/santaHat/santaHat_threeDim_512x512.png";
-import santaHat_threeDim_32x32 from "../../../public/2DAssets/hats/santaHat/santaHat_threeDim_32x32.png";
 import seamanHat_512x512 from "../../../public/2DAssets/hats/seamanHat/seamanHat_512x512.png";
 import seamanHat_32x32 from "../../../public/2DAssets/hats/seamanHat/seamanHat_32x32.png";
 import seamanHat_off_512x512 from "../../../public/2DAssets/hats/seamanHat/seamanHat_off_512x512.png";
 import seamanHat_off_32x32 from "../../../public/2DAssets/hats/seamanHat/seamanHat_off_32x32.png";
-import seamanHat_threeDim_512x512 from "../../../public/2DAssets/hats/seamanHat/seamanHat_threeDim_512x512.png";
-import seamanHat_threeDim_32x32 from "../../../public/2DAssets/hats/seamanHat/seamanHat_threeDim_32x32.png";
 import stylishHat_512x512 from "../../../public/2DAssets/hats/stylishHat/stylishHat_512x512.png";
 import stylishHat_32x32 from "../../../public/2DAssets/hats/stylishHat/stylishHat_32x32.png";
 import stylishHat_off_512x512 from "../../../public/2DAssets/hats/stylishHat/stylishHat_off_512x512.png";
 import stylishHat_off_32x32 from "../../../public/2DAssets/hats/stylishHat/stylishHat_off_32x32.png";
-import stylishHat_threeDim_512x512 from "../../../public/2DAssets/hats/stylishHat/stylishHat_threeDim_512x512.png";
-import stylishHat_threeDim_32x32 from "../../../public/2DAssets/hats/stylishHat/stylishHat_threeDim_32x32.png";
 import ushankaHat_512x512 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_512x512.png";
 import ushankaHat_32x32 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_32x32.png";
 import ushankaHat_off_512x512 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_off_512x512.png";
 import ushankaHat_off_32x32 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_off_32x32.png";
-import ushankaHat_threeDim_512x512 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_threeDim_512x512.png";
-import ushankaHat_threeDim_32x32 from "../../../public/2DAssets/hats/ushankaHat/ushankaHat_threeDim_32x32.png";
 import vikingHelmet_512x512 from "../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_512x512.png";
 import vikingHelmet_32x32 from "../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_32x32.png";
 import vikingHelmet_off_512x512 from "../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_off_512x512.png";
 import vikingHelmet_off_32x32 from "../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_off_32x32.png";
-import vikingHelmet_threeDim_512x512 from "../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_threeDim_512x512.png";
-import vikingHelmet_threeDim_32x32 from "../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_threeDim_32x32.png";
 
 const hatsLabels: {
   [hatsEffectType in HatsEffectTypes]: string;
@@ -198,12 +157,6 @@ export default function HatsButton({
       iconOff?: string;
       imageOff?: string;
       imageOffSmall?: string;
-      iconThreeDim?: string;
-      imageThreeDim?: string;
-      imageThreeDimSmall?: string;
-      iconThreeDimOff?: string;
-      imageThreeDimOff?: string;
-      imageThreeDimOffSmall?: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -213,10 +166,6 @@ export default function HatsButton({
       imageSmall: AsianConicalHat_32x32,
       imageOff: AsianConicalHat_off_512x512,
       imageOffSmall: AsianConicalHat_off_32x32,
-      imageThreeDim: AsianConicalHat_threeDim_512x512,
-      imageThreeDimSmall: AsianConicalHat_threeDim_32x32,
-      imageThreeDimOff: AsianConicalHat_512x512,
-      imageThreeDimOffSmall: AsianConicalHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -225,10 +174,6 @@ export default function HatsButton({
       imageSmall: aviatorHelmet_32x32,
       imageOff: aviatorHelmet_off_512x512,
       imageOffSmall: aviatorHelmet_off_32x32,
-      imageThreeDim: aviatorHelmet_threeDim_512x512,
-      imageThreeDimSmall: aviatorHelmet_threeDim_32x32,
-      imageThreeDimOff: aviatorHelmet_512x512,
-      imageThreeDimOffSmall: aviatorHelmet_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -237,10 +182,6 @@ export default function HatsButton({
       imageSmall: bicornHat_32x32,
       imageOff: bicornHat_off_512x512,
       imageOffSmall: bicornHat_off_32x32,
-      imageThreeDim: bicornHat_threeDim_512x512,
-      imageThreeDimSmall: bicornHat_threeDim_32x32,
-      imageThreeDimOff: bicornHat_512x512,
-      imageThreeDimOffSmall: bicornHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -249,10 +190,6 @@ export default function HatsButton({
       imageSmall: bicycleHelmet_32x32,
       imageOff: bicycleHelmet_off_512x512,
       imageOffSmall: bicycleHelmet_off_32x32,
-      imageThreeDim: bicycleHelmet_threeDim_512x512,
-      imageThreeDimSmall: bicycleHelmet_threeDim_32x32,
-      imageThreeDimOff: bicycleHelmet_512x512,
-      imageThreeDimOffSmall: bicycleHelmet_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -261,10 +198,6 @@ export default function HatsButton({
       imageSmall: captainsHat_32x32,
       imageOff: captainsHat_off_512x512,
       imageOffSmall: captainsHat_off_32x32,
-      imageThreeDim: captainsHat_threeDim_512x512,
-      imageThreeDimSmall: captainsHat_threeDim_32x32,
-      imageThreeDimOff: captainsHat_512x512,
-      imageThreeDimOffSmall: captainsHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -273,10 +206,6 @@ export default function HatsButton({
       imageSmall: chefHat_32x32,
       imageOff: chefHat_off_512x512,
       imageOffSmall: chefHat_off_32x32,
-      imageThreeDim: chefHat_threeDim_512x512,
-      imageThreeDimSmall: chefHat_threeDim_32x32,
-      imageThreeDimOff: chefHat_512x512,
-      imageThreeDimOffSmall: chefHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -285,10 +214,6 @@ export default function HatsButton({
       imageSmall: chickenHat_32x32,
       imageOff: chickenHat_off_512x512,
       imageOffSmall: chickenHat_off_32x32,
-      imageThreeDim: chickenHat_threeDim_512x512,
-      imageThreeDimSmall: chickenHat_threeDim_32x32,
-      imageThreeDimOff: chickenHat_512x512,
-      imageThreeDimOffSmall: chickenHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -297,10 +222,6 @@ export default function HatsButton({
       imageSmall: deadManHat_32x32,
       imageOff: deadManHat_off_512x512,
       imageOffSmall: deadManHat_off_32x32,
-      imageThreeDim: deadManHat_threeDim_512x512,
-      imageThreeDimSmall: deadManHat_threeDim_32x32,
-      imageThreeDimOff: deadManHat_512x512,
-      imageThreeDimOffSmall: deadManHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -309,8 +230,6 @@ export default function HatsButton({
       imageSmall: dogEars_32x32,
       icon: dogEarsIcon,
       iconOff: dogEarsOffIcon,
-      iconThreeDim: threeDim_dogEarsIcon,
-      iconThreeDimOff: threeDim_dogEarsOffIcon,
       flipped: true,
       bgColor: "white",
     },
@@ -319,10 +238,6 @@ export default function HatsButton({
       imageSmall: flatCap_32x32,
       imageOff: flatCap_off_512x512,
       imageOffSmall: flatCap_off_32x32,
-      imageThreeDim: flatCap_threeDim_512x512,
-      imageThreeDimSmall: flatCap_threeDim_32x32,
-      imageThreeDimOff: flatCap_512x512,
-      imageThreeDimOffSmall: flatCap_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -331,10 +246,6 @@ export default function HatsButton({
       imageSmall: hardHat_32x32,
       imageOff: hardHat_off_512x512,
       imageOffSmall: hardHat_off_32x32,
-      imageThreeDim: hardHat_threeDim_512x512,
-      imageThreeDimSmall: hardHat_threeDim_32x32,
-      imageThreeDimOff: hardHat_512x512,
-      imageThreeDimOffSmall: hardHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -343,10 +254,6 @@ export default function HatsButton({
       imageSmall: hopliteHelmet_32x32,
       imageOff: hopliteHelmet_off_512x512,
       imageOffSmall: hopliteHelmet_off_32x32,
-      imageThreeDim: hopliteHelmet_threeDim_512x512,
-      imageThreeDimSmall: hopliteHelmet_threeDim_32x32,
-      imageThreeDimOff: hopliteHelmet_512x512,
-      imageThreeDimOffSmall: hopliteHelmet_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -355,10 +262,6 @@ export default function HatsButton({
       imageSmall: militaryHat_32x32,
       imageOff: militaryHat_off_512x512,
       imageOffSmall: militaryHat_off_32x32,
-      imageThreeDim: militaryHat_threeDim_512x512,
-      imageThreeDimSmall: militaryHat_threeDim_32x32,
-      imageThreeDimOff: militaryHat_512x512,
-      imageThreeDimOffSmall: militaryHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -367,10 +270,6 @@ export default function HatsButton({
       imageSmall: rabbitEars_32x32,
       imageOff: rabbitEars_off_512x512,
       imageOffSmall: rabbitEars_off_32x32,
-      imageThreeDim: rabbitEars_threeDim_512x512,
-      imageThreeDimSmall: rabbitEars_threeDim_32x32,
-      imageThreeDimOff: rabbitEars_512x512,
-      imageThreeDimOffSmall: rabbitEars_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -379,10 +278,6 @@ export default function HatsButton({
       imageSmall: santaHat_32x32,
       imageOff: santaHat_off_512x512,
       imageOffSmall: santaHat_off_32x32,
-      imageThreeDim: santaHat_threeDim_512x512,
-      imageThreeDimSmall: santaHat_threeDim_32x32,
-      imageThreeDimOff: santaHat_512x512,
-      imageThreeDimOffSmall: santaHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -391,10 +286,6 @@ export default function HatsButton({
       imageSmall: seamanHat_32x32,
       imageOff: seamanHat_off_512x512,
       imageOffSmall: seamanHat_off_32x32,
-      imageThreeDim: seamanHat_threeDim_512x512,
-      imageThreeDimSmall: seamanHat_threeDim_32x32,
-      imageThreeDimOff: seamanHat_512x512,
-      imageThreeDimOffSmall: seamanHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -403,10 +294,6 @@ export default function HatsButton({
       imageSmall: stylishHat_32x32,
       imageOff: stylishHat_off_512x512,
       imageOffSmall: stylishHat_off_32x32,
-      imageThreeDim: stylishHat_threeDim_512x512,
-      imageThreeDimSmall: stylishHat_threeDim_32x32,
-      imageThreeDimOff: stylishHat_512x512,
-      imageThreeDimOffSmall: stylishHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -415,10 +302,6 @@ export default function HatsButton({
       imageSmall: ushankaHat_32x32,
       imageOff: ushankaHat_off_512x512,
       imageOffSmall: ushankaHat_off_32x32,
-      imageThreeDim: ushankaHat_threeDim_512x512,
-      imageThreeDimSmall: ushankaHat_threeDim_32x32,
-      imageThreeDimOff: ushankaHat_512x512,
-      imageThreeDimOffSmall: ushankaHat_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -427,10 +310,6 @@ export default function HatsButton({
       imageSmall: vikingHelmet_32x32,
       imageOff: vikingHelmet_off_512x512,
       imageOffSmall: vikingHelmet_off_32x32,
-      imageThreeDim: vikingHelmet_threeDim_512x512,
-      imageThreeDimSmall: vikingHelmet_threeDim_32x32,
-      imageThreeDimOff: vikingHelmet_512x512,
-      imageThreeDimOffSmall: vikingHelmet_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -462,8 +341,6 @@ export default function HatsButton({
       if (isUser) {
         if (currentEffectsStyles.current[type][videoId].hats) {
           currentEffectsStyles.current[type][videoId].hats.style = effectType;
-          currentEffectsStyles.current[type][videoId].hats.transforms =
-            assetSizePositionMap.hats[effectType];
         }
       } else {
         if (
@@ -473,38 +350,14 @@ export default function HatsButton({
           remoteCurrentEffectsStyles.current[username][instance][type][
             videoId
           ].hats.style = effectType;
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
-          ].hats.transforms = assetSizePositionMap.hats[effectType];
         }
       }
 
-      await handleVisualEffectChange(
-        "hats",
-        isUser
-          ? userStreamEffects.current[type][videoId].hats
-          : remoteStreamEffects.current[username][instance][type][videoId].hats
-      );
+      await handleVisualEffectChange("hats", streamEffects);
     }
 
     setEffectsDisabled(false);
     setCloseHoldToggle(true);
-  };
-
-  const doubleClickFunction = async () => {
-    if (!effectsStyles) {
-      return;
-    }
-
-    setEffectsDisabled(true);
-
-    effectsStyles.threeDim = !effectsStyles.threeDim;
-
-    setRerender((prev) => prev + 1);
-
-    await handleVisualEffectChange("hats", streamEffects);
-
-    setEffectsDisabled(false);
   };
 
   return (
@@ -519,13 +372,7 @@ export default function HatsButton({
         if (hatsEffects[effectsStyles.style].icon) {
           const iconSrc =
             hatsEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "iconThreeDimOff"
-                  : "iconThreeDim"
-                : streamEffects
-                ? "iconOff"
-                : "icon"
+              streamEffects ? "iconOff" : "icon"
             ];
 
           if (iconSrc) {
@@ -543,24 +390,12 @@ export default function HatsButton({
         } else {
           const imageSrc =
             hatsEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "imageThreeDimOff"
-                  : "imageThreeDim"
-                : streamEffects
-                ? "imageOff"
-                : "image"
+              streamEffects ? "imageOff" : "image"
             ];
 
           const imageLoadingSrc =
             hatsEffects[effectsStyles.style][
-              effectsStyles?.threeDim
-                ? streamEffects
-                  ? "imageThreeDimOffSmall"
-                  : "imageThreeDimSmall"
-                : streamEffects
-                ? "imageOffSmall"
-                : "imageSmall"
+              streamEffects ? "imageOffSmall" : "imageSmall"
             ];
 
           if (imageSrc) {
@@ -576,7 +411,6 @@ export default function HatsButton({
           }
         }
       }}
-      doubleClickFunction={doubleClickFunction}
       holdContent={
         <div
           ref={hatsContainerRef}

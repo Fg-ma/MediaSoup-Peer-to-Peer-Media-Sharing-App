@@ -1,10 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
-import {
-  assetSizePositionMap,
-  BeardsEffectTypes,
-} from "../../context/currentEffectsStylesContext/typeConstant";
+import { BeardsEffectTypes } from "../../context/currentEffectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -86,12 +83,6 @@ export default function BeardsButton({
       iconOff?: string;
       imageOff?: string;
       imageOffSmall?: string;
-      iconThreeDim?: string;
-      imageThreeDim?: string;
-      imageThreeDimSmall?: string;
-      iconThreeDimOff?: string;
-      imageThreeDimOff?: string;
-      imageThreeDimOffSmall?: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -101,8 +92,6 @@ export default function BeardsButton({
       imageSmall: classicalCurlyBeard_32x32,
       icon: classicalCurlyBeardIcon,
       iconOff: classicalCurlyBeardOffIcon,
-      iconThreeDim: threeDim_classicalCurlyBeardIcon,
-      iconThreeDimOff: threeDim_classicalCurlyBeardOffIcon,
       flipped: true,
       bgColor: "black",
     },
@@ -111,10 +100,6 @@ export default function BeardsButton({
       imageSmall: chinBeard_32x32,
       imageOff: chinBeard_off_512x512,
       imageOffSmall: chinBeard_off_32x32,
-      imageThreeDim: chinBeard_threeDim_512x512,
-      imageThreeDimSmall: chinBeard_threeDim_32x32,
-      imageThreeDimOff: chinBeard_512x512,
-      imageThreeDimOffSmall: chinBeard_32x32,
       flipped: false,
       bgColor: "black",
     },
@@ -123,10 +108,6 @@ export default function BeardsButton({
       imageSmall: fullBeard_32x32,
       imageOff: fullBeard_off_512x512,
       imageOffSmall: fullBeard_off_32x32,
-      imageThreeDim: fullBeard_threeDim_512x512,
-      imageThreeDimSmall: fullBeard_threeDim_32x32,
-      imageThreeDimOff: fullBeard_512x512,
-      imageThreeDimOffSmall: fullBeard_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -158,8 +139,6 @@ export default function BeardsButton({
       if (isUser) {
         if (currentEffectsStyles.current[type][videoId].beards) {
           currentEffectsStyles.current[type][videoId].beards.style = effectType;
-          currentEffectsStyles.current[type][videoId].beards.transforms =
-            assetSizePositionMap.beards[effectType];
         }
       } else {
         if (
@@ -169,39 +148,14 @@ export default function BeardsButton({
           remoteCurrentEffectsStyles.current[username][instance][type][
             videoId
           ].beards.style = effectType;
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
-          ].beards.transforms = assetSizePositionMap.beards[effectType];
         }
       }
 
-      await handleVisualEffectChange(
-        "beards",
-        isUser
-          ? userStreamEffects.current[type][videoId].beards
-          : remoteStreamEffects.current[username][instance][type][videoId]
-              .beards
-      );
+      await handleVisualEffectChange("beards", streamEffects);
     }
 
     setEffectsDisabled(false);
     setCloseHoldToggle(true);
-  };
-
-  const doubleClickFunction = async () => {
-    if (!effectsStyles) {
-      return;
-    }
-
-    setEffectsDisabled(true);
-
-    effectsStyles.threeDim = !effectsStyles.threeDim;
-
-    setRerender((prev) => prev + 1);
-
-    await handleVisualEffectChange("beards", streamEffects);
-
-    setEffectsDisabled(false);
   };
 
   return (
@@ -216,13 +170,7 @@ export default function BeardsButton({
         if (beardsEffects[effectsStyles.style].icon) {
           const iconSrc =
             beardsEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "iconThreeDimOff"
-                  : "iconThreeDim"
-                : streamEffects
-                ? "iconOff"
-                : "icon"
+              streamEffects ? "iconOff" : "icon"
             ];
 
           if (iconSrc) {
@@ -240,24 +188,12 @@ export default function BeardsButton({
         } else {
           const imageSrc =
             beardsEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "imageThreeDimOff"
-                  : "imageThreeDim"
-                : streamEffects
-                ? "imageOff"
-                : "image"
+              streamEffects ? "imageOff" : "image"
             ];
 
           const imageLoadingSrc =
             beardsEffects[effectsStyles.style][
-              effectsStyles?.threeDim
-                ? streamEffects
-                  ? "imageThreeDimOffSmall"
-                  : "imageThreeDimSmall"
-                : streamEffects
-                ? "imageOffSmall"
-                : "imageSmall"
+              streamEffects ? "imageOffSmall" : "imageSmall"
             ];
 
           if (imageSrc) {
@@ -273,7 +209,6 @@ export default function BeardsButton({
           }
         }
       }}
-      doubleClickFunction={doubleClickFunction}
       holdContent={
         <div
           ref={beardsContainerRef}

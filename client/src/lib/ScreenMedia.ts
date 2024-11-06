@@ -187,40 +187,21 @@ class ScreenMedia {
     this.babylonScene.deleteEffectMeshes(effect);
 
     if (this.effects[effect as ScreenEffectTypes]) {
-      if (!currentStyle.threeDim) {
-        this.babylonScene.createEffectMeshes(
-          "2D",
-          meshData2D.meshLabel,
-          "",
-          // @ts-ignore
-          assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
-          meshData2D.meshPath,
-          meshData2D.meshFile,
-          effect,
-          "free",
-          undefined,
-          [0, 0, this.babylonScene.twoDimMeshesZCoord],
-          meshData2D.initScale,
-          meshData2D.initRotation
-        );
-      }
-      if (currentStyle.threeDim) {
-        this.babylonScene.createEffectMeshes(
-          meshData3D.meshType,
-          meshData3D.meshLabel,
-          "",
-          // @ts-ignore
-          assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
-          meshData3D.meshPath,
-          meshData3D.meshFile,
-          effect,
-          "faceTrack",
-          meshData3D.soundEffectPath,
-          [0, 0, this.babylonScene.threeDimMeshesZCoord],
-          meshData3D.initScale,
-          meshData3D.initRotation
-        );
-      }
+      this.babylonScene.createEffectMeshes(
+        meshData3D.meshType,
+        meshData3D.meshLabel,
+        "",
+        // @ts-ignore
+        assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
+        meshData3D.meshPath,
+        meshData3D.meshFile,
+        effect,
+        "faceTrack",
+        meshData3D.soundEffectPath,
+        [0, 0, this.babylonScene.threeDimMeshesZCoord],
+        meshData3D.initScale,
+        meshData3D.initRotation
+      );
     }
   };
 

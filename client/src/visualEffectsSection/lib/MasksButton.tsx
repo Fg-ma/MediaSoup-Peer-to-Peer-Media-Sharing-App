@@ -1,10 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
-import {
-  assetSizePositionMap,
-  MasksEffectTypes,
-} from "../../context/currentEffectsStylesContext/typeConstant";
+import { MasksEffectTypes } from "../../context/currentEffectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -17,134 +14,90 @@ import baseMask_512x512 from "../../../public/2DAssets/masks/baseMask/baseMask_5
 import baseMask_32x32 from "../../../public/2DAssets/masks/baseMask/baseMask_32x32.png";
 import baseMaskIcon from "../../../public/svgs/visualEffects/masks/baseMask/baseMaskIcon.svg";
 import baseMaskOffIcon from "../../../public/svgs/visualEffects/masks/baseMask/baseMaskOffIcon.svg";
-import threeDim_baseMaskIcon from "../../../public/svgs/visualEffects/masks/baseMask/threeDim_baseMaskIcon.svg";
-import threeDim_baseMaskOffIcon from "../../../public/svgs/visualEffects/masks/baseMask/threeDim_baseMaskOffIcon.svg";
 import alienMask_512x512 from "../../../public/2DAssets/masks/alienMask/alienMask_512x512.png";
 import alienMask_32x32 from "../../../public/2DAssets/masks/alienMask/alienMask_32x32.png";
 import alienMask_off_512x512 from "../../../public/2DAssets/masks/alienMask/alienMask_off_512x512.png";
 import alienMask_off_32x32 from "../../../public/2DAssets/masks/alienMask/alienMask_off_32x32.png";
-import alienMask_threeDim_512x512 from "../../../public/2DAssets/masks/alienMask/alienMask_threeDim_512x512.png";
-import alienMask_threeDim_32x32 from "../../../public/2DAssets/masks/alienMask/alienMask_threeDim_32x32.png";
 import clownMask_512x512 from "../../../public/2DAssets/masks/clownMask/clownMask_512x512.png";
 import clownMask_32x32 from "../../../public/2DAssets/masks/clownMask/clownMask_32x32.png";
 import clownMask_off_512x512 from "../../../public/2DAssets/masks/clownMask/clownMask_off_512x512.png";
 import clownMask_off_32x32 from "../../../public/2DAssets/masks/clownMask/clownMask_off_32x32.png";
-import clownMask_threeDim_512x512 from "../../../public/2DAssets/masks/clownMask/clownMask_threeDim_512x512.png";
-import clownMask_threeDim_32x32 from "../../../public/2DAssets/masks/clownMask/clownMask_threeDim_32x32.png";
 import creatureMask_512x512 from "../../../public/2DAssets/masks/creatureMask/creatureMask_512x512.png";
 import creatureMask_32x32 from "../../../public/2DAssets/masks/creatureMask/creatureMask_32x32.png";
 import creatureMask_off_512x512 from "../../../public/2DAssets/masks/creatureMask/creatureMask_off_512x512.png";
 import creatureMask_off_32x32 from "../../../public/2DAssets/masks/creatureMask/creatureMask_off_32x32.png";
-import creatureMask_threeDim_512x512 from "../../../public/2DAssets/masks/creatureMask/creatureMask_threeDim_512x512.png";
-import creatureMask_threeDim_32x32 from "../../../public/2DAssets/masks/creatureMask/creatureMask_threeDim_32x32.png";
 import cyberMask_512x512 from "../../../public/2DAssets/masks/cyberMask/cyberMask_512x512.png";
 import cyberMask_32x32 from "../../../public/2DAssets/masks/cyberMask/cyberMask_32x32.png";
 import cyberMask_off_512x512 from "../../../public/2DAssets/masks/cyberMask/cyberMask_off_512x512.png";
 import cyberMask_off_32x32 from "../../../public/2DAssets/masks/cyberMask/cyberMask_off_32x32.png";
-import cyberMask_threeDim_512x512 from "../../../public/2DAssets/masks/cyberMask/cyberMask_threeDim_512x512.png";
-import cyberMask_threeDim_32x32 from "../../../public/2DAssets/masks/cyberMask/cyberMask_threeDim_32x32.png";
 import darkKnightMask_512x512 from "../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_512x512.png";
 import darkKnightMask_32x32 from "../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_32x32.png";
 import darkKnightMask_off_512x512 from "../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_off_512x512.png";
 import darkKnightMask_off_32x32 from "../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_off_32x32.png";
-import darkKnightMask_threeDim_512x512 from "../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_threeDim_512x512.png";
-import darkKnightMask_threeDim_32x32 from "../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_threeDim_32x32.png";
 import demonMask_512x512 from "../../../public/2DAssets/masks/demonMask/demonMask_512x512.png";
 import demonMask_32x32 from "../../../public/2DAssets/masks/demonMask/demonMask_32x32.png";
 import demonMask_off_512x512 from "../../../public/2DAssets/masks/demonMask/demonMask_off_512x512.png";
 import demonMask_off_32x32 from "../../../public/2DAssets/masks/demonMask/demonMask_off_32x32.png";
-import demonMask_threeDim_512x512 from "../../../public/2DAssets/masks/demonMask/demonMask_threeDim_512x512.png";
-import demonMask_threeDim_32x32 from "../../../public/2DAssets/masks/demonMask/demonMask_threeDim_32x32.png";
 import gasMask1_512x512 from "../../../public/2DAssets/masks/gasMask1/gasMask1_512x512.png";
 import gasMask1_32x32 from "../../../public/2DAssets/masks/gasMask1/gasMask1_32x32.png";
 import gasMask1_off_512x512 from "../../../public/2DAssets/masks/gasMask1/gasMask1_off_512x512.png";
 import gasMask1_off_32x32 from "../../../public/2DAssets/masks/gasMask1/gasMask1_off_32x32.png";
-import gasMask1_threeDim_512x512 from "../../../public/2DAssets/masks/gasMask1/gasMask1_threeDim_512x512.png";
-import gasMask1_threeDim_32x32 from "../../../public/2DAssets/masks/gasMask1/gasMask1_threeDim_32x32.png";
 import gasMask2_512x512 from "../../../public/2DAssets/masks/gasMask2/gasMask2_512x512.png";
 import gasMask2_32x32 from "../../../public/2DAssets/masks/gasMask2/gasMask2_32x32.png";
 import gasMask2_off_512x512 from "../../../public/2DAssets/masks/gasMask2/gasMask2_off_512x512.png";
 import gasMask2_off_32x32 from "../../../public/2DAssets/masks/gasMask2/gasMask2_off_32x32.png";
-import gasMask2_threeDim_512x512 from "../../../public/2DAssets/masks/gasMask2/gasMask2_threeDim_512x512.png";
-import gasMask2_threeDim_32x32 from "../../../public/2DAssets/masks/gasMask2/gasMask2_threeDim_32x32.png";
 import gasMask3_512x512 from "../../../public/2DAssets/masks/gasMask3/gasMask3_512x512.png";
 import gasMask3_32x32 from "../../../public/2DAssets/masks/gasMask3/gasMask3_32x32.png";
 import gasMask3_off_512x512 from "../../../public/2DAssets/masks/gasMask3/gasMask3_off_512x512.png";
 import gasMask3_off_32x32 from "../../../public/2DAssets/masks/gasMask3/gasMask3_off_32x32.png";
-import gasMask3_threeDim_512x512 from "../../../public/2DAssets/masks/gasMask3/gasMask3_threeDim_512x512.png";
-import gasMask3_threeDim_32x32 from "../../../public/2DAssets/masks/gasMask3/gasMask3_threeDim_32x32.png";
 import gasMask4_512x512 from "../../../public/2DAssets/masks/gasMask4/gasMask4_512x512.png";
 import gasMask4_32x32 from "../../../public/2DAssets/masks/gasMask4/gasMask4_32x32.png";
 import gasMask4_off_512x512 from "../../../public/2DAssets/masks/gasMask4/gasMask4_off_512x512.png";
 import gasMask4_off_32x32 from "../../../public/2DAssets/masks/gasMask4/gasMask4_off_32x32.png";
-import gasMask4_threeDim_512x512 from "../../../public/2DAssets/masks/gasMask4/gasMask4_threeDim_512x512.png";
-import gasMask4_threeDim_32x32 from "../../../public/2DAssets/masks/gasMask4/gasMask4_threeDim_32x32.png";
 import masqueradeMask_512x512 from "../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_512x512.png";
 import masqueradeMask_32x32 from "../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_32x32.png";
 import masqueradeMask_off_512x512 from "../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_off_512x512.png";
 import masqueradeMask_off_32x32 from "../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_off_32x32.png";
-import masqueradeMask_threeDim_512x512 from "../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_threeDim_512x512.png";
-import masqueradeMask_threeDim_32x32 from "../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_threeDim_32x32.png";
 import metalManMask_512x512 from "../../../public/2DAssets/masks/metalManMask/metalManMask_512x512.png";
 import metalManMask_32x32 from "../../../public/2DAssets/masks/metalManMask/metalManMask_32x32.png";
 import metalManMask_off_512x512 from "../../../public/2DAssets/masks/metalManMask/metalManMask_off_512x512.png";
 import metalManMask_off_32x32 from "../../../public/2DAssets/masks/metalManMask/metalManMask_off_32x32.png";
-import metalManMask_threeDim_512x512 from "../../../public/2DAssets/masks/metalManMask/metalManMask_threeDim_512x512.png";
-import metalManMask_threeDim_32x32 from "../../../public/2DAssets/masks/metalManMask/metalManMask_threeDim_32x32.png";
 import oniMask_512x512 from "../../../public/2DAssets/masks/oniMask/oniMask_512x512.png";
 import oniMask_32x32 from "../../../public/2DAssets/masks/oniMask/oniMask_32x32.png";
 import oniMask_off_512x512 from "../../../public/2DAssets/masks/oniMask/oniMask_off_512x512.png";
 import oniMask_off_32x32 from "../../../public/2DAssets/masks/oniMask/oniMask_off_32x32.png";
-import oniMask_threeDim_512x512 from "../../../public/2DAssets/masks/oniMask/oniMask_threeDim_512x512.png";
-import oniMask_threeDim_32x32 from "../../../public/2DAssets/masks/oniMask/oniMask_threeDim_32x32.png";
 import plagueDoctorMask_512x512 from "../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_512x512.png";
 import plagueDoctorMask_32x32 from "../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_32x32.png";
 import plagueDoctorMask_off_512x512 from "../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_off_512x512.png";
 import plagueDoctorMask_off_32x32 from "../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_off_32x32.png";
-import plagueDoctorMask_threeDim_512x512 from "../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_threeDim_512x512.png";
-import plagueDoctorMask_threeDim_32x32 from "../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_threeDim_32x32.png";
 import sixEyesMask_512x512 from "../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_512x512.png";
 import sixEyesMask_32x32 from "../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_32x32.png";
 import sixEyesMask_off_512x512 from "../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_off_512x512.png";
 import sixEyesMask_off_32x32 from "../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_off_32x32.png";
-import sixEyesMask_threeDim_512x512 from "../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_threeDim_512x512.png";
-import sixEyesMask_threeDim_32x32 from "../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_threeDim_32x32.png";
 import tenguMask_512x512 from "../../../public/2DAssets/masks/tenguMask/tenguMask_512x512.png";
 import tenguMask_32x32 from "../../../public/2DAssets/masks/tenguMask/tenguMask_32x32.png";
 import tenguMask_off_512x512 from "../../../public/2DAssets/masks/tenguMask/tenguMask_off_512x512.png";
 import tenguMask_off_32x32 from "../../../public/2DAssets/masks/tenguMask/tenguMask_off_32x32.png";
-import tenguMask_threeDim_512x512 from "../../../public/2DAssets/masks/tenguMask/tenguMask_threeDim_512x512.png";
-import tenguMask_threeDim_32x32 from "../../../public/2DAssets/masks/tenguMask/tenguMask_threeDim_32x32.png";
 import threeFaceMask_512x512 from "../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_512x512.png";
 import threeFaceMask_32x32 from "../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_32x32.png";
 import threeFaceMask_off_512x512 from "../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_off_512x512.png";
 import threeFaceMask_off_32x32 from "../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_off_32x32.png";
-import threeFaceMask_threeDim_512x512 from "../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_threeDim_512x512.png";
-import threeFaceMask_threeDim_32x32 from "../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_threeDim_32x32.png";
 import weldingMask_512x512 from "../../../public/2DAssets/masks/weldingMask/weldingMask_512x512.png";
 import weldingMask_32x32 from "../../../public/2DAssets/masks/weldingMask/weldingMask_32x32.png";
 import weldingMask_off_512x512 from "../../../public/2DAssets/masks/weldingMask/weldingMask_off_512x512.png";
 import weldingMask_off_32x32 from "../../../public/2DAssets/masks/weldingMask/weldingMask_off_32x32.png";
-import weldingMask_threeDim_512x512 from "../../../public/2DAssets/masks/weldingMask/weldingMask_threeDim_512x512.png";
-import weldingMask_threeDim_32x32 from "../../../public/2DAssets/masks/weldingMask/weldingMask_threeDim_32x32.png";
 import woodlandMask_512x512 from "../../../public/2DAssets/masks/woodlandMask/woodlandMask_512x512.png";
 import woodlandMask_32x32 from "../../../public/2DAssets/masks/woodlandMask/woodlandMask_32x32.png";
 import woodlandMask_off_512x512 from "../../../public/2DAssets/masks/woodlandMask/woodlandMask_off_512x512.png";
 import woodlandMask_off_32x32 from "../../../public/2DAssets/masks/woodlandMask/woodlandMask_off_32x32.png";
-import woodlandMask_threeDim_512x512 from "../../../public/2DAssets/masks/woodlandMask/woodlandMask_threeDim_512x512.png";
-import woodlandMask_threeDim_32x32 from "../../../public/2DAssets/masks/woodlandMask/woodlandMask_threeDim_32x32.png";
 import woodPaintedMask_512x512 from "../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_512x512.png";
 import woodPaintedMask_32x32 from "../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_32x32.png";
 import woodPaintedMask_off_512x512 from "../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_off_512x512.png";
 import woodPaintedMask_off_32x32 from "../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_off_32x32.png";
-import woodPaintedMask_threeDim_512x512 from "../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_threeDim_512x512.png";
-import woodPaintedMask_threeDim_32x32 from "../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_threeDim_32x32.png";
 import zombieMask_512x512 from "../../../public/2DAssets/masks/zombieMask/zombieMask_512x512.png";
 import zombieMask_32x32 from "../../../public/2DAssets/masks/zombieMask/zombieMask_32x32.png";
 import zombieMask_off_512x512 from "../../../public/2DAssets/masks/zombieMask/zombieMask_off_512x512.png";
 import zombieMask_off_32x32 from "../../../public/2DAssets/masks/zombieMask/zombieMask_off_32x32.png";
-import zombieMask_threeDim_512x512 from "../../../public/2DAssets/masks/zombieMask/zombieMask_threeDim_512x512.png";
-import zombieMask_threeDim_32x32 from "../../../public/2DAssets/masks/zombieMask/zombieMask_threeDim_32x32.png";
 
 const masksLabels: {
   [masksEffectType in MasksEffectTypes]: string;
@@ -219,12 +172,6 @@ export default function MasksButton({
       iconOff?: string;
       imageOff?: string;
       imageOffSmall?: string;
-      iconThreeDim?: string;
-      imageThreeDim?: string;
-      imageThreeDimSmall?: string;
-      iconThreeDimOff?: string;
-      imageThreeDimOff?: string;
-      imageThreeDimOffSmall?: string;
       flipped: boolean;
       bgColor: "white" | "black";
     };
@@ -234,8 +181,6 @@ export default function MasksButton({
       imageSmall: baseMask_32x32,
       icon: baseMaskIcon,
       iconOff: baseMaskOffIcon,
-      iconThreeDim: threeDim_baseMaskIcon,
-      iconThreeDimOff: threeDim_baseMaskOffIcon,
       flipped: false,
       bgColor: "white",
     },
@@ -244,10 +189,6 @@ export default function MasksButton({
       imageSmall: alienMask_32x32,
       imageOff: alienMask_off_512x512,
       imageOffSmall: alienMask_off_32x32,
-      imageThreeDim: alienMask_threeDim_512x512,
-      imageThreeDimSmall: alienMask_threeDim_32x32,
-      imageThreeDimOff: alienMask_512x512,
-      imageThreeDimOffSmall: alienMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -256,10 +197,6 @@ export default function MasksButton({
       imageSmall: clownMask_32x32,
       imageOff: clownMask_off_512x512,
       imageOffSmall: clownMask_off_32x32,
-      imageThreeDim: clownMask_threeDim_512x512,
-      imageThreeDimSmall: clownMask_threeDim_32x32,
-      imageThreeDimOff: clownMask_512x512,
-      imageThreeDimOffSmall: clownMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -268,10 +205,6 @@ export default function MasksButton({
       imageSmall: creatureMask_32x32,
       imageOff: creatureMask_off_512x512,
       imageOffSmall: creatureMask_off_32x32,
-      imageThreeDim: creatureMask_threeDim_512x512,
-      imageThreeDimSmall: creatureMask_threeDim_32x32,
-      imageThreeDimOff: creatureMask_512x512,
-      imageThreeDimOffSmall: creatureMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -280,10 +213,6 @@ export default function MasksButton({
       imageSmall: cyberMask_32x32,
       imageOff: cyberMask_off_512x512,
       imageOffSmall: cyberMask_off_32x32,
-      imageThreeDim: cyberMask_threeDim_512x512,
-      imageThreeDimSmall: cyberMask_threeDim_32x32,
-      imageThreeDimOff: cyberMask_512x512,
-      imageThreeDimOffSmall: cyberMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -292,10 +221,6 @@ export default function MasksButton({
       imageSmall: darkKnightMask_32x32,
       imageOff: darkKnightMask_off_512x512,
       imageOffSmall: darkKnightMask_off_32x32,
-      imageThreeDim: darkKnightMask_threeDim_512x512,
-      imageThreeDimSmall: darkKnightMask_threeDim_32x32,
-      imageThreeDimOff: darkKnightMask_512x512,
-      imageThreeDimOffSmall: darkKnightMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -304,10 +229,6 @@ export default function MasksButton({
       imageSmall: demonMask_32x32,
       imageOff: demonMask_off_512x512,
       imageOffSmall: demonMask_off_32x32,
-      imageThreeDim: demonMask_threeDim_512x512,
-      imageThreeDimSmall: demonMask_threeDim_32x32,
-      imageThreeDimOff: demonMask_512x512,
-      imageThreeDimOffSmall: demonMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -316,10 +237,6 @@ export default function MasksButton({
       imageSmall: gasMask1_32x32,
       imageOff: gasMask1_off_512x512,
       imageOffSmall: gasMask1_off_32x32,
-      imageThreeDim: gasMask1_threeDim_512x512,
-      imageThreeDimSmall: gasMask1_threeDim_32x32,
-      imageThreeDimOff: gasMask1_512x512,
-      imageThreeDimOffSmall: gasMask1_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -328,10 +245,6 @@ export default function MasksButton({
       imageSmall: gasMask2_32x32,
       imageOff: gasMask2_off_512x512,
       imageOffSmall: gasMask2_off_32x32,
-      imageThreeDim: gasMask2_threeDim_512x512,
-      imageThreeDimSmall: gasMask2_threeDim_32x32,
-      imageThreeDimOff: gasMask2_512x512,
-      imageThreeDimOffSmall: gasMask2_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -340,10 +253,6 @@ export default function MasksButton({
       imageSmall: gasMask3_32x32,
       imageOff: gasMask3_off_512x512,
       imageOffSmall: gasMask3_off_32x32,
-      imageThreeDim: gasMask3_threeDim_512x512,
-      imageThreeDimSmall: gasMask3_threeDim_32x32,
-      imageThreeDimOff: gasMask3_512x512,
-      imageThreeDimOffSmall: gasMask3_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -352,10 +261,6 @@ export default function MasksButton({
       imageSmall: gasMask4_32x32,
       imageOff: gasMask4_off_512x512,
       imageOffSmall: gasMask4_off_32x32,
-      imageThreeDim: gasMask4_threeDim_512x512,
-      imageThreeDimSmall: gasMask4_threeDim_32x32,
-      imageThreeDimOff: gasMask4_512x512,
-      imageThreeDimOffSmall: gasMask4_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -364,10 +269,6 @@ export default function MasksButton({
       imageSmall: masqueradeMask_32x32,
       imageOff: masqueradeMask_off_512x512,
       imageOffSmall: masqueradeMask_off_32x32,
-      imageThreeDim: masqueradeMask_threeDim_512x512,
-      imageThreeDimSmall: masqueradeMask_threeDim_32x32,
-      imageThreeDimOff: masqueradeMask_512x512,
-      imageThreeDimOffSmall: masqueradeMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -376,10 +277,6 @@ export default function MasksButton({
       imageSmall: metalManMask_32x32,
       imageOff: metalManMask_off_512x512,
       imageOffSmall: metalManMask_off_32x32,
-      imageThreeDim: metalManMask_threeDim_512x512,
-      imageThreeDimSmall: metalManMask_threeDim_32x32,
-      imageThreeDimOff: metalManMask_512x512,
-      imageThreeDimOffSmall: metalManMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -388,10 +285,6 @@ export default function MasksButton({
       imageSmall: oniMask_32x32,
       imageOff: oniMask_off_512x512,
       imageOffSmall: oniMask_off_32x32,
-      imageThreeDim: oniMask_threeDim_512x512,
-      imageThreeDimSmall: oniMask_threeDim_32x32,
-      imageThreeDimOff: oniMask_512x512,
-      imageThreeDimOffSmall: oniMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -400,10 +293,6 @@ export default function MasksButton({
       imageSmall: plagueDoctorMask_32x32,
       imageOff: plagueDoctorMask_off_512x512,
       imageOffSmall: plagueDoctorMask_off_32x32,
-      imageThreeDim: plagueDoctorMask_threeDim_512x512,
-      imageThreeDimSmall: plagueDoctorMask_threeDim_32x32,
-      imageThreeDimOff: plagueDoctorMask_512x512,
-      imageThreeDimOffSmall: plagueDoctorMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -412,10 +301,6 @@ export default function MasksButton({
       imageSmall: sixEyesMask_32x32,
       imageOff: sixEyesMask_off_512x512,
       imageOffSmall: sixEyesMask_off_32x32,
-      imageThreeDim: sixEyesMask_threeDim_512x512,
-      imageThreeDimSmall: sixEyesMask_threeDim_32x32,
-      imageThreeDimOff: sixEyesMask_512x512,
-      imageThreeDimOffSmall: sixEyesMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -424,10 +309,6 @@ export default function MasksButton({
       imageSmall: tenguMask_32x32,
       imageOff: tenguMask_off_512x512,
       imageOffSmall: tenguMask_off_32x32,
-      imageThreeDim: tenguMask_threeDim_512x512,
-      imageThreeDimSmall: tenguMask_threeDim_32x32,
-      imageThreeDimOff: tenguMask_512x512,
-      imageThreeDimOffSmall: tenguMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -436,10 +317,6 @@ export default function MasksButton({
       imageSmall: threeFaceMask_32x32,
       imageOff: threeFaceMask_off_512x512,
       imageOffSmall: threeFaceMask_off_32x32,
-      imageThreeDim: threeFaceMask_threeDim_512x512,
-      imageThreeDimSmall: threeFaceMask_threeDim_32x32,
-      imageThreeDimOff: threeFaceMask_512x512,
-      imageThreeDimOffSmall: threeFaceMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -448,10 +325,6 @@ export default function MasksButton({
       imageSmall: weldingMask_32x32,
       imageOff: weldingMask_off_512x512,
       imageOffSmall: weldingMask_off_32x32,
-      imageThreeDim: weldingMask_threeDim_512x512,
-      imageThreeDimSmall: weldingMask_threeDim_32x32,
-      imageThreeDimOff: weldingMask_512x512,
-      imageThreeDimOffSmall: weldingMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -460,10 +333,6 @@ export default function MasksButton({
       imageSmall: woodlandMask_32x32,
       imageOff: woodlandMask_off_512x512,
       imageOffSmall: woodlandMask_off_32x32,
-      imageThreeDim: woodlandMask_threeDim_512x512,
-      imageThreeDimSmall: woodlandMask_threeDim_32x32,
-      imageThreeDimOff: woodlandMask_512x512,
-      imageThreeDimOffSmall: woodlandMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -472,10 +341,6 @@ export default function MasksButton({
       imageSmall: woodPaintedMask_32x32,
       imageOff: woodPaintedMask_off_512x512,
       imageOffSmall: woodPaintedMask_off_32x32,
-      imageThreeDim: woodPaintedMask_threeDim_512x512,
-      imageThreeDimSmall: woodPaintedMask_threeDim_32x32,
-      imageThreeDimOff: woodPaintedMask_512x512,
-      imageThreeDimOffSmall: woodPaintedMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -484,10 +349,6 @@ export default function MasksButton({
       imageSmall: zombieMask_32x32,
       imageOff: zombieMask_off_512x512,
       imageOffSmall: zombieMask_off_32x32,
-      imageThreeDim: zombieMask_threeDim_512x512,
-      imageThreeDimSmall: zombieMask_threeDim_32x32,
-      imageThreeDimOff: zombieMask_512x512,
-      imageThreeDimOffSmall: zombieMask_32x32,
       flipped: false,
       bgColor: "white",
     },
@@ -519,8 +380,6 @@ export default function MasksButton({
       if (isUser) {
         if (currentEffectsStyles.current[type][videoId].masks) {
           currentEffectsStyles.current[type][videoId].masks.style = effectType;
-          currentEffectsStyles.current[type][videoId].masks.transforms =
-            assetSizePositionMap.masks[effectType];
         }
       } else {
         if (
@@ -530,38 +389,14 @@ export default function MasksButton({
           remoteCurrentEffectsStyles.current[username][instance][type][
             videoId
           ].masks.style = effectType;
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
-          ].masks.transforms = assetSizePositionMap.masks[effectType];
         }
       }
 
-      await handleVisualEffectChange(
-        "masks",
-        isUser
-          ? userStreamEffects.current[type][videoId].masks
-          : remoteStreamEffects.current[username][instance][type][videoId].masks
-      );
+      await handleVisualEffectChange("masks", streamEffects);
     }
 
     setEffectsDisabled(false);
     setCloseHoldToggle(true);
-  };
-
-  const doubleClickFunction = async () => {
-    if (!effectsStyles) {
-      return;
-    }
-
-    setEffectsDisabled(true);
-
-    effectsStyles.threeDim = !effectsStyles.threeDim;
-
-    setRerender((prev) => !prev);
-
-    await handleVisualEffectChange("masks", streamEffects);
-
-    setEffectsDisabled(false);
   };
 
   return (
@@ -576,13 +411,7 @@ export default function MasksButton({
         if (masksEffects[effectsStyles.style].icon) {
           const iconSrc =
             masksEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "iconThreeDimOff"
-                  : "iconThreeDim"
-                : streamEffects
-                ? "iconOff"
-                : "icon"
+              streamEffects ? "iconOff" : "icon"
             ];
 
           if (iconSrc) {
@@ -600,24 +429,12 @@ export default function MasksButton({
         } else {
           const imageSrc =
             masksEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "imageThreeDimOff"
-                  : "imageThreeDim"
-                : streamEffects
-                ? "imageOff"
-                : "image"
+              streamEffects ? "imageOff" : "image"
             ];
 
           const imageLoadingSrc =
             masksEffects[effectsStyles.style][
-              effectsStyles.threeDim
-                ? streamEffects
-                  ? "imageThreeDimOffSmall"
-                  : "imageThreeDimSmall"
-                : streamEffects
-                ? "imageOffSmall"
-                : "imageSmall"
+              streamEffects ? "imageOffSmall" : "imageSmall"
             ];
 
           if (imageSrc) {
@@ -633,7 +450,6 @@ export default function MasksButton({
           }
         }
       }}
-      doubleClickFunction={doubleClickFunction}
       holdContent={
         <div
           ref={masksContainerRef}
