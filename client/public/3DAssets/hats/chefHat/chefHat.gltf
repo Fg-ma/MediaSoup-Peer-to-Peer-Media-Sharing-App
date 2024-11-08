@@ -22,7 +22,13 @@
 		{
 			"doubleSided":true,
 			"name":"chefhat_1_null",
-			"pbrMetallicRoughness":{}
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":0
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
 		}
 	],
 	"meshes":[
@@ -39,6 +45,19 @@
 					"material":0
 				}
 			]
+		}
+	],
+	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		}
+	],
+	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"chefhat_1_null_diffuse",
+			"uri":"texs/chefhat_1_null_diffuse.png"
 		}
 	],
 	"accessors":[
@@ -101,6 +120,12 @@
 			"byteLength":6072,
 			"byteOffset":18976,
 			"target":34963
+		}
+	],
+	"samplers":[
+		{
+			"magFilter":9729,
+			"minFilter":9987
 		}
 	],
 	"buffers":[

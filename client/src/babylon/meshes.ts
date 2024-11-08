@@ -35,7 +35,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.5, 1.5, 1.5],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/mustaches/fullMustache.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -5 },
     },
     mustache1: {
       defaultMeshPlacement: "nose",
@@ -46,7 +46,7 @@ const assetMeshes: MeshesData = {
       initScale: [0.4375, 0.4375, 0.4375],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/mustaches/mustache1.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -3.5 },
     },
     mustache2: {
       defaultMeshPlacement: "nose",
@@ -57,7 +57,7 @@ const assetMeshes: MeshesData = {
       initScale: [0.4375, 0.4375, 0.4375],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/mustaches/mustache2.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -3.5 },
     },
     mustache3: {
       defaultMeshPlacement: "nose",
@@ -68,7 +68,7 @@ const assetMeshes: MeshesData = {
       initScale: [0.4375, 0.4375, 0.4375],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/mustaches/mustache3.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -3.5 },
     },
     mustache4: {
       defaultMeshPlacement: "nose",
@@ -79,7 +79,7 @@ const assetMeshes: MeshesData = {
       initScale: [0.4375, 0.4375, 0.4375],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -2 },
     },
     nicodemusMustache: {
       defaultMeshPlacement: "nose",
@@ -90,7 +90,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.75, 1.75, 1.75],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -3 },
     },
     pencilMustache: {
       defaultMeshPlacement: "nose",
@@ -101,7 +101,7 @@ const assetMeshes: MeshesData = {
       initScale: [1, 1, 1],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/mustaches/pencilMustache.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -2.5 },
     },
     spongebobMustache: {
       defaultMeshPlacement: "nose",
@@ -112,7 +112,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.5, 1.5, 1.5],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -2.5 },
     },
     tinyMustache: {
       defaultMeshPlacement: "nose",
@@ -123,7 +123,7 @@ const assetMeshes: MeshesData = {
       initScale: [1, 1, 1],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -2 },
     },
     wingedMustache: {
       defaultMeshPlacement: "nose",
@@ -134,7 +134,7 @@ const assetMeshes: MeshesData = {
       initScale: [1, 1, 1],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -3 },
     },
   },
   beards: {
@@ -820,7 +820,7 @@ const assetMeshes: MeshesData = {
       meshType: "gltf",
       meshLabel: "vikingHelmet_gltf",
       meshPath: "/3DAssets/hats/vikingHelmet/",
-      meshFile: "vikingHelmet.gltf",
+      meshFile: "vikingHelmet2.gltf",
       initScale: [1.75, 1.75, 1.75],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/hats/vikingHelmet.mp3",
@@ -837,7 +837,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     axolotl: {
       defaultMeshPlacement: "forehead",
@@ -848,7 +848,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/axolotl.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 20 },
     },
     babyDragon: {
       defaultMeshPlacement: "forehead",
@@ -859,7 +859,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/babyDragon.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     beardedDragon: {
       defaultMeshPlacement: "forehead",
@@ -870,7 +870,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.5, 1.5, 1.5],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     bird1: {
       defaultMeshPlacement: "forehead",
@@ -881,7 +881,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/bird1.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     bird2: {
       defaultMeshPlacement: "forehead",
@@ -889,10 +889,10 @@ const assetMeshes: MeshesData = {
       meshLabel: "bird2_gltf",
       meshPath: "/3DAssets/pets/bird2/",
       meshFile: "bird2.gltf",
-      initScale: [1.25, 1.25, 1.25],
+      initScale: [1.5, 1.5, 1.5],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/bird2.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 12 },
     },
     boxer: {
       defaultMeshPlacement: "forehead",
@@ -903,7 +903,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.5, 1.5, 1.5],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/boxer.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 4 },
     },
     brain: {
       defaultMeshPlacement: "forehead",
@@ -914,7 +914,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.5, 1.5, 1.5],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/brain.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     buddyHamster: {
       defaultMeshPlacement: "forehead",
@@ -922,10 +922,10 @@ const assetMeshes: MeshesData = {
       meshLabel: "buddyHamster_gltf",
       meshPath: "/3DAssets/pets/buddyHamster/",
       meshFile: "buddyHamster.gltf",
-      initScale: [1.5, 1.5, 1.5],
+      initScale: [1, 1, 1],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 16 },
     },
     cat1: {
       defaultMeshPlacement: "forehead",
@@ -933,10 +933,10 @@ const assetMeshes: MeshesData = {
       meshLabel: "cat1_gltf",
       meshPath: "/3DAssets/pets/cat1/",
       meshFile: "cat1.gltf",
-      initScale: [1.25, 1.25, 1.25],
+      initScale: [1, 1, 1],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/cat1.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 28 },
     },
     cat2: {
       defaultMeshPlacement: "forehead",
@@ -944,10 +944,10 @@ const assetMeshes: MeshesData = {
       meshLabel: "cat2_gltf",
       meshPath: "/3DAssets/pets/cat2/",
       meshFile: "cat2.gltf",
-      initScale: [1.5, 1.5, 1.5],
+      initScale: [1, 1, 1],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/cat2.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 16 },
     },
     dodoBird: {
       defaultMeshPlacement: "forehead",
@@ -958,7 +958,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 20 },
     },
     happyHamster: {
       defaultMeshPlacement: "forehead",
@@ -969,7 +969,7 @@ const assetMeshes: MeshesData = {
       initScale: [0.75, 0.75, 0.75],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 16 },
     },
     mechanicalGrasshopper: {
       defaultMeshPlacement: "forehead",
@@ -977,10 +977,10 @@ const assetMeshes: MeshesData = {
       meshLabel: "mechanicalGrasshopper_gltf",
       meshPath: "/3DAssets/pets/mechanicalGrasshopper/",
       meshFile: "mechanicalGrasshopper.gltf",
-      initScale: [1.625, 1.625, 1.625],
+      initScale: [1.5, 1.5, 1.5],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/mechanicalGrasshopper.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 16 },
     },
     panda1: {
       defaultMeshPlacement: "forehead",
@@ -991,7 +991,7 @@ const assetMeshes: MeshesData = {
       initScale: [1, 1, 1],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 24 },
     },
     panda2: {
       defaultMeshPlacement: "forehead",
@@ -1002,7 +1002,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 24 },
     },
     petRock: {
       defaultMeshPlacement: "forehead",
@@ -1013,7 +1013,7 @@ const assetMeshes: MeshesData = {
       initScale: [0.5, 0.5, 0.5],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 12 },
     },
     pig: {
       defaultMeshPlacement: "forehead",
@@ -1024,7 +1024,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/pig.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     redFox1: {
       defaultMeshPlacement: "forehead",
@@ -1035,7 +1035,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/redFox1.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     redFox2: {
       defaultMeshPlacement: "forehead",
@@ -1046,7 +1046,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.625, 1.625, 1.625],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/redFox2.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     roboDog: {
       defaultMeshPlacement: "forehead",
@@ -1054,10 +1054,10 @@ const assetMeshes: MeshesData = {
       meshLabel: "roboDog_gltf",
       meshPath: "/3DAssets/pets/roboDog/",
       meshFile: "roboDog.gltf",
-      initScale: [0.375, 0.375, 0.375],
+      initScale: [1.25, 1.25, 1.25],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/roboDog.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 16 },
     },
     skeletonTRex: {
       defaultMeshPlacement: "forehead",
@@ -1068,7 +1068,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.5, 1.5, 1.5],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     snail: {
       defaultMeshPlacement: "forehead",
@@ -1079,7 +1079,7 @@ const assetMeshes: MeshesData = {
       initScale: [1, 1, 1],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/snail.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     spinosaurus: {
       defaultMeshPlacement: "forehead",
@@ -1090,7 +1090,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.625, 1.625, 1.625],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/spinosaurus.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
     TRex: {
       defaultMeshPlacement: "forehead",
@@ -1101,7 +1101,7 @@ const assetMeshes: MeshesData = {
       initScale: [0.004, 0.004, 0.004],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/pets/TRex.mp3",
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 8 },
     },
   },
 };

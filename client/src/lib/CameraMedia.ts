@@ -248,6 +248,8 @@ class CameraMedia {
               i,
               effect as EffectType,
               "faceTrack",
+              meshData.transforms.offsetX,
+              meshData.transforms.offsetY,
               meshData.soundEffectPath,
               [0, 0, this.babylonScene.threeDimMeshesZCoord],
               meshData.initScale,
@@ -354,25 +356,27 @@ class CameraMedia {
     }
 
     // @ts-ignore
-    const meshData3D = assetMeshes[effect][currentStyle.style];
+    const meshData = assetMeshes[effect][currentStyle.style];
 
     // Delete old meshes
     this.babylonScene.deleteEffectMeshes(effect);
 
     if (this.effects[effect]) {
       this.babylonScene.createEffectMeshes(
-        meshData3D.meshType,
-        meshData3D.meshLabel,
+        meshData.meshType,
+        meshData.meshLabel,
         "",
-        meshData3D.defaultMeshPlacement,
-        meshData3D.meshPath,
-        meshData3D.meshFile,
+        meshData.defaultMeshPlacement,
+        meshData.meshPath,
+        meshData.meshFile,
         effect,
         "faceTrack",
-        meshData3D.soundEffectPath,
+        meshData.transforms.offsetX,
+        meshData.transforms.offsetY,
+        meshData.soundEffectPath,
         [0, 0, this.babylonScene.threeDimMeshesZCoord],
-        meshData3D.initScale,
-        meshData3D.initRotation
+        meshData.initScale,
+        meshData.initRotation
       );
     }
   };

@@ -3,10 +3,6 @@ import {
   NormalizedLandmarkList,
   NormalizedLandmarkListList,
 } from "@mediapipe/face_mesh";
-import {
-  CameraEffectStylesType,
-  EffectStylesType,
-} from "../context/currentEffectsStylesContext/typeConstant";
 import Deadbanding from "./Deadbanding";
 import SmoothLandmarksUtils from "./SmoothLandmarksUtils";
 import { Point2D } from "./typeContant";
@@ -185,13 +181,6 @@ class FaceLandmarks {
     });
 
     this.faceIdLandmarksPairs = faceIdLandmarksPairs;
-  };
-
-  private directionalShift = (shiftDistance: number, headAngle: number) => {
-    const perpendicularAngle = headAngle + Math.PI / 2;
-    const shiftX = Math.cos(perpendicularAngle) * shiftDistance;
-    const shiftY = Math.sin(perpendicularAngle) * shiftDistance;
-    return { shiftX, shiftY };
   };
 
   private updateHeadRotations = (

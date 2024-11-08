@@ -429,7 +429,7 @@ class BabylonRenderLoop {
   private positionsScreenSpaceToSceneSpace = (
     mesh: AbstractMesh,
     position: [number, number]
-  ) => {
+  ): [number, number, number] => {
     const zPosition = mesh.position.z; // distance from camera
     const cameraFOV = this.camera.fov; // FOV in radians
     const aspectRatio = this.canvas.width / this.canvas.height;
@@ -446,7 +446,9 @@ class BabylonRenderLoop {
     ];
   };
 
-  private sceneSpaceToPositionsScreenSpace = (mesh: AbstractMesh) => {
+  private sceneSpaceToPositionsScreenSpace = (
+    mesh: AbstractMesh
+  ): [number, number] => {
     const zPosition = mesh.position.z;
     const cameraFOV = this.camera.fov;
     const aspectRatio = this.canvas.width / this.canvas.height;
@@ -476,6 +478,21 @@ class BabylonRenderLoop {
 
     // Convert normalized screen coordinates to world coordinates
     return scale * Math.max(verticalExtent, horizontalExtent);
+  };
+
+  private directionalShift = (
+    shiftParallel: number,
+    shiftPerpendicular: number,
+    headAngle: number
+  ): { x: number; y: number } => {
+    let x = Math.cos(headAngle) * shiftParallel;
+    let y = Math.sin(headAngle) * shiftParallel;
+
+    const perpendicularAngle = headAngle + Math.PI / 2;
+    x += Math.cos(perpendicularAngle) * shiftPerpendicular;
+    y += Math.sin(perpendicularAngle) * shiftPerpendicular;
+
+    return { x, y };
   };
 
   private updateMeshPositionsScaleRotation = () => {
@@ -544,7 +561,7 @@ class BabylonRenderLoop {
       usedTrackers[meshMetadata.effectType].push(closestTrackerId);
 
       if (meshMetadata.positionStyle === "faceTrack") {
-        let position: number[] | undefined;
+        let position: [number, number, number] | undefined;
 
         switch (meshMetadata.defaultMeshPlacement) {
           case "forehead":
@@ -578,6 +595,18 @@ class BabylonRenderLoop {
         if (!position) {
           continue;
         }
+
+        // Offset the position
+        const offset = this.directionalShift(
+          meshMetadata.shiftX,
+          meshMetadata.shiftY,
+          calculatedLandmarks.headRotationAngles[closestTrackerId]
+        );
+        position = [
+          position[0] + offset.x,
+          position[1] + offset.y,
+          position[2],
+        ];
 
         // Set the mesh position in world space
         mesh.position = new Vector3(position[0], position[1], position[2]);
