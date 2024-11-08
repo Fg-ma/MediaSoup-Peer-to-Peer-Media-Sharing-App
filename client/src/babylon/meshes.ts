@@ -147,7 +147,7 @@ const assetMeshes: MeshesData = {
       initScale: [0.625, 0.625, 0.625],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: 6 },
     },
     classicalCurlyBeard: {
       defaultMeshPlacement: "nose",
@@ -158,7 +158,7 @@ const assetMeshes: MeshesData = {
       initScale: [1.875, 1.875, 1.875],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -28 },
     },
     fullBeard: {
       defaultMeshPlacement: "nose",
@@ -166,10 +166,10 @@ const assetMeshes: MeshesData = {
       meshLabel: "fullBeard_gltf",
       meshPath: "/3DAssets/beards/fullBeard/",
       meshFile: "fullBeard.gltf",
-      initScale: [2.25, 2.25, 2.25],
+      initScale: [3, 2.5, 2.5],
       initRotation: [0, 0, 0],
       soundEffectPath: undefined,
-      transforms: { offsetX: 0, offsetY: 0 },
+      transforms: { offsetX: 0, offsetY: -17 },
     },
   },
   masks: {

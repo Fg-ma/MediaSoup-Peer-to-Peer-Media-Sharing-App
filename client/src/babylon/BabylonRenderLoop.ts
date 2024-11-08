@@ -483,7 +483,8 @@ class BabylonRenderLoop {
   private directionalShift = (
     shiftParallel: number,
     shiftPerpendicular: number,
-    headAngle: number
+    headAngle: number,
+    headPitchAngle: number
   ): { x: number; y: number } => {
     let x = Math.cos(headAngle) * shiftParallel;
     let y = Math.sin(headAngle) * shiftParallel;
@@ -600,7 +601,8 @@ class BabylonRenderLoop {
         const offset = this.directionalShift(
           meshMetadata.shiftX,
           meshMetadata.shiftY,
-          calculatedLandmarks.headRotationAngles[closestTrackerId]
+          calculatedLandmarks.headRotationAngles[closestTrackerId],
+          calculatedLandmarks.headPitchAngles[closestTrackerId]
         );
         position = [
           position[0] + offset.x,
