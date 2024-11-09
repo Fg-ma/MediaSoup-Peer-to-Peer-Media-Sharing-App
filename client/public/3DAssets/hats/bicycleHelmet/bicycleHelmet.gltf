@@ -86,7 +86,7 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":1225,
+			"count":1158,
 			"max":[
 				0.702078104019165,
 				0.4397217631340027,
@@ -102,45 +102,45 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":1225,
+			"count":1158,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":1225,
+			"count":1158,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":6192,
+			"count":5844,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":14700,
+			"byteLength":13896,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":14700,
-			"byteOffset":14700,
+			"byteLength":13896,
+			"byteOffset":13896,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":9800,
-			"byteOffset":29400,
+			"byteLength":9264,
+			"byteOffset":27792,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":12384,
-			"byteOffset":39200,
+			"byteLength":11688,
+			"byteOffset":37056,
 			"target":34963
 		}
 	],
@@ -152,7 +152,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":51584,
+			"byteLength":48744,
 			"uri":"bicycleHelmet.bin"
 		}
 	]

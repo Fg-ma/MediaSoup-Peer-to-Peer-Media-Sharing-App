@@ -598,9 +598,12 @@ class BabylonRenderLoop {
         }
 
         // Offset the position
+        const interocularScaleShift =
+          calculatedLandmarks.interocularDistances[closestTrackerId] * 5;
+
         const offset = this.directionalShift(
-          meshMetadata.shiftX,
-          meshMetadata.shiftY,
+          meshMetadata.shiftX * interocularScaleShift,
+          meshMetadata.shiftY * interocularScaleShift,
           calculatedLandmarks.headRotationAngles[closestTrackerId],
           calculatedLandmarks.headPitchAngles[closestTrackerId]
         );

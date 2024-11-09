@@ -200,14 +200,14 @@ class FaceLandmarks {
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headRotationAngles",
       faceId,
-      Math.atan2(dyEyes, dxEyes)
+      Math.atan2(dyEyes, dxEyes) / 1.35
     );
 
     // Calculate head angle y axis
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headYawAngles",
       faceId,
-      Math.atan2(dzEyes, dxEyes)
+      Math.atan2(dzEyes, dxEyes) / 1.4
     );
 
     // Calculate the pitch using the distances between points
@@ -216,11 +216,18 @@ class FaceLandmarks {
       noseBridge.y - (leftNoseBase.y + rightNoseBase.y) / 2
     );
 
+    let headPitchAngle = Math.atan2(depthDistance, verticalDistance);
+    if (headPitchAngle > 0) {
+      headPitchAngle /= 1.5;
+    } else {
+      headPitchAngle /= 1.1;
+    }
+
     // Calculate head angle x axis
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headPitchAngles",
       faceId,
-      Math.atan2(depthDistance, verticalDistance)
+      headPitchAngle
     );
 
     return [dxEyes, dyEyes, dzEyes];
@@ -231,7 +238,8 @@ class FaceLandmarks {
     leftEye: NormalizedLandmark,
     rightEye: NormalizedLandmark,
     dxEyes: number,
-    dyEyes: number
+    dyEyes: number,
+    dzEyes: number
   ) => {
     // Set eye center positions
     const eyesCenterPosition: [number, number] = [
@@ -244,11 +252,18 @@ class FaceLandmarks {
       eyesCenterPosition
     );
 
+    // Calculate the basic 2D interocular distance
+    const interocularDistance2D = Math.sqrt(
+      dxEyes * dxEyes +
+        (dyEyes / 2) * (dyEyes / 2) +
+        (dzEyes / 2.5) * (dzEyes / 2.5)
+    );
+
     // Update InterocularDistance
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "interocularDistances",
       faceId,
-      Math.sqrt(dxEyes * dxEyes + dyEyes * dyEyes)
+      interocularDistance2D
     );
   };
 
@@ -296,7 +311,7 @@ class FaceLandmarks {
         rightNoseBase
       );
 
-      this.updateEyes(faceId, rightEye, leftEye, dxEyes, dyEyes);
+      this.updateEyes(faceId, rightEye, leftEye, dxEyes, dyEyes, dzEyes);
 
       this.updateChin(faceId, chin);
 

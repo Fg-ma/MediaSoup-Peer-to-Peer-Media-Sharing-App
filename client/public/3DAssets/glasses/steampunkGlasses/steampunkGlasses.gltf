@@ -22,7 +22,6 @@
 		{
 			"alphaCutoff":0.5,
 			"alphaMode":"MASK",
-			"doubleSided":true,
 			"name":"DefaultMaterial.001",
 			"normalTexture":{
 				"index":0
@@ -91,7 +90,7 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":3101,
+			"count":2962,
 			"max":[
 				0.7883263826370239,
 				0.25048965215682983,
@@ -107,45 +106,45 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":3101,
+			"count":2962,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":3101,
+			"count":2962,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":15240,
+			"count":14343,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":37212,
+			"byteLength":35544,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":37212,
-			"byteOffset":37212,
+			"byteLength":35544,
+			"byteOffset":35544,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":24808,
-			"byteOffset":74424,
+			"byteLength":23696,
+			"byteOffset":71088,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":30480,
-			"byteOffset":99232,
+			"byteLength":28686,
+			"byteOffset":94784,
 			"target":34963
 		}
 	],
@@ -157,7 +156,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":129712,
+			"byteLength":123472,
 			"uri":"steampunkGlasses.bin"
 		}
 	]

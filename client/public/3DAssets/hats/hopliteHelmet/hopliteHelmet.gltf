@@ -109,73 +109,73 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":1937,
+			"count":1905,
 			"max":[
-				0.9015988111495972,
-				1.5041382312774658,
-				0.44454944133758545
+				0.9015988707542419,
+				1.4358816146850586,
+				0.6419830322265625
 			],
 			"min":[
-				-0.9015988111495972,
-				-0.33454516530036926,
-				-0.35571593046188354
+				-0.9015987515449524,
+				-0.4028018116950989,
+				-0.1582823544740677
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":1937,
+			"count":1905,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":1937,
+			"count":1905,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5126,
-			"count":1937,
+			"count":1905,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":4,
 			"componentType":5123,
-			"count":8574,
+			"count":8376,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":23244,
+			"byteLength":22860,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":23244,
-			"byteOffset":23244,
+			"byteLength":22860,
+			"byteOffset":22860,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":15496,
-			"byteOffset":46488,
+			"byteLength":15240,
+			"byteOffset":45720,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":15496,
-			"byteOffset":61984,
+			"byteLength":15240,
+			"byteOffset":60960,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":17148,
-			"byteOffset":77480,
+			"byteLength":16752,
+			"byteOffset":76200,
 			"target":34963
 		}
 	],
@@ -187,7 +187,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":94628,
+			"byteLength":92952,
 			"uri":"hopliteHelmet.bin"
 		}
 	]

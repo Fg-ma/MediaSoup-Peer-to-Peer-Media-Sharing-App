@@ -190,11 +190,11 @@
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":3122,
+			"count":2383,
 			"max":[
 				0.9747769236564636,
 				1.091149091720581,
-				1.093042016029358
+				1.0896915197372437
 			],
 			"min":[
 				-0.9790645837783813,
@@ -206,19 +206,19 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":3122,
+			"count":2383,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":3122,
+			"count":2383,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":7,
 			"componentType":5123,
-			"count":11616,
+			"count":11415,
 			"type":"SCALAR"
 		}
 	],
@@ -249,26 +249,26 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":37464,
+			"byteLength":28596,
 			"byteOffset":80240,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":37464,
-			"byteOffset":117704,
+			"byteLength":28596,
+			"byteOffset":108836,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":24976,
-			"byteOffset":155168,
+			"byteLength":19064,
+			"byteOffset":137432,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":23232,
-			"byteOffset":180144,
+			"byteLength":22830,
+			"byteOffset":156496,
 			"target":34963
 		}
 	],
@@ -280,7 +280,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":203376,
+			"byteLength":179328,
 			"uri":"aviatorHelmet.bin"
 		}
 	]
