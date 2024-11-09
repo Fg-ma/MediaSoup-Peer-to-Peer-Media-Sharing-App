@@ -156,29 +156,29 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":2047,
+			"count":2046,
 			"max":[
-				0.9729176163673401,
-				-0.0008201618911698461,
-				1.011618971824646
+				0.9968914985656738,
+				0.2056768238544464,
+				1.470998764038086
 			],
 			"min":[
-				-0.9800004363059998,
-				-0.6208339333534241,
-				-1.2318284511566162
+				-0.956026554107666,
+				-0.4143369495868683,
+				-0.7724486589431763
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":2047,
+			"count":2046,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":2047,
+			"count":2046,
 			"type":"VEC2"
 		},
 		{
@@ -192,14 +192,14 @@
 			"componentType":5126,
 			"count":2383,
 			"max":[
-				0.9747769236564636,
-				1.091149091720581,
-				1.0896915197372437
+				0.9987508058547974,
+				1.2976460456848145,
+				1.5490713119506836
 			],
 			"min":[
-				-0.9790645837783813,
-				-3.2875845432281494,
-				-1.1951985359191895
+				-0.9550907015800476,
+				-3.081087589263916,
+				-0.7358187437057495
 			],
 			"type":"VEC3"
 		},
@@ -225,50 +225,50 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":24564,
+			"byteLength":24552,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":24564,
-			"byteOffset":24564,
+			"byteLength":24552,
+			"byteOffset":24552,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":16376,
-			"byteOffset":49128,
+			"byteLength":16368,
+			"byteOffset":49104,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":14736,
-			"byteOffset":65504,
+			"byteOffset":65472,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":28596,
-			"byteOffset":80240,
+			"byteOffset":80208,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":28596,
-			"byteOffset":108836,
+			"byteOffset":108804,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":19064,
-			"byteOffset":137432,
+			"byteOffset":137400,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":22830,
-			"byteOffset":156496,
+			"byteOffset":156464,
 			"target":34963
 		}
 	],
@@ -280,7 +280,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":179328,
+			"byteLength":179296,
 			"uri":"aviatorHelmet.bin"
 		}
 	]

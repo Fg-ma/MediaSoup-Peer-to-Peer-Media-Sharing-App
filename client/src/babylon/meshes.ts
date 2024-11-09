@@ -237,7 +237,7 @@ const assetMeshes: MeshesData = {
       initScale: [4.5, 4.25, 4.25],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/masks/darkKnightMask.mp3",
-      transforms: { offsetX: 0, offsetY: -0.5 },
+      transforms: { offsetX: 0, offsetY: -1 },
     },
     demonMask: {
       defaultMeshPlacement: "eyesCenter",
@@ -629,12 +629,12 @@ const assetMeshes: MeshesData = {
       transforms: { offsetX: 0, offsetY: 0 },
     },
     aviatorHelmet: {
-      defaultMeshPlacement: "forehead",
+      defaultMeshPlacement: "eyesCenter",
       meshType: "gltf",
       meshLabel: "aviatorHelmet_gltf",
       meshPath: "/3DAssets/hats/aviatorHelmet/",
       meshFile: "aviatorHelmet.gltf",
-      initScale: [1.25, 1.25, 1.25],
+      initScale: [1.625, 1.625, 1.625],
       initRotation: [0, 0, 0],
       soundEffectPath: "/audioAssets/hats/aviatorHelmet.mp3",
       transforms: { offsetX: 0, offsetY: 0 },
