@@ -7,7 +7,7 @@ import FgSVG from "../../fgSVG/FgSVG";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../../audioEffects/AudioEffects";
+} from "../../audioEffects/typeConstant";
 
 export default function SamplerEffect({
   samplerEffectsToolbarRef,
@@ -178,22 +178,22 @@ export default function SamplerEffect({
         )}
       </div>
       <div className='w-max h-max flex space-x-3'>
-        {Object.entries(effect.options).map((option) => (
+        {Object.entries(effect.options).map(([key, option]) => (
           <FgKnobButton
-            key={option[0]}
+            key={key}
             height={5.75}
             options={{
-              id: option[1].id,
-              initValue: option[1].initValue,
-              topLabel: option[1].topLabel,
-              bottomLabel: option[1].bottomLabel,
-              ticks: option[1].ticks,
-              rangeMax: option[1].rangeMax,
-              rangeMin: option[1].rangeMin,
-              precision: option[1].precision,
-              units: option[1].units,
-              snapToWholeNum: option[1].snapToWholeNum,
-              snapToNearestTick: option[1].snapToNearestTick,
+              id: option?.id,
+              initValue: option?.initValue,
+              topLabel: option?.topLabel,
+              bottomLabel: option?.bottomLabel,
+              ticks: option?.ticks,
+              rangeMax: option?.rangeMax,
+              rangeMin: option?.rangeMin,
+              precision: option?.precision,
+              units: option?.units,
+              snapToWholeNum: option?.snapToWholeNum,
+              snapToNearestTick: option?.snapToNearestTick,
             }}
             onValueChange={handleValueChange}
           />

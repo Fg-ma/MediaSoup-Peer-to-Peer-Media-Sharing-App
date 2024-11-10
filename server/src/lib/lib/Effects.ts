@@ -15,7 +15,7 @@ class Effects {
     requestedProducerType: "camera" | "screen" | "audio";
     requestedProducerId: string | undefined;
     effect: string;
-    effectStyle: any;
+    effectStyle: string;
     blockStateChange: boolean;
   }) {
     const msg = {
@@ -42,7 +42,7 @@ class Effects {
     producerType: "camera" | "screen" | "audio";
     producerId: string | undefined;
     effect: string;
-    effectStyle: any;
+    effectStyle: string;
     blockStateChange: boolean;
   }) {
     const msg = {

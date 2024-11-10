@@ -104,6 +104,7 @@ export default function SettingsPanel({
 
   // Function to check if a key or its descendants are active
   const isDescendantActive = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: Record<string, any>,
     init: boolean = true
   ): boolean => {
@@ -209,22 +210,25 @@ export default function SettingsPanel({
                 <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between px-2 rounded items-center'>
                   <div>Subtitles</div>
                   <div>
-                    {closedCaptionsSelections.hasOwnProperty(
+                    {Object.prototype.hasOwnProperty.call(
+                      closedCaptionsSelections,
                       settings.closedCaption.value
                     ) ? (
-                      // @ts-ignore
+                      // @ts-expect-error: check
                       closedCaptionsSelections[settings.closedCaption.value]
-                    ) : expandedClosedCaptionsBrowserSelections.hasOwnProperty(
+                    ) : Object.prototype.hasOwnProperty.call(
+                        expandedClosedCaptionsBrowserSelections,
                         settings.closedCaption.value
                       ) ? (
-                      // @ts-ignore
+                      // @ts-expect-error: check
                       expandedClosedCaptionsBrowserSelections[
                         settings.closedCaption.value
                       ]
-                    ) : expandedClosedCaptionsVoskSelections.hasOwnProperty(
+                    ) : Object.prototype.hasOwnProperty.call(
+                        expandedClosedCaptionsVoskSelections,
                         settings.closedCaption.value
                       ) ? (
-                      // @ts-ignore
+                      // @ts-expect-error: check
                       expandedClosedCaptionsVoskSelections[
                         settings.closedCaption.value
                       ]

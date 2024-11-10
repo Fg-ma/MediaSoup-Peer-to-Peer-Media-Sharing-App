@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import FgPanel from "../fgPanel/FgPanel";
 import FgButton from "../fgButton/FgButton";
-import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import { BackgroundMusicTypes } from "../context/currentEffectsStylesContext/typeConstant";
 import FgImage from "../fgImage/FgImage";
@@ -43,20 +42,12 @@ const backgroundMusicLabels: {
 };
 
 export default function FgBackgroundMusicPortal({
-  username,
-  instance,
-  isUser,
   closeCallback,
   backgroundMusicButtonRef,
 }: {
-  username: string;
-  instance: string;
-  isUser: boolean;
   closeCallback: () => void;
   backgroundMusicButtonRef: React.RefObject<HTMLButtonElement>;
 }) {
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
   const { userMedia } = useStreamsContext();
 
   const [backgroundMusic, setBackgroundMusic] = useState<{

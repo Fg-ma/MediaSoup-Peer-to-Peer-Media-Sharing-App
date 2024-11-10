@@ -1,47 +1,19 @@
 import { VerticalSplitPanesOptions } from "../VerticalSplitPanes";
 
 class VerticalSplitPanesController {
-  private verticalSplitPanesOptions: VerticalSplitPanesOptions;
-  private paneHeight: string;
-  private setPaneHeight: React.Dispatch<React.SetStateAction<string>>;
-  private setHeaderLightness: React.Dispatch<React.SetStateAction<number>>;
-  private verticalSplitPanesRef: React.RefObject<HTMLDivElement>;
-  private isResizing: React.MutableRefObject<boolean>;
-  private startMousePosition: React.MutableRefObject<number>;
-  private startPaneHeight: React.MutableRefObject<number>;
-  private maxPaneHeightCallback?: () => void;
-  private minPaneHeightCallback?: () => void;
-  private panelSizeChangeCallback?: () => void;
-
   constructor(
-    verticalSplitPanesOptions: VerticalSplitPanesOptions,
-    paneHeight: string,
-    setPaneHeight: React.Dispatch<React.SetStateAction<string>>,
-    setHeaderLightness: React.Dispatch<React.SetStateAction<number>>,
-    verticalSplitPanesRef: React.RefObject<HTMLDivElement>,
-    isResizing: React.MutableRefObject<boolean>,
-    startMousePosition: React.MutableRefObject<number>,
-    startPaneHeight: React.MutableRefObject<number>,
-    maxPaneHeightCallback?: () => void,
-    minPaneHeightCallback?: () => void,
-    panelSizeChangeCallback?: () => void
-  ) {
-    this.verticalSplitPanesOptions = verticalSplitPanesOptions;
-    this.paneHeight = paneHeight;
-    this.setPaneHeight = setPaneHeight;
-    this.setHeaderLightness = setHeaderLightness;
-    this.verticalSplitPanesRef = verticalSplitPanesRef;
-    this.isResizing = isResizing;
-    this.startMousePosition = startMousePosition;
-    this.startPaneHeight = startPaneHeight;
-    this.maxPaneHeightCallback = maxPaneHeightCallback;
-    this.minPaneHeightCallback = minPaneHeightCallback;
-    this.panelSizeChangeCallback = panelSizeChangeCallback;
-
-    this.handleMouseDown.bind(this);
-    this.handleMouseMove.bind(this);
-    this.handleMouseUp.bind(this);
-  }
+    private verticalSplitPanesOptions: VerticalSplitPanesOptions,
+    private paneHeight: string,
+    private setPaneHeight: React.Dispatch<React.SetStateAction<string>>,
+    private setHeaderLightness: React.Dispatch<React.SetStateAction<number>>,
+    private verticalSplitPanesRef: React.RefObject<HTMLDivElement>,
+    private isResizing: React.MutableRefObject<boolean>,
+    private startMousePosition: React.MutableRefObject<number>,
+    private startPaneHeight: React.MutableRefObject<number>,
+    private maxPaneHeightCallback?: () => void,
+    private minPaneHeightCallback?: () => void,
+    private panelSizeChangeCallback?: () => void
+  ) {}
 
   // Handles softly lowering and raising the pane height when togglePaneHeight is called
   animateTogglePaneHeight = (targetHeight: number, duration = 500) => {
@@ -109,7 +81,7 @@ class VerticalSplitPanesController {
       }
 
       // Calculate lightness based on the percentage of newPaneHeight
-      let lightness = this.getLightness(newPaneHeight);
+      const lightness = this.getLightness(newPaneHeight);
 
       this.setPaneHeight(`${newPaneHeight}%`);
       this.setHeaderLightness(lightness);

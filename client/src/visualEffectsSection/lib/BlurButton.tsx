@@ -33,7 +33,7 @@ export default function BlurButton({
 }) {
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
 
   const streamEffects = isUser
     ? userStreamEffects.current[type][videoId].blur

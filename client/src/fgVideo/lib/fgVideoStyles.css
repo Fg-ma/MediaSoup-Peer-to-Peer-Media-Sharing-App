@@ -37,17 +37,12 @@
   border-radius: 0.125rem;
 }
 
-.main-video {
-  transform: scaleX(var(--flip-video));
-}
-
 .video-container.mini-player .main-video {
   transform: scaleX(1);
 }
 
 .video-container {
   --primary-video-color: #f56114;
-  --flip-video: "1";
   --closed-captions-font-family: "K2D";
   --closed-captions-font-color: white;
   --closed-captions-font-size: 2rem;

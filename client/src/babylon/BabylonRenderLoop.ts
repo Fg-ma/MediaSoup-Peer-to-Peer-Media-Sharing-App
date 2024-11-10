@@ -483,8 +483,7 @@ class BabylonRenderLoop {
   private directionalShift = (
     shiftParallel: number,
     shiftPerpendicular: number,
-    headAngle: number,
-    headPitchAngle: number
+    headAngle: number
   ): { x: number; y: number } => {
     let x = Math.cos(headAngle) * shiftParallel;
     let y = Math.sin(headAngle) * shiftParallel;
@@ -545,7 +544,7 @@ class BabylonRenderLoop {
             Math.pow(nosePosition.y - meshPosition[1], 2)
         );
         if (
-          // @ts-ignore
+          // @ts-expect-error: no types enforce in mesh metadata
           !usedTrackers[meshMetadata.effectType].includes(faceId) &&
           distance < closestDistance
         ) {
@@ -558,7 +557,7 @@ class BabylonRenderLoop {
         continue;
       }
 
-      // @ts-ignore
+      // @ts-expect-error: no types enforce in mesh metadata
       usedTrackers[meshMetadata.effectType].push(closestTrackerId);
 
       if (meshMetadata.positionStyle === "faceTrack") {
@@ -604,8 +603,7 @@ class BabylonRenderLoop {
         const offset = this.directionalShift(
           meshMetadata.shiftX * interocularScaleShift,
           meshMetadata.shiftY * interocularScaleShift,
-          calculatedLandmarks.headRotationAngles[closestTrackerId],
-          calculatedLandmarks.headPitchAngles[closestTrackerId]
+          calculatedLandmarks.headRotationAngles[closestTrackerId]
         );
         position = [
           position[0] + offset.x,
@@ -632,11 +630,11 @@ class BabylonRenderLoop {
           mesh.metadata.initScale[2] * interocularDistance
         );
       } else if (meshMetadata.positionStyle === "landmarks") {
+        const faceLandmarkPairs = this.faceLandmarks.getFaceIdLandmarksPairs();
+
         this.babylonMeshes.updateFaceMesh(
           mesh,
-          this.faceLandmarks
-            .getFaceIdLandmarksPairs()
-            [closestTrackerId].landmarks.slice(0, -10)
+          faceLandmarkPairs[closestTrackerId].landmarks.slice(0, -10)
         );
       }
     }
@@ -649,7 +647,7 @@ class BabylonRenderLoop {
       }
 
       if (
-        // @ts-ignore
+        // @ts-expect-error: no types enforce in mesh metadata
         !usedTrackers[meshMetadata.effectType].includes(meshMetadata.faceId)
       ) {
         mesh.scaling = new Vector3(0, 0, 0);

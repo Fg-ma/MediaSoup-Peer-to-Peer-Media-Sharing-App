@@ -4,6 +4,11 @@ import SettingsPanel from "./SettingsPanel";
 import { ActivePages } from "../FgVideoControls";
 import { Settings } from "../../fgVideo/FgVideo";
 
+type RecursiveObject = {
+  active?: boolean;
+  [key: string]: RecursiveObject | boolean | undefined; // Allows nested objects and boolean values
+};
+
 export default function FgSettingsButton({
   effectsActive,
   videoContainerRef,
@@ -28,7 +33,7 @@ export default function FgSettingsButton({
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
 
-  const deactivateAll = (obj: Record<string, any>) => {
+  const deactivateAll = (obj: RecursiveObject) => {
     // Check if the current object has an 'active' property and if it's true
     if (obj.active === true) {
       obj.active = false;
@@ -54,7 +59,7 @@ export default function FgSettingsButton({
 
       const deactivePages = deactivateAll(newActivePages);
 
-      return deactivePages as ActivePages;
+      return deactivePages as unknown as ActivePages;
     });
 
     if (!videoContainerRef.current?.classList.contains("in-settings")) {

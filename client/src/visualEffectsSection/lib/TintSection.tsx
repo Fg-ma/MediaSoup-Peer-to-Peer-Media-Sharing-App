@@ -38,7 +38,7 @@ export default function TintSection({
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [color, setColor] = useState("#F56114");
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);

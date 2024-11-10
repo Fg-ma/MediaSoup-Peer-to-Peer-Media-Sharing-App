@@ -6,30 +6,11 @@ import FgButton from "../fgButton/FgButton";
 import FgVolumeElementController from "../fgVolumeElement/lib/FgVolumeElementController";
 import VolumeSVG from "../fgVolumeElement/lib/VolumeSVG";
 import { useSignalContext } from "../context/signalContext/SignalContext";
-
-export interface FgVolumeElementOptions {
-  iconSize?: string;
-  volumeSliderHeight?: string;
-  volumeSliderWidth?: string;
-  volumeSliderThumbSize?: string;
-  primaryColor?: string;
-  isSlider?: boolean;
-  initialVolume?: string;
-  primaryVolumeSliderColor?: string;
-  secondaryVolumeSliderColor?: string;
-}
-
-const defaultFgVolumeElementOptions = {
-  iconSize: "2.5rem",
-  volumeSliderHeight: "0.25rem",
-  volumeSliderWidth: "5rem",
-  volumeSliderThumbSize: "0.9375rem",
-  primaryColor: "white",
-  isSlider: true,
-  initialVolume: "high",
-  primaryVolumeSliderColor: "white",
-  secondaryVolumeSliderColor: "rgba(150, 150, 150, 0.5)",
-};
+import {
+  defaultFgVolumeElementOptions,
+  FgVolumeElementControllerMessagesType,
+  FgVolumeElementOptions,
+} from "./lib/typeConstant";
 
 export default function FgVolumeElement({
   socket,
@@ -114,14 +95,18 @@ export default function FgVolumeElement({
       fgVolumeElementOptions.volumeSliderThumbSize
     );
 
-    socket.current.on("message", (event: any) =>
-      fgVolumeElementController.handleMessage(event)
+    socket.current.on(
+      "message",
+      (event: FgVolumeElementControllerMessagesType) =>
+        fgVolumeElementController.handleMessage(event)
     );
 
     // Cleanup event listener on unmount
     return () => {
-      socket.current.off("message", (event: any) =>
-        fgVolumeElementController.handleMessage(event)
+      socket.current.off(
+        "message",
+        (event: FgVolumeElementControllerMessagesType) =>
+          fgVolumeElementController.handleMessage(event)
       );
     };
   }, []);

@@ -195,7 +195,7 @@ class Producers {
 
     this.producerTransport.current.on(
       "connect",
-      async ({ dtlsParameters }, callback, errback) => {
+      async ({ dtlsParameters }, callback, _errback) => {
         const msg = {
           type: "connectProducerTransport",
           dtlsParameters,
@@ -216,10 +216,10 @@ class Producers {
     // Begin transport on producer
     this.producerTransport.current.on(
       "produce",
-      async (params, callback, errback) => {
+      async (params, callback, _errback) => {
         const { kind, rtpParameters, appData } = params;
 
-        let msg = {
+        const msg = {
           type: "createNewProducer",
           producerType: appData.producerType,
           transportId: this.producerTransport.current?.id,

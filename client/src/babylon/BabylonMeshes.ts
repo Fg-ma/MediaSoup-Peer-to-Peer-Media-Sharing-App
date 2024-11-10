@@ -15,6 +15,7 @@ import {
   Mesh,
   StandardMaterial,
   UniversalCamera,
+  IAxisDragGizmo,
 } from "@babylonjs/core";
 import { Delaunay } from "d3-delaunay";
 import MeshLoaders from "./MeshLoaders";
@@ -64,7 +65,7 @@ class BabylonMeshes {
       kbInfo.event.preventDefault();
 
       switch (kbInfo.type) {
-        case KeyboardEventTypes.KEYDOWN:
+        case KeyboardEventTypes.KEYDOWN: {
           const keyDown = kbInfo.event.key.toLowerCase();
           switch (keyDown) {
             case "1":
@@ -219,7 +220,8 @@ class BabylonMeshes {
               break;
           }
           break;
-        case KeyboardEventTypes.KEYUP:
+        }
+        case KeyboardEventTypes.KEYUP: {
           const keyUp = kbInfo.event.key.toLowerCase();
 
           switch (keyUp) {
@@ -233,6 +235,7 @@ class BabylonMeshes {
               break;
           }
           break;
+        }
       }
     });
   }
@@ -442,8 +445,8 @@ class BabylonMeshes {
         if (mesh) {
           // Compare the final node with the targeted animation's target
           if (
-            meshMetaData.meshLabel !== undefined &&
-            meshMetaData.meshLabel === targetedAnim.target.metadata.meshLabel
+            meshLabel !== undefined &&
+            meshLabel === targetedAnim.target.metadata.meshLabel
           ) {
             animGroup.stop(); // Stop the animation before removing the mesh
           }
@@ -475,7 +478,10 @@ class BabylonMeshes {
   };
 
   // Helper function to register observables for any gizmo type
-  private registerGizmoInteraction = (mesh: AbstractMesh, gizmo: any) => {
+  private registerGizmoInteraction = (
+    mesh: AbstractMesh,
+    gizmo: IAxisDragGizmo
+  ) => {
     gizmo.dragBehavior?.onDragObservable.add(() => {
       const meshMetaData = mesh.metadata;
 
@@ -497,7 +503,7 @@ class BabylonMeshes {
     const gizmoManager = new GizmoManager(this.scene);
 
     switch (gizmoType) {
-      case "position":
+      case "position": {
         gizmoManager.positionGizmoEnabled = true;
 
         const positionGizmo = gizmoManager.gizmos.positionGizmo;
@@ -535,8 +541,7 @@ class BabylonMeshes {
         gizmoManager.usePointerToAttachGizmos = false; // Disable auto attaching
 
         // Add dragging behavior along a specific plane (Y-axis constrained)
-        let dragBehavior: PointerDragBehavior;
-        dragBehavior = new PointerDragBehavior({
+        const dragBehavior = new PointerDragBehavior({
           dragPlaneNormal: new Vector3(0, 0, 1),
         });
 
@@ -546,7 +551,8 @@ class BabylonMeshes {
         // Store the drag behavior in the mesh's metadata for later access
         meshMetaData.dragBehavior = dragBehavior;
         break;
-      case "rotation":
+      }
+      case "rotation": {
         gizmoManager.rotationGizmoEnabled = true;
 
         const rotationGizmo = gizmoManager.gizmos.rotationGizmo;
@@ -583,7 +589,8 @@ class BabylonMeshes {
           false;
         gizmoManager.usePointerToAttachGizmos = false; // Disable auto attaching
         break;
-      case "scale":
+      }
+      case "scale": {
         gizmoManager.scaleGizmoEnabled = true;
 
         const scaleGizmo = gizmoManager.gizmos.scaleGizmo;
@@ -615,6 +622,7 @@ class BabylonMeshes {
           }
         }
         break;
+      }
     }
 
     // Attach the gizmo to the selected mesh

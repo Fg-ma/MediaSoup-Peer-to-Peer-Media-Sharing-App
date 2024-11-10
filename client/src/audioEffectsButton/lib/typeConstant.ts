@@ -2,7 +2,7 @@ import { SliderOptions } from "../../fgSlider/FgSlider";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../../audioEffects/AudioEffects";
+} from "../../audioEffects/typeConstant";
 
 import backgroundTex1 from "../../../public/backgroundTexs/backgroundTex1.jpg";
 import backgroundTex2 from "../../../public/backgroundTexs/backgroundTex2.jpg";

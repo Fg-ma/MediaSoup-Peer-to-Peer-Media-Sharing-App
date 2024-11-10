@@ -1,7 +1,12 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const path = require("path");
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
 
-module.exports = {
+// Get the current directory using import.meta.url
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default {
   entry: "./index.tsx",
   mode: "development",
   output: {

@@ -12,10 +12,14 @@ class FaceDetectionWebWorker {
   }
 
   loadModel = async () => {
+    // eslint-disable-next-line no-undef
     tf.wasm.setWasmPaths("/faceMeshModel/");
+    // eslint-disable-next-line no-undef
     await tf.ready();
 
+    // eslint-disable-next-line no-undef
     this.faceDetector = await faceLandmarksDetection.load(
+      // eslint-disable-next-line no-undef
       faceLandmarksDetection.SupportedPackages.mediapipeFaceDetector,
       {
         maxFaces: this.maxFaces,

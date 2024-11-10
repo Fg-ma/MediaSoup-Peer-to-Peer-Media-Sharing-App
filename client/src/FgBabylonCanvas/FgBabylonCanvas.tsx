@@ -31,7 +31,6 @@ export interface FgVideoOptions {
   acceptsAudioEffects?: boolean;
   isStream?: boolean;
   autoPlay?: boolean;
-  flipVideo?: boolean;
   isSlider?: boolean;
   isPlayPause?: boolean;
   isVolume?: boolean;
@@ -84,7 +83,6 @@ export const defaultFgVideoOptions = {
   acceptsAudioEffects: false,
   isStream: false,
   autoPlay: true,
-  flipVideo: false,
   isSlider: true,
   isPlayPause: true,
   isVolume: true,
@@ -167,6 +165,8 @@ export default function FgBabylonCanvas({
 
   const [inVideo, setInVideo] = useState(true);
 
+  const [pausedState, setPausedState] = useState(false);
+
   const paused = useRef(fgVideoOptions.autoPlay);
 
   const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -180,14 +180,9 @@ export default function FgBabylonCanvas({
 
   const tintColor = useRef("#F56114");
 
-  const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
-
-  const totalTimeRef = useRef<HTMLDivElement>(null);
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
-  const [captionsActive, setCaptionsActive] = useState(false);
-
-  const timelineContainerRef = useRef<HTMLDivElement>(null);
+  const [_, setCaptionsActive] = useState(false);
 
   const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -215,7 +210,6 @@ export default function FgBabylonCanvas({
       canvasContainerRef.current.appendChild(
         userMedia.current[type][videoId].canvas
       );
-      userMedia.current[type][videoId].canvas.width;
     }
   }, [videoId, userMedia]);
 
@@ -239,7 +233,7 @@ export default function FgBabylonCanvas({
           producerType: type,
           producerId: videoId,
           effect: effect,
-          // @ts-ignore
+          // @ts-expect-error: ts can't infer type, videoId, and effect are strictly enforces and exist
           effectStyle: currentEffectsStyles.current[type][videoId][effect],
           blockStateChange: blockStateChange,
         };
@@ -255,7 +249,7 @@ export default function FgBabylonCanvas({
         requestedProducerId: videoId,
         effect: effect,
         effectStyle:
-          // @ts-ignore
+          // @ts-expect-error: ts can't infer type, videoId, and effect are strictly enforces and exist
           remoteCurrentEffectsStyles.current[username][instance][type][videoId][
             effect
           ],
@@ -278,6 +272,7 @@ export default function FgBabylonCanvas({
     videoRef,
     audioRef,
     canvasContainerRef,
+    setPausedState,
     inVideo,
     setInVideo,
     shiftPressed,
@@ -304,14 +299,13 @@ export default function FgBabylonCanvas({
     videoId,
     controls,
     undefined,
+    setPausedState,
     remoteStreamEffects,
     currentEffectsStyles,
     remoteCurrentEffectsStyles,
     videoRef,
     canvasContainerRef,
     audioRef,
-    timelineContainerRef,
-    currentTimeRef,
     fgVideoOptions,
     handleVisualEffectChange
   );
@@ -410,14 +404,13 @@ export default function FgBabylonCanvas({
         type={type}
         videoId={videoId}
         controls={controls}
+        pausedState={pausedState}
         clientMute={clientMute}
         localMute={localMute}
         videoContainerRef={canvasContainerRef}
         audioStream={audioStream}
         audioRef={audioRef}
         currentTimeRef={currentTimeRef}
-        totalTimeRef={totalTimeRef}
-        playbackSpeedButtonRef={playbackSpeedButtonRef}
         tintColor={tintColor}
         effectsActive={effectsActive}
         audioEffectsActive={audioEffectsActive}

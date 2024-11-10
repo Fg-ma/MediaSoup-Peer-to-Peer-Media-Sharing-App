@@ -62,13 +62,6 @@ export default function SamplerMetronome() {
     setHovered(false);
   };
 
-  const handleMouseDown = (event: MouseEvent) => {
-    if (!samplerMetronomeRef.current?.contains(event.target as Node)) {
-      document.removeEventListener("mousedown", handleMouseDown);
-      setMetronomeVolumeActive(false);
-    }
-  };
-
   useEffect(() => {
     userMedia.current.audio?.setMetronomeBPM(bpm);
 

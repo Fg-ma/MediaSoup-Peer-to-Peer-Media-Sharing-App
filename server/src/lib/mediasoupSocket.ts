@@ -137,7 +137,7 @@ type MediasoupSocketEvents =
       requestedProducerType: "camera" | "screen" | "audio";
       requestedProducerId: string | undefined;
       effect: string;
-      effectStyle: any;
+      effectStyle: string;
       blockStateChange: boolean;
     }
   | {
@@ -148,7 +148,7 @@ type MediasoupSocketEvents =
       producerType: "camera" | "screen" | "audio";
       producerId: string | undefined;
       effect: string;
-      effectStyle: any;
+      effectStyle: string;
       blockStateChange: boolean;
     }
   | {

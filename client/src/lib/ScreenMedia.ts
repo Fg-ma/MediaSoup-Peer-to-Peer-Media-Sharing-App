@@ -178,29 +178,28 @@ class ScreenMedia {
       return;
     }
 
-    // @ts-ignore
-    const meshData2D = assetMeshes[effect][currentStyle.style].planeMesh;
-    // @ts-ignore
-    const meshData3D = assetMeshes[effect][currentStyle.style].mesh;
+    // @ts-expect-error: ts can't verify effect and style correlate
+    const meshData = assetMeshes[effect][currentStyle.style];
 
     // Delete old meshes
     this.babylonScene.deleteEffectMeshes(effect);
 
     if (this.effects[effect as ScreenEffectTypes]) {
       this.babylonScene.createEffectMeshes(
-        meshData3D.meshType,
-        meshData3D.meshLabel,
+        meshData.meshType,
+        meshData.meshLabel,
         "",
-        // @ts-ignore
-        assetMeshes[effect][currentStyle.style].defaultMeshPlacement,
-        meshData3D.meshPath,
-        meshData3D.meshFile,
+        meshData.defaultMeshPlacement,
+        meshData.meshPath,
+        meshData.meshFile,
         effect,
         "faceTrack",
-        meshData3D.soundEffectPath,
+        meshData.transforms.offsetX,
+        meshData.transforms.offsetY,
+        meshData.soundEffectPath,
         [0, 0, this.babylonScene.threeDimMeshesZCoord],
-        meshData3D.initScale,
-        meshData3D.initRotation
+        meshData.initScale,
+        meshData.initRotation
       );
     }
   };

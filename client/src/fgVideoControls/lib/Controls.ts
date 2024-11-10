@@ -1,9 +1,5 @@
 import { Socket } from "socket.io-client";
-import {
-  defaultFgVideoOptions,
-  FgVideoOptions,
-  Settings,
-} from "../../fgVideo/FgVideo";
+import { FgVideoOptions, Settings } from "../../fgVideo/FgVideo";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -75,6 +71,7 @@ class Controls {
     private videoRef: React.RefObject<HTMLVideoElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
+    private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private inVideo: boolean,
     private setInVideo: React.Dispatch<React.SetStateAction<boolean>>,
     private shiftPressed: React.MutableRefObject<boolean>,
@@ -347,6 +344,7 @@ class Controls {
     } else {
       this.videoContainerRef.current?.classList.remove("paused");
     }
+    this.setPausedState((prev) => !prev);
   };
 
   handlePictureInPicture = (action: string) => {

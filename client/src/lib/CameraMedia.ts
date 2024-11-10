@@ -119,7 +119,7 @@ class CameraMedia {
 
     this.faceDetectionWorker.onmessage = (event) => {
       switch (event.data.message) {
-        case "FACES_DETECTED":
+        case "FACES_DETECTED": {
           this.faceDetectionProcessing[0] = false;
           const detectedFaces = event.data.numFacesDetected;
           if (detectedFaces !== this.maxFaces[0]) {
@@ -132,6 +132,7 @@ class CameraMedia {
             this.rectifyEffectMeshCount();
           }
           break;
+        }
         default:
           break;
       }
@@ -235,7 +236,7 @@ class CameraMedia {
         } else {
           for (let i = count; i < this.maxFaces[0]; i++) {
             const meshData =
-              // @ts-ignore
+              // @ts-expect-error: ts can't verify effect and style correlation
               assetMeshes[effect as EffectType][currentEffectStyle.style];
 
             this.babylonScene.createMesh(
@@ -355,7 +356,7 @@ class CameraMedia {
       return;
     }
 
-    // @ts-ignore
+    // @ts-expect-error: ts can't verify effect and style correlation
     const meshData = assetMeshes[effect][currentStyle.style];
 
     // Delete old meshes

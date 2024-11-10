@@ -69,7 +69,7 @@ export default function BabylonPostProcessEffectsButton({
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
 
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const postProcessEffectsContainerRef = useRef<HTMLDivElement>(null);
 

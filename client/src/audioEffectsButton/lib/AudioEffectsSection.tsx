@@ -60,7 +60,7 @@ export default function AudioEffectsSection({
   backgroundColor?: string;
   secondaryBackgroundColor?: string;
 }) {
-  const [rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
   const [cols, setCols] = useState(3);
   const [volumeState, setVolumeState] = useState<{
     from: "off" | "low" | "high" | "";
@@ -103,7 +103,9 @@ export default function AudioEffectsSection({
     }
   };
 
-  const handleMessage = (event: any) => {
+  const handleMessage = (event: {
+    type: "effectChangeRequested" | "clientEffectChanged";
+  }) => {
     switch (event.type) {
       case "effectChangeRequested":
         setRerender((prev) => !prev);

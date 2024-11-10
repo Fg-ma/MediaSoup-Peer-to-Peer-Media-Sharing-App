@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSpring, animated } from "react-spring";
+import { useSpring, animated, SpringValue } from "react-spring";
 import { colors } from "../fgVideo/lib/colors";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
 import FgButton from "../fgButton/FgButton";
-import FgPortal from "../fgPortal/FgPortal";
 
 const shadowColors = {
   black: "rgba(0, 0, 0, 0.8)",
@@ -118,7 +117,7 @@ export default function FgAudioElement({
     h: 0.23,
   };
 
-  const springs = useSpring<{ [key: string]: any }>({
+  const springs = useSpring<{ [key: string]: SpringValue<number> }>({
     ...Object.fromEntries(movingY.map((y, index) => [`y${index + 1}`, y])),
     ...Object.fromEntries(fixedY.map((y, index) => [`fixed_y${index + 1}`, y])),
     config: { duration: fgAudioElementOptions.springDuration },
@@ -316,10 +315,10 @@ export default function FgAudioElement({
     } else if (fgAudioElementOptions.muteStyleOption === "smile") {
       movingYArray = sineCurveY.current
         .filter((_, index) => index % 2 === 0)
-        .map((value, index) => value * 10 + 50);
+        .map((value) => value * 10 + 50);
       fixedYArray = sineCurveY.current
         .filter((_, index) => index % 2 === 1)
-        .map((value, index) => value * 10 + 50);
+        .map((value) => value * 10 + 50);
       fixedYArray.push(50);
     }
 
@@ -331,9 +330,11 @@ export default function FgAudioElement({
     }
   };
 
-  const ySpringsArray = Object.values(springs).map((spring: any) =>
-    spring.get()
-  );
+  const ySpringsArray = Object.values(springs)
+    .filter((spring): spring is SpringValue<number> => spring !== undefined)
+    .map((spring) => spring.get());
+
+  // @ts-expect-error: ts cannot infer y1 is avaible
   const animatedPathData = springs.y1.to(
     () =>
       pathGenerator.current?.generatePathData(

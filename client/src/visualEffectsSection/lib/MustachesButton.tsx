@@ -98,7 +98,7 @@ export default function MustachesButton({
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
   const mustachesContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser

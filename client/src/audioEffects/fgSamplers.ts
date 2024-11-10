@@ -1,277 +1,433 @@
+export type FgSamplerCategories =
+  | "pianos"
+  | "guitars"
+  | "strings"
+  | "winds"
+  | "synths"
+  | "organs"
+  | "misc";
+
+export type FgPianosSamplers =
+  | "default"
+  | "ac1"
+  | "ac2"
+  | "bell"
+  | "brokenCassette"
+  | "claviPiano"
+  | "curlyElectric"
+  | "dragonMagicOld"
+  | "electric1"
+  | "electric2"
+  | "electric3"
+  | "electric4"
+  | "electric5"
+  | "softSteinway"
+  | "studioOne1"
+  | "studioOne2"
+  | "studioOne3"
+  | "studioOne4"
+  | "studioOne5"
+  | "studioOne6"
+  | "studioOne7"
+  | "studioOne8"
+  | "studioOne9"
+  | "studioOne10"
+  | "studioOne11"
+  | "studioOne12"
+  | "studioOne13"
+  | "toy";
+export type FgPianosLabels =
+  | "Default"
+  | "AC 1"
+  | "AC 2"
+  | "Bell"
+  | "Broken cassette"
+  | "Clavi piano"
+  | "Curly electric"
+  | "Dragon magic"
+  | "Electric 1"
+  | "Electric 2"
+  | "Electric 3"
+  | "Electric 4"
+  | "Electric 5"
+  | "Soft Steinway"
+  | "Studio one 1"
+  | "Studio one 2"
+  | "Studio one 3"
+  | "Studio one 4"
+  | "Studio one 5"
+  | "Studio one 6"
+  | "Studio one 7"
+  | "Studio one 8"
+  | "Studio one 9"
+  | "Studio one 10"
+  | "Studio one 11"
+  | "Studio one 12"
+  | "Studio one 13"
+  | "Toy";
+export type FgGuitarsSamplers =
+  | "acGuitar"
+  | "acousticGuitar"
+  | "AXAFifthsBounceGuitar"
+  | "AXAVoodooVibeGuitar"
+  | "brightGuitar"
+  | "clankyAmpMetalGuitar"
+  | "clankyMetalBassGuitar"
+  | "ferrumIronGuitar"
+  | "freshGuitar"
+  | "fretlessGuitar"
+  | "fuzzGuitar"
+  | "MexicanGuitarron"
+  | "mutedGuitar"
+  | "RJSGuitar";
+export type FgGuitarsLabels =
+  | "AC guitar"
+  | "Acoustic guitar"
+  | "AXA fifths bounce guitar"
+  | "AXA voodoo vibe guitar"
+  | "Bright guitar"
+  | "Clanky amp metal guitar"
+  | "Clanky metal bass guitar"
+  | "Ferrum iron guitar"
+  | "Fresh guitar"
+  | "Fretless guitar"
+  | "Fuzz guitar"
+  | "Mexican guitarron"
+  | "Muted guitar"
+  | "RJS guitar";
+export type FgStringsSamplers =
+  | "acBass"
+  | "anaBass"
+  | "beyondBowCello"
+  | "brokenCello"
+  | "cello"
+  | "electricBass1"
+  | "electricBass2"
+  | "jarreBass"
+  | "longFMBass"
+  | "lyreLyre1"
+  | "lyreLyre2"
+  | "lyreLyre3"
+  | "moogBass"
+  | "shortFMBass"
+  | "strings1"
+  | "strings2"
+  | "sweepBass"
+  | "synthBass"
+  | "uncleJohns5StringBanjo"
+  | "violin";
+export type FgStringsLabels =
+  | "AC bass"
+  | "Ana bass"
+  | "Beyond bow cello"
+  | "Broken cello"
+  | "Cello"
+  | "Electric bass 1"
+  | "Electric bass 2"
+  | "Jarre bass"
+  | "Long FM bass"
+  | "Lyre lyre 1"
+  | "Lyre lyre 2"
+  | "Lyre lyre 3"
+  | "Moog bass"
+  | "Short FM bass"
+  | "Strings 1"
+  | "Strings 2"
+  | "Sweep bass"
+  | "Synth bass"
+  | "Uncle John's five string banjo"
+  | "Violin";
+export type FgWindsSamplers =
+  | "bassFrenchHorn"
+  | "bassTrombone"
+  | "bassTrumpet"
+  | "bassTuba"
+  | "brass1"
+  | "brass2"
+  | "clarinet"
+  | "classicSlideWhistle"
+  | "doubleBass"
+  | "flugelhorn"
+  | "flute"
+  | "forestFlute"
+  | "hoverFlute"
+  | "oboe1"
+  | "oboe2"
+  | "recorder"
+  | "saxophone"
+  | "tenorSaxophone"
+  | "whistle";
+export type FgWindsLabels =
+  | "Bass French horn"
+  | "Bass trombone"
+  | "Bass trumpet"
+  | "Bass tuba"
+  | "Brass 1"
+  | "Brass 2"
+  | "Clarinet"
+  | "Classic slide whistle"
+  | "Double bass"
+  | "Flugel horn"
+  | "Flute"
+  | "Forest flute"
+  | "Hover flute"
+  | "Oboe 1"
+  | "Oboe 2"
+  | "Recorder"
+  | "Saxophone"
+  | "Tenor saxophone"
+  | "Whistle";
+export type FgDrumsSamplers =
+  | "cassette"
+  | "claveFrog"
+  | "garageSaleDrumKit"
+  | "huntersPercussionBongos"
+  | "huntersPercussionConga"
+  | "huntersPercussionDjembe"
+  | "huntersPercussionTaikoFamily"
+  | "huntersPercussionUdu"
+  | "JonsCajons"
+  | "kitchenDrumKit"
+  | "metallophon"
+  | "No.37"
+  | "omani"
+  | "slitLog"
+  | "solarWinds"
+  | "tinCan";
+export type FgDrumsLabels =
+  | "Cassette"
+  | "Clave frog"
+  | "Garage sale drum kit"
+  | "Hunter's percussion bongos"
+  | "Hunter's percussion conga"
+  | "Hunter's percussion djembe"
+  | "Hunter's percussion taiko family"
+  | "Hunter's percussion udu"
+  | "Jon's cajons"
+  | "Kitchen drum kit"
+  | "Metallophon"
+  | "No.37"
+  | "Omani"
+  | "Slit log"
+  | "Solar winds"
+  | "Tin can";
+export type FgSynthsSamplers =
+  | "leadSynth1"
+  | "leadSynth2"
+  | "leadSynth3"
+  | "leadSynth4"
+  | "leadSynth5"
+  | "leadSynth6"
+  | "leadSynth7"
+  | "padSynth1"
+  | "padSynth2";
+export type FgSynthsLabels =
+  | "Lead synth 1"
+  | "Lead synth 2"
+  | "Lead synth 3"
+  | "Lead synth 4"
+  | "Lead synth 5"
+  | "Lead synth 6"
+  | "Lead synth 7"
+  | "Pad synth 1"
+  | "Pad synth 2";
+export type FgOrgansSamplers =
+  | "bottle"
+  | "cassetteTape"
+  | "electric1"
+  | "electric2"
+  | "electric3"
+  | "fallout1"
+  | "fallout2"
+  | "fallout3"
+  | "fallout4"
+  | "fallout5"
+  | "littleRed"
+  | "pipe1"
+  | "pipe2"
+  | "pipe3"
+  | "spooky";
+export type FgOrgansLabels =
+  | "Bottle"
+  | "Cassette tape"
+  | "Electric 1"
+  | "Electric 2"
+  | "Electric 3"
+  | "Fallout 1"
+  | "Fallout 2"
+  | "Fallout 3"
+  | "Fallout 4"
+  | "Fallout 5"
+  | "Little red"
+  | "Pipe 1"
+  | "Pipe 2"
+  | "Pipe 3"
+  | "Spooky";
+export type FgMiscSamplers =
+  | "accordion"
+  | "ancientBronzeBells"
+  | "AustrianJawHarp"
+  | "bells1"
+  | "bells2"
+  | "bellsGong"
+  | "brokenSplashCymbalGong"
+  | "choirOfTheFallen"
+  | "clavichord"
+  | "cosmos"
+  | "discordChoir"
+  | "gong"
+  | "handBells"
+  | "harmonica"
+  | "MariePneuma"
+  | "marimba"
+  | "mechanisedChoir"
+  | "MicahsChoir"
+  | "musicalStones1"
+  | "musicalStones2"
+  | "orchestra"
+  | "plasmaDriveKalimba"
+  | "quietChoir"
+  | "rainStick"
+  | "spellSinger"
+  | "streetBountyXylophone"
+  | "vibraphone"
+  | "xylophone";
+export type FgMiscLabels =
+  | "Accordion"
+  | "Ancient bronze bells"
+  | "Austrian jaw harp"
+  | "Bells 1"
+  | "Bells 2"
+  | "Bells gong"
+  | "Broken splash cymbal gong"
+  | "Choir of the fallen"
+  | "Clavichord"
+  | "Cosmos"
+  | "Discord choir"
+  | "Gong"
+  | "Hand bells"
+  | "Harmonica"
+  | "Marie pneuma"
+  | "Marimba"
+  | "Mechanised choir"
+  | "Micah's choir"
+  | "Musical stones 1"
+  | "Musical stones 2"
+  | "Orchestra"
+  | "Plasma drive kalimba"
+  | "Quiet choir"
+  | "Rain stick"
+  | "Spell singer"
+  | "Street bounty xylophone"
+  | "Vibraphone"
+  | "Xylophone";
+
 export type FgSamplers =
   | {
       category: "pianos";
-      kind:
-        | "default"
-        | "ac1"
-        | "ac2"
-        | "bell"
-        | "brokenCassette"
-        | "claviPiano"
-        | "curlyElectric"
-        | "dragonMagicOld"
-        | "electric1"
-        | "electric2"
-        | "electric3"
-        | "electric4"
-        | "electric5"
-        | "softSteinway"
-        | "toy";
-      label:
-        | "Default"
-        | "AC 1"
-        | "AC 2"
-        | "Bell"
-        | "Broken cassette"
-        | "Clavi piano"
-        | "Curly electric"
-        | "Dragon magic old"
-        | "Electric 1"
-        | "Electric 2"
-        | "Electric 3"
-        | "Electric 4"
-        | "Electric 5"
-        | "Soft Steinway"
-        | "Toy";
+      kind: FgPianosSamplers;
+      label: FgPianosLabels;
       playOnlyDefined: boolean;
       definedNotes?: string[];
     }
   | {
       category: "guitars";
-      kind:
-        | "acGuitar"
-        | "acousticGuitar"
-        | "AXAFifthsBounceGuitar"
-        | "AXAVoodooVibeGuitar"
-        | "brightGuitar"
-        | "clankyAmpMetalGuitar"
-        | "clankyMetalBassGuitar"
-        | "ferrumIronGuitar"
-        | "freshGuitar"
-        | "fretlessGuitar"
-        | "fuzzGuitar"
-        | "MexicanGuitarron"
-        | "mutedGuitar"
-        | "RJSGuitar";
-
-      label:
-        | "AC Guitar"
-        | "Acoustic guitar"
-        | "AXA fifths bounce guitar"
-        | "AXA voodoo vibe guitar"
-        | "Bright guitar"
-        | "Clanky amp metal guitar"
-        | "Clanky metal bass guitar"
-        | "Ferrum iron guitar"
-        | "Fresh guitar"
-        | "Fretless guitar"
-        | "Fuzz guitar"
-        | "Mexican guitarron"
-        | "Muted guitar"
-        | "RJS guitar";
+      kind: FgGuitarsSamplers;
+      label: FgGuitarsLabels;
       playOnlyDefined: boolean;
       definedNotes?: string[];
     }
   | {
       category: "strings";
-      kind:
-        | "acBass"
-        | "anaBass"
-        | "beyondBowCello"
-        | "brokenCello"
-        | "cello"
-        | "electricBass1"
-        | "electricBass2"
-        | "jarreBass"
-        | "longFMBass"
-        | "moogBass"
-        | "shortFMBass"
-        | "strings1"
-        | "strings2"
-        | "sweepBass"
-        | "synthBass"
-        | "uncleJohns5StringBanjo"
-        | "violin";
-      label:
-        | "AC bass"
-        | "Ana Bass"
-        | "Beyond bow cello"
-        | "Broken cello"
-        | "Cello"
-        | "Electric bass 1"
-        | "Electric bass 2"
-        | "Jarre bass"
-        | "Long FM bass"
-        | "Moog bass"
-        | "Short FM bass"
-        | "Strings 1"
-        | "Strings 2"
-        | "Sweep bass"
-        | "Synth bass"
-        | "Uncle John's five string banjo"
-        | "Violin";
+      kind: FgStringsSamplers;
+      label: FgStringsLabels;
       playOnlyDefined: boolean;
       definedNotes?: string[];
     }
   | {
       category: "winds";
-      kind:
-        | "bassFrenchHorn"
-        | "bassTrombone"
-        | "bassTrumpet"
-        | "bassTuba"
-        | "clarinet"
-        | "classicSlideWhistle"
-        | "flugelhorn"
-        | "flute"
-        | "forestFlute"
-        | "hoverFlute"
-        | "oboe1"
-        | "oboe2"
-        | "recorder"
-        | "saxophone"
-        | "tenorSaxophone"
-        | "whistle";
-      label:
-        | "Bass French horn"
-        | "Bass trombone"
-        | "Brss trumpet"
-        | "Bass tuba"
-        | "Clarinet"
-        | "Classic slide whistle"
-        | "Flugelhorn"
-        | "Flute"
-        | "Forest flute"
-        | "Hover flute"
-        | "Oboe 1"
-        | "Oboe 2"
-        | "Recorder"
-        | "Saxophone"
-        | "Tenor saxophone"
-        | "Whistle";
+      kind: FgWindsSamplers;
+      label: FgWindsLabels;
       playOnlyDefined: boolean;
       definedNotes?: string[];
     }
   | {
       category: "drums";
-      kind:
-        | "claveFrog"
-        | "garageSaleDrumKit"
-        | "handBells"
-        | "JonsCajons"
-        | "kitchenDrumKit"
-        | "metallophon"
-        | "slitLogDrum"
-        | "solarWinds"
-        | "tinCanDrums";
-      label:
-        | "Clave frog"
-        | "Garage sale drum kit"
-        | "Hand bells"
-        | "Jon's cajons"
-        | "Kitchen drum kit"
-        | "Metallophon"
-        | "Slit log drum"
-        | "Solar winds"
-        | "Tin can drums";
+      kind: FgDrumsSamplers;
+      label: FgDrumsLabels;
       playOnlyDefined: boolean;
       definedNotes?: string[];
     }
   | {
       category: "synths";
-      kind:
-        | "leadSynth1"
-        | "leadSynth2"
-        | "leadSynth3"
-        | "leadSynth4"
-        | "leadSynth5"
-        | "leadSynth6"
-        | "leadSynth7"
-        | "padSynth1"
-        | "padSynth2";
-      label:
-        | "Lead synth 1"
-        | "Lead synth 2"
-        | "Lead synth 3"
-        | "Lead synth 4"
-        | "Lead synth 5"
-        | "Lead synth 6"
-        | "Lead synth 7"
-        | "Pad synth 1"
-        | "Pad synth 2";
+      kind: FgSynthsSamplers;
+      label: FgSynthsLabels;
       playOnlyDefined: boolean;
       definedNotes?: string[];
     }
   | {
       category: "organs";
-      kind:
-        | "bottle"
-        | "cassetteTape"
-        | "electric1"
-        | "electric2"
-        | "electric3"
-        | "littleRed"
-        | "pipe1"
-        | "pipe2"
-        | "pipe3"
-        | "spooky";
-      label:
-        | "Bottle"
-        | "Cassette tape"
-        | "Electric 1"
-        | "Electric 2"
-        | "Electric 3"
-        | "Little red"
-        | "Pipe 1"
-        | "Pipe 2"
-        | "Pipe 3"
-        | "Spooky";
+      kind: FgOrgansSamplers;
+      label: FgOrgansLabels;
       playOnlyDefined: boolean;
       definedNotes?: string[];
     }
   | {
-      category: "organs";
-      kind:
-        | "accordion"
-        | "bells1"
-        | "bells2"
-        | "brokenSplashCymbalGong"
-        | "clavichord"
-        | "cosmos"
-        | "gong"
-        | "harmonica"
-        | "marimba"
-        | "mechanisedChoir"
-        | "MicahsChoir"
-        | "orchestra"
-        | "plasmaDriveKalimba"
-        | "spellSinger"
-        | "streetBountyXylophone"
-        | "vibraphone"
-        | "xylophone";
-      label:
-        | "Accordion"
-        | "Bells 1"
-        | "Bells 2"
-        | "Broken splash cymbal gong"
-        | "Clavichord"
-        | "Cosmos"
-        | "Gong"
-        | "Harmonica"
-        | "Marimba"
-        | "Mechanised choir"
-        | "Micah's choir"
-        | "Orchestra"
-        | "Plasma drive kalimba"
-        | "Spell singer"
-        | "Street bounty xylophone"
-        | "Vibraphone"
-        | "Xylophone";
+      category: "misc";
+      kind: FgMiscSamplers;
+      label: FgMiscLabels;
       playOnlyDefined: boolean;
       definedNotes?: string[];
     };
 
-const fgSamplers = {
+export type SamplerType = {
+  sampler: {
+    urls: {
+      [note: string]: string;
+    };
+    release: number;
+    baseUrl: string;
+  };
+  label:
+    | FgPianosLabels
+    | FgGuitarsLabels
+    | FgStringsLabels
+    | FgWindsLabels
+    | FgDrumsLabels
+    | FgSynthsLabels
+    | FgOrgansLabels
+    | FgMiscLabels;
+  playOnlyDefined: boolean;
+};
+
+export type FgSamplersType = {
+  pianos: {
+    [fgPianosSampler in FgPianosSamplers]: SamplerType;
+  };
+  guitars: {
+    [fgGuitarsSampler in FgGuitarsSamplers]: SamplerType;
+  };
+  strings: {
+    [fgStringsSampler in FgStringsSamplers]: SamplerType;
+  };
+  winds: {
+    [fgWindsSampler in FgWindsSamplers]: SamplerType;
+  };
+  drums: {
+    [fgDrumsSampler in FgDrumsSamplers]: SamplerType;
+  };
+  synths: {
+    [fgSynthsSampler in FgSynthsSamplers]: SamplerType;
+  };
+  organs: {
+    [fgOrgansSampler in FgOrgansSamplers]: SamplerType;
+  };
+  misc: {
+    [fgMiscSampler in FgMiscSamplers]: SamplerType;
+  };
+};
+
+const fgSamplers: FgSamplersType = {
   pianos: {
     default: {
       sampler: {
@@ -451,7 +607,7 @@ const fgSamplers = {
         release: 1,
         baseUrl: "/audioSamples/pianos/claviPiano/",
       },
-      label: "Clavi Piano",
+      label: "Clavi piano",
       playOnlyDefined: false,
     },
     curlyElectric: {
@@ -2299,7 +2455,7 @@ const fgSamplers = {
         release: 1,
         baseUrl: "/audioSamples/winds/flugelhorn/",
       },
-      label: "Flugelhorn",
+      label: "Flugel horn",
       playOnlyDefined: false,
     },
     flute: {
@@ -2947,7 +3103,7 @@ const fgSamplers = {
         release: 1,
         baseUrl: "/audioSamples/drums/huntersPercussionBongos/",
       },
-      label: "Hunters percussion bongos",
+      label: "Hunter's percussion bongos",
       playOnlyDefined: true,
     },
     huntersPercussionConga: {
@@ -3041,7 +3197,7 @@ const fgSamplers = {
         release: 1,
         baseUrl: "/audioSamples/drums/huntersPercussionConga/",
       },
-      label: "Hunters percussion conga",
+      label: "Hunter's percussion conga",
       playOnlyDefined: true,
     },
     huntersPercussionDjembe: {
@@ -3127,7 +3283,7 @@ const fgSamplers = {
         release: 1,
         baseUrl: "/audioSamples/drums/huntersPercussionDjembe/",
       },
-      label: "Hunters percussion djembe",
+      label: "Hunter's percussion djembe",
       playOnlyDefined: true,
     },
     huntersPercussionTaikoFamily: {
@@ -3221,7 +3377,7 @@ const fgSamplers = {
         release: 1,
         baseUrl: "/audioSamples/drums/huntersPercussionTaikoFamily/",
       },
-      label: "Hunters percussion taiko family",
+      label: "Hunter's percussion taiko family",
       playOnlyDefined: true,
     },
     huntersPercussionUdu: {
@@ -3315,7 +3471,7 @@ const fgSamplers = {
         release: 1,
         baseUrl: "/audioSamples/drums/huntersPercussionUdu/",
       },
-      label: "Hunters percussion udu",
+      label: "Hunter's percussion udu",
       playOnlyDefined: true,
     },
     JonsCajons: {
@@ -4895,6 +5051,91 @@ const fgSamplers = {
         baseUrl: "/audioSamples/misc/harmonica/",
       },
       label: "Harmonica",
+      playOnlyDefined: false,
+    },
+    MariePneuma: {
+      sampler: {
+        urls: {
+          C0: "C0.wav",
+          "C#0": "C#0.wav",
+          D0: "D0.wav",
+          "D#0": "D#0.wav",
+          E0: "E0.wav",
+          F0: "F0.wav",
+          "F#0": "F#0.wav",
+          G0: "G0.wav",
+          "G#0": "G#0.wav",
+          A0: "A0.wav",
+          "A#0": "A#0.wav",
+          B0: "B0.wav",
+          C1: "C1.wav",
+          "C#1": "C#1.wav",
+          D1: "D1.wav",
+          "D#1": "D#1.wav",
+          E1: "E1.wav",
+          F1: "F1.wav",
+          "F#1": "F#1.wav",
+          G1: "G1.wav",
+          "G#1": "G#1.wav",
+          A1: "A1.wav",
+          "A#1": "A#1.wav",
+          B1: "B1.wav",
+          C2: "C2.wav",
+          "C#2": "C#2.wav",
+          D2: "D2.wav",
+          "D#2": "D#2.wav",
+          E2: "E2.wav",
+          F2: "F2.wav",
+          "F#2": "F#2.wav",
+          G2: "G2.wav",
+          "G#2": "G#2.wav",
+          A2: "A2.wav",
+          "A#2": "A#2.wav",
+          B2: "B2.wav",
+          C3: "C3.wav",
+          "C#3": "C#3.wav",
+          D3: "D3.wav",
+          "D#3": "D#3.wav",
+          E3: "E3.wav",
+          F3: "F3.wav",
+          "F#3": "F#3.wav",
+          G3: "G3.wav",
+          "G#3": "G#3.wav",
+          A3: "A3.wav",
+          "A#3": "A#3.wav",
+          B3: "B3.wav",
+          C4: "C4.wav",
+          "C#4": "C#4.wav",
+          D4: "D4.wav",
+          "D#4": "D#4.wav",
+          E4: "E4.wav",
+          F4: "F4.wav",
+          "F#4": "F#4.wav",
+          G4: "G4.wav",
+          "G#4": "G#4.wav",
+          A4: "A4.wav",
+          "A#4": "A#4.wav",
+          B4: "B4.wav",
+          C5: "C5.wav",
+          "C#5": "C#5.wav",
+          D5: "D5.wav",
+          "D#5": "D#5.wav",
+          E5: "E5.wav",
+          F5: "F5.wav",
+          "F#5": "F#5.wav",
+          G5: "G5.wav",
+          "G#5": "G#5.wav",
+          A5: "A5.wav",
+          "A#5": "A#5.wav",
+          B5: "B5.wav",
+          C6: "C6.wav",
+          "C#6": "C#6.wav",
+          D6: "D6.wav",
+        },
+        release: 1,
+        baseUrl: "/audioSamples/misc/MariePneuma/",
+      },
+      label: "Marie pneuma",
       playOnlyDefined: false,
     },
     marimba: {

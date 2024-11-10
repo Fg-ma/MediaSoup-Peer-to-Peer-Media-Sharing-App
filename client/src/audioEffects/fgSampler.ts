@@ -1,14 +1,29 @@
 import * as Tone from "tone";
-import { AudioMixEffectsType, MixEffectsOptionsType } from "./AudioEffects";
-import fgSamplers, { FgSamplers } from "./fgSamplers";
+import fgSamplers, {
+  FgDrumsSamplers,
+  FgGuitarsSamplers,
+  FgMiscSamplers,
+  FgOrgansSamplers,
+  FgPianosSamplers,
+  FgSamplers,
+  FgStringsSamplers,
+  FgSynthsSamplers,
+  FgWindsSamplers,
+  SamplerType,
+} from "./fgSamplers";
 import FgMetronome from "./fgMetronome";
+import {
+  AudioMixEffectsType,
+  MixEffectsOptionsType,
+  ToneEffectsType,
+} from "./typeConstant";
 
 class FgSampler {
   private sampler: Tone.Sampler | undefined;
   private playOnlyDefined: boolean;
   private definedNotes: string[] = [];
 
-  private samplerEffects: any[] = [];
+  private samplerEffects: ToneEffectsType[] = [];
 
   private playingNotes: Set<string> = new Set();
 
@@ -366,7 +381,15 @@ class FgSampler {
   }
 
   swapSampler = (
-    sampler: { category: string; kind: string },
+    sampler:
+      | { category: "pianos"; kind: FgPianosSamplers }
+      | { category: "guitars"; kind: FgGuitarsSamplers }
+      | { category: "strings"; kind: FgStringsSamplers }
+      | { category: "winds"; kind: FgWindsSamplers }
+      | { category: "drums"; kind: FgDrumsSamplers }
+      | { category: "synths"; kind: FgSynthsSamplers }
+      | { category: "organs"; kind: FgOrgansSamplers }
+      | { category: "misc"; kind: FgMiscSamplers },
     increment?: number
   ): FgSamplers => {
     // Disconnect and dispose of the current sampler if it exists
@@ -376,33 +399,26 @@ class FgSampler {
     }
 
     if (increment === undefined) {
-      this.sampler = new Tone.Sampler(
-        // @ts-ignore
-        fgSamplers[sampler.category][sampler.kind].sampler
-      );
+      // @ts-expect-error: TypeScript cannot infer that sampler.kind is a valid key for the given sampler.category
+      const fgSampler: SamplerType = fgSamplers[sampler.category][sampler.kind];
+
+      this.sampler = new Tone.Sampler(fgSampler.sampler);
       this.sampler.connect(this.volumeNode);
-      this.playOnlyDefined =
-        // @ts-ignore
-        fgSamplers[sampler.category][sampler.kind].playOnlyDefined;
+      this.playOnlyDefined = fgSampler.playOnlyDefined;
 
       if (this.playOnlyDefined) {
-        this.definedNotes = Object.keys(
-          // @ts-ignore
-          fgSamplers[sampler.category][sampler.kind].sampler.urls
-        );
+        this.definedNotes = Object.keys(fgSampler.sampler.urls);
       }
 
       return {
         category: sampler.category,
         kind: sampler.kind,
-        // @ts-ignore
-        label: fgSamplers[sampler.category][sampler.kind].label,
+        label: fgSampler.label,
         playOnlyDefined: this.playOnlyDefined,
         definedNotes: this.definedNotes,
       } as FgSamplers;
     } else {
       // Get an array of sampler kinds in the category
-      // @ts-ignore
       const kinds = Object.keys(fgSamplers[sampler.category]);
 
       // Find the index of the current kind
@@ -413,27 +429,21 @@ class FgSampler {
       const newIndex = (currentIndex + increment + kinds.length) % kinds.length;
       const newKind = kinds[newIndex];
 
-      this.sampler = new Tone.Sampler(
-        // @ts-ignore
-        fgSamplers[sampler.category][newKind].sampler
-      );
+      // @ts-expect-error: TypeScript cannot infer that newKind is a valid key for the given sampler.category
+      const fgSampler: SamplerType = fgSamplers[sampler.category][newKind];
+
+      this.sampler = new Tone.Sampler(fgSampler.sampler);
       this.sampler.connect(this.volumeNode);
-      this.playOnlyDefined =
-        // @ts-ignore
-        fgSamplers[sampler.category][newKind].playOnlyDefined;
+      this.playOnlyDefined = fgSampler.playOnlyDefined;
       if (this.playOnlyDefined) {
-        this.definedNotes = Object.keys(
-          // @ts-ignore
-          fgSamplers[sampler.category][newKind].sampler.urls
-        );
+        this.definedNotes = Object.keys(fgSampler.sampler.urls);
       }
 
       return {
-        // @ts-ignore
         category: sampler.category,
-        kind: newKind as any,
-        // @ts-ignore
-        label: fgSamplers[sampler.category][newKind].label,
+        // @ts-expect-error: TypeScript cannot infer that newKind is a valid kind
+        kind: newKind,
+        label: fgSampler.label,
         playOnlyDefined: this.playOnlyDefined,
         definedNotes: this.definedNotes,
       };
@@ -565,7 +575,7 @@ class FgSampler {
     });
   };
 
-  private removeEffect(effect: any | undefined) {
+  private removeEffect(effect: ToneEffectsType | undefined) {
     if (!effect) return;
 
     const effectIndex = this.samplerEffects.indexOf(effect);
@@ -609,7 +619,7 @@ class FgSampler {
     }
   }
 
-  private addEffect(effect: any) {
+  private addEffect(effect: ToneEffectsType) {
     // Disconnect the last effect in the chain from the mediaStreamDestination
     if (this.samplerEffects.length > 0) {
       this.samplerEffects[this.samplerEffects.length - 1].disconnect();

@@ -9,100 +9,11 @@ import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 
 class BundleSocket {
-  private isUser: boolean;
-  private username: string;
-  private instance: string;
-
-  private setCameraStreams: React.Dispatch<
-    React.SetStateAction<
-      | {
-          [screenKey: string]: MediaStream;
-        }
-      | undefined
-    >
-  >;
-  private setScreenStreams: React.Dispatch<
-    React.SetStateAction<
-      | {
-          [screenKey: string]: MediaStream;
-        }
-      | undefined
-    >
-  >;
-  private setAudioStream: React.Dispatch<
-    React.SetStateAction<MediaStream | undefined>
-  >;
-
-  private remoteTracksMap: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: {
-        camera?:
-          | {
-              [cameraId: string]: MediaStreamTrack;
-            }
-          | undefined;
-        screen?:
-          | {
-              [screenId: string]: MediaStreamTrack;
-            }
-          | undefined;
-        audio?: MediaStreamTrack | undefined;
-      };
-    };
-  }>;
-  private remoteStreamEffects: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: {
-        camera: {
-          [cameraId: string]: {
-            [effectType in CameraEffectTypes]: boolean;
-          };
-        };
-        screen: {
-          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-        };
-        audio: { [effectType in AudioEffectTypes]: boolean };
-      };
-    };
-  }>;
-  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
-  private remoteCurrentEffectsStyles: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: EffectStylesType;
-    };
-  }>;
-  private userMedia: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: CameraMedia;
-    };
-    screen: {
-      [screenId: string]: ScreenMedia;
-    };
-    audio: AudioMedia | undefined;
-  }>;
-
-  private audioRef: React.RefObject<HTMLAudioElement>;
-
-  private clientMute: React.MutableRefObject<boolean>;
-  private localMute: React.MutableRefObject<boolean>;
-
-  private acceptsAudioEffects: boolean;
-  private setAcceptsCameraEffects: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
-  private setAcceptsScreenEffects: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
-  private setAcceptsAudioEffects: React.Dispatch<React.SetStateAction<boolean>>;
-  private handleAudioEffectChange: (effect: AudioEffectTypes) => void;
-
-  private onNewConsumerWasCreatedCallback?: () => void;
-
   constructor(
-    isUser: boolean,
-    username: string,
-    instance: string,
-    setCameraStreams: React.Dispatch<
+    private isUser: boolean,
+    private username: string,
+    private instance: string,
+    private setCameraStreams: React.Dispatch<
       React.SetStateAction<
         | {
             [screenKey: string]: MediaStream;
@@ -110,7 +21,7 @@ class BundleSocket {
         | undefined
       >
     >,
-    setScreenStreams: React.Dispatch<
+    private setScreenStreams: React.Dispatch<
       React.SetStateAction<
         | {
             [screenKey: string]: MediaStream;
@@ -118,10 +29,10 @@ class BundleSocket {
         | undefined
       >
     >,
-    setAudioStream: React.Dispatch<
+    private setAudioStream: React.Dispatch<
       React.SetStateAction<MediaStream | undefined>
     >,
-    remoteTracksMap: React.MutableRefObject<{
+    private remoteTracksMap: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
           camera?:
@@ -138,7 +49,7 @@ class BundleSocket {
         };
       };
     }>,
-    remoteStreamEffects: React.MutableRefObject<{
+    private remoteStreamEffects: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
           camera: {
@@ -153,13 +64,12 @@ class BundleSocket {
         };
       };
     }>,
-    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-    remoteCurrentEffectsStyles: React.MutableRefObject<{
+    private remoteCurrentEffectsStyles: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: EffectStylesType;
       };
     }>,
-    userMedia: React.MutableRefObject<{
+    private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
       };
@@ -168,37 +78,22 @@ class BundleSocket {
       };
       audio: AudioMedia | undefined;
     }>,
-    audioRef: React.RefObject<HTMLAudioElement>,
-    clientMute: React.MutableRefObject<boolean>,
-    localMute: React.MutableRefObject<boolean>,
-    acceptsAudioEffects: boolean,
-    setAcceptsCameraEffects: React.Dispatch<React.SetStateAction<boolean>>,
-    setAcceptsScreenEffects: React.Dispatch<React.SetStateAction<boolean>>,
-    setAcceptsAudioEffects: React.Dispatch<React.SetStateAction<boolean>>,
-    handleAudioEffectChange: (effect: AudioEffectTypes) => void,
-    onNewConsumerWasCreatedCallback?: () => any
-  ) {
-    this.isUser = isUser;
-    this.username = username;
-    this.instance = instance;
-    this.setCameraStreams = setCameraStreams;
-    this.setScreenStreams = setScreenStreams;
-    this.setAudioStream = setAudioStream;
-    this.remoteTracksMap = remoteTracksMap;
-    this.remoteStreamEffects = remoteStreamEffects;
-    this.currentEffectsStyles = currentEffectsStyles;
-    this.remoteCurrentEffectsStyles = remoteCurrentEffectsStyles;
-    this.userMedia = userMedia;
-    this.audioRef = audioRef;
-    this.clientMute = clientMute;
-    this.localMute = localMute;
-    this.acceptsAudioEffects = acceptsAudioEffects;
-    this.setAcceptsCameraEffects = setAcceptsCameraEffects;
-    this.setAcceptsScreenEffects = setAcceptsScreenEffects;
-    this.setAcceptsAudioEffects = setAcceptsAudioEffects;
-    this.handleAudioEffectChange = handleAudioEffectChange;
-    this.onNewConsumerWasCreatedCallback = onNewConsumerWasCreatedCallback;
-  }
+    private audioRef: React.RefObject<HTMLAudioElement>,
+    private clientMute: React.MutableRefObject<boolean>,
+    private localMute: React.MutableRefObject<boolean>,
+    private acceptsAudioEffects: boolean,
+    private setAcceptsCameraEffects: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
+    private setAcceptsScreenEffects: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
+    private setAcceptsAudioEffects: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
+    private handleAudioEffectChange: (effect: AudioEffectTypes) => void,
+    private onNewConsumerWasCreatedCallback?: () => void
+  ) {}
 
   onNewConsumerWasCreated = (event: {
     type: string;
@@ -399,14 +294,10 @@ class BundleSocket {
     requestedProducerType: "camera" | "screen" | "audio";
     requestedProducerId: string | undefined;
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-    effectStyle: any;
     blockStateChange: boolean;
   }) => {
     if (this.acceptsAudioEffects && event.requestedProducerType === "audio") {
-      // @ts-ignore
-      this.currentEffectsStyles.current.audio[event.effect] = event.effectStyle;
-
-      // @ts-ignore
+      // @ts-expect-error: event.effect and event.requestedProducerType have no strict correlation enforcement
       this.handleAudioEffectChange(event.effect);
     }
   };
@@ -418,7 +309,6 @@ class BundleSocket {
     producerType: "camera" | "screen" | "audio";
     producerId: string | undefined;
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-    effectStyle: any;
     blockStateChange: boolean;
   }) => {
     if (
@@ -428,19 +318,14 @@ class BundleSocket {
       event.producerType === "audio"
     ) {
       if (!event.blockStateChange) {
-        // @ts-ignore
+        // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
         this.remoteStreamEffects.current[event.username][event.instance].audio[
           event.effect
         ] =
-          // @ts-ignore
+          // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
           !this.remoteStreamEffects.current[event.username][event.instance]
             .audio[event.effect];
       }
-
-      // @ts-ignore
-      this.remoteCurrentEffectsStyles.current[event.username][
-        event.instance
-      ].audio[event.effect] = event.effectStyle;
     }
   };
 }

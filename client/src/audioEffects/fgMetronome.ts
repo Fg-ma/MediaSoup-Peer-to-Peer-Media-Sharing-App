@@ -58,7 +58,7 @@ class FgMetronome {
   setMetronomeBPM = (bpm: number) => {
     this.bpm = bpm;
 
-    this.transport.bpm.value = bpm; // Set BPM
+    this.transport.bpm.value = this.bpm; // Set BPM
   };
 
   // Set volume (in decibels)

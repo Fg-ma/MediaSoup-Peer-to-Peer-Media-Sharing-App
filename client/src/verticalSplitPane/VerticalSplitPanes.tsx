@@ -83,7 +83,7 @@ export default function VerticalSplitPanes({
       parseFloat(verticalSplitPanesOptions.initialPaneHeight) || 0;
 
     // Set the initial lightness based on the initial height
-    let initialLightness =
+    const initialLightness =
       verticalSplitPanesController.getLightness(initialHeight);
 
     setHeaderLightness(initialLightness);

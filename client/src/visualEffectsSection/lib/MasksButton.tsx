@@ -153,7 +153,7 @@ export default function MasksButton({
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
-  const [rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
   const masksContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser

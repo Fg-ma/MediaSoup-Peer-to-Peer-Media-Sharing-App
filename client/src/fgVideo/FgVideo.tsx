@@ -32,7 +32,6 @@ export interface FgVideoOptions {
   acceptsAudioEffects?: boolean;
   isStream?: boolean;
   autoPlay?: boolean;
-  flipVideo?: boolean;
   isSlider?: boolean;
   isPlayPause?: boolean;
   isVolume?: boolean;
@@ -73,7 +72,6 @@ export const defaultFgVideoOptions = {
   acceptsAudioEffects: false,
   isStream: false,
   autoPlay: true,
-  flipVideo: false,
   isSlider: true,
   isPlayPause: true,
   isVolume: true,
@@ -148,6 +146,8 @@ export default function FgVideo({
 
   const [inVideo, setInVideo] = useState(true);
 
+  const [pausedState, setPausedState] = useState(false);
+
   const paused = useRef(fgVideoOptions.autoPlay);
 
   const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -161,14 +161,9 @@ export default function FgVideo({
 
   const tintColor = useRef("#F56114");
 
-  const playbackSpeedButtonRef = useRef<HTMLButtonElement>(null);
-
-  const totalTimeRef = useRef<HTMLDivElement>(null);
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
-  const [captionsActive, setCaptionsActive] = useState(false);
-
-  const timelineContainerRef = useRef<HTMLDivElement>(null);
+  const [_, setCaptionsActive] = useState(false);
 
   const [settings, setSettings] = useState<Settings>({
     closedCaption: {
@@ -206,7 +201,7 @@ export default function FgVideo({
           producerType: type,
           producerId: videoId,
           effect: effect,
-          // @ts-ignore
+          // @ts-expect-error: ts can't verify type, videoId, and effect correlate
           effectStyle: currentEffectsStyles.current[type][videoId][effect],
           blockStateChange: blockStateChange,
         };
@@ -222,7 +217,7 @@ export default function FgVideo({
         requestedProducerId: videoId,
         effect: effect,
         effectStyle:
-          // @ts-ignore
+          // @ts-expect-error: ts can't verify username, instance, type, videoId, and effect correlate
           remoteCurrentEffectsStyles.current[username][instance][type][videoId][
             effect
           ],
@@ -245,6 +240,7 @@ export default function FgVideo({
     videoRef,
     audioRef,
     videoContainerRef,
+    setPausedState,
     inVideo,
     setInVideo,
     shiftPressed,
@@ -271,14 +267,13 @@ export default function FgVideo({
     videoId,
     controls,
     videoStream,
+    setPausedState,
     remoteStreamEffects,
     currentEffectsStyles,
     remoteCurrentEffectsStyles,
     videoRef,
     videoContainerRef,
     audioRef,
-    timelineContainerRef,
-    currentTimeRef,
     fgVideoOptions,
     handleVisualEffectChange
   );
@@ -382,14 +377,13 @@ export default function FgVideo({
             type={type}
             videoId={videoId}
             controls={controls}
+            pausedState={pausedState}
             clientMute={clientMute}
             localMute={localMute}
             videoContainerRef={videoContainerRef}
             audioStream={audioStream}
             audioRef={audioRef}
             currentTimeRef={currentTimeRef}
-            totalTimeRef={totalTimeRef}
-            playbackSpeedButtonRef={playbackSpeedButtonRef}
             tintColor={tintColor}
             effectsActive={effectsActive}
             audioEffectsActive={audioEffectsActive}

@@ -1,6 +1,12 @@
 import { interpolate } from "flubber";
 import React, { useState, useEffect, useRef } from "react";
-import { motion, animate, useMotionValue, useTransform } from "framer-motion";
+import {
+  motion,
+  animate,
+  useMotionValue,
+  useTransform,
+  AnimationPlaybackControls,
+} from "framer-motion";
 
 export default function SVGMorpher({
   pathArrays,
@@ -17,11 +23,14 @@ export default function SVGMorpher({
   const pathIndexRef = useRef(0);
   const isAnimateRef = useRef(true);
   const progress = useMotionValue(0);
-  const currentAnimationRef = useRef<any>(null); // Reference to store the current animation
-  const debounceTimeoutRef = useRef<any>(null); // Reference to store the debounce timeout
+  const currentAnimationRef = useRef<AnimationPlaybackControls | undefined>(
+    undefined
+  ); // Reference to store the current animation
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined); // Reference to store the debounce timeout
 
-  let paths = [];
+  const paths = [];
   for (const pathArray of pathArrays) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const arrayOfIndices = pathArray.map((_: any, i: any) => i);
 
     paths.push(
@@ -50,6 +59,7 @@ export default function SVGMorpher({
     return () => {
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = undefined;
       }
     };
   }, [pathArrays]);

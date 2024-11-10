@@ -125,7 +125,7 @@ export default function HideBackgroundButton({
   const [color, setColor] = useState("#F56114");
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
   const hideBackgroundContainerRef = useRef<HTMLDivElement>(null);
   const colorRef = useRef("#F56114");

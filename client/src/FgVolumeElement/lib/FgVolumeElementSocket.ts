@@ -1,65 +1,33 @@
 class FgVolumeElementSocket {
-  private username: string;
-  private instance: string;
-
-  private isUser: boolean;
-
-  private audioRef: React.RefObject<HTMLAudioElement>;
-
-  private clientMute: React.MutableRefObject<boolean>;
-  private localMute: React.MutableRefObject<boolean>;
-  private setActive: React.Dispatch<React.SetStateAction<boolean>>;
-
-  private volumeState: {
-    from: string;
-    to: string;
-  };
-  private setVolumeState: React.Dispatch<
-    React.SetStateAction<{
-      from: string;
-      to: string;
-    }>
-  >;
-
   constructor(
-    username: string,
-    instance: string,
+    private username: string,
+    private instance: string,
 
-    isUser: boolean,
+    private isUser: boolean,
 
-    audioRef: React.RefObject<HTMLAudioElement>,
+    private audioRef: React.RefObject<HTMLAudioElement>,
 
-    clientMute: React.MutableRefObject<boolean>,
-    localMute: React.MutableRefObject<boolean>,
-    setActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private clientMute: React.MutableRefObject<boolean>,
+    private localMute: React.MutableRefObject<boolean>,
+    private setActive: React.Dispatch<React.SetStateAction<boolean>>,
 
-    volumeState: {
+    private volumeState: {
       from: string;
       to: string;
     },
-    setVolumeState: React.Dispatch<
+    private setVolumeState: React.Dispatch<
       React.SetStateAction<{
         from: string;
         to: string;
       }>
     >
-  ) {
-    this.username = username;
-    this.instance = instance;
-    this.isUser = isUser;
-    this.audioRef = audioRef;
-    this.clientMute = clientMute;
-    this.localMute = localMute;
-    this.setActive = setActive;
-    this.volumeState = volumeState;
-    this.setVolumeState = setVolumeState;
-  }
+  ) {}
 
-  onClientMuteStateResponsed(event: {
+  onClientMuteStateResponsed = (event: {
     type: string;
     producerUsername: string;
     producerInstance: string;
-  }) {
+  }) => {
     if (
       this.isUser ||
       (this.username !== event.producerUsername &&
@@ -73,14 +41,14 @@ class FgVolumeElementSocket {
     if (this.volumeState.to !== "off") {
       this.setVolumeState((prev) => ({ from: prev.to, to: "off" }));
     }
-  }
+  };
 
   // Get client mute changes from other users
-  onClientMuteChange(event: {
+  onClientMuteChange = (event: {
     type: string;
     username: string;
     clientMute: boolean;
-  }) {
+  }) => {
     if (this.isUser) {
       return;
     }
@@ -95,7 +63,7 @@ class FgVolumeElementSocket {
 
     const newVolume = this.audioRef.current.volume;
     let newVolumeState;
-    if (event.clientMute || newVolume === 0) {
+    if (event.clientMute || this.localMute.current || newVolume === 0) {
       newVolumeState = "off";
     } else if (this.audioRef.current.volume >= 0.5) {
       newVolumeState = "high";
@@ -105,11 +73,17 @@ class FgVolumeElementSocket {
 
     this.audioRef.current.muted = newVolumeState === "off";
 
-    this.setVolumeState((prev) => ({
-      from: prev.to,
-      to: newVolumeState,
-    }));
-  }
+    this.setVolumeState((prev) => {
+      if (prev.to !== newVolumeState) {
+        return {
+          from: prev.to,
+          to: newVolumeState,
+        };
+      } else {
+        return prev;
+      }
+    });
+  };
 
   // Handles local mute changes from outside bundle
   onLocalMuteChange = () => {

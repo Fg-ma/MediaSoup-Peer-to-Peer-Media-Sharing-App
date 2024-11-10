@@ -103,14 +103,13 @@ export default function FgVideoControls({
   type,
   videoId,
   controls,
+  pausedState,
   clientMute,
   localMute,
   videoContainerRef,
   audioStream,
   audioRef,
   currentTimeRef,
-  totalTimeRef,
-  playbackSpeedButtonRef,
   tintColor,
   effectsActive,
   audioEffectsActive,
@@ -131,14 +130,13 @@ export default function FgVideoControls({
   type: "camera" | "screen";
   videoId: string;
   controls: Controls;
+  pausedState: boolean;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
-  totalTimeRef: React.RefObject<HTMLDivElement>;
-  playbackSpeedButtonRef: React.RefObject<HTMLButtonElement>;
   tintColor: React.MutableRefObject<string>;
   effectsActive: boolean;
   audioEffectsActive: boolean;
@@ -173,11 +171,11 @@ export default function FgVideoControls({
       },
     },
   });
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
   const rightVideoControlsRef = useRef<HTMLDivElement>(null);
   const browserStandardSpeechRecognitionAvailable = useRef(true);
 
-  const handleMessage = (event: any) => {
+  const handleMessage = (event: { type: "localMuteChange" }) => {
     if (event.type === "localMuteChange") {
       setRerender((prev) => prev + 1);
     }
@@ -243,6 +241,7 @@ export default function FgVideoControls({
             defaultFgVideoOptions.isPlayPause) && (
             <Suspense fallback={<div>Loading...</div>}>
               <PlayPauseButton
+                pausedState={pausedState}
                 controls={controls}
                 effectsActive={effectsActive}
                 settingsActive={settingsActive}

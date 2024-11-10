@@ -1,7 +1,7 @@
 import React from "react";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
-import { AudioMixEffectsType } from "../../audioEffects/AudioEffects";
+import { AudioMixEffectsType } from "../../audioEffects/typeConstant";
 import {
   DynamicMixEffect,
   LabelPlacementType,
@@ -123,16 +123,16 @@ export default function AudioMixEffect({
             key={index}
             options={{
               id: `${effect}_${key}`,
-              initValue: option.initValue,
-              topLabel: option.topLabel,
-              bottomLabel: option.bottomLabel,
-              ticks: option.ticks,
-              rangeMax: option.rangeMax,
-              rangeMin: option.rangeMin,
-              precision: option.precision,
-              units: option.units,
-              snapToWholeNum: option.snapToWholeNum,
-              snapToNearestTick: option.snapToNearestTick,
+              initValue: option?.initValue,
+              topLabel: option?.topLabel,
+              bottomLabel: option?.bottomLabel,
+              ticks: option?.ticks,
+              rangeMax: option?.rangeMax,
+              rangeMin: option?.rangeMin,
+              precision: option?.precision,
+              units: option?.units,
+              snapToWholeNum: option?.snapToWholeNum,
+              snapToNearestTick: option?.snapToNearestTick,
               orientation: dynamicMixEffect.orientation,
             }}
             onValueChange={updateMixEffectsValues}

@@ -4,7 +4,7 @@ import SelectionPanel from "./lib/SelectionPanel";
 
 export type RecursiveSelections = {
   value: string;
-  [selection: string]: any | RecursiveSelections;
+  [selection: string]: string | RecursiveSelections;
 };
 
 export default function FgSelectionButton({

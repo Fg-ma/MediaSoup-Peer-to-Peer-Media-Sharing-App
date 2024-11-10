@@ -696,12 +696,12 @@ class Deadbanding {
         const style =
           this.currentEffectsStyles.current.camera[id][effectType].style;
 
-        // @ts-ignore
+        // @ts-expect-error: no enforcement between effectType and style
         for (const deadbanding in deadbandingValues[effectType][style]) {
           const deadbandingType = deadbanding as LandmarkTypes;
 
           const newDeadbandingValue =
-            // @ts-ignore
+            // @ts-expect-error: no enforcement between effectType and style
             deadbandingValues[effectType][style][deadbandingType];
 
           if (newDeadbandingValue) {

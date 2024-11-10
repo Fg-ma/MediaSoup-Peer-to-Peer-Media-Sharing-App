@@ -1,4 +1,4 @@
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense, useRef } from "react";
 import { Socket } from "socket.io-client";
 import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";

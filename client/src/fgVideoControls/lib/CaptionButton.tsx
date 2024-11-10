@@ -168,6 +168,7 @@ export default function CaptionButton({
   const [voskCaptions, setVoskCaptions] = useState<VoskResult>();
 
   const [browserLang, setBrowserLang] = useState<browserLangs>("en-US");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const browserRecognizer = useRef<any>();
 
   const voskRecognizer = useRef<KaldiRecognizer>();

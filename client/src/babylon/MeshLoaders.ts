@@ -25,7 +25,7 @@ class MeshLoaders {
         meshPath,
         meshFile,
         this.scene,
-        (meshes, particleSystems, skeletons, animationGroups) => {
+        (meshes, _particleSystems, _skeletons, animationGroups) => {
           if (meshes.length > 0) {
             animationGroups.forEach((animationGroup) => {
               animationGroup.pause(); // Pause the animation by default
@@ -56,7 +56,7 @@ class MeshLoaders {
           }
         },
         null,
-        (scene, message, exception) => {
+        (_scene, message, exception) => {
           console.error(`Error loading mesh: ${message}`, exception);
           reject(exception); // Reject the promise on error
         }

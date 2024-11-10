@@ -138,7 +138,7 @@ export default function HatsButton({
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
   const hatsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser

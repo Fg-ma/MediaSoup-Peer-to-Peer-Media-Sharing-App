@@ -74,7 +74,7 @@ export default function FgPanel({
     }),
   };
 
-  const [rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
   const [isHover, setIsHover] = useState(false);
   const [position, setPosition] = useState<{ x?: number; y?: number }>({
     x: initPosition.x,

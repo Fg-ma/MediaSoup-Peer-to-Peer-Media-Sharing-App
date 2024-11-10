@@ -1,5 +1,6 @@
 import { createModel, KaldiRecognizer, Model } from "vosk-browser";
 import { browserLangs, VoskResult } from "./CaptionButton";
+import { RecognizerMessage } from "vosk-browser/dist/interfaces";
 
 class CaptionsFunctions {
   private loadedVoskModel?: {
@@ -18,7 +19,9 @@ class CaptionsFunctions {
 
   private voskRecognizer: React.MutableRefObject<KaldiRecognizer | undefined>;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private SpeechRecognition: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private browserRecognizer: React.MutableRefObject<any>;
 
   private browserLang: browserLangs;
@@ -49,6 +52,7 @@ class CaptionsFunctions {
 
     voskRecognizer: React.MutableRefObject<KaldiRecognizer | undefined>,
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     browserRecognizer: React.MutableRefObject<any>,
 
     browserLang: browserLangs,
@@ -71,7 +75,7 @@ class CaptionsFunctions {
       browserStandardSpeechRecognitionAvailable;
 
     this.SpeechRecognition =
-      // @ts-ignore
+      // @ts-expect-error: window has bad typing these exist
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (this.SpeechRecognition) {
@@ -81,7 +85,10 @@ class CaptionsFunctions {
 
       newBrowserRecognizer.lang = this.browserLang;
 
-      newBrowserRecognizer.onresult = (event: any) => {
+      newBrowserRecognizer.onresult = (event: {
+        results: [{ transcript: string }[]];
+        resultIndex: number;
+      }) => {
         let newBrowserCaptions = "";
 
         // Iterate through results
@@ -117,8 +124,8 @@ class CaptionsFunctions {
       recognizer.setWords(true);
 
       // Add event listener for "result"
-      recognizer.on("result", (message: any) => {
-        const result: VoskResult = message;
+      recognizer.on("result", (message: RecognizerMessage) => {
+        const result = message as VoskResult;
         this.setVoskCaptions(result);
       });
 

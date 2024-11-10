@@ -134,7 +134,7 @@ class FgSoundBoardController {
 
     crazyBoardEffects[boardEffect].running = true;
 
-    crazyBoardEffects[boardEffect].sequence.forEach(async (keys, index) => {
+    crazyBoardEffects[boardEffect].sequence.forEach(async (_, index) => {
       setTimeout(
         () => this.carzyBoardEffectUpdater(boardEffect, index),
         index * this.crazyBoardEffectInterval

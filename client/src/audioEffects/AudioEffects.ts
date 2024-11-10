@@ -3,65 +3,11 @@ import FgSampler from "./fgSampler";
 import FgSoundEffects from "./fgSoundEffects";
 import FgBackgroundMusic from "./fgBackgroundMusic";
 import FgAssetSoundEffects from "./fgAssetSoundEffects";
-
-export type AudioMixEffectsType =
-  | "autoFilter"
-  | "autoPanner"
-  | "autoWah"
-  | "bitCrusher"
-  | "chebyshev"
-  | "chorus"
-  | "distortion"
-  | "EQ"
-  | "feedbackDelay"
-  | "freeverb"
-  | "JCReverb"
-  | "phaser"
-  | "pingPongDelay"
-  | "pitchShift"
-  | "reverb"
-  | "stereoWidener"
-  | "tremolo"
-  | "vibrato";
-
-type AutoFilterOptionsType = "frequency" | "baseFrequency" | "octaves";
-type AutoPannerOptionsType = "frequency";
-type AutoWahOptionsType = "baseFrequency" | "octaves" | "sensitivity";
-type BitCrusher = "bits";
-type Chebyshev = "order";
-type ChorusOptionsType = "frequency" | "delayTime" | "depth";
-type DistortionOptionsType = "distortion" | "oversample";
-type EQOptionsType = "high" | "mid" | "low";
-type FeedbackDelayOptionsType = "delayTime" | "feedback";
-type FreeverbOptionsType = "roomSize" | "dampening";
-type JCReverbOptionsType = "roomSize";
-type PhaserOptionsType = "frequency" | "octaves" | "baseFrequency";
-type PingPongDelayOptionsType = "delayTime" | "feedback";
-type PitchShiftOptionsType = "pitch";
-type ReverbOptionsType = "decay" | "preDelay";
-type StereoWidenerOptionsType = "width";
-type TremoloOptionsType = "frequency" | "depth";
-type VibratoOptionsType = "frequency" | "depth";
-
-export type MixEffectsOptionsType =
-  | AutoFilterOptionsType
-  | AutoPannerOptionsType
-  | AutoWahOptionsType
-  | BitCrusher
-  | Chebyshev
-  | ChorusOptionsType
-  | DistortionOptionsType
-  | EQOptionsType
-  | FeedbackDelayOptionsType
-  | FreeverbOptionsType
-  | JCReverbOptionsType
-  | PhaserOptionsType
-  | PingPongDelayOptionsType
-  | PitchShiftOptionsType
-  | ReverbOptionsType
-  | StereoWidenerOptionsType
-  | TremoloOptionsType
-  | VibratoOptionsType;
+import {
+  AudioMixEffectsType,
+  MixEffectsOptionsType,
+  ToneEffectsType,
+} from "./typeConstant";
 
 class AudioEffects {
   private masterChain: Tone.Gain;
@@ -71,7 +17,7 @@ class AudioEffects {
   private backgroundMusicChain: Tone.Gain;
   private assetSoundEffectsChain: Tone.Gain;
 
-  private micEffects: any[] = [];
+  private micEffects: ToneEffectsType[] = [];
 
   private autoFilter: Tone.AutoFilter | undefined;
   private autoPanner: Tone.AutoPanner | undefined;
@@ -601,7 +547,7 @@ class AudioEffects {
     });
   };
 
-  private removeEffect(effect: any | undefined) {
+  private removeEffect(effect: ToneEffectsType | undefined) {
     if (!effect) return;
 
     const effectIndex = this.micEffects.indexOf(effect);
@@ -639,7 +585,7 @@ class AudioEffects {
     }
   }
 
-  private addEffect(effect: any) {
+  private addEffect(effect: ToneEffectsType) {
     if (this.micEffects.length > 0) {
       this.micEffects[this.micEffects.length - 1].disconnect();
       this.micEffects[this.micEffects.length - 1].connect(effect);

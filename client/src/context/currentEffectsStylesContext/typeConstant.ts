@@ -189,7 +189,7 @@ export interface ScreenEffectStylesType {
   };
 }
 
-export interface AudioEffectStylesType {}
+export type AudioEffectStylesType = object;
 
 export type BackgroundMusicTypes =
   | "adventureTime"

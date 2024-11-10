@@ -3,63 +3,21 @@ import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 
 class Consumers {
-  private socket: React.MutableRefObject<Socket>;
-  private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
-
-  private table_id: React.MutableRefObject<string>;
-  private username: React.MutableRefObject<string>;
-  private instance: React.MutableRefObject<string>;
-
-  private subBtnRef: React.RefObject<HTMLButtonElement>;
-
-  private consumerTransport: React.MutableRefObject<
-    mediasoup.types.Transport<mediasoup.types.AppData> | undefined
-  >;
-
-  private remoteTracksMap: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: {
-        camera?: { [cameraId: string]: MediaStreamTrack };
-        screen?: { [screenId: string]: MediaStreamTrack };
-        audio?: MediaStreamTrack | undefined;
-      };
-    };
-  }>;
-
-  private setUpEffectContext: (
-    username: string,
-    instance: string,
-    cameraIds: (string | undefined)[],
-    screenIds: (string | undefined)[]
-  ) => void;
-
-  private createConsumerBundle: (
-    trackUsername: string,
-    trackInstance: string,
-    remoteCameraStreams: {
-      [screenId: string]: MediaStream;
-    },
-    remoteScreenStreams: {
-      [screenId: string]: MediaStream;
-    },
-    remoteAudioStream: MediaStream | undefined
-  ) => void;
-
   constructor(
-    socket: React.MutableRefObject<Socket>,
-    device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private socket: React.MutableRefObject<Socket>,
+    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
 
-    table_id: React.MutableRefObject<string>,
-    username: React.MutableRefObject<string>,
-    instance: React.MutableRefObject<string>,
+    private table_id: React.MutableRefObject<string>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
 
-    subBtnRef: React.RefObject<HTMLButtonElement>,
+    private subBtnRef: React.RefObject<HTMLButtonElement>,
 
-    consumerTransport: React.MutableRefObject<
+    private consumerTransport: React.MutableRefObject<
       mediasoup.types.Transport<mediasoup.types.AppData> | undefined
     >,
 
-    remoteTracksMap: React.MutableRefObject<{
+    private remoteTracksMap: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
           camera?: { [cameraId: string]: MediaStreamTrack };
@@ -69,14 +27,14 @@ class Consumers {
       };
     }>,
 
-    setUpEffectContext: (
+    private setUpEffectContext: (
       username: string,
       instance: string,
       cameraIds: (string | undefined)[],
       screenIds: (string | undefined)[]
     ) => void,
 
-    createConsumerBundle: (
+    private createConsumerBundle: (
       trackUsername: string,
       trackInstance: string,
       remoteCameraStreams: {
@@ -87,18 +45,7 @@ class Consumers {
       },
       remoteAudioStream: MediaStream | undefined
     ) => void
-  ) {
-    this.socket = socket;
-    this.device = device;
-    this.table_id = table_id;
-    this.username = username;
-    this.instance = instance;
-    this.subBtnRef = subBtnRef;
-    this.consumerTransport = consumerTransport;
-    this.remoteTracksMap = remoteTracksMap;
-    this.setUpEffectContext = setUpEffectContext;
-    this.createConsumerBundle = createConsumerBundle;
-  }
+  ) {}
 
   async onSubscribed(event: {
     type: string;
@@ -110,6 +57,7 @@ class Consumers {
               producerId: string;
               id: string;
               kind: "audio" | "video" | undefined;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               rtpParameters: any;
               type: string;
               producerPaused: boolean;
@@ -120,6 +68,7 @@ class Consumers {
               producerId: string;
               id: string;
               kind: "audio" | "video" | undefined;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               rtpParameters: any;
               type: string;
               producerPaused: boolean;
@@ -129,6 +78,7 @@ class Consumers {
             producerId: string;
             id: string;
             kind: "audio" | "video" | undefined;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             rtpParameters: any;
             type: string;
             producerPaused: boolean;
@@ -149,7 +99,7 @@ class Consumers {
 
     for (const producerUsername in subscriptions) {
       for (const producerInstance in subscriptions[producerUsername]) {
-        let newRemoteTrack: {
+        const newRemoteTrack: {
           camera?: { [cameraId: string]: MediaStreamTrack };
           screen?: { [screenId: string]: MediaStreamTrack };
           audio?: MediaStreamTrack;
@@ -245,7 +195,7 @@ class Consumers {
 
     this.consumerTransport.current.on(
       "connect",
-      ({ dtlsParameters }, callback, errback) => {
+      ({ dtlsParameters }, callback, _errback) => {
         const msg = {
           type: "connectConsumerTransport",
           transportId: this.consumerTransport.current?.id,
@@ -268,12 +218,13 @@ class Consumers {
       "connectionstatechange",
       async (state) => {
         switch (state) {
-          case "connecting":
+          case "connecting": {
             break;
-          case "connected":
+          }
+          case "connected": {
             for (const username in this.remoteTracksMap.current) {
               for (const instance in this.remoteTracksMap.current[username]) {
-                let remoteCameraStreams: {
+                const remoteCameraStreams: {
                   [cameraId: string]: MediaStream;
                 } = {};
                 for (const key in this.remoteTracksMap.current[username][
@@ -288,7 +239,7 @@ class Consumers {
                   remoteCameraStreams[key] = remoteCameraStream;
                 }
 
-                let remoteScreenStreams: {
+                const remoteScreenStreams: {
                   [screenId: string]: MediaStream;
                 } = {};
                 for (const key in this.remoteTracksMap.current[username][
@@ -329,9 +280,11 @@ class Consumers {
             };
             this.socket.current.send(msg);
             break;
-          case "failed":
+          }
+          case "failed": {
             this.consumerTransport.current?.close();
             break;
+          }
           default:
             break;
         }
@@ -443,7 +396,7 @@ class Consumers {
           event.producerInstance
         ].audio)
     ) {
-      let remoteCameraStreams: { [cameraId: string]: MediaStream } = {};
+      const remoteCameraStreams: { [cameraId: string]: MediaStream } = {};
       if (
         this.remoteTracksMap.current[event.producerUsername][
           event.producerInstance
@@ -462,7 +415,7 @@ class Consumers {
         }
       }
 
-      let remoteScreenStreams: { [screenId: string]: MediaStream } = {};
+      const remoteScreenStreams: { [screenId: string]: MediaStream } = {};
       if (
         this.remoteTracksMap.current[event.producerUsername][
           event.producerInstance

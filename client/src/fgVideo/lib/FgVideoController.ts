@@ -13,7 +13,7 @@ type FgVideoMessageEvents =
       requestedProducerType: "camera" | "screen" | "audio";
       requestedProducerId: string;
       effect: CameraEffectTypes | ScreenEffectTypes;
-      effectStyle: any;
+      effectStyle: string;
       blockStateChange: boolean;
     }
   | {
@@ -23,61 +23,20 @@ type FgVideoMessageEvents =
       producerType: "camera" | "screen" | "audio";
       producerId: string;
       effect: CameraEffectTypes | ScreenEffectTypes;
-      effectStyle: any;
+      effectStyle: string;
       blockStateChange: boolean;
     };
 
 class FgVideoController {
-  private username: string;
-  private instance: string;
-  private type: "camera" | "screen";
-  private videoId: string;
-
-  private controls: Controls;
-
-  private videoStream: MediaStream | undefined;
-
-  private remoteStreamEffects: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: {
-        camera: {
-          [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-        };
-        screen: {
-          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-        };
-        audio: { [effectType in AudioEffectTypes]: boolean };
-      };
-    };
-  }>;
-  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
-  private remoteCurrentEffectsStyles: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: EffectStylesType;
-    };
-  }>;
-
-  private videoRef: React.RefObject<HTMLVideoElement>;
-  private videoContainerRef: React.RefObject<HTMLDivElement>;
-  private audioRef: React.RefObject<HTMLAudioElement>;
-  private timelineContainerRef: React.RefObject<HTMLDivElement>;
-  private currentTimeRef: React.RefObject<HTMLDivElement>;
-
-  private fgVideoOptions: FgVideoOptions;
-
-  private handleVisualEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => Promise<void>;
-
   constructor(
-    username: string,
-    instance: string,
-    type: "camera" | "screen",
-    videoId: string,
-    controls: Controls,
-    videoStream: MediaStream | undefined,
-    remoteStreamEffects: React.MutableRefObject<{
+    private username: string,
+    private instance: string,
+    private type: "camera" | "screen",
+    private videoId: string,
+    private controls: Controls,
+    private videoStream: MediaStream | undefined,
+    private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
+    private remoteStreamEffects: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
           camera: {
@@ -90,40 +49,21 @@ class FgVideoController {
         };
       };
     }>,
-    currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-    remoteCurrentEffectsStyles: React.MutableRefObject<{
+    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private remoteCurrentEffectsStyles: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: EffectStylesType;
       };
     }>,
-    videoRef: React.RefObject<HTMLVideoElement>,
-    videoContainerRef: React.RefObject<HTMLDivElement>,
-    audioRef: React.RefObject<HTMLAudioElement>,
-    timelineContainerRef: React.RefObject<HTMLDivElement>,
-    currentTimeRef: React.RefObject<HTMLDivElement>,
-    fgVideoOptions: FgVideoOptions,
-    handleVisualEffectChange: (
+    private videoRef: React.RefObject<HTMLVideoElement>,
+    private videoContainerRef: React.RefObject<HTMLDivElement>,
+    private audioRef: React.RefObject<HTMLAudioElement>,
+    private fgVideoOptions: FgVideoOptions,
+    private handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>
-  ) {
-    this.username = username;
-    this.instance = instance;
-    this.type = type;
-    this.videoId = videoId;
-    this.controls = controls;
-    this.videoStream = videoStream;
-    this.remoteStreamEffects = remoteStreamEffects;
-    this.currentEffectsStyles = currentEffectsStyles;
-    this.remoteCurrentEffectsStyles = remoteCurrentEffectsStyles;
-    this.videoRef = videoRef;
-    this.videoContainerRef = videoContainerRef;
-    this.audioRef = audioRef;
-    this.timelineContainerRef = timelineContainerRef;
-    this.currentTimeRef = currentTimeRef;
-    this.fgVideoOptions = fgVideoOptions;
-    this.handleVisualEffectChange = handleVisualEffectChange;
-  }
+  ) {}
 
   init = () => {
     // Set videoStream as srcObject
@@ -155,14 +95,6 @@ class FgVideoController {
         defaultFgVideoOptions.primaryVideoColor
       }`
     );
-    this.videoContainerRef.current?.style.setProperty(
-      "--flip-video",
-      `${
-        this.fgVideoOptions.flipVideo ?? defaultFgVideoOptions.flipVideo
-          ? -1
-          : 1
-      }`
-    );
   };
 
   onEffectChangeRequested = (event: {
@@ -170,7 +102,7 @@ class FgVideoController {
     requestedProducerType: "camera" | "screen" | "audio";
     requestedProducerId: string | undefined;
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-    effectStyle: any;
+    effectStyle: string;
     blockStateChange: boolean;
   }) => {
     if (
@@ -178,12 +110,16 @@ class FgVideoController {
       this.type === event.requestedProducerType &&
       this.videoId === event.requestedProducerId
     ) {
-      // @ts-ignore
+      // @ts-expect-error: ts can't verify type, videoId, and effect correlate
       this.currentEffectsStyles.current[this.type][this.videoId][event.effect] =
         event.effectStyle;
 
-      // @ts-ignore
+      // @ts-expect-error: ts can't verify type and effect correlate
       this.handleVisualEffectChange(event.effect, event.blockStateChange);
+    }
+
+    if (event.effect === "pause") {
+      this.setPausedState((prev) => !prev);
     }
   };
 
@@ -194,7 +130,7 @@ class FgVideoController {
     producerType: "camera" | "screen" | "audio";
     producerId: string | undefined;
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-    effectStyle: any;
+    effectStyle: string;
     blockStateChange: boolean;
   }) => {
     if (
@@ -205,17 +141,17 @@ class FgVideoController {
       this.videoId === event.producerId
     ) {
       if (!event.blockStateChange) {
-        // @ts-ignore
+        // @ts-expect-error: ts can't verify username, instance, videoId, and effect correlate
         this.remoteStreamEffects.current[this.username][this.instance][
           this.type
         ][this.videoId][event.effect] =
-          // @ts-ignore
+          // @ts-expect-error: ts can't verify username, instance, videoId, and effect correlate
           !this.remoteStreamEffects.current[this.username][this.instance][
             this.type
           ][this.videoId][event.effect];
       }
 
-      // @ts-ignore
+      // @ts-expect-error: ts can't verify username, instance, videoId, and effect correlate
       this.remoteCurrentEffectsStyles.current[this.username][this.instance][
         this.type
       ][this.videoId][event.effect] = event.effectStyle;

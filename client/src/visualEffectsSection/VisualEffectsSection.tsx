@@ -65,7 +65,7 @@ export default function VisualEffectsSection({
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
 }) {
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
   const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
 
@@ -115,7 +115,19 @@ export default function VisualEffectsSection({
     };
   }, []);
 
-  const handleMessage = (event: any) => {
+  const handleMessage = (
+    event:
+      | {
+          type: "effectChangeRequested";
+          requestedProducerId: string;
+        }
+      | {
+          type: "clientEffectChanged";
+          username: string;
+          instance: string;
+          producerId: string;
+        }
+  ) => {
     switch (event.type) {
       case "effectChangeRequested":
         if (videoId === event.requestedProducerId && acceptsVisualEffects) {

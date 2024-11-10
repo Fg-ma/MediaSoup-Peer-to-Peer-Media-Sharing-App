@@ -2,6 +2,10 @@ import React, { useRef, useState } from "react";
 import { KnobButtonOptions } from "../../fgKnobButton/FgKnobButton";
 import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import SamplerEffect from "./SamplerEffect";
+import {
+  AudioMixEffectsType,
+  MixEffectsOptionsType,
+} from "../../audioEffects/typeConstant";
 
 import autoFilterIcon from "../../../public/svgs/audioEffects/autoFilterIcon.svg";
 import autoPannerIcon from "../../../public/svgs/audioEffects/autoPannerIcon.svg";
@@ -14,10 +18,6 @@ import phaserIcon from "../../../public/svgs/audioEffects/phaserIcon.svg";
 import pitchShiftIcon from "../../../public/svgs/audioEffects/pitchShiftIcon.svg";
 import reverbIcon from "../../../public/svgs/audioEffects/reverbIcon.svg";
 import stereoWidenerIcon from "../../../public/svgs/audioEffects/stereoWidenerIcon.svg";
-import {
-  AudioMixEffectsType,
-  MixEffectsOptionsType,
-} from "src/audioEffects/AudioEffects";
 
 export interface SamplerEffectType {
   labelIcon?: string;

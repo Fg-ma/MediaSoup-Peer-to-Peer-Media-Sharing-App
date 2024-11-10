@@ -14,20 +14,14 @@ import classicalCurlyBeard_512x512 from "../../../public/2DAssets/beards/classic
 import classicalCurlyBeard_32x32 from "../../../public/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_32x32.png";
 import classicalCurlyBeardIcon from "../../../public/svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardIcon.svg";
 import classicalCurlyBeardOffIcon from "../../../public/svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardOffIcon.svg";
-import threeDim_classicalCurlyBeardIcon from "../../../public/svgs/visualEffects/beards/classicalCurlyBeard/threeDim_classicalCurlyBeardIcon.svg";
-import threeDim_classicalCurlyBeardOffIcon from "../../../public/svgs/visualEffects/beards/classicalCurlyBeard/threeDim_classicalCurlyBeardOffIcon.svg";
 import chinBeard_512x512 from "../../../public/2DAssets/beards/chinBeard/chinBeard_512x512.png";
 import chinBeard_32x32 from "../../../public/2DAssets/beards/chinBeard/chinBeard_32x32.png";
 import chinBeard_off_512x512 from "../../../public/2DAssets/beards/chinBeard/chinBeard_off_512x512.png";
 import chinBeard_off_32x32 from "../../../public/2DAssets/beards/chinBeard/chinBeard_off_32x32.png";
-import chinBeard_threeDim_512x512 from "../../../public/2DAssets/beards/chinBeard/chinBeard_threeDim_512x512.png";
-import chinBeard_threeDim_32x32 from "../../../public/2DAssets/beards/chinBeard/chinBeard_threeDim_32x32.png";
 import fullBeard_512x512 from "../../../public/2DAssets/beards/fullBeard/fullBeard_512x512.png";
 import fullBeard_32x32 from "../../../public/2DAssets/beards/fullBeard/fullBeard_32x32.png";
 import fullBeard_off_512x512 from "../../../public/2DAssets/beards/fullBeard/fullBeard_off_512x512.png";
 import fullBeard_off_32x32 from "../../../public/2DAssets/beards/fullBeard/fullBeard_off_32x32.png";
-import fullBeard_threeDim_512x512 from "../../../public/2DAssets/beards/fullBeard/fullBeard_threeDim_512x512.png";
-import fullBeard_threeDim_32x32 from "../../../public/2DAssets/beards/fullBeard/fullBeard_threeDim_32x32.png";
 
 const beardsLabels: {
   [beardsEffectType in BeardsEffectTypes]: string;
@@ -64,7 +58,7 @@ export default function BeardsButton({
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
-  const [rerender, setRerender] = useState(0);
+  const [_, setRerender] = useState(0);
   const beardsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser

@@ -6,11 +6,11 @@ import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../scrollingContainer/lib/ScrollingContainerButton";
 import FgPanel from "../../fgPanel/FgPanel";
 import { SliderChangeEvent } from "../../fgSlider/FgSlider";
+import { DynamicMixEffect, staticMixEffects } from "./typeConstant";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../../audioEffects/AudioEffects";
-import { DynamicMixEffect, staticMixEffects } from "./typeConstant";
+} from "../../audioEffects/typeConstant";
 
 export default function AudioMixEffectsPortal({
   audioMixEffectsButtonRef,
@@ -21,7 +21,7 @@ export default function AudioMixEffectsPortal({
 }) {
   const { userMedia } = useStreamsContext();
 
-  const [rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
   const [focus, setFocus] = useState(true);
   const dynamicMixEffects = useRef<{
     [mixEffect in AudioMixEffectsType]: DynamicMixEffect;

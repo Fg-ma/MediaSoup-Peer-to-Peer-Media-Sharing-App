@@ -4,11 +4,12 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
-import AudioEffects, {
+import AudioEffects from "../audioEffects/AudioEffects";
+import { FgSamplers } from "src/audioEffects/fgSamplers";
+import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../audioEffects/AudioEffects";
-import { FgSamplers } from "src/audioEffects/fgSamplers";
+} from "src/audioEffects/typeConstant";
 
 class AudioMedia {
   private audioContext: Tone.BaseContext;
@@ -1450,6 +1451,7 @@ class AudioMedia {
     sampler: { category: string; kind: string },
     increment?: number
   ): FgSamplers => {
+    // @ts-expect-error: ts can't verify category and kind correlation
     return this.audioEffects.fgSampler.swapSampler(sampler, increment);
   };
 

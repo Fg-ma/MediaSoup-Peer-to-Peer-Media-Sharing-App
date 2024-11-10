@@ -1,68 +1,34 @@
-import { FgVolumeElementOptions } from "../../fgVolumeElement/FgVolumeElement";
 import FgVolumeElementSocket from "../../fgVolumeElement/lib/FgVolumeElementSocket";
+import {
+  FgVolumeElementControllerMessagesType,
+  FgVolumeElementOptions,
+} from "./typeConstant";
 
 class FgVolumeElementController {
-  private username: string;
-  private instance: string;
-  private isUser: boolean;
-  private fgVolumeElementOptions: FgVolumeElementOptions;
-
-  private audioRef: React.RefObject<HTMLAudioElement>;
-  private sliderRef: React.RefObject<HTMLInputElement>;
-  private clientMute: React.MutableRefObject<boolean>;
-  private localMute: React.MutableRefObject<boolean>;
-  private setActive: React.Dispatch<React.SetStateAction<boolean>>;
-
-  private volumeState: {
-    from: string;
-    to: string;
-  };
-  private setVolumeState: React.Dispatch<
-    React.SetStateAction<{
-      from: string;
-      to: string;
-    }>
-  >;
-
-  private tracksColorSetterCallback: (() => void) | undefined;
-
   fgVolumeElementSocket: FgVolumeElementSocket;
 
   constructor(
-    username: string,
-    instance: string,
-    isUser: boolean,
-    fgVolumeElementOptions: FgVolumeElementOptions,
-    audioRef: React.RefObject<HTMLAudioElement>,
-    sliderRef: React.RefObject<HTMLInputElement>,
-    clientMute: React.MutableRefObject<boolean>,
-    localMute: React.MutableRefObject<boolean>,
-    setActive: React.Dispatch<React.SetStateAction<boolean>>,
-    volumeState: {
+    private username: string,
+    private instance: string,
+    private isUser: boolean,
+    private fgVolumeElementOptions: FgVolumeElementOptions,
+    private audioRef: React.RefObject<HTMLAudioElement>,
+    private sliderRef: React.RefObject<HTMLInputElement>,
+    private clientMute: React.MutableRefObject<boolean>,
+    private localMute: React.MutableRefObject<boolean>,
+    private setActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private volumeState: {
       from: string;
       to: string;
     },
-    setVolumeState: React.Dispatch<
+    private setVolumeState: React.Dispatch<
       React.SetStateAction<{
         from: string;
         to: string;
       }>
     >,
-    tracksColorSetterCallback: (() => void) | undefined
+    private tracksColorSetterCallback: (() => void) | undefined
   ) {
-    this.username = username;
-    this.instance = instance;
-    this.isUser = isUser;
-    this.fgVolumeElementOptions = fgVolumeElementOptions;
-    this.audioRef = audioRef;
-    this.sliderRef = sliderRef;
-    this.clientMute = clientMute;
-    this.localMute = localMute;
-    this.setActive = setActive;
-    this.volumeState = volumeState;
-    this.setVolumeState = setVolumeState;
-    this.tracksColorSetterCallback = tracksColorSetterCallback;
-
     this.fgVolumeElementSocket = new FgVolumeElementSocket(
       this.username,
       this.instance,
@@ -74,11 +40,9 @@ class FgVolumeElementController {
       this.volumeState,
       this.setVolumeState
     );
-
-    this.volumeSliderChangeHandler.bind(this);
   }
 
-  handleMessage(event: any) {
+  handleMessage = (event: FgVolumeElementControllerMessagesType) => {
     switch (event.type) {
       case "clientMuteStateResponsed":
         this.fgVolumeElementSocket.onClientMuteStateResponsed(event);
@@ -89,9 +53,9 @@ class FgVolumeElementController {
       default:
         break;
     }
-  }
+  };
 
-  volumeSliderChangeHandler() {
+  volumeSliderChangeHandler = () => {
     this.tracksColorSetter();
 
     if (!this.audioRef.current || this.clientMute?.current) {
@@ -116,9 +80,9 @@ class FgVolumeElementController {
         to: newVolumeState,
       }));
     }
-  }
+  };
 
-  tracksColorSetter() {
+  tracksColorSetter = () => {
     if (!this.sliderRef.current || !this.audioRef.current) {
       return;
     }
@@ -137,7 +101,7 @@ class FgVolumeElementController {
     if (this.tracksColorSetterCallback) {
       this.tracksColorSetterCallback();
     }
-  }
+  };
 }
 
 export default FgVolumeElementController;

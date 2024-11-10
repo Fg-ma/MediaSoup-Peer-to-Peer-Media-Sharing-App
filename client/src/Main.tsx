@@ -72,6 +72,7 @@ type MediasoupSocketEvents =
                 producerId: string;
                 id: string;
                 kind: "audio" | "video" | undefined;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 rtpParameters: any;
                 type: string;
                 producerPaused: boolean;
@@ -82,6 +83,7 @@ type MediasoupSocketEvents =
                 producerId: string;
                 id: string;
                 kind: "audio" | "video" | undefined;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 rtpParameters: any;
                 type: string;
                 producerPaused: boolean;
@@ -91,6 +93,7 @@ type MediasoupSocketEvents =
               producerId: string;
               id: string;
               kind: "audio" | "video" | undefined;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               rtpParameters: any;
               type: string;
               producerPaused: boolean;
@@ -177,7 +180,7 @@ export default function Main() {
   const audioBtnRef = useRef<HTMLButtonElement>(null);
   const muteBtnRef = useRef<HTMLButtonElement>(null);
   const mutedAudioRef = useRef(false);
-  const [mutedAudio, setMutedAudio] = useState(false);
+  const [_, setMutedAudio] = useState(false);
   const isAudio = useRef(false);
   const [audioActive, setAudioActive] = useState(false);
 
@@ -504,8 +507,7 @@ export default function Main() {
         producerType: "audio",
         producerId: undefined,
         effect: effect,
-        // @ts-ignore
-        effectStyle: currentEffectsStyles.current.audio[effect],
+        effectStyle: undefined,
         blockStateChange: false,
       };
 

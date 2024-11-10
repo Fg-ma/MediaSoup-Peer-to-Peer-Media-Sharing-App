@@ -9,6 +9,7 @@ const onRouterCapabilities = async (
 ) => {
   try {
     device.current = new mediasoup.Device();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.name === "UnsupportedError") {
       console.error("Browser not supported");

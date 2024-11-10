@@ -16,7 +16,7 @@ export default function ExpandingSelectionPanelButton({
   selections: RecursiveSelections;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [renderer, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
   const buttonRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 

@@ -2,34 +2,15 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import BundleController from "./lib/BundleController";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import FgBabylonCanvas from "../fgBabylonCanvas/FgBabylonCanvas";
+import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 
 const FgVideo = React.lazy(() => import("../fgVideo/FgVideo"));
 const FgAudioElementContainer = React.lazy(
   () => import("../fgAudioElement/FgAudioElementContainer")
 );
-
-interface BundleOptions {
-  isUser?: boolean;
-  acceptsCameraEffects?: boolean;
-  acceptsScreenEffects?: boolean;
-  acceptsAudioEffects?: boolean;
-  primaryVolumeSliderColor?: string;
-  secondaryVolumeSliderColor?: string;
-  initialVolume?: "off" | "low" | "high";
-}
-
-const defaultBundleOptions = {
-  isUser: false,
-  acceptsCameraEffects: false,
-  acceptsScreenEffects: false,
-  acceptsAudioEffects: false,
-  primaryVolumeSliderColor: "white",
-  secondaryVolumeSliderColor: "rgba(150, 150, 150, 0.5)",
-};
 
 export default function Bundle({
   socket,
@@ -54,9 +35,9 @@ export default function Bundle({
   initScreenStreams?: { [screenKey: string]: MediaStream };
   initAudioStream?: MediaStream;
   options?: BundleOptions;
-  handleMuteCallback?: () => any;
-  onRendered?: () => any;
-  onNewConsumerWasCreatedCallback?: () => any;
+  handleMuteCallback?: () => void;
+  onRendered?: () => void;
+  onNewConsumerWasCreatedCallback?: () => void;
 }) {
   const bundleOptions = {
     ...defaultBundleOptions,
@@ -65,8 +46,7 @@ export default function Bundle({
 
   const { userMedia, remoteTracksMap, remoteStreamEffects } =
     useStreamsContext();
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { remoteCurrentEffectsStyles } = useCurrentEffectsStylesContext();
   const { signal } = useSignalContext();
 
   const [cameraStreams, setCameraStreams] = useState<
@@ -101,56 +81,21 @@ export default function Bundle({
     bundleOptions.acceptsAudioEffects
   );
 
-  const handleAudioEffectChange = (effect: AudioEffectTypes) => {
-    if (bundleOptions.isUser) {
-      userMedia.current.audio?.changeEffects(effect, false);
-
-      if (acceptsAudioEffects) {
-        const msg = {
-          type: "clientEffectChange",
-          table_id: table_id,
-          username: username,
-          instance: instance,
-          producerType: "audio",
-          producerId: undefined,
-          effect: effect,
-          // @ts-ignore
-          effectStyle: currentEffectsStyles.current.audio[effect],
-          blockStateChange: false,
-        };
-        socket.current.emit("message", msg);
-      }
-    } else if (acceptsAudioEffects) {
-      const msg = {
-        type: "requestEffectChange",
-        table_id: table_id,
-        requestedUsername: username,
-        requestedInstance: instance,
-        requestedProducerType: "audio",
-        requestedProducerId: undefined,
-        effect: effect,
-        effectStyle:
-          // @ts-ignore
-          remoteCurrentEffectsStyles.current[username][instance].audio[effect],
-        blockStateChange: false,
-      };
-
-      socket.current.emit("message", msg);
-    }
-  };
-
   const bundleController = new BundleController(
     bundleOptions.isUser,
+    table_id,
     username,
     instance,
+    socket,
+    bundleOptions,
     setCameraStreams,
     setScreenStreams,
     setAudioStream,
     remoteTracksMap,
     remoteStreamEffects,
-    currentEffectsStyles,
     remoteCurrentEffectsStyles,
     userMedia,
+    bundleRef,
     audioRef,
     clientMute,
     localMute,
@@ -158,8 +103,8 @@ export default function Bundle({
     setAcceptsCameraEffects,
     setAcceptsScreenEffects,
     setAcceptsAudioEffects,
-    handleAudioEffectChange,
-    onNewConsumerWasCreatedCallback
+    onNewConsumerWasCreatedCallback,
+    handleMuteCallback
   );
 
   // Initial functions & call onRendered call back if one is availiable
@@ -194,66 +139,6 @@ export default function Bundle({
       audioRef.current.srcObject = samplerStream;
     }
   }, [audioRef, audioStream]);
-
-  const tracksColorSetterCallback = () => {
-    if (!bundleRef.current || !audioRef.current) {
-      return;
-    }
-
-    const volumeSliders = bundleRef.current.querySelectorAll(".volume-slider");
-
-    let value = audioRef.current.volume;
-    if (
-      audioRef.current.muted &&
-      !bundleOptions.isUser &&
-      !clientMute.current
-    ) {
-      value = 0;
-    }
-    const min = 0;
-    const max = 1;
-    const percentage = ((value - min) / (max - min)) * 100;
-    const trackColor = `linear-gradient(to right, ${bundleOptions.primaryVolumeSliderColor} 0%, ${bundleOptions.primaryVolumeSliderColor} ${percentage}%, ${bundleOptions.secondaryVolumeSliderColor} ${percentage}%, ${bundleOptions.secondaryVolumeSliderColor} 100%)`;
-
-    volumeSliders.forEach((slider) => {
-      const sliderElement = slider as HTMLInputElement;
-      sliderElement.style.background = trackColor;
-    });
-  };
-
-  const handleVolumeSliderCallback = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const volume = parseFloat(event.target.value);
-
-    if (bundleRef.current) {
-      const volumeSliders =
-        bundleRef.current.querySelectorAll(".volume-slider");
-
-      volumeSliders.forEach((slider) => {
-        const sliderElement = slider as HTMLInputElement;
-        sliderElement.value = `${volume}`;
-      });
-    }
-
-    tracksColorSetterCallback();
-  };
-
-  const handleMute = () => {
-    if (handleMuteCallback) {
-      handleMuteCallback();
-    }
-
-    if (clientMute.current) {
-      return;
-    }
-
-    localMute.current = !localMute.current;
-
-    if (audioRef.current && !bundleOptions.isUser) {
-      audioRef.current.muted = localMute.current;
-    }
-  };
 
   useEffect(() => {
     if (!signal) {
@@ -297,7 +182,9 @@ export default function Bundle({
                 bundleRef={bundleRef}
                 audioStream={audioStream}
                 audioRef={audioRef}
-                handleAudioEffectChange={handleAudioEffectChange}
+                handleAudioEffectChange={
+                  bundleController.handleAudioEffectChange
+                }
                 clientMute={clientMute}
                 localMute={localMute}
                 options={{
@@ -305,7 +192,6 @@ export default function Bundle({
                   acceptsVisualEffects: acceptsCameraEffects,
                   acceptsAudioEffects: acceptsAudioEffects,
                   isStream: true,
-                  flipVideo: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,
                   isTotalTime: false,
@@ -325,10 +211,14 @@ export default function Bundle({
                       : "low"
                     : "high",
                 }}
-                handleMute={handleMute}
+                handleMute={bundleController.handleMute}
                 handleMuteCallback={handleMuteCallback}
-                handleVolumeSliderCallback={handleVolumeSliderCallback}
-                tracksColorSetterCallback={tracksColorSetterCallback}
+                handleVolumeSliderCallback={
+                  bundleController.handleVolumeSliderCallback
+                }
+                tracksColorSetterCallback={
+                  bundleController.tracksColorSetterCallback
+                }
               />
             ) : (
               <FgVideo
@@ -343,7 +233,9 @@ export default function Bundle({
                 videoStream={cameraStream}
                 audioStream={audioStream}
                 audioRef={audioRef}
-                handleAudioEffectChange={handleAudioEffectChange}
+                handleAudioEffectChange={
+                  bundleController.handleAudioEffectChange
+                }
                 clientMute={clientMute}
                 localMute={localMute}
                 options={{
@@ -351,7 +243,6 @@ export default function Bundle({
                   acceptsVisualEffects: acceptsCameraEffects,
                   acceptsAudioEffects: acceptsAudioEffects,
                   isStream: true,
-                  flipVideo: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,
                   isClosedCaptions: true,
@@ -365,10 +256,14 @@ export default function Bundle({
                       : "low"
                     : "high",
                 }}
-                handleMute={handleMute}
+                handleMute={bundleController.handleMute}
                 handleMuteCallback={handleMuteCallback}
-                handleVolumeSliderCallback={handleVolumeSliderCallback}
-                tracksColorSetterCallback={tracksColorSetterCallback}
+                handleVolumeSliderCallback={
+                  bundleController.handleVolumeSliderCallback
+                }
+                tracksColorSetterCallback={
+                  bundleController.tracksColorSetterCallback
+                }
               />
             )}
           </Suspense>
@@ -389,7 +284,9 @@ export default function Bundle({
                 bundleRef={bundleRef}
                 audioStream={audioStream}
                 audioRef={audioRef}
-                handleAudioEffectChange={handleAudioEffectChange}
+                handleAudioEffectChange={
+                  bundleController.handleAudioEffectChange
+                }
                 clientMute={clientMute}
                 localMute={localMute}
                 options={{
@@ -397,7 +294,6 @@ export default function Bundle({
                   acceptsVisualEffects: acceptsScreenEffects,
                   acceptsAudioEffects: acceptsAudioEffects,
                   isStream: true,
-                  flipVideo: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,
                   isTotalTime: false,
@@ -417,10 +313,14 @@ export default function Bundle({
                       : "low"
                     : "high",
                 }}
-                handleMute={handleMute}
+                handleMute={bundleController.handleMute}
                 handleMuteCallback={handleMuteCallback}
-                handleVolumeSliderCallback={handleVolumeSliderCallback}
-                tracksColorSetterCallback={tracksColorSetterCallback}
+                handleVolumeSliderCallback={
+                  bundleController.handleVolumeSliderCallback
+                }
+                tracksColorSetterCallback={
+                  bundleController.tracksColorSetterCallback
+                }
               />
             ) : (
               <FgVideo
@@ -435,7 +335,9 @@ export default function Bundle({
                 videoStream={screenStream}
                 audioStream={audioStream}
                 audioRef={audioRef}
-                handleAudioEffectChange={handleAudioEffectChange}
+                handleAudioEffectChange={
+                  bundleController.handleAudioEffectChange
+                }
                 clientMute={clientMute}
                 localMute={localMute}
                 options={{
@@ -456,10 +358,14 @@ export default function Bundle({
                       : "low"
                     : "high",
                 }}
-                handleMute={handleMute}
+                handleMute={bundleController.handleMute}
                 handleMuteCallback={handleMuteCallback}
-                handleVolumeSliderCallback={handleVolumeSliderCallback}
-                tracksColorSetterCallback={tracksColorSetterCallback}
+                handleVolumeSliderCallback={
+                  bundleController.handleVolumeSliderCallback
+                }
+                tracksColorSetterCallback={
+                  bundleController.tracksColorSetterCallback
+                }
               />
             )}
           </Suspense>
@@ -475,8 +381,8 @@ export default function Bundle({
               name={name}
               audioStream={audioStream}
               audioRef={audioRef}
-              handleAudioEffectChange={handleAudioEffectChange}
-              handleMute={handleMute}
+              handleAudioEffectChange={bundleController.handleAudioEffectChange}
+              handleMute={bundleController.handleMute}
               localMute={localMute}
               isUser={bundleOptions.isUser}
               clientMute={clientMute}

@@ -7,7 +7,7 @@ export default function SelectionPanelButton({
 }: {
   previousPanels: React.MutableRefObject<string[]>;
   content: string;
-  selectionValue: any;
+  selectionValue: string;
 }) {
   return (
     <div

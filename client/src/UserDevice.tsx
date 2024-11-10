@@ -38,7 +38,8 @@ class UserDevice {
   // Function to get hardware information
   private getHardwareInfo() {
     this.cores = navigator.hardwareConcurrency || 4; // Default to 4 if not available
-    this.memory = (navigator as any).deviceMemory || 4; // Default to 4GB if not available
+    // @ts-expect-error: navigator types suck
+    this.memory = navigator.deviceMemory || 4; // Default to 4GB if not available
   }
 
   // Function to adjust parameters based on performance

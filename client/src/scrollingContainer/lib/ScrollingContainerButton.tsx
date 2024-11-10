@@ -16,7 +16,7 @@ export default function ScrollingContainerButton({
       className={`scrolling_container_button ${
         active ? "selected" : ""
       } font-K2D text-lg bg-fg-white-95 rounded px-5 pb-2 shadow w-max`}
-      onClick={(event) => {
+      onClick={() => {
         setActive((prev) => !prev);
 
         if (callbackFunction) {
