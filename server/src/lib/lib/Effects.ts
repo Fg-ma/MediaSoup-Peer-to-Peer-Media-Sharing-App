@@ -1,11 +1,7 @@
 import { Server as SocketIOServer } from "socket.io";
 
 class Effects {
-  private io: SocketIOServer;
-
-  constructor(io: SocketIOServer) {
-    this.io = io;
-  }
+  constructor(private io: SocketIOServer) {}
 
   onRequestEffectChange(event: {
     type: "requestEffectChange";
@@ -15,16 +11,21 @@ class Effects {
     requestedProducerType: "camera" | "screen" | "audio";
     requestedProducerId: string | undefined;
     effect: string;
-    effectStyle: string;
     blockStateChange: boolean;
+    data: {
+      style: string;
+      hideBackgroundStyle?: string;
+      hideBackgroundColor?: string;
+      postProcessStyle?: string;
+    };
   }) {
     const msg = {
       type: "effectChangeRequested",
       requestedProducerType: event.requestedProducerType,
       requestedProducerId: event.requestedProducerId,
       effect: event.effect,
-      effectStyle: event.effectStyle,
       blockStateChange: event.blockStateChange,
+      data: event.data,
     };
 
     this.io

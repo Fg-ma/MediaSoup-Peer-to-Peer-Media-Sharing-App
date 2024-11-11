@@ -15,11 +15,9 @@ import { getNextWorker, getWorkerByIdx } from "../workerManager";
 import MediasoupCleanup from "./MediasoupCleanup";
 
 class Producers {
-  private io: SocketIOServer;
   private mediasoupCleanup: MediasoupCleanup;
 
-  constructor(io: SocketIOServer) {
-    this.io = io;
+  constructor(private io: SocketIOServer) {
     this.mediasoupCleanup = new MediasoupCleanup();
   }
 

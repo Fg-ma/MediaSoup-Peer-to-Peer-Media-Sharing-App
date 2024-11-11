@@ -24,6 +24,7 @@ import {
   expandedClosedCaptionsVoskSelections,
 } from "../fgVideoControls/lib/ClosedCaptionsPage";
 import FgVideoController from "../fgVideo/lib/FgVideoController";
+import { HideBackgroundEffectTypes } from "src/context/currentEffectsStylesContext/typeConstant";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -167,7 +168,7 @@ export default function FgBabylonCanvas({
 
   const [pausedState, setPausedState] = useState(false);
 
-  const paused = useRef(fgVideoOptions.autoPlay);
+  const paused = useRef(!fgVideoOptions.autoPlay);
 
   const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -219,7 +220,9 @@ export default function FgBabylonCanvas({
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
+    hideBackgroundStyle?: HideBackgroundEffectTypes,
+    hideBackgroundColor?: string
   ) => {
     if (fgVideoOptions.isUser) {
       controls.handleVisualEffect(effect, blockStateChange);
@@ -248,12 +251,16 @@ export default function FgBabylonCanvas({
         requestedProducerType: type,
         requestedProducerId: videoId,
         effect: effect,
-        effectStyle:
-          // @ts-expect-error: ts can't infer type, videoId, and effect are strictly enforces and exist
-          remoteCurrentEffectsStyles.current[username][instance][type][videoId][
-            effect
-          ],
         blockStateChange: blockStateChange,
+        data: {
+          style:
+            // @ts-expect-error: ts can't verify username, instance, type, videoId, and effect correlate
+            remoteCurrentEffectsStyles.current[username][instance][type][
+              videoId
+            ][effect],
+          hideBackgroundStyle: hideBackgroundStyle,
+          hideBackgroundColor: hideBackgroundColor,
+        },
       };
 
       socket?.current.emit("message", msg);
@@ -300,6 +307,8 @@ export default function FgBabylonCanvas({
     controls,
     undefined,
     setPausedState,
+    paused,
+    userMedia,
     remoteStreamEffects,
     currentEffectsStyles,
     remoteCurrentEffectsStyles,
@@ -378,9 +387,11 @@ export default function FgBabylonCanvas({
     <div
       ref={canvasContainerRef}
       id={`${videoId}_container`}
-      className={`video-container ${fgVideoOptions.autoPlay ? "" : "paused"} ${
-        effectsActive ? "in-effects" : ""
-      } ${audioEffectsActive ? "in-effects" : ""} ${
+      className={`video-container ${pausedState ? "paused" : ""} ${
+        fgVideoOptions.autoPlay ? "" : "paused"
+      } ${effectsActive ? "in-effects" : ""} ${
+        audioEffectsActive ? "in-effects" : ""
+      } ${
         inVideo ? "in-video" : ""
       } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md h-[${
         userMedia.current[type][videoId].canvas.height

@@ -3,13 +3,9 @@ import { MediasoupSocket } from "../mediasoupTypes";
 import MediasoupCleanup from "./MediasoupCleanup";
 
 class Tables {
-  private socket: MediasoupSocket;
-  private io: SocketIOServer;
   private mediasoupCleanup: MediasoupCleanup;
 
-  constructor(socket: MediasoupSocket, io: SocketIOServer) {
-    this.socket = socket;
-    this.io = io;
+  constructor(private socket: MediasoupSocket, private io: SocketIOServer) {
     this.mediasoupCleanup = new MediasoupCleanup();
   }
 

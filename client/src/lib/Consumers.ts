@@ -166,6 +166,16 @@ class Consumers {
         }
         this.remoteTracksMap.current[producerUsername][producerInstance] =
           newRemoteTrack;
+
+        const msg = {
+          type: "requestCatchUpData",
+          table_id: this.table_id.current,
+          inquiringUsername: this.username.current,
+          inquiringInstance: this.instance.current,
+          inquiredUsername: producerUsername,
+          inquiredInstance: producerInstance,
+        };
+        this.socket.current.send(msg);
       }
     }
   }

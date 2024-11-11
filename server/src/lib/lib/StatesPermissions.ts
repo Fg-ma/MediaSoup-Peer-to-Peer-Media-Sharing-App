@@ -1,11 +1,7 @@
 import { Server as SocketIOServer } from "socket.io";
 
 class StatesPermissions {
-  private io: SocketIOServer;
-
-  constructor(io: SocketIOServer) {
-    this.io = io;
-  }
+  constructor(private io: SocketIOServer) {}
 
   onRequestStatesPermissions(event: {
     type: "requestStatesPermissions";

@@ -20,6 +20,8 @@ class ScreenMedia {
   canvas: HTMLCanvasElement;
   private video: HTMLVideoElement;
 
+  private creationTime = Date.now();
+
   private effects: {
     [screenEffect in ScreenEffectTypes]?: boolean;
   };
@@ -128,7 +130,7 @@ class ScreenMedia {
     return [r / 255, g / 255, b / 255];
   };
 
-  async changeEffects(
+  changeEffects(
     effect: ScreenEffectTypes,
     tintColor?: string,
     blockStateChange: boolean = false
@@ -215,6 +217,14 @@ class ScreenMedia {
   setTintColor(newTintColor: string) {
     this.babylonScene.setTintColor(this.hexToNormalizedRgb(newTintColor));
   }
+
+  getPaused = () => {
+    return this.effects.pause ?? false;
+  };
+
+  getTimeEllapsed = () => {
+    return Date.now() - this.creationTime;
+  };
 }
 
 export default ScreenMedia;

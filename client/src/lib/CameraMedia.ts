@@ -24,6 +24,8 @@ class CameraMedia {
   canvas: HTMLCanvasElement;
   private video: HTMLVideoElement;
 
+  private creationTime = Date.now();
+
   private faceLandmarks: FaceLandmarks;
 
   private faceMeshWorker: Worker;
@@ -287,11 +289,11 @@ class CameraMedia {
     return [r / 255, g / 255, b / 255];
   };
 
-  async changeEffects(
+  changeEffects = (
     effect: CameraEffectTypes,
     tintColor?: string,
     blockStateChange: boolean = false
-  ) {
+  ) => {
     if (this.effects[effect] !== undefined) {
       if (!blockStateChange) {
         this.effects[effect] = !this.effects[effect];
@@ -346,7 +348,7 @@ class CameraMedia {
         this.effects[effect]
       );
     }
-  }
+  };
 
   drawNewEffect = (effect: EffectType) => {
     const currentStyle =
@@ -382,17 +384,25 @@ class CameraMedia {
     }
   };
 
-  getStream() {
+  getStream = () => {
     return this.canvas.captureStream();
-  }
+  };
 
-  getTrack() {
+  getTrack = () => {
     return this.canvas.captureStream().getVideoTracks()[0];
-  }
+  };
 
-  setTintColor(newTintColor: string) {
+  setTintColor = (newTintColor: string) => {
     this.babylonScene.setTintColor(this.hexToNormalizedRgb(newTintColor));
-  }
+  };
+
+  getPaused = () => {
+    return this.effects.pause ?? false;
+  };
+
+  getTimeEllapsed = () => {
+    return Date.now() - this.creationTime;
+  };
 }
 
 export default CameraMedia;

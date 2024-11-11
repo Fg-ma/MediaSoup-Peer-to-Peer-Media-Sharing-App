@@ -57,6 +57,7 @@ const characterEdgeStyleMap = {
 };
 
 class Controls {
+  private initTimeOffset = 0;
   private initTime: number;
 
   constructor(
@@ -115,8 +116,7 @@ class Controls {
   }
 
   formatDuration = (time: number) => {
-    time = Math.floor(time / 1000);
-
+    // No need to divide by 1000; assume `time` is already in seconds
     const seconds = Math.floor(time % 60)
       .toString()
       .padStart(2, "0");
@@ -339,12 +339,10 @@ class Controls {
   handlePausePlay = () => {
     this.handleVisualEffectChange("pause");
     this.paused.current = !this.paused.current;
-    if (this.paused.current) {
-      this.videoContainerRef.current?.classList.add("paused");
-    } else {
-      this.videoContainerRef.current?.classList.remove("paused");
+
+    if (this.fgVideoOptions.isUser) {
+      this.setPausedState((prev) => !prev);
     }
-    this.setPausedState((prev) => !prev);
   };
 
   handlePictureInPicture = (action: string) => {
@@ -357,9 +355,15 @@ class Controls {
 
   timeUpdate = () => {
     if (this.currentTimeRef.current) {
-      this.currentTimeRef.current.textContent = this.formatDuration(
-        Date.now() - this.initTime
-      );
+      if (this.videoRef.current?.currentTime !== undefined) {
+        this.currentTimeRef.current.textContent = this.formatDuration(
+          this.videoRef.current.currentTime
+        );
+      } else {
+        this.currentTimeRef.current.textContent = this.formatDuration(
+          (Date.now() - this.initTime - this.initTimeOffset) / 1000
+        );
+      }
     }
   };
 
@@ -424,18 +428,22 @@ class Controls {
     }
 
     if (this.type === "camera") {
-      await this.userMedia.current[this.type][this.videoId].changeEffects(
+      this.userMedia.current[this.type][this.videoId].changeEffects(
         effect as CameraEffectTypes,
         this.tintColor.current,
         blockStateChange
       );
     } else if (this.type === "screen") {
-      await this.userMedia.current[this.type][this.videoId].changeEffects(
+      this.userMedia.current[this.type][this.videoId].changeEffects(
         effect as ScreenEffectTypes,
         this.tintColor.current,
         blockStateChange
       );
     }
+  };
+
+  setInitTimeOffset = (offset: number) => {
+    this.initTimeOffset = offset;
   };
 }
 

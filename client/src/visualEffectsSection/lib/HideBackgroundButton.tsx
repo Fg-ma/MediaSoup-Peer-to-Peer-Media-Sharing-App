@@ -1,7 +1,10 @@
 import React, { useRef, useState, Suspense } from "react";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import { HideBackgroundEffectTypes } from "../../context/currentEffectsStylesContext/typeConstant";
+import {
+  HideBackgroundEffectTypes,
+  PostProcessEffects,
+} from "../../context/currentEffectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -111,7 +114,10 @@ export default function HideBackgroundButton({
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
+    blockStateChange?: boolean,
+    hideBackgroundStyle?: HideBackgroundEffectTypes,
+    hideBackgroundColor?: string,
+    postProcessStyle?: PostProcessEffects
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
@@ -228,13 +234,19 @@ export default function HideBackgroundButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    userMedia.current.camera[
-      videoId
-    ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+    if (isUser) {
+      userMedia.current.camera[
+        videoId
+      ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+        effectsStyles.style
+      );
+    }
+
+    await handleVisualEffectChange(
+      "hideBackground",
+      false,
       effectsStyles.style
     );
-
-    await handleVisualEffectChange("hideBackground");
 
     setEffectsDisabled(false);
   };
@@ -252,13 +264,20 @@ export default function HideBackgroundButton({
 
     if (effectsStyles.style !== effectType || !streamEffects) {
       effectsStyles.style = effectType;
-      userMedia.current.camera[
-        videoId
-      ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
-        effectType
-      );
+      if (isUser) {
+        userMedia.current.camera[
+          videoId
+        ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+          effectType
+        );
+      }
 
-      await handleVisualEffectChange("hideBackground", streamEffects);
+      await handleVisualEffectChange(
+        "hideBackground",
+        streamEffects,
+        effectType,
+        undefined
+      );
     }
 
     setEffectsDisabled(false);
@@ -268,17 +287,24 @@ export default function HideBackgroundButton({
   const handleAcceptColorCallback = async () => {
     setEffectsDisabled(true);
 
-    userMedia.current.camera[
-      videoId
-    ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
-      colorRef.current
-    );
+    if (isUser) {
+      userMedia.current.camera[
+        videoId
+      ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
+        colorRef.current
+      );
+    }
 
     if (effectsStyles.style !== "color" || !streamEffects) {
       effectsStyles.style = "color";
       effectsStyles.color = colorRef.current;
 
-      await handleVisualEffectChange("hideBackground", streamEffects);
+      await handleVisualEffectChange(
+        "hideBackground",
+        streamEffects,
+        undefined,
+        colorRef.current
+      );
     }
 
     setEffectsDisabled(false);

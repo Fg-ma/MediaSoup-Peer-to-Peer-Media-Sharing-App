@@ -29,6 +29,7 @@ import ScreenSection from "./screenSection/ScreenSection";
 import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
 import Deadbanding from "./babylon/Deadbanding";
+import FgMetaData from "./lib/FgMetaData";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")
@@ -136,6 +137,12 @@ type MediasoupSocketEvents =
       type: "statesPermissionsRequested";
       inquiringUsername: string;
       inquiringInstance: string;
+    }
+  | {
+      type: "requestedCatchUpData";
+      inquiringUsername: string;
+      inquiringInstance: string;
+      inquiredInstance: string;
     };
 
 export default function Main() {
@@ -286,6 +293,9 @@ export default function Main() {
           userStreamEffects,
           currentEffectsStyles
         );
+        break;
+      case "requestedCatchUpData":
+        fgMetaData.onRequestedCatchUpData(event);
         break;
       default:
         break;
@@ -493,6 +503,14 @@ export default function Main() {
     remoteTracksMap,
     setUpEffectContext,
     bundlesController.createConsumerBundle
+  );
+
+  const fgMetaData = new FgMetaData(
+    table_id,
+    username,
+    instance,
+    socket,
+    userMedia
   );
 
   const handleExternalAudioEffectChange = (effect: AudioEffectTypes) => {

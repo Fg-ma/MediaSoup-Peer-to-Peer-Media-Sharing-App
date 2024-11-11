@@ -1,46 +1,49 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../fgButton/FgButton";
-import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import FgImage from "../fgImage/FgImage";
-
-import prismaColors from "../../public/2DAssets/postProcess/prismaColors_512x512.jpg";
-import prismaColorsSmall from "../../public/2DAssets/postProcess/prismaColors_32x32.jpg";
-import blackAndWhite from "../../public/2DAssets/postProcess/blackAndWhite_256x256.jpg";
-import blackAndWhiteSmall from "../../public/2DAssets/postProcess/blackAndWhite_32x32.jpg";
-import bubbleChromatic from "../../public/2DAssets/postProcess/bubbleChromatic_850x850.jpg";
-import bubbleChromaticSmall from "../../public/2DAssets/postProcess/bubbleChromatic_32x32.jpg";
-import fisheye from "../../public/2DAssets/postProcess/fisheye_512x512.jpg";
-import fisheyeSmall from "../../public/2DAssets/postProcess/fisheye_32x32.jpg";
-import nightVision from "../../public/2DAssets/postProcess/nightVision_512x512.jpg";
-import nightVisionSmall from "../../public/2DAssets/postProcess/nightVision_32x32.jpg";
-import vintageTV from "../../public/2DAssets/postProcess/vintageTV_512x512.jpg";
-import vintageTVSmall from "../../public/2DAssets/postProcess/vintageTV_32x32.jpg";
-import motionblur from "../../public/2DAssets/postProcess/motionBlur_512x512.jpg";
-import motionblurSmall from "../../public/2DAssets/postProcess/motionBlur_32x32.jpg";
-import pixelation from "../../public/2DAssets/postProcess/pixelation_256x256.png";
-import pixelationSmall from "../../public/2DAssets/postProcess/pixelation_32x32.png";
-import old from "../../public/2DAssets/postProcess/old_512x512.jpg";
-import oldSmall from "../../public/2DAssets/postProcess/old_32x32.jpg";
-import chromaticAberration from "../../public/2DAssets/postProcess/chromaticAberration_512x512.jpg";
-import chromaticAberrationSmall from "../../public/2DAssets/postProcess/chromaticAberration_32x32.jpg";
-import colorSplash from "../../public/2DAssets/postProcess/colorSplash_850x850.jpg";
-import colorSplashSmall from "../../public/2DAssets/postProcess/colorSplash_32x32.jpg";
-import tonemap from "../../public/2DAssets/postProcess/tonemap_512x512.jpg";
-import tonemapSmall from "../../public/2DAssets/postProcess/tonemap_32x32.jpg";
-import rays from "../../public/2DAssets/postProcess/rays_512x512.jpg";
-import raysSmall from "../../public/2DAssets/postProcess/rays_32x32.jpg";
-import sharpen from "../../public/2DAssets/postProcess/sharpen_512x512.jpg";
-import sharpenSmall from "../../public/2DAssets/postProcess/sharpen_32x32.jpg";
-import tiltShift from "../../public/2DAssets/postProcess/tiltShift_512x512.jpg";
-import tiltShiftSmall from "../../public/2DAssets/postProcess/tiltShift_32x32.jpg";
-import cartoon from "../../public/2DAssets/postProcess/cartoon_512x512.png";
-import cartoonSmall from "../../public/2DAssets/postProcess/cartoon_32x32.png";
+import FgButton from "../../fgButton/FgButton";
+import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import { useCurrentEffectsStylesContext } from "../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "src/context/streamsContext/typeConstant";
-import { PostProcessEffects } from "src/context/currentEffectsStylesContext/typeConstant";
+} from "../../context/streamsContext/typeConstant";
+import {
+  HideBackgroundEffectTypes,
+  PostProcessEffects,
+} from "../../context/currentEffectsStylesContext/typeConstant";
+import FgImage from "../../fgImage/FgImage";
+
+import prismaColors from "../../../public/2DAssets/postProcess/prismaColors_512x512.jpg";
+import prismaColorsSmall from "../../../public/2DAssets/postProcess/prismaColors_32x32.jpg";
+import blackAndWhite from "../../../public/2DAssets/postProcess/blackAndWhite_256x256.jpg";
+import blackAndWhiteSmall from "../../../public/2DAssets/postProcess/blackAndWhite_32x32.jpg";
+import bubbleChromatic from "../../../public/2DAssets/postProcess/bubbleChromatic_850x850.jpg";
+import bubbleChromaticSmall from "../../../public/2DAssets/postProcess/bubbleChromatic_32x32.jpg";
+import fisheye from "../../../public/2DAssets/postProcess/fisheye_512x512.jpg";
+import fisheyeSmall from "../../../public/2DAssets/postProcess/fisheye_32x32.jpg";
+import nightVision from "../../../public/2DAssets/postProcess/nightVision_512x512.jpg";
+import nightVisionSmall from "../../../public/2DAssets/postProcess/nightVision_32x32.jpg";
+import vintageTV from "../../../public/2DAssets/postProcess/vintageTV_512x512.jpg";
+import vintageTVSmall from "../../../public/2DAssets/postProcess/vintageTV_32x32.jpg";
+import motionblur from "../../../public/2DAssets/postProcess/motionBlur_512x512.jpg";
+import motionblurSmall from "../../../public/2DAssets/postProcess/motionBlur_32x32.jpg";
+import pixelation from "../../../public/2DAssets/postProcess/pixelation_256x256.png";
+import pixelationSmall from "../../../public/2DAssets/postProcess/pixelation_32x32.png";
+import old from "../../../public/2DAssets/postProcess/old_512x512.jpg";
+import oldSmall from "../../../public/2DAssets/postProcess/old_32x32.jpg";
+import chromaticAberration from "../../../public/2DAssets/postProcess/chromaticAberration_512x512.jpg";
+import chromaticAberrationSmall from "../../../public/2DAssets/postProcess/chromaticAberration_32x32.jpg";
+import colorSplash from "../../../public/2DAssets/postProcess/colorSplash_850x850.jpg";
+import colorSplashSmall from "../../../public/2DAssets/postProcess/colorSplash_32x32.jpg";
+import tonemap from "../../../public/2DAssets/postProcess/tonemap_512x512.jpg";
+import tonemapSmall from "../../../public/2DAssets/postProcess/tonemap_32x32.jpg";
+import rays from "../../../public/2DAssets/postProcess/rays_512x512.jpg";
+import raysSmall from "../../../public/2DAssets/postProcess/rays_32x32.jpg";
+import sharpen from "../../../public/2DAssets/postProcess/sharpen_512x512.jpg";
+import sharpenSmall from "../../../public/2DAssets/postProcess/sharpen_32x32.jpg";
+import tiltShift from "../../../public/2DAssets/postProcess/tiltShift_512x512.jpg";
+import tiltShiftSmall from "../../../public/2DAssets/postProcess/tiltShift_32x32.jpg";
+import cartoon from "../../../public/2DAssets/postProcess/cartoon_512x512.png";
+import cartoonSmall from "../../../public/2DAssets/postProcess/cartoon_32x32.png";
 
 export default function BabylonPostProcessEffectsButton({
   username,
@@ -59,7 +62,10 @@ export default function BabylonPostProcessEffectsButton({
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
+    blockStateChange?: boolean,
+    hideBackgroundStyle?: HideBackgroundEffectTypes,
+    hideBackgroundColor?: string,
+    postProcessStyle?: PostProcessEffects
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
@@ -151,13 +157,21 @@ export default function BabylonPostProcessEffectsButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    userMedia.current[type][
-      videoId
-    ].babylonScene.babylonShaderController.swapPostProcessEffects(
+    if (isUser) {
+      userMedia.current[type][
+        videoId
+      ].babylonScene.babylonShaderController.swapPostProcessEffects(
+        effectsStyles.style
+      );
+    }
+
+    await handleVisualEffectChange(
+      "postProcess",
+      false,
+      undefined,
+      undefined,
       effectsStyles.style
     );
-
-    await handleVisualEffectChange("postProcess");
 
     setEffectsDisabled(false);
   };
@@ -179,11 +193,22 @@ export default function BabylonPostProcessEffectsButton({
 
     if (effectsStyles.style !== effectType || !streamEffects) {
       effectsStyles.style = effectType;
-      userMedia.current[type][
-        videoId
-      ].babylonScene.babylonShaderController.swapPostProcessEffects(effectType);
 
-      await handleVisualEffectChange("postProcess", streamEffects);
+      if (isUser) {
+        userMedia.current[type][
+          videoId
+        ].babylonScene.babylonShaderController.swapPostProcessEffects(
+          effectType
+        );
+      }
+
+      await handleVisualEffectChange(
+        "postProcess",
+        streamEffects,
+        undefined,
+        undefined,
+        effectType
+      );
     }
 
     setEffectsDisabled(false);

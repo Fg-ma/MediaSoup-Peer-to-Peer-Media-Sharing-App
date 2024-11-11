@@ -14,6 +14,7 @@ import Mute from "./lib/Mute";
 import Effects from "./lib/Effects";
 import Tables from "./lib/Tables";
 import StatesPermissions from "./lib/StatesPermissions";
+import FgMetaData from "./lib/FgMetaData";
 
 type MediasoupSocketEvents =
   | {
@@ -137,8 +138,13 @@ type MediasoupSocketEvents =
       requestedProducerType: "camera" | "screen" | "audio";
       requestedProducerId: string | undefined;
       effect: string;
-      effectStyle: string;
       blockStateChange: boolean;
+      data: {
+        style: string;
+        hideBackgroundStyle?: string;
+        hideBackgroundColor?: string;
+        postProcessStyle?: string;
+      };
     }
   | {
       type: "clientEffectChange";
@@ -172,6 +178,28 @@ type MediasoupSocketEvents =
       audioPermission: boolean;
       streamEffects: any;
       currentEffectsStyles: any;
+    }
+  | {
+      type: "requestCatchUpData";
+      table_id: string;
+      inquiringUsername: string;
+      inquiringInstance: string;
+      inquiredUsername: string;
+      inquiredInstance: string;
+    }
+  | {
+      type: "responseCatchUpData";
+      table_id: string;
+      inquiringUsername: string;
+      inquiringInstance: string;
+      inquiredUsername: string;
+      inquiredInstance: string;
+      data: {
+        cameraPaused: boolean | undefined;
+        cameraTimeEllapsed: number | undefined;
+        screenPaused: boolean | undefined;
+        screenTimeEllapsed: number | undefined;
+      };
     };
 
 const mediasoupSocket = async (io: SocketIOServer) => {
@@ -182,6 +210,7 @@ const mediasoupSocket = async (io: SocketIOServer) => {
     const mute = new Mute(io);
     const effects = new Effects(io);
     const statesPermissions = new StatesPermissions(io);
+    const fgMetaData = new FgMetaData(io);
 
     socket.on(
       "joinTable",
@@ -255,6 +284,12 @@ const mediasoupSocket = async (io: SocketIOServer) => {
           break;
         case "statesPermissionsResponse":
           statesPermissions.onStatesPermissionsResponse(event);
+          break;
+        case "requestCatchUpData":
+          fgMetaData.onRequestCatchUpData(event);
+          break;
+        case "responseCatchUpData":
+          fgMetaData.onResponseCatchUpData(event);
           break;
         default:
           break;

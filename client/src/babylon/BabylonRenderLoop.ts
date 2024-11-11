@@ -102,7 +102,7 @@ class BabylonRenderLoop {
   }
 
   renderLoop = () => {
-    if (this.effects.hideBackground) {
+    if (!this.effects.pause && this.effects.hideBackground) {
       this.hideBackgroundEffect();
       this.updateHideBackgroundCanvas();
     }

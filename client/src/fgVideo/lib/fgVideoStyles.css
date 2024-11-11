@@ -22,6 +22,7 @@
 }
 
 .video-container.in-video .captions,
+.video-container.paused .captions,
 .video-container.in-effects .captions,
 .video-container.in-settings .captions,
 .video-container.in-audio-effects .captions {
@@ -77,6 +78,9 @@
 .video-container.in-video .video-controls-container,
 .video-container.in-video .video-navigation-container,
 .video-container.in-video .controls-gradient,
+.video-container.paused .video-controls-container,
+.video-container.paused .video-navigation-container,
+.video-container.paused .controls-gradient,
 .video-container.in-effects .video-controls-container,
 .video-container.in-effects .video-navigation-container,
 .video-container.in-effects .controls-gradient,

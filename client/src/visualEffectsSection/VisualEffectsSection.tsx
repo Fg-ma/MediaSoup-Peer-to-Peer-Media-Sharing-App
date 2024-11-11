@@ -7,10 +7,13 @@ import {
 } from "../context/streamsContext/typeConstant";
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
+import {
+  HideBackgroundEffectTypes,
+  PostProcessEffects,
+} from "../context/currentEffectsStylesContext/typeConstant";
 
 const BabylonPostProcessEffectsButton = React.lazy(
-  () =>
-    import("../babylonPostProcessEffectsButton/BabylonPostProcessEffectsButton")
+  () => import("./lib/BabylonPostProcessEffectsButton")
 );
 const HideBackgroundButton = React.lazy(
   () => import("./lib/HideBackgroundButton")
@@ -61,7 +64,10 @@ export default function VisualEffectsSection({
   videoContainerRef: React.RefObject<HTMLDivElement>;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
+    blockStateChange?: boolean,
+    hideBackgroundStyle?: HideBackgroundEffectTypes,
+    hideBackgroundColor?: string,
+    postProcessStyle?: PostProcessEffects
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
 }) {

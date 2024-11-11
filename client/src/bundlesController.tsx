@@ -6,56 +6,13 @@ import ScreenMedia from "./lib/ScreenMedia";
 import AudioMedia from "./lib/AudioMedia";
 
 class BundlesController {
-  private socket: React.MutableRefObject<Socket>;
-  private table_id: React.MutableRefObject<string>;
-  private username: React.MutableRefObject<string>;
-  private instance: React.MutableRefObject<string>;
-
-  private userMedia: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: CameraMedia;
-    };
-    screen: {
-      [screenId: string]: ScreenMedia;
-    };
-    audio: AudioMedia | undefined;
-  }>;
-
-  private remoteVideosContainerRef: React.RefObject<HTMLDivElement>;
-
-  private isCamera: React.MutableRefObject<boolean>;
-  private isScreen: React.MutableRefObject<boolean>;
-  private isAudio: React.MutableRefObject<boolean>;
-
-  private bundles: {
-    [username: string]: { [instance: string]: React.JSX.Element };
-  };
-  private setBundles: React.Dispatch<
-    React.SetStateAction<{
-      [username: string]: { [instance: string]: React.JSX.Element };
-    }>
-  >;
-
-  private muteAudio: () => void;
-
-  private setUpEffectContext: (
-    username: string,
-    instance: string,
-    cameraIds: (string | undefined)[],
-    screenIds: (string | undefined)[]
-  ) => void;
-
-  private acceptCameraEffects: boolean;
-  private acceptScreenEffects: boolean;
-  private acceptAudioEffects: boolean;
-
   constructor(
-    socket: React.MutableRefObject<Socket>,
-    table_id: React.MutableRefObject<string>,
-    username: React.MutableRefObject<string>,
-    instance: React.MutableRefObject<string>,
+    private socket: React.MutableRefObject<Socket>,
+    private table_id: React.MutableRefObject<string>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
 
-    userMedia: React.MutableRefObject<{
+    private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
       };
@@ -65,51 +22,34 @@ class BundlesController {
       audio: AudioMedia | undefined;
     }>,
 
-    remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
+    private remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
 
-    isCamera: React.MutableRefObject<boolean>,
-    isScreen: React.MutableRefObject<boolean>,
-    isAudio: React.MutableRefObject<boolean>,
+    private isCamera: React.MutableRefObject<boolean>,
+    private isScreen: React.MutableRefObject<boolean>,
+    private isAudio: React.MutableRefObject<boolean>,
 
-    bundles: {
+    private bundles: {
       [username: string]: { [instance: string]: React.JSX.Element };
     },
-    setBundles: React.Dispatch<
+    private setBundles: React.Dispatch<
       React.SetStateAction<{
         [username: string]: { [instance: string]: React.JSX.Element };
       }>
     >,
 
-    muteAudio: () => void,
+    private muteAudio: () => void,
 
-    setUpEffectContext: (
+    private setUpEffectContext: (
       username: string,
       instance: string,
       cameraIds: (string | undefined)[],
       screenIds: (string | undefined)[]
     ) => void,
 
-    acceptCameraEffects: boolean,
-    acceptScreenEffects: boolean,
-    acceptAudioEffects: boolean
-  ) {
-    this.socket = socket;
-    this.table_id = table_id;
-    this.username = username;
-    this.instance = instance;
-    this.userMedia = userMedia;
-    this.remoteVideosContainerRef = remoteVideosContainerRef;
-    this.isCamera = isCamera;
-    this.isScreen = isScreen;
-    this.isAudio = isAudio;
-    this.bundles = bundles;
-    this.setBundles = setBundles;
-    this.muteAudio = muteAudio;
-    this.setUpEffectContext = setUpEffectContext;
-    this.acceptCameraEffects = acceptCameraEffects;
-    this.acceptScreenEffects = acceptScreenEffects;
-    this.acceptAudioEffects = acceptAudioEffects;
-  }
+    private acceptCameraEffects: boolean,
+    private acceptScreenEffects: boolean,
+    private acceptAudioEffects: boolean
+  ) {}
 
   createProducerBundle = () => {
     if (this.remoteVideosContainerRef.current) {

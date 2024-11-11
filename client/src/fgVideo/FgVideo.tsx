@@ -25,6 +25,10 @@ import {
   expandedClosedCaptionsVoskSelections,
 } from "../fgVideoControls/lib/ClosedCaptionsPage";
 import "./lib/fgVideoStyles.css";
+import {
+  HideBackgroundEffectTypes,
+  PostProcessEffects,
+} from "../context/currentEffectsStylesContext/typeConstant";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -148,7 +152,7 @@ export default function FgVideo({
 
   const [pausedState, setPausedState] = useState(false);
 
-  const paused = useRef(fgVideoOptions.autoPlay);
+  const paused = useRef(!fgVideoOptions.autoPlay);
 
   const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -187,7 +191,10 @@ export default function FgVideo({
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
+    hideBackgroundStyle?: HideBackgroundEffectTypes,
+    hideBackgroundColor?: string,
+    postProcessStyle?: PostProcessEffects
   ) => {
     if (fgVideoOptions.isUser) {
       controls.handleVisualEffect(effect, blockStateChange);
@@ -216,12 +223,17 @@ export default function FgVideo({
         requestedProducerType: type,
         requestedProducerId: videoId,
         effect: effect,
-        effectStyle:
-          // @ts-expect-error: ts can't verify username, instance, type, videoId, and effect correlate
-          remoteCurrentEffectsStyles.current[username][instance][type][videoId][
-            effect
-          ],
         blockStateChange: blockStateChange,
+        data: {
+          style:
+            // @ts-expect-error: ts can't verify username, instance, type, videoId, and effect correlate
+            remoteCurrentEffectsStyles.current[username][instance][type][
+              videoId
+            ][effect],
+          hideBackgroundStyle: hideBackgroundStyle,
+          hideBackgroundColor: hideBackgroundColor,
+          postProcessStyle: postProcessStyle,
+        },
       };
 
       socket?.current.emit("message", msg);
@@ -268,6 +280,8 @@ export default function FgVideo({
     controls,
     videoStream,
     setPausedState,
+    paused,
+    userMedia,
     remoteStreamEffects,
     currentEffectsStyles,
     remoteCurrentEffectsStyles,
@@ -339,7 +353,7 @@ export default function FgVideo({
     <div
       ref={videoContainerRef}
       id={`${videoId}_container`}
-      className={`video-container ${fgVideoOptions.autoPlay ? "" : "paused"} ${
+      className={`video-container ${pausedState ? "paused" : ""} ${
         effectsActive ? "in-effects" : ""
       } ${audioEffectsActive ? "in-effects" : ""} ${
         inVideo ? "in-video" : ""
@@ -352,11 +366,6 @@ export default function FgVideo({
           <video
             ref={videoRef}
             id={videoId}
-            onClick={() => {
-              if (fgVideoOptions.isPlayPause) {
-                controls.handlePausePlay();
-              }
-            }}
             onTimeUpdate={() => controls.timeUpdate()}
             className='main-video w-full z-0'
             controls={false}

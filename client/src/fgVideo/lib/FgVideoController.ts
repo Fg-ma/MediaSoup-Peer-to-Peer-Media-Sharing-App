@@ -3,9 +3,16 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../context/streamsContext/typeConstant";
-import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
+import {
+  EffectStylesType,
+  HideBackgroundEffectTypes,
+  PostProcessEffects,
+} from "../../context/currentEffectsStylesContext/typeConstant";
 import { defaultFgVideoOptions, FgVideoOptions } from "../FgVideo";
 import Controls from "../../fgVideoControls/lib/Controls";
+import CameraMedia from "../../lib/CameraMedia";
+import ScreenMedia from "../../lib/ScreenMedia";
+import AudioMedia from "../../lib/AudioMedia";
 
 type FgVideoMessageEvents =
   | {
@@ -13,8 +20,8 @@ type FgVideoMessageEvents =
       requestedProducerType: "camera" | "screen" | "audio";
       requestedProducerId: string;
       effect: CameraEffectTypes | ScreenEffectTypes;
-      effectStyle: string;
       blockStateChange: boolean;
+      data: { style: string };
     }
   | {
       type: "clientEffectChanged";
@@ -25,6 +32,17 @@ type FgVideoMessageEvents =
       effect: CameraEffectTypes | ScreenEffectTypes;
       effectStyle: string;
       blockStateChange: boolean;
+    }
+  | {
+      type: "responsedCatchUpData";
+      inquiredUsername: string;
+      inquiredInstance: string;
+      data: {
+        cameraPaused: boolean;
+        cameraTimeEllapsed: number;
+        screenPaused: boolean;
+        screenTimeEllapsed: number;
+      };
     };
 
 class FgVideoController {
@@ -36,6 +54,16 @@ class FgVideoController {
     private controls: Controls,
     private videoStream: MediaStream | undefined,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
+    private paused: React.MutableRefObject<boolean>,
+    private userMedia: React.MutableRefObject<{
+      camera: {
+        [cameraId: string]: CameraMedia;
+      };
+      screen: {
+        [screenId: string]: ScreenMedia;
+      };
+      audio: AudioMedia | undefined;
+    }>,
     private remoteStreamEffects: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
@@ -102,8 +130,13 @@ class FgVideoController {
     requestedProducerType: "camera" | "screen" | "audio";
     requestedProducerId: string | undefined;
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-    effectStyle: string;
     blockStateChange: boolean;
+    data: {
+      style: string;
+      hideBackgroundStyle?: HideBackgroundEffectTypes;
+      hideBackgroundColor?: string;
+      postProcessStyle?: PostProcessEffects;
+    };
   }) => {
     if (
       this.fgVideoOptions.acceptsVisualEffects &&
@@ -112,14 +145,47 @@ class FgVideoController {
     ) {
       // @ts-expect-error: ts can't verify type, videoId, and effect correlate
       this.currentEffectsStyles.current[this.type][this.videoId][event.effect] =
-        event.effectStyle;
+        event.data.style;
+
+      if (event.effect === "pause") {
+        this.setPausedState((prev) => !prev);
+      }
+
+      if (
+        event.effect === "hideBackground" &&
+        event.data.hideBackgroundColor !== undefined
+      ) {
+        this.userMedia.current.camera[
+          this.videoId
+        ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
+          event.data.hideBackgroundColor
+        );
+      }
+
+      if (
+        event.effect === "hideBackground" &&
+        event.data.hideBackgroundStyle !== undefined
+      ) {
+        this.userMedia.current.camera[
+          this.videoId
+        ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+          event.data.hideBackgroundStyle
+        );
+      }
+
+      if (
+        event.effect === "postProcess" &&
+        event.data.postProcessStyle !== undefined
+      ) {
+        this.userMedia.current[this.type][
+          this.videoId
+        ].babylonScene.babylonShaderController.swapPostProcessEffects(
+          event.data.postProcessStyle
+        );
+      }
 
       // @ts-expect-error: ts can't verify type and effect correlate
       this.handleVisualEffectChange(event.effect, event.blockStateChange);
-    }
-
-    if (event.effect === "pause") {
-      this.setPausedState((prev) => !prev);
     }
   };
 
@@ -155,6 +221,46 @@ class FgVideoController {
       this.remoteCurrentEffectsStyles.current[this.username][this.instance][
         this.type
       ][this.videoId][event.effect] = event.effectStyle;
+
+      if (event.effect === "pause") {
+        this.setPausedState((prev) => !prev);
+      }
+    }
+  };
+
+  onResponsedCatchUpData = (event: {
+    type: "responsedCatchUpData";
+    inquiredUsername: string;
+    inquiredInstance: string;
+    data: {
+      cameraPaused: boolean | undefined;
+      cameraTimeEllapsed: number | undefined;
+      screenPaused: boolean | undefined;
+      screenTimeEllapsed: number | undefined;
+    };
+  }) => {
+    if (
+      !this.fgVideoOptions.isUser &&
+      this.username === event.inquiredUsername &&
+      this.instance === event.inquiredInstance
+    ) {
+      if (this.type === "camera") {
+        if (event.data.cameraPaused) {
+          this.paused.current = !this.paused.current;
+          this.setPausedState((prev) => !prev);
+        }
+        if (event.data.cameraTimeEllapsed) {
+          this.controls.setInitTimeOffset(event.data.cameraTimeEllapsed);
+        }
+      } else if (this.type === "screen") {
+        if (event.data.screenPaused) {
+          this.paused.current = !this.paused.current;
+          this.setPausedState((prev) => !prev);
+        }
+        if (event.data.screenTimeEllapsed) {
+          this.controls.setInitTimeOffset(event.data.screenTimeEllapsed);
+        }
+      }
     }
   };
 
@@ -165,6 +271,9 @@ class FgVideoController {
         break;
       case "clientEffectChanged":
         this.onClientEffectChanged(event);
+        break;
+      case "responsedCatchUpData":
+        this.onResponsedCatchUpData(event);
         break;
       default:
         break;

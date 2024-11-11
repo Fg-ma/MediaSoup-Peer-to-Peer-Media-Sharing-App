@@ -59,68 +59,18 @@ class SelfieSegmentationWebWorker {
     const width = confidenceMask.width;
     const height = confidenceMask.height;
 
-    const scaleFactor = 1.1; // Adjust this value to scale in x-direction
-    const centerX = Math.floor(width / 2); // Calculate the x-center
     const rgbaData = new Uint8ClampedArray(width * height * 4);
 
     for (let y = 0; y < height; y++) {
-      let firstFilledIndex = -1;
-      let lastFilledIndex = -1;
-
       for (let x = 0; x < width; x++) {
         const originalIndex = y * width + x;
-        const scaledX = centerX + Math.round((x - centerX) * scaleFactor);
+        const value = maskData[originalIndex];
+        const rgbaIndex = (y * width + x) * 4;
 
-        if (scaledX >= 0 && scaledX < width) {
-          const value = maskData[originalIndex];
-          const rgbaIndex = (y * width + scaledX) * 4;
-
-          rgbaData[rgbaIndex] = 255;
-          rgbaData[rgbaIndex + 1] = 255;
-          rgbaData[rgbaIndex + 2] = 255;
-          rgbaData[rgbaIndex + 3] = (1 - value) * 255;
-
-          // Fill any gaps up to the current scaledX position
-          if (lastFilledIndex >= 0 && scaledX > lastFilledIndex + 1) {
-            for (let fillX = lastFilledIndex + 1; fillX < scaledX; fillX++) {
-              const fillIndex = (y * width + fillX) * 4;
-              rgbaData[fillIndex] = 255;
-              rgbaData[fillIndex + 1] = 255;
-              rgbaData[fillIndex + 2] = 255;
-              rgbaData[fillIndex + 3] = (1 - value) * 255;
-            }
-          }
-
-          // Track the first and last filled indices for edge filling
-          if (firstFilledIndex === -1) firstFilledIndex = scaledX;
-          lastFilledIndex = scaledX;
-        }
-      }
-
-      // Fill any remaining gaps on the far left up to the first filled pixel
-      if (firstFilledIndex > 0) {
-        for (let x = 0; x < firstFilledIndex; x++) {
-          const rgbaIndex = (y * width + x) * 4;
-          const fillIndex = (y * width + firstFilledIndex) * 4;
-
-          rgbaData[rgbaIndex] = rgbaData[fillIndex];
-          rgbaData[rgbaIndex + 1] = rgbaData[fillIndex + 1];
-          rgbaData[rgbaIndex + 2] = rgbaData[fillIndex + 2];
-          rgbaData[rgbaIndex + 3] = rgbaData[fillIndex + 3];
-        }
-      }
-
-      // Fill any remaining gaps on the far right based on the last filled pixel
-      if (lastFilledIndex >= 0) {
-        for (let x = lastFilledIndex + 1; x < width; x++) {
-          const rgbaIndex = (y * width + x) * 4;
-          const fillIndex = (y * width + lastFilledIndex) * 4;
-
-          rgbaData[rgbaIndex] = rgbaData[fillIndex];
-          rgbaData[rgbaIndex + 1] = rgbaData[fillIndex + 1];
-          rgbaData[rgbaIndex + 2] = rgbaData[fillIndex + 2];
-          rgbaData[rgbaIndex + 3] = rgbaData[fillIndex + 3];
-        }
+        rgbaData[rgbaIndex] = 255; // R
+        rgbaData[rgbaIndex + 1] = 255; // G
+        rgbaData[rgbaIndex + 2] = 255; // B
+        rgbaData[rgbaIndex + 3] = (1 - value) * 255; // Alpha channel
       }
     }
 

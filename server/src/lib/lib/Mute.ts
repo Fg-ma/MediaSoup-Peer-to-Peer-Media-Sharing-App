@@ -1,11 +1,7 @@
 import { Server as SocketIOServer } from "socket.io";
 
 class Mute {
-  private io: SocketIOServer;
-
-  constructor(io: SocketIOServer) {
-    this.io = io;
-  }
+  constructor(private io: SocketIOServer) {}
 
   onClientMute(event: {
     type: string;
