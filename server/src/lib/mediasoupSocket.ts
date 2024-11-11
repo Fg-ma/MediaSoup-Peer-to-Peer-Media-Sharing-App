@@ -176,8 +176,8 @@ type MediasoupSocketEvents =
       cameraPermission: boolean;
       screenPermission: boolean;
       audioPermission: boolean;
-      streamEffects: any;
-      currentEffectsStyles: any;
+      streamEffects: string;
+      currentEffectsStyles: string;
     }
   | {
       type: "requestCatchUpData";
@@ -186,6 +186,8 @@ type MediasoupSocketEvents =
       inquiringInstance: string;
       inquiredUsername: string;
       inquiredInstance: string;
+      inquiredType: "camera" | "screen";
+      inquiredVideoId: string;
     }
   | {
       type: "responseCatchUpData";
@@ -194,12 +196,18 @@ type MediasoupSocketEvents =
       inquiringInstance: string;
       inquiredUsername: string;
       inquiredInstance: string;
-      data: {
-        cameraPaused: boolean | undefined;
-        cameraTimeEllapsed: number | undefined;
-        screenPaused: boolean | undefined;
-        screenTimeEllapsed: number | undefined;
-      };
+      inquiredType: "camera" | "screen";
+      inquiredVideoId: string;
+      data:
+        | {
+            cameraPaused: boolean;
+            cameraTimeEllapsed: number;
+          }
+        | {
+            screenPaused: boolean;
+            screenTimeEllapsed: number;
+          }
+        | undefined;
     };
 
 const mediasoupSocket = async (io: SocketIOServer) => {

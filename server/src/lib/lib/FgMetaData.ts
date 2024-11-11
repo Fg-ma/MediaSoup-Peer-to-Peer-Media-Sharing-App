@@ -10,12 +10,15 @@ class FgMetaData {
     inquiringInstance: string;
     inquiredUsername: string;
     inquiredInstance: string;
+    inquiredType: "camera" | "screen" | "audio";
+    inquiredVideoId: string;
   }) => {
     const msg = {
       type: "requestedCatchUpData",
-      inquiringUsername: event.inquiredUsername,
-      inquiringInstance: event.inquiredInstance,
-      inquiredInstance: event.inquiredInstance,
+      inquiringUsername: event.inquiringUsername,
+      inquiringInstance: event.inquiringInstance,
+      inquiredType: event.inquiredType,
+      inquiredVideoId: event.inquiredVideoId,
     };
     this.io
       .to(
@@ -31,21 +34,31 @@ class FgMetaData {
     inquiringInstance: string;
     inquiredUsername: string;
     inquiredInstance: string;
-    data: {
-      cameraPaused: boolean | undefined;
-      cameraTimeEllapsed: number | undefined;
-      screenPaused: boolean | undefined;
-      screenTimeEllapsed: number | undefined;
-    };
+    inquiredType: "camera" | "screen";
+    inquiredVideoId: string;
+    data:
+      | {
+          cameraPaused: boolean;
+          cameraTimeEllapsed: number;
+        }
+      | {
+          screenPaused: boolean;
+          screenTimeEllapsed: number;
+        }
+      | undefined;
   }) => {
     const msg = {
       type: "responsedCatchUpData",
       inquiredUsername: event.inquiredUsername,
       inquiredInstance: event.inquiredInstance,
+      inquiredType: event.inquiredType,
+      inquiredVideoId: event.inquiredVideoId,
       data: event.data,
     };
     this.io
-      .to(`user_${event.table_id}_${event.inquiringUsername}`)
+      .to(
+        `instance_${event.table_id}_${event.inquiringUsername}_${event.inquiringInstance}`
+      )
       .emit("message", msg);
   };
 }

@@ -142,7 +142,8 @@ type MediasoupSocketEvents =
       type: "requestedCatchUpData";
       inquiringUsername: string;
       inquiringInstance: string;
-      inquiredInstance: string;
+      inquiredType: "camera" | "screen" | "audio";
+      inquiredVideoId: string;
     };
 
 export default function Main() {

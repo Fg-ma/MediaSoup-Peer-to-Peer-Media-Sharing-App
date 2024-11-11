@@ -57,7 +57,6 @@ const characterEdgeStyleMap = {
 };
 
 class Controls {
-  private initTimeOffset = 0;
   private initTime: number;
 
   constructor(
@@ -110,7 +109,8 @@ class Controls {
         [screenId: string]: ScreenMedia;
       };
       audio: AudioMedia | undefined;
-    }>
+    }>,
+    private initTimeOffset: React.MutableRefObject<number>
   ) {
     this.initTime = Date.now();
   }
@@ -357,11 +357,11 @@ class Controls {
     if (this.currentTimeRef.current) {
       if (this.videoRef.current?.currentTime !== undefined) {
         this.currentTimeRef.current.textContent = this.formatDuration(
-          this.videoRef.current.currentTime
+          this.videoRef.current.currentTime + this.initTimeOffset.current / 1000
         );
       } else {
         this.currentTimeRef.current.textContent = this.formatDuration(
-          (Date.now() - this.initTime - this.initTimeOffset) / 1000
+          (Date.now() - this.initTime - this.initTimeOffset.current) / 1000
         );
       }
     }
@@ -443,7 +443,7 @@ class Controls {
   };
 
   setInitTimeOffset = (offset: number) => {
-    this.initTimeOffset = offset;
+    this.initTimeOffset.current = offset;
   };
 }
 

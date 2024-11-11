@@ -151,7 +151,7 @@ class Consumers {
       );
     }
 
-    let newConsumers: {
+    const newConsumers: {
       [producerUsername: string]: {
         [producerInstance: string]: {
           camera?: {
@@ -159,6 +159,7 @@ class Consumers {
               producerId: string;
               id: string;
               kind: string;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               rtpParameters: any;
               type: string;
               producerPaused: boolean;
@@ -169,6 +170,7 @@ class Consumers {
               producerId: string;
               id: string;
               kind: string;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               rtpParameters: any;
               type: string;
               producerPaused: boolean;
@@ -178,6 +180,7 @@ class Consumers {
             producerId: string;
             id: string;
             kind: string;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             rtpParameters: any;
             type: string;
             producerPaused: boolean;
@@ -306,6 +309,7 @@ class Consumers {
       producerId: string;
       id: string;
       kind: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rtpParameters: any;
       type: string;
       producerPaused: boolean;
@@ -348,7 +352,7 @@ class Consumers {
         type: consumer.type,
         producerPaused: consumer.producerPaused,
       };
-    } catch (error) {
+    } catch (_error) {
       return;
     }
 

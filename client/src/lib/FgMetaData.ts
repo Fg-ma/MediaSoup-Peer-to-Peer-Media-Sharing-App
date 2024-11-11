@@ -2,6 +2,11 @@ import { Socket } from "socket.io-client";
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
+import {
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../context/streamsContext/typeConstant";
 
 class FgMetaData {
   constructor(
@@ -24,34 +29,24 @@ class FgMetaData {
     type: "requestedCatchUpData";
     inquiringUsername: string;
     inquiringInstance: string;
-    inquiredInstance: string;
+    inquiredType: "camera" | "screen" | "audio";
+    inquiredVideoId: string;
   }) => {
-    const cameraData = {
-      cameraPaused:
-        this.userMedia.current.camera[event.inquiringInstance]?.getPaused() ??
-        undefined,
-      cameraTimeEllapsed:
-        this.userMedia.current.camera[
-          event.inquiredInstance
-        ]?.getTimeEllapsed() ?? undefined,
-    };
-    const screenData = {
-      screenPaused:
-        this.userMedia.current.screen[event.inquiringInstance]?.getPaused() ??
-        undefined,
-      screenTimeEllapsed:
-        this.userMedia.current.screen[
-          event.inquiredInstance
-        ]?.getTimeEllapsed() ?? undefined,
-    };
+    let data;
+    if (event.inquiredType === "camera") {
+      const cameraMedia = this.userMedia.current.camera[event.inquiredVideoId];
+      data = {
+        cameraPaused: cameraMedia.getPaused(),
+        cameraTimeEllapsed: cameraMedia.getTimeEllapsed(),
+      };
+    } else if (event.inquiredType === "screen") {
+      const screenMedia = this.userMedia.current.screen[event.inquiredVideoId];
+      data = {
+        screenPaused: screenMedia.getPaused(),
+        screenTimeEllapsed: screenMedia.getTimeEllapsed(),
+      };
+    }
 
-    console.log(
-      event.inquiringInstance,
-      this.userMedia.current.camera,
-      event.inquiredInstance,
-      cameraData,
-      screenData
-    );
     const msg = {
       type: "responseCatchUpData",
       table_id: this.table_id.current,
@@ -59,12 +54,10 @@ class FgMetaData {
       inquiringInstance: event.inquiringInstance,
       inquiredUsername: this.username.current,
       inquiredInstance: this.instance.current,
-      data: {
-        ...cameraData,
-        ...screenData,
-      },
+      inquiredType: event.inquiredType,
+      inquiredVideoId: event.inquiredVideoId,
+      data,
     };
-
     this.socket.current.emit("message", msg);
   };
 }

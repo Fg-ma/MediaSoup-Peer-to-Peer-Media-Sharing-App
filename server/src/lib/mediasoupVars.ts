@@ -61,6 +61,7 @@ export const tableConsumers: {
                 producerId: string;
                 id: string;
                 kind: string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 rtpParameters: any;
                 type: string;
                 producerPaused: boolean;
@@ -72,6 +73,7 @@ export const tableConsumers: {
                 producerId: string;
                 id: string;
                 kind: string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 rtpParameters: any;
                 type: string;
                 producerPaused: boolean;
@@ -82,6 +84,7 @@ export const tableConsumers: {
               producerId: string;
               id: string;
               kind: string;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               rtpParameters: any;
               type: string;
               producerPaused: boolean;

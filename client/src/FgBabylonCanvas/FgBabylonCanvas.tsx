@@ -114,6 +114,8 @@ export default function FgBabylonCanvas({
   socket,
   videoId,
   table_id,
+  activeUsername,
+  activeInstance,
   username,
   instance,
   name,
@@ -133,6 +135,8 @@ export default function FgBabylonCanvas({
   socket: React.MutableRefObject<Socket>;
   videoId: string;
   table_id: string;
+  activeUsername: string | undefined;
+  activeInstance: string | undefined;
   username: string;
   instance: string;
   name?: string;
@@ -202,6 +206,8 @@ export default function FgBabylonCanvas({
       },
     },
   });
+
+  const initTimeOffset = useRef(0);
 
   useEffect(() => {
     if (
@@ -296,7 +302,8 @@ export default function FgBabylonCanvas({
     tracksColorSetterCallback,
     tintColor,
     userStreamEffects,
-    userMedia
+    userMedia,
+    initTimeOffset
   );
 
   const fgVideoController = new FgVideoController(
@@ -323,11 +330,14 @@ export default function FgBabylonCanvas({
     // Set up initial conditions
     fgVideoController.init();
 
+    // Listen for messages on socket
     socket.current.on("message", fgVideoController.handleMessage);
 
+    // Keep video time
     controls.timeUpdate();
     timeUpdateInterval.current = setInterval(controls.timeUpdate, 1000);
 
+    // Add eventlisteners
     if (fgVideoOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
@@ -352,6 +362,21 @@ export default function FgBabylonCanvas({
       videoRef.current?.addEventListener("leavepictureinpicture", () =>
         controls.handlePictureInPicture("leave")
       );
+    }
+
+    // Request initial data
+    if (!fgVideoOptions.isUser && activeUsername && activeInstance) {
+      const msg = {
+        type: "requestCatchUpData",
+        table_id: table_id,
+        inquiringUsername: activeUsername,
+        inquiringInstance: activeInstance,
+        inquiredUsername: username,
+        inquiredInstance: instance,
+        inquiredType: type,
+        inquiredVideoId: videoId,
+      };
+      socket.current.send(msg);
     }
 
     return () => {

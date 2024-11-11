@@ -35,7 +35,7 @@ const createConsumer = async (
     return;
   }
 
-  let consumers: {
+  const consumers: {
     [producerUsername: string]: {
       [producerInstance: string]: {
         camera?: {
@@ -44,6 +44,7 @@ const createConsumer = async (
             producerId: string;
             id: string;
             kind: string;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             rtpParameters: any;
             type: string;
             producerPaused: boolean;
@@ -55,6 +56,7 @@ const createConsumer = async (
             producerId: string;
             id: string;
             kind: string;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             rtpParameters: any;
             type: string;
             producerPaused: boolean;
@@ -65,6 +67,7 @@ const createConsumer = async (
           producerId: string;
           id: string;
           kind: string;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           rtpParameters: any;
           type: string;
           producerPaused: boolean;

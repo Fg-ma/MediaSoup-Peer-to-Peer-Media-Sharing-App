@@ -37,12 +37,18 @@ type FgVideoMessageEvents =
       type: "responsedCatchUpData";
       inquiredUsername: string;
       inquiredInstance: string;
-      data: {
-        cameraPaused: boolean;
-        cameraTimeEllapsed: number;
-        screenPaused: boolean;
-        screenTimeEllapsed: number;
-      };
+      inquiredType: "camera" | "screen";
+      inquiredVideoId: string;
+      data:
+        | {
+            cameraPaused: boolean;
+            cameraTimeEllapsed: number;
+          }
+        | {
+            screenPaused: boolean;
+            screenTimeEllapsed: number;
+          }
+        | undefined;
     };
 
 class FgVideoController {
@@ -232,32 +238,43 @@ class FgVideoController {
     type: "responsedCatchUpData";
     inquiredUsername: string;
     inquiredInstance: string;
-    data: {
-      cameraPaused: boolean | undefined;
-      cameraTimeEllapsed: number | undefined;
-      screenPaused: boolean | undefined;
-      screenTimeEllapsed: number | undefined;
-    };
+    inquiredType: "camera" | "screen";
+    inquiredVideoId: string;
+    data:
+      | {
+          cameraPaused: boolean;
+          cameraTimeEllapsed: number;
+        }
+      | {
+          screenPaused: boolean;
+          screenTimeEllapsed: number;
+        }
+      | undefined;
   }) => {
     if (
       !this.fgVideoOptions.isUser &&
       this.username === event.inquiredUsername &&
-      this.instance === event.inquiredInstance
+      this.instance === event.inquiredInstance &&
+      this.type === event.inquiredType &&
+      this.videoId === event.inquiredVideoId &&
+      event.data
     ) {
       if (this.type === "camera") {
-        if (event.data.cameraPaused) {
-          this.paused.current = !this.paused.current;
-          this.setPausedState((prev) => !prev);
-        }
-        if (event.data.cameraTimeEllapsed) {
+        if ("cameraPaused" in event.data) {
+          if (event.data.cameraPaused) {
+            this.paused.current = !this.paused.current;
+            this.setPausedState((prev) => !prev);
+          }
+
           this.controls.setInitTimeOffset(event.data.cameraTimeEllapsed);
         }
       } else if (this.type === "screen") {
-        if (event.data.screenPaused) {
-          this.paused.current = !this.paused.current;
-          this.setPausedState((prev) => !prev);
-        }
-        if (event.data.screenTimeEllapsed) {
+        if ("screenPaused" in event.data) {
+          if (event.data.screenPaused) {
+            this.paused.current = !this.paused.current;
+            this.setPausedState((prev) => !prev);
+          }
+
           this.controls.setInitTimeOffset(event.data.screenTimeEllapsed);
         }
       }

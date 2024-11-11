@@ -35,8 +35,8 @@ class StatesPermissions {
     cameraPermission: boolean;
     screenPermission: boolean;
     audioPermission: boolean;
-    streamEffects: any;
-    currentEffectsStyles: any;
+    streamEffects: string;
+    currentEffectsStyles: string;
   }) {
     const msg = {
       type: "statesPermissionsResponsed",

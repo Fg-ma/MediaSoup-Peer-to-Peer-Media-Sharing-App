@@ -15,6 +15,8 @@ const FgAudioElementContainer = React.lazy(
 export default function Bundle({
   socket,
   table_id,
+  activeUsername,
+  activeInstance,
   username,
   instance,
   name,
@@ -28,6 +30,8 @@ export default function Bundle({
 }: {
   socket: React.MutableRefObject<Socket>;
   table_id: string;
+  activeUsername: string | undefined;
+  activeInstance: string | undefined;
   username: string;
   instance: string;
   name?: string;
@@ -175,6 +179,8 @@ export default function Bundle({
                 socket={socket}
                 videoId={key}
                 table_id={table_id}
+                activeUsername={activeUsername}
+                activeInstance={activeInstance}
                 username={username}
                 instance={instance}
                 name={name}
@@ -225,6 +231,8 @@ export default function Bundle({
                 socket={socket}
                 videoId={key}
                 table_id={table_id}
+                activeUsername={activeUsername}
+                activeInstance={activeInstance}
                 username={username}
                 instance={instance}
                 name={name}
@@ -277,6 +285,8 @@ export default function Bundle({
                 socket={socket}
                 videoId={key}
                 table_id={table_id}
+                activeUsername={activeUsername}
+                activeInstance={activeInstance}
                 username={username}
                 instance={instance}
                 name={name}
@@ -327,6 +337,8 @@ export default function Bundle({
                 socket={socket}
                 videoId={key}
                 table_id={table_id}
+                activeUsername={activeUsername}
+                activeInstance={activeInstance}
                 username={username}
                 instance={instance}
                 name={name}

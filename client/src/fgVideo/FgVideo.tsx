@@ -94,6 +94,8 @@ export default function FgVideo({
   socket,
   videoId,
   table_id,
+  activeUsername,
+  activeInstance,
   username,
   instance,
   name,
@@ -115,6 +117,8 @@ export default function FgVideo({
   socket: React.MutableRefObject<Socket>;
   videoId: string;
   table_id: string;
+  activeUsername: string | undefined;
+  activeInstance: string | undefined;
   username: string;
   instance: string;
   name?: string;
@@ -184,6 +188,8 @@ export default function FgVideo({
       },
     },
   });
+
+  const initTimeOffset = useRef(0);
 
   useEffect(() => {
     controls.updateCaptionsStyles();
@@ -269,7 +275,8 @@ export default function FgVideo({
     tracksColorSetterCallback,
     tintColor,
     userStreamEffects,
-    userMedia
+    userMedia,
+    initTimeOffset
   );
 
   const fgVideoController = new FgVideoController(
@@ -296,8 +303,10 @@ export default function FgVideo({
     // Set up initial conditions
     fgVideoController.init();
 
+    // Listen for messages on socket
     socket.current.on("message", fgVideoController.handleMessage);
 
+    // Add eventlisteners
     if (fgVideoOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
@@ -324,6 +333,21 @@ export default function FgVideo({
       );
     }
 
+    // Request initial data
+    if (!fgVideoOptions.isUser && activeUsername && activeInstance) {
+      const msg = {
+        type: "requestCatchUpData",
+        table_id: table_id,
+        inquiringUsername: activeUsername,
+        inquiringInstance: activeInstance,
+        inquiredUsername: username,
+        inquiredInstance: instance,
+        inquiredType: type,
+        inquiredVideoId: videoId,
+      };
+      socket.current.send(msg);
+    }
+
     return () => {
       socket.current.off("message", fgVideoController.handleMessage);
       if (fgVideoOptions.isFullScreen) {
@@ -347,6 +371,20 @@ export default function FgVideo({
         );
       }
     };
+  }, []);
+
+  useEffect(() => {
+    if (!fgVideoOptions.isUser && activeUsername && activeInstance) {
+      const msg = {
+        type: "requestCatchUpData",
+        table_id: table_id,
+        inquiringUsername: activeUsername,
+        inquiringInstance: activeInstance,
+        inquiredUsername: username,
+        inquiredInstance: instance,
+      };
+      socket.current.send(msg);
+    }
   }, []);
 
   return (

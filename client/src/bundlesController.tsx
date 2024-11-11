@@ -70,6 +70,8 @@ class BundlesController {
       const newBundle = (
         <Bundle
           table_id={this.table_id.current}
+          activeUsername={undefined}
+          activeInstance={undefined}
           username={this.username.current}
           instance={this.instance.current}
           socket={this.socket}
@@ -129,6 +131,8 @@ class BundlesController {
         <Bundle
           socket={this.socket}
           table_id={this.table_id.current}
+          activeUsername={this.username.current}
+          activeInstance={this.instance.current}
           username={trackUsername}
           instance={trackInstance}
           initCameraStreams={
