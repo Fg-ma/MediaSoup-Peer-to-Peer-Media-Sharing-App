@@ -11,6 +11,9 @@ import createWebRtcTransport from "../createWebRtcTransport";
 import createConsumer from "../createConsumer";
 import { getNextWorker, getWorkerByIdx } from "../workerManager";
 import MediasoupCleanup from "./MediasoupCleanup";
+import { ProducerTypes } from "./typeConstant";
+import { SctpStreamParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
+import { RtpParameters } from "mediasoup/node/lib/fbs/rtp-parameters";
 
 class Consumers {
   private mediasoupCleanup: MediasoupCleanup;
@@ -159,8 +162,7 @@ class Consumers {
               producerId: string;
               id: string;
               kind: string;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              rtpParameters: any;
+              rtpParameters: RtpParameters;
               type: string;
               producerPaused: boolean;
             };
@@ -170,8 +172,7 @@ class Consumers {
               producerId: string;
               id: string;
               kind: string;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              rtpParameters: any;
+              rtpParameters: RtpParameters;
               type: string;
               producerPaused: boolean;
             };
@@ -180,10 +181,20 @@ class Consumers {
             producerId: string;
             id: string;
             kind: string;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            rtpParameters: any;
+            rtpParameters: RtpParameters;
             type: string;
             producerPaused: boolean;
+          };
+          json?: {
+            [jsonId: string]: {
+              producerId: string;
+              id: string;
+              label: string;
+              sctpStreamParameters: SctpStreamParameters;
+              type: string;
+              producerPaused: boolean;
+              protocol: string;
+            };
           };
         };
       };
@@ -282,6 +293,40 @@ class Consumers {
             producerPaused: audioConsumerData!.producerPaused,
           };
         }
+
+        if (
+          consumers[producerUsername] &&
+          consumers[producerUsername][producerInstance] &&
+          consumers[producerUsername][producerInstance].json
+        ) {
+          if (!newConsumers[producerUsername]) {
+            newConsumers[producerUsername] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance]) {
+            newConsumers[producerUsername][producerInstance] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance].json) {
+            newConsumers[producerUsername][producerInstance].json = {};
+          }
+          for (const jsonId in consumers[producerUsername][producerInstance]
+            .json) {
+            const json =
+              consumers[producerUsername][producerInstance].json?.[jsonId];
+
+            if (json) {
+              newConsumers[producerUsername][producerInstance].json![jsonId] = {
+                producerId: json.producerId,
+                id: json.id,
+                // @ts-expect-error: IDK
+                sctpStreamParameters: json.sctpStreamParameters,
+                label: json.label,
+                type: json.type,
+                producerPaused: json.producerPaused,
+                protocol: json.protocol,
+              };
+            }
+          }
+        }
       }
     }
 
@@ -295,7 +340,7 @@ class Consumers {
 
   async onNewConsumer(event: {
     type: string;
-    consumerType: "camera" | "screen" | "audio";
+    consumerType: ProducerTypes;
     rtpCapabilities: RtpCapabilities;
     producerUsername: string;
     producerInstance: string;
@@ -321,7 +366,9 @@ class Consumers {
         .transport;
 
     const producer =
-      event.consumerType === "camera" || event.consumerType === "screen"
+      event.consumerType === "camera" ||
+      event.consumerType === "screen" ||
+      event.consumerType === "json"
         ? event.incomingProducerId
           ? tableProducers[event.table_id][event.producerUsername][
               event.producerInstance
@@ -340,7 +387,7 @@ class Consumers {
       const consumer = await transport.consume({
         producerId: producer.id,
         rtpCapabilities: event.rtpCapabilities,
-        paused: producer.kind === "video",
+        paused: event.type === "video",
       });
 
       newConsumer = {
@@ -384,17 +431,23 @@ class Consumers {
       ][event.producerInstance] = {};
     }
     if (
-      (event.consumerType === "camera" || event.consumerType === "screen") &&
+      (event.consumerType === "camera" ||
+        event.consumerType === "screen" ||
+        event.consumerType === "json") &&
       !tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
-      ][event.consumerType as "camera" | "screen"]
+      ][event.consumerType]
     ) {
       tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
-      ][event.producerInstance][event.consumerType as "camera" | "screen"] = {};
+      ][event.producerInstance][event.consumerType] = {};
     }
 
-    if (event.consumerType === "camera" || event.consumerType === "screen") {
+    if (
+      event.consumerType === "camera" ||
+      event.consumerType === "screen" ||
+      event.consumerType === "json"
+    ) {
       if (event.incomingProducerId) {
         tableConsumers[event.table_id][event.username][event.instance][
           event.producerUsername
@@ -435,7 +488,7 @@ class Consumers {
     producerUsername: string;
     producerInstance: string;
     consumerId?: string;
-    consumerType: string;
+    consumerType: ProducerTypes;
   }) {
     const msg = {
       type: "newConsumerWasCreated",

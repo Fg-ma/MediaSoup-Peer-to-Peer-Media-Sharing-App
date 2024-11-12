@@ -1,4 +1,5 @@
 import { Server as SocketIOServer } from "socket.io";
+import { ProducerTypes } from "./typeConstant";
 
 class FgMetaData {
   constructor(private io: SocketIOServer) {}
@@ -10,7 +11,7 @@ class FgMetaData {
     inquiringInstance: string;
     inquiredUsername: string;
     inquiredInstance: string;
-    inquiredType: "camera" | "screen" | "audio";
+    inquiredType: ProducerTypes;
     inquiredVideoId: string;
   }) => {
     const msg = {
@@ -34,7 +35,7 @@ class FgMetaData {
     inquiringInstance: string;
     inquiredUsername: string;
     inquiredInstance: string;
-    inquiredType: "camera" | "screen";
+    inquiredType: ProducerTypes;
     inquiredVideoId: string;
     data:
       | {

@@ -67,13 +67,3 @@ const getWorkerByIdx = (idx: number) => {
 };
 
 export { initializeWorkers, getNextWorker, getWorkerByIdx, releaseWorker };
-
-// Round Robin load balancing setup
-// let nextMediasoupWorkerIdx = 0;
-// Get the next worker in the sequence
-//const getNextWorker = () => {
-//  const worker = workers[nextMediasoupWorkerIdx];
-//  const fullWorker = { ...worker, workerIdx: nextMediasoupWorkerIdx };
-//  nextMediasoupWorkerIdx = (nextMediasoupWorkerIdx + 1) % workers.length;
-//  return fullWorker;
-//};

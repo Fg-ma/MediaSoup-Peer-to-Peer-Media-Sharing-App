@@ -52,6 +52,23 @@ export const config = {
       ] as TransportListenIp[],
       maxIncomeBitrate: 1500000,
       initialAvailableOutgoingBitrate: 1000000,
+      numSctpStreams: {
+        OS: 1024,
+        MIS: 1024,
+      },
+    },
+    pipeTransport: {
+      listenIps: [
+        {
+          ip: "0.0.0.0",
+        },
+      ] as TransportListenIp[],
+      enableSctp: true,
+      numSctpStreams: {
+        OS: 1024,
+        MIS: 1024,
+      },
+      maxIncomeBitrate: 1500000,
     },
   },
 } as const;

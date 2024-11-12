@@ -30,6 +30,7 @@ import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
 import Deadbanding from "./babylon/Deadbanding";
 import FgMetaData from "./lib/FgMetaData";
+import JSONButton from "./JSONButton";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")
@@ -191,6 +192,9 @@ export default function Main() {
   const [_, setMutedAudio] = useState(false);
   const isAudio = useRef(false);
   const [audioActive, setAudioActive] = useState(false);
+
+  const isJSON = useRef(false);
+  const [_jsonActive, setJSONActive] = useState(false);
 
   const subBtnRef = useRef<HTMLButtonElement>(null);
   const [subscribedActive, setSubscribedActive] = useState(false);
@@ -481,6 +485,7 @@ export default function Main() {
     isCamera,
     isScreen,
     isAudio,
+    isJSON,
     isSubscribed,
     handleDisableEnableBtns,
     producerTransport,
@@ -703,6 +708,15 @@ export default function Main() {
             )}
         </div>
       </div>
+      <JSONButton
+        table_id={table_id}
+        username={username}
+        instance={instance}
+        device={device}
+        socket={socket}
+        isJSON={isJSON}
+        setJSONActive={setJSONActive}
+      />
     </div>
   );
 }

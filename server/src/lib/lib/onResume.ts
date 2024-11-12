@@ -22,12 +22,12 @@ const onResume = async (
             producerUsername
           ][producerInstance].camera
         ) {
-          const cameras =
+          const cameraConsumers =
             tableConsumers[event.table_id][event.username][event.instance][
               producerUsername
             ][producerInstance].camera;
-          for (const cameraId in cameras) {
-            await cameras[cameraId].consumer?.resume();
+          for (const cameraId in cameraConsumers) {
+            await cameraConsumers[cameraId].consumer?.resume();
           }
         }
         if (
@@ -35,12 +35,12 @@ const onResume = async (
             producerUsername
           ][producerInstance].screen
         ) {
-          const screens =
+          const screenConsumers =
             tableConsumers[event.table_id][event.username][event.instance][
               producerUsername
             ][producerInstance].screen;
-          for (const screenId in screens) {
-            await screens[screenId].consumer?.resume();
+          for (const screenId in screenConsumers) {
+            await screenConsumers[screenId].consumer?.resume();
           }
         }
         if (
@@ -51,6 +51,19 @@ const onResume = async (
           await tableConsumers[event.table_id][event.username][event.instance][
             producerUsername
           ][producerInstance].audio!.consumer?.resume();
+        }
+        if (
+          tableConsumers[event.table_id][event.username][event.instance][
+            producerUsername
+          ][producerInstance].json
+        ) {
+          const jsonConsumers =
+            tableConsumers[event.table_id][event.username][event.instance][
+              producerUsername
+            ][producerInstance].json;
+          for (const jsonId in jsonConsumers) {
+            await jsonConsumers[jsonId].consumer?.resume();
+          }
         }
       } catch (error) {
         console.error(

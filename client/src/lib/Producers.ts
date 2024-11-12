@@ -63,6 +63,7 @@ class Producers {
     private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
     private isAudio: React.MutableRefObject<boolean>,
+    private isJSON: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
 
     private handleDisableEnableBtns: (disabled: boolean) => void,
@@ -170,6 +171,42 @@ class Producers {
     await this.producerTransport.current?.produce(audioParams);
   };
 
+  private createJSONProducer = async () => {
+    if (!this.producerTransport.current) {
+      console.error("No transport available to create JSON data producer");
+      return;
+    }
+
+    // Create a data producer for JSON data on the transport
+    const jsonDataProducer = await this.producerTransport.current.produceData({
+      label: "jsonDataChannel",
+      protocol: "json",
+    });
+
+    console.log("JSON data producer created with id:", jsonDataProducer.id);
+
+    // Initialize a counter for JSON data
+    let counter = 0;
+
+    // Set up periodic JSON data transmission
+    const intervalId = setInterval(() => {
+      const jsonData = {
+        id: jsonDataProducer.id,
+        counter: counter++,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Send JSON data over the data producer
+      jsonDataProducer.send(JSON.stringify(jsonData));
+    }, 1000);
+
+    // Stop JSON feed when transport or data producer closes
+    jsonDataProducer.on("close", () => {
+      clearInterval(intervalId);
+      console.log("JSON data producer closed");
+    });
+  };
+
   onProducerTransportCreated = async (event: {
     type: string;
     params: {
@@ -235,6 +272,37 @@ class Producers {
 
         this.socket.current.once(
           "newProducerCallback",
+          (res: { id: string }) => {
+            callback(res);
+          }
+        );
+        return;
+      }
+    );
+
+    this.producerTransport.current.on(
+      "producedata",
+      async (params, callback, _errback) => {
+        // Create the producer based on params
+        const { label, protocol, sctpStreamParameters } = params;
+
+        const msg = {
+          type: "createNewJSONProducer",
+          producerType: "json",
+          transportId: this.producerTransport.current?.id,
+          label,
+          protocol,
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+          producerId: "json1",
+          sctpStreamParameters,
+        };
+
+        this.socket.current.emit("message", msg);
+
+        this.socket.current.once(
+          "newJSONProducerCallback",
           (res: { id: string }) => {
             callback(res);
           }
@@ -339,6 +407,9 @@ class Producers {
         }
 
         await this.createAudioProducer(audioBrowserMedia);
+      }
+      if (this.isJSON.current) {
+        await this.createJSONProducer();
       }
     } catch (error) {
       console.error(error);

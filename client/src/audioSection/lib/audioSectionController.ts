@@ -2,40 +2,20 @@ import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 
 class AudioSectionController {
-  private socket: React.MutableRefObject<Socket>;
-  private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
-  private table_id: React.MutableRefObject<string>;
-  private username: React.MutableRefObject<string>;
-  private instance: React.MutableRefObject<string>;
-
-  private isAudio: React.MutableRefObject<boolean>;
-  private setAudioActive: (value: React.SetStateAction<boolean>) => void;
-
-  private handleDisableEnableBtns: (disabled: boolean) => void;
-
   constructor(
-    socket: React.MutableRefObject<Socket>,
-    device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-    table_id: React.MutableRefObject<string>,
-    username: React.MutableRefObject<string>,
-    instance: React.MutableRefObject<string>,
+    private socket: React.MutableRefObject<Socket>,
+    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private table_id: React.MutableRefObject<string>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
 
-    isAudio: React.MutableRefObject<boolean>,
-    setAudioActive: (value: React.SetStateAction<boolean>) => void,
+    private isAudio: React.MutableRefObject<boolean>,
+    private setAudioActive: (value: React.SetStateAction<boolean>) => void,
 
-    handleDisableEnableBtns: (disabled: boolean) => void
-  ) {
-    this.socket = socket;
-    this.device = device;
-    this.table_id = table_id;
-    this.username = username;
-    this.instance = instance;
-    this.isAudio = isAudio;
-    this.setAudioActive = setAudioActive;
-    this.handleDisableEnableBtns = handleDisableEnableBtns;
-  }
+    private handleDisableEnableBtns: (disabled: boolean) => void
+  ) {}
 
-  shareAudio() {
+  shareAudio = () => {
     if (!this.table_id.current || !this.username.current) {
       console.error("Missing table_id or username!");
       return;
@@ -67,7 +47,7 @@ class AudioSectionController {
       };
       this.socket.current.emit("message", msg);
     }
-  }
+  };
 }
 
 export default AudioSectionController;

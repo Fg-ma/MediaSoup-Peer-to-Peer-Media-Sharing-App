@@ -5,9 +5,12 @@ import AudioMedia from "../../lib/AudioMedia";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
+  DataStreamTypes,
   defaultAudioStreamEffects,
   ScreenEffectTypes,
 } from "./typeConstant";
+import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
+import { DataProducer } from "mediasoup-client/lib/DataProducer";
 
 export interface StreamsContextProviderProps {
   children: React.ReactNode;
@@ -61,6 +64,25 @@ export interface StreamsContextType {
             }
           | undefined;
         audio?: MediaStreamTrack | undefined;
+        json?:
+          | {
+              [jsonId: string]: MediaStreamTrack;
+            }
+          | undefined;
+      };
+    };
+  }>;
+  remoteDataStream: React.MutableRefObject<{
+    [username: string]: {
+      [instance: string]: {
+        [dataStreamType in DataStreamTypes]?: DataConsumer;
+      };
+    };
+  }>;
+  userDataStream: React.MutableRefObject<{
+    [username: string]: {
+      [instance: string]: {
+        positionScaleRotation?: DataProducer;
       };
     };
   }>;
@@ -127,6 +149,20 @@ export function StreamsContextProvider({
       };
     };
   }>({});
+  const remoteDataStream = useRef<{
+    [username: string]: {
+      [instance: string]: {
+        positionScaleRotation?: DataConsumer;
+      };
+    };
+  }>({});
+  const userDataStream = useRef<{
+    [username: string]: {
+      [instance: string]: {
+        positionScaleRotation?: DataProducer;
+      };
+    };
+  }>({});
 
   return (
     <StreamsContext.Provider
@@ -137,6 +173,8 @@ export function StreamsContextProvider({
         userStreamEffects,
         remoteStreamEffects,
         remoteTracksMap,
+        remoteDataStream,
+        userDataStream,
       }}
     >
       {children}

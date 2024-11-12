@@ -15,6 +15,8 @@ import Effects from "./lib/Effects";
 import Tables from "./lib/Tables";
 import StatesPermissions from "./lib/StatesPermissions";
 import FgMetaData from "./lib/FgMetaData";
+import { ProducerTypes } from "./lib/typeConstant";
+import { SctpParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
 
 type MediasoupSocketEvents =
   | {
@@ -27,7 +29,7 @@ type MediasoupSocketEvents =
       type: "createProducerTransport";
       forceTcp: boolean;
       rtpCapabilities: RtpCapabilities;
-      producerType: string;
+      producerType: ProducerTypes;
       table_id: string;
       username: string;
       instance: number;
@@ -49,6 +51,18 @@ type MediasoupSocketEvents =
       username: string;
       instance: string;
       producerId?: string;
+    }
+  | {
+      type: "createNewJSONProducer";
+      producerType: "json";
+      transportId: string;
+      label: string;
+      protocol: "json";
+      table_id: string;
+      username: string;
+      instance: string;
+      producerId: string;
+      sctpStreamParameters: SctpParameters;
     }
   | {
       type: "createConsumerTransport";
@@ -76,7 +90,7 @@ type MediasoupSocketEvents =
     }
   | {
       type: "newConsumer";
-      consumerType: "camera" | "screen" | "audio";
+      consumerType: ProducerTypes;
       rtpCapabilities: RtpCapabilities;
       producerUsername: string;
       producerInstance: string;
@@ -90,7 +104,7 @@ type MediasoupSocketEvents =
       table_id: string;
       username: string;
       instance: string;
-      producerType: "camera" | "screen" | "audio";
+      producerType: ProducerTypes;
       producerId?: string;
     }
   | {
@@ -117,7 +131,7 @@ type MediasoupSocketEvents =
       table_id: string;
       username: string;
       instance: string;
-      producerType: "camera" | "screen" | "audio";
+      producerType: ProducerTypes;
       producerId: string | undefined;
     }
   | {
@@ -128,14 +142,14 @@ type MediasoupSocketEvents =
       producerUsername: string;
       producerInstance: string;
       consumerId?: string;
-      consumerType: string;
+      consumerType: ProducerTypes;
     }
   | {
       type: "requestEffectChange";
       table_id: string;
       requestedUsername: string;
       requestedInstance: string;
-      requestedProducerType: "camera" | "screen" | "audio";
+      requestedProducerType: ProducerTypes;
       requestedProducerId: string | undefined;
       effect: string;
       blockStateChange: boolean;
@@ -151,7 +165,7 @@ type MediasoupSocketEvents =
       table_id: string;
       username: string;
       instance: string;
-      producerType: "camera" | "screen" | "audio";
+      producerType: ProducerTypes;
       producerId: string | undefined;
       effect: string;
       effectStyle: string;
@@ -186,7 +200,7 @@ type MediasoupSocketEvents =
       inquiringInstance: string;
       inquiredUsername: string;
       inquiredInstance: string;
-      inquiredType: "camera" | "screen";
+      inquiredType: ProducerTypes;
       inquiredVideoId: string;
     }
   | {
@@ -196,7 +210,7 @@ type MediasoupSocketEvents =
       inquiringInstance: string;
       inquiredUsername: string;
       inquiredInstance: string;
-      inquiredType: "camera" | "screen";
+      inquiredType: ProducerTypes;
       inquiredVideoId: string;
       data:
         | {
@@ -247,6 +261,9 @@ const mediasoupSocket = async (io: SocketIOServer) => {
           break;
         case "createNewProducer":
           producers.onCreateNewProducer(event);
+          break;
+        case "createNewJSONProducer":
+          producers.onCreateNewJSONProducer(event);
           break;
         case "createConsumerTransport":
           consumers.onCreateConsumerTransport(event);

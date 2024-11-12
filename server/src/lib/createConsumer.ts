@@ -1,10 +1,10 @@
 import {
-  Consumer,
   Producer,
   RtpCapabilities,
   Router,
+  DataProducer,
 } from "mediasoup/node/lib/types";
-import { tableConsumerTransports } from "./mediasoupVars";
+import { ConsumerInstance, tableConsumerTransports } from "./mediasoupVars";
 
 const createConsumer = async (
   table_id: string,
@@ -16,6 +16,7 @@ const createConsumer = async (
         camera?: { [cameraId: string]: Producer };
         screen?: { [screenId: string]: Producer };
         audio?: Producer;
+        json?: { [jsonId: string]: DataProducer };
       };
     };
   },
@@ -37,42 +38,7 @@ const createConsumer = async (
 
   const consumers: {
     [producerUsername: string]: {
-      [producerInstance: string]: {
-        camera?: {
-          [cameraId: string]: {
-            consumer: Consumer;
-            producerId: string;
-            id: string;
-            kind: string;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            rtpParameters: any;
-            type: string;
-            producerPaused: boolean;
-          };
-        };
-        screen?: {
-          [screenId: string]: {
-            consumer: Consumer;
-            producerId: string;
-            id: string;
-            kind: string;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            rtpParameters: any;
-            type: string;
-            producerPaused: boolean;
-          };
-        };
-        audio?: {
-          consumer: Consumer;
-          producerId: string;
-          id: string;
-          kind: string;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          rtpParameters: any;
-          type: string;
-          producerPaused: boolean;
-        };
-      };
+      [producerInstance: string]: ConsumerInstance;
     };
   } = {};
 
@@ -230,6 +196,59 @@ const createConsumer = async (
         } catch (error) {
           console.error("consume failed: ", error);
           continue;
+        }
+      }
+
+      const jsonProducers = producers[producerUsername][producerInstance].json;
+
+      if (jsonProducers) {
+        for (const jsonProducerId in jsonProducers) {
+          const jsonProducer = jsonProducers[jsonProducerId];
+
+          // Check if consumer transport can consume from this producer
+          if (
+            !mediasoupRouter.canConsume({
+              producerId: jsonProducer.id,
+              rtpCapabilities,
+            })
+          ) {
+            console.error(`Cannot consume from producer ${jsonProducer.id}`);
+          }
+
+          try {
+            // Create a consumer for the producer
+            const consumer = await transport.consumeData({
+              dataProducerId: jsonProducer.id,
+              // @ts-expect-error: praise the lord he's done it again
+              label: jsonProducer.label,
+            });
+
+            // Store the consumer in the consumers object
+            if (!consumers[producerUsername]) {
+              consumers[producerUsername] = {};
+            }
+            if (!consumers[producerUsername][producerInstance]) {
+              consumers[producerUsername][producerInstance] = {};
+            }
+            if (!consumers[producerUsername][producerInstance].json) {
+              consumers[producerUsername][producerInstance].json = {};
+            }
+            consumers[producerUsername][producerInstance].json![
+              jsonProducerId
+            ] = {
+              consumer: consumer,
+              producerId: jsonProducer.id,
+              id: consumer.id,
+              label: consumer.label,
+              // @ts-expect-error: hell if I know but it works
+              sctpStreamParameters: consumer.sctpStreamParameters,
+              type: consumer.type,
+              producerPaused: consumer.dataProducerPaused,
+              protocol: consumer.protocol,
+            };
+          } catch (error) {
+            console.error("consume failed: ", error);
+          }
         }
       }
     }

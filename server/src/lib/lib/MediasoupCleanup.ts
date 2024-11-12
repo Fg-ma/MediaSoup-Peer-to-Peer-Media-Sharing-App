@@ -6,6 +6,7 @@ import {
   workersMap,
 } from "../mediasoupVars";
 import { releaseWorker } from "../workerManager";
+import { ProducerTypes } from "./typeConstant";
 
 class MediasoupCleanup {
   clearTableConsumers(
@@ -14,7 +15,7 @@ class MediasoupCleanup {
     instance?: string,
     producerUsername?: string,
     producerInstance?: string,
-    producerType?: "camera" | "screen" | "audio"
+    producerType?: ProducerTypes
   ) {
     if (
       instance &&
@@ -99,7 +100,7 @@ class MediasoupCleanup {
     table_id: string,
     username: string,
     instance: string,
-    producerType?: "camera" | "screen" | "audio"
+    producerType?: ProducerTypes
   ) {
     if (
       producerType &&
@@ -282,11 +283,13 @@ class MediasoupCleanup {
     table_id: string,
     username: string,
     instance: string,
-    producerType: "camera" | "screen" | "audio",
+    producerType: ProducerTypes,
     producerId?: string
   ) {
     if (
-      (producerType === "camera" || producerType === "screen") &&
+      (producerType === "camera" ||
+        producerType === "screen" ||
+        producerType === "json") &&
       producerId &&
       tableProducers[table_id] &&
       tableProducers[table_id][username] &&
@@ -340,7 +343,7 @@ class MediasoupCleanup {
     table_id: string,
     username: string,
     instance: string,
-    producerType: "camera" | "screen" | "audio",
+    producerType: ProducerTypes,
     producerId?: string
   ) {
     for (const consumerUsername in tableConsumers[table_id]) {
@@ -361,7 +364,8 @@ class MediasoupCleanup {
                   if (
                     iterProducerType === producerType &&
                     (iterProducerType === "camera" ||
-                      iterProducerType === "screen")
+                      iterProducerType === "screen" ||
+                      iterProducerType === "json")
                   ) {
                     for (const iterProducerId in tableConsumers[table_id][
                       consumerUsername

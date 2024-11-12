@@ -1,4 +1,5 @@
 import { Server as SocketIOServer } from "socket.io";
+import { ProducerTypes } from "./typeConstant";
 
 class Effects {
   constructor(private io: SocketIOServer) {}
@@ -8,7 +9,7 @@ class Effects {
     table_id: string;
     requestedUsername: string;
     requestedInstance: string;
-    requestedProducerType: "camera" | "screen" | "audio";
+    requestedProducerType: ProducerTypes;
     requestedProducerId: string | undefined;
     effect: string;
     blockStateChange: boolean;
@@ -40,7 +41,7 @@ class Effects {
     table_id: string;
     username: string;
     instance: string;
-    producerType: "camera" | "screen" | "audio";
+    producerType: ProducerTypes;
     producerId: string | undefined;
     effect: string;
     effectStyle: string;

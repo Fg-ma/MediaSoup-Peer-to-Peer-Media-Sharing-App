@@ -6,41 +6,17 @@ import AudioMedia from "../../lib/AudioMedia";
 import Producers from "../../lib/Producers";
 
 class CameraSectionController {
-  private socket: React.MutableRefObject<Socket>;
-  private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
-  private table_id: React.MutableRefObject<string>;
-  private username: React.MutableRefObject<string>;
-  private instance: React.MutableRefObject<string>;
-
-  private isCamera: React.MutableRefObject<boolean>;
-  private setCameraActive: (value: React.SetStateAction<boolean>) => void;
-
-  private userMedia: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: CameraMedia;
-    };
-    screen: {
-      [screenId: string]: ScreenMedia;
-    };
-    audio: AudioMedia | undefined;
-  }>;
-  private userCameraCount: React.MutableRefObject<number>;
-
-  private producers: Producers;
-
-  private handleDisableEnableBtns: (disabled: boolean) => void;
-
   constructor(
-    socket: React.MutableRefObject<Socket>,
-    device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-    table_id: React.MutableRefObject<string>,
-    username: React.MutableRefObject<string>,
-    instance: React.MutableRefObject<string>,
+    private socket: React.MutableRefObject<Socket>,
+    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private table_id: React.MutableRefObject<string>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
 
-    isCamera: React.MutableRefObject<boolean>,
-    setCameraActive: (value: React.SetStateAction<boolean>) => void,
+    private isCamera: React.MutableRefObject<boolean>,
+    private setCameraActive: (value: React.SetStateAction<boolean>) => void,
 
-    userMedia: React.MutableRefObject<{
+    private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
       };
@@ -49,26 +25,14 @@ class CameraSectionController {
       };
       audio: AudioMedia | undefined;
     }>,
-    userCameraCount: React.MutableRefObject<number>,
+    private userCameraCount: React.MutableRefObject<number>,
 
-    producers: Producers,
+    private producers: Producers,
 
-    handleDisableEnableBtns: (disabled: boolean) => void
-  ) {
-    this.socket = socket;
-    this.device = device;
-    this.table_id = table_id;
-    this.username = username;
-    this.instance = instance;
-    this.isCamera = isCamera;
-    this.setCameraActive = setCameraActive;
-    this.userMedia = userMedia;
-    this.userCameraCount = userCameraCount;
-    this.producers = producers;
-    this.handleDisableEnableBtns = handleDisableEnableBtns;
-  }
+    private handleDisableEnableBtns: (disabled: boolean) => void
+  ) {}
 
-  shareCamera() {
+  shareCamera = () => {
     if (!this.table_id.current || !this.username.current) {
       console.error("Missing table_id or username!");
       return;
@@ -111,9 +75,9 @@ class CameraSectionController {
         }
       }
     }
-  }
+  };
 
-  async shareNewCamera() {
+  shareNewCamera = () => {
     if (!this.table_id.current || !this.username.current) {
       console.error("Missing table_id or username!");
       return;
@@ -124,7 +88,7 @@ class CameraSectionController {
     if (this.device.current) {
       this.producers.createNewProducer("camera");
     }
-  }
+  };
 }
 
 export default CameraSectionController;

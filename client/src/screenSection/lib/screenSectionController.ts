@@ -6,41 +6,17 @@ import AudioMedia from "../../lib/AudioMedia";
 import Producers from "../../lib/Producers";
 
 class ScreenSectionController {
-  private socket: React.MutableRefObject<Socket>;
-  private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
-  private table_id: React.MutableRefObject<string>;
-  private username: React.MutableRefObject<string>;
-  private instance: React.MutableRefObject<string>;
-
-  private isScreen: React.MutableRefObject<boolean>;
-  private setScreenActive: (value: React.SetStateAction<boolean>) => void;
-
-  private userMedia: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: CameraMedia;
-    };
-    screen: {
-      [screenId: string]: ScreenMedia;
-    };
-    audio: AudioMedia | undefined;
-  }>;
-  private userScreenCount: React.MutableRefObject<number>;
-
-  private producers: Producers;
-
-  private handleDisableEnableBtns: (disabled: boolean) => void;
-
   constructor(
-    socket: React.MutableRefObject<Socket>,
-    device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-    table_id: React.MutableRefObject<string>,
-    username: React.MutableRefObject<string>,
-    instance: React.MutableRefObject<string>,
+    private socket: React.MutableRefObject<Socket>,
+    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private table_id: React.MutableRefObject<string>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
 
-    isScreen: React.MutableRefObject<boolean>,
-    setScreenActive: (value: React.SetStateAction<boolean>) => void,
+    private isScreen: React.MutableRefObject<boolean>,
+    private setScreenActive: (value: React.SetStateAction<boolean>) => void,
 
-    userMedia: React.MutableRefObject<{
+    private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
       };
@@ -49,26 +25,14 @@ class ScreenSectionController {
       };
       audio: AudioMedia | undefined;
     }>,
-    userScreenCount: React.MutableRefObject<number>,
+    private userScreenCount: React.MutableRefObject<number>,
 
-    producers: Producers,
+    private producers: Producers,
 
-    handleDisableEnableBtns: (disabled: boolean) => void
-  ) {
-    this.socket = socket;
-    this.device = device;
-    this.table_id = table_id;
-    this.username = username;
-    this.instance = instance;
-    this.isScreen = isScreen;
-    this.setScreenActive = setScreenActive;
-    this.userMedia = userMedia;
-    this.userScreenCount = userScreenCount;
-    this.producers = producers;
-    this.handleDisableEnableBtns = handleDisableEnableBtns;
-  }
+    private handleDisableEnableBtns: (disabled: boolean) => void
+  ) {}
 
-  shareScreen() {
+  shareScreen = () => {
     if (!this.table_id.current || !this.username.current) {
       console.error("Missing table_id or username!");
       return;
@@ -109,9 +73,9 @@ class ScreenSectionController {
         }
       }
     }
-  }
+  };
 
-  shareNewScreen() {
+  shareNewScreen = () => {
     if (!this.table_id.current || !this.username.current) {
       console.error("Missing table_id or username!");
       return;
@@ -122,7 +86,7 @@ class ScreenSectionController {
     if (this.device.current) {
       this.producers.createNewProducer("screen");
     }
-  }
+  };
 }
 
 export default ScreenSectionController;

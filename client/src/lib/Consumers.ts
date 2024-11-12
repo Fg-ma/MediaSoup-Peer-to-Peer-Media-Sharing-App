@@ -1,6 +1,10 @@
 import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
+import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
+import { RtpParameters } from "mediasoup-client/lib/RtpParameters";
+import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
+import { DataStreamTypes } from "src/context/streamsContext/typeConstant";
 
 class Consumers {
   constructor(
@@ -68,8 +72,7 @@ class Consumers {
               producerId: string;
               id: string;
               kind: "audio" | "video" | undefined;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              rtpParameters: any;
+              rtpParameters: RtpParameters;
               type: string;
               producerPaused: boolean;
             };
@@ -78,10 +81,20 @@ class Consumers {
             producerId: string;
             id: string;
             kind: "audio" | "video" | undefined;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            rtpParameters: any;
+            rtpParameters: RtpParameters;
             type: string;
             producerPaused: boolean;
+          };
+          json?: {
+            positionScaleRotation?: {
+              producerId: string;
+              id: string;
+              label: string;
+              sctpStreamParameters: SctpStreamParameters;
+              type: string;
+              producerPaused: boolean;
+              protocol: string;
+            };
           };
         };
       };
@@ -103,6 +116,9 @@ class Consumers {
           camera?: { [cameraId: string]: MediaStreamTrack };
           screen?: { [screenId: string]: MediaStreamTrack };
           audio?: MediaStreamTrack;
+        } = {};
+        const newRemoteDataStream: {
+          [dataStreamType in DataStreamTypes]?: DataConsumer;
         } = {};
 
         if (subscriptions[producerUsername][producerInstance].camera) {
@@ -161,11 +177,37 @@ class Consumers {
           newRemoteTrack.audio = consumer.track;
         }
 
+        if (subscriptions[producerUsername][producerInstance].json) {
+          for (const jsonId in subscriptions[producerUsername][producerInstance]
+            .json) {
+            const subscriptionJSONData =
+              subscriptions[producerUsername][producerInstance].json![
+                jsonId as DataStreamTypes
+              ];
+            if (!subscriptionJSONData) {
+              continue;
+            }
+            const { producerId, id, sctpStreamParameters, label, protocol } =
+              subscriptionJSONData;
+
+            const consumer = await this.consumerTransport.current.consumeData({
+              id,
+              dataProducerId: producerId,
+              sctpStreamParameters,
+              label,
+              protocol,
+            });
+            newRemoteDataStream[jsonId as DataStreamTypes] = consumer;
+          }
+        }
+
         if (!this.remoteTracksMap.current[producerUsername]) {
           this.remoteTracksMap.current[producerUsername] = {};
         }
         this.remoteTracksMap.current[producerUsername][producerInstance] =
           newRemoteTrack;
+        this.remoteDataStream.current[producerUsername][producerInstance] =
+          newRemoteDataStream;
       }
     }
   }

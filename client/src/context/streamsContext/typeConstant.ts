@@ -126,3 +126,5 @@ export type AudioEffectTypes =
   | "bubbly"
   | "thunder"
   | "echosOfThePast";
+
+export type DataStreamTypes = "positionScaleRotation";

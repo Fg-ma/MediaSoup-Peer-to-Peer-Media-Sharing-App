@@ -13,6 +13,8 @@ import {
 import createWebRtcTransport from "../createWebRtcTransport";
 import { getNextWorker, getWorkerByIdx } from "../workerManager";
 import MediasoupCleanup from "./MediasoupCleanup";
+import { ProducerTypes } from "./typeConstant";
+import { SctpParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
 
 class Producers {
   private mediasoupCleanup: MediasoupCleanup;
@@ -25,7 +27,7 @@ class Producers {
     type: string;
     forceTcp: boolean;
     rtpCapabilities: RtpCapabilities;
-    producerType: string;
+    producerType: ProducerTypes;
     table_id: string;
     username: string;
     instance: number;
@@ -148,7 +150,7 @@ class Producers {
   }
 
   onCreateNewProducer = async (event: {
-    type: string;
+    type: "createNewProducer";
     producerType: "camera" | "screen" | "audio";
     transportId: string;
     kind: MediaKind;
@@ -236,12 +238,102 @@ class Producers {
       });
   };
 
+  onCreateNewJSONProducer = async (event: {
+    type: "createNewJSONProducer";
+    producerType: "json"; // Producer type is strictly "json" for this case
+    transportId: string;
+    label: string;
+    protocol: "json"; // Protocol is explicitly "json"
+    table_id: string;
+    username: string;
+    instance: string;
+    producerId: string;
+    sctpStreamParameters: SctpParameters;
+  }) => {
+    const {
+      label,
+      protocol,
+      producerId,
+      table_id,
+      username,
+      instance,
+      sctpStreamParameters,
+    } = event;
+
+    // Validate that the transport and producer type are correctly set up
+    if (
+      !tableProducerTransports[table_id] ||
+      !tableProducerTransports[table_id][username] ||
+      !tableProducerTransports[table_id][username][instance]
+    ) {
+      console.error(
+        "Producer transport not found for the given table, username, or instance."
+      );
+      return;
+    }
+
+    // Check if a producer of this type already exists, and avoid creating a new one if it does
+    if (tableProducers[table_id]?.[username]?.[instance]?.json?.[producerId]) {
+      return;
+    }
+
+    // Now, produce the new JSON producer
+    try {
+      const transport =
+        tableProducerTransports[table_id][username][instance].transport;
+      const newProducer = await transport.produceData({
+        label,
+        protocol,
+        // @ts-expect-error: I don't know but it works
+        sctpStreamParameters,
+      });
+
+      // Make sure the producers object structure exists for the new producer
+      if (!tableProducers[table_id]) {
+        tableProducers[table_id] = {};
+      }
+      if (!tableProducers[table_id][username]) {
+        tableProducers[table_id][username] = {};
+      }
+      if (!tableProducers[table_id][username][instance]) {
+        tableProducers[table_id][username][instance] = {};
+      }
+      if (!tableProducers[table_id][username][instance].json) {
+        tableProducers[table_id][username][instance].json = {};
+      }
+
+      // Store the new JSON producer under the appropriate keys
+      if (producerId) {
+        tableProducers[table_id][username][instance].json[producerId] =
+          newProducer;
+      }
+
+      // Emit a message indicating the new JSON producer is available
+      const msg = {
+        type: "newJSONProducerAvailable",
+        producerUsername: username,
+        producerInstance: instance,
+        producerType: "json",
+        producerId,
+      };
+
+      this.io.to(`table_${table_id}`).emit("message", msg);
+      this.io
+        .to(`instance_${table_id}_${username}_${instance}`)
+        .emit("newJSONProducerCallback", {
+          id: newProducer.id, // Return the producer's ID after successful creation
+        });
+    } catch (error) {
+      console.error("Error creating JSON producer:", error);
+    }
+  };
+
   onNewProducerCreated(event: {
     type: string;
     table_id: string;
     username: string;
     instance: string;
-    producerType: "camera" | "screen" | "audio";
+    producerType: ProducerTypes;
     producerId: string | undefined;
   }) {
     const msg = {
@@ -259,7 +351,7 @@ class Producers {
     table_id: string;
     username: string;
     instance: string;
-    producerType: "camera" | "screen" | "audio";
+    producerType: ProducerTypes;
     producerId?: string;
   }) {
     try {

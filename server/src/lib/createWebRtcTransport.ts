@@ -2,7 +2,7 @@ import { Router } from "mediasoup/node/lib/types";
 import { config } from "../config";
 
 const createWebRtcTransport = async (mediasoupRouter: Router) => {
-  const { maxIncomeBitrate, initialAvailableOutgoingBitrate } =
+  const { maxIncomeBitrate, initialAvailableOutgoingBitrate, numSctpStreams } =
     config.mediasoup.webRtcTransport;
 
   const transport = await mediasoupRouter.createWebRtcTransport({
@@ -11,6 +11,8 @@ const createWebRtcTransport = async (mediasoupRouter: Router) => {
     enableTcp: true,
     preferUdp: true,
     initialAvailableOutgoingBitrate,
+    enableSctp: true,
+    numSctpStreams,
   });
 
   if (maxIncomeBitrate) {
@@ -28,6 +30,7 @@ const createWebRtcTransport = async (mediasoupRouter: Router) => {
       iceParameters: transport.iceParameters,
       iceCandidates: transport.iceCandidates,
       dtlsParameters: transport.dtlsParameters,
+      sctpParameters: transport.sctpParameters,
     },
   };
 };
