@@ -194,27 +194,7 @@ class Producers {
       },
     });
 
-    jsonDataProducer.on("close", () => {
-      clearInterval(intervalId);
-      console.log("JSON data producer closed");
-    });
-
     this.userDataStreams.current[dataStreamType] = jsonDataProducer;
-
-    // Initialize a counter for JSON data
-    let counter = 0;
-
-    // Set up periodic JSON data transmission
-    const intervalId = setInterval(() => {
-      const jsonData = {
-        id: jsonDataProducer.id,
-        counter: counter++,
-        timestamp: new Date().toISOString(),
-      };
-
-      // Send JSON data over the data producer
-      jsonDataProducer.send(JSON.stringify(jsonData));
-    }, 1000);
   };
 
   onProducerTransportCreated = async (event: {
@@ -466,6 +446,10 @@ class Producers {
       }
 
       await this.createCameraProducer(cameraBrowserMedia);
+
+      if (this.userDataStreams.current.positionScaleRotation === undefined) {
+        await this.createJSONProducer("positionScaleRotation");
+      }
     } else if (producerType === "screen") {
       producerId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
       if (
@@ -494,6 +478,10 @@ class Producers {
       }
 
       await this.createScreenProducer(screenBrowserMedia);
+
+      if (this.userDataStreams.current.positionScaleRotation === undefined) {
+        await this.createJSONProducer("positionScaleRotation");
+      }
     } else if (producerType === "audio") {
       if (this.userMedia.current.audio) {
         // Reenable buttons
@@ -517,6 +505,10 @@ class Producers {
       }
 
       await this.createAudioProducer(audioBrowserMedia);
+
+      if (this.userDataStreams.current.positionScaleRotation === undefined) {
+        await this.createJSONProducer("positionScaleRotation");
+      }
     }
 
     // Reenable buttons

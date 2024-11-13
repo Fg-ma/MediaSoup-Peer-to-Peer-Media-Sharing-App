@@ -515,7 +515,6 @@ class Consumers {
       tableProducers[event.table_id][event.producerUsername][
         event.producerInstance
       ]?.[event.consumerType]?.[event.dataStreamType];
-
     if (!producer) {
       console.error(`No producer found`);
       return;
@@ -525,7 +524,7 @@ class Consumers {
       const consumer = await transport.consumeData({
         dataProducerId: producer.id,
         // @ts-expect-error: praise the lord he's done it again
-        label: jsonProducer.label,
+        label: producer.label,
       });
 
       newConsumer = {

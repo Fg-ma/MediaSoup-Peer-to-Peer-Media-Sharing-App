@@ -582,11 +582,14 @@ export default function Main() {
   };
 
   return (
-    <div className='min-w-full min-h-full overflow-x-hidden flex-col'>
+    <div className='w-screen h-screen overflow-x-hidden flex-col'>
       <div className='flex justify-center min-w-full bg-black h-16 text-white items-center mb-10'>
         Mediasoup Video Sharing App
       </div>
-      <div className='flex-col flex-wrap -mx-1 overflow-hidden px-5'>
+      <div
+        className='flex-col flex-wrap overflow-hidden px-5 w-full'
+        style={{ height: "calc(100% - 6.5rem)" }}
+      >
         <div className='flex items-center justify-center'>
           <CameraSection
             socket={socket}
@@ -736,7 +739,11 @@ export default function Main() {
             {isInTable ? "Join New Room" : "Join Room"}
           </button>
         </div>
-        <div ref={remoteVideosContainerRef} className='w-full grid grid-cols-1'>
+        <div
+          ref={remoteVideosContainerRef}
+          className='relative bg-fg-white-65 rounded-md m-4'
+          style={{ width: "calc(100% - 2rem)", height: "calc(100% - 10rem)" }}
+        >
           {bundles &&
             Object.keys(bundles).length !== 0 &&
             Object.keys(bundles).map(
