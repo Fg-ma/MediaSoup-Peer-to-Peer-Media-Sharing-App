@@ -5,6 +5,7 @@ import {
   RtpCapabilities,
   MediaKind,
   RtpParameters,
+  SctpCapabilities,
 } from "mediasoup/node/lib/types";
 import onGetRouterRtpCapabilities from "./lib/onGetRouterRtpCapabilities";
 import onResume from "./lib/onResume";
@@ -17,6 +18,7 @@ import StatesPermissions from "./lib/StatesPermissions";
 import FgMetaData from "./lib/FgMetaData";
 import { ProducerTypes } from "./lib/typeConstant";
 import { SctpParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
+import { DataStreamTypes } from "./mediasoupVars";
 
 type MediasoupSocketEvents =
   | {
@@ -63,6 +65,7 @@ type MediasoupSocketEvents =
       instance: string;
       producerId: string;
       sctpStreamParameters: SctpParameters;
+      dataStreamType: DataStreamTypes;
     }
   | {
       type: "createConsumerTransport";
@@ -90,7 +93,7 @@ type MediasoupSocketEvents =
     }
   | {
       type: "newConsumer";
-      consumerType: ProducerTypes;
+      consumerType: "camera" | "screen" | "audio";
       rtpCapabilities: RtpCapabilities;
       producerUsername: string;
       producerInstance: string;
@@ -98,6 +101,18 @@ type MediasoupSocketEvents =
       table_id: string;
       username: string;
       instance: string;
+    }
+  | {
+      type: "newJSONConsumer";
+      consumerType: "json";
+      sctpCapabilities: SctpCapabilities;
+      producerUsername: string;
+      producerInstance: string;
+      incomingProducerId: string;
+      table_id: string;
+      username: string;
+      instance: string;
+      dataStreamType: DataStreamTypes;
     }
   | {
       type: "removeProducer";
@@ -279,6 +294,9 @@ const mediasoupSocket = async (io: SocketIOServer) => {
           break;
         case "newConsumer":
           consumers.onNewConsumer(event);
+          break;
+        case "newJSONConsumer":
+          consumers.onNewJSONConsumer(event);
           break;
         case "removeProducer":
           producers.onRemoveProducer(event);

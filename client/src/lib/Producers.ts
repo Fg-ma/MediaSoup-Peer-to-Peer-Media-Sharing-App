@@ -9,6 +9,7 @@ import {
 import {
   AudioEffectTypes,
   CameraEffectTypes,
+  DataStreamTypes,
   defaultAudioStreamEffects,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
@@ -56,6 +57,9 @@ class Producers {
         };
       };
     }>,
+    private userDataStreams: React.MutableRefObject<{
+      positionScaleRotation?: mediasoup.types.DataProducer;
+    }>,
 
     private userCameraCount: React.MutableRefObject<number>,
     private userScreenCount: React.MutableRefObject<number>,
@@ -63,7 +67,6 @@ class Producers {
     private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
     private isAudio: React.MutableRefObject<boolean>,
-    private isJSON: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
 
     private handleDisableEnableBtns: (disabled: boolean) => void,
@@ -171,19 +174,32 @@ class Producers {
     await this.producerTransport.current?.produce(audioParams);
   };
 
-  private createJSONProducer = async () => {
+  private createJSONProducer = async (dataStreamType: DataStreamTypes) => {
     if (!this.producerTransport.current) {
       console.error("No transport available to create JSON data producer");
       return;
     }
 
+    const jsonId = `${this.username.current}_${dataStreamType}_data_stream`;
+    const label = `${this.username.current}_${dataStreamType}`;
+
     // Create a data producer for JSON data on the transport
     const jsonDataProducer = await this.producerTransport.current.produceData({
-      label: "jsonDataChannel",
+      label: label,
       protocol: "json",
+      appData: {
+        producerType: "json",
+        producerId: jsonId,
+        dataStreamType: dataStreamType,
+      },
     });
 
-    console.log("JSON data producer created with id:", jsonDataProducer.id);
+    jsonDataProducer.on("close", () => {
+      clearInterval(intervalId);
+      console.log("JSON data producer closed");
+    });
+
+    this.userDataStreams.current[dataStreamType] = jsonDataProducer;
 
     // Initialize a counter for JSON data
     let counter = 0;
@@ -199,12 +215,6 @@ class Producers {
       // Send JSON data over the data producer
       jsonDataProducer.send(JSON.stringify(jsonData));
     }, 1000);
-
-    // Stop JSON feed when transport or data producer closes
-    jsonDataProducer.on("close", () => {
-      clearInterval(intervalId);
-      console.log("JSON data producer closed");
-    });
   };
 
   onProducerTransportCreated = async (event: {
@@ -284,19 +294,20 @@ class Producers {
       "producedata",
       async (params, callback, _errback) => {
         // Create the producer based on params
-        const { label, protocol, sctpStreamParameters } = params;
+        const { label, protocol, sctpStreamParameters, appData } = params;
 
         const msg = {
           type: "createNewJSONProducer",
-          producerType: "json",
+          producerType: appData.producerType,
           transportId: this.producerTransport.current?.id,
           label,
           protocol,
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
-          producerId: "json1",
+          producerId: appData.producerId,
           sctpStreamParameters,
+          dataStreamType: appData.dataStreamType,
         };
 
         this.socket.current.emit("message", msg);
@@ -356,6 +367,10 @@ class Producers {
         }
 
         await this.createCameraProducer(cameraBrowserMedia);
+
+        if (this.userDataStreams.current.positionScaleRotation === undefined) {
+          await this.createJSONProducer("positionScaleRotation");
+        }
       }
       if (this.isScreen.current) {
         if (
@@ -382,6 +397,10 @@ class Producers {
         }
 
         await this.createScreenProducer(screenBrowserMedia);
+
+        if (this.userDataStreams.current.positionScaleRotation === undefined) {
+          await this.createJSONProducer("positionScaleRotation");
+        }
       }
       if (this.isAudio.current) {
         if (this.userMedia.current.audio) {
@@ -407,9 +426,10 @@ class Producers {
         }
 
         await this.createAudioProducer(audioBrowserMedia);
-      }
-      if (this.isJSON.current) {
-        await this.createJSONProducer();
+
+        if (this.userDataStreams.current.positionScaleRotation === undefined) {
+          await this.createJSONProducer("positionScaleRotation");
+        }
       }
     } catch (error) {
       console.error(error);
@@ -538,6 +558,37 @@ class Producers {
         username: this.username.current,
         instance: this.instance.current,
         incomingProducerId: event.producerId,
+      };
+      this.socket.current.emit("message", msg);
+    }
+  };
+
+  onNewJSONProducerAvailable = (event: {
+    type: "newJSONProducerAvailable";
+    producerUsername: string;
+    producerInstance: string;
+    producerType: string;
+    producerId: string;
+    dataStreamType: DataStreamTypes;
+  }) => {
+    if (
+      event.producerInstance !== this.instance.current &&
+      this.isSubscribed.current &&
+      this.device.current
+    ) {
+      const { sctpCapabilities } = this.device.current;
+
+      const msg = {
+        type: "newJSONConsumer",
+        consumerType: event.producerType,
+        sctpCapabilities: sctpCapabilities,
+        producerUsername: event.producerUsername,
+        producerInstance: event.producerInstance,
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+        incomingProducerId: event.producerId,
+        dataStreamType: event.dataStreamType,
       };
       this.socket.current.emit("message", msg);
     }

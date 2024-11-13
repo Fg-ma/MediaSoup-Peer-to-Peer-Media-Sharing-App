@@ -20,6 +20,8 @@ export const workersMap: {
   [table_id: string]: number;
 } = {};
 
+export type DataStreamTypes = "positionScaleRotation";
+
 export type TableProducerTransports = {
   [table_id: string]: {
     [username: string]: {
@@ -48,7 +50,7 @@ export type TableProducers = {
         camera?: { [cameraId: string]: Producer };
         screen?: { [screenId: string]: Producer };
         audio?: Producer;
-        json?: { [jsonId: string]: DataProducer };
+        json?: { [dataStreamType in DataStreamTypes]?: DataProducer };
       };
     };
   };
@@ -89,7 +91,7 @@ export type ConsumerInstance = {
     producerPaused: boolean;
   };
   json?: {
-    [jsonId: string]: {
+    [dataStreamType in DataStreamTypes]?: {
       consumer: DataConsumer;
       producerId: string;
       id: string;

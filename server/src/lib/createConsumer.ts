@@ -4,7 +4,11 @@ import {
   Router,
   DataProducer,
 } from "mediasoup/node/lib/types";
-import { ConsumerInstance, tableConsumerTransports } from "./mediasoupVars";
+import {
+  ConsumerInstance,
+  DataStreamTypes,
+  tableConsumerTransports,
+} from "./mediasoupVars";
 
 const createConsumer = async (
   table_id: string,
@@ -16,7 +20,7 @@ const createConsumer = async (
         camera?: { [cameraId: string]: Producer };
         screen?: { [screenId: string]: Producer };
         audio?: Producer;
-        json?: { [jsonId: string]: DataProducer };
+        json?: { [dataStreamType in DataStreamTypes]?: DataProducer };
       };
     };
   },
@@ -202,18 +206,10 @@ const createConsumer = async (
       const jsonProducers = producers[producerUsername][producerInstance].json;
 
       if (jsonProducers) {
-        for (const jsonProducerId in jsonProducers) {
-          const jsonProducer = jsonProducers[jsonProducerId];
+        for (const dataStreamType in jsonProducers) {
+          const jsonProducer = jsonProducers[dataStreamType as DataStreamTypes];
 
-          // Check if consumer transport can consume from this producer
-          if (
-            !mediasoupRouter.canConsume({
-              producerId: jsonProducer.id,
-              rtpCapabilities,
-            })
-          ) {
-            console.error(`Cannot consume from producer ${jsonProducer.id}`);
-          }
+          if (jsonProducer === undefined) continue;
 
           try {
             // Create a consumer for the producer
@@ -234,7 +230,7 @@ const createConsumer = async (
               consumers[producerUsername][producerInstance].json = {};
             }
             consumers[producerUsername][producerInstance].json![
-              jsonProducerId
+              dataStreamType as DataStreamTypes
             ] = {
               consumer: consumer,
               producerId: jsonProducer.id,

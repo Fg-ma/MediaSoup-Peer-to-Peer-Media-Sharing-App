@@ -72,19 +72,15 @@ export interface StreamsContextType {
       };
     };
   }>;
-  remoteDataStream: React.MutableRefObject<{
+  remoteDataStreams: React.MutableRefObject<{
     [username: string]: {
       [instance: string]: {
         [dataStreamType in DataStreamTypes]?: DataConsumer;
       };
     };
   }>;
-  userDataStream: React.MutableRefObject<{
-    [username: string]: {
-      [instance: string]: {
-        positionScaleRotation?: DataProducer;
-      };
-    };
+  userDataStreams: React.MutableRefObject<{
+    positionScaleRotation?: DataProducer;
   }>;
 }
 
@@ -149,19 +145,15 @@ export function StreamsContextProvider({
       };
     };
   }>({});
-  const remoteDataStream = useRef<{
+  const remoteDataStreams = useRef<{
     [username: string]: {
       [instance: string]: {
         positionScaleRotation?: DataConsumer;
       };
     };
   }>({});
-  const userDataStream = useRef<{
-    [username: string]: {
-      [instance: string]: {
-        positionScaleRotation?: DataProducer;
-      };
-    };
+  const userDataStreams = useRef<{
+    positionScaleRotation?: DataProducer;
   }>({});
 
   return (
@@ -173,8 +165,8 @@ export function StreamsContextProvider({
         userStreamEffects,
         remoteStreamEffects,
         remoteTracksMap,
-        remoteDataStream,
-        userDataStream,
+        remoteDataStreams,
+        userDataStreams,
       }}
     >
       {children}

@@ -6,6 +6,7 @@ import {
   RtpParameters,
 } from "mediasoup/node/lib/types";
 import {
+  DataStreamTypes,
   tableProducerTransports,
   tableProducers,
   workersMap,
@@ -240,15 +241,16 @@ class Producers {
 
   onCreateNewJSONProducer = async (event: {
     type: "createNewJSONProducer";
-    producerType: "json"; // Producer type is strictly "json" for this case
+    producerType: "json";
     transportId: string;
     label: string;
-    protocol: "json"; // Protocol is explicitly "json"
+    protocol: "json";
     table_id: string;
     username: string;
     instance: string;
     producerId: string;
     sctpStreamParameters: SctpParameters;
+    dataStreamType: DataStreamTypes;
   }) => {
     const {
       label,
@@ -258,6 +260,7 @@ class Producers {
       username,
       instance,
       sctpStreamParameters,
+      dataStreamType,
     } = event;
 
     // Validate that the transport and producer type are correctly set up
@@ -273,7 +276,9 @@ class Producers {
     }
 
     // Check if a producer of this type already exists, and avoid creating a new one if it does
-    if (tableProducers[table_id]?.[username]?.[instance]?.json?.[producerId]) {
+    if (
+      tableProducers[table_id]?.[username]?.[instance]?.json?.[dataStreamType]
+    ) {
       return;
     }
 
@@ -304,7 +309,7 @@ class Producers {
 
       // Store the new JSON producer under the appropriate keys
       if (producerId) {
-        tableProducers[table_id][username][instance].json[producerId] =
+        tableProducers[table_id][username][instance].json[dataStreamType] =
           newProducer;
       }
 
@@ -315,6 +320,7 @@ class Producers {
         producerInstance: instance,
         producerType: "json",
         producerId,
+        dataStreamType,
       };
 
       this.io.to(`table_${table_id}`).emit("message", msg);

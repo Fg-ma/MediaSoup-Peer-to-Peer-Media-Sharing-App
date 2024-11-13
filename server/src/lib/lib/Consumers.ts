@@ -1,7 +1,12 @@
 import { Server as SocketIOServer } from "socket.io";
-import { DtlsParameters } from "mediasoup/node/lib/types";
+import {
+  DataConsumer,
+  DtlsParameters,
+  SctpCapabilities,
+} from "mediasoup/node/lib/types";
 import { RtpCapabilities, Consumer } from "mediasoup/node/lib/types";
 import {
+  DataStreamTypes,
   tableConsumerTransports,
   tableConsumers,
   tableProducers,
@@ -308,13 +313,18 @@ class Consumers {
           if (!newConsumers[producerUsername][producerInstance].json) {
             newConsumers[producerUsername][producerInstance].json = {};
           }
-          for (const jsonId in consumers[producerUsername][producerInstance]
-            .json) {
+          for (const dataStreamType in consumers[producerUsername][
+            producerInstance
+          ].json) {
             const json =
-              consumers[producerUsername][producerInstance].json?.[jsonId];
+              consumers[producerUsername][producerInstance].json?.[
+                dataStreamType as DataStreamTypes
+              ];
 
             if (json) {
-              newConsumers[producerUsername][producerInstance].json![jsonId] = {
+              newConsumers[producerUsername][producerInstance].json![
+                dataStreamType as DataStreamTypes
+              ] = {
                 producerId: json.producerId,
                 id: json.id,
                 // @ts-expect-error: IDK
@@ -339,8 +349,8 @@ class Consumers {
   }
 
   async onNewConsumer(event: {
-    type: string;
-    consumerType: ProducerTypes;
+    type: "newConsumer";
+    consumerType: "camera" | "screen" | "audio";
     rtpCapabilities: RtpCapabilities;
     producerUsername: string;
     producerInstance: string;
@@ -354,8 +364,7 @@ class Consumers {
       producerId: string;
       id: string;
       kind: string;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      rtpParameters: any;
+      rtpParameters: RtpParameters;
       type: string;
       producerPaused: boolean;
     };
@@ -366,9 +375,7 @@ class Consumers {
         .transport;
 
     const producer =
-      event.consumerType === "camera" ||
-      event.consumerType === "screen" ||
-      event.consumerType === "json"
+      event.consumerType === "camera" || event.consumerType === "screen"
         ? event.incomingProducerId
           ? tableProducers[event.table_id][event.producerUsername][
               event.producerInstance
@@ -387,7 +394,8 @@ class Consumers {
       const consumer = await transport.consume({
         producerId: producer.id,
         rtpCapabilities: event.rtpCapabilities,
-        paused: event.type === "video",
+        paused:
+          event.consumerType === "camera" || event.consumerType === "screen",
       });
 
       newConsumer = {
@@ -395,6 +403,7 @@ class Consumers {
         producerId: producer.id,
         id: consumer.id,
         kind: consumer.kind,
+        // @ts-expect-error: type shit
         rtpParameters: consumer.rtpParameters,
         type: consumer.type,
         producerPaused: consumer.producerPaused,
@@ -431,9 +440,7 @@ class Consumers {
       ][event.producerInstance] = {};
     }
     if (
-      (event.consumerType === "camera" ||
-        event.consumerType === "screen" ||
-        event.consumerType === "json") &&
+      (event.consumerType === "camera" || event.consumerType === "screen") &&
       !tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
       ][event.consumerType]
@@ -443,11 +450,7 @@ class Consumers {
       ][event.producerInstance][event.consumerType] = {};
     }
 
-    if (
-      event.consumerType === "camera" ||
-      event.consumerType === "screen" ||
-      event.consumerType === "json"
-    ) {
+    if (event.consumerType === "camera" || event.consumerType === "screen") {
       if (event.incomingProducerId) {
         tableConsumers[event.table_id][event.username][event.instance][
           event.producerUsername
@@ -476,6 +479,130 @@ class Consumers {
           rtpParameters: newConsumer.rtpParameters,
           type: newConsumer.type,
           producerPaused: newConsumer.producerPaused,
+        },
+      });
+  }
+
+  async onNewJSONConsumer(event: {
+    type: "newJSONConsumer";
+    consumerType: "json";
+    sctpCapabilities: SctpCapabilities;
+    producerUsername: string;
+    producerInstance: string;
+    incomingProducerId: string;
+    table_id: string;
+    username: string;
+    instance: string;
+    dataStreamType: DataStreamTypes;
+  }) {
+    let newConsumer: {
+      consumer: DataConsumer;
+      producerId: string;
+      id: string;
+      label: string;
+      sctpStreamParameters: SctpStreamParameters | undefined;
+      type: string;
+      producerPaused: boolean;
+      protocol: string;
+    };
+
+    // Get the consumer transport associated with the user
+    const transport =
+      tableConsumerTransports[event.table_id][event.username][event.instance]
+        .transport;
+
+    const producer =
+      tableProducers[event.table_id][event.producerUsername][
+        event.producerInstance
+      ]?.[event.consumerType]?.[event.dataStreamType];
+
+    if (!producer) {
+      console.error(`No producer found`);
+      return;
+    }
+
+    try {
+      const consumer = await transport.consumeData({
+        dataProducerId: producer.id,
+        // @ts-expect-error: praise the lord he's done it again
+        label: jsonProducer.label,
+      });
+
+      newConsumer = {
+        consumer: consumer,
+        producerId: producer.id,
+        id: consumer.id,
+        label: consumer.label,
+        // @ts-expect-error: hell if I know but it works
+        sctpStreamParameters: consumer.sctpStreamParameters,
+        type: consumer.type,
+        producerPaused: consumer.dataProducerPaused,
+        protocol: consumer.protocol,
+      };
+    } catch (_error) {
+      return;
+    }
+
+    if (!tableConsumers[event.table_id]) {
+      tableConsumers[event.table_id] = {};
+    }
+    if (!tableConsumers[event.table_id][event.username]) {
+      tableConsumers[event.table_id][event.username] = {};
+    }
+    if (!tableConsumers[event.table_id][event.username][event.instance]) {
+      tableConsumers[event.table_id][event.username][event.instance] = {};
+    }
+    if (
+      !tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ]
+    ) {
+      tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ] = {};
+    }
+    if (
+      !tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.producerInstance]
+    ) {
+      tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.producerInstance] = {};
+    }
+    if (
+      !tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.consumerType]
+    ) {
+      tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.producerInstance][event.consumerType] = {};
+    }
+
+    if (event.incomingProducerId) {
+      tableConsumers[event.table_id][event.username][event.instance][
+        event.producerUsername
+      ][event.producerInstance][event.consumerType]![event.dataStreamType] =
+        newConsumer;
+    }
+
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", {
+        type: "newJSONConsumerSubscribed",
+        producerUsername: event.producerUsername,
+        producerInstance: event.producerInstance,
+        consumerId: event.incomingProducerId,
+        consumerType: event.consumerType,
+        data: {
+          producerId: newConsumer.producerId,
+          id: newConsumer.id,
+          label: newConsumer.label,
+          sctpStreamParameters: newConsumer.sctpStreamParameters,
+          type: newConsumer.type,
+          producerPaused: newConsumer.producerPaused,
+          dataStreamType: event.dataStreamType,
         },
       });
   }

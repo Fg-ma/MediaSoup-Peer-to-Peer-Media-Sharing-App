@@ -48,7 +48,17 @@ class Consumers {
         [screenId: string]: MediaStream;
       },
       remoteAudioStream: MediaStream | undefined
-    ) => void
+    ) => void,
+
+    private remoteDataStreams: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: {
+          positionScaleRotation?:
+            | mediasoup.types.DataConsumer<mediasoup.types.AppData>
+            | undefined;
+        };
+      };
+    }>
   ) {}
 
   async onSubscribed(event: {
@@ -86,7 +96,7 @@ class Consumers {
             producerPaused: boolean;
           };
           json?: {
-            positionScaleRotation?: {
+            [dataStreamType in DataStreamTypes]?: {
               producerId: string;
               id: string;
               label: string;
@@ -198,6 +208,9 @@ class Consumers {
               protocol,
             });
             newRemoteDataStream[jsonId as DataStreamTypes] = consumer;
+            consumer.on("message", (message) => {
+              console.log(message);
+            });
           }
         }
 
@@ -206,7 +219,10 @@ class Consumers {
         }
         this.remoteTracksMap.current[producerUsername][producerInstance] =
           newRemoteTrack;
-        this.remoteDataStream.current[producerUsername][producerInstance] =
+        if (!this.remoteDataStreams.current[producerUsername]) {
+          this.remoteDataStreams.current[producerUsername] = {};
+        }
+        this.remoteDataStreams.current[producerUsername][producerInstance] =
           newRemoteDataStream;
       }
     }
@@ -346,7 +362,7 @@ class Consumers {
   }
 
   async onNewConsumerSubscribed(event: {
-    type: string;
+    type: "newConsumerSubscribed";
     producerUsername: string;
     producerInstance: string;
     consumerId?: string;
@@ -509,6 +525,74 @@ class Consumers {
       instance: this.instance.current,
     };
     this.socket.current.send(msg);
+
+    const message = {
+      type: "newConsumerCreated",
+      table_id: this.table_id.current,
+      username: this.username.current,
+      instance: this.instance.current,
+      producerUsername: event.producerUsername,
+      producerInstance: event.producerInstance,
+      consumerId: event.consumerId,
+      consumerType: event.consumerType,
+    };
+    this.socket.current.emit("message", message);
+  }
+
+  async onNewJSONConsumerSubscribed(event: {
+    type: "newJSONConsumerSubscribed";
+    producerUsername: string;
+    producerInstance: string;
+    consumerId?: string;
+    consumerType: "json";
+    data: {
+      producerId: string;
+      id: string;
+      label: string;
+      sctpStreamParameters: SctpStreamParameters;
+      type: string;
+      producerPaused: boolean;
+      protocol: string;
+    };
+  }) {
+    if (event.producerInstance === this.instance.current) {
+      return;
+    }
+
+    const { producerId, id, label, sctpStreamParameters, protocol } =
+      event.data;
+    const consumer = await this.consumerTransport.current?.consumeData({
+      id,
+      dataProducerId: producerId,
+      sctpStreamParameters,
+      label,
+      protocol,
+    });
+
+    if (!consumer) {
+      console.error("Failed to create camera consumer!");
+      return;
+    }
+
+    if (!this.remoteDataStreams.current[event.producerUsername]) {
+      this.remoteDataStreams.current[event.producerUsername] = {};
+    }
+    if (
+      !this.remoteDataStreams.current[event.producerUsername][
+        event.producerInstance
+      ]
+    ) {
+      this.remoteDataStreams.current[event.producerUsername][
+        event.producerInstance
+      ] = {};
+    }
+    consumer.on("message", (message) => {
+      console.log("asasda", message);
+    });
+
+    this.remoteDataStreams.current[event.producerUsername][
+      event.producerInstance
+    ][label as DataStreamTypes] = consumer;
 
     const message = {
       type: "newConsumerCreated",

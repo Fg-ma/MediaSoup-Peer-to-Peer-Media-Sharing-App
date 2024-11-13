@@ -12,6 +12,7 @@ import {
 } from "./context/currentEffectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
+  DataStreamTypes,
   defaultAudioStreamEffects,
   defaultCameraStreamEffects,
   defaultScreenStreamEffects,
@@ -30,7 +31,7 @@ import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
 import Deadbanding from "./babylon/Deadbanding";
 import FgMetaData from "./lib/FgMetaData";
-import JSONButton from "./JSONButton";
+import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")
@@ -100,6 +101,17 @@ type MediasoupSocketEvents =
               type: string;
               producerPaused: boolean;
             };
+            json?: {
+              [dataStreamType in DataStreamTypes]?: {
+                producerId: string;
+                id: string;
+                label: string;
+                sctpStreamParameters: SctpStreamParameters;
+                type: string;
+                producerPaused: boolean;
+                protocol: string;
+              };
+            };
           };
         };
       };
@@ -119,6 +131,22 @@ type MediasoupSocketEvents =
         producerPaused: boolean;
       };
     }
+  | {
+      type: "newJSONConsumerSubscribed";
+      producerUsername: string;
+      producerInstance: string;
+      consumerId?: string;
+      consumerType: "json";
+      data: {
+        producerId: string;
+        id: string;
+        label: string;
+        sctpStreamParameters: SctpStreamParameters;
+        type: string;
+        producerPaused: boolean;
+        protocol: string;
+      };
+    }
   | { type: "newProducer"; producerType: "camera" | "screen" | "audio" }
   | {
       type: "newProducerAvailable";
@@ -126,6 +154,14 @@ type MediasoupSocketEvents =
       producerInstance: string;
       producerType: string;
       producerId?: string;
+    }
+  | {
+      type: "newJSONProducerAvailable";
+      producerUsername: string;
+      producerInstance: string;
+      producerType: string;
+      producerId: string;
+      dataStreamType: DataStreamTypes;
     }
   | {
       type: "producerDisconnected";
@@ -155,6 +191,8 @@ export default function Main() {
     userStreamEffects,
     remoteStreamEffects,
     remoteTracksMap,
+    remoteDataStreams,
+    userDataStreams,
   } = useStreamsContext();
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
@@ -192,9 +230,6 @@ export default function Main() {
   const [_, setMutedAudio] = useState(false);
   const isAudio = useRef(false);
   const [audioActive, setAudioActive] = useState(false);
-
-  const isJSON = useRef(false);
-  const [_jsonActive, setJSONActive] = useState(false);
 
   const subBtnRef = useRef<HTMLButtonElement>(null);
   const [subscribedActive, setSubscribedActive] = useState(false);
@@ -275,11 +310,17 @@ export default function Main() {
       case "newConsumerSubscribed":
         consumers.onNewConsumerSubscribed(event);
         break;
+      case "newJSONConsumerSubscribed":
+        consumers.onNewJSONConsumerSubscribed(event);
+        break;
       case "newProducer":
         producers.createNewProducer(event.producerType);
         break;
       case "newProducerAvailable":
         producers.onNewProducerAvailable(event);
+        break;
+      case "newJSONProducerAvailable":
+        producers.onNewJSONProducerAvailable(event);
         break;
       case "producerDisconnected":
         producers.onProducerDisconnected(event);
@@ -480,12 +521,12 @@ export default function Main() {
     currentEffectsStyles,
     userStreamEffects,
     remoteTracksMap,
+    userDataStreams,
     userCameraCount,
     userScreenCount,
     isCamera,
     isScreen,
     isAudio,
-    isJSON,
     isSubscribed,
     handleDisableEnableBtns,
     producerTransport,
@@ -508,7 +549,8 @@ export default function Main() {
     consumerTransport,
     remoteTracksMap,
     setUpEffectContext,
-    bundlesController.createConsumerBundle
+    bundlesController.createConsumerBundle,
+    remoteDataStreams
   );
 
   const fgMetaData = new FgMetaData(
@@ -708,15 +750,6 @@ export default function Main() {
             )}
         </div>
       </div>
-      <JSONButton
-        table_id={table_id}
-        username={username}
-        instance={instance}
-        device={device}
-        socket={socket}
-        isJSON={isJSON}
-        setJSONActive={setJSONActive}
-      />
     </div>
   );
 }
