@@ -25,6 +25,9 @@ import {
 } from "../fgVideoControls/lib/ClosedCaptionsPage";
 import FgVideoController from "../fgVideo/lib/FgVideoController";
 import { HideBackgroundEffectTypes } from "src/context/currentEffectsStylesContext/typeConstant";
+import MovementButton from "./MovementButton";
+import RotateButton from "./RotateButton";
+import ScaleButton from "./ScaleButton";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -166,6 +169,7 @@ export default function FgBabylonCanvas({
     useCurrentEffectsStylesContext();
 
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const subContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [inVideo, setInVideo] = useState(true);
@@ -209,12 +213,15 @@ export default function FgBabylonCanvas({
 
   const initTimeOffset = useRef(0);
 
+  const [position, setPosition] = useState({ left: 50, top: 50 });
+  const [scale, setScale] = useState({ x: 25, y: 25 });
+  const [rotation, setRotation] = useState(0);
+
   useEffect(() => {
-    if (
-      canvasContainerRef.current &&
-      userMedia.current[type][videoId]?.canvas
-    ) {
-      canvasContainerRef.current.appendChild(
+    if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {
+      userMedia.current[type][videoId].canvas.style.position = "absolute";
+      userMedia.current[type][videoId].canvas.style.top = "0%";
+      subContainerRef.current.appendChild(
         userMedia.current[type][videoId].canvas
       );
     }
@@ -408,6 +415,168 @@ export default function FgBabylonCanvas({
     };
   }, []);
 
+  const movementDragFunction = (displacement: { x: number; y: number }) => {
+    if (!bundleRef.current || !subContainerRef.current) {
+      return;
+    }
+
+    setPosition({
+      left: Math.max(
+        Math.min(
+          (displacement.x / bundleRef.current.clientWidth -
+            subContainerRef.current.clientWidth /
+              bundleRef.current.clientWidth) *
+            100,
+          (1 -
+            subContainerRef.current.clientWidth /
+              bundleRef.current.clientWidth) *
+            100
+        ),
+        0
+      ),
+      top: Math.max(
+        Math.min(
+          (displacement.y / bundleRef.current.clientHeight -
+            (subContainerRef.current.clientWidth + 10) /
+              2 /
+              bundleRef.current.clientWidth) *
+            100,
+          (1 -
+            subContainerRef.current.clientHeight /
+              bundleRef.current.clientHeight) *
+            100
+        ),
+        0
+      ),
+    });
+  };
+
+  const scaleDragFunction = (displacement: { x: number; y: number }) => {
+    if (!bundleRef.current || !subContainerRef.current) {
+      return;
+    }
+    const bundleRect = bundleRef.current.getBoundingClientRect();
+    const subContainerRect = subContainerRef.current.getBoundingClientRect();
+    const referenceX = subContainerRect.left - bundleRect.left;
+    const referenceY = subContainerRect.top - bundleRect.top;
+
+    setScale({
+      x: Math.max(
+        6,
+        ((Math.min(displacement.x, bundleRef.current.clientWidth) -
+          referenceX) /
+          bundleRef.current.clientWidth) *
+          100
+      ),
+      y: Math.max(
+        6,
+        ((Math.min(displacement.y, bundleRef.current.clientHeight) -
+          referenceY) /
+          bundleRef.current.clientHeight) *
+          100
+      ),
+    });
+  };
+
+  const rotateTriangleToAlign = (
+    purple: { x: number; y: number },
+    orange: { x: number; y: number },
+    red: { x: number; y: number },
+    blue: { x: number; y: number }
+  ) => {
+    const vectorToRed = { x: red.x - orange.x, y: red.y - orange.y };
+    const vectorToPurple = { x: purple.x - orange.x, y: purple.y - orange.y };
+
+    const angleToRed = Math.atan2(vectorToRed.y, vectorToRed.x);
+    const angleToPurple = Math.atan2(vectorToPurple.y, vectorToPurple.x);
+
+    // Calculate the required rotation angle to align purple point with the red vector.
+    const rotationAngle = angleToRed - angleToPurple;
+
+    // Rotation matrix components based on the rotationAngle
+    const cosTheta = Math.cos(rotationAngle);
+    const sinTheta = Math.sin(rotationAngle);
+
+    // Helper function to apply the rotation matrix
+    function rotateAroundOrange(point: { x: number; y: number }) {
+      // Translate point to origin (relative to orange), apply rotation, then translate back
+      const translatedX = point.x - orange.x;
+      const translatedY = point.y - orange.y;
+
+      return {
+        x: translatedX * cosTheta - translatedY * sinTheta + orange.x,
+        y: translatedX * sinTheta + translatedY * cosTheta + orange.y,
+      };
+    }
+
+    // Step 5: Rotate all points in the triangle around the orange point
+    const rotatedPurple = rotateAroundOrange(purple);
+    const rotatedRed = rotateAroundOrange(red);
+    const rotatedBlue = rotateAroundOrange(blue);
+
+    // Step 6: Calculate the angle of the rotated red point with respect to the x-axis, relative to the orange point
+    const finalVectorToRed = {
+      x: rotatedRed.x - orange.x,
+      y: rotatedRed.y - orange.y,
+    };
+    const finalAngleRedX = Math.atan2(finalVectorToRed.y, finalVectorToRed.x);
+
+    // Return the rotated coordinates and the final angle
+    return {
+      rotatedPoints: {
+        purple: rotatedPurple,
+        orange: orange, // unchanged
+        red: rotatedRed,
+        blue: rotatedBlue,
+      },
+      finalAngleRedX: finalAngleRedX * (180 / Math.PI), // convert to degrees for easier interpretation
+    };
+  };
+
+  const rotateDragFunction = (displacement: { x: number; y: number }) => {
+    if (!bundleRef.current || !subContainerRef.current) {
+      return;
+    }
+
+    const subContainerRect = subContainerRef.current.getBoundingClientRect();
+
+    const topRightCorner = {
+      x: subContainerRect.right,
+      y: subContainerRect.top,
+    };
+
+    const bottomLeftCorner = {
+      x: subContainerRect.left,
+      y: subContainerRect.bottom,
+    };
+
+    const bottomRightCorner = {
+      x: subContainerRect.right,
+      y: subContainerRect.bottom,
+    };
+
+    console.log(
+      topRightCorner,
+      bottomLeftCorner,
+      bottomRightCorner,
+      displacement,
+      rotateTriangleToAlign(
+        topRightCorner,
+        bottomLeftCorner,
+        bottomRightCorner,
+        displacement
+      ).finalAngleRedX
+    );
+    setRotation(
+      rotateTriangleToAlign(
+        topRightCorner,
+        bottomLeftCorner,
+        bottomRightCorner,
+        displacement
+      ).finalAngleRedX
+    );
+  };
+
   return (
     <div
       ref={canvasContainerRef}
@@ -416,62 +585,77 @@ export default function FgBabylonCanvas({
         fgVideoOptions.autoPlay ? "" : "paused"
       } ${effectsActive ? "in-effects" : ""} ${
         audioEffectsActive ? "in-effects" : ""
-      } ${
-        inVideo ? "in-video" : ""
-      } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md h-[${
-        userMedia.current[type][videoId].canvas.height
-      }px] w-[${
-        userMedia.current[type][videoId].canvas.width
-      }px] max-h-[720px] max-w-[1280px]`}
+      } ${inVideo ? "in-video" : ""}
+        flex items-center justify-center`}
+      style={{
+        position: "absolute",
+        left: `${position.left}%`,
+        top: `${position.top}%`,
+        height: `${scale.y}%`,
+        width: `${scale.x}%`,
+        rotate: `${rotation}deg`,
+        transformOrigin: "0% 100%",
+      }}
       onMouseEnter={() => controls.handleMouseEnter()}
       onMouseLeave={() => controls.handleMouseLeave()}
     >
-      <FgVideoNavigation
-        name={name}
-        username={username}
-        isClose={fgVideoOptions.isClose}
-        controls={controls}
+      <RotateButton dragFunction={rotateDragFunction} bundleRef={bundleRef} />
+      <MovementButton
+        dragFunction={movementDragFunction}
+        bundleRef={bundleRef}
       />
-      <FgVideoControls
-        socket={socket}
-        table_id={table_id}
-        username={username}
-        instance={instance}
-        type={type}
-        videoId={videoId}
-        controls={controls}
-        pausedState={pausedState}
-        clientMute={clientMute}
-        localMute={localMute}
-        videoContainerRef={canvasContainerRef}
-        audioStream={audioStream}
-        audioRef={audioRef}
-        currentTimeRef={currentTimeRef}
-        tintColor={tintColor}
-        effectsActive={effectsActive}
-        audioEffectsActive={audioEffectsActive}
-        setAudioEffectsActive={setAudioEffectsActive}
-        settings={settings}
-        setSettings={setSettings}
-        fgVideoOptions={fgVideoOptions}
-        handleVisualEffectChange={handleVisualEffectChange}
-        handleAudioEffectChange={handleAudioEffectChange}
-        handleMuteCallback={handleMuteCallback}
-        handleVolumeSliderCallback={handleVolumeSliderCallback}
-        tracksColorSetterCallback={tracksColorSetterCallback}
-      />
+      <ScaleButton dragFunction={scaleDragFunction} bundleRef={bundleRef} />
       <div
-        className='controls-gradient absolute bottom-0 w-full h-20 z-10'
-        style={{
-          background: `linear-gradient(to top, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
-        }}
-      ></div>
-      <div
-        className='controls-gradient absolute top-0 w-full h-20 z-10'
-        style={{
-          background: `linear-gradient(to bottom, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
-        }}
-      ></div>
+        ref={subContainerRef}
+        className={`relative flex items-center justify-center text-white font-K2D h-full w-full overflow-hidden rounded-md`}
+      >
+        <FgVideoNavigation
+          name={name}
+          username={username}
+          isClose={fgVideoOptions.isClose}
+          controls={controls}
+        />
+        <FgVideoControls
+          socket={socket}
+          table_id={table_id}
+          username={username}
+          instance={instance}
+          type={type}
+          videoId={videoId}
+          controls={controls}
+          pausedState={pausedState}
+          clientMute={clientMute}
+          localMute={localMute}
+          videoContainerRef={canvasContainerRef}
+          audioStream={audioStream}
+          audioRef={audioRef}
+          currentTimeRef={currentTimeRef}
+          tintColor={tintColor}
+          effectsActive={effectsActive}
+          audioEffectsActive={audioEffectsActive}
+          setAudioEffectsActive={setAudioEffectsActive}
+          settings={settings}
+          setSettings={setSettings}
+          fgVideoOptions={fgVideoOptions}
+          handleVisualEffectChange={handleVisualEffectChange}
+          handleAudioEffectChange={handleAudioEffectChange}
+          handleMuteCallback={handleMuteCallback}
+          handleVolumeSliderCallback={handleVolumeSliderCallback}
+          tracksColorSetterCallback={tracksColorSetterCallback}
+        />
+        <div
+          className='controls-gradient absolute bottom-0 w-full h-20 z-10'
+          style={{
+            background: `linear-gradient(to top, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
+          }}
+        ></div>
+        <div
+          className='controls-gradient absolute top-0 w-full h-20 z-10'
+          style={{
+            background: `linear-gradient(to bottom, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
+          }}
+        ></div>
+      </div>
     </div>
   );
 }

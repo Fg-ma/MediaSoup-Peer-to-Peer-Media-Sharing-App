@@ -750,7 +750,11 @@ export default function Main() {
               (username) =>
                 Object.keys(bundles[username]).length !== 0 &&
                 Object.entries(bundles[username]).map(([key, bundle]) => (
-                  <div key={key} id={`${key}_bundle`}>
+                  <div
+                    className='w-full h-full absolute top-0 left-0'
+                    key={key}
+                    id={`${key}_bundle`}
+                  >
                     {bundle}
                   </div>
                 ))

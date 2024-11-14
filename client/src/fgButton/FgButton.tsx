@@ -53,6 +53,8 @@ export default function FgButton({
   holdFunction,
   contentFunction,
   doubleClickFunction,
+  dragFunction,
+  referenceDragElement,
   focusFunction,
   blurFunction,
   holdContent,
@@ -79,6 +81,8 @@ export default function FgButton({
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: (event: React.MouseEvent) => void;
+  dragFunction?: (displacement: { x: number; y: number }) => void;
+  referenceDragElement?: React.RefObject<HTMLElement>;
   focusFunction?: (event: React.FocusEvent) => void;
   blurFunction?: (event: React.FocusEvent) => void;
   holdContent?: React.ReactElement;
@@ -122,6 +126,10 @@ export default function FgButton({
   const toggleClickContentRef = useRef<HTMLDivElement>(null);
 
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const startDragPosition = useRef<{ x: number; y: number } | undefined>(
+    undefined
+  );
 
   // Use useCallback to memoize the toggleHold function
   const toggleHold = useCallback(
@@ -174,6 +182,11 @@ export default function FgButton({
         }
       }, fgButtonOptions.holdTimeoutDuration);
     }
+
+    if (dragFunction) {
+      startDragPosition.current = { x: event.clientX, y: event.clientY };
+      window.addEventListener("mousemove", handleDragMouseMove);
+    }
   };
 
   const handleMouseUp = (event: MouseEvent) => {
@@ -219,6 +232,10 @@ export default function FgButton({
       setIsHeld(false);
       isClicked.current = false;
     }
+
+    if (dragFunction) {
+      window.removeEventListener("mousemove", handleDragMouseMove);
+    }
   };
 
   const handleDoubleClick = (event: React.MouseEvent) => {
@@ -263,6 +280,27 @@ export default function FgButton({
           handleMouseMove(event as unknown as MouseEvent)
         );
       }
+    }
+  };
+
+  const handleDragMouseMove = (event: MouseEvent) => {
+    if (dragFunction === undefined || startDragPosition.current === undefined) {
+      return;
+    }
+
+    if (referenceDragElement?.current) {
+      const rect = referenceDragElement.current.getBoundingClientRect();
+      dragFunction({
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      });
+    } else {
+      dragFunction({
+        x: event.clientX - startDragPosition.current.x,
+        y: event.clientY - startDragPosition.current.y,
+      });
+
+      startDragPosition.current = { x: event.clientX, y: event.clientY };
     }
   };
 

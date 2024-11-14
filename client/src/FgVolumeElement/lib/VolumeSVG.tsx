@@ -23,7 +23,6 @@ export default function VolumeSVG({
   color?: string;
   duration?: number;
 }) {
-  console.log(volumeState);
   const [_, setRerender] = useState(true);
   const progress = useMotionValue(0);
   const prevVolumeState = useRef<string | undefined>();
