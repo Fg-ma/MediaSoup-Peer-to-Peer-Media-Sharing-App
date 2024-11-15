@@ -81,7 +81,10 @@ export default function FgButton({
   holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: (event: React.MouseEvent) => void;
-  dragFunction?: (displacement: { x: number; y: number }) => void;
+  dragFunction?: (
+    displacement: { x: number; y: number },
+    event: MouseEvent
+  ) => void;
   referenceDragElement?: React.RefObject<HTMLElement>;
   focusFunction?: (event: React.FocusEvent) => void;
   blurFunction?: (event: React.FocusEvent) => void;
@@ -290,15 +293,21 @@ export default function FgButton({
 
     if (referenceDragElement?.current) {
       const rect = referenceDragElement.current.getBoundingClientRect();
-      dragFunction({
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      });
+      dragFunction(
+        {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+        },
+        event
+      );
     } else {
-      dragFunction({
-        x: event.clientX - startDragPosition.current.x,
-        y: event.clientY - startDragPosition.current.y,
-      });
+      dragFunction(
+        {
+          x: event.clientX - startDragPosition.current.x,
+          y: event.clientY - startDragPosition.current.y,
+        },
+        event
+      );
 
       startDragPosition.current = { x: event.clientX, y: event.clientY };
     }

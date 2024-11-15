@@ -218,6 +218,24 @@ export default function FgBabylonCanvas({
   const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
+    if (!subContainerRef.current) {
+      return;
+    }
+
+    const subContainerRect = subContainerRef.current.getBoundingClientRect();
+
+    positioning.current = {
+      ...positioning.current,
+      initTop: subContainerRect.top,
+      initBottom: subContainerRect.bottom,
+      initLeft: subContainerRect.left,
+      initRight: subContainerRect.right,
+      initWidth: subContainerRect.width,
+      initHeight: subContainerRect.height,
+    };
+  }, []);
+
+  useEffect(() => {
     if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {
       userMedia.current[type][videoId].canvas.style.position = "absolute";
       userMedia.current[type][videoId].canvas.style.top = "0%";
@@ -415,17 +433,46 @@ export default function FgBabylonCanvas({
     };
   }, []);
 
+  const positioning = useRef({
+    initTop: 0,
+    initBottom: 0,
+    initRight: 0,
+    initLeft: 0,
+    initWidth: 0,
+    initHeight: 0,
+    initRotationMouse: { x: 0, y: 0 },
+    initMovementMouse: { x: 0, y: 0 },
+  });
+
+  const movementMouseDownFunction = (event: React.MouseEvent) => {
+    if (!bundleRef.current) {
+      return;
+    }
+
+    positioning.current = {
+      ...positioning.current,
+      initMovementMouse: {
+        x: event.clientX - bundleRef.current.clientLeft,
+        y: event.clientY - bundleRef.current.clientTop,
+      },
+    };
+  };
+
   const movementDragFunction = (displacement: { x: number; y: number }) => {
     if (!bundleRef.current || !subContainerRef.current) {
       return;
     }
 
+    const angle = 2 * Math.PI - rotation * (Math.PI / 180);
+
     setPosition({
       left: Math.max(
         Math.min(
-          (displacement.x / bundleRef.current.clientWidth -
-            subContainerRef.current.clientWidth /
-              bundleRef.current.clientWidth) *
+          ((displacement.x -
+            positioning.current.initWidth * Math.cos(angle) -
+            (positioning.current.initHeight / 2) *
+              Math.cos(Math.PI / 2 - angle)) /
+            bundleRef.current.clientWidth) *
             100,
           (1 -
             subContainerRef.current.clientWidth /
@@ -436,10 +483,11 @@ export default function FgBabylonCanvas({
       ),
       top: Math.max(
         Math.min(
-          (displacement.y / bundleRef.current.clientHeight -
-            (subContainerRef.current.clientWidth + 10) /
-              2 /
-              bundleRef.current.clientWidth) *
+          ((displacement.y +
+            positioning.current.initWidth * Math.sin(angle) -
+            (positioning.current.initHeight / 2) *
+              Math.sin(Math.PI / 2 - angle)) /
+            bundleRef.current.clientHeight) *
             100,
           (1 -
             subContainerRef.current.clientHeight /
@@ -478,103 +526,78 @@ export default function FgBabylonCanvas({
     });
   };
 
-  const rotateTriangleToAlign = (
-    purple: { x: number; y: number },
-    orange: { x: number; y: number },
-    red: { x: number; y: number },
-    blue: { x: number; y: number }
+  const calculateRotationAngle = (
+    bottomLeft: { x: number; y: number },
+    topRight: { x: number; y: number },
+    mouse: { x: number; y: number }
   ) => {
-    const vectorToRed = { x: red.x - orange.x, y: red.y - orange.y };
-    const vectorToPurple = { x: purple.x - orange.x, y: purple.y - orange.y };
+    // Calculate the current vector from bottom-left to top-right
+    const currentVectorX = topRight.x - bottomLeft.x;
+    const currentVectorY = topRight.y - bottomLeft.y;
 
-    const angleToRed = Math.atan2(vectorToRed.y, vectorToRed.x);
-    const angleToPurple = Math.atan2(vectorToPurple.y, vectorToPurple.x);
+    // Calculate the target vector from bottom-left to the mouse
+    const targetVectorX = mouse.x - bottomLeft.x;
+    const targetVectorY = mouse.y - bottomLeft.y;
 
-    // Calculate the required rotation angle to align purple point with the red vector.
-    const rotationAngle = angleToRed - angleToPurple;
+    // Calculate angles from the x-axis for each vector
+    let currentAngle =
+      Math.atan2(currentVectorY, currentVectorX) * (180 / Math.PI);
+    // Math.atan2(currentVectorY, currentVectorX) * (180 / Math.PI);
+    let targetAngle =
+      Math.atan2(targetVectorY, targetVectorX) * (180 / Math.PI);
+    // console.log(currentAngle, targetAngle);
 
-    // Rotation matrix components based on the rotationAngle
-    const cosTheta = Math.cos(rotationAngle);
-    const sinTheta = Math.sin(rotationAngle);
+    // Normalize both angles to the range [0, 360)
+    if (currentAngle < 0) currentAngle += 360;
+    if (targetAngle < 0) targetAngle += 360;
 
-    // Helper function to apply the rotation matrix
-    function rotateAroundOrange(point: { x: number; y: number }) {
-      // Translate point to origin (relative to orange), apply rotation, then translate back
-      const translatedX = point.x - orange.x;
-      const translatedY = point.y - orange.y;
+    // Calculate the angle difference
+    let angleDifference = targetAngle - currentAngle;
 
-      return {
-        x: translatedX * cosTheta - translatedY * sinTheta + orange.x,
-        y: translatedX * sinTheta + translatedY * cosTheta + orange.y,
-      };
+    // Normalize the angle difference to ensure it's in the range [0, 360)
+    if (angleDifference < 0) angleDifference += 360;
+
+    return angleDifference;
+  };
+
+  const mouseDownRotateFunction = (event: React.MouseEvent) => {
+    if (!subContainerRef.current || rotation !== 0) {
+      return;
     }
 
-    // Step 5: Rotate all points in the triangle around the orange point
-    const rotatedPurple = rotateAroundOrange(purple);
-    const rotatedRed = rotateAroundOrange(red);
-    const rotatedBlue = rotateAroundOrange(blue);
-
-    // Step 6: Calculate the angle of the rotated red point with respect to the x-axis, relative to the orange point
-    const finalVectorToRed = {
-      x: rotatedRed.x - orange.x,
-      y: rotatedRed.y - orange.y,
-    };
-    const finalAngleRedX = Math.atan2(finalVectorToRed.y, finalVectorToRed.x);
-
-    // Return the rotated coordinates and the final angle
-    return {
-      rotatedPoints: {
-        purple: rotatedPurple,
-        orange: orange, // unchanged
-        red: rotatedRed,
-        blue: rotatedBlue,
-      },
-      finalAngleRedX: finalAngleRedX * (180 / Math.PI), // convert to degrees for easier interpretation
+    positioning.current = {
+      ...positioning.current,
+      initRotationMouse: { x: event.clientX, y: event.clientY },
     };
   };
 
-  const rotateDragFunction = (displacement: { x: number; y: number }) => {
+  const rotateDragFunction = (
+    _displacement: { x: number; y: number },
+    event: MouseEvent
+  ) => {
     if (!bundleRef.current || !subContainerRef.current) {
       return;
     }
 
-    const subContainerRect = subContainerRef.current.getBoundingClientRect();
+    const bundleRect = bundleRef.current.getBoundingClientRect();
 
-    const topRightCorner = {
-      x: subContainerRect.right,
-      y: subContainerRect.top,
-    };
-
-    const bottomLeftCorner = {
-      x: subContainerRect.left,
-      y: subContainerRect.bottom,
-    };
-
-    const bottomRightCorner = {
-      x: subContainerRect.right,
-      y: subContainerRect.bottom,
-    };
-
-    console.log(
-      topRightCorner,
-      bottomLeftCorner,
-      bottomRightCorner,
-      displacement,
-      rotateTriangleToAlign(
-        topRightCorner,
-        bottomLeftCorner,
-        bottomRightCorner,
-        displacement
-      ).finalAngleRedX
+    const angle = calculateRotationAngle(
+      {
+        x:
+          (position.left / 100) * bundleRef.current.clientWidth +
+          bundleRect.left,
+        y:
+          (position.top / 100) * bundleRef.current.clientHeight +
+          bundleRect.top,
+      },
+      positioning.current.initRotationMouse,
+      {
+        x: event.clientX,
+        y: event.clientY,
+      }
     );
-    setRotation(
-      rotateTriangleToAlign(
-        topRightCorner,
-        bottomLeftCorner,
-        bottomRightCorner,
-        displacement
-      ).finalAngleRedX
-    );
+
+    setRotation(angle);
   };
 
   return (
@@ -594,14 +617,19 @@ export default function FgBabylonCanvas({
         height: `${scale.y}%`,
         width: `${scale.x}%`,
         rotate: `${rotation}deg`,
-        transformOrigin: "0% 100%",
+        transformOrigin: "0% 0%",
       }}
       onMouseEnter={() => controls.handleMouseEnter()}
       onMouseLeave={() => controls.handleMouseLeave()}
     >
-      <RotateButton dragFunction={rotateDragFunction} bundleRef={bundleRef} />
+      <RotateButton
+        dragFunction={rotateDragFunction}
+        mouseDownFunction={mouseDownRotateFunction}
+        bundleRef={bundleRef}
+      />
       <MovementButton
         dragFunction={movementDragFunction}
+        mouseDownFunction={movementMouseDownFunction}
         bundleRef={bundleRef}
       />
       <ScaleButton dragFunction={scaleDragFunction} bundleRef={bundleRef} />
