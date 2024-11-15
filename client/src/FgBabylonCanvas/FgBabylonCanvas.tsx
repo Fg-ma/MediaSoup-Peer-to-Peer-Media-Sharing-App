@@ -465,17 +465,22 @@ export default function FgBabylonCanvas({
 
     const angle = 2 * Math.PI - rotation * (Math.PI / 180);
 
+    const pixelScale = {
+      x: (scale.x / 100) * bundleRef.current.clientWidth,
+      y: (scale.y / 100) * bundleRef.current.clientHeight,
+    };
+    console.log(angle, pixelScale.y * Math.sin(90 - angle));
     setPosition({
       left: Math.max(
         Math.min(
           ((displacement.x -
-            positioning.current.initWidth * Math.cos(angle) -
-            (positioning.current.initHeight / 2) *
-              Math.cos(Math.PI / 2 - angle)) /
+            pixelScale.x * Math.cos(angle) -
+            (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle)) /
             bundleRef.current.clientWidth) *
             100,
           (1 -
-            subContainerRef.current.clientWidth /
+            (pixelScale.x * Math.cos(angle) +
+              pixelScale.y * Math.cos(Math.PI / 2 - angle)) /
               bundleRef.current.clientWidth) *
             100
         ),
@@ -484,17 +489,16 @@ export default function FgBabylonCanvas({
       top: Math.max(
         Math.min(
           ((displacement.y +
-            positioning.current.initWidth * Math.sin(angle) -
-            (positioning.current.initHeight / 2) *
-              Math.sin(Math.PI / 2 - angle)) /
+            pixelScale.x * Math.sin(angle) -
+            (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle)) /
             bundleRef.current.clientHeight) *
             100,
           (1 -
-            subContainerRef.current.clientHeight /
-              bundleRef.current.clientHeight) *
+            (pixelScale.y * Math.cos(angle)) / bundleRef.current.clientHeight) *
             100
         ),
-        0
+        ((pixelScale.x * Math.sin(angle)) / bundleRef.current.clientHeight) *
+          100
       ),
     });
   };
@@ -505,20 +509,20 @@ export default function FgBabylonCanvas({
     }
     const bundleRect = bundleRef.current.getBoundingClientRect();
     const subContainerRect = subContainerRef.current.getBoundingClientRect();
-    const referenceX = subContainerRect.left - bundleRect.left;
-    const referenceY = subContainerRect.top - bundleRect.top;
+    const referenceX = position.left;
+    const referenceY = position.top;
 
     setScale({
       x: Math.max(
         6,
-        ((Math.min(displacement.x, bundleRef.current.clientWidth) -
+        ((Math.min(displacement.x, bundleRef.current.clientWidth) +
           referenceX) /
           bundleRef.current.clientWidth) *
           100
       ),
       y: Math.max(
         6,
-        ((Math.min(displacement.y, bundleRef.current.clientHeight) -
+        ((Math.min(displacement.y, bundleRef.current.clientHeight) +
           referenceY) /
           bundleRef.current.clientHeight) *
           100
