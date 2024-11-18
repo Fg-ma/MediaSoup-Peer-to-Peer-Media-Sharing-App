@@ -438,6 +438,8 @@ export default function FgBabylonCanvas({
           position,
           scale,
           rotation,
+          bundleWidth: bundleRef.current?.clientWidth,
+          bundleHeight: bundleRef.current?.clientHeight,
         })
       );
     }

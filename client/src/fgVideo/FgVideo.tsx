@@ -430,6 +430,31 @@ export default function FgVideo({
     }
   }, [position, scale, rotation]);
 
+  function transformAngleBetweenBoxes(
+    angle: number,
+    box1Width: number,
+    box1Height: number,
+    box2Width: number,
+    box2Height: number
+  ): number {
+    // Aspect ratios
+    const aspectRatio1 = box1Width / box1Height;
+    const aspectRatio2 = box2Width / box2Height;
+
+    // Components of the angle in the first box
+    const x1 = Math.cos(angle);
+    const y1 = Math.sin(angle);
+
+    // Scale components based on aspect ratios
+    const x2 = x1 / aspectRatio1; // Scale x-component by the first box's aspect ratio
+    const y2 = y1 / aspectRatio2; // Scale y-component by the second box's aspect ratio
+
+    // Compute the transformed angle in the second box
+    const transformedAngle = Math.atan2(y2, x2);
+
+    return transformedAngle;
+  }
+
   useEffect(() => {
     if (
       !fgVideoOptions.isUser &&
@@ -442,9 +467,21 @@ export default function FgVideo({
         (message) => {
           const data = JSON.parse(message);
 
+          if (!bundleRef.current) {
+            return;
+          }
+
+          const newAngle = transformAngleBetweenBoxes(
+            (data.rotation * Math.PI) / 180,
+            data.bundleWidth,
+            data.bundleHeight,
+            bundleRef.current.clientWidth,
+            bundleRef.current.clientHeight
+          );
+
           setPosition(data.position);
           setScale(data.scale);
-          setRotation(data.rotation);
+          setRotation((newAngle * 180) / Math.PI);
         }
       );
     }
@@ -494,7 +531,7 @@ export default function FgVideo({
           className='main-video w-full h-full absolute top-0 left-0'
           controls={false}
           autoPlay={fgVideoOptions.autoPlay}
-          style={videoStyles}
+          style={{ ...videoStyles, objectFit: "fill" }}
         ></video>
         <FgVideoNavigation
           name={name}
