@@ -25,9 +25,9 @@ import {
 } from "../fgVideoControls/lib/ClosedCaptionsPage";
 import FgVideoController from "../fgVideo/lib/FgVideoController";
 import { HideBackgroundEffectTypes } from "src/context/currentEffectsStylesContext/typeConstant";
-import MovementButton from "./MovementButton";
-import RotateButton from "./RotateButton";
-import ScaleButton from "./ScaleButton";
+import PanButton from "../fgVideo/lib/PanButton";
+import RotateButton from "../fgVideo/lib/RotateButton";
+import ScaleButton from "../fgVideo/lib/ScaleButton";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -163,8 +163,13 @@ export default function FgBabylonCanvas({
     ...options,
   };
 
-  const { userMedia, userStreamEffects, remoteStreamEffects } =
-    useStreamsContext();
+  const {
+    userMedia,
+    userStreamEffects,
+    remoteStreamEffects,
+    userDataStreams,
+    remoteDataStreams,
+  } = useStreamsContext();
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
 
@@ -216,38 +221,6 @@ export default function FgBabylonCanvas({
   const [position, setPosition] = useState({ left: 50, top: 50 });
   const [scale, setScale] = useState({ x: 25, y: 25 });
   const [rotation, setRotation] = useState(0);
-
-  useEffect(() => {
-    if (!subContainerRef.current) {
-      return;
-    }
-
-    const subContainerRect = subContainerRef.current.getBoundingClientRect();
-
-    positioning.current = {
-      ...positioning.current,
-      initTop: subContainerRect.top,
-      initBottom: subContainerRect.bottom,
-      initLeft: subContainerRect.left,
-      initRight: subContainerRect.right,
-      initWidth: subContainerRect.width,
-      initHeight: subContainerRect.height,
-    };
-  }, []);
-
-  useEffect(() => {
-    if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {
-      userMedia.current[type][videoId].canvas.style.position = "absolute";
-      userMedia.current[type][videoId].canvas.style.top = "0%";
-      subContainerRef.current.appendChild(
-        userMedia.current[type][videoId].canvas
-      );
-    }
-  }, [videoId, userMedia]);
-
-  useEffect(() => {
-    controls.updateCaptionsStyles();
-  }, [settings]);
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -348,8 +321,19 @@ export default function FgBabylonCanvas({
     canvasContainerRef,
     audioRef,
     fgVideoOptions,
-    handleVisualEffectChange
+    handleVisualEffectChange,
+    bundleRef,
+    position,
+    setPosition,
+    scale,
+    setScale,
+    rotation,
+    setRotation
   );
+
+  useEffect(() => {
+    controls.updateCaptionsStyles();
+  }, [settings]);
 
   useEffect(() => {
     // Set up initial conditions
@@ -433,176 +417,51 @@ export default function FgBabylonCanvas({
     };
   }, []);
 
-  const positioning = useRef({
-    initTop: 0,
-    initBottom: 0,
-    initRight: 0,
-    initLeft: 0,
-    initWidth: 0,
-    initHeight: 0,
-    initRotationMouse: { x: 0, y: 0 },
-    initMovementMouse: { x: 0, y: 0 },
-  });
-
-  const movementMouseDownFunction = (event: React.MouseEvent) => {
-    if (!bundleRef.current) {
-      return;
+  useEffect(() => {
+    if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {
+      userMedia.current[type][videoId].canvas.style.position = "absolute";
+      userMedia.current[type][videoId].canvas.style.top = "0%";
+      userMedia.current[type][videoId].canvas.style.left = "0%";
+      userMedia.current[type][videoId].canvas.style.width = "100%";
+      userMedia.current[type][videoId].canvas.style.height = "100%";
+      subContainerRef.current.appendChild(
+        userMedia.current[type][videoId].canvas
+      );
     }
+  }, [videoId, userMedia]);
 
-    positioning.current = {
-      ...positioning.current,
-      initMovementMouse: {
-        x: event.clientX - bundleRef.current.clientLeft,
-        y: event.clientY - bundleRef.current.clientTop,
-      },
-    };
-  };
-
-  const movementDragFunction = (displacement: { x: number; y: number }) => {
-    if (!bundleRef.current || !subContainerRef.current) {
-      return;
+  useEffect(() => {
+    if (fgVideoOptions.isUser) {
+      userDataStreams.current.positionScaleRotation?.send(
+        JSON.stringify({
+          id: videoId,
+          position,
+          scale,
+          rotation,
+        })
+      );
     }
+  }, [position, scale, rotation]);
 
-    const angle = 2 * Math.PI - rotation * (Math.PI / 180);
+  useEffect(() => {
+    if (
+      !fgVideoOptions.isUser &&
+      remoteDataStreams.current[username] &&
+      remoteDataStreams.current[username][instance] &&
+      remoteDataStreams.current[username][instance].positionScaleRotation
+    ) {
+      remoteDataStreams.current[username][instance].positionScaleRotation.on(
+        "message",
+        (message) => {
+          const data = JSON.parse(message);
 
-    const pixelScale = {
-      x: (scale.x / 100) * bundleRef.current.clientWidth,
-      y: (scale.y / 100) * bundleRef.current.clientHeight,
-    };
-    console.log(angle, pixelScale.y * Math.sin(90 - angle));
-    setPosition({
-      left: Math.max(
-        Math.min(
-          ((displacement.x -
-            pixelScale.x * Math.cos(angle) -
-            (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle)) /
-            bundleRef.current.clientWidth) *
-            100,
-          (1 -
-            (pixelScale.x * Math.cos(angle) +
-              pixelScale.y * Math.cos(Math.PI / 2 - angle)) /
-              bundleRef.current.clientWidth) *
-            100
-        ),
-        0
-      ),
-      top: Math.max(
-        Math.min(
-          ((displacement.y +
-            pixelScale.x * Math.sin(angle) -
-            (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle)) /
-            bundleRef.current.clientHeight) *
-            100,
-          (1 -
-            (pixelScale.y * Math.cos(angle)) / bundleRef.current.clientHeight) *
-            100
-        ),
-        ((pixelScale.x * Math.sin(angle)) / bundleRef.current.clientHeight) *
-          100
-      ),
-    });
-  };
-
-  const scaleDragFunction = (displacement: { x: number; y: number }) => {
-    if (!bundleRef.current || !subContainerRef.current) {
-      return;
+          setPosition(data.position);
+          setScale(data.scale);
+          setRotation(data.rotation);
+        }
+      );
     }
-    const bundleRect = bundleRef.current.getBoundingClientRect();
-    const subContainerRect = subContainerRef.current.getBoundingClientRect();
-    const referenceX = position.left;
-    const referenceY = position.top;
-
-    setScale({
-      x: Math.max(
-        6,
-        ((Math.min(displacement.x, bundleRef.current.clientWidth) +
-          referenceX) /
-          bundleRef.current.clientWidth) *
-          100
-      ),
-      y: Math.max(
-        6,
-        ((Math.min(displacement.y, bundleRef.current.clientHeight) +
-          referenceY) /
-          bundleRef.current.clientHeight) *
-          100
-      ),
-    });
-  };
-
-  const calculateRotationAngle = (
-    bottomLeft: { x: number; y: number },
-    topRight: { x: number; y: number },
-    mouse: { x: number; y: number }
-  ) => {
-    // Calculate the current vector from bottom-left to top-right
-    const currentVectorX = topRight.x - bottomLeft.x;
-    const currentVectorY = topRight.y - bottomLeft.y;
-
-    // Calculate the target vector from bottom-left to the mouse
-    const targetVectorX = mouse.x - bottomLeft.x;
-    const targetVectorY = mouse.y - bottomLeft.y;
-
-    // Calculate angles from the x-axis for each vector
-    let currentAngle =
-      Math.atan2(currentVectorY, currentVectorX) * (180 / Math.PI);
-    // Math.atan2(currentVectorY, currentVectorX) * (180 / Math.PI);
-    let targetAngle =
-      Math.atan2(targetVectorY, targetVectorX) * (180 / Math.PI);
-    // console.log(currentAngle, targetAngle);
-
-    // Normalize both angles to the range [0, 360)
-    if (currentAngle < 0) currentAngle += 360;
-    if (targetAngle < 0) targetAngle += 360;
-
-    // Calculate the angle difference
-    let angleDifference = targetAngle - currentAngle;
-
-    // Normalize the angle difference to ensure it's in the range [0, 360)
-    if (angleDifference < 0) angleDifference += 360;
-
-    return angleDifference;
-  };
-
-  const mouseDownRotateFunction = (event: React.MouseEvent) => {
-    if (!subContainerRef.current || rotation !== 0) {
-      return;
-    }
-
-    positioning.current = {
-      ...positioning.current,
-      initRotationMouse: { x: event.clientX, y: event.clientY },
-    };
-  };
-
-  const rotateDragFunction = (
-    _displacement: { x: number; y: number },
-    event: MouseEvent
-  ) => {
-    if (!bundleRef.current || !subContainerRef.current) {
-      return;
-    }
-
-    const bundleRect = bundleRef.current.getBoundingClientRect();
-
-    const angle = calculateRotationAngle(
-      {
-        x:
-          (position.left / 100) * bundleRef.current.clientWidth +
-          bundleRect.left,
-        y:
-          (position.top / 100) * bundleRef.current.clientHeight +
-          bundleRect.top,
-      },
-      positioning.current.initRotationMouse,
-      {
-        x: event.clientX,
-        y: event.clientY,
-      }
-    );
-
-    setRotation(angle);
-  };
+  }, []);
 
   return (
     <div
@@ -618,8 +477,8 @@ export default function FgBabylonCanvas({
         position: "absolute",
         left: `${position.left}%`,
         top: `${position.top}%`,
-        height: `${scale.y}%`,
         width: `${scale.x}%`,
+        height: `${scale.y}%`,
         rotate: `${rotation}deg`,
         transformOrigin: "0% 0%",
       }}
@@ -627,16 +486,17 @@ export default function FgBabylonCanvas({
       onMouseLeave={() => controls.handleMouseLeave()}
     >
       <RotateButton
-        dragFunction={rotateDragFunction}
-        mouseDownFunction={mouseDownRotateFunction}
+        dragFunction={fgVideoController.rotateDragFunction}
         bundleRef={bundleRef}
       />
-      <MovementButton
-        dragFunction={movementDragFunction}
-        mouseDownFunction={movementMouseDownFunction}
+      <PanButton
+        dragFunction={fgVideoController.movementDragFunction}
         bundleRef={bundleRef}
       />
-      <ScaleButton dragFunction={scaleDragFunction} bundleRef={bundleRef} />
+      <ScaleButton
+        dragFunction={fgVideoController.scaleDragFunction}
+        bundleRef={bundleRef}
+      />
       <div
         ref={subContainerRef}
         className={`relative flex items-center justify-center text-white font-K2D h-full w-full overflow-hidden rounded-md`}

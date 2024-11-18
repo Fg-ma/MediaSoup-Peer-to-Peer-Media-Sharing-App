@@ -16,6 +16,10 @@ export interface StreamsContextProviderProps {
   children: React.ReactNode;
 }
 
+export interface UserDataStreams {
+  positionScaleRotation?: DataProducer;
+}
+
 export interface StreamsContextType {
   userCameraCount: React.MutableRefObject<number>;
   userScreenCount: React.MutableRefObject<number>;
@@ -79,9 +83,7 @@ export interface StreamsContextType {
       };
     };
   }>;
-  userDataStreams: React.MutableRefObject<{
-    positionScaleRotation?: DataProducer;
-  }>;
+  userDataStreams: React.MutableRefObject<UserDataStreams>;
 }
 
 const StreamsContext = createContext<StreamsContextType | undefined>(undefined);
@@ -152,9 +154,7 @@ export function StreamsContextProvider({
       };
     };
   }>({});
-  const userDataStreams = useRef<{
-    positionScaleRotation?: DataProducer;
-  }>({});
+  const userDataStreams = useRef<UserDataStreams>({});
 
   return (
     <StreamsContext.Provider

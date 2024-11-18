@@ -208,9 +208,6 @@ class Consumers {
               protocol,
             });
             newRemoteDataStream[jsonId as DataStreamTypes] = consumer;
-            consumer.on("message", (message) => {
-              console.log(message);
-            });
           }
         }
 
@@ -586,9 +583,6 @@ class Consumers {
         event.producerInstance
       ] = {};
     }
-    consumer.on("message", (message) => {
-      console.log("asasda", message);
-    });
 
     this.remoteDataStreams.current[event.producerUsername][
       event.producerInstance

@@ -75,6 +75,31 @@
   margin-top: 0.375rem;
 }
 
+.pan-btn,
+.scale-btn,
+.rotate-btn {
+  display: none;
+  transition: display 150ms ease-in-out;
+}
+
+.video-container.in-video .pan-btn,
+.video-container.in-video .scale-btn,
+.video-container.in-video .rotate-btn,
+.video-container.paused .pan-btn,
+.video-container.paused .scale-btn,
+.video-container.paused .rotate-btn,
+.video-container.in-effects .pan-btn,
+.video-container.in-effects .scale-btn,
+.video-container.in-effects .rotate-btn,
+.video-container.in-settings .pan-btn,
+.video-container.in-settings .scale-btn,
+.video-container.in-settings .rotate-btn,
+.video-container.in-audio-effects .pan-btn,
+.video-container.in-audio-effects .scale-btn,
+.video-container.in-audio-effects .rotate-btn {
+  display: block;
+}
+
 .video-container.in-video .video-controls-container,
 .video-container.in-video .video-navigation-container,
 .video-container.in-video .controls-gradient,
@@ -91,14 +116,16 @@
 .video-container.in-audio-effects .video-navigation-container,
 .video-container.in-audio-effects .controls-gradient {
   opacity: 1;
-  transition-delay: 0s;
 }
 
 /* full-screen */
 .video-container.full-screen {
   max-width: initial;
-  width: 100%;
-  max-height: 100vh;
+  width: 100% !important;
+  max-height: 100vh !important;
+  left: 0% !important;
+  top: 0% !important;
+  rotate: 0deg !important;
 }
 
 .video-container.full-screen .video-controls {

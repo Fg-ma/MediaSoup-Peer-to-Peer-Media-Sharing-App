@@ -19,6 +19,7 @@ import AudioMedia from "./AudioMedia";
 import UserDevice from "../UserDevice";
 import BrowserMedia from "../BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
+import { UserDataStreams } from "src/context/streamsContext/StreamsContext";
 
 class Producers {
   constructor(
@@ -57,9 +58,7 @@ class Producers {
         };
       };
     }>,
-    private userDataStreams: React.MutableRefObject<{
-      positionScaleRotation?: mediasoup.types.DataProducer;
-    }>,
+    private userDataStreams: React.MutableRefObject<UserDataStreams>,
 
     private userCameraCount: React.MutableRefObject<number>,
     private userScreenCount: React.MutableRefObject<number>,

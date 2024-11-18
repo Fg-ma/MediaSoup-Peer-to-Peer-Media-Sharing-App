@@ -29,6 +29,9 @@ import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
 } from "../context/currentEffectsStylesContext/typeConstant";
+import RotateButton from "./lib/RotateButton";
+import PanButton from "./lib/PanButton";
+import ScaleButton from "./lib/ScaleButton";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -144,12 +147,18 @@ export default function FgVideo({
     ...options,
   };
 
-  const { userMedia, userStreamEffects, remoteStreamEffects } =
-    useStreamsContext();
+  const {
+    userMedia,
+    userStreamEffects,
+    remoteStreamEffects,
+    userDataStreams,
+    remoteDataStreams,
+  } = useStreamsContext();
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
+  const subContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [inVideo, setInVideo] = useState(true);
@@ -191,9 +200,9 @@ export default function FgVideo({
 
   const initTimeOffset = useRef(0);
 
-  useEffect(() => {
-    controls.updateCaptionsStyles();
-  }, [settings]);
+  const [position, setPosition] = useState({ left: 50, top: 50 });
+  const [scale, setScale] = useState({ x: 25, y: 25 });
+  const [rotation, setRotation] = useState(0);
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -296,7 +305,14 @@ export default function FgVideo({
     videoContainerRef,
     audioRef,
     fgVideoOptions,
-    handleVisualEffectChange
+    handleVisualEffectChange,
+    bundleRef,
+    position,
+    setPosition,
+    scale,
+    setScale,
+    rotation,
+    setRotation
   );
 
   useEffect(() => {
@@ -387,6 +403,53 @@ export default function FgVideo({
     }
   }, []);
 
+  useEffect(() => {
+    controls.updateCaptionsStyles();
+  }, [settings]);
+
+  useEffect(() => {
+    if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {
+      userMedia.current[type][videoId].canvas.style.position = "absolute";
+      userMedia.current[type][videoId].canvas.style.top = "0%";
+      subContainerRef.current.appendChild(
+        userMedia.current[type][videoId].canvas
+      );
+    }
+  }, [videoId, userMedia]);
+
+  useEffect(() => {
+    if (fgVideoOptions.isUser) {
+      userDataStreams.current.positionScaleRotation?.send(
+        JSON.stringify({
+          id: videoId,
+          position,
+          scale,
+          rotation,
+        })
+      );
+    }
+  }, [position, scale, rotation]);
+
+  useEffect(() => {
+    if (
+      !fgVideoOptions.isUser &&
+      remoteDataStreams.current[username] &&
+      remoteDataStreams.current[username][instance] &&
+      remoteDataStreams.current[username][instance].positionScaleRotation
+    ) {
+      remoteDataStreams.current[username][instance].positionScaleRotation.on(
+        "message",
+        (message) => {
+          const data = JSON.parse(message);
+
+          setPosition(data.position);
+          setScale(data.scale);
+          setRotation(data.rotation);
+        }
+      );
+    }
+  }, []);
+
   return (
     <div
       ref={videoContainerRef}
@@ -395,69 +458,91 @@ export default function FgVideo({
         effectsActive ? "in-effects" : ""
       } ${audioEffectsActive ? "in-effects" : ""} ${
         inVideo ? "in-video" : ""
-      } relative flex items-center justify-center text-white font-K2D overflow-hidden rounded-md`}
+      } flex items-center justify-center`}
+      style={{
+        position: "absolute",
+        left: `${position.left}%`,
+        top: `${position.top}%`,
+        width: `${scale.x}%`,
+        height: `${scale.y}%`,
+        rotate: `${rotation}deg`,
+        transformOrigin: "0% 0%",
+      }}
       onMouseEnter={() => controls.handleMouseEnter()}
       onMouseLeave={() => controls.handleMouseLeave()}
     >
-      {videoStream && (
-        <>
-          <video
-            ref={videoRef}
-            id={videoId}
-            onTimeUpdate={() => controls.timeUpdate()}
-            className='main-video w-full z-0'
-            controls={false}
-            autoPlay={fgVideoOptions.autoPlay}
-            style={videoStyles}
-          ></video>
-          <FgVideoNavigation
-            name={name}
-            username={username}
-            isClose={fgVideoOptions.isClose}
-            controls={controls}
-          />
-          <FgVideoControls
-            socket={socket}
-            table_id={table_id}
-            username={username}
-            instance={instance}
-            type={type}
-            videoId={videoId}
-            controls={controls}
-            pausedState={pausedState}
-            clientMute={clientMute}
-            localMute={localMute}
-            videoContainerRef={videoContainerRef}
-            audioStream={audioStream}
-            audioRef={audioRef}
-            currentTimeRef={currentTimeRef}
-            tintColor={tintColor}
-            effectsActive={effectsActive}
-            audioEffectsActive={audioEffectsActive}
-            setAudioEffectsActive={setAudioEffectsActive}
-            settings={settings}
-            setSettings={setSettings}
-            fgVideoOptions={fgVideoOptions}
-            handleVisualEffectChange={handleVisualEffectChange}
-            handleAudioEffectChange={handleAudioEffectChange}
-            handleMuteCallback={handleMuteCallback}
-            handleVolumeSliderCallback={handleVolumeSliderCallback}
-            tracksColorSetterCallback={tracksColorSetterCallback}
-          />
-          <div
-            className='controls-gradient absolute bottom-0 w-full h-20 z-10'
-            style={{
-              background: `linear-gradient(to top, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
-            }}
-          ></div>
-          <div
-            className='controls-gradient absolute top-0 w-full h-20 z-10'
-            style={{
-              background: `linear-gradient(to bottom, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
-            }}
-          ></div>
-        </>
-      )}
+      <RotateButton
+        dragFunction={fgVideoController.rotateDragFunction}
+        bundleRef={bundleRef}
+      />
+      <PanButton
+        dragFunction={fgVideoController.movementDragFunction}
+        bundleRef={bundleRef}
+      />
+      <ScaleButton
+        dragFunction={fgVideoController.scaleDragFunction}
+        bundleRef={bundleRef}
+      />
+      <div
+        ref={subContainerRef}
+        className={`relative flex items-center justify-center text-white font-K2D h-full w-full overflow-hidden rounded-md`}
+      >
+        <video
+          ref={videoRef}
+          id={videoId}
+          onTimeUpdate={() => controls.timeUpdate()}
+          className='main-video w-full h-full absolute top-0 left-0'
+          controls={false}
+          autoPlay={fgVideoOptions.autoPlay}
+          style={videoStyles}
+        ></video>
+        <FgVideoNavigation
+          name={name}
+          username={username}
+          isClose={fgVideoOptions.isClose}
+          controls={controls}
+        />
+        <FgVideoControls
+          socket={socket}
+          table_id={table_id}
+          username={username}
+          instance={instance}
+          type={type}
+          videoId={videoId}
+          controls={controls}
+          pausedState={pausedState}
+          clientMute={clientMute}
+          localMute={localMute}
+          videoContainerRef={videoContainerRef}
+          audioStream={audioStream}
+          audioRef={audioRef}
+          currentTimeRef={currentTimeRef}
+          tintColor={tintColor}
+          effectsActive={effectsActive}
+          audioEffectsActive={audioEffectsActive}
+          setAudioEffectsActive={setAudioEffectsActive}
+          settings={settings}
+          setSettings={setSettings}
+          fgVideoOptions={fgVideoOptions}
+          handleVisualEffectChange={handleVisualEffectChange}
+          handleAudioEffectChange={handleAudioEffectChange}
+          handleMuteCallback={handleMuteCallback}
+          handleVolumeSliderCallback={handleVolumeSliderCallback}
+          tracksColorSetterCallback={tracksColorSetterCallback}
+        />
+        <div
+          className='controls-gradient absolute bottom-0 w-full h-20 z-10'
+          style={{
+            background: `linear-gradient(to top, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
+          }}
+        ></div>
+        <div
+          className='controls-gradient absolute top-0 w-full h-20 z-10'
+          style={{
+            background: `linear-gradient(to bottom, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
+          }}
+        ></div>
+      </div>
     </div>
   );
 }
