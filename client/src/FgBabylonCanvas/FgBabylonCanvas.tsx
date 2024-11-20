@@ -432,6 +432,53 @@ export default function FgBabylonCanvas({
 
   useEffect(() => {
     if (fgVideoOptions.isUser) {
+      const angle = ((360 - rotation) / 180) * Math.PI;
+
+      if (!bundleRef.current) {
+        return;
+      }
+
+      const corners = {
+        topLeft: {
+          x: (position.left / 100) * bundleRef.current.clientWidth,
+          y: (position.top / 100) * bundleRef.current.clientHeight,
+        },
+        topRight: {
+          x:
+            ((position.left + scale.x * Math.cos(angle)) / 100) *
+            bundleRef.current.clientWidth,
+          y:
+            ((position.top - scale.x * Math.sin(angle)) / 100) *
+            bundleRef.current.clientHeight,
+        }, // Top-right
+        bottomRight: {
+          x:
+            ((position.left +
+              scale.x * Math.cos(angle) +
+              scale.y * Math.cos(Math.PI / 2 - angle)) /
+              100) *
+            bundleRef.current.clientWidth,
+          y:
+            ((position.top -
+              scale.x * Math.sin(angle) +
+              scale.y * Math.sin(Math.PI / 2 - angle)) /
+              100) *
+            bundleRef.current.clientHeight,
+        }, // Bottom-right
+        bottomLeft: {
+          x:
+            ((position.left + scale.y * Math.cos(Math.PI / 2 - angle)) / 100) *
+            bundleRef.current.clientWidth,
+          y:
+            ((position.top + scale.y * Math.sin(Math.PI / 2 - angle)) / 100) *
+            bundleRef.current.clientHeight,
+        },
+      };
+      console.log(
+        corners,
+        bundleRef.current.clientHeight,
+        bundleRef.current.clientWidth
+      );
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           id: videoId,
@@ -440,6 +487,7 @@ export default function FgBabylonCanvas({
           rotation,
           bundleWidth: bundleRef.current?.clientWidth,
           bundleHeight: bundleRef.current?.clientHeight,
+          corners,
         })
       );
     }

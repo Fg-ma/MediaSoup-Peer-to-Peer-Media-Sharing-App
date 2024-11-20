@@ -430,29 +430,85 @@ export default function FgVideo({
     }
   }, [position, scale, rotation]);
 
-  function transformAngleBetweenBoxes(
-    angle: number,
-    box1Width: number,
-    box1Height: number,
-    box2Width: number,
-    box2Height: number
-  ): number {
-    // Aspect ratios
-    const aspectRatio1 = box1Width / box1Height;
-    const aspectRatio2 = box2Width / box2Height;
+  type Point = { x: number; y: number };
 
-    // Components of the angle in the first box
-    const x1 = Math.cos(angle);
-    const y1 = Math.sin(angle);
+  function rotateCorners(
+    corners: {
+      topLeft: Point;
+      topRight: Point;
+      bottomRight: Point;
+      bottomLeft: Point;
+    },
+    theta: number
+  ): {
+    topLeft: Point;
+    topRight: Point;
+    bottomRight: Point;
+    bottomLeft: Point;
+  } {
+    const { topLeft, topRight, bottomRight, bottomLeft } = corners;
 
-    // Scale components based on aspect ratios
-    const x2 = x1 / aspectRatio1; // Scale x-component by the first box's aspect ratio
-    const y2 = y1 / aspectRatio2; // Scale y-component by the second box's aspect ratio
+    // Helper function to rotate a single point around the origin
+    const rotatePoint = (point: Point, origin: Point, angle: number): Point => {
+      const translatedX = point.x - origin.x;
+      const translatedY = point.y - origin.y;
 
-    // Compute the transformed angle in the second box
-    const transformedAngle = Math.atan2(y2, x2);
+      const rotatedX =
+        translatedX * Math.cos(angle) - translatedY * Math.sin(angle);
+      const rotatedY =
+        translatedX * Math.sin(angle) + translatedY * Math.cos(angle);
 
-    return transformedAngle;
+      return { x: rotatedX + origin.x, y: rotatedY + origin.y };
+    };
+
+    // Rotate each corner
+    return {
+      topLeft: topLeft, // This point remains unchanged
+      topRight: rotatePoint(topRight, topLeft, theta),
+      bottomRight: rotatePoint(bottomRight, topLeft, theta),
+      bottomLeft: rotatePoint(bottomLeft, topLeft, theta),
+    };
+  }
+
+  function getData(corners: {
+    topLeft: Point;
+    topRight: Point;
+    bottomRight: Point;
+    bottomLeft: Point;
+  }) {
+    const { topLeft, topRight } = corners;
+
+    // Calculate the difference in the x and y coordinates
+    const deltaX = topRight.x - topLeft.x;
+    const deltaY = topRight.y - topLeft.y;
+
+    // Use Math.atan2 to find the angle with respect to the x-axis
+    const angle = Math.atan2(deltaY, deltaX);
+
+    // Convert the angle from radians to degrees
+    const angleInDegrees = angle * (180 / Math.PI);
+
+    const rotatedCorners = rotateCorners(corners, 2 * Math.PI + angle);
+    console.log(corners, rotatedCorners, angle);
+    return {
+      width: Math.abs(rotatedCorners.topLeft.x - rotatedCorners.topRight.x),
+      height: Math.abs(rotatedCorners.topLeft.y - rotatedCorners.bottomLeft.y),
+      rotation: angleInDegrees,
+    };
+  }
+
+  function scalePointUniformly(
+    sourceWidth: number,
+    sourceHeight: number,
+    destWidth: number,
+    destHeight: number,
+    point: Point
+  ): Point {
+    // Scale the point
+    const scaledX = point.x * (destWidth / sourceWidth);
+    const scaledY = point.y * (destHeight / sourceHeight);
+
+    return { x: scaledX, y: scaledY };
   }
 
   useEffect(() => {
@@ -471,17 +527,50 @@ export default function FgVideo({
             return;
           }
 
-          const newAngle = transformAngleBetweenBoxes(
-            (data.rotation * Math.PI) / 180,
-            data.bundleWidth,
-            data.bundleHeight,
-            bundleRef.current.clientWidth,
-            bundleRef.current.clientHeight
-          );
+          const scaledCorners = {
+            topLeft: scalePointUniformly(
+              data.bundleWidth,
+              data.bundleHeight,
+              bundleRef.current.clientWidth,
+              bundleRef.current.clientHeight,
+              data.corners.topLeft
+            ),
+            topRight: scalePointUniformly(
+              data.bundleWidth,
+              data.bundleHeight,
+              bundleRef.current.clientWidth,
+              bundleRef.current.clientHeight,
+              data.corners.topRight
+            ),
+            bottomRight: scalePointUniformly(
+              data.bundleWidth,
+              data.bundleHeight,
+              bundleRef.current.clientWidth,
+              bundleRef.current.clientHeight,
+              data.corners.bottomRight
+            ),
+            bottomLeft: scalePointUniformly(
+              data.bundleWidth,
+              data.bundleHeight,
+              bundleRef.current.clientWidth,
+              bundleRef.current.clientHeight,
+              data.corners.bottomLeft
+            ),
+          };
 
-          setPosition(data.position);
-          setScale(data.scale);
-          setRotation((newAngle * 180) / Math.PI);
+          const newData = getData(scaledCorners);
+
+          setPosition({
+            left:
+              (scaledCorners.topLeft.x / bundleRef.current.clientWidth) * 100,
+            top:
+              (scaledCorners.topLeft.y / bundleRef.current.clientHeight) * 100,
+          });
+          setScale({
+            x: (newData.width / bundleRef.current.clientWidth) * 100,
+            y: (newData.height / bundleRef.current.clientHeight) * 100,
+          });
+          setRotation(newData.rotation);
         }
       );
     }
