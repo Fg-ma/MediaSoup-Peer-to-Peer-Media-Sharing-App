@@ -6,16 +6,22 @@ import rotateIcon from "../../../public/svgs/rotateIcon.svg";
 export default function RotateButton({
   dragFunction,
   bundleRef,
+  mouseDownFunction,
+  mouseUpFunction,
 }: {
   dragFunction: (
     displacement: { x: number; y: number },
     event: MouseEvent
   ) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
+  mouseDownFunction: () => void;
+  mouseUpFunction: () => void;
 }) {
   return (
     <FgButton
       className='rotate-btn absolute left-full bottom-full w-6 aspect-square z-[10000]'
+      mouseDownFunction={mouseDownFunction}
+      mouseUpFunction={mouseUpFunction}
       dragFunction={dragFunction}
       referenceDragElement={bundleRef}
       contentFunction={() => {

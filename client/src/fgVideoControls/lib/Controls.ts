@@ -333,6 +333,8 @@ class Controls {
   handleMouseLeave = () => {
     this.leaveVideoTimer.current = setTimeout(() => {
       this.setInVideo(false);
+      clearTimeout(this.leaveVideoTimer.current);
+      this.leaveVideoTimer.current = undefined;
     }, this.fgVideoOptions.controlsVanishTime);
   };
 

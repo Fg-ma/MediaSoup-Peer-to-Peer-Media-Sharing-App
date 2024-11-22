@@ -163,11 +163,13 @@ export default function FgVideo({
 
   const [inVideo, setInVideo] = useState(true);
 
+  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+
   const [pausedState, setPausedState] = useState(false);
 
   const paused = useRef(!fgVideoOptions.autoPlay);
 
-  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const [adjustingDimensions, setAdjustingDimensions] = useState(true);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -297,6 +299,7 @@ export default function FgVideo({
     videoStream,
     setPausedState,
     paused,
+    setAdjustingDimensions,
     userMedia,
     remoteStreamEffects,
     currentEffectsStyles,
@@ -321,6 +324,37 @@ export default function FgVideo({
 
     // Listen for messages on socket
     socket.current.on("message", fgVideoController.handleMessage);
+
+    // Request initial catch up data
+    if (!fgVideoOptions.isUser && activeUsername && activeInstance) {
+      const msg = {
+        type: "requestCatchUpData",
+        table_id: table_id,
+        inquiringUsername: activeUsername,
+        inquiringInstance: activeInstance,
+        inquiredUsername: username,
+        inquiredInstance: instance,
+      };
+      socket.current.send(msg);
+    }
+
+    if (
+      !fgVideoOptions.isUser &&
+      remoteDataStreams.current[username] &&
+      remoteDataStreams.current[username][instance] &&
+      remoteDataStreams.current[username][instance].positionScaleRotation
+    ) {
+      remoteDataStreams.current[username][instance].positionScaleRotation.on(
+        "message",
+        (message) => {
+          const data = JSON.parse(message);
+
+          setPosition(data.position);
+          setScale(data.scale);
+          setRotation(data.rotation);
+        }
+      );
+    }
 
     // Add eventlisteners
     if (fgVideoOptions.isFullScreen) {
@@ -390,20 +424,6 @@ export default function FgVideo({
   }, []);
 
   useEffect(() => {
-    if (!fgVideoOptions.isUser && activeUsername && activeInstance) {
-      const msg = {
-        type: "requestCatchUpData",
-        table_id: table_id,
-        inquiringUsername: activeUsername,
-        inquiringInstance: activeInstance,
-        inquiredUsername: username,
-        inquiredInstance: instance,
-      };
-      socket.current.send(msg);
-    }
-  }, []);
-
-  useEffect(() => {
     controls.updateCaptionsStyles();
   }, [settings]);
 
@@ -430,152 +450,6 @@ export default function FgVideo({
     }
   }, [position, scale, rotation]);
 
-  type Point = { x: number; y: number };
-
-  function rotateCorners(
-    corners: {
-      topLeft: Point;
-      topRight: Point;
-      bottomRight: Point;
-      bottomLeft: Point;
-    },
-    theta: number
-  ): {
-    topLeft: Point;
-    topRight: Point;
-    bottomRight: Point;
-    bottomLeft: Point;
-  } {
-    const { topLeft, topRight, bottomRight, bottomLeft } = corners;
-
-    // Helper function to rotate a single point around the origin
-    const rotatePoint = (point: Point, origin: Point, angle: number): Point => {
-      const translatedX = point.x - origin.x;
-      const translatedY = point.y - origin.y;
-
-      const rotatedX =
-        translatedX * Math.cos(angle) - translatedY * Math.sin(angle);
-      const rotatedY =
-        translatedX * Math.sin(angle) + translatedY * Math.cos(angle);
-
-      return { x: rotatedX + origin.x, y: rotatedY + origin.y };
-    };
-
-    // Rotate each corner
-    return {
-      topLeft: topLeft, // This point remains unchanged
-      topRight: rotatePoint(topRight, topLeft, theta),
-      bottomRight: rotatePoint(bottomRight, topLeft, theta),
-      bottomLeft: rotatePoint(bottomLeft, topLeft, theta),
-    };
-  }
-
-  function getData(corners: {
-    topLeft: Point;
-    topRight: Point;
-    bottomRight: Point;
-    bottomLeft: Point;
-  }) {
-    const { topLeft, topRight } = corners;
-
-    // Calculate the difference in the x and y coordinates
-    const deltaX = topRight.x - topLeft.x;
-    const deltaY = topRight.y - topLeft.y;
-
-    // Use Math.atan2 to find the angle with respect to the x-axis
-    const angle = Math.atan2(deltaY, deltaX);
-
-    // Convert the angle from radians to degrees
-    const angleInDegrees = angle * (180 / Math.PI);
-
-    const rotatedCorners = rotateCorners(corners, 2 * Math.PI + angle);
-    console.log(corners, rotatedCorners, angle);
-    return {
-      width: Math.abs(rotatedCorners.topLeft.x - rotatedCorners.topRight.x),
-      height: Math.abs(rotatedCorners.topLeft.y - rotatedCorners.bottomLeft.y),
-      rotation: angleInDegrees,
-    };
-  }
-
-  function scalePointUniformly(
-    sourceWidth: number,
-    sourceHeight: number,
-    destWidth: number,
-    destHeight: number,
-    point: Point
-  ): Point {
-    // Scale the point
-    const scaledX = point.x * (destWidth / sourceWidth);
-    const scaledY = point.y * (destHeight / sourceHeight);
-
-    return { x: scaledX, y: scaledY };
-  }
-
-  useEffect(() => {
-    if (
-      !fgVideoOptions.isUser &&
-      remoteDataStreams.current[username] &&
-      remoteDataStreams.current[username][instance] &&
-      remoteDataStreams.current[username][instance].positionScaleRotation
-    ) {
-      remoteDataStreams.current[username][instance].positionScaleRotation.on(
-        "message",
-        (message) => {
-          const data = JSON.parse(message);
-
-          if (!bundleRef.current) {
-            return;
-          }
-
-          const scaledCorners = {
-            topLeft: scalePointUniformly(
-              data.bundleWidth,
-              data.bundleHeight,
-              bundleRef.current.clientWidth,
-              bundleRef.current.clientHeight,
-              data.corners.topLeft
-            ),
-            topRight: scalePointUniformly(
-              data.bundleWidth,
-              data.bundleHeight,
-              bundleRef.current.clientWidth,
-              bundleRef.current.clientHeight,
-              data.corners.topRight
-            ),
-            bottomRight: scalePointUniformly(
-              data.bundleWidth,
-              data.bundleHeight,
-              bundleRef.current.clientWidth,
-              bundleRef.current.clientHeight,
-              data.corners.bottomRight
-            ),
-            bottomLeft: scalePointUniformly(
-              data.bundleWidth,
-              data.bundleHeight,
-              bundleRef.current.clientWidth,
-              bundleRef.current.clientHeight,
-              data.corners.bottomLeft
-            ),
-          };
-
-          const newData = getData(scaledCorners);
-
-          setPosition({
-            left:
-              (scaledCorners.topLeft.x / bundleRef.current.clientWidth) * 100,
-            top:
-              (scaledCorners.topLeft.y / bundleRef.current.clientHeight) * 100,
-          });
-          setScale({
-            x: (newData.width / bundleRef.current.clientWidth) * 100,
-            y: (newData.height / bundleRef.current.clientHeight) * 100,
-          });
-          setRotation(newData.rotation);
-        }
-      );
-    }
-  }, []);
-
   return (
     <div
       ref={videoContainerRef}
@@ -584,6 +458,8 @@ export default function FgVideo({
         effectsActive ? "in-effects" : ""
       } ${audioEffectsActive ? "in-effects" : ""} ${
         inVideo ? "in-video" : ""
+      } ${
+        adjustingDimensions ? "adjusting-dimensions" : ""
       } flex items-center justify-center`}
       style={{
         position: "absolute",
@@ -600,14 +476,20 @@ export default function FgVideo({
       <RotateButton
         dragFunction={fgVideoController.rotateDragFunction}
         bundleRef={bundleRef}
+        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
+        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
       />
       <PanButton
         dragFunction={fgVideoController.movementDragFunction}
         bundleRef={bundleRef}
+        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
+        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
       />
       <ScaleButton
         dragFunction={fgVideoController.scaleDragFunction}
         bundleRef={bundleRef}
+        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
+        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
       />
       <div
         ref={subContainerRef}

@@ -278,13 +278,10 @@ export default function FgVideoControls({
               />
             </Suspense>
           )}
-          <div className='duration-container flex items-center gap-1 px-1'>
+          <div className='flex items-center gap-1 px-1 select-none'>
             {(fgVideoOptions.isCurrentTime ??
               defaultFgVideoOptions.isCurrentTime) && (
-              <div
-                ref={currentTimeRef}
-                className='current-time font-K2D text-lg'
-              ></div>
+              <div ref={currentTimeRef} className='font-K2D text-lg'></div>
             )}
           </div>
         </div>

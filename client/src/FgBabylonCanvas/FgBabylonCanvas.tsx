@@ -179,11 +179,13 @@ export default function FgBabylonCanvas({
 
   const [inVideo, setInVideo] = useState(true);
 
+  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+
   const [pausedState, setPausedState] = useState(false);
 
   const paused = useRef(!fgVideoOptions.autoPlay);
 
-  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const [adjustingDimensions, setAdjustingDimensions] = useState(true);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -313,6 +315,7 @@ export default function FgBabylonCanvas({
     undefined,
     setPausedState,
     paused,
+    setAdjustingDimensions,
     userMedia,
     remoteStreamEffects,
     currentEffectsStyles,
@@ -345,6 +348,24 @@ export default function FgBabylonCanvas({
     // Keep video time
     controls.timeUpdate();
     timeUpdateInterval.current = setInterval(controls.timeUpdate, 1000);
+
+    if (
+      !fgVideoOptions.isUser &&
+      remoteDataStreams.current[username] &&
+      remoteDataStreams.current[username][instance] &&
+      remoteDataStreams.current[username][instance].positionScaleRotation
+    ) {
+      remoteDataStreams.current[username][instance].positionScaleRotation.on(
+        "message",
+        (message) => {
+          const data = JSON.parse(message);
+
+          setPosition(data.position);
+          setScale(data.scale);
+          setRotation(data.rotation);
+        }
+      );
+    }
 
     // Add eventlisteners
     if (fgVideoOptions.isFullScreen) {
@@ -432,86 +453,20 @@ export default function FgBabylonCanvas({
 
   useEffect(() => {
     if (fgVideoOptions.isUser) {
-      const angle = ((360 - rotation) / 180) * Math.PI;
-
       if (!bundleRef.current) {
         return;
       }
 
-      const corners = {
-        topLeft: {
-          x: (position.left / 100) * bundleRef.current.clientWidth,
-          y: (position.top / 100) * bundleRef.current.clientHeight,
-        },
-        topRight: {
-          x:
-            ((position.left + scale.x * Math.cos(angle)) / 100) *
-            bundleRef.current.clientWidth,
-          y:
-            ((position.top - scale.x * Math.sin(angle)) / 100) *
-            bundleRef.current.clientHeight,
-        }, // Top-right
-        bottomRight: {
-          x:
-            ((position.left +
-              scale.x * Math.cos(angle) +
-              scale.y * Math.cos(Math.PI / 2 - angle)) /
-              100) *
-            bundleRef.current.clientWidth,
-          y:
-            ((position.top -
-              scale.x * Math.sin(angle) +
-              scale.y * Math.sin(Math.PI / 2 - angle)) /
-              100) *
-            bundleRef.current.clientHeight,
-        }, // Bottom-right
-        bottomLeft: {
-          x:
-            ((position.left + scale.y * Math.cos(Math.PI / 2 - angle)) / 100) *
-            bundleRef.current.clientWidth,
-          y:
-            ((position.top + scale.y * Math.sin(Math.PI / 2 - angle)) / 100) *
-            bundleRef.current.clientHeight,
-        },
-      };
-      console.log(
-        corners,
-        bundleRef.current.clientHeight,
-        bundleRef.current.clientWidth
-      );
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           id: videoId,
           position,
           scale,
           rotation,
-          bundleWidth: bundleRef.current?.clientWidth,
-          bundleHeight: bundleRef.current?.clientHeight,
-          corners,
         })
       );
     }
   }, [position, scale, rotation]);
-
-  useEffect(() => {
-    if (
-      !fgVideoOptions.isUser &&
-      remoteDataStreams.current[username] &&
-      remoteDataStreams.current[username][instance] &&
-      remoteDataStreams.current[username][instance].positionScaleRotation
-    ) {
-      remoteDataStreams.current[username][instance].positionScaleRotation.on(
-        "message",
-        (message) => {
-          const data = JSON.parse(message);
-
-          setPosition(data.position);
-          setScale(data.scale);
-          setRotation(data.rotation);
-        }
-      );
-    }
-  }, []);
 
   return (
     <div
@@ -521,8 +476,9 @@ export default function FgBabylonCanvas({
         fgVideoOptions.autoPlay ? "" : "paused"
       } ${effectsActive ? "in-effects" : ""} ${
         audioEffectsActive ? "in-effects" : ""
-      } ${inVideo ? "in-video" : ""}
-        flex items-center justify-center`}
+      } ${inVideo ? "in-video" : ""} ${
+        adjustingDimensions ? "adjusting-dimensions" : ""
+      } flex items-center justify-center z-10`}
       style={{
         position: "absolute",
         left: `${position.left}%`,
@@ -538,14 +494,20 @@ export default function FgBabylonCanvas({
       <RotateButton
         dragFunction={fgVideoController.rotateDragFunction}
         bundleRef={bundleRef}
+        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
+        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
       />
       <PanButton
         dragFunction={fgVideoController.movementDragFunction}
         bundleRef={bundleRef}
+        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
+        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
       />
       <ScaleButton
         dragFunction={fgVideoController.scaleDragFunction}
         bundleRef={bundleRef}
+        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
+        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
       />
       <div
         ref={subContainerRef}

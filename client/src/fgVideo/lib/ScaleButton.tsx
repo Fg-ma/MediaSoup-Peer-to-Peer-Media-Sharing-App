@@ -6,13 +6,19 @@ import scaleIcon from "../../../public/svgs/scaleIcon.svg";
 export default function ScaleButton({
   dragFunction,
   bundleRef,
+  mouseDownFunction,
+  mouseUpFunction,
 }: {
   dragFunction: (displacement: { x: number; y: number }) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
+  mouseDownFunction: () => void;
+  mouseUpFunction: () => void;
 }) {
   return (
     <FgButton
       className='scale-btn absolute left-full top-full w-6 aspect-square z-[10000] pl-1 pt-1'
+      mouseDownFunction={mouseDownFunction}
+      mouseUpFunction={mouseUpFunction}
       dragFunction={dragFunction}
       referenceDragElement={bundleRef}
       contentFunction={() => {

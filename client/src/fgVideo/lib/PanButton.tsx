@@ -6,13 +6,19 @@ import panIcon from "../../../public/svgs/panIcon.svg";
 export default function PanButton({
   dragFunction,
   bundleRef,
+  mouseDownFunction,
+  mouseUpFunction,
 }: {
   dragFunction: (displacement: { x: number; y: number }) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
+  mouseDownFunction: () => void;
+  mouseUpFunction: () => void;
 }) {
   return (
     <FgButton
       className='pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-[10000] pl-1'
+      mouseDownFunction={mouseDownFunction}
+      mouseUpFunction={mouseUpFunction}
       dragFunction={dragFunction}
       referenceDragElement={bundleRef}
       contentFunction={() => {

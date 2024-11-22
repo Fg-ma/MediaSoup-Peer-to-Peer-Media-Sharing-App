@@ -55,6 +55,7 @@
 .video-container .video-controls-container,
 .video-container .video-navigation-container,
 .video-container .controls-gradient {
+  pointer-events: none;
   opacity: 0;
   transition: opacity 150ms ease-in-out;
 }
@@ -82,6 +83,9 @@
   transition: display 150ms ease-in-out;
 }
 
+.video-container.adjusting-dimensions .pan-btn,
+.video-container.adjusting-dimensions .scale-btn,
+.video-container.adjusting-dimensions .rotate-btn,
 .video-container.in-video .pan-btn,
 .video-container.in-video .scale-btn,
 .video-container.in-video .rotate-btn,
@@ -152,9 +156,4 @@
   height: 2px;
   border-radius: 1px;
   background-color: var(--primary-video-color);
-}
-
-.babylonJS-canvas {
-  width: 100%;
-  height: 100%;
 }

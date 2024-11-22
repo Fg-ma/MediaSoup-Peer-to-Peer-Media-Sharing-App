@@ -61,6 +61,9 @@ class FgVideoController {
     private videoStream: MediaStream | undefined,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
+    private setAdjustingDimensions: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
     private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
@@ -807,6 +810,14 @@ class FgVideoController {
     if (targetAngle < 0) targetAngle += 360;
 
     return targetAngle;
+  };
+
+  adjustmentBtnMouseDownFunction = () => {
+    this.setAdjustingDimensions(true);
+  };
+
+  adjustmentBtnMouseUpFunction = () => {
+    this.setAdjustingDimensions(false);
   };
 }
 

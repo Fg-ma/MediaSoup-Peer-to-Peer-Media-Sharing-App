@@ -32,6 +32,7 @@ import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
 import Deadbanding from "./babylon/Deadbanding";
 import FgMetaData from "./lib/FgMetaData";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
+import FgTable from "./fgTable/FgTable";
 
 const AudioEffectsButton = React.lazy(
   () => import("./audioEffectsButton/AudioEffectsButton")
@@ -582,12 +583,12 @@ export default function Main() {
   };
 
   return (
-    <div className='w-screen h-screen overflow-x-hidden flex-col'>
+    <div className='w-screen h-screen flex-col'>
       <div className='flex justify-center min-w-full bg-black h-16 text-white items-center mb-10'>
         Mediasoup Video Sharing App
       </div>
       <div
-        className='flex-col flex-wrap overflow-hidden px-5 w-full'
+        className='flex-col flex-wrap px-5 w-full'
         style={{ height: "calc(100% - 6.5rem)" }}
       >
         <div className='flex items-center justify-center'>
@@ -734,32 +735,15 @@ export default function Main() {
               isInTable
                 ? "bg-orange-500 hover:bg-orange-700"
                 : "bg-blue-500 hover:bg-blue-700"
-            } text-white font-bold py-2 px-4`}
+            } text-white font-bold py-2 px-4 max-h-[42px]`}
           >
             {isInTable ? "Join New Room" : "Join Room"}
           </button>
         </div>
-        <div
-          ref={remoteVideosContainerRef}
-          className='relative bg-fg-white-65 rounded-md m-4'
-          style={{ width: "calc(100% - 2rem)", height: "calc(100% - 10rem)" }}
-        >
-          {bundles &&
-            Object.keys(bundles).length !== 0 &&
-            Object.keys(bundles).map(
-              (username) =>
-                Object.keys(bundles[username]).length !== 0 &&
-                Object.entries(bundles[username]).map(([key, bundle]) => (
-                  <div
-                    className='w-full h-full absolute top-0 left-0'
-                    key={key}
-                    id={`${key}_bundle`}
-                  >
-                    {bundle}
-                  </div>
-                ))
-            )}
-        </div>
+        <FgTable
+          remoteVideosContainerRef={remoteVideosContainerRef}
+          bundles={bundles}
+        />
       </div>
     </div>
   );
