@@ -1,17 +1,15 @@
-import React, { useState, useRef, useEffect, Suspense } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import { useStreamsContext } from "./context/streamsContext/StreamsContext";
 import { useCurrentEffectsStylesContext } from "./context/currentEffectsStylesContext/CurrentEffectsStylesContext";
-import { useSignalContext } from "./context/signalContext/SignalContext";
 import {
   defaultAudioCurrentEffectsStyles,
   defaultCameraCurrentEffectsStyles,
   defaultScreenCurrentEffectsStyles,
 } from "./context/currentEffectsStylesContext/typeConstant";
 import {
-  AudioEffectTypes,
   DataStreamTypes,
   defaultAudioStreamEffects,
   defaultCameraStreamEffects,
@@ -23,20 +21,12 @@ import Consumers from "./lib/Consumers";
 import UserDevice from "./UserDevice";
 import BrowserMedia from "./BrowserMedia";
 import BundlesController from "./bundlesController";
-import subscribe from "./subscribe";
-import joinTable from "./joinTable";
-import CameraSection from "./cameraSection/CameraSection";
-import ScreenSection from "./screenSection/ScreenSection";
-import AudioSection from "./audioSection/AudioSection";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
 import Deadbanding from "./babylon/Deadbanding";
 import FgMetaData from "./lib/FgMetaData";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import FgTable from "./fgTable/FgTable";
-
-const AudioEffectsButton = React.lazy(
-  () => import("./audioEffectsButton/AudioEffectsButton")
-);
+import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 
 const websocketURL = "http://localhost:8000";
 
@@ -197,7 +187,6 @@ export default function Main() {
   } = useStreamsContext();
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
-  const { setSignal } = useSignalContext();
 
   const socket = useRef<Socket>(io(websocketURL));
   const device = useRef<mediasoup.Device>();
@@ -226,27 +215,19 @@ export default function Main() {
   const [screenActive, setScreenActive] = useState(false);
 
   const audioBtnRef = useRef<HTMLButtonElement>(null);
-  const muteBtnRef = useRef<HTMLButtonElement>(null);
   const mutedAudioRef = useRef(false);
   const [_, setMutedAudio] = useState(false);
   const isAudio = useRef(false);
   const [audioActive, setAudioActive] = useState(false);
 
   const subBtnRef = useRef<HTMLButtonElement>(null);
-  const [subscribedActive, setSubscribedActive] = useState(false);
   const isSubscribed = useRef(false);
-
-  const tableIdRef = useRef<HTMLInputElement>(null);
-  const [isInTable, setIsInTable] = useState(false);
-  const usernameRef = useRef<HTMLInputElement>(null);
 
   const remoteVideosContainerRef = useRef<HTMLDivElement>(null);
 
   const acceptCameraEffects = true;
   const acceptScreenEffects = true;
   const acceptAudioEffects = true;
-
-  const [audioEffectsActive, setAudioEffectsActive] = useState(false);
 
   const muteAudio = () => {
     setMutedAudio((prev) => !prev);
@@ -264,24 +245,6 @@ export default function Main() {
       clientMute: mutedAudioRef.current,
     };
     socket.current.emit("message", msg);
-  };
-
-  const handleExternalMute = () => {
-    muteAudio();
-
-    const msg: {
-      type: "localMuteChange";
-      table_id: string;
-      username: string;
-      instance: string;
-    } = {
-      type: "localMuteChange",
-      table_id: table_id.current,
-      username: username.current,
-      instance: instance.current,
-    };
-
-    setSignal(msg);
   };
 
   const handleDisableEnableBtns = (disabled: boolean) => {
@@ -562,26 +525,6 @@ export default function Main() {
     userMedia
   );
 
-  const handleExternalAudioEffectChange = (effect: AudioEffectTypes) => {
-    userMedia.current.audio?.changeEffects(effect, false);
-
-    if (acceptAudioEffects) {
-      const msg = {
-        type: "clientEffectChange",
-        table_id: table_id.current,
-        username: username.current,
-        instance: instance.current,
-        producerType: "audio",
-        producerId: undefined,
-        effect: effect,
-        effectStyle: undefined,
-        blockStateChange: false,
-      };
-
-      socket.current.emit("message", msg);
-    }
-  };
-
   return (
     <div className='w-screen h-screen flex-col'>
       <div className='flex justify-center min-w-full bg-black h-16 text-white items-center mb-10'>
@@ -591,155 +534,38 @@ export default function Main() {
         className='flex-col flex-wrap px-5 w-full'
         style={{ height: "calc(100% - 6.5rem)" }}
       >
-        <div className='flex items-center justify-center'>
-          <CameraSection
-            socket={socket}
-            device={device}
-            table_id={table_id}
-            username={username}
-            instance={instance}
-            cameraBtnRef={cameraBtnRef}
-            newCameraBtnRef={newCameraBtnRef}
-            isCamera={isCamera}
-            setCameraActive={setCameraActive}
-            cameraActive={cameraActive}
-            producers={producers}
-            handleDisableEnableBtns={handleDisableEnableBtns}
-          />
-          <AudioSection
-            socket={socket}
-            device={device}
-            table_id={table_id}
-            username={username}
-            instance={instance}
-            audioBtnRef={audioBtnRef}
-            muteBtnRef={muteBtnRef}
-            mutedAudioRef={mutedAudioRef}
-            isAudio={isAudio}
-            audioActive={audioActive}
-            setAudioActive={setAudioActive}
-            handleExternalMute={handleExternalMute}
-            handleDisableEnableBtns={handleDisableEnableBtns}
-          />
-          <ScreenSection
-            socket={socket}
-            device={device}
-            table_id={table_id}
-            username={username}
-            instance={instance}
-            screenBtnRef={screenBtnRef}
-            newScreenBtnRef={newScreenBtnRef}
-            isScreen={isScreen}
-            screenActive={screenActive}
-            setScreenActive={setScreenActive}
-            producers={producers}
-            handleDisableEnableBtns={handleDisableEnableBtns}
-          />
-          <div className='flex flex-col mx-2'>
-            <button
-              ref={subBtnRef}
-              onClick={() =>
-                subscribe(
-                  isSubscribed,
-                  subBtnRef,
-                  setSubscribedActive,
-                  socket,
-                  table_id,
-                  username,
-                  instance,
-                  consumerTransport,
-                  remoteTracksMap,
-                  setBundles
-                )
-              }
-              className={`${
-                subscribedActive
-                  ? "bg-orange-500 hover:bg-orange-700"
-                  : "bg-blue-500 hover:bg-blue-700"
-              } text-white font-bold py-2 px-3 disabled:opacity-25`}
-            >
-              {subscribedActive ? "Unsubscribe" : "Subscribe"}
-            </button>
-          </div>
-          {isAudio.current && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <AudioEffectsButton
-                socket={socket}
-                username={username.current}
-                instance={instance.current}
-                isUser={true}
-                audioEffectsActive={audioEffectsActive}
-                setAudioEffectsActive={setAudioEffectsActive}
-                handleAudioEffectChange={handleExternalAudioEffectChange}
-                handleMute={handleExternalMute}
-                muteStateRef={mutedAudioRef}
-                options={{ color: "black", placement: "below" }}
-              />
-            </Suspense>
-          )}
-        </div>
-        <div className='flex justify-center mt-5'>
-          <input
-            ref={tableIdRef}
-            id='tableIdyInputField'
-            type='text'
-            className='border border-gray-400 px-4 py-2 mr-2'
-            placeholder='Enter room name'
-          />
-          <input
-            ref={usernameRef}
-            id='usernameInputField'
-            type='text'
-            className='border border-gray-400 px-4 py-2 mr-2'
-            placeholder='Enter username'
-          />
-          <button
-            onClick={() => {
-              joinTable(
-                socket,
-                tableIdRef,
-                usernameRef,
-                table_id,
-                username,
-                instance,
-                setIsInTable,
-                userMedia,
-                userCameraCount,
-                userScreenCount,
-                remoteTracksMap,
-                handleDisableEnableBtns,
-                setBundles,
-                consumerTransport,
-                producerTransport,
-                isCamera,
-                setCameraActive,
-                isScreen,
-                setScreenActive,
-                isAudio,
-                setAudioActive,
-                setMutedAudio,
-                mutedAudioRef,
-                setSubscribedActive,
-                isSubscribed,
-                device
-              );
-              const msg = {
-                type: "getRouterRtpCapabilities",
-                table_id: table_id.current,
-                username: username.current,
-                instance: instance.current,
-              };
-              socket.current.emit("message", msg);
-            }}
-            className={`${
-              isInTable
-                ? "bg-orange-500 hover:bg-orange-700"
-                : "bg-blue-500 hover:bg-blue-700"
-            } text-white font-bold py-2 px-4 max-h-[42px]`}
-          >
-            {isInTable ? "Join New Room" : "Join Room"}
-          </button>
-        </div>
+        <FgTableFunctions
+          table_id={table_id}
+          username={username}
+          instance={instance}
+          socket={socket}
+          device={device}
+          producers={producers}
+          producerTransport={producerTransport}
+          consumerTransport={consumerTransport}
+          setBundles={setBundles}
+          acceptAudioEffects={acceptAudioEffects}
+          isCamera={isCamera}
+          cameraActive={cameraActive}
+          setCameraActive={setCameraActive}
+          cameraBtnRef={cameraBtnRef}
+          newCameraBtnRef={newCameraBtnRef}
+          isScreen={isScreen}
+          screenActive={screenActive}
+          setScreenActive={setScreenActive}
+          screenBtnRef={screenBtnRef}
+          newScreenBtnRef={newScreenBtnRef}
+          setMutedAudio={setMutedAudio}
+          mutedAudioRef={mutedAudioRef}
+          isAudio={isAudio}
+          audioActive={audioActive}
+          setAudioActive={setAudioActive}
+          audioBtnRef={audioBtnRef}
+          isSubscribed={isSubscribed}
+          subBtnRef={subBtnRef}
+          muteAudio={muteAudio}
+          handleDisableEnableBtns={handleDisableEnableBtns}
+        />
         <FgTable
           remoteVideosContainerRef={remoteVideosContainerRef}
           bundles={bundles}

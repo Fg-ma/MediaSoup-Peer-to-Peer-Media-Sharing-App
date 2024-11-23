@@ -9,20 +9,19 @@ export default function RotateButton({
   mouseDownFunction,
   mouseUpFunction,
 }: {
-  dragFunction: (
-    displacement: { x: number; y: number },
-    event: MouseEvent
-  ) => void;
+  dragFunction: (event: MouseEvent) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
   mouseDownFunction: () => void;
   mouseUpFunction: () => void;
 }) {
   return (
     <FgButton
-      className='rotate-btn absolute left-full bottom-full w-6 aspect-square z-[10000]'
+      className='rotate-btn absolute left-full bottom-full w-6 aspect-square z-10'
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}
-      dragFunction={dragFunction}
+      dragFunction={(_displacement, event) => {
+        dragFunction(event);
+      }}
       referenceDragElement={bundleRef}
       contentFunction={() => {
         return (

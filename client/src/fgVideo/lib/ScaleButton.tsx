@@ -16,7 +16,7 @@ export default function ScaleButton({
 }) {
   return (
     <FgButton
-      className='scale-btn absolute left-full top-full w-6 aspect-square z-[10000] pl-1 pt-1'
+      className='scale-btn absolute left-full top-full w-6 aspect-square z-10 pl-1 pt-1'
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}
       dragFunction={dragFunction}

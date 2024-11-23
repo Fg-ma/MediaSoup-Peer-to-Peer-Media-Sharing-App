@@ -114,9 +114,7 @@ export default function FgTable({
       <div
         ref={remoteVideosContainerRef}
         className={`fg-table relative rounded-md w-full h-full ${
-          aspectDir.current === "width"
-            ? "overflow-y-auto overflow-x-visible"
-            : "overflow-x-auto overflow-y-visible"
+          aspectDir.current === "width" ? "overflow-y-auto" : "overflow-x-auto"
         }`}
         onScroll={fgTableController.scrollFunction}
         onWheel={fgTableController.horizontalScrollWheel}

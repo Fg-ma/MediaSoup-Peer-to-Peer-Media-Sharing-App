@@ -157,3 +157,49 @@
   border-radius: 1px;
   background-color: var(--primary-video-color);
 }
+
+.animated-border-box,
+.animated-border-box-glow {
+  height: calc(100% + 8px);
+  width: calc(100% + 8px);
+  position: absolute;
+  overflow: hidden;
+  z-index: 0;
+  border-radius: 0.375rem;
+}
+
+.animated-border-box-glow {
+  overflow: hidden;
+  filter: blur(15px);
+}
+
+.animated-border-box:before,
+.animated-border-box-glow:before {
+  content: "";
+  z-index: -2;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  position: absolute;
+  width: 500%;
+  height: 500%;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /*border color, change middle color*/
+  background-image: conic-gradient(
+    rgba(0, 0, 0, 0) 0deg,
+    #f56114 90deg,
+    rgba(0, 0, 0, 0) 95deg,
+    #f56114 180deg,
+    rgba(0, 0, 0, 0) 185deg
+  );
+  /* change speed here */
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: translate(-50%, -50%) rotate(1turn);
+  }
+}

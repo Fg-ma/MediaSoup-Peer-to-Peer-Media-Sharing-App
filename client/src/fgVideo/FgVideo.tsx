@@ -32,6 +32,7 @@ import {
 import RotateButton from "./lib/RotateButton";
 import PanButton from "./lib/PanButton";
 import ScaleButton from "./lib/ScaleButton";
+import FgAdjustmentVideoController from "./lib/FgAdjustmentVideoControls";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -169,7 +170,7 @@ export default function FgVideo({
 
   const paused = useRef(!fgVideoOptions.autoPlay);
 
-  const [adjustingDimensions, setAdjustingDimensions] = useState(true);
+  const [adjustingDimensions, setAdjustingDimensions] = useState(false);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -202,9 +203,16 @@ export default function FgVideo({
 
   const initTimeOffset = useRef(0);
 
-  const [position, setPosition] = useState({ left: 50, top: 50 });
-  const [scale, setScale] = useState({ x: 25, y: 25 });
-  const [rotation, setRotation] = useState(0);
+  const [_rerender, setRerender] = useState(false);
+  const positioning = useRef<{
+    position: { left: number; top: number };
+    scale: { x: number; y: number };
+    rotation: number;
+  }>({
+    position: { left: 50, top: 50 },
+    scale: { x: 25, y: 25 },
+    rotation: 0,
+  });
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -257,6 +265,13 @@ export default function FgVideo({
     }
   };
 
+  const fgAdjustmentVideoController = new FgAdjustmentVideoController(
+    setAdjustingDimensions,
+    bundleRef,
+    positioning,
+    setRerender
+  );
+
   const controls = new Controls(
     socket,
     videoId,
@@ -287,7 +302,8 @@ export default function FgVideo({
     tintColor,
     userStreamEffects,
     userMedia,
-    initTimeOffset
+    initTimeOffset,
+    fgAdjustmentVideoController
   );
 
   const fgVideoController = new FgVideoController(
@@ -299,7 +315,6 @@ export default function FgVideo({
     videoStream,
     setPausedState,
     paused,
-    setAdjustingDimensions,
     userMedia,
     remoteStreamEffects,
     currentEffectsStyles,
@@ -308,14 +323,7 @@ export default function FgVideo({
     videoContainerRef,
     audioRef,
     fgVideoOptions,
-    handleVisualEffectChange,
-    bundleRef,
-    position,
-    setPosition,
-    scale,
-    setScale,
-    rotation,
-    setRotation
+    handleVisualEffectChange
   );
 
   useEffect(() => {
@@ -349,9 +357,7 @@ export default function FgVideo({
         (message) => {
           const data = JSON.parse(message);
 
-          setPosition(data.position);
-          setScale(data.scale);
-          setRotation(data.rotation);
+          positioning.current = data.positioning;
         }
       );
     }
@@ -442,13 +448,11 @@ export default function FgVideo({
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           id: videoId,
-          position,
-          scale,
-          rotation,
+          positioning: positioning.current,
         })
       );
     }
-  }, [position, scale, rotation]);
+  }, [positioning.current]);
 
   return (
     <div
@@ -463,34 +467,52 @@ export default function FgVideo({
       } flex items-center justify-center`}
       style={{
         position: "absolute",
-        left: `${position.left}%`,
-        top: `${position.top}%`,
-        width: `${scale.x}%`,
-        height: `${scale.y}%`,
-        rotate: `${rotation}deg`,
+        left: `${positioning.current.position.left}%`,
+        top: `${positioning.current.position.top}%`,
+        width: `${positioning.current.scale.x}%`,
+        height: `${positioning.current.scale.y}%`,
+        rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
       onMouseEnter={() => controls.handleMouseEnter()}
       onMouseLeave={() => controls.handleMouseLeave()}
     >
       <RotateButton
-        dragFunction={fgVideoController.rotateDragFunction}
+        dragFunction={fgAdjustmentVideoController.rotateDragFunction}
         bundleRef={bundleRef}
-        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
-        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
+        mouseDownFunction={
+          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
+        }
+        mouseUpFunction={
+          fgAdjustmentVideoController.adjustmentBtnMouseUpFunction
+        }
       />
       <PanButton
-        dragFunction={fgVideoController.movementDragFunction}
+        dragFunction={fgAdjustmentVideoController.movementDragFunction}
         bundleRef={bundleRef}
-        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
-        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
+        mouseDownFunction={
+          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
+        }
+        mouseUpFunction={
+          fgAdjustmentVideoController.adjustmentBtnMouseUpFunction
+        }
       />
       <ScaleButton
-        dragFunction={fgVideoController.scaleDragFunction}
+        dragFunction={fgAdjustmentVideoController.scaleDragFunction}
         bundleRef={bundleRef}
-        mouseDownFunction={fgVideoController.adjustmentBtnMouseDownFunction}
-        mouseUpFunction={fgVideoController.adjustmentBtnMouseUpFunction}
+        mouseDownFunction={
+          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
+        }
+        mouseUpFunction={
+          fgAdjustmentVideoController.adjustmentBtnMouseUpFunction
+        }
       />
+      {adjustingDimensions && (
+        <>
+          <div className='animated-border-box-glow'></div>
+          <div className='animated-border-box'></div>
+        </>
+      )}
       <div
         ref={subContainerRef}
         className={`relative flex items-center justify-center text-white font-K2D h-full w-full overflow-hidden rounded-md`}

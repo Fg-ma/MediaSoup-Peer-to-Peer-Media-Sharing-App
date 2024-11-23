@@ -8,6 +8,7 @@ import {
 import CameraMedia from "src/lib/CameraMedia";
 import ScreenMedia from "src/lib/ScreenMedia";
 import AudioMedia from "src/lib/AudioMedia";
+import FgAdjustmentVideoController from "src/fgVideo/lib/FgAdjustmentVideoControls";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -110,7 +111,8 @@ class Controls {
       };
       audio: AudioMedia | undefined;
     }>,
-    private initTimeOffset: React.MutableRefObject<number>
+    private initTimeOffset: React.MutableRefObject<number>,
+    private fgAdjustmentVideoController: FgAdjustmentVideoController
   ) {
     this.initTime = Date.now();
   }
@@ -265,9 +267,70 @@ class Controls {
       case "arrowdown":
         this.volumeControl(-0.05);
         break;
+      case "s":
+        document.addEventListener("mousemove", this.scaleFuntion);
+        document.addEventListener("mousedown", this.scaleFunctionEnd);
+        break;
+      case "g":
+        document.addEventListener("mousemove", this.moveFunction);
+        document.addEventListener("mousedown", this.moveFunctionEnd);
+        break;
+      case "r":
+        document.addEventListener("mousemove", this.rotateFunction);
+        document.addEventListener("mousedown", this.rotateFunctionEnd);
+        break;
       default:
         break;
     }
+  };
+
+  scaleFunctionEnd = () => {
+    this.fgAdjustmentVideoController.adjustmentBtnMouseUpFunction();
+    document.removeEventListener("mousemove", this.scaleFuntion);
+    document.removeEventListener("mousedown", this.scaleFunctionEnd);
+  };
+
+  rotateFunctionEnd = () => {
+    this.fgAdjustmentVideoController.adjustmentBtnMouseUpFunction();
+    document.removeEventListener("mousemove", this.rotateFunction);
+    document.removeEventListener("mousedown", this.rotateFunctionEnd);
+  };
+
+  moveFunctionEnd = () => {
+    this.fgAdjustmentVideoController.adjustmentBtnMouseUpFunction();
+    document.removeEventListener("mousemove", this.moveFunction);
+    document.removeEventListener("mousedown", this.moveFunctionEnd);
+  };
+
+  moveFunction = (event: MouseEvent) => {
+    if (!this.bundleRef.current) {
+      return;
+    }
+
+    const rect = this.bundleRef.current.getBoundingClientRect();
+    this.fgAdjustmentVideoController.movementDragFunction({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    });
+    this.fgAdjustmentVideoController.adjustmentBtnMouseDownFunction();
+  };
+
+  scaleFuntion = (event: MouseEvent) => {
+    if (!this.bundleRef.current) {
+      return;
+    }
+
+    const rect = this.bundleRef.current.getBoundingClientRect();
+    this.fgAdjustmentVideoController.scaleDragFunction({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    });
+    this.fgAdjustmentVideoController.adjustmentBtnMouseDownFunction();
+  };
+
+  rotateFunction = (event: MouseEvent) => {
+    this.fgAdjustmentVideoController.rotateDragFunction(event);
+    this.fgAdjustmentVideoController.adjustmentBtnMouseDownFunction();
   };
 
   volumeControl = (volumeChangeAmount: number) => {

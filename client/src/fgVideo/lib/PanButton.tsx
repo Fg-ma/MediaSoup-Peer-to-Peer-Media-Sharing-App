@@ -16,7 +16,7 @@ export default function PanButton({
 }) {
   return (
     <FgButton
-      className='pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-[10000] pl-1'
+      className='pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1'
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}
       dragFunction={dragFunction}

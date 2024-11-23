@@ -177,6 +177,14 @@ export default function VisualEffectsSection({
       animate='animate'
       exit='init'
       transition={EffectSectionTransition}
+      onScroll={(event) => {
+        event.stopPropagation();
+        event.preventDefault();
+      }}
+      onWheel={(event) => {
+        event.stopPropagation();
+        event.preventDefault();
+      }}
     >
       <Suspense fallback={<div>Loading...</div>}>
         <BabylonPostProcessEffectsButton
