@@ -27,6 +27,7 @@ import FgMetaData from "./lib/FgMetaData";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
+import "./scrollbar.css";
 
 const websocketURL = "http://localhost:8000";
 

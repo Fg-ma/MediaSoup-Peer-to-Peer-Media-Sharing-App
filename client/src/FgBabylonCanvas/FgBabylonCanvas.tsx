@@ -178,7 +178,7 @@ export default function FgBabylonCanvas({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [inVideo, setInVideo] = useState(true);
+  const [inVideo, setInVideo] = useState(false);
 
   const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -368,7 +368,15 @@ export default function FgBabylonCanvas({
         (message) => {
           const data = JSON.parse(message);
 
-          positioning.current = data.positioning;
+          if (
+            data.table_id === table_id &&
+            data.username === username &&
+            data.instance === instance &&
+            data.videoId === videoId
+          ) {
+            positioning.current = data.positioning;
+            setRerender((prev) => !prev);
+          }
         }
       );
     }
@@ -459,13 +467,12 @@ export default function FgBabylonCanvas({
 
   useEffect(() => {
     if (fgVideoOptions.isUser) {
-      if (!bundleRef.current) {
-        return;
-      }
-
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
-          id: videoId,
+          table_id,
+          username,
+          instance,
+          videoId,
           positioning: positioning.current,
         })
       );

@@ -1,4 +1,5 @@
 import {
+  DataStreamTypes,
   tableConsumers,
   tableConsumerTransports,
   tableProducers,
@@ -284,12 +285,27 @@ class MediasoupCleanup {
     username: string,
     instance: string,
     producerType: ProducerTypes,
-    producerId?: string
+    producerId?: string,
+    dataStreamType?: DataStreamTypes
   ) {
     if (
-      (producerType === "camera" ||
-        producerType === "screen" ||
-        producerType === "json") &&
+      producerType === "json" &&
+      dataStreamType &&
+      tableProducers[table_id] &&
+      tableProducers[table_id][username] &&
+      tableProducers[table_id][username][instance] &&
+      tableProducers[table_id][username][instance][producerType] &&
+      tableProducers[table_id][username][instance][producerType][dataStreamType]
+    ) {
+      delete tableProducers[table_id][username][instance][producerType][
+        dataStreamType
+      ];
+
+      this.clearTableProducers(table_id, username, instance, producerType);
+    }
+
+    if (
+      (producerType === "camera" || producerType === "screen") &&
       producerId &&
       tableProducers[table_id] &&
       tableProducers[table_id][username] &&
@@ -344,7 +360,8 @@ class MediasoupCleanup {
     username: string,
     instance: string,
     producerType: ProducerTypes,
-    producerId?: string
+    producerId?: string,
+    dataStreamType?: DataStreamTypes
   ) {
     for (const consumerUsername in tableConsumers[table_id]) {
       for (const consumerInstance in tableConsumers[table_id][
@@ -361,49 +378,69 @@ class MediasoupCleanup {
                 for (const iterProducerType in tableConsumers[table_id][
                   consumerUsername
                 ][consumerInstance][producerUsername][producerInstance]) {
-                  if (
-                    iterProducerType === producerType &&
-                    (iterProducerType === "camera" ||
-                      iterProducerType === "screen" ||
-                      iterProducerType === "json")
-                  ) {
-                    for (const iterProducerId in tableConsumers[table_id][
-                      consumerUsername
-                    ][consumerInstance][producerUsername][producerInstance][
-                      iterProducerType
-                    ]) {
-                      if (iterProducerId === producerId) {
-                        delete tableConsumers[table_id][consumerUsername][
-                          consumerInstance
-                        ][producerUsername][producerInstance][
-                          iterProducerType
-                        ]?.[iterProducerId];
+                  if (iterProducerType === producerType) {
+                    if (
+                      iterProducerType === "json" &&
+                      dataStreamType &&
+                      tableConsumers[table_id][consumerUsername][
+                        consumerInstance
+                      ][producerUsername][producerInstance][iterProducerType]?.[
+                        dataStreamType
+                      ]
+                    ) {
+                      delete tableConsumers[table_id][consumerUsername][
+                        consumerInstance
+                      ][producerUsername][producerInstance][iterProducerType][
+                        dataStreamType
+                      ];
 
-                        this.clearTableConsumers(
-                          table_id,
-                          consumerUsername,
-                          consumerInstance,
-                          producerUsername,
-                          iterProducerType
-                        );
+                      this.clearTableConsumers(
+                        table_id,
+                        consumerUsername,
+                        consumerInstance,
+                        producerUsername,
+                        iterProducerType
+                      );
+                    }
+                    if (
+                      iterProducerType === "camera" ||
+                      iterProducerType === "screen"
+                    ) {
+                      for (const iterProducerId in tableConsumers[table_id][
+                        consumerUsername
+                      ][consumerInstance][producerUsername][producerInstance][
+                        iterProducerType
+                      ]) {
+                        if (iterProducerId === producerId) {
+                          delete tableConsumers[table_id][consumerUsername][
+                            consumerInstance
+                          ][producerUsername][producerInstance][
+                            iterProducerType
+                          ]?.[iterProducerId];
+
+                          this.clearTableConsumers(
+                            table_id,
+                            consumerUsername,
+                            consumerInstance,
+                            producerUsername,
+                            iterProducerType
+                          );
+                        }
                       }
                     }
-                  }
-                  if (
-                    iterProducerType === producerType &&
-                    iterProducerType === "audio"
-                  ) {
-                    delete tableConsumers[table_id][consumerUsername][
-                      consumerInstance
-                    ][producerUsername][producerInstance][iterProducerType];
+                    if (iterProducerType === "audio") {
+                      delete tableConsumers[table_id][consumerUsername][
+                        consumerInstance
+                      ][producerUsername][producerInstance][iterProducerType];
 
-                    this.clearTableConsumers(
-                      table_id,
-                      consumerUsername,
-                      consumerInstance,
-                      producerUsername,
-                      iterProducerType
-                    );
+                      this.clearTableConsumers(
+                        table_id,
+                        consumerUsername,
+                        consumerInstance,
+                        producerUsername,
+                        iterProducerType
+                      );
+                    }
                   }
                 }
               }

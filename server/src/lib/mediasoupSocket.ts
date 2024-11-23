@@ -121,6 +121,7 @@ type MediasoupSocketEvents =
       instance: string;
       producerType: ProducerTypes;
       producerId?: string;
+      dataStreamType?: DataStreamTypes;
     }
   | {
       type: "unsubscribe";

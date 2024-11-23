@@ -3,6 +3,7 @@ import FgButton from "../../fgButton/FgButton";
 import SettingsPanel from "./SettingsPanel";
 import { ActivePages } from "../FgVideoControls";
 import { Settings } from "../../fgVideo/FgVideo";
+import { FgVideoOptions } from "src/fgBabylonCanvas/FgBabylonCanvas";
 
 type RecursiveObject = {
   active?: boolean;
@@ -10,6 +11,7 @@ type RecursiveObject = {
 };
 
 export default function FgSettingsButton({
+  fgVideoOptions,
   effectsActive,
   videoContainerRef,
   settingsActive,
@@ -20,6 +22,7 @@ export default function FgSettingsButton({
   setSettings,
   browserStandardSpeechRecognitionAvailable,
 }: {
+  fgVideoOptions: FgVideoOptions;
   effectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
@@ -96,7 +99,7 @@ export default function FgSettingsButton({
     <>
       <FgButton
         externalRef={settingsButtonRef}
-        className='flex items-center justify-center overflow-clip'
+        className='flex items-center justify-center pointer-events-auto'
         mouseDownFunction={toggleSettings}
         contentFunction={() => (
           <svg
@@ -126,6 +129,7 @@ export default function FgSettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
+          fgVideoOptions={fgVideoOptions}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}

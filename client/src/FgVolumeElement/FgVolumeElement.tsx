@@ -211,7 +211,7 @@ export default function FgVolumeElement({
   return (
     <div
       ref={volumeContainer}
-      className='volume-container flex items-center justify-center'
+      className='volume-container flex items-center justify-center pointer-events-auto'
       style={{ height: `calc(${fgVolumeElementOptions.iconSize} * 2)` }}
     >
       <FgButton

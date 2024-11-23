@@ -182,8 +182,8 @@
   left: 50%;
   transform: translate(-50%, -50%) rotate(0deg);
   position: absolute;
-  width: 500%;
-  height: 500%;
+  width: 1000%;
+  height: 1000%;
   background-repeat: no-repeat;
   background-position: 0 0;
   /*border color, change middle color*/

@@ -42,7 +42,7 @@ export default function EffectsButton({
           </div>
         ) : undefined
       }
-      className='flex items-center justify-center w-10 min-w-10 aspect-square relative scale-x-[-1]'
+      className='flex items-center justify-center w-10 min-w-10 aspect-square relative scale-x-[-1] pointer-events-auto'
     />
   );
 }

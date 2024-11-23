@@ -129,7 +129,7 @@ export default function ClosedCaptionsOptionsPage({
         </div>
       </div>
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
-      <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem]'>
+      <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
         {Object.keys(closedCaptionsOptionsArrays).map((option) => (
           <FgButton
             key={option}

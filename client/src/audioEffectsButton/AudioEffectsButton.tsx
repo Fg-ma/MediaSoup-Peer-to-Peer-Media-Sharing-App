@@ -98,7 +98,7 @@ export default function AudioEffectsButton({
             <></>
           )
         }
-        className='flex items-center justify-center w-10 min-w-10 aspect-square'
+        className='flex items-center justify-center w-10 min-w-10 aspect-square pointer-events-auto'
         style={style}
       />
       {audioEffectsActive && (

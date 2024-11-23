@@ -42,7 +42,7 @@ export default function PlayPauseButton({
           </div>
         ) : undefined
       }
-      className='flex items-center justify-center w-10 aspect-square'
+      className='flex items-center justify-center w-10 aspect-square pointer-events-auto'
     />
   );
 }

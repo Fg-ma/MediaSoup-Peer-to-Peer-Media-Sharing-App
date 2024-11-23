@@ -2,7 +2,6 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import Main from "./src/Main";
 import "./index.css";
-import "./scrollbar.css";
 import { StreamsContextProvider } from "./src/context/streamsContext/StreamsContext";
 import { SignalContextProvider } from "./src/context/signalContext/SignalContext";
 import { CurrentEffectsStylesContextProvider } from "./src/context/currentEffectsStylesContext/CurrentEffectsStylesContext";

@@ -13,7 +13,9 @@ class ScreenSectionController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
+    private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
+    private isAudio: React.MutableRefObject<boolean>,
     private setScreenActive: (value: React.SetStateAction<boolean>) => void,
 
     private userMedia: React.MutableRefObject<{
@@ -60,6 +62,7 @@ class ScreenSectionController {
         const producerId = `${this.username.current}_screen_stream_${i}`;
 
         if (producerId in this.userMedia.current.screen) {
+          // Remove screen producer
           const msg = {
             type: "removeProducer",
             table_id: this.table_id.current,
@@ -69,6 +72,19 @@ class ScreenSectionController {
             producerId: producerId,
           };
           this.socket.current.emit("message", msg);
+
+          if (!this.isCamera.current && !this.isAudio.current) {
+            // Remove positionRotationScale producer
+            const message = {
+              type: "removeProducer",
+              table_id: this.table_id.current,
+              username: this.username.current,
+              instance: this.instance.current,
+              producerType: "json",
+              dataStreamType: "positionScaleRotation",
+            };
+            this.socket.current.emit("message", message);
+          }
           break;
         }
       }

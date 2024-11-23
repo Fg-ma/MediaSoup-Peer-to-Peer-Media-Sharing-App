@@ -12,7 +12,7 @@ import ClosedCaptionsOptionsPage, {
 } from "./ClosedCaptionsOptionsPage";
 import PageTemplate from "./PageTemplate";
 import { ActivePages } from "../FgVideoControls";
-import { Settings } from "src/fgVideo/FgVideo";
+import { FgVideoOptions, Settings } from "src/fgVideo/FgVideo";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -81,6 +81,7 @@ const closedCaptionOptionsPageTitles = {
 };
 
 export default function SettingsPanel({
+  fgVideoOptions,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -89,6 +90,7 @@ export default function SettingsPanel({
   setSettings,
   browserStandardSpeechRecognitionAvailable,
 }: {
+  fgVideoOptions: FgVideoOptions;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -184,7 +186,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-black bg-opacity-75 font-K2D text-base text-white'
+      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-black bg-opacity-75 font-K2D text-base text-white pointer-events-auto'
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -204,42 +206,44 @@ export default function SettingsPanel({
             animate='animate'
             exit='exit'
           >
-            <FgButton
-              className='w-full'
-              contentFunction={() => (
-                <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between px-2 rounded items-center'>
-                  <div>Subtitles</div>
-                  <div>
-                    {Object.prototype.hasOwnProperty.call(
-                      closedCaptionsSelections,
-                      settings.closedCaption.value
-                    ) ? (
-                      // @ts-expect-error: check
-                      closedCaptionsSelections[settings.closedCaption.value]
-                    ) : Object.prototype.hasOwnProperty.call(
-                        expandedClosedCaptionsBrowserSelections,
+            {fgVideoOptions.isVolume && (
+              <FgButton
+                className='w-full'
+                contentFunction={() => (
+                  <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between px-2 rounded items-center'>
+                    <div>Subtitles</div>
+                    <div>
+                      {Object.prototype.hasOwnProperty.call(
+                        closedCaptionsSelections,
                         settings.closedCaption.value
                       ) ? (
-                      // @ts-expect-error: check
-                      expandedClosedCaptionsBrowserSelections[
-                        settings.closedCaption.value
-                      ]
-                    ) : Object.prototype.hasOwnProperty.call(
-                        expandedClosedCaptionsVoskSelections,
-                        settings.closedCaption.value
-                      ) ? (
-                      // @ts-expect-error: check
-                      expandedClosedCaptionsVoskSelections[
-                        settings.closedCaption.value
-                      ]
-                    ) : (
-                      <></>
-                    )}
+                        // @ts-expect-error: check
+                        closedCaptionsSelections[settings.closedCaption.value]
+                      ) : Object.prototype.hasOwnProperty.call(
+                          expandedClosedCaptionsBrowserSelections,
+                          settings.closedCaption.value
+                        ) ? (
+                        // @ts-expect-error: check
+                        expandedClosedCaptionsBrowserSelections[
+                          settings.closedCaption.value
+                        ]
+                      ) : Object.prototype.hasOwnProperty.call(
+                          expandedClosedCaptionsVoskSelections,
+                          settings.closedCaption.value
+                        ) ? (
+                        // @ts-expect-error: check
+                        expandedClosedCaptionsVoskSelections[
+                          settings.closedCaption.value
+                        ]
+                      ) : (
+                        <></>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-              mouseDownFunction={handleClosedCaptionsActive}
-            />
+                )}
+                mouseDownFunction={handleClosedCaptionsActive}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>

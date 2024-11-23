@@ -181,6 +181,8 @@ export default function FgTableFunctions({
           cameraBtnRef={cameraBtnRef}
           newCameraBtnRef={newCameraBtnRef}
           isCamera={isCamera}
+          isScreen={isScreen}
+          isAudio={isAudio}
           setCameraActive={setCameraActive}
           cameraActive={cameraActive}
           producers={producers}
@@ -209,7 +211,9 @@ export default function FgTableFunctions({
           instance={instance}
           screenBtnRef={screenBtnRef}
           newScreenBtnRef={newScreenBtnRef}
+          isCamera={isCamera}
           isScreen={isScreen}
+          isAudio={isAudio}
           screenActive={screenActive}
           setScreenActive={setScreenActive}
           producers={producers}

@@ -359,6 +359,7 @@ class Producers {
     instance: string;
     producerType: ProducerTypes;
     producerId?: string;
+    dataStreamType?: DataStreamTypes;
   }) {
     try {
       this.mediasoupCleanup.removeProducer(
@@ -366,7 +367,8 @@ class Producers {
         event.username,
         event.instance,
         event.producerType,
-        event.producerId
+        event.producerId,
+        event.dataStreamType
       );
 
       // Remove consumers
@@ -375,7 +377,8 @@ class Producers {
         event.username,
         event.instance,
         event.producerType,
-        event.producerId
+        event.producerId,
+        event.dataStreamType
       );
 
       // Remove producer transports

@@ -208,7 +208,7 @@ export default function FgVideoControls({
   }, []);
 
   return (
-    <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20'>
+    <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20 pointer-events-none'>
       <div className='relative pointer-events-auto'>
         <AnimatePresence>
           {effectsActive && (
@@ -327,9 +327,10 @@ export default function FgVideoControls({
                 />
               </Suspense>
             )}
-          {
+          {fgVideoOptions.isVolume && (
             <Suspense fallback={<div>Loading...</div>}>
               <FgSettingsButton
+                fgVideoOptions={fgVideoOptions}
                 effectsActive={effectsActive}
                 videoContainerRef={videoContainerRef}
                 settingsActive={settingsActive}
@@ -343,7 +344,7 @@ export default function FgVideoControls({
                 }
               />
             </Suspense>
-          }
+          )}
           {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
             fgVideoOptions.isEffects && (
               <Suspense fallback={<div>Loading...</div>}>

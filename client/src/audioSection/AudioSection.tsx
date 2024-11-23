@@ -69,7 +69,7 @@ export default function AudioSection({
   }, [mutedAudioRef.current]);
 
   return (
-    <div className='flex space-x-4 mx-2 h-10'>
+    <div className='flex space-x-4 mx-2 h-10 pointer-events-auto'>
       <FgButton
         externalRef={audioBtnRef}
         clickFunction={() => audioSectionController.shareAudio()}

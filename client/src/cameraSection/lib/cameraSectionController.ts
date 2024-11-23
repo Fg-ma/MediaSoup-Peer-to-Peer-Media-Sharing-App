@@ -14,6 +14,8 @@ class CameraSectionController {
     private instance: React.MutableRefObject<string>,
 
     private isCamera: React.MutableRefObject<boolean>,
+    private isScreen: React.MutableRefObject<boolean>,
+    private isAudio: React.MutableRefObject<boolean>,
     private setCameraActive: (value: React.SetStateAction<boolean>) => void,
 
     private userMedia: React.MutableRefObject<{
@@ -58,19 +60,32 @@ class CameraSectionController {
       }
     } else if (!this.isCamera.current) {
       for (let i = this.userCameraCount.current; i >= 0; i--) {
-        const producerId = `${this.username.current}_camera_stream_${i}`;
+        const cameraProducerId = `${this.username.current}_camera_stream_${i}`;
 
-        if (producerId in this.userMedia.current.camera) {
+        if (cameraProducerId in this.userMedia.current.camera) {
+          // Remove camera producer
           const msg = {
             type: "removeProducer",
             table_id: this.table_id.current,
             username: this.username.current,
             instance: this.instance.current,
             producerType: "camera",
-            producerId: producerId,
+            producerId: cameraProducerId,
           };
-
           this.socket.current.emit("message", msg);
+
+          if (!this.isScreen.current && !this.isAudio.current) {
+            // Remove positionRotationScale producer
+            const message = {
+              type: "removeProducer",
+              table_id: this.table_id.current,
+              username: this.username.current,
+              instance: this.instance.current,
+              producerType: "json",
+              dataStreamType: "positionScaleRotation",
+            };
+            this.socket.current.emit("message", message);
+          }
           break;
         }
       }

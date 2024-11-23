@@ -17,7 +17,9 @@ export default function ScreenSection({
   instance,
   screenBtnRef,
   newScreenBtnRef,
+  isCamera,
   isScreen,
+  isAudio,
   screenActive,
   setScreenActive,
   producers,
@@ -30,7 +32,9 @@ export default function ScreenSection({
   instance: React.MutableRefObject<string>;
   screenBtnRef: React.RefObject<HTMLButtonElement>;
   newScreenBtnRef: React.RefObject<HTMLButtonElement>;
+  isCamera: React.MutableRefObject<boolean>;
   isScreen: React.MutableRefObject<boolean>;
+  isAudio: React.MutableRefObject<boolean>;
   screenActive: boolean;
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>;
   producers: Producers;
@@ -45,7 +49,9 @@ export default function ScreenSection({
     username,
     instance,
 
+    isCamera,
     isScreen,
+    isAudio,
     setScreenActive,
 
     userMedia,
