@@ -22,52 +22,13 @@ export const keysMap: { [key: string]: string } = {
 };
 
 class FgPianoController {
-  private isUser: boolean;
-
-  private userMedia: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: CameraMedia;
-    };
-    screen: {
-      [screenId: string]: ScreenMedia;
-    };
-    audio: AudioMedia | undefined;
-  }>;
-
-  private scaleSectionContainerRef: React.RefObject<HTMLDivElement>;
-  private scaleSectionRef: React.RefObject<HTMLDivElement>;
-
-  private keyWidth: React.MutableRefObject<number>;
-
-  private setVisibleOctave: React.Dispatch<React.SetStateAction<Octaves>>;
-  private visibleOctaveRef: React.MutableRefObject<Octaves>;
-
-  private keysPressed: React.MutableRefObject<string[]>;
-  private setKeyPresses: React.Dispatch<
-    React.SetStateAction<{
-      [key: string]: {
-        currentlyPressed: boolean;
-        height: number;
-        bottom: number;
-      }[];
-    }>
-  >;
-  private shiftPressed: React.MutableRefObject<boolean>;
-  private controlPressed: React.MutableRefObject<boolean>;
-
-  private keyVisualizerActiveRef: React.MutableRefObject<boolean>;
-  private keyVisualizerRef: React.RefObject<HTMLDivElement>;
-  private visualizerAnimationFrameRef: React.MutableRefObject<
-    number | undefined
-  >;
-
-  private heightGrowFactor = 1.5; // Height growth factor for pressed key
-  private bottomGrowFactor = 1.5; // Bottom movement factor for released key
+  private heightGrowFactor = 2; // Height growth factor for pressed key
+  private bottomGrowFactor = 2; // Bottom movement factor for released key
 
   constructor(
-    isUser: boolean,
+    private isUser: boolean,
 
-    userMedia: React.MutableRefObject<{
+    private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
       };
@@ -77,16 +38,16 @@ class FgPianoController {
       audio: AudioMedia | undefined;
     }>,
 
-    scaleSectionContainerRef: React.RefObject<HTMLDivElement>,
-    scaleSectionRef: React.RefObject<HTMLDivElement>,
+    private scaleSectionContainerRef: React.RefObject<HTMLDivElement>,
+    private scaleSectionRef: React.RefObject<HTMLDivElement>,
 
-    keyWidth: React.MutableRefObject<number>,
+    private keyWidth: React.MutableRefObject<number>,
 
-    setVisibleOctave: React.Dispatch<React.SetStateAction<Octaves>>,
-    visibleOctaveRef: React.MutableRefObject<Octaves>,
+    private setVisibleOctave: React.Dispatch<React.SetStateAction<Octaves>>,
+    private visibleOctaveRef: React.MutableRefObject<Octaves>,
 
-    keysPressed: React.MutableRefObject<string[]>,
-    setKeyPresses: React.Dispatch<
+    private keysPressed: React.MutableRefObject<string[]>,
+    private setKeyPresses: React.Dispatch<
       React.SetStateAction<{
         [key: string]: {
           currentlyPressed: boolean;
@@ -95,28 +56,15 @@ class FgPianoController {
         }[];
       }>
     >,
-    shiftPressed: React.MutableRefObject<boolean>,
-    controlPressed: React.MutableRefObject<boolean>,
+    private shiftPressed: React.MutableRefObject<boolean>,
+    private controlPressed: React.MutableRefObject<boolean>,
 
-    keyVisualizerActiveRef: React.MutableRefObject<boolean>,
-    keyVisualizerRef: React.RefObject<HTMLDivElement>,
-    visualizerAnimationFrameRef: React.MutableRefObject<number | undefined>
-  ) {
-    this.isUser = isUser;
-    this.userMedia = userMedia;
-    this.scaleSectionContainerRef = scaleSectionContainerRef;
-    this.scaleSectionRef = scaleSectionRef;
-    this.keyWidth = keyWidth;
-    this.setVisibleOctave = setVisibleOctave;
-    this.visibleOctaveRef = visibleOctaveRef;
-    this.keysPressed = keysPressed;
-    this.setKeyPresses = setKeyPresses;
-    this.shiftPressed = shiftPressed;
-    this.controlPressed = controlPressed;
-    this.keyVisualizerActiveRef = keyVisualizerActiveRef;
-    this.keyVisualizerRef = keyVisualizerRef;
-    this.visualizerAnimationFrameRef = visualizerAnimationFrameRef;
-  }
+    private keyVisualizerActiveRef: React.MutableRefObject<boolean>,
+    private keyVisualizerRef: React.RefObject<HTMLDivElement>,
+    private visualizerAnimationFrameRef: React.MutableRefObject<
+      number | undefined
+    >
+  ) {}
 
   playNote = (note: string, octave: number, isPress: boolean) => {
     if (this.isUser) {
@@ -411,7 +359,7 @@ class FgPianoController {
           }
 
           // Only keep updating if it's within the bounds of the visualizer
-          if (newBottom <= (this.keyVisualizerRef.current?.clientHeight ?? 0)) {
+          if (newBottom <= 100) {
             updatedKeyPresses[key][index] = {
               ...keyPresses[index],
               height: newHeight,

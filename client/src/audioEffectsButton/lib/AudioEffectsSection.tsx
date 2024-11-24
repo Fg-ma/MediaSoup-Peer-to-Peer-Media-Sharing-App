@@ -392,9 +392,6 @@ export default function AudioEffectsSection({
       {backgroundMusicActive && (
         <Suspense fallback={<div>Loading...</div>}>
           <FgBackgroundMusicPortal
-            username={username}
-            instance={instance}
-            isUser={isUser}
             closeCallback={closeBackgroundMusicCallback}
             backgroundMusicButtonRef={backgroundMusicButtonRef}
           />

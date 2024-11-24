@@ -21,10 +21,14 @@ export default function KeyVisualizer({
             return (
               <div
                 key={`${key}_${index}`}
-                className={`key-visualizer-key ${key}`}
+                className={`key-visualizer-key ${
+                  instance && instance.currentlyPressed
+                    ? "key-visualizer-currently-pressed"
+                    : ""
+                } ${key}`}
                 style={{
-                  bottom: instance && instance.bottom && `${instance.bottom}px`,
-                  height: instance && instance.height && `${instance.height}px`,
+                  bottom: instance && instance.bottom && `${instance.bottom}%`,
+                  height: instance && instance.height && `${instance.height}%`,
                 }}
               />
             );
