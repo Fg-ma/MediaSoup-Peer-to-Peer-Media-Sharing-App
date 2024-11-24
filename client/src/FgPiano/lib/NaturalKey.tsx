@@ -1,5 +1,5 @@
 import React from "react";
-import FgButton from "../../fgButton/FgButton";
+import FgButton from "../../fgElements/fgButton/FgButton";
 import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
 
 const NaturalKeyVar: Variants = {

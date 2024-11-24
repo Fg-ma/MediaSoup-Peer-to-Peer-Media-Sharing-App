@@ -1,6 +1,8 @@
 import React from "react";
-import FgSVG from "../../fgSVG/FgSVG";
-import FgSlider, { SliderChangeEvent } from "../../fgSlider/FgSlider";
+import FgSVG from "../../fgElements/fgSVG/FgSVG";
+import FgSlider, {
+  SliderChangeEvent,
+} from "../../fgElements/fgSlider/FgSlider";
 import { AudioMixEffectsType } from "../../audioEffects/typeConstant";
 import {
   DynamicMixEffect,

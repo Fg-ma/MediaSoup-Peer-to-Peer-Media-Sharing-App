@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { KnobButtonOptions } from "../../fgKnobButton/FgKnobButton";
+import { KnobButtonOptions } from "../../fgElements/fgKnobButton/FgKnobButton";
 import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import SamplerEffect from "./SamplerEffect";
 import {

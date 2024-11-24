@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Transition, Variants, motion, AnimatePresence } from "framer-motion";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgButton from "../../fgElements/fgButton/FgButton";
+import FgSVG from "../../fgElements/fgSVG/FgSVG";
 
 import metronomeIcon from "../../../public/svgs/audioEffects/metronomeIcon.svg";
 import metronomeOffIcon from "../../../public/svgs/audioEffects/metronomeOffIcon.svg";

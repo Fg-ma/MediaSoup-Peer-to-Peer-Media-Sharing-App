@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
-import FgButton from "../../fgButton/FgButton";
+import FgButton from "../../fgElements/fgButton/FgButton";
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
 

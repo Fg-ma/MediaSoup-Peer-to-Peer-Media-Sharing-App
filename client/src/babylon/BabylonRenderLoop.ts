@@ -12,7 +12,7 @@ import {
   HideBackgroundEffectTypes,
 } from "../context/currentEffectsStylesContext/typeConstant";
 import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
-import UserDevice from "../UserDevice";
+import UserDevice from "../lib/UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
 import BabylonMeshes from "./BabylonMeshes";
 import FaceLandmarks from "./FaceLandmarks";

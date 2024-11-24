@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
-import FgButton from "../../fgButton/FgButton";
-import FgSelectionButton from "../../fgSelectionButton/FgSelectionButton";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgButton from "../../fgElements/fgButton/FgButton";
+import FgSelectionButton from "../../fgElements/fgSelectionButton/FgSelectionButton";
+import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import { navTransition, navVar } from "./SamplerToolbar";
 import navigateForward from "../../../public/svgs/navigateForward.svg";
 import navigateBack from "../../../public/svgs/navigateBack.svg";
-import FgPortal from "../../fgPortal/FgPortal";
+import FgPortal from "../../fgElements/fgPortal/FgPortal";
 import { FgSamplers } from "src/audioEffects/fgSamplers";
 
 const notes = [

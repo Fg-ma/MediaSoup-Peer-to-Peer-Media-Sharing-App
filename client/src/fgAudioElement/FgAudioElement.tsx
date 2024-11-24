@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated, SpringValue } from "react-spring";
-import { colors } from "../fgVideo/lib/colors";
+import { colors } from "../fgVisualMedia/lib/colors";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
-import FgButton from "../fgButton/FgButton";
+import FgButton from "../fgElements/fgButton/FgButton";
 
 const shadowColors = {
   black: "rgba(0, 0, 0, 0.8)",

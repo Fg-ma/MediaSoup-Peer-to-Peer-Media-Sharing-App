@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import { AudioEffectTypes } from "../../context/streamsContext/typeConstant";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgButton from "../../fgElements/fgButton/FgButton";
+import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import { AudioEffectTemplate } from "./typeConstant";
 
 export default function AudioEffectButton({

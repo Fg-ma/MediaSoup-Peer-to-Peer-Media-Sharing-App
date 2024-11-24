@@ -1,0 +1,50 @@
+import React, { useState } from "react";
+import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import fullScreenIcon from "../../../../../../public/svgs/fullScreenIcon.svg";
+import fullScreenOffIcon from "../../../../../../public/svgs/fullScreenOffIcon.svg";
+
+import FgLowerVideoController from "../FgLowerVideoController";
+
+export default function FullScreenButton({
+  fgLowerVideoController,
+  visualEffectsActive,
+  settingsActive,
+}: {
+  fgLowerVideoController: FgLowerVideoController;
+  visualEffectsActive: boolean;
+  settingsActive: boolean;
+}) {
+  const [active, setActive] = useState(false);
+
+  return (
+    <FgButton
+      clickFunction={() => {
+        fgLowerVideoController.handleFullScreen();
+        setActive((prev) => !prev);
+      }}
+      contentFunction={() => {
+        const iconSrc = active ? fullScreenOffIcon : fullScreenIcon;
+
+        return (
+          <FgSVG
+            src={iconSrc}
+            attributes={[
+              { key: "width", value: "36px" },
+              { key: "height", value: "36px" },
+              { key: "fill", value: "white" },
+            ]}
+          />
+        );
+      }}
+      hoverContent={
+        !visualEffectsActive && !settingsActive ? (
+          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+            Full screen (f)
+          </div>
+        ) : undefined
+      }
+      className='flex items-center justify-center w-10 aspect-square scale-x-[-1] pointer-events-auto'
+    />
+  );
+}

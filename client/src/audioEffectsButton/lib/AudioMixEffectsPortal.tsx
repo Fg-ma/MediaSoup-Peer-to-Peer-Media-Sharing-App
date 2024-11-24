@@ -4,8 +4,8 @@ import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import AudioMixEffect from "./AudioMixEffect";
 import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../scrollingContainer/lib/ScrollingContainerButton";
-import FgPanel from "../../fgPanel/FgPanel";
-import { SliderChangeEvent } from "../../fgSlider/FgSlider";
+import FgPanel from "../../fgElements/fgPanel/FgPanel";
+import { SliderChangeEvent } from "../../fgElements/fgSlider/FgSlider";
 import { DynamicMixEffect, staticMixEffects } from "./typeConstant";
 import {
   AudioMixEffectsType,

@@ -1,12 +1,12 @@
 import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgButton from "../../fgElements/fgButton/FgButton";
+import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import { Octaves } from "../FgPiano";
 import navigateForward from "../../../public/svgs/navigateForward.svg";
 import navigateBack from "../../../public/svgs/navigateBack.svg";
 import { navTransition, navVar } from "./SamplerToolbar";
-import FgPortal from "../../fgPortal/FgPortal";
+import FgPortal from "../../fgElements/fgPortal/FgPortal";
 
 export default function OctaveSelection({
   visibleOctaveRef,

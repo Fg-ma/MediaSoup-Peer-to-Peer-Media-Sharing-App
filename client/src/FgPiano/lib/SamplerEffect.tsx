@@ -1,9 +1,9 @@
 import React from "react";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import { SamplerEffectType } from "./SamplerEffectsToolbar";
-import FgKnobButton from "../../fgKnobButton/FgKnobButton";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgKnobButton from "../../fgElements/fgKnobButton/FgKnobButton";
+import FgButton from "../../fgElements/fgButton/FgButton";
+import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,

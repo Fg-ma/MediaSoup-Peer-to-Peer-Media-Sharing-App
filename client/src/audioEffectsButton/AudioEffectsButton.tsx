@@ -2,8 +2,8 @@ import React, { Suspense, useRef } from "react";
 import { Socket } from "socket.io-client";
 import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
-import FgButton from "../fgButton/FgButton";
-import FgSVG from "../fgSVG/FgSVG";
+import FgButton from "../fgElements/fgButton/FgButton";
+import FgSVG from "../fgElements/fgSVG/FgSVG";
 import audioEffectIcon from "../../public/svgs/audioEffects/audioEffectIcon.svg";
 import audioEffectOffIcon from "../../public/svgs/audioEffects/audioEffectOffIcon.svg";
 

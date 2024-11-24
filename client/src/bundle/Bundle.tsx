@@ -4,10 +4,10 @@ import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesC
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import BundleController from "./lib/BundleController";
 import { useSignalContext } from "../context/signalContext/SignalContext";
-import FgBabylonCanvas from "../fgBabylonCanvas/FgBabylonCanvas";
+import FgBabylonCanvas from "../fgVisualMedia/FgBabylonCanvas";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 
-const FgVideo = React.lazy(() => import("../fgVideo/FgVideo"));
+const FgVideo = React.lazy(() => import("../fgVisualMedia/FgVideo"));
 const FgAudioElementContainer = React.lazy(
   () => import("../fgAudioElement/FgAudioElementContainer")
 );

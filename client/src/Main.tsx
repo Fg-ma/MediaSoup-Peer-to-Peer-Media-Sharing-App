@@ -18,8 +18,8 @@ import {
 import onRouterCapabilities from "./lib/onRouterCapabilities";
 import Producers from "./lib/Producers";
 import Consumers from "./lib/Consumers";
-import UserDevice from "./UserDevice";
-import BrowserMedia from "./BrowserMedia";
+import UserDevice from "./lib/UserDevice";
+import BrowserMedia from "./lib/BrowserMedia";
 import BundlesController from "./bundlesController";
 import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
 import Deadbanding from "./babylon/Deadbanding";
@@ -226,6 +226,12 @@ export default function Main() {
 
   const remoteVideosContainerRef = useRef<HTMLDivElement>(null);
 
+  const permissions = useRef({
+    acceptsCameraEffects: true,
+    acceptsScreenEffects: true,
+    acceptsAudioEffects: true,
+    acceptsPositionScaleRotationManipulation: true,
+  });
   const acceptCameraEffects = true;
   const acceptScreenEffects = true;
   const acceptAudioEffects = true;

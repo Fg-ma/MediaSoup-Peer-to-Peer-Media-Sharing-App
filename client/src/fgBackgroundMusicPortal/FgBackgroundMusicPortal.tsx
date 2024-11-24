@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
-import FgPanel from "../fgPanel/FgPanel";
-import FgButton from "../fgButton/FgButton";
+import FgPanel from "../fgElements/fgPanel/FgPanel";
+import FgButton from "../fgElements/fgButton/FgButton";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import { BackgroundMusicTypes } from "../context/currentEffectsStylesContext/typeConstant";
-import FgImage from "../fgImage/FgImage";
-import FgSVG from "../fgSVG/FgSVG";
+import FgImage from "../fgElements/fgImage/FgImage";
+import FgSVG from "../fgElements/fgSVG/FgSVG";
 
 import additionIcon from "../../public/svgs/additionIcon.svg";
 import adventureTimeIcon from "../../public/svgs/audioEffects/adventureTimeIcon.svg";

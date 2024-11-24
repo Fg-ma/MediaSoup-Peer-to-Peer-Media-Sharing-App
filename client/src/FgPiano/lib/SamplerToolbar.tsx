@@ -4,8 +4,8 @@ import { Octaves } from "../FgPiano";
 import SelectSampler from "./SelectSampler";
 import SamplerVolume from "./SamplerVolume";
 import OctaveSelection from "./OctaveSelection";
-import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgButton from "../../fgElements/fgButton/FgButton";
+import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import FgPianoController from "./FgPianoController";
 
 import effectIcon from "../../../public/svgs/effectIcon.svg";

@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import FgAudioElement from "./FgAudioElement";
 
-const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));
+const FgPortal = React.lazy(() => import("../fgElements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
   () => import("../audioEffectsButton/lib/AudioEffectsSection")
 );

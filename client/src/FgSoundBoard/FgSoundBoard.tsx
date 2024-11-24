@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import FgPanel from "../fgPanel/FgPanel";
-import FgButton from "../fgButton/FgButton";
+import FgPanel from "../fgElements/fgPanel/FgPanel";
+import FgButton from "../fgElements/fgButton/FgButton";
 import "./lib/soundBoard.css";
 import FgTriToggleButton from "../fgTriToggleButton/FgTriToggleButton";
 import FgSoundBoardController from "./lib/FgSoundBoardController";
@@ -14,7 +14,7 @@ import {
   SoundEffects,
   SoundEffectsMetaData,
 } from "./lib/typeConstant";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVG from "../fgElements/fgSVG/FgSVG";
 
 import additionIcon from "../../public/svgs/additionIcon.svg";
 

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import "./lib/fgVolumeElement.css";
 import volumeSVGPaths from "../fgVolumeElement/lib/volumeSVGPaths";
-import FgButton from "../fgButton/FgButton";
+import FgButton from "../fgElements/fgButton/FgButton";
 import FgVolumeElementController from "../fgVolumeElement/lib/FgVolumeElementController";
 import VolumeSVG from "../fgVolumeElement/lib/VolumeSVG";
 import { useSignalContext } from "../context/signalContext/SignalContext";
@@ -21,7 +21,7 @@ export default function FgVolumeElement({
   audioRef,
   clientMute,
   localMute,
-  effectsActive,
+  visualEffectsActive,
   settingsActive,
   options,
   handleMuteCallback,
@@ -36,7 +36,7 @@ export default function FgVolumeElement({
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
-  effectsActive: boolean;
+  visualEffectsActive: boolean;
   settingsActive: boolean;
   options?: FgVolumeElementOptions;
   handleMuteCallback?: () => void;
@@ -246,7 +246,7 @@ export default function FgVolumeElement({
           );
         }}
         hoverContent={
-          !effectsActive && !settingsActive ? (
+          !visualEffectsActive && !settingsActive ? (
             <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
               {active ? "Unmute (m)" : "Mute (m)"}
             </div>

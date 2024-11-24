@@ -3,10 +3,10 @@ import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import CameraSection from "../cameraSection/CameraSection";
-import AudioSection from "../audioSection/AudioSection";
+import CameraSection from "./lib/cameraSection/CameraSection";
+import AudioSection from "./lib/audioSection/AudioSection";
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
-import ScreenSection from "../screenSection/ScreenSection";
+import ScreenSection from "./lib/screenSection/ScreenSection";
 import Producers from "../lib/Producers";
 import TableFunctionsController from "./lib/TableFunctionsController";
 
@@ -197,6 +197,8 @@ export default function FgTableFunctions({
           audioBtnRef={audioBtnRef}
           muteBtnRef={muteBtnRef}
           mutedAudioRef={mutedAudioRef}
+          isCamera={isCamera}
+          isScreen={isScreen}
           isAudio={isAudio}
           audioActive={audioActive}
           setAudioActive={setAudioActive}

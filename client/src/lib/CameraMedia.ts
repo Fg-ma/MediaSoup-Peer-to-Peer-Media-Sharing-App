@@ -9,7 +9,7 @@ import {
   defaultCameraStreamEffects,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
-import UserDevice from "../UserDevice";
+import UserDevice from "./UserDevice";
 import BabylonScene, {
   EffectType,
   validEffectTypes,

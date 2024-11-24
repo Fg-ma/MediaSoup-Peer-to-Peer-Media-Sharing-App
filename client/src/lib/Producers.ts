@@ -16,8 +16,8 @@ import {
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
-import UserDevice from "../UserDevice";
-import BrowserMedia from "../BrowserMedia";
+import UserDevice from "./UserDevice";
+import BrowserMedia from "./BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import { UserDataStreams } from "src/context/streamsContext/StreamsContext";
 
