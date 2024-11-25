@@ -7,12 +7,13 @@ import OctaveSelection from "./OctaveSelection";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import FgPianoController from "./FgPianoController";
+import SamplerMetronome from "./SamplerMetronome";
+import FgBackgroundSelector from "../../fgBackgroundSelector/FgBackgroundSelector";
 
 import effectIcon from "../../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
 import keyVisualizerIcon from "../../../public/svgs/audioEffects/keyVisualizerIcon.svg";
 import keyVisualizerOffIcon from "../../../public/svgs/audioEffects/keyVisualizerOffIcon.svg";
-import SamplerMetronome from "./SamplerMetronome";
 
 export const navVar: Variants = {
   leftInit: { opacity: 0, x: -20 },
@@ -124,6 +125,7 @@ export default function SamplerToolbar({
           className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         />
+        {keyVisualizerActive && <FgBackgroundSelector />}
         <FgButton
           contentFunction={() => {
             const iconSrc = samplerEffectsActive ? effectOffIcon : effectIcon;

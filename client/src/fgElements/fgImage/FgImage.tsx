@@ -43,7 +43,7 @@ export default function FgImage({
       {...props}
     >
       <img
-        className='w-full h-full object-contain'
+        className='w-full h-full'
         ref={imgRef}
         src={src}
         onLoad={loaded}

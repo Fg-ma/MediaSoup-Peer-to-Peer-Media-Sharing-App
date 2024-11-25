@@ -7,36 +7,51 @@ import chooseBackgroundOffIcon from "../../public/svgs/chooseBackgroundOffIcon.s
 import BackgroundSelectorPanel from "./lib/BackgroundSelectorPanel";
 
 export default function FgBackgroundSelector() {
-  const [active, setActive] = useState(false);
+  const [backgroundSelectorPanelActive, setBackgroundSelectorPanelActive] =
+    useState(false);
 
   const backgroundSelectorBtnRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <div>
+    <>
       <FgButton
         externalRef={backgroundSelectorBtnRef}
-        className='w-10 h-10'
         contentFunction={() => {
           return (
             <FgSVG
-              src={active ? chooseBackgroundOffIcon : chooseBackgroundIcon}
+              src={
+                backgroundSelectorPanelActive
+                  ? chooseBackgroundOffIcon
+                  : chooseBackgroundIcon
+              }
               attributes={[
                 { key: "width", value: "100%" },
                 { key: "height", value: "100%" },
-                { key: "fill", value: "white" },
-                { key: "stroke", value: "white" },
+                { key: "fill", value: "black" },
+                { key: "stroke", value: "black" },
               ]}
             />
           );
         }}
-        clickFunction={() => setActive((prev) => !prev)}
+        clickFunction={() => setBackgroundSelectorPanelActive((prev) => !prev)}
+        hoverContent={
+          backgroundSelectorPanelActive ? (
+            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+              Background selector
+            </div>
+          ) : (
+            <></>
+          )
+        }
+        className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
+        options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
       />
-      {active && (
+      {backgroundSelectorPanelActive && (
         <BackgroundSelectorPanel
-          setActive={setActive}
+          setBackgroundSelectorPanelActive={setBackgroundSelectorPanelActive}
           backgroundSelectorBtnRef={backgroundSelectorBtnRef}
         />
       )}
-    </div>
+    </>
   );
 }

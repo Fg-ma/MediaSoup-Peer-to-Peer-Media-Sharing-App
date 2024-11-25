@@ -215,8 +215,8 @@ export default function FgPiano({
         referenceElement,
         placement: "below",
       }}
-      initHeight={"300px"}
-      initWidth={"401px"}
+      initHeight={"330px"}
+      initWidth={"530px"}
       minWidth={285}
       minHeight={190}
       shadow={{
