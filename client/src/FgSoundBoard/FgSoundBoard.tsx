@@ -4,7 +4,6 @@ import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import FgPanel from "../fgElements/fgPanel/FgPanel";
 import FgButton from "../fgElements/fgButton/FgButton";
 import "./lib/soundBoard.css";
-import FgTriToggleButton from "../fgTriToggleButton/FgTriToggleButton";
 import FgSoundBoardController from "./lib/FgSoundBoardController";
 import {
   BoardModes,
@@ -15,6 +14,7 @@ import {
   SoundEffectsMetaData,
 } from "./lib/typeConstant";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
+import FgTriToggleButton from "../fgElements/fgTriToggleButton/FgTriToggleButton";
 
 import additionIcon from "../../public/svgs/additionIcon.svg";
 

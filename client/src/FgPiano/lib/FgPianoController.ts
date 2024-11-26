@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { keys } from "./Scale";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
@@ -47,15 +48,6 @@ class FgPianoController {
     private visibleOctaveRef: React.MutableRefObject<Octaves>,
 
     private keysPressed: React.MutableRefObject<string[]>,
-    private setKeyPresses: React.Dispatch<
-      React.SetStateAction<{
-        [key: string]: {
-          currentlyPressed: boolean;
-          height: number;
-          bottom: number;
-        }[];
-      }>
-    >,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
 
@@ -117,60 +109,31 @@ class FgPianoController {
   };
 
   handleKeyUp = (eventKey: string, octave: Octaves) => {
+    if (!this.keyVisualizerRef.current) {
+      return;
+    }
+
     const pianoKey = keysMap[eventKey];
 
     if (this.keyVisualizerActiveRef.current) {
       if (pianoKey === "shift" || pianoKey === "control") {
-        this.setKeyPresses((prevKeyPresses) => {
-          const newKeyPresses = { ...prevKeyPresses };
+        const children = Array.from(this.keyVisualizerRef.current.children);
+        children.forEach((child) => {
+          const [key] = child.id.split("_");
+          const [_childKey, childOctave] = key.split("-fg-");
 
-          for (const keyPress in newKeyPresses) {
-            const keyPressStringArray = keyPress.split("-fg-");
-            const keyPressOctave =
-              keyPressStringArray[keyPressStringArray.length - 1];
-
-            if (parseInt(keyPressOctave) === octave) {
-              for (let i = 0; i < newKeyPresses[keyPress].length; i++) {
-                newKeyPresses[keyPress][i] = {
-                  ...newKeyPresses[keyPress][i],
-                  currentlyPressed: false,
-                };
-              }
-            }
+          if (parseInt(childOctave) === octave) {
+            child.classList.remove("key-visualizer-currently-pressed");
           }
-
-          return newKeyPresses;
         });
       } else {
-        this.setKeyPresses((prevKeyPresses) => {
-          const key = `${pianoKey}-fg-${octave}`;
+        const children = Array.from(this.keyVisualizerRef.current.children);
+        children.forEach((child) => {
+          const [key] = child.id.split("_");
+          const [childKey, childOctave] = key.split("-fg-");
 
-          const updatedKeyPressArray = prevKeyPresses[key]
-            ? [...prevKeyPresses[key]]
-            : [];
-
-          if (updatedKeyPressArray.length > 0) {
-            const lastEntry = updatedKeyPressArray.pop();
-            if (lastEntry) {
-              lastEntry.currentlyPressed = false;
-
-              const newKeyPresses = {
-                ...prevKeyPresses,
-                [key]: [...updatedKeyPressArray, lastEntry],
-              };
-
-              return newKeyPresses;
-            } else {
-              return prevKeyPresses;
-            }
-          } else {
-            const newKeyPresses = {
-              ...prevKeyPresses,
-            };
-
-            delete newKeyPresses[key];
-
-            return newKeyPresses;
+          if (childKey === pianoKey && parseInt(childOctave) === octave) {
+            child.classList.remove("key-visualizer-currently-pressed");
           }
         });
       }
@@ -203,6 +166,10 @@ class FgPianoController {
   };
 
   handleKeyDown = (eventKey: string, octave: Octaves) => {
+    if (!this.keyVisualizerRef.current) {
+      return;
+    }
+
     const pianoKey = keysMap[eventKey];
 
     if (
@@ -217,46 +184,26 @@ class FgPianoController {
       }
 
       if (pianoKey === "shift" || pianoKey === "control") {
-        this.setKeyPresses((prevKeyPresses) => {
-          const newKeyPresses = { ...prevKeyPresses };
+        const children = Array.from(this.keyVisualizerRef.current.children);
+        children.forEach((child) => {
+          const [key] = child.id.split("_");
+          const [_childKey, childOctave] = key.split("-fg-");
 
-          for (const keyPress in newKeyPresses) {
-            const keyPressStringArray = keyPress.split("-fg-");
-            const keyPressOctave =
-              keyPressStringArray[keyPressStringArray.length - 1];
-
-            if (parseInt(keyPressOctave) === this.visibleOctaveRef.current) {
-              for (let i = 0; i < newKeyPresses[keyPress].length; i++) {
-                newKeyPresses[keyPress][i] = {
-                  ...newKeyPresses[keyPress][i],
-                  currentlyPressed: false,
-                };
-              }
-            }
+          if (parseInt(childOctave) === this.visibleOctaveRef.current) {
+            child.classList.remove("key-visualizer-currently-pressed");
           }
-
-          return newKeyPresses;
         });
       } else {
-        this.setKeyPresses((prevKeyPresses) => {
-          const key = `${pianoKey}-fg-${octave}`;
+        const newKeyElement = document.createElement("div");
+        const key = `${pianoKey}-fg-${octave}`;
+        newKeyElement.id = `${key}_${uuidv4()}`;
+        newKeyElement.style.bottom = "0px";
+        newKeyElement.style.height = "1px";
+        newKeyElement.classList.add(key);
+        newKeyElement.classList.add("key-visualizer-key");
+        newKeyElement.classList.add("key-visualizer-currently-pressed");
 
-          const currentKeyPresses = prevKeyPresses[key] || [];
-
-          const newKeyPresses = {
-            ...prevKeyPresses,
-            [key]: [
-              ...currentKeyPresses,
-              {
-                currentlyPressed: true,
-                height: 0,
-                bottom: 0,
-              },
-            ],
-          };
-
-          return newKeyPresses;
-        });
+        this.keyVisualizerRef.current?.appendChild(newKeyElement);
       }
     }
 
@@ -340,47 +287,48 @@ class FgPianoController {
   };
 
   updateVisualizerAnimations = () => {
-    this.setKeyPresses((prevKeyPresses) => {
-      const updatedKeyPresses: typeof prevKeyPresses = {};
+    if (!this.keyVisualizerRef.current) return;
 
-      Object.entries(prevKeyPresses).forEach(([key, keyPresses]) => {
-        updatedKeyPresses[key] = updatedKeyPresses[key] || [];
+    const children = Array.from(this.keyVisualizerRef.current.children);
+    children.forEach((child) => {
+      if (!this.keyVisualizerRef.current) return;
 
-        keyPresses.forEach((instance, index) => {
-          if (!instance) return;
+      const element = child as HTMLElement;
 
-          let newHeight = instance.height;
-          let newBottom = instance.bottom;
+      if (!element.classList.contains("key-visualizer-key")) {
+        return;
+      }
 
-          if (instance.currentlyPressed) {
-            newHeight += this.heightGrowFactor; // Grow height when pressed
-          } else {
-            newBottom += this.bottomGrowFactor; // Move upwards when released
-          }
+      if (element.classList.contains("key-visualizer-currently-pressed")) {
+        const currentHeight = parseInt(
+          element.style.height.slice(0, -2) || "0",
+          10
+        );
+        element.style.height = `${currentHeight + this.heightGrowFactor}px`;
+      } else {
+        const newBottom =
+          parseInt(element.style.bottom.slice(0, -2) || "0", 10) +
+          this.bottomGrowFactor;
 
-          // Only keep updating if it's within the bounds of the visualizer
-          if (newBottom <= 100) {
-            updatedKeyPresses[key][index] = {
-              ...keyPresses[index],
-              height: newHeight,
-              bottom: newBottom,
-            };
-          }
-        });
-
-        // Delete any empty keyPresses
-        if (updatedKeyPresses[key].length === 0) {
-          delete updatedKeyPresses[key];
+        if (newBottom <= this.keyVisualizerRef.current.clientHeight + 5) {
+          element.style.bottom = `${newBottom}px`;
+        } else {
+          child.remove();
         }
-      });
-
-      return updatedKeyPresses;
+      }
     });
 
-    // Continue updating using requestAnimationFrame for smooth animation
-    this.visualizerAnimationFrameRef.current = requestAnimationFrame(
-      this.updateVisualizerAnimations
-    );
+    if (children.length > 0) {
+      // Continue updating using requestAnimationFrame for smooth animation
+      this.visualizerAnimationFrameRef.current = requestAnimationFrame(
+        this.updateVisualizerAnimations
+      );
+    } else {
+      if (this.visualizerAnimationFrameRef.current) {
+        cancelAnimationFrame(this.visualizerAnimationFrameRef.current);
+        this.visualizerAnimationFrameRef.current = undefined;
+      }
+    }
   };
 }
 

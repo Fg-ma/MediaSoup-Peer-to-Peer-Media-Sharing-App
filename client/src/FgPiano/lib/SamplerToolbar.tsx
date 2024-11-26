@@ -45,6 +45,7 @@ export default function SamplerToolbar({
   keyVisualizerActive,
   setKeyVisualizerActive,
   keyVisualizerActiveRef,
+  keyVisualizerContainerRef,
 }: {
   focus: boolean;
   fgPianoController: FgPianoController;
@@ -54,6 +55,7 @@ export default function SamplerToolbar({
   keyVisualizerActive: boolean;
   setKeyVisualizerActive: React.Dispatch<React.SetStateAction<boolean>>;
   keyVisualizerActiveRef: React.MutableRefObject<boolean>;
+  keyVisualizerContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const rightScaleSectionToolbarRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +127,9 @@ export default function SamplerToolbar({
           className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         />
-        {keyVisualizerActive && <FgBackgroundSelector />}
+        {keyVisualizerActive && (
+          <FgBackgroundSelector backgroundRef={keyVisualizerContainerRef} />
+        )}
         <FgButton
           contentFunction={() => {
             const iconSrc = samplerEffectsActive ? effectOffIcon : effectIcon;

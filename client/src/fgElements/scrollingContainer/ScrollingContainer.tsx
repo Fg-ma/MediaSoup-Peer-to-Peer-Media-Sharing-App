@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, ReactNode } from "react";
 import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 import "./lib/scrollingContainer.css";
-import FgButton from "../fgElements/fgButton/FgButton";
-import FgSVG from "../fgElements/fgSVG/FgSVG";
-import navigateForward from "../../public/svgs/navigateForward.svg";
-import navigateBack from "../../public/svgs/navigateBack.svg";
+import FgButton from "../fgButton/FgButton";
+import FgSVG from "../fgSVG/FgSVG";
+
+import navigateForward from "../../../public/svgs/navigateForward.svg";
+import navigateBack from "../../../public/svgs/navigateBack.svg";
 
 const scrollButtonsVar: Variants = {
   leftInit: { opacity: 0, x: -20 },

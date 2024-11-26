@@ -35,13 +35,6 @@ export default function FgPiano({
   const [focus, setFocus] = useState(false);
   const [samplerEffectsActive, setSamplerEffectsActive] = useState(false);
   const [keyVisualizerActive, setKeyVisualizerActive] = useState(false);
-  const [keyPresses, setKeyPresses] = useState<{
-    [key: string]: {
-      currentlyPressed: boolean;
-      height: number;
-      bottom: number;
-    }[];
-  }>({});
   const keyVisualizerActiveRef = useRef(false);
   const visibleOctaveRef = useRef<Octaves>(initialOctave);
   const scaleSectionContainerRef = useRef<HTMLDivElement>(null);
@@ -52,6 +45,7 @@ export default function FgPiano({
   const controlPressed = useRef(false);
   const keysPressed = useRef<string[]>([]);
   const keyVisualizerRef = useRef<HTMLDivElement>(null);
+  const keyVisualizerContainerRef = useRef<HTMLDivElement>(null);
   const visualizerAnimationFrameRef = useRef<number | undefined>(undefined);
 
   const fgPianoController = new FgPianoController(
@@ -63,7 +57,6 @@ export default function FgPiano({
     setVisibleOctave,
     visibleOctaveRef,
     keysPressed,
-    setKeyPresses,
     shiftPressed,
     controlPressed,
     keyVisualizerActiveRef,
@@ -160,16 +153,6 @@ export default function FgPiano({
     activeScale?.classList.add("active-octave");
   }, [visibleOctave]);
 
-  useEffect(() => {
-    if (
-      Object.keys(keyPresses).length === 0 &&
-      visualizerAnimationFrameRef.current
-    ) {
-      cancelAnimationFrame(visualizerAnimationFrameRef.current);
-      visualizerAnimationFrameRef.current = undefined;
-    }
-  }, [Object.keys(keyPresses).length]);
-
   return (
     <FgPanel
       content={
@@ -183,10 +166,11 @@ export default function FgPiano({
             keyVisualizerActive={keyVisualizerActive}
             setKeyVisualizerActive={setKeyVisualizerActive}
             keyVisualizerActiveRef={keyVisualizerActiveRef}
+            keyVisualizerContainerRef={keyVisualizerContainerRef}
           />
           {samplerEffectsActive && (
             <Suspense fallback={<div>Loading...</div>}>
-              <SamplerEffectsToolbar focus={focus} />{" "}
+              <SamplerEffectsToolbar focus={focus} />
             </Suspense>
           )}
           <ScaleSection
@@ -200,10 +184,8 @@ export default function FgPiano({
             setKeyVisualizerActive={setKeyVisualizerActive}
             keyVisualizerActiveRef={keyVisualizerActiveRef}
             keyVisualizerRef={keyVisualizerRef}
-            keyPresses={keyPresses}
+            keyVisualizerContainerRef={keyVisualizerContainerRef}
             visualizerAnimationFrameRef={visualizerAnimationFrameRef}
-            keysPressed={keysPressed}
-            setKeyPresses={setKeyPresses}
           />
         </div>
       }

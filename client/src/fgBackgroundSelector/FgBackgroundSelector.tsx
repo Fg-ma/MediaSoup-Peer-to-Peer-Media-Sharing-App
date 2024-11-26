@@ -6,7 +6,11 @@ import chooseBackgroundIcon from "../../public/svgs/chooseBackgroundIcon.svg";
 import chooseBackgroundOffIcon from "../../public/svgs/chooseBackgroundOffIcon.svg";
 import BackgroundSelectorPanel from "./lib/BackgroundSelectorPanel";
 
-export default function FgBackgroundSelector() {
+export default function FgBackgroundSelector({
+  backgroundRef,
+}: {
+  backgroundRef: React.RefObject<HTMLDivElement>;
+}) {
   const [backgroundSelectorPanelActive, setBackgroundSelectorPanelActive] =
     useState(false);
 
@@ -48,6 +52,7 @@ export default function FgBackgroundSelector() {
       />
       {backgroundSelectorPanelActive && (
         <BackgroundSelectorPanel
+          backgroundRef={backgroundRef}
           setBackgroundSelectorPanelActive={setBackgroundSelectorPanelActive}
           backgroundSelectorBtnRef={backgroundSelectorBtnRef}
         />

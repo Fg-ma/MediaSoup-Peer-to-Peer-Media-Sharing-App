@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FgPanel from "../../fgElements/fgPanel/FgPanel";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgImage from "../../fgElements/fgImage/FgImage";
@@ -129,63 +129,84 @@ const recommendations: {
     | NatureCategories
     | SpaceCategories
     | TechnologyCategories]?: {
+    category: Categories;
     label: string;
     url: string;
     loadingUrl: string;
   };
 } = {
   geometric4: {
+    category: "geometric",
     label: "Geometric 4",
     url: geometric4_1280x843,
     loadingUrl: geometric4_64x42,
   },
   geometric6: {
+    category: "geometric",
     label: "Geometric 6",
     url: geometric6_1280x720,
     loadingUrl: geometric6_64x36,
   },
   mountains: {
+    category: "nature",
     label: "Mountains",
     url: mountains_1024x1280,
     loadingUrl: mountains_51x64,
   },
   shoreSide: {
+    category: "nature",
     label: "Shore side",
     url: shoreSide_1024x1280,
     loadingUrl: shoreSide_51x64,
   },
   submarine: {
+    category: "nature",
     label: "Submarine",
     url: submarine_854x1280,
     loadingUrl: submarine_43x64,
   },
   sunnySideUp: {
+    category: "nature",
     label: "Sunny side up",
     url: sunnySideUp_1280x1280,
     loadingUrl: sunnySideUp_64x64,
   },
   blueBall: {
+    category: "space",
     label: "Blue ball",
     url: blueBall_1280x800,
     loadingUrl: blueBall_64x40,
   },
   solarParty: {
+    category: "space",
     label: "Solar party",
     url: solarParty_960x1280,
     loadingUrl: solarParty_48x64,
   },
   starMap: {
+    category: "space",
     label: "Star map",
     url: starMap_1169x1280,
     loadingUrl: starMap_58x64,
   },
-  binary: { label: "Binary", url: binary_1280x1280, loadingUrl: binary_64x64 },
+  binary: {
+    category: "technology",
+    label: "Binary",
+    url: binary_1280x1280,
+    loadingUrl: binary_64x64,
+  },
   circuit: {
+    category: "technology",
     label: "Circuit",
     url: circuit_1280x1273,
     loadingUrl: circuit_64x64,
   },
-  robot: { label: "Robot", url: robot_854x1280, loadingUrl: robot_43x64 },
+  robot: {
+    category: "technology",
+    label: "Robot",
+    url: robot_854x1280,
+    loadingUrl: robot_43x64,
+  },
 };
 
 const categories: {
@@ -377,16 +398,18 @@ const categories: {
 };
 
 export default function BackgroundSelectorPanel({
+  backgroundRef,
   setBackgroundSelectorPanelActive,
   backgroundSelectorBtnRef,
 }: {
+  backgroundRef: React.RefObject<HTMLDivElement>;
   setBackgroundSelectorPanelActive: React.Dispatch<
     React.SetStateAction<boolean>
   >;
   backgroundSelectorBtnRef: React.RefObject<HTMLButtonElement>;
 }) {
   const [activeCategory, setActiveCategory] = useState<Categories | "">("");
-  const activeBackground = useState<
+  const [activeBackground, setActiveBackground] = useState<
     | { category: ""; categorySelection: "" }
     | { category: "christmas"; categorySelection: ChristmasCategories | "" }
     | { category: "geometric"; categorySelection: GeometricCategories | "" }
@@ -421,22 +444,39 @@ export default function BackgroundSelectorPanel({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     categorySelection: any
   ) => {
-    if (activeBackground.current.categorySelection !== categorySelection) {
+    if (activeBackground.categorySelection !== categorySelection) {
       setActiveCategory("");
     }
-    if (activeBackground.current.categorySelection !== categorySelection) {
-      activeBackground.current = {
+    if (activeBackground.categorySelection !== categorySelection) {
+      setActiveBackground({
         category,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         categorySelection: categorySelection as any,
-      };
+      });
     } else {
-      activeBackground.current = {
+      setActiveBackground({
         category,
         categorySelection: "",
-      };
+      });
     }
   };
+
+  useEffect(() => {
+    if (
+      !backgroundRef.current ||
+      activeBackground.category === "" ||
+      activeBackground.categorySelection === ""
+    ) {
+      return;
+    }
+
+    // prettier-ignore
+    // @ts-expect-error: correlation error
+    backgroundRef.current.style.backgroundImage = `url(${categories[activeBackground.category][activeBackground.categorySelection].url})`;
+    backgroundRef.current.style.backgroundSize = "cover";
+    backgroundRef.current.style.backgroundPosition = "center";
+    backgroundRef.current.style.backgroundRepeat = "no-repeat";
+  }, [activeBackground]);
 
   return (
     <FgPanel
@@ -476,16 +516,19 @@ export default function BackgroundSelectorPanel({
               className='w-full min-h-[4.5rem] h-[4.5rem] flex space-x-2 overflow-x-auto tiny-horizontal-scroll-bar'
               onWheel={handleRecommendationsSectionWheel}
             >
-              {activeBackground.current &&
-                activeBackground.current.category !== "" &&
-                activeBackground.current.categorySelection !== "" && (
+              {activeBackground &&
+                activeBackground.category !== "" &&
+                activeBackground.categorySelection !== "" &&
+                !Object.keys(recommendations).includes(
+                  activeBackground.categorySelection
+                ) && (
                   <FgButton
-                    className='aspect-square h-full border-2 border-fg-secondary rounded'
+                    className='aspect-square h-full border-2 border-fg-secondary rounded overflow-clip'
                     contentFunction={() => {
                       const data =
                         // @ts-expect-error: type correspondance issue
-                        categories[activeBackground.current.category][
-                          activeBackground.current.categorySelection
+                        categories[activeBackground.category][
+                          activeBackground.categorySelection
                         ];
 
                       return (
@@ -504,51 +547,66 @@ export default function BackgroundSelectorPanel({
                       <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
                         {
                           // @ts-expect-error: type correspondance issue
-                          categories[activeBackground.current.category][
-                            activeBackground.current.categorySelection
+                          categories[activeBackground.category][
+                            activeBackground.categorySelection
                           ].label
                         }
                       </div>
                     }
                     scrollingContainerRef={recommendationsSectionRef}
                     options={{ hoverTimeoutDuration: 500 }}
+                    clickFunction={() =>
+                      handleSelectBackground(
+                        activeBackground.category,
+                        activeBackground.categorySelection
+                      )
+                    }
                   />
                 )}
               {Object.entries(recommendations).map(
                 ([recommendationName, recommendation]) => {
-                  if (
-                    activeBackground.current.categorySelection !==
-                    recommendationName
-                  ) {
-                    return (
-                      <FgButton
-                        key={recommendationName}
-                        className='aspect-square h-full border-2 border-fg-white-75 hover:border-fg-secondary rounded'
-                        contentFunction={() => {
-                          return (
-                            <FgImage
-                              src={recommendation.url}
-                              srcLoading={recommendation.loadingUrl}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                              }}
-                            />
-                          );
-                        }}
-                        hoverContent={
-                          <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                            {recommendation.label}
-                          </div>
-                        }
-                        scrollingContainerRef={recommendationsSectionRef}
-                        options={{ hoverTimeoutDuration: 500 }}
-                      />
-                    );
-                  }
+                  return (
+                    <FgButton
+                      key={recommendationName}
+                      className={`aspect-square h-full border-2 hover:border-fg-secondary rounded overflow-clip ${
+                        activeBackground.categorySelection ===
+                        recommendationName
+                          ? "border-fg-secondary"
+                          : "border-fg-white-75"
+                      }`}
+                      contentFunction={() => {
+                        return (
+                          <FgImage
+                            src={recommendation.url}
+                            srcLoading={recommendation.loadingUrl}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        );
+                      }}
+                      hoverContent={
+                        <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                          {recommendation.label}
+                        </div>
+                      }
+                      scrollingContainerRef={recommendationsSectionRef}
+                      options={{ hoverTimeoutDuration: 500 }}
+                      clickFunction={() =>
+                        handleSelectBackground(
+                          recommendation.category,
+                          recommendationName
+                        )
+                      }
+                    />
+                  );
                 }
               )}
+            </div>
+            <div className='text-xl w-full flex items-center justify-start'>
+              Categories
             </div>
             <div
               ref={categoriesSectionRef}
@@ -559,7 +617,7 @@ export default function BackgroundSelectorPanel({
                   return (
                     <FgButton
                       key={categoryName}
-                      className='w-full h-full border-2 border-fg-white-75 hover:border-fg-secondary rounded'
+                      className='w-full h-full border-2 border-fg-white-75 hover:border-fg-secondary rounded overflow-clip'
                       contentFunction={() => {
                         return (
                           <FgSVG
@@ -630,9 +688,8 @@ export default function BackgroundSelectorPanel({
                   return (
                     <FgButton
                       key={categorySelection}
-                      className={`aspect-square h-full border-2 hover:border-fg-secondary rounded ${
-                        activeBackground.current.categorySelection ===
-                        categorySelection
+                      className={`aspect-square h-full border-2 hover:border-fg-secondary rounded overflow-clip ${
+                        activeBackground.categorySelection === categorySelection
                           ? "border-fg-secondary"
                           : "border-fg-white-75"
                       }`}
@@ -671,7 +728,7 @@ export default function BackgroundSelectorPanel({
         )
       }
       initWidth='400px'
-      initHeight='294px'
+      initHeight='328px'
       minWidth={400}
       minHeight={294}
       closePosition={"topRight"}

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { KnobButtonOptions } from "../../fgElements/fgKnobButton/FgKnobButton";
-import ScrollingContainer from "../../scrollingContainer/ScrollingContainer";
+import ScrollingContainer from "../../fgElements/scrollingContainer/ScrollingContainer";
 import SamplerEffect from "./SamplerEffect";
 import {
   AudioMixEffectsType,
