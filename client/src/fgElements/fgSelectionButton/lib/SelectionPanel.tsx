@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants } from "framer-motion";
-import { RecursiveSelections } from "../../../fgSelectionButton/FgSelectionButton";
 import SelectionPanelButton from "./SelectionPanelButton";
 import ExpandingSelectionPanelButton from "./ExpandingSelectionPanelButton";
+import { RecursiveSelections } from "../FgSelectionButton";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },

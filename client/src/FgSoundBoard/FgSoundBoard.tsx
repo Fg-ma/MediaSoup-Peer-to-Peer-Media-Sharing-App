@@ -228,8 +228,8 @@ export default function FgSoundBoard({
         referenceElement: soundBoardButtonRef,
         placement: "below",
       }}
-      initHeight='434px'
-      initWidth='395px'
+      initHeight='645px'
+      initWidth='605px'
       shadow={{ left: true, right: false, bottom: false, top: false }}
       closeCallback={closeCallback}
       closePosition='topRight'

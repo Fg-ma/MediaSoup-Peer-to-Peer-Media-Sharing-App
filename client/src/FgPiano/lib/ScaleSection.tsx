@@ -37,6 +37,7 @@ export default function ScaleSection({
   const currentPress = useRef<
     { note: string | null; octave: string | null } | undefined
   >(undefined);
+  const keyVisualizerNotes = useRef<{}>({ "1": {} }); // js/css very slow add store
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -126,15 +127,9 @@ export default function ScaleSection({
         parseInt(currentPress.current.octave),
         false
       );
-
-      currentPress.current = undefined;
     }
 
-    if (keyVisualizerActive) {
-      if (!keyVisualizerRef.current) {
-        return;
-      }
-
+    if (keyVisualizerActive && keyVisualizerRef.current) {
       const children = Array.from(keyVisualizerRef.current.children);
       children.forEach((child) => {
         if (
@@ -156,6 +151,8 @@ export default function ScaleSection({
         }
       });
     }
+
+    currentPress.current = undefined;
   };
 
   const handleMouseDown = (event: React.MouseEvent) => {
@@ -219,14 +216,18 @@ export default function ScaleSection({
     };
 
     if (
-      currentPress.current &&
-      currentPress.current.note &&
-      currentPress.current.octave
+      !currentPress.current ||
+      (targetValues.note === currentPress.current.note &&
+        targetValues.octave === currentPress.current.octave)
     ) {
+      return;
+    }
+
+    if (currentPress.current.note && currentPress.current.octave) {
       const key = document.getElementById(
         `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
       );
-      if (key && !key.classList.contains("pressed")) {
+      if (key && key.classList.contains("pressed")) {
         key?.classList.remove("pressed");
 
         fgPianoController.playNote(
@@ -237,36 +238,9 @@ export default function ScaleSection({
           false
         );
       }
-
-      currentPress.current = undefined;
     }
 
-    if (targetValues.note && targetValues.octave) {
-      const key = document.getElementById(
-        `piano_key_${targetValues.octave}_${targetValues.note}`
-      );
-      if (key && !key.classList.contains("pressed")) {
-        key.classList.add("pressed");
-
-        fgPianoController.playNote(
-          targetValues.note,
-          parseInt(targetValues.octave),
-          true
-        );
-      }
-
-      currentPress.current = targetValues;
-    }
-
-    if (
-      !currentPress.current ||
-      targetValues.note !== currentPress.current.note ||
-      targetValues.octave !== currentPress.current.octave
-    ) {
-      if (!keyVisualizerActiveRef.current || !keyVisualizerRef.current) {
-        return;
-      }
-
+    if (keyVisualizerActiveRef.current && keyVisualizerRef.current) {
       const children = Array.from(keyVisualizerRef.current.children);
       children.forEach((child) => {
         if (
@@ -305,58 +279,77 @@ export default function ScaleSection({
         );
       }
     }
+
+    currentPress.current = undefined;
+
+    if (targetValues.note && targetValues.octave) {
+      const key = document.getElementById(
+        `piano_key_${targetValues.octave}_${targetValues.note}`
+      );
+      if (key && !key.classList.contains("pressed")) {
+        key.classList.add("pressed");
+
+        fgPianoController.playNote(
+          targetValues.note,
+          parseInt(targetValues.octave),
+          true
+        );
+      }
+
+      currentPress.current = targetValues;
+    }
   };
 
   return (
-    <div
-      ref={scaleSectionContainerRef}
-      className='scale-section-container hide-scroll-bar'
-      onMouseDown={handleMouseDown}
-    >
-      <VerticalSplitPanes
-        topContent={
-          keyVisualizerActive ? (
-            <Suspense fallback={<div>Loading...</div>}>
-              <KeyVisualizer keyVisualizerRef={keyVisualizerRef} />
-            </Suspense>
-          ) : undefined
-        }
-        bottomContent={
-          <div
-            ref={scaleSectionRef}
-            className='scale-section space-x-0.25 py-0.25 px-2'
-          >
-            <Scale octave={0} visibleOctave={visibleOctave} />
-            <Scale octave={1} visibleOctave={visibleOctave} />
-            <Scale octave={2} visibleOctave={visibleOctave} />
-            <Scale octave={3} visibleOctave={visibleOctave} />
-            <Scale octave={4} visibleOctave={visibleOctave} />
-            <Scale octave={5} visibleOctave={visibleOctave} />
-            <Scale octave={6} visibleOctave={visibleOctave} />
-          </div>
-        }
-        floatingTopContent={
-          keyVisualizerActive ? (
+    <div className='grow w-full flex items-center justify-center relative overflow-hidden'>
+      <div
+        ref={scaleSectionContainerRef}
+        className='scale-section-container hide-scroll-bar'
+        onMouseDown={handleMouseDown}
+      >
+        <VerticalSplitPanes
+          topContent={
+            keyVisualizerActive ? (
+              <Suspense fallback={<div>Loading...</div>}>
+                <KeyVisualizer keyVisualizerRef={keyVisualizerRef} />
+              </Suspense>
+            ) : undefined
+          }
+          bottomContent={
             <div
-              ref={keyVisualizerContainerRef}
-              className='h-full select-none w-full'
-            ></div>
-          ) : undefined
-        }
-        panelSizeChangeCallback={fgPianoController.resize}
-        minPaneHeightCallback={() => {
-          setKeyVisualizerActive(false);
-          keyVisualizerActiveRef.current = false;
-        }}
-        options={{
-          initialPaneHeight: "20%",
-          minPaneHeight: 0,
-          maxPaneHeight: 65,
-          dividerButton: false,
-          floatingTopContentOffset: "3rem",
-          floatingTopContentWidth: "calc(100% - 1.5rem)",
-        }}
-      />
+              ref={scaleSectionRef}
+              className='scale-section space-x-0.25 py-0.25 px-2'
+            >
+              <Scale octave={0} visibleOctave={visibleOctave} />
+              <Scale octave={1} visibleOctave={visibleOctave} />
+              <Scale octave={2} visibleOctave={visibleOctave} />
+              <Scale octave={3} visibleOctave={visibleOctave} />
+              <Scale octave={4} visibleOctave={visibleOctave} />
+              <Scale octave={5} visibleOctave={visibleOctave} />
+              <Scale octave={6} visibleOctave={visibleOctave} />
+            </div>
+          }
+          floatingTopContent={
+            keyVisualizerActive ? (
+              <div
+                ref={keyVisualizerContainerRef}
+                className='h-full select-none w-full'
+              ></div>
+            ) : undefined
+          }
+          panelSizeChangeCallback={fgPianoController.resize}
+          minPaneHeightCallback={() => {
+            setKeyVisualizerActive(false);
+            keyVisualizerActiveRef.current = false;
+          }}
+          options={{
+            initialPaneHeight: "20%",
+            minPaneHeight: 0,
+            maxPaneHeight: 65,
+            dividerButton: false,
+          }}
+        />
+      </div>
     </div>
   );
 }

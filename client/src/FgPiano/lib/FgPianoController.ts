@@ -109,13 +109,9 @@ class FgPianoController {
   };
 
   handleKeyUp = (eventKey: string, octave: Octaves) => {
-    if (!this.keyVisualizerRef.current) {
-      return;
-    }
-
     const pianoKey = keysMap[eventKey];
 
-    if (this.keyVisualizerActiveRef.current) {
+    if (this.keyVisualizerActiveRef.current && this.keyVisualizerRef.current) {
       if (pianoKey === "shift" || pianoKey === "control") {
         const children = Array.from(this.keyVisualizerRef.current.children);
         children.forEach((child) => {
@@ -166,13 +162,10 @@ class FgPianoController {
   };
 
   handleKeyDown = (eventKey: string, octave: Octaves) => {
-    if (!this.keyVisualizerRef.current) {
-      return;
-    }
-
     const pianoKey = keysMap[eventKey];
 
     if (
+      this.keyVisualizerRef.current &&
       this.keyVisualizerActiveRef.current &&
       !this.keysPressed.current.includes(pianoKey)
     ) {

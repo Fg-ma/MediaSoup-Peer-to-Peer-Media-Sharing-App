@@ -320,10 +320,7 @@ export default function FgBackgroundMusicPortal({
   return (
     <FgPanel
       content={
-        <div
-          ref={backgroundMusicContainerRef}
-          className='small-vertical-scroll-bar overflow-y-auto overflow-x-hidden w-full h-full'
-        >
+        <div ref={backgroundMusicContainerRef} className='w-full h-full'>
           <input
             ref={fileSelectorRef}
             className='hidden'
@@ -332,7 +329,7 @@ export default function FgBackgroundMusicPortal({
             multiple
           />
           <div
-            className={`py-2 w-full h-full min-h-max min-w-max grid gap-3 items-center justify-center justify-items-center place-items-center ${
+            className={`small-vertical-scroll-bar overflow-y-auto py-2 w-full h-full grid gap-1 items-center justify-center justify-items-center place-items-center ${
               cols === 3
                 ? "grid-cols-3"
                 : cols === 4
@@ -344,7 +341,7 @@ export default function FgBackgroundMusicPortal({
           >
             <FgButton
               contentFunction={() => (
-                <div className='bg-white flex items-center justify-center w-14 min-w-14 aspect-square rounded border-2 border-fg-black-35 border-opacity-75 hover:border-3 hover:border-fg-secondary hover:border-opacity-100'>
+                <div className='bg-white flex items-center justify-center min-w-12 max-w-24 aspect-square rounded border-2 border-fg-black-35 border-opacity-75 hover:border-3 hover:border-fg-secondary hover:border-opacity-100'>
                   <FgSVG
                     src={additionIcon}
                     attributes={[
@@ -376,7 +373,7 @@ export default function FgBackgroundMusicPortal({
                           file.playing
                             ? "border-3 border-fg-secondary border-opacity-100"
                             : "border-2 border-fg-black-35 border-opacity-75"
-                        } font-K2D text-3xl bg-white flex items-center justify-center w-14 min-w-14 aspect-square rounded hover:border-3 hover:border-fg-secondary hover:border-opacity-100`}
+                        } font-K2D text-3xl bg-white flex items-center justify-center min-w-12 max-w-24 aspect-square rounded hover:border-3 hover:border-fg-secondary hover:border-opacity-100`}
                       >
                         {key}
                       </div>
@@ -408,7 +405,7 @@ export default function FgBackgroundMusicPortal({
                         : "border-2 border-white border-opacity-75"
                     } ${effect.bgColor === "white" ? "bg-white" : ""} ${
                       effect.bgColor === "black" ? "bg-black" : ""
-                    } flex items-center justify-center w-14 min-w-14 aspect-square rounded hover:border-3 hover:border-fg-secondary hover:bg-opacity-100`}
+                    } flex items-center justify-center min-w-12 max-w-24 aspect-square rounded hover:border-3 hover:border-fg-secondary hover:bg-opacity-100`}
                     data-background-music-effects-button-value={key}
                   >
                     {effect.image ? (
@@ -416,7 +413,7 @@ export default function FgBackgroundMusicPortal({
                         src={effect.image}
                         srcLoading={effect.imageSmall}
                         alt={key}
-                        style={{ width: "3.25rem", height: "3.25rem" }}
+                        style={{ width: "100%", height: "100%" }}
                         data-background-music-effects-button-value={key}
                       />
                     ) : (
@@ -452,10 +449,10 @@ export default function FgBackgroundMusicPortal({
         referenceElement: backgroundMusicButtonRef.current ?? undefined,
         placement: "below",
       }}
-      initWidth={"245px"}
-      initHeight={"235px"}
-      minWidth={245}
-      minHeight={235}
+      initWidth={"278px"}
+      initHeight={"264px"}
+      minWidth={204}
+      minHeight={190}
       closeCallback={closeCallback}
       closePosition='topRight'
       shadow={{ bottom: true, top: true }}

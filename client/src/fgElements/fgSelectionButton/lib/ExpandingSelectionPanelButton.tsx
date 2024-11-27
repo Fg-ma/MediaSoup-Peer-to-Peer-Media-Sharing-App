@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { RecursiveSelections } from "../../../fgSelectionButton/FgSelectionButton";
 import SelectionPanel from "./SelectionPanel";
+import { RecursiveSelections } from "../FgSelectionButton";
 
 export default function ExpandingSelectionPanelButton({
   panelRefs,
@@ -40,16 +40,20 @@ export default function ExpandingSelectionPanelButton({
 
     // Check if the mouse is within any of the panels from this index onward
     const isInPanel = panelRefs.current.slice(panelIndex).some((ref) => {
-      // console.log(ref.current, event.target);
       return ref.current?.contains(event.target as Node) ?? false;
     });
 
     if (!isInPanel && !buttonRef.current?.contains(event.target as Node)) {
       document.removeEventListener("mousemove", handleMouseMove);
 
-      previousPanels.current = previousPanels.current.filter(
-        (panel) => panel !== selections.value
-      );
+      const targetValue = selections.value;
+      const lastIndex = previousPanels.current.lastIndexOf(targetValue);
+
+      if (lastIndex !== -1) {
+        previousPanels.current = previousPanels.current.filter(
+          (_, index) => index !== lastIndex
+        );
+      }
       setExpanded(false);
     }
   };

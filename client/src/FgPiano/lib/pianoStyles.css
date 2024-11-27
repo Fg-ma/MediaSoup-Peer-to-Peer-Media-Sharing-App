@@ -9,8 +9,8 @@
   --key-width: 0px;
   --key-border-style: solid;
   --scale-section-container-width: 0px;
-  flex-grow: 1;
   width: 100%;
+  height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   display: flex;

@@ -348,8 +348,8 @@ export default function AudioEffectsSection({
           placement: placement,
           padding: padding,
         }}
-        initWidth={"204px"}
-        initHeight={"190px"}
+        initWidth={"278px"}
+        initHeight={"268px"}
         minWidth={204}
         minHeight={190}
         resizeCallback={gridColumnsChange}

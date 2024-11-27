@@ -333,16 +333,234 @@ const samplerSelections = {
   },
 };
 
-export default function SelectSampler() {
+export const samplerBackgroundMap = {
+  pianos: {
+    default: { category: "music", categorySelection: "pianoKeys" },
+    ac1: { category: "music", categorySelection: "note" },
+    ac2: { category: "music", categorySelection: "note" },
+    bell: { category: "music", categorySelection: "musicStream" },
+    brokenCassette: { category: "music", categorySelection: "pianoKeys" },
+    claviPiano: { category: "music", categorySelection: "vinyl" },
+    curlyElectric: { category: "music", categorySelection: "speakers" },
+    dragonMagicOld: { category: "music", categorySelection: "musicStream" },
+    electric1: { category: "music", categorySelection: "musicPattern" },
+    electric2: { category: "music", categorySelection: "dj" },
+    electric3: { category: "music", categorySelection: "turtleDJ" },
+    electric4: { category: "music", categorySelection: "sheetMusic" },
+    electric5: { category: "music", categorySelection: "sheetMusic" },
+    softSteinway: {
+      category: "music",
+      categorySelection: "abstractIntruments",
+    },
+    studioOne1: { category: "music", categorySelection: "note" },
+    studioOne2: { category: "music", categorySelection: "note" },
+    studioOne3: { category: "music", categorySelection: "note" },
+    studioOne4: { category: "music", categorySelection: "note" },
+    studioOne5: { category: "music", categorySelection: "note" },
+    studioOne6: { category: "music", categorySelection: "note" },
+    studioOne7: { category: "music", categorySelection: "note" },
+    studioOne8: { category: "music", categorySelection: "note" },
+    studioOne9: { category: "music", categorySelection: "note" },
+    studioOne10: { category: "music", categorySelection: "speakers" },
+    studioOne11: { category: "music", categorySelection: "speakers" },
+    studioOne12: { category: "music", categorySelection: "speakers" },
+    studioOne13: { category: "music", categorySelection: "speakers" },
+    toy: { category: "music", categorySelection: "musicPattern" },
+  },
+  guitars: {
+    acGuitar: { category: "music", categorySelection: "limeLightGuitar" },
+    acousticGuitar: { category: "music", categorySelection: "acousticGuitar" },
+    AXAFifthsBounceGuitar: {
+      category: "music",
+      categorySelection: "rockGodGuitar",
+    },
+    AXAVoodooVibeGuitar: {
+      category: "music",
+      categorySelection: "paintElectricGuitar",
+    },
+    brightGuitar: {
+      category: "music",
+      categorySelection: "acousticGuitarSketch",
+    },
+    clankyAmpMetalGuitar: {
+      category: "music",
+      categorySelection: "rockGodGuitar",
+    },
+    clankyMetalBassGuitar: {
+      category: "music",
+      categorySelection: "electricGuitar",
+    },
+    ferrumIronGuitar: { category: "music", categorySelection: "velvetGuitar" },
+    freshGuitar: { category: "music", categorySelection: "cleanGuitar" },
+    fretlessGuitar: {
+      category: "music",
+      categorySelection: "paintElectricGuitar",
+    },
+    fuzzGuitar: { category: "music", categorySelection: "electricGuitar" },
+    MexicanGuitarron: {
+      category: "music",
+      categorySelection: "acousticGuitarSketch",
+    },
+    mutedGuitar: { category: "music", categorySelection: "velvetGuitar" },
+    RJSGuitar: { category: "music", categorySelection: "cleanGuitar" },
+  },
+  strings: {
+    acBass: { category: "music", categorySelection: "bassMan" },
+    anaBass: { category: "music", categorySelection: "bassMan" },
+    electricBass1: { category: "music", categorySelection: "dj" },
+    electricBass2: { category: "music", categorySelection: "bassMan" },
+    jarreBass: { category: "music", categorySelection: "abstractIntruments" },
+    longFMBass: { category: "music", categorySelection: "controls" },
+    moogBass: { category: "music", categorySelection: "abstractIntruments" },
+    shortFMBass: { category: "music", categorySelection: "bassMan" },
+    sweepBass: { category: "music", categorySelection: "note" },
+    synthBass: { category: "music", categorySelection: "vinyl" },
+    beyondBowCello: { category: "music", categorySelection: "cello" },
+    brokenCello: { category: "music", categorySelection: "cello" },
+    cello: { category: "music", categorySelection: "cello" },
+    lyreLyre1: { category: "music", categorySelection: "musicStream" },
+    lyreLyre2: { category: "music", categorySelection: "musicStream" },
+    lyreLyre3: { category: "music", categorySelection: "musicStream" },
+    strings1: { category: "music", categorySelection: "abstractIntruments" },
+    strings2: { category: "music", categorySelection: "musicPattern" },
+    uncleJohns5StringBanjo: {
+      category: "music",
+      categorySelection: "sheetMusic",
+    },
+    violin: { category: "music", categorySelection: "violin" },
+  },
+  winds: {
+    bassFrenchHorn: { category: "music", categorySelection: "FrenchHornCombo" },
+    bassTrombone: {
+      category: "music",
+      categorySelection: "abstractInstruments",
+    },
+    bassTrumpet: { category: "music", categorySelection: "trumpetMan" },
+    bassTuba: { category: "music", categorySelection: "dj" },
+    brass1: { category: "music", categorySelection: "sheetMusic" },
+    brass2: { category: "music", categorySelection: "musicStream" },
+    clarinet: { category: "music", categorySelection: "clarinet" },
+    classicSlideWhistle: {
+      category: "music",
+      categorySelection: "musicStream",
+    },
+    doubleBass: { category: "music", categorySelection: "abstractInstruments" },
+    flugelhorn: { category: "music", categorySelection: "note" },
+    flute: { category: "music", categorySelection: "flute" },
+    forestFlute: { category: "music", categorySelection: "musicStream" },
+    hoverFlute: { category: "music", categorySelection: "flute" },
+    oboe1: { category: "music", categorySelection: "abstractInstruments" },
+    oboe2: { category: "music", categorySelection: "musicPattern" },
+    recorder: { category: "music", categorySelection: "note" },
+    saxophone: { category: "music", categorySelection: "subwaySaxophone" },
+    tenorSaxophone: { category: "music", categorySelection: "subwaySaxophone" },
+    whistle: { category: "music", categorySelection: "note" },
+  },
+  drums: {
+    cassette: { category: "music", categorySelection: "note" },
+    claveFrog: { category: "music", categorySelection: "musicStream" },
+    garageSaleDrumKit: { category: "music", categorySelection: "drums" },
+    huntersPercussionBongos: {
+      category: "music",
+      categorySelection: "abstractInstruments",
+    },
+    huntersPercussionConga: {
+      category: "music",
+      categorySelection: "abstractInstruments",
+    },
+    huntersPercussionDjembe: {
+      category: "music",
+      categorySelection: "abstractInstruments",
+    },
+    huntersPercussionTaikoFamily: {
+      category: "music",
+      categorySelection: "abstractInstruments",
+    },
+    huntersPercussionUdu: {
+      category: "music",
+      categorySelection: "abstractInstruments",
+    },
+    JonsCajons: { category: "music", categorySelection: "musicPattern" },
+    kitchenDrumKit: { category: "music", categorySelection: "musicStream" },
+    metallophon: { category: "music", categorySelection: "note" },
+    "No.37": { category: "music", categorySelection: "drums" },
+    omani: { category: "music", categorySelection: "dj" },
+    slitLog: { category: "music", categorySelection: "musicStream" },
+    solarWinds: { category: "music", categorySelection: "musicPattern" },
+    tinCan: { category: "music", categorySelection: "turtleDJ" },
+  },
+  synths: {
+    leadSynth1: { category: "music", categorySelection: "controls" },
+    leadSynth2: { category: "music", categorySelection: "dj" },
+    leadSynth3: { category: "music", categorySelection: "turtleDJ" },
+    leadSynth4: { category: "music", categorySelection: "vinyl" },
+    leadSynth5: { category: "music", categorySelection: "speakers" },
+    leadSynth6: { category: "music", categorySelection: "musicPattern" },
+    leadSynth7: { category: "music", categorySelection: "note" },
+    padSynth1: { category: "music", categorySelection: "dj" },
+    padSynth2: { category: "music", categorySelection: "turtleDJ" },
+  },
+  organs: {
+    bottle: { category: "music", categorySelection: "sheetMusic" },
+    cassetteTape: { category: "music", categorySelection: "turtleDJ" },
+    electric1: { category: "music", categorySelection: "dj" },
+    electric2: { category: "music", categorySelection: "musicStream" },
+    electric3: { category: "music", categorySelection: "musicPattern" },
+    fallout1: { category: "music", categorySelection: "organ" },
+    fallout2: { category: "music", categorySelection: "turtleDJ" },
+    fallout3: { category: "music", categorySelection: "abstractInstruments" },
+    fallout4: { category: "music", categorySelection: "note" },
+    fallout5: { category: "music", categorySelection: "musicStream" },
+    littleRed: { category: "music", categorySelection: "sheetMusic" },
+    pipe1: { category: "music", categorySelection: "organ" },
+    pipe2: { category: "music", categorySelection: "organ" },
+    pipe3: { category: "music", categorySelection: "organ" },
+    spooky: { category: "music", categorySelection: "organ" },
+  },
+  misc: {
+    accordion: { category: "music", categorySelection: "note" },
+    AustrianJawHarp: { category: "music", categorySelection: "musicPattern" },
+    ancientBronzeBells: { category: "music", categorySelection: "note" },
+    bells1: { category: "music", categorySelection: "note" },
+    bells2: { category: "music", categorySelection: "note" },
+    handBells: { category: "music", categorySelection: "note" },
+    choirOfTheFallen: { category: "music", categorySelection: "venue" },
+    discordChoir: { category: "music", categorySelection: "venue" },
+    mechanisedChoir: { category: "music", categorySelection: "venue" },
+    MicahsChoir: { category: "music", categorySelection: "venue" },
+    quietChoir: { category: "music", categorySelection: "venue" },
+    clavichord: { category: "music", categorySelection: "turtleDJ" },
+    cosmos: { category: "music", categorySelection: "dj" },
+    bellsGong: { category: "music", categorySelection: "dj" },
+    brokenSplashCymbalGong: {
+      category: "music",
+      categorySelection: "turtleDJ",
+    },
+    gong: { category: "music", categorySelection: "dj" },
+    harmonica: { category: "music", categorySelection: "abstractIntruments" },
+    MariePneuma: { category: "music", categorySelection: "musicPattern" },
+    marimba: { category: "music", categorySelection: "note" },
+    musicalStones1: { category: "music", categorySelection: "musicPattern" },
+    musicalStones2: { category: "music", categorySelection: "musicStream" },
+    orchestra: { category: "music", categorySelection: "sheetMusic" },
+    plasmaDriveKalimba: { category: "music", categorySelection: "musicStream" },
+    rainStick: { category: "music", categorySelection: "note" },
+    spellSinger: { category: "music", categorySelection: "musicStream" },
+    streetBountyXylophone: { category: "music", categorySelection: "note" },
+    vibraphone: { category: "music", categorySelection: "turtleDJ" },
+    xylophone: { category: "music", categorySelection: "sheetMusic" },
+  },
+};
+
+export default function SelectSampler({
+  sampler,
+  setSampler,
+}: {
+  sampler: FgSamplers;
+  setSampler: React.Dispatch<React.SetStateAction<FgSamplers>>;
+}) {
   const { userMedia } = useStreamsContext();
 
-  const [sampler, setSampler] = useState<FgSamplers>({
-    category: "pianos",
-    kind: "default",
-    label: "Default",
-    playOnlyDefined: false,
-    definedNotes: [],
-  });
   const [hover, setHover] = useState(false);
   const hoverTimeout = useRef<NodeJS.Timeout>();
   const selectSamplerLabelRef = useRef<HTMLDivElement>(null);
@@ -441,6 +659,13 @@ export default function SelectSampler() {
       }
     }
   }, [sampler]);
+
+  useEffect(() => {
+    userMedia.current.audio?.swapSampler({
+      category: sampler.category,
+      kind: sampler.kind,
+    });
+  }, []);
 
   return (
     <div className='font-K2D text-lg flex items-center justify-center space-x-1'>

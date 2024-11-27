@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { Octaves } from "../FgPiano";
-import SelectSampler from "./SelectSampler";
+import SelectSampler, { samplerBackgroundMap } from "./SelectSampler";
 import SamplerVolume from "./SamplerVolume";
 import OctaveSelection from "./OctaveSelection";
 import FgButton from "../../fgElements/fgButton/FgButton";
@@ -14,6 +14,7 @@ import effectIcon from "../../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
 import keyVisualizerIcon from "../../../public/svgs/audioEffects/keyVisualizerIcon.svg";
 import keyVisualizerOffIcon from "../../../public/svgs/audioEffects/keyVisualizerOffIcon.svg";
+import { FgSamplers } from "src/audioEffects/fgSamplers";
 
 export const navVar: Variants = {
   leftInit: { opacity: 0, x: -20 },
@@ -57,6 +58,13 @@ export default function SamplerToolbar({
   keyVisualizerActiveRef: React.MutableRefObject<boolean>;
   keyVisualizerContainerRef: React.RefObject<HTMLDivElement>;
 }) {
+  const [sampler, setSampler] = useState<FgSamplers>({
+    category: "pianos",
+    kind: "default",
+    label: "Default",
+    playOnlyDefined: false,
+    definedNotes: [],
+  });
   const rightScaleSectionToolbarRef = useRef<HTMLDivElement>(null);
 
   const handleWheel = (event: WheelEvent) => {
@@ -128,7 +136,13 @@ export default function SamplerToolbar({
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         />
         {keyVisualizerActive && (
-          <FgBackgroundSelector backgroundRef={keyVisualizerContainerRef} />
+          <FgBackgroundSelector
+            backgroundRef={keyVisualizerContainerRef}
+            defaultActiveBackground={
+              // @ts-expect-error: correlation error
+              samplerBackgroundMap[sampler.category][sampler.kind]
+            }
+          />
         )}
         <FgButton
           contentFunction={() => {
@@ -169,7 +183,7 @@ export default function SamplerToolbar({
             visibleOctaveRef={visibleOctaveRef}
             scrollToOctave={fgPianoController.scrollToOctave}
           />
-          <SelectSampler />
+          <SelectSampler sampler={sampler} setSampler={setSampler} />
         </div>
       </div>
     </div>

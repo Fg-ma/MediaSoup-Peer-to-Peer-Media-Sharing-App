@@ -449,6 +449,20 @@ class FgSoundBoardController {
     }));
 
     this.fileSelectorRef.current?.click();
+
+    window.addEventListener("focus", this.handleImportDerivedWindowFocusChange);
+  };
+
+  handleImportDerivedWindowFocusChange = () => {
+    this.setImportButton((prevEffects) => ({
+      ...prevEffects,
+      pressed: false,
+    }));
+
+    window.removeEventListener(
+      "focus",
+      this.handleImportDerivedWindowFocusChange
+    );
   };
 
   handleImportEffectClickUp = () => {

@@ -46,10 +46,6 @@ export default function VerticalSplitPanes({
     maxPaneHeight?: number;
     dividerButton?: boolean;
     stableScrollbarGutter?: boolean;
-    floatingTopContentOffset?: string;
-    floatingTopContentWidth?: string;
-    floatingBottomContentOffset?: string;
-    floatingBottomContentWidth?: string;
   };
 }) {
   const verticalSplitPanesOptions = {
@@ -103,9 +99,9 @@ export default function VerticalSplitPanes({
         <div
           className='absolute z-10'
           style={{
-            top: verticalSplitPanesOptions.floatingTopContentOffset,
-            width: verticalSplitPanesOptions.floatingTopContentWidth ?? "100%",
-            height: topPaneRef.current?.clientHeight,
+            top: "0px",
+            width: "100%",
+            height: paneHeight,
           }}
         >
           {floatingTopContent}
@@ -115,9 +111,8 @@ export default function VerticalSplitPanes({
         <div
           className='absolute w-max z-10'
           style={{
-            bottom: verticalSplitPanesOptions.floatingBottomContentOffset,
-            width:
-              verticalSplitPanesOptions.floatingBottomContentWidth ?? "100%",
+            bottom: "0px",
+            width: "100%",
             height: bottomPaneRef.current?.clientHeight,
           }}
         >
