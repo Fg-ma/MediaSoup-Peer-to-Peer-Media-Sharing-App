@@ -15,6 +15,8 @@ import landscape_1280x640 from "../../../public/backgroundImages/christmas/lands
 import landscape_64x32 from "../../../public/backgroundImages/christmas/landscape_64x32.png";
 import snowFlake_1280x852 from "../../../public/backgroundImages/christmas/snowFlake_1280x852.jpg";
 import snowflake_64x43 from "../../../public/backgroundImages/christmas/snowflake_64x43.jpg";
+import snowman_1280x880 from "../../../public/backgroundImages/christmas/snowman_1280x880.png";
+import snowman_64x44 from "../../../public/backgroundImages/christmas/snowman_64x44.png";
 import whiteChristmas_1280x910 from "../../../public/backgroundImages/christmas/whiteChristmas_1280x910.png";
 import whiteChristmas_64x46 from "../../../public/backgroundImages/christmas/whiteChristmas_64x46.png";
 import winterWonderLand_1280x956 from "../../../public/backgroundImages/christmas/winterWonderLand_1280x956.jpg";
@@ -28,6 +30,8 @@ import burstingWithFlames_1280x1062 from "../../../public/backgroundImages/dark/
 import burstingWithFlames_64x53 from "../../../public/backgroundImages/dark/burstingWithFlames_64x53.png";
 import hauntedHouses_1280x1269 from "../../../public/backgroundImages/dark/hauntedHouses_1280x1269.png";
 import hauntedHouses_64x63 from "../../../public/backgroundImages/dark/hauntedHouses_64x63.png";
+import jackOLantern_1067x1067 from "../../../public/backgroundImages/dark/jackOLantern_1067x1067.jpg";
+import jackOLantern_64x64 from "../../../public/backgroundImages/dark/jackOLantern_64x64.jpg";
 import skullOperator_1280x1280 from "../../../public/backgroundImages/dark/skullOperator_1280x1280.png";
 import skullOperator_64x64 from "../../../public/backgroundImages/dark/skullOperator_64x64.png";
 import skyline_1280x806 from "../../../public/backgroundImages/dark/skyline_1280x806.png";
@@ -49,6 +53,8 @@ import geometric5_1280x959 from "../../../public/backgroundImages/geometric/geom
 import geometric5_64x48 from "../../../public/backgroundImages/geometric/geometric5_64x48.png";
 import geometric6_1280x720 from "../../../public/backgroundImages/geometric/geometric6_1280x720.png";
 import geometric6_64x36 from "../../../public/backgroundImages/geometric/geometric6_64x36.png";
+import geometric7_869x1224 from "../../../public/backgroundImages/geometric/geometric7_869x1224.png";
+import geometric7_45x64 from "../../../public/backgroundImages/geometric/geometric7_45x64.png";
 
 import abstractInstruments_1280x853 from "../../../public/backgroundImages/music/abstractInstruments_1280x853.png";
 import abstractInstruments_64x43 from "../../../public/backgroundImages/music/abstractInstruments_64x43.png";
@@ -111,6 +117,8 @@ import vinyl_64x43 from "../../../public/backgroundImages/music/vinyl_64x43.jpg"
 import violin_960x1280 from "../../../public/backgroundImages/music/violin_960x1280.jpg";
 import violin_48x64 from "../../../public/backgroundImages/music/violin_48x64.jpg";
 
+import bird_1280x1280 from "../../../public/backgroundImages/nature/bird_1280x1280.jpg";
+import bird_64x64 from "../../../public/backgroundImages/nature/bird_64x64.jpg";
 import birds_1280x841 from "../../../public/backgroundImages/nature/birds_1280x841.png";
 import birds_64x42 from "../../../public/backgroundImages/nature/birds_64x42.png";
 import cave_1280x1011 from "../../../public/backgroundImages/nature/cave_1280x1011.png";
@@ -121,8 +129,14 @@ import flowering_1280x1280 from "../../../public/backgroundImages/nature/floweri
 import flowering_64x64 from "../../../public/backgroundImages/nature/flowering_64x64.png";
 import fungus_1280x1172 from "../../../public/backgroundImages/nature/fungus_1280x1172.png";
 import fungus_64x59 from "../../../public/backgroundImages/nature/fungus_64x59.png";
+import lightHouse_1064x1064 from "../../../public/backgroundImages/nature/lightHouse_1064x1064.png";
+import lightHouse_64x64 from "../../../public/backgroundImages/nature/lightHouse_64x64.png";
 import mountains_1024x1280 from "../../../public/backgroundImages/nature/mountains_1024x1280.png";
 import mountains_51x64 from "../../../public/backgroundImages/nature/mountains_51x64.png";
+import mushrooms_1280x1280 from "../../../public/backgroundImages/nature/mushrooms_1280x1280.png";
+import mushrooms_64x64 from "../../../public/backgroundImages/nature/mushrooms_64x64.png";
+import plant_905x1280 from "../../../public/backgroundImages/nature/plant_905x1280.png";
+import plant_45x64 from "../../../public/backgroundImages/nature/plant_45x64.png";
 import rollingHills_1280x827 from "../../../public/backgroundImages/nature/rollingHills_1280x827.png";
 import rollingHills_64x41 from "../../../public/backgroundImages/nature/rollingHills_64x41.png";
 import shoreSide_1024x1280 from "../../../public/backgroundImages/nature/shoreSide_1024x1280.png";
@@ -133,6 +147,8 @@ import submarine_854x1280 from "../../../public/backgroundImages/nature/submarin
 import submarine_43x64 from "../../../public/backgroundImages/nature/submarine_43x64.png";
 import sunnySideUp_1280x1280 from "../../../public/backgroundImages/nature/sunnySideUp_1280x1280.png";
 import sunnySideUp_64x64 from "../../../public/backgroundImages/nature/sunnySideUp_64x64.png";
+import swordfish_1280x929 from "../../../public/backgroundImages/nature/swordfish_1280x929.png";
+import swordfish_64x46 from "../../../public/backgroundImages/nature/swordfish_64x46.png";
 
 import gotMeat_1280x931 from "../../../public/backgroundImages/neon/gotMeat_1280x931.png";
 import gotMeat_64x47 from "../../../public/backgroundImages/neon/gotMeat_64x47.png";
@@ -197,6 +213,7 @@ export type ChristmasCategories =
   | "forest"
   | "landscape"
   | "snowflake"
+  | "snowman"
   | "whiteChristmas"
   | "winterWonderLand";
 export type DarkCategories =
@@ -204,6 +221,7 @@ export type DarkCategories =
   | "alley"
   | "burstingWithFlames"
   | "hauntedHouses"
+  | "jackOLantern"
   | "skullOperator"
   | "skyline"
   | "splatter"
@@ -214,7 +232,8 @@ export type GeometricCategories =
   | "geometric3"
   | "geometric4"
   | "geometric5"
-  | "geometric6";
+  | "geometric6"
+  | "geometric7";
 export type MusicCategories =
   | "abstractInstruments"
   | "acousticGuitar"
@@ -247,17 +266,22 @@ export type MusicCategories =
   | "vinyl"
   | "violin";
 export type NatureCategories =
+  | "bird"
   | "birds"
   | "cave"
   | "clearing"
   | "flowering"
   | "fungus"
+  | "lightHouse"
   | "mountains"
+  | "mushrooms"
+  | "plant"
   | "rollingHills"
   | "shoreSide"
   | "sprouting"
   | "submarine"
-  | "sunnySideUp";
+  | "sunnySideUp"
+  | "swordfish";
 export type NeonCategories =
   | "gotMeat"
   | "map"
@@ -474,6 +498,11 @@ export const categories: {
       url: snowFlake_1280x852,
       loadingUrl: snowflake_64x43,
     },
+    snowman: {
+      label: "Snowman",
+      url: snowman_1280x880,
+      loadingUrl: snowman_64x44,
+    },
     whiteChristmas: {
       label: "White christmas",
       url: whiteChristmas_1280x910,
@@ -505,6 +534,11 @@ export const categories: {
       label: "Haunted houses",
       url: hauntedHouses_1280x1269,
       loadingUrl: hauntedHouses_64x63,
+    },
+    jackOLantern: {
+      label: "Jack 'O lantern",
+      url: jackOLantern_1067x1067,
+      loadingUrl: jackOLantern_64x64,
     },
     skullOperator: {
       label: "Skull operator",
@@ -557,6 +591,11 @@ export const categories: {
       label: "Geometric 6",
       url: geometric6_1280x720,
       loadingUrl: geometric6_64x36,
+    },
+    geometric7: {
+      label: "Geometric 7",
+      url: geometric7_869x1224,
+      loadingUrl: geometric7_45x64,
     },
   },
   music: {
@@ -676,6 +715,7 @@ export const categories: {
     violin: { label: "Violin", url: violin_960x1280, loadingUrl: violin_48x64 },
   },
   nature: {
+    bird: { label: "Bird", url: bird_1280x1280, loadingUrl: bird_64x64 },
     birds: { label: "Birds", url: birds_1280x841, loadingUrl: birds_64x42 },
     cave: { label: "Cave", url: cave_1280x1011, loadingUrl: cave_64x51 },
     clearing: {
@@ -693,10 +733,25 @@ export const categories: {
       url: fungus_1280x1172,
       loadingUrl: fungus_64x59,
     },
+    lightHouse: {
+      label: "Light house",
+      url: lightHouse_1064x1064,
+      loadingUrl: lightHouse_64x64,
+    },
     mountains: {
       label: "Mountains",
       url: mountains_1024x1280,
       loadingUrl: mountains_51x64,
+    },
+    mushrooms: {
+      label: "Mushrooms",
+      url: mushrooms_1280x1280,
+      loadingUrl: mushrooms_64x64,
+    },
+    plant: {
+      label: "Plant",
+      url: plant_905x1280,
+      loadingUrl: plant_45x64,
     },
     rollingHills: {
       label: "Rolling hills",
@@ -722,6 +777,11 @@ export const categories: {
       label: "Sunny side up",
       url: sunnySideUp_1280x1280,
       loadingUrl: sunnySideUp_64x64,
+    },
+    swordfish: {
+      label: "Swordfish",
+      url: swordfish_1280x929,
+      loadingUrl: swordfish_64x46,
     },
   },
   neon: {
