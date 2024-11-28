@@ -350,7 +350,7 @@ export const samplerBackgroundMap = {
     electric5: { category: "music", categorySelection: "sheetMusic" },
     softSteinway: {
       category: "music",
-      categorySelection: "abstractIntruments",
+      categorySelection: "abstractInstruments",
     },
     studioOne1: { category: "music", categorySelection: "note" },
     studioOne2: { category: "music", categorySelection: "note" },
@@ -409,9 +409,9 @@ export const samplerBackgroundMap = {
     anaBass: { category: "music", categorySelection: "bassMan" },
     electricBass1: { category: "music", categorySelection: "dj" },
     electricBass2: { category: "music", categorySelection: "bassMan" },
-    jarreBass: { category: "music", categorySelection: "abstractIntruments" },
+    jarreBass: { category: "music", categorySelection: "abstractInstruments" },
     longFMBass: { category: "music", categorySelection: "controls" },
-    moogBass: { category: "music", categorySelection: "abstractIntruments" },
+    moogBass: { category: "music", categorySelection: "abstractInstruments" },
     shortFMBass: { category: "music", categorySelection: "bassMan" },
     sweepBass: { category: "music", categorySelection: "note" },
     synthBass: { category: "music", categorySelection: "vinyl" },
@@ -421,7 +421,7 @@ export const samplerBackgroundMap = {
     lyreLyre1: { category: "music", categorySelection: "musicStream" },
     lyreLyre2: { category: "music", categorySelection: "musicStream" },
     lyreLyre3: { category: "music", categorySelection: "musicStream" },
-    strings1: { category: "music", categorySelection: "abstractIntruments" },
+    strings1: { category: "music", categorySelection: "abstractInstruments" },
     strings2: { category: "music", categorySelection: "musicPattern" },
     uncleJohns5StringBanjo: {
       category: "music",
@@ -537,7 +537,7 @@ export const samplerBackgroundMap = {
       categorySelection: "turtleDJ",
     },
     gong: { category: "music", categorySelection: "dj" },
-    harmonica: { category: "music", categorySelection: "abstractIntruments" },
+    harmonica: { category: "music", categorySelection: "abstractInstruments" },
     MariePneuma: { category: "music", categorySelection: "musicPattern" },
     marimba: { category: "music", categorySelection: "note" },
     musicalStones1: { category: "music", categorySelection: "musicPattern" },
@@ -725,6 +725,7 @@ export default function SelectSampler({
         }}
         mouseDownFunction={handleMouseDown}
         mouseUpFunction={handleMouseUp}
+        options={{ mode: "pick" }}
       />
       <FgButton
         className='w-6 aspect-square rounded-full flex items-center justify-center pl-0.5'

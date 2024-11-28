@@ -18,6 +18,32 @@ const SamplerEffectsToolbar = React.lazy(
 
 export type Octaves = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
+export type NoteStore = {
+  "0": HTMLDivElement[];
+  "1": HTMLDivElement[];
+  "2": HTMLDivElement[];
+  "3": HTMLDivElement[];
+  "4": HTMLDivElement[];
+  "5": HTMLDivElement[];
+  "6": HTMLDivElement[];
+};
+
+export type Notes =
+  | "C"
+  | "C#"
+  | "D"
+  | "D#"
+  | "E"
+  | "F"
+  | "F#"
+  | "G"
+  | "G#"
+  | "A"
+  | "A#"
+  | "B";
+
+export type StringOctaves = "0" | "1" | "2" | "3" | "4" | "5" | "6";
+
 export default function FgPiano({
   isUser,
   initialOctave = 3,
@@ -47,6 +73,22 @@ export default function FgPiano({
   const keyVisualizerRef = useRef<HTMLDivElement>(null);
   const keyVisualizerContainerRef = useRef<HTMLDivElement>(null);
   const visualizerAnimationFrameRef = useRef<number | undefined>(undefined);
+  const keyVisualizerNotesStore = useRef<{
+    [note in Notes]: NoteStore;
+  }>({
+    C: { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    "C#": { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    D: { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    "D#": { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    E: { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    F: { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    "F#": { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    G: { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    "G#": { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    A: { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    "A#": { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+    B: { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
+  });
 
   const fgPianoController = new FgPianoController(
     isUser,
@@ -61,7 +103,8 @@ export default function FgPiano({
     controlPressed,
     keyVisualizerActiveRef,
     keyVisualizerRef,
-    visualizerAnimationFrameRef
+    visualizerAnimationFrameRef,
+    keyVisualizerNotesStore
   );
 
   const handleKeyUp = (event: KeyboardEvent) => {
@@ -186,6 +229,7 @@ export default function FgPiano({
             keyVisualizerRef={keyVisualizerRef}
             keyVisualizerContainerRef={keyVisualizerContainerRef}
             visualizerAnimationFrameRef={visualizerAnimationFrameRef}
+            keyVisualizerNotesStore={keyVisualizerNotesStore}
           />
         </div>
       }

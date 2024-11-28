@@ -8,12 +8,14 @@ export default function ExpandingSelectionPanelButton({
   isParentScrolling,
   content,
   selections,
+  parentPanelRef,
 }: {
   panelRefs: React.MutableRefObject<React.RefObject<HTMLDivElement>[]>;
   previousPanels: React.MutableRefObject<string[]>;
   isParentScrolling: boolean;
   content: string;
   selections: RecursiveSelections;
+  parentPanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [_, setRerender] = useState(false);
@@ -57,6 +59,32 @@ export default function ExpandingSelectionPanelButton({
       setExpanded(false);
     }
   };
+
+  const handleWheel = () => {
+    document.removeEventListener("mousemove", handleMouseMove);
+
+    const targetValue = selections.value;
+    const lastIndex = previousPanels.current.lastIndexOf(targetValue);
+
+    if (lastIndex !== -1) {
+      previousPanels.current = previousPanels.current.filter(
+        (_, index) => index !== lastIndex
+      );
+    }
+    setExpanded(false);
+  };
+
+  useEffect(() => {
+    if (isParentScrolling && parentPanelRef.current) {
+      parentPanelRef.current.addEventListener("wheel", handleWheel);
+    }
+
+    return () => {
+      if (isParentScrolling && parentPanelRef && parentPanelRef.current) {
+        parentPanelRef.current.removeEventListener("wheel", handleWheel);
+      }
+    };
+  }, [isParentScrolling, parentPanelRef.current]);
 
   return (
     <div

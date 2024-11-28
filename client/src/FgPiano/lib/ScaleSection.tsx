@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, Suspense } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Scale from "./Scale";
-import { Octaves } from "../FgPiano";
+import { Notes, NoteStore, Octaves, StringOctaves } from "../FgPiano";
 import VerticalSplitPanes from "../../fgElements/verticalSplitPane/VerticalSplitPanes";
 import FgPianoController from "./FgPianoController";
 
@@ -20,6 +20,7 @@ export default function ScaleSection({
   keyVisualizerRef,
   keyVisualizerContainerRef,
   visualizerAnimationFrameRef,
+  keyVisualizerNotesStore,
 }: {
   fgPianoController: FgPianoController;
   scaleSectionContainerRef: React.RefObject<HTMLDivElement>;
@@ -33,22 +34,38 @@ export default function ScaleSection({
   keyVisualizerRef: React.RefObject<HTMLDivElement>;
   keyVisualizerContainerRef: React.RefObject<HTMLDivElement>;
   visualizerAnimationFrameRef: React.MutableRefObject<number | undefined>;
+  keyVisualizerNotesStore: React.MutableRefObject<{
+    [note in Notes]: NoteStore;
+  }>;
 }) {
   const currentPress = useRef<
     { note: string | null; octave: string | null } | undefined
   >(undefined);
-  const keyVisualizerNotes = useRef<{}>({ "1": {} }); // js/css very slow add store
 
   useEffect(() => {
-    const handleWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
+    scaleSectionContainerRef?.current?.addEventListener("wheel", handleWheel);
 
-      currentPress.current = undefined;
+    return () => {
+      scaleSectionContainerRef?.current?.removeEventListener(
+        "wheel",
+        handleWheel
+      );
+    };
+  }, [keyVisualizerActive]);
 
-      if (!keyVisualizerRef.current) {
-        return;
-      }
+  useEffect(() => {
+    setTimeout(() => {
+      fgPianoController.resize();
+    }, 0);
+  }, [keyVisualizerActive]);
+
+  const handleWheel = (event: WheelEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    currentPress.current = undefined;
+
+    if (keyVisualizerRef.current) {
       const children = Array.from(keyVisualizerRef.current.children);
       children.forEach((child) => {
         const [key] = child.id.split("_");
@@ -67,50 +84,35 @@ export default function ScaleSection({
           child.classList.remove("key-visualizer-currently-pressed");
         }
       });
+    }
 
-      if (scaleSectionContainerRef && scaleSectionContainerRef.current) {
-        // If horizontal scroll is dominant, scroll horizontally.
-        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-          scaleSectionContainerRef.current.scrollLeft += event.deltaX;
-        } else {
-          scaleSectionContainerRef.current.scrollLeft += event.deltaY;
-        }
-
-        if (scaleSectionContainerRef.current.scrollLeft === 0) {
-          visibleOctaveRef.current = 0;
-          setVisibleOctave(0);
-        } else if (
-          scaleSectionContainerRef.current.scrollLeft +
-            scaleSectionContainerRef.current.clientWidth ===
-          scaleSectionContainerRef.current.scrollWidth
-        ) {
-          visibleOctaveRef.current = 6;
-          setVisibleOctave(6);
-        } else {
-          fgPianoController.getVisibleOctave();
-        }
+    if (scaleSectionContainerRef && scaleSectionContainerRef.current) {
+      // If horizontal scroll is dominant, scroll horizontally.
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        scaleSectionContainerRef.current.scrollLeft += event.deltaX;
+      } else {
+        scaleSectionContainerRef.current.scrollLeft += event.deltaY;
       }
-    };
 
-    scaleSectionContainerRef?.current?.addEventListener("wheel", handleWheel);
-
-    return () => {
-      scaleSectionContainerRef?.current?.removeEventListener(
-        "wheel",
-        handleWheel
-      );
-    };
-  }, [keyVisualizerActive]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      fgPianoController.resize();
-    }, 0);
-  }, [keyVisualizerActive]);
+      if (scaleSectionContainerRef.current.scrollLeft === 0) {
+        visibleOctaveRef.current = 0;
+        setVisibleOctave(0);
+      } else if (
+        scaleSectionContainerRef.current.scrollLeft +
+          scaleSectionContainerRef.current.clientWidth ===
+        scaleSectionContainerRef.current.scrollWidth
+      ) {
+        visibleOctaveRef.current = 6;
+        setVisibleOctave(6);
+      } else {
+        fgPianoController.getVisibleOctave();
+      }
+    }
+  };
 
   const handleMouseUp = () => {
-    window.removeEventListener("pointerup", handleMouseUp);
-    window.removeEventListener("pointermove", handleMouseMove);
+    document.removeEventListener("pointerup", handleMouseUp);
+    document.removeEventListener("pointermove", handleMouseMove);
 
     if (
       currentPress.current &&
@@ -155,9 +157,9 @@ export default function ScaleSection({
     currentPress.current = undefined;
   };
 
-  const handleMouseDown = (event: React.MouseEvent) => {
-    window.addEventListener("pointerup", handleMouseUp);
-    window.addEventListener("pointermove", handleMouseMove);
+  const handlePointerDown = (event: React.PointerEvent) => {
+    document.addEventListener("pointerup", handleMouseUp);
+    document.addEventListener("pointermove", handleMouseMove);
 
     const targetElement = event.target as HTMLElement;
     const note = targetElement.getAttribute("data-note");
@@ -195,6 +197,10 @@ export default function ScaleSection({
       newKeyElement.classList.add("key-visualizer-currently-pressed");
 
       keyVisualizerRef.current?.appendChild(newKeyElement);
+
+      keyVisualizerNotesStore.current[note as Notes][
+        octave as StringOctaves
+      ].push(newKeyElement);
     }
 
     if (keyElement && !keyElement.classList.contains("pressed")) {
@@ -203,7 +209,7 @@ export default function ScaleSection({
     }
   };
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const handleMouseMove = (event: PointerEvent) => {
     const targetElement = event.target as HTMLButtonElement;
 
     if (targetElement.disabled) {
@@ -262,16 +268,22 @@ export default function ScaleSection({
         }
       });
 
-      const newKeyElement = document.createElement("div");
-      const key = `${targetValues.note}-fg-${targetValues.octave}`;
-      newKeyElement.id = `${key}_${uuidv4()}`;
-      newKeyElement.style.bottom = "0px";
-      newKeyElement.style.height = "1px";
-      newKeyElement.classList.add(key);
-      newKeyElement.classList.add("key-visualizer-key");
-      newKeyElement.classList.add("key-visualizer-currently-pressed");
+      if (targetValues.note && targetValues.octave) {
+        const newKeyElement = document.createElement("div");
+        const key = `${targetValues.note}-fg-${targetValues.octave}`;
+        newKeyElement.id = `${key}_${uuidv4()}`;
+        newKeyElement.style.bottom = "0px";
+        newKeyElement.style.height = "1px";
+        newKeyElement.classList.add(key);
+        newKeyElement.classList.add("key-visualizer-key");
+        newKeyElement.classList.add("key-visualizer-currently-pressed");
 
-      keyVisualizerRef.current.appendChild(newKeyElement);
+        keyVisualizerRef.current.appendChild(newKeyElement);
+
+        keyVisualizerNotesStore.current[targetValues.note as Notes][
+          targetValues.octave as StringOctaves
+        ].push(newKeyElement);
+      }
 
       if (visualizerAnimationFrameRef.current === undefined) {
         visualizerAnimationFrameRef.current = requestAnimationFrame(
@@ -305,7 +317,8 @@ export default function ScaleSection({
       <div
         ref={scaleSectionContainerRef}
         className='scale-section-container hide-scroll-bar'
-        onMouseDown={handleMouseDown}
+        onPointerDown={handlePointerDown}
+        onTouchEnd={handleMouseUp}
       >
         <VerticalSplitPanes
           topContent={

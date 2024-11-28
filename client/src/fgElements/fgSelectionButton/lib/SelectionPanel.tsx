@@ -97,6 +97,7 @@ export default function SelectionPanel({
             isParentScrolling={scrollingAvailable}
             content={selection}
             selections={selectionValue}
+            parentPanelRef={externalPanelRef ? externalPanelRef : panelRef}
           />,
         ]);
       }

@@ -50,8 +50,8 @@ import geometric5_64x48 from "../../../public/backgroundImages/geometric/geometr
 import geometric6_1280x720 from "../../../public/backgroundImages/geometric/geometric6_1280x720.png";
 import geometric6_64x36 from "../../../public/backgroundImages/geometric/geometric6_64x36.png";
 
-import abstractIntruments_1280x853 from "../../../public/backgroundImages/music/abstractIntruments_1280x853.png";
-import abstractIntruments_64x43 from "../../../public/backgroundImages/music/abstractIntruments_64x43.png";
+import abstractInstruments_1280x853 from "../../../public/backgroundImages/music/abstractInstruments_1280x853.png";
+import abstractInstruments_64x43 from "../../../public/backgroundImages/music/abstractInstruments_64x43.png";
 import acousticGuitar_960x1280 from "../../../public/backgroundImages/music/acousticGuitar_960x1280.jpg";
 import acousticGuitar_48x64 from "../../../public/backgroundImages/music/acousticGuitar_48x64.jpg";
 import acousticGuitarSketch_1280x1280 from "../../../public/backgroundImages/music/acousticGuitarSketch_1280x1280.jpg";
@@ -562,8 +562,8 @@ export const categories: {
   music: {
     abstractInstruments: {
       label: "Abstract instruments",
-      url: abstractIntruments_1280x853,
-      loadingUrl: abstractIntruments_64x43,
+      url: abstractInstruments_1280x853,
+      loadingUrl: abstractInstruments_64x43,
     },
     acousticGuitar: {
       label: "Acoustic guitar",

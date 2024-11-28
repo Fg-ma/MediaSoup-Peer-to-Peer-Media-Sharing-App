@@ -3,7 +3,7 @@ import { keys } from "./Scale";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
-import { Octaves } from "../FgPiano";
+import { Notes, NoteStore, Octaves, StringOctaves } from "../FgPiano";
 
 export const keysMap: { [key: string]: string } = {
   s: "C",
@@ -23,8 +23,8 @@ export const keysMap: { [key: string]: string } = {
 };
 
 class FgPianoController {
-  private heightGrowFactor = 2; // Height growth factor for pressed key
-  private bottomGrowFactor = 2; // Bottom movement factor for released key
+  private heightGrowFactor = 5; // Height growth factor for pressed key
+  private bottomGrowFactor = 5; // Bottom movement factor for released key
 
   constructor(
     private isUser: boolean,
@@ -55,7 +55,10 @@ class FgPianoController {
     private keyVisualizerRef: React.RefObject<HTMLDivElement>,
     private visualizerAnimationFrameRef: React.MutableRefObject<
       number | undefined
-    >
+    >,
+    private keyVisualizerNotesStore: React.MutableRefObject<{
+      [note in Notes]: NoteStore;
+    }>
   ) {}
 
   playNote = (note: string, octave: number, isPress: boolean) => {
@@ -196,7 +199,11 @@ class FgPianoController {
         newKeyElement.classList.add("key-visualizer-key");
         newKeyElement.classList.add("key-visualizer-currently-pressed");
 
-        this.keyVisualizerRef.current?.appendChild(newKeyElement);
+        this.keyVisualizerRef.current.appendChild(newKeyElement);
+
+        this.keyVisualizerNotesStore.current[pianoKey as Notes][
+          `${octave}`
+        ].push(newKeyElement);
       }
     }
 
@@ -278,40 +285,68 @@ class FgPianoController {
       }
     }
   };
+  private lastExecutionTime = 0;
 
   updateVisualizerAnimations = () => {
-    if (!this.keyVisualizerRef.current) return;
+    const now = performance.now();
+    if (now - this.lastExecutionTime < 32) {
+      this.visualizerAnimationFrameRef.current = requestAnimationFrame(
+        this.updateVisualizerAnimations
+      );
+      return;
+    } // 16ms ~ 60FPS
 
-    const children = Array.from(this.keyVisualizerRef.current.children);
-    children.forEach((child) => {
-      if (!this.keyVisualizerRef.current) return;
+    this.lastExecutionTime = now;
+    if (
+      !this.keyVisualizerRef.current ||
+      !this.keyVisualizerNotesStore.current
+    ) {
+      this.visualizerAnimationFrameRef.current = requestAnimationFrame(
+        this.updateVisualizerAnimations
+      );
+      return;
+    }
 
-      const element = child as HTMLElement;
+    let atLeastOneDiv = false;
 
-      if (!element.classList.contains("key-visualizer-key")) {
-        return;
-      }
+    const keyVisualizerHeight = this.keyVisualizerRef.current.clientHeight;
+    const noteStores = Object.keys(this.keyVisualizerNotesStore.current);
+    noteStores.forEach((note) => {
+      const octaveStores = Object.entries(
+        this.keyVisualizerNotesStore.current[note as Notes]
+      );
+      octaveStores.forEach(([octave, elements]) => {
+        elements.forEach((element, index) => {
+          atLeastOneDiv = true;
 
-      if (element.classList.contains("key-visualizer-currently-pressed")) {
-        const currentHeight = parseInt(
-          element.style.height.slice(0, -2) || "0",
-          10
-        );
-        element.style.height = `${currentHeight + this.heightGrowFactor}px`;
-      } else {
-        const newBottom =
-          parseInt(element.style.bottom.slice(0, -2) || "0", 10) +
-          this.bottomGrowFactor;
+          const { style, classList } = element;
+          if (classList.contains("key-visualizer-currently-pressed")) {
+            const currentHeight = parseInt(
+              style.height.slice(0, -2) || "0",
+              10
+            );
+            style.height = `${currentHeight + this.heightGrowFactor}px`;
+          } else {
+            const newBottom =
+              parseInt(style.bottom.slice(0, -2) || "0", 10) +
+              this.bottomGrowFactor;
 
-        if (newBottom <= this.keyVisualizerRef.current.clientHeight + 5) {
-          element.style.bottom = `${newBottom}px`;
-        } else {
-          child.remove();
-        }
-      }
+            if (newBottom <= keyVisualizerHeight + 5) {
+              style.bottom = `${newBottom}px`;
+            } else {
+              if (element.isConnected) {
+                element.remove();
+                this.keyVisualizerNotesStore.current[note as Notes][
+                  octave as StringOctaves
+                ].splice(index, 1);
+              }
+            }
+          }
+        });
+      });
     });
 
-    if (children.length > 0) {
+    if (atLeastOneDiv) {
       // Continue updating using requestAnimationFrame for smooth animation
       this.visualizerAnimationFrameRef.current = requestAnimationFrame(
         this.updateVisualizerAnimations
