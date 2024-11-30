@@ -6,11 +6,27 @@ import scaleIcon from "../../../../public/svgs/scaleIcon.svg";
 export default function ScaleButton({
   dragFunction,
   bundleRef,
+  positioning,
   mouseDownFunction,
   mouseUpFunction,
 }: {
-  dragFunction: (displacement: { x: number; y: number }) => void;
+  dragFunction: (
+    kind: "any" | "square",
+    displacement: { x: number; y: number },
+    referencePoint: { x: number; y: number }
+  ) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
+  positioning: React.MutableRefObject<{
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }>;
   mouseDownFunction: () => void;
   mouseUpFunction: () => void;
 }) {
@@ -19,7 +35,20 @@ export default function ScaleButton({
       className='scale-btn absolute left-full top-full w-6 aspect-square z-10 pl-1 pt-1'
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}
-      dragFunction={dragFunction}
+      dragFunction={(displacement) => {
+        if (!bundleRef.current) {
+          return;
+        }
+
+        dragFunction("any", displacement, {
+          x:
+            (positioning.current.position.left / 100) *
+            bundleRef.current.clientWidth,
+          y:
+            (positioning.current.position.top / 100) *
+            bundleRef.current.clientHeight,
+        });
+      }}
       referenceDragElement={bundleRef}
       contentFunction={() => {
         return (

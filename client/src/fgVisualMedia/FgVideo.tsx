@@ -266,9 +266,9 @@ export default function FgVideo({
   };
 
   const fgAdjustmentVideoController = new FgAdjustmentVideoController(
-    setAdjustingDimensions,
     bundleRef,
     positioning,
+    setAdjustingDimensions,
     setRerender
   );
 
@@ -494,6 +494,7 @@ export default function FgVideo({
       <RotateButton
         dragFunction={fgAdjustmentVideoController.rotateDragFunction}
         bundleRef={bundleRef}
+        positioning={positioning}
         mouseDownFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
         }
@@ -504,6 +505,7 @@ export default function FgVideo({
       <PanButton
         dragFunction={fgAdjustmentVideoController.movementDragFunction}
         bundleRef={bundleRef}
+        positioning={positioning}
         mouseDownFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
         }
@@ -514,6 +516,7 @@ export default function FgVideo({
       <ScaleButton
         dragFunction={fgAdjustmentVideoController.scaleDragFunction}
         bundleRef={bundleRef}
+        positioning={positioning}
         mouseDownFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
         }

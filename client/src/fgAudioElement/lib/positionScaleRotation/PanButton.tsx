@@ -2,7 +2,7 @@ import React from "react";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import panIcon from "../../../../public/svgs/panIcon.svg";
-import { RotationPoints } from "../FgAdjustmentVideoControls";
+import { RotationPoints } from "../../../fgVisualMedia/lib/FgAdjustmentVideoControls";
 
 export default function PanButton({
   dragFunction,
@@ -37,16 +37,13 @@ export default function PanButton({
 }) {
   return (
     <FgButton
-      className='pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1'
+      className='w-7 aspect-square absolute top-1/2 -translate-y-1/2 -left-3'
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}
       dragFunction={(displacement) => {
         if (!bundleRef.current) {
           return;
         }
-
-        const angle =
-          2 * Math.PI - positioning.current.rotation * (Math.PI / 180);
 
         const pixelScale = {
           x:
@@ -57,16 +54,11 @@ export default function PanButton({
         };
 
         dragFunction(
-          "topLeft",
+          "middleLeft",
           displacement,
           {
-            x:
-              -15 -
-              pixelScale.x * Math.cos(angle) -
-              (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
-            y:
-              pixelScale.x * Math.sin(angle) -
-              (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
+            x: 0,
+            y: -(pixelScale.y / 2),
           },
           {
             x:
@@ -74,7 +66,8 @@ export default function PanButton({
               bundleRef.current.clientWidth,
             y:
               (positioning.current.position.top / 100) *
-              bundleRef.current.clientHeight,
+                bundleRef.current.clientHeight +
+              pixelScale.y / 2,
           }
         );
       }}

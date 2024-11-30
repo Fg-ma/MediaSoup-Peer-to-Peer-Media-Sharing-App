@@ -1,10 +1,9 @@
 import React from "react";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
-import panIcon from "../../../../public/svgs/panIcon.svg";
-import { RotationPoints } from "../FgAdjustmentVideoControls";
+import scaleIcon from "../../../../public/svgs/scaleIcon.svg";
 
-export default function PanButton({
+export default function ScaleButton({
   dragFunction,
   bundleRef,
   positioning,
@@ -12,13 +11,9 @@ export default function PanButton({
   mouseUpFunction,
 }: {
   dragFunction: (
-    rotationPointPlacement: RotationPoints,
+    kind: "any" | "square",
     displacement: { x: number; y: number },
-    buttonPosition: {
-      x: number;
-      y: number;
-    },
-    rotationPoint: { x: number; y: number }
+    referencePoint: { x: number; y: number }
   ) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
   positioning: React.MutableRefObject<{
@@ -37,7 +32,7 @@ export default function PanButton({
 }) {
   return (
     <FgButton
-      className='pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1'
+      className='w-6 aspect-square absolute top-1/2 translate-y-1/2 -right-1.5'
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}
       dragFunction={(displacement) => {
@@ -57,16 +52,10 @@ export default function PanButton({
         };
 
         dragFunction(
-          "topLeft",
-          displacement,
+          "square",
           {
-            x:
-              -15 -
-              pixelScale.x * Math.cos(angle) -
-              (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
-            y:
-              pixelScale.x * Math.sin(angle) -
-              (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
+            x: displacement.x + Math.sin(angle) * (pixelScale.x / 2),
+            y: displacement.y + Math.cos(angle) * (pixelScale.y / 2),
           },
           {
             x:
@@ -82,7 +71,7 @@ export default function PanButton({
       contentFunction={() => {
         return (
           <FgSVG
-            src={panIcon}
+            src={scaleIcon}
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },

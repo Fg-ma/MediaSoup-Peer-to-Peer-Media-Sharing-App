@@ -4,6 +4,7 @@ import { colors } from "../fgVisualMedia/lib/colors";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
 import FgButton from "../fgElements/fgButton/FgButton";
+import FgAudioElementController from "./lib/FgAudioElementController";
 
 const shadowColors = {
   black: "rgba(0, 0, 0, 0.8)",
@@ -19,19 +20,7 @@ const shadowColors = {
   FgSecondary: "rgba(17, 57, 96, 0.8)",
 };
 
-const defaultFgAudioElementOptions: {
-  springDuration: number;
-  noiseThreshold: number;
-  numFixedPoints: number;
-  bellCurveAmplitude: number;
-  bellCurveMean: number;
-  bellCurveStdDev: number;
-  shadowColor: string;
-  volumeColor: string;
-  primaryMuteColor: string;
-  secondaryMuteColor: string;
-  muteStyleOption: "morse" | "smile";
-} = {
+const defaultFgAudioElementOptions: FgAudioElementOptionsType = {
   springDuration: 250,
   noiseThreshold: 0.2,
   numFixedPoints: 10,
@@ -43,6 +32,20 @@ const defaultFgAudioElementOptions: {
   primaryMuteColor: "FgPrimary",
   secondaryMuteColor: "black",
   muteStyleOption: "smile",
+};
+
+export type FgAudioElementOptionsType = {
+  springDuration: number;
+  noiseThreshold: number;
+  numFixedPoints: number;
+  bellCurveAmplitude: number;
+  bellCurveMean: number;
+  bellCurveStdDev: number;
+  shadowColor: string;
+  volumeColor: string;
+  primaryMuteColor: string;
+  secondaryMuteColor: string;
+  muteStyleOption: "morse" | "smile";
 };
 
 export default function FgAudioElement({
@@ -123,159 +126,40 @@ export default function FgAudioElement({
     config: { duration: fgAudioElementOptions.springDuration },
   });
 
-  const init = () => {
-    if (!pathGenerator.current) {
-      return;
-    }
-
-    // X points
-    const totalWidth = 100;
-    const startOffset = 16;
-    const endOffset = 16;
-    const usableWidth = totalWidth - startOffset - endOffset;
-    const step = usableWidth / (fgAudioElementOptions.numFixedPoints - 1);
-
-    fixedPointsX.current = Array.from(
-      { length: fgAudioElementOptions.numFixedPoints },
-      (_, i) => startOffset + i * step
-    );
-
-    sineCurveY.current = pathGenerator.current.generateSineWave(
-      fgAudioElementOptions.numFixedPoints * 2 - 3,
-      1,
-      1,
-      0
-    );
-
-    bellCurveY.current = pathGenerator.current.generateBellCurve(
-      fgAudioElementOptions.numFixedPoints - 1,
-      fgAudioElementOptions.bellCurveAmplitude,
-      fgAudioElementOptions.bellCurveMean,
-      fgAudioElementOptions.bellCurveStdDev
-    );
-  };
-
-  const handleVolumeSlider = (volume: number) => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-      if (!isUser) {
-        audioRef.current.muted = volume === 0;
-      }
-    }
-  };
-
-  const startDrag = (event: React.MouseEvent, side: "left" | "right") => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (!isUser) {
-      window.addEventListener("mousemove", drag);
-      window.addEventListener("mouseup", stopDrag);
-    }
-
-    sideDragging.current = side;
-  };
-
-  const drag = (event: MouseEvent) => {
-    if (!svgRef.current || !sideDragging.current) return;
-
-    const svgPoint = svgRef.current.createSVGPoint();
-    svgPoint.x = event.clientX;
-    svgPoint.y = event.clientY;
-
-    const cursorPoint = svgPoint.matrixTransform(
-      svgRef.current.getScreenCTM()?.inverse()
-    );
-
-    const newY = Math.max(-34, Math.min(134, cursorPoint.y));
-
-    if (sideDragging.current === "left") {
-      setLeftHandlePosition((prevState) => ({ ...prevState, y: newY }));
-    } else if (sideDragging.current === "right") {
-      setRightHandlePosition((prevState) => ({ ...prevState, y: newY }));
-    }
-
-    const newVol = Math.abs(newY - 50) / 84;
-
-    handleVolumeSlider(newVol);
-  };
-
-  const stopDrag = (event: MouseEvent) => {
-    event.stopPropagation();
-
-    if (!isUser) {
-      window.removeEventListener("mousemove", drag);
-      window.removeEventListener("mouseup", stopDrag);
-    }
-
-    setLeftHandlePosition((prevState) => ({ ...prevState, y: 50 }));
-    setRightHandlePosition((prevState) => ({ ...prevState, y: 50 }));
-    sideDragging.current = null;
-  };
-
-  const isOnPath = (event: React.MouseEvent) => {
-    const pathElement = pathRef.current;
-    const svgElement = svgRef.current;
-
-    if (!pathElement || !svgElement || clientMute.current) return false;
-
-    // Create an SVG point in client coordinates
-    const svgPoint = svgElement.createSVGPoint();
-    svgPoint.x = event.clientX;
-    svgPoint.y = event.clientY;
-
-    // Transform the client point to SVG coordinates
-    const svgPointTransformed = svgPoint.matrixTransform(
-      svgElement.getScreenCTM()?.inverse()
-    );
-
-    // Check if the point is on the stroke of the path
-    return pathElement.isPointInStroke(svgPointTransformed);
-  };
-
-  const onClick = (event: React.MouseEvent) => {
-    const validClick = isOnPath(event);
-
-    if (validClick) {
-      handleMute();
-    }
-  };
-
-  const onMouseMove = (event: MouseEvent) => {
-    const validMove = isOnPath(event as unknown as React.MouseEvent);
-
-    if (validMove) {
-      if (!svgRef.current?.classList.contains("cursor-pointer")) {
-        svgRef.current?.classList.add("cursor-pointer");
-      }
-
-      if (!timerRef.current) {
-        timerRef.current = setTimeout(() => {
-          setPopupVisible(true);
-        }, 2500);
-      }
-    } else {
-      if (svgRef.current?.classList.contains("cursor-pointer")) {
-        svgRef.current?.classList.remove("cursor-pointer");
-      }
-
-      if (timerRef.current) {
-        setPopupVisible(false);
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    }
-  };
+  const fgAudioElementController = new FgAudioElementController(
+    isUser,
+    fgAudioElementOptions,
+    localMute,
+    clientMute,
+    fixedPointsX,
+    sineCurveY,
+    bellCurveY,
+    setMovingY,
+    setFixedY,
+    svgRef,
+    pathRef,
+    audioRef,
+    pathGenerator,
+    timerRef,
+    sideDragging,
+    setLeftHandlePosition,
+    setRightHandlePosition,
+    setPopupVisible,
+    handleMute
+  );
 
   useEffect(() => {
     pathGenerator.current = new PathGenerator();
 
-    init();
+    fgAudioElementController.init();
 
-    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mousemove", fgAudioElementController.onMouseMove);
 
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener(
+        "mousemove",
+        fgAudioElementController.onMouseMove
+      );
     };
   }, []);
 
@@ -292,43 +176,16 @@ export default function FgAudioElement({
       fgAudioElementOptions.noiseThreshold
     );
 
-    audioAnalyzer.current.initAudio(updateMovingY, audioStream);
+    audioAnalyzer.current.initAudio(
+      fgAudioElementController.updateMovingY,
+      audioStream
+    );
 
     // Cleanup on unmount
     return () => {
       audioAnalyzer.current?.destructor();
     };
   }, [audioStream]);
-
-  // Function to update the moving points' Y values
-  const updateMovingY = (volumeLevel: number) => {
-    let movingYArray;
-    let fixedYArray;
-    if (
-      (!localMute.current && !clientMute.current) ||
-      fgAudioElementOptions.muteStyleOption !== "smile"
-    ) {
-      movingYArray = bellCurveY.current.map(
-        (value, index) => value * volumeLevel * 84 * (-1) ** index + 50
-      );
-      fixedYArray = Array(fgAudioElementOptions.numFixedPoints - 1).fill(50);
-    } else if (fgAudioElementOptions.muteStyleOption === "smile") {
-      movingYArray = sineCurveY.current
-        .filter((_, index) => index % 2 === 0)
-        .map((value) => value * 10 + 50);
-      fixedYArray = sineCurveY.current
-        .filter((_, index) => index % 2 === 1)
-        .map((value) => value * 10 + 50);
-      fixedYArray.push(50);
-    }
-
-    if (movingYArray) {
-      setMovingY(movingYArray);
-    }
-    if (fixedYArray) {
-      setFixedY(fixedYArray);
-    }
-  };
 
   const ySpringsArray = Object.values(springs)
     .filter((spring): spring is SpringValue<number> => spring !== undefined)
@@ -349,464 +206,463 @@ export default function FgAudioElement({
   );
 
   return (
-    <div className='w-60 aspect-square'>
-      <FgButton
-        clickFunction={onClick}
-        contentFunction={() => (
-          <svg
-            className='w-full aspect-square'
-            ref={svgRef}
-            viewBox={`0 0 ${viewBoxSize.w} ${viewBoxSize.h}`}
-          >
-            <defs>
-              <filter id={`${username}_shadow`}>
-                <feGaussianBlur
-                  in='SourceAlpha'
-                  stdDeviation='2'
-                  result='blur'
-                />
-                <feOffset in='blur' dx='1' dy='2' result='offsetBlur' />
+    <FgButton
+      clickFunction={fgAudioElementController.onClick}
+      className='w-full h-full'
+      contentFunction={() => (
+        <svg
+          className='w-full h-full'
+          ref={svgRef}
+          viewBox={`0 0 ${viewBoxSize.w} ${viewBoxSize.h}`}
+        >
+          <defs>
+            <filter id={`${username}_shadow`}>
+              <feGaussianBlur
+                in='SourceAlpha'
+                stdDeviation='0.75'
+                result='blur'
+              />
+              <feOffset in='blur' dx='0.25' dy='0.5' result='offsetBlur' />
 
-                <feFlood
-                  floodColor={
-                    shadowColors[
-                      fgAudioElementOptions.shadowColor as keyof typeof shadowColors
-                    ]
-                  }
-                  result='colorBlur'
-                />
-                <feComposite
-                  in='colorBlur'
-                  in2='offsetBlur'
-                  operator='in'
-                  result='coloredBlur'
-                />
+              <feFlood
+                floodColor={
+                  shadowColors[
+                    fgAudioElementOptions.shadowColor as keyof typeof shadowColors
+                  ]
+                }
+                result='colorBlur'
+              />
+              <feComposite
+                in='colorBlur'
+                in2='offsetBlur'
+                operator='in'
+                result='coloredBlur'
+              />
 
-                <feMerge>
-                  <feMergeNode in='coloredBlur' />
-                  <feMergeNode in='SourceGraphic' />
-                </feMerge>
-              </filter>
+              <feMerge>
+                <feMergeNode in='coloredBlur' />
+                <feMergeNode in='SourceGraphic' />
+              </feMerge>
+            </filter>
 
-              <mask id={`${username}_mask`}>
-                <rect
-                  x='0'
-                  y='0'
-                  width={viewBoxSize.w}
-                  height={viewBoxSize.h}
-                  fill='black'
-                />
-                <animated.path
-                  ref={pathRef}
-                  d={animatedPathData}
-                  stroke='white'
-                  strokeWidth='4'
-                  fill='none'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </mask>
-
-              {fgAudioElementOptions.muteStyleOption === "morse" && (
-                <linearGradient
-                  id={`${username}_mute_morse_gradient`}
-                  x1='0%'
-                  y1='0%'
-                  x2='100%'
-                  y2='0%'
-                  gradientUnits='userSpaceOnUse'
-                >
-                  {/* m */}
-                  <stop
-                    offset='6%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='15.34%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='16.216%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='18.59%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='19.47%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='28.369%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-
-                  <stop
-                    offset='29.249%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='38.146%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-
-                  {/* u */}
-                  <stop
-                    offset='39.026%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='41.40%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='42.28%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='44.658%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='45.538%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='47.91%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='48.79%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='51.17%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='52.05%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='60.947%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-
-                  <stop
-                    offset='61.827%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='70.72%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-
-                  {/* t */}
-                  <stop
-                    offset='71.60%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='80.50%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-
-                  <stop
-                    offset='81.38%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='90.27%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-
-                  {/* e */}
-                  <stop
-                    offset='91.16%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                  <stop
-                    offset='94%'
-                    stopColor={
-                      colors[
-                        fgAudioElementOptions.primaryMuteColor as keyof typeof colors
-                      ]
-                    }
-                  />
-                </linearGradient>
-              )}
-
-              <linearGradient
-                id={`${username}_top_gradient`}
-                x1='0%'
-                y1='0%'
-                x2='0%'
-                y2='100%'
-              >
-                <stop
-                  offset='45%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.volumeColor as keyof typeof colors
-                    ]
-                  }
-                />
-                <stop offset='95%' stopColor='black' />
-              </linearGradient>
-
-              <linearGradient
-                id={`${username}_bottom_gradient`}
-                x1='0%'
-                y1='0%'
-                x2='0%'
-                y2='100%'
-              >
-                <stop offset='5%' stopColor='black' />
-                <stop
-                  offset='55%'
-                  stopColor={
-                    colors[
-                      fgAudioElementOptions.volumeColor as keyof typeof colors
-                    ]
-                  }
-                />
-              </linearGradient>
-
-              <pattern
-                id={`${username}_background_matrix`}
-                x='0'
-                y='0'
-                width={viewBoxSize.w}
-                height={viewBoxSize.h}
-                patternUnits='userSpaceOnUse'
-              >
-                <rect
-                  x='0'
-                  y='0'
-                  width={viewBoxSize.w * patternSize.w}
-                  height={viewBoxSize.h * patternSize.h}
-                  fill={`url(#${username}_top_gradient)`}
-                ></rect>
-                <rect
-                  x={viewBoxSize.w * patternSize.w}
-                  y='0'
-                  width={viewBoxSize.w * (1 - 2 * patternSize.w)}
-                  height={viewBoxSize.h * patternSize.h}
-                  fill='black'
-                ></rect>
-                <rect
-                  x={viewBoxSize.w * (1 - patternSize.w)}
-                  y='0'
-                  width={viewBoxSize.w * patternSize.w}
-                  height={viewBoxSize.h * patternSize.h}
-                  fill={`url(#${username}_top_gradient)`}
-                ></rect>
-
-                <rect
-                  x='0'
-                  y={viewBoxSize.h * patternSize.h}
-                  width={viewBoxSize.w * patternSize.w}
-                  height={viewBoxSize.h * (1 - 2 * patternSize.h)}
-                  fill='black'
-                ></rect>
-                <rect
-                  x={viewBoxSize.w * patternSize.w}
-                  y={viewBoxSize.h * patternSize.h}
-                  width={viewBoxSize.w * (1 - 2 * patternSize.w)}
-                  height={viewBoxSize.h * (1 - 2 * patternSize.h)}
-                  fill='black'
-                ></rect>
-                <rect
-                  x={viewBoxSize.w * (1 - patternSize.w)}
-                  y={viewBoxSize.h * patternSize.h}
-                  width={viewBoxSize.w * patternSize.w}
-                  height={viewBoxSize.h * (1 - 2 * patternSize.h)}
-                  fill='black'
-                ></rect>
-
-                <rect
-                  x='0'
-                  y={viewBoxSize.h * (1 - patternSize.h)}
-                  width={viewBoxSize.w * patternSize.w}
-                  height={viewBoxSize.h * patternSize.h}
-                  fill={`url(#${username}_bottom_gradient)`}
-                ></rect>
-                <rect
-                  x={viewBoxSize.w * patternSize.w}
-                  y={viewBoxSize.h * (1 - patternSize.h)}
-                  width={viewBoxSize.w * (1 - 2 * patternSize.w)}
-                  height={viewBoxSize.h * patternSize.h}
-                  fill='black'
-                ></rect>
-                <rect
-                  x={viewBoxSize.w * (1 - patternSize.w)}
-                  y={viewBoxSize.h * (1 - patternSize.h)}
-                  width={viewBoxSize.w * patternSize.w}
-                  height={viewBoxSize.h * patternSize.h}
-                  fill={`url(#${username}_bottom_gradient)`}
-                ></rect>
-              </pattern>
-            </defs>
-            <g filter={`url(#${username}_shadow)`}>
+            <mask id={`${username}_mask`}>
               <rect
                 x='0'
                 y='0'
                 width={viewBoxSize.w}
                 height={viewBoxSize.h}
-                fill={
-                  (localMute.current || clientMute.current) &&
-                  fgAudioElementOptions.muteStyleOption === "morse"
-                    ? `url(#${username}_mute_morse_gradient)`
-                    : `url(#${username}_background_matrix)`
-                }
-                mask={`url(#${username}_mask)`}
+                fill='black'
               />
-            </g>
-            {!isUser && (
-              <animated.rect
-                ref={leftHandleRef}
-                onMouseDown={(event) => {
-                  if (!isUser) startDrag(event, "left");
-                }}
-                x={4}
-                y={47}
-                width={16}
-                height={6}
-                rx={3}
-                ry={3}
-                fill='transparent'
-                style={{ cursor: "pointer" }}
+              <animated.path
+                ref={pathRef}
+                d={animatedPathData}
+                stroke='white'
+                strokeWidth='4'
+                fill='none'
+                strokeLinecap='round'
+                strokeLinejoin='round'
               />
-            )}
-            {!isUser && (
-              <animated.rect
-                ref={rightHandleRef}
-                onMouseDown={(event) => {
-                  if (!isUser) startDrag(event, "right");
-                }}
-                x={80}
-                y={47}
-                width={16}
-                height={6}
-                rx={3}
-                ry={3}
-                fill='transparent'
-                style={{ cursor: "pointer" }}
-              />
-            )}
-          </svg>
-        )}
-        doubleClickFunction={
-          doubleClickFunction &&
-          ((event) => {
-            const validDoubleClick = isOnPath(event);
+            </mask>
 
-            if (validDoubleClick) doubleClickFunction();
-          })
-        }
-        style={{ cursor: "default" }}
-      />
-    </div>
+            {fgAudioElementOptions.muteStyleOption === "morse" && (
+              <linearGradient
+                id={`${username}_mute_morse_gradient`}
+                x1='0%'
+                y1='0%'
+                x2='100%'
+                y2='0%'
+                gradientUnits='userSpaceOnUse'
+              >
+                {/* m */}
+                <stop
+                  offset='6%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='15.34%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='16.216%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='18.59%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='19.47%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='28.369%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+
+                <stop
+                  offset='29.249%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='38.146%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+
+                {/* u */}
+                <stop
+                  offset='39.026%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='41.40%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='42.28%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='44.658%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='45.538%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='47.91%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='48.79%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='51.17%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='52.05%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='60.947%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+
+                <stop
+                  offset='61.827%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='70.72%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+
+                {/* t */}
+                <stop
+                  offset='71.60%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='80.50%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+
+                <stop
+                  offset='81.38%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='90.27%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+
+                {/* e */}
+                <stop
+                  offset='91.16%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+                <stop
+                  offset='94%'
+                  stopColor={
+                    colors[
+                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                    ]
+                  }
+                />
+              </linearGradient>
+            )}
+
+            <linearGradient
+              id={`${username}_top_gradient`}
+              x1='0%'
+              y1='0%'
+              x2='0%'
+              y2='100%'
+            >
+              <stop
+                offset='45%'
+                stopColor={
+                  colors[
+                    fgAudioElementOptions.volumeColor as keyof typeof colors
+                  ]
+                }
+              />
+              <stop offset='95%' stopColor='black' />
+            </linearGradient>
+
+            <linearGradient
+              id={`${username}_bottom_gradient`}
+              x1='0%'
+              y1='0%'
+              x2='0%'
+              y2='100%'
+            >
+              <stop offset='5%' stopColor='black' />
+              <stop
+                offset='55%'
+                stopColor={
+                  colors[
+                    fgAudioElementOptions.volumeColor as keyof typeof colors
+                  ]
+                }
+              />
+            </linearGradient>
+
+            <pattern
+              id={`${username}_background_matrix`}
+              x='0'
+              y='0'
+              width={viewBoxSize.w}
+              height={viewBoxSize.h}
+              patternUnits='userSpaceOnUse'
+            >
+              <rect
+                x='0'
+                y='0'
+                width={viewBoxSize.w * patternSize.w}
+                height={viewBoxSize.h * patternSize.h}
+                fill={`url(#${username}_top_gradient)`}
+              ></rect>
+              <rect
+                x={viewBoxSize.w * patternSize.w}
+                y='0'
+                width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                height={viewBoxSize.h * patternSize.h}
+                fill='black'
+              ></rect>
+              <rect
+                x={viewBoxSize.w * (1 - patternSize.w)}
+                y='0'
+                width={viewBoxSize.w * patternSize.w}
+                height={viewBoxSize.h * patternSize.h}
+                fill={`url(#${username}_top_gradient)`}
+              ></rect>
+
+              <rect
+                x='0'
+                y={viewBoxSize.h * patternSize.h}
+                width={viewBoxSize.w * patternSize.w}
+                height={viewBoxSize.h * (1 - 2 * patternSize.h)}
+                fill='black'
+              ></rect>
+              <rect
+                x={viewBoxSize.w * patternSize.w}
+                y={viewBoxSize.h * patternSize.h}
+                width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                height={viewBoxSize.h * (1 - 2 * patternSize.h)}
+                fill='black'
+              ></rect>
+              <rect
+                x={viewBoxSize.w * (1 - patternSize.w)}
+                y={viewBoxSize.h * patternSize.h}
+                width={viewBoxSize.w * patternSize.w}
+                height={viewBoxSize.h * (1 - 2 * patternSize.h)}
+                fill='black'
+              ></rect>
+
+              <rect
+                x='0'
+                y={viewBoxSize.h * (1 - patternSize.h)}
+                width={viewBoxSize.w * patternSize.w}
+                height={viewBoxSize.h * patternSize.h}
+                fill={`url(#${username}_bottom_gradient)`}
+              ></rect>
+              <rect
+                x={viewBoxSize.w * patternSize.w}
+                y={viewBoxSize.h * (1 - patternSize.h)}
+                width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                height={viewBoxSize.h * patternSize.h}
+                fill='black'
+              ></rect>
+              <rect
+                x={viewBoxSize.w * (1 - patternSize.w)}
+                y={viewBoxSize.h * (1 - patternSize.h)}
+                width={viewBoxSize.w * patternSize.w}
+                height={viewBoxSize.h * patternSize.h}
+                fill={`url(#${username}_bottom_gradient)`}
+              ></rect>
+            </pattern>
+          </defs>
+          <g filter={`url(#${username}_shadow)`}>
+            <rect
+              x='0'
+              y='0'
+              width={viewBoxSize.w}
+              height={viewBoxSize.h}
+              fill={
+                (localMute.current || clientMute.current) &&
+                fgAudioElementOptions.muteStyleOption === "morse"
+                  ? `url(#${username}_mute_morse_gradient)`
+                  : `url(#${username}_background_matrix)`
+              }
+              mask={`url(#${username}_mask)`}
+            />
+          </g>
+          {!isUser && (
+            <animated.rect
+              ref={leftHandleRef}
+              onMouseDown={(event) => {
+                if (!isUser) fgAudioElementController.startDrag(event, "left");
+              }}
+              x={4}
+              y={47}
+              width={16}
+              height={6}
+              rx={3}
+              ry={3}
+              fill='transparent'
+              style={{ cursor: "pointer" }}
+            />
+          )}
+          {!isUser && (
+            <animated.rect
+              ref={rightHandleRef}
+              onMouseDown={(event) => {
+                if (!isUser) fgAudioElementController.startDrag(event, "right");
+              }}
+              x={80}
+              y={47}
+              width={16}
+              height={6}
+              rx={3}
+              ry={3}
+              fill='transparent'
+              style={{ cursor: "pointer" }}
+            />
+          )}
+        </svg>
+      )}
+      doubleClickFunction={
+        doubleClickFunction &&
+        ((event) => {
+          const validDoubleClick = fgAudioElementController.isOnPath(event);
+
+          if (validDoubleClick) doubleClickFunction();
+        })
+      }
+      style={{ cursor: "default" }}
+    />
   );
 }

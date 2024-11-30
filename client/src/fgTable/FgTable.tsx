@@ -120,7 +120,7 @@ export default function FgTable({
         onWheel={fgTableController.horizontalScrollWheel}
       >
         <div
-          className='bg-fg-white-65 aspect-square'
+          className='bg-fg-white-65 aspect-square overflow-hidden'
           style={{
             ...(aspectDir.current === "width"
               ? { width: "100%" }

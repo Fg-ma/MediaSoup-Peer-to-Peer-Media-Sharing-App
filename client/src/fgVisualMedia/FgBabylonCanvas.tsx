@@ -282,9 +282,9 @@ export default function FgBabylonCanvas({
   };
 
   const fgAdjustmentVideoController = new FgAdjustmentVideoController(
-    setAdjustingDimensions,
     bundleRef,
     positioning,
+    setAdjustingDimensions,
     setRerender
   );
 
@@ -522,6 +522,7 @@ export default function FgBabylonCanvas({
       <RotateButton
         dragFunction={fgAdjustmentVideoController.rotateDragFunction}
         bundleRef={bundleRef}
+        positioning={positioning}
         mouseDownFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
         }
@@ -532,6 +533,7 @@ export default function FgBabylonCanvas({
       <PanButton
         dragFunction={fgAdjustmentVideoController.movementDragFunction}
         bundleRef={bundleRef}
+        positioning={positioning}
         mouseDownFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
         }
@@ -542,6 +544,7 @@ export default function FgBabylonCanvas({
       <ScaleButton
         dragFunction={fgAdjustmentVideoController.scaleDragFunction}
         bundleRef={bundleRef}
+        positioning={positioning}
         mouseDownFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
         }

@@ -1,10 +1,9 @@
 import React from "react";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
-import panIcon from "../../../../public/svgs/panIcon.svg";
-import { RotationPoints } from "../FgAdjustmentVideoControls";
+import rotateIcon from "../../../../public/svgs/rotateIcon.svg";
 
-export default function PanButton({
+export default function RotateButton({
   dragFunction,
   bundleRef,
   positioning,
@@ -12,13 +11,11 @@ export default function PanButton({
   mouseUpFunction,
 }: {
   dragFunction: (
-    rotationPointPlacement: RotationPoints,
-    displacement: { x: number; y: number },
-    buttonPosition: {
+    event: MouseEvent,
+    referencePoint: {
       x: number;
       y: number;
-    },
-    rotationPoint: { x: number; y: number }
+    }
   ) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
   positioning: React.MutableRefObject<{
@@ -37,16 +34,13 @@ export default function PanButton({
 }) {
   return (
     <FgButton
-      className='pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1'
+      className='w-7 aspect-square absolute top-1/2 -translate-y-[150%] -right-1.5'
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}
-      dragFunction={(displacement) => {
+      dragFunction={(_displacement, event) => {
         if (!bundleRef.current) {
           return;
         }
-
-        const angle =
-          2 * Math.PI - positioning.current.rotation * (Math.PI / 180);
 
         const pixelScale = {
           x:
@@ -56,33 +50,21 @@ export default function PanButton({
             bundleRef.current.clientHeight,
         };
 
-        dragFunction(
-          "topLeft",
-          displacement,
-          {
-            x:
-              -15 -
-              pixelScale.x * Math.cos(angle) -
-              (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
-            y:
-              pixelScale.x * Math.sin(angle) -
-              (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
-          },
-          {
-            x:
-              (positioning.current.position.left / 100) *
-              bundleRef.current.clientWidth,
-            y:
-              (positioning.current.position.top / 100) *
-              bundleRef.current.clientHeight,
-          }
-        );
+        dragFunction(event, {
+          x:
+            (positioning.current.position.left / 100) *
+            bundleRef.current.clientWidth,
+          y:
+            (positioning.current.position.top / 100) *
+              bundleRef.current.clientHeight +
+            pixelScale.y / 2,
+        });
       }}
       referenceDragElement={bundleRef}
       contentFunction={() => {
         return (
           <FgSVG
-            src={panIcon}
+            src={rotateIcon}
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },

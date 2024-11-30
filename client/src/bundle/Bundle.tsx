@@ -393,6 +393,7 @@ export default function Bundle({
               name={name}
               audioStream={audioStream}
               audioRef={audioRef}
+              bundleRef={bundleRef}
               handleAudioEffectChange={bundleController.handleAudioEffectChange}
               handleMute={bundleController.handleMute}
               localMute={localMute}

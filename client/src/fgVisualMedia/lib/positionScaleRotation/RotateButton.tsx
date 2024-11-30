@@ -6,11 +6,29 @@ import rotateIcon from "../../../../public/svgs/rotateIcon.svg";
 export default function RotateButton({
   dragFunction,
   bundleRef,
+  positioning,
   mouseDownFunction,
   mouseUpFunction,
 }: {
-  dragFunction: (event: MouseEvent) => void;
+  dragFunction: (
+    event: MouseEvent,
+    referencePoint: {
+      x: number;
+      y: number;
+    }
+  ) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
+  positioning: React.MutableRefObject<{
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }>;
   mouseDownFunction: () => void;
   mouseUpFunction: () => void;
 }) {
@@ -20,7 +38,18 @@ export default function RotateButton({
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}
       dragFunction={(_displacement, event) => {
-        dragFunction(event);
+        if (!bundleRef.current) {
+          return;
+        }
+
+        dragFunction(event, {
+          x:
+            (positioning.current.position.left / 100) *
+            bundleRef.current.clientWidth,
+          y:
+            (positioning.current.position.top / 100) *
+            bundleRef.current.clientHeight,
+        });
       }}
       referenceDragElement={bundleRef}
       contentFunction={() => {
