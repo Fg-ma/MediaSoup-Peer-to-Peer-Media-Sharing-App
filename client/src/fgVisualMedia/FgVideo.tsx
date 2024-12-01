@@ -28,10 +28,10 @@ import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
 } from "../context/currentEffectsStylesContext/typeConstant";
-import RotateButton from "./lib/positionScaleRotation/RotateButton";
-import PanButton from "./lib/positionScaleRotation/PanButton";
-import ScaleButton from "./lib/positionScaleRotation/ScaleButton";
-import FgAdjustmentVideoController from "./lib/FgAdjustmentVideoControls";
+import RotateButton from "../fgAdjustmentComponents/RotateButton";
+import PanButton from "../fgAdjustmentComponents/PanButton";
+import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
+import FgAdjustmentVideoController from "../fgAdjustmentComponents/lib/FgAdjustmentVideoControls";
 import FgLowerVideoController from "./lib/fgLowerVideoControls/lib/FgLowerVideoController";
 
 export interface FgVideoOptions {
@@ -492,9 +492,28 @@ export default function FgVideo({
       onMouseLeave={() => fgLowerVideoController.handleMouseLeave()}
     >
       <RotateButton
-        dragFunction={fgAdjustmentVideoController.rotateDragFunction}
+        className={
+          "rotate-btn absolute left-full bottom-full w-6 aspect-square z-10"
+        }
+        dragFunction={(_displacement, event) => {
+          if (!bundleRef.current) {
+            return;
+          }
+
+          const box = bundleRef.current.getBoundingClientRect();
+
+          fgAdjustmentVideoController.rotateDragFunction(event, {
+            x:
+              (positioning.current.position.left / 100) *
+                bundleRef.current.clientWidth +
+              box.left,
+            y:
+              (positioning.current.position.top / 100) *
+                bundleRef.current.clientHeight +
+              box.top,
+          });
+        }}
         bundleRef={bundleRef}
-        positioning={positioning}
         mouseDownFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
         }
@@ -503,23 +522,105 @@ export default function FgVideo({
         }
       />
       <PanButton
-        dragFunction={fgAdjustmentVideoController.movementDragFunction}
+        className={
+          "pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1"
+        }
+        dragFunction={(displacement) => {
+          if (!bundleRef.current) {
+            return;
+          }
+
+          const angle =
+            2 * Math.PI - positioning.current.rotation * (Math.PI / 180);
+
+          const pixelScale = {
+            x:
+              (positioning.current.scale.x / 100) *
+              bundleRef.current.clientWidth,
+            y:
+              (positioning.current.scale.y / 100) *
+              bundleRef.current.clientHeight,
+          };
+
+          fgAdjustmentVideoController.movementDragFunction(
+            displacement,
+            {
+              x:
+                -15 * Math.cos(angle) -
+                pixelScale.x * Math.cos(angle) -
+                (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
+              y:
+                15 * Math.sin(angle) +
+                pixelScale.x * Math.sin(angle) -
+                (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
+            },
+            {
+              x:
+                (positioning.current.position.left / 100) *
+                bundleRef.current.clientWidth,
+              y:
+                (positioning.current.position.top / 100) *
+                bundleRef.current.clientHeight,
+            }
+          );
+        }}
         bundleRef={bundleRef}
-        positioning={positioning}
-        mouseDownFunction={
-          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
+        mouseDownFunction={() =>
+          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction(
+            "position",
+            { rotationPointPlacement: "topLeft" }
+          )
         }
         mouseUpFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseUpFunction
         }
       />
       <ScaleButton
-        dragFunction={fgAdjustmentVideoController.scaleDragFunction}
-        bundleRef={bundleRef}
-        positioning={positioning}
-        mouseDownFunction={
-          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
+        className={
+          "scale-btn absolute left-full top-full w-6 aspect-square z-10 pl-1 pt-1"
         }
+        dragFunction={(displacement) => {
+          if (!bundleRef.current) {
+            return;
+          }
+
+          const referencePoint = {
+            x:
+              (positioning.current.position.left / 100) *
+              bundleRef.current.clientWidth,
+            y:
+              (positioning.current.position.top / 100) *
+              bundleRef.current.clientHeight,
+          };
+
+          fgAdjustmentVideoController.scaleDragFunction(
+            "any",
+            displacement,
+            referencePoint,
+            referencePoint
+          );
+        }}
+        bundleRef={bundleRef}
+        mouseDownFunction={() => {
+          if (!bundleRef.current) {
+            return;
+          }
+
+          const referencePoint = {
+            x:
+              (positioning.current.position.left / 100) *
+              bundleRef.current.clientWidth,
+            y:
+              (positioning.current.position.top / 100) *
+              bundleRef.current.clientHeight,
+          };
+
+          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction("scale", {
+            aspect: "square",
+            referencePoint: referencePoint,
+            rotationPoint: referencePoint,
+          });
+        }}
         mouseUpFunction={
           fgAdjustmentVideoController.adjustmentBtnMouseUpFunction
         }

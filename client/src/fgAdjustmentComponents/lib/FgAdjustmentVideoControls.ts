@@ -21,7 +21,22 @@ const boundaryCheckingRotationPointMap: {
   middleRight: { x: 1, y: 0.5 },
 };
 
+export type AdjustmentTypes = "position" | "scale" | "rotation";
+
+export type AdjustmentBtnMouseDownDetails = {
+  aspect?: "square";
+  referencePoint?: { x: number; y: number };
+  rotationPoint?: { x: number; y: number };
+  rotationPointPlacement?: RotationPoints;
+};
+
 class FgAdjustmentVideoController {
+  private maxTop = 0;
+  private minTop = 0;
+  private maxLeft = 0;
+  private minLeft = 0;
+  private maxSquareDims = 0;
+
   constructor(
     private bundleRef: React.RefObject<HTMLDivElement>,
     private positioning: React.MutableRefObject<{
@@ -38,14 +53,12 @@ class FgAdjustmentVideoController {
     private setAdjustingDimensions: React.Dispatch<
       React.SetStateAction<boolean>
     >,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
-    private canvasRef?: React.RefObject<HTMLCanvasElement>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   movementDragFunction = (
-    rotationPointPlacement: RotationPoints,
     displacement: { x: number; y: number },
-    buttonPosition: { x: number; y: number },
+    referencePoint: { x: number; y: number },
     rotationPoint: { x: number; y: number }
   ) => {
     if (!this.bundleRef.current) {
@@ -64,9 +77,9 @@ class FgAdjustmentVideoController {
         this.bundleRef.current.clientHeight,
     };
 
-    const left = displacement.x + buttonPosition.x;
+    const left = displacement.x + referencePoint.x;
 
-    const top = displacement.y + buttonPosition.y;
+    const top = displacement.y + referencePoint.y;
 
     const isOutside = this.isBoxOutside(
       left,
@@ -88,46 +101,20 @@ class FgAdjustmentVideoController {
       };
       this.setRerender((prev) => !prev);
     } else {
-      const { max: leftMax, min: leftMin } = this.getLeftBounds(
-        angle,
-        pixelScale.x,
-        pixelScale.y,
-        boundaryCheckingRotationPointMap[rotationPointPlacement].x *
-          pixelScale.x,
-        boundaryCheckingRotationPointMap[rotationPointPlacement].y *
-          pixelScale.y
-      );
-
-      const maxLeft = (leftMax / this.bundleRef.current.clientWidth) * 100;
-      const minLeft = (leftMin / this.bundleRef.current.clientWidth) * 100;
-
-      const { max: topMax, min: topMin } = this.getTopBounds(
-        angle,
-        pixelScale.x,
-        pixelScale.y,
-        boundaryCheckingRotationPointMap[rotationPointPlacement].x *
-          pixelScale.x,
-        boundaryCheckingRotationPointMap[rotationPointPlacement].y *
-          pixelScale.y
-      );
-
-      const maxTop = (topMax / this.bundleRef.current.clientHeight) * 100;
-      const minTop = (topMin / this.bundleRef.current.clientHeight) * 100;
-
       this.positioning.current = {
         ...this.positioning.current,
         position: {
           left:
-            (left / this.bundleRef.current.clientWidth) * 100 > maxLeft
-              ? maxLeft
-              : (left / this.bundleRef.current.clientWidth) * 100 < minLeft
-              ? minLeft
+            (left / this.bundleRef.current.clientWidth) * 100 > this.maxLeft
+              ? this.maxLeft
+              : (left / this.bundleRef.current.clientWidth) * 100 < this.minLeft
+              ? this.minLeft
               : (left / this.bundleRef.current.clientWidth) * 100,
           top:
-            (top / this.bundleRef.current.clientHeight) * 100 > maxTop
-              ? maxTop
-              : (top / this.bundleRef.current.clientHeight) * 100 < minTop
-              ? minTop
+            (top / this.bundleRef.current.clientHeight) * 100 > this.maxTop
+              ? this.maxTop
+              : (top / this.bundleRef.current.clientHeight) * 100 < this.minTop
+              ? this.minTop
               : (top / this.bundleRef.current.clientHeight) * 100,
         },
       };
@@ -138,7 +125,8 @@ class FgAdjustmentVideoController {
   scaleDragFunction = (
     kind: "any" | "square",
     displacement: { x: number; y: number },
-    referencePoint: { x: number; y: number }
+    referencePoint: { x: number; y: number },
+    rotationPoint: { x: number; y: number }
   ) => {
     if (!this.bundleRef.current) {
       return;
@@ -191,10 +179,10 @@ class FgAdjustmentVideoController {
       referenceX,
       referenceY,
       theta,
-      ADotB,
-      BPerpMag,
-      referenceX,
-      referenceY
+      kind === "square" ? Math.max(ADotB, BPerpMag) : ADotB,
+      kind === "square" ? Math.max(ADotB, BPerpMag) : BPerpMag,
+      rotationPoint.x,
+      rotationPoint.y
     );
 
     if (!isOutside) {
@@ -227,6 +215,8 @@ class FgAdjustmentVideoController {
             referenceX,
             referenceY,
             theta,
+            rotationPoint.x,
+            rotationPoint.y,
             ADotB,
             (this.positioning.current.scale.y / 100) *
               this.bundleRef.current.clientHeight
@@ -261,6 +251,8 @@ class FgAdjustmentVideoController {
               referenceX,
               referenceY,
               theta,
+              rotationPoint.x,
+              rotationPoint.y,
               (this.positioning.current.scale.x / 100) *
                 this.bundleRef.current.clientWidth,
               BPerpMag
@@ -278,6 +270,31 @@ class FgAdjustmentVideoController {
           this.setRerender((prev) => !prev);
         }
       }
+    } else if (isOutside && kind === "square") {
+      const maxDims =
+        (this.getMaxSquareAspectDim(
+          referenceX,
+          referenceY,
+          theta,
+          rotationPoint.x,
+          rotationPoint.y,
+          0,
+          0
+        ) /
+          Math.max(
+            this.bundleRef.current.clientHeight,
+            this.bundleRef.current.clientWidth
+          )) *
+        100;
+
+      this.positioning.current = {
+        ...this.positioning.current,
+        scale: {
+          x: maxDims,
+          y: maxDims,
+        },
+      };
+      this.setRerender((prev) => !prev);
     }
   };
 
@@ -291,16 +308,12 @@ class FgAdjustmentVideoController {
 
     const { x: referenceX, y: referenceY } = referencePoint;
 
-    const angle = this.calculateRotationAngle(
-      {
-        x: referenceX,
-        y: referenceY,
-      },
-      {
-        x: event.clientX,
-        y: event.clientY,
-      }
-    );
+    const angle = this.calculateRotationAngle(referencePoint, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    const box = this.bundleRef.current.getBoundingClientRect();
 
     const isOutside = this.isBoxOutside(
       (this.positioning.current.position.left / 100) *
@@ -312,8 +325,8 @@ class FgAdjustmentVideoController {
         this.bundleRef.current.clientWidth,
       (this.positioning.current.scale.y / 100) *
         this.bundleRef.current.clientHeight,
-      referenceX,
-      referenceY
+      referenceX - box.left,
+      referenceY - box.top
     );
 
     if (!isOutside) {
@@ -365,43 +378,6 @@ class FgAdjustmentVideoController {
     const rotatedCorners = corners.map(([px, py]) =>
       this.rotatePoint(px, py, rotatePointX, rotatePointY, -theta)
     );
-
-    if (this.canvasRef && this.canvasRef.current && this.bundleRef.current) {
-      this.canvasRef.current.width = this.bundleRef.current.clientWidth;
-      this.canvasRef.current.height = this.bundleRef.current.clientHeight;
-      const ctx = this.canvasRef.current.getContext("2d");
-
-      if (ctx) {
-        ctx.clearRect(
-          0,
-          0,
-          this.canvasRef.current.width,
-          this.canvasRef.current.height
-        ); // Clear canvas before drawing
-
-        ctx.fillStyle = "red";
-        ctx.fillRect(
-          0,
-          0,
-          this.canvasRef.current.width,
-          this.canvasRef.current.height
-        );
-
-        ctx.fillStyle = "blue"; // Set point color
-        rotatedCorners.forEach(([x, y]) => {
-          ctx.beginPath();
-          ctx.arc(x, y, 3, 0, 2 * Math.PI); // Draw a circle for each point
-          ctx.fill();
-        });
-
-        ctx.fillStyle = "purple"; // Set point color
-        corners.forEach(([x, y]) => {
-          ctx.beginPath();
-          ctx.arc(x, y, 3, 0, 2 * Math.PI); // Draw a circle for each point
-          ctx.fill();
-        });
-      }
-    }
 
     // Check if any corner is outside the bounding box
     const isOutside = rotatedCorners.some(([rotatedX, rotatedY]) => {
@@ -526,9 +502,11 @@ class FgAdjustmentVideoController {
   };
 
   private getMaxWidth = (
-    x1: number,
-    y1: number,
+    left: number,
+    top: number,
     theta: number,
+    rotationPointX: number,
+    rotationPointY: number,
     startWidth: number,
     height: number
   ) => {
@@ -539,13 +517,13 @@ class FgAdjustmentVideoController {
       i += 4;
 
       isOutside = this.isBoxOutside(
-        x1,
-        y1,
+        left,
+        top,
         theta,
         startWidth + i,
         height,
-        x1,
-        y1
+        rotationPointX,
+        rotationPointY
       );
     }
 
@@ -557,13 +535,13 @@ class FgAdjustmentVideoController {
       i += 1;
 
       isOutside = this.isBoxOutside(
-        x1,
-        y1,
+        left,
+        top,
         theta,
         startWidth + i,
         height,
-        x1,
-        y1
+        rotationPointX,
+        rotationPointY
       );
     }
 
@@ -571,9 +549,11 @@ class FgAdjustmentVideoController {
   };
 
   private getMaxHeight = (
-    x1: number,
-    y1: number,
+    left: number,
+    top: number,
     theta: number,
+    rotationPointX: number,
+    rotationPointY: number,
     width: number,
     startHeight: number
   ) => {
@@ -584,13 +564,13 @@ class FgAdjustmentVideoController {
       i += 4;
 
       isOutside = this.isBoxOutside(
-        x1,
-        y1,
+        left,
+        top,
         theta,
         width,
         startHeight + i,
-        x1,
-        y1
+        rotationPointX,
+        rotationPointY
       );
     }
 
@@ -602,17 +582,66 @@ class FgAdjustmentVideoController {
       i += 1;
 
       isOutside = this.isBoxOutside(
-        x1,
-        y1,
+        left,
+        top,
         theta,
         width,
         startHeight + i,
-        x1,
-        y1
+        rotationPointX,
+        rotationPointY
       );
     }
 
     return startHeight + i - 1;
+  };
+
+  private getMaxSquareAspectDim = (
+    left: number,
+    top: number,
+    theta: number,
+    rotationPointX: number,
+    rotationPointY: number,
+    width: number,
+    height: number
+  ) => {
+    let isOutside = false;
+    let i = -8;
+
+    const startDim = Math.min(width, height);
+
+    while (!isOutside) {
+      i += 8;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        startDim + i,
+        startDim + i,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    isOutside = false;
+
+    i -= 9;
+
+    while (!isOutside) {
+      i += 1;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        startDim + i,
+        startDim + i,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    return startDim + i - 1;
   };
 
   private calculateRotationAngle = (
@@ -633,7 +662,89 @@ class FgAdjustmentVideoController {
     return targetAngle;
   };
 
-  adjustmentBtnMouseDownFunction = () => {
+  adjustmentBtnMouseDownFunction = (
+    kind?: AdjustmentTypes,
+    details?: AdjustmentBtnMouseDownDetails
+  ) => {
+    if (kind === "scale") {
+      if (
+        details &&
+        details.aspect &&
+        details.referencePoint &&
+        details.rotationPoint &&
+        details.aspect === "square"
+      ) {
+        if (!this.bundleRef.current) {
+          return;
+        }
+
+        let theta =
+          2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
+        if (theta > 2 * Math.PI - 0.0000001) {
+          theta = 0;
+        }
+
+        this.maxSquareDims =
+          (this.getMaxSquareAspectDim(
+            details.referencePoint.x,
+            details.referencePoint.y,
+            theta,
+            details.rotationPoint.x,
+            details.rotationPoint.y,
+            0,
+            0
+          ) /
+            Math.max(
+              this.bundleRef.current.clientHeight,
+              this.bundleRef.current.clientWidth
+            )) *
+          100;
+      }
+    } else if (kind === "position") {
+      if (details && details.rotationPointPlacement) {
+        if (!this.bundleRef.current) {
+          return;
+        }
+
+        const angle =
+          2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
+
+        const pixelScale = {
+          x:
+            (this.positioning.current.scale.x / 100) *
+            this.bundleRef.current.clientWidth,
+          y:
+            (this.positioning.current.scale.y / 100) *
+            this.bundleRef.current.clientHeight,
+        };
+
+        const { max: leftMax, min: leftMin } = this.getLeftBounds(
+          angle,
+          pixelScale.x,
+          pixelScale.y,
+          boundaryCheckingRotationPointMap[details.rotationPointPlacement].x *
+            pixelScale.x,
+          boundaryCheckingRotationPointMap[details.rotationPointPlacement].y *
+            pixelScale.y
+        );
+
+        this.maxLeft = (leftMax / this.bundleRef.current.clientWidth) * 100;
+        this.minLeft = (leftMin / this.bundleRef.current.clientWidth) * 100;
+
+        const { max: topMax, min: topMin } = this.getTopBounds(
+          angle,
+          pixelScale.x,
+          pixelScale.y,
+          boundaryCheckingRotationPointMap[details.rotationPointPlacement].x *
+            pixelScale.x,
+          boundaryCheckingRotationPointMap[details.rotationPointPlacement].y *
+            pixelScale.y
+        );
+
+        this.maxTop = (topMax / this.bundleRef.current.clientHeight) * 100;
+        this.minTop = (topMin / this.bundleRef.current.clientHeight) * 100;
+      }
+    }
     this.setAdjustingDimensions(true);
   };
 

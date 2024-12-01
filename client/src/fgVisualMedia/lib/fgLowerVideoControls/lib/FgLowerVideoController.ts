@@ -8,7 +8,7 @@ import {
 import CameraMedia from "src/lib/CameraMedia";
 import ScreenMedia from "src/lib/ScreenMedia";
 import AudioMedia from "src/lib/AudioMedia";
-import FgAdjustmentVideoController from "../../FgAdjustmentVideoControls";
+import FgAdjustmentVideoController from "../../../../fgAdjustmentComponents/lib/FgAdjustmentVideoControls";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
