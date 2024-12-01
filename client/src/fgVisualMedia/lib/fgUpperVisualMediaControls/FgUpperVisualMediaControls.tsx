@@ -1,18 +1,18 @@
 import React, { Suspense } from "react";
-import FgLowerVideoController from "../fgLowerVideoControls/lib/FgLowerVideoController";
+import FgLowerVisualMediaController from "../fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 
 const CloseButton = React.lazy(() => import("./lib/closeButton/CloseButton"));
 
-export default function FgUpperVideoControls({
+export default function FgUpperVisualMediaControls({
   name,
   username,
   isClose,
-  fgLowerVideoController,
+  fgLowerVisualMediaController,
 }: {
   name: string | undefined;
   username: string;
   isClose: boolean;
-  fgLowerVideoController: FgLowerVideoController;
+  fgLowerVisualMediaController: FgLowerVisualMediaController;
 }) {
   return (
     <div className='video-navigation-container absolute top-0 w-full h-10 flex items-center justify-center z-20 space-x-2'>
@@ -21,7 +21,9 @@ export default function FgUpperVideoControls({
       </div>
       {isClose && (
         <Suspense fallback={<div>Loading...</div>}>
-          <CloseButton fgLowerVideoController={fgLowerVideoController} />
+          <CloseButton
+            fgLowerVisualMediaController={fgLowerVisualMediaController}
+          />
         </Suspense>
       )}
     </div>

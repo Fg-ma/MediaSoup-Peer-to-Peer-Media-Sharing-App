@@ -1,24 +1,24 @@
 import React from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgLowerVideoController from "../FgLowerVideoController";
+import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
 import effectIcon from "../../../../../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../../../../../public/svgs/effectOffIcon.svg";
 
 export default function VisualEffectsButton({
-  fgLowerVideoController,
+  fgLowerVisualMediaController,
   visualEffectsActive,
   settingsActive,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
   settingsActive: boolean;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVideoController.handleVisualEffects();
+        fgLowerVisualMediaController.handleVisualEffects();
       }}
       contentFunction={() => {
         const iconSrc = visualEffectsActive ? effectOffIcon : effectIcon;

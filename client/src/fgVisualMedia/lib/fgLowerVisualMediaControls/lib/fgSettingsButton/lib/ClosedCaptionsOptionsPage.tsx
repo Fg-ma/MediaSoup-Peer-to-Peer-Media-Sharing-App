@@ -10,7 +10,7 @@ import {
   FontFamilies,
   FontOpacities,
   FontSizes,
-} from "../../../FgLowerVideoControls";
+} from "../../../FgLowerVisualMediaControls";
 import { Settings } from "../../../../../FgVideo";
 
 import navigateBackIcon from "../../../../../../../public/svgs/navigateBack.svg";

@@ -30,7 +30,7 @@ export type AdjustmentBtnMouseDownDetails = {
   rotationPointPlacement?: RotationPoints;
 };
 
-class FgAdjustmentVideoController {
+class FgContentAdjustmentController {
   private maxTop = 0;
   private minTop = 0;
   private maxLeft = 0;
@@ -753,4 +753,4 @@ class FgAdjustmentVideoController {
   };
 }
 
-export default FgAdjustmentVideoController;
+export default FgContentAdjustmentController;

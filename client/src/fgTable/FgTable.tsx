@@ -92,7 +92,7 @@ export default function FgTable({
             : "fg-horizontal-scrollbar"
         }`}
       >
-        <div
+        <div // jerky scroll bar and clickable track for scrolling
           ref={scrollbarTrackRef}
           className={`fg-scrollbar-track ${
             aspectDir.current === "width"

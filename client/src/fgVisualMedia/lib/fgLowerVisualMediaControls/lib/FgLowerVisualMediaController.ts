@@ -5,10 +5,10 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../context/streamsContext/typeConstant";
-import CameraMedia from "src/lib/CameraMedia";
-import ScreenMedia from "src/lib/ScreenMedia";
-import AudioMedia from "src/lib/AudioMedia";
-import FgAdjustmentVideoController from "../../../../fgAdjustmentComponents/lib/FgAdjustmentVideoControls";
+import CameraMedia from "../../../../lib/CameraMedia";
+import ScreenMedia from "../../../../lib/ScreenMedia";
+import AudioMedia from "../../../../lib/AudioMedia";
+import FgContentAdjustmentController from "../../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -57,7 +57,7 @@ const characterEdgeStyleMap = {
     "-1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black, 1px 1px 0px black",
 };
 
-class FgLowerVideoController {
+class FgLowerVisualMediaController {
   private initTime: number;
 
   constructor(
@@ -74,14 +74,12 @@ class FgLowerVideoController {
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private inVideo: boolean,
-    private setInVideo: React.Dispatch<React.SetStateAction<boolean>>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
     private paused: React.MutableRefObject<boolean>,
     private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private currentTimeRef: React.RefObject<HTMLDivElement>,
-    private leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setVisualEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
@@ -114,7 +112,18 @@ class FgLowerVideoController {
       audio: AudioMedia | undefined;
     }>,
     private initTimeOffset: React.MutableRefObject<number>,
-    private fgAdjustmentVideoController: FgAdjustmentVideoController
+    private fgContentAdjustmentController: FgContentAdjustmentController,
+    private positioning: React.MutableRefObject<{
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }>
   ) {
     this.initTime = Date.now();
   }
@@ -197,7 +206,7 @@ class FgLowerVideoController {
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
-      !this.inVideo ||
+      !this.videoContainerRef.current?.classList.contains("in-video") ||
       this.videoContainerRef.current?.classList.contains("in-piano") ||
       this.controlPressed.current ||
       this.shiftPressed.current
@@ -270,14 +279,24 @@ class FgLowerVideoController {
         this.volumeControl(-0.05);
         break;
       case "s":
+        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+          "scale"
+        );
         document.addEventListener("mousemove", this.scaleFuntion);
         document.addEventListener("mousedown", this.scaleFunctionEnd);
         break;
       case "g":
+        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+          "position",
+          { rotationPointPlacement: "topLeft" }
+        );
         document.addEventListener("mousemove", this.moveFunction);
         document.addEventListener("mousedown", this.moveFunctionEnd);
         break;
       case "r":
+        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+          "rotation"
+        );
         document.addEventListener("mousemove", this.rotateFunction);
         document.addEventListener("mousedown", this.rotateFunctionEnd);
         break;
@@ -287,19 +306,19 @@ class FgLowerVideoController {
   };
 
   scaleFunctionEnd = () => {
-    this.fgAdjustmentVideoController.adjustmentBtnMouseUpFunction();
+    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
     document.removeEventListener("mousemove", this.scaleFuntion);
     document.removeEventListener("mousedown", this.scaleFunctionEnd);
   };
 
   rotateFunctionEnd = () => {
-    this.fgAdjustmentVideoController.adjustmentBtnMouseUpFunction();
+    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
     document.removeEventListener("mousemove", this.rotateFunction);
     document.removeEventListener("mousedown", this.rotateFunctionEnd);
   };
 
   moveFunctionEnd = () => {
-    this.fgAdjustmentVideoController.adjustmentBtnMouseUpFunction();
+    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
     document.removeEventListener("mousemove", this.moveFunction);
     document.removeEventListener("mousedown", this.moveFunctionEnd);
   };
@@ -309,12 +328,45 @@ class FgLowerVideoController {
       return;
     }
 
+    const angle =
+      2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
+
+    const pixelScale = {
+      x:
+        (this.positioning.current.scale.x / 100) *
+        this.bundleRef.current.clientWidth,
+      y:
+        (this.positioning.current.scale.y / 100) *
+        this.bundleRef.current.clientHeight,
+    };
+
     const rect = this.bundleRef.current.getBoundingClientRect();
-    this.fgAdjustmentVideoController.movementDragFunction({
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    });
-    this.fgAdjustmentVideoController.adjustmentBtnMouseDownFunction();
+
+    this.fgContentAdjustmentController.movementDragFunction(
+      {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      },
+      {
+        x:
+          -15 * Math.cos(angle) -
+          pixelScale.x * Math.cos(angle) -
+          (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
+        y:
+          15 * Math.sin(angle) +
+          pixelScale.x * Math.sin(angle) -
+          (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
+      },
+      {
+        x:
+          (this.positioning.current.position.left / 100) *
+          this.bundleRef.current.clientWidth,
+        y:
+          (this.positioning.current.position.top / 100) *
+          this.bundleRef.current.clientHeight,
+      }
+    );
+    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
   };
 
   scaleFuntion = (event: MouseEvent) => {
@@ -323,16 +375,46 @@ class FgLowerVideoController {
     }
 
     const rect = this.bundleRef.current.getBoundingClientRect();
-    this.fgAdjustmentVideoController.scaleDragFunction({
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    });
-    this.fgAdjustmentVideoController.adjustmentBtnMouseDownFunction();
+
+    const referencePoint = {
+      x:
+        (this.positioning.current.position.left / 100) *
+        this.bundleRef.current.clientWidth,
+      y:
+        (this.positioning.current.position.top / 100) *
+        this.bundleRef.current.clientHeight,
+    };
+
+    this.fgContentAdjustmentController.scaleDragFunction(
+      "any",
+      {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      },
+      referencePoint,
+      referencePoint
+    );
+    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
   };
 
   rotateFunction = (event: MouseEvent) => {
-    this.fgAdjustmentVideoController.rotateDragFunction(event);
-    this.fgAdjustmentVideoController.adjustmentBtnMouseDownFunction();
+    if (!this.bundleRef.current) {
+      return;
+    }
+
+    const box = this.bundleRef.current.getBoundingClientRect();
+
+    this.fgContentAdjustmentController.rotateDragFunction(event, {
+      x:
+        (this.positioning.current.position.left / 100) *
+          this.bundleRef.current.clientWidth +
+        box.left,
+      y:
+        (this.positioning.current.position.top / 100) *
+          this.bundleRef.current.clientHeight +
+        box.top,
+    });
+    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
   };
 
   volumeControl = (volumeChangeAmount: number) => {
@@ -385,22 +467,6 @@ class FgLowerVideoController {
         console.error("Failed to request picture in picture:", error);
       });
     }
-  };
-
-  handleMouseEnter = () => {
-    this.setInVideo(true);
-    if (this.leaveVideoTimer.current) {
-      clearTimeout(this.leaveVideoTimer.current);
-      this.leaveVideoTimer.current = undefined;
-    }
-  };
-
-  handleMouseLeave = () => {
-    this.leaveVideoTimer.current = setTimeout(() => {
-      this.setInVideo(false);
-      clearTimeout(this.leaveVideoTimer.current);
-      this.leaveVideoTimer.current = undefined;
-    }, this.fgVideoOptions.controlsVanishTime);
   };
 
   handlePausePlay = () => {
@@ -514,4 +580,4 @@ class FgLowerVideoController {
   };
 }
 
-export default FgLowerVideoController;
+export default FgLowerVisualMediaController;

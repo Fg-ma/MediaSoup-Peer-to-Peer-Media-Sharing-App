@@ -7,8 +7,8 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
-import FgUpperVideoControls from "./lib/fgUpperVideoControls/FgUpperVideoControls";
-import FgLowerVideoControls, {
+import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
+import FgLowerVisualMediaControls, {
   BackgroundColors,
   BackgroundOpacities,
   CharacterEdgeStyles,
@@ -16,19 +16,19 @@ import FgLowerVideoControls, {
   FontFamilies,
   FontOpacities,
   FontSizes,
-} from "./lib/fgLowerVideoControls/FgLowerVideoControls";
+} from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import {
   closedCaptionsSelections,
   expandedClosedCaptionsBrowserSelections,
   expandedClosedCaptionsVoskSelections,
-} from "./lib/fgLowerVideoControls/lib/fgSettingsButton/lib/ClosedCaptionsPage";
+} from "./lib/fgLowerVisualMediaControls/lib/fgSettingsButton/lib/ClosedCaptionsPage";
 import FgVideoController from "./lib/FgVideoController";
 import { HideBackgroundEffectTypes } from "src/context/currentEffectsStylesContext/typeConstant";
 import PanButton from "../fgAdjustmentComponents/PanButton";
 import RotateButton from "../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
-import FgAdjustmentVideoController from "../fgAdjustmentComponents/lib/FgAdjustmentVideoControls";
-import FgLowerVideoController from "./lib/fgLowerVideoControls/lib/FgLowerVideoController";
+import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
+import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 
 export interface FgVideoOptions {
   isUser?: boolean;
@@ -239,7 +239,7 @@ export default function FgBabylonCanvas({
     hideBackgroundColor?: string
   ) => {
     if (fgVideoOptions.isUser) {
-      fgLowerVideoController.handleVisualEffect(effect, blockStateChange);
+      fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
 
       if (fgVideoOptions.acceptsVisualEffects) {
         const msg = {
@@ -281,14 +281,14 @@ export default function FgBabylonCanvas({
     }
   };
 
-  const fgAdjustmentVideoController = new FgAdjustmentVideoController(
+  const fgContentAdjustmentController = new FgContentAdjustmentController(
     bundleRef,
     positioning,
     setAdjustingDimensions,
     setRerender
   );
 
-  const fgLowerVideoController = new FgLowerVideoController(
+  const fgLowerVisualMediaController = new FgLowerVisualMediaController(
     socket,
     videoId,
     table_id,
@@ -302,14 +302,12 @@ export default function FgBabylonCanvas({
     canvasContainerRef,
     setPausedState,
     inVideo,
-    setInVideo,
     shiftPressed,
     controlPressed,
     paused,
     setCaptionsActive,
     settings,
     currentTimeRef,
-    leaveVideoTimer,
     setVisualEffectsActive,
     setAudioEffectsActive,
     handleMute,
@@ -319,7 +317,8 @@ export default function FgBabylonCanvas({
     userStreamEffects,
     userMedia,
     initTimeOffset,
-    fgAdjustmentVideoController
+    fgContentAdjustmentController,
+    positioning
   );
 
   const fgVideoController = new FgVideoController(
@@ -327,7 +326,7 @@ export default function FgBabylonCanvas({
     instance,
     type,
     videoId,
-    fgLowerVideoController,
+    fgLowerVisualMediaController,
     undefined,
     setPausedState,
     paused,
@@ -339,11 +338,13 @@ export default function FgBabylonCanvas({
     canvasContainerRef,
     audioRef,
     fgVideoOptions,
-    handleVisualEffectChange
+    handleVisualEffectChange,
+    setInVideo,
+    leaveVideoTimer
   );
 
   useEffect(() => {
-    fgLowerVideoController.updateCaptionsStyles();
+    fgLowerVisualMediaController.updateCaptionsStyles();
   }, [settings]);
 
   useEffect(() => {
@@ -363,9 +364,9 @@ export default function FgBabylonCanvas({
     socket.current.on("message", fgVideoController.handleMessage);
 
     // Keep video time
-    fgLowerVideoController.timeUpdate();
+    fgLowerVisualMediaController.timeUpdate();
     timeUpdateInterval.current = setInterval(
-      fgLowerVideoController.timeUpdate,
+      fgLowerVisualMediaController.timeUpdate,
       1000
     );
 
@@ -397,13 +398,19 @@ export default function FgBabylonCanvas({
     if (fgVideoOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
-        fgLowerVideoController.handleFullScreenChange
+        fgLowerVisualMediaController.handleFullScreenChange
       );
     }
 
-    document.addEventListener("keydown", fgLowerVideoController.handleKeyDown);
+    document.addEventListener(
+      "keydown",
+      fgLowerVisualMediaController.handleKeyDown
+    );
 
-    document.addEventListener("keyup", fgLowerVideoController.handleKeyUp);
+    document.addEventListener(
+      "keyup",
+      fgLowerVisualMediaController.handleKeyUp
+    );
 
     document.addEventListener(
       "visibilitychange",
@@ -412,11 +419,11 @@ export default function FgBabylonCanvas({
 
     if (fgVideoOptions.isPictureInPicture) {
       videoRef.current?.addEventListener("enterpictureinpicture", () =>
-        fgLowerVideoController.handlePictureInPicture("enter")
+        fgLowerVisualMediaController.handlePictureInPicture("enter")
       );
 
       videoRef.current?.addEventListener("leavepictureinpicture", () =>
-        fgLowerVideoController.handlePictureInPicture("leave")
+        fgLowerVisualMediaController.handlePictureInPicture("leave")
       );
     }
 
@@ -444,24 +451,27 @@ export default function FgBabylonCanvas({
       if (fgVideoOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
-          fgLowerVideoController.handleFullScreenChange
+          fgLowerVisualMediaController.handleFullScreenChange
         );
       }
       document.removeEventListener(
         "keydown",
-        fgLowerVideoController.handleKeyDown
+        fgLowerVisualMediaController.handleKeyDown
       );
-      document.removeEventListener("keyup", fgLowerVideoController.handleKeyUp);
+      document.removeEventListener(
+        "keyup",
+        fgLowerVisualMediaController.handleKeyUp
+      );
       document.removeEventListener(
         "visibilitychange",
         fgVideoController.handleVisibilityChange
       );
       if (fgVideoOptions.isPictureInPicture) {
         videoRef.current?.removeEventListener("enterpictureinpicture", () =>
-          fgLowerVideoController.handlePictureInPicture("enter")
+          fgLowerVisualMediaController.handlePictureInPicture("enter")
         );
         videoRef.current?.removeEventListener("leavepictureinpicture", () =>
-          fgLowerVideoController.handlePictureInPicture("leave")
+          fgLowerVisualMediaController.handlePictureInPicture("leave")
         );
       }
     };
@@ -516,8 +526,8 @@ export default function FgBabylonCanvas({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
-      onMouseEnter={() => fgLowerVideoController.handleMouseEnter()}
-      onMouseLeave={() => fgLowerVideoController.handleMouseLeave()}
+      onMouseEnter={() => fgVideoController.handleMouseEnter()}
+      onMouseLeave={() => fgVideoController.handleMouseLeave()}
     >
       <RotateButton
         className={
@@ -530,7 +540,7 @@ export default function FgBabylonCanvas({
 
           const box = bundleRef.current.getBoundingClientRect();
 
-          fgAdjustmentVideoController.rotateDragFunction(event, {
+          fgContentAdjustmentController.rotateDragFunction(event, {
             x:
               (positioning.current.position.left / 100) *
                 bundleRef.current.clientWidth +
@@ -543,10 +553,10 @@ export default function FgBabylonCanvas({
         }}
         bundleRef={bundleRef}
         mouseDownFunction={
-          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction
+          fgContentAdjustmentController.adjustmentBtnMouseDownFunction
         }
         mouseUpFunction={
-          fgAdjustmentVideoController.adjustmentBtnMouseUpFunction
+          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
         }
       />
       <PanButton
@@ -570,7 +580,7 @@ export default function FgBabylonCanvas({
               bundleRef.current.clientHeight,
           };
 
-          fgAdjustmentVideoController.movementDragFunction(
+          fgContentAdjustmentController.movementDragFunction(
             displacement,
             {
               x:
@@ -594,13 +604,13 @@ export default function FgBabylonCanvas({
         }}
         bundleRef={bundleRef}
         mouseDownFunction={() =>
-          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction(
+          fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
             "position",
             { rotationPointPlacement: "topLeft" }
           )
         }
         mouseUpFunction={
-          fgAdjustmentVideoController.adjustmentBtnMouseUpFunction
+          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
         }
       />
       <ScaleButton
@@ -621,7 +631,7 @@ export default function FgBabylonCanvas({
               bundleRef.current.clientHeight,
           };
 
-          fgAdjustmentVideoController.scaleDragFunction(
+          fgContentAdjustmentController.scaleDragFunction(
             "any",
             displacement,
             referencePoint,
@@ -629,28 +639,11 @@ export default function FgBabylonCanvas({
           );
         }}
         bundleRef={bundleRef}
-        mouseDownFunction={() => {
-          if (!bundleRef.current) {
-            return;
-          }
-
-          const referencePoint = {
-            x:
-              (positioning.current.position.left / 100) *
-              bundleRef.current.clientWidth,
-            y:
-              (positioning.current.position.top / 100) *
-              bundleRef.current.clientHeight,
-          };
-
-          fgAdjustmentVideoController.adjustmentBtnMouseDownFunction("scale", {
-            aspect: "square",
-            referencePoint: referencePoint,
-            rotationPoint: referencePoint,
-          });
-        }}
+        mouseDownFunction={
+          fgContentAdjustmentController.adjustmentBtnMouseDownFunction
+        }
         mouseUpFunction={
-          fgAdjustmentVideoController.adjustmentBtnMouseUpFunction
+          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
         }
       />
       {adjustingDimensions && (
@@ -663,20 +656,20 @@ export default function FgBabylonCanvas({
         ref={subContainerRef}
         className='relative flex items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
       >
-        <FgUpperVideoControls
+        <FgUpperVisualMediaControls
           name={name}
           username={username}
           isClose={fgVideoOptions.isClose}
-          fgLowerVideoController={fgLowerVideoController}
+          fgLowerVisualMediaController={fgLowerVisualMediaController}
         />
-        <FgLowerVideoControls
+        <FgLowerVisualMediaControls
           socket={socket}
           table_id={table_id}
           username={username}
           instance={instance}
           type={type}
           videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
+          fgLowerVisualMediaController={fgLowerVisualMediaController}
           pausedState={pausedState}
           clientMute={clientMute}
           localMute={localMute}

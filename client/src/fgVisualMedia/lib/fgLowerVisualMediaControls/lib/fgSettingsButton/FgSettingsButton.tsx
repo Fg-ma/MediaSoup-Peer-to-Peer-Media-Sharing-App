@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import SettingsPanel from "./lib/SettingsPanel";
-import { ActivePages } from "../../FgLowerVideoControls";
+import { ActivePages } from "../../FgLowerVisualMediaControls";
 import { Settings } from "../../../../FgVideo";
 import { FgVideoOptions } from "../../../../FgBabylonCanvas";
 

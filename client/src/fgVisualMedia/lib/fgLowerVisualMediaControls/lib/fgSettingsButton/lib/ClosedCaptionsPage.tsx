@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import FgButton from "../../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../../fgElements/fgSVG/FgSVG";
-import { ActivePages } from "../../../FgLowerVideoControls";
+import { ActivePages } from "../../../FgLowerVisualMediaControls";
 import { Settings } from "../../../../../FgVideo";
 
 import navigateBackIcon from "../../../../../../../public/svgs/navigateBack.svg";

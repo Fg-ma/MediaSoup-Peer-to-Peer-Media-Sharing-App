@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgLowerVideoController from "../FgLowerVideoController";
+import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
 export default function PictureInPictureButton({
-  fgLowerVideoController,
+  fgLowerVisualMediaController,
   visualEffectsActive,
   settingsActive,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
   settingsActive: boolean;
 }) {
@@ -16,7 +16,7 @@ export default function PictureInPictureButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVideoController.handleMiniPlayer();
+        fgLowerVisualMediaController.handleMiniPlayer();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {

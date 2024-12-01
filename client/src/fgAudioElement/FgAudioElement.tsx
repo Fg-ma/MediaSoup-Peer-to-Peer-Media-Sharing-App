@@ -5,6 +5,7 @@ import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgAudioElementController from "./lib/FgAudioElementController";
+import { FgAudioElementContainerOptionsType } from "./FgAudioElementContainer";
 
 const shadowColors = {
   black: "rgba(0, 0, 0, 0.8)",
@@ -20,34 +21,6 @@ const shadowColors = {
   FgSecondary: "rgba(17, 57, 96, 0.8)",
 };
 
-const defaultFgAudioElementOptions: FgAudioElementOptionsType = {
-  springDuration: 250,
-  noiseThreshold: 0.2,
-  numFixedPoints: 10,
-  bellCurveAmplitude: 1,
-  bellCurveMean: 0.5,
-  bellCurveStdDev: 0.4,
-  shadowColor: "black",
-  volumeColor: "FgPrimary",
-  primaryMuteColor: "FgPrimary",
-  secondaryMuteColor: "black",
-  muteStyleOption: "smile",
-};
-
-export type FgAudioElementOptionsType = {
-  springDuration: number;
-  noiseThreshold: number;
-  numFixedPoints: number;
-  bellCurveAmplitude: number;
-  bellCurveMean: number;
-  bellCurveStdDev: number;
-  shadowColor: string;
-  volumeColor: string;
-  primaryMuteColor: string;
-  secondaryMuteColor: string;
-  muteStyleOption: "morse" | "smile";
-};
-
 export default function FgAudioElement({
   svgRef,
   audioStream,
@@ -59,7 +32,7 @@ export default function FgAudioElement({
   localMute,
   isUser = false,
   doubleClickFunction,
-  options,
+  fgAudioElementContainerOptions,
 }: {
   svgRef: React.RefObject<SVGSVGElement>;
   audioStream?: MediaStream;
@@ -71,30 +44,13 @@ export default function FgAudioElement({
   localMute: React.MutableRefObject<boolean>;
   isUser?: boolean;
   doubleClickFunction?: (() => void) | undefined;
-  options?: {
-    springDuration?: number;
-    noiseThreshold?: number;
-    numFixedPoints?: number;
-    bellCurveAmplitude?: number;
-    bellCurveMean?: number;
-    bellCurveStdDev?: number;
-    shadowColor?: string;
-    volumeColor?: string;
-    primaryMuteColor?: string;
-    secondaryMuteColor?: string;
-    muteStyleOption?: "morse" | "smile";
-  };
+  fgAudioElementContainerOptions: FgAudioElementContainerOptionsType;
 }) {
-  const fgAudioElementOptions = {
-    ...defaultFgAudioElementOptions,
-    ...options,
-  };
-
   const [movingY, setMovingY] = useState<number[]>(
-    Array(fgAudioElementOptions.numFixedPoints - 1).fill(50)
+    Array(fgAudioElementContainerOptions.numFixedPoints - 1).fill(50)
   );
   const [fixedY, setFixedY] = useState<number[]>(
-    Array(fgAudioElementOptions.numFixedPoints - 1).fill(50)
+    Array(fgAudioElementContainerOptions.numFixedPoints - 1).fill(50)
   );
   const [leftHandlePosition, setLeftHandlePosition] = useState({ x: 4, y: 50 });
   const [rightHandlePosition, setRightHandlePosition] = useState({
@@ -123,12 +79,12 @@ export default function FgAudioElement({
   const springs = useSpring<{ [key: string]: SpringValue<number> }>({
     ...Object.fromEntries(movingY.map((y, index) => [`y${index + 1}`, y])),
     ...Object.fromEntries(fixedY.map((y, index) => [`fixed_y${index + 1}`, y])),
-    config: { duration: fgAudioElementOptions.springDuration },
+    config: { duration: fgAudioElementContainerOptions.springDuration },
   });
 
   const fgAudioElementController = new FgAudioElementController(
     isUser,
-    fgAudioElementOptions,
+    fgAudioElementContainerOptions,
     localMute,
     clientMute,
     fixedPointsX,
@@ -173,7 +129,7 @@ export default function FgAudioElement({
     }
 
     audioAnalyzer.current = new AudioAnalyser(
-      fgAudioElementOptions.noiseThreshold
+      fgAudioElementContainerOptions.noiseThreshold
     );
 
     audioAnalyzer.current.initAudio(
@@ -196,7 +152,7 @@ export default function FgAudioElement({
     () =>
       pathGenerator.current?.generatePathData(
         ySpringsArray,
-        fgAudioElementOptions.muteStyleOption,
+        fgAudioElementContainerOptions.muteStyleOption,
         fixedPointsX,
         localMute,
         clientMute,
@@ -227,7 +183,7 @@ export default function FgAudioElement({
               <feFlood
                 floodColor={
                   shadowColors[
-                    fgAudioElementOptions.shadowColor as keyof typeof shadowColors
+                    fgAudioElementContainerOptions.shadowColor as keyof typeof shadowColors
                   ]
                 }
                 result='colorBlur'
@@ -264,7 +220,7 @@ export default function FgAudioElement({
               />
             </mask>
 
-            {fgAudioElementOptions.muteStyleOption === "morse" && (
+            {fgAudioElementContainerOptions.muteStyleOption === "morse" && (
               <linearGradient
                 id={`${username}_mute_morse_gradient`}
                 x1='0%'
@@ -278,7 +234,7 @@ export default function FgAudioElement({
                   offset='6%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -286,7 +242,7 @@ export default function FgAudioElement({
                   offset='15.34%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -294,7 +250,7 @@ export default function FgAudioElement({
                   offset='16.216%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -302,7 +258,7 @@ export default function FgAudioElement({
                   offset='18.59%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -310,7 +266,7 @@ export default function FgAudioElement({
                   offset='19.47%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -318,7 +274,7 @@ export default function FgAudioElement({
                   offset='28.369%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -327,7 +283,7 @@ export default function FgAudioElement({
                   offset='29.249%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -335,7 +291,7 @@ export default function FgAudioElement({
                   offset='38.146%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -345,7 +301,7 @@ export default function FgAudioElement({
                   offset='39.026%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -353,7 +309,7 @@ export default function FgAudioElement({
                   offset='41.40%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -361,7 +317,7 @@ export default function FgAudioElement({
                   offset='42.28%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -369,7 +325,7 @@ export default function FgAudioElement({
                   offset='44.658%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -377,7 +333,7 @@ export default function FgAudioElement({
                   offset='45.538%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -385,7 +341,7 @@ export default function FgAudioElement({
                   offset='47.91%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -393,7 +349,7 @@ export default function FgAudioElement({
                   offset='48.79%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -401,7 +357,7 @@ export default function FgAudioElement({
                   offset='51.17%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -409,7 +365,7 @@ export default function FgAudioElement({
                   offset='52.05%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -417,7 +373,7 @@ export default function FgAudioElement({
                   offset='60.947%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -426,7 +382,7 @@ export default function FgAudioElement({
                   offset='61.827%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -434,7 +390,7 @@ export default function FgAudioElement({
                   offset='70.72%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -444,7 +400,7 @@ export default function FgAudioElement({
                   offset='71.60%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -452,7 +408,7 @@ export default function FgAudioElement({
                   offset='80.50%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -461,7 +417,7 @@ export default function FgAudioElement({
                   offset='81.38%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -469,7 +425,7 @@ export default function FgAudioElement({
                   offset='90.27%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.secondaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.secondaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -479,7 +435,7 @@ export default function FgAudioElement({
                   offset='91.16%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -487,7 +443,7 @@ export default function FgAudioElement({
                   offset='94%'
                   stopColor={
                     colors[
-                      fgAudioElementOptions.primaryMuteColor as keyof typeof colors
+                      fgAudioElementContainerOptions.primaryMuteColor as keyof typeof colors
                     ]
                   }
                 />
@@ -505,7 +461,7 @@ export default function FgAudioElement({
                 offset='45%'
                 stopColor={
                   colors[
-                    fgAudioElementOptions.volumeColor as keyof typeof colors
+                    fgAudioElementContainerOptions.volumeColor as keyof typeof colors
                   ]
                 }
               />
@@ -524,7 +480,7 @@ export default function FgAudioElement({
                 offset='55%'
                 stopColor={
                   colors[
-                    fgAudioElementOptions.volumeColor as keyof typeof colors
+                    fgAudioElementContainerOptions.volumeColor as keyof typeof colors
                   ]
                 }
               />
@@ -613,7 +569,7 @@ export default function FgAudioElement({
               height={viewBoxSize.h}
               fill={
                 (localMute.current || clientMute.current) &&
-                fgAudioElementOptions.muteStyleOption === "morse"
+                fgAudioElementContainerOptions.muteStyleOption === "morse"
                   ? `url(#${username}_mute_morse_gradient)`
                   : `url(#${username}_background_matrix)`
               }

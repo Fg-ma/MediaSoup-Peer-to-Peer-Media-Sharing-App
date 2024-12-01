@@ -1,18 +1,18 @@
 import React from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgLowerVideoController from "../FgLowerVideoController";
+import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
 import playIcon from "../../../../../../public/svgs/playIcon.svg";
 import pauseIcon from "../../../../../../public/svgs/pauseIcon.svg";
 
 export default function PlayPauseButton({
-  fgLowerVideoController,
+  fgLowerVisualMediaController,
   visualEffectsActive,
   settingsActive,
   pausedState,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
   settingsActive: boolean;
   pausedState: boolean;
@@ -20,7 +20,7 @@ export default function PlayPauseButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVideoController.handlePausePlay();
+        fgLowerVisualMediaController.handlePausePlay();
       }}
       contentFunction={() => {
         const iconSrc = pausedState ? playIcon : pauseIcon;

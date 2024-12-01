@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
+
 import fullScreenIcon from "../../../../../../public/svgs/fullScreenIcon.svg";
 import fullScreenOffIcon from "../../../../../../public/svgs/fullScreenOffIcon.svg";
 
-import FgLowerVideoController from "../FgLowerVideoController";
-
 export default function FullScreenButton({
-  fgLowerVideoController,
+  fgLowerVisualMediaController,
   visualEffectsActive,
   settingsActive,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
   settingsActive: boolean;
 }) {
@@ -20,7 +20,7 @@ export default function FullScreenButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVideoController.handleFullScreen();
+        fgLowerVisualMediaController.handleFullScreen();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {

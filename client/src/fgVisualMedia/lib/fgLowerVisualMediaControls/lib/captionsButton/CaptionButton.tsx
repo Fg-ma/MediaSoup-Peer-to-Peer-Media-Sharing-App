@@ -5,7 +5,7 @@ import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import { Settings } from "../../../../FgVideo";
 import FgVideoCaptions from "./lib/FgVideoCaptions";
 import CaptionsController from "./lib/CaptionsController";
-import FgLowerVideoController from "../FgLowerVideoController";
+import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
 import captionsIcon from "../../../../../../public/svgs/captionsIcon.svg";
 
@@ -146,7 +146,7 @@ export interface VoskResult {
 }
 
 export default function CaptionButton({
-  fgLowerVideoController,
+  fgLowerVisualMediaController,
   visualEffectsActive,
   settingsActive,
   settings,
@@ -154,7 +154,7 @@ export default function CaptionButton({
   videoContainerRef,
   browserStandardSpeechRecognitionAvailable,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
   settingsActive: boolean;
   settings: Settings;
@@ -232,9 +232,9 @@ export default function CaptionButton({
 
           setActive((prev) => !prev);
 
-          fgLowerVideoController.handleClosedCaptions();
+          fgLowerVisualMediaController.handleClosedCaptions();
 
-          fgLowerVideoController.updateCaptionsStyles();
+          fgLowerVisualMediaController.updateCaptionsStyles();
         }}
         contentFunction={() => {
           return (

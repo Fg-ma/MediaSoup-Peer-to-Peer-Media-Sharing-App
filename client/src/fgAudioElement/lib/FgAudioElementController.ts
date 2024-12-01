@@ -1,10 +1,10 @@
-import { FgAudioElementOptionsType } from "../FgAudioElement";
+import { FgAudioElementContainerOptionsType } from "../FgAudioElementContainer";
 import PathGenerator from "./PathGenerator";
 
 class FgAudioElementController {
   constructor(
     private isUser: boolean,
-    private fgAudioElementOptions: FgAudioElementOptionsType,
+    private fgAudioElementContainerOptions: FgAudioElementContainerOptionsType,
     private localMute: React.MutableRefObject<boolean>,
     private clientMute: React.MutableRefObject<boolean>,
     private fixedPointsX: React.MutableRefObject<number[]>,
@@ -44,25 +44,26 @@ class FgAudioElementController {
     const startOffset = 16;
     const endOffset = 16;
     const usableWidth = totalWidth - startOffset - endOffset;
-    const step = usableWidth / (this.fgAudioElementOptions.numFixedPoints - 1);
+    const step =
+      usableWidth / (this.fgAudioElementContainerOptions.numFixedPoints - 1);
 
     this.fixedPointsX.current = Array.from(
-      { length: this.fgAudioElementOptions.numFixedPoints },
+      { length: this.fgAudioElementContainerOptions.numFixedPoints },
       (_, i) => startOffset + i * step
     );
 
     this.sineCurveY.current = this.pathGenerator.current.generateSineWave(
-      this.fgAudioElementOptions.numFixedPoints * 2 - 3,
+      this.fgAudioElementContainerOptions.numFixedPoints * 2 - 3,
       1,
       1,
       0
     );
 
     this.bellCurveY.current = this.pathGenerator.current.generateBellCurve(
-      this.fgAudioElementOptions.numFixedPoints - 1,
-      this.fgAudioElementOptions.bellCurveAmplitude,
-      this.fgAudioElementOptions.bellCurveMean,
-      this.fgAudioElementOptions.bellCurveStdDev
+      this.fgAudioElementContainerOptions.numFixedPoints - 1,
+      this.fgAudioElementContainerOptions.bellCurveAmplitude,
+      this.fgAudioElementContainerOptions.bellCurveMean,
+      this.fgAudioElementContainerOptions.bellCurveStdDev
     );
   };
 
@@ -184,15 +185,17 @@ class FgAudioElementController {
     let fixedYArray;
     if (
       (!this.localMute.current && !this.clientMute.current) ||
-      this.fgAudioElementOptions.muteStyleOption !== "smile"
+      this.fgAudioElementContainerOptions.muteStyleOption !== "smile"
     ) {
       movingYArray = this.bellCurveY.current.map(
         (value, index) => value * volumeLevel * 84 * (-1) ** index + 50
       );
-      fixedYArray = Array(this.fgAudioElementOptions.numFixedPoints - 1).fill(
-        50
-      );
-    } else if (this.fgAudioElementOptions.muteStyleOption === "smile") {
+      fixedYArray = Array(
+        this.fgAudioElementContainerOptions.numFixedPoints - 1
+      ).fill(50);
+    } else if (
+      this.fgAudioElementContainerOptions.muteStyleOption === "smile"
+    ) {
       movingYArray = this.sineCurveY.current
         .filter((_, index) => index % 2 === 0)
         .map((value) => value * 10 + 50);

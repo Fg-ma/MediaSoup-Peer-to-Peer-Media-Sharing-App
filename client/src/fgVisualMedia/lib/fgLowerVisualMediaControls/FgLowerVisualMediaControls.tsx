@@ -7,7 +7,7 @@ import {
   ScreenEffectTypes,
 } from "../../../context/streamsContext/typeConstant";
 import { defaultFgVideoOptions, FgVideoOptions, Settings } from "../../FgVideo";
-import FgLowerVideoController from "./lib/FgLowerVideoController";
+import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
 
 const PlayPauseButton = React.lazy(
   () => import("./lib/playPauseButton/PlayPauseButton")
@@ -101,14 +101,14 @@ export interface ActivePages {
   };
 }
 
-export default function FgLowerVideoControls({
+export default function FgLowerVisualMediaControls({
   socket,
   table_id,
   username,
   instance,
   type,
   videoId,
-  fgLowerVideoController,
+  fgLowerVisualMediaController,
   pausedState,
   clientMute,
   localMute,
@@ -135,7 +135,7 @@ export default function FgLowerVideoControls({
   instance: string;
   type: "camera" | "screen";
   videoId: string;
-  fgLowerVideoController: FgLowerVideoController;
+  fgLowerVisualMediaController: FgLowerVisualMediaController;
   pausedState: boolean;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
@@ -248,7 +248,7 @@ export default function FgLowerVideoControls({
             <Suspense fallback={<div>Loading...</div>}>
               <PlayPauseButton
                 pausedState={pausedState}
-                fgLowerVideoController={fgLowerVideoController}
+                fgLowerVisualMediaController={fgLowerVisualMediaController}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
               />
@@ -299,7 +299,7 @@ export default function FgLowerVideoControls({
             defaultFgVideoOptions.isFullScreen) && (
             <Suspense fallback={<div>Loading...</div>}>
               <FullScreenButton
-                fgLowerVideoController={fgLowerVideoController}
+                fgLowerVisualMediaController={fgLowerVisualMediaController}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
               />
@@ -309,7 +309,7 @@ export default function FgLowerVideoControls({
             defaultFgVideoOptions.isPictureInPicture) && (
             <Suspense fallback={<div>Loading...</div>}>
               <PictureInPictureButton
-                fgLowerVideoController={fgLowerVideoController}
+                fgLowerVisualMediaController={fgLowerVisualMediaController}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
               />
@@ -321,7 +321,7 @@ export default function FgLowerVideoControls({
             audioStream && (
               <Suspense fallback={<div>Loading...</div>}>
                 <CaptionButton
-                  fgLowerVideoController={fgLowerVideoController}
+                  fgLowerVisualMediaController={fgLowerVisualMediaController}
                   visualEffectsActive={visualEffectsActive}
                   settingsActive={settingsActive}
                   settings={settings}
@@ -355,7 +355,7 @@ export default function FgLowerVideoControls({
             fgVideoOptions.isEffects && (
               <Suspense fallback={<div>Loading...</div>}>
                 <VisualEffectsButton
-                  fgLowerVideoController={fgLowerVideoController}
+                  fgLowerVisualMediaController={fgLowerVisualMediaController}
                   visualEffectsActive={visualEffectsActive}
                   settingsActive={settingsActive}
                 />

@@ -2,17 +2,17 @@ import React from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import closeIcon from "../../../../../../public/svgs/closeIcon.svg";
-import FgLowerVideoController from "../../../fgLowerVideoControls/lib/FgLowerVideoController";
+import FgLowerVisualMediaController from "../../../fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 
 export default function CloseButton({
-  fgLowerVideoController,
+  fgLowerVisualMediaController,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  fgLowerVisualMediaController: FgLowerVisualMediaController;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVideoController.handleCloseVideo();
+        fgLowerVisualMediaController.handleCloseVideo();
       }}
       contentFunction={() => {
         return (

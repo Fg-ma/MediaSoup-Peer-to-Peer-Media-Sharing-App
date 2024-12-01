@@ -12,7 +12,7 @@ import { defaultFgVideoOptions, FgVideoOptions } from "../FgVideo";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
-import FgLowerVideoController from "./fgLowerVideoControls/lib/FgLowerVideoController";
+import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 
 type FgVideoMessageEvents =
   | {
@@ -57,7 +57,7 @@ class FgVideoController {
     private instance: string,
     private type: "camera" | "screen",
     private videoId: string,
-    private fgLowerVideoController: FgLowerVideoController,
+    private fgLowerVisualMediaController: FgLowerVisualMediaController,
     private videoStream: MediaStream | undefined,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
@@ -96,7 +96,9 @@ class FgVideoController {
     private handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
-    ) => Promise<void>
+    ) => Promise<void>,
+    private setInVideo: React.Dispatch<React.SetStateAction<boolean>>,
+    private leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | undefined>
   ) {}
 
   init = () => {
@@ -266,7 +268,7 @@ class FgVideoController {
             this.setPausedState((prev) => !prev);
           }
 
-          this.fgLowerVideoController.setInitTimeOffset(
+          this.fgLowerVisualMediaController.setInitTimeOffset(
             event.data.cameraTimeEllapsed
           );
         }
@@ -277,7 +279,7 @@ class FgVideoController {
             this.setPausedState((prev) => !prev);
           }
 
-          this.fgLowerVideoController.setInitTimeOffset(
+          this.fgLowerVisualMediaController.setInitTimeOffset(
             event.data.screenTimeEllapsed
           );
         }
@@ -308,14 +310,30 @@ class FgVideoController {
 
     if (document.hidden) {
       if (!this.videoContainerRef.current?.classList.contains("paused")) {
-        this.fgLowerVideoController.handlePausePlay();
+        this.fgLowerVisualMediaController.handlePausePlay();
       }
     } else {
       if (this.videoContainerRef.current?.classList.contains("paused")) {
-        this.fgLowerVideoController.handlePausePlay();
+        this.fgLowerVisualMediaController.handlePausePlay();
       }
     }
   }
+
+  handleMouseEnter = () => {
+    this.setInVideo(true);
+    if (this.leaveVideoTimer.current) {
+      clearTimeout(this.leaveVideoTimer.current);
+      this.leaveVideoTimer.current = undefined;
+    }
+  };
+
+  handleMouseLeave = () => {
+    this.leaveVideoTimer.current = setTimeout(() => {
+      this.setInVideo(false);
+      clearTimeout(this.leaveVideoTimer.current);
+      this.leaveVideoTimer.current = undefined;
+    }, this.fgVideoOptions.controlsVanishTime);
+  };
 }
 
 export default FgVideoController;

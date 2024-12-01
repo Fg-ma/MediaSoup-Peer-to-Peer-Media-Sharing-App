@@ -2,15 +2,47 @@ import React, { Suspense, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import FgAudioElement from "./FgAudioElement";
-import FgAdjustmentVideoController from "../fgAdjustmentComponents/lib/FgAdjustmentVideoControls";
+import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import PanButton from "../fgAdjustmentComponents/PanButton";
 import RotateButton from "../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
+import "./lib/audioElement.css";
 
 const FgPortal = React.lazy(() => import("../fgElements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
   () => import("../audioEffectsButton/lib/AudioEffectsSection")
 );
+
+export type FgAudioElementContainerOptionsType = {
+  controlsVanishTime: number;
+  springDuration: number;
+  noiseThreshold: number;
+  numFixedPoints: number;
+  bellCurveAmplitude: number;
+  bellCurveMean: number;
+  bellCurveStdDev: number;
+  shadowColor: string;
+  volumeColor: string;
+  primaryMuteColor: string;
+  secondaryMuteColor: string;
+  muteStyleOption: "morse" | "smile";
+};
+
+const defaultFgAudioElementContainerOptions: FgAudioElementContainerOptionsType =
+  {
+    controlsVanishTime: 1250,
+    springDuration: 250,
+    noiseThreshold: 0.2,
+    numFixedPoints: 10,
+    bellCurveAmplitude: 1,
+    bellCurveMean: 0.5,
+    bellCurveStdDev: 0.4,
+    shadowColor: "black",
+    volumeColor: "FgPrimary",
+    primaryMuteColor: "FgPrimary",
+    secondaryMuteColor: "black",
+    muteStyleOption: "smile",
+  };
 
 export default function FgAudioElementContainer({
   socket,
@@ -40,6 +72,7 @@ export default function FgAudioElementContainer({
   localMute: React.MutableRefObject<boolean>;
   isUser: boolean;
   options?: {
+    controlsVanishTime?: number;
     springDuration?: number;
     noiseThreshold?: number;
     numFixedPoints?: number;
@@ -53,13 +86,20 @@ export default function FgAudioElementContainer({
     muteStyleOption?: "morse" | "smile";
   };
 }) {
+  const fgAudioElementContainerOptions = {
+    ...defaultFgAudioElementContainerOptions,
+    ...options,
+  };
+
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
     useState(false);
   const audioElementSVGRef = useRef<SVGSVGElement>(null);
 
   const [_rerender, setRerender] = useState(false);
-  const [_adjustingDimensions, setAdjustingDimensions] = useState(false);
+  const [adjustingDimensions, setAdjustingDimensions] = useState(false);
+  const [inAudioContainer, setInAudioContainer] = useState(false);
+
   const positioning = useRef<{
     position: { left: number; top: number };
     scale: { x: number; y: number };
@@ -70,7 +110,11 @@ export default function FgAudioElementContainer({
     rotation: 0,
   });
 
-  const fgAdjustmentAudioController = new FgAdjustmentVideoController(
+  const leaveAudioContainerTimer = useRef<NodeJS.Timeout | undefined>(
+    undefined
+  );
+
+  const fgContentAdjustmentController = new FgContentAdjustmentController(
     bundleRef,
     positioning,
     setAdjustingDimensions,
@@ -79,7 +123,11 @@ export default function FgAudioElementContainer({
 
   return (
     <div
-      className='bg-fg-primary bg-opacity-30'
+      className={`audio-element-container ${
+        adjustingDimensions ? "adjusting-dimensions" : ""
+      } ${
+        inAudioContainer ? "in-audio-container" : ""
+      } bg-fg-primary bg-opacity-30`}
       style={{
         position: "relative",
         left: `${positioning.current.position.left}%`,
@@ -95,10 +143,24 @@ export default function FgAudioElementContainer({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 50%",
       }}
+      onMouseEnter={() => {
+        setInAudioContainer(true);
+        if (leaveAudioContainerTimer.current) {
+          clearTimeout(leaveAudioContainerTimer.current);
+          leaveAudioContainerTimer.current = undefined;
+        }
+      }}
+      onMouseLeave={() => {
+        leaveAudioContainerTimer.current = setTimeout(() => {
+          setInAudioContainer(false);
+          clearTimeout(leaveAudioContainerTimer.current);
+          leaveAudioContainerTimer.current = undefined;
+        }, fgAudioElementContainerOptions.controlsVanishTime);
+      }}
     >
       <PanButton
         className={
-          "min-w-7 w-[5.5%] aspect-square absolute top-1/2 -translate-y-1/2 -left-3"
+          "pan-btn min-w-7 w-[5.5%] aspect-square absolute top-1/2 -translate-y-1/2 -left-3" // disapeaing button
         }
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
@@ -114,7 +176,7 @@ export default function FgAudioElementContainer({
               bundleRef.current.clientHeight,
           };
 
-          fgAdjustmentAudioController.movementDragFunction(
+          fgContentAdjustmentController.movementDragFunction(
             displacement,
             {
               x: 0,
@@ -133,18 +195,18 @@ export default function FgAudioElementContainer({
         }}
         bundleRef={bundleRef}
         mouseDownFunction={() => {
-          fgAdjustmentAudioController.adjustmentBtnMouseDownFunction(
+          fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
             "position",
             { rotationPointPlacement: "middleLeft" }
           );
         }}
         mouseUpFunction={
-          fgAdjustmentAudioController.adjustmentBtnMouseUpFunction
+          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
         }
       />
       <RotateButton
         className={
-          "min-w-7 w-[5.5%] aspect-square absolute top-1/2 -translate-y-[150%] -right-1.5"
+          "rotate-btn min-w-7 w-[5.5%] aspect-square absolute top-1/2 -translate-y-[150%] -right-1.5"
         }
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
@@ -162,7 +224,7 @@ export default function FgAudioElementContainer({
 
           const box = bundleRef.current.getBoundingClientRect();
 
-          fgAdjustmentAudioController.rotateDragFunction(event, {
+          fgContentAdjustmentController.rotateDragFunction(event, {
             x:
               (positioning.current.position.left / 100) *
                 bundleRef.current.clientWidth +
@@ -176,15 +238,15 @@ export default function FgAudioElementContainer({
         }}
         bundleRef={bundleRef}
         mouseDownFunction={
-          fgAdjustmentAudioController.adjustmentBtnMouseDownFunction
+          fgContentAdjustmentController.adjustmentBtnMouseDownFunction
         }
         mouseUpFunction={
-          fgAdjustmentAudioController.adjustmentBtnMouseUpFunction
+          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
         }
       />
       <ScaleButton
         className={
-          "min-w-6 w-[5%] aspect-square absolute top-1/2 translate-y-1/2 -right-1.5"
+          "scale-btn min-w-6 w-[5%] aspect-square absolute top-1/2 translate-y-1/2 -right-1.5"
         }
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
@@ -203,7 +265,7 @@ export default function FgAudioElementContainer({
               bundleRef.current.clientHeight,
           };
 
-          fgAdjustmentAudioController.scaleDragFunction(
+          fgContentAdjustmentController.scaleDragFunction(
             "square",
             {
               x: displacement.x + Math.sin(angle) * (pixelScale.x / 2),
@@ -243,29 +305,32 @@ export default function FgAudioElementContainer({
               bundleRef.current.clientHeight,
           };
 
-          fgAdjustmentAudioController.adjustmentBtnMouseDownFunction("scale", {
-            aspect: "square",
-            referencePoint: {
-              x:
-                (positioning.current.position.left / 100) *
-                bundleRef.current.clientWidth,
-              y:
-                (positioning.current.position.top / 100) *
-                bundleRef.current.clientHeight,
-            },
-            rotationPoint: {
-              x:
-                (positioning.current.position.left / 100) *
-                bundleRef.current.clientWidth,
-              y:
-                (positioning.current.position.top / 100) *
-                  bundleRef.current.clientHeight +
-                pixelScale.y / 2,
-            },
-          });
+          fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+            "scale",
+            {
+              aspect: "square",
+              referencePoint: {
+                x:
+                  (positioning.current.position.left / 100) *
+                  bundleRef.current.clientWidth,
+                y:
+                  (positioning.current.position.top / 100) *
+                  bundleRef.current.clientHeight,
+              },
+              rotationPoint: {
+                x:
+                  (positioning.current.position.left / 100) *
+                  bundleRef.current.clientWidth,
+                y:
+                  (positioning.current.position.top / 100) *
+                    bundleRef.current.clientHeight +
+                  pixelScale.y / 2,
+              },
+            }
+          );
         }}
         mouseUpFunction={
-          fgAdjustmentAudioController.adjustmentBtnMouseUpFunction
+          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
         }
       />
       <FgAudioElement
@@ -281,7 +346,7 @@ export default function FgAudioElementContainer({
         doubleClickFunction={() => {
           setAudioEffectsSectionVisible((prev) => !prev);
         }}
-        options={options}
+        fgAudioElementContainerOptions={fgAudioElementContainerOptions}
       />
       {popupVisible && (
         <Suspense fallback={<div>Loading...</div>}>

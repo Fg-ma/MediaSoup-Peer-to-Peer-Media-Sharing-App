@@ -11,7 +11,7 @@ import ClosedCaptionsOptionsPage, {
   closedCaptionsOptionsArrays,
 } from "./ClosedCaptionsOptionsPage";
 import PageTemplate from "./PageTemplate";
-import { ActivePages } from "../../../FgLowerVideoControls";
+import { ActivePages } from "../../../FgLowerVisualMediaControls";
 import { FgVideoOptions, Settings } from "../../../../../FgVideo";
 
 const SelectionPanelVar: Variants = {
