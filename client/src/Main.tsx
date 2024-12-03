@@ -224,7 +224,7 @@ export default function Main() {
   const subBtnRef = useRef<HTMLButtonElement>(null);
   const isSubscribed = useRef(false);
 
-  const remoteVideosContainerRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
 
   const permissions = useRef({
     acceptsCameraEffects: true,
@@ -453,7 +453,7 @@ export default function Main() {
     username,
     instance,
     userMedia,
-    remoteVideosContainerRef,
+    tableRef,
     isCamera,
     isScreen,
     isAudio,
@@ -533,51 +533,40 @@ export default function Main() {
   );
 
   return (
-    <div className='w-screen h-screen flex-col'>
-      <div className='flex justify-center min-w-full bg-black h-16 text-white items-center mb-10'>
-        Mediasoup Video Sharing App
-      </div>
-      <div
-        className='flex-col flex-wrap px-5 w-full'
-        style={{ height: "calc(100% - 6.5rem)" }}
-      >
-        <FgTableFunctions
-          table_id={table_id}
-          username={username}
-          instance={instance}
-          socket={socket}
-          device={device}
-          producers={producers}
-          producerTransport={producerTransport}
-          consumerTransport={consumerTransport}
-          setBundles={setBundles}
-          acceptAudioEffects={acceptAudioEffects}
-          isCamera={isCamera}
-          cameraActive={cameraActive}
-          setCameraActive={setCameraActive}
-          cameraBtnRef={cameraBtnRef}
-          newCameraBtnRef={newCameraBtnRef}
-          isScreen={isScreen}
-          screenActive={screenActive}
-          setScreenActive={setScreenActive}
-          screenBtnRef={screenBtnRef}
-          newScreenBtnRef={newScreenBtnRef}
-          setMutedAudio={setMutedAudio}
-          mutedAudioRef={mutedAudioRef}
-          isAudio={isAudio}
-          audioActive={audioActive}
-          setAudioActive={setAudioActive}
-          audioBtnRef={audioBtnRef}
-          isSubscribed={isSubscribed}
-          subBtnRef={subBtnRef}
-          muteAudio={muteAudio}
-          handleDisableEnableBtns={handleDisableEnableBtns}
-        />
-        <FgTable
-          remoteVideosContainerRef={remoteVideosContainerRef}
-          bundles={bundles}
-        />
-      </div>
+    <div className='w-screen h-screen flex-col space-y-3 flex-wrap p-5 overflow-hidden'>
+      <FgTableFunctions
+        table_id={table_id}
+        username={username}
+        instance={instance}
+        socket={socket}
+        device={device}
+        producers={producers}
+        producerTransport={producerTransport}
+        consumerTransport={consumerTransport}
+        setBundles={setBundles}
+        acceptAudioEffects={acceptAudioEffects}
+        isCamera={isCamera}
+        cameraActive={cameraActive}
+        setCameraActive={setCameraActive}
+        cameraBtnRef={cameraBtnRef}
+        newCameraBtnRef={newCameraBtnRef}
+        isScreen={isScreen}
+        screenActive={screenActive}
+        setScreenActive={setScreenActive}
+        screenBtnRef={screenBtnRef}
+        newScreenBtnRef={newScreenBtnRef}
+        setMutedAudio={setMutedAudio}
+        mutedAudioRef={mutedAudioRef}
+        isAudio={isAudio}
+        audioActive={audioActive}
+        setAudioActive={setAudioActive}
+        audioBtnRef={audioBtnRef}
+        isSubscribed={isSubscribed}
+        subBtnRef={subBtnRef}
+        muteAudio={muteAudio}
+        handleDisableEnableBtns={handleDisableEnableBtns}
+      />
+      <FgTable tableRef={tableRef} bundles={bundles} />
     </div>
   );
 }

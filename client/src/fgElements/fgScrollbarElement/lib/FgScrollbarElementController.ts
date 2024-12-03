@@ -1,11 +1,14 @@
 class FgScrollbarController {
+  private scrollTimeoutTime = 1250;
+
   constructor(
-    private containerRef: React.RefObject<HTMLDivElement>,
-    private direction: "vertical" | "horizontal",
-    private scrollTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
-    private remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
+    private scrollingContentRef: React.RefObject<HTMLDivElement>,
+    private scrollbarElementRef: React.RefObject<HTMLDivElement>,
+    private scrollbarRef: React.RefObject<HTMLDivElement>,
     private scrollbarTrackRef: React.RefObject<HTMLDivElement>,
     private scrollbarThumbRef: React.RefObject<HTMLDivElement>,
+    private scrollTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private direction: "vertical" | "horizontal",
     private dragging: React.MutableRefObject<boolean>,
     private scrollStart: React.MutableRefObject<{
       x: number;
@@ -19,15 +22,16 @@ class FgScrollbarController {
 
   updateVerticalScrollbar = () => {
     if (
-      !this.remoteVideosContainerRef.current ||
+      !this.scrollingContentRef.current ||
       !this.scrollbarThumbRef.current ||
-      !this.scrollbarTrackRef.current
+      !this.scrollbarTrackRef.current ||
+      !this.scrollbarRef.current
     ) {
       return;
     }
 
-    const contentHeight = this.remoteVideosContainerRef.current.scrollHeight;
-    const containerHeight = this.remoteVideosContainerRef.current.clientHeight;
+    const contentHeight = this.scrollingContentRef.current.scrollHeight;
+    const containerHeight = this.scrollingContentRef.current.clientHeight;
 
     // Get the track height from the ref (the custom track height set by CSS)
     const trackHeight = this.scrollbarTrackRef.current.clientHeight;
@@ -42,7 +46,7 @@ class FgScrollbarController {
     this.scrollbarThumbRef.current.style.height = `${thumbHeight}px`;
 
     // Calculate the thumb position as a ratio of the scroll position to the content height
-    const scrollPosition = this.remoteVideosContainerRef.current.scrollTop;
+    const scrollPosition = this.scrollingContentRef.current.scrollTop;
 
     // Calculate thumb's top position relative to the track
     const thumbPosition =
@@ -55,15 +59,16 @@ class FgScrollbarController {
 
   updateHorizontalScrollbar = () => {
     if (
-      !this.remoteVideosContainerRef.current ||
+      !this.scrollingContentRef.current ||
       !this.scrollbarThumbRef.current ||
-      !this.scrollbarTrackRef.current
+      !this.scrollbarTrackRef.current ||
+      !this.scrollbarRef.current
     ) {
       return;
     }
 
-    const contentWidth = this.remoteVideosContainerRef.current.scrollWidth;
-    const containerWidth = this.remoteVideosContainerRef.current.clientWidth;
+    const contentWidth = this.scrollingContentRef.current.scrollWidth;
+    const containerWidth = this.scrollingContentRef.current.clientWidth;
 
     // Get the track width from the ref (the custom track width set by CSS)
     const trackWidth = this.scrollbarTrackRef.current.clientWidth;
@@ -78,7 +83,7 @@ class FgScrollbarController {
     this.scrollbarThumbRef.current.style.width = `${thumbWidth}px`;
 
     // Calculate the thumb position as a ratio of the scroll position to the content width
-    const scrollPosition = this.remoteVideosContainerRef.current.scrollLeft;
+    const scrollPosition = this.scrollingContentRef.current.scrollLeft;
 
     // Calculate thumb's left position relative to the track
     const thumbPosition =
@@ -95,8 +100,8 @@ class FgScrollbarController {
 
     this.scrollStart.current = { x: event.clientX, y: event.clientY };
     this.startScrollPosition.current = {
-      top: this.remoteVideosContainerRef.current?.scrollTop ?? 0,
-      left: this.remoteVideosContainerRef.current?.scrollLeft ?? 0,
+      top: this.scrollingContentRef.current?.scrollTop ?? 0,
+      left: this.scrollingContentRef.current?.scrollLeft ?? 0,
     };
 
     this.dragging.current = true;
@@ -107,34 +112,34 @@ class FgScrollbarController {
   };
 
   thumbDragMove = (event: MouseEvent) => {
-    if (!this.remoteVideosContainerRef.current) return;
+    if (!this.scrollingContentRef.current) return;
 
     if (this.direction === "vertical") {
       const deltaY = event.clientY - this.scrollStart.current.y;
-      const contentHeight = this.remoteVideosContainerRef.current.scrollHeight;
-      const containerHeight =
-        this.remoteVideosContainerRef.current.clientHeight;
+      const contentHeight = this.scrollingContentRef.current.scrollHeight;
+      const containerHeight = this.scrollingContentRef.current.clientHeight;
 
       // Calculate the new scroll position based on mouse movement
       const newScrollTop =
         this.startScrollPosition.current.top +
         (deltaY / containerHeight) * contentHeight;
       // Apply the scroll position to the container
-      this.remoteVideosContainerRef.current.scrollTop = newScrollTop;
+      this.scrollingContentRef.current.scrollTop = newScrollTop;
 
       // Update the scrollbar thumb position
       this.updateVerticalScrollbar();
     } else {
       const deltaX = event.clientX - this.scrollStart.current.x;
-      const contentWidth = this.remoteVideosContainerRef.current.scrollWidth;
-      const containerWidth = this.remoteVideosContainerRef.current.clientWidth;
+      const contentWidth = this.scrollingContentRef.current.scrollWidth;
+      const containerWidth = this.scrollingContentRef.current.clientWidth;
 
       // Calculate the new scroll position based on mouse movement
       const newScrollLeft =
         this.startScrollPosition.current.left +
         (deltaX / containerWidth) * contentWidth;
+
       // Apply the scroll position to the container
-      this.remoteVideosContainerRef.current.scrollLeft = newScrollLeft;
+      this.scrollingContentRef.current.scrollLeft = newScrollLeft;
 
       // Update the scrollbar thumb position
       this.updateHorizontalScrollbar();
@@ -150,19 +155,16 @@ class FgScrollbarController {
   };
 
   horizontalScrollWheel = (event: WheelEvent) => {
-    if (
-      this.direction === "vertical" ||
-      !this.remoteVideosContainerRef.current
-    ) {
+    if (this.direction === "vertical" || !this.scrollingContentRef.current) {
       return;
     }
 
-    this.remoteVideosContainerRef.current.scrollLeft += event.deltaY;
+    this.scrollingContentRef.current.scrollLeft += event.deltaY;
   };
 
   trackMouseDown = (event: React.MouseEvent) => {
     if (
-      !this.remoteVideosContainerRef.current ||
+      !this.scrollingContentRef.current ||
       !this.scrollbarTrackRef.current ||
       !this.scrollbarThumbRef.current
     ) {
@@ -170,7 +172,7 @@ class FgScrollbarController {
     }
 
     const track = this.scrollbarTrackRef.current;
-    const container = this.remoteVideosContainerRef.current;
+    const container = this.scrollingContentRef.current;
     const thumb = this.scrollbarThumbRef.current;
 
     if (this.direction === "vertical") {
@@ -236,7 +238,7 @@ class FgScrollbarController {
       this.updateHorizontalScrollbar();
     }
 
-    this.containerRef.current?.classList.remove("hide-fg-scrollbar");
+    this.scrollbarElementRef.current?.classList.remove("hide-fg-scrollbar");
 
     if (this.scrollTimeout.current) {
       clearTimeout(this.scrollTimeout.current);
@@ -245,8 +247,79 @@ class FgScrollbarController {
 
     if (!this.dragging.current) {
       this.scrollTimeout.current = setTimeout(() => {
-        this.containerRef.current?.classList.add("hide-fg-scrollbar");
-      }, 750);
+        this.scrollbarElementRef.current?.classList.add("hide-fg-scrollbar");
+
+        clearTimeout(this.scrollTimeout.current);
+        this.scrollTimeout.current = undefined;
+      }, this.scrollTimeoutTime);
+    }
+  };
+
+  hideTableScrollBar = (event: React.MouseEvent) => {
+    if (!this.scrollbarElementRef.current || this.dragging.current) return;
+
+    const rect = this.scrollbarElementRef.current.getBoundingClientRect();
+
+    if (this.direction === "vertical") {
+      // Check if the mouse is within 40px of the right edge of the container
+      if (rect.right - event.clientX <= 40) {
+        this.scrollbarElementRef.current.classList.remove("hide-fg-scrollbar");
+      } else {
+        if (
+          !this.scrollbarElementRef.current.classList.contains(
+            "hide-fg-scrollbar"
+          ) &&
+          !this.scrollTimeout.current
+        ) {
+          this.scrollTimeout.current = setTimeout(() => {
+            this.scrollbarElementRef.current?.classList.add(
+              "hide-fg-scrollbar"
+            );
+
+            clearTimeout(this.scrollTimeout.current);
+            this.scrollTimeout.current = undefined;
+          }, this.scrollTimeoutTime);
+        }
+      }
+    } else {
+      // Check if the mouse is within 40px of the right edge of the container
+      if (rect.bottom - event.clientY <= 40) {
+        this.scrollbarElementRef.current.classList.remove("hide-fg-scrollbar");
+      } else {
+        if (
+          !this.scrollbarElementRef.current.classList.contains(
+            "hide-fg-scrollbar"
+          ) &&
+          !this.scrollTimeout.current
+        ) {
+          this.scrollTimeout.current = setTimeout(() => {
+            this.scrollbarElementRef.current?.classList.add(
+              "hide-fg-scrollbar"
+            );
+
+            clearTimeout(this.scrollTimeout.current);
+            this.scrollTimeout.current = undefined;
+          }, this.scrollTimeoutTime);
+        }
+      }
+    }
+  };
+
+  mouseLeaveFunction = () => {
+    if (this.dragging.current) {
+      return;
+    }
+
+    if (this.scrollTimeout.current) {
+      clearTimeout(this.scrollTimeout.current);
+      this.scrollTimeout.current = undefined;
+    }
+
+    if (
+      this.scrollbarElementRef.current &&
+      !this.scrollbarElementRef.current.classList.contains("hide-fg-scrollbar")
+    ) {
+      this.scrollbarElementRef.current.classList.add("hide-fg-scrollbar");
     }
   };
 }

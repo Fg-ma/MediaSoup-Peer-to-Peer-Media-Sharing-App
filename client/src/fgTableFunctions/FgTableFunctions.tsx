@@ -1,4 +1,4 @@
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
@@ -168,6 +168,10 @@ export default function FgTableFunctions({
       socket.current.emit("message", msg);
     }
   };
+
+  useEffect(() => {
+    setAudioEffectsActive(false);
+  }, [isAudio.current]);
 
   return (
     <>
