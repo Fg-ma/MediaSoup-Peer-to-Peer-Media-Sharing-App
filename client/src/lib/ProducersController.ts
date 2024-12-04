@@ -21,7 +21,7 @@ import BrowserMedia from "./BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import { UserDataStreams } from "src/context/streamsContext/StreamsContext";
 
-class Producers {
+class ProducersController {
   constructor(
     private socket: React.MutableRefObject<Socket>,
     private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -816,4 +816,4 @@ class Producers {
     }
   };
 }
-export default Producers;
+export default ProducersController;

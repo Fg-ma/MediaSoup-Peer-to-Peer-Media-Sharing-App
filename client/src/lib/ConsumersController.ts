@@ -6,7 +6,7 @@ import { RtpParameters } from "mediasoup-client/lib/RtpParameters";
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import { DataStreamTypes } from "src/context/streamsContext/typeConstant";
 
-class Consumers {
+class ConsumersController {
   constructor(
     private socket: React.MutableRefObject<Socket>,
     private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
@@ -602,4 +602,4 @@ class Consumers {
   }
 }
 
-export default Consumers;
+export default ConsumersController;

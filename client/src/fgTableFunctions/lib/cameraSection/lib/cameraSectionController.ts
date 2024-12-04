@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import CameraMedia from "../../../../lib/CameraMedia";
 import ScreenMedia from "../../../../lib/ScreenMedia";
 import AudioMedia from "../../../../lib/AudioMedia";
-import Producers from "../../../../lib/Producers";
+import ProducersController from "../../../../lib/ProducersController";
 
 class CameraSectionController {
   constructor(
@@ -29,7 +29,7 @@ class CameraSectionController {
     }>,
     private userCameraCount: React.MutableRefObject<number>,
 
-    private producers: Producers,
+    private producersController: ProducersController,
 
     private handleDisableEnableBtns: (disabled: boolean) => void
   ) {}
@@ -100,7 +100,7 @@ class CameraSectionController {
     this.userCameraCount.current = this.userCameraCount.current + 1;
 
     if (this.device.current) {
-      this.producers.createNewProducer("camera");
+      this.producersController.createNewProducer("camera");
     }
   };
 }

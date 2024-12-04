@@ -7,7 +7,7 @@ import removeScreenIcon from "../../../../public/svgs/removeScreenIcon.svg";
 import shareScreenIcon from "../../../../public/svgs/shareScreenIcon.svg";
 import { useStreamsContext } from "../../../context/streamsContext/StreamsContext";
 import ScreenSectionController from "./lib/ScreenSectionController";
-import Producers from "../../../lib/Producers";
+import ProducersController from "../../../lib/ProducersController";
 
 export default function ScreenSection({
   socket,
@@ -22,7 +22,7 @@ export default function ScreenSection({
   isAudio,
   screenActive,
   setScreenActive,
-  producers,
+  producersController,
   handleDisableEnableBtns,
 }: {
   socket: React.MutableRefObject<Socket>;
@@ -37,7 +37,7 @@ export default function ScreenSection({
   isAudio: React.MutableRefObject<boolean>;
   screenActive: boolean;
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>;
-  producers: Producers;
+  producersController: ProducersController;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { userMedia, userScreenCount } = useStreamsContext();
@@ -57,7 +57,7 @@ export default function ScreenSection({
     userMedia,
     userScreenCount,
 
-    producers,
+    producersController,
 
     handleDisableEnableBtns
   );

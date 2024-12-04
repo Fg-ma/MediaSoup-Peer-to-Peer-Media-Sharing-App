@@ -16,12 +16,11 @@ import {
   defaultScreenStreamEffects,
 } from "./context/streamsContext/typeConstant";
 import onRouterCapabilities from "./lib/onRouterCapabilities";
-import Producers from "./lib/Producers";
-import Consumers from "./lib/Consumers";
+import ProducersController from "./lib/ProducersController";
+import ConsumersController from "./lib/ConsumersController";
 import UserDevice from "./lib/UserDevice";
 import BrowserMedia from "./lib/BrowserMedia";
 import BundlesController from "./bundlesController";
-import onStatesPermissionsRequested from "./lib/onStatesPermissionsRequested";
 import Deadbanding from "./babylon/Deadbanding";
 import FgMetaData from "./lib/FgMetaData";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
@@ -29,6 +28,7 @@ import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 import "./scrollbar.css";
 import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
+import PermissionsController from "./lib/PermissionsController";
 
 const websocketURL = "http://localhost:8000";
 
@@ -260,46 +260,36 @@ export default function Main() {
         onRouterCapabilities(event, device);
         break;
       case "producerTransportCreated":
-        producers.onProducerTransportCreated(event);
+        producersController.onProducerTransportCreated(event);
         break;
       case "consumerTransportCreated":
-        consumers.onConsumerTransportCreated(event);
+        consumersController.onConsumerTransportCreated(event);
         break;
       case "resumed":
         break;
       case "subscribed":
-        consumers.onSubscribed(event);
+        consumersController.onSubscribed(event);
         break;
       case "newConsumerSubscribed":
-        consumers.onNewConsumerSubscribed(event);
+        consumersController.onNewConsumerSubscribed(event);
         break;
       case "newJSONConsumerSubscribed":
-        consumers.onNewJSONConsumerSubscribed(event);
+        consumersController.onNewJSONConsumerSubscribed(event);
         break;
       case "newProducer":
-        producers.createNewProducer(event.producerType);
+        producersController.createNewProducer(event.producerType);
         break;
       case "newProducerAvailable":
-        producers.onNewProducerAvailable(event);
+        producersController.onNewProducerAvailable(event);
         break;
       case "newJSONProducerAvailable":
-        producers.onNewJSONProducerAvailable(event);
+        producersController.onNewJSONProducerAvailable(event);
         break;
       case "producerDisconnected":
-        producers.onProducerDisconnected(event);
+        producersController.onProducerDisconnected(event);
         break;
       case "statesPermissionsRequested":
-        onStatesPermissionsRequested(
-          event,
-          socket,
-          table_id,
-          username,
-          instance,
-          mutedAudioRef,
-          permissions,
-          userStreamEffects,
-          currentEffectsStyles
-        );
+        permissionsController.onStatesPermissionsRequested(event);
         break;
       case "requestedCatchUpData":
         fgMetaData.onRequestedCatchUpData(event);
@@ -470,7 +460,7 @@ export default function Main() {
     handleDisableEnableBtns
   );
 
-  const producers = new Producers(
+  const producersController = new ProducersController(
     socket,
     device,
     table_id,
@@ -498,7 +488,7 @@ export default function Main() {
     browserMedia
   );
 
-  const consumers = new Consumers(
+  const consumersController = new ConsumersController(
     socket,
     device,
     table_id,
@@ -520,6 +510,17 @@ export default function Main() {
     userMedia
   );
 
+  const permissionsController = new PermissionsController(
+    socket,
+    table_id,
+    username,
+    instance,
+    mutedAudioRef,
+    permissions,
+    userStreamEffects,
+    currentEffectsStyles
+  );
+
   return (
     <div className='w-screen h-screen flex-col space-y-3 flex-wrap p-5 overflow-hidden'>
       <FgTableFunctions
@@ -528,7 +529,7 @@ export default function Main() {
         instance={instance}
         socket={socket}
         device={device}
-        producers={producers}
+        producersController={producersController}
         producerTransport={producerTransport}
         consumerTransport={consumerTransport}
         setBundles={setBundles}

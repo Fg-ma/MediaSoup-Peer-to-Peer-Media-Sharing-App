@@ -7,7 +7,7 @@ import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import ScreenSection from "./lib/screenSection/ScreenSection";
-import Producers from "../lib/Producers";
+import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
 import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
 
@@ -21,7 +21,7 @@ export default function FgTableFunctions({
   instance,
   socket,
   device,
-  producers,
+  producersController,
   producerTransport,
   consumerTransport,
   setBundles,
@@ -51,7 +51,7 @@ export default function FgTableFunctions({
   instance: React.MutableRefObject<string>;
   socket: React.MutableRefObject<Socket>;
   device: React.MutableRefObject<mediasoup.types.Device | undefined>;
-  producers: Producers;
+  producersController: ProducersController;
   producerTransport: React.MutableRefObject<
     mediasoup.types.Transport<mediasoup.types.AppData> | undefined
   >;
@@ -189,7 +189,7 @@ export default function FgTableFunctions({
           isAudio={isAudio}
           setCameraActive={setCameraActive}
           cameraActive={cameraActive}
-          producers={producers}
+          producersController={producersController}
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <AudioSection
@@ -222,7 +222,7 @@ export default function FgTableFunctions({
           isAudio={isAudio}
           screenActive={screenActive}
           setScreenActive={setScreenActive}
-          producers={producers}
+          producersController={producersController}
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <div className='flex flex-col mx-2'>

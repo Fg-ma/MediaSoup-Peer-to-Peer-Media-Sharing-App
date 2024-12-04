@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import CameraMedia from "../../../../lib/CameraMedia";
 import ScreenMedia from "../../../../lib/ScreenMedia";
 import AudioMedia from "../../../../lib/AudioMedia";
-import Producers from "../../../../lib/Producers";
+import ProducersController from "../../../../lib/ProducersController";
 
 class ScreenSectionController {
   constructor(
@@ -29,7 +29,7 @@ class ScreenSectionController {
     }>,
     private userScreenCount: React.MutableRefObject<number>,
 
-    private producers: Producers,
+    private producersController: ProducersController,
 
     private handleDisableEnableBtns: (disabled: boolean) => void
   ) {}
@@ -99,7 +99,7 @@ class ScreenSectionController {
     this.userScreenCount.current = this.userScreenCount.current + 1;
 
     if (this.device.current) {
-      this.producers.createNewProducer("screen");
+      this.producersController.createNewProducer("screen");
     }
   };
 }

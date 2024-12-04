@@ -7,7 +7,7 @@ import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import shareCameraIcon from "../../../../public/svgs/shareCameraIcon.svg";
 import removeCameraIcon from "../../../../public/svgs/removeCameraIcon.svg";
-import Producers from "../../../lib/Producers";
+import ProducersController from "../../../lib/ProducersController";
 
 export default function CameraSection({
   socket,
@@ -22,7 +22,7 @@ export default function CameraSection({
   isAudio,
   setCameraActive,
   cameraActive,
-  producers,
+  producersController,
   handleDisableEnableBtns,
 }: {
   socket: React.MutableRefObject<Socket>;
@@ -37,7 +37,7 @@ export default function CameraSection({
   isAudio: React.MutableRefObject<boolean>;
   setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
   cameraActive: boolean;
-  producers: Producers;
+  producersController: ProducersController;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { userMedia, userCameraCount } = useStreamsContext();
@@ -57,7 +57,7 @@ export default function CameraSection({
     userMedia,
     userCameraCount,
 
-    producers,
+    producersController,
 
     handleDisableEnableBtns
   );
