@@ -8,22 +8,8 @@ import {
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
-import FgLowerVisualMediaControls, {
-  BackgroundColors,
-  BackgroundOpacities,
-  CharacterEdgeStyles,
-  FontColors,
-  FontFamilies,
-  FontOpacities,
-  FontSizes,
-} from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
-import FgVideoController from "./lib/FgVideoController";
-import {
-  closedCaptionsSelections,
-  expandedClosedCaptionsBrowserSelections,
-  expandedClosedCaptionsVoskSelections,
-} from "./lib/fgLowerVisualMediaControls/lib/fgSettingsButton/lib/ClosedCaptionsPage";
-import "./lib/fgVideoStyles.css";
+import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
+import FgVisualMediaController from "./lib/FgVisualMediaController";
 import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
@@ -33,66 +19,11 @@ import PanButton from "../fgAdjustmentComponents/PanButton";
 import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
-
-export interface FgVideoOptions {
-  isUser?: boolean;
-  acceptsVisualEffects?: boolean;
-  acceptsAudioEffects?: boolean;
-  isStream?: boolean;
-  autoPlay?: boolean;
-  isSlider?: boolean;
-  isPlayPause?: boolean;
-  isVolume?: boolean;
-  isCurrentTime?: boolean;
-  isClosedCaptions?: boolean;
-  isPictureInPicture?: boolean;
-  isEffects?: boolean;
-  isFullScreen?: boolean;
-  isClose?: boolean;
-  controlsVanishTime?: number;
-  closedCaptionsDecoratorColor?: string;
-  primaryVideoColor?: string;
-  initialVolume?: "high" | "low" | "off";
-}
-
-export interface Settings {
-  closedCaption: {
-    value:
-      | keyof typeof closedCaptionsSelections
-      | keyof typeof expandedClosedCaptionsVoskSelections
-      | keyof typeof expandedClosedCaptionsBrowserSelections;
-    closedCaptionOptionsActive: {
-      value: "";
-      fontFamily: { value: FontFamilies };
-      fontColor: { value: FontColors };
-      fontOpacity: { value: FontOpacities };
-      fontSize: { value: FontSizes };
-      backgroundColor: { value: BackgroundColors };
-      backgroundOpacity: { value: BackgroundOpacities };
-      characterEdgeStyle: { value: CharacterEdgeStyles };
-    };
-  };
-}
-
-export const defaultFgVideoOptions = {
-  isUser: false,
-  acceptsVisualEffects: false,
-  acceptsAudioEffects: false,
-  isStream: false,
-  autoPlay: true,
-  isSlider: true,
-  isPlayPause: true,
-  isVolume: true,
-  isCurrentTime: true,
-  isClosedCaptions: true,
-  isPictureInPicture: true,
-  isEffects: true,
-  isFullScreen: true,
-  isClose: true,
-  controlsVanishTime: 1250,
-  closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
-  primaryVideoColor: "#f56114",
-};
+import {
+  defaultFgVisualMediaOptions,
+  FgVisualMediaOptions,
+  Settings,
+} from "./lib/typeConstant";
 
 export default function FgVideo({
   socket,
@@ -134,7 +65,7 @@ export default function FgVideo({
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   videoStyles?: React.CSSProperties;
-  options?: FgVideoOptions;
+  options?: FgVisualMediaOptions;
   handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMute: () => void;
   handleMuteCallback: (() => void) | undefined;
@@ -143,8 +74,8 @@ export default function FgVideo({
   ) => void;
   tracksColorSetterCallback: () => void;
 }) {
-  const fgVideoOptions = {
-    ...defaultFgVideoOptions,
+  const fgVisualMediaOptions = {
+    ...defaultFgVisualMediaOptions,
     ...options,
   };
 
@@ -168,7 +99,7 @@ export default function FgVideo({
 
   const [pausedState, setPausedState] = useState(false);
 
-  const paused = useRef(!fgVideoOptions.autoPlay);
+  const paused = useRef(!fgVisualMediaOptions.autoPlay);
 
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
 
@@ -221,10 +152,15 @@ export default function FgVideo({
     hideBackgroundColor?: string,
     postProcessStyle?: PostProcessEffects
   ) => {
-    if (fgVideoOptions.isUser) {
+    if (fgVisualMediaOptions.isUser) {
       fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
 
-      if (fgVideoOptions.acceptsVisualEffects) {
+      if (
+        (type === "camera" &&
+          fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+        (type === "screen" &&
+          fgVisualMediaOptions.permissions.acceptsScreenEffects)
+      ) {
         const msg = {
           type: "clientEffectChange",
           table_id: table_id,
@@ -239,7 +175,12 @@ export default function FgVideo({
         };
         socket?.current.emit("message", msg);
       }
-    } else if (fgVideoOptions.acceptsVisualEffects) {
+    } else if (
+      (type === "camera" &&
+        fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+      (type === "screen" &&
+        fgVisualMediaOptions.permissions.acceptsScreenEffects)
+    ) {
       const msg = {
         type: "requestEffectChange",
         table_id: table_id,
@@ -279,7 +220,7 @@ export default function FgVideo({
     username,
     instance,
     type,
-    fgVideoOptions,
+    fgVisualMediaOptions,
     bundleRef,
     videoRef,
     audioRef,
@@ -305,7 +246,7 @@ export default function FgVideo({
     positioning
   );
 
-  const fgVideoController = new FgVideoController(
+  const fgVisualMediaController = new FgVisualMediaController(
     username,
     instance,
     type,
@@ -321,7 +262,7 @@ export default function FgVideo({
     videoRef,
     videoContainerRef,
     audioRef,
-    fgVideoOptions,
+    fgVisualMediaOptions,
     handleVisualEffectChange,
     setInVideo,
     leaveVideoTimer
@@ -329,13 +270,13 @@ export default function FgVideo({
 
   useEffect(() => {
     // Set up initial conditions
-    fgVideoController.init();
+    fgVisualMediaController.init();
 
     // Listen for messages on socket
-    socket.current.on("message", fgVideoController.handleMessage);
+    socket.current.on("message", fgVisualMediaController.handleMessage);
 
     // Request initial catch up data
-    if (!fgVideoOptions.isUser && activeUsername && activeInstance) {
+    if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
       const msg = {
         type: "requestCatchUpData",
         table_id: table_id,
@@ -348,7 +289,7 @@ export default function FgVideo({
     }
 
     if (
-      !fgVideoOptions.isUser &&
+      !fgVisualMediaOptions.isUser &&
       remoteDataStreams.current[username] &&
       remoteDataStreams.current[username][instance] &&
       remoteDataStreams.current[username][instance].positionScaleRotation
@@ -372,7 +313,7 @@ export default function FgVideo({
     }
 
     // Add eventlisteners
-    if (fgVideoOptions.isFullScreen) {
+    if (fgVisualMediaOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
         fgLowerVisualMediaController.handleFullScreenChange
@@ -391,10 +332,10 @@ export default function FgVideo({
 
     document.addEventListener(
       "visibilitychange",
-      fgVideoController.handleVisibilityChange
+      fgVisualMediaController.handleVisibilityChange
     );
 
-    if (fgVideoOptions.isPictureInPicture) {
+    if (fgVisualMediaOptions.isPictureInPicture) {
       videoRef.current?.addEventListener("enterpictureinpicture", () =>
         fgLowerVisualMediaController.handlePictureInPicture("enter")
       );
@@ -405,7 +346,7 @@ export default function FgVideo({
     }
 
     // Request initial data
-    if (!fgVideoOptions.isUser && activeUsername && activeInstance) {
+    if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
       const msg = {
         type: "requestCatchUpData",
         table_id: table_id,
@@ -420,8 +361,8 @@ export default function FgVideo({
     }
 
     return () => {
-      socket.current.off("message", fgVideoController.handleMessage);
-      if (fgVideoOptions.isFullScreen) {
+      socket.current.off("message", fgVisualMediaController.handleMessage);
+      if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
           fgLowerVisualMediaController.handleFullScreenChange
@@ -437,9 +378,9 @@ export default function FgVideo({
       );
       document.removeEventListener(
         "visibilitychange",
-        fgVideoController.handleVisibilityChange
+        fgVisualMediaController.handleVisibilityChange
       );
-      if (fgVideoOptions.isPictureInPicture) {
+      if (fgVisualMediaOptions.isPictureInPicture) {
         videoRef.current?.removeEventListener("enterpictureinpicture", () =>
           fgLowerVisualMediaController.handlePictureInPicture("enter")
         );
@@ -465,7 +406,7 @@ export default function FgVideo({
   }, [videoId, userMedia]);
 
   useEffect(() => {
-    if (fgVideoOptions.isUser) {
+    if (fgVisualMediaOptions.isUser) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           table_id,
@@ -498,8 +439,8 @@ export default function FgVideo({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
-      onMouseEnter={() => fgVideoController.handleMouseEnter()}
-      onMouseLeave={() => fgVideoController.handleMouseLeave()}
+      onMouseEnter={() => fgVisualMediaController.handleMouseEnter()}
+      onMouseLeave={() => fgVisualMediaController.handleMouseLeave()}
     >
       <RotateButton
         className={
@@ -634,13 +575,13 @@ export default function FgVideo({
           onTimeUpdate={() => fgLowerVisualMediaController.timeUpdate()}
           className='main-video w-full h-full absolute top-0 left-0'
           controls={false}
-          autoPlay={fgVideoOptions.autoPlay}
+          autoPlay={fgVisualMediaOptions.autoPlay}
           style={{ ...videoStyles, objectFit: "fill" }}
         ></video>
         <FgUpperVisualMediaControls
           name={name}
           username={username}
-          isClose={fgVideoOptions.isClose}
+          isClose={fgVisualMediaOptions.isClose}
           fgLowerVisualMediaController={fgLowerVisualMediaController}
         />
         <FgLowerVisualMediaControls
@@ -664,7 +605,7 @@ export default function FgVideo({
           setAudioEffectsActive={setAudioEffectsActive}
           settings={settings}
           setSettings={setSettings}
-          fgVideoOptions={fgVideoOptions}
+          fgVisualMediaOptions={fgVisualMediaOptions}
           handleVisualEffectChange={handleVisualEffectChange}
           handleAudioEffectChange={handleAudioEffectChange}
           handleMuteCallback={handleMuteCallback}

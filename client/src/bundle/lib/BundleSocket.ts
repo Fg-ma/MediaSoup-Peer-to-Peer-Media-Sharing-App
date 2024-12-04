@@ -7,6 +7,7 @@ import { EffectStylesType } from "../../context/currentEffectsStylesContext/type
 import AudioMedia from "../../lib/AudioMedia";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
+import { Permissions } from "../../context/permissionsContext/PermissionsContext";
 
 class BundleSocket {
   constructor(
@@ -81,16 +82,8 @@ class BundleSocket {
     private audioRef: React.RefObject<HTMLAudioElement>,
     private clientMute: React.MutableRefObject<boolean>,
     private localMute: React.MutableRefObject<boolean>,
-    private acceptsAudioEffects: boolean,
-    private setAcceptsCameraEffects: React.Dispatch<
-      React.SetStateAction<boolean>
-    >,
-    private setAcceptsScreenEffects: React.Dispatch<
-      React.SetStateAction<boolean>
-    >,
-    private setAcceptsAudioEffects: React.Dispatch<
-      React.SetStateAction<boolean>
-    >,
+    private permissions: Permissions,
+    private setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
     private handleAudioEffectChange: (effect: AudioEffectTypes) => void,
     private onNewConsumerWasCreatedCallback?: () => void
   ) {}
@@ -253,9 +246,7 @@ class BundleSocket {
     inquiredUsername: string;
     inquiredInstance: string;
     clientMute: boolean;
-    cameraPermission: boolean;
-    screenPermission: boolean;
-    audioPermission: boolean;
+    permissions: Permissions;
     streamEffects: {
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -278,9 +269,7 @@ class BundleSocket {
       this.clientMute.current = event.clientMute;
     }
 
-    this.setAcceptsCameraEffects(event.cameraPermission);
-    this.setAcceptsScreenEffects(event.screenPermission);
-    this.setAcceptsAudioEffects(event.audioPermission);
+    this.setPermissions(event.permissions);
 
     this.remoteStreamEffects.current[this.username][this.instance] =
       event.streamEffects;
@@ -296,7 +285,10 @@ class BundleSocket {
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
     blockStateChange: boolean;
   }) => {
-    if (this.acceptsAudioEffects && event.requestedProducerType === "audio") {
+    if (
+      this.permissions.acceptsAudioEffects &&
+      event.requestedProducerType === "audio"
+    ) {
       // @ts-expect-error: event.effect and event.requestedProducerType have no strict correlation enforcement
       this.handleAudioEffectChange(event.effect);
     }

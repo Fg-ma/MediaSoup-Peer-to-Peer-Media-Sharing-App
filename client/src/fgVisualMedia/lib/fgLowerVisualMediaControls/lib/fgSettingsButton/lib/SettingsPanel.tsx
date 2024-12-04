@@ -12,7 +12,7 @@ import ClosedCaptionsOptionsPage, {
 } from "./ClosedCaptionsOptionsPage";
 import PageTemplate from "./PageTemplate";
 import { ActivePages } from "../../../FgLowerVisualMediaControls";
-import { FgVideoOptions, Settings } from "../../../../../FgVideo";
+import { FgVisualMediaOptions, Settings } from "../../../../typeConstant";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -81,7 +81,7 @@ const closedCaptionOptionsPageTitles = {
 };
 
 export default function SettingsPanel({
-  fgVideoOptions,
+  fgVisualMediaOptions,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -90,7 +90,7 @@ export default function SettingsPanel({
   setSettings,
   browserStandardSpeechRecognitionAvailable,
 }: {
-  fgVideoOptions: FgVideoOptions;
+  fgVisualMediaOptions: FgVisualMediaOptions;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -206,7 +206,7 @@ export default function SettingsPanel({
             animate='animate'
             exit='exit'
           >
-            {fgVideoOptions.isVolume && (
+            {fgVisualMediaOptions.isVolume && (
               <FgButton
                 className='w-full'
                 contentFunction={() => (

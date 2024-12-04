@@ -9,6 +9,7 @@ import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import ScreenSection from "./lib/screenSection/ScreenSection";
 import Producers from "../lib/Producers";
 import TableFunctionsController from "./lib/TableFunctionsController";
+import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -24,7 +25,6 @@ export default function FgTableFunctions({
   producerTransport,
   consumerTransport,
   setBundles,
-  acceptAudioEffects,
   isCamera,
   cameraActive,
   setCameraActive,
@@ -65,7 +65,6 @@ export default function FgTableFunctions({
       };
     }>
   >;
-  acceptAudioEffects: boolean;
   isCamera: React.MutableRefObject<boolean>;
   cameraActive: boolean;
   setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -90,6 +89,7 @@ export default function FgTableFunctions({
   const { userMedia, userCameraCount, userScreenCount, remoteTracksMap } =
     useStreamsContext();
   const { setSignal } = useSignalContext();
+  const { permissions } = usePermissionsContext();
 
   const [subscribedActive, setSubscribedActive] = useState(false);
 
@@ -152,7 +152,7 @@ export default function FgTableFunctions({
   const handleExternalAudioEffectChange = (effect: AudioEffectTypes) => {
     userMedia.current.audio?.changeEffects(effect, false);
 
-    if (acceptAudioEffects) {
+    if (permissions.current.acceptsAudioEffects) {
       const msg = {
         type: "clientEffectChange",
         table_id: table_id.current,

@@ -8,111 +8,20 @@ import {
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
-import FgLowerVisualMediaControls, {
-  BackgroundColors,
-  BackgroundOpacities,
-  CharacterEdgeStyles,
-  FontColors,
-  FontFamilies,
-  FontOpacities,
-  FontSizes,
-} from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
-import {
-  closedCaptionsSelections,
-  expandedClosedCaptionsBrowserSelections,
-  expandedClosedCaptionsVoskSelections,
-} from "./lib/fgLowerVisualMediaControls/lib/fgSettingsButton/lib/ClosedCaptionsPage";
-import FgVideoController from "./lib/FgVideoController";
-import { HideBackgroundEffectTypes } from "src/context/currentEffectsStylesContext/typeConstant";
+import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
+import FgVisualMediaController from "./lib/FgVisualMediaController";
+import { HideBackgroundEffectTypes } from "../context/currentEffectsStylesContext/typeConstant";
 import PanButton from "../fgAdjustmentComponents/PanButton";
 import RotateButton from "../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
-
-export interface FgVideoOptions {
-  isUser?: boolean;
-  acceptsVisualEffects?: boolean;
-  acceptsAudioEffects?: boolean;
-  isStream?: boolean;
-  autoPlay?: boolean;
-  isSlider?: boolean;
-  isPlayPause?: boolean;
-  isVolume?: boolean;
-  isCurrentTime?: boolean;
-  isTotalTime?: boolean;
-  isPlaybackSpeed?: boolean;
-  isClosedCaptions?: boolean;
-  isPictureInPicture?: boolean;
-  isTheater?: boolean;
-  isEffects?: boolean;
-  isFullScreen?: boolean;
-  isTimeLine?: boolean;
-  isSkip?: boolean;
-  isThumbnail?: boolean;
-  isPreview?: boolean;
-  isClose?: boolean;
-  skipIncrement?: number;
-  initialProgressPosition?: number;
-  controlsVanishTime?: number;
-  timelineBackgroundColor?: string;
-  closedCaptionsDecoratorColor?: string;
-  timelinePrimaryBackgroundColor?: string;
-  timelineSecondaryBackgroundColor?: string;
-  primaryVideoColor?: string;
-  initialVolume?: "high" | "low" | "off";
-}
-
-export interface Settings {
-  closedCaption: {
-    value:
-      | keyof typeof closedCaptionsSelections
-      | keyof typeof expandedClosedCaptionsVoskSelections
-      | keyof typeof expandedClosedCaptionsBrowserSelections;
-    closedCaptionOptionsActive: {
-      value: "";
-      fontFamily: { value: FontFamilies };
-      fontColor: { value: FontColors };
-      fontOpacity: { value: FontOpacities };
-      fontSize: { value: FontSizes };
-      backgroundColor: { value: BackgroundColors };
-      backgroundOpacity: { value: BackgroundOpacities };
-      characterEdgeStyle: { value: CharacterEdgeStyles };
-    };
-  };
-}
-
-export const defaultFgVideoOptions = {
-  isUser: false,
-  acceptsVisualEffects: false,
-  acceptsAudioEffects: false,
-  isStream: false,
-  autoPlay: true,
-  isSlider: true,
-  isPlayPause: true,
-  isVolume: true,
-  isCurrentTime: true,
-  isTotalTime: true,
-  isPlaybackSpeed: true,
-  isClosedCaptions: true,
-  isPictureInPicture: true,
-  isTheater: true,
-  isEffects: true,
-  isFullScreen: true,
-  isTimeLine: true,
-  isSkip: true,
-  isThumbnail: true,
-  isPreview: true,
-  isClose: true,
-  skipIncrement: 10,
-  initialProgressPosition: 0,
-  controlsVanishTime: 1250,
-  timelineBackgroundColor: "rgba(150, 150, 150, 0.5)",
-  closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
-  timelinePrimaryBackgroundColor: "#f56114",
-  timelineSecondaryBackgroundColor: "rgb(150, 150, 150)",
-  primaryVideoColor: "#f56114",
-};
+import {
+  defaultFgVisualMediaOptions,
+  FgVisualMediaOptions,
+  Settings,
+} from "./lib/typeConstant";
+import "./lib/fgVideoStyles.css";
 
 export default function FgBabylonCanvas({
   socket,
@@ -150,7 +59,7 @@ export default function FgBabylonCanvas({
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
-  options?: FgVideoOptions;
+  options?: FgVisualMediaOptions;
   handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMute: () => void;
   handleMuteCallback: (() => void) | undefined;
@@ -159,8 +68,8 @@ export default function FgBabylonCanvas({
   ) => void;
   tracksColorSetterCallback: () => void;
 }) {
-  const fgVideoOptions = {
-    ...defaultFgVideoOptions,
+  const fgVisualMediaOptions = {
+    ...defaultFgVisualMediaOptions,
     ...options,
   };
 
@@ -184,7 +93,7 @@ export default function FgBabylonCanvas({
 
   const [pausedState, setPausedState] = useState(false);
 
-  const paused = useRef(!fgVideoOptions.autoPlay);
+  const paused = useRef(!fgVisualMediaOptions.autoPlay);
 
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
 
@@ -238,10 +147,15 @@ export default function FgBabylonCanvas({
     hideBackgroundStyle?: HideBackgroundEffectTypes,
     hideBackgroundColor?: string
   ) => {
-    if (fgVideoOptions.isUser) {
+    if (fgVisualMediaOptions.isUser) {
       fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
 
-      if (fgVideoOptions.acceptsVisualEffects) {
+      if (
+        (type === "camera" &&
+          fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+        (type === "screen" &&
+          fgVisualMediaOptions.permissions.acceptsScreenEffects)
+      ) {
         const msg = {
           type: "clientEffectChange",
           table_id: table_id,
@@ -256,7 +170,12 @@ export default function FgBabylonCanvas({
         };
         socket?.current.emit("message", msg);
       }
-    } else if (fgVideoOptions.acceptsVisualEffects) {
+    } else if (
+      (type === "camera" &&
+        fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+      (type === "screen" &&
+        fgVisualMediaOptions.permissions.acceptsScreenEffects)
+    ) {
       const msg = {
         type: "requestEffectChange",
         table_id: table_id,
@@ -295,7 +214,7 @@ export default function FgBabylonCanvas({
     username,
     instance,
     type,
-    fgVideoOptions,
+    fgVisualMediaOptions,
     bundleRef,
     videoRef,
     audioRef,
@@ -321,7 +240,7 @@ export default function FgBabylonCanvas({
     positioning
   );
 
-  const fgVideoController = new FgVideoController(
+  const fgVisualMediaController = new FgVisualMediaController(
     username,
     instance,
     type,
@@ -337,7 +256,7 @@ export default function FgBabylonCanvas({
     videoRef,
     canvasContainerRef,
     audioRef,
-    fgVideoOptions,
+    fgVisualMediaOptions,
     handleVisualEffectChange,
     setInVideo,
     leaveVideoTimer
@@ -358,10 +277,10 @@ export default function FgBabylonCanvas({
     }
 
     // Set up initial conditions
-    fgVideoController.init();
+    fgVisualMediaController.init();
 
     // Listen for messages on socket
-    socket.current.on("message", fgVideoController.handleMessage);
+    socket.current.on("message", fgVisualMediaController.handleMessage);
 
     // Keep video time
     fgLowerVisualMediaController.timeUpdate();
@@ -371,7 +290,7 @@ export default function FgBabylonCanvas({
     );
 
     if (
-      !fgVideoOptions.isUser &&
+      !fgVisualMediaOptions.isUser &&
       remoteDataStreams.current[username] &&
       remoteDataStreams.current[username][instance] &&
       remoteDataStreams.current[username][instance].positionScaleRotation
@@ -395,7 +314,7 @@ export default function FgBabylonCanvas({
     }
 
     // Add eventlisteners
-    if (fgVideoOptions.isFullScreen) {
+    if (fgVisualMediaOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
         fgLowerVisualMediaController.handleFullScreenChange
@@ -414,10 +333,10 @@ export default function FgBabylonCanvas({
 
     document.addEventListener(
       "visibilitychange",
-      fgVideoController.handleVisibilityChange
+      fgVisualMediaController.handleVisibilityChange
     );
 
-    if (fgVideoOptions.isPictureInPicture) {
+    if (fgVisualMediaOptions.isPictureInPicture) {
       videoRef.current?.addEventListener("enterpictureinpicture", () =>
         fgLowerVisualMediaController.handlePictureInPicture("enter")
       );
@@ -428,7 +347,7 @@ export default function FgBabylonCanvas({
     }
 
     // Request initial data
-    if (!fgVideoOptions.isUser && activeUsername && activeInstance) {
+    if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
       const msg = {
         type: "requestCatchUpData",
         table_id: table_id,
@@ -443,12 +362,12 @@ export default function FgBabylonCanvas({
     }
 
     return () => {
-      socket.current.off("message", fgVideoController.handleMessage);
+      socket.current.off("message", fgVisualMediaController.handleMessage);
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
         timeUpdateInterval.current = undefined;
       }
-      if (fgVideoOptions.isFullScreen) {
+      if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
           fgLowerVisualMediaController.handleFullScreenChange
@@ -464,9 +383,9 @@ export default function FgBabylonCanvas({
       );
       document.removeEventListener(
         "visibilitychange",
-        fgVideoController.handleVisibilityChange
+        fgVisualMediaController.handleVisibilityChange
       );
-      if (fgVideoOptions.isPictureInPicture) {
+      if (fgVisualMediaOptions.isPictureInPicture) {
         videoRef.current?.removeEventListener("enterpictureinpicture", () =>
           fgLowerVisualMediaController.handlePictureInPicture("enter")
         );
@@ -491,7 +410,7 @@ export default function FgBabylonCanvas({
   }, [videoId, userMedia]);
 
   useEffect(() => {
-    if (fgVideoOptions.isUser) {
+    if (fgVisualMediaOptions.isUser) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           table_id,
@@ -509,7 +428,7 @@ export default function FgBabylonCanvas({
       ref={canvasContainerRef}
       id={`${videoId}_container`}
       className={`video-container ${pausedState ? "paused" : ""} ${
-        fgVideoOptions.autoPlay ? "" : "paused"
+        fgVisualMediaOptions.autoPlay ? "" : "paused"
       } ${visualEffectsActive ? "in-effects" : ""} ${
         audioEffectsActive ? "in-effects" : ""
       } ${inVideo ? "in-video" : ""} ${
@@ -526,8 +445,8 @@ export default function FgBabylonCanvas({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
-      onMouseEnter={() => fgVideoController.handleMouseEnter()}
-      onMouseLeave={() => fgVideoController.handleMouseLeave()}
+      onMouseEnter={() => fgVisualMediaController.handleMouseEnter()}
+      onMouseLeave={() => fgVisualMediaController.handleMouseLeave()}
     >
       <RotateButton
         className={
@@ -659,7 +578,7 @@ export default function FgBabylonCanvas({
         <FgUpperVisualMediaControls
           name={name}
           username={username}
-          isClose={fgVideoOptions.isClose}
+          isClose={fgVisualMediaOptions.isClose}
           fgLowerVisualMediaController={fgLowerVisualMediaController}
         />
         <FgLowerVisualMediaControls
@@ -683,7 +602,7 @@ export default function FgBabylonCanvas({
           setAudioEffectsActive={setAudioEffectsActive}
           settings={settings}
           setSettings={setSettings}
-          fgVideoOptions={fgVideoOptions}
+          fgVisualMediaOptions={fgVisualMediaOptions}
           handleVisualEffectChange={handleVisualEffectChange}
           handleAudioEffectChange={handleAudioEffectChange}
           handleMuteCallback={handleMuteCallback}

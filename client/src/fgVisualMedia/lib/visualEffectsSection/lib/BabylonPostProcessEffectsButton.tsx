@@ -54,6 +54,7 @@ export default function BabylonPostProcessEffectsButton({
   handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
+  scrollingContainerRef,
 }: {
   username: string;
   instance: string;
@@ -69,6 +70,7 @@ export default function BabylonPostProcessEffectsButton({
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia, userStreamEffects, remoteStreamEffects } =
     useStreamsContext();
@@ -296,6 +298,7 @@ export default function BabylonPostProcessEffectsButton({
       }
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
+      scrollingContainerRef={scrollingContainerRef}
       options={{
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,

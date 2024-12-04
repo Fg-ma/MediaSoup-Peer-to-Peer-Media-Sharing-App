@@ -2,8 +2,7 @@ import React, { useEffect, useRef } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import SettingsPanel from "./lib/SettingsPanel";
 import { ActivePages } from "../../FgLowerVisualMediaControls";
-import { Settings } from "../../../../FgVideo";
-import { FgVideoOptions } from "../../../../FgBabylonCanvas";
+import { FgVisualMediaOptions, Settings } from "../../../typeConstant";
 
 type RecursiveObject = {
   active?: boolean;
@@ -11,7 +10,7 @@ type RecursiveObject = {
 };
 
 export default function FgSettingsButton({
-  fgVideoOptions,
+  fgVisualMediaOptions,
   visualEffectsActive,
   videoContainerRef,
   settingsActive,
@@ -22,7 +21,7 @@ export default function FgSettingsButton({
   setSettings,
   browserStandardSpeechRecognitionAvailable,
 }: {
-  fgVideoOptions: FgVideoOptions;
+  fgVisualMediaOptions: FgVisualMediaOptions;
   visualEffectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
@@ -129,7 +128,7 @@ export default function FgSettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
-          fgVideoOptions={fgVideoOptions}
+          fgVisualMediaOptions={fgVisualMediaOptions}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}

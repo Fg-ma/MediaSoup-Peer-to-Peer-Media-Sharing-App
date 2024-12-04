@@ -8,11 +8,11 @@ import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
 } from "../../context/currentEffectsStylesContext/typeConstant";
-import { defaultFgVideoOptions, FgVideoOptions } from "../FgVideo";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
+import { FgVisualMediaOptions } from "./typeConstant";
 
 type FgVideoMessageEvents =
   | {
@@ -51,7 +51,7 @@ type FgVideoMessageEvents =
         | undefined;
     };
 
-class FgVideoController {
+class FgVisualMediaController {
   constructor(
     private username: string,
     private instance: string,
@@ -92,7 +92,7 @@ class FgVideoController {
     private videoRef: React.RefObject<HTMLVideoElement>,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
-    private fgVideoOptions: FgVideoOptions,
+    private fgVisualMediaOptions: FgVisualMediaOptions,
     private handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
@@ -105,7 +105,7 @@ class FgVideoController {
     // Set videoStream as srcObject
     if (
       this.videoRef.current &&
-      (this.fgVideoOptions.isStream ?? defaultFgVideoOptions.isStream) &&
+      this.fgVisualMediaOptions.isStream &&
       this.videoStream
     ) {
       this.videoRef.current.srcObject = this.videoStream!;
@@ -126,10 +126,7 @@ class FgVideoController {
 
     this.videoContainerRef.current?.style.setProperty(
       "--primary-video-color",
-      `${
-        this.fgVideoOptions.primaryVideoColor ??
-        defaultFgVideoOptions.primaryVideoColor
-      }`
+      `${this.fgVisualMediaOptions.primaryVideoColor}`
     );
   };
 
@@ -147,7 +144,11 @@ class FgVideoController {
     };
   }) => {
     if (
-      this.fgVideoOptions.acceptsVisualEffects &&
+      this.fgVisualMediaOptions.permissions &&
+      ((this.type === "camera" &&
+        this.fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+        (this.type === "screen" &&
+          this.fgVisualMediaOptions.permissions.acceptsScreenEffects)) &&
       this.type === event.requestedProducerType &&
       this.videoId === event.requestedProducerId
     ) {
@@ -208,7 +209,7 @@ class FgVideoController {
     blockStateChange: boolean;
   }) => {
     if (
-      !this.fgVideoOptions.isUser &&
+      !this.fgVisualMediaOptions.isUser &&
       this.username === event.username &&
       this.instance === event.instance &&
       this.type === event.producerType &&
@@ -254,7 +255,7 @@ class FgVideoController {
       | undefined;
   }) => {
     if (
-      !this.fgVideoOptions.isUser &&
+      !this.fgVisualMediaOptions.isUser &&
       this.username === event.inquiredUsername &&
       this.instance === event.inquiredInstance &&
       this.type === event.inquiredType &&
@@ -332,8 +333,8 @@ class FgVideoController {
       this.setInVideo(false);
       clearTimeout(this.leaveVideoTimer.current);
       this.leaveVideoTimer.current = undefined;
-    }, this.fgVideoOptions.controlsVanishTime);
+    }, this.fgVisualMediaOptions.controlsVanishTime);
   };
 }
 
-export default FgVideoController;
+export default FgVisualMediaController;

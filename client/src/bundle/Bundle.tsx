@@ -6,6 +6,7 @@ import BundleController from "./lib/BundleController";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import FgBabylonCanvas from "../fgVisualMedia/FgBabylonCanvas";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
+import { Permissions } from "../context/permissionsContext/PermissionsContext";
 
 const FgVideo = React.lazy(() => import("../fgVisualMedia/FgVideo"));
 const FgAudioElementContainer = React.lazy(
@@ -75,14 +76,8 @@ export default function Bundle({
   const clientMute = useRef(false); // User audio mute
   const localMute = useRef(false); // Not user audio mute
 
-  const [acceptsCameraEffects, setAcceptsCameraEffects] = useState(
-    bundleOptions.acceptsCameraEffects
-  );
-  const [acceptsScreenEffects, setAcceptsScreenEffects] = useState(
-    bundleOptions.acceptsScreenEffects
-  );
-  const [acceptsAudioEffects, setAcceptsAudioEffects] = useState(
-    bundleOptions.acceptsAudioEffects
+  const [permissions, setPermissions] = useState<Permissions>(
+    bundleOptions.permissions
   );
 
   const bundleController = new BundleController(
@@ -103,10 +98,8 @@ export default function Bundle({
     audioRef,
     clientMute,
     localMute,
-    acceptsAudioEffects,
-    setAcceptsCameraEffects,
-    setAcceptsScreenEffects,
-    setAcceptsAudioEffects,
+    permissions,
+    setPermissions,
     onNewConsumerWasCreatedCallback,
     handleMuteCallback
   );
@@ -195,18 +188,11 @@ export default function Bundle({
                 localMute={localMute}
                 options={{
                   isUser: bundleOptions.isUser,
-                  acceptsVisualEffects: acceptsCameraEffects,
-                  acceptsAudioEffects: acceptsAudioEffects,
+                  permissions: permissions,
                   isStream: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,
-                  isTotalTime: false,
-                  isPlaybackSpeed: false,
                   isClosedCaptions: true,
-                  isTimeLine: false,
-                  isSkip: false,
-                  isThumbnail: false,
-                  isPreview: false,
                   initialVolume: bundleOptions.initialVolume
                     ? bundleOptions.initialVolume
                     : audioRef.current
@@ -248,8 +234,7 @@ export default function Bundle({
                 localMute={localMute}
                 options={{
                   isUser: bundleOptions.isUser,
-                  acceptsVisualEffects: acceptsCameraEffects,
-                  acceptsAudioEffects: acceptsAudioEffects,
+                  permissions: permissions,
                   isStream: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,
@@ -301,18 +286,11 @@ export default function Bundle({
                 localMute={localMute}
                 options={{
                   isUser: bundleOptions.isUser,
-                  acceptsVisualEffects: acceptsScreenEffects,
-                  acceptsAudioEffects: acceptsAudioEffects,
+                  permissions: permissions,
                   isStream: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,
-                  isTotalTime: false,
-                  isPlaybackSpeed: false,
                   isClosedCaptions: true,
-                  isTimeLine: false,
-                  isSkip: false,
-                  isThumbnail: false,
-                  isPreview: false,
                   initialVolume: bundleOptions.initialVolume
                     ? bundleOptions.initialVolume
                     : audioRef.current
@@ -354,8 +332,7 @@ export default function Bundle({
                 localMute={localMute}
                 options={{
                   isUser: bundleOptions.isUser,
-                  acceptsVisualEffects: acceptsScreenEffects,
-                  acceptsAudioEffects: acceptsAudioEffects,
+                  permissions: permissions,
                   isStream: true,
                   isSlider: !bundleOptions.isUser,
                   isVolume: audioStream ? true : false,

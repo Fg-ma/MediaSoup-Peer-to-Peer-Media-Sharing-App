@@ -1,5 +1,4 @@
 import { Socket } from "socket.io-client";
-import { FgVideoOptions, Settings } from "../../../FgVideo";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -9,6 +8,7 @@ import CameraMedia from "../../../../lib/CameraMedia";
 import ScreenMedia from "../../../../lib/ScreenMedia";
 import AudioMedia from "../../../../lib/AudioMedia";
 import FgContentAdjustmentController from "../../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import { FgVisualMediaOptions, Settings } from "../../typeConstant";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -67,7 +67,7 @@ class FgLowerVisualMediaController {
     private username: string,
     private instance: string,
     private type: "camera" | "screen",
-    private fgVideoOptions: FgVideoOptions,
+    private fgVisualMediaOptions: FgVisualMediaOptions,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private videoRef: React.RefObject<HTMLVideoElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
@@ -226,37 +226,37 @@ class FgLowerVisualMediaController {
         break;
       case " ":
         if (tagName === "button") return;
-        if (this.fgVideoOptions.isPlayPause) {
+        if (this.fgVisualMediaOptions.isPlayPause) {
           this.handlePausePlay();
         }
         break;
       case "mediaplaypause":
-        if (this.fgVideoOptions.isPlayPause) {
+        if (this.fgVisualMediaOptions.isPlayPause) {
           this.handlePausePlay();
         }
         break;
       case "k":
-        if (this.fgVideoOptions.isPlayPause) {
+        if (this.fgVisualMediaOptions.isPlayPause) {
           this.handlePausePlay();
         }
         break;
       case "f":
-        if (this.fgVideoOptions.isFullScreen) {
+        if (this.fgVisualMediaOptions.isFullScreen) {
           this.handleFullScreen();
         }
         break;
       case "i":
-        if (this.fgVideoOptions.isPictureInPicture) {
+        if (this.fgVisualMediaOptions.isPictureInPicture) {
           this.handleMiniPlayer();
         }
         break;
       case "m":
-        if (this.fgVideoOptions.isVolume) {
+        if (this.fgVisualMediaOptions.isVolume) {
           this.handleMute();
         }
         break;
       case "c":
-        if (this.fgVideoOptions.isClosedCaptions) {
+        if (this.fgVisualMediaOptions.isClosedCaptions) {
           this.handleClosedCaptions();
         }
         break;
@@ -473,7 +473,7 @@ class FgLowerVisualMediaController {
     this.handleVisualEffectChange("pause");
     this.paused.current = !this.paused.current;
 
-    if (this.fgVideoOptions.isUser) {
+    if (this.fgVisualMediaOptions.isUser) {
       this.setPausedState((prev) => !prev);
     }
   };

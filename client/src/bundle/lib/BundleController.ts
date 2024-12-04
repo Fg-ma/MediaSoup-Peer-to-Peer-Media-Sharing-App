@@ -10,6 +10,7 @@ import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
 import { BundleControllerMessageType, BundleOptions } from "./typeConstant";
+import { Permissions } from "../../context/permissionsContext/PermissionsContext";
 
 class BundleController {
   bundleSocket: BundleSocket;
@@ -90,16 +91,8 @@ class BundleController {
     private audioRef: React.RefObject<HTMLAudioElement>,
     private clientMute: React.MutableRefObject<boolean>,
     private localMute: React.MutableRefObject<boolean>,
-    private acceptsAudioEffects: boolean,
-    private setAcceptsCameraEffects: React.Dispatch<
-      React.SetStateAction<boolean>
-    >,
-    private setAcceptsScreenEffects: React.Dispatch<
-      React.SetStateAction<boolean>
-    >,
-    private setAcceptsAudioEffects: React.Dispatch<
-      React.SetStateAction<boolean>
-    >,
+    private permissions: Permissions,
+    private setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
     private onNewConsumerWasCreatedCallback?: () => void,
     private handleMuteCallback?: () => void
   ) {
@@ -117,10 +110,8 @@ class BundleController {
       this.audioRef,
       this.clientMute,
       this.localMute,
-      this.acceptsAudioEffects,
-      this.setAcceptsCameraEffects,
-      this.setAcceptsScreenEffects,
-      this.setAcceptsAudioEffects,
+      this.permissions,
+      this.setPermissions,
       this.handleAudioEffectChange,
       this.onNewConsumerWasCreatedCallback
     );
@@ -130,7 +121,7 @@ class BundleController {
     if (this.bundleOptions.isUser) {
       this.userMedia.current.audio?.changeEffects(effect, false);
 
-      if (this.acceptsAudioEffects) {
+      if (this.permissions.acceptsAudioEffects) {
         const msg = {
           type: "clientEffectChange",
           table_id: this.table_id,
@@ -143,7 +134,7 @@ class BundleController {
         };
         this.socket.current.emit("message", msg);
       }
-    } else if (this.acceptsAudioEffects) {
+    } else if (this.permissions.acceptsAudioEffects) {
       const msg = {
         type: "requestEffectChange",
         table_id: this.table_id,

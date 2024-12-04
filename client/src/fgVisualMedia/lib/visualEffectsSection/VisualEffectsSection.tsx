@@ -196,6 +196,7 @@ export default function VisualEffectsSection({
           handleVisualEffectChange={handleVisualEffectChange}
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
         />
         <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       </Suspense>
@@ -210,6 +211,7 @@ export default function VisualEffectsSection({
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
+            scrollingContainerRef={effectsContainerRef}
           />
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
         </Suspense>
@@ -223,6 +225,7 @@ export default function VisualEffectsSection({
         handleVisualEffectChange={handleVisualEffectChange}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <TintSection
@@ -235,6 +238,7 @@ export default function VisualEffectsSection({
         tintColor={tintColor}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
       />
       {type === "camera" && (
         <Suspense fallback={<div>Loading...</div>}>
@@ -248,6 +252,7 @@ export default function VisualEffectsSection({
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
+            scrollingContainerRef={effectsContainerRef}
           />
         </Suspense>
       )}
@@ -263,6 +268,7 @@ export default function VisualEffectsSection({
             isUser={isUser}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
+            scrollingContainerRef={effectsContainerRef}
           />
         </Suspense>
       )}
@@ -278,6 +284,7 @@ export default function VisualEffectsSection({
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
+            scrollingContainerRef={effectsContainerRef}
           />
         </Suspense>
       )}
@@ -293,6 +300,7 @@ export default function VisualEffectsSection({
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
+            scrollingContainerRef={effectsContainerRef}
           />
         </Suspense>
       )}
@@ -308,6 +316,7 @@ export default function VisualEffectsSection({
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
+            scrollingContainerRef={effectsContainerRef}
           />
         </Suspense>
       )}
@@ -323,6 +332,7 @@ export default function VisualEffectsSection({
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
+            scrollingContainerRef={effectsContainerRef}
           />
         </Suspense>
       )}

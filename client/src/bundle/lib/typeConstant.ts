@@ -4,15 +4,14 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../context/streamsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/PermissionsContext";
 
 export interface BundleOptions {
   isUser?: boolean;
-  acceptsCameraEffects?: boolean;
-  acceptsScreenEffects?: boolean;
-  acceptsAudioEffects?: boolean;
   primaryVolumeSliderColor?: string;
   secondaryVolumeSliderColor?: string;
   initialVolume?: "off" | "low" | "high";
+  permissions?: Permissions;
 }
 
 export type BundleControllerMessageType =
@@ -45,9 +44,7 @@ export type BundleControllerMessageType =
       inquiredUsername: string;
       inquiredInstance: string;
       clientMute: boolean;
-      cameraPermission: boolean;
-      screenPermission: boolean;
-      audioPermission: boolean;
+      permissions: Permissions;
       streamEffects: {
         camera: {
           [cameraId: string]: {
@@ -84,9 +81,12 @@ export type BundleControllerMessageType =
 
 export const defaultBundleOptions = {
   isUser: false,
-  acceptsCameraEffects: false,
-  acceptsScreenEffects: false,
-  acceptsAudioEffects: false,
   primaryVolumeSliderColor: "white",
   secondaryVolumeSliderColor: "rgba(150, 150, 150, 0.5)",
+  permissions: {
+    acceptsCameraEffects: false,
+    acceptsScreenEffects: false,
+    acceptsAudioEffects: false,
+    acceptsPositionScaleRotationManipulation: false,
+  },
 };

@@ -5,6 +5,7 @@ import "./index.css";
 import { StreamsContextProvider } from "./src/context/streamsContext/StreamsContext";
 import { SignalContextProvider } from "./src/context/signalContext/SignalContext";
 import { CurrentEffectsStylesContextProvider } from "./src/context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { PermissionsContextProvider } from "./src/context/permissionsContext/PermissionsContext";
 
 const container = document.getElementById("root");
 const root = createRoot(container as HTMLElement);
@@ -16,7 +17,9 @@ function App() {
     <StreamsContextProvider>
       <CurrentEffectsStylesContextProvider>
         <SignalContextProvider>
-          <Main />
+          <PermissionsContextProvider>
+            <Main />
+          </PermissionsContextProvider>
         </SignalContextProvider>
       </CurrentEffectsStylesContextProvider>
     </StreamsContextProvider>

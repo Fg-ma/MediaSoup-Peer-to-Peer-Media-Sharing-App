@@ -4,6 +4,7 @@ import Bundle from "./bundle/Bundle";
 import CameraMedia from "./lib/CameraMedia";
 import ScreenMedia from "./lib/ScreenMedia";
 import AudioMedia from "./lib/AudioMedia";
+import { Permissions } from "./context/permissionsContext/PermissionsContext";
 
 class BundlesController {
   constructor(
@@ -46,9 +47,7 @@ class BundlesController {
       screenIds: (string | undefined)[]
     ) => void,
 
-    private acceptCameraEffects: boolean,
-    private acceptScreenEffects: boolean,
-    private acceptAudioEffects: boolean
+    private permissions: React.MutableRefObject<Permissions>
   ) {}
 
   createProducerBundle = () => {
@@ -84,9 +83,7 @@ class BundlesController {
           initAudioStream={this.isAudio.current ? initAudioStream : undefined}
           options={{
             isUser: true,
-            acceptsCameraEffects: this.acceptCameraEffects,
-            acceptsScreenEffects: this.acceptScreenEffects,
-            acceptsAudioEffects: this.acceptAudioEffects,
+            permissions: this.permissions.current,
           }}
           handleMuteCallback={this.muteAudio}
         />

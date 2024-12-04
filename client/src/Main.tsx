@@ -28,6 +28,7 @@ import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 import "./scrollbar.css";
+import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 
 const websocketURL = "http://localhost:8000";
 
@@ -188,6 +189,7 @@ export default function Main() {
   } = useStreamsContext();
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
+  const { permissions } = usePermissionsContext();
 
   const socket = useRef<Socket>(io(websocketURL));
   const device = useRef<mediasoup.Device>();
@@ -225,16 +227,6 @@ export default function Main() {
   const isSubscribed = useRef(false);
 
   const tableRef = useRef<HTMLDivElement>(null);
-
-  const permissions = useRef({
-    acceptsCameraEffects: true,
-    acceptsScreenEffects: true,
-    acceptsAudioEffects: true,
-    acceptsPositionScaleRotationManipulation: true,
-  });
-  const acceptCameraEffects = true;
-  const acceptScreenEffects = true;
-  const acceptAudioEffects = true;
 
   const muteAudio = () => {
     setMutedAudio((prev) => !prev);
@@ -304,9 +296,7 @@ export default function Main() {
           username,
           instance,
           mutedAudioRef,
-          acceptCameraEffects,
-          acceptScreenEffects,
-          acceptAudioEffects,
+          permissions,
           userStreamEffects,
           currentEffectsStyles
         );
@@ -461,9 +451,7 @@ export default function Main() {
     setBundles,
     muteAudio,
     setUpEffectContext,
-    acceptCameraEffects,
-    acceptScreenEffects,
-    acceptAudioEffects
+    permissions
   );
 
   const userDevice = new UserDevice();
@@ -544,7 +532,6 @@ export default function Main() {
         producerTransport={producerTransport}
         consumerTransport={consumerTransport}
         setBundles={setBundles}
-        acceptAudioEffects={acceptAudioEffects}
         isCamera={isCamera}
         cameraActive={cameraActive}
         setCameraActive={setCameraActive}

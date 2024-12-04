@@ -1,4 +1,5 @@
 import { Server as SocketIOServer } from "socket.io";
+import { Permissions } from "./typeConstant";
 
 class StatesPermissions {
   constructor(private io: SocketIOServer) {}
@@ -32,9 +33,7 @@ class StatesPermissions {
     inquiredUsername: string;
     inquiredInstance: string;
     clientMute: boolean;
-    cameraPermission: boolean;
-    screenPermission: boolean;
-    audioPermission: boolean;
+    permissions: Permissions;
     streamEffects: string;
     currentEffectsStyles: string;
   }) {
@@ -43,9 +42,7 @@ class StatesPermissions {
       inquiredUsername: event.inquiredUsername,
       inquiredInstance: event.inquiredInstance,
       clientMute: event.clientMute,
-      cameraPermission: event.cameraPermission,
-      screenPermission: event.screenPermission,
-      audioPermission: event.audioPermission,
+      permissions: event.permissions,
       streamEffects: event.streamEffects,
       currentEffectsStyles: event.currentEffectsStyles,
     };

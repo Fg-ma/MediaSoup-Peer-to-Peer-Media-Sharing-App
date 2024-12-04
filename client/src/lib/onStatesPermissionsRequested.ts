@@ -5,6 +5,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
+import { Permissions } from "../context/permissionsContext/PermissionsContext";
 
 const onStatesPermissionsRequested = (
   event: {
@@ -17,9 +18,7 @@ const onStatesPermissionsRequested = (
   username: React.MutableRefObject<string>,
   instance: React.MutableRefObject<string>,
   mutedAudioRef: React.MutableRefObject<boolean>,
-  acceptCameraEffects: boolean,
-  acceptScreenEffects: boolean,
-  acceptAudioEffects: boolean,
+  permissions: React.MutableRefObject<Permissions>,
   userStreamEffects: React.MutableRefObject<{
     camera: {
       [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -41,9 +40,7 @@ const onStatesPermissionsRequested = (
     inquiredUsername: username.current,
     inquiredInstance: instance.current,
     clientMute: mutedAudioRef.current,
-    cameraPermission: acceptCameraEffects,
-    screenPermission: acceptScreenEffects,
-    audioPermission: acceptAudioEffects,
+    permissions: permissions.current,
     streamEffects: userStreamEffects.current,
     currentEffectsStyles: currentEffectsStyles.current,
   };

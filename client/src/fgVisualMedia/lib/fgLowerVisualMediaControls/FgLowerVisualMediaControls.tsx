@@ -6,8 +6,12 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../context/streamsContext/typeConstant";
-import { defaultFgVideoOptions, FgVideoOptions, Settings } from "../../FgVideo";
 import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
+import {
+  defaultFgVisualMediaOptions,
+  FgVisualMediaOptions,
+  Settings,
+} from "../typeConstant";
 
 const PlayPauseButton = React.lazy(
   () => import("./lib/playPauseButton/PlayPauseButton")
@@ -122,7 +126,7 @@ export default function FgLowerVisualMediaControls({
   setAudioEffectsActive,
   settings,
   setSettings,
-  fgVideoOptions,
+  fgVisualMediaOptions,
   handleVisualEffectChange,
   handleAudioEffectChange,
   handleMuteCallback,
@@ -149,7 +153,7 @@ export default function FgLowerVisualMediaControls({
   setAudioEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
-  fgVideoOptions: FgVideoOptions;
+  fgVisualMediaOptions: FgVisualMediaOptions;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
@@ -225,10 +229,18 @@ export default function FgLowerVisualMediaControls({
                 type={type}
                 videoId={videoId}
                 socket={socket}
-                isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
+                isUser={
+                  fgVisualMediaOptions.isUser ??
+                  defaultFgVisualMediaOptions.isUser
+                }
                 acceptsVisualEffects={
-                  fgVideoOptions.acceptsVisualEffects ??
-                  defaultFgVideoOptions.acceptsVisualEffects
+                  type === "camera"
+                    ? fgVisualMediaOptions.permissions?.acceptsCameraEffects ??
+                      defaultFgVisualMediaOptions.permissions
+                        .acceptsCameraEffects
+                    : fgVisualMediaOptions.permissions?.acceptsScreenEffects ??
+                      defaultFgVisualMediaOptions.permissions
+                        .acceptsScreenEffects
                 }
                 videoContainerRef={videoContainerRef}
                 handleVisualEffectChange={handleVisualEffectChange}
@@ -243,8 +255,7 @@ export default function FgLowerVisualMediaControls({
           className='w-max h-10 z-20 flex items-center space-x-2'
           style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
         >
-          {(fgVideoOptions.isPlayPause ??
-            defaultFgVideoOptions.isPlayPause) && (
+          {fgVisualMediaOptions.isPlayPause && (
             <Suspense fallback={<div>Loading...</div>}>
               <PlayPauseButton
                 pausedState={pausedState}
@@ -254,23 +265,25 @@ export default function FgLowerVisualMediaControls({
               />
             </Suspense>
           )}
-          {(fgVideoOptions.isVolume ?? defaultFgVideoOptions.isPlayPause) && (
+          {fgVisualMediaOptions.isVolume && (
             <Suspense fallback={<div>Loading...</div>}>
               <FgVolumeElement
                 socket={socket}
                 table_id={table_id}
                 username={username}
                 instance={instance}
-                isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
+                isUser={
+                  fgVisualMediaOptions.isUser ??
+                  defaultFgVisualMediaOptions.isUser
+                }
                 audioRef={audioRef}
                 clientMute={clientMute}
                 localMute={localMute}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
                 options={{
-                  isSlider:
-                    fgVideoOptions.isSlider ?? defaultFgVideoOptions.isSlider,
-                  initialVolume: fgVideoOptions.initialVolume ?? "high",
+                  isSlider: fgVisualMediaOptions.isSlider,
+                  initialVolume: fgVisualMediaOptions.initialVolume ?? "high",
                 }}
                 handleMuteCallback={() => {
                   if (handleMuteCallback !== undefined) {
@@ -284,19 +297,17 @@ export default function FgLowerVisualMediaControls({
               />
             </Suspense>
           )}
-          <div className='flex items-center gap-1 px-1 select-none'>
-            {(fgVideoOptions.isCurrentTime ??
-              defaultFgVideoOptions.isCurrentTime) && (
+          {fgVisualMediaOptions.isCurrentTime && (
+            <div className='flex items-center gap-1 px-1 select-none'>
               <div ref={currentTimeRef} className='font-K2D text-lg'></div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
         <div
           ref={rightVideoControlsRef}
           className='hide-scroll-bar w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
         >
-          {(fgVideoOptions.isFullScreen ??
-            defaultFgVideoOptions.isFullScreen) && (
+          {fgVisualMediaOptions.isFullScreen && (
             <Suspense fallback={<div>Loading...</div>}>
               <FullScreenButton
                 fgLowerVisualMediaController={fgLowerVisualMediaController}
@@ -305,8 +316,7 @@ export default function FgLowerVisualMediaControls({
               />
             </Suspense>
           )}
-          {(fgVideoOptions.isPictureInPicture ??
-            defaultFgVideoOptions.isPictureInPicture) && (
+          {fgVisualMediaOptions.isPictureInPicture && (
             <Suspense fallback={<div>Loading...</div>}>
               <PictureInPictureButton
                 fgLowerVisualMediaController={fgLowerVisualMediaController}
@@ -315,9 +325,8 @@ export default function FgLowerVisualMediaControls({
               />
             </Suspense>
           )}
-          {(fgVideoOptions.isClosedCaptions ??
-            defaultFgVideoOptions.isClosedCaptions) &&
-            fgVideoOptions.isVolume &&
+          {fgVisualMediaOptions.isClosedCaptions &&
+            fgVisualMediaOptions.isVolume &&
             audioStream && (
               <Suspense fallback={<div>Loading...</div>}>
                 <CaptionButton
@@ -333,10 +342,10 @@ export default function FgLowerVisualMediaControls({
                 />
               </Suspense>
             )}
-          {fgVideoOptions.isVolume && (
+          {fgVisualMediaOptions.isVolume && (
             <Suspense fallback={<div>Loading...</div>}>
               <FgSettingsButton
-                fgVideoOptions={fgVideoOptions}
+                fgVisualMediaOptions={fgVisualMediaOptions}
                 visualEffectsActive={visualEffectsActive}
                 videoContainerRef={videoContainerRef}
                 settingsActive={settingsActive}
@@ -351,8 +360,12 @@ export default function FgLowerVisualMediaControls({
               />
             </Suspense>
           )}
-          {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
-            fgVideoOptions.isEffects && (
+          {(fgVisualMediaOptions.isUser ||
+            (type === "camera" &&
+              fgVisualMediaOptions.permissions?.acceptsCameraEffects) ||
+            (type === "screen" &&
+              fgVisualMediaOptions.permissions?.acceptsScreenEffects)) &&
+            fgVisualMediaOptions.isEffects && (
               <Suspense fallback={<div>Loading...</div>}>
                 <VisualEffectsButton
                   fgLowerVisualMediaController={fgLowerVisualMediaController}
@@ -361,14 +374,21 @@ export default function FgLowerVisualMediaControls({
                 />
               </Suspense>
             )}
-          {(fgVideoOptions.isUser || fgVideoOptions.acceptsVisualEffects) &&
-            fgVideoOptions.isVolume && (
+          {(fgVisualMediaOptions.isUser ||
+            (type === "camera" &&
+              fgVisualMediaOptions.permissions?.acceptsCameraEffects) ||
+            (type === "screen" &&
+              fgVisualMediaOptions.permissions?.acceptsScreenEffects)) &&
+            fgVisualMediaOptions.isVolume && (
               <Suspense fallback={<div>Loading...</div>}>
                 <AudioEffectsButton
                   socket={socket}
                   username={username}
                   instance={instance}
-                  isUser={fgVideoOptions.isUser ?? defaultFgVideoOptions.isUser}
+                  isUser={
+                    fgVisualMediaOptions.isUser ??
+                    defaultFgVisualMediaOptions.isUser
+                  }
                   audioEffectsActive={audioEffectsActive}
                   setAudioEffectsActive={setAudioEffectsActive}
                   handleAudioEffectChange={handleAudioEffectChange}
@@ -383,7 +403,7 @@ export default function FgLowerVisualMediaControls({
                       return;
                     }
 
-                    if (!fgVideoOptions.isUser) {
+                    if (!fgVisualMediaOptions.isUser) {
                       audioRef.current.muted = localMute.current;
                     }
 
