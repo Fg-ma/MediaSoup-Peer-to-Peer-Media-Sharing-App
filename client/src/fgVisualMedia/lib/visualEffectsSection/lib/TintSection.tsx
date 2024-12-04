@@ -21,6 +21,7 @@ export default function TintSection({
   tintColor,
   effectsDisabled,
   setEffectsDisabled,
+  scrollingContainerRef,
 }: {
   username: string;
   instance: string;
@@ -34,6 +35,7 @@ export default function TintSection({
   tintColor: React.MutableRefObject<string>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
@@ -86,6 +88,7 @@ export default function TintSection({
             Tint
           </div>
         }
+        scrollingContainerRef={scrollingContainerRef}
         className='flex items-center justify-center min-w-10 w-10 aspect-square'
         options={{
           hoverTimeoutDuration: 750,
@@ -101,6 +104,7 @@ export default function TintSection({
               Color picker
             </div>
           }
+          scrollingContainerRef={scrollingContainerRef}
           className='w-6 h-6 m-2 border border-white rounded'
           style={{ backgroundColor: tempColor }}
           options={{

@@ -80,6 +80,7 @@ export default function MustachesButton({
   handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
+  scrollingContainerRef,
 }: {
   username: string;
   instance: string;
@@ -92,6 +93,7 @@ export default function MustachesButton({
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
@@ -360,6 +362,7 @@ export default function MustachesButton({
       }
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
+      scrollingContainerRef={scrollingContainerRef}
       className='flex items-center justify-center min-w-10 w-10 aspect-square'
       options={{
         defaultDataValue: effectsStyles?.style,

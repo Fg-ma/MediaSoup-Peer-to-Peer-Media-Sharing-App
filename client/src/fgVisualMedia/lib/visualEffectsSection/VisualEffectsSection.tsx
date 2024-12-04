@@ -78,21 +78,21 @@ export default function VisualEffectsSection({
   const [overflowingXDirection, setOverflowingXDirection] = useState(false);
   const effectsContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const updateWidth = () => {
-      if (videoContainerRef.current) {
-        const newEffectsWidth = videoContainerRef.current.clientWidth * 0.9;
+  const updateWidth = () => {
+    if (videoContainerRef.current) {
+      const newEffectsWidth = videoContainerRef.current.clientWidth * 0.9;
 
-        setEffectsWidth(newEffectsWidth);
+      setEffectsWidth(newEffectsWidth);
 
-        if (effectsContainerRef.current) {
-          setOverflowingXDirection(
-            effectsContainerRef.current.scrollWidth > newEffectsWidth
-          );
-        }
+      if (effectsContainerRef.current) {
+        setOverflowingXDirection(
+          effectsContainerRef.current.scrollWidth > newEffectsWidth
+        );
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     // Update width on mount
     updateWidth();
 
@@ -101,10 +101,13 @@ export default function VisualEffectsSection({
 
     // Cleanup event listener on unmount
     return () => window.removeEventListener("resize", updateWidth);
-  }, [videoContainerRef]);
+  }, [videoContainerRef.current]);
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
+      event.stopPropagation();
+      event.preventDefault();
+
       if (effectsContainerRef.current) {
         effectsContainerRef.current.scrollLeft += event.deltaY;
       }
@@ -177,14 +180,6 @@ export default function VisualEffectsSection({
       animate='animate'
       exit='init'
       transition={EffectSectionTransition}
-      onScroll={(event) => {
-        event.stopPropagation();
-        event.preventDefault();
-      }}
-      onWheel={(event) => {
-        event.stopPropagation();
-        event.preventDefault();
-      }}
     >
       <Suspense fallback={<div>Loading...</div>}>
         <BabylonPostProcessEffectsButton

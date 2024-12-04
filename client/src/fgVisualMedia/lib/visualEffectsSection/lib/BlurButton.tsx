@@ -18,6 +18,7 @@ export default function BlurButton({
   handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
+  scrollingContainerRef,
 }: {
   username: string;
   instance: string;
@@ -30,6 +31,7 @@ export default function BlurButton({
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
@@ -66,6 +68,7 @@ export default function BlurButton({
           Blur
         </div>
       }
+      scrollingContainerRef={scrollingContainerRef}
       className='flex items-center justify-center min-w-10 w-10 aspect-square'
       options={{
         hoverTimeoutDuration: 750,

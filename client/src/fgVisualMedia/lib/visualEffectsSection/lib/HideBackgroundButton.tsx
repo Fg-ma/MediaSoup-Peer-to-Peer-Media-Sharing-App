@@ -106,6 +106,7 @@ export default function HideBackgroundButton({
   handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
+  scrollingContainerRef,
 }: {
   username: string;
   instance: string;
@@ -121,6 +122,7 @@ export default function HideBackgroundButton({
   ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia, userStreamEffects, remoteStreamEffects } =
     useStreamsContext();
@@ -395,6 +397,7 @@ export default function HideBackgroundButton({
         }
         closeHoldToggle={closeHoldToggle}
         setCloseHoldToggle={setCloseHoldToggle}
+        scrollingContainerRef={scrollingContainerRef}
         className='flex items-center justify-center min-w-10 w-10 aspect-square'
         options={{
           defaultDataValue: effectsStyles?.style,
@@ -412,6 +415,7 @@ export default function HideBackgroundButton({
               Color picker
             </div>
           }
+          scrollingContainerRef={scrollingContainerRef}
           className='w-6 h-6 m-2 border border-white rounded'
           style={{ backgroundColor: tempColor }}
           options={{

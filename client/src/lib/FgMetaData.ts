@@ -2,11 +2,6 @@ import { Socket } from "socket.io-client";
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../context/streamsContext/typeConstant";
 
 class FgMetaData {
   constructor(
