@@ -74,7 +74,11 @@ class CameraSectionController {
           };
           this.socket.current.emit("message", msg);
 
-          if (!this.isScreen.current && !this.isAudio.current) {
+          if (
+            Object.keys(this.userMedia.current.camera).length === 1 &&
+            !this.isScreen.current &&
+            !this.isAudio.current
+          ) {
             // Remove positionRotationScale producer
             const message = {
               type: "removeProducer",
@@ -86,6 +90,9 @@ class CameraSectionController {
             };
             this.socket.current.emit("message", message);
           }
+
+          // return after the first stream is removed
+          return;
         }
       }
     }

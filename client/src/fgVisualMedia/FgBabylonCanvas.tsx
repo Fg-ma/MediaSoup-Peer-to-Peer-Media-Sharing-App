@@ -404,7 +404,9 @@ export default function FgBabylonCanvas({
         }
       );
     }
-  }, [remoteDataStreams.current]);
+  }, [
+    remoteDataStreams.current?.[username]?.[instance]?.positionScaleRotation,
+  ]);
 
   useEffect(() => {
     if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {

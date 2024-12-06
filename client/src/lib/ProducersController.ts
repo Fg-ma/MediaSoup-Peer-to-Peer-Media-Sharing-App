@@ -20,6 +20,7 @@ import UserDevice from "./UserDevice";
 import BrowserMedia from "./BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import { UserDataStreams } from "src/context/streamsContext/StreamsContext";
+import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 
 class ProducersController {
   constructor(
@@ -40,6 +41,11 @@ class ProducersController {
       audio: AudioMedia | undefined;
     }>,
     private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private remoteCurrentEffectsStyles: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: EffectStylesType;
+      };
+    }>,
     private userStreamEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -49,16 +55,39 @@ class ProducersController {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
+    private remoteStreamEffects: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: {
+          camera: {
+            [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+          };
+          screen: {
+            [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+          };
+          audio: { [effectType in AudioEffectTypes]: boolean };
+        };
+      };
+    }>,
     private remoteTracksMap: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
           camera?: { [cameraId: string]: MediaStreamTrack };
           screen?: { [screenId: string]: MediaStreamTrack };
           audio?: MediaStreamTrack | undefined;
+          json?: {
+            [dataStreamType in DataStreamTypes]?: MediaStreamTrack;
+          };
         };
       };
     }>,
     private userDataStreams: React.MutableRefObject<UserDataStreams>,
+    private remoteDataStreams: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: {
+          [dataStreamType in DataStreamTypes]?: DataConsumer;
+        };
+      };
+    }>,
 
     private userCameraCount: React.MutableRefObject<number>,
     private userScreenCount: React.MutableRefObject<number>,
@@ -589,8 +618,9 @@ class ProducersController {
     type: string;
     producerUsername: string;
     producerInstance: string;
-    producerType: "camera" | "screen" | "audio";
-    producerId: string;
+    producerType: "camera" | "screen" | "audio" | "json";
+    producerId?: string;
+    dataStreamType?: DataStreamTypes;
   }) => {
     if (
       event.producerUsername === this.username.current &&
@@ -598,7 +628,10 @@ class ProducersController {
     ) {
       // Call deconstructors then delete userMedia
       if (event.producerType === "camera" || event.producerType === "screen") {
-        if (this.userMedia.current[event.producerType][event.producerId]) {
+        if (
+          event.producerId &&
+          this.userMedia.current[event.producerType][event.producerId]
+        ) {
           this.userMedia.current[event.producerType][
             event.producerId
           ].deconstructor();
@@ -609,46 +642,61 @@ class ProducersController {
           this.userMedia.current[event.producerType]?.deconstructor();
           this.userMedia.current[event.producerType] = undefined;
         }
-      }
-
-      // Delete old stream effects
-      const streamEffects = this.userStreamEffects.current[event.producerType];
-
-      if (streamEffects) {
-        if (event.producerType === "audio") {
-          this.userStreamEffects.current.audio = structuredClone(
-            defaultAudioStreamEffects
-          );
-        } else if (
-          event.producerType === "camera" ||
-          event.producerType === "screen"
+      } else if (event.producerType === "json") {
+        if (
+          event.dataStreamType &&
+          this.userDataStreams.current[event.dataStreamType]
         ) {
-          if (event.producerId && event.producerId in streamEffects) {
-            delete this.userStreamEffects.current[event.producerType][
-              event.producerId as keyof typeof streamEffects
-            ];
-          }
+          this.userDataStreams.current[event.dataStreamType]?.close();
+          delete this.userDataStreams.current[event.dataStreamType];
         }
       }
 
-      // Delete old effects styles
-      if (this.currentEffectsStyles.current[event.producerType]) {
-        if (event.producerType === "audio") {
-          this.currentEffectsStyles.current.audio = structuredClone(
-            defaultAudioCurrentEffectsStyles
-          );
-        } else if (
-          event.producerType === "camera" ||
-          event.producerType === "screen"
-        ) {
-          if (
-            event.producerId &&
-            event.producerId in
-              this.currentEffectsStyles.current[event.producerType]
+      if (
+        event.producerType === "camera" ||
+        event.producerType === "screen" ||
+        event.producerType === "audio"
+      ) {
+        // Delete old stream effects
+        const streamEffects =
+          this.userStreamEffects.current?.[event.producerType];
+
+        if (streamEffects) {
+          if (event.producerType === "audio") {
+            this.userStreamEffects.current.audio = structuredClone(
+              defaultAudioStreamEffects
+            );
+          } else if (
+            event.producerType === "camera" ||
+            event.producerType === "screen"
           ) {
-            delete this.currentEffectsStyles.current[event.producerType][
-              event.producerId
-            ];
+            if (event.producerId && event.producerId in streamEffects) {
+              delete this.userStreamEffects.current[event.producerType][
+                event.producerId as keyof typeof streamEffects
+              ];
+            }
+          }
+        }
+
+        // Delete old effects styles
+        if (this.currentEffectsStyles.current?.[event.producerType]) {
+          if (event.producerType === "audio") {
+            this.currentEffectsStyles.current.audio = structuredClone(
+              defaultAudioCurrentEffectsStyles
+            );
+          } else if (
+            event.producerType === "camera" ||
+            event.producerType === "screen"
+          ) {
+            if (
+              event.producerId &&
+              event.producerId in
+                this.currentEffectsStyles.current[event.producerType]
+            ) {
+              delete this.currentEffectsStyles.current[event.producerType][
+                event.producerId
+              ];
+            }
           }
         }
       }
@@ -702,6 +750,7 @@ class ProducersController {
       // Delete remote tracks
       if (event.producerType === "camera" || event.producerType === "screen") {
         if (
+          event.producerId &&
           this.remoteTracksMap.current[event.producerUsername] &&
           this.remoteTracksMap.current[event.producerUsername][
             event.producerInstance
@@ -784,6 +833,136 @@ class ProducersController {
               ).length === 0
             ) {
               delete this.remoteTracksMap.current[event.producerUsername];
+            }
+          }
+        }
+      } else if (event.producerType === "json") {
+        if (
+          event.dataStreamType &&
+          this.remoteTracksMap.current[event.producerUsername] &&
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ] &&
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ][event.producerType] &&
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ]?.[event.producerType]?.[event.dataStreamType]
+        ) {
+          delete this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ][event.producerType]?.[event.dataStreamType];
+
+          if (
+            Object.keys(
+              this.remoteTracksMap.current[event.producerUsername][
+                event.producerInstance
+              ][event.producerType] || { break: true }
+            ).length === 0
+          ) {
+            delete this.remoteTracksMap.current[event.producerUsername][
+              event.producerInstance
+            ][event.producerType];
+
+            if (
+              Object.keys(
+                this.remoteTracksMap.current[event.producerUsername][
+                  event.producerInstance
+                ] || { break: true }
+              ).length === 0
+            ) {
+              delete this.remoteTracksMap.current[event.producerUsername][
+                event.producerInstance
+              ];
+
+              if (
+                Object.keys(
+                  this.remoteTracksMap.current[event.producerUsername] || {
+                    break: true,
+                  }
+                ).length === 0
+              ) {
+                delete this.remoteTracksMap.current[event.producerUsername];
+              }
+            }
+          }
+        }
+
+        if (
+          event.dataStreamType &&
+          this.remoteDataStreams.current?.[event.producerUsername]?.[
+            event.producerInstance
+          ]?.[event.dataStreamType]
+        ) {
+          this.remoteDataStreams.current?.[event.producerUsername]?.[
+            event.producerInstance
+          ]?.[event.dataStreamType]?.close();
+          delete this.remoteDataStreams.current?.[event.producerUsername]?.[
+            event.producerInstance
+          ]?.[event.dataStreamType];
+        }
+      }
+
+      if (
+        event.producerType === "camera" ||
+        event.producerType === "screen" ||
+        event.producerType === "audio"
+      ) {
+        // Delete old stream effects
+        const streamEffects =
+          event.producerId &&
+          (event.producerType === "camera" || event.producerType === "screen")
+            ? this.remoteStreamEffects.current?.[event.producerUsername]?.[
+                event.producerInstance
+              ]?.[event.producerType]?.[event.producerId]
+            : this.remoteStreamEffects.current?.[event.producerUsername]?.[
+                event.producerInstance
+              ]?.[event.producerType];
+
+        if (streamEffects) {
+          if (event.producerType === "audio") {
+            this.remoteStreamEffects.current[event.producerUsername][
+              event.producerInstance
+            ][event.producerType] = structuredClone(defaultAudioStreamEffects);
+          } else if (
+            event.producerType === "camera" ||
+            event.producerType === "screen"
+          ) {
+            if (event.producerId && event.producerId in streamEffects) {
+              delete this.remoteStreamEffects.current[event.producerUsername][
+                event.producerInstance
+              ][event.producerType][event.producerId];
+            }
+          }
+        }
+
+        // Delete old effects styles
+        if (
+          this.remoteCurrentEffectsStyles.current?.[event.producerUsername]?.[
+            event.producerInstance
+          ]?.[event.producerType]
+        ) {
+          if (event.producerType === "audio") {
+            this.remoteCurrentEffectsStyles.current[event.producerUsername][
+              event.producerInstance
+            ][event.producerType] = structuredClone(
+              defaultAudioCurrentEffectsStyles
+            );
+          } else if (
+            event.producerType === "camera" ||
+            event.producerType === "screen"
+          ) {
+            if (
+              event.producerId &&
+              event.producerId in
+                this.remoteCurrentEffectsStyles.current[event.producerUsername][
+                  event.producerInstance
+                ][event.producerType]
+            ) {
+              delete this.remoteCurrentEffectsStyles.current[
+                event.producerUsername
+              ][event.producerInstance][event.producerType][event.producerId];
             }
           }
         }

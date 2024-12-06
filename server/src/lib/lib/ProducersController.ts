@@ -347,6 +347,7 @@ class ProducersController {
         producerInstance: event.instance,
         producerType: event.producerType,
         producerId: event.producerId,
+        dataStreamType: event.dataStreamType,
       };
 
       this.io.to(`table_${event.table_id}`).emit("message", msg);

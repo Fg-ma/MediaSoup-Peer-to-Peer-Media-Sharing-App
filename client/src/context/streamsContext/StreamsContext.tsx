@@ -70,7 +70,7 @@ export interface StreamsContextType {
         audio?: MediaStreamTrack | undefined;
         json?:
           | {
-              [jsonId: string]: MediaStreamTrack;
+              [dataStreamType in DataStreamTypes]?: MediaStreamTrack;
             }
           | undefined;
       };

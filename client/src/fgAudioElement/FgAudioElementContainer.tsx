@@ -192,7 +192,9 @@ export default function FgAudioElementContainer({
         }
       );
     }
-  }, [remoteDataStreams.current]);
+  }, [
+    remoteDataStreams.current?.[username]?.[instance]?.positionScaleRotation,
+  ]);
 
   useEffect(() => {
     if (isUser) {

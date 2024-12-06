@@ -363,6 +363,7 @@ export default function FgVideo({
   }, []);
 
   useEffect(() => {
+    console.log(remoteDataStreams.current);
     if (
       !fgVisualMediaOptions.isUser &&
       remoteDataStreams.current[username] &&
@@ -386,7 +387,9 @@ export default function FgVideo({
         }
       );
     }
-  }, [remoteDataStreams.current]);
+  }, [
+    remoteDataStreams.current?.[username]?.[instance]?.positionScaleRotation,
+  ]);
 
   useEffect(() => {
     fgLowerVisualMediaController.updateCaptionsStyles();
