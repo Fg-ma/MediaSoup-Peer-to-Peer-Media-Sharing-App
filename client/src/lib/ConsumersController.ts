@@ -558,6 +558,7 @@ class ConsumersController {
 
     const { producerId, id, label, sctpStreamParameters, protocol } =
       event.data;
+
     const consumer = await this.consumerTransport.current?.consumeData({
       id,
       dataProducerId: producerId,
@@ -584,9 +585,10 @@ class ConsumersController {
       ] = {};
     }
 
+    const splitLabel = label.split("_");
     this.remoteDataStreams.current[event.producerUsername][
       event.producerInstance
-    ][label as DataStreamTypes] = consumer;
+    ][splitLabel[splitLabel.length - 1] as DataStreamTypes] = consumer;
 
     const message = {
       type: "newConsumerCreated",

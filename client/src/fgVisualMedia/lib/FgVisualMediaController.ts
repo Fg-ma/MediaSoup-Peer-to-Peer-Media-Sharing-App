@@ -70,19 +70,6 @@ type FgVisualMediaMessageEvents =
               rotation: number;
             };
           }
-        | {
-            positioning: {
-              position: {
-                left: number;
-                top: number;
-              };
-              scale: {
-                x: number;
-                y: number;
-              };
-              rotation: number;
-            };
-          }
         | undefined;
     };
 
@@ -320,19 +307,6 @@ class FgVisualMediaController {
             rotation: number;
           };
         }
-      | {
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
       | undefined;
   }) => {
     if (
@@ -341,7 +315,8 @@ class FgVisualMediaController {
       this.instance === event.inquiredInstance &&
       this.type === event.inquiredType &&
       this.videoId === event.inquiredVideoId &&
-      event.data
+      event.data &&
+      Object.keys(event.data.positioning).length !== 0
     ) {
       if (this.type === "camera") {
         if ("paused" in event.data) {

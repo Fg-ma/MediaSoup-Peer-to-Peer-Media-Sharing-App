@@ -160,6 +160,15 @@ export default function FgAudioElementContainer({
       socket.current.send(msg);
     }
 
+    return () => {
+      socket.current.off(
+        "message",
+        fgAudioElementContainerController.handleMessage
+      );
+    };
+  }, []);
+
+  useEffect(() => {
     if (
       !isUser &&
       remoteDataStreams.current[username] &&
@@ -183,14 +192,7 @@ export default function FgAudioElementContainer({
         }
       );
     }
-
-    return () => {
-      socket.current.off(
-        "message",
-        fgAudioElementContainerController.handleMessage
-      );
-    };
-  }, []);
+  }, [remoteDataStreams.current]);
 
   useEffect(() => {
     if (isUser) {

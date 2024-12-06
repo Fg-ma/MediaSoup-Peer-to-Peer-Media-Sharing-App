@@ -564,6 +564,7 @@ class ConsumersController {
           sctpStreamParameters: newConsumer.sctpStreamParameters,
           type: newConsumer.type,
           producerPaused: newConsumer.producerPaused,
+          protocol: newConsumer.protocol,
           dataStreamType: event.dataStreamType,
         },
       });

@@ -80,7 +80,6 @@ class ProducersController {
           .emit("message", msg);
       }
     } catch (error) {
-      console.error(error);
       this.io
         .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
         .emit("message", {

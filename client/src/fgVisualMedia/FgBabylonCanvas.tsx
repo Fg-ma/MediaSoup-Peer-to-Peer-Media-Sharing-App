@@ -312,30 +312,6 @@ export default function FgBabylonCanvas({
       socket.current.send(msg);
     }
 
-    if (
-      !fgVisualMediaOptions.isUser &&
-      remoteDataStreams.current[username] &&
-      remoteDataStreams.current[username][instance] &&
-      remoteDataStreams.current[username][instance].positionScaleRotation
-    ) {
-      remoteDataStreams.current[username][instance].positionScaleRotation.on(
-        "message",
-        (message) => {
-          const data = JSON.parse(message);
-
-          if (
-            data.table_id === table_id &&
-            data.username === username &&
-            data.instance === instance &&
-            data.videoId === videoId
-          ) {
-            positioning.current = data.positioning;
-            setRerender((prev) => !prev);
-          }
-        }
-      );
-    }
-
     // Add eventlisteners
     if (fgVisualMediaOptions.isFullScreen) {
       document.addEventListener(
@@ -403,6 +379,32 @@ export default function FgBabylonCanvas({
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (
+      !fgVisualMediaOptions.isUser &&
+      remoteDataStreams.current[username] &&
+      remoteDataStreams.current[username][instance] &&
+      remoteDataStreams.current[username][instance].positionScaleRotation
+    ) {
+      remoteDataStreams.current[username][instance].positionScaleRotation.on(
+        "message",
+        (message) => {
+          const data = JSON.parse(message);
+
+          if (
+            data.table_id === table_id &&
+            data.username === username &&
+            data.instance === instance &&
+            data.videoId === videoId
+          ) {
+            positioning.current = data.positioning;
+            setRerender((prev) => !prev);
+          }
+        }
+      );
+    }
+  }, [remoteDataStreams.current]);
 
   useEffect(() => {
     if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {
