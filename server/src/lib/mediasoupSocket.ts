@@ -1,254 +1,24 @@
 import { Server as SocketIOServer } from "socket.io";
-import { MediasoupSocket } from "./mediasoupTypes";
-import {
-  DtlsParameters,
-  RtpCapabilities,
-  MediaKind,
-  RtpParameters,
-  SctpCapabilities,
-} from "mediasoup/node/lib/types";
+import { MediasoupSocket, MediasoupSocketEvents } from "./mediasoupTypes";
 import onGetRouterRtpCapabilities from "./lib/onGetRouterRtpCapabilities";
 import onResume from "./lib/onResume";
-import Producers from "./lib/Producers";
-import Consumers from "./lib/Consumers";
-import Mute from "./lib/Mute";
-import Effects from "./lib/Effects";
+import ProducersController from "./lib/ProducersController";
+import ConsumersController from "./lib/ConsumersController";
+import MuteController from "./lib/MuteController";
+import EffectsController from "./lib/EffectsController";
 import Tables from "./lib/Tables";
-import StatesPermissions from "./lib/StatesPermissions";
-import FgMetaData from "./lib/FgMetaData";
-import { ProducerTypes } from "./lib/typeConstant";
-import { SctpParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
-import { DataStreamTypes } from "./mediasoupVars";
-
-type MediasoupSocketEvents =
-  | {
-      type: "getRouterRtpCapabilities";
-      table_id: string;
-      username: string;
-      instance: string;
-    }
-  | {
-      type: "createProducerTransport";
-      forceTcp: boolean;
-      rtpCapabilities: RtpCapabilities;
-      producerType: ProducerTypes;
-      table_id: string;
-      username: string;
-      instance: number;
-    }
-  | {
-      type: "connectProducerTransport";
-      dtlsParameters: DtlsParameters;
-      table_id: string;
-      username: string;
-      instance: string;
-    }
-  | {
-      type: "createNewProducer";
-      producerType: "camera" | "screen" | "audio";
-      transportId: string;
-      kind: MediaKind;
-      rtpParameters: RtpParameters;
-      table_id: string;
-      username: string;
-      instance: string;
-      producerId?: string;
-    }
-  | {
-      type: "createNewJSONProducer";
-      producerType: "json";
-      transportId: string;
-      label: string;
-      protocol: "json";
-      table_id: string;
-      username: string;
-      instance: string;
-      producerId: string;
-      sctpStreamParameters: SctpParameters;
-      dataStreamType: DataStreamTypes;
-    }
-  | {
-      type: "createConsumerTransport";
-      forceTcp: boolean;
-      table_id: string;
-      username: string;
-      instance: string;
-    }
-  | {
-      type: "connectConsumerTransport";
-      transportId: string;
-      dtlsParameters: DtlsParameters;
-      table_id: string;
-      username: string;
-      instance: string;
-    }
-  | { type: "resume"; table_id: string; username: string; instance: string }
-  | {
-      type: "consume";
-      rtpCapabilities: RtpCapabilities;
-      table_id: string;
-      username: string;
-      instance: string;
-      producerId?: string;
-    }
-  | {
-      type: "newConsumer";
-      consumerType: "camera" | "screen" | "audio";
-      rtpCapabilities: RtpCapabilities;
-      producerUsername: string;
-      producerInstance: string;
-      incomingProducerId?: string;
-      table_id: string;
-      username: string;
-      instance: string;
-    }
-  | {
-      type: "newJSONConsumer";
-      consumerType: "json";
-      sctpCapabilities: SctpCapabilities;
-      producerUsername: string;
-      producerInstance: string;
-      incomingProducerId: string;
-      table_id: string;
-      username: string;
-      instance: string;
-      dataStreamType: DataStreamTypes;
-    }
-  | {
-      type: "removeProducer";
-      table_id: string;
-      username: string;
-      instance: string;
-      producerType: ProducerTypes;
-      producerId?: string;
-      dataStreamType?: DataStreamTypes;
-    }
-  | {
-      type: "unsubscribe";
-      table_id: string;
-      username: string;
-      instance: string;
-    }
-  | {
-      type: "clientMute";
-      table_id: string;
-      username: string;
-      instance: string;
-      clientMute: boolean;
-    }
-  | {
-      type: "deleteProducerTransport";
-      table_id: string;
-      username: string;
-      instance: string;
-    }
-  | {
-      type: "newProducerCreated";
-      table_id: string;
-      username: string;
-      instance: string;
-      producerType: ProducerTypes;
-      producerId: string | undefined;
-    }
-  | {
-      type: "newConsumerCreated";
-      table_id: string;
-      username: string;
-      instance: string;
-      producerUsername: string;
-      producerInstance: string;
-      consumerId?: string;
-      consumerType: ProducerTypes;
-    }
-  | {
-      type: "requestEffectChange";
-      table_id: string;
-      requestedUsername: string;
-      requestedInstance: string;
-      requestedProducerType: ProducerTypes;
-      requestedProducerId: string | undefined;
-      effect: string;
-      blockStateChange: boolean;
-      data: {
-        style: string;
-        hideBackgroundStyle?: string;
-        hideBackgroundColor?: string;
-        postProcessStyle?: string;
-      };
-    }
-  | {
-      type: "clientEffectChange";
-      table_id: string;
-      username: string;
-      instance: string;
-      producerType: ProducerTypes;
-      producerId: string | undefined;
-      effect: string;
-      effectStyle: string;
-      blockStateChange: boolean;
-    }
-  | {
-      type: "requestStatesPermissions";
-      table_id: string;
-      inquiringUsername: string;
-      inquiringInstance: string;
-      inquiredUsername: string;
-      inquiredInstance: string;
-    }
-  | {
-      type: "statesPermissionsResponse";
-      table_id: string;
-      inquiringUsername: string;
-      inquiringInstance: string;
-      inquiredUsername: string;
-      inquiredInstance: string;
-      clientMute: boolean;
-      cameraPermission: boolean;
-      screenPermission: boolean;
-      audioPermission: boolean;
-      streamEffects: string;
-      currentEffectsStyles: string;
-    }
-  | {
-      type: "requestCatchUpData";
-      table_id: string;
-      inquiringUsername: string;
-      inquiringInstance: string;
-      inquiredUsername: string;
-      inquiredInstance: string;
-      inquiredType: ProducerTypes;
-      inquiredVideoId: string;
-    }
-  | {
-      type: "responseCatchUpData";
-      table_id: string;
-      inquiringUsername: string;
-      inquiringInstance: string;
-      inquiredUsername: string;
-      inquiredInstance: string;
-      inquiredType: ProducerTypes;
-      inquiredVideoId: string;
-      data:
-        | {
-            cameraPaused: boolean;
-            cameraTimeEllapsed: number;
-          }
-        | {
-            screenPaused: boolean;
-            screenTimeEllapsed: number;
-          }
-        | undefined;
-    };
+import StatesPermissionsController from "./lib/StatesPermissionsController";
+import MetadataController from "./lib/MetadataController";
 
 const mediasoupSocket = async (io: SocketIOServer) => {
   io.on("connection", (socket: MediasoupSocket) => {
     const tables = new Tables(socket, io);
-    const producers = new Producers(io);
-    const consumers = new Consumers(io);
-    const mute = new Mute(io);
-    const effects = new Effects(io);
-    const statesPermissions = new StatesPermissions(io);
-    const fgMetaData = new FgMetaData(io);
+    const producersController = new ProducersController(io);
+    const consumersController = new ConsumersController(io);
+    const muteController = new MuteController(io);
+    const effectsController = new EffectsController(io);
+    const statesPermissionsController = new StatesPermissionsController(io);
+    const metadataController = new MetadataController(io);
 
     socket.on(
       "joinTable",
@@ -270,70 +40,76 @@ const mediasoupSocket = async (io: SocketIOServer) => {
           onGetRouterRtpCapabilities(event, io);
           break;
         case "createProducerTransport":
-          producers.onCreateProducerTransport(event);
+          producersController.onCreateProducerTransport(event);
           break;
         case "connectProducerTransport":
-          producers.onConnectProducerTransport(event);
+          producersController.onConnectProducerTransport(event);
           break;
         case "createNewProducer":
-          producers.onCreateNewProducer(event);
+          producersController.onCreateNewProducer(event);
           break;
         case "createNewJSONProducer":
-          producers.onCreateNewJSONProducer(event);
+          producersController.onCreateNewJSONProducer(event);
           break;
         case "createConsumerTransport":
-          consumers.onCreateConsumerTransport(event);
+          consumersController.onCreateConsumerTransport(event);
           break;
         case "connectConsumerTransport":
-          consumers.onConnectConsumerTransport(event);
+          consumersController.onConnectConsumerTransport(event);
           break;
         case "resume":
           onResume(event, io);
           break;
         case "consume":
-          consumers.onConsume(event);
+          consumersController.onConsume(event);
           break;
         case "newConsumer":
-          consumers.onNewConsumer(event);
+          consumersController.onNewConsumer(event);
           break;
         case "newJSONConsumer":
-          consumers.onNewJSONConsumer(event);
+          consumersController.onNewJSONConsumer(event);
           break;
         case "removeProducer":
-          producers.onRemoveProducer(event);
+          producersController.onRemoveProducer(event);
           break;
         case "unsubscribe":
-          consumers.onUnsubscribe(event);
+          consumersController.onUnsubscribe(event);
           break;
         case "clientMute":
-          mute.onClientMute(event);
+          muteController.onClientMute(event);
           break;
         case "deleteProducerTransport":
-          producers.onDeleteProducerTransport(event);
+          producersController.onDeleteProducerTransport(event);
           break;
         case "newProducerCreated":
-          producers.onNewProducerCreated(event);
+          producersController.onNewProducerCreated(event);
           break;
         case "newConsumerCreated":
-          consumers.onNewConsumerCreated(event);
+          consumersController.onNewConsumerCreated(event);
           break;
         case "requestEffectChange":
-          effects.onRequestEffectChange(event);
+          effectsController.onRequestEffectChange(event);
           break;
         case "clientEffectChange":
-          effects.onClientEffectChange(event);
+          effectsController.onClientEffectChange(event);
           break;
-        case "requestStatesPermissions":
-          statesPermissions.onRequestStatesPermissions(event);
+        case "requestPermissions":
+          statesPermissionsController.onRequestPermissions(event);
           break;
-        case "statesPermissionsResponse":
-          statesPermissions.onStatesPermissionsResponse(event);
+        case "requestBundleMetadata":
+          metadataController.onRequestBundleMetadata(event);
+          break;
+        case "permissionsResponse":
+          statesPermissionsController.onPermissionsResponse(event);
+          break;
+        case "bundleMetadataResponse":
+          metadataController.onBundleMetadataResponse(event);
           break;
         case "requestCatchUpData":
-          fgMetaData.onRequestCatchUpData(event);
+          metadataController.onRequestCatchUpData(event);
           break;
         case "responseCatchUpData":
-          fgMetaData.onResponseCatchUpData(event);
+          metadataController.onResponseCatchUpData(event);
           break;
         default:
           break;

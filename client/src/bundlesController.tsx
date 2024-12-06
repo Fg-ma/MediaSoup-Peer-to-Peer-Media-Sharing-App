@@ -145,7 +145,7 @@ class BundlesController {
           initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
           onRendered={() => {
             const msg = {
-              type: "requestStatesPermissions",
+              type: "requestPermissions",
               table_id: this.table_id.current,
               inquiringUsername: this.username.current,
               inquiringInstance: this.instance.current,
@@ -154,6 +154,17 @@ class BundlesController {
             };
 
             this.socket.current.emit("message", msg);
+
+            const message = {
+              type: "requestBundleMetadata",
+              table_id: this.table_id.current,
+              inquiringUsername: this.username.current,
+              inquiringInstance: this.instance.current,
+              inquiredUsername: trackUsername,
+              inquiredInstance: trackInstance,
+            };
+
+            this.socket.current.emit("message", message);
           }}
           onNewConsumerWasCreatedCallback={() => {
             const msg = {

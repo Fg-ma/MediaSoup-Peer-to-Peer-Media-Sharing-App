@@ -1,25 +1,13 @@
 import { Server as SocketIOServer } from "socket.io";
-import { ProducerTypes } from "./typeConstant";
+import {
+  onClientEffectChangeType,
+  onRequestEffectChangeType,
+} from "../mediasoupTypes";
 
-class Effects {
+class EffectsController {
   constructor(private io: SocketIOServer) {}
 
-  onRequestEffectChange(event: {
-    type: "requestEffectChange";
-    table_id: string;
-    requestedUsername: string;
-    requestedInstance: string;
-    requestedProducerType: ProducerTypes;
-    requestedProducerId: string | undefined;
-    effect: string;
-    blockStateChange: boolean;
-    data: {
-      style: string;
-      hideBackgroundStyle?: string;
-      hideBackgroundColor?: string;
-      postProcessStyle?: string;
-    };
-  }) {
+  onRequestEffectChange(event: onRequestEffectChangeType) {
     const msg = {
       type: "effectChangeRequested",
       requestedProducerType: event.requestedProducerType,
@@ -36,17 +24,7 @@ class Effects {
       .emit("message", msg);
   }
 
-  onClientEffectChange(event: {
-    type: "clientEffectChange";
-    table_id: string;
-    username: string;
-    instance: string;
-    producerType: ProducerTypes;
-    producerId: string | undefined;
-    effect: string;
-    effectStyle: string;
-    blockStateChange: boolean;
-  }) {
+  onClientEffectChange(event: onClientEffectChangeType) {
     const msg = {
       type: "clientEffectChanged",
       username: event.username,
@@ -62,4 +40,4 @@ class Effects {
   }
 }
 
-export default Effects;
+export default EffectsController;

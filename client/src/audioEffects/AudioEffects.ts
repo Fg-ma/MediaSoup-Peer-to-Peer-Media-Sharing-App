@@ -382,6 +382,7 @@ class AudioEffects {
   };
 
   constructor(
+    private audioContext: Tone.BaseContext,
     private audioStream: Tone.UserMedia,
     private masterMediaStreamDestination: MediaStreamAudioDestinationNode,
     private micMediaStreamDestination: MediaStreamAudioDestinationNode,
@@ -402,7 +403,6 @@ class AudioEffects {
 
     this.assetSoundEffectsChain = new Tone.Gain(); // Create a Gain node for the asset sound effects chain
 
-    // Connect micChain and samplerChain to the masterChain
     this.micChain.connect(this.masterChain);
     this.samplerChain.connect(this.masterChain);
     this.soundEffectsChain.connect(this.masterChain);
@@ -442,15 +442,10 @@ class AudioEffects {
     );
   }
 
-  // Method to mute/unmute the mic chain
-  setMicChainMute(isMuted: boolean) {
-    this.micChain.gain.value = isMuted ? 0 : 1;
-  }
-
   // Method to mute/unmute the sampler chain
-  setSamplerChainMute(isMuted: boolean) {
+  setSamplerChainMute = (isMuted: boolean) => {
     this.samplerChain.gain.value = isMuted ? 0 : 1;
-  }
+  };
 
   updateEffects = (
     effects: {
@@ -547,7 +542,7 @@ class AudioEffects {
     });
   };
 
-  private removeEffect(effect: ToneEffectsType | undefined) {
+  private removeEffect = (effect: ToneEffectsType | undefined) => {
     if (!effect) return;
 
     const effectIndex = this.micEffects.indexOf(effect);
@@ -583,9 +578,9 @@ class AudioEffects {
       this.micEffects.splice(effectIndex, 1);
       effect.dispose();
     }
-  }
+  };
 
-  private addEffect(effect: ToneEffectsType) {
+  private addEffect = (effect: ToneEffectsType) => {
     if (this.micEffects.length > 0) {
       this.micEffects[this.micEffects.length - 1].disconnect();
       this.micEffects[this.micEffects.length - 1].connect(effect);
@@ -599,7 +594,7 @@ class AudioEffects {
 
     effect.connect(this.micMediaStreamDestination);
     effect.connect(this.masterChain);
-  }
+  };
 
   /* 
     frequency: (0 - 10) Hz

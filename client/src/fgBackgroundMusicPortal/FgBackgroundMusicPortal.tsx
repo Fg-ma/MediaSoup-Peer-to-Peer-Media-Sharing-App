@@ -145,6 +145,7 @@ export default function FgBackgroundMusicPortal({
   >({});
   const [cols, setCols] = useState(3);
   const backgroundMusicContainerRef = useRef<HTMLDivElement>(null);
+  const backgroundMusicScrollingContainerRef = useRef<HTMLDivElement>(null);
   const fileSelectorRef = useRef<HTMLInputElement>(null);
 
   const gridColumnsChange = () => {
@@ -329,6 +330,7 @@ export default function FgBackgroundMusicPortal({
             multiple
           />
           <div
+            ref={backgroundMusicScrollingContainerRef}
             className={`small-vertical-scroll-bar overflow-y-auto py-2 w-full h-full grid gap-1 items-center justify-center justify-items-center place-items-center ${
               cols === 3
                 ? "grid-cols-3"
@@ -360,6 +362,7 @@ export default function FgBackgroundMusicPortal({
                   Import background music
                 </div>
               }
+              scrollingContainerRef={backgroundMusicScrollingContainerRef}
             />
             {Object.entries(importedFiles).map(
               ([key, file]) =>
@@ -383,7 +386,7 @@ export default function FgBackgroundMusicPortal({
                         {file.file.name}
                       </div>
                     }
-                    scrollingContainerRef={backgroundMusicContainerRef}
+                    scrollingContainerRef={backgroundMusicScrollingContainerRef}
                     options={{
                       hoverZValue: 999999999999999,
                       hoverTimeoutDuration: 750,
@@ -435,7 +438,7 @@ export default function FgBackgroundMusicPortal({
                     {backgroundMusicLabels[key as BackgroundMusicTypes]}
                   </div>
                 }
-                scrollingContainerRef={backgroundMusicContainerRef}
+                scrollingContainerRef={backgroundMusicScrollingContainerRef}
                 options={{
                   hoverZValue: 999999999999999,
                   hoverTimeoutDuration: 750,

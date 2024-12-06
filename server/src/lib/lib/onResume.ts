@@ -1,15 +1,8 @@
 import { Server as SocketIOServer } from "socket.io";
 import { tableConsumers } from "../mediasoupVars";
+import { onResumeType } from "../mediasoupTypes";
 
-const onResume = async (
-  event: {
-    type: string;
-    table_id: string;
-    username: string;
-    instance: string;
-  },
-  io: SocketIOServer
-) => {
+const onResume = async (event: onResumeType, io: SocketIOServer) => {
   for (const producerUsername in tableConsumers[event.table_id][event.username][
     event.instance
   ]) {
@@ -62,6 +55,7 @@ const onResume = async (
               producerUsername
             ][producerInstance].json;
           for (const jsonId in jsonConsumers) {
+            // @ts-expect-error: ts doesn't recoginizes keys in loop
             await jsonConsumers[jsonId].consumer?.resume();
           }
         }

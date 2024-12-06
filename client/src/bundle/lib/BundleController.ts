@@ -164,8 +164,11 @@ class BundleController {
       case "clientMuteChange":
         this.bundleSocket.onClientMuteChange(event);
         break;
-      case "statesPermissionsResponsed":
-        this.bundleSocket.onStatesPermissionsResponsed(event);
+      case "permissionsResponsed":
+        this.bundleSocket.onPermissionsResponsed(event);
+        break;
+      case "bundleMetadataResponsed":
+        this.bundleSocket.onBundleMetadataResponsed(event);
         break;
       case "effectChangeRequested":
         this.bundleSocket.onEffectChangeRequested(event);

@@ -40,25 +40,34 @@ export type BundleControllerMessageType =
       clientMute: boolean;
     }
   | {
-      type: "statesPermissionsResponsed";
+      type: "permissionsResponsed";
       inquiredUsername: string;
       inquiredInstance: string;
-      clientMute: boolean;
-      permissions: Permissions;
-      streamEffects: {
-        camera: {
-          [cameraId: string]: {
-            [effectType in CameraEffectTypes]: boolean;
-          };
-        };
-        screen: {
-          [screenId: string]: {
-            [effectType in ScreenEffectTypes]: boolean;
-          };
-        };
-        audio: { [effectType in AudioEffectTypes]: boolean };
+      data: {
+        permissions: Permissions;
       };
-      currentEffectsStyles: EffectStylesType;
+    }
+  | {
+      type: "bundleMetadataResponsed";
+      inquiredUsername: string;
+      inquiredInstance: string;
+      data: {
+        clientMute: boolean;
+        streamEffects: {
+          camera: {
+            [cameraId: string]: {
+              [effectType in CameraEffectTypes]: boolean;
+            };
+          };
+          screen: {
+            [screenId: string]: {
+              [effectType in ScreenEffectTypes]: boolean;
+            };
+          };
+          audio: { [effectType in AudioEffectTypes]: boolean };
+        };
+        currentEffectsStyles: EffectStylesType;
+      };
     }
   | {
       type: "effectChangeRequested";

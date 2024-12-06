@@ -1,15 +1,10 @@
 import { Server as SocketIOServer } from "socket.io";
+import { onClientMuteType } from "../mediasoupTypes";
 
-class Mute {
+class MuteController {
   constructor(private io: SocketIOServer) {}
 
-  onClientMute(event: {
-    type: string;
-    table_id: string;
-    username: string;
-    instance: string;
-    clientMute: boolean;
-  }) {
+  onClientMute = (event: onClientMuteType) => {
     const msg = {
       type: "clientMuteChange",
       username: event.username,
@@ -17,7 +12,7 @@ class Mute {
       clientMute: event.clientMute,
     };
     this.io.to(`table_${event.table_id}`).emit("message", msg);
-  }
+  };
 }
 
-export default Mute;
+export default MuteController;

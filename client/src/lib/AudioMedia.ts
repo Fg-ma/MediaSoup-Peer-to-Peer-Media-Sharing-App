@@ -65,6 +65,7 @@ class AudioMedia {
     this.audioStream.connect(this.micMediaStreamDestination);
 
     this.audioEffects = new AudioEffects(
+      this.audioContext,
       this.audioStream,
       this.masterMediaStreamDestination,
       this.micMediaStreamDestination,
@@ -118,19 +119,29 @@ class AudioMedia {
 
   openMic = async () => {
     await this.audioStream.open();
-
-    // Fix this it is janky way of getting mic started
-    this.audioEffects.updateEffects([
-      {
-        type: "reverb",
-        updates: [{ option: "decay", value: 1 }],
-      },
-    ]);
-    this.audioEffects.removeEffects(["reverb"]);
   };
 
   deconstructor = () => {
+    // Disconnect all destinations
+    this.masterMediaStreamDestination.disconnect();
+    this.micMediaStreamDestination.disconnect();
+    this.samplerMediaStreamDestination.disconnect();
+    this.soundEffectsMediaStreamDestination.disconnect();
+    this.backgroundMusicMediaStreamDestination.disconnect();
+    this.assetSoundEffectsMediaStreamDestination.disconnect();
+
+    // Close audioStream
     this.audioStream.close();
+
+    this.audioContext.dispose();
+
+    // Stop audio tracks from MediaStreams
+    const mediaStreams = [this.mediaStream, this.masterMediaStream];
+    mediaStreams.forEach((stream) => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop()); // Stop all tracks
+      }
+    });
   };
 
   changeEffects = (
@@ -1456,7 +1467,8 @@ class AudioMedia {
   };
 
   muteMic = (isMuted: boolean) => {
-    this.audioEffects.setMicChainMute(isMuted);
+    this.masterMediaStreamDestination.stream.getAudioTracks()[0].enabled =
+      !isMuted;
   };
 
   // Set volume (in decibels)

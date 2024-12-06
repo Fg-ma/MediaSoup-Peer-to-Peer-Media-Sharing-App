@@ -1,10 +1,6 @@
 import { Server as SocketIOServer } from "socket.io";
-import {
-  DataConsumer,
-  DtlsParameters,
-  SctpCapabilities,
-} from "mediasoup/node/lib/types";
-import { RtpCapabilities, Consumer } from "mediasoup/node/lib/types";
+import { DataConsumer } from "mediasoup/node/lib/types";
+import { Consumer } from "mediasoup/node/lib/types";
 import {
   DataStreamTypes,
   tableConsumerTransports,
@@ -16,24 +12,26 @@ import createWebRtcTransport from "../createWebRtcTransport";
 import createConsumer from "../createConsumer";
 import { getNextWorker, getWorkerByIdx } from "../workerManager";
 import MediasoupCleanup from "./MediasoupCleanup";
-import { ProducerTypes } from "./typeConstant";
 import { SctpStreamParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
 import { RtpParameters } from "mediasoup/node/lib/fbs/rtp-parameters";
+import {
+  onConnectConsumerTransportType,
+  onConsumeType,
+  onCreateConsumerTransportType,
+  onNewConsumerCreatedType,
+  onNewConsumerType,
+  onNewJSONConsumerType,
+  onUnsubscribeType,
+} from "../mediasoupTypes";
 
-class Consumers {
+class ConsumersController {
   private mediasoupCleanup: MediasoupCleanup;
 
   constructor(private io: SocketIOServer) {
     this.mediasoupCleanup = new MediasoupCleanup();
   }
 
-  async onCreateConsumerTransport(event: {
-    type: string;
-    forceTcp: boolean;
-    table_id: string;
-    username: string;
-    instance: string;
-  }) {
+  async onCreateConsumerTransport(event: onCreateConsumerTransportType) {
     try {
       // Get the next available worker and router if one doesn't already exist
       let mediasoupRouter;
@@ -76,14 +74,7 @@ class Consumers {
     }
   }
 
-  async onConnectConsumerTransport(event: {
-    type: string;
-    transportId: string;
-    dtlsParameters: DtlsParameters;
-    table_id: string;
-    username: string;
-    instance: string;
-  }) {
+  async onConnectConsumerTransport(event: onConnectConsumerTransportType) {
     if (
       !tableConsumerTransports[event.table_id] ||
       !tableConsumerTransports[event.table_id][event.username] ||
@@ -114,14 +105,7 @@ class Consumers {
       });
   }
 
-  async onConsume(event: {
-    type: string;
-    rtpCapabilities: RtpCapabilities;
-    table_id: string;
-    username: string;
-    instance: string;
-    producerId?: string;
-  }) {
+  async onConsume(event: onConsumeType) {
     // Get the next available worker and router
     const { router: mediasoupRouter } = getWorkerByIdx(
       workersMap[event.table_id]
@@ -348,17 +332,7 @@ class Consumers {
       });
   }
 
-  async onNewConsumer(event: {
-    type: "newConsumer";
-    consumerType: "camera" | "screen" | "audio";
-    rtpCapabilities: RtpCapabilities;
-    producerUsername: string;
-    producerInstance: string;
-    incomingProducerId?: string;
-    table_id: string;
-    username: string;
-    instance: string;
-  }) {
+  async onNewConsumer(event: onNewConsumerType) {
     let newConsumer: {
       consumer: Consumer;
       producerId: string;
@@ -483,18 +457,7 @@ class Consumers {
       });
   }
 
-  async onNewJSONConsumer(event: {
-    type: "newJSONConsumer";
-    consumerType: "json";
-    sctpCapabilities: SctpCapabilities;
-    producerUsername: string;
-    producerInstance: string;
-    incomingProducerId: string;
-    table_id: string;
-    username: string;
-    instance: string;
-    dataStreamType: DataStreamTypes;
-  }) {
+  async onNewJSONConsumer(event: onNewJSONConsumerType) {
     let newConsumer: {
       consumer: DataConsumer;
       producerId: string;
@@ -606,16 +569,7 @@ class Consumers {
       });
   }
 
-  onNewConsumerCreated(event: {
-    type: string;
-    table_id: string;
-    username: string;
-    instance: string;
-    producerUsername: string;
-    producerInstance: string;
-    consumerId?: string;
-    consumerType: ProducerTypes;
-  }) {
+  onNewConsumerCreated(event: onNewConsumerCreatedType) {
     const msg = {
       type: "newConsumerWasCreated",
       producerUsername: event.producerUsername,
@@ -628,12 +582,7 @@ class Consumers {
       .emit("message", msg);
   }
 
-  onUnsubscribe(event: {
-    type: string;
-    table_id: string;
-    username: string;
-    instance: string;
-  }) {
+  onUnsubscribe(event: onUnsubscribeType) {
     this.mediasoupCleanup.deleteConsumerTransport(
       event.table_id,
       event.username,
@@ -665,4 +614,4 @@ class Consumers {
   }
 }
 
-export default Consumers;
+export default ConsumersController;

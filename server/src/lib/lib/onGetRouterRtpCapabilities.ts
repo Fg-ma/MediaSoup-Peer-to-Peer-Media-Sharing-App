@@ -2,9 +2,10 @@ import { Router } from "mediasoup/node/lib/Router";
 import { Server as SocketIOServer } from "socket.io";
 import { workersMap } from "../mediasoupVars";
 import { getNextWorker, getWorkerByIdx } from "../workerManager";
+import { onGetRouterRtpCapabilitiesType } from "../mediasoupTypes";
 
 const onGetRouterRtpCapabilities = (
-  event: { type: string; table_id: string; username: string; instance: string },
+  event: onGetRouterRtpCapabilitiesType,
   io: SocketIOServer
 ) => {
   // Get the next available worker and router if one doesn't already exist

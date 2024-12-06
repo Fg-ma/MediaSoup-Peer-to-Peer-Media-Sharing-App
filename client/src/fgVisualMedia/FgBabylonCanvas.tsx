@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
@@ -11,9 +11,6 @@ import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpper
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import FgVisualMediaController from "./lib/FgVisualMediaController";
 import { HideBackgroundEffectTypes } from "../context/currentEffectsStylesContext/typeConstant";
-import PanButton from "../fgAdjustmentComponents/PanButton";
-import RotateButton from "../fgAdjustmentComponents/RotateButton";
-import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import {
@@ -22,6 +19,16 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import "./lib/fgVideoStyles.css";
+
+const PanButton = React.lazy(
+  () => import("../fgAdjustmentComponents/PanButton")
+);
+const RotateButton = React.lazy(
+  () => import("../fgAdjustmentComponents/RotateButton")
+);
+const ScaleButton = React.lazy(
+  () => import("../fgAdjustmentComponents/ScaleButton")
+);
 
 export default function FgBabylonCanvas({
   socket,
@@ -247,6 +254,7 @@ export default function FgBabylonCanvas({
     videoId,
     fgLowerVisualMediaController,
     undefined,
+    positioning,
     setPausedState,
     paused,
     userMedia,
@@ -288,6 +296,21 @@ export default function FgBabylonCanvas({
       fgLowerVisualMediaController.timeUpdate,
       1000
     );
+
+    // Request initial data
+    if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
+      const msg = {
+        type: "requestCatchUpData",
+        table_id: table_id,
+        inquiringUsername: activeUsername,
+        inquiringInstance: activeInstance,
+        inquiredUsername: username,
+        inquiredInstance: instance,
+        inquiredType: type,
+        inquiredVideoId: videoId,
+      };
+      socket.current.send(msg);
+    }
 
     if (
       !fgVisualMediaOptions.isUser &&
@@ -344,21 +367,6 @@ export default function FgBabylonCanvas({
       videoRef.current?.addEventListener("leavepictureinpicture", () =>
         fgLowerVisualMediaController.handlePictureInPicture("leave")
       );
-    }
-
-    // Request initial data
-    if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
-      const msg = {
-        type: "requestCatchUpData",
-        table_id: table_id,
-        inquiringUsername: activeUsername,
-        inquiringInstance: activeInstance,
-        inquiredUsername: username,
-        inquiredInstance: instance,
-        inquiredType: type,
-        inquiredVideoId: videoId,
-      };
-      socket.current.send(msg);
     }
 
     return () => {
@@ -447,124 +455,131 @@ export default function FgBabylonCanvas({
       }}
       onMouseEnter={() => fgVisualMediaController.handleMouseEnter()}
       onMouseLeave={() => fgVisualMediaController.handleMouseLeave()}
+      data-positioning={JSON.stringify(positioning.current)}
     >
-      <RotateButton
-        className={
-          "rotate-btn absolute left-full bottom-full w-6 aspect-square z-10"
-        }
-        dragFunction={(_displacement, event) => {
-          if (!bundleRef.current) {
-            return;
-          }
-
-          const box = bundleRef.current.getBoundingClientRect();
-
-          fgContentAdjustmentController.rotateDragFunction(event, {
-            x:
-              (positioning.current.position.left / 100) *
-                bundleRef.current.clientWidth +
-              box.left,
-            y:
-              (positioning.current.position.top / 100) *
-                bundleRef.current.clientHeight +
-              box.top,
-          });
-        }}
-        bundleRef={bundleRef}
-        mouseDownFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction
-        }
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
-        }
-      />
-      <PanButton
-        className={
-          "pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1"
-        }
-        dragFunction={(displacement) => {
-          if (!bundleRef.current) {
-            return;
-          }
-
-          const angle =
-            2 * Math.PI - positioning.current.rotation * (Math.PI / 180);
-
-          const pixelScale = {
-            x:
-              (positioning.current.scale.x / 100) *
-              bundleRef.current.clientWidth,
-            y:
-              (positioning.current.scale.y / 100) *
-              bundleRef.current.clientHeight,
-          };
-
-          fgContentAdjustmentController.movementDragFunction(
-            displacement,
-            {
-              x:
-                -15 * Math.cos(angle) -
-                pixelScale.x * Math.cos(angle) -
-                (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
-              y:
-                15 * Math.sin(angle) +
-                pixelScale.x * Math.sin(angle) -
-                (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
-            },
-            {
-              x:
-                (positioning.current.position.left / 100) *
-                bundleRef.current.clientWidth,
-              y:
-                (positioning.current.position.top / 100) *
-                bundleRef.current.clientHeight,
+      {(fgVisualMediaOptions.isUser ||
+        fgVisualMediaOptions.permissions
+          .acceptsPositionScaleRotationManipulation) && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <RotateButton
+            className={
+              "rotate-btn absolute left-full bottom-full w-6 aspect-square z-10"
             }
-          );
-        }}
-        bundleRef={bundleRef}
-        mouseDownFunction={() =>
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
-            "position",
-            { rotationPointPlacement: "topLeft" }
-          )
-        }
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
-        }
-      />
-      <ScaleButton
-        className={
-          "scale-btn absolute left-full top-full w-6 aspect-square z-10 pl-1 pt-1"
-        }
-        dragFunction={(displacement) => {
-          if (!bundleRef.current) {
-            return;
-          }
+            dragFunction={(_displacement, event) => {
+              if (!bundleRef.current) {
+                return;
+              }
 
-          const referencePoint = {
-            x:
-              (positioning.current.position.left / 100) *
-              bundleRef.current.clientWidth,
-            y:
-              (positioning.current.position.top / 100) *
-              bundleRef.current.clientHeight,
-          };
+              const box = bundleRef.current.getBoundingClientRect();
 
-          fgContentAdjustmentController.scaleDragFunction(
-            "any",
-            displacement,
-            referencePoint,
-            referencePoint
-          );
-        }}
-        bundleRef={bundleRef}
-        mouseDownFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction
-        }
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
-        }
-      />
+              fgContentAdjustmentController.rotateDragFunction(event, {
+                x:
+                  (positioning.current.position.left / 100) *
+                    bundleRef.current.clientWidth +
+                  box.left,
+                y:
+                  (positioning.current.position.top / 100) *
+                    bundleRef.current.clientHeight +
+                  box.top,
+              });
+            }}
+            bundleRef={bundleRef}
+            mouseDownFunction={
+              fgContentAdjustmentController.adjustmentBtnMouseDownFunction
+            }
+            mouseUpFunction={
+              fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+            }
+          />
+          <PanButton
+            className={
+              "pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1"
+            }
+            dragFunction={(displacement) => {
+              if (!bundleRef.current) {
+                return;
+              }
+
+              const angle =
+                2 * Math.PI - positioning.current.rotation * (Math.PI / 180);
+
+              const pixelScale = {
+                x:
+                  (positioning.current.scale.x / 100) *
+                  bundleRef.current.clientWidth,
+                y:
+                  (positioning.current.scale.y / 100) *
+                  bundleRef.current.clientHeight,
+              };
+
+              fgContentAdjustmentController.movementDragFunction(
+                displacement,
+                {
+                  x:
+                    -15 * Math.cos(angle) -
+                    pixelScale.x * Math.cos(angle) -
+                    (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
+                  y:
+                    15 * Math.sin(angle) +
+                    pixelScale.x * Math.sin(angle) -
+                    (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
+                },
+                {
+                  x:
+                    (positioning.current.position.left / 100) *
+                    bundleRef.current.clientWidth,
+                  y:
+                    (positioning.current.position.top / 100) *
+                    bundleRef.current.clientHeight,
+                }
+              );
+            }}
+            bundleRef={bundleRef}
+            mouseDownFunction={() =>
+              fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+                "position",
+                { rotationPointPlacement: "topLeft" }
+              )
+            }
+            mouseUpFunction={
+              fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+            }
+          />
+          <ScaleButton
+            className={
+              "scale-btn absolute left-full top-full w-6 aspect-square z-10 pl-1 pt-1"
+            }
+            dragFunction={(displacement) => {
+              if (!bundleRef.current) {
+                return;
+              }
+
+              const referencePoint = {
+                x:
+                  (positioning.current.position.left / 100) *
+                  bundleRef.current.clientWidth,
+                y:
+                  (positioning.current.position.top / 100) *
+                  bundleRef.current.clientHeight,
+              };
+
+              fgContentAdjustmentController.scaleDragFunction(
+                "any",
+                displacement,
+                referencePoint,
+                referencePoint
+              );
+            }}
+            bundleRef={bundleRef}
+            mouseDownFunction={
+              fgContentAdjustmentController.adjustmentBtnMouseDownFunction
+            }
+            mouseUpFunction={
+              fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+            }
+          />
+        </Suspense>
+      )}
       {adjustingDimensions && (
         <>
           <div className='animated-border-box-glow'></div>

@@ -1,5 +1,6 @@
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
+import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import FgAudioElement from "./FgAudioElement";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
@@ -7,6 +8,7 @@ import PanButton from "../fgAdjustmentComponents/PanButton";
 import RotateButton from "../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
 import "./lib/audioElement.css";
+import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
 
 const FgPortal = React.lazy(() => import("../fgElements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
@@ -46,6 +48,9 @@ const defaultFgAudioElementContainerOptions: FgAudioElementContainerOptionsType 
 
 export default function FgAudioElementContainer({
   socket,
+  table_id,
+  activeUsername,
+  activeInstance,
   username,
   instance,
   name,
@@ -60,6 +65,9 @@ export default function FgAudioElementContainer({
   options,
 }: {
   socket: React.MutableRefObject<Socket>;
+  table_id: string;
+  activeUsername: string | undefined;
+  activeInstance: string | undefined;
   username: string;
   instance: string;
   name?: string;
@@ -91,6 +99,8 @@ export default function FgAudioElementContainer({
     ...options,
   };
 
+  const { userDataStreams, remoteDataStreams } = useStreamsContext();
+
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
     useState(false);
@@ -121,13 +131,87 @@ export default function FgAudioElementContainer({
     setRerender
   );
 
+  const fgAudioElementContainerController =
+    new FgAudioElementContainerController(
+      isUser,
+      username,
+      instance,
+      positioning
+    );
+
+  useEffect(() => {
+    // Listen for messages on socket
+    socket.current.on(
+      "message",
+      fgAudioElementContainerController.handleMessage
+    );
+
+    // Request initial catch up data
+    if (!isUser && activeUsername && activeInstance) {
+      const msg = {
+        type: "requestCatchUpData",
+        table_id: table_id,
+        inquiringUsername: activeUsername,
+        inquiringInstance: activeInstance,
+        inquiredUsername: username,
+        inquiredInstance: instance,
+        inquiredType: "audio",
+      };
+      socket.current.send(msg);
+    }
+
+    if (
+      !isUser &&
+      remoteDataStreams.current[username] &&
+      remoteDataStreams.current[username][instance] &&
+      remoteDataStreams.current[username][instance].positionScaleRotation
+    ) {
+      remoteDataStreams.current[username][instance].positionScaleRotation.on(
+        "message",
+        (message) => {
+          const data = JSON.parse(message);
+
+          if (
+            data.table_id === table_id &&
+            data.username === username &&
+            data.instance === instance &&
+            data.type === "audio"
+          ) {
+            positioning.current = data.positioning;
+            setRerender((prev) => !prev);
+          }
+        }
+      );
+    }
+
+    return () => {
+      socket.current.off(
+        "message",
+        fgAudioElementContainerController.handleMessage
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isUser) {
+      userDataStreams.current.positionScaleRotation?.send(
+        JSON.stringify({
+          table_id,
+          username,
+          instance,
+          type: "audio",
+          positioning: positioning.current,
+        })
+      );
+    }
+  }, [positioning.current]);
+
   return (
     <div
+      id={`${username}_${instance}_audio_element_container`}
       className={`audio-element-container ${
         adjustingDimensions ? "adjusting-dimensions" : ""
-      } ${
-        inAudioContainer ? "in-audio-container" : ""
-      } bg-fg-primary bg-opacity-30`}
+      } ${inAudioContainer ? "in-audio-container" : ""}`}
       style={{
         position: "relative",
         left: `${positioning.current.position.left}%`,
@@ -157,6 +241,7 @@ export default function FgAudioElementContainer({
           leaveAudioContainerTimer.current = undefined;
         }, fgAudioElementContainerOptions.controlsVanishTime);
       }}
+      data-positioning={JSON.stringify(positioning.current)}
     >
       <PanButton
         className={

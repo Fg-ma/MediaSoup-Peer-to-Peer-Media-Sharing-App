@@ -22,7 +22,7 @@ import UserDevice from "./lib/UserDevice";
 import BrowserMedia from "./lib/BrowserMedia";
 import BundlesController from "./bundlesController";
 import Deadbanding from "./babylon/Deadbanding";
-import FgMetaData from "./lib/FgMetaData";
+import Metadata from "./lib/Metadata";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
@@ -164,7 +164,12 @@ type MediasoupSocketEvents =
       producerId: string;
     }
   | {
-      type: "statesPermissionsRequested";
+      type: "permissionsRequested";
+      inquiringUsername: string;
+      inquiringInstance: string;
+    }
+  | {
+      type: "bundleMetadataRequested";
       inquiringUsername: string;
       inquiringInstance: string;
     }
@@ -288,11 +293,14 @@ export default function Main() {
       case "producerDisconnected":
         producersController.onProducerDisconnected(event);
         break;
-      case "statesPermissionsRequested":
-        permissionsController.onStatesPermissionsRequested(event);
+      case "permissionsRequested":
+        permissionsController.onPermissionsRequested(event);
+        break;
+      case "bundleMetadataRequested":
+        metadata.onBundleMetadataRequested(event);
         break;
       case "requestedCatchUpData":
-        fgMetaData.onRequestedCatchUpData(event);
+        metadata.onRequestedCatchUpData(event);
         break;
       default:
         break;
@@ -502,12 +510,15 @@ export default function Main() {
     remoteDataStreams
   );
 
-  const fgMetaData = new FgMetaData(
+  const metadata = new Metadata(
     table_id,
     username,
     instance,
     socket,
-    userMedia
+    userMedia,
+    mutedAudioRef,
+    userStreamEffects,
+    currentEffectsStyles
   );
 
   const permissionsController = new PermissionsController(
@@ -515,10 +526,7 @@ export default function Main() {
     table_id,
     username,
     instance,
-    mutedAudioRef,
-    permissions,
-    userStreamEffects,
-    currentEffectsStyles
+    permissions
   );
 
   return (

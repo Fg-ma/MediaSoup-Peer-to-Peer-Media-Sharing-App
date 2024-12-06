@@ -145,7 +145,6 @@ class MediasoupCleanup {
     }
   }
 
-  // Delete producer transports
   deleteProducerTransports(
     table_id: string,
     username: string,
@@ -177,7 +176,6 @@ class MediasoupCleanup {
     }
   }
 
-  // Delete consumer transports
   deleteConsumerTransport(
     table_id: string,
     username: string,
@@ -212,7 +210,6 @@ class MediasoupCleanup {
     }
   }
 
-  // Release workers if necessary
   releaseWorkers(table_id: string) {
     if (
       !tableProducerTransports[table_id] &&
@@ -223,7 +220,6 @@ class MediasoupCleanup {
     }
   }
 
-  // Delete producer
   deleteProducer(table_id: string, username: string, instance: string) {
     if (
       tableProducers[table_id] &&
@@ -236,7 +232,6 @@ class MediasoupCleanup {
     }
   }
 
-  // Delete consumer
   deleteConsumer(table_id: string, username: string, instance: string) {
     if (
       tableConsumers[table_id] &&
@@ -279,7 +274,6 @@ class MediasoupCleanup {
     }
   }
 
-  // Remove producers
   removeProducer(
     table_id: string,
     username: string,

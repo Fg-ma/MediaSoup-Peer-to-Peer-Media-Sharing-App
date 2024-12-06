@@ -14,7 +14,7 @@ import AudioMedia from "../../lib/AudioMedia";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import { FgVisualMediaOptions } from "./typeConstant";
 
-type FgVideoMessageEvents =
+type FgVisualMediaMessageEvents =
   | {
       type: "effectChangeRequested";
       requestedProducerType: "camera" | "screen" | "audio";
@@ -41,12 +41,47 @@ type FgVideoMessageEvents =
       inquiredVideoId: string;
       data:
         | {
-            cameraPaused: boolean;
-            cameraTimeEllapsed: number;
+            paused: boolean;
+            timeEllapsed: number;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
+            };
           }
         | {
-            screenPaused: boolean;
-            screenTimeEllapsed: number;
+            paused: boolean;
+            timeEllapsed: number;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
+            };
+          }
+        | {
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
+            };
           }
         | undefined;
     };
@@ -59,6 +94,17 @@ class FgVisualMediaController {
     private videoId: string,
     private fgLowerVisualMediaController: FgLowerVisualMediaController,
     private videoStream: MediaStream | undefined,
+    private positioning: React.MutableRefObject<{
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
     private userMedia: React.MutableRefObject<{
@@ -245,12 +291,47 @@ class FgVisualMediaController {
     inquiredVideoId: string;
     data:
       | {
-          cameraPaused: boolean;
-          cameraTimeEllapsed: number;
+          paused: boolean;
+          timeEllapsed: number;
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
         }
       | {
-          screenPaused: boolean;
-          screenTimeEllapsed: number;
+          paused: boolean;
+          timeEllapsed: number;
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
+        }
+      | {
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
         }
       | undefined;
   }) => {
@@ -263,32 +344,36 @@ class FgVisualMediaController {
       event.data
     ) {
       if (this.type === "camera") {
-        if ("cameraPaused" in event.data) {
-          if (event.data.cameraPaused) {
+        if ("paused" in event.data) {
+          if (event.data.paused) {
             this.paused.current = !this.paused.current;
             this.setPausedState((prev) => !prev);
           }
 
           this.fgLowerVisualMediaController.setInitTimeOffset(
-            event.data.cameraTimeEllapsed
+            event.data.timeEllapsed
           );
+
+          this.positioning.current = event.data.positioning;
         }
       } else if (this.type === "screen") {
-        if ("screenPaused" in event.data) {
-          if (event.data.screenPaused) {
+        if ("paused" in event.data) {
+          if (event.data.paused) {
             this.paused.current = !this.paused.current;
             this.setPausedState((prev) => !prev);
           }
 
           this.fgLowerVisualMediaController.setInitTimeOffset(
-            event.data.screenTimeEllapsed
+            event.data.timeEllapsed
           );
+
+          this.positioning.current = event.data.positioning;
         }
       }
     }
   };
 
-  handleMessage = (event: FgVideoMessageEvents) => {
+  handleMessage = (event: FgVisualMediaMessageEvents) => {
     switch (event.type) {
       case "effectChangeRequested":
         this.onEffectChangeRequested(event);

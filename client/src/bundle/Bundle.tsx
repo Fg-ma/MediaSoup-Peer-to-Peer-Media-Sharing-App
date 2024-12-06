@@ -365,6 +365,9 @@ export default function Bundle({
           <Suspense fallback={<div>Loading...</div>}>
             <FgAudioElementContainer
               socket={socket}
+              table_id={table_id}
+              activeUsername={activeUsername}
+              activeInstance={activeInstance}
               username={username}
               instance={instance}
               name={name}

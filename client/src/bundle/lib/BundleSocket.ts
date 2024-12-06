@@ -241,22 +241,13 @@ class BundleSocket {
     }
   };
 
-  onStatesPermissionsResponsed = (event: {
-    type: "statesPermissionsResponsed";
+  onPermissionsResponsed = (event: {
+    type: "permissionsResponsed";
     inquiredUsername: string;
     inquiredInstance: string;
-    clientMute: boolean;
-    permissions: Permissions;
-    streamEffects: {
-      camera: {
-        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-      };
-      screen: {
-        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-      };
-      audio: { [effectType in AudioEffectTypes]: boolean };
+    data: {
+      permissions: Permissions;
     };
-    currentEffectsStyles: EffectStylesType;
   }) => {
     if (
       this.username !== event.inquiredUsername &&
@@ -265,17 +256,43 @@ class BundleSocket {
       return;
     }
 
-    if (this.isUser) {
-      this.clientMute.current = event.clientMute;
+    this.setPermissions(event.data.permissions);
+  };
+
+  onBundleMetadataResponsed = (event: {
+    type: "bundleMetadataResponsed";
+    inquiredUsername: string;
+    inquiredInstance: string;
+    data: {
+      clientMute: boolean;
+      streamEffects: {
+        camera: {
+          [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+        };
+        screen: {
+          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+        };
+        audio: { [effectType in AudioEffectTypes]: boolean };
+      };
+      currentEffectsStyles: EffectStylesType;
+    };
+  }) => {
+    if (
+      this.username !== event.inquiredUsername &&
+      this.instance !== event.inquiredInstance
+    ) {
+      return;
     }
 
-    this.setPermissions(event.permissions);
+    if (!this.isUser) {
+      this.clientMute.current = event.data.clientMute;
+    }
 
     this.remoteStreamEffects.current[this.username][this.instance] =
-      event.streamEffects;
+      event.data.streamEffects;
 
     this.remoteCurrentEffectsStyles.current[this.username][this.instance] =
-      event.currentEffectsStyles;
+      event.data.currentEffectsStyles;
   };
 
   onEffectChangeRequested = (event: {

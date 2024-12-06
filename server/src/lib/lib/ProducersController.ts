@@ -1,12 +1,5 @@
 import { Server as SocketIOServer } from "socket.io";
 import {
-  DtlsParameters,
-  RtpCapabilities,
-  MediaKind,
-  RtpParameters,
-} from "mediasoup/node/lib/types";
-import {
-  DataStreamTypes,
   tableProducerTransports,
   tableProducers,
   workersMap,
@@ -14,25 +7,24 @@ import {
 import createWebRtcTransport from "../createWebRtcTransport";
 import { getNextWorker, getWorkerByIdx } from "../workerManager";
 import MediasoupCleanup from "./MediasoupCleanup";
-import { ProducerTypes } from "./typeConstant";
-import { SctpParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
+import {
+  onConnectProducerTransportType,
+  onCreateNewJSONProducerType,
+  onCreateNewProducerType,
+  onCreateProducerTransportType,
+  onDeleteProducerTransportType,
+  onNewProducerCreatedType,
+  onRemoveProducerType,
+} from "../mediasoupTypes";
 
-class Producers {
+class ProducersController {
   private mediasoupCleanup: MediasoupCleanup;
 
   constructor(private io: SocketIOServer) {
     this.mediasoupCleanup = new MediasoupCleanup();
   }
 
-  async onCreateProducerTransport(event: {
-    type: string;
-    forceTcp: boolean;
-    rtpCapabilities: RtpCapabilities;
-    producerType: ProducerTypes;
-    table_id: string;
-    username: string;
-    instance: number;
-  }) {
+  onCreateProducerTransport = async (event: onCreateProducerTransportType) => {
     try {
       // Get the next available worker and router if one doesn't already exist
       let mediasoupRouter;
@@ -96,14 +88,9 @@ class Producers {
           error,
         });
     }
-  }
+  };
 
-  async onDeleteProducerTransport(event: {
-    type: string;
-    table_id: string;
-    username: string;
-    instance: string;
-  }) {
+  onDeleteProducerTransport = (event: onDeleteProducerTransportType) => {
     this.mediasoupCleanup.deleteProducerTransports(
       event.table_id,
       event.username,
@@ -111,15 +98,11 @@ class Producers {
     );
 
     this.mediasoupCleanup.releaseWorkers(event.table_id);
-  }
+  };
 
-  async onConnectProducerTransport(event: {
-    type: string;
-    dtlsParameters: DtlsParameters;
-    table_id: string;
-    username: string;
-    instance: string;
-  }) {
+  onConnectProducerTransport = async (
+    event: onConnectProducerTransportType
+  ) => {
     if (
       !tableProducerTransports[event.table_id] ||
       !tableProducerTransports[event.table_id][event.username] ||
@@ -148,19 +131,9 @@ class Producers {
         type: "producerConnected",
         data: "producer connected",
       });
-  }
+  };
 
-  onCreateNewProducer = async (event: {
-    type: "createNewProducer";
-    producerType: "camera" | "screen" | "audio";
-    transportId: string;
-    kind: MediaKind;
-    rtpParameters: RtpParameters;
-    table_id: string;
-    username: string;
-    instance: string;
-    producerId?: string;
-  }) => {
+  onCreateNewProducer = async (event: onCreateNewProducerType) => {
     const { kind, rtpParameters } = event;
 
     if (
@@ -239,19 +212,7 @@ class Producers {
       });
   };
 
-  onCreateNewJSONProducer = async (event: {
-    type: "createNewJSONProducer";
-    producerType: "json";
-    transportId: string;
-    label: string;
-    protocol: "json";
-    table_id: string;
-    username: string;
-    instance: string;
-    producerId: string;
-    sctpStreamParameters: SctpParameters;
-    dataStreamType: DataStreamTypes;
-  }) => {
+  onCreateNewJSONProducer = async (event: onCreateNewJSONProducerType) => {
     const {
       label,
       protocol,
@@ -334,14 +295,7 @@ class Producers {
     }
   };
 
-  onNewProducerCreated(event: {
-    type: string;
-    table_id: string;
-    username: string;
-    instance: string;
-    producerType: ProducerTypes;
-    producerId: string | undefined;
-  }) {
+  onNewProducerCreated = (event: onNewProducerCreatedType) => {
     const msg = {
       type: "newProducerWasCreated",
       producerType: event.producerType,
@@ -350,17 +304,9 @@ class Producers {
     this.io
       .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
       .emit("message", msg);
-  }
+  };
 
-  async onRemoveProducer(event: {
-    type: string;
-    table_id: string;
-    username: string;
-    instance: string;
-    producerType: ProducerTypes;
-    producerId?: string;
-    dataStreamType?: DataStreamTypes;
-  }) {
+  onRemoveProducer = (event: onRemoveProducerType) => {
     try {
       this.mediasoupCleanup.removeProducer(
         event.table_id,
@@ -408,7 +354,7 @@ class Producers {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 }
 
-export default Producers;
+export default ProducersController;
