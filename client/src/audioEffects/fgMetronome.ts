@@ -1,11 +1,12 @@
 import * as Tone from "tone";
 import metronomeUrl from "../../public/audioSamples/metronome.wav";
+import { TransportClass } from "tone/build/esm/core/clock/Transport";
 
 class FgMetronome {
   private metronome: Tone.Player;
   private bpm: number = 120;
 
-  private transport: ReturnType<typeof Tone.getTransport>;
+  private transport: TransportClass;
 
   private volumeNode: Tone.Volume;
 
@@ -24,7 +25,7 @@ class FgMetronome {
 
     // Set up the transport with a repeating event
     this.transport.scheduleRepeat((time: number) => {
-      this.metronome.start(time); // Play the tick sound at each beat
+      this.metronome.start(time);
     }, "4n"); // Repeat every quarter note
   }
 

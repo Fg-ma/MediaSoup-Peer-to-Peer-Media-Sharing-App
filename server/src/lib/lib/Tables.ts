@@ -42,7 +42,7 @@ class Tables {
 
     this.mediasoupCleanup.deleteConsumer(table_id, username, instance);
 
-    this.io.to(`table_${table_id}`).emit("userLeftTable", username);
+    this.io.to(`table_${table_id}`).emit("userLeftTable", username, instance);
   }
 
   disconnect() {

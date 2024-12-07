@@ -12,7 +12,6 @@ import {
   onCreateNewJSONProducerType,
   onCreateNewProducerType,
   onCreateProducerTransportType,
-  onDeleteProducerTransportType,
   onNewProducerCreatedType,
   onRemoveProducerType,
 } from "../mediasoupTypes";
@@ -25,78 +24,46 @@ class ProducersController {
   }
 
   onCreateProducerTransport = async (event: onCreateProducerTransportType) => {
-    try {
-      // Get the next available worker and router if one doesn't already exist
-      let mediasoupRouter;
-      if (!workersMap[event.table_id]) {
-        const { router, workerIdx } = getNextWorker();
-        workersMap[event.table_id] = workerIdx;
-        mediasoupRouter = router;
-      } else {
-        const { router } = getWorkerByIdx(workersMap[event.table_id]);
-        mediasoupRouter = router;
+    // Get the next available worker and router if one doesn't already exist
+    let mediasoupRouter;
+    if (!workersMap[event.table_id]) {
+      const { router, workerIdx } = getNextWorker();
+      workersMap[event.table_id] = workerIdx;
+      mediasoupRouter = router;
+    } else {
+      const { router } = getWorkerByIdx(workersMap[event.table_id]);
+      mediasoupRouter = router;
+    }
+
+    if (
+      !tableProducerTransports[event.table_id] ||
+      !tableProducerTransports[event.table_id][event.username] ||
+      !tableProducerTransports[event.table_id][event.username][event.instance]
+    ) {
+      const { transport, params } = await createWebRtcTransport(
+        mediasoupRouter
+      );
+
+      if (!tableProducerTransports[event.table_id]) {
+        tableProducerTransports[event.table_id] = {};
+      }
+      if (!tableProducerTransports[event.table_id][event.username]) {
+        tableProducerTransports[event.table_id][event.username] = {};
       }
 
-      if (
-        !tableProducerTransports[event.table_id] ||
-        !tableProducerTransports[event.table_id][event.username] ||
-        !tableProducerTransports[event.table_id][event.username][event.instance]
-      ) {
-        const { transport, params } = await createWebRtcTransport(
-          mediasoupRouter
-        );
-
-        if (!tableProducerTransports[event.table_id]) {
-          tableProducerTransports[event.table_id] = {};
-        }
-        if (!tableProducerTransports[event.table_id][event.username]) {
-          tableProducerTransports[event.table_id][event.username] = {};
-        }
-
-        tableProducerTransports[event.table_id][event.username][
-          event.instance
-        ] = {
+      tableProducerTransports[event.table_id][event.username][event.instance] =
+        {
           transport,
           isConnected: false,
         };
 
-        this.io
-          .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
-          .emit("message", {
-            type: "producerTransportCreated",
-            params: params,
-          });
-      } else if (
-        tableProducerTransports[event.table_id] &&
-        tableProducerTransports[event.table_id][event.username] &&
-        tableProducerTransports[event.table_id][event.username][event.instance]
-      ) {
-        const msg = {
-          type: "newProducer",
-          producerType: event.producerType,
-        };
-        this.io
-          .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
-          .emit("message", msg);
-      }
-    } catch (error) {
       this.io
         .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
         .emit("message", {
           type: "producerTransportCreated",
-          error,
+          params: params,
         });
     }
-  };
-
-  onDeleteProducerTransport = (event: onDeleteProducerTransportType) => {
-    this.mediasoupCleanup.deleteProducerTransports(
-      event.table_id,
-      event.username,
-      event.instance
-    );
-
-    this.mediasoupCleanup.releaseWorkers(event.table_id);
   };
 
   onConnectProducerTransport = async (
@@ -325,19 +292,6 @@ class ProducersController {
         event.producerId,
         event.dataStreamType
       );
-
-      // Remove producer transports
-      if (
-        !tableProducers[event.table_id] ||
-        !tableProducers[event.table_id][event.username] ||
-        !tableProducers[event.table_id][event.username][event.instance]
-      ) {
-        this.mediasoupCleanup.deleteProducerTransports(
-          event.table_id,
-          event.username,
-          event.instance
-        );
-      }
 
       this.mediasoupCleanup.releaseWorkers(event.table_id);
 

@@ -15,8 +15,6 @@ class ConsumersController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
-    private subBtnRef: React.RefObject<HTMLButtonElement>,
-
     private consumerTransport: React.MutableRefObject<
       mediasoup.types.Transport<mediasoup.types.AppData> | undefined
     >,
@@ -115,9 +113,6 @@ class ConsumersController {
       return;
     }
 
-    if (this.subBtnRef.current) {
-      this.subBtnRef.current.disabled = false;
-    }
     const subscriptions = event.data;
 
     for (const producerUsername in subscriptions) {

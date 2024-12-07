@@ -2,23 +2,27 @@ class AudioAnalyzer {
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
 
-  constructor(private noiseThreshold: number) {
-    this.initAudio.bind(this);
+  constructor(
+    private noiseThreshold: number,
+    private updateMovingY: (volumeLevel: number) => void,
+    private audioStream: MediaStream | undefined
+  ) {
+    this.initAudio();
   }
 
-  destructor() {
+  destructor = () => {
     if (!this.audioContext) {
       return;
     }
     this.audioContext.close();
     this.audioContext = null;
-  }
+  };
 
   // Update audio levels
-  updateAudioLevels(
+  updateAudioLevels = (
     analyser: AnalyserNode | null,
     updateMovingY: (volumeLevel: number) => void
-  ) {
+  ) => {
     if (analyser === null) return;
 
     // Create a buffer for frequency data
@@ -43,14 +47,11 @@ class AudioAnalyzer {
     requestAnimationFrame(() =>
       this.updateAudioLevels(analyser, updateMovingY)
     );
-  }
+  };
 
-  initAudio(
-    updateMovingY: (volumeLevel: number) => void,
-    audioStream: MediaStream | undefined
-  ) {
+  initAudio = () => {
     try {
-      const stream = audioStream;
+      const stream = this.audioStream;
 
       if (!stream) {
         return;
@@ -68,11 +69,11 @@ class AudioAnalyzer {
       source.connect(this.analyser);
 
       // Start updating audio levels
-      this.updateAudioLevels(this.analyser, updateMovingY);
+      this.updateAudioLevels(this.analyser, this.updateMovingY);
     } catch (err) {
       console.error("Error accessing audio stream:", err);
     }
-  }
+  };
 }
 
 export default AudioAnalyzer;

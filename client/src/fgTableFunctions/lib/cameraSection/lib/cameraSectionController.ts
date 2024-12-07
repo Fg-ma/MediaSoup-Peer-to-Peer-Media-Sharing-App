@@ -14,8 +14,6 @@ class CameraSectionController {
     private instance: React.MutableRefObject<string>,
 
     private isCamera: React.MutableRefObject<boolean>,
-    private isScreen: React.MutableRefObject<boolean>,
-    private isAudio: React.MutableRefObject<boolean>,
     private setCameraActive: (value: React.SetStateAction<boolean>) => void,
 
     private userMedia: React.MutableRefObject<{
@@ -46,24 +44,12 @@ class CameraSectionController {
 
     if (this.isCamera.current) {
       this.userCameraCount.current = this.userCameraCount.current + 1;
-      if (this.device.current) {
-        const msg = {
-          type: "createProducerTransport",
-          forceTcp: false,
-          rtpCapabilities: this.device.current.rtpCapabilities,
-          producerType: "camera",
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-        };
-        this.socket.current.emit("message", msg);
-      }
+      this.producersController.createNewProducer("camera");
     } else if (!this.isCamera.current) {
       for (let i = this.userCameraCount.current; i >= 0; i--) {
         const cameraProducerId = `${this.username.current}_camera_stream_${i}`;
 
         if (cameraProducerId in this.userMedia.current.camera) {
-          // Remove camera producer
           const msg = {
             type: "removeProducer",
             table_id: this.table_id.current,
@@ -73,23 +59,6 @@ class CameraSectionController {
             producerId: cameraProducerId,
           };
           this.socket.current.emit("message", msg);
-
-          if (
-            Object.keys(this.userMedia.current.camera).length === 1 &&
-            !this.isScreen.current &&
-            !this.isAudio.current
-          ) {
-            // Remove positionRotationScale producer
-            const message = {
-              type: "removeProducer",
-              table_id: this.table_id.current,
-              username: this.username.current,
-              instance: this.instance.current,
-              producerType: "json",
-              dataStreamType: "positionScaleRotation",
-            };
-            this.socket.current.emit("message", message);
-          }
 
           // return after the first stream is removed
           return;

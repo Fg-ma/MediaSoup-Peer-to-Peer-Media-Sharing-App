@@ -10,6 +10,7 @@ import ScreenSection from "./lib/screenSection/ScreenSection";
 import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
 import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
+import onRouterCapabilities from "../lib/onRouterCapabilities";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -42,7 +43,6 @@ export default function FgTableFunctions({
   setAudioActive,
   audioBtnRef,
   isSubscribed,
-  subBtnRef,
   muteAudio,
   handleDisableEnableBtns,
 }: {
@@ -82,16 +82,18 @@ export default function FgTableFunctions({
   setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
   audioBtnRef: React.RefObject<HTMLButtonElement>;
   isSubscribed: React.MutableRefObject<boolean>;
-  subBtnRef: React.RefObject<HTMLButtonElement>;
   muteAudio: () => void;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
-  const { userMedia, userCameraCount, userScreenCount, remoteTracksMap } =
-    useStreamsContext();
+  const {
+    userMedia,
+    userCameraCount,
+    userScreenCount,
+    remoteTracksMap,
+    userDataStreams,
+  } = useStreamsContext();
   const { setSignal } = useSignalContext();
   const { permissions } = usePermissionsContext();
-
-  const [subscribedActive, setSubscribedActive] = useState(false);
 
   const muteBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -110,6 +112,7 @@ export default function FgTableFunctions({
     instance,
     setIsInTable,
     userMedia,
+    userDataStreams,
     userCameraCount,
     userScreenCount,
     remoteTracksMap,
@@ -125,10 +128,8 @@ export default function FgTableFunctions({
     setAudioActive,
     setMutedAudio,
     mutedAudioRef,
-    setSubscribedActive,
     isSubscribed,
-    device,
-    subBtnRef
+    device
   );
 
   const handleExternalMute = () => {
@@ -173,6 +174,30 @@ export default function FgTableFunctions({
     setAudioEffectsActive(false);
   }, [isAudio.current]);
 
+  const handleMessage = async (event: {
+    type: "routerCapabilities";
+    rtpCapabilities: mediasoup.types.RtpCapabilities;
+  }) => {
+    switch (event.type) {
+      case "routerCapabilities":
+        await onRouterCapabilities(event, device);
+
+        tableFunctionsController.subscribe();
+        tableFunctionsController.createProducerTransport();
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    socket.current.on("message", handleMessage);
+
+    return () => {
+      socket.current.off("message", handleMessage);
+    };
+  }, [socket.current]);
+
   return (
     <>
       <div className='flex items-center justify-center'>
@@ -185,8 +210,6 @@ export default function FgTableFunctions({
           cameraBtnRef={cameraBtnRef}
           newCameraBtnRef={newCameraBtnRef}
           isCamera={isCamera}
-          isScreen={isScreen}
-          isAudio={isAudio}
           setCameraActive={setCameraActive}
           cameraActive={cameraActive}
           producersController={producersController}
@@ -201,12 +224,11 @@ export default function FgTableFunctions({
           audioBtnRef={audioBtnRef}
           muteBtnRef={muteBtnRef}
           mutedAudioRef={mutedAudioRef}
-          isCamera={isCamera}
-          isScreen={isScreen}
           isAudio={isAudio}
           audioActive={audioActive}
           setAudioActive={setAudioActive}
           handleExternalMute={handleExternalMute}
+          producersController={producersController}
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <ScreenSection
@@ -217,27 +239,12 @@ export default function FgTableFunctions({
           instance={instance}
           screenBtnRef={screenBtnRef}
           newScreenBtnRef={newScreenBtnRef}
-          isCamera={isCamera}
           isScreen={isScreen}
-          isAudio={isAudio}
           screenActive={screenActive}
           setScreenActive={setScreenActive}
           producersController={producersController}
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
-        <div className='flex flex-col mx-2'>
-          <button
-            ref={subBtnRef}
-            onClick={tableFunctionsController.subscribe}
-            className={`${
-              subscribedActive
-                ? "bg-orange-500 hover:bg-orange-700"
-                : "bg-blue-500 hover:bg-blue-700"
-            } text-white font-bold py-2 px-3 disabled:opacity-25`}
-          >
-            {subscribedActive ? "Unsubscribe" : "Subscribe"}
-          </button>
-        </div>
         {isAudio.current && (
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsButton

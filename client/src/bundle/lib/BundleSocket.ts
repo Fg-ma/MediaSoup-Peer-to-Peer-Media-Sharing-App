@@ -278,7 +278,7 @@ class BundleSocket {
     };
   }) => {
     if (
-      this.username !== event.inquiredUsername &&
+      this.username !== event.inquiredUsername ||
       this.instance !== event.inquiredInstance
     ) {
       return;
@@ -288,11 +288,13 @@ class BundleSocket {
       this.clientMute.current = event.data.clientMute;
     }
 
-    this.remoteStreamEffects.current[this.username][this.instance] =
-      event.data.streamEffects;
+    this.remoteStreamEffects.current[event.inquiredUsername][
+      event.inquiredInstance
+    ] = event.data.streamEffects;
 
-    this.remoteCurrentEffectsStyles.current[this.username][this.instance] =
-      event.data.currentEffectsStyles;
+    this.remoteCurrentEffectsStyles.current[event.inquiredUsername][
+      event.inquiredInstance
+    ] = event.data.currentEffectsStyles;
   };
 
   onEffectChangeRequested = (event: {

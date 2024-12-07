@@ -104,6 +104,9 @@ class ProducersController {
     private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
     private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
     private createProducerBundle: () => void,
+    private bundles: {
+      [username: string]: { [instance: string]: React.JSX.Element };
+    },
     private setBundles: React.Dispatch<
       React.SetStateAction<{
         [username: string]: { [instance: string]: React.JSX.Element };
@@ -202,7 +205,7 @@ class ProducersController {
     await this.producerTransport.current?.produce(audioParams);
   };
 
-  private createJSONProducer = async (dataStreamType: DataStreamTypes) => {
+  createJSONProducer = async (dataStreamType: DataStreamTypes) => {
     if (!this.producerTransport.current) {
       console.error("No transport available to create JSON data producer");
       return;
@@ -337,7 +340,6 @@ class ProducersController {
         case "connecting":
           break;
         case "connected":
-          this.createProducerBundle();
           this.handleDisableEnableBtns(false);
           break;
         case "failed":
@@ -349,102 +351,19 @@ class ProducersController {
     });
     // connection state change end
 
-    try {
-      if (this.isCamera.current) {
-        if (
-          this.userMedia.current.camera[
-            `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-          ]
-        ) {
-          return;
-        }
-
-        const cameraBrowserMedia = await this.browserMedia.getCameraMedia();
-
-        if (!cameraBrowserMedia) {
-          this.producerTransport.current = undefined;
-          this.userCameraCount.current = this.userCameraCount.current - 1;
-          const msg = {
-            type: "deleteProducerTransport",
-            table_id: this.table_id.current,
-            username: this.username.current,
-            instance: this.instance.current,
-          };
-          this.socket.current.emit("message", msg);
-          return;
-        }
-
-        await this.createCameraProducer(cameraBrowserMedia);
-
-        if (this.userDataStreams.current.positionScaleRotation === undefined) {
-          await this.createJSONProducer("positionScaleRotation");
-        }
-      }
-      if (this.isScreen.current) {
-        if (
-          this.userMedia.current.screen[
-            `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-          ]
-        ) {
-          return;
-        }
-
-        const screenBrowserMedia = await this.browserMedia.getScreenMedia();
-
-        if (!screenBrowserMedia) {
-          this.producerTransport.current = undefined;
-          this.userScreenCount.current = this.userScreenCount.current - 1;
-          const msg = {
-            type: "deleteProducerTransport",
-            table_id: this.table_id.current,
-            username: this.username.current,
-            instance: this.instance.current,
-          };
-          this.socket.current.emit("message", msg);
-          return;
-        }
-
-        await this.createScreenProducer(screenBrowserMedia);
-
-        if (this.userDataStreams.current.positionScaleRotation === undefined) {
-          await this.createJSONProducer("positionScaleRotation");
-        }
-      }
-      if (this.isAudio.current) {
-        if (this.userMedia.current.audio) {
-          console.error(
-            "Already existing audio stream for: ",
-            this.username.current
-          );
-          return;
-        }
-
-        const audioBrowserMedia = await this.browserMedia.getAudioMedia();
-
-        if (!audioBrowserMedia) {
-          this.producerTransport.current = undefined;
-          const msg = {
-            type: "deleteProducerTransport",
-            table_id: this.table_id.current,
-            username: this.username.current,
-            instance: this.instance.current,
-          };
-          this.socket.current.emit("message", msg);
-          return;
-        }
-
-        await this.createAudioProducer(audioBrowserMedia);
-
-        if (this.userDataStreams.current.positionScaleRotation === undefined) {
-          await this.createJSONProducer("positionScaleRotation");
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    await this.createJSONProducer("positionScaleRotation");
   };
 
   createNewProducer = async (producerType: "camera" | "screen" | "audio") => {
+    if (
+      !this.bundles[this.username.current] ||
+      !Object.keys(this.bundles[this.username.current]).includes(
+        this.instance.current
+      )
+    ) {
+      this.createProducerBundle();
+    }
+
     let producerId: string | undefined;
     if (producerType === "camera") {
       producerId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
@@ -474,10 +393,6 @@ class ProducersController {
       }
 
       await this.createCameraProducer(cameraBrowserMedia);
-
-      if (this.userDataStreams.current.positionScaleRotation === undefined) {
-        await this.createJSONProducer("positionScaleRotation");
-      }
     } else if (producerType === "screen") {
       producerId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
       if (
@@ -506,10 +421,6 @@ class ProducersController {
       }
 
       await this.createScreenProducer(screenBrowserMedia);
-
-      if (this.userDataStreams.current.positionScaleRotation === undefined) {
-        await this.createJSONProducer("positionScaleRotation");
-      }
     } else if (producerType === "audio") {
       if (this.userMedia.current.audio) {
         // Reenable buttons
@@ -533,10 +444,6 @@ class ProducersController {
       }
 
       await this.createAudioProducer(audioBrowserMedia);
-
-      if (this.userDataStreams.current.positionScaleRotation === undefined) {
-        await this.createJSONProducer("positionScaleRotation");
-      }
     }
 
     // Reenable buttons
@@ -642,14 +549,6 @@ class ProducersController {
           this.userMedia.current[event.producerType]?.deconstructor();
           this.userMedia.current[event.producerType] = undefined;
         }
-      } else if (event.producerType === "json") {
-        if (
-          event.dataStreamType &&
-          this.userDataStreams.current[event.dataStreamType]
-        ) {
-          this.userDataStreams.current[event.dataStreamType]?.close();
-          delete this.userDataStreams.current[event.dataStreamType];
-        }
       }
 
       if (
@@ -725,7 +624,6 @@ class ProducersController {
 
           return newBundles;
         });
-        this.producerTransport.current = undefined;
       }
 
       // Clean up camera and screen states
@@ -887,20 +785,6 @@ class ProducersController {
               }
             }
           }
-        }
-
-        if (
-          event.dataStreamType &&
-          this.remoteDataStreams.current?.[event.producerUsername]?.[
-            event.producerInstance
-          ]?.[event.dataStreamType]
-        ) {
-          this.remoteDataStreams.current?.[event.producerUsername]?.[
-            event.producerInstance
-          ]?.[event.dataStreamType]?.close();
-          delete this.remoteDataStreams.current?.[event.producerUsername]?.[
-            event.producerInstance
-          ]?.[event.dataStreamType];
         }
       }
 

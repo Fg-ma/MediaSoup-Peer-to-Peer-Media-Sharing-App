@@ -1,5 +1,6 @@
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
+import ProducersController from "src/lib/ProducersController";
 
 class AudioSectionController {
   constructor(
@@ -9,8 +10,8 @@ class AudioSectionController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
-    private isCamera: React.MutableRefObject<boolean>,
-    private isScreen: React.MutableRefObject<boolean>,
+    private producersController: ProducersController,
+
     private isAudio: React.MutableRefObject<boolean>,
     private setAudioActive: (value: React.SetStateAction<boolean>) => void,
 
@@ -27,18 +28,7 @@ class AudioSectionController {
     this.setAudioActive((prev) => !prev);
 
     if (this.isAudio.current) {
-      if (this.device.current) {
-        const msg = {
-          type: "createProducerTransport",
-          forceTcp: false,
-          rtpCapabilities: this.device.current.rtpCapabilities,
-          producerType: "audio",
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-        };
-        this.socket.current.emit("message", msg);
-      }
+      this.producersController.createNewProducer("audio");
     } else if (!this.isAudio.current) {
       const msg = {
         type: "removeProducer",
@@ -48,19 +38,6 @@ class AudioSectionController {
         producerType: "audio",
       };
       this.socket.current.emit("message", msg);
-
-      if (!this.isCamera.current && !this.isScreen.current) {
-        // Remove positionRotationScale producer
-        const message = {
-          type: "removeProducer",
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-          producerType: "json",
-          dataStreamType: "positionScaleRotation",
-        };
-        this.socket.current.emit("message", message);
-      }
     }
   };
 }

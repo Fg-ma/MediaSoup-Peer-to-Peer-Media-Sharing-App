@@ -78,9 +78,6 @@ const mediasoupSocket = async (io: SocketIOServer) => {
         case "clientMute":
           muteController.onClientMute(event);
           break;
-        case "deleteProducerTransport":
-          producersController.onDeleteProducerTransport(event);
-          break;
         case "newProducerCreated":
           producersController.onNewProducerCreated(event);
           break;

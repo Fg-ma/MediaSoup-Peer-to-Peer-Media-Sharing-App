@@ -1,8 +1,9 @@
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import AudioMedia from "src/lib/AudioMedia";
-import CameraMedia from "src/lib/CameraMedia";
-import ScreenMedia from "src/lib/ScreenMedia";
+import { UserDataStreams } from "../../context/streamsContext/StreamsContext";
+import AudioMedia from "../../lib/AudioMedia";
+import CameraMedia from "../../lib/CameraMedia";
+import ScreenMedia from "../../lib/ScreenMedia";
 
 class TableFunctionsController {
   constructor(
@@ -22,6 +23,7 @@ class TableFunctionsController {
       };
       audio: AudioMedia | undefined;
     }>,
+    private userDataStreams: React.MutableRefObject<UserDataStreams>,
     private userCameraCount: React.MutableRefObject<number>,
     private userScreenCount: React.MutableRefObject<number>,
     private remoteTracksMap: React.MutableRefObject<{
@@ -59,10 +61,8 @@ class TableFunctionsController {
     private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
     private setMutedAudio: React.Dispatch<React.SetStateAction<boolean>>,
     private mutedAudioRef: React.MutableRefObject<boolean>,
-    private setSubscribedActive: React.Dispatch<React.SetStateAction<boolean>>,
     private isSubscribed: React.MutableRefObject<boolean>,
-    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-    private subBtnRef: React.RefObject<HTMLButtonElement>
+    private device: React.MutableRefObject<mediasoup.types.Device | undefined>
   ) {}
 
   joinTable = () => {
@@ -109,6 +109,12 @@ class TableFunctionsController {
   };
 
   private leaveTable = () => {
+    this.producerTransport.current = undefined;
+
+    this.unsubscribe();
+
+    this.removePositionScaleRotationProducer();
+
     for (const cameraId in this.userMedia.current.camera) {
       this.userMedia.current.camera[cameraId].deconstructor();
       delete this.userMedia.current.camera[cameraId];
@@ -141,7 +147,6 @@ class TableFunctionsController {
     this.setAudioActive(false);
     this.setMutedAudio(false);
     this.mutedAudioRef.current = false;
-    this.setSubscribedActive(false);
     this.isSubscribed.current = false;
     this.setIsInTable(false);
   };
@@ -151,23 +156,24 @@ class TableFunctionsController {
       console.error("Missing table_id or username!");
       return;
     }
-    this.subBtnRef.current!.disabled = true;
     this.isSubscribed.current = !this.isSubscribed.current;
-    this.setSubscribedActive((prev) => !prev);
 
     if (this.isSubscribed.current) {
       const msg = {
         type: "createConsumerTransport",
-        forceTcp: false,
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
       };
 
       this.socket.current.send(msg);
-    } else if (!this.isSubscribed.current) {
-      this.consumerTransport.current = undefined;
+    }
+  };
 
+  private unsubscribe = () => {
+    this.isSubscribed.current = !this.isSubscribed.current;
+
+    if (!this.isSubscribed.current) {
       this.setBundles((prev) => {
         const previousBundles = { ...prev };
 
@@ -193,12 +199,35 @@ class TableFunctionsController {
         instance: this.instance.current,
       };
       this.socket.current.emit("message", msg);
-      this.socket.current.on("message", (event) => {
-        if (event.type === "unsubscribed") {
-          this.subBtnRef.current!.disabled = false;
-        }
-      });
     }
+  };
+
+  createProducerTransport = () => {
+    const msg = {
+      type: "createProducerTransport",
+      table_id: this.table_id.current,
+      username: this.username.current,
+      instance: this.instance.current,
+    };
+    this.socket.current.emit("message", msg);
+  };
+
+  private removePositionScaleRotationProducer = () => {
+    if (this.userDataStreams.current.positionScaleRotation) {
+      this.userDataStreams.current.positionScaleRotation.close();
+      delete this.userDataStreams.current.positionScaleRotation;
+    }
+
+    // Remove positionRotationScale producer
+    const message = {
+      type: "removeProducer",
+      table_id: this.table_id.current,
+      username: this.username.current,
+      instance: this.instance.current,
+      producerType: "json",
+      dataStreamType: "positionScaleRotation",
+    };
+    this.socket.current.emit("message", message);
   };
 }
 

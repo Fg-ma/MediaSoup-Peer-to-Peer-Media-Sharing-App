@@ -1,33 +1,13 @@
 import * as Tone from "tone";
-import fgSamplers, {
-  FgDrumsSamplers,
-  FgGuitarsSamplers,
-  FgMiscSamplers,
-  FgOrgansSamplers,
-  FgPianosSamplers,
-  FgSamplers,
-  FgStringsSamplers,
-  FgSynthsSamplers,
-  FgWindsSamplers,
-  SamplerType,
-} from "./fgSamplers";
-import FgMetronome from "./FgMetronome";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
   ToneEffectsType,
 } from "./typeConstant";
 
-class FgSampler {
-  private sampler: Tone.Sampler | undefined;
-  private playOnlyDefined: boolean;
-  private definedNotes: string[] = [];
+class FgMic {
+  private micEffects: ToneEffectsType[] = [];
 
-  private samplerEffects: ToneEffectsType[] = [];
-
-  private playingNotes: Set<string> = new Set();
-
-  private volumeNode: Tone.Volume;
   private autoFilter: Tone.AutoFilter | undefined;
   private autoPanner: Tone.AutoPanner | undefined;
   private autoWah: Tone.AutoWah | undefined;
@@ -47,8 +27,6 @@ class FgSampler {
   private tremolo: Tone.Tremolo | undefined;
   private vibrato: Tone.Vibrato | undefined;
 
-  fgMetronome: FgMetronome;
-
   private effectUpdaters: {
     [key in AudioMixEffectsType]: (
       updates: { option: MixEffectsOptionsType; value: number }[]
@@ -58,6 +36,7 @@ class FgSampler {
       if (!this.autoFilter) {
         this.applyAutoFilter();
       }
+
       updates.map((update) => {
         switch (update.option) {
           case "frequency":
@@ -363,122 +342,11 @@ class FgSampler {
   };
 
   constructor(
-    private samplerMediaStreamDestination: MediaStreamAudioDestinationNode,
-    private masterChain: Tone.Gain,
-    private samplerChain: Tone.Gain
-  ) {
-    this.volumeNode = new Tone.Volume(0); // 0 dB by default
-
-    this.sampler = new Tone.Sampler(fgSamplers.pianos.default.sampler);
-    this.playOnlyDefined = fgSamplers.pianos.default.playOnlyDefined;
-
-    // Set up the initial connections
-    this.sampler.connect(this.volumeNode);
-    this.volumeNode.connect(this.samplerChain); // Connect volumeNode to the sampler chain
-    this.samplerChain.connect(this.samplerMediaStreamDestination); // Connect sampler chain to mediaStreamDestination
-
-    this.fgMetronome = new FgMetronome();
-  }
-
-  swapSampler = (
-    sampler:
-      | { category: "pianos"; kind: FgPianosSamplers }
-      | { category: "guitars"; kind: FgGuitarsSamplers }
-      | { category: "strings"; kind: FgStringsSamplers }
-      | { category: "winds"; kind: FgWindsSamplers }
-      | { category: "drums"; kind: FgDrumsSamplers }
-      | { category: "synths"; kind: FgSynthsSamplers }
-      | { category: "organs"; kind: FgOrgansSamplers }
-      | { category: "misc"; kind: FgMiscSamplers },
-    increment?: number
-  ): FgSamplers => {
-    // Disconnect and dispose of the current sampler if it exists
-    if (this.sampler) {
-      this.sampler.disconnect();
-      this.sampler.dispose();
-    }
-
-    if (increment === undefined) {
-      // @ts-expect-error: TypeScript cannot infer that sampler.kind is a valid key for the given sampler.category
-      const fgSampler: SamplerType = fgSamplers[sampler.category][sampler.kind];
-
-      this.sampler = new Tone.Sampler(fgSampler.sampler);
-      this.sampler.connect(this.volumeNode);
-      this.playOnlyDefined = fgSampler.playOnlyDefined;
-
-      if (this.playOnlyDefined) {
-        this.definedNotes = Object.keys(fgSampler.sampler.urls);
-      }
-
-      return {
-        category: sampler.category,
-        kind: sampler.kind,
-        label: fgSampler.label,
-        playOnlyDefined: this.playOnlyDefined,
-        definedNotes: this.definedNotes,
-      } as FgSamplers;
-    } else {
-      // Get an array of sampler kinds in the category
-      const kinds = Object.keys(fgSamplers[sampler.category]);
-
-      // Find the index of the current kind
-      const currentIndex = kinds.indexOf(sampler.kind);
-      if (currentIndex === -1) throw new Error("Invalid sampler kind");
-
-      // Calculate the new index, wrapping around if necessary
-      const newIndex = (currentIndex + increment + kinds.length) % kinds.length;
-      const newKind = kinds[newIndex];
-
-      // @ts-expect-error: TypeScript cannot infer that newKind is a valid key for the given sampler.category
-      const fgSampler: SamplerType = fgSamplers[sampler.category][newKind];
-
-      this.sampler = new Tone.Sampler(fgSampler.sampler);
-      this.sampler.connect(this.volumeNode);
-      this.playOnlyDefined = fgSampler.playOnlyDefined;
-      if (this.playOnlyDefined) {
-        this.definedNotes = Object.keys(fgSampler.sampler.urls);
-      }
-
-      return {
-        category: sampler.category,
-        // @ts-expect-error: TypeScript cannot infer that newKind is a valid kind
-        kind: newKind,
-        label: fgSampler.label,
-        playOnlyDefined: this.playOnlyDefined,
-        definedNotes: this.definedNotes,
-      };
-    }
-  };
-
-  // Trigger a note when a key is pressed
-  playNote = (note: string, isPress: boolean) => {
-    if (!this.sampler?.loaded) {
-      return;
-    }
-
-    if (isPress) {
-      if (!this.playingNotes.has(note)) {
-        this.playingNotes.add(note);
-        if (this.playOnlyDefined) {
-          if (this.definedNotes.includes(note)) {
-            this.sampler?.triggerAttack(note);
-          }
-        } else {
-          this.sampler?.triggerAttack(note);
-        }
-      }
-    } else {
-      if (this.playingNotes.has(note)) {
-        this.playingNotes.delete(note);
-        this.sampler?.triggerRelease(note);
-      }
-    }
-  };
-
-  // Set volume (in decibels)
-  setVolume = (volume: number) => {
-    this.volumeNode.volume.value = volume;
-  };
+    private audioStream: Tone.UserMedia,
+    private micMediaStreamDestination: MediaStreamAudioDestinationNode,
+    private masterChain: Tone.Gain<"gain">,
+    private micChain: Tone.Gain<"gain">
+  ) {}
 
   updateEffects = (
     effects: {
@@ -575,67 +443,59 @@ class FgSampler {
     });
   };
 
-  private removeEffect(effect: ToneEffectsType | undefined) {
+  private removeEffect = (effect: ToneEffectsType | undefined) => {
     if (!effect) return;
 
-    const effectIndex = this.samplerEffects.indexOf(effect);
+    const effectIndex = this.micEffects.indexOf(effect);
 
     if (effectIndex !== -1) {
-      // Disconnect the effect from the chain
       effect.disconnect();
 
-      // Reconnect the previous effect in the chain to the next one
       if (effectIndex > 0) {
-        this.samplerEffects[effectIndex - 1].disconnect();
-        if (effectIndex < this.samplerEffects.length - 1) {
-          this.samplerEffects[effectIndex - 1].connect(
-            this.samplerEffects[effectIndex + 1]
+        this.micEffects[effectIndex - 1].disconnect();
+        if (effectIndex < this.micEffects.length - 1) {
+          this.micEffects[effectIndex - 1].connect(
+            this.micEffects[effectIndex + 1]
           );
         } else {
-          this.samplerEffects[effectIndex - 1].connect(
-            this.samplerMediaStreamDestination
+          this.micEffects[effectIndex - 1].connect(
+            this.micMediaStreamDestination
           );
         }
       } else {
-        // If it's the first effect, reconnect the effectChain to the next effect or mediaStreamDestination
-        this.samplerChain.disconnect();
-        if (this.samplerEffects.length > 1) {
-          this.samplerChain.connect(this.samplerEffects[1]);
+        this.micChain.disconnect();
+        if (this.micEffects.length > 1) {
+          this.micChain.connect(this.micEffects[1]);
         } else {
-          this.samplerChain.connect(this.samplerMediaStreamDestination);
+          this.micChain.connect(this.micMediaStreamDestination);
         }
       }
 
       // Ensure the master chain is properly updated
-      if (this.samplerEffects.length === 1) {
-        this.samplerEffects[0].connect(this.masterChain);
+      if (this.micEffects.length === 1) {
+        this.micEffects[0].connect(this.masterChain);
       }
 
-      // Remove the effect from the array
-      this.samplerEffects.splice(effectIndex, 1);
-
-      // Dispose of the effect
+      this.micEffects.splice(effectIndex, 1);
       effect.dispose();
     }
-  }
+  };
 
-  private addEffect(effect: ToneEffectsType) {
-    // Disconnect the last effect in the chain from the mediaStreamDestination
-    if (this.samplerEffects.length > 0) {
-      this.samplerEffects[this.samplerEffects.length - 1].disconnect();
-      this.samplerEffects[this.samplerEffects.length - 1].connect(effect);
+  private addEffect = (effect: ToneEffectsType) => {
+    if (this.micEffects.length > 0) {
+      this.micEffects[this.micEffects.length - 1].disconnect();
+      this.micEffects[this.micEffects.length - 1].connect(effect);
     } else {
-      this.samplerChain.disconnect();
-      this.samplerChain.connect(effect);
+      this.micChain.disconnect();
+      this.micChain.connect(effect);
     }
 
-    // Add the new effect to the chain
-    this.samplerEffects.push(effect);
+    this.audioStream.connect(effect);
+    this.micEffects.push(effect);
 
-    // Connect the new effect to the mediaStreamDestination
-    effect.connect(this.samplerMediaStreamDestination);
+    effect.connect(this.micMediaStreamDestination);
     effect.connect(this.masterChain);
-  }
+  };
 
   /* 
     frequency: (0 - 10) Hz
@@ -799,4 +659,4 @@ class FgSampler {
   };
 }
 
-export default FgSampler;
+export default FgMic;

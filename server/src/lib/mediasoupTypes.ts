@@ -31,7 +31,6 @@ export type MediasoupSocketEvents =
   | onRemoveProducerType
   | onUnsubscribeType
   | onClientMuteType
-  | onDeleteProducerTransportType
   | onNewProducerCreatedType
   | onNewConsumerCreatedType
   | onRequestEffectChangeType
@@ -52,9 +51,6 @@ export type onGetRouterRtpCapabilitiesType = {
 
 export type onCreateProducerTransportType = {
   type: "createProducerTransport";
-  forceTcp: boolean;
-  rtpCapabilities: RtpCapabilities;
-  producerType: ProducerTypes;
   table_id: string;
   username: string;
   instance: number;
@@ -175,13 +171,6 @@ export type onClientMuteType = {
   username: string;
   instance: string;
   clientMute: boolean;
-};
-
-export type onDeleteProducerTransportType = {
-  type: "deleteProducerTransport";
-  table_id: string;
-  username: string;
-  instance: string;
 };
 
 export type onNewProducerCreatedType = {

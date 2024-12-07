@@ -121,6 +121,14 @@ class FgBackgroundMusic {
   setVolume = (volume: number) => {
     this.volumeNode.volume.value = volume;
   };
+
+  toggleAllOff = () => {
+    for (const player of Object.entries(this.players)) {
+      if (player[1].player.state === "started") {
+        player[1].player.stop();
+      }
+    }
+  };
 }
 
 export default FgBackgroundMusic;

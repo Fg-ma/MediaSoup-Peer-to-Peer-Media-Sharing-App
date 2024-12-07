@@ -13,9 +13,7 @@ class ScreenSectionController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
-    private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
-    private isAudio: React.MutableRefObject<boolean>,
     private setScreenActive: (value: React.SetStateAction<boolean>) => void,
 
     private userMedia: React.MutableRefObject<{
@@ -45,18 +43,7 @@ class ScreenSectionController {
 
     if (this.isScreen.current) {
       this.userScreenCount.current = this.userScreenCount.current + 1;
-      if (this.device.current) {
-        const msg = {
-          type: "createProducerTransport",
-          forceTcp: false,
-          rtpCapabilities: this.device.current.rtpCapabilities,
-          producerType: "screen",
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-        };
-        this.socket.current.emit("message", msg);
-      }
+      this.producersController.createNewProducer("screen");
     } else if (!this.isScreen.current) {
       for (let i = this.userScreenCount.current; i >= 0; i--) {
         const producerId = `${this.username.current}_screen_stream_${i}`;
@@ -72,23 +59,6 @@ class ScreenSectionController {
             producerId: producerId,
           };
           this.socket.current.emit("message", msg);
-
-          if (
-            Object.keys(this.userMedia.current.screen).length === 1 &&
-            !this.isCamera.current &&
-            !this.isAudio.current
-          ) {
-            // Remove positionRotationScale producer
-            const message = {
-              type: "removeProducer",
-              table_id: this.table_id.current,
-              username: this.username.current,
-              instance: this.instance.current,
-              producerType: "json",
-              dataStreamType: "positionScaleRotation",
-            };
-            this.socket.current.emit("message", message);
-          }
 
           // return after the first stream is removed
           return;

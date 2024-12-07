@@ -6,6 +6,7 @@ import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import shareAudioIcon from "../../../../public/svgs/shareAudioIcon.svg";
 import removeAudioIcon from "../../../../public/svgs/removeAudioIcon.svg";
 import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
+import ProducersController from "../../../lib/ProducersController";
 
 const FgButton = React.lazy(
   () => import("../../../fgElements/fgButton/FgButton")
@@ -23,12 +24,11 @@ export default function AudioSection({
   audioBtnRef,
   muteBtnRef,
   mutedAudioRef,
-  isCamera,
-  isScreen,
   isAudio,
   audioActive,
   setAudioActive,
   handleExternalMute,
+  producersController,
   handleDisableEnableBtns,
 }: {
   socket: React.MutableRefObject<Socket>;
@@ -39,12 +39,11 @@ export default function AudioSection({
   audioBtnRef: React.RefObject<HTMLButtonElement>;
   muteBtnRef: React.RefObject<HTMLButtonElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
-  isCamera: React.MutableRefObject<boolean>;
-  isScreen: React.MutableRefObject<boolean>;
   isAudio: React.MutableRefObject<boolean>;
   audioActive: boolean;
   setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
   handleExternalMute: () => void;
+  producersController: ProducersController;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const [volumeState, setVolumeState] = useState<{
@@ -62,8 +61,8 @@ export default function AudioSection({
     username,
     instance,
 
-    isCamera,
-    isScreen,
+    producersController,
+
     isAudio,
     setAudioActive,
 

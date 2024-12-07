@@ -15,7 +15,6 @@ import {
   defaultCameraStreamEffects,
   defaultScreenStreamEffects,
 } from "./context/streamsContext/typeConstant";
-import onRouterCapabilities from "./lib/onRouterCapabilities";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import UserDevice from "./lib/UserDevice";
@@ -33,10 +32,6 @@ import PermissionsController from "./lib/PermissionsController";
 const websocketURL = "http://localhost:8000";
 
 type MediasoupSocketEvents =
-  | {
-      type: "routerCapabilities";
-      rtpCapabilities: mediasoup.types.RtpCapabilities;
-    }
   | {
       type: "producerTransportCreated";
       params: {
@@ -140,7 +135,6 @@ type MediasoupSocketEvents =
         protocol: string;
       };
     }
-  | { type: "newProducer"; producerType: "camera" | "screen" | "audio" }
   | {
       type: "newProducerAvailable";
       producerUsername: string;
@@ -228,7 +222,6 @@ export default function Main() {
   const isAudio = useRef(false);
   const [audioActive, setAudioActive] = useState(false);
 
-  const subBtnRef = useRef<HTMLButtonElement>(null);
   const isSubscribed = useRef(false);
 
   const tableRef = useRef<HTMLDivElement>(null);
@@ -261,9 +254,6 @@ export default function Main() {
 
   const handleMessage = (event: MediasoupSocketEvents) => {
     switch (event.type) {
-      case "routerCapabilities":
-        onRouterCapabilities(event, device);
-        break;
       case "producerTransportCreated":
         producersController.onProducerTransportCreated(event);
         break;
@@ -280,9 +270,6 @@ export default function Main() {
         break;
       case "newJSONConsumerSubscribed":
         consumersController.onNewJSONConsumerSubscribed(event);
-        break;
-      case "newProducer":
-        producersController.createNewProducer(event.producerType);
         break;
       case "newProducerAvailable":
         producersController.onNewProducerAvailable(event);
@@ -370,6 +357,91 @@ export default function Main() {
     }
   };
 
+  const handleUserLeftCleanup = (
+    disconnectedUsername: string,
+    disconnectedInstance: string
+  ) => {
+    setBundles((prev) => {
+      const updatedBundles = { ...prev };
+      if (updatedBundles[disconnectedUsername]) {
+        delete updatedBundles[disconnectedUsername][disconnectedInstance];
+      }
+      return updatedBundles;
+    });
+
+    if (
+      remoteTracksMap.current[disconnectedUsername] &&
+      remoteTracksMap.current[disconnectedUsername][disconnectedInstance]
+    ) {
+      delete remoteTracksMap.current[disconnectedUsername][
+        disconnectedInstance
+      ];
+
+      if (
+        Object.keys(remoteTracksMap.current[disconnectedUsername]).length === 0
+      ) {
+        delete remoteTracksMap.current[disconnectedUsername];
+      }
+    }
+
+    if (
+      remoteDataStreams.current?.[disconnectedUsername]?.[
+        disconnectedInstance
+      ] !== undefined
+    ) {
+      remoteDataStreams.current?.[disconnectedUsername]?.[
+        disconnectedInstance
+      ].positionScaleRotation?.close();
+      delete remoteDataStreams.current?.[disconnectedUsername]?.[
+        disconnectedInstance
+      ].positionScaleRotation;
+      delete remoteDataStreams.current?.[disconnectedUsername]?.[
+        disconnectedInstance
+      ];
+
+      if (
+        Object.keys(remoteDataStreams.current?.[disconnectedUsername])
+          .length === 0
+      ) {
+        delete remoteDataStreams.current?.[disconnectedUsername];
+      }
+    }
+
+    if (
+      remoteStreamEffects.current?.[disconnectedUsername]?.[
+        disconnectedInstance
+      ] !== undefined
+    ) {
+      delete remoteStreamEffects.current?.[disconnectedUsername]?.[
+        disconnectedInstance
+      ];
+
+      if (
+        Object.keys(remoteStreamEffects.current?.[disconnectedUsername])
+          .length === 0
+      ) {
+        delete remoteStreamEffects.current?.[disconnectedUsername];
+      }
+    }
+
+    if (
+      remoteCurrentEffectsStyles.current?.[disconnectedUsername]?.[
+        disconnectedInstance
+      ] !== undefined
+    ) {
+      delete remoteCurrentEffectsStyles.current?.[disconnectedUsername]?.[
+        disconnectedInstance
+      ];
+
+      if (
+        Object.keys(remoteCurrentEffectsStyles.current?.[disconnectedUsername])
+          .length === 0
+      ) {
+        delete remoteCurrentEffectsStyles.current?.[disconnectedUsername];
+      }
+    }
+  };
+
   useEffect(() => {
     socket.current.on("message", handleMessage);
 
@@ -377,29 +449,7 @@ export default function Main() {
     socket.current.on(
       "userDisconnected",
       (disconnectedUsername: string, disconnectedInstance: string) => {
-        setBundles((prev) => {
-          const updatedBundles = { ...prev };
-          if (updatedBundles[disconnectedUsername]) {
-            delete updatedBundles[disconnectedUsername][disconnectedInstance];
-          }
-          return updatedBundles;
-        });
-
-        if (
-          remoteTracksMap.current[disconnectedUsername] &&
-          remoteTracksMap.current[disconnectedUsername][disconnectedInstance]
-        ) {
-          delete remoteTracksMap.current[disconnectedUsername][
-            disconnectedInstance
-          ];
-
-          if (
-            Object.keys(remoteTracksMap.current[disconnectedUsername])
-              .length === 0
-          ) {
-            delete remoteTracksMap.current[disconnectedUsername];
-          }
-        }
+        handleUserLeftCleanup(disconnectedUsername, disconnectedInstance);
       }
     );
 
@@ -407,24 +457,7 @@ export default function Main() {
     socket.current.on(
       "userLeftTable",
       (leftUsername: string, leftInstance: string) => {
-        setBundles((prev) => {
-          const updatedBundles = { ...prev };
-          if (updatedBundles[leftUsername]) {
-            delete updatedBundles[leftUsername][leftInstance];
-          }
-          return updatedBundles;
-        });
-
-        if (
-          remoteTracksMap.current[leftUsername] &&
-          remoteTracksMap.current[leftUsername][leftInstance]
-        ) {
-          delete remoteTracksMap.current[leftUsername][leftInstance];
-
-          if (Object.keys(remoteTracksMap.current[leftUsername]).length === 0) {
-            delete remoteTracksMap.current[leftUsername];
-          }
-        }
+        handleUserLeftCleanup(leftUsername, leftInstance);
       }
     );
 
@@ -433,7 +466,7 @@ export default function Main() {
       socket.current.off("message", handleMessage);
       socket.current.off("userDisconnected");
     };
-  }, [socket]);
+  }, [socket.current]);
 
   const bundlesController = new BundlesController(
     socket,
@@ -493,6 +526,7 @@ export default function Main() {
     setScreenActive,
     setCameraActive,
     bundlesController.createProducerBundle,
+    bundles,
     setBundles,
     userDevice,
     deadbanding,
@@ -505,7 +539,6 @@ export default function Main() {
     table_id,
     username,
     instance,
-    subBtnRef,
     consumerTransport,
     remoteTracksMap,
     setUpEffectContext,
@@ -561,7 +594,6 @@ export default function Main() {
         setAudioActive={setAudioActive}
         audioBtnRef={audioBtnRef}
         isSubscribed={isSubscribed}
-        subBtnRef={subBtnRef}
         muteAudio={muteAudio}
         handleDisableEnableBtns={handleDisableEnableBtns}
       />

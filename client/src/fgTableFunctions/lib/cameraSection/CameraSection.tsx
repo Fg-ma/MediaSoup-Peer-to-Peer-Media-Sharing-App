@@ -18,8 +18,6 @@ export default function CameraSection({
   cameraBtnRef,
   newCameraBtnRef,
   isCamera,
-  isScreen,
-  isAudio,
   setCameraActive,
   cameraActive,
   producersController,
@@ -33,8 +31,6 @@ export default function CameraSection({
   cameraBtnRef: React.RefObject<HTMLButtonElement>;
   newCameraBtnRef: React.RefObject<HTMLButtonElement>;
   isCamera: React.MutableRefObject<boolean>;
-  isScreen: React.MutableRefObject<boolean>;
-  isAudio: React.MutableRefObject<boolean>;
   setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
   cameraActive: boolean;
   producersController: ProducersController;
@@ -50,8 +46,6 @@ export default function CameraSection({
     instance,
 
     isCamera,
-    isScreen,
-    isAudio,
     setCameraActive,
 
     userMedia,
