@@ -4,11 +4,15 @@ import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesC
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import BundleController from "./lib/BundleController";
 import { useSignalContext } from "../context/signalContext/SignalContext";
-import FgBabylonCanvas from "../fgVisualMedia/FgBabylonCanvas";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import { Permissions } from "../context/permissionsContext/PermissionsContext";
 
-const FgVideo = React.lazy(() => import("../fgVisualMedia/FgVideo"));
+const UserVisualMedia = React.lazy(
+  () => import("../fgVisualMedia/UserVisualMedia")
+);
+const RemoteVisualMedia = React.lazy(
+  () => import("../fgVisualMedia/RemoteVisualMedia")
+);
 const FgAudioElementContainer = React.lazy(
   () => import("../fgAudioElement/FgAudioElementContainer")
 );
@@ -168,7 +172,7 @@ export default function Bundle({
         Object.entries(cameraStreams).map(([key, cameraStream]) => (
           <Suspense key={key} fallback={<div>Loading...</div>}>
             {bundleOptions.isUser ? (
-              <FgBabylonCanvas
+              <UserVisualMedia
                 socket={socket}
                 videoId={key}
                 table_id={table_id}
@@ -213,7 +217,7 @@ export default function Bundle({
                 }
               />
             ) : (
-              <FgVideo
+              <RemoteVisualMedia
                 socket={socket}
                 videoId={key}
                 table_id={table_id}
@@ -266,7 +270,7 @@ export default function Bundle({
         Object.entries(screenStreams).map(([key, screenStream]) => (
           <Suspense key={key} fallback={<div>Loading...</div>}>
             {bundleOptions.isUser ? (
-              <FgBabylonCanvas
+              <UserVisualMedia
                 socket={socket}
                 videoId={key}
                 table_id={table_id}
@@ -311,7 +315,7 @@ export default function Bundle({
                 }
               />
             ) : (
-              <FgVideo
+              <RemoteVisualMedia
                 socket={socket}
                 videoId={key}
                 table_id={table_id}
@@ -378,6 +382,7 @@ export default function Bundle({
               handleMute={bundleController.handleMute}
               localMute={localMute}
               isUser={bundleOptions.isUser}
+              permissions={permissions}
               clientMute={clientMute}
             />
           </Suspense>

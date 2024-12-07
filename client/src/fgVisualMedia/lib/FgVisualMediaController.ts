@@ -13,6 +13,7 @@ import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import { FgVisualMediaOptions } from "./typeConstant";
+import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 
 type FgVisualMediaMessageEvents =
   | {
@@ -71,16 +72,29 @@ type FgVisualMediaMessageEvents =
             };
           }
         | undefined;
+    }
+  | {
+      type: "newConsumerWasCreated";
+      producerUsername: string;
+      producerInstance: string;
+      consumerId?: string;
+      consumerType: string;
     };
 
 class FgVisualMediaController {
   constructor(
+    private table_id: string,
     private username: string,
     private instance: string,
     private type: "camera" | "screen",
     private videoId: string,
     private fgLowerVisualMediaController: FgLowerVisualMediaController,
     private videoStream: MediaStream | undefined,
+    private positioningListeners: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: () => void;
+      };
+    }>,
     private positioning: React.MutableRefObject<{
       position: {
         left: number;
@@ -122,8 +136,15 @@ class FgVisualMediaController {
         [instance: string]: EffectStylesType;
       };
     }>,
+    private remoteDataStreams: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: {
+          positionScaleRotation?: DataConsumer | undefined;
+        };
+      };
+    }>,
     private videoRef: React.RefObject<HTMLVideoElement>,
-    private videoContainerRef: React.RefObject<HTMLDivElement>,
+    private visualMediaContainerRef: React.RefObject<HTMLDivElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
     private fgVisualMediaOptions: FgVisualMediaOptions,
     private handleVisualEffectChange: (
@@ -131,7 +152,8 @@ class FgVisualMediaController {
       blockStateChange?: boolean
     ) => Promise<void>,
     private setInVideo: React.Dispatch<React.SetStateAction<boolean>>,
-    private leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | undefined>
+    private leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   init = () => {
@@ -146,7 +168,7 @@ class FgVisualMediaController {
 
     // Set initial track statte
     const volumeSliders =
-      this.videoContainerRef.current?.querySelectorAll(".volume-slider");
+      this.visualMediaContainerRef.current?.querySelectorAll(".volume-slider");
 
     volumeSliders?.forEach((slider) => {
       const sliderElement = slider as HTMLInputElement;
@@ -157,7 +179,7 @@ class FgVisualMediaController {
       }
     });
 
-    this.videoContainerRef.current?.style.setProperty(
+    this.visualMediaContainerRef.current?.style.setProperty(
       "--primary-video-color",
       `${this.fgVisualMediaOptions.primaryVideoColor}`
     );
@@ -348,6 +370,42 @@ class FgVisualMediaController {
     }
   };
 
+  onNewConsumerWasCreated = () => {
+    for (const remoteUsername in this.remoteDataStreams.current) {
+      const remoteUserStreams = this.remoteDataStreams.current[remoteUsername];
+      for (const remoteInstance in remoteUserStreams) {
+        const stream = remoteUserStreams[remoteInstance].positionScaleRotation;
+        if (
+          stream &&
+          (!this.positioningListeners.current[remoteUsername] ||
+            !this.positioningListeners.current[remoteUsername][remoteInstance])
+        ) {
+          const handleMessage = (message: string) => {
+            const data = JSON.parse(message);
+            if (
+              data.table_id === this.table_id &&
+              data.username === this.username &&
+              data.instance === this.instance &&
+              data.type === "audio"
+            ) {
+              this.positioning.current = data.positioning;
+              this.setRerender((prev) => !prev);
+            }
+          };
+
+          stream.on("message", handleMessage);
+
+          // Store cleanup function
+          if (!this.positioningListeners.current[remoteUsername]) {
+            this.positioningListeners.current[remoteUsername] = {};
+          }
+          this.positioningListeners.current[remoteUsername][remoteInstance] =
+            () => stream.off("message", handleMessage);
+        }
+      }
+    }
+  };
+
   handleMessage = (event: FgVisualMediaMessageEvents) => {
     switch (event.type) {
       case "effectChangeRequested":
@@ -358,6 +416,9 @@ class FgVisualMediaController {
         break;
       case "responsedCatchUpData":
         this.onResponsedCatchUpData(event);
+        break;
+      case "newConsumerWasCreated":
+        this.onNewConsumerWasCreated();
         break;
       default:
         break;
@@ -370,11 +431,11 @@ class FgVisualMediaController {
     }
 
     if (document.hidden) {
-      if (!this.videoContainerRef.current?.classList.contains("paused")) {
+      if (!this.visualMediaContainerRef.current?.classList.contains("paused")) {
         this.fgLowerVisualMediaController.handlePausePlay();
       }
     } else {
-      if (this.videoContainerRef.current?.classList.contains("paused")) {
+      if (this.visualMediaContainerRef.current?.classList.contains("paused")) {
         this.fgLowerVisualMediaController.handlePausePlay();
       }
     }
@@ -394,6 +455,39 @@ class FgVisualMediaController {
       clearTimeout(this.leaveVideoTimer.current);
       this.leaveVideoTimer.current = undefined;
     }, this.fgVisualMediaOptions.controlsVanishTime);
+  };
+
+  // Attach message listeners
+  attachPositioningListeners = () => {
+    for (const remoteUsername in remoteDataStreams.current) {
+      const remoteUserStreams = remoteDataStreams.current[remoteUsername];
+      for (const remoteInstance in remoteUserStreams) {
+        const stream = remoteUserStreams[remoteInstance].positionScaleRotation;
+        if (stream) {
+          const handleMessage = (message: string) => {
+            const data = JSON.parse(message);
+            if (
+              data.table_id === table_id &&
+              data.username === username &&
+              data.instance === instance &&
+              data.type === "audio"
+            ) {
+              positioning.current = data.positioning;
+              setRerender((prev) => !prev);
+            }
+          };
+
+          stream.on("message", handleMessage);
+
+          // Store cleanup function
+          if (!positioningListeners.current[remoteUsername]) {
+            positioningListeners.current[remoteUsername] = {};
+          }
+          positioningListeners.current[remoteUsername][remoteInstance] = () =>
+            stream.off("message", handleMessage);
+        }
+      }
+    }
   };
 }
 

@@ -38,7 +38,7 @@ export default function AudioEffectsSection({
   padding,
   handleMute,
   muteStateRef,
-  videoContainerRef,
+  visualMediaContainerRef,
   closeLabelElement,
   closeCallback,
   backgroundColor,
@@ -54,7 +54,7 @@ export default function AudioEffectsSection({
   padding: number;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
-  videoContainerRef?: React.RefObject<HTMLDivElement>;
+  visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
   closeCallback?: () => void;
   backgroundColor?: string;
@@ -233,13 +233,17 @@ export default function AudioEffectsSection({
               externalRef={pianoRef}
               className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
-                if (videoContainerRef?.current) {
+                if (visualMediaContainerRef?.current) {
                   if (
-                    videoContainerRef.current.classList.contains("in-piano")
+                    visualMediaContainerRef.current.classList.contains(
+                      "in-piano"
+                    )
                   ) {
-                    videoContainerRef.current.classList.remove("in-piano");
+                    visualMediaContainerRef.current.classList.remove(
+                      "in-piano"
+                    );
                   } else {
-                    videoContainerRef.current.classList.add("in-piano");
+                    visualMediaContainerRef.current.classList.add("in-piano");
                   }
                 }
                 setPanioActive((prev) => !prev);

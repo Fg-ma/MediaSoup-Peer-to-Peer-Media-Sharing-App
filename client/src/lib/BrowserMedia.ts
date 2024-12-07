@@ -5,27 +5,9 @@ import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
 
 class BrowserMedia {
-  private device: React.MutableRefObject<mediasoup.types.Device | undefined>;
-  private userMedia: React.MutableRefObject<{
-    camera: {
-      [cameraId: string]: CameraMedia;
-    };
-    screen: {
-      [screenId: string]: ScreenMedia;
-    };
-    audio: AudioMedia | undefined;
-  }>;
-  private isCamera: React.MutableRefObject<boolean>;
-  private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
-  private isScreen: React.MutableRefObject<boolean>;
-  private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>;
-  private isAudio: React.MutableRefObject<boolean>;
-  private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
-  private handleDisableEnableBtns: (disabled: boolean) => void;
-
   constructor(
-    device: React.MutableRefObject<mediasoup.types.Device | undefined>,
-    userMedia: React.MutableRefObject<{
+    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
       };
@@ -34,24 +16,14 @@ class BrowserMedia {
       };
       audio: AudioMedia | undefined;
     }>,
-    isCamera: React.MutableRefObject<boolean>,
-    setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
-    isScreen: React.MutableRefObject<boolean>,
-    setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
-    isAudio: React.MutableRefObject<boolean>,
-    setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
-    handleDisableEnableBtns: (disabled: boolean) => void
-  ) {
-    this.device = device;
-    this.userMedia = userMedia;
-    this.isCamera = isCamera;
-    this.setCameraActive = setCameraActive;
-    this.isScreen = isScreen;
-    this.setScreenActive = setScreenActive;
-    this.isAudio = isAudio;
-    this.setAudioActive = setAudioActive;
-    this.handleDisableEnableBtns = handleDisableEnableBtns;
-  }
+    private isCamera: React.MutableRefObject<boolean>,
+    private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private isScreen: React.MutableRefObject<boolean>,
+    private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private isAudio: React.MutableRefObject<boolean>,
+    private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private handleDisableEnableBtns: (disabled: boolean) => void
+  ) {}
 
   getCameraMedia = async () => {
     if (this.device.current && !this.device.current.canProduce("video")) {
@@ -103,13 +75,9 @@ class BrowserMedia {
   };
 
   getAudioMedia = async () => {
-    if (this.device.current && !this.device.current.canProduce("audio")) {
-      console.error("Cannot produce audio");
-      return;
-    }
-
     try {
-      return new Tone.UserMedia();
+      const mic = new Tone.UserMedia();
+      return mic;
     } catch (error) {
       this.handleDisableEnableBtns(false);
       if (this.userMedia.current.audio === undefined) {

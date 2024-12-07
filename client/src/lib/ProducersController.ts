@@ -190,7 +190,6 @@ class ProducersController {
       this.userStreamEffects,
       audioBrowserMedia
     );
-    await newAudioMedia.openMic();
 
     this.userMedia.current.audio = newAudioMedia;
 

@@ -116,7 +116,7 @@ export default function FgLowerVisualMediaControls({
   pausedState,
   clientMute,
   localMute,
-  videoContainerRef,
+  visualMediaContainerRef,
   audioStream,
   audioRef,
   currentTimeRef,
@@ -143,7 +143,7 @@ export default function FgLowerVisualMediaControls({
   pausedState: boolean;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
-  videoContainerRef: React.RefObject<HTMLDivElement>;
+  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
@@ -242,7 +242,7 @@ export default function FgLowerVisualMediaControls({
                       defaultFgVisualMediaOptions.permissions
                         .acceptsScreenEffects
                 }
-                videoContainerRef={videoContainerRef}
+                visualMediaContainerRef={visualMediaContainerRef}
                 handleVisualEffectChange={handleVisualEffectChange}
                 tintColor={tintColor}
               />
@@ -335,7 +335,7 @@ export default function FgLowerVisualMediaControls({
                   settingsActive={settingsActive}
                   settings={settings}
                   audioStream={audioStream}
-                  videoContainerRef={videoContainerRef}
+                  visualMediaContainerRef={visualMediaContainerRef}
                   browserStandardSpeechRecognitionAvailable={
                     browserStandardSpeechRecognitionAvailable
                   }
@@ -347,7 +347,7 @@ export default function FgLowerVisualMediaControls({
               <FgSettingsButton
                 fgVisualMediaOptions={fgVisualMediaOptions}
                 visualEffectsActive={visualEffectsActive}
-                videoContainerRef={videoContainerRef}
+                visualMediaContainerRef={visualMediaContainerRef}
                 settingsActive={settingsActive}
                 setSettingsActive={setSettingsActive}
                 activePages={activePages}
@@ -414,7 +414,7 @@ export default function FgLowerVisualMediaControls({
                     setRerender((prev) => prev + 1);
                   }}
                   muteStateRef={localMute}
-                  videoContainerRef={videoContainerRef}
+                  visualMediaContainerRef={visualMediaContainerRef}
                   closeLabelElement={
                     <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0 bg-white'>
                       Close (x)

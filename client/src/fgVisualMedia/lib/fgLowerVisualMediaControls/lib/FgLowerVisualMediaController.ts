@@ -71,7 +71,7 @@ class FgLowerVisualMediaController {
     private bundleRef: React.RefObject<HTMLDivElement>,
     private videoRef: React.RefObject<HTMLVideoElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
-    private videoContainerRef: React.RefObject<HTMLDivElement>,
+    private visualMediaContainerRef: React.RefObject<HTMLDivElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private inVideo: boolean,
     private shiftPressed: React.MutableRefObject<boolean>,
@@ -146,8 +146,8 @@ class FgLowerVisualMediaController {
   };
 
   handleClosedCaptions = () => {
-    if (this.videoContainerRef.current) {
-      this.videoContainerRef.current.classList.toggle("captions");
+    if (this.visualMediaContainerRef.current) {
+      this.visualMediaContainerRef.current.classList.toggle("captions");
       this.setCaptionsActive((prev) => !prev);
     }
   };
@@ -180,16 +180,16 @@ class FgLowerVisualMediaController {
       document
         .exitFullscreen()
         .then(() => {
-          this.videoContainerRef.current?.classList.remove("full-screen");
+          this.visualMediaContainerRef.current?.classList.remove("full-screen");
         })
         .catch((error) => {
           console.error("Failed to exit full screen:", error);
         });
     } else {
-      this.videoContainerRef.current
+      this.visualMediaContainerRef.current
         ?.requestFullscreen()
         .then(() => {
-          this.videoContainerRef.current?.classList.add("full-screen");
+          this.visualMediaContainerRef.current?.classList.add("full-screen");
         })
         .catch((error) => {
           console.error("Failed to request full screen:", error);
@@ -199,15 +199,15 @@ class FgLowerVisualMediaController {
 
   handleFullScreenChange = () => {
     if (!document.fullscreenElement) {
-      this.videoContainerRef.current?.classList.remove("full-screen");
+      this.visualMediaContainerRef.current?.classList.remove("full-screen");
     }
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
-      !this.videoContainerRef.current?.classList.contains("in-video") ||
-      this.videoContainerRef.current?.classList.contains("in-piano") ||
+      !this.visualMediaContainerRef.current?.classList.contains("in-video") ||
+      this.visualMediaContainerRef.current?.classList.contains("in-piano") ||
       this.controlPressed.current ||
       this.shiftPressed.current
     ) {
@@ -458,7 +458,9 @@ class FgLowerVisualMediaController {
   };
 
   handleMiniPlayer = () => {
-    if (this.videoContainerRef.current?.classList.contains("mini-player")) {
+    if (
+      this.visualMediaContainerRef.current?.classList.contains("mini-player")
+    ) {
       document.exitPictureInPicture().catch((error) => {
         console.error("Failed to exit picture in picture:", error);
       });
@@ -480,9 +482,9 @@ class FgLowerVisualMediaController {
 
   handlePictureInPicture = (action: string) => {
     if (action === "enter") {
-      this.videoContainerRef.current?.classList.add("mini-player");
+      this.visualMediaContainerRef.current?.classList.add("mini-player");
     } else if (action === "leave") {
-      this.videoContainerRef.current?.classList.remove("mini-player");
+      this.visualMediaContainerRef.current?.classList.remove("mini-player");
     }
   };
 
@@ -501,11 +503,11 @@ class FgLowerVisualMediaController {
   };
 
   updateCaptionsStyles = () => {
-    if (!this.videoContainerRef.current) {
+    if (!this.visualMediaContainerRef.current) {
       return;
     }
 
-    const style = this.videoContainerRef.current.style;
+    const style = this.visualMediaContainerRef.current.style;
     const captionOptions =
       this.settings.closedCaption.closedCaptionOptionsActive;
 

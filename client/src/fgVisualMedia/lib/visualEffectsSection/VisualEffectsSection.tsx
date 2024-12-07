@@ -26,10 +26,11 @@ const HatsButton = React.lazy(() => import("./lib/HatsButton"));
 const PetsButton = React.lazy(() => import("./lib/PetsButton"));
 
 const EffectSectionVar: Variants = {
-  init: { opacity: 0, scale: 0.8 },
+  init: { opacity: 0, scale: 0.8, translate: "-50%" },
   animate: {
     opacity: 1,
     scale: 1,
+    translate: "-50%",
     transition: {
       scale: { type: "spring", stiffness: 80 },
     },
@@ -50,7 +51,7 @@ export default function VisualEffectsSection({
   socket,
   isUser,
   acceptsVisualEffects,
-  videoContainerRef,
+  visualMediaContainerRef,
   handleVisualEffectChange,
   tintColor,
 }: {
@@ -61,7 +62,7 @@ export default function VisualEffectsSection({
   socket: React.MutableRefObject<Socket>;
   isUser: boolean;
   acceptsVisualEffects: boolean;
-  videoContainerRef: React.RefObject<HTMLDivElement>;
+  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean,
@@ -79,8 +80,8 @@ export default function VisualEffectsSection({
   const effectsContainerRef = useRef<HTMLDivElement>(null);
 
   const updateWidth = () => {
-    if (videoContainerRef.current) {
-      const newEffectsWidth = videoContainerRef.current.clientWidth * 0.9;
+    if (visualMediaContainerRef.current) {
+      const newEffectsWidth = visualMediaContainerRef.current.clientWidth * 0.9;
 
       setEffectsWidth(newEffectsWidth);
 
@@ -93,15 +94,8 @@ export default function VisualEffectsSection({
   };
 
   useEffect(() => {
-    // Update width on mount
     updateWidth();
-
-    // Add resize event listener
-    window.addEventListener("resize", updateWidth);
-
-    // Cleanup event listener on unmount
-    return () => window.removeEventListener("resize", updateWidth);
-  }, [videoContainerRef.current]);
+  }, [visualMediaContainerRef.current?.clientWidth]);
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -117,10 +111,12 @@ export default function VisualEffectsSection({
 
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
+    window.addEventListener("resize", updateWidth);
+
     return () => {
       socket.current.off("message", handleMessage);
-
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("resize", updateWidth);
     };
   }, []);
 
@@ -163,17 +159,9 @@ export default function VisualEffectsSection({
       ref={effectsContainerRef}
       className={`${
         overflowingXDirection ? "" : "pb-2"
-      } tiny-horizontal-scroll-bar overflow-x-auto rounded border mb-5 border-white border-opacity-75 bg-black bg-opacity-75 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center`}
+      } left-1/2 tiny-horizontal-scroll-bar overflow-x-auto rounded border mb-5 border-white border-opacity-75 bg-black bg-opacity-75 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center`}
       style={{
         width: effectsWidth,
-        left: videoContainerRef.current
-          ? `${
-              ((videoContainerRef.current.clientWidth - effectsWidth) /
-                2 /
-                videoContainerRef.current.clientWidth) *
-              100
-            }%`
-          : undefined,
       }}
       variants={EffectSectionVar}
       initial='init'

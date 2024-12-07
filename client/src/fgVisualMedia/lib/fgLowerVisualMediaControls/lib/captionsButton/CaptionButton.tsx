@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { KaldiRecognizer, Model } from "vosk-browser";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import { Settings } from "../../../../FgVideo";
 import FgVideoCaptions from "./lib/FgVideoCaptions";
 import CaptionsController from "./lib/CaptionsController";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
+import { Settings } from "../../../typeConstant";
 
 import captionsIcon from "../../../../../../public/svgs/captionsIcon.svg";
 
@@ -151,7 +151,7 @@ export default function CaptionButton({
   settingsActive,
   settings,
   audioStream,
-  videoContainerRef,
+  visualMediaContainerRef,
   browserStandardSpeechRecognitionAvailable,
 }: {
   fgLowerVisualMediaController: FgLowerVisualMediaController;
@@ -159,7 +159,7 @@ export default function CaptionButton({
   settingsActive: boolean;
   settings: Settings;
   audioStream: MediaStream;
-  videoContainerRef: React.RefObject<HTMLDivElement>;
+  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
 }) {
   const [active, setActive] = useState(false);
@@ -262,7 +262,7 @@ export default function CaptionButton({
       />
       {active && (
         <FgVideoCaptions
-          videoContainerRef={videoContainerRef}
+          visualMediaContainerRef={visualMediaContainerRef}
           browserStandardSpeechRecognitionAvailable={
             browserStandardSpeechRecognitionAvailable
           }

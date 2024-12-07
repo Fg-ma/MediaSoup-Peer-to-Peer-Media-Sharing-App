@@ -12,7 +12,7 @@ type RecursiveObject = {
 export default function FgSettingsButton({
   fgVisualMediaOptions,
   visualEffectsActive,
-  videoContainerRef,
+  visualMediaContainerRef,
   settingsActive,
   setSettingsActive,
   activePages,
@@ -23,7 +23,7 @@ export default function FgSettingsButton({
 }: {
   fgVisualMediaOptions: FgVisualMediaOptions;
   visualEffectsActive: boolean;
-  videoContainerRef: React.RefObject<HTMLDivElement>;
+  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
   activePages: ActivePages;
@@ -64,10 +64,10 @@ export default function FgSettingsButton({
       return deactivePages as unknown as ActivePages;
     });
 
-    if (!videoContainerRef.current?.classList.contains("in-settings")) {
-      videoContainerRef.current?.classList.add("in-settings");
+    if (!visualMediaContainerRef.current?.classList.contains("in-settings")) {
+      visualMediaContainerRef.current?.classList.add("in-settings");
     } else {
-      videoContainerRef.current?.classList.remove("in-settings");
+      visualMediaContainerRef.current?.classList.remove("in-settings");
     }
   };
 

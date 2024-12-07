@@ -9,6 +9,7 @@ import RotateButton from "../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
 import "./lib/audioElement.css";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
+import { Permissions } from "../context/permissionsContext/PermissionsContext";
 
 const FgPortal = React.lazy(() => import("../fgElements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
@@ -62,6 +63,7 @@ export default function FgAudioElementContainer({
   clientMute,
   localMute,
   isUser,
+  permissions,
   options,
 }: {
   socket: React.MutableRefObject<Socket>;
@@ -79,6 +81,7 @@ export default function FgAudioElementContainer({
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   isUser: boolean;
+  permissions: Permissions;
   options?: {
     controlsVanishTime?: number;
     springDuration?: number;
@@ -110,6 +113,12 @@ export default function FgAudioElementContainer({
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
   const [inAudioContainer, setInAudioContainer] = useState(false);
 
+  const positioningListeners = useRef<{
+    [username: string]: {
+      [instance: string]: () => void;
+    };
+  }>({});
+
   const positioning = useRef<{
     position: { left: number; top: number };
     scale: { x: number; y: number };
@@ -134,9 +143,13 @@ export default function FgAudioElementContainer({
   const fgAudioElementContainerController =
     new FgAudioElementContainerController(
       isUser,
+      table_id,
       username,
       instance,
-      positioning
+      positioning,
+      remoteDataStreams,
+      positioningListeners,
+      setRerender
     );
 
   useEffect(() => {
@@ -169,35 +182,66 @@ export default function FgAudioElementContainer({
   }, []);
 
   useEffect(() => {
+    // Ensure remoteDataStreams and necessary permissions are valid
     if (
-      !isUser &&
-      remoteDataStreams.current[username] &&
-      remoteDataStreams.current[username][instance] &&
-      remoteDataStreams.current[username][instance].positionScaleRotation
+      !remoteDataStreams.current ||
+      (isUser && !permissions.acceptsAudioEffects)
     ) {
-      remoteDataStreams.current[username][instance].positionScaleRotation.on(
-        "message",
-        (message) => {
-          const data = JSON.parse(message);
+      return;
+    }
 
-          if (
-            data.table_id === table_id &&
-            data.username === username &&
-            data.instance === instance &&
-            data.type === "audio"
-          ) {
-            positioning.current = data.positioning;
-            setRerender((prev) => !prev);
+    // Attach message listeners
+    const attachListeners = () => {
+      for (const remoteUsername in remoteDataStreams.current) {
+        const remoteUserStreams = remoteDataStreams.current[remoteUsername];
+        for (const remoteInstance in remoteUserStreams) {
+          const stream =
+            remoteUserStreams[remoteInstance].positionScaleRotation;
+          if (stream) {
+            const handleMessage = (message: string) => {
+              const data = JSON.parse(message);
+              if (
+                data.table_id === table_id &&
+                data.username === username &&
+                data.instance === instance &&
+                data.type === "audio"
+              ) {
+                positioning.current = data.positioning;
+                setRerender((prev) => !prev);
+              }
+            };
+
+            stream.on("message", handleMessage);
+
+            // Store cleanup function
+            if (!positioningListeners.current[remoteUsername]) {
+              positioningListeners.current[remoteUsername] = {};
+            }
+            positioningListeners.current[remoteUsername][remoteInstance] = () =>
+              stream.off("message", handleMessage);
           }
         }
+      }
+    };
+
+    attachListeners();
+
+    // Cleanup on unmount or dependency change
+    return () => {
+      Object.values(positioningListeners.current).forEach((userListners) =>
+        Object.values(userListners).forEach((removeListener) =>
+          removeListener()
+        )
       );
-    }
-  }, [
-    remoteDataStreams.current?.[username]?.[instance]?.positionScaleRotation,
-  ]);
+    };
+  }, []);
 
   useEffect(() => {
-    if (isUser) {
+    if (
+      adjustingDimensions &&
+      (isUser || permissions.acceptsAudioEffects) &&
+      userDataStreams.current.positionScaleRotation?.readyState === "open"
+    ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           table_id,
@@ -432,9 +476,13 @@ export default function FgAudioElementContainer({
         clientMute={clientMute}
         localMute={localMute}
         isUser={isUser}
-        doubleClickFunction={() => {
-          setAudioEffectsSectionVisible((prev) => !prev);
-        }}
+        doubleClickFunction={
+          isUser
+            ? () => {
+                setAudioEffectsSectionVisible((prev) => !prev);
+              }
+            : undefined
+        }
         fgAudioElementContainerOptions={fgAudioElementContainerOptions}
       />
       {popupVisible && (
@@ -449,7 +497,7 @@ export default function FgAudioElementContainer({
           />
         </Suspense>
       )}
-      {audioEffectsSectionVisible && (
+      {isUser && audioEffectsSectionVisible && (
         <Suspense fallback={<div>Loading...</div>}>
           <AudioEffectsSection
             socket={socket}

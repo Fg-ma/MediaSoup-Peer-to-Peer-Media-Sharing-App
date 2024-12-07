@@ -26,7 +26,7 @@ export default function AudioEffectsButton({
   handleAudioEffectChange,
   handleMute,
   muteStateRef,
-  videoContainerRef,
+  visualMediaContainerRef,
   closeLabelElement,
   hoverLabelElement,
   options,
@@ -41,7 +41,7 @@ export default function AudioEffectsButton({
   handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
-  videoContainerRef?: React.RefObject<HTMLDivElement>;
+  visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
   hoverLabelElement?: React.ReactElement;
   options?: {
@@ -114,7 +114,7 @@ export default function AudioEffectsButton({
             padding={12}
             handleMute={handleMute}
             muteStateRef={muteStateRef}
-            videoContainerRef={videoContainerRef}
+            visualMediaContainerRef={visualMediaContainerRef}
             closeLabelElement={closeLabelElement}
             closeCallback={() => setAudioEffectsActive(false)}
             backgroundColor={audioEffectsButtonOptions.backgroundColor}

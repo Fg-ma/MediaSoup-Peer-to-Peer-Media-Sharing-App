@@ -10,29 +10,22 @@ import {
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import FgVisualMediaController from "./lib/FgVisualMediaController";
-import {
-  HideBackgroundEffectTypes,
-  PostProcessEffects,
-} from "../context/currentEffectsStylesContext/typeConstant";
-import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import { HideBackgroundEffectTypes } from "../context/currentEffectsStylesContext/typeConstant";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
+import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import {
   defaultFgVisualMediaOptions,
   FgVisualMediaOptions,
   Settings,
 } from "./lib/typeConstant";
+import "./lib/fgVideoStyles.css";
+import VisualMediaGradient from "./lib/VisualMediaGradient";
 
-const PanButton = React.lazy(
-  () => import("../fgAdjustmentComponents/PanButton")
-);
-const RotateButton = React.lazy(
-  () => import("../fgAdjustmentComponents/RotateButton")
-);
-const ScaleButton = React.lazy(
-  () => import("../fgAdjustmentComponents/ScaleButton")
+const VisualMediaAdjustmentButtons = React.lazy(
+  () => import("./lib/VisualMediaAdjustmentButtons")
 );
 
-export default function FgVideo({
+export default function FgBabylonCanvas({
   socket,
   videoId,
   table_id,
@@ -43,12 +36,10 @@ export default function FgVideo({
   name,
   type,
   bundleRef,
-  videoStream,
   audioStream,
   audioRef,
   clientMute,
   localMute,
-  videoStyles,
   options,
   handleAudioEffectChange,
   handleMute,
@@ -66,12 +57,10 @@ export default function FgVideo({
   name?: string;
   type: "camera" | "screen";
   bundleRef: React.RefObject<HTMLDivElement>;
-  videoStream?: MediaStream;
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
-  videoStyles?: React.CSSProperties;
   options?: FgVisualMediaOptions;
   handleAudioEffectChange: (effect: AudioEffectTypes) => void;
   handleMute: () => void;
@@ -96,9 +85,9 @@ export default function FgVideo({
   const { currentEffectsStyles, remoteCurrentEffectsStyles } =
     useCurrentEffectsStylesContext();
 
-  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(document.createElement("video"));
 
   const [inVideo, setInVideo] = useState(false);
 
@@ -123,6 +112,8 @@ export default function FgVideo({
 
   const [_, setCaptionsActive] = useState(false);
 
+  const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
+
   const [settings, setSettings] = useState<Settings>({
     closedCaption: {
       value: "en-US",
@@ -142,6 +133,13 @@ export default function FgVideo({
   const initTimeOffset = useRef(0);
 
   const [_rerender, setRerender] = useState(false);
+
+  const positioningListeners = useRef<{
+    [username: string]: {
+      [instance: string]: () => void;
+    };
+  }>({});
+
   const positioning = useRef<{
     position: { left: number; top: number };
     scale: { x: number; y: number };
@@ -156,8 +154,7 @@ export default function FgVideo({
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange: boolean = false,
     hideBackgroundStyle?: HideBackgroundEffectTypes,
-    hideBackgroundColor?: string,
-    postProcessStyle?: PostProcessEffects
+    hideBackgroundColor?: string
   ) => {
     if (fgVisualMediaOptions.isUser) {
       fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
@@ -176,7 +173,7 @@ export default function FgVideo({
           producerType: type,
           producerId: videoId,
           effect: effect,
-          // @ts-expect-error: ts can't verify type, videoId, and effect correlate
+          // @ts-expect-error: ts can't infer type, videoId, and effect are strictly enforces and exist
           effectStyle: currentEffectsStyles.current[type][videoId][effect],
           blockStateChange: blockStateChange,
         };
@@ -205,7 +202,6 @@ export default function FgVideo({
             ][effect],
           hideBackgroundStyle: hideBackgroundStyle,
           hideBackgroundColor: hideBackgroundColor,
-          postProcessStyle: postProcessStyle,
         },
       };
 
@@ -231,7 +227,7 @@ export default function FgVideo({
     bundleRef,
     videoRef,
     audioRef,
-    videoContainerRef,
+    visualMediaContainerRef,
     setPausedState,
     inVideo,
     shiftPressed,
@@ -254,12 +250,14 @@ export default function FgVideo({
   );
 
   const fgVisualMediaController = new FgVisualMediaController(
+    table_id,
     username,
     instance,
     type,
     videoId,
     fgLowerVisualMediaController,
-    videoStream,
+    undefined,
+    positioningListeners,
     positioning,
     setPausedState,
     paused,
@@ -267,23 +265,45 @@ export default function FgVideo({
     remoteStreamEffects,
     currentEffectsStyles,
     remoteCurrentEffectsStyles,
+    remoteDataStreams,
     videoRef,
-    videoContainerRef,
+    visualMediaContainerRef,
     audioRef,
     fgVisualMediaOptions,
     handleVisualEffectChange,
     setInVideo,
-    leaveVideoTimer
+    leaveVideoTimer,
+    setRerender
   );
 
   useEffect(() => {
+    fgLowerVisualMediaController.updateCaptionsStyles();
+  }, [settings]);
+
+  useEffect(() => {
+    const canvas = userMedia.current[type][videoId].canvas;
+    const stream = canvas.captureStream();
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.onloadedmetadata = () => {
+        videoRef.current?.play();
+      };
+    }
+
     // Set up initial conditions
     fgVisualMediaController.init();
 
     // Listen for messages on socket
     socket.current.on("message", fgVisualMediaController.handleMessage);
 
-    // Request initial catch up data
+    // Keep video time
+    fgLowerVisualMediaController.timeUpdate();
+    timeUpdateInterval.current = setInterval(
+      fgLowerVisualMediaController.timeUpdate,
+      1000
+    );
+
+    // Request initial data
     if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
       const msg = {
         type: "requestCatchUpData",
@@ -333,6 +353,10 @@ export default function FgVideo({
 
     return () => {
       socket.current.off("message", fgVisualMediaController.handleMessage);
+      if (timeUpdateInterval.current !== undefined) {
+        clearInterval(timeUpdateInterval.current);
+        timeUpdateInterval.current = undefined;
+      }
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
@@ -363,42 +387,36 @@ export default function FgVideo({
   }, []);
 
   useEffect(() => {
-    console.log(remoteDataStreams.current);
+    // Ensure remoteDataStreams and necessary permissions are valid
     if (
-      !fgVisualMediaOptions.isUser &&
-      remoteDataStreams.current[username] &&
-      remoteDataStreams.current[username][instance] &&
-      remoteDataStreams.current[username][instance].positionScaleRotation
+      !remoteDataStreams.current ||
+      (type === "camera" &&
+        !fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+      (type === "screen" &&
+        !fgVisualMediaOptions.permissions.acceptsScreenEffects)
     ) {
-      remoteDataStreams.current[username][instance].positionScaleRotation.on(
-        "message",
-        (message) => {
-          const data = JSON.parse(message);
-
-          if (
-            data.table_id === table_id &&
-            data.username === username &&
-            data.instance === instance &&
-            data.videoId === videoId
-          ) {
-            positioning.current = data.positioning;
-            setRerender((prev) => !prev);
-          }
-        }
-      );
+      return;
     }
-  }, [
-    remoteDataStreams.current?.[username]?.[instance]?.positionScaleRotation,
-  ]);
 
-  useEffect(() => {
-    fgLowerVisualMediaController.updateCaptionsStyles();
-  }, [settings]);
+    attachListeners();
+
+    // Cleanup on unmount or dependency change
+    return () => {
+      Object.values(positioningListeners.current).forEach((userListners) =>
+        Object.values(userListners).forEach((removeListener) =>
+          removeListener()
+        )
+      );
+    };
+  }, []);
 
   useEffect(() => {
     if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {
       userMedia.current[type][videoId].canvas.style.position = "absolute";
       userMedia.current[type][videoId].canvas.style.top = "0%";
+      userMedia.current[type][videoId].canvas.style.left = "0%";
+      userMedia.current[type][videoId].canvas.style.width = "100%";
+      userMedia.current[type][videoId].canvas.style.height = "100%";
       subContainerRef.current.appendChild(
         userMedia.current[type][videoId].canvas
       );
@@ -406,13 +424,16 @@ export default function FgVideo({
   }, [videoId, userMedia]);
 
   useEffect(() => {
-    if (fgVisualMediaOptions.isUser) {
+    if (
+      adjustingDimensions &&
+      userDataStreams.current.positionScaleRotation?.readyState === "open"
+    ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           table_id,
           username,
           instance,
-          videoId,
+          type: "audio",
           positioning: positioning.current,
         })
       );
@@ -421,15 +442,17 @@ export default function FgVideo({
 
   return (
     <div
-      ref={videoContainerRef}
+      ref={visualMediaContainerRef}
       id={`${videoId}_container`}
-      className={`video-container ${pausedState ? "paused" : ""} ${
-        visualEffectsActive ? "in-effects" : ""
-      } ${audioEffectsActive ? "in-effects" : ""} ${
-        inVideo ? "in-video" : ""
-      } ${
-        adjustingDimensions ? "adjusting-dimensions" : ""
-      } flex items-center justify-center`}
+      className={`visual-media-container ${pausedState ? "paused" : ""} ${
+        fgVisualMediaOptions.autoPlay ? "" : "paused"
+      } ${visualEffectsActive ? "in-effects" : ""} ${
+        audioEffectsActive ? "in-effects" : ""
+      } ${inVideo ? "in-video" : ""} ${
+        adjustingDimensions
+          ? "adjusting-dimensions pointer-events-none"
+          : "pointer-events-auto"
+      } flex items-center justify-center z-10`}
       style={{
         position: "absolute",
         left: `${positioning.current.position.left}%`,
@@ -447,122 +470,10 @@ export default function FgVideo({
         fgVisualMediaOptions.permissions
           .acceptsPositionScaleRotationManipulation) && (
         <Suspense fallback={<div>Loading...</div>}>
-          <RotateButton
-            className={
-              "rotate-btn absolute left-full bottom-full w-6 aspect-square z-10"
-            }
-            dragFunction={(_displacement, event) => {
-              if (!bundleRef.current) {
-                return;
-              }
-
-              const box = bundleRef.current.getBoundingClientRect();
-
-              fgContentAdjustmentController.rotateDragFunction(event, {
-                x:
-                  (positioning.current.position.left / 100) *
-                    bundleRef.current.clientWidth +
-                  box.left,
-                y:
-                  (positioning.current.position.top / 100) *
-                    bundleRef.current.clientHeight +
-                  box.top,
-              });
-            }}
+          <VisualMediaAdjustmentButtons
             bundleRef={bundleRef}
-            mouseDownFunction={
-              fgContentAdjustmentController.adjustmentBtnMouseDownFunction
-            }
-            mouseUpFunction={
-              fgContentAdjustmentController.adjustmentBtnMouseUpFunction
-            }
-          />
-          <PanButton
-            className={
-              "pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1"
-            }
-            dragFunction={(displacement) => {
-              if (!bundleRef.current) {
-                return;
-              }
-
-              const angle =
-                2 * Math.PI - positioning.current.rotation * (Math.PI / 180);
-
-              const pixelScale = {
-                x:
-                  (positioning.current.scale.x / 100) *
-                  bundleRef.current.clientWidth,
-                y:
-                  (positioning.current.scale.y / 100) *
-                  bundleRef.current.clientHeight,
-              };
-
-              fgContentAdjustmentController.movementDragFunction(
-                displacement,
-                {
-                  x:
-                    -15 * Math.cos(angle) -
-                    pixelScale.x * Math.cos(angle) -
-                    (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
-                  y:
-                    15 * Math.sin(angle) +
-                    pixelScale.x * Math.sin(angle) -
-                    (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
-                },
-                {
-                  x:
-                    (positioning.current.position.left / 100) *
-                    bundleRef.current.clientWidth,
-                  y:
-                    (positioning.current.position.top / 100) *
-                    bundleRef.current.clientHeight,
-                }
-              );
-            }}
-            bundleRef={bundleRef}
-            mouseDownFunction={() =>
-              fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
-                "position",
-                { rotationPointPlacement: "topLeft" }
-              )
-            }
-            mouseUpFunction={
-              fgContentAdjustmentController.adjustmentBtnMouseUpFunction
-            }
-          />
-          <ScaleButton
-            className={
-              "scale-btn absolute left-full top-full w-6 aspect-square z-10 pl-1 pt-1"
-            }
-            dragFunction={(displacement) => {
-              if (!bundleRef.current) {
-                return;
-              }
-
-              const referencePoint = {
-                x:
-                  (positioning.current.position.left / 100) *
-                  bundleRef.current.clientWidth,
-                y:
-                  (positioning.current.position.top / 100) *
-                  bundleRef.current.clientHeight,
-              };
-
-              fgContentAdjustmentController.scaleDragFunction(
-                "any",
-                displacement,
-                referencePoint,
-                referencePoint
-              );
-            }}
-            bundleRef={bundleRef}
-            mouseDownFunction={
-              fgContentAdjustmentController.adjustmentBtnMouseDownFunction
-            }
-            mouseUpFunction={
-              fgContentAdjustmentController.adjustmentBtnMouseUpFunction
-            }
+            positioning={positioning}
+            fgContentAdjustmentController={fgContentAdjustmentController}
           />
         </Suspense>
       )}
@@ -574,17 +485,8 @@ export default function FgVideo({
       )}
       <div
         ref={subContainerRef}
-        className={`relative flex items-center justify-center text-white font-K2D h-full w-full overflow-hidden rounded-md`}
+        className='relative flex items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
       >
-        <video
-          ref={videoRef}
-          id={videoId}
-          onTimeUpdate={() => fgLowerVisualMediaController.timeUpdate()}
-          className='main-video w-full h-full absolute top-0 left-0'
-          controls={false}
-          autoPlay={fgVisualMediaOptions.autoPlay}
-          style={{ ...videoStyles, objectFit: "fill" }}
-        ></video>
         <FgUpperVisualMediaControls
           name={name}
           username={username}
@@ -602,7 +504,7 @@ export default function FgVideo({
           pausedState={pausedState}
           clientMute={clientMute}
           localMute={localMute}
-          videoContainerRef={videoContainerRef}
+          visualMediaContainerRef={visualMediaContainerRef}
           audioStream={audioStream}
           audioRef={audioRef}
           currentTimeRef={currentTimeRef}
@@ -619,18 +521,7 @@ export default function FgVideo({
           handleVolumeSliderCallback={handleVolumeSliderCallback}
           tracksColorSetterCallback={tracksColorSetterCallback}
         />
-        <div
-          className='controls-gradient absolute bottom-0 w-full h-20 z-10'
-          style={{
-            background: `linear-gradient(to top, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
-          }}
-        ></div>
-        <div
-          className='controls-gradient absolute top-0 w-full h-20 z-10'
-          style={{
-            background: `linear-gradient(to bottom, rgba(0, 0, 0, .5) -10%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%)`,
-          }}
-        ></div>
+        <VisualMediaGradient />
       </div>
     </div>
   );

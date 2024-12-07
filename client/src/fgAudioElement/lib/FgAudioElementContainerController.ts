@@ -1,59 +1,70 @@
-type FgAudioContainerMessageEvents = {
-  type: "responsedCatchUpData";
-  inquiredUsername: string;
-  inquiredInstance: string;
-  inquiredType: "camera" | "screen" | "audio";
-  inquiredVideoId: string;
-  data:
-    | {
-        paused: boolean;
-        timeEllapsed: number;
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
-    | {
-        paused: boolean;
-        timeEllapsed: number;
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
-    | {
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
-    | undefined;
-};
+import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
+
+type FgAudioContainerMessageEvents =
+  | {
+      type: "responsedCatchUpData";
+      inquiredUsername: string;
+      inquiredInstance: string;
+      inquiredType: "camera" | "screen" | "audio";
+      inquiredVideoId: string;
+      data:
+        | {
+            paused: boolean;
+            timeEllapsed: number;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
+            };
+          }
+        | {
+            paused: boolean;
+            timeEllapsed: number;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
+            };
+          }
+        | {
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
+            };
+          }
+        | undefined;
+    }
+  | {
+      type: "newConsumerWasCreated";
+      producerUsername: string;
+      producerInstance: string;
+      consumerId?: string;
+      consumerType: string;
+    };
 
 class FgAudioElementContainerController {
   constructor(
     private isUser: boolean,
+    private table_id: string,
     private username: string,
     private instance: string,
     private positioning: React.MutableRefObject<{
@@ -66,7 +77,20 @@ class FgAudioElementContainerController {
         y: number;
       };
       rotation: number;
-    }>
+    }>,
+    private remoteDataStreams: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: {
+          positionScaleRotation?: DataConsumer | undefined;
+        };
+      };
+    }>,
+    private positioningListeners: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: () => void;
+      };
+    }>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   onResponsedCatchUpData = (event: {
@@ -133,10 +157,49 @@ class FgAudioElementContainerController {
     }
   };
 
+  onNewConsumerWasCreated = () => {
+    for (const remoteUsername in this.remoteDataStreams.current) {
+      const remoteUserStreams = this.remoteDataStreams.current[remoteUsername];
+      for (const remoteInstance in remoteUserStreams) {
+        const stream = remoteUserStreams[remoteInstance].positionScaleRotation;
+        if (
+          stream &&
+          (!this.positioningListeners.current[remoteUsername] ||
+            !this.positioningListeners.current[remoteUsername][remoteInstance])
+        ) {
+          const handleMessage = (message: string) => {
+            const data = JSON.parse(message);
+            if (
+              data.table_id === this.table_id &&
+              data.username === this.username &&
+              data.instance === this.instance &&
+              data.type === "audio"
+            ) {
+              this.positioning.current = data.positioning;
+              this.setRerender((prev) => !prev);
+            }
+          };
+
+          stream.on("message", handleMessage);
+
+          // Store cleanup function
+          if (!this.positioningListeners.current[remoteUsername]) {
+            this.positioningListeners.current[remoteUsername] = {};
+          }
+          this.positioningListeners.current[remoteUsername][remoteInstance] =
+            () => stream.off("message", handleMessage);
+        }
+      }
+    }
+  };
+
   handleMessage = (event: FgAudioContainerMessageEvents) => {
     switch (event.type) {
       case "responsedCatchUpData":
         this.onResponsedCatchUpData(event);
+        break;
+      case "newConsumerWasCreated":
+        this.onNewConsumerWasCreated();
         break;
       default:
         break;

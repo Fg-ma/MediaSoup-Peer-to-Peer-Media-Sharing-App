@@ -114,6 +114,8 @@ class AudioMedia {
     this.masterMediaStream.addTrack(
       this.masterMediaStreamDestination.stream.getAudioTracks()[0]
     );
+
+    this.openMic();
   }
 
   deconstructor = () => {
@@ -122,6 +124,7 @@ class AudioMedia {
   };
 
   openMic = async () => {
+    await Tone.start();
     await this.audioStream.open();
   };
 
@@ -1522,15 +1525,15 @@ class AudioMedia {
   };
 
   getStream = () => {
-    return this.mediaStream;
+    return this.masterMediaStream;
   };
 
   getTracks = () => {
-    return this.mediaStream.getAudioTracks();
+    return this.masterMediaStream.getAudioTracks();
   };
 
   getMasterTrack = () => {
-    return this.masterMediaStreamDestination.stream.getAudioTracks()[0];
+    return this.masterMediaStream.getAudioTracks()[0];
   };
 
   getMasterStream = () => {
