@@ -14,7 +14,7 @@ const ColorPicker = React.lazy(() => import("./ColorPicker"));
 export default function TintSection({
   username,
   instance,
-  videoId,
+  visualMediaId,
   type,
   isUser,
   handleVisualEffectChange,
@@ -25,7 +25,7 @@ export default function TintSection({
 }: {
   username: string;
   instance: string;
-  videoId: string;
+  visualMediaId: string;
   type: "camera" | "screen";
   isUser: boolean;
   handleVisualEffectChange: (
@@ -46,8 +46,8 @@ export default function TintSection({
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].tint
-    : remoteStreamEffects.current[username][instance][type][videoId].tint;
+    ? userStreamEffects.current[type][visualMediaId].tint
+    : remoteStreamEffects.current[username][instance][type][visualMediaId].tint;
 
   const handleColorPicker = () => {
     setTempColor(tintColor.current);
@@ -57,7 +57,7 @@ export default function TintSection({
   if (isUser) {
     useEffect(() => {
       setRerender((prev) => prev + 1);
-    }, [userStreamEffects.current[type][videoId].tint]);
+    }, [userStreamEffects.current[type][visualMediaId].tint]);
   }
 
   return (

@@ -6,7 +6,7 @@ type FgAudioContainerMessageEvents =
       inquiredUsername: string;
       inquiredInstance: string;
       inquiredType: "camera" | "screen" | "audio";
-      inquiredVideoId: string;
+      inquiredProducerId: string;
       data:
         | {
             paused: boolean;
@@ -98,7 +98,7 @@ class FgAudioElementContainerController {
     inquiredUsername: string;
     inquiredInstance: string;
     inquiredType: "camera" | "screen" | "audio";
-    inquiredVideoId: string;
+    inquiredProducerId: string;
     data:
       | {
           paused: boolean;

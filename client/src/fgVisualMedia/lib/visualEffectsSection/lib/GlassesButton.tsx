@@ -110,7 +110,7 @@ export default function GlassesButton({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   isUser,
   handleVisualEffectChange,
   effectsDisabled,
@@ -120,7 +120,7 @@ export default function GlassesButton({
   username: string;
   instance: string;
   type: "camera";
-  videoId: string;
+  visualMediaId: string;
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -139,12 +139,14 @@ export default function GlassesButton({
   const glassesContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].glasses
-    : remoteStreamEffects.current[username][instance][type][videoId].glasses;
-  const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][videoId].glasses
-    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
+    ? userStreamEffects.current[type][visualMediaId].glasses
+    : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .glasses;
+  const effectsStyles = isUser
+    ? currentEffectsStyles.current[type][visualMediaId].glasses
+    : remoteCurrentEffectsStyles.current[username][instance][type][
+        visualMediaId
+      ].glasses;
 
   const glassesEffects: {
     [key in GlassesEffectTypes]: {
@@ -328,17 +330,18 @@ export default function GlassesButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][videoId].glasses) {
-          currentEffectsStyles.current[type][videoId].glasses.style =
+        if (currentEffectsStyles.current[type][visualMediaId].glasses) {
+          currentEffectsStyles.current[type][visualMediaId].glasses.style =
             effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-            .glasses
+          remoteCurrentEffectsStyles.current[username][instance][type][
+            visualMediaId
+          ].glasses
         ) {
           remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
+            visualMediaId
           ].glasses.style = effectType;
         }
       }

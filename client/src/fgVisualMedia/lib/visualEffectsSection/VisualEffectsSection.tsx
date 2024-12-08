@@ -47,7 +47,7 @@ export default function VisualEffectsSection({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   socket,
   isUser,
   acceptsVisualEffects,
@@ -58,7 +58,7 @@ export default function VisualEffectsSection({
   username: string;
   instance: string;
   type: "camera" | "screen";
-  videoId: string;
+  visualMediaId: string;
   socket: React.MutableRefObject<Socket>;
   isUser: boolean;
   acceptsVisualEffects: boolean;
@@ -135,7 +135,10 @@ export default function VisualEffectsSection({
   ) => {
     switch (event.type) {
       case "effectChangeRequested":
-        if (videoId === event.requestedProducerId && acceptsVisualEffects) {
+        if (
+          visualMediaId === event.requestedProducerId &&
+          acceptsVisualEffects
+        ) {
           setRerender((prev) => prev + 1);
         }
         break;
@@ -144,7 +147,7 @@ export default function VisualEffectsSection({
           !isUser &&
           username === event.username &&
           instance === event.instance &&
-          videoId === event.producerId
+          visualMediaId === event.producerId
         ) {
           setRerender((prev) => prev + 1);
         }
@@ -159,7 +162,7 @@ export default function VisualEffectsSection({
       ref={effectsContainerRef}
       className={`${
         overflowingXDirection ? "" : "pb-2"
-      } left-1/2 tiny-horizontal-scroll-bar overflow-x-auto rounded border mb-5 border-white border-opacity-75 bg-black bg-opacity-75 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center`}
+      } tiny-horizontal-scroll-bar left-1/2 h-max overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center`}
       style={{
         width: effectsWidth,
       }}
@@ -174,7 +177,7 @@ export default function VisualEffectsSection({
           username={username}
           instance={instance}
           type={type}
-          videoId={videoId}
+          visualMediaId={visualMediaId}
           isUser={isUser}
           handleVisualEffectChange={handleVisualEffectChange}
           effectsDisabled={effectsDisabled}
@@ -189,7 +192,7 @@ export default function VisualEffectsSection({
             username={username}
             instance={instance}
             type={type}
-            videoId={videoId}
+            visualMediaId={visualMediaId}
             isUser={isUser}
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
@@ -203,7 +206,7 @@ export default function VisualEffectsSection({
         username={username}
         instance={instance}
         type={type}
-        videoId={videoId}
+        visualMediaId={visualMediaId}
         isUser={isUser}
         handleVisualEffectChange={handleVisualEffectChange}
         effectsDisabled={effectsDisabled}
@@ -215,7 +218,7 @@ export default function VisualEffectsSection({
         username={username}
         instance={instance}
         type={type}
-        videoId={videoId}
+        visualMediaId={visualMediaId}
         isUser={isUser}
         handleVisualEffectChange={handleVisualEffectChange}
         tintColor={tintColor}
@@ -230,7 +233,7 @@ export default function VisualEffectsSection({
             username={username}
             instance={instance}
             type={type}
-            videoId={videoId}
+            visualMediaId={visualMediaId}
             isUser={isUser}
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
@@ -247,7 +250,7 @@ export default function VisualEffectsSection({
             instance={instance}
             handleVisualEffectChange={handleVisualEffectChange}
             type={type}
-            videoId={videoId}
+            visualMediaId={visualMediaId}
             isUser={isUser}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
@@ -262,7 +265,7 @@ export default function VisualEffectsSection({
             username={username}
             instance={instance}
             type={type}
-            videoId={videoId}
+            visualMediaId={visualMediaId}
             isUser={isUser}
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
@@ -278,7 +281,7 @@ export default function VisualEffectsSection({
             username={username}
             instance={instance}
             type={type}
-            videoId={videoId}
+            visualMediaId={visualMediaId}
             isUser={isUser}
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
@@ -294,7 +297,7 @@ export default function VisualEffectsSection({
             username={username}
             instance={instance}
             type={type}
-            videoId={videoId}
+            visualMediaId={visualMediaId}
             isUser={isUser}
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
@@ -310,7 +313,7 @@ export default function VisualEffectsSection({
             username={username}
             instance={instance}
             type={type}
-            videoId={videoId}
+            visualMediaId={visualMediaId}
             isUser={isUser}
             handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}

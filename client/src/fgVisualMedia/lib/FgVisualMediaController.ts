@@ -39,7 +39,7 @@ type FgVisualMediaMessageEvents =
       inquiredUsername: string;
       inquiredInstance: string;
       inquiredType: "camera" | "screen";
-      inquiredVideoId: string;
+      inquiredProducerId: string;
       data:
         | {
             paused: boolean;
@@ -87,7 +87,7 @@ class FgVisualMediaController {
     private username: string,
     private instance: string,
     private type: "camera" | "screen",
-    private videoId: string,
+    private visualMediaId: string,
     private fgLowerVisualMediaController: FgLowerVisualMediaController,
     private videoStream: MediaStream | undefined,
     private positioningListeners: React.MutableRefObject<{
@@ -151,8 +151,10 @@ class FgVisualMediaController {
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>,
-    private setInVideo: React.Dispatch<React.SetStateAction<boolean>>,
-    private leaveVideoTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private setInVisualMedia: React.Dispatch<React.SetStateAction<boolean>>,
+    private leaveVisualMediaTimer: React.MutableRefObject<
+      NodeJS.Timeout | undefined
+    >,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
@@ -205,11 +207,12 @@ class FgVisualMediaController {
         (this.type === "screen" &&
           this.fgVisualMediaOptions.permissions.acceptsScreenEffects)) &&
       this.type === event.requestedProducerType &&
-      this.videoId === event.requestedProducerId
+      this.visualMediaId === event.requestedProducerId
     ) {
-      // @ts-expect-error: ts can't verify type, videoId, and effect correlate
-      this.currentEffectsStyles.current[this.type][this.videoId][event.effect] =
-        event.data.style;
+      // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
+      this.currentEffectsStyles.current[this.type][this.visualMediaId][
+        event.effect
+      ] = event.data.style;
 
       if (event.effect === "pause") {
         this.setPausedState((prev) => !prev);
@@ -220,7 +223,7 @@ class FgVisualMediaController {
         event.data.hideBackgroundColor !== undefined
       ) {
         this.userMedia.current.camera[
-          this.videoId
+          this.visualMediaId
         ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
           event.data.hideBackgroundColor
         );
@@ -231,7 +234,7 @@ class FgVisualMediaController {
         event.data.hideBackgroundStyle !== undefined
       ) {
         this.userMedia.current.camera[
-          this.videoId
+          this.visualMediaId
         ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
           event.data.hideBackgroundStyle
         );
@@ -242,7 +245,7 @@ class FgVisualMediaController {
         event.data.postProcessStyle !== undefined
       ) {
         this.userMedia.current[this.type][
-          this.videoId
+          this.visualMediaId
         ].babylonScene.babylonShaderController.swapPostProcessEffects(
           event.data.postProcessStyle
         );
@@ -268,23 +271,23 @@ class FgVisualMediaController {
       this.username === event.username &&
       this.instance === event.instance &&
       this.type === event.producerType &&
-      this.videoId === event.producerId
+      this.visualMediaId === event.producerId
     ) {
       if (!event.blockStateChange) {
-        // @ts-expect-error: ts can't verify username, instance, videoId, and effect correlate
+        // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
         this.remoteStreamEffects.current[this.username][this.instance][
           this.type
-        ][this.videoId][event.effect] =
-          // @ts-expect-error: ts can't verify username, instance, videoId, and effect correlate
+        ][this.visualMediaId][event.effect] =
+          // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
           !this.remoteStreamEffects.current[this.username][this.instance][
             this.type
-          ][this.videoId][event.effect];
+          ][this.visualMediaId][event.effect];
       }
 
-      // @ts-expect-error: ts can't verify username, instance, videoId, and effect correlate
+      // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
       this.remoteCurrentEffectsStyles.current[this.username][this.instance][
         this.type
-      ][this.videoId][event.effect] = event.effectStyle;
+      ][this.visualMediaId][event.effect] = event.effectStyle;
 
       if (event.effect === "pause") {
         this.setPausedState((prev) => !prev);
@@ -297,7 +300,7 @@ class FgVisualMediaController {
     inquiredUsername: string;
     inquiredInstance: string;
     inquiredType: "camera" | "screen";
-    inquiredVideoId: string;
+    inquiredProducerId: string;
     data:
       | {
           paused: boolean;
@@ -336,7 +339,7 @@ class FgVisualMediaController {
       this.username === event.inquiredUsername &&
       this.instance === event.inquiredInstance &&
       this.type === event.inquiredType &&
-      this.videoId === event.inquiredVideoId &&
+      this.visualMediaId === event.inquiredProducerId &&
       event.data &&
       Object.keys(event.data.positioning).length !== 0
     ) {
@@ -370,7 +373,59 @@ class FgVisualMediaController {
     }
   };
 
-  onNewConsumerWasCreated = () => {
+  handleMessage = (event: FgVisualMediaMessageEvents) => {
+    switch (event.type) {
+      case "effectChangeRequested":
+        this.onEffectChangeRequested(event);
+        break;
+      case "clientEffectChanged":
+        this.onClientEffectChanged(event);
+        break;
+      case "responsedCatchUpData":
+        this.onResponsedCatchUpData(event);
+        break;
+      case "newConsumerWasCreated":
+        this.attachPositioningListeners();
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleVisibilityChange() {
+    if (this.type !== "camera") {
+      return;
+    }
+
+    if (document.hidden) {
+      if (!this.visualMediaContainerRef.current?.classList.contains("paused")) {
+        this.fgLowerVisualMediaController.handlePausePlay();
+      }
+    } else {
+      if (this.visualMediaContainerRef.current?.classList.contains("paused")) {
+        this.fgLowerVisualMediaController.handlePausePlay();
+      }
+    }
+  }
+
+  handleMouseEnter = () => {
+    this.setInVisualMedia(true);
+    if (this.leaveVisualMediaTimer.current) {
+      clearTimeout(this.leaveVisualMediaTimer.current);
+      this.leaveVisualMediaTimer.current = undefined;
+    }
+  };
+
+  handleMouseLeave = () => {
+    this.leaveVisualMediaTimer.current = setTimeout(() => {
+      this.setInVisualMedia(false);
+      clearTimeout(this.leaveVisualMediaTimer.current);
+      this.leaveVisualMediaTimer.current = undefined;
+    }, this.fgVisualMediaOptions.controlsVanishTime);
+  };
+
+  // Attach message listeners
+  attachPositioningListeners = () => {
     for (const remoteUsername in this.remoteDataStreams.current) {
       const remoteUserStreams = this.remoteDataStreams.current[remoteUsername];
       for (const remoteInstance in remoteUserStreams) {
@@ -401,90 +456,6 @@ class FgVisualMediaController {
           }
           this.positioningListeners.current[remoteUsername][remoteInstance] =
             () => stream.off("message", handleMessage);
-        }
-      }
-    }
-  };
-
-  handleMessage = (event: FgVisualMediaMessageEvents) => {
-    switch (event.type) {
-      case "effectChangeRequested":
-        this.onEffectChangeRequested(event);
-        break;
-      case "clientEffectChanged":
-        this.onClientEffectChanged(event);
-        break;
-      case "responsedCatchUpData":
-        this.onResponsedCatchUpData(event);
-        break;
-      case "newConsumerWasCreated":
-        this.onNewConsumerWasCreated();
-        break;
-      default:
-        break;
-    }
-  };
-
-  handleVisibilityChange() {
-    if (this.type !== "camera") {
-      return;
-    }
-
-    if (document.hidden) {
-      if (!this.visualMediaContainerRef.current?.classList.contains("paused")) {
-        this.fgLowerVisualMediaController.handlePausePlay();
-      }
-    } else {
-      if (this.visualMediaContainerRef.current?.classList.contains("paused")) {
-        this.fgLowerVisualMediaController.handlePausePlay();
-      }
-    }
-  }
-
-  handleMouseEnter = () => {
-    this.setInVideo(true);
-    if (this.leaveVideoTimer.current) {
-      clearTimeout(this.leaveVideoTimer.current);
-      this.leaveVideoTimer.current = undefined;
-    }
-  };
-
-  handleMouseLeave = () => {
-    this.leaveVideoTimer.current = setTimeout(() => {
-      this.setInVideo(false);
-      clearTimeout(this.leaveVideoTimer.current);
-      this.leaveVideoTimer.current = undefined;
-    }, this.fgVisualMediaOptions.controlsVanishTime);
-  };
-
-  // Attach message listeners
-  attachPositioningListeners = () => {
-    for (const remoteUsername in remoteDataStreams.current) {
-      const remoteUserStreams = remoteDataStreams.current[remoteUsername];
-      for (const remoteInstance in remoteUserStreams) {
-        const stream = remoteUserStreams[remoteInstance].positionScaleRotation;
-        if (stream) {
-          const handleMessage = (message: string) => {
-            const data = JSON.parse(message);
-            if (
-              data.table_id === table_id &&
-              data.username === username &&
-              data.instance === instance &&
-              data.type === "audio"
-            ) {
-              positioning.current = data.positioning;
-              setRerender((prev) => !prev);
-            }
-          };
-
-          stream.on("message", handleMessage);
-
-          // Store cleanup function
-          if (!positioningListeners.current[remoteUsername]) {
-            positioningListeners.current[remoteUsername] = {};
-          }
-          positioningListeners.current[remoteUsername][remoteInstance] = () =>
-            stream.off("message", handleMessage);
         }
       }
     }

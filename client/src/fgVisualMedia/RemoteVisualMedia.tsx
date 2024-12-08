@@ -22,6 +22,7 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import VisualMediaGradient from "./lib/VisualMediaGradient";
+import "./lib/fgVisualMediaStyles.css";
 
 const VisualMediaAdjustmentButtons = React.lazy(
   () => import("./lib/VisualMediaAdjustmentButtons")
@@ -29,8 +30,8 @@ const VisualMediaAdjustmentButtons = React.lazy(
 
 export default function RemoteVisualMedia({
   socket,
-  videoId,
   table_id,
+  visualMediaId,
   activeUsername,
   activeInstance,
   username,
@@ -52,8 +53,8 @@ export default function RemoteVisualMedia({
   tracksColorSetterCallback,
 }: {
   socket: React.MutableRefObject<Socket>;
-  videoId: string;
   table_id: string;
+  visualMediaId: string;
   activeUsername: string | undefined;
   activeInstance: string | undefined;
   username: string;
@@ -95,9 +96,9 @@ export default function RemoteVisualMedia({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [inVideo, setInVideo] = useState(false);
+  const [inVisualMedia, setInVisualMedia] = useState(false);
 
-  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const leaveVisualMediaTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [pausedState, setPausedState] = useState(false);
 
@@ -176,10 +177,11 @@ export default function RemoteVisualMedia({
           username: username,
           instance: instance,
           producerType: type,
-          producerId: videoId,
+          producerId: visualMediaId,
           effect: effect,
-          // @ts-expect-error: ts can't verify type, videoId, and effect correlate
-          effectStyle: currentEffectsStyles.current[type][videoId][effect],
+          effectStyle:
+            // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
+            currentEffectsStyles.current[type][visualMediaId][effect],
           blockStateChange: blockStateChange,
         };
         socket?.current.emit("message", msg);
@@ -196,14 +198,14 @@ export default function RemoteVisualMedia({
         requestedUsername: username,
         requestedInstance: instance,
         requestedProducerType: type,
-        requestedProducerId: videoId,
+        requestedProducerId: visualMediaId,
         effect: effect,
         blockStateChange: blockStateChange,
         data: {
           style:
-            // @ts-expect-error: ts can't verify username, instance, type, videoId, and effect correlate
+            // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
             remoteCurrentEffectsStyles.current[username][instance][type][
-              videoId
+              visualMediaId
             ][effect],
           hideBackgroundStyle: hideBackgroundStyle,
           hideBackgroundColor: hideBackgroundColor,
@@ -224,7 +226,7 @@ export default function RemoteVisualMedia({
 
   const fgLowerVisualMediaController = new FgLowerVisualMediaController(
     socket,
-    videoId,
+    visualMediaId,
     table_id,
     username,
     instance,
@@ -235,7 +237,6 @@ export default function RemoteVisualMedia({
     audioRef,
     visualMediaContainerRef,
     setPausedState,
-    inVideo,
     shiftPressed,
     controlPressed,
     paused,
@@ -260,7 +261,7 @@ export default function RemoteVisualMedia({
     username,
     instance,
     type,
-    videoId,
+    visualMediaId,
     fgLowerVisualMediaController,
     videoStream,
     positioningListeners,
@@ -277,14 +278,16 @@ export default function RemoteVisualMedia({
     audioRef,
     fgVisualMediaOptions,
     handleVisualEffectChange,
-    setInVideo,
-    leaveVideoTimer,
+    setInVisualMedia,
+    leaveVisualMediaTimer,
     setRerender
   );
 
   useEffect(() => {
     // Set up initial conditions
     fgVisualMediaController.init();
+
+    fgVisualMediaController.attachPositioningListeners();
 
     // Listen for messages on socket
     socket.current.on("message", fgVisualMediaController.handleMessage);
@@ -299,7 +302,7 @@ export default function RemoteVisualMedia({
         inquiredUsername: username,
         inquiredInstance: instance,
         inquiredType: type,
-        inquiredVideoId: videoId,
+        inquiredProducerId: visualMediaId,
       };
       socket.current.send(msg);
     }
@@ -338,6 +341,11 @@ export default function RemoteVisualMedia({
     }
 
     return () => {
+      Object.values(positioningListeners.current).forEach((userListners) =>
+        Object.values(userListners).forEach((removeListener) =>
+          removeListener()
+        )
+      );
       socket.current.off("message", fgVisualMediaController.handleMessage);
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
@@ -369,64 +377,6 @@ export default function RemoteVisualMedia({
   }, []);
 
   useEffect(() => {
-    // Ensure remoteDataStreams and necessary permissions are valid
-    if (
-      !remoteDataStreams.current ||
-      (type === "camera" &&
-        !fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
-      (type === "screen" &&
-        !fgVisualMediaOptions.permissions.acceptsScreenEffects)
-    ) {
-      return;
-    }
-
-    // Attach message listeners
-    const attachListeners = () => {
-      for (const remoteUsername in remoteDataStreams.current) {
-        const remoteUserStreams = remoteDataStreams.current[remoteUsername];
-        for (const remoteInstance in remoteUserStreams) {
-          const stream =
-            remoteUserStreams[remoteInstance].positionScaleRotation;
-          if (stream) {
-            const handleMessage = (message: string) => {
-              const data = JSON.parse(message);
-              if (
-                data.table_id === table_id &&
-                data.username === username &&
-                data.instance === instance &&
-                data.type === "audio"
-              ) {
-                positioning.current = data.positioning;
-                setRerender((prev) => !prev);
-              }
-            };
-
-            stream.on("message", handleMessage);
-
-            // Store cleanup function
-            if (!positioningListeners.current[remoteUsername]) {
-              positioningListeners.current[remoteUsername] = {};
-            }
-            positioningListeners.current[remoteUsername][remoteInstance] = () =>
-              stream.off("message", handleMessage);
-          }
-        }
-      }
-    };
-
-    attachListeners();
-
-    // Cleanup on unmount or dependency change
-    return () => {
-      Object.values(positioningListeners.current).forEach((userListners) =>
-        Object.values(userListners).forEach((removeListener) =>
-          removeListener()
-        )
-      );
-    };
-  }, []);
-
-  useEffect(() => {
     fgLowerVisualMediaController.updateCaptionsStyles();
   }, [settings]);
 
@@ -451,11 +401,11 @@ export default function RemoteVisualMedia({
   return (
     <div
       ref={visualMediaContainerRef}
-      id={`${videoId}_container`}
+      id={`${visualMediaId}_container`}
       className={`visual-media-container ${pausedState ? "paused" : ""} ${
         visualEffectsActive ? "in-effects" : ""
       } ${audioEffectsActive ? "in-effects" : ""} ${
-        inVideo ? "in-video" : ""
+        inVisualMedia ? "in-visual-media" : ""
       } ${
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
@@ -497,7 +447,7 @@ export default function RemoteVisualMedia({
       >
         <video
           ref={videoRef}
-          id={videoId}
+          id={visualMediaId}
           onTimeUpdate={() => fgLowerVisualMediaController.timeUpdate()}
           className='main-video w-full h-full absolute top-0 left-0'
           controls={false}
@@ -507,7 +457,7 @@ export default function RemoteVisualMedia({
         <FgUpperVisualMediaControls
           name={name}
           username={username}
-          isClose={fgVisualMediaOptions.isClose}
+          fgVisualMediaOptions={fgVisualMediaOptions}
           fgLowerVisualMediaController={fgLowerVisualMediaController}
         />
         <FgLowerVisualMediaControls
@@ -516,7 +466,7 @@ export default function RemoteVisualMedia({
           username={username}
           instance={instance}
           type={type}
-          videoId={videoId}
+          visualMediaId={visualMediaId}
           fgLowerVisualMediaController={fgLowerVisualMediaController}
           pausedState={pausedState}
           clientMute={clientMute}

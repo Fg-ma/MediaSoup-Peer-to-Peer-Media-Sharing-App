@@ -21,7 +21,7 @@
   bottom: 1rem;
 }
 
-.visual-media-container.in-video .captions,
+.visual-media-container.in-visual-media .captions,
 .visual-media-container.paused .captions,
 .visual-media-container.in-effects .captions,
 .visual-media-container.in-settings .captions,
@@ -38,7 +38,7 @@
   border-radius: 0.125rem;
 }
 
-.visual-media-container.mini-player .main-video {
+.visual-media-container.mini-player .main-visual-media {
   transform: scaleX(1);
 }
 
@@ -53,7 +53,7 @@
 }
 
 .visual-media-container .video-controls-container,
-.visual-media-container .video-navigation-container,
+.visual-media-container .visual-media-upper-controls,
 .visual-media-container .controls-gradient {
   pointer-events: none;
   opacity: 0;
@@ -70,7 +70,7 @@
   margin-bottom: 0.375rem;
 }
 
-.video-navigation-container {
+.visual-media-upper-controls {
   padding-left: 1.25rem;
   padding-right: 0.25rem;
   margin-top: 0.375rem;
@@ -86,9 +86,9 @@
 .visual-media-container.adjusting-dimensions .pan-btn,
 .visual-media-container.adjusting-dimensions .scale-btn,
 .visual-media-container.adjusting-dimensions .rotate-btn,
-.visual-media-container.in-video .pan-btn,
-.visual-media-container.in-video .scale-btn,
-.visual-media-container.in-video .rotate-btn,
+.visual-media-container.in-visual-media .pan-btn,
+.visual-media-container.in-visual-media .scale-btn,
+.visual-media-container.in-visual-media .rotate-btn,
 .visual-media-container.paused .pan-btn,
 .visual-media-container.paused .scale-btn,
 .visual-media-container.paused .rotate-btn,
@@ -104,20 +104,20 @@
   display: block;
 }
 
-.visual-media-container.in-video .video-controls-container,
-.visual-media-container.in-video .video-navigation-container,
-.visual-media-container.in-video .controls-gradient,
+.visual-media-container.in-visual-media .video-controls-container,
+.visual-media-container.in-visual-media .visual-media-upper-controls,
+.visual-media-container.in-visual-media .controls-gradient,
 .visual-media-container.paused .video-controls-container,
-.visual-media-container.paused .video-navigation-container,
+.visual-media-container.paused .visual-media-upper-controls,
 .visual-media-container.paused .controls-gradient,
 .visual-media-container.in-effects .video-controls-container,
-.visual-media-container.in-effects .video-navigation-container,
+.visual-media-container.in-effects .visual-media-upper-controls,
 .visual-media-container.in-effects .controls-gradient,
 .visual-media-container.in-settings .video-controls-container,
-.visual-media-container.in-settings .video-navigation-container,
+.visual-media-container.in-settings .visual-media-upper-controls,
 .visual-media-container.in-settings .controls-gradient,
 .visual-media-container.in-audio-effects .video-controls-container,
-.visual-media-container.in-audio-effects .video-navigation-container,
+.visual-media-container.in-audio-effects .visual-media-upper-controls,
 .visual-media-container.in-audio-effects .controls-gradient {
   opacity: 1;
 }
@@ -137,7 +137,7 @@
   margin-bottom: 1.25rem;
 }
 
-.visual-media-container.full-screen .video-navigation-container {
+.visual-media-container.full-screen .visual-media-upper-controls {
   padding-left: 2.5rem;
   padding-right: 1.5rem;
   margin-top: 1.25rem;

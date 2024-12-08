@@ -44,7 +44,7 @@ class MetadataController {
       inquiringUsername: event.inquiringUsername,
       inquiringInstance: event.inquiringInstance,
       inquiredType: event.inquiredType,
-      inquiredVideoId: event.inquiredVideoId,
+      inquiredProducerId: event.inquiredProducerId,
     };
     this.io
       .to(
@@ -59,7 +59,7 @@ class MetadataController {
       inquiredUsername: event.inquiredUsername,
       inquiredInstance: event.inquiredInstance,
       inquiredType: event.inquiredType,
-      inquiredVideoId: event.inquiredVideoId,
+      inquiredProducerId: event.inquiredProducerId,
       data: event.data,
     };
     this.io

@@ -75,7 +75,7 @@ export default function MustachesButton({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   isUser,
   handleVisualEffectChange,
   effectsDisabled,
@@ -85,7 +85,7 @@ export default function MustachesButton({
   username: string;
   instance: string;
   type: "camera";
-  videoId: string;
+  visualMediaId: string;
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -104,12 +104,14 @@ export default function MustachesButton({
   const mustachesContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].mustaches
-    : remoteStreamEffects.current[username][instance][type][videoId].mustaches;
-  const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][videoId].mustaches
-    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
+    ? userStreamEffects.current[type][visualMediaId].mustaches
+    : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .mustaches;
+  const effectsStyles = isUser
+    ? currentEffectsStyles.current[type][visualMediaId].mustaches
+    : remoteCurrentEffectsStyles.current[username][instance][type][
+        visualMediaId
+      ].mustaches;
 
   const mustachesEffects: {
     [key in MustachesEffectTypes]: {
@@ -237,17 +239,18 @@ export default function MustachesButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][videoId].mustaches) {
-          currentEffectsStyles.current[type][videoId].mustaches.style =
+        if (currentEffectsStyles.current[type][visualMediaId].mustaches) {
+          currentEffectsStyles.current[type][visualMediaId].mustaches.style =
             effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-            .mustaches
+          remoteCurrentEffectsStyles.current[username][instance][type][
+            visualMediaId
+          ].mustaches
         ) {
           remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
+            visualMediaId
           ].mustaches.style = effectType;
         }
       }

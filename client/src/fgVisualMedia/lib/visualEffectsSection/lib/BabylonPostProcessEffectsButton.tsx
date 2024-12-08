@@ -49,7 +49,7 @@ export default function BabylonPostProcessEffectsButton({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   isUser,
   handleVisualEffectChange,
   effectsDisabled,
@@ -59,7 +59,7 @@ export default function BabylonPostProcessEffectsButton({
   username: string;
   instance: string;
   type: "camera" | "screen";
-  videoId: string;
+  visualMediaId: string;
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -82,13 +82,14 @@ export default function BabylonPostProcessEffectsButton({
   const postProcessEffectsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].postProcess
-    : remoteStreamEffects.current[username][instance][type][videoId]
+    ? userStreamEffects.current[type][visualMediaId].postProcess
+    : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .postProcess;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][videoId].postProcess
-    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-        .postProcess;
+    ? currentEffectsStyles.current[type][visualMediaId].postProcess
+    : remoteCurrentEffectsStyles.current[username][instance][type][
+        visualMediaId
+      ].postProcess;
 
   const postProcessEffectsChoices: {
     [postProcessEffect in PostProcessEffects]?: {
@@ -161,7 +162,7 @@ export default function BabylonPostProcessEffectsButton({
 
     if (isUser) {
       userMedia.current[type][
-        videoId
+        visualMediaId
       ].babylonScene.babylonShaderController.swapPostProcessEffects(
         effectsStyles.style
       );
@@ -198,7 +199,7 @@ export default function BabylonPostProcessEffectsButton({
 
       if (isUser) {
         userMedia.current[type][
-          videoId
+          visualMediaId
         ].babylonScene.babylonShaderController.swapPostProcessEffects(
           effectType
         );
@@ -243,7 +244,7 @@ export default function BabylonPostProcessEffectsButton({
       holdContent={
         <div
           ref={postProcessEffectsContainerRef}
-          className='overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+          className='pl-3 pr-1 overflow-y-auto small-vertical-scroll-bar max-h-60 mb-4 grid grid-cols-3 w-max gap-x-2 gap-y-2 py-3 border-3 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-lg rounded-md'
         >
           {Object.entries(postProcessEffectsChoices).map(
             ([postProcessEffect, choice]) => (
@@ -255,7 +256,7 @@ export default function BabylonPostProcessEffectsButton({
                       postProcessEffect === effectsStyles.style
                         ? "border-fg-secondary border-3 border-opacity-100"
                         : ""
-                    } border-white flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                    } border-white flex items-center justify-center w-16 min-w-16 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
                     onClick={holdFunction}
                     data-camera-post-process-effects-button-value={
                       postProcessEffect
@@ -266,8 +267,8 @@ export default function BabylonPostProcessEffectsButton({
                       srcLoading={choice.imageSmall}
                       alt={postProcessEffect}
                       style={{
-                        width: "2.75rem",
-                        height: "2.75rem",
+                        width: "100%",
+                        height: "100%",
                         objectFit: "contain",
                       }}
                       data-camera-post-process-effects-button-value={

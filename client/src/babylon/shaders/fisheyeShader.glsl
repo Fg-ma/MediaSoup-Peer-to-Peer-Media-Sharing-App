@@ -13,10 +13,10 @@ void main(void) {
   float dist = length(uv);
     
   // Apply fisheye distortion only within the circular region (dist < 1.0)
-  if (dist < 1.0) 
+  if (dist < 1.0) {
     // Fisheye distortion: expand distances non-linearly
-    float radius = 1.0 - pow(1.0 - dist, distortionStrength); // Distort radius outward
-        
+    float radius = 1.0 - pow(1.0 - dist, distortionStrength);
+    
     // Keep the angle unchanged
     vec2 direction = normalize(uv);
         
@@ -39,7 +39,7 @@ void main(void) {
       // No fading, just apply fisheye distortion
       gl_FragColor = color;
     }
-  else {
+  } else {
     // Outside the fisheye circle, render black
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
   }

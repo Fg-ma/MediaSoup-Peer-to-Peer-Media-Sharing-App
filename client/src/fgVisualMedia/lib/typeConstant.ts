@@ -27,7 +27,6 @@ export interface FgVisualMediaOptions {
   isPictureInPicture?: boolean;
   isEffects?: boolean;
   isFullScreen?: boolean;
-  isClose?: boolean;
   controlsVanishTime?: number;
   closedCaptionsDecoratorColor?: string;
   primaryVideoColor?: string;
@@ -60,6 +59,7 @@ export const defaultFgVisualMediaOptions = {
     acceptsScreenEffects: false,
     acceptsAudioEffects: false,
     acceptsPositionScaleRotationManipulation: false,
+    acceptsCloseMedia: false,
   },
   isStream: false,
   autoPlay: true,
@@ -71,7 +71,6 @@ export const defaultFgVisualMediaOptions = {
   isPictureInPicture: true,
   isEffects: true,
   isFullScreen: true,
-  isClose: true,
   controlsVanishTime: 1250,
   closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
   primaryVideoColor: "#f56114",

@@ -46,13 +46,14 @@ class Metadata {
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredType: "camera" | "screen" | "audio";
-    inquiredVideoId: string;
+    inquiredProducerId: string;
   }) => {
     let data;
     if (event.inquiredType === "camera") {
-      const cameraMedia = this.userMedia.current.camera[event.inquiredVideoId];
+      const cameraMedia =
+        this.userMedia.current.camera[event.inquiredProducerId];
       const dataPositioningValue = document
-        .getElementById(`${event.inquiredVideoId}_container`)
+        .getElementById(`${event.inquiredProducerId}_container`)
         ?.getAttribute("data-positioning");
       const positioning = JSON.parse(dataPositioningValue || "{}");
       data = {
@@ -61,9 +62,10 @@ class Metadata {
         positioning,
       };
     } else if (event.inquiredType === "screen") {
-      const screenMedia = this.userMedia.current.screen[event.inquiredVideoId];
+      const screenMedia =
+        this.userMedia.current.screen[event.inquiredProducerId];
       const dataPositioningValue = document
-        .getElementById(`${event.inquiredVideoId}_container`)
+        .getElementById(`${event.inquiredProducerId}_container`)
         ?.getAttribute("data-positioning");
       const positioning = JSON.parse(dataPositioningValue || "{}");
       data = {
@@ -91,7 +93,7 @@ class Metadata {
       inquiredUsername: this.username.current,
       inquiredInstance: this.instance.current,
       inquiredType: event.inquiredType,
-      inquiredVideoId: event.inquiredVideoId,
+      inquiredProducerId: event.inquiredProducerId,
       data,
     };
     this.socket.current.emit("message", msg);

@@ -111,7 +111,7 @@ export default function FgLowerVisualMediaControls({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   fgLowerVisualMediaController,
   pausedState,
   clientMute,
@@ -138,7 +138,7 @@ export default function FgLowerVisualMediaControls({
   username: string;
   instance: string;
   type: "camera" | "screen";
-  videoId: string;
+  visualMediaId: string;
   fgLowerVisualMediaController: FgLowerVisualMediaController;
   pausedState: boolean;
   clientMute: React.MutableRefObject<boolean>;
@@ -227,7 +227,7 @@ export default function FgLowerVisualMediaControls({
                 username={username}
                 instance={instance}
                 type={type}
-                videoId={videoId}
+                visualMediaId={visualMediaId}
                 socket={socket}
                 isUser={
                   fgVisualMediaOptions.isUser ??

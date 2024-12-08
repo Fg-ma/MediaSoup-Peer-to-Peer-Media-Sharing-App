@@ -18,8 +18,8 @@ import {
   FgVisualMediaOptions,
   Settings,
 } from "./lib/typeConstant";
-import "./lib/fgVideoStyles.css";
 import VisualMediaGradient from "./lib/VisualMediaGradient";
+import "./lib/fgVisualMediaStyles.css";
 
 const VisualMediaAdjustmentButtons = React.lazy(
   () => import("./lib/VisualMediaAdjustmentButtons")
@@ -27,8 +27,8 @@ const VisualMediaAdjustmentButtons = React.lazy(
 
 export default function FgBabylonCanvas({
   socket,
-  videoId,
   table_id,
+  visualMediaId,
   activeUsername,
   activeInstance,
   username,
@@ -48,7 +48,7 @@ export default function FgBabylonCanvas({
   tracksColorSetterCallback,
 }: {
   socket: React.MutableRefObject<Socket>;
-  videoId: string;
+  visualMediaId: string;
   table_id: string;
   activeUsername: string | undefined;
   activeInstance: string | undefined;
@@ -89,9 +89,9 @@ export default function FgBabylonCanvas({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(document.createElement("video"));
 
-  const [inVideo, setInVideo] = useState(false);
+  const [inVisualMedia, setInVisualMedia] = useState(false);
 
-  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const leaveVisualMediaTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [pausedState, setPausedState] = useState(false);
 
@@ -171,10 +171,11 @@ export default function FgBabylonCanvas({
           username: username,
           instance: instance,
           producerType: type,
-          producerId: videoId,
+          producerId: visualMediaId,
           effect: effect,
-          // @ts-expect-error: ts can't infer type, videoId, and effect are strictly enforces and exist
-          effectStyle: currentEffectsStyles.current[type][videoId][effect],
+          effectStyle:
+            // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
+            currentEffectsStyles.current[type][visualMediaId][effect],
           blockStateChange: blockStateChange,
         };
         socket?.current.emit("message", msg);
@@ -191,14 +192,14 @@ export default function FgBabylonCanvas({
         requestedUsername: username,
         requestedInstance: instance,
         requestedProducerType: type,
-        requestedProducerId: videoId,
+        requestedProducerId: visualMediaId,
         effect: effect,
         blockStateChange: blockStateChange,
         data: {
           style:
-            // @ts-expect-error: ts can't verify username, instance, type, videoId, and effect correlate
+            // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
             remoteCurrentEffectsStyles.current[username][instance][type][
-              videoId
+              visualMediaId
             ][effect],
           hideBackgroundStyle: hideBackgroundStyle,
           hideBackgroundColor: hideBackgroundColor,
@@ -218,7 +219,7 @@ export default function FgBabylonCanvas({
 
   const fgLowerVisualMediaController = new FgLowerVisualMediaController(
     socket,
-    videoId,
+    visualMediaId,
     table_id,
     username,
     instance,
@@ -229,7 +230,6 @@ export default function FgBabylonCanvas({
     audioRef,
     visualMediaContainerRef,
     setPausedState,
-    inVideo,
     shiftPressed,
     controlPressed,
     paused,
@@ -254,7 +254,7 @@ export default function FgBabylonCanvas({
     username,
     instance,
     type,
-    videoId,
+    visualMediaId,
     fgLowerVisualMediaController,
     undefined,
     positioningListeners,
@@ -271,17 +271,13 @@ export default function FgBabylonCanvas({
     audioRef,
     fgVisualMediaOptions,
     handleVisualEffectChange,
-    setInVideo,
-    leaveVideoTimer,
+    setInVisualMedia,
+    leaveVisualMediaTimer,
     setRerender
   );
 
   useEffect(() => {
-    fgLowerVisualMediaController.updateCaptionsStyles();
-  }, [settings]);
-
-  useEffect(() => {
-    const canvas = userMedia.current[type][videoId].canvas;
+    const canvas = userMedia.current[type][visualMediaId].canvas;
     const stream = canvas.captureStream();
     if (videoRef.current) {
       videoRef.current.srcObject = stream;
@@ -292,6 +288,15 @@ export default function FgBabylonCanvas({
 
     // Set up initial conditions
     fgVisualMediaController.init();
+
+    if (
+      (type === "camera" &&
+        fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+      (type === "screen" &&
+        fgVisualMediaOptions.permissions.acceptsScreenEffects)
+    ) {
+      fgVisualMediaController.attachPositioningListeners();
+    }
 
     // Listen for messages on socket
     socket.current.on("message", fgVisualMediaController.handleMessage);
@@ -313,7 +318,7 @@ export default function FgBabylonCanvas({
         inquiredUsername: username,
         inquiredInstance: instance,
         inquiredType: type,
-        inquiredVideoId: videoId,
+        inquiredProducerId: visualMediaId,
       };
       socket.current.send(msg);
     }
@@ -352,6 +357,11 @@ export default function FgBabylonCanvas({
     }
 
     return () => {
+      Object.values(positioningListeners.current).forEach((userListners) =>
+        Object.values(userListners).forEach((removeListener) =>
+          removeListener()
+        )
+      );
       socket.current.off("message", fgVisualMediaController.handleMessage);
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
@@ -387,41 +397,24 @@ export default function FgBabylonCanvas({
   }, []);
 
   useEffect(() => {
-    // Ensure remoteDataStreams and necessary permissions are valid
-    if (
-      !remoteDataStreams.current ||
-      (type === "camera" &&
-        !fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
-      (type === "screen" &&
-        !fgVisualMediaOptions.permissions.acceptsScreenEffects)
-    ) {
-      return;
-    }
-
-    attachListeners();
-
-    // Cleanup on unmount or dependency change
-    return () => {
-      Object.values(positioningListeners.current).forEach((userListners) =>
-        Object.values(userListners).forEach((removeListener) =>
-          removeListener()
-        )
-      );
-    };
-  }, []);
+    fgLowerVisualMediaController.updateCaptionsStyles();
+  }, [settings]);
 
   useEffect(() => {
-    if (subContainerRef.current && userMedia.current[type][videoId]?.canvas) {
-      userMedia.current[type][videoId].canvas.style.position = "absolute";
-      userMedia.current[type][videoId].canvas.style.top = "0%";
-      userMedia.current[type][videoId].canvas.style.left = "0%";
-      userMedia.current[type][videoId].canvas.style.width = "100%";
-      userMedia.current[type][videoId].canvas.style.height = "100%";
+    if (
+      subContainerRef.current &&
+      userMedia.current[type][visualMediaId]?.canvas
+    ) {
+      userMedia.current[type][visualMediaId].canvas.style.position = "absolute";
+      userMedia.current[type][visualMediaId].canvas.style.top = "0%";
+      userMedia.current[type][visualMediaId].canvas.style.left = "0%";
+      userMedia.current[type][visualMediaId].canvas.style.width = "100%";
+      userMedia.current[type][visualMediaId].canvas.style.height = "100%";
       subContainerRef.current.appendChild(
-        userMedia.current[type][videoId].canvas
+        userMedia.current[type][visualMediaId].canvas
       );
     }
-  }, [videoId, userMedia]);
+  }, [visualMediaId, userMedia]);
 
   useEffect(() => {
     if (
@@ -443,12 +436,12 @@ export default function FgBabylonCanvas({
   return (
     <div
       ref={visualMediaContainerRef}
-      id={`${videoId}_container`}
+      id={`${visualMediaId}_container`}
       className={`visual-media-container ${pausedState ? "paused" : ""} ${
         fgVisualMediaOptions.autoPlay ? "" : "paused"
       } ${visualEffectsActive ? "in-effects" : ""} ${
         audioEffectsActive ? "in-effects" : ""
-      } ${inVideo ? "in-video" : ""} ${
+      } ${inVisualMedia ? "in-visual-media" : ""} ${
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
@@ -490,7 +483,7 @@ export default function FgBabylonCanvas({
         <FgUpperVisualMediaControls
           name={name}
           username={username}
-          isClose={fgVisualMediaOptions.isClose}
+          fgVisualMediaOptions={fgVisualMediaOptions}
           fgLowerVisualMediaController={fgLowerVisualMediaController}
         />
         <FgLowerVisualMediaControls
@@ -499,7 +492,7 @@ export default function FgBabylonCanvas({
           username={username}
           instance={instance}
           type={type}
-          videoId={videoId}
+          visualMediaId={visualMediaId}
           fgLowerVisualMediaController={fgLowerVisualMediaController}
           pausedState={pausedState}
           clientMute={clientMute}

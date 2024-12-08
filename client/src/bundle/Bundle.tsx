@@ -174,7 +174,7 @@ export default function Bundle({
             {bundleOptions.isUser ? (
               <UserVisualMedia
                 socket={socket}
-                videoId={key}
+                visualMediaId={key}
                 table_id={table_id}
                 activeUsername={activeUsername}
                 activeInstance={activeInstance}
@@ -219,7 +219,7 @@ export default function Bundle({
             ) : (
               <RemoteVisualMedia
                 socket={socket}
-                videoId={key}
+                visualMediaId={key}
                 table_id={table_id}
                 activeUsername={activeUsername}
                 activeInstance={activeInstance}
@@ -272,7 +272,7 @@ export default function Bundle({
             {bundleOptions.isUser ? (
               <UserVisualMedia
                 socket={socket}
-                videoId={key}
+                visualMediaId={key}
                 table_id={table_id}
                 activeUsername={activeUsername}
                 activeInstance={activeInstance}
@@ -317,7 +317,7 @@ export default function Bundle({
             ) : (
               <RemoteVisualMedia
                 socket={socket}
-                videoId={key}
+                visualMediaId={key}
                 table_id={table_id}
                 activeUsername={activeUsername}
                 activeInstance={activeInstance}

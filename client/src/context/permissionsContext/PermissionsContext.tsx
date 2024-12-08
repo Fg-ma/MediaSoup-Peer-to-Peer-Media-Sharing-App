@@ -5,6 +5,7 @@ export type Permissions = {
   acceptsScreenEffects: boolean;
   acceptsAudioEffects: boolean;
   acceptsPositionScaleRotationManipulation: boolean;
+  acceptsCloseMedia: boolean;
 };
 
 export interface PermissionsContextProviderProps {
@@ -37,6 +38,7 @@ export function PermissionsContextProvider({
     acceptsScreenEffects: true,
     acceptsAudioEffects: true,
     acceptsPositionScaleRotationManipulation: true,
+    acceptsCloseMedia: true,
   });
 
   return (

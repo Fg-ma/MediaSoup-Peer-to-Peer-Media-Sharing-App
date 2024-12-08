@@ -172,7 +172,7 @@ type MediasoupSocketEvents =
       inquiringUsername: string;
       inquiringInstance: string;
       inquiredType: "camera" | "screen" | "audio";
-      inquiredVideoId: string;
+      inquiredProducerId: string;
     };
 
 export default function Main() {

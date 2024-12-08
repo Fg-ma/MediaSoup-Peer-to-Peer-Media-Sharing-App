@@ -13,7 +13,7 @@ export default function BlurButton({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   isUser,
   handleVisualEffectChange,
   effectsDisabled,
@@ -23,7 +23,7 @@ export default function BlurButton({
   username: string;
   instance: string;
   type: "camera" | "screen";
-  videoId: string;
+  visualMediaId: string;
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -38,8 +38,8 @@ export default function BlurButton({
   const [_, setRerender] = useState(0);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].blur
-    : remoteStreamEffects.current[username][instance][type][videoId].blur;
+    ? userStreamEffects.current[type][visualMediaId].blur
+    : remoteStreamEffects.current[username][instance][type][visualMediaId].blur;
 
   return (
     <FgButton

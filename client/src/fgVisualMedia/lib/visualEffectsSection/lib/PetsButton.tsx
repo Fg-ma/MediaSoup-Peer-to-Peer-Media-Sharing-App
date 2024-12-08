@@ -145,7 +145,7 @@ export default function PetsButton({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   isUser,
   handleVisualEffectChange,
   effectsDisabled,
@@ -155,7 +155,7 @@ export default function PetsButton({
   username: string;
   instance: string;
   type: "camera";
-  videoId: string;
+  visualMediaId: string;
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -174,12 +174,13 @@ export default function PetsButton({
   const petsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].pets
-    : remoteStreamEffects.current[username][instance][type][videoId].pets;
+    ? userStreamEffects.current[type][visualMediaId].pets
+    : remoteStreamEffects.current[username][instance][type][visualMediaId].pets;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][videoId].pets
-    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-        .pets;
+    ? currentEffectsStyles.current[type][visualMediaId].pets
+    : remoteCurrentEffectsStyles.current[username][instance][type][
+        visualMediaId
+      ].pets;
 
   const petsEffects: {
     [key in PetsEffectTypes]: {
@@ -419,16 +420,18 @@ export default function PetsButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][videoId].pets) {
-          currentEffectsStyles.current[type][videoId].pets.style = effectType;
+        if (currentEffectsStyles.current[type][visualMediaId].pets) {
+          currentEffectsStyles.current[type][visualMediaId].pets.style =
+            effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-            .pets
+          remoteCurrentEffectsStyles.current[username][instance][type][
+            visualMediaId
+          ].pets
         ) {
           remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
+            visualMediaId
           ].pets.style = effectType;
         }
       }

@@ -62,7 +62,7 @@ class FgLowerVisualMediaController {
 
   constructor(
     private socket: React.MutableRefObject<Socket> | undefined,
-    private videoId: string,
+    private visualMediaId: string,
     private table_id: string,
     private username: string,
     private instance: string,
@@ -73,7 +73,6 @@ class FgLowerVisualMediaController {
     private audioRef: React.RefObject<HTMLAudioElement>,
     private visualMediaContainerRef: React.RefObject<HTMLDivElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
-    private inVideo: boolean,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
     private paused: React.MutableRefObject<boolean>,
@@ -160,7 +159,7 @@ class FgLowerVisualMediaController {
         username: this.username,
         instance: this.instance,
         producerType: this.type,
-        producerId: this.videoId,
+        producerId: this.visualMediaId,
       };
 
       this.socket.current.emit("message", msg);
@@ -546,30 +545,30 @@ class FgLowerVisualMediaController {
     // Fill stream effects if state change isn't blocked
     if (!blockStateChange) {
       if (this.type === "camera") {
-        this.userStreamEffects.current[this.type][this.videoId][
+        this.userStreamEffects.current[this.type][this.visualMediaId][
           effect as CameraEffectTypes
         ] =
-          !this.userStreamEffects.current[this.type][this.videoId][
+          !this.userStreamEffects.current[this.type][this.visualMediaId][
             effect as CameraEffectTypes
           ];
       } else if (this.type === "screen") {
-        this.userStreamEffects.current[this.type][this.videoId][
+        this.userStreamEffects.current[this.type][this.visualMediaId][
           effect as ScreenEffectTypes
         ] =
-          !this.userStreamEffects.current[this.type][this.videoId][
+          !this.userStreamEffects.current[this.type][this.visualMediaId][
             effect as ScreenEffectTypes
           ];
       }
     }
 
     if (this.type === "camera") {
-      this.userMedia.current[this.type][this.videoId].changeEffects(
+      this.userMedia.current[this.type][this.visualMediaId].changeEffects(
         effect as CameraEffectTypes,
         this.tintColor.current,
         blockStateChange
       );
     } else if (this.type === "screen") {
-      this.userMedia.current[this.type][this.videoId].changeEffects(
+      this.userMedia.current[this.type][this.visualMediaId].changeEffects(
         effect as ScreenEffectTypes,
         this.tintColor.current,
         blockStateChange

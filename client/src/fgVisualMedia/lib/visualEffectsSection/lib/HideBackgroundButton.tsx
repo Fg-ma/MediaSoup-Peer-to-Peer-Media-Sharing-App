@@ -101,7 +101,7 @@ export default function HideBackgroundButton({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   isUser,
   handleVisualEffectChange,
   effectsDisabled,
@@ -111,7 +111,7 @@ export default function HideBackgroundButton({
   username: string;
   instance: string;
   type: "camera";
-  videoId: string;
+  visualMediaId: string;
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -139,13 +139,14 @@ export default function HideBackgroundButton({
   const colorRef = useRef("#F56114");
 
   const streamEffects = isUser
-    ? userStreamEffects.current.camera[videoId].hideBackground
-    : remoteStreamEffects.current[username][instance].camera[videoId]
+    ? userStreamEffects.current.camera[visualMediaId].hideBackground
+    : remoteStreamEffects.current[username][instance].camera[visualMediaId]
         .hideBackground;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][videoId].hideBackground
-    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-        .hideBackground;
+    ? currentEffectsStyles.current[type][visualMediaId].hideBackground
+    : remoteCurrentEffectsStyles.current[username][instance][type][
+        visualMediaId
+      ].hideBackground;
 
   const backgroundChoices: {
     [hideBackgroundEffect in HideBackgroundEffectTypes]?: {
@@ -238,7 +239,7 @@ export default function HideBackgroundButton({
 
     if (isUser) {
       userMedia.current.camera[
-        videoId
+        visualMediaId
       ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
         effectsStyles.style
       );
@@ -268,7 +269,7 @@ export default function HideBackgroundButton({
       effectsStyles.style = effectType;
       if (isUser) {
         userMedia.current.camera[
-          videoId
+          visualMediaId
         ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
           effectType
         );
@@ -291,7 +292,7 @@ export default function HideBackgroundButton({
 
     if (isUser) {
       userMedia.current.camera[
-        videoId
+        visualMediaId
       ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
         colorRef.current
       );

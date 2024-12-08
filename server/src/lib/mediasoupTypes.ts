@@ -274,7 +274,7 @@ export type onRequestCatchUpDataType = {
   inquiredUsername: string;
   inquiredInstance: string;
   inquiredType: ProducerTypes;
-  inquiredVideoId: string;
+  inquiredProducerId: string;
 };
 
 export type onResponseCatchUpDataType = {
@@ -285,7 +285,7 @@ export type onResponseCatchUpDataType = {
   inquiredUsername: string;
   inquiredInstance: string;
   inquiredType: ProducerTypes;
-  inquiredVideoId: string;
+  inquiredProducerId: string;
   data:
     | {
         paused: boolean;

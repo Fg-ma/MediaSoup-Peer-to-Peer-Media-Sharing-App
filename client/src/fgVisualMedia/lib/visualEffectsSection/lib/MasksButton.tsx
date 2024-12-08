@@ -130,7 +130,7 @@ export default function MasksButton({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   isUser,
   handleVisualEffectChange,
   effectsDisabled,
@@ -140,7 +140,7 @@ export default function MasksButton({
   username: string;
   instance: string;
   type: "camera";
-  videoId: string;
+  visualMediaId: string;
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -159,12 +159,14 @@ export default function MasksButton({
   const masksContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].masks
-    : remoteStreamEffects.current[username][instance][type][videoId].masks;
-  const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][videoId].masks
-    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
+    ? userStreamEffects.current[type][visualMediaId].masks
+    : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .masks;
+  const effectsStyles = isUser
+    ? currentEffectsStyles.current[type][visualMediaId].masks
+    : remoteCurrentEffectsStyles.current[username][instance][type][
+        visualMediaId
+      ].masks;
 
   const masksEffects: {
     [key in MasksEffectTypes]: {
@@ -380,16 +382,18 @@ export default function MasksButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][videoId].masks) {
-          currentEffectsStyles.current[type][videoId].masks.style = effectType;
+        if (currentEffectsStyles.current[type][visualMediaId].masks) {
+          currentEffectsStyles.current[type][visualMediaId].masks.style =
+            effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-            .masks
+          remoteCurrentEffectsStyles.current[username][instance][type][
+            visualMediaId
+          ].masks
         ) {
           remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
+            visualMediaId
           ].masks.style = effectType;
         }
       }

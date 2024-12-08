@@ -115,7 +115,7 @@ export default function HatsButton({
   username,
   instance,
   type,
-  videoId,
+  visualMediaId,
   isUser,
   handleVisualEffectChange,
   effectsDisabled,
@@ -125,7 +125,7 @@ export default function HatsButton({
   username: string;
   instance: string;
   type: "camera";
-  videoId: string;
+  visualMediaId: string;
   isUser: boolean;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -144,12 +144,13 @@ export default function HatsButton({
   const hatsContainerRef = useRef<HTMLDivElement>(null);
 
   const streamEffects = isUser
-    ? userStreamEffects.current[type][videoId].hats
-    : remoteStreamEffects.current[username][instance][type][videoId].hats;
+    ? userStreamEffects.current[type][visualMediaId].hats
+    : remoteStreamEffects.current[username][instance][type][visualMediaId].hats;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][videoId].hats
-    : remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-        .hats;
+    ? currentEffectsStyles.current[type][visualMediaId].hats
+    : remoteCurrentEffectsStyles.current[username][instance][type][
+        visualMediaId
+      ].hats;
 
   const hatsEffects: {
     [key in HatsEffectTypes]: {
@@ -341,16 +342,18 @@ export default function HatsButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][videoId].hats) {
-          currentEffectsStyles.current[type][videoId].hats.style = effectType;
+        if (currentEffectsStyles.current[type][visualMediaId].hats) {
+          currentEffectsStyles.current[type][visualMediaId].hats.style =
+            effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][videoId]
-            .hats
+          remoteCurrentEffectsStyles.current[username][instance][type][
+            visualMediaId
+          ].hats
         ) {
           remoteCurrentEffectsStyles.current[username][instance][type][
-            videoId
+            visualMediaId
           ].hats.style = effectType;
         }
       }
