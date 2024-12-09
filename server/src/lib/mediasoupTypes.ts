@@ -66,7 +66,7 @@ export type onConnectProducerTransportType = {
 
 export type onCreateNewProducerType = {
   type: "createNewProducer";
-  producerType: "camera" | "screen" | "audio";
+  producerType: "camera" | "screen" | "screenAudio" | "audio";
   transportId: string;
   kind: MediaKind;
   rtpParameters: RtpParameters;
@@ -125,7 +125,7 @@ export type onConsumeType = {
 
 export type onNewConsumerType = {
   type: "newConsumer";
-  consumerType: "camera" | "screen" | "audio";
+  consumerType: "camera" | "screen" | "screenAudio" | "audio";
   rtpCapabilities: RtpCapabilities;
   producerUsername: string;
   producerInstance: string;

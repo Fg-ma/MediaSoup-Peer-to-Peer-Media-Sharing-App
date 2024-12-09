@@ -37,6 +37,7 @@ export function CurrentEffectsStylesContextProvider({
   const currentEffectsStyles = useRef<EffectStylesType>({
     camera: {},
     screen: {},
+    screenAudio: {},
     audio: structuredClone(defaultAudioCurrentEffectsStyles),
   });
   const remoteCurrentEffectsStyles = useRef<{

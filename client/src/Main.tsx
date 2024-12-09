@@ -298,7 +298,8 @@ export default function Main() {
     username: string,
     instance: string,
     cameraIds: (string | undefined)[],
-    screenIds: (string | undefined)[]
+    screenIds: (string | undefined)[],
+    screenAudioIds: (string | undefined)[]
   ) => {
     if (!remoteStreamEffects.current[username]) {
       remoteStreamEffects.current[username] = {};
@@ -307,6 +308,7 @@ export default function Main() {
       remoteStreamEffects.current[username][instance] = {
         camera: {},
         screen: {},
+        screenAudio: {},
         audio: structuredClone(defaultAudioStreamEffects),
       };
     }
@@ -318,6 +320,7 @@ export default function Main() {
       remoteCurrentEffectsStyles.current[username][instance] = {
         camera: {},
         screen: {},
+        screenAudio: {},
         audio: structuredClone(defaultAudioCurrentEffectsStyles),
       };
     }
@@ -353,6 +356,26 @@ export default function Main() {
         remoteCurrentEffectsStyles.current[username][instance].screen[
           screenId
         ] = structuredClone(defaultScreenCurrentEffectsStyles);
+      }
+    }
+
+    for (const screenAudioId of screenAudioIds) {
+      if (!screenAudioId) {
+        return;
+      }
+
+      remoteStreamEffects.current[username][instance].screenAudio[
+        screenAudioId
+      ] = structuredClone(defaultAudioStreamEffects);
+
+      if (
+        !remoteCurrentEffectsStyles.current[username][instance].screenAudio[
+          screenAudioId
+        ]
+      ) {
+        remoteCurrentEffectsStyles.current[username][instance].screenAudio[
+          screenAudioId
+        ] = structuredClone(defaultAudioCurrentEffectsStyles);
       }
     }
   };
@@ -519,7 +542,6 @@ export default function Main() {
     userScreenCount,
     isCamera,
     isScreen,
-    isAudio,
     isSubscribed,
     handleDisableEnableBtns,
     producerTransport,
@@ -541,9 +563,9 @@ export default function Main() {
     instance,
     consumerTransport,
     remoteTracksMap,
+    remoteDataStreams,
     setUpEffectContext,
-    bundlesController.createConsumerBundle,
-    remoteDataStreams
+    bundlesController.createConsumerBundle
   );
 
   const metadata = new Metadata(

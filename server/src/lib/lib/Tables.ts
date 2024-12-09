@@ -38,9 +38,9 @@ class Tables {
 
     this.mediasoupCleanup.releaseWorkers(table_id);
 
-    this.mediasoupCleanup.deleteProducer(table_id, username, instance);
+    this.mediasoupCleanup.deleteProducerInstance(table_id, username, instance);
 
-    this.mediasoupCleanup.deleteConsumer(table_id, username, instance);
+    this.mediasoupCleanup.deleteConsumerInstance(table_id, username, instance);
 
     this.io.to(`table_${table_id}`).emit("userLeftTable", username, instance);
   }
@@ -74,13 +74,13 @@ class Tables {
 
     this.mediasoupCleanup.releaseWorkers(this.socket.table_id);
 
-    this.mediasoupCleanup.deleteProducer(
+    this.mediasoupCleanup.deleteProducerInstance(
       this.socket.table_id,
       this.socket.username,
       this.socket.instance
     );
 
-    this.mediasoupCleanup.deleteConsumer(
+    this.mediasoupCleanup.deleteConsumerInstance(
       this.socket.table_id,
       this.socket.username,
       this.socket.instance

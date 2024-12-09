@@ -208,10 +208,13 @@ export type BackgroundMusicTypes =
 
 export interface EffectStylesType {
   camera: {
-    [id: string]: CameraEffectStylesType;
+    [cameraId: string]: CameraEffectStylesType;
   };
   screen: {
-    [id: string]: ScreenEffectStylesType;
+    [screenId: string]: ScreenEffectStylesType;
+  };
+  screenAudio: {
+    [screenAudioId: string]: AudioEffectStylesType;
   };
   audio: AudioEffectStylesType;
 }

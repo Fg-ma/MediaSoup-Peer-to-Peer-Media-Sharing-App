@@ -7,11 +7,14 @@ import {
   EffectStylesType,
 } from "../context/currentEffectsStylesContext/typeConstant";
 import {
-  AudioEffectTypes,
-  CameraEffectTypes,
   DataStreamTypes,
   defaultAudioStreamEffects,
-  ScreenEffectTypes,
+  RemoteDataStreamsType,
+  RemoteStreamEffectsType,
+  RemoteTracksMapType,
+  UserDataStreamsType,
+  UserMediaType,
+  UserStreamEffectsType,
 } from "../context/streamsContext/typeConstant";
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
@@ -19,8 +22,7 @@ import AudioMedia from "./AudioMedia";
 import UserDevice from "./UserDevice";
 import BrowserMedia from "./BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
-import { UserDataStreams } from "src/context/streamsContext/StreamsContext";
-import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
+import ScreenAudioMedia from "./ScreenAudioMedia";
 
 class ProducersController {
   constructor(
@@ -31,70 +33,24 @@ class ProducersController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
     private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
     private remoteCurrentEffectsStyles: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: EffectStylesType;
       };
     }>,
-    private userStreamEffects: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-      };
-      screen: {
-        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-      };
-      audio: { [effectType in AudioEffectTypes]: boolean };
-    }>,
-    private remoteStreamEffects: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera: {
-            [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-          };
-          screen: {
-            [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-          };
-          audio: { [effectType in AudioEffectTypes]: boolean };
-        };
-      };
-    }>,
-    private remoteTracksMap: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera?: { [cameraId: string]: MediaStreamTrack };
-          screen?: { [screenId: string]: MediaStreamTrack };
-          audio?: MediaStreamTrack | undefined;
-          json?: {
-            [dataStreamType in DataStreamTypes]?: MediaStreamTrack;
-          };
-        };
-      };
-    }>,
-    private userDataStreams: React.MutableRefObject<UserDataStreams>,
-    private remoteDataStreams: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          [dataStreamType in DataStreamTypes]?: DataConsumer;
-        };
-      };
-    }>,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
+    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
+    private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
 
     private userCameraCount: React.MutableRefObject<number>,
     private userScreenCount: React.MutableRefObject<number>,
 
     private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
-    private isAudio: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
 
     private handleDisableEnableBtns: (disabled: boolean) => void,
@@ -185,10 +141,8 @@ class ProducersController {
 
   private createAudioProducer = async (audioBrowserMedia: UserMedia) => {
     const newAudioMedia = new AudioMedia(
-      this.username.current,
-      this.table_id.current,
-      this.userStreamEffects,
-      audioBrowserMedia
+      audioBrowserMedia,
+      this.userStreamEffects
     );
 
     this.userMedia.current.audio = newAudioMedia;
@@ -202,6 +156,30 @@ class ProducersController {
     };
 
     await this.producerTransport.current?.produce(audioParams);
+  };
+
+  private createScreenAudioProducer = async (
+    screenAudioBrowserMedia: MediaStream
+  ) => {
+    const screenId = `${this.username.current}_screen_audio_stream_${this.userScreenCount.current}`;
+    const newScreenAudioMedia = new ScreenAudioMedia(
+      screenAudioBrowserMedia,
+      this.userStreamEffects
+    );
+
+    this.userMedia.current.screenAudio[screenId] = newScreenAudioMedia;
+
+    const screenAudioTracks =
+      this.userMedia.current.screenAudio[screenId].getMasterTrack();
+    const screenAudioParams = {
+      track: screenAudioTracks,
+      appData: {
+        producerType: "screenAudio",
+        producerId: screenId,
+      },
+    };
+
+    await this.producerTransport.current?.produce(screenAudioParams);
   };
 
   createJSONProducer = async (dataStreamType: DataStreamTypes) => {
@@ -287,7 +265,7 @@ class ProducersController {
           instance: this.instance.current,
           producerId: appData.producerId,
         };
-
+        console.log(msg);
         this.socket.current.emit("message", msg);
 
         this.socket.current.once(
@@ -419,7 +397,17 @@ class ProducersController {
         return;
       }
 
-      await this.createScreenProducer(screenBrowserMedia);
+      const videoTracks = screenBrowserMedia.getVideoTracks()[0];
+      const audioTracks = screenBrowserMedia.getAudioTracks()[0];
+
+      const videoStream = new MediaStream([videoTracks]);
+      const audioStream = new MediaStream([audioTracks]);
+      console.log(audioTracks, audioStream);
+
+      await this.createScreenProducer(videoStream);
+      if (audioStream) {
+        await this.createScreenAudioProducer(audioStream);
+      }
     } else if (producerType === "audio") {
       if (this.userMedia.current.audio) {
         // Reenable buttons
@@ -736,52 +724,40 @@ class ProducersController {
       } else if (event.producerType === "json") {
         if (
           event.dataStreamType &&
-          this.remoteTracksMap.current[event.producerUsername] &&
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteDataStreams.current[event.producerUsername] &&
+          this.remoteDataStreams.current[event.producerUsername][
             event.producerInstance
           ] &&
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteDataStreams.current[event.producerUsername][
             event.producerInstance
-          ][event.producerType] &&
-          this.remoteTracksMap.current[event.producerUsername][
+          ] &&
+          this.remoteDataStreams.current[event.producerUsername][
             event.producerInstance
-          ]?.[event.producerType]?.[event.dataStreamType]
+          ]?.[event.dataStreamType]
         ) {
-          delete this.remoteTracksMap.current[event.producerUsername][
+          delete this.remoteDataStreams.current[event.producerUsername][
             event.producerInstance
-          ][event.producerType]?.[event.dataStreamType];
+          ][event.dataStreamType];
 
           if (
             Object.keys(
-              this.remoteTracksMap.current[event.producerUsername][
+              this.remoteDataStreams.current[event.producerUsername][
                 event.producerInstance
-              ][event.producerType] || { break: true }
+              ] || { break: true }
             ).length === 0
           ) {
-            delete this.remoteTracksMap.current[event.producerUsername][
+            delete this.remoteDataStreams.current[event.producerUsername][
               event.producerInstance
-            ][event.producerType];
+            ];
 
             if (
               Object.keys(
-                this.remoteTracksMap.current[event.producerUsername][
-                  event.producerInstance
-                ] || { break: true }
+                this.remoteDataStreams.current[event.producerUsername] || {
+                  break: true,
+                }
               ).length === 0
             ) {
-              delete this.remoteTracksMap.current[event.producerUsername][
-                event.producerInstance
-              ];
-
-              if (
-                Object.keys(
-                  this.remoteTracksMap.current[event.producerUsername] || {
-                    break: true,
-                  }
-                ).length === 0
-              ) {
-                delete this.remoteTracksMap.current[event.producerUsername];
-              }
+              delete this.remoteDataStreams.current[event.producerUsername];
             }
           }
         }

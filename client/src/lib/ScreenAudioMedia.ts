@@ -10,13 +10,14 @@ import {
   MixEffectsOptionsType,
 } from "../audioEffects/typeConstant";
 
-class AudioMedia {
+class ScreenAudioMedia {
+  private audioSource: MediaStreamAudioSourceNode;
   private audioContext: Tone.BaseContext;
   private mediaStream: MediaStream;
   private masterMediaStream: MediaStream;
 
   private masterMediaStreamDestination: MediaStreamAudioDestinationNode;
-  private micMediaStreamDestination: MediaStreamAudioDestinationNode;
+  private audioStreamMediaStreamDestination: MediaStreamAudioDestinationNode;
   private samplerMediaStreamDestination: MediaStreamAudioDestinationNode;
   private soundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode;
   private backgroundMusicMediaStreamDestination: MediaStreamAudioDestinationNode;
@@ -29,7 +30,7 @@ class AudioMedia {
   };
 
   constructor(
-    private audioStream: Tone.UserMedia,
+    private audioStream: MediaStream,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>
   ) {
     this.effects = {};
@@ -38,7 +39,7 @@ class AudioMedia {
     this.audioContext = Tone.getContext();
     this.masterMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
-    this.micMediaStreamDestination =
+    this.audioStreamMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
     this.samplerMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
@@ -49,15 +50,19 @@ class AudioMedia {
     this.assetSoundEffectsMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
 
-    // Connect the Tone.UserMedia instance to the MediaStreamDestination
-    this.audioStream.connect(this.masterMediaStreamDestination);
-    this.audioStream.connect(this.micMediaStreamDestination);
+    // Create a source node from the provided MediaStream
+    this.audioSource = this.audioContext.createMediaStreamSource(
+      this.audioStream
+    );
+
+    // Connect the source to the master MediaStreamDestination
+    this.audioSource.connect(this.masterMediaStreamDestination);
 
     this.audioEffects = new AudioEffects(
-      this.audioStream,
+      this.audioSource,
       this.masterMediaStreamDestination,
-      this.micMediaStreamDestination,
       undefined,
+      this.audioStreamMediaStreamDestination,
       this.samplerMediaStreamDestination,
       this.soundEffectsMediaStreamDestination,
       this.backgroundMusicMediaStreamDestination,
@@ -70,11 +75,6 @@ class AudioMedia {
     // Add the master track (from masterMediaStreamDestination) to combined stream
     this.mediaStream.addTrack(
       this.masterMediaStreamDestination.stream.getAudioTracks()[0]
-    );
-
-    // Add the mic track (from micMediaStreamDestination) to combined stream
-    this.mediaStream.addTrack(
-      this.micMediaStreamDestination.stream.getAudioTracks()[0]
     );
 
     // Add the sampler track (from samplerMediaStreamDestination) to combined stream
@@ -105,17 +105,11 @@ class AudioMedia {
       this.masterMediaStreamDestination.stream.getAudioTracks()[0]
     );
 
-    this.openMic();
+    Tone.start();
   }
 
   deconstructor = () => {
     this.audioEffects.deconstructor();
-    this.audioStream.close();
-  };
-
-  openMic = async () => {
-    await Tone.start();
-    await this.audioStream.open();
   };
 
   changeEffects = (
@@ -153,7 +147,7 @@ class AudioMedia {
   applyEffect = (effect: AudioEffectTypes) => {
     switch (effect) {
       case "robot":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -189,7 +183,7 @@ class AudioMedia {
         ]);
         break;
       case "echo":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -214,7 +208,7 @@ class AudioMedia {
         ]);
         break;
       case "alien":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "pitchShift",
             updates: [{ option: "pitch", value: 12 }],
@@ -237,7 +231,7 @@ class AudioMedia {
         ]);
         break;
       case "underwater":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -260,7 +254,7 @@ class AudioMedia {
         ]);
         break;
       case "telephone":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "EQ",
             updates: [
@@ -283,7 +277,7 @@ class AudioMedia {
         ]);
         break;
       case "space":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -312,7 +306,7 @@ class AudioMedia {
         ]);
         break;
       case "distortion":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "distortion",
             updates: [
@@ -331,7 +325,7 @@ class AudioMedia {
         ]);
         break;
       case "vintage":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "bitCrusher",
             updates: [{ option: "bits", value: 6 }],
@@ -354,7 +348,7 @@ class AudioMedia {
         ]);
         break;
       case "psychedelic":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "autoFilter",
             updates: [
@@ -387,7 +381,7 @@ class AudioMedia {
         ]);
         break;
       case "deepBass":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "EQ",
             updates: [
@@ -410,7 +404,7 @@ class AudioMedia {
         ]);
         break;
       case "highEnergy":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "distortion",
             updates: [
@@ -436,7 +430,7 @@ class AudioMedia {
         ]);
         break;
       case "ambient":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -465,7 +459,7 @@ class AudioMedia {
         ]);
         break;
       case "glitch":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "bitCrusher",
             updates: [{ option: "bits", value: 2 }],
@@ -491,7 +485,7 @@ class AudioMedia {
         ]);
         break;
       case "muffled":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "EQ",
             updates: [
@@ -517,7 +511,7 @@ class AudioMedia {
         ]);
         break;
       case "crystal":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "pitchShift",
             updates: [{ option: "pitch", value: 7 }],
@@ -546,7 +540,7 @@ class AudioMedia {
         ]);
         break;
       case "heavyMetal":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "distortion",
             updates: [
@@ -569,7 +563,7 @@ class AudioMedia {
         ]);
         break;
       case "dreamy":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -598,7 +592,7 @@ class AudioMedia {
         ]);
         break;
       case "horror":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -621,7 +615,7 @@ class AudioMedia {
         ]);
         break;
       case "sciFi":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "autoFilter",
             updates: [
@@ -648,7 +642,7 @@ class AudioMedia {
         ]);
         break;
       case "dystopian":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "distortion",
             updates: [
@@ -671,7 +665,7 @@ class AudioMedia {
         ]);
         break;
       case "retroGame":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "bitCrusher",
             updates: [{ option: "bits", value: 2 }],
@@ -697,7 +691,7 @@ class AudioMedia {
         ]);
         break;
       case "ghostly":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -726,7 +720,7 @@ class AudioMedia {
         ]);
         break;
       case "metallic":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "phaser",
             updates: [
@@ -756,7 +750,7 @@ class AudioMedia {
         ]);
         break;
       case "hypnotic":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "tremolo",
             updates: [
@@ -781,7 +775,7 @@ class AudioMedia {
         ]);
         break;
       case "cyberpunk":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "distortion",
             updates: [
@@ -804,7 +798,7 @@ class AudioMedia {
         ]);
         break;
       case "windy":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -830,7 +824,7 @@ class AudioMedia {
         ]);
         break;
       case "radio":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "EQ",
             updates: [
@@ -857,7 +851,7 @@ class AudioMedia {
         ]);
         break;
       case "explosion":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "distortion",
             updates: [
@@ -883,7 +877,7 @@ class AudioMedia {
         ]);
         break;
       case "whisper":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "EQ",
             updates: [
@@ -906,7 +900,7 @@ class AudioMedia {
         ]);
         break;
       case "submarine":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -929,7 +923,7 @@ class AudioMedia {
         ]);
         break;
       case "windTunnel":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "autoFilter",
             updates: [
@@ -955,7 +949,7 @@ class AudioMedia {
         ]);
         break;
       case "crushedBass":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "bitCrusher",
             updates: [{ option: "bits", value: 2 }],
@@ -974,7 +968,7 @@ class AudioMedia {
         ]);
         break;
       case "ethereal":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -993,7 +987,7 @@ class AudioMedia {
         ]);
         break;
       case "electroSting":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "autoFilter",
             updates: [
@@ -1012,7 +1006,7 @@ class AudioMedia {
         ]);
         break;
       case "heartbeat":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "tremolo",
             updates: [
@@ -1034,7 +1028,7 @@ class AudioMedia {
         ]);
         break;
       case "underworld":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
             updates: [
@@ -1057,7 +1051,7 @@ class AudioMedia {
         ]);
         break;
       case "sizzling":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "distortion",
             updates: [
@@ -1079,7 +1073,7 @@ class AudioMedia {
         ]);
         break;
       case "staticNoise":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "bitCrusher",
             updates: [{ option: "bits", value: 2 }],
@@ -1102,7 +1096,7 @@ class AudioMedia {
         ]);
         break;
       case "bubbly":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "autoFilter",
             updates: [
@@ -1128,7 +1122,7 @@ class AudioMedia {
         ]);
         break;
       case "thunder":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "distortion",
             updates: [
@@ -1150,7 +1144,7 @@ class AudioMedia {
         ]);
         break;
       case "echosOfThePast":
-        this.audioEffects?.fgMic?.updateEffects([
+        this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "feedbackDelay",
             updates: [
@@ -1179,7 +1173,7 @@ class AudioMedia {
   removeEffect = (effect: AudioEffectTypes) => {
     switch (effect) {
       case "robot":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "distortion",
           "pitchShift",
@@ -1188,31 +1182,35 @@ class AudioMedia {
         ]);
         break;
       case "echo":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "feedbackDelay",
           "chorus",
         ]);
         break;
       case "alien":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "pitchShift",
           "phaser",
           "vibrato",
         ]);
         break;
       case "underwater":
-        this.audioEffects?.fgMic?.removeEffects(["reverb", "EQ", "autoFilter"]);
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
+          "reverb",
+          "EQ",
+          "autoFilter",
+        ]);
         break;
       case "telephone":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "EQ",
           "distortion",
           "bitCrusher",
         ]);
         break;
       case "space":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "feedbackDelay",
           "chorus",
@@ -1220,17 +1218,21 @@ class AudioMedia {
         ]);
         break;
       case "distortion":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "distortion",
           "bitCrusher",
           "chebyshev",
         ]);
         break;
       case "vintage":
-        this.audioEffects?.fgMic?.removeEffects(["bitCrusher", "reverb", "EQ"]);
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
+          "bitCrusher",
+          "reverb",
+          "EQ",
+        ]);
         break;
       case "psychedelic":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "autoFilter",
           "chorus",
           "vibrato",
@@ -1238,21 +1240,21 @@ class AudioMedia {
         ]);
         break;
       case "deepBass":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "EQ",
           "reverb",
           "stereoWidener",
         ]);
         break;
       case "highEnergy":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "distortion",
           "reverb",
           "autoWah",
         ]);
         break;
       case "ambient":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "feedbackDelay",
           "freeverb",
@@ -1260,7 +1262,7 @@ class AudioMedia {
         ]);
         break;
       case "glitch":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "bitCrusher",
           "distortion",
           "feedbackDelay",
@@ -1268,10 +1270,14 @@ class AudioMedia {
         ]);
         break;
       case "muffled":
-        this.audioEffects?.fgMic?.removeEffects(["EQ", "reverb", "autoFilter"]);
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
+          "EQ",
+          "reverb",
+          "autoFilter",
+        ]);
         break;
       case "crystal":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "pitchShift",
           "chorus",
           "feedbackDelay",
@@ -1279,14 +1285,14 @@ class AudioMedia {
         ]);
         break;
       case "heavyMetal":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "distortion",
           "EQ",
           "chebyshev",
         ]);
         break;
       case "dreamy":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "stereoWidener",
           "vibrato",
@@ -1294,14 +1300,14 @@ class AudioMedia {
         ]);
         break;
       case "horror":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "pitchShift",
           "phaser",
         ]);
         break;
       case "sciFi":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "autoFilter",
           "pitchShift",
           "reverb",
@@ -1309,14 +1315,14 @@ class AudioMedia {
         ]);
         break;
       case "dystopian":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "distortion",
           "phaser",
           "bitCrusher",
         ]);
         break;
       case "retroGame":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "bitCrusher",
           "feedbackDelay",
           "distortion",
@@ -1324,7 +1330,7 @@ class AudioMedia {
         ]);
         break;
       case "ghostly":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "pitchShift",
           "vibrato",
@@ -1332,7 +1338,7 @@ class AudioMedia {
         ]);
         break;
       case "metallic":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "phaser",
           "distortion",
           "reverb",
@@ -1340,106 +1346,125 @@ class AudioMedia {
         ]);
         break;
       case "hypnotic":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "tremolo",
           "feedbackDelay",
           "chorus",
         ]);
         break;
       case "cyberpunk":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "distortion",
           "autoWah",
           "stereoWidener",
         ]);
         break;
       case "windy":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "autoFilter",
           "vibrato",
         ]);
         break;
       case "radio":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "EQ",
           "distortion",
           "autoFilter",
         ]);
         break;
       case "explosion":
-        this.audioEffects?.fgMic?.removeEffects(["distortion", "reverb", "EQ"]);
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
+          "distortion",
+          "reverb",
+          "EQ",
+        ]);
         break;
       case "whisper":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "EQ",
           "reverb",
           "stereoWidener",
         ]);
         break;
       case "submarine":
-        this.audioEffects?.fgMic?.removeEffects(["reverb", "autoFilter", "EQ"]);
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
+          "reverb",
+          "autoFilter",
+          "EQ",
+        ]);
         break;
       case "windTunnel":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "autoFilter",
           "reverb",
           "vibrato",
         ]);
         break;
       case "crushedBass":
-        this.audioEffects?.fgMic?.removeEffects(["bitCrusher", "EQ", "reverb"]);
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
+          "bitCrusher",
+          "EQ",
+          "reverb",
+        ]);
         break;
       case "ethereal":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "stereoWidener",
           "pitchShift",
         ]);
         break;
       case "electroSting":
-        this.audioEffects?.fgMic?.removeEffects(["autoFilter", "distortion"]);
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
+          "autoFilter",
+          "distortion",
+        ]);
         break;
       case "heartbeat":
-        this.audioEffects?.fgMic?.removeEffects(["tremolo", "EQ", "reverb"]);
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
+          "tremolo",
+          "EQ",
+          "reverb",
+        ]);
         break;
       case "underworld":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "reverb",
           "phaser",
           "pitchShift",
         ]);
         break;
       case "sizzling":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "distortion",
           "bitCrusher",
           "reverb",
         ]);
         break;
       case "staticNoise":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "bitCrusher",
           "autoFilter",
           "feedbackDelay",
         ]);
         break;
       case "bubbly":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "autoFilter",
           "pingPongDelay",
           "chorus",
         ]);
         break;
       case "thunder":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "distortion",
           "reverb",
           "pitchShift",
         ]);
         break;
       case "echosOfThePast":
-        this.audioEffects?.fgMic?.removeEffects([
+        this.audioEffects?.fgAudioStreamEffects?.removeEffects([
           "feedbackDelay",
           "reverb",
           "pitchShift",
@@ -1456,11 +1481,11 @@ class AudioMedia {
       updates: { option: MixEffectsOptionsType; value: number }[];
     }[]
   ) => {
-    this.audioEffects.fgMic?.updateEffects(effects);
+    this.audioEffects.fgAudioStreamEffects?.updateEffects(effects);
   };
 
   removeMixEffects = (effects: AudioMixEffectsType[]) => {
-    this.audioEffects.fgMic?.removeEffects(effects);
+    this.audioEffects.fgAudioStreamEffects?.removeEffects(effects);
   };
 
   samplerEffectsChange = (
@@ -1530,8 +1555,8 @@ class AudioMedia {
     return this.masterMediaStream;
   };
 
-  getMicTrack = () => {
-    return this.micMediaStreamDestination.stream.getAudioTracks()[0];
+  getAudioStreamTrack = () => {
+    return this.audioStreamMediaStreamDestination.stream.getAudioTracks()[0];
   };
 
   getSamplerTrack = () => {
@@ -1539,4 +1564,4 @@ class AudioMedia {
   };
 }
 
-export default AudioMedia;
+export default ScreenAudioMedia;

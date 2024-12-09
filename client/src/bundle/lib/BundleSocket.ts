@@ -1,13 +1,21 @@
 import {
   AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
+  RemoteStreamEffectsType,
+  RemoteTracksMapType,
+  UserMediaType,
 } from "../../context/streamsContext/typeConstant";
 import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
-import AudioMedia from "../../lib/AudioMedia";
-import CameraMedia from "../../lib/CameraMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
 import { Permissions } from "../../context/permissionsContext/PermissionsContext";
+import {
+  onBundleMetadataResponsedType,
+  onClientEffectChangedType,
+  onClientMuteChangeType,
+  onEffectChangeRequestedType,
+  onNewConsumerWasCreatedType,
+  onNewProducerWasCreatedType,
+  onPermissionsResponsedType,
+  onProducerDisconnectedType,
+} from "./typeConstant";
 
 class BundleSocket {
   constructor(
@@ -17,7 +25,7 @@ class BundleSocket {
     private setCameraStreams: React.Dispatch<
       React.SetStateAction<
         | {
-            [screenKey: string]: MediaStream;
+            [cameraId: string]: MediaStream;
           }
         | undefined
       >
@@ -25,7 +33,15 @@ class BundleSocket {
     private setScreenStreams: React.Dispatch<
       React.SetStateAction<
         | {
-            [screenKey: string]: MediaStream;
+            [screenId: string]: MediaStream;
+          }
+        | undefined
+      >
+    >,
+    private setScreenAudioStreams: React.Dispatch<
+      React.SetStateAction<
+        | {
+            [screenAudioId: string]: MediaStream;
           }
         | undefined
       >
@@ -33,52 +49,14 @@ class BundleSocket {
     private setAudioStream: React.Dispatch<
       React.SetStateAction<MediaStream | undefined>
     >,
-    private remoteTracksMap: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera?:
-            | {
-                [cameraId: string]: MediaStreamTrack;
-              }
-            | undefined;
-          screen?:
-            | {
-                [screenId: string]: MediaStreamTrack;
-              }
-            | undefined;
-          audio?: MediaStreamTrack | undefined;
-        };
-      };
-    }>,
-    private remoteStreamEffects: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera: {
-            [cameraId: string]: {
-              [effectType in CameraEffectTypes]: boolean;
-            };
-          };
-          screen: {
-            [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-          };
-          audio: { [effectType in AudioEffectTypes]: boolean };
-        };
-      };
-    }>,
+    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
     private remoteCurrentEffectsStyles: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: EffectStylesType;
       };
     }>,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
     private audioRef: React.RefObject<HTMLAudioElement>,
     private clientMute: React.MutableRefObject<boolean>,
     private localMute: React.MutableRefObject<boolean>,
@@ -88,13 +66,7 @@ class BundleSocket {
     private onNewConsumerWasCreatedCallback?: () => void
   ) {}
 
-  onNewConsumerWasCreated = (event: {
-    type: string;
-    producerUsername: string;
-    producerInstance: string;
-    consumerId?: string;
-    consumerType: string;
-  }) => {
+  onNewConsumerWasCreated = (event: onNewConsumerWasCreatedType) => {
     if (
       this.username !== event.producerUsername ||
       this.instance !== event.producerInstance
@@ -136,6 +108,61 @@ class BundleSocket {
         }
         return newStreams;
       });
+    } else if (event.consumerType === "screenAudio") {
+      // Create AudioContext and AnalyserNode
+      const audioContext = new AudioContext();
+      const thimg =
+        this.remoteTracksMap.current[event.producerUsername][
+          event.producerInstance
+        ].screenAudio;
+      const stream = new MediaStream([
+        ...(event.consumerId && thimg ? [thimg[event.consumerId]] : []),
+      ]);
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      console.log(
+        stream,
+        this.remoteTracksMap.current[event.producerUsername][
+          event.producerInstance
+        ].screenAudio?.[event.consumerId ?? "asd"]
+      );
+
+      // Configure the analyser
+      analyser.fftSize = 256; // Set the size of the FFT (frequency bins)
+      const dataArray = new Uint8Array(analyser.frequencyBinCount); // Array to store frequency data
+
+      // Connect the audio stream source to the analyser
+      source.connect(analyser);
+
+      // Function to log audio volume
+      function logAudioVolume() {
+        analyser.getByteFrequencyData(dataArray); // Get the frequency data
+        const averageVolume =
+          dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+        console.log(`Audio Volume: ${averageVolume}`);
+
+        // Schedule next log
+        requestAnimationFrame(logAudioVolume);
+      }
+
+      // Start logging the audio volume
+      logAudioVolume();
+      this.setScreenAudioStreams((prev) => {
+        const newStreams = { ...prev };
+        const newStream = new MediaStream();
+        if (event.consumerId) {
+          const track =
+            this.remoteTracksMap.current[event.producerUsername][
+              event.producerInstance
+            ].screenAudio?.[event.consumerId];
+          if (track) {
+            newStream.addTrack(track);
+          }
+
+          newStreams[event.consumerId] = newStream;
+        }
+        return newStreams;
+      });
     } else if (event.consumerType === "audio") {
       const newStream = new MediaStream();
       const track =
@@ -154,11 +181,7 @@ class BundleSocket {
     }
   };
 
-  onNewProducerWasCreated = (event: {
-    type: string;
-    producerType: "camera" | "screen" | "audio";
-    producerId: string | undefined;
-  }) => {
+  onNewProducerWasCreated = (event: onNewProducerWasCreatedType) => {
     if (!this.isUser) {
       return;
     }
@@ -181,18 +204,21 @@ class BundleSocket {
         }
         return newStreams;
       });
+    } else if (event.producerType === "screenAudio") {
+      this.setScreenAudioStreams((prev) => {
+        const newStreams = { ...prev };
+        if (event.producerId) {
+          newStreams[event.producerId] =
+            this.userMedia.current.screenAudio[event.producerId].getStream();
+        }
+        return newStreams;
+      });
     } else if (event.producerType === "audio") {
       this.setAudioStream(this.userMedia.current.audio?.getStream());
     }
   };
 
-  onProducerDisconnected = (event: {
-    type: string;
-    producerUsername: string;
-    producerInstance: string;
-    producerType: string;
-    producerId: string;
-  }) => {
+  onProducerDisconnected = (event: onProducerDisconnectedType) => {
     if (
       event.producerUsername === this.username &&
       event.producerInstance === this.instance
@@ -209,6 +235,12 @@ class BundleSocket {
           delete newStreams[event.producerId];
           return newStreams;
         });
+      } else if (event.producerType === "screenAudio") {
+        this.setScreenAudioStreams((prev) => {
+          const newStreams = { ...prev };
+          delete newStreams[event.producerId];
+          return newStreams;
+        });
       } else if (event.producerType === "audio") {
         this.setAudioStream(undefined);
       }
@@ -216,11 +248,7 @@ class BundleSocket {
   };
 
   // Get client mute changes from other users
-  onClientMuteChange = (event: {
-    type: string;
-    username: string;
-    clientMute: boolean;
-  }) => {
+  onClientMuteChange = (event: onClientMuteChangeType) => {
     if (this.isUser) {
       return;
     }
@@ -241,14 +269,7 @@ class BundleSocket {
     }
   };
 
-  onPermissionsResponsed = (event: {
-    type: "permissionsResponsed";
-    inquiredUsername: string;
-    inquiredInstance: string;
-    data: {
-      permissions: Permissions;
-    };
-  }) => {
+  onPermissionsResponsed = (event: onPermissionsResponsedType) => {
     if (
       this.username !== event.inquiredUsername &&
       this.instance !== event.inquiredInstance
@@ -259,24 +280,7 @@ class BundleSocket {
     this.setPermissions(event.data.permissions);
   };
 
-  onBundleMetadataResponsed = (event: {
-    type: "bundleMetadataResponsed";
-    inquiredUsername: string;
-    inquiredInstance: string;
-    data: {
-      clientMute: boolean;
-      streamEffects: {
-        camera: {
-          [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-        };
-        screen: {
-          [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-        };
-        audio: { [effectType in AudioEffectTypes]: boolean };
-      };
-      currentEffectsStyles: EffectStylesType;
-    };
-  }) => {
+  onBundleMetadataResponsed = (event: onBundleMetadataResponsedType) => {
     if (
       this.username !== event.inquiredUsername ||
       this.instance !== event.inquiredInstance
@@ -297,13 +301,7 @@ class BundleSocket {
     ] = event.data.currentEffectsStyles;
   };
 
-  onEffectChangeRequested = (event: {
-    type: "effectChangeRequested";
-    requestedProducerType: "camera" | "screen" | "audio";
-    requestedProducerId: string | undefined;
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-    blockStateChange: boolean;
-  }) => {
+  onEffectChangeRequested = (event: onEffectChangeRequestedType) => {
     if (
       this.permissions.acceptsAudioEffects &&
       event.requestedProducerType === "audio"
@@ -313,15 +311,7 @@ class BundleSocket {
     }
   };
 
-  onClientEffectChanged = (event: {
-    type: "clientEffectChanged";
-    username: string;
-    instance: string;
-    producerType: "camera" | "screen" | "audio";
-    producerId: string | undefined;
-    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-    blockStateChange: boolean;
-  }) => {
+  onClientEffectChanged = (event: onClientEffectChangedType) => {
     if (
       !this.isUser &&
       this.username === event.username &&

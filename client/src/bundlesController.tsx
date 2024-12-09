@@ -1,10 +1,8 @@
 import React from "react";
 import { Socket } from "socket.io-client";
 import Bundle from "./bundle/Bundle";
-import CameraMedia from "./lib/CameraMedia";
-import ScreenMedia from "./lib/ScreenMedia";
-import AudioMedia from "./lib/AudioMedia";
 import { Permissions } from "./context/permissionsContext/PermissionsContext";
+import { UserMediaType } from "./context/streamsContext/typeConstant";
 
 class BundlesController {
   constructor(
@@ -13,15 +11,7 @@ class BundlesController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
 
     private remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
 
@@ -44,7 +34,8 @@ class BundlesController {
       username: string,
       instance: string,
       cameraIds: (string | undefined)[],
-      screenIds: (string | undefined)[]
+      screenIds: (string | undefined)[],
+      screenAudioIds: (string | undefined)[]
     ) => void,
 
     private permissions: React.MutableRefObject<Permissions>
@@ -64,6 +55,13 @@ class BundlesController {
           this.userMedia.current.screen[screenId].getStream();
       }
 
+      const initScreenAudioStreams: { [screenAudioId: string]: MediaStream } =
+        {};
+      for (const screenAudioId in this.userMedia.current.screenAudio) {
+        initScreenAudioStreams[screenAudioId] =
+          this.userMedia.current.screenAudio[screenAudioId].getMasterStream();
+      }
+
       const initAudioStream = this.userMedia.current.audio?.getMasterStream();
 
       const newBundle = (
@@ -79,6 +77,9 @@ class BundlesController {
           }
           initScreenStreams={
             this.isScreen.current ? initScreenStreams : undefined
+          }
+          initScreenAudioStreams={
+            this.isScreen.current ? initScreenAudioStreams : undefined
           }
           initAudioStream={this.isAudio.current ? initAudioStream : undefined}
           options={{
@@ -111,6 +112,9 @@ class BundlesController {
     remoteScreenStreams: {
       [screenId: string]: MediaStream;
     },
+    remoteScreenAudioStreams: {
+      [screenAudioId: string]: MediaStream;
+    },
     remoteAudioStream: MediaStream | undefined
   ) => {
     if (
@@ -121,7 +125,8 @@ class BundlesController {
         trackUsername,
         trackInstance,
         Object.keys(remoteCameraStreams),
-        Object.keys(remoteScreenStreams)
+        Object.keys(remoteScreenStreams),
+        Object.keys(remoteScreenAudioStreams)
       );
 
       const newBundle = (
@@ -140,6 +145,11 @@ class BundlesController {
           initScreenStreams={
             Object.keys(remoteScreenStreams).length !== 0
               ? remoteScreenStreams
+              : undefined
+          }
+          initScreenAudioStreams={
+            Object.keys(remoteScreenAudioStreams).length !== 0
+              ? remoteScreenAudioStreams
               : undefined
           }
           initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}

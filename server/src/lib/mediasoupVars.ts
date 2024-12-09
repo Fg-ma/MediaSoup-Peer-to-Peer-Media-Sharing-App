@@ -49,6 +49,7 @@ export type TableProducers = {
       [instance: string]: {
         camera?: { [cameraId: string]: Producer };
         screen?: { [screenId: string]: Producer };
+        screenAudio?: { [screenAudioId: string]: Producer };
         audio?: Producer;
         json?: { [dataStreamType in DataStreamTypes]?: DataProducer };
       };
@@ -70,6 +71,18 @@ export type ConsumerInstance = {
   };
   screen?: {
     [screenId: string]: {
+      consumer: Consumer;
+      producerId: string;
+      id: string;
+      kind: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      rtpParameters: any;
+      type: string;
+      producerPaused: boolean;
+    };
+  };
+  screenAudio?: {
+    [screenAudioId: string]: {
       consumer: Consumer;
       producerId: string;
       id: string;

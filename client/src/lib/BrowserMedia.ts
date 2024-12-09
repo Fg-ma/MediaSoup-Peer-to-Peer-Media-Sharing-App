@@ -56,10 +56,10 @@ class BrowserMedia {
     try {
       return await navigator.mediaDevices.getDisplayMedia({
         video: {
-          height: { max: screen.height * 0.75 },
-          width: { max: screen.width * 0.75 },
+          height: { max: screen.height },
+          width: { max: screen.width },
         },
-        audio: false,
+        audio: true,
       });
     } catch (error) {
       this.handleDisableEnableBtns(false);

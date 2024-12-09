@@ -1,4 +1,9 @@
-export type ProducerTypes = "camera" | "screen" | "audio" | "json";
+export type ProducerTypes =
+  | "camera"
+  | "screen"
+  | "screenAudio"
+  | "audio"
+  | "json";
 
 export type Permissions = {
   acceptsCameraEffects: boolean;

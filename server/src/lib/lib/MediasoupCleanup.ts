@@ -220,7 +220,7 @@ class MediasoupCleanup {
     }
   }
 
-  deleteProducer(table_id: string, username: string, instance: string) {
+  deleteProducerInstance(table_id: string, username: string, instance: string) {
     if (
       tableProducers[table_id] &&
       tableProducers[table_id][username] &&
@@ -232,7 +232,7 @@ class MediasoupCleanup {
     }
   }
 
-  deleteConsumer(table_id: string, username: string, instance: string) {
+  deleteConsumerInstance(table_id: string, username: string, instance: string) {
     if (
       tableConsumers[table_id] &&
       tableConsumers[table_id][username] &&
@@ -299,7 +299,9 @@ class MediasoupCleanup {
     }
 
     if (
-      (producerType === "camera" || producerType === "screen") &&
+      (producerType === "camera" ||
+        producerType === "screen" ||
+        producerType === "screenAudio") &&
       producerId &&
       tableProducers[table_id] &&
       tableProducers[table_id][username] &&
@@ -398,7 +400,8 @@ class MediasoupCleanup {
                     }
                     if (
                       iterProducerType === "camera" ||
-                      iterProducerType === "screen"
+                      iterProducerType === "screen" ||
+                      iterProducerType === "screenAudio"
                     ) {
                       for (const iterProducerId in tableConsumers[table_id][
                         consumerUsername

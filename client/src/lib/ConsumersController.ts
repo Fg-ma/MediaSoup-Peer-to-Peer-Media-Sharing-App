@@ -4,7 +4,11 @@ import { Socket } from "socket.io-client";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import { RtpParameters } from "mediasoup-client/lib/RtpParameters";
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
-import { DataStreamTypes } from "src/context/streamsContext/typeConstant";
+import {
+  DataStreamTypes,
+  RemoteDataStreamsType,
+  RemoteTracksMapType,
+} from "../context/streamsContext/typeConstant";
 
 class ConsumersController {
   constructor(
@@ -19,21 +23,15 @@ class ConsumersController {
       mediasoup.types.Transport<mediasoup.types.AppData> | undefined
     >,
 
-    private remoteTracksMap: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera?: { [cameraId: string]: MediaStreamTrack };
-          screen?: { [screenId: string]: MediaStreamTrack };
-          audio?: MediaStreamTrack | undefined;
-        };
-      };
-    }>,
+    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
 
     private setUpEffectContext: (
       username: string,
       instance: string,
       cameraIds: (string | undefined)[],
-      screenIds: (string | undefined)[]
+      screenIds: (string | undefined)[],
+      screenAudioIds: (string | undefined)[]
     ) => void,
 
     private createConsumerBundle: (
@@ -45,18 +43,11 @@ class ConsumersController {
       remoteScreenStreams: {
         [screenId: string]: MediaStream;
       },
+      remoteScreenAudioStreams: {
+        [screenId: string]: MediaStream;
+      },
       remoteAudioStream: MediaStream | undefined
-    ) => void,
-
-    private remoteDataStreams: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          positionScaleRotation?:
-            | mediasoup.types.DataConsumer<mediasoup.types.AppData>
-            | undefined;
-        };
-      };
-    }>
+    ) => void
   ) {}
 
   async onSubscribed(event: {
@@ -77,6 +68,16 @@ class ConsumersController {
           };
           screen?: {
             [screenId: string]: {
+              producerId: string;
+              id: string;
+              kind: "audio" | "video" | undefined;
+              rtpParameters: RtpParameters;
+              type: string;
+              producerPaused: boolean;
+            };
+          };
+          screenAudio?: {
+            [screenAudioId: string]: {
               producerId: string;
               id: string;
               kind: "audio" | "video" | undefined;
@@ -120,6 +121,7 @@ class ConsumersController {
         const newRemoteTrack: {
           camera?: { [cameraId: string]: MediaStreamTrack };
           screen?: { [screenId: string]: MediaStreamTrack };
+          screenAudio?: { [screenAudioId: string]: MediaStreamTrack };
           audio?: MediaStreamTrack;
         } = {};
         const newRemoteDataStream: {
@@ -165,6 +167,29 @@ class ConsumersController {
               rtpParameters,
             });
             newRemoteTrack.screen[key] = consumer.track;
+          }
+        }
+
+        if (subscriptions[producerUsername][producerInstance].screenAudio) {
+          if (!newRemoteTrack.screenAudio) {
+            newRemoteTrack.screenAudio = {};
+          }
+          for (const key in subscriptions[producerUsername][producerInstance]
+            .screenAudio) {
+            const subscriptionCameraData =
+              subscriptions[producerUsername][producerInstance].screenAudio![
+                key
+              ];
+            const { producerId, id, kind, rtpParameters } =
+              subscriptionCameraData;
+
+            const consumer = await this.consumerTransport.current.consume({
+              id,
+              producerId,
+              kind,
+              rtpParameters,
+            });
+            newRemoteTrack.screenAudio[key] = consumer.track;
           }
         }
 
@@ -304,6 +329,20 @@ class ConsumersController {
                   remoteScreenStreams[key] = remoteScreenStream;
                 }
 
+                const remoteScreenAudioStreams: {
+                  [screenId: string]: MediaStream;
+                } = {};
+                for (const key in this.remoteTracksMap.current[username][
+                  instance
+                ].screenAudio) {
+                  const remoteScreenAudioStream = new MediaStream();
+                  remoteScreenAudioStream.addTrack(
+                    this.remoteTracksMap.current[username][instance]
+                      .screenAudio![key]
+                  );
+                  remoteScreenAudioStreams[key] = remoteScreenAudioStream;
+                }
+
                 let remoteAudioStream: MediaStream | undefined = undefined;
                 if (this.remoteTracksMap.current[username][instance].audio) {
                   remoteAudioStream = new MediaStream();
@@ -317,6 +356,7 @@ class ConsumersController {
                   instance,
                   remoteCameraStreams,
                   remoteScreenStreams,
+                  remoteScreenAudioStreams,
                   remoteAudioStream
                 );
               }
@@ -358,7 +398,7 @@ class ConsumersController {
     producerUsername: string;
     producerInstance: string;
     consumerId?: string;
-    consumerType: "camera" | "screen" | "audio";
+    consumerType: "camera" | "screen" | "screenAudio" | "audio";
     data: {
       producerId: string;
       id: string;
@@ -397,7 +437,11 @@ class ConsumersController {
         event.producerInstance
       ] = {};
     }
-    if (event.consumerType === "camera" || event.consumerType === "screen") {
+    if (
+      event.consumerType === "camera" ||
+      event.consumerType === "screen" ||
+      event.consumerType === "screenAudio"
+    ) {
       if (
         !this.remoteTracksMap.current[event.producerUsername][
           event.producerInstance
@@ -423,7 +467,8 @@ class ConsumersController {
       event.producerUsername,
       event.producerInstance,
       event.consumerType === "camera" ? [event.consumerId] : [],
-      event.consumerType === "screen" ? [event.consumerId] : []
+      event.consumerType === "screen" ? [event.consumerId] : [],
+      event.consumerType === "screenAudio" ? [event.consumerId] : []
     );
 
     if (
@@ -441,6 +486,11 @@ class ConsumersController {
           this.remoteTracksMap.current[event.producerUsername][
             event.producerInstance
           ].screen || {}
+        ).length === 1 ||
+        Object.keys(
+          this.remoteTracksMap.current[event.producerUsername][
+            event.producerInstance
+          ].screenAudio || {}
         ).length === 1 ||
         this.remoteTracksMap.current[event.producerUsername][
           event.producerInstance
@@ -484,6 +534,26 @@ class ConsumersController {
         }
       }
 
+      const remoteScreenAudioStreams: { [screenAudioId: string]: MediaStream } =
+        {};
+      if (
+        this.remoteTracksMap.current[event.producerUsername][
+          event.producerInstance
+        ]?.screenAudio
+      ) {
+        for (const key in this.remoteTracksMap.current[event.producerUsername][
+          event.producerInstance
+        ].screenAudio) {
+          const remoteScreenAudioStream = new MediaStream();
+          remoteScreenAudioStream.addTrack(
+            this.remoteTracksMap.current[event.producerUsername][
+              event.producerInstance
+            ].screenAudio![key]
+          );
+          remoteScreenAudioStreams[key] = remoteScreenAudioStream;
+        }
+      }
+
       let remoteAudioStream: MediaStream | undefined = undefined;
       if (
         this.remoteTracksMap.current[event.producerUsername][
@@ -506,6 +576,7 @@ class ConsumersController {
         event.producerInstance,
         remoteCameraStreams,
         remoteScreenStreams,
+        remoteScreenAudioStreams,
         remoteAudioStream
       );
     }

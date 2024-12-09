@@ -111,7 +111,9 @@ class ProducersController {
     }
 
     if (
-      ((event.producerType === "camera" || event.producerType === "screen") &&
+      ((event.producerType === "camera" ||
+        event.producerType === "screen" ||
+        event.producerType === "screenAudio") &&
         event.producerId &&
         tableProducers[event.table_id]?.[event.username]?.[event.instance]?.[
           event.producerType
@@ -141,7 +143,9 @@ class ProducersController {
       tableProducers[event.table_id][event.username][event.instance] = {};
     }
     if (
-      (event.producerType === "camera" || event.producerType === "screen") &&
+      (event.producerType === "camera" ||
+        event.producerType === "screen" ||
+        event.producerType === "screenAudio") &&
       !tableProducers[event.table_id][event.username][event.instance][
         event.producerType
       ]
@@ -151,7 +155,11 @@ class ProducersController {
       ] = {};
     }
 
-    if (event.producerType === "camera" || event.producerType === "screen") {
+    if (
+      event.producerType === "camera" ||
+      event.producerType === "screen" ||
+      event.producerType === "screenAudio"
+    ) {
       if (event.producerId) {
         tableProducers[event.table_id][event.username][event.instance][
           event.producerType

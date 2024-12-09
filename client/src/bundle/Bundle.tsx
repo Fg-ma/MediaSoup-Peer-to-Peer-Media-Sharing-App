@@ -27,6 +27,7 @@ export default function Bundle({
   name,
   initCameraStreams,
   initScreenStreams,
+  initScreenAudioStreams,
   initAudioStream,
   options,
   handleMuteCallback,
@@ -40,8 +41,9 @@ export default function Bundle({
   username: string;
   instance: string;
   name?: string;
-  initCameraStreams?: { [cameraKey: string]: MediaStream };
-  initScreenStreams?: { [screenKey: string]: MediaStream };
+  initCameraStreams?: { [cameraId: string]: MediaStream };
+  initScreenStreams?: { [screenId: string]: MediaStream };
+  initScreenAudioStreams?: { [screenAudioId: string]: MediaStream };
   initAudioStream?: MediaStream;
   options?: BundleOptions;
   handleMuteCallback?: () => void;
@@ -60,16 +62,22 @@ export default function Bundle({
 
   const [cameraStreams, setCameraStreams] = useState<
     | {
-        [screenKey: string]: MediaStream;
+        [cameraId: string]: MediaStream;
       }
     | undefined
   >(initCameraStreams);
   const [screenStreams, setScreenStreams] = useState<
     | {
-        [screenKey: string]: MediaStream;
+        [screenId: string]: MediaStream;
       }
     | undefined
   >(initScreenStreams);
+  const [screenAudioStreams, setScreenAudioStreams] = useState<
+    | {
+        [screenAudioId: string]: MediaStream;
+      }
+    | undefined
+  >(initScreenAudioStreams);
   const [audioStream, setAudioStream] = useState<MediaStream | undefined>(
     initAudioStream
   );
@@ -93,6 +101,7 @@ export default function Bundle({
     bundleOptions,
     setCameraStreams,
     setScreenStreams,
+    setScreenAudioStreams,
     setAudioStream,
     remoteTracksMap,
     remoteStreamEffects,
@@ -140,6 +149,17 @@ export default function Bundle({
       audioRef.current.srcObject = samplerStream;
     }
   }, [audioRef, audioStream]);
+
+  useEffect(() => {
+    if (!screenAudioStreams || !Object.values(screenAudioStreams)[0]) {
+      return;
+    }
+    console.log(
+      screenAudioStreams,
+      Object.values(screenAudioStreams ?? {})[0],
+      Object.values(screenAudioStreams ?? {})[0].getAudioTracks()
+    );
+  }, []);
 
   useEffect(() => {
     if (!signal) {

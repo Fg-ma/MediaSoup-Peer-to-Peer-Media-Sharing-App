@@ -150,7 +150,7 @@ export default function RemoteVisualMedia({
     scale: { x: number; y: number };
     rotation: number;
   }>({
-    position: { left: 50, top: 50 },
+    position: { left: 37.5, top: 37.5 },
     scale: { x: 25, y: 25 },
     rotation: 0,
   });

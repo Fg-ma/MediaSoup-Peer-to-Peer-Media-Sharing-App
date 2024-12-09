@@ -1,14 +1,12 @@
 import { Socket } from "socket.io-client";
 import {
   AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
+  RemoteStreamEffectsType,
+  RemoteTracksMapType,
+  UserMediaType,
 } from "../../context/streamsContext/typeConstant";
 import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
 import BundleSocket from "./BundleSocket";
-import CameraMedia from "../../lib/CameraMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
-import AudioMedia from "../../lib/AudioMedia";
 import { BundleControllerMessageType, BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/PermissionsContext";
 
@@ -25,7 +23,7 @@ class BundleController {
     private setCameraStreams: React.Dispatch<
       React.SetStateAction<
         | {
-            [screenKey: string]: MediaStream;
+            [cameraId: string]: MediaStream;
           }
         | undefined
       >
@@ -33,7 +31,15 @@ class BundleController {
     private setScreenStreams: React.Dispatch<
       React.SetStateAction<
         | {
-            [screenKey: string]: MediaStream;
+            [screenId: string]: MediaStream;
+          }
+        | undefined
+      >
+    >,
+    private setScreenAudioStreams: React.Dispatch<
+      React.SetStateAction<
+        | {
+            [screenAudioId: string]: MediaStream;
           }
         | undefined
       >
@@ -41,52 +47,14 @@ class BundleController {
     private setAudioStream: React.Dispatch<
       React.SetStateAction<MediaStream | undefined>
     >,
-    private remoteTracksMap: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera?:
-            | {
-                [cameraId: string]: MediaStreamTrack;
-              }
-            | undefined;
-          screen?:
-            | {
-                [screenId: string]: MediaStreamTrack;
-              }
-            | undefined;
-          audio?: MediaStreamTrack | undefined;
-        };
-      };
-    }>,
-    private remoteStreamEffects: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera: {
-            [cameraId: string]: {
-              [effectType in CameraEffectTypes]: boolean;
-            };
-          };
-          screen: {
-            [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-          };
-          audio: { [effectType in AudioEffectTypes]: boolean };
-        };
-      };
-    }>,
+    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
     private remoteCurrentEffectsStyles: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: EffectStylesType;
       };
     }>,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
     private clientMute: React.MutableRefObject<boolean>,
@@ -102,6 +70,7 @@ class BundleController {
       this.instance,
       this.setCameraStreams,
       this.setScreenStreams,
+      this.setScreenAudioStreams,
       this.setAudioStream,
       this.remoteTracksMap,
       this.remoteStreamEffects,

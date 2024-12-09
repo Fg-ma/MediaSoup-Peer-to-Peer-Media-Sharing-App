@@ -166,6 +166,16 @@ class ConsumersController {
               producerPaused: boolean;
             };
           };
+          screenAudio?: {
+            [screenAudioId: string]: {
+              producerId: string;
+              id: string;
+              kind: string;
+              rtpParameters: RtpParameters;
+              type: string;
+              producerPaused: boolean;
+            };
+          };
           audio?: {
             producerId: string;
             id: string;
@@ -261,6 +271,42 @@ class ConsumersController {
         if (
           consumers[producerUsername] &&
           consumers[producerUsername][producerInstance] &&
+          consumers[producerUsername][producerInstance].screenAudio
+        ) {
+          if (!newConsumers[producerUsername]) {
+            newConsumers[producerUsername] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance]) {
+            newConsumers[producerUsername][producerInstance] = {};
+          }
+          if (!newConsumers[producerUsername][producerInstance].screenAudio) {
+            newConsumers[producerUsername][producerInstance].screenAudio = {};
+          }
+          for (const screenAudioId in consumers[producerUsername][
+            producerInstance
+          ].screenAudio) {
+            const screenAudio =
+              consumers[producerUsername][producerInstance].screenAudio?.[
+                screenAudioId
+              ];
+
+            if (screenAudio)
+              newConsumers[producerUsername][producerInstance].screenAudio![
+                screenAudioId
+              ] = {
+                producerId: screenAudio.producerId,
+                id: screenAudio.id,
+                kind: screenAudio.kind,
+                rtpParameters: screenAudio.rtpParameters,
+                type: screenAudio.type,
+                producerPaused: screenAudio.producerPaused,
+              };
+          }
+        }
+
+        if (
+          consumers[producerUsername] &&
+          consumers[producerUsername][producerInstance] &&
           consumers[producerUsername][producerInstance].audio
         ) {
           if (!newConsumers[producerUsername]) {
@@ -349,7 +395,9 @@ class ConsumersController {
         .transport;
 
     const producer =
-      event.consumerType === "camera" || event.consumerType === "screen"
+      event.consumerType === "camera" ||
+      event.consumerType === "screen" ||
+      event.consumerType === "screenAudio"
         ? event.incomingProducerId
           ? tableProducers[event.table_id][event.producerUsername][
               event.producerInstance
@@ -369,7 +417,9 @@ class ConsumersController {
         producerId: producer.id,
         rtpCapabilities: event.rtpCapabilities,
         paused:
-          event.consumerType === "camera" || event.consumerType === "screen",
+          event.consumerType === "camera" ||
+          event.consumerType === "screen" ||
+          event.consumerType === "screenAudio",
       });
 
       newConsumer = {
@@ -414,7 +464,9 @@ class ConsumersController {
       ][event.producerInstance] = {};
     }
     if (
-      (event.consumerType === "camera" || event.consumerType === "screen") &&
+      (event.consumerType === "camera" ||
+        event.consumerType === "screen" ||
+        event.consumerType === "screenAudio") &&
       !tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
       ][event.consumerType]
@@ -424,7 +476,11 @@ class ConsumersController {
       ][event.producerInstance][event.consumerType] = {};
     }
 
-    if (event.consumerType === "camera" || event.consumerType === "screen") {
+    if (
+      event.consumerType === "camera" ||
+      event.consumerType === "screen" ||
+      event.consumerType === "screenAudio"
+    ) {
       if (event.incomingProducerId) {
         tableConsumers[event.table_id][event.username][event.instance][
           event.producerUsername
@@ -437,7 +493,7 @@ class ConsumersController {
         event.producerUsername
       ][event.producerInstance][event.consumerType] = newConsumer;
     }
-
+    console.log(newConsumer);
     this.io
       .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
       .emit("message", {

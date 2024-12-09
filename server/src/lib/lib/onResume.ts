@@ -39,6 +39,20 @@ const onResume = async (event: onResumeType, io: SocketIOServer) => {
         if (
           tableConsumers[event.table_id][event.username][event.instance][
             producerUsername
+          ][producerInstance].screenAudio
+        ) {
+          const screenAudioConsumers =
+            tableConsumers[event.table_id][event.username][event.instance][
+              producerUsername
+            ][producerInstance].screenAudio;
+          for (const screenAudioId in screenAudioConsumers) {
+            console.log("wokaksodasdasd");
+            await screenAudioConsumers[screenAudioId].consumer?.resume();
+          }
+        }
+        if (
+          tableConsumers[event.table_id][event.username][event.instance][
+            producerUsername
           ][producerInstance].audio
         ) {
           await tableConsumers[event.table_id][event.username][event.instance][
