@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { Permissions } from "../context/permissionsContext/PermissionsContext";
+import { Permissions } from "../context/permissionsContext/typeConstant";
 
 class PermissionsController {
   constructor(

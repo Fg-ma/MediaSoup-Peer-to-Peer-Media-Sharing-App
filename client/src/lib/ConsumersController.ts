@@ -51,14 +51,14 @@ class ConsumersController {
   ) {}
 
   async onSubscribed(event: {
-    type: string;
+    type: "subscribed";
     data: {
       [username: string]: {
         [instance: string]: {
           camera?: {
             [cameraId: string]: {
-              producerId: string;
               id: string;
+              producerId: string;
               kind: "audio" | "video" | undefined;
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               rtpParameters: any;
@@ -68,8 +68,8 @@ class ConsumersController {
           };
           screen?: {
             [screenId: string]: {
-              producerId: string;
               id: string;
+              producerId: string;
               kind: "audio" | "video" | undefined;
               rtpParameters: RtpParameters;
               type: string;
@@ -78,8 +78,8 @@ class ConsumersController {
           };
           screenAudio?: {
             [screenAudioId: string]: {
-              producerId: string;
               id: string;
+              producerId: string;
               kind: "audio" | "video" | undefined;
               rtpParameters: RtpParameters;
               type: string;
@@ -87,8 +87,8 @@ class ConsumersController {
             };
           };
           audio?: {
-            producerId: string;
             id: string;
+            producerId: string;
             kind: "audio" | "video" | undefined;
             rtpParameters: RtpParameters;
             type: string;
@@ -96,8 +96,8 @@ class ConsumersController {
           };
           json?: {
             [dataStreamType in DataStreamTypes]?: {
-              producerId: string;
               id: string;
+              producerId: string;
               label: string;
               sctpStreamParameters: SctpStreamParameters;
               type: string;
@@ -136,7 +136,7 @@ class ConsumersController {
             .camera) {
             const subscriptionCameraData =
               subscriptions[producerUsername][producerInstance].camera![key];
-            const { producerId, id, kind, rtpParameters } =
+            const { id, producerId, kind, rtpParameters } =
               subscriptionCameraData;
 
             const consumer = await this.consumerTransport.current.consume({
@@ -157,7 +157,7 @@ class ConsumersController {
             .screen) {
             const subscriptionCameraData =
               subscriptions[producerUsername][producerInstance].screen![key];
-            const { producerId, id, kind, rtpParameters } =
+            const { id, producerId, kind, rtpParameters } =
               subscriptionCameraData;
 
             const consumer = await this.consumerTransport.current.consume({
@@ -180,7 +180,7 @@ class ConsumersController {
               subscriptions[producerUsername][producerInstance].screenAudio![
                 key
               ];
-            const { producerId, id, kind, rtpParameters } =
+            const { id, producerId, kind, rtpParameters } =
               subscriptionCameraData;
 
             const consumer = await this.consumerTransport.current.consume({
@@ -196,7 +196,7 @@ class ConsumersController {
         if (subscriptions[producerUsername][producerInstance].audio) {
           const subscriptionAudioData =
             subscriptions[producerUsername][producerInstance].audio!;
-          const { producerId, id, kind, rtpParameters } = subscriptionAudioData;
+          const { id, producerId, kind, rtpParameters } = subscriptionAudioData;
 
           const consumer = await this.consumerTransport.current.consume({
             id,
@@ -217,7 +217,7 @@ class ConsumersController {
             if (!subscriptionJSONData) {
               continue;
             }
-            const { producerId, id, sctpStreamParameters, label, protocol } =
+            const { id, producerId, sctpStreamParameters, label, protocol } =
               subscriptionJSONData;
 
             const consumer = await this.consumerTransport.current.consumeData({
@@ -397,11 +397,11 @@ class ConsumersController {
     type: "newConsumerSubscribed";
     producerUsername: string;
     producerInstance: string;
-    consumerId?: string;
-    consumerType: "camera" | "screen" | "screenAudio" | "audio";
+    producerId?: string;
+    producerType: "camera" | "screen" | "screenAudio" | "audio";
     data: {
-      producerId: string;
       id: string;
+      producerId: string;
       kind: "audio" | "video" | undefined;
       rtpParameters: mediasoup.types.RtpParameters;
       type: string;
@@ -412,7 +412,7 @@ class ConsumersController {
       return;
     }
 
-    const { producerId, id, kind, rtpParameters } = event.data;
+    const { id, producerId, kind, rtpParameters } = event.data;
     const consumer = await this.consumerTransport.current?.consume({
       id,
       producerId,
@@ -438,24 +438,24 @@ class ConsumersController {
       ] = {};
     }
     if (
-      event.consumerType === "camera" ||
-      event.consumerType === "screen" ||
-      event.consumerType === "screenAudio"
+      event.producerType === "camera" ||
+      event.producerType === "screen" ||
+      event.producerType === "screenAudio"
     ) {
       if (
         !this.remoteTracksMap.current[event.producerUsername][
           event.producerInstance
-        ][event.consumerType]
+        ][event.producerType]
       ) {
         this.remoteTracksMap.current[event.producerUsername][
           event.producerInstance
-        ][event.consumerType] = {};
+        ][event.producerType] = {};
       }
 
-      if (event.consumerId) {
+      if (event.producerId) {
         this.remoteTracksMap.current[event.producerUsername][
           event.producerInstance
-        ][event.consumerType]![event.consumerId] = consumer.track;
+        ][event.producerType]![event.producerId] = consumer.track;
       }
     } else {
       this.remoteTracksMap.current[event.producerUsername][
@@ -466,9 +466,9 @@ class ConsumersController {
     this.setUpEffectContext(
       event.producerUsername,
       event.producerInstance,
-      event.consumerType === "camera" ? [event.consumerId] : [],
-      event.consumerType === "screen" ? [event.consumerId] : [],
-      event.consumerType === "screenAudio" ? [event.consumerId] : []
+      event.producerType === "camera" ? [event.producerId] : [],
+      event.producerType === "screen" ? [event.producerId] : [],
+      event.producerType === "screenAudio" ? [event.producerId] : []
     );
 
     if (
@@ -596,8 +596,8 @@ class ConsumersController {
       instance: this.instance.current,
       producerUsername: event.producerUsername,
       producerInstance: event.producerInstance,
-      consumerId: event.consumerId,
-      consumerType: event.consumerType,
+      producerId: event.producerId,
+      producerType: event.producerType,
     };
     this.socket.current.emit("message", message);
   }
@@ -606,11 +606,11 @@ class ConsumersController {
     type: "newJSONConsumerSubscribed";
     producerUsername: string;
     producerInstance: string;
-    consumerId?: string;
-    consumerType: "json";
+    producerId?: string;
+    producerType: "json";
     data: {
-      producerId: string;
       id: string;
+      producerId: string;
       label: string;
       sctpStreamParameters: SctpStreamParameters;
       type: string;
@@ -622,7 +622,7 @@ class ConsumersController {
       return;
     }
 
-    const { producerId, id, label, sctpStreamParameters, protocol } =
+    const { id, producerId, label, sctpStreamParameters, protocol } =
       event.data;
 
     const consumer = await this.consumerTransport.current?.consumeData({
@@ -663,8 +663,8 @@ class ConsumersController {
       instance: this.instance.current,
       producerUsername: event.producerUsername,
       producerInstance: event.producerInstance,
-      consumerId: event.consumerId,
-      consumerType: event.consumerType,
+      producerId: event.producerId,
+      producerType: event.producerType,
     };
     this.socket.current.emit("message", message);
   }

@@ -21,6 +21,8 @@ export default function AudioEffectsButton({
   username,
   instance,
   isUser,
+  producerType,
+  producerId,
   audioEffectsActive,
   setAudioEffectsActive,
   handleAudioEffectChange,
@@ -36,9 +38,15 @@ export default function AudioEffectsButton({
   username: string;
   instance: string;
   isUser: boolean;
+  producerType: "audio" | "screenAudio";
+  producerId: string | undefined;
   audioEffectsActive: boolean;
   setAudioEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
+  handleAudioEffectChange: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => void;
   handleMute: () => void;
   muteStateRef: React.MutableRefObject<boolean>;
   visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
@@ -108,6 +116,8 @@ export default function AudioEffectsButton({
             username={username}
             instance={instance}
             isUser={isUser}
+            producerType={producerType}
+            producerId={producerId}
             handleAudioEffectChange={handleAudioEffectChange}
             placement={audioEffectsButtonOptions.placement}
             referenceElement={buttonRef}

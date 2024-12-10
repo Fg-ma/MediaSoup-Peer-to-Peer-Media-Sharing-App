@@ -32,6 +32,8 @@ export default function AudioEffectsSection({
   username,
   instance,
   isUser,
+  producerType,
+  producerId,
   handleAudioEffectChange,
   placement,
   referenceElement,
@@ -48,7 +50,13 @@ export default function AudioEffectsSection({
   username: string;
   instance: string;
   isUser: boolean;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
+  producerType: "audio" | "screenAudio";
+  producerId: string | undefined;
+  handleAudioEffectChange: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => void;
   placement: "above" | "below" | "left" | "right";
   referenceElement: React.RefObject<HTMLElement>;
   padding: number;
@@ -128,7 +136,7 @@ export default function AudioEffectsSection({
   }, []);
 
   const audioEffectChange = (effect: AudioEffectTypes) => {
-    handleAudioEffectChange(effect);
+    handleAudioEffectChange(producerType, producerId, effect);
 
     setRerender((prev) => !prev);
   };
@@ -338,6 +346,8 @@ export default function AudioEffectsSection({
                   username={username}
                   instance={instance}
                   isUser={isUser}
+                  producerType={producerType}
+                  producerId={producerId}
                   audioEffect={effect[0] as AudioEffectTypes}
                   audioEffectTemplate={effect[1]}
                   scrollingContainerRef={audioSectionRef}

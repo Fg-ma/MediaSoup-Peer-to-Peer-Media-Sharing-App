@@ -5,7 +5,7 @@ import {
   ScreenEffectTypes,
   UserStreamEffectsType,
 } from "../../context/streamsContext/typeConstant";
-import { Permissions } from "../../context/permissionsContext/PermissionsContext";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 export interface BundleOptions {
   isUser?: boolean;
@@ -43,8 +43,8 @@ export type onNewConsumerWasCreatedType = {
   type: "newConsumerWasCreated";
   producerUsername: string;
   producerInstance: string;
-  consumerId?: string;
-  consumerType: "camera" | "screen" | "audio" | "screenAudio";
+  producerId?: string;
+  producerType: "camera" | "screen" | "audio" | "screenAudio";
 };
 
 export type onClientMuteChangeType = {
@@ -100,6 +100,7 @@ export const defaultBundleOptions = {
   permissions: {
     acceptsCameraEffects: false,
     acceptsScreenEffects: false,
+    acceptsScreenAudioEffects: false,
     acceptsAudioEffects: false,
     acceptsPositionScaleRotationManipulation: false,
     acceptsCloseMedia: false,

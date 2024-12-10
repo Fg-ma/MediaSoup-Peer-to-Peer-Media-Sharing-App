@@ -60,8 +60,8 @@ type MediasoupSocketEvents =
           [instance: string]: {
             camera?: {
               [cameraId: string]: {
-                producerId: string;
                 id: string;
+                producerId: string;
                 kind: "audio" | "video" | undefined;
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 rtpParameters: any;
@@ -71,8 +71,8 @@ type MediasoupSocketEvents =
             };
             screen?: {
               [screenId: string]: {
-                producerId: string;
                 id: string;
+                producerId: string;
                 kind: "audio" | "video" | undefined;
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 rtpParameters: any;
@@ -81,8 +81,8 @@ type MediasoupSocketEvents =
               };
             };
             audio?: {
-              producerId: string;
               id: string;
+              producerId: string;
               kind: "audio" | "video" | undefined;
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               rtpParameters: any;
@@ -91,8 +91,8 @@ type MediasoupSocketEvents =
             };
             json?: {
               [dataStreamType in DataStreamTypes]?: {
-                producerId: string;
                 id: string;
+                producerId: string;
                 label: string;
                 sctpStreamParameters: SctpStreamParameters;
                 type: string;
@@ -108,11 +108,11 @@ type MediasoupSocketEvents =
       type: "newConsumerSubscribed";
       producerUsername: string;
       producerInstance: string;
-      consumerId?: string;
-      consumerType: "camera" | "screen" | "audio";
+      producerId?: string;
+      producerType: "camera" | "screen" | "screenAudio" | "audio";
       data: {
-        producerId: string;
         id: string;
+        producerId: string;
         kind: "audio" | "video" | undefined;
         rtpParameters: mediasoup.types.RtpParameters;
         type: string;
@@ -123,11 +123,11 @@ type MediasoupSocketEvents =
       type: "newJSONConsumerSubscribed";
       producerUsername: string;
       producerInstance: string;
-      consumerId?: string;
-      consumerType: "json";
+      producerId?: string;
+      producerType: "json";
       data: {
-        producerId: string;
         id: string;
+        producerId: string;
         label: string;
         sctpStreamParameters: SctpStreamParameters;
         type: string;
@@ -154,7 +154,7 @@ type MediasoupSocketEvents =
       type: "producerDisconnected";
       producerUsername: string;
       producerInstance: string;
-      producerType: "camera" | "screen" | "audio";
+      producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
       producerId: string;
     }
   | {
@@ -178,8 +178,6 @@ type MediasoupSocketEvents =
 export default function Main() {
   const {
     userMedia,
-    userCameraCount,
-    userScreenCount,
     userStreamEffects,
     remoteStreamEffects,
     remoteTracksMap,
@@ -538,8 +536,6 @@ export default function Main() {
     remoteTracksMap,
     userDataStreams,
     remoteDataStreams,
-    userCameraCount,
-    userScreenCount,
     isCamera,
     isScreen,
     isSubscribed,

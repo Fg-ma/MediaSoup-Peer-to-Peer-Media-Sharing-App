@@ -9,7 +9,7 @@ import RotateButton from "../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
 import "./lib/audioElement.css";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
-import { Permissions } from "../context/permissionsContext/PermissionsContext";
+import { Permissions } from "../context/permissionsContext/typeConstant";
 
 const FgPortal = React.lazy(() => import("../fgElements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
@@ -76,7 +76,11 @@ export default function FgAudioElementContainer({
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   bundleRef: React.RefObject<HTMLDivElement>;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
+  handleAudioEffectChange: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => void;
   handleMute: () => void;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
@@ -504,6 +508,8 @@ export default function FgAudioElementContainer({
             username={username}
             instance={instance}
             isUser={isUser}
+            producerType={"audio"}
+            producerId={undefined}
             handleAudioEffectChange={handleAudioEffectChange}
             placement='right'
             referenceElement={

@@ -41,6 +41,7 @@ export default function RemoteVisualMedia({
   bundleRef,
   videoStream,
   audioStream,
+  screenAudioStream,
   audioRef,
   clientMute,
   localMute,
@@ -64,12 +65,17 @@ export default function RemoteVisualMedia({
   bundleRef: React.RefObject<HTMLDivElement>;
   videoStream?: MediaStream;
   audioStream?: MediaStream;
+  screenAudioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   videoStyles?: React.CSSProperties;
   options?: FgVisualMediaOptions;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
+  handleAudioEffectChange: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => void;
   handleMute: () => void;
   handleMuteCallback: (() => void) | undefined;
   handleVolumeSliderCallback: (
@@ -95,6 +101,7 @@ export default function RemoteVisualMedia({
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const screenAudioRef = useRef<HTMLAudioElement>(null);
 
   const [inVisualMedia, setInVisualMedia] = useState(false);
 
@@ -253,7 +260,8 @@ export default function RemoteVisualMedia({
     userMedia,
     initTimeOffset,
     fgContentAdjustmentController,
-    positioning
+    positioning,
+    screenAudioStream
   );
 
   const fgVisualMediaController = new FgVisualMediaController(
@@ -398,6 +406,14 @@ export default function RemoteVisualMedia({
     }
   }, [positioning.current]);
 
+  useEffect(() => {
+    if (!screenAudioRef.current || !screenAudioStream) {
+      return;
+    }
+
+    screenAudioRef.current.srcObject = screenAudioStream;
+  }, [screenAudioStream]);
+
   return (
     <div
       ref={visualMediaContainerRef}
@@ -473,6 +489,7 @@ export default function RemoteVisualMedia({
           localMute={localMute}
           visualMediaContainerRef={visualMediaContainerRef}
           audioStream={audioStream}
+          screenAudioStream={screenAudioStream}
           audioRef={audioRef}
           currentTimeRef={currentTimeRef}
           tintColor={tintColor}
@@ -490,6 +507,14 @@ export default function RemoteVisualMedia({
         />
         <VisualMediaGradient />
       </div>
+      {type === "screen" && screenAudioStream && (
+        <audio
+          ref={screenAudioRef}
+          id={`${visualMediaId}_audio`}
+          className='w-0 z-0'
+          autoPlay={true}
+        ></audio>
+      )}
     </div>
   );
 }

@@ -5,7 +5,6 @@ import {
   UserMediaType,
 } from "../../context/streamsContext/typeConstant";
 import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
-import { Permissions } from "../../context/permissionsContext/PermissionsContext";
 import {
   onBundleMetadataResponsedType,
   onClientEffectChangedType,
@@ -16,6 +15,7 @@ import {
   onPermissionsResponsedType,
   onProducerDisconnectedType,
 } from "./typeConstant";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 class BundleSocket {
   constructor(
@@ -62,7 +62,11 @@ class BundleSocket {
     private localMute: React.MutableRefObject<boolean>,
     private permissions: Permissions,
     private setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
-    private handleAudioEffectChange: (effect: AudioEffectTypes) => void,
+    private handleAudioEffectChange: (
+      producerType: "audio" | "screenAudio",
+      producerId: string | undefined,
+      effect: AudioEffectTypes
+    ) => void,
     private onNewConsumerWasCreatedCallback?: () => void
   ) {}
 
@@ -74,96 +78,58 @@ class BundleSocket {
       return;
     }
 
-    if (event.consumerType === "camera") {
+    if (event.producerType === "camera") {
       this.setCameraStreams((prev) => {
         const newStreams = { ...prev };
         const newStream = new MediaStream();
-        if (event.consumerId) {
+        if (event.producerId) {
           const track =
             this.remoteTracksMap.current[event.producerUsername][
               event.producerInstance
-            ].camera?.[event.consumerId];
+            ].camera?.[event.producerId];
           if (track) {
             newStream.addTrack(track);
           }
 
-          newStreams[event.consumerId] = newStream;
+          newStreams[event.producerId] = newStream;
         }
         return newStreams;
       });
-    } else if (event.consumerType === "screen") {
+    } else if (event.producerType === "screen") {
       this.setScreenStreams((prev) => {
         const newStreams = { ...prev };
         const newStream = new MediaStream();
-        if (event.consumerId) {
+        if (event.producerId) {
           const track =
             this.remoteTracksMap.current[event.producerUsername][
               event.producerInstance
-            ].screen?.[event.consumerId];
+            ].screen?.[event.producerId];
           if (track) {
             newStream.addTrack(track);
           }
 
-          newStreams[event.consumerId] = newStream;
+          newStreams[event.producerId] = newStream;
         }
         return newStreams;
       });
-    } else if (event.consumerType === "screenAudio") {
-      // Create AudioContext and AnalyserNode
-      const audioContext = new AudioContext();
-      const thimg =
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ].screenAudio;
-      const stream = new MediaStream([
-        ...(event.consumerId && thimg ? [thimg[event.consumerId]] : []),
-      ]);
-      const source = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
-      console.log(
-        stream,
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ].screenAudio?.[event.consumerId ?? "asd"]
-      );
-
-      // Configure the analyser
-      analyser.fftSize = 256; // Set the size of the FFT (frequency bins)
-      const dataArray = new Uint8Array(analyser.frequencyBinCount); // Array to store frequency data
-
-      // Connect the audio stream source to the analyser
-      source.connect(analyser);
-
-      // Function to log audio volume
-      function logAudioVolume() {
-        analyser.getByteFrequencyData(dataArray); // Get the frequency data
-        const averageVolume =
-          dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
-        console.log(`Audio Volume: ${averageVolume}`);
-
-        // Schedule next log
-        requestAnimationFrame(logAudioVolume);
-      }
-
-      // Start logging the audio volume
-      logAudioVolume();
+    } else if (event.producerType === "screenAudio") {
       this.setScreenAudioStreams((prev) => {
         const newStreams = { ...prev };
         const newStream = new MediaStream();
-        if (event.consumerId) {
+        if (event.producerId) {
           const track =
             this.remoteTracksMap.current[event.producerUsername][
               event.producerInstance
-            ].screenAudio?.[event.consumerId];
+            ].screenAudio?.[event.producerId];
           if (track) {
             newStream.addTrack(track);
           }
 
-          newStreams[event.consumerId] = newStream;
+          newStreams[event.producerId] = newStream;
         }
         return newStreams;
       });
-    } else if (event.consumerType === "audio") {
+    } else if (event.producerType === "audio") {
       const newStream = new MediaStream();
       const track =
         this.remoteTracksMap.current[event.producerUsername][
@@ -304,10 +270,15 @@ class BundleSocket {
   onEffectChangeRequested = (event: onEffectChangeRequestedType) => {
     if (
       this.permissions.acceptsAudioEffects &&
-      event.requestedProducerType === "audio"
+      (event.requestedProducerType === "audio" ||
+        event.requestedProducerType === "screenAudio")
     ) {
-      // @ts-expect-error: event.effect and event.requestedProducerType have no strict correlation enforcement
-      this.handleAudioEffectChange(event.effect);
+      this.handleAudioEffectChange(
+        event.requestedProducerType,
+        event.requestedProducerId,
+        // @ts-expect-error: event.effect and event.requestedProducerType have no strict correlation enforcement
+        event.effect
+      );
     }
   };
 
@@ -326,6 +297,22 @@ class BundleSocket {
           // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
           !this.remoteStreamEffects.current[event.username][event.instance]
             .audio[event.effect];
+      }
+    } else if (
+      !this.isUser &&
+      this.username === event.username &&
+      this.instance === event.instance &&
+      event.producerType === "screenAudio" &&
+      event.producerId
+    ) {
+      if (!event.blockStateChange) {
+        // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
+        this.remoteStreamEffects.current[event.username][
+          event.instance
+        ].screenAudio[event.producerId][event.effect] =
+          // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
+          !this.remoteStreamEffects.current[event.username][event.instance]
+            .screenAudio[event.producerId][event.effect];
       }
     }
   };

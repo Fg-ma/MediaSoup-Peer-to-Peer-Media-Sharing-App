@@ -60,8 +60,8 @@ export type ConsumerInstance = {
   camera?: {
     [cameraId: string]: {
       consumer: Consumer;
-      producerId: string;
       id: string;
+      producerId: string;
       kind: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rtpParameters: any;
@@ -72,8 +72,8 @@ export type ConsumerInstance = {
   screen?: {
     [screenId: string]: {
       consumer: Consumer;
-      producerId: string;
       id: string;
+      producerId: string;
       kind: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rtpParameters: any;
@@ -84,8 +84,8 @@ export type ConsumerInstance = {
   screenAudio?: {
     [screenAudioId: string]: {
       consumer: Consumer;
-      producerId: string;
       id: string;
+      producerId: string;
       kind: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rtpParameters: any;
@@ -95,8 +95,8 @@ export type ConsumerInstance = {
   };
   audio?: {
     consumer: Consumer;
-    producerId: string;
     id: string;
+    producerId: string;
     kind: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rtpParameters: any;
@@ -106,8 +106,8 @@ export type ConsumerInstance = {
   json?: {
     [dataStreamType in DataStreamTypes]?: {
       consumer: DataConsumer;
-      producerId: string;
       id: string;
+      producerId: string;
       label: string;
       sctpStreamParameters: SctpStreamParameters | undefined;
       type: string;

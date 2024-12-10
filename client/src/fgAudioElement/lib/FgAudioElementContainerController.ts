@@ -57,8 +57,8 @@ type FgAudioContainerMessageEvents =
       type: "newConsumerWasCreated";
       producerUsername: string;
       producerInstance: string;
-      consumerId?: string;
-      consumerType: string;
+      producerId?: string;
+      producerType: string;
     };
 
 class FgAudioElementContainerController {

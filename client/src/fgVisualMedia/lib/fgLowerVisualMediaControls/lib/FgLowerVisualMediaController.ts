@@ -122,7 +122,8 @@ class FgLowerVisualMediaController {
         y: number;
       };
       rotation: number;
-    }>
+    }>,
+    private screenAudioStream?: MediaStream
   ) {
     this.initTime = Date.now();
   }
@@ -152,17 +153,30 @@ class FgLowerVisualMediaController {
   };
 
   handleCloseVideo = () => {
-    if (this.socket) {
-      const msg = {
+    if (!this.socket) {
+      return;
+    }
+
+    const msg = {
+      type: "removeProducer",
+      table_id: this.table_id,
+      username: this.username,
+      instance: this.instance,
+      producerType: this.type,
+      producerId: this.visualMediaId,
+    };
+    this.socket.current.emit("message", msg);
+
+    if (this.type === "screen" && this.screenAudioStream) {
+      const message = {
         type: "removeProducer",
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
-        producerType: this.type,
-        producerId: this.visualMediaId,
+        producerType: "screenAudio",
+        producerId: `${this.visualMediaId}_audio`,
       };
-
-      this.socket.current.emit("message", msg);
+      this.socket.current.emit("message", message);
     }
   };
 

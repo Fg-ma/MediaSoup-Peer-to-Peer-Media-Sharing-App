@@ -273,8 +273,6 @@ const createConsumer = async (
             // Create a consumer for the producer
             const consumer = await transport.consumeData({
               dataProducerId: jsonProducer.id,
-              // @ts-expect-error: praise the lord he's done it again
-              label: jsonProducer.label,
             });
 
             // Store the consumer in the consumers object

@@ -5,7 +5,7 @@ import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import BundleController from "./lib/BundleController";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
-import { Permissions } from "../context/permissionsContext/PermissionsContext";
+import { Permissions } from "../context/permissionsContext/typeConstant";
 
 const UserVisualMedia = React.lazy(
   () => import("../fgVisualMedia/UserVisualMedia")
@@ -151,17 +151,6 @@ export default function Bundle({
   }, [audioRef, audioStream]);
 
   useEffect(() => {
-    if (!screenAudioStreams || !Object.values(screenAudioStreams)[0]) {
-      return;
-    }
-    console.log(
-      screenAudioStreams,
-      Object.values(screenAudioStreams ?? {})[0],
-      Object.values(screenAudioStreams ?? {})[0].getAudioTracks()
-    );
-  }, []);
-
-  useEffect(() => {
     if (!signal) {
       return;
     }
@@ -302,6 +291,9 @@ export default function Bundle({
                 type='screen'
                 bundleRef={bundleRef}
                 audioStream={audioStream}
+                screenAudioStream={userMedia.current.screenAudio?.[
+                  `${key}_audio`
+                ].getMasterStream()}
                 audioRef={audioRef}
                 handleAudioEffectChange={
                   bundleController.handleAudioEffectChange
@@ -348,6 +340,7 @@ export default function Bundle({
                 bundleRef={bundleRef}
                 videoStream={screenStream}
                 audioStream={audioStream}
+                screenAudioStream={screenAudioStreams?.[`${key}_audio`]}
                 audioRef={audioRef}
                 handleAudioEffectChange={
                   bundleController.handleAudioEffectChange

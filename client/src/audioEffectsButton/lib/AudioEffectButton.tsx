@@ -9,6 +9,8 @@ export default function AudioEffectButton({
   username,
   instance,
   isUser,
+  producerType,
+  producerId,
   audioEffect,
   audioEffectTemplate,
   scrollingContainerRef,
@@ -17,6 +19,8 @@ export default function AudioEffectButton({
   username: string;
   instance: string;
   isUser: boolean;
+  producerType: "audio" | "screenAudio";
+  producerId?: string;
   audioEffect: AudioEffectTypes;
   audioEffectTemplate: AudioEffectTemplate;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -29,8 +33,18 @@ export default function AudioEffectButton({
   const attributes = useRef<{ key: string; value: string; id?: string }[]>([]);
 
   const streamEffects = isUser
-    ? userStreamEffects.current.audio[audioEffect]
-    : remoteStreamEffects.current[username][instance].audio[audioEffect];
+    ? producerType === "audio"
+      ? userStreamEffects.current[producerType][audioEffect]
+      : producerId
+      ? userStreamEffects.current[producerType][producerId][audioEffect]
+      : undefined
+    : producerType === "audio"
+    ? remoteStreamEffects.current[username][instance][producerType][audioEffect]
+    : producerId
+    ? remoteStreamEffects.current[username][instance][producerType][producerId][
+        audioEffect
+      ]
+    : undefined;
 
   for (let i = 0; i < audioEffectTemplate.attributes.length; i++) {
     const attribute = audioEffectTemplate.attributes[i];

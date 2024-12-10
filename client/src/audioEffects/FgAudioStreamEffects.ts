@@ -342,7 +342,7 @@ class FgAudioStreamEffects {
   };
 
   constructor(
-    private audioStream: Tone.UserMedia,
+    private audioStream: MediaStreamAudioSourceNode,
     private audioStreamMediaStreamDestination: MediaStreamAudioDestinationNode,
     private masterChain: Tone.Gain<"gain">,
     private audioStreamChain: Tone.Gain<"gain">

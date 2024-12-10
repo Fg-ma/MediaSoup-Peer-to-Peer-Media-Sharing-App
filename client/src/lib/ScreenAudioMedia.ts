@@ -1,10 +1,11 @@
 import * as Tone from "tone";
 import {
   AudioEffectTypes,
+  defaultAudioStreamEffects,
   UserStreamEffectsType,
 } from "../context/streamsContext/typeConstant";
 import AudioEffects from "../audioEffects/AudioEffects";
-import { FgSamplers } from "src/audioEffects/fgSamplers";
+import { FgSamplers } from "../audioEffects/fgSamplers";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
@@ -30,10 +31,14 @@ class ScreenAudioMedia {
   };
 
   constructor(
+    private screenAudioId: string,
     private audioStream: MediaStream,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>
   ) {
     this.effects = {};
+
+    this.userStreamEffects.current.screenAudio[this.screenAudioId] =
+      structuredClone(defaultAudioStreamEffects);
 
     // Create an AudioContext and MediaStreamDestination
     this.audioContext = Tone.getContext();
@@ -51,9 +56,11 @@ class ScreenAudioMedia {
       this.audioContext.createMediaStreamDestination();
 
     // Create a source node from the provided MediaStream
-    this.audioSource = this.audioContext.createMediaStreamSource(
-      this.audioStream
-    );
+    // this.audioSource = this.audioContext.createMediaStreamSource(
+    //   this.audioStream
+    // );
+    const audioContext = Tone.getContext().rawContext as AudioContext; // Get the underlying Web Audio context
+    this.audioSource = audioContext.createMediaStreamSource(audioStream); // Create source node
 
     // Connect the source to the master MediaStreamDestination
     this.audioSource.connect(this.masterMediaStreamDestination);
@@ -118,23 +125,34 @@ class ScreenAudioMedia {
   ) => {
     if (!blockStateChange) {
       // Clear all old effects
-      for (const oldEffect in this.userStreamEffects.current.audio) {
+      for (const oldEffect in this.userStreamEffects.current.screenAudio[
+        this.screenAudioId
+      ]) {
         if (
-          this.userStreamEffects.current.audio[oldEffect as AudioEffectTypes]
+          this.userStreamEffects.current.screenAudio[this.screenAudioId][
+            oldEffect as AudioEffectTypes
+          ]
         ) {
           this.removeEffect(oldEffect as AudioEffectTypes);
         }
         if (oldEffect !== effect) {
-          this.userStreamEffects.current.audio[oldEffect as AudioEffectTypes] =
-            false;
+          this.userStreamEffects.current.screenAudio[this.screenAudioId][
+            oldEffect as AudioEffectTypes
+          ] = false;
         }
       }
 
-      this.userStreamEffects.current.audio[effect as AudioEffectTypes] =
-        !this.userStreamEffects.current.audio[effect as AudioEffectTypes];
+      this.userStreamEffects.current.screenAudio[this.screenAudioId][
+        effect as AudioEffectTypes
+      ] =
+        !this.userStreamEffects.current.screenAudio[this.screenAudioId][
+          effect as AudioEffectTypes
+        ];
 
       this.effects[effect] =
-        this.userStreamEffects.current.audio[effect as AudioEffectTypes];
+        this.userStreamEffects.current.screenAudio[this.screenAudioId][
+          effect as AudioEffectTypes
+        ];
     }
 
     if (this.effects[effect]) {
@@ -145,8 +163,10 @@ class ScreenAudioMedia {
   };
 
   applyEffect = (effect: AudioEffectTypes) => {
+    console.log(effect);
     switch (effect) {
       case "robot":
+        console.log(this.audioEffects, this.audioEffects?.fgAudioStreamEffects);
         this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",
@@ -1540,7 +1560,7 @@ class ScreenAudioMedia {
   };
 
   getStream = () => {
-    return this.masterMediaStream;
+    return this.mediaStream;
   };
 
   getTracks = () => {

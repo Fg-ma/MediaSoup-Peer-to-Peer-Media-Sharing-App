@@ -28,7 +28,7 @@ type FgVisualMediaMessageEvents =
       type: "clientEffectChanged";
       username: string;
       instance: string;
-      producerType: "camera" | "screen" | "audio";
+      producerType: "camera" | "screen" | "screenAudio" | "audio";
       producerId: string;
       effect: CameraEffectTypes | ScreenEffectTypes;
       effectStyle: string;
@@ -77,8 +77,8 @@ type FgVisualMediaMessageEvents =
       type: "newConsumerWasCreated";
       producerUsername: string;
       producerInstance: string;
-      consumerId?: string;
-      consumerType: string;
+      producerId?: string;
+      producerType: string;
     };
 
 class FgVisualMediaController {
@@ -260,37 +260,72 @@ class FgVisualMediaController {
     type: "clientEffectChanged";
     username: string;
     instance: string;
-    producerType: "camera" | "screen" | "audio";
+    producerType: "camera" | "screen" | "screenAudio" | "audio";
     producerId: string | undefined;
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-    effectStyle: string;
+    effectStyle?: string;
     blockStateChange: boolean;
   }) => {
     if (
       !this.fgVisualMediaOptions.isUser &&
-      this.username === event.username &&
-      this.instance === event.instance &&
-      this.type === event.producerType &&
-      this.visualMediaId === event.producerId
+      event.username === this.username &&
+      event.instance === this.instance &&
+      (event.producerType === "camera" || event.producerType === "screen") &&
+      event.producerId === this.visualMediaId
     ) {
       if (!event.blockStateChange) {
         // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
-        this.remoteStreamEffects.current[this.username][this.instance][
-          this.type
+        this.remoteStreamEffects.current[event.username][event.instance][
+          event.producerType
         ][this.visualMediaId][event.effect] =
           // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
-          !this.remoteStreamEffects.current[this.username][this.instance][
-            this.type
-          ][this.visualMediaId][event.effect];
+          !this.remoteStreamEffects.current[event.username][event.instance][
+            event.producerType
+          ][event.producerId][event.effect];
       }
 
-      // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
-      this.remoteCurrentEffectsStyles.current[this.username][this.instance][
-        this.type
-      ][this.visualMediaId][event.effect] = event.effectStyle;
+      if (event.effectStyle) {
+        // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
+        this.remoteCurrentEffectsStyles.current[event.username][event.instance][
+          this.type
+        ][event.producerId][event.effect] = event.effectStyle;
+      }
 
       if (event.effect === "pause") {
         this.setPausedState((prev) => !prev);
+      }
+    } else if (
+      !this.fgVisualMediaOptions.isUser &&
+      event.username === this.username &&
+      event.instance === this.instance &&
+      event.producerType === "audio"
+    ) {
+      if (!event.blockStateChange) {
+        // @ts-expect-error: ts can't verify username, instance, and effect correlate
+        this.remoteStreamEffects.current[event.username][event.instance][
+          event.producerType
+        ][event.effect] =
+          // @ts-expect-error: ts can't verify username, instance, and effect correlate
+          !this.remoteStreamEffects.current[event.username][event.instance][
+            event.producerType
+          ][event.effect];
+      }
+    } else if (
+      !this.fgVisualMediaOptions.isUser &&
+      event.username === this.username &&
+      event.instance === this.instance &&
+      event.producerType === "screenAudio" &&
+      event.producerId === `${this.visualMediaId}_audio`
+    ) {
+      if (!event.blockStateChange) {
+        // @ts-expect-error: ts can't verify username, instance, event.producerId, and effect correlate
+        this.remoteStreamEffects.current[event.username][event.instance][
+          event.producerType
+        ][event.producerId][event.effect] =
+          // @ts-expect-error: ts can't verify username, instance, event.producerId, and effect correlate
+          !this.remoteStreamEffects.current[event.username][event.instance][
+            event.producerType
+          ][event.producerId][event.effect];
       }
     }
   };

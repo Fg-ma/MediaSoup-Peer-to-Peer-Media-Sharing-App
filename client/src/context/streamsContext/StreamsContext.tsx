@@ -14,8 +14,6 @@ export interface StreamsContextProviderProps {
 }
 
 export interface StreamsContextType {
-  userCameraCount: React.MutableRefObject<number>;
-  userScreenCount: React.MutableRefObject<number>;
   userMedia: React.MutableRefObject<UserMediaType>;
   userStreamEffects: React.MutableRefObject<UserStreamEffectsType>;
   remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>;
@@ -39,8 +37,6 @@ export const useStreamsContext = () => {
 export function StreamsContextProvider({
   children,
 }: StreamsContextProviderProps) {
-  const userCameraCount = useRef(0);
-  const userScreenCount = useRef(0);
   const userMedia = useRef<UserMediaType>({
     camera: {},
     screen: {},
@@ -61,8 +57,6 @@ export function StreamsContextProvider({
   return (
     <StreamsContext.Provider
       value={{
-        userCameraCount,
-        userScreenCount,
         userMedia,
         userStreamEffects,
         remoteStreamEffects,

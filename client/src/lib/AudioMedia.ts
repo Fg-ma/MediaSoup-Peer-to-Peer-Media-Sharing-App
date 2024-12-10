@@ -4,7 +4,7 @@ import {
   UserStreamEffectsType,
 } from "../context/streamsContext/typeConstant";
 import AudioEffects from "../audioEffects/AudioEffects";
-import { FgSamplers } from "src/audioEffects/fgSamplers";
+import { FgSamplers } from "../audioEffects/fgSamplers";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,

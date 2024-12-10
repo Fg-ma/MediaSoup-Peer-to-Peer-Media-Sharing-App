@@ -1,4 +1,4 @@
-import { Permissions } from "../../context/permissionsContext/PermissionsContext";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
 import {
   BackgroundColors,
   BackgroundOpacities,
@@ -58,6 +58,7 @@ export const defaultFgVisualMediaOptions = {
     acceptsCameraEffects: false,
     acceptsScreenEffects: false,
     acceptsAudioEffects: false,
+    acceptsScreenAudioEffects: false,
     acceptsPositionScaleRotationManipulation: false,
     acceptsCloseMedia: false,
   },

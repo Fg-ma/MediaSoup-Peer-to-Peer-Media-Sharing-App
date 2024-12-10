@@ -125,19 +125,19 @@ export type onConsumeType = {
 
 export type onNewConsumerType = {
   type: "newConsumer";
-  consumerType: "camera" | "screen" | "screenAudio" | "audio";
   rtpCapabilities: RtpCapabilities;
-  producerUsername: string;
-  producerInstance: string;
-  incomingProducerId?: string;
   table_id: string;
   username: string;
   instance: string;
+  producerUsername: string;
+  producerInstance: string;
+  producerId?: string;
+  producerType: "camera" | "screen" | "screenAudio" | "audio";
 };
 
 export type onNewJSONConsumerType = {
   type: "newJSONConsumer";
-  consumerType: "json";
+  producerType: "json";
   sctpCapabilities: SctpCapabilities;
   producerUsername: string;
   producerInstance: string;
@@ -189,8 +189,8 @@ export type onNewConsumerCreatedType = {
   instance: string;
   producerUsername: string;
   producerInstance: string;
-  consumerId?: string;
-  consumerType: ProducerTypes;
+  producerId?: string;
+  producerType: ProducerTypes;
 };
 
 export type onRequestEffectChangeType = {

@@ -37,6 +37,7 @@ export default function FgBabylonCanvas({
   type,
   bundleRef,
   audioStream,
+  screenAudioStream,
   audioRef,
   clientMute,
   localMute,
@@ -58,11 +59,16 @@ export default function FgBabylonCanvas({
   type: "camera" | "screen";
   bundleRef: React.RefObject<HTMLDivElement>;
   audioStream?: MediaStream;
+  screenAudioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   options?: FgVisualMediaOptions;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
+  handleAudioEffectChange: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => void;
   handleMute: () => void;
   handleMuteCallback: (() => void) | undefined;
   handleVolumeSliderCallback: (
@@ -246,7 +252,8 @@ export default function FgBabylonCanvas({
     userMedia,
     initTimeOffset,
     fgContentAdjustmentController,
-    positioning
+    positioning,
+    screenAudioStream
   );
 
   const fgVisualMediaController = new FgVisualMediaController(
@@ -499,6 +506,7 @@ export default function FgBabylonCanvas({
           localMute={localMute}
           visualMediaContainerRef={visualMediaContainerRef}
           audioStream={audioStream}
+          screenAudioStream={screenAudioStream}
           audioRef={audioRef}
           currentTimeRef={currentTimeRef}
           tintColor={tintColor}

@@ -85,13 +85,7 @@ export default function FgTableFunctions({
   muteAudio: () => void;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
-  const {
-    userMedia,
-    userCameraCount,
-    userScreenCount,
-    remoteTracksMap,
-    userDataStreams,
-  } = useStreamsContext();
+  const { userMedia, remoteTracksMap, userDataStreams } = useStreamsContext();
   const { setSignal } = useSignalContext();
   const { permissions } = usePermissionsContext();
 
@@ -113,8 +107,6 @@ export default function FgTableFunctions({
     setIsInTable,
     userMedia,
     userDataStreams,
-    userCameraCount,
-    userScreenCount,
     remoteTracksMap,
     handleDisableEnableBtns,
     setBundles,
@@ -150,7 +142,16 @@ export default function FgTableFunctions({
     setSignal(msg);
   };
 
-  const handleExternalAudioEffectChange = (effect: AudioEffectTypes) => {
+  const handleExternalAudioEffectChange = (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => {
+    if (producerType === "audio") {
+      userMedia.current.audio?.changeEffects(effect, false);
+    } else if (producerType === "screenAudio" && producerId) {
+      userMedia.current.screenAudio[producerId].changeEffects(effect, false);
+    }
     userMedia.current.audio?.changeEffects(effect, false);
 
     if (permissions.current.acceptsAudioEffects) {
@@ -159,8 +160,8 @@ export default function FgTableFunctions({
         table_id: table_id.current,
         username: username.current,
         instance: instance.current,
-        producerType: "audio",
-        producerId: undefined,
+        producerType,
+        producerId,
         effect: effect,
         effectStyle: undefined,
         blockStateChange: false,
@@ -252,6 +253,8 @@ export default function FgTableFunctions({
               username={username.current}
               instance={instance.current}
               isUser={true}
+              producerType={"audio"}
+              producerId={undefined}
               audioEffectsActive={audioEffectsActive}
               setAudioEffectsActive={setAudioEffectsActive}
               handleAudioEffectChange={handleExternalAudioEffectChange}

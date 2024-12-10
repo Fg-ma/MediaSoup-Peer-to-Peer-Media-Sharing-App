@@ -25,7 +25,6 @@ class ScreenSectionController {
       };
       audio: AudioMedia | undefined;
     }>,
-    private userScreenCount: React.MutableRefObject<number>,
 
     private producersController: ProducersController,
 
@@ -42,27 +41,30 @@ class ScreenSectionController {
     this.setScreenActive((prev) => !prev);
 
     if (this.isScreen.current) {
-      this.userScreenCount.current = this.userScreenCount.current + 1;
       this.producersController.createNewProducer("screen");
     } else if (!this.isScreen.current) {
-      for (let i = this.userScreenCount.current; i >= 0; i--) {
-        const producerId = `${this.username.current}_screen_stream_${i}`;
+      const screenIds = Object.keys(this.userMedia.current.screen);
 
-        if (producerId in this.userMedia.current.screen) {
-          // Remove screen producer
-          const msg = {
-            type: "removeProducer",
-            table_id: this.table_id.current,
-            username: this.username.current,
-            instance: this.instance.current,
-            producerType: "screen",
-            producerId: producerId,
-          };
-          this.socket.current.emit("message", msg);
+      if (screenIds.length > 0 && screenIds[screenIds.length - 1]) {
+        const msg = {
+          type: "removeProducer",
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+          producerType: "screen",
+          producerId: screenIds[screenIds.length - 1],
+        };
+        this.socket.current.emit("message", msg);
 
-          // return after the first stream is removed
-          return;
-        }
+        const message = {
+          type: "removeProducer",
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+          producerType: "screen",
+          producerId: `${screenIds[screenIds.length - 1]}_audio`,
+        };
+        this.socket.current.emit("message", message);
       }
     }
   };
@@ -73,7 +75,6 @@ class ScreenSectionController {
       return;
     }
     this.handleDisableEnableBtns(true);
-    this.userScreenCount.current = this.userScreenCount.current + 1;
 
     if (this.device.current) {
       this.producersController.createNewProducer("screen");

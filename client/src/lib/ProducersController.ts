@@ -2,6 +2,7 @@ import React from "react";
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { UserMedia } from "tone";
+import { v4 as uuidv4 } from "uuid";
 import {
   defaultAudioCurrentEffectsStyles,
   EffectStylesType,
@@ -46,9 +47,6 @@ class ProducersController {
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
     private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
 
-    private userCameraCount: React.MutableRefObject<number>,
-    private userScreenCount: React.MutableRefObject<number>,
-
     private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
@@ -74,8 +72,10 @@ class ProducersController {
     private browserMedia: BrowserMedia
   ) {}
 
-  private createCameraProducer = async (cameraBrowserMedia: MediaStream) => {
-    const cameraId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
+  private createCameraProducer = async (
+    cameraId: string,
+    cameraBrowserMedia: MediaStream
+  ) => {
     const newCameraMedia = new CameraMedia(
       this.username.current,
       this.table_id.current,
@@ -107,8 +107,10 @@ class ProducersController {
     }
   };
 
-  private createScreenProducer = async (screenBrowserMedia: MediaStream) => {
-    const screenId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
+  private createScreenProducer = async (
+    screenId: string,
+    screenBrowserMedia: MediaStream
+  ) => {
     const newScreenMedia = new ScreenMedia(
       this.username.current,
       this.table_id.current,
@@ -159,23 +161,25 @@ class ProducersController {
   };
 
   private createScreenAudioProducer = async (
+    screenId: string,
     screenAudioBrowserMedia: MediaStream
   ) => {
-    const screenId = `${this.username.current}_screen_audio_stream_${this.userScreenCount.current}`;
+    const screenAudioId = `${screenId}_audio`;
     const newScreenAudioMedia = new ScreenAudioMedia(
+      screenAudioId,
       screenAudioBrowserMedia,
       this.userStreamEffects
     );
 
-    this.userMedia.current.screenAudio[screenId] = newScreenAudioMedia;
+    this.userMedia.current.screenAudio[screenAudioId] = newScreenAudioMedia;
 
     const screenAudioTracks =
-      this.userMedia.current.screenAudio[screenId].getMasterTrack();
+      this.userMedia.current.screenAudio[screenAudioId].getMasterTrack();
     const screenAudioParams = {
       track: screenAudioTracks,
       appData: {
         producerType: "screenAudio",
-        producerId: screenId,
+        producerId: screenAudioId,
       },
     };
 
@@ -188,8 +192,8 @@ class ProducersController {
       return;
     }
 
-    const jsonId = `${this.username.current}_${dataStreamType}_data_stream`;
-    const label = `${this.username.current}_${dataStreamType}`;
+    const jsonId = `${this.username.current}_${this.instance.current}_${dataStreamType}_data_stream`;
+    const label = `${this.username.current}_${this.instance.current}_${dataStreamType}`;
 
     // Create a data producer for JSON data on the transport
     const jsonDataProducer = await this.producerTransport.current.produceData({
@@ -265,7 +269,7 @@ class ProducersController {
           instance: this.instance.current,
           producerId: appData.producerId,
         };
-        console.log(msg);
+
         this.socket.current.emit("message", msg);
 
         this.socket.current.once(
@@ -343,12 +347,10 @@ class ProducersController {
 
     let producerId: string | undefined;
     if (producerType === "camera") {
-      producerId = `${this.username.current}_camera_stream_${this.userCameraCount.current}`;
-      if (
-        this.userMedia.current.camera[
-          `${this.username.current}_camera_stream_${this.userCameraCount.current}`
-        ]
-      ) {
+      // prettier-ignore
+      producerId = `${this.username.current}_${this.instance.current}_camera_stream_${uuidv4()}`;
+
+      if (this.userMedia.current.camera[producerId]) {
         // Reenable buttons
         this.handleDisableEnableBtns(false);
 
@@ -369,14 +371,12 @@ class ProducersController {
         return;
       }
 
-      await this.createCameraProducer(cameraBrowserMedia);
+      await this.createCameraProducer(producerId, cameraBrowserMedia);
     } else if (producerType === "screen") {
-      producerId = `${this.username.current}_screen_stream_${this.userScreenCount.current}`;
-      if (
-        this.userMedia.current.screen[
-          `${this.username.current}_screen_stream_${this.userScreenCount.current}`
-        ]
-      ) {
+      // prettier-ignore
+      producerId = `${this.username.current}_${this.instance.current}_screen_stream_${uuidv4()}`;
+
+      if (this.userMedia.current.screen[producerId]) {
         // Reenable buttons
         this.handleDisableEnableBtns(false);
 
@@ -402,11 +402,10 @@ class ProducersController {
 
       const videoStream = new MediaStream([videoTracks]);
       const audioStream = new MediaStream([audioTracks]);
-      console.log(audioTracks, audioStream);
 
-      await this.createScreenProducer(videoStream);
+      await this.createScreenProducer(producerId, videoStream);
       if (audioStream) {
-        await this.createScreenAudioProducer(audioStream);
+        await this.createScreenAudioProducer(producerId, audioStream);
       }
     } else if (producerType === "audio") {
       if (this.userMedia.current.audio) {
@@ -464,14 +463,14 @@ class ProducersController {
 
       const msg = {
         type: "newConsumer",
-        consumerType: event.producerType,
+        producerType: event.producerType,
         rtpCapabilities: rtpCapabilities,
-        producerUsername: event.producerUsername,
-        producerInstance: event.producerInstance,
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
-        incomingProducerId: event.producerId,
+        producerUsername: event.producerUsername,
+        producerInstance: event.producerInstance,
+        producerId: event.producerId,
       };
       this.socket.current.emit("message", msg);
     }
@@ -494,7 +493,7 @@ class ProducersController {
 
       const msg = {
         type: "newJSONConsumer",
-        consumerType: event.producerType,
+        producerType: event.producerType,
         sctpCapabilities: sctpCapabilities,
         producerUsername: event.producerUsername,
         producerInstance: event.producerInstance,
@@ -512,7 +511,7 @@ class ProducersController {
     type: string;
     producerUsername: string;
     producerInstance: string;
-    producerType: "camera" | "screen" | "audio" | "json";
+    producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
     producerId?: string;
     dataStreamType?: DataStreamTypes;
   }) => {
@@ -521,7 +520,11 @@ class ProducersController {
       event.producerInstance === this.instance.current
     ) {
       // Call deconstructors then delete userMedia
-      if (event.producerType === "camera" || event.producerType === "screen") {
+      if (
+        event.producerType === "camera" ||
+        event.producerType === "screen" ||
+        event.producerType === "screenAudio"
+      ) {
         if (
           event.producerId &&
           this.userMedia.current[event.producerType][event.producerId]
@@ -541,6 +544,7 @@ class ProducersController {
       if (
         event.producerType === "camera" ||
         event.producerType === "screen" ||
+        event.producerType === "screenAudio" ||
         event.producerType === "audio"
       ) {
         // Delete old stream effects
@@ -554,7 +558,8 @@ class ProducersController {
             );
           } else if (
             event.producerType === "camera" ||
-            event.producerType === "screen"
+            event.producerType === "screen" ||
+            event.producerType === "screenAudio"
           ) {
             if (event.producerId && event.producerId in streamEffects) {
               delete this.userStreamEffects.current[event.producerType][
@@ -572,7 +577,8 @@ class ProducersController {
             );
           } else if (
             event.producerType === "camera" ||
-            event.producerType === "screen"
+            event.producerType === "screen" ||
+            event.producerType === "screenAudio"
           ) {
             if (
               event.producerId &&
@@ -593,6 +599,8 @@ class ProducersController {
           Object.keys(this.userMedia.current.camera).length === 0) &&
         (!this.userMedia.current.screen ||
           Object.keys(this.userMedia.current.screen).length === 0) &&
+        (!this.userMedia.current.screenAudio ||
+          Object.keys(this.userMedia.current.screenAudio).length === 0) &&
         !this.userMedia.current.audio
       ) {
         this.setBundles((prev) => {
@@ -613,7 +621,6 @@ class ProducersController {
         });
       }
 
-      // Clean up camera and screen states
       if (Object.keys(this.userMedia.current.camera).length === 0) {
         this.isCamera.current = false;
         this.setCameraActive(false);
@@ -633,7 +640,11 @@ class ProducersController {
       this.handleDisableEnableBtns(false);
     } else {
       // Delete remote tracks
-      if (event.producerType === "camera" || event.producerType === "screen") {
+      if (
+        event.producerType === "camera" ||
+        event.producerType === "screen" ||
+        event.producerType === "screenAudio"
+      ) {
         if (
           event.producerId &&
           this.remoteTracksMap.current[event.producerUsername] &&
@@ -766,12 +777,15 @@ class ProducersController {
       if (
         event.producerType === "camera" ||
         event.producerType === "screen" ||
+        event.producerType === "screenAudio" ||
         event.producerType === "audio"
       ) {
         // Delete old stream effects
         const streamEffects =
           event.producerId &&
-          (event.producerType === "camera" || event.producerType === "screen")
+          (event.producerType === "camera" ||
+            event.producerType === "screen" ||
+            event.producerType === "screenAudio")
             ? this.remoteStreamEffects.current?.[event.producerUsername]?.[
                 event.producerInstance
               ]?.[event.producerType]?.[event.producerId]
@@ -786,7 +800,8 @@ class ProducersController {
             ][event.producerType] = structuredClone(defaultAudioStreamEffects);
           } else if (
             event.producerType === "camera" ||
-            event.producerType === "screen"
+            event.producerType === "screen" ||
+            event.producerType === "screenAudio"
           ) {
             if (event.producerId && event.producerId in streamEffects) {
               delete this.remoteStreamEffects.current[event.producerUsername][
@@ -810,7 +825,8 @@ class ProducersController {
             );
           } else if (
             event.producerType === "camera" ||
-            event.producerType === "screen"
+            event.producerType === "screen" ||
+            event.producerType === "screenAudio"
           ) {
             if (
               event.producerId &&

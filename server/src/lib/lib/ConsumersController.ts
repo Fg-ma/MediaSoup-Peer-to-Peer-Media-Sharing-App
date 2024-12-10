@@ -148,8 +148,8 @@ class ConsumersController {
         [producerInstance: string]: {
           camera?: {
             [cameraId: string]: {
-              producerId: string;
               id: string;
+              producerId: string;
               kind: string;
               rtpParameters: RtpParameters;
               type: string;
@@ -158,8 +158,8 @@ class ConsumersController {
           };
           screen?: {
             [screenId: string]: {
-              producerId: string;
               id: string;
+              producerId: string;
               kind: string;
               rtpParameters: RtpParameters;
               type: string;
@@ -168,8 +168,8 @@ class ConsumersController {
           };
           screenAudio?: {
             [screenAudioId: string]: {
-              producerId: string;
               id: string;
+              producerId: string;
               kind: string;
               rtpParameters: RtpParameters;
               type: string;
@@ -177,8 +177,8 @@ class ConsumersController {
             };
           };
           audio?: {
-            producerId: string;
             id: string;
+            producerId: string;
             kind: string;
             rtpParameters: RtpParameters;
             type: string;
@@ -186,8 +186,8 @@ class ConsumersController {
           };
           json?: {
             [jsonId: string]: {
-              producerId: string;
               id: string;
+              producerId: string;
               label: string;
               sctpStreamParameters: SctpStreamParameters;
               type: string;
@@ -224,8 +224,8 @@ class ConsumersController {
               newConsumers[producerUsername][producerInstance].camera![
                 cameraId
               ] = {
-                producerId: camera.producerId,
                 id: camera.id,
+                producerId: camera.producerId,
                 kind: camera.kind,
                 rtpParameters: camera.rtpParameters,
                 type: camera.type,
@@ -258,8 +258,8 @@ class ConsumersController {
               newConsumers[producerUsername][producerInstance].screen![
                 screenId
               ] = {
-                producerId: screen.producerId,
                 id: screen.id,
+                producerId: screen.producerId,
                 kind: screen.kind,
                 rtpParameters: screen.rtpParameters,
                 type: screen.type,
@@ -294,8 +294,8 @@ class ConsumersController {
               newConsumers[producerUsername][producerInstance].screenAudio![
                 screenAudioId
               ] = {
-                producerId: screenAudio.producerId,
                 id: screenAudio.id,
+                producerId: screenAudio.producerId,
                 kind: screenAudio.kind,
                 rtpParameters: screenAudio.rtpParameters,
                 type: screenAudio.type,
@@ -320,12 +320,12 @@ class ConsumersController {
             consumers[producerUsername][producerInstance].audio;
 
           newConsumers[producerUsername][producerInstance].audio = {
-            producerId: audioConsumerData!.producerId,
-            id: audioConsumerData!.id,
-            kind: audioConsumerData!.kind,
-            rtpParameters: audioConsumerData!.rtpParameters,
-            type: audioConsumerData!.type,
-            producerPaused: audioConsumerData!.producerPaused,
+            id: audioConsumerData.id,
+            producerId: audioConsumerData.producerId,
+            kind: audioConsumerData.kind,
+            rtpParameters: audioConsumerData.rtpParameters,
+            type: audioConsumerData.type,
+            producerPaused: audioConsumerData.producerPaused,
           };
         }
 
@@ -355,8 +355,8 @@ class ConsumersController {
               newConsumers[producerUsername][producerInstance].json![
                 dataStreamType as DataStreamTypes
               ] = {
-                producerId: json.producerId,
                 id: json.id,
+                producerId: json.producerId,
                 // @ts-expect-error: IDK
                 sctpStreamParameters: json.sctpStreamParameters,
                 label: json.label,
@@ -395,17 +395,17 @@ class ConsumersController {
         .transport;
 
     const producer =
-      event.consumerType === "camera" ||
-      event.consumerType === "screen" ||
-      event.consumerType === "screenAudio"
-        ? event.incomingProducerId
+      event.producerType === "camera" ||
+      event.producerType === "screen" ||
+      event.producerType === "screenAudio"
+        ? event.producerId
           ? tableProducers[event.table_id][event.producerUsername][
               event.producerInstance
-            ]?.[event.consumerType]?.[event.incomingProducerId]
+            ]?.[event.producerType]?.[event.producerId]
           : undefined
         : tableProducers[event.table_id][event.producerUsername][
             event.producerInstance
-          ][event.consumerType];
+          ][event.producerType];
 
     if (!producer) {
       console.error(`No producer found`);
@@ -417,14 +417,14 @@ class ConsumersController {
         producerId: producer.id,
         rtpCapabilities: event.rtpCapabilities,
         paused:
-          event.consumerType === "camera" ||
-          event.consumerType === "screen" ||
-          event.consumerType === "screenAudio",
+          event.producerType === "camera" ||
+          event.producerType === "screen" ||
+          event.producerType === "screenAudio",
       });
 
       newConsumer = {
         consumer: consumer,
-        producerId: producer.id,
+        producerId: consumer.producerId,
         id: consumer.id,
         kind: consumer.kind,
         // @ts-expect-error: type shit
@@ -464,47 +464,46 @@ class ConsumersController {
       ][event.producerInstance] = {};
     }
     if (
-      (event.consumerType === "camera" ||
-        event.consumerType === "screen" ||
-        event.consumerType === "screenAudio") &&
+      (event.producerType === "camera" ||
+        event.producerType === "screen" ||
+        event.producerType === "screenAudio") &&
       !tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
-      ][event.consumerType]
+      ][event.producerType]
     ) {
       tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
-      ][event.producerInstance][event.consumerType] = {};
+      ][event.producerInstance][event.producerType] = {};
     }
 
     if (
-      event.consumerType === "camera" ||
-      event.consumerType === "screen" ||
-      event.consumerType === "screenAudio"
+      event.producerType === "camera" ||
+      event.producerType === "screen" ||
+      event.producerType === "screenAudio"
     ) {
-      if (event.incomingProducerId) {
+      if (event.producerId) {
         tableConsumers[event.table_id][event.username][event.instance][
           event.producerUsername
-        ][event.producerInstance][event.consumerType]![
-          event.incomingProducerId
-        ] = newConsumer;
+        ][event.producerInstance][event.producerType]![event.producerId] =
+          newConsumer;
       }
     } else {
       tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
-      ][event.producerInstance][event.consumerType] = newConsumer;
+      ][event.producerInstance][event.producerType] = newConsumer;
     }
-    console.log(newConsumer);
+
     this.io
       .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
       .emit("message", {
         type: "newConsumerSubscribed",
         producerUsername: event.producerUsername,
         producerInstance: event.producerInstance,
-        consumerId: event.incomingProducerId,
-        consumerType: event.consumerType,
+        producerId: event.producerId,
+        producerType: event.producerType,
         data: {
-          producerId: newConsumer.producerId,
           id: newConsumer.id,
+          producerId: newConsumer.producerId,
           kind: newConsumer.kind,
           rtpParameters: newConsumer.rtpParameters,
           type: newConsumer.type,
@@ -533,7 +532,7 @@ class ConsumersController {
     const producer =
       tableProducers[event.table_id][event.producerUsername][
         event.producerInstance
-      ]?.[event.consumerType]?.[event.dataStreamType];
+      ]?.[event.producerType]?.[event.dataStreamType];
     if (!producer) {
       console.error(`No producer found`);
       return;
@@ -542,8 +541,6 @@ class ConsumersController {
     try {
       const consumer = await transport.consumeData({
         dataProducerId: producer.id,
-        // @ts-expect-error: praise the lord he's done it again
-        label: producer.label,
       });
 
       newConsumer = {
@@ -591,17 +588,17 @@ class ConsumersController {
     if (
       !tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
-      ][event.consumerType]
+      ][event.producerType]
     ) {
       tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
-      ][event.producerInstance][event.consumerType] = {};
+      ][event.producerInstance][event.producerType] = {};
     }
 
     if (event.incomingProducerId) {
       tableConsumers[event.table_id][event.username][event.instance][
         event.producerUsername
-      ][event.producerInstance][event.consumerType]![event.dataStreamType] =
+      ][event.producerInstance][event.producerType]![event.dataStreamType] =
         newConsumer;
     }
 
@@ -611,11 +608,11 @@ class ConsumersController {
         type: "newJSONConsumerSubscribed",
         producerUsername: event.producerUsername,
         producerInstance: event.producerInstance,
-        consumerId: event.incomingProducerId,
-        consumerType: event.consumerType,
+        producerId: event.incomingProducerId,
+        producerType: event.producerType,
         data: {
-          producerId: newConsumer.producerId,
           id: newConsumer.id,
+          producerId: newConsumer.producerId,
           label: newConsumer.label,
           sctpStreamParameters: newConsumer.sctpStreamParameters,
           type: newConsumer.type,
@@ -631,8 +628,8 @@ class ConsumersController {
       type: "newConsumerWasCreated",
       producerUsername: event.producerUsername,
       producerInstance: event.producerInstance,
-      consumerId: event.consumerId,
-      consumerType: event.consumerType,
+      producerId: event.producerId,
+      producerType: event.producerType,
     };
     this.io
       .to(`instance_${event.table_id}_${event.username}_${event.instance}`)

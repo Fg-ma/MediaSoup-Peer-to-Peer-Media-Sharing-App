@@ -118,6 +118,7 @@ export default function FgLowerVisualMediaControls({
   localMute,
   visualMediaContainerRef,
   audioStream,
+  screenAudioStream,
   audioRef,
   currentTimeRef,
   tintColor,
@@ -145,6 +146,7 @@ export default function FgLowerVisualMediaControls({
   localMute: React.MutableRefObject<boolean>;
   visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   audioStream?: MediaStream;
+  screenAudioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
   tintColor: React.MutableRefObject<string>;
@@ -158,7 +160,11 @@ export default function FgLowerVisualMediaControls({
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
-  handleAudioEffectChange: (effect: AudioEffectTypes) => void;
+  handleAudioEffectChange: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => void;
   handleMuteCallback: (() => void) | undefined;
   handleVolumeSliderCallback: (
     event: React.ChangeEvent<HTMLInputElement>
@@ -374,65 +380,69 @@ export default function FgLowerVisualMediaControls({
                 />
               </Suspense>
             )}
-          {(fgVisualMediaOptions.isUser ||
-            (type === "camera" &&
-              fgVisualMediaOptions.permissions?.acceptsCameraEffects) ||
-            (type === "screen" &&
-              fgVisualMediaOptions.permissions?.acceptsScreenEffects)) &&
-            fgVisualMediaOptions.isVolume && (
-              <Suspense fallback={<div>Loading...</div>}>
-                <AudioEffectsButton
-                  socket={socket}
-                  username={username}
-                  instance={instance}
-                  isUser={
-                    fgVisualMediaOptions.isUser ??
-                    defaultFgVisualMediaOptions.isUser
+          {(((fgVisualMediaOptions.isUser ||
+            fgVisualMediaOptions.permissions?.acceptsAudioEffects) &&
+            fgVisualMediaOptions.isVolume) ||
+            ((fgVisualMediaOptions.isUser ||
+              fgVisualMediaOptions.permissions?.acceptsScreenAudioEffects) &&
+              screenAudioStream)) && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <AudioEffectsButton
+                socket={socket}
+                username={username}
+                instance={instance}
+                isUser={
+                  fgVisualMediaOptions.isUser ??
+                  defaultFgVisualMediaOptions.isUser
+                }
+                producerType={screenAudioStream ? "screenAudio" : "audio"}
+                producerId={
+                  screenAudioStream ? `${visualMediaId}_audio` : undefined
+                }
+                audioEffectsActive={audioEffectsActive}
+                setAudioEffectsActive={setAudioEffectsActive}
+                handleAudioEffectChange={handleAudioEffectChange}
+                handleMute={() => {
+                  if (clientMute.current) {
+                    return;
                   }
-                  audioEffectsActive={audioEffectsActive}
-                  setAudioEffectsActive={setAudioEffectsActive}
-                  handleAudioEffectChange={handleAudioEffectChange}
-                  handleMute={() => {
-                    if (clientMute.current) {
-                      return;
-                    }
 
-                    localMute.current = !localMute.current;
+                  localMute.current = !localMute.current;
 
-                    if (!audioRef.current) {
-                      return;
-                    }
-
-                    if (!fgVisualMediaOptions.isUser) {
-                      audioRef.current.muted = localMute.current;
-                    }
-
-                    if (handleMuteCallback !== undefined) {
-                      handleMuteCallback();
-                    }
-
-                    setRerender((prev) => prev + 1);
-                  }}
-                  muteStateRef={localMute}
-                  visualMediaContainerRef={visualMediaContainerRef}
-                  closeLabelElement={
-                    <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0 bg-white'>
-                      Close (x)
-                    </div>
+                  if (!audioRef.current) {
+                    return;
                   }
-                  hoverLabelElement={
-                    <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-                      Audio effects (a)
-                    </div>
+
+                  if (!fgVisualMediaOptions.isUser) {
+                    audioRef.current.muted = localMute.current;
                   }
-                  style={{ transform: "scaleX(-1)" }}
-                  options={{
-                    backgroundColor: "rgba(10, 10, 10, 1)",
-                    secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
-                  }}
-                />
-              </Suspense>
-            )}
+
+                  if (handleMuteCallback !== undefined) {
+                    handleMuteCallback();
+                  }
+
+                  setRerender((prev) => prev + 1);
+                }}
+                muteStateRef={localMute}
+                visualMediaContainerRef={visualMediaContainerRef}
+                closeLabelElement={
+                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0 bg-white'>
+                    Close (x)
+                  </div>
+                }
+                hoverLabelElement={
+                  <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
+                    Audio effects (a)
+                  </div>
+                }
+                style={{ transform: "scaleX(-1)" }}
+                options={{
+                  backgroundColor: "rgba(10, 10, 10, 1)",
+                  secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
+                }}
+              />
+            </Suspense>
+          )}
         </div>
       </div>
     </div>

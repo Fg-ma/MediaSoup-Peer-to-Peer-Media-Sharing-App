@@ -25,7 +25,6 @@ class CameraSectionController {
       };
       audio: AudioMedia | undefined;
     }>,
-    private userCameraCount: React.MutableRefObject<number>,
 
     private producersController: ProducersController,
 
@@ -43,26 +42,20 @@ class CameraSectionController {
     this.setCameraActive((prev) => !prev);
 
     if (this.isCamera.current) {
-      this.userCameraCount.current = this.userCameraCount.current + 1;
       this.producersController.createNewProducer("camera");
     } else if (!this.isCamera.current) {
-      for (let i = this.userCameraCount.current; i >= 0; i--) {
-        const cameraProducerId = `${this.username.current}_camera_stream_${i}`;
+      const cameraIds = Object.keys(this.userMedia.current.camera);
 
-        if (cameraProducerId in this.userMedia.current.camera) {
-          const msg = {
-            type: "removeProducer",
-            table_id: this.table_id.current,
-            username: this.username.current,
-            instance: this.instance.current,
-            producerType: "camera",
-            producerId: cameraProducerId,
-          };
-          this.socket.current.emit("message", msg);
-
-          // return after the first stream is removed
-          return;
-        }
+      if (cameraIds.length > 0 && cameraIds[cameraIds.length - 1]) {
+        const msg = {
+          type: "removeProducer",
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+          producerType: "camera",
+          producerId: cameraIds[cameraIds.length - 1],
+        };
+        this.socket.current.emit("message", msg);
       }
     }
   };
@@ -73,7 +66,6 @@ class CameraSectionController {
       return;
     }
     this.handleDisableEnableBtns(true);
-    this.userCameraCount.current = this.userCameraCount.current + 1;
 
     if (this.device.current) {
       this.producersController.createNewProducer("camera");

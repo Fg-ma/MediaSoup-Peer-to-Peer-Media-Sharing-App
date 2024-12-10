@@ -36,7 +36,7 @@ export default function ScreenSection({
   producersController: ProducersController;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
-  const { userMedia, userScreenCount } = useStreamsContext();
+  const { userMedia } = useStreamsContext();
 
   const screenSectionController = new ScreenSectionController(
     socket,
@@ -49,7 +49,6 @@ export default function ScreenSection({
     setScreenActive,
 
     userMedia,
-    userScreenCount,
 
     producersController,
 

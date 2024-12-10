@@ -110,8 +110,8 @@ class AudioEffects {
 
     if (
       this.audioStream instanceof Tone.UserMedia &&
-      this.micMediaStreamDestination &&
-      this.micChain
+      this.micMediaStreamDestination !== undefined &&
+      this.micChain !== undefined
     ) {
       this.fgMic = new FgMic(
         this.audioStream,
@@ -122,10 +122,11 @@ class AudioEffects {
     }
 
     if (
-      this.audioStream instanceof Tone.UserMedia &&
-      this.audioStreamMediaStreamDestination &&
-      this.audioStreamChain
+      !(this.audioStream instanceof Tone.UserMedia) &&
+      this.audioStreamMediaStreamDestination !== undefined &&
+      this.audioStreamChain !== undefined
     ) {
+      console.log("waiosdjasd");
       this.fgAudioStreamEffects = new FgAudioStreamEffects(
         this.audioStream,
         this.audioStreamMediaStreamDestination,

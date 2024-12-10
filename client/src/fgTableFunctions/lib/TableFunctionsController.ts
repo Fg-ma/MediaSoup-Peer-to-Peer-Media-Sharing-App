@@ -1,9 +1,10 @@
 import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import { UserDataStreams } from "../../context/streamsContext/StreamsContext";
-import AudioMedia from "../../lib/AudioMedia";
-import CameraMedia from "../../lib/CameraMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
+import {
+  RemoteTracksMapType,
+  UserDataStreamsType,
+  UserMediaType,
+} from "../../context/streamsContext/typeConstant";
 
 class TableFunctionsController {
   constructor(
@@ -14,33 +15,9 @@ class TableFunctionsController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
     private setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
-    private userDataStreams: React.MutableRefObject<UserDataStreams>,
-    private userCameraCount: React.MutableRefObject<number>,
-    private userScreenCount: React.MutableRefObject<number>,
-    private remoteTracksMap: React.MutableRefObject<{
-      [username: string]: {
-        camera?:
-          | {
-              [cameraId: string]: MediaStreamTrack;
-            }
-          | undefined;
-        screen?:
-          | {
-              [screenId: string]: MediaStreamTrack;
-            }
-          | undefined;
-        audio?: MediaStreamTrack | undefined;
-      };
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
+    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
     private handleDisableEnableBtns: (disabled: boolean) => void,
     private setBundles: React.Dispatch<
       React.SetStateAction<{
@@ -119,13 +96,11 @@ class TableFunctionsController {
       this.userMedia.current.camera[cameraId].deconstructor();
       delete this.userMedia.current.camera[cameraId];
     }
-    this.userCameraCount.current = 0;
 
     for (const screenId in this.userMedia.current.screen) {
       this.userMedia.current.screen[screenId].deconstructor();
       delete this.userMedia.current.screen[screenId];
     }
-    this.userScreenCount.current = 0;
 
     if (this.userMedia.current.audio) {
       this.userMedia.current.audio.deconstructor();

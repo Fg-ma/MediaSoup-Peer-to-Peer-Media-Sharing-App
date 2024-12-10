@@ -1,12 +1,5 @@
 import React, { createContext, useContext, useRef } from "react";
-
-export type Permissions = {
-  acceptsCameraEffects: boolean;
-  acceptsScreenEffects: boolean;
-  acceptsAudioEffects: boolean;
-  acceptsPositionScaleRotationManipulation: boolean;
-  acceptsCloseMedia: boolean;
-};
+import { Permissions } from "./typeConstant";
 
 export interface PermissionsContextProviderProps {
   children: React.ReactNode;
@@ -36,6 +29,7 @@ export function PermissionsContextProvider({
   const permissions = useRef<Permissions>({
     acceptsCameraEffects: true,
     acceptsScreenEffects: true,
+    acceptsScreenAudioEffects: true,
     acceptsAudioEffects: true,
     acceptsPositionScaleRotationManipulation: true,
     acceptsCloseMedia: true,

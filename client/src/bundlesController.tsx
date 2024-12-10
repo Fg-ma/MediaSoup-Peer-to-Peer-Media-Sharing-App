@@ -1,8 +1,8 @@
 import React from "react";
 import { Socket } from "socket.io-client";
 import Bundle from "./bundle/Bundle";
-import { Permissions } from "./context/permissionsContext/PermissionsContext";
 import { UserMediaType } from "./context/streamsContext/typeConstant";
+import { Permissions } from "./context/permissionsContext/typeConstant";
 
 class BundlesController {
   constructor(

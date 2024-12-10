@@ -46,7 +46,6 @@ const onResume = async (event: onResumeType, io: SocketIOServer) => {
               producerUsername
             ][producerInstance].screenAudio;
           for (const screenAudioId in screenAudioConsumers) {
-            console.log("wokaksodasdasd");
             await screenAudioConsumers[screenAudioId].consumer?.resume();
           }
         }

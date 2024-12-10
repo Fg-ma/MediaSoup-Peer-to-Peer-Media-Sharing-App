@@ -36,7 +36,7 @@ export default function CameraSection({
   producersController: ProducersController;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
-  const { userMedia, userCameraCount } = useStreamsContext();
+  const { userMedia } = useStreamsContext();
 
   const cameraSectionController = new CameraSectionController(
     socket,
@@ -49,7 +49,6 @@ export default function CameraSection({
     setCameraActive,
 
     userMedia,
-    userCameraCount,
 
     producersController,
 

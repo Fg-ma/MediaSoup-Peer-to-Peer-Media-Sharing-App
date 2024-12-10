@@ -8,7 +8,7 @@ import {
 import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
 import BundleSocket from "./BundleSocket";
 import { BundleControllerMessageType, BundleOptions } from "./typeConstant";
-import { Permissions } from "../../context/permissionsContext/PermissionsContext";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 class BundleController {
   bundleSocket: BundleSocket;
@@ -86,9 +86,20 @@ class BundleController {
     );
   }
 
-  handleAudioEffectChange = (effect: AudioEffectTypes) => {
+  handleAudioEffectChange = (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => {
     if (this.bundleOptions.isUser) {
-      this.userMedia.current.audio?.changeEffects(effect, false);
+      if (producerType === "audio") {
+        this.userMedia.current.audio?.changeEffects(effect, false);
+      } else if (producerType === "screenAudio" && producerId) {
+        this.userMedia.current.screenAudio[producerId].changeEffects(
+          effect,
+          false
+        );
+      }
 
       if (this.permissions.acceptsAudioEffects) {
         const msg = {
@@ -96,8 +107,8 @@ class BundleController {
           table_id: this.table_id,
           username: this.username,
           instance: this.instance,
-          producerType: "audio",
-          producerId: undefined,
+          producerType,
+          producerId,
           effect: effect,
           blockStateChange: false,
         };
@@ -109,8 +120,8 @@ class BundleController {
         table_id: this.table_id,
         requestedUsername: this.username,
         requestedInstance: this.instance,
-        requestedProducerType: "audio",
-        requestedProducerId: undefined,
+        requestedProducerType: producerType,
+        requestedProducerId: producerId,
         effect: effect,
         blockStateChange: false,
       };
