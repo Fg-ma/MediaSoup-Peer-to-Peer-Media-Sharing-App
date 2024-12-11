@@ -188,7 +188,7 @@ export default function FgLowerVisualMediaControls({
     },
   });
   const [_, setRerender] = useState(0);
-  const rightVideoControlsRef = useRef<HTMLDivElement>(null);
+  const rightVisualMediaControlsRef = useRef<HTMLDivElement>(null);
   const browserStandardSpeechRecognitionAvailable = useRef(true);
 
   const handleMessage = (event: { type: "localMuteChange" }) => {
@@ -201,11 +201,11 @@ export default function FgLowerVisualMediaControls({
     event.preventDefault();
     event.stopPropagation();
 
-    if (rightVideoControlsRef.current) {
+    if (rightVisualMediaControlsRef.current) {
       if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-        rightVideoControlsRef.current.scrollLeft -= event.deltaX / 2;
+        rightVisualMediaControlsRef.current.scrollLeft -= event.deltaX / 2;
       } else {
-        rightVideoControlsRef.current.scrollLeft -= event.deltaY / 2;
+        rightVisualMediaControlsRef.current.scrollLeft -= event.deltaY / 2;
       }
     }
   };
@@ -213,13 +213,16 @@ export default function FgLowerVisualMediaControls({
   useEffect(() => {
     socket.current.on("message", (event) => handleMessage(event));
 
-    rightVideoControlsRef.current?.addEventListener("wheel", handleWheel);
+    rightVisualMediaControlsRef.current?.addEventListener("wheel", handleWheel);
 
     // Cleanup event listener on unmount
     return () => {
       socket.current.off("message", (event) => handleMessage(event));
 
-      rightVideoControlsRef.current?.removeEventListener("wheel", handleWheel);
+      rightVisualMediaControlsRef.current?.removeEventListener(
+        "wheel",
+        handleWheel
+      );
     };
   }, []);
 
@@ -271,7 +274,11 @@ export default function FgLowerVisualMediaControls({
               />
             </Suspense>
           )}
-          {fgVisualMediaOptions.isVolume && (
+          {(fgVisualMediaOptions.isVolume ||
+            (screenAudioStream &&
+              (fgVisualMediaOptions.isUser ||
+                fgVisualMediaOptions.permissions
+                  ?.acceptsScreenAudioEffects))) && (
             <Suspense fallback={<div>Loading...</div>}>
               <FgVolumeElement
                 socket={socket}
@@ -310,7 +317,7 @@ export default function FgLowerVisualMediaControls({
           )}
         </div>
         <div
-          ref={rightVideoControlsRef}
+          ref={rightVisualMediaControlsRef}
           className='hide-scroll-bar w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
         >
           {fgVisualMediaOptions.isFullScreen && (
@@ -319,6 +326,7 @@ export default function FgLowerVisualMediaControls({
                 fgLowerVisualMediaController={fgLowerVisualMediaController}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
+                scrollingContainerRef={rightVisualMediaControlsRef}
               />
             </Suspense>
           )}
@@ -328,6 +336,7 @@ export default function FgLowerVisualMediaControls({
                 fgLowerVisualMediaController={fgLowerVisualMediaController}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
+                scrollingContainerRef={rightVisualMediaControlsRef}
               />
             </Suspense>
           )}
@@ -345,6 +354,7 @@ export default function FgLowerVisualMediaControls({
                   browserStandardSpeechRecognitionAvailable={
                     browserStandardSpeechRecognitionAvailable
                   }
+                  scrollingContainerRef={rightVisualMediaControlsRef}
                 />
               </Suspense>
             )}
@@ -363,6 +373,7 @@ export default function FgLowerVisualMediaControls({
                 browserStandardSpeechRecognitionAvailable={
                   browserStandardSpeechRecognitionAvailable
                 }
+                scrollingContainerRef={rightVisualMediaControlsRef}
               />
             </Suspense>
           )}
@@ -377,6 +388,7 @@ export default function FgLowerVisualMediaControls({
                   fgLowerVisualMediaController={fgLowerVisualMediaController}
                   visualEffectsActive={visualEffectsActive}
                   settingsActive={settingsActive}
+                  scrollingContainerRef={rightVisualMediaControlsRef}
                 />
               </Suspense>
             )}
@@ -389,11 +401,16 @@ export default function FgLowerVisualMediaControls({
             <Suspense fallback={<div>Loading...</div>}>
               <AudioEffectsButton
                 socket={socket}
+                table_id={table_id}
                 username={username}
                 instance={instance}
                 isUser={
                   fgVisualMediaOptions.isUser ??
                   defaultFgVisualMediaOptions.isUser
+                }
+                permissions={
+                  fgVisualMediaOptions.permissions ??
+                  defaultFgVisualMediaOptions.permissions
                 }
                 producerType={screenAudioStream ? "screenAudio" : "audio"}
                 producerId={
@@ -435,6 +452,7 @@ export default function FgLowerVisualMediaControls({
                     Audio effects (a)
                   </div>
                 }
+                scrollingContainerRef={rightVisualMediaControlsRef}
                 style={{ transform: "scaleX(-1)" }}
                 options={{
                   backgroundColor: "rgba(10, 10, 10, 1)",

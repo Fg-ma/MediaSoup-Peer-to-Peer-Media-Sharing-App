@@ -505,9 +505,11 @@ export default function FgAudioElementContainer({
         <Suspense fallback={<div>Loading...</div>}>
           <AudioEffectsSection
             socket={socket}
+            table_id={table_id}
             username={username}
             instance={instance}
             isUser={isUser}
+            permissions={permissions}
             producerType={"audio"}
             producerId={undefined}
             handleAudioEffectChange={handleAudioEffectChange}

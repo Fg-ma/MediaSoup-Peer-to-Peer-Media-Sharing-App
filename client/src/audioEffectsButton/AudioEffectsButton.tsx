@@ -4,6 +4,8 @@ import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesC
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
+import { Permissions } from "../context/permissionsContext/typeConstant";
+
 import audioEffectIcon from "../../public/svgs/audioEffects/audioEffectIcon.svg";
 import audioEffectOffIcon from "../../public/svgs/audioEffects/audioEffectOffIcon.svg";
 
@@ -18,9 +20,11 @@ const defaultAudioEffectsButtonOptions: {
 
 export default function AudioEffectsButton({
   socket,
+  table_id,
   username,
   instance,
   isUser,
+  permissions,
   producerType,
   producerId,
   audioEffectsActive,
@@ -31,13 +35,16 @@ export default function AudioEffectsButton({
   visualMediaContainerRef,
   closeLabelElement,
   hoverLabelElement,
-  options,
+  scrollingContainerRef,
   style,
+  options,
 }: {
   socket: React.MutableRefObject<Socket>;
+  table_id: string;
   username: string;
   instance: string;
   isUser: boolean;
+  permissions: Permissions;
   producerType: "audio" | "screenAudio";
   producerId: string | undefined;
   audioEffectsActive: boolean;
@@ -52,13 +59,14 @@ export default function AudioEffectsButton({
   visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
   hoverLabelElement?: React.ReactElement;
+  scrollingContainerRef?: React.RefObject<HTMLDivElement>;
+  style?: React.CSSProperties;
   options?: {
     color?: string;
     placement?: "above" | "below" | "left" | "right";
     backgroundColor?: string;
     secondaryBackgroundColor?: string;
   };
-  style?: React.CSSProperties;
 }) {
   const audioEffectsButtonOptions = {
     ...defaultAudioEffectsButtonOptions,
@@ -106,6 +114,7 @@ export default function AudioEffectsButton({
             <></>
           )
         }
+        scrollingContainerRef={scrollingContainerRef}
         className='flex items-center justify-center w-10 min-w-10 aspect-square pointer-events-auto'
         style={style}
       />
@@ -113,9 +122,11 @@ export default function AudioEffectsButton({
         <Suspense fallback={<div>Loading...</div>}>
           <AudioEffectsSection
             socket={socket}
+            table_id={table_id}
             username={username}
             instance={instance}
             isUser={isUser}
+            permissions={permissions}
             producerType={producerType}
             producerId={producerId}
             handleAudioEffectChange={handleAudioEffectChange}

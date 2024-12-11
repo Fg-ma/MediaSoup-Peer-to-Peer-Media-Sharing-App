@@ -250,9 +250,11 @@ export default function FgTableFunctions({
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsButton
               socket={socket}
+              table_id={table_id.current}
               username={username.current}
               instance={instance.current}
               isUser={true}
+              permissions={permissions.current}
               producerType={"audio"}
               producerId={undefined}
               audioEffectsActive={audioEffectsActive}

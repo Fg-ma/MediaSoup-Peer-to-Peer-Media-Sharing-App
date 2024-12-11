@@ -309,6 +309,10 @@ class FgSoundBoardController {
     );
   };
 
+  closeSoundBoard = () => {
+    this.userMedia.current.audio?.audioEffects.fgSoundEffects.endAllSoundEffects();
+  };
+
   private toggleAudio = async (key: number): Promise<boolean> => {
     let succeeded = false;
 

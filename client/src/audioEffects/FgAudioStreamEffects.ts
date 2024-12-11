@@ -492,7 +492,7 @@ class FgAudioStreamEffects {
       this.audioStreamChain.connect(effect);
     }
 
-    this.audioStream.connect(effect);
+    Tone.connect(this.audioStream, effect);
     this.audioStreamEffects.push(effect);
 
     effect.connect(this.audioStreamMediaStreamDestination);

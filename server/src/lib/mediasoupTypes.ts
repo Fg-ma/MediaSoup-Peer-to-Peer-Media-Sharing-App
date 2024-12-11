@@ -16,6 +16,26 @@ export interface MediasoupSocket extends Socket {
   instance?: string;
 }
 
+export type AudioMixEffectsType =
+  | "autoFilter"
+  | "autoPanner"
+  | "autoWah"
+  | "bitCrusher"
+  | "chebyshev"
+  | "chorus"
+  | "distortion"
+  | "EQ"
+  | "feedbackDelay"
+  | "freeverb"
+  | "JCReverb"
+  | "phaser"
+  | "pingPongDelay"
+  | "pitchShift"
+  | "reverb"
+  | "stereoWidener"
+  | "tremolo"
+  | "vibrato";
+
 export type MediasoupSocketEvents =
   | onGetRouterRtpCapabilitiesType
   | onCreateProducerTransportType
@@ -40,7 +60,11 @@ export type MediasoupSocketEvents =
   | onPermissionsResponseType
   | onBundleMetadataResponseType
   | onRequestCatchUpDataType
-  | onResponseCatchUpDataType;
+  | onResponseCatchUpDataType
+  | onRequestMixEffectActivityChangeType
+  | onClientMixEffectActivityChangeType
+  | onRequestMixEffectValueChangeType
+  | onClientMixEffectValueChangeType;
 
 export type onGetRouterRtpCapabilitiesType = {
   type: "getRouterRtpCapabilities";
@@ -331,4 +355,50 @@ export type onResponseCatchUpDataType = {
         };
       }
     | undefined;
+};
+
+export type onRequestMixEffectActivityChangeType = {
+  type: "requestMixEffectActivityChange";
+  table_id: string;
+  requestedUsername: string;
+  requestedInstance: string;
+  requestedProducerType: "audio" | "screenAudio";
+  requestedProducerId: string | undefined;
+  effect: AudioMixEffectsType;
+  active: boolean;
+};
+
+export type onClientMixEffectActivityChangeType = {
+  type: "clientMixEffectActivityChange";
+  table_id: string;
+  username: string;
+  instance: string;
+  producerType: "audio" | "screenAudio";
+  producerId: string | undefined;
+  effect: AudioMixEffectsType;
+  active: boolean;
+};
+
+export type onRequestMixEffectValueChangeType = {
+  type: "requestMixEffectValueChange";
+  table_id: string;
+  requestedUsername: string;
+  requestedInstance: string;
+  requestedProducerType: "audio" | "screenAudio";
+  requestedProducerId: string | undefined;
+  effect: AudioMixEffectsType;
+  option: string;
+  value: number;
+};
+
+export type onClientMixEffectValueChangeType = {
+  type: "clientMixEffectValueChange";
+  table_id: string;
+  username: string;
+  instance: string;
+  producerType: "audio" | "screenAudio";
+  producerId: string | undefined;
+  effect: AudioMixEffectsType;
+  option: string;
+  value: number;
 };

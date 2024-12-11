@@ -16,14 +16,14 @@ export default function AudioMixEffect({
   dynamicMixEffect,
   effectLabel,
   labelPlacement,
-  updateMixEffectsValues,
+  mixEffectValueChange,
 }: {
   effect: AudioMixEffectsType;
   staticMixEffect: StaticMixEffect;
   dynamicMixEffect: DynamicMixEffect;
   effectLabel: string;
   labelPlacement: LabelPlacementType;
-  updateMixEffectsValues: (event: SliderChangeEvent) => void;
+  mixEffectValueChange: (event: SliderChangeEvent) => void;
 }) {
   return (
     <div
@@ -137,7 +137,7 @@ export default function AudioMixEffect({
               snapToNearestTick: option?.snapToNearestTick,
               orientation: dynamicMixEffect.orientation,
             }}
-            onValueChange={updateMixEffectsValues}
+            onValueChange={mixEffectValueChange}
           />
         ))}
       </div>

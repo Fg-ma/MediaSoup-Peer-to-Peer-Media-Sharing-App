@@ -81,6 +81,17 @@ class FgSoundEffects {
 
     return true;
   };
+
+  endAllSoundEffects = () => {
+    for (const key of Object.keys(this.players)) {
+      if (
+        this.players[parseInt(key)].player.loaded &&
+        this.players[parseInt(key)].player.state === "started"
+      ) {
+        this.players[parseInt(key)].player.stop();
+      }
+    }
+  };
 }
 
 export default FgSoundEffects;

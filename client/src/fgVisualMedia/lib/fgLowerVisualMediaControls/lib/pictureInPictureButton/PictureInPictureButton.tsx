@@ -6,10 +6,12 @@ export default function PictureInPictureButton({
   fgLowerVisualMediaController,
   visualEffectsActive,
   settingsActive,
+  scrollingContainerRef,
 }: {
   fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
   settingsActive: boolean;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const [active, setActive] = useState(false);
 
@@ -41,6 +43,7 @@ export default function PictureInPictureButton({
           </div>
         ) : undefined
       }
+      scrollingContainerRef={scrollingContainerRef}
       className='flex items-center justify-center w-10 aspect-square scale-x-[-1] pointer-events-auto'
     />
   );

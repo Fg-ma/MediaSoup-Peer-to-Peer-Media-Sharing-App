@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { Socket } from "socket.io-client";
 import isEqual from "lodash/isEqual";
 import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
 import AudioMixEffect from "./AudioMixEffect";
@@ -11,11 +12,64 @@ import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
 } from "../../audioEffects/typeConstant";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
+
+type MixEffectsSocketEvents =
+  | {
+      type: "clientMixEffectActivityChanged";
+      username: string;
+      instance: string;
+      producerType: "audio" | "screenAudio";
+      producerId: string | undefined;
+      effect: AudioMixEffectsType;
+      active: boolean;
+    }
+  | {
+      type: "mixEffectActivityChangeRequested";
+      requestedProducerType: "audio" | "screenAudio";
+      requestedProducerId: string | undefined;
+      effect: AudioMixEffectsType;
+      active: boolean;
+    }
+  | {
+      type: "clientMixEffectValueChanged";
+      username: string;
+      instance: string;
+      producerType: "audio" | "screenAudio";
+      producerId: string | undefined;
+      effect: AudioMixEffectsType;
+      option: MixEffectsOptionsType;
+      value: number;
+    }
+  | {
+      type: "mixEffectValueChangeRequested";
+      requestedProducerType: "audio" | "screenAudio";
+      requestedProducerId: string | undefined;
+      effect: AudioMixEffectsType;
+      option: MixEffectsOptionsType;
+      value: number;
+    };
 
 export default function AudioMixEffectsPortal({
+  socket,
+  table_id,
+  username,
+  instance,
+  producerType,
+  producerId,
+  isUser,
+  permissions,
   audioMixEffectsButtonRef,
   closeCallback,
 }: {
+  socket: React.MutableRefObject<Socket>;
+  table_id: string;
+  username: string;
+  instance: string;
+  producerType: "audio" | "screenAudio";
+  producerId: string | undefined;
+  isUser: boolean;
+  permissions: Permissions;
   audioMixEffectsButtonRef: React.RefObject<HTMLButtonElement>;
   closeCallback: () => void;
 }) {
@@ -338,24 +392,64 @@ export default function AudioMixEffectsPortal({
     dynamicMixEffects.current = newDynamicMixEffects;
   };
 
-  const mixEffectChange = (active: boolean, effect?: string) => {
-    if (!effect) {
-      return;
-    }
-
+  const userMixEffectChange = (
+    active: boolean,
+    effect: AudioMixEffectsType
+  ) => {
     dynamicMixEffects.current = {
       ...dynamicMixEffects.current,
       [effect]: {
-        ...dynamicMixEffects.current[effect as AudioMixEffectsType],
+        ...dynamicMixEffects.current[effect],
         active,
       },
     };
 
-    if (!dynamicMixEffects.current[effect as AudioMixEffectsType].active) {
-      userMedia.current.audio?.removeMixEffects([
-        effect as AudioMixEffectsType,
-      ]);
+    if (!dynamicMixEffects.current[effect].active) {
+      if (producerType === "audio") {
+        userMedia.current.audio?.removeMixEffects([effect]);
+      } else if (producerType === "screenAudio" && producerId) {
+        userMedia.current.screenAudio[producerId].removeMixEffects([effect]);
+      }
     }
+
+    if (portalRef.current) {
+      getPackedPositions(
+        portalRef.current.getBoundingClientRect().width - 28,
+        28
+      );
+    }
+
+    setRerender((prev) => !prev);
+
+    if (
+      (producerType === "audio" && permissions.acceptsAudioEffects) ||
+      (producerType === "screenAudio" && permissions.acceptsScreenAudioEffects)
+    ) {
+      const msg = {
+        type: "clientMixEffectActivityChange",
+        table_id,
+        username,
+        instance,
+        producerType,
+        producerId,
+        effect,
+        active,
+      };
+      socket.current.emit("message", msg);
+    }
+  };
+
+  const remoteMixEffectChange = (
+    active: boolean,
+    effect: AudioMixEffectsType
+  ) => {
+    dynamicMixEffects.current = {
+      ...dynamicMixEffects.current,
+      [effect]: {
+        ...dynamicMixEffects.current[effect],
+        active,
+      },
+    };
 
     if (portalRef.current) {
       getPackedPositions(
@@ -367,29 +461,169 @@ export default function AudioMixEffectsPortal({
     setRerender((prev) => !prev);
   };
 
-  const updateMixEffectsValues = (event: SliderChangeEvent) => {
-    const [effect, option] = event.id.split("_");
+  const mixEffectChange = (active: boolean, effect: AudioMixEffectsType) => {
+    if (isUser) {
+      userMixEffectChange(active, effect);
+    } else {
+      if (
+        (producerType === "audio" && permissions.acceptsAudioEffects) ||
+        (producerType === "screenAudio" &&
+          permissions.acceptsScreenAudioEffects)
+      ) {
+        const msg = {
+          type: "requestMixEffectActivityChange",
+          table_id,
+          requestedUsername: username,
+          requestedInstance: instance,
+          requestedProducerType: producerType,
+          requestedProducerId: producerId,
+          effect,
+          active,
+        };
 
+        socket.current.emit("message", msg);
+      }
+    }
+  };
+
+  const userMixEffectValueChange = (
+    effect: AudioMixEffectsType,
+    option: MixEffectsOptionsType,
+    value: number
+  ) => {
     if (
-      dynamicMixEffects.current[effect as AudioMixEffectsType] &&
-      dynamicMixEffects.current[effect as AudioMixEffectsType].values
+      dynamicMixEffects.current[effect] &&
+      dynamicMixEffects.current[effect].values
     ) {
-      dynamicMixEffects.current[effect as AudioMixEffectsType].values[
-        option as MixEffectsOptionsType
-      ] = event.value;
+      dynamicMixEffects.current[effect].values[option] = value;
     }
 
     const effects = [
       {
         type: effect as AudioMixEffectsType,
-        updates: [
-          { option: option as MixEffectsOptionsType, value: event.value },
-        ],
+        updates: [{ option, value }],
       },
     ];
 
-    userMedia.current.audio?.mixEffects(effects);
+    if (producerType === "audio") {
+      userMedia.current.audio?.mixEffects(effects);
+    } else if (producerType === "screenAudio" && producerId) {
+      userMedia.current.screenAudio[producerId].mixEffects(effects);
+    }
+
+    if (
+      (producerType === "audio" && permissions.acceptsAudioEffects) ||
+      (producerType === "screenAudio" && permissions.acceptsScreenAudioEffects)
+    ) {
+      const msg = {
+        type: "clientMixEffectValueChange",
+        table_id,
+        username,
+        instance,
+        producerType,
+        producerId,
+        effect,
+        option,
+        value,
+      };
+      socket.current.emit("message", msg);
+    }
   };
+
+  const remoteMixEffectValueChange = (
+    effect: AudioMixEffectsType,
+    option: MixEffectsOptionsType,
+    value: number
+  ) => {
+    if (
+      dynamicMixEffects.current[effect] &&
+      dynamicMixEffects.current[effect].values
+    ) {
+      dynamicMixEffects.current[effect].values[option] = value;
+    }
+
+    setRerender((prev) => !prev);
+  };
+
+  const mixEffectValueChange = (event: SliderChangeEvent) => {
+    if (isUser) {
+      const [effect, option] = event.id.split("_");
+      userMixEffectValueChange(
+        effect as AudioMixEffectsType,
+        option as MixEffectsOptionsType,
+        event.value
+      );
+    } else {
+      if (
+        (producerType === "audio" && permissions.acceptsAudioEffects) ||
+        (producerType === "screenAudio" &&
+          permissions.acceptsScreenAudioEffects)
+      ) {
+        const [effect, option] = event.id.split("_");
+
+        const msg = {
+          type: "requestMixEffectValueChange",
+          table_id,
+          requestedUsername: username,
+          requestedInstance: instance,
+          requestedProducerType: producerType,
+          requestedProducerId: producerId,
+          effect,
+          option,
+          value: event.value,
+        };
+
+        socket.current.emit("message", msg);
+      }
+    }
+  };
+
+  const handleMessage = (event: MixEffectsSocketEvents) => {
+    switch (event.type) {
+      case "mixEffectActivityChangeRequested":
+        if (
+          ((producerType === "audio" && permissions.acceptsAudioEffects) ||
+            (producerType === "screenAudio" &&
+              permissions.acceptsScreenAudioEffects)) &&
+          event.requestedProducerType === producerType &&
+          (producerType === "audio" ||
+            (producerType === "screenAudio" &&
+              event.requestedProducerId === producerId))
+        ) {
+          userMixEffectChange(event.active, event.effect);
+        }
+        break;
+      case "clientMixEffectActivityChanged":
+        remoteMixEffectChange(event.active, event.effect);
+        break;
+      case "mixEffectValueChangeRequested":
+        if (
+          ((producerType === "audio" && permissions.acceptsAudioEffects) ||
+            (producerType === "screenAudio" &&
+              permissions.acceptsScreenAudioEffects)) &&
+          event.requestedProducerType === producerType &&
+          (producerType === "audio" ||
+            (producerType === "screenAudio" &&
+              event.requestedProducerId === producerId))
+        ) {
+          userMixEffectValueChange(event.effect, event.option, event.value);
+        }
+        break;
+      case "clientMixEffectValueChanged":
+        remoteMixEffectValueChange(event.effect, event.option, event.value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    socket.current.on("message", handleMessage);
+
+    return () => {
+      socket.current.off("message", handleMessage);
+    };
+  }, [socket.current]);
 
   return (
     <FgPanel
@@ -409,7 +643,14 @@ export default function AudioMixEffectsPortal({
                           key={effect}
                           content={staticMixEffect.effectLabel}
                           id={effect}
-                          callbackFunction={mixEffectChange}
+                          callbackFunction={(active, id) => {
+                            if (id) {
+                              mixEffectChange(
+                                active,
+                                id as AudioMixEffectsType
+                              );
+                            }
+                          }}
                         />
                       );
                     }
@@ -443,7 +684,7 @@ export default function AudioMixEffectsPortal({
                           dynamicMixEffect.orientation ?? "vertical"
                         ]
                       }
-                      updateMixEffectsValues={updateMixEffectsValues}
+                      mixEffectValueChange={mixEffectValueChange}
                     />
                   );
                 }

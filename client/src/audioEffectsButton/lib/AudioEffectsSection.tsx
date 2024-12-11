@@ -7,6 +7,7 @@ import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import AudioEffectButton from "./AudioEffectButton";
 import { audioEffectTemplates } from "./typeConstant";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
@@ -29,9 +30,11 @@ const FgSoundBoard = React.lazy(
 
 export default function AudioEffectsSection({
   socket,
+  table_id,
   username,
   instance,
   isUser,
+  permissions,
   producerType,
   producerId,
   handleAudioEffectChange,
@@ -47,9 +50,11 @@ export default function AudioEffectsSection({
   secondaryBackgroundColor,
 }: {
   socket: React.MutableRefObject<Socket>;
+  table_id: string;
   username: string;
   instance: string;
   isUser: boolean;
+  permissions: Permissions;
   producerType: "audio" | "screenAudio";
   producerId: string | undefined;
   handleAudioEffectChange: (
@@ -236,109 +241,117 @@ export default function AudioEffectsSection({
               }
               options={{ hoverTimeoutDuration: 350 }}
             />
-            <FgButton
-              scrollingContainerRef={audioSectionRef}
-              externalRef={pianoRef}
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                if (visualMediaContainerRef?.current) {
-                  if (
-                    visualMediaContainerRef.current.classList.contains(
-                      "in-piano"
-                    )
-                  ) {
-                    visualMediaContainerRef.current.classList.remove(
-                      "in-piano"
-                    );
-                  } else {
-                    visualMediaContainerRef.current.classList.add("in-piano");
-                  }
-                }
-                setPanioActive((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={panioActive ? pianoOffIcon : pianoIcon}
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                      { key: "fill", value: "white" },
-                      { key: "stroke", value: "white" },
-                    ]}
-                  />
-                );
-              }}
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {panioActive ? "Close synth" : "Synth"}
-                </div>
-              }
-              options={{ hoverTimeoutDuration: 350 }}
-            />
-            <FgButton
-              scrollingContainerRef={audioSectionRef}
-              externalRef={soundBoardButtonRef}
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                setSoundBoardActive((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={soundBoardActive ? soundBoardOffIcon : soundBoardIcon}
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                      { key: "fill", value: "white" },
-                      { key: "stroke", value: "white" },
-                    ]}
-                  />
-                );
-              }}
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {soundBoardActive ? "Close sound board" : "Sound board"}
-                </div>
-              }
-              options={{ hoverTimeoutDuration: 350 }}
-            />
-            <FgButton
-              scrollingContainerRef={audioSectionRef}
-              externalRef={backgroundMusicButtonRef}
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                setBackgroundMusicActive((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={
-                      backgroundMusicActive
-                        ? backgroundMusicOffIcon
-                        : backgroundMusicIcon
+            {isUser && (
+              <FgButton
+                scrollingContainerRef={audioSectionRef}
+                externalRef={pianoRef}
+                className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                clickFunction={() => {
+                  if (visualMediaContainerRef?.current) {
+                    if (
+                      visualMediaContainerRef.current.classList.contains(
+                        "in-piano"
+                      )
+                    ) {
+                      visualMediaContainerRef.current.classList.remove(
+                        "in-piano"
+                      );
+                    } else {
+                      visualMediaContainerRef.current.classList.add("in-piano");
                     }
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                      { key: "fill", value: "white" },
-                      { key: "stroke", value: "white" },
-                    ]}
-                  />
-                );
-              }}
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {backgroundMusicActive
-                    ? "Close background music"
-                    : "Background music"}
-                </div>
-              }
-              options={{ hoverTimeoutDuration: 350 }}
-            />
+                  }
+                  setPanioActive((prev) => !prev);
+                }}
+                contentFunction={() => {
+                  return (
+                    <FgSVG
+                      src={panioActive ? pianoOffIcon : pianoIcon}
+                      className='flex items-center justify-center'
+                      attributes={[
+                        { key: "width", value: "90%" },
+                        { key: "height", value: "90%" },
+                        { key: "fill", value: "white" },
+                        { key: "stroke", value: "white" },
+                      ]}
+                    />
+                  );
+                }}
+                hoverContent={
+                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                    {panioActive ? "Close synth" : "Synth"}
+                  </div>
+                }
+                options={{ hoverTimeoutDuration: 350 }}
+              />
+            )}
+            {isUser && (
+              <FgButton
+                scrollingContainerRef={audioSectionRef}
+                externalRef={soundBoardButtonRef}
+                className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                clickFunction={() => {
+                  setSoundBoardActive((prev) => !prev);
+                }}
+                contentFunction={() => {
+                  return (
+                    <FgSVG
+                      src={
+                        soundBoardActive ? soundBoardOffIcon : soundBoardIcon
+                      }
+                      className='flex items-center justify-center'
+                      attributes={[
+                        { key: "width", value: "90%" },
+                        { key: "height", value: "90%" },
+                        { key: "fill", value: "white" },
+                        { key: "stroke", value: "white" },
+                      ]}
+                    />
+                  );
+                }}
+                hoverContent={
+                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                    {soundBoardActive ? "Close sound board" : "Sound board"}
+                  </div>
+                }
+                options={{ hoverTimeoutDuration: 350 }}
+              />
+            )}
+            {isUser && (
+              <FgButton
+                scrollingContainerRef={audioSectionRef}
+                externalRef={backgroundMusicButtonRef}
+                className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                clickFunction={() => {
+                  setBackgroundMusicActive((prev) => !prev);
+                }}
+                contentFunction={() => {
+                  return (
+                    <FgSVG
+                      src={
+                        backgroundMusicActive
+                          ? backgroundMusicOffIcon
+                          : backgroundMusicIcon
+                      }
+                      className='flex items-center justify-center'
+                      attributes={[
+                        { key: "width", value: "90%" },
+                        { key: "height", value: "90%" },
+                        { key: "fill", value: "white" },
+                        { key: "stroke", value: "white" },
+                      ]}
+                    />
+                  );
+                }}
+                hoverContent={
+                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                    {backgroundMusicActive
+                      ? "Close background music"
+                      : "Background music"}
+                  </div>
+                }
+                options={{ hoverTimeoutDuration: 350 }}
+              />
+            )}
             {Object.entries(audioEffectTemplates).map((effect) => {
               return (
                 <AudioEffectButton
@@ -377,6 +390,14 @@ export default function AudioEffectsSection({
       {audioMixEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>
           <AudioMixEffectsPortal
+            socket={socket}
+            table_id={table_id}
+            username={username}
+            instance={instance}
+            producerType={producerType}
+            producerId={producerId}
+            isUser={isUser}
+            permissions={permissions}
             audioMixEffectsButtonRef={audioMixEffectsButtonRef}
             closeCallback={() => {
               setAudioMixEffectsActive(false);

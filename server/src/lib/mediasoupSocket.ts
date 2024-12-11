@@ -108,6 +108,18 @@ const mediasoupSocket = async (io: SocketIOServer) => {
         case "responseCatchUpData":
           metadataController.onResponseCatchUpData(event);
           break;
+        case "clientMixEffectActivityChange":
+          effectsController.onClientMixEffectActivityChange(event);
+          break;
+        case "requestMixEffectActivityChange":
+          effectsController.onRequestMixEffectActivityChange(event);
+          break;
+        case "clientMixEffectValueChange":
+          effectsController.onClientMixEffectValueChange(event);
+          break;
+        case "requestMixEffectValueChange":
+          effectsController.onRequestMixEffectValueChange(event);
+          break;
         default:
           break;
       }

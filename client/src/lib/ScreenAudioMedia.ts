@@ -56,11 +56,9 @@ class ScreenAudioMedia {
       this.audioContext.createMediaStreamDestination();
 
     // Create a source node from the provided MediaStream
-    // this.audioSource = this.audioContext.createMediaStreamSource(
-    //   this.audioStream
-    // );
-    const audioContext = Tone.getContext().rawContext as AudioContext; // Get the underlying Web Audio context
-    this.audioSource = audioContext.createMediaStreamSource(audioStream); // Create source node
+    this.audioSource = this.audioContext.createMediaStreamSource(
+      this.audioStream
+    );
 
     // Connect the source to the master MediaStreamDestination
     this.audioSource.connect(this.masterMediaStreamDestination);

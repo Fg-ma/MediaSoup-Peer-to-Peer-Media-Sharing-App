@@ -153,6 +153,7 @@ export default function CaptionButton({
   audioStream,
   visualMediaContainerRef,
   browserStandardSpeechRecognitionAvailable,
+  scrollingContainerRef,
 }: {
   fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
@@ -161,6 +162,7 @@ export default function CaptionButton({
   audioStream: MediaStream;
   visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const [active, setActive] = useState(false);
 
@@ -258,6 +260,7 @@ export default function CaptionButton({
             </div>
           ) : undefined
         }
+        scrollingContainerRef={scrollingContainerRef}
         className='caption-button flex-col items-center justify-center scale-x-[-1] pointer-events-auto'
       />
       {active && (

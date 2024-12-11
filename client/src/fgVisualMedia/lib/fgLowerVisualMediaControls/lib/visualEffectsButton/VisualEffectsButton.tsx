@@ -10,10 +10,12 @@ export default function VisualEffectsButton({
   fgLowerVisualMediaController,
   visualEffectsActive,
   settingsActive,
+  scrollingContainerRef,
 }: {
   fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
   settingsActive: boolean;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
@@ -42,6 +44,7 @@ export default function VisualEffectsButton({
           </div>
         ) : undefined
       }
+      scrollingContainerRef={scrollingContainerRef}
       className='flex items-center justify-center w-10 min-w-10 aspect-square relative scale-x-[-1] pointer-events-auto'
     />
   );

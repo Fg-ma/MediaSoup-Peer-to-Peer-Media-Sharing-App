@@ -231,7 +231,12 @@ export default function FgSoundBoard({
       initHeight='645px'
       initWidth='605px'
       shadow={{ left: true, right: false, bottom: false, top: false }}
-      closeCallback={closeCallback}
+      closeCallback={() => {
+        fgSoundBoardController.closeSoundBoard();
+        if (closeCallback) {
+          closeCallback();
+        }
+      }}
       closePosition='topRight'
       focusCallback={(newFocus: boolean) => setFocus(newFocus)}
     />

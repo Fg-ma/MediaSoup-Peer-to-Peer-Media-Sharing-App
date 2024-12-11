@@ -20,6 +20,7 @@ export default function FgSettingsButton({
   settings,
   setSettings,
   browserStandardSpeechRecognitionAvailable,
+  scrollingContainerRef,
 }: {
   fgVisualMediaOptions: FgVisualMediaOptions;
   visualEffectsActive: boolean;
@@ -31,6 +32,7 @@ export default function FgSettingsButton({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -125,6 +127,7 @@ export default function FgSettingsButton({
             </div>
           ) : undefined
         }
+        scrollingContainerRef={scrollingContainerRef}
       />
       {settingsActive && (
         <SettingsPanel
