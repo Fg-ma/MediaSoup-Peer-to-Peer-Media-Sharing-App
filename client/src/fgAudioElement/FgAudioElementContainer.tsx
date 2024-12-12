@@ -1,15 +1,15 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
+import { Permissions } from "../context/permissionsContext/typeConstant";
+import { AudioEffectTypes } from "../context/streamEffectsContext/typeConstant";
 import FgAudioElement from "./FgAudioElement";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import PanButton from "../fgAdjustmentComponents/PanButton";
 import RotateButton from "../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
-import "./lib/audioElement.css";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
-import { Permissions } from "../context/permissionsContext/typeConstant";
+import "./lib/audioElement.css";
 
 const FgPortal = React.lazy(() => import("../fgElements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(

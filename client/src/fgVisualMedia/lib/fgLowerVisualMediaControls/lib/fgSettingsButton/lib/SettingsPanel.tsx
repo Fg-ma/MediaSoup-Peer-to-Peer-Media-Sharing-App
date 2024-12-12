@@ -88,7 +88,6 @@ export default function SettingsPanel({
   setActivePages,
   settings,
   setSettings,
-  browserStandardSpeechRecognitionAvailable,
 }: {
   fgVisualMediaOptions: FgVisualMediaOptions;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
@@ -97,7 +96,6 @@ export default function SettingsPanel({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
-  browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -261,9 +259,6 @@ export default function SettingsPanel({
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}
-                browserStandardSpeechRecognitionAvailable={
-                  browserStandardSpeechRecognitionAvailable
-                }
               />
             </motion.div>
           )}

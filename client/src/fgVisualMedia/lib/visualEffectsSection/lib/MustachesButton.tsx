@@ -1,11 +1,10 @@
 import React, { useRef, useState } from "react";
-import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
-import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { MustachesEffectTypes } from "../../../../context/effectsStylesContext/typeConstant";
+import { useStreamEffectsContext } from "../../../../context/streamEffectsContext/StreamEffectsContext";
 import {
+  MustachesEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/streamsContext/typeConstant";
+} from "../../../../context/streamEffectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
@@ -95,8 +94,12 @@ export default function MustachesButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
-  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
+  const {
+    userEffectsStyles,
+    remoteEffectsStyles,
+    userStreamEffects,
+    remoteStreamEffects,
+  } = useStreamEffectsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [_, setRerender] = useState(0);

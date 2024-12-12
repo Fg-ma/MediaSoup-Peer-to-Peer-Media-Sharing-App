@@ -1,14 +1,12 @@
 import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../context/streamsContext/typeConstant";
-import {
   UserEffectsStylesType,
   HideBackgroundEffectTypes,
   PostProcessEffects,
   RemoteEffectStylesType,
-} from "../../context/effectsStylesContext/typeConstant";
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../../context/streamEffectsContext/typeConstant";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";

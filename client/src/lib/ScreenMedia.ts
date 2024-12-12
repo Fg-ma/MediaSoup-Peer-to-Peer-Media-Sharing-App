@@ -1,13 +1,11 @@
 import {
   defaultScreenEffectsStyles,
   UserEffectsStylesType,
-} from "../context/effectsStylesContext/typeConstant";
-import {
   AudioEffectTypes,
   CameraEffectTypes,
   defaultScreenStreamEffects,
   ScreenEffectTypes,
-} from "../context/streamsContext/typeConstant";
+} from "../context/streamEffectsContext/typeConstant";
 import UserDevice from "./UserDevice";
 import BabylonScene, {
   EffectType,

@@ -3,18 +3,16 @@ import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import { useStreamsContext } from "./context/streamsContext/StreamsContext";
-import { useEffectsStylesContext } from "./context/effectsStylesContext/EffectsStylesContext";
+import { useStreamEffectsContext } from "./context/streamEffectsContext/StreamEffectsContext";
 import {
-  defaultAudioEffectsStyles,
-  defaultCameraEffectsStyles,
-  defaultScreenEffectsStyles,
-} from "./context/effectsStylesContext/typeConstant";
-import {
-  DataStreamTypes,
   defaultAudioStreamEffects,
   defaultCameraStreamEffects,
   defaultScreenStreamEffects,
-} from "./context/streamsContext/typeConstant";
+  defaultAudioEffectsStyles,
+  defaultCameraEffectsStyles,
+  defaultScreenEffectsStyles,
+} from "./context/streamEffectsContext/typeConstant";
+import { DataStreamTypes } from "./context/streamsContext/typeConstant";
 import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
@@ -181,15 +179,14 @@ type MediasoupSocketEvents =
     };
 
 export default function Main() {
+  const { userMedia, remoteTracksMap, remoteDataStreams, userDataStreams } =
+    useStreamsContext();
   const {
-    userMedia,
+    userEffectsStyles,
+    remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
-    remoteTracksMap,
-    remoteDataStreams,
-    userDataStreams,
-  } = useStreamsContext();
-  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
+  } = useStreamEffectsContext();
   const { permissions } = usePermissionsContext();
 
   const socket = useRef<Socket>(io(websocketURL));

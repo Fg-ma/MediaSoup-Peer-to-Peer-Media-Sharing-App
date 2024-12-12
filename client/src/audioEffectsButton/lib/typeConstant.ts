@@ -1,4 +1,5 @@
 import { SliderOptions } from "../../fgElements/fgSlider/FgSlider";
+import { AudioEffectTypes } from "../../context/streamEffectsContext/typeConstant";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
@@ -23,7 +24,6 @@ import phaserIcon from "../../../public/svgs/audioEffects/phaserIcon.svg";
 import pitchShiftIcon from "../../../public/svgs/audioEffects/pitchShiftIcon.svg";
 import reverbIcon from "../../../public/svgs/audioEffects/reverbIcon.svg";
 import stereoWidenerIcon from "../../../public/svgs/audioEffects/stereoWidenerIcon.svg";
-import { AudioEffectTypes } from "src/context/streamsContext/typeConstant";
 
 import robotIcon from "../../../public/svgs/audioEffects/robotIcon.svg";
 import robotOffIcon from "../../../public/svgs/audioEffects/robotOffIcon.svg";

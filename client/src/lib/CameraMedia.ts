@@ -2,13 +2,11 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   defaultCameraEffectsStyles,
   UserEffectsStylesType,
-} from "../context/effectsStylesContext/typeConstant";
-import {
   AudioEffectTypes,
   CameraEffectTypes,
   defaultCameraStreamEffects,
   ScreenEffectTypes,
-} from "../context/streamsContext/typeConstant";
+} from "../context/streamEffectsContext/typeConstant";
 import UserDevice from "./UserDevice";
 import BabylonScene, {
   EffectType,

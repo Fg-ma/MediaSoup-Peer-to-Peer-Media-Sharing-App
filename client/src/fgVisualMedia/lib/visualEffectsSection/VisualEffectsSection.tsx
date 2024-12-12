@@ -4,13 +4,11 @@ import { Transition, Variants, motion } from "framer-motion";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../context/streamsContext/typeConstant";
-import TintSection from "./lib/TintSection";
-import BlurButtton from "./lib/BlurButton";
-import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../../../context/effectsStylesContext/typeConstant";
+} from "../../../context/streamEffectsContext/typeConstant";
+import TintSection from "./lib/TintSection";
+import BlurButtton from "./lib/BlurButton";
 
 const BabylonPostProcessEffectsButton = React.lazy(
   () => import("./lib/BabylonPostProcessEffectsButton")

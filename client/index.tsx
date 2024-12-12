@@ -4,7 +4,7 @@ import Main from "./src/Main";
 import "./index.css";
 import { StreamsContextProvider } from "./src/context/streamsContext/StreamsContext";
 import { SignalContextProvider } from "./src/context/signalContext/SignalContext";
-import { EffectsStylesContextProvider } from "./src/context/effectsStylesContext/EffectsStylesContext";
+import { StreamEffectsContextProvider } from "./src/context/streamEffectsContext/StreamEffectsContext";
 import { PermissionsContextProvider } from "./src/context/permissionsContext/PermissionsContext";
 
 const container = document.getElementById("root");
@@ -15,13 +15,13 @@ root.render(<App />);
 function App() {
   return (
     <StreamsContextProvider>
-      <EffectsStylesContextProvider>
+      <StreamEffectsContextProvider>
         <SignalContextProvider>
           <PermissionsContextProvider>
             <Main />
           </PermissionsContextProvider>
         </SignalContextProvider>
-      </EffectsStylesContextProvider>
+      </StreamEffectsContextProvider>
     </StreamsContextProvider>
   );
 }

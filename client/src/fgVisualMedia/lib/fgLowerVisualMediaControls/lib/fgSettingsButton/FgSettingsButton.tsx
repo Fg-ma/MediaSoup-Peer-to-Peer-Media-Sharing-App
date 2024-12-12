@@ -19,7 +19,6 @@ export default function FgSettingsButton({
   setActivePages,
   settings,
   setSettings,
-  browserStandardSpeechRecognitionAvailable,
   scrollingContainerRef,
 }: {
   fgVisualMediaOptions: FgVisualMediaOptions;
@@ -31,7 +30,6 @@ export default function FgSettingsButton({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
-  browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
@@ -138,9 +136,6 @@ export default function FgSettingsButton({
           setActivePages={setActivePages}
           settings={settings}
           setSettings={setSettings}
-          browserStandardSpeechRecognitionAvailable={
-            browserStandardSpeechRecognitionAvailable
-          }
         />
       )}
     </>

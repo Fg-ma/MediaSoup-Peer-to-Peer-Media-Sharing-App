@@ -4,19 +4,19 @@ import { Socket } from "socket.io-client";
 import { UserMedia } from "tone";
 import { v4 as uuidv4 } from "uuid";
 import {
+  UserStreamEffectsType,
+  RemoteStreamEffectsType,
+  defaultAudioStreamEffects,
   defaultAudioEffectsStyles,
   RemoteEffectStylesType,
   UserEffectsStylesType,
-} from "../context/effectsStylesContext/typeConstant";
+} from "../context/streamEffectsContext/typeConstant";
 import {
   DataStreamTypes,
-  defaultAudioStreamEffects,
   RemoteDataStreamsType,
-  RemoteStreamEffectsType,
   RemoteTracksMapType,
   UserDataStreamsType,
   UserMediaType,
-  UserStreamEffectsType,
 } from "../context/streamsContext/typeConstant";
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";

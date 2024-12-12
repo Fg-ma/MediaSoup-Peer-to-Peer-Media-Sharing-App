@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
+import { useStreamEffectsContext } from "../../../../context/streamEffectsContext/StreamEffectsContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/streamsContext/typeConstant";
-import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
+} from "../../../../context/streamEffectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 
@@ -38,7 +38,7 @@ export default function TintSection({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
+  const { userStreamEffects, remoteStreamEffects } = useStreamEffectsContext();
 
   const [color, setColor] = useState("#F56114");
   const [_, setRerender] = useState(0);

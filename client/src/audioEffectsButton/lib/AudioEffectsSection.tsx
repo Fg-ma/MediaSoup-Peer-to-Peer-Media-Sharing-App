@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Socket } from "socket.io-client";
-import { AudioEffectTypes } from "../../context/streamsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { AudioEffectTypes } from "../../context/streamEffectsContext/typeConstant";
 import FgPanel from "../../fgElements/fgPanel/FgPanel";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import AudioEffectButton from "./AudioEffectButton";
 import { audioEffectTemplates } from "./typeConstant";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
-import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";

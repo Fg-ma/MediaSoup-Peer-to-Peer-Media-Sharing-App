@@ -10,8 +10,8 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   UserEffectsStylesType,
   HideBackgroundEffectTypes,
-} from "../context/effectsStylesContext/typeConstant";
-import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
+  CameraEffectTypes,
+} from "../context/streamEffectsContext/typeConstant";
 import UserDevice from "../lib/UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
 import BabylonMeshes from "./BabylonMeshes";

@@ -1,19 +1,17 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import { useEffectsStylesContext } from "../context/effectsStylesContext/EffectsStylesContext";
-import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../context/streamsContext/typeConstant";
-import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
-import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
-import FgVisualMediaController from "./lib/FgVisualMediaController";
+import { useStreamEffectsContext } from "../context/streamEffectsContext/StreamEffectsContext";
 import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../context/effectsStylesContext/typeConstant";
+  AudioEffectTypes,
+  CameraEffectTypes,
+  ScreenEffectTypes,
+} from "../context/streamEffectsContext/typeConstant";
+import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
+import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
+import FgVisualMediaController from "./lib/FgVisualMediaController";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import {
@@ -88,14 +86,13 @@ export default function RemoteVisualMedia({
     ...options,
   };
 
+  const { userMedia, userDataStreams, remoteDataStreams } = useStreamsContext();
   const {
-    userMedia,
+    userEffectsStyles,
+    remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
-    userDataStreams,
-    remoteDataStreams,
-  } = useStreamsContext();
-  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
+  } = useStreamEffectsContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -156,8 +153,8 @@ export default function RemoteVisualMedia({
     scale: { x: number; y: number };
     rotation: number;
   }>({
-    position: { left: 37.5, top: 37.5 },
-    scale: { x: 25, y: 25 },
+    position: { left: 32.5, top: 32.5 },
+    scale: { x: 35, y: 35 },
     rotation: 0,
   });
 
@@ -490,6 +487,7 @@ export default function RemoteVisualMedia({
           audioStream={audioStream}
           screenAudioStream={screenAudioStream}
           audioRef={audioRef}
+          subContainerRef={subContainerRef}
           currentTimeRef={currentTimeRef}
           tintColor={tintColor}
           visualEffectsActive={visualEffectsActive}

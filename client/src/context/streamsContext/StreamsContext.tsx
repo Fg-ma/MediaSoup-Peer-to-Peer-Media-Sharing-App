@@ -1,12 +1,9 @@
 import React, { createContext, useContext, useRef } from "react";
 import {
-  defaultAudioStreamEffects,
   RemoteDataStreamsType,
-  RemoteStreamEffectsType,
   RemoteTracksMapType,
   UserDataStreamsType,
   UserMediaType,
-  UserStreamEffectsType,
 } from "./typeConstant";
 
 export interface StreamsContextProviderProps {
@@ -15,8 +12,6 @@ export interface StreamsContextProviderProps {
 
 export interface StreamsContextType {
   userMedia: React.MutableRefObject<UserMediaType>;
-  userStreamEffects: React.MutableRefObject<UserStreamEffectsType>;
-  remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>;
   remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>;
   remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>;
   userDataStreams: React.MutableRefObject<UserDataStreamsType>;
@@ -43,13 +38,6 @@ export function StreamsContextProvider({
     screenAudio: {},
     audio: undefined,
   });
-  const userStreamEffects = useRef<UserStreamEffectsType>({
-    camera: {},
-    screen: {},
-    screenAudio: {},
-    audio: structuredClone(defaultAudioStreamEffects),
-  });
-  const remoteStreamEffects = useRef<RemoteStreamEffectsType>({});
   const remoteTracksMap = useRef<RemoteTracksMapType>({});
   const remoteDataStreams = useRef<RemoteDataStreamsType>({});
   const userDataStreams = useRef<UserDataStreamsType>({});
@@ -58,8 +46,6 @@ export function StreamsContextProvider({
     <StreamsContext.Provider
       value={{
         userMedia,
-        userStreamEffects,
-        remoteStreamEffects,
         remoteTracksMap,
         remoteDataStreams,
         userDataStreams,

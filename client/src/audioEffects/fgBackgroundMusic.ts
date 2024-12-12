@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { BackgroundMusicTypes } from "../context/effectsStylesContext/typeConstant";
+import { BackgroundMusicTypes } from "../context/streamEffectsContext/typeConstant";
 
 class FgBackgroundMusic {
   private volumeNode: Tone.Volume;

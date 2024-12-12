@@ -18,13 +18,15 @@ import {
   Material,
 } from "@babylonjs/core";
 import "@babylonjs/inspector";
-import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
+import {
+  CameraEffectTypes,
+  UserEffectsStylesType,
+} from "../context/streamEffectsContext/typeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import UserDevice from "../lib/UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
-import { UserEffectsStylesType } from "../context/effectsStylesContext/typeConstant";
 import FaceLandmarks from "./FaceLandmarks";
 import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";

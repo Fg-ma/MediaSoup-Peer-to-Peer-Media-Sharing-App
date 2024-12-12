@@ -6,8 +6,8 @@ import {
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-} from "../context/effectsStylesContext/typeConstant";
-import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
+  CameraEffectTypes,
+} from "../context/streamEffectsContext/typeConstant";
 import { LandmarkTypes } from "./FaceLandmarks";
 
 type DeadbandingTypes =

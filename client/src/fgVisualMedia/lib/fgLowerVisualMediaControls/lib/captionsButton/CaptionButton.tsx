@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { KaldiRecognizer, Model } from "vosk-browser";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgVideoCaptions from "./lib/FgVideoCaptions";
+import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 import { Settings } from "../../../typeConstant";
@@ -25,126 +25,6 @@ const voskModels: { [model: string]: string } = {
   "vi-VN": "vosk-model-small-vn-0.3.tar.gz",
 };
 
-export type browserLangs =
-  | "af-ZA"
-  | "am-ET"
-  | "ar-SA"
-  | "az-AZ"
-  | "bg-BG"
-  | "bn-BD"
-  | "bn-IN"
-  | "ca-ES"
-  | "cs-CZ"
-  | "da-DK"
-  | "de-DE"
-  | "el-GR"
-  | "en-AU"
-  | "en-CA"
-  | "en-GB"
-  | "en-IN"
-  | "en-NZ"
-  | "en-US"
-  | "es-AR"
-  | "es-BO"
-  | "es-CL"
-  | "es-CO"
-  | "es-CR"
-  | "es-DO"
-  | "es-EC"
-  | "es-ES"
-  | "es-GT"
-  | "es-HN"
-  | "es-MX"
-  | "es-NI"
-  | "es-PA"
-  | "es-PE"
-  | "es-PR"
-  | "es-PY"
-  | "es-SV"
-  | "es-US"
-  | "es-UY"
-  | "es-VE"
-  | "et-EE"
-  | "eu-ES"
-  | "fa-IR"
-  | "fi-FI"
-  | "fil-PH"
-  | "fr-BE"
-  | "fr-CA"
-  | "fr-CH"
-  | "fr-FR"
-  | "gl-ES"
-  | "gu-IN"
-  | "he-IL"
-  | "hi-IN"
-  | "hr-HR"
-  | "hu-HU"
-  | "hy-AM"
-  | "id-ID"
-  | "is-IS"
-  | "it-IT"
-  | "ja-JP"
-  | "jv-ID"
-  | "ka-GE"
-  | "kk-KZ"
-  | "km-KH"
-  | "kn-IN"
-  | "ko-KR"
-  | "lo-LA"
-  | "lt-LT"
-  | "lv-LV"
-  | "ml-IN"
-  | "mn-MN"
-  | "mr-IN"
-  | "ms-MY"
-  | "my-MM"
-  | "ne-NP"
-  | "nl-BE"
-  | "nl-NL"
-  | "no-NO"
-  | "pl-PL"
-  | "pt-BR"
-  | "pt-PT"
-  | "ro-RO"
-  | "ru-RU"
-  | "si-LK"
-  | "sk-SK"
-  | "sl-SI"
-  | "sq-AL"
-  | "sr-RS"
-  | "su-ID"
-  | "sv-SE"
-  | "sw-KE"
-  | "ta-IN"
-  | "ta-LK"
-  | "te-IN"
-  | "th-TH"
-  | "tr-TR"
-  | "uk-UA"
-  | "ur-IN"
-  | "ur-PK"
-  | "uz-UZ"
-  | "vi-VN"
-  | "zh-CN"
-  | "zh-HK"
-  | "zh-TW"
-  | "zu-ZA"
-  | "Farsi";
-
-export interface VoskResult {
-  event: string;
-  recognizerId: string;
-  result: {
-    result: {
-      conf: number;
-      start: number;
-      end: number;
-      word: string;
-    }[];
-    text: string;
-  };
-}
-
 export default function CaptionButton({
   fgLowerVisualMediaController,
   visualEffectsActive,
@@ -152,8 +32,8 @@ export default function CaptionButton({
   settings,
   audioStream,
   visualMediaContainerRef,
-  browserStandardSpeechRecognitionAvailable,
   scrollingContainerRef,
+  containerRef,
 }: {
   fgLowerVisualMediaController: FgLowerVisualMediaController;
   visualEffectsActive: boolean;
@@ -161,17 +41,12 @@ export default function CaptionButton({
   settings: Settings;
   audioStream: MediaStream;
   visualMediaContainerRef: React.RefObject<HTMLDivElement>;
-  browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement>;
 }) {
   const [active, setActive] = useState(false);
 
-  const [browserCaptions, setBrowserCaptions] = useState("");
-  const [voskCaptions, setVoskCaptions] = useState<VoskResult>();
-
-  const [browserLang, setBrowserLang] = useState<browserLangs>("en-US");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const browserRecognizer = useRef<any>();
+  const [voskCaptions, setVoskCaptions] = useState<string>("");
 
   const voskRecognizer = useRef<KaldiRecognizer>();
   const [loadedVoskModel, setLoadedVoskModel] = useState<{
@@ -183,34 +58,23 @@ export default function CaptionButton({
     loadedVoskModel,
     setLoadedVoskModel,
     voskRecognizer,
-    browserRecognizer,
-    browserLang,
-    setBrowserCaptions,
-    setVoskCaptions,
-    browserStandardSpeechRecognitionAvailable
+    setVoskCaptions
   );
 
   useEffect(() => {
-    if (audioStream && !browserStandardSpeechRecognitionAvailable.current) {
-      captionsController.voskProcessAudioStream(audioStream);
+    if (!audioStream || !voskRecognizer.current) {
+      return;
     }
-  }, [audioStream, voskRecognizer]);
+
+    captionsController.voskProcessAudioStream(audioStream);
+  }, [audioStream, voskRecognizer.current]);
 
   useEffect(() => {
-    if (browserStandardSpeechRecognitionAvailable.current) {
-      browserRecognizer.current.stop();
-
-      setBrowserLang(settings.closedCaption.value);
-      browserRecognizer.current.lang = settings.closedCaption.value;
-
-      if (active) {
-        browserRecognizer.current.start();
-      }
-    } else {
-      captionsController.loadVoskModel(
-        voskModels[settings.closedCaption.value]
-      );
+    if (!active) {
+      return;
     }
+
+    captionsController.loadVoskModel(voskModels[settings.closedCaption.value]);
   }, [settings.closedCaption.value]);
 
   return (
@@ -218,18 +82,9 @@ export default function CaptionButton({
       <FgButton
         clickFunction={() => {
           if (!active) {
-            if (browserStandardSpeechRecognitionAvailable.current) {
-              setBrowserLang(settings.closedCaption.value);
-              browserRecognizer.current.start();
-            } else {
-              captionsController.loadVoskModel(
-                voskModels[settings.closedCaption.value]
-              );
-            }
-          } else {
-            if (browserStandardSpeechRecognitionAvailable.current) {
-              browserRecognizer.current.stop();
-            }
+            captionsController.loadVoskModel(
+              voskModels[settings.closedCaption.value]
+            );
           }
 
           setActive((prev) => !prev);
@@ -264,13 +119,10 @@ export default function CaptionButton({
         className='caption-button flex-col items-center justify-center scale-x-[-1] pointer-events-auto'
       />
       {active && (
-        <FgVideoCaptions
+        <Captions
           visualMediaContainerRef={visualMediaContainerRef}
-          browserStandardSpeechRecognitionAvailable={
-            browserStandardSpeechRecognitionAvailable
-          }
           voskCaptions={voskCaptions}
-          browserCaptions={browserCaptions}
+          containerRef={containerRef}
         />
       )}
     </>

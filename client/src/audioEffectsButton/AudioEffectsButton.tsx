@@ -1,9 +1,9 @@
 import React, { Suspense, useRef } from "react";
 import { Socket } from "socket.io-client";
-import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
+import { AudioEffectTypes } from "../context/streamEffectsContext/typeConstant";
+import { Permissions } from "../context/permissionsContext/typeConstant";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
-import { Permissions } from "../context/permissionsContext/typeConstant";
 
 import audioEffectIcon from "../../public/svgs/audioEffects/audioEffectIcon.svg";
 import audioEffectOffIcon from "../../public/svgs/audioEffects/audioEffectOffIcon.svg";

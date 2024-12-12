@@ -1,13 +1,13 @@
 import { Socket } from "socket.io-client";
-import CameraMedia from "./CameraMedia";
-import ScreenMedia from "./ScreenMedia";
-import AudioMedia from "./AudioMedia";
 import {
+  UserEffectsStylesType,
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../context/streamsContext/typeConstant";
-import { UserEffectsStylesType } from "../context/effectsStylesContext/typeConstant";
+} from "../context/streamEffectsContext/typeConstant";
+import CameraMedia from "./CameraMedia";
+import ScreenMedia from "./ScreenMedia";
+import AudioMedia from "./AudioMedia";
 
 class Metadata {
   constructor(

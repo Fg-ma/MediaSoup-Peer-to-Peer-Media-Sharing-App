@@ -1,46 +1,15 @@
 import { createModel, KaldiRecognizer, Model } from "vosk-browser";
-import { browserLangs, VoskResult } from "../CaptionButton";
 import { RecognizerMessage } from "vosk-browser/dist/interfaces";
 
 class CaptionsController {
-  private loadedVoskModel?: {
-    model: Model;
-    path: string;
-  };
-  private setLoadedVoskModel: React.Dispatch<
-    React.SetStateAction<
-      | {
-          model: Model;
-          path: string;
-        }
-      | undefined
-    >
-  >;
-
-  private voskRecognizer: React.MutableRefObject<KaldiRecognizer | undefined>;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private SpeechRecognition: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private browserRecognizer: React.MutableRefObject<any>;
-
-  private browserLang: browserLangs;
-
-  private setBrowserCaptions: React.Dispatch<React.SetStateAction<string>>;
-  private setVoskCaptions: React.Dispatch<
-    React.SetStateAction<VoskResult | undefined>
-  >;
-
-  private browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
-
   constructor(
-    loadedVoskModel:
+    private loadedVoskModel:
       | {
           model: Model;
           path: string;
         }
       | undefined,
-    setLoadedVoskModel: React.Dispatch<
+    private setLoadedVoskModel: React.Dispatch<
       React.SetStateAction<
         | {
             model: Model;
@@ -50,60 +19,10 @@ class CaptionsController {
       >
     >,
 
-    voskRecognizer: React.MutableRefObject<KaldiRecognizer | undefined>,
+    private voskRecognizer: React.MutableRefObject<KaldiRecognizer | undefined>,
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    browserRecognizer: React.MutableRefObject<any>,
-
-    browserLang: browserLangs,
-
-    setBrowserCaptions: React.Dispatch<React.SetStateAction<string>>,
-    setVoskCaptions: React.Dispatch<
-      React.SetStateAction<VoskResult | undefined>
-    >,
-
-    browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>
-  ) {
-    this.loadedVoskModel = loadedVoskModel;
-    this.setLoadedVoskModel = setLoadedVoskModel;
-    this.voskRecognizer = voskRecognizer;
-    this.browserRecognizer = browserRecognizer;
-    this.browserLang = browserLang;
-    this.setBrowserCaptions = setBrowserCaptions;
-    this.setVoskCaptions = setVoskCaptions;
-    this.browserStandardSpeechRecognitionAvailable =
-      browserStandardSpeechRecognitionAvailable;
-
-    this.SpeechRecognition =
-      // @ts-expect-error: window has bad typing these exist
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (this.SpeechRecognition) {
-      const newBrowserRecognizer = new this.SpeechRecognition();
-      newBrowserRecognizer.continuous = true; // Keep listening until stopped
-      newBrowserRecognizer.interimResults = true; // Provide partial results
-
-      newBrowserRecognizer.lang = this.browserLang;
-
-      newBrowserRecognizer.onresult = (event: {
-        results: [{ transcript: string }[]];
-        resultIndex: number;
-      }) => {
-        let newBrowserCaptions = "";
-
-        // Iterate through results
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i];
-          newBrowserCaptions += result[0].transcript;
-        }
-        this.setBrowserCaptions(newBrowserCaptions);
-      };
-
-      this.browserRecognizer.current = newBrowserRecognizer;
-    } else {
-      this.browserStandardSpeechRecognitionAvailable.current = false;
-    }
-  }
+    private setVoskCaptions: React.Dispatch<React.SetStateAction<string>>
+  ) {}
 
   // Function to load vosk model
   loadVoskModel = async (path: string) => {
@@ -117,19 +36,20 @@ class CaptionsController {
 
     try {
       const model = await createModel(`/speechToTextModels/${path}`);
-      this.setLoadedVoskModel({ model, path });
 
       // Create recognizer
       const recognizer = new model.KaldiRecognizer(48000);
       recognizer.setWords(true);
 
-      // Add event listener for "result"
-      recognizer.on("result", (message: RecognizerMessage) => {
-        const result = message as VoskResult;
-        this.setVoskCaptions(result);
+      recognizer.on("partialresult", (message: RecognizerMessage) => {
+        const results = message as { result: { partial: string } };
+        if (results.result.partial !== "") {
+          this.setVoskCaptions(results.result.partial);
+        }
       });
 
       this.voskRecognizer.current = recognizer;
+      this.setLoadedVoskModel({ model, path });
     } catch (error) {
       console.error("Error loading model:", error);
     }

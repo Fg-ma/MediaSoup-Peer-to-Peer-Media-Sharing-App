@@ -5,7 +5,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../context/streamsContext/typeConstant";
+} from "../../../context/streamEffectsContext/typeConstant";
 import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
 import {
   defaultFgVisualMediaOptions,
@@ -120,6 +120,7 @@ export default function FgLowerVisualMediaControls({
   audioStream,
   screenAudioStream,
   audioRef,
+  subContainerRef,
   currentTimeRef,
   tintColor,
   visualEffectsActive,
@@ -148,6 +149,7 @@ export default function FgLowerVisualMediaControls({
   audioStream?: MediaStream;
   screenAudioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
+  subContainerRef: React.RefObject<HTMLDivElement>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
   tintColor: React.MutableRefObject<string>;
   visualEffectsActive: boolean;
@@ -189,7 +191,6 @@ export default function FgLowerVisualMediaControls({
   });
   const [_, setRerender] = useState(false);
   const rightVisualMediaControlsRef = useRef<HTMLDivElement>(null);
-  const browserStandardSpeechRecognitionAvailable = useRef(true);
 
   const handleMessage = (event: { type: "localMuteChange" }) => {
     if (event.type === "localMuteChange") {
@@ -351,10 +352,8 @@ export default function FgLowerVisualMediaControls({
                   settings={settings}
                   audioStream={audioStream}
                   visualMediaContainerRef={visualMediaContainerRef}
-                  browserStandardSpeechRecognitionAvailable={
-                    browserStandardSpeechRecognitionAvailable
-                  }
                   scrollingContainerRef={rightVisualMediaControlsRef}
+                  containerRef={subContainerRef}
                 />
               </Suspense>
             )}
@@ -370,9 +369,6 @@ export default function FgLowerVisualMediaControls({
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}
-                browserStandardSpeechRecognitionAvailable={
-                  browserStandardSpeechRecognitionAvailable
-                }
                 scrollingContainerRef={rightVisualMediaControlsRef}
               />
             </Suspense>

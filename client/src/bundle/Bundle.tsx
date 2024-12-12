@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import { useEffectsStylesContext } from "../context/effectsStylesContext/EffectsStylesContext";
+import { useStreamEffectsContext } from "../context/streamEffectsContext/StreamEffectsContext";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
 import BundleController from "./lib/BundleController";
 import { useSignalContext } from "../context/signalContext/SignalContext";
@@ -55,9 +55,9 @@ export default function Bundle({
     ...options,
   };
 
-  const { userMedia, remoteTracksMap, remoteStreamEffects } =
-    useStreamsContext();
-  const { remoteEffectsStyles } = useEffectsStylesContext();
+  const { userMedia, remoteTracksMap } = useStreamsContext();
+  const { remoteEffectsStyles, remoteStreamEffects } =
+    useStreamEffectsContext();
   const { signal } = useSignalContext();
 
   const [cameraStreams, setCameraStreams] = useState<

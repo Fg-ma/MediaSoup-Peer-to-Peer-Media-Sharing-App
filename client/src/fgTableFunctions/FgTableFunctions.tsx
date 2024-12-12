@@ -3,13 +3,13 @@ import * as mediasoup from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
+import { AudioEffectTypes } from "../context/streamEffectsContext/typeConstant";
 import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
-import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import ScreenSection from "./lib/screenSection/ScreenSection";
 import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
-import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
 import onRouterCapabilities from "../lib/onRouterCapabilities";
 
 const AudioEffectsButton = React.lazy(

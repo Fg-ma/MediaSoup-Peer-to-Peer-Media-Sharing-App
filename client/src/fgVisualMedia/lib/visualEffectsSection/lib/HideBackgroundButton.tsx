@@ -1,14 +1,12 @@
 import React, { useRef, useState, Suspense } from "react";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
+import { useStreamEffectsContext } from "../../../../context/streamEffectsContext/StreamEffectsContext";
 import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../../../../context/effectsStylesContext/typeConstant";
-import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/streamsContext/typeConstant";
+} from "../../../../context/streamEffectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
@@ -124,9 +122,13 @@ export default function HideBackgroundButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia, userStreamEffects, remoteStreamEffects } =
-    useStreamsContext();
-  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
+  const { userMedia } = useStreamsContext();
+  const {
+    userEffectsStyles,
+    remoteEffectsStyles,
+    userStreamEffects,
+    remoteStreamEffects,
+  } = useStreamEffectsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [color, setColor] = useState("#F56114");

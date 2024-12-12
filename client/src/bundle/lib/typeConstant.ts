@@ -1,10 +1,10 @@
-import { UserEffectsStylesType } from "../../context/effectsStylesContext/typeConstant";
 import {
+  UserEffectsStylesType,
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
   UserStreamEffectsType,
-} from "../../context/streamsContext/typeConstant";
+} from "../../context/streamEffectsContext/typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 export interface BundleOptions {

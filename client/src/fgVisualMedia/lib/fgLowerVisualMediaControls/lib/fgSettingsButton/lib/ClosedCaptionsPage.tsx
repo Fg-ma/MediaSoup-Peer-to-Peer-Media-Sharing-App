@@ -123,12 +123,10 @@ export default function ClosedCaptionsPage({
   setActivePages,
   settings,
   setSettings,
-  browserStandardSpeechRecognitionAvailable,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
-  browserStandardSpeechRecognitionAvailable: React.MutableRefObject<boolean>;
 }) {
   const [moreActive, setMoreActive] = useState(false);
 
@@ -248,7 +246,6 @@ export default function ClosedCaptionsPage({
           </div>
         ))}
         {moreActive &&
-          browserStandardSpeechRecognitionAvailable.current &&
           Object.entries(expandedClosedCaptionsBrowserSelections).map(
             ([key, lang]) => (
               <div
@@ -296,7 +293,6 @@ export default function ClosedCaptionsPage({
             )
           )}
         {moreActive &&
-          !browserStandardSpeechRecognitionAvailable.current &&
           Object.entries(expandedClosedCaptionsVoskSelections).map(
             ([key, lang]) => (
               <div

@@ -1,8 +1,9 @@
 import React from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import closeIcon from "../../../../../../public/svgs/closeIcon.svg";
 import FgLowerVisualMediaController from "../../../fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
+
+import closeIcon from "../../../../../../public/svgs/closeIcon.svg";
 
 export default function CloseButton({
   fgLowerVisualMediaController,
