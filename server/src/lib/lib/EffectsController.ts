@@ -87,6 +87,7 @@ class EffectsController {
       effect: event.effect,
       option: event.option,
       value: event.value,
+      styleValue: event.styleValue,
     };
 
     this.io.to(`table_${event.table_id}`).emit("message", msg);
@@ -102,6 +103,7 @@ class EffectsController {
       effect: event.effect,
       option: event.option,
       value: event.value,
+      styleValue: event.styleValue,
     };
 
     this.io

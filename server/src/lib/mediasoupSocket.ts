@@ -120,6 +120,9 @@ const mediasoupSocket = async (io: SocketIOServer) => {
         case "requestMixEffectValueChange":
           effectsController.onRequestMixEffectValueChange(event);
           break;
+        case "requestRemoveProducer":
+          producersController.onRequestRemoveProducer(event);
+          break;
         default:
           break;
       }

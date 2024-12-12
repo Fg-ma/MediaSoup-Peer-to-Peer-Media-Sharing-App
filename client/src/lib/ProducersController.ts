@@ -4,9 +4,10 @@ import { Socket } from "socket.io-client";
 import { UserMedia } from "tone";
 import { v4 as uuidv4 } from "uuid";
 import {
-  defaultAudioCurrentEffectsStyles,
-  EffectStylesType,
-} from "../context/currentEffectsStylesContext/typeConstant";
+  defaultAudioEffectsStyles,
+  RemoteEffectStylesType,
+  UserEffectsStylesType,
+} from "../context/effectsStylesContext/typeConstant";
 import {
   DataStreamTypes,
   defaultAudioStreamEffects,
@@ -24,6 +25,7 @@ import UserDevice from "./UserDevice";
 import BrowserMedia from "./BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import ScreenAudioMedia from "./ScreenAudioMedia";
+import { Permissions } from "../context/permissionsContext/typeConstant";
 
 class ProducersController {
   constructor(
@@ -34,13 +36,11 @@ class ProducersController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
+    private permissions: React.MutableRefObject<Permissions>,
+
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-    private remoteCurrentEffectsStyles: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: EffectStylesType;
-      };
-    }>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
     private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
@@ -81,7 +81,7 @@ class ProducersController {
       this.table_id.current,
       cameraId,
       cameraBrowserMedia,
-      this.currentEffectsStyles,
+      this.userEffectsStyles,
       this.userStreamEffects,
       this.userDevice,
       this.deadbanding,
@@ -116,7 +116,7 @@ class ProducersController {
       this.table_id.current,
       screenId,
       screenBrowserMedia,
-      this.currentEffectsStyles,
+      this.userEffectsStyles,
       this.userStreamEffects,
       this.userDevice,
       this.userMedia
@@ -570,10 +570,10 @@ class ProducersController {
         }
 
         // Delete old effects styles
-        if (this.currentEffectsStyles.current?.[event.producerType]) {
+        if (this.userEffectsStyles.current?.[event.producerType]) {
           if (event.producerType === "audio") {
-            this.currentEffectsStyles.current.audio = structuredClone(
-              defaultAudioCurrentEffectsStyles
+            this.userEffectsStyles.current.audio = structuredClone(
+              defaultAudioEffectsStyles
             );
           } else if (
             event.producerType === "camera" ||
@@ -583,9 +583,9 @@ class ProducersController {
             if (
               event.producerId &&
               event.producerId in
-                this.currentEffectsStyles.current[event.producerType]
+                this.userEffectsStyles.current[event.producerType]
             ) {
-              delete this.currentEffectsStyles.current[event.producerType][
+              delete this.userEffectsStyles.current[event.producerType][
                 event.producerId
               ];
             }
@@ -813,16 +813,14 @@ class ProducersController {
 
         // Delete old effects styles
         if (
-          this.remoteCurrentEffectsStyles.current?.[event.producerUsername]?.[
+          this.remoteEffectsStyles.current?.[event.producerUsername]?.[
             event.producerInstance
           ]?.[event.producerType]
         ) {
           if (event.producerType === "audio") {
-            this.remoteCurrentEffectsStyles.current[event.producerUsername][
+            this.remoteEffectsStyles.current[event.producerUsername][
               event.producerInstance
-            ][event.producerType] = structuredClone(
-              defaultAudioCurrentEffectsStyles
-            );
+            ][event.producerType] = structuredClone(defaultAudioEffectsStyles);
           } else if (
             event.producerType === "camera" ||
             event.producerType === "screen" ||
@@ -831,13 +829,13 @@ class ProducersController {
             if (
               event.producerId &&
               event.producerId in
-                this.remoteCurrentEffectsStyles.current[event.producerUsername][
+                this.remoteEffectsStyles.current[event.producerUsername][
                   event.producerInstance
                 ][event.producerType]
             ) {
-              delete this.remoteCurrentEffectsStyles.current[
-                event.producerUsername
-              ][event.producerInstance][event.producerType][event.producerId];
+              delete this.remoteEffectsStyles.current[event.producerUsername][
+                event.producerInstance
+              ][event.producerType][event.producerId];
             }
           }
         }
@@ -867,6 +865,24 @@ class ProducersController {
           return newBundles;
         });
       }
+    }
+  };
+
+  onRemoveProducerRequested = (event: {
+    type: "removeProducerRequested";
+    producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
+    producerId: string;
+  }) => {
+    if (this.permissions.current.acceptsCloseMedia) {
+      const msg = {
+        type: "removeProducer",
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+        producerType: event.producerType,
+        producerId: event.producerId,
+      };
+      this.socket.current.emit("message", msg);
     }
   };
 }

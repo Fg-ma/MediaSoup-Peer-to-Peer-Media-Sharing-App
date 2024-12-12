@@ -43,6 +43,8 @@ export default function AudioEffectsSection({
   padding,
   handleMute,
   muteStateRef,
+  localMute,
+  clientMute,
   visualMediaContainerRef,
   closeLabelElement,
   closeCallback,
@@ -66,7 +68,9 @@ export default function AudioEffectsSection({
   referenceElement: React.RefObject<HTMLElement>;
   padding: number;
   handleMute: () => void;
-  muteStateRef: React.MutableRefObject<boolean>;
+  muteStateRef?: React.MutableRefObject<boolean>;
+  localMute?: React.MutableRefObject<boolean>;
+  clientMute?: React.MutableRefObject<boolean>;
   visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
   closeCallback?: () => void;
@@ -75,12 +79,29 @@ export default function AudioEffectsSection({
 }) {
   const [_, setRerender] = useState(false);
   const [cols, setCols] = useState(3);
+  // No one in there right mind will ever be able to read this again and I'm ok with that
   const [volumeState, setVolumeState] = useState<{
     from: "off" | "low" | "high" | "";
     to: "off" | "low" | "high";
   }>({
     from: "",
-    to: muteStateRef.current ? "off" : "high",
+    to: muteStateRef
+      ? muteStateRef.current
+        ? "off"
+        : "high"
+      : clientMute
+      ? clientMute.current
+        ? "off"
+        : localMute
+        ? localMute.current
+          ? "off"
+          : "high"
+        : "high"
+      : localMute
+      ? localMute.current
+        ? "off"
+        : "high"
+      : "high",
   });
   const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
   const [panioActive, setPanioActive] = useState(false);
@@ -94,12 +115,28 @@ export default function AudioEffectsSection({
   const backgroundMusicButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const newTo = muteStateRef.current ? "off" : "high";
+    const newTo = muteStateRef
+      ? muteStateRef.current
+        ? "off"
+        : "high"
+      : clientMute
+      ? clientMute.current
+        ? "off"
+        : localMute
+        ? localMute.current
+          ? "off"
+          : "high"
+        : "high"
+      : localMute
+      ? localMute.current
+        ? "off"
+        : "high"
+      : "high";
 
     if (newTo !== volumeState.to) {
       setVolumeState((prev) => ({ from: prev.to, to: newTo }));
     }
-  }, [muteStateRef.current]);
+  }, [muteStateRef?.current, clientMute?.current, localMute?.current]);
 
   const gridColumnsChange = () => {
     if (!audioSectionRef.current) return;
@@ -117,13 +154,20 @@ export default function AudioEffectsSection({
   };
 
   const handleMessage = (event: {
-    type: "effectChangeRequested" | "clientEffectChanged";
+    type:
+      | "effectChangeRequested"
+      | "clientEffectChanged"
+      | "localMuteChange"
+      | "clientMuteChange";
   }) => {
     switch (event.type) {
       case "effectChangeRequested":
         setRerender((prev) => !prev);
         break;
       case "clientEffectChanged":
+        setRerender((prev) => !prev);
+        break;
+      case "clientMuteChange":
         setRerender((prev) => !prev);
         break;
       default:
@@ -174,11 +218,8 @@ export default function AudioEffectsSection({
               scrollingContainerRef={audioSectionRef}
               className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
-                setVolumeState((prev) => ({
-                  from: prev.to,
-                  to: muteStateRef.current ? "high" : "off",
-                }));
                 handleMute();
+                setRerender((prev) => !prev);
               }}
               contentFunction={() => (
                 <svg
@@ -204,7 +245,23 @@ export default function AudioEffectsSection({
               )}
               hoverContent={
                 <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {muteStateRef.current ? "Unmute" : "Mute"}
+                  {muteStateRef
+                    ? muteStateRef.current
+                      ? "Unmute"
+                      : "Mute"
+                    : clientMute
+                    ? clientMute.current
+                      ? "Unmute"
+                      : localMute
+                      ? localMute.current
+                        ? "Unmute"
+                        : "Mute"
+                      : "Mute"
+                    : localMute
+                    ? localMute.current
+                      ? "Unmute"
+                      : "Mute"
+                    : "Mute"}
                 </div>
               }
               options={{ hoverTimeoutDuration: 350 }}

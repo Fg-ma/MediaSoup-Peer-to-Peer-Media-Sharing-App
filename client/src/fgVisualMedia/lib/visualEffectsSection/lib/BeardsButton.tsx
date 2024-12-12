@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { useCurrentEffectsStylesContext } from "../../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { BeardsEffectTypes } from "../../../../context/currentEffectsStylesContext/typeConstant";
+import { BeardsEffectTypes } from "../../../../context/effectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -55,8 +55,7 @@ export default function BeardsButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -68,10 +67,9 @@ export default function BeardsButton({
     : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .beards;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][visualMediaId].beards
-    : remoteCurrentEffectsStyles.current[username][instance][type][
-        visualMediaId
-      ].beards;
+    ? userEffectsStyles.current[type][visualMediaId].beards
+    : remoteEffectsStyles.current[username][instance][type][visualMediaId]
+        .beards;
 
   const beardsEffects: {
     [key in BeardsEffectTypes]: {
@@ -135,17 +133,16 @@ export default function BeardsButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][visualMediaId].beards) {
-          currentEffectsStyles.current[type][visualMediaId].beards.style =
+        if (userEffectsStyles.current[type][visualMediaId].beards) {
+          userEffectsStyles.current[type][visualMediaId].beards.style =
             effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].beards
+          remoteEffectsStyles.current[username][instance][type][visualMediaId]
+            .beards
         ) {
-          remoteCurrentEffectsStyles.current[username][instance][type][
+          remoteEffectsStyles.current[username][instance][type][
             visualMediaId
           ].beards.style = effectType;
         }

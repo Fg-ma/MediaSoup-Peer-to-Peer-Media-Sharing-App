@@ -4,10 +4,11 @@ import {
   ScreenEffectTypes,
 } from "../../context/streamsContext/typeConstant";
 import {
-  EffectStylesType,
+  UserEffectsStylesType,
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../../context/currentEffectsStylesContext/typeConstant";
+  RemoteEffectStylesType,
+} from "../../context/effectsStylesContext/typeConstant";
 import CameraMedia from "../../lib/CameraMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
@@ -130,12 +131,8 @@ class FgVisualMediaController {
         };
       };
     }>,
-    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
-    private remoteCurrentEffectsStyles: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: EffectStylesType;
-      };
-    }>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private remoteDataStreams: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
@@ -210,7 +207,7 @@ class FgVisualMediaController {
       this.visualMediaId === event.requestedProducerId
     ) {
       // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
-      this.currentEffectsStyles.current[this.type][this.visualMediaId][
+      this.userEffectsStyles.current[this.type][this.visualMediaId][
         event.effect
       ] = event.data.style;
 
@@ -286,46 +283,13 @@ class FgVisualMediaController {
 
       if (event.effectStyle) {
         // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
-        this.remoteCurrentEffectsStyles.current[event.username][event.instance][
+        this.remoteEffectsStyles.current[event.username][event.instance][
           this.type
         ][event.producerId][event.effect] = event.effectStyle;
       }
 
       if (event.effect === "pause") {
         this.setPausedState((prev) => !prev);
-      }
-    } else if (
-      !this.fgVisualMediaOptions.isUser &&
-      event.username === this.username &&
-      event.instance === this.instance &&
-      event.producerType === "audio"
-    ) {
-      if (!event.blockStateChange) {
-        // @ts-expect-error: ts can't verify username, instance, and effect correlate
-        this.remoteStreamEffects.current[event.username][event.instance][
-          event.producerType
-        ][event.effect] =
-          // @ts-expect-error: ts can't verify username, instance, and effect correlate
-          !this.remoteStreamEffects.current[event.username][event.instance][
-            event.producerType
-          ][event.effect];
-      }
-    } else if (
-      !this.fgVisualMediaOptions.isUser &&
-      event.username === this.username &&
-      event.instance === this.instance &&
-      event.producerType === "screenAudio" &&
-      event.producerId === `${this.visualMediaId}_audio`
-    ) {
-      if (!event.blockStateChange) {
-        // @ts-expect-error: ts can't verify username, instance, event.producerId, and effect correlate
-        this.remoteStreamEffects.current[event.username][event.instance][
-          event.producerType
-        ][event.producerId][event.effect] =
-          // @ts-expect-error: ts can't verify username, instance, event.producerId, and effect correlate
-          !this.remoteStreamEffects.current[event.username][event.instance][
-            event.producerType
-          ][event.producerId][event.effect];
       }
     }
   };

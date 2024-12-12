@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../context/effectsStylesContext/EffectsStylesContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -13,7 +13,7 @@ import FgVisualMediaController from "./lib/FgVisualMediaController";
 import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../context/currentEffectsStylesContext/typeConstant";
+} from "../context/effectsStylesContext/typeConstant";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import {
@@ -95,8 +95,7 @@ export default function RemoteVisualMedia({
     userDataStreams,
     remoteDataStreams,
   } = useStreamsContext();
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -188,7 +187,7 @@ export default function RemoteVisualMedia({
           effect: effect,
           effectStyle:
             // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
-            currentEffectsStyles.current[type][visualMediaId][effect],
+            userEffectsStyles.current[type][visualMediaId][effect],
           blockStateChange: blockStateChange,
         };
         socket?.current.emit("message", msg);
@@ -211,7 +210,7 @@ export default function RemoteVisualMedia({
         data: {
           style:
             // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
-            remoteCurrentEffectsStyles.current[username][instance][type][
+            remoteEffectsStyles.current[username][instance][type][
               visualMediaId
             ][effect],
           hideBackgroundStyle: hideBackgroundStyle,
@@ -278,8 +277,8 @@ export default function RemoteVisualMedia({
     paused,
     userMedia,
     remoteStreamEffects,
-    currentEffectsStyles,
-    remoteCurrentEffectsStyles,
+    userEffectsStyles,
+    remoteEffectsStyles,
     remoteDataStreams,
     videoRef,
     visualMediaContainerRef,

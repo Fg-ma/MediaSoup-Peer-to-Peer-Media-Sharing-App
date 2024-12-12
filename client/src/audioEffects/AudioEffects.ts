@@ -126,7 +126,6 @@ class AudioEffects {
       this.audioStreamMediaStreamDestination !== undefined &&
       this.audioStreamChain !== undefined
     ) {
-      console.log("waiosdjasd");
       this.fgAudioStreamEffects = new FgAudioStreamEffects(
         this.audioStream,
         this.audioStreamMediaStreamDestination,

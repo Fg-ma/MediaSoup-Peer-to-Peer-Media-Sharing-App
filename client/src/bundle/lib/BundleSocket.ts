@@ -1,10 +1,11 @@
 import {
   AudioEffectTypes,
+  defaultAudioStreamEffects,
   RemoteStreamEffectsType,
   RemoteTracksMapType,
   UserMediaType,
 } from "../../context/streamsContext/typeConstant";
-import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
+import { RemoteEffectStylesType } from "../../context/effectsStylesContext/typeConstant";
 import {
   onBundleMetadataResponsedType,
   onClientEffectChangedType,
@@ -51,11 +52,7 @@ class BundleSocket {
     >,
     private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
     private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
-    private remoteCurrentEffectsStyles: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: EffectStylesType;
-      };
-    }>,
+    private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private audioRef: React.RefObject<HTMLAudioElement>,
     private clientMute: React.MutableRefObject<boolean>,
@@ -262,16 +259,17 @@ class BundleSocket {
       event.inquiredInstance
     ] = event.data.streamEffects;
 
-    this.remoteCurrentEffectsStyles.current[event.inquiredUsername][
+    this.remoteEffectsStyles.current[event.inquiredUsername][
       event.inquiredInstance
-    ] = event.data.currentEffectsStyles;
+    ] = event.data.userEffectsStyles;
   };
 
   onEffectChangeRequested = (event: onEffectChangeRequestedType) => {
     if (
-      this.permissions.acceptsAudioEffects &&
-      (event.requestedProducerType === "audio" ||
-        event.requestedProducerType === "screenAudio")
+      (event.requestedProducerType === "audio" &&
+        this.permissions.acceptsAudioEffects) ||
+      (event.requestedProducerType === "screenAudio" &&
+        this.permissions.acceptsScreenAudioEffects)
     ) {
       this.handleAudioEffectChange(
         event.requestedProducerType,
@@ -293,8 +291,7 @@ class BundleSocket {
         // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
         this.remoteStreamEffects.current[event.username][event.instance].audio[
           event.effect
-        ] =
-          // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
+        ] = // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
           !this.remoteStreamEffects.current[event.username][event.instance]
             .audio[event.effect];
       }
@@ -306,13 +303,15 @@ class BundleSocket {
       event.producerId
     ) {
       if (!event.blockStateChange) {
-        // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
         this.remoteStreamEffects.current[event.username][
           event.instance
-        ].screenAudio[event.producerId][event.effect] =
-          // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
-          !this.remoteStreamEffects.current[event.username][event.instance]
-            .screenAudio[event.producerId][event.effect];
+        ].screenAudio[event.producerId] = {
+          ...defaultAudioStreamEffects,
+          [event.effect]:
+            // @ts-expect-error: event.effect and event.producerType have no strict correlation enforcement
+            !this.remoteStreamEffects.current[event.username][event.instance]
+              .screenAudio[event.producerId][event.effect],
+        };
       }
     }
   };

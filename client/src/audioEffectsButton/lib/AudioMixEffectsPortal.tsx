@@ -40,6 +40,7 @@ type MixEffectsSocketEvents =
       effect: AudioMixEffectsType;
       option: MixEffectsOptionsType;
       value: number;
+      styleValue: number;
     }
   | {
       type: "mixEffectValueChangeRequested";
@@ -48,6 +49,7 @@ type MixEffectsSocketEvents =
       effect: AudioMixEffectsType;
       option: MixEffectsOptionsType;
       value: number;
+      styleValue: number;
     };
 
 export default function AudioMixEffectsPortal({
@@ -297,6 +299,192 @@ export default function AudioMixEffectsPortal({
     },
   });
   const portalRef = useRef<HTMLDivElement>(null);
+  const [sliderValues, setSliderValues] = useState<{
+    [mixEffect in AudioMixEffectsType]: {
+      [option in MixEffectsOptionsType]?: number;
+    };
+  }>({
+    autoFilter: {
+      frequency: 0,
+      baseFrequency: 0,
+      octaves: 0,
+    },
+    autoPanner: {
+      frequency: 0,
+    },
+    autoWah: {
+      baseFrequency: 0,
+      octaves: 0,
+      sensitivity: 0,
+    },
+    bitCrusher: {
+      bits: 0,
+    },
+    chebyshev: {
+      order: 0,
+    },
+    chorus: {
+      frequency: 0,
+      delayTime: 0,
+      depth: 0,
+    },
+    freeverb: {
+      roomSize: 0,
+      dampening: 0,
+    },
+    JCReverb: {
+      roomSize: 0,
+    },
+    pingPongDelay: {
+      delayTime: 0,
+      feedback: 0,
+    },
+    stereoWidener: {
+      width: 0,
+    },
+    tremolo: {
+      frequency: 0,
+      depth: 0,
+    },
+    vibrato: {
+      frequency: 0,
+      depth: 0,
+    },
+    distortion: {
+      distortion: 0,
+      oversample: 0,
+    },
+    EQ: {
+      high: 0,
+      mid: 0,
+      low: 0,
+    },
+    feedbackDelay: {
+      delayTime: 0,
+      feedback: 0,
+    },
+    phaser: {
+      frequency: 0,
+      octaves: 0,
+      baseFrequency: 0,
+    },
+    pitchShift: {
+      pitch: 0,
+    },
+    reverb: {
+      decay: 0,
+      preDelay: 0,
+    },
+  });
+  const [sliderStyleValues, setSliderStyleValues] = useState<{
+    [mixEffect in AudioMixEffectsType]: {
+      [option in MixEffectsOptionsType]?: number;
+    };
+  }>({
+    autoFilter: {
+      frequency: 0,
+      baseFrequency: 0,
+      octaves: 0,
+    },
+    autoPanner: {
+      frequency: 0,
+    },
+    autoWah: {
+      baseFrequency: 0,
+      octaves: 0,
+      sensitivity: 0,
+    },
+    bitCrusher: {
+      bits: 0,
+    },
+    chebyshev: {
+      order: 0,
+    },
+    chorus: {
+      frequency: 0,
+      delayTime: 0,
+      depth: 0,
+    },
+    freeverb: {
+      roomSize: 0,
+      dampening: 0,
+    },
+    JCReverb: {
+      roomSize: 0,
+    },
+    pingPongDelay: {
+      delayTime: 0,
+      feedback: 0,
+    },
+    stereoWidener: {
+      width: 0,
+    },
+    tremolo: {
+      frequency: 0,
+      depth: 0,
+    },
+    vibrato: {
+      frequency: 0,
+      depth: 0,
+    },
+    distortion: {
+      distortion: 0,
+      oversample: 0,
+    },
+    EQ: {
+      high: 0,
+      mid: 0,
+      low: 0,
+    },
+    feedbackDelay: {
+      delayTime: 0,
+      feedback: 0,
+    },
+    phaser: {
+      frequency: 0,
+      octaves: 0,
+      baseFrequency: 0,
+    },
+    pitchShift: {
+      pitch: 0,
+    },
+    reverb: {
+      decay: 0,
+      preDelay: 0,
+    },
+  });
+
+  const updateSliderExternalSliderValues = (
+    id: string,
+    value?: number,
+    styleValue?: number
+  ) => {
+    const [effect, option] = id.split("_");
+
+    if (value) {
+      setSliderValues((prev) => {
+        return {
+          ...prev,
+          [effect]: {
+            ...prev[effect as AudioMixEffectsType],
+            [option]: value,
+          },
+        };
+      });
+    }
+
+    if (styleValue) {
+      setSliderStyleValues((prev) => {
+        return {
+          ...prev,
+          [effect]: {
+            ...prev[effect as AudioMixEffectsType],
+            [option]: styleValue,
+          },
+        };
+      });
+    }
+  };
 
   const getPackedPositions = (containerWidth: number, padding: number) => {
     const positions: { x: number; y: number }[] = [];
@@ -489,7 +677,8 @@ export default function AudioMixEffectsPortal({
   const userMixEffectValueChange = (
     effect: AudioMixEffectsType,
     option: MixEffectsOptionsType,
-    value: number
+    value: number,
+    styleValue: number
   ) => {
     if (
       dynamicMixEffects.current[effect] &&
@@ -497,6 +686,8 @@ export default function AudioMixEffectsPortal({
     ) {
       dynamicMixEffects.current[effect].values[option] = value;
     }
+
+    updateSliderExternalSliderValues(`${effect}_${option}`, value, styleValue);
 
     const effects = [
       {
@@ -525,6 +716,7 @@ export default function AudioMixEffectsPortal({
         effect,
         option,
         value,
+        styleValue,
       };
       socket.current.emit("message", msg);
     }
@@ -533,7 +725,8 @@ export default function AudioMixEffectsPortal({
   const remoteMixEffectValueChange = (
     effect: AudioMixEffectsType,
     option: MixEffectsOptionsType,
-    value: number
+    value: number,
+    styleValue: number
   ) => {
     if (
       dynamicMixEffects.current[effect] &&
@@ -542,16 +735,19 @@ export default function AudioMixEffectsPortal({
       dynamicMixEffects.current[effect].values[option] = value;
     }
 
+    updateSliderExternalSliderValues(`${effect}_${option}`, value, styleValue);
     setRerender((prev) => !prev);
   };
 
   const mixEffectValueChange = (event: SliderChangeEvent) => {
+    const [effect, option] = event.id.split("_");
+
     if (isUser) {
-      const [effect, option] = event.id.split("_");
       userMixEffectValueChange(
         effect as AudioMixEffectsType,
         option as MixEffectsOptionsType,
-        event.value
+        event.value,
+        event.styleValue
       );
     } else {
       if (
@@ -559,8 +755,6 @@ export default function AudioMixEffectsPortal({
         (producerType === "screenAudio" &&
           permissions.acceptsScreenAudioEffects)
       ) {
-        const [effect, option] = event.id.split("_");
-
         const msg = {
           type: "requestMixEffectValueChange",
           table_id,
@@ -571,6 +765,7 @@ export default function AudioMixEffectsPortal({
           effect,
           option,
           value: event.value,
+          styleValue: event.styleValue,
         };
 
         socket.current.emit("message", msg);
@@ -606,11 +801,21 @@ export default function AudioMixEffectsPortal({
             (producerType === "screenAudio" &&
               event.requestedProducerId === producerId))
         ) {
-          userMixEffectValueChange(event.effect, event.option, event.value);
+          userMixEffectValueChange(
+            event.effect,
+            event.option,
+            event.value,
+            event.styleValue
+          );
         }
         break;
       case "clientMixEffectValueChanged":
-        remoteMixEffectValueChange(event.effect, event.option, event.value);
+        remoteMixEffectValueChange(
+          event.effect,
+          event.option,
+          event.value,
+          event.styleValue
+        );
         break;
       default:
         break;
@@ -684,6 +889,8 @@ export default function AudioMixEffectsPortal({
                           dynamicMixEffect.orientation ?? "vertical"
                         ]
                       }
+                      sliderValues={sliderValues}
+                      sliderStyleValues={sliderStyleValues}
                       mixEffectValueChange={mixEffectValueChange}
                     />
                   );

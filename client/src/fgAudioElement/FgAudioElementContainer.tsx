@@ -481,7 +481,7 @@ export default function FgAudioElementContainer({
         localMute={localMute}
         isUser={isUser}
         doubleClickFunction={
-          isUser
+          isUser || permissions.acceptsAudioEffects
             ? () => {
                 setAudioEffectsSectionVisible((prev) => !prev);
               }
@@ -501,29 +501,31 @@ export default function FgAudioElementContainer({
           />
         </Suspense>
       )}
-      {isUser && audioEffectsSectionVisible && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <AudioEffectsSection
-            socket={socket}
-            table_id={table_id}
-            username={username}
-            instance={instance}
-            isUser={isUser}
-            permissions={permissions}
-            producerType={"audio"}
-            producerId={undefined}
-            handleAudioEffectChange={handleAudioEffectChange}
-            placement='right'
-            referenceElement={
-              audioElementSVGRef as unknown as React.RefObject<HTMLElement>
-            }
-            padding={12}
-            handleMute={handleMute}
-            muteStateRef={localMute}
-            closeCallback={() => setAudioEffectsSectionVisible(false)}
-          />
-        </Suspense>
-      )}
+      {(isUser || permissions.acceptsAudioEffects) &&
+        audioEffectsSectionVisible && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <AudioEffectsSection
+              socket={socket}
+              table_id={table_id}
+              username={username}
+              instance={instance}
+              isUser={isUser}
+              permissions={permissions}
+              producerType={"audio"}
+              producerId={undefined}
+              handleAudioEffectChange={handleAudioEffectChange}
+              placement='right'
+              referenceElement={
+                audioElementSVGRef as unknown as React.RefObject<HTMLElement>
+              }
+              padding={12}
+              handleMute={handleMute}
+              localMute={localMute}
+              clientMute={clientMute}
+              closeCallback={() => setAudioEffectsSectionVisible(false)}
+            />
+          </Suspense>
+        )}
     </div>
   );
 }

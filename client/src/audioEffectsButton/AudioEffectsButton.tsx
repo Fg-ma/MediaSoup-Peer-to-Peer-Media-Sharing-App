@@ -1,6 +1,5 @@
 import React, { Suspense, useRef } from "react";
 import { Socket } from "socket.io-client";
-import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
 import { AudioEffectTypes } from "../context/streamsContext/typeConstant";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
@@ -32,6 +31,8 @@ export default function AudioEffectsButton({
   handleAudioEffectChange,
   handleMute,
   muteStateRef,
+  localMute,
+  clientMute,
   visualMediaContainerRef,
   closeLabelElement,
   hoverLabelElement,
@@ -55,7 +56,9 @@ export default function AudioEffectsButton({
     effect: AudioEffectTypes
   ) => void;
   handleMute: () => void;
-  muteStateRef: React.MutableRefObject<boolean>;
+  muteStateRef?: React.MutableRefObject<boolean>;
+  localMute?: React.MutableRefObject<boolean>;
+  clientMute?: React.MutableRefObject<boolean>;
   visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
   hoverLabelElement?: React.ReactElement;
@@ -73,7 +76,6 @@ export default function AudioEffectsButton({
     ...options,
   };
 
-  const { currentEffectsStyles } = useCurrentEffectsStylesContext();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -84,10 +86,6 @@ export default function AudioEffectsButton({
           setAudioEffectsActive((prev) => !prev);
         }}
         contentFunction={() => {
-          if (!currentEffectsStyles.current.audio) {
-            return;
-          }
-
           return (
             <FgSVG
               src={audioEffectsActive ? audioEffectOffIcon : audioEffectIcon}
@@ -135,6 +133,8 @@ export default function AudioEffectsButton({
             padding={12}
             handleMute={handleMute}
             muteStateRef={muteStateRef}
+            localMute={localMute}
+            clientMute={clientMute}
             visualMediaContainerRef={visualMediaContainerRef}
             closeLabelElement={closeLabelElement}
             closeCallback={() => setAudioEffectsActive(false)}

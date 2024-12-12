@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -9,7 +9,7 @@ import {
 import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../../../../context/currentEffectsStylesContext/typeConstant";
+} from "../../../../context/effectsStylesContext/typeConstant";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 
 import prismaColors from "../../../../../public/2DAssets/postProcess/prismaColors_512x512.jpg";
@@ -74,8 +74,7 @@ export default function BabylonPostProcessEffectsButton({
 }) {
   const { userMedia, userStreamEffects, remoteStreamEffects } =
     useStreamsContext();
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
 
   const [_, setRerender] = useState(0);
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -86,10 +85,9 @@ export default function BabylonPostProcessEffectsButton({
     : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .postProcess;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][visualMediaId].postProcess
-    : remoteCurrentEffectsStyles.current[username][instance][type][
-        visualMediaId
-      ].postProcess;
+    ? userEffectsStyles.current[type][visualMediaId].postProcess
+    : remoteEffectsStyles.current[username][instance][type][visualMediaId]
+        .postProcess;
 
   const postProcessEffectsChoices: {
     [postProcessEffect in PostProcessEffects]?: {

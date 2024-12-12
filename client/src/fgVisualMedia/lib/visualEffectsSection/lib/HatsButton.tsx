@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { useCurrentEffectsStylesContext } from "../../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { HatsEffectTypes } from "../../../../context/currentEffectsStylesContext/typeConstant";
+import { HatsEffectTypes } from "../../../../context/effectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -135,8 +135,7 @@ export default function HatsButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -147,10 +146,8 @@ export default function HatsButton({
     ? userStreamEffects.current[type][visualMediaId].hats
     : remoteStreamEffects.current[username][instance][type][visualMediaId].hats;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][visualMediaId].hats
-    : remoteCurrentEffectsStyles.current[username][instance][type][
-        visualMediaId
-      ].hats;
+    ? userEffectsStyles.current[type][visualMediaId].hats
+    : remoteEffectsStyles.current[username][instance][type][visualMediaId].hats;
 
   const hatsEffects: {
     [key in HatsEffectTypes]: {
@@ -342,17 +339,16 @@ export default function HatsButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][visualMediaId].hats) {
-          currentEffectsStyles.current[type][visualMediaId].hats.style =
+        if (userEffectsStyles.current[type][visualMediaId].hats) {
+          userEffectsStyles.current[type][visualMediaId].hats.style =
             effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].hats
+          remoteEffectsStyles.current[username][instance][type][visualMediaId]
+            .hats
         ) {
-          remoteCurrentEffectsStyles.current[username][instance][type][
+          remoteEffectsStyles.current[username][instance][type][
             visualMediaId
           ].hats.style = effectType;
         }

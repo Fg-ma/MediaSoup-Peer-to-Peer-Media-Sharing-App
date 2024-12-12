@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { useCurrentEffectsStylesContext } from "../../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { MasksEffectTypes } from "../../../../context/currentEffectsStylesContext/typeConstant";
+import { MasksEffectTypes } from "../../../../context/effectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -150,8 +150,7 @@ export default function MasksButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -163,10 +162,9 @@ export default function MasksButton({
     : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .masks;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][visualMediaId].masks
-    : remoteCurrentEffectsStyles.current[username][instance][type][
-        visualMediaId
-      ].masks;
+    ? userEffectsStyles.current[type][visualMediaId].masks
+    : remoteEffectsStyles.current[username][instance][type][visualMediaId]
+        .masks;
 
   const masksEffects: {
     [key in MasksEffectTypes]: {
@@ -382,17 +380,16 @@ export default function MasksButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][visualMediaId].masks) {
-          currentEffectsStyles.current[type][visualMediaId].masks.style =
+        if (userEffectsStyles.current[type][visualMediaId].masks) {
+          userEffectsStyles.current[type][visualMediaId].masks.style =
             effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].masks
+          remoteEffectsStyles.current[username][instance][type][visualMediaId]
+            .masks
         ) {
-          remoteCurrentEffectsStyles.current[username][instance][type][
+          remoteEffectsStyles.current[username][instance][type][
             visualMediaId
           ].masks.style = effectType;
         }

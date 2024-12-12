@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { useCurrentEffectsStylesContext } from "../../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { GlassesEffectTypes } from "../../../../context/currentEffectsStylesContext/typeConstant";
+import { GlassesEffectTypes } from "../../../../context/effectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -130,8 +130,7 @@ export default function GlassesButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -143,10 +142,9 @@ export default function GlassesButton({
     : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .glasses;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][visualMediaId].glasses
-    : remoteCurrentEffectsStyles.current[username][instance][type][
-        visualMediaId
-      ].glasses;
+    ? userEffectsStyles.current[type][visualMediaId].glasses
+    : remoteEffectsStyles.current[username][instance][type][visualMediaId]
+        .glasses;
 
   const glassesEffects: {
     [key in GlassesEffectTypes]: {
@@ -330,17 +328,16 @@ export default function GlassesButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][visualMediaId].glasses) {
-          currentEffectsStyles.current[type][visualMediaId].glasses.style =
+        if (userEffectsStyles.current[type][visualMediaId].glasses) {
+          userEffectsStyles.current[type][visualMediaId].glasses.style =
             effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].glasses
+          remoteEffectsStyles.current[username][instance][type][visualMediaId]
+            .glasses
         ) {
-          remoteCurrentEffectsStyles.current[username][instance][type][
+          remoteEffectsStyles.current[username][instance][type][
             visualMediaId
           ].glasses.style = effectType;
         }

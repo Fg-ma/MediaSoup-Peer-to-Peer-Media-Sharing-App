@@ -1,12 +1,12 @@
 import {
   BeardsEffectTypes,
-  EffectStylesType,
+  UserEffectsStylesType,
   GlassesEffectTypes,
   HatsEffectTypes,
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-} from "../context/currentEffectsStylesContext/typeConstant";
+} from "../context/effectsStylesContext/typeConstant";
 import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
 import { LandmarkTypes } from "./FaceLandmarks";
 
@@ -656,17 +656,15 @@ const deadbandingValues: DeadbandingValues = {
 };
 
 class Deadbanding {
-  private currentEffectsStyles: React.MutableRefObject<EffectStylesType>;
-
   private deadbandingMap: {
     [cameraId in string]: {
       [landmarkType in LandmarkTypes]: number;
     };
   } = {};
 
-  constructor(currentEffectsStyles: React.MutableRefObject<EffectStylesType>) {
-    this.currentEffectsStyles = currentEffectsStyles;
-  }
+  constructor(
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>
+  ) {}
 
   update = (
     id: string,
@@ -691,10 +689,10 @@ class Deadbanding {
       const effectType = type as DeadbandingTypes;
       if (
         effects[effectType] &&
-        this.currentEffectsStyles.current.camera[id][effectType]
+        this.userEffectsStyles.current.camera[id][effectType]
       ) {
         const style =
-          this.currentEffectsStyles.current.camera[id][effectType].style;
+          this.userEffectsStyles.current.camera[id][effectType].style;
 
         // @ts-expect-error: no enforcement between effectType and style
         for (const deadbanding in deadbandingValues[effectType][style]) {

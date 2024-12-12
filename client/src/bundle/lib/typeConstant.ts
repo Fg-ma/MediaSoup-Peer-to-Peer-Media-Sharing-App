@@ -1,4 +1,4 @@
-import { EffectStylesType } from "src/context/currentEffectsStylesContext/typeConstant";
+import { UserEffectsStylesType } from "../../context/effectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -69,7 +69,7 @@ export type onBundleMetadataResponsedType = {
   data: {
     clientMute: boolean;
     streamEffects: UserStreamEffectsType;
-    currentEffectsStyles: EffectStylesType;
+    userEffectsStyles: UserEffectsStylesType;
   };
 };
 

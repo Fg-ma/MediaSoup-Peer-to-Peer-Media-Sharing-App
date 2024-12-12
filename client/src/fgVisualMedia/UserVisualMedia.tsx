@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../context/effectsStylesContext/EffectsStylesContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -10,7 +10,7 @@ import {
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import FgVisualMediaController from "./lib/FgVisualMediaController";
-import { HideBackgroundEffectTypes } from "../context/currentEffectsStylesContext/typeConstant";
+import { HideBackgroundEffectTypes } from "../context/effectsStylesContext/typeConstant";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import {
@@ -88,8 +88,7 @@ export default function FgBabylonCanvas({
     userDataStreams,
     remoteDataStreams,
   } = useStreamsContext();
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -181,7 +180,7 @@ export default function FgBabylonCanvas({
           effect: effect,
           effectStyle:
             // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
-            currentEffectsStyles.current[type][visualMediaId][effect],
+            userEffectsStyles.current[type][visualMediaId][effect],
           blockStateChange: blockStateChange,
         };
         socket?.current.emit("message", msg);
@@ -204,7 +203,7 @@ export default function FgBabylonCanvas({
         data: {
           style:
             // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
-            remoteCurrentEffectsStyles.current[username][instance][type][
+            remoteEffectsStyles.current[username][instance][type][
               visualMediaId
             ][effect],
           hideBackgroundStyle: hideBackgroundStyle,
@@ -270,8 +269,8 @@ export default function FgBabylonCanvas({
     paused,
     userMedia,
     remoteStreamEffects,
-    currentEffectsStyles,
-    remoteCurrentEffectsStyles,
+    userEffectsStyles,
+    remoteEffectsStyles,
     remoteDataStreams,
     videoRef,
     visualMediaContainerRef,
@@ -452,7 +451,7 @@ export default function FgBabylonCanvas({
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
-      } flex items-center justify-center z-10`}
+      } flex items-center justify-center`}
       style={{
         position: "absolute",
         left: `${positioning.current.position.left}%`,

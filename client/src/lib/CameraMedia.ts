@@ -1,8 +1,8 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
-  defaultCameraCurrentEffectsStyles,
-  EffectStylesType,
-} from "../context/currentEffectsStylesContext/typeConstant";
+  defaultCameraEffectsStyles,
+  UserEffectsStylesType,
+} from "../context/effectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -50,7 +50,7 @@ class CameraMedia {
     private table_id: string,
     private cameraId: string,
     private initCameraStream: MediaStream,
-    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -81,9 +81,9 @@ class CameraMedia {
     this.canvas = document.createElement("canvas");
     this.canvas.classList.add("babylonJS-canvas");
 
-    if (!currentEffectsStyles.current.camera[this.cameraId]) {
-      currentEffectsStyles.current.camera[this.cameraId] = structuredClone(
-        defaultCameraCurrentEffectsStyles
+    if (!userEffectsStyles.current.camera[this.cameraId]) {
+      userEffectsStyles.current.camera[this.cameraId] = structuredClone(
+        defaultCameraEffectsStyles
       );
     }
 
@@ -173,7 +173,7 @@ class CameraMedia {
       this.video,
       this.faceLandmarks,
       this.effects,
-      this.currentEffectsStyles,
+      this.userEffectsStyles,
       this.faceMeshWorker,
       this.faceMeshResults,
       this.faceMeshProcessing,
@@ -227,7 +227,7 @@ class CameraMedia {
 
       if (count < this.maxFaces[0]) {
         const currentEffectStyle =
-          this.currentEffectsStyles.current.camera[this.cameraId][
+          this.userEffectsStyles.current.camera[this.cameraId][
             effect as EffectType
           ];
 
@@ -305,7 +305,7 @@ class CameraMedia {
     if (validEffectTypes.includes(effect as EffectType)) {
       if (
         effect !== "masks" ||
-        this.currentEffectsStyles.current.camera[this.cameraId].masks.style !==
+        this.userEffectsStyles.current.camera[this.cameraId].masks.style !==
           "baseMask"
       ) {
         this.drawNewEffect(effect as EffectType);
@@ -352,7 +352,7 @@ class CameraMedia {
 
   drawNewEffect = (effect: EffectType) => {
     const currentStyle =
-      this.currentEffectsStyles.current.camera?.[this.cameraId]?.[effect];
+      this.userEffectsStyles.current.camera?.[this.cameraId]?.[effect];
 
     if (!currentStyle) {
       return;

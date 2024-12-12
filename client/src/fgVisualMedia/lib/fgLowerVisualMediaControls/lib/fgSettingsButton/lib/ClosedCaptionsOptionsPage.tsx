@@ -11,7 +11,7 @@ import {
   FontOpacities,
   FontSizes,
 } from "../../../FgLowerVisualMediaControls";
-import { Settings } from "../../../../../RemoteVisualMedia";
+import { Settings } from "../../../../typeConstant";
 
 import navigateBackIcon from "../../../../../../../public/svgs/navigateBack.svg";
 import navigateForwardIcon from "../../../../../../../public/svgs/navigateForward.svg";

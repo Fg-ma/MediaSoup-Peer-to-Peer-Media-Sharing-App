@@ -64,7 +64,8 @@ export type MediasoupSocketEvents =
   | onRequestMixEffectActivityChangeType
   | onClientMixEffectActivityChangeType
   | onRequestMixEffectValueChangeType
-  | onClientMixEffectValueChangeType;
+  | onClientMixEffectValueChangeType
+  | onRequestRemoveProducerType;
 
 export type onGetRouterRtpCapabilitiesType = {
   type: "getRouterRtpCapabilities";
@@ -389,6 +390,7 @@ export type onRequestMixEffectValueChangeType = {
   effect: AudioMixEffectsType;
   option: string;
   value: number;
+  styleValue: number;
 };
 
 export type onClientMixEffectValueChangeType = {
@@ -401,4 +403,14 @@ export type onClientMixEffectValueChangeType = {
   effect: AudioMixEffectsType;
   option: string;
   value: number;
+  styleValue: number;
+};
+
+export type onRequestRemoveProducerType = {
+  type: "requestRemoveProducer";
+  table_id: string;
+  username: string;
+  instance: string;
+  producerType: ProducerTypes;
+  producerId: string;
 };

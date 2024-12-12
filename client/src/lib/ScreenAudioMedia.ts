@@ -161,10 +161,8 @@ class ScreenAudioMedia {
   };
 
   applyEffect = (effect: AudioEffectTypes) => {
-    console.log(effect);
     switch (effect) {
       case "robot":
-        console.log(this.audioEffects, this.audioEffects?.fgAudioStreamEffects);
         this.audioEffects?.fgAudioStreamEffects?.updateEffects([
           {
             type: "reverb",

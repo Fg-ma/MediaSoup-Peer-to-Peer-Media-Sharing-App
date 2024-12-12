@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { useCurrentEffectsStylesContext } from "../../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { MustachesEffectTypes } from "../../../../context/currentEffectsStylesContext/typeConstant";
+import { MustachesEffectTypes } from "../../../../context/effectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -95,8 +95,7 @@ export default function MustachesButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -108,10 +107,9 @@ export default function MustachesButton({
     : remoteStreamEffects.current[username][instance][type][visualMediaId]
         .mustaches;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][visualMediaId].mustaches
-    : remoteCurrentEffectsStyles.current[username][instance][type][
-        visualMediaId
-      ].mustaches;
+    ? userEffectsStyles.current[type][visualMediaId].mustaches
+    : remoteEffectsStyles.current[username][instance][type][visualMediaId]
+        .mustaches;
 
   const mustachesEffects: {
     [key in MustachesEffectTypes]: {
@@ -239,17 +237,16 @@ export default function MustachesButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][visualMediaId].mustaches) {
-          currentEffectsStyles.current[type][visualMediaId].mustaches.style =
+        if (userEffectsStyles.current[type][visualMediaId].mustaches) {
+          userEffectsStyles.current[type][visualMediaId].mustaches.style =
             effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].mustaches
+          remoteEffectsStyles.current[username][instance][type][visualMediaId]
+            .mustaches
         ) {
-          remoteCurrentEffectsStyles.current[username][instance][type][
+          remoteEffectsStyles.current[username][instance][type][
             visualMediaId
           ].mustaches.style = effectType;
         }

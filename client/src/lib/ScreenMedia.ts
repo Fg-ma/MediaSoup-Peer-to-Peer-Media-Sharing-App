@@ -1,7 +1,7 @@
 import {
-  defaultScreenCurrentEffectsStyles,
-  EffectStylesType,
-} from "../context/currentEffectsStylesContext/typeConstant";
+  defaultScreenEffectsStyles,
+  UserEffectsStylesType,
+} from "../context/effectsStylesContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -35,7 +35,7 @@ class ScreenMedia {
     private table_id: string,
     private screenId: string,
     private initScreenStream: MediaStream,
-    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -65,9 +65,9 @@ class ScreenMedia {
     this.canvas = document.createElement("canvas");
     this.canvas.classList.add("babylonJS-canvas");
 
-    if (!currentEffectsStyles.current.screen[this.screenId]) {
-      currentEffectsStyles.current.screen[this.screenId] = structuredClone(
-        defaultScreenCurrentEffectsStyles
+    if (!userEffectsStyles.current.screen[this.screenId]) {
+      userEffectsStyles.current.screen[this.screenId] = structuredClone(
+        defaultScreenEffectsStyles
       );
     }
 
@@ -81,7 +81,7 @@ class ScreenMedia {
       this.video,
       undefined,
       this.effects,
-      this.currentEffectsStyles,
+      this.userEffectsStyles,
       undefined,
       undefined,
       undefined,
@@ -174,7 +174,7 @@ class ScreenMedia {
 
   drawNewEffect = (effect: EffectType) => {
     const currentStyle =
-      this.currentEffectsStyles.current.camera?.[this.screenId]?.[effect];
+      this.userEffectsStyles.current.camera?.[this.screenId]?.[effect];
 
     if (!currentStyle) {
       return;

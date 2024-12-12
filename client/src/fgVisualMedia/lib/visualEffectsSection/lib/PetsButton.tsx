@@ -1,11 +1,11 @@
 import React, { useRef, useState } from "react";
-import { useCurrentEffectsStylesContext } from "../../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../context/streamsContext/typeConstant";
-import { PetsEffectTypes } from "../../../../context/currentEffectsStylesContext/typeConstant";
+import { PetsEffectTypes } from "../../../../context/effectsStylesContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
@@ -165,8 +165,7 @@ export default function PetsButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
   const { userStreamEffects, remoteStreamEffects } = useStreamsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -177,10 +176,8 @@ export default function PetsButton({
     ? userStreamEffects.current[type][visualMediaId].pets
     : remoteStreamEffects.current[username][instance][type][visualMediaId].pets;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][visualMediaId].pets
-    : remoteCurrentEffectsStyles.current[username][instance][type][
-        visualMediaId
-      ].pets;
+    ? userEffectsStyles.current[type][visualMediaId].pets
+    : remoteEffectsStyles.current[username][instance][type][visualMediaId].pets;
 
   const petsEffects: {
     [key in PetsEffectTypes]: {
@@ -420,17 +417,16 @@ export default function PetsButton({
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       if (isUser) {
-        if (currentEffectsStyles.current[type][visualMediaId].pets) {
-          currentEffectsStyles.current[type][visualMediaId].pets.style =
+        if (userEffectsStyles.current[type][visualMediaId].pets) {
+          userEffectsStyles.current[type][visualMediaId].pets.style =
             effectType;
         }
       } else {
         if (
-          remoteCurrentEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].pets
+          remoteEffectsStyles.current[username][instance][type][visualMediaId]
+            .pets
         ) {
-          remoteCurrentEffectsStyles.current[username][instance][type][
+          remoteEffectsStyles.current[username][instance][type][
             visualMediaId
           ].pets.style = effectType;
         }

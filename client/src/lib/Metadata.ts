@@ -7,7 +7,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/streamsContext/typeConstant";
-import { EffectStylesType } from "../context/currentEffectsStylesContext/typeConstant";
+import { UserEffectsStylesType } from "../context/effectsStylesContext/typeConstant";
 
 class Metadata {
   constructor(
@@ -38,7 +38,7 @@ class Metadata {
         [effectType in AudioEffectTypes]: boolean;
       };
     }>,
-    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>
   ) {}
 
   onRequestedCatchUpData = (event: {
@@ -114,7 +114,7 @@ class Metadata {
       data: {
         clientMute: this.mutedAudioRef.current,
         streamEffects: this.userStreamEffects.current,
-        currentEffectsStyles: this.currentEffectsStyles.current,
+        userEffectsStyles: this.userEffectsStyles.current,
       },
     };
 

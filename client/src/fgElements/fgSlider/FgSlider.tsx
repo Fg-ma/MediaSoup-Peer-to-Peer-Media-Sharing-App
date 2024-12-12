@@ -56,16 +56,22 @@ export interface SliderOptions {
 }
 
 export interface SliderChangeEvent {
-  value: number;
   id: string;
+  value: number;
+  styleValue: number;
 }
 
-interface SliderProps extends SliderOptions {
+export default function FgSlider({
+  externalValue,
+  externalStyleValue,
+  options,
+  onValueChange,
+}: {
+  externalValue?: number;
+  externalStyleValue?: number;
   options: SliderOptions;
   onValueChange?: (event: SliderChangeEvent) => void;
-}
-
-export default function FgSlider({ options, onValueChange }: SliderProps) {
+}) {
   const fgSliderOptions = {
     ...defaultFgSliderOptions,
     ...options,
@@ -223,9 +229,9 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
 
   useEffect(() => {
     if (onValueChange) {
-      onValueChange({ value, id: fgSliderOptions.id });
+      onValueChange({ id: fgSliderOptions.id, value, styleValue });
     }
-  }, [value]);
+  }, [value, styleValue]);
 
   return (
     <div
@@ -285,7 +291,11 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
                 : fgSliderOptions.orientation === "horizontal"
                 ? "right"
                 : "top"
-            }, #F56114 ${styleValue}%, #e6e6e6 ${styleValue}%)`,
+            }, #F56114 ${
+              externalStyleValue ? externalStyleValue : styleValue
+            }%, #e6e6e6 ${
+              externalStyleValue ? externalStyleValue : styleValue
+            }%)`,
             boxShadow: sliding ? "inset 0 0 1.25px rgba(0, 0, 0, 0.3)" : "",
           }}
           ref={trackRef}
@@ -402,7 +412,9 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
                 ? "bottom"
                 : fgSliderOptions.orientation === "horizontal"
                 ? "left"
-                : "bottom"]: `calc(${styleValue}% - 5px)`,
+                : "bottom"]: `calc(${
+                externalStyleValue ? externalStyleValue : styleValue
+              }% - 5px)`,
             }}
             ref={handleRef}
             onMouseEnter={() => {
@@ -415,7 +427,7 @@ export default function FgSlider({ options, onValueChange }: SliderProps) {
           {(sliding || handleHovering) && (
             <Suspense fallback={<div>Loading...</div>}>
               <SliderValuePortal
-                value={value}
+                value={externalValue ? externalValue : value}
                 handleRef={handleRef}
                 precision={fgSliderOptions.precision}
                 units={fgSliderOptions.units}

@@ -206,7 +206,7 @@ export type BackgroundMusicTypes =
   | "ukulele"
   | "wacky";
 
-export interface EffectStylesType {
+export type UserEffectsStylesType = {
   camera: {
     [cameraId: string]: CameraEffectStylesType;
   };
@@ -217,7 +217,13 @@ export interface EffectStylesType {
     [screenAudioId: string]: AudioEffectStylesType;
   };
   audio: AudioEffectStylesType;
-}
+};
+
+export type RemoteEffectStylesType = {
+  [username: string]: {
+    [instance: string]: UserEffectsStylesType;
+  };
+};
 
 export const defaultPostProcess: PostProcessEffects = "prismaColors";
 export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
@@ -231,8 +237,8 @@ export const defaultPet: PetsEffectTypes = "beardedDragon";
 
 export const defaultBackgroundMusic: BackgroundMusicTypes = "mischief";
 
-export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType =
-  Object.freeze({
+export const defaultCameraEffectsStyles: CameraEffectStylesType = Object.freeze(
+  {
     pause: Object.freeze({
       style: "",
     }),
@@ -267,14 +273,17 @@ export const defaultCameraCurrentEffectsStyles: CameraEffectStylesType =
     pets: Object.freeze({
       style: defaultPet,
     }),
-  });
+  }
+);
 
-export const defaultScreenCurrentEffectsStyles: ScreenEffectStylesType =
-  Object.freeze({
+export const defaultScreenEffectsStyles: ScreenEffectStylesType = Object.freeze(
+  {
     postProcess: Object.freeze({
       style: defaultPostProcess,
     }),
-  });
+  }
+);
 
-export const defaultAudioCurrentEffectsStyles: AudioEffectStylesType =
-  Object.freeze({});
+export const defaultAudioEffectsStyles: AudioEffectStylesType = Object.freeze(
+  {}
+);

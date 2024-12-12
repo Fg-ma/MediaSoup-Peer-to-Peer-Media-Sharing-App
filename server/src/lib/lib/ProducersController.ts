@@ -14,6 +14,7 @@ import {
   onCreateProducerTransportType,
   onNewProducerCreatedType,
   onRemoveProducerType,
+  onRequestRemoveProducerType,
 } from "../mediasoupTypes";
 
 class ProducersController {
@@ -316,6 +317,18 @@ class ProducersController {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  onRequestRemoveProducer = (event: onRequestRemoveProducerType) => {
+    const msg = {
+      type: "removeProducerRequested",
+      producerType: event.producerType,
+      producerId: event.producerId,
+    };
+
+    this.io
+      .to(`instance_${event.table_id}_${event.username}_${event.instance}`)
+      .emit("message", msg);
   };
 }
 

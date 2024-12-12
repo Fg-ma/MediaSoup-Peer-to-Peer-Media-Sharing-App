@@ -1,5 +1,5 @@
 import { MeshesData, MeshJSON } from "./typeContant";
-import { HideBackgroundEffectTypes } from "../context/currentEffectsStylesContext/typeConstant";
+import { HideBackgroundEffectTypes } from "../context/effectsStylesContext/typeConstant";
 
 export const baseMaskData: {
   "2Durl": string;

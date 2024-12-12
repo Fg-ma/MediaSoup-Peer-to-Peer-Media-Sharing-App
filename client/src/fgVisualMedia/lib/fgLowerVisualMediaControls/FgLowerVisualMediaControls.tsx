@@ -187,13 +187,13 @@ export default function FgLowerVisualMediaControls({
       },
     },
   });
-  const [_, setRerender] = useState(0);
+  const [_, setRerender] = useState(false);
   const rightVisualMediaControlsRef = useRef<HTMLDivElement>(null);
   const browserStandardSpeechRecognitionAvailable = useRef(true);
 
   const handleMessage = (event: { type: "localMuteChange" }) => {
     if (event.type === "localMuteChange") {
-      setRerender((prev) => prev + 1);
+      setRerender((prev) => !prev);
     }
   };
 
@@ -303,7 +303,7 @@ export default function FgLowerVisualMediaControls({
                     handleMuteCallback();
                   }
 
-                  setRerender((prev) => prev + 1);
+                  setRerender((prev) => !prev);
                 }}
                 handleVolumeSliderCallback={handleVolumeSliderCallback}
                 tracksColorSetterCallback={tracksColorSetterCallback}
@@ -438,9 +438,10 @@ export default function FgLowerVisualMediaControls({
                     handleMuteCallback();
                   }
 
-                  setRerender((prev) => prev + 1);
+                  setRerender((prev) => !prev);
                 }}
-                muteStateRef={localMute}
+                localMute={localMute}
+                clientMute={clientMute}
                 visualMediaContainerRef={visualMediaContainerRef}
                 closeLabelElement={
                   <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0 bg-white'>

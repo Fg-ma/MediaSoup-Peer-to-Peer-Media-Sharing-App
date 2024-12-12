@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import FgButton from "../../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../../fgElements/fgSVG/FgSVG";
 import { ActivePages } from "../../../FgLowerVisualMediaControls";
-import { Settings } from "../../../../../RemoteVisualMedia";
+import { Settings } from "../../../../typeConstant";
 
 import navigateBackIcon from "../../../../../../../public/svgs/navigateBack.svg";
 

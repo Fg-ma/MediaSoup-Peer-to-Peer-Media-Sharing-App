@@ -8,9 +8,9 @@ import {
 } from "@babylonjs/core";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
-  EffectStylesType,
+  UserEffectsStylesType,
   HideBackgroundEffectTypes,
-} from "../context/currentEffectsStylesContext/typeConstant";
+} from "../context/effectsStylesContext/typeConstant";
 import { CameraEffectTypes } from "../context/streamsContext/typeConstant";
 import UserDevice from "../lib/UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
@@ -50,7 +50,7 @@ class BabylonRenderLoop {
     private effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     },
-    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private faceMeshWorker: Worker | undefined,
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
     private faceMeshProcessing: boolean[] | undefined,
@@ -196,7 +196,7 @@ class BabylonRenderLoop {
           height: this.offscreenCanvas.height,
           smooth:
             this.effects.masks &&
-            this.currentEffectsStyles.current.camera[this.id].masks.style ===
+            this.userEffectsStyles.current.camera[this.id].masks.style ===
               "baseMask"
               ? true
               : false,
@@ -358,7 +358,7 @@ class BabylonRenderLoop {
     this.hideBackgroundCtx.globalCompositeOperation = "source-atop";
 
     if (
-      this.currentEffectsStyles.current.camera[this.id].hideBackground.style !==
+      this.userEffectsStyles.current.camera[this.id].hideBackground.style !==
       "color"
     ) {
       this.hideBackgroundCtx.drawImage(

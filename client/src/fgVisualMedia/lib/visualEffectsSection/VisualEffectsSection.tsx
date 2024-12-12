@@ -10,7 +10,7 @@ import BlurButtton from "./lib/BlurButton";
 import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../../../context/currentEffectsStylesContext/typeConstant";
+} from "../../../context/effectsStylesContext/typeConstant";
 
 const BabylonPostProcessEffectsButton = React.lazy(
   () => import("./lib/BabylonPostProcessEffectsButton")

@@ -3,7 +3,10 @@ import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import FgSlider, {
   SliderChangeEvent,
 } from "../../fgElements/fgSlider/FgSlider";
-import { AudioMixEffectsType } from "../../audioEffects/typeConstant";
+import {
+  AudioMixEffectsType,
+  MixEffectsOptionsType,
+} from "../../audioEffects/typeConstant";
 import {
   DynamicMixEffect,
   LabelPlacementType,
@@ -16,6 +19,8 @@ export default function AudioMixEffect({
   dynamicMixEffect,
   effectLabel,
   labelPlacement,
+  sliderValues,
+  sliderStyleValues,
   mixEffectValueChange,
 }: {
   effect: AudioMixEffectsType;
@@ -23,6 +28,16 @@ export default function AudioMixEffect({
   dynamicMixEffect: DynamicMixEffect;
   effectLabel: string;
   labelPlacement: LabelPlacementType;
+  sliderValues: {
+    [mixEffect in AudioMixEffectsType]: {
+      [option in MixEffectsOptionsType]?: number;
+    };
+  };
+  sliderStyleValues: {
+    [mixEffect in AudioMixEffectsType]: {
+      [option in MixEffectsOptionsType]?: number;
+    };
+  };
   mixEffectValueChange: (event: SliderChangeEvent) => void;
 }) {
   return (
@@ -123,6 +138,13 @@ export default function AudioMixEffect({
         {Object.entries(staticMixEffect.options).map(([key, option], index) => (
           <FgSlider
             key={index}
+            externalValue={
+              sliderValues[effect][key as MixEffectsOptionsType] ?? undefined
+            }
+            externalStyleValue={
+              sliderStyleValues[effect][key as MixEffectsOptionsType] ??
+              undefined
+            }
             options={{
               id: `${effect}_${key}`,
               initValue: option?.initValue,

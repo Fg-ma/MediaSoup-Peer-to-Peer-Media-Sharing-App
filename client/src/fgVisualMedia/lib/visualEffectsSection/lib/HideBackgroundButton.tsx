@@ -1,10 +1,10 @@
 import React, { useRef, useState, Suspense } from "react";
 import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "../../../../context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "../../../../context/effectsStylesContext/EffectsStylesContext";
 import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../../../../context/currentEffectsStylesContext/typeConstant";
+} from "../../../../context/effectsStylesContext/typeConstant";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -126,8 +126,7 @@ export default function HideBackgroundButton({
 }) {
   const { userMedia, userStreamEffects, remoteStreamEffects } =
     useStreamsContext();
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [color, setColor] = useState("#F56114");
@@ -143,10 +142,9 @@ export default function HideBackgroundButton({
     : remoteStreamEffects.current[username][instance].camera[visualMediaId]
         .hideBackground;
   const effectsStyles = isUser
-    ? currentEffectsStyles.current[type][visualMediaId].hideBackground
-    : remoteCurrentEffectsStyles.current[username][instance][type][
-        visualMediaId
-      ].hideBackground;
+    ? userEffectsStyles.current[type][visualMediaId].hideBackground
+    : remoteEffectsStyles.current[username][instance][type][visualMediaId]
+        .hideBackground;
 
   const backgroundChoices: {
     [hideBackgroundEffect in HideBackgroundEffectTypes]?: {

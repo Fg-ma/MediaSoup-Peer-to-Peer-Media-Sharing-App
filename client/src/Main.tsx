@@ -3,18 +3,19 @@ import * as mediasoup from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import { useStreamsContext } from "./context/streamsContext/StreamsContext";
-import { useCurrentEffectsStylesContext } from "./context/currentEffectsStylesContext/CurrentEffectsStylesContext";
+import { useEffectsStylesContext } from "./context/effectsStylesContext/EffectsStylesContext";
 import {
-  defaultAudioCurrentEffectsStyles,
-  defaultCameraCurrentEffectsStyles,
-  defaultScreenCurrentEffectsStyles,
-} from "./context/currentEffectsStylesContext/typeConstant";
+  defaultAudioEffectsStyles,
+  defaultCameraEffectsStyles,
+  defaultScreenEffectsStyles,
+} from "./context/effectsStylesContext/typeConstant";
 import {
   DataStreamTypes,
   defaultAudioStreamEffects,
   defaultCameraStreamEffects,
   defaultScreenStreamEffects,
 } from "./context/streamsContext/typeConstant";
+import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import UserDevice from "./lib/UserDevice";
@@ -25,9 +26,8 @@ import Metadata from "./lib/Metadata";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
-import "./scrollbar.css";
-import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 import PermissionsController from "./lib/PermissionsController";
+import "./scrollbar.css";
 
 const websocketURL = "http://localhost:8000";
 
@@ -173,6 +173,11 @@ type MediasoupSocketEvents =
       inquiringInstance: string;
       inquiredType: "camera" | "screen" | "audio";
       inquiredProducerId: string;
+    }
+  | {
+      type: "removeProducerRequested";
+      producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
+      producerId: string;
     };
 
 export default function Main() {
@@ -184,8 +189,7 @@ export default function Main() {
     remoteDataStreams,
     userDataStreams,
   } = useStreamsContext();
-  const { currentEffectsStyles, remoteCurrentEffectsStyles } =
-    useCurrentEffectsStylesContext();
+  const { userEffectsStyles, remoteEffectsStyles } = useEffectsStylesContext();
   const { permissions } = usePermissionsContext();
 
   const socket = useRef<Socket>(io(websocketURL));
@@ -287,6 +291,9 @@ export default function Main() {
       case "requestedCatchUpData":
         metadata.onRequestedCatchUpData(event);
         break;
+      case "removeProducerRequested":
+        producersController.onRemoveProducerRequested(event);
+        break;
       default:
         break;
     }
@@ -311,15 +318,15 @@ export default function Main() {
       };
     }
 
-    if (!remoteCurrentEffectsStyles.current[username]) {
-      remoteCurrentEffectsStyles.current[username] = {};
+    if (!remoteEffectsStyles.current[username]) {
+      remoteEffectsStyles.current[username] = {};
     }
-    if (!remoteCurrentEffectsStyles.current[username][instance]) {
-      remoteCurrentEffectsStyles.current[username][instance] = {
+    if (!remoteEffectsStyles.current[username][instance]) {
+      remoteEffectsStyles.current[username][instance] = {
         camera: {},
         screen: {},
         screenAudio: {},
-        audio: structuredClone(defaultAudioCurrentEffectsStyles),
+        audio: structuredClone(defaultAudioEffectsStyles),
       };
     }
 
@@ -331,12 +338,9 @@ export default function Main() {
       remoteStreamEffects.current[username][instance].camera[cameraId] =
         structuredClone(defaultCameraStreamEffects);
 
-      if (
-        !remoteCurrentEffectsStyles.current[username][instance].camera[cameraId]
-      ) {
-        remoteCurrentEffectsStyles.current[username][instance].camera[
-          cameraId
-        ] = structuredClone(defaultCameraCurrentEffectsStyles);
+      if (!remoteEffectsStyles.current[username][instance].camera[cameraId]) {
+        remoteEffectsStyles.current[username][instance].camera[cameraId] =
+          structuredClone(defaultCameraEffectsStyles);
       }
     }
 
@@ -348,12 +352,9 @@ export default function Main() {
       remoteStreamEffects.current[username][instance].screen[screenId] =
         structuredClone(defaultScreenStreamEffects);
 
-      if (
-        !remoteCurrentEffectsStyles.current[username][instance].screen[screenId]
-      ) {
-        remoteCurrentEffectsStyles.current[username][instance].screen[
-          screenId
-        ] = structuredClone(defaultScreenCurrentEffectsStyles);
+      if (!remoteEffectsStyles.current[username][instance].screen[screenId]) {
+        remoteEffectsStyles.current[username][instance].screen[screenId] =
+          structuredClone(defaultScreenEffectsStyles);
       }
     }
 
@@ -367,13 +368,13 @@ export default function Main() {
       ] = structuredClone(defaultAudioStreamEffects);
 
       if (
-        !remoteCurrentEffectsStyles.current[username][instance].screenAudio[
+        !remoteEffectsStyles.current[username][instance].screenAudio[
           screenAudioId
         ]
       ) {
-        remoteCurrentEffectsStyles.current[username][instance].screenAudio[
+        remoteEffectsStyles.current[username][instance].screenAudio[
           screenAudioId
-        ] = structuredClone(defaultAudioCurrentEffectsStyles);
+        ] = structuredClone(defaultAudioEffectsStyles);
       }
     }
   };
@@ -446,19 +447,19 @@ export default function Main() {
     }
 
     if (
-      remoteCurrentEffectsStyles.current?.[disconnectedUsername]?.[
+      remoteEffectsStyles.current?.[disconnectedUsername]?.[
         disconnectedInstance
       ] !== undefined
     ) {
-      delete remoteCurrentEffectsStyles.current?.[disconnectedUsername]?.[
+      delete remoteEffectsStyles.current?.[disconnectedUsername]?.[
         disconnectedInstance
       ];
 
       if (
-        Object.keys(remoteCurrentEffectsStyles.current?.[disconnectedUsername])
+        Object.keys(remoteEffectsStyles.current?.[disconnectedUsername])
           .length === 0
       ) {
-        delete remoteCurrentEffectsStyles.current?.[disconnectedUsername];
+        delete remoteEffectsStyles.current?.[disconnectedUsername];
       }
     }
   };
@@ -508,7 +509,7 @@ export default function Main() {
 
   const userDevice = new UserDevice();
 
-  const deadbanding = new Deadbanding(currentEffectsStyles);
+  const deadbanding = new Deadbanding(userEffectsStyles);
 
   const browserMedia = new BrowserMedia(
     device,
@@ -528,9 +529,10 @@ export default function Main() {
     table_id,
     username,
     instance,
+    permissions,
     userMedia,
-    currentEffectsStyles,
-    remoteCurrentEffectsStyles,
+    userEffectsStyles,
+    remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
     remoteTracksMap,
@@ -572,7 +574,7 @@ export default function Main() {
     userMedia,
     mutedAudioRef,
     userStreamEffects,
-    currentEffectsStyles
+    userEffectsStyles
   );
 
   const permissionsController = new PermissionsController(

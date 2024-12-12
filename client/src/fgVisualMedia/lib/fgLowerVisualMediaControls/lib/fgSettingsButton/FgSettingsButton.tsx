@@ -6,7 +6,7 @@ import { FgVisualMediaOptions, Settings } from "../../../typeConstant";
 
 type RecursiveObject = {
   active?: boolean;
-  [key: string]: RecursiveObject | boolean | undefined; // Allows nested objects and boolean values
+  [key: string]: RecursiveObject | boolean | undefined;
 };
 
 export default function FgSettingsButton({

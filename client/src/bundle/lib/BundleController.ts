@@ -5,7 +5,7 @@ import {
   RemoteTracksMapType,
   UserMediaType,
 } from "../../context/streamsContext/typeConstant";
-import { EffectStylesType } from "../../context/currentEffectsStylesContext/typeConstant";
+import { RemoteEffectStylesType } from "../../context/effectsStylesContext/typeConstant";
 import BundleSocket from "./BundleSocket";
 import { BundleControllerMessageType, BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
@@ -49,11 +49,7 @@ class BundleController {
     >,
     private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
     private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
-    private remoteCurrentEffectsStyles: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: EffectStylesType;
-      };
-    }>,
+    private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
@@ -74,7 +70,7 @@ class BundleController {
       this.setAudioStream,
       this.remoteTracksMap,
       this.remoteStreamEffects,
-      this.remoteCurrentEffectsStyles,
+      this.remoteEffectsStyles,
       this.userMedia,
       this.audioRef,
       this.clientMute,
@@ -101,7 +97,11 @@ class BundleController {
         );
       }
 
-      if (this.permissions.acceptsAudioEffects) {
+      if (
+        (producerType === "audio" && this.permissions.acceptsAudioEffects) ||
+        (producerType === "screenAudio" &&
+          this.permissions.acceptsScreenAudioEffects)
+      ) {
         const msg = {
           type: "clientEffectChange",
           table_id: this.table_id,
@@ -114,7 +114,11 @@ class BundleController {
         };
         this.socket.current.emit("message", msg);
       }
-    } else if (this.permissions.acceptsAudioEffects) {
+    } else if (
+      (producerType === "audio" && this.permissions.acceptsAudioEffects) ||
+      (producerType === "screenAudio" &&
+        this.permissions.acceptsScreenAudioEffects)
+    ) {
       const msg = {
         type: "requestEffectChange",
         table_id: this.table_id,

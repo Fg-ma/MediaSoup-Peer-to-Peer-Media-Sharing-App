@@ -24,7 +24,7 @@ import BabylonRenderLoop from "./BabylonRenderLoop";
 import UserDevice from "../lib/UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
-import { EffectStylesType } from "../context/currentEffectsStylesContext/typeConstant";
+import { UserEffectsStylesType } from "../context/effectsStylesContext/typeConstant";
 import FaceLandmarks from "./FaceLandmarks";
 import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";
@@ -97,7 +97,7 @@ class BabylonScene {
     private effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     },
-    private currentEffectsStyles: React.MutableRefObject<EffectStylesType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private faceMeshWorker: Worker | undefined,
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
     private faceMeshProcessing: boolean[] | undefined,
@@ -153,7 +153,7 @@ class BabylonScene {
       this.canvas,
       this.video,
       this.effects,
-      this.currentEffectsStyles,
+      this.userEffectsStyles,
       this.faceMeshWorker,
       this.faceMeshResults,
       this.faceMeshProcessing,
