@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from "react";
-import * as mediasoup from "mediasoup-client";
+import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import AudioSectionController from "./lib/audioSectionController";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
@@ -32,7 +32,7 @@ export default function AudioSection({
   handleDisableEnableBtns,
 }: {
   socket: React.MutableRefObject<Socket>;
-  device: React.MutableRefObject<mediasoup.types.Device | undefined>;
+  device: React.MutableRefObject<types.Device | undefined>;
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;

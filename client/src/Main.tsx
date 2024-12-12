@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import * as mediasoup from "mediasoup-client";
+import { types, Device } from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import { useStreamsContext } from "./context/streamsContext/StreamsContext";
@@ -34,9 +34,9 @@ type MediasoupSocketEvents =
       type: "producerTransportCreated";
       params: {
         id: string;
-        iceParameters: mediasoup.types.IceParameters;
-        iceCandidates: mediasoup.types.IceCandidate[];
-        dtlsParameters: mediasoup.types.DtlsParameters;
+        iceParameters: types.IceParameters;
+        iceCandidates: types.IceCandidate[];
+        dtlsParameters: types.DtlsParameters;
       };
       error?: unknown;
     }
@@ -44,9 +44,9 @@ type MediasoupSocketEvents =
       type: "consumerTransportCreated";
       params: {
         id: string;
-        iceParameters: mediasoup.types.IceParameters;
-        iceCandidates: mediasoup.types.IceCandidate[];
-        dtlsParameters: mediasoup.types.DtlsParameters;
+        iceParameters: types.IceParameters;
+        iceCandidates: types.IceCandidate[];
+        dtlsParameters: types.DtlsParameters;
       };
       error?: unknown;
     }
@@ -112,7 +112,7 @@ type MediasoupSocketEvents =
         id: string;
         producerId: string;
         kind: "audio" | "video" | undefined;
-        rtpParameters: mediasoup.types.RtpParameters;
+        rtpParameters: types.RtpParameters;
         type: string;
         producerPaused: boolean;
       };
@@ -190,7 +190,7 @@ export default function Main() {
   const { permissions } = usePermissionsContext();
 
   const socket = useRef<Socket>(io(websocketURL));
-  const device = useRef<mediasoup.Device>();
+  const device = useRef<Device>();
 
   const table_id = useRef("");
   const username = useRef("");
@@ -200,10 +200,8 @@ export default function Main() {
     [username: string]: { [instance: string]: React.JSX.Element };
   }>({});
 
-  const consumerTransport =
-    useRef<mediasoup.types.Transport<mediasoup.types.AppData>>();
-  const producerTransport =
-    useRef<mediasoup.types.Transport<mediasoup.types.AppData>>();
+  const consumerTransport = useRef<types.Transport<types.AppData>>();
+  const producerTransport = useRef<types.Transport<types.AppData>>();
 
   const cameraBtnRef = useRef<HTMLButtonElement>(null);
   const newCameraBtnRef = useRef<HTMLButtonElement>(null);

@@ -1,4 +1,4 @@
-import * as Tone from "tone";
+import { BaseContext, UserMedia, getContext, start } from "tone";
 import {
   AudioEffectTypes,
   UserStreamEffectsType,
@@ -11,7 +11,7 @@ import {
 } from "../audioEffects/typeConstant";
 
 class AudioMedia {
-  private audioContext: Tone.BaseContext;
+  private audioContext: BaseContext;
   private mediaStream: MediaStream;
   private masterMediaStream: MediaStream;
 
@@ -29,13 +29,13 @@ class AudioMedia {
   };
 
   constructor(
-    private audioStream: Tone.UserMedia,
+    private audioStream: UserMedia,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>
   ) {
     this.effects = {};
 
     // Create an AudioContext and MediaStreamDestination
-    this.audioContext = Tone.getContext();
+    this.audioContext = getContext();
     this.masterMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
     this.micMediaStreamDestination =
@@ -49,7 +49,7 @@ class AudioMedia {
     this.assetSoundEffectsMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
 
-    // Connect the Tone.UserMedia instance to the MediaStreamDestination
+    // Connect the UserMedia instance to the MediaStreamDestination
     this.audioStream.connect(this.masterMediaStreamDestination);
     this.audioStream.connect(this.micMediaStreamDestination);
 
@@ -114,7 +114,7 @@ class AudioMedia {
   };
 
   openMic = async () => {
-    await Tone.start();
+    await start();
     await this.audioStream.open();
   };
 

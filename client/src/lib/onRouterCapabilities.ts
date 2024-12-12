@@ -1,14 +1,14 @@
-import * as mediasoup from "mediasoup-client";
+import { types, Device } from "mediasoup-client";
 
 const onRouterCapabilities = async (
   event: {
     type: string;
-    rtpCapabilities: mediasoup.types.RtpCapabilities;
+    rtpCapabilities: types.RtpCapabilities;
   },
-  device: React.MutableRefObject<mediasoup.types.Device | undefined>
+  device: React.MutableRefObject<types.Device | undefined>
 ) => {
   try {
-    device.current = new mediasoup.Device();
+    device.current = new Device();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.name === "UnsupportedError") {

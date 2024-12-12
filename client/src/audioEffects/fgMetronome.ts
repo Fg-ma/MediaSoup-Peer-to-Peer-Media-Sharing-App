@@ -1,27 +1,27 @@
-import * as Tone from "tone";
-import metronomeUrl from "../../public/audioSamples/metronome.wav";
+import { Player, Volume, getTransport, ToneAudioNode, Gain } from "tone";
 import { TransportClass } from "tone/build/esm/core/clock/Transport";
+import metronomeUrl from "../../public/audioSamples/metronome.wav";
 
 class FgMetronome {
-  private metronome: Tone.Player;
+  private metronome: Player;
   private bpm: number = 120;
 
   private transport: TransportClass;
 
-  private volumeNode: Tone.Volume;
+  private volumeNode: Volume;
 
   constructor() {
-    this.metronome = new Tone.Player({
+    this.metronome = new Player({
       url: metronomeUrl,
       loop: false, // Ensure the player does not loop
     });
 
-    this.volumeNode = new Tone.Volume(1);
+    this.volumeNode = new Volume(1);
     this.metronome.connect(this.volumeNode);
     this.volumeNode.toDestination();
 
     // Use getTransport to get the transport object
-    this.transport = Tone.getTransport();
+    this.transport = getTransport();
 
     // Set up the transport with a repeating event
     this.transport.scheduleRepeat((time: number) => {
@@ -29,7 +29,7 @@ class FgMetronome {
     }, "4n"); // Repeat every quarter note
   }
 
-  connect(destination: Tone.ToneAudioNode | Tone.Gain) {
+  connect(destination: ToneAudioNode | Gain) {
     this.metronome.connect(this.volumeNode);
     this.volumeNode.connect(destination);
   }

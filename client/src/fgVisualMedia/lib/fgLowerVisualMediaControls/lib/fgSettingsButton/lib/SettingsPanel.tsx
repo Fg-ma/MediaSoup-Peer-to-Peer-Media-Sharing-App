@@ -4,8 +4,6 @@ import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
 import FgButton from "../../../../../../fgElements/fgButton/FgButton";
 import ClosedCaptionsPage, {
   closedCaptionsSelections,
-  expandedClosedCaptionsBrowserSelections,
-  expandedClosedCaptionsVoskSelections,
 } from "./ClosedCaptionsPage";
 import ClosedCaptionsOptionsPage, {
   closedCaptionsOptionsArrays,
@@ -214,28 +212,8 @@ export default function SettingsPanel({
                       {Object.prototype.hasOwnProperty.call(
                         closedCaptionsSelections,
                         settings.closedCaption.value
-                      ) ? (
-                        // @ts-expect-error: check
-                        closedCaptionsSelections[settings.closedCaption.value]
-                      ) : Object.prototype.hasOwnProperty.call(
-                          expandedClosedCaptionsBrowserSelections,
-                          settings.closedCaption.value
-                        ) ? (
-                        // @ts-expect-error: check
-                        expandedClosedCaptionsBrowserSelections[
-                          settings.closedCaption.value
-                        ]
-                      ) : Object.prototype.hasOwnProperty.call(
-                          expandedClosedCaptionsVoskSelections,
-                          settings.closedCaption.value
-                        ) ? (
-                        // @ts-expect-error: check
-                        expandedClosedCaptionsVoskSelections[
-                          settings.closedCaption.value
-                        ]
-                      ) : (
-                        <></>
-                      )}
+                      ) &&
+                        closedCaptionsSelections[settings.closedCaption.value]}
                     </div>
                   </div>
                 )}

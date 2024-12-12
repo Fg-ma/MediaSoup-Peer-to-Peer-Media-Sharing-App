@@ -1,11 +1,11 @@
-import * as mediasoup from "mediasoup-client";
+import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import ProducersController from "src/lib/ProducersController";
 
 class AudioSectionController {
   constructor(
     private socket: React.MutableRefObject<Socket>,
-    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private device: React.MutableRefObject<types.Device | undefined>,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,

@@ -8,11 +8,7 @@ import {
   FontOpacities,
   FontSizes,
 } from "./fgLowerVisualMediaControls/FgLowerVisualMediaControls";
-import {
-  closedCaptionsSelections,
-  expandedClosedCaptionsBrowserSelections,
-  expandedClosedCaptionsVoskSelections,
-} from "./fgLowerVisualMediaControls/lib/fgSettingsButton/lib/ClosedCaptionsPage";
+import { closedCaptionsSelections } from "./fgLowerVisualMediaControls/lib/fgSettingsButton/lib/ClosedCaptionsPage";
 
 export interface FgVisualMediaOptions {
   isUser?: boolean;
@@ -35,10 +31,7 @@ export interface FgVisualMediaOptions {
 
 export interface Settings {
   closedCaption: {
-    value:
-      | keyof typeof closedCaptionsSelections
-      | keyof typeof expandedClosedCaptionsVoskSelections
-      | keyof typeof expandedClosedCaptionsBrowserSelections;
+    value: keyof typeof closedCaptionsSelections;
     closedCaptionOptionsActive: {
       value: "";
       fontFamily: { value: FontFamilies };

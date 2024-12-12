@@ -1,5 +1,5 @@
 import React from "react";
-import * as mediasoup from "mediasoup-client";
+import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { UserMedia } from "tone";
 import { v4 as uuidv4 } from "uuid";
@@ -30,7 +30,7 @@ import { Permissions } from "../context/permissionsContext/typeConstant";
 class ProducersController {
   constructor(
     private socket: React.MutableRefObject<Socket>,
-    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private device: React.MutableRefObject<types.Device | undefined>,
 
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
@@ -53,7 +53,7 @@ class ProducersController {
 
     private handleDisableEnableBtns: (disabled: boolean) => void,
     private producerTransport: React.MutableRefObject<
-      mediasoup.types.Transport<mediasoup.types.AppData> | undefined
+      types.Transport<types.AppData> | undefined
     >,
     private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
     private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -77,8 +77,6 @@ class ProducersController {
     cameraBrowserMedia: MediaStream
   ) => {
     const newCameraMedia = new CameraMedia(
-      this.username.current,
-      this.table_id.current,
       cameraId,
       cameraBrowserMedia,
       this.userEffectsStyles,
@@ -112,8 +110,6 @@ class ProducersController {
     screenBrowserMedia: MediaStream
   ) => {
     const newScreenMedia = new ScreenMedia(
-      this.username.current,
-      this.table_id.current,
       screenId,
       screenBrowserMedia,
       this.userEffectsStyles,
@@ -213,9 +209,9 @@ class ProducersController {
     type: string;
     params: {
       id: string;
-      iceParameters: mediasoup.types.IceParameters;
-      iceCandidates: mediasoup.types.IceCandidate[];
-      dtlsParameters: mediasoup.types.DtlsParameters;
+      iceParameters: types.IceParameters;
+      iceCandidates: types.IceCandidate[];
+      dtlsParameters: types.DtlsParameters;
     };
     error?: unknown;
   }) => {
@@ -397,15 +393,9 @@ class ProducersController {
         return;
       }
 
-      const videoTracks = screenBrowserMedia.getVideoTracks()[0];
-      const audioTracks = screenBrowserMedia.getAudioTracks()[0];
-
-      const videoStream = new MediaStream([videoTracks]);
-      const audioStream = new MediaStream([audioTracks]);
-
-      await this.createScreenProducer(producerId, videoStream);
-      if (audioStream) {
-        await this.createScreenAudioProducer(producerId, audioStream);
+      await this.createScreenProducer(producerId, screenBrowserMedia);
+      if (screenBrowserMedia.getAudioTracks()[0]) {
+        await this.createScreenAudioProducer(producerId, screenBrowserMedia);
       }
     } else if (producerType === "audio") {
       if (this.userMedia.current.audio) {

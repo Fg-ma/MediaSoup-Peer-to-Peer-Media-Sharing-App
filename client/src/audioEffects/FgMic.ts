@@ -1,4 +1,25 @@
-import * as Tone from "tone";
+import {
+  AutoFilter,
+  AutoPanner,
+  AutoWah,
+  BitCrusher,
+  Chebyshev,
+  Chorus,
+  Distortion,
+  EQ3,
+  FeedbackDelay,
+  Freeverb,
+  JCReverb,
+  Phaser,
+  PingPongDelay,
+  PitchShift,
+  Reverb,
+  StereoWidener,
+  Tremolo,
+  Vibrato,
+  UserMedia,
+  Gain,
+} from "tone";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
@@ -8,24 +29,24 @@ import {
 class FgMic {
   private micEffects: ToneEffectsType[] = [];
 
-  private autoFilter: Tone.AutoFilter | undefined;
-  private autoPanner: Tone.AutoPanner | undefined;
-  private autoWah: Tone.AutoWah | undefined;
-  private bitCrusher: Tone.BitCrusher | undefined;
-  private chebyshev: Tone.Chebyshev | undefined;
-  private chorus: Tone.Chorus | undefined;
-  private distortion: Tone.Distortion | undefined;
-  private eq3: Tone.EQ3 | undefined;
-  private feedbackDelay: Tone.FeedbackDelay | undefined;
-  private freeverb: Tone.Freeverb | undefined;
-  private JCReverb: Tone.JCReverb | undefined;
-  private phaser: Tone.Phaser | undefined;
-  private pingPongDelay: Tone.PingPongDelay | undefined;
-  private pitchShift: Tone.PitchShift | undefined;
-  private reverb: Tone.Reverb | undefined;
-  private stereoWidener: Tone.StereoWidener | undefined;
-  private tremolo: Tone.Tremolo | undefined;
-  private vibrato: Tone.Vibrato | undefined;
+  private autoFilter: AutoFilter | undefined;
+  private autoPanner: AutoPanner | undefined;
+  private autoWah: AutoWah | undefined;
+  private bitCrusher: BitCrusher | undefined;
+  private chebyshev: Chebyshev | undefined;
+  private chorus: Chorus | undefined;
+  private distortion: Distortion | undefined;
+  private eq3: EQ3 | undefined;
+  private feedbackDelay: FeedbackDelay | undefined;
+  private freeverb: Freeverb | undefined;
+  private JCReverb: JCReverb | undefined;
+  private phaser: Phaser | undefined;
+  private pingPongDelay: PingPongDelay | undefined;
+  private pitchShift: PitchShift | undefined;
+  private reverb: Reverb | undefined;
+  private stereoWidener: StereoWidener | undefined;
+  private tremolo: Tremolo | undefined;
+  private vibrato: Vibrato | undefined;
 
   private effectUpdaters: {
     [key in AudioMixEffectsType]: (
@@ -342,10 +363,10 @@ class FgMic {
   };
 
   constructor(
-    private audioStream: Tone.UserMedia,
+    private audioStream: UserMedia,
     private micMediaStreamDestination: MediaStreamAudioDestinationNode,
-    private masterChain: Tone.Gain<"gain">,
-    private micChain: Tone.Gain<"gain">
+    private masterChain: Gain<"gain">,
+    private micChain: Gain<"gain">
   ) {}
 
   updateEffects = (
@@ -503,7 +524,7 @@ class FgMic {
     octaves: (0 - 8) octaves
   */
   private applyAutoFilter = () => {
-    this.autoFilter = new Tone.AutoFilter().start();
+    this.autoFilter = new AutoFilter().start();
     this.addEffect(this.autoFilter);
   };
 
@@ -511,7 +532,7 @@ class FgMic {
     frequency: (0 - 10) Hz
   */
   private applyAutoPanner = () => {
-    this.autoPanner = new Tone.AutoPanner().start();
+    this.autoPanner = new AutoPanner().start();
     this.addEffect(this.autoPanner);
   };
 
@@ -521,7 +542,7 @@ class FgMic {
     sensitivity: (-40 - 0) dB
   */
   private applyAutoWah = () => {
-    this.autoWah = new Tone.AutoWah();
+    this.autoWah = new AutoWah();
     this.addEffect(this.autoWah);
   };
 
@@ -529,7 +550,7 @@ class FgMic {
     bits: (1 - 8) bits
   */
   private applyBitCrusher = () => {
-    this.bitCrusher = new Tone.BitCrusher();
+    this.bitCrusher = new BitCrusher();
     this.addEffect(this.bitCrusher);
   };
 
@@ -537,7 +558,7 @@ class FgMic {
     order: (1 - 100) order
   */
   private applyChebyshev = () => {
-    this.chebyshev = new Tone.Chebyshev();
+    this.chebyshev = new Chebyshev();
     this.addEffect(this.chebyshev);
   };
 
@@ -547,7 +568,7 @@ class FgMic {
     depth: (0 - 1) %
   */
   private applyChorus = () => {
-    this.chorus = new Tone.Chorus().start();
+    this.chorus = new Chorus().start();
     this.addEffect(this.chorus);
   };
 
@@ -556,7 +577,7 @@ class FgMic {
     oversample: (2, 4) x
   */
   private applyDistortion = () => {
-    this.distortion = new Tone.Distortion();
+    this.distortion = new Distortion();
     this.addEffect(this.distortion);
   };
 
@@ -566,7 +587,7 @@ class FgMic {
     high: (-24 - 24) dB
   */
   private applyEQ = () => {
-    this.eq3 = new Tone.EQ3();
+    this.eq3 = new EQ3();
     this.addEffect(this.eq3);
   };
 
@@ -575,7 +596,7 @@ class FgMic {
     feedback: (0 - 1) %
   */
   private applyFeedbackDelay = () => {
-    this.feedbackDelay = new Tone.FeedbackDelay();
+    this.feedbackDelay = new FeedbackDelay();
     this.addEffect(this.feedbackDelay);
   };
 
@@ -584,7 +605,7 @@ class FgMic {
     dampening: (0 - 10000) Hz
   */
   private applyFreeverb = () => {
-    this.freeverb = new Tone.Freeverb();
+    this.freeverb = new Freeverb();
     this.addEffect(this.freeverb);
   };
 
@@ -592,7 +613,7 @@ class FgMic {
     roomSize: (0 - 1) size
   */
   private applyJCReverb = () => {
-    this.JCReverb = new Tone.JCReverb();
+    this.JCReverb = new JCReverb();
     this.addEffect(this.JCReverb);
   };
 
@@ -602,7 +623,7 @@ class FgMic {
     baseFrequency: (0 - 10000) Hz
   */
   private applyPhaser = () => {
-    this.phaser = new Tone.Phaser();
+    this.phaser = new Phaser();
     this.addEffect(this.phaser);
   };
 
@@ -611,7 +632,7 @@ class FgMic {
     feedback: (0 - 1) %
   */
   private applyPingPongDelay = () => {
-    this.pingPongDelay = new Tone.PingPongDelay();
+    this.pingPongDelay = new PingPongDelay();
     this.addEffect(this.pingPongDelay);
   };
 
@@ -619,7 +640,7 @@ class FgMic {
     pitch: (-12 - 12) semitones
   */
   private applyPitchShift = () => {
-    this.pitchShift = new Tone.PitchShift();
+    this.pitchShift = new PitchShift();
     this.addEffect(this.pitchShift);
   };
 
@@ -628,7 +649,7 @@ class FgMic {
     preDelay: (0 - 0.1) seconds
   */
   private applyReverb = () => {
-    this.reverb = new Tone.Reverb();
+    this.reverb = new Reverb();
     this.addEffect(this.reverb);
   };
 
@@ -636,7 +657,7 @@ class FgMic {
     width: (0 - 1) width
   */
   private applyStereoWidener = () => {
-    this.stereoWidener = new Tone.StereoWidener();
+    this.stereoWidener = new StereoWidener();
     this.addEffect(this.stereoWidener);
   };
 
@@ -645,7 +666,7 @@ class FgMic {
     depth: (0 - 1) %
   */
   private applyTremolo = () => {
-    this.tremolo = new Tone.Tremolo().start();
+    this.tremolo = new Tremolo().start();
     this.addEffect(this.tremolo);
   };
 
@@ -654,7 +675,7 @@ class FgMic {
     depth: (0 - 1) %
   */
   private applyVibrato = () => {
-    this.vibrato = new Tone.Vibrato();
+    this.vibrato = new Vibrato();
     this.addEffect(this.vibrato);
   };
 }

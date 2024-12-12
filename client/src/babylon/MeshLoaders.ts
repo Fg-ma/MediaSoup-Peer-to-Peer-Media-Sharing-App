@@ -7,7 +7,6 @@ import {
   Material,
   Scene,
 } from "@babylonjs/core";
-import "@babylonjs/loaders";
 
 class MeshLoaders {
   constructor(private scene: Scene) {}

@@ -1,24 +1,24 @@
-import * as Tone from "tone";
+import { Player, Volume, Gain } from "tone";
 import { BackgroundMusicTypes } from "../context/streamEffectsContext/typeConstant";
 
 class FgBackgroundMusic {
-  private volumeNode: Tone.Volume;
+  private volumeNode: Volume;
   players: {
     [backgroundMusicType in BackgroundMusicTypes]?: {
-      player: Tone.Player;
+      player: Player;
       url: string;
     };
   } = {};
   importedPlayers: Record<
     number,
-    { player: Tone.Player; file: File; path: string }
+    { player: Player; file: File; path: string }
   > = {};
 
   constructor(
     private backgroundMusicMediaStreamDestination: MediaStreamAudioDestinationNode,
-    private backgroundMusicChain: Tone.Gain
+    private backgroundMusicChain: Gain
   ) {
-    this.volumeNode = new Tone.Volume(0); // 0 dB by default
+    this.volumeNode = new Volume(0); // 0 dB by default
 
     // Set up the initial connections
     this.volumeNode.connect(this.backgroundMusicChain); // Connect volumeNode to the sound effects chain
@@ -34,7 +34,7 @@ class FgBackgroundMusic {
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       try {
-        const player = new Tone.Player(url, () => {
+        const player = new Player(url, () => {
           resolve(); // Resolve the promise once the sound is loaded
         }).toDestination();
 
@@ -82,7 +82,7 @@ class FgBackgroundMusic {
       try {
         const url = URL.createObjectURL(file);
 
-        const player = new Tone.Player(url, () => {
+        const player = new Player(url, () => {
           resolve(); // Resolve the promise once the sound is loaded
         }).toDestination();
 

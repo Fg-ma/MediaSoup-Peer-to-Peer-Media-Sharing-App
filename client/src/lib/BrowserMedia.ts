@@ -1,12 +1,12 @@
-import * as mediasoup from "mediasoup-client";
-import * as Tone from "tone";
+import { types } from "mediasoup-client";
+import { UserMedia } from "tone";
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
 
 class BrowserMedia {
   constructor(
-    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private device: React.MutableRefObject<types.Device | undefined>,
     private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
@@ -76,7 +76,7 @@ class BrowserMedia {
 
   getAudioMedia = async () => {
     try {
-      const mic = new Tone.UserMedia();
+      const mic = new UserMedia();
       return mic;
     } catch (error) {
       this.handleDisableEnableBtns(false);

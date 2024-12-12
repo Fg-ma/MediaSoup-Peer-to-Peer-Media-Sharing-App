@@ -2,11 +2,11 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   defaultCameraEffectsStyles,
   UserEffectsStylesType,
-  AudioEffectTypes,
   CameraEffectTypes,
   defaultCameraStreamEffects,
-  ScreenEffectTypes,
+  UserStreamEffectsType,
 } from "../context/streamEffectsContext/typeConstant";
+import { UserMediaType } from "../context/streamsContext/typeConstant";
 import UserDevice from "./UserDevice";
 import BabylonScene, {
   EffectType,
@@ -15,8 +15,6 @@ import BabylonScene, {
 import assetMeshes from "../babylon/meshes";
 import FaceLandmarks from "../babylon/FaceLandmarks";
 import Deadbanding from "../babylon/Deadbanding";
-import ScreenMedia from "./ScreenMedia";
-import AudioMedia from "./AudioMedia";
 
 class CameraMedia {
   canvas: HTMLCanvasElement;
@@ -44,31 +42,13 @@ class CameraMedia {
   babylonScene: BabylonScene;
 
   constructor(
-    private username: string,
-    private table_id: string,
     private cameraId: string,
     private initCameraStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userStreamEffects: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-      };
-      screen: {
-        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-      };
-      audio: { [effectType in AudioEffectTypes]: boolean };
-    }>,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>
+    private userMedia: React.MutableRefObject<UserMediaType>
   ) {
     this.effects = {};
 

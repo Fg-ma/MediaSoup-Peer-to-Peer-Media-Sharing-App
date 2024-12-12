@@ -1,4 +1,25 @@
-import * as Tone from "tone";
+import {
+  Filter,
+  Panner,
+  AutoFilter,
+  AutoPanner,
+  AutoWah,
+  Chorus,
+  Distortion,
+  EQ3,
+  FeedbackDelay,
+  Freeverb,
+  JCReverb,
+  Phaser,
+  PingPongDelay,
+  PitchShift,
+  Reverb,
+  StereoWidener,
+  Tremolo,
+  Vibrato,
+  BitCrusher,
+  Chebyshev,
+} from "tone";
 
 export type AudioMixEffectsType =
   | "autoFilter"
@@ -23,8 +44,8 @@ export type AudioMixEffectsType =
 export type AutoFilterOptionsType = "frequency" | "baseFrequency" | "octaves";
 export type AutoPannerOptionsType = "frequency";
 export type AutoWahOptionsType = "baseFrequency" | "octaves" | "sensitivity";
-export type BitCrusher = "bits";
-export type Chebyshev = "order";
+export type BitCrusherType = "bits";
+export type ChebyshevType = "order";
 export type ChorusOptionsType = "frequency" | "delayTime" | "depth";
 export type DistortionOptionsType = "distortion" | "oversample";
 export type EQOptionsType = "high" | "mid" | "low";
@@ -43,8 +64,8 @@ export type MixEffectsOptionsType =
   | AutoFilterOptionsType
   | AutoPannerOptionsType
   | AutoWahOptionsType
-  | BitCrusher
-  | Chebyshev
+  | BitCrusherType
+  | ChebyshevType
   | ChorusOptionsType
   | DistortionOptionsType
   | EQOptionsType
@@ -60,23 +81,23 @@ export type MixEffectsOptionsType =
   | VibratoOptionsType;
 
 export type ToneEffectsType =
-  | Tone.Filter
-  | Tone.Panner
-  | Tone.AutoFilter
-  | Tone.AutoPanner
-  | Tone.AutoWah
-  | Tone.BitCrusher
-  | Tone.Chebyshev
-  | Tone.Chorus
-  | Tone.Distortion
-  | Tone.EQ3
-  | Tone.FeedbackDelay
-  | Tone.Freeverb
-  | Tone.JCReverb
-  | Tone.Phaser
-  | Tone.PingPongDelay
-  | Tone.PitchShift
-  | Tone.Reverb
-  | Tone.StereoWidener
-  | Tone.Tremolo
-  | Tone.Vibrato;
+  | Filter
+  | Panner
+  | AutoFilter
+  | AutoPanner
+  | AutoWah
+  | BitCrusher
+  | Chebyshev
+  | Chorus
+  | Distortion
+  | EQ3
+  | FeedbackDelay
+  | Freeverb
+  | JCReverb
+  | Phaser
+  | PingPongDelay
+  | PitchShift
+  | Reverb
+  | StereoWidener
+  | Tremolo
+  | Vibrato;

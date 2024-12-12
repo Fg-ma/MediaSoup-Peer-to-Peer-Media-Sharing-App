@@ -1,4 +1,4 @@
-import * as Tone from "tone";
+import { BaseContext, getContext, start } from "tone";
 import {
   AudioEffectTypes,
   defaultAudioStreamEffects,
@@ -13,7 +13,7 @@ import {
 
 class ScreenAudioMedia {
   private audioSource: MediaStreamAudioSourceNode;
-  private audioContext: Tone.BaseContext;
+  private audioContext: BaseContext;
   private mediaStream: MediaStream;
   private masterMediaStream: MediaStream;
 
@@ -41,7 +41,7 @@ class ScreenAudioMedia {
       structuredClone(defaultAudioStreamEffects);
 
     // Create an AudioContext and MediaStreamDestination
-    this.audioContext = Tone.getContext();
+    this.audioContext = getContext();
     this.masterMediaStreamDestination =
       this.audioContext.createMediaStreamDestination();
     this.audioStreamMediaStreamDestination =
@@ -110,7 +110,7 @@ class ScreenAudioMedia {
       this.masterMediaStreamDestination.stream.getAudioTracks()[0]
     );
 
-    Tone.start();
+    start();
   }
 
   deconstructor = () => {
@@ -1529,11 +1529,6 @@ class ScreenAudioMedia {
     return this.audioEffects.fgSampler.swapSampler(sampler, increment);
   };
 
-  muteMic = (isMuted: boolean) => {
-    this.masterMediaStreamDestination.stream.getAudioTracks()[0].enabled =
-      !isMuted;
-  };
-
   // Set volume (in decibels)
   setSamplerVolume = (volume: number) => {
     this.audioEffects.fgSampler.setVolume(volume);
@@ -1556,7 +1551,7 @@ class ScreenAudioMedia {
   };
 
   getStream = () => {
-    return this.mediaStream;
+    return this.masterMediaStream;
   };
 
   getTracks = () => {

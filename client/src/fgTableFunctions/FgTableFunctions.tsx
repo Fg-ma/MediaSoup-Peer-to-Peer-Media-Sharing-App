@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import * as mediasoup from "mediasoup-client";
+import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useStreamsContext } from "../context/streamsContext/StreamsContext";
@@ -50,13 +50,13 @@ export default function FgTableFunctions({
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;
   socket: React.MutableRefObject<Socket>;
-  device: React.MutableRefObject<mediasoup.types.Device | undefined>;
+  device: React.MutableRefObject<types.Device | undefined>;
   producersController: ProducersController;
   producerTransport: React.MutableRefObject<
-    mediasoup.types.Transport<mediasoup.types.AppData> | undefined
+    types.Transport<types.AppData> | undefined
   >;
   consumerTransport: React.MutableRefObject<
-    mediasoup.types.Transport<mediasoup.types.AppData> | undefined
+    types.Transport<types.AppData> | undefined
   >;
   setBundles: React.Dispatch<
     React.SetStateAction<{
@@ -152,7 +152,6 @@ export default function FgTableFunctions({
     } else if (producerType === "screenAudio" && producerId) {
       userMedia.current.screenAudio[producerId].changeEffects(effect, false);
     }
-    userMedia.current.audio?.changeEffects(effect, false);
 
     if (permissions.current.acceptsAudioEffects) {
       const msg = {
@@ -163,7 +162,6 @@ export default function FgTableFunctions({
         producerType,
         producerId,
         effect: effect,
-        effectStyle: undefined,
         blockStateChange: false,
       };
 
@@ -177,7 +175,7 @@ export default function FgTableFunctions({
 
   const handleMessage = async (event: {
     type: "routerCapabilities";
-    rtpCapabilities: mediasoup.types.RtpCapabilities;
+    rtpCapabilities: types.RtpCapabilities;
   }) => {
     switch (event.type) {
       case "routerCapabilities":

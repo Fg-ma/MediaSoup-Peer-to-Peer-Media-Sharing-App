@@ -151,6 +151,7 @@ export default function FgAudioElementContainer({
       username,
       instance,
       positioning,
+      permissions,
       remoteDataStreams,
       positioningListeners,
       setRerender
@@ -194,41 +195,7 @@ export default function FgAudioElementContainer({
       return;
     }
 
-    // Attach message listeners
-    const attachListeners = () => {
-      for (const remoteUsername in remoteDataStreams.current) {
-        const remoteUserStreams = remoteDataStreams.current[remoteUsername];
-        for (const remoteInstance in remoteUserStreams) {
-          const stream =
-            remoteUserStreams[remoteInstance].positionScaleRotation;
-          if (stream) {
-            const handleMessage = (message: string) => {
-              const data = JSON.parse(message);
-              if (
-                data.table_id === table_id &&
-                data.username === username &&
-                data.instance === instance &&
-                data.type === "audio"
-              ) {
-                positioning.current = data.positioning;
-                setRerender((prev) => !prev);
-              }
-            };
-
-            stream.on("message", handleMessage);
-
-            // Store cleanup function
-            if (!positioningListeners.current[remoteUsername]) {
-              positioningListeners.current[remoteUsername] = {};
-            }
-            positioningListeners.current[remoteUsername][remoteInstance] = () =>
-              stream.off("message", handleMessage);
-          }
-        }
-      }
-    };
-
-    attachListeners();
+    fgAudioElementContainerController.attachListeners();
 
     // Cleanup on unmount or dependency change
     return () => {

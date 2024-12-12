@@ -1,3 +1,4 @@
+import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import {
   UserEffectsStylesType,
   HideBackgroundEffectTypes,
@@ -12,7 +13,6 @@ import ScreenMedia from "../../lib/ScreenMedia";
 import AudioMedia from "../../lib/AudioMedia";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import { FgVisualMediaOptions } from "./typeConstant";
-import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 
 type FgVisualMediaMessageEvents =
   | {
@@ -435,10 +435,12 @@ class FgVisualMediaController {
           const handleMessage = (message: string) => {
             const data = JSON.parse(message);
             if (
+              this.fgVisualMediaOptions.permissions
+                ?.acceptsPositionScaleRotationManipulation &&
               data.table_id === this.table_id &&
               data.username === this.username &&
               data.instance === this.instance &&
-              data.type === "audio"
+              data.type === this.type
             ) {
               this.positioning.current = data.positioning;
               this.setRerender((prev) => !prev);

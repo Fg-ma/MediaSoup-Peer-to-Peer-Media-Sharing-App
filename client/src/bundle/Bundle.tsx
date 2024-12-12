@@ -291,9 +291,14 @@ export default function Bundle({
                 type='screen'
                 bundleRef={bundleRef}
                 audioStream={audioStream}
-                screenAudioStream={userMedia.current.screenAudio?.[
-                  `${key}_audio`
-                ].getMasterStream()}
+                screenAudioStream={
+                  userMedia.current.screenAudio &&
+                  userMedia.current.screenAudio?.[`${key}_audio`]
+                    ? userMedia.current.screenAudio?.[
+                        `${key}_audio`
+                      ].getMasterStream()
+                    : undefined
+                }
                 audioRef={audioRef}
                 handleAudioEffectChange={
                   bundleController.handleAudioEffectChange
@@ -377,8 +382,11 @@ export default function Bundle({
           </Suspense>
         ))}
       {audioStream &&
-        Object.keys(cameraStreams || {}).length === 0 &&
-        Object.keys(screenStreams || {}).length === 0 && (
+        Object.keys(cameraStreams ?? {}).length === 0 &&
+        (Object.keys(screenStreams ?? {}).length === 0 ||
+          (bundleOptions.isUser &&
+            Object.keys(userMedia.current.screenAudio ?? {}).length !== 0) ||
+          (!bundleOptions.isUser && screenAudioStreams)) && (
           <Suspense fallback={<div>Loading...</div>}>
             <FgAudioElementContainer
               socket={socket}

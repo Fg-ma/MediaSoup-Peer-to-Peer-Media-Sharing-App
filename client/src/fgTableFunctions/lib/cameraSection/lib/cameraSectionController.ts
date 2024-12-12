@@ -1,4 +1,4 @@
-import * as mediasoup from "mediasoup-client";
+import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import CameraMedia from "../../../../lib/CameraMedia";
 import ScreenMedia from "../../../../lib/ScreenMedia";
@@ -8,7 +8,7 @@ import ProducersController from "../../../../lib/ProducersController";
 class CameraSectionController {
   constructor(
     private socket: React.MutableRefObject<Socket>,
-    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private device: React.MutableRefObject<types.Device | undefined>,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,

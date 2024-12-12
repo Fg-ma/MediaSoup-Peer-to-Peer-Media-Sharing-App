@@ -1,4 +1,4 @@
-import * as mediasoup from "mediasoup-client";
+import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import {
   RemoteTracksMapType,
@@ -25,10 +25,10 @@ class TableFunctionsController {
       }>
     >,
     private consumerTransport: React.MutableRefObject<
-      mediasoup.types.Transport<mediasoup.types.AppData> | undefined
+      types.Transport<types.AppData> | undefined
     >,
     private producerTransport: React.MutableRefObject<
-      mediasoup.types.Transport<mediasoup.types.AppData> | undefined
+      types.Transport<types.AppData> | undefined
     >,
     private isCamera: React.MutableRefObject<boolean>,
     private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -39,7 +39,7 @@ class TableFunctionsController {
     private setMutedAudio: React.Dispatch<React.SetStateAction<boolean>>,
     private mutedAudioRef: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
-    private device: React.MutableRefObject<mediasoup.types.Device | undefined>
+    private device: React.MutableRefObject<types.Device | undefined>
   ) {}
 
   joinTable = () => {

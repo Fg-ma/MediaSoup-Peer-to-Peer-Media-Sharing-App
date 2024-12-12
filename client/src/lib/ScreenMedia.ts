@@ -1,18 +1,16 @@
 import {
   defaultScreenEffectsStyles,
   UserEffectsStylesType,
-  AudioEffectTypes,
-  CameraEffectTypes,
   defaultScreenStreamEffects,
   ScreenEffectTypes,
+  UserStreamEffectsType,
 } from "../context/streamEffectsContext/typeConstant";
+import { UserMediaType } from "../context/streamsContext/typeConstant";
 import UserDevice from "./UserDevice";
 import BabylonScene, {
   EffectType,
   validEffectTypes,
 } from "../babylon/BabylonScene";
-import CameraMedia from "./CameraMedia";
-import AudioMedia from "./AudioMedia";
 
 class ScreenMedia {
   canvas: HTMLCanvasElement;
@@ -29,30 +27,12 @@ class ScreenMedia {
   babylonScene: BabylonScene;
 
   constructor(
-    private username: string,
-    private table_id: string,
     private screenId: string,
     private initScreenStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userStreamEffects: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-      };
-      screen: {
-        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-      };
-      audio: { [effectType in AudioEffectTypes]: boolean };
-    }>,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userDevice: UserDevice,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>
+    private userMedia: React.MutableRefObject<UserMediaType>
   ) {
     this.effects = {};
 

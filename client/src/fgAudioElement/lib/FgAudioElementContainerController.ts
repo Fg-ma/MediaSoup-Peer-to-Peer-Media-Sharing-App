@@ -1,4 +1,5 @@
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 type FgAudioContainerMessageEvents =
   | {
@@ -78,6 +79,7 @@ class FgAudioElementContainerController {
       };
       rotation: number;
     }>,
+    private permissions: Permissions,
     private remoteDataStreams: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: {
@@ -203,6 +205,39 @@ class FgAudioElementContainerController {
         break;
       default:
         break;
+    }
+  };
+
+  attachListeners = () => {
+    for (const remoteUsername in this.remoteDataStreams.current) {
+      const remoteUserStreams = this.remoteDataStreams.current[remoteUsername];
+      for (const remoteInstance in remoteUserStreams) {
+        const stream = remoteUserStreams[remoteInstance].positionScaleRotation;
+        if (stream) {
+          const handleMessage = (message: string) => {
+            const data = JSON.parse(message);
+            if (
+              this.permissions.acceptsAudioEffects &&
+              data.table_id === this.table_id &&
+              data.username === this.username &&
+              data.instance === this.instance &&
+              data.type === "audio"
+            ) {
+              this.positioning.current = data.positioning;
+              this.setRerender((prev) => !prev);
+            }
+          };
+
+          stream.on("message", handleMessage);
+
+          // Store cleanup function
+          if (!this.positioningListeners.current[remoteUsername]) {
+            this.positioningListeners.current[remoteUsername] = {};
+          }
+          this.positioningListeners.current[remoteUsername][remoteInstance] =
+            () => stream.off("message", handleMessage);
+        }
+      }
     }
   };
 }

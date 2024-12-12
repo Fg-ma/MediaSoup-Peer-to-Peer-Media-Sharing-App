@@ -424,6 +424,8 @@ export default function FgBabylonCanvas({
   useEffect(() => {
     if (
       adjustingDimensions &&
+      fgVisualMediaOptions.permissions
+        .acceptsPositionScaleRotationManipulation &&
       userDataStreams.current.positionScaleRotation?.readyState === "open"
     ) {
       userDataStreams.current.positionScaleRotation?.send(
@@ -431,7 +433,7 @@ export default function FgBabylonCanvas({
           table_id,
           username,
           instance,
-          type: "audio",
+          type,
           positioning: positioning.current,
         })
       );

@@ -1,4 +1,4 @@
-import * as Tone from "tone";
+import { UserMedia, Gain } from "tone";
 import FgMic from "./FgMic";
 import FgSampler from "./FgSampler";
 import FgSoundEffects from "./FgSoundEffects";
@@ -8,13 +8,13 @@ import { AudioMixEffectsType } from "./typeConstant";
 import FgAudioStreamEffects from "./FgAudioStreamEffects";
 
 class AudioEffects {
-  private masterChain: Tone.Gain;
-  private micChain: Tone.Gain | undefined;
-  private audioStreamChain: Tone.Gain | undefined;
-  private samplerChain: Tone.Gain;
-  private soundEffectsChain: Tone.Gain;
-  private backgroundMusicChain: Tone.Gain;
-  private assetSoundEffectsChain: Tone.Gain;
+  private masterChain: Gain;
+  private micChain: Gain | undefined;
+  private audioStreamChain: Gain | undefined;
+  private samplerChain: Gain;
+  private soundEffectsChain: Gain;
+  private backgroundMusicChain: Gain;
+  private assetSoundEffectsChain: Gain;
 
   effects: AudioMixEffectsType[] = [
     "autoFilter",
@@ -50,7 +50,7 @@ class AudioEffects {
   fgAssetSoundEffects: FgAssetSoundEffects;
 
   constructor(
-    private audioStream: Tone.UserMedia | MediaStreamAudioSourceNode,
+    private audioStream: UserMedia | MediaStreamAudioSourceNode,
     private masterMediaStreamDestination: MediaStreamAudioDestinationNode,
     private micMediaStreamDestination:
       | MediaStreamAudioDestinationNode
@@ -63,23 +63,23 @@ class AudioEffects {
     private backgroundMusicMediaStreamDestination: MediaStreamAudioDestinationNode,
     private assetSoundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode
   ) {
-    this.masterChain = new Tone.Gain(); // Create a Gain node for the master chain
+    this.masterChain = new Gain(); // Create a Gain node for the master chain
 
     if (this.micMediaStreamDestination) {
-      this.micChain = new Tone.Gain(); // Create a Gain node for the mic chain
+      this.micChain = new Gain(); // Create a Gain node for the mic chain
     }
 
     if (this.audioStreamMediaStreamDestination) {
-      this.audioStreamChain = new Tone.Gain(); // Create a Gain node for the mic chain
+      this.audioStreamChain = new Gain(); // Create a Gain node for the mic chain
     }
 
-    this.samplerChain = new Tone.Gain(); // Create a Gain node for the sampler chain
+    this.samplerChain = new Gain(); // Create a Gain node for the sampler chain
 
-    this.soundEffectsChain = new Tone.Gain(); // Create a Gain node for the sound effects chain
+    this.soundEffectsChain = new Gain(); // Create a Gain node for the sound effects chain
 
-    this.backgroundMusicChain = new Tone.Gain(); // Create a Gain node for the background music chain
+    this.backgroundMusicChain = new Gain(); // Create a Gain node for the background music chain
 
-    this.assetSoundEffectsChain = new Tone.Gain(); // Create a Gain node for the asset sound effects chain
+    this.assetSoundEffectsChain = new Gain(); // Create a Gain node for the asset sound effects chain
 
     if (this.micChain) {
       this.micChain.connect(this.masterChain);
@@ -109,7 +109,7 @@ class AudioEffects {
     );
 
     if (
-      this.audioStream instanceof Tone.UserMedia &&
+      this.audioStream instanceof UserMedia &&
       this.micMediaStreamDestination !== undefined &&
       this.micChain !== undefined
     ) {
@@ -122,7 +122,7 @@ class AudioEffects {
     }
 
     if (
-      !(this.audioStream instanceof Tone.UserMedia) &&
+      !(this.audioStream instanceof UserMedia) &&
       this.audioStreamMediaStreamDestination !== undefined &&
       this.audioStreamChain !== undefined
     ) {

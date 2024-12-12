@@ -1,5 +1,5 @@
 import React from "react";
-import * as mediasoup from "mediasoup-client";
+import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { useStreamsContext } from "../../../context/streamsContext/StreamsContext";
 import CameraSectionController from "./lib/cameraSectionController";
@@ -24,7 +24,7 @@ export default function CameraSection({
   handleDisableEnableBtns,
 }: {
   socket: React.MutableRefObject<Socket>;
-  device: React.MutableRefObject<mediasoup.types.Device | undefined>;
+  device: React.MutableRefObject<types.Device | undefined>;
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;

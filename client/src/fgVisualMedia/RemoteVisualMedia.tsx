@@ -387,7 +387,8 @@ export default function RemoteVisualMedia({
   useEffect(() => {
     if (
       adjustingDimensions &&
-      fgVisualMediaOptions.permissions.acceptsAudioEffects &&
+      fgVisualMediaOptions.permissions
+        .acceptsPositionScaleRotationManipulation &&
       userDataStreams.current.positionScaleRotation?.readyState === "open"
     ) {
       userDataStreams.current.positionScaleRotation?.send(
@@ -395,7 +396,7 @@ export default function RemoteVisualMedia({
           table_id,
           username,
           instance,
-          type: "audio",
+          type,
           positioning: positioning.current,
         })
       );

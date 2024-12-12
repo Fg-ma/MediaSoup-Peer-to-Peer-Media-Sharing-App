@@ -1,9 +1,9 @@
 import React from "react";
-import * as mediasoup from "mediasoup-client";
-import { Socket } from "socket.io-client";
+import { types } from "mediasoup-client";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import { RtpParameters } from "mediasoup-client/lib/RtpParameters";
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
+import { Socket } from "socket.io-client";
 import {
   DataStreamTypes,
   RemoteDataStreamsType,
@@ -13,14 +13,14 @@ import {
 class ConsumersController {
   constructor(
     private socket: React.MutableRefObject<Socket>,
-    private device: React.MutableRefObject<mediasoup.types.Device | undefined>,
+    private device: React.MutableRefObject<types.Device | undefined>,
 
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
     private consumerTransport: React.MutableRefObject<
-      mediasoup.types.Transport<mediasoup.types.AppData> | undefined
+      types.Transport<types.AppData> | undefined
     >,
 
     private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
@@ -249,9 +249,9 @@ class ConsumersController {
     type: "consumerTransportCreated";
     params: {
       id: string;
-      iceParameters: mediasoup.types.IceParameters;
-      iceCandidates: mediasoup.types.IceCandidate[];
-      dtlsParameters: mediasoup.types.DtlsParameters;
+      iceParameters: types.IceParameters;
+      iceCandidates: types.IceCandidate[];
+      dtlsParameters: types.DtlsParameters;
     };
     error?: unknown;
   }) {
@@ -403,7 +403,7 @@ class ConsumersController {
       id: string;
       producerId: string;
       kind: "audio" | "video" | undefined;
-      rtpParameters: mediasoup.types.RtpParameters;
+      rtpParameters: types.RtpParameters;
       type: string;
       producerPaused: boolean;
     };

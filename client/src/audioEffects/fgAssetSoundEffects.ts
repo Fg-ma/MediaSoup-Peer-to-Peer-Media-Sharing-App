@@ -1,14 +1,14 @@
-import * as Tone from "tone";
+import { Volume, Player, Gain } from "tone";
 
 class FgAssetSoundEffects {
-  private volumeNode: Tone.Volume;
-  players: { [url: string]: Tone.Player } = {};
+  private volumeNode: Volume;
+  players: { [url: string]: Player } = {};
 
   constructor(
     private assetSoundEffectsMediaStreamDestination: MediaStreamAudioDestinationNode,
-    private assetSoundEffectsChain: Tone.Gain
+    private assetSoundEffectsChain: Gain
   ) {
-    this.volumeNode = new Tone.Volume(0); // 0 dB by default
+    this.volumeNode = new Volume(0); // 0 dB by default
 
     // Set up the initial connections
     this.volumeNode.connect(this.assetSoundEffectsChain); // Connect volumeNode to the sound effects chain
@@ -21,7 +21,7 @@ class FgAssetSoundEffects {
   loadAssetSoundEffect = (url: string): Promise<void> => {
     return new Promise((resolve, reject) => {
       try {
-        const player = new Tone.Player(url, () => {
+        const player = new Player(url, () => {
           resolve(); // Resolve the promise once the sound is loaded
         }).toDestination();
 
@@ -50,7 +50,7 @@ class FgAssetSoundEffects {
     }
 
     // Create a new player with the updated URL
-    const newPlayer = new Tone.Player(url).toDestination();
+    const newPlayer = new Player(url).toDestination();
     newPlayer.connect(this.volumeNode);
 
     // Update the player entry with the new player and URL
