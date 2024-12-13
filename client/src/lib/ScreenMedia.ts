@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client";
 import {
   defaultScreenEffectsStyles,
   UserEffectsStylesType,
@@ -22,12 +23,14 @@ class ScreenMedia {
     [screenEffect in ScreenEffectTypes]?: boolean;
   };
 
-  private maxFaces: [number] = [1];
-
   babylonScene: BabylonScene;
 
   constructor(
+    private table_id: string,
+    private username: string,
+    private instance: string,
     private screenId: string,
+    private socket: React.MutableRefObject<Socket>,
     private originalScreenStream: MediaStream,
     private screenStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -70,7 +73,7 @@ class ScreenMedia {
       undefined,
       undefined,
       this.userDevice,
-      this.maxFaces,
+      [0],
       this.userMedia
     );
 
@@ -80,7 +83,39 @@ class ScreenMedia {
       this.canvas.height = this.video.videoHeight;
       this.video.play();
     };
+
+    this.originalScreenStream
+      .getVideoTracks()[0]
+      .addEventListener("ended", this.originalScreenStreamEnded);
   }
+
+  originalScreenStreamEnded = () => {
+    this.originalScreenStream
+      .getVideoTracks()[0]
+      .removeEventListener("ended", this.originalScreenStreamEnded);
+
+    const msg = {
+      type: "removeProducer",
+      table_id: this.table_id,
+      username: this.username,
+      instance: this.instance,
+      producerType: "screen",
+      producerId: this.screenId,
+    };
+    this.socket.current.emit("message", msg);
+
+    if (this.userMedia.current.screenAudio[`${this.screenId}_audio`]) {
+      const message = {
+        type: "removeProducer",
+        table_id: this.table_id,
+        username: this.username,
+        instance: this.instance,
+        producerType: "screenAudio",
+        producerId: `${this.screenId}_audio`,
+      };
+      this.socket.current.emit("message", message);
+    }
+  };
 
   deconstructor() {
     // End initial stream

@@ -111,7 +111,11 @@ class ProducersController {
     screenBrowserMedia: MediaStream
   ) => {
     const newScreenMedia = new ScreenMedia(
+      this.table_id.current,
+      this.username.current,
+      this.instance.current,
       screenId,
+      this.socket,
       originalScreenBrowserMedia,
       screenBrowserMedia,
       this.userEffectsStyles,

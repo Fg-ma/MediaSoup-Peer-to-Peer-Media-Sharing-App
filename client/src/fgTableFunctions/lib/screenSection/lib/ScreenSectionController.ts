@@ -1,8 +1,6 @@
 import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
-import CameraMedia from "../../../../lib/CameraMedia";
-import ScreenMedia from "../../../../lib/ScreenMedia";
-import AudioMedia from "../../../../lib/AudioMedia";
+import { UserMediaType } from "../../../../context/streamsContext/typeConstant";
 import ProducersController from "../../../../lib/ProducersController";
 
 class ScreenSectionController {
@@ -16,15 +14,7 @@ class ScreenSectionController {
     private isScreen: React.MutableRefObject<boolean>,
     private setScreenActive: (value: React.SetStateAction<boolean>) => void,
 
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
 
     private producersController: ProducersController,
 
@@ -56,15 +46,21 @@ class ScreenSectionController {
         };
         this.socket.current.emit("message", msg);
 
-        const message = {
-          type: "removeProducer",
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-          producerType: "screen",
-          producerId: `${screenIds[screenIds.length - 1]}_audio`,
-        };
-        this.socket.current.emit("message", message);
+        if (
+          this.userMedia.current.screenAudio[
+            `${screenIds[screenIds.length - 1]}_audio`
+          ]
+        ) {
+          const message = {
+            type: "removeProducer",
+            table_id: this.table_id.current,
+            username: this.username.current,
+            instance: this.instance.current,
+            producerType: "screenAudio",
+            producerId: `${screenIds[screenIds.length - 1]}_audio`,
+          };
+          this.socket.current.emit("message", message);
+        }
       }
     }
   };
