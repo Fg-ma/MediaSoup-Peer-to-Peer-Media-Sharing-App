@@ -28,7 +28,8 @@ class ScreenMedia {
 
   constructor(
     private screenId: string,
-    private initScreenStream: MediaStream,
+    private originalScreenStream: MediaStream,
+    private screenStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userDevice: UserDevice,
@@ -73,7 +74,7 @@ class ScreenMedia {
       this.userMedia
     );
 
-    this.video.srcObject = this.initScreenStream;
+    this.video.srcObject = this.screenStream;
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
@@ -83,7 +84,8 @@ class ScreenMedia {
 
   deconstructor() {
     // End initial stream
-    this.initScreenStream.getTracks().forEach((track) => track.stop());
+    this.screenStream.getTracks().forEach((track) => track.stop());
+    this.originalScreenStream.getTracks().forEach((track) => track.stop());
 
     // End video
     this.video.pause();

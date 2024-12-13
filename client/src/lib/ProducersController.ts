@@ -107,10 +107,12 @@ class ProducersController {
 
   private createScreenProducer = async (
     screenId: string,
+    originalScreenBrowserMedia: MediaStream,
     screenBrowserMedia: MediaStream
   ) => {
     const newScreenMedia = new ScreenMedia(
       screenId,
+      originalScreenBrowserMedia,
       screenBrowserMedia,
       this.userEffectsStyles,
       this.userStreamEffects,
@@ -393,9 +395,19 @@ class ProducersController {
         return;
       }
 
-      await this.createScreenProducer(producerId, screenBrowserMedia);
-      if (screenBrowserMedia.getAudioTracks()[0]) {
-        await this.createScreenAudioProducer(producerId, screenBrowserMedia);
+      const videoTrack = screenBrowserMedia.getVideoTracks()[0];
+      const audioTrack = screenBrowserMedia.getAudioTracks()[0];
+
+      await this.createScreenProducer(
+        producerId,
+        screenBrowserMedia,
+        new MediaStream([videoTrack])
+      );
+      if (audioTrack) {
+        await this.createScreenAudioProducer(
+          producerId,
+          new MediaStream([audioTrack])
+        );
       }
     } else if (producerType === "audio") {
       if (this.userMedia.current.audio) {
