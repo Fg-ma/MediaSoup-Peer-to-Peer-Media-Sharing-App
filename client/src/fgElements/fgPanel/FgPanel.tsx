@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
+import FgPanelController from "./lib/FgPanelController";
 
 const FgButton = React.lazy(() => import("../fgButton/FgButton"));
 
@@ -24,6 +25,9 @@ export default function FgPanel({
   closeCallback,
   closeLabelElement,
   closePosition,
+  panelBoundariesRef,
+  panelBoundariesScrollingContainerRef,
+  panelInsertionPointRef,
   shadow = {
     left: false,
     right: false,
@@ -52,6 +56,9 @@ export default function FgPanel({
   closeCallback?: () => void;
   closeLabelElement?: React.ReactElement;
   closePosition?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+  panelBoundariesRef?: React.RefObject<HTMLDivElement>;
+  panelBoundariesScrollingContainerRef?: React.RefObject<HTMLDivElement>;
+  panelInsertionPointRef?: React.RefObject<HTMLDivElement>;
   shadow?: {
     left?: boolean;
     right?: boolean;
@@ -94,6 +101,28 @@ export default function FgPanel({
   const isResizing = useRef(false);
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
     undefined
+  );
+
+  const fgPanelController = new FgPanelController(
+    setRerender,
+    setPosition,
+    size,
+    setSize,
+    setFocus,
+    setFocusClicked,
+    panelRef,
+    containerRef,
+    closeButtonRef,
+    isDragging,
+    startPosition,
+    isResizing,
+    resizingDirection,
+    minWidth,
+    minHeight,
+    closeCallback,
+    panelBoundariesRef,
+    panelBoundariesScrollingContainerRef,
+    panelInsertionPointRef
   );
 
   useEffect(() => {
@@ -154,120 +183,6 @@ export default function FgPanel({
     initPosition.padding,
   ]);
 
-  const handleMouseMove = (event: React.MouseEvent | MouseEvent) => {
-    if (isDragging.current && !isResizing.current) {
-      setPosition({
-        x: event.clientX - startPosition.current.x,
-        y: event.clientY - startPosition.current.y,
-      });
-    } else if (isResizing.current && !isDragging.current) {
-      if (!panelRef.current) {
-        return;
-      }
-
-      const rect = panelRef.current.getBoundingClientRect();
-      const newSize = { ...size };
-
-      switch (resizingDirection.current) {
-        case "se":
-          newSize.width = `${Math.max(minWidth, event.clientX - rect.left)}px`;
-          newSize.height = `${Math.max(minHeight, event.clientY - rect.top)}px`;
-          break;
-        case "sw":
-          newSize.width = `${Math.max(minWidth, rect.right - event.clientX)}px`;
-          newSize.height = `${Math.max(minHeight, event.clientY - rect.top)}px`;
-          if (minWidth < rect.right - event.clientX) {
-            setPosition((prev) => ({ ...prev, x: event.clientX }));
-          }
-          break;
-        case "nw":
-          newSize.width = `${Math.max(minWidth, rect.right - event.clientX)}px`;
-          newSize.height = `${Math.max(
-            minHeight,
-            rect.bottom - event.clientY
-          )}px`;
-          if (
-            minWidth < rect.right - event.clientX ||
-            minHeight < rect.bottom - event.clientY
-          ) {
-            setPosition((prev) => {
-              const newPosition = {
-                ...prev,
-              };
-
-              if (minWidth < rect.right - event.clientX) {
-                newPosition.x = event.clientX;
-              }
-              if (minHeight < rect.bottom - event.clientY) {
-                newPosition.y = event.clientY;
-              }
-
-              return newPosition;
-            });
-          }
-          break;
-        case "ne":
-          newSize.width = `${Math.max(minWidth, event.clientX - rect.left)}px`;
-          // prettier-ignore
-          newSize.height = `${Math.max(minHeight, rect.bottom - event.clientY)}px`;
-          if (minHeight < rect.bottom - event.clientY) {
-            setPosition((prev) => ({ ...prev, y: event.clientY }));
-          }
-          break;
-      }
-
-      setSize(newSize);
-    }
-  };
-
-  const handleMouseUp = () => {
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-
-    isDragging.current = false;
-    isResizing.current = false;
-
-    setRerender((prev) => !prev);
-  };
-
-  const handleResizeMouseDown = (
-    event: React.MouseEvent,
-    direction: "se" | "sw" | "ne" | "nw"
-  ) => {
-    event.preventDefault();
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    isResizing.current = true;
-    resizingDirection.current = direction;
-  };
-
-  const handleDragMouseDown = (event: React.MouseEvent) => {
-    event.preventDefault();
-
-    if (
-      event.target === containerRef.current ||
-      containerRef.current?.contains(event.target as Node) ||
-      closeButtonRef.current?.contains(event.target as Node)
-    ) {
-      return;
-    }
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    isDragging.current = true;
-
-    if (panelRef.current) {
-      const rect = panelRef.current.getBoundingClientRect();
-      startPosition.current = {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      };
-    }
-  };
-
   useEffect(() => {
     if (isResizing.current && resizingDirection.current) {
       document.body.style.cursor = `${resizingDirection.current}-resize`;
@@ -282,40 +197,29 @@ export default function FgPanel({
     }
   }, [size]);
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (!closeCallback || event.target instanceof HTMLInputElement) return;
-
-    const key = event.key.toLowerCase();
-    if (["x", "delete", "escape"].includes(key)) {
-      closeCallback();
-    }
-  };
-
   useEffect(() => {
     if (closeCallback && isHover) {
-      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keydown", fgPanelController.handleKeyDown);
     }
 
     return () => {
       if (closeCallback && isHover) {
-        document.removeEventListener("keydown", handleKeyDown);
+        document.removeEventListener(
+          "keydown",
+          fgPanelController.handleKeyDown
+        );
       }
     };
   }, [isHover]);
 
-  const handlePanelClick = (event: MouseEvent) => {
-    if (panelRef.current) {
-      const value = panelRef.current.contains(event.target as Node);
-      setFocus(value);
-      setFocusClicked(value);
-    }
-  };
-
   useEffect(() => {
-    document.addEventListener("mousedown", handlePanelClick);
+    document.addEventListener("mousedown", fgPanelController.handlePanelClick);
 
     return () => {
-      document.removeEventListener("mousedown", handlePanelClick);
+      document.removeEventListener(
+        "mousedown",
+        fgPanelController.handlePanelClick
+      );
     };
   }, []);
 
@@ -365,7 +269,7 @@ export default function FgPanel({
       </div>
       {moveable && (
         <div
-          onMouseDown={handleDragMouseDown}
+          onMouseDown={fgPanelController.handleDragMouseDown}
           className='h-3 absolute top-0 cursor-pointer'
           style={{
             width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -375,7 +279,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onMouseDown={handleDragMouseDown}
+          onMouseDown={fgPanelController.handleDragMouseDown}
           className='h-3 absolute bottom-0 cursor-pointer'
           style={{
             width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -385,7 +289,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onMouseDown={handleDragMouseDown}
+          onMouseDown={fgPanelController.handleDragMouseDown}
           className='w-3 absolute left-0 cursor-pointer'
           style={{
             height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -395,7 +299,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onMouseDown={handleDragMouseDown}
+          onMouseDown={fgPanelController.handleDragMouseDown}
           className='w-3 absolute right-0 cursor-pointer'
           style={{
             height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -405,25 +309,33 @@ export default function FgPanel({
       )}
       {resizeable && (closePosition !== "bottomLeft" || !closeCallback) && (
         <div
-          onMouseDown={(event) => handleResizeMouseDown(event, "se")}
+          onMouseDown={(event) =>
+            fgPanelController.handleResizeMouseDown(event, "se")
+          }
           className='w-3 aspect-square absolute right-0 bottom-0 cursor-se-resize'
         />
       )}
       {resizeable && (closePosition !== "bottomRight" || !closeCallback) && (
         <div
-          onMouseDown={(event) => handleResizeMouseDown(event, "sw")}
+          onMouseDown={(event) =>
+            fgPanelController.handleResizeMouseDown(event, "sw")
+          }
           className='w-3 aspect-square absolute left-0 bottom-0 cursor-sw-resize'
         />
       )}
       {resizeable && (closePosition !== "topLeft" || !closeCallback) && (
         <div
-          onMouseDown={(event) => handleResizeMouseDown(event, "nw")}
+          onMouseDown={(event) =>
+            fgPanelController.handleResizeMouseDown(event, "nw")
+          }
           className='w-3 aspect-square absolute left-0 top-0 cursor-nw-resize'
         />
       )}
       {resizeable && (closePosition !== "topRight" || !closeCallback) && (
         <div
-          onMouseDown={(event) => handleResizeMouseDown(event, "ne")}
+          onMouseDown={(event) =>
+            fgPanelController.handleResizeMouseDown(event, "ne")
+          }
           className='w-3 aspect-square absolute right-0 top-0 cursor-ne-resize'
         />
       )}
@@ -473,6 +385,8 @@ export default function FgPanel({
         }}
       />
     </motion.div>,
-    document.body
+    panelInsertionPointRef && panelInsertionPointRef.current
+      ? panelInsertionPointRef.current
+      : document.body
   );
 }

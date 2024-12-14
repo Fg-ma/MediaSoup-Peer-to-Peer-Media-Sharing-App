@@ -1,0 +1,593 @@
+.snake-game-board {
+  --grid-size: 1;
+  background-color: #7db543;
+  aspect-ratio: 1 / 1 !important;
+}
+
+.snake-game-board .snake-game-row {
+  display: flex;
+  width: 100%;
+  height: calc(100% / var(--grid-size));
+}
+
+.snake-game-board .snake-game-cell {
+  width: calc(100% / var(--grid-size));
+  height: 100%;
+}
+
+.snake-game-board .snake-game-cell-odd {
+  background-color: #7db543;
+}
+
+.snake-game-board .snake-game-cell-even {
+  background-color: #47974a;
+}
+
+.snake-game-board .snake-game-snake {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.snake-game-board .snake-game-food {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.snake-game-board .snake-game-apple {
+  background-image: url("../../../../public/snakeGameAssets/food/apple.png");
+}
+
+.snake-game-board .snake-game-banana {
+  background-image: url("../../../../public/snakeGameAssets/food/banana.png");
+}
+
+.snake-game-board .snake-game-donut {
+  background-image: url("../../../../public/snakeGameAssets/food/donut.png");
+}
+
+.snake-game-board .snake-game-grapes {
+  background-image: url("../../../../public/snakeGameAssets/food/grapes.png");
+}
+
+.snake-game-board .snake-game-orange {
+  background-image: url("../../../../public/snakeGameAssets/food/orange.png");
+}
+
+.snake-game-board .snake-game-pizza {
+  background-image: url("../../../../public/snakeGameAssets/food/pizza.png");
+}
+
+.snake-game-board .snake-game-strawberry {
+  background-image: url("../../../../public/snakeGameAssets/food/strawberry.png");
+}
+
+.snake-game-board .snake-game-watermelon {
+  background-image: url("../../../../public/snakeGameAssets/food/watermelon.png");
+}
+
+/* black-pink */
+.snake-game-board .snake-game-snake-head-black-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBlackPink.png");
+}
+
+.snake-game-board .snake-game-snake-tail-black-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBlackPink.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-black-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlackPink.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-black-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlackPink.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-black-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBlackPink.png");
+}
+
+/* black-yellow */
+.snake-game-board .snake-game-snake-head-black-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBlackYellow.png");
+}
+
+.snake-game-board .snake-game-snake-tail-black-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBlackYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-black-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlackYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-black-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlackYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-black-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBlackYellow.png");
+}
+
+/* blue-blue */
+.snake-game-board .snake-game-snake-head-blue-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBlueBlue.png");
+}
+
+.snake-game-board .snake-game-snake-tail-blue-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBlueBlue.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-blue-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueBlue.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-blue-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueBlue.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-blue-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBlueBlue.png");
+}
+
+/* blue-green */
+.snake-game-board .snake-game-snake-head-blue-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBlueGreen.png");
+}
+
+.snake-game-board .snake-game-snake-tail-blue-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBlueGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-blue-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-blue-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-blue-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBlueGreen.png");
+}
+
+/* blue-orange */
+.snake-game-board .snake-game-snake-head-blue-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBlueOrange.png");
+}
+
+.snake-game-board .snake-game-snake-tail-blue-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBlueOrange.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-blue-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueOrange.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-blue-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueOrange.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-blue-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBlueOrange.png");
+}
+
+/* blue-purple */
+.snake-game-board .snake-game-snake-head-blue-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBluePurple.png");
+}
+
+.snake-game-board .snake-game-snake-tail-blue-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBluePurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-blue-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBluePurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-blue-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBluePurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-blue-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBluePurple.png");
+}
+
+/* blue-red */
+.snake-game-board .snake-game-snake-head-blue-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBlueRed.png");
+}
+
+.snake-game-board .snake-game-snake-tail-blue-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBlueRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-blue-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-blue-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-blue-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBlueRed.png");
+}
+
+/* blue-white */
+.snake-game-board .snake-game-snake-head-blue-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBlueWhite.png");
+}
+
+.snake-game-board .snake-game-snake-tail-blue-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBlueWhite.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-blue-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueWhite.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-blue-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueWhite.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-blue-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBlueWhite.png");
+}
+
+/* blue-yellow */
+.snake-game-board .snake-game-snake-head-blue-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadBlueYellow.png");
+}
+
+.snake-game-board .snake-game-snake-tail-blue-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtBlueYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-blue-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-blue-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyBlueYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-blue-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveBlueYellow.png");
+}
+
+/* green-green */
+.snake-game-board .snake-game-snake-head-green-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadGreenGreen.png");
+}
+
+.snake-game-board .snake-game-snake-tail-green-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtGreenGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-green-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyGreenGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-green-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyGreenGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-green-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveGreenGreen.png");
+}
+
+/* green-purple */
+.snake-game-board .snake-game-snake-head-green-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadGreenPurple.png");
+}
+
+.snake-game-board .snake-game-snake-tail-green-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtGreenPurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-green-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyGreenPurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-green-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyGreenPurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-green-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveGreenPurple.png");
+}
+
+/* green-white */
+.snake-game-board .snake-game-snake-head-green-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadGreenWhite.png");
+}
+
+.snake-game-board .snake-game-snake-tail-green-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtGreenWhite.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-green-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyGreenWhite.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-green-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyGreenWhite.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-green-white {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveGreenWhite.png");
+}
+
+/* green-yellow */
+.snake-game-board .snake-game-snake-head-green-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadGreenGreen.png");
+}
+
+.snake-game-board .snake-game-snake-tail-green-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtGreenYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-green-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyGreenYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-green-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyGreenYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-green-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveGreenYellow.png");
+}
+
+/* orange-blue */
+.snake-game-board .snake-game-snake-head-orange-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadOrangeBlue.png");
+}
+
+.snake-game-board .snake-game-snake-tail-orange-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtOrangeBlue.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-orange-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyOrangeBlue.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-orange-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyOrangeBlue.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-orange-blue {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveOrangeBlue.png");
+}
+
+/* orange-pink */
+.snake-game-board .snake-game-snake-head-orange-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadOrangePink.png");
+}
+
+.snake-game-board .snake-game-snake-tail-orange-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtOrangePink.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-orange-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyOrangePink.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-orange-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyOrangePink.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-orange-pink {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveOrangePink.png");
+}
+
+/* orange-purple */
+.snake-game-board .snake-game-snake-head-orange-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadOrangePurple.png");
+}
+
+.snake-game-board .snake-game-snake-tail-orange-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtOrangePurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-orange-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyOrangePurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-orange-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyOrangePurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-orange-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveOrangePurple.png");
+}
+
+/* orange-red */
+.snake-game-board .snake-game-snake-head-orange-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadOrangeRed.png");
+}
+
+.snake-game-board .snake-game-snake-tail-orange-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtOrangeRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-orange-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyOrangeRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-orange-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyOrangeRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-orange-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveOrangeRed.png");
+}
+
+/* pink-green */
+.snake-game-board .snake-game-snake-head-pink-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadPinkGreen.png");
+}
+
+.snake-game-board .snake-game-snake-tail-pink-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtPinkGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-pink-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyPinkGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-pink-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyPinkGreen.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-pink-green {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurvePinkGreen.png");
+}
+
+/* pink-orange */
+.snake-game-board .snake-game-snake-head-pink-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadPinkOrange.png");
+}
+
+.snake-game-board .snake-game-snake-tail-pink-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtPinkOrange.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-pink-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyPinkOrange.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-pink-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyPinkOrange.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-pink-orange {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurvePinkOrange.png");
+}
+
+/* pink-purple */
+.snake-game-board .snake-game-snake-head-pink-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadPinkPurple.png");
+}
+
+.snake-game-board .snake-game-snake-tail-pink-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtPinkPurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-pink-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyPinkPurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-pink-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyPinkPurple.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-pink-purple {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurvePinkPurple.png");
+}
+
+/* red-black */
+.snake-game-board .snake-game-snake-head-red-black {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadRedBlack.png");
+}
+
+.snake-game-board .snake-game-snake-tail-red-black {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtRedBlack.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-red-black {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyRedBlack.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-red-black {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyRedBlack.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-red-black {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveRedBlack.png");
+}
+
+/* red-yellow */
+.snake-game-board .snake-game-snake-head-red-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadRedYellow.png");
+}
+
+.snake-game-board .snake-game-snake-tail-red-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtRedYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-red-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyRedYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-red-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyRedYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-red-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveRedYellow.png");
+}
+
+/* white-aqua */
+.snake-game-board .snake-game-snake-head-white-aqua {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadWhiteAqua.png");
+}
+
+.snake-game-board .snake-game-snake-tail-white-aqua {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtWhiteAqua.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-white-aqua {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyWhiteAqua.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-white-aqua {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyWhiteAqua.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-white-aqua {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveWhiteAqua.png");
+}
+
+/* white-red */
+.snake-game-board .snake-game-snake-head-white-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadWhiteRed.png");
+}
+
+.snake-game-board .snake-game-snake-tail-white-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtWhiteRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-white-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyWhiteRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-white-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyWhiteRed.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-white-red {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveWhiteRed.png");
+}
+
+/* white-yellow */
+.snake-game-board .snake-game-snake-head-white-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadWhiteYellow.png");
+}
+
+.snake-game-board .snake-game-snake-tail-white-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeButtWhiteYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-horizontal-white-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyWhiteYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-vertical-white-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyWhiteYellow.png");
+}
+
+.snake-game-board .snake-game-snake-body-curve-white-yellow {
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeBodyCurveWhiteYellow.png");
+}

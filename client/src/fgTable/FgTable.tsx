@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import FgTableController from "./lib/FgTableController";
 import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElement";
 import "./lib/fgTable.css";
+import SnakeGame from "../games/snakeGame/SnakeGame";
 
 export default function FgTable({
   tableRef,
@@ -15,7 +16,7 @@ export default function FgTable({
   };
 }) {
   const [_rerender, setRerender] = useState(false);
-
+  const tableTopRef = useRef<HTMLDivElement>(null);
   const aspectDir = useRef<"width" | "height">("width");
 
   const fgTableController = new FgTableController(
@@ -67,6 +68,7 @@ export default function FgTable({
           }`}
         >
           <div
+            ref={tableTopRef}
             className='bg-fg-white-65 aspect-square overflow-hidden'
             style={{
               ...(aspectDir.current === "width"
@@ -75,6 +77,7 @@ export default function FgTable({
             }}
           >
             <div className='w-full h-full relative'>
+              <SnakeGame tableRef={tableRef} tableTopRef={tableTopRef} />
               {bundles &&
                 Object.keys(bundles).length !== 0 &&
                 Object.keys(bundles).map(
