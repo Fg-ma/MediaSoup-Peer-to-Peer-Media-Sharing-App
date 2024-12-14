@@ -5,8 +5,8 @@ import {
   defaultScreenStreamEffects,
   ScreenEffectTypes,
   UserStreamEffectsType,
-} from "../context/streamEffectsContext/typeConstant";
-import { UserMediaType } from "../context/streamsContext/typeConstant";
+} from "../context/effectsContext/typeConstant";
+import { UserMediaType } from "../context/mediaContext/typeConstant";
 import UserDevice from "./UserDevice";
 import BabylonScene, {
   EffectType,

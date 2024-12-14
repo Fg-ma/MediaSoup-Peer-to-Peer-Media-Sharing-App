@@ -1,5 +1,5 @@
 import React from "react";
-import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { SamplerEffectType } from "./SamplerEffectsToolbar";
 import FgKnobButton from "../../fgElements/fgKnobButton/FgKnobButton";
 import FgButton from "../../fgElements/fgButton/FgButton";
@@ -38,7 +38,7 @@ export default function SamplerEffect({
     }>
   >;
 }) {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const handleValueChange = (value: number, id: string | undefined) => {
     if (id === undefined) {

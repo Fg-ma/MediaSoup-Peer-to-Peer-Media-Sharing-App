@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
 
 export default function SamplerVolume() {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const [mute, setMute] = useState(false);
   const [volumeState, setVolumeState] = useState({

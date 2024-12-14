@@ -1,11 +1,11 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import { useStreamEffectsContext } from "../context/streamEffectsContext/StreamEffectsContext";
-import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import BundleController from "./lib/BundleController";
+import { useEffectsContext } from "../context/effectsContext/EffectsContext";
+import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import { Permissions } from "../context/permissionsContext/typeConstant";
+import BundleController from "./lib/BundleController";
 
 const UserVisualMedia = React.lazy(
   () => import("../fgVisualMedia/UserVisualMedia")
@@ -16,6 +16,7 @@ const RemoteVisualMedia = React.lazy(
 const FgAudioElementContainer = React.lazy(
   () => import("../fgAudioElement/FgAudioElementContainer")
 );
+const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
 export default function Bundle({
   socket,
@@ -29,6 +30,8 @@ export default function Bundle({
   initScreenStreams,
   initScreenAudioStreams,
   initAudioStream,
+  tableRef,
+  tableTopRef,
   options,
   handleMuteCallback,
   onRendered,
@@ -45,6 +48,8 @@ export default function Bundle({
   initScreenStreams?: { [screenId: string]: MediaStream };
   initScreenAudioStreams?: { [screenAudioId: string]: MediaStream };
   initAudioStream?: MediaStream;
+  tableRef: React.RefObject<HTMLDivElement>;
+  tableTopRef: React.RefObject<HTMLDivElement>;
   options?: BundleOptions;
   handleMuteCallback?: () => void;
   onRendered?: () => void;
@@ -55,9 +60,8 @@ export default function Bundle({
     ...options,
   };
 
-  const { userMedia, remoteTracksMap } = useStreamsContext();
-  const { remoteEffectsStyles, remoteStreamEffects } =
-    useStreamEffectsContext();
+  const { userMedia, remoteTracksMap } = useMediaContext();
+  const { remoteEffectsStyles, remoteStreamEffects } = useEffectsContext();
   const { signal } = useSignalContext();
 
   const [cameraStreams, setCameraStreams] = useState<
@@ -407,6 +411,16 @@ export default function Bundle({
               clientMute={clientMute}
             />
           </Suspense>
+        )}
+      {bundleOptions.isUser &&
+        userMedia.current.games.snake &&
+        Object.keys(userMedia.current.games.snake).length !== 0 &&
+        Object.entries(userMedia.current.games.snake).map(
+          ([gameId, _snakeGame]) => (
+            <Suspense key={gameId} fallback={<div>Loading...</div>}>
+              <SnakeGame tableRef={tableRef} tableTopRef={tableTopRef} />
+            </Suspense>
+          )
         )}
       <audio
         ref={audioRef}

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useStreamEffectsContext } from "../../../../context/streamEffectsContext/StreamEffectsContext";
+import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/streamEffectsContext/typeConstant";
+} from "../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 
@@ -34,7 +34,7 @@ export default function BlurButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userStreamEffects, remoteStreamEffects } = useStreamEffectsContext();
+  const { userStreamEffects, remoteStreamEffects } = useEffectsContext();
 
   const [_, setRerender] = useState(0);
 

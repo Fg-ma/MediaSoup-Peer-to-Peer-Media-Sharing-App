@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
@@ -24,7 +24,7 @@ const samplerMetronomeVolumeTransition: Transition = {
 };
 
 export default function SamplerMetronomeVolume() {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const [mute, setMute] = useState(false);
   const [volumeState, setVolumeState] = useState({
@@ -122,7 +122,7 @@ export default function SamplerMetronomeVolume() {
             max='1'
             step='any'
           />
-        </div>{" "}
+        </div>
         <FgButton
           clickFunction={handleMute}
           contentFunction={() => (

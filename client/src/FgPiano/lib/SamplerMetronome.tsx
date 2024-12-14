@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Transition, Variants, motion, AnimatePresence } from "framer-motion";
-import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
 
@@ -24,7 +24,7 @@ export const bpmInputTransition: Transition = {
 };
 
 export default function SamplerMetronome() {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const [metronomeActive, setMetronomeActive] = useState(false);
   const [bpm, setBpm] = useState(120);

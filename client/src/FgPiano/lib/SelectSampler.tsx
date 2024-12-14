@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSelectionButton from "../../fgElements/fgSelectionButton/FgSelectionButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
@@ -559,7 +559,7 @@ export default function SelectSampler({
   sampler: FgSamplers;
   setSampler: React.Dispatch<React.SetStateAction<FgSamplers>>;
 }) {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const [hover, setHover] = useState(false);
   const hoverTimeout = useRef<NodeJS.Timeout>();

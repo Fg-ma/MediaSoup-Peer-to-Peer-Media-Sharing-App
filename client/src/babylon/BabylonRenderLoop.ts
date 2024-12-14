@@ -11,7 +11,7 @@ import {
   UserEffectsStylesType,
   HideBackgroundEffectTypes,
   CameraEffectTypes,
-} from "../context/streamEffectsContext/typeConstant";
+} from "../context/effectsContext/typeConstant";
 import UserDevice from "../lib/UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
 import BabylonMeshes from "./BabylonMeshes";

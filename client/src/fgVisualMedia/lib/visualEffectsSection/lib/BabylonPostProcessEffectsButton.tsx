@@ -1,13 +1,13 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
-import { useStreamsContext } from "../../../../context/streamsContext/StreamsContext";
-import { useStreamEffectsContext } from "../../../../context/streamEffectsContext/StreamEffectsContext";
+import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
+import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import {
   CameraEffectTypes,
   HideBackgroundEffectTypes,
   PostProcessEffects,
   ScreenEffectTypes,
-} from "../../../../context/streamEffectsContext/typeConstant";
+} from "../../../../context/effectsContext/typeConstant";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 
 import prismaColors from "../../../../../public/2DAssets/postProcess/prismaColors_512x512.jpg";
@@ -70,13 +70,13 @@ export default function BabylonPostProcessEffectsButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
   const {
     userEffectsStyles,
     remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
-  } = useStreamEffectsContext();
+  } = useEffectsContext();
 
   const [_, setRerender] = useState(0);
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);

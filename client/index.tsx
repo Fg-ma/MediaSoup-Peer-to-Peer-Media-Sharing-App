@@ -1,8 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { StreamsContextProvider } from "./src/context/streamsContext/StreamsContext";
+import { MediaContextProvider } from "./src/context/mediaContext/MediaContext";
 import { SignalContextProvider } from "./src/context/signalContext/SignalContext";
-import { StreamEffectsContextProvider } from "./src/context/streamEffectsContext/StreamEffectsContext";
+import { EffectsContextProvider } from "./src/context/effectsContext/EffectsContext";
 import { PermissionsContextProvider } from "./src/context/permissionsContext/PermissionsContext";
 import Main from "./src/Main";
 import "./index.css";
@@ -14,14 +14,14 @@ root.render(<App />);
 
 function App() {
   return (
-    <StreamsContextProvider>
-      <StreamEffectsContextProvider>
+    <MediaContextProvider>
+      <EffectsContextProvider>
         <SignalContextProvider>
           <PermissionsContextProvider>
             <Main />
           </PermissionsContextProvider>
         </SignalContextProvider>
-      </StreamEffectsContextProvider>
-    </StreamsContextProvider>
+      </EffectsContextProvider>
+    </MediaContextProvider>
   );
 }

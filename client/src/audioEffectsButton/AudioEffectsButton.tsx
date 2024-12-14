@@ -1,6 +1,6 @@
 import React, { Suspense, useRef } from "react";
 import { Socket } from "socket.io-client";
-import { AudioEffectTypes } from "../context/streamEffectsContext/typeConstant";
+import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { Permissions } from "../context/permissionsContext/typeConstant";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgSVG from "../fgElements/fgSVG/FgSVG";

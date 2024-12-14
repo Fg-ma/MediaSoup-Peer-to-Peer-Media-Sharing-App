@@ -2,12 +2,13 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
-import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
-import { AudioEffectTypes } from "../context/streamEffectsContext/typeConstant";
+import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
 import ScreenSection from "./lib/screenSection/ScreenSection";
+import GamesSection from "./lib/gamesSection/GamesSection";
 import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
 import onRouterCapabilities from "../lib/onRouterCapabilities";
@@ -85,7 +86,7 @@ export default function FgTableFunctions({
   muteAudio: () => void;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
-  const { userMedia, remoteTracksMap, userDataStreams } = useStreamsContext();
+  const { userMedia, remoteTracksMap, userDataStreams } = useMediaContext();
   const { setSignal } = useSignalContext();
   const { permissions } = usePermissionsContext();
 
@@ -244,6 +245,7 @@ export default function FgTableFunctions({
           producersController={producersController}
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
+        <GamesSection />
         {isAudio.current && (
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsButton

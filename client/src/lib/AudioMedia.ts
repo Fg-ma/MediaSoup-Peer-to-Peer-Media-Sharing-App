@@ -2,7 +2,7 @@ import { BaseContext, UserMedia, getContext, start } from "tone";
 import {
   AudioEffectTypes,
   UserStreamEffectsType,
-} from "../context/streamEffectsContext/typeConstant";
+} from "../context/effectsContext/typeConstant";
 import AudioEffects from "../audioEffects/AudioEffects";
 import { FgSamplers } from "../audioEffects/fgSamplers";
 import {

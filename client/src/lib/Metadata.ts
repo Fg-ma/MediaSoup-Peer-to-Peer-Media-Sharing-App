@@ -4,7 +4,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../context/streamEffectsContext/typeConstant";
+} from "../context/effectsContext/typeConstant";
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";

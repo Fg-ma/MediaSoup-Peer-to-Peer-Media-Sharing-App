@@ -21,7 +21,7 @@ import "@babylonjs/inspector";
 import {
   CameraEffectTypes,
   UserEffectsStylesType,
-} from "../context/streamEffectsContext/typeConstant";
+} from "../context/effectsContext/typeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import UserDevice from "../lib/UserDevice";

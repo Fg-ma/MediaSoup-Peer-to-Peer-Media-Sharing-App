@@ -4,7 +4,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   UserStreamEffectsType,
-} from "../../context/streamEffectsContext/typeConstant";
+} from "../../context/effectsContext/typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 export interface BundleOptions {

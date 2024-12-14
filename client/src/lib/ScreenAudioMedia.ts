@@ -3,7 +3,7 @@ import {
   AudioEffectTypes,
   defaultAudioStreamEffects,
   UserStreamEffectsType,
-} from "../context/streamEffectsContext/typeConstant";
+} from "../context/effectsContext/typeConstant";
 import AudioEffects from "../audioEffects/AudioEffects";
 import { FgSamplers } from "../audioEffects/fgSamplers";
 import {

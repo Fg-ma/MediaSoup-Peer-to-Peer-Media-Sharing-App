@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useStreamEffectsContext } from "../../context/streamEffectsContext/StreamEffectsContext";
-import { AudioEffectTypes } from "../../context/streamEffectsContext/typeConstant";
+import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
+import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import { AudioEffectTemplate } from "./typeConstant";
@@ -26,7 +26,7 @@ export default function AudioEffectButton({
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   handleAudioEffectChange: (effect: AudioEffectTypes) => void;
 }) {
-  const { userStreamEffects, remoteStreamEffects } = useStreamEffectsContext();
+  const { userStreamEffects, remoteStreamEffects } = useEffectsContext();
 
   const [isVisible, setIsVisible] = useState(false);
   const buttonRef = useRef<HTMLDivElement>(null);

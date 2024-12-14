@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../context/mediaContext/MediaContext";
 import FgPanel from "../fgElements/fgPanel/FgPanel";
 import FgButton from "../fgElements/fgButton/FgButton";
 import "./lib/soundBoard.css";
@@ -25,7 +25,7 @@ export default function FgSoundBoard({
   soundBoardButtonRef?: HTMLButtonElement;
   closeCallback?: () => void;
 }) {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const [soundEffects, setSoundEffects] =
     useState<SoundEffects>(defaultSoundEffects);

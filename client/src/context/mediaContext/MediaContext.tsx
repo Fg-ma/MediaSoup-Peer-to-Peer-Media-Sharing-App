@@ -6,44 +6,43 @@ import {
   UserMediaType,
 } from "./typeConstant";
 
-export interface StreamsContextProviderProps {
+export interface MediaContextProviderProps {
   children: React.ReactNode;
 }
 
-export interface StreamsContextType {
+export interface MediaContextType {
   userMedia: React.MutableRefObject<UserMediaType>;
   remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>;
   remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>;
   userDataStreams: React.MutableRefObject<UserDataStreamsType>;
 }
 
-const StreamsContext = createContext<StreamsContextType | undefined>(undefined);
+const MediaContext = createContext<MediaContextType | undefined>(undefined);
 
-export const useStreamsContext = () => {
-  const context = useContext(StreamsContext);
+export const useMediaContext = () => {
+  const context = useContext(MediaContext);
   if (!context) {
     throw new Error(
-      "useStreamsContext must be used within an StreamsContextProvider"
+      "useMediaContext must be used within an MediaContextProvider"
     );
   }
   return context;
 };
 
-export function StreamsContextProvider({
-  children,
-}: StreamsContextProviderProps) {
+export function MediaContextProvider({ children }: MediaContextProviderProps) {
   const userMedia = useRef<UserMediaType>({
     camera: {},
     screen: {},
     screenAudio: {},
     audio: undefined,
+    games: {},
   });
   const remoteTracksMap = useRef<RemoteTracksMapType>({});
   const remoteDataStreams = useRef<RemoteDataStreamsType>({});
   const userDataStreams = useRef<UserDataStreamsType>({});
 
   return (
-    <StreamsContext.Provider
+    <MediaContext.Provider
       value={{
         userMedia,
         remoteTracksMap,
@@ -52,8 +51,8 @@ export function StreamsContextProvider({
       }}
     >
       {children}
-    </StreamsContext.Provider>
+    </MediaContext.Provider>
   );
 }
 
-export default StreamsContext;
+export default MediaContext;

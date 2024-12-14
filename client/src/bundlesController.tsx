@@ -1,7 +1,7 @@
 import React from "react";
 import { Socket } from "socket.io-client";
 import Bundle from "./bundle/Bundle";
-import { UserMediaType } from "./context/streamsContext/typeConstant";
+import { UserMediaType } from "./context/mediaContext/typeConstant";
 import { Permissions } from "./context/permissionsContext/typeConstant";
 
 class BundlesController {
@@ -13,7 +13,8 @@ class BundlesController {
 
     private userMedia: React.MutableRefObject<UserMediaType>,
 
-    private remoteVideosContainerRef: React.RefObject<HTMLDivElement>,
+    private tableRef: React.RefObject<HTMLDivElement>,
+    private tableTopRef: React.RefObject<HTMLDivElement>,
 
     private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
@@ -42,7 +43,7 @@ class BundlesController {
   ) {}
 
   createProducerBundle = () => {
-    if (this.remoteVideosContainerRef.current) {
+    if (this.tableRef.current) {
       const initCameraStreams: { [cameraId: string]: MediaStream } = {};
       for (const cameraId in this.userMedia.current.camera) {
         initCameraStreams[cameraId] =
@@ -82,6 +83,8 @@ class BundlesController {
             this.isScreen.current ? initScreenAudioStreams : undefined
           }
           initAudioStream={this.isAudio.current ? initAudioStream : undefined}
+          tableRef={this.tableRef}
+          tableTopRef={this.tableTopRef}
           options={{
             isUser: true,
             permissions: this.permissions.current,
@@ -153,6 +156,8 @@ class BundlesController {
               : undefined
           }
           initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
+          tableRef={this.tableRef}
+          tableTopRef={this.tableTopRef}
           onRendered={() => {
             const msg = {
               type: "requestPermissions",

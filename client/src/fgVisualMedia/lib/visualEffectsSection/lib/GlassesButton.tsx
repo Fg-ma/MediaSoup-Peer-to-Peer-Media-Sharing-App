@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
-import { useStreamEffectsContext } from "../../../../context/streamEffectsContext/StreamEffectsContext";
+import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import {
   GlassesEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/streamEffectsContext/typeConstant";
+} from "../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
@@ -134,7 +134,7 @@ export default function GlassesButton({
     remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
-  } = useStreamEffectsContext();
+  } = useEffectsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [_, setRerender] = useState(0);

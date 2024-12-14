@@ -1,13 +1,13 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import { useStreamEffectsContext } from "../context/streamEffectsContext/StreamEffectsContext";
+import { useMediaContext } from "../context/mediaContext/MediaContext";
+import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import {
   HideBackgroundEffectTypes,
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../context/streamEffectsContext/typeConstant";
+} from "../context/effectsContext/typeConstant";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import FgVisualMediaController from "./lib/FgVisualMediaController";
@@ -81,13 +81,13 @@ export default function FgBabylonCanvas({
     ...options,
   };
 
-  const { userMedia, userDataStreams, remoteDataStreams } = useStreamsContext();
+  const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
   const {
     userEffectsStyles,
     remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
-  } = useStreamEffectsContext();
+  } = useEffectsContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);

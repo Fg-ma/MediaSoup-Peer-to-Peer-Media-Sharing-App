@@ -7,6 +7,8 @@ import ScreenMedia from "src/lib/ScreenMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
+export type GameTypes = "snake";
+
 export type UserMediaType = {
   camera: {
     [cameraId: string]: CameraMedia;
@@ -14,6 +16,11 @@ export type UserMediaType = {
   screen: { [screenId: string]: ScreenMedia };
   screenAudio: { [screenAudioId: string]: ScreenAudioMedia };
   audio: AudioMedia | undefined;
+  games: {
+    [gameType in GameTypes]?: {
+      [gameId: string]: string;
+    };
+  };
 };
 
 export type RemoteTracksMapType = {

@@ -1,8 +1,8 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { Permissions } from "../context/permissionsContext/typeConstant";
-import { AudioEffectTypes } from "../context/streamEffectsContext/typeConstant";
+import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import FgAudioElement from "./FgAudioElement";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import PanButton from "../fgAdjustmentComponents/PanButton";
@@ -106,7 +106,7 @@ export default function FgAudioElementContainer({
     ...options,
   };
 
-  const { userDataStreams, remoteDataStreams } = useStreamsContext();
+  const { userDataStreams, remoteDataStreams } = useMediaContext();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =

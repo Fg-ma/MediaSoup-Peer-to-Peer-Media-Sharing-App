@@ -3,7 +3,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/streamEffectsContext/typeConstant";
+} from "../../../../context/effectsContext/typeConstant";
 import CameraMedia from "../../../../lib/CameraMedia";
 import ScreenMedia from "../../../../lib/ScreenMedia";
 import AudioMedia from "../../../../lib/AudioMedia";

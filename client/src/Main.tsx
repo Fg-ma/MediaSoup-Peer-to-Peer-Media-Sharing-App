@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { types, Device } from "mediasoup-client";
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
-import { useStreamsContext } from "./context/streamsContext/StreamsContext";
-import { useStreamEffectsContext } from "./context/streamEffectsContext/StreamEffectsContext";
+import { useMediaContext } from "./context/mediaContext/MediaContext";
+import { useEffectsContext } from "./context/effectsContext/EffectsContext";
 import {
   defaultAudioStreamEffects,
   defaultCameraStreamEffects,
@@ -11,8 +11,8 @@ import {
   defaultAudioEffectsStyles,
   defaultCameraEffectsStyles,
   defaultScreenEffectsStyles,
-} from "./context/streamEffectsContext/typeConstant";
-import { DataStreamTypes } from "./context/streamsContext/typeConstant";
+} from "./context/effectsContext/typeConstant";
+import { DataStreamTypes } from "./context/mediaContext/typeConstant";
 import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
@@ -180,13 +180,13 @@ type MediasoupSocketEvents =
 
 export default function Main() {
   const { userMedia, remoteTracksMap, remoteDataStreams, userDataStreams } =
-    useStreamsContext();
+    useMediaContext();
   const {
     userEffectsStyles,
     remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
-  } = useStreamEffectsContext();
+  } = useEffectsContext();
   const { permissions } = usePermissionsContext();
 
   const socket = useRef<Socket>(io(websocketURL));
@@ -222,6 +222,7 @@ export default function Main() {
   const isSubscribed = useRef(false);
 
   const tableRef = useRef<HTMLDivElement>(null);
+  const tableTopRef = useRef<HTMLDivElement>(null);
 
   const muteAudio = () => {
     setMutedAudio((prev) => !prev);
@@ -492,6 +493,7 @@ export default function Main() {
     instance,
     userMedia,
     tableRef,
+    tableTopRef,
     isCamera,
     isScreen,
     isAudio,
@@ -612,7 +614,11 @@ export default function Main() {
         muteAudio={muteAudio}
         handleDisableEnableBtns={handleDisableEnableBtns}
       />
-      <FgTable tableRef={tableRef} bundles={bundles} />
+      <FgTable
+        tableRef={tableRef}
+        tableTopRef={tableTopRef}
+        bundles={bundles}
+      />
     </div>
   );
 }

@@ -2,12 +2,12 @@ import { Socket } from "socket.io-client";
 import {
   RemoteTracksMapType,
   UserMediaType,
-} from "../../context/streamsContext/typeConstant";
+} from "../../context/mediaContext/typeConstant";
 import {
   RemoteEffectStylesType,
   AudioEffectTypes,
   RemoteStreamEffectsType,
-} from "../../context/streamEffectsContext/typeConstant";
+} from "../../context/effectsContext/typeConstant";
 import BundleSocket from "./BundleSocket";
 import { BundleControllerMessageType, BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";

@@ -1,13 +1,13 @@
 import {
   RemoteTracksMapType,
   UserMediaType,
-} from "../../context/streamsContext/typeConstant";
+} from "../../context/mediaContext/typeConstant";
 import {
   RemoteEffectStylesType,
   AudioEffectTypes,
   defaultAudioStreamEffects,
   RemoteStreamEffectsType,
-} from "../../context/streamEffectsContext/typeConstant";
+} from "../../context/effectsContext/typeConstant";
 import {
   onBundleMetadataResponsedType,
   onClientEffectChangedType,

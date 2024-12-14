@@ -9,7 +9,7 @@ import FgPanel from "../fgElements/fgPanel/FgPanel";
 import "./lib/pianoStyles.css";
 import ScaleSection from "./lib/ScaleSection";
 import FgPianoController, { keysMap } from "./lib/FgPianoController";
-import { useStreamsContext } from "../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../context/mediaContext/MediaContext";
 import SamplerToolbar from "./lib/SamplerToolbar";
 
 const SamplerEffectsToolbar = React.lazy(
@@ -55,7 +55,7 @@ export default function FgPiano({
   closeCallback?: () => void;
   referenceElement?: HTMLElement;
 }) {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const [visibleOctave, setVisibleOctave] = useState<Octaves>(initialOctave);
   const [focus, setFocus] = useState(false);

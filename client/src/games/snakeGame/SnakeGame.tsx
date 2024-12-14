@@ -53,6 +53,7 @@ function SnakeGame({
   const [gameOver, setGameOver] = useState(false);
   const [started, setStarted] = useState(false);
   const [minDimension, setMinDimension] = useState<"height" | "width">("width");
+  const focused = useRef(true);
   const boardRef = useRef<HTMLDivElement>(null);
   const snakeGameRef = useRef<HTMLDivElement>(null);
 
@@ -67,7 +68,10 @@ function SnakeGame({
     direction,
     setGameOver,
     started,
-    setStarted
+    setStarted,
+    focused,
+    setMinDimension,
+    snakeGameRef
   );
 
   useEffect(() => {
@@ -150,6 +154,7 @@ function SnakeGame({
           .some((segment) => segment.x === head.x && segment.y === head.y)
       ) {
         setGameOver(true);
+        setStarted(false);
         clearInterval(gameInterval);
         return;
       }
@@ -172,27 +177,10 @@ function SnakeGame({
   }, [started]);
 
   useEffect(() => {
-    console.log(gridSize);
     boardRef.current?.style.setProperty("--grid-size", `${gridSize}`);
 
-    getMinDimension();
+    snakeGameController.getMinDimension();
   }, [gridSize, boardRef.current, snakeGameRef.current]);
-
-  const getMinDimension = () => {
-    const box = snakeGameRef.current?.getBoundingClientRect();
-
-    if (!box) {
-      return;
-    }
-
-    setMinDimension(() => {
-      if (box.width > box.height) {
-        return "height";
-      } else {
-        return "width";
-      }
-    });
-  };
 
   return (
     <FgPanel
@@ -207,7 +195,7 @@ function SnakeGame({
             {snakeGameController.renderBoard()}
             {gameOver && (
               <div
-                className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
+                className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 cursor-pointer'
                 onClick={snakeGameController.endScreenClick}
               >
                 <div
@@ -229,7 +217,8 @@ function SnakeGame({
       panelBoundariesRef={tableTopRef}
       panelBoundariesScrollingContainerRef={tableRef}
       panelInsertionPointRef={tableRef}
-      resizeCallback={getMinDimension}
+      resizeCallback={snakeGameController.getMinDimension}
+      focusCallback={(focus) => (focused.current = focus)}
       initHeight={"400px"}
       initWidth={"400px"}
       minWidth={400}

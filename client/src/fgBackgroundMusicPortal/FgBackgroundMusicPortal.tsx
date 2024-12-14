@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
 import FgPanel from "../fgElements/fgPanel/FgPanel";
 import FgButton from "../fgElements/fgButton/FgButton";
-import { useStreamsContext } from "../context/streamsContext/StreamsContext";
-import { BackgroundMusicTypes } from "../context/streamEffectsContext/typeConstant";
+import { useMediaContext } from "../context/mediaContext/MediaContext";
+import { BackgroundMusicTypes } from "../context/effectsContext/typeConstant";
 import FgImage from "../fgElements/fgImage/FgImage";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
 
@@ -48,7 +48,7 @@ export default function FgBackgroundMusicPortal({
   closeCallback: () => void;
   backgroundMusicButtonRef: React.RefObject<HTMLButtonElement>;
 }) {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const [backgroundMusic, setBackgroundMusic] = useState<{
     [backgroundMusicType in BackgroundMusicTypes]: {

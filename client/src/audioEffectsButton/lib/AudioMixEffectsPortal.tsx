@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Socket } from "socket.io-client";
 import isEqual from "lodash/isEqual";
-import { useStreamsContext } from "../../context/streamsContext/StreamsContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import AudioMixEffect from "./AudioMixEffect";
 import ScrollingContainer from "../../fgElements/scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../fgElements/scrollingContainer/lib/ScrollingContainerButton";
@@ -75,7 +75,7 @@ export default function AudioMixEffectsPortal({
   audioMixEffectsButtonRef: React.RefObject<HTMLButtonElement>;
   closeCallback: () => void;
 }) {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const [_, setRerender] = useState(false);
   const [focus, setFocus] = useState(true);

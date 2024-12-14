@@ -5,7 +5,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../context/streamEffectsContext/typeConstant";
+} from "../../../context/effectsContext/typeConstant";
 import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
 import {
   defaultFgVisualMediaOptions,

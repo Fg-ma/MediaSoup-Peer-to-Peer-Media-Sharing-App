@@ -39,12 +39,30 @@ class SnakeGameController {
     private direction: React.MutableRefObject<"up" | "down" | "right" | "left">,
     private setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
     private started: boolean,
-    private setStarted: React.Dispatch<React.SetStateAction<boolean>>
-  ) {}
+    private setStarted: React.Dispatch<React.SetStateAction<boolean>>,
+    private focused: React.MutableRefObject<boolean>,
+    private setMinDimension: React.Dispatch<
+      React.SetStateAction<"height" | "width">
+    >,
+    private snakeGameRef: React.RefObject<HTMLDivElement>
+  ) {
+    this.lastKeyPress = Date.now();
+  }
 
   handleKeyPress = (event: KeyboardEvent) => {
+    console.log("wokred");
+    if (!this.focused.current) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
     if (!this.started) {
       this.setStarted(true);
+      this.setGameOver(false);
+      this.setSnake(this.initialSnake);
+      this.food.current = this.initialFood;
+      this.direction.current = "up";
     }
 
     const currentTime = Date.now();
@@ -234,6 +252,22 @@ class SnakeGameController {
     this.setSnake(this.initialSnake);
     this.food.current = this.initialFood;
     this.direction.current = "up";
+  };
+
+  getMinDimension = () => {
+    const box = this.snakeGameRef.current?.getBoundingClientRect();
+
+    if (!box) {
+      return;
+    }
+
+    this.setMinDimension(() => {
+      if (box.width > box.height) {
+        return "height";
+      } else {
+        return "width";
+      }
+    });
   };
 }
 

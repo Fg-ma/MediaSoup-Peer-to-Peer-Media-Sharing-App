@@ -10,14 +10,14 @@ import {
   defaultAudioEffectsStyles,
   RemoteEffectStylesType,
   UserEffectsStylesType,
-} from "../context/streamEffectsContext/typeConstant";
+} from "../context/effectsContext/typeConstant";
 import {
   DataStreamTypes,
   RemoteDataStreamsType,
   RemoteTracksMapType,
   UserDataStreamsType,
   UserMediaType,
-} from "../context/streamsContext/typeConstant";
+} from "../context/mediaContext/typeConstant";
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";

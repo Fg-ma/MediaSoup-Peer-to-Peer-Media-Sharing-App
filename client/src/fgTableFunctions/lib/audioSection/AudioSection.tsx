@@ -1,12 +1,13 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
+import ProducersController from "../../../lib/ProducersController";
 import AudioSectionController from "./lib/audioSectionController";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
+import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
+
 import shareAudioIcon from "../../../../public/svgs/shareAudioIcon.svg";
 import removeAudioIcon from "../../../../public/svgs/removeAudioIcon.svg";
-import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
-import ProducersController from "../../../lib/ProducersController";
 
 const FgButton = React.lazy(
   () => import("../../../fgElements/fgButton/FgButton")
@@ -116,7 +117,7 @@ export default function AudioSection({
         }}
         hoverContent={
           <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            {audioActive ? "Remove Audio" : "Publish Audio"}
+            {audioActive ? "Remove audio" : "Publish audio"}
           </div>
         }
       />

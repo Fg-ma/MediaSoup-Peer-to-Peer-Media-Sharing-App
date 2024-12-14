@@ -8,7 +8,7 @@ import {
   DataStreamTypes,
   RemoteDataStreamsType,
   RemoteTracksMapType,
-} from "../context/streamsContext/typeConstant";
+} from "../context/mediaContext/typeConstant";
 
 class ConsumersController {
   constructor(

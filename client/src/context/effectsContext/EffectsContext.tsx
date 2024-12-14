@@ -8,34 +8,32 @@ import {
   defaultAudioStreamEffects,
 } from "./typeConstant";
 
-export interface StreamEffectsContextProviderProps {
+export interface EffectsContextProviderProps {
   children: React.ReactNode;
 }
 
-export interface StreamEffectsContextType {
+export interface EffectsContextType {
   userStreamEffects: React.MutableRefObject<UserStreamEffectsType>;
   remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>;
   userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>;
   remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>;
 }
 
-const StreamEffectsContext = createContext<
-  StreamEffectsContextType | undefined
->(undefined);
+const EffectsContext = createContext<EffectsContextType | undefined>(undefined);
 
-export const useStreamEffectsContext = () => {
-  const context = useContext(StreamEffectsContext);
+export const useEffectsContext = () => {
+  const context = useContext(EffectsContext);
   if (!context) {
     throw new Error(
-      "useStreamEffectsContext must be used within an StreamEffectsContextProvider"
+      "useEffectsContext must be used within an EffectsContextProvider"
     );
   }
   return context;
 };
 
-export function StreamEffectsContextProvider({
+export function EffectsContextProvider({
   children,
-}: StreamEffectsContextProviderProps) {
+}: EffectsContextProviderProps) {
   const userStreamEffects = useRef<UserStreamEffectsType>({
     camera: {},
     screen: {},
@@ -52,7 +50,7 @@ export function StreamEffectsContextProvider({
   const remoteEffectsStyles = useRef<RemoteEffectStylesType>({});
 
   return (
-    <StreamEffectsContext.Provider
+    <EffectsContext.Provider
       value={{
         userStreamEffects,
         remoteStreamEffects,
@@ -61,8 +59,8 @@ export function StreamEffectsContextProvider({
       }}
     >
       {children}
-    </StreamEffectsContext.Provider>
+    </EffectsContext.Provider>
   );
 }
 
-export default StreamEffectsContext;
+export default EffectsContext;

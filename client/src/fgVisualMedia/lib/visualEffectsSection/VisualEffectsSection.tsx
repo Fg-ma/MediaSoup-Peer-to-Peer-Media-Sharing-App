@@ -6,7 +6,7 @@ import {
   ScreenEffectTypes,
   HideBackgroundEffectTypes,
   PostProcessEffects,
-} from "../../../context/streamEffectsContext/typeConstant";
+} from "../../../context/effectsContext/typeConstant";
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
 

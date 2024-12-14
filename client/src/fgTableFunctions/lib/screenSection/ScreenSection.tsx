@@ -1,13 +1,14 @@
 import React from "react";
 import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
+import { useMediaContext } from "../../../context/mediaContext/MediaContext";
+import ProducersController from "../../../lib/ProducersController";
+import ScreenSectionController from "./lib/ScreenSectionController";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
+
 import removeScreenIcon from "../../../../public/svgs/removeScreenIcon.svg";
 import shareScreenIcon from "../../../../public/svgs/shareScreenIcon.svg";
-import { useStreamsContext } from "../../../context/streamsContext/StreamsContext";
-import ScreenSectionController from "./lib/ScreenSectionController";
-import ProducersController from "../../../lib/ProducersController";
 
 export default function ScreenSection({
   socket,
@@ -36,7 +37,7 @@ export default function ScreenSection({
   producersController: ProducersController;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
-  const { userMedia } = useStreamsContext();
+  const { userMedia } = useMediaContext();
 
   const screenSectionController = new ScreenSectionController(
     socket,

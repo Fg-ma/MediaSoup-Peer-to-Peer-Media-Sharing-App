@@ -37,7 +37,7 @@ export default function FgPanel({
   backgroundColor = "#ffffff",
   secondaryBackgroundColor = "#f3f3f3",
 }: {
-  content: React.ReactNode;
+  content?: React.ReactNode;
   initPosition?: {
     x?: number;
     y?: number;

@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import FgTableController from "./lib/FgTableController";
 import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElement";
 import "./lib/fgTable.css";
-import SnakeGame from "../games/snakeGame/SnakeGame";
 
 export default function FgTable({
   tableRef,
+  tableTopRef,
   bundles,
 }: {
   tableRef: React.RefObject<HTMLDivElement>;
+  tableTopRef: React.RefObject<HTMLDivElement>;
   bundles: {
     [username: string]: {
       [instance: string]: React.JSX.Element;
@@ -16,7 +17,6 @@ export default function FgTable({
   };
 }) {
   const [_rerender, setRerender] = useState(false);
-  const tableTopRef = useRef<HTMLDivElement>(null);
   const aspectDir = useRef<"width" | "height">("width");
 
   const fgTableController = new FgTableController(
@@ -77,7 +77,6 @@ export default function FgTable({
             }}
           >
             <div className='w-full h-full relative'>
-              <SnakeGame tableRef={tableRef} tableTopRef={tableTopRef} />
               {bundles &&
                 Object.keys(bundles).length !== 0 &&
                 Object.keys(bundles).map(

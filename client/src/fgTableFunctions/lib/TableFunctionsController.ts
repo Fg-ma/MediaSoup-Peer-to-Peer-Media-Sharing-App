@@ -4,7 +4,7 @@ import {
   RemoteTracksMapType,
   UserDataStreamsType,
   UserMediaType,
-} from "../../context/streamsContext/typeConstant";
+} from "../../context/mediaContext/typeConstant";
 
 class TableFunctionsController {
   constructor(
