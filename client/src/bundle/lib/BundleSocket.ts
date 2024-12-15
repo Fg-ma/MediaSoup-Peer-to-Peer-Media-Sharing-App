@@ -1,5 +1,5 @@
 import {
-  RemoteTracksMapType,
+  RemoteMediaType,
   UserMediaType,
 } from "../../context/mediaContext/typeConstant";
 import {
@@ -52,7 +52,7 @@ class BundleSocket {
     private setAudioStream: React.Dispatch<
       React.SetStateAction<MediaStream | undefined>
     >,
-    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private remoteMedia: React.MutableRefObject<RemoteMediaType>,
     private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
     private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
@@ -83,7 +83,7 @@ class BundleSocket {
         const newStream = new MediaStream();
         if (event.producerId) {
           const track =
-            this.remoteTracksMap.current[event.producerUsername][
+            this.remoteMedia.current[event.producerUsername][
               event.producerInstance
             ].camera?.[event.producerId];
           if (track) {
@@ -100,7 +100,7 @@ class BundleSocket {
         const newStream = new MediaStream();
         if (event.producerId) {
           const track =
-            this.remoteTracksMap.current[event.producerUsername][
+            this.remoteMedia.current[event.producerUsername][
               event.producerInstance
             ].screen?.[event.producerId];
           if (track) {
@@ -117,7 +117,7 @@ class BundleSocket {
         const newStream = new MediaStream();
         if (event.producerId) {
           const track =
-            this.remoteTracksMap.current[event.producerUsername][
+            this.remoteMedia.current[event.producerUsername][
               event.producerInstance
             ].screenAudio?.[event.producerId];
           if (track) {
@@ -131,9 +131,8 @@ class BundleSocket {
     } else if (event.producerType === "audio") {
       const newStream = new MediaStream();
       const track =
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ].audio;
+        this.remoteMedia.current[event.producerUsername][event.producerInstance]
+          .audio;
       if (track) {
         newStream.addTrack(track);
       }

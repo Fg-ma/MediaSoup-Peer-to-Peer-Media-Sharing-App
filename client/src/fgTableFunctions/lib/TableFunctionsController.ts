@@ -1,10 +1,11 @@
 import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import {
-  RemoteTracksMapType,
+  RemoteMediaType,
   UserDataStreamsType,
   UserMediaType,
 } from "../../context/mediaContext/typeConstant";
+import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
 
 class TableFunctionsController {
   constructor(
@@ -17,8 +18,11 @@ class TableFunctionsController {
     private setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
-    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private remoteMedia: React.MutableRefObject<RemoteMediaType>,
     private handleDisableEnableBtns: (disabled: boolean) => void,
+    private bundles: {
+      [username: string]: { [instance: string]: React.JSX.Element };
+    },
     private setBundles: React.Dispatch<
       React.SetStateAction<{
         [username: string]: { [instance: string]: React.JSX.Element };
@@ -39,7 +43,8 @@ class TableFunctionsController {
     private setMutedAudio: React.Dispatch<React.SetStateAction<boolean>>,
     private mutedAudioRef: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
-    private device: React.MutableRefObject<types.Device | undefined>
+    private device: React.MutableRefObject<types.Device | undefined>,
+    private createProducerBundle: () => void
   ) {}
 
   joinTable = () => {
@@ -74,6 +79,16 @@ class TableFunctionsController {
         this.leaveTable();
       }
 
+      this.userMedia.current.gamesSignaling = new GamesSignalingMedia(
+        this.table_id.current,
+        this.username.current,
+        this.instance.current,
+        "ws://localhost:8042",
+        this.userMedia,
+        this.bundles,
+        this.createProducerBundle
+      );
+
       // Join new table
       this.socket.current.emit(
         "joinTable",
@@ -102,12 +117,22 @@ class TableFunctionsController {
       delete this.userMedia.current.screen[screenId];
     }
 
+    for (const screenAudioId in this.userMedia.current.screenAudio) {
+      this.userMedia.current.screenAudio[screenAudioId].deconstructor();
+      delete this.userMedia.current.screenAudio[screenAudioId];
+    }
+
     if (this.userMedia.current.audio) {
       this.userMedia.current.audio.deconstructor();
       this.userMedia.current.audio = undefined;
     }
 
-    this.remoteTracksMap.current = {};
+    if (this.userMedia.current.gamesSignaling) {
+      this.userMedia.current.gamesSignaling.deconstructor();
+      this.userMedia.current.gamesSignaling = undefined;
+    }
+
+    this.remoteMedia.current = {};
 
     this.handleDisableEnableBtns(false);
     this.device.current = undefined;
@@ -165,7 +190,7 @@ class TableFunctionsController {
         }
         return previousBundles;
       });
-      this.remoteTracksMap.current = {};
+      this.remoteMedia.current = {};
 
       const msg = {
         type: "unsubscribe",

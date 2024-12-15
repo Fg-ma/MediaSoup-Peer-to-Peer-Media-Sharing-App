@@ -1,10 +1,9 @@
 import React, { useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgPanel from "../../../fgElements/fgPanel/FgPanel";
-import { v4 as uuidv4 } from "uuid";
-import SnakeGameMedia from "../../../lib/SnakeGameMedia";
 
 import joystickIcon from "../../../../public/svgs/games/joystickIcon.svg";
 import snakeGameIcon from "../../../../public/svgs/games/snakeGameIcon.svg";
@@ -14,18 +13,10 @@ export default function GamesSection({
   table_id,
   username,
   instance,
-  bundles,
-  createProducerBundle,
 }: {
   table_id: string;
   username: string;
   instance: string;
-  bundles: {
-    [username: string]: {
-      [instance: string]: React.JSX.Element;
-    };
-  };
-  createProducerBundle: () => void;
 }) {
   const { userMedia } = useMediaContext();
 
@@ -117,28 +108,10 @@ export default function GamesSection({
                   }
 
                   if (!snakeGameActive) {
-                    if (!userMedia.current.games.snake) {
-                      userMedia.current.games.snake = {};
-                    }
-
-                    // prettier-ignore
-                    const snakeGameId  = `snake_game_${uuidv4()}`;
-
-                    const snakeGameMedia = new SnakeGameMedia(
-                      table_id,
-                      username,
-                      instance,
-                      snakeGameId,
-                      "ws://localhost:8042"
+                    userMedia.current.gamesSignaling?.initiateGame(
+                      "snake",
+                      `snake_game_${uuidv4()}`
                     );
-                    userMedia.current.games.snake[snakeGameId] = snakeGameMedia;
-
-                    if (
-                      !bundles[username] ||
-                      !Object.keys(bundles[username]).includes(instance)
-                    ) {
-                      createProducerBundle();
-                    }
                   } else {
                     console.log("leave");
                   }

@@ -1,14 +1,45 @@
 import GameMediaUniversalFunctions from "./GameMediaUniversalFunctions";
 
+type OutGoingMessages =
+  | {
+      type: "snakeDirectionChange";
+      data: {
+        table_id: string;
+        username: string;
+        instance: string;
+        gameId: string;
+        direction: "up" | "down" | "left" | "right";
+      };
+    }
+  | {
+      type: "newFood";
+      data: {
+        table_id: string;
+        username: string;
+        instance: string;
+        gameId: string;
+        food: { x: number; y: number; class: string }[];
+      };
+    };
+
+type IncomingMessages = {
+  type: "snakeDirectionChanged";
+  data: { direction: string; playerId: number };
+};
+
 class SnakeGameMedia extends GameMediaUniversalFunctions {
+  initiator: boolean;
+
   constructor(
     table_id: string,
     username: string,
     instance: string,
     gameId: string,
-    private url: string
+    private url: string,
+    initiator: boolean
   ) {
     super(table_id, username, instance, "snake", gameId);
+    this.initiator = initiator;
 
     this.connect(this.url);
   }
@@ -30,24 +61,13 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     };
   };
 
-  sendMessage = (message: {
-    type: "changeSnakeDirection";
-    data: {
-      table_id: string;
-      username: string;
-      instance: string;
-      direction: "up" | "down" | "left" | "right";
-    };
-  }) => {
+  sendMessage = (message: OutGoingMessages) => {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
     }
   };
 
-  handleMessage = (message: {
-    type: "snakeDirectionChanged";
-    data: { direction: string; playerId: number };
-  }) => {
+  handleMessage = (message: IncomingMessages) => {
     switch (message.type) {
       case "snakeDirectionChanged":
         console.log(
@@ -59,14 +79,28 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     }
   };
 
-  changeSnakeDirection = (direction: "up" | "down" | "left" | "right") => {
+  snakeDirectionChange = (direction: "up" | "down" | "left" | "right") => {
     this.sendMessage({
-      type: "changeSnakeDirection",
+      type: "snakeDirectionChange",
       data: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
+        gameId: this.gameId,
         direction,
+      },
+    });
+  };
+
+  newFood = (food: { x: number; y: number; class: string }[]) => {
+    this.sendMessage({
+      type: "newFood",
+      data: {
+        table_id: this.table_id,
+        username: this.username,
+        instance: this.instance,
+        gameId: this.gameId,
+        food,
       },
     });
   };

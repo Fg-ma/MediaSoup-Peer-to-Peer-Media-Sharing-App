@@ -3,38 +3,19 @@ import { Buffer } from "buffer";
 import {
   GameTypes,
   GameWebSocket,
+  MessageTypes,
   SocketData,
   SocketTypes,
 } from "./typeConstant";
-import Broadcaster from "./Broadcaster";
-import TablesController from "./TablesController";
-
-type MessageTypes =
-  | {
-      type: "joinTable";
-      data: {
-        table_id: string;
-        username: string;
-        instance: string;
-        socketType: SocketTypes;
-        gameType: GameTypes | undefined;
-        gameId: string | undefined;
-      };
-    }
-  | {
-      type: "leaveTable";
-      data: {
-        table_id: string;
-        username: string;
-        instance: string;
-        socketType: SocketTypes;
-        gameType: GameTypes | undefined;
-        gameId: string | undefined;
-      };
-    };
+import Broadcaster from "./lib/Broadcaster";
+import TablesController from "./lib/TablesController";
+import UniversalGameController from "./lib/UniversalGameController";
+import SnakeGameController from "./lib/SnakeGameController";
 
 const broadcaster = new Broadcaster();
 const tablesController = new TablesController(broadcaster);
+const universalGameController = new UniversalGameController(broadcaster);
+const snakeGameController = new SnakeGameController(broadcaster);
 
 uWS
   .App()
@@ -58,31 +39,22 @@ uWS
     }
   });
 
-const handleMessage = (ws: GameWebSocket, msg: MessageTypes) => {
-  const { type, data } = msg;
-
-  switch (type) {
+const handleMessage = (ws: GameWebSocket, event: MessageTypes) => {
+  switch (event.type) {
     case "joinTable":
-      tablesController.joinTable(
-        ws,
-        data.table_id,
-        data.username,
-        data.instance,
-        data.socketType,
-        data.gameType,
-        data.gameId
-      );
+      tablesController.onJoinTable(ws, event);
       break;
     case "leaveTable":
-      tablesController.joinTable(
-        ws,
-        data.table_id,
-        data.username,
-        data.instance,
-        data.socketType,
-        data.gameType,
-        data.gameId
-      );
+      tablesController.onLeaveTable(event);
+      break;
+    case "initiateGame":
+      universalGameController.onInitiateGame(event);
+      break;
+    case "gameStart":
+      universalGameController.onGameStart(event);
+      break;
+    case "snakeDirectionChange":
+      snakeGameController.onSnakeDirectionChange(event);
       break;
     default:
       break;

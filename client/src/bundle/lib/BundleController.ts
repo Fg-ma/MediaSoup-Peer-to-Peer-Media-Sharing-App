@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client";
 import {
-  RemoteTracksMapType,
+  RemoteMediaType,
   UserMediaType,
 } from "../../context/mediaContext/typeConstant";
 import {
@@ -49,7 +49,7 @@ class BundleController {
     private setAudioStream: React.Dispatch<
       React.SetStateAction<MediaStream | undefined>
     >,
-    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private remoteMedia: React.MutableRefObject<RemoteMediaType>,
     private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
     private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
@@ -70,7 +70,7 @@ class BundleController {
       this.setScreenStreams,
       this.setScreenAudioStreams,
       this.setAudioStream,
-      this.remoteTracksMap,
+      this.remoteMedia,
       this.remoteStreamEffects,
       this.remoteEffectsStyles,
       this.userMedia,

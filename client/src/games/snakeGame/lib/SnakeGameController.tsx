@@ -1,17 +1,21 @@
 import React, { ReactElement } from "react";
+import { UserMediaType } from "../../../context/mediaContext/typeConstant";
 import { foodClasses, SnakeColorsType } from "./typeConstant";
+import SnakeGameSocket from "./SnakeGameSocket";
 
-class SnakeGameController {
+class SnakeGameController extends SnakeGameSocket {
   private lastKeyPress = 0;
   private debounceKeyPressTime = 150;
 
   constructor(
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    private snakeGameId: string,
     private gridSize: number,
     private snake: {
       x: number;
       y: number;
     }[],
-    private setSnake: React.Dispatch<
+    setSnake: React.Dispatch<
       React.SetStateAction<
         {
           x: number;
@@ -19,27 +23,22 @@ class SnakeGameController {
         }[]
       >
     >,
-    private initialSnake: {
+    initialSnake: {
       x: number;
       y: number;
     }[],
     private snakeColor: SnakeColorsType,
-    private food: React.MutableRefObject<
+    food: React.MutableRefObject<
       {
         x: number;
         y: number;
         class: string;
       }[]
     >,
-    private initialFood: {
-      x: number;
-      y: number;
-      class: string;
-    }[],
-    private direction: React.MutableRefObject<"up" | "down" | "right" | "left">,
-    private setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
+    direction: React.MutableRefObject<"up" | "down" | "right" | "left">,
+    setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
     private started: boolean,
-    private setStarted: React.Dispatch<React.SetStateAction<boolean>>,
+    setStarted: React.Dispatch<React.SetStateAction<boolean>>,
     private focused: React.MutableRefObject<boolean>,
     private gameInterval: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setMinDimension: React.Dispatch<
@@ -47,6 +46,8 @@ class SnakeGameController {
     >,
     private snakeGameRef: React.RefObject<HTMLDivElement>
   ) {
+    super(food, direction, initialSnake, setSnake, setStarted, setGameOver);
+
     this.lastKeyPress = Date.now();
   }
 
@@ -59,11 +60,9 @@ class SnakeGameController {
     event.stopPropagation();
 
     if (!this.started) {
-      this.setStarted(true);
-      this.setGameOver(false);
-      this.setSnake(this.initialSnake);
-      this.food.current = this.initialFood;
-      this.direction.current = "up";
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.gameStart({
+        food: this.food.current,
+      });
     }
 
     const currentTime = Date.now();
@@ -126,6 +125,9 @@ class SnakeGameController {
     }
 
     if (validKeyPress) {
+      this.userMedia.current.games.snake?.[
+        this.snakeGameId
+      ]?.snakeDirectionChange(this.direction.current);
       this.lastKeyPress = currentTime;
     }
   };
@@ -259,12 +261,12 @@ class SnakeGameController {
     return board;
   };
 
-  endScreenClick = () => {
-    this.setGameOver(false);
-    this.setStarted(true);
-    this.setSnake(this.initialSnake);
-    this.food.current = this.initialFood;
-    this.direction.current = "up";
+  startGameClick = () => {
+    if (!this.started) {
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.gameStart({
+        food: this.food.current,
+      });
+    }
   };
 
   getMinDimension = () => {
@@ -301,8 +303,12 @@ class SnakeGameController {
       })
       .filter((value) => value !== undefined);
     if (foodEatenIndices.length !== 0) {
-      // If snake eats food, generate new food
-      const newFood = [...this.food.current];
+      const newFood = [];
+
+      // Remove eaten food
+      this.food.current = this.food.current.filter(
+        (_, index) => !foodEatenIndices.includes(index)
+      );
 
       for (const index of foodEatenIndices) {
         let attempts = 0;
@@ -326,24 +332,19 @@ class SnakeGameController {
                 item.x === proposedPosition.x && item.y === proposedPosition.y
             )
           ) {
-            newFood[index] = {
+            newFood.push({
               ...proposedPosition,
               class:
                 foodClasses[Math.floor(Math.random() * foodClasses.length)],
-            };
+            });
             validSpotFound = true; // Exit loop
           }
 
           attempts++;
         }
-
-        // If no valid spot was found after 20 attempts, keep the current food position
-        if (!validSpotFound) {
-          newFood[index] = this.food.current[index]; // Retain the current food position
-        }
       }
 
-      this.food.current = newFood;
+      this.userMedia.current.games.snake?.[this.snakeGameId].newFood(newFood);
     } else {
       // Move snake (remove tail)
       newSnake.pop();

@@ -1,19 +1,21 @@
 import { v4 as uuidv4 } from "uuid";
-import { GameTypes, GameWebSocket, SocketTypes, tables } from "./typeConstant";
+import {
+  GameTypes,
+  GameWebSocket,
+  onJoinTableType,
+  onLeaveTableType,
+  SocketTypes,
+  tables,
+} from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
-  joinTable = (
-    ws: GameWebSocket,
-    table_id: string,
-    username: string,
-    instance: string,
-    socketType: SocketTypes,
-    gameType: GameTypes | undefined,
-    gameId: string | undefined
-  ) => {
+  onJoinTable = (ws: GameWebSocket, event: onJoinTableType) => {
+    const { table_id, username, instance, socketType, gameType, gameId } =
+      event.data;
+
     if (!tables[table_id]) {
       tables[table_id] = {};
     }
@@ -53,14 +55,10 @@ class TablesController {
     );
   };
 
-  leaveTable = (
-    table_id: string,
-    username: string,
-    instance: string,
-    socketType: SocketTypes,
-    gameType: GameTypes | undefined,
-    gameId: string | undefined
-  ) => {
+  onLeaveTable = (event: onLeaveTableType) => {
+    const { table_id, username, instance, socketType, gameType, gameId } =
+      event.data;
+
     if (socketType === "signaling") {
       if (
         tables[table_id] &&

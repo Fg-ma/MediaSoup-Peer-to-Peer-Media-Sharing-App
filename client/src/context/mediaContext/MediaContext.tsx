@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useRef } from "react";
 import {
   RemoteDataStreamsType,
-  RemoteTracksMapType,
+  RemoteMediaType,
   UserDataStreamsType,
   UserMediaType,
 } from "./typeConstant";
@@ -12,7 +12,7 @@ export interface MediaContextProviderProps {
 
 export interface MediaContextType {
   userMedia: React.MutableRefObject<UserMediaType>;
-  remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>;
+  remoteMedia: React.MutableRefObject<RemoteMediaType>;
   remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>;
   userDataStreams: React.MutableRefObject<UserDataStreamsType>;
 }
@@ -35,9 +35,10 @@ export function MediaContextProvider({ children }: MediaContextProviderProps) {
     screen: {},
     screenAudio: {},
     audio: undefined,
+    gamesSignaling: undefined,
     games: {},
   });
-  const remoteTracksMap = useRef<RemoteTracksMapType>({});
+  const remoteMedia = useRef<RemoteMediaType>({});
   const remoteDataStreams = useRef<RemoteDataStreamsType>({});
   const userDataStreams = useRef<UserDataStreamsType>({});
 
@@ -45,7 +46,7 @@ export function MediaContextProvider({ children }: MediaContextProviderProps) {
     <MediaContext.Provider
       value={{
         userMedia,
-        remoteTracksMap,
+        remoteMedia,
         remoteDataStreams,
         userDataStreams,
       }}

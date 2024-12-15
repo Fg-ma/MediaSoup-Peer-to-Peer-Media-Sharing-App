@@ -179,7 +179,7 @@ type MediasoupSocketEvents =
     };
 
 export default function Main() {
-  const { userMedia, remoteTracksMap, remoteDataStreams, userDataStreams } =
+  const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
     useMediaContext();
   const {
     userEffectsStyles,
@@ -388,17 +388,13 @@ export default function Main() {
     });
 
     if (
-      remoteTracksMap.current[disconnectedUsername] &&
-      remoteTracksMap.current[disconnectedUsername][disconnectedInstance]
+      remoteMedia.current[disconnectedUsername] &&
+      remoteMedia.current[disconnectedUsername][disconnectedInstance]
     ) {
-      delete remoteTracksMap.current[disconnectedUsername][
-        disconnectedInstance
-      ];
+      delete remoteMedia.current[disconnectedUsername][disconnectedInstance];
 
-      if (
-        Object.keys(remoteTracksMap.current[disconnectedUsername]).length === 0
-      ) {
-        delete remoteTracksMap.current[disconnectedUsername];
+      if (Object.keys(remoteMedia.current[disconnectedUsername]).length === 0) {
+        delete remoteMedia.current[disconnectedUsername];
       }
     }
 
@@ -532,7 +528,7 @@ export default function Main() {
     remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
-    remoteTracksMap,
+    remoteMedia,
     userDataStreams,
     remoteDataStreams,
     isCamera,
@@ -557,7 +553,7 @@ export default function Main() {
     username,
     instance,
     consumerTransport,
-    remoteTracksMap,
+    remoteMedia,
     remoteDataStreams,
     setUpEffectContext,
     bundlesController.createConsumerBundle

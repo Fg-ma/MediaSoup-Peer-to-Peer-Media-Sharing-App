@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgPanel from "../../fgElements/fgPanel/FgPanel";
 import SnakeGameController from "./lib/SnakeGameController";
 import { SnakeColorsType } from "./lib/typeConstant";
@@ -7,12 +8,16 @@ import "./lib/snakeGame.css";
 import gameOverCard from "../../../public/snakeGameAssets/gameOverCard.jpg";
 
 function SnakeGame({
+  snakeGameId,
   tableRef,
   tableTopRef,
 }: {
+  snakeGameId: string;
   tableRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
 }) {
+  const { userMedia } = useMediaContext();
+
   const gridSize = 15;
   const gameSpeed = 150;
   const initialSnake = [
@@ -59,13 +64,14 @@ function SnakeGame({
   const snakeGameRef = useRef<HTMLDivElement>(null);
 
   const snakeGameController = new SnakeGameController(
+    userMedia,
+    snakeGameId,
     gridSize,
     snake,
     setSnake,
     initialSnake,
     snakeColor,
     food,
-    initialFood,
     direction,
     setGameOver,
     started,
@@ -101,6 +107,23 @@ function SnakeGame({
     snakeGameController.getMinDimension();
   }, [gridSize, boardRef.current, snakeGameRef.current]);
 
+  useEffect(() => {
+    if (
+      !userMedia.current.games.snake ||
+      !userMedia.current.games.snake[snakeGameId] ||
+      !userMedia.current.games.snake[snakeGameId].ws ||
+      userMedia.current.games.snake[snakeGameId].ws.readyState !==
+        WebSocket.OPEN
+    ) {
+      return;
+    }
+
+    userMedia.current.games.snake[snakeGameId].ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      snakeGameController.handleMessage(message);
+    };
+  }, [userMedia.current.games.snake?.[snakeGameId]?.ws?.readyState]);
+
   return (
     <FgPanel
       content={
@@ -115,7 +138,7 @@ function SnakeGame({
             {gameOver && (
               <div
                 className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 cursor-pointer'
-                onClick={snakeGameController.endScreenClick}
+                onClick={snakeGameController.startGameClick}
               >
                 <div
                   className='w-4/5 h-3/5 rounded-lg flex items-center justify-center font-K2D text-2xl bg-no-repeat bg-cover'
@@ -126,7 +149,7 @@ function SnakeGame({
             {!started && !gameOver && (
               <div
                 className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
-                onClick={snakeGameController.endScreenClick}
+                onClick={snakeGameController.startGameClick}
               >
                 <div className='w-4/5 h-3/5 rounded-lg bg-fg-white-95 flex items-center justify-center font-K2D text-2xl'>
                   Press any key to start
@@ -143,8 +166,8 @@ function SnakeGame({
       focusCallback={(focus) => (focused.current = focus)}
       initHeight={"400px"}
       initWidth={"400px"}
-      minWidth={400}
-      minHeight={400}
+      minWidth={150}
+      minHeight={150}
       initPosition={{ relativeToBoundaries: "center" }}
     />
   );

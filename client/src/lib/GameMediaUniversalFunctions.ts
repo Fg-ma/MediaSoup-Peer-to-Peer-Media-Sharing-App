@@ -2,7 +2,7 @@ import { GameTypes } from "../context/mediaContext/typeConstant";
 
 type SocketTypes = "signaling" | "games";
 
-type UniversalMessages =
+type OutGoingUniversalMessages =
   | {
       type: "joinTable";
       data: {
@@ -24,10 +24,43 @@ type UniversalMessages =
         gameType: GameTypes;
         gameId: string;
       };
+    }
+  | {
+      type: "gameStart";
+      data: {
+        table_id: string;
+        gameType: GameTypes;
+        gameId: string;
+        initialGameState: object;
+      };
+    };
+
+type IncomingUniversalMessages =
+  | {
+      type: "userJoined";
+      data: {
+        table_id: string;
+        username: string;
+        instance: string;
+        socketType: SocketTypes;
+        gameType: GameTypes | undefined;
+        gameId: string | undefined;
+      };
+    }
+  | {
+      type: "userLeft";
+      data: {
+        table_id: string;
+        username: string;
+        instance: string;
+        socketType: SocketTypes;
+        gameType: GameTypes | undefined;
+        gameId: string | undefined;
+      };
     };
 
 class GameMediaUniversalFunctions {
-  protected ws: WebSocket | undefined;
+  ws: WebSocket | undefined;
 
   constructor(
     protected table_id: string,
@@ -37,37 +70,13 @@ class GameMediaUniversalFunctions {
     protected gameId: string
   ) {}
 
-  sendUniversalMessage = (message: UniversalMessages) => {
+  sendUniversalMessage = (message: OutGoingUniversalMessages) => {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
     }
   };
 
-  handleUniversalMessage = (
-    message:
-      | {
-          type: "userJoined";
-          data: {
-            table_id: string;
-            username: string;
-            instance: string;
-            socketType: SocketTypes;
-            gameType: GameTypes | undefined;
-            gameId: string | undefined;
-          };
-        }
-      | {
-          type: "userLeft";
-          data: {
-            table_id: string;
-            username: string;
-            instance: string;
-            socketType: SocketTypes;
-            gameType: GameTypes | undefined;
-            gameId: string | undefined;
-          };
-        }
-  ) => {
+  handleUniversalMessage = (message: IncomingUniversalMessages) => {
     switch (message.type) {
       case "userJoined":
         break;
@@ -102,6 +111,18 @@ class GameMediaUniversalFunctions {
         socketType: "games",
         gameType: this.gameType,
         gameId: this.gameId,
+      },
+    });
+  };
+
+  gameStart = (initialGameState: object) => {
+    this.sendUniversalMessage({
+      type: "gameStart",
+      data: {
+        table_id: this.table_id,
+        gameType: this.gameType,
+        gameId: this.gameId,
+        initialGameState: initialGameState,
       },
     });
   };

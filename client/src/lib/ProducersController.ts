@@ -14,7 +14,7 @@ import {
 import {
   DataStreamTypes,
   RemoteDataStreamsType,
-  RemoteTracksMapType,
+  RemoteMediaType,
   UserDataStreamsType,
   UserMediaType,
 } from "../context/mediaContext/typeConstant";
@@ -43,7 +43,7 @@ class ProducersController {
     private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
-    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private remoteMedia: React.MutableRefObject<RemoteMediaType>,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
     private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
 
@@ -653,88 +653,88 @@ class ProducersController {
       ) {
         if (
           event.producerId &&
-          this.remoteTracksMap.current[event.producerUsername] &&
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteMedia.current[event.producerUsername] &&
+          this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ] &&
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ][event.producerType] &&
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ][event.producerType]![event.producerId]
         ) {
-          delete this.remoteTracksMap.current[event.producerUsername][
+          delete this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ]?.[event.producerType]?.[event.producerId];
 
           if (
             Object.keys(
-              this.remoteTracksMap.current[event.producerUsername][
+              this.remoteMedia.current[event.producerUsername][
                 event.producerInstance
               ][event.producerType] || { break: true }
             ).length === 0
           ) {
-            delete this.remoteTracksMap.current[event.producerUsername][
+            delete this.remoteMedia.current[event.producerUsername][
               event.producerInstance
             ]?.[event.producerType];
 
             if (
               Object.keys(
-                this.remoteTracksMap.current[event.producerUsername][
+                this.remoteMedia.current[event.producerUsername][
                   event.producerInstance
                 ] || { break: true }
               ).length === 0
             ) {
-              delete this.remoteTracksMap.current[event.producerUsername][
+              delete this.remoteMedia.current[event.producerUsername][
                 event.producerInstance
               ];
 
               if (
                 Object.keys(
-                  this.remoteTracksMap.current[event.producerUsername] || {
+                  this.remoteMedia.current[event.producerUsername] || {
                     break: true,
                   }
                 ).length === 0
               ) {
-                delete this.remoteTracksMap.current[event.producerUsername];
+                delete this.remoteMedia.current[event.producerUsername];
               }
             }
           }
         }
       } else if (event.producerType === "audio") {
         if (
-          this.remoteTracksMap.current[event.producerUsername] &&
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteMedia.current[event.producerUsername] &&
+          this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ] &&
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ][event.producerType]
         ) {
-          delete this.remoteTracksMap.current[event.producerUsername][
+          delete this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ][event.producerType];
 
           if (
             Object.keys(
-              this.remoteTracksMap.current[event.producerUsername][
+              this.remoteMedia.current[event.producerUsername][
                 event.producerInstance
               ] || { break: true }
             ).length === 0
           ) {
-            delete this.remoteTracksMap.current[event.producerUsername][
+            delete this.remoteMedia.current[event.producerUsername][
               event.producerInstance
             ];
 
             if (
               Object.keys(
-                this.remoteTracksMap.current[event.producerUsername] || {
+                this.remoteMedia.current[event.producerUsername] || {
                   break: true,
                 }
               ).length === 0
             ) {
-              delete this.remoteTracksMap.current[event.producerUsername];
+              delete this.remoteMedia.current[event.producerUsername];
             }
           }
         }
@@ -849,8 +849,8 @@ class ProducersController {
 
       // Clean up bundles
       if (
-        !this.remoteTracksMap.current[event.producerUsername] ||
-        !this.remoteTracksMap.current[event.producerUsername][
+        !this.remoteMedia.current[event.producerUsername] ||
+        !this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ]
       ) {

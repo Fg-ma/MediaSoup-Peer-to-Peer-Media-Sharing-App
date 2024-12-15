@@ -5,6 +5,7 @@ import CameraMedia from "../../lib/CameraMedia";
 import SnakeGameMedia from "../../lib/SnakeGameMedia";
 import ScreenAudioMedia from "../../lib/ScreenAudioMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
+import GamesSignalingMedia from "src/lib/GamesSignalingMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -17,14 +18,15 @@ export type UserMediaType = {
   screen: { [screenId: string]: ScreenMedia };
   screenAudio: { [screenAudioId: string]: ScreenAudioMedia };
   audio: AudioMedia | undefined;
+  gamesSignaling: GamesSignalingMedia | undefined;
   games: {
-    [gameType in GameTypes]?: {
+    snake?: {
       [gameId: string]: SnakeGameMedia;
     };
   };
 };
 
-export type RemoteTracksMapType = {
+export type RemoteMediaType = {
   [username: string]: {
     [instance: string]: {
       camera?: { [cameraId: string]: MediaStreamTrack };

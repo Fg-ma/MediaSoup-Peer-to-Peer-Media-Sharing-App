@@ -1,4 +1,4 @@
-import { GameTypes, SocketTypes, tables } from "./typeConstant";
+import { GameTypes, SocketTypes, tables } from "../typeConstant";
 
 class Broadcaster {
   constructor() {}
@@ -8,13 +8,18 @@ class Broadcaster {
     socketType: SocketTypes,
     gameType: GameTypes | undefined,
     gameId: string | undefined,
-    message: object
+    message: object,
+    exclude?: { username: string; instance: string }[]
   ) => {
     if (tables[table_id]) {
       const msg = JSON.stringify(message);
 
-      Object.values(tables[table_id]).forEach((user) => {
-        Object.values(user).forEach((socket) => {
+      Object.entries(tables[table_id]).forEach(([username, user]) => {
+        Object.entries(user).forEach(([instance, socket]) => {
+          if (exclude && exclude.includes({ username, instance })) {
+            return;
+          }
+
           try {
             if (socketType === "signaling" && socket.signaling) {
               socket.signaling.send(msg);

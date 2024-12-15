@@ -60,7 +60,7 @@ export default function Bundle({
     ...options,
   };
 
-  const { userMedia, remoteTracksMap } = useMediaContext();
+  const { userMedia, remoteMedia } = useMediaContext();
   const { remoteEffectsStyles, remoteStreamEffects } = useEffectsContext();
   const { signal } = useSignalContext();
 
@@ -107,7 +107,7 @@ export default function Bundle({
     setScreenStreams,
     setScreenAudioStreams,
     setAudioStream,
-    remoteTracksMap,
+    remoteMedia,
     remoteStreamEffects,
     remoteEffectsStyles,
     userMedia,
@@ -416,9 +416,13 @@ export default function Bundle({
         userMedia.current.games.snake &&
         Object.keys(userMedia.current.games.snake).length !== 0 &&
         Object.entries(userMedia.current.games.snake).map(
-          ([gameId, _snakeGame]) => (
-            <Suspense key={gameId} fallback={<div>Loading...</div>}>
-              <SnakeGame tableRef={tableRef} tableTopRef={tableTopRef} />
+          ([snakeGameId, _snakeGame]) => (
+            <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
+              <SnakeGame
+                snakeGameId={snakeGameId}
+                tableRef={tableRef}
+                tableTopRef={tableTopRef}
+              />
             </Suspense>
           )
         )}

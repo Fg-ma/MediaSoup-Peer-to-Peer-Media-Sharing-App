@@ -7,7 +7,7 @@ import { Socket } from "socket.io-client";
 import {
   DataStreamTypes,
   RemoteDataStreamsType,
-  RemoteTracksMapType,
+  RemoteMediaType,
 } from "../context/mediaContext/typeConstant";
 
 class ConsumersController {
@@ -23,7 +23,7 @@ class ConsumersController {
       types.Transport<types.AppData> | undefined
     >,
 
-    private remoteTracksMap: React.MutableRefObject<RemoteTracksMapType>,
+    private remoteMedia: React.MutableRefObject<RemoteMediaType>,
     private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
 
     private setUpEffectContext: (
@@ -231,10 +231,10 @@ class ConsumersController {
           }
         }
 
-        if (!this.remoteTracksMap.current[producerUsername]) {
-          this.remoteTracksMap.current[producerUsername] = {};
+        if (!this.remoteMedia.current[producerUsername]) {
+          this.remoteMedia.current[producerUsername] = {};
         }
-        this.remoteTracksMap.current[producerUsername][producerInstance] =
+        this.remoteMedia.current[producerUsername][producerInstance] =
           newRemoteTrack;
         if (!this.remoteDataStreams.current[producerUsername]) {
           this.remoteDataStreams.current[producerUsername] = {};
@@ -297,19 +297,16 @@ class ConsumersController {
             break;
           }
           case "connected": {
-            for (const username in this.remoteTracksMap.current) {
-              for (const instance in this.remoteTracksMap.current[username]) {
+            for (const username in this.remoteMedia.current) {
+              for (const instance in this.remoteMedia.current[username]) {
                 const remoteCameraStreams: {
                   [cameraId: string]: MediaStream;
                 } = {};
-                for (const key in this.remoteTracksMap.current[username][
-                  instance
-                ].camera) {
+                for (const key in this.remoteMedia.current[username][instance]
+                  .camera) {
                   const remoteCameraStream = new MediaStream();
                   remoteCameraStream.addTrack(
-                    this.remoteTracksMap.current[username][instance].camera![
-                      key
-                    ]
+                    this.remoteMedia.current[username][instance].camera![key]
                   );
                   remoteCameraStreams[key] = remoteCameraStream;
                 }
@@ -317,14 +314,11 @@ class ConsumersController {
                 const remoteScreenStreams: {
                   [screenId: string]: MediaStream;
                 } = {};
-                for (const key in this.remoteTracksMap.current[username][
-                  instance
-                ].screen) {
+                for (const key in this.remoteMedia.current[username][instance]
+                  .screen) {
                   const remoteScreenStream = new MediaStream();
                   remoteScreenStream.addTrack(
-                    this.remoteTracksMap.current[username][instance].screen![
-                      key
-                    ]
+                    this.remoteMedia.current[username][instance].screen![key]
                   );
                   remoteScreenStreams[key] = remoteScreenStream;
                 }
@@ -332,22 +326,22 @@ class ConsumersController {
                 const remoteScreenAudioStreams: {
                   [screenId: string]: MediaStream;
                 } = {};
-                for (const key in this.remoteTracksMap.current[username][
-                  instance
-                ].screenAudio) {
+                for (const key in this.remoteMedia.current[username][instance]
+                  .screenAudio) {
                   const remoteScreenAudioStream = new MediaStream();
                   remoteScreenAudioStream.addTrack(
-                    this.remoteTracksMap.current[username][instance]
-                      .screenAudio![key]
+                    this.remoteMedia.current[username][instance].screenAudio![
+                      key
+                    ]
                   );
                   remoteScreenAudioStreams[key] = remoteScreenAudioStream;
                 }
 
                 let remoteAudioStream: MediaStream | undefined = undefined;
-                if (this.remoteTracksMap.current[username][instance].audio) {
+                if (this.remoteMedia.current[username][instance].audio) {
                   remoteAudioStream = new MediaStream();
                   remoteAudioStream.addTrack(
-                    this.remoteTracksMap.current[username][instance].audio!
+                    this.remoteMedia.current[username][instance].audio!
                   );
                 }
 
@@ -425,17 +419,14 @@ class ConsumersController {
       return;
     }
 
-    if (!this.remoteTracksMap.current[event.producerUsername]) {
-      this.remoteTracksMap.current[event.producerUsername] = {};
+    if (!this.remoteMedia.current[event.producerUsername]) {
+      this.remoteMedia.current[event.producerUsername] = {};
     }
     if (
-      !this.remoteTracksMap.current[event.producerUsername][
-        event.producerInstance
-      ]
+      !this.remoteMedia.current[event.producerUsername][event.producerInstance]
     ) {
-      this.remoteTracksMap.current[event.producerUsername][
-        event.producerInstance
-      ] = {};
+      this.remoteMedia.current[event.producerUsername][event.producerInstance] =
+        {};
     }
     if (
       event.producerType === "camera" ||
@@ -443,22 +434,22 @@ class ConsumersController {
       event.producerType === "screenAudio"
     ) {
       if (
-        !this.remoteTracksMap.current[event.producerUsername][
+        !this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ][event.producerType]
       ) {
-        this.remoteTracksMap.current[event.producerUsername][
+        this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ][event.producerType] = {};
       }
 
       if (event.producerId) {
-        this.remoteTracksMap.current[event.producerUsername][
+        this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ][event.producerType]![event.producerId] = consumer.track;
       }
     } else {
-      this.remoteTracksMap.current[event.producerUsername][
+      this.remoteMedia.current[event.producerUsername][
         event.producerInstance
       ].audio = consumer.track;
     }
@@ -473,41 +464,38 @@ class ConsumersController {
 
     if (
       Object.keys(
-        this.remoteTracksMap.current[event.producerUsername][
+        this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ] || {}
       ).length === 1 &&
       (Object.keys(
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ].camera || {}
+        this.remoteMedia.current[event.producerUsername][event.producerInstance]
+          .camera || {}
       ).length === 1 ||
         Object.keys(
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ].screen || {}
         ).length === 1 ||
         Object.keys(
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ].screenAudio || {}
         ).length === 1 ||
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ].audio)
+        this.remoteMedia.current[event.producerUsername][event.producerInstance]
+          .audio)
     ) {
       const remoteCameraStreams: { [cameraId: string]: MediaStream } = {};
       if (
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ]?.camera
+        this.remoteMedia.current[event.producerUsername][event.producerInstance]
+          ?.camera
       ) {
-        for (const key in this.remoteTracksMap.current[event.producerUsername][
+        for (const key in this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ].camera) {
           const remoteCameraStream = new MediaStream();
           remoteCameraStream.addTrack(
-            this.remoteTracksMap.current[event.producerUsername][
+            this.remoteMedia.current[event.producerUsername][
               event.producerInstance
             ].camera![key]
           );
@@ -517,16 +505,15 @@ class ConsumersController {
 
       const remoteScreenStreams: { [screenId: string]: MediaStream } = {};
       if (
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ]?.screen
+        this.remoteMedia.current[event.producerUsername][event.producerInstance]
+          ?.screen
       ) {
-        for (const key in this.remoteTracksMap.current[event.producerUsername][
+        for (const key in this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ].screen) {
           const remoteScreenStream = new MediaStream();
           remoteScreenStream.addTrack(
-            this.remoteTracksMap.current[event.producerUsername][
+            this.remoteMedia.current[event.producerUsername][
               event.producerInstance
             ].screen![key]
           );
@@ -537,16 +524,15 @@ class ConsumersController {
       const remoteScreenAudioStreams: { [screenAudioId: string]: MediaStream } =
         {};
       if (
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ]?.screenAudio
+        this.remoteMedia.current[event.producerUsername][event.producerInstance]
+          ?.screenAudio
       ) {
-        for (const key in this.remoteTracksMap.current[event.producerUsername][
+        for (const key in this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ].screenAudio) {
           const remoteScreenAudioStream = new MediaStream();
           remoteScreenAudioStream.addTrack(
-            this.remoteTracksMap.current[event.producerUsername][
+            this.remoteMedia.current[event.producerUsername][
               event.producerInstance
             ].screenAudio![key]
           );
@@ -556,16 +542,15 @@ class ConsumersController {
 
       let remoteAudioStream: MediaStream | undefined = undefined;
       if (
-        this.remoteTracksMap.current[event.producerUsername][
+        this.remoteMedia.current[event.producerUsername][
           event.producerInstance
         ] &&
-        this.remoteTracksMap.current[event.producerUsername][
-          event.producerInstance
-        ].audio
+        this.remoteMedia.current[event.producerUsername][event.producerInstance]
+          .audio
       ) {
         remoteAudioStream = new MediaStream();
         remoteAudioStream.addTrack(
-          this.remoteTracksMap.current[event.producerUsername][
+          this.remoteMedia.current[event.producerUsername][
             event.producerInstance
           ].audio!
         );

@@ -94,7 +94,7 @@ export default function FgTableFunctions({
   };
   createProducerBundle: () => void;
 }) {
-  const { userMedia, remoteTracksMap, userDataStreams } = useMediaContext();
+  const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
   const { setSignal } = useSignalContext();
   const { permissions } = usePermissionsContext();
 
@@ -116,8 +116,9 @@ export default function FgTableFunctions({
     setIsInTable,
     userMedia,
     userDataStreams,
-    remoteTracksMap,
+    remoteMedia,
     handleDisableEnableBtns,
+    bundles,
     setBundles,
     consumerTransport,
     producerTransport,
@@ -130,7 +131,8 @@ export default function FgTableFunctions({
     setMutedAudio,
     mutedAudioRef,
     isSubscribed,
-    device
+    device,
+    createProducerBundle
   );
 
   const handleExternalMute = () => {
@@ -257,8 +259,6 @@ export default function FgTableFunctions({
           table_id={table_id.current}
           username={username.current}
           instance={instance.current}
-          bundles={bundles}
-          createProducerBundle={createProducerBundle}
         />
         {isAudio.current && (
           <Suspense fallback={<div>Loading...</div>}>
