@@ -44,6 +44,7 @@ export default function FgPanel({
     referenceElement?: HTMLElement;
     placement?: "above" | "below" | "left" | "right";
     padding?: number;
+    relativeToBoundaries?: "center";
   };
   initWidth?: string;
   initHeight?: string;
@@ -182,6 +183,25 @@ export default function FgPanel({
     initPosition.placement,
     initPosition.padding,
   ]);
+
+  useEffect(() => {
+    if (
+      !initPosition.relativeToBoundaries ||
+      !panelBoundariesRef ||
+      !panelBoundariesRef.current ||
+      !panelRef.current
+    ) {
+      return;
+    }
+
+    const boundariesRect = panelBoundariesRef.current.getBoundingClientRect();
+    const panelRect = panelRef.current.getBoundingClientRect();
+
+    const left = (boundariesRect.width - panelRect.width) / 2;
+    const top = (boundariesRect.height - panelRect.height) / 2;
+
+    setPosition({ x: left > 0 ? left : 0, y: top > 0 ? top : 0 });
+  }, [initPosition.relativeToBoundaries]);
 
   useEffect(() => {
     if (isResizing.current && resizingDirection.current) {

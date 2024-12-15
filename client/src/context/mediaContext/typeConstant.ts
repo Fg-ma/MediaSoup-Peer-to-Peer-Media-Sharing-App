@@ -1,9 +1,10 @@
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import { DataProducer } from "mediasoup-client/lib/DataProducer";
-import AudioMedia from "src/lib/AudioMedia";
-import CameraMedia from "src/lib/CameraMedia";
-import ScreenAudioMedia from "src/lib/ScreenAudioMedia";
-import ScreenMedia from "src/lib/ScreenMedia";
+import AudioMedia from "../../lib/AudioMedia";
+import CameraMedia from "../../lib/CameraMedia";
+import SnakeGameMedia from "../../lib/SnakeGameMedia";
+import ScreenAudioMedia from "../../lib/ScreenAudioMedia";
+import ScreenMedia from "../../lib/ScreenMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -18,7 +19,7 @@ export type UserMediaType = {
   audio: AudioMedia | undefined;
   games: {
     [gameType in GameTypes]?: {
-      [gameId: string]: string;
+      [gameId: string]: SnakeGameMedia;
     };
   };
 };

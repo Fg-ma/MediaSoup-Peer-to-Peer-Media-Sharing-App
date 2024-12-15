@@ -86,13 +86,22 @@ class FgPanelController {
       }
 
       const rect = this.panelRef.current.getBoundingClientRect();
+      const panelBoundaries =
+        this.panelBoundariesRef?.current?.getBoundingClientRect();
+
+      const maxWidth =
+        (panelBoundaries
+          ? panelBoundaries.width + panelBoundaries.left
+          : window.innerWidth) - rect.left;
+      const maxHeight =
+        (panelBoundaries
+          ? panelBoundaries.height + panelBoundaries.top
+          : window.innerHeight) - rect.top;
+
+      const minX = panelBoundaries?.left ?? 0;
+      const minY = panelBoundaries?.top ?? 0;
+
       const newSize = { ...this.size };
-
-      const maxWidth = window.innerWidth - rect.left;
-      const maxHeight = window.innerHeight - rect.top;
-
-      const minX = 0;
-      const minY = 0;
 
       switch (this.resizingDirection.current) {
         case "se":
@@ -117,7 +126,7 @@ class FgPanelController {
           if (rect.right - event.clientX > this.minWidth) {
             this.setPosition((prev) => ({
               ...prev,
-              x: Math.max(minX, event.clientX),
+              x: Math.max(0, event.clientX - minX),
             }));
           }
           break;
@@ -134,10 +143,10 @@ class FgPanelController {
             const newPosition = { ...prev };
 
             if (rect.right - event.clientX > this.minWidth) {
-              newPosition.x = Math.max(minX, event.clientX);
+              newPosition.x = Math.max(0, event.clientX - minX);
             }
             if (rect.bottom - event.clientY > this.minHeight) {
-              newPosition.y = Math.max(minY, event.clientY);
+              newPosition.y = Math.max(0, event.clientY - minY);
             }
 
             return newPosition;
@@ -155,7 +164,7 @@ class FgPanelController {
           if (rect.bottom - event.clientY > this.minHeight) {
             this.setPosition((prev) => ({
               ...prev,
-              y: Math.max(minY, event.clientY),
+              y: Math.max(0, event.clientY - minY),
             }));
           }
           break;

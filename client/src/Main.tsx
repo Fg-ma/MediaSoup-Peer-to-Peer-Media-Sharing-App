@@ -613,6 +613,8 @@ export default function Main() {
         isSubscribed={isSubscribed}
         muteAudio={muteAudio}
         handleDisableEnableBtns={handleDisableEnableBtns}
+        bundles={bundles}
+        createProducerBundle={bundlesController.createProducerBundle}
       />
       <FgTable
         tableRef={tableRef}

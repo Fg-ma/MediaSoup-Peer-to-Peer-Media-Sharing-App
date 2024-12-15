@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { SnakeColorsType } from "./typeConstant";
+import { foodClasses, SnakeColorsType } from "./typeConstant";
 
 class SnakeGameController {
   private lastKeyPress = 0;
@@ -41,6 +41,7 @@ class SnakeGameController {
     private started: boolean,
     private setStarted: React.Dispatch<React.SetStateAction<boolean>>,
     private focused: React.MutableRefObject<boolean>,
+    private gameInterval: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setMinDimension: React.Dispatch<
       React.SetStateAction<"height" | "width">
     >,
@@ -50,13 +51,13 @@ class SnakeGameController {
   }
 
   handleKeyPress = (event: KeyboardEvent) => {
-    console.log("wokred");
     if (!this.focused.current) {
       return;
     }
 
     event.preventDefault();
     event.stopPropagation();
+
     if (!this.started) {
       this.setStarted(true);
       this.setGameOver(false);
@@ -71,49 +72,61 @@ class SnakeGameController {
       return;
     }
 
-    this.lastKeyPress = currentTime;
+    let validKeyPress = false;
 
     switch (event.key.toLowerCase()) {
       case "w":
         if (this.direction.current !== "down") {
+          validKeyPress = true;
           this.direction.current = "up";
         }
         break;
       case "arrowup":
         if (this.direction.current !== "down") {
+          validKeyPress = true;
           this.direction.current = "up";
         }
         break;
       case "s":
         if (this.direction.current !== "up") {
+          validKeyPress = true;
           this.direction.current = "down";
         }
         break;
       case "arrowdown":
         if (this.direction.current !== "up") {
+          validKeyPress = true;
           this.direction.current = "down";
         }
         break;
       case "a":
         if (this.direction.current !== "right") {
+          validKeyPress = true;
           this.direction.current = "left";
         }
         break;
       case "arrowleft":
         if (this.direction.current !== "right") {
+          validKeyPress = true;
           this.direction.current = "left";
         }
         break;
       case "d":
         if (this.direction.current !== "left") {
+          validKeyPress = true;
           this.direction.current = "right";
         }
         break;
       case "arrowright":
         if (this.direction.current !== "left") {
+          validKeyPress = true;
           this.direction.current = "right";
         }
         break;
+    }
+
+    if (validKeyPress) {
+      this.lastKeyPress = currentTime;
     }
   };
 
@@ -268,6 +281,91 @@ class SnakeGameController {
         return "width";
       }
     });
+  };
+
+  gameLoop = () => {
+    const newSnake = [...this.snake];
+    const head = { ...newSnake[0] };
+
+    // Move snake in the chosen direction
+    if (this.direction.current === "up") head.y -= 1;
+    if (this.direction.current === "down") head.y += 1;
+    if (this.direction.current === "left") head.x -= 1;
+    if (this.direction.current === "right") head.x += 1;
+
+    newSnake.unshift(head);
+
+    const foodEatenIndices = this.food.current
+      .map((item, index) => {
+        if (item.x === head.x && item.y === head.y) return index;
+      })
+      .filter((value) => value !== undefined);
+    if (foodEatenIndices.length !== 0) {
+      // If snake eats food, generate new food
+      const newFood = [...this.food.current];
+
+      for (const index of foodEatenIndices) {
+        let attempts = 0;
+        let validSpotFound = false;
+
+        while (attempts < 20 && !validSpotFound) {
+          const proposedPosition = {
+            x: Math.floor(Math.random() * this.gridSize),
+            y: Math.floor(Math.random() * this.gridSize),
+          };
+
+          // Check if the position is valid
+          if (
+            !newSnake.some(
+              (segment) =>
+                segment.x === proposedPosition.x &&
+                segment.y === proposedPosition.y
+            ) &&
+            !this.food.current.some(
+              (item) =>
+                item.x === proposedPosition.x && item.y === proposedPosition.y
+            )
+          ) {
+            newFood[index] = {
+              ...proposedPosition,
+              class:
+                foodClasses[Math.floor(Math.random() * foodClasses.length)],
+            };
+            validSpotFound = true; // Exit loop
+          }
+
+          attempts++;
+        }
+
+        // If no valid spot was found after 20 attempts, keep the current food position
+        if (!validSpotFound) {
+          newFood[index] = this.food.current[index]; // Retain the current food position
+        }
+      }
+
+      this.food.current = newFood;
+    } else {
+      // Move snake (remove tail)
+      newSnake.pop();
+    }
+
+    // Check for game over conditions
+    if (
+      head.x < 0 ||
+      head.x >= this.gridSize ||
+      head.y < 0 ||
+      head.y >= this.gridSize ||
+      newSnake
+        .slice(1)
+        .some((segment) => segment.x === head.x && segment.y === head.y)
+    ) {
+      this.setGameOver(true);
+      this.setStarted(false);
+      clearInterval(this.gameInterval.current);
+      return;
+    }
+
+    this.setSnake(newSnake);
   };
 }
 

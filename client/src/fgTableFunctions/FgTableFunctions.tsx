@@ -46,6 +46,8 @@ export default function FgTableFunctions({
   isSubscribed,
   muteAudio,
   handleDisableEnableBtns,
+  bundles,
+  createProducerBundle,
 }: {
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
@@ -85,6 +87,12 @@ export default function FgTableFunctions({
   isSubscribed: React.MutableRefObject<boolean>;
   muteAudio: () => void;
   handleDisableEnableBtns: (disabled: boolean) => void;
+  bundles: {
+    [username: string]: {
+      [instance: string]: React.JSX.Element;
+    };
+  };
+  createProducerBundle: () => void;
 }) {
   const { userMedia, remoteTracksMap, userDataStreams } = useMediaContext();
   const { setSignal } = useSignalContext();
@@ -245,7 +253,13 @@ export default function FgTableFunctions({
           producersController={producersController}
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
-        <GamesSection />
+        <GamesSection
+          table_id={table_id.current}
+          username={username.current}
+          instance={instance.current}
+          bundles={bundles}
+          createProducerBundle={createProducerBundle}
+        />
         {isAudio.current && (
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsButton

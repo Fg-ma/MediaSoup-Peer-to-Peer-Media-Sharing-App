@@ -9,7 +9,7 @@ class Tables {
     this.mediasoupCleanup = new MediasoupCleanup();
   }
 
-  join(table_id: string, username: string, instance: string) {
+  join = (table_id: string, username: string, instance: string) => {
     this.socket.join(`table_${table_id}`);
     this.socket.join(`user_${table_id}_${username}`);
     this.socket.join(`instance_${table_id}_${username}_${instance}`);
@@ -17,9 +17,9 @@ class Tables {
     this.socket.table_id = table_id;
     this.socket.username = username;
     this.socket.instance = instance;
-  }
+  };
 
-  leave(table_id: string, username: string, instance: string) {
+  leave = (table_id: string, username: string, instance: string) => {
     this.socket.leave(`table_${table_id}`);
     this.socket.leave(`user_${table_id}_${username}`);
     this.socket.leave(`instance_${table_id}_${username}_${instance}`);
@@ -43,9 +43,9 @@ class Tables {
     this.mediasoupCleanup.deleteConsumerInstance(table_id, username, instance);
 
     this.io.to(`table_${table_id}`).emit("userLeftTable", username, instance);
-  }
+  };
 
-  disconnect() {
+  disconnect = () => {
     if (
       !this.socket.table_id ||
       !this.socket.username ||
@@ -89,7 +89,7 @@ class Tables {
     this.io
       .to(`table_${this.socket.table_id}`)
       .emit("userDisconnected", this.socket.username, this.socket.instance);
-  }
+  };
 }
 
 export default Tables;
