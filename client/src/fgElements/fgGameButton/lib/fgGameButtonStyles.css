@@ -1,0 +1,71 @@
+.fg-game-button-stationary-rim {
+  --r: 40%;
+  background: radial-gradient(
+      50% var(--r) at 50% var(--r),
+      #0003 99.99%,
+      #0000 0
+    ),
+    #00e359;
+  border-radius: 100% / calc(var(--r) * 2);
+  width: 16rem;
+  height: 7rem;
+}
+
+.fg-game-button-moving-part {
+  background: radial-gradient(50% 36% at 50% 36%, #0003 99.99%, #0000 0),
+    #3cf599;
+  border-radius: 100% / 72%;
+  height: 100%;
+  transform: translate(-50%, -78%);
+  transition: background 0.05s ease, border-radius 0.05s ease, height 0.05s ease,
+    transform 0.05s ease;
+}
+
+.fg-game-button-moving-part.fg-game-button-clicked {
+  background: radial-gradient(50% 45% at 50% 45%, #0003 99.99%, #0000 0),
+    #3cf599;
+  border-radius: 100% / 90%;
+  height: 80%;
+  transform: translate(-50%, -73%);
+}
+
+.fg-game-button-stationary-rim-2 {
+  --r: 47%;
+  background: radial-gradient(
+      50% var(--r) at 50% var(--r),
+      #0000 99.99%,
+      #0006 0
+    ),
+    #00e359;
+  border-radius: 100% / calc(var(--r) * 2);
+  width: 4rem;
+  height: 4rem;
+}
+
+.fg-game-button-moving-part-2 {
+  --r: 45%;
+  background: radial-gradient(
+      50% var(--r) at 50% var(--r),
+      #0000 99.99%,
+      #0006 0
+    ),
+    #3cf599;
+  border-radius: 100% / calc(var(--r) * 2);
+  height: 97%;
+  transform: translate(-50%, -60%);
+  transition: background 0.025s linear, border-radius 0.025s linear,
+    height 0.025s linear, transform 0.025s linear;
+}
+
+.fg-game-button-moving-part-2.fg-game-button-clicked-2 {
+  --r: 48%;
+  background: radial-gradient(
+      50% var(--r) at 50% var(--r),
+      #0000 99.99%,
+      #0006 0
+    ),
+    #3cf599;
+  border-radius: 100% / calc(var(--r) * 2);
+  height: 90%;
+  transform: translate(-50%, -57.5%);
+}

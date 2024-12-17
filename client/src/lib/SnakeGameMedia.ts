@@ -12,13 +12,12 @@ type OutGoingMessages =
       };
     }
   | {
-      type: "newFood";
+      type: "addSnake";
       data: {
         table_id: string;
         username: string;
         instance: string;
         gameId: string;
-        food: { x: number; y: number; class: string }[];
       };
     };
 
@@ -92,15 +91,14 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     });
   };
 
-  newFood = (food: { x: number; y: number; class: string }[]) => {
+  addSnake = () => {
     this.sendMessage({
-      type: "newFood",
+      type: "addSnake",
       data: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
         gameId: this.gameId,
-        food,
       },
     });
   };

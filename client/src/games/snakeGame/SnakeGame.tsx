@@ -7,11 +7,27 @@ import "./lib/snakeGame.css";
 
 import gameOverCard from "../../../public/snakeGameAssets/gameOverCard.jpg";
 
+export type Directions = "up" | "down" | "left" | "right";
+
+export type Snake = {
+  position: { x: number; y: number }[];
+  direction: Directions;
+};
+
+export type GameState = {
+  snakes: { [username: string]: { [instance: string]: Snake } };
+  food: { x: number; y: number; class: string }[];
+};
+
 function SnakeGame({
+  username,
+  instance,
   snakeGameId,
   tableRef,
   tableTopRef,
 }: {
+  username: string;
+  instance: string;
   snakeGameId: string;
   tableRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
@@ -19,76 +35,39 @@ function SnakeGame({
   const { userMedia } = useMediaContext();
 
   const gridSize = 15;
-  const gameSpeed = 150;
-  const initialSnake = [
-    { x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2) },
-    { x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2) + 1 },
-    { x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2) + 2 },
-  ];
-  const initialFood = [
-    {
-      x: Math.floor(Math.random() * gridSize),
-      y: Math.floor(Math.random() * gridSize),
-      class: "snake-game-apple",
-    },
-    {
-      x: Math.floor(Math.random() * gridSize),
-      y: Math.floor(Math.random() * gridSize),
-      class: "snake-game-banana",
-    },
-    {
-      x: Math.floor(Math.random() * gridSize),
-      y: Math.floor(Math.random() * gridSize),
-      class: "snake-game-donut",
-    },
-    {
-      x: Math.floor(Math.random() * gridSize),
-      y: Math.floor(Math.random() * gridSize),
-      class: "snake-game-orange",
-    },
-  ];
 
-  const [snake, setSnake] = useState(initialSnake);
+  const [gameState, setGameState] = useState<GameState>({
+    snakes: {},
+    food: [],
+  });
   const [snakeColor, _setSnakeColor] = useState<SnakeColorsType>({
     primary: "blue",
     secondary: "green",
   });
-  const food = useRef(initialFood);
-  const direction = useRef<"right" | "left" | "up" | "down">("up");
-  const [gameOver, setGameOver] = useState(false);
+  const [gameOver, _setGameOver] = useState(false);
   const [started, setStarted] = useState(false);
+  const [staged, setStaged] = useState(false);
   const [minDimension, setMinDimension] = useState<"height" | "width">("width");
   const focused = useRef(true);
-  const gameInterval = useRef<NodeJS.Timeout | undefined>(undefined);
   const boardRef = useRef<HTMLDivElement>(null);
   const snakeGameRef = useRef<HTMLDivElement>(null);
 
   const snakeGameController = new SnakeGameController(
-    userMedia,
+    username,
+    instance,
     snakeGameId,
+    userMedia,
     gridSize,
-    snake,
-    setSnake,
-    initialSnake,
+    gameState,
+    setGameState,
     snakeColor,
-    food,
-    direction,
-    setGameOver,
+    focused,
+    setMinDimension,
+    snakeGameRef,
     started,
     setStarted,
-    focused,
-    gameInterval,
-    setMinDimension,
-    snakeGameRef
+    setStaged
   );
-
-  useEffect(() => {
-    if (gameOver || !started) return;
-
-    gameInterval.current = setInterval(snakeGameController.gameLoop, gameSpeed);
-
-    return () => clearInterval(gameInterval.current);
-  }, [snake, gameOver, started]);
 
   useEffect(() => {
     document.addEventListener("keydown", snakeGameController.handleKeyPress);
@@ -146,13 +125,23 @@ function SnakeGame({
                 ></div>
               </div>
             )}
-            {!started && !gameOver && (
+            {!staged && !started && !gameOver && (
               <div
                 className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
                 onClick={snakeGameController.startGameClick}
               >
                 <div className='w-4/5 h-3/5 rounded-lg bg-fg-white-95 flex items-center justify-center font-K2D text-2xl'>
                   Press any key to start
+                </div>
+              </div>
+            )}
+            {staged && (
+              <div
+                className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
+                onClick={snakeGameController.startGameClick}
+              >
+                <div className='w-4/5 h-3/5 rounded-lg bg-fg-white-95 flex items-center justify-center font-K2D text-2xl'>
+                  Stagging
                 </div>
               </div>
             )}

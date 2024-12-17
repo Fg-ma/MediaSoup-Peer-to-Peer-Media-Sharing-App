@@ -1,12 +1,6 @@
 import uWS from "uWebSockets.js";
 import { Buffer } from "buffer";
-import {
-  GameTypes,
-  GameWebSocket,
-  MessageTypes,
-  SocketData,
-  SocketTypes,
-} from "./typeConstant";
+import { GameWebSocket, MessageTypes, SocketData } from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
 import TablesController from "./lib/TablesController";
 import UniversalGameController from "./lib/UniversalGameController";
@@ -15,7 +9,7 @@ import SnakeGameController from "./lib/SnakeGameController";
 const broadcaster = new Broadcaster();
 const tablesController = new TablesController(broadcaster);
 const universalGameController = new UniversalGameController(broadcaster);
-const snakeGameController = new SnakeGameController(broadcaster);
+const snakeGameController = new SnakeGameController();
 
 uWS
   .App()
@@ -50,11 +44,17 @@ const handleMessage = (ws: GameWebSocket, event: MessageTypes) => {
     case "initiateGame":
       universalGameController.onInitiateGame(event);
       break;
+    case "stageGame":
+      universalGameController.onStageGame(event);
+      break;
     case "gameStart":
       universalGameController.onGameStart(event);
       break;
     case "snakeDirectionChange":
       snakeGameController.onSnakeDirectionChange(event);
+      break;
+    case "addSnake":
+      snakeGameController.onAddSnake(event);
       break;
     default:
       break;

@@ -31,7 +31,14 @@ type OutGoingUniversalMessages =
         table_id: string;
         gameType: GameTypes;
         gameId: string;
-        initialGameState: object;
+      };
+    }
+  | {
+      type: "stageGame";
+      data: {
+        table_id: string;
+        gameType: GameTypes;
+        gameId: string;
       };
     };
 
@@ -115,14 +122,24 @@ class GameMediaUniversalFunctions {
     });
   };
 
-  gameStart = (initialGameState: object) => {
+  gameStart = () => {
     this.sendUniversalMessage({
       type: "gameStart",
       data: {
         table_id: this.table_id,
         gameType: this.gameType,
         gameId: this.gameId,
-        initialGameState: initialGameState,
+      },
+    });
+  };
+
+  stageGame = () => {
+    this.sendUniversalMessage({
+      type: "stageGame",
+      data: {
+        table_id: this.table_id,
+        gameType: this.gameType,
+        gameId: this.gameId,
       },
     });
   };

@@ -419,6 +419,8 @@ export default function Bundle({
           ([snakeGameId, _snakeGame]) => (
             <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
               <SnakeGame
+                username={username}
+                instance={instance}
                 snakeGameId={snakeGameId}
                 tableRef={tableRef}
                 tableTopRef={tableTopRef}

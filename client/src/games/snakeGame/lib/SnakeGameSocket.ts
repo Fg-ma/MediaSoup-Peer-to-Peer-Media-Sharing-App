@@ -1,80 +1,56 @@
-type Messages = onSnakeDirectionChangedType | onGameStartedType;
+import { GameState } from "../SnakeGame";
 
-type onSnakeDirectionChangedType = {
-  type: "snakeDirectionChanged";
-  sender: {
-    username: string;
-    instance: string;
-  };
-  direction: "up" | "down" | "left" | "right";
+type Messages = onGameStagedType | onGameStartedType | onGameStateUpdateType;
+
+type onGameStagedType = {
+  type: "gameStaged";
 };
 
 type onGameStartedType = {
   type: "gameStarted";
-  initialGameState: {
-    food: {
-      x: number;
-      y: number;
-      class: string;
-    }[];
+};
+
+type onGameStateUpdateType = {
+  type: "gameStateUpdate";
+  data: {
+    gameState: GameState;
   };
 };
 
 class SnakeGameSocket {
   constructor(
-    protected food: React.MutableRefObject<
-      {
-        x: number;
-        y: number;
-        class: string;
-      }[]
-    >,
-    protected direction: React.MutableRefObject<
-      "up" | "down" | "right" | "left"
-    >,
-    protected initialSnake: {
-      x: number;
-      y: number;
-    }[],
-    protected setSnake: React.Dispatch<
-      React.SetStateAction<
-        {
-          x: number;
-          y: number;
-        }[]
-      >
-    >,
+    protected setGameState: React.Dispatch<React.SetStateAction<GameState>>,
     protected setStarted: React.Dispatch<React.SetStateAction<boolean>>,
-    protected setGameOver: React.Dispatch<React.SetStateAction<boolean>>
+    protected setStaged: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   handleMessage = (event: Messages) => {
     switch (event.type) {
-      case "snakeDirectionChanged":
-        this.onSnakeDirectionChanged(event);
+      case "gameStaged":
+        this.onGameStaged();
         break;
       case "gameStarted":
-        this.onGameStarted(event);
+        this.onGameStarted();
+        break;
+      case "gameStateUpdate":
+        this.onGameStateUpdate(event);
         break;
       default:
         break;
     }
   };
 
-  onSnakeDirectionChanged = (event: onSnakeDirectionChangedType) => {
-    this.direction.current = event.direction;
+  onGameStaged = () => {
+    this.setStaged(true);
   };
 
-  onGameStarted = (event: onGameStartedType) => {
-    this.resetGame();
-    this.food.current = event.initialGameState.food;
-  };
-
-  resetGame = () => {
-    this.setGameOver(false);
+  onGameStarted = () => {
     this.setStarted(true);
-    this.setSnake(this.initialSnake);
-    this.direction.current = "up";
+    this.setStaged(false);
+  };
+
+  onGameStateUpdate = (event: onGameStateUpdateType) => {
+    this.setGameState(event.data.gameState);
   };
 }
 

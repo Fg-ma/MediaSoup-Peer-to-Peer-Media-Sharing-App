@@ -1,27 +1,26 @@
-import { onSnakeDirectionChangeType } from "src/typeConstant";
-import Broadcaster from "./Broadcaster";
+import {
+  onAddSnakeType,
+  onSnakeDirectionChangeType,
+  snakeGames,
+} from "../typeConstant";
 
 class SnakeGameController {
-  constructor(private broadcaster: Broadcaster) {}
+  constructor() {}
 
   onSnakeDirectionChange = (event: onSnakeDirectionChangeType) => {
     const { table_id, username, instance, gameId, direction } = event.data;
 
-    this.broadcaster.broadcastToTable(
-      table_id,
-      "games",
-      "snake",
-      gameId,
-      {
-        type: "snakeDirectionChanged",
-        sender: {
-          username,
-          instance,
-        },
-        direction,
-      },
-      [{ username, instance }]
+    snakeGames[table_id][gameId].changeSnakeDirection(
+      username,
+      instance,
+      direction
     );
+  };
+
+  onAddSnake = (event: onAddSnakeType) => {
+    const { table_id, username, instance, gameId } = event.data;
+
+    snakeGames[table_id][gameId].addSnake(username, instance);
   };
 }
 

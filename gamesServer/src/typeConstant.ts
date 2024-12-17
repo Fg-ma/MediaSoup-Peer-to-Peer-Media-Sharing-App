@@ -1,4 +1,5 @@
 import uWS from "uWebSockets.js";
+import SnakeGame from "./lib/SnakeGame";
 
 export type SocketTypes = "signaling" | "games";
 
@@ -41,8 +42,10 @@ export type MessageTypes =
   | onJoinTableType
   | onLeaveTableType
   | onInitiateGameType
+  | onStageGame
   | onGameStart
-  | onSnakeDirectionChangeType;
+  | onSnakeDirectionChangeType
+  | onAddSnakeType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -80,13 +83,21 @@ export type onInitiateGameType = {
   };
 };
 
+export type onStageGame = {
+  type: "stageGame";
+  data: {
+    table_id: string;
+    gameType: GameTypes;
+    gameId: string;
+  };
+};
+
 export type onGameStart = {
   type: "gameStart";
   data: {
     table_id: string;
     gameType: GameTypes;
     gameId: string;
-    initialGameState: object;
   };
 };
 
@@ -102,4 +113,20 @@ export type onSnakeDirectionChangeType = {
   };
 };
 
+export type onAddSnakeType = {
+  type: "addSnake";
+  data: {
+    table_id: string;
+    username: string;
+    instance: string;
+    gameId: string;
+  };
+};
+
+export type SnakeGames = {
+  [table_id: string]: { [snakeGameId: string]: SnakeGame };
+};
+
 export const tables: Tables = {};
+
+export const snakeGames: SnakeGames = {};

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import FgTableController from "./lib/FgTableController";
 import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElement";
+import FgGameButton from "../fgElements/fgGameButton/FgGameButton";
 import "./lib/fgTable.css";
 
 export default function FgTable({
@@ -77,6 +78,7 @@ export default function FgTable({
             }}
           >
             <div className='w-full h-full relative'>
+              <FgGameButton />
               {bundles &&
                 Object.keys(bundles).length !== 0 &&
                 Object.keys(bundles).map(

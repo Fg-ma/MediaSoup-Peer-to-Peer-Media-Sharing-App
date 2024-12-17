@@ -1,52 +1,32 @@
-import React, { ReactElement } from "react";
+import React from "react";
 import { UserMediaType } from "../../../context/mediaContext/typeConstant";
-import { foodClasses, SnakeColorsType } from "./typeConstant";
+import { SnakeColorsType } from "./typeConstant";
 import SnakeGameSocket from "./SnakeGameSocket";
+import { GameState } from "../SnakeGame";
 
 class SnakeGameController extends SnakeGameSocket {
   private lastKeyPress = 0;
   private debounceKeyPressTime = 150;
 
   constructor(
-    private userMedia: React.MutableRefObject<UserMediaType>,
+    private username: string,
+    private instance: string,
     private snakeGameId: string,
+    private userMedia: React.MutableRefObject<UserMediaType>,
     private gridSize: number,
-    private snake: {
-      x: number;
-      y: number;
-    }[],
-    setSnake: React.Dispatch<
-      React.SetStateAction<
-        {
-          x: number;
-          y: number;
-        }[]
-      >
-    >,
-    initialSnake: {
-      x: number;
-      y: number;
-    }[],
+    private gameState: GameState,
+    setGameState: React.Dispatch<React.SetStateAction<GameState>>,
     private snakeColor: SnakeColorsType,
-    food: React.MutableRefObject<
-      {
-        x: number;
-        y: number;
-        class: string;
-      }[]
-    >,
-    direction: React.MutableRefObject<"up" | "down" | "right" | "left">,
-    setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
-    private started: boolean,
-    setStarted: React.Dispatch<React.SetStateAction<boolean>>,
     private focused: React.MutableRefObject<boolean>,
-    private gameInterval: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setMinDimension: React.Dispatch<
       React.SetStateAction<"height" | "width">
     >,
-    private snakeGameRef: React.RefObject<HTMLDivElement>
+    private snakeGameRef: React.RefObject<HTMLDivElement>,
+    private started: boolean,
+    setStarted: React.Dispatch<React.SetStateAction<boolean>>,
+    setStaged: React.Dispatch<React.SetStateAction<boolean>>
   ) {
-    super(food, direction, initialSnake, setSnake, setStarted, setGameOver);
+    super(setGameState, setStarted, setStaged);
 
     this.lastKeyPress = Date.now();
   }
@@ -56,13 +36,19 @@ class SnakeGameController extends SnakeGameSocket {
       return;
     }
 
-    event.preventDefault();
-    event.stopPropagation();
+    if (
+      event.key.toLowerCase() === "arrowup" ||
+      event.key.toLowerCase() === "arrowdown" ||
+      event.key.toLowerCase() === "arrowleft" ||
+      event.key.toLowerCase() === "arrowright"
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
 
     if (!this.started) {
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.gameStart({
-        food: this.food.current,
-      });
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.stageGame();
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.addSnake();
     }
 
     const currentTime = Date.now();
@@ -72,81 +58,97 @@ class SnakeGameController extends SnakeGameSocket {
     }
 
     let validKeyPress = false;
+    let newDirection: "up" | "down" | "left" | "right" | undefined = undefined;
+
+    const currentDirection =
+      this.gameState.snakes[this.username]?.[this.instance]?.direction ?? "";
 
     switch (event.key.toLowerCase()) {
       case "w":
-        if (this.direction.current !== "down") {
+        if (currentDirection !== "down") {
           validKeyPress = true;
-          this.direction.current = "up";
+          newDirection = "up";
         }
         break;
       case "arrowup":
-        if (this.direction.current !== "down") {
+        if (currentDirection !== "down") {
           validKeyPress = true;
-          this.direction.current = "up";
+          newDirection = "up";
         }
         break;
       case "s":
-        if (this.direction.current !== "up") {
+        if (currentDirection !== "up") {
           validKeyPress = true;
-          this.direction.current = "down";
+          newDirection = "down";
         }
         break;
       case "arrowdown":
-        if (this.direction.current !== "up") {
+        if (currentDirection !== "up") {
           validKeyPress = true;
-          this.direction.current = "down";
+          newDirection = "down";
         }
         break;
       case "a":
-        if (this.direction.current !== "right") {
+        if (currentDirection !== "right") {
           validKeyPress = true;
-          this.direction.current = "left";
+          newDirection = "left";
         }
         break;
       case "arrowleft":
-        if (this.direction.current !== "right") {
+        if (currentDirection !== "right") {
           validKeyPress = true;
-          this.direction.current = "left";
+          newDirection = "left";
         }
         break;
       case "d":
-        if (this.direction.current !== "left") {
+        if (currentDirection !== "left") {
           validKeyPress = true;
-          this.direction.current = "right";
+          newDirection = "right";
         }
         break;
       case "arrowright":
-        if (this.direction.current !== "left") {
+        if (currentDirection !== "left") {
           validKeyPress = true;
-          this.direction.current = "right";
+          newDirection = "right";
         }
         break;
     }
 
     if (validKeyPress) {
-      this.userMedia.current.games.snake?.[
-        this.snakeGameId
-      ]?.snakeDirectionChange(this.direction.current);
       this.lastKeyPress = currentTime;
+
+      if (newDirection) {
+        this.userMedia.current.games.snake?.[
+          this.snakeGameId
+        ]?.snakeDirectionChange(newDirection);
+      }
     }
   };
 
-  getSegmentClass = (index: number) => {
+  getSegmentClass = (
+    snakeSegments: { x: number; y: number }[],
+    index: number
+  ) => {
     if (index === 0)
       return {
         className: "snake-game-snake-head",
-        rotation: this.getRotation(this.snake[index], this.snake[index + 1]),
+        rotation: this.getRotation(
+          snakeSegments[index],
+          snakeSegments[index + 1]
+        ),
       };
-    if (index === this.snake.length - 1)
+    if (index === snakeSegments.length - 1)
       return {
         className: "snake-game-snake-tail",
-        rotation: this.getRotation(this.snake[index - 1], this.snake[index]),
+        rotation: this.getRotation(
+          snakeSegments[index - 1],
+          snakeSegments[index]
+        ),
       };
 
-    const prev = this.snake[index - 1];
-    const curr = this.snake[index];
-    const next = this.snake[index + 1];
+    const prev = snakeSegments[index - 1];
+    const curr = snakeSegments[index];
+    const next = snakeSegments[index + 1];
 
     const isHorizontal = prev.x === curr.x && curr.x === next.x;
     const isVertical = prev.y === curr.y && curr.y === next.y;
@@ -215,29 +217,48 @@ class SnakeGameController extends SnakeGameSocket {
     return "0deg";
   };
 
-  renderBoard = () => {
-    const board: ReactElement[] = [];
+  renderBoard = (): React.ReactElement[] => {
+    const board: React.ReactElement[] = [];
+
     for (let y = 0; y < this.gridSize; y++) {
-      const row: ReactElement[] = [];
+      const row: React.ReactElement[] = [];
       for (let x = 0; x < this.gridSize; x++) {
         let cellClass = "";
         let cellBackgroundRotation = "";
-        const snakeSegmentIndex = this.snake.findIndex(
-          (segment) => segment.x === x && segment.y === y
-        );
-        if (snakeSegmentIndex !== -1) {
-          const { className, rotation } =
-            this.getSegmentClass(snakeSegmentIndex);
-          cellClass = `${className}-${this.snakeColor.primary}-${this.snakeColor.secondary} snake-game-snake`;
-          cellBackgroundRotation = rotation;
-        } else {
-          const foodIndex = this.food.current.findIndex(
+
+        // Check if the cell is part of a snake
+        let isSnakeCell = false;
+        for (const [_username, instances] of Object.entries(
+          this.gameState.snakes
+        )) {
+          for (const [_instance, snakeSegments] of Object.entries(instances)) {
+            const segmentIndex = snakeSegments.position.findIndex(
+              (segment) => segment.x === x && segment.y === y
+            );
+            if (segmentIndex !== -1) {
+              const { className, rotation } = this.getSegmentClass(
+                snakeSegments.position,
+                segmentIndex
+              );
+              cellClass = `${className}-${this.snakeColor.primary}-${this.snakeColor.secondary} snake-game-snake`;
+              cellBackgroundRotation = rotation;
+              isSnakeCell = true;
+              break;
+            }
+          }
+          if (isSnakeCell) break;
+        }
+
+        // Check if the cell contains food
+        if (!isSnakeCell) {
+          const foodIndex = this.gameState.food.findIndex(
             (item) => item.x === x && item.y === y
           );
           if (foodIndex !== -1) {
-            cellClass = `snake-game-food ${this.food.current[foodIndex].class}`;
+            cellClass = `snake-game-food ${this.gameState.food[foodIndex].class}`;
           }
         }
+
         row.push(
           <div
             key={`${x},${y}`}
@@ -258,14 +279,14 @@ class SnakeGameController extends SnakeGameSocket {
         </div>
       );
     }
+
     return board;
   };
 
   startGameClick = () => {
     if (!this.started) {
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.gameStart({
-        food: this.food.current,
-      });
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.stageGame();
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.addSnake();
     }
   };
 
@@ -283,90 +304,6 @@ class SnakeGameController extends SnakeGameSocket {
         return "width";
       }
     });
-  };
-
-  gameLoop = () => {
-    const newSnake = [...this.snake];
-    const head = { ...newSnake[0] };
-
-    // Move snake in the chosen direction
-    if (this.direction.current === "up") head.y -= 1;
-    if (this.direction.current === "down") head.y += 1;
-    if (this.direction.current === "left") head.x -= 1;
-    if (this.direction.current === "right") head.x += 1;
-
-    newSnake.unshift(head);
-
-    const foodEatenIndices = this.food.current
-      .map((item, index) => {
-        if (item.x === head.x && item.y === head.y) return index;
-      })
-      .filter((value) => value !== undefined);
-    if (foodEatenIndices.length !== 0) {
-      const newFood = [];
-
-      // Remove eaten food
-      this.food.current = this.food.current.filter(
-        (_, index) => !foodEatenIndices.includes(index)
-      );
-
-      for (const index of foodEatenIndices) {
-        let attempts = 0;
-        let validSpotFound = false;
-
-        while (attempts < 20 && !validSpotFound) {
-          const proposedPosition = {
-            x: Math.floor(Math.random() * this.gridSize),
-            y: Math.floor(Math.random() * this.gridSize),
-          };
-
-          // Check if the position is valid
-          if (
-            !newSnake.some(
-              (segment) =>
-                segment.x === proposedPosition.x &&
-                segment.y === proposedPosition.y
-            ) &&
-            !this.food.current.some(
-              (item) =>
-                item.x === proposedPosition.x && item.y === proposedPosition.y
-            )
-          ) {
-            newFood.push({
-              ...proposedPosition,
-              class:
-                foodClasses[Math.floor(Math.random() * foodClasses.length)],
-            });
-            validSpotFound = true; // Exit loop
-          }
-
-          attempts++;
-        }
-      }
-
-      this.userMedia.current.games.snake?.[this.snakeGameId].newFood(newFood);
-    } else {
-      // Move snake (remove tail)
-      newSnake.pop();
-    }
-
-    // Check for game over conditions
-    if (
-      head.x < 0 ||
-      head.x >= this.gridSize ||
-      head.y < 0 ||
-      head.y >= this.gridSize ||
-      newSnake
-        .slice(1)
-        .some((segment) => segment.x === head.x && segment.y === head.y)
-    ) {
-      this.setGameOver(true);
-      this.setStarted(false);
-      clearInterval(this.gameInterval.current);
-      return;
-    }
-
-    this.setSnake(newSnake);
   };
 }
 
