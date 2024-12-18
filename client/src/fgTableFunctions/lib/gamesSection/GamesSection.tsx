@@ -6,8 +6,8 @@ import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgPanel from "../../../fgElements/fgPanel/FgPanel";
 
 import joystickIcon from "../../../../public/svgs/games/joystickIcon.svg";
-import snakeGameIcon from "../../../../public/svgs/games/snakeGameIcon.svg";
-import snakeGameOffIcon from "../../../../public/svgs/games/snakeGameOffIcon.svg";
+import snakeGameIcon from "../../../../public/svgs/games/snake/snakeGameIcon.svg";
+import snakeGameOffIcon from "../../../../public/svgs/games/snake/snakeGameOffIcon.svg";
 
 export default function GamesSection({
   table_id,

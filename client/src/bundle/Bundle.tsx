@@ -30,8 +30,6 @@ export default function Bundle({
   initScreenStreams,
   initScreenAudioStreams,
   initAudioStream,
-  tableRef,
-  tableTopRef,
   options,
   handleMuteCallback,
   onRendered,
@@ -48,8 +46,6 @@ export default function Bundle({
   initScreenStreams?: { [screenId: string]: MediaStream };
   initScreenAudioStreams?: { [screenAudioId: string]: MediaStream };
   initAudioStream?: MediaStream;
-  tableRef: React.RefObject<HTMLDivElement>;
-  tableTopRef: React.RefObject<HTMLDivElement>;
   options?: BundleOptions;
   handleMuteCallback?: () => void;
   onRendered?: () => void;
@@ -422,8 +418,7 @@ export default function Bundle({
                 username={username}
                 instance={instance}
                 snakeGameId={snakeGameId}
-                tableRef={tableRef}
-                tableTopRef={tableTopRef}
+                bundleRef={bundleRef}
               />
             </Suspense>
           )

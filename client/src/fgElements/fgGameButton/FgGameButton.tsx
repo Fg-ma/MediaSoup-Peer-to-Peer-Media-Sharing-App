@@ -1,7 +1,35 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import "./lib/fgGameButtonStyles.css";
+import FgButton from "../fgButton/FgButton";
 
-export default function FgGameButton() {
+const defaultFgGameButtonOptions = {
+  primaryColor: "#3cf599",
+  secondaryColor: "#00e359",
+  hoverTimeoutDuration: 0,
+  hoverType: undefined,
+  hoverSpacing: undefined,
+};
+
+export default function FgGameButton({
+  className,
+  clickFunction,
+  hoverContent,
+  options,
+}: {
+  className?: string;
+  clickFunction?: (event: React.MouseEvent) => void;
+  hoverContent?: React.ReactElement;
+  options?: {
+    primaryColor?: string;
+    secondaryColor?: string;
+    hoverTimeoutDuration?: number;
+    hoverType?: "above" | "below" | "left" | "right" | undefined;
+    hoverSpacing?: number;
+  };
+}) {
+  const fgGameButtonOptions = { ...defaultFgGameButtonOptions, ...options };
+
+  const rimRef = useRef<HTMLDivElement>(null);
   const movingPartRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = () => {
@@ -13,8 +41,8 @@ export default function FgGameButton() {
 
     const classes = movingPartRef.current.classList;
 
-    if (!classes.contains("fg-game-button-clicked-2")) {
-      classes.add("fg-game-button-clicked-2");
+    if (!classes.contains("fg-game-button-clicked")) {
+      classes.add("fg-game-button-clicked");
     }
   };
 
@@ -25,17 +53,43 @@ export default function FgGameButton() {
       return;
     }
 
-    movingPartRef.current.classList.remove("fg-game-button-clicked-2");
+    movingPartRef.current.classList.remove("fg-game-button-clicked");
   };
 
+  useEffect(() => {
+    rimRef.current?.style.setProperty(
+      "--primary-color",
+      `${fgGameButtonOptions.primaryColor}`
+    );
+    rimRef.current?.style.setProperty(
+      "--secondary-color",
+      `${fgGameButtonOptions.secondaryColor}`
+    );
+  }, []);
+
   return (
-    <div className='fg-game-button-stationary-rim-2 relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
-      <div
-        ref={movingPartRef}
-        className='fg-game-button-moving-part-2 absolute top-1/2 left-1/2 w-[90%]'
-        style={{ backgroundColor: "#3cf599" }}
-        onMouseDown={handleMouseDown}
-      ></div>
-    </div>
+    <FgButton
+      className={className}
+      clickFunction={clickFunction}
+      hoverContent={hoverContent}
+      contentFunction={() => (
+        <div
+          ref={rimRef}
+          className='fg-game-button-stationary-rim w-full h-full relative'
+          onMouseDown={handleMouseDown}
+        >
+          <div
+            ref={movingPartRef}
+            className='fg-game-button-moving-part absolute top-1/2 left-1/2 w-[90%]'
+          ></div>
+        </div>
+      )}
+      options={{
+        hoverTimeoutDuration: fgGameButtonOptions.hoverTimeoutDuration,
+        hoverType: fgGameButtonOptions.hoverType,
+        hoverZValue: 1000000,
+        hoverSpacing: fgGameButtonOptions.hoverSpacing,
+      }}
+    />
   );
 }

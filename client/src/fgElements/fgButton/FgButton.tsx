@@ -6,29 +6,34 @@ import React, {
   useCallback,
 } from "react";
 import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
+import FgButtonController from "./lib/FgButtonController";
 
 const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));
 
-interface FgButtonOptions {
+export type FgButtonOptions = {
   defaultDataValue?: string;
   holdTimeoutDuration?: number;
   doubleClickTimeoutDuration?: number;
   hoverTimeoutDuration?: number;
   hoverZValue?: number;
-  hoverType?: "above" | "below";
-  holdType?: "above" | "below";
+  hoverType?: "above" | "below" | "left" | "right";
+  hoverSpacing?: number;
+  holdType?: "above" | "below" | "left" | "right";
   holdKind?: "disappear" | "toggle";
+  holdSpacing?: number;
   disabled?: boolean;
-}
+};
 
 const defaultFgButtonOptions: {
   defaultDataValue?: string;
   holdTimeoutDuration: number;
   doubleClickTimeoutDuration: number;
   hoverTimeoutDuration: number;
-  hoverType: "above" | "below";
-  holdType: "above" | "below";
+  hoverType: "above" | "below" | "left" | "right";
+  hoverSpacing?: number;
+  holdType: "above" | "below" | "left" | "right";
   holdKind: "disappear" | "toggle";
+  holdSpacing?: number;
   disabled: boolean;
 } = {
   defaultDataValue: undefined,
@@ -36,8 +41,10 @@ const defaultFgButtonOptions: {
   doubleClickTimeoutDuration: 250,
   hoverTimeoutDuration: 50,
   hoverType: "above",
+  hoverSpacing: undefined,
   holdType: "above",
   holdKind: "disappear",
+  holdSpacing: undefined,
   disabled: false,
 };
 
@@ -116,19 +123,19 @@ export default function FgButton({
 
   const isClicked = useRef(false);
 
-  const holdTimeout = useRef<NodeJS.Timeout>();
+  const holdTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const [isHeld, setIsHeld] = useState(false);
   const [isHeldToggle, setIsHeldToggle] = useState(false);
   const isHeldRef = useRef(false);
   const holdContentRef = useRef<HTMLDivElement>(null);
 
-  const hoverTimeout = useRef<NodeJS.Timeout>();
+  const hoverTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const [isHover, setIsHover] = useState(false);
 
   const [isClickToggle, setIsClickToggle] = useState(false);
   const toggleClickContentRef = useRef<HTMLDivElement>(null);
 
-  const clickTimeout = useRef<NodeJS.Timeout | null>(null);
+  const clickTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const startDragPosition = useRef<{ x: number; y: number } | undefined>(
     undefined
@@ -162,156 +169,34 @@ export default function FgButton({
     [toggleClickContentRef, setIsClickToggle]
   );
 
-  const handleMouseDown = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-
-    window.addEventListener("mouseup", handleMouseUp);
-
-    isClicked.current = true;
-
-    if (mouseDownFunction) {
-      mouseDownFunction(event);
-    }
-
-    if (holdFunction && clickTimeout.current === null) {
-      holdTimeout.current = setTimeout(() => {
-        isHeldRef.current = true;
-        setIsHeld(true);
-        if (fgButtonOptions.holdKind === "toggle") {
-          setIsHeldToggle(true);
-          window.addEventListener("mousedown", toggleHold);
-        }
-      }, fgButtonOptions.holdTimeoutDuration);
-    }
-
-    if (dragFunction) {
-      startDragPosition.current = { x: event.clientX, y: event.clientY };
-      window.addEventListener("mousemove", handleDragMouseMove);
-    }
-  };
-
-  const handleMouseUp = (event: MouseEvent) => {
-    window.removeEventListener("mouseup", handleMouseUp);
-
-    if (toggleClickContent) {
-      if (!isClickToggle) {
-        window.addEventListener("mouseup", togglePopup);
-      }
-      setIsClickToggle((prev) => !prev);
-    }
-
-    if (mouseUpFunction) {
-      mouseUpFunction(event);
-    }
-
-    if (isClicked.current && clickTimeout.current === null) {
-      if (!isHeldRef.current) {
-        if (doubleClickFunction) {
-          clickTimeout.current = setTimeout(() => {
-            if (clickFunction)
-              clickFunction(event as unknown as React.MouseEvent);
-            if (clickTimeout.current !== null) {
-              clearTimeout(clickTimeout.current);
-              clickTimeout.current = null;
-            }
-          }, fgButtonOptions.doubleClickTimeoutDuration);
-        } else {
-          if (clickFunction)
-            clickFunction(event as unknown as React.MouseEvent);
-        }
-      } else {
-        if (holdFunction) {
-          holdFunction(event as unknown as React.MouseEvent);
-        }
-      }
-
-      if (holdTimeout.current !== null) {
-        clearTimeout(holdTimeout.current);
-      }
-
-      isHeldRef.current = false;
-      setIsHeld(false);
-      isClicked.current = false;
-    }
-
-    if (dragFunction) {
-      window.removeEventListener("mousemove", handleDragMouseMove);
-    }
-  };
-
-  const handleDoubleClick = (event: React.MouseEvent) => {
-    if (clickTimeout.current) {
-      clearTimeout(clickTimeout.current);
-      clickTimeout.current = null;
-    }
-    if (doubleClickFunction) {
-      doubleClickFunction(event);
-    }
-    isClicked.current = false;
-  };
-
-  const handleMouseEnter = () => {
-    if (hoverContent && !hoverTimeout.current) {
-      hoverTimeout.current = setTimeout(() => {
-        setIsHover(true);
-      }, fgButtonOptions.hoverTimeoutDuration);
-
-      document.addEventListener("mousemove", handleMouseMove);
-      if (scrollingContainerRef && scrollingContainerRef.current) {
-        scrollingContainerRef.current.addEventListener("scroll", (event) =>
-          handleMouseMove(event as unknown as MouseEvent)
-        );
-      }
-    }
-  };
-
-  const handleMouseMove = (event: MouseEvent) => {
-    const buttonElement = externalRef?.current || buttonRef.current;
-
-    if (buttonElement && !buttonElement.contains(event.target as Node)) {
-      setIsHover(false);
-      if (hoverTimeout.current !== undefined) {
-        clearTimeout(hoverTimeout.current);
-        hoverTimeout.current = undefined;
-      }
-
-      document.removeEventListener("mousemove", handleMouseMove);
-      if (scrollingContainerRef && scrollingContainerRef.current) {
-        scrollingContainerRef.current.removeEventListener("scroll", (event) =>
-          handleMouseMove(event as unknown as MouseEvent)
-        );
-      }
-    }
-  };
-
-  const handleDragMouseMove = (event: MouseEvent) => {
-    if (dragFunction === undefined || startDragPosition.current === undefined) {
-      return;
-    }
-
-    if (referenceDragElement?.current) {
-      const rect = referenceDragElement.current.getBoundingClientRect();
-      dragFunction(
-        {
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
-        },
-        event
-      );
-    } else {
-      dragFunction(
-        {
-          x: event.clientX - startDragPosition.current.x,
-          y: event.clientY - startDragPosition.current.y,
-        },
-        event
-      );
-
-      startDragPosition.current = { x: event.clientX, y: event.clientY };
-    }
-  };
+  const fgButtonController = new FgButtonController(
+    fgButtonOptions,
+    clickFunction,
+    mouseDownFunction,
+    mouseUpFunction,
+    doubleClickFunction,
+    holdFunction,
+    dragFunction,
+    toggleHold,
+    togglePopup,
+    hoverContent,
+    toggleClickContent,
+    clickTimeout,
+    holdTimeout,
+    hoverTimeout,
+    isClicked,
+    setIsClickToggle,
+    isClickToggle,
+    setIsHeld,
+    isHeldRef,
+    setIsHeldToggle,
+    setIsHover,
+    startDragPosition,
+    buttonRef,
+    externalRef,
+    scrollingContainerRef,
+    referenceDragElement
+  );
 
   useEffect(() => {
     if (closeHoldToggle) {
@@ -336,14 +221,14 @@ export default function FgButton({
       <ButtonComponent
         id={externalId}
         ref={externalRef ? externalRef : buttonRef}
-        onMouseDown={(event) => handleMouseDown(event)}
+        onMouseDown={(event) => fgButtonController.handleMouseDown(event)}
         onTouchStart={touchStartFunction}
         onTouchEnd={touchEndFunction}
         className={className}
         style={style}
         data-value={fgButtonOptions.defaultDataValue}
-        onDoubleClick={handleDoubleClick}
-        onMouseEnter={handleMouseEnter}
+        onDoubleClick={fgButtonController.handleDoubleClick}
+        onMouseEnter={fgButtonController.handleMouseEnter}
         onFocus={focusFunction}
         onBlur={blurFunction}
         disabled={fgButtonOptions.disabled}
@@ -365,6 +250,7 @@ export default function FgButton({
             <Suspense fallback={<div>Loading...</div>}>
               <FgPortal
                 type={fgButtonOptions.hoverType}
+                spacing={fgButtonOptions.hoverSpacing}
                 content={hoverContent}
                 externalRef={externalRef ? externalRef : buttonRef}
                 zValue={fgButtonOptions.hoverZValue}
@@ -379,6 +265,7 @@ export default function FgButton({
             <Suspense fallback={<div>Loading...</div>}>
               <FgPortal
                 type={fgButtonOptions.hoverType}
+                spacing={fgButtonOptions.holdSpacing}
                 content={toggleClickContent}
                 externalRef={externalRef ? externalRef : buttonRef}
                 externalPortalRef={toggleClickContentRef}

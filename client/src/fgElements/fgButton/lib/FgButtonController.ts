@@ -1,0 +1,209 @@
+import { FgButtonOptions } from "../FgButton";
+
+class FgButtonController {
+  constructor(
+    private fgButtonOptions: FgButtonOptions,
+    private clickFunction: ((event: React.MouseEvent) => void) | undefined,
+    private mouseDownFunction: ((event: React.MouseEvent) => void) | undefined,
+    private mouseUpFunction: ((event: MouseEvent) => void) | undefined,
+    private doubleClickFunction:
+      | ((event: React.MouseEvent) => void)
+      | undefined,
+    private holdFunction:
+      | ((event: React.MouseEvent<Element, MouseEvent>) => void)
+      | undefined,
+    private dragFunction:
+      | ((
+          displacement: {
+            x: number;
+            y: number;
+          },
+          event: MouseEvent
+        ) => void)
+      | undefined,
+    private toggleHold: (event: MouseEvent) => void,
+    private togglePopup: (event: MouseEvent) => void,
+    private hoverContent: React.ReactElement | undefined,
+    private toggleClickContent: React.ReactElement | undefined,
+    private clickTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private holdTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private hoverTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private isClicked: React.MutableRefObject<boolean>,
+    private setIsClickToggle: React.Dispatch<React.SetStateAction<boolean>>,
+    private isClickToggle: boolean,
+    private setIsHeld: React.Dispatch<React.SetStateAction<boolean>>,
+    private isHeldRef: React.MutableRefObject<boolean>,
+    private setIsHeldToggle: React.Dispatch<React.SetStateAction<boolean>>,
+    private setIsHover: React.Dispatch<React.SetStateAction<boolean>>,
+    private startDragPosition: React.MutableRefObject<
+      | {
+          x: number;
+          y: number;
+        }
+      | undefined
+    >,
+    private buttonRef: React.RefObject<HTMLButtonElement>,
+    private externalRef: React.RefObject<HTMLButtonElement> | undefined,
+    private scrollingContainerRef: React.RefObject<HTMLDivElement> | undefined,
+    private referenceDragElement: React.RefObject<HTMLElement> | undefined
+  ) {}
+
+  handleMouseDown = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+
+    window.addEventListener("mouseup", this.handleMouseUp);
+
+    this.isClicked.current = true;
+
+    if (this.mouseDownFunction) {
+      this.mouseDownFunction(event);
+    }
+
+    if (this.holdFunction && this.clickTimeout.current === undefined) {
+      this.holdTimeout.current = setTimeout(() => {
+        this.isHeldRef.current = true;
+        this.setIsHeld(true);
+        if (this.fgButtonOptions.holdKind === "toggle") {
+          this.setIsHeldToggle(true);
+          window.addEventListener("mousedown", this.toggleHold);
+        }
+      }, this.fgButtonOptions.holdTimeoutDuration);
+    }
+
+    if (this.dragFunction) {
+      this.startDragPosition.current = { x: event.clientX, y: event.clientY };
+      window.addEventListener("mousemove", this.handleDragMouseMove);
+    }
+  };
+
+  handleMouseUp = (event: MouseEvent) => {
+    window.removeEventListener("mouseup", this.handleMouseUp);
+
+    if (this.toggleClickContent) {
+      if (!this.isClickToggle) {
+        window.addEventListener("mouseup", this.togglePopup);
+      }
+      this.setIsClickToggle((prev) => !prev);
+    }
+
+    if (this.mouseUpFunction) {
+      this.mouseUpFunction(event);
+    }
+
+    if (this.isClicked.current && this.clickTimeout.current === undefined) {
+      if (!this.isHeldRef.current) {
+        if (this.doubleClickFunction) {
+          this.clickTimeout.current = setTimeout(() => {
+            if (this.clickFunction)
+              this.clickFunction(event as unknown as React.MouseEvent);
+            if (this.clickTimeout.current !== undefined) {
+              clearTimeout(this.clickTimeout.current);
+              this.clickTimeout.current = undefined;
+            }
+          }, this.fgButtonOptions.doubleClickTimeoutDuration);
+        } else {
+          if (this.clickFunction) {
+            this.clickFunction(event as unknown as React.MouseEvent);
+          }
+        }
+      } else {
+        if (this.holdFunction) {
+          this.holdFunction(event as unknown as React.MouseEvent);
+        }
+      }
+
+      if (this.holdTimeout.current !== undefined) {
+        clearTimeout(this.holdTimeout.current);
+        this.holdTimeout.current = undefined;
+      }
+
+      this.isHeldRef.current = false;
+      this.setIsHeld(false);
+      this.isClicked.current = false;
+    }
+
+    if (this.dragFunction) {
+      window.removeEventListener("mousemove", this.handleDragMouseMove);
+    }
+  };
+
+  handleDoubleClick = (event: React.MouseEvent) => {
+    if (this.clickTimeout.current) {
+      clearTimeout(this.clickTimeout.current);
+      this.clickTimeout.current = undefined;
+    }
+    if (this.doubleClickFunction) {
+      this.doubleClickFunction(event);
+    }
+    this.isClicked.current = false;
+  };
+
+  handleMouseEnter = () => {
+    if (this.hoverContent && !this.hoverTimeout.current) {
+      this.hoverTimeout.current = setTimeout(() => {
+        this.setIsHover(true);
+      }, this.fgButtonOptions.hoverTimeoutDuration);
+
+      document.addEventListener("mousemove", this.handleMouseMove);
+      if (this.scrollingContainerRef && this.scrollingContainerRef.current) {
+        this.scrollingContainerRef.current.addEventListener("scroll", (event) =>
+          this.handleMouseMove(event as unknown as MouseEvent)
+        );
+      }
+    }
+  };
+
+  handleMouseMove = (event: MouseEvent) => {
+    const buttonElement = this.externalRef?.current || this.buttonRef.current;
+
+    if (buttonElement && !buttonElement.contains(event.target as Node)) {
+      this.setIsHover(false);
+      if (this.hoverTimeout.current !== undefined) {
+        clearTimeout(this.hoverTimeout.current);
+        this.hoverTimeout.current = undefined;
+      }
+
+      document.removeEventListener("mousemove", this.handleMouseMove);
+      if (this.scrollingContainerRef && this.scrollingContainerRef.current) {
+        this.scrollingContainerRef.current.removeEventListener(
+          "scroll",
+          (event) => this.handleMouseMove(event as unknown as MouseEvent)
+        );
+      }
+    }
+  };
+
+  handleDragMouseMove = (event: MouseEvent) => {
+    if (
+      this.dragFunction === undefined ||
+      this.startDragPosition.current === undefined
+    ) {
+      return;
+    }
+
+    if (this.referenceDragElement?.current) {
+      const rect = this.referenceDragElement.current.getBoundingClientRect();
+      this.dragFunction(
+        {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+        },
+        event
+      );
+    } else {
+      this.dragFunction(
+        {
+          x: event.clientX - this.startDragPosition.current.x,
+          y: event.clientY - this.startDragPosition.current.y,
+        },
+        event
+      );
+
+      this.startDragPosition.current = { x: event.clientX, y: event.clientY };
+    }
+  };
+}
+
+export default FgButtonController;

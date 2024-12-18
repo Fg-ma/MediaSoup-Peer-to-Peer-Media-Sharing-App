@@ -18,7 +18,7 @@ import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import UserDevice from "./lib/UserDevice";
 import BrowserMedia from "./lib/BrowserMedia";
-import BundlesController from "./bundlesController";
+import BundlesController from "./BundlesController";
 import Deadbanding from "./babylon/Deadbanding";
 import Metadata from "./lib/Metadata";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
@@ -489,7 +489,6 @@ export default function Main() {
     instance,
     userMedia,
     tableRef,
-    tableTopRef,
     isCamera,
     isScreen,
     isAudio,

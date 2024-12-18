@@ -18,10 +18,6 @@ class SnakeGameController extends SnakeGameSocket {
     setGameState: React.Dispatch<React.SetStateAction<GameState>>,
     private snakeColor: SnakeColorsType,
     private focused: React.MutableRefObject<boolean>,
-    private setMinDimension: React.Dispatch<
-      React.SetStateAction<"height" | "width">
-    >,
-    private snakeGameRef: React.RefObject<HTMLDivElement>,
     private started: boolean,
     setStarted: React.Dispatch<React.SetStateAction<boolean>>,
     setStaged: React.Dispatch<React.SetStateAction<boolean>>
@@ -288,22 +284,6 @@ class SnakeGameController extends SnakeGameSocket {
       this.userMedia.current.games.snake?.[this.snakeGameId]?.stageGame();
       this.userMedia.current.games.snake?.[this.snakeGameId]?.addSnake();
     }
-  };
-
-  getMinDimension = () => {
-    const box = this.snakeGameRef.current?.getBoundingClientRect();
-
-    if (!box) {
-      return;
-    }
-
-    this.setMinDimension(() => {
-      if (box.width > box.height) {
-        return "height";
-      } else {
-        return "width";
-      }
-    });
   };
 }
 

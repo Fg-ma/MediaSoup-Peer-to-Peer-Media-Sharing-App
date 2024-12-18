@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
+import FgPortalController from "./lib/FgPortalController";
 
 const FgPortalVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -23,13 +24,15 @@ const FgPortalTransition: Transition = {
 export default function FgPortal({
   type,
   mouseType = "topRight",
+  spacing,
   content,
   externalRef,
   externalPortalRef,
   zValue = 51,
 }: {
-  type: "above" | "below" | "mouse";
+  type: "above" | "below" | "left" | "right" | "mouse";
   mouseType?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+  spacing?: number;
   content: React.ReactElement;
   externalRef?: React.RefObject<HTMLElement>;
   externalPortalRef?: React.RefObject<HTMLDivElement>;
@@ -41,92 +44,38 @@ export default function FgPortal({
   } | null>(null);
   const internalPortalRef = useRef<HTMLDivElement>(null);
   const portalRef = externalPortalRef ?? internalPortalRef;
-  const mouseOffsets = {
-    topLeft: { left: -8, top: -40 },
-    topRight: { left: 12, top: -40 },
-    bottomLeft: { left: -8, top: 0 },
-    bottomRight: { left: 16, top: 0 },
-  };
 
-  const getStaticPortalPosition = () => {
-    const externalRect = externalRef?.current?.getBoundingClientRect();
-
-    if (!externalRect || !portalRef.current) {
-      return;
-    }
-
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    const portalWidth = portalRef.current.clientWidth;
-    const portalHeight = portalRef.current.clientHeight;
-
-    let top: number = 0;
-    if (type === "above") {
-      top = externalRect.top - portalHeight;
-
-      // Check if it goes off the screen above, then switch to below
-      if (top < 0) {
-        top = externalRect.top + externalRect.height;
-
-        // Check if it goes off screen and set to bottom of screen if so
-        if (top + portalRef.current.clientHeight > viewportHeight) {
-          top = viewportHeight - portalHeight;
-        }
-      }
-    } else if (type === "below") {
-      top = externalRect.top + externalRect.height;
-
-      // Check if it goes off the screen below, then switch to above
-      if (top + portalRef.current.clientHeight > viewportHeight) {
-        top = externalRect.top - portalHeight;
-
-        // Check if it goes off screen and set to zero if so
-        if (top < 0) {
-          top = 0;
-        }
-      }
-    }
-
-    let left = externalRect.left + externalRect.width / 2 - portalWidth / 2;
-
-    // Adjust left to prevent going off the left side of the screen
-    if (left < 0) {
-      left = 0;
-    }
-
-    // Adjust left to prevent going off the right side of the screen
-    if (left + portalWidth > viewportWidth) {
-      left = viewportWidth - portalWidth;
-    }
-
-    setPortalPosition({
-      top: top,
-      left: left,
-    });
-  };
-
-  const getDynamicPortalPosition = (event: MouseEvent) => {
-    setPortalPosition({
-      left:
-        event.clientX +
-        mouseOffsets[mouseType].left -
-        (mouseType === "bottomLeft" || mouseType === "topLeft"
-          ? portalRef.current?.clientWidth ?? 0
-          : 0),
-      top: event.clientY + mouseOffsets[mouseType].top,
-    });
-  };
+  const fgPortalController = new FgPortalController(
+    externalRef,
+    portalRef,
+    spacing,
+    type,
+    mouseType,
+    setPortalPosition
+  );
 
   useEffect(() => {
-    if (type === "above" || type === "below") getStaticPortalPosition();
+    if (
+      type === "above" ||
+      type === "below" ||
+      type === "left" ||
+      type === "right"
+    ) {
+      fgPortalController.getStaticPortalPosition();
+    }
 
     if (type === "mouse")
-      window.addEventListener("mousemove", getDynamicPortalPosition);
+      window.addEventListener(
+        "mousemove",
+        fgPortalController.getDynamicPortalPosition
+      );
 
     return () => {
       if (type === "mouse")
-        window.removeEventListener("mousemove", getDynamicPortalPosition);
+        window.removeEventListener(
+          "mousemove",
+          fgPortalController.getDynamicPortalPosition
+        );
     };
   }, [content]);
 

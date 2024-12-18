@@ -14,7 +14,6 @@ class BundlesController {
     private userMedia: React.MutableRefObject<UserMediaType>,
 
     private tableRef: React.RefObject<HTMLDivElement>,
-    private tableTopRef: React.RefObject<HTMLDivElement>,
 
     private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
@@ -83,8 +82,6 @@ class BundlesController {
             this.isScreen.current ? initScreenAudioStreams : undefined
           }
           initAudioStream={this.isAudio.current ? initAudioStream : undefined}
-          tableRef={this.tableRef}
-          tableTopRef={this.tableTopRef}
           options={{
             isUser: true,
             permissions: this.permissions.current,
@@ -156,8 +153,6 @@ class BundlesController {
               : undefined
           }
           initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
-          tableRef={this.tableRef}
-          tableTopRef={this.tableTopRef}
           onRendered={() => {
             const msg = {
               type: "requestPermissions",
