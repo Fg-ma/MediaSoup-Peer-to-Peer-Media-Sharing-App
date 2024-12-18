@@ -1,3 +1,29 @@
+import snakeHeadBlackPink from "../../../../public/snakeGameAssets/snake/snakeHeadBlackPink.png";
+import snakeHeadBlackYellow from "../../../../public/snakeGameAssets/snake/snakeHeadBlackYellow.png";
+import snakeHeadBlueBlue from "../../../../public/snakeGameAssets/snake/snakeHeadBlueBlue.png";
+import snakeHeadBlueGreen from "../../../../public/snakeGameAssets/snake/snakeHeadBlueGreen.png";
+import snakeHeadBlueOrange from "../../../../public/snakeGameAssets/snake/snakeHeadBlueOrange.png";
+import snakeHeadBluePurple from "../../../../public/snakeGameAssets/snake/snakeHeadBluePurple.png";
+import snakeHeadBlueRed from "../../../../public/snakeGameAssets/snake/snakeHeadBlueRed.png";
+import snakeHeadBlueWhite from "../../../../public/snakeGameAssets/snake/snakeHeadBlueWhite.png";
+import snakeHeadBlueYellow from "../../../../public/snakeGameAssets/snake/snakeHeadBlueYellow.png";
+import snakeHeadGreenGreen from "../../../../public/snakeGameAssets/snake/snakeHeadGreenGreen.png";
+import snakeHeadGreenPurple from "../../../../public/snakeGameAssets/snake/snakeHeadGreenPurple.png";
+import snakeHeadGreenWhite from "../../../../public/snakeGameAssets/snake/snakeHeadGreenWhite.png";
+import snakeHeadGreenYellow from "../../../../public/snakeGameAssets/snake/snakeHeadGreenYellow.png";
+import snakeHeadOrangeBlue from "../../../../public/snakeGameAssets/snake/snakeHeadOrangeBlue.png";
+import snakeHeadOrangePink from "../../../../public/snakeGameAssets/snake/snakeHeadOrangePink.png";
+import snakeHeadOrangePurple from "../../../../public/snakeGameAssets/snake/snakeHeadOrangePurple.png";
+import snakeHeadOrangeRed from "../../../../public/snakeGameAssets/snake/snakeHeadOrangeRed.png";
+import snakeHeadPinkGreen from "../../../../public/snakeGameAssets/snake/snakeHeadPinkGreen.png";
+import snakeHeadPinkOrange from "../../../../public/snakeGameAssets/snake/snakeHeadPinkOrange.png";
+import snakeHeadPinkPurple from "../../../../public/snakeGameAssets/snake/snakeHeadPinkPurple.png";
+import snakeHeadRedBlack from "../../../../public/snakeGameAssets/snake/snakeHeadRedBlack.png";
+import snakeHeadRedYellow from "../../../../public/snakeGameAssets/snake/snakeHeadRedYellow.png";
+import snakeHeadWhiteAqua from "../../../../public/snakeGameAssets/snake/snakeHeadWhiteAqua.png";
+import snakeHeadWhiteRed from "../../../../public/snakeGameAssets/snake/snakeHeadWhiteRed.png";
+import snakeHeadWhiteYellow from "../../../../public/snakeGameAssets/snake/snakeHeadWhiteYellow.png";
+
 export type SnakeColorsType =
   | {
       primary: "black";
@@ -110,3 +136,42 @@ export const foodClasses = [
   "snake-game-strawberry",
   "snake-game-watermelon",
 ];
+
+export const snakeColorIconMap = {
+  black: { pink: snakeHeadBlackPink, yellow: snakeHeadBlackYellow },
+  blue: {
+    blue: snakeHeadBlueBlue,
+    green: snakeHeadBlueGreen,
+    orange: snakeHeadBlueOrange,
+    purple: snakeHeadBluePurple,
+    red: snakeHeadBlueRed,
+    white: snakeHeadBlueWhite,
+    yellow: snakeHeadBlueYellow,
+  },
+  green: {
+    green: snakeHeadGreenGreen,
+    purple: snakeHeadGreenPurple,
+    white: snakeHeadGreenWhite,
+    yellow: snakeHeadGreenYellow,
+  },
+  orange: {
+    blue: snakeHeadOrangeBlue,
+    pink: snakeHeadOrangePink,
+    purple: snakeHeadOrangePurple,
+    red: snakeHeadOrangeRed,
+  },
+  pink: {
+    green: snakeHeadPinkGreen,
+    orange: snakeHeadPinkOrange,
+    purple: snakeHeadPinkPurple,
+  },
+  red: {
+    black: snakeHeadRedBlack,
+    yellow: snakeHeadRedYellow,
+  },
+  white: {
+    aqua: snakeHeadWhiteAqua,
+    red: snakeHeadWhiteRed,
+    yellow: snakeHeadWhiteYellow,
+  },
+};

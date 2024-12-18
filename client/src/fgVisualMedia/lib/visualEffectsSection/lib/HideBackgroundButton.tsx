@@ -10,6 +10,7 @@ import {
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const ColorPicker = React.lazy(() => import("./ColorPicker"));
 
@@ -330,9 +331,9 @@ export default function HideBackgroundButton({
           );
         }}
         hoverContent={
-          <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            {streamEffects ? "Reveal background" : "Hide background"}
-          </div>
+          <FgHoverContentStandard
+            content={streamEffects ? "Reveal background" : "Hide background"}
+          />
         }
         holdFunction={holdFunction}
         holdContent={
@@ -379,13 +380,13 @@ export default function HideBackgroundButton({
                   </div>
                 )}
                 hoverContent={
-                  <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                    {
+                  <FgHoverContentStandard
+                    content={
                       hideBackgroundLabels[
                         background as HideBackgroundEffectTypes
                       ]
                     }
-                  </div>
+                  />
                 }
                 scrollingContainerRef={hideBackgroundContainerRef}
                 options={{
@@ -411,11 +412,7 @@ export default function HideBackgroundButton({
         <FgButton
           externalRef={colorPickerBtnRef}
           clickFunction={() => handleColorPicker()}
-          hoverContent={
-            <div className='mb-6 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              Color picker
-            </div>
-          }
+          hoverContent={<FgHoverContentStandard content='Color picker' />}
           scrollingContainerRef={scrollingContainerRef}
           className='w-6 h-6 m-2 border border-white rounded'
           style={{ backgroundColor: tempColor }}

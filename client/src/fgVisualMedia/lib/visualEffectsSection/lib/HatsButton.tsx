@@ -8,6 +8,7 @@ import {
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import AsianConicalHat_512x512 from "../../../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_512x512.png";
 import AsianConicalHat_32x32 from "../../../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_32x32.png";
@@ -447,9 +448,9 @@ export default function HatsButton({
                 </div>
               )}
               hoverContent={
-                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                  {hatsLabels[hat as HatsEffectTypes]}
-                </div>
+                <FgHoverContentStandard
+                  content={hatsLabels[hat as HatsEffectTypes]}
+                />
               }
               scrollingContainerRef={hatsContainerRef}
               options={{
@@ -460,11 +461,7 @@ export default function HatsButton({
           ))}
         </div>
       }
-      hoverContent={
-        <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Hats
-        </div>
-      }
+      hoverContent={<FgHoverContentStandard content='Hats' />}
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
       scrollingContainerRef={scrollingContainerRef}

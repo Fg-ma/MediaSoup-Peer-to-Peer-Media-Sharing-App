@@ -8,6 +8,7 @@ import {
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import angryHamster_512x512 from "../../../../../public/2DAssets/pets/angryHamster/angryHamster_512x512.png";
 import angryHamster_32x32 from "../../../../../public/2DAssets/pets/angryHamster/angryHamster_32x32.png";
@@ -525,9 +526,9 @@ export default function PetsButton({
                 </div>
               )}
               hoverContent={
-                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                  {petsLabels[pet as PetsEffectTypes]}
-                </div>
+                <FgHoverContentStandard
+                  content={petsLabels[pet as PetsEffectTypes]}
+                />
               }
               scrollingContainerRef={petsContainerRef}
               options={{
@@ -538,11 +539,7 @@ export default function PetsButton({
           ))}
         </div>
       }
-      hoverContent={
-        <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Pets
-        </div>
-      }
+      hoverContent={<FgHoverContentStandard content='Pets' />}
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
       scrollingContainerRef={scrollingContainerRef}

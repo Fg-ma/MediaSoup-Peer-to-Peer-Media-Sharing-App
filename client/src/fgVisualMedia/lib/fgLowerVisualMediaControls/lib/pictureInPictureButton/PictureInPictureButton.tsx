@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
 export default function PictureInPictureButton({
@@ -38,9 +39,10 @@ export default function PictureInPictureButton({
       }}
       hoverContent={
         !visualEffectsActive && !settingsActive ? (
-          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            Picture in picture (i)
-          </div>
+          <FgHoverContentStandard
+            content='Picture in picture (i)'
+            style='dark'
+          />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

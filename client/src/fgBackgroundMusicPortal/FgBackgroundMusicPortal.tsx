@@ -5,6 +5,7 @@ import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { BackgroundMusicTypes } from "../context/effectsContext/typeConstant";
 import FgImage from "../fgElements/fgImage/FgImage";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import additionIcon from "../../public/svgs/additionIcon.svg";
 import adventureTimeIcon from "../../public/svgs/audioEffects/adventureTimeIcon.svg";
@@ -358,9 +359,7 @@ export default function FgBackgroundMusicPortal({
               mouseDownFunction={handleImportEffectClickDown}
               touchStartFunction={handleImportEffectClickDown}
               hoverContent={
-                <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                  Import background music
-                </div>
+                <FgHoverContentStandard content='Import background music' />
               }
               scrollingContainerRef={backgroundMusicScrollingContainerRef}
             />
@@ -382,9 +381,7 @@ export default function FgBackgroundMusicPortal({
                       </div>
                     )}
                     hoverContent={
-                      <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                        {file.file.name}
-                      </div>
+                      <FgHoverContentStandard content={file.file.name} />
                     }
                     scrollingContainerRef={backgroundMusicScrollingContainerRef}
                     options={{
@@ -434,9 +431,9 @@ export default function FgBackgroundMusicPortal({
                   </div>
                 )}
                 hoverContent={
-                  <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                    {backgroundMusicLabels[key as BackgroundMusicTypes]}
-                  </div>
+                  <FgHoverContentStandard
+                    content={backgroundMusicLabels[key as BackgroundMusicTypes]}
+                  />
                 }
                 scrollingContainerRef={backgroundMusicScrollingContainerRef}
                 options={{

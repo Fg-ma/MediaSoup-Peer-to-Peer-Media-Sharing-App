@@ -4,6 +4,7 @@ import { SamplerEffectType } from "./SamplerEffectsToolbar";
 import FgKnobButton from "../../fgElements/fgKnobButton/FgKnobButton";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
@@ -156,11 +157,13 @@ export default function SamplerEffect({
             </div>
           )}
           hoverContent={
-            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-              {effects[effectValue].active
-                ? `Remove ${effect.effectLabel.toLowerCase()}`
-                : `Add ${effect.effectLabel.toLowerCase()}`}
-            </div>
+            <FgHoverContentStandard
+              content={
+                effects[effectValue].active
+                  ? `Remove ${effect.effectLabel.toLowerCase()}`
+                  : `Add ${effect.effectLabel.toLowerCase()}`
+              }
+            />
           }
           options={{
             hoverTimeoutDuration: 1500,

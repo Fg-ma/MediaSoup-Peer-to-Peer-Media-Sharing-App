@@ -1,6 +1,7 @@
 import React from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
 import playIcon from "../../../../../../public/svgs/playIcon.svg";
@@ -38,9 +39,10 @@ export default function PlayPauseButton({
       }}
       hoverContent={
         !visualEffectsActive && !settingsActive ? (
-          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            {pausedState ? "Play (k)" : "Pause (k)"}
-          </div>
+          <FgHoverContentStandard
+            content={pausedState ? "Play (k)" : "Pause (k)"}
+            style='dark'
+          />
         ) : undefined
       }
       className='flex items-center justify-center w-10 aspect-square pointer-events-auto'

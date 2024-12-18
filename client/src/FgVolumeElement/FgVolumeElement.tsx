@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import "./lib/fgVolumeElement.css";
-import volumeSVGPaths from "../fgVolumeElement/lib/volumeSVGPaths";
+import { useSignalContext } from "../context/signalContext/SignalContext";
 import FgButton from "../fgElements/fgButton/FgButton";
+import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import volumeSVGPaths from "../fgVolumeElement/lib/volumeSVGPaths";
 import FgVolumeElementController from "../fgVolumeElement/lib/FgVolumeElementController";
 import VolumeSVG from "../fgVolumeElement/lib/VolumeSVG";
-import { useSignalContext } from "../context/signalContext/SignalContext";
 import {
   defaultFgVolumeElementOptions,
   FgVolumeElementControllerMessagesType,
   FgVolumeElementOptions,
 } from "./lib/typeConstant";
+import "./lib/fgVolumeElement.css";
 
 export default function FgVolumeElement({
   socket,
@@ -247,9 +248,10 @@ export default function FgVolumeElement({
         }}
         hoverContent={
           !visualEffectsActive && !settingsActive ? (
-            <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              {active ? "Unmute (m)" : "Mute (m)"}
-            </div>
+            <FgHoverContentStandard
+              content={active ? "Unmute (m)" : "Mute (m)"}
+              style='dark'
+            />
           ) : undefined
         }
         className='aspect-square flex items-center justify-center relative'

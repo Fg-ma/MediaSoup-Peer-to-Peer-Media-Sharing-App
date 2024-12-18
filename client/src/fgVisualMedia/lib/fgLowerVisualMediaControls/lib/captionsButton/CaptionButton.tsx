@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { KaldiRecognizer, Model } from "vosk-browser";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
@@ -126,9 +127,7 @@ export default function CaptionButton({
         }}
         hoverContent={
           !visualEffectsActive && !settingsActive ? (
-            <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              Captions (c)
-            </div>
+            <FgHoverContentStandard content='Captions (c)' style='dark' />
           ) : undefined
         }
         scrollingContainerRef={scrollingContainerRef}

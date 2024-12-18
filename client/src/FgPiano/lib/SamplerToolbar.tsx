@@ -6,15 +6,16 @@ import SamplerVolume from "./SamplerVolume";
 import OctaveSelection from "./OctaveSelection";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import FgPianoController from "./FgPianoController";
 import SamplerMetronome from "./SamplerMetronome";
 import FgBackgroundSelector from "../../fgBackgroundSelector/FgBackgroundSelector";
+import { FgSamplers } from "../../audioEffects/fgSamplers";
 
 import effectIcon from "../../../public/svgs/effectIcon.svg";
 import effectOffIcon from "../../../public/svgs/effectOffIcon.svg";
 import keyVisualizerIcon from "../../../public/svgs/audioEffects/keyVisualizerIcon.svg";
 import keyVisualizerOffIcon from "../../../public/svgs/audioEffects/keyVisualizerOffIcon.svg";
-import { FgSamplers } from "src/audioEffects/fgSamplers";
 
 export const navVar: Variants = {
   leftInit: { opacity: 0, x: -20 },
@@ -128,9 +129,11 @@ export default function SamplerToolbar({
             keyVisualizerActiveRef.current = !keyVisualizerActiveRef.current;
           }}
           hoverContent={
-            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-              {samplerEffectsActive ? "Close key visualizer" : "Key visualizer"}
-            </div>
+            <FgHoverContentStandard
+              content={
+                samplerEffectsActive ? "Close key visualizer" : "Key visualizer"
+              }
+            />
           }
           className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
@@ -164,9 +167,9 @@ export default function SamplerToolbar({
             setSamplerEffectsActive((prev) => !prev);
           }}
           hoverContent={
-            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-              {samplerEffectsActive ? "Close effects" : "Effects"}
-            </div>
+            <FgHoverContentStandard
+              content={samplerEffectsActive ? "Close effects" : "Effects"}
+            />
           }
           className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}

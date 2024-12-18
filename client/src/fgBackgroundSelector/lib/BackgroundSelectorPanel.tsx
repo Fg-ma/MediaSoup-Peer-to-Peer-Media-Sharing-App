@@ -3,6 +3,7 @@ import FgPanel from "../../fgElements/fgPanel/FgPanel";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgImage from "../../fgElements/fgImage/FgImage";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import {
   ActiveBackground,
   categories,
@@ -145,9 +146,7 @@ export default function BackgroundSelectorPanel({
                   );
                 }}
                 hoverContent={
-                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                    Import background
-                  </div>
+                  <FgHoverContentStandard content='Import background' />
                 }
                 options={{ hoverTimeoutDuration: 500 }}
                 clickFunction={() => {
@@ -175,11 +174,7 @@ export default function BackgroundSelectorPanel({
                         />
                       );
                     }}
-                    hoverContent={
-                      <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                        {filename}
-                      </div>
-                    }
+                    hoverContent={<FgHoverContentStandard content={filename} />}
                     scrollingContainerRef={userbackgroundsSectionRef}
                     options={{ hoverTimeoutDuration: 500 }}
                     clickFunction={() => handleSelectBackground("", filename)}
@@ -224,14 +219,14 @@ export default function BackgroundSelectorPanel({
                         );
                       }}
                       hoverContent={
-                        <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                          {
+                        <FgHoverContentStandard
+                          content={
                             // @ts-expect-error: type correspondance issue
                             categories[activeBackground.category][
                               activeBackground.categorySelection
                             ].label
                           }
-                        </div>
+                        />
                       }
                       scrollingContainerRef={recommendationsSectionRef}
                       options={{ hoverTimeoutDuration: 500 }}
@@ -268,9 +263,9 @@ export default function BackgroundSelectorPanel({
                           );
                         }}
                         hoverContent={
-                          <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                            {recommendation.label}
-                          </div>
+                          <FgHoverContentStandard
+                            content={recommendation.label}
+                          />
                         }
                         scrollingContainerRef={recommendationsSectionRef}
                         options={{ hoverTimeoutDuration: 500 }}
@@ -314,9 +309,9 @@ export default function BackgroundSelectorPanel({
                         setActiveCategory(categoryName as Categories);
                       }}
                       hoverContent={
-                        <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                          {categoryMetadata.label}
-                        </div>
+                        <FgHoverContentStandard
+                          content={categoryMetadata.label}
+                        />
                       }
                       options={{ hoverTimeoutDuration: 500 }}
                       scrollingContainerRef={categoriesSectionRef}
@@ -347,11 +342,7 @@ export default function BackgroundSelectorPanel({
                 clickFunction={() => {
                   setActiveCategory("");
                 }}
-                hoverContent={
-                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md'>
-                    Back
-                  </div>
-                }
+                hoverContent={<FgHoverContentStandard content='Back' />}
                 options={{ hoverType: "above", hoverTimeoutDuration: 750 }}
               />
               <div className='text-2xl text-black pb-1'>
@@ -386,9 +377,9 @@ export default function BackgroundSelectorPanel({
                         );
                       }}
                       hoverContent={
-                        <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                          {categorySelectionData.label}
-                        </div>
+                        <FgHoverContentStandard
+                          content={categorySelectionData.label}
+                        />
                       }
                       scrollingContainerRef={backgroundSelectionSection}
                       options={{ hoverTimeoutDuration: 500 }}

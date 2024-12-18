@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
 import { ActivePages } from "../../FgLowerVisualMediaControls";
 import { FgVisualMediaOptions, Settings } from "../../../typeConstant";
@@ -120,9 +121,7 @@ export default function FgSettingsButton({
         )}
         hoverContent={
           !visualEffectsActive && !settingsActive ? (
-            <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              Settings
-            </div>
+            <FgHoverContentStandard content='Settings' style='dark' />
           ) : undefined
         }
         scrollingContainerRef={scrollingContainerRef}

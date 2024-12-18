@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import FgButton from "../../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import { ActivePages } from "../../../FgLowerVisualMediaControls";
 import { Settings } from "../../../../typeConstant";
 
@@ -155,11 +156,7 @@ export default function ClosedCaptionsPage({
                   key as keyof typeof closedCaptionsSelections
                 )
               }
-              hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                  Auto generated
-                </div>
-              }
+              hoverContent={<FgHoverContentStandard content='Auto generated' />}
               scrollingContainerRef={scrollingContainerRef}
               options={{
                 hoverTimeoutDuration: 2000,

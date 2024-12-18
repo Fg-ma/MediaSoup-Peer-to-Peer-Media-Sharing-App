@@ -6,6 +6,7 @@ import {
 } from "../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import blurIcon from "../../../../../public/svgs/visualEffects/blurIcon.svg";
 import blurOffIcon from "../../../../../public/svgs/visualEffects/blurOffIcon.svg";
@@ -64,11 +65,7 @@ export default function BlurButton({
           />
         );
       }}
-      hoverContent={
-        <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Blur
-        </div>
-      }
+      hoverContent={<FgHoverContentStandard content='Blur' />}
       scrollingContainerRef={scrollingContainerRef}
       className='flex items-center justify-center min-w-10 w-10 aspect-square'
       options={{

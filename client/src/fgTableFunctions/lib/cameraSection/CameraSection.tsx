@@ -2,10 +2,11 @@ import React from "react";
 import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
-import ProducersController from "../../../lib/ProducersController";
-import CameraSectionController from "./lib/cameraSectionController";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import ProducersController from "../../../lib/ProducersController";
+import CameraSectionController from "./lib/cameraSectionController";
 
 import shareCameraIcon from "../../../../public/svgs/shareCameraIcon.svg";
 import removeCameraIcon from "../../../../public/svgs/removeCameraIcon.svg";
@@ -94,9 +95,9 @@ export default function CameraSection({
           }
         }}
         hoverContent={
-          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            {cameraActive ? "Remove camera" : "Publish camera"}
-          </div>
+          <FgHoverContentStandard
+            content={cameraActive ? "Remove camera" : "Publish camera"}
+          />
         }
       />
       <FgButton
@@ -116,11 +117,7 @@ export default function CameraSection({
             ]}
           />
         )}
-        hoverContent={
-          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            Publish a new camera
-          </div>
-        }
+        hoverContent={<FgHoverContentStandard content='Publish a new camera' />}
       />
     </div>
   );

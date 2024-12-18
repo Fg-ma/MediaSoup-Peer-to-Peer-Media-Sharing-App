@@ -3,6 +3,7 @@ import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import { AudioEffectTemplate } from "./typeConstant";
 
 export default function AudioEffectButton({
@@ -111,11 +112,13 @@ export default function AudioEffectButton({
             );
           }}
           hoverContent={
-            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-              {streamEffects
-                ? audioEffectTemplate.hoverContent.deactive
-                : audioEffectTemplate.hoverContent.active}
-            </div>
+            <FgHoverContentStandard
+              content={
+                streamEffects
+                  ? audioEffectTemplate.hoverContent.deactive
+                  : audioEffectTemplate.hoverContent.active
+              }
+            />
           }
           options={{
             hoverTimeoutDuration: 750,

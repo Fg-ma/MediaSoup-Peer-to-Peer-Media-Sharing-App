@@ -3,6 +3,7 @@ import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import FgSlider, {
   SliderChangeEvent,
 } from "../../fgElements/fgSlider/FgSlider";
+import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
@@ -111,9 +112,7 @@ export default function AudioMixEffect({
               { key: "height", value: "1.25rem" },
             ]}
             hoverContent={
-              <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                {staticMixEffect.effectLabel}
-              </div>
+              <FgHoverContentStandard content={staticMixEffect.effectLabel} />
             }
             options={{ hoverTimeoutDuration: 1500 }}
           />

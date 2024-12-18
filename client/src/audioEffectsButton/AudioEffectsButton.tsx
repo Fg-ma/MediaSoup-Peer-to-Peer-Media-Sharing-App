@@ -4,6 +4,7 @@ import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { Permissions } from "../context/permissionsContext/typeConstant";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import audioEffectIcon from "../../public/svgs/audioEffects/audioEffectIcon.svg";
 import audioEffectOffIcon from "../../public/svgs/audioEffects/audioEffectOffIcon.svg";
@@ -103,9 +104,7 @@ export default function AudioEffectsButton({
               {hoverLabelElement ? (
                 hoverLabelElement
               ) : (
-                <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-                  Audio effects
-                </div>
+                <FgHoverContentStandard content='Audio effects' style='dark' />
               )}
             </>
           ) : (

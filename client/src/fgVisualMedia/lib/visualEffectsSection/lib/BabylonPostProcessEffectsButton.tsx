@@ -9,6 +9,7 @@ import {
   ScreenEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import prismaColors from "../../../../../public/2DAssets/postProcess/prismaColors_512x512.jpg";
 import prismaColorsSmall from "../../../../../public/2DAssets/postProcess/prismaColors_32x32.jpg";
@@ -277,11 +278,7 @@ export default function BabylonPostProcessEffectsButton({
                     />
                   </div>
                 )}
-                hoverContent={
-                  <div className='mb-2 w-max py-1 px-2 text-black font-K2D text-sm bg-white shadow-lg rounded-md relative bottom-0'>
-                    {choice.label}
-                  </div>
-                }
+                hoverContent={<FgHoverContentStandard content={choice.label} />}
                 scrollingContainerRef={postProcessEffectsContainerRef}
                 options={{
                   hoverZValue: 999999999999999,
@@ -292,11 +289,7 @@ export default function BabylonPostProcessEffectsButton({
           )}
         </div>
       }
-      hoverContent={
-        <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-          Camera effects
-        </div>
-      }
+      hoverContent={<FgHoverContentStandard content='Camera effects' />}
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
       scrollingContainerRef={scrollingContainerRef}

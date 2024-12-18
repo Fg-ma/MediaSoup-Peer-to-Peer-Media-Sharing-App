@@ -6,6 +6,7 @@ import {
 } from "../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import tintIcon from "../../../../../public/svgs/visualEffects/tintIcon.svg";
 import tintOffIcon from "../../../../../public/svgs/visualEffects/tintOffIcon.svg";
@@ -84,11 +85,7 @@ export default function TintSection({
             />
           );
         }}
-        hoverContent={
-          <div className='mb-3.5 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            Tint
-          </div>
-        }
+        hoverContent={<FgHoverContentStandard content='Tint' />}
         scrollingContainerRef={scrollingContainerRef}
         className='flex items-center justify-center min-w-10 w-10 aspect-square'
         options={{
@@ -100,11 +97,7 @@ export default function TintSection({
         <FgButton
           externalRef={colorPickerBtnRef}
           clickFunction={() => handleColorPicker()}
-          hoverContent={
-            <div className='mb-6 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-              Color picker
-            </div>
-          }
+          hoverContent={<FgHoverContentStandard content='Color picker' />}
           scrollingContainerRef={scrollingContainerRef}
           className='w-6 h-6 m-2 border border-white rounded'
           style={{ backgroundColor: tempColor }}

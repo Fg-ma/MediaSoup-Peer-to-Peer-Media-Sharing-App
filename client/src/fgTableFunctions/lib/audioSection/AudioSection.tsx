@@ -1,9 +1,10 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
+import FgSVG from "../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import ProducersController from "../../../lib/ProducersController";
 import AudioSectionController from "./lib/audioSectionController";
-import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
 
 import shareAudioIcon from "../../../../public/svgs/shareAudioIcon.svg";
@@ -116,9 +117,9 @@ export default function AudioSection({
           }
         }}
         hoverContent={
-          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            {audioActive ? "Remove audio" : "Publish audio"}
-          </div>
+          <FgHoverContentStandard
+            content={audioActive ? "Remove audio" : "Publish audio"}
+          />
         }
       />
       {audioActive && (
@@ -160,9 +161,9 @@ export default function AudioSection({
               </svg>
             )}
             hoverContent={
-              <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-                {mutedAudioRef.current ? "Unmute" : "Mute"}
-              </div>
+              <FgHoverContentStandard
+                content={mutedAudioRef.current ? "Unmute" : "Mute"}
+              />
             }
           />
         </Suspense>

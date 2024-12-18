@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import FgPanelController from "./lib/FgPanelController";
 
 const FgButton = React.lazy(() => import("../fgButton/FgButton"));
@@ -379,12 +380,7 @@ export default function FgPanel({
               closeLabelElement ? (
                 closeLabelElement
               ) : (
-                <div
-                  className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0'
-                  style={{ backgroundColor: backgroundColor }}
-                >
-                  Close (x)
-                </div>
+                <FgHoverContentStandard content='Close (x)' />
               )
             }
           />

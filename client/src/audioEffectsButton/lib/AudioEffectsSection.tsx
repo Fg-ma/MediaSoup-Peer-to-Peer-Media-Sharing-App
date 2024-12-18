@@ -5,6 +5,7 @@ import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgPanel from "../../fgElements/fgPanel/FgPanel";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import AudioEffectButton from "./AudioEffectButton";
 import { audioEffectTemplates } from "./typeConstant";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
@@ -244,25 +245,27 @@ export default function AudioEffectsSection({
                 </svg>
               )}
               hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {muteStateRef
-                    ? muteStateRef.current
-                      ? "Unmute"
-                      : "Mute"
-                    : clientMute
-                    ? clientMute.current
-                      ? "Unmute"
+                <FgHoverContentStandard
+                  content={
+                    muteStateRef
+                      ? muteStateRef.current
+                        ? "Unmute"
+                        : "Mute"
+                      : clientMute
+                      ? clientMute.current
+                        ? "Unmute"
+                        : localMute
+                        ? localMute.current
+                          ? "Unmute"
+                          : "Mute"
+                        : "Mute"
                       : localMute
                       ? localMute.current
                         ? "Unmute"
                         : "Mute"
                       : "Mute"
-                    : localMute
-                    ? localMute.current
-                      ? "Unmute"
-                      : "Mute"
-                    : "Mute"}
-                </div>
+                  }
+                />
               }
               options={{ hoverTimeoutDuration: 350 }}
             />
@@ -292,9 +295,11 @@ export default function AudioEffectsSection({
                 );
               }}
               hoverContent={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                  {audioMixEffectsActive ? "Close mix effects" : "Mix effects"}
-                </div>
+                <FgHoverContentStandard
+                  content={
+                    audioMixEffectsActive ? "Close mix effects" : "Mix effects"
+                  }
+                />
               }
               options={{ hoverTimeoutDuration: 350 }}
             />
@@ -334,9 +339,9 @@ export default function AudioEffectsSection({
                   );
                 }}
                 hoverContent={
-                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                    {panioActive ? "Close synth" : "Synth"}
-                  </div>
+                  <FgHoverContentStandard
+                    content={panioActive ? "Close synth" : "Synth"}
+                  />
                 }
                 options={{ hoverTimeoutDuration: 350 }}
               />
@@ -366,9 +371,11 @@ export default function AudioEffectsSection({
                   );
                 }}
                 hoverContent={
-                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                    {soundBoardActive ? "Close sound board" : "Sound board"}
-                  </div>
+                  <FgHoverContentStandard
+                    content={
+                      soundBoardActive ? "Close sound board" : "Sound board"
+                    }
+                  />
                 }
                 options={{ hoverTimeoutDuration: 350 }}
               />
@@ -400,11 +407,13 @@ export default function AudioEffectsSection({
                   );
                 }}
                 hoverContent={
-                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                    {backgroundMusicActive
-                      ? "Close background music"
-                      : "Background music"}
-                  </div>
+                  <FgHoverContentStandard
+                    content={
+                      backgroundMusicActive
+                        ? "Close background music"
+                        : "Background music"
+                    }
+                  />
                 }
                 options={{ hoverTimeoutDuration: 350 }}
               />

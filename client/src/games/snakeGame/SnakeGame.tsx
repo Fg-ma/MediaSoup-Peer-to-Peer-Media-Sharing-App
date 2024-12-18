@@ -12,6 +12,7 @@ import gameOverCard from "../../../public/snakeGameAssets/gameOverCard.jpg";
 import snakeColorChangeIcon from "../../../public/svgs/games/snake/snakeColorChangeIcon.svg";
 import gridIcon from "../../../public/svgs/games/snake/gridIcon.svg";
 import gridOffIcon from "../../../public/svgs/games/snake/gridOffIcon.svg";
+import SnakeColorPickerPanel from "./lib/SnakeColorPickerPanel";
 
 export type Directions = "up" | "down" | "left" | "right";
 
@@ -44,7 +45,7 @@ function SnakeGame({
     snakes: {},
     food: [],
   });
-  const [snakeColor, _setSnakeColor] = useState<SnakeColorsType>({
+  const [snakeColor, setSnakeColor] = useState<SnakeColorsType>({
     primary: "blue",
     secondary: "green",
   });
@@ -55,6 +56,7 @@ function SnakeGame({
   const [gridSizePanelActive, setGridSizePanelActive] = useState(false);
   const focused = useRef(true);
   const boardRef = useRef<HTMLDivElement>(null);
+  const snakeColorPickerButtonRef = useRef<HTMLButtonElement>(null);
 
   const snakeGameController = new SnakeGameController(
     username,
@@ -104,75 +106,59 @@ function SnakeGame({
   }, [userMedia.current.games.snake?.[snakeGameId]?.ws?.readyState]);
 
   return (
-    <FgGame
-      bundleRef={bundleRef}
-      content={
-        <div
-          ref={boardRef}
-          className='snake-game-board w-full aspect-square relative rounded overflow-hidden'
-        >
-          {snakeGameController.renderBoard()}
-          {gameOver && (
-            <div
-              className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 cursor-pointer'
-              onClick={snakeGameController.startGameClick}
-            >
+    <>
+      <FgGame
+        bundleRef={bundleRef}
+        content={
+          <div
+            ref={boardRef}
+            className='snake-game-board w-full aspect-square relative rounded overflow-hidden'
+          >
+            {snakeGameController.renderBoard()}
+            {gameOver && (
               <div
-                className='w-4/5 h-3/5 rounded-lg flex items-center justify-center font-K2D text-2xl bg-no-repeat bg-cover'
-                style={{ backgroundImage: `url(${gameOverCard})` }}
-              ></div>
-            </div>
-          )}
-          {!staged && !started && !gameOver && (
-            <div
-              className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
-              onClick={snakeGameController.startGameClick}
-            >
-              <div className='w-4/5 h-3/5 rounded-lg bg-fg-white-95 flex items-center justify-center font-K2D text-2xl select-none'>
-                Press any key to start
+                className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 cursor-pointer'
+                onClick={snakeGameController.startGameClick}
+              >
+                <div
+                  className='w-4/5 h-3/5 rounded-lg flex items-center justify-center font-K2D text-2xl bg-no-repeat bg-cover'
+                  style={{ backgroundImage: `url(${gameOverCard})` }}
+                ></div>
               </div>
-            </div>
-          )}
-          {staged && (
-            <div
-              className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
-              onClick={snakeGameController.startGameClick}
-            >
-              <div className='w-4/5 h-3/5 rounded-lg bg-fg-white-95 flex items-center justify-center font-K2D text-2xl select-none'>
-                Stagging
-              </div>
-            </div>
-          )}
-        </div>
-      }
-      gameFunctionsSection={
-        <div
-          className={`flex flex-col items-center justify-center h-max space-y-2 px-2`}
-        >
-          <FgButton
-            className='w-12 aspect-square'
-            clickFunction={() => setSnakeColorPanelActive((prev) => !prev)}
-            contentFunction={() => (
-              <FgSVG
-                src={snakeColorChangeIcon}
-                attributes={[
-                  { key: "width", value: "100%" },
-                  { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
-                  { key: "stroke", value: "white" },
-                ]}
-              />
             )}
-          />
-          <FgButton
-            className='w-12 aspect-square'
-            clickFunction={() => setGridSizePanelActive((prev) => !prev)}
-            contentFunction={() => {
-              const src = gridSizePanelActive ? gridOffIcon : gridIcon;
-
-              return (
+            {!staged && !started && !gameOver && (
+              <div
+                className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
+                onClick={snakeGameController.startGameClick}
+              >
+                <div className='w-4/5 h-3/5 rounded-lg bg-fg-white-95 flex items-center justify-center font-K2D text-2xl select-none'>
+                  Press any key to start
+                </div>
+              </div>
+            )}
+            {staged && (
+              <div
+                className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
+                onClick={snakeGameController.startGameClick}
+              >
+                <div className='w-4/5 h-3/5 rounded-lg bg-fg-white-95 flex items-center justify-center font-K2D text-2xl select-none'>
+                  Stagging
+                </div>
+              </div>
+            )}
+          </div>
+        }
+        gameFunctionsSection={
+          <div
+            className={`flex flex-col items-center justify-center h-max space-y-2 px-2`}
+          >
+            <FgButton
+              externalRef={snakeColorPickerButtonRef}
+              className='w-12 aspect-square'
+              clickFunction={() => setSnakeColorPanelActive((prev) => !prev)}
+              contentFunction={() => (
                 <FgSVG
-                  src={src}
+                  src={snakeColorChangeIcon}
                   attributes={[
                     { key: "width", value: "100%" },
                     { key: "height", value: "100%" },
@@ -180,13 +166,39 @@ function SnakeGame({
                     { key: "stroke", value: "white" },
                   ]}
                 />
-              );
-            }}
-          />
-        </div>
-      }
-      initPosition={{ relativeToBoundaries: "center" }}
-    />
+              )}
+            />
+            <FgButton
+              className='w-12 aspect-square'
+              clickFunction={() => setGridSizePanelActive((prev) => !prev)}
+              contentFunction={() => {
+                const src = gridSizePanelActive ? gridOffIcon : gridIcon;
+
+                return (
+                  <FgSVG
+                    src={src}
+                    attributes={[
+                      { key: "width", value: "100%" },
+                      { key: "height", value: "100%" },
+                      { key: "fill", value: "white" },
+                      { key: "stroke", value: "white" },
+                    ]}
+                  />
+                );
+              }}
+            />
+          </div>
+        }
+        initPosition={{ relativeToBoundaries: "center" }}
+      />
+      {snakeColorPanelActive && (
+        <SnakeColorPickerPanel
+          snakeColorPickerButtonRef={snakeColorPickerButtonRef}
+          setSnakeColorPanelActive={setSnakeColorPanelActive}
+          setSnakeColor={setSnakeColor}
+        />
+      )}
+    </>
   );
 }
 

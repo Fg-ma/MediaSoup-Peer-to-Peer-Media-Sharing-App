@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import { ActiveBackground, categories } from "./lib/typeConstant";
 import BackgroundSelectorPanel from "./lib/BackgroundSelectorPanel";
 
@@ -82,9 +83,7 @@ export default function FgBackgroundSelector({
         clickFunction={() => setBackgroundSelectorPanelActive((prev) => !prev)}
         hoverContent={
           backgroundSelectorPanelActive ? (
-            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-              Background selector
-            </div>
+            <FgHoverContentStandard content='Background selector' />
           ) : (
             <></>
           )

@@ -2,10 +2,11 @@ import React from "react";
 import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
-import ProducersController from "../../../lib/ProducersController";
-import ScreenSectionController from "./lib/ScreenSectionController";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import ProducersController from "../../../lib/ProducersController";
+import ScreenSectionController from "./lib/ScreenSectionController";
 
 import removeScreenIcon from "../../../../public/svgs/removeScreenIcon.svg";
 import shareScreenIcon from "../../../../public/svgs/shareScreenIcon.svg";
@@ -94,9 +95,9 @@ export default function ScreenSection({
           }
         }}
         hoverContent={
-          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            {screenActive ? "Remove screen" : "Share screen"}
-          </div>
+          <FgHoverContentStandard
+            content={screenActive ? "Remove screen" : "Share screen"}
+          />
         }
       />
       <FgButton
@@ -116,11 +117,7 @@ export default function ScreenSection({
             ]}
           />
         )}
-        hoverContent={
-          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            Share a new screen
-          </div>
-        }
+        hoverContent={<FgHoverContentStandard content='Share a new screen' />}
       />
     </div>
   );

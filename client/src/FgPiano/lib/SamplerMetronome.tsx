@@ -3,6 +3,7 @@ import { Transition, Variants, motion, AnimatePresence } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import metronomeIcon from "../../../public/svgs/audioEffects/metronomeIcon.svg";
 import metronomeOffIcon from "../../../public/svgs/audioEffects/metronomeOffIcon.svg";
@@ -134,9 +135,9 @@ export default function SamplerMetronome() {
         }}
         hoverContent={
           !metronomeVolumeActive ? (
-            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-              {metronomeActive ? "Stop metronome" : "Start metronome"}
-            </div>
+            <FgHoverContentStandard
+              content={metronomeActive ? "Stop metronome" : "Start metronome"}
+            />
           ) : undefined
         }
         className='flex items-center justify-center h-8 min-h-8 aspect-square relative'

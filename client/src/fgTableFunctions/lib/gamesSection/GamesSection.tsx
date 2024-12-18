@@ -4,6 +4,7 @@ import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgPanel from "../../../fgElements/fgPanel/FgPanel";
+import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 import joystickIcon from "../../../../public/svgs/games/joystickIcon.svg";
 import snakeGameIcon from "../../../../public/svgs/games/snake/snakeGameIcon.svg";
@@ -69,9 +70,9 @@ export default function GamesSection({
           );
         }}
         hoverContent={
-          <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-            {gamesActive ? "Close games" : "Open games"}
-          </div>
+          <FgHoverContentStandard
+            content={gamesActive ? "Close games" : "Open games"}
+          />
         }
       />
       {gamesActive && (
@@ -119,9 +120,9 @@ export default function GamesSection({
                   setSnakeGameActive((prev) => !prev);
                 }}
                 hoverContent={
-                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                    {snakeGameActive ? "Close snake" : "Open snake"}
-                  </div>
+                  <FgHoverContentStandard
+                    content={snakeGameActive ? "Close snake" : "Open snake"}
+                  />
                 }
                 options={{ hoverTimeoutDuration: 350 }}
               />
