@@ -13,12 +13,14 @@ import snakeColorChangeIcon from "../../../public/svgs/games/snake/snakeColorCha
 import gridIcon from "../../../public/svgs/games/snake/gridIcon.svg";
 import gridOffIcon from "../../../public/svgs/games/snake/gridOffIcon.svg";
 import SnakeColorPickerPanel from "./lib/SnakeColorPickerPanel";
+import SnakeGridSizePanel from "./lib/SnakeGridSizePanel";
 
 export type Directions = "up" | "down" | "left" | "right";
 
 export type Snake = {
   position: { x: number; y: number }[];
   direction: Directions;
+  color: SnakeColorsType;
 };
 
 export type GameState = {
@@ -39,17 +41,13 @@ function SnakeGame({
 }) {
   const { userMedia } = useMediaContext();
 
-  const gridSize = 15;
+  const [gridSize, setGridSize] = useState(15);
 
   const [gameState, setGameState] = useState<GameState>({
     snakes: {},
     food: [],
   });
-  const [snakeColor, setSnakeColor] = useState<SnakeColorsType>({
-    primary: "blue",
-    secondary: "green",
-  });
-  const [gameOver, _setGameOver] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
   const [started, setStarted] = useState(false);
   const [staged, setStaged] = useState(false);
   const [snakeColorPanelActive, setSnakeColorPanelActive] = useState(false);
@@ -57,6 +55,8 @@ function SnakeGame({
   const focused = useRef(true);
   const boardRef = useRef<HTMLDivElement>(null);
   const snakeColorPickerButtonRef = useRef<HTMLButtonElement>(null);
+  const snakeGridSizeButtonRef = useRef<HTMLButtonElement>(null);
+  const userDirection = useRef<Directions>("up");
 
   const snakeGameController = new SnakeGameController(
     username,
@@ -66,11 +66,12 @@ function SnakeGame({
     gridSize,
     gameState,
     setGameState,
-    snakeColor,
     focused,
     started,
     setStarted,
-    setStaged
+    setStaged,
+    setGameOver,
+    userDirection
   );
 
   useEffect(() => {
@@ -169,6 +170,7 @@ function SnakeGame({
               )}
             />
             <FgButton
+              externalRef={snakeGridSizeButtonRef}
               className='w-12 aspect-square'
               clickFunction={() => setGridSizePanelActive((prev) => !prev)}
               contentFunction={() => {
@@ -189,13 +191,45 @@ function SnakeGame({
             />
           </div>
         }
+        startGameFunction={() => {
+          if (!started) {
+            setGameOver(false);
+            userDirection.current = "up";
+            userMedia.current.games.snake?.[snakeGameId]?.joinGame();
+            userMedia.current.games.snake?.[snakeGameId]?.startGame();
+          }
+        }}
+        closeGameFunction={() => {
+          userMedia.current.games.snake?.[snakeGameId]?.closeGame();
+        }}
+        joinGameFunction={() => {}}
+        leaveGameFunction={() => {
+          if (
+            Object.keys(gameState.snakes).length === 0 ||
+            (Object.keys(gameState.snakes).length === 1 &&
+              Object.keys(Object.values(gameState.snakes)[0]).length <= 1)
+          ) {
+            userMedia.current.games.snake?.[snakeGameId]?.closeGame();
+          } else {
+            userMedia.current.games.snake?.[snakeGameId]?.leaveGame();
+          }
+        }}
         initPosition={{ relativeToBoundaries: "center" }}
       />
       {snakeColorPanelActive && (
         <SnakeColorPickerPanel
+          snakeGameId={snakeGameId}
           snakeColorPickerButtonRef={snakeColorPickerButtonRef}
           setSnakeColorPanelActive={setSnakeColorPanelActive}
-          setSnakeColor={setSnakeColor}
+          gameState={gameState}
+        />
+      )}
+      {gridSizePanelActive && (
+        <SnakeGridSizePanel
+          snakeGameId={snakeGameId}
+          snakeGridSizeButtonRef={snakeGridSizeButtonRef}
+          setGridSizePanelActive={setGridSizePanelActive}
+          setGridSize={setGridSize}
         />
       )}
     </>

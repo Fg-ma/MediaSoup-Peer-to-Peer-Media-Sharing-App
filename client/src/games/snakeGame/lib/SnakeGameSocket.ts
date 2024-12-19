@@ -1,6 +1,10 @@
 import { GameState } from "../SnakeGame";
 
-type Messages = onGameStagedType | onGameStartedType | onGameStateUpdateType;
+type Messages =
+  | onGameStagedType
+  | onGameStartedType
+  | onGameStateUpdateType
+  | onGameOverType;
 
 type onGameStagedType = {
   type: "gameStaged";
@@ -17,11 +21,16 @@ type onGameStateUpdateType = {
   };
 };
 
+type onGameOverType = {
+  type: "gameOver";
+};
+
 class SnakeGameSocket {
   constructor(
     protected setGameState: React.Dispatch<React.SetStateAction<GameState>>,
     protected setStarted: React.Dispatch<React.SetStateAction<boolean>>,
-    protected setStaged: React.Dispatch<React.SetStateAction<boolean>>
+    protected setStaged: React.Dispatch<React.SetStateAction<boolean>>,
+    protected setGameOver: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   handleMessage = (event: Messages) => {
@@ -34,6 +43,9 @@ class SnakeGameSocket {
         break;
       case "gameStateUpdate":
         this.onGameStateUpdate(event);
+        break;
+      case "gameOver":
+        this.onGameOver();
         break;
       default:
         break;
@@ -51,6 +63,12 @@ class SnakeGameSocket {
 
   onGameStateUpdate = (event: onGameStateUpdateType) => {
     this.setGameState(event.data.gameState);
+  };
+
+  onGameOver = () => {
+    this.setGameOver(true);
+    this.setStarted(false);
+    this.setStaged(false);
   };
 }
 

@@ -18,7 +18,7 @@ import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import UserDevice from "./lib/UserDevice";
 import BrowserMedia from "./lib/BrowserMedia";
-import BundlesController from "./BundlesController";
+import BundlesController from "./lib/BundlesController";
 import Deadbanding from "./babylon/Deadbanding";
 import Metadata from "./lib/Metadata";
 import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
@@ -609,7 +609,7 @@ export default function Main() {
         muteAudio={muteAudio}
         handleDisableEnableBtns={handleDisableEnableBtns}
         bundles={bundles}
-        createProducerBundle={bundlesController.createProducerBundle}
+        bundlesController={bundlesController}
       />
       <FgTable
         tableRef={tableRef}

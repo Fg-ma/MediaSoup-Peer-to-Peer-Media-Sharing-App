@@ -1,8 +1,8 @@
 import React from "react";
 import { Socket } from "socket.io-client";
-import Bundle from "./bundle/Bundle";
-import { UserMediaType } from "./context/mediaContext/typeConstant";
-import { Permissions } from "./context/permissionsContext/typeConstant";
+import Bundle from "../bundle/Bundle";
+import { UserMediaType } from "../context/mediaContext/typeConstant";
+import { Permissions } from "../context/permissionsContext/typeConstant";
 
 class BundlesController {
   constructor(
@@ -199,6 +199,31 @@ class BundlesController {
             [trackInstance]: newBundle,
           },
         };
+        return newBundles;
+      });
+    }
+  };
+
+  cleanUpProducerBundle = () => {
+    if (
+      this.userMedia.current.audio === undefined &&
+      Object.keys(this.userMedia.current.camera).length === 0 &&
+      Object.keys(this.userMedia.current.screen).length === 0 &&
+      Object.keys(this.userMedia.current.screenAudio).length === 0 &&
+      Object.keys(this.userMedia.current.games).length === 0
+    ) {
+      this.setBundles((prev) => {
+        const newBundles = {
+          ...prev,
+        };
+
+        if (
+          newBundles[this.username.current] &&
+          newBundles[this.username.current][this.instance.current]
+        ) {
+          delete newBundles[this.username.current][this.instance.current];
+        }
+
         return newBundles;
       });
     }

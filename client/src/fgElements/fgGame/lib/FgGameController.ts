@@ -3,19 +3,40 @@ class FgGameController {
     private setFocus: React.Dispatch<React.SetStateAction<boolean>>,
     private setFocusClicked: React.Dispatch<React.SetStateAction<boolean>>,
     private gameRef: React.RefObject<HTMLDivElement>,
-    private closeCallback: (() => void) | undefined
+    private closeGameFunction: (() => void) | undefined,
+    private startGameFunction: (() => void) | undefined
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
-    if (!this.closeCallback || event.target instanceof HTMLInputElement) return;
+    if (!focus || event.target instanceof HTMLInputElement) return;
 
-    const key = event.key.toLowerCase();
-    if (["x", "delete", "escape"].includes(key)) {
-      this.closeCallback();
+    switch (event.key.toLowerCase()) {
+      case "p":
+        if (this.startGameFunction) {
+          this.startGameFunction();
+        }
+        break;
+      case "x":
+        if (this.closeGameFunction) {
+          this.closeGameFunction();
+        }
+        break;
+      case "delete":
+        if (this.closeGameFunction) {
+          this.closeGameFunction();
+        }
+        break;
+      case "escape":
+        if (this.closeGameFunction) {
+          this.closeGameFunction();
+        }
+        break;
+      default:
+        break;
     }
   };
 
-  handleGameClick = (event: MouseEvent) => {
+  handleGameClick = (event: React.MouseEvent) => {
     if (this.gameRef.current) {
       const value = this.gameRef.current.contains(event.target as Node);
       this.setFocus(value);

@@ -1,5 +1,6 @@
 import uWS from "uWebSockets.js";
-import SnakeGame from "./lib/SnakeGame";
+import SnakeGame from "./snakeGame/SnakeGame";
+import { SnakeColorsType } from "./snakeGame/lib/typeConstant";
 
 export type SocketTypes = "signaling" | "games";
 
@@ -42,10 +43,14 @@ export type MessageTypes =
   | onJoinTableType
   | onLeaveTableType
   | onInitiateGameType
-  | onStageGame
-  | onGameStart
+  | onStageGameType
+  | onStartGameType
+  | onCloseGameType
   | onSnakeDirectionChangeType
-  | onAddSnakeType;
+  | onChangeGridSizeType
+  | onJoinGameType
+  | onLeaveGameType
+  | onChangeSnakeColorType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -76,14 +81,12 @@ export type onInitiateGameType = {
   type: "initiateGame";
   data: {
     table_id: string;
-    username: string;
-    instance: string;
     gameType: GameTypes;
     gameId: string;
   };
 };
 
-export type onStageGame = {
+export type onStageGameType = {
   type: "stageGame";
   data: {
     table_id: string;
@@ -92,10 +95,41 @@ export type onStageGame = {
   };
 };
 
-export type onGameStart = {
-  type: "gameStart";
+export type onStartGameType = {
+  type: "startGame";
   data: {
     table_id: string;
+    gameType: GameTypes;
+    gameId: string;
+  };
+};
+
+export type onCloseGameType = {
+  type: "closeGame";
+  data: {
+    table_id: string;
+    gameType: GameTypes;
+    gameId: string;
+  };
+};
+
+export type onJoinGameType = {
+  type: "joinGame";
+  data: {
+    table_id: string;
+    username: string;
+    instance: string;
+    gameType: GameTypes;
+    gameId: string;
+  };
+};
+
+export type onLeaveGameType = {
+  type: "leaveGame";
+  data: {
+    table_id: string;
+    username: string;
+    instance: string;
     gameType: GameTypes;
     gameId: string;
   };
@@ -113,13 +147,23 @@ export type onSnakeDirectionChangeType = {
   };
 };
 
-export type onAddSnakeType = {
-  type: "addSnake";
+export type onChangeGridSizeType = {
+  type: "changeGridSize";
+  data: {
+    table_id: string;
+    gameId: string;
+    gridSize: number;
+  };
+};
+
+export type onChangeSnakeColorType = {
+  type: "changeSnakeColor";
   data: {
     table_id: string;
     username: string;
     instance: string;
     gameId: string;
+    newSnakeColor: SnakeColorsType;
   };
 };
 

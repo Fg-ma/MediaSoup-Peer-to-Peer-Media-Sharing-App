@@ -43,16 +43,10 @@ class TablesController {
     ws.gameType = gameType;
     ws.gameId = gameId;
 
-    this.broadcaster.broadcastToTable(
-      table_id,
-      "signaling",
-      undefined,
-      undefined,
-      {
-        type: "userJoined",
-        data: { table_id, username, instance, socketType, gameType, gameId },
-      }
-    );
+    this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
+      type: "userJoined",
+      data: { table_id, username, instance, socketType, gameType, gameId },
+    });
   };
 
   onLeaveTable = (event: onLeaveTableType) => {
@@ -118,16 +112,10 @@ class TablesController {
       }
     }
 
-    this.broadcaster.broadcastToTable(
-      table_id,
-      "signaling",
-      undefined,
-      undefined,
-      {
-        type: "userLeft",
-        data: { table_id, username, instance, socketType, gameType, gameId },
-      }
-    );
+    this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
+      type: "userLeft",
+      data: { table_id, username, instance, socketType, gameType, gameId },
+    });
   };
 }
 

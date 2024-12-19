@@ -1,7 +1,5 @@
 import { GameTypes } from "../context/mediaContext/typeConstant";
 
-type SocketTypes = "signaling" | "games";
-
 type OutGoingUniversalMessages =
   | {
       type: "joinTable";
@@ -26,7 +24,7 @@ type OutGoingUniversalMessages =
       };
     }
   | {
-      type: "gameStart";
+      type: "startGame";
       data: {
         table_id: string;
         gameType: GameTypes;
@@ -40,29 +38,33 @@ type OutGoingUniversalMessages =
         gameType: GameTypes;
         gameId: string;
       };
-    };
-
-type IncomingUniversalMessages =
+    }
   | {
-      type: "userJoined";
+      type: "closeGame";
       data: {
         table_id: string;
-        username: string;
-        instance: string;
-        socketType: SocketTypes;
-        gameType: GameTypes | undefined;
-        gameId: string | undefined;
+        gameType: GameTypes;
+        gameId: string;
       };
     }
   | {
-      type: "userLeft";
+      type: "joinGame";
       data: {
         table_id: string;
         username: string;
         instance: string;
-        socketType: SocketTypes;
-        gameType: GameTypes | undefined;
-        gameId: string | undefined;
+        gameType: GameTypes;
+        gameId: string;
+      };
+    }
+  | {
+      type: "leaveGame";
+      data: {
+        table_id: string;
+        username: string;
+        instance: string;
+        gameType: GameTypes;
+        gameId: string;
       };
     };
 
@@ -80,17 +82,6 @@ class GameMediaUniversalFunctions {
   sendUniversalMessage = (message: OutGoingUniversalMessages) => {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
-    }
-  };
-
-  handleUniversalMessage = (message: IncomingUniversalMessages) => {
-    switch (message.type) {
-      case "userJoined":
-        break;
-      case "userLeft":
-        break;
-      default:
-        break;
     }
   };
 
@@ -122,9 +113,9 @@ class GameMediaUniversalFunctions {
     });
   };
 
-  gameStart = () => {
+  startGame = () => {
     this.sendUniversalMessage({
-      type: "gameStart",
+      type: "startGame",
       data: {
         table_id: this.table_id,
         gameType: this.gameType,
@@ -138,6 +129,43 @@ class GameMediaUniversalFunctions {
       type: "stageGame",
       data: {
         table_id: this.table_id,
+        gameType: this.gameType,
+        gameId: this.gameId,
+      },
+    });
+  };
+
+  closeGame = () => {
+    this.sendUniversalMessage({
+      type: "closeGame",
+      data: {
+        table_id: this.table_id,
+        gameType: this.gameType,
+        gameId: this.gameId,
+      },
+    });
+  };
+
+  joinGame = () => {
+    this.sendUniversalMessage({
+      type: "joinGame",
+      data: {
+        table_id: this.table_id,
+        username: this.username,
+        instance: this.instance,
+        gameType: this.gameType,
+        gameId: this.gameId,
+      },
+    });
+  };
+
+  leaveGame = () => {
+    this.sendUniversalMessage({
+      type: "leaveGame",
+      data: {
+        table_id: this.table_id,
+        username: this.username,
+        instance: this.instance,
         gameType: this.gameType,
         gameId: this.gameId,
       },

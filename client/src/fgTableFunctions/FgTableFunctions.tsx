@@ -12,6 +12,7 @@ import GamesSection from "./lib/gamesSection/GamesSection";
 import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
 import onRouterCapabilities from "../lib/onRouterCapabilities";
+import BundlesController from "../lib/BundlesController";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -47,7 +48,7 @@ export default function FgTableFunctions({
   muteAudio,
   handleDisableEnableBtns,
   bundles,
-  createProducerBundle,
+  bundlesController,
 }: {
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
@@ -92,7 +93,7 @@ export default function FgTableFunctions({
       [instance: string]: React.JSX.Element;
     };
   };
-  createProducerBundle: () => void;
+  bundlesController: BundlesController;
 }) {
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
   const { setSignal } = useSignalContext();
@@ -132,7 +133,7 @@ export default function FgTableFunctions({
     mutedAudioRef,
     isSubscribed,
     device,
-    createProducerBundle
+    bundlesController
   );
 
   const handleExternalMute = () => {

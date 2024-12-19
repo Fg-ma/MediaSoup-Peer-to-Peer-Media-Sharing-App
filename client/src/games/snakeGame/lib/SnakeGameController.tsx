@@ -1,8 +1,7 @@
 import React from "react";
 import { UserMediaType } from "../../../context/mediaContext/typeConstant";
-import { SnakeColorsType } from "./typeConstant";
 import SnakeGameSocket from "./SnakeGameSocket";
-import { GameState } from "../SnakeGame";
+import { Directions, GameState } from "../SnakeGame";
 
 class SnakeGameController extends SnakeGameSocket {
   private lastKeyPress = 0;
@@ -16,13 +15,14 @@ class SnakeGameController extends SnakeGameSocket {
     private gridSize: number,
     private gameState: GameState,
     setGameState: React.Dispatch<React.SetStateAction<GameState>>,
-    private snakeColor: SnakeColorsType,
     private focused: React.MutableRefObject<boolean>,
     private started: boolean,
     setStarted: React.Dispatch<React.SetStateAction<boolean>>,
-    setStaged: React.Dispatch<React.SetStateAction<boolean>>
+    setStaged: React.Dispatch<React.SetStateAction<boolean>>,
+    setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
+    private userDirection: React.MutableRefObject<Directions>
   ) {
-    super(setGameState, setStarted, setStaged);
+    super(setGameState, setStarted, setStaged, setGameOver);
 
     this.lastKeyPress = Date.now();
   }
@@ -32,19 +32,23 @@ class SnakeGameController extends SnakeGameSocket {
       return;
     }
 
+    const key = event.key.toLowerCase();
+
     if (
-      event.key.toLowerCase() === "arrowup" ||
-      event.key.toLowerCase() === "arrowdown" ||
-      event.key.toLowerCase() === "arrowleft" ||
-      event.key.toLowerCase() === "arrowright"
+      key === "arrowup" ||
+      key === "arrowdown" ||
+      key === "arrowleft" ||
+      key === "arrowright"
     ) {
       event.preventDefault();
       event.stopPropagation();
     }
 
-    if (!this.started) {
+    if (!this.started && key !== "p") {
+      this.setGameOver(false);
+      this.userDirection.current = "up";
       this.userMedia.current.games.snake?.[this.snakeGameId]?.stageGame();
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.addSnake();
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.joinGame();
     }
 
     const currentTime = Date.now();
@@ -56,54 +60,51 @@ class SnakeGameController extends SnakeGameSocket {
     let validKeyPress = false;
     let newDirection: "up" | "down" | "left" | "right" | undefined = undefined;
 
-    const currentDirection =
-      this.gameState.snakes[this.username]?.[this.instance]?.direction ?? "";
-
-    switch (event.key.toLowerCase()) {
+    switch (key) {
       case "w":
-        if (currentDirection !== "down") {
+        if (this.userDirection.current !== "down") {
           validKeyPress = true;
           newDirection = "up";
         }
         break;
       case "arrowup":
-        if (currentDirection !== "down") {
+        if (this.userDirection.current !== "down") {
           validKeyPress = true;
           newDirection = "up";
         }
         break;
       case "s":
-        if (currentDirection !== "up") {
+        if (this.userDirection.current !== "up") {
           validKeyPress = true;
           newDirection = "down";
         }
         break;
       case "arrowdown":
-        if (currentDirection !== "up") {
+        if (this.userDirection.current !== "up") {
           validKeyPress = true;
           newDirection = "down";
         }
         break;
       case "a":
-        if (currentDirection !== "right") {
+        if (this.userDirection.current !== "right") {
           validKeyPress = true;
           newDirection = "left";
         }
         break;
       case "arrowleft":
-        if (currentDirection !== "right") {
+        if (this.userDirection.current !== "right") {
           validKeyPress = true;
           newDirection = "left";
         }
         break;
       case "d":
-        if (currentDirection !== "left") {
+        if (this.userDirection.current !== "left") {
           validKeyPress = true;
           newDirection = "right";
         }
         break;
       case "arrowright":
-        if (currentDirection !== "left") {
+        if (this.userDirection.current !== "left") {
           validKeyPress = true;
           newDirection = "right";
         }
@@ -113,7 +114,9 @@ class SnakeGameController extends SnakeGameSocket {
     if (validKeyPress) {
       this.lastKeyPress = currentTime;
 
-      if (newDirection) {
+      if (newDirection && newDirection !== this.userDirection.current) {
+        this.userDirection.current = newDirection;
+
         this.userMedia.current.games.snake?.[
           this.snakeGameId
         ]?.snakeDirectionChange(newDirection);
@@ -228,15 +231,16 @@ class SnakeGameController extends SnakeGameSocket {
           this.gameState.snakes
         )) {
           for (const [_instance, snakeSegments] of Object.entries(instances)) {
-            const segmentIndex = snakeSegments.position.findIndex(
+            const { position, color } = snakeSegments;
+            const segmentIndex = position.findIndex(
               (segment) => segment.x === x && segment.y === y
             );
             if (segmentIndex !== -1) {
               const { className, rotation } = this.getSegmentClass(
-                snakeSegments.position,
+                position,
                 segmentIndex
               );
-              cellClass = `${className}-${this.snakeColor.primary}-${this.snakeColor.secondary} snake-game-snake`;
+              cellClass = `${className}-${color.primary}-${color.secondary} snake-game-snake`;
               cellBackgroundRotation = rotation;
               isSnakeCell = true;
               break;
@@ -281,8 +285,10 @@ class SnakeGameController extends SnakeGameSocket {
 
   startGameClick = () => {
     if (!this.started) {
+      this.setGameOver(false);
+      this.userDirection.current = "up";
       this.userMedia.current.games.snake?.[this.snakeGameId]?.stageGame();
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.addSnake();
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.joinGame();
     }
   };
 }

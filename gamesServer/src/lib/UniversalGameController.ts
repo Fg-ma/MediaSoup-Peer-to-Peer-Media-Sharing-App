@@ -1,17 +1,21 @@
 import Broadcaster from "./Broadcaster";
 import {
-  onGameStart,
+  onStartGameType,
   onInitiateGameType,
-  onStageGame,
+  onStageGameType,
   snakeGames,
+  tables,
+  onCloseGameType,
+  onJoinGameType,
+  onLeaveGameType,
 } from "../typeConstant";
-import SnakeGame from "./SnakeGame";
+import SnakeGame from "../snakeGame/SnakeGame";
 
 class UniversalGameController {
   constructor(private broadcaster: Broadcaster) {}
 
   onInitiateGame = (event: onInitiateGameType) => {
-    const { table_id, username, instance, gameType, gameId } = event.data;
+    const { table_id, gameType, gameId } = event.data;
 
     if (gameType === "snake") {
       if (!snakeGames[table_id]) {
@@ -32,15 +36,13 @@ class UniversalGameController {
       undefined,
       {
         type: "gameInitiated",
-        username,
-        instance,
         gameType,
         gameId,
       }
     );
   };
 
-  onStageGame = (event: onStageGame) => {
+  onStageGame = (event: onStageGameType) => {
     const { table_id, gameType, gameId } = event.data;
 
     this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
@@ -50,19 +52,9 @@ class UniversalGameController {
     if (gameType === "snake") {
       snakeGames[table_id][gameId].stageGame();
     }
-
-    setTimeout(() => {
-      if (gameType === "snake") {
-        snakeGames[table_id][gameId].startGame();
-      }
-
-      this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
-        type: "gameStarted",
-      });
-    }, 500);
   };
 
-  onGameStart = (event: onGameStart) => {
+  onStartGame = (event: onStartGameType) => {
     const { table_id, gameType, gameId } = event.data;
 
     if (gameType === "snake") {
@@ -72,6 +64,68 @@ class UniversalGameController {
     this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
       type: "gameStarted",
     });
+  };
+
+  onCloseGame = (event: onCloseGameType) => {
+    const { table_id, gameType, gameId } = event.data;
+
+    if (gameType === "snake") {
+      snakeGames[table_id][gameId].closeGame();
+    }
+
+    this.broadcaster.broadcastToTable(
+      table_id,
+      "signaling",
+      undefined,
+      undefined,
+      {
+        type: "gameClosed",
+        gameType,
+        gameId,
+      }
+    );
+
+    for (const username in tables[table_id]) {
+      for (const instance in tables[table_id][username]) {
+        if (
+          tables[table_id][username][instance].games[gameType] &&
+          tables[table_id][username][instance].games[gameType][gameId]
+        ) {
+          delete tables[table_id][username][instance].games[gameType][gameId];
+
+          if (
+            Object.keys(tables[table_id][username][instance].games[gameType])
+              .length === 0
+          ) {
+            delete tables[table_id][username][instance].games[gameType];
+          }
+        }
+      }
+    }
+  };
+
+  onJoinGame = (event: onJoinGameType) => {
+    const { table_id, username, instance, gameType, gameId } = event.data;
+
+    switch (gameType) {
+      case "snake":
+        snakeGames[table_id][gameId].joinGame(username, instance);
+        break;
+      default:
+        break;
+    }
+  };
+
+  onLeaveGame = (event: onLeaveGameType) => {
+    const { table_id, username, instance, gameType, gameId } = event.data;
+
+    switch (gameType) {
+      case "snake":
+        snakeGames[table_id][gameId].leaveGame(username, instance);
+        break;
+      default:
+        break;
+    }
   };
 }
 

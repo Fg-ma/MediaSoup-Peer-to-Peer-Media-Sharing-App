@@ -4,7 +4,7 @@ import FgGameController from "./lib/FgGameController";
 import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
 import ControlButtons from "./lib/ControlButtons";
 import PlayersSection from "./lib/playersSection/PlayersSection";
-import EndGameButton from "./EndGameButton";
+import EndGameButton from "./lib/EndGameButton";
 
 const GameTransition: Transition = {
   transition: {
@@ -19,7 +19,10 @@ export default function FgGame({
   initPosition = { x: 0, y: 0 },
   resizeCallback,
   focusCallback,
-  closeCallback,
+  startGameFunction,
+  joinGameFunction,
+  leaveGameFunction,
+  closeGameFunction,
   backgroundColor = "#ffffff",
   secondaryBackgroundColor = "#f3f3f3",
 }: {
@@ -36,7 +39,10 @@ export default function FgGame({
   };
   resizeCallback?: () => void;
   focusCallback?: (focus: boolean) => void;
-  closeCallback?: () => void;
+  startGameFunction?: () => void;
+  joinGameFunction?: () => void;
+  leaveGameFunction?: () => void;
+  closeGameFunction?: () => void;
   backgroundColor?: string;
   secondaryBackgroundColor?: string;
 }) {
@@ -54,7 +60,6 @@ export default function FgGame({
   };
 
   const [_, setRerender] = useState(false);
-  const [isHover, setIsHover] = useState(false);
   const positioning = useRef<{
     position: { left: number; top: number };
     scale: { x: number; y: number };
@@ -77,7 +82,8 @@ export default function FgGame({
     setFocus,
     setFocusClicked,
     gameRef,
-    closeCallback
+    closeGameFunction,
+    startGameFunction
   );
 
   useEffect(() => {
@@ -153,25 +159,10 @@ export default function FgGame({
   }, [positioning.current.scale]);
 
   useEffect(() => {
-    if (closeCallback && isHover) {
-      document.addEventListener("keydown", fgGameController.handleKeyDown);
-    }
+    document.addEventListener("keydown", fgGameController.handleKeyDown);
 
     return () => {
-      if (closeCallback && isHover) {
-        document.removeEventListener("keydown", fgGameController.handleKeyDown);
-      }
-    };
-  }, [isHover]);
-
-  useEffect(() => {
-    document.addEventListener("mousedown", fgGameController.handleGameClick);
-
-    return () => {
-      document.removeEventListener(
-        "mousedown",
-        fgGameController.handleGameClick
-      );
+      document.removeEventListener("keydown", fgGameController.handleKeyDown);
     };
   }, []);
 
@@ -192,8 +183,7 @@ export default function FgGame({
           setFocus(false);
         }
       }}
-      onHoverEnd={closeCallback && (() => setIsHover(false))}
-      onHoverStart={closeCallback && (() => setIsHover(true))}
+      onMouseDown={fgGameController.handleGameClick}
       className={`${
         focusClicked ? "z-[50]" : focus ? "z-[49]" : "z-0"
       } rounded absolute`}
@@ -223,8 +213,12 @@ export default function FgGame({
         <PlayersSection />
       </div>
       <div className='absolute left-0 bottom-full flex items-end justify-between w-full h-max space-x-2'>
-        <ControlButtons />
-        <EndGameButton />
+        <ControlButtons
+          startGameFunction={startGameFunction}
+          joinGameFunction={joinGameFunction}
+          leaveGameFunction={leaveGameFunction}
+        />
+        <EndGameButton closeGameFunction={closeGameFunction} />
       </div>
       {content}
       <FgGameAdjustmentButtons

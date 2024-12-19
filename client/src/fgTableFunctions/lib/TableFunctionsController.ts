@@ -6,6 +6,7 @@ import {
   UserMediaType,
 } from "../../context/mediaContext/typeConstant";
 import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
+import BundlesController from "../../lib/BundlesController";
 
 class TableFunctionsController {
   constructor(
@@ -44,7 +45,7 @@ class TableFunctionsController {
     private mutedAudioRef: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
     private device: React.MutableRefObject<types.Device | undefined>,
-    private createProducerBundle: () => void
+    private bundlesController: BundlesController
   ) {}
 
   joinTable = () => {
@@ -86,7 +87,7 @@ class TableFunctionsController {
         "ws://localhost:8042",
         this.userMedia,
         this.bundles,
-        this.createProducerBundle
+        this.bundlesController
       );
 
       // Join new table

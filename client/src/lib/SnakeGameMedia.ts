@@ -1,3 +1,4 @@
+import { SnakeColorsType } from "../games/snakeGame/lib/typeConstant";
 import GameMediaUniversalFunctions from "./GameMediaUniversalFunctions";
 
 type OutGoingMessages =
@@ -12,69 +13,53 @@ type OutGoingMessages =
       };
     }
   | {
-      type: "addSnake";
+      type: "changeGridSize";
+      data: {
+        table_id: string;
+        gameId: string;
+        gridSize: number;
+      };
+    }
+  | {
+      type: "changeSnakeColor";
       data: {
         table_id: string;
         username: string;
         instance: string;
         gameId: string;
+        newSnakeColor: SnakeColorsType;
       };
     };
 
-type IncomingMessages = {
-  type: "snakeDirectionChanged";
-  data: { direction: string; playerId: number };
-};
-
 class SnakeGameMedia extends GameMediaUniversalFunctions {
-  initiator: boolean;
-
   constructor(
     table_id: string,
     username: string,
     instance: string,
     gameId: string,
-    private url: string,
-    initiator: boolean
+    private url: string
   ) {
     super(table_id, username, instance, "snake", gameId);
-    this.initiator = initiator;
-
-    this.connect(this.url);
   }
 
-  private connect = (url: string) => {
-    this.ws = new WebSocket(url);
+  connect = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      this.ws = new WebSocket(this.url);
 
-    this.ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === "userJoined" || message.type === "userLeft") {
-        this.handleUniversalMessage(message);
-      } else {
-        this.handleMessage(message);
-      }
-    };
+      this.ws.onopen = () => {
+        this.joinTable();
+        resolve();
+      };
 
-    this.ws.onopen = () => {
-      this.joinTable();
-    };
+      this.ws.onerror = (err) => {
+        reject(err);
+      };
+    });
   };
 
   sendMessage = (message: OutGoingMessages) => {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
-    }
-  };
-
-  handleMessage = (message: IncomingMessages) => {
-    switch (message.type) {
-      case "snakeDirectionChanged":
-        console.log(
-          `Player ${message.data.playerId} moved snake to ${message.data.direction}`
-        );
-        break;
-      default:
-        break;
     }
   };
 
@@ -91,14 +76,26 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     });
   };
 
-  addSnake = () => {
+  changeGridSize = (gridSize: number) => {
     this.sendMessage({
-      type: "addSnake",
+      type: "changeGridSize",
+      data: {
+        table_id: this.table_id,
+        gameId: this.gameId,
+        gridSize,
+      },
+    });
+  };
+
+  changeSnakeColor = (newSnakeColor: SnakeColorsType) => {
+    this.sendMessage({
+      type: "changeSnakeColor",
       data: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
         gameId: this.gameId,
+        newSnakeColor,
       },
     });
   };

@@ -1,19 +1,25 @@
 import React, { useRef, useState } from "react";
+import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import FgPanel from "../../../fgElements/fgPanel/FgPanel";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgImage from "../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import { snakeColorIconMap, SnakeColorsType } from "./typeConstant";
+import { GameState } from "../SnakeGame";
 
 export default function SnakeColorPickerPanel({
+  snakeGameId,
   snakeColorPickerButtonRef,
   setSnakeColorPanelActive,
-  setSnakeColor,
+  gameState,
 }: {
+  snakeGameId: string;
   snakeColorPickerButtonRef: React.RefObject<HTMLButtonElement>;
   setSnakeColorPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
-  setSnakeColor: React.Dispatch<React.SetStateAction<SnakeColorsType>>;
+  gameState: GameState;
 }) {
+  const { userMedia } = useMediaContext();
+
   const [cols, setCols] = useState(3);
   const snakeColorPickerRef = useRef<HTMLDivElement>(null);
 
@@ -62,10 +68,25 @@ export default function SnakeColorPickerPanel({
                     />
                   )}
                   clickFunction={() => {
-                    setSnakeColor({
-                      primary: primaryColor,
-                      secondary: secondaryColor,
-                    } as SnakeColorsType);
+                    const usedColors = new Set<SnakeColorsType>(
+                      Object.values(gameState.snakes)
+                        .flatMap((instances) => Object.values(instances))
+                        .map((snake) => snake.color)
+                    );
+
+                    if (
+                      !usedColors.has({
+                        primary: primaryColor,
+                        secondary: secondaryColor,
+                      } as SnakeColorsType)
+                    ) {
+                      userMedia.current.games.snake?.[
+                        snakeGameId
+                      ]?.changeSnakeColor({
+                        primary: primaryColor,
+                        secondary: secondaryColor,
+                      } as SnakeColorsType);
+                    }
                   }}
                   hoverContent={
                     <FgHoverContentStandard

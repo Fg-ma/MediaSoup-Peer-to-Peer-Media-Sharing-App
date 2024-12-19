@@ -1,62 +1,51 @@
+import BundlesController from "src/lib/BundlesController";
 import { GameTypes, UserMediaType } from "../context/mediaContext/typeConstant";
 import SnakeGameMedia from "./SnakeGameMedia";
 
-type OutGoingMessages =
-  | {
-      type: "joinTable";
-      data: {
-        table_id: string;
-        username: string;
-        instance: string;
-        socketType: "signaling";
-      };
-    }
-  | {
-      type: "leaveTable";
-      data: {
-        table_id: string;
-        username: string;
-        instance: string;
-        socketType: "signaling";
-      };
-    }
-  | {
-      type: "initiateGame";
-      data: {
-        table_id: string;
-        username: string;
-        instance: string;
-        gameType: GameTypes;
-        gameId: string;
-      };
-    };
+type OutGoingMessages = onJoinTableType | onLeaveTableType | onInitiateGameType;
 
-type IncomingMessages =
-  | {
-      type: "userJoined";
-      data: {
-        table_id: string;
-        username: string;
-        instance: string;
-        socketType: "signaling";
-      };
-    }
-  | {
-      type: "userLeft";
-      data: {
-        table_id: string;
-        username: string;
-        instance: string;
-        socketType: "signaling";
-      };
-    }
-  | {
-      type: "gameInitiated";
-      username: string;
-      instance: string;
-      gameType: GameTypes;
-      gameId: string;
-    };
+type onJoinTableType = {
+  type: "joinTable";
+  data: {
+    table_id: string;
+    username: string;
+    instance: string;
+    socketType: "signaling";
+  };
+};
+
+type onLeaveTableType = {
+  type: "leaveTable";
+  data: {
+    table_id: string;
+    username: string;
+    instance: string;
+    socketType: "signaling";
+  };
+};
+
+type onInitiateGameType = {
+  type: "initiateGame";
+  data: {
+    table_id: string;
+    gameType: GameTypes;
+    gameId: string;
+  };
+};
+
+type IncomingMessages = onGameInitiatedType | onGameClosedType;
+
+type onGameInitiatedType = {
+  type: "gameInitiated";
+  gameType: GameTypes;
+  gameId: string;
+};
+
+type onGameClosedType = {
+  type: "gameClosed";
+  gameType: GameTypes;
+  gameId: string;
+};
 
 class GamesSignalingMedia {
   private ws: WebSocket | undefined;
@@ -70,7 +59,7 @@ class GamesSignalingMedia {
     private bundles: {
       [username: string]: { [instance: string]: React.JSX.Element };
     },
-    private createProducerBundle: () => void
+    private bundlesController: BundlesController
   ) {
     this.connect(this.url);
   }
@@ -108,43 +97,71 @@ class GamesSignalingMedia {
     }
   };
 
-  handleMessage = (message: IncomingMessages) => {
-    switch (message.type) {
-      case "userJoined":
+  handleMessage = (event: IncomingMessages) => {
+    switch (event.type) {
+      case "gameInitiated":
+        this.onGameInitiated(event);
         break;
-      case "userLeft":
+      case "gameClosed":
+        this.onGameClosed(event);
         break;
-      case "gameInitiated": {
-        switch (message.gameType) {
-          case "snake": {
-            if (!this.userMedia.current.games.snake) {
-              this.userMedia.current.games.snake = {};
-            }
-            const snakeGameMedia = new SnakeGameMedia(
-              this.table_id,
-              this.username,
-              this.instance,
-              message.gameId,
-              "ws://localhost:8042",
-              message.username === this.username &&
-                message.instance === this.instance
-            );
-            this.userMedia.current.games.snake[message.gameId] = snakeGameMedia;
-
-            if (
-              !this.bundles[this.username] ||
-              !Object.keys(this.bundles[this.username]).includes(this.instance)
-            ) {
-              this.createProducerBundle();
-            }
-            break;
-          }
-        }
-        break;
-      }
       default:
         break;
     }
+  };
+
+  onGameInitiated = async (event: onGameInitiatedType) => {
+    const { gameType, gameId } = event;
+    switch (gameType) {
+      case "snake": {
+        if (!this.userMedia.current.games.snake) {
+          this.userMedia.current.games.snake = {};
+        }
+        const snakeGameMedia = new SnakeGameMedia(
+          this.table_id,
+          this.username,
+          this.instance,
+          gameId,
+          "ws://localhost:8042"
+        );
+        await snakeGameMedia.connect();
+
+        this.userMedia.current.games.snake[gameId] = snakeGameMedia;
+
+        if (
+          !this.bundles[this.username] ||
+          !Object.keys(this.bundles[this.username]).includes(this.instance)
+        ) {
+          this.bundlesController.createProducerBundle();
+        }
+        break;
+      }
+    }
+  };
+
+  onGameClosed = (event: onGameClosedType) => {
+    const { gameType, gameId } = event;
+
+    switch (gameType) {
+      case "snake":
+        {
+          if (
+            this.userMedia.current.games.snake &&
+            this.userMedia.current.games.snake[gameId]
+          ) {
+            delete this.userMedia.current.games.snake[gameId];
+
+            if (Object.keys(this.userMedia.current.games.snake).length === 0) {
+              delete this.userMedia.current.games.snake;
+            }
+          }
+        }
+        break;
+      default:
+        break;
+    }
+
+    this.bundlesController.cleanUpProducerBundle();
   };
 
   joinTable = () => {
@@ -176,8 +193,6 @@ class GamesSignalingMedia {
       type: "initiateGame",
       data: {
         table_id: this.table_id,
-        username: this.username,
-        instance: this.instance,
         gameType,
         gameId,
       },

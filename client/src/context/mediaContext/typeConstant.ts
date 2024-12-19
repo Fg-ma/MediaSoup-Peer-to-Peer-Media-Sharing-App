@@ -5,7 +5,7 @@ import CameraMedia from "../../lib/CameraMedia";
 import SnakeGameMedia from "../../lib/SnakeGameMedia";
 import ScreenAudioMedia from "../../lib/ScreenAudioMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
-import GamesSignalingMedia from "src/lib/GamesSignalingMedia";
+import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
