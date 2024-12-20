@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState } from "react";
 import FgImage from "../../../../fgImage/FgImage";
 import "./gamePlayerIcon.css";
 
@@ -6,20 +6,15 @@ import placeHolderImage_1280x1262 from "../../../../../../public/backgroundImage
 import placeHolderImage_64x63 from "../../../../../../public/backgroundImages/space/apollo_64x63.png";
 
 export default function GamePlayerIcon({
-  primaryColor = "red",
-  secondaryColor = "blue",
+  primaryColor,
+  secondaryColor,
   shadowColor = { r: 0, g: 0, b: 0 },
 }: {
   primaryColor?: string;
   secondaryColor?: string;
   shadowColor?: { r: number; g: number; b: number };
 }) {
-  const gamePlayerIcon = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    gamePlayerIcon.current?.setAttribute("--primary-color", primaryColor);
-    gamePlayerIcon.current?.setAttribute("--secondary-color", secondaryColor);
-  }, [primaryColor, secondaryColor]);
+  const [hover, setHover] = useState(false);
 
   return (
     <div
@@ -27,8 +22,30 @@ export default function GamePlayerIcon({
       style={{
         boxShadow: `0px 3px 5px rgba(${shadowColor.r}, ${shadowColor.g}, ${shadowColor.b}, 0.6)`,
       }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
-      <div className='game-player-icon-border'></div>
+      <div
+        className='game-player-icon-border absolute inset-0'
+        style={{
+          background: primaryColor
+            ? secondaryColor
+              ? hover
+                ? `linear-gradient(
+            105deg,
+            ${primaryColor} 42.5%,
+            ${secondaryColor} 57.5%
+          )`
+                : `linear-gradient(
+            90deg,
+            ${primaryColor} 42.5%,
+            ${secondaryColor} 57.5%
+          )`
+              : primaryColor
+            : "rgb(230 230 230)",
+          transition: "background 0.5s linear",
+        }}
+      ></div>
       <FgImage
         src={placeHolderImage_1280x1262}
         srcLoading={placeHolderImage_64x63}

@@ -4,12 +4,14 @@ import FgSVG from "../fgElements/fgSVG/FgSVG";
 import panIcon from "../../public/svgs/panIcon.svg";
 
 export default function PanButton({
+  externalRef,
   className,
   dragFunction,
   bundleRef,
   mouseDownFunction,
   mouseUpFunction,
 }: {
+  externalRef?: React.RefObject<HTMLButtonElement>;
   className?: string;
   dragFunction: (displacement: { x: number; y: number }) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
@@ -18,6 +20,7 @@ export default function PanButton({
 }) {
   return (
     <FgButton
+      externalRef={externalRef}
       className={className}
       mouseDownFunction={mouseDownFunction}
       mouseUpFunction={mouseUpFunction}

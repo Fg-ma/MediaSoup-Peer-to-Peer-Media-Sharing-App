@@ -43,14 +43,14 @@ const handleMessage = (ws: GameWebSocket, event: MessageTypes) => {
     case "joinTable":
       tablesController.onJoinTable(ws, event);
       break;
+    case "newGameSocket":
+      tablesController.onNewGameSocket(ws, event);
+      break;
     case "leaveTable":
       tablesController.onLeaveTable(event);
       break;
     case "initiateGame":
       universalGameController.onInitiateGame(event);
-      break;
-    case "stageGame":
-      universalGameController.onStageGame(event);
       break;
     case "startGame":
       universalGameController.onStartGame(event);
@@ -63,6 +63,9 @@ const handleMessage = (ws: GameWebSocket, event: MessageTypes) => {
       break;
     case "leaveGame":
       universalGameController.onLeaveGame(event);
+      break;
+    case "getPlayersState":
+      universalGameController.onGetPlayersState(event);
       break;
     case "snakeDirectionChange":
       snakeGameController.onSnakeDirectionChange(event);

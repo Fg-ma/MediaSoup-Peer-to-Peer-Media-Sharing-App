@@ -5,23 +5,35 @@ import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgImage from "../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import { snakeColorIconMap, SnakeColorsType } from "./typeConstant";
-import { GameState } from "../SnakeGame";
+import { PlayersState } from "../SnakeGame";
 
 export default function SnakeColorPickerPanel({
+  username,
+  instance,
   snakeGameId,
   snakeColorPickerButtonRef,
   setSnakeColorPanelActive,
-  gameState,
+  playersState,
+  userSnakeColor,
 }: {
+  username: string;
+  instance: string;
   snakeGameId: string;
   snakeColorPickerButtonRef: React.RefObject<HTMLButtonElement>;
   setSnakeColorPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
-  gameState: GameState;
+  playersState: PlayersState;
+  userSnakeColor: React.MutableRefObject<SnakeColorsType | undefined>;
 }) {
   const { userMedia } = useMediaContext();
 
   const [cols, setCols] = useState(3);
   const snakeColorPickerRef = useRef<HTMLDivElement>(null);
+
+  const usedColors = new Set<SnakeColorsType>(
+    Object.values(playersState).flatMap((instances) =>
+      Object.values(instances).map((playerState) => playerState.snakeColor)
+    )
+  );
 
   const gridColumnsChange = () => {
     if (!snakeColorPickerRef.current) return;
@@ -59,7 +71,16 @@ export default function SnakeColorPickerPanel({
                 <FgButton
                   key={`${primaryColor}-${secondaryColor}`}
                   scrollingContainerRef={snakeColorPickerRef}
-                  className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3'
+                  className={`flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 ${
+                    playersState[username] &&
+                    playersState[username][instance] &&
+                    playersState[username][instance].snakeColor.primary ===
+                      primaryColor &&
+                    playersState[username][instance].snakeColor.primary ===
+                      secondaryColor
+                      ? "border-fg-secondary"
+                      : "border-gray-300"
+                  }`}
                   contentFunction={() => (
                     <FgImage
                       src={src}
@@ -68,12 +89,6 @@ export default function SnakeColorPickerPanel({
                     />
                   )}
                   clickFunction={() => {
-                    const usedColors = new Set<SnakeColorsType>(
-                      Object.values(gameState.snakes)
-                        .flatMap((instances) => Object.values(instances))
-                        .map((snake) => snake.color)
-                    );
-
                     if (
                       !usedColors.has({
                         primary: primaryColor,
@@ -86,6 +101,10 @@ export default function SnakeColorPickerPanel({
                         primary: primaryColor,
                         secondary: secondaryColor,
                       } as SnakeColorsType);
+                      userSnakeColor.current = {
+                        primary: primaryColor,
+                        secondary: secondaryColor,
+                      } as SnakeColorsType;
                     }
                   }}
                   hoverContent={

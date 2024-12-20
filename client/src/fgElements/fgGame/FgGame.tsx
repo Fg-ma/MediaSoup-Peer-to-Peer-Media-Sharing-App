@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgGameController from "./lib/FgGameController";
 import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
 import ControlButtons from "./lib/ControlButtons";
@@ -13,9 +14,13 @@ const GameTransition: Transition = {
 };
 
 export default function FgGame({
+  table_id,
+  username,
+  instance,
   bundleRef,
   content,
   gameFunctionsSection,
+  players,
   initPosition = { x: 0, y: 0 },
   resizeCallback,
   focusCallback,
@@ -26,9 +31,24 @@ export default function FgGame({
   backgroundColor = "#ffffff",
   secondaryBackgroundColor = "#f3f3f3",
 }: {
+  table_id: string;
+  username: string;
+  instance: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   content?: React.ReactNode;
   gameFunctionsSection?: React.ReactNode;
+  players?: {
+    user?: {
+      primaryColor?: string;
+      secondaryColor?: string;
+      shadowColor?: { r: number; g: number; b: number };
+    };
+    players: {
+      primaryColor?: string;
+      secondaryColor?: string;
+      shadowColor?: { r: number; g: number; b: number };
+    }[];
+  };
   initPosition?: {
     x?: number;
     y?: number;
@@ -59,6 +79,8 @@ export default function FgGame({
     }),
   };
 
+  const { userDataStreams, remoteDataStreams } = useMediaContext();
+
   const [_, setRerender] = useState(false);
   const positioning = useRef<{
     position: { left: number; top: number };
@@ -69,9 +91,14 @@ export default function FgGame({
     scale: { x: 35, y: 35 },
     rotation: 0,
   });
+  const positioningListeners = useRef<{
+    [username: string]: {
+      [instance: string]: () => void;
+    };
+  }>({});
   const [focus, setFocus] = useState(true);
   const [focusClicked, setFocusClicked] = useState(true);
-  const [_adjustingDimensions, setAdjustingDimensions] = useState(false);
+  const [adjustingDimensions, setAdjustingDimensions] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
@@ -79,11 +106,18 @@ export default function FgGame({
   );
 
   const fgGameController = new FgGameController(
+    table_id,
+    username,
+    instance,
     setFocus,
     setFocusClicked,
     gameRef,
     closeGameFunction,
-    startGameFunction
+    startGameFunction,
+    remoteDataStreams,
+    positioningListeners,
+    positioning,
+    setRerender
   );
 
   useEffect(() => {
@@ -159,6 +193,8 @@ export default function FgGame({
   }, [positioning.current.scale]);
 
   useEffect(() => {
+    fgGameController.attachPositioningListeners();
+
     document.addEventListener("keydown", fgGameController.handleKeyDown);
 
     return () => {
@@ -171,6 +207,23 @@ export default function FgGame({
       focusCallback(focus);
     }, [focus]);
   }
+
+  useEffect(() => {
+    if (
+      adjustingDimensions &&
+      userDataStreams.current.positionScaleRotation?.readyState === "open"
+    ) {
+      userDataStreams.current.positionScaleRotation?.send(
+        JSON.stringify({
+          table_id,
+          username,
+          instance,
+          type: "games",
+          positioning: positioning.current,
+        })
+      );
+    }
+  }, [positioning.current]);
 
   return (
     <motion.div
@@ -208,11 +261,11 @@ export default function FgGame({
       exit='init'
       transition={GameTransition}
     >
-      <div className='absolute right-full bottom-0 flex flex-col items-end justify-between w-max h-full'>
-        {gameFunctionsSection}
-        <PlayersSection />
+      <div className='absolute right-full bottom-0 flex flex-col items-end justify-between w-[15%] min-w-14 max-w-24 h-full'>
+        <div className='w-full h-max z-20'>{gameFunctionsSection}</div>
+        <PlayersSection players={players} />
       </div>
-      <div className='absolute left-0 bottom-full flex items-end justify-between w-full h-max space-x-2'>
+      <div className='absolute left-0 bottom-full flex items-center justify-between w-full h-[15%] min-h-14 max-h-24 space-x-2'>
         <ControlButtons
           startGameFunction={startGameFunction}
           joinGameFunction={joinGameFunction}

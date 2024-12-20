@@ -12,7 +12,7 @@ export default function ControlButtons({
   leaveGameFunction?: () => void;
 }) {
   return (
-    <div className='flex items-center justify-center w-max h-10 space-x-2 my-2'>
+    <div className='flex items-center justify-center w-max h-full space-x-2 py-2'>
       <FgGameButton
         className='h-full aspect-square'
         clickFunction={startGameFunction}

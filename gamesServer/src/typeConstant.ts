@@ -41,16 +41,17 @@ export interface SocketData {
 
 export type MessageTypes =
   | onJoinTableType
+  | onNewGameSocketType
   | onLeaveTableType
   | onInitiateGameType
-  | onStageGameType
   | onStartGameType
   | onCloseGameType
   | onSnakeDirectionChangeType
   | onChangeGridSizeType
   | onJoinGameType
   | onLeaveGameType
-  | onChangeSnakeColorType;
+  | onChangeSnakeColorType
+  | onGetPlayersStateType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -58,9 +59,17 @@ export type onJoinTableType = {
     table_id: string;
     username: string;
     instance: string;
-    socketType: SocketTypes;
-    gameType: GameTypes | undefined;
-    gameId: string | undefined;
+  };
+};
+
+export type onNewGameSocketType = {
+  type: "newGameSocket";
+  data: {
+    table_id: string;
+    username: string;
+    instance: string;
+    gameType: GameTypes;
+    gameId: string;
   };
 };
 
@@ -83,15 +92,7 @@ export type onInitiateGameType = {
     table_id: string;
     gameType: GameTypes;
     gameId: string;
-  };
-};
-
-export type onStageGameType = {
-  type: "stageGame";
-  data: {
-    table_id: string;
-    gameType: GameTypes;
-    gameId: string;
+    initiator: { username: string; instance: string };
   };
 };
 
@@ -121,11 +122,23 @@ export type onJoinGameType = {
     instance: string;
     gameType: GameTypes;
     gameId: string;
+    data: object;
   };
 };
 
 export type onLeaveGameType = {
   type: "leaveGame";
+  data: {
+    table_id: string;
+    username: string;
+    instance: string;
+    gameType: GameTypes;
+    gameId: string;
+  };
+};
+
+export type onGetPlayersStateType = {
+  type: "getPlayersState";
   data: {
     table_id: string;
     username: string;

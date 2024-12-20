@@ -32,14 +32,19 @@ type OutGoingMessages =
     };
 
 class SnakeGameMedia extends GameMediaUniversalFunctions {
+  initiator = false;
+
   constructor(
     table_id: string,
     username: string,
     instance: string,
     gameId: string,
-    private url: string
+    private url: string,
+    initiator: boolean
   ) {
     super(table_id, username, instance, "snake", gameId);
+
+    this.initiator = initiator;
   }
 
   connect = (): Promise<void> => {
@@ -47,13 +52,15 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
       this.ws = new WebSocket(this.url);
 
       this.ws.onopen = () => {
-        this.joinTable();
+        this.newGameSocket();
         resolve();
       };
 
       this.ws.onerror = (err) => {
         reject(err);
       };
+
+      this.ws.onclose = () => {};
     });
   };
 

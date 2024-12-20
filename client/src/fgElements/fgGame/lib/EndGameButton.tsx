@@ -1,5 +1,8 @@
 import React from "react";
 import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
+
+import closeIcon from "../../../../public/svgs/closeIcon.svg";
 
 export default function EndGameButton({
   closeGameFunction,
@@ -8,10 +11,19 @@ export default function EndGameButton({
 }) {
   return (
     <FgButton
-      className='bg-fg-primary h-10 w-16 rounded flex items-center justify-center my-2'
+      className='h-full aspect-square rounded flex items-end justify-end py-2 pr-2'
       clickFunction={closeGameFunction}
       contentFunction={() => (
-        <div className='font-K2D text-lg select-none'>End</div>
+        <FgSVG
+          className='flex items-center justify-center h-full max-h-8 aspect-square'
+          src={closeIcon}
+          attributes={[
+            { key: "width", value: "80%" },
+            { key: "height", value: "80%" },
+            { key: "stroke", value: "white" },
+            { key: "fill", value: "white" },
+          ]}
+        />
       )}
     />
   );

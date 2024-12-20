@@ -3,24 +3,19 @@ import {
   Directions,
   foodClasses,
   GameState,
+  PlayersState,
   Snake,
   snakeColors,
   SnakeColorsType,
 } from "./lib/typeConstant";
 
 class SnakeGame {
+  private playerCount = 0;
   private gridSize = 15;
   private gameSpeed = 150;
-  private stagging = false;
   private started = false;
   private gameOver = false;
-  private stageGameTimeout: NodeJS.Timeout | undefined = undefined;
 
-  private initialSnake = [
-    { x: Math.floor(this.gridSize / 2), y: Math.floor(this.gridSize / 2) },
-    { x: Math.floor(this.gridSize / 2), y: Math.floor(this.gridSize / 2) + 1 },
-    { x: Math.floor(this.gridSize / 2), y: Math.floor(this.gridSize / 2) + 2 },
-  ];
   private initialFood = [
     {
       x: Math.floor(Math.random() * this.gridSize),
@@ -44,6 +39,7 @@ class SnakeGame {
     },
   ];
   private gameState: GameState = { snakes: {}, food: this.initialFood };
+  private playersState: PlayersState = {};
   private gameInterval?: NodeJS.Timeout;
 
   constructor(
@@ -58,36 +54,48 @@ class SnakeGame {
       clearInterval(this.gameInterval);
       this.gameInterval = undefined;
     }
-
-    // Clear staging timeout
-    if (this.stageGameTimeout) {
-      clearTimeout(this.stageGameTimeout);
-      this.stageGameTimeout = undefined;
-    }
   };
 
-  joinGame = (username: string, instance: string) => {
-    if (this.started) {
+  joinGame = (
+    username: string,
+    instance: string,
+    data: { snakeColor?: SnakeColorsType }
+  ) => {
+    if (this.playersState[username] && this.playersState[username][instance]) {
       return;
     }
 
-    if (!this.gameState.snakes[username]) {
-      this.gameState.snakes[username] = {};
+    this.playerCount++;
+
+    if (!this.playersState[username]) {
+      this.playersState[username] = {};
     }
 
-    this.gameState.snakes[username][instance] = {
-      position: [...this.initialSnake],
-      direction: "up",
-      color: this.getRandomSnakeColor(),
-    };
+    const color =
+      data.snakeColor && !this.isColorInUse(data.snakeColor)
+        ? data.snakeColor
+        : this.getRandomSnakeColor();
+
+    this.playersState[username][instance] = { snakeColor: color };
+
+    this.broadcaster.broadcastToTable(
+      this.table_id,
+      "games",
+      "snake",
+      this.snakeGameId,
+      {
+        type: "playersStateUpdated",
+        playersState: this.playersState,
+      }
+    );
   };
 
   getRandomSnakeColor = (): SnakeColorsType => {
     // Collect all used colors in a Set for fast lookup
     const usedColors = new Set<SnakeColorsType>(
-      Object.values(this.gameState.snakes)
-        .flatMap((instances) => Object.values(instances))
-        .map((snake) => snake.color)
+      Object.values(this.playersState).flatMap((instances) =>
+        Object.values(instances).map((playerState) => playerState.snakeColor)
+      )
     );
 
     // Filter available colors
@@ -116,6 +124,25 @@ class SnakeGame {
         delete this.gameState.snakes[username];
       }
     }
+
+    if (this.playersState[username] && this.playersState[username][instance]) {
+      delete this.playersState[username][instance];
+
+      if (Object.keys(this.playersState[username]).length === 0) {
+        delete this.playersState[username];
+      }
+    }
+
+    this.broadcaster.broadcastToTable(
+      this.table_id,
+      "games",
+      "snake",
+      this.snakeGameId,
+      {
+        type: "playersStateUpdated",
+        playersState: this.playersState,
+      }
+    );
   };
 
   changeSnakeColor = (
@@ -123,50 +150,38 @@ class SnakeGame {
     instance: string,
     color: SnakeColorsType
   ) => {
-    if (
-      this.gameState.snakes[username] &&
-      this.gameState.snakes[username][instance] &&
-      !this.isColorInUse(color)
-    ) {
-      this.gameState.snakes[username][instance].color = color;
+    if (this.isColorInUse(color)) {
+      return;
     }
+
+    if (!this.playersState[username][instance]) {
+      return;
+    }
+
+    this.playersState[username][instance].snakeColor = color;
+
+    this.broadcaster.broadcastToTable(
+      this.table_id,
+      "games",
+      "snake",
+      this.snakeGameId,
+      {
+        type: "playersStateUpdated",
+        playersState: this.playersState,
+      }
+    );
   };
 
   isColorInUse = (color: SnakeColorsType): boolean => {
     // Collect all used colors in a Set for fast lookup
     const usedColors = new Set<SnakeColorsType>(
-      Object.values(this.gameState.snakes)
-        .flatMap((instances) => Object.values(instances))
-        .map((snake) => snake.color)
+      Object.values(this.playersState).flatMap((instances) =>
+        Object.values(instances).map((playerState) => playerState.snakeColor)
+      )
     );
 
     // Check if the given color is in the set
     return usedColors.has(color);
-  };
-
-  stageGame = () => {
-    if (!this.started && this.stageGameTimeout === undefined) {
-      this.stagging = true;
-      this.started = false;
-      this.gameOver = false;
-
-      this.stageGameTimeout = setTimeout(() => {
-        clearTimeout(this.stageGameTimeout);
-        this.stageGameTimeout = undefined;
-
-        this.startGame();
-
-        this.broadcaster.broadcastToTable(
-          this.table_id,
-          "games",
-          "snake",
-          this.snakeGameId,
-          {
-            type: "gameStarted",
-          }
-        );
-      }, 1000);
-    }
   };
 
   startGame = () => {
@@ -174,13 +189,82 @@ class SnakeGame {
       return;
     }
 
+    const newGridSize = this.calculateGridSize();
+    if (this.gridSize < newGridSize) {
+      this.changeGridSize(newGridSize);
+    }
+    const zones = this.generateZones();
+
+    let i = 0;
+    for (const username in this.playersState) {
+      if (!this.gameState.snakes[username]) {
+        this.gameState.snakes[username] = {};
+      }
+
+      for (const instance in this.playersState[username]) {
+        this.gameState.snakes[username][instance] = {
+          position: this.placeSnake(zones[i]),
+          direction: "up",
+        };
+        i++;
+      }
+    }
+
     this.started = true;
-    this.stagging = false;
     this.gameOver = false;
 
     this.gameInterval = setInterval(() => {
       this.gameLoop();
     }, this.gameSpeed);
+  };
+
+  calculateGridSize = () => {
+    const baseArea = 25;
+    return Math.max(15, Math.ceil(Math.sqrt(this.playerCount * baseArea)));
+  };
+
+  generateZones() {
+    const zones = [];
+    const zoneSize = Math.floor(
+      this.gridSize / Math.ceil(Math.sqrt(this.playerCount))
+    );
+    const edgeBuffer = 3; // No spawn area around edges
+
+    for (let x = edgeBuffer; x < this.gridSize - edgeBuffer; x += zoneSize) {
+      for (let y = edgeBuffer; y < this.gridSize - edgeBuffer; y += zoneSize) {
+        zones.push({
+          xStart: x,
+          xEnd: Math.min(x + zoneSize - 1, this.gridSize - edgeBuffer - 1),
+          yStart: y,
+          yEnd: Math.min(y + zoneSize - 1, this.gridSize - edgeBuffer - 1),
+        });
+      }
+    }
+
+    // Shuffle the zones array
+    for (let i = zones.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [zones[i], zones[j]] = [zones[j], zones[i]];
+    }
+
+    return zones.slice(0, this.playerCount); // Only return zones needed for players
+  }
+
+  placeSnake = (zone: {
+    xStart: number;
+    xEnd: number;
+    yStart: number;
+    yEnd: number;
+  }) => {
+    const snake = [];
+    const startX = Math.floor((zone.xStart + zone.xEnd) / 2);
+    const startY = Math.floor((zone.yStart + zone.yEnd) / 2);
+
+    for (let i = 0; i < 3; i++) {
+      snake.push({ x: startX, y: startY + i });
+    }
+
+    return snake;
   };
 
   changeSnakeDirection = (
@@ -206,7 +290,12 @@ class SnakeGame {
 
         this.eatFood(newSnake, head);
 
-        const gameOver = this.checkEndConditions(newSnake, head);
+        const gameOver = this.checkEndConditions(
+          username,
+          instance,
+          newSnake,
+          head
+        );
 
         if (gameOver) {
           delete this.gameState.snakes[username][instance];
@@ -219,7 +308,6 @@ class SnakeGame {
               this.gameInterval = undefined;
               this.gameOver = true;
               this.started = false;
-              this.stagging = false;
 
               this.broadcaster.broadcastToTable(
                 this.table_id,
@@ -256,7 +344,6 @@ class SnakeGame {
     const newSnake: Snake = {
       direction: snake.direction,
       position: snake.position,
-      color: snake.color,
     };
     const head = { ...newSnake.position[0] };
 
@@ -338,6 +425,8 @@ class SnakeGame {
   };
 
   private checkEndConditions = (
+    username: string,
+    instance: string,
     newSnake: Snake,
     head: {
       x: number;
@@ -354,6 +443,21 @@ class SnakeGame {
         .some((segment) => segment.x === head.x && segment.y === head.y)
     ) {
       return true;
+    }
+
+    for (const snakeUsername in this.gameState.snakes) {
+      for (const snakeInstance in this.gameState.snakes[snakeUsername]) {
+        const snake = this.gameState.snakes[snakeUsername][snakeInstance];
+        if (username !== snakeUsername && instance !== snakeInstance) {
+          if (
+            snake.position.some(
+              (segment) => segment.x === head.x && segment.y === head.y
+            )
+          ) {
+            return true;
+          }
+        }
+      }
     }
 
     return false;
@@ -406,17 +510,20 @@ class SnakeGame {
       }
     }
 
-    this.initialSnake = [
-      { x: Math.floor(this.gridSize / 2), y: Math.floor(this.gridSize / 2) },
+    this.broadcaster.broadcastToTable(
+      this.table_id,
+      "games",
+      "snake",
+      this.snakeGameId,
       {
-        x: Math.floor(this.gridSize / 2),
-        y: Math.floor(this.gridSize / 2) + 1,
-      },
-      {
-        x: Math.floor(this.gridSize / 2),
-        y: Math.floor(this.gridSize / 2) + 2,
-      },
-    ];
+        type: "gridSizeChanged",
+        gridSize,
+      }
+    );
+  };
+
+  getPlayersState = () => {
+    return this.playersState;
   };
 }
 

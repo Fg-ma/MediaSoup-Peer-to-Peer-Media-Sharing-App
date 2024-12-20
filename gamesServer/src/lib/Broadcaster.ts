@@ -74,31 +74,32 @@ class Broadcaster {
   broadcastToInstance = (
     table_id: string,
     username: string,
+    instance: string,
     socketType: SocketTypes,
     gameType: GameTypes | undefined,
     gameId: string | undefined,
     message: object
   ) => {
-    if (tables[table_id] && tables[table_id][username]) {
+    if (
+      tables[table_id] &&
+      tables[table_id][username] &&
+      tables[table_id][username][instance]
+    ) {
       const msg = JSON.stringify(message);
 
-      Object.values(tables[table_id][username]).forEach((socket) => {
-        try {
-          if (socketType === "signaling" && socket.signaling) {
-            socket.signaling.send(msg);
-          } else if (
-            socketType === "games" &&
-            gameType &&
-            socket.games[gameType] &&
-            gameId &&
-            socket.games[gameType][gameId]
-          ) {
-            socket.games[gameType][gameId].send(msg);
-          }
-        } catch (error) {
-          console.error("Failed to send message:", error);
-        }
-      });
+      const socket = tables[table_id][username][instance];
+
+      if (socketType === "signaling" && socket.signaling) {
+        socket.signaling.send(msg);
+      } else if (
+        socketType === "games" &&
+        gameType &&
+        socket.games[gameType] &&
+        gameId &&
+        socket.games[gameType][gameId]
+      ) {
+        socket.games[gameType][gameId].send(msg);
+      }
     }
   };
 }

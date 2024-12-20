@@ -1,26 +1,4 @@
-.game-player-icon {
-  --primary-color: red;
-  --secondary-color: blue;
-}
-
 .game-player-icon .game-player-icon-border {
-  position: absolute;
-  inset: 0;
-  borderradius: 50;
-  background: linear-gradient(
-    90deg,
-    var(--primary-color) 42.5%,
-    var(--secondary-color) 57.5%
-  );
   webkitmask: radial-gradient(circle, transparent 58%, white 62%);
   mask: radial-gradient(circle, transparent 58%, white 62%);
-  transition: "background 0.5s linear";
-}
-
-.game-player-icon .game-player-icon-border:hover {
-  background: linear-gradient(
-    105deg,
-    var(--primary-color) 42.5%,
-    var(--secondary-color) 57.5%
-  );
 }

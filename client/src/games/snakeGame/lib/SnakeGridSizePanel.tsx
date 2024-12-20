@@ -5,11 +5,13 @@ import FgSlider from "../../../fgElements/fgSlider/FgSlider";
 
 export default function SnakeGridSizePanel({
   snakeGameId,
+  started,
   snakeGridSizeButtonRef,
   setGridSizePanelActive,
   setGridSize,
 }: {
   snakeGameId: string;
+  started: boolean;
   snakeGridSizeButtonRef: React.RefObject<HTMLButtonElement>;
   setGridSizePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   setGridSize: React.Dispatch<React.SetStateAction<number>>;
@@ -21,6 +23,17 @@ export default function SnakeGridSizePanel({
       content={
         <div className='h-full w-full flex items-center justify-center'>
           <FgSlider
+            onValueChange={(event) => {
+              if (started) {
+                return;
+              }
+
+              userMedia.current.games.snake?.[snakeGameId].changeGridSize(
+                event.value
+              );
+              setGridSize(event.value);
+            }}
+            disabled={started}
             options={{
               initValue: 15,
               topLabel: "Grid size",
@@ -30,12 +43,6 @@ export default function SnakeGridSizePanel({
               precision: 1,
               snapToWholeNum: true,
               orientation: "horizontal",
-            }}
-            onValueChange={(event) => {
-              userMedia.current.games.snake?.[snakeGameId].changeGridSize(
-                event.value
-              );
-              setGridSize(event.value);
             }}
           />
         </div>

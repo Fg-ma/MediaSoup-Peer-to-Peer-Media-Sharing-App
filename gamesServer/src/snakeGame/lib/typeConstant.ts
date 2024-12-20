@@ -3,12 +3,15 @@ export type Directions = "up" | "down" | "left" | "right";
 export type Snake = {
   position: { x: number; y: number }[];
   direction: Directions;
-  color: SnakeColorsType;
 };
 
 export type GameState = {
   snakes: { [username: string]: { [instance: string]: Snake } };
   food: { x: number; y: number; class: string }[];
+};
+
+export type PlayersState = {
+  [username: string]: { [instance: string]: { snakeColor: SnakeColorsType } };
 };
 
 export type SnakeColorsType =

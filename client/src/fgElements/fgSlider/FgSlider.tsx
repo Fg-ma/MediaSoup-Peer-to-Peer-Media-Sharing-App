@@ -64,13 +64,15 @@ export interface SliderChangeEvent {
 export default function FgSlider({
   externalValue,
   externalStyleValue,
-  options,
   onValueChange,
+  disabled = false,
+  options,
 }: {
   externalValue?: number;
   externalStyleValue?: number;
-  options: SliderOptions;
   onValueChange?: (event: SliderChangeEvent) => void;
+  disabled?: boolean;
+  options: SliderOptions;
 }) {
   const fgSliderOptions = {
     ...defaultFgSliderOptions,
@@ -218,11 +220,16 @@ export default function FgSlider({
   };
 
   const handleMouseDown = (event: React.MouseEvent) => {
+    if (disabled) {
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 
     setSliding(true);
     handleMouseMove(event);
+
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
   };
@@ -243,7 +250,8 @@ export default function FgSlider({
     >
       {fgSliderOptions.topLabel && (
         <div
-          className={`text-black text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
+          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
+            ${disabled ? "text-fg-black-25" : "text-black"}
             ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
             ${
               fgSliderOptions.orientation === "horizontal"
@@ -258,7 +266,7 @@ export default function FgSlider({
             fgSliderOptions.orientation === "horizontal" && (
               <AnimatePresence>
                 <motion.div
-                  className='w-max'
+                  className='w-max select-none'
                   variants={tickVar}
                   initial='init'
                   animate='animate'
@@ -278,7 +286,8 @@ export default function FgSlider({
         `}
       >
         <div
-          className={`relative cursor-pointer rounded hover:shadow-FgSlider
+          className={`relative cursor-pointer rounded 
+            ${disabled ? "" : "hover:shadow-FgSlider"}
             ${fgSliderOptions.orientation === "vertical" ? "w-2.5 h-full" : ""}
             ${
               fgSliderOptions.orientation === "horizontal" ? "h-2.5 w-full" : ""
@@ -291,7 +300,7 @@ export default function FgSlider({
                 : fgSliderOptions.orientation === "horizontal"
                 ? "right"
                 : "top"
-            }, #F56114 ${
+            }, ${disabled ? "#EF9668" : "#F56114"} ${
               externalStyleValue ? externalStyleValue : styleValue
             }%, #e6e6e6 ${
               externalStyleValue ? externalStyleValue : styleValue
@@ -304,7 +313,8 @@ export default function FgSlider({
           {tickPositions.current.map((pos, index) => (
             <div key={pos}>
               <div
-                className={`absolute bg-black rounded-1.5
+                className={`absolute rounded-1.5
+                  ${disabled ? "bg-fg-black-25" : "bg-black"}
                   ${
                     fgSliderOptions.orientation === "vertical"
                       ? "w-3.5 h-1 left-1/2 -translate-x-1/2"
@@ -346,7 +356,8 @@ export default function FgSlider({
                         ? "left"
                         : ""]: `${pos}%`,
                     }}
-                    className={`text-black font-K2D text-sm absolute w-max flex justify-center items-center
+                    className={`select-none font-K2D text-sm absolute w-max flex justify-center items-center
+                      ${disabled ? "text-fg-black-25" : "text-black"}
                       ${
                         fgSliderOptions.orientation === "vertical"
                           ? "left-3.5"
@@ -395,7 +406,8 @@ export default function FgSlider({
             </div>
           ))}
           <div
-            className={`absolute rounded bg-fg-black-20 cursor-pointer
+            className={`absolute rounded cursor-pointer
+              ${disabled ? "bg-fg-black-35" : "bg-fg-black-20"}
               ${
                 fgSliderOptions.orientation === "vertical"
                   ? "w-4.5 h-2.5 left-1/2 -translate-x-1/2"
@@ -438,7 +450,8 @@ export default function FgSlider({
       </div>
       {fgSliderOptions.bottomLabel && (
         <div
-          className={`text-black text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
+          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
+            ${disabled ? "text-fg-black-25" : "text-black"}
             ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
             ${
               fgSliderOptions.orientation === "horizontal"
@@ -453,7 +466,7 @@ export default function FgSlider({
             fgSliderOptions.orientation === "horizontal" && (
               <AnimatePresence>
                 <motion.div
-                  className='w-max'
+                  className='w-max select-none'
                   variants={tickVar}
                   initial='init'
                   animate='animate'

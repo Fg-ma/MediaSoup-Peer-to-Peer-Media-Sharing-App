@@ -1,15 +1,13 @@
 import React from "react";
 import { UserMediaType } from "../../../context/mediaContext/typeConstant";
 import SnakeGameSocket from "./SnakeGameSocket";
-import { Directions, GameState } from "../SnakeGame";
+import { Directions, GameState, PlayersState } from "../SnakeGame";
 
 class SnakeGameController extends SnakeGameSocket {
   private lastKeyPress = 0;
-  private debounceKeyPressTime = 150;
+  private debounceKeyPressTime = 50;
 
   constructor(
-    private username: string,
-    private instance: string,
     private snakeGameId: string,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private gridSize: number,
@@ -18,11 +16,13 @@ class SnakeGameController extends SnakeGameSocket {
     private focused: React.MutableRefObject<boolean>,
     private started: boolean,
     setStarted: React.Dispatch<React.SetStateAction<boolean>>,
-    setStaged: React.Dispatch<React.SetStateAction<boolean>>,
     setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
-    private userDirection: React.MutableRefObject<Directions>
+    private userDirection: React.MutableRefObject<Directions>,
+    setPlayersState: React.Dispatch<React.SetStateAction<PlayersState>>,
+    private playersState: PlayersState,
+    setGridSize: React.Dispatch<React.SetStateAction<number>>
   ) {
-    super(setGameState, setStarted, setStaged, setGameOver);
+    super(setGameState, setStarted, setGameOver, setPlayersState, setGridSize);
 
     this.lastKeyPress = Date.now();
   }
@@ -38,7 +38,8 @@ class SnakeGameController extends SnakeGameSocket {
       key === "arrowup" ||
       key === "arrowdown" ||
       key === "arrowleft" ||
-      key === "arrowright"
+      key === "arrowright" ||
+      key === " "
     ) {
       event.preventDefault();
       event.stopPropagation();
@@ -47,8 +48,7 @@ class SnakeGameController extends SnakeGameSocket {
     if (!this.started && key !== "p") {
       this.setGameOver(false);
       this.userDirection.current = "up";
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.stageGame();
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.joinGame();
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.startGame();
     }
 
     const currentTime = Date.now();
@@ -227,11 +227,13 @@ class SnakeGameController extends SnakeGameSocket {
 
         // Check if the cell is part of a snake
         let isSnakeCell = false;
-        for (const [_username, instances] of Object.entries(
+        for (const [playerUsername, instances] of Object.entries(
           this.gameState.snakes
         )) {
-          for (const [_instance, snakeSegments] of Object.entries(instances)) {
-            const { position, color } = snakeSegments;
+          for (const [playerInstance, snakeSegments] of Object.entries(
+            instances
+          )) {
+            const { position } = snakeSegments;
             const segmentIndex = position.findIndex(
               (segment) => segment.x === x && segment.y === y
             );
@@ -240,7 +242,16 @@ class SnakeGameController extends SnakeGameSocket {
                 position,
                 segmentIndex
               );
-              cellClass = `${className}-${color.primary}-${color.secondary} snake-game-snake`;
+
+              if (
+                this.playersState[playerUsername] &&
+                this.playersState[playerUsername][playerInstance]
+              ) {
+                const { primary, secondary } =
+                  this.playersState[playerUsername][playerInstance].snakeColor;
+
+                cellClass = `${className}-${primary}-${secondary} snake-game-snake`;
+              }
               cellBackgroundRotation = rotation;
               isSnakeCell = true;
               break;
@@ -287,8 +298,7 @@ class SnakeGameController extends SnakeGameSocket {
     if (!this.started) {
       this.setGameOver(false);
       this.userDirection.current = "up";
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.stageGame();
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.joinGame();
+      this.userMedia.current.games.snake?.[this.snakeGameId]?.startGame();
     }
   };
 }

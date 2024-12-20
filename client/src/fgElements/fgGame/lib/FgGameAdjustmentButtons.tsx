@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import PanButton from "../../../fgAdjustmentComponents/PanButton";
 import RotateButton from "../../../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../../../fgAdjustmentComponents/ScaleButton";
@@ -25,6 +25,8 @@ export default function FgGameAdjustmentButtons({
   setAdjustingDimensions: React.Dispatch<React.SetStateAction<boolean>>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const panBtnRef = useRef<HTMLButtonElement>(null);
+
   const fgContentAdjustmentController = new FgContentAdjustmentController(
     bundleRef,
     positioning,
@@ -35,9 +37,7 @@ export default function FgGameAdjustmentButtons({
   return (
     <>
       <RotateButton
-        className={
-          "rotate-btn absolute left-full bottom-full w-6 aspect-square z-10"
-        }
+        className='rotate-btn absolute left-full bottom-full aspect-square z-10 w-[10%] min-w-8 max-w-14'
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
             return;
@@ -65,9 +65,8 @@ export default function FgGameAdjustmentButtons({
         }
       />
       <PanButton
-        className={
-          "pan-btn absolute left-full top-1/2 -translate-y-1/2 w-7 aspect-square z-10 pl-1"
-        }
+        externalRef={panBtnRef}
+        className='pan-btn absolute left-full top-1/2 -translate-y-1/2 aspect-square z-10 pl-1 w-[10%] min-w-7 max-w-[3.25rem]'
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
@@ -85,15 +84,17 @@ export default function FgGameAdjustmentButtons({
               bundleRef.current.clientHeight,
           };
 
+          const buttonWidth = (panBtnRef.current?.clientWidth ?? 0) / 2;
+
           fgContentAdjustmentController.movementDragFunction(
             displacement,
             {
               x:
-                -15 * Math.cos(angle) -
+                -buttonWidth * Math.cos(angle) -
                 pixelScale.x * Math.cos(angle) -
                 (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
               y:
-                15 * Math.sin(angle) +
+                buttonWidth * Math.sin(angle) +
                 pixelScale.x * Math.sin(angle) -
                 (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
             },
@@ -119,9 +120,7 @@ export default function FgGameAdjustmentButtons({
         }
       />
       <ScaleButton
-        className={
-          "scale-btn absolute left-full top-full w-6 aspect-square z-10 pl-1 pt-1"
-        }
+        className='scale-btn absolute left-full top-full aspect-square z-10 pl-1 pt-1 w-[10%] min-w-6 max-w-12'
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
