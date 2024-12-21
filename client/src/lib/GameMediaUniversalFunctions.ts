@@ -68,6 +68,16 @@ type OutGoingUniversalMessages =
         gameType: GameTypes;
         gameId: string;
       };
+    }
+  | {
+      type: "getIntialGameStates";
+      data: {
+        table_id: string;
+        username: string;
+        instance: string;
+        gameType: GameTypes;
+        gameId: string;
+      };
     };
 
 class GameMediaUniversalFunctions {
@@ -166,6 +176,19 @@ class GameMediaUniversalFunctions {
   getPlayersState = () => {
     this.sendUniversalMessage({
       type: "getPlayersState",
+      data: {
+        table_id: this.table_id,
+        username: this.username,
+        instance: this.instance,
+        gameType: this.gameType,
+        gameId: this.gameId,
+      },
+    });
+  };
+
+  getIntialGameStates = () => {
+    this.sendUniversalMessage({
+      type: "getIntialGameStates",
       data: {
         table_id: this.table_id,
         username: this.username,

@@ -8,7 +8,6 @@ import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/F
 
 import joystickIcon from "../../../../public/svgs/games/joystickIcon.svg";
 import snakeGameIcon from "../../../../public/svgs/games/snake/snakeGameIcon.svg";
-import snakeGameOffIcon from "../../../../public/svgs/games/snake/snakeGameOffIcon.svg";
 
 export default function GamesSection({
   table_id,
@@ -22,7 +21,6 @@ export default function GamesSection({
   const { userMedia } = useMediaContext();
 
   const [gamesActive, setGamesActive] = useState(false);
-  const [snakeGameActive, setSnakeGameActive] = useState(false);
   const [cols, setCols] = useState(3);
   const gamesButtonRef = useRef<HTMLButtonElement>(null);
   const gamesSectionRef = useRef<HTMLDivElement>(null);
@@ -95,7 +93,7 @@ export default function GamesSection({
                 className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3'
                 contentFunction={() => (
                   <FgSVG
-                    src={snakeGameActive ? snakeGameOffIcon : snakeGameIcon}
+                    src={snakeGameIcon}
                     className='h-full aspect-square'
                     attributes={[
                       { key: "width", value: "100%" },
@@ -108,21 +106,13 @@ export default function GamesSection({
                     return;
                   }
 
-                  if (!snakeGameActive) {
-                    userMedia.current.gamesSignaling?.initiateGame(
-                      "snake",
-                      `snake_game_${uuidv4()}`
-                    );
-                  } else {
-                    console.log("leave");
-                  }
-
-                  setSnakeGameActive((prev) => !prev);
+                  userMedia.current.gamesSignaling?.initiateGame(
+                    "snake",
+                    `snake_game_${uuidv4()}`
+                  );
                 }}
                 hoverContent={
-                  <FgHoverContentStandard
-                    content={snakeGameActive ? "Close snake" : "Open snake"}
-                  />
+                  <FgHoverContentStandard content='Start snake game' />
                 }
                 options={{ hoverTimeoutDuration: 350 }}
               />

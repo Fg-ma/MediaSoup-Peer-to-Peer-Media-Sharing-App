@@ -3,8 +3,11 @@ import {
   onBundleMetadataResponseType,
   onRequestBundleMetadataType,
   onRequestCatchUpDataType,
+  onRequestGameCatchUpDataType,
   onResponseCatchUpDataType,
+  onResponseGameCatchUpDataType,
 } from "../mediasoupTypes";
+import { tableProducers } from "../mediasoupVars";
 
 class MetadataController {
   constructor(private io: SocketIOServer) {}
@@ -53,6 +56,35 @@ class MetadataController {
       .emit("message", msg);
   };
 
+  onRequestGameCatchUpData = (event: onRequestGameCatchUpDataType) => {
+    const { table_id, inquiringUsername, inquiringInstance, gameId } = event;
+
+    let validUser: { username: string; instance: string } | undefined =
+      undefined;
+
+    for (const username in tableProducers[table_id]) {
+      if (username !== inquiringUsername) {
+        for (const instance in tableProducers[table_id][username]) {
+          if (instance !== inquiringInstance) {
+            validUser = { username, instance };
+          }
+        }
+      }
+    }
+
+    if (validUser) {
+      const msg = {
+        type: "requestedGameCatchUpData",
+        inquiringUsername: inquiringUsername,
+        inquiringInstance: inquiringInstance,
+        gameId: gameId,
+      };
+      this.io
+        .to(`instance_${table_id}_${validUser.username}_${validUser.instance}`)
+        .emit("message", msg);
+    }
+  };
+
   onResponseCatchUpData = (event: onResponseCatchUpDataType) => {
     const msg = {
       type: "responsedCatchUpData",
@@ -66,6 +98,25 @@ class MetadataController {
       .to(
         `instance_${event.table_id}_${event.inquiringUsername}_${event.inquiringInstance}`
       )
+      .emit("message", msg);
+  };
+
+  onResponseGameCatchUpData = (event: onResponseGameCatchUpDataType) => {
+    const {
+      table_id,
+      inquiringUsername,
+      inquiringInstance,
+      gameId,
+      positioning,
+    } = event;
+
+    const msg = {
+      type: "responsedGameCatchUpData",
+      gameId,
+      positioning: positioning,
+    };
+    this.io
+      .to(`instance_${table_id}_${inquiringUsername}_${inquiringInstance}`)
       .emit("message", msg);
   };
 }

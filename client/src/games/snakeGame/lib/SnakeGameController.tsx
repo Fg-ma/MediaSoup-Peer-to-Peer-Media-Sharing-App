@@ -1,12 +1,9 @@
 import React from "react";
 import { UserMediaType } from "../../../context/mediaContext/typeConstant";
 import SnakeGameSocket from "./SnakeGameSocket";
-import { Directions, GameState, PlayersState } from "../SnakeGame";
+import { GameState, PlayersState } from "./typeConstant";
 
 class SnakeGameController extends SnakeGameSocket {
-  private lastKeyPress = 0;
-  private debounceKeyPressTime = 50;
-
   constructor(
     private snakeGameId: string,
     private userMedia: React.MutableRefObject<UserMediaType>,
@@ -17,14 +14,11 @@ class SnakeGameController extends SnakeGameSocket {
     private started: boolean,
     setStarted: React.Dispatch<React.SetStateAction<boolean>>,
     setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
-    private userDirection: React.MutableRefObject<Directions>,
     setPlayersState: React.Dispatch<React.SetStateAction<PlayersState>>,
     private playersState: PlayersState,
     setGridSize: React.Dispatch<React.SetStateAction<number>>
   ) {
     super(setGameState, setStarted, setGameOver, setPlayersState, setGridSize);
-
-    this.lastKeyPress = Date.now();
   }
 
   handleKeyPress = (event: KeyboardEvent) => {
@@ -47,80 +41,42 @@ class SnakeGameController extends SnakeGameSocket {
 
     if (!this.started && key !== "p") {
       this.setGameOver(false);
-      this.userDirection.current = "up";
       this.userMedia.current.games.snake?.[this.snakeGameId]?.startGame();
     }
 
-    const currentTime = Date.now();
-
-    if (currentTime - this.lastKeyPress < this.debounceKeyPressTime) {
-      return;
-    }
-
-    let validKeyPress = false;
     let newDirection: "up" | "down" | "left" | "right" | undefined = undefined;
 
     switch (key) {
       case "w":
-        if (this.userDirection.current !== "down") {
-          validKeyPress = true;
-          newDirection = "up";
-        }
+        newDirection = "up";
         break;
       case "arrowup":
-        if (this.userDirection.current !== "down") {
-          validKeyPress = true;
-          newDirection = "up";
-        }
+        newDirection = "up";
         break;
       case "s":
-        if (this.userDirection.current !== "up") {
-          validKeyPress = true;
-          newDirection = "down";
-        }
+        newDirection = "down";
         break;
       case "arrowdown":
-        if (this.userDirection.current !== "up") {
-          validKeyPress = true;
-          newDirection = "down";
-        }
+        newDirection = "down";
         break;
       case "a":
-        if (this.userDirection.current !== "right") {
-          validKeyPress = true;
-          newDirection = "left";
-        }
+        newDirection = "left";
         break;
       case "arrowleft":
-        if (this.userDirection.current !== "right") {
-          validKeyPress = true;
-          newDirection = "left";
-        }
+        newDirection = "left";
         break;
       case "d":
-        if (this.userDirection.current !== "left") {
-          validKeyPress = true;
-          newDirection = "right";
-        }
+        newDirection = "right";
         break;
       case "arrowright":
-        if (this.userDirection.current !== "left") {
-          validKeyPress = true;
-          newDirection = "right";
-        }
+        newDirection = "right";
         break;
     }
 
-    if (validKeyPress) {
-      this.lastKeyPress = currentTime;
-
-      if (newDirection && newDirection !== this.userDirection.current) {
-        this.userDirection.current = newDirection;
-
-        this.userMedia.current.games.snake?.[
-          this.snakeGameId
-        ]?.snakeDirectionChange(newDirection);
-      }
+    if (newDirection) {
+      this.userMedia.current.games.snake?.[
+        this.snakeGameId
+      ]?.snakeDirectionChange(newDirection);
     }
   };
 
@@ -297,7 +253,6 @@ class SnakeGameController extends SnakeGameSocket {
   startGameClick = () => {
     if (!this.started) {
       this.setGameOver(false);
-      this.userDirection.current = "up";
       this.userMedia.current.games.snake?.[this.snakeGameId]?.startGame();
     }
   };

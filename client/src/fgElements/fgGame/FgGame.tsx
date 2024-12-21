@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Socket } from "socket.io-client";
 import { Transition, Variants, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgGameController from "./lib/FgGameController";
@@ -6,6 +7,7 @@ import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
 import ControlButtons from "./lib/ControlButtons";
 import PlayersSection from "./lib/playersSection/PlayersSection";
 import EndGameButton from "./lib/EndGameButton";
+import "./lib/fgGame.css";
 
 const GameTransition: Transition = {
   transition: {
@@ -14,9 +16,12 @@ const GameTransition: Transition = {
 };
 
 export default function FgGame({
+  socket,
   table_id,
   username,
   instance,
+  gameId,
+  gameStarted,
   bundleRef,
   content,
   gameFunctionsSection,
@@ -31,9 +36,12 @@ export default function FgGame({
   backgroundColor = "#ffffff",
   secondaryBackgroundColor = "#f3f3f3",
 }: {
+  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
+  gameId: string;
+  gameStarted: boolean;
   bundleRef: React.RefObject<HTMLDivElement>;
   content?: React.ReactNode;
   gameFunctionsSection?: React.ReactNode;
@@ -97,6 +105,7 @@ export default function FgGame({
     };
   }>({});
   const [focus, setFocus] = useState(true);
+  const [hideControls, setHideControls] = useState(true);
   const [focusClicked, setFocusClicked] = useState(true);
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
@@ -104,13 +113,24 @@ export default function FgGame({
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
     undefined
   );
+  const mouseLeaveHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
+    undefined
+  );
+  const mouseStillHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
+    undefined
+  );
 
   const fgGameController = new FgGameController(
+    socket,
     table_id,
-    username,
-    instance,
+    gameId,
+    gameStarted,
     setFocus,
     setFocusClicked,
+    focusClicked,
+    setHideControls,
+    mouseLeaveHideControlsTimeout,
+    mouseStillHideControlsTimeout,
     gameRef,
     closeGameFunction,
     startGameFunction,
@@ -193,11 +213,28 @@ export default function FgGame({
   }, [positioning.current.scale]);
 
   useEffect(() => {
+    socket.current.on("message", fgGameController.handleMessage);
+
+    const msg = {
+      type: "requestGameCatchUpData",
+      table_id: table_id,
+      inquiringUsername: username,
+      inquiringInstance: instance,
+      gameId: gameId,
+    };
+    socket.current.send(msg);
+
     fgGameController.attachPositioningListeners();
 
     document.addEventListener("keydown", fgGameController.handleKeyDown);
 
     return () => {
+      Object.values(positioningListeners.current).forEach((userListners) =>
+        Object.values(userListners).forEach((removeListener) =>
+          removeListener()
+        )
+      );
+      socket.current.off("message", fgGameController.handleMessage);
       document.removeEventListener("keydown", fgGameController.handleKeyDown);
     };
   }, []);
@@ -216,8 +253,7 @@ export default function FgGame({
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           table_id,
-          username,
-          instance,
+          gameId,
           type: "games",
           positioning: positioning.current,
         })
@@ -228,18 +264,13 @@ export default function FgGame({
   return (
     <motion.div
       ref={gameRef}
-      onMouseEnter={() => {
-        setFocus(true);
-      }}
-      onMouseLeave={() => {
-        if (!focusClicked) {
-          setFocus(false);
-        }
-      }}
+      onMouseEnter={fgGameController.handleMouseEnter}
+      onMouseLeave={fgGameController.handleMouseLeave}
+      onMouseMove={fgGameController.handleMouseMove}
       onMouseDown={fgGameController.handleGameClick}
-      className={`${
+      className={`fg-game ${
         focusClicked ? "z-[50]" : focus ? "z-[49]" : "z-0"
-      } rounded absolute`}
+      } ${hideControls ? "hide-controls" : ""} rounded absolute`}
       style={{
         left: `${positioning.current.position.left}%`,
         top: `${positioning.current.position.top}%`,
@@ -261,11 +292,11 @@ export default function FgGame({
       exit='init'
       transition={GameTransition}
     >
-      <div className='absolute right-full bottom-0 flex flex-col items-end justify-between w-[15%] min-w-14 max-w-24 h-full'>
+      <div className='fg-game-left-controls-section absolute right-full bottom-0 flex flex-col items-end justify-between w-[15%] min-w-14 max-w-24 h-full'>
         <div className='w-full h-max z-20'>{gameFunctionsSection}</div>
         <PlayersSection players={players} />
       </div>
-      <div className='absolute left-0 bottom-full flex items-center justify-between w-full h-[15%] min-h-14 max-h-24 space-x-2'>
+      <div className='fg-game-top-controls-section absolute left-0 bottom-full flex items-center justify-between w-full h-[15%] min-h-10 max-h-16 space-x-2 overflow-x-auto'>
         <ControlButtons
           startGameFunction={startGameFunction}
           joinGameFunction={joinGameFunction}

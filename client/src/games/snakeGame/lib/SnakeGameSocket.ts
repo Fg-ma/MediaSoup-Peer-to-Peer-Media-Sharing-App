@@ -1,4 +1,4 @@
-import { GameState, PlayersState } from "../SnakeGame";
+import { GameState, PlayersState } from "./typeConstant";
 
 type Messages =
   | onGameStartedType
@@ -6,7 +6,7 @@ type Messages =
   | onGameOverType
   | onPlayersStateUpdatedType
   | onGridSizeChangedType
-  | onPlayersStateReturnedtype;
+  | onInitialGameStatesReturnedType;
 
 type onGameStartedType = {
   type: "gameStarted";
@@ -33,9 +33,13 @@ type onGridSizeChangedType = {
   gridSize: number;
 };
 
-type onPlayersStateReturnedtype = {
-  type: "playersStateReturned";
-  playersState: PlayersState;
+type onInitialGameStatesReturnedType = {
+  type: "initialGameStatesReturned";
+  initialGameStates: {
+    started: boolean;
+    gameOver: boolean;
+    playersState: PlayersState;
+  };
 };
 
 class SnakeGameSocket {
@@ -66,8 +70,8 @@ class SnakeGameSocket {
       case "gridSizeChanged":
         this.onGridSizeChanged(event);
         break;
-      case "playersStateReturned":
-        this.onPlayersStateReturned(event);
+      case "initialGameStatesReturned":
+        this.onInitialGameStatesReturned(event);
         break;
       default:
         break;
@@ -89,7 +93,6 @@ class SnakeGameSocket {
   };
 
   private onPlayersStateUpdated = (event: onPlayersStateUpdatedType) => {
-    console.log(event);
     this.setPlayersState(event.playersState);
   };
 
@@ -97,8 +100,14 @@ class SnakeGameSocket {
     this.setGridSize(event.gridSize);
   };
 
-  private onPlayersStateReturned = (event: onPlayersStateReturnedtype) => {
-    this.setPlayersState(event.playersState);
+  private onInitialGameStatesReturned = (
+    event: onInitialGameStatesReturnedType
+  ) => {
+    const { started, gameOver, playersState } = event.initialGameStates;
+
+    this.setStarted(started);
+    this.setGameOver(gameOver);
+    this.setPlayersState(playersState);
   };
 }
 

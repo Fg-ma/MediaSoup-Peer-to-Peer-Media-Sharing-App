@@ -59,8 +59,6 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
       this.ws.onerror = (err) => {
         reject(err);
       };
-
-      this.ws.onclose = () => {};
     });
   };
 

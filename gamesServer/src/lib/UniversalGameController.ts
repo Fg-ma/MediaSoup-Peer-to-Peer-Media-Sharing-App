@@ -8,6 +8,7 @@ import {
   onJoinGameType,
   onLeaveGameType,
   onGetPlayersStateType,
+  onGetIntialGameStatesType,
 } from "../typeConstant";
 import SnakeGame from "../snakeGame/SnakeGame";
 import { SnakeColorsType } from "src/snakeGame/lib/typeConstant";
@@ -59,8 +60,15 @@ class UniversalGameController {
   onCloseGame = (event: onCloseGameType) => {
     const { table_id, gameType, gameId } = event.data;
 
-    if (gameType === "snake") {
-      snakeGames[table_id][gameId].closeGame();
+    for (const username in tables[table_id]) {
+      for (const instance in tables[table_id][username]) {
+        if (
+          tables[table_id][username][instance].games[gameType] &&
+          tables[table_id][username][instance].games[gameType][gameId]
+        ) {
+          tables[table_id][username][instance].games[gameType][gameId].close();
+        }
+      }
     }
 
     this.broadcaster.broadcastToTable(
@@ -74,24 +82,6 @@ class UniversalGameController {
         gameId,
       }
     );
-
-    for (const username in tables[table_id]) {
-      for (const instance in tables[table_id][username]) {
-        if (
-          tables[table_id][username][instance].games[gameType] &&
-          tables[table_id][username][instance].games[gameType][gameId]
-        ) {
-          delete tables[table_id][username][instance].games[gameType][gameId];
-
-          if (
-            Object.keys(tables[table_id][username][instance].games[gameType])
-              .length === 0
-          ) {
-            delete tables[table_id][username][instance].games[gameType];
-          }
-        }
-      }
-    }
   };
 
   onJoinGame = (event: onJoinGameType) => {
@@ -145,6 +135,33 @@ class UniversalGameController {
       {
         type: "playersStateReturned",
         playersState,
+      }
+    );
+  };
+
+  onGetIntialGameStates = (event: onGetIntialGameStatesType) => {
+    const { table_id, username, instance, gameType, gameId } = event.data;
+
+    let initialGameStates = {};
+
+    switch (gameType) {
+      case "snake":
+        initialGameStates = snakeGames[table_id][gameId].getIntialGameStates();
+        break;
+      default:
+        break;
+    }
+
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      username,
+      instance,
+      "games",
+      gameType,
+      gameId,
+      {
+        type: "initialGameStatesReturned",
+        initialGameStates,
       }
     );
   };

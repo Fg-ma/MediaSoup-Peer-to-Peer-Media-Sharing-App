@@ -415,6 +415,7 @@ export default function Bundle({
           ([snakeGameId, _snakeGame]) => (
             <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
               <SnakeGame
+                socket={socket}
                 table_id={table_id}
                 username={username}
                 instance={instance}

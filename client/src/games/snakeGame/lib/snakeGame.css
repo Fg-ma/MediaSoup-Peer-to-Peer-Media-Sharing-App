@@ -1,17 +1,18 @@
 .snake-game-board {
-  --grid-size: 1;
   background-color: #7db543;
   aspect-ratio: 1 / 1 !important;
 }
 
 .snake-game-board .snake-game-row {
+  flex-grow: 1;
   display: flex;
   width: 100%;
-  height: calc(100% / var(--grid-size));
+  justify-content: stretch;
 }
 
 .snake-game-board .snake-game-cell {
-  width: calc(100% / var(--grid-size));
+  overflow: hidden;
+  flex-grow: 1;
   height: 100%;
 }
 
@@ -24,13 +25,13 @@
 }
 
 .snake-game-board .snake-game-snake {
-  background-size: contain;
+  background-size: 101% 101%;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .snake-game-board .snake-game-food {
-  background-size: contain;
+  background-size: 101% 101%;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -321,7 +322,7 @@
 
 /* green-yellow */
 .snake-game-board .snake-game-snake-head-green-yellow {
-  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadGreenGreen.png");
+  background-image: url("../../../../public/snakeGameAssets/snake/snakeHeadGreenYellow.png");
 }
 
 .snake-game-board .snake-game-snake-tail-green-yellow {

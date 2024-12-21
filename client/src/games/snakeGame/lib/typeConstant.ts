@@ -126,6 +126,47 @@ export type SnakeColorsType =
       secondary: "yellow";
     };
 
+export type Directions = "up" | "down" | "left" | "right";
+
+export type Snake = {
+  position: { x: number; y: number }[];
+  direction: Directions;
+};
+
+export type GameState = {
+  snakes: { [username: string]: { [instance: string]: Snake } };
+  food: { x: number; y: number; class: string }[];
+};
+
+export type PlayersState = {
+  [username: string]: { [instance: string]: { snakeColor: SnakeColorsType } };
+};
+
+type ColorMapColors =
+  | "black"
+  | "blue"
+  | "green"
+  | "orange"
+  | "pink"
+  | "red"
+  | "white";
+
+export const colorMap: {
+  [key in ColorMapColors]: {
+    r: number;
+    g: number;
+    b: number;
+  };
+} = {
+  black: { r: 0, g: 0, b: 0 },
+  blue: { r: 0, g: 0, b: 255 },
+  green: { r: 0, g: 128, b: 0 },
+  orange: { r: 255, g: 165, b: 0 },
+  pink: { r: 255, g: 192, b: 203 },
+  red: { r: 255, g: 0, b: 0 },
+  white: { r: 255, g: 255, b: 255 },
+};
+
 export const foodClasses = [
   "snake-game-apple",
   "snake-game-banana",

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Socket } from "socket.io-client";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgGame from "../../fgElements/fgGame/FgGame";
 import FgButton from "../../fgElements/fgButton/FgButton";
@@ -7,7 +8,13 @@ import FgImage from "../../fgElements/fgImage/FgImage";
 import SnakeGameController from "./lib/SnakeGameController";
 import SnakeColorPickerPanel from "./lib/SnakeColorPickerPanel";
 import SnakeGridSizePanel from "./lib/SnakeGridSizePanel";
-import { snakeColorIconMap, SnakeColorsType } from "./lib/typeConstant";
+import {
+  colorMap,
+  GameState,
+  PlayersState,
+  snakeColorIconMap,
+  SnakeColorsType,
+} from "./lib/typeConstant";
 import "./lib/snakeGame.css";
 
 import gameOverCard from "../../../public/snakeGameAssets/gameOverCard.jpg";
@@ -16,33 +23,15 @@ import snakeColorChangeIcon from "../../../public/svgs/games/snake/snakeColorCha
 import gridIcon from "../../../public/svgs/games/snake/gridIcon.svg";
 import gridOffIcon from "../../../public/svgs/games/snake/gridOffIcon.svg";
 
-export type Directions = "up" | "down" | "left" | "right";
-
-export type Snake = {
-  position: { x: number; y: number }[];
-  direction: Directions;
-};
-
-export type GameState = {
-  snakes: { [username: string]: { [instance: string]: Snake } };
-  food: { x: number; y: number; class: string }[];
-};
-
-export type UsedSnakeColors = {
-  [username: string]: { [instance: string]: SnakeColorsType };
-};
-
-export type PlayersState = {
-  [username: string]: { [instance: string]: { snakeColor: SnakeColorsType } };
-};
-
 function SnakeGame({
+  socket,
   table_id,
   username,
   instance,
   snakeGameId,
   bundleRef,
 }: {
+  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
@@ -66,7 +55,6 @@ function SnakeGame({
   const boardRef = useRef<HTMLDivElement>(null);
   const snakeColorPickerButtonRef = useRef<HTMLButtonElement>(null);
   const snakeGridSizeButtonRef = useRef<HTMLButtonElement>(null);
-  const userDirection = useRef<Directions>("up");
   const userSnakeColor = useRef<SnakeColorsType | undefined>(undefined);
 
   const snakeGameController = new SnakeGameController(
@@ -79,7 +67,6 @@ function SnakeGame({
     started,
     setStarted,
     setGameOver,
-    userDirection,
     setPlayersState,
     playersState,
     setGridSize
@@ -97,10 +84,6 @@ function SnakeGame({
   }, [started]);
 
   useEffect(() => {
-    boardRef.current?.style.setProperty("--grid-size", `${gridSize}`);
-  }, [gridSize, boardRef.current]);
-
-  useEffect(() => {
     if (
       !userMedia.current.games.snake ||
       !userMedia.current.games.snake[snakeGameId] ||
@@ -111,7 +94,7 @@ function SnakeGame({
       return;
     }
 
-    userMedia.current.games.snake[snakeGameId].getPlayersState();
+    userMedia.current.games.snake[snakeGameId].getIntialGameStates();
 
     userMedia.current.games.snake[snakeGameId].ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
@@ -128,14 +111,17 @@ function SnakeGame({
   return (
     <>
       <FgGame
+        socket={socket}
         table_id={table_id}
         username={username}
         instance={instance}
+        gameId={snakeGameId}
+        gameStarted={started}
         bundleRef={bundleRef}
         content={
           <div
             ref={boardRef}
-            className='snake-game-board w-full aspect-square relative rounded overflow-hidden'
+            className='snake-game-board w-full aspect-square relative rounded overflow-hidden flex flex-col'
           >
             {snakeGameController.renderBoard()}
             {gameOver && (
@@ -255,8 +241,10 @@ function SnakeGame({
                     playersState[username][instance].snakeColor.primary,
                   secondaryColor:
                     playersState[username][instance].snakeColor.secondary,
-                  // shadowColor:
-                  //   playersState[username][instance].snakeColor.primary,
+                  shadowColor:
+                    colorMap[
+                      playersState[username][instance].snakeColor.primary
+                    ],
                 }
               : undefined,
           players: Object.entries(playersState)
@@ -270,6 +258,7 @@ function SnakeGame({
                     return {
                       primaryColor: instanceState.snakeColor.primary,
                       secondaryColor: instanceState.snakeColor.secondary,
+                      shadowColor: colorMap[instanceState.snakeColor.primary],
                     };
                   }
                 }
@@ -280,7 +269,6 @@ function SnakeGame({
         startGameFunction={() => {
           if (!started) {
             setGameOver(false);
-            userDirection.current = "up";
             userMedia.current.games.snake?.[snakeGameId]?.startGame();
           }
         }}

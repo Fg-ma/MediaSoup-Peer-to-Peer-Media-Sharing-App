@@ -87,21 +87,7 @@ class TablesController {
         tables[table_id][username][instance] &&
         tables[table_id][username][instance].signaling
       ) {
-        delete tables[table_id][username][instance].signaling;
-
-        if (
-          Object.keys(tables[table_id][username][instance].games).length === 0
-        ) {
-          delete tables[table_id][username][instance];
-
-          if (Object.keys(tables[table_id][username]).length === 0) {
-            delete tables[table_id][username];
-
-            if (Object.keys(tables[table_id]).length === 0) {
-              delete tables[table_id];
-            }
-          }
-        }
+        tables[table_id][username][instance].signaling.close();
       }
     } else if (socketType === "games") {
       if (
@@ -112,30 +98,7 @@ class TablesController {
         tables[table_id][username][instance].games[gameType] &&
         tables[table_id][username][instance].games[gameType][gameId]
       ) {
-        delete tables[table_id][username][instance].games[gameType][gameId];
-
-        if (
-          Object.keys(tables[table_id][username][instance].games[gameType])
-            .length === 0
-        ) {
-          delete tables[table_id][username][instance].games[gameType];
-
-          if (
-            Object.keys(tables[table_id][username][instance].games).length ===
-              0 &&
-            !tables[table_id][username][instance].signaling
-          ) {
-            delete tables[table_id][username][instance];
-
-            if (Object.keys(tables[table_id][username]).length === 0) {
-              delete tables[table_id][username];
-
-              if (Object.keys(tables[table_id]).length === 0) {
-                delete tables[table_id];
-              }
-            }
-          }
-        }
+        tables[table_id][username][instance].games[gameType][gameId].close();
       }
     }
 

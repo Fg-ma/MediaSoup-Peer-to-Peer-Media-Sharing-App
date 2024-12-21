@@ -39,6 +39,9 @@ class SnakeGame {
     },
   ];
   private gameState: GameState = { snakes: {}, food: this.initialFood };
+  private lastRenderedSnakesState: {
+    [username: string]: { [instance: string]: Snake };
+  } = {};
   private playersState: PlayersState = {};
   private gameInterval?: NodeJS.Timeout;
 
@@ -200,12 +203,14 @@ class SnakeGame {
       if (!this.gameState.snakes[username]) {
         this.gameState.snakes[username] = {};
       }
+      if (!this.lastRenderedSnakesState[username]) {
+        this.lastRenderedSnakesState[username] = {};
+      }
 
       for (const instance in this.playersState[username]) {
-        this.gameState.snakes[username][instance] = {
-          position: this.placeSnake(zones[i]),
-          direction: "up",
-        };
+        this.gameState.snakes[username][instance] = this.placeSnake(zones[i]);
+        this.lastRenderedSnakesState[username][instance] =
+          this.gameState.snakes[username][instance];
         i++;
       }
     }
@@ -260,11 +265,84 @@ class SnakeGame {
     const startX = Math.floor((zone.xStart + zone.xEnd) / 2);
     const startY = Math.floor((zone.yStart + zone.yEnd) / 2);
 
+    // Randomly determine the initial direction
+    const directions: Directions[] = ["up", "down", "left", "right"];
+    const initialDirection =
+      directions[Math.floor(Math.random() * directions.length)];
+
+    // Place the snake based on the random orientation
     for (let i = 0; i < 3; i++) {
-      snake.push({ x: startX, y: startY + i });
+      if (initialDirection === "up") {
+        snake.push({ x: startX, y: startY + i });
+      } else if (initialDirection === "down") {
+        snake.push({ x: startX, y: startY - i });
+      } else if (initialDirection === "left") {
+        snake.push({ x: startX + i, y: startY });
+      } else if (initialDirection === "right") {
+        snake.push({ x: startX - i, y: startY });
+      }
     }
 
-    return snake;
+    return { position: snake, direction: initialDirection };
+  };
+
+  private isValidDirection = (
+    current: Directions,
+    next: Directions
+  ): boolean => {
+    return !(
+      (current === "up" && next === "down") ||
+      (current === "down" && next === "up") ||
+      (current === "left" && next === "right") ||
+      (current === "right" && next === "left")
+    );
+  };
+
+  private calculateFoodCount = (): number => {
+    // Base food count is 2 + 1 food per player, scaled by grid size
+    const baseFood = 2;
+    const playerFactor = this.playerCount;
+    const gridFactor = Math.floor(this.gridSize / 10);
+    return baseFood + playerFactor + gridFactor;
+  };
+
+  private generateFood = (): void => {
+    const targetFoodCount = this.calculateFoodCount();
+    while (this.gameState.food.length < targetFoodCount) {
+      let validSpotFound = false;
+      let attempts = 0;
+
+      while (!validSpotFound && attempts < 10) {
+        const proposedPosition = {
+          x: Math.floor(Math.random() * this.gridSize),
+          y: Math.floor(Math.random() * this.gridSize),
+        };
+
+        const isPositionValid =
+          !Object.values(this.gameState.snakes).some((instanceSnakes) =>
+            Object.values(instanceSnakes).some((snake) =>
+              snake.position.some(
+                (segment) =>
+                  segment.x === proposedPosition.x &&
+                  segment.y === proposedPosition.y
+              )
+            )
+          ) &&
+          !this.gameState.food.some(
+            (item) =>
+              item.x === proposedPosition.x && item.y === proposedPosition.y
+          );
+
+        if (isPositionValid) {
+          this.gameState.food.push({
+            ...proposedPosition,
+            class: foodClasses[Math.floor(Math.random() * foodClasses.length)],
+          });
+          validSpotFound = true;
+        }
+        attempts++;
+      }
+    }
   };
 
   changeSnakeDirection = (
@@ -273,10 +351,17 @@ class SnakeGame {
     direction: Directions
   ) => {
     if (
-      this.started &&
-      this.gameState.snakes[username] &&
-      this.gameState.snakes[username][instance]
+      !this.started ||
+      !this.gameState.snakes[username] ||
+      !this.gameState.snakes[username][instance]
     ) {
+      return;
+    }
+
+    const currentDirection =
+      this.lastRenderedSnakesState[username][instance].direction;
+
+    if (this.isValidDirection(currentDirection, direction)) {
       this.gameState.snakes[username][instance].direction = direction;
     }
   };
@@ -326,6 +411,8 @@ class SnakeGame {
       }
     }
 
+    this.lastRenderedSnakesState = this.gameState.snakes;
+
     this.broadcaster.broadcastToTable(
       this.table_id,
       "games",
@@ -358,68 +445,23 @@ class SnakeGame {
     return { newSnake, head };
   };
 
-  private eatFood = (
-    newSnake: Snake,
-    head: {
-      x: number;
-      y: number;
-    }
-  ) => {
+  private eatFood = (newSnake: Snake, head: { x: number; y: number }): void => {
     const foodEatenIndices = this.gameState.food
-      .map((item, index) => {
-        if (item.x === head.x && item.y === head.y) return index;
-      })
+      .map((item, index) =>
+        item.x === head.x && item.y === head.y ? index : undefined
+      )
       .filter((value) => value !== undefined);
-    if (foodEatenIndices.length !== 0) {
-      // Remove eaten food
+
+    if (foodEatenIndices.length > 0) {
+      // Remove the eaten food
       this.gameState.food = this.gameState.food.filter(
         (_, index) => !foodEatenIndices.includes(index)
       );
 
-      const newFood = [];
-
-      for (const _index of foodEatenIndices) {
-        let attempts = 0;
-        let validSpotFound = false;
-
-        while (attempts < 10 && !validSpotFound) {
-          const proposedPosition = {
-            x: Math.floor(Math.random() * this.gridSize),
-            y: Math.floor(Math.random() * this.gridSize),
-          };
-
-          // Check if the position is valid
-          const isPositionValid =
-            !Object.values(this.gameState.snakes).some((instanceSnakes) =>
-              Object.values(instanceSnakes).some((snake) =>
-                snake.position.some(
-                  (segment) =>
-                    segment.x === proposedPosition.x &&
-                    segment.y === proposedPosition.y
-                )
-              )
-            ) &&
-            !this.gameState.food.some(
-              (item) =>
-                item.x === proposedPosition.x && item.y === proposedPosition.y
-            );
-
-          if (isPositionValid) {
-            newFood.push({
-              ...proposedPosition,
-              class:
-                foodClasses[Math.floor(Math.random() * foodClasses.length)],
-            });
-            validSpotFound = true; // Exit loop
-          }
-
-          attempts++;
-        }
-      }
-
-      this.gameState.food.push(...newFood);
+      // Generate new food up to the target count
+      this.generateFood();
     } else {
-      // Move snake (remove tail)
+      // Move snake (remove tail if no food eaten)
       newSnake.position.pop();
     }
   };
@@ -469,46 +511,8 @@ class SnakeGame {
     }
 
     this.gridSize = gridSize;
-
     this.gameState.food = [];
-
-    for (let i = 0; i < 4; i++) {
-      let attempts = 0;
-      let validSpotFound = false;
-
-      while (attempts < 10 && !validSpotFound) {
-        const proposedPosition = {
-          x: Math.floor(Math.random() * this.gridSize),
-          y: Math.floor(Math.random() * this.gridSize),
-        };
-
-        // Check if the position is valid
-        const isPositionValid =
-          !Object.values(this.gameState.snakes).some((instanceSnakes) =>
-            Object.values(instanceSnakes).some((snake) =>
-              snake.position.some(
-                (segment) =>
-                  segment.x === proposedPosition.x &&
-                  segment.y === proposedPosition.y
-              )
-            )
-          ) &&
-          !this.gameState.food.some(
-            (item) =>
-              item.x === proposedPosition.x && item.y === proposedPosition.y
-          );
-
-        if (isPositionValid) {
-          this.gameState.food.push({
-            ...proposedPosition,
-            class: foodClasses[Math.floor(Math.random() * foodClasses.length)],
-          });
-          validSpotFound = true; // Exit loop
-        }
-
-        attempts++;
-      }
-    }
+    this.generateFood();
 
     this.broadcaster.broadcastToTable(
       this.table_id,
@@ -524,6 +528,14 @@ class SnakeGame {
 
   getPlayersState = () => {
     return this.playersState;
+  };
+
+  getIntialGameStates = () => {
+    return {
+      started: this.started,
+      gameOver: this.gameOver,
+      playersState: this.playersState,
+    };
   };
 }
 

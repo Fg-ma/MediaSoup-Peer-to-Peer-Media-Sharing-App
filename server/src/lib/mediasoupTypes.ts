@@ -60,7 +60,9 @@ export type MediasoupSocketEvents =
   | onPermissionsResponseType
   | onBundleMetadataResponseType
   | onRequestCatchUpDataType
+  | onRequestGameCatchUpDataType
   | onResponseCatchUpDataType
+  | onResponseGameCatchUpDataType
   | onRequestMixEffectActivityChangeType
   | onClientMixEffectActivityChangeType
   | onRequestMixEffectValueChangeType
@@ -302,6 +304,14 @@ export type onRequestCatchUpDataType = {
   inquiredProducerId: string;
 };
 
+export type onRequestGameCatchUpDataType = {
+  type: "requestGameCatchUpData";
+  table_id: string;
+  inquiringUsername: string;
+  inquiringInstance: string;
+  gameId: string;
+};
+
 export type onResponseCatchUpDataType = {
   type: "responseCatchUpData";
   table_id: string;
@@ -356,6 +366,25 @@ export type onResponseCatchUpDataType = {
         };
       }
     | undefined;
+};
+
+export type onResponseGameCatchUpDataType = {
+  type: "responseGameCatchUpData";
+  table_id: string;
+  inquiringUsername: string;
+  inquiringInstance: string;
+  gameId: string;
+  positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
 };
 
 export type onRequestMixEffectActivityChangeType = {

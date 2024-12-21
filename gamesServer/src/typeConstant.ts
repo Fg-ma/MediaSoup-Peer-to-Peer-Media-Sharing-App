@@ -44,14 +44,15 @@ export type MessageTypes =
   | onNewGameSocketType
   | onLeaveTableType
   | onInitiateGameType
-  | onStartGameType
-  | onCloseGameType
-  | onSnakeDirectionChangeType
-  | onChangeGridSizeType
   | onJoinGameType
   | onLeaveGameType
-  | onChangeSnakeColorType
-  | onGetPlayersStateType;
+  | onStartGameType
+  | onCloseGameType
+  | onGetPlayersStateType
+  | onGetIntialGameStatesType
+  | onSnakeDirectionChangeType
+  | onChangeGridSizeType
+  | onChangeSnakeColorType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -139,6 +140,17 @@ export type onLeaveGameType = {
 
 export type onGetPlayersStateType = {
   type: "getPlayersState";
+  data: {
+    table_id: string;
+    username: string;
+    instance: string;
+    gameType: GameTypes;
+    gameId: string;
+  };
+};
+
+export type onGetIntialGameStatesType = {
+  type: "getIntialGameStates";
   data: {
     table_id: string;
     username: string;
