@@ -4,20 +4,21 @@ import FgPanel from "../../../fgElements/fgPanel/FgPanel";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgImage from "../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import { snakeColorIconMap, SnakeColorsType } from "./typeConstant";
-import { PlayersState } from "../SnakeGame";
+import {
+  PlayersState,
+  snakeColorIconMap,
+  SnakeColorsType,
+} from "./typeConstant";
 
 export default function SnakeColorPickerPanel({
-  username,
-  instance,
+  externalRef,
   snakeGameId,
   snakeColorPickerButtonRef,
   setSnakeColorPanelActive,
   playersState,
   userSnakeColor,
 }: {
-  username: string;
-  instance: string;
+  externalRef: React.RefObject<HTMLDivElement>;
   snakeGameId: string;
   snakeColorPickerButtonRef: React.RefObject<HTMLButtonElement>;
   setSnakeColorPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,10 +30,8 @@ export default function SnakeColorPickerPanel({
   const [cols, setCols] = useState(3);
   const snakeColorPickerRef = useRef<HTMLDivElement>(null);
 
-  const usedColors = new Set<SnakeColorsType>(
-    Object.values(playersState).flatMap((instances) =>
-      Object.values(instances).map((playerState) => playerState.snakeColor)
-    )
+  const usedColors = Object.values(playersState).flatMap((instances) =>
+    Object.values(instances).map((playerState) => playerState.snakeColor)
   );
 
   const gridColumnsChange = () => {
@@ -52,6 +51,7 @@ export default function SnakeColorPickerPanel({
 
   return (
     <FgPanel
+      externalRef={externalRef}
       content={
         <div
           ref={snakeColorPickerRef}
@@ -72,28 +72,38 @@ export default function SnakeColorPickerPanel({
                   key={`${primaryColor}-${secondaryColor}`}
                   scrollingContainerRef={snakeColorPickerRef}
                   className={`flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 ${
-                    playersState[username] &&
-                    playersState[username][instance] &&
-                    playersState[username][instance].snakeColor.primary ===
-                      primaryColor &&
-                    playersState[username][instance].snakeColor.primary ===
-                      secondaryColor
+                    usedColors.some(
+                      (color) =>
+                        color.primary === primaryColor &&
+                        color.secondary === secondaryColor
+                    )
                       ? "border-fg-secondary"
                       : "border-gray-300"
                   }`}
                   contentFunction={() => (
                     <FgImage
                       src={src}
-                      style={{ width: "100%", height: "100%" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        ...(usedColors.some(
+                          (color) =>
+                            color.primary === primaryColor &&
+                            color.secondary === secondaryColor
+                        )
+                          ? { filter: "grayscale(100%)" }
+                          : {}),
+                      }}
                       alt={`Snake color option: ${primaryColor} ${secondaryColor}`}
                     />
                   )}
                   clickFunction={() => {
                     if (
-                      !usedColors.has({
-                        primary: primaryColor,
-                        secondary: secondaryColor,
-                      } as SnakeColorsType)
+                      !usedColors.some(
+                        (color) =>
+                          color.primary === primaryColor &&
+                          color.secondary === secondaryColor
+                      )
                     ) {
                       userMedia.current.games.snake?.[
                         snakeGameId

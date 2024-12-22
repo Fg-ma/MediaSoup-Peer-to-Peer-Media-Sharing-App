@@ -13,6 +13,7 @@ const PanelTransition: Transition = {
 };
 
 export default function FgPanel({
+  externalRef,
   content,
   initPosition = { x: 0, y: 0 },
   initWidth = "100px",
@@ -38,6 +39,7 @@ export default function FgPanel({
   backgroundColor = "#ffffff",
   secondaryBackgroundColor = "#f3f3f3",
 }: {
+  externalRef?: React.RefObject<HTMLDivElement>;
   content?: React.ReactNode;
   initPosition?: {
     x?: number;
@@ -95,7 +97,7 @@ export default function FgPanel({
   });
   const [focus, setFocus] = useState(true);
   const [focusClicked, setFocusClicked] = useState(true);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = externalRef ?? useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const isDragging = useRef(false);
@@ -263,7 +265,7 @@ export default function FgPanel({
       }}
       onHoverEnd={closeCallback && (() => setIsHover(false))}
       onHoverStart={closeCallback && (() => setIsHover(true))}
-      className={`${
+      className={`fg-panel ${
         focusClicked ? "z-[50]" : focus ? "z-[49]" : "z-0"
       } shadow-lg rounded absolute p-3 overflow-hidden`}
       style={{

@@ -92,6 +92,7 @@ export default function FgBabylonCanvas({
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(document.createElement("video"));
+  const panBtnRef = useRef<HTMLButtonElement>(null);
 
   const [inVisualMedia, setInVisualMedia] = useState(false);
 
@@ -233,6 +234,7 @@ export default function FgBabylonCanvas({
     videoRef,
     audioRef,
     visualMediaContainerRef,
+    panBtnRef,
     setPausedState,
     shiftPressed,
     controlPressed,
@@ -472,6 +474,7 @@ export default function FgBabylonCanvas({
         <Suspense fallback={<div>Loading...</div>}>
           <VisualMediaAdjustmentButtons
             bundleRef={bundleRef}
+            panBtnRef={panBtnRef}
             positioning={positioning}
             fgContentAdjustmentController={fgContentAdjustmentController}
           />

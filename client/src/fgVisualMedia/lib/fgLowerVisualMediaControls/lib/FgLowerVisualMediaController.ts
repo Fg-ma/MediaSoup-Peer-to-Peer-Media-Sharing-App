@@ -72,6 +72,7 @@ class FgLowerVisualMediaController {
     private videoRef: React.RefObject<HTMLVideoElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
     private visualMediaContainerRef: React.RefObject<HTMLDivElement>,
+    private panBtnRef: React.RefObject<HTMLButtonElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
@@ -379,6 +380,8 @@ class FgLowerVisualMediaController {
 
     const rect = this.bundleRef.current.getBoundingClientRect();
 
+    const buttonWidth = (this.panBtnRef.current?.clientWidth ?? 0) / 2;
+
     this.fgContentAdjustmentController.movementDragFunction(
       {
         x: event.clientX - rect.left,
@@ -386,11 +389,11 @@ class FgLowerVisualMediaController {
       },
       {
         x:
-          -15 * Math.cos(angle) -
+          -buttonWidth * Math.cos(angle) -
           pixelScale.x * Math.cos(angle) -
           (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
         y:
-          15 * Math.sin(angle) +
+          buttonWidth * Math.sin(angle) +
           pixelScale.x * Math.sin(angle) -
           (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
       },

@@ -1,6 +1,16 @@
+.fg-panel {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.fg-panel.hide-controls {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .snake-game-board {
   background-color: #7db543;
-  aspect-ratio: 1 / 1 !important;
 }
 
 .snake-game-board .snake-game-row {

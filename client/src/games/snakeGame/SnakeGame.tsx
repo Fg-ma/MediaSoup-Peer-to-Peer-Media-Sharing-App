@@ -55,6 +55,8 @@ function SnakeGame({
   const boardRef = useRef<HTMLDivElement>(null);
   const snakeColorPickerButtonRef = useRef<HTMLButtonElement>(null);
   const snakeGridSizeButtonRef = useRef<HTMLButtonElement>(null);
+  const snakeColorPickerPanelRef = useRef<HTMLDivElement>(null);
+  const snakeGridSizePanelRef = useRef<HTMLDivElement>(null);
   const userSnakeColor = useRef<SnakeColorsType | undefined>(undefined);
 
   const snakeGameController = new SnakeGameController(
@@ -291,12 +293,12 @@ function SnakeGame({
             userMedia.current.games.snake?.[snakeGameId]?.leaveGame();
           }
         }}
+        popupRefs={[snakeColorPickerPanelRef, snakeGridSizePanelRef]}
         initPosition={{ relativeToBoundaries: "center" }}
       />
       {snakeColorPanelActive && (
         <SnakeColorPickerPanel
-          username={username}
-          instance={instance}
+          externalRef={snakeColorPickerPanelRef}
           snakeGameId={snakeGameId}
           snakeColorPickerButtonRef={snakeColorPickerButtonRef}
           setSnakeColorPanelActive={setSnakeColorPanelActive}
@@ -306,6 +308,7 @@ function SnakeGame({
       )}
       {gridSizePanelActive && (
         <SnakeGridSizePanel
+          externalRef={snakeGridSizePanelRef}
           started={started}
           snakeGameId={snakeGameId}
           snakeGridSizeButtonRef={snakeGridSizeButtonRef}

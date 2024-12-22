@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client";
 import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
+import FgContentAdjustmentController from "../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 
 type Messages =
   | onNewConsumerWasCreatedType
@@ -67,7 +68,11 @@ class FgGameController {
       };
       rotation: number;
     }>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private bundleRef: React.RefObject<HTMLDivElement>,
+    private panBtnRef: React.RefObject<HTMLButtonElement>,
+    private fgContentAdjustmentController: FgContentAdjustmentController,
+    private popupRefs: React.RefObject<HTMLElement>[] | undefined
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -94,9 +99,145 @@ class FgGameController {
           this.closeGameFunction();
         }
         break;
+      case "s":
+        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+          "scale"
+        );
+        document.addEventListener("mousemove", this.scaleFuntion);
+        document.addEventListener("mousedown", this.scaleFunctionEnd);
+        break;
+      case "g":
+        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+          "position",
+          { rotationPointPlacement: "topLeft" }
+        );
+        document.addEventListener("mousemove", this.moveFunction);
+        document.addEventListener("mousedown", this.moveFunctionEnd);
+        break;
+      case "r":
+        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+          "rotation"
+        );
+        document.addEventListener("mousemove", this.rotateFunction);
+        document.addEventListener("mousedown", this.rotateFunctionEnd);
+        break;
       default:
         break;
     }
+  };
+
+  scaleFunctionEnd = () => {
+    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
+    document.removeEventListener("mousemove", this.scaleFuntion);
+    document.removeEventListener("mousedown", this.scaleFunctionEnd);
+  };
+
+  rotateFunctionEnd = () => {
+    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
+    document.removeEventListener("mousemove", this.rotateFunction);
+    document.removeEventListener("mousedown", this.rotateFunctionEnd);
+  };
+
+  moveFunctionEnd = () => {
+    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
+    document.removeEventListener("mousemove", this.moveFunction);
+    document.removeEventListener("mousedown", this.moveFunctionEnd);
+  };
+
+  moveFunction = (event: MouseEvent) => {
+    if (!this.bundleRef.current) {
+      return;
+    }
+
+    const angle =
+      2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
+
+    const pixelScale = {
+      x:
+        (this.positioning.current.scale.x / 100) *
+        this.bundleRef.current.clientWidth,
+      y:
+        (this.positioning.current.scale.y / 100) *
+        this.bundleRef.current.clientHeight,
+    };
+
+    const rect = this.bundleRef.current.getBoundingClientRect();
+
+    const buttonWidth = (this.panBtnRef.current?.clientWidth ?? 0) / 2;
+
+    this.fgContentAdjustmentController.movementDragFunction(
+      {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      },
+      {
+        x:
+          -buttonWidth * Math.cos(angle) -
+          pixelScale.x * Math.cos(angle) -
+          (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
+        y:
+          buttonWidth * Math.sin(angle) +
+          pixelScale.x * Math.sin(angle) -
+          (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
+      },
+      {
+        x:
+          (this.positioning.current.position.left / 100) *
+          this.bundleRef.current.clientWidth,
+        y:
+          (this.positioning.current.position.top / 100) *
+          this.bundleRef.current.clientHeight,
+      }
+    );
+    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
+  };
+
+  scaleFuntion = (event: MouseEvent) => {
+    if (!this.bundleRef.current) {
+      return;
+    }
+
+    const rect = this.bundleRef.current.getBoundingClientRect();
+
+    const referencePoint = {
+      x:
+        (this.positioning.current.position.left / 100) *
+        this.bundleRef.current.clientWidth,
+      y:
+        (this.positioning.current.position.top / 100) *
+        this.bundleRef.current.clientHeight,
+    };
+
+    this.fgContentAdjustmentController.scaleDragFunction(
+      "any",
+      {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      },
+      referencePoint,
+      referencePoint
+    );
+    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
+  };
+
+  rotateFunction = (event: MouseEvent) => {
+    if (!this.bundleRef.current) {
+      return;
+    }
+
+    const box = this.bundleRef.current.getBoundingClientRect();
+
+    this.fgContentAdjustmentController.rotateDragFunction(event, {
+      x:
+        (this.positioning.current.position.left / 100) *
+          this.bundleRef.current.clientWidth +
+        box.left,
+      y:
+        (this.positioning.current.position.top / 100) *
+          this.bundleRef.current.clientHeight +
+        box.top,
+    });
+    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
   };
 
   handleGameClick = (event: React.MouseEvent) => {
@@ -194,6 +335,13 @@ class FgGameController {
         this.mouseLeaveHideControlsTimeout.current = undefined;
 
         this.setHideControls(true);
+
+        if (this.popupRefs) {
+          this.popupRefs.map((ref) => {
+            if (!ref.current?.classList.contains("hide-controls"))
+              ref.current?.classList.add("hide-controls");
+          });
+        }
       }, 1250);
     }
 
@@ -207,6 +355,12 @@ class FgGameController {
     this.setFocus(true);
     this.setHideControls(false);
 
+    if (this.popupRefs) {
+      this.popupRefs.map((ref) =>
+        ref.current?.classList.remove("hide-controls")
+      );
+    }
+
     if (this.mouseLeaveHideControlsTimeout.current) {
       clearTimeout(this.mouseLeaveHideControlsTimeout.current);
       this.mouseLeaveHideControlsTimeout.current = undefined;
@@ -218,12 +372,24 @@ class FgGameController {
         this.mouseStillHideControlsTimeout.current = undefined;
 
         this.setHideControls(true);
+
+        if (this.popupRefs) {
+          this.popupRefs.map((ref) => {
+            if (!ref.current?.classList.contains("hide-controls"))
+              ref.current?.classList.add("hide-controls");
+          });
+        }
       }, 1250);
     }
   };
 
   handleMouseMove = (event: React.MouseEvent) => {
     this.setHideControls(false);
+    if (this.popupRefs) {
+      this.popupRefs.map((ref) =>
+        ref.current?.classList.remove("hide-controls")
+      );
+    }
 
     if (this.mouseStillHideControlsTimeout.current) {
       clearTimeout(this.mouseStillHideControlsTimeout.current);
@@ -233,15 +399,24 @@ class FgGameController {
     const target = event.target;
 
     if (
-      this.gameStarted &&
-      target &&
-      this.gameRef.current?.contains(target as Node)
+      (this.gameStarted &&
+        target &&
+        this.gameRef.current?.contains(target as Node)) ||
+      (this.popupRefs &&
+        this.popupRefs.some((ref) => ref.current?.contains(target as Node)))
     ) {
       this.mouseStillHideControlsTimeout.current = setTimeout(() => {
         clearTimeout(this.mouseStillHideControlsTimeout.current);
         this.mouseStillHideControlsTimeout.current = undefined;
 
         this.setHideControls(true);
+
+        if (this.popupRefs) {
+          this.popupRefs.map((ref) => {
+            if (!ref.current?.classList.contains("hide-controls"))
+              ref.current?.classList.add("hide-controls");
+          });
+        }
       }, 1250);
     }
   };

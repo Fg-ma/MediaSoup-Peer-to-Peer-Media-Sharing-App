@@ -4,12 +4,14 @@ import FgPanel from "../../../fgElements/fgPanel/FgPanel";
 import FgSlider from "../../../fgElements/fgSlider/FgSlider";
 
 export default function SnakeGridSizePanel({
+  externalRef,
   snakeGameId,
   started,
   snakeGridSizeButtonRef,
   setGridSizePanelActive,
   setGridSize,
 }: {
+  externalRef: React.RefObject<HTMLDivElement>;
   snakeGameId: string;
   started: boolean;
   snakeGridSizeButtonRef: React.RefObject<HTMLButtonElement>;
@@ -20,6 +22,7 @@ export default function SnakeGridSizePanel({
 
   return (
     <FgPanel
+      externalRef={externalRef}
       content={
         <div className='h-full w-full flex items-center justify-center'>
           <FgSlider

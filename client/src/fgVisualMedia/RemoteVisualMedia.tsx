@@ -98,6 +98,7 @@ export default function RemoteVisualMedia({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const screenAudioRef = useRef<HTMLAudioElement>(null);
+  const panBtnRef = useRef<HTMLButtonElement>(null);
 
   const [inVisualMedia, setInVisualMedia] = useState(false);
 
@@ -239,6 +240,7 @@ export default function RemoteVisualMedia({
     videoRef,
     audioRef,
     visualMediaContainerRef,
+    panBtnRef,
     setPausedState,
     shiftPressed,
     controlPressed,
@@ -443,6 +445,7 @@ export default function RemoteVisualMedia({
         <Suspense fallback={<div>Loading...</div>}>
           <VisualMediaAdjustmentButtons
             bundleRef={bundleRef}
+            panBtnRef={panBtnRef}
             positioning={positioning}
             fgContentAdjustmentController={fgContentAdjustmentController}
           />

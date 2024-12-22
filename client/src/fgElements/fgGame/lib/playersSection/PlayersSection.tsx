@@ -57,7 +57,6 @@ export default function PlayersSection({
         onMouseLeave={handleMouseLeave}
         onWheel={(event) => {
           event.stopPropagation();
-          event.preventDefault();
         }}
       >
         {isHover &&

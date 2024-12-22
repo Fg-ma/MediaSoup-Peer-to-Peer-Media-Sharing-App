@@ -39,7 +39,13 @@ class SnakeGameController extends SnakeGameSocket {
       event.stopPropagation();
     }
 
-    if (!this.started && key !== "p") {
+    if (
+      !this.started &&
+      key !== "p" &&
+      key !== "g" &&
+      key !== "s" &&
+      key !== "r"
+    ) {
       this.setGameOver(false);
       this.userMedia.current.games.snake?.[this.snakeGameId]?.startGame();
     }

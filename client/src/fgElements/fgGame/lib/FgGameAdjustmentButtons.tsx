@@ -1,16 +1,18 @@
-import React, { useRef } from "react";
+import React from "react";
 import PanButton from "../../../fgAdjustmentComponents/PanButton";
 import RotateButton from "../../../fgAdjustmentComponents/RotateButton";
 import ScaleButton from "../../../fgAdjustmentComponents/ScaleButton";
-import FgContentAdjustmentController from "../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import FgContentAdjustmentController from "src/fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 
 export default function FgGameAdjustmentButtons({
   bundleRef,
+  panBtnRef,
+  fgContentAdjustmentController,
   positioning,
-  setAdjustingDimensions,
-  setRerender,
 }: {
   bundleRef: React.RefObject<HTMLDivElement>;
+  panBtnRef: React.RefObject<HTMLButtonElement>;
+  fgContentAdjustmentController: FgContentAdjustmentController;
   positioning: React.MutableRefObject<{
     position: {
       left: number;
@@ -22,18 +24,7 @@ export default function FgGameAdjustmentButtons({
     };
     rotation: number;
   }>;
-  setAdjustingDimensions: React.Dispatch<React.SetStateAction<boolean>>;
-  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const panBtnRef = useRef<HTMLButtonElement>(null);
-
-  const fgContentAdjustmentController = new FgContentAdjustmentController(
-    bundleRef,
-    positioning,
-    setAdjustingDimensions,
-    setRerender
-  );
-
   return (
     <>
       <RotateButton

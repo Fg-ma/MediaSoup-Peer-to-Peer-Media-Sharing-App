@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Socket } from "socket.io-client";
 import { Transition, Variants, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
+import FgContentAdjustmentController from "../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import FgGameController from "./lib/FgGameController";
 import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
 import ControlButtons from "./lib/ControlButtons";
@@ -26,13 +27,14 @@ export default function FgGame({
   content,
   gameFunctionsSection,
   players,
-  initPosition = { x: 0, y: 0 },
   resizeCallback,
   focusCallback,
   startGameFunction,
   joinGameFunction,
   leaveGameFunction,
   closeGameFunction,
+  popupRefs,
+  initPosition = { x: 0, y: 0 },
   backgroundColor = "#ffffff",
   secondaryBackgroundColor = "#f3f3f3",
 }: {
@@ -57,6 +59,13 @@ export default function FgGame({
       shadowColor?: { r: number; g: number; b: number };
     }[];
   };
+  resizeCallback?: () => void;
+  focusCallback?: (focus: boolean) => void;
+  startGameFunction?: () => void;
+  joinGameFunction?: () => void;
+  leaveGameFunction?: () => void;
+  closeGameFunction?: () => void;
+  popupRefs?: React.RefObject<HTMLElement>[];
   initPosition?: {
     x?: number;
     y?: number;
@@ -65,12 +74,6 @@ export default function FgGame({
     padding?: number;
     relativeToBoundaries?: "center";
   };
-  resizeCallback?: () => void;
-  focusCallback?: (focus: boolean) => void;
-  startGameFunction?: () => void;
-  joinGameFunction?: () => void;
-  leaveGameFunction?: () => void;
-  closeGameFunction?: () => void;
   backgroundColor?: string;
   secondaryBackgroundColor?: string;
 }) {
@@ -109,6 +112,7 @@ export default function FgGame({
   const [focusClicked, setFocusClicked] = useState(true);
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
+  const panBtnRef = useRef<HTMLButtonElement>(null);
   const isResizing = useRef(false);
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
     undefined
@@ -118,6 +122,13 @@ export default function FgGame({
   );
   const mouseStillHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
     undefined
+  );
+
+  const fgContentAdjustmentController = new FgContentAdjustmentController(
+    bundleRef,
+    positioning,
+    setAdjustingDimensions,
+    setRerender
   );
 
   const fgGameController = new FgGameController(
@@ -137,7 +148,11 @@ export default function FgGame({
     remoteDataStreams,
     positioningListeners,
     positioning,
-    setRerender
+    setRerender,
+    bundleRef,
+    panBtnRef,
+    fgContentAdjustmentController,
+    popupRefs
   );
 
   useEffect(() => {
@@ -239,6 +254,44 @@ export default function FgGame({
     };
   }, []);
 
+  useEffect(() => {
+    if (popupRefs) {
+      for (const ref of popupRefs) {
+        if (!ref.current) {
+          continue;
+        }
+
+        ref.current.addEventListener(
+          "mouseenter",
+          fgGameController.handleMouseEnter
+        );
+        ref.current.addEventListener(
+          "mouseleave",
+          fgGameController.handleMouseLeave
+        );
+      }
+    }
+
+    return () => {
+      if (popupRefs) {
+        for (const ref of popupRefs) {
+          if (!ref.current) {
+            continue;
+          }
+
+          ref.current.removeEventListener(
+            "mouseenter",
+            fgGameController.handleMouseEnter
+          );
+          ref.current.removeEventListener(
+            "mouseleave",
+            fgGameController.handleMouseLeave
+          );
+        }
+      }
+    };
+  }, [popupRefs]);
+
   if (focusCallback) {
     useEffect(() => {
       focusCallback(focus);
@@ -307,9 +360,9 @@ export default function FgGame({
       {content}
       <FgGameAdjustmentButtons
         bundleRef={bundleRef}
+        panBtnRef={panBtnRef}
+        fgContentAdjustmentController={fgContentAdjustmentController}
         positioning={positioning}
-        setAdjustingDimensions={setAdjustingDimensions}
-        setRerender={setRerender}
       />
     </motion.div>
   );
