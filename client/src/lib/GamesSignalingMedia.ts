@@ -40,15 +40,19 @@ type IncomingMessages =
 
 type onGameInitiatedType = {
   type: "gameInitiated";
-  gameType: GameTypes;
-  gameId: string;
-  initiator: { username: string; instance: string };
+  data: {
+    gameType: GameTypes;
+    gameId: string;
+    initiator: { username: string; instance: string };
+  };
 };
 
 type onGameClosedType = {
   type: "gameClosed";
-  gameType: GameTypes;
-  gameId: string;
+  data: {
+    gameType: GameTypes;
+    gameId: string;
+  };
 };
 
 type onUserJoinedTableType = {
@@ -125,7 +129,7 @@ class GamesSignalingMedia {
   };
 
   onGameInitiated = async (event: onGameInitiatedType) => {
-    const { gameType, gameId, initiator } = event;
+    const { gameType, gameId, initiator } = event.data;
 
     switch (gameType) {
       case "snake": {
@@ -157,7 +161,7 @@ class GamesSignalingMedia {
   };
 
   onGameClosed = (event: onGameClosedType) => {
-    const { gameType, gameId } = event;
+    const { gameType, gameId } = event.data;
 
     switch (gameType) {
       case "snake":

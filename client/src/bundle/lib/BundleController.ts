@@ -106,13 +106,15 @@ class BundleController {
       ) {
         const msg = {
           type: "clientEffectChange",
-          table_id: this.table_id,
-          username: this.username,
-          instance: this.instance,
-          producerType,
-          producerId,
-          effect: effect,
-          blockStateChange: false,
+          data: {
+            table_id: this.table_id,
+            username: this.username,
+            instance: this.instance,
+            producerType,
+            producerId,
+            effect: effect,
+            blockStateChange: false,
+          },
         };
         this.socket.current.emit("message", msg);
       }
@@ -123,13 +125,15 @@ class BundleController {
     ) {
       const msg = {
         type: "requestEffectChange",
-        table_id: this.table_id,
-        requestedUsername: this.username,
-        requestedInstance: this.instance,
-        requestedProducerType: producerType,
-        requestedProducerId: producerId,
-        effect: effect,
-        blockStateChange: false,
+        data: {
+          table_id: this.table_id,
+          requestedUsername: this.username,
+          requestedInstance: this.instance,
+          requestedProducerType: producerType,
+          requestedProducerId: producerId,
+          effect: effect,
+          blockStateChange: false,
+        },
       };
 
       this.socket.current.emit("message", msg);

@@ -29,8 +29,6 @@ export default function FgBabylonCanvas({
   socket,
   table_id,
   visualMediaId,
-  activeUsername,
-  activeInstance,
   username,
   instance,
   name,
@@ -51,8 +49,6 @@ export default function FgBabylonCanvas({
   socket: React.MutableRefObject<Socket>;
   visualMediaId: string;
   table_id: string;
-  activeUsername: string | undefined;
-  activeInstance: string | undefined;
   username: string;
   instance: string;
   name?: string;
@@ -172,16 +168,18 @@ export default function FgBabylonCanvas({
       ) {
         const msg = {
           type: "clientEffectChange",
-          table_id: table_id,
-          username: username,
-          instance: instance,
-          producerType: type,
-          producerId: visualMediaId,
-          effect: effect,
-          effectStyle:
-            // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
-            userEffectsStyles.current[type][visualMediaId][effect],
-          blockStateChange: blockStateChange,
+          data: {
+            table_id: table_id,
+            username: username,
+            instance: instance,
+            producerType: type,
+            producerId: visualMediaId,
+            effect: effect,
+            effectStyle:
+              // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
+              userEffectsStyles.current[type][visualMediaId][effect],
+            blockStateChange: blockStateChange,
+          },
         };
         socket?.current.emit("message", msg);
       }
@@ -193,14 +191,14 @@ export default function FgBabylonCanvas({
     ) {
       const msg = {
         type: "requestEffectChange",
-        table_id: table_id,
-        requestedUsername: username,
-        requestedInstance: instance,
-        requestedProducerType: type,
-        requestedProducerId: visualMediaId,
-        effect: effect,
-        blockStateChange: blockStateChange,
         data: {
+          table_id: table_id,
+          requestedUsername: username,
+          requestedInstance: instance,
+          requestedProducerType: type,
+          requestedProducerId: visualMediaId,
+          effect: effect,
+          blockStateChange: blockStateChange,
           style:
             // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
             remoteEffectsStyles.current[username][instance][type][
@@ -296,15 +294,6 @@ export default function FgBabylonCanvas({
     // Set up initial conditions
     fgVisualMediaController.init();
 
-    if (
-      (type === "camera" &&
-        fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
-      (type === "screen" &&
-        fgVisualMediaOptions.permissions.acceptsScreenEffects)
-    ) {
-      fgVisualMediaController.attachPositioningListeners();
-    }
-
     // Listen for messages on socket
     socket.current.on("message", fgVisualMediaController.handleMessage);
 
@@ -314,21 +303,6 @@ export default function FgBabylonCanvas({
       fgLowerVisualMediaController.timeUpdate,
       1000
     );
-
-    // Request initial data
-    if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
-      const msg = {
-        type: "requestCatchUpData",
-        table_id: table_id,
-        inquiringUsername: activeUsername,
-        inquiringInstance: activeInstance,
-        inquiredUsername: username,
-        inquiredInstance: instance,
-        inquiredType: type,
-        inquiredProducerId: visualMediaId,
-      };
-      socket.current.send(msg);
-    }
 
     // Add eventlisteners
     if (fgVisualMediaOptions.isFullScreen) {
@@ -369,6 +343,7 @@ export default function FgBabylonCanvas({
           removeListener()
         )
       );
+      positioningListeners.current = {};
       socket.current.off("message", fgVisualMediaController.handleMessage);
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
@@ -441,6 +416,19 @@ export default function FgBabylonCanvas({
       );
     }
   }, [positioning.current]);
+
+  useEffect(() => {
+    if (
+      (type === "camera" &&
+        fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+      (type === "screen" &&
+        fgVisualMediaOptions.permissions.acceptsScreenEffects)
+    ) {
+      fgVisualMediaController.attachPositioningListeners(
+        fgVisualMediaOptions.permissions
+      );
+    }
+  }, [fgVisualMediaOptions.permissions]);
 
   return (
     <div

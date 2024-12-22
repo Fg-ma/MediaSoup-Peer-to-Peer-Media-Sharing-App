@@ -13,7 +13,7 @@ export const config = {
     numWorkers: Object.keys(os.cpus()).length,
     worker: {
       rtcMinPort: 10000,
-      rtcMaxPort: 10100,
+      rtcMaxPort: 19999,
       logLevel: "debug",
       logTags: [
         "info",

@@ -185,8 +185,6 @@ export default function Bundle({
                 socket={socket}
                 visualMediaId={key}
                 table_id={table_id}
-                activeUsername={activeUsername}
-                activeInstance={activeInstance}
                 username={username}
                 instance={instance}
                 name={name}
@@ -283,8 +281,6 @@ export default function Bundle({
                 socket={socket}
                 visualMediaId={key}
                 table_id={table_id}
-                activeUsername={activeUsername}
-                activeInstance={activeInstance}
                 username={username}
                 instance={instance}
                 name={name}

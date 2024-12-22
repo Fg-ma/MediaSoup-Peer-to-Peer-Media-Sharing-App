@@ -9,7 +9,7 @@ import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import FgPianoController from "./FgPianoController";
 import SamplerMetronome from "./SamplerMetronome";
-import FgBackgroundSelector from "../../fgBackgroundSelector/FgBackgroundSelector";
+import FgBackgroundSelector from "../../fgElements/fgBackgroundSelector/FgBackgroundSelector";
 import { FgSamplers } from "../../audioEffects/fgSamplers";
 
 import effectIcon from "../../../public/svgs/effectIcon.svg";

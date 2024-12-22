@@ -177,16 +177,18 @@ export default function RemoteVisualMedia({
       ) {
         const msg = {
           type: "clientEffectChange",
-          table_id: table_id,
-          username: username,
-          instance: instance,
-          producerType: type,
-          producerId: visualMediaId,
-          effect: effect,
-          effectStyle:
-            // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
-            userEffectsStyles.current[type][visualMediaId][effect],
-          blockStateChange: blockStateChange,
+          data: {
+            table_id: table_id,
+            username: username,
+            instance: instance,
+            producerType: type,
+            producerId: visualMediaId,
+            effect: effect,
+            effectStyle:
+              // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
+              userEffectsStyles.current[type][visualMediaId][effect],
+            blockStateChange: blockStateChange,
+          },
         };
         socket?.current.emit("message", msg);
       }
@@ -198,14 +200,14 @@ export default function RemoteVisualMedia({
     ) {
       const msg = {
         type: "requestEffectChange",
-        table_id: table_id,
-        requestedUsername: username,
-        requestedInstance: instance,
-        requestedProducerType: type,
-        requestedProducerId: visualMediaId,
-        effect: effect,
-        blockStateChange: blockStateChange,
         data: {
+          table_id: table_id,
+          requestedUsername: username,
+          requestedInstance: instance,
+          requestedProducerType: type,
+          requestedProducerId: visualMediaId,
+          effect: effect,
+          blockStateChange: blockStateChange,
           style:
             // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
             remoteEffectsStyles.current[username][instance][type][
@@ -293,8 +295,6 @@ export default function RemoteVisualMedia({
     // Set up initial conditions
     fgVisualMediaController.init();
 
-    fgVisualMediaController.attachPositioningListeners();
-
     // Listen for messages on socket
     socket.current.on("message", fgVisualMediaController.handleMessage);
 
@@ -302,13 +302,15 @@ export default function RemoteVisualMedia({
     if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
       const msg = {
         type: "requestCatchUpData",
-        table_id: table_id,
-        inquiringUsername: activeUsername,
-        inquiringInstance: activeInstance,
-        inquiredUsername: username,
-        inquiredInstance: instance,
-        inquiredType: type,
-        inquiredProducerId: visualMediaId,
+        data: {
+          table_id: table_id,
+          inquiringUsername: activeUsername,
+          inquiringInstance: activeInstance,
+          inquiredUsername: username,
+          inquiredInstance: instance,
+          inquiredType: type,
+          inquiredProducerId: visualMediaId,
+        },
       };
       socket.current.send(msg);
     }
@@ -352,6 +354,7 @@ export default function RemoteVisualMedia({
           removeListener()
         )
       );
+      positioningListeners.current = {};
       socket.current.off("message", fgVisualMediaController.handleMessage);
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
@@ -412,6 +415,12 @@ export default function RemoteVisualMedia({
 
     screenAudioRef.current.srcObject = screenAudioStream;
   }, [screenAudioStream]);
+
+  useEffect(() => {
+    fgVisualMediaController.attachPositioningListeners(
+      fgVisualMediaOptions.permissions
+    );
+  }, [fgVisualMediaOptions.permissions]);
 
   return (
     <div

@@ -11,12 +11,24 @@ export interface FgVolumeElementOptions {
 }
 
 export type FgVolumeElementControllerMessagesType =
-  | {
-      type: "clientMuteStateResponsed";
-      producerUsername: string;
-      producerInstance: string;
-    }
-  | { type: "clientMuteChange"; username: string; clientMute: boolean };
+  | onClientMuteStateResponsedType
+  | onClientMuteChangeType;
+
+export type onClientMuteStateResponsedType = {
+  type: "clientMuteStateResponsed";
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+  };
+};
+
+export type onClientMuteChangeType = {
+  type: "clientMuteChange";
+  data: {
+    username: string;
+    clientMute: boolean;
+  };
+};
 
 export const defaultFgVolumeElementOptions = {
   iconSize: "2.5rem",

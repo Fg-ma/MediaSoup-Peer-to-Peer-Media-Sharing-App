@@ -155,6 +155,7 @@ class MediasoupCleanup {
       tableProducerTransports[table_id][username] &&
       tableProducerTransports[table_id][username][instance]
     ) {
+      tableProducerTransports[table_id][username][instance].transport.close();
       delete tableProducerTransports[table_id][username][instance];
 
       if (
@@ -186,6 +187,7 @@ class MediasoupCleanup {
       tableConsumerTransports[table_id][username] &&
       tableConsumerTransports[table_id][username][instance]
     ) {
+      tableConsumerTransports[table_id][username][instance].transport.close();
       delete tableConsumerTransports[table_id][username][instance];
 
       if (

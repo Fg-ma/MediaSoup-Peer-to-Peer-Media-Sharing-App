@@ -39,11 +39,14 @@ class SnakeGameController extends SnakeGameSocket {
       event.stopPropagation();
     }
 
+    const tagName = document.activeElement?.tagName.toLowerCase();
+    if (tagName === "input") return;
+
     if (
       !this.started &&
       key !== "p" &&
       key !== "g" &&
-      key !== "s" &&
+      key !== "y" &&
       key !== "r"
     ) {
       this.setGameOver(false);

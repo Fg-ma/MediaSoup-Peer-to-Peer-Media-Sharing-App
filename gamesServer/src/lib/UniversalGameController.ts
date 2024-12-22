@@ -38,9 +38,11 @@ class UniversalGameController {
       undefined,
       {
         type: "gameInitiated",
-        gameType,
-        gameId,
-        initiator,
+        data: {
+          gameType,
+          gameId,
+          initiator,
+        },
       }
     );
   };
@@ -78,8 +80,10 @@ class UniversalGameController {
       undefined,
       {
         type: "gameClosed",
-        gameType,
-        gameId,
+        data: {
+          gameType,
+          gameId,
+        },
       }
     );
   };
@@ -134,7 +138,9 @@ class UniversalGameController {
       gameId,
       {
         type: "playersStateReturned",
-        playersState,
+        data: {
+          playersState,
+        },
       }
     );
   };
@@ -161,7 +167,7 @@ class UniversalGameController {
       gameId,
       {
         type: "initialGameStatesReturned",
-        initialGameStates,
+        data: initialGameStates,
       }
     );
   };

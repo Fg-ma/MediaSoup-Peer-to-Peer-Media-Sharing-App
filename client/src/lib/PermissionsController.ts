@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client";
 import { Permissions } from "../context/permissionsContext/typeConstant";
+import { onPermissionsRequestedType } from "src/Main";
 
 class PermissionsController {
   constructor(
@@ -10,19 +11,17 @@ class PermissionsController {
     private permissions: React.MutableRefObject<Permissions>
   ) {}
 
-  onPermissionsRequested = (event: {
-    type: "permissionsRequested";
-    inquiringUsername: string;
-    inquiringInstance: string;
-  }) => {
+  onPermissionsRequested = (event: onPermissionsRequestedType) => {
+    const { inquiringUsername, inquiringInstance } = event.data;
+
     const msg = {
       type: "permissionsResponse",
-      table_id: this.table_id.current,
-      inquiringUsername: event.inquiringUsername,
-      inquiringInstance: event.inquiringInstance,
-      inquiredUsername: this.username.current,
-      inquiredInstance: this.instance.current,
       data: {
+        table_id: this.table_id.current,
+        inquiringUsername,
+        inquiringInstance,
+        inquiredUsername: this.username.current,
+        inquiredInstance: this.instance.current,
         permissions: this.permissions.current,
       },
     };

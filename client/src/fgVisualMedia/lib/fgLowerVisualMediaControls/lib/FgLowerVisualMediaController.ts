@@ -161,44 +161,52 @@ class FgLowerVisualMediaController {
     if (this.fgVisualMediaOptions.isUser) {
       const msg = {
         type: "removeProducer",
-        table_id: this.table_id,
-        username: this.username,
-        instance: this.instance,
-        producerType: this.type,
-        producerId: this.visualMediaId,
+        data: {
+          table_id: this.table_id,
+          username: this.username,
+          instance: this.instance,
+          producerType: this.type,
+          producerId: this.visualMediaId,
+        },
       };
       this.socket.current.emit("message", msg);
 
       if (this.type === "screen" && this.screenAudioStream) {
         const message = {
           type: "removeProducer",
-          table_id: this.table_id,
-          username: this.username,
-          instance: this.instance,
-          producerType: "screenAudio",
-          producerId: `${this.visualMediaId}_audio`,
+          data: {
+            table_id: this.table_id,
+            username: this.username,
+            instance: this.instance,
+            producerType: "screenAudio",
+            producerId: `${this.visualMediaId}_audio`,
+          },
         };
         this.socket.current.emit("message", message);
       }
     } else {
       const msg = {
         type: "requestRemoveProducer",
-        table_id: this.table_id,
-        username: this.username,
-        instance: this.instance,
-        producerType: this.type,
-        producerId: this.visualMediaId,
+        data: {
+          table_id: this.table_id,
+          username: this.username,
+          instance: this.instance,
+          producerType: this.type,
+          producerId: this.visualMediaId,
+        },
       };
       this.socket.current.emit("message", msg);
 
       if (this.type === "screen" && this.screenAudioStream) {
         const message = {
           type: "requestRemoveProducer",
-          table_id: this.table_id,
-          username: this.username,
-          instance: this.instance,
-          producerType: "screenAudio",
-          producerId: `${this.visualMediaId}_audio`,
+          data: {
+            table_id: this.table_id,
+            username: this.username,
+            instance: this.instance,
+            producerType: "screenAudio",
+            producerId: `${this.visualMediaId}_audio`,
+          },
         };
         this.socket.current.emit("message", message);
       }

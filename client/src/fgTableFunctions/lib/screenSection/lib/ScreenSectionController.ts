@@ -38,11 +38,13 @@ class ScreenSectionController {
       if (screenIds.length > 0 && screenIds[screenIds.length - 1]) {
         const msg = {
           type: "removeProducer",
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-          producerType: "screen",
-          producerId: screenIds[screenIds.length - 1],
+          data: {
+            table_id: this.table_id.current,
+            username: this.username.current,
+            instance: this.instance.current,
+            producerType: "screen",
+            producerId: screenIds[screenIds.length - 1],
+          },
         };
         this.socket.current.emit("message", msg);
 
@@ -53,11 +55,13 @@ class ScreenSectionController {
         ) {
           const message = {
             type: "removeProducer",
-            table_id: this.table_id.current,
-            username: this.username.current,
-            instance: this.instance.current,
-            producerType: "screenAudio",
-            producerId: `${screenIds[screenIds.length - 1]}_audio`,
+            data: {
+              table_id: this.table_id.current,
+              username: this.username.current,
+              instance: this.instance.current,
+              producerType: "screenAudio",
+              producerId: `${screenIds[screenIds.length - 1]}_audio`,
+            },
           };
           this.socket.current.emit("message", message);
         }

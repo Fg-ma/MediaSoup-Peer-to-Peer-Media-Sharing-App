@@ -5,13 +5,18 @@ class MuteController {
   constructor(private io: SocketIOServer) {}
 
   onClientMute = (event: onClientMuteType) => {
+    const { table_id, username, instance, clientMute } = event.data;
+
     const msg = {
       type: "clientMuteChange",
-      username: event.username,
-      instance: event.instance,
-      clientMute: event.clientMute,
+      data: {
+        username,
+        instance,
+        clientMute,
+      },
     };
-    this.io.to(`table_${event.table_id}`).emit("message", msg);
+
+    this.io.to(`table_${table_id}`).emit("message", msg);
   };
 }
 

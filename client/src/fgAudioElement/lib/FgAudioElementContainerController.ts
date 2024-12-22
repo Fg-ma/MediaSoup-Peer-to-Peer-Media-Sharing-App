@@ -2,101 +2,12 @@ import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 type FgAudioContainerMessageEvents =
-  | {
-      type: "responsedCatchUpData";
-      inquiredUsername: string;
-      inquiredInstance: string;
-      inquiredType: "camera" | "screen" | "audio";
-      inquiredProducerId: string;
-      data:
-        | {
-            paused: boolean;
-            timeEllapsed: number;
-            positioning: {
-              position: {
-                left: number;
-                top: number;
-              };
-              scale: {
-                x: number;
-                y: number;
-              };
-              rotation: number;
-            };
-          }
-        | {
-            paused: boolean;
-            timeEllapsed: number;
-            positioning: {
-              position: {
-                left: number;
-                top: number;
-              };
-              scale: {
-                x: number;
-                y: number;
-              };
-              rotation: number;
-            };
-          }
-        | {
-            positioning: {
-              position: {
-                left: number;
-                top: number;
-              };
-              scale: {
-                x: number;
-                y: number;
-              };
-              rotation: number;
-            };
-          }
-        | undefined;
-    }
-  | {
-      type: "newConsumerWasCreated";
-      producerUsername: string;
-      producerInstance: string;
-      producerId?: string;
-      producerType: string;
-    };
+  | onResponsedCatchUpDataType
+  | onNewConsumerWasCreatedType;
 
-class FgAudioElementContainerController {
-  constructor(
-    private isUser: boolean,
-    private table_id: string,
-    private username: string,
-    private instance: string,
-    private positioning: React.MutableRefObject<{
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    }>,
-    private permissions: Permissions,
-    private remoteDataStreams: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          positionScaleRotation?: DataConsumer | undefined;
-        };
-      };
-    }>,
-    private positioningListeners: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: () => void;
-      };
-    }>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
-  ) {}
-
-  onResponsedCatchUpData = (event: {
-    type: "responsedCatchUpData";
+type onResponsedCatchUpDataType = {
+  type: "responsedCatchUpData";
+  data: {
     inquiredUsername: string;
     inquiredInstance: string;
     inquiredType: "camera" | "screen" | "audio";
@@ -146,16 +57,65 @@ class FgAudioElementContainerController {
           };
         }
       | undefined;
-  }) => {
+  };
+};
+
+type onNewConsumerWasCreatedType = {
+  type: "newConsumerWasCreated";
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+    producerId?: string;
+    producerType: string;
+  };
+};
+
+class FgAudioElementContainerController {
+  constructor(
+    private isUser: boolean,
+    private table_id: string,
+    private username: string,
+    private instance: string,
+    private positioning: React.MutableRefObject<{
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }>,
+    private permissions: Permissions,
+    private remoteDataStreams: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: {
+          positionScaleRotation?: DataConsumer | undefined;
+        };
+      };
+    }>,
+    private positioningListeners: React.MutableRefObject<{
+      [username: string]: {
+        [instance: string]: () => void;
+      };
+    }>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+  ) {}
+
+  onResponsedCatchUpData = (event: onResponsedCatchUpDataType) => {
+    const { inquiredUsername, inquiredInstance, inquiredType, data } =
+      event.data;
+
     if (
       !this.isUser &&
-      this.username === event.inquiredUsername &&
-      this.instance === event.inquiredInstance &&
-      event.inquiredType === "audio" &&
-      event.data &&
-      Object.keys(event.data.positioning).length !== 0
+      this.username === inquiredUsername &&
+      this.instance === inquiredInstance &&
+      inquiredType === "audio" &&
+      data &&
+      Object.keys(data.positioning).length !== 0
     ) {
-      this.positioning.current = event.data.positioning;
+      this.positioning.current = data.positioning;
     }
   };
 

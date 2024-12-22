@@ -49,11 +49,13 @@ class CameraSectionController {
       if (cameraIds.length > 0 && cameraIds[cameraIds.length - 1]) {
         const msg = {
           type: "removeProducer",
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-          producerType: "camera",
-          producerId: cameraIds[cameraIds.length - 1],
+          data: {
+            table_id: this.table_id.current,
+            username: this.username.current,
+            instance: this.instance.current,
+            producerType: "camera",
+            producerId: cameraIds[cameraIds.length - 1],
+          },
         };
         this.socket.current.emit("message", msg);
       }

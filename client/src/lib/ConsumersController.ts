@@ -1,7 +1,5 @@
 import React from "react";
 import { types } from "mediasoup-client";
-import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
-import { RtpParameters } from "mediasoup-client/lib/RtpParameters";
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import { Socket } from "socket.io-client";
 import {
@@ -9,6 +7,12 @@ import {
   RemoteDataStreamsType,
   RemoteMediaType,
 } from "../context/mediaContext/typeConstant";
+import {
+  onConsumerTransportCreatedType,
+  onNewConsumerSubscribedType,
+  onNewJSONConsumerSubscribedType,
+  onSubscribedType,
+} from "../Main";
 
 class ConsumersController {
   constructor(
@@ -50,65 +54,7 @@ class ConsumersController {
     ) => void
   ) {}
 
-  async onSubscribed(event: {
-    type: "subscribed";
-    data: {
-      [username: string]: {
-        [instance: string]: {
-          camera?: {
-            [cameraId: string]: {
-              id: string;
-              producerId: string;
-              kind: "audio" | "video" | undefined;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              rtpParameters: any;
-              type: string;
-              producerPaused: boolean;
-            };
-          };
-          screen?: {
-            [screenId: string]: {
-              id: string;
-              producerId: string;
-              kind: "audio" | "video" | undefined;
-              rtpParameters: RtpParameters;
-              type: string;
-              producerPaused: boolean;
-            };
-          };
-          screenAudio?: {
-            [screenAudioId: string]: {
-              id: string;
-              producerId: string;
-              kind: "audio" | "video" | undefined;
-              rtpParameters: RtpParameters;
-              type: string;
-              producerPaused: boolean;
-            };
-          };
-          audio?: {
-            id: string;
-            producerId: string;
-            kind: "audio" | "video" | undefined;
-            rtpParameters: RtpParameters;
-            type: string;
-            producerPaused: boolean;
-          };
-          json?: {
-            [dataStreamType in DataStreamTypes]?: {
-              id: string;
-              producerId: string;
-              label: string;
-              sctpStreamParameters: SctpStreamParameters;
-              type: string;
-              producerPaused: boolean;
-              protocol: string;
-            };
-          };
-        };
-      };
-    };
-  }) {
+  async onSubscribed(event: onSubscribedType) {
     if (!this.consumerTransport.current) {
       console.error("No consumer transport available!");
       return;
@@ -245,39 +191,33 @@ class ConsumersController {
     }
   }
 
-  async onConsumerTransportCreated(event: {
-    type: "consumerTransportCreated";
-    params: {
-      id: string;
-      iceParameters: types.IceParameters;
-      iceCandidates: types.IceCandidate[];
-      dtlsParameters: types.DtlsParameters;
-    };
-    error?: unknown;
-  }) {
+  async onConsumerTransportCreated(event: onConsumerTransportCreatedType) {
     if (event.error) {
       console.error("On consumer transport create error: ", event.error);
     }
+
+    const { params } = event.data;
 
     if (!this.device.current) {
       console.error("No device found");
       return;
     }
 
-    this.consumerTransport.current = this.device.current.createRecvTransport(
-      event.params
-    );
+    this.consumerTransport.current =
+      this.device.current.createRecvTransport(params);
 
     this.consumerTransport.current.on(
       "connect",
       ({ dtlsParameters }, callback, _errback) => {
         const msg = {
           type: "connectConsumerTransport",
-          transportId: this.consumerTransport.current?.id,
-          dtlsParameters,
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
+          data: {
+            transportId: this.consumerTransport.current?.id,
+            dtlsParameters,
+            table_id: this.table_id.current,
+            username: this.username.current,
+            instance: this.instance.current,
+          },
         };
 
         this.socket.current.send(msg);
@@ -358,9 +298,11 @@ class ConsumersController {
 
             const msg = {
               type: "resume",
-              table_id: this.table_id.current,
-              username: this.username.current,
-              instance: this.instance.current,
+              data: {
+                table_id: this.table_id.current,
+                username: this.username.current,
+                instance: this.instance.current,
+              },
             };
             this.socket.current.send(msg);
             break;
@@ -378,38 +320,34 @@ class ConsumersController {
     const { rtpCapabilities } = this.device.current;
     const msg = {
       type: "consume",
-      rtpCapabilities: rtpCapabilities,
-      table_id: this.table_id.current,
-      username: this.username.current,
-      instance: this.instance.current,
+      data: {
+        rtpCapabilities,
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+      },
     };
 
     this.socket.current.send(msg);
   }
 
-  async onNewConsumerSubscribed(event: {
-    type: "newConsumerSubscribed";
-    producerUsername: string;
-    producerInstance: string;
-    producerId?: string;
-    producerType: "camera" | "screen" | "screenAudio" | "audio";
-    data: {
-      id: string;
-      producerId: string;
-      kind: "audio" | "video" | undefined;
-      rtpParameters: types.RtpParameters;
-      type: string;
-      producerPaused: boolean;
-    };
-  }) {
-    if (event.producerInstance === this.instance.current) {
+  async onNewConsumerSubscribed(event: onNewConsumerSubscribedType) {
+    const {
+      producerUsername,
+      producerInstance,
+      producerType,
+      producerId,
+      data,
+    } = event.data;
+
+    if (producerInstance === this.instance.current) {
       return;
     }
 
-    const { id, producerId, kind, rtpParameters } = event.data;
+    const { id, kind, rtpParameters } = data;
     const consumer = await this.consumerTransport.current?.consume({
       id,
-      producerId,
+      producerId: data.producerId,
       kind,
       rtpParameters,
     });
@@ -419,85 +357,74 @@ class ConsumersController {
       return;
     }
 
-    if (!this.remoteMedia.current[event.producerUsername]) {
-      this.remoteMedia.current[event.producerUsername] = {};
+    if (!this.remoteMedia.current[producerUsername]) {
+      this.remoteMedia.current[producerUsername] = {};
+    }
+    if (!this.remoteMedia.current[producerUsername][producerInstance]) {
+      this.remoteMedia.current[producerUsername][producerInstance] = {};
     }
     if (
-      !this.remoteMedia.current[event.producerUsername][event.producerInstance]
-    ) {
-      this.remoteMedia.current[event.producerUsername][event.producerInstance] =
-        {};
-    }
-    if (
-      event.producerType === "camera" ||
-      event.producerType === "screen" ||
-      event.producerType === "screenAudio"
+      producerType === "camera" ||
+      producerType === "screen" ||
+      producerType === "screenAudio"
     ) {
       if (
-        !this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
-        ][event.producerType]
+        !this.remoteMedia.current[producerUsername][producerInstance][
+          producerType
+        ]
       ) {
-        this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
-        ][event.producerType] = {};
+        this.remoteMedia.current[producerUsername][producerInstance][
+          producerType
+        ] = {};
       }
 
-      if (event.producerId) {
-        this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
-        ][event.producerType]![event.producerId] = consumer.track;
+      if (producerId) {
+        this.remoteMedia.current[producerUsername][producerInstance][
+          producerType
+        ]![producerId] = consumer.track;
       }
     } else {
-      this.remoteMedia.current[event.producerUsername][
-        event.producerInstance
-      ].audio = consumer.track;
+      this.remoteMedia.current[producerUsername][producerInstance].audio =
+        consumer.track;
     }
 
     this.setUpEffectContext(
-      event.producerUsername,
-      event.producerInstance,
-      event.producerType === "camera" ? [event.producerId] : [],
-      event.producerType === "screen" ? [event.producerId] : [],
-      event.producerType === "screenAudio" ? [event.producerId] : []
+      producerUsername,
+      producerInstance,
+      producerType === "camera" ? [producerId] : [],
+      producerType === "screen" ? [producerId] : [],
+      producerType === "screenAudio" ? [producerId] : []
     );
 
     if (
       Object.keys(
-        this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
-        ] || {}
+        this.remoteMedia.current[producerUsername][producerInstance] || {}
       ).length === 1 &&
       (Object.keys(
-        this.remoteMedia.current[event.producerUsername][event.producerInstance]
-          .camera || {}
+        this.remoteMedia.current[producerUsername][producerInstance].camera ||
+          {}
       ).length === 1 ||
         Object.keys(
-          this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ].screen || {}
+          this.remoteMedia.current[producerUsername][producerInstance].screen ||
+            {}
         ).length === 1 ||
         Object.keys(
-          this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ].screenAudio || {}
+          this.remoteMedia.current[producerUsername][producerInstance]
+            .screenAudio || {}
         ).length === 1 ||
-        this.remoteMedia.current[event.producerUsername][event.producerInstance]
-          .audio)
+        this.remoteMedia.current[producerUsername][producerInstance].audio)
     ) {
       const remoteCameraStreams: { [cameraId: string]: MediaStream } = {};
       if (
-        this.remoteMedia.current[event.producerUsername][event.producerInstance]
-          ?.camera
+        this.remoteMedia.current[producerUsername][producerInstance]?.camera
       ) {
-        for (const key in this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
+        for (const key in this.remoteMedia.current[producerUsername][
+          producerInstance
         ].camera) {
           const remoteCameraStream = new MediaStream();
           remoteCameraStream.addTrack(
-            this.remoteMedia.current[event.producerUsername][
-              event.producerInstance
-            ].camera![key]
+            this.remoteMedia.current[producerUsername][producerInstance]
+              .camera![key]
           );
           remoteCameraStreams[key] = remoteCameraStream;
         }
@@ -505,17 +432,15 @@ class ConsumersController {
 
       const remoteScreenStreams: { [screenId: string]: MediaStream } = {};
       if (
-        this.remoteMedia.current[event.producerUsername][event.producerInstance]
-          ?.screen
+        this.remoteMedia.current[producerUsername][producerInstance]?.screen
       ) {
-        for (const key in this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
+        for (const key in this.remoteMedia.current[producerUsername][
+          producerInstance
         ].screen) {
           const remoteScreenStream = new MediaStream();
           remoteScreenStream.addTrack(
-            this.remoteMedia.current[event.producerUsername][
-              event.producerInstance
-            ].screen![key]
+            this.remoteMedia.current[producerUsername][producerInstance]
+              .screen![key]
           );
           remoteScreenStreams[key] = remoteScreenStream;
         }
@@ -524,17 +449,16 @@ class ConsumersController {
       const remoteScreenAudioStreams: { [screenAudioId: string]: MediaStream } =
         {};
       if (
-        this.remoteMedia.current[event.producerUsername][event.producerInstance]
+        this.remoteMedia.current[producerUsername][producerInstance]
           ?.screenAudio
       ) {
-        for (const key in this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
+        for (const key in this.remoteMedia.current[producerUsername][
+          producerInstance
         ].screenAudio) {
           const remoteScreenAudioStream = new MediaStream();
           remoteScreenAudioStream.addTrack(
-            this.remoteMedia.current[event.producerUsername][
-              event.producerInstance
-            ].screenAudio![key]
+            this.remoteMedia.current[producerUsername][producerInstance]
+              .screenAudio![key]
           );
           remoteScreenAudioStreams[key] = remoteScreenAudioStream;
         }
@@ -542,23 +466,18 @@ class ConsumersController {
 
       let remoteAudioStream: MediaStream | undefined = undefined;
       if (
-        this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
-        ] &&
-        this.remoteMedia.current[event.producerUsername][event.producerInstance]
-          .audio
+        this.remoteMedia.current[producerUsername][producerInstance] &&
+        this.remoteMedia.current[producerUsername][producerInstance].audio
       ) {
         remoteAudioStream = new MediaStream();
         remoteAudioStream.addTrack(
-          this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ].audio!
+          this.remoteMedia.current[producerUsername][producerInstance].audio!
         );
       }
 
       this.createConsumerBundle(
-        event.producerUsername,
-        event.producerInstance,
+        producerUsername,
+        producerInstance,
         remoteCameraStreams,
         remoteScreenStreams,
         remoteScreenAudioStreams,
@@ -568,51 +487,47 @@ class ConsumersController {
 
     const msg = {
       type: "resume",
-      table_id: this.table_id.current,
-      username: this.username.current,
-      instance: this.instance.current,
+      data: {
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+      },
     };
     this.socket.current.send(msg);
 
     const message = {
       type: "newConsumerCreated",
-      table_id: this.table_id.current,
-      username: this.username.current,
-      instance: this.instance.current,
-      producerUsername: event.producerUsername,
-      producerInstance: event.producerInstance,
-      producerId: event.producerId,
-      producerType: event.producerType,
+      data: {
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+        producerUsername,
+        producerInstance,
+        producerId,
+        producerType,
+      },
     };
     this.socket.current.emit("message", message);
   }
 
-  async onNewJSONConsumerSubscribed(event: {
-    type: "newJSONConsumerSubscribed";
-    producerUsername: string;
-    producerInstance: string;
-    producerId?: string;
-    producerType: "json";
-    data: {
-      id: string;
-      producerId: string;
-      label: string;
-      sctpStreamParameters: SctpStreamParameters;
-      type: string;
-      producerPaused: boolean;
-      protocol: string;
-    };
-  }) {
-    if (event.producerInstance === this.instance.current) {
+  async onNewJSONConsumerSubscribed(event: onNewJSONConsumerSubscribedType) {
+    const {
+      producerUsername,
+      producerInstance,
+      producerType,
+      producerId,
+      data,
+    } = event.data;
+
+    if (producerInstance === this.instance.current) {
       return;
     }
 
-    const { id, producerId, label, sctpStreamParameters, protocol } =
-      event.data;
+    const { id, label, sctpStreamParameters, protocol } = data;
 
     const consumer = await this.consumerTransport.current?.consumeData({
       id,
-      dataProducerId: producerId,
+      dataProducerId: data.producerId,
       sctpStreamParameters,
       label,
       protocol,
@@ -623,33 +538,29 @@ class ConsumersController {
       return;
     }
 
-    if (!this.remoteDataStreams.current[event.producerUsername]) {
-      this.remoteDataStreams.current[event.producerUsername] = {};
+    if (!this.remoteDataStreams.current[producerUsername]) {
+      this.remoteDataStreams.current[producerUsername] = {};
     }
-    if (
-      !this.remoteDataStreams.current[event.producerUsername][
-        event.producerInstance
-      ]
-    ) {
-      this.remoteDataStreams.current[event.producerUsername][
-        event.producerInstance
-      ] = {};
+    if (!this.remoteDataStreams.current[producerUsername][producerInstance]) {
+      this.remoteDataStreams.current[producerUsername][producerInstance] = {};
     }
 
     const splitLabel = label.split("_");
-    this.remoteDataStreams.current[event.producerUsername][
-      event.producerInstance
-    ][splitLabel[splitLabel.length - 1] as DataStreamTypes] = consumer;
+    this.remoteDataStreams.current[producerUsername][producerInstance][
+      splitLabel[splitLabel.length - 1] as DataStreamTypes
+    ] = consumer;
 
     const message = {
       type: "newConsumerCreated",
-      table_id: this.table_id.current,
-      username: this.username.current,
-      instance: this.instance.current,
-      producerUsername: event.producerUsername,
-      producerInstance: event.producerInstance,
-      producerId: event.producerId,
-      producerType: event.producerType,
+      data: {
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+        producerUsername,
+        producerInstance,
+        producerId,
+        producerType,
+      },
     };
     this.socket.current.emit("message", message);
   }

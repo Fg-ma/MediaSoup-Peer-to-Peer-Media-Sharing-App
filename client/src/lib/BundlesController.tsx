@@ -156,22 +156,26 @@ class BundlesController {
           onRendered={() => {
             const msg = {
               type: "requestPermissions",
-              table_id: this.table_id.current,
-              inquiringUsername: this.username.current,
-              inquiringInstance: this.instance.current,
-              inquiredUsername: trackUsername,
-              inquiredInstance: trackInstance,
+              data: {
+                table_id: this.table_id.current,
+                inquiringUsername: this.username.current,
+                inquiringInstance: this.instance.current,
+                inquiredUsername: trackUsername,
+                inquiredInstance: trackInstance,
+              },
             };
 
             this.socket.current.emit("message", msg);
 
             const message = {
               type: "requestBundleMetadata",
-              table_id: this.table_id.current,
-              inquiringUsername: this.username.current,
-              inquiringInstance: this.instance.current,
-              inquiredUsername: trackUsername,
-              inquiredInstance: trackInstance,
+              data: {
+                table_id: this.table_id.current,
+                inquiringUsername: this.username.current,
+                inquiringInstance: this.instance.current,
+                inquiredUsername: trackUsername,
+                inquiredInstance: trackInstance,
+              },
             };
 
             this.socket.current.emit("message", message);
@@ -179,11 +183,13 @@ class BundlesController {
           onNewConsumerWasCreatedCallback={() => {
             const msg = {
               type: "requestClientMuteState",
-              table_id: this.table_id.current,
-              username: this.username.current,
-              instance: this.instance.current,
-              producerUsername: trackUsername,
-              producerInstance: trackInstance,
+              data: {
+                table_id: this.table_id.current,
+                username: this.username.current,
+                instance: this.instance.current,
+                producerUsername: trackUsername,
+                producerInstance: trackInstance,
+              },
             };
 
             this.socket.current.emit("message", msg);

@@ -26,157 +26,217 @@ import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 import PermissionsController from "./lib/PermissionsController";
 import "./scrollbar.css";
+import { RtpParameters } from "mediasoup-client/lib/RtpParameters";
 
 const websocketURL = "http://localhost:8000";
 
-type MediasoupSocketEvents =
-  | {
-      type: "producerTransportCreated";
-      params: {
-        id: string;
-        iceParameters: types.IceParameters;
-        iceCandidates: types.IceCandidate[];
-        dtlsParameters: types.DtlsParameters;
-      };
-      error?: unknown;
-    }
-  | {
-      type: "consumerTransportCreated";
-      params: {
-        id: string;
-        iceParameters: types.IceParameters;
-        iceCandidates: types.IceCandidate[];
-        dtlsParameters: types.DtlsParameters;
-      };
-      error?: unknown;
-    }
-  | { type: "resumed" }
-  | {
-      type: "subscribed";
-      data: {
-        [username: string]: {
-          [instance: string]: {
-            camera?: {
-              [cameraId: string]: {
-                id: string;
-                producerId: string;
-                kind: "audio" | "video" | undefined;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                rtpParameters: any;
-                type: string;
-                producerPaused: boolean;
-              };
-            };
-            screen?: {
-              [screenId: string]: {
-                id: string;
-                producerId: string;
-                kind: "audio" | "video" | undefined;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                rtpParameters: any;
-                type: string;
-                producerPaused: boolean;
-              };
-            };
-            audio?: {
-              id: string;
-              producerId: string;
-              kind: "audio" | "video" | undefined;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              rtpParameters: any;
-              type: string;
-              producerPaused: boolean;
-            };
-            json?: {
-              [dataStreamType in DataStreamTypes]?: {
-                id: string;
-                producerId: string;
-                label: string;
-                sctpStreamParameters: SctpStreamParameters;
-                type: string;
-                producerPaused: boolean;
-                protocol: string;
-              };
-            };
+export type MediasoupSocketEvents =
+  | onProducerTransportCreatedType
+  | onConsumerTransportCreatedType
+  | onResumedType
+  | onSubscribedType
+  | onNewConsumerSubscribedType
+  | onNewJSONConsumerSubscribedType
+  | onNewProducerAvailableType
+  | onNewJSONProducerAvailableType
+  | onProducerDisconnectedType
+  | onPermissionsRequestedType
+  | onBundleMetadataRequestedType
+  | onRequestedCatchUpDataType
+  | onRemoveProducerRequestedType;
+
+export type onProducerTransportCreatedType = {
+  type: "producerTransportCreated";
+  data: {
+    params: {
+      id: string;
+      iceParameters: types.IceParameters;
+      iceCandidates: types.IceCandidate[];
+      dtlsParameters: types.DtlsParameters;
+    };
+  };
+  error?: unknown;
+};
+
+export type onConsumerTransportCreatedType = {
+  type: "consumerTransportCreated";
+  data: {
+    params: {
+      id: string;
+      iceParameters: types.IceParameters;
+      iceCandidates: types.IceCandidate[];
+      dtlsParameters: types.DtlsParameters;
+    };
+  };
+  error?: unknown;
+};
+
+export type onResumedType = { type: "resumed" };
+
+export type onSubscribedType = {
+  type: "subscribed";
+  data: {
+    [username: string]: {
+      [instance: string]: {
+        camera?: {
+          [cameraId: string]: {
+            id: string;
+            producerId: string;
+            kind: "audio" | "video" | undefined;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            rtpParameters: any;
+            type: string;
+            producerPaused: boolean;
+          };
+        };
+        screen?: {
+          [screenId: string]: {
+            id: string;
+            producerId: string;
+            kind: "audio" | "video" | undefined;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            rtpParameters: any;
+            type: string;
+            producerPaused: boolean;
+          };
+        };
+        screenAudio?: {
+          [screenAudioId: string]: {
+            id: string;
+            producerId: string;
+            kind: "audio" | "video" | undefined;
+            rtpParameters: RtpParameters;
+            type: string;
+            producerPaused: boolean;
+          };
+        };
+        audio?: {
+          id: string;
+          producerId: string;
+          kind: "audio" | "video" | undefined;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          rtpParameters: any;
+          type: string;
+          producerPaused: boolean;
+        };
+        json?: {
+          [dataStreamType in DataStreamTypes]?: {
+            id: string;
+            producerId: string;
+            label: string;
+            sctpStreamParameters: SctpStreamParameters;
+            type: string;
+            producerPaused: boolean;
+            protocol: string;
           };
         };
       };
-    }
-  | {
-      type: "newConsumerSubscribed";
-      producerUsername: string;
-      producerInstance: string;
-      producerId?: string;
-      producerType: "camera" | "screen" | "screenAudio" | "audio";
-      data: {
-        id: string;
-        producerId: string;
-        kind: "audio" | "video" | undefined;
-        rtpParameters: types.RtpParameters;
-        type: string;
-        producerPaused: boolean;
-      };
-    }
-  | {
-      type: "newJSONConsumerSubscribed";
-      producerUsername: string;
-      producerInstance: string;
-      producerId?: string;
-      producerType: "json";
-      data: {
-        id: string;
-        producerId: string;
-        label: string;
-        sctpStreamParameters: SctpStreamParameters;
-        type: string;
-        producerPaused: boolean;
-        protocol: string;
-      };
-    }
-  | {
-      type: "newProducerAvailable";
-      producerUsername: string;
-      producerInstance: string;
-      producerType: string;
-      producerId?: string;
-    }
-  | {
-      type: "newJSONProducerAvailable";
-      producerUsername: string;
-      producerInstance: string;
-      producerType: string;
-      producerId: string;
-      dataStreamType: DataStreamTypes;
-    }
-  | {
-      type: "producerDisconnected";
-      producerUsername: string;
-      producerInstance: string;
-      producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
-      producerId: string;
-    }
-  | {
-      type: "permissionsRequested";
-      inquiringUsername: string;
-      inquiringInstance: string;
-    }
-  | {
-      type: "bundleMetadataRequested";
-      inquiringUsername: string;
-      inquiringInstance: string;
-    }
-  | {
-      type: "requestedCatchUpData";
-      inquiringUsername: string;
-      inquiringInstance: string;
-      inquiredType: "camera" | "screen" | "audio";
-      inquiredProducerId: string;
-    }
-  | {
-      type: "removeProducerRequested";
-      producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
-      producerId: string;
     };
+  };
+};
+
+export type onNewConsumerSubscribedType = {
+  type: "newConsumerSubscribed";
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+    producerId?: string;
+    producerType: "camera" | "screen" | "screenAudio" | "audio";
+    data: {
+      id: string;
+      producerId: string;
+      kind: "audio" | "video" | undefined;
+      rtpParameters: types.RtpParameters;
+      type: string;
+      producerPaused: boolean;
+    };
+  };
+};
+
+export type onNewJSONConsumerSubscribedType = {
+  type: "newJSONConsumerSubscribed";
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+    producerId?: string;
+    producerType: "json";
+    data: {
+      id: string;
+      producerId: string;
+      label: string;
+      sctpStreamParameters: SctpStreamParameters;
+      type: string;
+      producerPaused: boolean;
+      protocol: string;
+    };
+  };
+};
+
+export type onNewProducerAvailableType = {
+  type: "newProducerAvailable";
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+    producerType: string;
+    producerId?: string;
+  };
+};
+
+export type onNewJSONProducerAvailableType = {
+  type: "newJSONProducerAvailable";
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+    producerType: string;
+    producerId: string;
+    dataStreamType: DataStreamTypes;
+  };
+};
+
+export type onProducerDisconnectedType = {
+  type: "producerDisconnected";
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+    producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
+    producerId: string;
+    dataStreamType?: DataStreamTypes;
+  };
+};
+
+export type onPermissionsRequestedType = {
+  type: "permissionsRequested";
+  data: {
+    inquiringUsername: string;
+    inquiringInstance: string;
+  };
+};
+
+export type onBundleMetadataRequestedType = {
+  type: "bundleMetadataRequested";
+  data: {
+    inquiringUsername: string;
+    inquiringInstance: string;
+  };
+};
+
+export type onRequestedCatchUpDataType = {
+  type: "requestedCatchUpData";
+  data: {
+    inquiringUsername: string;
+    inquiringInstance: string;
+    inquiredType: "camera" | "screen" | "audio";
+    inquiredProducerId: string;
+  };
+};
+
+export type onRemoveProducerRequestedType = {
+  type: "removeProducerRequested";
+  data: {
+    producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
+    producerId: string;
+  };
+};
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -234,10 +294,12 @@ export default function Main() {
 
     const msg = {
       type: "clientMute",
-      table_id: table_id.current,
-      username: username.current,
-      instance: instance.current,
-      clientMute: mutedAudioRef.current,
+      data: {
+        table_id: table_id.current,
+        username: username.current,
+        instance: instance.current,
+        clientMute: mutedAudioRef.current,
+      },
     };
     socket.current.emit("message", msg);
   };
@@ -588,6 +650,7 @@ export default function Main() {
         producersController={producersController}
         producerTransport={producerTransport}
         consumerTransport={consumerTransport}
+        tableTopRef={tableTopRef}
         setBundles={setBundles}
         isCamera={isCamera}
         cameraActive={cameraActive}

@@ -26,6 +26,13 @@ import BrowserMedia from "./BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import ScreenAudioMedia from "./ScreenAudioMedia";
 import { Permissions } from "../context/permissionsContext/typeConstant";
+import {
+  onNewJSONProducerAvailableType,
+  onNewProducerAvailableType,
+  onProducerDisconnectedType,
+  onProducerTransportCreatedType,
+  onRemoveProducerRequestedType,
+} from "src/Main";
 
 class ProducersController {
   constructor(
@@ -211,38 +218,34 @@ class ProducersController {
     this.userDataStreams.current[dataStreamType] = jsonDataProducer;
   };
 
-  onProducerTransportCreated = async (event: {
-    type: string;
-    params: {
-      id: string;
-      iceParameters: types.IceParameters;
-      iceCandidates: types.IceCandidate[];
-      dtlsParameters: types.DtlsParameters;
-    };
-    error?: unknown;
-  }) => {
+  onProducerTransportCreated = async (
+    event: onProducerTransportCreatedType
+  ) => {
     if (event.error) {
       console.error("Producer transport create error: ", event.error);
       return;
     }
 
+    const { params } = event.data;
+
     if (!this.device.current) {
       console.error("No device found");
       return;
     }
-    this.producerTransport.current = this.device.current.createSendTransport(
-      event.params
-    );
+    this.producerTransport.current =
+      this.device.current.createSendTransport(params);
 
     this.producerTransport.current.on(
       "connect",
       async ({ dtlsParameters }, callback, _errback) => {
         const msg = {
           type: "connectProducerTransport",
-          dtlsParameters,
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
+          data: {
+            dtlsParameters,
+            table_id: this.table_id.current,
+            username: this.username.current,
+            instance: this.instance.current,
+          },
         };
 
         this.socket.current.send(msg);
@@ -262,14 +265,16 @@ class ProducersController {
 
         const msg = {
           type: "createNewProducer",
-          producerType: appData.producerType,
-          transportId: this.producerTransport.current?.id,
-          kind,
-          rtpParameters,
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-          producerId: appData.producerId,
+          data: {
+            producerType: appData.producerType,
+            transportId: this.producerTransport.current?.id,
+            kind,
+            rtpParameters,
+            table_id: this.table_id.current,
+            username: this.username.current,
+            instance: this.instance.current,
+            producerId: appData.producerId,
+          },
         };
 
         this.socket.current.emit("message", msg);
@@ -292,16 +297,18 @@ class ProducersController {
 
         const msg = {
           type: "createNewJSONProducer",
-          producerType: appData.producerType,
-          transportId: this.producerTransport.current?.id,
-          label,
-          protocol,
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-          producerId: appData.producerId,
-          sctpStreamParameters,
-          dataStreamType: appData.dataStreamType,
+          data: {
+            producerType: appData.producerType,
+            transportId: this.producerTransport.current?.id,
+            label,
+            protocol,
+            table_id: this.table_id.current,
+            username: this.username.current,
+            instance: this.instance.current,
+            producerId: appData.producerId,
+            sctpStreamParameters,
+            dataStreamType: appData.dataStreamType,
+          },
         };
 
         this.socket.current.emit("message", msg);
@@ -443,25 +450,24 @@ class ProducersController {
 
     const msg = {
       type: "newProducerCreated",
-      table_id: this.table_id.current,
-      username: this.username.current,
-      instance: this.instance.current,
-      producerType: producerType,
-      producerId: producerId,
+      data: {
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+        producerType,
+        producerId,
+      },
     };
 
     this.socket.current.emit("message", msg);
   };
 
-  onNewProducerAvailable = (event: {
-    type: "newProducerAvailable";
-    producerUsername: string;
-    producerInstance: string;
-    producerType: string;
-    producerId?: string;
-  }) => {
+  onNewProducerAvailable = (event: onNewProducerAvailableType) => {
+    const { producerUsername, producerInstance, producerType, producerId } =
+      event.data;
+
     if (
-      event.producerInstance !== this.instance.current &&
+      producerInstance !== this.instance.current &&
       this.isSubscribed.current &&
       this.device.current
     ) {
@@ -469,29 +475,32 @@ class ProducersController {
 
       const msg = {
         type: "newConsumer",
-        producerType: event.producerType,
-        rtpCapabilities: rtpCapabilities,
-        table_id: this.table_id.current,
-        username: this.username.current,
-        instance: this.instance.current,
-        producerUsername: event.producerUsername,
-        producerInstance: event.producerInstance,
-        producerId: event.producerId,
+        data: {
+          producerType,
+          rtpCapabilities,
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+          producerUsername,
+          producerInstance,
+          producerId,
+        },
       };
       this.socket.current.emit("message", msg);
     }
   };
 
-  onNewJSONProducerAvailable = (event: {
-    type: "newJSONProducerAvailable";
-    producerUsername: string;
-    producerInstance: string;
-    producerType: string;
-    producerId: string;
-    dataStreamType: DataStreamTypes;
-  }) => {
+  onNewJSONProducerAvailable = (event: onNewJSONProducerAvailableType) => {
+    const {
+      producerUsername,
+      producerInstance,
+      producerType,
+      producerId,
+      dataStreamType,
+    } = event.data;
+
     if (
-      event.producerInstance !== this.instance.current &&
+      producerInstance !== this.instance.current &&
       this.isSubscribed.current &&
       this.device.current
     ) {
@@ -499,101 +508,95 @@ class ProducersController {
 
       const msg = {
         type: "newJSONConsumer",
-        producerType: event.producerType,
-        sctpCapabilities: sctpCapabilities,
-        producerUsername: event.producerUsername,
-        producerInstance: event.producerInstance,
-        table_id: this.table_id.current,
-        username: this.username.current,
-        instance: this.instance.current,
-        incomingProducerId: event.producerId,
-        dataStreamType: event.dataStreamType,
+        data: {
+          producerType,
+          sctpCapabilities,
+          producerUsername,
+          producerInstance,
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+          incomingProducerId: producerId,
+          dataStreamType,
+        },
       };
       this.socket.current.emit("message", msg);
     }
   };
 
-  onProducerDisconnected = (event: {
-    type: string;
-    producerUsername: string;
-    producerInstance: string;
-    producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
-    producerId?: string;
-    dataStreamType?: DataStreamTypes;
-  }) => {
+  onProducerDisconnected = (event: onProducerDisconnectedType) => {
+    const {
+      producerUsername,
+      producerInstance,
+      producerType,
+      producerId,
+      dataStreamType,
+    } = event.data;
+
     if (
-      event.producerUsername === this.username.current &&
-      event.producerInstance === this.instance.current
+      producerUsername === this.username.current &&
+      producerInstance === this.instance.current
     ) {
       // Call deconstructors then delete userMedia
       if (
-        event.producerType === "camera" ||
-        event.producerType === "screen" ||
-        event.producerType === "screenAudio"
+        producerType === "camera" ||
+        producerType === "screen" ||
+        producerType === "screenAudio"
       ) {
-        if (
-          event.producerId &&
-          this.userMedia.current[event.producerType][event.producerId]
-        ) {
-          this.userMedia.current[event.producerType][
-            event.producerId
-          ].deconstructor();
-          delete this.userMedia.current[event.producerType][event.producerId];
+        if (producerId && this.userMedia.current[producerType][producerId]) {
+          this.userMedia.current[producerType][producerId].deconstructor();
+          delete this.userMedia.current[producerType][producerId];
         }
-      } else if (event.producerType === "audio") {
-        if (this.userMedia.current[event.producerType]) {
-          this.userMedia.current[event.producerType]?.deconstructor();
-          this.userMedia.current[event.producerType] = undefined;
+      } else if (producerType === "audio") {
+        if (this.userMedia.current[producerType]) {
+          this.userMedia.current[producerType]?.deconstructor();
+          this.userMedia.current[producerType] = undefined;
         }
       }
 
       if (
-        event.producerType === "camera" ||
-        event.producerType === "screen" ||
-        event.producerType === "screenAudio" ||
-        event.producerType === "audio"
+        producerType === "camera" ||
+        producerType === "screen" ||
+        producerType === "screenAudio" ||
+        producerType === "audio"
       ) {
         // Delete old stream effects
-        const streamEffects =
-          this.userStreamEffects.current?.[event.producerType];
+        const streamEffects = this.userStreamEffects.current?.[producerType];
 
         if (streamEffects) {
-          if (event.producerType === "audio") {
+          if (producerType === "audio") {
             this.userStreamEffects.current.audio = structuredClone(
               defaultAudioStreamEffects
             );
           } else if (
-            event.producerType === "camera" ||
-            event.producerType === "screen" ||
-            event.producerType === "screenAudio"
+            producerType === "camera" ||
+            producerType === "screen" ||
+            producerType === "screenAudio"
           ) {
-            if (event.producerId && event.producerId in streamEffects) {
-              delete this.userStreamEffects.current[event.producerType][
-                event.producerId as keyof typeof streamEffects
+            if (producerId && producerId in streamEffects) {
+              delete this.userStreamEffects.current[producerType][
+                producerId as keyof typeof streamEffects
               ];
             }
           }
         }
 
         // Delete old effects styles
-        if (this.userEffectsStyles.current?.[event.producerType]) {
-          if (event.producerType === "audio") {
+        if (this.userEffectsStyles.current?.[producerType]) {
+          if (producerType === "audio") {
             this.userEffectsStyles.current.audio = structuredClone(
               defaultAudioEffectsStyles
             );
           } else if (
-            event.producerType === "camera" ||
-            event.producerType === "screen" ||
-            event.producerType === "screenAudio"
+            producerType === "camera" ||
+            producerType === "screen" ||
+            producerType === "screenAudio"
           ) {
             if (
-              event.producerId &&
-              event.producerId in
-                this.userEffectsStyles.current[event.producerType]
+              producerId &&
+              producerId in this.userEffectsStyles.current[producerType]
             ) {
-              delete this.userEffectsStyles.current[event.producerType][
-                event.producerId
-              ];
+              delete this.userEffectsStyles.current[producerType][producerId];
             }
           }
         }
@@ -613,13 +616,13 @@ class ProducersController {
           const newBundles = { ...prev };
 
           if (
-            newBundles[event.producerUsername] &&
-            newBundles[event.producerUsername][event.producerInstance]
+            newBundles[producerUsername] &&
+            newBundles[producerUsername][producerInstance]
           ) {
-            delete newBundles[event.producerUsername][event.producerInstance];
+            delete newBundles[producerUsername][producerInstance];
 
-            if (Object.keys(newBundles[event.producerUsername]).length === 0) {
-              delete newBundles[event.producerUsername];
+            if (Object.keys(newBundles[producerUsername]).length === 0) {
+              delete newBundles[producerUsername];
             }
           }
 
@@ -647,201 +650,191 @@ class ProducersController {
     } else {
       // Delete remote tracks
       if (
-        event.producerType === "camera" ||
-        event.producerType === "screen" ||
-        event.producerType === "screenAudio"
+        producerType === "camera" ||
+        producerType === "screen" ||
+        producerType === "screenAudio"
       ) {
         if (
-          event.producerId &&
-          this.remoteMedia.current[event.producerUsername] &&
-          this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
+          producerId &&
+          this.remoteMedia.current[producerUsername] &&
+          this.remoteMedia.current[producerUsername][producerInstance] &&
+          this.remoteMedia.current[producerUsername][producerInstance][
+            producerType
           ] &&
-          this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ][event.producerType] &&
-          this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ][event.producerType]![event.producerId]
+          this.remoteMedia.current[producerUsername][producerInstance][
+            producerType
+          ]![producerId]
         ) {
-          delete this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ]?.[event.producerType]?.[event.producerId];
+          delete this.remoteMedia.current[producerUsername][producerInstance]?.[
+            producerType
+          ]?.[producerId];
 
           if (
             Object.keys(
-              this.remoteMedia.current[event.producerUsername][
-                event.producerInstance
-              ][event.producerType] || { break: true }
+              this.remoteMedia.current[producerUsername][producerInstance][
+                producerType
+              ] || { break: true }
             ).length === 0
           ) {
-            delete this.remoteMedia.current[event.producerUsername][
-              event.producerInstance
-            ]?.[event.producerType];
+            delete this.remoteMedia.current[producerUsername][
+              producerInstance
+            ]?.[producerType];
 
             if (
               Object.keys(
-                this.remoteMedia.current[event.producerUsername][
-                  event.producerInstance
+                this.remoteMedia.current[producerUsername][
+                  producerInstance
                 ] || { break: true }
               ).length === 0
             ) {
-              delete this.remoteMedia.current[event.producerUsername][
-                event.producerInstance
+              delete this.remoteMedia.current[producerUsername][
+                producerInstance
               ];
 
               if (
                 Object.keys(
-                  this.remoteMedia.current[event.producerUsername] || {
+                  this.remoteMedia.current[producerUsername] || {
                     break: true,
                   }
                 ).length === 0
               ) {
-                delete this.remoteMedia.current[event.producerUsername];
+                delete this.remoteMedia.current[producerUsername];
               }
             }
           }
         }
-      } else if (event.producerType === "audio") {
+      } else if (producerType === "audio") {
         if (
-          this.remoteMedia.current[event.producerUsername] &&
-          this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ] &&
-          this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ][event.producerType]
+          this.remoteMedia.current[producerUsername] &&
+          this.remoteMedia.current[producerUsername][producerInstance] &&
+          this.remoteMedia.current[producerUsername][producerInstance][
+            producerType
+          ]
         ) {
-          delete this.remoteMedia.current[event.producerUsername][
-            event.producerInstance
-          ][event.producerType];
+          delete this.remoteMedia.current[producerUsername][producerInstance][
+            producerType
+          ];
 
           if (
             Object.keys(
-              this.remoteMedia.current[event.producerUsername][
-                event.producerInstance
-              ] || { break: true }
+              this.remoteMedia.current[producerUsername][producerInstance] || {
+                break: true,
+              }
             ).length === 0
           ) {
-            delete this.remoteMedia.current[event.producerUsername][
-              event.producerInstance
-            ];
+            delete this.remoteMedia.current[producerUsername][producerInstance];
 
             if (
               Object.keys(
-                this.remoteMedia.current[event.producerUsername] || {
+                this.remoteMedia.current[producerUsername] || {
                   break: true,
                 }
               ).length === 0
             ) {
-              delete this.remoteMedia.current[event.producerUsername];
+              delete this.remoteMedia.current[producerUsername];
             }
           }
         }
-      } else if (event.producerType === "json") {
+      } else if (producerType === "json") {
         if (
-          event.dataStreamType &&
-          this.remoteDataStreams.current[event.producerUsername] &&
-          this.remoteDataStreams.current[event.producerUsername][
-            event.producerInstance
-          ] &&
-          this.remoteDataStreams.current[event.producerUsername][
-            event.producerInstance
-          ] &&
-          this.remoteDataStreams.current[event.producerUsername][
-            event.producerInstance
-          ]?.[event.dataStreamType]
+          dataStreamType &&
+          this.remoteDataStreams.current[producerUsername] &&
+          this.remoteDataStreams.current[producerUsername][producerInstance] &&
+          this.remoteDataStreams.current[producerUsername][producerInstance] &&
+          this.remoteDataStreams.current[producerUsername][producerInstance]?.[
+            dataStreamType
+          ]
         ) {
-          delete this.remoteDataStreams.current[event.producerUsername][
-            event.producerInstance
-          ][event.dataStreamType];
+          delete this.remoteDataStreams.current[producerUsername][
+            producerInstance
+          ][dataStreamType];
 
           if (
             Object.keys(
-              this.remoteDataStreams.current[event.producerUsername][
-                event.producerInstance
+              this.remoteDataStreams.current[producerUsername][
+                producerInstance
               ] || { break: true }
             ).length === 0
           ) {
-            delete this.remoteDataStreams.current[event.producerUsername][
-              event.producerInstance
+            delete this.remoteDataStreams.current[producerUsername][
+              producerInstance
             ];
 
             if (
               Object.keys(
-                this.remoteDataStreams.current[event.producerUsername] || {
+                this.remoteDataStreams.current[producerUsername] || {
                   break: true,
                 }
               ).length === 0
             ) {
-              delete this.remoteDataStreams.current[event.producerUsername];
+              delete this.remoteDataStreams.current[producerUsername];
             }
           }
         }
       }
 
       if (
-        event.producerType === "camera" ||
-        event.producerType === "screen" ||
-        event.producerType === "screenAudio" ||
-        event.producerType === "audio"
+        producerType === "camera" ||
+        producerType === "screen" ||
+        producerType === "screenAudio" ||
+        producerType === "audio"
       ) {
         // Delete old stream effects
         const streamEffects =
-          event.producerId &&
-          (event.producerType === "camera" ||
-            event.producerType === "screen" ||
-            event.producerType === "screenAudio")
-            ? this.remoteStreamEffects.current?.[event.producerUsername]?.[
-                event.producerInstance
-              ]?.[event.producerType]?.[event.producerId]
-            : this.remoteStreamEffects.current?.[event.producerUsername]?.[
-                event.producerInstance
-              ]?.[event.producerType];
+          producerId &&
+          (producerType === "camera" ||
+            producerType === "screen" ||
+            producerType === "screenAudio")
+            ? this.remoteStreamEffects.current?.[producerUsername]?.[
+                producerInstance
+              ]?.[producerType]?.[producerId]
+            : this.remoteStreamEffects.current?.[producerUsername]?.[
+                producerInstance
+              ]?.[producerType];
 
         if (streamEffects) {
-          if (event.producerType === "audio") {
-            this.remoteStreamEffects.current[event.producerUsername][
-              event.producerInstance
-            ][event.producerType] = structuredClone(defaultAudioStreamEffects);
+          if (producerType === "audio") {
+            this.remoteStreamEffects.current[producerUsername][
+              producerInstance
+            ][producerType] = structuredClone(defaultAudioStreamEffects);
           } else if (
-            event.producerType === "camera" ||
-            event.producerType === "screen" ||
-            event.producerType === "screenAudio"
+            producerType === "camera" ||
+            producerType === "screen" ||
+            producerType === "screenAudio"
           ) {
-            if (event.producerId && event.producerId in streamEffects) {
-              delete this.remoteStreamEffects.current[event.producerUsername][
-                event.producerInstance
-              ][event.producerType][event.producerId];
+            if (producerId && producerId in streamEffects) {
+              delete this.remoteStreamEffects.current[producerUsername][
+                producerInstance
+              ][producerType][producerId];
             }
           }
         }
 
         // Delete old effects styles
         if (
-          this.remoteEffectsStyles.current?.[event.producerUsername]?.[
-            event.producerInstance
-          ]?.[event.producerType]
+          this.remoteEffectsStyles.current?.[producerUsername]?.[
+            producerInstance
+          ]?.[producerType]
         ) {
-          if (event.producerType === "audio") {
-            this.remoteEffectsStyles.current[event.producerUsername][
-              event.producerInstance
-            ][event.producerType] = structuredClone(defaultAudioEffectsStyles);
+          if (producerType === "audio") {
+            this.remoteEffectsStyles.current[producerUsername][
+              producerInstance
+            ][producerType] = structuredClone(defaultAudioEffectsStyles);
           } else if (
-            event.producerType === "camera" ||
-            event.producerType === "screen" ||
-            event.producerType === "screenAudio"
+            producerType === "camera" ||
+            producerType === "screen" ||
+            producerType === "screenAudio"
           ) {
             if (
-              event.producerId &&
-              event.producerId in
-                this.remoteEffectsStyles.current[event.producerUsername][
-                  event.producerInstance
-                ][event.producerType]
+              producerId &&
+              producerId in
+                this.remoteEffectsStyles.current[producerUsername][
+                  producerInstance
+                ][producerType]
             ) {
-              delete this.remoteEffectsStyles.current[event.producerUsername][
-                event.producerInstance
-              ][event.producerType][event.producerId];
+              delete this.remoteEffectsStyles.current[producerUsername][
+                producerInstance
+              ][producerType][producerId];
             }
           }
         }
@@ -849,22 +842,20 @@ class ProducersController {
 
       // Clean up bundles
       if (
-        !this.remoteMedia.current[event.producerUsername] ||
-        !this.remoteMedia.current[event.producerUsername][
-          event.producerInstance
-        ]
+        !this.remoteMedia.current[producerUsername] ||
+        !this.remoteMedia.current[producerUsername][producerInstance]
       ) {
         this.setBundles((prev) => {
           const newBundles = { ...prev };
 
           if (
-            newBundles[event.producerUsername] &&
-            newBundles[event.producerUsername][event.producerInstance]
+            newBundles[producerUsername] &&
+            newBundles[producerUsername][producerInstance]
           ) {
-            delete newBundles[event.producerUsername][event.producerInstance];
+            delete newBundles[producerUsername][producerInstance];
 
-            if (Object.keys(newBundles[event.producerUsername]).length === 0) {
-              delete newBundles[event.producerUsername];
+            if (Object.keys(newBundles[producerUsername]).length === 0) {
+              delete newBundles[producerUsername];
             }
           }
 
@@ -874,22 +865,23 @@ class ProducersController {
     }
   };
 
-  onRemoveProducerRequested = (event: {
-    type: "removeProducerRequested";
-    producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
-    producerId: string;
-  }) => {
-    if (this.permissions.current.acceptsCloseMedia) {
-      const msg = {
-        type: "removeProducer",
+  onRemoveProducerRequested = (event: onRemoveProducerRequestedType) => {
+    if (!this.permissions.current.acceptsCloseMedia) {
+      return;
+    }
+
+    const { producerType, producerId } = event.data;
+    const msg = {
+      type: "removeProducer",
+      data: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
-        producerType: event.producerType,
-        producerId: event.producerId,
-      };
-      this.socket.current.emit("message", msg);
-    }
+        producerType,
+        producerId,
+      },
+    };
+    this.socket.current.emit("message", msg);
   };
 }
 export default ProducersController;

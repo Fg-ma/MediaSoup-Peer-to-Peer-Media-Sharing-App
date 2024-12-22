@@ -3,7 +3,9 @@ import { types, Device } from "mediasoup-client";
 const onRouterCapabilities = async (
   event: {
     type: string;
-    rtpCapabilities: types.RtpCapabilities;
+    data: {
+      rtpCapabilities: types.RtpCapabilities;
+    };
   },
   device: React.MutableRefObject<types.Device | undefined>
 ) => {
@@ -18,7 +20,9 @@ const onRouterCapabilities = async (
     }
     return;
   }
-  await device.current?.load({ routerRtpCapabilities: event.rtpCapabilities });
+  await device.current?.load({
+    routerRtpCapabilities: event.data.rtpCapabilities,
+  });
 };
 
 export default onRouterCapabilities;

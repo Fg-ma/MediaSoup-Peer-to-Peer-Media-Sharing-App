@@ -13,6 +13,7 @@ import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
 import onRouterCapabilities from "../lib/onRouterCapabilities";
 import BundlesController from "../lib/BundlesController";
+import FgBackgroundSelector from "../fgElements/fgBackgroundSelector/FgBackgroundSelector";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -27,6 +28,7 @@ export default function FgTableFunctions({
   producersController,
   producerTransport,
   consumerTransport,
+  tableTopRef,
   setBundles,
   isCamera,
   cameraActive,
@@ -62,6 +64,7 @@ export default function FgTableFunctions({
   consumerTransport: React.MutableRefObject<
     types.Transport<types.AppData> | undefined
   >;
+  tableTopRef: React.RefObject<HTMLDivElement>;
   setBundles: React.Dispatch<
     React.SetStateAction<{
       [username: string]: {
@@ -168,13 +171,15 @@ export default function FgTableFunctions({
     if (permissions.current.acceptsAudioEffects) {
       const msg = {
         type: "clientEffectChange",
-        table_id: table_id.current,
-        username: username.current,
-        instance: instance.current,
-        producerType,
-        producerId,
-        effect: effect,
-        blockStateChange: false,
+        data: {
+          table_id: table_id.current,
+          username: username.current,
+          instance: instance.current,
+          producerType,
+          producerId,
+          effect: effect,
+          blockStateChange: false,
+        },
       };
 
       socket.current.emit("message", msg);
@@ -187,7 +192,9 @@ export default function FgTableFunctions({
 
   const handleMessage = async (event: {
     type: "routerCapabilities";
-    rtpCapabilities: types.RtpCapabilities;
+    data: {
+      rtpCapabilities: types.RtpCapabilities;
+    };
   }) => {
     switch (event.type) {
       case "routerCapabilities":
@@ -228,7 +235,6 @@ export default function FgTableFunctions({
         />
         <AudioSection
           socket={socket}
-          device={device}
           table_id={table_id}
           username={username}
           instance={instance}
@@ -261,6 +267,7 @@ export default function FgTableFunctions({
           username={username.current}
           instance={instance.current}
         />
+        <FgBackgroundSelector backgroundRef={tableTopRef} />
         {isAudio.current && (
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsButton
@@ -300,14 +307,6 @@ export default function FgTableFunctions({
         <button
           onClick={() => {
             tableFunctionsController.joinTable();
-
-            const msg = {
-              type: "getRouterRtpCapabilities",
-              table_id: table_id.current,
-              username: username.current,
-              instance: instance.current,
-            };
-            socket.current.emit("message", msg);
           }}
           className={`${
             isInTable

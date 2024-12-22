@@ -8,6 +8,10 @@ import {
 import CameraMedia from "./CameraMedia";
 import ScreenMedia from "./ScreenMedia";
 import AudioMedia from "./AudioMedia";
+import {
+  onBundleMetadataRequestedType,
+  onRequestedCatchUpDataType,
+} from "../Main";
 
 class Metadata {
   constructor(
@@ -41,19 +45,19 @@ class Metadata {
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>
   ) {}
 
-  onRequestedCatchUpData = (event: {
-    type: "requestedCatchUpData";
-    inquiringUsername: string;
-    inquiringInstance: string;
-    inquiredType: "camera" | "screen" | "audio";
-    inquiredProducerId: string;
-  }) => {
+  onRequestedCatchUpData = (event: onRequestedCatchUpDataType) => {
+    const {
+      inquiringUsername,
+      inquiringInstance,
+      inquiredType,
+      inquiredProducerId,
+    } = event.data;
+
     let data;
-    if (event.inquiredType === "camera") {
-      const cameraMedia =
-        this.userMedia.current.camera[event.inquiredProducerId];
+    if (inquiredType === "camera") {
+      const cameraMedia = this.userMedia.current.camera[inquiredProducerId];
       const dataPositioningValue = document
-        .getElementById(`${event.inquiredProducerId}_container`)
+        .getElementById(`${inquiredProducerId}_container`)
         ?.getAttribute("data-positioning");
       const positioning = JSON.parse(dataPositioningValue || "{}");
       data = {
@@ -61,11 +65,10 @@ class Metadata {
         timeEllapsed: cameraMedia.getTimeEllapsed(),
         positioning,
       };
-    } else if (event.inquiredType === "screen") {
-      const screenMedia =
-        this.userMedia.current.screen[event.inquiredProducerId];
+    } else if (inquiredType === "screen") {
+      const screenMedia = this.userMedia.current.screen[inquiredProducerId];
       const dataPositioningValue = document
-        .getElementById(`${event.inquiredProducerId}_container`)
+        .getElementById(`${inquiredProducerId}_container`)
         ?.getAttribute("data-positioning");
       const positioning = JSON.parse(dataPositioningValue || "{}");
       data = {
@@ -73,7 +76,7 @@ class Metadata {
         timeEllapsed: screenMedia.getTimeEllapsed(),
         positioning,
       };
-    } else if (event.inquiredType === "audio") {
+    } else if (inquiredType === "audio") {
       const dataPositioningValue = document
         .getElementById(
           `${this.username.current}_${this.instance.current}_audio_element_container`
@@ -87,31 +90,31 @@ class Metadata {
 
     const msg = {
       type: "responseCatchUpData",
-      table_id: this.table_id.current,
-      inquiringUsername: event.inquiringUsername,
-      inquiringInstance: event.inquiringInstance,
-      inquiredUsername: this.username.current,
-      inquiredInstance: this.instance.current,
-      inquiredType: event.inquiredType,
-      inquiredProducerId: event.inquiredProducerId,
-      data,
+      data: {
+        table_id: this.table_id.current,
+        inquiringUsername,
+        inquiringInstance,
+        inquiredUsername: this.username.current,
+        inquiredInstance: this.instance.current,
+        inquiredType,
+        inquiredProducerId,
+        data,
+      },
     };
     this.socket.current.emit("message", msg);
   };
 
-  onBundleMetadataRequested = (event: {
-    type: "bundleMetadataRequested";
-    inquiringUsername: string;
-    inquiringInstance: string;
-  }) => {
+  onBundleMetadataRequested = (event: onBundleMetadataRequestedType) => {
+    const { inquiringUsername, inquiringInstance } = event.data;
+
     const msg = {
       type: "bundleMetadataResponse",
-      table_id: this.table_id.current,
-      inquiringUsername: event.inquiringUsername,
-      inquiringInstance: event.inquiringInstance,
-      inquiredUsername: this.username.current,
-      inquiredInstance: this.instance.current,
       data: {
+        table_id: this.table_id.current,
+        inquiringUsername,
+        inquiringInstance,
+        inquiredUsername: this.username.current,
+        inquiredInstance: this.instance.current,
         clientMute: this.mutedAudioRef.current,
         streamEffects: this.userStreamEffects.current,
         userEffectsStyles: this.userEffectsStyles.current,

@@ -96,22 +96,26 @@ class ScreenMedia {
 
     const msg = {
       type: "removeProducer",
-      table_id: this.table_id,
-      username: this.username,
-      instance: this.instance,
-      producerType: "screen",
-      producerId: this.screenId,
+      data: {
+        table_id: this.table_id,
+        username: this.username,
+        instance: this.instance,
+        producerType: "screen",
+        producerId: this.screenId,
+      },
     };
     this.socket.current.emit("message", msg);
 
     if (this.userMedia.current.screenAudio[`${this.screenId}_audio`]) {
       const message = {
         type: "removeProducer",
-        table_id: this.table_id,
-        username: this.username,
-        instance: this.instance,
-        producerType: "screenAudio",
-        producerId: `${this.screenId}_audio`,
+        data: {
+          table_id: this.table_id,
+          username: this.username,
+          instance: this.instance,
+          producerType: "screenAudio",
+          producerId: `${this.screenId}_audio`,
+        },
       };
       this.socket.current.emit("message", message);
     }

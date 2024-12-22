@@ -11,24 +11,28 @@ type onNewConsumerWasCreatedType = { type: "newConsumerWasCreated" };
 
 type onRequestedGameCatchUpDataType = {
   type: "requestedGameCatchUpData";
-  inquiringUsername: string;
-  inquiringInstance: string;
-  gameId: string;
+  data: {
+    inquiringUsername: string;
+    inquiringInstance: string;
+    gameId: string;
+  };
 };
 
 type onResponsedGameCatchUpDataType = {
   type: "responsedGameCatchUpData";
-  gameId: string;
-  positioning: {
-    position: {
-      left: number;
-      top: number;
+  data: {
+    gameId: string;
+    positioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
     };
-    scale: {
-      x: number;
-      y: number;
-    };
-    rotation: number;
   };
 };
 
@@ -37,10 +41,8 @@ class FgGameController {
     private socket: React.MutableRefObject<Socket>,
     private table_id: string,
     private gameId: string,
+    private hideControls: boolean,
     private gameStarted: boolean,
-    private setFocus: React.Dispatch<React.SetStateAction<boolean>>,
-    private setFocusClicked: React.Dispatch<React.SetStateAction<boolean>>,
-    private focusClicked: boolean,
     private setHideControls: React.Dispatch<React.SetStateAction<boolean>>,
     private mouseLeaveHideControlsTimeout: React.MutableRefObject<
       NodeJS.Timeout | undefined
@@ -76,7 +78,7 @@ class FgGameController {
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
-    if (!focus || event.target instanceof HTMLInputElement) return;
+    if (this.hideControls || event.target instanceof HTMLInputElement) return;
 
     switch (event.key.toLowerCase()) {
       case "p":
@@ -99,7 +101,7 @@ class FgGameController {
           this.closeGameFunction();
         }
         break;
-      case "s":
+      case "y":
         this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
           "scale"
         );
@@ -209,7 +211,7 @@ class FgGameController {
     };
 
     this.fgContentAdjustmentController.scaleDragFunction(
-      "any",
+      "square",
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
@@ -238,14 +240,6 @@ class FgGameController {
         box.top,
     });
     this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
-  };
-
-  handleGameClick = (event: React.MouseEvent) => {
-    if (this.gameRef.current) {
-      const value = this.gameRef.current.contains(event.target as Node);
-      this.setFocus(value);
-      this.setFocusClicked(value);
-    }
   };
 
   attachPositioningListeners = () => {
@@ -284,23 +278,25 @@ class FgGameController {
   };
 
   onRequestedGameCatchUpData = (event: onRequestedGameCatchUpDataType) => {
-    const { inquiringUsername, inquiringInstance, gameId } = event;
+    const { inquiringUsername, inquiringInstance, gameId } = event.data;
 
     if (gameId === this.gameId) {
       const msg = {
         type: "responseGameCatchUpData",
-        table_id: this.table_id,
-        inquiringUsername,
-        inquiringInstance,
-        gameId,
-        positioning: this.positioning.current,
+        data: {
+          table_id: this.table_id,
+          inquiringUsername,
+          inquiringInstance,
+          gameId,
+          positioning: this.positioning.current,
+        },
       };
       this.socket.current.send(msg);
     }
   };
 
   onResponsedGameCatchUpData = (event: onResponsedGameCatchUpDataType) => {
-    const { gameId, positioning } = event;
+    const { gameId, positioning } = event.data;
 
     if (gameId === this.gameId) {
       this.positioning.current = positioning;
@@ -325,10 +321,6 @@ class FgGameController {
   };
 
   handleMouseLeave = () => {
-    if (!this.focusClicked) {
-      this.setFocus(false);
-    }
-
     if (!this.mouseLeaveHideControlsTimeout.current) {
       this.mouseLeaveHideControlsTimeout.current = setTimeout(() => {
         clearTimeout(this.mouseLeaveHideControlsTimeout.current);
@@ -352,7 +344,6 @@ class FgGameController {
   };
 
   handleMouseEnter = () => {
-    this.setFocus(true);
     this.setHideControls(false);
 
     if (this.popupRefs) {

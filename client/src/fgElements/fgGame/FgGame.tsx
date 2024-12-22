@@ -16,6 +16,18 @@ const GameTransition: Transition = {
   },
 };
 
+const GameVar: Variants = {
+  init: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      scale: { type: "spring", stiffness: 100 },
+      backgroundColor: { duration: 0.3, ease: "linear" },
+    },
+  },
+};
+
 export default function FgGame({
   socket,
   table_id,
@@ -28,15 +40,12 @@ export default function FgGame({
   gameFunctionsSection,
   players,
   resizeCallback,
-  focusCallback,
   startGameFunction,
   joinGameFunction,
   leaveGameFunction,
   closeGameFunction,
   popupRefs,
   initPosition = { x: 0, y: 0 },
-  backgroundColor = "#ffffff",
-  secondaryBackgroundColor = "#f3f3f3",
 }: {
   socket: React.MutableRefObject<Socket>;
   table_id: string;
@@ -60,7 +69,6 @@ export default function FgGame({
     }[];
   };
   resizeCallback?: () => void;
-  focusCallback?: (focus: boolean) => void;
   startGameFunction?: () => void;
   joinGameFunction?: () => void;
   leaveGameFunction?: () => void;
@@ -74,22 +82,7 @@ export default function FgGame({
     padding?: number;
     relativeToBoundaries?: "center";
   };
-  backgroundColor?: string;
-  secondaryBackgroundColor?: string;
 }) {
-  const GameVar: Variants = {
-    init: { opacity: 0, scale: 0.8 },
-    animate: (focus: boolean) => ({
-      opacity: 1,
-      scale: 1,
-      backgroundColor: focus ? backgroundColor : secondaryBackgroundColor,
-      transition: {
-        scale: { type: "spring", stiffness: 100 },
-        backgroundColor: { duration: 0.3, ease: "linear" },
-      },
-    }),
-  };
-
   const { userDataStreams, remoteDataStreams } = useMediaContext();
 
   const [_, setRerender] = useState(false);
@@ -107,9 +100,7 @@ export default function FgGame({
       [instance: string]: () => void;
     };
   }>({});
-  const [focus, setFocus] = useState(true);
   const [hideControls, setHideControls] = useState(true);
-  const [focusClicked, setFocusClicked] = useState(true);
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
   const panBtnRef = useRef<HTMLButtonElement>(null);
@@ -135,10 +126,8 @@ export default function FgGame({
     socket,
     table_id,
     gameId,
+    hideControls,
     gameStarted,
-    setFocus,
-    setFocusClicked,
-    focusClicked,
     setHideControls,
     mouseLeaveHideControlsTimeout,
     mouseStillHideControlsTimeout,
@@ -232,16 +221,16 @@ export default function FgGame({
 
     const msg = {
       type: "requestGameCatchUpData",
-      table_id: table_id,
-      inquiringUsername: username,
-      inquiringInstance: instance,
-      gameId: gameId,
+      data: {
+        table_id: table_id,
+        inquiringUsername: username,
+        inquiringInstance: instance,
+        gameId: gameId,
+      },
     };
     socket.current.send(msg);
 
     fgGameController.attachPositioningListeners();
-
-    document.addEventListener("keydown", fgGameController.handleKeyDown);
 
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
@@ -250,9 +239,16 @@ export default function FgGame({
         )
       );
       socket.current.off("message", fgGameController.handleMessage);
-      document.removeEventListener("keydown", fgGameController.handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", fgGameController.handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", fgGameController.handleKeyDown);
+    };
+  }, [hideControls]);
 
   useEffect(() => {
     if (popupRefs) {
@@ -292,12 +288,6 @@ export default function FgGame({
     };
   }, [popupRefs]);
 
-  if (focusCallback) {
-    useEffect(() => {
-      focusCallback(focus);
-    }, [focus]);
-  }
-
   useEffect(() => {
     if (
       adjustingDimensions &&
@@ -320,10 +310,9 @@ export default function FgGame({
       onMouseEnter={fgGameController.handleMouseEnter}
       onMouseLeave={fgGameController.handleMouseLeave}
       onMouseMove={fgGameController.handleMouseMove}
-      onMouseDown={fgGameController.handleGameClick}
-      className={`fg-game ${
-        focusClicked ? "z-[50]" : focus ? "z-[49]" : "z-0"
-      } ${hideControls ? "hide-controls" : ""} rounded absolute`}
+      className={`fg-game ${hideControls ? "z-[49]" : "z-0"} ${
+        hideControls ? "hide-controls" : ""
+      } rounded absolute`}
       style={{
         left: `${positioning.current.position.left}%`,
         top: `${positioning.current.position.top}%`,
@@ -338,7 +327,6 @@ export default function FgGame({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
-      custom={focus}
       variants={GameVar}
       initial='init'
       animate='animate'

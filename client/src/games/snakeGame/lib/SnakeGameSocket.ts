@@ -25,17 +25,21 @@ type onGameOverType = {
 
 type onPlayersStateUpdatedType = {
   type: "playersStateUpdated";
-  playersState: PlayersState;
+  data: {
+    playersState: PlayersState;
+  };
 };
 
 type onGridSizeChangedType = {
   type: "gridSizeChanged";
-  gridSize: number;
+  data: {
+    gridSize: number;
+  };
 };
 
 type onInitialGameStatesReturnedType = {
   type: "initialGameStatesReturned";
-  initialGameStates: {
+  data: {
     started: boolean;
     gameOver: boolean;
     playersState: PlayersState;
@@ -93,17 +97,17 @@ class SnakeGameSocket {
   };
 
   private onPlayersStateUpdated = (event: onPlayersStateUpdatedType) => {
-    this.setPlayersState(event.playersState);
+    this.setPlayersState(event.data.playersState);
   };
 
   private onGridSizeChanged = (event: onGridSizeChangedType) => {
-    this.setGridSize(event.gridSize);
+    this.setGridSize(event.data.gridSize);
   };
 
   private onInitialGameStatesReturned = (
     event: onInitialGameStatesReturnedType
   ) => {
-    const { started, gameOver, playersState } = event.initialGameStates;
+    const { started, gameOver, playersState } = event.data;
 
     this.setStarted(started);
     this.setGameOver(gameOver);

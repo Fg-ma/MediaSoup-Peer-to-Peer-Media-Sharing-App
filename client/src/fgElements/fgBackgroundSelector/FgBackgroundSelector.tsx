@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import FgButton from "../fgElements/fgButton/FgButton";
-import FgSVG from "../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../fgButton/FgButton";
+import FgSVG from "../fgSVG/FgSVG";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import { ActiveBackground, categories } from "./lib/typeConstant";
 import BackgroundSelectorPanel from "./lib/BackgroundSelectorPanel";
 
-import chooseBackgroundIcon from "../../public/svgs/chooseBackgroundIcon.svg";
-import chooseBackgroundOffIcon from "../../public/svgs/chooseBackgroundOffIcon.svg";
+import chooseBackgroundIcon from "../../../public/svgs/chooseBackgroundIcon.svg";
+import chooseBackgroundOffIcon from "../../../public/svgs/chooseBackgroundOffIcon.svg";
 
 export default function FgBackgroundSelector({
   backgroundRef,

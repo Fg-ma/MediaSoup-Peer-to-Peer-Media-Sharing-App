@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { types } from "mediasoup-client";
 import { Socket } from "socket.io-client";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
@@ -19,7 +18,6 @@ const VolumeSVG = React.lazy(
 
 export default function AudioSection({
   socket,
-  device,
   table_id,
   username,
   instance,
@@ -34,7 +32,6 @@ export default function AudioSection({
   handleDisableEnableBtns,
 }: {
   socket: React.MutableRefObject<Socket>;
-  device: React.MutableRefObject<types.Device | undefined>;
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;
@@ -58,7 +55,6 @@ export default function AudioSection({
 
   const audioSectionController = new AudioSectionController(
     socket,
-    device,
     table_id,
     username,
     instance,

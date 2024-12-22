@@ -98,12 +98,20 @@ class TableFunctionsController {
         this.instance.current
       );
       this.setIsInTable(true);
+
+      const msg = {
+        type: "getRouterRtpCapabilities",
+        data: {
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+        },
+      };
+      this.socket.current.emit("message", msg);
     }
   };
 
   private leaveTable = () => {
-    this.producerTransport.current = undefined;
-
     this.unsubscribe();
 
     this.removePositionScaleRotationProducer();
@@ -138,7 +146,9 @@ class TableFunctionsController {
     this.handleDisableEnableBtns(false);
     this.device.current = undefined;
     this.setBundles({});
+    this.consumerTransport.current?.close();
     this.consumerTransport.current = undefined;
+    this.producerTransport.current?.close();
     this.producerTransport.current = undefined;
     this.isCamera.current = false;
     this.setCameraActive(false);
@@ -162,9 +172,11 @@ class TableFunctionsController {
     if (this.isSubscribed.current) {
       const msg = {
         type: "createConsumerTransport",
-        table_id: this.table_id.current,
-        username: this.username.current,
-        instance: this.instance.current,
+        data: {
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+        },
       };
 
       this.socket.current.send(msg);
@@ -195,9 +207,11 @@ class TableFunctionsController {
 
       const msg = {
         type: "unsubscribe",
-        table_id: this.table_id.current,
-        username: this.username.current,
-        instance: this.instance.current,
+        data: {
+          table_id: this.table_id.current,
+          username: this.username.current,
+          instance: this.instance.current,
+        },
       };
       this.socket.current.emit("message", msg);
     }
@@ -206,9 +220,11 @@ class TableFunctionsController {
   createProducerTransport = () => {
     const msg = {
       type: "createProducerTransport",
-      table_id: this.table_id.current,
-      username: this.username.current,
-      instance: this.instance.current,
+      data: {
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+      },
     };
     this.socket.current.emit("message", msg);
   };
@@ -222,11 +238,13 @@ class TableFunctionsController {
     // Remove positionRotationScale producer
     const message = {
       type: "removeProducer",
-      table_id: this.table_id.current,
-      username: this.username.current,
-      instance: this.instance.current,
-      producerType: "json",
-      dataStreamType: "positionScaleRotation",
+      data: {
+        table_id: this.table_id.current,
+        username: this.username.current,
+        instance: this.instance.current,
+        producerType: "json",
+        dataStreamType: "positionScaleRotation",
+      },
     };
     this.socket.current.emit("message", message);
   };

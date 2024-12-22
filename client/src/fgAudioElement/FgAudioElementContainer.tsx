@@ -168,12 +168,14 @@ export default function FgAudioElementContainer({
     if (!isUser && activeUsername && activeInstance) {
       const msg = {
         type: "requestCatchUpData",
-        table_id: table_id,
-        inquiringUsername: activeUsername,
-        inquiringInstance: activeInstance,
-        inquiredUsername: username,
-        inquiredInstance: instance,
-        inquiredType: "audio",
+        data: {
+          table_id: table_id,
+          inquiringUsername: activeUsername,
+          inquiringInstance: activeInstance,
+          inquiredUsername: username,
+          inquiredInstance: instance,
+          inquiredType: "audio",
+        },
       };
       socket.current.send(msg);
     }

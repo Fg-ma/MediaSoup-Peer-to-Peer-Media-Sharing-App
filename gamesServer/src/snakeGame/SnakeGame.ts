@@ -271,7 +271,9 @@ class SnakeGame {
       this.snakeGameId,
       {
         type: "playersStateUpdated",
-        playersState: this.playersState,
+        data: {
+          playersState: this.playersState,
+        },
       }
     );
   };
@@ -297,7 +299,9 @@ class SnakeGame {
       this.snakeGameId,
       {
         type: "gridSizeChanged",
-        gridSize: this.gridSize,
+        data: {
+          gridSize: this.gridSize,
+        },
       }
     );
   };

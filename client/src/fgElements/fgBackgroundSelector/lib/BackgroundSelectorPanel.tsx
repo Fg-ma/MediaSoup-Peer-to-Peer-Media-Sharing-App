@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
-import FgPanel from "../../fgElements/fgPanel/FgPanel";
-import FgButton from "../../fgElements/fgButton/FgButton";
-import FgImage from "../../fgElements/fgImage/FgImage";
-import FgSVG from "../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgPanel from "../../fgPanel/FgPanel";
+import FgButton from "../../fgButton/FgButton";
+import FgImage from "../../fgImage/FgImage";
+import FgSVG from "../../fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
 import {
   ActiveBackground,
   categories,
@@ -12,8 +12,8 @@ import {
   recommendations,
 } from "./typeConstant";
 
-import additionIcon from "../../../public/svgs/additionIcon.svg";
-import navigateBack from "../../../public/svgs/navigateBack.svg";
+import additionIcon from "../../../../public/svgs/additionIcon.svg";
+import navigateBack from "../../../../public/svgs/navigateBack.svg";
 
 export default function BackgroundSelectorPanel({
   setBackgroundSelectorPanelActive,

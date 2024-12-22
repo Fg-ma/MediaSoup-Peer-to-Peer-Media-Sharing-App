@@ -27,46 +27,54 @@ export type BundleControllerMessageType =
 
 export type onProducerDisconnectedType = {
   type: "producerDisconnected";
-  producerUsername: string;
-  producerInstance: string;
-  producerType: "camera" | "screen" | "screenAudio" | "audio";
-  producerId: string;
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+    producerType: "camera" | "screen" | "screenAudio" | "audio";
+    producerId: string;
+  };
 };
 
 export type onNewProducerWasCreatedType = {
   type: "newProducerWasCreated";
-  producerType: "camera" | "screen" | "screenAudio" | "audio";
-  producerId: string | undefined;
+  data: {
+    producerType: "camera" | "screen" | "screenAudio" | "audio";
+    producerId: string | undefined;
+  };
 };
 
 export type onNewConsumerWasCreatedType = {
   type: "newConsumerWasCreated";
-  producerUsername: string;
-  producerInstance: string;
-  producerId?: string;
-  producerType: "camera" | "screen" | "audio" | "screenAudio";
+  data: {
+    producerUsername: string;
+    producerInstance: string;
+    producerId?: string;
+    producerType: "camera" | "screen" | "audio" | "screenAudio";
+  };
 };
 
 export type onClientMuteChangeType = {
   type: "clientMuteChange";
-  username: string;
-  clientMute: boolean;
+  data: {
+    username: string;
+    clientMute: boolean;
+  };
 };
 
 export type onPermissionsResponsedType = {
   type: "permissionsResponsed";
-  inquiredUsername: string;
-  inquiredInstance: string;
   data: {
+    inquiredUsername: string;
+    inquiredInstance: string;
     permissions: Permissions;
   };
 };
 
 export type onBundleMetadataResponsedType = {
   type: "bundleMetadataResponsed";
-  inquiredUsername: string;
-  inquiredInstance: string;
   data: {
+    inquiredUsername: string;
+    inquiredInstance: string;
     clientMute: boolean;
     streamEffects: UserStreamEffectsType;
     userEffectsStyles: UserEffectsStylesType;
@@ -75,22 +83,26 @@ export type onBundleMetadataResponsedType = {
 
 export type onEffectChangeRequestedType = {
   type: "effectChangeRequested";
-  requestedProducerType: "camera" | "screen" | "screenAudio" | "audio";
-  requestedProducerId: string | undefined;
-  effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-  effectStyle: string;
-  blockStateChange: boolean;
+  data: {
+    requestedProducerType: "camera" | "screen" | "screenAudio" | "audio";
+    requestedProducerId: string | undefined;
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
+    effectStyle: string;
+    blockStateChange: boolean;
+  };
 };
 
 export type onClientEffectChangedType = {
   type: "clientEffectChanged";
-  username: string;
-  instance: string;
-  producerType: "camera" | "screen" | "screenAudio" | "audio";
-  producerId: string | undefined;
-  effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
-  effectStyle: string;
-  blockStateChange: boolean;
+  data: {
+    username: string;
+    instance: string;
+    producerType: "camera" | "screen" | "screenAudio" | "audio";
+    producerId: string | undefined;
+    effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
+    effectStyle: string;
+    blockStateChange: boolean;
+  };
 };
 
 export const defaultBundleOptions = {

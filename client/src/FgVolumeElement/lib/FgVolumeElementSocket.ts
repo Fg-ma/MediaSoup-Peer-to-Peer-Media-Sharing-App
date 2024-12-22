@@ -1,3 +1,8 @@
+import {
+  onClientMuteChangeType,
+  onClientMuteStateResponsedType,
+} from "./typeConstant";
+
 class FgVolumeElementSocket {
   constructor(
     private username: string,
@@ -23,15 +28,12 @@ class FgVolumeElementSocket {
     >
   ) {}
 
-  onClientMuteStateResponsed = (event: {
-    type: string;
-    producerUsername: string;
-    producerInstance: string;
-  }) => {
+  onClientMuteStateResponsed = (event: onClientMuteStateResponsedType) => {
+    const { producerUsername, producerInstance } = event.data;
+
     if (
       this.isUser ||
-      (this.username !== event.producerUsername &&
-        this.instance !== event.producerInstance)
+      (this.username !== producerUsername && this.instance !== producerInstance)
     ) {
       return;
     }
@@ -44,18 +46,14 @@ class FgVolumeElementSocket {
   };
 
   // Get client mute changes from other users
-  onClientMuteChange = (event: {
-    type: string;
-    username: string;
-    clientMute: boolean;
-  }) => {
+  onClientMuteChange = (event: onClientMuteChangeType) => {
+    const { clientMute } = event.data;
+
     if (this.isUser) {
       return;
     }
 
-    this.setActive(
-      event.clientMute ? event.clientMute : this.localMute.current
-    );
+    this.setActive(clientMute ? clientMute : this.localMute.current);
 
     if (!this.audioRef.current) {
       return;
@@ -63,7 +61,7 @@ class FgVolumeElementSocket {
 
     const newVolume = this.audioRef.current.volume;
     let newVolumeState;
-    if (event.clientMute || this.localMute.current || newVolume === 0) {
+    if (clientMute || this.localMute.current || newVolume === 0) {
       newVolumeState = "off";
     } else if (this.audioRef.current.volume >= 0.5) {
       newVolumeState = "high";
