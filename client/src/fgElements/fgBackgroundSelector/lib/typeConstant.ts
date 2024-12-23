@@ -1,18 +1,26 @@
 import ChristmasIcon from "../../../../public/svgs/christmasIcon.svg";
 import DarkIcon from "../../../../public/svgs/darkIcon.svg";
 import geometricIcon from "../../../../public/svgs/geometricIcon.svg";
+import miscIcon from "../../../../public/svgs/miscIcon.svg";
 import musicIcon from "../../../../public/svgs/musicIcon.svg";
 import natureIcon from "../../../../public/svgs/natureIcon.svg";
 import neonIcon from "../../../../public/svgs/neonIcon.svg";
+import pixelArtIcon from "../../../../public/svgs/pixelArtIcon.svg";
 import spaceIcon from "../../../../public/svgs/spaceIcon.svg";
 import technologyIcon from "../../../../public/svgs/technologyIcon.svg";
 
 import cabin_854x1280 from "../../../../public/backgroundImages/christmas/cabin_854x1280.png";
 import cabin_43x64 from "../../../../public/backgroundImages/christmas/cabin_43x64.png";
+import christmasCassette_1042x979 from "../../../../public/backgroundImages/christmas/christmasCassette_1042x979.png";
+import christmasCassette_64x60 from "../../../../public/backgroundImages/christmas/christmasCassette_64x60.png";
 import forest_1280x777 from "../../../../public/backgroundImages/christmas/forest_1280x777.jpg";
 import forest_64x39 from "../../../../public/backgroundImages/christmas/forest_64x39.jpg";
+import igloo_1280x1280 from "../../../../public/backgroundImages/christmas/igloo_1280x1280.png";
+import igloo_64x64 from "../../../../public/backgroundImages/christmas/igloo_64x64.png";
 import landscape_1280x640 from "../../../../public/backgroundImages/christmas/landscape_1280x640.png";
 import landscape_64x32 from "../../../../public/backgroundImages/christmas/landscape_64x32.png";
+import merryChristmas_1280x731 from "../../../../public/backgroundImages/christmas/merryChristmas_1280x731.png";
+import merryChristmas_64x37 from "../../../../public/backgroundImages/christmas/merryChristmas_64x37.png";
 import snowFlake_1280x852 from "../../../../public/backgroundImages/christmas/snowFlake_1280x852.jpg";
 import snowflake_64x43 from "../../../../public/backgroundImages/christmas/snowflake_64x43.jpg";
 import snowman_1280x880 from "../../../../public/backgroundImages/christmas/snowman_1280x880.png";
@@ -55,6 +63,19 @@ import geometric6_1280x720 from "../../../../public/backgroundImages/geometric/g
 import geometric6_64x36 from "../../../../public/backgroundImages/geometric/geometric6_64x36.png";
 import geometric7_869x1224 from "../../../../public/backgroundImages/geometric/geometric7_869x1224.png";
 import geometric7_45x64 from "../../../../public/backgroundImages/geometric/geometric7_45x64.png";
+import geometric8_1280x735 from "../../../../public/backgroundImages/geometric/geometric8_1280x735.png";
+import geometric8_64x37 from "../../../../public/backgroundImages/geometric/geometric8_64x37.png";
+import geometric9_1280x1280 from "../../../../public/backgroundImages/geometric/geometric9_1280x1280.png";
+import geometric9_64x64 from "../../../../public/backgroundImages/geometric/geometric9_64x64.png";
+
+import dragon_1280x1280 from "../../../../public/backgroundImages/misc/dragon_1280x1280.png";
+import dragon_64x64 from "../../../../public/backgroundImages/misc/dragon_64x64.png";
+import map_1280x904 from "../../../../public/backgroundImages/misc/map_1280x904.jpg";
+import map_64x45 from "../../../../public/backgroundImages/misc/map_64x45.jpg";
+import theCircles_1280x359 from "../../../../public/backgroundImages/misc/theCircles_1280x359.jpg";
+import theCircles_64x18 from "../../../../public/backgroundImages/misc/theCircles_64x18.jpg";
+import yellow_985x985 from "../../../../public/backgroundImages/misc/yellow_985x985.png";
+import yellow_64x64 from "../../../../public/backgroundImages/misc/yellow_64x64.png";
 
 import abstractInstruments_1280x853 from "../../../../public/backgroundImages/music/abstractInstruments_1280x853.png";
 import abstractInstruments_64x43 from "../../../../public/backgroundImages/music/abstractInstruments_64x43.png";
@@ -133,10 +154,16 @@ import lightHouse_1064x1064 from "../../../../public/backgroundImages/nature/lig
 import lightHouse_64x64 from "../../../../public/backgroundImages/nature/lightHouse_64x64.png";
 import mountains_1024x1280 from "../../../../public/backgroundImages/nature/mountains_1024x1280.png";
 import mountains_51x64 from "../../../../public/backgroundImages/nature/mountains_51x64.png";
+import mountainView_964x1280 from "../../../../public/backgroundImages/nature/mountainView_964x1280.png";
+import mountainView_48x64 from "../../../../public/backgroundImages/nature/mountainView_48x64.png";
 import mushrooms_1280x1280 from "../../../../public/backgroundImages/nature/mushrooms_1280x1280.png";
 import mushrooms_64x64 from "../../../../public/backgroundImages/nature/mushrooms_64x64.png";
 import plant_905x1280 from "../../../../public/backgroundImages/nature/plant_905x1280.png";
 import plant_45x64 from "../../../../public/backgroundImages/nature/plant_45x64.png";
+import redMoon_1280x964 from "../../../../public/backgroundImages/nature/redMoon_1280x964.jpg";
+import redMoon_64x48 from "../../../../public/backgroundImages/nature/redMoon_64x48.jpg";
+import reflection_1280x720 from "../../../../public/backgroundImages/nature/reflection_1280x720.jpg";
+import reflection_64x36 from "../../../../public/backgroundImages/nature/reflection_64x36.jpg";
 import rollingHills_1280x827 from "../../../../public/backgroundImages/nature/rollingHills_1280x827.png";
 import rollingHills_64x41 from "../../../../public/backgroundImages/nature/rollingHills_64x41.png";
 import shoreSide_1024x1280 from "../../../../public/backgroundImages/nature/shoreSide_1024x1280.png";
@@ -149,6 +176,8 @@ import sunnySideUp_1280x1280 from "../../../../public/backgroundImages/nature/su
 import sunnySideUp_64x64 from "../../../../public/backgroundImages/nature/sunnySideUp_64x64.png";
 import swordfish_1280x929 from "../../../../public/backgroundImages/nature/swordfish_1280x929.png";
 import swordfish_64x46 from "../../../../public/backgroundImages/nature/swordfish_64x46.png";
+import temple_1280x894 from "../../../../public/backgroundImages/nature/temple_1280x894.jpg";
+import temple_64x45 from "../../../../public/backgroundImages/nature/temple_64x45.jpg";
 
 import gotMeat_1280x931 from "../../../../public/backgroundImages/neon/gotMeat_1280x931.png";
 import gotMeat_64x47 from "../../../../public/backgroundImages/neon/gotMeat_64x47.png";
@@ -163,6 +192,31 @@ import tiger_64x42 from "../../../../public/backgroundImages/neon/tiger_64x42.pn
 import trex_1280x836 from "../../../../public/backgroundImages/neon/trex_1280x836.png";
 import trex_64x42 from "../../../../public/backgroundImages/neon/trex_64x42.png";
 
+import bikingThroughTheCity_717x1280 from "../../../../public/backgroundImages/pixelArt/bikingThroughTheCity_717x1280.png";
+import bikingThroughTheCity_36x64 from "../../../../public/backgroundImages/pixelArt/bikingThroughTheCity_36x64.png";
+import downByTheRiver_1100x572 from "../../../../public/backgroundImages/pixelArt/downByTheRiver_1100x572.png";
+import downByTheRiver_64x33 from "../../../../public/backgroundImages/pixelArt/downByTheRiver_64x33.png";
+import dragonCassette_960x960 from "../../../../public/backgroundImages/pixelArt/dragonCassette_960x960.png";
+import dragonCassette_64x64 from "../../../../public/backgroundImages/pixelArt/dragonCassette_64x64.png";
+import floatingIsland_1280x978 from "../../../../public/backgroundImages/pixelArt/floatingIsland_1280x978.png";
+import floatingIsland_64x49 from "../../../../public/backgroundImages/pixelArt/floatingIsland_64x49.png";
+import knightInShiningArmor_1280x720 from "../../../../public/backgroundImages/pixelArt/knightInShiningArmor_1280x720.png";
+import knightInShiningArmor_64x36 from "../../../../public/backgroundImages/pixelArt/knightInShiningArmor_64x36.png";
+import octopusAttack_1280x1280 from "../../../../public/backgroundImages/pixelArt/octopusAttack_1280x1280.png";
+import octopusAttack_64x64 from "../../../../public/backgroundImages/pixelArt/octopusAttack_64x64.png";
+import pixelHouse_1182x1280 from "../../../../public/backgroundImages/pixelArt/pixelHouse_1182x1280.png";
+import pixelHouse_59x64 from "../../../../public/backgroundImages/pixelArt/pixelHouse_59x64.png";
+import seaMonster_1280x1280 from "../../../../public/backgroundImages/pixelArt/seaMonster_1280x1280.png";
+import seaMonster_64x64 from "../../../../public/backgroundImages/pixelArt/seaMonster_64x64.png";
+import store_1280x1280 from "../../../../public/backgroundImages/pixelArt/store_1280x1280.png";
+import store_64x64 from "../../../../public/backgroundImages/pixelArt/store_64x64.png";
+import sword_1280x1280 from "../../../../public/backgroundImages/pixelArt/sword_1280x1280.png";
+import sword_64x64 from "../../../../public/backgroundImages/pixelArt/sword_64x64.png";
+import village_1280x1280 from "../../../../public/backgroundImages/pixelArt/village_1280x1280.png";
+import village_64x64 from "../../../../public/backgroundImages/pixelArt/village_64x64.png";
+import warCassette_1280x979 from "../../../../public/backgroundImages/pixelArt/warCassette_1280x979.png";
+import warCassette_64x49 from "../../../../public/backgroundImages/pixelArt/warCassette_64x49.png";
+
 import apollo_1280x1262 from "../../../../public/backgroundImages/space/apollo_1280x1262.png";
 import apollo_64x63 from "../../../../public/backgroundImages/space/apollo_64x63.png";
 import astronaut_1280x836 from "../../../../public/backgroundImages/space/astronaut_1280x836.png";
@@ -171,6 +225,8 @@ import bigDipper_1280x1277 from "../../../../public/backgroundImages/space/bigDi
 import bigDipper_64x64 from "../../../../public/backgroundImages/space/bigDipper_64x64.png";
 import blueBall_1280x800 from "../../../../public/backgroundImages/space/blueBall_1280x800.png";
 import blueBall_64x40 from "../../../../public/backgroundImages/space/blueBall_64x40.png";
+import heyTheresEarth_1280x1280 from "../../../../public/backgroundImages/space/heyTheresEarth_1280x1280.png";
+import heyTheresEarth_64x64 from "../../../../public/backgroundImages/space/heyTheresEarth_64x64.png";
 import landscape1_1280x721 from "../../../../public/backgroundImages/space/landscape1_1280x721.png";
 import landscape1_64x36 from "../../../../public/backgroundImages/space/landscape1_64x36.png";
 import landscape2_1280x720 from "../../../../public/backgroundImages/space/landscape2_1280x720.png";
@@ -183,6 +239,8 @@ import solarParty_960x1280 from "../../../../public/backgroundImages/space/solar
 import solarParty_48x64 from "../../../../public/backgroundImages/space/solarParty_48x64.png";
 import starMap_1169x1280 from "../../../../public/backgroundImages/space/starMap_1169x1280.png";
 import starMap_58x64 from "../../../../public/backgroundImages/space/starMap_58x64.png";
+import theWorldAwaits_1280x828 from "../../../../public/backgroundImages/space/theWorldAwaits_1280x828.png";
+import theWorldAwaits_64x41 from "../../../../public/backgroundImages/space/theWorldAwaits_64x41.png";
 
 import binary_1280x1280 from "../../../../public/backgroundImages/technology/binary_1280x1280.png";
 import binary_64x64 from "../../../../public/backgroundImages/technology/binary_64x64.png";
@@ -203,15 +261,20 @@ export type Categories =
   | "christmas"
   | "dark"
   | "geometric"
+  | "misc"
   | "music"
   | "nature"
   | "neon"
+  | "pixelArt"
   | "space"
   | "technology";
 export type ChristmasCategories =
   | "cabin"
+  | "christmasCassette"
   | "forest"
+  | "igloo"
   | "landscape"
+  | "merryChristmas"
   | "snowflake"
   | "snowman"
   | "whiteChristmas"
@@ -233,7 +296,10 @@ export type GeometricCategories =
   | "geometric4"
   | "geometric5"
   | "geometric6"
-  | "geometric7";
+  | "geometric7"
+  | "geometric8"
+  | "geometric9";
+export type MiscCategories = "dragon" | "map" | "theCircles" | "yellow";
 export type MusicCategories =
   | "abstractInstruments"
   | "acousticGuitar"
@@ -274,14 +340,18 @@ export type NatureCategories =
   | "fungus"
   | "lightHouse"
   | "mountains"
+  | "mountainView"
   | "mushrooms"
   | "plant"
+  | "redMoon"
+  | "reflection"
   | "rollingHills"
   | "shoreSide"
   | "sprouting"
   | "submarine"
   | "sunnySideUp"
-  | "swordfish";
+  | "swordfish"
+  | "temple";
 export type NeonCategories =
   | "gotMeat"
   | "map"
@@ -289,17 +359,32 @@ export type NeonCategories =
   | "sign"
   | "tiger"
   | "trex";
+export type PixelArtCategories =
+  | "bikingThroughTheCity"
+  | "downByTheRiver"
+  | "dragonCassette"
+  | "floatingIsland"
+  | "knightInShiningArmor"
+  | "octopusAttack"
+  | "pixelHouse"
+  | "seaMonster"
+  | "store"
+  | "sword"
+  | "village"
+  | "warCassette";
 export type SpaceCategories =
   | "apollo"
   | "astronaut"
   | "bigDipper"
   | "blueBall"
+  | "heyTheresEarth"
   | "landscape1"
   | "landscape2"
   | "overTheMoon"
   | "rocket"
   | "solarParty"
-  | "starMap";
+  | "starMap"
+  | "theWorldAwaits";
 export type TechnologyCategories =
   | "binary"
   | "calculator"
@@ -313,9 +398,11 @@ export type ActiveBackground =
   | { category: "christmas"; categorySelection: ChristmasCategories | "" }
   | { category: "dark"; categorySelection: DarkCategories | "" }
   | { category: "geometric"; categorySelection: GeometricCategories | "" }
+  | { category: "misc"; categorySelection: MiscCategories | "" }
   | { category: "music"; categorySelection: MusicCategories | "" }
   | { category: "nature"; categorySelection: NatureCategories | "" }
   | { category: "neon"; categorySelection: NeonCategories | "" }
+  | { category: "pixelArt"; categorySelection: PixelArtCategories | "" }
   | { category: "space"; categorySelection: SpaceCategories | "" }
   | { category: "technology"; categorySelection: TechnologyCategories | "" };
 
@@ -325,18 +412,25 @@ export const categoriesMetadata: {
   christmas: { label: "Christmas", url: ChristmasIcon },
   dark: { label: "Dark", url: DarkIcon },
   geometric: { label: "Geometric", url: geometricIcon },
+  misc: { label: "Misc", url: miscIcon },
   music: { label: "Music", url: musicIcon },
   nature: { label: "Nature", url: natureIcon },
   neon: { label: "Neon", url: neonIcon },
+  pixelArt: { label: "Pixel art", url: pixelArtIcon },
   space: { label: "Space", url: spaceIcon },
   technology: { label: "Technology", url: technologyIcon },
 };
 
 export const recommendations: {
-  [christmasCategory in
+  [category in
     | ChristmasCategories
+    | DarkCategories
     | GeometricCategories
+    | MiscCategories
+    | MusicCategories
     | NatureCategories
+    | NeonCategories
+    | PixelArtCategories
     | SpaceCategories
     | TechnologyCategories]?: {
     category: Categories;
@@ -441,6 +535,13 @@ export const categories: {
       loadingUrl: string;
     };
   };
+  misc: {
+    [miscCategory in MiscCategories]: {
+      label: string;
+      url: string;
+      loadingUrl: string;
+    };
+  };
   music: {
     [geometricCategory in MusicCategories]: {
       label: string;
@@ -457,6 +558,13 @@ export const categories: {
   };
   neon: {
     [neonCategory in NeonCategories]: {
+      label: string;
+      url: string;
+      loadingUrl: string;
+    };
+  };
+  pixelArt: {
+    [pixelArtCategory in PixelArtCategories]: {
       label: string;
       url: string;
       loadingUrl: string;
@@ -483,15 +591,30 @@ export const categories: {
       url: cabin_854x1280,
       loadingUrl: cabin_43x64,
     },
+    christmasCassette: {
+      label: "Christmas cassette",
+      url: christmasCassette_1042x979,
+      loadingUrl: christmasCassette_64x60,
+    },
     forest: {
       label: "Forest",
       url: forest_1280x777,
       loadingUrl: forest_64x39,
     },
+    igloo: {
+      label: "Igloo",
+      url: igloo_1280x1280,
+      loadingUrl: igloo_64x64,
+    },
     landscape: {
       label: "Landscape",
       url: landscape_1280x640,
       loadingUrl: landscape_64x32,
+    },
+    merryChristmas: {
+      label: "Merry Christmas",
+      url: merryChristmas_1280x731,
+      loadingUrl: merryChristmas_64x37,
     },
     snowflake: {
       label: "Snowflake",
@@ -596,6 +719,38 @@ export const categories: {
       label: "Geometric 7",
       url: geometric7_869x1224,
       loadingUrl: geometric7_45x64,
+    },
+    geometric8: {
+      label: "Geometric 8",
+      url: geometric8_1280x735,
+      loadingUrl: geometric8_64x37,
+    },
+    geometric9: {
+      label: "Geometric 9",
+      url: geometric9_1280x1280,
+      loadingUrl: geometric9_64x64,
+    },
+  },
+  misc: {
+    dragon: {
+      label: "Dragon",
+      url: dragon_1280x1280,
+      loadingUrl: dragon_64x64,
+    },
+    map: {
+      label: "Map",
+      url: map_1280x904,
+      loadingUrl: map_64x45,
+    },
+    theCircles: {
+      label: "The circles",
+      url: theCircles_1280x359,
+      loadingUrl: theCircles_64x18,
+    },
+    yellow: {
+      label: "Yellow",
+      url: yellow_985x985,
+      loadingUrl: yellow_64x64,
     },
   },
   music: {
@@ -743,6 +898,11 @@ export const categories: {
       url: mountains_1024x1280,
       loadingUrl: mountains_51x64,
     },
+    mountainView: {
+      label: "Mountain view",
+      url: mountainView_964x1280,
+      loadingUrl: mountainView_48x64,
+    },
     mushrooms: {
       label: "Mushrooms",
       url: mushrooms_1280x1280,
@@ -752,6 +912,16 @@ export const categories: {
       label: "Plant",
       url: plant_905x1280,
       loadingUrl: plant_45x64,
+    },
+    redMoon: {
+      label: "Red moon",
+      url: redMoon_1280x964,
+      loadingUrl: redMoon_64x48,
+    },
+    reflection: {
+      label: "Reflection",
+      url: reflection_1280x720,
+      loadingUrl: reflection_64x36,
     },
     rollingHills: {
       label: "Rolling hills",
@@ -782,6 +952,11 @@ export const categories: {
       label: "Swordfish",
       url: swordfish_1280x929,
       loadingUrl: swordfish_64x46,
+    },
+    temple: {
+      label: "Temple",
+      url: temple_1280x894,
+      loadingUrl: temple_64x45,
     },
   },
   neon: {
@@ -816,6 +991,68 @@ export const categories: {
       loadingUrl: trex_64x42,
     },
   },
+  pixelArt: {
+    bikingThroughTheCity: {
+      label: "Biking through the city",
+      url: bikingThroughTheCity_717x1280,
+      loadingUrl: bikingThroughTheCity_36x64,
+    },
+    downByTheRiver: {
+      label: "Down by the river",
+      url: downByTheRiver_1100x572,
+      loadingUrl: downByTheRiver_64x33,
+    },
+    dragonCassette: {
+      label: "Dragon cassette",
+      url: dragonCassette_960x960,
+      loadingUrl: dragonCassette_64x64,
+    },
+    floatingIsland: {
+      label: "Floating island",
+      url: floatingIsland_1280x978,
+      loadingUrl: floatingIsland_64x49,
+    },
+    knightInShiningArmor: {
+      label: "Knight in shining armor",
+      url: knightInShiningArmor_1280x720,
+      loadingUrl: knightInShiningArmor_64x36,
+    },
+    octopusAttack: {
+      label: "Octopus attack",
+      url: octopusAttack_1280x1280,
+      loadingUrl: octopusAttack_64x64,
+    },
+    pixelHouse: {
+      label: "Pixel house",
+      url: pixelHouse_1182x1280,
+      loadingUrl: pixelHouse_59x64,
+    },
+    seaMonster: {
+      label: "Sea monster",
+      url: seaMonster_1280x1280,
+      loadingUrl: seaMonster_64x64,
+    },
+    store: {
+      label: "Store",
+      url: store_1280x1280,
+      loadingUrl: store_64x64,
+    },
+    sword: {
+      label: "Sword",
+      url: sword_1280x1280,
+      loadingUrl: sword_64x64,
+    },
+    village: {
+      label: "Village",
+      url: village_1280x1280,
+      loadingUrl: village_64x64,
+    },
+    warCassette: {
+      label: "War cassette",
+      url: warCassette_1280x979,
+      loadingUrl: warCassette_64x49,
+    },
+  },
   space: {
     apollo: {
       label: "Apollo",
@@ -836,6 +1073,11 @@ export const categories: {
       label: "Blue ball",
       url: blueBall_1280x800,
       loadingUrl: blueBall_64x40,
+    },
+    heyTheresEarth: {
+      label: "Hey there's Earth!",
+      url: heyTheresEarth_1280x1280,
+      loadingUrl: heyTheresEarth_64x64,
     },
     landscape1: {
       label: "Landscape 1",
@@ -866,6 +1108,11 @@ export const categories: {
       label: "Star map",
       url: starMap_1169x1280,
       loadingUrl: starMap_58x64,
+    },
+    theWorldAwaits: {
+      label: "The world awaits",
+      url: theWorldAwaits_1280x828,
+      loadingUrl: theWorldAwaits_64x41,
     },
   },
   technology: {
