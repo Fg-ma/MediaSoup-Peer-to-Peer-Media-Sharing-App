@@ -46,10 +46,10 @@ class FgGameController {
     private hideControls: boolean,
     private gameStarted: boolean,
     private setHideControls: React.Dispatch<React.SetStateAction<boolean>>,
-    private mouseLeaveHideControlsTimeout: React.MutableRefObject<
+    private pointerLeaveHideControlsTimeout: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
-    private mouseStillHideControlsTimeout: React.MutableRefObject<
+    private pointerStillHideControlsTimeout: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
     private gameRef: React.RefObject<HTMLDivElement>,
@@ -104,26 +104,26 @@ class FgGameController {
         }
         break;
       case "y":
-        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
           "scale"
         );
-        document.addEventListener("mousemove", this.scaleFuntion);
-        document.addEventListener("mousedown", this.scaleFunctionEnd);
+        document.addEventListener("pointermove", this.scaleFuntion);
+        document.addEventListener("pointerdown", this.scaleFunctionEnd);
         break;
       case "g":
-        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
           "position",
           { rotationPointPlacement: "topLeft" }
         );
-        document.addEventListener("mousemove", this.moveFunction);
-        document.addEventListener("mousedown", this.moveFunctionEnd);
+        document.addEventListener("pointermove", this.moveFunction);
+        document.addEventListener("pointerdown", this.moveFunctionEnd);
         break;
       case "r":
-        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
           "rotation"
         );
-        document.addEventListener("mousemove", this.rotateFunction);
-        document.addEventListener("mousedown", this.rotateFunctionEnd);
+        document.addEventListener("pointermove", this.rotateFunction);
+        document.addEventListener("pointerdown", this.rotateFunctionEnd);
         break;
       default:
         break;
@@ -131,24 +131,24 @@ class FgGameController {
   };
 
   scaleFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
-    document.removeEventListener("mousemove", this.scaleFuntion);
-    document.removeEventListener("mousedown", this.scaleFunctionEnd);
+    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    document.removeEventListener("pointermove", this.scaleFuntion);
+    document.removeEventListener("pointerdown", this.scaleFunctionEnd);
   };
 
   rotateFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
-    document.removeEventListener("mousemove", this.rotateFunction);
-    document.removeEventListener("mousedown", this.rotateFunctionEnd);
+    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    document.removeEventListener("pointermove", this.rotateFunction);
+    document.removeEventListener("pointerdown", this.rotateFunctionEnd);
   };
 
   moveFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
-    document.removeEventListener("mousemove", this.moveFunction);
-    document.removeEventListener("mousedown", this.moveFunctionEnd);
+    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    document.removeEventListener("pointermove", this.moveFunction);
+    document.removeEventListener("pointerdown", this.moveFunctionEnd);
   };
 
-  moveFunction = (event: MouseEvent) => {
+  moveFunction = (event: PointerEvent) => {
     if (!this.bundleRef.current) {
       return;
     }
@@ -193,10 +193,10 @@ class FgGameController {
           this.bundleRef.current.clientHeight,
       }
     );
-    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
+    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
-  scaleFuntion = (event: MouseEvent) => {
+  scaleFuntion = (event: PointerEvent) => {
     if (!this.bundleRef.current) {
       return;
     }
@@ -221,10 +221,10 @@ class FgGameController {
       referencePoint,
       referencePoint
     );
-    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
+    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
-  rotateFunction = (event: MouseEvent) => {
+  rotateFunction = (event: PointerEvent) => {
     if (!this.bundleRef.current) {
       return;
     }
@@ -241,7 +241,7 @@ class FgGameController {
           this.bundleRef.current.clientHeight +
         box.top,
     });
-    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
+    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
   attachPositioningListeners = () => {
@@ -325,11 +325,11 @@ class FgGameController {
     }
   };
 
-  handleMouseLeave = () => {
-    if (!this.mouseLeaveHideControlsTimeout.current) {
-      this.mouseLeaveHideControlsTimeout.current = setTimeout(() => {
-        clearTimeout(this.mouseLeaveHideControlsTimeout.current);
-        this.mouseLeaveHideControlsTimeout.current = undefined;
+  handlePointerLeave = () => {
+    if (!this.pointerLeaveHideControlsTimeout.current) {
+      this.pointerLeaveHideControlsTimeout.current = setTimeout(() => {
+        clearTimeout(this.pointerLeaveHideControlsTimeout.current);
+        this.pointerLeaveHideControlsTimeout.current = undefined;
 
         this.setHideControls(true);
 
@@ -342,13 +342,13 @@ class FgGameController {
       }, 1250);
     }
 
-    if (this.mouseStillHideControlsTimeout.current) {
-      clearTimeout(this.mouseStillHideControlsTimeout.current);
-      this.mouseStillHideControlsTimeout.current = undefined;
+    if (this.pointerStillHideControlsTimeout.current) {
+      clearTimeout(this.pointerStillHideControlsTimeout.current);
+      this.pointerStillHideControlsTimeout.current = undefined;
     }
   };
 
-  handleMouseEnter = () => {
+  handlePointerEnter = () => {
     this.setHideControls(false);
 
     if (this.popupRefs) {
@@ -357,15 +357,15 @@ class FgGameController {
       );
     }
 
-    if (this.mouseLeaveHideControlsTimeout.current) {
-      clearTimeout(this.mouseLeaveHideControlsTimeout.current);
-      this.mouseLeaveHideControlsTimeout.current = undefined;
+    if (this.pointerLeaveHideControlsTimeout.current) {
+      clearTimeout(this.pointerLeaveHideControlsTimeout.current);
+      this.pointerLeaveHideControlsTimeout.current = undefined;
     }
 
     if (this.gameStarted) {
-      this.mouseStillHideControlsTimeout.current = setTimeout(() => {
-        clearTimeout(this.mouseStillHideControlsTimeout.current);
-        this.mouseStillHideControlsTimeout.current = undefined;
+      this.pointerStillHideControlsTimeout.current = setTimeout(() => {
+        clearTimeout(this.pointerStillHideControlsTimeout.current);
+        this.pointerStillHideControlsTimeout.current = undefined;
 
         this.setHideControls(true);
 
@@ -379,7 +379,7 @@ class FgGameController {
     }
   };
 
-  handleMouseMove = (event: React.MouseEvent) => {
+  handlePointerMove = (event: React.PointerEvent) => {
     this.setHideControls(false);
     if (this.popupRefs) {
       this.popupRefs.map((ref) =>
@@ -387,9 +387,9 @@ class FgGameController {
       );
     }
 
-    if (this.mouseStillHideControlsTimeout.current) {
-      clearTimeout(this.mouseStillHideControlsTimeout.current);
-      this.mouseStillHideControlsTimeout.current = undefined;
+    if (this.pointerStillHideControlsTimeout.current) {
+      clearTimeout(this.pointerStillHideControlsTimeout.current);
+      this.pointerStillHideControlsTimeout.current = undefined;
     }
 
     const target = event.target;
@@ -401,9 +401,9 @@ class FgGameController {
       (this.popupRefs &&
         this.popupRefs.some((ref) => ref.current?.contains(target as Node)))
     ) {
-      this.mouseStillHideControlsTimeout.current = setTimeout(() => {
-        clearTimeout(this.mouseStillHideControlsTimeout.current);
-        this.mouseStillHideControlsTimeout.current = undefined;
+      this.pointerStillHideControlsTimeout.current = setTimeout(() => {
+        clearTimeout(this.pointerStillHideControlsTimeout.current);
+        this.pointerStillHideControlsTimeout.current = undefined;
 
         this.setHideControls(true);
 

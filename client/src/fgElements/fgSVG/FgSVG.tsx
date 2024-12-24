@@ -44,17 +44,17 @@ export default function FgSVG({
 
   const svgContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = () => {
+  const handlePointerEnter = () => {
     if (hoverContent && !hoverTimeout.current) {
       hoverTimeout.current = setTimeout(() => {
         setIsHover(true);
       }, fgSVGOptions.hoverTimeoutDuration);
 
-      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("pointermove", handlePointerMove);
     }
   };
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const handlePointerMove = (event: PointerEvent) => {
     const svgElement = svgContainerRef.current;
 
     if (svgElement && !svgElement.contains(event.target as Node)) {
@@ -64,7 +64,7 @@ export default function FgSVG({
         hoverTimeout.current = undefined;
       }
 
-      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("pointermove", handlePointerMove);
     }
   };
 
@@ -110,7 +110,7 @@ export default function FgSVG({
     <div
       className={className}
       ref={svgContainerRef}
-      {...(hoverContent && { onMouseEnter: handleMouseEnter })}
+      {...(hoverContent && { onPointerEnter: handlePointerEnter })}
     >
       {hoverContent && (
         <AnimatePresence>

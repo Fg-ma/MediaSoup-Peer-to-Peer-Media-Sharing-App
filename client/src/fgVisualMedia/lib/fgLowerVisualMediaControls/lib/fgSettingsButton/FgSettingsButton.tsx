@@ -73,7 +73,7 @@ export default function FgSettingsButton({
   };
 
   useEffect(() => {
-    const handleCloseSettings = (event: MouseEvent) => {
+    const handleCloseSettings = (event: PointerEvent) => {
       const target = event.target as Node;
 
       if (
@@ -85,12 +85,12 @@ export default function FgSettingsButton({
     };
 
     if (settingsActive) {
-      document.addEventListener("mousedown", handleCloseSettings);
+      document.addEventListener("pointerdown", handleCloseSettings);
     }
 
     return () => {
       if (settingsActive) {
-        document.removeEventListener("mousedown", handleCloseSettings);
+        document.removeEventListener("pointerdown", handleCloseSettings);
       }
     };
   }, [settingsActive]);
@@ -100,7 +100,7 @@ export default function FgSettingsButton({
       <FgButton
         externalRef={settingsButtonRef}
         className='flex items-center justify-center pointer-events-auto'
-        mouseDownFunction={toggleSettings}
+        clickFunction={toggleSettings}
         contentFunction={() => (
           <svg
             xmlns='http://www.w3.org/2000/svg'

@@ -92,6 +92,8 @@ export default function Bundle({
     bundleOptions.permissions
   );
 
+  const [_, setRerender] = useState(false);
+
   const bundleController = new BundleController(
     bundleOptions.isUser,
     table_id,
@@ -114,7 +116,8 @@ export default function Bundle({
     permissions,
     setPermissions,
     onNewConsumerWasCreatedCallback,
-    handleMuteCallback
+    handleMuteCallback,
+    setRerender
   );
 
   // Initial functions & call onRendered call back if one is availiable
@@ -169,6 +172,18 @@ export default function Bundle({
         break;
     }
   }, [signal]);
+
+  useEffect(() => {
+    userMedia.current.gamesSignaling?.addMessageListener(
+      bundleController.gameClosedListner
+    );
+
+    return () => {
+      userMedia.current.gamesSignaling?.removeMessageListener(
+        bundleController.gameClosedListner
+      );
+    };
+  }, [userMedia.current.gamesSignaling]);
 
   return (
     <div

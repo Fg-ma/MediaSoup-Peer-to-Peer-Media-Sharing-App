@@ -94,7 +94,7 @@ class FgScrollbarController {
     this.scrollbarThumbRef.current.style.left = `${thumbPosition}px`;
   };
 
-  thumbDragStart = (event: React.MouseEvent) => {
+  thumbDragStart = (event: React.PointerEvent) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -106,12 +106,12 @@ class FgScrollbarController {
 
     this.dragging.current = true;
 
-    // Add mousemove and mouseup event listeners to track dragging
-    document.addEventListener("mousemove", this.thumbDragMove);
-    document.addEventListener("mouseup", this.thumbDragEnd);
+    // Add pointermove and pointerup event listeners to track dragging
+    document.addEventListener("pointermove", this.thumbDragMove);
+    document.addEventListener("pointerup", this.thumbDragEnd);
   };
 
-  thumbDragMove = (event: MouseEvent) => {
+  thumbDragMove = (event: PointerEvent) => {
     if (!this.scrollingContentRef.current) return;
 
     if (this.direction === "vertical") {
@@ -119,7 +119,7 @@ class FgScrollbarController {
       const contentHeight = this.scrollingContentRef.current.scrollHeight;
       const containerHeight = this.scrollingContentRef.current.clientHeight;
 
-      // Calculate the new scroll position based on mouse movement
+      // Calculate the new scroll position based on pointer movement
       const newScrollTop =
         this.startScrollPosition.current.top +
         (deltaY / containerHeight) * contentHeight;
@@ -133,7 +133,7 @@ class FgScrollbarController {
       const contentWidth = this.scrollingContentRef.current.scrollWidth;
       const containerWidth = this.scrollingContentRef.current.clientWidth;
 
-      // Calculate the new scroll position based on mouse movement
+      // Calculate the new scroll position based on pointer movement
       const newScrollLeft =
         this.startScrollPosition.current.left +
         (deltaX / containerWidth) * contentWidth;
@@ -149,9 +149,9 @@ class FgScrollbarController {
   thumbDragEnd = () => {
     this.dragging.current = false;
 
-    // Remove mousemove and mouseup listeners
-    document.removeEventListener("mousemove", this.thumbDragMove);
-    document.removeEventListener("mouseup", this.thumbDragEnd);
+    // Remove pointermove and pointerup listeners
+    document.removeEventListener("pointermove", this.thumbDragMove);
+    document.removeEventListener("pointerup", this.thumbDragEnd);
   };
 
   horizontalScrollWheel = (event: WheelEvent) => {
@@ -162,7 +162,7 @@ class FgScrollbarController {
     this.scrollingContentRef.current.scrollLeft += event.deltaY;
   };
 
-  trackMouseDown = (event: React.MouseEvent) => {
+  trackPointerDown = (event: React.PointerEvent) => {
     if (
       !this.scrollingContentRef.current ||
       !this.scrollbarTrackRef.current ||
@@ -255,13 +255,13 @@ class FgScrollbarController {
     }
   };
 
-  hideTableScrollBar = (event: React.MouseEvent) => {
+  hideTableScrollBar = (event: React.PointerEvent) => {
     if (!this.scrollbarElementRef.current || this.dragging.current) return;
 
     const rect = this.scrollbarElementRef.current.getBoundingClientRect();
 
     if (this.direction === "vertical") {
-      // Check if the mouse is within 40px of the right edge of the container
+      // Check if the pointer is within 40px of the right edge of the container
       if (rect.right - event.clientX <= 40) {
         this.scrollbarElementRef.current.classList.remove("hide-fg-scrollbar");
       } else {
@@ -282,7 +282,7 @@ class FgScrollbarController {
         }
       }
     } else {
-      // Check if the mouse is within 40px of the right edge of the container
+      // Check if the pointer is within 40px of the right edge of the container
       if (rect.bottom - event.clientY <= 40) {
         this.scrollbarElementRef.current.classList.remove("hide-fg-scrollbar");
       } else {
@@ -305,7 +305,7 @@ class FgScrollbarController {
     }
   };
 
-  mouseLeaveFunction = () => {
+  pointerLeaveFunction = () => {
     if (this.dragging.current) {
       return;
     }

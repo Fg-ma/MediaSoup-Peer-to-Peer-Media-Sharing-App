@@ -39,7 +39,7 @@ class FgPanelController {
     private panelInsertionPointRef?: React.RefObject<HTMLDivElement>
   ) {}
 
-  handleMouseMove = (event: React.MouseEvent | MouseEvent) => {
+  handlePointerMove = (event: React.PointerEvent | PointerEvent) => {
     if (this.isDragging.current && !this.isResizing.current) {
       if (!this.panelRef.current) {
         return;
@@ -174,9 +174,9 @@ class FgPanelController {
     }
   };
 
-  handleMouseUp = () => {
-    document.removeEventListener("mousemove", this.handleMouseMove);
-    document.removeEventListener("mouseup", this.handleMouseUp);
+  handlePointerUp = () => {
+    document.removeEventListener("pointermove", this.handlePointerMove);
+    document.removeEventListener("pointerup", this.handlePointerUp);
 
     this.isDragging.current = false;
     this.isResizing.current = false;
@@ -184,20 +184,20 @@ class FgPanelController {
     this.setRerender((prev) => !prev);
   };
 
-  handleResizeMouseDown = (
-    event: React.MouseEvent,
+  handleResizePointerDown = (
+    event: React.PointerEvent,
     direction: "se" | "sw" | "ne" | "nw"
   ) => {
     event.preventDefault();
 
-    document.addEventListener("mousemove", this.handleMouseMove);
-    document.addEventListener("mouseup", this.handleMouseUp);
+    document.addEventListener("pointermove", this.handlePointerMove);
+    document.addEventListener("pointerup", this.handlePointerUp);
 
     this.isResizing.current = true;
     this.resizingDirection.current = direction;
   };
 
-  handleDragMouseDown = (event: React.MouseEvent) => {
+  handleDragPointerDown = (event: React.PointerEvent) => {
     event.preventDefault();
 
     if (
@@ -208,8 +208,8 @@ class FgPanelController {
       return;
     }
 
-    document.addEventListener("mousemove", this.handleMouseMove);
-    document.addEventListener("mouseup", this.handleMouseUp);
+    document.addEventListener("pointermove", this.handlePointerMove);
+    document.addEventListener("pointerup", this.handlePointerUp);
 
     this.isDragging.current = true;
 
@@ -239,7 +239,7 @@ class FgPanelController {
     }
   };
 
-  handlePanelClick = (event: MouseEvent) => {
+  handlePanelClick = (event: PointerEvent) => {
     if (this.panelRef.current) {
       const value = this.panelRef.current.contains(event.target as Node);
       this.setFocus(value);

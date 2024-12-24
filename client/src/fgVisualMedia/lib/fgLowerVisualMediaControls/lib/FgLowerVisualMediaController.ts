@@ -325,26 +325,26 @@ class FgLowerVisualMediaController {
         this.volumeControl(-0.05);
         break;
       case "s":
-        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
           "scale"
         );
-        document.addEventListener("mousemove", this.scaleFuntion);
-        document.addEventListener("mousedown", this.scaleFunctionEnd);
+        document.addEventListener("pointermove", this.scaleFuntion);
+        document.addEventListener("pointerdown", this.scaleFunctionEnd);
         break;
       case "g":
-        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
           "position",
           { rotationPointPlacement: "topLeft" }
         );
-        document.addEventListener("mousemove", this.moveFunction);
-        document.addEventListener("mousedown", this.moveFunctionEnd);
+        document.addEventListener("pointermove", this.moveFunction);
+        document.addEventListener("pointerdown", this.moveFunctionEnd);
         break;
       case "r":
-        this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
           "rotation"
         );
-        document.addEventListener("mousemove", this.rotateFunction);
-        document.addEventListener("mousedown", this.rotateFunctionEnd);
+        document.addEventListener("pointermove", this.rotateFunction);
+        document.addEventListener("pointerdown", this.rotateFunctionEnd);
         break;
       default:
         break;
@@ -352,24 +352,24 @@ class FgLowerVisualMediaController {
   };
 
   scaleFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
-    document.removeEventListener("mousemove", this.scaleFuntion);
-    document.removeEventListener("mousedown", this.scaleFunctionEnd);
+    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    document.removeEventListener("pointermove", this.scaleFuntion);
+    document.removeEventListener("pointerdown", this.scaleFunctionEnd);
   };
 
   rotateFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
-    document.removeEventListener("mousemove", this.rotateFunction);
-    document.removeEventListener("mousedown", this.rotateFunctionEnd);
+    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    document.removeEventListener("pointermove", this.rotateFunction);
+    document.removeEventListener("pointerdown", this.rotateFunctionEnd);
   };
 
   moveFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnMouseUpFunction();
-    document.removeEventListener("mousemove", this.moveFunction);
-    document.removeEventListener("mousedown", this.moveFunctionEnd);
+    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    document.removeEventListener("pointermove", this.moveFunction);
+    document.removeEventListener("pointerdown", this.moveFunctionEnd);
   };
 
-  moveFunction = (event: MouseEvent) => {
+  moveFunction = (event: PointerEvent) => {
     if (!this.bundleRef.current) {
       return;
     }
@@ -414,10 +414,10 @@ class FgLowerVisualMediaController {
           this.bundleRef.current.clientHeight,
       }
     );
-    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
+    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
-  scaleFuntion = (event: MouseEvent) => {
+  scaleFuntion = (event: PointerEvent) => {
     if (!this.bundleRef.current) {
       return;
     }
@@ -442,10 +442,10 @@ class FgLowerVisualMediaController {
       referencePoint,
       referencePoint
     );
-    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
+    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
-  rotateFunction = (event: MouseEvent) => {
+  rotateFunction = (event: PointerEvent) => {
     if (!this.bundleRef.current) {
       return;
     }
@@ -462,7 +462,7 @@ class FgLowerVisualMediaController {
           this.bundleRef.current.clientHeight +
         box.top,
     });
-    this.fgContentAdjustmentController.adjustmentBtnMouseDownFunction();
+    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
   volumeControl = (volumeChangeAmount: number) => {

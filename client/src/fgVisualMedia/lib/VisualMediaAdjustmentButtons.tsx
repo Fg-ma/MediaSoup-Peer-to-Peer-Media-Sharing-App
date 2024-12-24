@@ -48,11 +48,11 @@ export default function VisualMediaAdjustmentButtons({
           });
         }}
         bundleRef={bundleRef}
-        mouseDownFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction
+        pointerDownFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerDownFunction
         }
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+        pointerUpFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
         }
       />
       <PanButton
@@ -100,14 +100,14 @@ export default function VisualMediaAdjustmentButtons({
           );
         }}
         bundleRef={bundleRef}
-        mouseDownFunction={() =>
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+        pointerDownFunction={() =>
+          fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
             "position",
             { rotationPointPlacement: "topLeft" }
           )
         }
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+        pointerUpFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
         }
       />
       <ScaleButton
@@ -134,11 +134,11 @@ export default function VisualMediaAdjustmentButtons({
           );
         }}
         bundleRef={bundleRef}
-        mouseDownFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction
+        pointerDownFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerDownFunction
         }
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+        pointerUpFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
         }
       />
     </>

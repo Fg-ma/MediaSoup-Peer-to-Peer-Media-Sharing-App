@@ -86,8 +86,8 @@ export default function FgScrollbarElement({
       ref={scrollbarElementRef}
       className='relative hide-fg-scrollbar'
       style={style}
-      onMouseMove={fgScrollbarElementController.hideTableScrollBar}
-      onMouseLeave={fgScrollbarElementController.mouseLeaveFunction}
+      onPointerMove={fgScrollbarElementController.hideTableScrollBar}
+      onPointerLeave={fgScrollbarElementController.pointerLeaveFunction}
     >
       <div
         ref={scrollbarRef}
@@ -104,7 +104,7 @@ export default function FgScrollbarElement({
               ? "fg-vertical-scrollbar-track"
               : "fg-horizontal-scrollbar-track"
           }`}
-          onMouseDown={fgScrollbarElementController.trackMouseDown}
+          onPointerDown={fgScrollbarElementController.trackPointerDown}
         >
           <div
             ref={scrollbarThumbRef}
@@ -113,7 +113,7 @@ export default function FgScrollbarElement({
                 ? "fg-vertical-scrollbar-thumb"
                 : "fg-horizontal-scrollbar-thumb"
             }`}
-            onMouseDown={fgScrollbarElementController.thumbDragStart}
+            onPointerDown={fgScrollbarElementController.thumbDragStart}
           ></div>
         </div>
       </div>

@@ -50,10 +50,10 @@ export default function SamplerMetronome() {
     }
   };
 
-  const handleMouseLeave = () => {
+  const handlePointerLeave = () => {
     samplerMetronomeRef.current?.removeEventListener(
-      "mouseleave",
-      handleMouseLeave
+      "pointerleave",
+      handlePointerLeave
     );
 
     if (bpmTimeout.current) {
@@ -72,20 +72,20 @@ export default function SamplerMetronome() {
   }, []);
 
   useEffect(() => {
-    const handleDocumentMouseDown = (event: MouseEvent) => {
+    const handleDocumentPointerDown = (event: PointerEvent) => {
       if (!samplerMetronomeRef.current?.contains(event.target as Node)) {
         setMetronomeVolumeActive(false);
       }
     };
 
     if (metronomeVolumeActive) {
-      document.addEventListener("mousedown", handleDocumentMouseDown);
+      document.addEventListener("pointerdown", handleDocumentPointerDown);
     } else {
-      document.removeEventListener("mousedown", handleDocumentMouseDown);
+      document.removeEventListener("pointerdown", handleDocumentPointerDown);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleDocumentMouseDown);
+      document.removeEventListener("pointerdown", handleDocumentPointerDown);
     };
   }, [metronomeVolumeActive]);
 
@@ -93,10 +93,10 @@ export default function SamplerMetronome() {
     <div
       ref={samplerMetronomeRef}
       className='flex items-center justify-center relative'
-      onMouseEnter={() => {
+      onPointerEnter={() => {
         samplerMetronomeRef.current?.addEventListener(
-          "mouseleave",
-          handleMouseLeave
+          "pointerleave",
+          handlePointerLeave
         );
 
         bpmTimeout.current = setTimeout(() => {

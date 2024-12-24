@@ -66,14 +66,14 @@ export default function FgPortal({
 
     if (type === "mouse")
       window.addEventListener(
-        "mousemove",
+        "pointermove",
         fgPortalController.getDynamicPortalPosition
       );
 
     return () => {
       if (type === "mouse")
         window.removeEventListener(
-          "mousemove",
+          "pointermove",
           fgPortalController.getDynamicPortalPosition
         );
     };

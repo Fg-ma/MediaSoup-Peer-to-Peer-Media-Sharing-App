@@ -8,7 +8,7 @@ class VerticalSplitPanesController {
     private setHeaderLightness: React.Dispatch<React.SetStateAction<number>>,
     private verticalSplitPanesRef: React.RefObject<HTMLDivElement>,
     private isResizing: React.MutableRefObject<boolean>,
-    private startMousePosition: React.MutableRefObject<number>,
+    private startPointerPosition: React.MutableRefObject<number>,
     private startPaneHeight: React.MutableRefObject<number>,
     private maxPaneHeightCallback?: () => void,
     private minPaneHeightCallback?: () => void,
@@ -48,13 +48,13 @@ class VerticalSplitPanesController {
         return;
       }
 
-      const mouseYDelta = clientY - this.startMousePosition.current;
+      const pointerYDelta = clientY - this.startPointerPosition.current;
 
       // Adjust the speed by fiddling with the sensitivity factor
       const sensitivityFactor = 1;
       let newPaneHeight =
         this.startPaneHeight.current +
-        (mouseYDelta / containerHeight) * 100 * sensitivityFactor;
+        (pointerYDelta / containerHeight) * 100 * sensitivityFactor;
 
       // Cap the newPaneHeight to a maximum value
       newPaneHeight = Math.min(
@@ -99,11 +99,11 @@ class VerticalSplitPanesController {
     document.removeEventListener("touchend", this.handleTouchUp);
   };
 
-  handleMouseUp = () => {
+  handlePointerUp = () => {
     this.isResizing.current = false;
 
-    document.removeEventListener("mousemove", this.handleMouseMove);
-    document.removeEventListener("mouseup", this.handleMouseUp);
+    document.removeEventListener("pointermove", this.handlePointerMove);
+    document.removeEventListener("pointerup", this.handlePointerUp);
   };
 
   handleTouchDown = (event: React.TouchEvent<HTMLDivElement>) => {
@@ -111,26 +111,26 @@ class VerticalSplitPanesController {
     event.stopPropagation();
 
     this.isResizing.current = true;
-    this.startMousePosition.current = event.touches[0].clientY;
+    this.startPointerPosition.current = event.touches[0].clientY;
     this.startPaneHeight.current = parseFloat(this.paneHeight) || 0;
 
     document.addEventListener("touchmove", this.handleTouchMove);
     document.addEventListener("touchend", this.handleTouchUp);
   };
 
-  handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  handlePointerDown = (event: React.PointerEvent) => {
     event.preventDefault();
     event.stopPropagation();
 
     this.isResizing.current = true;
-    this.startMousePosition.current = event.clientY;
+    this.startPointerPosition.current = event.clientY;
     this.startPaneHeight.current = parseFloat(this.paneHeight) || 0;
 
-    document.addEventListener("mousemove", this.handleMouseMove);
-    document.addEventListener("mouseup", this.handleMouseUp);
+    document.addEventListener("pointermove", this.handlePointerMove);
+    document.addEventListener("pointerup", this.handlePointerUp);
   };
 
-  handleMouseMove = (event: MouseEvent) => {
+  handlePointerMove = (event: PointerEvent) => {
     this.handleMove(event.clientY);
   };
 

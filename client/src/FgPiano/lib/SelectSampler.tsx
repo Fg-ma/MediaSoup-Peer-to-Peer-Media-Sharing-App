@@ -565,9 +565,9 @@ export default function SelectSampler({
   const hoverTimeout = useRef<NodeJS.Timeout>();
   const selectSamplerLabelRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = () => {
+  const handlePointerEnter = () => {
     if (selectSamplerLabelRef.current?.classList.contains("truncate")) {
-      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("pointermove", handlePointerMove);
 
       if (!hoverTimeout.current) {
         hoverTimeout.current = setTimeout(() => {
@@ -577,12 +577,12 @@ export default function SelectSampler({
     }
   };
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const handlePointerMove = (event: PointerEvent) => {
     if (
       selectSamplerLabelRef.current &&
       !selectSamplerLabelRef.current.contains(event.target as Node)
     ) {
-      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("pointermove", handlePointerMove);
 
       setHover(false);
       if (hoverTimeout.current !== undefined) {
@@ -592,8 +592,8 @@ export default function SelectSampler({
     }
   };
 
-  const handleMouseDown = () => {
-    document.removeEventListener("mousemove", handleMouseMove);
+  const handlePointerDown = () => {
+    document.removeEventListener("pointermove", handlePointerMove);
 
     setHover(false);
     if (hoverTimeout.current !== undefined) {
@@ -602,12 +602,12 @@ export default function SelectSampler({
     }
   };
 
-  const handleMouseUp = (event: MouseEvent) => {
+  const handlePointerUp = (event: PointerEvent) => {
     if (
       event.target &&
       selectSamplerLabelRef.current?.contains(event.target as Node)
     ) {
-      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("pointermove", handlePointerMove);
 
       setHover(true);
       if (!hoverTimeout.current) {
@@ -697,7 +697,7 @@ export default function SelectSampler({
           <div
             ref={selectSamplerLabelRef}
             className='select-sampler-label'
-            onMouseEnter={handleMouseEnter}
+            onPointerEnter={handlePointerEnter}
           >
             {sampler.label}
             {hover && (
@@ -723,8 +723,8 @@ export default function SelectSampler({
             setSampler(newSampler);
           }
         }}
-        mouseDownFunction={handleMouseDown}
-        mouseUpFunction={handleMouseUp}
+        pointerDownFunction={handlePointerDown}
+        pointerUpFunction={handlePointerUp}
         options={{ mode: "pick" }}
       />
       <FgButton

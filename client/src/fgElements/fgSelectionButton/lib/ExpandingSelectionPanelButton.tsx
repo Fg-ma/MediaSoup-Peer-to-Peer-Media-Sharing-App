@@ -34,19 +34,19 @@ export default function ExpandingSelectionPanelButton({
     };
   }, [panelRef.current]);
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const handlePointerMove = (event: PointerEvent) => {
     // Find the index of the current panelRef in panelRefs
     const panelIndex = panelRefs.current.findIndex(
       (ref) => ref.current === panelRef.current
     );
 
-    // Check if the mouse is within any of the panels from this index onward
+    // Check if the pointer is within any of the panels from this index onward
     const isInPanel = panelRefs.current.slice(panelIndex).some((ref) => {
       return ref.current?.contains(event.target as Node) ?? false;
     });
 
     if (!isInPanel && !buttonRef.current?.contains(event.target as Node)) {
-      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("pointermove", handlePointerMove);
 
       const targetValue = selections.value;
       const lastIndex = previousPanels.current.lastIndexOf(targetValue);
@@ -61,7 +61,7 @@ export default function ExpandingSelectionPanelButton({
   };
 
   const handleWheel = () => {
-    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("pointermove", handlePointerMove);
 
     const targetValue = selections.value;
     const lastIndex = previousPanels.current.lastIndexOf(targetValue);
@@ -90,8 +90,8 @@ export default function ExpandingSelectionPanelButton({
     <div
       ref={buttonRef}
       className='cursor-default relative px-2 w-full h-8 hover:bg-fg-white-80 rounded'
-      onMouseEnter={() => {
-        document.addEventListener("mousemove", handleMouseMove);
+      onPointerEnter={() => {
+        document.addEventListener("pointermove", handlePointerMove);
 
         previousPanels.current.push(selections.value);
         setExpanded(true);

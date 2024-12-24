@@ -152,16 +152,10 @@ export default function FgSoundBoard({
                 className={`sound-board-btn ${
                   importButton.pressed ? "pressed" : ""
                 } ${importButton.classes.join(" ")}`}
-                mouseDownFunction={
+                pointerDownFunction={
                   fgSoundBoardController.handleImportEffectClickDown
                 }
-                mouseUpFunction={
-                  fgSoundBoardController.handleImportEffectClickUp
-                }
-                touchStartFunction={
-                  fgSoundBoardController.handleImportEffectClickDown
-                }
-                touchEndFunction={
+                pointerUpFunction={
                   fgSoundBoardController.handleImportEffectClickUp
                 }
                 contentFunction={() => (
@@ -195,16 +189,10 @@ export default function FgSoundBoard({
                   className={`sound-board-btn ${
                     effect.pressed ? "pressed" : ""
                   } ${effect.classes.join(" ")}`}
-                  mouseDownFunction={() =>
+                  pointerDownFunction={() =>
                     fgSoundBoardController.clickDown(parseInt(key))
                   }
-                  mouseUpFunction={() =>
-                    fgSoundBoardController.clickUp(parseInt(key))
-                  }
-                  touchStartFunction={() =>
-                    fgSoundBoardController.clickDown(parseInt(key))
-                  }
-                  touchEndFunction={() =>
+                  pointerUpFunction={() =>
                     fgSoundBoardController.clickUp(parseInt(key))
                   }
                   contentFunction={() => (

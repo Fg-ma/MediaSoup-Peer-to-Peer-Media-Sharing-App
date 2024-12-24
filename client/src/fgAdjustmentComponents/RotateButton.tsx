@@ -7,8 +7,8 @@ export default function RotateButton({
   className,
   dragFunction,
   bundleRef,
-  mouseDownFunction,
-  mouseUpFunction,
+  pointerDownFunction,
+  pointerUpFunction,
 }: {
   className?: string;
   dragFunction: (
@@ -16,17 +16,17 @@ export default function RotateButton({
       x: number;
       y: number;
     },
-    event: MouseEvent
+    event: PointerEvent
   ) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
-  mouseDownFunction: () => void;
-  mouseUpFunction: () => void;
+  pointerDownFunction: () => void;
+  pointerUpFunction: () => void;
 }) {
   return (
     <FgButton
       className={className}
-      mouseDownFunction={mouseDownFunction}
-      mouseUpFunction={mouseUpFunction}
+      pointerDownFunction={pointerDownFunction}
+      pointerUpFunction={pointerUpFunction}
       dragFunction={dragFunction}
       referenceDragElement={bundleRef}
       contentFunction={() => {

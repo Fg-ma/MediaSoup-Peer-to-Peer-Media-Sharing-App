@@ -22,8 +22,8 @@ export default function GamePlayerIcon({
       style={{
         boxShadow: `0px 3px 5px rgba(${shadowColor.r}, ${shadowColor.g}, ${shadowColor.b}, 0.6)`,
       }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      onPointerEnter={() => setHover(true)}
+      onPointerLeave={() => setHover(false)}
     >
       <div
         className='game-player-icon-border absolute inset-0'

@@ -96,15 +96,15 @@ export default function FgKnobButton({
     return newValue;
   };
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const handlePointerMove = (event: PointerEvent) => {
     if (!knobButtonRef.current) return;
 
     const rect = knobButtonRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    const mouseX = event.clientX;
-    const mouseY = event.clientY;
-    const angleRad = Math.atan2(mouseY - centerY, mouseX - centerX);
+    const pointerX = event.clientX;
+    const pointerY = event.clientY;
+    const angleRad = Math.atan2(pointerY - centerY, pointerX - centerX);
     let newAngle = (angleRad * 180) / Math.PI - 135;
 
     if (newAngle < 0) {
@@ -132,20 +132,20 @@ export default function FgKnobButton({
     setValue(getValueFromAngle(newAngle));
   };
 
-  const handleMouseUp = () => {
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
+  const handlePointerUp = () => {
+    document.removeEventListener("pointermove", handlePointerMove);
+    document.removeEventListener("pointerup", handlePointerUp);
 
     setClicked(false);
   };
 
-  const handleMouseDown = (event: React.MouseEvent) => {
+  const handlePointerDown = (event: React.PointerEvent) => {
     event.preventDefault();
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointerup", handlePointerUp);
 
-    handleMouseMove(event as unknown as MouseEvent);
+    handlePointerMove(event as unknown as PointerEvent);
 
     setClicked(true);
   };
@@ -174,7 +174,7 @@ export default function FgKnobButton({
       <div
         ref={knobButtonRef}
         className='grow aspect-square cursor-pointer relative'
-        onMouseDown={handleMouseDown}
+        onPointerDown={handlePointerDown}
       >
         <svg className='w-max h-full' viewBox='0 0 100 100'>
           {/* after path round*/}

@@ -456,8 +456,8 @@ export default function FgBabylonCanvas({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
-      onMouseEnter={() => fgVisualMediaController.handleMouseEnter()}
-      onMouseLeave={() => fgVisualMediaController.handleMouseLeave()}
+      onPointerEnter={() => fgVisualMediaController.handlePointerEnter()}
+      onPointerLeave={() => fgVisualMediaController.handlePointerLeave()}
       data-positioning={JSON.stringify(positioning.current)}
     >
       {(fgVisualMediaOptions.isUser ||

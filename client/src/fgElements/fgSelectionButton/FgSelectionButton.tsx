@@ -15,15 +15,15 @@ export default function FgSelectionButton({
   content,
   selections,
   valueSelectionFunction,
-  mouseDownFunction,
-  mouseUpFunction,
+  pointerDownFunction,
+  pointerUpFunction,
   options,
 }: {
   content: React.ReactElement;
   selections: RecursiveSelections;
   valueSelectionFunction?: (value: string[]) => void;
-  mouseDownFunction?: (event: React.MouseEvent) => void;
-  mouseUpFunction?: (event: MouseEvent) => void;
+  pointerDownFunction?: (event: React.PointerEvent) => void;
+  pointerUpFunction?: (event: PointerEvent) => void;
   options?: {
     mode?: "hold" | "pick";
   };
@@ -38,26 +38,26 @@ export default function FgSelectionButton({
   const previousPanels = useRef<string[]>([]);
   const panelRefs = useRef<React.RefObject<HTMLDivElement>[]>([]);
 
-  const handleMouseDown = (event: React.MouseEvent) => {
+  const handlePointerDown = (event: React.PointerEvent) => {
     if (!selectionPanelActive) {
       previousPanels.current = [];
       setSelectionPanelActive(true);
 
-      if (mouseDownFunction) {
-        mouseDownFunction(event);
+      if (pointerDownFunction) {
+        pointerDownFunction(event);
       }
 
       if (fgSelectionButtonOptions.mode === "pick") {
         setTimeout(() => {
-          document.addEventListener("mousedown", handleMouseUp);
+          document.addEventListener("pointerdown", handlePointerUp);
         }, 0);
       }
     }
   };
 
-  const handleMouseUp = (event: MouseEvent) => {
+  const handlePointerUp = (event: PointerEvent) => {
     if (fgSelectionButtonOptions.mode === "pick") {
-      document.removeEventListener("mousedown", handleMouseUp);
+      document.removeEventListener("pointerdown", handlePointerUp);
     }
 
     setSelectionPanelActive(false);
@@ -76,8 +76,8 @@ export default function FgSelectionButton({
       }
     }
 
-    if (mouseUpFunction) {
-      mouseUpFunction(event);
+    if (pointerUpFunction) {
+      pointerUpFunction(event);
     }
   };
 
@@ -85,9 +85,9 @@ export default function FgSelectionButton({
     <FgButton
       externalRef={buttonRef}
       className='relative'
-      mouseDownFunction={handleMouseDown}
+      pointerDownFunction={handlePointerDown}
       {...(fgSelectionButtonOptions.mode === "hold"
-        ? { mouseUpFunction: handleMouseUp }
+        ? { pointerUpFunction: handlePointerUp }
         : {})}
       contentFunction={() => (
         <>

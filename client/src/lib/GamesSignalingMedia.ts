@@ -67,7 +67,8 @@ type onUserJoinedTableType = {
 };
 
 class GamesSignalingMedia {
-  private ws: WebSocket | undefined;
+  protected ws: WebSocket | undefined;
+  private messageListeners: Set<(message: MessageEvent) => void> = new Set();
 
   constructor(
     private table_id: string,
@@ -95,20 +96,34 @@ class GamesSignalingMedia {
       this.ws.onclose = null;
       this.ws.onerror = null;
     }
+
+    this.messageListeners.clear();
   };
 
   private connect = (url: string) => {
     this.ws = new WebSocket(url);
 
-    this.ws.onmessage = (event) => {
+    this.ws.onmessage = (event: MessageEvent) => {
       const message = JSON.parse(event.data);
+
       this.handleMessage(message);
+      this.messageListeners.forEach((listener) => {
+        listener(event);
+      });
     };
 
     this.ws.onopen = () => {
       this.joinTable();
     };
   };
+
+  addMessageListener(listener: (message: MessageEvent) => void): void {
+    this.messageListeners.add(listener);
+  }
+
+  removeMessageListener(listener: (message: MessageEvent) => void): void {
+    this.messageListeners.delete(listener);
+  }
 
   sendMessage = (message: OutGoingMessages) => {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
@@ -175,6 +190,7 @@ class GamesSignalingMedia {
             this.userMedia.current.games.snake &&
             this.userMedia.current.games.snake[gameId]
           ) {
+            this.userMedia.current.games.snake[gameId].destructor();
             delete this.userMedia.current.games.snake[gameId];
 
             if (Object.keys(this.userMedia.current.games.snake).length === 0) {

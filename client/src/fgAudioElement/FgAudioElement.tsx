@@ -109,12 +109,15 @@ export default function FgAudioElement({
 
     fgAudioElementController.init();
 
-    window.addEventListener("mousemove", fgAudioElementController.onMouseMove);
+    window.addEventListener(
+      "pointermove",
+      fgAudioElementController.onPointerMove
+    );
 
     return () => {
       window.removeEventListener(
-        "mousemove",
-        fgAudioElementController.onMouseMove
+        "pointermove",
+        fgAudioElementController.onPointerMove
       );
     };
   }, []);
@@ -576,7 +579,7 @@ export default function FgAudioElement({
           {!isUser && (
             <animated.rect
               ref={leftHandleRef}
-              onMouseDown={(event) => {
+              onPointerDown={(event) => {
                 if (!isUser) fgAudioElementController.startDrag(event, "left");
               }}
               x={4}
@@ -592,7 +595,7 @@ export default function FgAudioElement({
           {!isUser && (
             <animated.rect
               ref={rightHandleRef}
-              onMouseDown={(event) => {
+              onPointerDown={(event) => {
                 if (!isUser) fgAudioElementController.startDrag(event, "right");
               }}
               x={80}
@@ -610,7 +613,9 @@ export default function FgAudioElement({
       doubleClickFunction={
         doubleClickFunction &&
         ((event) => {
-          const validDoubleClick = fgAudioElementController.isOnPath(event);
+          const validDoubleClick = fgAudioElementController.isOnPath(
+            event as unknown as React.PointerEvent
+          );
 
           if (validDoubleClick) doubleClickFunction();
         })

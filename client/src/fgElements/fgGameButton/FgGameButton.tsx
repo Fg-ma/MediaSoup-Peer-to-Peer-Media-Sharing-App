@@ -32,12 +32,12 @@ export default function FgGameButton({
   const rimRef = useRef<HTMLDivElement>(null);
   const movingPartRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = () => {
+  const handlePointerDown = () => {
     if (!movingPartRef.current) {
       return;
     }
 
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("pointerup", handlePointerUp);
 
     const classes = movingPartRef.current.classList;
 
@@ -46,8 +46,8 @@ export default function FgGameButton({
     }
   };
 
-  const handleMouseUp = () => {
-    document.removeEventListener("mouseup", handleMouseUp);
+  const handlePointerUp = () => {
+    document.removeEventListener("pointerup", handlePointerUp);
 
     if (!movingPartRef.current) {
       return;
@@ -76,7 +76,7 @@ export default function FgGameButton({
         <div
           ref={rimRef}
           className='fg-game-button-stationary-rim w-full h-full relative'
-          onMouseDown={handleMouseDown}
+          onPointerDown={handlePointerDown}
         >
           <div
             ref={movingPartRef}

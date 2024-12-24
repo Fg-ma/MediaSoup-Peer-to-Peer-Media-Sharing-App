@@ -20,9 +20,9 @@ export default function OctaveSelection({
   const octaveDivRef = useRef<HTMLDivElement>(null);
   const octaveLabelRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = () => {
+  const handlePointerEnter = () => {
     if (octaveLabelRef.current?.classList.contains("hidden")) {
-      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("pointermove", handlePointerMove);
 
       hoverTimeout.current = setTimeout(() => {
         setHover(true);
@@ -30,12 +30,12 @@ export default function OctaveSelection({
     }
   };
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const handlePointerMove = (event: PointerEvent) => {
     if (
       octaveDivRef.current &&
       !octaveDivRef.current.contains(event.target as Node)
     ) {
-      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("pointermove", handlePointerMove);
 
       setHover(false);
       if (hoverTimeout.current !== undefined) {
@@ -84,7 +84,7 @@ export default function OctaveSelection({
       <div
         ref={octaveDivRef}
         className='octave-container mb-0.5 cursor-default select-none truncate grow flex'
-        onMouseEnter={handleMouseEnter}
+        onPointerEnter={handlePointerEnter}
       >
         <div ref={octaveLabelRef} className='octave-label'>
           Octave

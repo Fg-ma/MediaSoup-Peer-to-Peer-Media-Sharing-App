@@ -356,8 +356,7 @@ export default function FgBackgroundMusicPortal({
                   />
                 </div>
               )}
-              mouseDownFunction={handleImportEffectClickDown}
-              touchStartFunction={handleImportEffectClickDown}
+              pointerDownFunction={handleImportEffectClickDown}
               hoverContent={
                 <FgHoverContentStandard content='Import background music' />
               }

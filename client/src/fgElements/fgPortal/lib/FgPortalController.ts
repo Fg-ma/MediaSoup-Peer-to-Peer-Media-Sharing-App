@@ -110,7 +110,7 @@ class FgPortalController {
     });
   };
 
-  getDynamicPortalPosition = (event: MouseEvent) => {
+  getDynamicPortalPosition = (event: PointerEvent) => {
     this.setPortalPosition({
       left:
         event.clientX +

@@ -217,7 +217,7 @@ export default function SettingsPanel({
                     </div>
                   </div>
                 )}
-                mouseDownFunction={handleClosedCaptionsActive}
+                clickFunction={handleClosedCaptionsActive}
               />
             )}
           </motion.div>

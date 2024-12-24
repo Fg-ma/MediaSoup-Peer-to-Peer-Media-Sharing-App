@@ -33,8 +33,8 @@ export default function PageTemplate({
               ]}
             />
           )}
-          // @ts-expect-error: trival non overlap of MouseEvent and React.MouseEvent
-          mouseUpFunction={backFunction}
+          // @ts-expect-error: trival non overlap of PointerEvent and React.PointerEvent
+          pointerUpFunction={backFunction}
         />
         {pageTitle && (
           <div

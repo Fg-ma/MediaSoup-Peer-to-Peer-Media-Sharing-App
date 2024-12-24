@@ -7,20 +7,20 @@ export default function ScaleButton({
   className,
   dragFunction,
   bundleRef,
-  mouseDownFunction,
-  mouseUpFunction,
+  pointerDownFunction,
+  pointerUpFunction,
 }: {
   className?: string;
   dragFunction: (displacement: { x: number; y: number }) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
-  mouseDownFunction: () => void;
-  mouseUpFunction: () => void;
+  pointerDownFunction: () => void;
+  pointerUpFunction: () => void;
 }) {
   return (
     <FgButton
       className={className}
-      mouseDownFunction={mouseDownFunction}
-      mouseUpFunction={mouseUpFunction}
+      pointerDownFunction={pointerDownFunction}
+      pointerUpFunction={pointerUpFunction}
       dragFunction={dragFunction}
       referenceDragElement={bundleRef}
       contentFunction={() => {

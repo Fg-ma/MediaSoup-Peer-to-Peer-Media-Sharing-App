@@ -76,19 +76,19 @@ class FgAudioElementController {
     }
   };
 
-  startDrag = (event: React.MouseEvent, side: "left" | "right") => {
+  startDrag = (event: React.PointerEvent, side: "left" | "right") => {
     event.preventDefault();
     event.stopPropagation();
 
     if (!this.isUser) {
-      window.addEventListener("mousemove", this.drag);
-      window.addEventListener("mouseup", this.stopDrag);
+      window.addEventListener("pointermove", this.drag);
+      window.addEventListener("pointerup", this.stopDrag);
     }
 
     this.sideDragging.current = side;
   };
 
-  drag = (event: MouseEvent) => {
+  drag = (event: PointerEvent) => {
     if (!this.svgRef.current || !this.sideDragging.current) return;
 
     const svgPoint = this.svgRef.current.createSVGPoint();
@@ -112,12 +112,12 @@ class FgAudioElementController {
     this.handleVolumeSlider(newVol);
   };
 
-  stopDrag = (event: MouseEvent) => {
+  stopDrag = (event: PointerEvent) => {
     event.stopPropagation();
 
     if (!this.isUser) {
-      window.removeEventListener("mousemove", this.drag);
-      window.removeEventListener("mouseup", this.stopDrag);
+      window.removeEventListener("pointermove", this.drag);
+      window.removeEventListener("pointerup", this.stopDrag);
     }
 
     this.setLeftHandlePosition((prevState) => ({ ...prevState, y: 50 }));
@@ -125,7 +125,7 @@ class FgAudioElementController {
     this.sideDragging.current = null;
   };
 
-  isOnPath = (event: React.MouseEvent) => {
+  isOnPath = (event: React.PointerEvent) => {
     const pathElement = this.pathRef.current;
     const svgElement = this.svgRef.current;
 
@@ -146,15 +146,15 @@ class FgAudioElementController {
   };
 
   onClick = (event: React.MouseEvent) => {
-    const validClick = this.isOnPath(event);
+    const validClick = this.isOnPath(event as unknown as React.PointerEvent);
 
     if (validClick) {
       this.handleMute();
     }
   };
 
-  onMouseMove = (event: MouseEvent) => {
-    const validMove = this.isOnPath(event as unknown as React.MouseEvent);
+  onPointerMove = (event: PointerEvent) => {
+    const validMove = this.isOnPath(event as unknown as React.PointerEvent);
 
     if (validMove) {
       if (!this.svgRef.current?.classList.contains("cursor-pointer")) {

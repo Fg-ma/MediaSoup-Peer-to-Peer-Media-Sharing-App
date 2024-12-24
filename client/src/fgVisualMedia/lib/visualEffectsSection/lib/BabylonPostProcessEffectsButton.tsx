@@ -180,7 +180,7 @@ export default function BabylonPostProcessEffectsButton({
     setEffectsDisabled(false);
   };
 
-  const holdFunction = async (event: React.MouseEvent<Element, MouseEvent>) => {
+  const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
     if (
       !effectsStyles ||
@@ -258,7 +258,9 @@ export default function BabylonPostProcessEffectsButton({
                         ? "border-fg-secondary border-3 border-opacity-100"
                         : ""
                     } border-white flex items-center justify-center w-16 min-w-16 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-                    onClick={holdFunction}
+                    onClick={(event) => {
+                      holdFunction(event as unknown as PointerEvent);
+                    }}
                     data-camera-post-process-effects-button-value={
                       postProcessEffect
                     }

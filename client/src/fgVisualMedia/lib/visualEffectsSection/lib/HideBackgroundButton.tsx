@@ -255,7 +255,7 @@ export default function HideBackgroundButton({
     setEffectsDisabled(false);
   };
 
-  const holdFunction = async (event: React.MouseEvent<Element, MouseEvent>) => {
+  const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
     if (!effectsStyles || !target || !target.dataset.visualEffectsButtonValue) {
       return;
@@ -349,7 +349,9 @@ export default function HideBackgroundButton({
                   width: "100%",
                   height: "100%",
                 }}
-                onClick={holdFunction}
+                onClick={(event) => {
+                  holdFunction(event as unknown as PointerEvent);
+                }}
                 data-visual-effects-button-value={"color"}
               ></div>
             </div>
@@ -363,7 +365,9 @@ export default function HideBackgroundButton({
                         ? "border-fg-secondary border-3 border-opacity-100"
                         : ""
                     } border-white flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-                    onClick={holdFunction}
+                    onClick={(event) => {
+                      holdFunction(event as unknown as PointerEvent);
+                    }}
                     data-visual-effects-button-value={background}
                   >
                     <FgImage

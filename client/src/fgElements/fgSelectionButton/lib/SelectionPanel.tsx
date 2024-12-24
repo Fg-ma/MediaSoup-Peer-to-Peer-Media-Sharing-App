@@ -164,9 +164,12 @@ export default function SelectionPanel({
     });
   };
 
-  const handleHoverScrollUpMouseMove = (event: MouseEvent) => {
+  const handleHoverScrollUpPointerMove = (event: PointerEvent) => {
     if (!scrollUpButtonRef.current?.contains(event.target as Node)) {
-      document.removeEventListener("mousemove", handleHoverScrollUpMouseMove);
+      document.removeEventListener(
+        "pointermove",
+        handleHoverScrollUpPointerMove
+      );
 
       if (scrollInterval.current) {
         clearInterval(scrollInterval.current);
@@ -176,7 +179,7 @@ export default function SelectionPanel({
   };
 
   const handleHoverScrollUp = () => {
-    document.addEventListener("mousemove", handleHoverScrollUpMouseMove);
+    document.addEventListener("pointermove", handleHoverScrollUpPointerMove);
 
     if (!scrollInterval.current) {
       scrollInterval.current = setInterval(() => {
@@ -187,9 +190,12 @@ export default function SelectionPanel({
     }
   };
 
-  const handleHoverScrollDownMouseMove = (event: MouseEvent) => {
+  const handleHoverScrollDownPointerMove = (event: PointerEvent) => {
     if (!scrollDownButtonRef.current?.contains(event.target as Node)) {
-      document.removeEventListener("mousemove", handleHoverScrollDownMouseMove);
+      document.removeEventListener(
+        "pointermove",
+        handleHoverScrollDownPointerMove
+      );
 
       if (scrollInterval.current) {
         clearInterval(scrollInterval.current);
@@ -199,7 +205,7 @@ export default function SelectionPanel({
   };
 
   const handleHoverScrollDown = () => {
-    document.addEventListener("mousemove", handleHoverScrollDownMouseMove);
+    document.addEventListener("pointermove", handleHoverScrollDownPointerMove);
 
     if (!scrollInterval.current) {
       scrollInterval.current = setInterval(() => {
@@ -240,7 +246,7 @@ export default function SelectionPanel({
             // prettier-ignore
             width: `calc(100% - ${isParentScrolling && portalPosition?.position === "right" ? "5.75rem" : "3.5rem"})`,
           }}
-          onMouseEnter={handleHoverScrollUp}
+          onPointerEnter={handleHoverScrollUp}
         ></div>
       )}
       <div
@@ -294,7 +300,7 @@ export default function SelectionPanel({
             // prettier-ignore
             width: `calc(100% - ${isParentScrolling && portalPosition?.position === "right" ? "5.75rem" : "3.5rem"})`,
           }}
-          onMouseEnter={handleHoverScrollDown}
+          onPointerEnter={handleHoverScrollDown}
         ></div>
       )}
       {portalPosition?.position === "left" && (

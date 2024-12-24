@@ -57,7 +57,8 @@ class BundleController extends BundleSocket {
     permissions: Permissions,
     setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
     onNewConsumerWasCreatedCallback: (() => void) | undefined,
-    private handleMuteCallback: (() => void) | undefined
+    private handleMuteCallback: (() => void) | undefined,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     super(
       isUser,
@@ -170,6 +171,13 @@ class BundleController extends BundleSocket {
 
     if (this.audioRef.current && !this.bundleOptions.isUser) {
       this.audioRef.current.muted = this.localMute.current;
+    }
+  };
+
+  gameClosedListner = (event: { data: string }) => {
+    const message = JSON.parse(event.data);
+    if (message.type === "gameClosed") {
+      this.setRerender((prev) => !prev);
     }
   };
 }

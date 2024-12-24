@@ -119,7 +119,7 @@ export default function ClosedCaptionsOptionsPage({
               ]}
             />
           )}
-          mouseDownFunction={handleClosedCaptionOptionsActive}
+          clickFunction={handleClosedCaptionOptionsActive}
         />
         <div
           className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'

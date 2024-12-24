@@ -61,7 +61,7 @@ export default function VerticalSplitPanes({
   const bottomPaneRef = useRef<HTMLDivElement>(null);
   const topPaneRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
-  const startMousePosition = useRef(0);
+  const startPointerPosition = useRef(0);
   const startPaneHeight = useRef(0);
 
   const verticalSplitPanesController = new VerticalSplitPanesController(
@@ -71,7 +71,7 @@ export default function VerticalSplitPanes({
     setHeaderLightness,
     verticalSplitPanesRef,
     isResizing,
-    startMousePosition,
+    startPointerPosition,
     startPaneHeight,
     maxPaneHeightCallback,
     minPaneHeightCallback,
@@ -140,8 +140,8 @@ export default function VerticalSplitPanes({
         {topContent && bottomContent && (
           <div
             className='cursor-pointer select-none'
-            onMouseDown={(event) => {
-              verticalSplitPanesController.handleMouseDown(event);
+            onPointerDown={(event) => {
+              verticalSplitPanesController.handlePointerDown(event);
             }}
             onTouchStart={(event) => {
               verticalSplitPanesController.handleTouchDown(event);

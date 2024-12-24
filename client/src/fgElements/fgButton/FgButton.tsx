@@ -53,10 +53,8 @@ export default function FgButton({
   externalRef,
   scrollingContainerRef,
   clickFunction,
-  mouseDownFunction,
-  mouseUpFunction,
-  touchStartFunction,
-  touchEndFunction,
+  pointerDownFunction,
+  pointerUpFunction,
   holdFunction,
   contentFunction,
   doubleClickFunction,
@@ -81,16 +79,14 @@ export default function FgButton({
   externalRef?: React.RefObject<HTMLButtonElement>;
   scrollingContainerRef?: React.RefObject<HTMLDivElement>;
   clickFunction?: (event: React.MouseEvent) => void;
-  mouseDownFunction?: (event: React.MouseEvent) => void;
-  mouseUpFunction?: (event: MouseEvent) => void;
-  touchStartFunction?: (event: React.TouchEvent) => void;
-  touchEndFunction?: (event: React.TouchEvent) => void;
-  holdFunction?: (event: React.MouseEvent<Element, MouseEvent>) => void;
+  pointerDownFunction?: (event: React.PointerEvent) => void;
+  pointerUpFunction?: (event: PointerEvent) => void;
+  holdFunction?: (event: PointerEvent) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: (event: React.MouseEvent) => void;
   dragFunction?: (
     displacement: { x: number; y: number },
-    event: MouseEvent
+    event: PointerEvent
   ) => void;
   referenceDragElement?: React.RefObject<HTMLElement>;
   focusFunction?: (event: React.FocusEvent) => void;
@@ -143,12 +139,12 @@ export default function FgButton({
 
   // Use useCallback to memoize the toggleHold function
   const toggleHold = useCallback(
-    (event: MouseEvent) => {
+    (event: PointerEvent) => {
       if (
         !holdContentRef.current ||
         !holdContentRef.current.contains(event.target as Node)
       ) {
-        window.removeEventListener("mousedown", toggleHold);
+        window.removeEventListener("pointerdown", toggleHold);
         setIsHeldToggle(false);
       }
     },
@@ -157,12 +153,12 @@ export default function FgButton({
 
   // Use useCallback to memoize the togglePopup function
   const togglePopup = useCallback(
-    (event: MouseEvent) => {
+    (event: PointerEvent) => {
       if (
         !toggleClickContentRef.current ||
         !toggleClickContentRef.current.contains(event.target as Node)
       ) {
-        window.removeEventListener("mouseup", togglePopup);
+        window.removeEventListener("pointerup", togglePopup);
         setIsClickToggle(false);
       }
     },
@@ -172,8 +168,8 @@ export default function FgButton({
   const fgButtonController = new FgButtonController(
     fgButtonOptions,
     clickFunction,
-    mouseDownFunction,
-    mouseUpFunction,
+    pointerDownFunction,
+    pointerUpFunction,
     doubleClickFunction,
     holdFunction,
     dragFunction,
@@ -200,7 +196,7 @@ export default function FgButton({
 
   useEffect(() => {
     if (closeHoldToggle) {
-      window.removeEventListener("mousedown", toggleHold);
+      window.removeEventListener("pointerdown", toggleHold);
       setIsHeldToggle(false);
       if (setCloseHoldToggle) setCloseHoldToggle(false);
     }
@@ -208,7 +204,7 @@ export default function FgButton({
 
   useEffect(() => {
     if (closeClickToggle) {
-      window.removeEventListener("mouseup", togglePopup);
+      window.removeEventListener("pointerup", togglePopup);
       setIsClickToggle(false);
       if (setCloseClickToggle) setCloseClickToggle(false);
     }
@@ -219,18 +215,16 @@ export default function FgButton({
   return (
     <>
       <ButtonComponent
-        id={externalId}
         ref={externalRef ? externalRef : buttonRef}
-        onMouseDown={(event) => fgButtonController.handleMouseDown(event)}
-        onTouchStart={touchStartFunction}
-        onTouchEnd={touchEndFunction}
+        id={externalId}
         className={className}
         style={style}
-        data-value={fgButtonOptions.defaultDataValue}
+        onPointerDown={(event) => fgButtonController.handlePointerDown(event)}
         onDoubleClick={fgButtonController.handleDoubleClick}
-        onMouseEnter={fgButtonController.handleMouseEnter}
+        onPointerEnter={fgButtonController.handlePointerEnter}
         onFocus={focusFunction}
         onBlur={blurFunction}
+        data-value={fgButtonOptions.defaultDataValue}
         disabled={fgButtonOptions.disabled}
         {...(animationOptions && {
           variants: animationOptions.variants,

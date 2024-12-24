@@ -21,7 +21,7 @@ export default function PlayersSection({
   const playersSectionRef = useRef<HTMLDivElement>(null);
   const hoverTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const handleMouseEnter = () => {
+  const handlePointerEnter = () => {
     setIsHover(true);
     if (hoverTimeout.current) {
       clearTimeout(hoverTimeout.current);
@@ -29,7 +29,7 @@ export default function PlayersSection({
     }
   };
 
-  const handleMouseLeave = () => {
+  const handlePointerLeave = () => {
     if (!hoverTimeout.current) {
       hoverTimeout.current = setTimeout(() => {
         setIsHover(false);
@@ -53,8 +53,8 @@ export default function PlayersSection({
     >
       <div
         className='flex flex-col items-center justify-end w-full h-max space-y-2 px-2'
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
         onWheel={(event) => {
           event.stopPropagation();
         }}

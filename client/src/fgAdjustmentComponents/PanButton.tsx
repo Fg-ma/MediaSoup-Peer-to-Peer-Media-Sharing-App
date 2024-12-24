@@ -8,22 +8,22 @@ export default function PanButton({
   className,
   dragFunction,
   bundleRef,
-  mouseDownFunction,
-  mouseUpFunction,
+  pointerDownFunction,
+  pointerUpFunction,
 }: {
   externalRef?: React.RefObject<HTMLButtonElement>;
   className?: string;
   dragFunction: (displacement: { x: number; y: number }) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
-  mouseDownFunction: () => void;
-  mouseUpFunction: () => void;
+  pointerDownFunction: () => void;
+  pointerUpFunction: () => void;
 }) {
   return (
     <FgButton
       externalRef={externalRef}
       className={className}
-      mouseDownFunction={mouseDownFunction}
-      mouseUpFunction={mouseUpFunction}
+      pointerDownFunction={pointerDownFunction}
+      pointerUpFunction={pointerUpFunction}
       dragFunction={dragFunction}
       referenceDragElement={bundleRef}
       contentFunction={() => {

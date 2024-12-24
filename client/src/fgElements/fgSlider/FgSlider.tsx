@@ -164,7 +164,7 @@ export default function FgSlider({
     )
   );
 
-  const handleMouseMove = (event: React.MouseEvent | MouseEvent) => {
+  const handlePointerMove = (event: React.PointerEvent | PointerEvent) => {
     if (!trackRef.current) {
       return;
     }
@@ -213,13 +213,13 @@ export default function FgSlider({
     );
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = () => {
     setSliding(false);
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
+    document.removeEventListener("pointermove", handlePointerMove);
+    document.removeEventListener("pointerup", handlePointerUp);
   };
 
-  const handleMouseDown = (event: React.MouseEvent) => {
+  const handlePointerDown = (event: React.PointerEvent) => {
     if (disabled) {
       return;
     }
@@ -228,10 +228,10 @@ export default function FgSlider({
     event.stopPropagation();
 
     setSliding(true);
-    handleMouseMove(event);
+    handlePointerMove(event);
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointerup", handlePointerUp);
   };
 
   useEffect(() => {
@@ -308,7 +308,7 @@ export default function FgSlider({
             boxShadow: sliding ? "inset 0 0 1.25px rgba(0, 0, 0, 0.3)" : "",
           }}
           ref={trackRef}
-          onMouseDown={handleMouseDown}
+          onPointerDown={handlePointerDown}
         >
           {tickPositions.current.map((pos, index) => (
             <div key={pos}>
@@ -333,12 +333,12 @@ export default function FgSlider({
                     ? "left"
                     : "bottom"]: `calc(${pos}% - 2px)`,
                 }}
-                onMouseEnter={() => {
+                onPointerEnter={() => {
                   tickHoveringTimeout.current = setTimeout(() => {
                     setTickHovering(true);
                   }, fgSliderOptions.tickHoveringTimeoutDuration);
                 }}
-                onMouseLeave={() => {
+                onPointerLeave={() => {
                   if (tickHoveringTimeout.current) {
                     clearTimeout(tickHoveringTimeout.current);
                   }
@@ -429,10 +429,10 @@ export default function FgSlider({
               }% - 5px)`,
             }}
             ref={handleRef}
-            onMouseEnter={() => {
+            onPointerEnter={() => {
               setHandleHovering(true);
             }}
-            onMouseLeave={() => {
+            onPointerLeave={() => {
               setHandleHovering(false);
             }}
           ></div>

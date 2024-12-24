@@ -108,10 +108,10 @@ export default function FgGame({
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
     undefined
   );
-  const mouseLeaveHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
+  const pointerLeaveHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
     undefined
   );
-  const mouseStillHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
+  const pointerStillHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
     undefined
   );
 
@@ -129,8 +129,8 @@ export default function FgGame({
     hideControls,
     gameStarted,
     setHideControls,
-    mouseLeaveHideControlsTimeout,
-    mouseStillHideControlsTimeout,
+    pointerLeaveHideControlsTimeout,
+    pointerStillHideControlsTimeout,
     gameRef,
     closeGameFunction,
     startGameFunction,
@@ -258,12 +258,12 @@ export default function FgGame({
         }
 
         ref.current.addEventListener(
-          "mouseenter",
-          fgGameController.handleMouseEnter
+          "pointerenter",
+          fgGameController.handlePointerEnter
         );
         ref.current.addEventListener(
-          "mouseleave",
-          fgGameController.handleMouseLeave
+          "pointerleave",
+          fgGameController.handlePointerLeave
         );
       }
     }
@@ -276,12 +276,12 @@ export default function FgGame({
           }
 
           ref.current.removeEventListener(
-            "mouseenter",
-            fgGameController.handleMouseEnter
+            "pointerenter",
+            fgGameController.handlePointerEnter
           );
           ref.current.removeEventListener(
-            "mouseleave",
-            fgGameController.handleMouseLeave
+            "pointerleave",
+            fgGameController.handlePointerLeave
           );
         }
       }
@@ -307,9 +307,9 @@ export default function FgGame({
   return (
     <motion.div
       ref={gameRef}
-      onMouseEnter={fgGameController.handleMouseEnter}
-      onMouseLeave={fgGameController.handleMouseLeave}
-      onMouseMove={fgGameController.handleMouseMove}
+      onPointerEnter={fgGameController.handlePointerEnter}
+      onPointerLeave={fgGameController.handlePointerLeave}
+      onPointerMove={fgGameController.handlePointerMove}
       className={`fg-game ${hideControls ? "z-[49]" : "z-0"} ${
         hideControls ? "hide-controls" : ""
       } rounded absolute`}

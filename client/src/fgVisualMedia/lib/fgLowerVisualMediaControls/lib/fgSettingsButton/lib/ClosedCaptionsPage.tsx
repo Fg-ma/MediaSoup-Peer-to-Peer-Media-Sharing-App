@@ -101,7 +101,7 @@ export default function ClosedCaptionsPage({
                 ]}
               />
             )}
-            mouseDownFunction={handleCloseClosedCaptionPage}
+            clickFunction={handleCloseClosedCaptionPage}
           />
           <div
             className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
@@ -116,7 +116,7 @@ export default function ClosedCaptionsPage({
               Options
             </div>
           )}
-          mouseDownFunction={handleClosedCaptionOptionsActive}
+          clickFunction={handleClosedCaptionOptionsActive}
         />
       </div>
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
@@ -140,7 +140,7 @@ export default function ClosedCaptionsPage({
                   {lang}
                 </div>
               )}
-              mouseDownFunction={() =>
+              clickFunction={() =>
                 setClosedCaptionsLang(
                   key as keyof typeof closedCaptionsSelections
                 )
@@ -151,7 +151,7 @@ export default function ClosedCaptionsPage({
               contentFunction={() => (
                 <div className='w-full bg-opacity-75 px-2'>(AG)</div>
               )}
-              mouseDownFunction={() =>
+              clickFunction={() =>
                 setClosedCaptionsLang(
                   key as keyof typeof closedCaptionsSelections
                 )

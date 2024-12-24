@@ -4,25 +4,25 @@ class FgButtonController {
   constructor(
     private fgButtonOptions: FgButtonOptions,
     private clickFunction: ((event: React.MouseEvent) => void) | undefined,
-    private mouseDownFunction: ((event: React.MouseEvent) => void) | undefined,
-    private mouseUpFunction: ((event: MouseEvent) => void) | undefined,
+    private pointerDownFunction:
+      | ((event: React.PointerEvent) => void)
+      | undefined,
+    private pointerUpFunction: ((event: PointerEvent) => void) | undefined,
     private doubleClickFunction:
       | ((event: React.MouseEvent) => void)
       | undefined,
-    private holdFunction:
-      | ((event: React.MouseEvent<Element, MouseEvent>) => void)
-      | undefined,
+    private holdFunction: ((event: PointerEvent) => void) | undefined,
     private dragFunction:
       | ((
           displacement: {
             x: number;
             y: number;
           },
-          event: MouseEvent
+          event: PointerEvent
         ) => void)
       | undefined,
-    private toggleHold: (event: MouseEvent) => void,
-    private togglePopup: (event: MouseEvent) => void,
+    private toggleHold: (event: PointerEvent) => void,
+    private togglePopup: (event: PointerEvent) => void,
     private hoverContent: React.ReactElement | undefined,
     private toggleClickContent: React.ReactElement | undefined,
     private clickTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
@@ -48,17 +48,16 @@ class FgButtonController {
     private referenceDragElement: React.RefObject<HTMLElement> | undefined
   ) {}
 
-  handleMouseDown = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  handlePointerDown = (event: React.PointerEvent) => {
+    event.stopPropagation();
     event.preventDefault();
 
-    window.addEventListener("mouseup", this.handleMouseUp);
+    window.addEventListener("pointerup", this.handlePointerUp);
 
     this.isClicked.current = true;
 
-    if (this.mouseDownFunction) {
-      this.mouseDownFunction(event);
+    if (this.pointerDownFunction) {
+      this.pointerDownFunction(event);
     }
 
     if (this.holdFunction && this.clickTimeout.current === undefined) {
@@ -67,29 +66,31 @@ class FgButtonController {
         this.setIsHeld(true);
         if (this.fgButtonOptions.holdKind === "toggle") {
           this.setIsHeldToggle(true);
-          window.addEventListener("mousedown", this.toggleHold);
+          window.addEventListener("pointerdown", this.toggleHold);
         }
       }, this.fgButtonOptions.holdTimeoutDuration);
     }
 
     if (this.dragFunction) {
       this.startDragPosition.current = { x: event.clientX, y: event.clientY };
-      window.addEventListener("mousemove", this.handleDragMouseMove);
+      window.addEventListener("pointermove", this.handleDragPointerMove);
     }
   };
 
-  handleMouseUp = (event: MouseEvent) => {
-    window.removeEventListener("mouseup", this.handleMouseUp);
+  handlePointerUp = (event: PointerEvent) => {
+    event.stopPropagation();
+
+    window.removeEventListener("pointerup", this.handlePointerUp);
 
     if (this.toggleClickContent) {
       if (!this.isClickToggle) {
-        window.addEventListener("mouseup", this.togglePopup);
+        window.addEventListener("pointerup", this.togglePopup);
       }
       this.setIsClickToggle((prev) => !prev);
     }
 
-    if (this.mouseUpFunction) {
-      this.mouseUpFunction(event);
+    if (this.pointerUpFunction) {
+      this.pointerUpFunction(event);
     }
 
     if (this.isClicked.current && this.clickTimeout.current === undefined) {
@@ -110,7 +111,7 @@ class FgButtonController {
         }
       } else {
         if (this.holdFunction) {
-          this.holdFunction(event as unknown as React.MouseEvent);
+          this.holdFunction(event);
         }
       }
 
@@ -125,7 +126,7 @@ class FgButtonController {
     }
 
     if (this.dragFunction) {
-      window.removeEventListener("mousemove", this.handleDragMouseMove);
+      window.removeEventListener("pointermove", this.handleDragPointerMove);
     }
   };
 
@@ -140,22 +141,24 @@ class FgButtonController {
     this.isClicked.current = false;
   };
 
-  handleMouseEnter = () => {
+  handlePointerEnter = () => {
     if (this.hoverContent && !this.hoverTimeout.current) {
       this.hoverTimeout.current = setTimeout(() => {
         this.setIsHover(true);
       }, this.fgButtonOptions.hoverTimeoutDuration);
 
-      document.addEventListener("mousemove", this.handleMouseMove);
+      document.addEventListener("pointermove", this.handlePointerMove);
       if (this.scrollingContainerRef && this.scrollingContainerRef.current) {
         this.scrollingContainerRef.current.addEventListener("scroll", (event) =>
-          this.handleMouseMove(event as unknown as MouseEvent)
+          this.handlePointerMove(event as unknown as PointerEvent)
         );
       }
     }
   };
 
-  handleMouseMove = (event: MouseEvent) => {
+  handlePointerMove = (event: PointerEvent) => {
+    event.stopPropagation();
+
     const buttonElement = this.externalRef?.current || this.buttonRef.current;
 
     if (buttonElement && !buttonElement.contains(event.target as Node)) {
@@ -165,17 +168,17 @@ class FgButtonController {
         this.hoverTimeout.current = undefined;
       }
 
-      document.removeEventListener("mousemove", this.handleMouseMove);
+      document.removeEventListener("pointermove", this.handlePointerMove);
       if (this.scrollingContainerRef && this.scrollingContainerRef.current) {
         this.scrollingContainerRef.current.removeEventListener(
           "scroll",
-          (event) => this.handleMouseMove(event as unknown as MouseEvent)
+          (event) => this.handlePointerMove(event as unknown as PointerEvent)
         );
       }
     }
   };
 
-  handleDragMouseMove = (event: MouseEvent) => {
+  handleDragPointerMove = (event: PointerEvent) => {
     if (
       this.dragFunction === undefined ||
       this.startDragPosition.current === undefined

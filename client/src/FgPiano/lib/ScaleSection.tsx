@@ -110,9 +110,9 @@ export default function ScaleSection({
     }
   };
 
-  const handleMouseUp = () => {
-    document.removeEventListener("pointerup", handleMouseUp);
-    document.removeEventListener("pointermove", handleMouseMove);
+  const handlePointerUp = () => {
+    document.removeEventListener("pointerup", handlePointerUp);
+    document.removeEventListener("pointermove", handlePointerMove);
 
     if (
       currentPress.current &&
@@ -158,8 +158,8 @@ export default function ScaleSection({
   };
 
   const handlePointerDown = (event: React.PointerEvent) => {
-    document.addEventListener("pointerup", handleMouseUp);
-    document.addEventListener("pointermove", handleMouseMove);
+    document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("pointermove", handlePointerMove);
 
     const targetElement = event.target as HTMLElement;
     const note = targetElement.getAttribute("data-note");
@@ -209,7 +209,7 @@ export default function ScaleSection({
     }
   };
 
-  const handleMouseMove = (event: PointerEvent) => {
+  const handlePointerMove = (event: PointerEvent) => {
     const targetElement = event.target as HTMLButtonElement;
 
     if (targetElement.disabled) {
@@ -318,7 +318,6 @@ export default function ScaleSection({
         ref={scaleSectionContainerRef}
         className='scale-section-container hide-scroll-bar'
         onPointerDown={handlePointerDown}
-        onTouchEnd={handleMouseUp}
       >
         <VerticalSplitPanes
           topContent={

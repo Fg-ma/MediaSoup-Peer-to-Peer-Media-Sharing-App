@@ -236,11 +236,14 @@ export default function FgPanel({
   }, [isHover]);
 
   useEffect(() => {
-    document.addEventListener("mousedown", fgPanelController.handlePanelClick);
+    document.addEventListener(
+      "pointerdown",
+      fgPanelController.handlePanelClick
+    );
 
     return () => {
       document.removeEventListener(
-        "mousedown",
+        "pointerdown",
         fgPanelController.handlePanelClick
       );
     };
@@ -255,10 +258,10 @@ export default function FgPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={panelRef}
-      onMouseEnter={() => {
+      onPointerEnter={() => {
         setFocus(true);
       }}
-      onMouseLeave={() => {
+      onPointerLeave={() => {
         if (!focusClicked) {
           setFocus(false);
         }
@@ -292,7 +295,7 @@ export default function FgPanel({
       </div>
       {moveable && (
         <div
-          onMouseDown={fgPanelController.handleDragMouseDown}
+          onPointerDown={fgPanelController.handleDragPointerDown}
           className='h-3 absolute top-0 cursor-pointer'
           style={{
             width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -302,7 +305,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onMouseDown={fgPanelController.handleDragMouseDown}
+          onPointerDown={fgPanelController.handleDragPointerDown}
           className='h-3 absolute bottom-0 cursor-pointer'
           style={{
             width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -312,7 +315,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onMouseDown={fgPanelController.handleDragMouseDown}
+          onPointerDown={fgPanelController.handleDragPointerDown}
           className='w-3 absolute left-0 cursor-pointer'
           style={{
             height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -322,7 +325,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onMouseDown={fgPanelController.handleDragMouseDown}
+          onPointerDown={fgPanelController.handleDragPointerDown}
           className='w-3 absolute right-0 cursor-pointer'
           style={{
             height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -332,32 +335,32 @@ export default function FgPanel({
       )}
       {resizeable && (closePosition !== "bottomLeft" || !closeCallback) && (
         <div
-          onMouseDown={(event) =>
-            fgPanelController.handleResizeMouseDown(event, "se")
+          onPointerDown={(event) =>
+            fgPanelController.handleResizePointerDown(event, "se")
           }
           className='w-3 aspect-square absolute right-0 bottom-0 cursor-se-resize'
         />
       )}
       {resizeable && (closePosition !== "bottomRight" || !closeCallback) && (
         <div
-          onMouseDown={(event) =>
-            fgPanelController.handleResizeMouseDown(event, "sw")
+          onPointerDown={(event) =>
+            fgPanelController.handleResizePointerDown(event, "sw")
           }
           className='w-3 aspect-square absolute left-0 bottom-0 cursor-sw-resize'
         />
       )}
       {resizeable && (closePosition !== "topLeft" || !closeCallback) && (
         <div
-          onMouseDown={(event) =>
-            fgPanelController.handleResizeMouseDown(event, "nw")
+          onPointerDown={(event) =>
+            fgPanelController.handleResizePointerDown(event, "nw")
           }
           className='w-3 aspect-square absolute left-0 top-0 cursor-nw-resize'
         />
       )}
       {resizeable && (closePosition !== "topRight" || !closeCallback) && (
         <div
-          onMouseDown={(event) =>
-            fgPanelController.handleResizeMouseDown(event, "ne")
+          onPointerDown={(event) =>
+            fgPanelController.handleResizePointerDown(event, "ne")
           }
           className='w-3 aspect-square absolute right-0 top-0 cursor-ne-resize'
         />

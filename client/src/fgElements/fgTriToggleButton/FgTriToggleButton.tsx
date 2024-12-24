@@ -98,7 +98,7 @@ export default function FgTriToggleButton({
     }
   };
 
-  const handleMouseMove = (event: React.MouseEvent) => {
+  const handlePointerMove = (event: React.PointerEvent) => {
     if (!containerRef.current) {
       return;
     }
@@ -122,7 +122,7 @@ export default function FgTriToggleButton({
     }
   };
 
-  const handleMouseEnter = () => {
+  const handlePointerEnter = () => {
     if (hoveringTimeout.current !== undefined) {
       return;
     }
@@ -132,7 +132,7 @@ export default function FgTriToggleButton({
     }, 2000);
   };
 
-  const handleMouseLeave = () => {
+  const handlePointerLeave = () => {
     setHovering(false);
 
     if (hoveringTimeout.current) {
@@ -146,9 +146,9 @@ export default function FgTriToggleButton({
       ref={containerRef}
       className='w-full h-full bg-fg-white-95 border-2 border-fg-white-85 rounded-full flex items-center justify-center cursor-pointer'
       onClick={handleClick}
-      onMouseMove={hoverable ? handleMouseMove : undefined}
-      onMouseEnter={hoverable ? handleMouseEnter : undefined}
-      onMouseLeave={hoverable ? handleMouseLeave : undefined}
+      onPointerMove={hoverable ? handlePointerMove : undefined}
+      onPointerEnter={hoverable ? handlePointerEnter : undefined}
+      onPointerLeave={hoverable ? handlePointerLeave : undefined}
     >
       <div
         className='relative'

@@ -66,7 +66,7 @@ export default function SamplerEffect({
     }
   };
 
-  const handleMouseDown = (event: React.MouseEvent) => {
+  const handlePointerDown = (event: React.PointerEvent) => {
     if (
       event.target instanceof SVGPathElement ||
       event.target instanceof SVGElement
@@ -112,7 +112,7 @@ export default function SamplerEffect({
       className={`w-max h-full flex overflow-hidden space-y-1 ${
         effect.labelPlacement === "top" ? "flex-col" : "flex-col-reverse"
       }`}
-      onMouseDown={handleMouseDown}
+      onPointerDown={handlePointerDown}
     >
       <div className='flex space-x-2 items-center justify-center'>
         {Object.keys(effect.options).length > 1 && (

@@ -248,14 +248,14 @@ export default function FgAudioElementContainer({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 50%",
       }}
-      onMouseEnter={() => {
+      onPointerEnter={() => {
         setInAudioContainer(true);
         if (leaveAudioContainerTimer.current) {
           clearTimeout(leaveAudioContainerTimer.current);
           leaveAudioContainerTimer.current = undefined;
         }
       }}
-      onMouseLeave={() => {
+      onPointerLeave={() => {
         leaveAudioContainerTimer.current = setTimeout(() => {
           setInAudioContainer(false);
           clearTimeout(leaveAudioContainerTimer.current);
@@ -300,14 +300,14 @@ export default function FgAudioElementContainer({
           );
         }}
         bundleRef={bundleRef}
-        mouseDownFunction={() => {
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+        pointerDownFunction={() => {
+          fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
             "position",
             { rotationPointPlacement: "middleLeft" }
           );
         }}
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+        pointerUpFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
         }
       />
       <RotateButton
@@ -343,11 +343,11 @@ export default function FgAudioElementContainer({
           });
         }}
         bundleRef={bundleRef}
-        mouseDownFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction
+        pointerDownFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerDownFunction
         }
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+        pointerUpFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
         }
       />
       <ScaleButton
@@ -397,7 +397,7 @@ export default function FgAudioElementContainer({
           );
         }}
         bundleRef={bundleRef}
-        mouseDownFunction={() => {
+        pointerDownFunction={() => {
           if (!bundleRef.current) {
             return;
           }
@@ -411,7 +411,7 @@ export default function FgAudioElementContainer({
               bundleRef.current.clientHeight,
           };
 
-          fgContentAdjustmentController.adjustmentBtnMouseDownFunction(
+          fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
             "scale",
             {
               aspect: "square",
@@ -435,8 +435,8 @@ export default function FgAudioElementContainer({
             }
           );
         }}
-        mouseUpFunction={
-          fgContentAdjustmentController.adjustmentBtnMouseUpFunction
+        pointerUpFunction={
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
         }
       />
       <FgAudioElement

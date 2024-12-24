@@ -23,7 +23,7 @@ const boundaryCheckingRotationPointMap: {
 
 export type AdjustmentTypes = "position" | "scale" | "rotation";
 
-export type AdjustmentBtnMouseDownDetails = {
+export type AdjustmentBtnPointerDownDetails = {
   aspect?: "square";
   referencePoint?: { x: number; y: number };
   rotationPoint?: { x: number; y: number };
@@ -299,7 +299,7 @@ class FgContentAdjustmentController {
   };
 
   rotateDragFunction = (
-    event: MouseEvent,
+    event: PointerEvent,
     referencePoint: { x: number; y: number }
   ) => {
     if (!this.bundleRef.current) {
@@ -646,11 +646,11 @@ class FgContentAdjustmentController {
 
   private calculateRotationAngle = (
     pointOfRotation: { x: number; y: number },
-    mouse: { x: number; y: number }
+    pointer: { x: number; y: number }
   ) => {
-    // Calculate the target vector from point of rotation to the mouse
-    const targetVectorX = mouse.x - pointOfRotation.x;
-    const targetVectorY = mouse.y - pointOfRotation.y;
+    // Calculate the target vector from point of rotation to the pointer
+    const targetVectorX = pointer.x - pointOfRotation.x;
+    const targetVectorY = pointer.y - pointOfRotation.y;
 
     // Calculate angles from the x-axis for each vector
     let targetAngle =
@@ -662,9 +662,9 @@ class FgContentAdjustmentController {
     return targetAngle;
   };
 
-  adjustmentBtnMouseDownFunction = (
+  adjustmentBtnPointerDownFunction = (
     kind?: AdjustmentTypes,
-    details?: AdjustmentBtnMouseDownDetails
+    details?: AdjustmentBtnPointerDownDetails
   ) => {
     if (kind === "scale") {
       if (
@@ -748,7 +748,7 @@ class FgContentAdjustmentController {
     this.setAdjustingDimensions(true);
   };
 
-  adjustmentBtnMouseUpFunction = () => {
+  adjustmentBtnPointerUpFunction = () => {
     this.setAdjustingDimensions(false);
   };
 }

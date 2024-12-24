@@ -381,7 +381,7 @@ class FgVisualMediaController {
     }
   }
 
-  handleMouseEnter = () => {
+  handlePointerEnter = () => {
     this.setInVisualMedia(true);
     if (this.leaveVisualMediaTimer.current) {
       clearTimeout(this.leaveVisualMediaTimer.current);
@@ -389,7 +389,7 @@ class FgVisualMediaController {
     }
   };
 
-  handleMouseLeave = () => {
+  handlePointerLeave = () => {
     this.leaveVisualMediaTimer.current = setTimeout(() => {
       this.setInVisualMedia(false);
       clearTimeout(this.leaveVisualMediaTimer.current);

@@ -72,6 +72,16 @@ class UniversalGameController {
           tables[table_id][username][instance].games[gameType][gameId]
         ) {
           tables[table_id][username][instance].games[gameType][gameId].close();
+
+          delete tables[table_id][username][instance].games[gameType]?.[gameId];
+
+          if (
+            Object.keys(
+              tables[table_id][username][instance].games[gameType] || {}
+            ).length === 0
+          ) {
+            delete tables[table_id][username][instance].games[gameType];
+          }
         }
       }
     }
