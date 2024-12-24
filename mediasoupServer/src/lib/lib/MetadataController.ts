@@ -19,11 +19,11 @@ class MetadataController {
       inquiringInstance,
       inquiredUsername,
       inquiredInstance,
-    } = event.data;
+    } = event.header;
 
     const msg = {
       type: "bundleMetadataRequested",
-      data: {
+      header: {
         inquiringUsername,
         inquiringInstance,
       },
@@ -41,19 +41,19 @@ class MetadataController {
       inquiringInstance,
       inquiredUsername,
       inquiredInstance,
-      clientMute,
-      streamEffects,
-      currentEffectsStyles,
-    } = event.data;
+    } = event.header;
+    const { clientMute, streamEffects, userEffectsStyles } = event.data;
 
     const msg = {
       type: "bundleMetadataResponsed",
-      data: {
+      header: {
         inquiredUsername,
         inquiredInstance,
+      },
+      data: {
         clientMute,
         streamEffects,
-        currentEffectsStyles,
+        userEffectsStyles,
       },
     };
 
@@ -71,11 +71,11 @@ class MetadataController {
       inquiredInstance,
       inquiredType,
       inquiredProducerId,
-    } = event.data;
+    } = event.header;
 
     const msg = {
       type: "requestedCatchUpData",
-      data: {
+      header: {
         inquiringUsername,
         inquiringInstance,
         inquiredType,
@@ -90,7 +90,7 @@ class MetadataController {
 
   onRequestGameCatchUpData = (event: onRequestGameCatchUpDataType) => {
     const { table_id, inquiringUsername, inquiringInstance, gameId } =
-      event.data;
+      event.header;
 
     let validUser: { username: string; instance: string } | undefined =
       undefined;
@@ -108,7 +108,7 @@ class MetadataController {
     if (validUser) {
       const msg = {
         type: "requestedGameCatchUpData",
-        data: {
+        header: {
           inquiringUsername,
           inquiringInstance,
           gameId,
@@ -129,18 +129,17 @@ class MetadataController {
       inquiredInstance,
       inquiredType,
       inquiredProducerId,
-      data,
-    } = event.data;
+    } = event.header;
 
     const msg = {
       type: "responsedCatchUpData",
-      data: {
+      header: {
         inquiredUsername,
         inquiredInstance,
         inquiredType,
         inquiredProducerId,
-        data,
       },
+      data: event.data,
     };
 
     this.io
@@ -149,18 +148,16 @@ class MetadataController {
   };
 
   onResponseGameCatchUpData = (event: onResponseGameCatchUpDataType) => {
-    const {
-      table_id,
-      inquiringUsername,
-      inquiringInstance,
-      gameId,
-      positioning,
-    } = event.data;
+    const { table_id, inquiringUsername, inquiringInstance, gameId } =
+      event.header;
+    const { positioning } = event.data;
 
     const msg = {
       type: "responsedGameCatchUpData",
-      data: {
+      header: {
         gameId,
+      },
+      data: {
         positioning,
       },
     };

@@ -16,11 +16,13 @@ type MixEffectsSocketEvents =
 
 type onClientMixEffectActivityChangedType = {
   type: "clientMixEffectActivityChanged";
-  data: {
+  header: {
     username: string;
     instance: string;
     producerType: "audio" | "screenAudio";
     producerId: string | undefined;
+  };
+  data: {
     effect: AudioMixEffectsType;
     active: boolean;
   };
@@ -28,9 +30,11 @@ type onClientMixEffectActivityChangedType = {
 
 type onMixEffectActivityChangeRequestedType = {
   type: "mixEffectActivityChangeRequested";
-  data: {
+  header: {
     requestedProducerType: "audio" | "screenAudio";
     requestedProducerId: string | undefined;
+  };
+  data: {
     effect: AudioMixEffectsType;
     active: boolean;
   };
@@ -38,11 +42,13 @@ type onMixEffectActivityChangeRequestedType = {
 
 type onClientMixEffectValueChangedType = {
   type: "clientMixEffectValueChanged";
-  data: {
+  header: {
     username: string;
     instance: string;
     producerType: "audio" | "screenAudio";
     producerId: string | undefined;
+  };
+  data: {
     effect: AudioMixEffectsType;
     option: MixEffectsOptionsType;
     value: number;
@@ -52,9 +58,11 @@ type onClientMixEffectValueChangedType = {
 
 type onMixEffectValueChangeRequestedType = {
   type: "mixEffectValueChangeRequested";
-  data: {
+  header: {
     requestedProducerType: "audio" | "screenAudio";
     requestedProducerId: string | undefined;
+  };
+  data: {
     effect: AudioMixEffectsType;
     option: MixEffectsOptionsType;
     value: number;
@@ -255,12 +263,14 @@ class AudioMixEffectsPortalController {
     ) {
       const msg = {
         type: "clientMixEffectActivityChange",
-        data: {
+        header: {
           table_id: this.table_id,
           username: this.username,
           instance: this.instance,
           producerType: this.producerType,
           producerId: this.producerId,
+        },
+        data: {
           effect,
           active,
         },
@@ -281,12 +291,14 @@ class AudioMixEffectsPortalController {
       ) {
         const msg = {
           type: "requestMixEffectActivityChange",
-          data: {
+          header: {
             table_id: this.table_id,
             requestedUsername: this.username,
             requestedInstance: this.instance,
             requestedProducerType: this.producerType,
             requestedProducerId: this.producerId,
+          },
+          data: {
             effect,
             active,
           },
@@ -336,12 +348,14 @@ class AudioMixEffectsPortalController {
     ) {
       const msg = {
         type: "clientMixEffectValueChange",
-        data: {
+        header: {
           table_id: this.table_id,
           username: this.username,
           instance: this.instance,
           producerType: this.producerType,
           producerId: this.producerId,
+        },
+        data: {
           effect,
           option,
           value,
@@ -371,12 +385,14 @@ class AudioMixEffectsPortalController {
       ) {
         const msg = {
           type: "requestMixEffectValueChange",
-          data: {
+          header: {
             table_id: this.table_id,
             requestedUsername: this.username,
             requestedInstance: this.instance,
             requestedProducerType: this.producerType,
             requestedProducerId: this.producerId,
+          },
+          data: {
             effect,
             option,
             value: event.value,
@@ -454,8 +470,8 @@ class AudioMixEffectsPortalController {
   onMixEffectActivityChangeRequested = (
     event: onMixEffectActivityChangeRequestedType
   ) => {
-    const { requestedProducerType, requestedProducerId, active, effect } =
-      event.data;
+    const { requestedProducerType, requestedProducerId } = event.header;
+    const { active, effect } = event.data;
 
     if (
       ((this.producerType === "audio" &&
@@ -482,14 +498,8 @@ class AudioMixEffectsPortalController {
   onMixEffectValueChangeRequested = (
     event: onMixEffectValueChangeRequestedType
   ) => {
-    const {
-      requestedProducerType,
-      requestedProducerId,
-      effect,
-      option,
-      value,
-      styleValue,
-    } = event.data;
+    const { requestedProducerType, requestedProducerId } = event.header;
+    const { effect, option, value, styleValue } = event.data;
 
     if (
       ((this.producerType === "audio" &&

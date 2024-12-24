@@ -49,7 +49,7 @@ class CameraSectionController {
       if (cameraIds.length > 0 && cameraIds[cameraIds.length - 1]) {
         const msg = {
           type: "removeProducer",
-          data: {
+          header: {
             table_id: this.table_id.current,
             username: this.username.current,
             instance: this.instance.current,

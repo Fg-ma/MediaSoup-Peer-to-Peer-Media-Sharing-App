@@ -240,11 +240,13 @@ class ProducersController {
       async ({ dtlsParameters }, callback, _errback) => {
         const msg = {
           type: "connectProducerTransport",
-          data: {
-            dtlsParameters,
+          header: {
             table_id: this.table_id.current,
             username: this.username.current,
             instance: this.instance.current,
+          },
+          data: {
+            dtlsParameters,
           },
         };
 
@@ -265,15 +267,17 @@ class ProducersController {
 
         const msg = {
           type: "createNewProducer",
-          data: {
-            producerType: appData.producerType,
-            transportId: this.producerTransport.current?.id,
-            kind,
-            rtpParameters,
+          header: {
             table_id: this.table_id.current,
             username: this.username.current,
             instance: this.instance.current,
+            producerType: appData.producerType,
             producerId: appData.producerId,
+          },
+          data: {
+            transportId: this.producerTransport.current?.id,
+            kind,
+            rtpParameters,
           },
         };
 
@@ -297,17 +301,19 @@ class ProducersController {
 
         const msg = {
           type: "createNewJSONProducer",
-          data: {
-            producerType: appData.producerType,
-            transportId: this.producerTransport.current?.id,
-            label,
-            protocol,
+          header: {
             table_id: this.table_id.current,
             username: this.username.current,
             instance: this.instance.current,
+            producerType: appData.producerType,
             producerId: appData.producerId,
-            sctpStreamParameters,
             dataStreamType: appData.dataStreamType,
+          },
+          data: {
+            transportId: this.producerTransport.current?.id,
+            label,
+            protocol,
+            sctpStreamParameters,
           },
         };
 
@@ -450,7 +456,7 @@ class ProducersController {
 
     const msg = {
       type: "newProducerCreated",
-      data: {
+      header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
@@ -464,7 +470,7 @@ class ProducersController {
 
   onNewProducerAvailable = (event: onNewProducerAvailableType) => {
     const { producerUsername, producerInstance, producerType, producerId } =
-      event.data;
+      event.header;
 
     if (
       producerInstance !== this.instance.current &&
@@ -475,15 +481,17 @@ class ProducersController {
 
       const msg = {
         type: "newConsumer",
-        data: {
-          producerType,
-          rtpCapabilities,
+        header: {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
+        },
+        data: {
           producerUsername,
           producerInstance,
+          producerType,
           producerId,
+          rtpCapabilities,
         },
       };
       this.socket.current.emit("message", msg);
@@ -497,7 +505,7 @@ class ProducersController {
       producerType,
       producerId,
       dataStreamType,
-    } = event.data;
+    } = event.header;
 
     if (
       producerInstance !== this.instance.current &&
@@ -508,16 +516,18 @@ class ProducersController {
 
       const msg = {
         type: "newJSONConsumer",
-        data: {
-          producerType,
-          sctpCapabilities,
-          producerUsername,
-          producerInstance,
+        header: {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
+        },
+        data: {
+          producerUsername,
+          producerInstance,
+          producerType,
           incomingProducerId: producerId,
           dataStreamType,
+          sctpCapabilities,
         },
       };
       this.socket.current.emit("message", msg);
@@ -531,7 +541,7 @@ class ProducersController {
       producerType,
       producerId,
       dataStreamType,
-    } = event.data;
+    } = event.header;
 
     if (
       producerUsername === this.username.current &&
@@ -870,10 +880,11 @@ class ProducersController {
       return;
     }
 
-    const { producerType, producerId } = event.data;
+    const { producerType, producerId } = event.header;
+
     const msg = {
       type: "removeProducer",
-      data: {
+      header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,

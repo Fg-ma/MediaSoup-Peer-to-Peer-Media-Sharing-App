@@ -51,7 +51,7 @@ class Metadata {
       inquiringInstance,
       inquiredType,
       inquiredProducerId,
-    } = event.data;
+    } = event.header;
 
     let data;
     if (inquiredType === "camera") {
@@ -90,7 +90,7 @@ class Metadata {
 
     const msg = {
       type: "responseCatchUpData",
-      data: {
+      header: {
         table_id: this.table_id.current,
         inquiringUsername,
         inquiringInstance,
@@ -98,23 +98,25 @@ class Metadata {
         inquiredInstance: this.instance.current,
         inquiredType,
         inquiredProducerId,
-        data,
       },
+      data,
     };
     this.socket.current.emit("message", msg);
   };
 
   onBundleMetadataRequested = (event: onBundleMetadataRequestedType) => {
-    const { inquiringUsername, inquiringInstance } = event.data;
+    const { inquiringUsername, inquiringInstance } = event.header;
 
     const msg = {
       type: "bundleMetadataResponse",
-      data: {
+      header: {
         table_id: this.table_id.current,
         inquiringUsername,
         inquiringInstance,
         inquiredUsername: this.username.current,
         inquiredInstance: this.instance.current,
+      },
+      data: {
         clientMute: this.mutedAudioRef.current,
         streamEffects: this.userStreamEffects.current,
         userEffectsStyles: this.userEffectsStyles.current,

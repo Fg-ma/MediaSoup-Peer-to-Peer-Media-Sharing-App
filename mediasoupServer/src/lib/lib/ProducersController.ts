@@ -25,7 +25,7 @@ class ProducersController {
   }
 
   onCreateProducerTransport = async (event: onCreateProducerTransportType) => {
-    const { table_id, username, instance } = event.data;
+    const { table_id, username, instance } = event.header;
 
     // Get the next available worker and router if one doesn't already exist
     let mediasoupRouter;
@@ -73,7 +73,8 @@ class ProducersController {
   onConnectProducerTransport = async (
     event: onConnectProducerTransportType
   ) => {
-    const { table_id, username, instance, dtlsParameters } = event.data;
+    const { table_id, username, instance } = event.header;
+    const { dtlsParameters } = event.data;
 
     if (
       !tableProducerTransports[table_id] ||
@@ -99,15 +100,9 @@ class ProducersController {
   };
 
   onCreateNewProducer = async (event: onCreateNewProducerType) => {
-    const {
-      table_id,
-      username,
-      instance,
-      producerType,
-      producerId,
-      kind,
-      rtpParameters,
-    } = event.data;
+    const { table_id, username, instance, producerType, producerId } =
+      event.header;
+    const { kind, rtpParameters } = event.data;
 
     if (
       !tableProducerTransports[table_id] ||
@@ -172,7 +167,7 @@ class ProducersController {
 
     const msg = {
       type: "newProducerAvailable",
-      data: {
+      header: {
         producerUsername: username,
         producerInstance: instance,
         producerType,
@@ -188,16 +183,9 @@ class ProducersController {
   };
 
   onCreateNewJSONProducer = async (event: onCreateNewJSONProducerType) => {
-    const {
-      table_id,
-      username,
-      instance,
-      label,
-      protocol,
-      producerId,
-      sctpStreamParameters,
-      dataStreamType,
-    } = event.data;
+    const { table_id, username, instance, producerId, dataStreamType } =
+      event.header;
+    const { label, protocol, sctpStreamParameters } = event.data;
 
     // Validate that the transport and producer type are correctly set up
     if (
@@ -252,7 +240,7 @@ class ProducersController {
       // Emit a message indicating the new JSON producer is available
       const msg = {
         type: "newJSONProducerAvailable",
-        data: {
+        header: {
           producerUsername: username,
           producerInstance: instance,
           producerType: "json",
@@ -274,11 +262,11 @@ class ProducersController {
 
   onNewProducerCreated = (event: onNewProducerCreatedType) => {
     const { table_id, username, instance, producerType, producerId } =
-      event.data;
+      event.header;
 
     const msg = {
       type: "newProducerWasCreated",
-      data: {
+      header: {
         producerType: producerType,
         producerId: producerId,
       },
@@ -296,7 +284,7 @@ class ProducersController {
       producerType,
       producerId,
       dataStreamType,
-    } = event.data;
+    } = event.header;
 
     try {
       this.mediasoupCleanup.removeProducer(
@@ -322,7 +310,7 @@ class ProducersController {
 
       const msg = {
         type: "producerDisconnected",
-        data: {
+        header: {
           producerUsername: username,
           producerInstance: instance,
           producerType,
@@ -339,11 +327,11 @@ class ProducersController {
 
   onRequestRemoveProducer = (event: onRequestRemoveProducerType) => {
     const { table_id, username, instance, producerType, producerId } =
-      event.data;
+      event.header;
 
     const msg = {
       type: "removeProducerRequested",
-      data: {
+      header: {
         producerType,
         producerId,
       },

@@ -18,6 +18,8 @@ class EffectsController {
       requestedInstance,
       requestedProducerType,
       requestedProducerId,
+    } = event.header;
+    const {
       effect,
       blockStateChange,
       style,
@@ -28,9 +30,11 @@ class EffectsController {
 
     const msg = {
       type: "effectChangeRequested",
-      data: {
+      header: {
         requestedProducerType,
         requestedProducerId,
+      },
+      data: {
         effect,
         blockStateChange,
         style,
@@ -46,24 +50,19 @@ class EffectsController {
   };
 
   onClientEffectChange = (event: onClientEffectChangeType) => {
-    const {
-      table_id,
-      username,
-      instance,
-      producerType,
-      producerId,
-      effect,
-      effectStyle,
-      blockStateChange,
-    } = event.data;
+    const { table_id, username, instance, producerType, producerId } =
+      event.header;
+    const { effect, effectStyle, blockStateChange } = event.data;
 
     const msg = {
       type: "clientEffectChanged",
-      data: {
+      header: {
         username,
         instance,
         producerType,
         producerId,
+      },
+      data: {
         effect,
         effectStyle,
         blockStateChange,
@@ -76,23 +75,19 @@ class EffectsController {
   onClientMixEffectActivityChange = (
     event: onClientMixEffectActivityChangeType
   ) => {
-    const {
-      table_id,
-      username,
-      instance,
-      producerType,
-      producerId,
-      effect,
-      active,
-    } = event.data;
+    const { table_id, username, instance, producerType, producerId } =
+      event.header;
+    const { effect, active } = event.data;
 
     const msg = {
       type: "clientMixEffectActivityChanged",
-      data: {
+      header: {
         username,
         instance,
         producerType,
         producerId,
+      },
+      data: {
         effect,
         active,
       },
@@ -110,15 +105,16 @@ class EffectsController {
       requestedInstance,
       requestedProducerType,
       requestedProducerId,
-      effect,
-      active,
-    } = event.data;
+    } = event.header;
+    const { effect, active } = event.data;
 
     const msg = {
       type: "mixEffectActivityChangeRequested",
-      data: {
+      header: {
         requestedProducerType,
         requestedProducerId,
+      },
+      data: {
         effect,
         active,
       },
@@ -130,25 +126,19 @@ class EffectsController {
   };
 
   onClientMixEffectValueChange = (event: onClientMixEffectValueChangeType) => {
-    const {
-      table_id,
-      username,
-      instance,
-      producerType,
-      producerId,
-      effect,
-      option,
-      value,
-      styleValue,
-    } = event.data;
+    const { table_id, username, instance, producerType, producerId } =
+      event.header;
+    const { effect, option, value, styleValue } = event.data;
 
     const msg = {
       type: "clientMixEffectValueChanged",
-      data: {
+      header: {
         username,
         instance,
         producerType,
         producerId,
+      },
+      data: {
         effect,
         option,
         value,
@@ -168,17 +158,16 @@ class EffectsController {
       requestedInstance,
       requestedProducerType,
       requestedProducerId,
-      effect,
-      option,
-      value,
-      styleValue,
-    } = event.data;
+    } = event.header;
+    const { effect, option, value, styleValue } = event.data;
 
     const msg = {
       type: "mixEffectValueChangeRequested",
-      data: {
+      header: {
         requestedProducerType,
         requestedProducerId,
+      },
+      data: {
         effect,
         option,
         value,

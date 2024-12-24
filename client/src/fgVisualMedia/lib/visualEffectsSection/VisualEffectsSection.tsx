@@ -122,13 +122,13 @@ export default function VisualEffectsSection({
     event:
       | {
           type: "effectChangeRequested";
-          data: {
+          header: {
             requestedProducerId: string;
           };
         }
       | {
           type: "clientEffectChanged";
-          data: {
+          header: {
             username: string;
             instance: string;
             producerId: string;
@@ -138,7 +138,7 @@ export default function VisualEffectsSection({
     switch (event.type) {
       case "effectChangeRequested":
         if (
-          visualMediaId === event.data.requestedProducerId &&
+          visualMediaId === event.header.requestedProducerId &&
           acceptsVisualEffects
         ) {
           setRerender((prev) => prev + 1);
@@ -147,9 +147,9 @@ export default function VisualEffectsSection({
       case "clientEffectChanged":
         if (
           !isUser &&
-          username === event.data.username &&
-          instance === event.data.instance &&
-          visualMediaId === event.data.producerId
+          username === event.header.username &&
+          instance === event.header.instance &&
+          visualMediaId === event.header.producerId
         ) {
           setRerender((prev) => prev + 1);
         }

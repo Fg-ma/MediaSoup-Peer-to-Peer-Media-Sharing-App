@@ -211,12 +211,14 @@ class ConsumersController {
       ({ dtlsParameters }, callback, _errback) => {
         const msg = {
           type: "connectConsumerTransport",
-          data: {
-            transportId: this.consumerTransport.current?.id,
-            dtlsParameters,
+          header: {
             table_id: this.table_id.current,
             username: this.username.current,
             instance: this.instance.current,
+          },
+          data: {
+            transportId: this.consumerTransport.current?.id,
+            dtlsParameters,
           },
         };
 
@@ -298,7 +300,7 @@ class ConsumersController {
 
             const msg = {
               type: "resume",
-              data: {
+              header: {
                 table_id: this.table_id.current,
                 username: this.username.current,
                 instance: this.instance.current,
@@ -320,11 +322,13 @@ class ConsumersController {
     const { rtpCapabilities } = this.device.current;
     const msg = {
       type: "consume",
-      data: {
-        rtpCapabilities,
+      header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
+      },
+      data: {
+        rtpCapabilities,
       },
     };
 
@@ -332,22 +336,17 @@ class ConsumersController {
   }
 
   async onNewConsumerSubscribed(event: onNewConsumerSubscribedType) {
-    const {
-      producerUsername,
-      producerInstance,
-      producerType,
-      producerId,
-      data,
-    } = event.data;
+    const { producerUsername, producerInstance, producerType, producerId } =
+      event.header;
 
     if (producerInstance === this.instance.current) {
       return;
     }
 
-    const { id, kind, rtpParameters } = data;
+    const { id, kind, rtpParameters } = event.data;
     const consumer = await this.consumerTransport.current?.consume({
       id,
-      producerId: data.producerId,
+      producerId: event.data.producerId,
       kind,
       rtpParameters,
     });
@@ -487,7 +486,7 @@ class ConsumersController {
 
     const msg = {
       type: "resume",
-      data: {
+      header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
@@ -497,10 +496,12 @@ class ConsumersController {
 
     const message = {
       type: "newConsumerCreated",
-      data: {
+      header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
+      },
+      data: {
         producerUsername,
         producerInstance,
         producerId,
@@ -511,23 +512,18 @@ class ConsumersController {
   }
 
   async onNewJSONConsumerSubscribed(event: onNewJSONConsumerSubscribedType) {
-    const {
-      producerUsername,
-      producerInstance,
-      producerType,
-      producerId,
-      data,
-    } = event.data;
+    const { producerUsername, producerInstance, producerType, producerId } =
+      event.header;
 
     if (producerInstance === this.instance.current) {
       return;
     }
 
-    const { id, label, sctpStreamParameters, protocol } = data;
+    const { id, label, sctpStreamParameters, protocol } = event.data;
 
     const consumer = await this.consumerTransport.current?.consumeData({
       id,
-      dataProducerId: data.producerId,
+      dataProducerId: event.data.producerId,
       sctpStreamParameters,
       label,
       protocol,
@@ -552,10 +548,12 @@ class ConsumersController {
 
     const message = {
       type: "newConsumerCreated",
-      data: {
+      header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
+      },
+      data: {
         producerUsername,
         producerInstance,
         producerId,

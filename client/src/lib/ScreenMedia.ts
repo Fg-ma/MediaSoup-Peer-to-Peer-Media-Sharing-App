@@ -96,7 +96,7 @@ class ScreenMedia {
 
     const msg = {
       type: "removeProducer",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
@@ -109,7 +109,7 @@ class ScreenMedia {
     if (this.userMedia.current.screenAudio[`${this.screenId}_audio`]) {
       const message = {
         type: "removeProducer",
-        data: {
+        header: {
           table_id: this.table_id,
           username: this.username,
           instance: this.instance,

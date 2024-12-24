@@ -16,7 +16,7 @@ export type FgVolumeElementControllerMessagesType =
 
 export type onClientMuteStateResponsedType = {
   type: "clientMuteStateResponsed";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
   };
@@ -24,8 +24,10 @@ export type onClientMuteStateResponsedType = {
 
 export type onClientMuteChangeType = {
   type: "clientMuteChange";
-  data: {
+  header: {
     username: string;
+  };
+  data: {
     clientMute: boolean;
   };
 };

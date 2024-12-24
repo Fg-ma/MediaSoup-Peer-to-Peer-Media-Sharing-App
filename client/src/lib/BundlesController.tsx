@@ -156,7 +156,7 @@ class BundlesController {
           onRendered={() => {
             const msg = {
               type: "requestPermissions",
-              data: {
+              header: {
                 table_id: this.table_id.current,
                 inquiringUsername: this.username.current,
                 inquiringInstance: this.instance.current,
@@ -169,7 +169,7 @@ class BundlesController {
 
             const message = {
               type: "requestBundleMetadata",
-              data: {
+              header: {
                 table_id: this.table_id.current,
                 inquiringUsername: this.username.current,
                 inquiringInstance: this.instance.current,
@@ -183,7 +183,7 @@ class BundlesController {
           onNewConsumerWasCreatedCallback={() => {
             const msg = {
               type: "requestClientMuteState",
-              data: {
+              header: {
                 table_id: this.table_id.current,
                 username: this.username.current,
                 instance: this.instance.current,

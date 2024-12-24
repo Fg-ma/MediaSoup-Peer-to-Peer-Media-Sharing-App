@@ -177,12 +177,14 @@ export default function RemoteVisualMedia({
       ) {
         const msg = {
           type: "clientEffectChange",
-          data: {
-            table_id: table_id,
-            username: username,
-            instance: instance,
+          header: {
+            table_id,
+            username,
+            instance,
             producerType: type,
             producerId: visualMediaId,
+          },
+          data: {
             effect: effect,
             effectStyle:
               // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
@@ -200,12 +202,14 @@ export default function RemoteVisualMedia({
     ) {
       const msg = {
         type: "requestEffectChange",
-        data: {
-          table_id: table_id,
+        header: {
+          table_id,
           requestedUsername: username,
           requestedInstance: instance,
           requestedProducerType: type,
           requestedProducerId: visualMediaId,
+        },
+        data: {
           effect: effect,
           blockStateChange: blockStateChange,
           style:
@@ -302,8 +306,8 @@ export default function RemoteVisualMedia({
     if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
       const msg = {
         type: "requestCatchUpData",
-        data: {
-          table_id: table_id,
+        header: {
+          table_id,
           inquiringUsername: activeUsername,
           inquiringInstance: activeInstance,
           inquiredUsername: username,

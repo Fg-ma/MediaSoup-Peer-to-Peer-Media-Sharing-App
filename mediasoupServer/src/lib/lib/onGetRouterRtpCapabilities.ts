@@ -8,7 +8,7 @@ const onGetRouterRtpCapabilities = (
   event: onGetRouterRtpCapabilitiesType,
   io: SocketIOServer
 ) => {
-  const { table_id, username, instance } = event.data;
+  const { table_id, username, instance } = event.header;
 
   // Get the next available worker and router if one doesn't already exist
   let mediasoupRouter: Router;

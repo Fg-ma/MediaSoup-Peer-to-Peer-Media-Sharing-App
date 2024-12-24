@@ -3,7 +3,7 @@ import { GameTypes } from "../context/mediaContext/typeConstant";
 type OutGoingUniversalMessages =
   | {
       type: "newGameSocket";
-      data: {
+      header: {
         table_id: string;
         username: string;
         instance: string;
@@ -13,7 +13,7 @@ type OutGoingUniversalMessages =
     }
   | {
       type: "leaveTable";
-      data: {
+      header: {
         table_id: string;
         username: string;
         instance: string;
@@ -24,7 +24,7 @@ type OutGoingUniversalMessages =
     }
   | {
       type: "startGame";
-      data: {
+      header: {
         table_id: string;
         gameType: GameTypes;
         gameId: string;
@@ -32,7 +32,7 @@ type OutGoingUniversalMessages =
     }
   | {
       type: "closeGame";
-      data: {
+      header: {
         table_id: string;
         gameType: GameTypes;
         gameId: string;
@@ -40,18 +40,18 @@ type OutGoingUniversalMessages =
     }
   | {
       type: "joinGame";
-      data: {
+      header: {
         table_id: string;
         username: string;
         instance: string;
         gameType: GameTypes;
         gameId: string;
-        data: object;
       };
+      data: object;
     }
   | {
       type: "leaveGame";
-      data: {
+      header: {
         table_id: string;
         username: string;
         instance: string;
@@ -61,7 +61,7 @@ type OutGoingUniversalMessages =
     }
   | {
       type: "getPlayersState";
-      data: {
+      header: {
         table_id: string;
         username: string;
         instance: string;
@@ -71,7 +71,7 @@ type OutGoingUniversalMessages =
     }
   | {
       type: "getIntialGameStates";
-      data: {
+      header: {
         table_id: string;
         username: string;
         instance: string;
@@ -100,7 +100,7 @@ class GameMediaUniversalFunctions {
   newGameSocket = () => {
     this.sendUniversalMessage({
       type: "newGameSocket",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
@@ -113,7 +113,7 @@ class GameMediaUniversalFunctions {
   leaveTable = () => {
     this.sendUniversalMessage({
       type: "leaveTable",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
@@ -127,7 +127,7 @@ class GameMediaUniversalFunctions {
   startGame = () => {
     this.sendUniversalMessage({
       type: "startGame",
-      data: {
+      header: {
         table_id: this.table_id,
         gameType: this.gameType,
         gameId: this.gameId,
@@ -138,7 +138,7 @@ class GameMediaUniversalFunctions {
   closeGame = () => {
     this.sendUniversalMessage({
       type: "closeGame",
-      data: {
+      header: {
         table_id: this.table_id,
         gameType: this.gameType,
         gameId: this.gameId,
@@ -149,21 +149,21 @@ class GameMediaUniversalFunctions {
   joinGame = (data: object) => {
     this.sendUniversalMessage({
       type: "joinGame",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
         gameType: this.gameType,
         gameId: this.gameId,
-        data,
       },
+      data,
     });
   };
 
   leaveGame = () => {
     this.sendUniversalMessage({
       type: "leaveGame",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
@@ -176,7 +176,7 @@ class GameMediaUniversalFunctions {
   getPlayersState = () => {
     this.sendUniversalMessage({
       type: "getPlayersState",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
@@ -189,7 +189,7 @@ class GameMediaUniversalFunctions {
   getIntialGameStates = () => {
     this.sendUniversalMessage({
       type: "getIntialGameStates",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,

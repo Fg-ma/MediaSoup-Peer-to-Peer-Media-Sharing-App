@@ -168,7 +168,7 @@ export default function FgAudioElementContainer({
     if (!isUser && activeUsername && activeInstance) {
       const msg = {
         type: "requestCatchUpData",
-        data: {
+        header: {
           table_id: table_id,
           inquiringUsername: activeUsername,
           inquiringInstance: activeInstance,

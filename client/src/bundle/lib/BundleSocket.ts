@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client";
 import {
   RemoteMediaType,
   UserMediaType,
@@ -9,6 +10,7 @@ import {
   RemoteStreamEffectsType,
 } from "../../context/effectsContext/typeConstant";
 import {
+  BundleOptions,
   onBundleMetadataResponsedType,
   onClientEffectChangedType,
   onClientMuteChangeType,
@@ -22,10 +24,13 @@ import { Permissions } from "../../context/permissionsContext/typeConstant";
 
 class BundleSocket {
   constructor(
-    private isUser: boolean,
-    private username: string,
-    private instance: string,
-    private setCameraStreams: React.Dispatch<
+    protected isUser: boolean,
+    protected table_id: string,
+    protected username: string,
+    protected instance: string,
+    protected socket: React.MutableRefObject<Socket>,
+    protected bundleOptions: BundleOptions,
+    protected setCameraStreams: React.Dispatch<
       React.SetStateAction<
         | {
             [cameraId: string]: MediaStream;
@@ -33,7 +38,7 @@ class BundleSocket {
         | undefined
       >
     >,
-    private setScreenStreams: React.Dispatch<
+    protected setScreenStreams: React.Dispatch<
       React.SetStateAction<
         | {
             [screenId: string]: MediaStream;
@@ -41,7 +46,7 @@ class BundleSocket {
         | undefined
       >
     >,
-    private setScreenAudioStreams: React.Dispatch<
+    protected setScreenAudioStreams: React.Dispatch<
       React.SetStateAction<
         | {
             [screenAudioId: string]: MediaStream;
@@ -49,29 +54,84 @@ class BundleSocket {
         | undefined
       >
     >,
-    private setAudioStream: React.Dispatch<
+    protected setAudioStream: React.Dispatch<
       React.SetStateAction<MediaStream | undefined>
     >,
-    private remoteMedia: React.MutableRefObject<RemoteMediaType>,
-    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
-    private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
-    private audioRef: React.RefObject<HTMLAudioElement>,
-    private clientMute: React.MutableRefObject<boolean>,
-    private localMute: React.MutableRefObject<boolean>,
-    private permissions: Permissions,
-    private setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
-    private handleAudioEffectChange: (
-      producerType: "audio" | "screenAudio",
-      producerId: string | undefined,
-      effect: AudioEffectTypes
-    ) => void,
-    private onNewConsumerWasCreatedCallback?: () => void
+    protected remoteMedia: React.MutableRefObject<RemoteMediaType>,
+    protected remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
+    protected remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
+    protected userMedia: React.MutableRefObject<UserMediaType>,
+    protected audioRef: React.RefObject<HTMLAudioElement>,
+    protected clientMute: React.MutableRefObject<boolean>,
+    protected localMute: React.MutableRefObject<boolean>,
+    protected permissions: Permissions,
+    protected setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
+    protected onNewConsumerWasCreatedCallback: (() => void) | undefined
   ) {}
+
+  handleAudioEffectChange = (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => {
+    if (this.bundleOptions.isUser) {
+      if (producerType === "audio") {
+        this.userMedia.current.audio?.changeEffects(effect, false);
+      } else if (producerType === "screenAudio" && producerId) {
+        this.userMedia.current.screenAudio[producerId].changeEffects(
+          effect,
+          false
+        );
+      }
+
+      if (
+        (producerType === "audio" && this.permissions.acceptsAudioEffects) ||
+        (producerType === "screenAudio" &&
+          this.permissions.acceptsScreenAudioEffects)
+      ) {
+        const msg = {
+          type: "clientEffectChange",
+          header: {
+            table_id: this.table_id,
+            username: this.username,
+            instance: this.instance,
+            producerType,
+            producerId,
+          },
+          data: {
+            effect: effect,
+            blockStateChange: false,
+          },
+        };
+        this.socket.current.emit("message", msg);
+      }
+    } else if (
+      (producerType === "audio" && this.permissions.acceptsAudioEffects) ||
+      (producerType === "screenAudio" &&
+        this.permissions.acceptsScreenAudioEffects)
+    ) {
+      const msg = {
+        type: "requestEffectChange",
+        header: {
+          table_id: this.table_id,
+          requestedUsername: this.username,
+          requestedInstance: this.instance,
+          requestedProducerType: producerType,
+          requestedProducerId: producerId,
+        },
+        data: {
+          effect: effect,
+          blockStateChange: false,
+        },
+      };
+
+      this.socket.current.emit("message", msg);
+    }
+  };
 
   onNewConsumerWasCreated = (event: onNewConsumerWasCreatedType) => {
     const { producerUsername, producerInstance, producerType, producerId } =
-      event.data;
+      event.header;
 
     if (
       this.username !== producerUsername ||
@@ -149,7 +209,7 @@ class BundleSocket {
       return;
     }
 
-    const { producerType, producerId } = event.data;
+    const { producerType, producerId } = event.header;
 
     if (producerType === "camera") {
       this.setCameraStreams((prev) => {
@@ -185,7 +245,7 @@ class BundleSocket {
 
   onProducerDisconnected = (event: onProducerDisconnectedType) => {
     const { producerUsername, producerInstance, producerType, producerId } =
-      event.data;
+      event.header;
 
     if (
       producerUsername === this.username &&
@@ -239,7 +299,8 @@ class BundleSocket {
   };
 
   onPermissionsResponsed = (event: onPermissionsResponsedType) => {
-    const { inquiredUsername, inquiredInstance, permissions } = event.data;
+    const { inquiredUsername, inquiredInstance } = event.header;
+    const { permissions } = event.data;
 
     if (
       this.username !== inquiredUsername &&
@@ -252,13 +313,8 @@ class BundleSocket {
   };
 
   onBundleMetadataResponsed = (event: onBundleMetadataResponsedType) => {
-    const {
-      inquiredUsername,
-      inquiredInstance,
-      clientMute,
-      streamEffects,
-      userEffectsStyles,
-    } = event.data;
+    const { inquiredUsername, inquiredInstance } = event.header;
+    const { clientMute, streamEffects, userEffectsStyles } = event.data;
 
     if (
       this.username !== inquiredUsername ||
@@ -279,7 +335,8 @@ class BundleSocket {
   };
 
   onEffectChangeRequested = (event: onEffectChangeRequestedType) => {
-    const { requestedProducerType, requestedProducerId, effect } = event.data;
+    const { requestedProducerType, requestedProducerId } = event.header;
+    const { effect } = event.data;
 
     if (
       (requestedProducerType === "audio" &&
@@ -297,14 +354,8 @@ class BundleSocket {
   };
 
   onClientEffectChanged = (event: onClientEffectChangedType) => {
-    const {
-      username,
-      instance,
-      producerType,
-      producerId,
-      blockStateChange,
-      effect,
-    } = event.data;
+    const { username, instance, producerType, producerId } = event.header;
+    const { blockStateChange, effect } = event.data;
 
     if (
       !this.isUser &&
@@ -328,7 +379,7 @@ class BundleSocket {
         this.remoteStreamEffects.current[username][instance].screenAudio[
           producerId
         ] = {
-          ...defaultAudioStreamEffects,
+          ...structuredClone(defaultAudioStreamEffects),
           [effect]:
             // @ts-expect-error: effect and producerType have no strict correlation enforcement
             !this.remoteStreamEffects.current[username][instance].screenAudio[

@@ -30,7 +30,7 @@ class AudioSectionController {
     } else if (!this.isAudio.current) {
       const msg = {
         type: "removeProducer",
-        data: {
+        header: {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,

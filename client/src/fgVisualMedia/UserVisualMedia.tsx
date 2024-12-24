@@ -168,12 +168,14 @@ export default function FgBabylonCanvas({
       ) {
         const msg = {
           type: "clientEffectChange",
-          data: {
-            table_id: table_id,
-            username: username,
-            instance: instance,
+          header: {
+            table_id,
+            username,
+            instance,
             producerType: type,
             producerId: visualMediaId,
+          },
+          data: {
             effect: effect,
             effectStyle:
               // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
@@ -191,14 +193,16 @@ export default function FgBabylonCanvas({
     ) {
       const msg = {
         type: "requestEffectChange",
-        data: {
-          table_id: table_id,
+        header: {
+          table_id,
           requestedUsername: username,
           requestedInstance: instance,
           requestedProducerType: type,
           requestedProducerId: visualMediaId,
-          effect: effect,
-          blockStateChange: blockStateChange,
+        },
+        data: {
+          effect,
+          blockStateChange,
           style:
             // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
             remoteEffectsStyles.current[username][instance][type][

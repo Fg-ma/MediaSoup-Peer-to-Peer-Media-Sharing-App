@@ -17,7 +17,8 @@ class UniversalGameController {
   constructor(private broadcaster: Broadcaster) {}
 
   onInitiateGame = (event: onInitiateGameType) => {
-    const { table_id, gameType, gameId, initiator } = event.data;
+    const { table_id, gameType, gameId } = event.header;
+    const { initiator } = event.data;
 
     if (gameType === "snake") {
       if (!snakeGames[table_id]) {
@@ -38,9 +39,11 @@ class UniversalGameController {
       undefined,
       {
         type: "gameInitiated",
-        data: {
+        header: {
           gameType,
           gameId,
+        },
+        data: {
           initiator,
         },
       }
@@ -48,7 +51,7 @@ class UniversalGameController {
   };
 
   onStartGame = (event: onStartGameType) => {
-    const { table_id, gameType, gameId } = event.data;
+    const { table_id, gameType, gameId } = event.header;
 
     if (gameType === "snake") {
       snakeGames[table_id][gameId].startGame();
@@ -60,7 +63,7 @@ class UniversalGameController {
   };
 
   onCloseGame = (event: onCloseGameType) => {
-    const { table_id, gameType, gameId } = event.data;
+    const { table_id, gameType, gameId } = event.header;
 
     for (const username in tables[table_id]) {
       for (const instance in tables[table_id][username]) {
@@ -80,7 +83,7 @@ class UniversalGameController {
       undefined,
       {
         type: "gameClosed",
-        data: {
+        header: {
           gameType,
           gameId,
         },
@@ -89,7 +92,8 @@ class UniversalGameController {
   };
 
   onJoinGame = (event: onJoinGameType) => {
-    const { table_id, username, instance, gameType, gameId, data } = event.data;
+    const { table_id, username, instance, gameType, gameId } = event.header;
+    const data = event.data;
 
     switch (gameType) {
       case "snake":
@@ -105,7 +109,7 @@ class UniversalGameController {
   };
 
   onLeaveGame = (event: onLeaveGameType) => {
-    const { table_id, username, instance, gameType, gameId } = event.data;
+    const { table_id, username, instance, gameType, gameId } = event.header;
 
     switch (gameType) {
       case "snake":
@@ -117,7 +121,7 @@ class UniversalGameController {
   };
 
   onGetPlayersState = (event: onGetPlayersStateType) => {
-    const { table_id, username, instance, gameType, gameId } = event.data;
+    const { table_id, username, instance, gameType, gameId } = event.header;
 
     let playersState = {};
 
@@ -146,7 +150,7 @@ class UniversalGameController {
   };
 
   onGetIntialGameStates = (event: onGetIntialGameStatesType) => {
-    const { table_id, username, instance, gameType, gameId } = event.data;
+    const { table_id, username, instance, gameType, gameId } = event.header;
 
     let initialGameStates = {};
 

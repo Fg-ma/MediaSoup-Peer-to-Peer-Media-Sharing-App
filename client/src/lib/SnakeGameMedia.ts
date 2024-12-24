@@ -4,29 +4,35 @@ import GameMediaUniversalFunctions from "./GameMediaUniversalFunctions";
 type OutGoingMessages =
   | {
       type: "snakeDirectionChange";
-      data: {
+      header: {
         table_id: string;
         username: string;
         instance: string;
         gameId: string;
+      };
+      data: {
         direction: "up" | "down" | "left" | "right";
       };
     }
   | {
       type: "changeGridSize";
-      data: {
+      header: {
         table_id: string;
         gameId: string;
+      };
+      data: {
         gridSize: number;
       };
     }
   | {
       type: "changeSnakeColor";
-      data: {
+      header: {
         table_id: string;
         username: string;
         instance: string;
         gameId: string;
+      };
+      data: {
         newSnakeColor: SnakeColorsType;
       };
     };
@@ -71,11 +77,13 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
   snakeDirectionChange = (direction: "up" | "down" | "left" | "right") => {
     this.sendMessage({
       type: "snakeDirectionChange",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
         gameId: this.gameId,
+      },
+      data: {
         direction,
       },
     });
@@ -84,9 +92,11 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
   changeGridSize = (gridSize: number) => {
     this.sendMessage({
       type: "changeGridSize",
-      data: {
+      header: {
         table_id: this.table_id,
         gameId: this.gameId,
+      },
+      data: {
         gridSize,
       },
     });
@@ -95,11 +105,13 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
   changeSnakeColor = (newSnakeColor: SnakeColorsType) => {
     this.sendMessage({
       type: "changeSnakeColor",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
         gameId: this.gameId,
+      },
+      data: {
         newSnakeColor,
       },
     });

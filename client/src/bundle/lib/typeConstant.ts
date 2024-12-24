@@ -27,7 +27,7 @@ export type BundleControllerMessageType =
 
 export type onProducerDisconnectedType = {
   type: "producerDisconnected";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
     producerType: "camera" | "screen" | "screenAudio" | "audio";
@@ -37,7 +37,7 @@ export type onProducerDisconnectedType = {
 
 export type onNewProducerWasCreatedType = {
   type: "newProducerWasCreated";
-  data: {
+  header: {
     producerType: "camera" | "screen" | "screenAudio" | "audio";
     producerId: string | undefined;
   };
@@ -45,36 +45,42 @@ export type onNewProducerWasCreatedType = {
 
 export type onNewConsumerWasCreatedType = {
   type: "newConsumerWasCreated";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
-    producerId?: string;
     producerType: "camera" | "screen" | "audio" | "screenAudio";
+    producerId?: string;
   };
 };
 
 export type onClientMuteChangeType = {
   type: "clientMuteChange";
-  data: {
+  header: {
     username: string;
+  };
+  data: {
     clientMute: boolean;
   };
 };
 
 export type onPermissionsResponsedType = {
   type: "permissionsResponsed";
-  data: {
+  header: {
     inquiredUsername: string;
     inquiredInstance: string;
+  };
+  data: {
     permissions: Permissions;
   };
 };
 
 export type onBundleMetadataResponsedType = {
   type: "bundleMetadataResponsed";
-  data: {
+  header: {
     inquiredUsername: string;
     inquiredInstance: string;
+  };
+  data: {
     clientMute: boolean;
     streamEffects: UserStreamEffectsType;
     userEffectsStyles: UserEffectsStylesType;
@@ -83,9 +89,11 @@ export type onBundleMetadataResponsedType = {
 
 export type onEffectChangeRequestedType = {
   type: "effectChangeRequested";
-  data: {
+  header: {
     requestedProducerType: "camera" | "screen" | "screenAudio" | "audio";
     requestedProducerId: string | undefined;
+  };
+  data: {
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
     effectStyle: string;
     blockStateChange: boolean;
@@ -94,11 +102,13 @@ export type onEffectChangeRequestedType = {
 
 export type onClientEffectChangedType = {
   type: "clientEffectChanged";
-  data: {
+  header: {
     username: string;
     instance: string;
     producerType: "camera" | "screen" | "screenAudio" | "audio";
     producerId: string | undefined;
+  };
+  data: {
     effect: CameraEffectTypes | ScreenEffectTypes | AudioEffectTypes;
     effectStyle: string;
     blockStateChange: boolean;

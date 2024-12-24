@@ -12,16 +12,18 @@ class PermissionsController {
   ) {}
 
   onPermissionsRequested = (event: onPermissionsRequestedType) => {
-    const { inquiringUsername, inquiringInstance } = event.data;
+    const { inquiringUsername, inquiringInstance } = event.header;
 
     const msg = {
       type: "permissionsResponse",
-      data: {
+      header: {
         table_id: this.table_id.current,
         inquiringUsername,
         inquiringInstance,
         inquiredUsername: this.username.current,
         inquiredInstance: this.instance.current,
+      },
+      data: {
         permissions: this.permissions.current,
       },
     };

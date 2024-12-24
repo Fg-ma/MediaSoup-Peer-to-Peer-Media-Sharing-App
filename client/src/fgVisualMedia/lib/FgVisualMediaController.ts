@@ -23,9 +23,11 @@ type FgVisualMediaMessageEvents =
 
 type onEffectChangeRequestedType = {
   type: "effectChangeRequested";
-  data: {
+  header: {
     requestedProducerType: "camera" | "screen" | "audio";
     requestedProducerId: string;
+  };
+  data: {
     effect: CameraEffectTypes | ScreenEffectTypes;
     blockStateChange: boolean;
     style: string;
@@ -37,11 +39,13 @@ type onEffectChangeRequestedType = {
 
 type onClientEffectChangedType = {
   type: "clientEffectChanged";
-  data: {
+  header: {
     username: string;
     instance: string;
     producerType: "camera" | "screen" | "screenAudio" | "audio";
     producerId: string;
+  };
+  data: {
     effect: CameraEffectTypes | ScreenEffectTypes;
     effectStyle: string;
     blockStateChange: boolean;
@@ -50,49 +54,49 @@ type onClientEffectChangedType = {
 
 type onResponsedCatchUpDataType = {
   type: "responsedCatchUpData";
-  data: {
+  header: {
     inquiredUsername: string;
     inquiredInstance: string;
     inquiredType: "camera" | "screen";
     inquiredProducerId: string;
-    data:
-      | {
-          paused: boolean;
-          timeEllapsed: number;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
-      | {
-          paused: boolean;
-          timeEllapsed: number;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
-      | undefined;
   };
+  data:
+    | {
+        paused: boolean;
+        timeEllapsed: number;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }
+    | {
+        paused: boolean;
+        timeEllapsed: number;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }
+    | undefined;
 };
 
 type onNewConsumerWasCreatedType = {
   type: "newConsumerWasCreated";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
     producerId?: string;
@@ -203,9 +207,8 @@ class FgVisualMediaController {
   };
 
   onEffectChangeRequested = (event: onEffectChangeRequestedType) => {
+    const { requestedProducerType, requestedProducerId } = event.header;
     const {
-      requestedProducerType,
-      requestedProducerId,
       effect,
       style,
       hideBackgroundColor,
@@ -260,21 +263,15 @@ class FgVisualMediaController {
   };
 
   onClientEffectChanged = (event: onClientEffectChangedType) => {
-    const {
-      username,
-      instance,
-      producerType,
-      producerId,
-      blockStateChange,
-      effect,
-      effectStyle,
-    } = event.data;
+    const { username, instance, producerType, producerId } = event.header;
+    const { blockStateChange, effect, effectStyle } = event.data;
 
     if (
       !this.fgVisualMediaOptions.isUser &&
       username === this.username &&
       instance === this.instance &&
       (producerType === "camera" || producerType === "screen") &&
+      producerType === this.type &&
       producerId === this.visualMediaId
     ) {
       if (!blockStateChange) {
@@ -290,7 +287,7 @@ class FgVisualMediaController {
 
       if (effectStyle) {
         // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
-        this.remoteEffectsStyles.current[username][instance][this.type][
+        this.remoteEffectsStyles.current[username][instance][producerType][
           producerId
         ][effect] = effectStyle;
       }
@@ -307,8 +304,8 @@ class FgVisualMediaController {
       inquiredInstance,
       inquiredType,
       inquiredProducerId,
-      data,
-    } = event.data;
+    } = event.header;
+    const data = event.data;
 
     if (
       !this.fgVisualMediaOptions.isUser &&

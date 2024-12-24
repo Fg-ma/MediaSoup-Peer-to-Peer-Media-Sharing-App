@@ -3,7 +3,7 @@ import { tableConsumers } from "../mediasoupVars";
 import { onResumeType } from "../mediasoupTypes";
 
 const onResume = async (event: onResumeType, io: SocketIOServer) => {
-  const { table_id, username, instance } = event.data;
+  const { table_id, username, instance } = event.header;
 
   for (const producerUsername in tableConsumers[table_id][username][instance]) {
     for (const producerInstance in tableConsumers[table_id][username][instance][

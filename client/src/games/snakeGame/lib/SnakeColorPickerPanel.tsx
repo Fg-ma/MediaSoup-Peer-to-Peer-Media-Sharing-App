@@ -133,7 +133,7 @@ export default function SnakeColorPickerPanel({
       }
       initPosition={{
         referenceElement: snakeColorPickerButtonRef.current ?? undefined,
-        placement: "below",
+        placement: "left",
         padding: 8,
       }}
       initWidth={"278px"}

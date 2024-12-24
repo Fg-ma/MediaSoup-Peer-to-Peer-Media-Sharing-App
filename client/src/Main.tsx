@@ -137,44 +137,44 @@ export type onSubscribedType = {
 
 export type onNewConsumerSubscribedType = {
   type: "newConsumerSubscribed";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
     producerId?: string;
     producerType: "camera" | "screen" | "screenAudio" | "audio";
-    data: {
-      id: string;
-      producerId: string;
-      kind: "audio" | "video" | undefined;
-      rtpParameters: types.RtpParameters;
-      type: string;
-      producerPaused: boolean;
-    };
+  };
+  data: {
+    id: string;
+    producerId: string;
+    kind: "audio" | "video" | undefined;
+    rtpParameters: types.RtpParameters;
+    type: string;
+    producerPaused: boolean;
   };
 };
 
 export type onNewJSONConsumerSubscribedType = {
   type: "newJSONConsumerSubscribed";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
     producerId?: string;
     producerType: "json";
-    data: {
-      id: string;
-      producerId: string;
-      label: string;
-      sctpStreamParameters: SctpStreamParameters;
-      type: string;
-      producerPaused: boolean;
-      protocol: string;
-    };
+  };
+  data: {
+    id: string;
+    producerId: string;
+    label: string;
+    sctpStreamParameters: SctpStreamParameters;
+    type: string;
+    producerPaused: boolean;
+    protocol: string;
   };
 };
 
 export type onNewProducerAvailableType = {
   type: "newProducerAvailable";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
     producerType: string;
@@ -184,7 +184,7 @@ export type onNewProducerAvailableType = {
 
 export type onNewJSONProducerAvailableType = {
   type: "newJSONProducerAvailable";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
     producerType: string;
@@ -195,7 +195,7 @@ export type onNewJSONProducerAvailableType = {
 
 export type onProducerDisconnectedType = {
   type: "producerDisconnected";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
     producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
@@ -206,7 +206,7 @@ export type onProducerDisconnectedType = {
 
 export type onPermissionsRequestedType = {
   type: "permissionsRequested";
-  data: {
+  header: {
     inquiringUsername: string;
     inquiringInstance: string;
   };
@@ -214,7 +214,7 @@ export type onPermissionsRequestedType = {
 
 export type onBundleMetadataRequestedType = {
   type: "bundleMetadataRequested";
-  data: {
+  header: {
     inquiringUsername: string;
     inquiringInstance: string;
   };
@@ -222,7 +222,7 @@ export type onBundleMetadataRequestedType = {
 
 export type onRequestedCatchUpDataType = {
   type: "requestedCatchUpData";
-  data: {
+  header: {
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredType: "camera" | "screen" | "audio";
@@ -232,7 +232,7 @@ export type onRequestedCatchUpDataType = {
 
 export type onRemoveProducerRequestedType = {
   type: "removeProducerRequested";
-  data: {
+  header: {
     producerType: "camera" | "screen" | "screenAudio" | "audio" | "json";
     producerId: string;
   };
@@ -294,10 +294,12 @@ export default function Main() {
 
     const msg = {
       type: "clientMute",
-      data: {
+      header: {
         table_id: table_id.current,
         username: username.current,
         instance: instance.current,
+      },
+      data: {
         clientMute: mutedAudioRef.current,
       },
     };
@@ -503,7 +505,7 @@ export default function Main() {
     if (
       remoteEffectsStyles.current?.[disconnectedUsername]?.[
         disconnectedInstance
-      ] !== undefined
+      ]
     ) {
       delete remoteEffectsStyles.current?.[disconnectedUsername]?.[
         disconnectedInstance

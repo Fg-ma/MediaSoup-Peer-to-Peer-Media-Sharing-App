@@ -5,24 +5,21 @@ import {
 } from "../../context/mediaContext/typeConstant";
 import {
   RemoteEffectStylesType,
-  AudioEffectTypes,
   RemoteStreamEffectsType,
 } from "../../context/effectsContext/typeConstant";
 import BundleSocket from "./BundleSocket";
 import { BundleControllerMessageType, BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 
-class BundleController {
-  bundleSocket: BundleSocket;
-
+class BundleController extends BundleSocket {
   constructor(
-    private isUser: boolean,
-    private table_id: string,
-    private username: string,
-    private instance: string,
-    private socket: React.MutableRefObject<Socket>,
-    private bundleOptions: BundleOptions,
-    private setCameraStreams: React.Dispatch<
+    isUser: boolean,
+    table_id: string,
+    username: string,
+    instance: string,
+    socket: React.MutableRefObject<Socket>,
+    bundleOptions: BundleOptions,
+    setCameraStreams: React.Dispatch<
       React.SetStateAction<
         | {
             [cameraId: string]: MediaStream;
@@ -30,7 +27,7 @@ class BundleController {
         | undefined
       >
     >,
-    private setScreenStreams: React.Dispatch<
+    setScreenStreams: React.Dispatch<
       React.SetStateAction<
         | {
             [screenId: string]: MediaStream;
@@ -38,7 +35,7 @@ class BundleController {
         | undefined
       >
     >,
-    private setScreenAudioStreams: React.Dispatch<
+    setScreenAudioStreams: React.Dispatch<
       React.SetStateAction<
         | {
             [screenAudioId: string]: MediaStream;
@@ -46,125 +43,71 @@ class BundleController {
         | undefined
       >
     >,
-    private setAudioStream: React.Dispatch<
+    setAudioStream: React.Dispatch<
       React.SetStateAction<MediaStream | undefined>
     >,
-    private remoteMedia: React.MutableRefObject<RemoteMediaType>,
-    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
-    private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
+    remoteMedia: React.MutableRefObject<RemoteMediaType>,
+    remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
+    remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
+    userMedia: React.MutableRefObject<UserMediaType>,
     private bundleRef: React.RefObject<HTMLDivElement>,
-    private audioRef: React.RefObject<HTMLAudioElement>,
-    private clientMute: React.MutableRefObject<boolean>,
-    private localMute: React.MutableRefObject<boolean>,
-    private permissions: Permissions,
-    private setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
-    private onNewConsumerWasCreatedCallback?: () => void,
-    private handleMuteCallback?: () => void
+    audioRef: React.RefObject<HTMLAudioElement>,
+    clientMute: React.MutableRefObject<boolean>,
+    localMute: React.MutableRefObject<boolean>,
+    permissions: Permissions,
+    setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
+    onNewConsumerWasCreatedCallback: (() => void) | undefined,
+    private handleMuteCallback: (() => void) | undefined
   ) {
-    this.bundleSocket = new BundleSocket(
-      this.isUser,
-      this.username,
-      this.instance,
-      this.setCameraStreams,
-      this.setScreenStreams,
-      this.setScreenAudioStreams,
-      this.setAudioStream,
-      this.remoteMedia,
-      this.remoteStreamEffects,
-      this.remoteEffectsStyles,
-      this.userMedia,
-      this.audioRef,
-      this.clientMute,
-      this.localMute,
-      this.permissions,
-      this.setPermissions,
-      this.handleAudioEffectChange,
-      this.onNewConsumerWasCreatedCallback
+    super(
+      isUser,
+      table_id,
+      username,
+      instance,
+      socket,
+      bundleOptions,
+      setCameraStreams,
+      setScreenStreams,
+      setScreenAudioStreams,
+      setAudioStream,
+      remoteMedia,
+      remoteStreamEffects,
+      remoteEffectsStyles,
+      userMedia,
+      audioRef,
+      clientMute,
+      localMute,
+      permissions,
+      setPermissions,
+      onNewConsumerWasCreatedCallback
     );
   }
-
-  handleAudioEffectChange = (
-    producerType: "audio" | "screenAudio",
-    producerId: string | undefined,
-    effect: AudioEffectTypes
-  ) => {
-    if (this.bundleOptions.isUser) {
-      if (producerType === "audio") {
-        this.userMedia.current.audio?.changeEffects(effect, false);
-      } else if (producerType === "screenAudio" && producerId) {
-        this.userMedia.current.screenAudio[producerId].changeEffects(
-          effect,
-          false
-        );
-      }
-
-      if (
-        (producerType === "audio" && this.permissions.acceptsAudioEffects) ||
-        (producerType === "screenAudio" &&
-          this.permissions.acceptsScreenAudioEffects)
-      ) {
-        const msg = {
-          type: "clientEffectChange",
-          data: {
-            table_id: this.table_id,
-            username: this.username,
-            instance: this.instance,
-            producerType,
-            producerId,
-            effect: effect,
-            blockStateChange: false,
-          },
-        };
-        this.socket.current.emit("message", msg);
-      }
-    } else if (
-      (producerType === "audio" && this.permissions.acceptsAudioEffects) ||
-      (producerType === "screenAudio" &&
-        this.permissions.acceptsScreenAudioEffects)
-    ) {
-      const msg = {
-        type: "requestEffectChange",
-        data: {
-          table_id: this.table_id,
-          requestedUsername: this.username,
-          requestedInstance: this.instance,
-          requestedProducerType: producerType,
-          requestedProducerId: producerId,
-          effect: effect,
-          blockStateChange: false,
-        },
-      };
-
-      this.socket.current.emit("message", msg);
-    }
-  };
 
   handleMessage = (event: BundleControllerMessageType) => {
     switch (event.type) {
       case "producerDisconnected":
-        this.bundleSocket.onProducerDisconnected(event);
+        this.onProducerDisconnected(event);
         break;
       case "newProducerWasCreated":
-        this.bundleSocket.onNewProducerWasCreated(event);
+        this.onNewProducerWasCreated(event);
         break;
       case "newConsumerWasCreated":
-        this.bundleSocket.onNewConsumerWasCreated(event);
+        this.onNewConsumerWasCreated(event);
         break;
       case "clientMuteChange":
-        this.bundleSocket.onClientMuteChange(event);
+        this.onClientMuteChange(event);
         break;
       case "permissionsResponsed":
-        this.bundleSocket.onPermissionsResponsed(event);
+        this.onPermissionsResponsed(event);
         break;
       case "bundleMetadataResponsed":
-        this.bundleSocket.onBundleMetadataResponsed(event);
+        this.onBundleMetadataResponsed(event);
         break;
       case "effectChangeRequested":
-        this.bundleSocket.onEffectChangeRequested(event);
+        this.onEffectChangeRequested(event);
         break;
       case "clientEffectChanged":
-        this.bundleSocket.onClientEffectChanged(event);
+        this.onClientEffectChanged(event);
         break;
       default:
         break;

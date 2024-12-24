@@ -11,7 +11,7 @@ type onNewConsumerWasCreatedType = { type: "newConsumerWasCreated" };
 
 type onRequestedGameCatchUpDataType = {
   type: "requestedGameCatchUpData";
-  data: {
+  header: {
     inquiringUsername: string;
     inquiringInstance: string;
     gameId: string;
@@ -20,8 +20,10 @@ type onRequestedGameCatchUpDataType = {
 
 type onResponsedGameCatchUpDataType = {
   type: "responsedGameCatchUpData";
-  data: {
+  header: {
     gameId: string;
+  };
+  data: {
     positioning: {
       position: {
         left: number;
@@ -278,16 +280,18 @@ class FgGameController {
   };
 
   onRequestedGameCatchUpData = (event: onRequestedGameCatchUpDataType) => {
-    const { inquiringUsername, inquiringInstance, gameId } = event.data;
+    const { inquiringUsername, inquiringInstance, gameId } = event.header;
 
     if (gameId === this.gameId) {
       const msg = {
         type: "responseGameCatchUpData",
-        data: {
+        header: {
           table_id: this.table_id,
           inquiringUsername,
           inquiringInstance,
           gameId,
+        },
+        data: {
           positioning: this.positioning.current,
         },
       };
@@ -296,7 +300,8 @@ class FgGameController {
   };
 
   onResponsedGameCatchUpData = (event: onResponsedGameCatchUpDataType) => {
-    const { gameId, positioning } = event.data;
+    const { gameId } = event.header;
+    const { positioning } = event.data;
 
     if (gameId === this.gameId) {
       this.positioning.current = positioning;

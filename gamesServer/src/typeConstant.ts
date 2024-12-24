@@ -56,7 +56,7 @@ export type MessageTypes =
 
 export type onJoinTableType = {
   type: "joinTable";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -65,7 +65,7 @@ export type onJoinTableType = {
 
 export type onNewGameSocketType = {
   type: "newGameSocket";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -76,7 +76,7 @@ export type onNewGameSocketType = {
 
 export type onLeaveTableType = {
   type: "leaveTable";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -89,17 +89,19 @@ export type onLeaveTableType = {
 // Universal
 export type onInitiateGameType = {
   type: "initiateGame";
-  data: {
+  header: {
     table_id: string;
     gameType: GameTypes;
     gameId: string;
+  };
+  data: {
     initiator: { username: string; instance: string };
   };
 };
 
 export type onStartGameType = {
   type: "startGame";
-  data: {
+  header: {
     table_id: string;
     gameType: GameTypes;
     gameId: string;
@@ -108,7 +110,7 @@ export type onStartGameType = {
 
 export type onCloseGameType = {
   type: "closeGame";
-  data: {
+  header: {
     table_id: string;
     gameType: GameTypes;
     gameId: string;
@@ -117,19 +119,19 @@ export type onCloseGameType = {
 
 export type onJoinGameType = {
   type: "joinGame";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
     gameType: GameTypes;
     gameId: string;
-    data: object;
   };
+  data: object;
 };
 
 export type onLeaveGameType = {
   type: "leaveGame";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -140,7 +142,7 @@ export type onLeaveGameType = {
 
 export type onGetPlayersStateType = {
   type: "getPlayersState";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -151,7 +153,7 @@ export type onGetPlayersStateType = {
 
 export type onGetIntialGameStatesType = {
   type: "getIntialGameStates";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -163,31 +165,37 @@ export type onGetIntialGameStatesType = {
 // Snake Game
 export type onSnakeDirectionChangeType = {
   type: "snakeDirectionChange";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
     gameId: string;
+  };
+  data: {
     direction: "up" | "down" | "left" | "right";
   };
 };
 
 export type onChangeGridSizeType = {
   type: "changeGridSize";
-  data: {
+  header: {
     table_id: string;
     gameId: string;
+  };
+  data: {
     gridSize: number;
   };
 };
 
 export type onChangeSnakeColorType = {
   type: "changeSnakeColor";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
     gameId: string;
+  };
+  data: {
     newSnakeColor: SnakeColorsType;
   };
 };

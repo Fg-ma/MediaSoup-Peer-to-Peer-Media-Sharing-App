@@ -14,11 +14,11 @@ class StatesPermissionsController {
       inquiringInstance,
       inquiredUsername,
       inquiredInstance,
-    } = event.data;
+    } = event.header;
 
     const msg = {
       type: "permissionsRequested",
-      data: {
+      header: {
         inquiringUsername,
         inquiringInstance,
       },
@@ -36,14 +36,16 @@ class StatesPermissionsController {
       inquiringInstance,
       inquiredUsername,
       inquiredInstance,
-      permissions,
-    } = event.data;
+    } = event.header;
+    const { permissions } = event.data;
 
     const msg = {
       type: "permissionsResponsed",
-      data: {
+      header: {
         inquiredUsername,
         inquiredInstance,
+      },
+      data: {
         permissions,
       },
     };

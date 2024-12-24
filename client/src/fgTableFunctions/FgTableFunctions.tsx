@@ -171,12 +171,14 @@ export default function FgTableFunctions({
     if (permissions.current.acceptsAudioEffects) {
       const msg = {
         type: "clientEffectChange",
-        data: {
+        header: {
           table_id: table_id.current,
           username: username.current,
           instance: instance.current,
           producerType,
           producerId,
+        },
+        data: {
           effect: effect,
           blockStateChange: false,
         },

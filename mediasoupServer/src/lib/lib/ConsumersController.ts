@@ -32,7 +32,7 @@ class ConsumersController {
   }
 
   async onCreateConsumerTransport(event: onCreateConsumerTransportType) {
-    const { table_id, username, instance } = event.data;
+    const { table_id, username, instance } = event.header;
 
     try {
       // Get the next available worker and router if one doesn't already exist
@@ -78,7 +78,8 @@ class ConsumersController {
   }
 
   async onConnectConsumerTransport(event: onConnectConsumerTransportType) {
-    const { table_id, username, instance, dtlsParameters } = event.data;
+    const { table_id, username, instance } = event.header;
+    const { dtlsParameters } = event.data;
 
     if (
       !tableConsumerTransports[table_id] ||
@@ -104,7 +105,8 @@ class ConsumersController {
   }
 
   async onConsume(event: onConsumeType) {
-    const { table_id, username, instance, rtpCapabilities } = event.data;
+    const { table_id, username, instance } = event.header;
+    const { rtpCapabilities } = event.data;
 
     // Get the next available worker and router
     const { router: mediasoupRouter } = getWorkerByIdx(workersMap[table_id]);
@@ -370,10 +372,8 @@ class ConsumersController {
   }
 
   async onNewConsumer(event: onNewConsumerType) {
+    const { table_id, username, instance } = event.header;
     const {
-      table_id,
-      username,
-      instance,
       producerType,
       producerId,
       producerUsername,
@@ -487,30 +487,32 @@ class ConsumersController {
       ][producerType] = newConsumer;
     }
 
-    this.io.to(`instance_${table_id}_${username}_${instance}`).emit("message", {
+    const msg = {
       type: "newConsumerSubscribed",
-      data: {
+      header: {
         producerUsername,
         producerInstance,
         producerId,
         producerType,
-        data: {
-          id: newConsumer.id,
-          producerId: newConsumer.producerId,
-          kind: newConsumer.kind,
-          rtpParameters: newConsumer.rtpParameters,
-          type: newConsumer.type,
-          producerPaused: newConsumer.producerPaused,
-        },
       },
-    });
+      data: {
+        id: newConsumer.id,
+        producerId: newConsumer.producerId,
+        kind: newConsumer.kind,
+        rtpParameters: newConsumer.rtpParameters,
+        type: newConsumer.type,
+        producerPaused: newConsumer.producerPaused,
+      },
+    };
+
+    this.io
+      .to(`instance_${table_id}_${username}_${instance}`)
+      .emit("message", msg);
   }
 
   async onNewJSONConsumer(event: onNewJSONConsumerType) {
+    const { table_id, username, instance } = event.header;
     const {
-      table_id,
-      username,
-      instance,
       producerUsername,
       producerInstance,
       producerType,
@@ -601,39 +603,33 @@ class ConsumersController {
 
     this.io.to(`instance_${table_id}_${username}_${instance}`).emit("message", {
       type: "newJSONConsumerSubscribed",
-      data: {
+      header: {
         producerUsername,
         producerInstance,
         producerId: incomingProducerId,
         producerType,
-        data: {
-          id: newConsumer.id,
-          producerId: newConsumer.producerId,
-          label: newConsumer.label,
-          sctpStreamParameters: newConsumer.sctpStreamParameters,
-          type: newConsumer.type,
-          producerPaused: newConsumer.producerPaused,
-          protocol: newConsumer.protocol,
-          dataStreamType: dataStreamType,
-        },
+        dataStreamType,
+      },
+      data: {
+        id: newConsumer.id,
+        producerId: newConsumer.producerId,
+        label: newConsumer.label,
+        sctpStreamParameters: newConsumer.sctpStreamParameters,
+        type: newConsumer.type,
+        producerPaused: newConsumer.producerPaused,
+        protocol: newConsumer.protocol,
       },
     });
   }
 
   onNewConsumerCreated(event: onNewConsumerCreatedType) {
-    const {
-      table_id,
-      username,
-      instance,
-      producerUsername,
-      producerInstance,
-      producerType,
-      producerId,
-    } = event.data;
+    const { table_id, username, instance } = event.header;
+    const { producerUsername, producerInstance, producerType, producerId } =
+      event.data;
 
     const msg = {
       type: "newConsumerWasCreated",
-      data: {
+      header: {
         producerUsername,
         producerInstance,
         producerType,
@@ -646,7 +642,7 @@ class ConsumersController {
   }
 
   onUnsubscribe(event: onUnsubscribeType) {
-    const { table_id, username, instance } = event.data;
+    const { table_id, username, instance } = event.header;
 
     this.mediasoupCleanup.deleteConsumerTransport(table_id, username, instance);
 

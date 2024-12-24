@@ -39,26 +39,26 @@ export default function SnakeGridSizePanel({
             disabled={started}
             options={{
               initValue: 15,
-              topLabel: "Grid size",
+              bottomLabel: "Grid size",
               ticks: 6,
               rangeMax: 60,
               rangeMin: 10,
               precision: 1,
               snapToWholeNum: true,
-              orientation: "horizontal",
+              orientation: "vertical",
             }}
           />
         </div>
       }
       initPosition={{
         referenceElement: snakeGridSizeButtonRef.current ?? undefined,
-        placement: "below",
+        placement: "left",
         padding: 8,
       }}
-      initWidth={"370px"}
-      initHeight={"80px"}
-      minWidth={200}
-      minHeight={60}
+      initWidth={"80px"}
+      initHeight={"370px"}
+      minWidth={60}
+      minHeight={200}
       closeCallback={() => setGridSizePanelActive(false)}
       closePosition='topRight'
     />

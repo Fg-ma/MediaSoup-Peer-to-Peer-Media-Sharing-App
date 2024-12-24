@@ -221,7 +221,7 @@ export default function FgGame({
 
     const msg = {
       type: "requestGameCatchUpData",
-      data: {
+      header: {
         table_id: table_id,
         inquiringUsername: username,
         inquiringInstance: instance,

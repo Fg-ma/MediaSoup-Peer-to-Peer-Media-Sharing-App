@@ -101,7 +101,7 @@ class TableFunctionsController {
 
       const msg = {
         type: "getRouterRtpCapabilities",
-        data: {
+        header: {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
@@ -172,7 +172,7 @@ class TableFunctionsController {
     if (this.isSubscribed.current) {
       const msg = {
         type: "createConsumerTransport",
-        data: {
+        header: {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
@@ -207,7 +207,7 @@ class TableFunctionsController {
 
       const msg = {
         type: "unsubscribe",
-        data: {
+        header: {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
@@ -220,7 +220,7 @@ class TableFunctionsController {
   createProducerTransport = () => {
     const msg = {
       type: "createProducerTransport",
-      data: {
+      header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
@@ -238,7 +238,7 @@ class TableFunctionsController {
     // Remove positionRotationScale producer
     const message = {
       type: "removeProducer",
-      data: {
+      header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,

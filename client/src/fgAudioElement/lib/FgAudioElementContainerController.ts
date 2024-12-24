@@ -7,66 +7,66 @@ type FgAudioContainerMessageEvents =
 
 type onResponsedCatchUpDataType = {
   type: "responsedCatchUpData";
-  data: {
+  header: {
     inquiredUsername: string;
     inquiredInstance: string;
     inquiredType: "camera" | "screen" | "audio";
     inquiredProducerId: string;
-    data:
-      | {
-          paused: boolean;
-          timeEllapsed: number;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
-      | {
-          paused: boolean;
-          timeEllapsed: number;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
-      | {
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
-      | undefined;
   };
+  data:
+    | {
+        paused: boolean;
+        timeEllapsed: number;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }
+    | {
+        paused: boolean;
+        timeEllapsed: number;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }
+    | {
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }
+    | undefined;
 };
 
 type onNewConsumerWasCreatedType = {
   type: "newConsumerWasCreated";
-  data: {
+  header: {
     producerUsername: string;
     producerInstance: string;
-    producerId?: string;
     producerType: string;
+    producerId?: string;
   };
 };
 
@@ -104,18 +104,17 @@ class FgAudioElementContainerController {
   ) {}
 
   onResponsedCatchUpData = (event: onResponsedCatchUpDataType) => {
-    const { inquiredUsername, inquiredInstance, inquiredType, data } =
-      event.data;
+    const { inquiredUsername, inquiredInstance, inquiredType } = event.header;
 
     if (
       !this.isUser &&
       this.username === inquiredUsername &&
       this.instance === inquiredInstance &&
       inquiredType === "audio" &&
-      data &&
-      Object.keys(data.positioning).length !== 0
+      event.data &&
+      Object.keys(event.data.positioning).length !== 0
     ) {
-      this.positioning.current = data.positioning;
+      this.positioning.current = event.data.positioning;
     }
   };
 

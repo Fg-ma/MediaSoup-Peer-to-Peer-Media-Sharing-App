@@ -13,7 +13,7 @@ class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
   onJoinTable = (ws: GameWebSocket, event: onJoinTableType) => {
-    const { table_id, username, instance } = event.data;
+    const { table_id, username, instance } = event.header;
 
     if (!tables[table_id]) {
       tables[table_id] = {};
@@ -50,7 +50,7 @@ class TablesController {
   };
 
   onNewGameSocket = (ws: GameWebSocket, event: onNewGameSocketType) => {
-    const { table_id, username, instance, gameType, gameId } = event.data;
+    const { table_id, username, instance, gameType, gameId } = event.header;
 
     if (!tables[table_id]) {
       tables[table_id] = {};
@@ -78,7 +78,7 @@ class TablesController {
 
   onLeaveTable = (event: onLeaveTableType) => {
     const { table_id, username, instance, socketType, gameType, gameId } =
-      event.data;
+      event.header;
 
     if (socketType === "signaling") {
       if (
@@ -104,7 +104,7 @@ class TablesController {
 
     this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
       type: "userLeft",
-      data: { table_id, username, instance, socketType, gameType, gameId },
+      header: { table_id, username, instance, socketType, gameType, gameId },
     });
   };
 

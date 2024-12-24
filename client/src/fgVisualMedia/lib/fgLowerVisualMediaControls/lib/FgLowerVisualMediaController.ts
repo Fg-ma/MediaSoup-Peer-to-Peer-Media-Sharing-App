@@ -161,7 +161,7 @@ class FgLowerVisualMediaController {
     if (this.fgVisualMediaOptions.isUser) {
       const msg = {
         type: "removeProducer",
-        data: {
+        header: {
           table_id: this.table_id,
           username: this.username,
           instance: this.instance,
@@ -174,7 +174,7 @@ class FgLowerVisualMediaController {
       if (this.type === "screen" && this.screenAudioStream) {
         const message = {
           type: "removeProducer",
-          data: {
+          header: {
             table_id: this.table_id,
             username: this.username,
             instance: this.instance,
@@ -187,7 +187,7 @@ class FgLowerVisualMediaController {
     } else {
       const msg = {
         type: "requestRemoveProducer",
-        data: {
+        header: {
           table_id: this.table_id,
           username: this.username,
           instance: this.instance,
@@ -200,7 +200,7 @@ class FgLowerVisualMediaController {
       if (this.type === "screen" && this.screenAudioStream) {
         const message = {
           type: "requestRemoveProducer",
-          data: {
+          header: {
             table_id: this.table_id,
             username: this.username,
             instance: this.instance,

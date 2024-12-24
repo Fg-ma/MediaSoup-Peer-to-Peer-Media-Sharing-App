@@ -162,7 +162,7 @@ export default function Bundle({
           signal.username === username &&
           signal.instance === instance
         ) {
-          bundleController.bundleSocket.onLocalMuteChange();
+          bundleController.onLocalMuteChange();
         }
         break;
       default:

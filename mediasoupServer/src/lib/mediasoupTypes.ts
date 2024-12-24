@@ -71,7 +71,7 @@ export type MediasoupSocketEvents =
 
 export type onGetRouterRtpCapabilitiesType = {
   type: "getRouterRtpCapabilities";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -80,7 +80,7 @@ export type onGetRouterRtpCapabilitiesType = {
 
 export type onCreateProducerTransportType = {
   type: "createProducerTransport";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: number;
@@ -89,22 +89,26 @@ export type onCreateProducerTransportType = {
 
 export type onConnectProducerTransportType = {
   type: "connectProducerTransport";
-  data: {
-    dtlsParameters: DtlsParameters;
+  header: {
     table_id: string;
     username: string;
     instance: string;
+  };
+  data: {
+    dtlsParameters: DtlsParameters;
   };
 };
 
 export type onCreateNewProducerType = {
   type: "createNewProducer";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
-    producerId?: string;
     producerType: "camera" | "screen" | "screenAudio" | "audio";
+    producerId?: string;
+  };
+  data: {
     transportId: string;
     kind: MediaKind;
     rtpParameters: RtpParameters;
@@ -113,36 +117,42 @@ export type onCreateNewProducerType = {
 
 export type onCreateNewJSONProducerType = {
   type: "createNewJSONProducer";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
-    producerId: string;
     producerType: "json";
+    producerId: string;
+    dataStreamType: DataStreamTypes;
+  };
+  data: {
     transportId: string;
     label: string;
     protocol: "json";
     sctpStreamParameters: SctpParameters;
-    dataStreamType: DataStreamTypes;
   };
 };
 
 export type onCreateConsumerTransportType = {
   type: "createConsumerTransport";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
+  };
+  data: {
     forceTcp: boolean;
   };
 };
 
 export type onConnectConsumerTransportType = {
   type: "connectConsumerTransport";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
+  };
+  data: {
     transportId: string;
     dtlsParameters: DtlsParameters;
   };
@@ -150,7 +160,7 @@ export type onConnectConsumerTransportType = {
 
 export type onResumeType = {
   type: "resume";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -159,47 +169,52 @@ export type onResumeType = {
 
 export type onConsumeType = {
   type: "consume";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
-    producerId?: string;
+  };
+  data: {
     rtpCapabilities: RtpCapabilities;
   };
 };
 
 export type onNewConsumerType = {
   type: "newConsumer";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
-    producerType: "camera" | "screen" | "screenAudio" | "audio";
+  };
+  data: {
     rtpCapabilities: RtpCapabilities;
     producerUsername: string;
     producerInstance: string;
+    producerType: "camera" | "screen" | "screenAudio" | "audio";
     producerId?: string;
   };
 };
 
 export type onNewJSONConsumerType = {
   type: "newJSONConsumer";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
-    producerType: "json";
-    dataStreamType: DataStreamTypes;
+  };
+  data: {
     sctpCapabilities: SctpCapabilities;
     producerUsername: string;
     producerInstance: string;
+    producerType: "json";
     incomingProducerId: string;
+    dataStreamType: DataStreamTypes;
   };
 };
 
 export type onRemoveProducerType = {
   type: "removeProducer";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -211,7 +226,7 @@ export type onRemoveProducerType = {
 
 export type onUnsubscribeType = {
   type: "unsubscribe";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -220,46 +235,52 @@ export type onUnsubscribeType = {
 
 export type onClientMuteType = {
   type: "clientMute";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
+  };
+  data: {
     clientMute: boolean;
   };
 };
 
 export type onNewProducerCreatedType = {
   type: "newProducerCreated";
-  data: {
-    table_id: string;
-    username: string;
-    instance: string;
-    producerType: ProducerTypes;
-    producerId: string | undefined;
-  };
-};
-
-export type onNewConsumerCreatedType = {
-  type: "newConsumerCreated";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
     producerType: ProducerTypes;
     producerId?: string;
+  };
+};
+
+export type onNewConsumerCreatedType = {
+  type: "newConsumerCreated";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+  };
+  data: {
     producerUsername: string;
     producerInstance: string;
+    producerType: ProducerTypes;
+    producerId?: string;
   };
 };
 
 export type onRequestEffectChangeType = {
   type: "requestEffectChange";
-  data: {
+  header: {
     table_id: string;
     requestedUsername: string;
     requestedInstance: string;
     requestedProducerType: ProducerTypes;
     requestedProducerId: string | undefined;
+  };
+  data: {
     effect: string;
     blockStateChange: boolean;
     style: string;
@@ -271,12 +292,14 @@ export type onRequestEffectChangeType = {
 
 export type onClientEffectChangeType = {
   type: "clientEffectChange";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
     producerType: ProducerTypes;
     producerId: string | undefined;
+  };
+  data: {
     effect: string;
     effectStyle: string;
     blockStateChange: boolean;
@@ -285,7 +308,7 @@ export type onClientEffectChangeType = {
 
 export type onRequestPermissionsType = {
   type: "requestPermissions";
-  data: {
+  header: {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
@@ -296,7 +319,7 @@ export type onRequestPermissionsType = {
 
 export type onRequestBundleMetadataType = {
   type: "requestBundleMetadata";
-  data: {
+  header: {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
@@ -307,33 +330,37 @@ export type onRequestBundleMetadataType = {
 
 export type onPermissionsResponseType = {
   type: "permissionsResponse";
-  data: {
+  header: {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredUsername: string;
     inquiredInstance: string;
+  };
+  data: {
     permissions: Permissions;
   };
 };
 
 export type onBundleMetadataResponseType = {
   type: "bundleMetadataResponse";
-  data: {
+  header: {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredUsername: string;
     inquiredInstance: string;
+  };
+  data: {
     clientMute: boolean;
     streamEffects: string;
-    currentEffectsStyles: string;
+    userEffectsStyles: string;
   };
 };
 
 export type onRequestCatchUpDataType = {
   type: "requestCatchUpData";
-  data: {
+  header: {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
@@ -346,7 +373,7 @@ export type onRequestCatchUpDataType = {
 
 export type onRequestGameCatchUpDataType = {
   type: "requestGameCatchUpData";
-  data: {
+  header: {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
@@ -356,7 +383,7 @@ export type onRequestGameCatchUpDataType = {
 
 export type onResponseCatchUpDataType = {
   type: "responseCatchUpData";
-  data: {
+  header: {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
@@ -364,61 +391,63 @@ export type onResponseCatchUpDataType = {
     inquiredInstance: string;
     inquiredType: ProducerTypes;
     inquiredProducerId: string;
-    data:
-      | {
-          paused: boolean;
-          timeEllapsed: number;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
-      | {
-          paused: boolean;
-          timeEllapsed: number;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
-      | {
-          positioning: {
-            position: {
-              left: number;
-              top: number;
-            };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-        }
-      | undefined;
   };
+  data:
+    | {
+        paused: boolean;
+        timeEllapsed: number;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }
+    | {
+        paused: boolean;
+        timeEllapsed: number;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }
+    | {
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }
+    | undefined;
 };
 
 export type onResponseGameCatchUpDataType = {
   type: "responseGameCatchUpData";
-  data: {
+  header: {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
     gameId: string;
+  };
+  data: {
     positioning: {
       position: {
         left: number;
@@ -435,12 +464,14 @@ export type onResponseGameCatchUpDataType = {
 
 export type onRequestMixEffectActivityChangeType = {
   type: "requestMixEffectActivityChange";
-  data: {
+  header: {
     table_id: string;
     requestedUsername: string;
     requestedInstance: string;
     requestedProducerType: "audio" | "screenAudio";
     requestedProducerId: string | undefined;
+  };
+  data: {
     effect: AudioMixEffectsType;
     active: boolean;
   };
@@ -448,12 +479,14 @@ export type onRequestMixEffectActivityChangeType = {
 
 export type onClientMixEffectActivityChangeType = {
   type: "clientMixEffectActivityChange";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
     producerType: "audio" | "screenAudio";
     producerId: string | undefined;
+  };
+  data: {
     effect: AudioMixEffectsType;
     active: boolean;
   };
@@ -461,12 +494,14 @@ export type onClientMixEffectActivityChangeType = {
 
 export type onRequestMixEffectValueChangeType = {
   type: "requestMixEffectValueChange";
-  data: {
+  header: {
     table_id: string;
     requestedUsername: string;
     requestedInstance: string;
     requestedProducerType: "audio" | "screenAudio";
     requestedProducerId: string | undefined;
+  };
+  data: {
     effect: AudioMixEffectsType;
     option: string;
     value: number;
@@ -476,12 +511,14 @@ export type onRequestMixEffectValueChangeType = {
 
 export type onClientMixEffectValueChangeType = {
   type: "clientMixEffectValueChange";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
     producerType: "audio" | "screenAudio";
     producerId: string | undefined;
+  };
+  data: {
     effect: AudioMixEffectsType;
     option: string;
     value: number;
@@ -491,7 +528,7 @@ export type onClientMixEffectValueChangeType = {
 
 export type onRequestRemoveProducerType = {
   type: "requestRemoveProducer";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;

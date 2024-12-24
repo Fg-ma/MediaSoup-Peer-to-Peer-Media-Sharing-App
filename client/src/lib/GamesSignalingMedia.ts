@@ -6,7 +6,7 @@ type OutGoingMessages = onJoinTableType | onLeaveTableType | onInitiateGameType;
 
 type onJoinTableType = {
   type: "joinTable";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -15,7 +15,7 @@ type onJoinTableType = {
 
 type onLeaveTableType = {
   type: "leaveTable";
-  data: {
+  header: {
     table_id: string;
     username: string;
     instance: string;
@@ -25,10 +25,12 @@ type onLeaveTableType = {
 
 type onInitiateGameType = {
   type: "initiateGame";
-  data: {
+  header: {
     table_id: string;
     gameType: GameTypes;
     gameId: string;
+  };
+  data: {
     initiator: { username: string; instance: string };
   };
 };
@@ -40,16 +42,18 @@ type IncomingMessages =
 
 type onGameInitiatedType = {
   type: "gameInitiated";
-  data: {
+  header: {
     gameType: GameTypes;
     gameId: string;
+  };
+  data: {
     initiator: { username: string; instance: string };
   };
 };
 
 type onGameClosedType = {
   type: "gameClosed";
-  data: {
+  header: {
     gameType: GameTypes;
     gameId: string;
   };
@@ -129,7 +133,8 @@ class GamesSignalingMedia {
   };
 
   onGameInitiated = async (event: onGameInitiatedType) => {
-    const { gameType, gameId, initiator } = event.data;
+    const { gameType, gameId } = event.header;
+    const { initiator } = event.data;
 
     switch (gameType) {
       case "snake": {
@@ -161,7 +166,7 @@ class GamesSignalingMedia {
   };
 
   onGameClosed = (event: onGameClosedType) => {
-    const { gameType, gameId } = event.data;
+    const { gameType, gameId } = event.header;
 
     switch (gameType) {
       case "snake":
@@ -222,7 +227,7 @@ class GamesSignalingMedia {
   joinTable = () => {
     this.sendMessage({
       type: "joinTable",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
@@ -233,7 +238,7 @@ class GamesSignalingMedia {
   leaveTable = () => {
     this.sendMessage({
       type: "leaveTable",
-      data: {
+      header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
@@ -245,10 +250,12 @@ class GamesSignalingMedia {
   initiateGame = (gameType: GameTypes, gameId: string) => {
     this.sendMessage({
       type: "initiateGame",
-      data: {
+      header: {
         table_id: this.table_id,
         gameType,
         gameId,
+      },
+      data: {
         initiator: { username: this.username, instance: this.instance },
       },
     });
