@@ -117,13 +117,13 @@ class GamesSignalingMedia {
     };
   };
 
-  addMessageListener(listener: (message: MessageEvent) => void): void {
+  addMessageListener = (listener: (message: MessageEvent) => void): void => {
     this.messageListeners.add(listener);
-  }
+  };
 
-  removeMessageListener(listener: (message: MessageEvent) => void): void {
+  removeMessageListener = (listener: (message: MessageEvent) => void): void => {
     this.messageListeners.delete(listener);
-  }
+  };
 
   sendMessage = (message: OutGoingMessages) => {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {

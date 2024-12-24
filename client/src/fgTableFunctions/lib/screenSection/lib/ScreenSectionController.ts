@@ -5,7 +5,7 @@ import ProducersController from "../../../../lib/ProducersController";
 
 class ScreenSectionController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private device: React.MutableRefObject<types.Device | undefined>,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
@@ -46,7 +46,7 @@ class ScreenSectionController {
             producerId: screenIds[screenIds.length - 1],
           },
         };
-        this.socket.current.emit("message", msg);
+        this.mediasoupSocket.current.emit("message", msg);
 
         if (
           this.userMedia.current.screenAudio[
@@ -63,7 +63,7 @@ class ScreenSectionController {
               producerId: `${screenIds[screenIds.length - 1]}_audio`,
             },
           };
-          this.socket.current.emit("message", message);
+          this.mediasoupSocket.current.emit("message", message);
         }
       }
     }

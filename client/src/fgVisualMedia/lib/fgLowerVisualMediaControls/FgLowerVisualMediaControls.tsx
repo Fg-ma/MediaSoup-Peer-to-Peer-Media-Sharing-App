@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 import { AnimatePresence } from "framer-motion";
+import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -106,7 +106,6 @@ export interface ActivePages {
 }
 
 export default function FgLowerVisualMediaControls({
-  socket,
   table_id,
   username,
   instance,
@@ -135,7 +134,6 @@ export default function FgLowerVisualMediaControls({
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
@@ -173,6 +171,8 @@ export default function FgLowerVisualMediaControls({
   ) => void;
   tracksColorSetterCallback: () => void;
 }) {
+  const { mediasoupSocket } = useSocketContext();
+
   const [settingsActive, setSettingsActive] = useState(false);
   const [activePages, setActivePages] = useState<ActivePages>({
     closedCaption: {
@@ -212,13 +212,13 @@ export default function FgLowerVisualMediaControls({
   };
 
   useEffect(() => {
-    socket.current.on("message", (event) => handleMessage(event));
+    mediasoupSocket.current.on("message", (event) => handleMessage(event));
 
     rightVisualMediaControlsRef.current?.addEventListener("wheel", handleWheel);
 
     // Cleanup event listener on unmount
     return () => {
-      socket.current.off("message", (event) => handleMessage(event));
+      mediasoupSocket.current.off("message", (event) => handleMessage(event));
 
       rightVisualMediaControlsRef.current?.removeEventListener(
         "wheel",
@@ -238,7 +238,6 @@ export default function FgLowerVisualMediaControls({
                 instance={instance}
                 type={type}
                 visualMediaId={visualMediaId}
-                socket={socket}
                 isUser={
                   fgVisualMediaOptions.isUser ??
                   defaultFgVisualMediaOptions.isUser
@@ -282,7 +281,6 @@ export default function FgLowerVisualMediaControls({
                   ?.acceptsScreenAudioEffects))) && (
             <Suspense fallback={<div>Loading...</div>}>
               <FgVolumeElement
-                socket={socket}
                 table_id={table_id}
                 username={username}
                 instance={instance}
@@ -396,7 +394,6 @@ export default function FgLowerVisualMediaControls({
               screenAudioStream)) && (
             <Suspense fallback={<div>Loading...</div>}>
               <AudioEffectsButton
-                socket={socket}
                 table_id={table_id}
                 username={username}
                 instance={instance}

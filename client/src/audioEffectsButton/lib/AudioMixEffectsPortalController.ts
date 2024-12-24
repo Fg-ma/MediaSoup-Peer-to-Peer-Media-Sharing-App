@@ -72,7 +72,7 @@ type onMixEffectValueChangeRequestedType = {
 
 class AudioMixEffectsPortalController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private table_id: string,
     private username: string,
     private instance: string,
@@ -275,7 +275,7 @@ class AudioMixEffectsPortalController {
           active,
         },
       };
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
     }
   };
 
@@ -304,7 +304,7 @@ class AudioMixEffectsPortalController {
           },
         };
 
-        this.socket.current.emit("message", msg);
+        this.mediasoupSocket.current.emit("message", msg);
       }
     }
   };
@@ -362,7 +362,7 @@ class AudioMixEffectsPortalController {
           styleValue,
         },
       };
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
     }
   };
 
@@ -400,7 +400,7 @@ class AudioMixEffectsPortalController {
           },
         };
 
-        this.socket.current.emit("message", msg);
+        this.mediasoupSocket.current.emit("message", msg);
       }
     }
   };

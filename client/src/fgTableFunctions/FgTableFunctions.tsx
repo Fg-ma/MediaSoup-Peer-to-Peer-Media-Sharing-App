@@ -1,19 +1,19 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { types } from "mediasoup-client";
-import { Socket } from "socket.io-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
 import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
+import { useSocketContext } from "../context/socketContext/SocketContext";
 import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
 import ScreenSection from "./lib/screenSection/ScreenSection";
 import GamesSection from "./lib/gamesSection/GamesSection";
 import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
-import onRouterCapabilities from "../lib/onRouterCapabilities";
 import BundlesController from "../lib/BundlesController";
 import FgBackgroundSelector from "../fgElements/fgBackgroundSelector/FgBackgroundSelector";
+import { FgBackground } from "../fgElements/fgBackgroundSelector/lib/typeConstant";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -23,7 +23,6 @@ export default function FgTableFunctions({
   table_id,
   username,
   instance,
-  socket,
   device,
   producersController,
   producerTransport,
@@ -55,7 +54,6 @@ export default function FgTableFunctions({
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;
-  socket: React.MutableRefObject<Socket>;
   device: React.MutableRefObject<types.Device | undefined>;
   producersController: ProducersController;
   producerTransport: React.MutableRefObject<
@@ -101,6 +99,9 @@ export default function FgTableFunctions({
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
   const { setSignal } = useSignalContext();
   const { permissions } = usePermissionsContext();
+  const { mediasoupSocket, tableSocket } = useSocketContext();
+
+  const externalBackgroundChange = useRef(false);
 
   const muteBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -110,8 +111,13 @@ export default function FgTableFunctions({
 
   const [audioEffectsActive, setAudioEffectsActive] = useState(false);
 
+  const [tableBackground, setTableBackground] = useState<
+    FgBackground | undefined
+  >();
+
   const tableFunctionsController = new TableFunctionsController(
-    socket,
+    tableSocket,
+    mediasoupSocket,
     tableIdRef,
     usernameRef,
     table_id,
@@ -136,7 +142,9 @@ export default function FgTableFunctions({
     mutedAudioRef,
     isSubscribed,
     device,
-    bundlesController
+    bundlesController,
+    externalBackgroundChange,
+    setTableBackground
   );
 
   const handleExternalMute = () => {
@@ -184,7 +192,7 @@ export default function FgTableFunctions({
         },
       };
 
-      socket.current.emit("message", msg);
+      mediasoupSocket.current.emit("message", msg);
     }
   };
 
@@ -192,37 +200,36 @@ export default function FgTableFunctions({
     setAudioEffectsActive(false);
   }, [isAudio.current]);
 
-  const handleMessage = async (event: {
-    type: "routerCapabilities";
-    data: {
-      rtpCapabilities: types.RtpCapabilities;
-    };
-  }) => {
-    switch (event.type) {
-      case "routerCapabilities":
-        await onRouterCapabilities(event, device);
-
-        tableFunctionsController.subscribe();
-        tableFunctionsController.createProducerTransport();
-        break;
-      default:
-        break;
-    }
-  };
-
   useEffect(() => {
-    socket.current.on("message", handleMessage);
+    mediasoupSocket.current.on(
+      "message",
+      tableFunctionsController.handleMediasoupSocketMessage
+    );
 
     return () => {
-      socket.current.off("message", handleMessage);
+      mediasoupSocket.current.off(
+        "message",
+        tableFunctionsController.handleMediasoupSocketMessage
+      );
     };
-  }, [socket.current]);
+  }, [mediasoupSocket.current]);
+
+  useEffect(() => {
+    tableSocket.current?.addMessageListener(
+      tableFunctionsController.handleTableSocketMessage
+    );
+
+    return () => {
+      tableSocket.current?.removeMessageListener(
+        tableFunctionsController.handleTableSocketMessage
+      );
+    };
+  }, [tableSocket.current]);
 
   return (
     <>
       <div className='flex items-center justify-center'>
         <CameraSection
-          socket={socket}
           device={device}
           table_id={table_id}
           username={username}
@@ -236,7 +243,6 @@ export default function FgTableFunctions({
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <AudioSection
-          socket={socket}
           table_id={table_id}
           username={username}
           instance={instance}
@@ -251,7 +257,6 @@ export default function FgTableFunctions({
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <ScreenSection
-          socket={socket}
           device={device}
           table_id={table_id}
           username={username}
@@ -269,11 +274,20 @@ export default function FgTableFunctions({
           username={username.current}
           instance={instance.current}
         />
-        <FgBackgroundSelector backgroundRef={tableTopRef} />
+        <FgBackgroundSelector
+          backgroundRef={tableTopRef}
+          defaultActiveBackground={tableBackground}
+          backgroundChangeFunction={(background: FgBackground) => {
+            if (externalBackgroundChange.current) {
+              externalBackgroundChange.current = false;
+            } else {
+              tableSocket.current?.changeTableBackground(background);
+            }
+          }}
+        />
         {isAudio.current && (
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsButton
-              socket={socket}
               table_id={table_id.current}
               username={username.current}
               instance={instance.current}

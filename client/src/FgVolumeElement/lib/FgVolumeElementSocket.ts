@@ -29,7 +29,7 @@ class FgVolumeElementSocket {
   ) {}
 
   onClientMuteStateResponsed = (event: onClientMuteStateResponsedType) => {
-    const { producerUsername, producerInstance } = event.data;
+    const { producerUsername, producerInstance } = event.header;
 
     if (
       this.isUser ||

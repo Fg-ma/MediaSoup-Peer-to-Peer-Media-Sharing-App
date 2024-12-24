@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Socket } from "socket.io-client";
 import isEqual from "lodash/isEqual";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
+import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
 import AudioMixEffect from "./AudioMixEffect";
 import ScrollingContainer from "../../fgElements/scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../fgElements/scrollingContainer/lib/ScrollingContainerButton";
@@ -11,11 +12,9 @@ import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
 } from "../../audioEffects/typeConstant";
-import { Permissions } from "../../context/permissionsContext/typeConstant";
 import AudioMixEffectsPortalController from "./AudioMixEffectsPortalController";
 
 export default function AudioMixEffectsPortal({
-  socket,
   table_id,
   username,
   instance,
@@ -26,7 +25,6 @@ export default function AudioMixEffectsPortal({
   audioMixEffectsButtonRef,
   closeCallback,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
@@ -38,6 +36,7 @@ export default function AudioMixEffectsPortal({
   closeCallback: () => void;
 }) {
   const { userMedia } = useMediaContext();
+  const { mediasoupSocket } = useSocketContext();
 
   const [_, setRerender] = useState(false);
   const [focus, setFocus] = useState(true);
@@ -417,7 +416,7 @@ export default function AudioMixEffectsPortal({
   });
 
   const audioMixEffectsPortalController = new AudioMixEffectsPortalController(
-    socket,
+    mediasoupSocket,
     table_id,
     username,
     instance,
@@ -434,15 +433,18 @@ export default function AudioMixEffectsPortal({
   );
 
   useEffect(() => {
-    socket.current.on("message", audioMixEffectsPortalController.handleMessage);
+    mediasoupSocket.current.on(
+      "message",
+      audioMixEffectsPortalController.handleMessage
+    );
 
     return () => {
-      socket.current.off(
+      mediasoupSocket.current.off(
         "message",
         audioMixEffectsPortalController.handleMessage
       );
     };
-  }, [socket.current]);
+  }, [mediasoupSocket.current]);
 
   return (
     <FgPanel

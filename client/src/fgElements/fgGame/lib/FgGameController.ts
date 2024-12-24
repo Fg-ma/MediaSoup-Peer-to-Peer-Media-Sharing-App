@@ -40,7 +40,7 @@ type onResponsedGameCatchUpDataType = {
 
 class FgGameController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private table_id: string,
     private gameId: string,
     private hideControls: boolean,
@@ -55,6 +55,8 @@ class FgGameController {
     private gameRef: React.RefObject<HTMLDivElement>,
     private closeGameFunction: (() => void) | undefined,
     private startGameFunction: (() => void) | undefined,
+    private joinGameFunction: (() => void) | undefined,
+    private leaveGameFunction: (() => void) | undefined,
     private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
@@ -86,6 +88,16 @@ class FgGameController {
       case "p":
         if (this.startGameFunction) {
           this.startGameFunction();
+        }
+        break;
+      case "l":
+        if (this.leaveGameFunction) {
+          this.leaveGameFunction();
+        }
+        break;
+      case "j":
+        if (this.joinGameFunction) {
+          this.joinGameFunction();
         }
         break;
       case "x":
@@ -295,7 +307,7 @@ class FgGameController {
           positioning: this.positioning.current,
         },
       };
-      this.socket.current.send(msg);
+      this.mediasoupSocket.current.send(msg);
     }
   };
 

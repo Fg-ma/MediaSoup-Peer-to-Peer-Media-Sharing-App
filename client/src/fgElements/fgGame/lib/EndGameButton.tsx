@@ -1,6 +1,7 @@
 import React from "react";
 import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
 
 import closeIcon from "../../../../public/svgs/closeIcon.svg";
 
@@ -25,6 +26,12 @@ export default function EndGameButton({
           ]}
         />
       )}
+      hoverContent={<FgHoverContentStandard content='End game (x)' />}
+      options={{
+        hoverTimeoutDuration: 750,
+        hoverType: "above",
+        hoverSpacing: 4,
+      }}
     />
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { types, Device } from "mediasoup-client";
-import { io, Socket } from "socket.io-client";
+import { RtpParameters } from "mediasoup-client/lib/RtpParameters";
+import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "./context/mediaContext/MediaContext";
 import { useEffectsContext } from "./context/effectsContext/EffectsContext";
@@ -14,6 +15,7 @@ import {
 } from "./context/effectsContext/typeConstant";
 import { DataStreamTypes } from "./context/mediaContext/typeConstant";
 import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
+import { useSocketContext } from "./context/socketContext/SocketContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import UserDevice from "./lib/UserDevice";
@@ -21,14 +23,10 @@ import BrowserMedia from "./lib/BrowserMedia";
 import BundlesController from "./lib/BundlesController";
 import Deadbanding from "./babylon/Deadbanding";
 import Metadata from "./lib/Metadata";
-import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 import PermissionsController from "./lib/PermissionsController";
 import "./scrollbar.css";
-import { RtpParameters } from "mediasoup-client/lib/RtpParameters";
-
-const websocketURL = "http://localhost:8000";
 
 export type MediasoupSocketEvents =
   | onProducerTransportCreatedType
@@ -248,8 +246,8 @@ export default function Main() {
     remoteStreamEffects,
   } = useEffectsContext();
   const { permissions } = usePermissionsContext();
+  const { mediasoupSocket } = useSocketContext();
 
-  const socket = useRef<Socket>(io(websocketURL));
   const device = useRef<Device>();
 
   const table_id = useRef("");
@@ -303,7 +301,7 @@ export default function Main() {
         clientMute: mutedAudioRef.current,
       },
     };
-    socket.current.emit("message", msg);
+    mediasoupSocket.current.emit("message", msg);
   };
 
   const handleDisableEnableBtns = (disabled: boolean) => {
@@ -521,10 +519,10 @@ export default function Main() {
   };
 
   useEffect(() => {
-    socket.current.on("message", handleMessage);
+    mediasoupSocket.current.on("message", handleMessage);
 
     // Handle user disconnect
-    socket.current.on(
+    mediasoupSocket.current.on(
       "userDisconnected",
       (disconnectedUsername: string, disconnectedInstance: string) => {
         handleUserLeftCleanup(disconnectedUsername, disconnectedInstance);
@@ -532,7 +530,7 @@ export default function Main() {
     );
 
     // Handle user left table
-    socket.current.on(
+    mediasoupSocket.current.on(
       "userLeftTable",
       (leftUsername: string, leftInstance: string) => {
         handleUserLeftCleanup(leftUsername, leftInstance);
@@ -540,14 +538,14 @@ export default function Main() {
     );
 
     return () => {
-      socket.current.off("connect");
-      socket.current.off("message", handleMessage);
-      socket.current.off("userDisconnected");
+      mediasoupSocket.current.off("connect");
+      mediasoupSocket.current.off("message", handleMessage);
+      mediasoupSocket.current.off("userDisconnected");
     };
-  }, [socket.current]);
+  }, [mediasoupSocket.current]);
 
   const bundlesController = new BundlesController(
-    socket,
+    mediasoupSocket,
     table_id,
     username,
     instance,
@@ -580,7 +578,7 @@ export default function Main() {
   );
 
   const producersController = new ProducersController(
-    socket,
+    mediasoupSocket,
     device,
     table_id,
     username,
@@ -610,7 +608,7 @@ export default function Main() {
   );
 
   const consumersController = new ConsumersController(
-    socket,
+    mediasoupSocket,
     device,
     table_id,
     username,
@@ -626,7 +624,7 @@ export default function Main() {
     table_id,
     username,
     instance,
-    socket,
+    mediasoupSocket,
     userMedia,
     mutedAudioRef,
     userStreamEffects,
@@ -634,7 +632,7 @@ export default function Main() {
   );
 
   const permissionsController = new PermissionsController(
-    socket,
+    mediasoupSocket,
     table_id,
     username,
     instance,
@@ -647,7 +645,6 @@ export default function Main() {
         table_id={table_id}
         username={username}
         instance={instance}
-        socket={socket}
         device={device}
         producersController={producersController}
         producerTransport={producerTransport}

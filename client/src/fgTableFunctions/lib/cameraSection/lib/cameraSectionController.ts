@@ -7,7 +7,7 @@ import ProducersController from "../../../../lib/ProducersController";
 
 class CameraSectionController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private device: React.MutableRefObject<types.Device | undefined>,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
@@ -57,7 +57,7 @@ class CameraSectionController {
             producerId: cameraIds[cameraIds.length - 1],
           },
         };
-        this.socket.current.emit("message", msg);
+        this.mediasoupSocket.current.emit("message", msg);
       }
     }
   };

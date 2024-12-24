@@ -7,10 +7,18 @@ import {
 } from "../../context/mediaContext/typeConstant";
 import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
 import BundlesController from "../../lib/BundlesController";
+import onRouterCapabilities from "../../lib/onRouterCapabilities";
+import { FgBackground } from "../../fgElements/fgBackgroundSelector/lib/typeConstant";
+import TableSocketController, {
+  IncomingTableMessages,
+} from "../../lib/TableSocketController";
 
 class TableFunctionsController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private tableSocket: React.MutableRefObject<
+      TableSocketController | undefined
+    >,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private tableIdRef: React.RefObject<HTMLInputElement>,
     private usernameRef: React.RefObject<HTMLInputElement>,
     private table_id: React.MutableRefObject<string>,
@@ -45,7 +53,11 @@ class TableFunctionsController {
     private mutedAudioRef: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
     private device: React.MutableRefObject<types.Device | undefined>,
-    private bundlesController: BundlesController
+    private bundlesController: BundlesController,
+    private externalBackgroundChange: React.MutableRefObject<boolean>,
+    private setTableBackground: React.Dispatch<
+      React.SetStateAction<FgBackground | undefined>
+    >
   ) {}
 
   joinTable = () => {
@@ -71,7 +83,7 @@ class TableFunctionsController {
     ) {
       // Leave previous table if there is one
       if (previousTableId.trim() !== "" && previousUsername.trim() !== "") {
-        this.socket.current.emit(
+        this.mediasoupSocket.current.emit(
           "leaveTable",
           previousTableId,
           previousUsername,
@@ -79,6 +91,13 @@ class TableFunctionsController {
         );
         this.leaveTable();
       }
+
+      this.tableSocket.current = new TableSocketController(
+        "ws://localhost:8043",
+        this.table_id.current,
+        this.username.current,
+        this.instance.current
+      );
 
       this.userMedia.current.gamesSignaling = new GamesSignalingMedia(
         this.table_id.current,
@@ -91,7 +110,7 @@ class TableFunctionsController {
       );
 
       // Join new table
-      this.socket.current.emit(
+      this.mediasoupSocket.current.emit(
         "joinTable",
         this.table_id.current,
         this.username.current,
@@ -107,11 +126,13 @@ class TableFunctionsController {
           instance: this.instance.current,
         },
       };
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
     }
   };
 
   private leaveTable = () => {
+    this.tableSocket.current?.deconstructor();
+
     this.unsubscribe();
 
     this.removePositionScaleRotationProducer();
@@ -179,7 +200,7 @@ class TableFunctionsController {
         },
       };
 
-      this.socket.current.send(msg);
+      this.mediasoupSocket.current.send(msg);
     }
   };
 
@@ -213,7 +234,7 @@ class TableFunctionsController {
           instance: this.instance.current,
         },
       };
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
     }
   };
 
@@ -226,7 +247,7 @@ class TableFunctionsController {
         instance: this.instance.current,
       },
     };
-    this.socket.current.emit("message", msg);
+    this.mediasoupSocket.current.emit("message", msg);
   };
 
   private removePositionScaleRotationProducer = () => {
@@ -246,7 +267,36 @@ class TableFunctionsController {
         dataStreamType: "positionScaleRotation",
       },
     };
-    this.socket.current.emit("message", message);
+    this.mediasoupSocket.current.emit("message", message);
+  };
+
+  handleTableSocketMessage = (message: IncomingTableMessages) => {
+    switch (message.type) {
+      case "tableBackgroundChanged":
+        this.externalBackgroundChange.current = true;
+        this.setTableBackground(message.data.background);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleMediasoupSocketMessage = async (event: {
+    type: "routerCapabilities";
+    data: {
+      rtpCapabilities: types.RtpCapabilities;
+    };
+  }) => {
+    switch (event.type) {
+      case "routerCapabilities":
+        await onRouterCapabilities(event, this.device);
+
+        this.subscribe();
+        this.createProducerTransport();
+        break;
+      default:
+        break;
+    }
   };
 }
 

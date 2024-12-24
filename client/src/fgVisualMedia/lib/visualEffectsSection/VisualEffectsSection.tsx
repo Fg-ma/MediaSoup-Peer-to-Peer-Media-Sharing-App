@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import { Socket } from "socket.io-client";
 import { Transition, Variants, motion } from "framer-motion";
 import {
   CameraEffectTypes,
@@ -7,6 +6,7 @@ import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
 } from "../../../context/effectsContext/typeConstant";
+import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
 
@@ -46,7 +46,6 @@ export default function VisualEffectsSection({
   instance,
   type,
   visualMediaId,
-  socket,
   isUser,
   acceptsVisualEffects,
   visualMediaContainerRef,
@@ -57,7 +56,6 @@ export default function VisualEffectsSection({
   instance: string;
   type: "camera" | "screen";
   visualMediaId: string;
-  socket: React.MutableRefObject<Socket>;
   isUser: boolean;
   acceptsVisualEffects: boolean;
   visualMediaContainerRef: React.RefObject<HTMLDivElement>;
@@ -70,6 +68,8 @@ export default function VisualEffectsSection({
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
 }) {
+  const { mediasoupSocket } = useSocketContext();
+
   const [_, setRerender] = useState(0);
   const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
@@ -105,14 +105,14 @@ export default function VisualEffectsSection({
       }
     };
 
-    socket.current.on("message", handleMessage);
+    mediasoupSocket.current.on("message", handleMessage);
 
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     window.addEventListener("resize", updateWidth);
 
     return () => {
-      socket.current.off("message", handleMessage);
+      mediasoupSocket.current.off("message", handleMessage);
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", updateWidth);
     };

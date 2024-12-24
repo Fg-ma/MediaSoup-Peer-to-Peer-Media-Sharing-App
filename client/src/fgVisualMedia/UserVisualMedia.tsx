@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import {
@@ -8,6 +7,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/effectsContext/typeConstant";
+import { useSocketContext } from "../context/socketContext/SocketContext";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import FgVisualMediaController from "./lib/FgVisualMediaController";
@@ -26,7 +26,6 @@ const VisualMediaAdjustmentButtons = React.lazy(
 );
 
 export default function FgBabylonCanvas({
-  socket,
   table_id,
   visualMediaId,
   username,
@@ -46,7 +45,6 @@ export default function FgBabylonCanvas({
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
 }: {
-  socket: React.MutableRefObject<Socket>;
   visualMediaId: string;
   table_id: string;
   username: string;
@@ -84,6 +82,7 @@ export default function FgBabylonCanvas({
     userStreamEffects,
     remoteStreamEffects,
   } = useEffectsContext();
+  const { mediasoupSocket } = useSocketContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -93,6 +92,9 @@ export default function FgBabylonCanvas({
   const [inVisualMedia, setInVisualMedia] = useState(false);
 
   const leaveVisualMediaTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const visualMediaMovementTimeout = useRef<NodeJS.Timeout | undefined>(
+    undefined
+  );
 
   const [pausedState, setPausedState] = useState(false);
 
@@ -183,7 +185,7 @@ export default function FgBabylonCanvas({
             blockStateChange: blockStateChange,
           },
         };
-        socket?.current.emit("message", msg);
+        mediasoupSocket?.current.emit("message", msg);
       }
     } else if (
       (type === "camera" &&
@@ -213,7 +215,7 @@ export default function FgBabylonCanvas({
         },
       };
 
-      socket?.current.emit("message", msg);
+      mediasoupSocket?.current.emit("message", msg);
     }
   };
 
@@ -225,7 +227,7 @@ export default function FgBabylonCanvas({
   );
 
   const fgLowerVisualMediaController = new FgLowerVisualMediaController(
-    socket,
+    mediasoupSocket,
     visualMediaId,
     table_id,
     username,
@@ -282,6 +284,7 @@ export default function FgBabylonCanvas({
     handleVisualEffectChange,
     setInVisualMedia,
     leaveVisualMediaTimer,
+    visualMediaMovementTimeout,
     setRerender
   );
 
@@ -298,8 +301,11 @@ export default function FgBabylonCanvas({
     // Set up initial conditions
     fgVisualMediaController.init();
 
-    // Listen for messages on socket
-    socket.current.on("message", fgVisualMediaController.handleMessage);
+    // Listen for messages on mediasoupSocket
+    mediasoupSocket.current.on(
+      "message",
+      fgVisualMediaController.handleMessage
+    );
 
     // Keep video time
     fgLowerVisualMediaController.timeUpdate();
@@ -348,7 +354,10 @@ export default function FgBabylonCanvas({
         )
       );
       positioningListeners.current = {};
-      socket.current.off("message", fgVisualMediaController.handleMessage);
+      mediasoupSocket.current.off(
+        "message",
+        fgVisualMediaController.handleMessage
+      );
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
         timeUpdateInterval.current = undefined;
@@ -489,7 +498,6 @@ export default function FgBabylonCanvas({
           fgLowerVisualMediaController={fgLowerVisualMediaController}
         />
         <FgLowerVisualMediaControls
-          socket={socket}
           table_id={table_id}
           username={username}
           instance={instance}

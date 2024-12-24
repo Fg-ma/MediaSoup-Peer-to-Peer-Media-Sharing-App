@@ -18,7 +18,7 @@ class Metadata {
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private userMedia: React.MutableRefObject<{
       camera: {
         [cameraId: string]: CameraMedia;
@@ -101,7 +101,7 @@ class Metadata {
       },
       data,
     };
-    this.socket.current.emit("message", msg);
+    this.mediasoupSocket.current.emit("message", msg);
   };
 
   onBundleMetadataRequested = (event: onBundleMetadataRequestedType) => {
@@ -123,7 +123,7 @@ class Metadata {
       },
     };
 
-    this.socket.current.emit("message", msg);
+    this.mediasoupSocket.current.emit("message", msg);
   };
 }
 

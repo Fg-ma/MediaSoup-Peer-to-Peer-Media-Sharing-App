@@ -17,7 +17,7 @@ class BundleController extends BundleSocket {
     table_id: string,
     username: string,
     instance: string,
-    socket: React.MutableRefObject<Socket>,
+    mediasoupSocket: React.MutableRefObject<Socket>,
     bundleOptions: BundleOptions,
     setCameraStreams: React.Dispatch<
       React.SetStateAction<
@@ -65,7 +65,7 @@ class BundleController extends BundleSocket {
       table_id,
       username,
       instance,
-      socket,
+      mediasoupSocket,
       bundleOptions,
       setCameraStreams,
       setScreenStreams,

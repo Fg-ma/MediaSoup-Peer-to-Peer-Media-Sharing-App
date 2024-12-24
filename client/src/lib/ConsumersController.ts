@@ -16,7 +16,7 @@ import {
 
 class ConsumersController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private device: React.MutableRefObject<types.Device | undefined>,
 
     private table_id: React.MutableRefObject<string>,
@@ -222,8 +222,8 @@ class ConsumersController {
           },
         };
 
-        this.socket.current.send(msg);
-        this.socket.current.on("message", (event) => {
+        this.mediasoupSocket.current.send(msg);
+        this.mediasoupSocket.current.on("message", (event) => {
           if (event.type === "consumerTransportConnected") {
             callback();
           }
@@ -306,7 +306,7 @@ class ConsumersController {
                 instance: this.instance.current,
               },
             };
-            this.socket.current.send(msg);
+            this.mediasoupSocket.current.send(msg);
             break;
           }
           case "failed": {
@@ -332,7 +332,7 @@ class ConsumersController {
       },
     };
 
-    this.socket.current.send(msg);
+    this.mediasoupSocket.current.send(msg);
   }
 
   async onNewConsumerSubscribed(event: onNewConsumerSubscribedType) {
@@ -492,7 +492,7 @@ class ConsumersController {
         instance: this.instance.current,
       },
     };
-    this.socket.current.send(msg);
+    this.mediasoupSocket.current.send(msg);
 
     const message = {
       type: "newConsumerCreated",
@@ -508,7 +508,7 @@ class ConsumersController {
         producerType,
       },
     };
-    this.socket.current.emit("message", message);
+    this.mediasoupSocket.current.emit("message", message);
   }
 
   async onNewJSONConsumerSubscribed(event: onNewJSONConsumerSubscribedType) {
@@ -560,7 +560,7 @@ class ConsumersController {
         producerType,
       },
     };
-    this.socket.current.emit("message", message);
+    this.mediasoupSocket.current.emit("message", message);
   }
 }
 

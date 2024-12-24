@@ -103,7 +103,7 @@ class SnakeGame {
           attacker.instance
         );
         if (target) {
-          this.handleSnakeCollision(attacker, target, headKey);
+          this.handleSnakeCollision(target, headKey);
         }
       }
     }
@@ -121,7 +121,6 @@ class SnakeGame {
   };
 
   private handleSnakeCollision = (
-    attacker: { username: string; instance: string },
     target: { username: string; instance: string },
     headKey: string
   ): void => {

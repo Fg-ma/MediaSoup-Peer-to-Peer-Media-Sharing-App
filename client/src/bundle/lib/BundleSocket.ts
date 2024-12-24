@@ -28,7 +28,7 @@ class BundleSocket {
     protected table_id: string,
     protected username: string,
     protected instance: string,
-    protected socket: React.MutableRefObject<Socket>,
+    protected mediasoupSocket: React.MutableRefObject<Socket>,
     protected bundleOptions: BundleOptions,
     protected setCameraStreams: React.Dispatch<
       React.SetStateAction<
@@ -103,7 +103,7 @@ class BundleSocket {
             blockStateChange: false,
           },
         };
-        this.socket.current.emit("message", msg);
+        this.mediasoupSocket.current.emit("message", msg);
       }
     } else if (
       (producerType === "audio" && this.permissions.acceptsAudioEffects) ||
@@ -125,7 +125,7 @@ class BundleSocket {
         },
       };
 
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
     }
   };
 

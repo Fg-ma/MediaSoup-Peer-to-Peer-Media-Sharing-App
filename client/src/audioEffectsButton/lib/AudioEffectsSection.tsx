@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import { Socket } from "socket.io-client";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
+import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgPanel from "../../fgElements/fgPanel/FgPanel";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import AudioEffectButton from "./AudioEffectButton";
-import { audioEffectTemplates } from "./typeConstant";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
+import { audioEffectTemplates } from "./typeConstant";
 
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
@@ -30,7 +30,6 @@ const FgSoundBoard = React.lazy(
 );
 
 export default function AudioEffectsSection({
-  socket,
   table_id,
   username,
   instance,
@@ -52,7 +51,6 @@ export default function AudioEffectsSection({
   backgroundColor,
   secondaryBackgroundColor,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
@@ -78,6 +76,8 @@ export default function AudioEffectsSection({
   backgroundColor?: string;
   secondaryBackgroundColor?: string;
 }) {
+  const { mediasoupSocket } = useSocketContext();
+
   const [_, setRerender] = useState(false);
   const [cols, setCols] = useState(3);
   // No one in there right mind will ever be able to read this again and I'm ok with that
@@ -177,11 +177,11 @@ export default function AudioEffectsSection({
   };
 
   useEffect(() => {
-    socket.current.on("message", handleMessage);
+    mediasoupSocket.current.on("message", handleMessage);
 
     // Cleanup event listener on unmount
     return () => {
-      socket.current.off("message", handleMessage);
+      mediasoupSocket.current.off("message", handleMessage);
     };
   }, []);
 
@@ -456,7 +456,6 @@ export default function AudioEffectsSection({
       {audioMixEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>
           <AudioMixEffectsPortal
-            socket={socket}
             table_id={table_id}
             username={username}
             instance={instance}

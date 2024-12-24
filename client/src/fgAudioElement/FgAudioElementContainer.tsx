@@ -1,8 +1,8 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { Permissions } from "../context/permissionsContext/typeConstant";
 import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
+import { useSocketContext } from "../context/socketContext/SocketContext";
 import FgAudioElement from "./FgAudioElement";
 import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import PanButton from "../fgAdjustmentComponents/PanButton";
@@ -48,7 +48,6 @@ const defaultFgAudioElementContainerOptions: FgAudioElementContainerOptionsType 
   };
 
 export default function FgAudioElementContainer({
-  socket,
   table_id,
   activeUsername,
   activeInstance,
@@ -66,7 +65,6 @@ export default function FgAudioElementContainer({
   permissions,
   options,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   activeUsername: string | undefined;
   activeInstance: string | undefined;
@@ -107,6 +105,7 @@ export default function FgAudioElementContainer({
   };
 
   const { userDataStreams, remoteDataStreams } = useMediaContext();
+  const { mediasoupSocket } = useSocketContext();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
@@ -158,8 +157,8 @@ export default function FgAudioElementContainer({
     );
 
   useEffect(() => {
-    // Listen for messages on socket
-    socket.current.on(
+    // Listen for messages on mediasoupSocket
+    mediasoupSocket.current.on(
       "message",
       fgAudioElementContainerController.handleMessage
     );
@@ -177,11 +176,11 @@ export default function FgAudioElementContainer({
           inquiredType: "audio",
         },
       };
-      socket.current.send(msg);
+      mediasoupSocket.current.send(msg);
     }
 
     return () => {
-      socket.current.off(
+      mediasoupSocket.current.off(
         "message",
         fgAudioElementContainerController.handleMessage
       );
@@ -474,7 +473,6 @@ export default function FgAudioElementContainer({
         audioEffectsSectionVisible && (
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsSection
-              socket={socket}
               table_id={table_id}
               username={username}
               instance={instance}

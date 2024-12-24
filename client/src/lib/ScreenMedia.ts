@@ -30,7 +30,7 @@ class ScreenMedia {
     private username: string,
     private instance: string,
     private screenId: string,
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private originalScreenStream: MediaStream,
     private screenStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -104,7 +104,7 @@ class ScreenMedia {
         producerId: this.screenId,
       },
     };
-    this.socket.current.emit("message", msg);
+    this.mediasoupSocket.current.emit("message", msg);
 
     if (this.userMedia.current.screenAudio[`${this.screenId}_audio`]) {
       const message = {
@@ -117,7 +117,7 @@ class ScreenMedia {
           producerId: `${this.screenId}_audio`,
         },
       };
-      this.socket.current.emit("message", message);
+      this.mediasoupSocket.current.emit("message", message);
     }
   };
 

@@ -61,7 +61,7 @@ class FgLowerVisualMediaController {
   private initTime: number;
 
   constructor(
-    private socket: React.MutableRefObject<Socket> | undefined,
+    private mediasoupSocket: React.MutableRefObject<Socket> | undefined,
     private visualMediaId: string,
     private table_id: string,
     private username: string,
@@ -154,7 +154,7 @@ class FgLowerVisualMediaController {
   };
 
   handleCloseVideo = () => {
-    if (!this.socket) {
+    if (!this.mediasoupSocket) {
       return;
     }
 
@@ -169,7 +169,7 @@ class FgLowerVisualMediaController {
           producerId: this.visualMediaId,
         },
       };
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
 
       if (this.type === "screen" && this.screenAudioStream) {
         const message = {
@@ -182,7 +182,7 @@ class FgLowerVisualMediaController {
             producerId: `${this.visualMediaId}_audio`,
           },
         };
-        this.socket.current.emit("message", message);
+        this.mediasoupSocket.current.emit("message", message);
       }
     } else {
       const msg = {
@@ -195,7 +195,7 @@ class FgLowerVisualMediaController {
           producerId: this.visualMediaId,
         },
       };
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
 
       if (this.type === "screen" && this.screenAudioStream) {
         const message = {
@@ -208,7 +208,7 @@ class FgLowerVisualMediaController {
             producerId: `${this.visualMediaId}_audio`,
           },
         };
-        this.socket.current.emit("message", message);
+        this.mediasoupSocket.current.emit("message", message);
       }
     }
   };
@@ -252,7 +252,9 @@ class FgLowerVisualMediaController {
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
-      !this.visualMediaContainerRef.current?.classList.contains("in-video") ||
+      !this.visualMediaContainerRef.current?.classList.contains(
+        "in-visual-media"
+      ) ||
       this.visualMediaContainerRef.current?.classList.contains("in-piano") ||
       this.controlPressed.current ||
       this.shiftPressed.current

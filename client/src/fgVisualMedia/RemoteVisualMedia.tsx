@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import {
@@ -9,6 +8,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/effectsContext/typeConstant";
+import { useSocketContext } from "../context/socketContext/SocketContext";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import FgVisualMediaController from "./lib/FgVisualMediaController";
@@ -27,7 +27,6 @@ const VisualMediaAdjustmentButtons = React.lazy(
 );
 
 export default function RemoteVisualMedia({
-  socket,
   table_id,
   visualMediaId,
   activeUsername,
@@ -51,7 +50,6 @@ export default function RemoteVisualMedia({
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   visualMediaId: string;
   activeUsername: string | undefined;
@@ -93,6 +91,7 @@ export default function RemoteVisualMedia({
     userStreamEffects,
     remoteStreamEffects,
   } = useEffectsContext();
+  const { mediasoupSocket } = useSocketContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -103,6 +102,9 @@ export default function RemoteVisualMedia({
   const [inVisualMedia, setInVisualMedia] = useState(false);
 
   const leaveVisualMediaTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const visualMediaMovementTimeout = useRef<NodeJS.Timeout | undefined>(
+    undefined
+  );
 
   const [pausedState, setPausedState] = useState(false);
 
@@ -192,7 +194,7 @@ export default function RemoteVisualMedia({
             blockStateChange: blockStateChange,
           },
         };
-        socket?.current.emit("message", msg);
+        mediasoupSocket?.current.emit("message", msg);
       }
     } else if (
       (type === "camera" &&
@@ -223,7 +225,7 @@ export default function RemoteVisualMedia({
         },
       };
 
-      socket?.current.emit("message", msg);
+      mediasoupSocket?.current.emit("message", msg);
     }
   };
 
@@ -235,7 +237,7 @@ export default function RemoteVisualMedia({
   );
 
   const fgLowerVisualMediaController = new FgLowerVisualMediaController(
-    socket,
+    mediasoupSocket,
     visualMediaId,
     table_id,
     username,
@@ -292,6 +294,7 @@ export default function RemoteVisualMedia({
     handleVisualEffectChange,
     setInVisualMedia,
     leaveVisualMediaTimer,
+    visualMediaMovementTimeout,
     setRerender
   );
 
@@ -299,8 +302,11 @@ export default function RemoteVisualMedia({
     // Set up initial conditions
     fgVisualMediaController.init();
 
-    // Listen for messages on socket
-    socket.current.on("message", fgVisualMediaController.handleMessage);
+    // Listen for messages on mediasoupSocket
+    mediasoupSocket.current.on(
+      "message",
+      fgVisualMediaController.handleMessage
+    );
 
     // Request initial catch up data
     if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
@@ -316,7 +322,7 @@ export default function RemoteVisualMedia({
           inquiredProducerId: visualMediaId,
         },
       };
-      socket.current.send(msg);
+      mediasoupSocket.current.send(msg);
     }
 
     // Add eventlisteners
@@ -359,7 +365,10 @@ export default function RemoteVisualMedia({
         )
       );
       positioningListeners.current = {};
-      socket.current.off("message", fgVisualMediaController.handleMessage);
+      mediasoupSocket.current.off(
+        "message",
+        fgVisualMediaController.handleMessage
+      );
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
@@ -490,7 +499,6 @@ export default function RemoteVisualMedia({
           fgLowerVisualMediaController={fgLowerVisualMediaController}
         />
         <FgLowerVisualMediaControls
-          socket={socket}
           table_id={table_id}
           username={username}
           instance={instance}

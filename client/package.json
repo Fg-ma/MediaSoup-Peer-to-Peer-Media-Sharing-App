@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run start\" \"npm run dev --prefix ../gamesServer\" \"npm run dev --prefix ../mediasoupServer\"",
+    "dev": "concurrently \"npm run start\" \"npm run dev --prefix ../gamesServer\" \"npm run dev --prefix ../mediasoupServer\" \"npm run dev --prefix ../tableServer\"",
     "start": "webpack-dev-server ."
   },
   "keywords": [],

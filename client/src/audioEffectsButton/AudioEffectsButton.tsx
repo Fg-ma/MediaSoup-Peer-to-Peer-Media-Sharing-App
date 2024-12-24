@@ -1,5 +1,4 @@
 import React, { Suspense, useRef } from "react";
-import { Socket } from "socket.io-client";
 import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { Permissions } from "../context/permissionsContext/typeConstant";
 import FgButton from "../fgElements/fgButton/FgButton";
@@ -19,7 +18,6 @@ const defaultAudioEffectsButtonOptions: {
 } = { color: "white", placement: "above" };
 
 export default function AudioEffectsButton({
-  socket,
   table_id,
   username,
   instance,
@@ -41,7 +39,6 @@ export default function AudioEffectsButton({
   style,
   options,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
@@ -118,7 +115,6 @@ export default function AudioEffectsButton({
       {audioEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>
           <AudioEffectsSection
-            socket={socket}
             table_id={table_id}
             username={username}
             instance={instance}

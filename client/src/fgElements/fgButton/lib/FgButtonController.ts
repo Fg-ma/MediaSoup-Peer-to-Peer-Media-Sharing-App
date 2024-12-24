@@ -49,7 +49,6 @@ class FgButtonController {
   ) {}
 
   handlePointerDown = (event: React.PointerEvent) => {
-    event.stopPropagation();
     event.preventDefault();
 
     window.addEventListener("pointerup", this.handlePointerUp);
@@ -78,8 +77,6 @@ class FgButtonController {
   };
 
   handlePointerUp = (event: PointerEvent) => {
-    event.stopPropagation();
-
     window.removeEventListener("pointerup", this.handlePointerUp);
 
     if (this.toggleClickContent) {
@@ -157,8 +154,6 @@ class FgButtonController {
   };
 
   handlePointerMove = (event: PointerEvent) => {
-    event.stopPropagation();
-
     const buttonElement = this.externalRef?.current || this.buttonRef.current;
 
     if (buttonElement && !buttonElement.contains(event.target as Node)) {
@@ -179,6 +174,7 @@ class FgButtonController {
   };
 
   handleDragPointerMove = (event: PointerEvent) => {
+    event.stopPropagation();
     if (
       this.dragFunction === undefined ||
       this.startDragPosition.current === undefined

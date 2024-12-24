@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
-import { ActiveBackground, categories } from "./lib/typeConstant";
+import { FgBackground, categories } from "./lib/typeConstant";
 import BackgroundSelectorPanel from "./lib/BackgroundSelectorPanel";
 
 import chooseBackgroundIcon from "../../../public/svgs/chooseBackgroundIcon.svg";
@@ -11,12 +11,14 @@ import chooseBackgroundOffIcon from "../../../public/svgs/chooseBackgroundOffIco
 export default function FgBackgroundSelector({
   backgroundRef,
   defaultActiveBackground,
+  backgroundChangeFunction,
 }: {
   backgroundRef: React.RefObject<HTMLDivElement>;
-  defaultActiveBackground?: ActiveBackground;
+  defaultActiveBackground?: FgBackground;
+  backgroundChangeFunction?: (background: FgBackground) => void;
 }) {
   const [activeBackground, setActiveBackground] = useState<
-    { category: ""; categorySelection: string } | ActiveBackground
+    { category: ""; categorySelection: string } | FgBackground
   >(defaultActiveBackground ?? { category: "", categorySelection: "" });
   const [imports, setImports] = useState<{
     [importFilename: string]: { file: File; url: string };
@@ -53,6 +55,10 @@ export default function FgBackgroundSelector({
 
   useEffect(() => {
     changeBackground();
+
+    if (backgroundChangeFunction) {
+      backgroundChangeFunction(activeBackground as FgBackground);
+    }
   }, [activeBackground]);
 
   useEffect(() => {

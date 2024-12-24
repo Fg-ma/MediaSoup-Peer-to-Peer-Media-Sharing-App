@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Socket } from "socket.io-client";
 import { Transition, Variants, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
+import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgContentAdjustmentController from "../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import FgGameController from "./lib/FgGameController";
 import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
@@ -29,7 +29,6 @@ const GameVar: Variants = {
 };
 
 export default function FgGame({
-  socket,
   table_id,
   username,
   instance,
@@ -47,7 +46,6 @@ export default function FgGame({
   popupRefs,
   initPosition = { x: 0, y: 0 },
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
@@ -84,6 +82,7 @@ export default function FgGame({
   };
 }) {
   const { userDataStreams, remoteDataStreams } = useMediaContext();
+  const { mediasoupSocket } = useSocketContext();
 
   const [_, setRerender] = useState(false);
   const positioning = useRef<{
@@ -123,7 +122,7 @@ export default function FgGame({
   );
 
   const fgGameController = new FgGameController(
-    socket,
+    mediasoupSocket,
     table_id,
     gameId,
     hideControls,
@@ -134,6 +133,8 @@ export default function FgGame({
     gameRef,
     closeGameFunction,
     startGameFunction,
+    joinGameFunction,
+    leaveGameFunction,
     remoteDataStreams,
     positioningListeners,
     positioning,
@@ -217,7 +218,7 @@ export default function FgGame({
   }, [positioning.current.scale]);
 
   useEffect(() => {
-    socket.current.on("message", fgGameController.handleMessage);
+    mediasoupSocket.current.on("message", fgGameController.handleMessage);
 
     const msg = {
       type: "requestGameCatchUpData",
@@ -228,7 +229,7 @@ export default function FgGame({
         gameId: gameId,
       },
     };
-    socket.current.send(msg);
+    mediasoupSocket.current.send(msg);
 
     fgGameController.attachPositioningListeners();
 
@@ -238,7 +239,7 @@ export default function FgGame({
           removeListener()
         )
       );
-      socket.current.off("message", fgGameController.handleMessage);
+      mediasoupSocket.current.off("message", fgGameController.handleMessage);
     };
   }, []);
 
@@ -310,7 +311,7 @@ export default function FgGame({
       onPointerEnter={fgGameController.handlePointerEnter}
       onPointerLeave={fgGameController.handlePointerLeave}
       onPointerMove={fgGameController.handlePointerMove}
-      className={`fg-game ${hideControls ? "z-[49]" : "z-0"} ${
+      className={`fg-game ${hideControls ? "z-[49] cursor-none" : "z-0"} ${
         hideControls ? "hide-controls" : ""
       } rounded absolute`}
       style={{
@@ -342,6 +343,11 @@ export default function FgGame({
           startGameFunction={startGameFunction}
           joinGameFunction={joinGameFunction}
           leaveGameFunction={leaveGameFunction}
+          userPlaying={players?.user === undefined ? false : true}
+          playerCount={
+            (players?.players.length ?? 0) +
+            (players?.user === undefined ? 0 : 1)
+          }
         />
         <EndGameButton closeGameFunction={closeGameFunction} />
       </div>

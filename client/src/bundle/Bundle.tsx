@@ -1,10 +1,10 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import { Permissions } from "../context/permissionsContext/typeConstant";
+import { useSocketContext } from "../context/socketContext/SocketContext";
 import BundleController from "./lib/BundleController";
 
 const UserVisualMedia = React.lazy(
@@ -19,7 +19,6 @@ const FgAudioElementContainer = React.lazy(
 const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
 export default function Bundle({
-  socket,
   table_id,
   activeUsername,
   activeInstance,
@@ -35,7 +34,6 @@ export default function Bundle({
   onRendered,
   onNewConsumerWasCreatedCallback,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   activeUsername: string | undefined;
   activeInstance: string | undefined;
@@ -59,6 +57,7 @@ export default function Bundle({
   const { userMedia, remoteMedia } = useMediaContext();
   const { remoteEffectsStyles, remoteStreamEffects } = useEffectsContext();
   const { signal } = useSignalContext();
+  const { mediasoupSocket } = useSocketContext();
 
   const [cameraStreams, setCameraStreams] = useState<
     | {
@@ -99,7 +98,7 @@ export default function Bundle({
     table_id,
     username,
     instance,
-    socket,
+    mediasoupSocket,
     bundleOptions,
     setCameraStreams,
     setScreenStreams,
@@ -126,13 +125,13 @@ export default function Bundle({
       onRendered();
     }
 
-    socket.current.on("message", (event) =>
+    mediasoupSocket.current.on("message", (event) =>
       bundleController.handleMessage(event)
     );
 
     // Cleanup event listener on unmount
     return () => {
-      socket.current.off("message", (event) =>
+      mediasoupSocket.current.off("message", (event) =>
         bundleController.handleMessage(event)
       );
     };
@@ -197,7 +196,6 @@ export default function Bundle({
           <Suspense key={key} fallback={<div>Loading...</div>}>
             {bundleOptions.isUser ? (
               <UserVisualMedia
-                socket={socket}
                 visualMediaId={key}
                 table_id={table_id}
                 username={username}
@@ -240,7 +238,6 @@ export default function Bundle({
               />
             ) : (
               <RemoteVisualMedia
-                socket={socket}
                 visualMediaId={key}
                 table_id={table_id}
                 activeUsername={activeUsername}
@@ -293,7 +290,6 @@ export default function Bundle({
           <Suspense key={key} fallback={<div>Loading...</div>}>
             {bundleOptions.isUser ? (
               <UserVisualMedia
-                socket={socket}
                 visualMediaId={key}
                 table_id={table_id}
                 username={username}
@@ -344,7 +340,6 @@ export default function Bundle({
               />
             ) : (
               <RemoteVisualMedia
-                socket={socket}
                 visualMediaId={key}
                 table_id={table_id}
                 activeUsername={activeUsername}
@@ -400,7 +395,6 @@ export default function Bundle({
           (!bundleOptions.isUser && screenAudioStreams)) && (
           <Suspense fallback={<div>Loading...</div>}>
             <FgAudioElementContainer
-              socket={socket}
               table_id={table_id}
               activeUsername={activeUsername}
               activeInstance={activeInstance}
@@ -426,7 +420,6 @@ export default function Bundle({
           ([snakeGameId, _snakeGame]) => (
             <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
               <SnakeGame
-                socket={socket}
                 table_id={table_id}
                 username={username}
                 instance={instance}

@@ -103,7 +103,7 @@ class TablesController {
     }
 
     this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
-      type: "userLeft",
+      type: "userLeftTable",
       header: { table_id, username, instance, socketType, gameType, gameId },
     });
   };

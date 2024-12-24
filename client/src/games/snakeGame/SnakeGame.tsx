@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Socket } from "socket.io-client";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgGame from "../../fgElements/fgGame/FgGame";
 import FgButton from "../../fgElements/fgButton/FgButton";
@@ -24,14 +23,12 @@ import gridIcon from "../../../public/svgs/games/snake/gridIcon.svg";
 import gridOffIcon from "../../../public/svgs/games/snake/gridOffIcon.svg";
 
 function SnakeGame({
-  socket,
   table_id,
   username,
   instance,
   snakeGameId,
   bundleRef,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
@@ -113,7 +110,6 @@ function SnakeGame({
   return (
     <>
       <FgGame
-        socket={socket}
         table_id={table_id}
         username={username}
         instance={instance}

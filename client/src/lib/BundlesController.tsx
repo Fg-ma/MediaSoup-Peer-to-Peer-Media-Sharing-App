@@ -6,7 +6,7 @@ import { Permissions } from "../context/permissionsContext/typeConstant";
 
 class BundlesController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
@@ -71,7 +71,6 @@ class BundlesController {
           activeInstance={undefined}
           username={this.username.current}
           instance={this.instance.current}
-          socket={this.socket}
           initCameraStreams={
             this.isCamera.current ? initCameraStreams : undefined
           }
@@ -131,7 +130,6 @@ class BundlesController {
 
       const newBundle = (
         <Bundle
-          socket={this.socket}
           table_id={this.table_id.current}
           activeUsername={this.username.current}
           activeInstance={this.instance.current}
@@ -165,7 +163,7 @@ class BundlesController {
               },
             };
 
-            this.socket.current.emit("message", msg);
+            this.mediasoupSocket.current.emit("message", msg);
 
             const message = {
               type: "requestBundleMetadata",
@@ -178,7 +176,7 @@ class BundlesController {
               },
             };
 
-            this.socket.current.emit("message", message);
+            this.mediasoupSocket.current.emit("message", message);
           }}
           onNewConsumerWasCreatedCallback={() => {
             const msg = {
@@ -192,7 +190,7 @@ class BundlesController {
               },
             };
 
-            this.socket.current.emit("message", msg);
+            this.mediasoupSocket.current.emit("message", msg);
           }}
         />
       );

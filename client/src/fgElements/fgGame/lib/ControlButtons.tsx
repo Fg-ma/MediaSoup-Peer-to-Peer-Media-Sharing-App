@@ -6,10 +6,14 @@ export default function ControlButtons({
   startGameFunction,
   joinGameFunction,
   leaveGameFunction,
+  userPlaying,
+  playerCount,
 }: {
   startGameFunction?: () => void;
   joinGameFunction?: () => void;
   leaveGameFunction?: () => void;
+  userPlaying: boolean;
+  playerCount: number;
 }) {
   return (
     <div className='flex items-center justify-center w-max h-full space-x-2 py-2'>
@@ -40,7 +44,17 @@ export default function ControlButtons({
       <FgGameButton
         className='h-full aspect-square'
         clickFunction={leaveGameFunction}
-        hoverContent={<FgHoverContentStandard content='Leave game (l)' />}
+        hoverContent={
+          <FgHoverContentStandard
+            content={
+              userPlaying
+                ? playerCount > 1
+                  ? "Leave game (l)"
+                  : "End game (l)"
+                : "End game (l)"
+            }
+          />
+        }
         options={{
           primaryColor: "#fd473c",
           secondaryColor: "#e11008",

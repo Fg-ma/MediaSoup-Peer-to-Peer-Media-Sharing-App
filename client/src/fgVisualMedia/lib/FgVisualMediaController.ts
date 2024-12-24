@@ -174,6 +174,9 @@ class FgVisualMediaController {
     private leaveVisualMediaTimer: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
+    private visualMediaMovementTimeout: React.MutableRefObject<
+      NodeJS.Timeout | undefined
+    >,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
@@ -381,8 +384,27 @@ class FgVisualMediaController {
     }
   }
 
+  handlePointerMove = () => {
+    this.setInVisualMedia(true);
+
+    if (this.visualMediaContainerRef.current) {
+      clearTimeout(this.visualMediaMovementTimeout.current);
+      this.visualMediaMovementTimeout.current = undefined;
+    }
+
+    this.visualMediaMovementTimeout.current = setTimeout(() => {
+      this.setInVisualMedia(false);
+    }, 3500);
+  };
+
   handlePointerEnter = () => {
     this.setInVisualMedia(true);
+
+    this.visualMediaContainerRef.current?.addEventListener(
+      "pointermove",
+      this.handlePointerMove
+    );
+
     if (this.leaveVisualMediaTimer.current) {
       clearTimeout(this.leaveVisualMediaTimer.current);
       this.leaveVisualMediaTimer.current = undefined;
@@ -390,6 +412,16 @@ class FgVisualMediaController {
   };
 
   handlePointerLeave = () => {
+    this.visualMediaContainerRef.current?.removeEventListener(
+      "pointermove",
+      this.handlePointerMove
+    );
+
+    if (this.visualMediaContainerRef.current) {
+      clearTimeout(this.visualMediaMovementTimeout.current);
+      this.visualMediaMovementTimeout.current = undefined;
+    }
+
     this.leaveVisualMediaTimer.current = setTimeout(() => {
       this.setInVisualMedia(false);
       clearTimeout(this.leaveVisualMediaTimer.current);

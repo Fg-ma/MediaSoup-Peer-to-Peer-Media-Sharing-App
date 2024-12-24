@@ -1,7 +1,7 @@
 import React from "react";
 import { types } from "mediasoup-client";
-import { Socket } from "socket.io-client";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
+import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
@@ -12,7 +12,6 @@ import removeScreenIcon from "../../../../public/svgs/removeScreenIcon.svg";
 import shareScreenIcon from "../../../../public/svgs/shareScreenIcon.svg";
 
 export default function ScreenSection({
-  socket,
   device,
   table_id,
   username,
@@ -25,7 +24,6 @@ export default function ScreenSection({
   producersController,
   handleDisableEnableBtns,
 }: {
-  socket: React.MutableRefObject<Socket>;
   device: React.MutableRefObject<types.Device | undefined>;
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
@@ -39,9 +37,10 @@ export default function ScreenSection({
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { userMedia } = useMediaContext();
+  const { mediasoupSocket } = useSocketContext();
 
   const screenSectionController = new ScreenSectionController(
-    socket,
+    mediasoupSocket,
     device,
     table_id,
     username,

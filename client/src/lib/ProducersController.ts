@@ -36,7 +36,7 @@ import {
 
 class ProducersController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private device: React.MutableRefObject<types.Device | undefined>,
 
     private table_id: React.MutableRefObject<string>,
@@ -122,7 +122,7 @@ class ProducersController {
       this.username.current,
       this.instance.current,
       screenId,
-      this.socket,
+      this.mediasoupSocket,
       originalScreenBrowserMedia,
       screenBrowserMedia,
       this.userEffectsStyles,
@@ -250,8 +250,8 @@ class ProducersController {
           },
         };
 
-        this.socket.current.send(msg);
-        this.socket.current.on("message", (event) => {
+        this.mediasoupSocket.current.send(msg);
+        this.mediasoupSocket.current.on("message", (event) => {
           if (event.type === "producerConnected") {
             callback();
           }
@@ -281,9 +281,9 @@ class ProducersController {
           },
         };
 
-        this.socket.current.emit("message", msg);
+        this.mediasoupSocket.current.emit("message", msg);
 
-        this.socket.current.once(
+        this.mediasoupSocket.current.once(
           "newProducerCallback",
           (res: { id: string }) => {
             callback(res);
@@ -317,9 +317,9 @@ class ProducersController {
           },
         };
 
-        this.socket.current.emit("message", msg);
+        this.mediasoupSocket.current.emit("message", msg);
 
-        this.socket.current.once(
+        this.mediasoupSocket.current.once(
           "newJSONProducerCallback",
           (res: { id: string }) => {
             callback(res);
@@ -465,7 +465,7 @@ class ProducersController {
       },
     };
 
-    this.socket.current.emit("message", msg);
+    this.mediasoupSocket.current.emit("message", msg);
   };
 
   onNewProducerAvailable = (event: onNewProducerAvailableType) => {
@@ -494,7 +494,7 @@ class ProducersController {
           rtpCapabilities,
         },
       };
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
     }
   };
 
@@ -530,7 +530,7 @@ class ProducersController {
           sctpCapabilities,
         },
       };
-      this.socket.current.emit("message", msg);
+      this.mediasoupSocket.current.emit("message", msg);
     }
   };
 
@@ -892,7 +892,7 @@ class ProducersController {
         producerId,
       },
     };
-    this.socket.current.emit("message", msg);
+    this.mediasoupSocket.current.emit("message", msg);
   };
 }
 export default ProducersController;

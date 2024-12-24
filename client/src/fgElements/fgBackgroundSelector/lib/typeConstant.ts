@@ -394,7 +394,7 @@ export type TechnologyCategories =
   | "technology2"
   | "WWW";
 
-export type ActiveBackground =
+export type FgBackground =
   | { category: "christmas"; categorySelection: ChristmasCategories | "" }
   | { category: "dark"; categorySelection: DarkCategories | "" }
   | { category: "geometric"; categorySelection: GeometricCategories | "" }

@@ -4,7 +4,7 @@ import { onPermissionsRequestedType } from "src/Main";
 
 class PermissionsController {
   constructor(
-    private socket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<Socket>,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
@@ -28,7 +28,7 @@ class PermissionsController {
       },
     };
 
-    this.socket.current.emit("message", msg);
+    this.mediasoupSocket.current.emit("message", msg);
   };
 }
 

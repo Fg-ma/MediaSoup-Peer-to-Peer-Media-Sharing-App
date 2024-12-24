@@ -45,6 +45,8 @@ class SnakeGameController extends SnakeGameSocket {
     if (
       !this.started &&
       key !== "p" &&
+      key !== "l" &&
+      key !== "j" &&
       key !== "g" &&
       key !== "y" &&
       key !== "r"

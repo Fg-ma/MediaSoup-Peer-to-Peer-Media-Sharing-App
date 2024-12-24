@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
+import { useSocketContext } from "../context/socketContext/SocketContext";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import volumeSVGPaths from "../fgVolumeElement/lib/volumeSVGPaths";
@@ -14,7 +14,6 @@ import {
 import "./lib/fgVolumeElement.css";
 
 export default function FgVolumeElement({
-  socket,
   table_id,
   username,
   instance,
@@ -29,7 +28,6 @@ export default function FgVolumeElement({
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
 }: {
-  socket: React.MutableRefObject<Socket>;
   table_id: string;
   username: string;
   instance: string;
@@ -52,6 +50,7 @@ export default function FgVolumeElement({
   };
 
   const { signal } = useSignalContext();
+  const { mediasoupSocket } = useSocketContext();
 
   const [active, setActive] = useState(
     fgVolumeElementOptions.initialVolume === "off" ? true : false
@@ -96,7 +95,7 @@ export default function FgVolumeElement({
       fgVolumeElementOptions.volumeSliderThumbSize
     );
 
-    socket.current.on(
+    mediasoupSocket.current.on(
       "message",
       (event: FgVolumeElementControllerMessagesType) =>
         fgVolumeElementController.handleMessage(event)
@@ -104,7 +103,7 @@ export default function FgVolumeElement({
 
     // Cleanup event listener on unmount
     return () => {
-      socket.current.off(
+      mediasoupSocket.current.off(
         "message",
         (event: FgVolumeElementControllerMessagesType) =>
           fgVolumeElementController.handleMessage(event)
