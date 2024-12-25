@@ -282,6 +282,9 @@ export default function Main() {
   const tableRef = useRef<HTMLDivElement>(null);
   const tableTopRef = useRef<HTMLDivElement>(null);
 
+  const [gridActive, setGridActive] = useState(false);
+  const [gridSize, setGridSize] = useState({ rows: 0, cols: 0 });
+
   const muteAudio = () => {
     setMutedAudio((prev) => !prev);
     mutedAudioRef.current = !mutedAudioRef.current;
@@ -672,11 +675,17 @@ export default function Main() {
         handleDisableEnableBtns={handleDisableEnableBtns}
         bundles={bundles}
         bundlesController={bundlesController}
+        gridActive={gridActive}
+        setGridActive={setGridActive}
+        gridSize={gridSize}
+        setGridSize={setGridSize}
       />
       <FgTable
         tableRef={tableRef}
         tableTopRef={tableTopRef}
         bundles={bundles}
+        gridActive={gridActive}
+        gridSize={gridSize}
       />
     </div>
   );

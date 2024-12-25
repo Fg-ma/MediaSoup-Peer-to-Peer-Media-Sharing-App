@@ -57,7 +57,7 @@ export default function CameraSection({
   );
 
   return (
-    <div className='flex space-x-4 mx-2 h-10'>
+    <div className='flex space-x-4 mx-2 h-full'>
       <FgButton
         externalRef={cameraBtnRef}
         clickFunction={() => cameraSectionController.shareCamera()}

@@ -14,6 +14,7 @@ import TableFunctionsController from "./lib/TableFunctionsController";
 import BundlesController from "../lib/BundlesController";
 import FgBackgroundSelector from "../fgElements/fgBackgroundSelector/FgBackgroundSelector";
 import { FgBackground } from "../fgElements/fgBackgroundSelector/lib/typeConstant";
+import TableGridSection from "./lib/tableGridButton/TableGridSection";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -50,6 +51,10 @@ export default function FgTableFunctions({
   handleDisableEnableBtns,
   bundles,
   bundlesController,
+  gridActive,
+  setGridActive,
+  gridSize,
+  setGridSize,
 }: {
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
@@ -95,6 +100,18 @@ export default function FgTableFunctions({
     };
   };
   bundlesController: BundlesController;
+  gridActive: boolean;
+  setGridActive: React.Dispatch<React.SetStateAction<boolean>>;
+  gridSize: {
+    rows: number;
+    cols: number;
+  };
+  setGridSize: React.Dispatch<
+    React.SetStateAction<{
+      rows: number;
+      cols: number;
+    }>
+  >;
 }) {
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
   const { setSignal } = useSignalContext();
@@ -228,7 +245,7 @@ export default function FgTableFunctions({
 
   return (
     <>
-      <div className='flex items-center justify-center'>
+      <div className='flex items-center justify-center h-10'>
         <CameraSection
           device={device}
           table_id={table_id}
@@ -284,6 +301,12 @@ export default function FgTableFunctions({
               tableSocket.current?.changeTableBackground(background);
             }
           }}
+        />
+        <TableGridSection
+          gridActive={gridActive}
+          setGridActive={setGridActive}
+          gridSize={gridSize}
+          setGridSize={setGridSize}
         />
         {isAudio.current && (
           <Suspense fallback={<div>Loading...</div>}>

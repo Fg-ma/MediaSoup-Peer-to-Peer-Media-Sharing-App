@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import FgTableController from "./lib/FgTableController";
 import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElement";
+import TableGridOverlay from "./lib/TableGridOverlay";
 import "./lib/fgTable.css";
 
 export default function FgTable({
   tableRef,
   tableTopRef,
   bundles,
+  gridActive,
+  gridSize,
 }: {
   tableRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
@@ -14,6 +17,11 @@ export default function FgTable({
     [username: string]: {
       [instance: string]: React.JSX.Element;
     };
+  };
+  gridActive: boolean;
+  gridSize: {
+    rows: number;
+    cols: number;
   };
 }) {
   const [_rerender, setRerender] = useState(false);
@@ -69,13 +77,20 @@ export default function FgTable({
         >
           <div
             ref={tableTopRef}
-            className='bg-fg-white-65 aspect-square overflow-hidden'
+            className='relative bg-fg-white-65 aspect-square overflow-hidden'
             style={{
               ...(aspectDir.current === "width"
                 ? { width: "100%" }
                 : { height: "100%" }),
             }}
           >
+            {gridActive && (
+              <TableGridOverlay
+                gridSize={gridSize}
+                tableTopRef={tableTopRef}
+                gridColor='#fff'
+              />
+            )}
             <div className='w-full h-full relative'>
               {bundles &&
                 Object.keys(bundles).length !== 0 &&

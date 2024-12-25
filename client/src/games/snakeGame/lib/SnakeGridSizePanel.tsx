@@ -43,7 +43,7 @@ export default function SnakeGridSizePanel({
               ticks: 6,
               rangeMax: 60,
               rangeMin: 10,
-              precision: 1,
+              precision: 0,
               snapToWholeNum: true,
               orientation: "vertical",
             }}
