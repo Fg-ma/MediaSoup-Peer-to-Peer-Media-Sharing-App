@@ -8,8 +8,11 @@ import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import tintIcon from "../../../../../public/svgs/visualEffects/tintIcon.svg";
-import tintOffIcon from "../../../../../public/svgs/visualEffects/tintOffIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const tintIcon = nginxAssetSeverBaseUrl + "svgs/visualEffects/tintIcon.svg";
+const tintOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/visualEffects/tintOffIcon.svg";
 
 const ColorPicker = React.lazy(() => import("./ColorPicker"));
 

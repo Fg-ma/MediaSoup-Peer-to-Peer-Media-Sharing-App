@@ -4,10 +4,14 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-
-import metronomeIcon from "../../../public/svgs/audioEffects/metronomeIcon.svg";
-import metronomeOffIcon from "../../../public/svgs/audioEffects/metronomeOffIcon.svg";
 import SamplerMetronomeVolume from "./SamplerMetronomeVolume";
+
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const metronomeIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/metronomeIcon.svg";
+const metronomeOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/metronomeOffIcon.svg";
 
 export const bpmInputVar: Variants = {
   init: { opacity: 0, x: -20 },

@@ -4,8 +4,10 @@ import "./lib/scrollingContainer.css";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 
-import navigateForward from "../../../public/svgs/navigateForward.svg";
-import navigateBack from "../../../public/svgs/navigateBack.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const navigateForward = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
+const navigateBack = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
 
 const scrollButtonsVar: Variants = {
   leftInit: { opacity: 0, x: -20 },

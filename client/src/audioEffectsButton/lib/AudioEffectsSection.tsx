@@ -10,16 +10,25 @@ import AudioEffectButton from "./AudioEffectButton";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
 import { audioEffectTemplates } from "./typeConstant";
 
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
-import mixAudioEffectsIcon from "../../../public/svgs/audioEffects/mixAudioEffectsIcon.svg";
-import mixAudioEffectsOffIcon from "../../../public/svgs/audioEffects/mixAudioEffectsOffIcon.svg";
-import pianoIcon from "../../../public/svgs/audioEffects/pianoIcon.svg";
-import pianoOffIcon from "../../../public/svgs/audioEffects/pianoOffIcon.svg";
-import soundBoardIcon from "../../../public/svgs/audioEffects/soundBoardIcon.svg";
-import soundBoardOffIcon from "../../../public/svgs/audioEffects/soundBoardOffIcon.svg";
-import backgroundMusicIcon from "../../../public/svgs/audioEffects/backgroundMusicIcon.svg";
-import backgroundMusicOffIcon from "../../../public/svgs/audioEffects/backgroundMusicOffIcon.svg";
+const mixAudioEffectsIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/mixAudioEffectsIcon.svg";
+const mixAudioEffectsOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/mixAudioEffectsOffIcon.svg";
+const pianoIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/pianoIcon.svg";
+const pianoOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/pianoOffIcon.svg";
+const soundBoardIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/soundBoardIcon.svg";
+const soundBoardOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/soundBoardOffIcon.svg";
+const backgroundMusicIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/backgroundMusicIcon.svg";
+const backgroundMusicOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/backgroundMusicOffIcon.svg";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")

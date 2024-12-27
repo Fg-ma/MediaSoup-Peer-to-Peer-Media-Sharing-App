@@ -1,7 +1,10 @@
 import React from "react";
 import FgButton from "../fgElements/fgButton/FgButton";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
-import scaleIcon from "../../public/svgs/scaleIcon.svg";
+
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const scaleIcon = nginxAssetSeverBaseUrl + "svgs/scaleIcon.svg";
 
 export default function ScaleButton({
   className,

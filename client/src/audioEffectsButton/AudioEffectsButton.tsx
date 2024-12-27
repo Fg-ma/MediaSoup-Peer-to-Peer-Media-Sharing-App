@@ -5,8 +5,12 @@ import FgButton from "../fgElements/fgButton/FgButton";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import audioEffectIcon from "../../public/svgs/audioEffects/audioEffectIcon.svg";
-import audioEffectOffIcon from "../../public/svgs/audioEffects/audioEffectOffIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const audioEffectIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/audioEffectIcon.svg";
+const audioEffectOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/audioEffectOffIcon.svg";
 
 const AudioEffectsSection = React.lazy(
   () => import("./lib/AudioEffectsSection")

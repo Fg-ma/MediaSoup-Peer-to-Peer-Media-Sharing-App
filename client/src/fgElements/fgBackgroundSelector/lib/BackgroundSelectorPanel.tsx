@@ -5,15 +5,17 @@ import FgImage from "../../fgImage/FgImage";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
 import {
-  ActiveBackground,
   categories,
   Categories,
   categoriesMetadata,
+  FgBackground,
   recommendations,
 } from "./typeConstant";
 
-import additionIcon from "../../../../public/svgs/additionIcon.svg";
-import navigateBack from "../../../../public/svgs/navigateBack.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
+const navigateBack = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
 
 export default function BackgroundSelectorPanel({
   setBackgroundSelectorPanelActive,
@@ -28,14 +30,14 @@ export default function BackgroundSelectorPanel({
   >;
   backgroundSelectorBtnRef: React.RefObject<HTMLButtonElement>;
   activeBackground:
-    | ActiveBackground
+    | FgBackground
     | {
         category: "";
         categorySelection: string;
       };
   setActiveBackground: React.Dispatch<
     React.SetStateAction<
-      | ActiveBackground
+      | FgBackground
       | {
           category: "";
           categorySelection: string;

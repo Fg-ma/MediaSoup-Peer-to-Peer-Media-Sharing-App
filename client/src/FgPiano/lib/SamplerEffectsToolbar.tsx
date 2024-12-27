@@ -7,17 +7,25 @@ import {
   MixEffectsOptionsType,
 } from "../../audioEffects/typeConstant";
 
-import autoFilterIcon from "../../../public/svgs/audioEffects/autoFilterIcon.svg";
-import autoPannerIcon from "../../../public/svgs/audioEffects/autoPannerIcon.svg";
-import bitCrusherIcon from "../../../public/svgs/audioEffects/bitCrusherIcon.svg";
-import chorusIcon from "../../../public/svgs/audioEffects/chorusIcon.svg";
-import delayIcon from "../../../public/svgs/audioEffects/delayIcon.svg";
-import distortionIcon from "../../../public/svgs/audioEffects/distortionIcon.svg";
-import EQIcon from "../../../public/svgs/audioEffects/EQIcon.svg";
-import phaserIcon from "../../../public/svgs/audioEffects/phaserIcon.svg";
-import pitchShiftIcon from "../../../public/svgs/audioEffects/pitchShiftIcon.svg";
-import reverbIcon from "../../../public/svgs/audioEffects/reverbIcon.svg";
-import stereoWidenerIcon from "../../../public/svgs/audioEffects/stereoWidenerIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const autoFilterIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/autoFilterIcon.svg";
+const autoPannerIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/autoPannerIcon.svg";
+const bitCrusherIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/bitCrusherIcon.svg";
+const chorusIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/chorusIcon.svg";
+const delayIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/delayIcon.svg";
+const distortionIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/distortionIcon.svg";
+const EQIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/EQIcon.svg";
+const phaserIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/phaserIcon.svg";
+const pitchShiftIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/pitchShiftIcon.svg";
+const reverbIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/reverbIcon.svg";
+const stereoWidenerIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/stereoWidenerIcon.svg";
 
 export interface SamplerEffectType {
   labelIcon?: string;

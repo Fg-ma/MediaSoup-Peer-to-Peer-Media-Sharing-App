@@ -10,82 +10,188 @@ import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import AsianConicalHat_512x512 from "../../../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_512x512.png";
-import AsianConicalHat_32x32 from "../../../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_32x32.png";
-import AsianConicalHat_off_512x512 from "../../../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_off_512x512.png";
-import AsianConicalHat_off_32x32 from "../../../../../public/2DAssets/hats/AsianConicalHat/AsianConicalHat_off_32x32.png";
-import aviatorHelmet_512x512 from "../../../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_512x512.png";
-import aviatorHelmet_32x32 from "../../../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_32x32.png";
-import aviatorHelmet_off_512x512 from "../../../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_off_512x512.png";
-import aviatorHelmet_off_32x32 from "../../../../../public/2DAssets/hats/aviatorHelmet/aviatorHelmet_off_32x32.png";
-import bicornHat_512x512 from "../../../../../public/2DAssets/hats/bicornHat/bicornHat_512x512.png";
-import bicornHat_32x32 from "../../../../../public/2DAssets/hats/bicornHat/bicornHat_32x32.png";
-import bicornHat_off_512x512 from "../../../../../public/2DAssets/hats/bicornHat/bicornHat_off_512x512.png";
-import bicornHat_off_32x32 from "../../../../../public/2DAssets/hats/bicornHat/bicornHat_off_32x32.png";
-import bicycleHelmet_512x512 from "../../../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_512x512.png";
-import bicycleHelmet_32x32 from "../../../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_32x32.png";
-import bicycleHelmet_off_512x512 from "../../../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_off_512x512.png";
-import bicycleHelmet_off_32x32 from "../../../../../public/2DAssets/hats/bicycleHelmet/bicycleHelmet_off_32x32.png";
-import captainsHat_512x512 from "../../../../../public/2DAssets/hats/captainsHat/captainsHat_512x512.png";
-import captainsHat_32x32 from "../../../../../public/2DAssets/hats/captainsHat/captainsHat_32x32.png";
-import captainsHat_off_512x512 from "../../../../../public/2DAssets/hats/captainsHat/captainsHat_off_512x512.png";
-import captainsHat_off_32x32 from "../../../../../public/2DAssets/hats/captainsHat/captainsHat_off_32x32.png";
-import chefHat_512x512 from "../../../../../public/2DAssets/hats/chefHat/chefHat_512x512.png";
-import chefHat_32x32 from "../../../../../public/2DAssets/hats/chefHat/chefHat_32x32.png";
-import chefHat_off_512x512 from "../../../../../public/2DAssets/hats/chefHat/chefHat_off_512x512.png";
-import chefHat_off_32x32 from "../../../../../public/2DAssets/hats/chefHat/chefHat_off_32x32.png";
-import chickenHat_512x512 from "../../../../../public/2DAssets/hats/chickenHat/chickenHat_512x512.png";
-import chickenHat_32x32 from "../../../../../public/2DAssets/hats/chickenHat/chickenHat_32x32.png";
-import chickenHat_off_512x512 from "../../../../../public/2DAssets/hats/chickenHat/chickenHat_off_512x512.png";
-import chickenHat_off_32x32 from "../../../../../public/2DAssets/hats/chickenHat/chickenHat_off_32x32.png";
-import deadManHat_512x512 from "../../../../../public/2DAssets/hats/deadManHat/deadManHat_512x512.png";
-import deadManHat_32x32 from "../../../../../public/2DAssets/hats/deadManHat/deadManHat_32x32.png";
-import deadManHat_off_512x512 from "../../../../../public/2DAssets/hats/deadManHat/deadManHat_off_512x512.png";
-import deadManHat_off_32x32 from "../../../../../public/2DAssets/hats/deadManHat/deadManHat_off_32x32.png";
-import dogEars_512x512 from "../../../../../public/2DAssets/hats/dogEars/dogEars_512x512.png";
-import dogEars_32x32 from "../../../../../public/2DAssets/hats/dogEars/dogEars_32x32.png";
-import dogEarsIcon from "../../../../../public/svgs/visualEffects/hats/dogEars/dogEarsIcon.svg";
-import dogEarsOffIcon from "../../../../../public/svgs/visualEffects/hats/dogEars/dogEarsOffIcon.svg";
-import flatCap_512x512 from "../../../../../public/2DAssets/hats/flatCap/flatCap_512x512.png";
-import flatCap_32x32 from "../../../../../public/2DAssets/hats/flatCap/flatCap_32x32.png";
-import flatCap_off_512x512 from "../../../../../public/2DAssets/hats/flatCap/flatCap_off_512x512.png";
-import flatCap_off_32x32 from "../../../../../public/2DAssets/hats/flatCap/flatCap_off_32x32.png";
-import hardHat_512x512 from "../../../../../public/2DAssets/hats/hardHat/hardHat_512x512.png";
-import hardHat_32x32 from "../../../../../public/2DAssets/hats/hardHat/hardHat_32x32.png";
-import hardHat_off_512x512 from "../../../../../public/2DAssets/hats/hardHat/hardHat_off_512x512.png";
-import hardHat_off_32x32 from "../../../../../public/2DAssets/hats/hardHat/hardHat_off_32x32.png";
-import hopliteHelmet_512x512 from "../../../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_512x512.png";
-import hopliteHelmet_32x32 from "../../../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_32x32.png";
-import hopliteHelmet_off_512x512 from "../../../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_off_512x512.png";
-import hopliteHelmet_off_32x32 from "../../../../../public/2DAssets/hats/hopliteHelmet/hopliteHelmet_off_32x32.png";
-import militaryHat_512x512 from "../../../../../public/2DAssets/hats/militaryHat/militaryHat_512x512.png";
-import militaryHat_32x32 from "../../../../../public/2DAssets/hats/militaryHat/militaryHat_32x32.png";
-import militaryHat_off_512x512 from "../../../../../public/2DAssets/hats/militaryHat/militaryHat_off_512x512.png";
-import militaryHat_off_32x32 from "../../../../../public/2DAssets/hats/militaryHat/militaryHat_off_32x32.png";
-import rabbitEars_512x512 from "../../../../../public/2DAssets/hats/rabbitEars/rabbitEars_512x512.png";
-import rabbitEars_32x32 from "../../../../../public/2DAssets/hats/rabbitEars/rabbitEars_32x32.png";
-import rabbitEars_off_512x512 from "../../../../../public/2DAssets/hats/rabbitEars/rabbitEars_off_512x512.png";
-import rabbitEars_off_32x32 from "../../../../../public/2DAssets/hats/rabbitEars/rabbitEars_off_32x32.png";
-import santaHat_512x512 from "../../../../../public/2DAssets/hats/santaHat/santaHat_512x512.png";
-import santaHat_32x32 from "../../../../../public/2DAssets/hats/santaHat/santaHat_32x32.png";
-import santaHat_off_512x512 from "../../../../../public/2DAssets/hats/santaHat/santaHat_off_512x512.png";
-import santaHat_off_32x32 from "../../../../../public/2DAssets/hats/santaHat/santaHat_off_32x32.png";
-import seamanHat_512x512 from "../../../../../public/2DAssets/hats/seamanHat/seamanHat_512x512.png";
-import seamanHat_32x32 from "../../../../../public/2DAssets/hats/seamanHat/seamanHat_32x32.png";
-import seamanHat_off_512x512 from "../../../../../public/2DAssets/hats/seamanHat/seamanHat_off_512x512.png";
-import seamanHat_off_32x32 from "../../../../../public/2DAssets/hats/seamanHat/seamanHat_off_32x32.png";
-import stylishHat_512x512 from "../../../../../public/2DAssets/hats/stylishHat/stylishHat_512x512.png";
-import stylishHat_32x32 from "../../../../../public/2DAssets/hats/stylishHat/stylishHat_32x32.png";
-import stylishHat_off_512x512 from "../../../../../public/2DAssets/hats/stylishHat/stylishHat_off_512x512.png";
-import stylishHat_off_32x32 from "../../../../../public/2DAssets/hats/stylishHat/stylishHat_off_32x32.png";
-import ushankaHat_512x512 from "../../../../../public/2DAssets/hats/ushankaHat/ushankaHat_512x512.png";
-import ushankaHat_32x32 from "../../../../../public/2DAssets/hats/ushankaHat/ushankaHat_32x32.png";
-import ushankaHat_off_512x512 from "../../../../../public/2DAssets/hats/ushankaHat/ushankaHat_off_512x512.png";
-import ushankaHat_off_32x32 from "../../../../../public/2DAssets/hats/ushankaHat/ushankaHat_off_32x32.png";
-import vikingHelmet_512x512 from "../../../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_512x512.png";
-import vikingHelmet_32x32 from "../../../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_32x32.png";
-import vikingHelmet_off_512x512 from "../../../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_off_512x512.png";
-import vikingHelmet_off_32x32 from "../../../../../public/2DAssets/hats/vikingHelmet/vikingHelmet_off_32x32.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const AsianConicalHat_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/AsianConicalHat/AsianConicalHat_512x512.png";
+const AsianConicalHat_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/AsianConicalHat/AsianConicalHat_32x32.png";
+const AsianConicalHat_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/AsianConicalHat/AsianConicalHat_off_512x512.png";
+const AsianConicalHat_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/AsianConicalHat/AsianConicalHat_off_32x32.png";
+const aviatorHelmet_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/aviatorHelmet/aviatorHelmet_512x512.png";
+const aviatorHelmet_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/aviatorHelmet/aviatorHelmet_32x32.png";
+const aviatorHelmet_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/aviatorHelmet/aviatorHelmet_off_512x512.png";
+const aviatorHelmet_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/aviatorHelmet/aviatorHelmet_off_32x32.png";
+const bicornHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/bicornHat/bicornHat_512x512.png";
+const bicornHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/bicornHat/bicornHat_32x32.png";
+const bicornHat_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/bicornHat/bicornHat_off_512x512.png";
+const bicornHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/bicornHat/bicornHat_off_32x32.png";
+const bicycleHelmet_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/bicycleHelmet/bicycleHelmet_512x512.png";
+const bicycleHelmet_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/bicycleHelmet/bicycleHelmet_32x32.png";
+const bicycleHelmet_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/bicycleHelmet/bicycleHelmet_off_512x512.png";
+const bicycleHelmet_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/bicycleHelmet/bicycleHelmet_off_32x32.png";
+const captainsHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/captainsHat/captainsHat_512x512.png";
+const captainsHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/captainsHat/captainsHat_32x32.png";
+const captainsHat_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/captainsHat/captainsHat_off_512x512.png";
+const captainsHat_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/captainsHat/captainsHat_off_32x32.png";
+const chefHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/chefHat/chefHat_512x512.png";
+const chefHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/chefHat/chefHat_32x32.png";
+const chefHat_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/chefHat/chefHat_off_512x512.png";
+const chefHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/chefHat/chefHat_off_32x32.png";
+const chickenHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/chickenHat/chickenHat_512x512.png";
+const chickenHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/chickenHat/chickenHat_32x32.png";
+const chickenHat_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/chickenHat/chickenHat_off_512x512.png";
+const chickenHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/chickenHat/chickenHat_off_32x32.png";
+const deadManHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/deadManHat/deadManHat_512x512.png";
+const deadManHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/deadManHat/deadManHat_32x32.png";
+const deadManHat_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/deadManHat/deadManHat_off_512x512.png";
+const deadManHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/deadManHat/deadManHat_off_32x32.png";
+const dogEars_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/dogEars/dogEars_512x512.png";
+const dogEars_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/dogEars/dogEars_32x32.png";
+const dogEarsIcon =
+  nginxAssetSeverBaseUrl + "svgs/visualEffects/hats/dogEars/dogEarsIcon.svg";
+const dogEarsOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/visualEffects/hats/dogEars/dogEarsOffIcon.svg";
+const flatCap_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/flatCap/flatCap_512x512.png";
+const flatCap_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/flatCap/flatCap_32x32.png";
+const flatCap_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/flatCap/flatCap_off_512x512.png";
+const flatCap_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/flatCap/flatCap_off_32x32.png";
+const hardHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/hardHat/hardHat_512x512.png";
+const hardHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/hardHat/hardHat_32x32.png";
+const hardHat_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/hardHat/hardHat_off_512x512.png";
+const hardHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/hardHat/hardHat_off_32x32.png";
+const hopliteHelmet_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/hopliteHelmet/hopliteHelmet_512x512.png";
+const hopliteHelmet_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/hopliteHelmet/hopliteHelmet_32x32.png";
+const hopliteHelmet_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/hopliteHelmet/hopliteHelmet_off_512x512.png";
+const hopliteHelmet_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/hopliteHelmet/hopliteHelmet_off_32x32.png";
+const militaryHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/militaryHat/militaryHat_512x512.png";
+const militaryHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/militaryHat/militaryHat_32x32.png";
+const militaryHat_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/militaryHat/militaryHat_off_512x512.png";
+const militaryHat_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/militaryHat/militaryHat_off_32x32.png";
+const rabbitEars_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_512x512.png";
+const rabbitEars_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_32x32.png";
+const rabbitEars_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/rabbitEars/rabbitEars_off_512x512.png";
+const rabbitEars_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_off_32x32.png";
+const santaHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/santaHat/santaHat_512x512.png";
+const santaHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/santaHat/santaHat_32x32.png";
+const santaHat_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/santaHat/santaHat_off_512x512.png";
+const santaHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/santaHat/santaHat_off_32x32.png";
+const seamanHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/seamanHat/seamanHat_512x512.png";
+const seamanHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/seamanHat/seamanHat_32x32.png";
+const seamanHat_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/seamanHat/seamanHat_off_512x512.png";
+const seamanHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/seamanHat/seamanHat_off_32x32.png";
+const stylishHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/stylishHat/stylishHat_512x512.png";
+const stylishHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/stylishHat/stylishHat_32x32.png";
+const stylishHat_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/stylishHat/stylishHat_off_512x512.png";
+const stylishHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/stylishHat/stylishHat_off_32x32.png";
+const ushankaHat_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_512x512.png";
+const ushankaHat_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_32x32.png";
+const ushankaHat_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/ushankaHat/ushankaHat_off_512x512.png";
+const ushankaHat_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_off_32x32.png";
+const vikingHelmet_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/vikingHelmet/vikingHelmet_512x512.png";
+const vikingHelmet_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/hats/vikingHelmet/vikingHelmet_32x32.png";
+const vikingHelmet_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/vikingHelmet/vikingHelmet_off_512x512.png";
+const vikingHelmet_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/hats/vikingHelmet/vikingHelmet_off_32x32.png";
 
 const hatsLabels: {
   [hatsEffectType in HatsEffectTypes]: string;

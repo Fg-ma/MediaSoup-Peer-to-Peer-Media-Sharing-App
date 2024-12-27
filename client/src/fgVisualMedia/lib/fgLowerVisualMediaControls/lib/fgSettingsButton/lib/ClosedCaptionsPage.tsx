@@ -5,7 +5,9 @@ import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentS
 import { ActivePages } from "../../../FgLowerVisualMediaControls";
 import { Settings } from "../../../../typeConstant";
 
-import navigateBackIcon from "../../../../../../../public/svgs/navigateBack.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
 
 export const closedCaptionsSelections = {
   ar: "Arabic",

@@ -10,94 +10,219 @@ import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import baseMask_512x512 from "../../../../../public/2DAssets/masks/baseMask/baseMask_512x512.png";
-import baseMask_32x32 from "../../../../../public/2DAssets/masks/baseMask/baseMask_32x32.png";
-import baseMaskIcon from "../../../../../public/svgs/visualEffects/masks/baseMask/baseMaskIcon.svg";
-import baseMaskOffIcon from "../../../../../public/svgs/visualEffects/masks/baseMask/baseMaskOffIcon.svg";
-import alienMask_512x512 from "../../../../../public/2DAssets/masks/alienMask/alienMask_512x512.png";
-import alienMask_32x32 from "../../../../../public/2DAssets/masks/alienMask/alienMask_32x32.png";
-import alienMask_off_512x512 from "../../../../../public/2DAssets/masks/alienMask/alienMask_off_512x512.png";
-import alienMask_off_32x32 from "../../../../../public/2DAssets/masks/alienMask/alienMask_off_32x32.png";
-import clownMask_512x512 from "../../../../../public/2DAssets/masks/clownMask/clownMask_512x512.png";
-import clownMask_32x32 from "../../../../../public/2DAssets/masks/clownMask/clownMask_32x32.png";
-import clownMask_off_512x512 from "../../../../../public/2DAssets/masks/clownMask/clownMask_off_512x512.png";
-import clownMask_off_32x32 from "../../../../../public/2DAssets/masks/clownMask/clownMask_off_32x32.png";
-import creatureMask_512x512 from "../../../../../public/2DAssets/masks/creatureMask/creatureMask_512x512.png";
-import creatureMask_32x32 from "../../../../../public/2DAssets/masks/creatureMask/creatureMask_32x32.png";
-import creatureMask_off_512x512 from "../../../../../public/2DAssets/masks/creatureMask/creatureMask_off_512x512.png";
-import creatureMask_off_32x32 from "../../../../../public/2DAssets/masks/creatureMask/creatureMask_off_32x32.png";
-import cyberMask_512x512 from "../../../../../public/2DAssets/masks/cyberMask/cyberMask_512x512.png";
-import cyberMask_32x32 from "../../../../../public/2DAssets/masks/cyberMask/cyberMask_32x32.png";
-import cyberMask_off_512x512 from "../../../../../public/2DAssets/masks/cyberMask/cyberMask_off_512x512.png";
-import cyberMask_off_32x32 from "../../../../../public/2DAssets/masks/cyberMask/cyberMask_off_32x32.png";
-import darkKnightMask_512x512 from "../../../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_512x512.png";
-import darkKnightMask_32x32 from "../../../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_32x32.png";
-import darkKnightMask_off_512x512 from "../../../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_off_512x512.png";
-import darkKnightMask_off_32x32 from "../../../../../public/2DAssets/masks/darkKnightMask/darkKnightMask_off_32x32.png";
-import demonMask_512x512 from "../../../../../public/2DAssets/masks/demonMask/demonMask_512x512.png";
-import demonMask_32x32 from "../../../../../public/2DAssets/masks/demonMask/demonMask_32x32.png";
-import demonMask_off_512x512 from "../../../../../public/2DAssets/masks/demonMask/demonMask_off_512x512.png";
-import demonMask_off_32x32 from "../../../../../public/2DAssets/masks/demonMask/demonMask_off_32x32.png";
-import gasMask1_512x512 from "../../../../../public/2DAssets/masks/gasMask1/gasMask1_512x512.png";
-import gasMask1_32x32 from "../../../../../public/2DAssets/masks/gasMask1/gasMask1_32x32.png";
-import gasMask1_off_512x512 from "../../../../../public/2DAssets/masks/gasMask1/gasMask1_off_512x512.png";
-import gasMask1_off_32x32 from "../../../../../public/2DAssets/masks/gasMask1/gasMask1_off_32x32.png";
-import gasMask2_512x512 from "../../../../../public/2DAssets/masks/gasMask2/gasMask2_512x512.png";
-import gasMask2_32x32 from "../../../../../public/2DAssets/masks/gasMask2/gasMask2_32x32.png";
-import gasMask2_off_512x512 from "../../../../../public/2DAssets/masks/gasMask2/gasMask2_off_512x512.png";
-import gasMask2_off_32x32 from "../../../../../public/2DAssets/masks/gasMask2/gasMask2_off_32x32.png";
-import gasMask3_512x512 from "../../../../../public/2DAssets/masks/gasMask3/gasMask3_512x512.png";
-import gasMask3_32x32 from "../../../../../public/2DAssets/masks/gasMask3/gasMask3_32x32.png";
-import gasMask3_off_512x512 from "../../../../../public/2DAssets/masks/gasMask3/gasMask3_off_512x512.png";
-import gasMask3_off_32x32 from "../../../../../public/2DAssets/masks/gasMask3/gasMask3_off_32x32.png";
-import gasMask4_512x512 from "../../../../../public/2DAssets/masks/gasMask4/gasMask4_512x512.png";
-import gasMask4_32x32 from "../../../../../public/2DAssets/masks/gasMask4/gasMask4_32x32.png";
-import gasMask4_off_512x512 from "../../../../../public/2DAssets/masks/gasMask4/gasMask4_off_512x512.png";
-import gasMask4_off_32x32 from "../../../../../public/2DAssets/masks/gasMask4/gasMask4_off_32x32.png";
-import masqueradeMask_512x512 from "../../../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_512x512.png";
-import masqueradeMask_32x32 from "../../../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_32x32.png";
-import masqueradeMask_off_512x512 from "../../../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_off_512x512.png";
-import masqueradeMask_off_32x32 from "../../../../../public/2DAssets/masks/masqueradeMask/masqueradeMask_off_32x32.png";
-import metalManMask_512x512 from "../../../../../public/2DAssets/masks/metalManMask/metalManMask_512x512.png";
-import metalManMask_32x32 from "../../../../../public/2DAssets/masks/metalManMask/metalManMask_32x32.png";
-import metalManMask_off_512x512 from "../../../../../public/2DAssets/masks/metalManMask/metalManMask_off_512x512.png";
-import metalManMask_off_32x32 from "../../../../../public/2DAssets/masks/metalManMask/metalManMask_off_32x32.png";
-import oniMask_512x512 from "../../../../../public/2DAssets/masks/oniMask/oniMask_512x512.png";
-import oniMask_32x32 from "../../../../../public/2DAssets/masks/oniMask/oniMask_32x32.png";
-import oniMask_off_512x512 from "../../../../../public/2DAssets/masks/oniMask/oniMask_off_512x512.png";
-import oniMask_off_32x32 from "../../../../../public/2DAssets/masks/oniMask/oniMask_off_32x32.png";
-import plagueDoctorMask_512x512 from "../../../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_512x512.png";
-import plagueDoctorMask_32x32 from "../../../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_32x32.png";
-import plagueDoctorMask_off_512x512 from "../../../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_off_512x512.png";
-import plagueDoctorMask_off_32x32 from "../../../../../public/2DAssets/masks/plagueDoctorMask/plagueDoctorMask_off_32x32.png";
-import sixEyesMask_512x512 from "../../../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_512x512.png";
-import sixEyesMask_32x32 from "../../../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_32x32.png";
-import sixEyesMask_off_512x512 from "../../../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_off_512x512.png";
-import sixEyesMask_off_32x32 from "../../../../../public/2DAssets/masks/sixEyesMask/sixEyesMask_off_32x32.png";
-import tenguMask_512x512 from "../../../../../public/2DAssets/masks/tenguMask/tenguMask_512x512.png";
-import tenguMask_32x32 from "../../../../../public/2DAssets/masks/tenguMask/tenguMask_32x32.png";
-import tenguMask_off_512x512 from "../../../../../public/2DAssets/masks/tenguMask/tenguMask_off_512x512.png";
-import tenguMask_off_32x32 from "../../../../../public/2DAssets/masks/tenguMask/tenguMask_off_32x32.png";
-import threeFaceMask_512x512 from "../../../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_512x512.png";
-import threeFaceMask_32x32 from "../../../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_32x32.png";
-import threeFaceMask_off_512x512 from "../../../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_off_512x512.png";
-import threeFaceMask_off_32x32 from "../../../../../public/2DAssets/masks/threeFaceMask/threeFaceMask_off_32x32.png";
-import weldingMask_512x512 from "../../../../../public/2DAssets/masks/weldingMask/weldingMask_512x512.png";
-import weldingMask_32x32 from "../../../../../public/2DAssets/masks/weldingMask/weldingMask_32x32.png";
-import weldingMask_off_512x512 from "../../../../../public/2DAssets/masks/weldingMask/weldingMask_off_512x512.png";
-import weldingMask_off_32x32 from "../../../../../public/2DAssets/masks/weldingMask/weldingMask_off_32x32.png";
-import woodlandMask_512x512 from "../../../../../public/2DAssets/masks/woodlandMask/woodlandMask_512x512.png";
-import woodlandMask_32x32 from "../../../../../public/2DAssets/masks/woodlandMask/woodlandMask_32x32.png";
-import woodlandMask_off_512x512 from "../../../../../public/2DAssets/masks/woodlandMask/woodlandMask_off_512x512.png";
-import woodlandMask_off_32x32 from "../../../../../public/2DAssets/masks/woodlandMask/woodlandMask_off_32x32.png";
-import woodPaintedMask_512x512 from "../../../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_512x512.png";
-import woodPaintedMask_32x32 from "../../../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_32x32.png";
-import woodPaintedMask_off_512x512 from "../../../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_off_512x512.png";
-import woodPaintedMask_off_32x32 from "../../../../../public/2DAssets/masks/woodPaintedMask/woodPaintedMask_off_32x32.png";
-import zombieMask_512x512 from "../../../../../public/2DAssets/masks/zombieMask/zombieMask_512x512.png";
-import zombieMask_32x32 from "../../../../../public/2DAssets/masks/zombieMask/zombieMask_32x32.png";
-import zombieMask_off_512x512 from "../../../../../public/2DAssets/masks/zombieMask/zombieMask_off_512x512.png";
-import zombieMask_off_32x32 from "../../../../../public/2DAssets/masks/zombieMask/zombieMask_off_32x32.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const baseMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/baseMask/baseMask_512x512.png";
+const baseMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/baseMask/baseMask_32x32.png";
+const baseMaskIcon =
+  nginxAssetSeverBaseUrl + "svgs/visualEffects/masks/baseMask/baseMaskIcon.svg";
+const baseMaskOffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/masks/baseMask/baseMaskOffIcon.svg";
+const alienMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/alienMask/alienMask_512x512.png";
+const alienMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/alienMask/alienMask_32x32.png";
+const alienMask_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/alienMask/alienMask_off_512x512.png";
+const alienMask_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/alienMask/alienMask_off_32x32.png";
+const clownMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/clownMask/clownMask_512x512.png";
+const clownMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/clownMask/clownMask_32x32.png";
+const clownMask_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/clownMask/clownMask_off_512x512.png";
+const clownMask_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/clownMask/clownMask_off_32x32.png";
+const creatureMask_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/creatureMask/creatureMask_512x512.png";
+const creatureMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/creatureMask/creatureMask_32x32.png";
+const creatureMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/creatureMask/creatureMask_off_512x512.png";
+const creatureMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/creatureMask/creatureMask_off_32x32.png";
+const cyberMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/cyberMask/cyberMask_512x512.png";
+const cyberMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/cyberMask/cyberMask_32x32.png";
+const cyberMask_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/cyberMask/cyberMask_off_512x512.png";
+const cyberMask_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/cyberMask/cyberMask_off_32x32.png";
+const darkKnightMask_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/darkKnightMask/darkKnightMask_512x512.png";
+const darkKnightMask_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/darkKnightMask/darkKnightMask_32x32.png";
+const darkKnightMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/darkKnightMask/darkKnightMask_off_512x512.png";
+const darkKnightMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/darkKnightMask/darkKnightMask_off_32x32.png";
+const demonMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/demonMask/demonMask_512x512.png";
+const demonMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/demonMask/demonMask_32x32.png";
+const demonMask_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/demonMask/demonMask_off_512x512.png";
+const demonMask_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/demonMask/demonMask_off_32x32.png";
+const gasMask1_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask1/gasMask1_512x512.png";
+const gasMask1_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask1/gasMask1_32x32.png";
+const gasMask1_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask1/gasMask1_off_512x512.png";
+const gasMask1_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask1/gasMask1_off_32x32.png";
+const gasMask2_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask2/gasMask2_512x512.png";
+const gasMask2_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask2/gasMask2_32x32.png";
+const gasMask2_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask2/gasMask2_off_512x512.png";
+const gasMask2_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask2/gasMask2_off_32x32.png";
+const gasMask3_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask3/gasMask3_512x512.png";
+const gasMask3_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask3/gasMask3_32x32.png";
+const gasMask3_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask3/gasMask3_off_512x512.png";
+const gasMask3_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask3/gasMask3_off_32x32.png";
+const gasMask4_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask4/gasMask4_512x512.png";
+const gasMask4_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask4/gasMask4_32x32.png";
+const gasMask4_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask4/gasMask4_off_512x512.png";
+const gasMask4_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask4/gasMask4_off_32x32.png";
+const masqueradeMask_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/masqueradeMask/masqueradeMask_512x512.png";
+const masqueradeMask_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/masqueradeMask/masqueradeMask_32x32.png";
+const masqueradeMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/masqueradeMask/masqueradeMask_off_512x512.png";
+const masqueradeMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/masqueradeMask/masqueradeMask_off_32x32.png";
+const metalManMask_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/metalManMask/metalManMask_512x512.png";
+const metalManMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/metalManMask/metalManMask_32x32.png";
+const metalManMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/metalManMask/metalManMask_off_512x512.png";
+const metalManMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/metalManMask/metalManMask_off_32x32.png";
+const oniMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/oniMask/oniMask_512x512.png";
+const oniMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/oniMask/oniMask_32x32.png";
+const oniMask_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/oniMask/oniMask_off_512x512.png";
+const oniMask_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/oniMask/oniMask_off_32x32.png";
+const plagueDoctorMask_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/plagueDoctorMask/plagueDoctorMask_512x512.png";
+const plagueDoctorMask_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/plagueDoctorMask/plagueDoctorMask_32x32.png";
+const plagueDoctorMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/plagueDoctorMask/plagueDoctorMask_off_512x512.png";
+const plagueDoctorMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/plagueDoctorMask/plagueDoctorMask_off_32x32.png";
+const sixEyesMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/sixEyesMask/sixEyesMask_512x512.png";
+const sixEyesMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/sixEyesMask/sixEyesMask_32x32.png";
+const sixEyesMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/sixEyesMask/sixEyesMask_off_512x512.png";
+const sixEyesMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/sixEyesMask/sixEyesMask_off_32x32.png";
+const tenguMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/tenguMask/tenguMask_512x512.png";
+const tenguMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/tenguMask/tenguMask_32x32.png";
+const tenguMask_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/tenguMask/tenguMask_off_512x512.png";
+const tenguMask_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/tenguMask/tenguMask_off_32x32.png";
+const threeFaceMask_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/threeFaceMask/threeFaceMask_512x512.png";
+const threeFaceMask_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/threeFaceMask/threeFaceMask_32x32.png";
+const threeFaceMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/threeFaceMask/threeFaceMask_off_512x512.png";
+const threeFaceMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/threeFaceMask/threeFaceMask_off_32x32.png";
+const weldingMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/weldingMask/weldingMask_512x512.png";
+const weldingMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/weldingMask/weldingMask_32x32.png";
+const weldingMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/weldingMask/weldingMask_off_512x512.png";
+const weldingMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/weldingMask/weldingMask_off_32x32.png";
+const woodlandMask_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/woodlandMask/woodlandMask_512x512.png";
+const woodlandMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/woodlandMask/woodlandMask_32x32.png";
+const woodlandMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/woodlandMask/woodlandMask_off_512x512.png";
+const woodlandMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/woodlandMask/woodlandMask_off_32x32.png";
+const woodPaintedMask_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/woodPaintedMask/woodPaintedMask_512x512.png";
+const woodPaintedMask_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/woodPaintedMask/woodPaintedMask_32x32.png";
+const woodPaintedMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/woodPaintedMask/woodPaintedMask_off_512x512.png";
+const woodPaintedMask_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/woodPaintedMask/woodPaintedMask_off_32x32.png";
+const zombieMask_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/zombieMask/zombieMask_512x512.png";
+const zombieMask_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/zombieMask/zombieMask_32x32.png";
+const zombieMask_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/masks/zombieMask/zombieMask_off_512x512.png";
+const zombieMask_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/masks/zombieMask/zombieMask_off_32x32.png";
 
 const masksLabels: {
   [masksEffectType in MasksEffectTypes]: string;

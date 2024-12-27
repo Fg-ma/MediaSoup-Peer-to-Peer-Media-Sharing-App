@@ -10,50 +10,132 @@ import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import disguiseMustache_512x512 from "../../../../../public/2DAssets/mustaches/disguiseMustache/disguiseMustache_512x512.png";
-import disguiseMustache_32x32 from "../../../../../public/2DAssets/mustaches/disguiseMustache/disguiseMustache_32x32.png";
-import disguiseMustacheIcon from "../../../../../public/svgs/visualEffects/mustaches/disguiseMustache/disguiseMustacheIcon.svg";
-import disguiseMustacheOffIcon from "../../../../../public/svgs/visualEffects/mustaches/disguiseMustache/disguiseMustacheOffIcon.svg";
-import fullMustache_512x512 from "../../../../../public/2DAssets/mustaches/fullMustache/fullMustache_512x512.png";
-import fullMustache_32x32 from "../../../../../public/2DAssets/mustaches/fullMustache/fullMustache_32x32.png";
-import fullMustache_off_512x512 from "../../../../../public/2DAssets/mustaches/fullMustache/fullMustache_off_512x512.png";
-import fullMustache_off_32x32 from "../../../../../public/2DAssets/mustaches/fullMustache/fullMustache_off_32x32.png";
-import mustache1_512x512 from "../../../../../public/2DAssets/mustaches/mustache1/mustache1_512x512.png";
-import mustache1_32x32 from "../../../../../public/2DAssets/mustaches/mustache1/mustache1_32x32.png";
-import mustache1Icon from "../../../../../public/svgs/visualEffects/mustaches/mustache1/mustache1Icon.svg";
-import mustache1OffIcon from "../../../../../public/svgs/visualEffects/mustaches/mustache1/mustache1OffIcon.svg";
-import mustache2_512x512 from "../../../../../public/2DAssets/mustaches/mustache2/mustache2_512x512.png";
-import mustache2_32x32 from "../../../../../public/2DAssets/mustaches/mustache2/mustache2_32x32.png";
-import mustache2Icon from "../../../../../public/svgs/visualEffects/mustaches/mustache2/mustache2Icon.svg";
-import mustache2OffIcon from "../../../../../public/svgs/visualEffects/mustaches/mustache2/mustache2OffIcon.svg";
-import mustache3_512x512 from "../../../../../public/2DAssets/mustaches/mustache3/mustache3_512x512.png";
-import mustache3_32x32 from "../../../../../public/2DAssets/mustaches/mustache3/mustache3_32x32.png";
-import mustache3Icon from "../../../../../public/svgs/visualEffects/mustaches/mustache3/mustache3Icon.svg";
-import mustache3OffIcon from "../../../../../public/svgs/visualEffects/mustaches/mustache3/mustache3OffIcon.svg";
-import mustache4_512x512 from "../../../../../public/2DAssets/mustaches/mustache4/mustache4_512x512.png";
-import mustache4_32x32 from "../../../../../public/2DAssets/mustaches/mustache4/mustache4_32x32.png";
-import mustache4Icon from "../../../../../public/svgs/visualEffects/mustaches/mustache4/mustache4Icon.svg";
-import mustache4OffIcon from "../../../../../public/svgs/visualEffects/mustaches/mustache4/mustache4OffIcon.svg";
-import nicodemusMustache_512x512 from "../../../../../public/2DAssets/mustaches/nicodemusMustache/nicodemusMustache_512x512.png";
-import nicodemusMustache_32x32 from "../../../../../public/2DAssets/mustaches/nicodemusMustache/nicodemusMustache_32x32.png";
-import nicodemusMustache_off_512x512 from "../../../../../public/2DAssets/mustaches/nicodemusMustache/nicodemusMustache_off_512x512.png";
-import nicodemusMustache_off_32x32 from "../../../../../public/2DAssets/mustaches/nicodemusMustache/nicodemusMustache_off_32x32.png";
-import pencilMustache_512x512 from "../../../../../public/2DAssets/mustaches/pencilMustache/pencilMustache_512x512.png";
-import pencilMustache_32x32 from "../../../../../public/2DAssets/mustaches/pencilMustache/pencilMustache_32x32.png";
-import pencilMustache_off_512x512 from "../../../../../public/2DAssets/mustaches/pencilMustache/pencilMustache_off_512x512.png";
-import pencilMustache_off_32x32 from "../../../../../public/2DAssets/mustaches/pencilMustache/pencilMustache_off_32x32.png";
-import spongebobMustache_512x512 from "../../../../../public/2DAssets/mustaches/spongebobMustache/spongebobMustache_512x512.png";
-import spongebobMustache_32x32 from "../../../../../public/2DAssets/mustaches/spongebobMustache/spongebobMustache_32x32.png";
-import spongebobMustache_off_512x512 from "../../../../../public/2DAssets/mustaches/spongebobMustache/spongebobMustache_off_512x512.png";
-import spongebobMustache_off_32x32 from "../../../../../public/2DAssets/mustaches/spongebobMustache/spongebobMustache_off_32x32.png";
-import tinyMustache_512x512 from "../../../../../public/2DAssets/mustaches/tinyMustache/tinyMustache_512x512.png";
-import tinyMustache_32x32 from "../../../../../public/2DAssets/mustaches/tinyMustache/tinyMustache_32x32.png";
-import tinyMustache_off_512x512 from "../../../../../public/2DAssets/mustaches/tinyMustache/tinyMustache_off_512x512.png";
-import tinyMustache_off_32x32 from "../../../../../public/2DAssets/mustaches/tinyMustache/tinyMustache_off_32x32.png";
-import wingedMustache_512x512 from "../../../../../public/2DAssets/mustaches/wingedMustache/wingedMustache_512x512.png";
-import wingedMustache_32x32 from "../../../../../public/2DAssets/mustaches/wingedMustache/wingedMustache_32x32.png";
-import wingedMustache_off_512x512 from "../../../../../public/2DAssets/mustaches/wingedMustache/wingedMustache_off_512x512.png";
-import wingedMustache_off_32x32 from "../../../../../public/2DAssets/mustaches/wingedMustache/wingedMustache_off_32x32.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const disguiseMustache_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/disguiseMustache/disguiseMustache_512x512.png";
+const disguiseMustache_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/disguiseMustache/disguiseMustache_32x32.png";
+const disguiseMustacheIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/disguiseMustache/disguiseMustacheIcon.svg";
+const disguiseMustacheOffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/disguiseMustache/disguiseMustacheOffIcon.svg";
+const fullMustache_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/fullMustache/fullMustache_512x512.png";
+const fullMustache_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/fullMustache/fullMustache_32x32.png";
+const fullMustache_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/fullMustache/fullMustache_off_512x512.png";
+const fullMustache_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/fullMustache/fullMustache_off_32x32.png";
+const mustache1_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache1/mustache1_512x512.png";
+const mustache1_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache1/mustache1_32x32.png";
+const mustache1Icon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/mustache1/mustache1Icon.svg";
+const mustache1OffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/mustache1/mustache1OffIcon.svg";
+const mustache2_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache2/mustache2_512x512.png";
+const mustache2_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache2/mustache2_32x32.png";
+const mustache2Icon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/mustache2/mustache2Icon.svg";
+const mustache2OffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/mustache2/mustache2OffIcon.svg";
+const mustache3_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache3/mustache3_512x512.png";
+const mustache3_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache3/mustache3_32x32.png";
+const mustache3Icon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/mustache3/mustache3Icon.svg";
+const mustache3OffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/mustache3/mustache3OffIcon.svg";
+const mustache4_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache4/mustache4_512x512.png";
+const mustache4_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache4/mustache4_32x32.png";
+const mustache4Icon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/mustache4/mustache4Icon.svg";
+const mustache4OffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/mustaches/mustache4/mustache4OffIcon.svg";
+const nicodemusMustache_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/nicodemusMustache/nicodemusMustache_512x512.png";
+const nicodemusMustache_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/nicodemusMustache/nicodemusMustache_32x32.png";
+const nicodemusMustache_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/nicodemusMustache/nicodemusMustache_off_512x512.png";
+const nicodemusMustache_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/nicodemusMustache/nicodemusMustache_off_32x32.png";
+const pencilMustache_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/pencilMustache/pencilMustache_512x512.png";
+const pencilMustache_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/pencilMustache/pencilMustache_32x32.png";
+const pencilMustache_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/pencilMustache/pencilMustache_off_512x512.png";
+const pencilMustache_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/pencilMustache/pencilMustache_off_32x32.png";
+const spongebobMustache_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/spongebobMustache/spongebobMustache_512x512.png";
+const spongebobMustache_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/spongebobMustache/spongebobMustache_32x32.png";
+const spongebobMustache_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/spongebobMustache/spongebobMustache_off_512x512.png";
+const spongebobMustache_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/spongebobMustache/spongebobMustache_off_32x32.png";
+const tinyMustache_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/tinyMustache/tinyMustache_512x512.png";
+const tinyMustache_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/tinyMustache/tinyMustache_32x32.png";
+const tinyMustache_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/tinyMustache/tinyMustache_off_512x512.png";
+const tinyMustache_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/tinyMustache/tinyMustache_off_32x32.png";
+const wingedMustache_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/wingedMustache/wingedMustache_512x512.png";
+const wingedMustache_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/wingedMustache/wingedMustache_32x32.png";
+const wingedMustache_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/wingedMustache/wingedMustache_off_512x512.png";
+const wingedMustache_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/mustaches/wingedMustache/wingedMustache_off_32x32.png";
 
 const mustachesLabels: {
   [beardsEffectType in MustachesEffectTypes]: string;

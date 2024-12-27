@@ -14,57 +14,117 @@ import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandar
 
 const ColorPicker = React.lazy(() => import("./ColorPicker"));
 
-import hideBackgroundIcon from "../../../../../public/svgs/visualEffects/hideBackgroundIcon.svg";
-import hideBackgroundOffIcon from "../../../../../public/svgs/visualEffects/hideBackgroundOffIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-import beachBackground from "../../../../../public/videoBackgrounds/beach_640x427.jpg";
-import beachBackgroundSmall from "../../../../../public/videoBackgrounds/beach_64x43.jpg";
-import brickWallBackground from "../../../../../public/videoBackgrounds/brickWall_640x427.jpg";
-import brickWallBackgroundSmall from "../../../../../public/videoBackgrounds/brickWall_64x43.jpg";
-import butterfliesBackground from "../../../../../public/videoBackgrounds/butterflies_640x360.jpg";
-import butterfliesBackgroundSmall from "../../../../../public/videoBackgrounds/butterflies_64x36.jpg";
-import cafeBackground from "../../../../../public/videoBackgrounds/cafe_427x640.jpg";
-import cafeBackgroundSmall from "../../../../../public/videoBackgrounds/cafe_43x64.jpg";
-import chalkBoardBackground from "../../../../../public/videoBackgrounds/chalkBoard_640x427.jpg";
-import chalkBoardBackgroundSmall from "../../../../../public/videoBackgrounds/chalkBoard_64x43.jpg";
-import citySkylineBackground from "../../../../../public/videoBackgrounds/citySkyline_640x331.jpg";
-import citySkylineBackgroundSmall from "../../../../../public/videoBackgrounds/citySkyline_64x33.jpg";
-import cliffPalaceBackground from "../../../../../public/videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_608x750.jpg";
-import cliffPalaceBackgroundSmall from "../../../../../public/videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_52x64.jpg";
-import eveningMcDonaldLakeBackground from "../../../../../public/videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_750x569.jpg";
-import eveningMcDonaldLakeBackgroundSmall from "../../../../../public/videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_64x49.jpg";
-import forestBackground from "../../../../../public/videoBackgrounds/forest_640x427.jpg";
-import forestBackgroundSmall from "../../../../../public/videoBackgrounds/forest_64x43.jpg";
-import halfDomeAppleOrchardBackground from "../../../../../public/videoBackgrounds/halfDomeAppleOrchardYosemiteCaliforniaByAnselAdams_750x575.jpg";
-import halfDomeAppleOrchardBackgroundSmall from "../../../../../public/videoBackgrounds/halfDomeAppleOrchardYosemiteCaliforniaByAnselAdams_64x49.jpg";
-import lakeBackground from "../../../../../public/videoBackgrounds/lake_640x457.jpg";
-import lakeBackgroundSmall from "../../../../../public/videoBackgrounds/lake_64x46.jpg";
-import libraryBackground from "../../../../../public/videoBackgrounds/library_640x427.jpg";
-import libraryBackgroundSmall from "../../../../../public/videoBackgrounds/library_64x43.jpg";
-import milkyWayBackground from "../../../../../public/videoBackgrounds/milkyWay_640x349.jpg";
-import milkyWayBackgroundSmall from "../../../../../public/videoBackgrounds/milkyWay_64x35.jpg";
-import mountainsBackground from "../../../../../public/videoBackgrounds/mountains_640x425.jpg";
-import mountainsBackgroundSmall from "../../../../../public/videoBackgrounds/mountains_64x43.jpg";
-import oceanBackground from "../../../../../public/videoBackgrounds/ocean_640x427.jpg";
-import oceanBackgroundSmall from "../../../../../public/videoBackgrounds/ocean_64x43.jpg";
-import oldFaithfulGeyserBackground from "../../../../../public/videoBackgrounds/oldFaithfulGeyserYellowstoneNationalParkWyomingByAnselAdams_532x750.jpg";
-import oldFaithfulGeyserBackgroundSmall from "../../../../../public/videoBackgrounds/oldFaithfulGeyserYellowstoneNationalParkWyomingByAnselAdams_45x64.jpg";
-import railroadBackground from "../../../../../public/videoBackgrounds/railroad_640x414.jpg";
-import railroadBackgroundSmall from "../../../../../public/videoBackgrounds/railroad_64x41.jpg";
-import rollingHillsBackground from "../../../../../public/videoBackgrounds/rollingHills_640x417.jpg";
-import rollingHillsBackgroundSmall from "../../../../../public/videoBackgrounds/rollingHills_64x42.jpg";
-import seaSideHousesBackground from "../../../../../public/videoBackgrounds/seaSideHouses_640x390.jpg";
-import seaSideHousesBackgroundSmall from "../../../../../public/videoBackgrounds/seaSideHouses_64x39.jpg";
-import snowCoveredMoutainsBackground from "../../../../../public/videoBackgrounds/snowCoveredMoutains_640x360.jpg";
-import snowCoveredMoutainsBackgroundSmall from "../../../../../public/videoBackgrounds/snowCoveredMoutains_64x36.jpg";
-import sunflowersBackground from "../../../../../public/videoBackgrounds/sunflowers_640x427.jpg";
-import sunflowersBackgroundSmall from "../../../../../public/videoBackgrounds/sunflowers_64x43.jpg";
-import sunsetBackground from "../../../../../public/videoBackgrounds/sunset_640x427.jpg";
-import sunsetBackgroundSmall from "../../../../../public/videoBackgrounds/sunset_64x43.jpg";
-import treesBackground from "../../../../../public/videoBackgrounds/trees_640x426.jpg";
-import treesBackgroundSmall from "../../../../../public/videoBackgrounds/trees_64x43.jpg";
-import windingRoadBackground from "../../../../../public/videoBackgrounds/windingRoad_640x427.jpg";
-import windingRoadBackgroundSmall from "../../../../../public/videoBackgrounds/windingRoad_64x43.jpg";
+const hideBackgroundIcon =
+  nginxAssetSeverBaseUrl + "svgs/visualEffects/hideBackgroundIcon.svg";
+const hideBackgroundOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/visualEffects/hideBackgroundOffIcon.svg";
+
+const beachBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/beach_640x427.jpg";
+const beachBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/beach_64x43.jpg";
+const brickWallBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/brickWall_640x427.jpg";
+const brickWallBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/brickWall_64x43.jpg";
+const butterfliesBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/butterflies_640x360.jpg";
+const butterfliesBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/butterflies_64x36.jpg";
+const cafeBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/cafe_427x640.jpg";
+const cafeBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/cafe_43x64.jpg";
+const chalkBoardBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/chalkBoard_640x427.jpg";
+const chalkBoardBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/chalkBoard_64x43.jpg";
+const citySkylineBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/citySkyline_640x331.jpg";
+const citySkylineBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/citySkyline_64x33.jpg";
+const cliffPalaceBackground =
+  nginxAssetSeverBaseUrl +
+  "videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_608x750.jpg";
+const cliffPalaceBackgroundSmall =
+  nginxAssetSeverBaseUrl +
+  "videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_52x64.jpg";
+const eveningMcDonaldLakeBackground =
+  nginxAssetSeverBaseUrl +
+  "videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_750x569.jpg";
+const eveningMcDonaldLakeBackgroundSmall =
+  nginxAssetSeverBaseUrl +
+  "videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_64x49.jpg";
+const forestBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/forest_640x427.jpg";
+const forestBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/forest_64x43.jpg";
+const halfDomeAppleOrchardBackground =
+  nginxAssetSeverBaseUrl +
+  "videoBackgrounds/halfDomeAppleOrchardYosemiteCaliforniaByAnselAdams_750x575.jpg";
+const halfDomeAppleOrchardBackgroundSmall =
+  nginxAssetSeverBaseUrl +
+  "videoBackgrounds/halfDomeAppleOrchardYosemiteCaliforniaByAnselAdams_64x49.jpg";
+const lakeBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/lake_640x457.jpg";
+const lakeBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/lake_64x46.jpg";
+const libraryBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/library_640x427.jpg";
+const libraryBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/library_64x43.jpg";
+const milkyWayBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/milkyWay_640x349.jpg";
+const milkyWayBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/milkyWay_64x35.jpg";
+const mountainsBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/mountains_640x425.jpg";
+const mountainsBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/mountains_64x43.jpg";
+const oceanBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/ocean_640x427.jpg";
+const oceanBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/ocean_64x43.jpg";
+const oldFaithfulGeyserBackground =
+  nginxAssetSeverBaseUrl +
+  "videoBackgrounds/oldFaithfulGeyserYellowstoneNationalParkWyomingByAnselAdams_532x750.jpg";
+const oldFaithfulGeyserBackgroundSmall =
+  nginxAssetSeverBaseUrl +
+  "videoBackgrounds/oldFaithfulGeyserYellowstoneNationalParkWyomingByAnselAdams_45x64.jpg";
+const railroadBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/railroad_640x414.jpg";
+const railroadBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/railroad_64x41.jpg";
+const rollingHillsBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/rollingHills_640x417.jpg";
+const rollingHillsBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/rollingHills_64x42.jpg";
+const seaSideHousesBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/seaSideHouses_640x390.jpg";
+const seaSideHousesBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/seaSideHouses_64x39.jpg";
+const snowCoveredMoutainsBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/snowCoveredMoutains_640x360.jpg";
+const snowCoveredMoutainsBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/snowCoveredMoutains_64x36.jpg";
+const sunflowersBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/sunflowers_640x427.jpg";
+const sunflowersBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/sunflowers_64x43.jpg";
+const sunsetBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/sunset_640x427.jpg";
+const sunsetBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/sunset_64x43.jpg";
+const treesBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/trees_640x426.jpg";
+const treesBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/trees_64x43.jpg";
+const windingRoadBackground =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/windingRoad_640x427.jpg";
+const windingRoadBackgroundSmall =
+  nginxAssetSeverBaseUrl + "videoBackgrounds/windingRoad_64x43.jpg";
 
 const hideBackgroundLabels: {
   [hideBackgroundEffectType in HideBackgroundEffectTypes]: string;

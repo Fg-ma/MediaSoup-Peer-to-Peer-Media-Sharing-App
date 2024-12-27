@@ -283,7 +283,7 @@ export default function Main() {
   const tableTopRef = useRef<HTMLDivElement>(null);
 
   const [gridActive, setGridActive] = useState(false);
-  const [gridSize, setGridSize] = useState({ rows: 0, cols: 0 });
+  const [gridSize, setGridSize] = useState({ rows: 15, cols: 15 });
 
   const muteAudio = () => {
     setMutedAudio((prev) => !prev);

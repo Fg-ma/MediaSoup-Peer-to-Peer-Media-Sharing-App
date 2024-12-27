@@ -427,6 +427,8 @@ export type FgSamplersType = {
   };
 };
 
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
 const fgSamplers: FgSamplersType = {
   pianos: {
     default: {
@@ -490,7 +492,7 @@ const fgSamplers: FgSamplersType = {
           A4: "A4.wav",
         },
         release: 1,
-        baseUrl: "/audioSamples/pianos/ac1/",
+        baseUrl: nginxAssetSeverBaseUrl + "audioSamples/pianos/ac1/",
       },
       label: "AC 1",
       playOnlyDefined: false,

@@ -5,8 +5,12 @@ import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStan
 import { FgBackground, categories } from "./lib/typeConstant";
 import BackgroundSelectorPanel from "./lib/BackgroundSelectorPanel";
 
-import chooseBackgroundIcon from "../../../public/svgs/chooseBackgroundIcon.svg";
-import chooseBackgroundOffIcon from "../../../public/svgs/chooseBackgroundOffIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const chooseBackgroundIcon =
+  nginxAssetSeverBaseUrl + "svgs/chooseBackgroundIcon.svg";
+const chooseBackgroundOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/chooseBackgroundOffIcon.svg";
 
 export default function FgBackgroundSelector({
   backgroundRef,

@@ -3,11 +3,14 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSelectionButton from "../../fgElements/fgSelectionButton/FgSelectionButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
-import { navTransition, navVar } from "./SamplerToolbar";
-import navigateForward from "../../../public/svgs/navigateForward.svg";
-import navigateBack from "../../../public/svgs/navigateBack.svg";
 import FgPortal from "../../fgElements/fgPortal/FgPortal";
-import { FgSamplers } from "src/audioEffects/fgSamplers";
+import { navTransition, navVar } from "./SamplerToolbar";
+import { FgSamplers } from "../../audioEffects/fgSamplers";
+
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const navigateForward = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
+const navigateBack = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
 
 const notes = [
   "C0",

@@ -16,7 +16,9 @@ import {
 import FgSVG from "../fgElements/fgSVG/FgSVG";
 import FgTriToggleButton from "../fgElements/fgTriToggleButton/FgTriToggleButton";
 
-import additionIcon from "../../public/svgs/additionIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
 
 export default function FgSoundBoard({
   soundBoardButtonRef,

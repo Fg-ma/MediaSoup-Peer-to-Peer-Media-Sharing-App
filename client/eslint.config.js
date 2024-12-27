@@ -26,4 +26,12 @@ export default [
       ],
     },
   },
+  {
+    env: {
+      node: true,
+    },
+    globals: {
+      process: "readonly",
+    },
+  },
 ];

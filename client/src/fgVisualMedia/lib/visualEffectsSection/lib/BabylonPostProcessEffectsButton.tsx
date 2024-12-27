@@ -11,38 +11,70 @@ import {
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import prismaColors from "../../../../../public/2DAssets/postProcess/prismaColors_512x512.jpg";
-import prismaColorsSmall from "../../../../../public/2DAssets/postProcess/prismaColors_32x32.jpg";
-import blackAndWhite from "../../../../../public/2DAssets/postProcess/blackAndWhite_256x256.jpg";
-import blackAndWhiteSmall from "../../../../../public/2DAssets/postProcess/blackAndWhite_32x32.jpg";
-import bubbleChromatic from "../../../../../public/2DAssets/postProcess/bubbleChromatic_850x850.jpg";
-import bubbleChromaticSmall from "../../../../../public/2DAssets/postProcess/bubbleChromatic_32x32.jpg";
-import fisheye from "../../../../../public/2DAssets/postProcess/fisheye_512x512.jpg";
-import fisheyeSmall from "../../../../../public/2DAssets/postProcess/fisheye_32x32.jpg";
-import nightVision from "../../../../../public/2DAssets/postProcess/nightVision_512x512.jpg";
-import nightVisionSmall from "../../../../../public/2DAssets/postProcess/nightVision_32x32.jpg";
-import vintageTV from "../../../../../public/2DAssets/postProcess/vintageTV_512x512.jpg";
-import vintageTVSmall from "../../../../../public/2DAssets/postProcess/vintageTV_32x32.jpg";
-import motionblur from "../../../../../public/2DAssets/postProcess/motionBlur_512x512.jpg";
-import motionblurSmall from "../../../../../public/2DAssets/postProcess/motionBlur_32x32.jpg";
-import pixelation from "../../../../../public/2DAssets/postProcess/pixelation_256x256.png";
-import pixelationSmall from "../../../../../public/2DAssets/postProcess/pixelation_32x32.png";
-import old from "../../../../../public/2DAssets/postProcess/old_512x512.jpg";
-import oldSmall from "../../../../../public/2DAssets/postProcess/old_32x32.jpg";
-import chromaticAberration from "../../../../../public/2DAssets/postProcess/chromaticAberration_512x512.jpg";
-import chromaticAberrationSmall from "../../../../../public/2DAssets/postProcess/chromaticAberration_32x32.jpg";
-import colorSplash from "../../../../../public/2DAssets/postProcess/colorSplash_850x850.jpg";
-import colorSplashSmall from "../../../../../public/2DAssets/postProcess/colorSplash_32x32.jpg";
-import tonemap from "../../../../../public/2DAssets/postProcess/tonemap_512x512.jpg";
-import tonemapSmall from "../../../../../public/2DAssets/postProcess/tonemap_32x32.jpg";
-import rays from "../../../../../public/2DAssets/postProcess/rays_512x512.jpg";
-import raysSmall from "../../../../../public/2DAssets/postProcess/rays_32x32.jpg";
-import sharpen from "../../../../../public/2DAssets/postProcess/sharpen_512x512.jpg";
-import sharpenSmall from "../../../../../public/2DAssets/postProcess/sharpen_32x32.jpg";
-import tiltShift from "../../../../../public/2DAssets/postProcess/tiltShift_512x512.jpg";
-import tiltShiftSmall from "../../../../../public/2DAssets/postProcess/tiltShift_32x32.jpg";
-import cartoon from "../../../../../public/2DAssets/postProcess/cartoon_512x512.png";
-import cartoonSmall from "../../../../../public/2DAssets/postProcess/cartoon_32x32.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const prismaColors =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/prismaColors_512x512.jpg";
+const prismaColorsSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/prismaColors_32x32.jpg";
+const blackAndWhite =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/blackAndWhite_256x256.jpg";
+const blackAndWhiteSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/blackAndWhite_32x32.jpg";
+const bubbleChromatic =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/bubbleChromatic_850x850.jpg";
+const bubbleChromaticSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/bubbleChromatic_32x32.jpg";
+const fisheye =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/fisheye_512x512.jpg";
+const fisheyeSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/fisheye_32x32.jpg";
+const nightVision =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/nightVision_512x512.jpg";
+const nightVisionSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/nightVision_32x32.jpg";
+const vintageTV =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/vintageTV_512x512.jpg";
+const vintageTVSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/vintageTV_32x32.jpg";
+const motionblur =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/motionBlur_512x512.jpg";
+const motionblurSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/motionBlur_32x32.jpg";
+const pixelation =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/pixelation_256x256.png";
+const pixelationSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/pixelation_32x32.png";
+const old = nginxAssetSeverBaseUrl + "2DAssets/postProcess/old_512x512.jpg";
+const oldSmall = nginxAssetSeverBaseUrl + "2DAssets/postProcess/old_32x32.jpg";
+const chromaticAberration =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/postProcess/chromaticAberration_512x512.jpg";
+const chromaticAberrationSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/chromaticAberration_32x32.jpg";
+const colorSplash =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/colorSplash_850x850.jpg";
+const colorSplashSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/colorSplash_32x32.jpg";
+const tonemap =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tonemap_512x512.jpg";
+const tonemapSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tonemap_32x32.jpg";
+const rays = nginxAssetSeverBaseUrl + "2DAssets/postProcess/rays_512x512.jpg";
+const raysSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/rays_32x32.jpg";
+const sharpen =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/sharpen_512x512.jpg";
+const sharpenSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/sharpen_32x32.jpg";
+const tiltShift =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tiltShift_512x512.jpg";
+const tiltShiftSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tiltShift_32x32.jpg";
+const cartoon =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/cartoon_512x512.png";
+const cartoonSmall =
+  nginxAssetSeverBaseUrl + "2DAssets/postProcess/cartoon_32x32.png";
 
 export default function BabylonPostProcessEffectsButton({
   username,

@@ -1,5 +1,7 @@
 node_modules
 
+.env
+
 /public/speechToTextModels/vosk-model-ar-mgb2-0.4.zip
 /public/speechToTextModels/vosk-model-en-us-0.22-lgraph.zip
 /public/speechToTextModels/vosk-model-small-ar-tn-0.1-linto.zip

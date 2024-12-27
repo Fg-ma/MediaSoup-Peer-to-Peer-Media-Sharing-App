@@ -10,18 +10,38 @@ import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import classicalCurlyBeard_512x512 from "../../../../../public/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_512x512.png";
-import classicalCurlyBeard_32x32 from "../../../../../public/2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_32x32.png";
-import classicalCurlyBeardIcon from "../../../../../public/svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardIcon.svg";
-import classicalCurlyBeardOffIcon from "../../../../../public/svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardOffIcon.svg";
-import chinBeard_512x512 from "../../../../../public/2DAssets/beards/chinBeard/chinBeard_512x512.png";
-import chinBeard_32x32 from "../../../../../public/2DAssets/beards/chinBeard/chinBeard_32x32.png";
-import chinBeard_off_512x512 from "../../../../../public/2DAssets/beards/chinBeard/chinBeard_off_512x512.png";
-import chinBeard_off_32x32 from "../../../../../public/2DAssets/beards/chinBeard/chinBeard_off_32x32.png";
-import fullBeard_512x512 from "../../../../../public/2DAssets/beards/fullBeard/fullBeard_512x512.png";
-import fullBeard_32x32 from "../../../../../public/2DAssets/beards/fullBeard/fullBeard_32x32.png";
-import fullBeard_off_512x512 from "../../../../../public/2DAssets/beards/fullBeard/fullBeard_off_512x512.png";
-import fullBeard_off_32x32 from "../../../../../public/2DAssets/beards/fullBeard/fullBeard_off_32x32.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const classicalCurlyBeard_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_512x512.png";
+const classicalCurlyBeard_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_32x32.png";
+const classicalCurlyBeardIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardIcon.svg";
+const classicalCurlyBeardOffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardOffIcon.svg";
+const chinBeard_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_512x512.png";
+const chinBeard_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_32x32.png";
+const chinBeard_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/beards/chinBeard/chinBeard_off_512x512.png";
+const chinBeard_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_off_32x32.png";
+const fullBeard_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_512x512.png";
+const fullBeard_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_32x32.png";
+const fullBeard_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/beards/fullBeard/fullBeard_off_512x512.png";
+const fullBeard_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_off_32x32.png";
 
 const beardsLabels: {
   [beardsEffectType in BeardsEffectTypes]: string;

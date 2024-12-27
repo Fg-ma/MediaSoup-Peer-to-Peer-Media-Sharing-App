@@ -8,7 +8,9 @@ import CaptionsController from "./lib/CaptionsController";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 import { Settings } from "../../../typeConstant";
 
-import captionsIcon from "../../../../../../public/svgs/captionsIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const captionsIcon = nginxAssetSeverBaseUrl + "svgs/captionsIcon.svg";
 
 const voskModels: { [model: string]: string } = {
   ar: "vosk-model-ar-mgb2-0.4.zip",

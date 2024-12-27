@@ -4,8 +4,10 @@ import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
-import effectIcon from "../../../../../../public/svgs/effectIcon.svg";
-import effectOffIcon from "../../../../../../public/svgs/effectOffIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const effectIcon = nginxAssetSeverBaseUrl + "svgs/effectIcon.svg";
+const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
 
 export default function VisualEffectsButton({
   fgLowerVisualMediaController,

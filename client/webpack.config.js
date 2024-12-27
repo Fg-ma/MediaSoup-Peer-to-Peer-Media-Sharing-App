@@ -1,10 +1,14 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
+import dotenv from "dotenv";
+import webpack from "webpack";
 
 // Get the current directory using import.meta.url
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+dotenv.config();
 
 export default {
   entry: "./index.tsx",
@@ -103,6 +107,9 @@ export default {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "public", "index.html"),
+    }),
+    new webpack.DefinePlugin({
+      "process.env": JSON.stringify(process.env),
     }),
   ],
 };

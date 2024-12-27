@@ -4,8 +4,10 @@ import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
-import playIcon from "../../../../../../public/svgs/playIcon.svg";
-import pauseIcon from "../../../../../../public/svgs/pauseIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const playIcon = nginxAssetSeverBaseUrl + "svgs/playIcon.svg";
+const pauseIcon = nginxAssetSeverBaseUrl + "svgs/pauseIcon.svg";
 
 export default function PlayPauseButton({
   fgLowerVisualMediaController,

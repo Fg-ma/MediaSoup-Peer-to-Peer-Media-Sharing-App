@@ -16,11 +16,15 @@ import {
 } from "./lib/typeConstant";
 import "./lib/snakeGame.css";
 
-import gameOverCard from "../../../public/snakeGameAssets/gameOverCard.jpg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-import snakeColorChangeIcon from "../../../public/svgs/games/snake/snakeColorChangeIcon.svg";
-import gridIcon from "../../../public/svgs/games/snake/gridIcon.svg";
-import gridOffIcon from "../../../public/svgs/games/snake/gridOffIcon.svg";
+const gameOverCard =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/gameOverCard.jpg";
+
+const snakeColorChangeIcon =
+  nginxAssetSeverBaseUrl + "svgs/games/snake/snakeColorChangeIcon.svg";
+const gridIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridIcon.svg";
+const gridOffIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridOffIcon.svg";
 
 function SnakeGame({
   table_id,
@@ -73,6 +77,11 @@ function SnakeGame({
 
   useEffect(() => {
     document.addEventListener("keydown", snakeGameController.handleKeyPress);
+
+    boardRef.current?.style.setProperty(
+      "--nginx-asset-server-base-url",
+      nginxAssetSeverBaseUrl ?? ""
+    );
 
     return () => {
       document.removeEventListener(

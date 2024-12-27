@@ -13,8 +13,10 @@ import {
 } from "../../../FgLowerVisualMediaControls";
 import { Settings } from "../../../../typeConstant";
 
-import navigateBackIcon from "../../../../../../../public/svgs/navigateBack.svg";
-import navigateForwardIcon from "../../../../../../../public/svgs/navigateForward.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
+const navigateForwardIcon = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
 
 export interface ClosedCaptionsOptions {
   fontFamily: FontFamilies;

@@ -8,8 +8,11 @@ import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import blurIcon from "../../../../../public/svgs/visualEffects/blurIcon.svg";
-import blurOffIcon from "../../../../../public/svgs/visualEffects/blurOffIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const blurIcon = nginxAssetSeverBaseUrl + "svgs/visualEffects/blurIcon.svg";
+const blurOffIcon =
+  nginxAssetSeverBaseUrl + "svgs/visualEffects/blurOffIcon.svg";
 
 export default function BlurButton({
   username,

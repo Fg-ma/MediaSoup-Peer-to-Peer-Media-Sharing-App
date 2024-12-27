@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import FgImage from "../../../../fgImage/FgImage";
 import "./gamePlayerIcon.css";
 
-import placeHolderImage_1280x1262 from "../../../../../../public/backgroundImages/space/apollo_1280x1262.png";
-import placeHolderImage_64x63 from "../../../../../../public/backgroundImages/space/apollo_64x63.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const placeHolderImage_1280x1262 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/apollo_1280x1262.png";
+const placeHolderImage_64x63 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/apollo_64x63.png";
 
 export default function GamePlayerIcon({
   primaryColor,

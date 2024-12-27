@@ -4,9 +4,11 @@ import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import TableGridSizePanel from "./lib/TableGridSizePanel";
 import "./lib/tableGridSection.css";
 
-import gridIcon from "../../../../public/svgs/games/snake/gridIcon.svg";
-import gridOffIcon from "../../../../public/svgs/games/snake/gridOffIcon.svg";
-import distanceIcon from "../../../../public/svgs/distanceIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const gridIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridIcon.svg";
+const gridOffIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridOffIcon.svg";
+const distanceIcon = nginxAssetSeverBaseUrl + "svgs/distanceIcon.svg";
 
 export default function TableGridSection({
   gridActive,

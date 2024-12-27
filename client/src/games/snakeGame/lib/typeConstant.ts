@@ -1,28 +1,55 @@
-import snakeHeadBlackPink from "../../../../public/snakeGameAssets/snake/snakeHeadBlackPink.png";
-import snakeHeadBlackYellow from "../../../../public/snakeGameAssets/snake/snakeHeadBlackYellow.png";
-import snakeHeadBlueBlue from "../../../../public/snakeGameAssets/snake/snakeHeadBlueBlue.png";
-import snakeHeadBlueGreen from "../../../../public/snakeGameAssets/snake/snakeHeadBlueGreen.png";
-import snakeHeadBlueOrange from "../../../../public/snakeGameAssets/snake/snakeHeadBlueOrange.png";
-import snakeHeadBluePurple from "../../../../public/snakeGameAssets/snake/snakeHeadBluePurple.png";
-import snakeHeadBlueRed from "../../../../public/snakeGameAssets/snake/snakeHeadBlueRed.png";
-import snakeHeadBlueWhite from "../../../../public/snakeGameAssets/snake/snakeHeadBlueWhite.png";
-import snakeHeadBlueYellow from "../../../../public/snakeGameAssets/snake/snakeHeadBlueYellow.png";
-import snakeHeadGreenGreen from "../../../../public/snakeGameAssets/snake/snakeHeadGreenGreen.png";
-import snakeHeadGreenPurple from "../../../../public/snakeGameAssets/snake/snakeHeadGreenPurple.png";
-import snakeHeadGreenWhite from "../../../../public/snakeGameAssets/snake/snakeHeadGreenWhite.png";
-import snakeHeadGreenYellow from "../../../../public/snakeGameAssets/snake/snakeHeadGreenYellow.png";
-import snakeHeadOrangeBlue from "../../../../public/snakeGameAssets/snake/snakeHeadOrangeBlue.png";
-import snakeHeadOrangePink from "../../../../public/snakeGameAssets/snake/snakeHeadOrangePink.png";
-import snakeHeadOrangePurple from "../../../../public/snakeGameAssets/snake/snakeHeadOrangePurple.png";
-import snakeHeadOrangeRed from "../../../../public/snakeGameAssets/snake/snakeHeadOrangeRed.png";
-import snakeHeadPinkGreen from "../../../../public/snakeGameAssets/snake/snakeHeadPinkGreen.png";
-import snakeHeadPinkOrange from "../../../../public/snakeGameAssets/snake/snakeHeadPinkOrange.png";
-import snakeHeadPinkPurple from "../../../../public/snakeGameAssets/snake/snakeHeadPinkPurple.png";
-import snakeHeadRedBlack from "../../../../public/snakeGameAssets/snake/snakeHeadRedBlack.png";
-import snakeHeadRedYellow from "../../../../public/snakeGameAssets/snake/snakeHeadRedYellow.png";
-import snakeHeadWhiteAqua from "../../../../public/snakeGameAssets/snake/snakeHeadWhiteAqua.png";
-import snakeHeadWhiteRed from "../../../../public/snakeGameAssets/snake/snakeHeadWhiteRed.png";
-import snakeHeadWhiteYellow from "../../../../public/snakeGameAssets/snake/snakeHeadWhiteYellow.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const snakeHeadBlackPink =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlackPink.png";
+const snakeHeadBlackYellow =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlackYellow.png";
+const snakeHeadBlueBlue =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueBlue.png";
+const snakeHeadBlueGreen =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueGreen.png";
+const snakeHeadBlueOrange =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueOrange.png";
+const snakeHeadBluePurple =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBluePurple.png";
+const snakeHeadBlueRed =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueRed.png";
+const snakeHeadBlueWhite =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueWhite.png";
+const snakeHeadBlueYellow =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueYellow.png";
+const snakeHeadGreenGreen =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadGreenGreen.png";
+const snakeHeadGreenPurple =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadGreenPurple.png";
+const snakeHeadGreenWhite =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadGreenWhite.png";
+const snakeHeadGreenYellow =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadGreenYellow.png";
+const snakeHeadOrangeBlue =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadOrangeBlue.png";
+const snakeHeadOrangePink =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadOrangePink.png";
+const snakeHeadOrangePurple =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadOrangePurple.png";
+const snakeHeadOrangeRed =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadOrangeRed.png";
+const snakeHeadPinkGreen =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadPinkGreen.png";
+const snakeHeadPinkOrange =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadPinkOrange.png";
+const snakeHeadPinkPurple =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadPinkPurple.png";
+const snakeHeadRedBlack =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadRedBlack.png";
+const snakeHeadRedYellow =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadRedYellow.png";
+const snakeHeadWhiteAqua =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteAqua.png";
+const snakeHeadWhiteRed =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteRed.png";
+const snakeHeadWhiteYellow =
+  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteYellow.png";
 
 export type SnakeColorsType =
   | {

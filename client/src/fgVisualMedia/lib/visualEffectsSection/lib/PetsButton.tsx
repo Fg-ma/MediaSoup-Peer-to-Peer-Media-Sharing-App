@@ -10,106 +10,227 @@ import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import angryHamster_512x512 from "../../../../../public/2DAssets/pets/angryHamster/angryHamster_512x512.png";
-import angryHamster_32x32 from "../../../../../public/2DAssets/pets/angryHamster/angryHamster_32x32.png";
-import angryHamster_off_512x512 from "../../../../../public/2DAssets/pets/angryHamster/angryHamster_off_512x512.png";
-import angryHamster_off_32x32 from "../../../../../public/2DAssets/pets/angryHamster/angryHamster_off_32x32.png";
-import axolotl_512x512 from "../../../../../public/2DAssets/pets/axolotl/axolotl_512x512.png";
-import axolotl_32x32 from "../../../../../public/2DAssets/pets/axolotl/axolotl_32x32.png";
-import axolotl_off_512x512 from "../../../../../public/2DAssets/pets/axolotl/axolotl_off_512x512.png";
-import axolotl_off_32x32 from "../../../../../public/2DAssets/pets/axolotl/axolotl_off_32x32.png";
-import babyDragon_512x512 from "../../../../../public/2DAssets/pets/babyDragon/babyDragon_512x512.png";
-import babyDragon_32x32 from "../../../../../public/2DAssets/pets/babyDragon/babyDragon_32x32.png";
-import babyDragon_off_512x512 from "../../../../../public/2DAssets/pets/babyDragon/babyDragon_off_512x512.png";
-import babyDragon_off_32x32 from "../../../../../public/2DAssets/pets/babyDragon/babyDragon_off_32x32.png";
-import beardedDragon_512x512 from "../../../../../public/2DAssets/pets/beardedDragon/beardedDragon_512x512.png";
-import beardedDragon_32x32 from "../../../../../public/2DAssets/pets/beardedDragon/beardedDragon_32x32.png";
-import beardedDragon_off_512x512 from "../../../../../public/2DAssets/pets/beardedDragon/beardedDragon_off_512x512.png";
-import beardedDragon_off_32x32 from "../../../../../public/2DAssets/pets/beardedDragon/beardedDragon_off_32x32.png";
-import bird1_512x512 from "../../../../../public/2DAssets/pets/bird1/bird1_512x512.png";
-import bird1_32x32 from "../../../../../public/2DAssets/pets/bird1/bird1_32x32.png";
-import bird1_off_512x512 from "../../../../../public/2DAssets/pets/bird1/bird1_off_512x512.png";
-import bird1_off_32x32 from "../../../../../public/2DAssets/pets/bird1/bird1_off_32x32.png";
-import bird2_512x512 from "../../../../../public/2DAssets/pets/bird2/bird2_512x512.png";
-import bird2_32x32 from "../../../../../public/2DAssets/pets/bird2/bird2_32x32.png";
-import bird2_off_512x512 from "../../../../../public/2DAssets/pets/bird2/bird2_off_512x512.png";
-import bird2_off_32x32 from "../../../../../public/2DAssets/pets/bird2/bird2_off_32x32.png";
-import boxer_512x512 from "../../../../../public/2DAssets/pets/boxer/boxer_512x512.png";
-import boxer_32x32 from "../../../../../public/2DAssets/pets/boxer/boxer_32x32.png";
-import boxer_off_512x512 from "../../../../../public/2DAssets/pets/boxer/boxer_off_512x512.png";
-import boxer_off_32x32 from "../../../../../public/2DAssets/pets/boxer/boxer_off_32x32.png";
-import brain_512x512 from "../../../../../public/2DAssets/pets/brain/brain_512x512.png";
-import brain_32x32 from "../../../../../public/2DAssets/pets/brain/brain_32x32.png";
-import brain_off_512x512 from "../../../../../public/2DAssets/pets/brain/brain_off_512x512.png";
-import brain_off_32x32 from "../../../../../public/2DAssets/pets/brain/brain_off_32x32.png";
-import buddyHamster_512x512 from "../../../../../public/2DAssets/pets/buddyHamster/buddyHamster_512x512.png";
-import buddyHamster_32x32 from "../../../../../public/2DAssets/pets/buddyHamster/buddyHamster_32x32.png";
-import buddyHamster_off_512x512 from "../../../../../public/2DAssets/pets/buddyHamster/buddyHamster_off_512x512.png";
-import buddyHamster_off_32x32 from "../../../../../public/2DAssets/pets/buddyHamster/buddyHamster_off_32x32.png";
-import cat1_512x512 from "../../../../../public/2DAssets/pets/cat1/cat1_512x512.png";
-import cat1_32x32 from "../../../../../public/2DAssets/pets/cat1/cat1_32x32.png";
-import cat1_off_512x512 from "../../../../../public/2DAssets/pets/cat1/cat1_off_512x512.png";
-import cat1_off_32x32 from "../../../../../public/2DAssets/pets/cat1/cat1_off_32x32.png";
-import cat2_512x512 from "../../../../../public/2DAssets/pets/cat2/cat2_512x512.png";
-import cat2_32x32 from "../../../../../public/2DAssets/pets/cat2/cat2_32x32.png";
-import cat2_off_512x512 from "../../../../../public/2DAssets/pets/cat2/cat2_off_512x512.png";
-import cat2_off_32x32 from "../../../../../public/2DAssets/pets/cat2/cat2_off_32x32.png";
-import dodoBird_512x512 from "../../../../../public/2DAssets/pets/dodoBird/dodoBird_512x512.png";
-import dodoBird_32x32 from "../../../../../public/2DAssets/pets/dodoBird/dodoBird_32x32.png";
-import dodoBird_off_512x512 from "../../../../../public/2DAssets/pets/dodoBird/dodoBird_off_512x512.png";
-import dodoBird_off_32x32 from "../../../../../public/2DAssets/pets/dodoBird/dodoBird_off_32x32.png";
-import happyHamster_512x512 from "../../../../../public/2DAssets/pets/happyHamster/happyHamster_512x512.png";
-import happyHamster_32x32 from "../../../../../public/2DAssets/pets/happyHamster/happyHamster_32x32.png";
-import happyHamster_off_512x512 from "../../../../../public/2DAssets/pets/happyHamster/happyHamster_off_512x512.png";
-import happyHamster_off_32x32 from "../../../../../public/2DAssets/pets/happyHamster/happyHamster_off_32x32.png";
-import mechanicalGrasshopper_512x512 from "../../../../../public/2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_512x512.png";
-import mechanicalGrasshopper_32x32 from "../../../../../public/2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_32x32.png";
-import mechanicalGrasshopper_off_512x512 from "../../../../../public/2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_off_512x512.png";
-import mechanicalGrasshopper_off_32x32 from "../../../../../public/2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_off_32x32.png";
-import panda1_512x512 from "../../../../../public/2DAssets/pets/panda1/panda1_512x512.png";
-import panda1_32x32 from "../../../../../public/2DAssets/pets/panda1/panda1_32x32.png";
-import panda1_off_512x512 from "../../../../../public/2DAssets/pets/panda1/panda1_off_512x512.png";
-import panda1_off_32x32 from "../../../../../public/2DAssets/pets/panda1/panda1_off_32x32.png";
-import panda2_512x512 from "../../../../../public/2DAssets/pets/panda2/panda2_512x512.png";
-import panda2_32x32 from "../../../../../public/2DAssets/pets/panda2/panda2_32x32.png";
-import panda2_off_512x512 from "../../../../../public/2DAssets/pets/panda2/panda2_off_512x512.png";
-import panda2_off_32x32 from "../../../../../public/2DAssets/pets/panda2/panda2_off_32x32.png";
-import petRock_512x512 from "../../../../../public/2DAssets/pets/petRock/petRock_512x512.png";
-import petRock_32x32 from "../../../../../public/2DAssets/pets/petRock/petRock_32x32.png";
-import petRock_off_512x512 from "../../../../../public/2DAssets/pets/petRock/petRock_off_512x512.png";
-import petRock_off_32x32 from "../../../../../public/2DAssets/pets/petRock/petRock_off_32x32.png";
-import pig_512x512 from "../../../../../public/2DAssets/pets/pig/pig_512x512.png";
-import pig_32x32 from "../../../../../public/2DAssets/pets/pig/pig_32x32.png";
-import pig_off_512x512 from "../../../../../public/2DAssets/pets/pig/pig_off_512x512.png";
-import pig_off_32x32 from "../../../../../public/2DAssets/pets/pig/pig_off_32x32.png";
-import redFox1_512x512 from "../../../../../public/2DAssets/pets/redFox1/redFox1_512x512.png";
-import redFox1_32x32 from "../../../../../public/2DAssets/pets/redFox1/redFox1_32x32.png";
-import redFox1_off_512x512 from "../../../../../public/2DAssets/pets/redFox1/redFox1_off_512x512.png";
-import redFox1_off_32x32 from "../../../../../public/2DAssets/pets/redFox1/redFox1_off_32x32.png";
-import redFox2_512x512 from "../../../../../public/2DAssets/pets/redFox2/redFox2_512x512.png";
-import redFox2_32x32 from "../../../../../public/2DAssets/pets/redFox2/redFox2_32x32.png";
-import redFox2_off_512x512 from "../../../../../public/2DAssets/pets/redFox2/redFox2_off_512x512.png";
-import redFox2_off_32x32 from "../../../../../public/2DAssets/pets/redFox2/redFox2_off_32x32.png";
-import roboDog_512x512 from "../../../../../public/2DAssets/pets/roboDog/roboDog_512x512.png";
-import roboDog_32x32 from "../../../../../public/2DAssets/pets/roboDog/roboDog_32x32.png";
-import roboDog_off_512x512 from "../../../../../public/2DAssets/pets/roboDog/roboDog_off_512x512.png";
-import roboDog_off_32x32 from "../../../../../public/2DAssets/pets/roboDog/roboDog_off_32x32.png";
-import skeletonTRex_512x512 from "../../../../../public/2DAssets/pets/skeletonTRex/skeletonTRex_512x512.png";
-import skeletonTRex_32x32 from "../../../../../public/2DAssets/pets/skeletonTRex/skeletonTRex_32x32.png";
-import skeletonTRex_off_512x512 from "../../../../../public/2DAssets/pets/skeletonTRex/skeletonTRex_off_512x512.png";
-import skeletonTRex_off_32x32 from "../../../../../public/2DAssets/pets/skeletonTRex/skeletonTRex_off_32x32.png";
-import snail_512x512 from "../../../../../public/2DAssets/pets/snail/snail_512x512.png";
-import snail_32x32 from "../../../../../public/2DAssets/pets/snail/snail_32x32.png";
-import snail_off_512x512 from "../../../../../public/2DAssets/pets/snail/snail_off_512x512.png";
-import snail_off_32x32 from "../../../../../public/2DAssets/pets/snail/snail_off_32x32.png";
-import spinosaurus_512x512 from "../../../../../public/2DAssets/pets/spinosaurus/spinosaurus_512x512.png";
-import spinosaurus_32x32 from "../../../../../public/2DAssets/pets/spinosaurus/spinosaurus_32x32.png";
-import spinosaurus_off_512x512 from "../../../../../public/2DAssets/pets/spinosaurus/spinosaurus_off_512x512.png";
-import spinosaurus_off_32x32 from "../../../../../public/2DAssets/pets/spinosaurus/spinosaurus_off_32x32.png";
-import TRex_512x512 from "../../../../../public/2DAssets/pets/TRex/TRex_512x512.png";
-import TRex_32x32 from "../../../../../public/2DAssets/pets/TRex/TRex_32x32.png";
-import TRex_off_512x512 from "../../../../../public/2DAssets/pets/TRex/TRex_off_512x512.png";
-import TRex_off_32x32 from "../../../../../public/2DAssets/pets/TRex/TRex_off_32x32.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const angryHamster_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/angryHamster/angryHamster_512x512.png";
+const angryHamster_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/angryHamster/angryHamster_32x32.png";
+const angryHamster_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/angryHamster/angryHamster_off_512x512.png";
+const angryHamster_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/angryHamster/angryHamster_off_32x32.png";
+const axolotl_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/axolotl/axolotl_512x512.png";
+const axolotl_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/axolotl/axolotl_32x32.png";
+const axolotl_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/axolotl/axolotl_off_512x512.png";
+const axolotl_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/axolotl/axolotl_off_32x32.png";
+const babyDragon_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/babyDragon/babyDragon_512x512.png";
+const babyDragon_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/babyDragon/babyDragon_32x32.png";
+const babyDragon_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/babyDragon/babyDragon_off_512x512.png";
+const babyDragon_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/babyDragon/babyDragon_off_32x32.png";
+const beardedDragon_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/beardedDragon/beardedDragon_512x512.png";
+const beardedDragon_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/beardedDragon/beardedDragon_32x32.png";
+const beardedDragon_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/beardedDragon/beardedDragon_off_512x512.png";
+const beardedDragon_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/beardedDragon/beardedDragon_off_32x32.png";
+const bird1_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/bird1/bird1_512x512.png";
+const bird1_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/bird1/bird1_32x32.png";
+const bird1_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/bird1/bird1_off_512x512.png";
+const bird1_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/bird1/bird1_off_32x32.png";
+const bird2_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/bird2/bird2_512x512.png";
+const bird2_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/bird2/bird2_32x32.png";
+const bird2_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/bird2/bird2_off_512x512.png";
+const bird2_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/bird2/bird2_off_32x32.png";
+const boxer_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/boxer/boxer_512x512.png";
+const boxer_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/boxer/boxer_32x32.png";
+const boxer_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/boxer/boxer_off_512x512.png";
+const boxer_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/boxer/boxer_off_32x32.png";
+const brain_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/brain/brain_512x512.png";
+const brain_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/brain/brain_32x32.png";
+const brain_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/brain/brain_off_512x512.png";
+const brain_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/brain/brain_off_32x32.png";
+const buddyHamster_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/buddyHamster/buddyHamster_512x512.png";
+const buddyHamster_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/buddyHamster/buddyHamster_32x32.png";
+const buddyHamster_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/buddyHamster/buddyHamster_off_512x512.png";
+const buddyHamster_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/buddyHamster/buddyHamster_off_32x32.png";
+const cat1_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/cat1/cat1_512x512.png";
+const cat1_32x32 = nginxAssetSeverBaseUrl + "2DAssets/pets/cat1/cat1_32x32.png";
+const cat1_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/cat1/cat1_off_512x512.png";
+const cat1_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/cat1/cat1_off_32x32.png";
+const cat2_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/cat2/cat2_512x512.png";
+const cat2_32x32 = nginxAssetSeverBaseUrl + "2DAssets/pets/cat2/cat2_32x32.png";
+const cat2_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/cat2/cat2_off_512x512.png";
+const cat2_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/cat2/cat2_off_32x32.png";
+const dodoBird_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/dodoBird/dodoBird_512x512.png";
+const dodoBird_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/dodoBird/dodoBird_32x32.png";
+const dodoBird_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/dodoBird/dodoBird_off_512x512.png";
+const dodoBird_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/dodoBird/dodoBird_off_32x32.png";
+const happyHamster_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/happyHamster/happyHamster_512x512.png";
+const happyHamster_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/happyHamster/happyHamster_32x32.png";
+const happyHamster_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/happyHamster/happyHamster_off_512x512.png";
+const happyHamster_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/happyHamster/happyHamster_off_32x32.png";
+const mechanicalGrasshopper_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_512x512.png";
+const mechanicalGrasshopper_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_32x32.png";
+const mechanicalGrasshopper_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_off_512x512.png";
+const mechanicalGrasshopper_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_off_32x32.png";
+const panda1_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/panda1/panda1_512x512.png";
+const panda1_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/panda1/panda1_32x32.png";
+const panda1_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/panda1/panda1_off_512x512.png";
+const panda1_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/panda1/panda1_off_32x32.png";
+const panda2_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/panda2/panda2_512x512.png";
+const panda2_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/panda2/panda2_32x32.png";
+const panda2_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/panda2/panda2_off_512x512.png";
+const panda2_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/panda2/panda2_off_32x32.png";
+const petRock_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/petRock/petRock_512x512.png";
+const petRock_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/petRock/petRock_32x32.png";
+const petRock_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/petRock/petRock_off_512x512.png";
+const petRock_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/petRock/petRock_off_32x32.png";
+const pig_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/pig/pig_512x512.png";
+const pig_32x32 = nginxAssetSeverBaseUrl + "2DAssets/pets/pig/pig_32x32.png";
+const pig_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/pig/pig_off_512x512.png";
+const pig_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/pig/pig_off_32x32.png";
+const redFox1_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox1/redFox1_512x512.png";
+const redFox1_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox1/redFox1_32x32.png";
+const redFox1_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox1/redFox1_off_512x512.png";
+const redFox1_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox1/redFox1_off_32x32.png";
+const redFox2_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox2/redFox2_512x512.png";
+const redFox2_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox2/redFox2_32x32.png";
+const redFox2_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox2/redFox2_off_512x512.png";
+const redFox2_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox2/redFox2_off_32x32.png";
+const roboDog_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/roboDog/roboDog_512x512.png";
+const roboDog_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/roboDog/roboDog_32x32.png";
+const roboDog_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/roboDog/roboDog_off_512x512.png";
+const roboDog_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/roboDog/roboDog_off_32x32.png";
+const skeletonTRex_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/skeletonTRex/skeletonTRex_512x512.png";
+const skeletonTRex_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/skeletonTRex/skeletonTRex_32x32.png";
+const skeletonTRex_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/skeletonTRex/skeletonTRex_off_512x512.png";
+const skeletonTRex_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/skeletonTRex/skeletonTRex_off_32x32.png";
+const snail_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/snail/snail_512x512.png";
+const snail_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/snail/snail_32x32.png";
+const snail_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/snail/snail_off_512x512.png";
+const snail_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/snail/snail_off_32x32.png";
+const spinosaurus_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/spinosaurus/spinosaurus_512x512.png";
+const spinosaurus_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/spinosaurus/spinosaurus_32x32.png";
+const spinosaurus_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/spinosaurus/spinosaurus_off_512x512.png";
+const spinosaurus_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/pets/spinosaurus/spinosaurus_off_32x32.png";
+const TRex_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/TRex/TRex_512x512.png";
+const TRex_32x32 = nginxAssetSeverBaseUrl + "2DAssets/pets/TRex/TRex_32x32.png";
+const TRex_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/TRex/TRex_off_512x512.png";
+const TRex_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/pets/TRex/TRex_off_32x32.png";
 
 const petsLabels: {
   [petsEffectType in PetsEffectTypes]: string;

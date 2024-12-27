@@ -4,7 +4,9 @@ import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../../../fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 
-import closeIcon from "../../../../../../public/svgs/closeIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const closeIcon = nginxAssetSeverBaseUrl + "svgs/closeIcon.svg";
 
 export default function CloseButton({
   fgLowerVisualMediaController,

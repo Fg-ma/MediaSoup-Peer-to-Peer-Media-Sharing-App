@@ -10,78 +10,191 @@ import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImage from "../../../../fgElements/fgImage/FgImage";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import defaultGlasses_512x512 from "../../../../../public/2DAssets/glasses/defaultGlasses/defaultGlasses_512x512.png";
-import defaultGlasses_32x32 from "../../../../../public/2DAssets/glasses/defaultGlasses/defaultGlasses_32x32.png";
-import defaultGlassesIcon from "../../../../../public/svgs/visualEffects/glasses/defaultGlasses/defaultGlassesIcon.svg";
-import defaultGlassesOffIcon from "../../../../../public/svgs/visualEffects/glasses/defaultGlasses/defaultGlassesOffIcon.svg";
-import AmericaGlasses_512x512 from "../../../../../public/2DAssets/glasses/AmericaGlasses/AmericaGlasses_512x512.png";
-import AmericaGlasses_32x32 from "../../../../../public/2DAssets/glasses/AmericaGlasses/AmericaGlasses_32x32.png";
-import AmericaGlassesIcon from "../../../../../public/svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesIcon.svg";
-import AmericaGlassesOffIcon from "../../../../../public/svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesOffIcon.svg";
-import aviatorGoggles_512x512 from "../../../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_512x512.png";
-import aviatorGoggles_32x32 from "../../../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_32x32.png";
-import aviatorGoggles_off_512x512 from "../../../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_off_512x512.png";
-import aviatorGoggles_off_32x32 from "../../../../../public/2DAssets/glasses/aviatorGoggles/aviatorGoggles_off_32x32.png";
-import bloodyGlasses_512x512 from "../../../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_512x512.png";
-import bloodyGlasses_32x32 from "../../../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_32x32.png";
-import bloodyGlasses_off_512x512 from "../../../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_off_512x512.png";
-import bloodyGlasses_off_32x32 from "../../../../../public/2DAssets/glasses/bloodyGlasses/bloodyGlasses_off_32x32.png";
-import eyeProtectionGlasses_512x512 from "../../../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_512x512.png";
-import eyeProtectionGlasses_32x32 from "../../../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_32x32.png";
-import eyeProtectionGlasses_off_512x512 from "../../../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_off_512x512.png";
-import eyeProtectionGlasses_off_32x32 from "../../../../../public/2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_off_32x32.png";
-import glasses1_512x512 from "../../../../../public/2DAssets/glasses/glasses1/glasses1_512x512.png";
-import glasses1_32x32 from "../../../../../public/2DAssets/glasses/glasses1/glasses1_32x32.png";
-import glasses1_off_512x512 from "../../../../../public/2DAssets/glasses/glasses1/glasses1_off_512x512.png";
-import glasses1_off_32x32 from "../../../../../public/2DAssets/glasses/glasses1/glasses1_off_32x32.png";
-import glasses2_512x512 from "../../../../../public/2DAssets/glasses/glasses2/glasses2_512x512.png";
-import glasses2_32x32 from "../../../../../public/2DAssets/glasses/glasses2/glasses2_32x32.png";
-import glasses2_off_512x512 from "../../../../../public/2DAssets/glasses/glasses2/glasses2_off_512x512.png";
-import glasses2_off_32x32 from "../../../../../public/2DAssets/glasses/glasses2/glasses2_off_32x32.png";
-import glasses3_512x512 from "../../../../../public/2DAssets/glasses/glasses3/glasses3_512x512.png";
-import glasses3_32x32 from "../../../../../public/2DAssets/glasses/glasses3/glasses3_32x32.png";
-import glasses3_off_512x512 from "../../../../../public/2DAssets/glasses/glasses3/glasses3_off_512x512.png";
-import glasses3_off_32x32 from "../../../../../public/2DAssets/glasses/glasses3/glasses3_off_32x32.png";
-import glasses4_512x512 from "../../../../../public/2DAssets/glasses/glasses4/glasses4_512x512.png";
-import glasses4_32x32 from "../../../../../public/2DAssets/glasses/glasses4/glasses4_32x32.png";
-import glasses4_off_512x512 from "../../../../../public/2DAssets/glasses/glasses4/glasses4_off_512x512.png";
-import glasses4_off_32x32 from "../../../../../public/2DAssets/glasses/glasses4/glasses4_off_32x32.png";
-import glasses5_512x512 from "../../../../../public/2DAssets/glasses/glasses5/glasses5_512x512.png";
-import glasses5_32x32 from "../../../../../public/2DAssets/glasses/glasses5/glasses5_32x32.png";
-import glasses5_off_512x512 from "../../../../../public/2DAssets/glasses/glasses5/glasses5_off_512x512.png";
-import glasses5_off_32x32 from "../../../../../public/2DAssets/glasses/glasses5/glasses5_off_32x32.png";
-import glasses6_512x512 from "../../../../../public/2DAssets/glasses/glasses6/glasses6_512x512.png";
-import glasses6_32x32 from "../../../../../public/2DAssets/glasses/glasses6/glasses6_32x32.png";
-import glasses6_off_512x512 from "../../../../../public/2DAssets/glasses/glasses6/glasses6_off_512x512.png";
-import glasses6_off_32x32 from "../../../../../public/2DAssets/glasses/glasses6/glasses6_off_32x32.png";
-import memeGlasses_512x512 from "../../../../../public/2DAssets/glasses/memeGlasses/memeGlasses_512x512.png";
-import memeGlasses_32x32 from "../../../../../public/2DAssets/glasses/memeGlasses/memeGlasses_32x32.png";
-import memeGlassesIcon from "../../../../../public/svgs/visualEffects/glasses/memeGlasses/memeGlassesIcon.svg";
-import memeGlassesOffIcon from "../../../../../public/svgs/visualEffects/glasses/memeGlasses/memeGlassesOffIcon.svg";
-import militaryTacticalGlasses_512x512 from "../../../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_512x512.png";
-import militaryTacticalGlasses_32x32 from "../../../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_32x32.png";
-import militaryTacticalGlasses_off_512x512 from "../../../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_off_512x512.png";
-import militaryTacticalGlasses_off_32x32 from "../../../../../public/2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_off_32x32.png";
-import shades_512x512 from "../../../../../public/2DAssets/glasses/shades/shades_512x512.png";
-import shades_32x32 from "../../../../../public/2DAssets/glasses/shades/shades_32x32.png";
-import shadesIcon from "../../../../../public/svgs/visualEffects/glasses/shades/shadesIcon.svg";
-import shadesOffIcon from "../../../../../public/svgs/visualEffects/glasses/shades/shadesOffIcon.svg";
-import steampunkGlasses_512x512 from "../../../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_512x512.png";
-import steampunkGlasses_32x32 from "../../../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_32x32.png";
-import steampunkGlasses_off_512x512 from "../../../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_off_512x512.png";
-import steampunkGlasses_off_32x32 from "../../../../../public/2DAssets/glasses/steampunkGlasses/steampunkGlasses_off_32x32.png";
-import threeDGlasses_512x512 from "../../../../../public/2DAssets/glasses/threeDGlasses/threeDGlasses_512x512.png";
-import threeDGlasses_32x32 from "../../../../../public/2DAssets/glasses/threeDGlasses/threeDGlasses_32x32.png";
-import threeDGlassesIcon from "../../../../../public/svgs/visualEffects/glasses/threeDGlasses/threeDGlassesIcon.svg";
-import threeDGlassesOffIcon from "../../../../../public/svgs/visualEffects/glasses/threeDGlasses/threeDGlassesOffIcon.svg";
-import toyGlasses_512x512 from "../../../../../public/2DAssets/glasses/toyGlasses/toyGlasses_512x512.png";
-import toyGlasses_32x32 from "../../../../../public/2DAssets/glasses/toyGlasses/toyGlasses_32x32.png";
-import toyGlasses_off_512x512 from "../../../../../public/2DAssets/glasses/toyGlasses/toyGlasses_off_512x512.png";
-import toyGlasses_off_32x32 from "../../../../../public/2DAssets/glasses/toyGlasses/toyGlasses_off_32x32.png";
-import VRGlasses_512x512 from "../../../../../public/2DAssets/glasses/VRGlasses/VRGlasses_512x512.png";
-import VRGlasses_32x32 from "../../../../../public/2DAssets/glasses/VRGlasses/VRGlasses_32x32.png";
-import VRGlasses_off_512x512 from "../../../../../public/2DAssets/glasses/VRGlasses/VRGlasses_off_512x512.png";
-import VRGlasses_off_32x32 from "../../../../../public/2DAssets/glasses/VRGlasses/VRGlasses_off_32x32.png";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const defaultGlasses_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/defaultGlasses/defaultGlasses_512x512.png";
+const defaultGlasses_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/defaultGlasses/defaultGlasses_32x32.png";
+const defaultGlassesIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/defaultGlasses/defaultGlassesIcon.svg";
+const defaultGlassesOffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/defaultGlasses/defaultGlassesOffIcon.svg";
+const AmericaGlasses_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/AmericaGlasses/AmericaGlasses_512x512.png";
+const AmericaGlasses_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/AmericaGlasses/AmericaGlasses_32x32.png";
+const AmericaGlassesIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesIcon.svg";
+const AmericaGlassesOffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesOffIcon.svg";
+const aviatorGoggles_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/aviatorGoggles/aviatorGoggles_512x512.png";
+const aviatorGoggles_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/aviatorGoggles/aviatorGoggles_32x32.png";
+const aviatorGoggles_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/aviatorGoggles/aviatorGoggles_off_512x512.png";
+const aviatorGoggles_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/aviatorGoggles/aviatorGoggles_off_32x32.png";
+const bloodyGlasses_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/bloodyGlasses/bloodyGlasses_512x512.png";
+const bloodyGlasses_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/bloodyGlasses/bloodyGlasses_32x32.png";
+const bloodyGlasses_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/bloodyGlasses/bloodyGlasses_off_512x512.png";
+const bloodyGlasses_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/bloodyGlasses/bloodyGlasses_off_32x32.png";
+const eyeProtectionGlasses_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_512x512.png";
+const eyeProtectionGlasses_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_32x32.png";
+const eyeProtectionGlasses_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_off_512x512.png";
+const eyeProtectionGlasses_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_off_32x32.png";
+const glasses1_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses1/glasses1_512x512.png";
+const glasses1_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses1/glasses1_32x32.png";
+const glasses1_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses1/glasses1_off_512x512.png";
+const glasses1_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses1/glasses1_off_32x32.png";
+const glasses2_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses2/glasses2_512x512.png";
+const glasses2_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses2/glasses2_32x32.png";
+const glasses2_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses2/glasses2_off_512x512.png";
+const glasses2_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses2/glasses2_off_32x32.png";
+const glasses3_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses3/glasses3_512x512.png";
+const glasses3_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses3/glasses3_32x32.png";
+const glasses3_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses3/glasses3_off_512x512.png";
+const glasses3_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses3/glasses3_off_32x32.png";
+const glasses4_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses4/glasses4_512x512.png";
+const glasses4_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses4/glasses4_32x32.png";
+const glasses4_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses4/glasses4_off_512x512.png";
+const glasses4_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses4/glasses4_off_32x32.png";
+const glasses5_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses5/glasses5_512x512.png";
+const glasses5_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses5/glasses5_32x32.png";
+const glasses5_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses5/glasses5_off_512x512.png";
+const glasses5_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses5/glasses5_off_32x32.png";
+const glasses6_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses6/glasses6_512x512.png";
+const glasses6_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses6/glasses6_32x32.png";
+const glasses6_off_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses6/glasses6_off_512x512.png";
+const glasses6_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses6/glasses6_off_32x32.png";
+const memeGlasses_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/memeGlasses/memeGlasses_512x512.png";
+const memeGlasses_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/memeGlasses/memeGlasses_32x32.png";
+const memeGlassesIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/memeGlasses/memeGlassesIcon.svg";
+const memeGlassesOffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/memeGlasses/memeGlassesOffIcon.svg";
+const militaryTacticalGlasses_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_512x512.png";
+const militaryTacticalGlasses_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_32x32.png";
+const militaryTacticalGlasses_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_off_512x512.png";
+const militaryTacticalGlasses_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_off_32x32.png";
+const shades_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/shades/shades_512x512.png";
+const shades_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/shades/shades_32x32.png";
+const shadesIcon =
+  nginxAssetSeverBaseUrl + "svgs/visualEffects/glasses/shades/shadesIcon.svg";
+const shadesOffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/shades/shadesOffIcon.svg";
+const steampunkGlasses_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/steampunkGlasses/steampunkGlasses_512x512.png";
+const steampunkGlasses_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/steampunkGlasses/steampunkGlasses_32x32.png";
+const steampunkGlasses_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/steampunkGlasses/steampunkGlasses_off_512x512.png";
+const steampunkGlasses_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/steampunkGlasses/steampunkGlasses_off_32x32.png";
+const threeDGlasses_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/threeDGlasses/threeDGlasses_512x512.png";
+const threeDGlasses_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/threeDGlasses/threeDGlasses_32x32.png";
+const threeDGlassesIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/threeDGlasses/threeDGlassesIcon.svg";
+const threeDGlassesOffIcon =
+  nginxAssetSeverBaseUrl +
+  "svgs/visualEffects/glasses/threeDGlasses/threeDGlassesOffIcon.svg";
+const toyGlasses_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/toyGlasses/toyGlasses_512x512.png";
+const toyGlasses_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/toyGlasses/toyGlasses_32x32.png";
+const toyGlasses_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/toyGlasses/toyGlasses_off_512x512.png";
+const toyGlasses_off_32x32 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/toyGlasses/toyGlasses_off_32x32.png";
+const VRGlasses_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/VRGlasses/VRGlasses_512x512.png";
+const VRGlasses_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/VRGlasses/VRGlasses_32x32.png";
+const VRGlasses_off_512x512 =
+  nginxAssetSeverBaseUrl +
+  "2DAssets/glasses/VRGlasses/VRGlasses_off_512x512.png";
+const VRGlasses_off_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/glasses/VRGlasses/VRGlasses_off_32x32.png";
 
 const glassesLabels: {
   [glassesEffectType in GlassesEffectTypes]: string;

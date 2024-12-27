@@ -7,22 +7,35 @@ import FgImage from "../fgElements/fgImage/FgImage";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import additionIcon from "../../public/svgs/additionIcon.svg";
-import adventureTimeIcon from "../../public/svgs/audioEffects/adventureTimeIcon.svg";
-import cacophonyIcon from "../../public/svgs/audioEffects/cacophonyIcon.svg";
-import drumBeatIcon from "../../public/svgs/audioEffects/drumBeatIcon.svg";
-import funkIcon from "../../public/svgs/audioEffects/funkIcon.svg";
-import harmonicIcon from "../../public/svgs/audioEffects/harmonicaIcon.svg";
-import mischiefIcon from "../../public/svgs/audioEffects/mischiefIcon.svg";
-import outWestIcon from "../../public/svgs/audioEffects/outWestIcon.svg";
-import pianoBackgroundMusicIcon from "../../public/svgs/audioEffects/pianoBackgroundMusicIcon.svg";
-import retroGameIcon from "../../public/svgs/audioEffects/retroGameIcon.svg";
-import spaceBackgroundMusicIcon from "../../public/svgs/audioEffects/spaceBackgroundMusicIcon.svg";
-import ukuleleIcon from "../../public/svgs/audioEffects/ukuleleIcon.svg";
-import wackyIcon from "../../public/svgs/audioEffects/wackyIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-import royalProcession_512x512 from "../../public/2DAssets/audio/royalProcession_512x512.png";
-import royalProcession_32x32 from "../../public/2DAssets/audio/royalProcession_32x32.png";
+const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
+const adventureTimeIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/adventureTimeIcon.svg";
+const cacophonyIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/cacophonyIcon.svg";
+const drumBeatIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/drumBeatIcon.svg";
+const funkIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/funkIcon.svg";
+const harmonicIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/harmonicaIcon.svg";
+const mischiefIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/mischiefIcon.svg";
+const outWestIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/outWestIcon.svg";
+const pianoBackgroundMusicIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/pianoBackgroundMusicIcon.svg";
+const retroGameIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/retroGameIcon.svg";
+const spaceBackgroundMusicIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/spaceBackgroundMusicIcon.svg";
+const ukuleleIcon =
+  nginxAssetSeverBaseUrl + "svgs/audioEffects/ukuleleIcon.svg";
+const wackyIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/wackyIcon.svg";
+const royalProcession_512x512 =
+  nginxAssetSeverBaseUrl + "2DAssets/audio/royalProcession_512x512.png";
+const royalProcession_32x32 =
+  nginxAssetSeverBaseUrl + "2DAssets/audio/royalProcession_32x32.png";
 
 const backgroundMusicLabels: {
   [backgroundMusicType in BackgroundMusicTypes]: string;

@@ -6,8 +6,11 @@ import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgPanel from "../../../fgElements/fgPanel/FgPanel";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
-import joystickIcon from "../../../../public/svgs/games/joystickIcon.svg";
-import snakeGameIcon from "../../../../public/svgs/games/snake/snakeGameIcon.svg";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const joystickIcon = nginxAssetSeverBaseUrl + "svgs/games/joystickIcon.svg";
+const snakeGameIcon =
+  nginxAssetSeverBaseUrl + "svgs/games/snake/snakeGameIcon.svg";
 
 export default function GamesSection({
   table_id,
