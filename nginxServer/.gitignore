@@ -6,7 +6,6 @@
 
 2DAssets
 audioAssets
-audioSamples
 backgroundImages
 backgroundMusic
 backgroundTexs
@@ -15,3 +14,11 @@ snakeGameAssets
 soundEffects
 svgs
 videoBackgrounds
+
+audioSamples/drums
+audioSamples/guitars
+audioSamples/misc
+audioSamples/organs
+audioSamples/pianos
+audioSamples/strings
+audioSamples/synths
