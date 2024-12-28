@@ -4,6 +4,29 @@
 /speechToTextModels/vosk-model-small-gu-0.42.zip
 /speechToTextModels/vosk-model-small-sv-rhasspy-0.15.zip
 
-audioSamples/misc
 audioSamples/organs
 
+audioSamples/misc/accordian
+audioSamples/misc/acientBronzeBells
+audioSamples/misc/AustrianJawHarp
+audioSamples/misc/bells1
+audioSamples/misc/bells2
+audioSamples/misc/bellsGong
+audioSamples/misc/brokenSplashGong
+audioSamples/misc/choirOfTheFallen
+audioSamples/misc/clavichord
+audioSamples/misc/cosmos
+audioSamples/misc/dischordChoir
+audioSamples/misc/gong
+audioSamples/misc/handBells
+audioSamples/misc/harmonica
+audioSamples/misc/MariePneuma
+audioSamples/misc/marimba
+audioSamples/misc/mechanisedChoir
+audioSamples/misc/musicalStones1
+audioSamples/misc/musicalStones2
+audioSamples/misc/orchestra
+audioSamples/misc/plasmaDriveKalimba
+audioSamples/misc/quietChoir
+audioSamples/misc/rainStick
+audioSamples/misc/spellSinger
