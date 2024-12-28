@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Josefin";
+  src: url("http://localhost:8044/fonts/JosefinSans-Regular.ttf");
+}
+
+@font-face {
+  font-family: "K2D";
+  src: url("http://localhost:8044/fonts/K2D-Bold.ttf");
+}

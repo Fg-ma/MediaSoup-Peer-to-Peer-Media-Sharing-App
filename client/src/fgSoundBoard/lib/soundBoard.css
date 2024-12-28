@@ -1,0 +1,412 @@
+.sound-board-btn {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 4px;
+  background-color: #cccccc;
+}
+
+.sound-board-btn-alt-1 {
+  position: absolute;
+  top: -5%;
+  right: 5%;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  transition: top 0.05s linear, right 0.05s linear;
+  z-index: 1;
+  background-color: white;
+  border: 4px solid #cccccc;
+}
+
+.sound-board-btn-alt-2 {
+  position: absolute;
+  bottom: 99%;
+  left: 91%;
+  width: 5%;
+  height: 6%;
+  transform: skewX(43deg);
+  border-top-right-radius: 3px;
+  transition: bottom 0.05s linear, left 0.05s linear, height 0.05s linear,
+    border-top-right-radius 0.05s linear,
+    border-bottom-right-radius 0.05s linear, transform 0.05s linear;
+  z-index: 0;
+  background-color: #cccccc;
+}
+
+.sound-board-btn-alt-3 {
+  position: absolute;
+  bottom: 0%;
+  left: -2%;
+  width: 5%;
+  height: 8%;
+  transform: skewX(49deg);
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 2px;
+  transition: bottom 0.05s linear, left 0.05s linear, height 0.05s linear,
+    border-top-left-radius 0.05s linear;
+  z-index: 0;
+  background-color: #cccccc;
+}
+
+.sound-board-btn.pressed:not(.failed) {
+  background-color: #f57e41;
+}
+
+.sound-board-btn.pressed:not(.failed) .sound-board-btn-alt-1 {
+  top: -2.5%;
+  right: 2.5%;
+  border: 4px solid #f57e41;
+  background-color: #fff5ef;
+}
+
+.sound-board-btn.pressed:not(.failed) .sound-board-btn-alt-2 {
+  bottom: 98%;
+  left: 93%;
+  height: 4%;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 1px;
+  transform: skewX(36deg);
+  background-color: #f57e41;
+}
+
+.sound-board-btn.pressed:not(.failed) .sound-board-btn-alt-3 {
+  bottom: 1%;
+  left: -1%;
+  height: 4%;
+  border-top-left-radius: 5px;
+  background-color: #f57e41;
+}
+
+.sound-board-btn.pressed.failed {
+  background-color: #f52c2c;
+}
+
+.sound-board-btn.pressed.failed .sound-board-btn-alt-1 {
+  top: -2.5%;
+  right: 2.5%;
+  border: 4px solid #f52c2c;
+  background-color: #ffe6e6;
+}
+
+.sound-board-btn.pressed.failed .sound-board-btn-alt-2 {
+  bottom: 98%;
+  left: 93%;
+  height: 4%;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 1px;
+  transform: skewX(36deg);
+  background-color: #f52c2c;
+}
+
+.sound-board-btn.pressed.failed .sound-board-btn-alt-3 {
+  bottom: 1%;
+  left: -1%;
+  height: 4%;
+  border-top-left-radius: 5px;
+  background-color: #f52c2c;
+}
+
+.sound-board-btn.active:not(.pressed) {
+  background-color: #2c92f5;
+}
+
+.sound-board-btn.active:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #2c92f5;
+  background-color: #eff7ff;
+}
+
+.sound-board-btn.active:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #2c92f5;
+}
+
+.sound-board-btn.active:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #2c92f5;
+}
+
+.sound-board-btn.assignment {
+  animation: flashColorBackground1 1s infinite alternate;
+}
+
+.sound-board-btn.assignment .sound-board-btn-alt-1 {
+  animation: flashColorBorder 1s infinite alternate,
+    flashColorBackground2 1s infinite alternate;
+}
+
+.sound-board-btn.assignment .sound-board-btn-alt-2 {
+  animation: flashColorBackground1 1s infinite alternate;
+}
+
+.sound-board-btn.assignment .sound-board-btn-alt-3 {
+  animation: flashColorBackground1 1s infinite alternate;
+}
+
+@keyframes flashColorBorder {
+  0% {
+    border: 4px solid #cccccc;
+  }
+  100% {
+    border: 4px solid #2c92f5;
+  }
+}
+
+@keyframes flashColorBackground1 {
+  0% {
+    background-color: #cccccc;
+  }
+  100% {
+    background-color: #2c92f5;
+  }
+}
+
+@keyframes flashColorBackground2 {
+  0% {
+    background-color: white;
+  }
+  100% {
+    background-color: #eff7ff;
+  }
+}
+
+/* Neon Green */
+.sound-board-btn.active-green:not(.pressed):not(.active) {
+  background-color: #2cf55b;
+}
+
+.sound-board-btn.active-green:not(.pressed):not(.active)
+  .sound-board-btn-alt-1 {
+  border: 4px solid #2cf55b;
+  background-color: #eafff2;
+}
+
+.sound-board-btn.active-green:not(.pressed):not(.active)
+  .sound-board-btn-alt-2 {
+  background-color: #2cf55b;
+}
+
+.sound-board-btn.active-green:not(.pressed):not(.active)
+  .sound-board-btn-alt-3 {
+  background-color: #2cf55b;
+}
+
+/* Neon Pink */
+.sound-board-btn.active-pink:not(.pressed):not(.active) {
+  background-color: #f52cae;
+}
+
+.sound-board-btn.active-pink:not(.pressed):not(.active) .sound-board-btn-alt-1 {
+  border: 4px solid #f52cae;
+  background-color: #ffeaf7;
+}
+
+.sound-board-btn.active-pink:not(.pressed):not(.active) .sound-board-btn-alt-2 {
+  background-color: #f52cae;
+}
+
+.sound-board-btn.active-pink:not(.pressed):not(.active) .sound-board-btn-alt-3 {
+  background-color: #f52cae;
+}
+
+/* Neon Yellow */
+.sound-board-btn.active-yellow:not(.pressed):not(.active) {
+  background-color: #f5d32c;
+}
+
+.sound-board-btn.active-yellow:not(.pressed):not(.active)
+  .sound-board-btn-alt-1 {
+  border: 4px solid #f5d32c;
+  background-color: #fffbe6;
+}
+
+.sound-board-btn.active-yellow:not(.pressed):not(.active)
+  .sound-board-btn-alt-2 {
+  background-color: #f5d32c;
+}
+
+.sound-board-btn.active-yellow:not(.pressed):not(.active)
+  .sound-board-btn-alt-3 {
+  background-color: #f5d32c;
+}
+
+/* Neon Purple */
+.sound-board-btn.active-purple:not(.pressed):not(.active) {
+  background-color: #a32cf5;
+}
+
+.sound-board-btn.active-purple:not(.pressed):not(.active)
+  .sound-board-btn-alt-1 {
+  border: 4px solid #a32cf5;
+  background-color: #f3e6ff;
+}
+
+.sound-board-btn.active-purple:not(.pressed):not(.active)
+  .sound-board-btn-alt-2 {
+  background-color: #a32cf5;
+}
+
+.sound-board-btn.active-purple:not(.pressed):not(.active)
+  .sound-board-btn-alt-3 {
+  background-color: #a32cf5;
+}
+
+/* Neon Aqua */
+.sound-board-btn.active-aqua:not(.pressed) {
+  background-color: #2cf5e5;
+}
+
+.sound-board-btn.active-aqua:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #2cf5e5;
+  background-color: #e6fffb;
+}
+
+.sound-board-btn.active-aqua:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #2cf5e5;
+}
+
+.sound-board-btn.active-aqua:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #2cf5e5;
+}
+
+/* Neon Lime */
+.sound-board-btn.active-lime:not(.pressed) {
+  background-color: #b5f52c;
+}
+
+.sound-board-btn.active-lime:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #b5f52c;
+  background-color: #f5ffe6;
+}
+
+.sound-board-btn.active-lime:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #b5f52c;
+}
+
+.sound-board-btn.active-lime:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #b5f52c;
+}
+
+/* Neon Coral */
+.sound-board-btn.active-coral:not(.pressed) {
+  background-color: #f5425d;
+}
+
+.sound-board-btn.active-coral:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #f5425d;
+  background-color: #ffe6ea;
+}
+
+.sound-board-btn.active-coral:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #f5425d;
+}
+
+.sound-board-btn.active-coral:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #f5425d;
+}
+
+/* Neon Teal */
+.sound-board-btn.active-teal:not(.pressed) {
+  background-color: #2cf5b1;
+}
+
+.sound-board-btn.active-teal:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #2cf5b1;
+  background-color: #e6fff5;
+}
+
+.sound-board-btn.active-teal:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #2cf5b1;
+}
+
+.sound-board-btn.active-teal:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #2cf5b1;
+}
+
+/* Neon Magenta */
+.sound-board-btn.active-magenta:not(.pressed) {
+  background-color: #f52cd1;
+}
+
+.sound-board-btn.active-magenta:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #f52cd1;
+  background-color: #ffe6f9;
+}
+
+.sound-board-btn.active-magenta:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #f52cd1;
+}
+
+.sound-board-btn.active-magenta:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #f52cd1;
+}
+
+/* Neon Sky */
+.sound-board-btn.active-sky:not(.pressed) {
+  background-color: #2cbdf5;
+}
+
+.sound-board-btn.active-sky:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #2cbdf5;
+  background-color: #e6f7ff;
+}
+
+.sound-board-btn.active-sky:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #2cbdf5;
+}
+
+.sound-board-btn.active-sky:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #2cbdf5;
+}
+
+/* Neon Mint */
+.sound-board-btn.active-mint:not(.pressed) {
+  background-color: #2cf58d;
+}
+
+.sound-board-btn.active-mint:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #2cf58d;
+  background-color: #e6fff5;
+}
+
+.sound-board-btn.active-mint:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #2cf58d;
+}
+
+.sound-board-btn.active-mint:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #2cf58d;
+}
+
+/* Neon Red */
+.sound-board-btn.active-red:not(.pressed) {
+  background-color: #f52c2c;
+}
+
+.sound-board-btn.active-red:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #f52c2c;
+  background-color: #ffe6e6;
+}
+
+.sound-board-btn.active-red:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #f52c2c;
+}
+
+.sound-board-btn.active-red:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #f52c2c;
+}
+
+/* Neon Gold */
+.sound-board-btn.active-gold:not(.pressed) {
+  background-color: #f5a32c;
+}
+
+.sound-board-btn.active-gold:not(.pressed) .sound-board-btn-alt-1 {
+  border: 4px solid #f5a32c;
+  background-color: #fff8e6;
+}
+
+.sound-board-btn.active-gold:not(.pressed) .sound-board-btn-alt-2 {
+  background-color: #f5a32c;
+}
+
+.sound-board-btn.active-gold:not(.pressed) .sound-board-btn-alt-3 {
+  background-color: #f5a32c;
+}
