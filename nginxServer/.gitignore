@@ -4,8 +4,6 @@
 /speechToTextModels/vosk-model-small-gu-0.42.zip
 /speechToTextModels/vosk-model-small-sv-rhasspy-0.15.zip
 
-audioSamples/organs/bottle
-audioSamples/organs/cassetteTape
 audioSamples/organs/electric1
 audioSamples/organs/electric2
 audioSamples/organs/electric3
