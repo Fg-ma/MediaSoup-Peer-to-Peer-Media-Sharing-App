@@ -4,7 +4,20 @@
 /speechToTextModels/vosk-model-small-gu-0.42.zip
 /speechToTextModels/vosk-model-small-sv-rhasspy-0.15.zip
 
-audioSamples/drums
 audioSamples/misc
 audioSamples/organs
 
+audioSamples/drums/cassette
+audioSamples/drums/claveFrog
+audioSamples/drums/garageSaleDrumKit
+audioSamples/drums/huntersPercussionBongos
+audioSamples/drums/huntersPercussionConga
+audioSamples/drums/huntersPercussionDjembe
+audioSamples/drums/huntersPercussionTaikoFamily
+audioSamples/drums/huntersPercussionUdu
+audioSamples/drums/JonsCajons
+audioSamples/drums/kitchenDrumKit
+audioSamples/drums/metallophon
+audioSamples/drums/No.37
+audioSamples/drums/omani
+audioSamples/drums/slitLog
