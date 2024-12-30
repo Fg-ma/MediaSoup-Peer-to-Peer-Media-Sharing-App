@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
-import * as http from "http";
+import * as https from "https";
+import fs from "fs";
 import { Server } from "socket.io";
 import cors from "cors";
 import { initializeWorkers } from "./lib/workerManager";
@@ -16,7 +17,21 @@ const main = async () => {
 
   app.use(express.static(path.join(__dirname, "../client")));
 
-  const server = http.createServer(app);
+  // Load SSL/TLS Certificates
+  const privateKey = fs.readFileSync(
+    "../certs/tabletop-mediasoup-server-key.pem",
+    "utf8"
+  );
+  const certificate = fs.readFileSync(
+    "../certs/tabletop-mediasoup-server.pem",
+    "utf8"
+  );
+
+  const credentials = { key: privateKey, cert: certificate };
+
+  // Create HTTPS server
+  const server = https.createServer(credentials, app);
+
   const io = new Server(server, {
     cors: {
       origin: "*",

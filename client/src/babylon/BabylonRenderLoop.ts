@@ -78,6 +78,7 @@ class BabylonRenderLoop {
     this.lastFaceCountCheck = performance.now();
 
     this.hideBackgroundEffectImage = new Image();
+    this.hideBackgroundEffectImage.crossOrigin = "anonymous";
 
     this.hideBackgroundOffscreenCanvas = document.createElement("canvas");
     this.hideBackgroundOffscreenContext =

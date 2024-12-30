@@ -3,12 +3,17 @@ import { fileURLToPath } from "url";
 import path, { dirname } from "path";
 import dotenv from "dotenv";
 import webpack from "webpack";
+import fs from "fs";
+import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
 
 // Get the current directory using import.meta.url
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 dotenv.config();
+
+const key = fs.readFileSync(process.env.SSL_KEY_FILE, "utf8");
+const cert = fs.readFileSync(process.env.SSL_CRT_FILE, "utf8");
 
 export default {
   entry: "./index.tsx",
@@ -21,6 +26,13 @@ export default {
   target: "web",
   devServer: {
     port: 8080,
+    server: {
+      type: "https",
+      options: {
+        key,
+        cert,
+      },
+    },
     static: [
       {
         directory: path.join(__dirname, "public"),
@@ -111,5 +123,6 @@ export default {
     new webpack.DefinePlugin({
       "process.env": JSON.stringify(process.env),
     }),
+    new NodePolyfillPlugin(),
   ],
 };

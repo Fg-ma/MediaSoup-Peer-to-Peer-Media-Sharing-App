@@ -12,8 +12,13 @@ import TablesController from "./lib/TablesController";
 const broadcaster = new Broadcaster();
 const tablesController = new TablesController(broadcaster);
 
+const sslOptions = {
+  key_file_name: "../certs/tabletop-table-server-key.pem",
+  cert_file_name: "../certs/tabletop-table-server.pem",
+};
+
 uWS
-  .App()
+  .SSLApp(sslOptions)
   .ws<SocketData>("/*", {
     message: (ws, message, _isBinary) => {
       const tableWS = ws as TableWebSocket;

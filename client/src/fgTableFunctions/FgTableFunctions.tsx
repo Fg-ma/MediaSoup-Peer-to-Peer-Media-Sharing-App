@@ -351,7 +351,7 @@ export default function FgTableFunctions({
             isInTable
               ? "bg-orange-500 hover:bg-orange-700"
               : "bg-blue-500 hover:bg-blue-700"
-          } text-white font-bold py-2 px-4 max-h-[42px]`}
+          } text-white font-bold py-2 px-4 max-h-[42px] font-Josefin`}
         >
           {isInTable ? "Join New Room" : "Join Room"}
         </button>

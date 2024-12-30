@@ -1,19 +1,37 @@
-import "../../public/faceMeshModel/tf-core.js";
-import "../../public/faceMeshModel/tf-converter.js";
-import "../../public/faceMeshModel/tf-backend-wasm.js";
-import "../../public/faceMeshModel/face-landmarks-detection.js";
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 class FaceDetectionWebWorker {
   faceDetector;
   maxFaces = 10;
 
   constructor() {
-    this.loadModel();
+    this.loadDependencies()
+      .then(this.loadModel)
+      .catch((error) =>
+        console.error("Error loading dependencies or model:", error)
+      );
   }
+
+  loadDependencies = async () => {
+    const baseUrl = nginxAssetSeverBaseUrl + "faceMeshModel/";
+
+    const scripts = [
+      "tf-core.js",
+      "tf-converter.js",
+      "tf-backend-wasm.js",
+      "face-landmarks-detection.js",
+    ];
+
+    try {
+      importScripts(...scripts.map((script) => `${baseUrl}${script}`));
+    } catch (error) {
+      throw new Error(`Failed to load scripts: ${error}`);
+    }
+  };
 
   loadModel = async () => {
     // eslint-disable-next-line no-undef
-    tf.wasm.setWasmPaths("/faceMeshModel/");
+    tf.wasm.setWasmPaths(nginxAssetSeverBaseUrl + "faceMeshModel/");
     // eslint-disable-next-line no-undef
     await tf.ready();
 

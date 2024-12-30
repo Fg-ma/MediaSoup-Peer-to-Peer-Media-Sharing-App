@@ -54,15 +54,15 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":7355,
+			"count":7352,
 			"max":[
 				0.8510714173316956,
-				0.9199439883232117,
+				0.91694575548172,
 				0.6166163086891174
 			],
 			"min":[
 				-0.8522476553916931,
-				-1.2655752897262573,
+				-1.2637066841125488,
 				-1.0026466846466064
 			],
 			"type":"VEC3"
@@ -70,51 +70,51 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":7355,
+			"count":7352,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":7355,
+			"count":7352,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":43326,
+			"count":43323,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":88260,
+			"byteLength":88224,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":88260,
-			"byteOffset":88260,
+			"byteLength":88224,
+			"byteOffset":88224,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":58840,
-			"byteOffset":176520,
+			"byteLength":58816,
+			"byteOffset":176448,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":86652,
-			"byteOffset":235360,
+			"byteLength":86646,
+			"byteOffset":235264,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":322012,
+			"byteLength":321912,
 			"uri":"classicalCurlyBeard.bin"
 		}
 	]

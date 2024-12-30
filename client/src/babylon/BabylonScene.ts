@@ -32,6 +32,8 @@ import CameraMedia from "../lib/CameraMedia";
 import ScreenMedia from "../lib/ScreenMedia";
 import AudioMedia from "../lib/AudioMedia";
 
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
 export type DefaultMeshPlacementType =
   | "forehead"
   | "chin"
@@ -551,7 +553,7 @@ class BabylonScene {
         // Create a full-screen layer for the pause image
         this.pauseLayer = new Layer(
           "pauseLayer",
-          "/2DAssets/videoPaused.png",
+          nginxAssetSeverBaseUrl + "2DAssets/videoPaused.png",
           this.scene,
           false
         );

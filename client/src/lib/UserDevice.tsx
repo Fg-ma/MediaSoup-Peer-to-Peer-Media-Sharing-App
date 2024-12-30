@@ -1,3 +1,5 @@
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
 class UserDevice {
   private MAX_FRAME_PROCESSING_TIME = 16;
   private MIN_FRAME_INTERVAL = 16;
@@ -12,7 +14,7 @@ class UserDevice {
 
   // Function to measure network speed
   private async measureNetworkSpeed() {
-    const imageUrl = "/2DAssets/benchMark.png"; // Correct path for testing image
+    const imageUrl = nginxAssetSeverBaseUrl + "2DAssets/benchMark.png"; // Correct path for testing image
     const fileSizeInBytes = 68.4 * 1024; // Size of the image in Bytes
 
     try {

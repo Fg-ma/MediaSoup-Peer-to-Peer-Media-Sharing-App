@@ -17,8 +17,13 @@ const tablesController = new TablesController(broadcaster);
 const universalGameController = new UniversalGameController(broadcaster);
 const snakeGameController = new SnakeGameController();
 
+const sslOptions = {
+  key_file_name: "../certs/tabletop-game-server-key.pem",
+  cert_file_name: "../certs/tabletop-game-server.pem",
+};
+
 uWS
-  .App()
+  .SSLApp(sslOptions)
   .ws<SocketData>("/*", {
     message: (ws, message, _isBinary) => {
       const gameWS = ws as GameWebSocket;

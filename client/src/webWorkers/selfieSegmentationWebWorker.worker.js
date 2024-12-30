@@ -1,5 +1,7 @@
 import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
 
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
 class SelfieSegmentationWebWorker {
   selfieSegmenter = null;
   isInitialized = false;
@@ -15,12 +17,16 @@ class SelfieSegmentationWebWorker {
 
       try {
         // Load the vision tasks WASM files
-        const vision = await FilesetResolver.forVisionTasks("/tasks-vision");
+        const vision = await FilesetResolver.forVisionTasks(
+          nginxAssetSeverBaseUrl + "tasks-vision"
+        );
 
         // Define options for the ImageSegmenter
         const options = {
           baseOptions: {
-            modelAssetPath: "/tasks-vision/selfie_segmenter.tflite",
+            modelAssetPath:
+              nginxAssetSeverBaseUrl + "tasks-vision/selfie_segmenter.tflite",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           outputCategoryMask: false,
