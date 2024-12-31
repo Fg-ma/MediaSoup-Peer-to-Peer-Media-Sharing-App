@@ -6,6 +6,7 @@ import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
 } from "../../../context/effectsContext/typeConstant";
+import { IncomingMediasoupMessages } from "../../../lib/MediasoupSocketController";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
@@ -105,36 +106,20 @@ export default function VisualEffectsSection({
       }
     };
 
-    mediasoupSocket.current.on("message", handleMessage);
+    mediasoupSocket.current?.addMessageListener(handleMessage);
 
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     window.addEventListener("resize", updateWidth);
 
     return () => {
-      mediasoupSocket.current.off("message", handleMessage);
+      mediasoupSocket.current?.removeMessageListener(handleMessage);
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", updateWidth);
     };
   }, []);
 
-  const handleMessage = (
-    event:
-      | {
-          type: "effectChangeRequested";
-          header: {
-            requestedProducerId: string;
-          };
-        }
-      | {
-          type: "clientEffectChanged";
-          header: {
-            username: string;
-            instance: string;
-            producerId: string;
-          };
-        }
-  ) => {
+  const handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "effectChangeRequested":
         if (

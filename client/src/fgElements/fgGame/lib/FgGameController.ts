@@ -1,46 +1,16 @@
-import { Socket } from "socket.io-client";
 import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
 import FgContentAdjustmentController from "../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
-
-type Messages =
-  | onNewConsumerWasCreatedType
-  | onRequestedGameCatchUpDataType
-  | onResponsedGameCatchUpDataType;
-
-type onNewConsumerWasCreatedType = { type: "newConsumerWasCreated" };
-
-type onRequestedGameCatchUpDataType = {
-  type: "requestedGameCatchUpData";
-  header: {
-    inquiringUsername: string;
-    inquiringInstance: string;
-    gameId: string;
-  };
-};
-
-type onResponsedGameCatchUpDataType = {
-  type: "responsedGameCatchUpData";
-  header: {
-    gameId: string;
-  };
-  data: {
-    positioning: {
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    };
-  };
-};
+import MediasoupSocketController, {
+  IncomingMediasoupMessages,
+  onRequestedGameCatchUpDataType,
+  onResponsedGameCatchUpDataType,
+} from "../../../lib/MediasoupSocketController";
 
 class FgGameController {
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private table_id: string,
     private gameId: string,
     private hideControls: boolean,
@@ -295,7 +265,7 @@ class FgGameController {
     const { inquiringUsername, inquiringInstance, gameId } = event.header;
 
     if (gameId === this.gameId) {
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "responseGameCatchUpData",
         header: {
           table_id: this.table_id,
@@ -306,8 +276,7 @@ class FgGameController {
         data: {
           positioning: this.positioning.current,
         },
-      };
-      this.mediasoupSocket.current.send(msg);
+      });
     }
   };
 
@@ -321,7 +290,7 @@ class FgGameController {
     }
   };
 
-  handleMessage = (event: Messages) => {
+  handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "newConsumerWasCreated":
         this.attachPositioningListeners();

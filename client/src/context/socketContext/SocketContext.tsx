@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useRef } from "react";
-import { io, Socket } from "socket.io-client";
-import TableSocketController from "src/lib/TableSocketController";
-
-const websocketURL = "http://localhost:8000";
+import MediasoupSocketController from "../../lib/MediasoupSocketController";
+import TableSocketController from "../../lib/TableSocketController";
 
 export interface SocketContextProviderProps {
   children: React.ReactNode;
@@ -10,7 +8,9 @@ export interface SocketContextProviderProps {
 
 export interface SocketContextType {
   tableSocket: React.MutableRefObject<TableSocketController | undefined>;
-  mediasoupSocket: React.MutableRefObject<Socket>;
+  mediasoupSocket: React.MutableRefObject<
+    MediasoupSocketController | undefined
+  >;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -29,7 +29,7 @@ export function SocketContextProvider({
   children,
 }: SocketContextProviderProps) {
   const tableSocket = useRef<TableSocketController | undefined>();
-  const mediasoupSocket = useRef<Socket>(io(websocketURL));
+  const mediasoupSocket = useRef<MediasoupSocketController | undefined>();
 
   return (
     <SocketContext.Provider

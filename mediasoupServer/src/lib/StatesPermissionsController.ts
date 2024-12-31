@@ -1,11 +1,11 @@
-import { Server as SocketIOServer } from "socket.io";
+import Broadcaster from "./Broadcaster";
 import {
   onPermissionsResponseType,
   onRequestPermissionsType,
-} from "../mediasoupTypes";
+} from "../typeConstant";
 
 class StatesPermissionsController {
-  constructor(private io: SocketIOServer) {}
+  constructor(private broadcaster: Broadcaster) {}
 
   onRequestPermissions = (event: onRequestPermissionsType) => {
     const {
@@ -24,9 +24,12 @@ class StatesPermissionsController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${inquiredUsername}_${inquiredInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      inquiredUsername,
+      inquiredInstance,
+      msg
+    );
   };
 
   onPermissionsResponse(event: onPermissionsResponseType) {
@@ -50,9 +53,12 @@ class StatesPermissionsController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${inquiringUsername}_${inquiringInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      inquiringUsername,
+      inquiringInstance,
+      msg
+    );
   }
 }
 

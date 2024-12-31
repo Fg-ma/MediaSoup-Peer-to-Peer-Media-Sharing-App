@@ -1,20 +1,20 @@
-import { Server as SocketIOServer } from "socket.io";
-import { DataConsumer } from "mediasoup/node/lib/types";
-import { Consumer } from "mediasoup/node/lib/types";
+import {
+  DataConsumer,
+  Consumer,
+  RtpParameters,
+  SctpStreamParameters,
+} from "mediasoup/node/lib/types";
+import createWebRtcTransport from "./createWebRtcTransport";
+import createConsumer from "./createConsumer";
+import { getNextWorker, getWorkerByIdx } from "./workerManager";
+import MediasoupCleanup from "./MediasoupCleanup";
+import Broadcaster from "./Broadcaster";
 import {
   DataStreamTypes,
   tableConsumerTransports,
   tableConsumers,
   tableProducers,
   workersMap,
-} from "../mediasoupVars";
-import createWebRtcTransport from "../createWebRtcTransport";
-import createConsumer from "../createConsumer";
-import { getNextWorker, getWorkerByIdx } from "../workerManager";
-import MediasoupCleanup from "./MediasoupCleanup";
-import { SctpStreamParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
-import { RtpParameters } from "mediasoup/node/lib/fbs/rtp-parameters";
-import {
   onConnectConsumerTransportType,
   onConsumeType,
   onCreateConsumerTransportType,
@@ -22,59 +22,48 @@ import {
   onNewConsumerType,
   onNewJSONConsumerType,
   onUnsubscribeType,
-} from "../mediasoupTypes";
+} from "../typeConstant";
 
 class ConsumersController {
-  private mediasoupCleanup: MediasoupCleanup;
-
-  constructor(private io: SocketIOServer) {
-    this.mediasoupCleanup = new MediasoupCleanup();
-  }
+  constructor(
+    private broadcaster: Broadcaster,
+    private mediasoupCleanup: MediasoupCleanup
+  ) {}
 
   async onCreateConsumerTransport(event: onCreateConsumerTransportType) {
     const { table_id, username, instance } = event.header;
 
-    try {
-      // Get the next available worker and router if one doesn't already exist
-      let mediasoupRouter;
-      if (!workersMap[table_id]) {
-        const { router, workerIdx } = getNextWorker();
-        workersMap[table_id] = workerIdx;
-        mediasoupRouter = router;
-      } else {
-        const { router } = getWorkerByIdx(workersMap[table_id]);
-        mediasoupRouter = router;
-      }
-
-      const { transport, params } = await createWebRtcTransport(
-        mediasoupRouter
-      );
-
-      if (!tableConsumerTransports[table_id]) {
-        tableConsumerTransports[table_id] = {};
-      }
-      if (!tableConsumerTransports[table_id][username]) {
-        tableConsumerTransports[table_id][username] = {};
-      }
-
-      tableConsumerTransports[table_id][username][instance] = {
-        transport,
-        isConnected: false,
-      };
-
-      this.io
-        .to(`instance_${table_id}_${username}_${instance}`)
-        .emit("message", {
-          type: "consumerTransportCreated",
-          data: {
-            params: params,
-          },
-        });
-    } catch (error) {
-      this.io
-        .to(`instance_${table_id}_${username}_${instance}`)
-        .emit("error", error);
+    // Get the next available worker and router if one doesn't already exist
+    let mediasoupRouter;
+    if (!workersMap[table_id]) {
+      const { router, workerIdx } = getNextWorker();
+      workersMap[table_id] = workerIdx;
+      mediasoupRouter = router;
+    } else {
+      const { router } = getWorkerByIdx(workersMap[table_id]);
+      mediasoupRouter = router;
     }
+
+    const { transport, params } = await createWebRtcTransport(mediasoupRouter);
+
+    if (!tableConsumerTransports[table_id]) {
+      tableConsumerTransports[table_id] = {};
+    }
+    if (!tableConsumerTransports[table_id][username]) {
+      tableConsumerTransports[table_id][username] = {};
+    }
+
+    tableConsumerTransports[table_id][username][instance] = {
+      transport,
+      isConnected: false,
+    };
+
+    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+      type: "consumerTransportCreated",
+      data: {
+        params: params,
+      },
+    });
   }
 
   async onConnectConsumerTransport(event: onConnectConsumerTransportType) {
@@ -98,7 +87,7 @@ class ConsumersController {
       tableConsumerTransports[table_id][username][instance].isConnected = true;
     }
 
-    this.io.to(`instance_${table_id}_${username}_${instance}`).emit("message", {
+    this.broadcaster.broadcastToInstance(table_id, username, instance, {
       type: "consumerTransportConnected",
       data: "consumer transport connected",
     });
@@ -352,8 +341,7 @@ class ConsumersController {
               ] = {
                 id: json.id,
                 producerId: json.producerId,
-                // @ts-expect-error: IDK
-                sctpStreamParameters: json.sctpStreamParameters,
+                sctpStreamParameters: json.sctpStreamParameters!,
                 label: json.label,
                 type: json.type,
                 producerPaused: json.producerPaused,
@@ -365,7 +353,7 @@ class ConsumersController {
       }
     }
 
-    this.io.to(`instance_${table_id}_${username}_${instance}`).emit("message", {
+    this.broadcaster.broadcastToInstance(table_id, username, instance, {
       type: "subscribed",
       data: newConsumers,
     });
@@ -428,7 +416,6 @@ class ConsumersController {
         producerId: consumer.producerId,
         id: consumer.id,
         kind: consumer.kind,
-        // @ts-expect-error: type shit
         rtpParameters: consumer.rtpParameters,
         type: consumer.type,
         producerPaused: consumer.producerPaused,
@@ -505,9 +492,7 @@ class ConsumersController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${username}_${instance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
   }
 
   async onNewJSONConsumer(event: onNewJSONConsumerType) {
@@ -554,7 +539,6 @@ class ConsumersController {
         producerId: producer.id,
         id: consumer.id,
         label: consumer.label,
-        // @ts-expect-error: hell if I know but it works
         sctpStreamParameters: consumer.sctpStreamParameters,
         type: consumer.type,
         producerPaused: consumer.dataProducerPaused,
@@ -601,7 +585,7 @@ class ConsumersController {
       ][producerType]![dataStreamType] = newConsumer;
     }
 
-    this.io.to(`instance_${table_id}_${username}_${instance}`).emit("message", {
+    const msg = {
       type: "newJSONConsumerSubscribed",
       header: {
         producerUsername,
@@ -619,7 +603,9 @@ class ConsumersController {
         producerPaused: newConsumer.producerPaused,
         protocol: newConsumer.protocol,
       },
-    });
+    };
+
+    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
   }
 
   onNewConsumerCreated(event: onNewConsumerCreatedType) {
@@ -636,9 +622,8 @@ class ConsumersController {
         producerId,
       },
     };
-    this.io
-      .to(`instance_${table_id}_${username}_${instance}`)
-      .emit("message", msg);
+
+    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
   }
 
   onUnsubscribe(event: onUnsubscribeType) {
@@ -661,9 +646,7 @@ class ConsumersController {
     const msg = {
       type: "unsubscribed",
     };
-    this.io
-      .to(`instance_${table_id}_${username}_${instance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
   }
 }
 

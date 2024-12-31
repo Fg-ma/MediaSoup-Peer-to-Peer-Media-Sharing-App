@@ -1,8 +1,7 @@
-import { Server as SocketIOServer } from "socket.io";
-import { tableConsumers } from "../mediasoupVars";
-import { onResumeType } from "../mediasoupTypes";
+import Broadcaster from "./Broadcaster";
+import { onResumeType, tableConsumers } from "../typeConstant";
 
-const onResume = async (event: onResumeType, io: SocketIOServer) => {
+const onResume = async (broadcaster: Broadcaster, event: onResumeType) => {
   const { table_id, username, instance } = event.header;
 
   for (const producerUsername in tableConsumers[table_id][username][instance]) {
@@ -82,7 +81,7 @@ const onResume = async (event: onResumeType, io: SocketIOServer) => {
     }
   }
 
-  io.to(`instance_${table_id}_${username}_${instance}`).emit("message", {
+  broadcaster.broadcastToInstance(table_id, username, instance, {
     type: "resumed",
     data: "resumed",
   });

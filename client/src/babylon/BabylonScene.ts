@@ -22,15 +22,13 @@ import {
   CameraEffectTypes,
   UserEffectsStylesType,
 } from "../context/effectsContext/typeConstant";
+import { UserMediaType } from "../context/mediaContext/typeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import UserDevice from "../lib/UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
 import FaceLandmarks from "./FaceLandmarks";
-import CameraMedia from "../lib/CameraMedia";
-import ScreenMedia from "../lib/ScreenMedia";
-import AudioMedia from "../lib/AudioMedia";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -112,15 +110,7 @@ class BabylonScene {
     private selfieSegmentationProcessing: boolean[] | undefined,
     private userDevice: UserDevice,
     private maxFaces: [number],
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>
+    private userMedia: React.MutableRefObject<UserMediaType>
   ) {
     this.engine = new Engine(this.canvas, true);
 

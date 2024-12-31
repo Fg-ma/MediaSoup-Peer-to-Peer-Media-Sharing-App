@@ -1,14 +1,12 @@
-import { Socket } from "socket.io-client";
+import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
-import CameraMedia from "../../../../lib/CameraMedia";
-import ScreenMedia from "../../../../lib/ScreenMedia";
-import AudioMedia from "../../../../lib/AudioMedia";
 import FgContentAdjustmentController from "../../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import { FgVisualMediaOptions, Settings } from "../../typeConstant";
+import MediasoupSocketController from "../../../../lib/MediasoupSocketController";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -61,7 +59,9 @@ class FgLowerVisualMediaController {
   private initTime: number;
 
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket> | undefined,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private visualMediaId: string,
     private table_id: string,
     private username: string,
@@ -102,15 +102,7 @@ class FgLowerVisualMediaController {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
     private initTimeOffset: React.MutableRefObject<number>,
     private fgContentAdjustmentController: FgContentAdjustmentController,
     private positioning: React.MutableRefObject<{
@@ -154,12 +146,8 @@ class FgLowerVisualMediaController {
   };
 
   handleCloseVideo = () => {
-    if (!this.mediasoupSocket) {
-      return;
-    }
-
     if (this.fgVisualMediaOptions.isUser) {
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "removeProducer",
         header: {
           table_id: this.table_id,
@@ -168,11 +156,10 @@ class FgLowerVisualMediaController {
           producerType: this.type,
           producerId: this.visualMediaId,
         },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      });
 
       if (this.type === "screen" && this.screenAudioStream) {
-        const message = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "removeProducer",
           header: {
             table_id: this.table_id,
@@ -181,11 +168,10 @@ class FgLowerVisualMediaController {
             producerType: "screenAudio",
             producerId: `${this.visualMediaId}_audio`,
           },
-        };
-        this.mediasoupSocket.current.emit("message", message);
+        });
       }
     } else {
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "requestRemoveProducer",
         header: {
           table_id: this.table_id,
@@ -194,11 +180,10 @@ class FgLowerVisualMediaController {
           producerType: this.type,
           producerId: this.visualMediaId,
         },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      });
 
       if (this.type === "screen" && this.screenAudioStream) {
-        const message = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "requestRemoveProducer",
           header: {
             table_id: this.table_id,
@@ -207,8 +192,7 @@ class FgLowerVisualMediaController {
             producerType: "screenAudio",
             producerId: `${this.visualMediaId}_audio`,
           },
-        };
-        this.mediasoupSocket.current.emit("message", message);
+        });
       }
     }
   };

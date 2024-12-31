@@ -1,7 +1,7 @@
 import * as mediasoup from "mediasoup";
 import { Worker, Router } from "mediasoup/node/lib/types";
 import { config } from "../config";
-import { workers } from "./mediasoupVars";
+import { workers } from "../typeConstant";
 
 // Initialize as many workers as there are number of cpus
 const initializeWorkers = async () => {

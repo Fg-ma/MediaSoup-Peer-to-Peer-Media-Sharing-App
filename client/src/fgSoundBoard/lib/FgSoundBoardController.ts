@@ -7,9 +7,7 @@ import {
   SoundEffects,
   SoundEffectsMetaData,
 } from "./typeConstant";
-import CameraMedia from "../../lib/CameraMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
-import AudioMedia from "../../lib/AudioMedia";
+import { UserMediaType } from "../../context/mediaContext/typeConstant";
 
 class FgSoundBoardController {
   crazyBoardEffectInterval = 75;
@@ -45,15 +43,7 @@ class FgSoundBoardController {
       React.SetStateAction<Record<number, { file: File; path: string }>>
     >,
     private tempImportedFiles: React.MutableRefObject<FileList | undefined>,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
     private audioEndTimeouts: React.MutableRefObject<
       Record<number, NodeJS.Timeout | undefined>
     >

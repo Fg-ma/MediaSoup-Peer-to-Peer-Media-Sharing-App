@@ -1,22 +1,24 @@
 import React from "react";
 import { types } from "mediasoup-client";
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
-import { Socket } from "socket.io-client";
 import {
   DataStreamTypes,
   RemoteDataStreamsType,
   RemoteMediaType,
 } from "../context/mediaContext/typeConstant";
-import {
+import MediasoupSocketController, {
+  IncomingMediasoupMessages,
   onConsumerTransportCreatedType,
   onNewConsumerSubscribedType,
   onNewJSONConsumerSubscribedType,
   onSubscribedType,
-} from "../Main";
+} from "./MediasoupSocketController";
 
 class ConsumersController {
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private device: React.MutableRefObject<types.Device | undefined>,
 
     private table_id: React.MutableRefObject<string>,
@@ -209,7 +211,7 @@ class ConsumersController {
     this.consumerTransport.current.on(
       "connect",
       ({ dtlsParameters }, callback, _errback) => {
-        const msg = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "connectConsumerTransport",
           header: {
             table_id: this.table_id.current,
@@ -217,17 +219,23 @@ class ConsumersController {
             instance: this.instance.current,
           },
           data: {
-            transportId: this.consumerTransport.current?.id,
+            transportId: this.consumerTransport.current?.id ?? "",
             dtlsParameters,
           },
-        };
-
-        this.mediasoupSocket.current.send(msg);
-        this.mediasoupSocket.current.on("message", (event) => {
+        });
+        const consumerTransportConnectedCallback = (
+          event: IncomingMediasoupMessages
+        ) => {
           if (event.type === "consumerTransportConnected") {
             callback();
+            this.mediasoupSocket.current?.removeMessageListener(
+              consumerTransportConnectedCallback
+            );
           }
-        });
+        };
+        this.mediasoupSocket.current?.addMessageListener(
+          consumerTransportConnectedCallback
+        );
       }
     );
 
@@ -298,15 +306,14 @@ class ConsumersController {
               }
             }
 
-            const msg = {
+            this.mediasoupSocket.current?.sendMessage({
               type: "resume",
               header: {
                 table_id: this.table_id.current,
                 username: this.username.current,
                 instance: this.instance.current,
               },
-            };
-            this.mediasoupSocket.current.send(msg);
+            });
             break;
           }
           case "failed": {
@@ -320,7 +327,8 @@ class ConsumersController {
     );
 
     const { rtpCapabilities } = this.device.current;
-    const msg = {
+
+    this.mediasoupSocket.current?.sendMessage({
       type: "consume",
       header: {
         table_id: this.table_id.current,
@@ -330,9 +338,7 @@ class ConsumersController {
       data: {
         rtpCapabilities,
       },
-    };
-
-    this.mediasoupSocket.current.send(msg);
+    });
   }
 
   async onNewConsumerSubscribed(event: onNewConsumerSubscribedType) {
@@ -484,17 +490,16 @@ class ConsumersController {
       );
     }
 
-    const msg = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "resume",
       header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
       },
-    };
-    this.mediasoupSocket.current.send(msg);
+    });
 
-    const message = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "newConsumerCreated",
       header: {
         table_id: this.table_id.current,
@@ -507,8 +512,7 @@ class ConsumersController {
         producerId,
         producerType,
       },
-    };
-    this.mediasoupSocket.current.emit("message", message);
+    });
   }
 
   async onNewJSONConsumerSubscribed(event: onNewJSONConsumerSubscribedType) {
@@ -546,7 +550,7 @@ class ConsumersController {
       splitLabel[splitLabel.length - 1] as DataStreamTypes
     ] = consumer;
 
-    const message = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "newConsumerCreated",
       header: {
         table_id: this.table_id.current,
@@ -559,8 +563,7 @@ class ConsumersController {
         producerId,
         producerType,
       },
-    };
-    this.mediasoupSocket.current.emit("message", message);
+    });
   }
 }
 

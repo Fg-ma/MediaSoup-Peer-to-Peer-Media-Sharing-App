@@ -1,12 +1,7 @@
-import { Server as SocketIOServer } from "socket.io";
-import {
-  tableProducerTransports,
-  tableProducers,
-  workersMap,
-} from "../mediasoupVars";
-import createWebRtcTransport from "../createWebRtcTransport";
-import { getNextWorker, getWorkerByIdx } from "../workerManager";
+import createWebRtcTransport from "./createWebRtcTransport";
+import { getNextWorker, getWorkerByIdx } from "./workerManager";
 import MediasoupCleanup from "./MediasoupCleanup";
+import Broadcaster from "./Broadcaster";
 import {
   onConnectProducerTransportType,
   onCreateNewJSONProducerType,
@@ -15,14 +10,16 @@ import {
   onNewProducerCreatedType,
   onRemoveProducerType,
   onRequestRemoveProducerType,
-} from "../mediasoupTypes";
+  tableProducerTransports,
+  tableProducers,
+  workersMap,
+} from "../typeConstant";
 
 class ProducersController {
-  private mediasoupCleanup: MediasoupCleanup;
-
-  constructor(private io: SocketIOServer) {
-    this.mediasoupCleanup = new MediasoupCleanup();
-  }
+  constructor(
+    private broadcaster: Broadcaster,
+    private mediasoupCleanup: MediasoupCleanup
+  ) {}
 
   onCreateProducerTransport = async (event: onCreateProducerTransportType) => {
     const { table_id, username, instance } = event.header;
@@ -59,14 +56,12 @@ class ProducersController {
         isConnected: false,
       };
 
-      this.io
-        .to(`instance_${table_id}_${username}_${instance}`)
-        .emit("message", {
-          type: "producerTransportCreated",
-          data: {
-            params,
-          },
-        });
+      this.broadcaster.broadcastToInstance(table_id, username, instance, {
+        type: "producerTransportCreated",
+        data: {
+          params,
+        },
+      });
     }
   };
 
@@ -93,7 +88,7 @@ class ProducersController {
       tableProducerTransports[table_id][username][instance].isConnected = true;
     }
 
-    this.io.to(`instance_${table_id}_${username}_${instance}`).emit("message", {
+    this.broadcaster.broadcastToInstance(table_id, username, instance, {
       type: "producerConnected",
       data: "producer connected",
     });
@@ -174,12 +169,13 @@ class ProducersController {
         producerId,
       },
     };
-    this.io.to(`table_${table_id}`).emit("message", msg);
-    this.io
-      .to(`instance_${table_id}_${username}_${instance}`)
-      .emit("newProducerCallback", {
+    this.broadcaster.broadcastToTable(table_id, msg);
+    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+      type: "newProducerCallback",
+      data: {
         id: newProducer.id,
-      });
+      },
+    });
   };
 
   onCreateNewJSONProducer = async (event: onCreateNewJSONProducerType) => {
@@ -249,12 +245,13 @@ class ProducersController {
         },
       };
 
-      this.io.to(`table_${table_id}`).emit("message", msg);
-      this.io
-        .to(`instance_${table_id}_${username}_${instance}`)
-        .emit("newJSONProducerCallback", {
-          id: newProducer.id, // Return the producer's ID after successful creation
-        });
+      this.broadcaster.broadcastToTable(table_id, msg);
+      this.broadcaster.broadcastToInstance(table_id, username, instance, {
+        type: "newJSONProducerCallback",
+        data: {
+          id: newProducer.id,
+        },
+      });
     } catch (error) {
       console.error("Error creating JSON producer:", error);
     }
@@ -271,9 +268,8 @@ class ProducersController {
         producerId: producerId,
       },
     };
-    this.io
-      .to(`instance_${table_id}_${username}_${instance}`)
-      .emit("message", msg);
+
+    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
   };
 
   onRemoveProducer = (event: onRemoveProducerType) => {
@@ -319,7 +315,7 @@ class ProducersController {
         },
       };
 
-      this.io.to(`table_${table_id}`).emit("message", msg);
+      this.broadcaster.broadcastToTable(table_id, msg);
     } catch (error) {
       console.error(error);
     }
@@ -337,9 +333,7 @@ class ProducersController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${username}_${instance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
   };
 }
 

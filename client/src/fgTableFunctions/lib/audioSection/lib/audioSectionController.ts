@@ -1,9 +1,11 @@
-import { Socket } from "socket.io-client";
-import ProducersController from "src/lib/ProducersController";
+import MediasoupSocketController from "../../../../lib/MediasoupSocketController";
+import ProducersController from "../../../../lib/ProducersController";
 
 class AudioSectionController {
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
@@ -28,7 +30,7 @@ class AudioSectionController {
     if (this.isAudio.current) {
       this.producersController.createNewProducer("audio");
     } else if (!this.isAudio.current) {
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "removeProducer",
         header: {
           table_id: this.table_id.current,
@@ -36,8 +38,7 @@ class AudioSectionController {
           instance: this.instance.current,
           producerType: "audio",
         },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      });
     }
   };
 }

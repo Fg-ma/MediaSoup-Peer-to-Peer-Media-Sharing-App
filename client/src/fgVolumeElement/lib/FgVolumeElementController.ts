@@ -1,8 +1,6 @@
+import { IncomingMediasoupMessages } from "src/lib/MediasoupSocketController";
 import FgVolumeElementSocket from "../../fgVolumeElement/lib/FgVolumeElementSocket";
-import {
-  FgVolumeElementControllerMessagesType,
-  FgVolumeElementOptions,
-} from "./typeConstant";
+import { FgVolumeElementOptions } from "./typeConstant";
 
 class FgVolumeElementController {
   fgVolumeElementSocket: FgVolumeElementSocket;
@@ -42,7 +40,7 @@ class FgVolumeElementController {
     );
   }
 
-  handleMessage = (event: FgVolumeElementControllerMessagesType) => {
+  handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "clientMuteStateResponsed":
         this.fgVolumeElementSocket.onClientMuteStateResponsed(event);

@@ -1,11 +1,13 @@
 import { types } from "mediasoup-client";
-import { Socket } from "socket.io-client";
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import ProducersController from "../../../../lib/ProducersController";
+import MediasoupSocketController from "../../../../lib/MediasoupSocketController";
 
 class ScreenSectionController {
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private device: React.MutableRefObject<types.Device | undefined>,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
@@ -36,7 +38,7 @@ class ScreenSectionController {
       const screenIds = Object.keys(this.userMedia.current.screen);
 
       if (screenIds.length > 0 && screenIds[screenIds.length - 1]) {
-        const msg = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "removeProducer",
           header: {
             table_id: this.table_id.current,
@@ -45,15 +47,14 @@ class ScreenSectionController {
             producerType: "screen",
             producerId: screenIds[screenIds.length - 1],
           },
-        };
-        this.mediasoupSocket.current.emit("message", msg);
+        });
 
         if (
           this.userMedia.current.screenAudio[
             `${screenIds[screenIds.length - 1]}_audio`
           ]
         ) {
-          const message = {
+          this.mediasoupSocket.current?.sendMessage({
             type: "removeProducer",
             header: {
               table_id: this.table_id.current,
@@ -62,8 +63,7 @@ class ScreenSectionController {
               producerType: "screenAudio",
               producerId: `${screenIds[screenIds.length - 1]}_audio`,
             },
-          };
-          this.mediasoupSocket.current.emit("message", message);
+          });
         }
       }
     }

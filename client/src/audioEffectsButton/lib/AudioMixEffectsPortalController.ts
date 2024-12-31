@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import { SliderChangeEvent } from "../../fgElements/fgSlider/FgSlider";
@@ -7,72 +6,19 @@ import {
   MixEffectsOptionsType,
 } from "../../audioEffects/typeConstant";
 import { DynamicMixEffect, staticMixEffects } from "./typeConstant";
-
-type MixEffectsSocketEvents =
-  | onClientMixEffectActivityChangedType
-  | onMixEffectActivityChangeRequestedType
-  | onClientMixEffectValueChangedType
-  | onMixEffectValueChangeRequestedType;
-
-type onClientMixEffectActivityChangedType = {
-  type: "clientMixEffectActivityChanged";
-  header: {
-    username: string;
-    instance: string;
-    producerType: "audio" | "screenAudio";
-    producerId: string | undefined;
-  };
-  data: {
-    effect: AudioMixEffectsType;
-    active: boolean;
-  };
-};
-
-type onMixEffectActivityChangeRequestedType = {
-  type: "mixEffectActivityChangeRequested";
-  header: {
-    requestedProducerType: "audio" | "screenAudio";
-    requestedProducerId: string | undefined;
-  };
-  data: {
-    effect: AudioMixEffectsType;
-    active: boolean;
-  };
-};
-
-type onClientMixEffectValueChangedType = {
-  type: "clientMixEffectValueChanged";
-  header: {
-    username: string;
-    instance: string;
-    producerType: "audio" | "screenAudio";
-    producerId: string | undefined;
-  };
-  data: {
-    effect: AudioMixEffectsType;
-    option: MixEffectsOptionsType;
-    value: number;
-    styleValue: number;
-  };
-};
-
-type onMixEffectValueChangeRequestedType = {
-  type: "mixEffectValueChangeRequested";
-  header: {
-    requestedProducerType: "audio" | "screenAudio";
-    requestedProducerId: string | undefined;
-  };
-  data: {
-    effect: AudioMixEffectsType;
-    option: MixEffectsOptionsType;
-    value: number;
-    styleValue: number;
-  };
-};
+import MediasoupSocketController, {
+  IncomingMediasoupMessages,
+  onClientMixEffectActivityChangedType,
+  onClientMixEffectValueChangedType,
+  onMixEffectActivityChangeRequestedType,
+  onMixEffectValueChangeRequestedType,
+} from "../../lib/MediasoupSocketController";
 
 class AudioMixEffectsPortalController {
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private table_id: string,
     private username: string,
     private instance: string,
@@ -261,7 +207,7 @@ class AudioMixEffectsPortalController {
       (this.producerType === "screenAudio" &&
         this.permissions.acceptsScreenAudioEffects)
     ) {
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "clientMixEffectActivityChange",
         header: {
           table_id: this.table_id,
@@ -274,8 +220,7 @@ class AudioMixEffectsPortalController {
           effect,
           active,
         },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      });
     }
   };
 
@@ -289,7 +234,7 @@ class AudioMixEffectsPortalController {
         (this.producerType === "screenAudio" &&
           this.permissions.acceptsScreenAudioEffects)
       ) {
-        const msg = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "requestMixEffectActivityChange",
           header: {
             table_id: this.table_id,
@@ -302,9 +247,7 @@ class AudioMixEffectsPortalController {
             effect,
             active,
           },
-        };
-
-        this.mediasoupSocket.current.emit("message", msg);
+        });
       }
     }
   };
@@ -346,7 +289,7 @@ class AudioMixEffectsPortalController {
       (this.producerType === "screenAudio" &&
         this.permissions.acceptsScreenAudioEffects)
     ) {
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "clientMixEffectValueChange",
         header: {
           table_id: this.table_id,
@@ -361,8 +304,7 @@ class AudioMixEffectsPortalController {
           value,
           styleValue,
         },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      });
     }
   };
 
@@ -383,7 +325,7 @@ class AudioMixEffectsPortalController {
         (this.producerType === "screenAudio" &&
           this.permissions.acceptsScreenAudioEffects)
       ) {
-        const msg = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "requestMixEffectValueChange",
           header: {
             table_id: this.table_id,
@@ -393,14 +335,12 @@ class AudioMixEffectsPortalController {
             requestedProducerId: this.producerId,
           },
           data: {
-            effect,
+            effect: effect as AudioMixEffectsType,
             option,
             value: event.value,
             styleValue: event.styleValue,
           },
-        };
-
-        this.mediasoupSocket.current.emit("message", msg);
+        });
       }
     }
   };
@@ -448,7 +388,7 @@ class AudioMixEffectsPortalController {
     this.setRerender((prev) => !prev);
   };
 
-  handleMessage = (event: MixEffectsSocketEvents) => {
+  handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "mixEffectActivityChangeRequested":
         this.onMixEffectActivityChangeRequested(event);

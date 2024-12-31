@@ -8,7 +8,6 @@ import FgVolumeElementController from "../fgVolumeElement/lib/FgVolumeElementCon
 import VolumeSVG from "../fgVolumeElement/lib/VolumeSVG";
 import {
   defaultFgVolumeElementOptions,
-  FgVolumeElementControllerMessagesType,
   FgVolumeElementOptions,
 } from "./lib/typeConstant";
 import "./lib/fgVolumeElement.css";
@@ -95,18 +94,14 @@ export default function FgVolumeElement({
       fgVolumeElementOptions.volumeSliderThumbSize
     );
 
-    mediasoupSocket.current.on(
-      "message",
-      (event: FgVolumeElementControllerMessagesType) =>
-        fgVolumeElementController.handleMessage(event)
+    mediasoupSocket.current?.addMessageListener(
+      fgVolumeElementController.handleMessage
     );
 
     // Cleanup event listener on unmount
     return () => {
-      mediasoupSocket.current.off(
-        "message",
-        (event: FgVolumeElementControllerMessagesType) =>
-          fgVolumeElementController.handleMessage(event)
+      mediasoupSocket.current?.removeMessageListener(
+        fgVolumeElementController.handleMessage
       );
     };
   }, []);

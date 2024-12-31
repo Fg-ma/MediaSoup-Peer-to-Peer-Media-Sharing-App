@@ -1,4 +1,3 @@
-import { Server as SocketIOServer } from "socket.io";
 import {
   onBundleMetadataResponseType,
   onRequestBundleMetadataType,
@@ -6,11 +5,12 @@ import {
   onRequestGameCatchUpDataType,
   onResponseCatchUpDataType,
   onResponseGameCatchUpDataType,
-} from "../mediasoupTypes";
-import { tableProducers } from "../mediasoupVars";
+  tableProducers,
+} from "../typeConstant";
+import Broadcaster from "./Broadcaster";
 
 class MetadataController {
-  constructor(private io: SocketIOServer) {}
+  constructor(private broadcaster: Broadcaster) {}
 
   onRequestBundleMetadata = (event: onRequestBundleMetadataType) => {
     const {
@@ -29,9 +29,12 @@ class MetadataController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${inquiredUsername}_${inquiredInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      inquiredUsername,
+      inquiredInstance,
+      msg
+    );
   };
 
   onBundleMetadataResponse = (event: onBundleMetadataResponseType) => {
@@ -57,9 +60,12 @@ class MetadataController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${inquiringUsername}_${inquiringInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      inquiringUsername,
+      inquiringInstance,
+      msg
+    );
   };
 
   onRequestCatchUpData = (event: onRequestCatchUpDataType) => {
@@ -83,9 +89,12 @@ class MetadataController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${inquiredUsername}_${inquiredInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      inquiredUsername,
+      inquiredInstance,
+      msg
+    );
   };
 
   onRequestGameCatchUpData = (event: onRequestGameCatchUpDataType) => {
@@ -114,9 +123,12 @@ class MetadataController {
           gameId,
         },
       };
-      this.io
-        .to(`instance_${table_id}_${validUser.username}_${validUser.instance}`)
-        .emit("message", msg);
+      this.broadcaster.broadcastToInstance(
+        table_id,
+        validUser.username,
+        validUser.instance,
+        msg
+      );
     }
   };
 
@@ -142,9 +154,12 @@ class MetadataController {
       data: event.data,
     };
 
-    this.io
-      .to(`instance_${table_id}_${inquiringUsername}_${inquiringInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      inquiringUsername,
+      inquiringInstance,
+      msg
+    );
   };
 
   onResponseGameCatchUpData = (event: onResponseGameCatchUpDataType) => {
@@ -161,9 +176,12 @@ class MetadataController {
         positioning,
       },
     };
-    this.io
-      .to(`instance_${table_id}_${inquiringUsername}_${inquiringInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      inquiringUsername,
+      inquiringInstance,
+      msg
+    );
   };
 }
 

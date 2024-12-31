@@ -1,12 +1,14 @@
 import React from "react";
-import { Socket } from "socket.io-client";
 import Bundle from "../bundle/Bundle";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
 import { Permissions } from "../context/permissionsContext/typeConstant";
+import MediasoupSocketController from "./MediasoupSocketController";
 
 class BundlesController {
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
@@ -152,7 +154,7 @@ class BundlesController {
           }
           initAudioStream={remoteAudioStream ? remoteAudioStream : undefined}
           onRendered={() => {
-            const msg = {
+            this.mediasoupSocket.current?.sendMessage({
               type: "requestPermissions",
               header: {
                 table_id: this.table_id.current,
@@ -161,11 +163,9 @@ class BundlesController {
                 inquiredUsername: trackUsername,
                 inquiredInstance: trackInstance,
               },
-            };
+            });
 
-            this.mediasoupSocket.current.emit("message", msg);
-
-            const message = {
+            this.mediasoupSocket.current?.sendMessage({
               type: "requestBundleMetadata",
               header: {
                 table_id: this.table_id.current,
@@ -174,12 +174,10 @@ class BundlesController {
                 inquiredUsername: trackUsername,
                 inquiredInstance: trackInstance,
               },
-            };
-
-            this.mediasoupSocket.current.emit("message", message);
+            });
           }}
           onNewConsumerWasCreatedCallback={() => {
-            const msg = {
+            this.mediasoupSocket.current?.sendMessage({
               type: "requestClientMuteState",
               header: {
                 table_id: this.table_id.current,
@@ -188,9 +186,7 @@ class BundlesController {
                 producerUsername: trackUsername,
                 producerInstance: trackInstance,
               },
-            };
-
-            this.mediasoupSocket.current.emit("message", msg);
+            });
           }}
         />
       );

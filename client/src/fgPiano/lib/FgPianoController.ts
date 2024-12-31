@@ -1,8 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
+import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import { keys } from "./Scale";
-import CameraMedia from "../../lib/CameraMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
-import AudioMedia from "../../lib/AudioMedia";
 import { Notes, NoteStore, Octaves, StringOctaves } from "../FgPiano";
 
 export const keysMap: { [key: string]: string } = {
@@ -29,15 +27,7 @@ class FgPianoController {
   constructor(
     private isUser: boolean,
 
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
 
     private scaleSectionContainerRef: React.RefObject<HTMLDivElement>,
     private scaleSectionRef: React.RefObject<HTMLDivElement>,

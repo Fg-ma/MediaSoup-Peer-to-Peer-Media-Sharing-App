@@ -5,11 +5,13 @@ import {
   tableProducers,
   tableProducerTransports,
   workersMap,
-} from "../mediasoupVars";
-import { releaseWorker } from "../workerManager";
-import { ProducerTypes } from "./typeConstant";
+  ProducerTypes,
+} from "../typeConstant";
+import { releaseWorker } from "./workerManager";
 
 class MediasoupCleanup {
+  constructor() {}
+
   clearTableConsumers(
     table_id: string,
     username: string,

@@ -10,28 +10,6 @@ export interface FgVolumeElementOptions {
   secondaryVolumeSliderColor?: string;
 }
 
-export type FgVolumeElementControllerMessagesType =
-  | onClientMuteStateResponsedType
-  | onClientMuteChangeType;
-
-export type onClientMuteStateResponsedType = {
-  type: "clientMuteStateResponsed";
-  header: {
-    producerUsername: string;
-    producerInstance: string;
-  };
-};
-
-export type onClientMuteChangeType = {
-  type: "clientMuteChange";
-  header: {
-    username: string;
-  };
-  data: {
-    clientMute: boolean;
-  };
-};
-
 export const defaultFgVolumeElementOptions = {
   iconSize: "2.5rem",
   volumeSliderHeight: "0.25rem",

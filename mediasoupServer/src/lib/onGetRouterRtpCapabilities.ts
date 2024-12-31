@@ -1,12 +1,11 @@
 import { Router } from "mediasoup/node/lib/Router";
-import { Server as SocketIOServer } from "socket.io";
-import { workersMap } from "../mediasoupVars";
-import { getNextWorker, getWorkerByIdx } from "../workerManager";
-import { onGetRouterRtpCapabilitiesType } from "../mediasoupTypes";
+import { getNextWorker, getWorkerByIdx } from "./workerManager";
+import Broadcaster from "./Broadcaster";
+import { workersMap, onGetRouterRtpCapabilitiesType } from "../typeConstant";
 
 const onGetRouterRtpCapabilities = (
-  event: onGetRouterRtpCapabilitiesType,
-  io: SocketIOServer
+  broadcaster: Broadcaster,
+  event: onGetRouterRtpCapabilitiesType
 ) => {
   const { table_id, username, instance } = event.header;
 
@@ -28,7 +27,7 @@ const onGetRouterRtpCapabilities = (
     },
   };
 
-  io.to(`instance_${table_id}_${username}_${instance}`).emit("message", msg);
+  broadcaster.broadcastToInstance(table_id, username, instance, msg);
 };
 
 export default onGetRouterRtpCapabilities;

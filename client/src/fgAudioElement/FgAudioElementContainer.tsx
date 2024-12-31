@@ -157,15 +157,13 @@ export default function FgAudioElementContainer({
     );
 
   useEffect(() => {
-    // Listen for messages on mediasoupSocket
-    mediasoupSocket.current.on(
-      "message",
+    mediasoupSocket.current?.addMessageListener(
       fgAudioElementContainerController.handleMessage
     );
 
     // Request initial catch up data
     if (!isUser && activeUsername && activeInstance) {
-      const msg = {
+      mediasoupSocket.current?.sendMessage({
         type: "requestCatchUpData",
         header: {
           table_id: table_id,
@@ -175,13 +173,11 @@ export default function FgAudioElementContainer({
           inquiredInstance: instance,
           inquiredType: "audio",
         },
-      };
-      mediasoupSocket.current.send(msg);
+      });
     }
 
     return () => {
-      mediasoupSocket.current.off(
-        "message",
+      mediasoupSocket.current?.removeMessageListener(
         fgAudioElementContainerController.handleMessage
       );
     };

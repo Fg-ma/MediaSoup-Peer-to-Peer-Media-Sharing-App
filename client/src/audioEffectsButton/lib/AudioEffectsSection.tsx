@@ -14,6 +14,7 @@ const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
+import { IncomingMediasoupMessages } from "src/lib/MediasoupSocketController";
 const mixAudioEffectsIcon =
   nginxAssetSeverBaseUrl + "svgs/audioEffects/mixAudioEffectsIcon.svg";
 const mixAudioEffectsOffIcon =
@@ -163,13 +164,7 @@ export default function AudioEffectsSection({
     }
   };
 
-  const handleMessage = (event: {
-    type:
-      | "effectChangeRequested"
-      | "clientEffectChanged"
-      | "localMuteChange"
-      | "clientMuteChange";
-  }) => {
+  const handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "effectChangeRequested":
         setRerender((prev) => !prev);
@@ -186,11 +181,10 @@ export default function AudioEffectsSection({
   };
 
   useEffect(() => {
-    mediasoupSocket.current.on("message", handleMessage);
+    mediasoupSocket.current?.addMessageListener(handleMessage);
 
-    // Cleanup event listener on unmount
     return () => {
-      mediasoupSocket.current.off("message", handleMessage);
+      mediasoupSocket.current?.removeMessageListener(handleMessage);
     };
   }, []);
 

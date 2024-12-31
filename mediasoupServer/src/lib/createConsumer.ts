@@ -8,7 +8,7 @@ import {
   ConsumerInstance,
   DataStreamTypes,
   tableConsumerTransports,
-} from "./mediasoupVars";
+} from "../typeConstant";
 
 const createConsumer = async (
   table_id: string,
@@ -292,7 +292,6 @@ const createConsumer = async (
               producerId: jsonProducer.id,
               id: consumer.id,
               label: consumer.label,
-              // @ts-expect-error: hell if I know but it works
               sctpStreamParameters: consumer.sctpStreamParameters,
               type: consumer.type,
               producerPaused: consumer.dataProducerPaused,

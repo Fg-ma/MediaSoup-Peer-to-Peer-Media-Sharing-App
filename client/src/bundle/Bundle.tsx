@@ -94,11 +94,11 @@ export default function Bundle({
   const [_, setRerender] = useState(false);
 
   const bundleController = new BundleController(
+    mediasoupSocket,
     bundleOptions.isUser,
     table_id,
     username,
     instance,
-    mediasoupSocket,
     bundleOptions,
     setCameraStreams,
     setScreenStreams,
@@ -119,20 +119,16 @@ export default function Bundle({
     setRerender
   );
 
-  // Initial functions & call onRendered call back if one is availiable
   useEffect(() => {
     if (onRendered) {
       onRendered();
     }
 
-    mediasoupSocket.current.on("message", (event) =>
-      bundleController.handleMessage(event)
-    );
+    mediasoupSocket.current?.addMessageListener(bundleController.handleMessage);
 
-    // Cleanup event listener on unmount
     return () => {
-      mediasoupSocket.current.off("message", (event) =>
-        bundleController.handleMessage(event)
+      mediasoupSocket.current?.removeMessageListener(
+        bundleController.handleMessage
       );
     };
   }, []);

@@ -15,6 +15,10 @@ import BundlesController from "../lib/BundlesController";
 import FgBackgroundSelector from "../fgElements/fgBackgroundSelector/FgBackgroundSelector";
 import { FgBackground } from "../fgElements/fgBackgroundSelector/lib/typeConstant";
 import TableGridSection from "./lib/tableGridButton/TableGridSection";
+import ConsumersController from "../lib/ConsumersController";
+import PermissionsController from "../lib/PermissionsController";
+import Metadata from "../lib/Metadata";
+import CleanupController from "../lib/CleanupController";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -25,7 +29,6 @@ export default function FgTableFunctions({
   username,
   instance,
   device,
-  producersController,
   producerTransport,
   consumerTransport,
   tableTopRef,
@@ -55,12 +58,16 @@ export default function FgTableFunctions({
   setGridActive,
   gridSize,
   setGridSize,
+  producersController,
+  consumersController,
+  permissionsController,
+  metadata,
+  cleanupController,
 }: {
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;
   device: React.MutableRefObject<types.Device | undefined>;
-  producersController: ProducersController;
   producerTransport: React.MutableRefObject<
     types.Transport<types.AppData> | undefined
   >;
@@ -112,6 +119,11 @@ export default function FgTableFunctions({
       cols: number;
     }>
   >;
+  producersController: ProducersController;
+  consumersController: ConsumersController;
+  permissionsController: PermissionsController;
+  metadata: Metadata;
+  cleanupController: CleanupController;
 }) {
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
   const { setSignal } = useSignalContext();
@@ -161,7 +173,12 @@ export default function FgTableFunctions({
     device,
     bundlesController,
     externalBackgroundChange,
-    setTableBackground
+    setTableBackground,
+    producersController,
+    consumersController,
+    permissionsController,
+    metadata,
+    cleanupController
   );
 
   const handleExternalMute = () => {
@@ -194,7 +211,7 @@ export default function FgTableFunctions({
     }
 
     if (permissions.current.acceptsAudioEffects) {
-      const msg = {
+      mediasoupSocket.current?.sendMessage({
         type: "clientEffectChange",
         header: {
           table_id: table_id.current,
@@ -207,9 +224,7 @@ export default function FgTableFunctions({
           effect: effect,
           blockStateChange: false,
         },
-      };
-
-      mediasoupSocket.current.emit("message", msg);
+      });
     }
   };
 
@@ -218,14 +233,12 @@ export default function FgTableFunctions({
   }, [isAudio.current]);
 
   useEffect(() => {
-    mediasoupSocket.current.on(
-      "message",
+    mediasoupSocket.current?.addMessageListener(
       tableFunctionsController.handleMediasoupSocketMessage
     );
 
     return () => {
-      mediasoupSocket.current.off(
-        "message",
+      mediasoupSocket.current?.removeMessageListener(
         tableFunctionsController.handleMediasoupSocketMessage
       );
     };

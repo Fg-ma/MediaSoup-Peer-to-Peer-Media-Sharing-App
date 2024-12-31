@@ -177,7 +177,7 @@ export default function RemoteVisualMedia({
         (type === "screen" &&
           fgVisualMediaOptions.permissions.acceptsScreenEffects)
       ) {
-        const msg = {
+        mediasoupSocket?.current?.sendMessage({
           type: "clientEffectChange",
           header: {
             table_id,
@@ -193,8 +193,7 @@ export default function RemoteVisualMedia({
               userEffectsStyles.current[type][visualMediaId][effect],
             blockStateChange: blockStateChange,
           },
-        };
-        mediasoupSocket?.current.emit("message", msg);
+        });
       }
     } else if (
       (type === "camera" &&
@@ -202,7 +201,7 @@ export default function RemoteVisualMedia({
       (type === "screen" &&
         fgVisualMediaOptions.permissions.acceptsScreenEffects)
     ) {
-      const msg = {
+      mediasoupSocket?.current?.sendMessage({
         type: "requestEffectChange",
         header: {
           table_id,
@@ -223,9 +222,7 @@ export default function RemoteVisualMedia({
           hideBackgroundColor: hideBackgroundColor,
           postProcessStyle: postProcessStyle,
         },
-      };
-
-      mediasoupSocket?.current.emit("message", msg);
+      });
     }
   };
 
@@ -303,14 +300,13 @@ export default function RemoteVisualMedia({
     fgVisualMediaController.init();
 
     // Listen for messages on mediasoupSocket
-    mediasoupSocket.current.on(
-      "message",
+    mediasoupSocket.current?.addMessageListener(
       fgVisualMediaController.handleMessage
     );
 
     // Request initial catch up data
     if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
-      const msg = {
+      mediasoupSocket.current?.sendMessage({
         type: "requestCatchUpData",
         header: {
           table_id,
@@ -321,8 +317,7 @@ export default function RemoteVisualMedia({
           inquiredType: type,
           inquiredProducerId: visualMediaId,
         },
-      };
-      mediasoupSocket.current.send(msg);
+      });
     }
 
     // Add eventlisteners
@@ -365,8 +360,7 @@ export default function RemoteVisualMedia({
         )
       );
       positioningListeners.current = {};
-      mediasoupSocket.current.off(
-        "message",
+      mediasoupSocket.current?.removeMessageListener(
         fgVisualMediaController.handleMessage
       );
       if (fgVisualMediaOptions.isFullScreen) {

@@ -1,21 +1,11 @@
 import { types } from "mediasoup-client";
 import { UserMedia } from "tone";
-import CameraMedia from "./CameraMedia";
-import ScreenMedia from "./ScreenMedia";
-import AudioMedia from "./AudioMedia";
+import { UserMediaType } from "../context/mediaContext/typeConstant";
 
 class BrowserMedia {
   constructor(
     private device: React.MutableRefObject<types.Device | undefined>,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
     private isCamera: React.MutableRefObject<boolean>,
     private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
     private isScreen: React.MutableRefObject<boolean>,

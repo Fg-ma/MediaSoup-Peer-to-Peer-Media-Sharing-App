@@ -14,6 +14,11 @@ class TablesController {
   onJoinTable = (ws: TableWebSocket, event: onJoinTableType) => {
     const { table_id, username, instance } = event.header;
 
+    ws.id = uuidv4();
+    ws.table_id = table_id;
+    ws.username = username;
+    ws.instance = instance;
+
     if (!tables[table_id]) {
       tables[table_id] = {};
     }
@@ -22,11 +27,6 @@ class TablesController {
     }
 
     tables[table_id][username][instance] = ws;
-
-    ws.id = uuidv4();
-    ws.table_id = table_id;
-    ws.username = username;
-    ws.instance = instance;
 
     this.broadcaster.broadcastToTable(table_id, {
       type: "userJoinedTable",

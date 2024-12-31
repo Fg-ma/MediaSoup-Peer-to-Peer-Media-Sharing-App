@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client";
 import {
   RemoteMediaType,
   UserMediaType,
@@ -9,8 +8,9 @@ import {
   defaultAudioStreamEffects,
   RemoteStreamEffectsType,
 } from "../../context/effectsContext/typeConstant";
-import {
-  BundleOptions,
+import { BundleOptions } from "./typeConstant";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
+import MediasoupSocketController, {
   onBundleMetadataResponsedType,
   onClientEffectChangedType,
   onClientMuteChangeType,
@@ -19,16 +19,17 @@ import {
   onNewProducerWasCreatedType,
   onPermissionsResponsedType,
   onProducerDisconnectedType,
-} from "./typeConstant";
-import { Permissions } from "../../context/permissionsContext/typeConstant";
+} from "../../lib/MediasoupSocketController";
 
 class BundleSocket {
   constructor(
+    protected mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     protected isUser: boolean,
     protected table_id: string,
     protected username: string,
     protected instance: string,
-    protected mediasoupSocket: React.MutableRefObject<Socket>,
     protected bundleOptions: BundleOptions,
     protected setCameraStreams: React.Dispatch<
       React.SetStateAction<
@@ -89,7 +90,7 @@ class BundleSocket {
         (producerType === "screenAudio" &&
           this.permissions.acceptsScreenAudioEffects)
       ) {
-        const msg = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "clientEffectChange",
           header: {
             table_id: this.table_id,
@@ -102,15 +103,14 @@ class BundleSocket {
             effect: effect,
             blockStateChange: false,
           },
-        };
-        this.mediasoupSocket.current.emit("message", msg);
+        });
       }
     } else if (
       (producerType === "audio" && this.permissions.acceptsAudioEffects) ||
       (producerType === "screenAudio" &&
         this.permissions.acceptsScreenAudioEffects)
     ) {
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "requestEffectChange",
         header: {
           table_id: this.table_id,
@@ -123,9 +123,7 @@ class BundleSocket {
           effect: effect,
           blockStateChange: false,
         },
-      };
-
-      this.mediasoupSocket.current.emit("message", msg);
+      });
     }
   };
 
@@ -251,19 +249,19 @@ class BundleSocket {
       producerUsername === this.username &&
       producerInstance === this.instance
     ) {
-      if (producerType === "camera") {
+      if (producerType === "camera" && producerId) {
         this.setCameraStreams((prev) => {
           const newStreams = { ...prev };
           delete newStreams[producerId];
           return newStreams;
         });
-      } else if (producerType === "screen") {
+      } else if (producerType === "screen" && producerId) {
         this.setScreenStreams((prev) => {
           const newStreams = { ...prev };
           delete newStreams[producerId];
           return newStreams;
         });
-      } else if (producerType === "screenAudio") {
+      } else if (producerType === "screenAudio" && producerId) {
         this.setScreenAudioStreams((prev) => {
           const newStreams = { ...prev };
           delete newStreams[producerId];

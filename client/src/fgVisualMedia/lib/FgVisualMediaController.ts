@@ -1,108 +1,23 @@
-import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import {
   UserEffectsStylesType,
-  HideBackgroundEffectTypes,
-  PostProcessEffects,
   RemoteEffectStylesType,
-  AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
+  RemoteStreamEffectsType,
 } from "../../context/effectsContext/typeConstant";
-import CameraMedia from "../../lib/CameraMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
-import AudioMedia from "../../lib/AudioMedia";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import { FgVisualMediaOptions } from "./typeConstant";
 import { Permissions } from "src/context/permissionsContext/typeConstant";
-
-type FgVisualMediaMessageEvents =
-  | onEffectChangeRequestedType
-  | onClientEffectChangedType
-  | onResponsedCatchUpDataType
-  | onNewConsumerWasCreatedType;
-
-type onEffectChangeRequestedType = {
-  type: "effectChangeRequested";
-  header: {
-    requestedProducerType: "camera" | "screen" | "audio";
-    requestedProducerId: string;
-  };
-  data: {
-    effect: CameraEffectTypes | ScreenEffectTypes;
-    blockStateChange: boolean;
-    style: string;
-    hideBackgroundStyle?: HideBackgroundEffectTypes;
-    hideBackgroundColor?: string;
-    postProcessStyle?: PostProcessEffects;
-  };
-};
-
-type onClientEffectChangedType = {
-  type: "clientEffectChanged";
-  header: {
-    username: string;
-    instance: string;
-    producerType: "camera" | "screen" | "screenAudio" | "audio";
-    producerId: string;
-  };
-  data: {
-    effect: CameraEffectTypes | ScreenEffectTypes;
-    effectStyle: string;
-    blockStateChange: boolean;
-  };
-};
-
-type onResponsedCatchUpDataType = {
-  type: "responsedCatchUpData";
-  header: {
-    inquiredUsername: string;
-    inquiredInstance: string;
-    inquiredType: "camera" | "screen";
-    inquiredProducerId: string;
-  };
-  data:
-    | {
-        paused: boolean;
-        timeEllapsed: number;
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
-    | {
-        paused: boolean;
-        timeEllapsed: number;
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
-    | undefined;
-};
-
-type onNewConsumerWasCreatedType = {
-  type: "newConsumerWasCreated";
-  header: {
-    producerUsername: string;
-    producerInstance: string;
-    producerId?: string;
-    producerType: string;
-  };
-};
+import {
+  IncomingMediasoupMessages,
+  onClientEffectChangedType,
+  onEffectChangeRequestedType,
+  onResponsedCatchUpDataType,
+} from "../../lib/MediasoupSocketController";
+import {
+  RemoteDataStreamsType,
+  UserMediaType,
+} from "../../context/mediaContext/typeConstant";
 
 class FgVisualMediaController {
   constructor(
@@ -131,37 +46,11 @@ class FgVisualMediaController {
     }>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
-    private remoteStreamEffects: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          camera: {
-            [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-          };
-          screen: {
-            [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-          };
-          audio: { [effectType in AudioEffectTypes]: boolean };
-        };
-      };
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
-    private remoteDataStreams: React.MutableRefObject<{
-      [username: string]: {
-        [instance: string]: {
-          positionScaleRotation?: DataConsumer | undefined;
-        };
-      };
-    }>,
+    private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
     private videoRef: React.RefObject<HTMLVideoElement>,
     private visualMediaContainerRef: React.RefObject<HTMLDivElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
@@ -261,7 +150,10 @@ class FgVisualMediaController {
         );
       }
 
-      this.handleVisualEffectChange(effect, blockStateChange);
+      this.handleVisualEffectChange(
+        effect as CameraEffectTypes | ScreenEffectTypes,
+        blockStateChange
+      );
     }
   };
 
@@ -349,7 +241,7 @@ class FgVisualMediaController {
     }
   };
 
-  handleMessage = (event: FgVisualMediaMessageEvents) => {
+  handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "effectChangeRequested":
         this.onEffectChangeRequested(event);

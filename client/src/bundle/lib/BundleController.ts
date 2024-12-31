@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client";
 import {
   RemoteMediaType,
   UserMediaType,
@@ -8,16 +7,21 @@ import {
   RemoteStreamEffectsType,
 } from "../../context/effectsContext/typeConstant";
 import BundleSocket from "./BundleSocket";
-import { BundleControllerMessageType, BundleOptions } from "./typeConstant";
+import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
+import MediasoupSocketController, {
+  IncomingMediasoupMessages,
+} from "../../lib/MediasoupSocketController";
 
 class BundleController extends BundleSocket {
   constructor(
+    mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     isUser: boolean,
     table_id: string,
     username: string,
     instance: string,
-    mediasoupSocket: React.MutableRefObject<Socket>,
     bundleOptions: BundleOptions,
     setCameraStreams: React.Dispatch<
       React.SetStateAction<
@@ -61,11 +65,11 @@ class BundleController extends BundleSocket {
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     super(
+      mediasoupSocket,
       isUser,
       table_id,
       username,
       instance,
-      mediasoupSocket,
       bundleOptions,
       setCameraStreams,
       setScreenStreams,
@@ -84,7 +88,7 @@ class BundleController extends BundleSocket {
     );
   }
 
-  handleMessage = (event: BundleControllerMessageType) => {
+  handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "producerDisconnected":
         this.onProducerDisconnected(event);

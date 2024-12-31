@@ -1,5 +1,4 @@
 import { types } from "mediasoup-client";
-import { Socket } from "socket.io-client";
 import {
   RemoteMediaType,
   UserDataStreamsType,
@@ -12,13 +11,23 @@ import { FgBackground } from "../../fgElements/fgBackgroundSelector/lib/typeCons
 import TableSocketController, {
   IncomingTableMessages,
 } from "../../lib/TableSocketController";
+import MediasoupSocketController, {
+  IncomingMediasoupMessages,
+} from "../../lib/MediasoupSocketController";
+import ProducersController from "../../lib/ProducersController";
+import ConsumersController from "../../lib/ConsumersController";
+import PermissionsController from "../../lib/PermissionsController";
+import Metadata from "../../lib/Metadata";
+import CleanupController from "../../lib/CleanupController";
 
 class TableFunctionsController {
   constructor(
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
     >,
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private tableIdRef: React.RefObject<HTMLInputElement>,
     private usernameRef: React.RefObject<HTMLInputElement>,
     private table_id: React.MutableRefObject<string>,
@@ -57,7 +66,12 @@ class TableFunctionsController {
     private externalBackgroundChange: React.MutableRefObject<boolean>,
     private setTableBackground: React.Dispatch<
       React.SetStateAction<FgBackground | undefined>
-    >
+    >,
+    private producersController: ProducersController,
+    private consumersController: ConsumersController,
+    private permissionsController: PermissionsController,
+    private metadata: Metadata,
+    private cleanupController: CleanupController
   ) {}
 
   joinTable = () => {
@@ -83,12 +97,6 @@ class TableFunctionsController {
     ) {
       // Leave previous table if there is one
       if (previousTableId.trim() !== "" && previousUsername.trim() !== "") {
-        this.mediasoupSocket.current.emit(
-          "leaveTable",
-          previousTableId,
-          previousUsername,
-          this.instance.current
-        );
         this.leaveTable();
       }
 
@@ -109,29 +117,27 @@ class TableFunctionsController {
         this.bundlesController
       );
 
-      // Join new table
-      this.mediasoupSocket.current.emit(
-        "joinTable",
+      this.mediasoupSocket.current = new MediasoupSocketController(
+        "ws://localhost:8000",
         this.table_id.current,
         this.username.current,
-        this.instance.current
+        this.instance.current,
+        this.producersController,
+        this.consumersController,
+        this.permissionsController,
+        this.metadata,
+        this.cleanupController
       );
-      this.setIsInTable(true);
 
-      const msg = {
-        type: "getRouterRtpCapabilities",
-        header: {
-          table_id: this.table_id.current,
-          username: this.username.current,
-          instance: this.instance.current,
-        },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      this.setIsInTable(true);
     }
   };
 
   private leaveTable = () => {
     this.tableSocket.current?.deconstructor();
+    this.tableSocket.current = undefined;
+    this.mediasoupSocket.current?.deconstructor();
+    this.mediasoupSocket.current = undefined;
 
     this.unsubscribe();
 
@@ -191,16 +197,14 @@ class TableFunctionsController {
     this.isSubscribed.current = !this.isSubscribed.current;
 
     if (this.isSubscribed.current) {
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "createConsumerTransport",
         header: {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
         },
-      };
-
-      this.mediasoupSocket.current.send(msg);
+      });
     }
   };
 
@@ -226,28 +230,26 @@ class TableFunctionsController {
       });
       this.remoteMedia.current = {};
 
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "unsubscribe",
         header: {
           table_id: this.table_id.current,
           username: this.username.current,
           instance: this.instance.current,
         },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      });
     }
   };
 
   createProducerTransport = () => {
-    const msg = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "createProducerTransport",
       header: {
         table_id: this.table_id.current,
         username: this.username.current,
         instance: this.instance.current,
       },
-    };
-    this.mediasoupSocket.current.emit("message", msg);
+    });
   };
 
   private removePositionScaleRotationProducer = () => {
@@ -256,8 +258,7 @@ class TableFunctionsController {
       delete this.userDataStreams.current.positionScaleRotation;
     }
 
-    // Remove positionRotationScale producer
-    const message = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "removeProducer",
       header: {
         table_id: this.table_id.current,
@@ -266,8 +267,7 @@ class TableFunctionsController {
         producerType: "json",
         dataStreamType: "positionScaleRotation",
       },
-    };
-    this.mediasoupSocket.current.emit("message", message);
+    });
   };
 
   handleTableSocketMessage = (message: IncomingTableMessages) => {
@@ -281,12 +281,7 @@ class TableFunctionsController {
     }
   };
 
-  handleMediasoupSocketMessage = async (event: {
-    type: "routerCapabilities";
-    data: {
-      rtpCapabilities: types.RtpCapabilities;
-    };
-  }) => {
+  handleMediasoupSocketMessage = async (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "routerCapabilities":
         await onRouterCapabilities(event, this.device);

@@ -168,7 +168,7 @@ export default function FgBabylonCanvas({
         (type === "screen" &&
           fgVisualMediaOptions.permissions.acceptsScreenEffects)
       ) {
-        const msg = {
+        mediasoupSocket?.current?.sendMessage({
           type: "clientEffectChange",
           header: {
             table_id,
@@ -184,8 +184,7 @@ export default function FgBabylonCanvas({
               userEffectsStyles.current[type][visualMediaId][effect],
             blockStateChange: blockStateChange,
           },
-        };
-        mediasoupSocket?.current.emit("message", msg);
+        });
       }
     } else if (
       (type === "camera" &&
@@ -193,7 +192,7 @@ export default function FgBabylonCanvas({
       (type === "screen" &&
         fgVisualMediaOptions.permissions.acceptsScreenEffects)
     ) {
-      const msg = {
+      mediasoupSocket?.current?.sendMessage({
         type: "requestEffectChange",
         header: {
           table_id,
@@ -213,9 +212,7 @@ export default function FgBabylonCanvas({
           hideBackgroundStyle: hideBackgroundStyle,
           hideBackgroundColor: hideBackgroundColor,
         },
-      };
-
-      mediasoupSocket?.current.emit("message", msg);
+      });
     }
   };
 
@@ -302,8 +299,7 @@ export default function FgBabylonCanvas({
     fgVisualMediaController.init();
 
     // Listen for messages on mediasoupSocket
-    mediasoupSocket.current.on(
-      "message",
+    mediasoupSocket.current?.addMessageListener(
       fgVisualMediaController.handleMessage
     );
 
@@ -354,8 +350,7 @@ export default function FgBabylonCanvas({
         )
       );
       positioningListeners.current = {};
-      mediasoupSocket.current.off(
-        "message",
+      mediasoupSocket.current?.removeMessageListener(
         fgVisualMediaController.handleMessage
       );
       if (timeUpdateInterval.current !== undefined) {

@@ -218,9 +218,9 @@ export default function FgGame({
   }, [positioning.current.scale]);
 
   useEffect(() => {
-    mediasoupSocket.current.on("message", fgGameController.handleMessage);
+    mediasoupSocket.current?.addMessageListener(fgGameController.handleMessage);
 
-    const msg = {
+    mediasoupSocket.current?.sendMessage({
       type: "requestGameCatchUpData",
       header: {
         table_id: table_id,
@@ -228,8 +228,7 @@ export default function FgGame({
         inquiringInstance: instance,
         gameId: gameId,
       },
-    };
-    mediasoupSocket.current.send(msg);
+    });
 
     fgGameController.attachPositioningListeners();
 
@@ -239,7 +238,9 @@ export default function FgGame({
           removeListener()
         )
       );
-      mediasoupSocket.current.off("message", fgGameController.handleMessage);
+      mediasoupSocket.current?.removeMessageListener(
+        fgGameController.handleMessage
+      );
     };
   }, []);
 

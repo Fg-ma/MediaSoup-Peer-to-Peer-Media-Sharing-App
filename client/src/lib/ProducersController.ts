@@ -1,6 +1,5 @@
 import React from "react";
 import { types } from "mediasoup-client";
-import { Socket } from "socket.io-client";
 import { UserMedia } from "tone";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -26,17 +25,20 @@ import BrowserMedia from "./BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import ScreenAudioMedia from "./ScreenAudioMedia";
 import { Permissions } from "../context/permissionsContext/typeConstant";
-import {
+import MediasoupSocketController, {
+  IncomingMediasoupMessages,
   onNewJSONProducerAvailableType,
   onNewProducerAvailableType,
   onProducerDisconnectedType,
   onProducerTransportCreatedType,
   onRemoveProducerRequestedType,
-} from "src/Main";
+} from "./MediasoupSocketController";
 
 class ProducersController {
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private device: React.MutableRefObject<types.Device | undefined>,
 
     private table_id: React.MutableRefObject<string>,
@@ -238,7 +240,7 @@ class ProducersController {
     this.producerTransport.current.on(
       "connect",
       async ({ dtlsParameters }, callback, _errback) => {
-        const msg = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "connectProducerTransport",
           header: {
             table_id: this.table_id.current,
@@ -248,14 +250,20 @@ class ProducersController {
           data: {
             dtlsParameters,
           },
-        };
-
-        this.mediasoupSocket.current.send(msg);
-        this.mediasoupSocket.current.on("message", (event) => {
+        });
+        const producerConnectedCallback = (
+          event: IncomingMediasoupMessages
+        ) => {
           if (event.type === "producerConnected") {
             callback();
+            this.mediasoupSocket.current?.removeMessageListener(
+              producerConnectedCallback
+            );
           }
-        });
+        };
+        this.mediasoupSocket.current?.addMessageListener(
+          producerConnectedCallback
+        );
       }
     );
 
@@ -265,30 +273,35 @@ class ProducersController {
       async (params, callback, _errback) => {
         const { kind, rtpParameters, appData } = params;
 
-        const msg = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "createNewProducer",
           header: {
             table_id: this.table_id.current,
             username: this.username.current,
             instance: this.instance.current,
-            producerType: appData.producerType,
-            producerId: appData.producerId,
+            producerType: appData.producerType as
+              | "screen"
+              | "audio"
+              | "screenAudio"
+              | "camera",
+            producerId: appData.producerId as string | undefined,
           },
           data: {
-            transportId: this.producerTransport.current?.id,
+            transportId: this.producerTransport.current?.id ?? "",
             kind,
             rtpParameters,
           },
-        };
+        });
 
-        this.mediasoupSocket.current.emit("message", msg);
-
-        this.mediasoupSocket.current.once(
-          "newProducerCallback",
-          (res: { id: string }) => {
-            callback(res);
+        const producerCallback = (event: IncomingMediasoupMessages) => {
+          if (event.type === "newProducerCallback") {
+            callback(event.data);
+            this.mediasoupSocket.current?.removeMessageListener(
+              producerCallback
+            );
           }
-        );
+        };
+        this.mediasoupSocket.current?.addMessageListener(producerCallback);
         return;
       }
     );
@@ -299,32 +312,33 @@ class ProducersController {
         // Create the producer based on params
         const { label, protocol, sctpStreamParameters, appData } = params;
 
-        const msg = {
+        this.mediasoupSocket.current?.sendMessage({
           type: "createNewJSONProducer",
           header: {
             table_id: this.table_id.current,
             username: this.username.current,
             instance: this.instance.current,
-            producerType: appData.producerType,
-            producerId: appData.producerId,
-            dataStreamType: appData.dataStreamType,
+            producerType: appData.producerType as "json",
+            producerId: appData.producerId as string,
+            dataStreamType: appData.dataStreamType as DataStreamTypes,
           },
           data: {
-            transportId: this.producerTransport.current?.id,
-            label,
-            protocol,
-            sctpStreamParameters,
+            transportId: this.producerTransport.current?.id ?? "",
+            label: label ?? "",
+            protocol: protocol as "json",
+            sctpStreamParameters: sctpStreamParameters as types.SctpParameters,
           },
-        };
+        });
 
-        this.mediasoupSocket.current.emit("message", msg);
-
-        this.mediasoupSocket.current.once(
-          "newJSONProducerCallback",
-          (res: { id: string }) => {
-            callback(res);
+        const jsonProducerCallback = (event: IncomingMediasoupMessages) => {
+          if (event.type === "newJSONProducerCallback") {
+            callback(event.data);
+            this.mediasoupSocket.current?.removeMessageListener(
+              jsonProducerCallback
+            );
           }
-        );
+        };
+        this.mediasoupSocket.current?.addMessageListener(jsonProducerCallback);
         return;
       }
     );
@@ -454,7 +468,7 @@ class ProducersController {
     // Reenable buttons
     this.handleDisableEnableBtns(false);
 
-    const msg = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "newProducerCreated",
       header: {
         table_id: this.table_id.current,
@@ -463,9 +477,7 @@ class ProducersController {
         producerType,
         producerId,
       },
-    };
-
-    this.mediasoupSocket.current.emit("message", msg);
+    });
   };
 
   onNewProducerAvailable = (event: onNewProducerAvailableType) => {
@@ -479,7 +491,7 @@ class ProducersController {
     ) {
       const { rtpCapabilities } = this.device.current;
 
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "newConsumer",
         header: {
           table_id: this.table_id.current,
@@ -493,8 +505,7 @@ class ProducersController {
           producerId,
           rtpCapabilities,
         },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      });
     }
   };
 
@@ -514,7 +525,7 @@ class ProducersController {
     ) {
       const { sctpCapabilities } = this.device.current;
 
-      const msg = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "newJSONConsumer",
         header: {
           table_id: this.table_id.current,
@@ -529,8 +540,7 @@ class ProducersController {
           dataStreamType,
           sctpCapabilities,
         },
-      };
-      this.mediasoupSocket.current.emit("message", msg);
+      });
     }
   };
 
@@ -882,7 +892,7 @@ class ProducersController {
 
     const { producerType, producerId } = event.header;
 
-    const msg = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "removeProducer",
       header: {
         table_id: this.table_id.current,
@@ -891,8 +901,7 @@ class ProducersController {
         producerType,
         producerId,
       },
-    };
-    this.mediasoupSocket.current.emit("message", msg);
+    });
   };
 }
 export default ProducersController;

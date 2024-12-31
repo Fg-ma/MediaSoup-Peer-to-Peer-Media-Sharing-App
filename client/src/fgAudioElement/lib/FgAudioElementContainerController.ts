@@ -1,74 +1,9 @@
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
-
-type FgAudioContainerMessageEvents =
-  | onResponsedCatchUpDataType
-  | onNewConsumerWasCreatedType;
-
-type onResponsedCatchUpDataType = {
-  type: "responsedCatchUpData";
-  header: {
-    inquiredUsername: string;
-    inquiredInstance: string;
-    inquiredType: "camera" | "screen" | "audio";
-    inquiredProducerId: string;
-  };
-  data:
-    | {
-        paused: boolean;
-        timeEllapsed: number;
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
-    | {
-        paused: boolean;
-        timeEllapsed: number;
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
-    | {
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
-    | undefined;
-};
-
-type onNewConsumerWasCreatedType = {
-  type: "newConsumerWasCreated";
-  header: {
-    producerUsername: string;
-    producerInstance: string;
-    producerType: string;
-    producerId?: string;
-  };
-};
+import {
+  IncomingMediasoupMessages,
+  onResponsedCatchUpDataType,
+} from "../../lib/MediasoupSocketController";
 
 class FgAudioElementContainerController {
   constructor(
@@ -154,7 +89,7 @@ class FgAudioElementContainerController {
     }
   };
 
-  handleMessage = (event: FgAudioContainerMessageEvents) => {
+  handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "responsedCatchUpData":
         this.onResponsedCatchUpData(event);

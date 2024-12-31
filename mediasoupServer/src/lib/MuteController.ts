@@ -1,8 +1,8 @@
-import { Server as SocketIOServer } from "socket.io";
-import { onClientMuteType } from "../mediasoupTypes";
+import { onClientMuteType } from "../typeConstant";
+import Broadcaster from "./Broadcaster";
 
 class MuteController {
-  constructor(private io: SocketIOServer) {}
+  constructor(private broadcaster: Broadcaster) {}
 
   onClientMute = (event: onClientMuteType) => {
     const { table_id, username, instance } = event.header;
@@ -19,7 +19,7 @@ class MuteController {
       },
     };
 
-    this.io.to(`table_${table_id}`).emit("message", msg);
+    this.broadcaster.broadcastToTable(table_id, msg);
   };
 }
 

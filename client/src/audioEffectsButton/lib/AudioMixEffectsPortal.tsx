@@ -433,14 +433,12 @@ export default function AudioMixEffectsPortal({
   );
 
   useEffect(() => {
-    mediasoupSocket.current.on(
-      "message",
+    mediasoupSocket.current?.addMessageListener(
       audioMixEffectsPortalController.handleMessage
     );
 
     return () => {
-      mediasoupSocket.current.off(
-        "message",
+      mediasoupSocket.current?.removeMessageListener(
         audioMixEffectsPortalController.handleMessage
       );
     };

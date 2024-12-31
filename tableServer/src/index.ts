@@ -20,7 +20,7 @@ const sslOptions = {
 uWS
   .SSLApp(sslOptions)
   .ws<SocketData>("/*", {
-    message: (ws, message, _isBinary) => {
+    message: (ws, message) => {
       const tableWS = ws as TableWebSocket;
 
       try {

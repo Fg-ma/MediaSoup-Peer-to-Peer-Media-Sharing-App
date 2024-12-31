@@ -6,6 +6,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../context/effectsContext/typeConstant";
+import { IncomingMediasoupMessages } from "../../../lib/MediasoupSocketController";
 import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
 import {
   defaultFgVisualMediaOptions,
@@ -192,7 +193,7 @@ export default function FgLowerVisualMediaControls({
   const [_, setRerender] = useState(false);
   const rightVisualMediaControlsRef = useRef<HTMLDivElement>(null);
 
-  const handleMessage = (event: { type: "localMuteChange" }) => {
+  const handleMessage = (event: IncomingMediasoupMessages) => {
     if (event.type === "localMuteChange") {
       setRerender((prev) => !prev);
     }
@@ -212,14 +213,13 @@ export default function FgLowerVisualMediaControls({
   };
 
   useEffect(() => {
-    mediasoupSocket.current.on("message", (event) => handleMessage(event));
+    mediasoupSocket.current?.addMessageListener(handleMessage);
 
     rightVisualMediaControlsRef.current?.addEventListener("wheel", handleWheel);
 
     // Cleanup event listener on unmount
     return () => {
-      mediasoupSocket.current.off("message", (event) => handleMessage(event));
-
+      mediasoupSocket.current?.removeMessageListener(handleMessage);
       rightVisualMediaControlsRef.current?.removeEventListener(
         "wheel",
         handleWheel

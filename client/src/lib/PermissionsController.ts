@@ -1,10 +1,13 @@
-import { Socket } from "socket.io-client";
 import { Permissions } from "../context/permissionsContext/typeConstant";
-import { onPermissionsRequestedType } from "src/Main";
+import MediasoupSocketController, {
+  onPermissionsRequestedType,
+} from "./MediasoupSocketController";
 
 class PermissionsController {
   constructor(
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
@@ -14,7 +17,7 @@ class PermissionsController {
   onPermissionsRequested = (event: onPermissionsRequestedType) => {
     const { inquiringUsername, inquiringInstance } = event.header;
 
-    const msg = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "permissionsResponse",
       header: {
         table_id: this.table_id.current,
@@ -26,9 +29,7 @@ class PermissionsController {
       data: {
         permissions: this.permissions.current,
       },
-    };
-
-    this.mediasoupSocket.current.emit("message", msg);
+    });
   };
 }
 

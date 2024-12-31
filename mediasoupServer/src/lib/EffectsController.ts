@@ -1,4 +1,3 @@
-import { Server as SocketIOServer } from "socket.io";
 import {
   onClientEffectChangeType,
   onClientMixEffectActivityChangeType,
@@ -6,10 +5,11 @@ import {
   onRequestEffectChangeType,
   onRequestMixEffectActivityChangeType,
   onRequestMixEffectValueChangeType,
-} from "../mediasoupTypes";
+} from "../typeConstant";
+import Broadcaster from "./Broadcaster";
 
 class EffectsController {
-  constructor(private io: SocketIOServer) {}
+  constructor(private broadcaster: Broadcaster) {}
 
   onRequestEffectChange = (event: onRequestEffectChangeType) => {
     const {
@@ -44,9 +44,12 @@ class EffectsController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${requestedUsername}_${requestedInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      requestedUsername,
+      requestedInstance,
+      msg
+    );
   };
 
   onClientEffectChange = (event: onClientEffectChangeType) => {
@@ -69,7 +72,7 @@ class EffectsController {
       },
     };
 
-    this.io.to(`table_${table_id}`).emit("message", msg);
+    this.broadcaster.broadcastToTable(table_id, msg);
   };
 
   onClientMixEffectActivityChange = (
@@ -93,7 +96,7 @@ class EffectsController {
       },
     };
 
-    this.io.to(`table_${table_id}`).emit("message", msg);
+    this.broadcaster.broadcastToTable(table_id, msg);
   };
 
   onRequestMixEffectActivityChange = (
@@ -120,9 +123,12 @@ class EffectsController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${requestedUsername}_${requestedInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      requestedUsername,
+      requestedInstance,
+      msg
+    );
   };
 
   onClientMixEffectValueChange = (event: onClientMixEffectValueChangeType) => {
@@ -146,7 +152,7 @@ class EffectsController {
       },
     };
 
-    this.io.to(`table_${table_id}`).emit("message", msg);
+    this.broadcaster.broadcastToTable(table_id, msg);
   };
 
   onRequestMixEffectValueChange = (
@@ -175,9 +181,12 @@ class EffectsController {
       },
     };
 
-    this.io
-      .to(`instance_${table_id}_${requestedUsername}_${requestedInstance}`)
-      .emit("message", msg);
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      requestedUsername,
+      requestedInstance,
+      msg
+    );
   };
 }
 

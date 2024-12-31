@@ -1,47 +1,24 @@
-import { Socket } from "socket.io-client";
 import {
   UserEffectsStylesType,
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
+  UserStreamEffectsType,
 } from "../context/effectsContext/typeConstant";
-import CameraMedia from "./CameraMedia";
-import ScreenMedia from "./ScreenMedia";
-import AudioMedia from "./AudioMedia";
-import {
+import MediasoupSocketController, {
   onBundleMetadataRequestedType,
   onRequestedCatchUpDataType,
-} from "../Main";
+} from "./MediasoupSocketController";
+import { UserMediaType } from "../context/mediaContext/typeConstant";
 
 class Metadata {
   constructor(
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private table_id: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
-    private mediasoupSocket: React.MutableRefObject<Socket>,
-    private userMedia: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: CameraMedia;
-      };
-      screen: {
-        [screenId: string]: ScreenMedia;
-      };
-      audio: AudioMedia | undefined;
-    }>,
+    private userMedia: React.MutableRefObject<UserMediaType>,
     private mutedAudioRef: React.MutableRefObject<boolean>,
-    private userStreamEffects: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: {
-          [effectType in CameraEffectTypes]: boolean;
-        };
-      };
-      screen: {
-        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-      };
-      audio: {
-        [effectType in AudioEffectTypes]: boolean;
-      };
-    }>,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>
   ) {}
 
@@ -54,7 +31,7 @@ class Metadata {
     } = event.header;
 
     let data;
-    if (inquiredType === "camera") {
+    if (inquiredType === "camera" && inquiredProducerId) {
       const cameraMedia = this.userMedia.current.camera[inquiredProducerId];
       const dataPositioningValue = document
         .getElementById(`${inquiredProducerId}_container`)
@@ -65,7 +42,7 @@ class Metadata {
         timeEllapsed: cameraMedia.getTimeEllapsed(),
         positioning,
       };
-    } else if (inquiredType === "screen") {
+    } else if (inquiredType === "screen" && inquiredProducerId) {
       const screenMedia = this.userMedia.current.screen[inquiredProducerId];
       const dataPositioningValue = document
         .getElementById(`${inquiredProducerId}_container`)
@@ -88,7 +65,7 @@ class Metadata {
       };
     }
 
-    const msg = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "responseCatchUpData",
       header: {
         table_id: this.table_id.current,
@@ -100,14 +77,13 @@ class Metadata {
         inquiredProducerId,
       },
       data,
-    };
-    this.mediasoupSocket.current.emit("message", msg);
+    });
   };
 
   onBundleMetadataRequested = (event: onBundleMetadataRequestedType) => {
     const { inquiringUsername, inquiringInstance } = event.header;
 
-    const msg = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "bundleMetadataResponse",
       header: {
         table_id: this.table_id.current,
@@ -121,9 +97,7 @@ class Metadata {
         streamEffects: this.userStreamEffects.current,
         userEffectsStyles: this.userEffectsStyles.current,
       },
-    };
-
-    this.mediasoupSocket.current.emit("message", msg);
+    });
   };
 }
 

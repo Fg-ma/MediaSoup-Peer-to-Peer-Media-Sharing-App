@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client";
 import {
   defaultScreenEffectsStyles,
   UserEffectsStylesType,
@@ -12,6 +11,7 @@ import BabylonScene, {
   EffectType,
   validEffectTypes,
 } from "../babylon/BabylonScene";
+import MediasoupSocketController from "./MediasoupSocketController";
 
 class ScreenMedia {
   canvas: HTMLCanvasElement;
@@ -30,7 +30,9 @@ class ScreenMedia {
     private username: string,
     private instance: string,
     private screenId: string,
-    private mediasoupSocket: React.MutableRefObject<Socket>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >,
     private originalScreenStream: MediaStream,
     private screenStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -94,7 +96,7 @@ class ScreenMedia {
       .getVideoTracks()[0]
       .removeEventListener("ended", this.originalScreenStreamEnded);
 
-    const msg = {
+    this.mediasoupSocket.current?.sendMessage({
       type: "removeProducer",
       header: {
         table_id: this.table_id,
@@ -103,11 +105,10 @@ class ScreenMedia {
         producerType: "screen",
         producerId: this.screenId,
       },
-    };
-    this.mediasoupSocket.current.emit("message", msg);
+    });
 
     if (this.userMedia.current.screenAudio[`${this.screenId}_audio`]) {
-      const message = {
+      this.mediasoupSocket.current?.sendMessage({
         type: "removeProducer",
         header: {
           table_id: this.table_id,
@@ -116,8 +117,7 @@ class ScreenMedia {
           producerType: "screenAudio",
           producerId: `${this.screenId}_audio`,
         },
-      };
-      this.mediasoupSocket.current.emit("message", message);
+      });
     }
   };
 

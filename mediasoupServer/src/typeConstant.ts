@@ -1,20 +1,166 @@
-import { Socket } from "socket.io";
 import {
   DtlsParameters,
   RtpCapabilities,
   MediaKind,
-  RtpParameters,
   SctpCapabilities,
+  Consumer,
+  Producer,
+  Transport,
+  Worker,
+  Router,
+  DataProducer,
+  DataConsumer,
+  RtpParameters,
+  SctpParameters,
+  SctpStreamParameters,
 } from "mediasoup/node/lib/types";
-import { Permissions, ProducerTypes } from "./lib/typeConstant";
-import { SctpParameters } from "mediasoup/node/lib/fbs/sctp-parameters";
-import { DataStreamTypes } from "./mediasoupVars";
+import uWS from "uWebSockets.js";
 
-export interface MediasoupSocket extends Socket {
-  table_id?: string;
-  username?: string;
-  instance?: string;
+interface MediasoupWorker {
+  worker: Worker;
+  router: Router;
+  activeConnections: number;
 }
+
+export interface Tables {
+  [table_id: string]: {
+    [username: string]: {
+      [instance: string]: MediasoupWebSocket;
+    };
+  };
+}
+
+export type TableProducerTransports = {
+  [table_id: string]: {
+    [username: string]: {
+      [instance: string]: {
+        transport: Transport;
+        isConnected: boolean;
+      };
+    };
+  };
+};
+export type TableConsumerTransports = {
+  [table_id: string]: {
+    [username: string]: {
+      [instance: string]: {
+        transport: Transport;
+        isConnected: boolean;
+      };
+    };
+  };
+};
+
+export type TableProducers = {
+  [table_id: string]: {
+    [username: string]: {
+      [instance: string]: {
+        camera?: { [cameraId: string]: Producer };
+        screen?: { [screenId: string]: Producer };
+        screenAudio?: { [screenAudioId: string]: Producer };
+        audio?: Producer;
+        json?: { [dataStreamType in DataStreamTypes]?: DataProducer };
+      };
+    };
+  };
+};
+export type ConsumerInstance = {
+  camera?: {
+    [cameraId: string]: {
+      consumer: Consumer;
+      id: string;
+      producerId: string;
+      kind: string;
+      rtpParameters: RtpParameters;
+      type: string;
+      producerPaused: boolean;
+    };
+  };
+  screen?: {
+    [screenId: string]: {
+      consumer: Consumer;
+      id: string;
+      producerId: string;
+      kind: string;
+      rtpParameters: RtpParameters;
+      type: string;
+      producerPaused: boolean;
+    };
+  };
+  screenAudio?: {
+    [screenAudioId: string]: {
+      consumer: Consumer;
+      id: string;
+      producerId: string;
+      kind: string;
+      rtpParameters: RtpParameters;
+      type: string;
+      producerPaused: boolean;
+    };
+  };
+  audio?: {
+    consumer: Consumer;
+    id: string;
+    producerId: string;
+    kind: string;
+    rtpParameters: RtpParameters;
+    type: string;
+    producerPaused: boolean;
+  };
+  json?: {
+    [dataStreamType in DataStreamTypes]?: {
+      consumer: DataConsumer;
+      id: string;
+      producerId: string;
+      label: string;
+      sctpStreamParameters: SctpStreamParameters | undefined;
+      type: string;
+      producerPaused: boolean;
+      protocol: string;
+    };
+  };
+};
+export type TableConsumers = {
+  [table_id: string]: {
+    [username: string]: {
+      [instance: string]: {
+        [producerUsername: string]: {
+          [producerInstance: string]: ConsumerInstance;
+        };
+      };
+    };
+  };
+};
+
+export interface MediasoupWebSocket extends uWS.WebSocket<SocketData> {
+  id: string;
+  table_id: string;
+  username: string;
+  instance: string;
+}
+
+export interface SocketData {
+  id: string;
+  table_id: string;
+  username: string;
+  instance: string;
+}
+
+export type ProducerTypes =
+  | "camera"
+  | "screen"
+  | "screenAudio"
+  | "audio"
+  | "json";
+
+export type DataStreamTypes = "positionScaleRotation";
+
+export type Permissions = {
+  acceptsCameraEffects: boolean;
+  acceptsScreenEffects: boolean;
+  acceptsAudioEffects: boolean;
+  acceptsPositionScaleRotationManipulation: boolean;
+};
 
 export type AudioMixEffectsType =
   | "autoFilter"
@@ -37,6 +183,7 @@ export type AudioMixEffectsType =
   | "vibrato";
 
 export type MediasoupSocketEvents =
+  | onJoinTableType
   | onGetRouterRtpCapabilitiesType
   | onCreateProducerTransportType
   | onConnectProducerTransportType
@@ -69,6 +216,15 @@ export type MediasoupSocketEvents =
   | onClientMixEffectValueChangeType
   | onRequestRemoveProducerType;
 
+export type onJoinTableType = {
+  type: "joinTable";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+  };
+};
+
 export type onGetRouterRtpCapabilitiesType = {
   type: "getRouterRtpCapabilities";
   header: {
@@ -83,7 +239,7 @@ export type onCreateProducerTransportType = {
   header: {
     table_id: string;
     username: string;
-    instance: number;
+    instance: string;
   };
 };
 
@@ -139,9 +295,6 @@ export type onCreateConsumerTransportType = {
     table_id: string;
     username: string;
     instance: string;
-  };
-  data: {
-    forceTcp: boolean;
   };
 };
 
@@ -283,7 +436,7 @@ export type onRequestEffectChangeType = {
   data: {
     effect: string;
     blockStateChange: boolean;
-    style: string;
+    style?: string;
     hideBackgroundStyle?: string;
     hideBackgroundColor?: string;
     postProcessStyle?: string;
@@ -301,7 +454,7 @@ export type onClientEffectChangeType = {
   };
   data: {
     effect: string;
-    effectStyle: string;
+    effectStyle?: string;
     blockStateChange: boolean;
   };
 };
@@ -367,7 +520,7 @@ export type onRequestCatchUpDataType = {
     inquiredUsername: string;
     inquiredInstance: string;
     inquiredType: ProducerTypes;
-    inquiredProducerId: string;
+    inquiredProducerId?: string;
   };
 };
 
@@ -390,7 +543,7 @@ export type onResponseCatchUpDataType = {
     inquiredUsername: string;
     inquiredInstance: string;
     inquiredType: ProducerTypes;
-    inquiredProducerId: string;
+    inquiredProducerId?: string;
   };
   data:
     | {
@@ -536,3 +689,16 @@ export type onRequestRemoveProducerType = {
     producerId: string;
   };
 };
+
+export const tables: Tables = {};
+
+export const tableProducerTransports: TableProducerTransports = {};
+export const tableConsumerTransports: TableConsumerTransports = {};
+
+export const tableProducers: TableProducers = {};
+export const tableConsumers: TableConsumers = {};
+
+export const workers: MediasoupWorker[] = [];
+export const workersMap: {
+  [table_id: string]: number;
+} = {};
