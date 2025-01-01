@@ -5,7 +5,8 @@ class MuteController {
   constructor(private broadcaster: Broadcaster) {}
 
   onClientMute = (event: onClientMuteType) => {
-    const { table_id, username, instance } = event.header;
+    const { table_id, username, instance, producerType, producerId } =
+      event.header;
     const { clientMute } = event.data;
 
     const msg = {
@@ -13,6 +14,8 @@ class MuteController {
       header: {
         username,
         instance,
+        producerType,
+        producerId,
       },
       data: {
         clientMute,

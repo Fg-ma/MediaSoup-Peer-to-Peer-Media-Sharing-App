@@ -17,9 +17,13 @@ export default function FgVolumeElement({
   username,
   instance,
   isUser,
+  producerType,
+  producerId,
   audioRef,
   clientMute,
+  screenAudioClientMute,
   localMute,
+  screenAudioLocalMute,
   visualEffectsActive,
   settingsActive,
   options,
@@ -31,17 +35,33 @@ export default function FgVolumeElement({
   username: string;
   instance: string;
   isUser: boolean;
+  producerType: "screenAudio" | "audio";
+  producerId: string | undefined;
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
+  screenAudioClientMute: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
   localMute: React.MutableRefObject<boolean>;
+  screenAudioLocalMute: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
   visualEffectsActive: boolean;
   settingsActive: boolean;
   options?: FgVolumeElementOptions;
-  handleMuteCallback?: () => void;
-  handleVolumeSliderCallback?: (
-    event: React.ChangeEvent<HTMLInputElement>
+  handleMuteCallback?: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
   ) => void;
-  tracksColorSetterCallback?: () => void;
+  handleVolumeSliderCallback?: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
+  tracksColorSetterCallback?: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
 }) {
   const fgVolumeElementOptions = {
     ...defaultFgVolumeElementOptions,
@@ -51,9 +71,6 @@ export default function FgVolumeElement({
   const { signal } = useSignalContext();
   const { mediasoupSocket } = useSocketContext();
 
-  const [active, setActive] = useState(
-    fgVolumeElementOptions.initialVolume === "off" ? true : false
-  );
   const [volumeState, setVolumeState] = useState({
     from: "",
     to: fgVolumeElementOptions.initialVolume,
@@ -64,13 +81,16 @@ export default function FgVolumeElement({
   const fgVolumeElementController = new FgVolumeElementController(
     username,
     instance,
+    producerType,
+    producerId,
     isUser,
     fgVolumeElementOptions,
     audioRef,
     sliderRef,
     clientMute,
+    screenAudioClientMute,
     localMute,
-    setActive,
+    screenAudioLocalMute,
     volumeState,
     setVolumeState,
     tracksColorSetterCallback
@@ -109,10 +129,24 @@ export default function FgVolumeElement({
   const handleVolumeSlider = (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
 
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-      if (!clientMute?.current && !isUser) {
-        audioRef.current.muted = volume > 0 ? false : true;
+    if (producerType === "audio") {
+      if (audioRef.current) {
+        audioRef.current.volume = volume;
+        if (!clientMute.current && !isUser) {
+          audioRef.current.muted = volume > 0 ? false : true;
+        }
+      }
+    } else {
+      if (producerId) {
+        const audioElement = document.getElementById(
+          producerId
+        ) as HTMLAudioElement | null;
+        if (audioElement) {
+          audioElement.volume = volume;
+          if (!screenAudioClientMute.current[producerId] && !isUser) {
+            audioElement.muted = volume > 0 ? false : true;
+          }
+        }
       }
     }
 
@@ -125,61 +159,135 @@ export default function FgVolumeElement({
     fgVolumeElementController.volumeSliderChangeHandler();
 
     if (handleVolumeSliderCallback) {
-      handleVolumeSliderCallback(event);
+      handleVolumeSliderCallback(event, producerType, producerId);
     }
   };
 
   const handleMute = () => {
-    if (clientMute.current) {
-      return;
-    }
-
-    localMute.current = !localMute.current;
-
-    if (!audioRef.current) {
-      return;
-    }
-
-    if (!isUser) {
-      audioRef.current.muted = localMute.current;
-    }
-
-    const newVolume = audioRef.current.volume;
-    let newVolumeState;
-    if (localMute.current || newVolume === 0) {
-      newVolumeState = "off";
-    } else if (newVolume >= 0.5) {
-      newVolumeState = "high";
-    } else {
-      newVolumeState = "low";
-    }
-
-    setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
-
     if (handleMuteCallback !== undefined) {
-      handleMuteCallback();
+      handleMuteCallback(producerType, producerId);
+    }
+
+    if (producerType === "audio") {
+      if (clientMute.current) {
+        return;
+      }
+
+      localMute.current = !localMute.current;
+
+      if (!audioRef.current) {
+        return;
+      }
+
+      if (!isUser) {
+        audioRef.current.muted = localMute.current;
+      }
+
+      const newVolume = audioRef.current.volume;
+      let newVolumeState;
+      if (localMute.current || newVolume === 0) {
+        newVolumeState = "off";
+      } else if (newVolume >= 0.5) {
+        newVolumeState = "high";
+      } else {
+        newVolumeState = "low";
+      }
+
+      if (volumeState.to !== newVolumeState) {
+        setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
+      }
+    } else {
+      if (!producerId || screenAudioClientMute.current[producerId]) {
+        return;
+      }
+
+      screenAudioLocalMute.current[producerId] =
+        !screenAudioLocalMute.current[producerId];
+
+      const audioElement = document.getElementById(
+        producerId
+      ) as HTMLAudioElement | null;
+
+      if (audioElement) {
+        if (!isUser) {
+          audioElement.muted = screenAudioLocalMute.current[producerId];
+        }
+
+        const newVolume = audioElement.volume;
+        let newVolumeState;
+        if (screenAudioLocalMute.current[producerId] || newVolume === 0) {
+          newVolumeState = "off";
+        } else if (newVolume >= 0.5) {
+          newVolumeState = "high";
+        } else {
+          newVolumeState = "low";
+        }
+
+        if (volumeState.to !== newVolumeState) {
+          setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
+        }
+      } else {
+        const newVolumeState = screenAudioLocalMute.current[producerId]
+          ? "off"
+          : "high";
+
+        if (volumeState.to !== newVolumeState) {
+          setVolumeState((prev) => ({
+            from: prev.to,
+            to: newVolumeState,
+          }));
+        }
+      }
     }
   };
 
   useEffect(() => {
-    if (!audioRef.current) {
-      return;
-    }
+    if (producerType === "audio") {
+      if (!audioRef.current) {
+        return;
+      }
 
-    const newVolume = audioRef.current.volume;
-    let newVolumeState;
-    if (localMute.current || newVolume === 0) {
-      newVolumeState = "off";
-    } else if (newVolume >= 0.5) {
-      newVolumeState = "high";
+      const newVolume = audioRef.current.volume;
+      let newVolumeState;
+      if (localMute.current || newVolume === 0) {
+        newVolumeState = "off";
+      } else if (newVolume >= 0.5) {
+        newVolumeState = "high";
+      } else {
+        newVolumeState = "low";
+      }
+
+      if (volumeState.to !== newVolumeState) {
+        setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
+      }
     } else {
-      newVolumeState = "low";
-    }
+      if (!producerId) {
+        return;
+      }
 
-    if (volumeState.to !== newVolumeState) {
-      setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
+      const audioElement = document.getElementById(
+        producerId
+      ) as HTMLAudioElement | null;
+
+      if (!audioElement) {
+        return;
+      }
+
+      const newVolume = audioElement.volume;
+      let newVolumeState;
+      if (screenAudioLocalMute.current[producerId] || newVolume === 0) {
+        newVolumeState = "off";
+      } else if (newVolume >= 0.5) {
+        newVolumeState = "high";
+      } else {
+        newVolumeState = "low";
+      }
+
+      if (volumeState.to !== newVolumeState) {
+        setVolumeState((prev) => ({ from: prev.to, to: newVolumeState }));
+      }
     }
-  }, [localMute.current]);
+  }, [localMute.current, screenAudioLocalMute.current[producerId ?? ""]]);
 
   useEffect(() => {
     if (!signal) {
@@ -188,13 +296,23 @@ export default function FgVolumeElement({
 
     switch (signal.type) {
       case "localMuteChange":
+        const {
+          table_id: newTable_id,
+          username: newUsername,
+          instance: newInstance,
+          producerType: newProducerType,
+          producerId: newProducerId,
+        } = signal.header;
         if (
-          signal.table_id === table_id &&
-          signal.username === username &&
-          signal.instance === instance
+          newTable_id === table_id &&
+          newUsername === username &&
+          newInstance === instance
         ) {
           setTimeout(() => {
-            fgVolumeElementController.fgVolumeElementSocket.onLocalMuteChange();
+            fgVolumeElementController.onLocalMuteChange(
+              newProducerType,
+              newProducerId
+            );
           }, 0);
         }
         break;
@@ -210,12 +328,7 @@ export default function FgVolumeElement({
       style={{ height: `calc(${fgVolumeElementOptions.iconSize} * 2)` }}
     >
       <FgButton
-        clickFunction={() => {
-          handleMute();
-          if (!clientMute.current) {
-            setActive((prev) => !prev);
-          }
-        }}
+        clickFunction={handleMute}
         contentFunction={() => {
           return (
             <svg
@@ -243,7 +356,29 @@ export default function FgVolumeElement({
         hoverContent={
           !visualEffectsActive && !settingsActive ? (
             <FgHoverContentStandard
-              content={active ? "Unmute (m)" : "Mute (m)"}
+              content={
+                producerType === "audio"
+                  ? audioRef.current?.volume === 0
+                    ? "Unmute (m)"
+                    : clientMute.current
+                    ? "Unmute (m)"
+                    : localMute.current
+                    ? "Unmute (m)"
+                    : "Mute (m)"
+                  : producerId
+                  ? (
+                      document.getElementById(
+                        producerId
+                      ) as HTMLAudioElement | null
+                    )?.volume === 0
+                    ? "Unmute (m)"
+                    : screenAudioClientMute.current[producerId]
+                    ? "Unmute (m)"
+                    : producerId && screenAudioLocalMute.current[producerId]
+                    ? "Unmute (m)"
+                    : "Mute (m)"
+                  : "Mute (m)"
+              }
               style='dark'
             />
           ) : undefined
@@ -255,7 +390,8 @@ export default function FgVolumeElement({
         <input
           ref={sliderRef}
           onInput={handleVolumeSlider}
-          className='volume-slider'
+          // prettier-ignore
+          className={`volume-slider volume-slider-${producerType}${producerId ? producerId : ""}`}
           type='range'
           min='0'
           max='1'

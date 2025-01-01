@@ -343,7 +343,8 @@ class FgVisualMediaController {
               data.table_id === this.table_id &&
               data.username === this.username &&
               data.instance === this.instance &&
-              data.type === this.type
+              data.type === this.type &&
+              data.producerId === this.visualMediaId
             ) {
               this.positioning.current = data.positioning;
               this.setRerender((prev) => !prev);

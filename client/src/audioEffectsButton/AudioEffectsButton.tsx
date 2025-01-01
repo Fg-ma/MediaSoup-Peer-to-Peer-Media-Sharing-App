@@ -34,8 +34,10 @@ export default function AudioEffectsButton({
   handleAudioEffectChange,
   handleMute,
   muteStateRef,
-  localMute,
   clientMute,
+  screenAudioClientMute,
+  localMute,
+  screenAudioLocalMute,
   visualMediaContainerRef,
   closeLabelElement,
   hoverLabelElement,
@@ -57,10 +59,19 @@ export default function AudioEffectsButton({
     producerId: string | undefined,
     effect: AudioEffectTypes
   ) => void;
-  handleMute: () => void;
+  handleMute: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
   muteStateRef?: React.MutableRefObject<boolean>;
-  localMute?: React.MutableRefObject<boolean>;
   clientMute?: React.MutableRefObject<boolean>;
+  screenAudioClientMute?: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
+  localMute?: React.MutableRefObject<boolean>;
+  screenAudioLocalMute?: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
   visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
   hoverLabelElement?: React.ReactElement;
@@ -132,8 +143,10 @@ export default function AudioEffectsButton({
             padding={12}
             handleMute={handleMute}
             muteStateRef={muteStateRef}
-            localMute={localMute}
             clientMute={clientMute}
+            screenAudioClientMute={screenAudioClientMute}
+            localMute={localMute}
+            screenAudioLocalMute={screenAudioLocalMute}
             visualMediaContainerRef={visualMediaContainerRef}
             closeLabelElement={closeLabelElement}
             closeCallback={() => setAudioEffectsActive(false)}

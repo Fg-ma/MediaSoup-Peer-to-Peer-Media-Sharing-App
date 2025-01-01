@@ -30,7 +30,10 @@ class BundlesController {
       }>
     >,
 
-    private muteAudio: () => void,
+    private muteAudio: (
+      producerType: "audio" | "screenAudio",
+      producerId: string | undefined
+    ) => void,
 
     private setUpEffectContext: (
       username: string,

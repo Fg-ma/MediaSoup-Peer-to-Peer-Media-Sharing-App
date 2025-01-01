@@ -4,9 +4,13 @@ export type Signals =
   | undefined
   | {
       type: "localMuteChange";
-      table_id: string;
-      username: string;
-      instance: string;
+      header: {
+        table_id: string;
+        username: string;
+        instance: string;
+        producerType: "audio" | "screenAudio";
+        producerId: string | undefined;
+      };
     };
 
 export interface SignalContextProviderProps {

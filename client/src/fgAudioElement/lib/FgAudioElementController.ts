@@ -31,7 +31,10 @@ class FgAudioElementController {
       }>
     >,
     private setPopupVisible: React.Dispatch<React.SetStateAction<boolean>>,
-    private handleMute: () => void
+    private handleMute: (
+      producerType: "audio" | "screenAudio",
+      producerId: string | undefined
+    ) => void
   ) {}
 
   init = () => {
@@ -149,7 +152,7 @@ class FgAudioElementController {
     const validClick = this.isOnPath(event as unknown as React.PointerEvent);
 
     if (validClick) {
-      this.handleMute();
+      this.handleMute("audio", undefined);
     }
   };
 

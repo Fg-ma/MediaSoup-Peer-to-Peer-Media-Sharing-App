@@ -392,6 +392,8 @@ export type onClientMuteType = {
     table_id: string;
     username: string;
     instance: string;
+    producerType: "audio" | "screenAudio";
+    producerId: string | undefined;
   };
   data: {
     clientMute: boolean;

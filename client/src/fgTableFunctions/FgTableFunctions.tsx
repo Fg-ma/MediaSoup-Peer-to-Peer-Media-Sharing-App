@@ -99,7 +99,10 @@ export default function FgTableFunctions({
   setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
   audioBtnRef: React.RefObject<HTMLButtonElement>;
   isSubscribed: React.MutableRefObject<boolean>;
-  muteAudio: () => void;
+  muteAudio: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
   handleDisableEnableBtns: (disabled: boolean) => void;
   bundles: {
     [username: string]: {
@@ -182,21 +185,18 @@ export default function FgTableFunctions({
   );
 
   const handleExternalMute = () => {
-    muteAudio();
+    muteAudio("audio", undefined);
 
-    const msg: {
-      type: "localMuteChange";
-      table_id: string;
-      username: string;
-      instance: string;
-    } = {
+    setSignal({
       type: "localMuteChange",
-      table_id: table_id.current,
-      username: username.current,
-      instance: instance.current,
-    };
-
-    setSignal(msg);
+      header: {
+        table_id: table_id.current,
+        username: username.current,
+        instance: instance.current,
+        producerType: "audio",
+        producerId: undefined,
+      },
+    });
   };
 
   const handleExternalAudioEffectChange = (

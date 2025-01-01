@@ -312,7 +312,7 @@ export default function FgGame({
       onPointerEnter={fgGameController.handlePointerEnter}
       onPointerLeave={fgGameController.handlePointerLeave}
       onPointerMove={fgGameController.handlePointerMove}
-      className={`fg-game ${hideControls ? "z-[49] cursor-none" : "z-0"} ${
+      className={`fg-game ${hideControls ? "z-[5] cursor-none" : "z-[49]"} ${
         hideControls ? "hide-controls" : ""
       } rounded absolute`}
       style={{

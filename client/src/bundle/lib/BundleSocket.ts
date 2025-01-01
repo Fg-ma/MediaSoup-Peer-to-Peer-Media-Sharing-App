@@ -64,7 +64,13 @@ class BundleSocket {
     protected userMedia: React.MutableRefObject<UserMediaType>,
     protected audioRef: React.RefObject<HTMLAudioElement>,
     protected clientMute: React.MutableRefObject<boolean>,
+    protected screenAudioClientMute: React.MutableRefObject<{
+      [screenAudioId: string]: boolean;
+    }>,
     protected localMute: React.MutableRefObject<boolean>,
+    protected screenAudioLocalMute: React.MutableRefObject<{
+      [screenAudioId: string]: boolean;
+    }>,
     protected permissions: Permissions,
     protected setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
     protected onNewConsumerWasCreatedCallback: (() => void) | undefined
@@ -273,26 +279,49 @@ class BundleSocket {
     }
   };
 
-  // Get client mute changes from other users
   onClientMuteChange = (event: onClientMuteChangeType) => {
     if (this.isUser) {
       return;
     }
-
     const { clientMute } = event.data;
-
-    this.clientMute.current = clientMute;
+    const { producerType, producerId } = event.header;
+    if (producerType === "audio") {
+      this.clientMute.current = clientMute;
+    } else {
+      if (producerId) {
+        this.screenAudioClientMute.current[producerId] = clientMute;
+      }
+    }
   };
 
-  onLocalMuteChange = () => {
-    if (this.clientMute.current) {
-      return;
-    }
+  onLocalMuteChange = (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => {
+    if (producerType === "audio") {
+      if (this.clientMute.current) {
+        return;
+      }
 
-    this.localMute.current = !this.localMute.current;
+      this.localMute.current = !this.localMute.current;
 
-    if (!this.isUser && this.audioRef.current) {
-      this.audioRef.current.muted = this.localMute.current;
+      if (!this.isUser && this.audioRef.current) {
+        this.audioRef.current.muted = this.localMute.current;
+      }
+    } else {
+      if (!producerId || this.screenAudioClientMute.current[producerId]) {
+        return;
+      }
+
+      this.screenAudioLocalMute.current[producerId] =
+        !this.screenAudioLocalMute.current[producerId];
+
+      const audioElement = document.getElementById(
+        producerId
+      ) as HTMLAudioElement | null;
+      if (!this.isUser && audioElement) {
+        audioElement.muted = this.localMute.current;
+      }
     }
   };
 

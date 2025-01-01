@@ -57,11 +57,22 @@ class BundleController extends BundleSocket {
     private bundleRef: React.RefObject<HTMLDivElement>,
     audioRef: React.RefObject<HTMLAudioElement>,
     clientMute: React.MutableRefObject<boolean>,
+    screenAudioClientMute: React.MutableRefObject<{
+      [screenAudioId: string]: boolean;
+    }>,
     localMute: React.MutableRefObject<boolean>,
+    screenAudioLocalMute: React.MutableRefObject<{
+      [screenAudioId: string]: boolean;
+    }>,
     permissions: Permissions,
     setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
     onNewConsumerWasCreatedCallback: (() => void) | undefined,
-    private handleMuteCallback: (() => void) | undefined,
+    private handleMuteCallback:
+      | ((
+          producerType: "audio" | "screenAudio",
+          producerId: string | undefined
+        ) => void)
+      | undefined,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     super(
@@ -81,7 +92,9 @@ class BundleController extends BundleSocket {
       userMedia,
       audioRef,
       clientMute,
+      screenAudioClientMute,
       localMute,
+      screenAudioLocalMute,
       permissions,
       setPermissions,
       onNewConsumerWasCreatedCallback
@@ -119,39 +132,84 @@ class BundleController extends BundleSocket {
     }
   };
 
-  tracksColorSetterCallback = () => {
-    if (!this.bundleRef.current || !this.audioRef.current) {
+  tracksColorSetterCallback = (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => {
+    if (!this.bundleRef.current) {
       return;
     }
 
-    const volumeSliders =
-      this.bundleRef.current.querySelectorAll(".volume-slider");
+    const volumeSliders = this.bundleRef.current.querySelectorAll(
+      `.volume-slider-${producerType}${producerId ? producerId : ""}`
+    );
 
-    let value = this.audioRef.current.volume;
-    if (
-      this.audioRef.current.muted &&
-      !this.bundleOptions.isUser &&
-      !this.clientMute.current
-    ) {
-      value = 0;
+    if (producerType === "audio") {
+      if (!this.audioRef.current) {
+        return;
+      }
+
+      let value = this.audioRef.current.volume;
+      if (
+        this.audioRef.current.muted &&
+        !this.bundleOptions.isUser &&
+        !this.clientMute.current
+      ) {
+        value = 0;
+      }
+      const min = 0;
+      const max = 1;
+      const percentage = ((value - min) / (max - min)) * 100;
+      const trackColor = `linear-gradient(to right, ${this.bundleOptions.primaryVolumeSliderColor} 0%, ${this.bundleOptions.primaryVolumeSliderColor} ${percentage}%, ${this.bundleOptions.secondaryVolumeSliderColor} ${percentage}%, ${this.bundleOptions.secondaryVolumeSliderColor} 100%)`;
+
+      volumeSliders.forEach((slider) => {
+        const sliderElement = slider as HTMLInputElement;
+        sliderElement.style.background = trackColor;
+      });
+    } else {
+      if (!producerId) {
+        return;
+      }
+
+      const audioElement = document.getElementById(
+        producerId
+      ) as HTMLAudioElement | null;
+
+      if (!audioElement) {
+        return;
+      }
+
+      let value = audioElement.volume;
+      if (
+        audioElement.muted &&
+        !this.bundleOptions.isUser &&
+        !this.screenAudioClientMute.current[producerId]
+      ) {
+        value = 0;
+      }
+      const min = 0;
+      const max = 1;
+      const percentage = ((value - min) / (max - min)) * 100;
+      const trackColor = `linear-gradient(to right, ${this.bundleOptions.primaryVolumeSliderColor} 0%, ${this.bundleOptions.primaryVolumeSliderColor} ${percentage}%, ${this.bundleOptions.secondaryVolumeSliderColor} ${percentage}%, ${this.bundleOptions.secondaryVolumeSliderColor} 100%)`;
+
+      volumeSliders.forEach((slider) => {
+        const sliderElement = slider as HTMLInputElement;
+        sliderElement.style.background = trackColor;
+      });
     }
-    const min = 0;
-    const max = 1;
-    const percentage = ((value - min) / (max - min)) * 100;
-    const trackColor = `linear-gradient(to right, ${this.bundleOptions.primaryVolumeSliderColor} 0%, ${this.bundleOptions.primaryVolumeSliderColor} ${percentage}%, ${this.bundleOptions.secondaryVolumeSliderColor} ${percentage}%, ${this.bundleOptions.secondaryVolumeSliderColor} 100%)`;
-
-    volumeSliders.forEach((slider) => {
-      const sliderElement = slider as HTMLInputElement;
-      sliderElement.style.background = trackColor;
-    });
   };
 
-  handleVolumeSliderCallback = (event: React.ChangeEvent<HTMLInputElement>) => {
+  handleVolumeSliderCallback = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => {
     const volume = parseFloat(event.target.value);
 
     if (this.bundleRef.current) {
-      const volumeSliders =
-        this.bundleRef.current.querySelectorAll(".volume-slider");
+      const volumeSliders = this.bundleRef.current.querySelectorAll(
+        `.volume-slider-${producerType}${producerId ? producerId : ""}`
+      );
 
       volumeSliders.forEach((slider) => {
         const sliderElement = slider as HTMLInputElement;
@@ -159,12 +217,15 @@ class BundleController extends BundleSocket {
       });
     }
 
-    this.tracksColorSetterCallback();
+    this.tracksColorSetterCallback(producerType, producerId);
   };
 
-  handleMute = () => {
+  handleMute = (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => {
     if (this.handleMuteCallback) {
-      this.handleMuteCallback();
+      this.handleMuteCallback(producerType, producerId);
     }
 
     if (this.clientMute.current) {

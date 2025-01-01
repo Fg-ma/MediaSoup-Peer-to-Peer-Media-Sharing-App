@@ -86,12 +86,18 @@ class FgLowerVisualMediaController {
     private setAudioEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
-    private handleMute: () => void,
+    private handleMute: (
+      producerType: "audio" | "screenAudio",
+      producerId: string | undefined
+    ) => void,
     private handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
       blockStateChange?: boolean
     ) => Promise<void>,
-    private tracksColorSetterCallback: () => void,
+    private tracksColorSetterCallback: (
+      producerType: "audio" | "screenAudio",
+      producerId: string | undefined
+    ) => void,
     private tintColor: React.MutableRefObject<string>,
     private userStreamEffects: React.MutableRefObject<{
       camera: {
@@ -284,7 +290,10 @@ class FgLowerVisualMediaController {
         break;
       case "m":
         if (this.fgVisualMediaOptions.isVolume) {
-          this.handleMute();
+          this.handleMute(
+            this.screenAudioStream ? "screenAudio" : "audio",
+            this.screenAudioStream ? `${this.visualMediaId}_audio` : undefined
+          );
         }
         break;
       case "c":
@@ -452,28 +461,65 @@ class FgLowerVisualMediaController {
   };
 
   volumeControl = (volumeChangeAmount: number) => {
-    if (!this.audioRef.current) {
-      return;
+    const producerType = this.screenAudioStream ? "screenAudio" : "audio";
+    const producerId = this.screenAudioStream
+      ? `${this.visualMediaId}_audio`
+      : undefined;
+    this.tracksColorSetterCallback(producerType, producerId);
+
+    if (!this.screenAudioStream) {
+      if (!this.audioRef.current) {
+        return;
+      }
+
+      const newVolume = Math.max(
+        0,
+        Math.min(1, this.audioRef.current.volume + volumeChangeAmount)
+      );
+
+      this.audioRef.current.volume = newVolume;
+
+      if (this.bundleRef.current) {
+        const volumeSliders = this.bundleRef.current.querySelectorAll(
+          `.volume-slider-${producerType}`
+        );
+
+        volumeSliders.forEach((slider) => {
+          const sliderElement = slider as HTMLInputElement;
+          sliderElement.value = `${newVolume}`;
+        });
+      }
+    } else {
+      if (!producerId) {
+        return;
+      }
+
+      const audioElement = document.getElementById(
+        producerId
+      ) as HTMLAudioElement | null;
+
+      if (!audioElement) {
+        return;
+      }
+
+      const newVolume = Math.max(
+        0,
+        Math.min(1, audioElement.volume + volumeChangeAmount)
+      );
+
+      audioElement.volume = newVolume;
+
+      if (this.bundleRef.current) {
+        const volumeSliders =
+          // prettier-ignore
+          this.bundleRef.current.querySelectorAll(`.volume-slider-${producerType}${producerId ? producerId : ""}`);
+
+        volumeSliders.forEach((slider) => {
+          const sliderElement = slider as HTMLInputElement;
+          sliderElement.value = `${newVolume}`;
+        });
+      }
     }
-
-    const newVolume = Math.max(
-      0,
-      Math.min(1, this.audioRef.current.volume + volumeChangeAmount)
-    );
-
-    this.audioRef.current.volume = newVolume;
-
-    if (this.bundleRef.current) {
-      const volumeSliders =
-        this.bundleRef.current.querySelectorAll(".volume-slider");
-
-      volumeSliders.forEach((slider) => {
-        const sliderElement = slider as HTMLInputElement;
-        sliderElement.value = `${newVolume}`;
-      });
-    }
-
-    this.tracksColorSetterCallback();
   };
 
   handleKeyUp = (event: KeyboardEvent) => {

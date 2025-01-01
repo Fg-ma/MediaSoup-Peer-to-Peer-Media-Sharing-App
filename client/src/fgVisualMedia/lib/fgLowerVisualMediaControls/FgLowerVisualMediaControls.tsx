@@ -115,7 +115,9 @@ export default function FgLowerVisualMediaControls({
   fgLowerVisualMediaController,
   pausedState,
   clientMute,
+  screenAudioClientMute,
   localMute,
+  screenAudioLocalMute,
   visualMediaContainerRef,
   audioStream,
   screenAudioStream,
@@ -143,7 +145,13 @@ export default function FgLowerVisualMediaControls({
   fgLowerVisualMediaController: FgLowerVisualMediaController;
   pausedState: boolean;
   clientMute: React.MutableRefObject<boolean>;
+  screenAudioClientMute: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
   localMute: React.MutableRefObject<boolean>;
+  screenAudioLocalMute: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
   visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   audioStream?: MediaStream;
   screenAudioStream?: MediaStream;
@@ -166,11 +174,21 @@ export default function FgLowerVisualMediaControls({
     producerId: string | undefined,
     effect: AudioEffectTypes
   ) => void;
-  handleMuteCallback: (() => void) | undefined;
+  handleMuteCallback:
+    | ((
+        producerType: "audio" | "screenAudio",
+        producerId: string | undefined
+      ) => void)
+    | undefined;
   handleVolumeSliderCallback: (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
   ) => void;
-  tracksColorSetterCallback: () => void;
+  tracksColorSetterCallback: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
 }) {
   const { mediasoupSocket } = useSocketContext();
 
@@ -288,9 +306,15 @@ export default function FgLowerVisualMediaControls({
                   fgVisualMediaOptions.isUser ??
                   defaultFgVisualMediaOptions.isUser
                 }
+                producerType={screenAudioStream ? "screenAudio" : "audio"}
+                producerId={
+                  screenAudioStream ? `${visualMediaId}_audio` : undefined
+                }
                 audioRef={audioRef}
                 clientMute={clientMute}
+                screenAudioClientMute={screenAudioClientMute}
                 localMute={localMute}
+                screenAudioLocalMute={screenAudioLocalMute}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
                 options={{
@@ -299,7 +323,10 @@ export default function FgLowerVisualMediaControls({
                 }}
                 handleMuteCallback={() => {
                   if (handleMuteCallback !== undefined) {
-                    handleMuteCallback();
+                    handleMuteCallback(
+                      screenAudioStream ? "screenAudio" : "audio",
+                      screenAudioStream ? `${visualMediaId}_audio` : undefined
+                    );
                   }
 
                   setRerender((prev) => !prev);
@@ -413,28 +440,57 @@ export default function FgLowerVisualMediaControls({
                 setAudioEffectsActive={setAudioEffectsActive}
                 handleAudioEffectChange={handleAudioEffectChange}
                 handleMute={() => {
-                  if (clientMute.current) {
-                    return;
-                  }
+                  if (!screenAudioStream) {
+                    if (clientMute.current) {
+                      return;
+                    }
 
-                  localMute.current = !localMute.current;
+                    localMute.current = !localMute.current;
 
-                  if (!audioRef.current) {
-                    return;
-                  }
+                    if (!audioRef.current) {
+                      return;
+                    }
 
-                  if (!fgVisualMediaOptions.isUser) {
-                    audioRef.current.muted = localMute.current;
+                    if (!fgVisualMediaOptions.isUser) {
+                      audioRef.current.muted = localMute.current;
+                    }
+                  } else {
+                    if (
+                      screenAudioClientMute.current[`${visualMediaId}_audio`]
+                    ) {
+                      return;
+                    }
+
+                    screenAudioLocalMute.current[`${visualMediaId}_audio`] =
+                      !screenAudioLocalMute.current[`${visualMediaId}_audio`];
+
+                    const audioElement = document.getElementById(
+                      `${visualMediaId}_audio`
+                    ) as HTMLAudioElement | null;
+
+                    if (!audioElement) {
+                      return;
+                    }
+
+                    if (!fgVisualMediaOptions.isUser) {
+                      audioElement.muted =
+                        screenAudioLocalMute.current[`${visualMediaId}_audio`];
+                    }
                   }
 
                   if (handleMuteCallback !== undefined) {
-                    handleMuteCallback();
+                    handleMuteCallback(
+                      screenAudioStream ? "screenAudio" : "audio",
+                      screenAudioStream ? `${visualMediaId}_audio` : undefined
+                    );
                   }
 
                   setRerender((prev) => !prev);
                 }}
-                localMute={localMute}
                 clientMute={clientMute}
+                screenAudioClientMute={screenAudioClientMute}
+                localMute={localMute}
+                screenAudioLocalMute={screenAudioLocalMute}
                 visualMediaContainerRef={visualMediaContainerRef}
                 closeLabelElement={
                   <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0 bg-white'>

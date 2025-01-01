@@ -53,8 +53,10 @@ export default function AudioEffectsSection({
   padding,
   handleMute,
   muteStateRef,
-  localMute,
   clientMute,
+  screenAudioClientMute,
+  localMute,
+  screenAudioLocalMute,
   visualMediaContainerRef,
   closeLabelElement,
   closeCallback,
@@ -76,10 +78,19 @@ export default function AudioEffectsSection({
   placement: "above" | "below" | "left" | "right";
   referenceElement: React.RefObject<HTMLElement>;
   padding: number;
-  handleMute: () => void;
+  handleMute: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
   muteStateRef?: React.MutableRefObject<boolean>;
-  localMute?: React.MutableRefObject<boolean>;
   clientMute?: React.MutableRefObject<boolean>;
+  screenAudioClientMute?: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
+  localMute?: React.MutableRefObject<boolean>;
+  screenAudioLocalMute?: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
   visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
   closeCallback?: () => void;
@@ -100,7 +111,7 @@ export default function AudioEffectsSection({
       ? muteStateRef.current
         ? "off"
         : "high"
-      : clientMute
+      : producerType === "audio" && clientMute
       ? clientMute.current
         ? "off"
         : localMute
@@ -108,8 +119,20 @@ export default function AudioEffectsSection({
           ? "off"
           : "high"
         : "high"
-      : localMute
+      : producerType === "screenAudio" && screenAudioClientMute && producerId
+      ? screenAudioClientMute.current[producerId]
+        ? "off"
+        : screenAudioLocalMute
+        ? screenAudioLocalMute.current[producerId]
+          ? "off"
+          : "high"
+        : "high"
+      : producerType === "audio" && localMute
       ? localMute.current
+        ? "off"
+        : "high"
+      : producerType === "screenAudio" && screenAudioLocalMute && producerId
+      ? screenAudioLocalMute.current[producerId]
         ? "off"
         : "high"
       : "high",
@@ -130,7 +153,7 @@ export default function AudioEffectsSection({
       ? muteStateRef.current
         ? "off"
         : "high"
-      : clientMute
+      : producerType === "audio" && clientMute
       ? clientMute.current
         ? "off"
         : localMute
@@ -138,8 +161,20 @@ export default function AudioEffectsSection({
           ? "off"
           : "high"
         : "high"
-      : localMute
+      : producerType === "screenAudio" && screenAudioClientMute && producerId
+      ? screenAudioClientMute.current[producerId]
+        ? "off"
+        : screenAudioLocalMute
+        ? screenAudioLocalMute.current[producerId]
+          ? "off"
+          : "high"
+        : "high"
+      : producerType === "audio" && localMute
       ? localMute.current
+        ? "off"
+        : "high"
+      : producerType === "screenAudio" && screenAudioLocalMute && producerId
+      ? screenAudioLocalMute.current[producerId]
         ? "off"
         : "high"
       : "high";
@@ -147,7 +182,13 @@ export default function AudioEffectsSection({
     if (newTo !== volumeState.to) {
       setVolumeState((prev) => ({ from: prev.to, to: newTo }));
     }
-  }, [muteStateRef?.current, clientMute?.current, localMute?.current]);
+  }, [
+    muteStateRef?.current,
+    clientMute?.current,
+    localMute?.current,
+    screenAudioClientMute?.current[producerId ?? ""],
+    screenAudioLocalMute?.current[producerId ?? ""],
+  ]);
 
   const gridColumnsChange = () => {
     if (!audioSectionRef.current) return;
@@ -222,7 +263,7 @@ export default function AudioEffectsSection({
               scrollingContainerRef={audioSectionRef}
               className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
               clickFunction={() => {
-                handleMute();
+                handleMute(producerType, producerId);
                 setRerender((prev) => !prev);
               }}
               contentFunction={() => (
@@ -254,7 +295,7 @@ export default function AudioEffectsSection({
                       ? muteStateRef.current
                         ? "Unmute"
                         : "Mute"
-                      : clientMute
+                      : producerType === "audio" && clientMute
                       ? clientMute.current
                         ? "Unmute"
                         : localMute
@@ -262,8 +303,24 @@ export default function AudioEffectsSection({
                           ? "Unmute"
                           : "Mute"
                         : "Mute"
-                      : localMute
+                      : producerType === "screenAudio" &&
+                        screenAudioClientMute &&
+                        producerId
+                      ? screenAudioClientMute.current[producerId]
+                        ? "Unmute"
+                        : screenAudioLocalMute
+                        ? screenAudioLocalMute.current[producerId]
+                          ? "Unmute"
+                          : "Mute"
+                        : "Mute"
+                      : producerType === "audio" && localMute
                       ? localMute.current
+                        ? "Unmute"
+                        : "Mute"
+                      : producerType === "screenAudio" &&
+                        screenAudioLocalMute &&
+                        producerId
+                      ? screenAudioLocalMute.current[producerId]
                         ? "Unmute"
                         : "Mute"
                       : "Mute"

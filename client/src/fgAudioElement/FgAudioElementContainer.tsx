@@ -79,7 +79,10 @@ export default function FgAudioElementContainer({
     producerId: string | undefined,
     effect: AudioEffectTypes
   ) => void;
-  handleMute: () => void;
+  handleMute: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   isUser: boolean;

@@ -37,7 +37,9 @@ export default function FgBabylonCanvas({
   screenAudioStream,
   audioRef,
   clientMute,
+  screenAudioClientMute,
   localMute,
+  screenAudioLocalMute,
   options,
   handleAudioEffectChange,
   handleMute,
@@ -56,19 +58,38 @@ export default function FgBabylonCanvas({
   screenAudioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   clientMute: React.MutableRefObject<boolean>;
+  screenAudioClientMute: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
   localMute: React.MutableRefObject<boolean>;
+  screenAudioLocalMute: React.MutableRefObject<{
+    [screenAudioId: string]: boolean;
+  }>;
   options?: FgVisualMediaOptions;
   handleAudioEffectChange: (
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
     effect: AudioEffectTypes
   ) => void;
-  handleMute: () => void;
-  handleMuteCallback: (() => void) | undefined;
-  handleVolumeSliderCallback: (
-    event: React.ChangeEvent<HTMLInputElement>
+  handleMute: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
   ) => void;
-  tracksColorSetterCallback: () => void;
+  handleMuteCallback:
+    | ((
+        producerType: "audio" | "screenAudio",
+        producerId: string | undefined
+      ) => void)
+    | undefined;
+  handleVolumeSliderCallback: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
+  tracksColorSetterCallback: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
 }) {
   const fgVisualMediaOptions = {
     ...defaultFgVisualMediaOptions,
@@ -419,6 +440,7 @@ export default function FgBabylonCanvas({
           username,
           instance,
           type,
+          producerId: visualMediaId,
           positioning: positioning.current,
         })
       );
@@ -501,7 +523,9 @@ export default function FgBabylonCanvas({
           fgLowerVisualMediaController={fgLowerVisualMediaController}
           pausedState={pausedState}
           clientMute={clientMute}
+          screenAudioClientMute={screenAudioClientMute}
           localMute={localMute}
+          screenAudioLocalMute={screenAudioLocalMute}
           visualMediaContainerRef={visualMediaContainerRef}
           audioStream={audioStream}
           screenAudioStream={screenAudioStream}

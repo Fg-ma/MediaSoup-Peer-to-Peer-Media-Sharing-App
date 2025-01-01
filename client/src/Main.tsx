@@ -75,12 +75,21 @@ export default function Main() {
   const [gridActive, setGridActive] = useState(false);
   const [gridSize, setGridSize] = useState({ rows: 15, cols: 15 });
 
-  const muteAudio = () => {
-    setMutedAudio((prev) => !prev);
-    mutedAudioRef.current = !mutedAudioRef.current;
+  const muteAudio = (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => {
+    if (producerType === "audio") {
+      setMutedAudio((prev) => !prev);
+      mutedAudioRef.current = !mutedAudioRef.current;
 
-    if (userMedia.current.audio) {
-      userMedia.current.audio.muteMic(mutedAudioRef.current);
+      if (userMedia.current.audio) {
+        userMedia.current.audio.muteMic(mutedAudioRef.current);
+      }
+    } else {
+      if (producerId && userMedia.current.screenAudio[producerId]) {
+        userMedia.current.screenAudio[producerId].toggleMute();
+      }
     }
 
     mediasoupSocket.current?.sendMessage({
@@ -89,9 +98,14 @@ export default function Main() {
         table_id: table_id.current,
         username: username.current,
         instance: instance.current,
+        producerType,
+        producerId,
       },
       data: {
-        clientMute: mutedAudioRef.current,
+        clientMute:
+          producerType === "audio"
+            ? mutedAudioRef.current
+            : userMedia.current.screenAudio[producerId ?? ""].muted,
       },
     });
   };

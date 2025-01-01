@@ -1,52 +1,64 @@
-import { IncomingMediasoupMessages } from "src/lib/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../lib/MediasoupSocketController";
 import FgVolumeElementSocket from "../../fgVolumeElement/lib/FgVolumeElementSocket";
 import { FgVolumeElementOptions } from "./typeConstant";
 
-class FgVolumeElementController {
-  fgVolumeElementSocket: FgVolumeElementSocket;
-
+class FgVolumeElementController extends FgVolumeElementSocket {
   constructor(
-    private username: string,
-    private instance: string,
-    private isUser: boolean,
+    username: string,
+    instance: string,
+    private producerType: "audio" | "screenAudio",
+    producerId: string | undefined,
+    isUser: boolean,
     private fgVolumeElementOptions: FgVolumeElementOptions,
-    private audioRef: React.RefObject<HTMLAudioElement>,
+    audioRef: React.RefObject<HTMLAudioElement>,
     private sliderRef: React.RefObject<HTMLInputElement>,
-    private clientMute: React.MutableRefObject<boolean>,
-    private localMute: React.MutableRefObject<boolean>,
-    private setActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private volumeState: {
+    clientMute: React.MutableRefObject<boolean>,
+    screenAudioClientMute: React.MutableRefObject<{
+      [screenAudioId: string]: boolean;
+    }>,
+    localMute: React.MutableRefObject<boolean>,
+    screenAudioLocalMute: React.MutableRefObject<{
+      [screenAudioId: string]: boolean;
+    }>,
+    volumeState: {
       from: string;
       to: string;
     },
-    private setVolumeState: React.Dispatch<
+    setVolumeState: React.Dispatch<
       React.SetStateAction<{
         from: string;
         to: string;
       }>
     >,
-    private tracksColorSetterCallback: (() => void) | undefined
+    private tracksColorSetterCallback:
+      | ((
+          producerType: "audio" | "screenAudio",
+          producerId: string | undefined
+        ) => void)
+      | undefined
   ) {
-    this.fgVolumeElementSocket = new FgVolumeElementSocket(
-      this.username,
-      this.instance,
-      this.isUser,
-      this.audioRef,
-      this.clientMute,
-      this.localMute,
-      this.setActive,
-      this.volumeState,
-      this.setVolumeState
+    super(
+      username,
+      instance,
+      producerId,
+      isUser,
+      audioRef,
+      clientMute,
+      screenAudioClientMute,
+      localMute,
+      screenAudioLocalMute,
+      volumeState,
+      setVolumeState
     );
   }
 
   handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "clientMuteStateResponsed":
-        this.fgVolumeElementSocket.onClientMuteStateResponsed(event);
+        this.onClientMuteStateResponsed(event);
         break;
       case "clientMuteChange":
-        this.fgVolumeElementSocket.onClientMuteChange(event);
+        this.onClientMuteChange(event);
         break;
       default:
         break;
@@ -56,48 +68,116 @@ class FgVolumeElementController {
   volumeSliderChangeHandler = () => {
     this.tracksColorSetter();
 
-    if (!this.audioRef.current || this.clientMute?.current) {
-      return;
-    }
+    if (this.producerType === "audio") {
+      if (!this.audioRef.current || this.clientMute?.current) {
+        return;
+      }
 
-    const newVolume = this.audioRef.current.volume;
-    let newVolumeState;
-    if ((this.audioRef.current.muted && !this.isUser) || newVolume === 0) {
-      newVolumeState = "off";
-    } else if (this.audioRef.current.volume >= 0.5) {
-      newVolumeState = "high";
+      const newVolume = this.audioRef.current.volume;
+      let newVolumeState;
+      if ((this.audioRef.current.muted && !this.isUser) || newVolume === 0) {
+        newVolumeState = "off";
+      } else if (this.audioRef.current.volume >= 0.5) {
+        newVolumeState = "high";
+      } else {
+        newVolumeState = "low";
+      }
+
+      if (this.volumeState.to !== newVolumeState) {
+        this.audioRef.current.muted = newVolumeState === "off";
+
+        this.setVolumeState((prev) => ({
+          from: prev.to,
+          to: newVolumeState,
+        }));
+      }
     } else {
-      newVolumeState = "low";
-    }
+      if (
+        !this.producerId ||
+        this.screenAudioClientMute.current[this.producerId]
+      ) {
+        return;
+      }
 
-    if (this.volumeState.to !== newVolumeState) {
-      this.audioRef.current.muted = newVolumeState === "off";
+      const audioElement = document.getElementById(
+        this.producerId
+      ) as HTMLAudioElement | null;
 
-      this.setVolumeState((prev) => ({
-        from: prev.to,
-        to: newVolumeState,
-      }));
+      if (!audioElement) {
+        return;
+      }
+
+      const newVolume = audioElement.volume;
+      let newVolumeState;
+      if ((audioElement.muted && !this.isUser) || newVolume === 0) {
+        newVolumeState = "off";
+      } else if (audioElement.volume >= 0.5) {
+        newVolumeState = "high";
+      } else {
+        newVolumeState = "low";
+      }
+
+      if (this.volumeState.to !== newVolumeState) {
+        audioElement.muted = newVolumeState === "off";
+
+        this.setVolumeState((prev) => ({
+          from: prev.to,
+          to: newVolumeState,
+        }));
+      }
     }
   };
 
   tracksColorSetter = () => {
-    if (!this.sliderRef.current || !this.audioRef.current) {
+    if (!this.sliderRef.current) {
       return;
     }
 
-    let value = this.audioRef.current.volume;
-    if (this.audioRef.current.muted && !this.clientMute.current) {
-      value = 0;
-    }
-    const min = 0;
-    const max = 1;
-    const percentage = ((value - min) / (max - min)) * 100;
-    const trackColor = `linear-gradient(to right, ${this.fgVolumeElementOptions.primaryVolumeSliderColor} 0%, ${this.fgVolumeElementOptions.primaryVolumeSliderColor} ${percentage}%, ${this.fgVolumeElementOptions.secondaryVolumeSliderColor} ${percentage}%, ${this.fgVolumeElementOptions.secondaryVolumeSliderColor} 100%)`;
+    if (this.producerType === "audio") {
+      if (!this.audioRef.current) {
+        return;
+      }
 
-    this.sliderRef.current.style.background = trackColor;
+      let value = this.audioRef.current.volume;
+      if (this.audioRef.current.muted && !this.clientMute.current) {
+        value = 0;
+      }
+      const min = 0;
+      const max = 1;
+      const percentage = ((value - min) / (max - min)) * 100;
+      const trackColor = `linear-gradient(to right, ${this.fgVolumeElementOptions.primaryVolumeSliderColor} 0%, ${this.fgVolumeElementOptions.primaryVolumeSliderColor} ${percentage}%, ${this.fgVolumeElementOptions.secondaryVolumeSliderColor} ${percentage}%, ${this.fgVolumeElementOptions.secondaryVolumeSliderColor} 100%)`;
+
+      this.sliderRef.current.style.background = trackColor;
+    } else {
+      if (!this.producerId) {
+        return;
+      }
+
+      const audioElement = document.getElementById(
+        this.producerId
+      ) as HTMLAudioElement | null;
+      if (!audioElement) {
+        return;
+      }
+
+      let value = audioElement.volume;
+
+      if (
+        audioElement.muted &&
+        !this.screenAudioClientMute.current[this.producerId]
+      ) {
+        value = 0;
+      }
+      const min = 0;
+      const max = 1;
+      const percentage = ((value - min) / (max - min)) * 100;
+      const trackColor = `linear-gradient(to right, ${this.fgVolumeElementOptions.primaryVolumeSliderColor} 0%, ${this.fgVolumeElementOptions.primaryVolumeSliderColor} ${percentage}%, ${this.fgVolumeElementOptions.secondaryVolumeSliderColor} ${percentage}%, ${this.fgVolumeElementOptions.secondaryVolumeSliderColor} 100%)`;
+
+      this.sliderRef.current.style.background = trackColor;
+    }
 
     if (this.tracksColorSetterCallback) {
-      this.tracksColorSetterCallback();
+      this.tracksColorSetterCallback(this.producerType, this.producerId);
     }
   };
 }

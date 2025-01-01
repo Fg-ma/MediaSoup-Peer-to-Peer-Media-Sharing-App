@@ -45,7 +45,10 @@ export default function Bundle({
   initScreenAudioStreams?: { [screenAudioId: string]: MediaStream };
   initAudioStream?: MediaStream;
   options?: BundleOptions;
-  handleMuteCallback?: () => void;
+  handleMuteCallback?: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
   onRendered?: () => void;
   onNewConsumerWasCreatedCallback?: () => void;
 }) {
@@ -85,7 +88,11 @@ export default function Bundle({
   const bundleRef = useRef<HTMLDivElement>(null);
 
   const clientMute = useRef(false); // User audio mute
+  const screenAudioClientMute = useRef<{ [screenAudioId: string]: boolean }>(
+    {}
+  ); // User screen audio mute
   const localMute = useRef(false); // Not user audio mute
+  const screenAudioLocalMute = useRef<{ [screenAudioId: string]: boolean }>({}); // Not user screen audio mute
 
   const [permissions, setPermissions] = useState<Permissions>(
     bundleOptions.permissions
@@ -111,7 +118,9 @@ export default function Bundle({
     bundleRef,
     audioRef,
     clientMute,
+    screenAudioClientMute,
     localMute,
+    screenAudioLocalMute,
     permissions,
     setPermissions,
     onNewConsumerWasCreatedCallback,
@@ -155,12 +164,19 @@ export default function Bundle({
 
     switch (signal.type) {
       case "localMuteChange":
+        const {
+          table_id: newTable_id,
+          username: newUsername,
+          instance: newInstance,
+          producerType: newProducerType,
+          producerId: newProducerId,
+        } = signal.header;
         if (
-          signal.table_id === table_id &&
-          signal.username === username &&
-          signal.instance === instance
+          newTable_id === table_id &&
+          newUsername === username &&
+          newInstance === instance
         ) {
-          bundleController.onLocalMuteChange();
+          bundleController.onLocalMuteChange(newProducerType, newProducerId);
         }
         break;
       default:
@@ -179,6 +195,34 @@ export default function Bundle({
       );
     };
   }, [userMedia.current.gamesSignaling]);
+
+  useEffect(() => {
+    if (bundleOptions.isUser) {
+      return;
+    }
+
+    for (const screenId in screenStreams) {
+      const screenAudioId = `${screenId}_audio`;
+      if (userMedia.current.screenAudio[screenAudioId]) {
+        if (screenAudioClientMute.current[screenAudioId] === undefined) {
+          screenAudioClientMute.current[screenAudioId] = false;
+        }
+        if (screenAudioLocalMute.current[screenAudioId] === undefined) {
+          screenAudioLocalMute.current[screenAudioId] = false;
+        }
+      }
+    }
+    for (const screenAudioId in screenAudioStreams) {
+      if (userMedia.current.screenAudio[screenAudioId]) {
+        if (screenAudioClientMute.current[screenAudioId] === undefined) {
+          screenAudioClientMute.current[screenAudioId] = false;
+        }
+        if (screenAudioLocalMute.current[screenAudioId] === undefined) {
+          screenAudioLocalMute.current[screenAudioId] = false;
+        }
+      }
+    }
+  }, [screenStreams, screenAudioStreams]);
 
   return (
     <div
@@ -205,7 +249,9 @@ export default function Bundle({
                   bundleController.handleAudioEffectChange
                 }
                 clientMute={clientMute}
+                screenAudioClientMute={screenAudioClientMute}
                 localMute={localMute}
+                screenAudioLocalMute={screenAudioLocalMute}
                 options={{
                   isUser: bundleOptions.isUser,
                   permissions: permissions,
@@ -250,7 +296,9 @@ export default function Bundle({
                   bundleController.handleAudioEffectChange
                 }
                 clientMute={clientMute}
+                screenAudioClientMute={screenAudioClientMute}
                 localMute={localMute}
+                screenAudioLocalMute={screenAudioLocalMute}
                 options={{
                   isUser: bundleOptions.isUser,
                   permissions: permissions,
@@ -307,7 +355,9 @@ export default function Bundle({
                   bundleController.handleAudioEffectChange
                 }
                 clientMute={clientMute}
+                screenAudioClientMute={screenAudioClientMute}
                 localMute={localMute}
+                screenAudioLocalMute={screenAudioLocalMute}
                 options={{
                   isUser: bundleOptions.isUser,
                   permissions: permissions,
@@ -353,7 +403,9 @@ export default function Bundle({
                   bundleController.handleAudioEffectChange
                 }
                 clientMute={clientMute}
+                screenAudioClientMute={screenAudioClientMute}
                 localMute={localMute}
+                screenAudioLocalMute={screenAudioLocalMute}
                 options={{
                   isUser: bundleOptions.isUser,
                   permissions: permissions,
@@ -412,19 +464,17 @@ export default function Bundle({
       {bundleOptions.isUser &&
         userMedia.current.games.snake &&
         Object.keys(userMedia.current.games.snake).length !== 0 &&
-        Object.entries(userMedia.current.games.snake).map(
-          ([snakeGameId, _snakeGame]) => (
-            <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
-              <SnakeGame
-                table_id={table_id}
-                username={username}
-                instance={instance}
-                snakeGameId={snakeGameId}
-                bundleRef={bundleRef}
-              />
-            </Suspense>
-          )
-        )}
+        Object.keys(userMedia.current.games.snake).map((snakeGameId) => (
+          <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
+            <SnakeGame
+              table_id={table_id}
+              username={username}
+              instance={instance}
+              snakeGameId={snakeGameId}
+              bundleRef={bundleRef}
+            />
+          </Suspense>
+        ))}
       <audio
         ref={audioRef}
         id={`${username}_audio_stream`}

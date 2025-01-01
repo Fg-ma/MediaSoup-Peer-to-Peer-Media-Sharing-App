@@ -26,6 +26,8 @@ class ScreenAudioMedia {
 
   audioEffects: AudioEffects;
 
+  muted = false;
+
   private effects: {
     [cameraEffect in AudioEffectTypes]?: boolean;
   };
@@ -1504,50 +1506,10 @@ class ScreenAudioMedia {
     this.audioEffects.fgAudioStreamEffects?.removeEffects(effects);
   };
 
-  samplerEffectsChange = (
-    effects: {
-      type: AudioMixEffectsType;
-      updates: { option: MixEffectsOptionsType; value: number }[];
-    }[]
-  ) => {
-    this.audioEffects.fgSampler.updateEffects(effects);
-  };
-
-  removeSamplerEffects = (effects: AudioMixEffectsType[]) => {
-    this.audioEffects.fgSampler.removeEffects(effects);
-  };
-
-  playNote = (note: string, isPress: boolean) => {
-    this.audioEffects.fgSampler.playNote(note, isPress);
-  };
-
-  swapSampler = (
-    sampler: { category: string; kind: string },
-    increment?: number
-  ): FgSamplers => {
-    // @ts-expect-error: ts can't verify category and kind correlation
-    return this.audioEffects.fgSampler.swapSampler(sampler, increment);
-  };
-
-  // Set volume (in decibels)
-  setSamplerVolume = (volume: number) => {
-    this.audioEffects.fgSampler.setVolume(volume);
-  };
-
-  startMetronome = () => {
-    return this.audioEffects.fgSampler.fgMetronome.startMetronome();
-  };
-
-  stopMetronome = () => {
-    return this.audioEffects.fgSampler.fgMetronome.stopMetronome();
-  };
-
-  setMetronomeBPM = (bpm: number) => {
-    this.audioEffects.fgSampler.fgMetronome.setMetronomeBPM(bpm);
-  };
-
-  setMetronomeVolume = (volume: number) => {
-    this.audioEffects.fgSampler.fgMetronome.setMetronomeVolume(volume);
+  toggleMute = () => {
+    this.muted = !this.muted;
+    this.masterMediaStreamDestination.stream.getAudioTracks()[0].enabled =
+      !this.masterMediaStreamDestination.stream.getAudioTracks()[0].enabled;
   };
 
   getStream = () => {

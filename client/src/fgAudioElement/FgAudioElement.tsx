@@ -39,7 +39,10 @@ export default function FgAudioElement({
   audioRef: React.RefObject<HTMLAudioElement>;
   username: string;
   setPopupVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  handleMute: () => void;
+  handleMute: (
+    producerType: "audio" | "screenAudio",
+    producerId: string | undefined
+  ) => void;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
   isUser?: boolean;
