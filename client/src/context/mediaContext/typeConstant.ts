@@ -6,6 +6,7 @@ import SnakeGameMedia from "../../lib/SnakeGameMedia";
 import ScreenAudioMedia from "../../lib/ScreenAudioMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
+import VideoMedia from "../../lib/VideoMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -18,6 +19,9 @@ export type UserMediaType = {
   screen: { [screenId: string]: ScreenMedia };
   screenAudio: { [screenAudioId: string]: ScreenAudioMedia };
   audio: AudioMedia | undefined;
+  video: {
+    [videoId: string]: VideoMedia;
+  };
   gamesSignaling: GamesSignalingMedia | undefined;
   games: {
     snake?: {
@@ -33,6 +37,9 @@ export type RemoteMediaType = {
       screen?: { [screenId: string]: MediaStreamTrack };
       screenAudio?: { [screenAudioId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack;
+      video?: {
+        [videoId: string]: { video: MediaStreamTrack; audio: MediaStreamTrack };
+      };
     };
   };
 };

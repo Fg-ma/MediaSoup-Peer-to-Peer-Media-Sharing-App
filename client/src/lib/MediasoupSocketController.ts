@@ -925,7 +925,7 @@ export type onNewConsumerWasCreatedType = {
   header: {
     producerUsername: string;
     producerInstance: string;
-    producerType: "camera" | "screen" | "audio" | "screenAudio";
+    producerType: "camera" | "screen" | "audio" | "screenAudio" | "json";
     producerId?: string;
   };
 };

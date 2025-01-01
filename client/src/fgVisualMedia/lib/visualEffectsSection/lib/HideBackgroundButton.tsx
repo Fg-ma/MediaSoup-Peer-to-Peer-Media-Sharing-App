@@ -9,7 +9,7 @@ import {
 } from "../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgImage from "../../../../fgElements/fgImage/FgImage";
+import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const ColorPicker = React.lazy(() => import("./ColorPicker"));
@@ -430,7 +430,7 @@ export default function HideBackgroundButton({
                     }}
                     data-visual-effects-button-value={background}
                   >
-                    <FgImage
+                    <FgImageElement
                       src={choice.image}
                       srcLoading={choice.imageSmall}
                       alt={background}

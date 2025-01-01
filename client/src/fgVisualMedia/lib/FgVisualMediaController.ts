@@ -79,9 +79,11 @@ class FgVisualMediaController {
       this.videoRef.current.srcObject = this.videoStream!;
     }
 
-    // Set initial track statte
+    // Set initial track state
     const volumeSliders =
-      this.visualMediaContainerRef.current?.querySelectorAll(".volume-slider");
+      this.visualMediaContainerRef.current?.querySelectorAll(
+        ".volume-slider-audio"
+      );
 
     volumeSliders?.forEach((slider) => {
       const sliderElement = slider as HTMLInputElement;
@@ -253,7 +255,10 @@ class FgVisualMediaController {
         this.onResponsedCatchUpData(event);
         break;
       case "newConsumerWasCreated":
-        this.attachPositioningListeners(this.fgVisualMediaOptions.permissions);
+        if (event.header.producerType == "json")
+          this.attachPositioningListeners(
+            this.fgVisualMediaOptions.permissions
+          );
         break;
       default:
         break;

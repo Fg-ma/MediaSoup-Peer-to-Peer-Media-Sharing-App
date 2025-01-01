@@ -25,7 +25,7 @@ const VisualMediaAdjustmentButtons = React.lazy(
   () => import("./lib/VisualMediaAdjustmentButtons")
 );
 
-export default function FgBabylonCanvas({
+export default function UserVisualMedia({
   table_id,
   visualMediaId,
   username,

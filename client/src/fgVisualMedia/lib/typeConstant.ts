@@ -54,6 +54,8 @@ export const defaultFgVisualMediaOptions = {
     acceptsScreenAudioEffects: false,
     acceptsPositionScaleRotationManipulation: false,
     acceptsCloseMedia: false,
+    acceptsVideoEffects: false,
+    acceptsImageEffects: false,
   },
   isStream: false,
   autoPlay: true,

@@ -56,6 +56,18 @@ export type AudioEffectTypes =
   | "thunder"
   | "echosOfThePast";
 
+export type VideoEffectTypes =
+  | "pause"
+  | "postProcess"
+  | "blur"
+  | "tint"
+  | "glasses"
+  | "beards"
+  | "mustaches"
+  | "masks"
+  | "hats"
+  | "pets";
+
 export type UserStreamEffectsType = {
   camera: {
     [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -68,6 +80,12 @@ export type UserStreamEffectsType = {
   };
   audio: {
     [effectType in AudioEffectTypes]: boolean;
+  };
+  video: {
+    [cameraId: string]: {
+      video: { [effectType in VideoEffectTypes]: boolean };
+      audio: { [effectType in AudioEffectTypes]: boolean };
+    };
   };
 };
 
@@ -283,6 +301,39 @@ export interface ScreenEffectStylesType {
 
 export type AudioEffectStylesType = object;
 
+export type VideoEffectStylesType = {
+  pause: {
+    style: "";
+  };
+  blur: {
+    style: "";
+  };
+  tint: {
+    style: "";
+  };
+  postProcess: {
+    style: PostProcessEffects;
+  };
+  glasses: {
+    style: GlassesEffectTypes;
+  };
+  beards: {
+    style: BeardsEffectTypes;
+  };
+  mustaches: {
+    style: MustachesEffectTypes;
+  };
+  masks: {
+    style: MasksEffectTypes;
+  };
+  hats: {
+    style: HatsEffectTypes;
+  };
+  pets: {
+    style: PetsEffectTypes;
+  };
+};
+
 export type BackgroundMusicTypes =
   | "adventureTime"
   | "cacophony"
@@ -309,6 +360,12 @@ export type UserEffectsStylesType = {
     [screenAudioId: string]: AudioEffectStylesType;
   };
   audio: AudioEffectStylesType;
+  video: {
+    [videoId: string]: {
+      video: VideoEffectStylesType;
+      audio: AudioEffectStylesType;
+    };
+  };
 };
 
 export type RemoteEffectStylesType = {
@@ -388,6 +445,21 @@ export const defaultScreenStreamEffects: {
   tint: false,
 });
 
+export const defaultVideoStreamEffects: {
+  [effect in VideoEffectTypes]: boolean;
+} = Object.freeze({
+  pause: false,
+  postProcess: false,
+  blur: false,
+  tint: false,
+  glasses: false,
+  beards: false,
+  mustaches: false,
+  masks: false,
+  hats: false,
+  pets: false,
+});
+
 export const defaultPostProcess: PostProcessEffects = "prismaColors";
 export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
 export const defaultHideBackgroundColor = "#F56114";
@@ -450,3 +522,36 @@ export const defaultScreenEffectsStyles: ScreenEffectStylesType = Object.freeze(
 export const defaultAudioEffectsStyles: AudioEffectStylesType = Object.freeze(
   {}
 );
+
+export const defaultVideoEffectsStyles: VideoEffectStylesType = Object.freeze({
+  pause: Object.freeze({
+    style: "",
+  }),
+  blur: Object.freeze({
+    style: "",
+  }),
+  tint: Object.freeze({
+    style: "",
+  }),
+  postProcess: Object.freeze({
+    style: defaultPostProcess,
+  }),
+  glasses: Object.freeze({
+    style: defaultGlasses,
+  }),
+  beards: Object.freeze({
+    style: defaultBeard,
+  }),
+  mustaches: Object.freeze({
+    style: defaultMustache,
+  }),
+  masks: Object.freeze({
+    style: defaultMask,
+  }),
+  hats: Object.freeze({
+    style: defaultHat,
+  }),
+  pets: Object.freeze({
+    style: defaultPet,
+  }),
+});

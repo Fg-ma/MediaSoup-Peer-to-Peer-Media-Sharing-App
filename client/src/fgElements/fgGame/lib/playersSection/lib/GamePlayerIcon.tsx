@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import FgImage from "../../../../fgImage/FgImage";
+import FgImageElement from "../../../../fgImageElement/FgImageElement";
 import "./gamePlayerIcon.css";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -50,7 +50,7 @@ export default function GamePlayerIcon({
           transition: "background 0.5s linear",
         }}
       ></div>
-      <FgImage
+      <FgImageElement
         src={placeHolderImage_1280x1262}
         srcLoading={placeHolderImage_64x63}
         style={{ width: "100%", height: "100%", userSelect: "none" }}

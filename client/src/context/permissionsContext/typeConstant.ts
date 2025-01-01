@@ -5,4 +5,6 @@ export type Permissions = {
   acceptsAudioEffects: boolean;
   acceptsPositionScaleRotationManipulation: boolean;
   acceptsCloseMedia: boolean;
+  acceptsVideoEffects: boolean;
+  acceptsImageEffects: boolean;
 };

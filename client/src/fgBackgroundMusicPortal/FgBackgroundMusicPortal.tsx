@@ -3,7 +3,7 @@ import FgPanel from "../fgElements/fgPanel/FgPanel";
 import FgButton from "../fgElements/fgButton/FgButton";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { BackgroundMusicTypes } from "../context/effectsContext/typeConstant";
-import FgImage from "../fgElements/fgImage/FgImage";
+import FgImageElement from "../fgElements/fgImageElement/FgImageElement";
 import FgSVG from "../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
@@ -421,7 +421,7 @@ export default function FgBackgroundMusicPortal({
                     data-background-music-effects-button-value={key}
                   >
                     {effect.image ? (
-                      <FgImage
+                      <FgImageElement
                         src={effect.image}
                         srcLoading={effect.imageSmall}
                         alt={key}

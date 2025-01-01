@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import FgPanel from "../../../fgElements/fgPanel/FgPanel";
 import FgButton from "../../../fgElements/fgButton/FgButton";
-import FgImage from "../../../fgElements/fgImage/FgImage";
+import FgImageElement from "../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import {
   PlayersState,
@@ -81,7 +81,7 @@ export default function SnakeColorPickerPanel({
                       : "border-gray-300"
                   }`}
                   contentFunction={() => (
-                    <FgImage
+                    <FgImageElement
                       src={src}
                       style={{
                         width: "100%",

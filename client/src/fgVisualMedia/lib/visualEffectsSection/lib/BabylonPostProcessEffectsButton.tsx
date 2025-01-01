@@ -8,7 +8,7 @@ import {
   PostProcessEffects,
   ScreenEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
-import FgImage from "../../../../fgElements/fgImage/FgImage";
+import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -297,7 +297,7 @@ export default function BabylonPostProcessEffectsButton({
                       postProcessEffect
                     }
                   >
-                    <FgImage
+                    <FgImageElement
                       src={choice.image}
                       srcLoading={choice.imageSmall}
                       alt={postProcessEffect}

@@ -3,7 +3,7 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import FgGame from "../../fgElements/fgGame/FgGame";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
-import FgImage from "../../fgElements/fgImage/FgImage";
+import FgImageElement from "../../fgElements/fgImageElement/FgImageElement";
 import SnakeGameController from "./lib/SnakeGameController";
 import SnakeColorPickerPanel from "./lib/SnakeColorPickerPanel";
 import SnakeGridSizePanel from "./lib/SnakeGridSizePanel";
@@ -170,7 +170,7 @@ function SnakeGame({
                       playersState[username][instance].snakeColor;
 
                     return (
-                      <FgImage
+                      <FgImageElement
                         // @ts-expect-error: can't correlate primary with secondary color
                         src={snakeColorIconMap[primary][secondary]}
                         style={{ width: "100%", height: "100%" }}

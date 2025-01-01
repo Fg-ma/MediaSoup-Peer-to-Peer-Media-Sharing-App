@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import FgPanel from "../../fgPanel/FgPanel";
 import FgButton from "../../fgButton/FgButton";
-import FgImage from "../../fgImage/FgImage";
+import FgImageElement from "../../fgImageElement/FgImageElement";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
 import {
@@ -166,7 +166,7 @@ export default function BackgroundSelectorPanel({
                     }`}
                     contentFunction={() => {
                       return (
-                        <FgImage
+                        <FgImageElement
                           src={file.url}
                           style={{
                             width: "100%",
@@ -209,7 +209,7 @@ export default function BackgroundSelectorPanel({
                           ];
 
                         return (
-                          <FgImage
+                          <FgImageElement
                             src={data.url}
                             srcLoading={data.loadingUrl}
                             style={{
@@ -253,7 +253,7 @@ export default function BackgroundSelectorPanel({
                         }`}
                         contentFunction={() => {
                           return (
-                            <FgImage
+                            <FgImageElement
                               src={recommendation.url}
                               srcLoading={recommendation.loadingUrl}
                               style={{
@@ -367,7 +367,7 @@ export default function BackgroundSelectorPanel({
                       }`}
                       contentFunction={() => {
                         return (
-                          <FgImage
+                          <FgImageElement
                             src={categorySelectionData.url}
                             srcLoading={categorySelectionData.loadingUrl}
                             style={{

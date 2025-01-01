@@ -7,7 +7,7 @@ import {
 } from "../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgImage from "../../../../fgElements/fgImage/FgImage";
+import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -219,7 +219,7 @@ export default function BeardsButton({
 
           if (imageSrc) {
             return (
-              <FgImage
+              <FgImageElement
                 src={imageSrc}
                 srcLoading={imageLoadingSrc}
                 alt={effectsStyles.style}
@@ -254,7 +254,7 @@ export default function BeardsButton({
                   }}
                   data-visual-effects-button-value={beard}
                 >
-                  <FgImage
+                  <FgImageElement
                     src={effect.image}
                     srcLoading={effect.imageSmall}
                     alt={beard}
