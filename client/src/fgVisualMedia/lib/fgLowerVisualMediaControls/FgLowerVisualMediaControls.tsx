@@ -41,6 +41,10 @@ const VisualEffectsSection = React.lazy(
 const AudioEffectsButton = React.lazy(
   () => import("../../../audioEffectsButton/AudioEffectsButton")
 );
+const FgHoverContentStandard = React.lazy(
+  () =>
+    import("../../../fgElements/fgHoverContentStandard/FgHoverContentStandard")
+);
 
 export type FontFamilies =
   | "K2D"
@@ -493,14 +497,13 @@ export default function FgLowerVisualMediaControls({
                 screenAudioLocalMute={screenAudioLocalMute}
                 visualMediaContainerRef={visualMediaContainerRef}
                 closeLabelElement={
-                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md shadow-lg rounded-md relative bottom-0 bg-white'>
-                    Close (x)
-                  </div>
+                  <FgHoverContentStandard content='Close (x)' style='dark' />
                 }
                 hoverLabelElement={
-                  <div className='mb-1 w-max py-1 px-2 text-white font-K2D text-sm bg-black bg-opacity-75 shadow-lg rounded-md relative bottom-0'>
-                    Audio effects (a)
-                  </div>
+                  <FgHoverContentStandard
+                    content='Audio effects (a)'
+                    style='dark'
+                  />
                 }
                 scrollingContainerRef={rightVisualMediaControlsRef}
                 style={{ transform: "scaleX(-1)" }}

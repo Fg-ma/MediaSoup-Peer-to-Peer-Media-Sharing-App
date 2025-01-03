@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
 export default function Captions({
-  visualMediaContainerRef,
+  videoContainerRef,
   voskCaptions,
   containerRef,
 }: {
-  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
+  videoContainerRef: React.RefObject<HTMLDivElement>;
   voskCaptions: string;
   containerRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -14,7 +14,7 @@ export default function Captions({
   const captionsRef = useRef<HTMLDivElement>(null);
   const timeOut = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  if (!visualMediaContainerRef.current) {
+  if (!videoContainerRef.current) {
     return;
   }
 
@@ -69,6 +69,6 @@ export default function Captions({
         </div>
       )}
     </div>,
-    visualMediaContainerRef.current
+    videoContainerRef.current
   );
 }

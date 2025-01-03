@@ -4,18 +4,18 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   RemoteStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../context/effectsContext/typeConstant";
 import FgLowerVideoController from "./fgLowerVideoControls/lib/FgLowerVideoController";
 import { FgVideoOptions } from "./typeConstant";
 import { Permissions } from "src/context/permissionsContext/typeConstant";
 import {
   IncomingMediasoupMessages,
   onResponsedCatchUpDataType,
-} from "../../lib/MediasoupSocketController";
+} from "../../../lib/MediasoupSocketController";
 import {
   RemoteDataStreamsType,
   UserMediaType,
-} from "../../context/mediaContext/typeConstant";
+} from "../../../context/mediaContext/typeConstant";
 
 class FgVideoController {
   constructor(

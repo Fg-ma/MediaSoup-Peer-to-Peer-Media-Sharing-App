@@ -1,32 +1,32 @@
 import React from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import FgLowerVisualMediaController from "../FgLowerVideoController";
+import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const effectIcon = nginxAssetSeverBaseUrl + "svgs/effectIcon.svg";
 const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
 
-export default function VisualEffectsButton({
-  fgLowerVisualMediaController,
-  visualEffectsActive,
+export default function VideoEffectsButton({
+  fgLowerVideoController,
+  videoEffectsActive,
   settingsActive,
   scrollingContainerRef,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
-  visualEffectsActive: boolean;
+  fgLowerVideoController: FgLowerVideoController;
+  videoEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVisualMediaController.handleVisualEffects();
+        fgLowerVideoController.handleVideoEffects();
       }}
       contentFunction={() => {
-        const iconSrc = visualEffectsActive ? effectOffIcon : effectIcon;
+        const iconSrc = videoEffectsActive ? effectOffIcon : effectIcon;
 
         return (
           <FgSVG
@@ -41,7 +41,7 @@ export default function VisualEffectsButton({
         );
       }}
       hoverContent={
-        !visualEffectsActive && !settingsActive ? (
+        !videoEffectsActive && !settingsActive ? (
           <FgHoverContentStandard content='Effects (e)' style='dark' />
         ) : undefined
       }

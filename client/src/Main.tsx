@@ -25,6 +25,7 @@ import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 import PermissionsController from "./lib/PermissionsController";
 import "./scrollbar.css";
 import CleanupController from "./lib/CleanupController";
+import Upload from "./Upload";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -146,6 +147,7 @@ export default function Main() {
         screen: {},
         screenAudio: {},
         audio: structuredClone(defaultAudioEffectsStyles),
+        video: {},
       };
     }
 
@@ -303,6 +305,7 @@ export default function Main() {
 
   return (
     <div className='w-screen h-screen flex-col space-y-3 flex-wrap p-5 overflow-hidden'>
+      <Upload />
       <FgTableFunctions
         table_id={table_id}
         username={username}

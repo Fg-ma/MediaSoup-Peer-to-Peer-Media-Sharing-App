@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import FgLowerVisualMediaController from "../FgLowerVideoController";
+import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../FgLowerVideoController";
 
 export default function PictureInPictureButton({
-  fgLowerVisualMediaController,
-  visualEffectsActive,
+  fgLowerVideoController,
+  videoEffectsActive,
   settingsActive,
   scrollingContainerRef,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
-  visualEffectsActive: boolean;
+  fgLowerVideoController: FgLowerVideoController;
+  videoEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -19,7 +19,7 @@ export default function PictureInPictureButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVisualMediaController.handleMiniPlayer();
+        fgLowerVideoController.handleMiniPlayer();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {
@@ -38,7 +38,7 @@ export default function PictureInPictureButton({
         );
       }}
       hoverContent={
-        !visualEffectsActive && !settingsActive ? (
+        !videoEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content='Picture in picture (i)'
             style='dark'

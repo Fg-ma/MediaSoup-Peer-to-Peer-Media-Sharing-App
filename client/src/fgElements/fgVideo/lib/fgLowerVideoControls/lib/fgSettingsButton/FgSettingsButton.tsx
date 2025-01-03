@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
 import { ActivePages } from "../../FgLowerVideoControls";
-import { FgVisualMediaOptions, Settings } from "../../../typeConstant";
+import { FgVideoOptions, Settings } from "../../../typeConstant";
 
 type RecursiveObject = {
   active?: boolean;
@@ -11,9 +11,9 @@ type RecursiveObject = {
 };
 
 export default function FgSettingsButton({
-  fgVisualMediaOptions,
-  visualEffectsActive,
-  visualMediaContainerRef,
+  fgVideoOptions,
+  videoEffectsActive,
+  videoContainerRef,
   settingsActive,
   setSettingsActive,
   activePages,
@@ -22,9 +22,9 @@ export default function FgSettingsButton({
   setSettings,
   scrollingContainerRef,
 }: {
-  fgVisualMediaOptions: FgVisualMediaOptions;
-  visualEffectsActive: boolean;
-  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
+  fgVideoOptions: FgVideoOptions;
+  videoEffectsActive: boolean;
+  videoContainerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
   activePages: ActivePages;
@@ -65,10 +65,10 @@ export default function FgSettingsButton({
       return deactivePages as unknown as ActivePages;
     });
 
-    if (!visualMediaContainerRef.current?.classList.contains("in-settings")) {
-      visualMediaContainerRef.current?.classList.add("in-settings");
+    if (!videoContainerRef.current?.classList.contains("in-settings")) {
+      videoContainerRef.current?.classList.add("in-settings");
     } else {
-      visualMediaContainerRef.current?.classList.remove("in-settings");
+      videoContainerRef.current?.classList.remove("in-settings");
     }
   };
 
@@ -120,7 +120,7 @@ export default function FgSettingsButton({
           </svg>
         )}
         hoverContent={
-          !visualEffectsActive && !settingsActive ? (
+          !videoEffectsActive && !settingsActive ? (
             <FgHoverContentStandard content='Settings' style='dark' />
           ) : undefined
         }
@@ -128,7 +128,7 @@ export default function FgSettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
-          fgVisualMediaOptions={fgVisualMediaOptions}
+          fgVideoOptions={fgVideoOptions}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}

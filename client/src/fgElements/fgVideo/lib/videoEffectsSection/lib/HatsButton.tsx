@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
+import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
 import {
   HatsEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+} from "../../../../../context/effectsContext/typeConstant";
+import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -218,22 +218,14 @@ const hatsLabels: {
 };
 
 export default function HatsButton({
-  username,
-  instance,
-  type,
-  visualMediaId,
-  isUser,
-  handleVisualEffectChange,
+  videoId,
+  handleVideoEffectChange,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
-  username: string;
-  instance: string;
-  type: "camera";
-  visualMediaId: string;
-  isUser: boolean;
-  handleVisualEffectChange: (
+  videoId: string;
+  handleVideoEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -241,23 +233,14 @@ export default function HatsButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const {
-    userEffectsStyles,
-    remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
-  } = useEffectsContext();
+  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [_, setRerender] = useState(0);
   const hatsContainerRef = useRef<HTMLDivElement>(null);
 
-  const streamEffects = isUser
-    ? userStreamEffects.current[type][visualMediaId].hats
-    : remoteStreamEffects.current[username][instance][type][visualMediaId].hats;
-  const effectsStyles = isUser
-    ? userEffectsStyles.current[type][visualMediaId].hats
-    : remoteEffectsStyles.current[username][instance][type][visualMediaId].hats;
+  const streamEffects = userStreamEffects.current.video[videoId].video.hats;
+  const effectsStyles = userEffectsStyles.current.video[videoId].video.hats;
 
   const hatsEffects: {
     [key in HatsEffectTypes]: {
@@ -429,42 +412,28 @@ export default function HatsButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await handleVisualEffectChange("hats");
+    await handleVideoEffectChange("hats");
 
     setEffectsDisabled(false);
   };
 
   const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
-    if (!effectsStyles || !target || !target.dataset.visualEffectsButtonValue) {
+    if (!effectsStyles || !target || !target.dataset.videoEffectsButtonValue) {
       return;
     }
 
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .visualEffectsButtonValue as HatsEffectTypes;
+      .videoEffectsButtonValue as HatsEffectTypes;
     if (
       effectType in hatsEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
-      if (isUser) {
-        if (userEffectsStyles.current[type][visualMediaId].hats) {
-          userEffectsStyles.current[type][visualMediaId].hats.style =
-            effectType;
-        }
-      } else {
-        if (
-          remoteEffectsStyles.current[username][instance][type][visualMediaId]
-            .hats
-        ) {
-          remoteEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].hats.style = effectType;
-        }
-      }
+      effectsStyles.style = effectType;
 
-      await handleVisualEffectChange("hats", streamEffects);
+      await handleVideoEffectChange("hats", streamEffects);
     }
 
     setEffectsDisabled(false);
@@ -494,7 +463,7 @@ export default function HatsButton({
                   { key: "width", value: "95%" },
                   { key: "height", value: "95%" },
                 ]}
-                data-visual-effects-button-value={effectsStyles.style}
+                data-video-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -516,7 +485,7 @@ export default function HatsButton({
                 srcLoading={imageLoadingSrc}
                 alt={effectsStyles.style}
                 style={{ width: "90%", height: "90%" }}
-                data-visual-effects-button-value={effectsStyles.style}
+                data-video-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -544,14 +513,14 @@ export default function HatsButton({
                   onClick={(event) => {
                     holdFunction(event as unknown as PointerEvent);
                   }}
-                  data-visual-effects-button-value={hat}
+                  data-video-effects-button-value={hat}
                 >
                   <FgImageElement
                     src={effect.image}
                     srcLoading={effect.imageSmall}
                     alt={hat}
                     style={{ width: "2.75rem", height: "2.75rem" }}
-                    data-visual-effects-button-value={hat}
+                    data-video-effects-button-value={hat}
                   />
                 </div>
               )}

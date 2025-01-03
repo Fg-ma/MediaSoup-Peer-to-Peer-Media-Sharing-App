@@ -72,7 +72,7 @@ export default function FgVideo({
 
   const [pausedState, setPausedState] = useState(false);
 
-  const paused = useRef("false");
+  const paused = useRef(false);
 
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
 
@@ -179,7 +179,7 @@ export default function FgVideo({
     instance,
     videoId,
     fgLowerVideoController,
-    undefined,
+    videoStream,
     positioningListeners,
     positioning,
     setPausedState,
@@ -261,7 +261,7 @@ export default function FgVideo({
       );
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
-        fgVideoController.handleMessage
+        fgVideoController.handleMediasoupMessage
       );
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);

@@ -1,4 +1,4 @@
-import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../../context/permissionsContext/typeConstant";
 import {
   BackgroundColors,
   BackgroundOpacities,
@@ -34,7 +34,13 @@ export interface Settings {
   };
 }
 
-export const defaultFgVideoOptions = {
+export const defaultFgVideoOptions: {
+  permissions: Permissions;
+  controlsVanishTime: number;
+  closedCaptionsDecoratorColor: string;
+  primaryVideoColor: string;
+  initialVolume: "high" | "low" | "off";
+} = {
   permissions: {
     acceptsCameraEffects: false,
     acceptsScreenEffects: false,

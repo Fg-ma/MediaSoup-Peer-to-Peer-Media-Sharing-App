@@ -1,8 +1,8 @@
 import React from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import FgLowerVisualMediaController from "../FgLowerVideoController";
+import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -10,20 +10,20 @@ const playIcon = nginxAssetSeverBaseUrl + "svgs/playIcon.svg";
 const pauseIcon = nginxAssetSeverBaseUrl + "svgs/pauseIcon.svg";
 
 export default function PlayPauseButton({
-  fgLowerVisualMediaController,
-  visualEffectsActive,
+  fgLowerVideoController,
+  videoEffectsActive,
   settingsActive,
   pausedState,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
-  visualEffectsActive: boolean;
+  fgLowerVideoController: FgLowerVideoController;
+  videoEffectsActive: boolean;
   settingsActive: boolean;
   pausedState: boolean;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVisualMediaController.handlePausePlay();
+        fgLowerVideoController.handlePausePlay();
       }}
       contentFunction={() => {
         const iconSrc = pausedState ? playIcon : pauseIcon;
@@ -40,7 +40,7 @@ export default function PlayPauseButton({
         );
       }}
       hoverContent={
-        !visualEffectsActive && !settingsActive ? (
+        !videoEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content={pausedState ? "Play (k)" : "Pause (k)"}
             style='dark'

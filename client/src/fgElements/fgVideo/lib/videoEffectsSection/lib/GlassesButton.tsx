@@ -425,10 +425,7 @@ export default function GlassesButton({
       effectType in glassesEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
-      if (userEffectsStyles.current.video[videoId].video.glasses) {
-        userEffectsStyles.current.video[videoId].video.glasses.style =
-          effectType;
-      }
+      effectsStyles.style = effectType;
 
       await handleVideoEffectChange("glasses", streamEffects);
     }

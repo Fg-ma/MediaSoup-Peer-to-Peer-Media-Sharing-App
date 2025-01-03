@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
+import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
 import {
   MasksEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+} from "../../../../../context/effectsContext/typeConstant";
+import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -252,22 +252,14 @@ const masksLabels: {
 };
 
 export default function MasksButton({
-  username,
-  instance,
-  type,
-  visualMediaId,
-  isUser,
-  handleVisualEffectChange,
+  videoId,
+  handleVideoEffectChange,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
-  username: string;
-  instance: string;
-  type: "camera";
-  visualMediaId: string;
-  isUser: boolean;
-  handleVisualEffectChange: (
+  videoId: string;
+  handleVideoEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -275,25 +267,14 @@ export default function MasksButton({
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const {
-    userEffectsStyles,
-    remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
-  } = useEffectsContext();
+  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [_, setRerender] = useState(false);
   const masksContainerRef = useRef<HTMLDivElement>(null);
 
-  const streamEffects = isUser
-    ? userStreamEffects.current[type][visualMediaId].masks
-    : remoteStreamEffects.current[username][instance][type][visualMediaId]
-        .masks;
-  const effectsStyles = isUser
-    ? userEffectsStyles.current[type][visualMediaId].masks
-    : remoteEffectsStyles.current[username][instance][type][visualMediaId]
-        .masks;
+  const streamEffects = userStreamEffects.current.video[videoId].video.masks;
+  const effectsStyles = userEffectsStyles.current.video[videoId].video.masks;
 
   const masksEffects: {
     [key in MasksEffectTypes]: {
@@ -489,42 +470,28 @@ export default function MasksButton({
     setEffectsDisabled(true);
     setRerender((prev) => !prev);
 
-    await handleVisualEffectChange("masks");
+    await handleVideoEffectChange("masks");
 
     setEffectsDisabled(false);
   };
 
   const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
-    if (!effectsStyles || !target || !target.dataset.visualEffectsButtonValue) {
+    if (!effectsStyles || !target || !target.dataset.videoEffectsButtonValue) {
       return;
     }
 
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .visualEffectsButtonValue as MasksEffectTypes;
+      .videoEffectsButtonValue as MasksEffectTypes;
     if (
       effectType in masksEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
-      if (isUser) {
-        if (userEffectsStyles.current[type][visualMediaId].masks) {
-          userEffectsStyles.current[type][visualMediaId].masks.style =
-            effectType;
-        }
-      } else {
-        if (
-          remoteEffectsStyles.current[username][instance][type][visualMediaId]
-            .masks
-        ) {
-          remoteEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].masks.style = effectType;
-        }
-      }
+      effectsStyles.style = effectType;
 
-      await handleVisualEffectChange("masks", streamEffects);
+      await handleVideoEffectChange("masks", streamEffects);
     }
 
     setEffectsDisabled(false);
@@ -554,7 +521,7 @@ export default function MasksButton({
                   { key: "width", value: "95%" },
                   { key: "height", value: "95%" },
                 ]}
-                data-visual-effects-button-value={effectsStyles.style}
+                data-video-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -576,7 +543,7 @@ export default function MasksButton({
                 srcLoading={imageLoadingSrc}
                 alt={effectsStyles.style}
                 style={{ width: "90%", height: "90%" }}
-                data-visual-effects-button-value={effectsStyles.style}
+                data-video-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -604,14 +571,14 @@ export default function MasksButton({
                   onClick={(event) => {
                     holdFunction(event as unknown as PointerEvent);
                   }}
-                  data-visual-effects-button-value={mask}
+                  data-video-effects-button-value={mask}
                 >
                   <FgImageElement
                     src={effect.image}
                     srcLoading={effect.imageSmall}
                     alt={mask}
                     style={{ width: "2.75rem", height: "2.75rem" }}
-                    data-visual-effects-button-value={mask}
+                    data-video-effects-button-value={mask}
                   />
                 </div>
               )}

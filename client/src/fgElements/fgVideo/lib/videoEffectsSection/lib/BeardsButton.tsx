@@ -137,10 +137,7 @@ export default function BeardsButton({
       effectType in beardsEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
-      if (userEffectsStyles.current.video[videoId].video.beards) {
-        userEffectsStyles.current.video[videoId].video.beards.style =
-          effectType;
-      }
+      effectsStyles.style = effectType;
 
       await handleVideoEffectChange("beards", streamEffects);
     }

@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
+import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
 import {
   PetsEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+} from "../../../../../context/effectsContext/typeConstant";
+import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -263,22 +263,14 @@ const petsLabels: {
 };
 
 export default function PetsButton({
-  username,
-  instance,
-  type,
-  visualMediaId,
-  isUser,
-  handleVisualEffectChange,
+  videoId,
+  handleVideoEffectChange,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
-  username: string;
-  instance: string;
-  type: "camera";
-  visualMediaId: string;
-  isUser: boolean;
-  handleVisualEffectChange: (
+  videoId: string;
+  handleVideoEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -297,12 +289,8 @@ export default function PetsButton({
   const [_, setRerender] = useState(false);
   const petsContainerRef = useRef<HTMLDivElement>(null);
 
-  const streamEffects = isUser
-    ? userStreamEffects.current[type][visualMediaId].pets
-    : remoteStreamEffects.current[username][instance][type][visualMediaId].pets;
-  const effectsStyles = isUser
-    ? userEffectsStyles.current[type][visualMediaId].pets
-    : remoteEffectsStyles.current[username][instance][type][visualMediaId].pets;
+  const streamEffects = userStreamEffects.current.video[videoId].video.pets;
+  const effectsStyles = userEffectsStyles.current.video[videoId].video.pets;
 
   const petsEffects: {
     [key in PetsEffectTypes]: {
@@ -522,42 +510,28 @@ export default function PetsButton({
     setEffectsDisabled(true);
     setRerender((prev) => !prev);
 
-    await handleVisualEffectChange("pets");
+    await handleVideoEffectChange("pets");
 
     setEffectsDisabled(false);
   };
 
   const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
-    if (!effectsStyles || !target || !target.dataset.visualEffectsButtonValue) {
+    if (!effectsStyles || !target || !target.dataset.videoEffectsButtonValue) {
       return;
     }
 
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .visualEffectsButtonValue as PetsEffectTypes;
+      .videoEffectsButtonValue as PetsEffectTypes;
     if (
       effectType in petsEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
-      if (isUser) {
-        if (userEffectsStyles.current[type][visualMediaId].pets) {
-          userEffectsStyles.current[type][visualMediaId].pets.style =
-            effectType;
-        }
-      } else {
-        if (
-          remoteEffectsStyles.current[username][instance][type][visualMediaId]
-            .pets
-        ) {
-          remoteEffectsStyles.current[username][instance][type][
-            visualMediaId
-          ].pets.style = effectType;
-        }
-      }
+      effectsStyles.style = effectType;
 
-      await handleVisualEffectChange("pets", streamEffects);
+      await handleVideoEffectChange("pets", streamEffects);
     }
 
     setEffectsDisabled(false);
@@ -587,7 +561,7 @@ export default function PetsButton({
                   { key: "width", value: "95%" },
                   { key: "height", value: "95%" },
                 ]}
-                data-visual-effects-button-value={effectsStyles.style}
+                data-video-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -609,7 +583,7 @@ export default function PetsButton({
                 srcLoading={imageLoadingSrc}
                 alt={effectsStyles.style}
                 style={{ width: "90%", height: "90%" }}
-                data-visual-effects-button-value={effectsStyles.style}
+                data-video-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -637,14 +611,14 @@ export default function PetsButton({
                   onClick={(event) => {
                     holdFunction(event as unknown as PointerEvent);
                   }}
-                  data-visual-effects-button-value={pet}
+                  data-video-effects-button-value={pet}
                 >
                   <FgImageElement
                     src={effect.image}
                     srcLoading={effect.imageSmall}
                     alt={pet}
                     style={{ width: "2.75rem", height: "2.75rem" }}
-                    data-visual-effects-button-value={pet}
+                    data-video-effects-button-value={pet}
                   />
                 </div>
               )}

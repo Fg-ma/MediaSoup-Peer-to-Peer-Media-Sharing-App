@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
+import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+} from "../../../../../context/effectsContext/typeConstant";
+import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -17,23 +17,15 @@ const tintOffIcon =
 const ColorPicker = React.lazy(() => import("./ColorPicker"));
 
 export default function TintSection({
-  username,
-  instance,
-  visualMediaId,
-  type,
-  isUser,
-  handleVisualEffectChange,
+  videoId,
+  handleVideoEffectChange,
   tintColor,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
-  username: string;
-  instance: string;
-  visualMediaId: string;
-  type: "camera" | "screen";
-  isUser: boolean;
-  handleVisualEffectChange: (
+  videoId: string;
+  handleVideoEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean
   ) => Promise<void>;
@@ -50,20 +42,16 @@ export default function TintSection({
   const [tempColor, setTempColor] = useState(color);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
 
-  const streamEffects = isUser
-    ? userStreamEffects.current[type][visualMediaId].tint
-    : remoteStreamEffects.current[username][instance][type][visualMediaId].tint;
+  const streamEffects = userStreamEffects.current.video[videoId].video.tint;
 
   const handleColorPicker = () => {
     setTempColor(tintColor.current);
     setIsColorPicker((prev) => !prev);
   };
 
-  if (isUser) {
-    useEffect(() => {
-      setRerender((prev) => prev + 1);
-    }, [userStreamEffects.current[type][visualMediaId].tint]);
-  }
+  useEffect(() => {
+    setRerender((prev) => prev + 1);
+  }, [streamEffects]);
 
   return (
     <div className='w-max flex'>
@@ -72,7 +60,7 @@ export default function TintSection({
           setEffectsDisabled(true);
           setRerender((prev) => prev + 1);
 
-          await handleVisualEffectChange("tint");
+          await handleVideoEffectChange("tint");
 
           setEffectsDisabled(false);
         }}
@@ -120,7 +108,7 @@ export default function TintSection({
               colorRef={tintColor}
               colorPickerBtnRef={colorPickerBtnRef}
               handleAcceptColorCallback={() => {
-                handleVisualEffectChange("tint", streamEffects);
+                handleVideoEffectChange("tint", streamEffects);
               }}
             />
           </Suspense>

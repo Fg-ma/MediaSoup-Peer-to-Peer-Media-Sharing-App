@@ -80,16 +80,16 @@ export default function VideoEffectsSection({
     updateWidth();
   }, [videoContainerRef.current?.clientWidth]);
 
+  const handleWheel = (event: WheelEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (effectsContainerRef.current) {
+      effectsContainerRef.current.scrollLeft += event.deltaY;
+    }
+  };
+
   useEffect(() => {
-    const handleWheel = (event: WheelEvent) => {
-      event.stopPropagation();
-      event.preventDefault();
-
-      if (effectsContainerRef.current) {
-        effectsContainerRef.current.scrollLeft += event.deltaY;
-      }
-    };
-
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     window.addEventListener("resize", updateWidth);

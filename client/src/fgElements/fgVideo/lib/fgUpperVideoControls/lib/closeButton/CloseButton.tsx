@@ -1,22 +1,22 @@
 import React from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import FgLowerVisualMediaController from "../../../fgLowerVideoControls/lib/FgLowerVideoController";
+import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../../../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const closeIcon = nginxAssetSeverBaseUrl + "svgs/closeIcon.svg";
 
 export default function CloseButton({
-  fgLowerVisualMediaController,
+  fgLowerVideoController,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
+  fgLowerVideoController: FgLowerVideoController;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVisualMediaController.handleCloseVideo();
+        fgLowerVideoController.handleCloseVideo();
       }}
       contentFunction={() => {
         return (

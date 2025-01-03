@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { KaldiRecognizer, Model } from "vosk-browser";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
-import FgLowerVisualMediaController from "../FgLowerVideoController";
+import FgLowerVideoController from "../FgLowerVideoController";
 import { Settings } from "../../../typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -45,21 +45,21 @@ const voskModels: { [model: string]: string } = {
 };
 
 export default function CaptionButton({
-  fgLowerVisualMediaController,
-  visualEffectsActive,
+  fgLowerVideoController,
+  videoEffectsActive,
   settingsActive,
   settings,
   audioStream,
-  visualMediaContainerRef,
+  videoContainerRef,
   scrollingContainerRef,
   containerRef,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
-  visualEffectsActive: boolean;
+  fgLowerVideoController: FgLowerVideoController;
+  videoEffectsActive: boolean;
   settingsActive: boolean;
   settings: Settings;
   audioStream: MediaStream;
-  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
+  videoContainerRef: React.RefObject<HTMLDivElement>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   containerRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -108,9 +108,9 @@ export default function CaptionButton({
 
           setActive((prev) => !prev);
 
-          fgLowerVisualMediaController.handleClosedCaptions();
+          fgLowerVideoController.handleClosedCaptions();
 
-          fgLowerVisualMediaController.updateCaptionsStyles();
+          fgLowerVideoController.updateCaptionsStyles();
         }}
         contentFunction={() => {
           return (
@@ -128,7 +128,7 @@ export default function CaptionButton({
           );
         }}
         hoverContent={
-          !visualEffectsActive && !settingsActive ? (
+          !videoEffectsActive && !settingsActive ? (
             <FgHoverContentStandard content='Captions (c)' style='dark' />
           ) : undefined
         }
@@ -137,7 +137,7 @@ export default function CaptionButton({
       />
       {active && (
         <Captions
-          visualMediaContainerRef={visualMediaContainerRef}
+          videoContainerRef={videoContainerRef}
           voskCaptions={voskCaptions}
           containerRef={containerRef}
         />

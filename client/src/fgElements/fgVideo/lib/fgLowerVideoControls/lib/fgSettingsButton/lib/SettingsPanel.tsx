@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
-import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgButton from "../../../../../../../fgElements/fgButton/FgButton";
 import ClosedCaptionsPage, {
   closedCaptionsSelections,
 } from "./ClosedCaptionsPage";
@@ -10,7 +10,7 @@ import ClosedCaptionsOptionsPage, {
 } from "./ClosedCaptionsOptionsPage";
 import PageTemplate from "./PageTemplate";
 import { ActivePages } from "../../../FgLowerVideoControls";
-import { FgVisualMediaOptions, Settings } from "../../../../typeConstant";
+import { FgVideoOptions, Settings } from "../../../../typeConstant";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -79,7 +79,7 @@ const closedCaptionOptionsPageTitles = {
 };
 
 export default function SettingsPanel({
-  fgVisualMediaOptions,
+  fgVideoOptions,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -87,7 +87,7 @@ export default function SettingsPanel({
   settings,
   setSettings,
 }: {
-  fgVisualMediaOptions: FgVisualMediaOptions;
+  fgVideoOptions: FgVideoOptions;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -202,24 +202,21 @@ export default function SettingsPanel({
             animate='animate'
             exit='exit'
           >
-            {fgVisualMediaOptions.isVolume && (
-              <FgButton
-                className='w-full'
-                contentFunction={() => (
-                  <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between px-2 rounded items-center'>
-                    <div>Subtitles</div>
-                    <div>
-                      {Object.prototype.hasOwnProperty.call(
-                        closedCaptionsSelections,
-                        settings.closedCaption.value
-                      ) &&
-                        closedCaptionsSelections[settings.closedCaption.value]}
-                    </div>
+            <FgButton
+              className='w-full'
+              contentFunction={() => (
+                <div className='w-full text-nowrap hover:bg-gray-400 flex justify-between px-2 rounded items-center'>
+                  <div>Subtitles</div>
+                  <div>
+                    {Object.prototype.hasOwnProperty.call(
+                      closedCaptionsSelections,
+                      settings.closedCaption.value
+                    ) && closedCaptionsSelections[settings.closedCaption.value]}
                   </div>
-                )}
-                clickFunction={handleClosedCaptionsActive}
-              />
-            )}
+                </div>
+              )}
+              clickFunction={handleClosedCaptionsActive}
+            />
           </motion.div>
         )}
       </AnimatePresence>
