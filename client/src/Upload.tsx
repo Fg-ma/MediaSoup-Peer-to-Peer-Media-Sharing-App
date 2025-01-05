@@ -50,10 +50,63 @@ export default function Upload() {
     }
   };
 
+  // Handle drag over event to allow drop
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Optionally, you can add styles to show drop zone active (e.g., change color)
+  };
+
+  // Handle drag leave event (optional, to reset styles)
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Reset styles here if necessary
+  };
+
+  // Handle file drop
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length > 0) {
+      const file = droppedFiles[0];
+      setFile(file); // Set the file to the state (or handle it further)
+      console.log("Dropped file:", file);
+    }
+  };
+
   return (
     <div>
-      <input type='file' onChange={handleFileChange} />
-      <button onClick={handleFileUpload}>Upload</button>
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        style={{
+          width: "300px",
+          height: "200px",
+          border: "2px dashed #aaa",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f9f9f9",
+          color: "#aaa",
+          cursor: "pointer",
+        }}
+      >
+        <p>{file ? file.name : "Drag a file here or select one"}</p>
+      </div>
+
+      <input
+        type='file'
+        onChange={handleFileChange}
+        style={{ marginTop: "10px" }}
+      />
+      <button onClick={handleFileUpload} style={{ marginTop: "10px" }}>
+        Upload
+      </button>
+
       {uploadProgress > 0 && <p>Progress: {uploadProgress}%</p>}
       {uploadStatus && <p>Status: {uploadStatus}</p>}
     </div>
