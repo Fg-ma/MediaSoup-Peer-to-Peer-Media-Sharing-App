@@ -6,6 +6,7 @@ export default function FileReceiver() {
   const hiddenVideoRef = useRef<HTMLVideoElement>(null);
   const shakaPlayer = useRef<shaka.Player | null>(null);
   const [showHiddenVideo, setShowHiddenVideo] = useState(false);
+  const mediaSource = useRef<MediaSource | undefined>(undefined);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -17,14 +18,19 @@ export default function FileReceiver() {
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
 
-      if (message.type === "fileStartedUploading") {
-        const { filename } = message;
-        console.log("started", filename);
-        fetchVideoWithRange(filename);
-      }
-
       if (message.type === "originalVideoReady") {
         const { url } = message;
+        // shakaPlayer.current
+        //   ?.load(url)
+        //   .then(() => {
+        //     console.log("Original video loaded successfully");
+        //   })
+        //   .catch(onErrorEvent);
+      }
+
+      if (message.type === "partialVideoReady") {
+        const { url } = message;
+        console.log(url, shakaPlayer.current);
         shakaPlayer.current
           ?.load(url)
           .then(() => {
@@ -35,62 +41,12 @@ export default function FileReceiver() {
 
       if (message.type === "dashVideoReady") {
         const { url } = message;
-        preloadDashStream(url);
+        // preloadDashStream(url);
       }
     };
 
     return () => ws.close();
   }, []);
-
-  const fetchVideoWithRange = async (filename: string) => {
-    let videoStream = new ReadableStream({
-      async start(controller) {
-        try {
-          let currentByte = 0;
-          const chunkSize = 1024 * 1024; // 1 MB chunks (can adjust)
-
-          while (true) {
-            const rangeHeader = `bytes=${currentByte}-${
-              currentByte + chunkSize - 1
-            }`;
-            console.log("Range Header:", rangeHeader);
-
-            const response = await fetch(
-              `https://localhost:8045/video/${filename}`,
-              {
-                headers: {
-                  Range: rangeHeader,
-                },
-              }
-            );
-
-            if (!response.ok) {
-              throw new Error("Failed to fetch video chunk");
-            }
-
-            const chunk = await response.arrayBuffer();
-            controller.enqueue(new Uint8Array(chunk));
-
-            currentByte += chunkSize;
-            if (chunk.byteLength < chunkSize) {
-              break; // End of file
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching video:", error);
-        }
-      },
-    });
-
-    const videoBlob = await streamToBlob(videoStream);
-    const videoUrlForPlayer = URL.createObjectURL(videoBlob);
-    shakaPlayer.current?.load(videoUrlForPlayer);
-  };
-
-  // Convert stream to Blob
-  const streamToBlob = (stream) => {
-    return new Response(stream).blob();
-  };
 
   const preloadDashStream = (dashUrl: string) => {
     if (hiddenVideoRef.current) {
@@ -115,7 +71,7 @@ export default function FileReceiver() {
       // Sync hidden video with the main video
       hiddenVideoRef.current.currentTime = currentTime;
       if (!isPaused) {
-        hiddenVideoRef.current.play();
+        // hiddenVideoRef.current.play();
       }
 
       // Match the size and position of the main video
@@ -126,16 +82,16 @@ export default function FileReceiver() {
 
       // After a short delay, switch the main video to DASH and hide the hidden video
       setTimeout(async () => {
-        await shakaPlayer.current?.load(dashUrl, currentTime);
+        if (!videoRef.current || !hiddenVideoRef.current) return;
+        await shakaPlayer.current.load(dashUrl, currentTime);
         videoRef.current.currentTime = currentTime;
         if (!isPaused) {
-          videoRef.current.play();
+          // videoRef.current.play();
         }
 
         // Hide the hidden video and clean up
         setShowHiddenVideo(false);
-        hiddenVideoRef.current.pause();
-        hiddenVideoRef.current.currentTime = 0;
+        hiddenVideoRef.current.src = "";
       }, 500); // Adjust the delay if needed
     } catch (error) {
       console.error("Error during DASH switch:", error);
@@ -176,6 +132,7 @@ export default function FileReceiver() {
         style={{
           width: "100%",
           objectFit: "cover",
+          maxHeight: "500px",
           backgroundColor: "#000",
         }}
       />

@@ -17,6 +17,11 @@ if (!fs.existsSync(processedDir)) {
   fs.mkdirSync(processedDir, { recursive: true });
 }
 
+const partialDir = path.join(__dirname, "../../nginxServer/partial");
+if (!fs.existsSync(partialDir)) {
+  fs.mkdirSync(partialDir, { recursive: true });
+}
+
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",
   cert_file_name: "../certs/tabletop-table-static-content-server.pem",
@@ -29,13 +34,44 @@ const random = (() => {
 
 const connectedClients = new Set<uWS.WebSocket<unknown>>(); // Store WebSocket clients
 
-// Function to process the uploaded video using Shaka Packager
-const processVideoWithABR = (
+const processPartialVideo = (
   inputFile: string,
   outputDir: string,
   filename: string
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
+    const baseName = path.basename(filename, path.extname(filename));
+    const outputPath = path.join(outputDir, `${baseName}_partial.mpd`);
+    const video500kPath = path.join(outputDir, `${baseName}_500k_30s.mp4`);
+    const video1MPath = path.join(outputDir, `${baseName}_1M_30s.mp4`);
+    const video2MPath = path.join(outputDir, `${baseName}_2M_30s.mp4`);
+    const audioPath = path.join(outputDir, `${baseName}_audio_30s.mp4`);
+
+    // Generate MPD for partial video
+    const command = `packager-win-x64.exe \
+      "in=${inputFile},stream=video,bandwidth=500000,output=${video500kPath}" \
+      "in=${inputFile},stream=video,bandwidth=1000000,output=${video1MPath}" \
+      "in=${inputFile},stream=video,bandwidth=2000000,output=${video2MPath}" \
+      "in=${inputFile},stream=audio,output=${audioPath}" \
+      --mpd_output "${outputPath}"`;
+
+    try {
+      await executeCommand(command);
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+// Function to process the uploaded video using Shaka Packager
+const processFullVideo = (
+  inputFile: string,
+  outputDir: string,
+  filename: string
+): Promise<void> => {
+  return new Promise(async (resolve, reject) => {
     const baseName = path.basename(filename, path.extname(filename));
     const video500kPath = path.join(outputDir, `${baseName}_500k.mp4`);
     const video1MPath = path.join(outputDir, `${baseName}_1M.mp4`);
@@ -43,14 +79,27 @@ const processVideoWithABR = (
     const audioPath = path.join(outputDir, `${baseName}_audio.mp4`);
     const outputPath = path.join(outputDir, `${baseName}.mpd`);
 
-    const packagerCommand = `packager-win-x64.exe \
-      "in=${inputFile},stream=video,bandwidth=500000,output=${video500kPath}" \
-      "in=${inputFile},stream=video,bandwidth=1000000,output=${video1MPath}" \
-      "in=${inputFile},stream=video,bandwidth=2000000,output=${video2MPath}" \
-      "in=${inputFile},stream=audio,output=${audioPath}" \
-      --mpd_output "${outputPath}"`;
+    const command = `packager-win-x64.exe \
+        "in=${inputFile},stream=video,bandwidth=500000,output=${video500kPath}" \
+        "in=${inputFile},stream=video,bandwidth=1000000,output=${video1MPath}" \
+        "in=${inputFile},stream=video,bandwidth=2000000,output=${video2MPath}" \
+        "in=${inputFile},stream=audio,output=${audioPath}" \
+        --mpd_output "${outputPath}"`;
 
-    const childProcess = exec(packagerCommand);
+    try {
+      await executeCommand(command);
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+// Helper function to execute shell commands
+const executeCommand = (command: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const childProcess = exec(command);
 
     let stderrBuffer = "";
     let stdoutBuffer = "";
@@ -66,16 +115,16 @@ const processVideoWithABR = (
     childProcess.on("close", (code) => {
       if (code !== 0) {
         console.error(
-          `Shaka Packager failed with exit code ${code}. stderr: ${stderrBuffer}`
+          `Command failed with exit code ${code}. stderr: ${stderrBuffer}`
         );
-        reject(new Error(`Shaka Packager failed with exit code ${code}`));
+        reject(new Error(`Command failed with exit code ${code}`));
       } else {
         resolve();
       }
     });
 
     childProcess.on("error", (err) => {
-      console.error("Error running Shaka Packager:", err);
+      console.error("Error running command:", err);
       reject(err);
     });
   });
@@ -87,15 +136,6 @@ uWS
     compression: uWS.SHARED_COMPRESSOR,
     maxPayloadLength: 16 * 1024 * 1024, // 16 MB
     idleTimeout: 60,
-    message: (ws, message) => {
-            try {
-        const msg = JSON.parse(Buffer.from(message).toString());
-       if (msg.type === "")
-      } catch (error) {
-        console.error("Failed to parse message:", error);
-      }
-    },
-
     open: (ws) => {
       connectedClients.add(ws);
       console.log("WebSocket client connected");
@@ -135,17 +175,45 @@ uWS
 
       file.pipe(writeStream);
 
-      setTimeout(() => {
-        // Notify clients that the original file is ready
-        const originalVideoMessage = JSON.stringify({
-          type: "fileStartedUploading",
-          filename: filename,
-        });
+      let receivedBytes = 0;
+      const chunkThreshold = 10 * 1024 * 1024; // Approx 30MB for 30 seconds of video
+      let partialVideoProcessed = false;
 
-        connectedClients.forEach((client) => {
-          client.send(originalVideoMessage, false);
-        });
-      }, 2000);
+      file.on("data", (chunk) => {
+        receivedBytes += chunk.length;
+
+        // When the first 30 seconds (30MB) are uploaded
+        if (receivedBytes >= chunkThreshold && !writeStream.closed) {
+          // If we haven't processed the partial video yet
+          if (!partialVideoProcessed) {
+            partialVideoProcessed = true; // Flag to prevent multiple processes
+
+            writeStream.end(() => {
+              // Start processing the partial video while upload continues
+              const partialVideoUrl = `https://localhost:8044/partial/${filename.slice(
+                0,
+                -4
+              )}_partial.mpd`;
+
+              processPartialVideo(saveTo, partialDir, filename)
+                .then(() => {
+                  const partialVideoMessage = JSON.stringify({
+                    type: "partialVideoReady",
+                    filename,
+                    url: partialVideoUrl,
+                  });
+
+                  connectedClients.forEach((client) => {
+                    client.send(partialVideoMessage, false);
+                  });
+                })
+                .catch((error) => {
+                  console.error("Error processing partial video:", error);
+                });
+            });
+          }
+        }
+      });
 
       file.on("end", async () => {
         // Notify clients that the original file is ready
@@ -161,7 +229,7 @@ uWS
 
         // Process video into DASH format in the background
         try {
-          await processVideoWithABR(saveTo, processedDir, filename);
+          await processFullVideo(saveTo, processedDir, filename);
 
           // Notify clients to switch to the DASH stream
           const dashVideoUrl = `https://localhost:8044/processed/${filename.slice(
@@ -211,31 +279,23 @@ uWS
       bb.destroy();
     });
   })
-  .get("/video/:filename", (res, req) => {
+  .get("/video/manifest/:filename", (res, req) => {
     const filename = req.getParameter(0);
     if (!filename) return;
-    const filePath = path.join(uploadsDir, filename);
-    const range = req.getHeader("Range");
-    console.log("Received Range:", range);
-    if (range) {
-      const [start, end] = range
-        .replace("bytes=", "")
-        .split("-")
-        .map((val) => parseInt(val, 10));
 
-      const fileStream = fs.createReadStream(filePath, { start, end });
+    const partialVideoUrl = `https://localhost:8044/processed/${filename.slice(
+      0,
+      -4
+    )}.mpd`;
+    const partialVideoMessage = JSON.stringify({
+      type: "partialVideo",
+      filename: filename,
+      url: partialVideoUrl,
+    });
 
-      res.writeStatus("206 Partial Content");
-      res.writeHeader(
-        "Content-Range",
-        `bytes ${start}-${end}/${fileBuffer.length}`
-      );
-      fileStream.pipe(res);
-    } else {
-      // Serve the whole file if no range is requested
-      const fileStream = fs.createReadStream(filePath);
-      fileStream.pipe(res);
-    }
+    connectedClients.forEach((client) => {
+      client.send(partialVideoMessage, false);
+    });
   })
   .listen(8045, (token) => {
     if (token) {

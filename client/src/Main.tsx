@@ -306,8 +306,8 @@ export default function Main() {
 
   return (
     <div className='w-screen h-screen flex-col space-y-3 flex-wrap p-5 overflow-hidden'>
-      {/* <Upload />
-      <FileReceiver /> */}
+      <Upload />
+      <FileReceiver />
       <FgTableFunctions
         table_id={table_id}
         username={username}
