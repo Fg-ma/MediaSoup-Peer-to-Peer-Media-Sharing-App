@@ -28,7 +28,7 @@ export default function FileReceiver() {
         //   .catch(onErrorEvent);
       }
 
-      if (message.type === "partialVideoReady") {
+      if (message.type === "truncatedVideoReady") {
         const { url } = message;
         console.log(url, shakaPlayer.current);
         shakaPlayer.current

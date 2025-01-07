@@ -9,14 +9,77 @@ export default function Upload() {
     setFile(e.target.files ? e.target.files[0] : null);
   };
 
+  const findMetadata = (file: File): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const buffer = event.target!.result as ArrayBuffer;
+        const data = new DataView(buffer);
+        let i = 0;
+        let metadata: any = { atoms: [] };
+
+        // Iterate through the file looking for MP4 atoms
+        while (i < data.byteLength) {
+          if (i + 8 > data.byteLength) {
+            // Ensure there's enough data to read size and type
+            break;
+          }
+
+          const atomSize = data.getUint32(i); // Atom size
+          const atomType = data.getUint32(i + 4); // Atom type
+
+          // Check if atom size is valid
+          if (atomSize < 8 || i + atomSize > data.byteLength) {
+            reject("Invalid atom size.");
+            return;
+          }
+
+          // Process known atoms
+          if (atomType === 0x66747970) {
+            // 'ftyp'
+            metadata.atoms.push({
+              type: "ftyp",
+              size: atomSize,
+              data: buffer.slice(i, i + atomSize),
+            });
+          } else if (atomType === 0x6d6f6f76) {
+            // 'moov'
+            metadata.moov = buffer.slice(i, i + atomSize);
+          } else if (atomType === 0x6d646174) {
+            // 'mdat'
+            metadata.atoms.push({
+              type: "mdat",
+              size: atomSize,
+              data: buffer.slice(i, i + atomSize),
+            });
+          }
+
+          i += atomSize; // Move to the next atom
+        }
+
+        // Reject if no 'moov' atom found
+        if (!metadata.moov) {
+          reject("moov atom not found.");
+        } else {
+          resolve(metadata);
+        }
+      };
+
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file); // Read the entire file
+    });
+  };
+
   const handleFileUpload = async () => {
     if (!file) {
       alert("Please select a file to upload");
       return;
     }
 
-    const url = "https://localhost:8045"; // Your uWebSockets server URL
+    const url = "https://localhost:8045/upload-video/";
     const formData = new FormData();
+
     formData.append("file", file);
 
     try {
@@ -24,18 +87,13 @@ export default function Upload() {
 
       xhr.open("POST", url, true);
 
+      const metadataData = await findMetadata(file);
+      xhr.setRequestHeader("X-Metadata", JSON.stringify(metadataData));
+
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
           const percentComplete = Math.round((e.loaded * 100) / e.total);
           setUploadProgress(percentComplete);
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          setUploadStatus("File uploaded successfully!");
-        } else {
-          setUploadStatus("File upload failed.");
         }
       };
 

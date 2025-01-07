@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { types, Device } from "mediasoup-client";
 import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "./context/mediaContext/MediaContext";
