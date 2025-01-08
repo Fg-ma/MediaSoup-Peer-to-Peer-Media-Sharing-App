@@ -9,6 +9,21 @@ export default function Upload() {
     setFile(e.target.files ? e.target.files[0] : null);
   };
 
+  const base64Encode = (arrayBuffer: ArrayBuffer): string => {
+    const uint8Array = new Uint8Array(arrayBuffer);
+    let binaryString = "";
+
+    // Process in chunks to avoid exceeding call stack limit
+    const chunkSize = 8192;
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+      binaryString += String.fromCharCode(
+        ...uint8Array.subarray(i, i + chunkSize)
+      );
+    }
+
+    return btoa(binaryString);
+  };
+
   const findMetadata = (file: File): Promise<any> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -19,46 +34,53 @@ export default function Upload() {
         let i = 0;
         let metadata: any = { atoms: [] };
 
-        // Iterate through the file looking for MP4 atoms
         while (i < data.byteLength) {
-          if (i + 8 > data.byteLength) {
-            // Ensure there's enough data to read size and type
-            break;
-          }
+          if (i + 8 > data.byteLength) break;
 
-          const atomSize = data.getUint32(i); // Atom size
-          const atomType = data.getUint32(i + 4); // Atom type
+          const atomSize = data.getUint32(i);
+          const atomType = new TextDecoder("ascii").decode(
+            buffer.slice(i + 4, i + 8)
+          );
 
-          // Check if atom size is valid
           if (atomSize < 8 || i + atomSize > data.byteLength) {
             reject("Invalid atom size.");
             return;
           }
 
-          // Process known atoms
-          if (atomType === 0x66747970) {
-            // 'ftyp'
-            metadata.atoms.push({
-              type: "ftyp",
-              size: atomSize,
-              data: buffer.slice(i, i + atomSize),
-            });
-          } else if (atomType === 0x6d6f6f76) {
-            // 'moov'
-            metadata.moov = buffer.slice(i, i + atomSize);
-          } else if (atomType === 0x6d646174) {
-            // 'mdat'
-            metadata.atoms.push({
-              type: "mdat",
-              size: atomSize,
-              data: buffer.slice(i, i + atomSize),
-            });
+          // Handle `moov` atom
+          if (atomType === "moov") {
+            const moovData = buffer.slice(i, i + atomSize);
+            const moovDecoded = new TextDecoder("ascii").decode(moovData);
+            console.log("moov atom (decoded):", moovDecoded);
+            metadata.moov = base64Encode(moovData); // Optionally, base64 encode the moov atom
           }
 
-          i += atomSize; // Move to the next atom
+          // Handle `ftyp` atom
+          if (atomType === "ftyp") {
+            const majorBrand = new TextDecoder("ascii").decode(
+              buffer.slice(i + 8, i + 12)
+            );
+            const minorVersion = data.getUint32(i + 12);
+            const compatibleBrands = new TextDecoder("ascii").decode(
+              buffer.slice(i + 16, i + atomSize)
+            );
+
+            console.log("ftyp atom:");
+            console.log("  Major Brand:", majorBrand);
+            console.log("  Minor Version:", minorVersion);
+            console.log("  Compatible Brands:", compatibleBrands);
+
+            metadata.ftyp = {
+              majorBrand,
+              minorVersion,
+              compatibleBrands,
+            };
+          }
+
+          metadata.atoms.push({ type: atomType, size: atomSize });
+          i += atomSize;
         }
 
-        // Reject if no 'moov' atom found
         if (!metadata.moov) {
           reject("moov atom not found.");
         } else {
@@ -67,9 +89,120 @@ export default function Upload() {
       };
 
       reader.onerror = reject;
-      reader.readAsArrayBuffer(file); // Read the entire file
+      reader.readAsArrayBuffer(file);
     });
   };
+
+  async function reorderMoovToBeginning(
+    inputFile: ArrayBuffer
+  ): Promise<Buffer> {
+    const data = new Uint8Array(inputFile);
+
+    let moovAtom: Uint8Array | null = null;
+    let mdatAtom: Uint8Array | null = null;
+    let otherAtoms: Uint8Array[] = [];
+
+    let offset = 0;
+    while (offset < data.length) {
+      const atomSize = new DataView(data.buffer).getUint32(offset, false);
+      const atomType = new TextDecoder("ascii").decode(
+        data.slice(offset + 4, offset + 8)
+      );
+
+      if (atomType === "moov") {
+        moovAtom = data.slice(offset, offset + atomSize);
+      } else if (atomType === "mdat") {
+        mdatAtom = data.slice(offset, offset + atomSize);
+      } else {
+        otherAtoms.push(data.slice(offset, offset + atomSize));
+      }
+
+      offset += atomSize;
+    }
+
+    if (!moovAtom || !mdatAtom) {
+      throw new Error("MP4 file must contain both 'moov' and 'mdat' atoms.");
+    }
+
+    // Adjust offsets in moov atom
+    const adjustedMoovAtom = adjustMoovOffsets(moovAtom, otherAtoms);
+
+    // Combine atoms: ftyp + moov + mdat
+    const reorderedData = Buffer.concat([
+      ...otherAtoms.map(Buffer.from), // Any atoms before moov (e.g., ftyp)
+      Buffer.from(adjustedMoovAtom), // Adjusted moov atom
+      Buffer.from(mdatAtom), // mdat atom
+    ]);
+
+    return reorderedData;
+  }
+
+  // Adjust offsets in moov atom
+  function adjustMoovOffsets(
+    moovAtom: Uint8Array,
+    adjustment: number
+  ): Uint8Array {
+    const moovData = new Uint8Array(moovAtom);
+
+    const updateOffsets = (atomType: string, size: number) => {
+      const offset = findAtomOffset(moovData, atomType);
+      if (offset !== -1) {
+        const entryCount = new DataView(moovData.buffer).getUint32(
+          offset + 4,
+          false
+        );
+        for (let i = 0; i < entryCount; i++) {
+          const currentOffset =
+            size === 4
+              ? new DataView(moovData.buffer).getUint32(
+                  offset + 8 + i * size,
+                  false
+                )
+              : new DataView(moovData.buffer).getBigUint64(
+                  offset + 8 + i * size,
+                  false
+                );
+          const newOffset = currentOffset + BigInt(adjustment);
+
+          if (size === 4) {
+            new DataView(moovData.buffer).setUint32(
+              offset + 8 + i * size,
+              Number(newOffset),
+              false
+            );
+          } else {
+            new DataView(moovData.buffer).setBigUint64(
+              offset + 8 + i * size,
+              newOffset,
+              false
+            );
+          }
+        }
+      }
+    };
+
+    // Update both stco (32-bit offsets) and co64 (64-bit offsets)
+    updateOffsets("stco", 4); // 32-bit offsets
+    updateOffsets("co64", 8); // 64-bit offsets
+
+    return moovData;
+  }
+
+  // Find atom offset
+  function findAtomOffset(buffer: Uint8Array, atomType: string): number {
+    let offset = 0;
+    while (offset < buffer.length) {
+      const atomSize = new DataView(buffer.buffer).getUint32(offset, false);
+      const atomTypeString = new TextDecoder().decode(
+        buffer.slice(offset + 4, offset + 8)
+      );
+      if (atomTypeString === atomType) {
+        return offset;
+      }
+      offset += atomSize;
+    }
+    return -1; // Atom not found
+  }
 
   const handleFileUpload = async () => {
     if (!file) {
@@ -77,18 +210,23 @@ export default function Upload() {
       return;
     }
 
+    const fileBuffer = await file.arrayBuffer();
+
     const url = "https://localhost:8045/upload-video/";
     const formData = new FormData();
 
-    formData.append("file", file);
+    // Append metadata as a JSON string
+    const metadataData = await findMetadata(file);
+    console.log(metadataData);
+    formData.append("metadata", JSON.stringify(metadataData));
+
+    const reorderedFile = await reorderMoovToBeginning(fileBuffer);
+    formData.append("file", new Blob([reorderedFile]), file.name);
 
     try {
       const xhr = new XMLHttpRequest();
 
       xhr.open("POST", url, true);
-
-      const metadataData = await findMetadata(file);
-      xhr.setRequestHeader("X-Metadata", JSON.stringify(metadataData));
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
@@ -131,7 +269,6 @@ export default function Upload() {
     if (droppedFiles.length > 0) {
       const file = droppedFiles[0];
       setFile(file); // Set the file to the state (or handle it further)
-      console.log("Dropped file:", file);
     }
   };
 
