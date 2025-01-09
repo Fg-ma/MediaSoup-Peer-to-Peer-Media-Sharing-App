@@ -1,11 +1,7 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
-import {
-  HideBackgroundEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../context/effectsContext/typeConstant";
+import { VideoEffectTypes } from "../../context/effectsContext/typeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgUpperVideoControls from "./lib/fgUpperVideoControls/FgUpperVideoControls";
 import FgLowerVideoControls from "./lib/fgLowerVideoControls/FgLowerVideoControls";
@@ -19,7 +15,6 @@ import {
 } from "./lib/typeConstant";
 import VideoGradient from "./lib/VideoGradient";
 import "./lib/fgVideoStyles.css";
-import { IncomingTableStaticContentMessages } from "src/lib/TableStaticContentSocketController";
 
 const VideoAdjustmentButtons = React.lazy(
   () => import("./lib/VideoAdjustmentButtons")
@@ -29,21 +24,17 @@ export default function FgVideo({
   table_id,
   username,
   instance,
-  name,
   videoId,
-  bundleRef,
-  videoStream,
-  audioStream,
+  name,
+  sharedBundleRef,
   options,
 }: {
   table_id: string;
   username: string;
   instance: string;
-  name?: string;
   videoId: string;
-  bundleRef: React.RefObject<HTMLDivElement>;
-  videoStream: MediaStream;
-  audioStream: MediaStream;
+  name?: string;
+  sharedBundleRef: React.RefObject<HTMLDivElement>;
   options?: FgVideoOptions;
 }) {
   const fgVideoOptions = {
@@ -52,18 +43,13 @@ export default function FgVideo({
   };
 
   const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
-  const {
-    userEffectsStyles,
-    remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
-  } = useEffectsContext();
-  const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
+  const { userStreamEffects } = useEffectsContext();
+  const { mediasoupSocket } = useSocketContext();
+
+  const videoMedia = userMedia.current.video[videoId];
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const panBtnRef = useRef<HTMLButtonElement>(null);
 
   const [inVideo, setInVideo] = useState(false);
@@ -128,35 +114,20 @@ export default function FgVideo({
     rotation: 0,
   });
 
-  const hiddenVideoRef = useRef<HTMLVideoElement>(null);
-  const shakaPlayer = useRef<shaka.Player | null>(null);
-  const [showHiddenVideo, setShowHiddenVideo] = useState(false);
-  const [hiddenVideoOpacity, setHiddenVideoOpacity] = useState(false);
-
-  const handleVideoEffectChange = async (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange: boolean = false
-  ) => {
-    fgLowerVideoController.handleVideoEffect(effect, blockStateChange);
-  };
-
   const fgContentAdjustmentController = new FgContentAdjustmentController(
-    bundleRef,
+    sharedBundleRef,
     positioning,
     setAdjustingDimensions,
     setRerender
   );
 
   const fgLowerVideoController = new FgLowerVideoController(
-    mediasoupSocket,
-    videoId,
     table_id,
     username,
     instance,
-    fgVideoOptions,
-    bundleRef,
-    videoRef,
-    audioRef,
+    videoId,
+    sharedBundleRef,
+    videoMedia,
     videoContainerRef,
     panBtnRef,
     setPausedState,
@@ -168,7 +139,6 @@ export default function FgVideo({
     currentTimeRef,
     setVideoEffectsActive,
     setAudioEffectsActive,
-    handleVideoEffectChange,
     tintColor,
     userStreamEffects,
     userMedia,
@@ -183,21 +153,11 @@ export default function FgVideo({
     instance,
     videoId,
     fgLowerVideoController,
-    videoStream,
     positioningListeners,
     positioning,
-    setPausedState,
-    paused,
-    userMedia,
-    remoteStreamEffects,
-    userEffectsStyles,
-    remoteEffectsStyles,
     remoteDataStreams,
-    videoRef,
     videoContainerRef,
-    audioRef,
     fgVideoOptions,
-    handleVideoEffectChange,
     setInVideo,
     leaveVideoTimer,
     videoMovementTimeout,
@@ -235,11 +195,11 @@ export default function FgVideo({
       fgVideoController.handleVisibilityChange
     );
 
-    videoRef.current?.addEventListener("enterpictureinpicture", () =>
+    videoMedia.video.addEventListener("enterpictureinpicture", () =>
       fgLowerVideoController.handlePictureInPicture("enter")
     );
 
-    videoRef.current?.addEventListener("leavepictureinpicture", () =>
+    videoMedia.video.addEventListener("leavepictureinpicture", () =>
       fgLowerVideoController.handlePictureInPicture("leave")
     );
 
@@ -270,10 +230,10 @@ export default function FgVideo({
         "visibilitychange",
         fgVideoController.handleVisibilityChange
       );
-      videoRef.current?.removeEventListener("enterpictureinpicture", () =>
+      videoMedia.video.removeEventListener("enterpictureinpicture", () =>
         fgLowerVideoController.handlePictureInPicture("enter")
       );
-      videoRef.current?.removeEventListener("leavepictureinpicture", () =>
+      videoMedia.video.removeEventListener("leavepictureinpicture", () =>
         fgLowerVideoController.handlePictureInPicture("leave")
       );
     };
@@ -290,9 +250,9 @@ export default function FgVideo({
       userMedia.current.video[videoId].canvas.style.left = "0%";
       userMedia.current.video[videoId].canvas.style.width = "100%";
       userMedia.current.video[videoId].canvas.style.height = "100%";
-      subContainerRef.current.appendChild(
-        userMedia.current.video[videoId].canvas
-      );
+      // subContainerRef.current.appendChild(
+      //   userMedia.current.video[videoId].canvas
+      // );
     }
   }, [videoId, userMedia]);
 
@@ -315,105 +275,40 @@ export default function FgVideo({
   }, [positioning.current]);
 
   useEffect(() => {
-    fgVideoController.attachPositioningListeners(fgVideoOptions.permissions);
-  }, [fgVideoOptions.permissions]);
+    fgVideoController.attachPositioningListeners();
 
-  useEffect(() => {
-    tableStaticContentSocket.current?.addMessageListener(
-      handleTableStaticContentMessage
-    );
-
-    return () =>
-      tableStaticContentSocket.current?.removeMessageListener(
-        handleTableStaticContentMessage
-      );
-  }, [tableStaticContentSocket.current]);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      shakaPlayer.current = new shaka.Player(videoRef.current);
-    }
+    subContainerRef.current?.appendChild(videoMedia.video);
+    subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
   }, []);
 
-  const preloadDashStream = (dashUrl: string) => {
-    if (hiddenVideoRef.current) {
-      const hiddenPlayer = new shaka.Player(hiddenVideoRef.current);
-      hiddenPlayer.load(dashUrl).then(() => {
-        switchToDashStream(dashUrl);
-      });
-    }
-  };
+  const scaleCallback = () => {
+    if (!subContainerRef.current) return;
 
-  const switchToDashStream = async (dashUrl: string) => {
-    if (!videoRef.current || !hiddenVideoRef.current) return;
-    console.log("DASH stream swap");
+    // Calculate the aspect ratio of the video
+    const videoAspectRatio =
+      videoMedia.video.videoWidth / videoMedia.video.videoHeight;
 
-    try {
-      const currentTime = videoRef.current.currentTime;
-      const isPaused = videoRef.current.paused;
+    // Get the size of the container
+    const containerBox = subContainerRef.current.getBoundingClientRect();
+    const containerWidth = containerBox.width;
+    const containerHeight = containerBox.height;
 
-      // Sync hidden video with the main video
-      hiddenVideoRef.current.currentTime = currentTime;
-      if (!isPaused) {
-        hiddenVideoRef.current.play();
-      }
+    // Calculate the container's aspect ratio
+    const containerAspectRatio = containerWidth / containerHeight;
 
-      const videoBox = videoRef.current.getBoundingClientRect();
-
-      hiddenVideoRef.current.width = videoBox.width;
-      hiddenVideoRef.current.height = videoBox.height;
-
-      setShowHiddenVideo(true);
-
-      setTimeout(() => {
-        setHiddenVideoOpacity(true);
-      }, 500);
-
-      // After a short delay, switch the main video to DASH and hide the hidden video
-      setTimeout(async () => {
-        if (!videoRef.current || !hiddenVideoRef.current) return;
-
-        await shakaPlayer.current?.load(dashUrl, currentTime);
-
-        videoRef.current.width = videoBox.width;
-        videoRef.current.height = videoBox.height;
-
-        videoRef.current.currentTime = hiddenVideoRef.current.currentTime;
-        if (!hiddenVideoRef.current.paused) {
-          videoRef.current.play();
-        }
-
-        // Hide the hidden video and clean up
-        setTimeout(() => {
-          setShowHiddenVideo(false);
-          setHiddenVideoOpacity(false);
-          if (hiddenVideoRef.current) hiddenVideoRef.current.src = "";
-        }, 250);
-      }, 1000); // Adjust the delay if needed
-    } catch (error) {
-      console.error("Error during DASH switch:", error);
-    }
-  };
-
-  const handleTableStaticContentMessage = (
-    message: IncomingTableStaticContentMessages
-  ) => {
-    switch (message.type) {
-      case "originalVideoReady":
-        shakaPlayer.current?.load(message.url).then(() => {
-          console.log("Original video loaded successfully");
-        });
-        break;
-      case "dashVideoReady":
-        preloadDashStream(message.url);
-        break;
-      // case "truncatedVideoReady":
-      //   shakaPlayer.current?.load(message.url).then(() => {
-      //     console.log("Original video loaded successfully");
-      //   });
-      //   break;
-      default:
-        break;
+    // Apply scaling based on the smaller dimension to prevent overflow
+    if (containerAspectRatio > videoAspectRatio) {
+      // Container is wider than the video aspect ratio
+      videoMedia.video.style.width = "auto";
+      videoMedia.video.style.height = "100%";
+      videoMedia.hiddenVideo.style.width = "auto";
+      videoMedia.hiddenVideo.style.height = "100%";
+    } else {
+      // Container is taller than the video aspect ratio
+      videoMedia.video.style.width = "100%";
+      videoMedia.video.style.height = "auto";
+      videoMedia.hiddenVideo.style.width = "100%";
+      videoMedia.hiddenVideo.style.height = "auto";
     }
   };
 
@@ -443,34 +338,12 @@ export default function FgVideo({
       onPointerLeave={() => fgVideoController.handlePointerLeave()}
       data-positioning={JSON.stringify(positioning.current)}
     >
-      <video
-        ref={videoRef}
-        controls
-        autoPlay
-        style={{
-          width: "100%",
-          objectFit: "cover",
-          backgroundColor: "#000",
-        }}
-      />
-      <video
-        ref={hiddenVideoRef}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          objectFit: "cover",
-          display: showHiddenVideo ? "" : "none",
-          opacity: hiddenVideoOpacity ? "100%" : "0%",
-          backgroundColor: "#000",
-          zIndex: 10,
-        }}
-      />
       <VideoAdjustmentButtons
-        bundleRef={bundleRef}
+        sharedBundleRef={sharedBundleRef}
         panBtnRef={panBtnRef}
         positioning={positioning}
         fgContentAdjustmentController={fgContentAdjustmentController}
+        scaleCallback={scaleCallback}
       />
       {adjustingDimensions && (
         <>
@@ -480,14 +353,10 @@ export default function FgVideo({
       )}
       <div
         ref={subContainerRef}
-        className='relative flex items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
+        className='relative flex items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
-        <FgUpperVideoControls
-          name={name}
-          username={username}
-          fgVideoOptions={fgVideoOptions}
-          fgLowerVideoController={fgLowerVideoController}
-        />
+        <FgUpperVideoControls fgLowerVideoController={fgLowerVideoController} />
+        {/* 
         <FgLowerVideoControls
           table_id={table_id}
           username={username}
@@ -508,7 +377,7 @@ export default function FgVideo({
           setSettings={setSettings}
           fgVideoOptions={fgVideoOptions}
           handleVideoEffectChange={handleVideoEffectChange}
-        />
+        /> */}
         <VideoGradient />
       </div>
     </div>

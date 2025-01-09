@@ -356,6 +356,8 @@ export default function Main() {
         bundles={bundles}
         gridActive={gridActive}
         gridSize={gridSize}
+        userDevice={userDevice}
+        deadbanding={deadbanding}
       />
     </div>
   );

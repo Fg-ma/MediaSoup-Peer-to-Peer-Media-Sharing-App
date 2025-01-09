@@ -4,6 +4,8 @@ import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElem
 import TableGridOverlay from "./lib/TableGridOverlay";
 import UploadTableLayer from "../uploadTableLayer/UploadTableLayer";
 import SharedBundle from "../sharedBundle/SharedBundle";
+import UserDevice from "../lib/UserDevice";
+import Deadbanding from "../babylon/Deadbanding";
 import "./lib/fgTable.css";
 
 export default function FgTable({
@@ -15,6 +17,8 @@ export default function FgTable({
   bundles,
   gridActive,
   gridSize,
+  userDevice,
+  deadbanding,
 }: {
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
@@ -31,6 +35,8 @@ export default function FgTable({
     rows: number;
     cols: number;
   };
+  userDevice: UserDevice;
+  deadbanding: Deadbanding;
 }) {
   const [_rerender, setRerender] = useState(false);
   const aspectDir = useRef<"width" | "height">("width");
@@ -104,6 +110,8 @@ export default function FgTable({
               table_id={table_id.current}
               username={username.current}
               instance={instance.current}
+              userDevice={userDevice}
+              deadbanding={deadbanding}
             />
             {bundles &&
               Object.keys(bundles).length !== 0 &&

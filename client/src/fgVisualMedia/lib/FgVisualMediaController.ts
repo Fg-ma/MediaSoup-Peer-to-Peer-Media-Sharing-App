@@ -265,7 +265,7 @@ class FgVisualMediaController {
     }
   };
 
-  handleVisibilityChange() {
+  handleVisibilityChange = () => {
     if (this.type !== "camera") {
       return;
     }
@@ -279,7 +279,7 @@ class FgVisualMediaController {
         this.fgLowerVisualMediaController.handlePausePlay();
       }
     }
-  }
+  };
 
   handlePointerMove = () => {
     this.setInVisualMedia(true);

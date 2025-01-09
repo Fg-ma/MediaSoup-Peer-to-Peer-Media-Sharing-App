@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 
@@ -31,7 +32,7 @@ export default function UploadMediaButton({
       return;
     }
 
-    const url = `https://localhost:8045/${table_id.current}`;
+    const url = `https://localhost:8045/upload/${table_id.current}/${uuidv4()}`;
     const formData = new FormData();
     formData.append("file", file.current);
 

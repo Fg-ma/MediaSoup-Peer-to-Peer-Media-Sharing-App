@@ -24,14 +24,24 @@ export type IncomingTableStaticContentMessages =
 
 type onOriginalVideoReadyType = {
   type: "originalVideoReady";
-  filename: string;
-  url: string;
+  header: {
+    videoId: string;
+  };
+  data: {
+    filename: string;
+    url: string;
+  };
 };
 
 type onDashVideoReadyType = {
   type: "dashVideoReady";
-  filename: string;
-  url: string;
+  header: {
+    videoId: string;
+  };
+  data: {
+    filename: string;
+    url: string;
+  };
 };
 
 class TableStaticContentSocketController {

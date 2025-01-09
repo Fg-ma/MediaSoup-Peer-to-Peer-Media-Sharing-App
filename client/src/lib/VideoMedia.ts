@@ -1,10 +1,13 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
+import shaka from "shaka-player";
 import {
-  defaultCameraEffectsStyles,
   UserEffectsStylesType,
-  CameraEffectTypes,
-  defaultCameraStreamEffects,
   UserStreamEffectsType,
+  defaultVideoStreamEffects,
+  defaultAudioStreamEffects,
+  defaultVideoEffectsStyles,
+  defaultAudioEffectsStyles,
+  VideoEffectTypes,
 } from "../context/effectsContext/typeConstant";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
 import UserDevice from "./UserDevice";
@@ -18,7 +21,13 @@ import Deadbanding from "../babylon/Deadbanding";
 
 class VideoMedia {
   canvas: HTMLCanvasElement;
-  private video: HTMLVideoElement;
+  video: HTMLVideoElement;
+  shakaPlayer: shaka.Player;
+  hiddenVideo: HTMLVideoElement;
+  hiddenShakaPlayer: shaka.Player;
+
+  originalVideoURL: string;
+  dashUrl: string | undefined;
 
   private creationTime = Date.now();
 
@@ -33,39 +42,45 @@ class VideoMedia {
   private selfieSegmentationResults: ImageData[] = [];
   private selfieSegmentationProcessing = [false];
 
+  filename: string;
+
   private effects: {
-    [cameraEffect in CameraEffectTypes]?: boolean;
-  };
+    [videoEffect in VideoEffectTypes]?: boolean;
+  } = {};
 
   private maxFaces: [number] = [1];
 
   babylonScene: BabylonScene;
 
   constructor(
-    private cameraId: string,
-    private initCameraStream: MediaStream,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private videoId: string,
+    filename: string,
+    originalVideoURL: string,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>
   ) {
-    this.effects = {};
+    this.filename = filename;
+    this.originalVideoURL = originalVideoURL;
 
-    this.userStreamEffects.current.camera[this.cameraId] = structuredClone(
-      defaultCameraStreamEffects
-    );
+    this.userStreamEffects.current.video[this.videoId] = {
+      video: structuredClone(defaultVideoStreamEffects),
+      audio: structuredClone(defaultAudioStreamEffects),
+    };
 
     this.canvas = document.createElement("canvas");
     this.canvas.classList.add("babylonJS-canvas");
 
-    if (!userEffectsStyles.current.camera[this.cameraId]) {
-      userEffectsStyles.current.camera[this.cameraId] = structuredClone(
-        defaultCameraEffectsStyles
-      );
+    if (!userEffectsStyles.current.video[this.videoId]) {
+      userEffectsStyles.current.video[this.videoId] = {
+        video: structuredClone(defaultVideoEffectsStyles),
+        audio: structuredClone(defaultAudioEffectsStyles),
+      };
     }
 
-    this.faceLandmarks = new FaceLandmarks(this.cameraId, this.deadbanding);
+    this.faceLandmarks = new FaceLandmarks(this.videoId, this.deadbanding);
 
     this.faceMeshWorker = new Worker(
       new URL("./../webWorkers/faceMeshWebWorker.worker", import.meta.url),
@@ -141,11 +156,33 @@ class VideoMedia {
       }
     };
 
-    // Start video and render loop
     this.video = document.createElement("video");
+    this.video.autoplay = true;
+    this.video.style.width = "100%";
+    this.video.style.objectFit = "cover";
+    this.video.style.backgroundColor = "#000";
+    this.shakaPlayer = new shaka.Player(this.video);
+    this.shakaPlayer.load(this.originalVideoURL).then(() => {
+      console.log("Original video loaded successfully");
+    });
+    this.video.onloadedmetadata = () => {
+      this.canvas.width = this.video.videoWidth;
+      this.canvas.height = this.video.videoHeight;
+    };
+
+    this.hiddenVideo = document.createElement("video");
+    this.hiddenVideo.style.position = "absolute";
+    this.hiddenVideo.style.top = "0";
+    this.hiddenVideo.style.left = "0";
+    this.hiddenVideo.style.objectFit = "cover";
+    this.hiddenVideo.style.backgroundColor = "#000";
+    this.hiddenVideo.style.zIndex = "10";
+    this.hiddenVideo.style.display = "none";
+    this.hiddenVideo.style.opacity = "0%";
+    this.hiddenShakaPlayer = new shaka.Player(this.hiddenVideo);
 
     this.babylonScene = new BabylonScene(
-      this.cameraId,
+      this.videoId,
       "camera",
       this.canvas,
       this.video,
@@ -164,32 +201,82 @@ class VideoMedia {
       this.maxFaces,
       this.userMedia
     );
-
-    this.video.srcObject = this.initCameraStream;
-    this.video.onloadedmetadata = () => {
-      this.canvas.width = this.video.videoWidth;
-      this.canvas.height = this.video.videoHeight;
-      this.video.play();
-    };
   }
 
   deconstructor() {
-    // End initial stream
-    this.initCameraStream.getTracks().forEach((track) => track.stop());
-
-    // End video
     this.video.pause();
     this.video.srcObject = null;
+    this.hiddenVideo.pause();
+    this.hiddenVideo.srcObject = null;
 
     this.canvas.remove();
 
     this.babylonScene.deconstructor();
   }
 
+  // preloadDashStream = (url: string) => {
+  //   this.dashUrl = url;
+
+  //   if (this.dashUrl) {
+  //     this.hiddenShakaPlayer.load(this.dashUrl).then(() => {
+  //       this.switchToDashStream();
+  //     });
+  //   }
+  // };
+
+  // switchToDashStream = async () => {
+  //   console.log("DASH stream swap");
+
+  //   try {
+  //     const currentTime = this.video.currentTime;
+  //     const isPaused = this.video.paused;
+
+  //     // Sync hidden video with the main video
+  //     this.hiddenVideo.currentTime = currentTime;
+  //     if (!isPaused) {
+  //       this.hiddenVideo.play();
+  //     }
+
+  //     const videoBox = this.video.getBoundingClientRect();
+
+  //     this.hiddenVideo.width = videoBox.width;
+  //     this.hiddenVideo.height = videoBox.height;
+
+  //     this.hiddenVideo.style.display = "";
+  //     this.hiddenVideo.style.opacity = "100%";
+
+  //     // After a short delay, switch the main video to DASH and hide the hidden video
+  //     setTimeout(async () => {
+  //       if (!this.dashUrl) return;
+
+  //       await this.shakaPlayer?.load(
+  //         this.dashUrl,
+  //         this.hiddenVideo.currentTime
+  //       );
+
+  //       this.video.width = videoBox.width;
+  //       this.video.height = videoBox.height;
+
+  //       this.video.currentTime = this.hiddenVideo.currentTime;
+  //       if (!this.hiddenVideo.paused) {
+  //         this.video.play();
+  //       }
+
+  //       // Hide the hidden video and clean up
+  //       setTimeout(() => {
+  //         this.hiddenVideo.style.display = "none";
+  //         this.hiddenVideo.style.opacity = "0%";
+  //       }, 250);
+  //     }, 500); // Adjust the delay if needed
+  //   } catch (error) {
+  //     console.error("Error during DASH switch:", error);
+  //   }
+  // };
+
   private rectifyEffectMeshCount = () => {
     for (const effect in this.effects) {
       if (
-        !this.effects[effect as CameraEffectTypes] ||
+        !this.effects[effect as VideoEffectTypes] ||
         !validEffectTypes.includes(effect as EffectType)
       ) {
         continue;
@@ -205,7 +292,7 @@ class VideoMedia {
 
       if (count < this.maxFaces[0]) {
         const currentEffectStyle =
-          this.userEffectsStyles.current.camera[this.cameraId][
+          this.userEffectsStyles.current.video[this.videoId].video[
             effect as EffectType
           ];
 
@@ -268,7 +355,7 @@ class VideoMedia {
   };
 
   changeEffects = (
-    effect: CameraEffectTypes,
+    effect: VideoEffectTypes,
     tintColor?: string,
     blockStateChange: boolean = false
   ) => {
@@ -283,7 +370,7 @@ class VideoMedia {
     if (validEffectTypes.includes(effect as EffectType)) {
       if (
         effect !== "masks" ||
-        this.userEffectsStyles.current.camera[this.cameraId].masks.style !==
+        this.userEffectsStyles.current.video[this.videoId].video.masks.style !==
           "baseMask"
       ) {
         this.drawNewEffect(effect as EffectType);
@@ -297,7 +384,7 @@ class VideoMedia {
         }
       }
     }
-    this.deadbanding.update(this.cameraId, this.effects);
+    this.deadbanding.update(this.videoId, this.effects);
 
     if (tintColor) {
       this.setTintColor(tintColor);
@@ -330,7 +417,7 @@ class VideoMedia {
 
   drawNewEffect = (effect: EffectType) => {
     const currentStyle =
-      this.userEffectsStyles.current.camera?.[this.cameraId]?.[effect];
+      this.userEffectsStyles.current.video?.[this.videoId]?.video[effect];
 
     if (!currentStyle) {
       return;

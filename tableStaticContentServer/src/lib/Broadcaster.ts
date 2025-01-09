@@ -18,7 +18,6 @@ class Broadcaster {
           }
 
           try {
-            console.log(msg, table_id, username, instance);
             socket.send(msg);
           } catch (error) {
             console.error("Failed to send message:", error);

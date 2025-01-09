@@ -1,12 +1,11 @@
-import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
+import { UserMediaType } from "../../../../../context/mediaContext/typeConstant";
 import {
-  AudioEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
-import FgContentAdjustmentController from "../../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
-import { FgVisualMediaOptions, Settings } from "../../typeConstant";
-import MediasoupSocketController from "../../../../lib/MediasoupSocketController";
+  UserStreamEffectsType,
+  VideoEffectTypes,
+} from "../../../../../context/effectsContext/typeConstant";
+import FgContentAdjustmentController from "../../../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import { Settings } from "../../typeConstant";
+import VideoMedia from "../../../../../lib/VideoMedia";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -59,19 +58,13 @@ class FgLowerVideoController {
   private initTime: number;
 
   constructor(
-    private mediasoupSocket: React.MutableRefObject<
-      MediasoupSocketController | undefined
-    >,
-    private visualMediaId: string,
     private table_id: string,
     private username: string,
     private instance: string,
-    private type: "camera" | "screen",
-    private fgVisualMediaOptions: FgVisualMediaOptions,
-    private bundleRef: React.RefObject<HTMLDivElement>,
-    private videoRef: React.RefObject<HTMLVideoElement>,
-    private audioRef: React.RefObject<HTMLAudioElement>,
-    private visualMediaContainerRef: React.RefObject<HTMLDivElement>,
+    private videoId: string,
+    private sharedBundleRef: React.RefObject<HTMLDivElement>,
+    private videoMedia: VideoMedia,
+    private videoContainerRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private shiftPressed: React.MutableRefObject<boolean>,
@@ -80,34 +73,14 @@ class FgLowerVideoController {
     private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private currentTimeRef: React.RefObject<HTMLDivElement>,
-    private setVisualEffectsActive: React.Dispatch<
+    private setVideoEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
     private setAudioEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
-    private handleMute: (
-      producerType: "audio" | "screenAudio",
-      producerId: string | undefined
-    ) => void,
-    private handleVisualEffectChange: (
-      effect: CameraEffectTypes | ScreenEffectTypes,
-      blockStateChange?: boolean
-    ) => Promise<void>,
-    private tracksColorSetterCallback: (
-      producerType: "audio" | "screenAudio",
-      producerId: string | undefined
-    ) => void,
     private tintColor: React.MutableRefObject<string>,
-    private userStreamEffects: React.MutableRefObject<{
-      camera: {
-        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-      };
-      screen: {
-        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-      };
-      audio: { [effectType in AudioEffectTypes]: boolean };
-    }>,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private initTimeOffset: React.MutableRefObject<number>,
     private fgContentAdjustmentController: FgContentAdjustmentController,
@@ -121,8 +94,7 @@ class FgLowerVideoController {
         y: number;
       };
       rotation: number;
-    }>,
-    private screenAudioStream?: MediaStream
+    }>
   ) {
     this.initTime = Date.now();
   }
@@ -145,66 +117,16 @@ class FgLowerVideoController {
   };
 
   handleClosedCaptions = () => {
-    if (this.visualMediaContainerRef.current) {
-      this.visualMediaContainerRef.current.classList.toggle("captions");
+    if (this.videoContainerRef.current) {
+      this.videoContainerRef.current.classList.toggle("captions");
       this.setCaptionsActive((prev) => !prev);
     }
   };
 
-  handleCloseVideo = () => {
-    if (this.fgVisualMediaOptions.isUser) {
-      this.mediasoupSocket.current?.sendMessage({
-        type: "removeProducer",
-        header: {
-          table_id: this.table_id,
-          username: this.username,
-          instance: this.instance,
-          producerType: this.type,
-          producerId: this.visualMediaId,
-        },
-      });
+  handleCloseVideo = () => {};
 
-      if (this.type === "screen" && this.screenAudioStream) {
-        this.mediasoupSocket.current?.sendMessage({
-          type: "removeProducer",
-          header: {
-            table_id: this.table_id,
-            username: this.username,
-            instance: this.instance,
-            producerType: "screenAudio",
-            producerId: `${this.visualMediaId}_audio`,
-          },
-        });
-      }
-    } else {
-      this.mediasoupSocket.current?.sendMessage({
-        type: "requestRemoveProducer",
-        header: {
-          table_id: this.table_id,
-          username: this.username,
-          instance: this.instance,
-          producerType: this.type,
-          producerId: this.visualMediaId,
-        },
-      });
-
-      if (this.type === "screen" && this.screenAudioStream) {
-        this.mediasoupSocket.current?.sendMessage({
-          type: "requestRemoveProducer",
-          header: {
-            table_id: this.table_id,
-            username: this.username,
-            instance: this.instance,
-            producerType: "screenAudio",
-            producerId: `${this.visualMediaId}_audio`,
-          },
-        });
-      }
-    }
-  };
-
-  handleVisualEffects = () => {
-    this.setVisualEffectsActive((prev) => !prev);
+  handleVideoEffects = () => {
+    this.setVideoEffectsActive((prev) => !prev);
   };
 
   handleAudioEffects = () => {
@@ -216,16 +138,16 @@ class FgLowerVideoController {
       document
         .exitFullscreen()
         .then(() => {
-          this.visualMediaContainerRef.current?.classList.remove("full-screen");
+          this.videoContainerRef.current?.classList.remove("full-screen");
         })
         .catch((error) => {
           console.error("Failed to exit full screen:", error);
         });
     } else {
-      this.visualMediaContainerRef.current
+      this.videoContainerRef.current
         ?.requestFullscreen()
         .then(() => {
-          this.visualMediaContainerRef.current?.classList.add("full-screen");
+          this.videoContainerRef.current?.classList.add("full-screen");
         })
         .catch((error) => {
           console.error("Failed to request full screen:", error);
@@ -235,17 +157,15 @@ class FgLowerVideoController {
 
   handleFullScreenChange = () => {
     if (!document.fullscreenElement) {
-      this.visualMediaContainerRef.current?.classList.remove("full-screen");
+      this.videoContainerRef.current?.classList.remove("full-screen");
     }
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
-      !this.visualMediaContainerRef.current?.classList.contains(
-        "in-visual-media"
-      ) ||
-      this.visualMediaContainerRef.current?.classList.contains("in-piano") ||
+      !this.videoContainerRef.current?.classList.contains("in-video-media") ||
+      this.videoContainerRef.current?.classList.contains("in-piano") ||
       this.controlPressed.current ||
       this.shiftPressed.current
     ) {
@@ -264,45 +184,27 @@ class FgLowerVideoController {
         break;
       case " ":
         if (tagName === "button") return;
-        if (this.fgVisualMediaOptions.isPlayPause) {
-          this.handlePausePlay();
-        }
+        this.handlePausePlay();
         break;
       case "mediaplaypause":
-        if (this.fgVisualMediaOptions.isPlayPause) {
-          this.handlePausePlay();
-        }
+        this.handlePausePlay();
         break;
       case "k":
-        if (this.fgVisualMediaOptions.isPlayPause) {
-          this.handlePausePlay();
-        }
+        this.handlePausePlay();
         break;
       case "f":
-        if (this.fgVisualMediaOptions.isFullScreen) {
-          this.handleFullScreen();
-        }
+        this.handleFullScreen();
         break;
       case "i":
-        if (this.fgVisualMediaOptions.isPictureInPicture) {
-          this.handleMiniPlayer();
-        }
+        this.handleMiniPlayer();
         break;
       case "m":
-        if (this.fgVisualMediaOptions.isVolume) {
-          this.handleMute(
-            this.screenAudioStream ? "screenAudio" : "audio",
-            this.screenAudioStream ? `${this.visualMediaId}_audio` : undefined
-          );
-        }
         break;
       case "c":
-        if (this.fgVisualMediaOptions.isClosedCaptions) {
-          this.handleClosedCaptions();
-        }
+        this.handleClosedCaptions();
         break;
       case "e":
-        this.handleVisualEffects();
+        this.handleVideoEffects();
         break;
       case "a":
         this.handleAudioEffects();
@@ -365,7 +267,7 @@ class FgLowerVideoController {
   };
 
   moveFunction = (event: PointerEvent) => {
-    if (!this.bundleRef.current) {
+    if (!this.sharedBundleRef.current) {
       return;
     }
 
@@ -375,13 +277,13 @@ class FgLowerVideoController {
     const pixelScale = {
       x:
         (this.positioning.current.scale.x / 100) *
-        this.bundleRef.current.clientWidth,
+        this.sharedBundleRef.current.clientWidth,
       y:
         (this.positioning.current.scale.y / 100) *
-        this.bundleRef.current.clientHeight,
+        this.sharedBundleRef.current.clientHeight,
     };
 
-    const rect = this.bundleRef.current.getBoundingClientRect();
+    const rect = this.sharedBundleRef.current.getBoundingClientRect();
 
     const buttonWidth = (this.panBtnRef.current?.clientWidth ?? 0) / 2;
 
@@ -403,29 +305,29 @@ class FgLowerVideoController {
       {
         x:
           (this.positioning.current.position.left / 100) *
-          this.bundleRef.current.clientWidth,
+          this.sharedBundleRef.current.clientWidth,
         y:
           (this.positioning.current.position.top / 100) *
-          this.bundleRef.current.clientHeight,
+          this.sharedBundleRef.current.clientHeight,
       }
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
   scaleFuntion = (event: PointerEvent) => {
-    if (!this.bundleRef.current) {
+    if (!this.sharedBundleRef.current) {
       return;
     }
 
-    const rect = this.bundleRef.current.getBoundingClientRect();
+    const rect = this.sharedBundleRef.current.getBoundingClientRect();
 
     const referencePoint = {
       x:
         (this.positioning.current.position.left / 100) *
-        this.bundleRef.current.clientWidth,
+        this.sharedBundleRef.current.clientWidth,
       y:
         (this.positioning.current.position.top / 100) *
-        this.bundleRef.current.clientHeight,
+        this.sharedBundleRef.current.clientHeight,
     };
 
     this.fgContentAdjustmentController.scaleDragFunction(
@@ -441,86 +343,26 @@ class FgLowerVideoController {
   };
 
   rotateFunction = (event: PointerEvent) => {
-    if (!this.bundleRef.current) {
+    if (!this.sharedBundleRef.current) {
       return;
     }
 
-    const box = this.bundleRef.current.getBoundingClientRect();
+    const box = this.sharedBundleRef.current.getBoundingClientRect();
 
     this.fgContentAdjustmentController.rotateDragFunction(event, {
       x:
         (this.positioning.current.position.left / 100) *
-          this.bundleRef.current.clientWidth +
+          this.sharedBundleRef.current.clientWidth +
         box.left,
       y:
         (this.positioning.current.position.top / 100) *
-          this.bundleRef.current.clientHeight +
+          this.sharedBundleRef.current.clientHeight +
         box.top,
     });
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
-  volumeControl = (volumeChangeAmount: number) => {
-    const producerType = this.screenAudioStream ? "screenAudio" : "audio";
-    const producerId = this.screenAudioStream
-      ? `${this.visualMediaId}_audio`
-      : undefined;
-    this.tracksColorSetterCallback(producerType, producerId);
-
-    if (!this.screenAudioStream) {
-      if (!this.audioRef.current) {
-        return;
-      }
-
-      const newVolume = Math.max(
-        0,
-        Math.min(1, this.audioRef.current.volume + volumeChangeAmount)
-      );
-
-      this.audioRef.current.volume = newVolume;
-
-      if (this.bundleRef.current) {
-        const volumeSliders = this.bundleRef.current.querySelectorAll(
-          `.volume-slider-${producerType}`
-        );
-
-        volumeSliders.forEach((slider) => {
-          const sliderElement = slider as HTMLInputElement;
-          sliderElement.value = `${newVolume}`;
-        });
-      }
-    } else {
-      if (!producerId) {
-        return;
-      }
-
-      const audioElement = document.getElementById(
-        producerId
-      ) as HTMLAudioElement | null;
-
-      if (!audioElement) {
-        return;
-      }
-
-      const newVolume = Math.max(
-        0,
-        Math.min(1, audioElement.volume + volumeChangeAmount)
-      );
-
-      audioElement.volume = newVolume;
-
-      if (this.bundleRef.current) {
-        const volumeSliders =
-          // prettier-ignore
-          this.bundleRef.current.querySelectorAll(`.volume-slider-${producerType}${producerId ? producerId : ""}`);
-
-        volumeSliders.forEach((slider) => {
-          const sliderElement = slider as HTMLInputElement;
-          sliderElement.value = `${newVolume}`;
-        });
-      }
-    }
-  };
+  volumeControl = (volumeChangeAmount: number) => {};
 
   handleKeyUp = (event: KeyboardEvent) => {
     if (!event.key) {
@@ -538,41 +380,38 @@ class FgLowerVideoController {
   };
 
   handleMiniPlayer = () => {
-    if (
-      this.visualMediaContainerRef.current?.classList.contains("mini-player")
-    ) {
+    if (this.videoContainerRef.current?.classList.contains("mini-player")) {
       document.exitPictureInPicture().catch((error) => {
         console.error("Failed to exit picture in picture:", error);
       });
     } else {
-      this.videoRef.current?.requestPictureInPicture().catch((error) => {
+      this.videoMedia.video.requestPictureInPicture().catch((error) => {
         console.error("Failed to request picture in picture:", error);
       });
     }
   };
 
   handlePausePlay = () => {
-    this.handleVisualEffectChange("pause");
+    this.handleVideoEffect("pause", false);
+
     this.paused.current = !this.paused.current;
 
-    if (this.fgVisualMediaOptions.isUser) {
-      this.setPausedState((prev) => !prev);
-    }
+    this.setPausedState((prev) => !prev);
   };
 
   handlePictureInPicture = (action: string) => {
     if (action === "enter") {
-      this.visualMediaContainerRef.current?.classList.add("mini-player");
+      this.videoContainerRef.current?.classList.add("mini-player");
     } else if (action === "leave") {
-      this.visualMediaContainerRef.current?.classList.remove("mini-player");
+      this.videoContainerRef.current?.classList.remove("mini-player");
     }
   };
 
   timeUpdate = () => {
     if (this.currentTimeRef.current) {
-      if (this.videoRef.current?.currentTime !== undefined) {
+      if (this.videoMedia.video.currentTime !== undefined) {
         this.currentTimeRef.current.textContent = this.formatDuration(
-          this.videoRef.current.currentTime + this.initTimeOffset.current / 1000
+          this.videoMedia.video.currentTime + this.initTimeOffset.current / 1000
         );
       } else {
         this.currentTimeRef.current.textContent = this.formatDuration(
@@ -583,11 +422,11 @@ class FgLowerVideoController {
   };
 
   updateCaptionsStyles = () => {
-    if (!this.visualMediaContainerRef.current) {
+    if (!this.videoContainerRef.current) {
       return;
     }
 
-    const style = this.visualMediaContainerRef.current.style;
+    const style = this.videoContainerRef.current.style;
     const captionOptions =
       this.settings.closedCaption.closedCaptionOptionsActive;
 
@@ -619,42 +458,20 @@ class FgLowerVideoController {
     );
   };
 
-  handleVisualEffect = async (
-    effect: CameraEffectTypes | ScreenEffectTypes,
+  handleVideoEffect = async (
+    effect: VideoEffectTypes,
     blockStateChange: boolean
   ) => {
-    // Fill stream effects if state change isn't blocked
     if (!blockStateChange) {
-      if (this.type === "camera") {
-        this.userStreamEffects.current[this.type][this.visualMediaId][
-          effect as CameraEffectTypes
-        ] =
-          !this.userStreamEffects.current[this.type][this.visualMediaId][
-            effect as CameraEffectTypes
-          ];
-      } else if (this.type === "screen") {
-        this.userStreamEffects.current[this.type][this.visualMediaId][
-          effect as ScreenEffectTypes
-        ] =
-          !this.userStreamEffects.current[this.type][this.visualMediaId][
-            effect as ScreenEffectTypes
-          ];
-      }
+      this.userStreamEffects.current.video[this.videoId].video[effect] =
+        !this.userStreamEffects.current.video[this.videoId].video[effect];
     }
 
-    if (this.type === "camera") {
-      this.userMedia.current[this.type][this.visualMediaId].changeEffects(
-        effect as CameraEffectTypes,
-        this.tintColor.current,
-        blockStateChange
-      );
-    } else if (this.type === "screen") {
-      this.userMedia.current[this.type][this.visualMediaId].changeEffects(
-        effect as ScreenEffectTypes,
-        this.tintColor.current,
-        blockStateChange
-      );
-    }
+    this.userMedia.current.video[this.videoId].changeEffects(
+      effect,
+      this.tintColor.current,
+      blockStateChange
+    );
   };
 
   setInitTimeOffset = (offset: number) => {
@@ -662,4 +479,4 @@ class FgLowerVideoController {
   };
 }
 
-export default FgLowerVisualMediaController;
+export default FgLowerVideoController;

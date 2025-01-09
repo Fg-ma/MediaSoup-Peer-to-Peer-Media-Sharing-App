@@ -65,12 +65,10 @@ const processVideoWithABR = (
 
     childProcess.stdout?.on("data", (data) => {
       stdoutBuffer += data;
-      console.log("Shaka Packager stdout:", data.trim());
     });
 
     childProcess.stderr?.on("data", (data) => {
       stderrBuffer += data;
-      console.warn("Shaka Packager stderr:", data.trim()); // Log as a warning, not error
     });
 
     childProcess.on("close", (code) => {
@@ -80,7 +78,6 @@ const processVideoWithABR = (
         );
         reject(new Error(`Shaka Packager failed with exit code ${code}`));
       } else {
-        console.log("Shaka Packager completed successfully.");
         resolve();
       }
     });
@@ -164,9 +161,10 @@ uWS
       res.writeStatus("404 Not Found").end("File not found.");
     }
   })
-  .post("/*", (res, req) => {
-    const url = req.getUrl(); // Extract URL
-    const table_id = url.split("/")[1];
+  .post("/upload/*", (res, req) => {
+    const url = req.getUrl();
+    const table_id = url.split("/")[2];
+    const videoId = url.split("/")[3];
 
     res.cork(() => {
       res.writeHeader("Access-Control-Allow-Origin", "https://localhost:8080");
@@ -193,8 +191,13 @@ uWS
         const originalVideoUrl = `https://localhost:8044/uploads/${filename}`;
         const originalVideoMessage = {
           type: "originalVideoReady",
-          filename: filename,
-          url: originalVideoUrl,
+          header: {
+            videoId,
+          },
+          data: {
+            filename,
+            url: originalVideoUrl,
+          },
         };
 
         broadcaster.broadcastToTable(table_id, originalVideoMessage);
@@ -210,8 +213,13 @@ uWS
           )}.mpd`;
           const dashVideoMessage = {
             type: "dashVideoReady",
-            filename: filename,
-            url: dashVideoUrl,
+            header: {
+              videoId,
+            },
+            data: {
+              filename,
+              url: dashVideoUrl,
+            },
           };
 
           broadcaster.broadcastToTable(table_id, dashVideoMessage);
@@ -252,8 +260,6 @@ uWS
   .listen(8045, (token) => {
     if (token) {
       console.log("Listening on https://localhost:8045");
-    } else {
-      console.log("Failed to start the server");
     }
   });
 

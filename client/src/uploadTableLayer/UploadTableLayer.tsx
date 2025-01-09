@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import FileReceiver from "../FileReceiver";
+import { v4 as uuidv4 } from "uuid";
 
 export default function UploadTableLayer({
   table_id,
@@ -16,7 +16,7 @@ export default function UploadTableLayer({
       return;
     }
 
-    const url = `https://localhost:8045/${table_id.current}`;
+    const url = `https://localhost:8045/upload/${table_id.current}/${uuidv4()}`;
     const formData = new FormData();
     formData.append("file", file.current);
 

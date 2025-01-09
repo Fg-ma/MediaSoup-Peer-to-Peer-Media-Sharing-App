@@ -11,7 +11,6 @@ import {
 import { closedCaptionsSelections } from "./fgLowerVideoControls/lib/fgSettingsButton/lib/ClosedCaptionsPage";
 
 export interface FgVideoOptions {
-  permissions?: Permissions;
   controlsVanishTime?: number;
   closedCaptionsDecoratorColor?: string;
   primaryVideoColor?: string;
@@ -35,22 +34,11 @@ export interface Settings {
 }
 
 export const defaultFgVideoOptions: {
-  permissions: Permissions;
   controlsVanishTime: number;
   closedCaptionsDecoratorColor: string;
   primaryVideoColor: string;
   initialVolume: "high" | "low" | "off";
 } = {
-  permissions: {
-    acceptsCameraEffects: false,
-    acceptsScreenEffects: false,
-    acceptsAudioEffects: false,
-    acceptsScreenAudioEffects: false,
-    acceptsPositionScaleRotationManipulation: false,
-    acceptsCloseMedia: false,
-    acceptsVideoEffects: false,
-    acceptsImageEffects: false,
-  },
   controlsVanishTime: 1250,
   closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
   primaryVideoColor: "#f56114",

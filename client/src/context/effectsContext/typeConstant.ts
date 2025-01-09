@@ -59,6 +59,7 @@ export type AudioEffectTypes =
 export type VideoEffectTypes =
   | "pause"
   | "postProcess"
+  | "hideBackground"
   | "blur"
   | "tint"
   | "glasses"
@@ -450,6 +451,7 @@ export const defaultVideoStreamEffects: {
 } = Object.freeze({
   pause: false,
   postProcess: false,
+  hideBackground: false,
   blur: false,
   tint: false,
   glasses: false,
