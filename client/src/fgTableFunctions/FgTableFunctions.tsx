@@ -19,6 +19,7 @@ import ConsumersController from "../lib/ConsumersController";
 import PermissionsController from "../lib/PermissionsController";
 import Metadata from "../lib/Metadata";
 import CleanupController from "../lib/CleanupController";
+import UploadMediaButton from "./lib/uploadMediaButton/UploadMediaButton";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -63,6 +64,7 @@ export default function FgTableFunctions({
   permissionsController,
   metadata,
   cleanupController,
+  setRerender,
 }: {
   table_id: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
@@ -127,11 +129,13 @@ export default function FgTableFunctions({
   permissionsController: PermissionsController;
   metadata: Metadata;
   cleanupController: CleanupController;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
   const { setSignal } = useSignalContext();
   const { permissions } = usePermissionsContext();
-  const { mediasoupSocket, tableSocket } = useSocketContext();
+  const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
+    useSocketContext();
 
   const externalBackgroundChange = useRef(false);
 
@@ -149,6 +153,7 @@ export default function FgTableFunctions({
 
   const tableFunctionsController = new TableFunctionsController(
     tableSocket,
+    tableStaticContentSocket,
     mediasoupSocket,
     tableIdRef,
     usernameRef,
@@ -181,7 +186,8 @@ export default function FgTableFunctions({
     consumersController,
     permissionsController,
     metadata,
-    cleanupController
+    cleanupController,
+    setRerender
   );
 
   const handleExternalMute = () => {
@@ -304,6 +310,7 @@ export default function FgTableFunctions({
           username={username.current}
           instance={instance.current}
         />
+        <UploadMediaButton table_id={table_id} />
         <FgBackgroundSelector
           backgroundRef={tableTopRef}
           defaultActiveBackground={tableBackground}

@@ -19,6 +19,7 @@ import {
 } from "./lib/typeConstant";
 import VideoGradient from "./lib/VideoGradient";
 import "./lib/fgVideoStyles.css";
+import { IncomingTableStaticContentMessages } from "src/lib/TableStaticContentSocketController";
 
 const VideoAdjustmentButtons = React.lazy(
   () => import("./lib/VideoAdjustmentButtons")
@@ -57,7 +58,7 @@ export default function FgVideo({
     userStreamEffects,
     remoteStreamEffects,
   } = useEffectsContext();
-  const { mediasoupSocket } = useSocketContext();
+  const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -127,11 +128,14 @@ export default function FgVideo({
     rotation: 0,
   });
 
+  const hiddenVideoRef = useRef<HTMLVideoElement>(null);
+  const shakaPlayer = useRef<shaka.Player | null>(null);
+  const [showHiddenVideo, setShowHiddenVideo] = useState(false);
+  const [hiddenVideoOpacity, setHiddenVideoOpacity] = useState(false);
+
   const handleVideoEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange: boolean = false,
-    hideBackgroundStyle?: HideBackgroundEffectTypes,
-    hideBackgroundColor?: string
+    blockStateChange: boolean = false
   ) => {
     fgLowerVideoController.handleVideoEffect(effect, blockStateChange);
   };
@@ -201,22 +205,8 @@ export default function FgVideo({
   );
 
   useEffect(() => {
-    const canvas = userMedia.current.video[videoId].canvas;
-    const stream = canvas.captureStream();
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream;
-      videoRef.current.onloadedmetadata = () => {
-        videoRef.current?.play();
-      };
-    }
-
     // Set up initial conditions
     fgVideoController.init();
-
-    // Listen for messages on tableSocket
-    tableSocket.current?.addMessageListener(
-      fgVideoController.handleTableMessage
-    );
 
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
@@ -325,10 +315,107 @@ export default function FgVideo({
   }, [positioning.current]);
 
   useEffect(() => {
-    if (fgVideoOptions.permissions.acceptsVideoEffects) {
-      fgVideoController.attachPositioningListeners(fgVideoOptions.permissions);
-    }
+    fgVideoController.attachPositioningListeners(fgVideoOptions.permissions);
   }, [fgVideoOptions.permissions]);
+
+  useEffect(() => {
+    tableStaticContentSocket.current?.addMessageListener(
+      handleTableStaticContentMessage
+    );
+
+    return () =>
+      tableStaticContentSocket.current?.removeMessageListener(
+        handleTableStaticContentMessage
+      );
+  }, [tableStaticContentSocket.current]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      shakaPlayer.current = new shaka.Player(videoRef.current);
+    }
+  }, []);
+
+  const preloadDashStream = (dashUrl: string) => {
+    if (hiddenVideoRef.current) {
+      const hiddenPlayer = new shaka.Player(hiddenVideoRef.current);
+      hiddenPlayer.load(dashUrl).then(() => {
+        switchToDashStream(dashUrl);
+      });
+    }
+  };
+
+  const switchToDashStream = async (dashUrl: string) => {
+    if (!videoRef.current || !hiddenVideoRef.current) return;
+    console.log("DASH stream swap");
+
+    try {
+      const currentTime = videoRef.current.currentTime;
+      const isPaused = videoRef.current.paused;
+
+      // Sync hidden video with the main video
+      hiddenVideoRef.current.currentTime = currentTime;
+      if (!isPaused) {
+        hiddenVideoRef.current.play();
+      }
+
+      const videoBox = videoRef.current.getBoundingClientRect();
+
+      hiddenVideoRef.current.width = videoBox.width;
+      hiddenVideoRef.current.height = videoBox.height;
+
+      setShowHiddenVideo(true);
+
+      setTimeout(() => {
+        setHiddenVideoOpacity(true);
+      }, 500);
+
+      // After a short delay, switch the main video to DASH and hide the hidden video
+      setTimeout(async () => {
+        if (!videoRef.current || !hiddenVideoRef.current) return;
+
+        await shakaPlayer.current?.load(dashUrl, currentTime);
+
+        videoRef.current.width = videoBox.width;
+        videoRef.current.height = videoBox.height;
+
+        videoRef.current.currentTime = hiddenVideoRef.current.currentTime;
+        if (!hiddenVideoRef.current.paused) {
+          videoRef.current.play();
+        }
+
+        // Hide the hidden video and clean up
+        setTimeout(() => {
+          setShowHiddenVideo(false);
+          setHiddenVideoOpacity(false);
+          if (hiddenVideoRef.current) hiddenVideoRef.current.src = "";
+        }, 250);
+      }, 1000); // Adjust the delay if needed
+    } catch (error) {
+      console.error("Error during DASH switch:", error);
+    }
+  };
+
+  const handleTableStaticContentMessage = (
+    message: IncomingTableStaticContentMessages
+  ) => {
+    switch (message.type) {
+      case "originalVideoReady":
+        shakaPlayer.current?.load(message.url).then(() => {
+          console.log("Original video loaded successfully");
+        });
+        break;
+      case "dashVideoReady":
+        preloadDashStream(message.url);
+        break;
+      // case "truncatedVideoReady":
+      //   shakaPlayer.current?.load(message.url).then(() => {
+      //     console.log("Original video loaded successfully");
+      //   });
+      //   break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div
@@ -356,16 +443,35 @@ export default function FgVideo({
       onPointerLeave={() => fgVideoController.handlePointerLeave()}
       data-positioning={JSON.stringify(positioning.current)}
     >
-      {fgVideoOptions.permissions.acceptsPositionScaleRotationManipulation && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <VideoAdjustmentButtons
-            bundleRef={bundleRef}
-            panBtnRef={panBtnRef}
-            positioning={positioning}
-            fgContentAdjustmentController={fgContentAdjustmentController}
-          />
-        </Suspense>
-      )}
+      <video
+        ref={videoRef}
+        controls
+        autoPlay
+        style={{
+          width: "100%",
+          objectFit: "cover",
+          backgroundColor: "#000",
+        }}
+      />
+      <video
+        ref={hiddenVideoRef}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          objectFit: "cover",
+          display: showHiddenVideo ? "" : "none",
+          opacity: hiddenVideoOpacity ? "100%" : "0%",
+          backgroundColor: "#000",
+          zIndex: 10,
+        }}
+      />
+      <VideoAdjustmentButtons
+        bundleRef={bundleRef}
+        panBtnRef={panBtnRef}
+        positioning={positioning}
+        fgContentAdjustmentController={fgContentAdjustmentController}
+      />
       {adjustingDimensions && (
         <>
           <div className='animated-border-box-glow'></div>

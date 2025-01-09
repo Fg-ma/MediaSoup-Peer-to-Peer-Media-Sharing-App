@@ -11,6 +11,7 @@ import { FgBackground } from "../../fgElements/fgBackgroundSelector/lib/typeCons
 import TableSocketController, {
   IncomingTableMessages,
 } from "../../lib/TableSocketController";
+import TableStaticContentSocketController from "../../lib/TableStaticContentSocketController";
 import MediasoupSocketController, {
   IncomingMediasoupMessages,
 } from "../../lib/MediasoupSocketController";
@@ -24,6 +25,9 @@ class TableFunctionsController {
   constructor(
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
+    >,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
     >,
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
@@ -71,7 +75,8 @@ class TableFunctionsController {
     private consumersController: ConsumersController,
     private permissionsController: PermissionsController,
     private metadata: Metadata,
-    private cleanupController: CleanupController
+    private cleanupController: CleanupController,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   joinTable = () => {
@@ -107,6 +112,14 @@ class TableFunctionsController {
         this.instance.current
       );
 
+      this.tableStaticContentSocket.current =
+        new TableStaticContentSocketController(
+          "ws://localhost:8045",
+          this.table_id.current,
+          this.username.current,
+          this.instance.current
+        );
+
       this.userMedia.current.gamesSignaling = new GamesSignalingMedia(
         this.table_id.current,
         this.username.current,
@@ -130,12 +143,16 @@ class TableFunctionsController {
       );
 
       this.setIsInTable(true);
+
+      this.setRerender((prev) => !prev);
     }
   };
 
   private leaveTable = () => {
     this.tableSocket.current?.deconstructor();
     this.tableSocket.current = undefined;
+    this.tableStaticContentSocket.current?.deconstructor();
+    this.tableStaticContentSocket.current = undefined;
     this.mediasoupSocket.current?.deconstructor();
     this.mediasoupSocket.current = undefined;
 

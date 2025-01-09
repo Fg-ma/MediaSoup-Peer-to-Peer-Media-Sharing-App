@@ -1,62 +1,36 @@
 import React, { useEffect, useRef, useState } from "react";
 import shaka from "shaka-player";
+import { useSocketContext } from "./context/socketContext/SocketContext";
+import { IncomingTableStaticContentMessages } from "./lib/TableStaticContentSocketController";
 
 export default function FileReceiver() {
+  const { tableStaticContentSocket } = useSocketContext();
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const hiddenVideoRef = useRef<HTMLVideoElement>(null);
   const shakaPlayer = useRef<shaka.Player | null>(null);
   const [showHiddenVideo, setShowHiddenVideo] = useState(false);
-  const mediaSource = useRef<MediaSource | undefined>(undefined);
+  const [hiddenVideoOpacity, setHiddenVideoOpacity] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
       shakaPlayer.current = new shaka.Player(videoRef.current);
     }
-
-    const ws = new WebSocket("wss://localhost:8045");
-
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-
-      if (message.type === "originalVideoReady") {
-        const { url } = message;
-        // shakaPlayer.current
-        //   ?.load(url)
-        //   .then(() => {
-        //     console.log("Original video loaded successfully");
-        //   })
-        //   .catch(onErrorEvent);
-      }
-
-      if (message.type === "truncatedVideoReady") {
-        const { url } = message;
-        console.log(url, shakaPlayer.current);
-        shakaPlayer.current
-          ?.load(url)
-          .then(() => {
-            console.log("Original video loaded successfully");
-          })
-          .catch(onErrorEvent);
-      }
-
-      if (message.type === "dashVideoReady") {
-        const { url } = message;
-        // preloadDashStream(url);
-      }
-    };
-
-    return () => ws.close();
   }, []);
+
+  useEffect(() => {
+    tableStaticContentSocket.current?.addMessageListener(handleMessage);
+
+    return () =>
+      tableStaticContentSocket.current?.removeMessageListener(handleMessage);
+  }, [tableStaticContentSocket.current]);
 
   const preloadDashStream = (dashUrl: string) => {
     if (hiddenVideoRef.current) {
       const hiddenPlayer = new shaka.Player(hiddenVideoRef.current);
-      hiddenPlayer
-        .load(dashUrl)
-        .then(() => {
-          switchToDashStream(dashUrl);
-        })
-        .catch(onErrorEvent);
+      hiddenPlayer.load(dashUrl).then(() => {
+        switchToDashStream(dashUrl);
+      });
     }
   };
 
@@ -71,49 +45,64 @@ export default function FileReceiver() {
       // Sync hidden video with the main video
       hiddenVideoRef.current.currentTime = currentTime;
       if (!isPaused) {
-        // hiddenVideoRef.current.play();
+        hiddenVideoRef.current.play();
       }
 
-      // Match the size and position of the main video
-      applyHiddenVideoStyles();
+      const videoBox = videoRef.current.getBoundingClientRect();
 
-      // Crossfade hidden video in and main video out
+      hiddenVideoRef.current.width = videoBox.width;
+      hiddenVideoRef.current.height = videoBox.height;
+
       setShowHiddenVideo(true);
+
+      setTimeout(() => {
+        setHiddenVideoOpacity(true);
+      }, 500);
 
       // After a short delay, switch the main video to DASH and hide the hidden video
       setTimeout(async () => {
         if (!videoRef.current || !hiddenVideoRef.current) return;
-        await shakaPlayer.current.load(dashUrl, currentTime);
-        videoRef.current.currentTime = currentTime;
-        if (!isPaused) {
-          // videoRef.current.play();
+
+        await shakaPlayer.current?.load(dashUrl, currentTime);
+
+        videoRef.current.width = videoBox.width;
+        videoRef.current.height = videoBox.height;
+
+        videoRef.current.currentTime = hiddenVideoRef.current.currentTime;
+        if (!hiddenVideoRef.current.paused) {
+          videoRef.current.play();
         }
 
         // Hide the hidden video and clean up
-        setShowHiddenVideo(false);
-        hiddenVideoRef.current.src = "";
-      }, 500); // Adjust the delay if needed
+        setTimeout(() => {
+          setShowHiddenVideo(false);
+          setHiddenVideoOpacity(false);
+          if (hiddenVideoRef.current) hiddenVideoRef.current.src = "";
+        }, 250);
+      }, 1000); // Adjust the delay if needed
     } catch (error) {
       console.error("Error during DASH switch:", error);
     }
   };
 
-  // Dynamically apply styles to the hidden video to match the main video
-  const applyHiddenVideoStyles = () => {
-    if (!videoRef.current || !hiddenVideoRef.current) return;
-
-    const mainVideoRect = videoRef.current.getBoundingClientRect();
-    const hiddenVideo = hiddenVideoRef.current;
-
-    hiddenVideo.style.position = "absolute";
-    hiddenVideo.style.width = `${mainVideoRect.width}px`;
-    hiddenVideo.style.height = `${mainVideoRect.height}px`;
-    hiddenVideo.style.zIndex = "10";
-    hiddenVideo.style.objectFit = "cover";
-  };
-
-  const onErrorEvent = (event: any) => {
-    console.error("Error:", event);
+  const handleMessage = (message: IncomingTableStaticContentMessages) => {
+    switch (message.type) {
+      case "originalVideoReady":
+        shakaPlayer.current?.load(message.url).then(() => {
+          console.log("Original video loaded successfully");
+        });
+        break;
+      case "dashVideoReady":
+        preloadDashStream(message.url);
+        break;
+      // case "truncatedVideoReady":
+      //   shakaPlayer.current?.load(message.url).then(() => {
+      //     console.log("Original video loaded successfully");
+      //   });
+      //   break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -121,8 +110,7 @@ export default function FileReceiver() {
       style={{
         position: "relative",
         overflow: "hidden",
-        width: "100%",
-        maxHeight: "500px",
+        width: "10%",
       }}
     >
       <video
@@ -132,7 +120,6 @@ export default function FileReceiver() {
         style={{
           width: "100%",
           objectFit: "cover",
-          maxHeight: "500px",
           backgroundColor: "#000",
         }}
       />
@@ -144,8 +131,9 @@ export default function FileReceiver() {
           left: 0,
           objectFit: "cover",
           display: showHiddenVideo ? "" : "none",
-          pointerEvents: "none",
+          opacity: hiddenVideoOpacity ? "100%" : "0%",
           backgroundColor: "#000",
+          zIndex: 10,
         }}
       />
     </div>

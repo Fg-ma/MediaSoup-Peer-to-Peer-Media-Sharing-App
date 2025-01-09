@@ -16,7 +16,6 @@ const RemoteVisualMedia = React.lazy(
 const FgAudioElementContainer = React.lazy(
   () => import("../fgAudioElement/FgAudioElementContainer")
 );
-const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
 export default function Bundle({
   table_id,
@@ -185,18 +184,6 @@ export default function Bundle({
   }, [signal]);
 
   useEffect(() => {
-    userMedia.current.gamesSignaling?.addMessageListener(
-      bundleController.gameClosedListner
-    );
-
-    return () => {
-      userMedia.current.gamesSignaling?.removeMessageListener(
-        bundleController.gameClosedListner
-      );
-    };
-  }, [userMedia.current.gamesSignaling]);
-
-  useEffect(() => {
     if (bundleOptions.isUser) {
       return;
     }
@@ -228,7 +215,7 @@ export default function Bundle({
     <div
       ref={bundleRef}
       id={`${username}_bundle_container`}
-      className='bundle-container w-full h-full relative'
+      className='w-full h-full absolute top-0 left-0'
     >
       {cameraStreams &&
         Object.keys(cameraStreams).length !== 0 &&
@@ -461,20 +448,6 @@ export default function Bundle({
             />
           </Suspense>
         )}
-      {bundleOptions.isUser &&
-        userMedia.current.games.snake &&
-        Object.keys(userMedia.current.games.snake).length !== 0 &&
-        Object.keys(userMedia.current.games.snake).map((snakeGameId) => (
-          <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
-            <SnakeGame
-              table_id={table_id}
-              username={username}
-              instance={instance}
-              snakeGameId={snakeGameId}
-              bundleRef={bundleRef}
-            />
-          </Suspense>
-        ))}
       <audio
         ref={audioRef}
         id={`${username}_audio_stream`}

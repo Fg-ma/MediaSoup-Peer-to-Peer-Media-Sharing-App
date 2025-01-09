@@ -5,12 +5,12 @@ import ScaleButton from "../../../fgAdjustmentComponents/ScaleButton";
 import FgContentAdjustmentController from "src/fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 
 export default function FgGameAdjustmentButtons({
-  bundleRef,
+  sharedBundleRef,
   panBtnRef,
   fgContentAdjustmentController,
   positioning,
 }: {
-  bundleRef: React.RefObject<HTMLDivElement>;
+  sharedBundleRef: React.RefObject<HTMLDivElement>;
   panBtnRef: React.RefObject<HTMLButtonElement>;
   fgContentAdjustmentController: FgContentAdjustmentController;
   positioning: React.MutableRefObject<{
@@ -30,24 +30,24 @@ export default function FgGameAdjustmentButtons({
       <RotateButton
         className='rotate-btn absolute left-full bottom-full aspect-square z-10 w-[10%] min-w-8 max-w-14'
         dragFunction={(_displacement, event) => {
-          if (!bundleRef.current) {
+          if (!sharedBundleRef.current) {
             return;
           }
 
-          const box = bundleRef.current.getBoundingClientRect();
+          const box = sharedBundleRef.current.getBoundingClientRect();
 
           fgContentAdjustmentController.rotateDragFunction(event, {
             x:
               (positioning.current.position.left / 100) *
-                bundleRef.current.clientWidth +
+                sharedBundleRef.current.clientWidth +
               box.left,
             y:
               (positioning.current.position.top / 100) *
-                bundleRef.current.clientHeight +
+                sharedBundleRef.current.clientHeight +
               box.top,
           });
         }}
-        bundleRef={bundleRef}
+        bundleRef={sharedBundleRef}
         pointerDownFunction={
           fgContentAdjustmentController.adjustmentBtnPointerDownFunction
         }
@@ -59,7 +59,7 @@ export default function FgGameAdjustmentButtons({
         externalRef={panBtnRef}
         className='pan-btn absolute left-full top-1/2 -translate-y-1/2 aspect-square z-10 pl-1 w-[10%] min-w-7 max-w-[3.25rem]'
         dragFunction={(displacement) => {
-          if (!bundleRef.current) {
+          if (!sharedBundleRef.current) {
             return;
           }
 
@@ -69,10 +69,10 @@ export default function FgGameAdjustmentButtons({
           const pixelScale = {
             x:
               (positioning.current.scale.x / 100) *
-              bundleRef.current.clientWidth,
+              sharedBundleRef.current.clientWidth,
             y:
               (positioning.current.scale.y / 100) *
-              bundleRef.current.clientHeight,
+              sharedBundleRef.current.clientHeight,
           };
 
           const buttonWidth = (panBtnRef.current?.clientWidth ?? 0) / 2;
@@ -92,14 +92,14 @@ export default function FgGameAdjustmentButtons({
             {
               x:
                 (positioning.current.position.left / 100) *
-                bundleRef.current.clientWidth,
+                sharedBundleRef.current.clientWidth,
               y:
                 (positioning.current.position.top / 100) *
-                bundleRef.current.clientHeight,
+                sharedBundleRef.current.clientHeight,
             }
           );
         }}
-        bundleRef={bundleRef}
+        bundleRef={sharedBundleRef}
         pointerDownFunction={() =>
           fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
             "position",
@@ -113,17 +113,17 @@ export default function FgGameAdjustmentButtons({
       <ScaleButton
         className='scale-btn absolute left-full top-full aspect-square z-10 pl-1 pt-1 w-[10%] min-w-6 max-w-12'
         dragFunction={(displacement) => {
-          if (!bundleRef.current) {
+          if (!sharedBundleRef.current) {
             return;
           }
 
           const referencePoint = {
             x:
               (positioning.current.position.left / 100) *
-              bundleRef.current.clientWidth,
+              sharedBundleRef.current.clientWidth,
             y:
               (positioning.current.position.top / 100) *
-              bundleRef.current.clientHeight,
+              sharedBundleRef.current.clientHeight,
           };
 
           fgContentAdjustmentController.scaleDragFunction(
@@ -133,7 +133,7 @@ export default function FgGameAdjustmentButtons({
             referencePoint
           );
         }}
-        bundleRef={bundleRef}
+        bundleRef={sharedBundleRef}
         pointerDownFunction={
           fgContentAdjustmentController.adjustmentBtnPointerDownFunction
         }

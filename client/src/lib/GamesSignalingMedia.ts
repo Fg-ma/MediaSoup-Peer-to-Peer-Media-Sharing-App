@@ -168,13 +168,6 @@ class GamesSignalingMedia {
         await snakeGameMedia.connect();
 
         this.userMedia.current.games.snake[gameId] = snakeGameMedia;
-
-        if (
-          !this.bundles[this.username] ||
-          !Object.keys(this.bundles[this.username]).includes(this.instance)
-        ) {
-          this.bundlesController.createProducerBundle();
-        }
         break;
       }
     }
@@ -227,13 +220,6 @@ class GamesSignalingMedia {
 
           this.userMedia.current.games.snake[activeGame.gameId] =
             snakeGameMedia;
-
-          if (
-            !this.bundles[this.username] ||
-            !Object.keys(this.bundles[this.username]).includes(this.instance)
-          ) {
-            this.bundlesController.createProducerBundle();
-          }
           break;
         }
       }

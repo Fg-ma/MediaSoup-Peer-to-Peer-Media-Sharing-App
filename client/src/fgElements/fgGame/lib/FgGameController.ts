@@ -45,7 +45,7 @@ class FgGameController {
       rotation: number;
     }>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
-    private bundleRef: React.RefObject<HTMLDivElement>,
+    private sharedBundleRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
     private fgContentAdjustmentController: FgContentAdjustmentController,
     private popupRefs: React.RefObject<HTMLElement>[] | undefined
@@ -131,7 +131,7 @@ class FgGameController {
   };
 
   moveFunction = (event: PointerEvent) => {
-    if (!this.bundleRef.current) {
+    if (!this.sharedBundleRef.current) {
       return;
     }
 
@@ -141,13 +141,13 @@ class FgGameController {
     const pixelScale = {
       x:
         (this.positioning.current.scale.x / 100) *
-        this.bundleRef.current.clientWidth,
+        this.sharedBundleRef.current.clientWidth,
       y:
         (this.positioning.current.scale.y / 100) *
-        this.bundleRef.current.clientHeight,
+        this.sharedBundleRef.current.clientHeight,
     };
 
-    const rect = this.bundleRef.current.getBoundingClientRect();
+    const rect = this.sharedBundleRef.current.getBoundingClientRect();
 
     const buttonWidth = (this.panBtnRef.current?.clientWidth ?? 0) / 2;
 
@@ -169,29 +169,29 @@ class FgGameController {
       {
         x:
           (this.positioning.current.position.left / 100) *
-          this.bundleRef.current.clientWidth,
+          this.sharedBundleRef.current.clientWidth,
         y:
           (this.positioning.current.position.top / 100) *
-          this.bundleRef.current.clientHeight,
+          this.sharedBundleRef.current.clientHeight,
       }
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
   scaleFuntion = (event: PointerEvent) => {
-    if (!this.bundleRef.current) {
+    if (!this.sharedBundleRef.current) {
       return;
     }
 
-    const rect = this.bundleRef.current.getBoundingClientRect();
+    const rect = this.sharedBundleRef.current.getBoundingClientRect();
 
     const referencePoint = {
       x:
         (this.positioning.current.position.left / 100) *
-        this.bundleRef.current.clientWidth,
+        this.sharedBundleRef.current.clientWidth,
       y:
         (this.positioning.current.position.top / 100) *
-        this.bundleRef.current.clientHeight,
+        this.sharedBundleRef.current.clientHeight,
     };
 
     this.fgContentAdjustmentController.scaleDragFunction(
@@ -207,20 +207,20 @@ class FgGameController {
   };
 
   rotateFunction = (event: PointerEvent) => {
-    if (!this.bundleRef.current) {
+    if (!this.sharedBundleRef.current) {
       return;
     }
 
-    const box = this.bundleRef.current.getBoundingClientRect();
+    const box = this.sharedBundleRef.current.getBoundingClientRect();
 
     this.fgContentAdjustmentController.rotateDragFunction(event, {
       x:
         (this.positioning.current.position.left / 100) *
-          this.bundleRef.current.clientWidth +
+          this.sharedBundleRef.current.clientWidth +
         box.left,
       y:
         (this.positioning.current.position.top / 100) *
-          this.bundleRef.current.clientHeight +
+          this.sharedBundleRef.current.clientHeight +
         box.top,
     });
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();

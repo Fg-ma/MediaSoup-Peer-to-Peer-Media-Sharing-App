@@ -238,13 +238,6 @@ class BundleController extends BundleSocket {
       this.audioRef.current.muted = this.localMute.current;
     }
   };
-
-  gameClosedListner = (event: { data: string }) => {
-    const message = JSON.parse(event.data);
-    if (message.type === "gameClosed") {
-      this.setRerender((prev) => !prev);
-    }
-  };
 }
 
 export default BundleController;

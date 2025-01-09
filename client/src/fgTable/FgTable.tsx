@@ -2,15 +2,23 @@ import React, { useEffect, useRef, useState } from "react";
 import FgTableController from "./lib/FgTableController";
 import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElement";
 import TableGridOverlay from "./lib/TableGridOverlay";
+import UploadTableLayer from "../uploadTableLayer/UploadTableLayer";
+import SharedBundle from "../sharedBundle/SharedBundle";
 import "./lib/fgTable.css";
 
 export default function FgTable({
+  table_id,
+  username,
+  instance,
   tableRef,
   tableTopRef,
   bundles,
   gridActive,
   gridSize,
 }: {
+  table_id: React.MutableRefObject<string>;
+  username: React.MutableRefObject<string>;
+  instance: React.MutableRefObject<string>;
   tableRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
   bundles: {
@@ -84,6 +92,7 @@ export default function FgTable({
                 : { height: "100%" }),
             }}
           >
+            <UploadTableLayer table_id={table_id} />
             {gridActive && (
               <TableGridOverlay
                 gridSize={gridSize}
@@ -91,23 +100,26 @@ export default function FgTable({
                 gridColor='#fff'
               />
             )}
-            <div className='w-full h-full relative'>
-              {bundles &&
-                Object.keys(bundles).length !== 0 &&
-                Object.keys(bundles).map(
-                  (username) =>
-                    Object.keys(bundles[username]).length !== 0 &&
-                    Object.entries(bundles[username]).map(([key, bundle]) => (
-                      <div
-                        className='w-full h-full absolute top-0 left-0'
-                        key={key}
-                        id={`${key}_bundle`}
-                      >
-                        {bundle}
-                      </div>
-                    ))
-                )}
-            </div>
+            <SharedBundle
+              table_id={table_id.current}
+              username={username.current}
+              instance={instance.current}
+            />
+            {bundles &&
+              Object.keys(bundles).length !== 0 &&
+              Object.keys(bundles).map(
+                (username) =>
+                  Object.keys(bundles[username]).length !== 0 &&
+                  Object.entries(bundles[username]).map(([key, bundle]) => (
+                    <div
+                      className='w-full h-full absolute top-0 left-0'
+                      key={key}
+                      id={`${key}_bundle`}
+                    >
+                      {bundle}
+                    </div>
+                  ))
+              )}
           </div>
         </div>
       }

@@ -34,7 +34,7 @@ export default function FgGame({
   instance,
   gameId,
   gameStarted,
-  bundleRef,
+  sharedBundleRef,
   content,
   gameFunctionsSection,
   players,
@@ -51,7 +51,7 @@ export default function FgGame({
   instance: string;
   gameId: string;
   gameStarted: boolean;
-  bundleRef: React.RefObject<HTMLDivElement>;
+  sharedBundleRef: React.RefObject<HTMLDivElement>;
   content?: React.ReactNode;
   gameFunctionsSection?: React.ReactNode;
   players?: {
@@ -115,7 +115,7 @@ export default function FgGame({
   );
 
   const fgContentAdjustmentController = new FgContentAdjustmentController(
-    bundleRef,
+    sharedBundleRef,
     positioning,
     setAdjustingDimensions,
     setRerender
@@ -139,7 +139,7 @@ export default function FgGame({
     positioningListeners,
     positioning,
     setRerender,
-    bundleRef,
+    sharedBundleRef,
     panBtnRef,
     fgContentAdjustmentController,
     popupRefs
@@ -354,7 +354,7 @@ export default function FgGame({
       </div>
       {content}
       <FgGameAdjustmentButtons
-        bundleRef={bundleRef}
+        sharedBundleRef={sharedBundleRef}
         panBtnRef={panBtnRef}
         fgContentAdjustmentController={fgContentAdjustmentController}
         positioning={positioning}

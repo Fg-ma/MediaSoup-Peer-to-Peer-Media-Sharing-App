@@ -31,13 +31,13 @@ function SnakeGame({
   username,
   instance,
   snakeGameId,
-  bundleRef,
+  sharedBundleRef,
 }: {
   table_id: string;
   username: string;
   instance: string;
   snakeGameId: string;
-  bundleRef: React.RefObject<HTMLDivElement>;
+  sharedBundleRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
 
@@ -124,7 +124,7 @@ function SnakeGame({
         instance={instance}
         gameId={snakeGameId}
         gameStarted={started}
-        bundleRef={bundleRef}
+        sharedBundleRef={sharedBundleRef}
         content={
           <div
             ref={boardRef}

@@ -3,8 +3,17 @@ import { randomFillSync } from "crypto";
 import fs from "fs";
 import path from "path";
 import busboy from "busboy";
-import { exec } from "child_process"; // For running shell commands (to invoke Shaka Packager)
-import { createTruncatedMP4 } from "./utils";
+import { exec } from "child_process";
+import {
+  MessageTypes,
+  tables,
+  TableStaticContentWebSocket,
+} from "./typeConstant";
+import Broadcaster from "./lib/Broadcaster";
+import TablesController from "./lib/TablesController";
+
+const broadcaster = new Broadcaster();
+const tablesController = new TablesController(broadcaster);
 
 // Ensure the uploads folder exists
 const uploadsDir = path.join(__dirname, "../../nginxServer/uploads");
@@ -27,8 +36,6 @@ const random = (() => {
   const buf = Buffer.alloc(16);
   return () => randomFillSync(buf).toString("hex");
 })();
-
-const connectedClients = new Set<uWS.WebSocket<unknown>>(); // Store WebSocket clients
 
 // Function to process the uploaded video using Shaka Packager
 const processVideoWithABR = (
@@ -58,10 +65,12 @@ const processVideoWithABR = (
 
     childProcess.stdout?.on("data", (data) => {
       stdoutBuffer += data;
+      console.log("Shaka Packager stdout:", data.trim());
     });
 
     childProcess.stderr?.on("data", (data) => {
       stderrBuffer += data;
+      console.warn("Shaka Packager stderr:", data.trim()); // Log as a warning, not error
     });
 
     childProcess.on("close", (code) => {
@@ -83,50 +92,42 @@ const processVideoWithABR = (
   });
 };
 
-const decodeBase64 = (base64String: string): Buffer => {
-  return Buffer.from(base64String, "base64");
-};
-
-// Function to process the truncated video using ffmpeg
-const processTruncatedVideo = (
-  inputFile: string,
-  outputFile: string
-): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const command = `ffmpeg -i ${inputFile} -c copy -movflags faststart ${outputFile}`;
-    const childProcess = exec(command);
-
-    childProcess.stdout?.on("data", (data) => console.log(data));
-    childProcess.stderr?.on("data", (data) => console.error(data));
-
-    childProcess.on("close", (code) => {
-      if (code !== 0) {
-        reject(new Error(`FFmpeg failed with exit code ${code}`));
-      } else {
-        console.log("Processed video successfully.");
-        resolve();
-      }
-    });
-
-    childProcess.on("error", (err) => {
-      reject(err);
-    });
-  });
-};
-
 uWS
   .SSLApp(sslOptions)
   .ws("/*", {
     compression: uWS.SHARED_COMPRESSOR,
     maxPayloadLength: 16 * 1024 * 1024, // 16 MB
     idleTimeout: 60,
-    open: (ws) => {
-      connectedClients.add(ws);
-      console.log("WebSocket client connected");
+    message: (ws, message) => {
+      const tableWS = ws as TableStaticContentWebSocket;
+
+      try {
+        const msg = JSON.parse(Buffer.from(message).toString());
+        handleMessage(tableWS, msg);
+      } catch (error) {
+        console.error("Failed to parse message:", error);
+      }
     },
+
     close: (ws) => {
-      connectedClients.delete(ws);
-      console.log("WebSocket client disconnected");
+      const tableWS = ws as TableStaticContentWebSocket;
+      const { table_id, username, instance } = tableWS;
+
+      if (
+        tables[table_id] &&
+        tables[table_id][username] &&
+        tables[table_id][username][instance]
+      ) {
+        delete tables[table_id][username][instance];
+
+        if (Object.keys(tables[table_id][username]).length === 0) {
+          delete tables[table_id][username];
+
+          if (Object.keys(tables[table_id]).length === 0) {
+            delete tables[table_id];
+          }
+        }
+      }
     },
   })
   .options("/*", (res, req) => {
@@ -163,7 +164,10 @@ uWS
       res.writeStatus("404 Not Found").end("File not found.");
     }
   })
-  .post("/upload-video/*", (res, req) => {
+  .post("/*", (res, req) => {
+    const url = req.getUrl(); // Extract URL
+    const table_id = url.split("/")[1];
+
     res.cork(() => {
       res.writeHeader("Access-Control-Allow-Origin", "https://localhost:8080");
     });
@@ -173,111 +177,44 @@ uWS
       headers[key] = value;
     });
 
-    let metadata: any = undefined;
-
     const bb = busboy({ headers });
-
-    bb.on("field", (name, value) => {
-      if (name === "metadata") {
-        try {
-          metadata = JSON.parse(value);
-
-          // Decode the Base64-encoded moov atom
-          if (metadata.moov) {
-            metadata.moov = decodeBase64(metadata.moov);
-          }
-        } catch (err) {
-          console.error("Invalid metadata JSON:", err);
-        }
-      }
-    });
 
     bb.on("file", (name, file, info) => {
       const filename = `${random()}.mp4`;
       const saveTo = path.join(uploadsDir, filename);
       const writeStream = fs.createWriteStream(saveTo);
 
+      file.on("data", (chunk) => {});
+
       file.pipe(writeStream);
-
-      // Create a second write stream for truncated file
-      let fileSize = 0;
-      let truncatedFileSaved = false;
-      const truncatedFilename = `${filename.slice(0, -4)}_truncated.mp4`;
-      const truncatedSaveTo = path.join(uploadsDir, truncatedFilename);
-      let accumulatedData = [];
-
-      file.on("data", async (chunk) => {
-        fileSize += chunk.length;
-
-        // Write to truncated stream until 20 MB is reached
-        if (fileSize <= 20 * 1024 * 1024) {
-          accumulatedData.push(chunk);
-        } else if (!truncatedFileSaved) {
-          truncatedFileSaved = true;
-
-          // Combine all chunks into a single ArrayBuffer
-          const combinedData = new Uint8Array(
-            accumulatedData.reduce((acc, chunk) => acc + chunk.length, 0)
-          );
-          let offset = 0;
-          for (const chunk of accumulatedData) {
-            combinedData.set(new Uint8Array(chunk), offset);
-            offset += chunk.length;
-          }
-
-          // Prepare the moov atom and truncated file for writing
-          if (metadata && metadata.moov) {
-            createTruncatedMP4(
-              metadata,
-              combinedData.buffer,
-              truncatedSaveTo
-            ).catch((err) =>
-              console.error("Error creating truncated MP4 file:", err)
-            );
-            // Notify clients
-            const videoUrl = `https://localhost:8044/uploads/${truncatedFilename}`;
-            const videoMessage = JSON.stringify({
-              type: "truncatedVideoReady",
-              filename: truncatedFilename,
-              url: videoUrl,
-            });
-
-            connectedClients.forEach((client) => {
-              client.send(videoMessage, false);
-            });
-          }
-        }
-      });
 
       file.on("end", async () => {
         // Notify clients that the original file is ready
         const originalVideoUrl = `https://localhost:8044/uploads/${filename}`;
-        const originalVideoMessage = JSON.stringify({
+        const originalVideoMessage = {
           type: "originalVideoReady",
           filename: filename,
           url: originalVideoUrl,
-        });
+        };
 
-        connectedClients.forEach((client) => {
-          client.send(originalVideoMessage, false);
-        });
+        broadcaster.broadcastToTable(table_id, originalVideoMessage);
 
         // Process video into DASH format in the background
         try {
-          // await processVideoWithABR(saveTo, processedDir, filename);
-          // // Notify clients to switch to the DASH stream
-          // const dashVideoUrl = `https://localhost:8044/processed/${filename.slice(
-          //   0,
-          //   -4
-          // )}.mpd`;
-          // const dashVideoMessage = JSON.stringify({
-          //   type: "dashVideoReady",
-          //   filename: filename,
-          //   url: dashVideoUrl,
-          // });
-          // connectedClients.forEach((client) => {
-          //   client.send(dashVideoMessage, false);
-          // });
+          await processVideoWithABR(saveTo, processedDir, filename);
+
+          // Notify clients to switch to the DASH stream
+          const dashVideoUrl = `https://localhost:8044/processed/${filename.slice(
+            0,
+            -4
+          )}.mpd`;
+          const dashVideoMessage = {
+            type: "dashVideoReady",
+            filename: filename,
+            url: dashVideoUrl,
+          };
+
+          broadcaster.broadcastToTable(table_id, dashVideoMessage);
         } catch (error) {
           console.error("Error during video processing:", error);
         }
@@ -319,3 +256,19 @@ uWS
       console.log("Failed to start the server");
     }
   });
+
+const handleMessage = (
+  ws: TableStaticContentWebSocket,
+  event: MessageTypes
+) => {
+  switch (event.type) {
+    case "joinTable":
+      tablesController.onJoinTable(ws, event);
+      break;
+    case "leaveTable":
+      tablesController.onLeaveTable(event);
+      break;
+    default:
+      break;
+  }
+};

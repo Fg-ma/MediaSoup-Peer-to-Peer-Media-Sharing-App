@@ -23,10 +23,8 @@ import Metadata from "./lib/Metadata";
 import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 import PermissionsController from "./lib/PermissionsController";
-import "./scrollbar.css";
 import CleanupController from "./lib/CleanupController";
-import Upload from "./Upload";
-import FileReceiver from "./FileReceiver";
+import "./scrollbar.css";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -65,7 +63,7 @@ export default function Main() {
 
   const audioBtnRef = useRef<HTMLButtonElement>(null);
   const mutedAudioRef = useRef(false);
-  const [_, setMutedAudio] = useState(false);
+  const [_mutedAudio, setMutedAudio] = useState(false);
   const isAudio = useRef(false);
   const [audioActive, setAudioActive] = useState(false);
 
@@ -76,6 +74,8 @@ export default function Main() {
 
   const [gridActive, setGridActive] = useState(false);
   const [gridSize, setGridSize] = useState({ rows: 15, cols: 15 });
+
+  const [_rerender, setRerender] = useState(false);
 
   const muteAudio = (
     producerType: "audio" | "screenAudio",
@@ -306,8 +306,6 @@ export default function Main() {
 
   return (
     <div className='w-screen h-screen flex-col space-y-3 flex-wrap p-5 overflow-hidden'>
-      <Upload />
-      <FileReceiver />
       <FgTableFunctions
         table_id={table_id}
         username={username}
@@ -347,8 +345,12 @@ export default function Main() {
         permissionsController={permissionsController}
         metadata={metadata}
         cleanupController={cleanupController}
+        setRerender={setRerender}
       />
       <FgTable
+        table_id={table_id}
+        username={username}
+        instance={instance}
         tableRef={tableRef}
         tableTopRef={tableTopRef}
         bundles={bundles}
