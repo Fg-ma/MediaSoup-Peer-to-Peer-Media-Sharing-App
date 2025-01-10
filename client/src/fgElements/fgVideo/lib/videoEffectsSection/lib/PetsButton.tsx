@@ -1,14 +1,11 @@
 import React, { useRef, useState } from "react";
 import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
-import {
-  PetsEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../../../../context/effectsContext/typeConstant";
+import { PetsEffectTypes } from "../../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -264,26 +261,18 @@ const petsLabels: {
 
 export default function PetsButton({
   videoId,
-  handleVideoEffectChange,
+  fgLowerVideoController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
   videoId: string;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => Promise<void>;
+  fgLowerVideoController: FgLowerVideoController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const {
-    userEffectsStyles,
-    remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
-  } = useEffectsContext();
+  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [_, setRerender] = useState(false);
@@ -510,7 +499,7 @@ export default function PetsButton({
     setEffectsDisabled(true);
     setRerender((prev) => !prev);
 
-    await handleVideoEffectChange("pets");
+    await fgLowerVideoController.handleVideoEffect("pets", false);
 
     setEffectsDisabled(false);
   };
@@ -531,7 +520,7 @@ export default function PetsButton({
     ) {
       effectsStyles.style = effectType;
 
-      await handleVideoEffectChange("pets", streamEffects);
+      await fgLowerVideoController.handleVideoEffect("pets", streamEffects);
     }
 
     setEffectsDisabled(false);

@@ -1,14 +1,11 @@
 import React, { useRef, useState } from "react";
 import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
-import {
-  BeardsEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../../../../context/effectsContext/typeConstant";
+import { BeardsEffectTypes } from "../../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -53,16 +50,13 @@ const beardsLabels: {
 
 export default function BeardsButton({
   videoId,
-  handleVideoEffectChange,
+  fgLowerVideoController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
   videoId: string;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => Promise<void>;
+  fgLowerVideoController: FgLowerVideoController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -118,7 +112,7 @@ export default function BeardsButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await handleVideoEffectChange("beards");
+    await fgLowerVideoController.handleVideoEffect("beards", false);
 
     setEffectsDisabled(false);
   };
@@ -139,7 +133,7 @@ export default function BeardsButton({
     ) {
       effectsStyles.style = effectType;
 
-      await handleVideoEffectChange("beards", streamEffects);
+      await fgLowerVideoController.handleVideoEffect("beards", streamEffects);
     }
 
     setEffectsDisabled(false);

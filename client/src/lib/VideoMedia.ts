@@ -214,64 +214,64 @@ class VideoMedia {
     this.babylonScene.deconstructor();
   }
 
-  // preloadDashStream = (url: string) => {
-  //   this.dashUrl = url;
+  preloadDashStream = (url: string) => {
+    this.dashUrl = url;
 
-  //   if (this.dashUrl) {
-  //     this.hiddenShakaPlayer.load(this.dashUrl).then(() => {
-  //       this.switchToDashStream();
-  //     });
-  //   }
-  // };
+    if (this.dashUrl) {
+      this.hiddenShakaPlayer.load(this.dashUrl).then(() => {
+        this.switchToDashStream();
+      });
+    }
+  };
 
-  // switchToDashStream = async () => {
-  //   console.log("DASH stream swap");
+  switchToDashStream = async () => {
+    console.log("DASH stream swap");
 
-  //   try {
-  //     const currentTime = this.video.currentTime;
-  //     const isPaused = this.video.paused;
+    try {
+      const currentTime = this.video.currentTime;
+      const isPaused = this.video.paused;
 
-  //     // Sync hidden video with the main video
-  //     this.hiddenVideo.currentTime = currentTime;
-  //     if (!isPaused) {
-  //       this.hiddenVideo.play();
-  //     }
+      // Sync hidden video with the main video
+      this.hiddenVideo.currentTime = currentTime;
+      if (!isPaused) {
+        this.hiddenVideo.play();
+      }
 
-  //     const videoBox = this.video.getBoundingClientRect();
+      const videoBox = this.video.getBoundingClientRect();
 
-  //     this.hiddenVideo.width = videoBox.width;
-  //     this.hiddenVideo.height = videoBox.height;
+      this.hiddenVideo.width = videoBox.width;
+      this.hiddenVideo.height = videoBox.height;
 
-  //     this.hiddenVideo.style.display = "";
-  //     this.hiddenVideo.style.opacity = "100%";
+      this.hiddenVideo.style.display = "";
+      this.hiddenVideo.style.opacity = "100%";
 
-  //     // After a short delay, switch the main video to DASH and hide the hidden video
-  //     setTimeout(async () => {
-  //       if (!this.dashUrl) return;
+      // After a short delay, switch the main video to DASH and hide the hidden video
+      setTimeout(async () => {
+        if (!this.dashUrl) return;
 
-  //       await this.shakaPlayer?.load(
-  //         this.dashUrl,
-  //         this.hiddenVideo.currentTime
-  //       );
+        await this.shakaPlayer?.load(
+          this.dashUrl,
+          this.hiddenVideo.currentTime
+        );
 
-  //       this.video.width = videoBox.width;
-  //       this.video.height = videoBox.height;
+        this.video.width = videoBox.width;
+        this.video.height = videoBox.height;
 
-  //       this.video.currentTime = this.hiddenVideo.currentTime;
-  //       if (!this.hiddenVideo.paused) {
-  //         this.video.play();
-  //       }
+        this.video.currentTime = this.hiddenVideo.currentTime;
+        if (!this.hiddenVideo.paused) {
+          this.video.play();
+        }
 
-  //       // Hide the hidden video and clean up
-  //       setTimeout(() => {
-  //         this.hiddenVideo.style.display = "none";
-  //         this.hiddenVideo.style.opacity = "0%";
-  //       }, 250);
-  //     }, 500); // Adjust the delay if needed
-  //   } catch (error) {
-  //     console.error("Error during DASH switch:", error);
-  //   }
-  // };
+        // Hide the hidden video and clean up
+        setTimeout(() => {
+          this.hiddenVideo.style.display = "none";
+          this.hiddenVideo.style.opacity = "0%";
+        }, 250);
+      }, 500); // Adjust the delay if needed
+    } catch (error) {
+      console.error("Error during DASH switch:", error);
+    }
+  };
 
   private rectifyEffectMeshCount = () => {
     for (const effect in this.effects) {

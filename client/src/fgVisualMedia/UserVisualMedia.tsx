@@ -2,7 +2,6 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import {
-  HideBackgroundEffectTypes,
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -176,62 +175,31 @@ export default function UserVisualMedia({
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange: boolean = false,
-    hideBackgroundStyle?: HideBackgroundEffectTypes,
-    hideBackgroundColor?: string
+    blockStateChange: boolean = false
   ) => {
-    if (fgVisualMediaOptions.isUser) {
-      fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
+    fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
 
-      if (
-        (type === "camera" &&
-          fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
-        (type === "screen" &&
-          fgVisualMediaOptions.permissions.acceptsScreenEffects)
-      ) {
-        mediasoupSocket?.current?.sendMessage({
-          type: "clientEffectChange",
-          header: {
-            table_id,
-            username,
-            instance,
-            producerType: type,
-            producerId: visualMediaId,
-          },
-          data: {
-            effect: effect,
-            effectStyle:
-              // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
-              userEffectsStyles.current[type][visualMediaId][effect],
-            blockStateChange: blockStateChange,
-          },
-        });
-      }
-    } else if (
+    if (
       (type === "camera" &&
         fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
       (type === "screen" &&
         fgVisualMediaOptions.permissions.acceptsScreenEffects)
     ) {
       mediasoupSocket?.current?.sendMessage({
-        type: "requestEffectChange",
+        type: "clientEffectChange",
         header: {
           table_id,
-          requestedUsername: username,
-          requestedInstance: instance,
-          requestedProducerType: type,
-          requestedProducerId: visualMediaId,
+          username,
+          instance,
+          producerType: type,
+          producerId: visualMediaId,
         },
         data: {
-          effect,
-          blockStateChange,
-          style:
-            // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
-            remoteEffectsStyles.current[username][instance][type][
-              visualMediaId
-            ][effect],
-          hideBackgroundStyle: hideBackgroundStyle,
-          hideBackgroundColor: hideBackgroundColor,
+          effect: effect,
+          effectStyle:
+            // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
+            userEffectsStyles.current[type][visualMediaId][effect],
+          blockStateChange: blockStateChange,
         },
       });
     }
@@ -486,9 +454,8 @@ export default function UserVisualMedia({
       onPointerLeave={() => fgVisualMediaController.handlePointerLeave()}
       data-positioning={JSON.stringify(positioning.current)}
     >
-      {(fgVisualMediaOptions.isUser ||
-        fgVisualMediaOptions.permissions
-          .acceptsPositionScaleRotationManipulation) && (
+      {fgVisualMediaOptions.permissions
+        .acceptsPositionScaleRotationManipulation && (
         <Suspense fallback={<div>Loading...</div>}>
           <VisualMediaAdjustmentButtons
             bundleRef={bundleRef}

@@ -94,8 +94,6 @@ export default function FgLowerVideoControls({
   fgLowerVideoController,
   pausedState,
   videoContainerRef,
-  audioStream,
-  audioRef,
   subContainerRef,
   currentTimeRef,
   tintColor,
@@ -105,7 +103,6 @@ export default function FgLowerVideoControls({
   settings,
   setSettings,
   fgVideoOptions,
-  handleVideoEffectChange,
 }: {
   table_id: string;
   username: string;
@@ -114,8 +111,6 @@ export default function FgLowerVideoControls({
   fgLowerVideoController: FgLowerVideoController;
   pausedState: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
-  audioStream: MediaStream;
-  audioRef: React.RefObject<HTMLAudioElement>;
   subContainerRef: React.RefObject<HTMLDivElement>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
   tintColor: React.MutableRefObject<string>;
@@ -125,10 +120,6 @@ export default function FgLowerVideoControls({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   fgVideoOptions: FgVideoOptions;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => Promise<void>;
 }) {
   const { mediasoupSocket } = useSocketContext();
 
@@ -191,7 +182,7 @@ export default function FgLowerVideoControls({
               <VideoEffectsSection
                 videoId={videoId}
                 videoContainerRef={videoContainerRef}
-                handleVideoEffectChange={handleVideoEffectChange}
+                fgLowerVideoController={fgLowerVideoController}
                 tintColor={tintColor}
               />
             </Suspense>
@@ -209,7 +200,7 @@ export default function FgLowerVideoControls({
             videoEffectsActive={videoEffectsActive}
             settingsActive={settingsActive}
           />
-          <FgVolumeElement
+          {/* <FgVolumeElement
             table_id={table_id}
             username={username}
             instance={instance}
@@ -227,7 +218,7 @@ export default function FgLowerVideoControls({
               isSlider: true,
               initialVolume: fgVideoOptions.initialVolume ?? "high",
             }}
-          />
+          /> */}
           <div className='flex items-center gap-1 px-1 select-none'>
             <div ref={currentTimeRef} className='font-K2D text-lg'></div>
           </div>
@@ -248,7 +239,7 @@ export default function FgLowerVideoControls({
             settingsActive={settingsActive}
             scrollingContainerRef={rightVideoControlsRef}
           />
-          <CaptionButton
+          {/* <CaptionButton
             fgLowerVideoController={fgLowerVideoController}
             videoEffectsActive={videoEffectsActive}
             settingsActive={settingsActive}
@@ -257,7 +248,7 @@ export default function FgLowerVideoControls({
             videoContainerRef={videoContainerRef}
             scrollingContainerRef={rightVideoControlsRef}
             containerRef={subContainerRef}
-          />
+          /> */}
           <FgSettingsButton
             fgVideoOptions={fgVideoOptions}
             videoEffectsActive={videoEffectsActive}
@@ -276,7 +267,7 @@ export default function FgLowerVideoControls({
             settingsActive={settingsActive}
             scrollingContainerRef={rightVideoControlsRef}
           />
-          <AudioEffectsButton
+          {/* <AudioEffectsButton
             table_id={table_id}
             username={username}
             instance={instance}
@@ -302,7 +293,7 @@ export default function FgLowerVideoControls({
               backgroundColor: "rgba(10, 10, 10, 1)",
               secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
             }}
-          />
+          /> */}
         </div>
       </div>
     </div>

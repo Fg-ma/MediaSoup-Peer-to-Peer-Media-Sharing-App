@@ -1,12 +1,9 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
-import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -18,23 +15,20 @@ const ColorPicker = React.lazy(() => import("./ColorPicker"));
 
 export default function TintSection({
   videoId,
-  handleVideoEffectChange,
+  fgLowerVideoController,
   tintColor,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
   videoId: string;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => Promise<void>;
+  fgLowerVideoController: FgLowerVideoController;
   tintColor: React.MutableRefObject<string>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userStreamEffects, remoteStreamEffects } = useEffectsContext();
+  const { userStreamEffects } = useEffectsContext();
 
   const [color, setColor] = useState("#F56114");
   const [_, setRerender] = useState(0);
@@ -60,7 +54,7 @@ export default function TintSection({
           setEffectsDisabled(true);
           setRerender((prev) => prev + 1);
 
-          await handleVideoEffectChange("tint");
+          await fgLowerVideoController.handleVideoEffect("tint", false);
 
           setEffectsDisabled(false);
         }}
@@ -108,7 +102,7 @@ export default function TintSection({
               colorRef={tintColor}
               colorPickerBtnRef={colorPickerBtnRef}
               handleAcceptColorCallback={() => {
-                handleVideoEffectChange("tint", streamEffects);
+                fgLowerVideoController.handleVideoEffect("tint", streamEffects);
               }}
             />
           </Suspense>

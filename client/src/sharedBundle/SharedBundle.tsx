@@ -92,7 +92,7 @@ export default function SharedBundle({
         {
           const { videoId } = message.header;
           const { url } = message.data;
-          // userMedia.current.video[videoId].preloadDashStream(url);
+          userMedia.current.video[videoId].preloadDashStream(url);
         }
         break;
       // case "truncatedVideoReady":
@@ -109,7 +109,7 @@ export default function SharedBundle({
     <div
       ref={sharedBundleRef}
       id={`${username}_shared_bundle_container`}
-      className='w-full h-full absolute top-0 left-0'
+      className='w-full h-full absolute top-0 left-0 pointer-events-none'
     >
       {userMedia.current.games.snake &&
         Object.keys(userMedia.current.games.snake).length !== 0 &&

@@ -9,6 +9,7 @@ import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -219,16 +220,13 @@ const hatsLabels: {
 
 export default function HatsButton({
   videoId,
-  handleVideoEffectChange,
+  fgLowerVideoController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
   videoId: string;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => Promise<void>;
+  fgLowerVideoController: FgLowerVideoController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -412,7 +410,7 @@ export default function HatsButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await handleVideoEffectChange("hats");
+    await fgLowerVideoController.handleVideoEffect("hats", false);
 
     setEffectsDisabled(false);
   };
@@ -433,7 +431,7 @@ export default function HatsButton({
     ) {
       effectsStyles.style = effectType;
 
-      await handleVideoEffectChange("hats", streamEffects);
+      await fgLowerVideoController.handleVideoEffect("hats", streamEffects);
     }
 
     setEffectsDisabled(false);

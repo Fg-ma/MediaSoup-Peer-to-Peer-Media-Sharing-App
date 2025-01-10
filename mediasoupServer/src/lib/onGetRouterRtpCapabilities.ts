@@ -1,12 +1,9 @@
 import { Router } from "mediasoup/node/lib/Router";
 import { getNextWorker, getWorkerByIdx } from "./workerManager";
-import Broadcaster from "./Broadcaster";
 import { workersMap, onGetRouterRtpCapabilitiesType } from "../typeConstant";
+import { broadcaster } from "../index";
 
-const onGetRouterRtpCapabilities = (
-  broadcaster: Broadcaster,
-  event: onGetRouterRtpCapabilitiesType
-) => {
+const onGetRouterRtpCapabilities = (event: onGetRouterRtpCapabilitiesType) => {
   const { table_id, username, instance } = event.header;
 
   // Get the next available worker and router if one doesn't already exist

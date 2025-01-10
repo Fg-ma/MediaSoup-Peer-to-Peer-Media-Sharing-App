@@ -8,7 +8,7 @@ export default function FgUpperVideoControls({
   fgLowerVideoController: FgLowerVideoController;
 }) {
   return (
-    <div className='video-media-upper-controls absolute top-0 w-full h-10 flex items-center justify-center z-20 space-x-2'>
+    <div className='video-media-upper-controls absolute top-0 w-full h-10 flex items-center justify-between z-20 space-x-2'>
       <div></div>
       <CloseButton fgLowerVideoController={fgLowerVideoController} />
     </div>

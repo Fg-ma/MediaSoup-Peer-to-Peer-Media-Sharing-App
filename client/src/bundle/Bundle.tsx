@@ -215,7 +215,7 @@ export default function Bundle({
     <div
       ref={bundleRef}
       id={`${username}_bundle_container`}
-      className='w-full h-full absolute top-0 left-0'
+      className='w-full h-full absolute top-0 left-0 pointer-events-none'
     >
       {cameraStreams &&
         Object.keys(cameraStreams).length !== 0 &&

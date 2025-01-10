@@ -73,7 +73,7 @@ export default function Main() {
   const tableTopRef = useRef<HTMLDivElement>(null);
 
   const [gridActive, setGridActive] = useState(false);
-  const [gridSize, setGridSize] = useState({ rows: 15, cols: 15 });
+  const [gridSize, setGridSize] = useState({ rows: 4, cols: 4 });
 
   const [_rerender, setRerender] = useState(false);
 

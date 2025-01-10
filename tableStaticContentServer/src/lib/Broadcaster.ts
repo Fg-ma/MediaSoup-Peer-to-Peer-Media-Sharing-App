@@ -59,6 +59,23 @@ class Broadcaster {
       socket.send(msg);
     }
   };
+
+  broadcastToFirstFoundInstance = (table_id: string, message: object) => {
+    if (tables[table_id]) {
+      const user = Object.entries(tables[table_id])[0];
+      if (user) {
+        const instance = Object.entries(tables[table_id][user[0]])[0];
+
+        if (instance) {
+          const msg = JSON.stringify(message);
+
+          const socket = tables[table_id][user[0]][instance[0]];
+
+          socket.send(msg);
+        }
+      }
+    }
+  };
 }
 
 export default Broadcaster;

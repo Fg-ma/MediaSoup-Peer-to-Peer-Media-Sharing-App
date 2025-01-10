@@ -1,15 +1,8 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Transition, Variants, motion } from "framer-motion";
-import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-  HideBackgroundEffectTypes,
-  PostProcessEffects,
-} from "../../../../context/effectsContext/typeConstant";
-import { IncomingMediasoupMessages } from "../../../../lib/MediasoupSocketController";
-import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
+import FgLowerVideoController from "../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const BabylonPostProcessEffectsButton = React.lazy(
   () => import("./lib/BabylonPostProcessEffectsButton")
@@ -42,18 +35,12 @@ const EffectSectionTransition: Transition = {
 export default function VideoEffectsSection({
   videoId,
   videoContainerRef,
-  handleVideoEffectChange,
+  fgLowerVideoController,
   tintColor,
 }: {
   videoId: string;
   videoContainerRef: React.RefObject<HTMLDivElement>;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean,
-    hideBackgroundStyle?: HideBackgroundEffectTypes,
-    hideBackgroundColor?: string,
-    postProcessStyle?: PostProcessEffects
-  ) => Promise<void>;
+  fgLowerVideoController: FgLowerVideoController;
   tintColor: React.MutableRefObject<string>;
 }) {
   const [effectsWidth, setEffectsWidth] = useState(0);
@@ -118,7 +105,7 @@ export default function VideoEffectsSection({
       <Suspense fallback={<div>Loading...</div>}>
         <BabylonPostProcessEffectsButton
           videoId={videoId}
-          handleVideoEffectChange={handleVideoEffectChange}
+          fgLowerVideoController={fgLowerVideoController}
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
@@ -127,7 +114,7 @@ export default function VideoEffectsSection({
       </Suspense>
       <BlurButtton
         videoId={videoId}
-        handleVideoEffectChange={handleVideoEffectChange}
+        fgLowerVideoController={fgLowerVideoController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
@@ -135,7 +122,7 @@ export default function VideoEffectsSection({
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <TintSection
         videoId={videoId}
-        handleVideoEffectChange={handleVideoEffectChange}
+        fgLowerVideoController={fgLowerVideoController}
         tintColor={tintColor}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
@@ -145,7 +132,7 @@ export default function VideoEffectsSection({
         <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
         <GlassesButton
           videoId={videoId}
-          handleVideoEffectChange={handleVideoEffectChange}
+          fgLowerVideoController={fgLowerVideoController}
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
@@ -155,7 +142,7 @@ export default function VideoEffectsSection({
         <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
         <BeardsButton
           videoId={videoId}
-          handleVideoEffectChange={handleVideoEffectChange}
+          fgLowerVideoController={fgLowerVideoController}
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
@@ -165,7 +152,7 @@ export default function VideoEffectsSection({
         <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
         <MustachesButton
           videoId={videoId}
-          handleVideoEffectChange={handleVideoEffectChange}
+          fgLowerVideoController={fgLowerVideoController}
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
@@ -175,7 +162,7 @@ export default function VideoEffectsSection({
         <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
         <MasksButton
           videoId={videoId}
-          handleVideoEffectChange={handleVideoEffectChange}
+          fgLowerVideoController={fgLowerVideoController}
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
@@ -185,7 +172,7 @@ export default function VideoEffectsSection({
         <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
         <HatsButton
           videoId={videoId}
-          handleVideoEffectChange={handleVideoEffectChange}
+          fgLowerVideoController={fgLowerVideoController}
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
@@ -195,7 +182,7 @@ export default function VideoEffectsSection({
         <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
         <PetsButton
           videoId={videoId}
-          handleVideoEffectChange={handleVideoEffectChange}
+          fgLowerVideoController={fgLowerVideoController}
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}

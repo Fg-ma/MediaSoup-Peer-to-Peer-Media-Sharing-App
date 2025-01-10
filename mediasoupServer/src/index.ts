@@ -1,23 +1,44 @@
 import uWS from "uWebSockets.js";
 import { Buffer } from "buffer";
 import { initializeWorkers } from "./lib/workerManager";
-import mediasoupSocket, { leaveTable } from "./mediasoupSocket";
+import handleMessage from "./lib/websocketMessages";
 import { MediasoupWebSocket, SocketData } from "./typeConstant";
+import ProducersController from "./lib/ProducersController";
+import ConsumersController from "./lib/ConsumersController";
+import MuteController from "./lib/MuteController";
+import EffectsController from "./lib/EffectsController";
+import Tables from "./lib/Tables";
+import StatesPermissionsController from "./lib/StatesPermissionsController";
+import MetadataController from "./lib/MetadataController";
+import Broadcaster from "./lib/Broadcaster";
+import MediasoupCleanup from "./lib/MediasoupCleanup";
+
+export const broadcaster = new Broadcaster();
+export const mediasoupCleanup = new MediasoupCleanup();
+export const tables = new Tables(broadcaster, mediasoupCleanup);
+export const producersController = new ProducersController(
+  broadcaster,
+  mediasoupCleanup
+);
+export const consumersController = new ConsumersController(
+  broadcaster,
+  mediasoupCleanup
+);
+export const muteController = new MuteController(broadcaster);
+export const effectsController = new EffectsController(broadcaster);
+export const statesPermissionsController = new StatesPermissionsController(
+  broadcaster
+);
+export const metadataController = new MetadataController(broadcaster);
+
+const sslOptions = {
+  key_file_name: "../certs/tabletop-mediasoup-server-key.pem",
+  cert_file_name: "../certs/tabletop-mediasoup-server.pem",
+};
 
 const main = async () => {
-  try {
-    // Initialize workers
-    await initializeWorkers();
-  } catch (error) {
-    console.error("Error initializing workers:", error);
-  }
+  await initializeWorkers();
 
-  const sslOptions = {
-    key_file_name: "../certs/tabletop-mediasoup-server-key.pem",
-    cert_file_name: "../certs/tabletop-mediasoup-server.pem",
-  };
-
-  // Create uWebSocket server
   uWS
     .SSLApp(sslOptions)
     .ws<SocketData>("/*", {
@@ -25,13 +46,13 @@ const main = async () => {
         const mediasoupWS = ws as MediasoupWebSocket;
 
         const event = JSON.parse(Buffer.from(message).toString());
-        mediasoupSocket(mediasoupWS, event);
+        handleMessage(mediasoupWS, event);
       },
       close: (ws) => {
         const mediasoupWS = ws as MediasoupWebSocket;
         const { table_id, username, instance } = mediasoupWS;
 
-        leaveTable(table_id, username, instance);
+        tables.leaveTable(table_id, username, instance);
       },
     })
     .listen(8000, (token) => {

@@ -1,14 +1,11 @@
 import React, { useRef, useState } from "react";
 import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
-import {
-  GlassesEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../../../../context/effectsContext/typeConstant";
+import { GlassesEffectTypes } from "../../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -221,16 +218,13 @@ const glassesLabels: {
 
 export default function GlassesButton({
   videoId,
-  handleVideoEffectChange,
+  fgLowerVideoController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
   videoId: string;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => Promise<void>;
+  fgLowerVideoController: FgLowerVideoController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -406,7 +400,7 @@ export default function GlassesButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await handleVideoEffectChange("glasses");
+    await fgLowerVideoController.handleVideoEffect("glasses", false);
 
     setEffectsDisabled(false);
   };
@@ -427,7 +421,7 @@ export default function GlassesButton({
     ) {
       effectsStyles.style = effectType;
 
-      await handleVideoEffectChange("glasses", streamEffects);
+      await fgLowerVideoController.handleVideoEffect("glasses", streamEffects);
     }
 
     setEffectsDisabled(false);

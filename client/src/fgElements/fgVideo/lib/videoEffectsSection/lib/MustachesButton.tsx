@@ -1,14 +1,11 @@
 import React, { useRef, useState } from "react";
 import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
-import {
-  MustachesEffectTypes,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../../../../context/effectsContext/typeConstant";
+import { MustachesEffectTypes } from "../../../../../context/effectsContext/typeConstant";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -155,16 +152,13 @@ const mustachesLabels: {
 
 export default function MustachesButton({
   videoId,
-  handleVideoEffectChange,
+  fgLowerVideoController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
   videoId: string;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
-  ) => Promise<void>;
+  fgLowerVideoController: FgLowerVideoController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -286,7 +280,7 @@ export default function MustachesButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await handleVideoEffectChange("mustaches");
+    await fgLowerVideoController.handleVideoEffect("mustaches", false);
 
     setEffectsDisabled(false);
   };
@@ -307,7 +301,10 @@ export default function MustachesButton({
     ) {
       effectsStyles.style = effectType;
 
-      await handleVideoEffectChange("mustaches", streamEffects);
+      await fgLowerVideoController.handleVideoEffect(
+        "mustaches",
+        streamEffects
+      );
     }
 
     setEffectsDisabled(false);

@@ -1,16 +1,12 @@
 import uWS from "uWebSockets.js";
 import { Buffer } from "buffer";
-import {
-  TableWebSocket,
-  MessageTypes,
-  SocketData,
-  tables,
-} from "./typeConstant";
+import { TableWebSocket, SocketData, tables } from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
 import TablesController from "./lib/TablesController";
+import handleMessage from "./lib/websocketMessages";
 
-const broadcaster = new Broadcaster();
-const tablesController = new TablesController(broadcaster);
+export const broadcaster = new Broadcaster();
+export const tablesController = new TablesController(broadcaster);
 
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-server-key.pem",
@@ -59,19 +55,3 @@ uWS
       console.error("Failed to start server");
     }
   });
-
-const handleMessage = (ws: TableWebSocket, event: MessageTypes) => {
-  switch (event.type) {
-    case "joinTable":
-      tablesController.onJoinTable(ws, event);
-      break;
-    case "leaveTable":
-      tablesController.onLeaveTable(event);
-      break;
-    case "changeTableBackground":
-      tablesController.onChangeTableBackgroundType(event);
-      break;
-    default:
-      break;
-  }
-};

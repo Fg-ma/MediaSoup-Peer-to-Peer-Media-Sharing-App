@@ -2,14 +2,10 @@ import React, { useRef, useState } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import { useMediaContext } from "../../../../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../../../../context/effectsContext/EffectsContext";
-import {
-  CameraEffectTypes,
-  HideBackgroundEffectTypes,
-  PostProcessEffects,
-  ScreenEffectTypes,
-} from "../../../../../context/effectsContext/typeConstant";
+import { PostProcessEffects } from "../../../../../context/effectsContext/typeConstant";
 import FgImageElement from "../../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgLowerVideoController from "../../fgLowerVideoControls/lib/FgLowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -78,19 +74,13 @@ const cartoonSmall =
 
 export default function BabylonPostProcessEffectsButton({
   videoId,
-  handleVideoEffectChange,
+  fgLowerVideoController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
   videoId: string;
-  handleVideoEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean,
-    hideBackgroundStyle?: HideBackgroundEffectTypes,
-    hideBackgroundColor?: string,
-    postProcessStyle?: PostProcessEffects
-  ) => Promise<void>;
+  fgLowerVideoController: FgLowerVideoController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -182,7 +172,7 @@ export default function BabylonPostProcessEffectsButton({
       effectsStyles.style
     );
 
-    await handleVideoEffectChange(
+    await fgLowerVideoController.handleVideoEffect(
       "postProcess",
       false,
       undefined,
@@ -215,7 +205,7 @@ export default function BabylonPostProcessEffectsButton({
         videoId
       ].babylonScene.babylonShaderController.swapPostProcessEffects(effectType);
 
-      await handleVideoEffectChange(
+      await fgLowerVideoController.handleVideoEffect(
         "postProcess",
         streamEffects,
         undefined,

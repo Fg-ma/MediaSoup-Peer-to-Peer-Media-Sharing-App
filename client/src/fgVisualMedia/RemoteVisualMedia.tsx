@@ -189,34 +189,7 @@ export default function RemoteVisualMedia({
     hideBackgroundColor?: string,
     postProcessStyle?: PostProcessEffects
   ) => {
-    if (fgVisualMediaOptions.isUser) {
-      fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
-
-      if (
-        (type === "camera" &&
-          fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
-        (type === "screen" &&
-          fgVisualMediaOptions.permissions.acceptsScreenEffects)
-      ) {
-        mediasoupSocket?.current?.sendMessage({
-          type: "clientEffectChange",
-          header: {
-            table_id,
-            username,
-            instance,
-            producerType: type,
-            producerId: visualMediaId,
-          },
-          data: {
-            effect: effect,
-            effectStyle:
-              // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
-              userEffectsStyles.current[type][visualMediaId][effect],
-            blockStateChange: blockStateChange,
-          },
-        });
-      }
-    } else if (
+    if (
       (type === "camera" &&
         fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
       (type === "screen" &&
@@ -326,7 +299,7 @@ export default function RemoteVisualMedia({
     );
 
     // Request initial catch up data
-    if (!fgVisualMediaOptions.isUser && activeUsername && activeInstance) {
+    if (activeUsername && activeInstance) {
       mediasoupSocket.current?.sendMessage({
         type: "requestCatchUpData",
         header: {
@@ -477,9 +450,8 @@ export default function RemoteVisualMedia({
       onPointerLeave={() => fgVisualMediaController.handlePointerLeave()}
       data-positioning={JSON.stringify(positioning.current)}
     >
-      {(fgVisualMediaOptions.isUser ||
-        fgVisualMediaOptions.permissions
-          .acceptsPositionScaleRotationManipulation) && (
+      {fgVisualMediaOptions.permissions
+        .acceptsPositionScaleRotationManipulation && (
         <Suspense fallback={<div>Loading...</div>}>
           <VisualMediaAdjustmentButtons
             bundleRef={bundleRef}

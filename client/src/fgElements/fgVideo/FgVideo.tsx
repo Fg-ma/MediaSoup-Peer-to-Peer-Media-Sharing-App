@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
-import { VideoEffectTypes } from "../../context/effectsContext/typeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgUpperVideoControls from "./lib/fgUpperVideoControls/FgUpperVideoControls";
 import FgLowerVideoControls from "./lib/fgLowerVideoControls/FgLowerVideoControls";
@@ -264,10 +263,8 @@ export default function FgVideo({
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
           table_id,
-          username,
-          instance,
           kind: "video",
-          producerId: videoId,
+          videoId: videoId,
           positioning: positioning.current,
         })
       );
@@ -356,7 +353,6 @@ export default function FgVideo({
         className='relative flex items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
         <FgUpperVideoControls fgLowerVideoController={fgLowerVideoController} />
-        {/* 
         <FgLowerVideoControls
           table_id={table_id}
           username={username}
@@ -365,8 +361,6 @@ export default function FgVideo({
           fgLowerVideoController={fgLowerVideoController}
           pausedState={pausedState}
           videoContainerRef={videoContainerRef}
-          audioStream={audioStream}
-          audioRef={audioRef}
           subContainerRef={subContainerRef}
           currentTimeRef={currentTimeRef}
           tintColor={tintColor}
@@ -376,8 +370,7 @@ export default function FgVideo({
           settings={settings}
           setSettings={setSettings}
           fgVideoOptions={fgVideoOptions}
-          handleVideoEffectChange={handleVideoEffectChange}
-        /> */}
+        />
         <VideoGradient />
       </div>
     </div>

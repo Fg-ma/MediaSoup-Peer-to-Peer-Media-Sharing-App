@@ -1,44 +1,27 @@
-import onGetRouterRtpCapabilities from "./lib/onGetRouterRtpCapabilities";
-import onResume from "./lib/onResume";
-import ProducersController from "./lib/ProducersController";
-import ConsumersController from "./lib/ConsumersController";
-import MuteController from "./lib/MuteController";
-import EffectsController from "./lib/EffectsController";
-import Tables from "./lib/Tables";
-import StatesPermissionsController from "./lib/StatesPermissionsController";
-import MetadataController from "./lib/MetadataController";
-import { MediasoupSocketEvents, MediasoupWebSocket } from "./typeConstant";
-import Broadcaster from "./lib/Broadcaster";
-import MediasoupCleanup from "./lib/MediasoupCleanup";
-
-const broadcaster = new Broadcaster();
-const mediasoupCleanup = new MediasoupCleanup();
-const tables = new Tables(broadcaster, mediasoupCleanup);
-const producersController = new ProducersController(
+import onGetRouterRtpCapabilities from "./onGetRouterRtpCapabilities";
+import onResume from "./onResume";
+import { MediasoupSocketEvents, MediasoupWebSocket } from "../typeConstant";
+import {
   broadcaster,
-  mediasoupCleanup
-);
-const consumersController = new ConsumersController(
-  broadcaster,
-  mediasoupCleanup
-);
-const muteController = new MuteController(broadcaster);
-const effectsController = new EffectsController(broadcaster);
-const statesPermissionsController = new StatesPermissionsController(
-  broadcaster
-);
-const metadataController = new MetadataController(broadcaster);
+  consumersController,
+  effectsController,
+  metadataController,
+  muteController,
+  producersController,
+  statesPermissionsController,
+  tables,
+} from "../index";
 
-const mediasoupSocket = async (
-  mediasoupWS: MediasoupWebSocket,
+const handleMessage = async (
+  ws: MediasoupWebSocket,
   event: MediasoupSocketEvents
 ) => {
   switch (event.type) {
     case "joinTable":
-      tables.joinTable(mediasoupWS, event);
+      tables.joinTable(ws, event);
       break;
     case "getRouterRtpCapabilities":
-      onGetRouterRtpCapabilities(broadcaster, event);
+      onGetRouterRtpCapabilities(event);
       break;
     case "createProducerTransport":
       producersController.onCreateProducerTransport(event);
@@ -135,12 +118,4 @@ const mediasoupSocket = async (
   }
 };
 
-export const leaveTable = (
-  table_id: string,
-  username: string,
-  instance: string
-) => {
-  tables.leaveTable(table_id, username, instance);
-};
-
-export default mediasoupSocket;
+export default handleMessage;

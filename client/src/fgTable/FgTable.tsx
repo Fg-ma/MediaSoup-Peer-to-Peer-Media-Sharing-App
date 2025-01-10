@@ -120,7 +120,7 @@ export default function FgTable({
                   Object.keys(bundles[username]).length !== 0 &&
                   Object.entries(bundles[username]).map(([key, bundle]) => (
                     <div
-                      className='w-full h-full absolute top-0 left-0'
+                      className='w-full h-full absolute top-0 left-0 pointer-events-none'
                       key={key}
                       id={`${key}_bundle`}
                     >

@@ -158,10 +158,8 @@ class FgVideoController {
             const data = JSON.parse(message);
             if (
               data.table_id === this.table_id &&
-              data.username === this.username &&
-              data.instance === this.instance &&
               data.kind === "video" &&
-              data.producerId === this.videoId
+              data.videoId === this.videoId
             ) {
               this.positioning.current = data.positioning;
               this.setRerender((prev) => !prev);
