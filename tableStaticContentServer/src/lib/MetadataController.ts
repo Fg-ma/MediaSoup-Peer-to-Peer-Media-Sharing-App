@@ -13,15 +13,19 @@ class MetadataController {
 
     this.broadcaster.broadcastToInstance(table_id, username, instance, {
       type: "responsedCatchUpTableData",
-      content: tableContent[table_id],
+      data: tableContent[table_id],
     });
   };
 
   onRequestCatchUpContentData = (event: onRequestCatchUpContentDataType) => {
-    const { table_id, username, instance } = event.header;
+    const { table_id, inquiringUsername, inquiringInstance } = event.header;
 
     this.broadcaster.broadcastToFirstFoundInstance(table_id, {
       type: "requestedCatchUpContentData",
+      header: {
+        inquiringUsername,
+        inquiringInstance,
+      },
     });
   };
 }

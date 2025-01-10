@@ -7,11 +7,13 @@ import handleMessage from "./lib/websocketMessages";
 import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
 import TableContentController from "./lib/TableContentController";
+import Cleanup from "./lib/Cleanup";
 
 export const broadcaster = new Broadcaster();
 export const tablesController = new TablesController(broadcaster);
 export const metadataController = new MetadataController(broadcaster);
 export const tableContentController = new TableContentController();
+export const cleanup = new Cleanup(broadcaster);
 
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",

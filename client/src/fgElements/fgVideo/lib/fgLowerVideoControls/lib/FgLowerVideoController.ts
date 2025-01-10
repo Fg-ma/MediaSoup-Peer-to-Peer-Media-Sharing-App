@@ -1,4 +1,5 @@
 import { UserMediaType } from "../../../../../context/mediaContext/typeConstant";
+import TableStaticContentSocketController from "../../../../../lib/TableStaticContentSocketController";
 import {
   UserStreamEffectsType,
   VideoEffectTypes,
@@ -58,6 +59,9 @@ class FgLowerVideoController {
   private initTime: number;
 
   constructor(
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
     private table_id: string,
     private username: string,
     private instance: string,
@@ -123,7 +127,9 @@ class FgLowerVideoController {
     }
   };
 
-  handleCloseVideo = () => {};
+  handleCloseVideo = () => {
+    this.tableStaticContentSocket.current?.deleteContent("video", this.videoId);
+  };
 
   handleVideoEffects = () => {
     this.setVideoEffectsActive((prev) => !prev);

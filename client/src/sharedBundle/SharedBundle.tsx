@@ -92,8 +92,11 @@ export default function SharedBundle({
         {
           const { videoId } = message.header;
           const { url } = message.data;
-          userMedia.current.video[videoId].preloadDashStream(url);
+          userMedia.current.video[videoId]?.preloadDashStream(url);
         }
+        break;
+      case "contentDeleted":
+        setRerender((prev) => !prev);
         break;
       // case "truncatedVideoReady":
       //   shakaPlayer.current?.load(message.url).then(() => {

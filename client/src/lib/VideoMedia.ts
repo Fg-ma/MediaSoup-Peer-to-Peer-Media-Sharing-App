@@ -60,10 +60,12 @@ class VideoMedia {
     private deadbanding: Deadbanding,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    dashUrl?: string | undefined
   ) {
     this.filename = filename;
     this.originalVideoURL = originalVideoURL;
+    this.dashUrl = dashUrl;
 
     this.userStreamEffects.current.video[this.videoId] = {
       video: structuredClone(defaultVideoStreamEffects),
@@ -162,9 +164,15 @@ class VideoMedia {
     this.video.style.objectFit = "cover";
     this.video.style.backgroundColor = "#000";
     this.shakaPlayer = new shaka.Player(this.video);
-    this.shakaPlayer.load(this.originalVideoURL).then(() => {
-      console.log("Original video loaded successfully");
-    });
+    if (this.dashUrl) {
+      this.shakaPlayer.load(this.dashUrl).then(() => {
+        console.log("Dash video loaded successfully");
+      });
+    } else {
+      this.shakaPlayer.load(this.originalVideoURL).then(() => {
+        console.log("Original video loaded successfully");
+      });
+    }
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
@@ -204,13 +212,39 @@ class VideoMedia {
   }
 
   deconstructor() {
+    // Pause and cleanup video elements
     this.video.pause();
     this.video.srcObject = null;
     this.hiddenVideo.pause();
     this.hiddenVideo.srcObject = null;
 
+    // Destroy Shaka players to release resources
+    if (this.shakaPlayer) {
+      this.shakaPlayer.destroy().catch((error) => {
+        console.error("Error destroying Shaka player:", error);
+      });
+    }
+    if (this.hiddenShakaPlayer) {
+      this.hiddenShakaPlayer.destroy().catch((error) => {
+        console.error("Error destroying hidden Shaka player:", error);
+      });
+    }
+
+    // Remove canvas element
     this.canvas.remove();
 
+    // Terminate workers to prevent memory leaks
+    if (this.faceMeshWorker) {
+      this.faceMeshWorker.terminate();
+    }
+    if (this.faceDetectionWorker) {
+      this.faceDetectionWorker.terminate();
+    }
+    if (this.selfieSegmentationWorker) {
+      this.selfieSegmentationWorker.terminate();
+    }
+
+    // Call the BabylonScene deconstructor
     this.babylonScene.deconstructor();
   }
 

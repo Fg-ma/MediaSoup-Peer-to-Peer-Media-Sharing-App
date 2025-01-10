@@ -6,12 +6,15 @@ import busboy from "busboy";
 import { exec } from "child_process";
 import { broadcaster, tableContentController } from "../index";
 
-export const uploadsDir = path.join(__dirname, "../../nginxServer/uploads");
+export const uploadsDir = path.join(__dirname, "../../../nginxServer/uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-export const processedDir = path.join(__dirname, "../../nginxServer/processed");
+export const processedDir = path.join(
+  __dirname,
+  "../../../nginxServer/processed"
+);
 if (!fs.existsSync(processedDir)) {
   fs.mkdirSync(processedDir, { recursive: true });
 }
@@ -103,12 +106,9 @@ const handlePosts = (app: uWS.TemplatedApp) => {
         // Notify clients that the original file is ready
         const originalVideoUrl = `https://localhost:8044/uploads/${filename}`;
 
-        tableContentController.setContent(
-          table_id,
-          "video",
-          videoId,
-          originalVideoUrl
-        );
+        tableContentController.setContent(table_id, "video", videoId, [
+          { property: "originalURL", value: originalVideoUrl },
+        ]);
 
         const originalVideoMessage = {
           type: "originalVideoReady",
@@ -132,12 +132,9 @@ const handlePosts = (app: uWS.TemplatedApp) => {
             -4
           )}.mpd`;
 
-          tableContentController.setContent(
-            table_id,
-            "video",
-            videoId,
-            dashVideoUrl
-          );
+          tableContentController.setContent(table_id, "video", videoId, [
+            { property: "dashURL", value: dashVideoUrl },
+          ]);
 
           const dashVideoMessage = {
             type: "dashVideoReady",

@@ -43,7 +43,7 @@ export default function FgVideo({
 
   const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
   const { userStreamEffects } = useEffectsContext();
-  const { mediasoupSocket } = useSocketContext();
+  const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
 
   const videoMedia = userMedia.current.video[videoId];
 
@@ -121,6 +121,7 @@ export default function FgVideo({
   );
 
   const fgLowerVideoController = new FgLowerVideoController(
+    tableStaticContentSocket,
     table_id,
     username,
     instance,

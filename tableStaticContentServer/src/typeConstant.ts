@@ -14,7 +14,8 @@ export interface TableContent {
   [table_id: string]: {
     [tableContentType in TableContentTypes]?: {
       [contentId: string]: {
-        url: string;
+        originalURL: string | undefined;
+        dashURL: string | undefined;
       };
     };
   };
@@ -38,7 +39,8 @@ export type MessageTypes =
   | onJoinTableType
   | onLeaveTableType
   | onRequestCatchUpTableDataType
-  | onRequestCatchUpContentDataType;
+  | onRequestCatchUpContentDataType
+  | onDeleteContentType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -71,8 +73,17 @@ export type onRequestCatchUpContentDataType = {
   type: "requestCatchUpContentData";
   header: {
     table_id: string;
-    username: string;
-    instance: string;
+    inquiringUsername: string;
+    inquiringInstance: string;
+  };
+};
+
+export type onDeleteContentType = {
+  type: "deleteContent";
+  header: {
+    table_id: string;
+    contentType: TableContentTypes;
+    contentId: string;
   };
 };
 

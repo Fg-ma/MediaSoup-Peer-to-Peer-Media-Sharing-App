@@ -4,6 +4,10 @@ import {
   UserDataStreamsType,
   UserMediaType,
 } from "../../context/mediaContext/typeConstant";
+import {
+  UserEffectsStylesType,
+  UserStreamEffectsType,
+} from "../../context/effectsContext/typeConstant";
 import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
 import BundlesController from "../../lib/BundlesController";
 import onRouterCapabilities from "../../lib/onRouterCapabilities";
@@ -20,6 +24,8 @@ import ConsumersController from "../../lib/ConsumersController";
 import PermissionsController from "../../lib/PermissionsController";
 import Metadata from "../../lib/Metadata";
 import CleanupController from "../../lib/CleanupController";
+import Deadbanding from "../../babylon/Deadbanding";
+import UserDevice from "../../lib/UserDevice";
 
 class TableFunctionsController {
   constructor(
@@ -41,6 +47,8 @@ class TableFunctionsController {
     private userMedia: React.MutableRefObject<UserMediaType>,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
     private remoteMedia: React.MutableRefObject<RemoteMediaType>,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private handleDisableEnableBtns: (disabled: boolean) => void,
     private bundles: {
       [username: string]: { [instance: string]: React.JSX.Element };
@@ -75,6 +83,8 @@ class TableFunctionsController {
     private consumersController: ConsumersController,
     private permissionsController: PermissionsController,
     private metadata: Metadata,
+    private userDevice: UserDevice,
+    private deadbanding: Deadbanding,
     private cleanupController: CleanupController,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
@@ -117,7 +127,12 @@ class TableFunctionsController {
           "ws://localhost:8045",
           this.table_id.current,
           this.username.current,
-          this.instance.current
+          this.instance.current,
+          this.userMedia,
+          this.userStreamEffects,
+          this.userEffectsStyles,
+          this.userDevice,
+          this.deadbanding
         );
 
       this.userMedia.current.gamesSignaling = new GamesSignalingMedia(

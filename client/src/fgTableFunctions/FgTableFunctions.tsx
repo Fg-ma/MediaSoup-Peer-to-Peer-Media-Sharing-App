@@ -5,6 +5,7 @@ import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
 import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { useSocketContext } from "../context/socketContext/SocketContext";
+import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
 import ScreenSection from "./lib/screenSection/ScreenSection";
@@ -20,6 +21,8 @@ import PermissionsController from "../lib/PermissionsController";
 import Metadata from "../lib/Metadata";
 import CleanupController from "../lib/CleanupController";
 import UploadMediaButton from "./lib/uploadMediaButton/UploadMediaButton";
+import UserDevice from "../lib/UserDevice";
+import Deadbanding from "../babylon/Deadbanding";
 
 const AudioEffectsButton = React.lazy(
   () => import("../audioEffectsButton/AudioEffectsButton")
@@ -63,6 +66,8 @@ export default function FgTableFunctions({
   consumersController,
   permissionsController,
   metadata,
+  userDevice,
+  deadbanding,
   cleanupController,
   setRerender,
 }: {
@@ -128,10 +133,13 @@ export default function FgTableFunctions({
   consumersController: ConsumersController;
   permissionsController: PermissionsController;
   metadata: Metadata;
+  userDevice: UserDevice;
+  deadbanding: Deadbanding;
   cleanupController: CleanupController;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
+  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { setSignal } = useSignalContext();
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
@@ -164,6 +172,8 @@ export default function FgTableFunctions({
     userMedia,
     userDataStreams,
     remoteMedia,
+    userStreamEffects,
+    userEffectsStyles,
     handleDisableEnableBtns,
     bundles,
     setBundles,
@@ -186,6 +196,8 @@ export default function FgTableFunctions({
     consumersController,
     permissionsController,
     metadata,
+    userDevice,
+    deadbanding,
     cleanupController,
     setRerender
   );

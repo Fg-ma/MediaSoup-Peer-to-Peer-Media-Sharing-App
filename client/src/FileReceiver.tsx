@@ -88,12 +88,12 @@ export default function FileReceiver() {
   const handleMessage = (message: IncomingTableStaticContentMessages) => {
     switch (message.type) {
       case "originalVideoReady":
-        shakaPlayer.current?.load(message.url).then(() => {
+        shakaPlayer.current?.load(message.data.url).then(() => {
           console.log("Original video loaded successfully");
         });
         break;
       case "dashVideoReady":
-        preloadDashStream(message.url);
+        preloadDashStream(message.data.url);
         break;
       // case "truncatedVideoReady":
       //   shakaPlayer.current?.load(message.url).then(() => {

@@ -344,6 +344,8 @@ export default function Main() {
         consumersController={consumersController}
         permissionsController={permissionsController}
         metadata={metadata}
+        userDevice={userDevice}
+        deadbanding={deadbanding}
         cleanupController={cleanupController}
         setRerender={setRerender}
       />

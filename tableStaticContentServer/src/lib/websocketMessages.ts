@@ -1,4 +1,4 @@
-import { metadataController, tablesController } from "../index";
+import { cleanup, metadataController, tablesController } from "../index";
 import { MessageTypes, TableStaticContentWebSocket } from "../typeConstant";
 
 const handleMessage = (
@@ -17,6 +17,9 @@ const handleMessage = (
       break;
     case "requestCatchUpContentData":
       metadataController.onRequestCatchUpContentData(event);
+      break;
+    case "deleteContent":
+      cleanup.onDeleteContent(event);
       break;
     default:
       break;
