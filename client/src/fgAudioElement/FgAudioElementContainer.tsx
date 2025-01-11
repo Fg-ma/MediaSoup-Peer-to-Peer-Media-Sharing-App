@@ -230,7 +230,7 @@ export default function FgAudioElementContainer({
       id={`${username}_${instance}_audio_element_container`}
       className={`audio-element-container ${
         adjustingDimensions ? "adjusting-dimensions" : ""
-      } ${inAudioContainer ? "in-audio-container" : ""}`}
+      } ${inAudioContainer ? "in-audio-container" : ""} pointer-events-auto`}
       style={{
         position: "relative",
         left: `${positioning.current.position.left}%`,
