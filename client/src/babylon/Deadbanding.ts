@@ -59,12 +59,6 @@ const deadbandingValues: DeadbandingValues = {
       headPitchAngles: 0.08,
       interocularDistances: 0.01,
     },
-    AmericaGlasses: {
-      headRotationAngles: 0.08,
-      headYawAngles: 0.08,
-      headPitchAngles: 0.08,
-      interocularDistances: 0.01,
-    },
     aviatorGoggles: {
       headRotationAngles: 0.08,
       headYawAngles: 0.08,

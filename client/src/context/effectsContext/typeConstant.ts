@@ -195,7 +195,6 @@ export type BeardsEffectTypes =
   | "fullBeard";
 export type GlassesEffectTypes =
   | "defaultGlasses"
-  | "AmericaGlasses"
   | "aviatorGoggles"
   | "bloodyGlasses"
   | "eyeProtectionGlasses"

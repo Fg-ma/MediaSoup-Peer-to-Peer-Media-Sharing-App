@@ -21,18 +21,6 @@ const defaultGlassesIcon =
 const defaultGlassesOffIcon =
   nginxAssetSeverBaseUrl +
   "svgs/visualEffects/glasses/defaultGlasses/defaultGlassesOffIcon.svg";
-const AmericaGlasses_512x512 =
-  nginxAssetSeverBaseUrl +
-  "2DAssets/glasses/AmericaGlasses/AmericaGlasses_512x512.png";
-const AmericaGlasses_32x32 =
-  nginxAssetSeverBaseUrl +
-  "2DAssets/glasses/AmericaGlasses/AmericaGlasses_32x32.png";
-const AmericaGlassesIcon =
-  nginxAssetSeverBaseUrl +
-  "svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesIcon.svg";
-const AmericaGlassesOffIcon =
-  nginxAssetSeverBaseUrl +
-  "svgs/visualEffects/glasses/AmericaGlasses/AmericaGlassesOffIcon.svg";
 const aviatorGoggles_512x512 =
   nginxAssetSeverBaseUrl +
   "2DAssets/glasses/aviatorGoggles/aviatorGoggles_512x512.png";
@@ -197,7 +185,6 @@ const glassesLabels: {
   [glassesEffectType in GlassesEffectTypes]: string;
 } = {
   defaultGlasses: "Default",
-  AmericaGlasses: "America",
   aviatorGoggles: "Aviator",
   bloodyGlasses: "Bloody",
   eyeProtectionGlasses: "Eye protection",
@@ -256,14 +243,6 @@ export default function GlassesButton({
       icon: defaultGlassesIcon,
       iconOff: defaultGlassesOffIcon,
       flipped: false,
-      bgColor: "white",
-    },
-    AmericaGlasses: {
-      image: AmericaGlasses_512x512,
-      imageSmall: AmericaGlasses_32x32,
-      icon: AmericaGlassesIcon,
-      iconOff: AmericaGlassesOffIcon,
-      flipped: true,
       bgColor: "white",
     },
     aviatorGoggles: {
