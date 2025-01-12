@@ -502,6 +502,10 @@ class VideoMedia {
   getTimeEllapsed = () => {
     return Date.now() - this.creationTime;
   };
+
+  getVideoTime = () => {
+    return this.video.currentTime;
+  };
 }
 
 export default VideoMedia;

@@ -12,7 +12,8 @@ type OutGoingTableStaticContentMessages =
   | onLeaveTableType
   | onRequestCatchUpTableDataType
   | onRequestCatchUpContentDataType
-  | onDeleteContentType;
+  | onDeleteContentType
+  | onCatchUpContentDataResponseType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -45,8 +46,10 @@ type onRequestCatchUpContentDataType = {
   type: "requestCatchUpContentData";
   header: {
     table_id: string;
-    username: string;
-    instance: string;
+    inquiringUsername: string;
+    inquiringInstance: string;
+    contentType: TableContentTypes;
+    contentId: string;
   };
 };
 
@@ -59,6 +62,32 @@ type onDeleteContentType = {
   };
 };
 
+type onCatchUpContentDataResponseType = {
+  type: "catchUpContentDataResponse";
+  header: {
+    table_id: string;
+    inquiringUsername: string;
+    inquiringInstance: string;
+    contentType: TableContentTypes;
+    contentId: string;
+  };
+  data: {
+    positioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    };
+    videoTime: number;
+    timeMeasured: number;
+  };
+};
+
 export type TableContentTypes = "video";
 
 export type IncomingTableStaticContentMessages =
@@ -66,9 +95,10 @@ export type IncomingTableStaticContentMessages =
   | onDashVideoReadyType
   | onResponsedCatchUpTableDataType
   | onRequestedCatchUpContentDataType
-  | onContentDeletedType;
+  | onContentDeletedType
+  | onCatchUpContentDataRespondedType;
 
-type onOriginalVideoReadyType = {
+export type onOriginalVideoReadyType = {
   type: "originalVideoReady";
   header: {
     videoId: string;
@@ -79,7 +109,7 @@ type onOriginalVideoReadyType = {
   };
 };
 
-type onDashVideoReadyType = {
+export type onDashVideoReadyType = {
   type: "dashVideoReady";
   header: {
     videoId: string;
@@ -90,7 +120,7 @@ type onDashVideoReadyType = {
   };
 };
 
-type onResponsedCatchUpTableDataType = {
+export type onResponsedCatchUpTableDataType = {
   type: "responsedCatchUpTableData";
   data: {
     [tableContentType in TableContentTypes]?: {
@@ -102,19 +132,44 @@ type onResponsedCatchUpTableDataType = {
   };
 };
 
-type onRequestedCatchUpContentDataType = {
+export type onRequestedCatchUpContentDataType = {
   type: "requestedCatchUpContentData";
   header: {
     inquiringUsername: string;
     inquiringInstance: string;
+    contentType: TableContentTypes;
+    contentId: string;
   };
 };
 
-type onContentDeletedType = {
+export type onContentDeletedType = {
   type: "contentDeleted";
   header: {
     contentType: TableContentTypes;
     contentId: string;
+  };
+};
+
+export type onCatchUpContentDataRespondedType = {
+  type: "catchUpContentDataResponded";
+  header: {
+    contentType: TableContentTypes;
+    contentId: string;
+  };
+  data: {
+    positioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    };
+    videoTime: number;
+    timeMeasured: number;
   };
 };
 
@@ -232,6 +287,58 @@ class TableStaticContentSocketController {
     });
   };
 
+  requestCatchUpContentData = (
+    contentType: TableContentTypes,
+    contentId: string
+  ) => {
+    this.sendMessage({
+      type: "requestCatchUpContentData",
+      header: {
+        table_id: this.table_id,
+        inquiringUsername: this.username,
+        inquiringInstance: this.instance,
+        contentType,
+        contentId,
+      },
+    });
+  };
+
+  catchUpContentDataResponse = (
+    inquiringUsername: string,
+    inquiringInstance: string,
+    contentType: TableContentTypes,
+    contentId: string,
+    positioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    },
+    videoTime: number,
+    timeMeasured: number
+  ) => {
+    this.sendMessage({
+      type: "catchUpContentDataResponse",
+      header: {
+        table_id: this.table_id,
+        inquiringUsername,
+        inquiringInstance,
+        contentType,
+        contentId,
+      },
+      data: {
+        positioning,
+        videoTime,
+        timeMeasured,
+      },
+    });
+  };
+
   private handleMessage = (message: IncomingTableStaticContentMessages) => {
     switch (message.type) {
       case "responsedCatchUpTableData":
@@ -275,15 +382,6 @@ class TableStaticContentSocketController {
         }
       }
     }
-
-    this.sendMessage({
-      type: "requestCatchUpContentData",
-      header: {
-        table_id: this.table_id,
-        username: this.username,
-        instance: this.instance,
-      },
-    });
   };
 
   private onRequestedCatchUpContentData = (

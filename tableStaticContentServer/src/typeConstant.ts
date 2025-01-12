@@ -40,7 +40,8 @@ export type MessageTypes =
   | onLeaveTableType
   | onRequestCatchUpTableDataType
   | onRequestCatchUpContentDataType
-  | onDeleteContentType;
+  | onDeleteContentType
+  | onCatchUpContentDataResponseType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -75,6 +76,8 @@ export type onRequestCatchUpContentDataType = {
     table_id: string;
     inquiringUsername: string;
     inquiringInstance: string;
+    contentType: TableContentTypes;
+    contentId: string;
   };
 };
 
@@ -84,6 +87,32 @@ export type onDeleteContentType = {
     table_id: string;
     contentType: TableContentTypes;
     contentId: string;
+  };
+};
+
+export type onCatchUpContentDataResponseType = {
+  type: "catchUpContentDataResponse";
+  header: {
+    table_id: string;
+    inquiringUsername: string;
+    inquiringInstance: string;
+    contentType: TableContentTypes;
+    contentId: string;
+  };
+  data: {
+    positioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    };
+    videoTime: number;
+    timeMeasured: number;
   };
 };
 

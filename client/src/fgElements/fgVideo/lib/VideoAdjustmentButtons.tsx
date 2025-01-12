@@ -9,7 +9,6 @@ export default function VideoAdjustmentButtons({
   panBtnRef,
   positioning,
   fgContentAdjustmentController,
-  scaleCallback,
 }: {
   sharedBundleRef: React.RefObject<HTMLDivElement>;
   panBtnRef: React.RefObject<HTMLButtonElement>;
@@ -25,7 +24,6 @@ export default function VideoAdjustmentButtons({
     rotation: number;
   }>;
   fgContentAdjustmentController: FgContentAdjustmentController;
-  scaleCallback: () => void;
 }) {
   return (
     <>
@@ -134,8 +132,6 @@ export default function VideoAdjustmentButtons({
             referencePoint,
             referencePoint
           );
-
-          scaleCallback();
         }}
         bundleRef={sharedBundleRef}
         pointerDownFunction={

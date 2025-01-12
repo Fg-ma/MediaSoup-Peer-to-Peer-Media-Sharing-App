@@ -113,6 +113,8 @@ export default function FgVideo({
     rotation: 0,
   });
 
+  const [desync, setDesync] = useState(false);
+
   const fgContentAdjustmentController = new FgContentAdjustmentController(
     sharedBundleRef,
     positioning,
@@ -148,10 +150,13 @@ export default function FgVideo({
   );
 
   const fgVideoController = new FgVideoController(
+    tableStaticContentSocket,
     table_id,
     username,
     instance,
     videoId,
+    videoMedia,
+    subContainerRef,
     fgLowerVideoController,
     positioningListeners,
     positioning,
@@ -165,12 +170,24 @@ export default function FgVideo({
   );
 
   useEffect(() => {
+    fgVideoController.scaleCallback();
+
+    tableStaticContentSocket.current?.requestCatchUpContentData(
+      "video",
+      videoId
+    );
+
     // Set up initial conditions
     fgVideoController.init();
 
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
       fgVideoController.handleMediasoupMessage
+    );
+
+    // Listen for messages on tableStaticContentSocket
+    tableStaticContentSocket.current?.addMessageListener(
+      fgVideoController.handleTableStaticContentMessage
     );
 
     // Keep video time
@@ -212,6 +229,9 @@ export default function FgVideo({
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
         fgVideoController.handleMediasoupMessage
+      );
+      tableStaticContentSocket.current?.removeMessageListener(
+        fgVideoController.handleTableStaticContentMessage
       );
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
@@ -273,42 +293,15 @@ export default function FgVideo({
   }, [positioning.current]);
 
   useEffect(() => {
+    fgVideoController.scaleCallback();
+  }, [positioning.current.scale]);
+
+  useEffect(() => {
     fgVideoController.attachPositioningListeners();
 
     subContainerRef.current?.appendChild(videoMedia.video);
     subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
   }, []);
-
-  const scaleCallback = () => {
-    if (!subContainerRef.current) return;
-
-    // Calculate the aspect ratio of the video
-    const videoAspectRatio =
-      videoMedia.video.videoWidth / videoMedia.video.videoHeight;
-
-    // Get the size of the container
-    const containerBox = subContainerRef.current.getBoundingClientRect();
-    const containerWidth = containerBox.width;
-    const containerHeight = containerBox.height;
-
-    // Calculate the container's aspect ratio
-    const containerAspectRatio = containerWidth / containerHeight;
-
-    // Apply scaling based on the smaller dimension to prevent overflow
-    if (containerAspectRatio > videoAspectRatio) {
-      // Container is wider than the video aspect ratio
-      videoMedia.video.style.width = "auto";
-      videoMedia.video.style.height = "100%";
-      videoMedia.hiddenVideo.style.width = "auto";
-      videoMedia.hiddenVideo.style.height = "100%";
-    } else {
-      // Container is taller than the video aspect ratio
-      videoMedia.video.style.width = "100%";
-      videoMedia.video.style.height = "auto";
-      videoMedia.hiddenVideo.style.width = "100%";
-      videoMedia.hiddenVideo.style.height = "auto";
-    }
-  };
 
   return (
     <div
@@ -341,7 +334,6 @@ export default function FgVideo({
         panBtnRef={panBtnRef}
         positioning={positioning}
         fgContentAdjustmentController={fgContentAdjustmentController}
-        scaleCallback={scaleCallback}
       />
       {adjustingDimensions && (
         <>

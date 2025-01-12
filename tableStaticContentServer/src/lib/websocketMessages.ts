@@ -21,6 +21,9 @@ const handleMessage = (
     case "deleteContent":
       cleanup.onDeleteContent(event);
       break;
+    case "catchUpContentDataResponse":
+      metadataController.onCatchUpContentDataResponse(event);
+      break;
     default:
       break;
   }

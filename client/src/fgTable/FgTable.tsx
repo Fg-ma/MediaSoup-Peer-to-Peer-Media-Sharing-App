@@ -7,6 +7,10 @@ import SharedBundle from "../sharedBundle/SharedBundle";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 import "./lib/fgTable.css";
+import LeftTableSection from "./lib/LeftTableSection";
+import RightTableSection from "./lib/RightTableSection";
+import TopTableSection from "./lib/TopTableSection";
+import BottomTableSection from "./lib/BottomTableSection";
 
 export default function FgTable({
   table_id,
@@ -77,64 +81,70 @@ export default function FgTable({
   }, []);
 
   return (
-    <FgScrollbarElement
-      direction={aspectDir.current === "width" ? "vertical" : "horizontal"}
-      scrollingContentRef={tableRef}
-      content={
-        <div
-          ref={tableRef}
-          className={`fg-table relative rounded-md w-full h-full ${
-            aspectDir.current === "width"
-              ? "overflow-y-auto"
-              : "overflow-x-auto"
-          }`}
-        >
+    <>
+      <LeftTableSection />
+      <RightTableSection />
+      <TopTableSection />
+      <BottomTableSection />
+      <FgScrollbarElement
+        direction={aspectDir.current === "width" ? "vertical" : "horizontal"}
+        scrollingContentRef={tableRef}
+        content={
           <div
-            ref={tableTopRef}
-            className='relative bg-fg-white-65 aspect-square overflow-hidden'
-            style={{
-              ...(aspectDir.current === "width"
-                ? { width: "100%" }
-                : { height: "100%" }),
-            }}
+            ref={tableRef}
+            className={`fg-table relative rounded-md w-full h-full ${
+              aspectDir.current === "width"
+                ? "overflow-y-auto"
+                : "overflow-x-auto"
+            }`}
           >
-            <UploadTableLayer table_id={table_id} />
-            {gridActive && (
-              <TableGridOverlay
-                gridSize={gridSize}
-                tableTopRef={tableTopRef}
-                gridColor='#fff'
-              />
-            )}
-            <SharedBundle
-              table_id={table_id.current}
-              username={username.current}
-              instance={instance.current}
-              userDevice={userDevice}
-              deadbanding={deadbanding}
-            />
-            {bundles &&
-              Object.keys(bundles).length !== 0 &&
-              Object.keys(bundles).map(
-                (username) =>
-                  Object.keys(bundles[username]).length !== 0 &&
-                  Object.entries(bundles[username]).map(([key, bundle]) => (
-                    <div
-                      className='w-full h-full absolute top-0 left-0 pointer-events-none'
-                      key={key}
-                      id={`${key}_bundle`}
-                    >
-                      {bundle}
-                    </div>
-                  ))
+            <div
+              ref={tableTopRef}
+              className='relative bg-fg-white-65 aspect-square overflow-hidden'
+              style={{
+                ...(aspectDir.current === "width"
+                  ? { width: "100%" }
+                  : { height: "100%" }),
+              }}
+            >
+              <UploadTableLayer table_id={table_id} />
+              {gridActive && (
+                <TableGridOverlay
+                  gridSize={gridSize}
+                  tableTopRef={tableTopRef}
+                  gridColor='#fff'
+                />
               )}
+              <SharedBundle
+                table_id={table_id.current}
+                username={username.current}
+                instance={instance.current}
+                userDevice={userDevice}
+                deadbanding={deadbanding}
+              />
+              {bundles &&
+                Object.keys(bundles).length !== 0 &&
+                Object.keys(bundles).map(
+                  (username) =>
+                    Object.keys(bundles[username]).length !== 0 &&
+                    Object.entries(bundles[username]).map(([key, bundle]) => (
+                      <div
+                        className='w-full h-full absolute top-0 left-0 pointer-events-none'
+                        key={key}
+                        id={`${key}_bundle`}
+                      >
+                        {bundle}
+                      </div>
+                    ))
+                )}
+            </div>
           </div>
-        </div>
-      }
-      style={{
-        width: "100%",
-        height: "calc(100% - 8rem)",
-      }}
-    />
+        }
+        style={{
+          width: "100%",
+          height: "calc(100% - 8rem)",
+        }}
+      />
+    </>
   );
 }

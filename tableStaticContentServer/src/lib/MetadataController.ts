@@ -1,4 +1,5 @@
 import {
+  onCatchUpContentDataResponseType,
   onRequestCatchUpContentDataType,
   onRequestCatchUpTableDataType,
   tableContent,
@@ -18,15 +19,52 @@ class MetadataController {
   };
 
   onRequestCatchUpContentData = (event: onRequestCatchUpContentDataType) => {
-    const { table_id, inquiringUsername, inquiringInstance } = event.header;
+    const {
+      table_id,
+      inquiringUsername,
+      inquiringInstance,
+      contentType,
+      contentId,
+    } = event.header;
 
     this.broadcaster.broadcastToFirstFoundInstance(table_id, {
       type: "requestedCatchUpContentData",
       header: {
         inquiringUsername,
         inquiringInstance,
+        contentType,
+        contentId,
       },
     });
+  };
+
+  onCatchUpContentDataResponse = (event: onCatchUpContentDataResponseType) => {
+    const {
+      table_id,
+      inquiringUsername,
+      inquiringInstance,
+      contentType,
+      contentId,
+    } = event.header;
+    const { positioning, videoTime, timeMeasured } = event.data;
+
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      inquiringUsername,
+      inquiringInstance,
+      {
+        type: "catchUpContentDataResponded",
+        header: {
+          contentType,
+          contentId,
+        },
+        data: {
+          positioning,
+          videoTime,
+          timeMeasured,
+        },
+      }
+    );
   };
 }
 

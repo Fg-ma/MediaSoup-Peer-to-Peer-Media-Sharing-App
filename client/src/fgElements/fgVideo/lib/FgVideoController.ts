@@ -1,17 +1,25 @@
 import FgLowerVideoController from "./fgLowerVideoControls/lib/FgLowerVideoController";
 import { FgVideoOptions } from "./typeConstant";
-import {
-  IncomingMediasoupMessages,
-  onResponsedCatchUpDataType,
-} from "../../../lib/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../../lib/MediasoupSocketController";
 import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
+import TableStaticContentSocketController, {
+  IncomingTableStaticContentMessages,
+  onCatchUpContentDataRespondedType,
+  onRequestedCatchUpContentDataType,
+} from "../../../lib/TableStaticContentSocketController";
+import VideoMedia from "../../../lib/VideoMedia";
 
 class FgVideoController {
   constructor(
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
     private table_id: string,
     private username: string,
     private instance: string,
     private videoId: string,
+    private videoMedia: VideoMedia,
+    private subContainerRef: React.RefObject<HTMLDivElement>,
     private fgLowerVideoController: FgLowerVideoController,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
@@ -45,41 +53,6 @@ class FgVideoController {
       "--primary-video-color",
       `${this.fgVideoOptions.primaryVideoColor}`
     );
-  };
-
-  onResponsedCatchUpData = (event: onResponsedCatchUpDataType) => {
-    const {
-      inquiredUsername,
-      inquiredInstance,
-      inquiredType,
-      inquiredProducerId,
-    } = event.header;
-    const data = event.data;
-
-    if (
-      inquiredUsername === this.username &&
-      inquiredInstance === this.instance &&
-      inquiredType === "video" &&
-      inquiredProducerId === this.videoId &&
-      data &&
-      Object.keys(data.positioning).length !== 0
-    ) {
-      this.positioning.current = data.positioning;
-    }
-  };
-
-  handleMediasoupMessage = (event: IncomingMediasoupMessages) => {
-    switch (event.type) {
-      case "newConsumerWasCreated":
-        if (event.header.producerType == "json")
-          this.attachPositioningListeners();
-        break;
-      case "responsedCatchUpData":
-        this.onResponsedCatchUpData(event);
-        break;
-      default:
-        break;
-    }
   };
 
   handleVisibilityChange = () => {
@@ -139,6 +112,17 @@ class FgVideoController {
     }, this.fgVideoOptions.controlsVanishTime);
   };
 
+  handleMediasoupMessage = (event: IncomingMediasoupMessages) => {
+    switch (event.type) {
+      case "newConsumerWasCreated":
+        if (event.header.producerType == "json")
+          this.attachPositioningListeners();
+        break;
+      default:
+        break;
+    }
+  };
+
   attachPositioningListeners = () => {
     Object.values(this.positioningListeners.current).forEach((userListners) =>
       Object.values(userListners).forEach((removeListener) => removeListener())
@@ -177,6 +161,88 @@ class FgVideoController {
         }
       }
     }
+  };
+
+  scaleCallback = () => {
+    if (!this.subContainerRef.current) return;
+
+    // Calculate the aspect ratio of the video
+    const videoAspectRatio =
+      this.videoMedia.video.videoWidth / this.videoMedia.video.videoHeight;
+
+    // Get the size of the container
+    const containerBox = this.subContainerRef.current.getBoundingClientRect();
+    const containerWidth = containerBox.width;
+    const containerHeight = containerBox.height;
+
+    // Calculate the container's aspect ratio
+    const containerAspectRatio = containerWidth / containerHeight;
+
+    // Apply scaling based on the smaller dimension to prevent overflow
+    if (containerAspectRatio > videoAspectRatio) {
+      // Container is wider than the video aspect ratio
+      this.videoMedia.video.style.width = "auto";
+      this.videoMedia.video.style.height = "100%";
+      this.videoMedia.hiddenVideo.style.width = "auto";
+      this.videoMedia.hiddenVideo.style.height = "100%";
+    } else {
+      // Container is taller than the video aspect ratio
+      this.videoMedia.video.style.width = "100%";
+      this.videoMedia.video.style.height = "auto";
+      this.videoMedia.hiddenVideo.style.width = "100%";
+      this.videoMedia.hiddenVideo.style.height = "auto";
+    }
+  };
+
+  handleTableStaticContentMessage = (
+    event: IncomingTableStaticContentMessages
+  ) => {
+    switch (event.type) {
+      case "requestedCatchUpContentData":
+        this.onRequestedCatchUpContentData(event);
+        break;
+      case "catchUpContentDataResponded":
+        this.onCatchUpContentDataResponded(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  onRequestedCatchUpContentData = (
+    event: onRequestedCatchUpContentDataType
+  ) => {
+    const { inquiringUsername, inquiringInstance, contentType, contentId } =
+      event.header;
+
+    this.tableStaticContentSocket.current?.catchUpContentDataResponse(
+      inquiringUsername,
+      inquiringInstance,
+      contentType,
+      contentId,
+      this.positioning.current,
+      this.videoMedia.getVideoTime(),
+      Date.now()
+    );
+  };
+
+  onCatchUpContentDataResponded = (
+    event: onCatchUpContentDataRespondedType
+  ) => {
+    const { contentType, contentId } = event.header;
+
+    if (contentType !== "video" || contentId !== this.videoId) {
+      return;
+    }
+
+    const { positioning, videoTime, timeMeasured } = event.data;
+
+    this.positioning.current = positioning;
+
+    this.videoMedia.video.currentTime =
+      videoTime + (Date.now() - timeMeasured) / 1000;
+
+    this.setRerender((prev) => !prev);
   };
 }
 
