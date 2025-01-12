@@ -1,6 +1,11 @@
 import uWS from "uWebSockets.js";
 import { Buffer } from "buffer";
-import { TableWebSocket, SocketData, tables } from "./typeConstant";
+import {
+  TableWebSocket,
+  SocketData,
+  tables,
+  tablesUserData,
+} from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
 import TablesController from "./lib/TablesController";
 import handleMessage from "./lib/websocketMessages";
@@ -44,6 +49,14 @@ uWS
           if (Object.keys(tables[table_id]).length === 0) {
             delete tables[table_id];
           }
+        }
+      }
+
+      if (tablesUserData[table_id] && tablesUserData[table_id][username]) {
+        delete tablesUserData[table_id][username];
+
+        if (Object.keys(tablesUserData[table_id]).length === 0) {
+          delete tablesUserData[table_id];
         }
       }
     },

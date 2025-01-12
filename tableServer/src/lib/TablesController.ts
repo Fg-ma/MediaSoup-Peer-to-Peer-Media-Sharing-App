@@ -3,7 +3,10 @@ import {
   onChangeTableBackgroundType,
   onJoinTableType,
   onLeaveTableType,
+  TableColors,
   tables,
+  tableSeatingChart,
+  tablesUserData,
   TableWebSocket,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
@@ -28,12 +31,23 @@ class TablesController {
 
     tables[table_id][username][instance] = ws;
 
+    if (!tablesUserData[table_id]) {
+      tablesUserData[table_id] = {};
+    }
+    if (!tablesUserData[table_id][username]) {
+      tablesUserData[table_id][username] = {
+        color: this.getRandomAvailableTableColor(table_id) ?? "tableTop",
+        seat: this.getNextAvailableTableSeat(table_id) ?? 17,
+      };
+    }
+
     this.broadcaster.broadcastToTable(table_id, {
       type: "userJoinedTable",
       header: {
         table_id,
         username,
         instance,
+        userData: tablesUserData[table_id],
       },
     });
   };
@@ -67,6 +81,67 @@ class TablesController {
       },
       [{ username, instance }]
     );
+  };
+
+  private getRandomAvailableTableColor = (
+    table_id: string
+  ): TableColors | null => {
+    const allColors: TableColors[] = [
+      "cyan",
+      "orange",
+      "blue",
+      "green",
+      "yellow",
+      "purple",
+      "pink",
+      "black",
+      "white",
+      "brown",
+      "lime",
+      "coral",
+      "gray",
+      "navy",
+      "lightBlue",
+      "tableTop",
+    ];
+
+    // Step 2: Collect colors already in use for the given table
+    const colorsAlreadyInUse: TableColors[] = [];
+    for (const username in tablesUserData[table_id]) {
+      colorsAlreadyInUse.push(tablesUserData[table_id][username].color);
+    }
+
+    // Step 3: Filter out used colors
+    const availableColors = allColors.filter(
+      (color) => !colorsAlreadyInUse.includes(color)
+    );
+
+    // Step 4: Return a random available color, or null if all colors are used
+    if (availableColors.length === 0) {
+      return null;
+    }
+    return availableColors[Math.floor(Math.random() * availableColors.length)];
+  };
+
+  private getNextAvailableTableSeat = (table_id: string): number | null => {
+    const seatsInUse = Object.keys(tablesUserData[table_id]).length + 1;
+    const seatingChart = tableSeatingChart[seatsInUse as 1];
+
+    const seatsAlreadTaken: number[] = [];
+    for (const username in tablesUserData[table_id]) {
+      seatsAlreadTaken.push(tablesUserData[table_id][username].seat);
+    }
+
+    // Step 3: Filter out used colors
+    const availableSeats = seatingChart.filter(
+      (seat) => !seatsAlreadTaken.includes(seat)
+    );
+
+    // Step 4: Return a random available color, or null if all colors are used
+    if (availableSeats.length === 0) {
+      return null;
+    }
+    return availableSeats[0];
   };
 }
 

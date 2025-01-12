@@ -26,15 +26,9 @@ export interface Tables {
   };
 }
 
-export interface TablesUserColors {
+export interface TablesUserData {
   [table_id: string]: {
-    [username: string]: TableColors;
-  };
-}
-
-export interface TablesSeating {
-  [table_id: string]: {
-    [username: string]: number;
+    [username: string]: { color: TableColors; seat: number };
   };
 }
 
@@ -90,27 +84,25 @@ export const tables: Tables = {};
 export const TableColorMap: {
   [tableColor in TableColors]: { primary: string; secondary: string };
 } = {
-  cyan: { primary: "", secondary: "" },
-  orange: { primary: "", secondary: "" },
-  blue: { primary: "", secondary: "" },
-  green: { primary: "", secondary: "" },
-  yellow: { primary: "", secondary: "" },
-  purple: { primary: "", secondary: "" },
-  pink: { primary: "", secondary: "" },
-  black: { primary: "", secondary: "" },
-  white: { primary: "", secondary: "" },
-  brown: { primary: "", secondary: "" },
-  lime: { primary: "", secondary: "" },
-  coral: { primary: "", secondary: "" },
-  gray: { primary: "", secondary: "" },
-  navy: { primary: "", secondary: "" },
-  lightBlue: { primary: "", secondary: "" },
-  tableTop: { primary: "", secondary: "" },
+  cyan: { primary: "#1a8ca2", secondary: "#336b7b" },
+  orange: { primary: "#f78528", secondary: "#ef6900" },
+  blue: { primary: "#1d69ca", secondary: "#1a1f6b" },
+  green: { primary: "#00763a", secondary: "#123324" },
+  yellow: { primary: "#e0c240", secondary: "#f7b705" },
+  purple: { primary: "#d4afdc", secondary: "#987fdd" },
+  pink: { primary: "#f77cf7", secondary: "#ed75d0" },
+  black: { primary: "#221d1e", secondary: "#0c0001" },
+  white: { primary: "#f6eded", secondary: "#e0d8d8" },
+  brown: { primary: "#5c423b", secondary: "#372b27" },
+  lime: { primary: "#bad95f", secondary: "#a0c15c" },
+  coral: { primary: "#f28a85", secondary: "#f7423b" },
+  gray: { primary: "#6a5d5e", secondary: "#483f40" },
+  navy: { primary: "#252c48", secondary: "#313246" },
+  lightBlue: { primary: "#88c3e7", secondary: "#61b4dd" },
+  tableTop: { primary: "#d40213", secondary: "#b10203" },
 };
 
-export const tablesUserColors: TablesUserColors = {};
-
-export const tablesSeating: TablesSeating = {};
+export const tablesUserData: TablesUserData = {};
 
 export const tableSeatingChart = {
   1: [1],
