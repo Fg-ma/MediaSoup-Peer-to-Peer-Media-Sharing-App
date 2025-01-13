@@ -1,5 +1,23 @@
 import { FgBackground } from "../fgElements/fgBackgroundSelector/lib/typeConstant";
 
+export type TableColors =
+  | "cyan"
+  | "orange"
+  | "blue"
+  | "green"
+  | "yellow"
+  | "purple"
+  | "pink"
+  | "black"
+  | "white"
+  | "brown"
+  | "lime"
+  | "coral"
+  | "gray"
+  | "navy"
+  | "lightBlue"
+  | "tableTop";
+
 type OutGoingTableMessages =
   | onJoinTableType
   | onLeaveTableType
@@ -33,11 +51,32 @@ type onChangeTableBackgroundType = {
   data: { background: FgBackground };
 };
 
-export type IncomingTableMessages = onTableBackgroundChangedType;
+export type IncomingTableMessages =
+  | onTableBackgroundChangedType
+  | onUserJoinedTableType
+  | onUserLeftTableType;
 
-type onTableBackgroundChangedType = {
+export type onTableBackgroundChangedType = {
   type: "tableBackgroundChanged";
   data: { background: FgBackground };
+};
+
+export type onUserJoinedTableType = {
+  type: "userJoinedTable";
+  data: {
+    userData: {
+      [username: string]: { color: TableColors; seat: number; online: boolean };
+    };
+  };
+};
+
+export type onUserLeftTableType = {
+  type: "userLeftTable";
+  data: {
+    userData: {
+      [username: string]: { color: TableColors; seat: number; online: boolean };
+    };
+  };
 };
 
 class TableSocketController {
@@ -74,7 +113,7 @@ class TableSocketController {
     this.ws.onmessage = (event: MessageEvent) => {
       this.messageListeners.forEach((listener) => {
         const message = JSON.parse(event.data);
-
+        console.log(message);
         listener(message as IncomingTableMessages);
       });
     };

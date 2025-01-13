@@ -28,7 +28,7 @@ export interface Tables {
 
 export interface TablesUserData {
   [table_id: string]: {
-    [username: string]: { color: TableColors; seat: number };
+    [username: string]: { color: TableColors; seat: number; online: boolean };
   };
 }
 

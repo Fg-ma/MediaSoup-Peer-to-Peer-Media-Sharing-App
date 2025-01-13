@@ -1,8 +1,26 @@
+import {
+  IncomingTableMessages,
+  onUserJoinedTableType,
+  onUserLeftTableType,
+  TableColors,
+} from "../../lib/TableSocketController";
+
 class FgTableController {
   constructor(
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
     private tableRef: React.RefObject<HTMLDivElement>,
-    private aspectDir: React.MutableRefObject<"width" | "height">
+    private setUserData: React.Dispatch<
+      React.SetStateAction<{
+        [username: string]: {
+          color: TableColors;
+          seat: number;
+          online: boolean;
+        };
+      }>
+    >,
+    private aspectDir: React.MutableRefObject<"width" | "height">,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   getAspectDir = () => {
@@ -23,6 +41,31 @@ class FgTableController {
         this.setRerender((prev) => !prev);
       }
     }
+  };
+
+  handleTableMessage = (event: IncomingTableMessages) => {
+    switch (event.type) {
+      case "userJoinedTable":
+        this.onUserJoinedTable(event);
+        break;
+      case "userLeftTable":
+        this.onUserLeftTable(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  onUserJoinedTable = (event: onUserJoinedTableType) => {
+    const { userData } = event.data;
+
+    this.setUserData(userData);
+  };
+
+  onUserLeftTable = (event: onUserLeftTableType) => {
+    const { userData } = event.data;
+
+    this.setUserData(userData);
   };
 }
 

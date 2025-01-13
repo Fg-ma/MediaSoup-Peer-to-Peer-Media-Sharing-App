@@ -38,15 +38,13 @@ class TablesController {
       tablesUserData[table_id][username] = {
         color: this.getRandomAvailableTableColor(table_id) ?? "tableTop",
         seat: this.getNextAvailableTableSeat(table_id) ?? 17,
+        online: true,
       };
     }
 
     this.broadcaster.broadcastToTable(table_id, {
       type: "userJoinedTable",
-      header: {
-        table_id,
-        username,
-        instance,
+      data: {
         userData: tablesUserData[table_id],
       },
     });
@@ -65,7 +63,9 @@ class TablesController {
 
     this.broadcaster.broadcastToTable(table_id, {
       type: "userLeftTable",
-      header: { table_id, username, instance },
+      data: {
+        userData: tablesUserData[table_id],
+      },
     });
   };
 
