@@ -1,6 +1,7 @@
 import React from "react";
 import { TableColors } from "../../lib/TableSocketController";
-import FgImage from "../../fgElements/fgImageElement/FgImageElement";
+import UserBubble from "./UserBubble";
+import { tableColorMap } from "../FgTable";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -31,10 +32,13 @@ export default function BottomTableSection({
         bottomUsers.length > 1 ? "justify-between" : "justify-center"
       }`}
     >
-      {bottomUsers.map(() => (
-        <div className='h-full aspect-square rounded-full border-2 border-red-500 overflow-hidden'>
-          <FgImage src={alien_960x960} srcLoading={alien_64x64} />
-        </div>
+      {bottomUsers.map((user) => (
+        <UserBubble
+          src={alien_960x960}
+          srcLoading={alien_64x64}
+          primaryColor={tableColorMap[user[1].color].primary}
+          secondaryColor={tableColorMap[user[1].color].secondary}
+        />
       ))}
     </div>
   );

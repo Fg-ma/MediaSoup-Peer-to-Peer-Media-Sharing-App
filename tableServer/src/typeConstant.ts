@@ -81,7 +81,7 @@ export type onChangeTableBackgroundType = {
 
 export const tables: Tables = {};
 
-export const TableColorMap: {
+export const tableColorMap: {
   [tableColor in TableColors]: { primary: string; secondary: string };
 } = {
   cyan: { primary: "#1a8ca2", secondary: "#336b7b" },
