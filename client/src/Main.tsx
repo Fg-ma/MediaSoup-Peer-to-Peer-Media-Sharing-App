@@ -24,6 +24,7 @@ import FgTable from "./fgTable/FgTable";
 import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 import PermissionsController from "./lib/PermissionsController";
 import CleanupController from "./lib/CleanupController";
+import JoinTableSection from "./joinTableSection/JoinTableSection";
 import "./scrollbar.css";
 
 export default function Main() {
@@ -305,50 +306,7 @@ export default function Main() {
   );
 
   return (
-    <div className='w-screen h-screen flex-col space-y-3 flex-wrap p-5 overflow-hidden'>
-      <FgTableFunctions
-        table_id={table_id}
-        username={username}
-        instance={instance}
-        device={device}
-        producerTransport={producerTransport}
-        consumerTransport={consumerTransport}
-        tableTopRef={tableTopRef}
-        setBundles={setBundles}
-        isCamera={isCamera}
-        cameraActive={cameraActive}
-        setCameraActive={setCameraActive}
-        cameraBtnRef={cameraBtnRef}
-        newCameraBtnRef={newCameraBtnRef}
-        isScreen={isScreen}
-        screenActive={screenActive}
-        setScreenActive={setScreenActive}
-        screenBtnRef={screenBtnRef}
-        newScreenBtnRef={newScreenBtnRef}
-        setMutedAudio={setMutedAudio}
-        mutedAudioRef={mutedAudioRef}
-        isAudio={isAudio}
-        audioActive={audioActive}
-        setAudioActive={setAudioActive}
-        audioBtnRef={audioBtnRef}
-        isSubscribed={isSubscribed}
-        muteAudio={muteAudio}
-        handleDisableEnableBtns={handleDisableEnableBtns}
-        bundles={bundles}
-        bundlesController={bundlesController}
-        gridActive={gridActive}
-        setGridActive={setGridActive}
-        gridSize={gridSize}
-        setGridSize={setGridSize}
-        producersController={producersController}
-        consumersController={consumersController}
-        permissionsController={permissionsController}
-        metadata={metadata}
-        userDevice={userDevice}
-        deadbanding={deadbanding}
-        cleanupController={cleanupController}
-        setRerender={setRerender}
-      />
+    <div className='w-screen h-screen flex flex-col space-y-[1.5%] p-[1.5%] overflow-hidden bg-fg-tone-black-1'>
       <FgTable
         table_id={table_id}
         username={username}
@@ -360,6 +318,64 @@ export default function Main() {
         gridSize={gridSize}
         userDevice={userDevice}
         deadbanding={deadbanding}
+      />
+      <FgTableFunctions
+        table_id={table_id}
+        username={username}
+        instance={instance}
+        device={device}
+        tableTopRef={tableTopRef}
+        isCamera={isCamera}
+        cameraActive={cameraActive}
+        setCameraActive={setCameraActive}
+        cameraBtnRef={cameraBtnRef}
+        newCameraBtnRef={newCameraBtnRef}
+        isScreen={isScreen}
+        screenActive={screenActive}
+        setScreenActive={setScreenActive}
+        screenBtnRef={screenBtnRef}
+        newScreenBtnRef={newScreenBtnRef}
+        mutedAudioRef={mutedAudioRef}
+        isAudio={isAudio}
+        audioActive={audioActive}
+        setAudioActive={setAudioActive}
+        audioBtnRef={audioBtnRef}
+        muteAudio={muteAudio}
+        handleDisableEnableBtns={handleDisableEnableBtns}
+        gridActive={gridActive}
+        setGridActive={setGridActive}
+        gridSize={gridSize}
+        setGridSize={setGridSize}
+        producersController={producersController}
+      />
+      <JoinTableSection
+        table_id={table_id}
+        username={username}
+        instance={instance}
+        device={device}
+        producerTransport={producerTransport}
+        consumerTransport={consumerTransport}
+        setBundles={setBundles}
+        isCamera={isCamera}
+        setCameraActive={setCameraActive}
+        isScreen={isScreen}
+        setScreenActive={setScreenActive}
+        setMutedAudio={setMutedAudio}
+        mutedAudioRef={mutedAudioRef}
+        isAudio={isAudio}
+        setAudioActive={setAudioActive}
+        isSubscribed={isSubscribed}
+        handleDisableEnableBtns={handleDisableEnableBtns}
+        bundles={bundles}
+        bundlesController={bundlesController}
+        producersController={producersController}
+        consumersController={consumersController}
+        permissionsController={permissionsController}
+        metadata={metadata}
+        userDevice={userDevice}
+        deadbanding={deadbanding}
+        cleanupController={cleanupController}
+        setRerender={setRerender}
       />
     </div>
   );

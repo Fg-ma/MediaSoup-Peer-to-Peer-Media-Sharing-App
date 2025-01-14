@@ -59,7 +59,7 @@ export default function CameraSection({
   );
 
   return (
-    <div className='flex space-x-4 mx-2 h-full'>
+    <div className='h-full flex space-x-4'>
       <FgButton
         externalRef={cameraBtnRef}
         clickFunction={() => cameraSectionController.shareCamera()}
@@ -67,7 +67,7 @@ export default function CameraSection({
           cameraActive
             ? "bg-orange-500 hover:bg-orange-700"
             : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold p-1 disabled:opacity-25`}
+        } text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
         contentFunction={() => {
           if (cameraActive) {
             return (
@@ -105,8 +105,8 @@ export default function CameraSection({
         externalRef={newCameraBtnRef}
         clickFunction={() => cameraSectionController.shareNewCamera()}
         className={`${
-          cameraActive ? "visible" : "hidden"
-        } bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25`}
+          cameraActive ? "" : "hidden"
+        } bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
         contentFunction={() => (
           <FgSVG
             src={shareCameraIcon}

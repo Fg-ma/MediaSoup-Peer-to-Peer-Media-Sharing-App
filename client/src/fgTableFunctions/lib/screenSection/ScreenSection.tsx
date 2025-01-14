@@ -59,7 +59,7 @@ export default function ScreenSection({
   );
 
   return (
-    <div className='flex space-x-4 mx-2 h-full'>
+    <div className='flex space-x-4 h-full'>
       <FgButton
         externalRef={screenBtnRef}
         clickFunction={() => screenSectionController.shareScreen()}
@@ -67,7 +67,7 @@ export default function ScreenSection({
           screenActive
             ? "bg-orange-500 hover:bg-orange-700"
             : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold p-1 disabled:opacity-25`}
+        } text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
         contentFunction={() => {
           if (screenActive) {
             return (
@@ -106,7 +106,7 @@ export default function ScreenSection({
         clickFunction={() => screenSectionController.shareNewScreen()}
         className={`${
           screenActive ? "visible" : "hidden"
-        } bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25`}
+        } bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
         contentFunction={() => (
           <FgSVG
             src={shareScreenIcon}

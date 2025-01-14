@@ -52,7 +52,7 @@ export default function GamesSection({
           gamesActive
             ? "bg-orange-500 hover:bg-orange-700"
             : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold p-1 disabled:opacity-25`}
+        } text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
         contentFunction={() => {
           return (
             <FgSVG

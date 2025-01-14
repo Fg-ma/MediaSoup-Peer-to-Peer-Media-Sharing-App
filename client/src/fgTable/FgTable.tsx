@@ -72,6 +72,7 @@ export default function FgTable({
   }>({});
   const [_rerender, setRerender] = useState(false);
   const aspectDir = useRef<"width" | "height">("width");
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const fgTableController = new FgTableController(
     username,
@@ -124,15 +125,16 @@ export default function FgTable({
   }, [tableSocket.current]);
 
   return (
-    <div
-      className='w-full flex flex-col'
-      style={{
-        height: "calc(100% - 8rem)",
-      }}
-    >
-      <TopTableSection userData={userData} />
-      <div className='w-full flex' style={{ height: "40rem" }}>
-        <LeftTableSection userData={userData} />
+    <div ref={tableContainerRef} className='grow h-1 w-full flex flex-col'>
+      <TopTableSection
+        userData={userData}
+        tableContainerRef={tableContainerRef}
+      />
+      <div className='w-full flex' style={{ height: "1px", flexGrow: "1" }}>
+        <LeftTableSection
+          userData={userData}
+          tableContainerRef={tableContainerRef}
+        />
         <FgScrollbarElement
           direction={aspectDir.current === "width" ? "vertical" : "horizontal"}
           scrollingContentRef={tableRef}
@@ -147,7 +149,7 @@ export default function FgTable({
             >
               <div
                 ref={tableTopRef}
-                className='relative bg-fg-white-65 aspect-square overflow-hidden'
+                className='relative bg-fg-tone-black-6 aspect-square overflow-hidden'
                 style={{
                   ...(aspectDir.current === "width"
                     ? { width: "100%" }
@@ -192,9 +194,15 @@ export default function FgTable({
             flexGrow: "1",
           }}
         />
-        <RightTableSection userData={userData} />
+        <RightTableSection
+          userData={userData}
+          tableContainerRef={tableContainerRef}
+        />
       </div>
-      <BottomTableSection userData={userData} />
+      <BottomTableSection
+        userData={userData}
+        tableContainerRef={tableContainerRef}
+      />
     </div>
   );
 }

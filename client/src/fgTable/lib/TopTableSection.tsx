@@ -12,6 +12,7 @@ const alien_64x64 =
 
 export default function TopTableSection({
   userData,
+  tableContainerRef,
 }: {
   userData: {
     [username: string]: {
@@ -20,7 +21,12 @@ export default function TopTableSection({
       online: boolean;
     };
   };
+  tableContainerRef: React.RefObject<HTMLDivElement>;
 }) {
+  const minDimension = Math.min(
+    tableContainerRef.current?.clientWidth ?? 0,
+    tableContainerRef.current?.clientHeight ?? 0
+  );
   const topSeats = [1, 2, 3, 4];
   const topUsers = Object.entries(userData).filter((data) =>
     topSeats.includes(data[1].seat)
@@ -28,18 +34,31 @@ export default function TopTableSection({
 
   return (
     <div
-      className={`w-full h-max max-h-[8%] flex items-center mb-[1%] ${
+      className={`w-full h-max flex items-center ${
         topUsers.length > 1 ? "justify-between" : "justify-center"
       }`}
+      style={{
+        maxHeight: `${minDimension * 0.08}px`,
+        ...(Object.keys(userData).length >= 4 && {
+          paddingLeft: `${minDimension * 0.08}px`,
+          paddingRight: `${minDimension * 0.08}px`,
+        }),
+        ...(topUsers.length !== 0 && {
+          marginBottom: `${minDimension * 0.01}px`,
+        }),
+      }}
     >
+      <div></div>
       {topUsers.map((user) => (
         <UserBubble
+          fullDim='height'
           src={alien_960x960}
           srcLoading={alien_64x64}
           primaryColor={tableColorMap[user[1].color].primary}
           secondaryColor={tableColorMap[user[1].color].secondary}
         />
       ))}
+      <div></div>
     </div>
   );
 }

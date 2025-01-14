@@ -31,6 +31,8 @@ class TablesController {
 
     tables[table_id][username][instance] = ws;
 
+    this.performSeatSwaps(table_id);
+
     if (!tablesUserData[table_id]) {
       tablesUserData[table_id] = {};
     }
@@ -83,6 +85,25 @@ class TablesController {
     );
   };
 
+  private performSeatSwaps = (table_id: string) => {
+    const tableData = tablesUserData[table_id];
+
+    if (!tableData) return;
+
+    const seatsInUse = Object.keys(tableData).length + 1;
+    const swaps = tableSeatingChart[seatsInUse as 1 | 4]?.swaps || [];
+
+    if (swaps.length === 0) return;
+
+    for (const username in tableData) {
+      const user = tableData[username];
+      const swap = swaps.find((swap) => swap.from === user.seat);
+      if (swap) {
+        user.seat = swap.to;
+      }
+    }
+  };
+
   private getRandomAvailableTableColor = (
     table_id: string
   ): TableColors | null => {
@@ -125,7 +146,7 @@ class TablesController {
 
   private getNextAvailableTableSeat = (table_id: string): number | null => {
     const seatsInUse = Object.keys(tablesUserData[table_id]).length + 1;
-    const seatingChart = tableSeatingChart[seatsInUse as 1];
+    const seatingChart = tableSeatingChart[seatsInUse as 1].seats;
 
     const seatsAlreadTaken: number[] = [];
     for (const username in tablesUserData[table_id]) {

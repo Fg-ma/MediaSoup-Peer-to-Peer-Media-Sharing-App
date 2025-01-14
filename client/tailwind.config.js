@@ -30,6 +30,26 @@ export default {
         "fg-black-15": "#262626",
         "fg-black-10": "#1A1A1A",
         "fg-black-5": "#0D0D0D",
+
+        "fg-red-dark": "#b20203",
+        "fg-red": "#e80110",
+        "fg-red-light": "#e32532",
+
+        "fg-orange-dark": "#e75707",
+        "fg-orange": "#f6630f",
+        "fg-orange-light": "#f97c02",
+
+        "fg-white": "#f2f2f2",
+        "fg-off-white": "#d6d6d6",
+
+        "fg-tone-black-1": "#090909",
+        "fg-tone-black-2": "#161616",
+        "fg-tone-black-3": "#1a1a1a",
+        "fg-tone-black-4": "#212121",
+        "fg-tone-black-5": "#313131",
+        "fg-tone-black-6": "#3e3e3e",
+        "fg-tone-black-7": "#515151",
+        "fg-tone-black-8": "#696969",
       },
       fontFamily: {
         Josefin: ["Josefin", "sans"],
