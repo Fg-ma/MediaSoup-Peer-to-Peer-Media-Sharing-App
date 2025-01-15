@@ -1,13 +1,14 @@
 import React, { Suspense } from "react";
-import GamesSection from "../gamesSection/GamesSection";
-import FgBackgroundSelector from "../../../fgElements/fgBackgroundSelector/FgBackgroundSelector";
-import TableGridButton from "../tableGridButton/TableGridButton";
-import { FgBackground } from "../../../fgElements/fgBackgroundSelector/lib/typeConstant";
 import { AudioEffectTypes } from "../../../context/effectsContext/typeConstant";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../../../context/permissionsContext/PermissionsContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
+import GamesSection from "../gamesSection/GamesSection";
+import FgBackgroundSelector from "../../../fgElements/fgBackgroundSelector/FgBackgroundSelector";
+import TableGridButton from "../tableGridButton/TableGridButton";
+import { FgBackground } from "../../../fgElements/fgBackgroundSelector/lib/typeConstant";
 import TableGridSizeButton from "../tableGrisSizeButton/TableGridSizeButton";
+import FgPanel from "../../../fgElements/fgPanel/FgPanel";
 
 const AudioEffectsButton = React.lazy(
   () => import("../../../audioEffectsButton/AudioEffectsButton")
@@ -18,8 +19,10 @@ export default function MoreTableFunctionsSection({
   username,
   instance,
   tableTopRef,
+  moreTableFunctionsButtonRef,
   mutedAudioRef,
   isAudio,
+  setMoreTableFunctionsActive,
   gridActive,
   setGridActive,
   gridSize,
@@ -34,8 +37,10 @@ export default function MoreTableFunctionsSection({
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;
   tableTopRef: React.RefObject<HTMLDivElement>;
+  moreTableFunctionsButtonRef: React.RefObject<HTMLButtonElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
   isAudio: React.MutableRefObject<boolean>;
+  setMoreTableFunctionsActive: React.Dispatch<React.SetStateAction<boolean>>;
   gridActive: boolean;
   setGridActive: React.Dispatch<React.SetStateAction<boolean>>;
   gridSize: {
@@ -88,44 +93,62 @@ export default function MoreTableFunctionsSection({
   };
 
   return (
-    <div className='mb-2 grid grid-cols-3 w-[24vw] h-80 bg-white p-3 gap-2'>
-      <GamesSection
-        table_id={table_id.current}
-        username={username.current}
-        instance={instance.current}
-      />
-      <FgBackgroundSelector
-        backgroundRef={tableTopRef}
-        defaultActiveBackground={tableBackground}
-        backgroundChangeFunction={(background: FgBackground) => {
-          if (externalBackgroundChange.current) {
-            externalBackgroundChange.current = false;
-          } else {
-            tableSocket.current?.changeTableBackground(background);
-          }
-        }}
-      />
-      <TableGridButton gridActive={gridActive} setGridActive={setGridActive} />
-      <TableGridSizeButton gridSize={gridSize} setGridSize={setGridSize} />
-      {isAudio.current && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <AudioEffectsButton
+    <FgPanel
+      content={
+        <div className='mb-2 grid grid-cols-3 w-full h-full bg-white p-3 gap-2 overflow-y-auto small-vertical-scroll-bar'>
+          <GamesSection
             table_id={table_id.current}
             username={username.current}
             instance={instance.current}
-            isUser={true}
-            permissions={permissions.current}
-            producerType={"audio"}
-            producerId={undefined}
-            audioEffectsActive={audioEffectsActive}
-            setAudioEffectsActive={setAudioEffectsActive}
-            handleAudioEffectChange={handleExternalAudioEffectChange}
-            handleMute={handleExternalMute}
-            muteStateRef={mutedAudioRef}
-            options={{ color: "black", placement: "below" }}
           />
-        </Suspense>
-      )}
-    </div>
+          <FgBackgroundSelector
+            backgroundRef={tableTopRef}
+            defaultActiveBackground={tableBackground}
+            backgroundChangeFunction={(background: FgBackground) => {
+              if (externalBackgroundChange.current) {
+                externalBackgroundChange.current = false;
+              } else {
+                tableSocket.current?.changeTableBackground(background);
+              }
+            }}
+          />
+          <TableGridButton
+            gridActive={gridActive}
+            setGridActive={setGridActive}
+          />
+          <TableGridSizeButton gridSize={gridSize} setGridSize={setGridSize} />
+          {isAudio.current && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <AudioEffectsButton
+                table_id={table_id.current}
+                username={username.current}
+                instance={instance.current}
+                isUser={true}
+                permissions={permissions.current}
+                producerType={"audio"}
+                producerId={undefined}
+                audioEffectsActive={audioEffectsActive}
+                setAudioEffectsActive={setAudioEffectsActive}
+                handleAudioEffectChange={handleExternalAudioEffectChange}
+                handleMute={handleExternalMute}
+                muteStateRef={mutedAudioRef}
+                options={{ color: "black", placement: "below" }}
+              />
+            </Suspense>
+          )}
+        </div>
+      }
+      initPosition={{
+        referenceElement: moreTableFunctionsButtonRef.current ?? undefined,
+        placement: "above",
+        padding: 8,
+      }}
+      initWidth={"24vw"}
+      initHeight={"400px"}
+      minWidth={200}
+      minHeight={200}
+      closeCallback={() => setMoreTableFunctionsActive(false)}
+      closePosition='topRight'
+    />
   );
 }

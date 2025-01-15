@@ -46,7 +46,7 @@ class FgPortalController {
         top = externalRect.top + externalRect.height + space;
 
         // Check if it goes off screen and set to bottom of screen if so
-        if (top + this.portalRef.current.clientHeight > viewportHeight) {
+        if (top + portalHeight > viewportHeight) {
           top = viewportHeight - portalHeight;
         }
       }
@@ -54,7 +54,7 @@ class FgPortalController {
       top = externalRect.top + externalRect.height + space;
 
       // Check if it goes off the screen below, then switch to above
-      if (top + this.portalRef.current.clientHeight > viewportHeight) {
+      if (top + portalHeight > viewportHeight) {
         top = externalRect.top - portalHeight - space;
 
         // Check if it goes off screen and set to zero if so

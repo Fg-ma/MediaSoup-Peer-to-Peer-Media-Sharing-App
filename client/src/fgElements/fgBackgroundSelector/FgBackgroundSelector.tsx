@@ -33,21 +33,35 @@ export default function FgBackgroundSelector({
   const backgroundSelectorBtnRef = useRef<HTMLButtonElement>(null);
 
   const changeBackground = () => {
-    if (!backgroundRef.current || activeBackground.categorySelection === "") {
+    if (!backgroundRef.current) {
+      return;
+    }
+
+    if (activeBackground.categorySelection === "") {
+      backgroundRef.current.style.imageRendering = "";
+      backgroundRef.current.style.backgroundImage = "";
+      backgroundRef.current.style.backgroundSize = "";
+      backgroundRef.current.style.backgroundPosition = "";
+      backgroundRef.current.style.backgroundRepeat = "";
       return;
     }
 
     if (activeBackground.category !== "") {
-      backgroundRef.current.style.backgroundImage =
-        categories[activeBackground.category] &&
+      const background =
         // @ts-expect-error: correlation error
-        categories[activeBackground.category][
+        categories[activeBackground.category]?.[
           activeBackground.categorySelection
-        ]
-          ? // prettier-ignore
-            // @ts-expect-error: correlation error
-            `url(${categories[activeBackground.category][activeBackground.categorySelection].url})`
-          : "";
+        ];
+
+      backgroundRef.current.style.backgroundImage = background
+        ? // prettier-ignore
+          `url(${background.url})`
+        : "";
+      if (background.pixelated) {
+        backgroundRef.current.style.imageRendering = "pixelated";
+      } else {
+        backgroundRef.current.style.imageRendering = "auto";
+      }
     } else {
       // prettier-ignore
       backgroundRef.current.style.backgroundImage = `url(${imports[activeBackground.categorySelection].url})`;

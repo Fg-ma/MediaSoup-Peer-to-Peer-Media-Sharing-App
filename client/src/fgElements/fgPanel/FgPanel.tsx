@@ -138,46 +138,82 @@ export default function FgPanel({
       return;
     }
 
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
     const referenceRect = initPosition.referenceElement.getBoundingClientRect();
+    const panelHeight = panelRef.current.clientHeight;
+    const panelWidth = panelRef.current.clientWidth;
 
     let top: number;
     if (initPosition.placement === "above") {
-      top = referenceRect.top - panelRef.current.clientHeight;
+      top = referenceRect.top - panelHeight - (initPosition.padding ?? 0);
 
-      if (initPosition.padding) {
-        top -= initPosition.padding;
+      // Check if it goes off the screen above, then switch to below
+      if (top < 0) {
+        top = referenceRect.bottom + (initPosition.padding ?? 0);
+
+        // Check if it goes off screen and set to bottom of screen if so
+        if (top + panelHeight > viewportHeight) {
+          top = viewportHeight - panelHeight;
+        }
       }
     } else if (initPosition.placement === "below") {
-      top = referenceRect.bottom;
+      top = referenceRect.bottom + (initPosition.padding ?? 0);
 
-      if (initPosition.padding) {
-        top += initPosition.padding;
+      // Check if it goes off the screen below, then switch to above
+      if (top + panelHeight > viewportHeight) {
+        top = referenceRect.top - panelHeight - (initPosition.padding ?? 0);
+
+        // Check if it goes off screen and set to zero if so
+        if (top < 0) {
+          top = 0;
+        }
       }
     } else {
       top =
         referenceRect.top +
         referenceRect.height / 2 -
         panelRef.current.clientHeight / 2;
+
+      // Constrain vertically
+      if (top < 0) top = 0;
+      if (top + panelHeight > viewportHeight)
+        top = viewportHeight - panelHeight;
     }
 
     let left: number;
     if (initPosition.placement === "left") {
-      left = referenceRect.left - panelRef.current.clientWidth;
+      left = referenceRect.left - panelWidth - (initPosition.padding ?? 0);
 
-      if (initPosition.padding) {
-        left -= initPosition.padding;
+      // Check if it goes off the screen left, switch to right
+      if (left < 0) {
+        left = referenceRect.right + (initPosition.padding ?? 0);
+
+        if (left + panelWidth > viewportWidth) {
+          left = viewportWidth - panelWidth; // Stick to right edge
+        }
       }
     } else if (initPosition.placement === "right") {
-      left = referenceRect.right;
+      left = referenceRect.right + (initPosition.padding ?? 0);
 
-      if (initPosition.padding) {
-        left += initPosition.padding;
+      // Check if it goes off the screen right, switch to left
+      if (left + panelWidth > viewportWidth) {
+        left = referenceRect.left - panelWidth - (initPosition.padding ?? 0);
+
+        if (left < 0) {
+          left = 0; // Stick to left edge
+        }
       }
     } else {
       left =
         referenceRect.left +
         referenceRect.width / 2 -
         panelRef.current.clientWidth / 2;
+
+      // Constrain horizontally
+      if (left < 0) left = 0;
+      if (left + panelWidth > viewportWidth) left = viewportWidth - panelWidth;
     }
 
     setPosition({ x: left, y: top });

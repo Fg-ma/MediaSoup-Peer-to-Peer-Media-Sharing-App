@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import MoreTableFunctionsSection from "../moreTableFunctionsSection/MoreTableFunctionsSection";
@@ -51,38 +51,45 @@ export default function MoreTableFunctionsButton({
 }) {
   const [moreTableFunctionsActive, setMoreTableFunctionsActive] =
     useState(false);
+  const moreTableFunctionsButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <FgButton
-      className='h-full aspect-square bg-transparent'
-      contentFunction={() => {
-        return (
-          <FgSVG
-            src={additionIcon}
-            className='h-full aspect-square'
-            attributes={[
-              { key: "width", value: "100%" },
-              { key: "height", value: "100%" },
-              { key: "fill", value: "#e80110" },
-            ]}
-            style={{
-              transition: "transform 0.1s ease",
-              ...(moreTableFunctionsActive
-                ? { transform: "rotate(45deg)" }
-                : {}),
-            }}
-          />
-        );
-      }}
-      setExternalClickToggleState={setMoreTableFunctionsActive}
-      toggleClickContent={
+    <>
+      <FgButton
+        externalRef={moreTableFunctionsButtonRef}
+        className='h-full aspect-square bg-transparent'
+        clickFunction={() => setMoreTableFunctionsActive((prev) => !prev)}
+        contentFunction={() => {
+          return (
+            <FgSVG
+              src={additionIcon}
+              className='h-full aspect-square'
+              attributes={[
+                { key: "width", value: "100%" },
+                { key: "height", value: "100%" },
+                { key: "fill", value: "#e80110" },
+              ]}
+              style={{
+                transition: "transform 0.1s ease",
+                ...(moreTableFunctionsActive
+                  ? { transform: "rotate(45deg)" }
+                  : {}),
+              }}
+            />
+          );
+        }}
+        setExternalClickToggleState={setMoreTableFunctionsActive}
+      />
+      {moreTableFunctionsActive && (
         <MoreTableFunctionsSection
           table_id={table_id}
           username={username}
           instance={instance}
           tableTopRef={tableTopRef}
+          moreTableFunctionsButtonRef={moreTableFunctionsButtonRef}
           mutedAudioRef={mutedAudioRef}
           isAudio={isAudio}
+          setMoreTableFunctionsActive={setMoreTableFunctionsActive}
           gridActive={gridActive}
           setGridActive={setGridActive}
           gridSize={gridSize}
@@ -93,8 +100,7 @@ export default function MoreTableFunctionsButton({
           externalBackgroundChange={externalBackgroundChange}
           handleExternalMute={handleExternalMute}
         />
-      }
-      options={{ toggleClickCloseWhenOutside: false }}
-    />
+      )}
+    </>
   );
 }
