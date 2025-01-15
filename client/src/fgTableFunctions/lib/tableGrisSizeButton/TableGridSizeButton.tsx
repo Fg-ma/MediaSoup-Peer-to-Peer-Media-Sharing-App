@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import TableGridSizePanel from "./lib/TableGridSizePanel";
+import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -26,7 +27,7 @@ export default function TableGridSizeButton({
   const tableGridSizeButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <div>
+    <>
       <FgButton
         externalRef={tableGridSizeButtonRef}
         className='h-full aspect-square'
@@ -46,6 +47,8 @@ export default function TableGridSizeButton({
             }}
           />
         )}
+        hoverContent={<FgHoverContentStandard content='Change grid size' />}
+        options={{ hoverTimeoutDuration: 750 }}
       />
       {gridSizePanelActive && (
         <TableGridSizePanel
@@ -55,6 +58,6 @@ export default function TableGridSizeButton({
           setGridSize={setGridSize}
         />
       )}
-    </div>
+    </>
   );
 }

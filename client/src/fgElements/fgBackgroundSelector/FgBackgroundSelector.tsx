@@ -16,10 +16,12 @@ export default function FgBackgroundSelector({
   backgroundRef,
   defaultActiveBackground,
   backgroundChangeFunction,
+  hoverType = "below",
 }: {
   backgroundRef: React.RefObject<HTMLDivElement>;
   defaultActiveBackground?: FgBackground;
   backgroundChangeFunction?: (background: FgBackground) => void;
+  hoverType?: "below" | "above";
 }) {
   const [activeBackground, setActiveBackground] = useState<
     { category: ""; categorySelection: string } | FgBackground
@@ -107,13 +109,13 @@ export default function FgBackgroundSelector({
         clickFunction={() => setBackgroundSelectorPanelActive((prev) => !prev)}
         hoverContent={
           backgroundSelectorPanelActive ? (
-            <FgHoverContentStandard content='Background selector' />
-          ) : (
             <></>
+          ) : (
+            <FgHoverContentStandard content='Background selector' />
           )
         }
         className='flex items-center justify-center h-full aspect-square relative'
-        options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
+        options={{ hoverType: hoverType, hoverTimeoutDuration: 750 }}
       />
       {backgroundSelectorPanelActive && (
         <BackgroundSelectorPanel

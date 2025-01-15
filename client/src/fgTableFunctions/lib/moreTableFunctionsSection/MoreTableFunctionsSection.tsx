@@ -95,47 +95,62 @@ export default function MoreTableFunctionsSection({
   return (
     <FgPanel
       content={
-        <div className='mb-2 grid grid-cols-3 w-full h-full bg-white p-3 gap-2 overflow-y-auto small-vertical-scroll-bar'>
-          <GamesSection
-            table_id={table_id.current}
-            username={username.current}
-            instance={instance.current}
-          />
-          <FgBackgroundSelector
-            backgroundRef={tableTopRef}
-            defaultActiveBackground={tableBackground}
-            backgroundChangeFunction={(background: FgBackground) => {
-              if (externalBackgroundChange.current) {
-                externalBackgroundChange.current = false;
-              } else {
-                tableSocket.current?.changeTableBackground(background);
-              }
-            }}
-          />
-          <TableGridButton
-            gridActive={gridActive}
-            setGridActive={setGridActive}
-          />
-          <TableGridSizeButton gridSize={gridSize} setGridSize={setGridSize} />
-          {isAudio.current && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <AudioEffectsButton
-                table_id={table_id.current}
-                username={username.current}
-                instance={instance.current}
-                isUser={true}
-                permissions={permissions.current}
-                producerType={"audio"}
-                producerId={undefined}
-                audioEffectsActive={audioEffectsActive}
-                setAudioEffectsActive={setAudioEffectsActive}
-                handleAudioEffectChange={handleExternalAudioEffectChange}
-                handleMute={handleExternalMute}
-                muteStateRef={mutedAudioRef}
-                options={{ color: "black", placement: "below" }}
-              />
-            </Suspense>
-          )}
+        <div className='w-full h-full overflow-y-auto small-vertical-scroll-bar'>
+          <div className='grid grid-cols-3 w-full my-2 h-max gap-3'>
+            <GamesSection
+              table_id={table_id.current}
+              username={username.current}
+              instance={instance.current}
+            />
+            <FgBackgroundSelector
+              backgroundRef={tableTopRef}
+              defaultActiveBackground={tableBackground}
+              backgroundChangeFunction={(background: FgBackground) => {
+                if (externalBackgroundChange.current) {
+                  externalBackgroundChange.current = false;
+                } else {
+                  tableSocket.current?.changeTableBackground(background);
+                }
+              }}
+              hoverType='above'
+            />
+            <TableGridButton
+              gridActive={gridActive}
+              setGridActive={setGridActive}
+            />
+            <TableGridSizeButton
+              gridSize={gridSize}
+              setGridSize={setGridSize}
+            />
+            {isAudio.current && (
+              <Suspense fallback={<div>Loading...</div>}>
+                <AudioEffectsButton
+                  table_id={table_id.current}
+                  username={username.current}
+                  instance={instance.current}
+                  isUser={true}
+                  permissions={permissions.current}
+                  producerType={"audio"}
+                  producerId={undefined}
+                  audioEffectsActive={audioEffectsActive}
+                  setAudioEffectsActive={setAudioEffectsActive}
+                  handleAudioEffectChange={handleExternalAudioEffectChange}
+                  handleMute={handleExternalMute}
+                  muteStateRef={mutedAudioRef}
+                  options={{
+                    color: "black",
+                    placement: "below",
+                    hoverTimeoutDuration: 750,
+                  }}
+                />
+              </Suspense>
+            )}
+            {
+              // Clock
+              // Weather
+              // compass
+            }
+          </div>
         </div>
       }
       initPosition={{
@@ -143,12 +158,13 @@ export default function MoreTableFunctionsSection({
         placement: "above",
         padding: 8,
       }}
-      initWidth={"24vw"}
-      initHeight={"400px"}
+      initWidth={"300px"}
+      initHeight={"230px"}
       minWidth={200}
-      minHeight={200}
+      minHeight={80}
       closeCallback={() => setMoreTableFunctionsActive(false)}
       closePosition='topRight'
+      shadow={{ top: true, bottom: true }}
     />
   );
 }

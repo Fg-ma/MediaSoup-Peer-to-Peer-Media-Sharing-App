@@ -16,21 +16,25 @@
 }
 
 .fg-scrollbar-track {
-  background-color: #e6e6e6;
+  background-color: #d6d6d6;
   border-radius: 5px;
   position: relative;
   pointer-events: auto;
 }
 
 .fg-scrollbar-thumb {
-  background-color: #333333;
+  background-color: #161616;
   border-radius: 5px;
   position: absolute;
   pointer-events: auto;
 }
 
 .fg-scrollbar-thumb:hover {
-  background-color: #262626;
+  background-color: #212121;
+}
+
+.fg-scrollbar-thumb.fg-scrollbar-thumb-pressed {
+  background-color: #212121;
 }
 
 .fg-scrollbar-track:hover {

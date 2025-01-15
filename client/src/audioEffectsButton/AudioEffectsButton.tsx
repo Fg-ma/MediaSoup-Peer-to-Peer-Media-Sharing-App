@@ -19,7 +19,8 @@ const AudioEffectsSection = React.lazy(
 const defaultAudioEffectsButtonOptions: {
   color: string;
   placement: "above" | "below" | "left" | "right";
-} = { color: "white", placement: "above" };
+  hoverTimeoutDuration: number;
+} = { color: "white", placement: "above", hoverTimeoutDuration: 0 };
 
 export default function AudioEffectsButton({
   table_id,
@@ -82,6 +83,7 @@ export default function AudioEffectsButton({
     placement?: "above" | "below" | "left" | "right";
     backgroundColor?: string;
     secondaryBackgroundColor?: string;
+    hoverTimeoutDuration?: number;
   };
 }) {
   const audioEffectsButtonOptions = {
@@ -126,6 +128,9 @@ export default function AudioEffectsButton({
         scrollingContainerRef={scrollingContainerRef}
         className='flex items-center justify-center h-full aspect-square pointer-events-auto'
         style={style}
+        options={{
+          hoverTimeoutDuration: audioEffectsButtonOptions.hoverTimeoutDuration,
+        }}
       />
       {audioEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>

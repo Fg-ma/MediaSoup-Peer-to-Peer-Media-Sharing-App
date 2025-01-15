@@ -106,6 +106,8 @@ class FgScrollbarController {
 
     this.dragging.current = true;
 
+    this.scrollbarThumbRef.current?.classList.add("fg-scrollbar-thumb-pressed");
+
     // Add pointermove and pointerup event listeners to track dragging
     document.addEventListener("pointermove", this.thumbDragMove);
     document.addEventListener("pointerup", this.thumbDragEnd);
@@ -148,6 +150,10 @@ class FgScrollbarController {
 
   thumbDragEnd = () => {
     this.dragging.current = false;
+
+    this.scrollbarThumbRef.current?.classList.remove(
+      "fg-scrollbar-thumb-pressed"
+    );
 
     // Remove pointermove and pointerup listeners
     document.removeEventListener("pointermove", this.thumbDragMove);

@@ -13,7 +13,7 @@ export default function ScrollingContainerButton({
 
   return (
     <button
-      className={`scrolling_container_button ${
+      className={`scrolling-container-button ${
         active ? "selected" : ""
       } font-K2D text-lg bg-fg-white-95 rounded px-5 pb-2 shadow w-max`}
       onClick={() => {
@@ -25,7 +25,7 @@ export default function ScrollingContainerButton({
       }}
     >
       {content}
-      <div className='scrolling_container_button_underline h-0.5 w-full rounded-full'></div>
+      <div className='scrolling-container-button-underline h-0.5 w-full rounded-full'></div>
     </button>
   );
 }

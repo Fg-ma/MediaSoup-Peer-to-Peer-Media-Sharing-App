@@ -44,27 +44,23 @@ export default function GamesSection({
   };
 
   return (
-    <div className='flex space-x-4 mx-2 w-full aspect-square'>
+    <div className='flex w-full aspect-square'>
       <FgButton
         externalRef={gamesButtonRef}
         clickFunction={() => setGamesActive((prev) => !prev)}
-        className={`${
-          gamesActive
-            ? "bg-orange-500 hover:bg-orange-700"
-            : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold p-1 disabled:opacity-25 w-full aspect-square`}
+        className='h-full aspect-square flex items-center justify-center'
         contentFunction={() => {
           return (
             <FgSVG
               src={joystickIcon}
-              className='w-full aspect-square'
+              className='h-full aspect-square'
               attributes={[
                 { key: "width", value: "100%" },
                 { key: "height", value: "100%" },
-                { key: "fill", value: "white", id: "joystickBottom" },
-                { key: "stroke", value: "white" },
+                { key: "fill", value: "black", id: "joystickBottom" },
+                { key: "stroke", value: "black" },
                 ...(gamesActive
-                  ? [{ key: "fill", value: "red", id: "joystickTop" }]
+                  ? [{ key: "fill", value: "#e80110", id: "joystickTop" }]
                   : [{ key: "fill", value: "none", id: "joystickTop" }]),
               ]}
             />
@@ -75,6 +71,7 @@ export default function GamesSection({
             content={gamesActive ? "Close games" : "Open games"}
           />
         }
+        options={{ hoverTimeoutDuration: 750 }}
       />
       {gamesActive && (
         <FgPanel

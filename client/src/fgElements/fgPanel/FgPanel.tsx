@@ -36,8 +36,8 @@ export default function FgPanel({
     bottom: false,
     top: false,
   },
-  backgroundColor = "#ffffff",
-  secondaryBackgroundColor = "#f3f3f3",
+  backgroundColor = "#f2f2f2",
+  secondaryBackgroundColor = "#d6d6d6",
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
   content?: React.ReactNode;
