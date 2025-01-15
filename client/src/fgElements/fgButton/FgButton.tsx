@@ -22,6 +22,7 @@ export type FgButtonOptions = {
   holdKind?: "disappear" | "toggle";
   holdSpacing?: number;
   disabled?: boolean;
+  toggleClickCloseWhenOutside?: boolean;
 };
 
 const defaultFgButtonOptions: {
@@ -35,6 +36,7 @@ const defaultFgButtonOptions: {
   holdKind: "disappear" | "toggle";
   holdSpacing?: number;
   disabled: boolean;
+  toggleClickCloseWhenOutside: boolean;
 } = {
   defaultDataValue: undefined,
   holdTimeoutDuration: 500,
@@ -46,6 +48,7 @@ const defaultFgButtonOptions: {
   holdKind: "disappear",
   holdSpacing: undefined,
   disabled: false,
+  toggleClickCloseWhenOutside: true,
 };
 
 export default function FgButton({
@@ -67,8 +70,7 @@ export default function FgButton({
   toggleClickContent,
   closeHoldToggle,
   setCloseHoldToggle,
-  closeClickToggle,
-  setCloseClickToggle,
+  setExternalClickToggleState,
   className,
   style,
   options,
@@ -96,8 +98,7 @@ export default function FgButton({
   toggleClickContent?: React.ReactElement;
   closeHoldToggle?: boolean;
   setCloseHoldToggle?: React.Dispatch<React.SetStateAction<boolean>>;
-  closeClickToggle?: boolean;
-  setCloseClickToggle?: React.Dispatch<React.SetStateAction<boolean>>;
+  setExternalClickToggleState?: React.Dispatch<React.SetStateAction<boolean>>;
   className?: string;
   style?: React.CSSProperties;
   options?: FgButtonOptions;
@@ -158,11 +159,18 @@ export default function FgButton({
         !toggleClickContentRef.current ||
         !toggleClickContentRef.current.contains(event.target as Node)
       ) {
+        if (
+          !(externalRef ? externalRef : buttonRef).current?.contains(
+            event.target as Node
+          )
+        ) {
+          setIsClickToggle(false);
+          if (setExternalClickToggleState) setExternalClickToggleState(false);
+        }
         window.removeEventListener("pointerup", togglePopup);
-        setIsClickToggle(false);
       }
     },
-    [toggleClickContentRef, setIsClickToggle]
+    [toggleClickContentRef, setIsClickToggle, setExternalClickToggleState]
   );
 
   const fgButtonController = new FgButtonController(
@@ -182,6 +190,7 @@ export default function FgButton({
     hoverTimeout,
     isClicked,
     setIsClickToggle,
+    setExternalClickToggleState,
     isClickToggle,
     setIsHeld,
     isHeldRef,
@@ -201,14 +210,6 @@ export default function FgButton({
       if (setCloseHoldToggle) setCloseHoldToggle(false);
     }
   }, [closeHoldToggle]);
-
-  useEffect(() => {
-    if (closeClickToggle) {
-      window.removeEventListener("pointerup", togglePopup);
-      setIsClickToggle(false);
-      if (setCloseClickToggle) setCloseClickToggle(false);
-    }
-  }, [closeClickToggle]);
 
   const ButtonComponent = animationOptions ? motion.button : "button";
 

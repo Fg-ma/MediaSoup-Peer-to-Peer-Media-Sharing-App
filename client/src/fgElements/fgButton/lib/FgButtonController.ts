@@ -30,6 +30,9 @@ class FgButtonController {
     private hoverTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private isClicked: React.MutableRefObject<boolean>,
     private setIsClickToggle: React.Dispatch<React.SetStateAction<boolean>>,
+    private setExternalClickToggleState:
+      | React.Dispatch<React.SetStateAction<boolean>>
+      | undefined,
     private isClickToggle: boolean,
     private setIsHeld: React.Dispatch<React.SetStateAction<boolean>>,
     private isHeldRef: React.MutableRefObject<boolean>,
@@ -76,14 +79,18 @@ class FgButtonController {
     }
   };
 
-  handlePointerUp = (event: PointerEvent) => {
+  private handlePointerUp = (event: PointerEvent) => {
     window.removeEventListener("pointerup", this.handlePointerUp);
 
     if (this.toggleClickContent) {
       if (!this.isClickToggle) {
-        window.addEventListener("pointerup", this.togglePopup);
+        if (this.fgButtonOptions.toggleClickCloseWhenOutside) {
+          window.addEventListener("pointerup", this.togglePopup);
+        }
       }
       this.setIsClickToggle((prev) => !prev);
+      if (this.setExternalClickToggleState)
+        this.setExternalClickToggleState((prev) => !prev);
     }
 
     if (this.pointerUpFunction) {

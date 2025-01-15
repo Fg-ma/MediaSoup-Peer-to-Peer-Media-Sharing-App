@@ -141,7 +141,7 @@ export default function FgTable({
           content={
             <div
               ref={tableRef}
-              className={`fg-table relative rounded-md w-full h-full ${
+              className={`fg-table relative rounded-md w-full h-full border-[3px] border-fg-off-white ${
                 aspectDir.current === "width"
                   ? "overflow-y-auto"
                   : "overflow-x-auto"

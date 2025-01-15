@@ -82,17 +82,13 @@ export default function AudioSection({
       <FgButton
         externalRef={audioBtnRef}
         clickFunction={() => audioSectionController.shareAudio()}
-        className={`${
-          audioActive
-            ? "bg-orange-500 hover:bg-orange-700"
-            : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
+        className='disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
         contentFunction={() => {
           if (audioActive) {
             return (
               <FgSVG
                 src={removeAudioIcon}
-                className='h-full aspect-square'
+                className='h-[80%] aspect-square'
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -104,7 +100,7 @@ export default function AudioSection({
             return (
               <FgSVG
                 src={shareAudioIcon}
-                className='h-full aspect-square'
+                className='h-[80%] aspect-square'
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -131,17 +127,12 @@ export default function AudioSection({
               }));
               handleExternalMute();
             }}
-            className={`${
-              mutedAudioRef.current
-                ? "bg-orange-500 hover:bg-orange-700"
-                : "bg-blue-500 hover:bg-blue-700"
-            } text-white font-bold p-1 disabled:opacity-25`}
+            className='disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
             contentFunction={() => (
               <svg
+                className='h-[75%] aspect-square'
                 xmlns='http://www.w3.org/2000/svg'
                 viewBox='0 0 100.0001 100.00001'
-                width='100%'
-                height='100%'
                 fill='white'
               >
                 <VolumeSVG

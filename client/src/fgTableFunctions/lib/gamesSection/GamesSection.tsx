@@ -44,7 +44,7 @@ export default function GamesSection({
   };
 
   return (
-    <div className='flex space-x-4 mx-2 h-full'>
+    <div className='flex space-x-4 mx-2 w-full aspect-square'>
       <FgButton
         externalRef={gamesButtonRef}
         clickFunction={() => setGamesActive((prev) => !prev)}
@@ -52,12 +52,12 @@ export default function GamesSection({
           gamesActive
             ? "bg-orange-500 hover:bg-orange-700"
             : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
+        } text-white font-bold p-1 disabled:opacity-25 w-full aspect-square`}
         contentFunction={() => {
           return (
             <FgSVG
               src={joystickIcon}
-              className='h-full aspect-square'
+              className='w-full aspect-square'
               attributes={[
                 { key: "width", value: "100%" },
                 { key: "height", value: "100%" },

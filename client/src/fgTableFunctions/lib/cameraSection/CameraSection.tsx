@@ -1,5 +1,6 @@
 import React from "react";
 import { types } from "mediasoup-client";
+import { motion } from "framer-motion";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
@@ -63,17 +64,13 @@ export default function CameraSection({
       <FgButton
         externalRef={cameraBtnRef}
         clickFunction={() => cameraSectionController.shareCamera()}
-        className={`${
-          cameraActive
-            ? "bg-orange-500 hover:bg-orange-700"
-            : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
+        className='disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
         contentFunction={() => {
           if (cameraActive) {
             return (
               <FgSVG
                 src={removeCameraIcon}
-                className='h-full aspect-square'
+                className='h-[80%] aspect-square'
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -85,7 +82,7 @@ export default function CameraSection({
             return (
               <FgSVG
                 src={shareCameraIcon}
-                className='h-full aspect-square'
+                className='h-[80%] aspect-square'
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -106,11 +103,11 @@ export default function CameraSection({
         clickFunction={() => cameraSectionController.shareNewCamera()}
         className={`${
           cameraActive ? "" : "hidden"
-        } bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
+        } disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white`}
         contentFunction={() => (
           <FgSVG
             src={shareCameraIcon}
-            className='h-full aspect-square'
+            className='h-[80%] aspect-square'
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },

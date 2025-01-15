@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -56,19 +57,20 @@ export default function UploadMediaButton({
         onChange={handleFileChange}
       />
       <FgButton
-        className='h-full aspect-square bg-fg-secondary'
+        className='h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        clickFunction={clickFunction}
         contentFunction={() => (
           <FgSVG
             src={uploadIcon}
-            className='flex justify-center items-center'
+            className='h-[75%] aspect-square flex justify-center items-center'
             attributes={[
-              { key: "width", value: "70%" },
-              { key: "height", value: "70%" },
+              { key: "width", value: "100%" },
+              { key: "height", value: "100%" },
               { key: "fill", value: "white" },
             ]}
           />
         )}
-        clickFunction={clickFunction}
+        hoverContent={<FgHoverContentStandard content='Upload to table' />}
       />
     </>
   );

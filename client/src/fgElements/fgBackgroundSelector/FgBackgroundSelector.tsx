@@ -98,7 +98,7 @@ export default function FgBackgroundSelector({
             <></>
           )
         }
-        className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
+        className='flex items-center justify-center h-full aspect-square relative'
         options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
       />
       {backgroundSelectorPanelActive && (

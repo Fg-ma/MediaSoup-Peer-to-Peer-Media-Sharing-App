@@ -63,17 +63,13 @@ export default function ScreenSection({
       <FgButton
         externalRef={screenBtnRef}
         clickFunction={() => screenSectionController.shareScreen()}
-        className={`${
-          screenActive
-            ? "bg-orange-500 hover:bg-orange-700"
-            : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
+        className='disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
         contentFunction={() => {
           if (screenActive) {
             return (
               <FgSVG
                 src={removeScreenIcon}
-                className='h-full aspect-square'
+                className='h-[80%] aspect-square'
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -85,7 +81,7 @@ export default function ScreenSection({
             return (
               <FgSVG
                 src={shareScreenIcon}
-                className='h-full aspect-square'
+                className='h-[80%] aspect-square'
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },

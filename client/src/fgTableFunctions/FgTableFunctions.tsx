@@ -1,32 +1,16 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { types } from "mediasoup-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
-import { useMediaContext } from "../context/mediaContext/MediaContext";
-import { usePermissionsContext } from "../context/permissionsContext/PermissionsContext";
-import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
 import ScreenSection from "./lib/screenSection/ScreenSection";
-import GamesSection from "./lib/gamesSection/GamesSection";
 import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
-import BundlesController from "../lib/BundlesController";
-import FgBackgroundSelector from "../fgElements/fgBackgroundSelector/FgBackgroundSelector";
 import { FgBackground } from "../fgElements/fgBackgroundSelector/lib/typeConstant";
-import TableGridSection from "./lib/tableGridButton/TableGridSection";
-import ConsumersController from "../lib/ConsumersController";
-import PermissionsController from "../lib/PermissionsController";
-import Metadata from "../lib/Metadata";
-import CleanupController from "../lib/CleanupController";
 import UploadMediaButton from "./lib/uploadMediaButton/UploadMediaButton";
-import UserDevice from "../lib/UserDevice";
-import Deadbanding from "../babylon/Deadbanding";
-import MoreTableFunctionsButton from "./lib/MoreTableFunctionsButton";
-
-const AudioEffectsButton = React.lazy(
-  () => import("../audioEffectsButton/AudioEffectsButton")
-);
+import MoreTableFunctionsButton from "./lib/moreTableFunctionsButton/MoreTableFunctionsButton";
+import MessageTableSection from "./lib/messageTableSection/MessageTableSection";
 
 export default function FgTableFunctions({
   table_id,
@@ -96,17 +80,14 @@ export default function FgTableFunctions({
   >;
   producersController: ProducersController;
 }) {
-  const { userMedia } = useMediaContext();
   const { setSignal } = useSignalContext();
-  const { permissions } = usePermissionsContext();
-  const { mediasoupSocket, tableSocket } = useSocketContext();
+  const { tableSocket } = useSocketContext();
 
   const externalBackgroundChange = useRef(false);
 
   const muteBtnRef = useRef<HTMLButtonElement>(null);
 
   const [audioEffectsActive, setAudioEffectsActive] = useState(false);
-
   const [tableBackground, setTableBackground] = useState<
     FgBackground | undefined
   >();
@@ -131,35 +112,6 @@ export default function FgTableFunctions({
     });
   };
 
-  const handleExternalAudioEffectChange = (
-    producerType: "audio" | "screenAudio",
-    producerId: string | undefined,
-    effect: AudioEffectTypes
-  ) => {
-    if (producerType === "audio") {
-      userMedia.current.audio?.changeEffects(effect, false);
-    } else if (producerType === "screenAudio" && producerId) {
-      userMedia.current.screenAudio[producerId].changeEffects(effect, false);
-    }
-
-    if (permissions.current.acceptsAudioEffects) {
-      mediasoupSocket.current?.sendMessage({
-        type: "clientEffectChange",
-        header: {
-          table_id: table_id.current,
-          username: username.current,
-          instance: instance.current,
-          producerType,
-          producerId,
-        },
-        data: {
-          effect: effect,
-          blockStateChange: false,
-        },
-      });
-    }
-  };
-
   useEffect(() => {
     setAudioEffectsActive(false);
   }, [isAudio.current]);
@@ -177,9 +129,25 @@ export default function FgTableFunctions({
   }, [tableSocket.current]);
 
   return (
-    <div className='w-full h-16 flex items-center justify-center'>
-      <div className='w-max h-full p-2 flex space-x-4 bg-fg-tone-black-6 rounded'>
-        <MoreTableFunctionsButton />
+    <div className='w-full h-16 flex items-center justify-center space-x-5 px-[5%]'>
+      <div className='w-max h-full py-2 px-4 flex space-x-3 bg-fg-tone-black-6 rounded-xl border-2 border-fg-off-white'>
+        <MoreTableFunctionsButton
+          table_id={table_id}
+          username={username}
+          instance={instance}
+          tableTopRef={tableTopRef}
+          mutedAudioRef={mutedAudioRef}
+          isAudio={isAudio}
+          gridActive={gridActive}
+          setGridActive={setGridActive}
+          gridSize={gridSize}
+          setGridSize={setGridSize}
+          audioEffectsActive={audioEffectsActive}
+          setAudioEffectsActive={setAudioEffectsActive}
+          tableBackground={tableBackground}
+          externalBackgroundChange={externalBackgroundChange}
+          handleExternalMute={handleExternalMute}
+        />
         <CameraSection
           device={device}
           table_id={table_id}
@@ -222,47 +190,7 @@ export default function FgTableFunctions({
         />
         <UploadMediaButton table_id={table_id} />
       </div>
-      <GamesSection
-        table_id={table_id.current}
-        username={username.current}
-        instance={instance.current}
-      />
-      <FgBackgroundSelector
-        backgroundRef={tableTopRef}
-        defaultActiveBackground={tableBackground}
-        backgroundChangeFunction={(background: FgBackground) => {
-          if (externalBackgroundChange.current) {
-            externalBackgroundChange.current = false;
-          } else {
-            tableSocket.current?.changeTableBackground(background);
-          }
-        }}
-      />
-      <TableGridSection
-        gridActive={gridActive}
-        setGridActive={setGridActive}
-        gridSize={gridSize}
-        setGridSize={setGridSize}
-      />
-      {isAudio.current && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <AudioEffectsButton
-            table_id={table_id.current}
-            username={username.current}
-            instance={instance.current}
-            isUser={true}
-            permissions={permissions.current}
-            producerType={"audio"}
-            producerId={undefined}
-            audioEffectsActive={audioEffectsActive}
-            setAudioEffectsActive={setAudioEffectsActive}
-            handleAudioEffectChange={handleExternalAudioEffectChange}
-            handleMute={handleExternalMute}
-            muteStateRef={mutedAudioRef}
-            options={{ color: "black", placement: "below" }}
-          />
-        </Suspense>
-      )}
+      <MessageTableSection />
     </div>
   );
 }

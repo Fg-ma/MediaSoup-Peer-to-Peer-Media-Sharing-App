@@ -1,4 +1,10 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, {
+  CSSProperties,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AnimatePresence } from "framer-motion";
 
 const FgPortal = React.lazy(() => import("../fgPortal/FgPortal"));
@@ -20,6 +26,7 @@ export default function FgSVG({
   src,
   attributes,
   className,
+  style,
   hoverContent,
   options,
 }: {
@@ -31,6 +38,7 @@ export default function FgSVG({
     transition?: string;
   }[];
   className?: string;
+  style?: CSSProperties;
   hoverContent?: React.ReactElement;
   options?: FgSVGOptions;
 }) {
@@ -109,6 +117,7 @@ export default function FgSVG({
   return (
     <div
       className={className}
+      style={style}
       ref={svgContainerRef}
       {...(hoverContent && { onPointerEnter: handlePointerEnter })}
     >

@@ -1,7 +1,0 @@
-.grid-size-icon {
-  transition: transform 0.5s ease;
-}
-
-.grid-size-icon-flipped {
-  transform: rotateX(180deg);
-}

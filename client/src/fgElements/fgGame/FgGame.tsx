@@ -314,7 +314,7 @@ export default function FgGame({
       onPointerMove={fgGameController.handlePointerMove}
       className={`fg-game ${hideControls ? "z-[5] cursor-none" : "z-[49]"} ${
         hideControls ? "hide-controls" : ""
-      } rounded absolute`}
+      } rounded absolute pointer-events-auto`}
       style={{
         left: `${positioning.current.position.left}%`,
         top: `${positioning.current.position.top}%`,

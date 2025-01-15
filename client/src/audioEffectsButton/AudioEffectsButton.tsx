@@ -124,7 +124,7 @@ export default function AudioEffectsButton({
           )
         }
         scrollingContainerRef={scrollingContainerRef}
-        className='flex items-center justify-center w-10 min-w-10 aspect-square pointer-events-auto'
+        className='flex items-center justify-center h-full aspect-square pointer-events-auto'
         style={style}
       />
       {audioEffectsActive && (

@@ -2,22 +2,15 @@ import React, { useRef, useState } from "react";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import TableGridSizePanel from "./lib/TableGridSizePanel";
-import "./lib/tableGridSection.css";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const gridIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridIcon.svg";
-const gridOffIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridOffIcon.svg";
 const distanceIcon = nginxAssetSeverBaseUrl + "svgs/distanceIcon.svg";
 
-export default function TableGridSection({
-  gridActive,
-  setGridActive,
+export default function TableGridSizeButton({
   gridSize,
   setGridSize,
 }: {
-  gridActive: boolean;
-  setGridActive: React.Dispatch<React.SetStateAction<boolean>>;
   gridSize: {
     rows: number;
     cols: number;
@@ -33,27 +26,7 @@ export default function TableGridSection({
   const tableGridSizeButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <div className='flex items-center justify-center h-full'>
-      <FgButton
-        externalRef={tableGridSizeButtonRef}
-        className='h-full aspect-square'
-        clickFunction={() => setGridActive((prev) => !prev)}
-        contentFunction={() => {
-          const src = gridActive ? gridOffIcon : gridIcon;
-
-          return (
-            <FgSVG
-              src={src}
-              attributes={[
-                { key: "width", value: "100%" },
-                { key: "height", value: "100%" },
-                { key: "fill", value: "black" },
-                { key: "stroke", value: "black" },
-              ]}
-            />
-          );
-        }}
-      />
+    <div>
       <FgButton
         externalRef={tableGridSizeButtonRef}
         className='h-full aspect-square'
@@ -67,11 +40,10 @@ export default function TableGridSection({
               { key: "fill", value: "black" },
               { key: "stroke", value: "black" },
             ]}
-            className={
-              gridSizePanelActive
-                ? "grid-size-icon grid-size-icon-flipped"
-                : "grid-size-icon"
-            }
+            style={{
+              transition: "transform 0.3s ease",
+              ...(gridSizePanelActive ? { transform: "rotateX(180deg)" } : {}),
+            }}
           />
         )}
       />
