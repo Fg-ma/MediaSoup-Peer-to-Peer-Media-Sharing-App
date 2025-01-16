@@ -1,6 +1,5 @@
 import React from "react";
 import { types } from "mediasoup-client";
-import { motion } from "framer-motion";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
@@ -94,9 +93,11 @@ export default function CameraSection({
         }}
         hoverContent={
           <FgHoverContentStandard
-            content={cameraActive ? "Remove camera" : "Publish camera"}
+            content={cameraActive ? "Remove camera" : "Enable camera"}
           />
         }
+        options={{ hoverTimeoutDuration: 100 }}
+        aria-label={"Enable camera"}
       />
       <FgButton
         externalRef={newCameraBtnRef}
@@ -115,7 +116,9 @@ export default function CameraSection({
             ]}
           />
         )}
-        hoverContent={<FgHoverContentStandard content='Publish a new camera' />}
+        hoverContent={<FgHoverContentStandard content='Add new camera' />}
+        options={{ hoverTimeoutDuration: 100 }}
+        aria-label={"Add new camera"}
       />
     </div>
   );

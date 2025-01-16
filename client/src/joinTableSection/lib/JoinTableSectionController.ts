@@ -47,9 +47,6 @@ class JoinTableSectionController {
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private handleDisableEnableBtns: (disabled: boolean) => void,
-    private bundles: {
-      [username: string]: { [instance: string]: React.JSX.Element };
-    },
     private setBundles: React.Dispatch<
       React.SetStateAction<{
         [username: string]: { [instance: string]: React.JSX.Element };
@@ -109,7 +106,7 @@ class JoinTableSectionController {
       }
 
       this.tableSocket.current = new TableSocketController(
-        "ws://localhost:8043",
+        "https://localhost:8043",
         this.table_id.current,
         this.username.current,
         this.instance.current
@@ -117,7 +114,7 @@ class JoinTableSectionController {
 
       this.tableStaticContentSocket.current =
         new TableStaticContentSocketController(
-          "ws://localhost:8045",
+          "https://localhost:8045",
           this.table_id.current,
           this.username.current,
           this.instance.current,
@@ -132,14 +129,13 @@ class JoinTableSectionController {
         this.table_id.current,
         this.username.current,
         this.instance.current,
-        "ws://localhost:8042",
+        "https://localhost:8042",
         this.userMedia,
-        this.bundles,
         this.bundlesController
       );
 
       this.mediasoupSocket.current = new MediasoupSocketController(
-        "ws://localhost:8000",
+        "https://localhost:8000",
         this.table_id.current,
         this.username.current,
         this.instance.current,

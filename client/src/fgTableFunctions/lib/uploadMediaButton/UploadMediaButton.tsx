@@ -71,6 +71,8 @@ export default function UploadMediaButton({
           />
         )}
         hoverContent={<FgHoverContentStandard content='Upload to table' />}
+        options={{ hoverTimeoutDuration: 100 }}
+        aria-label={"Upload file to table"}
       />
     </>
   );

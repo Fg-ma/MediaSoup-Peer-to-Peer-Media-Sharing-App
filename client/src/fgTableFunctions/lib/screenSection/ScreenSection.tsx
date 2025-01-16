@@ -96,6 +96,8 @@ export default function ScreenSection({
             content={screenActive ? "Remove screen" : "Share screen"}
           />
         }
+        options={{ hoverTimeoutDuration: 100 }}
+        aria-label={"Share screen"}
       />
       <FgButton
         externalRef={newScreenBtnRef}
@@ -115,6 +117,8 @@ export default function ScreenSection({
           />
         )}
         hoverContent={<FgHoverContentStandard content='Share a new screen' />}
+        options={{ hoverTimeoutDuration: 100 }}
+        aria-label={"Share a new screen"}
       />
     </div>
   );

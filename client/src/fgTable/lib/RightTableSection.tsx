@@ -47,7 +47,11 @@ export default function RightTableSection({
       <div></div>
       {rightUsers.map((user) => (
         <UserBubble
+          key={user[0]}
+          username={user[0]}
+          userData={userData}
           fullDim='width'
+          placement='right'
           src={alien_960x960}
           srcLoading={alien_64x64}
           primaryColor={tableColorMap[user[1].color].primary}

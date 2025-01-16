@@ -3,6 +3,7 @@ import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import MoreTableFunctionsSection from "../moreTableFunctionsSection/MoreTableFunctionsSection";
 import { FgBackground } from "../../../fgElements/fgBackgroundSelector/lib/typeConstant";
+import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -79,6 +80,13 @@ export default function MoreTableFunctionsButton({
           );
         }}
         setExternalClickToggleState={setMoreTableFunctionsActive}
+        hoverContent={
+          !moreTableFunctionsActive ? (
+            <FgHoverContentStandard content='More table functions' />
+          ) : undefined
+        }
+        options={{ hoverTimeoutDuration: 100 }}
+        aria-label={"More table functions"}
       />
       {moreTableFunctionsActive && (
         <MoreTableFunctionsSection

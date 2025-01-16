@@ -72,6 +72,7 @@ export default function GamesSection({
           />
         }
         options={{ hoverTimeoutDuration: 750 }}
+        aria-label={"Games"}
       />
       {gamesActive && (
         <FgPanel
@@ -114,7 +115,8 @@ export default function GamesSection({
                 hoverContent={
                   <FgHoverContentStandard content='Start snake game' />
                 }
-                options={{ hoverTimeoutDuration: 350 }}
+                options={{ hoverTimeoutDuration: 750 }}
+                aria-label={"Snake game"}
               />
             </div>
           }

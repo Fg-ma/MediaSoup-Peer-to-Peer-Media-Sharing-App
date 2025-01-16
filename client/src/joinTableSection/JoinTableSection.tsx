@@ -31,7 +31,6 @@ export default function JoinTableSection({
   setAudioActive,
   isSubscribed,
   handleDisableEnableBtns,
-  bundles,
   bundlesController,
   producersController,
   consumersController,
@@ -69,11 +68,6 @@ export default function JoinTableSection({
   setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
   isSubscribed: React.MutableRefObject<boolean>;
   handleDisableEnableBtns: (disabled: boolean) => void;
-  bundles: {
-    [username: string]: {
-      [instance: string]: React.JSX.Element;
-    };
-  };
   bundlesController: BundlesController;
   producersController: ProducersController;
   consumersController: ConsumersController;
@@ -108,7 +102,6 @@ export default function JoinTableSection({
     userStreamEffects,
     userEffectsStyles,
     handleDisableEnableBtns,
-    bundles,
     setBundles,
     consumerTransport,
     producerTransport,

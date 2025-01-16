@@ -21,7 +21,9 @@ export type TableColors =
 type OutGoingTableMessages =
   | onJoinTableType
   | onLeaveTableType
-  | onChangeTableBackgroundType;
+  | onChangeTableBackgroundType
+  | onMoveSeatsType
+  | onSwapSeatsType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -51,10 +53,30 @@ type onChangeTableBackgroundType = {
   data: { background: FgBackground };
 };
 
+type onMoveSeatsType = {
+  type: "moveSeats";
+  header: {
+    table_id: string;
+    username: string;
+  };
+  data: { direction: "left" | "right" };
+};
+
+type onSwapSeatsType = {
+  type: "swapSeats";
+  header: {
+    table_id: string;
+    username: string;
+    targetUsername: string;
+  };
+};
+
 export type IncomingTableMessages =
   | onTableBackgroundChangedType
   | onUserJoinedTableType
-  | onUserLeftTableType;
+  | onUserLeftTableType
+  | onSeatsMovedType
+  | onSeatsSwapedType;
 
 export type onTableBackgroundChangedType = {
   type: "tableBackgroundChanged";
@@ -72,6 +94,24 @@ export type onUserJoinedTableType = {
 
 export type onUserLeftTableType = {
   type: "userLeftTable";
+  data: {
+    userData: {
+      [username: string]: { color: TableColors; seat: number; online: boolean };
+    };
+  };
+};
+
+export type onSeatsMovedType = {
+  type: "seatsMoved";
+  data: {
+    userData: {
+      [username: string]: { color: TableColors; seat: number; online: boolean };
+    };
+  };
+};
+
+export type onSeatsSwapedType = {
+  type: "seatsSwaped";
   data: {
     userData: {
       [username: string]: { color: TableColors; seat: number; online: boolean };
@@ -113,7 +153,7 @@ class TableSocketController {
     this.ws.onmessage = (event: MessageEvent) => {
       this.messageListeners.forEach((listener) => {
         const message = JSON.parse(event.data);
-        console.log(message);
+
         listener(message as IncomingTableMessages);
       });
     };
@@ -172,6 +212,30 @@ class TableSocketController {
         instance: this.instance,
       },
       data: { background },
+    });
+  };
+
+  moveSeats = (direction: "left" | "right", username: string) => {
+    this.sendMessage({
+      type: "moveSeats",
+      header: {
+        table_id: this.table_id,
+        username,
+      },
+      data: { direction },
+    });
+  };
+
+  swapSeats = (targetUsername: string) => {
+    if (targetUsername === this.username) return;
+
+    this.sendMessage({
+      type: "swapSeats",
+      header: {
+        table_id: this.table_id,
+        username: this.username,
+        targetUsername,
+      },
     });
   };
 }

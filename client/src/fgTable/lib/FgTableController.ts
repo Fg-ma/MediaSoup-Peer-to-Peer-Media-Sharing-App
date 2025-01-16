@@ -1,5 +1,7 @@
 import {
   IncomingTableMessages,
+  onSeatsMovedType,
+  onSeatsSwapedType,
   onUserJoinedTableType,
   onUserLeftTableType,
   TableColors,
@@ -51,18 +53,36 @@ class FgTableController {
       case "userLeftTable":
         this.onUserLeftTable(event);
         break;
+      case "seatsMoved":
+        this.onSeatsMoved(event);
+        break;
+      case "seatsSwaped":
+        this.onSeatsSwaped(event);
+        break;
       default:
         break;
     }
   };
 
-  onUserJoinedTable = (event: onUserJoinedTableType) => {
+  private onUserJoinedTable = (event: onUserJoinedTableType) => {
     const { userData } = event.data;
 
     this.setUserData(userData);
   };
 
-  onUserLeftTable = (event: onUserLeftTableType) => {
+  private onUserLeftTable = (event: onUserLeftTableType) => {
+    const { userData } = event.data;
+
+    this.setUserData(userData);
+  };
+
+  private onSeatsMoved = (event: onSeatsMovedType) => {
+    const { userData } = event.data;
+
+    this.setUserData(userData);
+  };
+
+  private onSeatsSwaped = (event: onSeatsSwapedType) => {
     const { userData } = event.data;
 
     this.setUserData(userData);

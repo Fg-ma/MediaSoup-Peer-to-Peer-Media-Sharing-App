@@ -112,9 +112,11 @@ export default function AudioSection({
         }}
         hoverContent={
           <FgHoverContentStandard
-            content={audioActive ? "Remove audio" : "Publish audio"}
+            content={audioActive ? "Remove audio" : "Enable audio"}
           />
         }
+        options={{ hoverTimeoutDuration: 100 }}
+        aria-label={"Enable audio"}
       />
       {audioActive && (
         <Suspense fallback={<div>Loading...</div>}>
@@ -154,6 +156,8 @@ export default function AudioSection({
                 content={mutedAudioRef.current ? "Unmute" : "Mute"}
               />
             }
+            options={{ hoverTimeoutDuration: 100 }}
+            aria-label={"Mute"}
           />
         </Suspense>
       )}

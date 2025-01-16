@@ -47,7 +47,11 @@ export default function LeftTableSection({
       <div></div>
       {leftUsers.map((user) => (
         <UserBubble
+          key={user[0]}
+          username={user[0]}
+          userData={userData}
           fullDim='width'
+          placement='left'
           src={alien_960x960}
           srcLoading={alien_64x64}
           primaryColor={tableColorMap[user[1].color].primary}

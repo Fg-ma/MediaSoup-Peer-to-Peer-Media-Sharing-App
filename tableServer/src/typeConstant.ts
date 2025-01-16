@@ -49,7 +49,9 @@ export interface SocketData {
 export type MessageTypes =
   | onJoinTableType
   | onLeaveTableType
-  | onChangeTableBackgroundType;
+  | onChangeTableBackgroundType
+  | onMoveSeatsType
+  | onSwapSeatsType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -77,6 +79,24 @@ export type onChangeTableBackgroundType = {
     instance: string;
   };
   data: { background: object };
+};
+
+export type onMoveSeatsType = {
+  type: "moveSeats";
+  header: {
+    table_id: string;
+    username: string;
+  };
+  data: { direction: "left" | "right" };
+};
+
+export type onSwapSeatsType = {
+  type: "swapSeats";
+  header: {
+    table_id: string;
+    username: string;
+    targetUsername: string;
+  };
 };
 
 export const tables: Tables = {};

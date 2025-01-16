@@ -28,9 +28,9 @@ export default function TopTableSection({
     tableContainerRef.current?.clientHeight ?? 0
   );
   const topSeats = [1, 2, 3, 4];
-  const topUsers = Object.entries(userData).filter((data) =>
-    topSeats.includes(data[1].seat)
-  );
+  const topUsers = Object.entries(userData)
+    .filter((data) => topSeats.includes(data[1].seat))
+    .sort((a, b) => a[1].seat - b[1].seat);
 
   return (
     <div
@@ -51,7 +51,11 @@ export default function TopTableSection({
       <div></div>
       {topUsers.map((user) => (
         <UserBubble
+          key={user[0]}
+          username={user[0]}
+          userData={userData}
           fullDim='height'
+          placement='top'
           src={alien_960x960}
           srcLoading={alien_64x64}
           primaryColor={tableColorMap[user[1].color].primary}

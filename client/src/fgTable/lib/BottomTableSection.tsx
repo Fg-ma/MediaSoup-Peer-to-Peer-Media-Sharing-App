@@ -51,7 +51,11 @@ export default function BottomTableSection({
       <div></div>
       {bottomUsers.map((user) => (
         <UserBubble
+          key={user[0]}
+          username={user[0]}
+          userData={userData}
           fullDim='height'
+          placement='bottom'
           src={alien_960x960}
           srcLoading={alien_64x64}
           primaryColor={tableColorMap[user[1].color].primary}

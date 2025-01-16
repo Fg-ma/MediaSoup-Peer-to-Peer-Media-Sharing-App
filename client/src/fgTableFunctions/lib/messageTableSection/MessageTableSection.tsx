@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 
@@ -15,7 +15,7 @@ export default function MessageTableSection() {
     <div className='grow w-1 h-full bg-fg-tone-black-6 rounded-xl border-2 border-fg-off-white relative py-[0.5%] px-[2%] flex space-x-2'>
       <input
         type='text'
-        className='bg-fg-white rounded w-full h-full text-fg-tone-black-1 text-lg pl-[1%] font-K2D'
+        className='bg-fg-white rounded grow h-full text-fg-tone-black-1 text-lg pl-[1%] font-K2D'
         placeholder='Send message...'
       />
       <FgButton
@@ -76,6 +76,7 @@ export default function MessageTableSection() {
             />
           </>
         )}
+        aria-label={"Send message to table"}
       />
     </div>
   );

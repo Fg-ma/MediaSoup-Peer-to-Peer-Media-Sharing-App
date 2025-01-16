@@ -5,6 +5,7 @@ import { SignalContextProvider } from "./src/context/signalContext/SignalContext
 import { EffectsContextProvider } from "./src/context/effectsContext/EffectsContext";
 import { PermissionsContextProvider } from "./src/context/permissionsContext/PermissionsContext";
 import { SocketContextProvider } from "./src/context/socketContext/SocketContext";
+import { UserInfoContextProvider } from "./src/context/userInfoContext/UserInfoContext";
 import Main from "./src/Main";
 import "./index.css";
 
@@ -20,7 +21,9 @@ function App() {
         <SignalContextProvider>
           <PermissionsContextProvider>
             <SocketContextProvider>
-              <Main />
+              <UserInfoContextProvider>
+                <Main />
+              </UserInfoContextProvider>
             </SocketContextProvider>
           </PermissionsContextProvider>
         </SignalContextProvider>

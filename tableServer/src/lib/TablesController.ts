@@ -3,6 +3,8 @@ import {
   onChangeTableBackgroundType,
   onJoinTableType,
   onLeaveTableType,
+  onMoveSeatsType,
+  onSwapSeatsType,
   TableColors,
   tables,
   tableSeatingChart,
@@ -71,7 +73,7 @@ class TablesController {
     });
   };
 
-  onChangeTableBackgroundType = (event: onChangeTableBackgroundType) => {
+  onChangeTableBackground = (event: onChangeTableBackgroundType) => {
     const { table_id, username, instance } = event.header;
     const { background } = event.data;
 
@@ -83,6 +85,76 @@ class TablesController {
       },
       [{ username, instance }]
     );
+  };
+
+  onMoveSeats = (event: onMoveSeatsType) => {
+    const { table_id, username } = event.header;
+    const { direction } = event.data;
+
+    // Get the table's user data
+    const tableData = tablesUserData[table_id];
+
+    // Get current user seat
+    const userSeat = tableData[username]?.seat;
+    if (!userSeat) return;
+
+    // Get all occupied seats (sorted in ascending order)
+    const occupiedSeats = Object.values(tableData)
+      .map((user) => user.seat)
+      .sort((a, b) => a - b);
+
+    const userIndex = occupiedSeats.findIndex(
+      (occupiedSeats) => occupiedSeats === userSeat
+    );
+
+    // Find the closest seat based on direction
+    let targetSeat: number;
+    if (direction === "left") {
+      targetSeat =
+        occupiedSeats[
+          userIndex - 1 < 0 ? occupiedSeats.length - 1 : userIndex - 1
+        ];
+    } else {
+      targetSeat =
+        occupiedSeats[
+          userIndex + 1 > occupiedSeats.length - 1 ? 0 : userIndex + 1
+        ];
+    }
+
+    // Find the user in the target seat
+    const targetUser = Object.keys(tableData).find(
+      (user) => tableData[user].seat === targetSeat
+    );
+
+    if (targetUser) {
+      tablesUserData[table_id][username].seat = targetSeat;
+      tablesUserData[table_id][targetUser].seat = userSeat;
+    }
+    this.broadcaster.broadcastToTable(table_id, {
+      type: "seatsMoved",
+      data: {
+        userData: tableData,
+      },
+    });
+  };
+
+  onSwapSeats = (event: onSwapSeatsType) => {
+    const { table_id, username, targetUsername } = event.header;
+
+    if (targetUsername === username) return;
+
+    const userSeat = tablesUserData[table_id][username].seat;
+    const targetSeat = tablesUserData[table_id][targetUsername].seat;
+
+    tablesUserData[table_id][username].seat = targetSeat;
+    tablesUserData[table_id][targetUsername].seat = userSeat;
+
+    this.broadcaster.broadcastToTable(table_id, {
+      type: "seatsSwaped",
+      data: {
+        userData: tablesUserData[table_id],
+      },
+    });
   };
 
   private performSeatSwaps = (table_id: string) => {

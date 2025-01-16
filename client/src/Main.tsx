@@ -366,7 +366,6 @@ export default function Main() {
         setAudioActive={setAudioActive}
         isSubscribed={isSubscribed}
         handleDisableEnableBtns={handleDisableEnableBtns}
-        bundles={bundles}
         bundlesController={bundlesController}
         producersController={producersController}
         consumersController={consumersController}

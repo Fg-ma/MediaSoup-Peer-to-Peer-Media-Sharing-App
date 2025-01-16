@@ -76,9 +76,6 @@ class GamesSignalingMedia {
     private instance: string,
     private url: string,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private bundles: {
-      [username: string]: { [instance: string]: React.JSX.Element };
-    },
     private bundlesController: BundlesController
   ) {
     this.connect(this.url);

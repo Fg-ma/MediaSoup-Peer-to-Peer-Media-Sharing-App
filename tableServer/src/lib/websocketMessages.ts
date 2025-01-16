@@ -10,7 +10,13 @@ const handleMessage = (ws: TableWebSocket, event: MessageTypes) => {
       tablesController.onLeaveTable(event);
       break;
     case "changeTableBackground":
-      tablesController.onChangeTableBackgroundType(event);
+      tablesController.onChangeTableBackground(event);
+      break;
+    case "moveSeats":
+      tablesController.onMoveSeats(event);
+      break;
+    case "swapSeats":
+      tablesController.onSwapSeats(event);
       break;
     default:
       break;
