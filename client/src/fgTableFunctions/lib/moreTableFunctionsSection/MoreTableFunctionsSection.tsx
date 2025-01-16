@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { AudioEffectTypes } from "../../../context/effectsContext/typeConstant";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../../../context/permissionsContext/PermissionsContext";
+import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import GamesSection from "../gamesSection/GamesSection";
 import FgBackgroundSelector from "../../../fgElements/fgBackgroundSelector/FgBackgroundSelector";
@@ -15,9 +16,6 @@ const AudioEffectsButton = React.lazy(
 );
 
 export default function MoreTableFunctionsSection({
-  table_id,
-  username,
-  instance,
   tableTopRef,
   moreTableFunctionsButtonRef,
   mutedAudioRef,
@@ -33,9 +31,6 @@ export default function MoreTableFunctionsSection({
   externalBackgroundChange,
   handleExternalMute,
 }: {
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
-  instance: React.MutableRefObject<string>;
   tableTopRef: React.RefObject<HTMLDivElement>;
   moreTableFunctionsButtonRef: React.RefObject<HTMLButtonElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
@@ -62,6 +57,7 @@ export default function MoreTableFunctionsSection({
   const { userMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
+  const { table_id, username, instance } = useUserInfoContext();
 
   const handleExternalAudioEffectChange = (
     producerType: "audio" | "screenAudio",
@@ -97,11 +93,7 @@ export default function MoreTableFunctionsSection({
       content={
         <div className='w-full h-full overflow-y-auto small-vertical-scroll-bar'>
           <div className='grid grid-cols-3 w-full my-2 h-max gap-3'>
-            <GamesSection
-              table_id={table_id.current}
-              username={username.current}
-              instance={instance.current}
-            />
+            <GamesSection />
             <FgBackgroundSelector
               backgroundRef={tableTopRef}
               defaultActiveBackground={tableBackground}

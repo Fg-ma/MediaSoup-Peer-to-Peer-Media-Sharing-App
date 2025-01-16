@@ -1,5 +1,6 @@
 import {
   IncomingTableMessages,
+  onKickedFromTableType,
   onSeatsMovedType,
   onSeatsSwapedType,
   onUserJoinedTableType,
@@ -59,6 +60,9 @@ class FgTableController {
       case "seatsSwaped":
         this.onSeatsSwaped(event);
         break;
+      case "kickedFromTable":
+        this.onKickedFromTableType(event);
+        break;
       default:
         break;
     }
@@ -83,6 +87,12 @@ class FgTableController {
   };
 
   private onSeatsSwaped = (event: onSeatsSwapedType) => {
+    const { userData } = event.data;
+
+    this.setUserData(userData);
+  };
+
+  private onKickedFromTableType = (event: onKickedFromTableType) => {
     const { userData } = event.data;
 
     this.setUserData(userData);

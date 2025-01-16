@@ -23,7 +23,8 @@ type OutGoingTableMessages =
   | onLeaveTableType
   | onChangeTableBackgroundType
   | onMoveSeatsType
-  | onSwapSeatsType;
+  | onSwapSeatsType
+  | onKickFromTableType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -71,12 +72,22 @@ type onSwapSeatsType = {
   };
 };
 
+type onKickFromTableType = {
+  type: "kickFromTable";
+  header: {
+    table_id: string;
+    username: string;
+    targetUsername: string;
+  };
+};
+
 export type IncomingTableMessages =
   | onTableBackgroundChangedType
   | onUserJoinedTableType
   | onUserLeftTableType
   | onSeatsMovedType
-  | onSeatsSwapedType;
+  | onSeatsSwapedType
+  | onKickedFromTableType;
 
 export type onTableBackgroundChangedType = {
   type: "tableBackgroundChanged";
@@ -112,6 +123,15 @@ export type onSeatsMovedType = {
 
 export type onSeatsSwapedType = {
   type: "seatsSwaped";
+  data: {
+    userData: {
+      [username: string]: { color: TableColors; seat: number; online: boolean };
+    };
+  };
+};
+
+export type onKickedFromTableType = {
+  type: "kickedFromTable";
   data: {
     userData: {
       [username: string]: { color: TableColors; seat: number; online: boolean };
@@ -231,6 +251,19 @@ class TableSocketController {
 
     this.sendMessage({
       type: "swapSeats",
+      header: {
+        table_id: this.table_id,
+        username: this.username,
+        targetUsername,
+      },
+    });
+  };
+
+  kickFromTable = (targetUsername: string) => {
+    if (targetUsername === this.username) return;
+
+    this.sendMessage({
+      type: "kickFromTable",
       header: {
         table_id: this.table_id,
         username: this.username,

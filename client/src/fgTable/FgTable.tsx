@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSocketContext } from "../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import FgTableController from "./lib/FgTableController";
 import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElement";
 import TableGridOverlay from "./lib/TableGridOverlay";
@@ -36,9 +37,6 @@ export const tableColorMap: {
 };
 
 export default function FgTable({
-  table_id,
-  username,
-  instance,
   tableRef,
   tableTopRef,
   bundles,
@@ -47,9 +45,6 @@ export default function FgTable({
   userDevice,
   deadbanding,
 }: {
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
-  instance: React.MutableRefObject<string>;
   tableRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
   bundles: {
@@ -66,6 +61,7 @@ export default function FgTable({
   deadbanding: Deadbanding;
 }) {
   const { tableSocket } = useSocketContext();
+  const { username, instance } = useUserInfoContext();
 
   const [userData, setUserData] = useState<{
     [username: string]: { color: TableColors; seat: number; online: boolean };
@@ -156,7 +152,7 @@ export default function FgTable({
                     : { height: "100%" }),
                 }}
               >
-                <UploadTableLayer table_id={table_id} />
+                <UploadTableLayer />
                 {gridActive && (
                   <TableGridOverlay
                     gridSize={gridSize}
@@ -165,9 +161,6 @@ export default function FgTable({
                   />
                 )}
                 <SharedBundle
-                  table_id={table_id.current}
-                  username={username.current}
-                  instance={instance.current}
                   userDevice={userDevice}
                   deadbanding={deadbanding}
                 />

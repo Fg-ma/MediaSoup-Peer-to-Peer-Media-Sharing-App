@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { Permissions } from "../context/permissionsContext/typeConstant";
+import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import FgAudioElement from "./FgAudioElement";
@@ -49,8 +50,6 @@ const defaultFgAudioElementContainerOptions: FgAudioElementContainerOptionsType 
 
 export default function FgAudioElementContainer({
   table_id,
-  activeUsername,
-  activeInstance,
   username,
   instance,
   name,
@@ -66,8 +65,6 @@ export default function FgAudioElementContainer({
   options,
 }: {
   table_id: string;
-  activeUsername: string | undefined;
-  activeInstance: string | undefined;
   username: string;
   instance: string;
   name?: string;
@@ -109,6 +106,8 @@ export default function FgAudioElementContainer({
 
   const { userDataStreams, remoteDataStreams } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
+  const { username: activeUsername, instance: activeInstance } =
+    useUserInfoContext();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
@@ -165,13 +164,13 @@ export default function FgAudioElementContainer({
     );
 
     // Request initial catch up data
-    if (!isUser && activeUsername && activeInstance) {
+    if (!isUser && activeUsername.current && activeInstance.current) {
       mediasoupSocket.current?.sendMessage({
         type: "requestCatchUpData",
         header: {
           table_id: table_id,
-          inquiringUsername: activeUsername,
-          inquiringInstance: activeInstance,
+          inquiringUsername: activeUsername.current,
+          inquiringInstance: activeInstance.current,
           inquiredUsername: username,
           inquiredInstance: instance,
           inquiredType: "audio",

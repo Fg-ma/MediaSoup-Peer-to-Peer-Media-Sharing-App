@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { types } from "mediasoup-client";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
 import ScreenSection from "./lib/screenSection/ScreenSection";
@@ -13,10 +13,6 @@ import MoreTableFunctionsButton from "./lib/moreTableFunctionsButton/MoreTableFu
 import MessageTableSection from "./lib/messageTableSection/MessageTableSection";
 
 export default function FgTableFunctions({
-  table_id,
-  username,
-  instance,
-  device,
   tableTopRef,
   isCamera,
   cameraActive,
@@ -41,10 +37,6 @@ export default function FgTableFunctions({
   setGridSize,
   producersController,
 }: {
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
-  instance: React.MutableRefObject<string>;
-  device: React.MutableRefObject<types.Device | undefined>;
   tableTopRef: React.RefObject<HTMLDivElement>;
   isCamera: React.MutableRefObject<boolean>;
   cameraActive: boolean;
@@ -82,6 +74,7 @@ export default function FgTableFunctions({
 }) {
   const { setSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
+  const { table_id, username, instance } = useUserInfoContext();
 
   const externalBackgroundChange = useRef(false);
 
@@ -132,9 +125,6 @@ export default function FgTableFunctions({
     <div className='w-full h-16 flex items-center justify-center space-x-5 px-[5%]'>
       <div className='w-max h-full py-2 px-4 flex space-x-3 bg-fg-tone-black-6 rounded-xl border-2 border-fg-off-white'>
         <MoreTableFunctionsButton
-          table_id={table_id}
-          username={username}
-          instance={instance}
           tableTopRef={tableTopRef}
           mutedAudioRef={mutedAudioRef}
           isAudio={isAudio}
@@ -149,10 +139,6 @@ export default function FgTableFunctions({
           handleExternalMute={handleExternalMute}
         />
         <CameraSection
-          device={device}
-          table_id={table_id}
-          username={username}
-          instance={instance}
           cameraBtnRef={cameraBtnRef}
           newCameraBtnRef={newCameraBtnRef}
           isCamera={isCamera}
@@ -162,10 +148,6 @@ export default function FgTableFunctions({
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <ScreenSection
-          device={device}
-          table_id={table_id}
-          username={username}
-          instance={instance}
           screenBtnRef={screenBtnRef}
           newScreenBtnRef={newScreenBtnRef}
           isScreen={isScreen}
@@ -175,9 +157,6 @@ export default function FgTableFunctions({
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <AudioSection
-          table_id={table_id}
-          username={username}
-          instance={instance}
           audioBtnRef={audioBtnRef}
           muteBtnRef={muteBtnRef}
           mutedAudioRef={mutedAudioRef}
@@ -188,7 +167,7 @@ export default function FgTableFunctions({
           producersController={producersController}
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
-        <UploadMediaButton table_id={table_id} />
+        <UploadMediaButton />
       </div>
       <MessageTableSection />
     </div>

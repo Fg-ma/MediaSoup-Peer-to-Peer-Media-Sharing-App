@@ -14,9 +14,7 @@ class FgVideoController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private table_id: string,
-    private username: string,
-    private instance: string,
+    private table_id: React.MutableRefObject<string>,
     private videoId: string,
     private videoMedia: VideoMedia,
     private subContainerRef: React.RefObject<HTMLDivElement>,
@@ -141,7 +139,7 @@ class FgVideoController {
           const handleMessage = (message: string) => {
             const data = JSON.parse(message);
             if (
-              data.table_id === this.table_id &&
+              data.table_id === this.table_id.current &&
               data.kind === "video" &&
               data.videoId === this.videoId
             ) {

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   onChangeTableBackgroundType,
   onJoinTableType,
+  onKickFromTableType,
   onLeaveTableType,
   onMoveSeatsType,
   onSwapSeatsType,
@@ -151,6 +152,23 @@ class TablesController {
 
     this.broadcaster.broadcastToTable(table_id, {
       type: "seatsSwaped",
+      data: {
+        userData: tablesUserData[table_id],
+      },
+    });
+  };
+
+  onKickFromTable = (event: onKickFromTableType) => {
+    const { table_id, username, targetUsername } = event.header;
+
+    if (targetUsername === username) return;
+
+    if (tablesUserData[table_id] && tablesUserData[table_id][username]) {
+      delete tablesUserData[table_id][username];
+    }
+
+    this.broadcaster.broadcastToTable(table_id, {
+      type: "kickedFromTable",
       data: {
         userData: tablesUserData[table_id],
       },

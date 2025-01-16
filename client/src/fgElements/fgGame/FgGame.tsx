@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import FgContentAdjustmentController from "../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import FgGameController from "./lib/FgGameController";
 import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
@@ -29,9 +30,6 @@ const GameVar: Variants = {
 };
 
 export default function FgGame({
-  table_id,
-  username,
-  instance,
   gameId,
   gameStarted,
   sharedBundleRef,
@@ -46,9 +44,6 @@ export default function FgGame({
   popupRefs,
   initPosition = { x: 0, y: 0 },
 }: {
-  table_id: string;
-  username: string;
-  instance: string;
   gameId: string;
   gameStarted: boolean;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
@@ -81,6 +76,7 @@ export default function FgGame({
     relativeToBoundaries?: "center";
   };
 }) {
+  const { table_id, username, instance } = useUserInfoContext();
   const { userDataStreams, remoteDataStreams } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
 
@@ -223,9 +219,9 @@ export default function FgGame({
     mediasoupSocket.current?.sendMessage({
       type: "requestGameCatchUpData",
       header: {
-        table_id: table_id,
-        inquiringUsername: username,
-        inquiringInstance: instance,
+        table_id: table_id.current,
+        inquiringUsername: username.current,
+        inquiringInstance: instance.current,
         gameId: gameId,
       },
     });
@@ -297,7 +293,7 @@ export default function FgGame({
     ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
-          table_id,
+          table_id: table_id.current,
           gameId,
           type: "games",
           positioning: positioning.current,

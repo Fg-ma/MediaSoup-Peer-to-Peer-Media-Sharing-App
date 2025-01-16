@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
@@ -8,11 +9,9 @@ const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const uploadIcon = nginxAssetSeverBaseUrl + "svgs/uploadIcon.svg";
 
-export default function UploadMediaButton({
-  table_id,
-}: {
-  table_id: React.MutableRefObject<string>;
-}) {
+export default function UploadMediaButton() {
+  const { table_id } = useUserInfoContext();
+
   const file = useRef<File | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 

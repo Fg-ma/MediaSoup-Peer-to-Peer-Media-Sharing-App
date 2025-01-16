@@ -51,7 +51,8 @@ export type MessageTypes =
   | onLeaveTableType
   | onChangeTableBackgroundType
   | onMoveSeatsType
-  | onSwapSeatsType;
+  | onSwapSeatsType
+  | onKickFromTableType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -92,6 +93,15 @@ export type onMoveSeatsType = {
 
 export type onSwapSeatsType = {
   type: "swapSeats";
+  header: {
+    table_id: string;
+    username: string;
+    targetUsername: string;
+  };
+};
+
+export type onKickFromTableType = {
+  type: "kickFromTable";
   header: {
     table_id: string;
     username: string;

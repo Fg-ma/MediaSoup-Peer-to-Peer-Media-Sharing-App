@@ -1,11 +1,10 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 
-export default function UploadTableLayer({
-  table_id,
-}: {
-  table_id: React.MutableRefObject<string>;
-}) {
+export default function UploadTableLayer() {
+  const { table_id } = useUserInfoContext();
+
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [draggingFiles, setDraggingFiles] = useState(false);
   const uploadRef = useRef<HTMLDivElement | null>(null);

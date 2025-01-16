@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
+import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import FgGame from "../../fgElements/fgGame/FgGame";
 import FgButton from "../../fgElements/fgButton/FgButton";
 import FgSVG from "../../fgElements/fgSVG/FgSVG";
@@ -27,19 +28,14 @@ const gridIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridIcon.svg";
 const gridOffIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridOffIcon.svg";
 
 function SnakeGame({
-  table_id,
-  username,
-  instance,
   snakeGameId,
   sharedBundleRef,
 }: {
-  table_id: string;
-  username: string;
-  instance: string;
   snakeGameId: string;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
+  const { username, instance } = useUserInfoContext();
 
   const [gridSize, setGridSize] = useState(15);
 
@@ -119,9 +115,6 @@ function SnakeGame({
   return (
     <>
       <FgGame
-        table_id={table_id}
-        username={username}
-        instance={instance}
         gameId={snakeGameId}
         gameStarted={started}
         sharedBundleRef={sharedBundleRef}
@@ -158,99 +151,107 @@ function SnakeGame({
           <div
             className={`flex flex-col items-center justify-center h-max w-full space-y-2 px-2`}
           >
-            {playersState[username] && playersState[username][instance] && (
-              <>
-                <FgButton
-                  className='w-full aspect-square rounded-xl bg-white overflow-hidden border-2 border-gray-300'
-                  clickFunction={() =>
-                    setSnakeColorPanelActive((prev) => !prev)
-                  }
-                  contentFunction={() => {
-                    const { primary, secondary } =
-                      playersState[username][instance].snakeColor;
+            {playersState[username.current] &&
+              playersState[username.current][instance.current] && (
+                <>
+                  <FgButton
+                    className='w-full aspect-square rounded-xl bg-white overflow-hidden border-2 border-gray-300'
+                    clickFunction={() =>
+                      setSnakeColorPanelActive((prev) => !prev)
+                    }
+                    contentFunction={() => {
+                      const { primary, secondary } =
+                        playersState[username.current][instance.current]
+                          .snakeColor;
 
-                    return (
-                      <FgImageElement
-                        // @ts-expect-error: can't correlate primary with secondary color
-                        src={snakeColorIconMap[primary][secondary]}
-                        style={{ width: "100%", height: "100%" }}
-                        alt={`Snake color option: ${primary} ${secondary}`}
-                      />
-                    );
-                  }}
-                />
-                <FgButton
-                  externalRef={snakeColorPickerButtonRef}
-                  className='w-full aspect-square'
-                  clickFunction={() =>
-                    setSnakeColorPanelActive((prev) => !prev)
-                  }
-                  contentFunction={() => (
-                    <FgSVG
-                      src={snakeColorChangeIcon}
-                      attributes={[
-                        { key: "width", value: "100%" },
-                        { key: "height", value: "100%" },
-                        { key: "fill", value: "white" },
-                        { key: "stroke", value: "white" },
-                        ...(snakeColorPanelActive
-                          ? [
-                              {
-                                key: "stroke",
-                                value: "#3cf599",
-                                id: "circle1",
-                              },
-                              {
-                                key: "stroke",
-                                value: "#3991ff",
-                                id: "circle2",
-                              },
-                              {
-                                key: "stroke",
-                                value: "#fd473c",
-                                id: "circle3",
-                              },
-                            ]
-                          : []),
-                      ]}
-                    />
-                  )}
-                />
-                <FgButton
-                  externalRef={snakeGridSizeButtonRef}
-                  className='w-full aspect-square'
-                  clickFunction={() => setGridSizePanelActive((prev) => !prev)}
-                  contentFunction={() => {
-                    const src = gridSizePanelActive ? gridOffIcon : gridIcon;
-
-                    return (
+                      return (
+                        <FgImageElement
+                          // @ts-expect-error: can't correlate primary with secondary color
+                          src={snakeColorIconMap[primary][secondary]}
+                          style={{ width: "100%", height: "100%" }}
+                          alt={`Snake color option: ${primary} ${secondary}`}
+                        />
+                      );
+                    }}
+                  />
+                  <FgButton
+                    externalRef={snakeColorPickerButtonRef}
+                    className='w-full aspect-square'
+                    clickFunction={() =>
+                      setSnakeColorPanelActive((prev) => !prev)
+                    }
+                    contentFunction={() => (
                       <FgSVG
-                        src={src}
+                        src={snakeColorChangeIcon}
                         attributes={[
                           { key: "width", value: "100%" },
                           { key: "height", value: "100%" },
                           { key: "fill", value: "white" },
                           { key: "stroke", value: "white" },
+                          ...(snakeColorPanelActive
+                            ? [
+                                {
+                                  key: "stroke",
+                                  value: "#3cf599",
+                                  id: "circle1",
+                                },
+                                {
+                                  key: "stroke",
+                                  value: "#3991ff",
+                                  id: "circle2",
+                                },
+                                {
+                                  key: "stroke",
+                                  value: "#fd473c",
+                                  id: "circle3",
+                                },
+                              ]
+                            : []),
                         ]}
                       />
-                    );
-                  }}
-                />
-              </>
-            )}
+                    )}
+                  />
+                  <FgButton
+                    externalRef={snakeGridSizeButtonRef}
+                    className='w-full aspect-square'
+                    clickFunction={() =>
+                      setGridSizePanelActive((prev) => !prev)
+                    }
+                    contentFunction={() => {
+                      const src = gridSizePanelActive ? gridOffIcon : gridIcon;
+
+                      return (
+                        <FgSVG
+                          src={src}
+                          attributes={[
+                            { key: "width", value: "100%" },
+                            { key: "height", value: "100%" },
+                            { key: "fill", value: "white" },
+                            { key: "stroke", value: "white" },
+                          ]}
+                        />
+                      );
+                    }}
+                  />
+                </>
+              )}
           </div>
         }
         players={{
           user:
-            playersState[username] && playersState[username][instance]
+            playersState[username.current] &&
+            playersState[username.current][instance.current]
               ? {
                   primaryColor:
-                    playersState[username][instance].snakeColor.primary,
+                    playersState[username.current][instance.current].snakeColor
+                      .primary,
                   secondaryColor:
-                    playersState[username][instance].snakeColor.secondary,
+                    playersState[username.current][instance.current].snakeColor
+                      .secondary,
                   shadowColor:
                     colorMap[
-                      playersState[username][instance].snakeColor.primary
+                      playersState[username.current][instance.current]
+                        .snakeColor.primary
                     ],
                 }
               : undefined,
@@ -259,8 +260,8 @@ function SnakeGame({
               Object.entries(userState).map(
                 ([playerInstance, instanceState]) => {
                   if (
-                    playerUsername !== username ||
-                    playerInstance !== instance
+                    playerUsername !== username.current ||
+                    playerInstance !== instance.current
                   ) {
                     return {
                       primaryColor: instanceState.snakeColor.primary,

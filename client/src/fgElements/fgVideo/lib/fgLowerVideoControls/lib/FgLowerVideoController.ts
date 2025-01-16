@@ -62,9 +62,6 @@ class FgLowerVideoController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private table_id: string,
-    private username: string,
-    private instance: string,
     private videoId: string,
     private sharedBundleRef: React.RefObject<HTMLDivElement>,
     private videoMedia: VideoMedia,

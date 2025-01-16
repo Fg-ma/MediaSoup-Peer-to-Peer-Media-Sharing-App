@@ -11,7 +11,7 @@ import {
   onGetIntialGameStatesType,
 } from "../typeConstant";
 import SnakeGame from "../snakeGame/SnakeGame";
-import { SnakeColorsType } from "src/snakeGame/lib/typeConstant";
+import { SnakeColorsType } from "../snakeGame/lib/typeConstant";
 
 class UniversalGameController {
   constructor(private broadcaster: Broadcaster) {}

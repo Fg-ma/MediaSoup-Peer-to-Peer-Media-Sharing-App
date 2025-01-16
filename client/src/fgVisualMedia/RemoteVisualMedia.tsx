@@ -8,6 +8,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../context/effectsContext/typeConstant";
+import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
@@ -29,8 +30,6 @@ const VisualMediaAdjustmentButtons = React.lazy(
 export default function RemoteVisualMedia({
   table_id,
   visualMediaId,
-  activeUsername,
-  activeInstance,
   username,
   instance,
   name,
@@ -54,8 +53,6 @@ export default function RemoteVisualMedia({
 }: {
   table_id: string;
   visualMediaId: string;
-  activeUsername: string | undefined;
-  activeInstance: string | undefined;
   username: string;
   instance: string;
   name?: string;
@@ -113,6 +110,8 @@ export default function RemoteVisualMedia({
     remoteStreamEffects,
   } = useEffectsContext();
   const { mediasoupSocket } = useSocketContext();
+  const { username: activeUsername, instance: activeInstance } =
+    useUserInfoContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -299,13 +298,13 @@ export default function RemoteVisualMedia({
     );
 
     // Request initial catch up data
-    if (activeUsername && activeInstance) {
+    if (activeUsername.current && activeInstance.current) {
       mediasoupSocket.current?.sendMessage({
         type: "requestCatchUpData",
         header: {
           table_id,
-          inquiringUsername: activeUsername,
-          inquiringInstance: activeInstance,
+          inquiringUsername: activeUsername.current,
+          inquiringInstance: activeInstance.current,
           inquiredUsername: username,
           inquiredInstance: instance,
           inquiredType: type,

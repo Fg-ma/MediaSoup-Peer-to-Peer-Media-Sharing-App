@@ -1,7 +1,7 @@
 import React from "react";
-import { types } from "mediasoup-client";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
@@ -14,10 +14,6 @@ const removeScreenIcon = nginxAssetSeverBaseUrl + "svgs/removeScreenIcon.svg";
 const shareScreenIcon = nginxAssetSeverBaseUrl + "svgs/shareScreenIcon.svg";
 
 export default function ScreenSection({
-  device,
-  table_id,
-  username,
-  instance,
   screenBtnRef,
   newScreenBtnRef,
   isScreen,
@@ -26,10 +22,6 @@ export default function ScreenSection({
   producersController,
   handleDisableEnableBtns,
 }: {
-  device: React.MutableRefObject<types.Device | undefined>;
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
-  instance: React.MutableRefObject<string>;
   screenBtnRef: React.RefObject<HTMLButtonElement>;
   newScreenBtnRef: React.RefObject<HTMLButtonElement>;
   isScreen: React.MutableRefObject<boolean>;
@@ -40,6 +32,7 @@ export default function ScreenSection({
 }) {
   const { userMedia } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
+  const { table_id, username, instance, device } = useUserInfoContext();
 
   const screenSectionController = new ScreenSectionController(
     mediasoupSocket,

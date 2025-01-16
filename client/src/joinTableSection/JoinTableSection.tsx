@@ -3,6 +3,7 @@ import { types } from "mediasoup-client";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
+import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import JoinTableSectionController from "./lib/JoinTableSectionController";
 import ProducersController from "../lib/ProducersController";
 import BundlesController from "../lib/BundlesController";
@@ -14,10 +15,6 @@ import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 
 export default function JoinTableSection({
-  table_id,
-  username,
-  instance,
-  device,
   producerTransport,
   consumerTransport,
   setBundles,
@@ -41,10 +38,6 @@ export default function JoinTableSection({
   cleanupController,
   setRerender,
 }: {
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
-  instance: React.MutableRefObject<string>;
-  device: React.MutableRefObject<types.Device | undefined>;
   producerTransport: React.MutableRefObject<
     types.Transport<types.AppData> | undefined
   >;
@@ -82,6 +75,7 @@ export default function JoinTableSection({
   const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
     useSocketContext();
+  const { table_id, username, instance, device } = useUserInfoContext();
   const [isInTable, setIsInTable] = useState(false);
   const tableIdRef = useRef<HTMLInputElement>(null);
   const usernameRef = useRef<HTMLInputElement>(null);

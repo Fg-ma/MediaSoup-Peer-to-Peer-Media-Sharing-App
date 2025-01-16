@@ -1,6 +1,5 @@
 import React, { useState, useRef } from "react";
-import { types, Device } from "mediasoup-client";
-import { v4 as uuidv4 } from "uuid";
+import { types } from "mediasoup-client";
 import { useMediaContext } from "./context/mediaContext/MediaContext";
 import { useEffectsContext } from "./context/effectsContext/EffectsContext";
 import {
@@ -26,6 +25,7 @@ import PermissionsController from "./lib/PermissionsController";
 import CleanupController from "./lib/CleanupController";
 import JoinTableSection from "./joinTableSection/JoinTableSection";
 import "./scrollbar.css";
+import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -38,12 +38,7 @@ export default function Main() {
   } = useEffectsContext();
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket } = useSocketContext();
-
-  const device = useRef<Device>();
-
-  const table_id = useRef("");
-  const username = useRef("");
-  const instance = useRef(uuidv4());
+  const { table_id, username, instance, device } = useUserInfoContext();
 
   const [bundles, setBundles] = useState<{
     [username: string]: { [instance: string]: React.JSX.Element };
@@ -308,9 +303,6 @@ export default function Main() {
   return (
     <div className='w-screen h-screen flex flex-col space-y-[1.5%] p-[1.5%] overflow-hidden bg-fg-tone-black-1'>
       <FgTable
-        table_id={table_id}
-        username={username}
-        instance={instance}
         tableRef={tableRef}
         tableTopRef={tableTopRef}
         bundles={bundles}
@@ -320,10 +312,6 @@ export default function Main() {
         deadbanding={deadbanding}
       />
       <FgTableFunctions
-        table_id={table_id}
-        username={username}
-        instance={instance}
-        device={device}
         tableTopRef={tableTopRef}
         isCamera={isCamera}
         cameraActive={cameraActive}
@@ -349,10 +337,6 @@ export default function Main() {
         producersController={producersController}
       />
       <JoinTableSection
-        table_id={table_id}
-        username={username}
-        instance={instance}
-        device={device}
         producerTransport={producerTransport}
         consumerTransport={consumerTransport}
         setBundles={setBundles}

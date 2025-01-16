@@ -165,7 +165,10 @@ export default function UserBubble({
                 <PrivateMessageButton userPanelRef={userPanelRef} />
                 <PingButton userPanelRef={userPanelRef} />
                 <OpenKidsTableButton userPanelRef={userPanelRef} />
-                <KickFromTableButton userPanelRef={userPanelRef} />
+                <KickFromTableButton
+                  username={username}
+                  userPanelRef={userPanelRef}
+                />
                 <SilenceButton userPanelRef={userPanelRef} />
                 <HideContentFromButton userPanelRef={userPanelRef} />
               </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import FgUpperVideoControls from "./lib/fgUpperVideoControls/FgUpperVideoControls";
 import FgLowerVideoControls from "./lib/fgLowerVideoControls/FgLowerVideoControls";
 import FgVideoController from "./lib/FgVideoController";
@@ -20,17 +21,11 @@ const VideoAdjustmentButtons = React.lazy(
 );
 
 export default function FgVideo({
-  table_id,
-  username,
-  instance,
   videoId,
   name,
   sharedBundleRef,
   options,
 }: {
-  table_id: string;
-  username: string;
-  instance: string;
   videoId: string;
   name?: string;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
@@ -44,6 +39,7 @@ export default function FgVideo({
   const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
   const { userStreamEffects } = useEffectsContext();
   const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
+  const { table_id, username, instance } = useUserInfoContext();
 
   const videoMedia = userMedia.current.video[videoId];
 
@@ -124,9 +120,6 @@ export default function FgVideo({
 
   const fgLowerVideoController = new FgLowerVideoController(
     tableStaticContentSocket,
-    table_id,
-    username,
-    instance,
     videoId,
     sharedBundleRef,
     videoMedia,
@@ -152,8 +145,6 @@ export default function FgVideo({
   const fgVideoController = new FgVideoController(
     tableStaticContentSocket,
     table_id,
-    username,
-    instance,
     videoId,
     videoMedia,
     subContainerRef,
@@ -283,7 +274,7 @@ export default function FgVideo({
     ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
-          table_id,
+          table_id: table_id.current,
           kind: "video",
           videoId: videoId,
           positioning: positioning.current,
@@ -347,9 +338,6 @@ export default function FgVideo({
       >
         <FgUpperVideoControls fgLowerVideoController={fgLowerVideoController} />
         <FgLowerVideoControls
-          table_id={table_id}
-          username={username}
-          instance={instance}
           videoId={videoId}
           fgLowerVideoController={fgLowerVideoController}
           pausedState={pausedState}

@@ -87,9 +87,6 @@ export interface ActivePages {
 }
 
 export default function FgLowerVideoControls({
-  table_id,
-  username,
-  instance,
   videoId,
   fgLowerVideoController,
   pausedState,
@@ -104,9 +101,6 @@ export default function FgLowerVideoControls({
   setSettings,
   fgVideoOptions,
 }: {
-  table_id: string;
-  username: string;
-  instance: string;
   videoId: string;
   fgLowerVideoController: FgLowerVideoController;
   pausedState: boolean;

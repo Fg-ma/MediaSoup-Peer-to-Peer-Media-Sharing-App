@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
+import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgPanel from "../../../fgElements/fgPanel/FgPanel";
@@ -12,16 +13,9 @@ const joystickIcon = nginxAssetSeverBaseUrl + "svgs/games/joystickIcon.svg";
 const snakeGameIcon =
   nginxAssetSeverBaseUrl + "svgs/games/snake/snakeGameIcon.svg";
 
-export default function GamesSection({
-  table_id,
-  username,
-  instance,
-}: {
-  table_id: string;
-  username: string;
-  instance: string;
-}) {
+export default function GamesSection() {
   const { userMedia } = useMediaContext();
+  const { table_id, username, instance } = useUserInfoContext();
 
   const [gamesActive, setGamesActive] = useState(false);
   const [cols, setCols] = useState(3);
@@ -103,7 +97,11 @@ export default function GamesSection({
                   />
                 )}
                 clickFunction={() => {
-                  if (!table_id || !username || !instance) {
+                  if (
+                    !table_id.current ||
+                    !username.current ||
+                    !instance.current
+                  ) {
                     return;
                   }
 

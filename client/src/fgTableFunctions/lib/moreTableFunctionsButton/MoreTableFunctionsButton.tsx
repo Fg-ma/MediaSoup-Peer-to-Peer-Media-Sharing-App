@@ -10,9 +10,6 @@ const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
 
 export default function MoreTableFunctionsButton({
-  table_id,
-  username,
-  instance,
   tableTopRef,
   mutedAudioRef,
   isAudio,
@@ -26,9 +23,6 @@ export default function MoreTableFunctionsButton({
   externalBackgroundChange,
   handleExternalMute,
 }: {
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
-  instance: React.MutableRefObject<string>;
   tableTopRef: React.RefObject<HTMLDivElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
   isAudio: React.MutableRefObject<boolean>;
@@ -90,9 +84,6 @@ export default function MoreTableFunctionsButton({
       />
       {moreTableFunctionsActive && (
         <MoreTableFunctionsSection
-          table_id={table_id}
-          username={username}
-          instance={instance}
           tableTopRef={tableTopRef}
           moreTableFunctionsButtonRef={moreTableFunctionsButtonRef}
           mutedAudioRef={mutedAudioRef}

@@ -1,7 +1,7 @@
 import React from "react";
-import { types } from "mediasoup-client";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
@@ -14,10 +14,6 @@ const shareCameraIcon = nginxAssetSeverBaseUrl + "svgs/shareCameraIcon.svg";
 const removeCameraIcon = nginxAssetSeverBaseUrl + "svgs/removeCameraIcon.svg";
 
 export default function CameraSection({
-  device,
-  table_id,
-  username,
-  instance,
   cameraBtnRef,
   newCameraBtnRef,
   isCamera,
@@ -26,10 +22,6 @@ export default function CameraSection({
   producersController,
   handleDisableEnableBtns,
 }: {
-  device: React.MutableRefObject<types.Device | undefined>;
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
-  instance: React.MutableRefObject<string>;
   cameraBtnRef: React.RefObject<HTMLButtonElement>;
   newCameraBtnRef: React.RefObject<HTMLButtonElement>;
   isCamera: React.MutableRefObject<boolean>;
@@ -40,6 +32,7 @@ export default function CameraSection({
 }) {
   const { userMedia } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
+  const { table_id, username, instance, device } = useUserInfoContext();
 
   const cameraSectionController = new CameraSectionController(
     mediasoupSocket,

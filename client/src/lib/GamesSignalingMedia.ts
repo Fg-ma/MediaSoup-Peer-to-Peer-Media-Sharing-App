@@ -1,4 +1,4 @@
-import BundlesController from "src/lib/BundlesController";
+import BundlesController from "../lib/BundlesController";
 import { GameTypes, UserMediaType } from "../context/mediaContext/typeConstant";
 import SnakeGameMedia from "./SnakeGameMedia";
 

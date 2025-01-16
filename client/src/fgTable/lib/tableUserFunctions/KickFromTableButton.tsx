@@ -1,4 +1,5 @@
 import React from "react";
+import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
@@ -8,12 +9,17 @@ const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const kickIcon = nginxAssetSeverBaseUrl + "svgs/userFunctions/kickIcon.svg";
 
 export default function KickFromTableButton({
+  username,
   userPanelRef,
 }: {
+  username: string;
   userPanelRef: React.RefObject<HTMLDivElement>;
 }) {
+  const { tableSocket } = useSocketContext();
+
   return (
     <FgButton
+      clickFunction={() => tableSocket.current?.kickFromTable(username)}
       contentFunction={() => (
         <FgSVG
           src={kickIcon}

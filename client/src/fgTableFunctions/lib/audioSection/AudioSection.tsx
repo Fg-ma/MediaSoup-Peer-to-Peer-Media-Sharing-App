@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import ProducersController from "../../../lib/ProducersController";
@@ -19,9 +20,6 @@ const VolumeSVG = React.lazy(
 );
 
 export default function AudioSection({
-  table_id,
-  username,
-  instance,
   audioBtnRef,
   muteBtnRef,
   mutedAudioRef,
@@ -32,9 +30,6 @@ export default function AudioSection({
   producersController,
   handleDisableEnableBtns,
 }: {
-  table_id: React.MutableRefObject<string>;
-  username: React.MutableRefObject<string>;
-  instance: React.MutableRefObject<string>;
   audioBtnRef: React.RefObject<HTMLButtonElement>;
   muteBtnRef: React.RefObject<HTMLButtonElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
@@ -46,6 +41,7 @@ export default function AudioSection({
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { mediasoupSocket } = useSocketContext();
+  const { table_id, username, instance } = useUserInfoContext();
 
   const [volumeState, setVolumeState] = useState<{
     from: "off" | "low" | "high" | "";

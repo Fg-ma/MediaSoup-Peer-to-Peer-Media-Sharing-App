@@ -1,8 +1,9 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
+import { useSocketContext } from "../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import SharedBundleController from "./lib/SharedBundleController";
-import { useSocketContext } from "../context/socketContext/SocketContext";
 import { IncomingTableStaticContentMessages } from "../lib/TableStaticContentSocketController";
 import VideoMedia from "../lib/VideoMedia";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
@@ -13,17 +14,11 @@ import FgVideo from "../fgElements/fgVideo/FgVideo";
 const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
 export default function SharedBundle({
-  table_id,
-  username,
-  instance,
   name,
   userDevice,
   deadbanding,
   options,
 }: {
-  table_id: string;
-  username: string;
-  instance: string;
   name?: string;
   userDevice: UserDevice;
   deadbanding: Deadbanding;
@@ -37,6 +32,7 @@ export default function SharedBundle({
   const { userMedia } = useMediaContext();
   const { tableStaticContentSocket } = useSocketContext();
   const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+  const { username } = useUserInfoContext();
 
   const sharedBundleRef = useRef<HTMLDivElement>(null);
 
@@ -111,7 +107,7 @@ export default function SharedBundle({
   return (
     <div
       ref={sharedBundleRef}
-      id={`${username}_shared_bundle_container`}
+      id={`${username.current}_shared_bundle_container`}
       className='w-full h-full absolute top-0 left-0 pointer-events-none'
     >
       {userMedia.current.games.snake &&
@@ -119,9 +115,6 @@ export default function SharedBundle({
         Object.keys(userMedia.current.games.snake).map((snakeGameId) => (
           <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
             <SnakeGame
-              table_id={table_id}
-              username={username}
-              instance={instance}
               snakeGameId={snakeGameId}
               sharedBundleRef={sharedBundleRef}
             />
@@ -131,13 +124,7 @@ export default function SharedBundle({
         Object.keys(userMedia.current.video).length !== 0 &&
         Object.keys(userMedia.current.video).map((videoId) => (
           <Suspense key={videoId} fallback={<div>Loading...</div>}>
-            <FgVideo
-              table_id={table_id}
-              username={username}
-              instance={instance}
-              videoId={videoId}
-              sharedBundleRef={sharedBundleRef}
-            />
+            <FgVideo videoId={videoId} sharedBundleRef={sharedBundleRef} />
           </Suspense>
         ))}
     </div>

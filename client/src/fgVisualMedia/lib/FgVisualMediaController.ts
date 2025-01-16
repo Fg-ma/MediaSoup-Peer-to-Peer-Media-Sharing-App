@@ -5,9 +5,9 @@ import {
   ScreenEffectTypes,
   RemoteStreamEffectsType,
 } from "../../context/effectsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import { FgVisualMediaOptions } from "./typeConstant";
-import { Permissions } from "src/context/permissionsContext/typeConstant";
 import {
   IncomingMediasoupMessages,
   onClientEffectChangedType,

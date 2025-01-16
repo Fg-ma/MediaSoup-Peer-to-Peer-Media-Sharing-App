@@ -9,12 +9,13 @@ import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHo
 import AudioEffectButton from "./AudioEffectButton";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
 import { audioEffectTemplates } from "./typeConstant";
+import { IncomingMediasoupMessages } from "../../lib/MediasoupSocketController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
-import { IncomingMediasoupMessages } from "src/lib/MediasoupSocketController";
+
 const mixAudioEffectsIcon =
   nginxAssetSeverBaseUrl + "svgs/audioEffects/mixAudioEffectsIcon.svg";
 const mixAudioEffectsOffIcon =

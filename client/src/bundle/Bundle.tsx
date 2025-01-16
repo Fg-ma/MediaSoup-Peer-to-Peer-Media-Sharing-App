@@ -19,8 +19,6 @@ const FgAudioElementContainer = React.lazy(
 
 export default function Bundle({
   table_id,
-  activeUsername,
-  activeInstance,
   username,
   instance,
   name,
@@ -34,8 +32,6 @@ export default function Bundle({
   onNewConsumerWasCreatedCallback,
 }: {
   table_id: string;
-  activeUsername: string | undefined;
-  activeInstance: string | undefined;
   username: string;
   instance: string;
   name?: string;
@@ -269,8 +265,6 @@ export default function Bundle({
               <RemoteVisualMedia
                 visualMediaId={key}
                 table_id={table_id}
-                activeUsername={activeUsername}
-                activeInstance={activeInstance}
                 username={username}
                 instance={instance}
                 name={name}
@@ -375,8 +369,6 @@ export default function Bundle({
               <RemoteVisualMedia
                 visualMediaId={key}
                 table_id={table_id}
-                activeUsername={activeUsername}
-                activeInstance={activeInstance}
                 username={username}
                 instance={instance}
                 name={name}
@@ -431,8 +423,6 @@ export default function Bundle({
           <Suspense fallback={<div>Loading...</div>}>
             <FgAudioElementContainer
               table_id={table_id}
-              activeUsername={activeUsername}
-              activeInstance={activeInstance}
               username={username}
               instance={instance}
               name={name}

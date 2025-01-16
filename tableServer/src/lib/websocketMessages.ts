@@ -18,6 +18,9 @@ const handleMessage = (ws: TableWebSocket, event: MessageTypes) => {
     case "swapSeats":
       tablesController.onSwapSeats(event);
       break;
+    case "kickFromTable":
+      tablesController.onKickFromTable(event);
+      break;
     default:
       break;
   }
