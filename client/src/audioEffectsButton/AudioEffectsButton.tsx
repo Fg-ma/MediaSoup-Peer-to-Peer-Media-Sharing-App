@@ -35,6 +35,7 @@ export default function AudioEffectsButton({
   handleAudioEffectChange,
   handleMute,
   muteStateRef,
+  videoContentMute,
   clientMute,
   screenAudioClientMute,
   localMute,
@@ -50,21 +51,24 @@ export default function AudioEffectsButton({
   username: string;
   instance: string;
   isUser: boolean;
-  permissions: Permissions;
-  producerType: "audio" | "screenAudio";
+  permissions: Permissions | undefined;
+  producerType: "audio" | "screenAudio" | "video";
   producerId: string | undefined;
   audioEffectsActive: boolean;
   setAudioEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
   handleAudioEffectChange: (
-    producerType: "audio" | "screenAudio",
+    producerType: "audio" | "screenAudio" | "video",
     producerId: string | undefined,
     effect: AudioEffectTypes
   ) => void;
   handleMute: (
-    producerType: "audio" | "screenAudio",
+    producerType: "audio" | "screenAudio" | "video",
     producerId: string | undefined
   ) => void;
   muteStateRef?: React.MutableRefObject<boolean>;
+  videoContentMute?: React.MutableRefObject<{
+    [producerId: string]: boolean;
+  }>;
   clientMute?: React.MutableRefObject<boolean>;
   screenAudioClientMute?: React.MutableRefObject<{
     [screenAudioId: string]: boolean;

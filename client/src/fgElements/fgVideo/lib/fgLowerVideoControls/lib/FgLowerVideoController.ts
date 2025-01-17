@@ -246,10 +246,15 @@ class FgLowerVideoController {
         document.addEventListener("pointermove", this.rotateFunction);
         document.addEventListener("pointerdown", this.rotateFunctionEnd);
         break;
+      case "h":
+        this.handleDesync();
+        break;
       default:
         break;
     }
   };
+
+  handleDesync = () => {};
 
   scaleFunctionEnd = () => {
     this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();

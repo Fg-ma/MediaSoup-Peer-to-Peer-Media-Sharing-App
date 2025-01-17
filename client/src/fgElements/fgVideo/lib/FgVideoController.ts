@@ -181,14 +181,18 @@ class FgVideoController {
       // Container is wider than the video aspect ratio
       this.videoMedia.video.style.width = "auto";
       this.videoMedia.video.style.height = "100%";
-      this.videoMedia.hiddenVideo.style.width = "auto";
-      this.videoMedia.hiddenVideo.style.height = "100%";
+      if (this.videoMedia.hiddenVideo) {
+        this.videoMedia.hiddenVideo.style.width = "auto";
+        this.videoMedia.hiddenVideo.style.height = "100%";
+      }
     } else {
       // Container is taller than the video aspect ratio
       this.videoMedia.video.style.width = "100%";
       this.videoMedia.video.style.height = "auto";
-      this.videoMedia.hiddenVideo.style.width = "100%";
-      this.videoMedia.hiddenVideo.style.height = "auto";
+      if (this.videoMedia.hiddenVideo) {
+        this.videoMedia.hiddenVideo.style.width = "100%";
+        this.videoMedia.hiddenVideo.style.height = "auto";
+      }
     }
   };
 

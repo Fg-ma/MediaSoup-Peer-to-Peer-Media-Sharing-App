@@ -1,10 +1,7 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
-import {
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
+import { useUserInfoContext } from "../../../../context/userInfoContext/UserInfoContext";
 import { IncomingMediasoupMessages } from "../../../../lib/MediasoupSocketController";
 import FgLowerVideoController from "./lib/FgLowerVideoController";
 import { FgVideoOptions, Settings } from "../typeConstant";
@@ -17,6 +14,8 @@ import CaptionButton from "./lib/captionsButton/CaptionButton";
 import FgSettingsButton from "./lib/fgSettingsButton/FgSettingsButton";
 import VideoEffectsButton from "./lib/videoEffectsButton/VideoEffectsButton";
 import AudioEffectsButton from "../../../../audioEffectsButton/AudioEffectsButton";
+import VideoMedia from "../../../../lib/VideoMedia";
+import { AudioEffectTypes } from "src/context/effectsContext/typeConstant";
 
 const VideoEffectsSection = React.lazy(
   () => import("../videoEffectsSection/VideoEffectsSection")
@@ -88,8 +87,10 @@ export interface ActivePages {
 
 export default function FgLowerVideoControls({
   videoId,
+  videoMedia,
   fgLowerVideoController,
   pausedState,
+  videoContentMute,
   videoContainerRef,
   subContainerRef,
   currentTimeRef,
@@ -102,8 +103,12 @@ export default function FgLowerVideoControls({
   fgVideoOptions,
 }: {
   videoId: string;
+  videoMedia: VideoMedia;
   fgLowerVideoController: FgLowerVideoController;
   pausedState: boolean;
+  videoContentMute: React.MutableRefObject<{
+    [videoId: string]: boolean;
+  }>;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   subContainerRef: React.RefObject<HTMLDivElement>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
@@ -116,6 +121,7 @@ export default function FgLowerVideoControls({
   fgVideoOptions: FgVideoOptions;
 }) {
   const { mediasoupSocket } = useSocketContext();
+  const { table_id, username, instance } = useUserInfoContext();
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [activePages, setActivePages] = useState<ActivePages>({
@@ -167,6 +173,17 @@ export default function FgLowerVideoControls({
     };
   }, []);
 
+  const handleAudioEffectChange = (
+    producerType: "audio" | "screenAudio" | "video",
+    producerId: string | undefined,
+    effect: AudioEffectTypes
+  ) => {};
+
+  const handleMute = (
+    producerType: "audio" | "screenAudio" | "video",
+    producerId: string | undefined
+  ) => {};
+
   return (
     <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20 pointer-events-none'>
       <div className='relative pointer-events-auto'>
@@ -195,11 +212,11 @@ export default function FgLowerVideoControls({
             settingsActive={settingsActive}
           />
           {/* <FgVolumeElement
-            table_id={table_id}
-            username={username}
-            instance={instance}
+            table_id={table_id.current}
+            username={username.current}
+            instance={instance.current}
             isUser={false}
-            producerType={"audio"}
+            producerType={"staticAudio"}
             producerId={undefined}
             audioRef={audioRef}
             clientMute={clientMute}
@@ -233,16 +250,16 @@ export default function FgLowerVideoControls({
             settingsActive={settingsActive}
             scrollingContainerRef={rightVideoControlsRef}
           />
-          {/* <CaptionButton
+          <CaptionButton
             fgLowerVideoController={fgLowerVideoController}
             videoEffectsActive={videoEffectsActive}
             settingsActive={settingsActive}
             settings={settings}
-            audioStream={audioStream}
+            audioStream={videoMedia.getAudioTrack()}
             videoContainerRef={videoContainerRef}
             scrollingContainerRef={rightVideoControlsRef}
             containerRef={subContainerRef}
-          /> */}
+          />
           <FgSettingsButton
             fgVideoOptions={fgVideoOptions}
             videoEffectsActive={videoEffectsActive}
@@ -261,17 +278,20 @@ export default function FgLowerVideoControls({
             settingsActive={settingsActive}
             scrollingContainerRef={rightVideoControlsRef}
           />
-          {/* <AudioEffectsButton
-            table_id={table_id}
-            username={username}
-            instance={instance}
+          <AudioEffectsButton
+            table_id={table_id.current}
+            username={username.current}
+            instance={instance.current}
             isUser={false}
-            permissions={fgVideoOptions.permissions}
-            producerType={"audio"}
-            producerId={undefined}
+            permissions={undefined}
+            producerType={"video"}
+            producerId={videoId}
             audioEffectsActive={audioEffectsActive}
             setAudioEffectsActive={setAudioEffectsActive}
             visualMediaContainerRef={videoContainerRef}
+            handleAudioEffectChange={handleAudioEffectChange}
+            handleMute={handleMute}
+            videoContentMute={videoContentMute}
             closeLabelElement={
               <FgHoverContentStandard content='Close (x)' style='dark' />
             }
@@ -287,7 +307,7 @@ export default function FgLowerVideoControls({
               backgroundColor: "rgba(10, 10, 10, 1)",
               secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
             }}
-          /> */}
+          />
         </div>
       </div>
     </div>

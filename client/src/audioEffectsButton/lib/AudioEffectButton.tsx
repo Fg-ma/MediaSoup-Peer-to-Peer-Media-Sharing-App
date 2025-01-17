@@ -20,7 +20,7 @@ export default function AudioEffectButton({
   username: string;
   instance: string;
   isUser: boolean;
-  producerType: "audio" | "screenAudio";
+  producerType: "audio" | "screenAudio" | "video";
   producerId?: string;
   audioEffect: AudioEffectTypes;
   audioEffectTemplate: AudioEffectTemplate;
@@ -36,11 +36,19 @@ export default function AudioEffectButton({
   const streamEffects = isUser
     ? producerType === "audio"
       ? userStreamEffects.current[producerType][audioEffect]
+      : producerType === "video"
+      ? producerId
+        ? userStreamEffects.current[producerType][producerId].audio[audioEffect]
+        : undefined
       : producerId
       ? userStreamEffects.current[producerType][producerId][audioEffect]
       : undefined
     : producerType === "audio"
     ? remoteStreamEffects.current[username][instance][producerType][audioEffect]
+    : producerType === "video"
+    ? producerId
+      ? remoteStreamEffects.current[producerType][producerId].audio[audioEffect]
+      : undefined
     : producerId
     ? remoteStreamEffects.current[username][instance][producerType][producerId][
         audioEffect

@@ -97,11 +97,11 @@ export default function ScreenSection({
         clickFunction={() => screenSectionController.shareNewScreen()}
         className={`${
           screenActive ? "visible" : "hidden"
-        } bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 disabled:opacity-25 h-full aspect-square`}
+        } disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white`}
         contentFunction={() => (
           <FgSVG
             src={shareScreenIcon}
-            className='h-full aspect-square'
+            className='h-[80%] aspect-square'
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },

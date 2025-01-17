@@ -35,6 +35,9 @@ export default function SharedBundle({
   const { username } = useUserInfoContext();
 
   const sharedBundleRef = useRef<HTMLDivElement>(null);
+  const videoContentMute = useRef<{
+    [videoId: string]: boolean;
+  }>({});
 
   const [_, setRerender] = useState(false);
 
@@ -124,7 +127,11 @@ export default function SharedBundle({
         Object.keys(userMedia.current.video).length !== 0 &&
         Object.keys(userMedia.current.video).map((videoId) => (
           <Suspense key={videoId} fallback={<div>Loading...</div>}>
-            <FgVideo videoId={videoId} sharedBundleRef={sharedBundleRef} />
+            <FgVideo
+              videoId={videoId}
+              sharedBundleRef={sharedBundleRef}
+              videoContentMute={videoContentMute}
+            />
           </Suspense>
         ))}
     </div>

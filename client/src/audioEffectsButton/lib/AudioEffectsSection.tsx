@@ -54,6 +54,7 @@ export default function AudioEffectsSection({
   padding,
   handleMute,
   muteStateRef,
+  videoContentMute,
   clientMute,
   screenAudioClientMute,
   localMute,
@@ -68,11 +69,11 @@ export default function AudioEffectsSection({
   username: string;
   instance: string;
   isUser: boolean;
-  permissions: Permissions;
-  producerType: "audio" | "screenAudio";
+  permissions: Permissions | undefined;
+  producerType: "audio" | "screenAudio" | "video";
   producerId: string | undefined;
   handleAudioEffectChange: (
-    producerType: "audio" | "screenAudio",
+    producerType: "audio" | "screenAudio" | "video",
     producerId: string | undefined,
     effect: AudioEffectTypes
   ) => void;
@@ -80,10 +81,13 @@ export default function AudioEffectsSection({
   referenceElement: React.RefObject<HTMLElement>;
   padding: number;
   handleMute: (
-    producerType: "audio" | "screenAudio",
+    producerType: "audio" | "screenAudio" | "video",
     producerId: string | undefined
   ) => void;
   muteStateRef?: React.MutableRefObject<boolean>;
+  videoContentMute?: React.MutableRefObject<{
+    [producerId: string]: boolean;
+  }>;
   clientMute?: React.MutableRefObject<boolean>;
   screenAudioClientMute?: React.MutableRefObject<{
     [screenAudioId: string]: boolean;
@@ -110,6 +114,10 @@ export default function AudioEffectsSection({
     from: "",
     to: muteStateRef
       ? muteStateRef.current
+        ? "off"
+        : "high"
+      : producerType === "video" && videoContentMute && producerId
+      ? videoContentMute.current[producerId]
         ? "off"
         : "high"
       : producerType === "audio" && clientMute
@@ -154,6 +162,10 @@ export default function AudioEffectsSection({
       ? muteStateRef.current
         ? "off"
         : "high"
+      : producerType === "video" && videoContentMute && producerId
+      ? videoContentMute.current[producerId]
+        ? "off"
+        : "high"
       : producerType === "audio" && clientMute
       ? clientMute.current
         ? "off"
@@ -185,6 +197,7 @@ export default function AudioEffectsSection({
     }
   }, [
     muteStateRef?.current,
+    videoContentMute?.current,
     clientMute?.current,
     localMute?.current,
     screenAudioClientMute?.current[producerId ?? ""],
@@ -296,6 +309,12 @@ export default function AudioEffectsSection({
                       ? muteStateRef.current
                         ? "Unmute"
                         : "Mute"
+                      : producerType === "video" &&
+                        videoContentMute &&
+                        producerId
+                      ? videoContentMute.current[producerId]
+                        ? "off"
+                        : "high"
                       : producerType === "audio" && clientMute
                       ? clientMute.current
                         ? "Unmute"

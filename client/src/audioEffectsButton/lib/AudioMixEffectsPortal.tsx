@@ -28,10 +28,10 @@ export default function AudioMixEffectsPortal({
   table_id: string;
   username: string;
   instance: string;
-  producerType: "audio" | "screenAudio";
+  producerType: "audio" | "screenAudio" | "video";
   producerId: string | undefined;
   isUser: boolean;
-  permissions: Permissions;
+  permissions: Permissions | undefined;
   audioMixEffectsButtonRef: React.RefObject<HTMLButtonElement>;
   closeCallback: () => void;
 }) {

@@ -83,7 +83,7 @@ export type UserStreamEffectsType = {
     [effectType in AudioEffectTypes]: boolean;
   };
   video: {
-    [cameraId: string]: {
+    [videoId: string]: {
       video: { [effectType in VideoEffectTypes]: boolean };
       audio: { [effectType in AudioEffectTypes]: boolean };
     };

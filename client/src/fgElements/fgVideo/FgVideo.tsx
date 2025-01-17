@@ -24,11 +24,15 @@ export default function FgVideo({
   videoId,
   name,
   sharedBundleRef,
+  videoContentMute,
   options,
 }: {
   videoId: string;
   name?: string;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
+  videoContentMute: React.MutableRefObject<{
+    [videoId: string]: boolean;
+  }>;
   options?: FgVideoOptions;
 }) {
   const fgVideoOptions = {
@@ -39,7 +43,7 @@ export default function FgVideo({
   const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
   const { userStreamEffects } = useEffectsContext();
   const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
-  const { table_id, username, instance } = useUserInfoContext();
+  const { table_id } = useUserInfoContext();
 
   const videoMedia = userMedia.current.video[videoId];
 
@@ -291,7 +295,9 @@ export default function FgVideo({
     fgVideoController.attachPositioningListeners();
 
     subContainerRef.current?.appendChild(videoMedia.video);
-    subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
+    if (videoMedia.hiddenVideo) {
+      subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
+    }
   }, []);
 
   return (
@@ -336,11 +342,16 @@ export default function FgVideo({
         ref={subContainerRef}
         className='relative flex items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
-        <FgUpperVideoControls fgLowerVideoController={fgLowerVideoController} />
+        <FgUpperVideoControls
+          desync={desync}
+          fgLowerVideoController={fgLowerVideoController}
+        />
         <FgLowerVideoControls
           videoId={videoId}
+          videoMedia={videoMedia}
           fgLowerVideoController={fgLowerVideoController}
           pausedState={pausedState}
+          videoContentMute={videoContentMute}
           videoContainerRef={videoContainerRef}
           subContainerRef={subContainerRef}
           currentTimeRef={currentTimeRef}

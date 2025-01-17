@@ -22,10 +22,10 @@ class AudioMixEffectsPortalController {
     private table_id: string,
     private username: string,
     private instance: string,
-    private producerType: "audio" | "screenAudio",
+    private producerType: "audio" | "screenAudio" | "video",
     private producerId: string | undefined,
     private isUser: boolean,
-    private permissions: Permissions,
+    private permissions: Permissions | undefined,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private dynamicMixEffects: React.MutableRefObject<{
@@ -203,9 +203,10 @@ class AudioMixEffectsPortalController {
     this.setRerender((prev) => !prev);
 
     if (
-      (this.producerType === "audio" && this.permissions.acceptsAudioEffects) ||
+      (this.producerType === "audio" &&
+        this.permissions?.acceptsAudioEffects) ||
       (this.producerType === "screenAudio" &&
-        this.permissions.acceptsScreenAudioEffects)
+        this.permissions?.acceptsScreenAudioEffects)
     ) {
       this.mediasoupSocket.current?.sendMessage({
         type: "clientMixEffectActivityChange",
@@ -230,9 +231,9 @@ class AudioMixEffectsPortalController {
     } else {
       if (
         (this.producerType === "audio" &&
-          this.permissions.acceptsAudioEffects) ||
+          this.permissions?.acceptsAudioEffects) ||
         (this.producerType === "screenAudio" &&
-          this.permissions.acceptsScreenAudioEffects)
+          this.permissions?.acceptsScreenAudioEffects)
       ) {
         this.mediasoupSocket.current?.sendMessage({
           type: "requestMixEffectActivityChange",
@@ -285,9 +286,10 @@ class AudioMixEffectsPortalController {
     }
 
     if (
-      (this.producerType === "audio" && this.permissions.acceptsAudioEffects) ||
+      (this.producerType === "audio" &&
+        this.permissions?.acceptsAudioEffects) ||
       (this.producerType === "screenAudio" &&
-        this.permissions.acceptsScreenAudioEffects)
+        this.permissions?.acceptsScreenAudioEffects)
     ) {
       this.mediasoupSocket.current?.sendMessage({
         type: "clientMixEffectValueChange",
@@ -321,9 +323,9 @@ class AudioMixEffectsPortalController {
     } else {
       if (
         (this.producerType === "audio" &&
-          this.permissions.acceptsAudioEffects) ||
+          this.permissions?.acceptsAudioEffects) ||
         (this.producerType === "screenAudio" &&
-          this.permissions.acceptsScreenAudioEffects)
+          this.permissions?.acceptsScreenAudioEffects)
       ) {
         this.mediasoupSocket.current?.sendMessage({
           type: "requestMixEffectValueChange",
@@ -415,9 +417,9 @@ class AudioMixEffectsPortalController {
 
     if (
       ((this.producerType === "audio" &&
-        this.permissions.acceptsAudioEffects) ||
+        this.permissions?.acceptsAudioEffects) ||
         (this.producerType === "screenAudio" &&
-          this.permissions.acceptsScreenAudioEffects)) &&
+          this.permissions?.acceptsScreenAudioEffects)) &&
       requestedProducerType === this.producerType &&
       (this.producerType === "audio" ||
         (this.producerType === "screenAudio" &&
@@ -443,9 +445,9 @@ class AudioMixEffectsPortalController {
 
     if (
       ((this.producerType === "audio" &&
-        this.permissions.acceptsAudioEffects) ||
+        this.permissions?.acceptsAudioEffects) ||
         (this.producerType === "screenAudio" &&
-          this.permissions.acceptsScreenAudioEffects)) &&
+          this.permissions?.acceptsScreenAudioEffects)) &&
       requestedProducerType === this.producerType &&
       (this.producerType === "audio" ||
         (this.producerType === "screenAudio" &&

@@ -23,8 +23,8 @@ class VideoMedia {
   canvas: HTMLCanvasElement;
   video: HTMLVideoElement;
   shakaPlayer: shaka.Player;
-  hiddenVideo: HTMLVideoElement;
-  hiddenShakaPlayer: shaka.Player;
+  hiddenVideo: HTMLVideoElement | undefined;
+  hiddenShakaPlayer: shaka.Player | undefined;
 
   originalVideoURL: string;
   dashUrl: string | undefined;
@@ -172,22 +172,23 @@ class VideoMedia {
       this.shakaPlayer.load(this.originalVideoURL).then(() => {
         console.log("Original video loaded successfully");
       });
+
+      this.hiddenVideo = document.createElement("video");
+      this.hiddenVideo.style.position = "absolute";
+      this.hiddenVideo.style.top = "0";
+      this.hiddenVideo.style.left = "0";
+      this.hiddenVideo.style.objectFit = "cover";
+      this.hiddenVideo.style.backgroundColor = "#000";
+      this.hiddenVideo.style.zIndex = "10";
+      this.hiddenVideo.style.display = "none";
+      this.hiddenVideo.style.opacity = "0%";
+      this.hiddenVideo.muted = true;
+      this.hiddenShakaPlayer = new shaka.Player(this.hiddenVideo);
     }
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
     };
-
-    this.hiddenVideo = document.createElement("video");
-    this.hiddenVideo.style.position = "absolute";
-    this.hiddenVideo.style.top = "0";
-    this.hiddenVideo.style.left = "0";
-    this.hiddenVideo.style.objectFit = "cover";
-    this.hiddenVideo.style.backgroundColor = "#000";
-    this.hiddenVideo.style.zIndex = "10";
-    this.hiddenVideo.style.display = "none";
-    this.hiddenVideo.style.opacity = "0%";
-    this.hiddenShakaPlayer = new shaka.Player(this.hiddenVideo);
 
     this.babylonScene = new BabylonScene(
       this.videoId,
@@ -215,8 +216,12 @@ class VideoMedia {
     // Pause and cleanup video elements
     this.video.pause();
     this.video.srcObject = null;
-    this.hiddenVideo.pause();
-    this.hiddenVideo.srcObject = null;
+
+    if (this.hiddenVideo) {
+      this.hiddenVideo.pause();
+      this.hiddenVideo.srcObject = null;
+      this.hiddenVideo = undefined;
+    }
 
     // Destroy Shaka players to release resources
     if (this.shakaPlayer) {
@@ -251,6 +256,8 @@ class VideoMedia {
   preloadDashStream = (url: string) => {
     this.dashUrl = url;
 
+    if (!this.hiddenShakaPlayer) return;
+
     if (this.dashUrl) {
       this.hiddenShakaPlayer.load(this.dashUrl).then(() => {
         this.switchToDashStream();
@@ -261,6 +268,8 @@ class VideoMedia {
   switchToDashStream = async () => {
     console.log("DASH stream swap");
 
+    if (!this.hiddenVideo) return;
+
     try {
       const currentTime = this.video.currentTime;
       const isPaused = this.video.paused;
@@ -270,6 +279,7 @@ class VideoMedia {
       if (!isPaused) {
         this.hiddenVideo.play();
       }
+      this.hiddenVideo.muted = false;
 
       const videoBox = this.video.getBoundingClientRect();
 
@@ -281,7 +291,7 @@ class VideoMedia {
 
       // After a short delay, switch the main video to DASH and hide the hidden video
       setTimeout(async () => {
-        if (!this.dashUrl) return;
+        if (!this.dashUrl || !this.hiddenVideo) return;
 
         await this.shakaPlayer?.load(
           this.dashUrl,
@@ -296,10 +306,16 @@ class VideoMedia {
           this.video.play();
         }
 
+        this.hiddenVideo.muted = true;
+
         // Hide the hidden video and clean up
         setTimeout(() => {
-          this.hiddenVideo.style.display = "none";
-          this.hiddenVideo.style.opacity = "0%";
+          if (this.hiddenVideo) {
+            this.hiddenVideo.pause();
+            this.hiddenVideo.remove();
+            this.hiddenVideo.srcObject = null;
+            this.hiddenVideo = undefined;
+          }
         }, 250);
       }, 500); // Adjust the delay if needed
     } catch (error) {
@@ -485,6 +501,10 @@ class VideoMedia {
 
   getStream = () => {
     return this.canvas.captureStream();
+  };
+
+  getAudioTrack = () => {
+    return this.video.captureStream() as MediaStream;
   };
 
   getTrack = () => {
