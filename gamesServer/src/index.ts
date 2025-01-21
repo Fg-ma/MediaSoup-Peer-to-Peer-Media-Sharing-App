@@ -13,8 +13,8 @@ export const universalGameController = new UniversalGameController(broadcaster);
 export const snakeGameController = new SnakeGameController();
 
 const sslOptions = {
-  key_file_name: "../certs/tabletop-game-server-key.pem",
-  cert_file_name: "../certs/tabletop-game-server.pem",
+  key_file_name: "../certs/tabletop-games-server-key.pem",
+  cert_file_name: "../certs/tabletop-games-server.pem",
 };
 
 uWS

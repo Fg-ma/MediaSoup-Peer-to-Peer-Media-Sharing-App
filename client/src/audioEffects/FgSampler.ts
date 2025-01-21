@@ -33,7 +33,7 @@ import fgSamplers, {
   FgWindsSamplers,
   SamplerType,
 } from "./fgSamplers";
-import FgMetronome from "./FgMetronome";
+import FgMetronome from "./fgMetronome";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,

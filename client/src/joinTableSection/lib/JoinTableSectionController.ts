@@ -106,7 +106,7 @@ class JoinTableSectionController {
       }
 
       this.tableSocket.current = new TableSocketController(
-        "https://localhost:8043",
+        "wss://localhost:8043",
         this.table_id.current,
         this.username.current,
         this.instance.current
@@ -114,7 +114,7 @@ class JoinTableSectionController {
 
       this.tableStaticContentSocket.current =
         new TableStaticContentSocketController(
-          "https://localhost:8045",
+          "wss://localhost:8045",
           this.table_id.current,
           this.username.current,
           this.instance.current,
@@ -129,13 +129,13 @@ class JoinTableSectionController {
         this.table_id.current,
         this.username.current,
         this.instance.current,
-        "https://localhost:8042",
+        "wss://localhost:8042",
         this.userMedia,
         this.bundlesController
       );
 
       this.mediasoupSocket.current = new MediasoupSocketController(
-        "https://localhost:8000",
+        "wss://localhost:8000",
         this.table_id.current,
         this.username.current,
         this.instance.current,
