@@ -1,6 +1,6 @@
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const ChristmasIcon = nginxAssetSeverBaseUrl + "svgs/christmasIcon.svg";
+const ChristmasIcon = nginxAssetSeverBaseUrl + "svgs/ChristmasIcon.svg";
 const DarkIcon = nginxAssetSeverBaseUrl + "svgs/darkIcon.svg";
 const geometricIcon = nginxAssetSeverBaseUrl + "svgs/geometricIcon.svg";
 const miscIcon = nginxAssetSeverBaseUrl + "svgs/miscIcon.svg";
@@ -51,8 +51,8 @@ const merryChristmas_1280x731 =
 const merryChristmas_64x37 =
   nginxAssetSeverBaseUrl +
   "backgroundImages/christmas/merryChristmas_64x37.png";
-const snowFlake_1280x852 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/snowFlake_1280x852.jpg";
+const snowflake_1280x852 =
+  nginxAssetSeverBaseUrl + "backgroundImages/christmas/snowflake_1280x852.jpg";
 const snowflake_64x43 =
   nginxAssetSeverBaseUrl + "backgroundImages/christmas/snowflake_64x43.jpg";
 const snowman_1280x880 =
@@ -491,6 +491,10 @@ const tree_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/tree_1280x1280.png";
 const tree_64x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/tree_64x64.png";
+const wolf_1277x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/wolf_1277x1280.png";
+const wolf_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/wolf_64x64.png";
 
 const gotMeat_1280x931 =
   nginxAssetSeverBaseUrl + "backgroundImages/neon/gotMeat_1280x931.png";
@@ -649,6 +653,14 @@ const apollo_1280x1262 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/apollo_1280x1262.png";
 const apollo_64x63 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/apollo_64x63.png";
+const ARP107_799x319 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/ARP107_799x319.jpg";
+const ARP107_64x26 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/ARP107_64x26.jpg";
+const ARP107_MIRI_1291x1356 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/ARP107_MIRI_1291x1356.png";
+const ARP107_MIRI_61x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/ARP107_MIRI_61x64.png";
 const astronaut_1280x857 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/astronaut_1280x857.jpg";
 const astronaut_64x43 =
@@ -665,6 +677,10 @@ const blueBall_1280x800 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/blueBall_1280x800.png";
 const blueBall_64x40 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/blueBall_64x40.png";
+const carinaNebula_800x463 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/carinaNebula_800x463.jpg";
+const carinaNebula_64x37 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/carinaNebula_64x37.png";
 const greenAstronaut_1280x1280 =
   nginxAssetSeverBaseUrl +
   "backgroundImages/space/greenAstronaut_1280x1280.png";
@@ -683,6 +699,83 @@ const landscape2_1280x720 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/landscape2_1280x720.png";
 const landscape2_64x36 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/landscape2_64x36.png";
+const M16_pillarsOfCreation_864x814 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/M16_pillarsOfCreation_864x814.jpg";
+const M16_pillarsOfCreation_64x60 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/M16_pillarsOfCreation_64x60.png";
+const M74_phantomGalaxy_799x245 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/M74_phantomGalaxy_799x245.jpg";
+const M74_phantomGalaxy_64x20 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/M74_phantomGalaxy_64x20.png";
+const M104_sombreroGalaxy_799x267 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/M104_sombreroGalaxy_799x267.jpg";
+const M104_sombreroGalaxy_64x21 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/M104_sombreroGalaxy_64x21.png";
+const NGC602_smallMagellanicCloud_799x693 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/NGC602_smallMagellanicCloud_799x693.jpg";
+const NGC602_smallMagellanicCloud_64x55 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/NGC602_smallMagellanicCloud_64x55.jpg";
+const NGC628_phantomGalaxy_800x501 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/NGC628_phantomGalaxy_800x501.jpg";
+const NGC628_phantomGalaxy_64x40 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/NGC628_phantomGalaxy_64x40.png";
+const NGC1385_1348x1963 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC1385_1348x1963.png";
+const NGC1385_44x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC1385_44x64.png";
+const NGC1672_seyfertGalaxy_800x304 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/NGC1672_seyfertGalaxy_800x304.jpg";
+const NGC1672_seyfertGalaxy_64x24 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/NGC1672_seyfertGalaxy_64x24.png";
+const NGC2090_1280x1218 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC2090_1280x1218.jpg";
+const NGC2090_64x61 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC2090_64x61.jpg";
+const NGC2207_800x613 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC2207_800x613.jpg";
+const NGC2207_64x49 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC2207_64x49.png";
+const NGC2566_729x800 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC2566_729x800.jpg";
+const NGC2566_58x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC2566_58x64.jpg";
+const NGC3132_southernRingNebula_800x745 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/NGC3132_southernRingNebula_800x745.jpg";
+const NGC3132_southernRingNebula_64x60 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/NGC3132_southernRingNebula_64x60.png";
+const NGC3324_864x657 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC3324_864x657.jpg";
+const NGC3324_64x49 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC3324_64x49.jpg";
+const NGC3351_799x468 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC3351_799x468.jpg";
+const NGC3351_64x37 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC3351_64x37.png";
+const NGC4449_1280x741 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC4449_1280x741.jpg";
+const NGC4449_64x37 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC4449_64x37.jpg";
+const NGC4449_NIR_1280x569 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC4449_NIR_1280x569.jpg";
+const NGC4449_NIR_64x28 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC4449_NIR_64x28.jpg";
+const NGC6440_800x512 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC6440_800x512.jpg";
+const NGC6440_64x41 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/NGC6440_64x41.jpg";
 const overTheMoon_1280x915 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/overTheMoon_1280x915.png";
 const overTheMoon_64x46 =
@@ -699,6 +792,10 @@ const rocket_1024x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/rocket_1024x1280.png";
 const rocket_51x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/rocket_51x64.png";
+const SN1987A_864x714 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/SN1987A_864x714.jpg";
+const SN1987A_64x53 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/SN1987A_64x53.jpg";
 const solarParty_960x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/solarParty_960x1280.png";
 const solarParty_48x64 =
@@ -723,6 +820,12 @@ const spaceTriangle_726x726 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/spaceTriangle_726x726.png";
 const spaceTriangle_64x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/spaceTriangle_64x64.png";
+const spiderwebProtocluster_800x501 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/spiderwebProtocluster_800x501.jpg";
+const spiderwebProtocluster_64x40 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/spiderwebProtocluster_64x40.jpg";
 const starMap_1169x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/starMap_1169x1280.png";
 const starMap_58x64 =
@@ -740,6 +843,14 @@ const ufo_1280x720 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/ufo_1280x720.jpg";
 const ufo_64x36 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/ufo_64x36.jpg";
+const westerlund1_1280x836 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/westerlund1_1280x836.jpg";
+const westerlund1_64x42 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/westerlund1_64x42.jpg";
+const WR124_864x851 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/WR124_864x851.jpg";
+const WR124_64x63 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/WR124_64x63.jpg";
 
 const atm_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/technology/atm_1280x1280.png";
@@ -988,7 +1099,8 @@ export type NatureCategories =
   | "sunset"
   | "swordfish"
   | "temple"
-  | "tree";
+  | "tree"
+  | "wolf";
 export type NeonCategories =
   | "gotMeat"
   | "map"
@@ -1031,28 +1143,51 @@ export type PixelArtCategories =
 export type SpaceCategories =
   | "alien"
   | "apollo"
+  | "ARP107"
+  | "ARP107_MIRI"
   | "astronaut"
   | "bigDipper"
   | "blueAstronaut"
   | "blueBall"
+  | "carinaNebula"
   | "greenAstronaut"
   | "heyTheresEarth"
   | "landscape1"
   | "landscape2"
+  | "M16_pillarsOfCreation"
+  | "M74_phantomGalaxy"
+  | "M104_sombreroGalaxy"
+  | "NGC602_smallMagellanicCloud"
+  | "NGC628_phantomGalaxy"
+  | "NGC1385"
+  | "NGC1672_seyfertGalaxy"
+  | "NGC2090"
+  | "NGC2207"
+  | "NGC2566"
+  | "NGC3132_southernRingNebula"
+  | "NGC3324"
+  | "NGC3351"
+  | "NGC4449"
+  | "NGC4449_NIR"
+  | "NGC6440"
   | "overTheMoon"
   | "planet"
   | "planetRing"
   | "rocket"
+  | "SN1987A"
   | "solarParty"
   | "spaceChart"
   | "spacePyramid"
   | "spaceShuttle1"
   | "spaceShuttle2"
   | "spaceTriangle"
+  | "spiderwebProtocluster"
   | "starMap"
   | "theBigQuestions"
   | "theWorldAwaits"
-  | "ufo";
+  | "ufo"
+  | "westerlund1"
+  | "WR124";
 export type TechnologyCategories =
   | "atm"
   | "bigData"
@@ -1333,7 +1468,7 @@ export const categories: {
     },
     snowflake: {
       label: "Snowflake",
-      url: snowFlake_1280x852,
+      url: snowflake_1280x852,
       loadingUrl: snowflake_64x43,
       pixelated: false,
     },
@@ -1959,6 +2094,12 @@ export const categories: {
       loadingUrl: tree_64x64,
       pixelated: false,
     },
+    wolf: {
+      label: "Wolf",
+      url: wolf_1277x1280,
+      loadingUrl: wolf_64x64,
+      pixelated: false,
+    },
   },
   neon: {
     gotMeat: {
@@ -2199,6 +2340,18 @@ export const categories: {
       loadingUrl: apollo_64x63,
       pixelated: false,
     },
+    ARP107: {
+      label: "ARP107",
+      url: ARP107_799x319,
+      loadingUrl: ARP107_64x26,
+      pixelated: false,
+    },
+    ARP107_MIRI: {
+      label: "ARP107 (MIRI)",
+      url: ARP107_MIRI_1291x1356,
+      loadingUrl: ARP107_MIRI_61x64,
+      pixelated: false,
+    },
     astronaut: {
       label: "Astronaut",
       url: astronaut_1280x857,
@@ -2221,6 +2374,12 @@ export const categories: {
       label: "Blue ball",
       url: blueBall_1280x800,
       loadingUrl: blueBall_64x40,
+      pixelated: false,
+    },
+    carinaNebula: {
+      label: "Carina nebula",
+      url: carinaNebula_800x463,
+      loadingUrl: carinaNebula_64x37,
       pixelated: false,
     },
     greenAstronaut: {
@@ -2247,6 +2406,102 @@ export const categories: {
       loadingUrl: landscape2_64x36,
       pixelated: false,
     },
+    M16_pillarsOfCreation: {
+      label: "Pillars of creation (M16)",
+      url: M16_pillarsOfCreation_864x814,
+      loadingUrl: M16_pillarsOfCreation_64x60,
+      pixelated: false,
+    },
+    M74_phantomGalaxy: {
+      label: "Phantom galaxy (M74)",
+      url: M74_phantomGalaxy_799x245,
+      loadingUrl: M74_phantomGalaxy_64x20,
+      pixelated: false,
+    },
+    M104_sombreroGalaxy: {
+      label: "Sombrero galaxy (M104)",
+      url: M104_sombreroGalaxy_799x267,
+      loadingUrl: M104_sombreroGalaxy_64x21,
+      pixelated: false,
+    },
+    NGC602_smallMagellanicCloud: {
+      label: "Small magellanic cloud (NGC602)",
+      url: NGC602_smallMagellanicCloud_799x693,
+      loadingUrl: NGC602_smallMagellanicCloud_64x55,
+      pixelated: false,
+    },
+    NGC628_phantomGalaxy: {
+      label: "Phantom galaxy (NGC628)",
+      url: NGC628_phantomGalaxy_800x501,
+      loadingUrl: NGC628_phantomGalaxy_64x40,
+      pixelated: false,
+    },
+    NGC1385: {
+      label: "NGC1385",
+      url: NGC1385_1348x1963,
+      loadingUrl: NGC1385_44x64,
+      pixelated: false,
+    },
+    NGC1672_seyfertGalaxy: {
+      label: "Seyfert galaxy (NGC1672)",
+      url: NGC1672_seyfertGalaxy_800x304,
+      loadingUrl: NGC1672_seyfertGalaxy_64x24,
+      pixelated: false,
+    },
+    NGC2090: {
+      label: "NGC2090",
+      url: NGC2090_1280x1218,
+      loadingUrl: NGC2090_64x61,
+      pixelated: false,
+    },
+    NGC2207: {
+      label: "NGC2207",
+      url: NGC2207_800x613,
+      loadingUrl: NGC2207_64x49,
+      pixelated: false,
+    },
+    NGC2566: {
+      label: "NGC2566",
+      url: NGC2566_729x800,
+      loadingUrl: NGC2566_58x64,
+      pixelated: false,
+    },
+    NGC3132_southernRingNebula: {
+      label: "Southern ring nebula (NGC3132)",
+      url: NGC3132_southernRingNebula_800x745,
+      loadingUrl: NGC3132_southernRingNebula_64x60,
+      pixelated: false,
+    },
+    NGC3324: {
+      label: "NGC3324",
+      url: NGC3324_864x657,
+      loadingUrl: NGC3324_64x49,
+      pixelated: false,
+    },
+    NGC3351: {
+      label: "NGC3351",
+      url: NGC3351_799x468,
+      loadingUrl: NGC3351_64x37,
+      pixelated: false,
+    },
+    NGC4449: {
+      label: "NGC4449",
+      url: NGC4449_1280x741,
+      loadingUrl: NGC4449_64x37,
+      pixelated: false,
+    },
+    NGC4449_NIR: {
+      label: "NGC4449 (NIR)",
+      url: NGC4449_NIR_1280x569,
+      loadingUrl: NGC4449_NIR_64x28,
+      pixelated: false,
+    },
+    NGC6440: {
+      label: "NGC6440",
+      url: NGC6440_800x512,
+      loadingUrl: NGC6440_64x41,
+      pixelated: false,
+    },
     overTheMoon: {
       label: "Over the moon",
       url: overTheMoon_1280x915,
@@ -2269,6 +2524,12 @@ export const categories: {
       label: "Rocket",
       url: rocket_1024x1280,
       loadingUrl: rocket_51x64,
+      pixelated: false,
+    },
+    SN1987A: {
+      label: "SN1987A",
+      url: SN1987A_864x714,
+      loadingUrl: SN1987A_64x53,
       pixelated: false,
     },
     solarParty: {
@@ -2307,6 +2568,12 @@ export const categories: {
       loadingUrl: spaceTriangle_64x64,
       pixelated: false,
     },
+    spiderwebProtocluster: {
+      label: "Spiderweb protocluster",
+      url: spiderwebProtocluster_800x501,
+      loadingUrl: spiderwebProtocluster_64x40,
+      pixelated: false,
+    },
     starMap: {
       label: "Star map",
       url: starMap_1169x1280,
@@ -2329,6 +2596,18 @@ export const categories: {
       label: "UFO",
       url: ufo_1280x720,
       loadingUrl: ufo_64x36,
+      pixelated: false,
+    },
+    westerlund1: {
+      label: "Westerlund 1",
+      url: westerlund1_1280x836,
+      loadingUrl: westerlund1_64x42,
+      pixelated: false,
+    },
+    WR124: {
+      label: "WR124",
+      url: WR124_864x851,
+      loadingUrl: WR124_64x63,
       pixelated: false,
     },
   },
