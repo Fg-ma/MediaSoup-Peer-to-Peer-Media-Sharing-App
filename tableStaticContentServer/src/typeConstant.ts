@@ -8,7 +8,7 @@ export interface Tables {
   };
 }
 
-export type TableContentTypes = "video";
+export type TableContentTypes = "video" | "image";
 
 export interface TableContent {
   [table_id: string]: {

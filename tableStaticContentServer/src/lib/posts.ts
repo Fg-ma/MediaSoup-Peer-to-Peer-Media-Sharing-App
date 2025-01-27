@@ -94,63 +94,93 @@ const handlePosts = (app: uWS.TemplatedApp) => {
     const bb = busboy({ headers });
 
     bb.on("file", (name, file, info) => {
-      const filename = `${random()}.mp4`;
+      const { mimeType } = info;
+
+      // Map MIME types to file extensions
+      const mimeToExtension: { [key: string]: string } = {
+        "image/jpeg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+        "video/mp4": ".mp4",
+        "video/mpeg": ".mpeg",
+        "image/gif": ".gif",
+        "application/pdf": ".pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+          ".docx",
+      };
+
+      const extension = mimeToExtension[mimeType] || ".bin";
+      const filename = `${random()}${extension}`;
       const saveTo = path.join(uploadsDir, filename);
       const writeStream = fs.createWriteStream(saveTo);
-
-      file.on("data", (chunk) => {});
 
       file.pipe(writeStream);
 
       file.on("end", async () => {
-        // Notify clients that the original file is ready
-        const originalVideoUrl = `https://localhost:8044/uploads/${filename}`;
+        const originalUrl = `https://localhost:8044/uploads/${filename}`;
 
-        tableContentController.setContent(table_id, "video", videoId, [
-          { property: "originalURL", value: originalVideoUrl },
-        ]);
-
-        const originalVideoMessage = {
-          type: "originalVideoReady",
-          header: {
-            videoId,
-          },
-          data: {
-            filename,
-            url: originalVideoUrl,
-          },
-        };
-        broadcaster.broadcastToTable(table_id, originalVideoMessage);
-
-        // Process video into DASH format in the background
-        try {
-          await processVideoWithABR(saveTo, processedDir, filename);
-
-          // Notify clients to switch to the DASH stream
-          const dashVideoUrl = `https://localhost:8044/processed/${filename.slice(
-            0,
-            -4
-          )}.mpd`;
-
+        // Differentiate handling based on file type
+        if (mimeType.startsWith("video/")) {
           tableContentController.setContent(table_id, "video", videoId, [
-            { property: "dashURL", value: dashVideoUrl },
+            { property: "originalURL", value: originalUrl },
           ]);
 
-          const dashVideoMessage = {
-            type: "dashVideoReady",
+          const originalVideoMessage = {
+            type: "originalVideoReady",
             header: {
               videoId,
             },
             data: {
               filename,
-              url: dashVideoUrl,
+              url: originalUrl,
             },
           };
-          broadcaster.broadcastToTable(table_id, dashVideoMessage);
-        } catch (error) {
-          console.error("Error during video processing:", error);
+          broadcaster.broadcastToTable(table_id, originalVideoMessage);
+
+          // Process video into DASH format in the background
+          try {
+            await processVideoWithABR(saveTo, processedDir, filename);
+
+            // Notify clients to switch to the DASH stream
+            const dashVideoUrl = `https://localhost:8044/processed/${filename.slice(
+              0,
+              -4
+            )}.mpd`;
+
+            tableContentController.setContent(table_id, "video", videoId, [
+              { property: "dashURL", value: dashVideoUrl },
+            ]);
+
+            const dashVideoMessage = {
+              type: "dashVideoReady",
+              header: {
+                videoId,
+              },
+              data: {
+                filename,
+                url: dashVideoUrl,
+              },
+            };
+            broadcaster.broadcastToTable(table_id, dashVideoMessage);
+          } catch (error) {
+            console.error("Error during video processing:", error);
+          }
+        } else if (mimeType.startsWith("image/")) {
+          // Image-specific handling
+          tableContentController.setContent(table_id, "image", videoId, [
+            { property: "originalURL", value: originalUrl },
+          ]);
+
+          broadcaster.broadcastToTable(table_id, {
+            type: "imageReady",
+            header: { videoId },
+            data: { filename: filename, url: originalUrl },
+          });
+        } else {
+          console.warn(`Unsupported file type uploaded: ${mimeType}`);
         }
       });
+
       file.on("error", (err) => {
         console.error(`Error writing file ${info.filename}:`, err);
       });
