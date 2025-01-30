@@ -1,8 +1,8 @@
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const ChristmasIcon = nginxAssetSeverBaseUrl + "svgs/ChristmasIcon.svg";
 const DarkIcon = nginxAssetSeverBaseUrl + "svgs/darkIcon.svg";
 const geometricIcon = nginxAssetSeverBaseUrl + "svgs/geometricIcon.svg";
+const HolidayIcon = nginxAssetSeverBaseUrl + "svgs/HolidayIcon.svg";
 const miscIcon = nginxAssetSeverBaseUrl + "svgs/miscIcon.svg";
 const musicIcon = nginxAssetSeverBaseUrl + "svgs/musicIcon.svg";
 const natureIcon = nginxAssetSeverBaseUrl + "svgs/natureIcon.svg";
@@ -10,77 +10,6 @@ const neonIcon = nginxAssetSeverBaseUrl + "svgs/neonIcon.svg";
 const pixelArtIcon = nginxAssetSeverBaseUrl + "svgs/pixelArtIcon.svg";
 const spaceIcon = nginxAssetSeverBaseUrl + "svgs/spaceIcon.svg";
 const technologyIcon = nginxAssetSeverBaseUrl + "svgs/technologyIcon.svg";
-
-const cabin_854x1280 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/cabin_854x1280.png";
-const cabin_43x64 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/cabin_43x64.png";
-const christmasCard1_1280x1087 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/christmasCard1_1280x1087.jpg";
-const christmasCard1_64x54 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/christmasCard1_64x54.jpg";
-const christmasCard2_1280x887 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/christmasCard2_1280x887.jpg";
-const christmasCard2_64x44 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/christmasCard2_64x44.jpg";
-const christmasCassette_1042x979 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/christmasCassette_1042x979.png";
-const christmasCassette_64x60 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/christmasCassette_64x60.png";
-const forest_1280x777 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/forest_1280x777.jpg";
-const forest_64x39 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/forest_64x39.jpg";
-const igloo_1280x1280 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/igloo_1280x1280.png";
-const igloo_64x64 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/igloo_64x64.png";
-const landscape_1280x640 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/landscape_1280x640.png";
-const landscape_64x32 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/landscape_64x32.png";
-const merryChristmas_1280x731 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/merryChristmas_1280x731.png";
-const merryChristmas_64x37 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/merryChristmas_64x37.png";
-const snowflake_1280x852 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/snowflake_1280x852.jpg";
-const snowflake_64x43 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/snowflake_64x43.jpg";
-const snowman_1280x880 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/snowman_1280x880.png";
-const snowman_64x44 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/snowman_64x44.png";
-const whiteChristmas_1280x910 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/whiteChristmas_1280x910.png";
-const whiteChristmas_64x46 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/whiteChristmas_64x46.png";
-const winterStreets_841x1280 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/winterStreets_841x1280.jpg";
-const winterStreets_42x64 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/winterStreets_42x64.jpg";
-const winterVillage_895x1280 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/winterVillage_895x1280.jpg";
-const winterVillage_45x64 =
-  nginxAssetSeverBaseUrl + "backgroundImages/christmas/winterVillage_45x64.jpg";
-const winterWonderLand_1280x956 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/winterWonderLand_1280x956.jpg";
-const winterWonderLand_64x48 =
-  nginxAssetSeverBaseUrl +
-  "backgroundImages/christmas/winterWonderLand_64x48.jpg";
 
 const actor_1280x836 =
   nginxAssetSeverBaseUrl + "backgroundImages/dark/actor_1280x836.png";
@@ -99,6 +28,10 @@ const crow_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/dark/crow_1280x1280.png";
 const crow_64x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/dark/crow_64x64.png";
+const evilPumpkin_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/dark/evilPumpkin_1280x1280.png";
+const evilPumpkin_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/dark/evilPumpkin_64x64.png";
 const hauntedHouses_1280x1269 =
   nginxAssetSeverBaseUrl + "backgroundImages/dark/hauntedHouses_1280x1269.png";
 const hauntedHouses_64x63 =
@@ -115,6 +48,10 @@ const nightStreet_1280x961 =
   nginxAssetSeverBaseUrl + "backgroundImages/dark/nightStreet_1280x961.png";
 const nightStreet_64x48 =
   nginxAssetSeverBaseUrl + "backgroundImages/dark/nightStreet_64x48.png";
+const pirateFlag_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/dark/pirateFlag_1280x1280.png";
+const pirateFlag_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/dark/pirateFlag_64x64.png";
 const skullOperator_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/dark/skullOperator_1280x1280.png";
 const skullOperator_64x64 =
@@ -196,19 +133,148 @@ const geometric12_1280x720 =
   "backgroundImages/geometric/geometric12_1280x720.png";
 const geometric12_64x36 =
   nginxAssetSeverBaseUrl + "backgroundImages/geometric/geometric12_64x36.png";
+const geometric13_1280x730 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/geometric/geometric13_1280x730.jpg";
+const geometric13_64x37 =
+  nginxAssetSeverBaseUrl + "backgroundImages/geometric/geometric13_64x37.jpg";
 
-const dragon_1280x1280 =
+const cabin_854x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/cabin_854x1280.png";
+const cabin_43x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/cabin_43x64.png";
+const christmasCard1_1280x1087 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/christmasCard1_1280x1087.jpg";
+const christmasCard1_64x54 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/christmasCard1_64x54.jpg";
+const christmasCard2_1280x887 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/christmasCard2_1280x887.jpg";
+const christmasCard2_64x44 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/christmasCard2_64x44.jpg";
+const christmasCassette_1042x979 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/christmasCassette_1042x979.png";
+const christmasCassette_64x60 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/christmasCassette_64x60.png";
+const forest_1280x777 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/forest_1280x777.jpg";
+const forest_64x39 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/forest_64x39.jpg";
+const igloo_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/igloo_1280x1280.png";
+const igloo_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/igloo_64x64.png";
+const landscape_1280x640 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/landscape_1280x640.png";
+const landscape_64x32 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/landscape_64x32.png";
+const leprechaun_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/leprechaun_1280x1280.png";
+const leprechaun_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/leprechaun_64x64.png";
+const merryChristmas_1280x731 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/merryChristmas_1280x731.png";
+const merryChristmas_64x37 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/merryChristmas_64x37.png";
+const snowflake_1280x852 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/snowflake_1280x852.jpg";
+const snowflake_64x43 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/snowflake_64x43.jpg";
+const snowman_1280x880 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/snowman_1280x880.png";
+const snowman_64x44 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/snowman_64x44.png";
+const whiteChristmas_1280x910 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/whiteChristmas_1280x910.png";
+const whiteChristmas_64x46 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/whiteChristmas_64x46.png";
+const winterStreets_841x1280 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/winterStreets_841x1280.jpg";
+const winterStreets_42x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/winterStreets_42x64.jpg";
+const winterVillage_895x1280 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/winterVillage_895x1280.jpg";
+const winterVillage_45x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/holiday/winterVillage_45x64.jpg";
+const winterWonderLand_1280x956 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/winterWonderLand_1280x956.jpg";
+const winterWonderLand_64x48 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/holiday/winterWonderLand_64x48.jpg";
+
+const abstract_1280x880 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/abstract_1280x880.png";
+const abstract_64x44 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/abstract_64x44.png";
+const ambulance_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/ambulance_1280x1280.jpg";
+const ambulance_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/ambulance_64x64.jpg";
+const biking_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/biking_1280x1280.png";
+const biking_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/biking_64x64.png";
+const boots_960x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/boots_960x1280.jpg";
+const boots_48x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/boots_48x64.jpg";
+const coffee_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/coffee_1280x1280.png";
+const coffee_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/coffee_64x64.png";
+const dragon_misc_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/misc/dragon_1280x1280.png";
-const dragon_64x64 =
+const dragon_misc_64x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/misc/dragon_64x64.png";
+const jackOfSpades_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/jackOfSpades_1280x1280.png";
+const jackOfSpades_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/jackOfSpades_64x64.png";
+const kingOfHearts_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/kingOfHearts_1280x1280.png";
+const kingOfHearts_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/kingOfHearts_64x64.png";
+const knight_1280x960 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/knight_1280x960.jpg";
+const knight_64x48 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/knight_64x48.jpg";
 const map_1280x904 =
   nginxAssetSeverBaseUrl + "backgroundImages/misc/map_1280x904.jpg";
 const map_64x45 =
   nginxAssetSeverBaseUrl + "backgroundImages/misc/map_64x45.jpg";
+const queenOfDiamonds_1280x1280 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/misc/queenOfDiamonds_1280x1280.png";
+const queenOfDiamonds_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/queenOfDiamonds_64x64.png";
+const scroll_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/scroll_1280x1280.png";
+const scroll_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/scroll_64x64.png";
+const study_1280x826 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/study_1280x826.jpg";
+const study_64x41 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/study_64x41.jpg";
+const temple_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/temple_1280x1280.png";
+const temple_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/temple_64x64.png";
 const theCircles_1280x359 =
   nginxAssetSeverBaseUrl + "backgroundImages/misc/theCircles_1280x359.jpg";
 const theCircles_64x18 =
   nginxAssetSeverBaseUrl + "backgroundImages/misc/theCircles_64x18.jpg";
+const theLastSupper_1280x640 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/theLastSupper_1280x640.png";
+const theLastSupper_64x32 =
+  nginxAssetSeverBaseUrl + "backgroundImages/misc/theLastSupper_64x32.png";
 const worldMap_1280x767 =
   nginxAssetSeverBaseUrl + "backgroundImages/misc/worldMap_1280x767.jpg";
 const worldMap_64x38 =
@@ -234,6 +300,10 @@ const acousticGuitarSketch_1280x1280 =
 const acousticGuitarSketch_64x64 =
   nginxAssetSeverBaseUrl +
   "backgroundImages/music/acousticGuitarSketch_64x64.jpg";
+const audioMan_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/music/audioMan_1280x1280.jpg";
+const audioMan_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/music/audioMan_64x64.jpg";
 const bassMan_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/music/bassMan_1280x1280.png";
 const bassMan_64x64 =
@@ -348,6 +418,14 @@ const violin_960x1280 =
 const violin_48x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/music/violin_48x64.jpg";
 
+const avocado_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/avocado_1280x1280.png";
+const avocado_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/avocado_64x64.png";
+const bear_1280x915 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/bear_1280x915.png";
+const bear_64x46 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/bear_64x46.png";
 const bird_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/bird_1280x1280.jpg";
 const bird_64x64 =
@@ -368,6 +446,18 @@ const creatures_1280x960 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/creatures_1280x960.jpg";
 const creatures_64x48 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/creatures_64x48.jpg";
+const desert_1280x911 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/desert_1280x911.png";
+const desert_64x46 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/desert_64x46.png";
+const dragon_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/dragon_1280x1280.png";
+const dragon_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/dragon_64x64.png";
+const dragonFight_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/dragonFight_1280x1280.png";
+const dragonFight_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/dragonFight_64x64.png";
 const elephant_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/elephant_1280x1280.png";
 const elephant_64x64 =
@@ -394,10 +484,18 @@ const houseOnTheMountain_1280x1280 =
 const houseOnTheMountain_64x64 =
   nginxAssetSeverBaseUrl +
   "backgroundImages/nature/houseOnTheMountain_64x64.jpg";
+const hummingBird_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/hummingBird_1280x1280.png";
+const hummingBird_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/hummingBird_64x64.png";
 const island_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/island_1280x1280.png";
 const island_64x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/island_64x64.png";
+const koi_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/koi_1280x1280.jpg";
+const koi_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/koi_64x64.jpg";
 const lakeSide_1280x720 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/lakeSide_1280x720.png";
 const lakeSide_64x36 =
@@ -443,6 +541,10 @@ const nightCity_905x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/nightCity_905x1280.png";
 const nightCity_45x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/nightCity_45x64.png";
+const path_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/path_1280x1280.png";
+const path_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/path_64x64.png";
 const plant_905x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/plant_905x1280.png";
 const plant_45x64 =
@@ -459,6 +561,10 @@ const rollingHills_1280x827 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/rollingHills_1280x827.png";
 const rollingHills_64x41 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/rollingHills_64x41.png";
+const seagull_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/seagull_1280x1280.jpg";
+const seagull_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/seagull_64x64.jpg";
 const shoreSide_1024x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/shoreSide_1024x1280.png";
 const shoreSide_51x64 =
@@ -491,6 +597,14 @@ const tree_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/tree_1280x1280.png";
 const tree_64x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/tree_64x64.png";
+const watermelon_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/watermelon_1280x1280.png";
+const watermelon_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/watermelon_64x64.png";
+const witchingHour_1006x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/witchingHour_1006x1280.jpg";
+const witchingHour_50x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/nature/witchingHour_50x64.jpg";
 const wolf_1277x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/nature/wolf_1277x1280.png";
 const wolf_64x64 =
@@ -677,10 +791,18 @@ const blueBall_1280x800 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/blueBall_1280x800.png";
 const blueBall_64x40 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/blueBall_64x40.png";
+const blueNight_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/blueNight_1280x1280.jpg";
+const blueNight_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/blueNight_64x64.png";
 const carinaNebula_800x463 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/carinaNebula_800x463.jpg";
 const carinaNebula_64x37 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/carinaNebula_64x37.png";
+const dreamyNight_896x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/dreamyNight_896x1280.jpg";
+const dreamyNight_45x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/dreamyNight_45x64.png";
 const greenAstronaut_1280x1280 =
   nginxAssetSeverBaseUrl +
   "backgroundImages/space/greenAstronaut_1280x1280.png";
@@ -776,6 +898,11 @@ const NGC6440_800x512 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/NGC6440_800x512.jpg";
 const NGC6440_64x41 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/NGC6440_64x41.jpg";
+const onceInABlueMoon_1280x1280 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/space/onceInABlueMoon_1280x1280.png";
+const onceInABlueMoon_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/space/onceInABlueMoon_64x64.png";
 const overTheMoon_1280x915 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/overTheMoon_1280x915.png";
 const overTheMoon_64x46 =
@@ -856,6 +983,10 @@ const atm_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/technology/atm_1280x1280.png";
 const atm_64x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/technology/atm_64x64.png";
+const atom_1280x1280 =
+  nginxAssetSeverBaseUrl + "backgroundImages/technology/atom_1280x1280.png";
+const atom_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/technology/atom_64x64.png";
 const bigData_853x853 =
   nginxAssetSeverBaseUrl + "backgroundImages/technology/bigData_853x853.jpg";
 const bigData_64x64 =
@@ -949,6 +1080,11 @@ const signal_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/technology/signal_1280x1280.png";
 const signal_64x64 =
   nginxAssetSeverBaseUrl + "backgroundImages/technology/signal_64x64.png";
+const submarine_1280x1280 =
+  nginxAssetSeverBaseUrl +
+  "backgroundImages/technology/submarine_1280x1280.png";
+const submarine_64x64 =
+  nginxAssetSeverBaseUrl + "backgroundImages/technology/submarine_64x64.png";
 const technology1_963x1280 =
   nginxAssetSeverBaseUrl +
   "backgroundImages/technology/technology1_963x1280.png";
@@ -973,9 +1109,9 @@ const zsh_64x54 =
   nginxAssetSeverBaseUrl + "backgroundImages/technology/zsh_64x54.png";
 
 export type Categories =
-  | "christmas"
   | "dark"
   | "geometric"
+  | "holiday"
   | "misc"
   | "music"
   | "nature"
@@ -983,30 +1119,17 @@ export type Categories =
   | "pixelArt"
   | "space"
   | "technology";
-export type ChristmasCategories =
-  | "cabin"
-  | "christmasCard1"
-  | "christmasCard2"
-  | "christmasCassette"
-  | "forest"
-  | "igloo"
-  | "landscape"
-  | "merryChristmas"
-  | "snowflake"
-  | "snowman"
-  | "whiteChristmas"
-  | "winterStreets"
-  | "winterVillage"
-  | "winterWonderLand";
 export type DarkCategories =
   | "actor"
   | "alley"
   | "burstingWithFlames"
   | "crow"
+  | "evilPumpkin"
   | "hauntedHouses"
   | "headHunter"
   | "jackOLantern"
   | "nightStreet"
+  | "pirateFlag"
   | "skullOperator"
   | "skulls"
   | "skyline"
@@ -1026,17 +1149,48 @@ export type GeometricCategories =
   | "geometric9"
   | "geometric10"
   | "geometric11"
-  | "geometric12";
+  | "geometric12"
+  | "geometric13";
+export type HolidayCategories =
+  | "cabin"
+  | "christmasCard1"
+  | "christmasCard2"
+  | "christmasCassette"
+  | "forest"
+  | "igloo"
+  | "landscape"
+  | "leprechaun"
+  | "merryChristmas"
+  | "snowflake"
+  | "snowman"
+  | "whiteChristmas"
+  | "winterStreets"
+  | "winterVillage"
+  | "winterWonderLand";
 export type MiscCategories =
+  | "abstract"
+  | "ambulance"
+  | "biking"
+  | "boots"
+  | "coffee"
   | "dragon"
+  | "jackOfSpades"
+  | "kingOfHearts"
+  | "knight"
   | "map"
+  | "queenOfDiamonds"
+  | "scroll"
+  | "study"
+  | "temple"
   | "theCircles"
+  | "theLastSupper"
   | "worldMap"
   | "yellow";
 export type MusicCategories =
   | "abstractInstruments"
   | "acousticGuitar"
   | "acousticGuitarSketch"
+  | "audioMan"
   | "bassMan"
   | "cello"
   | "clarinet"
@@ -1065,18 +1219,25 @@ export type MusicCategories =
   | "vinyl"
   | "violin";
 export type NatureCategories =
+  | "avocado"
+  | "bear"
   | "bird"
   | "birds"
   | "cave"
   | "clearing"
   | "creatures"
+  | "desert"
+  | "dragon"
+  | "dragonFight"
   | "elephant"
   | "flowering"
   | "fungus"
   | "house"
   | "houseOnTheHill"
   | "houseOnTheMountain"
+  | "hummingBird"
   | "island"
+  | "koi"
   | "lakeSide"
   | "lifesInHand"
   | "lightHouse"
@@ -1088,10 +1249,12 @@ export type NatureCategories =
   | "mountainView"
   | "mushrooms"
   | "nightCity"
+  | "path"
   | "plant"
   | "redMoon"
   | "reflection"
   | "rollingHills"
+  | "seagull"
   | "shoreSide"
   | "sprouting"
   | "submarine"
@@ -1100,6 +1263,8 @@ export type NatureCategories =
   | "swordfish"
   | "temple"
   | "tree"
+  | "watermelon"
+  | "witchingHour"
   | "wolf";
 export type NeonCategories =
   | "gotMeat"
@@ -1149,7 +1314,9 @@ export type SpaceCategories =
   | "bigDipper"
   | "blueAstronaut"
   | "blueBall"
+  | "blueNight"
   | "carinaNebula"
+  | "dreamyNight"
   | "greenAstronaut"
   | "heyTheresEarth"
   | "landscape1"
@@ -1170,6 +1337,7 @@ export type SpaceCategories =
   | "NGC4449"
   | "NGC4449_NIR"
   | "NGC6440"
+  | "onceInABlueMoon"
   | "overTheMoon"
   | "planet"
   | "planetRing"
@@ -1190,6 +1358,7 @@ export type SpaceCategories =
   | "WR124";
 export type TechnologyCategories =
   | "atm"
+  | "atom"
   | "bigData"
   | "binary"
   | "bitcoin"
@@ -1210,6 +1379,7 @@ export type TechnologyCategories =
   | "robotMech"
   | "scienceChicken"
   | "signal"
+  | "submarine"
   | "technology1"
   | "technology2"
   | "theCloud"
@@ -1217,9 +1387,9 @@ export type TechnologyCategories =
   | "zsh";
 
 export type FgBackground =
-  | { category: "christmas"; categorySelection: ChristmasCategories | "" }
   | { category: "dark"; categorySelection: DarkCategories | "" }
   | { category: "geometric"; categorySelection: GeometricCategories | "" }
+  | { category: "holiday"; categorySelection: HolidayCategories | "" }
   | { category: "misc"; categorySelection: MiscCategories | "" }
   | { category: "music"; categorySelection: MusicCategories | "" }
   | { category: "nature"; categorySelection: NatureCategories | "" }
@@ -1231,9 +1401,9 @@ export type FgBackground =
 export const categoriesMetadata: {
   [category in Categories]: { label: string; url: string };
 } = {
-  christmas: { label: "Christmas", url: ChristmasIcon },
   dark: { label: "Dark", url: DarkIcon },
   geometric: { label: "Geometric", url: geometricIcon },
+  holiday: { label: "Holiday", url: HolidayIcon },
   misc: { label: "Misc", url: miscIcon },
   music: { label: "Music", url: musicIcon },
   nature: { label: "Nature", url: natureIcon },
@@ -1245,9 +1415,9 @@ export const categoriesMetadata: {
 
 export const recommendations: {
   [category in
-    | ChristmasCategories
     | DarkCategories
     | GeometricCategories
+    | HolidayCategories
     | MiscCategories
     | MusicCategories
     | NatureCategories
@@ -1336,14 +1506,6 @@ export const recommendations: {
 };
 
 export const categories: {
-  christmas: {
-    [christmasCategory in ChristmasCategories]: {
-      label: string;
-      url: string;
-      loadingUrl: string;
-      pixelated: boolean;
-    };
-  };
   dark: {
     [darkCategory in DarkCategories]: {
       label: string;
@@ -1354,6 +1516,14 @@ export const categories: {
   };
   geometric: {
     [geometricCategory in GeometricCategories]: {
+      label: string;
+      url: string;
+      loadingUrl: string;
+      pixelated: boolean;
+    };
+  };
+  holiday: {
+    [christmasCategory in HolidayCategories]: {
       label: string;
       url: string;
       loadingUrl: string;
@@ -1417,92 +1587,6 @@ export const categories: {
     };
   };
 } = {
-  christmas: {
-    cabin: {
-      label: "Cabin",
-      url: cabin_854x1280,
-      loadingUrl: cabin_43x64,
-      pixelated: false,
-    },
-    christmasCard1: {
-      label: "Christmas card 1",
-      url: christmasCard1_1280x1087,
-      loadingUrl: christmasCard1_64x54,
-      pixelated: false,
-    },
-    christmasCard2: {
-      label: "Christmas card 2",
-      url: christmasCard2_1280x887,
-      loadingUrl: christmasCard2_64x44,
-      pixelated: false,
-    },
-    christmasCassette: {
-      label: "Christmas cassette",
-      url: christmasCassette_1042x979,
-      loadingUrl: christmasCassette_64x60,
-      pixelated: false,
-    },
-    forest: {
-      label: "Forest",
-      url: forest_1280x777,
-      loadingUrl: forest_64x39,
-      pixelated: false,
-    },
-    igloo: {
-      label: "Igloo",
-      url: igloo_1280x1280,
-      loadingUrl: igloo_64x64,
-      pixelated: false,
-    },
-    landscape: {
-      label: "Landscape",
-      url: landscape_1280x640,
-      loadingUrl: landscape_64x32,
-      pixelated: false,
-    },
-    merryChristmas: {
-      label: "Merry Christmas",
-      url: merryChristmas_1280x731,
-      loadingUrl: merryChristmas_64x37,
-      pixelated: false,
-    },
-    snowflake: {
-      label: "Snowflake",
-      url: snowflake_1280x852,
-      loadingUrl: snowflake_64x43,
-      pixelated: false,
-    },
-    snowman: {
-      label: "Snowman",
-      url: snowman_1280x880,
-      loadingUrl: snowman_64x44,
-      pixelated: false,
-    },
-    whiteChristmas: {
-      label: "White christmas",
-      url: whiteChristmas_1280x910,
-      loadingUrl: whiteChristmas_64x46,
-      pixelated: false,
-    },
-    winterStreets: {
-      label: "Winter streets",
-      url: winterStreets_841x1280,
-      loadingUrl: winterStreets_42x64,
-      pixelated: false,
-    },
-    winterVillage: {
-      label: "Winter village",
-      url: winterVillage_895x1280,
-      loadingUrl: winterVillage_45x64,
-      pixelated: false,
-    },
-    winterWonderLand: {
-      label: "Winter wonder land",
-      url: winterWonderLand_1280x956,
-      loadingUrl: winterWonderLand_64x48,
-      pixelated: false,
-    },
-  },
   dark: {
     actor: {
       label: "Actor",
@@ -1528,6 +1612,12 @@ export const categories: {
       loadingUrl: crow_64x64,
       pixelated: false,
     },
+    evilPumpkin: {
+      label: "Evil pumpkin",
+      url: evilPumpkin_1280x1280,
+      loadingUrl: evilPumpkin_64x64,
+      pixelated: false,
+    },
     hauntedHouses: {
       label: "Haunted houses",
       url: hauntedHouses_1280x1269,
@@ -1550,6 +1640,12 @@ export const categories: {
       label: "Night street",
       url: nightStreet_1280x961,
       loadingUrl: nightStreet_64x48,
+      pixelated: false,
+    },
+    pirateFlag: {
+      label: "Pirate flag",
+      url: pirateFlag_1280x1280,
+      loadingUrl: pirateFlag_64x64,
       pixelated: false,
     },
     skullOperator: {
@@ -1668,12 +1764,158 @@ export const categories: {
       loadingUrl: geometric12_64x36,
       pixelated: false,
     },
+    geometric13: {
+      label: "Geometric 13",
+      url: geometric13_1280x730,
+      loadingUrl: geometric13_64x37,
+      pixelated: false,
+    },
+  },
+  holiday: {
+    cabin: {
+      label: "Cabin",
+      url: cabin_854x1280,
+      loadingUrl: cabin_43x64,
+      pixelated: false,
+    },
+    christmasCard1: {
+      label: "Christmas card 1",
+      url: christmasCard1_1280x1087,
+      loadingUrl: christmasCard1_64x54,
+      pixelated: false,
+    },
+    christmasCard2: {
+      label: "Christmas card 2",
+      url: christmasCard2_1280x887,
+      loadingUrl: christmasCard2_64x44,
+      pixelated: false,
+    },
+    christmasCassette: {
+      label: "Christmas cassette",
+      url: christmasCassette_1042x979,
+      loadingUrl: christmasCassette_64x60,
+      pixelated: false,
+    },
+    forest: {
+      label: "Forest",
+      url: forest_1280x777,
+      loadingUrl: forest_64x39,
+      pixelated: false,
+    },
+    igloo: {
+      label: "Igloo",
+      url: igloo_1280x1280,
+      loadingUrl: igloo_64x64,
+      pixelated: false,
+    },
+    landscape: {
+      label: "Landscape",
+      url: landscape_1280x640,
+      loadingUrl: landscape_64x32,
+      pixelated: false,
+    },
+    leprechaun: {
+      label: "Leprechaun",
+      url: leprechaun_1280x1280,
+      loadingUrl: leprechaun_64x64,
+      pixelated: false,
+    },
+    merryChristmas: {
+      label: "Merry Christmas",
+      url: merryChristmas_1280x731,
+      loadingUrl: merryChristmas_64x37,
+      pixelated: false,
+    },
+    snowflake: {
+      label: "Snowflake",
+      url: snowflake_1280x852,
+      loadingUrl: snowflake_64x43,
+      pixelated: false,
+    },
+    snowman: {
+      label: "Snowman",
+      url: snowman_1280x880,
+      loadingUrl: snowman_64x44,
+      pixelated: false,
+    },
+    whiteChristmas: {
+      label: "White christmas",
+      url: whiteChristmas_1280x910,
+      loadingUrl: whiteChristmas_64x46,
+      pixelated: false,
+    },
+    winterStreets: {
+      label: "Winter streets",
+      url: winterStreets_841x1280,
+      loadingUrl: winterStreets_42x64,
+      pixelated: false,
+    },
+    winterVillage: {
+      label: "Winter village",
+      url: winterVillage_895x1280,
+      loadingUrl: winterVillage_45x64,
+      pixelated: false,
+    },
+    winterWonderLand: {
+      label: "Winter wonder land",
+      url: winterWonderLand_1280x956,
+      loadingUrl: winterWonderLand_64x48,
+      pixelated: false,
+    },
   },
   misc: {
+    abstract: {
+      label: "Abstract",
+      url: abstract_1280x880,
+      loadingUrl: abstract_64x44,
+      pixelated: false,
+    },
+    ambulance: {
+      label: "Ambulance",
+      url: ambulance_1280x1280,
+      loadingUrl: ambulance_64x64,
+      pixelated: false,
+    },
+    biking: {
+      label: "Biking",
+      url: biking_1280x1280,
+      loadingUrl: biking_64x64,
+      pixelated: false,
+    },
+    boots: {
+      label: "Boots",
+      url: boots_960x1280,
+      loadingUrl: boots_48x64,
+      pixelated: false,
+    },
+    coffee: {
+      label: "Coffee",
+      url: coffee_1280x1280,
+      loadingUrl: coffee_64x64,
+      pixelated: false,
+    },
     dragon: {
       label: "Dragon",
-      url: dragon_1280x1280,
-      loadingUrl: dragon_64x64,
+      url: dragon_misc_1280x1280,
+      loadingUrl: dragon_misc_64x64,
+      pixelated: false,
+    },
+    jackOfSpades: {
+      label: "Jack of spades",
+      url: jackOfSpades_1280x1280,
+      loadingUrl: jackOfSpades_64x64,
+      pixelated: false,
+    },
+    kingOfHearts: {
+      label: "King of hearts",
+      url: kingOfHearts_1280x1280,
+      loadingUrl: kingOfHearts_64x64,
+      pixelated: false,
+    },
+    knight: {
+      label: "Knight",
+      url: knight_1280x960,
+      loadingUrl: knight_64x48,
       pixelated: false,
     },
     map: {
@@ -1682,10 +1924,40 @@ export const categories: {
       loadingUrl: map_64x45,
       pixelated: false,
     },
+    queenOfDiamonds: {
+      label: "Queen of diamonds",
+      url: queenOfDiamonds_1280x1280,
+      loadingUrl: queenOfDiamonds_64x64,
+      pixelated: false,
+    },
+    scroll: {
+      label: "Scroll",
+      url: scroll_1280x1280,
+      loadingUrl: scroll_64x64,
+      pixelated: false,
+    },
+    study: {
+      label: "Study",
+      url: study_1280x826,
+      loadingUrl: study_64x41,
+      pixelated: false,
+    },
+    temple: {
+      label: "Temple",
+      url: temple_1280x1280,
+      loadingUrl: temple_64x64,
+      pixelated: false,
+    },
     theCircles: {
       label: "The circles",
       url: theCircles_1280x359,
       loadingUrl: theCircles_64x18,
+      pixelated: false,
+    },
+    theLastSupper: {
+      label: "The last supper",
+      url: theLastSupper_1280x640,
+      loadingUrl: theLastSupper_64x32,
       pixelated: false,
     },
     worldMap: {
@@ -1718,6 +1990,12 @@ export const categories: {
       label: "Acoustic guitar sketch",
       url: acousticGuitarSketch_1280x1280,
       loadingUrl: acousticGuitarSketch_64x64,
+      pixelated: false,
+    },
+    audioMan: {
+      label: "Audio man",
+      url: audioMan_1280x1280,
+      loadingUrl: audioMan_64x64,
       pixelated: false,
     },
     bassMan: {
@@ -1884,6 +2162,18 @@ export const categories: {
     },
   },
   nature: {
+    avocado: {
+      label: "Avocado",
+      url: avocado_1280x1280,
+      loadingUrl: avocado_64x64,
+      pixelated: false,
+    },
+    bear: {
+      label: "Bear",
+      url: bear_1280x915,
+      loadingUrl: bear_64x46,
+      pixelated: false,
+    },
     bird: {
       label: "Bird",
       url: bird_1280x1280,
@@ -1912,6 +2202,24 @@ export const categories: {
       label: "Creatures",
       url: creatures_1280x960,
       loadingUrl: creatures_64x48,
+      pixelated: false,
+    },
+    desert: {
+      label: "Desert",
+      url: desert_1280x911,
+      loadingUrl: desert_64x46,
+      pixelated: false,
+    },
+    dragon: {
+      label: "Dragon",
+      url: dragon_1280x1280,
+      loadingUrl: dragon_64x64,
+      pixelated: false,
+    },
+    dragonFight: {
+      label: "Dragon fight",
+      url: dragonFight_1280x1280,
+      loadingUrl: dragonFight_64x64,
       pixelated: false,
     },
     elephant: {
@@ -1950,10 +2258,22 @@ export const categories: {
       loadingUrl: houseOnTheMountain_64x64,
       pixelated: false,
     },
+    hummingBird: {
+      label: "Humming bird",
+      url: hummingBird_1280x1280,
+      loadingUrl: hummingBird_64x64,
+      pixelated: false,
+    },
     island: {
       label: "Island",
       url: island_1280x1280,
       loadingUrl: island_64x64,
+      pixelated: false,
+    },
+    koi: {
+      label: "Koi",
+      url: koi_1280x1280,
+      loadingUrl: koi_64x64,
       pixelated: false,
     },
     lakeSide: {
@@ -2022,6 +2342,12 @@ export const categories: {
       loadingUrl: nightCity_45x64,
       pixelated: false,
     },
+    path: {
+      label: "Path",
+      url: path_1280x1280,
+      loadingUrl: path_64x64,
+      pixelated: false,
+    },
     plant: {
       label: "Plant",
       url: plant_905x1280,
@@ -2044,6 +2370,12 @@ export const categories: {
       label: "Rolling hills",
       url: rollingHills_1280x827,
       loadingUrl: rollingHills_64x41,
+      pixelated: false,
+    },
+    seagull: {
+      label: "Seagull",
+      url: seagull_1280x1280,
+      loadingUrl: seagull_64x64,
       pixelated: false,
     },
     shoreSide: {
@@ -2092,6 +2424,18 @@ export const categories: {
       label: "Tree",
       url: tree_1280x1280,
       loadingUrl: tree_64x64,
+      pixelated: false,
+    },
+    watermelon: {
+      label: "Watermelon",
+      url: watermelon_1280x1280,
+      loadingUrl: watermelon_64x64,
+      pixelated: false,
+    },
+    witchingHour: {
+      label: "Witching hour",
+      url: witchingHour_1006x1280,
+      loadingUrl: witchingHour_50x64,
       pixelated: false,
     },
     wolf: {
@@ -2376,10 +2720,22 @@ export const categories: {
       loadingUrl: blueBall_64x40,
       pixelated: false,
     },
+    blueNight: {
+      label: "Blue night",
+      url: blueNight_1280x1280,
+      loadingUrl: blueNight_64x64,
+      pixelated: false,
+    },
     carinaNebula: {
       label: "Carina nebula",
       url: carinaNebula_800x463,
       loadingUrl: carinaNebula_64x37,
+      pixelated: false,
+    },
+    dreamyNight: {
+      label: "Dreamy night",
+      url: dreamyNight_896x1280,
+      loadingUrl: dreamyNight_45x64,
       pixelated: false,
     },
     greenAstronaut: {
@@ -2502,6 +2858,12 @@ export const categories: {
       loadingUrl: NGC6440_64x41,
       pixelated: false,
     },
+    onceInABlueMoon: {
+      label: "Once in a blue moon",
+      url: onceInABlueMoon_1280x1280,
+      loadingUrl: onceInABlueMoon_64x64,
+      pixelated: false,
+    },
     overTheMoon: {
       label: "Over the moon",
       url: overTheMoon_1280x915,
@@ -2616,6 +2978,12 @@ export const categories: {
       label: "ATM",
       url: atm_1280x1280,
       loadingUrl: atm_64x64,
+      pixelated: false,
+    },
+    atom: {
+      label: "Atom",
+      url: atom_1280x1280,
+      loadingUrl: atom_64x64,
       pixelated: false,
     },
     bigData: {
@@ -2736,6 +3104,12 @@ export const categories: {
       label: "Signal",
       url: signal_1280x1280,
       loadingUrl: signal_64x64,
+      pixelated: false,
+    },
+    submarine: {
+      label: "Submarine",
+      url: submarine_1280x1280,
+      loadingUrl: submarine_64x64,
       pixelated: false,
     },
     technology1: {
