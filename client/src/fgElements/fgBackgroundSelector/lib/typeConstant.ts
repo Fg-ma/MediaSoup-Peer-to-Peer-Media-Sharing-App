@@ -1429,6 +1429,7 @@ export const recommendations: {
     label: string;
     url: string;
     loadingUrl: string;
+    pixelated: boolean;
   };
 } = {
   geometric4: {
@@ -1436,72 +1437,112 @@ export const recommendations: {
     label: "Geometric 4",
     url: geometric4_1280x843,
     loadingUrl: geometric4_64x42,
+    pixelated: false,
   },
   geometric6: {
     category: "geometric",
     label: "Geometric 6",
     url: geometric6_1280x720,
     loadingUrl: geometric6_64x36,
+    pixelated: false,
   },
   mountains: {
     category: "nature",
     label: "Mountains",
     url: mountains_1024x1280,
     loadingUrl: mountains_51x64,
+    pixelated: false,
   },
   shoreSide: {
     category: "nature",
     label: "Shore side",
     url: shoreSide_1024x1280,
     loadingUrl: shoreSide_51x64,
+    pixelated: false,
   },
   submarine: {
     category: "nature",
     label: "Submarine",
     url: submarine_854x1280,
     loadingUrl: submarine_43x64,
+    pixelated: false,
   },
   sunnySideUp: {
     category: "nature",
     label: "Sunny side up",
     url: sunnySideUp_1280x1280,
     loadingUrl: sunnySideUp_64x64,
+    pixelated: false,
   },
   blueBall: {
     category: "space",
     label: "Blue ball",
     url: blueBall_1280x800,
     loadingUrl: blueBall_64x40,
+    pixelated: false,
   },
   solarParty: {
     category: "space",
     label: "Solar party",
     url: solarParty_960x1280,
     loadingUrl: solarParty_48x64,
+    pixelated: false,
   },
   starMap: {
     category: "space",
     label: "Star map",
     url: starMap_1169x1280,
     loadingUrl: starMap_58x64,
+    pixelated: false,
   },
   binary: {
     category: "technology",
     label: "Binary",
     url: binary_1280x1280,
     loadingUrl: binary_64x64,
+    pixelated: false,
   },
   circuit: {
     category: "technology",
     label: "Circuit",
     url: circuit_1280x1273,
     loadingUrl: circuit_64x64,
+    pixelated: false,
   },
   robot: {
     category: "technology",
     label: "Robot",
     url: robot_854x1280,
     loadingUrl: robot_43x64,
+    pixelated: false,
+  },
+  M16_pillarsOfCreation: {
+    category: "space",
+    label: "Pillars of creation (M16)",
+    url: M16_pillarsOfCreation_864x814,
+    loadingUrl: M16_pillarsOfCreation_64x60,
+    pixelated: false,
+  },
+  theBigQuestions: {
+    category: "space",
+    label: "The big questions",
+    url: theBigQuestions_1280x1280,
+    loadingUrl: theBigQuestions_64x64,
+    pixelated: false,
+  },
+  moonLight: {
+    category: "nature",
+    label: "Moon light",
+    url: moonLight_768x1280,
+    loadingUrl: moonLight_38x64,
+    pixelated: false,
+  },
+  redMoon: {
+    category: "nature",
+    label: "Red moon",
+    url: redMoon_1280x964,
+    loadingUrl: redMoon_64x48,
+    pixelated: false,
   },
 };
 

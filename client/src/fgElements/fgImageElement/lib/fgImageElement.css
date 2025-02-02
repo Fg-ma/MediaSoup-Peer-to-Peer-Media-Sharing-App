@@ -2,6 +2,7 @@
   background-image: var(--background-image);
   background-repeat: no-repeat;
   background-size: cover;
+  position: relative;
 }
 
 .blurred-img::before {
@@ -9,8 +10,8 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  background-color: black;
-  animation: pulse 2.5s infinite;
+  background-color: rgb(115 115 115);
+  animation: pulse 4s infinite;
 }
 
 @keyframes pulse {
