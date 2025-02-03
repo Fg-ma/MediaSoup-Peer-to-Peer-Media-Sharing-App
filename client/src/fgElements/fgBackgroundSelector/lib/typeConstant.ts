@@ -2,7 +2,7 @@ const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const DarkIcon = nginxAssetSeverBaseUrl + "svgs/darkIcon.svg";
 const geometricIcon = nginxAssetSeverBaseUrl + "svgs/geometricIcon.svg";
-const HolidayIcon = nginxAssetSeverBaseUrl + "svgs/HolidayIcon.svg";
+const holidayIcon = nginxAssetSeverBaseUrl + "svgs/holidayIcon.svg";
 const miscIcon = nginxAssetSeverBaseUrl + "svgs/miscIcon.svg";
 const musicIcon = nginxAssetSeverBaseUrl + "svgs/musicIcon.svg";
 const natureIcon = nginxAssetSeverBaseUrl + "svgs/natureIcon.svg";
@@ -794,7 +794,7 @@ const blueBall_64x40 =
 const blueNight_1280x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/blueNight_1280x1280.jpg";
 const blueNight_64x64 =
-  nginxAssetSeverBaseUrl + "backgroundImages/space/blueNight_64x64.png";
+  nginxAssetSeverBaseUrl + "backgroundImages/space/blueNight_64x64.jpg";
 const carinaNebula_800x463 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/carinaNebula_800x463.jpg";
 const carinaNebula_64x37 =
@@ -802,7 +802,7 @@ const carinaNebula_64x37 =
 const dreamyNight_896x1280 =
   nginxAssetSeverBaseUrl + "backgroundImages/space/dreamyNight_896x1280.jpg";
 const dreamyNight_45x64 =
-  nginxAssetSeverBaseUrl + "backgroundImages/space/dreamyNight_45x64.png";
+  nginxAssetSeverBaseUrl + "backgroundImages/space/dreamyNight_45x64.jpg";
 const greenAstronaut_1280x1280 =
   nginxAssetSeverBaseUrl +
   "backgroundImages/space/greenAstronaut_1280x1280.png";
@@ -1403,7 +1403,7 @@ export const categoriesMetadata: {
 } = {
   dark: { label: "Dark", url: DarkIcon },
   geometric: { label: "Geometric", url: geometricIcon },
-  holiday: { label: "Holiday", url: HolidayIcon },
+  holiday: { label: "Holiday", url: holidayIcon },
   misc: { label: "Misc", url: miscIcon },
   music: { label: "Music", url: musicIcon },
   nature: { label: "Nature", url: natureIcon },

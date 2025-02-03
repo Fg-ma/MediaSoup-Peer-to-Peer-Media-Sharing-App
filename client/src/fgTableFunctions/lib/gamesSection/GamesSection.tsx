@@ -6,6 +6,7 @@ import FgButton from "../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../fgElements/fgSVG/FgSVG";
 import FgPanel from "../../../fgElements/fgPanel/FgPanel";
 import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import LazyScrollingContainer from "../../../fgElements/lazyScrollingContainer/LazyScrollingContainer";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -42,7 +43,7 @@ export default function GamesSection() {
       <FgButton
         externalRef={gamesButtonRef}
         clickFunction={() => setGamesActive((prev) => !prev)}
-        className='h-full aspect-square flex items-center justify-center'
+        className='flex h-full aspect-square items-center justify-center'
         contentFunction={() => {
           return (
             <FgSVG
@@ -71,8 +72,8 @@ export default function GamesSection() {
       {gamesActive && (
         <FgPanel
           content={
-            <div
-              ref={gamesSectionRef}
+            <LazyScrollingContainer
+              externalRef={gamesSectionRef}
               className={`small-vertical-scroll-bar grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto py-2 ${
                 cols === 3
                   ? "grid-cols-3"
@@ -82,41 +83,42 @@ export default function GamesSection() {
                   ? "grid-cols-5"
                   : "grid-cols-6"
               }`}
-            >
-              <FgButton
-                scrollingContainerRef={gamesSectionRef}
-                className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3'
-                contentFunction={() => (
-                  <FgSVG
-                    src={snakeGameIcon}
-                    className='h-full aspect-square'
-                    attributes={[
-                      { key: "width", value: "100%" },
-                      { key: "height", value: "100%" },
-                    ]}
-                  />
-                )}
-                clickFunction={() => {
-                  if (
-                    !table_id.current ||
-                    !username.current ||
-                    !instance.current
-                  ) {
-                    return;
-                  }
+              items={[
+                <FgButton
+                  scrollingContainerRef={gamesSectionRef}
+                  className='flex border-gray-300 items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3'
+                  contentFunction={() => (
+                    <FgSVG
+                      src={snakeGameIcon}
+                      className='h-full aspect-square'
+                      attributes={[
+                        { key: "width", value: "100%" },
+                        { key: "height", value: "100%" },
+                      ]}
+                    />
+                  )}
+                  clickFunction={() => {
+                    if (
+                      !table_id.current ||
+                      !username.current ||
+                      !instance.current
+                    ) {
+                      return;
+                    }
 
-                  userMedia.current.gamesSignaling?.initiateGame(
-                    "snake",
-                    `snake_game_${uuidv4()}`
-                  );
-                }}
-                hoverContent={
-                  <FgHoverContentStandard content='Start snake game' />
-                }
-                options={{ hoverTimeoutDuration: 750 }}
-                aria-label={"Snake game"}
-              />
-            </div>
+                    userMedia.current.gamesSignaling?.initiateGame(
+                      "snake",
+                      `snake_game_${uuidv4()}`
+                    );
+                  }}
+                  hoverContent={
+                    <FgHoverContentStandard content='Start snake game' />
+                  }
+                  options={{ hoverTimeoutDuration: 750 }}
+                  aria-label={"Snake game"}
+                />,
+              ]}
+            />
           }
           initPosition={{
             referenceElement: gamesButtonRef.current ?? undefined,

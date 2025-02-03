@@ -10,71 +10,8 @@ import {
 } from "../../../../context/effectsContext/typeConstant";
 import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
-
-const prismaColors =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/prismaColors_512x512.jpg";
-const prismaColorsSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/prismaColors_32x32.jpg";
-const blackAndWhite =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/blackAndWhite_256x256.jpg";
-const blackAndWhiteSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/blackAndWhite_32x32.jpg";
-const bubbleChromatic =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/bubbleChromatic_850x850.jpg";
-const bubbleChromaticSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/bubbleChromatic_32x32.jpg";
-const fisheye =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/fisheye_512x512.jpg";
-const fisheyeSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/fisheye_32x32.jpg";
-const nightVision =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/nightVision_512x512.jpg";
-const nightVisionSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/nightVision_32x32.jpg";
-const vintageTV =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/vintageTV_512x512.jpg";
-const vintageTVSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/vintageTV_32x32.jpg";
-const motionblur =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/motionBlur_512x512.jpg";
-const motionblurSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/motionBlur_32x32.jpg";
-const pixelation =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/pixelation_256x256.png";
-const pixelationSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/pixelation_32x32.png";
-const old = nginxAssetSeverBaseUrl + "2DAssets/postProcess/old_512x512.jpg";
-const oldSmall = nginxAssetSeverBaseUrl + "2DAssets/postProcess/old_32x32.jpg";
-const chromaticAberration =
-  nginxAssetSeverBaseUrl +
-  "2DAssets/postProcess/chromaticAberration_512x512.jpg";
-const chromaticAberrationSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/chromaticAberration_32x32.jpg";
-const colorSplash =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/colorSplash_850x850.jpg";
-const colorSplashSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/colorSplash_32x32.jpg";
-const tonemap =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tonemap_512x512.jpg";
-const tonemapSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tonemap_32x32.jpg";
-const rays = nginxAssetSeverBaseUrl + "2DAssets/postProcess/rays_512x512.jpg";
-const raysSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/rays_32x32.jpg";
-const sharpen =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/sharpen_512x512.jpg";
-const sharpenSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/sharpen_32x32.jpg";
-const tiltShift =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tiltShift_512x512.jpg";
-const tiltShiftSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tiltShift_32x32.jpg";
-const cartoon =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/cartoon_512x512.png";
-const cartoonSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/cartoon_32x32.png";
+import LazyScrollingContainer from "../../../../fgElements/lazyScrollingContainer/LazyScrollingContainer";
+import { postProcessEffectsChoices } from "./typeConstant";
 
 export default function BabylonPostProcessEffectsButton({
   username,
@@ -123,71 +60,6 @@ export default function BabylonPostProcessEffectsButton({
     ? userEffectsStyles.current[type][visualMediaId].postProcess
     : remoteEffectsStyles.current[username][instance][type][visualMediaId]
         .postProcess;
-
-  const postProcessEffectsChoices: {
-    [postProcessEffect in PostProcessEffects]?: {
-      label: string;
-      image: string;
-      imageSmall: string;
-    };
-  } = {
-    prismaColors: {
-      label: "Prisma colors",
-      image: prismaColors,
-      imageSmall: prismaColorsSmall,
-    },
-    blackAndWhite: {
-      label: "Black & white",
-      image: blackAndWhite,
-      imageSmall: blackAndWhiteSmall,
-    },
-    bubbleChromatic: {
-      label: "Bubbles",
-      image: bubbleChromatic,
-      imageSmall: bubbleChromaticSmall,
-    },
-    fisheye: { label: "Fisheye", image: fisheye, imageSmall: fisheyeSmall },
-    nightVision: {
-      label: "Night vision",
-      image: nightVision,
-      imageSmall: nightVisionSmall,
-    },
-    vintageTV: {
-      label: "Vintage TV",
-      image: vintageTV,
-      imageSmall: vintageTVSmall,
-    },
-    motionblur: {
-      label: "Motion blur",
-      image: motionblur,
-      imageSmall: motionblurSmall,
-    },
-    pixelation: {
-      label: "Pixelation",
-      image: pixelation,
-      imageSmall: pixelationSmall,
-    },
-    old: { label: "Old timey", image: old, imageSmall: oldSmall },
-    chromaticAberration: {
-      label: "Chromatic aberration",
-      image: chromaticAberration,
-      imageSmall: chromaticAberrationSmall,
-    },
-    colorSplash: {
-      label: "Color splash",
-      image: colorSplash,
-      imageSmall: colorSplashSmall,
-    },
-    tonemap: { label: "Tone map", image: tonemap, imageSmall: tonemapSmall },
-    rays: { label: "Rays", image: rays, imageSmall: raysSmall },
-    sharpen: { label: "Sharpen", image: sharpen, imageSmall: sharpenSmall },
-    tiltShift: {
-      label: "Tilt shift",
-      image: tiltShift,
-      imageSmall: tiltShiftSmall,
-    },
-    cartoon: { label: "Cartoon", image: cartoon, imageSmall: cartoonSmall },
-  };
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
@@ -275,53 +147,57 @@ export default function BabylonPostProcessEffectsButton({
       )}
       holdFunction={holdFunction}
       holdContent={
-        <div
-          ref={postProcessEffectsContainerRef}
-          className='pl-3 pr-1 overflow-y-auto small-vertical-scroll-bar max-h-60 mb-4 grid grid-cols-3 w-max gap-x-2 gap-y-2 py-3 border-3 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-lg rounded-md'
-        >
-          {Object.entries(postProcessEffectsChoices).map(
-            ([postProcessEffect, choice]) => (
-              <FgButton
-                key={postProcessEffect}
-                contentFunction={() => (
-                  <div
-                    className={`${
-                      postProcessEffect === effectsStyles.style
-                        ? "border-fg-secondary border-3 border-opacity-100"
-                        : ""
-                    } border-white flex items-center justify-center w-16 min-w-16 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-                    onClick={(event) => {
-                      holdFunction(event as unknown as PointerEvent);
-                    }}
-                    data-camera-post-process-effects-button-value={
-                      postProcessEffect
-                    }
-                  >
-                    <FgImageElement
-                      src={choice.image}
-                      srcLoading={choice.imageSmall}
-                      alt={postProcessEffect}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
+        <LazyScrollingContainer
+          externalRef={postProcessEffectsContainerRef}
+          className='grid pl-3 pr-1 overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-60 gap-x-2 gap-y-2 py-3 border-3 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-lg rounded-md'
+          items={[
+            ...Object.entries(postProcessEffectsChoices).map(
+              ([postProcessEffect, choice]) => (
+                <FgButton
+                  key={postProcessEffect}
+                  className='flex w-full aspect-square items-center justify-center'
+                  contentFunction={() => (
+                    <div
+                      className={`${
+                        postProcessEffect === effectsStyles.style
+                          ? "border-fg-secondary border-3 border-opacity-100"
+                          : ""
+                      } border-white flex items-center justify-center w-full h-full hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                      onClick={(event) => {
+                        holdFunction(event as unknown as PointerEvent);
                       }}
                       data-camera-post-process-effects-button-value={
                         postProcessEffect
                       }
-                    />
-                  </div>
-                )}
-                hoverContent={<FgHoverContentStandard content={choice.label} />}
-                scrollingContainerRef={postProcessEffectsContainerRef}
-                options={{
-                  hoverZValue: 999999999999999,
-                  hoverTimeoutDuration: 750,
-                }}
-              />
-            )
-          )}
-        </div>
+                    >
+                      <FgImageElement
+                        src={choice.image}
+                        srcLoading={choice.imageSmall}
+                        alt={postProcessEffect}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                        data-camera-post-process-effects-button-value={
+                          postProcessEffect
+                        }
+                      />
+                    </div>
+                  )}
+                  hoverContent={
+                    <FgHoverContentStandard content={choice.label} />
+                  }
+                  scrollingContainerRef={postProcessEffectsContainerRef}
+                  options={{
+                    hoverZValue: 999999999999999,
+                    hoverTimeoutDuration: 750,
+                  }}
+                />
+              )
+            ),
+          ]}
+        />
       }
       hoverContent={<FgHoverContentStandard content='Camera effects' />}
       closeHoldToggle={closeHoldToggle}
@@ -331,6 +207,7 @@ export default function BabylonPostProcessEffectsButton({
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,
         holdKind: "toggle",
+        holdType: "above",
       }}
     />
   );
