@@ -63,6 +63,7 @@ export default function MoreTableFunctionsButton({
                 { key: "width", value: "100%" },
                 { key: "height", value: "100%" },
                 { key: "fill", value: "#e80110" },
+                { key: "stroke", value: "#e80110" },
               ]}
               style={{
                 transition: "transform 0.1s ease",

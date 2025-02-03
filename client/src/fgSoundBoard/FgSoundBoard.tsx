@@ -149,7 +149,7 @@ export default function FgSoundBoard({
             </div>
           </motion.div>
           <div className='small-multidirectional-scroll-bar p-4 overflow-auto w-full grow relative'>
-            <div className='w-full h-full min-h-max min-w-max grid grid-cols-5 gap-3 items-center justify-center justify-items-center place-items-center'>
+            <div className='grid w-full h-full min-h-max min-w-max grid-cols-5 gap-3 items-center justify-center justify-items-center place-items-center'>
               <FgButton
                 className={`sound-board-btn ${
                   importButton.pressed ? "pressed" : ""
@@ -170,11 +170,11 @@ export default function FgSoundBoard({
                           { key: "height", value: "90%" },
                           {
                             key: "fill",
-                            value: importButton.pressed ? "#f57e41" : "#cccccc",
+                            value: importButton.pressed ? "#e80110" : "#cccccc",
                           },
                           {
                             key: "stroke",
-                            value: importButton.pressed ? "#f57e41" : "#cccccc",
+                            value: importButton.pressed ? "#e80110" : "#cccccc",
                           },
                         ]}
                         className='w-full h-full flex items-center justify-center z-[2]'

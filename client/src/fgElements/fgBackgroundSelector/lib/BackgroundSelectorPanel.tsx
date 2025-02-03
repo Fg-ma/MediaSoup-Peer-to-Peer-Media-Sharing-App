@@ -114,7 +114,7 @@ export default function BackgroundSelectorPanel({
               className='grid w-full grow overflow-y-auto grid-cols-3 gap-2 small-vertical-scroll-bar'
               items={[
                 <FgButton
-                  className='h-full aspect-square border-4 border-fg-white-75 hover:border-fg-secondary rounded'
+                  className='h-full aspect-square border-4 border-fg-red-dark hover:border-fg-red-light rounded'
                   contentFunction={() => {
                     return (
                       <FgSVG
@@ -122,8 +122,8 @@ export default function BackgroundSelectorPanel({
                         attributes={[
                           { key: "width", value: "100%" },
                           { key: "height", value: "100%" },
-                          { key: "fill", value: "black" },
-                          { key: "stroke", value: "black" },
+                          { key: "fill", value: "#e80110" },
+                          { key: "stroke", value: "#e80110" },
                         ]}
                       />
                     );

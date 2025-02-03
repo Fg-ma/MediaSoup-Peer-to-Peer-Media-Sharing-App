@@ -29,8 +29,6 @@ export default function AudioEffectButton({
 }) {
   const { userStreamEffects, remoteStreamEffects } = useEffectsContext();
 
-  const [isVisible, setIsVisible] = useState(false);
-  const buttonRef = useRef<HTMLDivElement>(null);
   const attributes = useRef<{ key: string; value: string; id?: string }[]>([]);
 
   const streamEffects = isUser
@@ -55,86 +53,55 @@ export default function AudioEffectButton({
       ]
     : undefined;
 
-  for (let i = 0; i < audioEffectTemplate.attributes.length; i++) {
-    const attribute = audioEffectTemplate.attributes[i];
-
-    attributes.current.push({
-      key: attribute.key,
-      id: attribute.id,
-      value:
-        attribute.activityDependentValue !== undefined
-          ? streamEffects
-            ? attribute.activityDependentValue.deactive
-            : attribute.activityDependentValue.active
-          : attribute.value,
-    });
-  }
-
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true); // Load the button when it's visible
-            observer.unobserve(entry.target); // Stop observing once it's loaded
-          }
-        });
-      },
-      {
-        root: scrollingContainerRef.current, // Container to observe within
-        threshold: 0.1, // Trigger when 10% of the button is visible
-      }
-    );
+    for (let i = 0; i < audioEffectTemplate.attributes.length; i++) {
+      const attribute = audioEffectTemplate.attributes[i];
 
-    if (buttonRef.current) {
-      observer.observe(buttonRef.current); // Start observing the button
+      attributes.current.push({
+        key: attribute.key,
+        id: attribute.id,
+        value:
+          attribute.activityDependentValue !== undefined
+            ? streamEffects
+              ? attribute.activityDependentValue.deactive
+              : attribute.activityDependentValue.active
+            : attribute.value,
+      });
     }
-
-    return () => {
-      if (buttonRef.current) {
-        observer.unobserve(buttonRef.current); // Clean up observer on unmount
-      }
-    };
-  }, [scrollingContainerRef]);
+  }, [streamEffects]);
 
   return (
-    <div ref={buttonRef} className='min-w-12 max-w-24 aspect-square'>
-      {isVisible ? (
-        <FgButton
-          className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75 overflow-clip relative'
-          scrollingContainerRef={scrollingContainerRef}
-          clickFunction={() => {
-            handleAudioEffectChange(audioEffect);
-          }}
-          contentFunction={() => {
-            return (
-              <FgSVG
-                src={
-                  streamEffects
-                    ? audioEffectTemplate.offIcon
-                    : audioEffectTemplate.icon
-                }
-                className='flex items-center justify-center'
-                attributes={attributes.current}
-              />
-            );
-          }}
-          hoverContent={
-            <FgHoverContentStandard
-              content={
-                streamEffects
-                  ? audioEffectTemplate.hoverContent.deactive
-                  : audioEffectTemplate.hoverContent.active
-              }
-            />
+    <FgButton
+      className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75 overflow-clip relative'
+      scrollingContainerRef={scrollingContainerRef}
+      clickFunction={() => {
+        handleAudioEffectChange(audioEffect);
+      }}
+      contentFunction={() => {
+        return (
+          <FgSVG
+            src={
+              streamEffects
+                ? audioEffectTemplate.offIcon
+                : audioEffectTemplate.icon
+            }
+            className='flex items-center justify-center'
+            attributes={attributes.current}
+          />
+        );
+      }}
+      hoverContent={
+        <FgHoverContentStandard
+          content={
+            streamEffects
+              ? audioEffectTemplate.hoverContent.deactive
+              : audioEffectTemplate.hoverContent.active
           }
-          options={{
-            hoverTimeoutDuration: 750,
-          }}
         />
-      ) : (
-        <div className='bg-gray-300 w-full h-full animate-pulse rounded'></div> // Placeholder while loading
-      )}
-    </div>
+      }
+      options={{
+        hoverTimeoutDuration: 750,
+      }}
+    />
   );
 }

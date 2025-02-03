@@ -10,6 +10,7 @@ import AudioEffectButton from "./AudioEffectButton";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
 import { audioEffectTemplates } from "./typeConstant";
 import { IncomingMediasoupMessages } from "../../lib/MediasoupSocketController";
+import LazyScrollingContainer from "../../fgElements/lazyScrollingContainer/LazyScrollingContainer";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -261,8 +262,8 @@ export default function AudioEffectsSection({
     <>
       <FgPanel
         content={
-          <div
-            ref={audioSectionRef}
+          <LazyScrollingContainer
+            externalRef={audioSectionRef}
             className={`small-vertical-scroll-bar grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto py-2 ${
               cols === 3
                 ? "grid-cols-3"
@@ -272,234 +273,237 @@ export default function AudioEffectsSection({
                 ? "grid-cols-5"
                 : "grid-cols-6"
             }`}
-          >
-            <FgButton
-              scrollingContainerRef={audioSectionRef}
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                handleMute(producerType, producerId);
-                setRerender((prev) => !prev);
-              }}
-              contentFunction={() => (
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 100.0001 100.00001'
-                  width='90%'
-                  height='90%'
-                  fill='white'
-                >
-                  <VolumeSVG
-                    volumeState={volumeState}
-                    movingPath={volumeSVGPaths.low.right}
-                    stationaryPaths={[
-                      volumeSVGPaths.high.left,
-                      volumeSVGPaths.high.middle,
-                    ]}
-                    color='white'
-                  />
-                  {volumeState.from === "" && volumeState.to === "off" && (
-                    <path d={volumeSVGPaths.strike} />
-                  )}
-                </svg>
-              )}
-              hoverContent={
-                <FgHoverContentStandard
-                  content={
-                    muteStateRef
-                      ? muteStateRef.current
-                        ? "Unmute"
-                        : "Mute"
-                      : producerType === "video" &&
-                        videoContentMute &&
-                        producerId
-                      ? videoContentMute.current[producerId]
-                        ? "off"
-                        : "high"
-                      : producerType === "audio" && clientMute
-                      ? clientMute.current
-                        ? "Unmute"
-                        : localMute
+            items={[
+              <FgButton
+                scrollingContainerRef={audioSectionRef}
+                className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                clickFunction={() => {
+                  handleMute(producerType, producerId);
+                  setRerender((prev) => !prev);
+                }}
+                contentFunction={() => (
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    viewBox='0 0 100.0001 100.00001'
+                    width='90%'
+                    height='90%'
+                    fill='white'
+                  >
+                    <VolumeSVG
+                      volumeState={volumeState}
+                      movingPath={volumeSVGPaths.low.right}
+                      stationaryPaths={[
+                        volumeSVGPaths.high.left,
+                        volumeSVGPaths.high.middle,
+                      ]}
+                      color='white'
+                    />
+                    {volumeState.from === "" && volumeState.to === "off" && (
+                      <path d={volumeSVGPaths.strike} />
+                    )}
+                  </svg>
+                )}
+                hoverContent={
+                  <FgHoverContentStandard
+                    content={
+                      muteStateRef
+                        ? muteStateRef.current
+                          ? "Unmute"
+                          : "Mute"
+                        : producerType === "video" &&
+                          videoContentMute &&
+                          producerId
+                        ? videoContentMute.current[producerId]
+                          ? "off"
+                          : "high"
+                        : producerType === "audio" && clientMute
+                        ? clientMute.current
+                          ? "Unmute"
+                          : localMute
+                          ? localMute.current
+                            ? "Unmute"
+                            : "Mute"
+                          : "Mute"
+                        : producerType === "screenAudio" &&
+                          screenAudioClientMute &&
+                          producerId
+                        ? screenAudioClientMute.current[producerId]
+                          ? "Unmute"
+                          : screenAudioLocalMute
+                          ? screenAudioLocalMute.current[producerId]
+                            ? "Unmute"
+                            : "Mute"
+                          : "Mute"
+                        : producerType === "audio" && localMute
                         ? localMute.current
                           ? "Unmute"
                           : "Mute"
-                        : "Mute"
-                      : producerType === "screenAudio" &&
-                        screenAudioClientMute &&
-                        producerId
-                      ? screenAudioClientMute.current[producerId]
-                        ? "Unmute"
-                        : screenAudioLocalMute
+                        : producerType === "screenAudio" &&
+                          screenAudioLocalMute &&
+                          producerId
                         ? screenAudioLocalMute.current[producerId]
                           ? "Unmute"
                           : "Mute"
                         : "Mute"
-                      : producerType === "audio" && localMute
-                      ? localMute.current
-                        ? "Unmute"
-                        : "Mute"
-                      : producerType === "screenAudio" &&
-                        screenAudioLocalMute &&
-                        producerId
-                      ? screenAudioLocalMute.current[producerId]
-                        ? "Unmute"
-                        : "Mute"
-                      : "Mute"
-                  }
-                />
-              }
-              options={{ hoverTimeoutDuration: 350 }}
-            />
-            <FgButton
-              scrollingContainerRef={audioSectionRef}
-              externalRef={audioMixEffectsButtonRef}
-              className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-              clickFunction={() => {
-                setAudioMixEffectsActive((prev) => !prev);
-              }}
-              contentFunction={() => {
-                return (
-                  <FgSVG
-                    src={
+                    }
+                  />
+                }
+                options={{ hoverTimeoutDuration: 350 }}
+              />,
+              <FgButton
+                scrollingContainerRef={audioSectionRef}
+                externalRef={audioMixEffectsButtonRef}
+                className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                clickFunction={() => {
+                  setAudioMixEffectsActive((prev) => !prev);
+                }}
+                contentFunction={() => {
+                  return (
+                    <FgSVG
+                      src={
+                        audioMixEffectsActive
+                          ? mixAudioEffectsOffIcon
+                          : mixAudioEffectsIcon
+                      }
+                      className='flex items-center justify-center'
+                      attributes={[
+                        { key: "width", value: "90%" },
+                        { key: "height", value: "90%" },
+                        { key: "fill", value: "white" },
+                        { key: "stroke", value: "white" },
+                      ]}
+                    />
+                  );
+                }}
+                hoverContent={
+                  <FgHoverContentStandard
+                    content={
                       audioMixEffectsActive
-                        ? mixAudioEffectsOffIcon
-                        : mixAudioEffectsIcon
+                        ? "Close mix effects"
+                        : "Mix effects"
                     }
-                    className='flex items-center justify-center'
-                    attributes={[
-                      { key: "width", value: "90%" },
-                      { key: "height", value: "90%" },
-                      { key: "fill", value: "white" },
-                      { key: "stroke", value: "white" },
-                    ]}
                   />
-                );
-              }}
-              hoverContent={
-                <FgHoverContentStandard
-                  content={
-                    audioMixEffectsActive ? "Close mix effects" : "Mix effects"
+                }
+                options={{ hoverTimeoutDuration: 350 }}
+              />,
+              isUser ? (
+                <FgButton
+                  scrollingContainerRef={audioSectionRef}
+                  externalRef={pianoRef}
+                  className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                  clickFunction={() => {
+                    if (visualMediaContainerRef?.current) {
+                      if (
+                        visualMediaContainerRef.current.classList.contains(
+                          "in-piano"
+                        )
+                      ) {
+                        visualMediaContainerRef.current.classList.remove(
+                          "in-piano"
+                        );
+                      } else {
+                        visualMediaContainerRef.current.classList.add(
+                          "in-piano"
+                        );
+                      }
+                    }
+                    setPanioActive((prev) => !prev);
+                  }}
+                  contentFunction={() => {
+                    return (
+                      <FgSVG
+                        src={panioActive ? pianoOffIcon : pianoIcon}
+                        className='flex items-center justify-center'
+                        attributes={[
+                          { key: "width", value: "90%" },
+                          { key: "height", value: "90%" },
+                          { key: "fill", value: "white" },
+                          { key: "stroke", value: "white" },
+                        ]}
+                      />
+                    );
+                  }}
+                  hoverContent={
+                    <FgHoverContentStandard
+                      content={panioActive ? "Close synth" : "Synth"}
+                    />
                   }
+                  options={{ hoverTimeoutDuration: 350 }}
                 />
-              }
-              options={{ hoverTimeoutDuration: 350 }}
-            />
-            {isUser && (
-              <FgButton
-                scrollingContainerRef={audioSectionRef}
-                externalRef={pianoRef}
-                className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-                clickFunction={() => {
-                  if (visualMediaContainerRef?.current) {
-                    if (
-                      visualMediaContainerRef.current.classList.contains(
-                        "in-piano"
-                      )
-                    ) {
-                      visualMediaContainerRef.current.classList.remove(
-                        "in-piano"
-                      );
-                    } else {
-                      visualMediaContainerRef.current.classList.add("in-piano");
-                    }
+              ) : null,
+              isUser ? (
+                <FgButton
+                  scrollingContainerRef={audioSectionRef}
+                  externalRef={soundBoardButtonRef}
+                  className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                  clickFunction={() => {
+                    setSoundBoardActive((prev) => !prev);
+                  }}
+                  contentFunction={() => {
+                    return (
+                      <FgSVG
+                        src={
+                          soundBoardActive ? soundBoardOffIcon : soundBoardIcon
+                        }
+                        className='flex items-center justify-center'
+                        attributes={[
+                          { key: "width", value: "90%" },
+                          { key: "height", value: "90%" },
+                          { key: "fill", value: "white" },
+                          { key: "stroke", value: "white" },
+                        ]}
+                      />
+                    );
+                  }}
+                  hoverContent={
+                    <FgHoverContentStandard
+                      content={
+                        soundBoardActive ? "Close sound board" : "Sound board"
+                      }
+                    />
                   }
-                  setPanioActive((prev) => !prev);
-                }}
-                contentFunction={() => {
-                  return (
-                    <FgSVG
-                      src={panioActive ? pianoOffIcon : pianoIcon}
-                      className='flex items-center justify-center'
-                      attributes={[
-                        { key: "width", value: "90%" },
-                        { key: "height", value: "90%" },
-                        { key: "fill", value: "white" },
-                        { key: "stroke", value: "white" },
-                      ]}
-                    />
-                  );
-                }}
-                hoverContent={
-                  <FgHoverContentStandard
-                    content={panioActive ? "Close synth" : "Synth"}
-                  />
-                }
-                options={{ hoverTimeoutDuration: 350 }}
-              />
-            )}
-            {isUser && (
-              <FgButton
-                scrollingContainerRef={audioSectionRef}
-                externalRef={soundBoardButtonRef}
-                className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-                clickFunction={() => {
-                  setSoundBoardActive((prev) => !prev);
-                }}
-                contentFunction={() => {
-                  return (
-                    <FgSVG
-                      src={
-                        soundBoardActive ? soundBoardOffIcon : soundBoardIcon
-                      }
-                      className='flex items-center justify-center'
-                      attributes={[
-                        { key: "width", value: "90%" },
-                        { key: "height", value: "90%" },
-                        { key: "fill", value: "white" },
-                        { key: "stroke", value: "white" },
-                      ]}
-                    />
-                  );
-                }}
-                hoverContent={
-                  <FgHoverContentStandard
-                    content={
-                      soundBoardActive ? "Close sound board" : "Sound board"
-                    }
-                  />
-                }
-                options={{ hoverTimeoutDuration: 350 }}
-              />
-            )}
-            {isUser && (
-              <FgButton
-                scrollingContainerRef={audioSectionRef}
-                externalRef={backgroundMusicButtonRef}
-                className='border-gray-300 flex items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-                clickFunction={() => {
-                  setBackgroundMusicActive((prev) => !prev);
-                }}
-                contentFunction={() => {
-                  return (
-                    <FgSVG
-                      src={
+                  options={{ hoverTimeoutDuration: 350 }}
+                />
+              ) : null,
+              isUser ? (
+                <FgButton
+                  scrollingContainerRef={audioSectionRef}
+                  externalRef={backgroundMusicButtonRef}
+                  className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                  clickFunction={() => {
+                    setBackgroundMusicActive((prev) => !prev);
+                  }}
+                  contentFunction={() => {
+                    return (
+                      <FgSVG
+                        src={
+                          backgroundMusicActive
+                            ? backgroundMusicOffIcon
+                            : backgroundMusicIcon
+                        }
+                        className='flex items-center justify-center'
+                        attributes={[
+                          { key: "width", value: "90%" },
+                          { key: "height", value: "90%" },
+                          { key: "fill", value: "white" },
+                          { key: "stroke", value: "white" },
+                        ]}
+                      />
+                    );
+                  }}
+                  hoverContent={
+                    <FgHoverContentStandard
+                      content={
                         backgroundMusicActive
-                          ? backgroundMusicOffIcon
-                          : backgroundMusicIcon
+                          ? "Close background music"
+                          : "Background music"
                       }
-                      className='flex items-center justify-center'
-                      attributes={[
-                        { key: "width", value: "90%" },
-                        { key: "height", value: "90%" },
-                        { key: "fill", value: "white" },
-                        { key: "stroke", value: "white" },
-                      ]}
                     />
-                  );
-                }}
-                hoverContent={
-                  <FgHoverContentStandard
-                    content={
-                      backgroundMusicActive
-                        ? "Close background music"
-                        : "Background music"
-                    }
-                  />
-                }
-                options={{ hoverTimeoutDuration: 350 }}
-              />
-            )}
-            {Object.entries(audioEffectTemplates).map((effect) => {
-              return (
+                  }
+                  options={{ hoverTimeoutDuration: 350 }}
+                />
+              ) : null,
+              ...Object.entries(audioEffectTemplates).map((effect) => (
                 <AudioEffectButton
                   key={effect[0]}
                   username={username}
@@ -512,9 +516,9 @@ export default function AudioEffectsSection({
                   scrollingContainerRef={audioSectionRef}
                   handleAudioEffectChange={audioEffectChange}
                 />
-              );
-            })}
-          </div>
+              )),
+            ]}
+          />
         }
         initPosition={{
           referenceElement: referenceElement.current ?? undefined,
