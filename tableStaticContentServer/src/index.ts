@@ -1,19 +1,27 @@
 import uWS from "uWebSockets.js";
+import dotenv from "dotenv";
 import { tables, TableStaticContentWebSocket } from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
-import handlePosts from "./lib/posts";
-import handleGets from "./lib/gets";
+import handlePosts from "./posts/posts";
+import handleGets from "./gets/gets";
 import handleMessage from "./lib/websocketMessages";
 import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
 import TableContentController from "./lib/TableContentController";
 import Cleanup from "./lib/Cleanup";
+import TableTopCeph from "./lib/TableTopCeph";
 
+dotenv.config();
+
+export const tableTopCeph = new TableTopCeph();
 export const broadcaster = new Broadcaster();
 export const tablesController = new TablesController(broadcaster);
 export const metadataController = new MetadataController(broadcaster);
 export const tableContentController = new TableContentController();
 export const cleanup = new Cleanup(broadcaster);
+
+// tableTopCeph.emptyBucket("mybucket");
+tableTopCeph.listBucketContents("mybucket");
 
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",

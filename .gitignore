@@ -1,5 +1,7 @@
 certs
 
+.env
+
 nginx-1.27.3
 nginx-1.27.3-2
 

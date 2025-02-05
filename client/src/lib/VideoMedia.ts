@@ -164,11 +164,13 @@ class VideoMedia {
     this.video.style.objectFit = "cover";
     this.video.style.backgroundColor = "#000";
     this.shakaPlayer = new shaka.Player(this.video);
+    console.log(this.originalVideoURL);
     if (this.dashUrl) {
       this.shakaPlayer.load(this.dashUrl).then(() => {
         console.log("Dash video loaded successfully");
       });
     } else {
+      console.log(this.originalVideoURL);
       this.shakaPlayer.load(this.originalVideoURL).then(() => {
         console.log("Original video loaded successfully");
       });

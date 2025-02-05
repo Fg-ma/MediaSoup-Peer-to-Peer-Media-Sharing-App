@@ -1,6 +1,6 @@
 import { tableContent, TableContentTypes } from "../typeConstant";
 import { unlinkSync } from "fs";
-import { processedDir, uploadsDir } from "./posts";
+import { processedDir, uploadsDir } from "../posts/posts";
 
 class TableContentController {
   constructor() {}
