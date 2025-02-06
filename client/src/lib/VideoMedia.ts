@@ -75,8 +75,8 @@ class VideoMedia {
     this.canvas = document.createElement("canvas");
     this.canvas.classList.add("babylonJS-canvas");
 
-    if (!userEffectsStyles.current.video[this.videoId]) {
-      userEffectsStyles.current.video[this.videoId] = {
+    if (!this.userEffectsStyles.current.video[this.videoId]) {
+      this.userEffectsStyles.current.video[this.videoId] = {
         video: structuredClone(defaultVideoEffectsStyles),
         audio: structuredClone(defaultAudioEffectsStyles),
       };
@@ -164,7 +164,7 @@ class VideoMedia {
     this.video.style.objectFit = "cover";
     this.video.style.backgroundColor = "#000";
     this.shakaPlayer = new shaka.Player(this.video);
-    console.log(this.originalVideoURL);
+
     if (this.dashUrl) {
       this.shakaPlayer.load(this.dashUrl).then(() => {
         console.log("Dash video loaded successfully");

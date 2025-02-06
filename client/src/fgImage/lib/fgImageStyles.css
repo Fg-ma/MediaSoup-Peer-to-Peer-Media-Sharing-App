@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.image-container .captions {
+  font-family: var(--closed-captions-font-family);
+  color: var(--closed-captions-font-color);
+  font-size: var(--closed-captions-font-size);
+  line-height: calc(var(--closed-captions-font-size) + 0.5rem);
+  opacity: var(--closed-captions-background-opacity);
+  text-shadow: var(--closed-captions-character-edge-style);
+  transition: line-height 150ms ease-in-out;
+  transform: translateX(-50%);
+  position: absolute;
+  left: 50%;
+  padding-right: 0.625rem;
+  padding-left: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 1rem;
+}
+
+.image-container.in-image .captions,
+.image-container.paused .captions,
+.image-container.in-effects .captions,
+.image-container.in-settings .captions,
+.image-container.in-audio-effects .captions {
+  bottom: 4rem;
+}
+
+.image-container .caption-text {
+  background-color: var(--closed-captions-background-color);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  text-align: center;
+  whitespace: normal;
+  border-radius: 0.125rem;
+  overflow: hidden;
+  max-height: calc((var(--closed-captions-font-size) + 0.5rem) * 3);
+  width: max-content;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.image-container.mini-player .main-image {
+  transform: scaleX(1);
+}
+
+.image-container {
+  --primary-image-color: #f56114;
+  --closed-captions-font-family: "K2D";
+  --closed-captions-font-color: white;
+  --closed-captions-font-size: 2rem;
+  --closed-captions-background-color: black;
+  --closed-captions-background-opacity: 75%;
+  --closed-captions-character-edge-style: none;
+}
+
+.image-container .image-controls-container,
+.image-container .image-upper-controls,
+.image-container .controls-gradient {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+}
+
+.image-controls-container {
+  pointer-events: none;
+}
+
+.image-controls {
+  pointer-events: auto;
+  padding-inline: 1rem;
+  margin-bottom: 0.375rem;
+}
+
+.image-upper-controls {
+  padding-left: 1.25rem;
+  padding-right: 0.25rem;
+  margin-top: 0.375rem;
+}
+
+.image-container .pan-btn,
+.image-container .scale-btn,
+.image-container .rotate-btn {
+  display: none;
+  transition: display 150ms ease-in-out;
+}
+
+.image-container.adjusting-dimensions .pan-btn,
+.image-container.adjusting-dimensions .scale-btn,
+.image-container.adjusting-dimensions .rotate-btn,
+.image-container.in-image .pan-btn,
+.image-container.in-image .scale-btn,
+.image-container.in-image .rotate-btn,
+.image-container.paused .pan-btn,
+.image-container.paused .scale-btn,
+.image-container.paused .rotate-btn,
+.image-container.in-effects .pan-btn,
+.image-container.in-effects .scale-btn,
+.image-container.in-effects .rotate-btn,
+.image-container.in-settings .pan-btn,
+.image-container.in-settings .scale-btn,
+.image-container.in-settings .rotate-btn,
+.image-container.in-audio-effects .pan-btn,
+.image-container.in-audio-effects .scale-btn,
+.image-container.in-audio-effects .rotate-btn {
+  display: block;
+}
+
+.image-container.in-image .image-controls-container,
+.image-container.in-image .image-upper-controls,
+.image-container.in-image .controls-gradient,
+.image-container.paused .image-controls-container,
+.image-container.paused .image-upper-controls,
+.image-container.paused .controls-gradient,
+.image-container.in-effects .image-controls-container,
+.image-container.in-effects .image-upper-controls,
+.image-container.in-effects .controls-gradient,
+.image-container.in-settings .image-controls-container,
+.image-container.in-settings .image-upper-controls,
+.image-container.in-settings .controls-gradient,
+.image-container.in-audio-effects .image-controls-container,
+.image-container.in-audio-effects .image-upper-controls,
+.image-container.in-audio-effects .controls-gradient {
+  opacity: 1;
+}
+
+.image-container {
+  cursor: none;
+}
+
+.image-container.in-image,
+.image-container.paused,
+.image-container.in-effects,
+.image-container.in-settings,
+.image-container.in-audio-effects {
+  cursor: auto;
+}
+
+/* full-screen */
+.image-container.full-screen {
+  max-width: initial;
+  width: 100% !important;
+  max-height: 100vh !important;
+  left: 0% !important;
+  top: 0% !important;
+  rotate: 0deg !important;
+}
+
+.image-container.full-screen .image-controls {
+  padding-inline: 2.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.image-container.full-screen .image-upper-controls {
+  padding-left: 2.5rem;
+  padding-right: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+/* mini-player */
+.image-container.mini-player {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}
+
+/* closed captions */
+.caption-button-underline {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--primary-image-color);
+}
+
+.animated-border-box,
+.animated-border-box-glow {
+  height: calc(100% + 8px);
+  width: calc(100% + 8px);
+  position: absolute;
+  overflow: hidden;
+  z-index: 0;
+  border-radius: 0.375rem;
+}
+
+.animated-border-box-glow {
+  overflow: hidden;
+  filter: blur(15px);
+}
+
+.animated-border-box:before,
+.animated-border-box-glow:before {
+  content: "";
+  z-index: -2;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  position: absolute;
+  width: 1000%;
+  height: 1000%;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /*border color, change middle color*/
+  background-image: conic-gradient(
+    rgba(0, 0, 0, 0) 0deg,
+    #f56114 90deg,
+    rgba(0, 0, 0, 0) 95deg,
+    #f56114 180deg,
+    rgba(0, 0, 0, 0) 185deg
+  );
+  /* change speed here */
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: translate(-50%, -50%) rotate(1turn);
+  }
+}

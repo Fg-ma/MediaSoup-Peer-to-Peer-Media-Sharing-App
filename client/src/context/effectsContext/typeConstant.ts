@@ -69,6 +69,8 @@ export type VideoEffectTypes =
   | "hats"
   | "pets";
 
+export type ImageEffectTypes = "";
+
 export type UserStreamEffectsType = {
   camera: {
     [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -86,6 +88,11 @@ export type UserStreamEffectsType = {
     [videoId: string]: {
       video: { [effectType in VideoEffectTypes]: boolean };
       audio: { [effectType in AudioEffectTypes]: boolean };
+    };
+  };
+  image: {
+    [videoId: string]: {
+      [effectType in ImageEffectTypes]: boolean;
     };
   };
 };
@@ -334,6 +341,8 @@ export type VideoEffectStylesType = {
   };
 };
 
+export type ImageEffectStylesType = object;
+
 export type BackgroundMusicTypes =
   | "adventureTime"
   | "bottledNoise"
@@ -383,6 +392,9 @@ export type UserEffectsStylesType = {
       video: VideoEffectStylesType;
       audio: AudioEffectStylesType;
     };
+  };
+  image: {
+    [imageId: string]: ImageEffectStylesType;
   };
 };
 
@@ -479,6 +491,10 @@ export const defaultVideoStreamEffects: {
   pets: false,
 });
 
+export const defaultImageStreamEffects: {
+  [effect in ImageEffectTypes]: boolean;
+} = Object.freeze({ "": false });
+
 export const defaultPostProcess: PostProcessEffects = "prismaColors";
 export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
 export const defaultHideBackgroundColor = "#F56114";
@@ -574,3 +590,7 @@ export const defaultVideoEffectsStyles: VideoEffectStylesType = Object.freeze({
     style: defaultPet,
   }),
 });
+
+export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze(
+  {}
+);

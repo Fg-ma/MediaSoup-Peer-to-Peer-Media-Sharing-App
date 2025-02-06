@@ -36,6 +36,7 @@ export function MediaContextProvider({ children }: MediaContextProviderProps) {
     screenAudio: {},
     audio: undefined,
     video: {},
+    image: {},
     gamesSignaling: undefined,
     games: {},
   });

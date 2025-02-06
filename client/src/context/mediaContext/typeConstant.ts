@@ -7,6 +7,7 @@ import ScreenAudioMedia from "../../lib/ScreenAudioMedia";
 import ScreenMedia from "../../lib/ScreenMedia";
 import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
 import VideoMedia from "../../lib/VideoMedia";
+import ImageMedia from "src/lib/ImageMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -21,6 +22,9 @@ export type UserMediaType = {
   audio: AudioMedia | undefined;
   video: {
     [videoId: string]: VideoMedia;
+  };
+  image: {
+    [imageId: string]: ImageMedia;
   };
   gamesSignaling: GamesSignalingMedia | undefined;
   games: {

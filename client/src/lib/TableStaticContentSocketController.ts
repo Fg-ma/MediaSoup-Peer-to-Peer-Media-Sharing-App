@@ -93,6 +93,7 @@ export type TableContentTypes = "video";
 export type IncomingTableStaticContentMessages =
   | onOriginalVideoReadyType
   | onDashVideoReadyType
+  | onImageReadyType
   | onResponsedCatchUpTableDataType
   | onRequestedCatchUpContentDataType
   | onContentDeletedType
@@ -113,6 +114,17 @@ export type onDashVideoReadyType = {
   type: "dashVideoReady";
   header: {
     videoId: string;
+  };
+  data: {
+    filename: string;
+    url: string;
+  };
+};
+
+export type onImageReadyType = {
+  type: "imageReady";
+  header: {
+    imageId: string;
   };
   data: {
     filename: string;

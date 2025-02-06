@@ -9,7 +9,8 @@ import VideoMedia from "../lib/VideoMedia";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
-import FgVideo from "../fgElements/fgVideo/FgVideo";
+import FgVideo from "../fgVideo/FgVideo";
+import ImageMedia from "../lib/ImageMedia";
 
 const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
@@ -94,6 +95,20 @@ export default function SharedBundle({
           userMedia.current.video[videoId]?.preloadDashStream(url);
         }
         break;
+      case "imageReady":
+        {
+          const { imageId } = message.header;
+          const { filename, url } = message.data;
+          userMedia.current.image[imageId] = new ImageMedia(
+            imageId,
+            filename,
+            url,
+            userEffectsStyles,
+            userStreamEffects
+          );
+          setRerender((prev) => !prev);
+        }
+        break;
       case "contentDeleted":
         setRerender((prev) => !prev);
         break;
@@ -129,6 +144,17 @@ export default function SharedBundle({
           <Suspense key={videoId} fallback={<div>Loading...</div>}>
             <FgVideo
               videoId={videoId}
+              sharedBundleRef={sharedBundleRef}
+              videoContentMute={videoContentMute}
+            />
+          </Suspense>
+        ))}
+      {userMedia.current.image &&
+        Object.keys(userMedia.current.image).length !== 0 &&
+        Object.keys(userMedia.current.image).map((imageId) => (
+          <Suspense key={imageId} fallback={<div>Loading...</div>}>
+            <FgVideo
+              videoId={imageId}
               sharedBundleRef={sharedBundleRef}
               videoContentMute={videoContentMute}
             />
