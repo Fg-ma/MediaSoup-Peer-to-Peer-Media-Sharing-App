@@ -69,7 +69,17 @@ export type VideoEffectTypes =
   | "hats"
   | "pets";
 
-export type ImageEffectTypes = "";
+export type ImageEffectTypes =
+  | "postProcess"
+  | "hideBackground"
+  | "blur"
+  | "tint"
+  | "glasses"
+  | "beards"
+  | "mustaches"
+  | "masks"
+  | "hats"
+  | "pets";
 
 export type UserStreamEffectsType = {
   camera: {
@@ -91,7 +101,7 @@ export type UserStreamEffectsType = {
     };
   };
   image: {
-    [videoId: string]: {
+    [imageId: string]: {
       [effectType in ImageEffectTypes]: boolean;
     };
   };
@@ -341,7 +351,35 @@ export type VideoEffectStylesType = {
   };
 };
 
-export type ImageEffectStylesType = object;
+export type ImageEffectStylesType = {
+  blur: {
+    style: "";
+  };
+  tint: {
+    style: "";
+  };
+  postProcess: {
+    style: PostProcessEffects;
+  };
+  glasses: {
+    style: GlassesEffectTypes;
+  };
+  beards: {
+    style: BeardsEffectTypes;
+  };
+  mustaches: {
+    style: MustachesEffectTypes;
+  };
+  masks: {
+    style: MasksEffectTypes;
+  };
+  hats: {
+    style: HatsEffectTypes;
+  };
+  pets: {
+    style: PetsEffectTypes;
+  };
+};
 
 export type BackgroundMusicTypes =
   | "adventureTime"
@@ -493,7 +531,18 @@ export const defaultVideoStreamEffects: {
 
 export const defaultImageStreamEffects: {
   [effect in ImageEffectTypes]: boolean;
-} = Object.freeze({ "": false });
+} = Object.freeze({
+  postProcess: false,
+  hideBackground: false,
+  blur: false,
+  tint: false,
+  glasses: false,
+  beards: false,
+  mustaches: false,
+  masks: false,
+  hats: false,
+  pets: false,
+});
 
 export const defaultPostProcess: PostProcessEffects = "prismaColors";
 export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
@@ -591,6 +640,32 @@ export const defaultVideoEffectsStyles: VideoEffectStylesType = Object.freeze({
   }),
 });
 
-export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze(
-  {}
-);
+export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
+  blur: Object.freeze({
+    style: "",
+  }),
+  tint: Object.freeze({
+    style: "",
+  }),
+  postProcess: Object.freeze({
+    style: defaultPostProcess,
+  }),
+  glasses: Object.freeze({
+    style: defaultGlasses,
+  }),
+  beards: Object.freeze({
+    style: defaultBeard,
+  }),
+  mustaches: Object.freeze({
+    style: defaultMustache,
+  }),
+  masks: Object.freeze({
+    style: defaultMask,
+  }),
+  hats: Object.freeze({
+    style: defaultHat,
+  }),
+  pets: Object.freeze({
+    style: defaultPet,
+  }),
+});

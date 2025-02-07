@@ -1,7 +1,17 @@
 import React, { useEffect, useRef } from "react";
 
-export default function LowerControls() {
-  const rightControlsRef = useRef<HTMLDivElement>(null);
+export default function LowerControls({
+  leftLowerControls,
+  rightLowerControls,
+  externalRightLowerControlsRef,
+}: {
+  leftLowerControls?: React.ReactNode[];
+  rightLowerControls?: React.ReactNode[];
+  externalRightLowerControlsRef?: React.RefObject<HTMLDivElement>;
+}) {
+  const rightControlsRef = externalRightLowerControlsRef
+    ? externalRightLowerControlsRef
+    : useRef<HTMLDivElement>(null);
 
   const handleWheel = (event: WheelEvent) => {
     event.preventDefault();
@@ -31,13 +41,17 @@ export default function LowerControls() {
           className='flex w-max h-10 z-20 items-center space-x-2'
           style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
         >
-          left
+          {leftLowerControls &&
+            leftLowerControls.length > 0 &&
+            leftLowerControls}
         </div>
         <div
           ref={rightControlsRef}
           className='hide-scroll-bar w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
         >
-          right
+          {rightLowerControls &&
+            rightLowerControls.length > 0 &&
+            rightLowerControls}
         </div>
       </div>
     </div>

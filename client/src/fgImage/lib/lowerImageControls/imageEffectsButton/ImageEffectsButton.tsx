@@ -1,7 +1,7 @@
 import React from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerImageController from "../LowerImageController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -12,12 +12,10 @@ const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
 export default function ImageEffectsButton({
   lowerImageController,
   imageEffectsActive,
-  settingsActive,
   scrollingContainerRef,
 }: {
   lowerImageController: LowerImageController;
   imageEffectsActive: boolean;
-  settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
@@ -41,7 +39,7 @@ export default function ImageEffectsButton({
         );
       }}
       hoverContent={
-        !imageEffectsActive && !settingsActive ? (
+        !imageEffectsActive ? (
           <FgHoverContentStandard content='Effects (e)' style='dark' />
         ) : undefined
       }

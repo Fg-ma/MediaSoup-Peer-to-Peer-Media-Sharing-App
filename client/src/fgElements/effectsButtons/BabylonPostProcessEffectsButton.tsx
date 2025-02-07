@@ -1,47 +1,40 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
-import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import { PostProcessEffects } from "../../../../context/effectsContext/typeConstant";
-import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import LowerImageController from "../../lowerImageControls/LowerImageController";
+import FgButton from "../fgButton/FgButton";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
+import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
+import { PostProcessEffects } from "../../context/effectsContext/typeConstant";
+import FgImageElement from "../fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import { postProcessEffectsChoices } from "./typeConstant";
 
 export default function BabylonPostProcessEffectsButton({
-  imageId,
-  lowerImageController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
+  streamEffects,
+  effectsStyles,
+  clickFunctionCallback,
+  holdFunctionCallback,
 }: {
-  imageId: string;
-  lowerImageController: LowerImageController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  streamEffects: boolean;
+  effectsStyles: {
+    style: PostProcessEffects;
+  };
+  clickFunctionCallback?: () => void;
+  holdFunctionCallback?: (effectType: PostProcessEffects) => void;
 }) {
-  const { userMedia } = useMediaContext();
-  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
-
   const [_, setRerender] = useState(0);
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const postProcessEffectsContainerRef = useRef<HTMLDivElement>(null);
-
-  const streamEffects = userStreamEffects.current.image[imageId].postProcess;
-  const effectsStyles = userEffectsStyles.current.image[imageId].postProcess;
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    userMedia.current.image[
-      imageId
-    ].babylonScene.babylonShaderController.swapPostProcessEffects(
-      effectsStyles.style
-    );
-
-    await lowerImageController.handleImageEffect("postProcess", false);
+    if (clickFunctionCallback) clickFunctionCallback();
 
     setEffectsDisabled(false);
   };
@@ -51,7 +44,7 @@ export default function BabylonPostProcessEffectsButton({
     if (
       !effectsStyles ||
       !target ||
-      !target.dataset.cameraPostProcessEffectsButtonValue
+      !target.dataset.postProcessEffectsButtonValue
     ) {
       return;
     }
@@ -59,19 +52,10 @@ export default function BabylonPostProcessEffectsButton({
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .cameraPostProcessEffectsButtonValue as PostProcessEffects;
+      .postProcessEffectsButtonValue as PostProcessEffects;
 
     if (effectsStyles.style !== effectType || !streamEffects) {
-      effectsStyles.style = effectType;
-
-      userMedia.current.image[
-        imageId
-      ].babylonScene.babylonShaderController.swapPostProcessEffects(effectType);
-
-      await lowerImageController.handleImageEffect(
-        "postProcess",
-        streamEffects
-      );
+      if (holdFunctionCallback) holdFunctionCallback(effectType);
     }
 
     setEffectsDisabled(false);
@@ -107,46 +91,47 @@ export default function BabylonPostProcessEffectsButton({
           className='grid pl-3 pr-1 overflow-y-auto small-vertical-scroll-bar max-h-60 mb-4 grid-cols-3 w-max gap-x-2 gap-y-2 py-3 border-3 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-lg rounded-md'
         >
           {Object.entries(postProcessEffectsChoices).map(
-            ([postProcessEffect, choice]) => (
-              <FgButton
-                key={postProcessEffect}
-                contentFunction={() => (
-                  <div
-                    className={`${
-                      postProcessEffect === effectsStyles.style
-                        ? "border-fg-secondary border-3 border-opacity-100"
-                        : ""
-                    } border-white flex items-center justify-center w-16 min-w-16 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-                    onClick={(event) => {
-                      holdFunction(event as unknown as PointerEvent);
-                    }}
-                    data-camera-post-process-effects-button-value={
-                      postProcessEffect
-                    }
-                  >
-                    <FgImageElement
-                      src={choice.image}
-                      srcLoading={choice.imageSmall}
-                      alt={postProcessEffect}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
+            ([postProcessEffect, choice]) =>
+              choice && (
+                <FgButton
+                  key={postProcessEffect}
+                  contentFunction={() => (
+                    <div
+                      className={`${
+                        postProcessEffect === effectsStyles.style
+                          ? "border-fg-secondary border-3 border-opacity-100"
+                          : ""
+                      } border-white flex items-center justify-center w-16 min-w-16 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                      onClick={(event) => {
+                        holdFunction(event as unknown as PointerEvent);
                       }}
-                      data-camera-post-process-effects-button-value={
-                        postProcessEffect
-                      }
-                    />
-                  </div>
-                )}
-                hoverContent={<FgHoverContentStandard content={choice.label} />}
-                scrollingContainerRef={postProcessEffectsContainerRef}
-                options={{
-                  hoverZValue: 999999999999999,
-                  hoverTimeoutDuration: 750,
-                }}
-              />
-            )
+                      data-post-process-effects-button-value={postProcessEffect}
+                    >
+                      <FgImageElement
+                        src={choice.image}
+                        srcLoading={choice.imageSmall}
+                        alt={postProcessEffect}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                        data-post-process-effects-button-value={
+                          postProcessEffect
+                        }
+                      />
+                    </div>
+                  )}
+                  hoverContent={
+                    <FgHoverContentStandard content={choice.label} />
+                  }
+                  scrollingContainerRef={postProcessEffectsContainerRef}
+                  options={{
+                    hoverZValue: 999999999999999,
+                    hoverTimeoutDuration: 750,
+                  }}
+                />
+              )
           )}
         </div>
       }

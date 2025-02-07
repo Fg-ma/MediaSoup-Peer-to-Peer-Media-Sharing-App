@@ -8,6 +8,7 @@ class LowerController {
       TableStaticContentSocketController | undefined
     >,
     private mediaId: string,
+    private filename: string,
     private kind: MediaKinds,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private mediaContainerRef: React.RefObject<HTMLDivElement>,
@@ -217,10 +218,13 @@ class LowerController {
   };
 
   handleClose = () => {
-    this.tableStaticContentSocket.current?.deleteContent(
-      this.kind,
-      this.mediaId
-    );
+    if (this.kind === "image" || this.kind === "video") {
+      this.tableStaticContentSocket.current?.deleteContent(
+        this.kind,
+        this.mediaId,
+        this.filename
+      );
+    }
   };
 }
 

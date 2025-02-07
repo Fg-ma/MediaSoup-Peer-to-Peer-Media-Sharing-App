@@ -1,4 +1,4 @@
-import { tableContentController } from "../index";
+import { tableContentController, tableTopCeph } from "../index";
 import Broadcaster from "./Broadcaster";
 import { onDeleteContentType } from "../typeConstant";
 
@@ -7,6 +7,9 @@ class Cleanup {
 
   onDeleteContent = (event: onDeleteContentType) => {
     const { table_id, contentType, contentId } = event.header;
+    const { filename } = event.data;
+
+    tableTopCeph.deleteFile("mybucket", filename);
 
     tableContentController.deleteContent(table_id, contentType, contentId);
 

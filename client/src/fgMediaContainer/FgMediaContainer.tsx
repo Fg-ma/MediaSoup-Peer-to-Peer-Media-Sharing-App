@@ -19,18 +19,31 @@ const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
 
 export default function FgMediaContainer({
   mediaId,
+  filename,
   kind,
   bundleRef,
   media,
+  popupElements,
+  leftLowerControls,
+  rightLowerControls,
+  leftUpperControls,
+  rightUpperControls,
   externalPositioning,
   externalMediaContainerRef,
   externalSubContainerRef,
+  externalRightLowerControlsRef,
   options,
 }: {
   mediaId: string;
+  filename: string;
   kind: MediaKinds;
   bundleRef: React.RefObject<HTMLDivElement>;
-  media: React.ReactNode;
+  media?: React.ReactNode;
+  popupElements?: React.ReactNode[];
+  leftLowerControls?: React.ReactNode[];
+  rightLowerControls?: React.ReactNode[];
+  leftUpperControls?: React.ReactNode[];
+  rightUpperControls?: React.ReactNode[];
   externalPositioning?: React.MutableRefObject<{
     position: {
       left: number;
@@ -44,6 +57,7 @@ export default function FgMediaContainer({
   }>;
   externalMediaContainerRef?: React.RefObject<HTMLDivElement>;
   externalSubContainerRef?: React.RefObject<HTMLDivElement>;
+  externalRightLowerControlsRef?: React.RefObject<HTMLDivElement>;
   options?: MediaContainerOptions;
 }) {
   const mediaContainerOptions = {
@@ -103,6 +117,7 @@ export default function FgMediaContainer({
   const lowerController = new LowerController(
     tableStaticContentSocket,
     mediaId,
+    filename,
     kind,
     bundleRef,
     mediaContainerRef,
@@ -212,9 +227,19 @@ export default function FgMediaContainer({
         ref={subContainerRef}
         className='flex relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
-        {media}
-        <UpperControls desync={desync} lowerController={lowerController} />
-        <LowerControls />
+        {media && media}
+        {popupElements && popupElements}
+        <UpperControls
+          desync={desync}
+          lowerController={lowerController}
+          leftUpperControls={leftUpperControls}
+          rightUpperControls={rightUpperControls}
+        />
+        <LowerControls
+          leftLowerControls={leftLowerControls}
+          rightLowerControls={rightLowerControls}
+          externalRightLowerControlsRef={externalRightLowerControlsRef}
+        />
         <Gradient />
       </div>
     </div>

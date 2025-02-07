@@ -14,11 +14,12 @@ class ImageMedia {
 
   filename: string;
 
-  fileChunks: Buffer[] = [];
+  private fileChunks: Buffer[] = [];
 
   private effects: {
     [imageEffect in ImageEffectTypes]?: boolean;
   } = {};
+  babylonScene: any;
 
   constructor(
     private imageId: string,

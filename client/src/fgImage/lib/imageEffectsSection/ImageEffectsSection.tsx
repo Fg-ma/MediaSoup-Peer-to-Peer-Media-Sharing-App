@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Transition, Variants, motion } from "framer-motion";
+import LowerImageController from "../lowerImageControls/LowerImageController";
 import TintSection from "./lib/TintSection";
 import BlurButtton from "./lib/BlurButton";
-import FgLowerVideoController from "../fgLowerVideoControls/lib/FgLowerVideoController";
-
-const BabylonPostProcessEffectsButton = React.lazy(
-  () => import("./lib/BabylonPostProcessEffectsButton")
-);
-const GlassesButton = React.lazy(() => import("./lib/GlassesButton"));
-const BeardsButton = React.lazy(() => import("./lib/BeardsButton"));
-const MustachesButton = React.lazy(() => import("./lib/MustachesButton"));
-const MasksButton = React.lazy(() => import("./lib/MasksButton"));
-const HatsButton = React.lazy(() => import("./lib/HatsButton"));
-const PetsButton = React.lazy(() => import("./lib/PetsButton"));
+import BabylonPostProcessEffectsButton from "./lib/BabylonPostProcessEffectsButton";
+import GlassesButton from "./lib/GlassesButton";
+import BeardsButton from "./lib/BeardsButton";
+import MustachesButton from "./lib/MustachesButton";
+import MasksButton from "./lib/MasksButton";
+import HatsButton from "./lib/HatsButton";
+import PetsButton from "./lib/PetsButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -32,15 +29,15 @@ const EffectSectionTransition: Transition = {
   },
 };
 
-export default function VideoEffectsSection({
-  videoId,
-  videoContainerRef,
-  fgLowerVideoController,
+export default function ImageEffectsSection({
+  imageId,
+  imageContainerRef,
+  lowerImageController,
   tintColor,
 }: {
-  videoId: string;
-  videoContainerRef: React.RefObject<HTMLDivElement>;
-  fgLowerVideoController: FgLowerVideoController;
+  imageId: string;
+  imageContainerRef: React.RefObject<HTMLDivElement>;
+  lowerImageController: LowerImageController;
   tintColor: React.MutableRefObject<string>;
 }) {
   const [effectsWidth, setEffectsWidth] = useState(0);
@@ -50,8 +47,8 @@ export default function VideoEffectsSection({
   const effectsContainerRef = useRef<HTMLDivElement>(null);
 
   const updateWidth = () => {
-    if (videoContainerRef.current) {
-      const newEffectsWidth = videoContainerRef.current.clientWidth * 0.9;
+    if (imageContainerRef.current) {
+      const newEffectsWidth = imageContainerRef.current.clientWidth * 0.9;
 
       setEffectsWidth(newEffectsWidth);
 
@@ -65,7 +62,7 @@ export default function VideoEffectsSection({
 
   useEffect(() => {
     updateWidth();
-  }, [videoContainerRef.current?.clientWidth]);
+  }, [imageContainerRef.current?.clientWidth]);
 
   const handleWheel = (event: WheelEvent) => {
     event.stopPropagation();
@@ -102,92 +99,78 @@ export default function VideoEffectsSection({
       exit='init'
       transition={EffectSectionTransition}
     >
-      <Suspense fallback={<div>Loading...</div>}>
-        <BabylonPostProcessEffectsButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      </Suspense>
+      <BabylonPostProcessEffectsButton
+        imageId={imageId}
+        lowerImageController={lowerImageController}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <BlurButtton
-        videoId={videoId}
-        fgLowerVideoController={fgLowerVideoController}
+        imageId={imageId}
+        lowerImageController={lowerImageController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <TintSection
-        videoId={videoId}
-        fgLowerVideoController={fgLowerVideoController}
+        imageId={imageId}
+        lowerImageController={lowerImageController}
         tintColor={tintColor}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
       />
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <GlassesButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <BeardsButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <MustachesButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <MasksButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <HatsButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <PetsButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <GlassesButton
+        imageId={imageId}
+        lowerImageController={lowerImageController}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <BeardsButton
+        imageId={imageId}
+        lowerImageController={lowerImageController}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <MustachesButton
+        imageId={imageId}
+        lowerImageController={lowerImageController}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <MasksButton
+        imageId={imageId}
+        lowerImageController={lowerImageController}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <HatsButton
+        imageId={imageId}
+        lowerImageController={lowerImageController}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <PetsButton
+        imageId={imageId}
+        lowerImageController={lowerImageController}
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+      />
     </motion.div>
   );
 }

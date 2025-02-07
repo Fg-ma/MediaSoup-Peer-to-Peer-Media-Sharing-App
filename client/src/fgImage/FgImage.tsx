@@ -3,10 +3,13 @@ import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import ImageController from "./lib/ImageController";
-import LowerImageController from "./lib/lowerImageControls/lib/LowerImageController";
+import LowerImageController from "./lib/lowerImageControls/LowerImageController";
 import { defaultImageOptions, ImageOptions } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import "./lib/fgImageStyles.css";
+import FullScreenButton from "./lib/lowerImageControls/fullScreenButton/FullScreenButton";
+import ImageEffectsButton from "./lib/lowerImageControls/imageEffectsButton/ImageEffectsButton";
+import ImageEffectsSection from "./lib/imageEffectsSection/ImageEffectsSection";
 
 export default function FgImage({
   imageId,
@@ -42,7 +45,9 @@ export default function FgImage({
 
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const rightLowerImageControlsRef = useRef<HTMLDivElement>(null);
+
+  const tintColor = useRef("");
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -114,12 +119,34 @@ export default function FgImage({
   return (
     <FgMediaContainer
       mediaId={imageId}
-      kind={"image"}
+      filename={imageMedia.filename}
+      kind='image'
       bundleRef={bundleRef}
-      media={<></>}
+      popupElements={[
+        <ImageEffectsSection
+          imageId={imageId}
+          imageContainerRef={imageContainerRef}
+          fgLowerVideoController={lowerImageController}
+          tintColor={tintColor}
+        />,
+      ]}
+      leftLowerControls={[]}
+      rightLowerControls={[
+        <FullScreenButton
+          lowerImageController={lowerImageController}
+          imageEffectsActive={imageEffectsActive}
+          scrollingContainerRef={rightLowerImageControlsRef}
+        />,
+        <ImageEffectsButton
+          lowerImageController={lowerImageController}
+          imageEffectsActive={imageEffectsActive}
+          scrollingContainerRef={rightLowerImageControlsRef}
+        />,
+      ]}
       externalPositioning={positioning}
       externalMediaContainerRef={imageContainerRef}
       externalSubContainerRef={subContainerRef}
+      externalRightLowerControlsRef={rightLowerImageControlsRef}
     />
   );
 }

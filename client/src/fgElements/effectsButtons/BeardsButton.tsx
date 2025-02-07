@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import { HatsEffectTypes } from "../../../../context/effectsContext/typeConstant";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
+import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
+import { BeardsEffectTypes } from "../../context/effectsContext/typeConstant";
+import FgButton from "../fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerImageController from "../../lowerImageControls/LowerImageController";
-import { hatsEffects, hatsLabels } from "./typeConstant";
+import { beardsEffects, beardsLabels } from "./typeConstant";
 
-export default function HatsButton({
+export default function BeardsButton({
   imageId,
   lowerImageController,
   effectsDisabled,
@@ -25,16 +25,16 @@ export default function HatsButton({
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [_, setRerender] = useState(0);
-  const hatsContainerRef = useRef<HTMLDivElement>(null);
+  const beardsContainerRef = useRef<HTMLDivElement>(null);
 
-  const streamEffects = userStreamEffects.current.image[imageId].hats;
-  const effectsStyles = userEffectsStyles.current.image[imageId].hats;
+  const streamEffects = userStreamEffects.current.image[imageId].beards;
+  const effectsStyles = userEffectsStyles.current.image[imageId].beards;
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await lowerImageController.handleImageEffect("hats", false);
+    await lowerImageController.handleImageEffect("beards", false);
 
     setEffectsDisabled(false);
   };
@@ -48,14 +48,14 @@ export default function HatsButton({
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .imageEffectsButtonValue as HatsEffectTypes;
+      .imageEffectsButtonValue as BeardsEffectTypes;
     if (
-      effectType in hatsEffects &&
+      effectType in beardsEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       effectsStyles.style = effectType;
 
-      await lowerImageController.handleImageEffect("hats", streamEffects);
+      await lowerImageController.handleImageEffect("beards", streamEffects);
     }
 
     setEffectsDisabled(false);
@@ -71,9 +71,9 @@ export default function HatsButton({
           return;
         }
 
-        if (hatsEffects[effectsStyles.style].icon) {
+        if (beardsEffects[effectsStyles.style].icon) {
           const iconSrc =
-            hatsEffects[effectsStyles.style][
+            beardsEffects[effectsStyles.style][
               streamEffects ? "iconOff" : "icon"
             ];
 
@@ -91,12 +91,12 @@ export default function HatsButton({
           }
         } else {
           const imageSrc =
-            hatsEffects[effectsStyles.style][
+            beardsEffects[effectsStyles.style][
               streamEffects ? "imageOff" : "image"
             ];
 
           const imageLoadingSrc =
-            hatsEffects[effectsStyles.style][
+            beardsEffects[effectsStyles.style][
               streamEffects ? "imageOffSmall" : "imageSmall"
             ];
 
@@ -115,16 +115,16 @@ export default function HatsButton({
       }}
       holdContent={
         <div
-          ref={hatsContainerRef}
+          ref={beardsContainerRef}
           className='grid border overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
         >
-          {Object.entries(hatsEffects).map(([hat, effect]) => (
+          {Object.entries(beardsEffects).map(([beard, effect]) => (
             <FgButton
-              key={hat}
+              key={beard}
               contentFunction={() => (
                 <div
                   className={`${
-                    hat === effectsStyles.style
+                    beard === effectsStyles.style
                       ? "border-fg-secondary border-3 border-opacity-100"
                       : ""
                   } ${effect.flipped && "scale-x-[-1]"} ${
@@ -135,23 +135,23 @@ export default function HatsButton({
                   onClick={(event) => {
                     holdFunction(event as unknown as PointerEvent);
                   }}
-                  data-image-effects-button-value={hat}
+                  data-image-effects-button-value={beard}
                 >
                   <FgImageElement
                     src={effect.image}
                     srcLoading={effect.imageSmall}
-                    alt={hat}
+                    alt={beard}
                     style={{ width: "2.75rem", height: "2.75rem" }}
-                    data-image-effects-button-value={hat}
+                    data-image-effects-button-value={beard}
                   />
                 </div>
               )}
               hoverContent={
                 <FgHoverContentStandard
-                  content={hatsLabels[hat as HatsEffectTypes]}
+                  content={beardsLabels[beard as BeardsEffectTypes]}
                 />
               }
-              scrollingContainerRef={hatsContainerRef}
+              scrollingContainerRef={beardsContainerRef}
               options={{
                 hoverZValue: 999999999999999,
                 hoverTimeoutDuration: 750,
@@ -160,7 +160,7 @@ export default function HatsButton({
           ))}
         </div>
       }
-      hoverContent={<FgHoverContentStandard content='Hats' />}
+      hoverContent={<FgHoverContentStandard content='Beards' />}
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
       scrollingContainerRef={scrollingContainerRef}

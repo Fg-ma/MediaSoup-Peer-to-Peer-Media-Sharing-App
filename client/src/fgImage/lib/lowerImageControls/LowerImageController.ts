@@ -1,7 +1,7 @@
 import {
   UserStreamEffectsType,
   ImageEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
+} from "../../../context/effectsContext/typeConstant";
 
 class LowerImageController {
   constructor(

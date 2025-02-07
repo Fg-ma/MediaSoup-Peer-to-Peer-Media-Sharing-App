@@ -89,6 +89,9 @@ export type onDeleteContentType = {
     contentType: TableContentTypes;
     contentId: string;
   };
+  data: {
+    filename: string;
+  };
 };
 
 export type onCatchUpContentDataResponseType = {

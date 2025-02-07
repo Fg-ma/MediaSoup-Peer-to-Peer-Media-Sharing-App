@@ -5,58 +5,18 @@ import FgButton from "../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
 import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import FgLowerVideoController from "../../fgLowerVideoControls/lib/FgLowerVideoController";
-
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
-
-const classicalCurlyBeard_512x512 =
-  nginxAssetSeverBaseUrl +
-  "2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_512x512.png";
-const classicalCurlyBeard_32x32 =
-  nginxAssetSeverBaseUrl +
-  "2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_32x32.png";
-const classicalCurlyBeardIcon =
-  nginxAssetSeverBaseUrl +
-  "svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardIcon.svg";
-const classicalCurlyBeardOffIcon =
-  nginxAssetSeverBaseUrl +
-  "svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardOffIcon.svg";
-const chinBeard_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_512x512.png";
-const chinBeard_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_32x32.png";
-const chinBeard_off_512x512 =
-  nginxAssetSeverBaseUrl +
-  "2DAssets/beards/chinBeard/chinBeard_off_512x512.png";
-const chinBeard_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_off_32x32.png";
-const fullBeard_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_512x512.png";
-const fullBeard_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_32x32.png";
-const fullBeard_off_512x512 =
-  nginxAssetSeverBaseUrl +
-  "2DAssets/beards/fullBeard/fullBeard_off_512x512.png";
-const fullBeard_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_off_32x32.png";
-
-const beardsLabels: {
-  [beardsEffectType in BeardsEffectTypes]: string;
-} = {
-  classicalCurlyBeard: "Classical curly",
-  chinBeard: "Chin",
-  fullBeard: "Full",
-};
+import LowerImageController from "../../lowerImageControls/LowerImageController";
+import { beardsEffects, beardsLabels } from "./typeConstant";
 
 export default function BeardsButton({
-  videoId,
-  fgLowerVideoController,
+  imageId,
+  lowerImageController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
 }: {
-  videoId: string;
-  fgLowerVideoController: FgLowerVideoController;
+  imageId: string;
+  lowerImageController: LowerImageController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -67,73 +27,35 @@ export default function BeardsButton({
   const [_, setRerender] = useState(0);
   const beardsContainerRef = useRef<HTMLDivElement>(null);
 
-  const streamEffects = userStreamEffects.current.video[videoId].video.beards;
-  const effectsStyles = userEffectsStyles.current.video[videoId].video.beards;
-
-  const beardsEffects: {
-    [key in BeardsEffectTypes]: {
-      image: string;
-      imageSmall: string;
-      icon?: string;
-      iconOff?: string;
-      imageOff?: string;
-      imageOffSmall?: string;
-      flipped: boolean;
-      bgColor: "white" | "black";
-    };
-  } = {
-    classicalCurlyBeard: {
-      image: classicalCurlyBeard_512x512,
-      imageSmall: classicalCurlyBeard_32x32,
-      icon: classicalCurlyBeardIcon,
-      iconOff: classicalCurlyBeardOffIcon,
-      flipped: true,
-      bgColor: "black",
-    },
-    chinBeard: {
-      image: chinBeard_512x512,
-      imageSmall: chinBeard_32x32,
-      imageOff: chinBeard_off_512x512,
-      imageOffSmall: chinBeard_off_32x32,
-      flipped: false,
-      bgColor: "black",
-    },
-    fullBeard: {
-      image: fullBeard_512x512,
-      imageSmall: fullBeard_32x32,
-      imageOff: fullBeard_off_512x512,
-      imageOffSmall: fullBeard_off_32x32,
-      flipped: false,
-      bgColor: "white",
-    },
-  };
+  const streamEffects = userStreamEffects.current.image[imageId].beards;
+  const effectsStyles = userEffectsStyles.current.image[imageId].beards;
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await fgLowerVideoController.handleVideoEffect("beards", false);
+    await lowerImageController.handleImageEffect("beards", false);
 
     setEffectsDisabled(false);
   };
 
   const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
-    if (!effectsStyles || !target || !target.dataset.videoEffectsButtonValue) {
+    if (!effectsStyles || !target || !target.dataset.imageEffectsButtonValue) {
       return;
     }
 
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .videoEffectsButtonValue as BeardsEffectTypes;
+      .imageEffectsButtonValue as BeardsEffectTypes;
     if (
       effectType in beardsEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
       effectsStyles.style = effectType;
 
-      await fgLowerVideoController.handleVideoEffect("beards", streamEffects);
+      await lowerImageController.handleImageEffect("beards", streamEffects);
     }
 
     setEffectsDisabled(false);
@@ -163,7 +85,7 @@ export default function BeardsButton({
                   { key: "width", value: "95%" },
                   { key: "height", value: "95%" },
                 ]}
-                data-video-effects-button-value={effectsStyles.style}
+                data-image-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -185,7 +107,7 @@ export default function BeardsButton({
                 srcLoading={imageLoadingSrc}
                 alt={effectsStyles.style}
                 style={{ width: "90%", height: "90%" }}
-                data-video-effects-button-value={effectsStyles.style}
+                data-image-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -213,14 +135,14 @@ export default function BeardsButton({
                   onClick={(event) => {
                     holdFunction(event as unknown as PointerEvent);
                   }}
-                  data-video-effects-button-value={beard}
+                  data-image-effects-button-value={beard}
                 >
                   <FgImageElement
                     src={effect.image}
                     srcLoading={effect.imageSmall}
                     alt={beard}
                     style={{ width: "2.75rem", height: "2.75rem" }}
-                    data-video-effects-button-value={beard}
+                    data-image-effects-button-value={beard}
                   />
                 </div>
               )}

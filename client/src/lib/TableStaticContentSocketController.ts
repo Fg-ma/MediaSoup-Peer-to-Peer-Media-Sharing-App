@@ -62,6 +62,9 @@ type onDeleteContentType = {
     contentType: TableContentTypes;
     contentId: string;
   };
+  data: {
+    filename: string;
+  };
 };
 
 type onCatchUpContentDataResponseType = {
@@ -361,13 +364,20 @@ class TableStaticContentSocketController {
     });
   };
 
-  deleteContent = (contentType: TableContentTypes, contentId: string) => {
+  deleteContent = (
+    contentType: TableContentTypes,
+    contentId: string,
+    filename: string
+  ) => {
     this.sendMessage({
       type: "deleteContent",
       header: {
         table_id: this.table_id,
         contentType: contentType,
         contentId: contentId,
+      },
+      data: {
+        filename,
       },
     });
   };

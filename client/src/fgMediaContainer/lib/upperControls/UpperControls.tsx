@@ -6,14 +6,23 @@ import SyncButton from "./lib/syncButton/SyncButton";
 export default function UpperControls({
   desync,
   lowerController,
+  leftUpperControls,
+  rightUpperControls,
 }: {
   desync: boolean;
   lowerController: LowerController;
+  leftUpperControls?: React.ReactNode[];
+  rightUpperControls?: React.ReactNode[];
 }) {
   return (
     <div className='flex media-upper-controls absolute top-0 w-full h-10 items-center justify-between z-20'>
-      <div></div>
+      <div>
+        {leftUpperControls && leftUpperControls.length > 0 && leftUpperControls}
+      </div>
       <div className='flex grow h-full items-center justify-end space-x-2'>
+        {rightUpperControls &&
+          rightUpperControls.length > 0 &&
+          rightUpperControls}
         <SyncButton desync={desync} lowerController={lowerController} />
         <CloseButton lowerController={lowerController} />
       </div>
