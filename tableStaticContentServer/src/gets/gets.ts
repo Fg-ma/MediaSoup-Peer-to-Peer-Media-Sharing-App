@@ -1,4 +1,4 @@
-import { PassThrough } from "stream";
+import { PassThrough, Readable } from "stream";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { tableTopCeph } from "../index";
 import { onGetImageType } from "../typeConstant";
@@ -21,10 +21,9 @@ class Gets {
 
     if (data.Body) {
       const passThrough = new PassThrough();
-      data.Body.pipe(passThrough);
+      (data.Body as Readable).pipe(passThrough);
 
       passThrough.on("data", (chunk) => {
-        console.log(chunk);
         this.broadcaster.broadcastToInstance(table_id, username, instance, {
           type: "chunk",
           data: { chunk },
@@ -32,7 +31,6 @@ class Gets {
       });
 
       passThrough.on("end", () => {
-        console.log("end");
         this.broadcaster.broadcastToInstance(table_id, username, instance, {
           type: "imageDownloadComplete",
         });
