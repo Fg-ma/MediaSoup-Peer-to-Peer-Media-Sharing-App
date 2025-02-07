@@ -17,7 +17,7 @@ const cephAccessKeyId = process.env.CEPH_ACCESS_KEY_ID;
 const cephSecretAccessKey = process.env.CEPH_SECRET_ACCESS_KEY;
 
 class TableTopCeph {
-  private s3Client = new S3Client({
+  s3Client = new S3Client({
     region: cephRegion ?? "",
     endpoint: cephEndpoint ?? "",
     credentials: {
@@ -44,12 +44,10 @@ class TableTopCeph {
         },
       });
 
-      upload.on("httpUploadProgress", (progress) => {
-        console.log(progress);
-      });
+      upload.on("httpUploadProgress", (progress) => {});
 
       // Wait for the upload to complete
-      const result = await upload.done();
+      await upload.done();
     } catch (error) {}
   };
 
@@ -63,29 +61,6 @@ class TableTopCeph {
       console.log("Bucket Contents:", result.Contents);
     } catch (err) {
       console.error("Error listing contents:", err);
-    }
-  };
-
-  streamFileToClient = async (bucketName: string, key: string, res: any) => {
-    const params = {
-      Bucket: bucketName,
-      Key: key,
-    };
-
-    try {
-      const data = await this.s3Client.send(new GetObjectCommand(params));
-      if (data.Body) {
-        res.setHeader(
-          "Content-Type",
-          data.ContentType || "application/octet-stream"
-        );
-        const passThrough = new PassThrough();
-        data.Body.pipe(passThrough).pipe(res);
-      } else {
-        res.status(404).send("File not found");
-      }
-    } catch (err) {
-      res.status(500).send("Error streaming file");
     }
   };
 

@@ -1,4 +1,4 @@
-import { cleanup, metadataController, tablesController } from "../index";
+import { cleanup, gets, metadataController, tablesController } from "../index";
 import { MessageTypes, TableStaticContentWebSocket } from "../typeConstant";
 
 const handleMessage = (
@@ -23,6 +23,9 @@ const handleMessage = (
       break;
     case "catchUpContentDataResponse":
       metadataController.onCatchUpContentDataResponse(event);
+      break;
+    case "getImage":
+      gets.getImage(ws, event);
       break;
     default:
       break;

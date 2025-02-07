@@ -41,15 +41,13 @@ const handlePosts = (app: uWS.TemplatedApp) => {
       const extension = mimeToExtension[mimeType] || ".bin";
       const filename = `${utils.random()}${extension}`;
 
-      tableTopCeph.uploadFile("mybucket", filename, file);
-
-      file.on("end", async () => {
-        const originalUrl = `https://localhost:8045/stream/${filename}`;
+      tableTopCeph.uploadFile("mybucket", filename, file).then(async () => {
+        const url = `https://localhost:8045/stream/${filename}`;
 
         // Differentiate handling based on file type
         if (mimeType.startsWith("video/")) {
           tableContentController.setContent(table_id, "video", contentId, [
-            { property: "originalURL", value: originalUrl },
+            { property: "url", value: url },
           ]);
 
           const originalVideoMessage = {
@@ -59,7 +57,7 @@ const handlePosts = (app: uWS.TemplatedApp) => {
             },
             data: {
               filename,
-              url: originalUrl,
+              url,
             },
           };
           broadcaster.broadcastToTable(table_id, originalVideoMessage);
@@ -95,13 +93,13 @@ const handlePosts = (app: uWS.TemplatedApp) => {
         } else if (mimeType.startsWith("image/")) {
           // Image-specific handling
           tableContentController.setContent(table_id, "image", contentId, [
-            { property: "originalURL", value: originalUrl },
+            { property: "url", value: url },
           ]);
 
           broadcaster.broadcastToTable(table_id, {
             type: "imageReady",
             header: { contentId },
-            data: { filename: filename, url: originalUrl },
+            data: { filename: filename, url },
           });
         } else {
           console.warn(`Unsupported file type uploaded: ${mimeType}`);
@@ -134,7 +132,6 @@ const handlePosts = (app: uWS.TemplatedApp) => {
     });
 
     res.onAborted(() => {
-      console.log("Request aborted");
       bb.destroy();
     });
   });

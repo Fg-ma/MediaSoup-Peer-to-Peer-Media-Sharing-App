@@ -3,13 +3,13 @@ import dotenv from "dotenv";
 import { tables, TableStaticContentWebSocket } from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
 import handlePosts from "./posts/posts";
-import handleGets from "./gets/gets";
 import handleMessage from "./lib/websocketMessages";
 import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
 import TableContentController from "./lib/TableContentController";
 import Cleanup from "./lib/Cleanup";
 import TableTopCeph from "./lib/TableTopCeph";
+import Gets from "./gets/gets";
 
 dotenv.config();
 
@@ -17,11 +17,12 @@ export const tableTopCeph = new TableTopCeph();
 export const broadcaster = new Broadcaster();
 export const tablesController = new TablesController(broadcaster);
 export const metadataController = new MetadataController(broadcaster);
+export const gets = new Gets(broadcaster);
 export const tableContentController = new TableContentController();
 export const cleanup = new Cleanup(broadcaster);
 
 // tableTopCeph.emptyBucket("mybucket");
-tableTopCeph.listBucketContents("mybucket");
+// tableTopCeph.listBucketContents("mybucket");
 
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",
@@ -71,10 +72,17 @@ app
     res.cork(() => {
       res
         .writeHeader("Access-Control-Allow-Origin", "https://localhost:8080")
-        .writeHeader("Access-Control-Allow-Methods", "POST, OPTIONS")
+        .writeHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         .writeHeader("Access-Control-Allow-Headers", "Content-Type")
-        .writeStatus("204 No Content")
         .end();
+    });
+  })
+  .options("/stream/*", (res, req) => {
+    res.cork(() => {
+      res.writeHeader("Access-Control-Allow-Origin", "*");
+      res.writeHeader("Access-Control-Allow-Methods", "GET");
+      res.writeHeader("Access-Control-Allow-Headers", "Content-Type");
+      res.writeHeader("Content-Type", "image/png");
     });
   })
   .listen(8045, (token) => {
@@ -84,4 +92,3 @@ app
   });
 
 handlePosts(app);
-handleGets(app);

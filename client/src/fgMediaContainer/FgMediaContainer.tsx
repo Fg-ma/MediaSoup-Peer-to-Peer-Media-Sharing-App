@@ -22,12 +22,28 @@ export default function FgMediaContainer({
   kind,
   bundleRef,
   media,
+  externalPositioning,
+  externalMediaContainerRef,
+  externalSubContainerRef,
   options,
 }: {
   mediaId: string;
   kind: MediaKinds;
   bundleRef: React.RefObject<HTMLDivElement>;
   media: React.ReactNode;
+  externalPositioning?: React.MutableRefObject<{
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }>;
+  externalMediaContainerRef?: React.RefObject<HTMLDivElement>;
+  externalSubContainerRef?: React.RefObject<HTMLDivElement>;
   options?: MediaContainerOptions;
 }) {
   const mediaContainerOptions = {
@@ -39,8 +55,10 @@ export default function FgMediaContainer({
   const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
   const { table_id } = useUserInfoContext();
 
-  const mediaContainerRef = useRef<HTMLDivElement>(null);
-  const subContainerRef = useRef<HTMLDivElement>(null);
+  const mediaContainerRef =
+    externalMediaContainerRef ?? useRef<HTMLDivElement>(null);
+  const subContainerRef =
+    externalSubContainerRef ?? useRef<HTMLDivElement>(null);
   const panBtnRef = useRef<HTMLButtonElement>(null);
 
   const [inMedia, setInMedia] = useState(false);
@@ -61,15 +79,17 @@ export default function FgMediaContainer({
     };
   }>({});
 
-  const positioning = useRef<{
-    position: { left: number; top: number };
-    scale: { x: number; y: number };
-    rotation: number;
-  }>({
-    position: { left: 32.5, top: 32.5 },
-    scale: { x: 35, y: 35 },
-    rotation: 0,
-  });
+  const positioning =
+    externalPositioning ??
+    useRef<{
+      position: { left: number; top: number };
+      scale: { x: number; y: number };
+      rotation: number;
+    }>({
+      position: { left: 32.5, top: 32.5 },
+      scale: { x: 35, y: 35 },
+      rotation: 0,
+    });
 
   const [desync, setDesync] = useState(false);
 

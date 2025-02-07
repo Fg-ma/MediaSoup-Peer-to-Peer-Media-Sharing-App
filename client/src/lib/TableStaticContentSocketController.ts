@@ -6,6 +6,7 @@ import { UserMediaType } from "../context/mediaContext/typeConstant";
 import Deadbanding from "../babylon/Deadbanding";
 import UserDevice from "./UserDevice";
 import VideoMedia from "./VideoMedia";
+import ImageMedia from "./ImageMedia";
 
 type OutGoingTableStaticContentMessages =
   | onJoinTableType
@@ -13,7 +14,8 @@ type OutGoingTableStaticContentMessages =
   | onRequestCatchUpTableDataType
   | onRequestCatchUpContentDataType
   | onDeleteContentType
-  | onCatchUpContentDataResponseType;
+  | onCatchUpContentDataResponseType
+  | onGetImageType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -71,29 +73,56 @@ type onCatchUpContentDataResponseType = {
     contentType: TableContentTypes;
     contentId: string;
   };
-  data: {
-    positioning: {
-      position: {
-        left: number;
-        top: number;
+  data:
+    | {
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+        videoTime: number;
+        timeMeasured: number;
+      }
+    | {
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
       };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    };
-    videoTime: number;
-    timeMeasured: number;
-  };
 };
 
-export type TableContentTypes = "video";
+type onGetImageType = {
+  type: "getImage";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+  };
+  data: { key: string };
+};
+
+export type TableContentTypes = "video" | "image";
 
 export type IncomingTableStaticContentMessages =
+  | { type: undefined }
   | onOriginalVideoReadyType
   | onDashVideoReadyType
   | onImageReadyType
+  | onChunkType
+  | onImageDownloadCompleteType
   | onResponsedCatchUpTableDataType
   | onRequestedCatchUpContentDataType
   | onContentDeletedType
@@ -132,13 +161,24 @@ export type onImageReadyType = {
   };
 };
 
+export type onChunkType = {
+  type: "chunk";
+  data: {
+    chunk: { data: number[] };
+  };
+};
+
+export type onImageDownloadCompleteType = {
+  type: "imageDownloadComplete";
+};
+
 export type onResponsedCatchUpTableDataType = {
   type: "responsedCatchUpTableData";
   data: {
     [tableContentType in TableContentTypes]?: {
       [contentId: string]: {
-        originalURL: string | undefined;
-        dashURL: string | undefined;
+        url?: string;
+        dashURL?: string;
       };
     };
   };
@@ -168,27 +208,41 @@ export type onCatchUpContentDataRespondedType = {
     contentType: TableContentTypes;
     contentId: string;
   };
-  data: {
-    positioning: {
-      position: {
-        left: number;
-        top: number;
+  data:
+    | {
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+        videoTime: number;
+        timeMeasured: number;
+      }
+    | {
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
       };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    };
-    videoTime: number;
-    timeMeasured: number;
-  };
 };
 
 class TableStaticContentSocketController {
   private ws: WebSocket | undefined;
   private messageListeners: Set<
-    (message: IncomingTableStaticContentMessages) => void
+    (message: IncomingTableStaticContentMessages, event: MessageEvent) => void
   > = new Set();
 
   constructor(
@@ -223,14 +277,15 @@ class TableStaticContentSocketController {
     this.ws = new WebSocket(url);
 
     this.ws.onmessage = (event: MessageEvent) => {
+      const message =
+        typeof event.data === "string"
+          ? (JSON.parse(event.data) as IncomingTableStaticContentMessages)
+          : { type: undefined };
+
+      this.handleMessage(message);
+
       this.messageListeners.forEach((listener) => {
-        const message = JSON.parse(
-          event.data
-        ) as IncomingTableStaticContentMessages;
-
-        this.handleMessage(message);
-
-        listener(message);
+        listener(message, event);
       });
     };
 
@@ -249,13 +304,19 @@ class TableStaticContentSocketController {
   };
 
   addMessageListener = (
-    listener: (message: IncomingTableStaticContentMessages) => void
+    listener: (
+      message: IncomingTableStaticContentMessages,
+      event: MessageEvent
+    ) => void
   ): void => {
     this.messageListeners.add(listener);
   };
 
   removeMessageListener = (
-    listener: (message: IncomingTableStaticContentMessages) => void
+    listener: (
+      message: IncomingTableStaticContentMessages,
+      event: MessageEvent
+    ) => void
   ): void => {
     this.messageListeners.delete(listener);
   };
@@ -285,6 +346,18 @@ class TableStaticContentSocketController {
         username: this.username,
         instance: this.instance,
       },
+    });
+  };
+
+  getImage = (key: string) => {
+    this.sendMessage({
+      type: "getImage",
+      header: {
+        table_id: this.table_id,
+        username: this.username,
+        instance: this.instance,
+      },
+      data: { key },
     });
   };
 
@@ -351,7 +424,9 @@ class TableStaticContentSocketController {
     });
   };
 
-  private handleMessage = (message: IncomingTableStaticContentMessages) => {
+  private handleMessage = (
+    message: { type: undefined } | IncomingTableStaticContentMessages
+  ) => {
     switch (message.type) {
       case "responsedCatchUpTableData":
         this.onResponsedCatchUpTableData(message);
@@ -377,17 +452,30 @@ class TableStaticContentSocketController {
           tableContent[contentType as TableContentTypes]?.[contentId];
         if (tableContentData) {
           if (contentType === "video") {
-            if (tableContentData.originalURL) {
+            if (tableContentData.url) {
               this.userMedia.current.video[contentId] = new VideoMedia(
                 contentId,
-                this.getFilename(tableContentData.originalURL),
-                tableContentData.originalURL,
+                this.getFilename(tableContentData.url),
+                tableContentData.url,
                 this.userDevice,
                 this.deadbanding,
                 this.userEffectsStyles,
                 this.userStreamEffects,
                 this.userMedia,
                 tableContentData.dashURL
+              );
+            }
+          } else if (contentType === "image") {
+            if (tableContentData.url) {
+              this.userMedia.current.image[contentId] = new ImageMedia(
+                contentId,
+                this.getFilename(tableContentData.url),
+                tableContentData.url,
+                this.userEffectsStyles,
+                this.userStreamEffects,
+                this.getImage,
+                this.addMessageListener,
+                this.removeMessageListener
               );
             }
           }

@@ -14,8 +14,8 @@ export interface TableContent {
   [table_id: string]: {
     [tableContentType in TableContentTypes]?: {
       [contentId: string]: {
-        originalURL: string | undefined;
-        dashURL: string | undefined;
+        url?: string;
+        dashURL?: string;
       };
     };
   };
@@ -41,7 +41,8 @@ export type MessageTypes =
   | onRequestCatchUpTableDataType
   | onRequestCatchUpContentDataType
   | onDeleteContentType
-  | onCatchUpContentDataResponseType;
+  | onCatchUpContentDataResponseType
+  | onGetImageType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -113,6 +114,18 @@ export type onCatchUpContentDataResponseType = {
     };
     videoTime: number;
     timeMeasured: number;
+  };
+};
+
+export type onGetImageType = {
+  type: "getImage";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+  };
+  data: {
+    key: string;
   };
 };
 

@@ -11,6 +11,7 @@ import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 import FgVideo from "../fgVideo/FgVideo";
 import ImageMedia from "../lib/ImageMedia";
+import FgImage from "../fgImage/FgImage";
 
 const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
@@ -99,13 +100,18 @@ export default function SharedBundle({
         {
           const { imageId } = message.header;
           const { filename, url } = message.data;
-          userMedia.current.image[imageId] = new ImageMedia(
-            imageId,
-            filename,
-            url,
-            userEffectsStyles,
-            userStreamEffects
-          );
+          if (tableStaticContentSocket.current) {
+            userMedia.current.image[imageId] = new ImageMedia(
+              imageId,
+              filename,
+              url,
+              userEffectsStyles,
+              userStreamEffects,
+              tableStaticContentSocket.current.getImage,
+              tableStaticContentSocket.current.addMessageListener,
+              tableStaticContentSocket.current.removeMessageListener
+            );
+          }
           setRerender((prev) => !prev);
         }
         break;
@@ -153,11 +159,7 @@ export default function SharedBundle({
         Object.keys(userMedia.current.image).length !== 0 &&
         Object.keys(userMedia.current.image).map((imageId) => (
           <Suspense key={imageId} fallback={<div>Loading...</div>}>
-            <FgVideo
-              videoId={imageId}
-              sharedBundleRef={sharedBundleRef}
-              videoContentMute={videoContentMute}
-            />
+            <FgImage imageId={imageId} bundleRef={sharedBundleRef} />
           </Suspense>
         ))}
     </div>

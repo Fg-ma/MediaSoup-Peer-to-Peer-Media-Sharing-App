@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
-import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import ImageController from "./lib/ImageController";
 import LowerImageController from "./lib/lowerImageControls/lib/LowerImageController";
 import { defaultImageOptions, ImageOptions } from "./lib/typeConstant";
@@ -23,16 +22,27 @@ export default function FgImage({
     ...options,
   };
 
-  const { userMedia, remoteDataStreams } = useMediaContext();
+  const { userMedia } = useMediaContext();
   const { userStreamEffects } = useEffectsContext();
-  const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
-  const { table_id } = useUserInfoContext();
+  const { tableStaticContentSocket } = useSocketContext();
 
   const imageMedia = userMedia.current.image[imageId];
 
+  const [imageEffectsActive, setImageEffectsActive] = useState(false);
+
+  const positioning = useRef<{
+    position: { left: number; top: number };
+    scale: { x: number; y: number };
+    rotation: number;
+  }>({
+    position: { left: 32.5, top: 32.5 },
+    scale: { x: 35, y: 35 },
+    rotation: 0,
+  });
+
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
-  const panBtnRef = useRef<HTMLButtonElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -40,33 +50,27 @@ export default function FgImage({
   const [_rerender, setRerender] = useState(false);
 
   const lowerImageController = new LowerImageController(
-    tableStaticContentSocket,
     imageId,
-    bundleRef,
-    imageMedia,
     imageContainerRef,
-    panBtnRef,
     shiftPressed,
     controlPressed,
+    setImageEffectsActive,
     userStreamEffects
   );
 
   const imageController = new ImageController(
-    table_id,
+    tableStaticContentSocket,
     imageId,
     imageMedia,
-    subContainerRef,
-    lowerImageController,
-    remoteDataStreams,
+    positioning,
     imageContainerRef,
+    subContainerRef,
     imageOptions,
     setRerender
   );
 
   useEffect(() => {
     subContainerRef.current?.appendChild(imageMedia.image);
-
-    imageController.scaleCallback();
 
     tableStaticContentSocket.current?.requestCatchUpContentData(
       "image",
@@ -75,11 +79,6 @@ export default function FgImage({
 
     // Set up initial conditions
     imageController.init();
-
-    // Listen for messages on mediasoupSocket
-    mediasoupSocket.current?.addMessageListener(
-      imageController.handleMediasoupMessage
-    );
 
     // Listen for messages on tableStaticContentSocket
     tableStaticContentSocket.current?.addMessageListener(
@@ -96,15 +95,7 @@ export default function FgImage({
 
     document.addEventListener("keyup", lowerImageController.handleKeyUp);
 
-    document.addEventListener(
-      "visibilitychange",
-      imageController.handleVisibilityChange
-    );
-
     return () => {
-      mediasoupSocket.current?.removeMessageListener(
-        imageController.handleMediasoupMessage
-      );
       tableStaticContentSocket.current?.removeMessageListener(
         imageController.handleTableStaticContentMessage
       );
@@ -117,19 +108,18 @@ export default function FgImage({
         lowerImageController.handleKeyDown
       );
       document.removeEventListener("keyup", lowerImageController.handleKeyUp);
-      document.removeEventListener(
-        "visibilitychange",
-        imageController.handleVisibilityChange
-      );
     };
   }, []);
 
   return (
     <FgMediaContainer
-      mediaId={"1"}
+      mediaId={imageId}
       kind={"image"}
       bundleRef={bundleRef}
-      media={<div ref={subContainerRef}></div>}
+      media={<></>}
+      externalPositioning={positioning}
+      externalMediaContainerRef={imageContainerRef}
+      externalSubContainerRef={subContainerRef}
     />
   );
 }

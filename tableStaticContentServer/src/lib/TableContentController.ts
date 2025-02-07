@@ -1,6 +1,5 @@
 import { tableContent, TableContentTypes } from "../typeConstant";
 import { unlinkSync } from "fs";
-import { processedDir, uploadsDir } from "../posts/posts";
 
 class TableContentController {
   constructor() {}
@@ -18,7 +17,7 @@ class TableContentController {
     type: TableContentTypes,
     contentId: string,
     properties: {
-      property: "originalURL" | "dashURL";
+      property: "url" | "dashURL";
       value: string;
     }[]
   ) => {
@@ -29,10 +28,7 @@ class TableContentController {
       tableContent[table_id][type] = {};
     }
     if (!tableContent[table_id][type][contentId]) {
-      tableContent[table_id][type][contentId] = {
-        originalURL: undefined,
-        dashURL: undefined,
-      };
+      tableContent[table_id][type][contentId] = {};
     }
     const tableContentData = tableContent[table_id][type][contentId];
     for (const property of properties) {
@@ -47,20 +43,15 @@ class TableContentController {
   ) => {
     if (tableContent[table_id]?.[type]?.[contentId]) {
       const tableContentData = tableContent[table_id][type][contentId];
-      if (tableContentData.originalURL) {
-        const filename = this.getFilename(tableContentData.originalURL);
-        unlinkSync(`${uploadsDir}/${filename}`);
+
+      if (tableContentData.url) {
+        const filename = this.getFilename(tableContentData.url);
       }
       if (tableContentData.dashURL) {
-        const filename = this.getFilename(tableContentData.dashURL).slice(
+        const dashFilename = this.getFilename(tableContentData.dashURL).slice(
           0,
           -4
         );
-        unlinkSync(`${processedDir}/${filename}.mpd`);
-        unlinkSync(`${processedDir}/${filename}_500k.mp4`);
-        unlinkSync(`${processedDir}/${filename}_1M.mp4`);
-        unlinkSync(`${processedDir}/${filename}_2M.mp4`);
-        unlinkSync(`${processedDir}/${filename}_audio.mp4`);
       }
 
       delete tableContent[table_id][type][contentId];

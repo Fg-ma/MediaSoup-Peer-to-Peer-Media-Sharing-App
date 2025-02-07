@@ -1,27 +1,44 @@
-import uWS from "uWebSockets.js";
-import fs from "fs";
+import { PassThrough } from "stream";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { tableTopCeph } from "../index";
+import { onGetImageType } from "../typeConstant";
+import Broadcaster from "../lib/Broadcaster";
 
-const handleGets = (app: uWS.TemplatedApp) => {
-  app.get("/stream/:key", async (res, req) => {
-    const key = req.getParameter(0);
+class Gets {
+  constructor(private broadcaster: Broadcaster) {}
 
-    if (!key) return;
+  getImage = async (event: onGetImageType) => {
+    const { table_id, username, instance } = event.header;
 
-    res.cork(() => {
-      res.writeHeader("Access-Control-Allow-Origin", "https://localhost:8080");
-      res.writeHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-      res.writeHeader("Access-Control-Allow-Headers", "Content-Type");
-    });
+    const key = event.data.key;
 
-    try {
-      await tableTopCeph.streamFileToClient("mybucket", key, res);
-    } catch (error) {
-      res
-        .writeStatus("500 Internal Server Error")
-        .end("Failed to stream file.");
+    if (!key) {
+      return;
     }
-  });
-};
 
-export default handleGets;
+    const params = { Bucket: "mybucket", Key: key };
+    const data = await tableTopCeph.s3Client.send(new GetObjectCommand(params));
+
+    if (data.Body) {
+      const passThrough = new PassThrough();
+      data.Body.pipe(passThrough);
+
+      passThrough.on("data", (chunk) => {
+        console.log(chunk);
+        this.broadcaster.broadcastToInstance(table_id, username, instance, {
+          type: "chunk",
+          data: { chunk },
+        });
+      });
+
+      passThrough.on("end", () => {
+        console.log("end");
+        this.broadcaster.broadcastToInstance(table_id, username, instance, {
+          type: "imageDownloadComplete",
+        });
+      });
+    }
+  };
+}
+
+export default Gets;
