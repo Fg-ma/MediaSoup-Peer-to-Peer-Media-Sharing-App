@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import FgLowerVideoController from "../FgLowerVideoController";
+import FgLowerVideoController from "../LowerVideoController";
 
-export default function PictureInPictureButton({
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const fullScreenIcon = nginxAssetSeverBaseUrl + "svgs/fullScreenIcon.svg";
+const fullScreenOffIcon = nginxAssetSeverBaseUrl + "svgs/fullScreenOffIcon.svg";
+
+export default function FullScreenButton({
   fgLowerVideoController,
   videoEffectsActive,
   settingsActive,
@@ -19,30 +25,26 @@ export default function PictureInPictureButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVideoController.handleMiniPlayer();
+        fgLowerVideoController.handleFullScreen();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {
-        return active ? (
-          <div className='flex h-9 w-9 items-center justify-center'>
-            <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-start items-start'>
-              <div className='bg-white w-3 h-2 rounded-sm ml-0.5 mt-0.5'></div>
-            </div>
-          </div>
-        ) : (
-          <div className='flex h-9 w-9 items-center justify-center'>
-            <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-end items-end'>
-              <div className='bg-white w-3 h-2 rounded-sm mr-0.5 mb-0.5'></div>
-            </div>
-          </div>
+        const iconSrc = active ? fullScreenOffIcon : fullScreenIcon;
+
+        return (
+          <FgSVG
+            src={iconSrc}
+            attributes={[
+              { key: "width", value: "36px" },
+              { key: "height", value: "36px" },
+              { key: "fill", value: "white" },
+            ]}
+          />
         );
       }}
       hoverContent={
         !videoEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard
-            content='Picture in picture (i)'
-            style='dark'
-          />
+          <FgHoverContentStandard content='Full screen (f)' style='dark' />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

@@ -3,18 +3,19 @@ import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
-import FgUpperVideoControls from "./lib/fgUpperVideoControls/FgUpperVideoControls";
-import FgLowerVideoControls from "./lib/fgLowerVideoControls/FgLowerVideoControls";
-import FgVideoController from "./lib/FgVideoController";
-import FgLowerVideoController from "./lib/fgLowerVideoControls/lib/FgLowerVideoController";
-import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import VideoController from "./lib/VideoController";
+import LowerVideoController from "./lib/lowerVideoControls/lib/LowerVideoController";
 import {
-  defaultFgVideoOptions,
-  FgVideoOptions,
+  defaultVideoOptions,
+  VideoOptions,
   Settings,
 } from "./lib/typeConstant";
-import VideoGradient from "./lib/VideoGradient";
 import "./lib/fgVideoStyles.css";
+import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
+import VideoEffectsSection from "./lib/videoEffectsSection/VideoEffectsSection";
+import FullScreenButton from "./lib/lowerVideoControls/lib/fullScreenButton/FullScreenButton";
+import VideoEffectsButton from "./lib/lowerVideoControls/lib/videoEffectsButton/VideoEffectsButton";
+import PlayPauseButton from "./lib/lowerVideoControls/lib/playPauseButton/PlayPauseButton";
 
 const VideoAdjustmentButtons = React.lazy(
   () => import("./lib/VideoAdjustmentButtons")
@@ -23,20 +24,20 @@ const VideoAdjustmentButtons = React.lazy(
 export default function FgVideo({
   videoId,
   name,
-  sharedBundleRef,
+  bundleRef,
   videoContentMute,
   options,
 }: {
   videoId: string;
   name?: string;
-  sharedBundleRef: React.RefObject<HTMLDivElement>;
+  bundleRef: React.RefObject<HTMLDivElement>;
   videoContentMute: React.MutableRefObject<{
     [videoId: string]: boolean;
   }>;
-  options?: FgVideoOptions;
+  options?: VideoOptions;
 }) {
-  const fgVideoOptions = {
-    ...defaultFgVideoOptions,
+  const videoOptions = {
+    ...defaultVideoOptions,
     ...options,
   };
 
@@ -49,18 +50,11 @@ export default function FgVideo({
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
-  const panBtnRef = useRef<HTMLButtonElement>(null);
-
-  const [inVideo, setInVideo] = useState(false);
-
-  const leaveVideoTimer = useRef<NodeJS.Timeout | undefined>(undefined);
-  const videoMovementTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+  const rightLowerVideoControlsRef = useRef<HTMLDivElement>(null);
 
   const [pausedState, setPausedState] = useState(false);
 
   const paused = useRef(false);
-
-  const [adjustingDimensions, setAdjustingDimensions] = useState(false);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -113,19 +107,10 @@ export default function FgVideo({
     rotation: 0,
   });
 
-  const [desync, setDesync] = useState(false);
-
-  const fgContentAdjustmentController = new FgContentAdjustmentController(
-    sharedBundleRef,
-    positioning,
-    setAdjustingDimensions,
-    setRerender
-  );
-
-  const fgLowerVideoController = new FgLowerVideoController(
+  const lowerVideoController = new LowerVideoController(
     tableStaticContentSocket,
     videoId,
-    sharedBundleRef,
+    bundleRef,
     videoMedia,
     videoContainerRef,
     panBtnRef,
@@ -146,26 +131,25 @@ export default function FgVideo({
     positioning
   );
 
-  const fgVideoController = new FgVideoController(
+  const videoController = new VideoController(
     tableStaticContentSocket,
-    table_id,
     videoId,
     videoMedia,
     subContainerRef,
-    fgLowerVideoController,
-    positioningListeners,
+    lowerVideoController,
     positioning,
-    remoteDataStreams,
     videoContainerRef,
-    fgVideoOptions,
-    setInVideo,
-    leaveVideoTimer,
-    videoMovementTimeout,
+    videoOptions,
     setRerender
   );
 
   useEffect(() => {
-    fgVideoController.scaleCallback();
+    subContainerRef.current?.appendChild(videoMedia.video);
+    if (videoMedia.hiddenVideo) {
+      subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
+    }
+
+    videoController.scaleCallback();
 
     tableStaticContentSocket.current?.requestCatchUpContentData(
       "video",
@@ -173,46 +157,41 @@ export default function FgVideo({
     );
 
     // Set up initial conditions
-    fgVideoController.init();
-
-    // Listen for messages on mediasoupSocket
-    mediasoupSocket.current?.addMessageListener(
-      fgVideoController.handleMediasoupMessage
-    );
+    videoController.init();
 
     // Listen for messages on tableStaticContentSocket
     tableStaticContentSocket.current?.addMessageListener(
-      fgVideoController.handleTableStaticContentMessage
+      videoController.handleTableStaticContentMessage
     );
 
     // Keep video time
-    fgLowerVideoController.timeUpdate();
+    lowerVideoController.timeUpdate();
     timeUpdateInterval.current = setInterval(
-      fgLowerVideoController.timeUpdate,
+      lowerVideoController.timeUpdate,
       1000
     );
 
     // Add eventlisteners
     document.addEventListener(
       "fullscreenchange",
-      fgLowerVideoController.handleFullScreenChange
+      lowerVideoController.handleFullScreenChange
     );
 
-    document.addEventListener("keydown", fgLowerVideoController.handleKeyDown);
+    document.addEventListener("keydown", lowerVideoController.handleKeyDown);
 
-    document.addEventListener("keyup", fgLowerVideoController.handleKeyUp);
+    document.addEventListener("keyup", lowerVideoController.handleKeyUp);
 
     document.addEventListener(
       "visibilitychange",
-      fgVideoController.handleVisibilityChange
+      videoController.handleVisibilityChange
     );
 
     videoMedia.video.addEventListener("enterpictureinpicture", () =>
-      fgLowerVideoController.handlePictureInPicture("enter")
+      lowerVideoController.handlePictureInPicture("enter")
     );
 
     videoMedia.video.addEventListener("leavepictureinpicture", () =>
-      fgLowerVideoController.handlePictureInPicture("leave")
+      lowerVideoController.handlePictureInPicture("leave")
     );
 
     return () => {
@@ -222,11 +201,8 @@ export default function FgVideo({
         )
       );
       positioningListeners.current = {};
-      mediasoupSocket.current?.removeMessageListener(
-        fgVideoController.handleMediasoupMessage
-      );
       tableStaticContentSocket.current?.removeMessageListener(
-        fgVideoController.handleTableStaticContentMessage
+        videoController.handleTableStaticContentMessage
       );
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
@@ -234,28 +210,28 @@ export default function FgVideo({
       }
       document.removeEventListener(
         "fullscreenchange",
-        fgLowerVideoController.handleFullScreenChange
+        lowerVideoController.handleFullScreenChange
       );
       document.removeEventListener(
         "keydown",
-        fgLowerVideoController.handleKeyDown
+        lowerVideoController.handleKeyDown
       );
-      document.removeEventListener("keyup", fgLowerVideoController.handleKeyUp);
+      document.removeEventListener("keyup", lowerVideoController.handleKeyUp);
       document.removeEventListener(
         "visibilitychange",
-        fgVideoController.handleVisibilityChange
+        videoController.handleVisibilityChange
       );
       videoMedia.video.removeEventListener("enterpictureinpicture", () =>
-        fgLowerVideoController.handlePictureInPicture("enter")
+        lowerVideoController.handlePictureInPicture("enter")
       );
       videoMedia.video.removeEventListener("leavepictureinpicture", () =>
-        fgLowerVideoController.handlePictureInPicture("leave")
+        lowerVideoController.handlePictureInPicture("leave")
       );
     };
   }, []);
 
   useEffect(() => {
-    fgLowerVideoController.updateCaptionsStyles();
+    lowerVideoController.updateCaptionsStyles();
   }, [settings]);
 
   useEffect(() => {
@@ -272,99 +248,108 @@ export default function FgVideo({
   }, [videoId, userMedia]);
 
   useEffect(() => {
-    if (
-      adjustingDimensions &&
-      userDataStreams.current.positionScaleRotation?.readyState === "open"
-    ) {
-      userDataStreams.current.positionScaleRotation?.send(
-        JSON.stringify({
-          table_id: table_id.current,
-          kind: "video",
-          videoId: videoId,
-          positioning: positioning.current,
-        })
-      );
-    }
-  }, [positioning.current]);
-
-  useEffect(() => {
-    fgVideoController.scaleCallback();
+    videoController.scaleCallback();
   }, [positioning.current.scale]);
 
-  useEffect(() => {
-    fgVideoController.attachPositioningListeners();
-
-    subContainerRef.current?.appendChild(videoMedia.video);
-    if (videoMedia.hiddenVideo) {
-      subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
-    }
-  }, []);
-
   return (
-    <div
-      ref={videoContainerRef}
-      id={`${videoId}_container`}
-      className={`video-media-container ${pausedState ? "paused" : ""} ${
-        videoEffectsActive ? "in-effects" : ""
-      } ${audioEffectsActive ? "in-effects" : ""} ${
-        inVideo ? "in-video" : ""
-      } ${
-        adjustingDimensions
-          ? "adjusting-dimensions pointer-events-none"
-          : "pointer-events-auto"
-      } flex items-center justify-center`}
-      style={{
-        position: "absolute",
-        left: `${positioning.current.position.left}%`,
-        top: `${positioning.current.position.top}%`,
-        width: `${positioning.current.scale.x}%`,
-        height: `${positioning.current.scale.y}%`,
-        rotate: `${positioning.current.rotation}deg`,
-        transformOrigin: "0% 0%",
-      }}
-      onPointerEnter={() => fgVideoController.handlePointerEnter()}
-      onPointerLeave={() => fgVideoController.handlePointerLeave()}
-      data-positioning={JSON.stringify(positioning.current)}
-    >
-      <VideoAdjustmentButtons
-        sharedBundleRef={sharedBundleRef}
-        panBtnRef={panBtnRef}
-        positioning={positioning}
-        fgContentAdjustmentController={fgContentAdjustmentController}
-      />
-      {adjustingDimensions && (
-        <>
-          <div className='animated-border-box-glow'></div>
-          <div className='animated-border-box'></div>
-        </>
-      )}
-      <div
-        ref={subContainerRef}
-        className='flex relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
-      >
-        <FgUpperVideoControls
-          desync={desync}
-          fgLowerVideoController={fgLowerVideoController}
-        />
-        <FgLowerVideoControls
-          videoId={videoId}
-          videoMedia={videoMedia}
-          fgLowerVideoController={fgLowerVideoController}
+    <FgMediaContainer
+      mediaId={videoId}
+      filename={videoMedia.filename}
+      kind='video'
+      bundleRef={bundleRef}
+      lowerPopupElements={[
+        videoEffectsActive ? (
+          <VideoEffectsSection
+            videoId={videoId}
+            videoContainerRef={videoContainerRef}
+            lowerVideoController={lowerVideoController}
+            tintColor={tintColor}
+          />
+        ) : null,
+      ]}
+      leftLowerControls={[
+        <PlayPauseButton
           pausedState={pausedState}
-          videoContentMute={videoContentMute}
-          videoContainerRef={videoContainerRef}
-          subContainerRef={subContainerRef}
-          currentTimeRef={currentTimeRef}
-          tintColor={tintColor}
+          lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
-          audioEffectsActive={audioEffectsActive}
-          setAudioEffectsActive={setAudioEffectsActive}
+          settingsActive={settingsActive}
+        />,
+        <div className='flex items-center gap-1 px-1 select-none'>
+          <div ref={currentTimeRef} className='font-K2D text-lg'></div>
+        </div>,
+      ]}
+      rightLowerControls={[
+        <FullScreenButton
+          lowerVideoController={lowerVideoController}
+          videoEffectsActive={videoEffectsActive}
+          scrollingContainerRef={rightLowerVideoControlsRef}
+        />,
+        <PictureInPictureButton
+          fgLowerVideoController={fgLowerVideoController}
+          videoEffectsActive={videoEffectsActive}
+          settingsActive={settingsActive}
+          scrollingContainerRef={rightVideoControlsRef}
+        />,
+        <CaptionButton
+          fgLowerVideoController={fgLowerVideoController}
+          videoEffectsActive={videoEffectsActive}
+          settingsActive={settingsActive}
+          settings={settings}
+          audioStream={videoMedia.getAudioTrack()}
+          videoContainerRef={videoContainerRef}
+          scrollingContainerRef={rightVideoControlsRef}
+          containerRef={subContainerRef}
+        />,
+        <FgSettingsButton
+          fgVideoOptions={fgVideoOptions}
+          videoEffectsActive={videoEffectsActive}
+          videoContainerRef={videoContainerRef}
+          settingsActive={settingsActive}
+          setSettingsActive={setSettingsActive}
+          activePages={activePages}
+          setActivePages={setActivePages}
           settings={settings}
           setSettings={setSettings}
-          fgVideoOptions={fgVideoOptions}
-        />
-        <VideoGradient />
-      </div>
-    </div>
+          scrollingContainerRef={rightVideoControlsRef}
+        />,
+        <VideoEffectsButton
+          lowerVideoController={lowerVideoController}
+          videoEffectsActive={videoEffectsActive}
+          scrollingContainerRef={rightLowerVideoControlsRef}
+        />,
+        <AudioEffectsButton
+          table_id={table_id.current}
+          username={username.current}
+          instance={instance.current}
+          isUser={false}
+          permissions={undefined}
+          producerType={"video"}
+          producerId={videoId}
+          audioEffectsActive={audioEffectsActive}
+          setAudioEffectsActive={setAudioEffectsActive}
+          visualMediaContainerRef={videoContainerRef}
+          handleAudioEffectChange={handleAudioEffectChange}
+          handleMute={handleMute}
+          videoContentMute={videoContentMute}
+          closeLabelElement={
+            <FgHoverContentStandard content='Close (x)' style='dark' />
+          }
+          hoverLabelElement={
+            <FgHoverContentStandard content='Audio effects (a)' style='dark' />
+          }
+          scrollingContainerRef={rightVideoControlsRef}
+          style={{ transform: "scaleX(-1)" }}
+          options={{
+            backgroundColor: "rgba(10, 10, 10, 1)",
+            secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
+          }}
+        />,
+      ]}
+      inMediaVariables={[videoEffectsActive, pausedState]}
+      externalPositioning={positioning}
+      externalMediaContainerRef={videoContainerRef}
+      externalSubContainerRef={subContainerRef}
+      externalRightLowerControlsRef={rightLowerVideoControlsRef}
+    />
   );
 }

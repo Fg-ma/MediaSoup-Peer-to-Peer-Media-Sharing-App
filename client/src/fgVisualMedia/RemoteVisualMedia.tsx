@@ -468,7 +468,7 @@ export default function RemoteVisualMedia({
       )}
       <div
         ref={subContainerRef}
-        className='relative flex items-center justify-center text-white font-K2D h-full w-full overflow-hidden rounded-md'
+        className='flex relative items-center justify-center text-white font-K2D h-full w-full overflow-hidden rounded-md'
       >
         <video
           ref={videoRef}

@@ -6,10 +6,10 @@ import {
   FontFamilies,
   FontOpacities,
   FontSizes,
-} from "./fgLowerVideoControls/FgLowerVideoControls";
-import { closedCaptionsSelections } from "./fgLowerVideoControls/lib/fgSettingsButton/lib/ClosedCaptionsPage";
+} from "./lowerVideoControls/LowerVideoControls";
+import { closedCaptionsSelections } from "./lowerVideoControls/lib/settingsButton/lib/ClosedCaptionsPage";
 
-export interface FgVideoOptions {
+export interface VideoOptions {
   controlsVanishTime?: number;
   closedCaptionsDecoratorColor?: string;
   primaryVideoColor?: string;
@@ -32,7 +32,7 @@ export interface Settings {
   };
 }
 
-export const defaultFgVideoOptions: {
+export const defaultVideoOptions: {
   controlsVanishTime: number;
   closedCaptionsDecoratorColor: string;
   primaryVideoColor: string;

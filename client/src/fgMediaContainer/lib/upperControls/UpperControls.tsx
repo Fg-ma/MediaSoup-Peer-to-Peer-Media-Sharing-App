@@ -11,8 +11,8 @@ export default function UpperControls({
 }: {
   desync: boolean;
   lowerController: LowerController;
-  leftUpperControls?: React.ReactNode[];
-  rightUpperControls?: React.ReactNode[];
+  leftUpperControls?: (React.ReactNode | null)[];
+  rightUpperControls?: (React.ReactNode | null)[];
 }) {
   return (
     <div className='flex media-upper-controls absolute top-0 w-full h-10 items-center justify-between z-20'>

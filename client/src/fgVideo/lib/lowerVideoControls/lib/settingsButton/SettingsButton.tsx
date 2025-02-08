@@ -2,16 +2,15 @@ import React, { useEffect, useRef } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
-import { ActivePages } from "../../FgLowerVideoControls";
-import { FgVideoOptions, Settings } from "../../../typeConstant";
+import { ActivePages } from "../../LowerVideoControls";
+import { Settings } from "../../../typeConstant";
 
 type RecursiveObject = {
   active?: boolean;
   [key: string]: RecursiveObject | boolean | undefined;
 };
 
-export default function FgSettingsButton({
-  fgVideoOptions,
+export default function SettingsButton({
   videoEffectsActive,
   videoContainerRef,
   settingsActive,
@@ -22,7 +21,6 @@ export default function FgSettingsButton({
   setSettings,
   scrollingContainerRef,
 }: {
-  fgVideoOptions: FgVideoOptions;
   videoEffectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
@@ -128,7 +126,6 @@ export default function FgSettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
-          fgVideoOptions={fgVideoOptions}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}

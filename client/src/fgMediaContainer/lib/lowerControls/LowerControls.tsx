@@ -1,13 +1,15 @@
 import React, { useEffect, useRef } from "react";
 
 export default function LowerControls({
+  externalRightLowerControlsRef,
   leftLowerControls,
   rightLowerControls,
-  externalRightLowerControlsRef,
+  lowerPopupElements,
 }: {
-  leftLowerControls?: React.ReactNode[];
-  rightLowerControls?: React.ReactNode[];
   externalRightLowerControlsRef?: React.RefObject<HTMLDivElement>;
+  leftLowerControls?: (React.ReactNode | null)[];
+  rightLowerControls?: (React.ReactNode | null)[];
+  lowerPopupElements?: (React.ReactNode | null)[];
 }) {
   const rightControlsRef = externalRightLowerControlsRef
     ? externalRightLowerControlsRef
@@ -36,6 +38,11 @@ export default function LowerControls({
 
   return (
     <div className='media-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20 pointer-events-none'>
+      {lowerPopupElements &&
+        lowerPopupElements.length > 0 &&
+        lowerPopupElements.map((element, index) => (
+          <React.Fragment key={index}>{element}</React.Fragment>
+        ))}
       <div className='flex media-controls w-full h-10 justify-between'>
         <div
           className='flex w-max h-10 z-20 items-center space-x-2'
@@ -43,7 +50,9 @@ export default function LowerControls({
         >
           {leftLowerControls &&
             leftLowerControls.length > 0 &&
-            leftLowerControls}
+            leftLowerControls.map((control, index) => (
+              <React.Fragment key={index}>{control}</React.Fragment>
+            ))}
         </div>
         <div
           ref={rightControlsRef}
@@ -51,7 +60,9 @@ export default function LowerControls({
         >
           {rightLowerControls &&
             rightLowerControls.length > 0 &&
-            rightLowerControls}
+            rightLowerControls.map((control, index) => (
+              <React.Fragment key={index}>{control}</React.Fragment>
+            ))}
         </div>
       </div>
     </div>

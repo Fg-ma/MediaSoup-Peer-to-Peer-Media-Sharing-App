@@ -23,11 +23,12 @@ export default function FgMediaContainer({
   kind,
   bundleRef,
   media,
-  popupElements,
+  lowerPopupElements,
   leftLowerControls,
   rightLowerControls,
   leftUpperControls,
   rightUpperControls,
+  inMediaVariables,
   externalPositioning,
   externalMediaContainerRef,
   externalSubContainerRef,
@@ -39,11 +40,12 @@ export default function FgMediaContainer({
   kind: MediaKinds;
   bundleRef: React.RefObject<HTMLDivElement>;
   media?: React.ReactNode;
-  popupElements?: React.ReactNode[];
-  leftLowerControls?: React.ReactNode[];
-  rightLowerControls?: React.ReactNode[];
-  leftUpperControls?: React.ReactNode[];
-  rightUpperControls?: React.ReactNode[];
+  lowerPopupElements?: (React.ReactNode | null)[];
+  leftLowerControls?: (React.ReactNode | null)[];
+  rightLowerControls?: (React.ReactNode | null)[];
+  leftUpperControls?: (React.ReactNode | null)[];
+  rightUpperControls?: (React.ReactNode | null)[];
+  inMediaVariables?: boolean[];
   externalPositioning?: React.MutableRefObject<{
     position: {
       left: number;
@@ -193,7 +195,9 @@ export default function FgMediaContainer({
     <div
       ref={mediaContainerRef}
       id={`${mediaId}_media_container`}
-      className={`media-container ${inMedia ? "in-media" : ""} ${
+      className={`media-container ${
+        inMedia || inMediaVariables?.some(Boolean) ? "in-media" : ""
+      } ${
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
@@ -228,7 +232,6 @@ export default function FgMediaContainer({
         className='flex relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
         {media && media}
-        {popupElements && popupElements}
         <UpperControls
           desync={desync}
           lowerController={lowerController}
@@ -236,9 +239,10 @@ export default function FgMediaContainer({
           rightUpperControls={rightUpperControls}
         />
         <LowerControls
+          externalRightLowerControlsRef={externalRightLowerControlsRef}
           leftLowerControls={leftLowerControls}
           rightLowerControls={rightLowerControls}
-          externalRightLowerControlsRef={externalRightLowerControlsRef}
+          lowerPopupElements={lowerPopupElements}
         />
         <Gradient />
       </div>

@@ -122,13 +122,15 @@ export default function FgImage({
       filename={imageMedia.filename}
       kind='image'
       bundleRef={bundleRef}
-      popupElements={[
-        <ImageEffectsSection
-          imageId={imageId}
-          imageContainerRef={imageContainerRef}
-          lowerImageController={lowerImageController}
-          tintColor={tintColor}
-        />,
+      lowerPopupElements={[
+        imageEffectsActive ? (
+          <ImageEffectsSection
+            imageId={imageId}
+            imageContainerRef={imageContainerRef}
+            lowerImageController={lowerImageController}
+            tintColor={tintColor}
+          />
+        ) : null,
       ]}
       leftLowerControls={[]}
       rightLowerControls={[
@@ -143,6 +145,7 @@ export default function FgImage({
           scrollingContainerRef={rightLowerImageControlsRef}
         />,
       ]}
+      inMediaVariables={[imageEffectsActive]}
       externalPositioning={positioning}
       externalMediaContainerRef={imageContainerRef}
       externalSubContainerRef={subContainerRef}

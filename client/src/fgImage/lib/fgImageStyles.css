@@ -148,6 +148,7 @@
   left: 0% !important;
   top: 0% !important;
   rotate: 0deg !important;
+  border-radius: 0%;
 }
 
 .image-container.full-screen .image-controls {

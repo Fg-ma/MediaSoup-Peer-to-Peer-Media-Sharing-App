@@ -9,8 +9,8 @@ import ClosedCaptionsOptionsPage, {
   closedCaptionsOptionsArrays,
 } from "./ClosedCaptionsOptionsPage";
 import PageTemplate from "./PageTemplate";
-import { ActivePages } from "../../../FgLowerVideoControls";
-import { FgVideoOptions, Settings } from "../../../../typeConstant";
+import { ActivePages } from "../../../LowerVideoControls";
+import { Settings } from "../../../../typeConstant";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -79,7 +79,6 @@ const closedCaptionOptionsPageTitles = {
 };
 
 export default function SettingsPanel({
-  fgVideoOptions,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -87,7 +86,6 @@ export default function SettingsPanel({
   settings,
   setSettings,
 }: {
-  fgVideoOptions: FgVideoOptions;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;

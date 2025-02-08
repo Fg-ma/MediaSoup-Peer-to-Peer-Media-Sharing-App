@@ -55,7 +55,7 @@ const characterEdgeStyleMap = {
     "-1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black, 1px 1px 0px black",
 };
 
-class FgLowerVideoController {
+class LowerVideoController {
   private initTime: number;
 
   constructor(
@@ -124,10 +124,6 @@ class FgLowerVideoController {
     }
   };
 
-  handleCloseVideo = () => {
-    this.tableStaticContentSocket.current?.deleteContent("video", this.videoId);
-  };
-
   handleVideoEffects = () => {
     this.setVideoEffectsActive((prev) => !prev);
   };
@@ -167,7 +163,7 @@ class FgLowerVideoController {
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
-      !this.videoContainerRef.current?.classList.contains("in-video-media") ||
+      !this.videoContainerRef.current?.classList.contains("in-media") ||
       this.videoContainerRef.current?.classList.contains("in-piano") ||
       this.controlPressed.current ||
       this.shiftPressed.current
@@ -212,162 +208,15 @@ class FgLowerVideoController {
       case "a":
         this.handleAudioEffects();
         break;
-      case "x":
-        this.handleCloseVideo();
-        break;
-      case "delete":
-        this.handleCloseVideo();
-        break;
       case "arrowup":
         this.volumeControl(0.05);
         break;
       case "arrowdown":
         this.volumeControl(-0.05);
         break;
-      case "s":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "scale"
-        );
-        document.addEventListener("pointermove", this.scaleFuntion);
-        document.addEventListener("pointerdown", this.scaleFunctionEnd);
-        break;
-      case "g":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "position",
-          { rotationPointPlacement: "topLeft" }
-        );
-        document.addEventListener("pointermove", this.moveFunction);
-        document.addEventListener("pointerdown", this.moveFunctionEnd);
-        break;
-      case "r":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "rotation"
-        );
-        document.addEventListener("pointermove", this.rotateFunction);
-        document.addEventListener("pointerdown", this.rotateFunctionEnd);
-        break;
-      case "h":
-        this.handleDesync();
-        break;
       default:
         break;
     }
-  };
-
-  handleDesync = () => {};
-
-  scaleFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
-    document.removeEventListener("pointermove", this.scaleFuntion);
-    document.removeEventListener("pointerdown", this.scaleFunctionEnd);
-  };
-
-  rotateFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
-    document.removeEventListener("pointermove", this.rotateFunction);
-    document.removeEventListener("pointerdown", this.rotateFunctionEnd);
-  };
-
-  moveFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
-    document.removeEventListener("pointermove", this.moveFunction);
-    document.removeEventListener("pointerdown", this.moveFunctionEnd);
-  };
-
-  moveFunction = (event: PointerEvent) => {
-    if (!this.sharedBundleRef.current) {
-      return;
-    }
-
-    const angle =
-      2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
-
-    const pixelScale = {
-      x:
-        (this.positioning.current.scale.x / 100) *
-        this.sharedBundleRef.current.clientWidth,
-      y:
-        (this.positioning.current.scale.y / 100) *
-        this.sharedBundleRef.current.clientHeight,
-    };
-
-    const rect = this.sharedBundleRef.current.getBoundingClientRect();
-
-    const buttonWidth = (this.panBtnRef.current?.clientWidth ?? 0) / 2;
-
-    this.fgContentAdjustmentController.movementDragFunction(
-      {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      },
-      {
-        x:
-          -buttonWidth * Math.cos(angle) -
-          pixelScale.x * Math.cos(angle) -
-          (pixelScale.y / 2) * Math.cos(Math.PI / 2 - angle),
-        y:
-          buttonWidth * Math.sin(angle) +
-          pixelScale.x * Math.sin(angle) -
-          (pixelScale.y / 2) * Math.sin(Math.PI / 2 - angle),
-      },
-      {
-        x:
-          (this.positioning.current.position.left / 100) *
-          this.sharedBundleRef.current.clientWidth,
-        y:
-          (this.positioning.current.position.top / 100) *
-          this.sharedBundleRef.current.clientHeight,
-      }
-    );
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
-  };
-
-  scaleFuntion = (event: PointerEvent) => {
-    if (!this.sharedBundleRef.current) {
-      return;
-    }
-
-    const rect = this.sharedBundleRef.current.getBoundingClientRect();
-
-    const referencePoint = {
-      x:
-        (this.positioning.current.position.left / 100) *
-        this.sharedBundleRef.current.clientWidth,
-      y:
-        (this.positioning.current.position.top / 100) *
-        this.sharedBundleRef.current.clientHeight,
-    };
-
-    this.fgContentAdjustmentController.scaleDragFunction(
-      "any",
-      {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      },
-      referencePoint,
-      referencePoint
-    );
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
-  };
-
-  rotateFunction = (event: PointerEvent) => {
-    if (!this.sharedBundleRef.current) {
-      return;
-    }
-
-    const box = this.sharedBundleRef.current.getBoundingClientRect();
-
-    this.fgContentAdjustmentController.rotateDragFunction(event, {
-      x:
-        (this.positioning.current.position.left / 100) *
-          this.sharedBundleRef.current.clientWidth +
-        box.left,
-      y:
-        (this.positioning.current.position.top / 100) *
-          this.sharedBundleRef.current.clientHeight +
-        box.top,
-    });
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
 
   volumeControl = (volumeChangeAmount: number) => {};
@@ -487,4 +336,4 @@ class FgLowerVideoController {
   };
 }
 
-export default FgLowerVideoController;
+export default LowerVideoController;

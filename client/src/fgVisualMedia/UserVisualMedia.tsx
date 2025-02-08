@@ -473,7 +473,7 @@ export default function UserVisualMedia({
       )}
       <div
         ref={subContainerRef}
-        className='relative flex items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
+        className='flex relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
       >
         <FgUpperVisualMediaControls
           name={name}

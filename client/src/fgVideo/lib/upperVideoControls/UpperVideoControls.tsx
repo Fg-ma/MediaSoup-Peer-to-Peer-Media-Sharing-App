@@ -1,5 +1,5 @@
 import React from "react";
-import FgLowerVideoController from "../fgLowerVideoControls/lib/FgLowerVideoController";
+import FgLowerVideoController from "../lowerVideoControls/lib/LowerVideoController";
 import CloseButton from "./lib/closeButton/CloseButton";
 import SyncButton from "./lib/syncButton/SyncButton";
 
