@@ -6,23 +6,36 @@ import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
 } from "../../../context/effectsContext/typeConstant";
-import { IncomingMediasoupMessages } from "../../../lib/MediasoupSocketController";
+import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
-import TintSection from "./lib/TintSection";
-import BlurButtton from "./lib/BlurButton";
+import { useMediaContext } from "../../../context/mediaContext/MediaContext";
+import { IncomingMediasoupMessages } from "../../../lib/MediasoupSocketController";
+import HideBackgroundButton from "../../../fgElements/effectsButtons/HideBackgroundButton";
+import TintSection from "../../../fgElements/effectsButtons/TintSection";
+import BlurButtton from "../../../fgElements/effectsButtons/BlurButton";
 
 const BabylonPostProcessEffectsButton = React.lazy(
-  () => import("./lib/BabylonPostProcessEffectsButton")
+  () =>
+    import("../../../fgElements/effectsButtons/BabylonPostProcessEffectsButton")
 );
-const HideBackgroundButton = React.lazy(
-  () => import("./lib/HideBackgroundButton")
+const GlassesButton = React.lazy(
+  () => import("../../../fgElements/effectsButtons/GlassesButton")
 );
-const GlassesButton = React.lazy(() => import("./lib/GlassesButton"));
-const BeardsButton = React.lazy(() => import("./lib/BeardsButton"));
-const MustachesButton = React.lazy(() => import("./lib/MustachesButton"));
-const MasksButton = React.lazy(() => import("./lib/MasksButton"));
-const HatsButton = React.lazy(() => import("./lib/HatsButton"));
-const PetsButton = React.lazy(() => import("./lib/PetsButton"));
+const BeardsButton = React.lazy(
+  () => import("../../../fgElements/effectsButtons/BeardsButton")
+);
+const MustachesButton = React.lazy(
+  () => import("../../../fgElements/effectsButtons/MustachesButton")
+);
+const MasksButton = React.lazy(
+  () => import("../../../fgElements/effectsButtons/MasksButton")
+);
+const HatsButton = React.lazy(
+  () => import("../../../fgElements/effectsButtons/HatsButton")
+);
+const PetsButton = React.lazy(
+  () => import("../../../fgElements/effectsButtons/PetsButton")
+);
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -70,6 +83,13 @@ export default function VisualEffectsSection({
   tintColor: React.MutableRefObject<string>;
 }) {
   const { mediasoupSocket } = useSocketContext();
+  const { userMedia } = useMediaContext();
+  const {
+    userEffectsStyles,
+    remoteEffectsStyles,
+    userStreamEffects,
+    remoteStreamEffects,
+  } = useEffectsContext();
 
   const [_, setRerender] = useState(0);
   const [effectsWidth, setEffectsWidth] = useState(0);
@@ -159,20 +179,79 @@ export default function VisualEffectsSection({
       exit='init'
       transition={EffectSectionTransition}
     >
-      <Suspense fallback={<div>Loading...</div>}>
-        <BabylonPostProcessEffectsButton
-          username={username}
-          instance={instance}
-          type={type}
-          visualMediaId={visualMediaId}
-          isUser={isUser}
-          handleVisualEffectChange={handleVisualEffectChange}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      </Suspense>
+      <BabylonPostProcessEffectsButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={
+          isUser
+            ? userStreamEffects.current[type][visualMediaId].postProcess
+            : remoteStreamEffects.current[username][instance][type][
+                visualMediaId
+              ].postProcess
+        }
+        effectsStyles={
+          isUser
+            ? userEffectsStyles.current[type][visualMediaId].postProcess
+            : remoteEffectsStyles.current[username][instance][type][
+                visualMediaId
+              ].postProcess
+        }
+        clickFunctionCallback={async () => {
+          const effectsStyles = isUser
+            ? userEffectsStyles.current[type][visualMediaId].postProcess
+            : remoteEffectsStyles.current[username][instance][type][
+                visualMediaId
+              ].postProcess;
+
+          if (isUser) {
+            userMedia.current[type][
+              visualMediaId
+            ].babylonScene.babylonShaderController.swapPostProcessEffects(
+              effectsStyles.style
+            );
+          }
+
+          await handleVisualEffectChange(
+            "postProcess",
+            false,
+            undefined,
+            undefined,
+            effectsStyles.style
+          );
+        }}
+        holdFunctionCallback={async (effectType) => {
+          const streamEffects = isUser
+            ? userStreamEffects.current[type][visualMediaId].postProcess
+            : remoteStreamEffects.current[username][instance][type][
+                visualMediaId
+              ].postProcess;
+          const effectsStyles = isUser
+            ? userEffectsStyles.current[type][visualMediaId].postProcess
+            : remoteEffectsStyles.current[username][instance][type][
+                visualMediaId
+              ].postProcess;
+
+          effectsStyles.style = effectType;
+
+          if (isUser) {
+            userMedia.current[type][
+              visualMediaId
+            ].babylonScene.babylonShaderController.swapPostProcessEffects(
+              effectType
+            );
+          }
+
+          await handleVisualEffectChange(
+            "postProcess",
+            streamEffects,
+            undefined,
+            undefined,
+            effectType
+          );
+        }}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       {type === "camera" && (
         <Suspense fallback={<div>Loading...</div>}>
           <HideBackgroundButton
@@ -185,47 +264,198 @@ export default function VisualEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
+            streamEffects={
+              isUser
+                ? userStreamEffects.current.camera[visualMediaId].hideBackground
+                : remoteStreamEffects.current[username][instance].camera[
+                    visualMediaId
+                  ].hideBackground
+            }
+            effectsStyles={
+              isUser
+                ? userEffectsStyles.current[type][visualMediaId].hideBackground
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].hideBackground
+            }
+            clickFunctionCallback={async () => {
+              const effectsStyles = isUser
+                ? userEffectsStyles.current[type][visualMediaId].hideBackground
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].hideBackground;
+
+              if (isUser) {
+                userMedia.current.camera[
+                  visualMediaId
+                ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+                  effectsStyles.style
+                );
+              }
+
+              await handleVisualEffectChange(
+                "hideBackground",
+                false,
+                effectsStyles.style
+              );
+            }}
+            holdFunctionCallback={async (effectType) => {
+              const effectsStyles = isUser
+                ? userEffectsStyles.current[type][visualMediaId].hideBackground
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].hideBackground;
+              const streamEffects = isUser
+                ? userStreamEffects.current.camera[visualMediaId].hideBackground
+                : remoteStreamEffects.current[username][instance].camera[
+                    visualMediaId
+                  ].hideBackground;
+
+              effectsStyles.style = effectType;
+              if (isUser) {
+                userMedia.current.camera[
+                  visualMediaId
+                ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+                  effectType
+                );
+              }
+
+              await handleVisualEffectChange(
+                "hideBackground",
+                streamEffects,
+                effectType,
+                undefined
+              );
+            }}
+            acceptColorCallback={async (color) => {
+              const effectsStyles = isUser
+                ? userEffectsStyles.current[type][visualMediaId].hideBackground
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].hideBackground;
+              const streamEffects = isUser
+                ? userStreamEffects.current.camera[visualMediaId].hideBackground
+                : remoteStreamEffects.current[username][instance].camera[
+                    visualMediaId
+                  ].hideBackground;
+
+              if (isUser) {
+                userMedia.current.camera[
+                  visualMediaId
+                ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                  color
+                );
+              }
+
+              if (effectsStyles.style !== "color" || !streamEffects) {
+                effectsStyles.style = "color";
+                effectsStyles.color = color;
+
+                await handleVisualEffectChange(
+                  "hideBackground",
+                  streamEffects,
+                  undefined,
+                  color
+                );
+              }
+            }}
           />
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
         </Suspense>
       )}
       <BlurButtton
-        username={username}
-        instance={instance}
-        type={type}
-        visualMediaId={visualMediaId}
-        isUser={isUser}
-        handleVisualEffectChange={handleVisualEffectChange}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={
+          isUser
+            ? userStreamEffects.current[type][visualMediaId].blur
+            : remoteStreamEffects.current[username][instance][type][
+                visualMediaId
+              ].blur
+        }
+        clickFunctionCallback={async () => {
+          await handleVisualEffectChange("blur");
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <TintSection
-        username={username}
-        instance={instance}
-        type={type}
-        visualMediaId={visualMediaId}
-        isUser={isUser}
-        handleVisualEffectChange={handleVisualEffectChange}
         tintColor={tintColor}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={
+          isUser
+            ? userStreamEffects.current[type][visualMediaId].tint
+            : remoteStreamEffects.current[username][instance][type][
+                visualMediaId
+              ].tint
+        }
+        clickFunctionCallback={async () => {
+          await handleVisualEffectChange("tint");
+        }}
+        acceptColorCallback={() => {
+          handleVisualEffectChange(
+            "tint",
+            isUser
+              ? userStreamEffects.current[type][visualMediaId].tint
+              : remoteStreamEffects.current[username][instance][type][
+                  visualMediaId
+                ].tint
+          );
+        }}
       />
       {type === "camera" && (
         <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <GlassesButton
-            username={username}
-            instance={instance}
-            type={type}
-            visualMediaId={visualMediaId}
-            isUser={isUser}
-            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
+            streamEffects={
+              isUser
+                ? userStreamEffects.current[type][visualMediaId].glasses
+                : remoteStreamEffects.current[username][instance][type][
+                    visualMediaId
+                  ].glasses
+            }
+            effectsStyles={
+              isUser
+                ? userEffectsStyles.current[type][visualMediaId].glasses
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].glasses
+            }
+            clickFunctionCallback={async () => {
+              await handleVisualEffectChange("glasses");
+            }}
+            holdFunctionCallback={async (effectType) => {
+              if (isUser) {
+                if (userEffectsStyles.current[type][visualMediaId].glasses) {
+                  userEffectsStyles.current[type][visualMediaId].glasses.style =
+                    effectType;
+                }
+              } else {
+                if (
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].glasses
+                ) {
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].glasses.style = effectType;
+                }
+              }
+
+              await handleVisualEffectChange(
+                "glasses",
+                isUser
+                  ? userStreamEffects.current[type][visualMediaId].glasses
+                  : remoteStreamEffects.current[username][instance][type][
+                      visualMediaId
+                    ].glasses
+              );
+            }}
           />
         </Suspense>
       )}
@@ -233,15 +463,53 @@ export default function VisualEffectsSection({
         <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <BeardsButton
-            username={username}
-            instance={instance}
-            handleVisualEffectChange={handleVisualEffectChange}
-            type={type}
-            visualMediaId={visualMediaId}
-            isUser={isUser}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
+            streamEffects={
+              isUser
+                ? userStreamEffects.current[type][visualMediaId].beards
+                : remoteStreamEffects.current[username][instance][type][
+                    visualMediaId
+                  ].beards
+            }
+            effectsStyles={
+              isUser
+                ? userEffectsStyles.current[type][visualMediaId].beards
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].beards
+            }
+            clickFunctionCallback={async () => {
+              await handleVisualEffectChange("beards");
+            }}
+            holdFunctionCallback={async (effectType) => {
+              if (isUser) {
+                if (userEffectsStyles.current[type][visualMediaId].beards) {
+                  userEffectsStyles.current[type][visualMediaId].beards.style =
+                    effectType;
+                }
+              } else {
+                if (
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].beards
+                ) {
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].beards.style = effectType;
+                }
+              }
+
+              await handleVisualEffectChange(
+                "beards",
+                isUser
+                  ? userStreamEffects.current[type][visualMediaId].beards
+                  : remoteStreamEffects.current[username][instance][type][
+                      visualMediaId
+                    ].beards
+              );
+            }}
           />
         </Suspense>
       )}
@@ -249,15 +517,54 @@ export default function VisualEffectsSection({
         <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <MustachesButton
-            username={username}
-            instance={instance}
-            type={type}
-            visualMediaId={visualMediaId}
-            isUser={isUser}
-            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
+            streamEffects={
+              isUser
+                ? userStreamEffects.current[type][visualMediaId].mustaches
+                : remoteStreamEffects.current[username][instance][type][
+                    visualMediaId
+                  ].mustaches
+            }
+            effectsStyles={
+              isUser
+                ? userEffectsStyles.current[type][visualMediaId].mustaches
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].mustaches
+            }
+            clickFunctionCallback={async () => {
+              await handleVisualEffectChange("mustaches");
+            }}
+            holdFunctionCallback={async (effectType) => {
+              if (isUser) {
+                if (userEffectsStyles.current[type][visualMediaId].mustaches) {
+                  userEffectsStyles.current[type][
+                    visualMediaId
+                  ].mustaches.style = effectType;
+                }
+              } else {
+                if (
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].mustaches
+                ) {
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].mustaches.style = effectType;
+                }
+              }
+
+              await handleVisualEffectChange(
+                "mustaches",
+                isUser
+                  ? userStreamEffects.current[type][visualMediaId].mustaches
+                  : remoteStreamEffects.current[username][instance][type][
+                      visualMediaId
+                    ].mustaches
+              );
+            }}
           />
         </Suspense>
       )}
@@ -265,15 +572,53 @@ export default function VisualEffectsSection({
         <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <MasksButton
-            username={username}
-            instance={instance}
-            type={type}
-            visualMediaId={visualMediaId}
-            isUser={isUser}
-            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
+            streamEffects={
+              isUser
+                ? userStreamEffects.current[type][visualMediaId].masks
+                : remoteStreamEffects.current[username][instance][type][
+                    visualMediaId
+                  ].masks
+            }
+            effectsStyles={
+              isUser
+                ? userEffectsStyles.current[type][visualMediaId].masks
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].masks
+            }
+            clickFunctionCallback={async () => {
+              await handleVisualEffectChange("masks");
+            }}
+            holdFunctionCallback={async (effectType) => {
+              if (isUser) {
+                if (userEffectsStyles.current[type][visualMediaId].masks) {
+                  userEffectsStyles.current[type][visualMediaId].masks.style =
+                    effectType;
+                }
+              } else {
+                if (
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].masks
+                ) {
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].masks.style = effectType;
+                }
+              }
+
+              await handleVisualEffectChange(
+                "masks",
+                isUser
+                  ? userStreamEffects.current[type][visualMediaId].masks
+                  : remoteStreamEffects.current[username][instance][type][
+                      visualMediaId
+                    ].masks
+              );
+            }}
           />
         </Suspense>
       )}
@@ -281,15 +626,53 @@ export default function VisualEffectsSection({
         <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <HatsButton
-            username={username}
-            instance={instance}
-            type={type}
-            visualMediaId={visualMediaId}
-            isUser={isUser}
-            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
+            streamEffects={
+              isUser
+                ? userStreamEffects.current[type][visualMediaId].hats
+                : remoteStreamEffects.current[username][instance][type][
+                    visualMediaId
+                  ].hats
+            }
+            effectsStyles={
+              isUser
+                ? userEffectsStyles.current[type][visualMediaId].hats
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].hats
+            }
+            clickFunctionCallback={async () => {
+              await handleVisualEffectChange("hats");
+            }}
+            holdFunctionCallback={async (effectType) => {
+              if (isUser) {
+                if (userEffectsStyles.current[type][visualMediaId].hats) {
+                  userEffectsStyles.current[type][visualMediaId].hats.style =
+                    effectType;
+                }
+              } else {
+                if (
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].hats
+                ) {
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].hats.style = effectType;
+                }
+              }
+
+              await handleVisualEffectChange(
+                "hats",
+                isUser
+                  ? userStreamEffects.current[type][visualMediaId].hats
+                  : remoteStreamEffects.current[username][instance][type][
+                      visualMediaId
+                    ].hats
+              );
+            }}
           />
         </Suspense>
       )}
@@ -297,15 +680,53 @@ export default function VisualEffectsSection({
         <Suspense fallback={<div>Loading...</div>}>
           <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
           <PetsButton
-            username={username}
-            instance={instance}
-            type={type}
-            visualMediaId={visualMediaId}
-            isUser={isUser}
-            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
+            streamEffects={
+              isUser
+                ? userStreamEffects.current[type][visualMediaId].pets
+                : remoteStreamEffects.current[username][instance][type][
+                    visualMediaId
+                  ].pets
+            }
+            effectsStyles={
+              isUser
+                ? userEffectsStyles.current[type][visualMediaId].pets
+                : remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].pets
+            }
+            clickFunctionCallback={async () => {
+              await handleVisualEffectChange("pets");
+            }}
+            holdFunctionCallback={async (effectType) => {
+              if (isUser) {
+                if (userEffectsStyles.current[type][visualMediaId].pets) {
+                  userEffectsStyles.current[type][visualMediaId].pets.style =
+                    effectType;
+                }
+              } else {
+                if (
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].pets
+                ) {
+                  remoteEffectsStyles.current[username][instance][type][
+                    visualMediaId
+                  ].pets.style = effectType;
+                }
+              }
+
+              await handleVisualEffectChange(
+                "pets",
+                isUser
+                  ? userStreamEffects.current[type][visualMediaId].pets
+                  : remoteStreamEffects.current[username][instance][type][
+                      visualMediaId
+                    ].pets
+              );
+            }}
           />
         </Suspense>
       )}

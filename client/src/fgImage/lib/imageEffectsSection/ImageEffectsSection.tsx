@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Transition, Variants, motion } from "framer-motion";
+import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
 import LowerImageController from "../lowerImageControls/LowerImageController";
-import TintSection from "./lib/TintSection";
-import BlurButtton from "./lib/BlurButton";
-import BabylonPostProcessEffectsButton from "./lib/BabylonPostProcessEffectsButton";
-import GlassesButton from "./lib/GlassesButton";
-import BeardsButton from "./lib/BeardsButton";
-import MustachesButton from "./lib/MustachesButton";
-import MasksButton from "./lib/MasksButton";
-import HatsButton from "./lib/HatsButton";
-import PetsButton from "./lib/PetsButton";
+import BabylonPostProcessEffectsButton from "../../../fgElements/effectsButtons/BabylonPostProcessEffectsButton";
+import BlurButton from "../../../fgElements/effectsButtons/BlurButton";
+import TintSection from "../../../fgElements/effectsButtons/TintSection";
+import GlassesButton from "../../../fgElements/effectsButtons/GlassesButton";
+import BeardsButton from "../../../fgElements/effectsButtons/BeardsButton";
+import MustachesButton from "../../../fgElements/effectsButtons/MustachesButton";
+import MasksButton from "../../../fgElements/effectsButtons/MasksButton";
+import HatsButton from "../../../fgElements/effectsButtons/HatsButton";
+import PetsButton from "../../../fgElements/effectsButtons/PetsButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -40,6 +41,8 @@ export default function ImageEffectsSection({
   lowerImageController: LowerImageController;
   tintColor: React.MutableRefObject<string>;
 }) {
+  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+
   const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
 
@@ -100,76 +103,164 @@ export default function ImageEffectsSection({
       transition={EffectSectionTransition}
     >
       <BabylonPostProcessEffectsButton
-        imageId={imageId}
-        lowerImageController={lowerImageController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].postProcess}
+        effectsStyles={userEffectsStyles.current.image[imageId].postProcess}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("postProcess", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.image[imageId].postProcess.style =
+            effectType;
+
+          await lowerImageController.handleImageEffect(
+            "postProcess",
+            userStreamEffects.current.image[imageId].postProcess
+          );
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      <BlurButtton
-        imageId={imageId}
-        lowerImageController={lowerImageController}
+      <BlurButton
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].blur}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("blur", false);
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <TintSection
-        imageId={imageId}
-        lowerImageController={lowerImageController}
         tintColor={tintColor}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].tint}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("beards", false);
+        }}
+        acceptColorCallback={() => {
+          lowerImageController.handleImageEffect(
+            "tint",
+            userStreamEffects.current.image[imageId].tint
+          );
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <GlassesButton
-        imageId={imageId}
-        lowerImageController={lowerImageController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].glasses}
+        effectsStyles={userEffectsStyles.current.image[imageId].glasses}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("glasses", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.image[imageId].glasses.style = effectType;
+
+          await lowerImageController.handleImageEffect(
+            "glasses",
+            userStreamEffects.current.image[imageId].glasses
+          );
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <BeardsButton
-        imageId={imageId}
-        lowerImageController={lowerImageController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].beards}
+        effectsStyles={userEffectsStyles.current.image[imageId].beards}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("beards", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.image[imageId].beards.style = effectType;
+
+          await lowerImageController.handleImageEffect(
+            "beards",
+            userStreamEffects.current.image[imageId].beards
+          );
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <MustachesButton
-        imageId={imageId}
-        lowerImageController={lowerImageController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].mustaches}
+        effectsStyles={userEffectsStyles.current.image[imageId].mustaches}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("mustaches", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.image[imageId].mustaches.style = effectType;
+
+          await lowerImageController.handleImageEffect(
+            "mustaches",
+            userStreamEffects.current.image[imageId].mustaches
+          );
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <MasksButton
-        imageId={imageId}
-        lowerImageController={lowerImageController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].masks}
+        effectsStyles={userEffectsStyles.current.image[imageId].masks}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("masks", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.image[imageId].masks.style = effectType;
+
+          await lowerImageController.handleImageEffect(
+            "masks",
+            userStreamEffects.current.image[imageId].masks
+          );
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <HatsButton
-        imageId={imageId}
-        lowerImageController={lowerImageController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].hats}
+        effectsStyles={userEffectsStyles.current.image[imageId].hats}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("hats", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.image[imageId].hats.style = effectType;
+
+          await lowerImageController.handleImageEffect(
+            "hats",
+            userStreamEffects.current.image[imageId].hats
+          );
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <PetsButton
-        imageId={imageId}
-        lowerImageController={lowerImageController}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].pets}
+        effectsStyles={userEffectsStyles.current.image[imageId].pets}
+        clickFunctionCallback={async () => {
+          await lowerImageController.handleImageEffect("pets", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.image[imageId].pets.style = effectType;
+
+          await lowerImageController.handleImageEffect(
+            "pets",
+            userStreamEffects.current.image[imageId].pets
+          );
+        }}
       />
     </motion.div>
   );

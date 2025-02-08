@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Transition, Variants, motion } from "framer-motion";
-import TintSection from "./lib/TintSection";
-import BlurButtton from "./lib/BlurButton";
+import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
 import FgLowerVideoController from "../fgLowerVideoControls/lib/FgLowerVideoController";
-
-const BabylonPostProcessEffectsButton = React.lazy(
-  () => import("./lib/BabylonPostProcessEffectsButton")
-);
-const GlassesButton = React.lazy(() => import("./lib/GlassesButton"));
-const BeardsButton = React.lazy(() => import("./lib/BeardsButton"));
-const MustachesButton = React.lazy(() => import("./lib/MustachesButton"));
-const MasksButton = React.lazy(() => import("./lib/MasksButton"));
-const HatsButton = React.lazy(() => import("./lib/HatsButton"));
-const PetsButton = React.lazy(() => import("./lib/PetsButton"));
+import BabylonPostProcessEffectsButton from "../../../fgElements/effectsButtons/BabylonPostProcessEffectsButton";
+import BlurButton from "../../../fgElements/effectsButtons/BlurButton";
+import TintSection from "../../../fgElements/effectsButtons/TintSection";
+import GlassesButton from "../../../fgElements/effectsButtons/GlassesButton";
+import BeardsButton from "../../../fgElements/effectsButtons/BeardsButton";
+import MustachesButton from "../../../fgElements/effectsButtons/MustachesButton";
+import MasksButton from "../../../fgElements/effectsButtons/MasksButton";
+import HatsButton from "../../../fgElements/effectsButtons/HatsButton";
+import PetsButton from "../../../fgElements/effectsButtons/PetsButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -43,6 +41,8 @@ export default function VideoEffectsSection({
   fgLowerVideoController: FgLowerVideoController;
   tintColor: React.MutableRefObject<string>;
 }) {
+  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+
   const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
 
@@ -102,92 +102,176 @@ export default function VideoEffectsSection({
       exit='init'
       transition={EffectSectionTransition}
     >
-      <Suspense fallback={<div>Loading...</div>}>
-        <BabylonPostProcessEffectsButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-      </Suspense>
-      <BlurButtton
-        videoId={videoId}
-        fgLowerVideoController={fgLowerVideoController}
+      <BabylonPostProcessEffectsButton
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={
+          userStreamEffects.current.video[videoId].video.postProcess
+        }
+        effectsStyles={
+          userEffectsStyles.current.video[videoId].video.postProcess
+        }
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("postProcess", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.video[videoId].video.postProcess.style =
+            effectType;
+
+          await fgLowerVideoController.handleVideoEffect(
+            "postProcess",
+            userStreamEffects.current.video[videoId].video.postProcess
+          );
+        }}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <BlurButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.video[videoId].video.blur}
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("blur", false);
+        }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
       <TintSection
-        videoId={videoId}
-        fgLowerVideoController={fgLowerVideoController}
         tintColor={tintColor}
         effectsDisabled={effectsDisabled}
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.video[videoId].video.tint}
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("beards", false);
+        }}
+        acceptColorCallback={() => {
+          fgLowerVideoController.handleVideoEffect(
+            "tint",
+            userStreamEffects.current.video[videoId].video.tint
+          );
+        }}
       />
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <GlassesButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <BeardsButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <MustachesButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <MasksButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <HatsButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
-        <PetsButton
-          videoId={videoId}
-          fgLowerVideoController={fgLowerVideoController}
-          effectsDisabled={effectsDisabled}
-          setEffectsDisabled={setEffectsDisabled}
-          scrollingContainerRef={effectsContainerRef}
-        />
-      </Suspense>
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <GlassesButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.video[videoId].video.glasses}
+        effectsStyles={userEffectsStyles.current.video[videoId].video.glasses}
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("glasses", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.video[videoId].video.glasses.style =
+            effectType;
+
+          await fgLowerVideoController.handleVideoEffect(
+            "glasses",
+            userStreamEffects.current.video[videoId].video.glasses
+          );
+        }}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <BeardsButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.video[videoId].video.beards}
+        effectsStyles={userEffectsStyles.current.video[videoId].video.beards}
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("beards", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.video[videoId].video.beards.style =
+            effectType;
+
+          await fgLowerVideoController.handleVideoEffect(
+            "beards",
+            userStreamEffects.current.video[videoId].video.beards
+          );
+        }}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <MustachesButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.video[videoId].video.mustaches}
+        effectsStyles={userEffectsStyles.current.video[videoId].video.mustaches}
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("mustaches", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.video[videoId].video.mustaches.style =
+            effectType;
+
+          await fgLowerVideoController.handleVideoEffect(
+            "mustaches",
+            userStreamEffects.current.video[videoId].video.mustaches
+          );
+        }}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <MasksButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.video[videoId].video.masks}
+        effectsStyles={userEffectsStyles.current.video[videoId].video.masks}
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("masks", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.video[videoId].video.masks.style =
+            effectType;
+
+          await fgLowerVideoController.handleVideoEffect(
+            "masks",
+            userStreamEffects.current.video[videoId].video.masks
+          );
+        }}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <HatsButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.video[videoId].video.hats}
+        effectsStyles={userEffectsStyles.current.video[videoId].video.hats}
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("hats", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.video[videoId].video.hats.style =
+            effectType;
+
+          await fgLowerVideoController.handleVideoEffect(
+            "hats",
+            userStreamEffects.current.video[videoId].video.hats
+          );
+        }}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <PetsButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.video[videoId].video.pets}
+        effectsStyles={userEffectsStyles.current.video[videoId].video.pets}
+        clickFunctionCallback={async () => {
+          await fgLowerVideoController.handleVideoEffect("pets", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          userEffectsStyles.current.video[videoId].video.pets.style =
+            effectType;
+
+          await fgLowerVideoController.handleVideoEffect(
+            "pets",
+            userStreamEffects.current.video[videoId].video.pets
+          );
+        }}
+      />
     </motion.div>
   );
 }

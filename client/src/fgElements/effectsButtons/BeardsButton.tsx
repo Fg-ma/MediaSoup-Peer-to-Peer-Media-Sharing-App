@@ -1,61 +1,59 @@
 import React, { useRef, useState } from "react";
-import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { BeardsEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgButton from "../fgButton/FgButton";
-import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import LowerImageController from "../../lowerImageControls/LowerImageController";
+import FgSVG from "../fgSVG/FgSVG";
+import FgImageElement from "../fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import { beardsEffects, beardsLabels } from "./typeConstant";
+import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingContainer";
 
 export default function BeardsButton({
-  imageId,
-  lowerImageController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
+  streamEffects,
+  effectsStyles,
+  clickFunctionCallback,
+  holdFunctionCallback,
 }: {
-  imageId: string;
-  lowerImageController: LowerImageController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  streamEffects: boolean;
+  effectsStyles: {
+    style: BeardsEffectTypes;
+  };
+  clickFunctionCallback?: () => Promise<void>;
+  holdFunctionCallback?: (effectType: BeardsEffectTypes) => Promise<void>;
 }) {
-  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
-
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [_, setRerender] = useState(0);
   const beardsContainerRef = useRef<HTMLDivElement>(null);
-
-  const streamEffects = userStreamEffects.current.image[imageId].beards;
-  const effectsStyles = userEffectsStyles.current.image[imageId].beards;
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await lowerImageController.handleImageEffect("beards", false);
+    if (clickFunctionCallback) await clickFunctionCallback();
 
     setEffectsDisabled(false);
   };
 
   const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
-    if (!effectsStyles || !target || !target.dataset.imageEffectsButtonValue) {
+    if (!effectsStyles || !target || !target.dataset.beardsEffectsButtonValue) {
       return;
     }
 
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .imageEffectsButtonValue as BeardsEffectTypes;
+      .beardsEffectsButtonValue as BeardsEffectTypes;
     if (
       effectType in beardsEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
-      effectsStyles.style = effectType;
-
-      await lowerImageController.handleImageEffect("beards", streamEffects);
+      if (holdFunctionCallback) await holdFunctionCallback(effectType);
     }
 
     setEffectsDisabled(false);
@@ -85,7 +83,7 @@ export default function BeardsButton({
                   { key: "width", value: "95%" },
                   { key: "height", value: "95%" },
                 ]}
-                data-image-effects-button-value={effectsStyles.style}
+                data-beards-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -107,58 +105,61 @@ export default function BeardsButton({
                 srcLoading={imageLoadingSrc}
                 alt={effectsStyles.style}
                 style={{ width: "90%", height: "90%" }}
-                data-image-effects-button-value={effectsStyles.style}
+                data-beards-effects-button-value={effectsStyles.style}
               />
             );
           }
         }
       }}
       holdContent={
-        <div
-          ref={beardsContainerRef}
-          className='grid border overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
-        >
-          {Object.entries(beardsEffects).map(([beard, effect]) => (
-            <FgButton
-              key={beard}
-              contentFunction={() => (
-                <div
-                  className={`${
-                    beard === effectsStyles.style
-                      ? "border-fg-secondary border-3 border-opacity-100"
-                      : ""
-                  } ${effect.flipped && "scale-x-[-1]"} ${
-                    effect.bgColor === "white" && "bg-white border-fg-black-35"
-                  } ${
-                    effect.bgColor === "black" && "border-white"
-                  } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
-                  onClick={(event) => {
-                    holdFunction(event as unknown as PointerEvent);
-                  }}
-                  data-image-effects-button-value={beard}
-                >
-                  <FgImageElement
-                    src={effect.image}
-                    srcLoading={effect.imageSmall}
-                    alt={beard}
-                    style={{ width: "2.75rem", height: "2.75rem" }}
-                    data-image-effects-button-value={beard}
+        <LazyScrollingContainer
+          externalRef={beardsContainerRef}
+          className='grid border overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-60 gap-x-1 gap-y-1 p-2 border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+          items={[
+            ...Object.entries(beardsEffects).map(([beard, effect]) => (
+              <FgButton
+                key={beard}
+                className='flex w-full aspect-square items-center justify-center'
+                contentFunction={() => (
+                  <div
+                    className={`${
+                      beard === effectsStyles.style
+                        ? "border-fg-secondary border-3 border-opacity-100"
+                        : ""
+                    } ${effect.flipped && "scale-x-[-1]"} ${
+                      effect.bgColor === "white" &&
+                      "bg-white border-fg-black-35"
+                    } ${
+                      effect.bgColor === "black" && "border-white"
+                    } flex items-center justify-center w-full h-full hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                    onClick={(event) => {
+                      holdFunction(event as unknown as PointerEvent);
+                    }}
+                    data-beards-effects-button-value={beard}
+                  >
+                    <FgImageElement
+                      src={effect.image}
+                      srcLoading={effect.imageSmall}
+                      alt={beard}
+                      style={{ width: "100%", height: "100%" }}
+                      data-beards-effects-button-value={beard}
+                    />
+                  </div>
+                )}
+                hoverContent={
+                  <FgHoverContentStandard
+                    content={beardsLabels[beard as BeardsEffectTypes]}
                   />
-                </div>
-              )}
-              hoverContent={
-                <FgHoverContentStandard
-                  content={beardsLabels[beard as BeardsEffectTypes]}
-                />
-              }
-              scrollingContainerRef={beardsContainerRef}
-              options={{
-                hoverZValue: 999999999999999,
-                hoverTimeoutDuration: 750,
-              }}
-            />
-          ))}
-        </div>
+                }
+                scrollingContainerRef={beardsContainerRef}
+                options={{
+                  hoverZValue: 999999999999999,
+                  hoverTimeoutDuration: 750,
+                }}
+              />
+            )),
+          ]}
+        />
       }
       hoverContent={<FgHoverContentStandard content='Beards' />}
       closeHoldToggle={closeHoldToggle}

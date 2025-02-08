@@ -47,7 +47,7 @@ class CaptionsController {
 
       recognizer.on("partialresult", (message: RecognizerMessage) => {
         const results = message as { result: { partial: string } };
-        console.log(results);
+
         if (results.result.partial !== "") {
           this.setVoskCaptions(results.result.partial);
         }

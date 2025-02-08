@@ -126,7 +126,7 @@ export default function FgImage({
         <ImageEffectsSection
           imageId={imageId}
           imageContainerRef={imageContainerRef}
-          fgLowerVideoController={lowerImageController}
+          lowerImageController={lowerImageController}
           tintColor={tintColor}
         />,
       ]}

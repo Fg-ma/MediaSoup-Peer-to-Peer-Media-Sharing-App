@@ -1,167 +1,63 @@
 import React, { useRef, useState } from "react";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import { MustachesEffectTypes } from "../../../../context/effectsContext/typeConstant";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import LowerImageController from "../../lowerImageControls/LowerImageController";
+import { MustachesEffectTypes } from "../../context/effectsContext/typeConstant";
+import FgButton from "../fgButton/FgButton";
+import FgSVG from "../fgSVG/FgSVG";
+import FgImageElement from "../fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
+import { mustachesEffects, mustachesLabels } from "./typeConstant";
+import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingContainer";
 
 export default function MustachesButton({
-  imageId,
-  fgLowerController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
+  streamEffects,
+  effectsStyles,
+  clickFunctionCallback,
+  holdFunctionCallback,
 }: {
-  videoId: string;
-  fgLowerVideoController: FgLowerVideoController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  streamEffects: boolean;
+  effectsStyles: {
+    style: MustachesEffectTypes;
+  };
+  clickFunctionCallback?: () => Promise<void>;
+  holdFunctionCallback?: (effectType: MustachesEffectTypes) => Promise<void>;
 }) {
-  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
-
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [_, setRerender] = useState(0);
   const mustachesContainerRef = useRef<HTMLDivElement>(null);
-
-  const streamEffects =
-    userStreamEffects.current.video[videoId].video.mustaches;
-  const effectsStyles =
-    userEffectsStyles.current.video[videoId].video.mustaches;
-
-  const mustachesEffects: {
-    [key in MustachesEffectTypes]: {
-      image: string;
-      imageSmall: string;
-      icon?: string;
-      iconOff?: string;
-      imageOff?: string;
-      imageOffSmall?: string;
-      flipped: boolean;
-      bgColor: "white" | "black";
-    };
-  } = {
-    disguiseMustache: {
-      image: disguiseMustache_512x512,
-      imageSmall: disguiseMustache_32x32,
-      icon: disguiseMustacheIcon,
-      iconOff: disguiseMustacheOffIcon,
-      flipped: false,
-      bgColor: "white",
-    },
-    fullMustache: {
-      image: fullMustache_512x512,
-      imageSmall: fullMustache_32x32,
-      imageOff: fullMustache_off_512x512,
-      imageOffSmall: fullMustache_off_32x32,
-      flipped: false,
-      bgColor: "white",
-    },
-    mustache1: {
-      image: mustache1_512x512,
-      imageSmall: mustache1_32x32,
-      icon: mustache1Icon,
-      iconOff: mustache1OffIcon,
-      flipped: false,
-      bgColor: "white",
-    },
-    mustache2: {
-      image: mustache2_512x512,
-      imageSmall: mustache2_32x32,
-      icon: mustache2Icon,
-      iconOff: mustache2OffIcon,
-      flipped: false,
-      bgColor: "white",
-    },
-    mustache3: {
-      image: mustache3_512x512,
-      imageSmall: mustache3_32x32,
-      icon: mustache3Icon,
-      iconOff: mustache3OffIcon,
-      flipped: false,
-      bgColor: "white",
-    },
-    mustache4: {
-      image: mustache4_512x512,
-      imageSmall: mustache4_32x32,
-      icon: mustache4Icon,
-      iconOff: mustache4OffIcon,
-      flipped: false,
-      bgColor: "white",
-    },
-    nicodemusMustache: {
-      image: nicodemusMustache_512x512,
-      imageSmall: nicodemusMustache_32x32,
-      imageOff: nicodemusMustache_off_512x512,
-      imageOffSmall: nicodemusMustache_off_32x32,
-      flipped: false,
-      bgColor: "black",
-    },
-    pencilMustache: {
-      image: pencilMustache_512x512,
-      imageSmall: pencilMustache_32x32,
-      imageOff: pencilMustache_off_512x512,
-      imageOffSmall: pencilMustache_off_32x32,
-      flipped: false,
-      bgColor: "white",
-    },
-    spongebobMustache: {
-      image: spongebobMustache_512x512,
-      imageSmall: spongebobMustache_32x32,
-      imageOff: spongebobMustache_off_512x512,
-      imageOffSmall: spongebobMustache_off_32x32,
-      flipped: false,
-      bgColor: "white",
-    },
-    tinyMustache: {
-      image: tinyMustache_512x512,
-      imageSmall: tinyMustache_32x32,
-      imageOff: tinyMustache_off_512x512,
-      imageOffSmall: tinyMustache_off_32x32,
-      flipped: false,
-      bgColor: "white",
-    },
-    wingedMustache: {
-      image: wingedMustache_512x512,
-      imageSmall: wingedMustache_32x32,
-      imageOff: wingedMustache_off_512x512,
-      imageOffSmall: wingedMustache_off_32x32,
-      flipped: false,
-      bgColor: "black",
-    },
-  };
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    await fgLowerVideoController.handleVideoEffect("mustaches", false);
+    if (clickFunctionCallback) await clickFunctionCallback();
 
     setEffectsDisabled(false);
   };
 
   const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
-    if (!effectsStyles || !target || !target.dataset.videoEffectsButtonValue) {
+    if (
+      !effectsStyles ||
+      !target ||
+      !target.dataset.mustachesEffectsButtonValue
+    ) {
       return;
     }
 
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .videoEffectsButtonValue as MustachesEffectTypes;
+      .mustachesEffectsButtonValue as MustachesEffectTypes;
     if (
       effectType in mustachesEffects &&
       (effectsStyles.style !== effectType || !streamEffects)
     ) {
-      effectsStyles.style = effectType;
-
-      await fgLowerVideoController.handleVideoEffect(
-        "mustaches",
-        streamEffects
-      );
+      if (holdFunctionCallback) await holdFunctionCallback(effectType);
     }
 
     setEffectsDisabled(false);
@@ -191,7 +87,7 @@ export default function MustachesButton({
                   { key: "width", value: "95%" },
                   { key: "height", value: "95%" },
                 ]}
-                data-video-effects-button-value={effectsStyles.style}
+                data-mustaches-effects-button-value={effectsStyles.style}
               />
             );
           }
@@ -213,58 +109,61 @@ export default function MustachesButton({
                 srcLoading={imageLoadingSrc}
                 alt={effectsStyles.style}
                 style={{ width: "90%", height: "90%" }}
-                data-video-effects-button-value={effectsStyles.style}
+                data-mustaches-effects-button-value={effectsStyles.style}
               />
             );
           }
         }
       }}
       holdContent={
-        <div
-          ref={mustachesContainerRef}
-          className='grid border overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-max gap-x-1 gap-y-1 p-2 border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
-        >
-          {Object.entries(mustachesEffects).map(([mustache, effect]) => (
-            <FgButton
-              key={mustache}
-              contentFunction={() => (
-                <div
-                  className={`${
-                    mustache === effectsStyles.style
-                      ? "border-fg-secondary border-3 border-opacity-100"
-                      : ""
-                  } ${effect.flipped && "scale-x-[-1]"} ${
-                    effect.bgColor === "white" && "bg-white border-fg-black-35"
-                  } ${
-                    effect.bgColor === "black" && "border-white"
-                  } flex items-center justify-center w-14 min-w-14 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75 relative`}
-                  onClick={(event) => {
-                    holdFunction(event as unknown as PointerEvent);
-                  }}
-                  data-video-effects-button-value={mustache}
-                >
-                  <FgImageElement
-                    src={effect.image}
-                    srcLoading={effect.imageSmall}
-                    alt={mustache}
-                    style={{ width: "2.75rem", height: "2.75rem" }}
-                    data-video-effects-button-value={mustache}
+        <LazyScrollingContainer
+          externalRef={mustachesContainerRef}
+          className='grid border overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-60 gap-x-1 gap-y-1 p-2 border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+          items={[
+            ...Object.entries(mustachesEffects).map(([mustache, effect]) => (
+              <FgButton
+                key={mustache}
+                className='flex w-full aspect-square items-center justify-center'
+                contentFunction={() => (
+                  <div
+                    className={`${
+                      mustache === effectsStyles.style
+                        ? "border-fg-secondary border-3 border-opacity-100"
+                        : ""
+                    } ${effect.flipped && "scale-x-[-1]"} ${
+                      effect.bgColor === "white" &&
+                      "bg-white border-fg-black-35"
+                    } ${
+                      effect.bgColor === "black" && "border-white"
+                    } flex items-center justify-center w-full h-full hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75 relative`}
+                    onClick={(event) => {
+                      holdFunction(event as unknown as PointerEvent);
+                    }}
+                    data-mustaches-effects-button-value={mustache}
+                  >
+                    <FgImageElement
+                      src={effect.image}
+                      srcLoading={effect.imageSmall}
+                      alt={mustache}
+                      style={{ width: "100%", height: "100%" }}
+                      data-mustaches-effects-button-value={mustache}
+                    />
+                  </div>
+                )}
+                hoverContent={
+                  <FgHoverContentStandard
+                    content={mustachesLabels[mustache as MustachesEffectTypes]}
                   />
-                </div>
-              )}
-              hoverContent={
-                <FgHoverContentStandard
-                  content={mustachesLabels[mustache as MustachesEffectTypes]}
-                />
-              }
-              scrollingContainerRef={mustachesContainerRef}
-              options={{
-                hoverZValue: 999999999999999,
-                hoverTimeoutDuration: 750,
-              }}
-            />
-          ))}
-        </div>
+                }
+                scrollingContainerRef={mustachesContainerRef}
+                options={{
+                  hoverZValue: 999999999999999,
+                  hoverTimeoutDuration: 750,
+                }}
+              />
+            )),
+          ]}
+        />
       }
       hoverContent={<FgHoverContentStandard content='Mustaches' />}
       closeHoldToggle={closeHoldToggle}

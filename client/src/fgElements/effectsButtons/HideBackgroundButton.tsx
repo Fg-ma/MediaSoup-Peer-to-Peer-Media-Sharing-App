@@ -1,17 +1,16 @@
 import React, { useRef, useState, Suspense } from "react";
-import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import {
   HideBackgroundEffectTypes,
   PostProcessEffects,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgImageElement from "../../../../fgElements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import LazyScrollingContainer from "../../../../fgElements/lazyScrollingContainer/LazyScrollingContainer";
+} from "../../context/effectsContext/typeConstant";
+import FgButton from "../fgButton/FgButton";
+import FgSVG from "../fgSVG/FgSVG";
+import FgImageElement from "../fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
+import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingContainer";
 import { backgroundChoices, hideBackgroundLabels } from "./typeConstant";
 
 const ColorPicker = React.lazy(() => import("./ColorPicker"));
@@ -33,6 +32,11 @@ export default function HideBackgroundButton({
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
+  streamEffects,
+  effectsStyles,
+  clickFunctionCallback,
+  holdFunctionCallback,
+  acceptColorCallback,
 }: {
   username: string;
   instance: string;
@@ -49,14 +53,18 @@ export default function HideBackgroundButton({
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  streamEffects: boolean;
+  effectsStyles: {
+    style: HideBackgroundEffectTypes;
+    color: string;
+  };
+  clickFunctionCallback?: () => Promise<void>;
+  holdFunctionCallback?: (
+    effectType: HideBackgroundEffectTypes
+  ) => Promise<void>;
+  acceptColorCallback?: (color: string) => Promise<void>;
 }) {
   const { userMedia } = useMediaContext();
-  const {
-    userEffectsStyles,
-    remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
-  } = useEffectsContext();
 
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [color, setColor] = useState("#F56114");
@@ -67,15 +75,6 @@ export default function HideBackgroundButton({
   const hideBackgroundContainerRef = useRef<HTMLDivElement>(null);
   const colorRef = useRef("#F56114");
 
-  const streamEffects = isUser
-    ? userStreamEffects.current.camera[visualMediaId].hideBackground
-    : remoteStreamEffects.current[username][instance].camera[visualMediaId]
-        .hideBackground;
-  const effectsStyles = isUser
-    ? userEffectsStyles.current[type][visualMediaId].hideBackground
-    : remoteEffectsStyles.current[username][instance][type][visualMediaId]
-        .hideBackground;
-
   const handleColorPicker = () => {
     setTempColor(colorRef.current);
     setIsColorPicker((prev) => !prev);
@@ -85,50 +84,28 @@ export default function HideBackgroundButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    if (isUser) {
-      userMedia.current.camera[
-        visualMediaId
-      ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
-        effectsStyles.style
-      );
-    }
-
-    await handleVisualEffectChange(
-      "hideBackground",
-      false,
-      effectsStyles.style
-    );
+    if (clickFunctionCallback) clickFunctionCallback();
 
     setEffectsDisabled(false);
   };
 
   const holdFunction = async (event: PointerEvent) => {
     const target = event.target as HTMLElement;
-    if (!effectsStyles || !target || !target.dataset.visualEffectsButtonValue) {
+    if (
+      !effectsStyles ||
+      !target ||
+      !target.dataset.hideBackgroundEffectsButtonValue
+    ) {
       return;
     }
 
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .visualEffectsButtonValue as HideBackgroundEffectTypes;
+      .hideBackgroundEffectsButtonValue as HideBackgroundEffectTypes;
 
     if (effectsStyles.style !== effectType || !streamEffects) {
-      effectsStyles.style = effectType;
-      if (isUser) {
-        userMedia.current.camera[
-          visualMediaId
-        ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
-          effectType
-        );
-      }
-
-      await handleVisualEffectChange(
-        "hideBackground",
-        streamEffects,
-        effectType,
-        undefined
-      );
+      if (holdFunctionCallback) await holdFunctionCallback(effectType);
     }
 
     setEffectsDisabled(false);
@@ -138,25 +115,7 @@ export default function HideBackgroundButton({
   const handleAcceptColorCallback = async () => {
     setEffectsDisabled(true);
 
-    if (isUser) {
-      userMedia.current.camera[
-        visualMediaId
-      ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
-        colorRef.current
-      );
-    }
-
-    if (effectsStyles.style !== "color" || !streamEffects) {
-      effectsStyles.style = "color";
-      effectsStyles.color = colorRef.current;
-
-      await handleVisualEffectChange(
-        "hideBackground",
-        streamEffects,
-        undefined,
-        colorRef.current
-      );
-    }
+    if (acceptColorCallback) await acceptColorCallback(colorRef.current);
 
     setEffectsDisabled(false);
   };
@@ -199,7 +158,7 @@ export default function HideBackgroundButton({
                   onClick={(event) => {
                     holdFunction(event as unknown as PointerEvent);
                   }}
-                  data-visual-effects-button-value={"color"}
+                  data-hide-background-effects-button-value={"color"}
                 ></div>
               </div>,
               ...Object.entries(backgroundChoices).map(
@@ -217,7 +176,7 @@ export default function HideBackgroundButton({
                         onClick={(event) => {
                           holdFunction(event as unknown as PointerEvent);
                         }}
-                        data-visual-effects-button-value={background}
+                        data-hide-background-effects-button-value={background}
                       >
                         <FgImageElement
                           src={choice.image}
@@ -228,7 +187,7 @@ export default function HideBackgroundButton({
                             height: "100%",
                             objectFit: "contain",
                           }}
-                          data-visual-effects-button-value={background}
+                          data-hide-background-effects-button-value={background}
                         />
                       </div>
                     )}

@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import FgButton from "../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import LowerImageController from "../../lowerImageControls/LowerImageController";
+import FgButton from "../fgButton/FgButton";
+import FgSVG from "../fgSVG/FgSVG";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -12,23 +10,19 @@ const blurOffIcon =
   nginxAssetSeverBaseUrl + "svgs/visualEffects/blurOffIcon.svg";
 
 export default function BlurButton({
-  imageId,
-  lowerImageController,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
+  streamEffects,
+  clickFunctionCallback,
 }: {
-  imageId: string;
-  lowerImageController: LowerImageController;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  streamEffects: boolean;
+  clickFunctionCallback?: () => Promise<void>;
 }) {
-  const { userStreamEffects } = useEffectsContext();
-
   const [_, setRerender] = useState(0);
-
-  const streamEffects = userStreamEffects.current.image[imageId].blur;
 
   return (
     <FgButton
@@ -36,7 +30,7 @@ export default function BlurButton({
         setEffectsDisabled(true);
         setRerender((prev) => prev + 1);
 
-        await lowerImageController.handleImageEffect("blur", false);
+        if (clickFunctionCallback) await clickFunctionCallback();
 
         setEffectsDisabled(false);
       }}

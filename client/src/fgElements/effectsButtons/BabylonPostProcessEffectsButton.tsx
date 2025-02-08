@@ -1,11 +1,10 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
-import { useMediaContext } from "../../context/mediaContext/MediaContext";
-import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { PostProcessEffects } from "../../context/effectsContext/typeConstant";
 import FgImageElement from "../fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import { postProcessEffectsChoices } from "./typeConstant";
+import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingContainer";
 
 export default function BabylonPostProcessEffectsButton({
   effectsDisabled,
@@ -23,8 +22,8 @@ export default function BabylonPostProcessEffectsButton({
   effectsStyles: {
     style: PostProcessEffects;
   };
-  clickFunctionCallback?: () => void;
-  holdFunctionCallback?: (effectType: PostProcessEffects) => void;
+  clickFunctionCallback?: () => Promise<void>;
+  holdFunctionCallback?: (effectType: PostProcessEffects) => Promise<void>;
 }) {
   const [_, setRerender] = useState(0);
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -34,7 +33,7 @@ export default function BabylonPostProcessEffectsButton({
     setEffectsDisabled(true);
     setRerender((prev) => prev + 1);
 
-    if (clickFunctionCallback) clickFunctionCallback();
+    if (clickFunctionCallback) await clickFunctionCallback();
 
     setEffectsDisabled(false);
   };
@@ -55,7 +54,7 @@ export default function BabylonPostProcessEffectsButton({
       .postProcessEffectsButtonValue as PostProcessEffects;
 
     if (effectsStyles.style !== effectType || !streamEffects) {
-      if (holdFunctionCallback) holdFunctionCallback(effectType);
+      if (holdFunctionCallback) await holdFunctionCallback(effectType);
     }
 
     setEffectsDisabled(false);
@@ -86,22 +85,22 @@ export default function BabylonPostProcessEffectsButton({
       )}
       holdFunction={holdFunction}
       holdContent={
-        <div
-          ref={postProcessEffectsContainerRef}
-          className='grid pl-3 pr-1 overflow-y-auto small-vertical-scroll-bar max-h-60 mb-4 grid-cols-3 w-max gap-x-2 gap-y-2 py-3 border-3 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-lg rounded-md'
-        >
-          {Object.entries(postProcessEffectsChoices).map(
-            ([postProcessEffect, choice]) =>
-              choice && (
+        <LazyScrollingContainer
+          externalRef={postProcessEffectsContainerRef}
+          className='grid pl-3 pr-1 overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-60 gap-x-2 gap-y-2 py-3 border-3 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-lg rounded-md'
+          items={[
+            ...Object.entries(postProcessEffectsChoices).map(
+              ([postProcessEffect, choice]) => (
                 <FgButton
                   key={postProcessEffect}
+                  className='flex w-full aspect-square items-center justify-center'
                   contentFunction={() => (
                     <div
                       className={`${
                         postProcessEffect === effectsStyles.style
                           ? "border-fg-secondary border-3 border-opacity-100"
                           : ""
-                      } border-white flex items-center justify-center w-16 min-w-16 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                      } border-white flex items-center justify-center w-full h-full hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
                       onClick={(event) => {
                         holdFunction(event as unknown as PointerEvent);
                       }}
@@ -132,8 +131,9 @@ export default function BabylonPostProcessEffectsButton({
                   }}
                 />
               )
-          )}
-        </div>
+            ),
+          ]}
+        />
       }
       hoverContent={<FgHoverContentStandard content='Camera effects' />}
       closeHoldToggle={closeHoldToggle}

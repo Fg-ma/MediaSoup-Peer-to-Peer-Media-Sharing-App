@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import FgPanel from "../../../../fgElements/fgPanel/FgPanel";
+import FgPanel from "../fgPanel/FgPanel";
 
 export default function ColorPicker({
   color,
