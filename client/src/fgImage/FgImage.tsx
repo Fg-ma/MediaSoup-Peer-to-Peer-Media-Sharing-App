@@ -47,7 +47,7 @@ export default function FgImage({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerImageControlsRef = useRef<HTMLDivElement>(null);
 
-  const tintColor = useRef("");
+  const tintColor = useRef("#F56114");
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -60,7 +60,9 @@ export default function FgImage({
     shiftPressed,
     controlPressed,
     setImageEffectsActive,
-    userStreamEffects
+    tintColor,
+    userStreamEffects,
+    userMedia
   );
 
   const imageController = new ImageController(
@@ -75,7 +77,7 @@ export default function FgImage({
   );
 
   useEffect(() => {
-    subContainerRef.current?.appendChild(imageMedia.image);
+    subContainerRef.current?.appendChild(imageMedia.canvas);
 
     tableStaticContentSocket.current?.requestCatchUpContentData(
       "image",

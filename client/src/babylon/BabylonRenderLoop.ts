@@ -42,11 +42,12 @@ class BabylonRenderLoop {
 
   constructor(
     private id: string,
+    private type: "camera" | "screen" | "image",
     private scene: Scene,
     private camera: UniversalCamera,
     private faceLandmarks: FaceLandmarks | undefined,
     private canvas: HTMLCanvasElement,
-    private video: HTMLVideoElement,
+    private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     },
@@ -148,7 +149,7 @@ class BabylonRenderLoop {
     if (
       !this.faceMeshResults ||
       !this.faceLandmarks ||
-      !this.video ||
+      !this.backgroundMedia ||
       !this.offscreenContext
     ) {
       return;
@@ -167,7 +168,7 @@ class BabylonRenderLoop {
 
       // Draw the video frame onto the offscreen canvas at the lower resolution
       this.offscreenContext?.drawImage(
-        this.video,
+        this.backgroundMedia,
         0,
         0,
         this.offscreenCanvas.width,
@@ -196,8 +197,9 @@ class BabylonRenderLoop {
           width: this.offscreenCanvas.width,
           height: this.offscreenCanvas.height,
           smooth:
+            (this.type === "camera" || this.type === "image") &&
             this.effects.masks &&
-            this.userEffectsStyles.current.camera[this.id].masks.style ===
+            this.userEffectsStyles.current[this.type][this.id].masks.style ===
               "baseMask"
               ? true
               : false,
@@ -267,7 +269,7 @@ class BabylonRenderLoop {
 
     // Draw the video frame onto the offscreen canvas at the lower resolution
     this.hideBackgroundOffscreenContext.drawImage(
-      this.video,
+      this.backgroundMedia,
       0,
       0,
       this.hideBackgroundOffscreenCanvas.width,
@@ -317,8 +319,14 @@ class BabylonRenderLoop {
       this.hideBackgroundCanvas.width === 0 ||
       this.hideBackgroundCanvas.height === 0
     ) {
-      this.hideBackgroundCanvas.width = this.video.videoWidth;
-      this.hideBackgroundCanvas.height = this.video.videoHeight;
+      this.hideBackgroundCanvas.width =
+        this.backgroundMedia instanceof HTMLVideoElement
+          ? this.backgroundMedia.videoWidth
+          : this.backgroundMedia.clientWidth;
+      this.hideBackgroundCanvas.height =
+        this.backgroundMedia instanceof HTMLVideoElement
+          ? this.backgroundMedia.videoHeight
+          : this.backgroundMedia.clientHeight;
     }
 
     this.hideBackgroundCtx.clearRect(
@@ -359,8 +367,9 @@ class BabylonRenderLoop {
     this.hideBackgroundCtx.globalCompositeOperation = "source-atop";
 
     if (
-      this.userEffectsStyles.current.camera[this.id].hideBackground.style !==
-      "color"
+      (this.type === "camera" || this.type === "image") &&
+      this.userEffectsStyles.current[this.type][this.id].hideBackground
+        .style !== "color"
     ) {
       this.hideBackgroundCtx.drawImage(
         this.hideBackgroundEffectImage,

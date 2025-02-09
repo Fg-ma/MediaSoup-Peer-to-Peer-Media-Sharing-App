@@ -10,12 +10,23 @@ export interface Tables {
 
 export type TableContentTypes = "video" | "image";
 
+export type TableTopStaticMimeType =
+  | "image/jpeg"
+  | "image/png"
+  | "image/webp"
+  | "video/mp4"
+  | "video/mpeg"
+  | "image/gif"
+  | "application/pdf"
+  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
 export interface TableContent {
   [table_id: string]: {
     [tableContentType in TableContentTypes]?: {
       [contentId: string]: {
         url?: string;
         dashURL?: string;
+        mimeType?: TableTopStaticMimeType;
       };
     };
   };
@@ -42,7 +53,7 @@ export type MessageTypes =
   | onRequestCatchUpContentDataType
   | onDeleteContentType
   | onCatchUpContentDataResponseType
-  | onGetImageType;
+  | onGetFileType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -120,8 +131,8 @@ export type onCatchUpContentDataResponseType = {
   };
 };
 
-export type onGetImageType = {
-  type: "getImage";
+export type onGetFileType = {
+  type: "getFile";
   header: {
     table_id: string;
     username: string;

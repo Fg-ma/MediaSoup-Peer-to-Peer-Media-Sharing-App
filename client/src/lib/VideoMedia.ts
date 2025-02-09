@@ -18,6 +18,10 @@ import BabylonScene, {
 import assetMeshes from "../babylon/meshes";
 import FaceLandmarks from "../babylon/FaceLandmarks";
 import Deadbanding from "../babylon/Deadbanding";
+import {
+  IncomingTableStaticContentMessages,
+  TableTopStaticMimeType,
+} from "./TableStaticContentSocketController";
 
 class VideoMedia {
   canvas: HTMLCanvasElement;
@@ -26,8 +30,12 @@ class VideoMedia {
   hiddenVideo: HTMLVideoElement | undefined;
   hiddenShakaPlayer: shaka.Player | undefined;
 
+  filename: string;
+  mimeType: TableTopStaticMimeType;
   originalVideoURL: string;
   dashUrl: string | undefined;
+
+  private fileChunks: Buffer[] = [];
 
   private creationTime = Date.now();
 
@@ -42,8 +50,6 @@ class VideoMedia {
   private selfieSegmentationResults: ImageData[] = [];
   private selfieSegmentationProcessing = [false];
 
-  filename: string;
-
   private effects: {
     [videoEffect in VideoEffectTypes]?: boolean;
   } = {};
@@ -55,15 +61,30 @@ class VideoMedia {
   constructor(
     private videoId: string,
     filename: string,
+    mimeType: TableTopStaticMimeType,
     originalVideoURL: string,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
+    private getVideo: (key: string) => void,
+    private addMessageListener: (
+      listener: (
+        message: IncomingTableStaticContentMessages,
+        event: MessageEvent
+      ) => void
+    ) => void,
+    private removeMessageListener: (
+      listener: (
+        message: IncomingTableStaticContentMessages,
+        event: MessageEvent
+      ) => void
+    ) => void,
     dashUrl?: string | undefined
   ) {
     this.filename = filename;
+    this.mimeType = mimeType;
     this.originalVideoURL = originalVideoURL;
     this.dashUrl = dashUrl;
 
@@ -82,7 +103,11 @@ class VideoMedia {
       };
     }
 
-    this.faceLandmarks = new FaceLandmarks(this.videoId, this.deadbanding);
+    this.faceLandmarks = new FaceLandmarks(
+      "video",
+      this.videoId,
+      this.deadbanding
+    );
 
     this.faceMeshWorker = new Worker(
       new URL("./../webWorkers/faceMeshWebWorker.worker", import.meta.url),
@@ -161,32 +186,32 @@ class VideoMedia {
     this.video = document.createElement("video");
     this.video.autoplay = true;
     this.video.style.width = "100%";
-    this.video.style.objectFit = "cover";
+    this.video.style.height = "100%";
+    this.video.style.objectFit = "contain";
     this.video.style.backgroundColor = "#000";
-    this.shakaPlayer = new shaka.Player(this.video);
+    // this.shakaPlayer = new shaka.Player(this.video);
 
-    if (this.dashUrl) {
-      this.shakaPlayer.load(this.dashUrl).then(() => {
-        console.log("Dash video loaded successfully");
-      });
-    } else {
-      console.log(this.originalVideoURL);
-      this.shakaPlayer.load(this.originalVideoURL).then(() => {
-        console.log("Original video loaded successfully");
-      });
+    // if (this.dashUrl) {
+    //   this.shakaPlayer.load(this.dashUrl).then(() => {
+    //     console.log("Dash video loaded successfully");
+    //   });
+    // } else {
+    //   this.shakaPlayer.load(this.originalVideoURL).then(() => {
+    //     console.log("Original video loaded successfully");
+    //   });
 
-      this.hiddenVideo = document.createElement("video");
-      this.hiddenVideo.style.position = "absolute";
-      this.hiddenVideo.style.top = "0";
-      this.hiddenVideo.style.left = "0";
-      this.hiddenVideo.style.objectFit = "cover";
-      this.hiddenVideo.style.backgroundColor = "#000";
-      this.hiddenVideo.style.zIndex = "10";
-      this.hiddenVideo.style.display = "none";
-      this.hiddenVideo.style.opacity = "0%";
-      this.hiddenVideo.muted = true;
-      this.hiddenShakaPlayer = new shaka.Player(this.hiddenVideo);
-    }
+    //   this.hiddenVideo = document.createElement("video");
+    //   this.hiddenVideo.style.position = "absolute";
+    //   this.hiddenVideo.style.top = "0";
+    //   this.hiddenVideo.style.left = "0";
+    //   this.hiddenVideo.style.objectFit = "cover";
+    //   this.hiddenVideo.style.backgroundColor = "#000";
+    //   this.hiddenVideo.style.zIndex = "10";
+    //   this.hiddenVideo.style.display = "none";
+    //   this.hiddenVideo.style.opacity = "0%";
+    //   this.hiddenVideo.muted = true;
+    //   this.hiddenShakaPlayer = new shaka.Player(this.hiddenVideo);
+    // }
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
@@ -212,6 +237,9 @@ class VideoMedia {
       this.maxFaces,
       this.userMedia
     );
+
+    this.getVideo(this.filename);
+    this.addMessageListener(this.getVideoListener);
   }
 
   deconstructor() {
@@ -254,6 +282,28 @@ class VideoMedia {
     // Call the BabylonScene deconstructor
     this.babylonScene.deconstructor();
   }
+
+  private getVideoListener = (
+    message: IncomingTableStaticContentMessages,
+    event: MessageEvent
+  ) => {
+    if (message.type === "downloadComplete") {
+      const mergedBuffer = Buffer.concat(this.fileChunks);
+      const blob = new Blob([new Uint8Array(mergedBuffer)], {
+        type: this.mimeType,
+      });
+
+      const url = URL.createObjectURL(blob);
+      console.log(url);
+      this.video.src = url;
+
+      this.removeMessageListener(this.getVideoListener);
+    } else if (message.type === "chunk") {
+      const chunkData = Buffer.from(message.data.chunk.data);
+      console.log(chunkData);
+      this.fileChunks.push(chunkData);
+    }
+  };
 
   preloadDashStream = (url: string) => {
     this.dashUrl = url;
@@ -436,7 +486,7 @@ class VideoMedia {
         }
       }
     }
-    this.deadbanding.update(this.videoId, this.effects);
+    this.deadbanding.update("video", this.videoId, this.effects);
 
     if (tintColor) {
       this.setTintColor(tintColor);
@@ -506,7 +556,7 @@ class VideoMedia {
   };
 
   getAudioTrack = () => {
-    return this.video.captureStream() as MediaStream;
+    return (this.video as any).captureStream() as MediaStream;
   };
 
   getTrack = () => {

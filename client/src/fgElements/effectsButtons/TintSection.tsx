@@ -26,10 +26,9 @@ export default function TintSection({
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   streamEffects: boolean;
   clickFunctionCallback?: () => Promise<void>;
-  acceptColorCallback?: () => void;
+  acceptColorCallback?: () => Promise<void>;
 }) {
   const [color, setColor] = useState("#F56114");
-  const [_, setRerender] = useState(0);
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
@@ -39,16 +38,11 @@ export default function TintSection({
     setIsColorPicker((prev) => !prev);
   };
 
-  useEffect(() => {
-    setRerender((prev) => prev + 1);
-  }, [streamEffects]);
-
   return (
     <div className='flex w-max'>
       <FgButton
         clickFunction={async () => {
           setEffectsDisabled(true);
-          setRerender((prev) => prev + 1);
 
           if (clickFunctionCallback) await clickFunctionCallback();
 
@@ -97,8 +91,11 @@ export default function TintSection({
               setIsColorPicker={setIsColorPicker}
               colorRef={tintColor}
               colorPickerBtnRef={colorPickerBtnRef}
-              handleAcceptColorCallback={() => {
-                if (acceptColorCallback) acceptColorCallback();
+              handleAcceptColorCallback={async () => {
+                setEffectsDisabled(true);
+                if (acceptColorCallback) await acceptColorCallback();
+
+                setEffectsDisabled(false);
               }}
             />
           </Suspense>

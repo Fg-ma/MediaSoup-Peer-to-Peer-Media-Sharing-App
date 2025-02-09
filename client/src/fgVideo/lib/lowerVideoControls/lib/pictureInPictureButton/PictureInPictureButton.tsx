@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import FgLowerVideoController from "../LowerVideoController";
+import LowerVideoController from "../LowerVideoController";
 
 export default function PictureInPictureButton({
-  fgLowerVideoController,
+  lowerVideoController,
   videoEffectsActive,
   settingsActive,
   scrollingContainerRef,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  lowerVideoController: LowerVideoController;
   videoEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -19,7 +19,7 @@ export default function PictureInPictureButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVideoController.handleMiniPlayer();
+        lowerVideoController.handleMiniPlayer();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {

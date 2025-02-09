@@ -1,10 +1,8 @@
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
-import TableStaticContentSocketController from "../../../../lib/TableStaticContentSocketController";
 import {
   UserStreamEffectsType,
   VideoEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
-import FgContentAdjustmentController from "../../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
 import { Settings } from "../../typeConstant";
 import VideoMedia from "../../../../lib/VideoMedia";
 
@@ -59,14 +57,9 @@ class LowerVideoController {
   private initTime: number;
 
   constructor(
-    private tableStaticContentSocket: React.MutableRefObject<
-      TableStaticContentSocketController | undefined
-    >,
     private videoId: string,
-    private sharedBundleRef: React.RefObject<HTMLDivElement>,
     private videoMedia: VideoMedia,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
-    private panBtnRef: React.RefObject<HTMLButtonElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
@@ -83,19 +76,7 @@ class LowerVideoController {
     private tintColor: React.MutableRefObject<string>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private initTimeOffset: React.MutableRefObject<number>,
-    private fgContentAdjustmentController: FgContentAdjustmentController,
-    private positioning: React.MutableRefObject<{
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    }>
+    private initTimeOffset: React.MutableRefObject<number>
   ) {
     this.initTime = Date.now();
   }

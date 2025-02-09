@@ -1,4 +1,8 @@
-import { tableContent, TableContentTypes } from "../typeConstant";
+import {
+  tableContent,
+  TableContentTypes,
+  TableTopStaticMimeType,
+} from "../typeConstant";
 import { unlinkSync } from "fs";
 
 class TableContentController {
@@ -16,10 +20,13 @@ class TableContentController {
     table_id: string,
     type: TableContentTypes,
     contentId: string,
-    properties: {
-      property: "url" | "dashURL";
-      value: string;
-    }[]
+    properties: (
+      | {
+          property: "url" | "dashURL";
+          value: string;
+        }
+      | { property: "mimeType"; value: TableTopStaticMimeType }
+    )[]
   ) => {
     if (!tableContent[table_id]) {
       tableContent[table_id] = {};
@@ -32,7 +39,7 @@ class TableContentController {
     }
     const tableContentData = tableContent[table_id][type][contentId];
     for (const property of properties) {
-      tableContentData[property.property] = property.value;
+      tableContentData[property.property] = property.value as any;
     }
   };
 
@@ -43,16 +50,6 @@ class TableContentController {
   ) => {
     if (tableContent[table_id]?.[type]?.[contentId]) {
       const tableContentData = tableContent[table_id][type][contentId];
-
-      if (tableContentData.url) {
-        const filename = this.getFilename(tableContentData.url);
-      }
-      if (tableContentData.dashURL) {
-        const dashFilename = this.getFilename(tableContentData.dashURL).slice(
-          0,
-          -4
-        );
-      }
 
       delete tableContent[table_id][type][contentId];
 

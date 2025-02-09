@@ -1,4 +1,4 @@
-import Deadbanding from "./Deadbanding";
+import Deadbanding, { DeadbandingMediaTypes } from "./Deadbanding";
 import {
   CalculatedLandmarkInterface,
   LandmarkTypes,
@@ -13,6 +13,7 @@ class SmoothLandmarksUtils {
   private smoothingFactorThreshold = 0.001;
 
   constructor(
+    private type: DeadbandingMediaTypes,
     private id: string,
     private calculatedLandmarks: CalculatedLandmarkInterface,
     private deadbanding: Deadbanding
@@ -36,7 +37,7 @@ class SmoothLandmarksUtils {
 
     if (
       Math.abs(deltaValue) <
-      this.deadbanding.getDeadbandingMapById(this.id)[featureType]
+      this.deadbanding.getDeadbandingMapById(this.type, this.id)[featureType]
     ) {
       return previousValue;
     }

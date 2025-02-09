@@ -255,19 +255,13 @@ export default function VisualEffectsSection({
       {type === "camera" && (
         <Suspense fallback={<div>Loading...</div>}>
           <HideBackgroundButton
-            username={username}
-            instance={instance}
-            type={type}
-            visualMediaId={visualMediaId}
-            isUser={isUser}
-            handleVisualEffectChange={handleVisualEffectChange}
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
             streamEffects={
               isUser
-                ? userStreamEffects.current.camera[visualMediaId].hideBackground
-                : remoteStreamEffects.current[username][instance].camera[
+                ? userStreamEffects.current[type][visualMediaId].hideBackground
+                : remoteStreamEffects.current[username][instance][type][
                     visualMediaId
                   ].hideBackground
             }
@@ -286,7 +280,7 @@ export default function VisualEffectsSection({
                   ].hideBackground;
 
               if (isUser) {
-                userMedia.current.camera[
+                userMedia.current[type][
                   visualMediaId
                 ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectsStyles.style
@@ -306,14 +300,14 @@ export default function VisualEffectsSection({
                     visualMediaId
                   ].hideBackground;
               const streamEffects = isUser
-                ? userStreamEffects.current.camera[visualMediaId].hideBackground
-                : remoteStreamEffects.current[username][instance].camera[
+                ? userStreamEffects.current[type][visualMediaId].hideBackground
+                : remoteStreamEffects.current[username][instance][type][
                     visualMediaId
                   ].hideBackground;
 
               effectsStyles.style = effectType;
               if (isUser) {
-                userMedia.current.camera[
+                userMedia.current[type][
                   visualMediaId
                 ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectType
@@ -334,13 +328,13 @@ export default function VisualEffectsSection({
                     visualMediaId
                   ].hideBackground;
               const streamEffects = isUser
-                ? userStreamEffects.current.camera[visualMediaId].hideBackground
-                : remoteStreamEffects.current[username][instance].camera[
+                ? userStreamEffects.current[type][visualMediaId].hideBackground
+                : remoteStreamEffects.current[username][instance][type][
                     visualMediaId
                   ].hideBackground;
 
               if (isUser) {
-                userMedia.current.camera[
+                userMedia.current[type][
                   visualMediaId
                 ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
                   color
@@ -394,8 +388,8 @@ export default function VisualEffectsSection({
         clickFunctionCallback={async () => {
           await handleVisualEffectChange("tint");
         }}
-        acceptColorCallback={() => {
-          handleVisualEffectChange(
+        acceptColorCallback={async () => {
+          await handleVisualEffectChange(
             "tint",
             isUser
               ? userStreamEffects.current[type][visualMediaId].tint

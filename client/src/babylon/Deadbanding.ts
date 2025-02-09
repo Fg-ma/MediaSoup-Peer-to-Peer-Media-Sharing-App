@@ -649,25 +649,30 @@ const deadbandingValues: DeadbandingValues = {
   },
 };
 
+export type DeadbandingMediaTypes = "camera" | "image" | "video";
+
 class Deadbanding {
   private deadbandingMap: {
-    [cameraId in string]: {
-      [landmarkType in LandmarkTypes]: number;
+    [mediaType in DeadbandingMediaTypes]: {
+      [mediaId: string]: {
+        [landmarkType in LandmarkTypes]: number;
+      };
     };
-  } = {};
+  } = { camera: {}, image: {}, video: {} };
 
   constructor(
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>
   ) {}
 
   update = (
+    mediaType: DeadbandingMediaTypes,
     id: string,
     effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     }
   ) => {
-    if (!this.deadbandingMap[id]) {
-      this.deadbandingMap[id] = {
+    if (!this.deadbandingMap[mediaType][id]) {
+      this.deadbandingMap[mediaType][id] = {
         interocularDistances: 0.0,
         headRotationAngles: 0.0,
         headYawAngles: 0.0,
@@ -683,10 +688,16 @@ class Deadbanding {
       const effectType = type as DeadbandingTypes;
       if (
         effects[effectType] &&
-        this.userEffectsStyles.current.camera[id][effectType]
+        ((mediaType === "video" &&
+          this.userEffectsStyles.current[mediaType][id].video[effectType]) ||
+          (mediaType !== "video" &&
+            this.userEffectsStyles.current[mediaType][id][effectType]))
       ) {
         const style =
-          this.userEffectsStyles.current.camera[id][effectType].style;
+          mediaType === "video"
+            ? this.userEffectsStyles.current[mediaType][id].video[effectType]
+                .style
+            : this.userEffectsStyles.current[mediaType][id][effectType];
 
         // @ts-expect-error: no enforcement between effectType and style
         for (const deadbanding in deadbandingValues[effectType][style]) {
@@ -698,11 +709,14 @@ class Deadbanding {
 
           if (newDeadbandingValue) {
             const currentDeadbandingValue =
-              this.deadbandingMap[id][deadbandingType as LandmarkTypes] ?? 0;
+              this.deadbandingMap[mediaType][id][
+                deadbandingType as LandmarkTypes
+              ] ?? 0;
 
             if (currentDeadbandingValue < newDeadbandingValue) {
-              this.deadbandingMap[id][deadbandingType as LandmarkTypes] =
-                newDeadbandingValue;
+              this.deadbandingMap[mediaType][id][
+                deadbandingType as LandmarkTypes
+              ] = newDeadbandingValue;
             }
           }
         }
@@ -714,8 +728,8 @@ class Deadbanding {
     return this.deadbandingMap;
   }
 
-  getDeadbandingMapById(id: string) {
-    return this.deadbandingMap[id];
+  getDeadbandingMapById(mediaType: DeadbandingMediaTypes, id: string) {
+    return this.deadbandingMap[mediaType][id];
   }
 }
 

@@ -2,7 +2,7 @@ import React from "react";
 import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import FgLowerVideoController from "../LowerVideoController";
+import LowerVideoController from "../LowerVideoController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -10,12 +10,12 @@ const playIcon = nginxAssetSeverBaseUrl + "svgs/playIcon.svg";
 const pauseIcon = nginxAssetSeverBaseUrl + "svgs/pauseIcon.svg";
 
 export default function PlayPauseButton({
-  fgLowerVideoController,
+  lowerVideoController,
   videoEffectsActive,
   settingsActive,
   pausedState,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  lowerVideoController: LowerVideoController;
   videoEffectsActive: boolean;
   settingsActive: boolean;
   pausedState: boolean;
@@ -23,7 +23,7 @@ export default function PlayPauseButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVideoController.handlePausePlay();
+        lowerVideoController.handlePausePlay();
       }}
       contentFunction={() => {
         const iconSrc = pausedState ? playIcon : pauseIcon;

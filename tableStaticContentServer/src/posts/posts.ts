@@ -2,6 +2,7 @@ import uWS from "uWebSockets.js";
 import busboy from "busboy";
 import { broadcaster, tableContentController, tableTopCeph } from "../index";
 import Utils from "./lib/Utils";
+import { TableTopStaticMimeType } from "src/typeConstant";
 
 const utils = new Utils();
 
@@ -48,6 +49,7 @@ const handlePosts = (app: uWS.TemplatedApp) => {
         if (mimeType.startsWith("video/")) {
           tableContentController.setContent(table_id, "video", contentId, [
             { property: "url", value: url },
+            { property: "mimeType", value: mimeType as TableTopStaticMimeType },
           ]);
 
           const originalVideoMessage = {
@@ -58,6 +60,7 @@ const handlePosts = (app: uWS.TemplatedApp) => {
             data: {
               filename,
               url,
+              mimeType,
             },
           };
           broadcaster.broadcastToTable(table_id, originalVideoMessage);
@@ -94,12 +97,13 @@ const handlePosts = (app: uWS.TemplatedApp) => {
           // Image-specific handling
           tableContentController.setContent(table_id, "image", contentId, [
             { property: "url", value: url },
+            { property: "mimeType", value: mimeType as TableTopStaticMimeType },
           ]);
 
           broadcaster.broadcastToTable(table_id, {
             type: "imageReady",
             header: { contentId },
-            data: { filename: filename, url },
+            data: { filename: filename, url, mimeType },
           });
         } else {
           console.warn(`Unsupported file type uploaded: ${mimeType}`);

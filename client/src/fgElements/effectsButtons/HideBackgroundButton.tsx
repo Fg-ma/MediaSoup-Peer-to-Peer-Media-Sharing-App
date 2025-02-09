@@ -23,12 +23,6 @@ const hideBackgroundOffIcon =
   nginxAssetSeverBaseUrl + "svgs/visualEffects/hideBackgroundOffIcon.svg";
 
 export default function HideBackgroundButton({
-  username,
-  instance,
-  type,
-  visualMediaId,
-  isUser,
-  handleVisualEffectChange,
   effectsDisabled,
   setEffectsDisabled,
   scrollingContainerRef,
@@ -38,18 +32,6 @@ export default function HideBackgroundButton({
   holdFunctionCallback,
   acceptColorCallback,
 }: {
-  username: string;
-  instance: string;
-  type: "camera";
-  visualMediaId: string;
-  isUser: boolean;
-  handleVisualEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean,
-    hideBackgroundStyle?: HideBackgroundEffectTypes,
-    hideBackgroundColor?: string,
-    postProcessStyle?: PostProcessEffects
-  ) => Promise<void>;
   effectsDisabled: boolean;
   setEffectsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -64,13 +46,10 @@ export default function HideBackgroundButton({
   ) => Promise<void>;
   acceptColorCallback?: (color: string) => Promise<void>;
 }) {
-  const { userMedia } = useMediaContext();
-
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const [color, setColor] = useState("#F56114");
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
-  const [_, setRerender] = useState(0);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
   const hideBackgroundContainerRef = useRef<HTMLDivElement>(null);
   const colorRef = useRef("#F56114");
@@ -82,9 +61,8 @@ export default function HideBackgroundButton({
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
-    setRerender((prev) => prev + 1);
 
-    if (clickFunctionCallback) clickFunctionCallback();
+    if (clickFunctionCallback) await clickFunctionCallback();
 
     setEffectsDisabled(false);
   };

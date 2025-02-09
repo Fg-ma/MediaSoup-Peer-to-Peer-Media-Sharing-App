@@ -1,3 +1,4 @@
+import { UserMediaType } from "src/context/mediaContext/typeConstant";
 import {
   UserStreamEffectsType,
   ImageEffectTypes,
@@ -12,7 +13,9 @@ class LowerImageController {
     private setImageEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>
+    private tintColor: React.MutableRefObject<string>,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userMedia: React.MutableRefObject<UserMediaType>
   ) {}
 
   handleImageEffects = () => {
@@ -101,6 +104,12 @@ class LowerImageController {
       this.userStreamEffects.current.image[this.imageId][effect] =
         !this.userStreamEffects.current.image[this.imageId][effect];
     }
+
+    this.userMedia.current.image[this.imageId].changeEffects(
+      effect,
+      this.tintColor.current,
+      blockStateChange
+    );
   };
 }
 

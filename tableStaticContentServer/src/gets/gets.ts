@@ -1,13 +1,13 @@
 import { PassThrough, Readable } from "stream";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { tableTopCeph } from "../index";
-import { onGetImageType } from "../typeConstant";
+import { onGetFileType } from "../typeConstant";
 import Broadcaster from "../lib/Broadcaster";
 
 class Gets {
   constructor(private broadcaster: Broadcaster) {}
 
-  getImage = async (event: onGetImageType) => {
+  getFile = async (event: onGetFileType) => {
     const { table_id, username, instance } = event.header;
 
     const key = event.data.key;
@@ -32,7 +32,7 @@ class Gets {
 
       passThrough.on("end", () => {
         this.broadcaster.broadcastToInstance(table_id, username, instance, {
-          type: "imageDownloadComplete",
+          type: "downloadComplete",
         });
       });
     }

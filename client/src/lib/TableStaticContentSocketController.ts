@@ -8,6 +8,16 @@ import UserDevice from "./UserDevice";
 import VideoMedia from "./VideoMedia";
 import ImageMedia from "./ImageMedia";
 
+export type TableTopStaticMimeType =
+  | "image/jpeg"
+  | "image/png"
+  | "image/webp"
+  | "video/mp4"
+  | "video/mpeg"
+  | "image/gif"
+  | "application/pdf"
+  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
 type OutGoingTableStaticContentMessages =
   | onJoinTableType
   | onLeaveTableType
@@ -15,7 +25,7 @@ type OutGoingTableStaticContentMessages =
   | onRequestCatchUpContentDataType
   | onDeleteContentType
   | onCatchUpContentDataResponseType
-  | onGetImageType;
+  | onGetFileType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -107,8 +117,8 @@ type onCatchUpContentDataResponseType = {
       };
 };
 
-type onGetImageType = {
-  type: "getImage";
+type onGetFileType = {
+  type: "getFile";
   header: {
     table_id: string;
     username: string;
@@ -125,7 +135,7 @@ export type IncomingTableStaticContentMessages =
   | onDashVideoReadyType
   | onImageReadyType
   | onChunkType
-  | onImageDownloadCompleteType
+  | onDownloadCompleteType
   | onResponsedCatchUpTableDataType
   | onRequestedCatchUpContentDataType
   | onContentDeletedType
@@ -139,6 +149,7 @@ export type onOriginalVideoReadyType = {
   data: {
     filename: string;
     url: string;
+    mimeType: TableTopStaticMimeType;
   };
 };
 
@@ -161,6 +172,7 @@ export type onImageReadyType = {
   data: {
     filename: string;
     url: string;
+    mimeType: TableTopStaticMimeType;
   };
 };
 
@@ -171,8 +183,8 @@ export type onChunkType = {
   };
 };
 
-export type onImageDownloadCompleteType = {
-  type: "imageDownloadComplete";
+export type onDownloadCompleteType = {
+  type: "downloadComplete";
 };
 
 export type onResponsedCatchUpTableDataType = {
@@ -182,6 +194,7 @@ export type onResponsedCatchUpTableDataType = {
       [contentId: string]: {
         url?: string;
         dashURL?: string;
+        mimeType?: TableTopStaticMimeType;
       };
     };
   };
@@ -352,9 +365,9 @@ class TableStaticContentSocketController {
     });
   };
 
-  getImage = (key: string) => {
+  getFile = (key: string) => {
     this.sendMessage({
-      type: "getImage",
+      type: "getFile",
       header: {
         table_id: this.table_id,
         username: this.username,
@@ -462,30 +475,38 @@ class TableStaticContentSocketController {
           tableContent[contentType as TableContentTypes]?.[contentId];
         if (tableContentData) {
           if (contentType === "video") {
-            if (tableContentData.url) {
+            if (tableContentData.url && tableContentData.mimeType) {
               this.userMedia.current.video[contentId] = new VideoMedia(
                 contentId,
                 this.getFilename(tableContentData.url),
+                tableContentData.mimeType,
                 tableContentData.url,
                 this.userDevice,
                 this.deadbanding,
                 this.userEffectsStyles,
                 this.userStreamEffects,
                 this.userMedia,
+                this.getFile,
+                this.addMessageListener,
+                this.removeMessageListener,
                 tableContentData.dashURL
               );
             }
           } else if (contentType === "image") {
-            if (tableContentData.url) {
+            if (tableContentData.url && tableContentData.mimeType) {
               this.userMedia.current.image[contentId] = new ImageMedia(
                 contentId,
                 this.getFilename(tableContentData.url),
+                tableContentData.mimeType,
                 tableContentData.url,
                 this.userEffectsStyles,
                 this.userStreamEffects,
-                this.getImage,
+                this.getFile,
                 this.addMessageListener,
-                this.removeMessageListener
+                this.removeMessageListener,
+                this.userDevice,
+                this.deadbanding,
+                this.userMedia
               );
             }
           }

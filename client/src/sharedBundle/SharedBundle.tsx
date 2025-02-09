@@ -75,17 +75,23 @@ export default function SharedBundle({
       case "originalVideoReady":
         {
           const { videoId } = message.header;
-          const { filename, url } = message.data;
-          userMedia.current.video[videoId] = new VideoMedia(
-            videoId,
-            filename,
-            url,
-            userDevice,
-            deadbanding,
-            userEffectsStyles,
-            userStreamEffects,
-            userMedia
-          );
+          const { filename, url, mimeType } = message.data;
+          if (tableStaticContentSocket.current) {
+            userMedia.current.video[videoId] = new VideoMedia(
+              videoId,
+              filename,
+              mimeType,
+              url,
+              userDevice,
+              deadbanding,
+              userEffectsStyles,
+              userStreamEffects,
+              userMedia,
+              tableStaticContentSocket.current.getFile,
+              tableStaticContentSocket.current.addMessageListener,
+              tableStaticContentSocket.current.removeMessageListener
+            );
+          }
           setRerender((prev) => !prev);
         }
         break;
@@ -99,17 +105,22 @@ export default function SharedBundle({
       case "imageReady":
         {
           const { imageId } = message.header;
-          const { filename, url } = message.data;
+          const { filename, url, mimeType } = message.data;
+          console.log(url);
           if (tableStaticContentSocket.current) {
             userMedia.current.image[imageId] = new ImageMedia(
               imageId,
               filename,
+              mimeType,
               url,
               userEffectsStyles,
               userStreamEffects,
-              tableStaticContentSocket.current.getImage,
+              tableStaticContentSocket.current.getFile,
               tableStaticContentSocket.current.addMessageListener,
-              tableStaticContentSocket.current.removeMessageListener
+              tableStaticContentSocket.current.removeMessageListener,
+              userDevice,
+              deadbanding,
+              userMedia
             );
           }
           setRerender((prev) => !prev);
@@ -150,7 +161,7 @@ export default function SharedBundle({
           <Suspense key={videoId} fallback={<div>Loading...</div>}>
             <FgVideo
               videoId={videoId}
-              sharedBundleRef={sharedBundleRef}
+              bundleRef={sharedBundleRef}
               videoContentMute={videoContentMute}
             />
           </Suspense>

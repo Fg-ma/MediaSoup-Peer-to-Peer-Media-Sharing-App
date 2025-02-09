@@ -361,6 +361,10 @@ export type ImageEffectStylesType = {
   postProcess: {
     style: PostProcessEffects;
   };
+  hideBackground: {
+    style: HideBackgroundEffectTypes;
+    color: string;
+  };
   glasses: {
     style: GlassesEffectTypes;
   };
@@ -620,6 +624,10 @@ export const defaultVideoEffectsStyles: VideoEffectStylesType = Object.freeze({
   postProcess: Object.freeze({
     style: defaultPostProcess,
   }),
+  hideBackground: Object.freeze({
+    style: defaultHideBackground,
+    color: defaultHideBackgroundColor,
+  }),
   glasses: Object.freeze({
     style: defaultGlasses,
   }),
@@ -649,6 +657,10 @@ export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
   }),
   postProcess: Object.freeze({
     style: defaultPostProcess,
+  }),
+  hideBackground: Object.freeze({
+    style: defaultHideBackground,
+    color: defaultHideBackgroundColor,
   }),
   glasses: Object.freeze({
     style: defaultGlasses,

@@ -229,7 +229,7 @@ export default function FgMediaContainer({
       )}
       <div
         ref={subContainerRef}
-        className='flex relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
+        className='flex sub-media-container relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
         {media && media}
         <UpperControls

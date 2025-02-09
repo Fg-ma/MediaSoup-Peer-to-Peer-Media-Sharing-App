@@ -3,7 +3,7 @@ import {
   NormalizedLandmarkList,
   NormalizedLandmarkListList,
 } from "@mediapipe/face_mesh";
-import Deadbanding from "./Deadbanding";
+import Deadbanding, { DeadbandingMediaTypes } from "./Deadbanding";
 import SmoothLandmarksUtils from "./SmoothLandmarksUtils";
 import { Point2D } from "./typeContant";
 
@@ -93,8 +93,13 @@ class FaceLandmarks {
   // Face tracking
   private faceTrackers: Point2D[] = [{ x: 0, y: 0 }];
 
-  constructor(private id: string, private deadbanding: Deadbanding) {
+  constructor(
+    private type: DeadbandingMediaTypes,
+    private id: string,
+    private deadbanding: Deadbanding
+  ) {
     this.smoothLandmarksUtils = new SmoothLandmarksUtils(
+      this.type,
       this.id,
       this.calculatedLandmarks,
       this.deadbanding

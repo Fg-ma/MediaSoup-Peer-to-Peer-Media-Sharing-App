@@ -5,7 +5,7 @@ import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
-import FgLowerVideoController from "../LowerVideoController";
+import LowerVideoController from "../LowerVideoController";
 import { Settings } from "../../../typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -45,7 +45,7 @@ const voskModels: { [model: string]: string } = {
 };
 
 export default function CaptionButton({
-  fgLowerVideoController,
+  lowerVideoController,
   videoEffectsActive,
   settingsActive,
   settings,
@@ -54,7 +54,7 @@ export default function CaptionButton({
   scrollingContainerRef,
   containerRef,
 }: {
-  fgLowerVideoController: FgLowerVideoController;
+  lowerVideoController: LowerVideoController;
   videoEffectsActive: boolean;
   settingsActive: boolean;
   settings: Settings;
@@ -108,9 +108,9 @@ export default function CaptionButton({
 
           setActive((prev) => !prev);
 
-          fgLowerVideoController.handleClosedCaptions();
+          lowerVideoController.handleClosedCaptions();
 
-          fgLowerVideoController.updateCaptionsStyles();
+          lowerVideoController.updateCaptionsStyles();
         }}
         contentFunction={() => {
           return (

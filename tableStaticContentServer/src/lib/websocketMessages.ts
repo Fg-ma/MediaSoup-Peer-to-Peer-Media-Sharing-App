@@ -24,8 +24,8 @@ const handleMessage = (
     case "catchUpContentDataResponse":
       metadataController.onCatchUpContentDataResponse(event);
       break;
-    case "getImage":
-      gets.getImage(event);
+    case "getFile":
+      gets.getFile(event);
       break;
     default:
       break;

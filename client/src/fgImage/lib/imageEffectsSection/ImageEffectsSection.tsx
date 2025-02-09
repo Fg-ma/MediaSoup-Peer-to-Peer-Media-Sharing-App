@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
+import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import LowerImageController from "../lowerImageControls/LowerImageController";
 import BabylonPostProcessEffectsButton from "../../../fgElements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../fgElements/effectsButtons/BlurButton";
@@ -11,6 +12,7 @@ import MustachesButton from "../../../fgElements/effectsButtons/MustachesButton"
 import MasksButton from "../../../fgElements/effectsButtons/MasksButton";
 import HatsButton from "../../../fgElements/effectsButtons/HatsButton";
 import PetsButton from "../../../fgElements/effectsButtons/PetsButton";
+import HideBackgroundButton from "../../../fgElements/effectsButtons/HideBackgroundButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -42,6 +44,7 @@ export default function ImageEffectsSection({
   tintColor: React.MutableRefObject<string>;
 }) {
   const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+  const { userMedia } = useMediaContext();
 
   const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
@@ -109,16 +112,88 @@ export default function ImageEffectsSection({
         streamEffects={userStreamEffects.current.image[imageId].postProcess}
         effectsStyles={userEffectsStyles.current.image[imageId].postProcess}
         clickFunctionCallback={async () => {
+          userMedia.current.image[
+            imageId
+          ].babylonScene?.babylonShaderController.swapPostProcessEffects(
+            userEffectsStyles.current.image[imageId].postProcess.style
+          );
+
           await lowerImageController.handleImageEffect("postProcess", false);
         }}
         holdFunctionCallback={async (effectType) => {
           userEffectsStyles.current.image[imageId].postProcess.style =
             effectType;
 
+          userMedia.current.image[
+            imageId
+          ].babylonScene?.babylonShaderController.swapPostProcessEffects(
+            effectType
+          );
+
           await lowerImageController.handleImageEffect(
             "postProcess",
             userStreamEffects.current.image[imageId].postProcess
           );
+        }}
+      />
+      <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
+      <HideBackgroundButton
+        effectsDisabled={effectsDisabled}
+        setEffectsDisabled={setEffectsDisabled}
+        scrollingContainerRef={effectsContainerRef}
+        streamEffects={userStreamEffects.current.image[imageId].hideBackground}
+        effectsStyles={userEffectsStyles.current.image[imageId].hideBackground}
+        clickFunctionCallback={async () => {
+          const effectsStyles =
+            userEffectsStyles.current.image[imageId].hideBackground;
+
+          userMedia.current.image[
+            imageId
+          ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+            effectsStyles.style
+          );
+
+          await lowerImageController.handleImageEffect("hideBackground", false);
+        }}
+        holdFunctionCallback={async (effectType) => {
+          const effectsStyles =
+            userEffectsStyles.current.image[imageId].hideBackground;
+          const streamEffects =
+            userStreamEffects.current.image[imageId].hideBackground;
+
+          effectsStyles.style = effectType;
+          userMedia.current.image[
+            imageId
+          ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+            effectType
+          );
+
+          await lowerImageController.handleImageEffect(
+            "hideBackground",
+            streamEffects
+          );
+        }}
+        acceptColorCallback={async (color) => {
+          const effectsStyles =
+            userEffectsStyles.current.image[imageId].hideBackground;
+          const streamEffects =
+            userStreamEffects.current.image[imageId].hideBackground;
+
+          userMedia.current.image[
+            imageId
+          ].babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+            color
+          );
+
+          if (effectsStyles.style !== "color" || !streamEffects) {
+            effectsStyles.style = "color";
+            effectsStyles.color = color;
+
+            await lowerImageController.handleImageEffect(
+              "hideBackground",
+              streamEffects
+            );
+          }
         }}
       />
       <div className='bg-white h-10 rounded-full w-0.25 min-w-0.25'></div>
@@ -139,10 +214,10 @@ export default function ImageEffectsSection({
         scrollingContainerRef={effectsContainerRef}
         streamEffects={userStreamEffects.current.image[imageId].tint}
         clickFunctionCallback={async () => {
-          await lowerImageController.handleImageEffect("beards", false);
+          await lowerImageController.handleImageEffect("tint", false);
         }}
-        acceptColorCallback={() => {
-          lowerImageController.handleImageEffect(
+        acceptColorCallback={async () => {
+          await lowerImageController.handleImageEffect(
             "tint",
             userStreamEffects.current.image[imageId].tint
           );

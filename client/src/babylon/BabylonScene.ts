@@ -16,6 +16,7 @@ import {
   Layer,
   DynamicTexture,
   Material,
+  Texture,
 } from "@babylonjs/core";
 import "@babylonjs/inspector";
 import {
@@ -64,9 +65,9 @@ class BabylonScene {
   private ambientLightThreeDimMeshes: HemisphericLight | undefined;
   private ambientLightTwoDimMeshes: HemisphericLight | undefined;
 
-  private videoPlane: Mesh | undefined;
-  private videoTexture: VideoTexture | undefined;
-  private videoMaterial: StandardMaterial | undefined;
+  private backgroundMediaPlane: Mesh | undefined;
+  private backgroundMediaTexture: VideoTexture | Texture | undefined;
+  private backgroundMediaMaterial: StandardMaterial | undefined;
 
   private hideBackgroundPlane: Mesh | undefined;
   private hideBackgroundTexture: DynamicTexture | undefined;
@@ -90,11 +91,13 @@ class BabylonScene {
   twoDimMeshesZCoord = 90;
   threeDimMeshesZCoord = 100;
 
+  imageAlreadyProcessed = 1;
+
   constructor(
     private id: string,
-    private type: "camera" | "screen",
+    private type: "camera" | "screen" | "image",
     private canvas: HTMLCanvasElement,
-    private video: HTMLVideoElement,
+    private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private faceLandmarks: FaceLandmarks | undefined,
     private effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
@@ -125,7 +128,7 @@ class BabylonScene {
 
     this.initCamera();
     this.initLighting();
-    this.initVideoPlane();
+    this.initBackgroundMediaPlane();
     this.initHideBackgroundPlane();
     this.initTintPlane();
 
@@ -141,11 +144,12 @@ class BabylonScene {
 
     this.babylonRenderLoop = new BabylonRenderLoop(
       this.id,
+      this.type,
       this.scene,
       this.camera,
       this.faceLandmarks,
       this.canvas,
-      this.video,
+      this.backgroundMedia,
       this.effects,
       this.userEffectsStyles,
       this.faceMeshWorker,
@@ -170,8 +174,20 @@ class BabylonScene {
 
     // Render loop
     this.engine.runRenderLoop(() => {
-      this.babylonRenderLoop.renderLoop();
+      if (
+        !(
+          this.backgroundMedia instanceof HTMLImageElement &&
+          this.imageAlreadyProcessed > 20
+        )
+      ) {
+        if (this.imageAlreadyProcessed <= 20) {
+          this.imageAlreadyProcessed += 1;
+        }
+
+        this.babylonRenderLoop.renderLoop();
+      }
       this.babylonShaderController.renderLoop();
+
       this.scene.render();
     });
 
@@ -249,26 +265,32 @@ class BabylonScene {
     plane.position = new Vector3(0, 0, backgroundDistance);
   };
 
-  private initVideoPlane = () => {
-    this.videoTexture = new VideoTexture(
-      "videoTexture",
-      this.video,
-      this.scene
-    );
+  private initBackgroundMediaPlane = () => {
+    this.backgroundMediaTexture =
+      this.backgroundMedia instanceof HTMLVideoElement
+        ? new VideoTexture(
+            "backgroundMediaTexture",
+            this.backgroundMedia,
+            this.scene
+          )
+        : new Texture(this.backgroundMedia.src, this.scene);
 
-    this.videoPlane = MeshBuilder.CreatePlane(
-      "videoPlane",
+    this.backgroundMediaPlane = MeshBuilder.CreatePlane(
+      "backgroundMediaPlane",
       { width: 1, height: 1 },
       this.scene
     );
-    this.videoMaterial = new StandardMaterial("videoMaterial", this.scene);
-    this.videoMaterial.diffuseTexture = this.videoTexture;
-    this.videoPlane.material = this.videoMaterial;
+    this.backgroundMediaMaterial = new StandardMaterial(
+      "backgroundMediaMaterial",
+      this.scene
+    );
+    this.backgroundMediaMaterial.diffuseTexture = this.backgroundMediaTexture;
+    this.backgroundMediaPlane.material = this.backgroundMediaMaterial;
 
-    this.updateBackgroundPlaneSize(this.videoPlane);
+    this.updateBackgroundPlaneSize(this.backgroundMediaPlane);
 
     if (this.backgroundLight) {
-      this.backgroundLight.includedOnlyMeshes.push(this.videoPlane);
+      this.backgroundLight.includedOnlyMeshes.push(this.backgroundMediaPlane);
     }
   };
 
@@ -350,8 +372,8 @@ class BabylonScene {
 
   private canvasSizeChange = () => {
     this.engine.resize();
-    if (this.videoPlane) {
-      this.updateBackgroundPlaneSize(this.videoPlane);
+    if (this.backgroundMediaPlane) {
+      this.updateBackgroundPlaneSize(this.backgroundMediaPlane);
     }
     if (this.hideBackgroundPlane) {
       this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.000001);

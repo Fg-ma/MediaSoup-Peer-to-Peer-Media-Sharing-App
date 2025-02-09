@@ -16,10 +16,10 @@ import VideoEffectsSection from "./lib/videoEffectsSection/VideoEffectsSection";
 import FullScreenButton from "./lib/lowerVideoControls/lib/fullScreenButton/FullScreenButton";
 import VideoEffectsButton from "./lib/lowerVideoControls/lib/videoEffectsButton/VideoEffectsButton";
 import PlayPauseButton from "./lib/lowerVideoControls/lib/playPauseButton/PlayPauseButton";
-
-const VideoAdjustmentButtons = React.lazy(
-  () => import("./lib/VideoAdjustmentButtons")
-);
+import PictureInPictureButton from "./lib/lowerVideoControls/lib/pictureInPictureButton/PictureInPictureButton";
+import CaptionButton from "./lib/lowerVideoControls/lib/captionsButton/CaptionButton";
+import SettingsButton from "./lib/lowerVideoControls/lib/settingsButton/SettingsButton";
+import { ActivePages } from "./lib/lowerVideoControls/LowerVideoControls";
 
 export default function FgVideo({
   videoId,
@@ -41,9 +41,9 @@ export default function FgVideo({
     ...options,
   };
 
-  const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
+  const { userMedia } = useMediaContext();
   const { userStreamEffects } = useEffectsContext();
-  const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
+  const { tableStaticContentSocket } = useSocketContext();
   const { table_id } = useUserInfoContext();
 
   const videoMedia = userMedia.current.video[videoId];
@@ -71,6 +71,7 @@ export default function FgVideo({
 
   const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
+  const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>({
     closedCaption: {
       value: "en-US",
@@ -83,6 +84,21 @@ export default function FgVideo({
         backgroundColor: { value: "black" },
         backgroundOpacity: { value: "75%" },
         characterEdgeStyle: { value: "None" },
+      },
+    },
+  });
+  const [activePages, setActivePages] = useState<ActivePages>({
+    closedCaption: {
+      active: false,
+      closedCaptionOptionsActive: {
+        active: false,
+        fontFamily: { active: false },
+        fontColor: { active: false },
+        fontOpacity: { active: false },
+        fontSize: { active: false },
+        backgroundColor: { active: false },
+        backgroundOpacity: { active: false },
+        characterEdgeStyle: { active: false },
       },
     },
   });
@@ -108,12 +124,9 @@ export default function FgVideo({
   });
 
   const lowerVideoController = new LowerVideoController(
-    tableStaticContentSocket,
     videoId,
-    bundleRef,
     videoMedia,
     videoContainerRef,
-    panBtnRef,
     setPausedState,
     shiftPressed,
     controlPressed,
@@ -126,9 +139,7 @@ export default function FgVideo({
     tintColor,
     userStreamEffects,
     userMedia,
-    initTimeOffset,
-    fgContentAdjustmentController,
-    positioning
+    initTimeOffset
   );
 
   const videoController = new VideoController(
@@ -285,23 +296,22 @@ export default function FgVideo({
           scrollingContainerRef={rightLowerVideoControlsRef}
         />,
         <PictureInPictureButton
-          fgLowerVideoController={fgLowerVideoController}
+          lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
           settingsActive={settingsActive}
-          scrollingContainerRef={rightVideoControlsRef}
+          scrollingContainerRef={rightLowerVideoControlsRef}
         />,
         <CaptionButton
-          fgLowerVideoController={fgLowerVideoController}
+          lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
           settingsActive={settingsActive}
           settings={settings}
           audioStream={videoMedia.getAudioTrack()}
           videoContainerRef={videoContainerRef}
-          scrollingContainerRef={rightVideoControlsRef}
+          scrollingContainerRef={rightLowerVideoControlsRef}
           containerRef={subContainerRef}
         />,
-        <FgSettingsButton
-          fgVideoOptions={fgVideoOptions}
+        <SettingsButton
           videoEffectsActive={videoEffectsActive}
           videoContainerRef={videoContainerRef}
           settingsActive={settingsActive}
@@ -310,40 +320,41 @@ export default function FgVideo({
           setActivePages={setActivePages}
           settings={settings}
           setSettings={setSettings}
-          scrollingContainerRef={rightVideoControlsRef}
+          scrollingContainerRef={rightLowerVideoControlsRef}
         />,
         <VideoEffectsButton
           lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
           scrollingContainerRef={rightLowerVideoControlsRef}
+          settingsActive={settingsActive}
         />,
-        <AudioEffectsButton
-          table_id={table_id.current}
-          username={username.current}
-          instance={instance.current}
-          isUser={false}
-          permissions={undefined}
-          producerType={"video"}
-          producerId={videoId}
-          audioEffectsActive={audioEffectsActive}
-          setAudioEffectsActive={setAudioEffectsActive}
-          visualMediaContainerRef={videoContainerRef}
-          handleAudioEffectChange={handleAudioEffectChange}
-          handleMute={handleMute}
-          videoContentMute={videoContentMute}
-          closeLabelElement={
-            <FgHoverContentStandard content='Close (x)' style='dark' />
-          }
-          hoverLabelElement={
-            <FgHoverContentStandard content='Audio effects (a)' style='dark' />
-          }
-          scrollingContainerRef={rightVideoControlsRef}
-          style={{ transform: "scaleX(-1)" }}
-          options={{
-            backgroundColor: "rgba(10, 10, 10, 1)",
-            secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
-          }}
-        />,
+        // <AudioEffectsButton
+        //   table_id={table_id.current}
+        //   username={username.current}
+        //   instance={instance.current}
+        //   isUser={false}
+        //   permissions={undefined}
+        //   producerType={"video"}
+        //   producerId={videoId}
+        //   audioEffectsActive={audioEffectsActive}
+        //   setAudioEffectsActive={setAudioEffectsActive}
+        //   visualMediaContainerRef={videoContainerRef}
+        //   handleAudioEffectChange={handleAudioEffectChange}
+        //   handleMute={handleMute}
+        //   videoContentMute={videoContentMute}
+        //   closeLabelElement={
+        //     <FgHoverContentStandard content='Close (x)' style='dark' />
+        //   }
+        //   hoverLabelElement={
+        //     <FgHoverContentStandard content='Audio effects (a)' style='dark' />
+        //   }
+        //   scrollingContainerRef={rightLowerVideoControlsRef}
+        //   style={{ transform: "scaleX(-1)" }}
+        //   options={{
+        //     backgroundColor: "rgba(10, 10, 10, 1)",
+        //     secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
+        //   }}
+        // />,
       ]}
       inMediaVariables={[videoEffectsActive, pausedState]}
       externalPositioning={positioning}

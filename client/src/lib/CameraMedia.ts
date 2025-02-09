@@ -65,7 +65,11 @@ class CameraMedia {
       );
     }
 
-    this.faceLandmarks = new FaceLandmarks(this.cameraId, this.deadbanding);
+    this.faceLandmarks = new FaceLandmarks(
+      "camera",
+      this.cameraId,
+      this.deadbanding
+    );
 
     this.faceMeshWorker = new Worker(
       new URL("./../webWorkers/faceMeshWebWorker.worker", import.meta.url),
@@ -309,7 +313,7 @@ class CameraMedia {
         }
       }
     }
-    this.deadbanding.update(this.cameraId, this.effects);
+    this.deadbanding.update("camera", this.cameraId, this.effects);
 
     if (tintColor) {
       this.setTintColor(tintColor);
