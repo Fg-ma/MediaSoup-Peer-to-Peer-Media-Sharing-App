@@ -42,7 +42,7 @@ class BabylonRenderLoop {
 
   constructor(
     private id: string,
-    private type: "camera" | "screen" | "image",
+    private type: "camera" | "screen" | "image" | "video",
     private scene: Scene,
     private camera: UniversalCamera,
     private faceLandmarks: FaceLandmarks | undefined,
@@ -76,7 +76,7 @@ class BabylonRenderLoop {
     this.offscreenCanvas.width = 320;
     this.offscreenCanvas.height = 180;
 
-    this.lastFaceCountCheck = performance.now();
+    this.lastFaceCountCheck = 0;
 
     this.hideBackgroundEffectImage = new Image();
     this.hideBackgroundEffectImage.crossOrigin = "anonymous";
@@ -91,6 +91,11 @@ class BabylonRenderLoop {
     this.hideBackgroundOffscreenCanvas.height = 180;
 
     this.hideBackgroundCanvas = document.createElement("canvas");
+    if (this.backgroundMedia instanceof HTMLImageElement) {
+      this.hideBackgroundCanvas.width = this.canvas.width;
+      this.hideBackgroundCanvas.height = this.canvas.height;
+    }
+
     this.hideBackgroundCtx = this.hideBackgroundCanvas.getContext("2d", {
       alpha: true,
       willReadFrequently: true,
@@ -101,6 +106,10 @@ class BabylonRenderLoop {
       "2d",
       { alpha: true, willReadFrequently: true }
     );
+
+    setTimeout(() => {
+      this.detectFaces();
+    }, 1000);
   }
 
   renderLoop = () => {
@@ -313,20 +322,6 @@ class BabylonRenderLoop {
       !this.selfieSegmentationResults[0]
     ) {
       return;
-    }
-
-    if (
-      this.hideBackgroundCanvas.width === 0 ||
-      this.hideBackgroundCanvas.height === 0
-    ) {
-      this.hideBackgroundCanvas.width =
-        this.backgroundMedia instanceof HTMLVideoElement
-          ? this.backgroundMedia.videoWidth
-          : this.backgroundMedia.clientWidth;
-      this.hideBackgroundCanvas.height =
-        this.backgroundMedia instanceof HTMLVideoElement
-          ? this.backgroundMedia.videoHeight
-          : this.backgroundMedia.clientHeight;
     }
 
     this.hideBackgroundCtx.clearRect(

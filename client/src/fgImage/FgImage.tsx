@@ -131,6 +131,7 @@ export default function FgImage({
             imageContainerRef={imageContainerRef}
             lowerImageController={lowerImageController}
             tintColor={tintColor}
+            imageMedia={imageMedia}
           />
         ) : null,
       ]}

@@ -258,7 +258,7 @@ export type onCatchUpContentDataRespondedType = {
 class TableStaticContentSocketController {
   private ws: WebSocket | undefined;
   private messageListeners: Set<
-    (message: IncomingTableStaticContentMessages, event: MessageEvent) => void
+    (message: IncomingTableStaticContentMessages) => void
   > = new Set();
 
   constructor(
@@ -301,7 +301,7 @@ class TableStaticContentSocketController {
       this.handleMessage(message);
 
       this.messageListeners.forEach((listener) => {
-        listener(message, event);
+        listener(message);
       });
     };
 
@@ -320,19 +320,13 @@ class TableStaticContentSocketController {
   };
 
   addMessageListener = (
-    listener: (
-      message: IncomingTableStaticContentMessages,
-      event: MessageEvent
-    ) => void
+    listener: (message: IncomingTableStaticContentMessages) => void
   ): void => {
     this.messageListeners.add(listener);
   };
 
   removeMessageListener = (
-    listener: (
-      message: IncomingTableStaticContentMessages,
-      event: MessageEvent
-    ) => void
+    listener: (message: IncomingTableStaticContentMessages) => void
   ): void => {
     this.messageListeners.delete(listener);
   };

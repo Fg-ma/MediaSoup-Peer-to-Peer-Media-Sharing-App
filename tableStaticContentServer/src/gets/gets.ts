@@ -9,32 +9,34 @@ class Gets {
 
   getFile = async (event: onGetFileType) => {
     const { table_id, username, instance } = event.header;
-
     const key = event.data.key;
 
-    if (!key) {
-      return;
-    }
+    if (!key) return;
 
-    const params = { Bucket: "mybucket", Key: key };
-    const data = await tableTopCeph.s3Client.send(new GetObjectCommand(params));
+    try {
+      const params = { Bucket: "mybucket", Key: key };
+      const data = await tableTopCeph.s3Client.send(
+        new GetObjectCommand(params)
+      );
 
-    if (data.Body) {
-      const passThrough = new PassThrough();
-      (data.Body as Readable).pipe(passThrough);
-
-      passThrough.on("data", (chunk) => {
-        this.broadcaster.broadcastToInstance(table_id, username, instance, {
-          type: "chunk",
-          data: { chunk },
-        });
-      });
-
-      passThrough.on("end", () => {
-        this.broadcaster.broadcastToInstance(table_id, username, instance, {
-          type: "downloadComplete",
-        });
-      });
+      if (data.Body && data.Body instanceof Readable) {
+        data.Body.on("data", (chunk) => {
+          this.broadcaster.broadcastToInstance(table_id, username, instance, {
+            type: "chunk",
+            data: { chunk },
+          });
+        })
+          .on("end", () => {
+            this.broadcaster.broadcastToInstance(table_id, username, instance, {
+              type: "downloadComplete",
+            });
+          })
+          .on("error", (err) => {
+            console.error("Error during file streaming:", err);
+          });
+      }
+    } catch (err) {
+      console.error("Error fetching file from S3:", err);
     }
   };
 }

@@ -155,10 +155,10 @@ export default function FgVideo({
   );
 
   useEffect(() => {
-    subContainerRef.current?.appendChild(videoMedia.video);
-    if (videoMedia.hiddenVideo) {
-      subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
-    }
+    subContainerRef.current?.appendChild(videoMedia.canvas);
+    // if (videoMedia.hiddenVideo) {
+    //   subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
+    // }
 
     videoController.scaleCallback();
 
@@ -275,6 +275,7 @@ export default function FgVideo({
             videoContainerRef={videoContainerRef}
             lowerVideoController={lowerVideoController}
             tintColor={tintColor}
+            videoMedia={videoMedia}
           />
         ) : null,
       ]}

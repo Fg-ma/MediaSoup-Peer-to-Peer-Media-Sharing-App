@@ -28,7 +28,8 @@ class ImageMedia {
   mimeType: TableTopStaticMimeType;
   imageURL: string;
 
-  private fileChunks: Buffer[] = [];
+  private fileChunks: Uint8Array[] = [];
+  private totalSize = 0;
 
   babylonScene: BabylonScene | undefined;
 
@@ -37,6 +38,7 @@ class ImageMedia {
   } = {};
 
   private maxFaces: [number] = [1];
+  detectedFaces: number = 0;
 
   private faceLandmarks: FaceLandmarks;
 
@@ -58,16 +60,10 @@ class ImageMedia {
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private getImage: (key: string) => void,
     private addMessageListener: (
-      listener: (
-        message: IncomingTableStaticContentMessages,
-        event: MessageEvent
-      ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
     private removeMessageListener: (
-      listener: (
-        message: IncomingTableStaticContentMessages,
-        event: MessageEvent
-      ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
@@ -143,6 +139,7 @@ class ImageMedia {
         case "FACES_DETECTED": {
           this.faceDetectionProcessing[0] = false;
           const detectedFaces = event.data.numFacesDetected;
+          this.detectedFaces = detectedFaces === undefined ? 0 : detectedFaces;
           if (detectedFaces !== this.maxFaces[0]) {
             this.maxFaces[0] = detectedFaces;
 
@@ -259,18 +256,24 @@ class ImageMedia {
     this.image.src = "";
   }
 
-  private getImageListener = (
-    message: IncomingTableStaticContentMessages,
-    event: MessageEvent
-  ) => {
-    if (message.type === "downloadComplete") {
-      const mergedBuffer = Buffer.concat(this.fileChunks);
-      const blob = new Blob([new Uint8Array(mergedBuffer)], {
-        type: this.mimeType,
-      });
+  private getImageListener = (message: IncomingTableStaticContentMessages) => {
+    if (message.type === "chunk") {
+      const chunkData = new Uint8Array(message.data.chunk.data);
+      this.fileChunks.push(chunkData);
+      this.totalSize += chunkData.length;
+    } else if (message.type === "downloadComplete") {
+      const mergedBuffer = new Uint8Array(this.totalSize);
+      let offset = 0;
 
+      for (const chunk of this.fileChunks) {
+        mergedBuffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      const blob = new Blob([mergedBuffer], { type: this.mimeType });
       const url = URL.createObjectURL(blob);
       this.image.src = url;
+
       this.babylonScene = new BabylonScene(
         this.imageId,
         "image",
@@ -291,10 +294,8 @@ class ImageMedia {
         this.maxFaces,
         this.userMedia
       );
+
       this.removeMessageListener(this.getImageListener);
-    } else if (message.type === "chunk") {
-      const chunkData = Buffer.from(message.data.chunk.data);
-      this.fileChunks.push(chunkData);
     }
   };
 

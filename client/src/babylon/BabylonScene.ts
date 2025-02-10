@@ -17,6 +17,7 @@ import {
   DynamicTexture,
   Material,
   Texture,
+  Color4,
 } from "@babylonjs/core";
 import "@babylonjs/inspector";
 import {
@@ -61,6 +62,8 @@ class BabylonScene {
   scene: Scene;
   private camera: UniversalCamera;
 
+  private resizeObserver: ResizeObserver;
+
   private backgroundLight: HemisphericLight | undefined;
   private ambientLightThreeDimMeshes: HemisphericLight | undefined;
   private ambientLightTwoDimMeshes: HemisphericLight | undefined;
@@ -95,7 +98,7 @@ class BabylonScene {
 
   constructor(
     private id: string,
-    private type: "camera" | "screen" | "image",
+    private type: "camera" | "screen" | "image" | "video",
     private canvas: HTMLCanvasElement,
     private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private faceLandmarks: FaceLandmarks | undefined,
@@ -118,6 +121,8 @@ class BabylonScene {
     this.engine = new Engine(this.canvas, true);
 
     this.scene = new Scene(this.engine);
+
+    this.scene.clearColor = new Color4(0, 0, 0, 1);
 
     this.camera = new UniversalCamera(
       "camera",
@@ -173,26 +178,17 @@ class BabylonScene {
     );
 
     // Render loop
-    this.engine.runRenderLoop(() => {
-      if (
-        !(
-          this.backgroundMedia instanceof HTMLImageElement &&
-          this.imageAlreadyProcessed > 20
-        )
-      ) {
-        if (this.imageAlreadyProcessed <= 20) {
-          this.imageAlreadyProcessed += 1;
-        }
-
-        this.babylonRenderLoop.renderLoop();
-      }
-      this.babylonShaderController.renderLoop();
-
-      this.scene.render();
-    });
+    this.engine.runRenderLoop(this.engineRenderLoop);
 
     window.addEventListener("resize", this.canvasSizeChange);
     window.addEventListener("fullscreenchange", this.canvasSizeChange);
+
+    this.resizeObserver = new ResizeObserver(this.canvasSizeChange);
+    this.resizeObserver.observe(this.canvas);
+
+    setTimeout(() => {
+      this.canvasSizeChange();
+    }, 1000);
   }
 
   deconstructor = () => {
@@ -201,6 +197,26 @@ class BabylonScene {
 
     window.removeEventListener("resize", this.canvasSizeChange);
     window.removeEventListener("fullscreenchange", this.canvasSizeChange);
+
+    this.resizeObserver.disconnect();
+  };
+
+  private engineRenderLoop = () => {
+    if (
+      !(
+        this.backgroundMedia instanceof HTMLImageElement &&
+        this.imageAlreadyProcessed > 20
+      )
+    ) {
+      if (this.imageAlreadyProcessed <= 20) {
+        this.imageAlreadyProcessed += 1;
+      }
+
+      this.babylonRenderLoop.renderLoop();
+    }
+    this.babylonShaderController.renderLoop();
+
+    this.scene.render();
   };
 
   private initCamera = () => {
@@ -246,20 +262,36 @@ class BabylonScene {
   private updateBackgroundPlaneSize = (plane: Mesh, zOffset?: number) => {
     const backgroundDistance = this.camera.maxZ - (zOffset ?? 0);
 
-    // Calculate the plane's height based on FOV and distance
     const verticalFOV = this.camera.fov;
     const planeHeight = 2 * Math.tan(verticalFOV / 2) * backgroundDistance;
 
     const canvas = this.engine.getRenderingCanvas();
     if (!canvas) return;
 
-    const aspectRatio = canvas.width / canvas.height;
-    const planeWidth = planeHeight * aspectRatio;
+    const canvasAspect = canvas.width / canvas.height;
+    const mediaAspect =
+      this.backgroundMedia instanceof HTMLVideoElement
+        ? this.backgroundMedia.videoWidth / this.backgroundMedia.videoHeight
+        : this.backgroundMedia.width / this.backgroundMedia.height;
 
-    // Update the plane's scaling and position
+    let planeWidth: number;
+    let planeScaledHeight: number;
+
+    // Compute dimensions based on `object-fit: contain`
+    if (canvasAspect > mediaAspect) {
+      // Fit by height
+      planeScaledHeight = planeHeight;
+      planeWidth = planeHeight * mediaAspect;
+    } else {
+      // Fit by width
+      planeWidth = planeHeight * canvasAspect;
+      planeScaledHeight = planeWidth / mediaAspect;
+    }
+
+    // Update the plane scaling
     plane.scaling = new Vector3(
       (this.type === "camera" ? -1 : 1) * planeWidth,
-      planeHeight,
+      planeScaledHeight,
       1
     );
     plane.position = new Vector3(0, 0, backgroundDistance);
@@ -372,6 +404,8 @@ class BabylonScene {
 
   private canvasSizeChange = () => {
     this.engine.resize();
+    this.scene.render();
+
     if (this.backgroundMediaPlane) {
       this.updateBackgroundPlaneSize(this.backgroundMediaPlane);
     }

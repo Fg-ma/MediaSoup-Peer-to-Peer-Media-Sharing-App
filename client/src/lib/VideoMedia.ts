@@ -35,7 +35,8 @@ class VideoMedia {
   originalVideoURL: string;
   dashUrl: string | undefined;
 
-  private fileChunks: Buffer[] = [];
+  private fileChunks: Uint8Array[] = [];
+  private totalSize = 0;
 
   private creationTime = Date.now();
 
@@ -55,8 +56,9 @@ class VideoMedia {
   } = {};
 
   private maxFaces: [number] = [1];
+  maxFacesDetected = 0;
 
-  babylonScene: BabylonScene;
+  babylonScene: BabylonScene | undefined;
 
   constructor(
     private videoId: string,
@@ -70,16 +72,10 @@ class VideoMedia {
     private userMedia: React.MutableRefObject<UserMediaType>,
     private getVideo: (key: string) => void,
     private addMessageListener: (
-      listener: (
-        message: IncomingTableStaticContentMessages,
-        event: MessageEvent
-      ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
     private removeMessageListener: (
-      listener: (
-        message: IncomingTableStaticContentMessages,
-        event: MessageEvent
-      ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
     dashUrl?: string | undefined
   ) {
@@ -144,6 +140,11 @@ class VideoMedia {
         case "FACES_DETECTED": {
           this.faceDetectionProcessing[0] = false;
           const detectedFaces = event.data.numFacesDetected;
+
+          if (detectedFaces > this.maxFacesDetected) {
+            this.maxFacesDetected = detectedFaces;
+          }
+
           if (detectedFaces !== this.maxFaces[0]) {
             this.maxFaces[0] = detectedFaces;
 
@@ -217,27 +218,6 @@ class VideoMedia {
       this.canvas.height = this.video.videoHeight;
     };
 
-    this.babylonScene = new BabylonScene(
-      this.videoId,
-      "camera",
-      this.canvas,
-      this.video,
-      this.faceLandmarks,
-      this.effects,
-      this.userEffectsStyles,
-      this.faceMeshWorker,
-      this.faceMeshResults,
-      this.faceMeshProcessing,
-      this.faceDetectionWorker,
-      this.faceDetectionProcessing,
-      this.selfieSegmentationWorker,
-      this.selfieSegmentationResults,
-      this.selfieSegmentationProcessing,
-      this.userDevice,
-      this.maxFaces,
-      this.userMedia
-    );
-
     this.getVideo(this.filename);
     this.addMessageListener(this.getVideoListener);
   }
@@ -280,28 +260,49 @@ class VideoMedia {
     }
 
     // Call the BabylonScene deconstructor
-    this.babylonScene.deconstructor();
+    this.babylonScene?.deconstructor();
   }
 
-  private getVideoListener = (
-    message: IncomingTableStaticContentMessages,
-    event: MessageEvent
-  ) => {
-    if (message.type === "downloadComplete") {
-      const mergedBuffer = Buffer.concat(this.fileChunks);
-      const blob = new Blob([new Uint8Array(mergedBuffer)], {
-        type: this.mimeType,
-      });
+  private getVideoListener = (message: IncomingTableStaticContentMessages) => {
+    if (message.type === "chunk") {
+      const chunkData = new Uint8Array(message.data.chunk.data);
+      this.fileChunks.push(chunkData);
+      this.totalSize += chunkData.length;
+    } else if (message.type === "downloadComplete") {
+      const mergedBuffer = new Uint8Array(this.totalSize);
+      let offset = 0;
 
+      for (const chunk of this.fileChunks) {
+        mergedBuffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      const blob = new Blob([mergedBuffer], { type: this.mimeType });
       const url = URL.createObjectURL(blob);
-      console.log(url);
       this.video.src = url;
 
+      this.babylonScene = new BabylonScene(
+        this.videoId,
+        "video",
+        this.canvas,
+        this.video,
+        this.faceLandmarks,
+        this.effects,
+        this.userEffectsStyles,
+        this.faceMeshWorker,
+        this.faceMeshResults,
+        this.faceMeshProcessing,
+        this.faceDetectionWorker,
+        this.faceDetectionProcessing,
+        this.selfieSegmentationWorker,
+        this.selfieSegmentationResults,
+        this.selfieSegmentationProcessing,
+        this.userDevice,
+        this.maxFaces,
+        this.userMedia
+      );
+
       this.removeMessageListener(this.getVideoListener);
-    } else if (message.type === "chunk") {
-      const chunkData = Buffer.from(message.data.chunk.data);
-      console.log(chunkData);
-      this.fileChunks.push(chunkData);
     }
   };
 
@@ -376,6 +377,8 @@ class VideoMedia {
   };
 
   private rectifyEffectMeshCount = () => {
+    if (!this.babylonScene) return;
+
     for (const effect in this.effects) {
       if (
         !this.effects[effect as VideoEffectTypes] ||
@@ -461,6 +464,8 @@ class VideoMedia {
     tintColor?: string,
     blockStateChange: boolean = false
   ) => {
+    if (!this.babylonScene) return;
+
     if (this.effects[effect] !== undefined) {
       if (!blockStateChange) {
         this.effects[effect] = !this.effects[effect];
@@ -518,6 +523,8 @@ class VideoMedia {
   };
 
   drawNewEffect = (effect: EffectType) => {
+    if (!this.babylonScene) return;
+
     const currentStyle =
       this.userEffectsStyles.current.video?.[this.videoId]?.video[effect];
 
@@ -564,7 +571,7 @@ class VideoMedia {
   };
 
   setTintColor = (newTintColor: string) => {
-    this.babylonScene.setTintColor(this.hexToNormalizedRgb(newTintColor));
+    this.babylonScene?.setTintColor(this.hexToNormalizedRgb(newTintColor));
   };
 
   getPaused = () => {
