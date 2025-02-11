@@ -23,6 +23,7 @@ export default function FgMediaContainer({
   kind,
   bundleRef,
   media,
+  rootMedia,
   lowerPopupElements,
   leftLowerControls,
   rightLowerControls,
@@ -40,6 +41,7 @@ export default function FgMediaContainer({
   kind: MediaKinds;
   bundleRef: React.RefObject<HTMLDivElement>;
   media?: React.ReactNode;
+  rootMedia: HTMLImageElement | HTMLVideoElement;
   lowerPopupElements?: (React.ReactNode | null)[];
   leftLowerControls?: (React.ReactNode | null)[];
   rightLowerControls?: (React.ReactNode | null)[];
@@ -95,6 +97,8 @@ export default function FgMediaContainer({
     };
   }>({});
 
+  const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
+
   const positioning =
     externalPositioning ??
     useRef<{
@@ -134,7 +138,9 @@ export default function FgMediaContainer({
     table_id,
     mediaId,
     kind,
+    rootMedia,
     positioningListeners,
+    setAspectRatio,
     positioning,
     remoteDataStreams,
     mediaContainerRef,
@@ -160,6 +166,21 @@ export default function FgMediaContainer({
 
     document.addEventListener("keyup", lowerController.handleKeyUp);
 
+    rootMedia.addEventListener(
+      "load",
+      mediaContainerController.handleMetadataLoaded
+    );
+
+    rootMedia.addEventListener(
+      "load",
+      mediaContainerController.handleMetadataLoaded
+    );
+
+    rootMedia.addEventListener(
+      "loadedmetadata",
+      mediaContainerController.handleMetadataLoaded
+    );
+
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
@@ -172,6 +193,14 @@ export default function FgMediaContainer({
       );
       document.removeEventListener("keydown", lowerController.handleKeyDown);
       document.removeEventListener("keyup", lowerController.handleKeyUp);
+      rootMedia.removeEventListener(
+        "load",
+        mediaContainerController.handleMetadataLoaded
+      );
+      rootMedia.removeEventListener(
+        "loadedmetadata",
+        mediaContainerController.handleMetadataLoaded
+      );
     };
   }, []);
 
@@ -220,6 +249,7 @@ export default function FgMediaContainer({
         panBtnRef={panBtnRef}
         positioning={positioning}
         fgContentAdjustmentController={fgContentAdjustmentController}
+        aspectRatio={aspectRatio}
       />
       {adjustingDimensions && (
         <>

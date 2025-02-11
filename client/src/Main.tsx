@@ -26,6 +26,7 @@ import CleanupController from "./lib/CleanupController";
 import JoinTableSection from "./joinTableSection/JoinTableSection";
 import "./scrollbar.css";
 import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
+import CreditPage from "./creditPage/CreditPage";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -145,6 +146,7 @@ export default function Main() {
         screenAudio: {},
         audio: structuredClone(defaultAudioEffectsStyles),
         video: {},
+        image: {},
       };
     }
 
@@ -301,6 +303,7 @@ export default function Main() {
   );
 
   return (
+    // <CreditPage />
     <div className='w-screen h-screen flex flex-col space-y-[1.5%] p-[1.5%] overflow-hidden bg-fg-tone-black-1'>
       <FgTable
         tableRef={tableRef}

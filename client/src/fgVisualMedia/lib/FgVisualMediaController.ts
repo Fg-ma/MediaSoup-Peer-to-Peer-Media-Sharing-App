@@ -66,7 +66,8 @@ class FgVisualMediaController {
     private visualMediaMovementTimeout: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private setAspectRatio: React.Dispatch<React.SetStateAction<number>>
   ) {}
 
   init = () => {
@@ -98,6 +99,17 @@ class FgVisualMediaController {
       "--primary-video-color",
       `${this.fgVisualMediaOptions.primaryVideoColor}`
     );
+  };
+
+  handleVideoMetadataLoaded = (videoElement: HTMLVideoElement) => {
+    if (videoElement) {
+      const aspectRatio = videoElement.videoWidth / videoElement.videoHeight;
+
+      // Update the positioning scale based on the aspect ratio
+      this.positioning.current.scale.y =
+        this.positioning.current.scale.x / aspectRatio;
+      this.setAspectRatio(aspectRatio);
+    }
   };
 
   onEffectChangeRequested = (event: onEffectChangeRequestedType) => {

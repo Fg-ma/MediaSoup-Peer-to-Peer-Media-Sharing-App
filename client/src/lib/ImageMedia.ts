@@ -83,7 +83,7 @@ class ImageMedia {
       );
     }
 
-    this.image = document.createElement("img") as HTMLImageElement;
+    this.image = document.createElement("img");
     this.image.onloadedmetadata = () => {
       this.canvas.width = this.image.width;
       this.canvas.height = this.image.height;

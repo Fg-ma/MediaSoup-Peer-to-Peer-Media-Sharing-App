@@ -211,6 +211,23 @@ export default function FgButton({
     }
   }, [closeHoldToggle]);
 
+  useEffect(() => {
+    if (!hoverContent) {
+      return;
+    }
+
+    const handleVisibilityChange = () => {
+      clearTimeout(hoverTimeout.current);
+      setIsHover(false);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [hoverContent]);
+
   const ButtonComponent = animationOptions ? motion.button : "button";
 
   return (

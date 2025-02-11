@@ -7,11 +7,15 @@ class MediaContainerController {
     private table_id: React.MutableRefObject<string>,
     private mediaId: string,
     private kind: MediaKinds,
+    private rootMedia: HTMLVideoElement | HTMLImageElement,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: () => void;
       };
     }>,
+    private setAspectRatio: React.Dispatch<
+      React.SetStateAction<number | undefined>
+    >,
     private positioning: React.MutableRefObject<{
       position: {
         left: number;
@@ -82,6 +86,24 @@ class MediaContainerController {
       clearTimeout(this.leaveTimer.current);
       this.leaveTimer.current = undefined;
     }, this.mediaContainerOptions.controlsVanishTime);
+  };
+
+  handleMetadataLoaded = () => {
+    const width =
+      this.rootMedia instanceof HTMLVideoElement
+        ? this.rootMedia.videoWidth
+        : this.rootMedia.width;
+    const height =
+      this.rootMedia instanceof HTMLVideoElement
+        ? this.rootMedia.videoHeight
+        : this.rootMedia.height;
+
+    if (width && height) {
+      const computedAspectRatio = width / height;
+      this.positioning.current.scale.y =
+        this.positioning.current.scale.x / computedAspectRatio;
+      this.setAspectRatio(computedAspectRatio);
+    }
   };
 
   handleMediasoupMessage = (event: IncomingMediasoupMessages) => {

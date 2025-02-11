@@ -32,8 +32,8 @@ export default {
         "fg-black-5": "#0D0D0D",
 
         "fg-red-dark": "#b20203",
-        "fg-red": "#e80110",
-        "fg-red-light": "#e32532",
+        "fg-red": "#d40213",
+        "fg-red-light": "#e62833",
 
         "fg-orange-dark": "#e75707",
         "fg-orange": "#f6630f",

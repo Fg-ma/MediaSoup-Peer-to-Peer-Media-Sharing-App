@@ -206,10 +206,13 @@ class BabylonRenderLoop {
           width: this.offscreenCanvas.width,
           height: this.offscreenCanvas.height,
           smooth:
-            (this.type === "camera" || this.type === "image") &&
             this.effects.masks &&
-            this.userEffectsStyles.current[this.type][this.id].masks.style ===
-              "baseMask"
+            (((this.type === "camera" || this.type === "image") &&
+              this.userEffectsStyles.current[this.type][this.id].masks.style ===
+                "baseMask") ||
+              (this.type === "video" &&
+                this.userEffectsStyles.current[this.type][this.id].video.masks
+                  .style === "baseMask"))
               ? true
               : false,
         });

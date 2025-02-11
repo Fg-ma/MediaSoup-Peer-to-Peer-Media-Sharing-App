@@ -123,6 +123,7 @@ export default function FgImage({
       mediaId={imageId}
       filename={imageMedia.filename}
       kind='image'
+      rootMedia={imageMedia.image}
       bundleRef={bundleRef}
       lowerPopupElements={[
         imageEffectsActive ? (

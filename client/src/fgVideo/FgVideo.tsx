@@ -267,6 +267,7 @@ export default function FgVideo({
       mediaId={videoId}
       filename={videoMedia.filename}
       kind='video'
+      rootMedia={videoMedia.video}
       bundleRef={bundleRef}
       lowerPopupElements={[
         videoEffectsActive ? (

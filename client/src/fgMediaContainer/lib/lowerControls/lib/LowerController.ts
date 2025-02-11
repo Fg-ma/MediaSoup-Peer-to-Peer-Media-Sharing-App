@@ -171,7 +171,7 @@ class LowerController {
     };
 
     this.fgContentAdjustmentController.scaleDragFunction(
-      "any",
+      "aspect",
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,

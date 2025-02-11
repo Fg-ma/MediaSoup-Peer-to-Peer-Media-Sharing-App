@@ -4,7 +4,7 @@ export default function FgHoverContentStandard({
   content,
   style = "light",
 }: {
-  content: string;
+  content: string | React.ReactElement;
   style?: "light" | "dark";
 }) {
   return (

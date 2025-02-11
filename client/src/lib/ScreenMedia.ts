@@ -15,7 +15,9 @@ import MediasoupSocketController from "./MediasoupSocketController";
 
 class ScreenMedia {
   canvas: HTMLCanvasElement;
-  private video: HTMLVideoElement;
+  video: HTMLVideoElement;
+
+  aspectRatio: number | undefined;
 
   private creationTime = Date.now();
 
@@ -83,6 +85,9 @@ class ScreenMedia {
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
+
+      this.aspectRatio = this.video.videoWidth / this.video.videoHeight;
+
       this.video.play();
     };
 

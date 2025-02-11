@@ -158,7 +158,7 @@ class GamesSignalingMedia {
           this.username,
           this.instance,
           gameId,
-          "ws://localhost:8042",
+          "https://localhost:8042",
           initiator.username === this.username &&
             initiator.instance === this.instance
         );

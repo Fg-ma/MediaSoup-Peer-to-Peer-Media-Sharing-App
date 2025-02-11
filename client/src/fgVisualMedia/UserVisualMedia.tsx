@@ -163,13 +163,20 @@ export default function UserVisualMedia({
     };
   }>({});
 
+  const [aspectRatio, setAspectRatio] = useState(
+    userMedia.current[type][visualMediaId].aspectRatio ?? 1 - 0.01
+  );
+
   const positioning = useRef<{
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
   }>({
     position: { left: 32.5, top: 32.5 },
-    scale: { x: 35, y: 35 },
+    scale: {
+      x: 35,
+      y: 35 / aspectRatio,
+    },
     rotation: 0,
   });
 
@@ -243,6 +250,7 @@ export default function UserVisualMedia({
     initTimeOffset,
     fgContentAdjustmentController,
     positioning,
+    aspectRatio,
     screenAudioStream
   );
 
@@ -271,7 +279,8 @@ export default function UserVisualMedia({
     setInVisualMedia,
     leaveVisualMediaTimer,
     visualMediaMovementTimeout,
-    setRerender
+    setRerender,
+    setAspectRatio
   );
 
   useEffect(() => {
@@ -332,6 +341,14 @@ export default function UserVisualMedia({
       );
     }
 
+    const videoElement = userMedia.current[type][visualMediaId].video;
+
+    if (videoElement) {
+      videoElement.addEventListener("loadedmetadata", () =>
+        fgVisualMediaController.handleVideoMetadataLoaded(videoElement)
+      );
+    }
+
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
@@ -370,6 +387,11 @@ export default function UserVisualMedia({
         );
         videoRef.current?.removeEventListener("leavepictureinpicture", () =>
           fgLowerVisualMediaController.handlePictureInPicture("leave")
+        );
+      }
+      if (videoElement) {
+        videoElement.removeEventListener("loadedmetadata", () =>
+          fgVisualMediaController.handleVideoMetadataLoaded(videoElement)
         );
       }
     };
@@ -462,6 +484,7 @@ export default function UserVisualMedia({
             panBtnRef={panBtnRef}
             positioning={positioning}
             fgContentAdjustmentController={fgContentAdjustmentController}
+            aspectRatio={aspectRatio}
           />
         </Suspense>
       )}

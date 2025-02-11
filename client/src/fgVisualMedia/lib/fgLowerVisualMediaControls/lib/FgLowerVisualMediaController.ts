@@ -122,6 +122,7 @@ class FgLowerVisualMediaController {
       };
       rotation: number;
     }>,
+    private aspectRatio: number,
     private screenAudioStream?: MediaStream
   ) {
     this.initTime = Date.now();
@@ -429,13 +430,14 @@ class FgLowerVisualMediaController {
     };
 
     this.fgContentAdjustmentController.scaleDragFunction(
-      "any",
+      "aspect",
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
       },
       referencePoint,
-      referencePoint
+      referencePoint,
+      this.aspectRatio
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };

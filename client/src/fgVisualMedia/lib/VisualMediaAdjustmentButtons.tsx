@@ -9,6 +9,7 @@ export default function VisualMediaAdjustmentButtons({
   panBtnRef,
   positioning,
   fgContentAdjustmentController,
+  aspectRatio,
 }: {
   bundleRef: React.RefObject<HTMLDivElement>;
   panBtnRef: React.RefObject<HTMLButtonElement>;
@@ -24,6 +25,7 @@ export default function VisualMediaAdjustmentButtons({
     rotation: number;
   }>;
   fgContentAdjustmentController: FgContentAdjustmentController;
+  aspectRatio: number | undefined;
 }) {
   return (
     <>
@@ -127,10 +129,11 @@ export default function VisualMediaAdjustmentButtons({
           };
 
           fgContentAdjustmentController.scaleDragFunction(
-            "any",
+            "aspect",
             displacement,
             referencePoint,
-            referencePoint
+            referencePoint,
+            aspectRatio
           );
         }}
         bundleRef={bundleRef}

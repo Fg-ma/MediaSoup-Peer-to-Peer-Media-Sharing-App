@@ -9,6 +9,7 @@ export default function AdjustmentButtons({
   panBtnRef,
   positioning,
   fgContentAdjustmentController,
+  aspectRatio,
 }: {
   bundleRef: React.RefObject<HTMLDivElement>;
   panBtnRef: React.RefObject<HTMLButtonElement>;
@@ -24,6 +25,7 @@ export default function AdjustmentButtons({
     rotation: number;
   }>;
   fgContentAdjustmentController: FgContentAdjustmentController;
+  aspectRatio: number | undefined;
 }) {
   return (
     <>
@@ -127,10 +129,11 @@ export default function AdjustmentButtons({
           };
 
           fgContentAdjustmentController.scaleDragFunction(
-            "any",
+            "aspect",
             displacement,
             referencePoint,
-            referencePoint
+            referencePoint,
+            aspectRatio
           );
         }}
         bundleRef={bundleRef}

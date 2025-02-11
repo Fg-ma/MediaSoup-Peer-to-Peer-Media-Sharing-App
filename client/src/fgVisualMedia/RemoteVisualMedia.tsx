@@ -177,9 +177,14 @@ export default function RemoteVisualMedia({
     rotation: number;
   }>({
     position: { left: 32.5, top: 32.5 },
-    scale: { x: 35, y: 35 },
+    scale: {
+      x: 35,
+      y: 35,
+    },
     rotation: 0,
   });
+
+  const [aspectRatio, setAspectRatio] = useState(0);
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -257,6 +262,7 @@ export default function RemoteVisualMedia({
     initTimeOffset,
     fgContentAdjustmentController,
     positioning,
+    aspectRatio,
     screenAudioStream
   );
 
@@ -285,7 +291,8 @@ export default function RemoteVisualMedia({
     setInVisualMedia,
     leaveVisualMediaTimer,
     visualMediaMovementTimeout,
-    setRerender
+    setRerender,
+    setAspectRatio
   );
 
   useEffect(() => {
@@ -346,6 +353,14 @@ export default function RemoteVisualMedia({
       );
     }
 
+    const videoElement = videoRef.current;
+
+    if (videoElement) {
+      videoElement.addEventListener("loadedmetadata", () =>
+        fgVisualMediaController.handleVideoMetadataLoaded(videoElement)
+      );
+    }
+
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
@@ -380,6 +395,11 @@ export default function RemoteVisualMedia({
         );
         videoRef.current?.removeEventListener("leavepictureinpicture", () =>
           fgLowerVisualMediaController.handlePictureInPicture("leave")
+        );
+      }
+      if (videoElement) {
+        videoElement.removeEventListener("loadedmetadata", () =>
+          fgVisualMediaController.handleVideoMetadataLoaded(videoElement)
         );
       }
     };
@@ -457,6 +477,7 @@ export default function RemoteVisualMedia({
             panBtnRef={panBtnRef}
             positioning={positioning}
             fgContentAdjustmentController={fgContentAdjustmentController}
+            aspectRatio={aspectRatio}
           />
         </Suspense>
       )}
