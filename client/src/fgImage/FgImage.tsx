@@ -4,20 +4,32 @@ import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import ImageController from "./lib/ImageController";
 import LowerImageController from "./lib/lowerImageControls/LowerImageController";
-import { defaultImageOptions, ImageOptions } from "./lib/typeConstant";
+import {
+  ActivePages,
+  defaultActiveSettingsPages,
+  defaultImageOptions,
+  defaultSettings,
+  ImageOptions,
+  Settings,
+} from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
-import "./lib/fgImageStyles.css";
 import FullScreenButton from "./lib/lowerImageControls/fullScreenButton/FullScreenButton";
 import ImageEffectsButton from "./lib/lowerImageControls/imageEffectsButton/ImageEffectsButton";
 import ImageEffectsSection from "./lib/imageEffectsSection/ImageEffectsSection";
+import "./lib/fgImageStyles.css";
+import DownloadButton from "./lib/lowerImageControls/downloadButton/DownloadButton";
+import SettingsButton from "./lib/lowerImageControls/settingsButton/SettingsButton";
+import DownloadRecordingButton from "./lib/lowerImageControls/downloadButton/DownloadRecordingButton";
 
 export default function FgImage({
   imageId,
   bundleRef,
+  tableRef,
   options,
 }: {
   imageId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
+  tableRef: React.RefObject<HTMLDivElement>;
   options?: ImageOptions;
 }) {
   const imageOptions = {
@@ -54,15 +66,32 @@ export default function FgImage({
 
   const [_rerender, setRerender] = useState(false);
 
+  const [settingsActive, setSettingsActive] = useState(false);
+  const [settings, setSettings] = useState<Settings>(
+    structuredClone(defaultSettings)
+  );
+  const [activePages, setActivePages] = useState<ActivePages>(
+    defaultActiveSettingsPages
+  );
+
+  const recording = useRef(false);
+  const downloadRecordingReady = useRef(false);
+
   const lowerImageController = new LowerImageController(
     imageId,
+    imageMedia,
     imageContainerRef,
     shiftPressed,
     controlPressed,
     setImageEffectsActive,
     tintColor,
     userStreamEffects,
-    userMedia
+    userMedia,
+    setSettingsActive,
+    settings,
+    recording,
+    downloadRecordingReady,
+    setRerender
   );
 
   const imageController = new ImageController(
@@ -73,7 +102,8 @@ export default function FgImage({
     imageContainerRef,
     subContainerRef,
     imageOptions,
-    setRerender
+    setRerender,
+    setSettingsActive
   );
 
   useEffect(() => {
@@ -102,6 +132,11 @@ export default function FgImage({
 
     document.addEventListener("keyup", lowerImageController.handleKeyUp);
 
+    tableRef.current?.addEventListener(
+      "scroll",
+      imageController.handleTableScroll
+    );
+
     return () => {
       tableStaticContentSocket.current?.removeMessageListener(
         imageController.handleTableStaticContentMessage
@@ -115,8 +150,24 @@ export default function FgImage({
         lowerImageController.handleKeyDown
       );
       document.removeEventListener("keyup", lowerImageController.handleKeyUp);
+      tableRef.current?.removeEventListener(
+        "scroll",
+        imageController.handleTableScroll
+      );
     };
   }, []);
+
+  useEffect(() => {
+    setActivePages(defaultActiveSettingsPages);
+  }, [settingsActive]);
+
+  useEffect(() => {
+    if (settings.downloadType.value !== "record" && recording.current) {
+      imageMedia.babylonScene?.stopRecording();
+      downloadRecordingReady.current = true;
+      recording.current = false;
+    }
+  }, [settings.downloadType.value]);
 
   return (
     <FgMediaContainer
@@ -143,13 +194,39 @@ export default function FgImage({
           imageEffectsActive={imageEffectsActive}
           scrollingContainerRef={rightLowerImageControlsRef}
         />,
+        <SettingsButton
+          effectsActive={imageEffectsActive}
+          containerRef={imageContainerRef}
+          settingsActive={settingsActive}
+          setSettingsActive={setSettingsActive}
+          activePages={activePages}
+          setActivePages={setActivePages}
+          settings={settings}
+          setSettings={setSettings}
+          scrollingContainerRef={rightLowerImageControlsRef}
+        />,
+        <DownloadButton
+          settings={settings}
+          recording={recording}
+          lowerImageController={lowerImageController}
+          imageEffectsActive={imageEffectsActive}
+          scrollingContainerRef={rightLowerImageControlsRef}
+        />,
+        settings.downloadType.value === "record" &&
+        downloadRecordingReady.current ? (
+          <DownloadRecordingButton
+            lowerImageController={lowerImageController}
+            imageEffectsActive={imageEffectsActive}
+            scrollingContainerRef={rightLowerImageControlsRef}
+          />
+        ) : null,
         <ImageEffectsButton
           lowerImageController={lowerImageController}
           imageEffectsActive={imageEffectsActive}
           scrollingContainerRef={rightLowerImageControlsRef}
         />,
       ]}
-      inMediaVariables={[imageEffectsActive]}
+      inMediaVariables={[imageEffectsActive, settingsActive]}
       externalPositioning={positioning}
       externalMediaContainerRef={imageContainerRef}
       externalSubContainerRef={subContainerRef}

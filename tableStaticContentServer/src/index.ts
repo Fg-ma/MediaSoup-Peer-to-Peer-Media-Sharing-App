@@ -21,7 +21,7 @@ export const gets = new Gets(broadcaster);
 export const tableContentController = new TableContentController();
 export const cleanup = new Cleanup(broadcaster);
 
-// tableTopCeph.emptyBucket("mybucket");
+tableTopCeph.emptyBucket("mybucket");
 // tableTopCeph.listBucketContents("mybucket");
 
 const sslOptions = {

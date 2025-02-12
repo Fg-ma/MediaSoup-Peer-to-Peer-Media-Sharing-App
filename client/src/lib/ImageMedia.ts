@@ -299,6 +299,25 @@ class ImageMedia {
     }
   };
 
+  downloadImage = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = this.image.naturalWidth;
+    canvas.height = this.image.naturalHeight;
+    const context = canvas.getContext("2d");
+
+    context?.drawImage(this.image, 0, 0);
+
+    const imageURL = canvas.toDataURL("image/png");
+
+    const link = document.createElement("a");
+    link.href = imageURL;
+    link.download = "downloaded-image.png";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   changeEffects = (
     effect: ImageEffectTypes,
     tintColor?: string,

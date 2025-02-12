@@ -192,11 +192,6 @@ export default function FgVideo({
 
     document.addEventListener("keyup", lowerVideoController.handleKeyUp);
 
-    document.addEventListener(
-      "visibilitychange",
-      videoController.handleVisibilityChange
-    );
-
     videoMedia.video.addEventListener("enterpictureinpicture", () =>
       lowerVideoController.handlePictureInPicture("enter")
     );
@@ -228,10 +223,6 @@ export default function FgVideo({
         lowerVideoController.handleKeyDown
       );
       document.removeEventListener("keyup", lowerVideoController.handleKeyUp);
-      document.removeEventListener(
-        "visibilitychange",
-        videoController.handleVisibilityChange
-      );
       videoMedia.video.removeEventListener("enterpictureinpicture", () =>
         lowerVideoController.handlePictureInPicture("enter")
       );

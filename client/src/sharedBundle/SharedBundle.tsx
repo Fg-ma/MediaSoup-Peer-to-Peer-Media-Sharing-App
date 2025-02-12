@@ -19,11 +19,13 @@ export default function SharedBundle({
   name,
   userDevice,
   deadbanding,
+  tableRef,
   options,
 }: {
   name?: string;
   userDevice: UserDevice;
   deadbanding: Deadbanding;
+  tableRef: React.RefObject<HTMLDivElement>;
   options?: BundleOptions;
 }) {
   const bundleOptions = {
@@ -99,6 +101,7 @@ export default function SharedBundle({
         {
           const { videoId } = message.header;
           const { url } = message.data;
+
           userMedia.current.video[videoId]?.preloadDashStream(url);
         }
         break;
@@ -106,7 +109,7 @@ export default function SharedBundle({
         {
           const { imageId } = message.header;
           const { filename, url, mimeType } = message.data;
-          console.log(url);
+
           if (tableStaticContentSocket.current) {
             userMedia.current.image[imageId] = new ImageMedia(
               imageId,
@@ -170,7 +173,11 @@ export default function SharedBundle({
         Object.keys(userMedia.current.image).length !== 0 &&
         Object.keys(userMedia.current.image).map((imageId) => (
           <Suspense key={imageId} fallback={<div>Loading...</div>}>
-            <FgImage imageId={imageId} bundleRef={sharedBundleRef} />
+            <FgImage
+              imageId={imageId}
+              bundleRef={sharedBundleRef}
+              tableRef={tableRef}
+            />
           </Suspense>
         ))}
     </div>

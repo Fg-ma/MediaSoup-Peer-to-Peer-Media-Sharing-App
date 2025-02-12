@@ -121,12 +121,12 @@ export default function FgTable({
   }, [tableSocket.current]);
 
   return (
-    <div ref={tableContainerRef} className='grow h-1 w-full flex flex-col'>
+    <div ref={tableContainerRef} className='flex grow h-1 w-full flex-col'>
       <TopTableSection
         userData={userData}
         tableContainerRef={tableContainerRef}
       />
-      <div className='w-full flex' style={{ height: "1px", flexGrow: "1" }}>
+      <div className='flex w-full' style={{ height: "1px", flexGrow: "1" }}>
         <LeftTableSection
           userData={userData}
           tableContainerRef={tableContainerRef}
@@ -163,6 +163,7 @@ export default function FgTable({
                 <SharedBundle
                   userDevice={userDevice}
                   deadbanding={deadbanding}
+                  tableRef={tableRef}
                 />
                 {bundles &&
                   Object.keys(bundles).length !== 0 &&

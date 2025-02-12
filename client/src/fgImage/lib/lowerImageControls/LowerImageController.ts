@@ -3,10 +3,13 @@ import {
   UserStreamEffectsType,
   ImageEffectTypes,
 } from "../../../context/effectsContext/typeConstant";
+import ImageMedia from "../../../lib/ImageMedia";
+import { downloadRecordingMimeMap, Settings } from "../typeConstant";
 
 class LowerImageController {
   constructor(
     private imageId: string,
+    private imageMedia: ImageMedia,
     private imageContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
@@ -15,7 +18,12 @@ class LowerImageController {
     >,
     private tintColor: React.MutableRefObject<string>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private settings: Settings,
+    private recording: React.MutableRefObject<boolean>,
+    private downloadRecordingReady: React.MutableRefObject<boolean>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   handleImageEffects = () => {
@@ -76,6 +84,15 @@ class LowerImageController {
       case "e":
         this.handleImageEffects();
         break;
+      case "d":
+        this.handleDownload();
+        break;
+      case "u":
+        this.handleSettings();
+        break;
+      case "h":
+        this.handleDownloadRecording();
+        break;
       default:
         break;
     }
@@ -110,6 +127,43 @@ class LowerImageController {
       this.tintColor.current,
       blockStateChange
     );
+  };
+
+  handleDownload = () => {
+    if (this.settings.downloadType.value === "snapShot") {
+      this.imageMedia.babylonScene?.downloadSnapShot();
+    } else if (this.settings.downloadType.value === "original") {
+      this.imageMedia.downloadImage();
+    } else if (this.settings.downloadType.value === "record") {
+      if (!this.recording.current) {
+        this.imageMedia.babylonScene?.startRecording(
+          downloadRecordingMimeMap[
+            this.settings.downloadType.downloadTypeOptions.mimeType.value
+          ],
+          parseInt(
+            this.settings.downloadType.downloadTypeOptions.fps.value.slice(
+              0,
+              -4
+            )
+          )
+        );
+        this.downloadRecordingReady.current = false;
+      } else {
+        this.imageMedia.babylonScene?.stopRecording();
+        this.downloadRecordingReady.current = true;
+      }
+
+      this.recording.current = !this.recording.current;
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  handleDownloadRecording = () => {
+    this.imageMedia.babylonScene?.downloadRecording();
+  };
+
+  handleSettings = () => {
+    this.setSettingsActive((prev) => !prev);
   };
 }
 

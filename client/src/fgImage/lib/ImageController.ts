@@ -27,7 +27,8 @@ class ImageController {
     private imageContainerRef: React.RefObject<HTMLDivElement>,
     private subContainerRef: React.RefObject<HTMLDivElement>,
     private imageOptions: ImageOptions,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   init = () => {
@@ -35,6 +36,10 @@ class ImageController {
       "--primary-image-color",
       `${this.imageOptions.primaryImageColor}`
     );
+  };
+
+  handleTableScroll = () => {
+    this.setSettingsActive(false);
   };
 
   handleTableStaticContentMessage = (

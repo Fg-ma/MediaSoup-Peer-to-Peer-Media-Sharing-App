@@ -1,7 +1,5 @@
 import LowerVideoController from "./lowerVideoControls/lib/LowerVideoController";
 import { VideoOptions } from "./typeConstant";
-import { IncomingMediasoupMessages } from "../../lib/MediasoupSocketController";
-import { RemoteDataStreamsType } from "../../context/mediaContext/typeConstant";
 import TableStaticContentSocketController, {
   IncomingTableStaticContentMessages,
   onCatchUpContentDataRespondedType,
@@ -39,18 +37,6 @@ class VideoController {
       "--primary-video-color",
       `${this.videoOptions.primaryVideoColor}`
     );
-  };
-
-  handleVisibilityChange = () => {
-    if (document.hidden) {
-      if (!this.videoContainerRef.current?.classList.contains("paused")) {
-        this.lowerVideoController.handlePausePlay();
-      }
-    } else {
-      if (this.videoContainerRef.current?.classList.contains("paused")) {
-        this.lowerVideoController.handlePausePlay();
-      }
-    }
   };
 
   scaleCallback = () => {

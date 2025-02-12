@@ -18,6 +18,7 @@ import {
   Material,
   Texture,
   Color4,
+  Tools,
 } from "@babylonjs/core";
 import "@babylonjs/inspector";
 import {
@@ -57,6 +58,13 @@ export const validEffectTypes: EffectType[] = [
   "hats",
 ];
 
+const recordingMimeTypeExtensionMap = {
+  "video/webm; codecs=vp9": ".webm",
+  "video/webm; codecs=vp8": ".webm",
+  "video/webm; codecs=av1": ".webm",
+  "video/ogg": ".ogg",
+};
+
 class BabylonScene {
   private engine: Engine;
   scene: Scene;
@@ -95,6 +103,11 @@ class BabylonScene {
   threeDimMeshesZCoord = 100;
 
   imageAlreadyProcessed = 1;
+
+  mediaRecorder: MediaRecorder | undefined = undefined;
+  chunks: Blob[] = [];
+  recordingURL: string | undefined;
+  recordingMimeType: string | undefined;
 
   constructor(
     private id: string,
@@ -192,6 +205,12 @@ class BabylonScene {
   }
 
   deconstructor = () => {
+    this.chunks = [];
+    if (this.recordingURL) {
+      URL.revokeObjectURL(this.recordingURL);
+      this.recordingURL = undefined;
+    }
+
     this.engine.stopRenderLoop();
     this.engine.dispose();
 
@@ -616,6 +635,83 @@ class BabylonScene {
         this.pauseLayer = undefined;
       }
     }
+  };
+
+  downloadSnapShot = () => {
+    if (this.engine) {
+      Tools.CreateScreenshotUsingRenderTarget(
+        this.engine,
+        this.camera,
+        { width: this.canvas.width, height: this.canvas.height },
+        (dataUrl) => {
+          // Create a link element for download
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = "scene-snapshot.png";
+
+          // Simulate a click to download the image
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      );
+    }
+  };
+
+  startRecording(mimeType: string, fps: number) {
+    this.chunks = [];
+    if (this.recordingURL) {
+      URL.revokeObjectURL(this.recordingURL);
+      this.recordingURL = undefined;
+    }
+
+    const stream = this.canvas.captureStream(fps);
+    try {
+      this.mediaRecorder = new MediaRecorder(stream, { mimeType });
+      this.recordingMimeType = mimeType;
+    } catch {
+      this.mediaRecorder = new MediaRecorder(stream, {
+        mimeType: "video/webm; codecs=vp9",
+      });
+      this.recordingMimeType = mimeType;
+    }
+
+    // Store recorded data chunks
+    this.mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        this.chunks.push(event.data);
+      }
+    };
+
+    this.mediaRecorder.onstop = () => {
+      const blob = new Blob(this.chunks, { type: this.recordingMimeType });
+      this.chunks = [];
+
+      // Create a download link
+      this.recordingURL = URL.createObjectURL(blob);
+    };
+
+    // Start recording
+    this.mediaRecorder.start();
+  }
+
+  stopRecording() {
+    this.mediaRecorder?.stop();
+  }
+
+  downloadRecording = () => {
+    if (!this.recordingURL || !this.recordingMimeType) return;
+
+    const a = document.createElement("a");
+    a.href = this.recordingURL;
+    a.download = `recording${
+      recordingMimeTypeExtensionMap[
+        this.recordingMimeType as keyof typeof recordingMimeTypeExtensionMap
+      ] ?? ".webp"
+    }`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 }
 
