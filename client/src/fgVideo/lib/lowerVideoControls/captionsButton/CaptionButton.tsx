@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { KaldiRecognizer, Model } from "vosk-browser";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
 import LowerVideoController from "../LowerVideoController";
-import { Settings } from "../../../typeConstant";
+import { Settings } from "../../typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

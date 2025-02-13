@@ -2,24 +2,27 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
-import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import VideoController from "./lib/VideoController";
-import LowerVideoController from "./lib/lowerVideoControls/lib/LowerVideoController";
+import LowerVideoController from "./lib/lowerVideoControls/LowerVideoController";
 import {
   defaultVideoOptions,
   VideoOptions,
   Settings,
+  ActivePages,
+  defaultSettings,
+  defaultActivePages,
 } from "./lib/typeConstant";
-import "./lib/fgVideoStyles.css";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import VideoEffectsSection from "./lib/videoEffectsSection/VideoEffectsSection";
-import FullScreenButton from "./lib/lowerVideoControls/lib/fullScreenButton/FullScreenButton";
-import VideoEffectsButton from "./lib/lowerVideoControls/lib/videoEffectsButton/VideoEffectsButton";
-import PlayPauseButton from "./lib/lowerVideoControls/lib/playPauseButton/PlayPauseButton";
-import PictureInPictureButton from "./lib/lowerVideoControls/lib/pictureInPictureButton/PictureInPictureButton";
-import CaptionButton from "./lib/lowerVideoControls/lib/captionsButton/CaptionButton";
-import SettingsButton from "./lib/lowerVideoControls/lib/settingsButton/SettingsButton";
-import { ActivePages } from "./lib/lowerVideoControls/LowerVideoControls";
+import FullScreenButton from "./lib/lowerVideoControls/fullScreenButton/FullScreenButton";
+import VideoEffectsButton from "./lib/lowerVideoControls/videoEffectsButton/VideoEffectsButton";
+import PlayPauseButton from "./lib/lowerVideoControls/playPauseButton/PlayPauseButton";
+import PictureInPictureButton from "./lib/lowerVideoControls/pictureInPictureButton/PictureInPictureButton";
+import CaptionButton from "./lib/lowerVideoControls/captionsButton/CaptionButton";
+import SettingsButton from "./lib/lowerVideoControls/settingsButton/SettingsButton";
+import "./lib/fgVideoStyles.css";
+import DownloadButton from "./lib/lowerVideoControls/downloadButton/DownloadButton";
+import DownloadRecordingButton from "./lib/lowerVideoControls/downloadButton/DownloadRecordingButton";
 
 export default function FgVideo({
   videoId,
@@ -44,7 +47,6 @@ export default function FgVideo({
   const { userMedia } = useMediaContext();
   const { userStreamEffects } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
-  const { table_id } = useUserInfoContext();
 
   const videoMedia = userMedia.current.video[videoId];
 
@@ -72,36 +74,14 @@ export default function FgVideo({
   const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [settingsActive, setSettingsActive] = useState(false);
-  const [settings, setSettings] = useState<Settings>({
-    closedCaption: {
-      value: "en-US",
-      closedCaptionOptionsActive: {
-        value: "",
-        fontFamily: { value: "K2D" },
-        fontColor: { value: "white" },
-        fontOpacity: { value: "100%" },
-        fontSize: { value: "base" },
-        backgroundColor: { value: "black" },
-        backgroundOpacity: { value: "75%" },
-        characterEdgeStyle: { value: "None" },
-      },
-    },
-  });
-  const [activePages, setActivePages] = useState<ActivePages>({
-    closedCaption: {
-      active: false,
-      closedCaptionOptionsActive: {
-        active: false,
-        fontFamily: { active: false },
-        fontColor: { active: false },
-        fontOpacity: { active: false },
-        fontSize: { active: false },
-        backgroundColor: { active: false },
-        backgroundOpacity: { active: false },
-        characterEdgeStyle: { active: false },
-      },
-    },
-  });
+  const [settings, setSettings] = useState<Settings>(
+    structuredClone(defaultSettings)
+  );
+  const [activePages, setActivePages] =
+    useState<ActivePages>(defaultActivePages);
+
+  const recording = useRef(false);
+  const downloadRecordingReady = useRef(false);
 
   const initTimeOffset = useRef(0);
 
@@ -139,7 +119,11 @@ export default function FgVideo({
     tintColor,
     userStreamEffects,
     userMedia,
-    initTimeOffset
+    initTimeOffset,
+    setSettingsActive,
+    recording,
+    downloadRecordingReady,
+    setRerender
   );
 
   const videoController = new VideoController(
@@ -294,16 +278,6 @@ export default function FgVideo({
           settingsActive={settingsActive}
           scrollingContainerRef={rightLowerVideoControlsRef}
         />,
-        <CaptionButton
-          lowerVideoController={lowerVideoController}
-          videoEffectsActive={videoEffectsActive}
-          settingsActive={settingsActive}
-          settings={settings}
-          audioStream={videoMedia.getAudioTrack()}
-          videoContainerRef={videoContainerRef}
-          scrollingContainerRef={rightLowerVideoControlsRef}
-          containerRef={subContainerRef}
-        />,
         <SettingsButton
           videoEffectsActive={videoEffectsActive}
           videoContainerRef={videoContainerRef}
@@ -314,6 +288,31 @@ export default function FgVideo({
           settings={settings}
           setSettings={setSettings}
           scrollingContainerRef={rightLowerVideoControlsRef}
+        />,
+        <DownloadButton
+          settings={settings}
+          recording={recording}
+          lowerVideoController={lowerVideoController}
+          videoEffectsActive={videoEffectsActive}
+          scrollingContainerRef={rightLowerVideoControlsRef}
+        />,
+        settings.downloadType.value === "record" &&
+        downloadRecordingReady.current ? (
+          <DownloadRecordingButton
+            lowerVideoController={lowerVideoController}
+            videoEffectsActive={videoEffectsActive}
+            scrollingContainerRef={rightLowerVideoControlsRef}
+          />
+        ) : null,
+        <CaptionButton
+          lowerVideoController={lowerVideoController}
+          videoEffectsActive={videoEffectsActive}
+          settingsActive={settingsActive}
+          settings={settings}
+          audioStream={videoMedia.getAudioTrack()}
+          videoContainerRef={videoContainerRef}
+          scrollingContainerRef={rightLowerVideoControlsRef}
+          containerRef={subContainerRef}
         />,
         <VideoEffectsButton
           lowerVideoController={lowerVideoController}
@@ -349,7 +348,7 @@ export default function FgVideo({
         //   }}
         // />,
       ]}
-      inMediaVariables={[videoEffectsActive, pausedState]}
+      inMediaVariables={[videoEffectsActive, pausedState, settingsActive]}
       externalPositioning={positioning}
       externalMediaContainerRef={videoContainerRef}
       externalSubContainerRef={subContainerRef}

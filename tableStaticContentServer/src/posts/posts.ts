@@ -1,6 +1,11 @@
 import uWS from "uWebSockets.js";
 import busboy from "busboy";
-import { broadcaster, tableContentController, tableTopCeph } from "../index";
+import {
+  broadcaster,
+  tableContentController,
+  tableTopCeph,
+  tableTopMongo,
+} from "../index";
 import Utils from "./lib/Utils";
 import { TableTopStaticMimeType } from "src/typeConstant";
 
@@ -52,6 +57,61 @@ const handlePosts = (app: uWS.TemplatedApp) => {
             { property: "mimeType", value: mimeType as TableTopStaticMimeType },
           ]);
 
+          await tableTopMongo.tableVideos?.uploads.uploadMetaData({
+            table_id,
+            videoId: contentId,
+            positioning: {
+              position: {
+                left: 50,
+                top: 50,
+              },
+              scale: {
+                x: 25,
+                y: 25,
+              },
+              rotation: 0,
+            },
+            effects: {
+              postProcess: false,
+              hideBackground: false,
+              blur: false,
+              tint: false,
+              glasses: false,
+              beards: false,
+              mustaches: false,
+              masks: false,
+              hats: false,
+              pets: false,
+            },
+            effectStyles: {
+              postProcess: {
+                style: "prismaColors",
+              },
+              hideBackground: {
+                style: "beach",
+                color: "#d40213",
+              },
+              glasses: {
+                style: "defaultGlasses",
+              },
+              beards: {
+                style: "classicalCurlyBeard",
+              },
+              mustaches: {
+                style: "mustache1",
+              },
+              masks: {
+                style: "baseMask",
+              },
+              hats: {
+                style: "stylishHat",
+              },
+              pets: {
+                style: "beardedDragon",
+              },
+            },
+          });
+
           const originalVideoMessage = {
             type: "originalVideoReady",
             header: {
@@ -94,7 +154,61 @@ const handlePosts = (app: uWS.TemplatedApp) => {
           //   console.error("Error during video processing:", error);
           // }
         } else if (mimeType.startsWith("image/")) {
-          // Image-specific handling
+          await tableTopMongo.tableImages?.uploads.uploadMetaData({
+            table_id,
+            imageId: contentId,
+            positioning: {
+              position: {
+                left: 50,
+                top: 50,
+              },
+              scale: {
+                x: 25,
+                y: 25,
+              },
+              rotation: 0,
+            },
+            effects: {
+              postProcess: false,
+              hideBackground: false,
+              blur: false,
+              tint: false,
+              glasses: false,
+              beards: false,
+              mustaches: false,
+              masks: false,
+              hats: false,
+              pets: false,
+            },
+            effectStyles: {
+              postProcess: {
+                style: "prismaColors",
+              },
+              hideBackground: {
+                style: "beach",
+                color: "#d40213",
+              },
+              glasses: {
+                style: "defaultGlasses",
+              },
+              beards: {
+                style: "classicalCurlyBeard",
+              },
+              mustaches: {
+                style: "mustache1",
+              },
+              masks: {
+                style: "baseMask",
+              },
+              hats: {
+                style: "stylishHat",
+              },
+              pets: {
+                style: "beardedDragon",
+              },
+            },
+          });
+
           tableContentController.setContent(table_id, "image", contentId, [
             { property: "url", value: url },
             { property: "mimeType", value: mimeType as TableTopStaticMimeType },

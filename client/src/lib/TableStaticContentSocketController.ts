@@ -167,7 +167,7 @@ export type onDashVideoReadyType = {
 export type onImageReadyType = {
   type: "imageReady";
   header: {
-    imageId: string;
+    contentId: string;
   };
   data: {
     filename: string;

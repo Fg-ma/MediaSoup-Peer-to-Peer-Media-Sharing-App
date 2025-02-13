@@ -107,12 +107,12 @@ export default function SharedBundle({
         break;
       case "imageReady":
         {
-          const { imageId } = message.header;
+          const { contentId } = message.header;
           const { filename, url, mimeType } = message.data;
 
           if (tableStaticContentSocket.current) {
-            userMedia.current.image[imageId] = new ImageMedia(
-              imageId,
+            userMedia.current.image[contentId] = new ImageMedia(
+              contentId,
               filename,
               mimeType,
               url,

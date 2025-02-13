@@ -13,7 +13,7 @@ import {
   Effect,
   PostProcess,
 } from "@babylonjs/core";
-import { PostProcessEffects } from "../context/effectsContext/typeConstant";
+import { PostProcessEffectsTypes } from "../context/effectsContext/typeConstant";
 
 class BabylonShaderController {
   private time = 0;
@@ -44,7 +44,7 @@ class BabylonShaderController {
   private vintageTVGlitchActiveTimeout: NodeJS.Timeout | undefined;
 
   private activeShaders: {
-    [postProcessEffect in PostProcessEffects]: boolean;
+    [postProcessEffect in PostProcessEffectsTypes]: boolean;
   } = {
     prismaColors: false,
     blackAndWhite: false,
@@ -120,7 +120,9 @@ class BabylonShaderController {
     }
   };
 
-  private createPostProcessEffect = (postProcessEffect: PostProcessEffects) => {
+  private createPostProcessEffect = (
+    postProcessEffect: PostProcessEffectsTypes
+  ) => {
     switch (postProcessEffect) {
       case "prismaColors":
         if (this.prismaColorsPostProcess === undefined) {
@@ -331,9 +333,9 @@ class BabylonShaderController {
         if (this.tonemapPostProcess === undefined) {
           this.tonemapPostProcess = new TonemapPostProcess(
             "tonemap",
-            TonemappingOperator.HejiDawson, // You can switch between Hable, Reinhard, or HejiDawson
-            1.0, // Exposure adjustment
-            this.camera // Attach it to your camera
+            TonemappingOperator.HejiDawson,
+            1.0,
+            this.camera
           );
         }
         break;
@@ -446,7 +448,9 @@ class BabylonShaderController {
     }
   };
 
-  private removePostProcessEffect = (postProcessEffect: PostProcessEffects) => {
+  private removePostProcessEffect = (
+    postProcessEffect: PostProcessEffectsTypes
+  ) => {
     switch (postProcessEffect) {
       case "prismaColors":
         if (this.prismaColorsPostProcess) {
@@ -597,11 +601,11 @@ class BabylonShaderController {
     this.updateUniforms();
   };
 
-  swapPostProcessEffects = (postProcessEffect: PostProcessEffects) => {
+  swapPostProcessEffects = (postProcessEffect: PostProcessEffectsTypes) => {
     for (const shader in this.activeShaders) {
-      if (this.activeShaders[shader as PostProcessEffects]) {
-        this.removePostProcessEffect(shader as PostProcessEffects);
-        this.activeShaders[shader as PostProcessEffects] = false;
+      if (this.activeShaders[shader as PostProcessEffectsTypes]) {
+        this.removePostProcessEffect(shader as PostProcessEffectsTypes);
+        this.activeShaders[shader as PostProcessEffectsTypes] = false;
       }
     }
 
@@ -611,14 +615,14 @@ class BabylonShaderController {
   togglePostProcessEffectsActive = (active: boolean) => {
     if (active) {
       for (const shader in this.activeShaders) {
-        if (this.activeShaders[shader as PostProcessEffects]) {
-          this.createPostProcessEffect(shader as PostProcessEffects);
+        if (this.activeShaders[shader as PostProcessEffectsTypes]) {
+          this.createPostProcessEffect(shader as PostProcessEffectsTypes);
         }
       }
     } else {
       for (const shader in this.activeShaders) {
-        if (this.activeShaders[shader as PostProcessEffects]) {
-          this.removePostProcessEffect(shader as PostProcessEffects);
+        if (this.activeShaders[shader as PostProcessEffectsTypes]) {
+          this.removePostProcessEffect(shader as PostProcessEffectsTypes);
         }
       }
     }

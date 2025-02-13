@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
+import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import VideoMedia from "../../../lib/VideoMedia";
-import lowerVideoController from "../lowerVideoControls/lib/LowerVideoController";
+import lowerVideoController from "../lowerVideoControls/LowerVideoController";
 import BabylonPostProcessEffectsButton from "../../../fgElements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../fgElements/effectsButtons/BlurButton";
 import TintSection from "../../../fgElements/effectsButtons/TintSection";
@@ -58,6 +59,7 @@ export default function VideoEffectsSection({
   videoMedia: VideoMedia;
 }) {
   const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+  const { userMedia } = useMediaContext();
 
   const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
@@ -129,11 +131,23 @@ export default function VideoEffectsSection({
           userEffectsStyles.current.video[videoId].video.postProcess
         }
         clickFunctionCallback={async () => {
+          userMedia.current.video[
+            videoId
+          ].babylonScene?.babylonShaderController.swapPostProcessEffects(
+            userEffectsStyles.current.video[videoId].video.postProcess.style
+          );
+
           await lowerVideoController.handleVideoEffect("postProcess", false);
         }}
         holdFunctionCallback={async (effectType) => {
           userEffectsStyles.current.video[videoId].video.postProcess.style =
             effectType;
+
+          userMedia.current.video[
+            videoId
+          ].babylonScene?.babylonShaderController.swapPostProcessEffects(
+            userEffectsStyles.current.video[videoId].video.postProcess.style
+          );
 
           await lowerVideoController.handleVideoEffect(
             "postProcess",

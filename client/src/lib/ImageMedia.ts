@@ -30,6 +30,7 @@ class ImageMedia {
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
+  private blobURL: string | undefined;
 
   babylonScene: BabylonScene | undefined;
 
@@ -271,8 +272,8 @@ class ImageMedia {
       }
 
       const blob = new Blob([mergedBuffer], { type: this.mimeType });
-      const url = URL.createObjectURL(blob);
-      this.image.src = url;
+      this.blobURL = URL.createObjectURL(blob);
+      this.image.src = this.blobURL;
 
       this.babylonScene = new BabylonScene(
         this.imageId,
@@ -300,18 +301,13 @@ class ImageMedia {
   };
 
   downloadImage = () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = this.image.naturalWidth;
-    canvas.height = this.image.naturalHeight;
-    const context = canvas.getContext("2d");
-
-    context?.drawImage(this.image, 0, 0);
-
-    const imageURL = canvas.toDataURL("image/png");
+    if (!this.blobURL) {
+      return;
+    }
 
     const link = document.createElement("a");
-    link.href = imageURL;
-    link.download = "downloaded-image.png";
+    link.href = this.blobURL;
+    link.download = "downloaded-video.png";
 
     document.body.appendChild(link);
     link.click();

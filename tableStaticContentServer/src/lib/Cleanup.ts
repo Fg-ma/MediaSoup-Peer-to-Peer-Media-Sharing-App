@@ -1,15 +1,17 @@
-import { tableContentController, tableTopCeph } from "../index";
+import { tableContentController, tableTopCeph, tableTopMongo } from "../index";
 import Broadcaster from "./Broadcaster";
 import { onDeleteContentType } from "../typeConstant";
 
 class Cleanup {
   constructor(private broadcaster: Broadcaster) {}
 
-  onDeleteContent = (event: onDeleteContentType) => {
+  onDeleteContent = async (event: onDeleteContentType) => {
     const { table_id, contentType, contentId } = event.header;
     const { filename } = event.data;
 
-    tableTopCeph.deleteFile("mybucket", filename);
+    await tableTopCeph.deleteFile("mybucket", filename);
+
+    await tableTopMongo.deleteDocument(table_id, contentType, contentId);
 
     tableContentController.deleteContent(table_id, contentType, contentId);
 

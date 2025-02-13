@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../fgElements/fgButton/FgButton";
+import FgHoverContentStandard from "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
-import { ActivePages } from "../../LowerVideoControls";
-import { Settings } from "../../../typeConstant";
+import { ActivePages, Settings } from "../../typeConstant";
 
 type RecursiveObject = {
   active?: boolean;

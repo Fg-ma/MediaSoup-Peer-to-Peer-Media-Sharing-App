@@ -10,10 +10,12 @@ import TableContentController from "./lib/TableContentController";
 import Cleanup from "./lib/Cleanup";
 import TableTopCeph from "./lib/TableTopCeph";
 import Gets from "./gets/gets";
+import TableTopMongo from "./mongo/TableTopMongo";
 
 dotenv.config();
 
 export const tableTopCeph = new TableTopCeph();
+export const tableTopMongo = new TableTopMongo();
 export const broadcaster = new Broadcaster();
 export const tablesController = new TablesController(broadcaster);
 export const metadataController = new MetadataController(broadcaster);
@@ -21,7 +23,7 @@ export const gets = new Gets(broadcaster);
 export const tableContentController = new TableContentController();
 export const cleanup = new Cleanup(broadcaster);
 
-tableTopCeph.emptyBucket("mybucket");
+// tableTopCeph.emptyBucket("mybucket");
 // tableTopCeph.listBucketContents("mybucket");
 
 const sslOptions = {

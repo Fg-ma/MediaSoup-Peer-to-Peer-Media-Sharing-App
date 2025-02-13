@@ -550,7 +550,7 @@ export const defaultImageStreamEffects: {
 
 export const defaultPostProcess: PostProcessEffectsTypes = "prismaColors";
 export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
-export const defaultHideBackgroundColor = "#F56114";
+export const defaultHideBackgroundColor = "#d40213";
 export const defaultBeard: BeardsEffectTypes = "classicalCurlyBeard";
 export const defaultGlasses: GlassesEffectTypes = "defaultGlasses";
 export const defaultMustache: MustachesEffectTypes = "mustache1";

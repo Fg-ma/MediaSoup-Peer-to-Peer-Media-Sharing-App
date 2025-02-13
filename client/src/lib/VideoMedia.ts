@@ -37,6 +37,7 @@ class VideoMedia {
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
+  private blobURL: string | undefined;
 
   private creationTime = Date.now();
 
@@ -278,8 +279,8 @@ class VideoMedia {
       }
 
       const blob = new Blob([mergedBuffer], { type: this.mimeType });
-      const url = URL.createObjectURL(blob);
-      this.video.src = url;
+      this.blobURL = URL.createObjectURL(blob);
+      this.video.src = this.blobURL;
 
       this.babylonScene = new BabylonScene(
         this.videoId,
@@ -584,6 +585,20 @@ class VideoMedia {
 
   getVideoTime = () => {
     return this.video.currentTime;
+  };
+
+  downloadVideo = () => {
+    if (!this.blobURL) {
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = this.blobURL;
+    link.download = "downloaded-video.mp4";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 }
 

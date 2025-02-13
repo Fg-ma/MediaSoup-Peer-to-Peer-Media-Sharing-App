@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
-import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgButton from "../../../../../fgElements/fgButton/FgButton";
 import ClosedCaptionsPage, {
   closedCaptionsSelections,
 } from "./ClosedCaptionsPage";
@@ -9,8 +9,17 @@ import ClosedCaptionsOptionsPage, {
   closedCaptionsOptionsArrays,
 } from "./ClosedCaptionsOptionsPage";
 import PageTemplate from "./PageTemplate";
-import { ActivePages } from "../../../LowerVideoControls";
-import { Settings } from "../../../../typeConstant";
+import {
+  ActivePages,
+  downloadTypeOptions,
+  downloadTypeOptionsArrays,
+  downloadTypeOptionsTitles,
+  DownloadTypeOptionsTypes,
+  downloadTypeSelections,
+  Settings,
+} from "../../../typeConstant";
+import DownloadTypePage from "./DownloadTypePage";
+import DownloadTypeOptionsPage from "./DownloadTypeOptionsPage";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -177,6 +186,16 @@ export default function SettingsPanel({
     });
   };
 
+  const handleDownloadTypeActive = () => {
+    setActivePages((prev) => {
+      const newActivePages = { ...prev };
+
+      newActivePages.downloadType.active = !newActivePages.downloadType.active;
+
+      return newActivePages;
+    });
+  };
+
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
@@ -200,6 +219,21 @@ export default function SettingsPanel({
             animate='animate'
             exit='exit'
           >
+            <FgButton
+              className='w-full'
+              contentFunction={() => (
+                <div className='flex w-full text-nowrap hover:bg-gray-400 justify-between px-2 rounded items-center'>
+                  <div>Download</div>
+                  <div>
+                    {Object.prototype.hasOwnProperty.call(
+                      downloadTypeSelections,
+                      settings.downloadType.value
+                    ) && downloadTypeSelections[settings.downloadType.value]}
+                  </div>
+                </div>
+              )}
+              clickFunction={handleDownloadTypeActive}
+            />
             <FgButton
               className='w-full'
               contentFunction={() => (
@@ -326,6 +360,121 @@ export default function SettingsPanel({
                             !newActivePages.closedCaption
                               .closedCaptionOptionsActive[
                               option as ClosedCaptionOptions
+                            ].active;
+
+                          return newActivePages;
+                        });
+                      }}
+                    />
+                  )
+                );
+              })}
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.downloadType.active &&
+          !isDescendantActive(activePages.downloadType) && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <DownloadTypePage
+                setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.downloadType.active &&
+          activePages.downloadType.downloadTypeOptions.active &&
+          !isDescendantActive(activePages.downloadType.downloadTypeOptions) && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <DownloadTypeOptionsPage
+                setActivePages={setActivePages}
+                settings={settings}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.downloadType.active &&
+          activePages.downloadType.downloadTypeOptions.active &&
+          isDescendantActive(activePages.downloadType.downloadTypeOptions) && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              {downloadTypeOptions.map((option) => {
+                const activePage =
+                  activePages.downloadType.downloadTypeOptions[
+                    option as DownloadTypeOptionsTypes
+                  ];
+                const activeSetting =
+                  settings.downloadType.downloadTypeOptions[
+                    option as DownloadTypeOptionsTypes
+                  ];
+
+                return (
+                  activePage.active && (
+                    <PageTemplate
+                      key={option}
+                      content={downloadTypeOptionsArrays[
+                        option as DownloadTypeOptionsTypes
+                      ].map((type) => (
+                        <FgButton
+                          key={type}
+                          className={`w-full rounded bg-opacity-75 min-w-32 px-2 ${
+                            type === activeSetting.value
+                              ? "bg-gray-400"
+                              : "hover:bg-gray-400"
+                          }`}
+                          contentFunction={() => (
+                            <div className='flex justify-start items-start'>
+                              {type}
+                            </div>
+                          )}
+                          clickFunction={() => {
+                            setSettings((prev) => {
+                              const newSettings = { ...prev };
+
+                              newSettings.downloadType.downloadTypeOptions[
+                                option as DownloadTypeOptionsTypes
+                              ].value = type;
+
+                              return newSettings;
+                            });
+                          }}
+                        />
+                      ))}
+                      pageTitle={
+                        downloadTypeOptionsTitles[
+                          option as DownloadTypeOptionsTypes
+                        ]
+                      }
+                      backFunction={() => {
+                        setActivePages((prev) => {
+                          const newActivePages = { ...prev };
+
+                          newActivePages.downloadType.downloadTypeOptions[
+                            option as DownloadTypeOptionsTypes
+                          ].active =
+                            !newActivePages.downloadType.downloadTypeOptions[
+                              option as DownloadTypeOptionsTypes
                             ].active;
 
                           return newActivePages;

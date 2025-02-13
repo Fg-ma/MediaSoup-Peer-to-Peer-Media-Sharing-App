@@ -1,57 +1,18 @@
-import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
+import { UserMediaType } from "../../../context/mediaContext/typeConstant";
 import {
   UserStreamEffectsType,
   VideoEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
-import { Settings } from "../../typeConstant";
-import VideoMedia from "../../../../lib/VideoMedia";
-
-const fontSizeMap = {
-  xsmall: "0.75rem",
-  small: "1.25rem",
-  base: "1.5rem",
-  medium: "2rem",
-  large: "2.5rem",
-  xlarge: "3rem",
-};
-
-const opacityMap = {
-  "25%": "0.25",
-  "50%": "0.5",
-  "75%": "0.75",
-  "100%": "1",
-};
-
-const colorMap = {
-  white: "rgba(255, 255, 255,",
-  black: "rgba(0, 0, 0,",
-  red: "rgba(255, 0, 0,",
-  green: "rgba(0, 255, 0,",
-  blue: "rgba(0, 0, 255,",
-  magenta: "rgba(255, 0, 255,",
-  orange: "rgba(255, 165, 0,",
-  cyan: "rgba(0, 255, 255,",
-};
-
-const fontFamilyMap = {
-  K2D: "'K2D', sans-serif",
-  Josephin: "'Josefin Sans', sans-serif",
-  mono: "'Courier New', monospace",
-  sans: "'Arial', sans-serif",
-  serif: "'Times New Roman', serif",
-  thin: "'Montserrat Thin', sans-serif",
-  bold: "'Noto Sans', sans-serif",
-};
-
-const characterEdgeStyleMap = {
-  None: "none",
-  Shadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
-  Raised: "1px 1px 2px rgba(0, 0, 0, 0.4)",
-  Inset:
-    "1px 1px 2px rgba(255, 255, 255, 0.5), -1px -1px 2px rgba(0, 0, 0, 0.4)",
-  Outline:
-    "-1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black, 1px 1px 0px black",
-};
+} from "../../../context/effectsContext/typeConstant";
+import {
+  characterEdgeStyleMap,
+  colorMap,
+  downloadRecordingMimeMap,
+  fontFamilyMap,
+  fontSizeMap,
+  opacityMap,
+  Settings,
+} from "../typeConstant";
+import VideoMedia from "../../../lib/VideoMedia";
 
 class LowerVideoController {
   private initTime: number;
@@ -76,7 +37,11 @@ class LowerVideoController {
     private tintColor: React.MutableRefObject<string>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private initTimeOffset: React.MutableRefObject<number>
+    private initTimeOffset: React.MutableRefObject<number>,
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private recording: React.MutableRefObject<boolean>,
+    private downloadRecordingReady: React.MutableRefObject<boolean>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     this.initTime = Date.now();
   }
@@ -194,6 +159,15 @@ class LowerVideoController {
         break;
       case "arrowdown":
         this.volumeControl(-0.05);
+        break;
+      case "d":
+        this.handleDownload();
+        break;
+      case "u":
+        this.handleSettings();
+        break;
+      case "h":
+        this.handleDownloadRecording();
         break;
       default:
         break;
@@ -314,6 +288,43 @@ class LowerVideoController {
 
   setInitTimeOffset = (offset: number) => {
     this.initTimeOffset.current = offset;
+  };
+
+  handleDownload = () => {
+    if (this.settings.downloadType.value === "snapShot") {
+      this.videoMedia.babylonScene?.downloadSnapShot();
+    } else if (this.settings.downloadType.value === "original") {
+      this.videoMedia.downloadVideo();
+    } else if (this.settings.downloadType.value === "record") {
+      if (!this.recording.current) {
+        this.videoMedia.babylonScene?.startRecording(
+          downloadRecordingMimeMap[
+            this.settings.downloadType.downloadTypeOptions.mimeType.value
+          ],
+          parseInt(
+            this.settings.downloadType.downloadTypeOptions.fps.value.slice(
+              0,
+              -4
+            )
+          )
+        );
+        this.downloadRecordingReady.current = false;
+      } else {
+        this.videoMedia.babylonScene?.stopRecording();
+        this.downloadRecordingReady.current = true;
+      }
+
+      this.recording.current = !this.recording.current;
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  handleDownloadRecording = () => {
+    this.videoMedia.babylonScene?.downloadRecording();
+  };
+
+  handleSettings = () => {
+    this.setSettingsActive((prev) => !prev);
   };
 }
 
