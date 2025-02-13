@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  Suspense,
+  useLayoutEffect,
+} from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import {
   CameraEffectTypes,
   ScreenEffectTypes,
   HideBackgroundEffectTypes,
-  PostProcessEffects,
+  PostProcessEffectTypes,
 } from "../../../context/effectsContext/typeConstant";
 import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
@@ -78,7 +84,7 @@ export default function VisualEffectsSection({
     blockStateChange?: boolean,
     hideBackgroundStyle?: HideBackgroundEffectTypes,
     hideBackgroundColor?: string,
-    postProcessStyle?: PostProcessEffects
+    postProcessStyle?: PostProcessEffectTypes
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
 }) {
@@ -91,30 +97,12 @@ export default function VisualEffectsSection({
     remoteStreamEffects,
   } = useEffectsContext();
 
-  const [_, setRerender] = useState(0);
-  const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
+  const [overflow, setOverflow] = useState(false);
 
-  const [overflowingXDirection, setOverflowingXDirection] = useState(false);
+  const [_, setRerender] = useState(0);
+
   const effectsContainerRef = useRef<HTMLDivElement>(null);
-
-  const updateWidth = () => {
-    if (visualMediaContainerRef.current) {
-      const newEffectsWidth = visualMediaContainerRef.current.clientWidth * 0.9;
-
-      setEffectsWidth(newEffectsWidth);
-
-      if (effectsContainerRef.current) {
-        setOverflowingXDirection(
-          effectsContainerRef.current.scrollWidth > newEffectsWidth
-        );
-      }
-    }
-  };
-
-  useEffect(() => {
-    updateWidth();
-  }, [visualMediaContainerRef.current?.clientWidth]);
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -130,13 +118,27 @@ export default function VisualEffectsSection({
 
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
-    window.addEventListener("resize", updateWidth);
-
     return () => {
       mediasoupSocket.current?.removeMessageListener(handleMessage);
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("resize", updateWidth);
     };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!effectsContainerRef.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      const el = effectsContainerRef.current;
+      if (el) {
+        setOverflow(el.clientWidth < el.scrollWidth);
+      }
+    });
+
+    observer.observe(effectsContainerRef.current);
+
+    return () => observer.disconnect();
   }, []);
 
   const handleMessage = (event: IncomingMediasoupMessages) => {
@@ -168,11 +170,8 @@ export default function VisualEffectsSection({
     <motion.div
       ref={effectsContainerRef}
       className={`${
-        overflowingXDirection ? "" : "pb-2"
-      } tiny-horizontal-scroll-bar left-1/2 h-max overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center`}
-      style={{
-        width: effectsWidth,
-      }}
+        overflow ? "pb-1" : "pb-2"
+      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full justify-center items-center pointer-events-auto`}
       variants={EffectSectionVar}
       initial='init'
       animate='animate'

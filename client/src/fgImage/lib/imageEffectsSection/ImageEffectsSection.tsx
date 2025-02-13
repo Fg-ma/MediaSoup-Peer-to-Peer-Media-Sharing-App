@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  Suspense,
+  useLayoutEffect,
+} from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
@@ -64,29 +70,10 @@ export default function ImageEffectsSection({
   const { userEffectsStyles, userStreamEffects } = useEffectsContext();
   const { userMedia } = useMediaContext();
 
-  const [effectsWidth, setEffectsWidth] = useState(0);
   const [effectsDisabled, setEffectsDisabled] = useState(false);
+  const [overflow, setOverflow] = useState(false);
 
-  const [overflowingXDirection, setOverflowingXDirection] = useState(false);
   const effectsContainerRef = useRef<HTMLDivElement>(null);
-
-  const updateWidth = () => {
-    if (imageContainerRef.current) {
-      const newEffectsWidth = imageContainerRef.current.clientWidth * 0.9;
-
-      setEffectsWidth(newEffectsWidth);
-
-      if (effectsContainerRef.current) {
-        setOverflowingXDirection(
-          effectsContainerRef.current.scrollWidth > newEffectsWidth
-        );
-      }
-    }
-  };
-
-  useEffect(() => {
-    updateWidth();
-  }, [imageContainerRef.current?.clientWidth]);
 
   const handleWheel = (event: WheelEvent) => {
     event.stopPropagation();
@@ -100,23 +87,34 @@ export default function ImageEffectsSection({
   useEffect(() => {
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
-    window.addEventListener("resize", updateWidth);
-
     return () => {
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("resize", updateWidth);
     };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!effectsContainerRef.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      const el = effectsContainerRef.current;
+      if (el) {
+        setOverflow(el.clientWidth < el.scrollWidth);
+      }
+    });
+
+    observer.observe(effectsContainerRef.current);
+
+    return () => observer.disconnect();
   }, []);
 
   return (
     <motion.div
       ref={effectsContainerRef}
       className={`${
-        overflowingXDirection ? "" : "pb-2"
-      } tiny-horizontal-scroll-bar left-1/2 h-max overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center pointer-events-auto`}
-      style={{
-        width: effectsWidth,
-      }}
+        overflow ? "pb-1" : "pb-2"
+      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center justify-center pointer-events-auto`}
       variants={EffectSectionVar}
       initial='init'
       animate='animate'

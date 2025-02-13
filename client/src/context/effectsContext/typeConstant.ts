@@ -137,7 +137,7 @@ export type CameraEffectStylesType = {
     style: "";
   };
   postProcess: {
-    style: PostProcessEffectsTypes;
+    style: PostProcessEffectTypes;
   };
   hideBackground: {
     style: HideBackgroundEffectTypes;
@@ -163,7 +163,7 @@ export type CameraEffectStylesType = {
   };
 };
 
-export type PostProcessEffectsTypes =
+export type PostProcessEffectTypes =
   | "prismaColors"
   | "blackAndWhite"
   | "bubbleChromatic"
@@ -312,7 +312,7 @@ export type PetsEffectTypes =
 
 export interface ScreenEffectStylesType {
   postProcess: {
-    style: PostProcessEffectsTypes;
+    style: PostProcessEffectTypes;
   };
 }
 
@@ -329,7 +329,7 @@ export type VideoEffectStylesType = {
     style: "";
   };
   postProcess: {
-    style: PostProcessEffectsTypes;
+    style: PostProcessEffectTypes;
   };
   glasses: {
     style: GlassesEffectTypes;
@@ -359,7 +359,7 @@ export type ImageEffectStylesType = {
     style: "";
   };
   postProcess: {
-    style: PostProcessEffectsTypes;
+    style: PostProcessEffectTypes;
   };
   hideBackground: {
     style: HideBackgroundEffectTypes;
@@ -548,7 +548,7 @@ export const defaultImageStreamEffects: {
   pets: false,
 });
 
-export const defaultPostProcess: PostProcessEffectsTypes = "prismaColors";
+export const defaultPostProcess: PostProcessEffectTypes = "prismaColors";
 export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
 export const defaultHideBackgroundColor = "#d40213";
 export const defaultBeard: BeardsEffectTypes = "classicalCurlyBeard";
