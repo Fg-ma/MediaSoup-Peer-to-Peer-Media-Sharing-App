@@ -2,7 +2,6 @@ import uWS from "uWebSockets.js";
 import dotenv from "dotenv";
 import { tables, TableStaticContentWebSocket } from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
-import handlePosts from "./posts/posts";
 import handleMessage from "./lib/websocketMessages";
 import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
@@ -11,6 +10,7 @@ import Cleanup from "./lib/Cleanup";
 import TableTopCeph from "./lib/TableTopCeph";
 import Gets from "./gets/gets";
 import TableTopMongo from "./mongo/TableTopMongo";
+import Posts from "./posts/posts";
 
 dotenv.config();
 
@@ -93,4 +93,4 @@ app
     }
   });
 
-handlePosts(app);
+export const posts = new Posts(app);

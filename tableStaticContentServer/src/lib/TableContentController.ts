@@ -3,18 +3,9 @@ import {
   TableContentTypes,
   TableTopStaticMimeType,
 } from "../typeConstant";
-import { unlinkSync } from "fs";
 
 class TableContentController {
   constructor() {}
-
-  private getFilename = (input: string): string => {
-    const lastSlashIndex = input.lastIndexOf("/");
-    if (lastSlashIndex === -1) {
-      return input;
-    }
-    return input.substring(lastSlashIndex + 1);
-  };
 
   setContent = (
     table_id: string,
@@ -49,8 +40,6 @@ class TableContentController {
     contentId: string
   ) => {
     if (tableContent[table_id]?.[type]?.[contentId]) {
-      const tableContentData = tableContent[table_id][type][contentId];
-
       delete tableContent[table_id][type][contentId];
 
       if (Object.keys(tableContent[table_id][type]).length === 0) {

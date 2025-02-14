@@ -1,26 +1,16 @@
 import { Collection } from "mongodb";
-import {
-  beardsEffectEncodingMap,
-  glassesEffectEncodingMap,
-  hatsEffectEncodingMap,
-  hideBackgroundEffectEncodingMap,
-  masksEffectEncodingMap,
-  mustachesEffectEncodingMap,
-  petsEffectEncodingMap,
-  postProcessEffectEncodingMap,
-} from "../typeConstant";
 import Encoder from "./Encoder";
-import { ImageEffectStylesType, ImageEffectTypes } from "./typeConstant";
+import { AudioEffectTypes } from "./typeConstant";
 
 class Uploads {
   constructor(
-    private tableImagesCollection: Collection,
+    private tableAudioCollection: Collection,
     private encoder: Encoder
   ) {}
 
   uploadMetaData = async (data: {
     table_id: string;
-    imageId: string;
+    audioId: string;
     positioning: {
       position: {
         left: number;
@@ -33,32 +23,30 @@ class Uploads {
       rotation: number;
     };
     effects: {
-      [effectType in ImageEffectTypes]: boolean;
+      [effectType in AudioEffectTypes]: boolean;
     };
-    effectStyles: ImageEffectStylesType;
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
     try {
-      await this.tableImagesCollection?.insertOne(mongoData);
+      await this.tableAudioCollection?.insertOne(mongoData);
     } catch (err) {
       console.error("Error uploading data:", err);
     }
   };
 
   editMetaData = async (
-    filter: { table_id: string; imageId: string },
+    filter: { table_id: string; audioId: string },
     updateData: Partial<{
       positioning: {
         position?: { left?: number; top?: number };
         scale?: { x?: number; y?: number };
         rotation?: number;
       };
-      effects?: { [effectType in ImageEffectTypes]?: boolean };
-      effectStyles?: ImageEffectStylesType;
+      effects?: { [effectType in AudioEffectTypes]?: boolean };
     }>
   ) => {
-    if (!this.tableImagesCollection) {
+    if (!this.tableAudioCollection) {
       console.error("Database not connected");
       return;
     }
@@ -98,39 +86,9 @@ class Uploads {
         .map((effect) => parseInt(effect));
     }
 
-    if (updateData.effectStyles) {
-      updateFields["es"] = {
-        "0": {
-          s: postProcessEffectEncodingMap[
-            updateData.effectStyles.postProcess.style
-          ],
-        },
-        "1": {
-          s: hideBackgroundEffectEncodingMap[
-            updateData.effectStyles.hideBackground.style
-          ],
-          c: updateData.effectStyles.hideBackground.color,
-        },
-        "2": {
-          s: glassesEffectEncodingMap[updateData.effectStyles.glasses.style],
-        },
-        "3": {
-          s: beardsEffectEncodingMap[updateData.effectStyles.beards.style],
-        },
-        "4": {
-          s: mustachesEffectEncodingMap[
-            updateData.effectStyles.mustaches.style
-          ],
-        },
-        "5": { s: masksEffectEncodingMap[updateData.effectStyles.masks.style] },
-        "6": { s: hatsEffectEncodingMap[updateData.effectStyles.hats.style] },
-        "7": { s: petsEffectEncodingMap[updateData.effectStyles.pets.style] },
-      };
-    }
-
     try {
-      const result = await this.tableImagesCollection.updateOne(
-        { tid: filter.table_id, iid: filter.imageId },
+      const result = await this.tableAudioCollection.updateOne(
+        { tid: filter.table_id, iid: filter.audioId },
         { $set: updateFields }
       );
       return result;

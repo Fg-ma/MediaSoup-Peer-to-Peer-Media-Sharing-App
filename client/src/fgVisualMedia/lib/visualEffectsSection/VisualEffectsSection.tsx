@@ -68,7 +68,6 @@ export default function VisualEffectsSection({
   visualMediaId,
   isUser,
   acceptsVisualEffects,
-  visualMediaContainerRef,
   handleVisualEffectChange,
   tintColor,
 }: {
@@ -78,7 +77,6 @@ export default function VisualEffectsSection({
   visualMediaId: string;
   isUser: boolean;
   acceptsVisualEffects: boolean;
-  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange?: boolean,
@@ -171,7 +169,7 @@ export default function VisualEffectsSection({
       ref={effectsContainerRef}
       className={`${
         overflow ? "pb-1" : "pb-2"
-      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full justify-center items-center pointer-events-auto`}
+      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center pointer-events-auto`}
       variants={EffectSectionVar}
       initial='init'
       animate='animate'

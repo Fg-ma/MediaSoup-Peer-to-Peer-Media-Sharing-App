@@ -13,7 +13,7 @@ import {
   Effect,
   PostProcess,
 } from "@babylonjs/core";
-import { PostProcessEffectsTypes } from "../context/effectsContext/typeConstant";
+import { PostProcessEffectTypes } from "../context/effectsContext/typeConstant";
 
 class BabylonShaderController {
   private time = 0;
@@ -44,7 +44,7 @@ class BabylonShaderController {
   private vintageTVGlitchActiveTimeout: NodeJS.Timeout | undefined;
 
   private activeShaders: {
-    [postProcessEffect in PostProcessEffectsTypes]: boolean;
+    [postProcessEffect in PostProcessEffectTypes]: boolean;
   } = {
     prismaColors: false,
     blackAndWhite: false,
@@ -121,7 +121,7 @@ class BabylonShaderController {
   };
 
   private createPostProcessEffect = (
-    postProcessEffect: PostProcessEffectsTypes
+    postProcessEffect: PostProcessEffectTypes
   ) => {
     switch (postProcessEffect) {
       case "prismaColors":
@@ -449,7 +449,7 @@ class BabylonShaderController {
   };
 
   private removePostProcessEffect = (
-    postProcessEffect: PostProcessEffectsTypes
+    postProcessEffect: PostProcessEffectTypes
   ) => {
     switch (postProcessEffect) {
       case "prismaColors":
@@ -601,11 +601,11 @@ class BabylonShaderController {
     this.updateUniforms();
   };
 
-  swapPostProcessEffects = (postProcessEffect: PostProcessEffectsTypes) => {
+  swapPostProcessEffects = (postProcessEffect: PostProcessEffectTypes) => {
     for (const shader in this.activeShaders) {
-      if (this.activeShaders[shader as PostProcessEffectsTypes]) {
-        this.removePostProcessEffect(shader as PostProcessEffectsTypes);
-        this.activeShaders[shader as PostProcessEffectsTypes] = false;
+      if (this.activeShaders[shader as PostProcessEffectTypes]) {
+        this.removePostProcessEffect(shader as PostProcessEffectTypes);
+        this.activeShaders[shader as PostProcessEffectTypes] = false;
       }
     }
 
@@ -615,14 +615,14 @@ class BabylonShaderController {
   togglePostProcessEffectsActive = (active: boolean) => {
     if (active) {
       for (const shader in this.activeShaders) {
-        if (this.activeShaders[shader as PostProcessEffectsTypes]) {
-          this.createPostProcessEffect(shader as PostProcessEffectsTypes);
+        if (this.activeShaders[shader as PostProcessEffectTypes]) {
+          this.createPostProcessEffect(shader as PostProcessEffectTypes);
         }
       }
     } else {
       for (const shader in this.activeShaders) {
-        if (this.activeShaders[shader as PostProcessEffectsTypes]) {
-          this.removePostProcessEffect(shader as PostProcessEffectsTypes);
+        if (this.activeShaders[shader as PostProcessEffectTypes]) {
+          this.removePostProcessEffect(shader as PostProcessEffectTypes);
         }
       }
     }

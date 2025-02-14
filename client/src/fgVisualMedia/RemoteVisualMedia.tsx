@@ -3,7 +3,7 @@ import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import {
   HideBackgroundEffectTypes,
-  PostProcessEffects,
+  PostProcessEffectTypes,
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
@@ -191,7 +191,7 @@ export default function RemoteVisualMedia({
     blockStateChange: boolean = false,
     hideBackgroundStyle?: HideBackgroundEffectTypes,
     hideBackgroundColor?: string,
-    postProcessStyle?: PostProcessEffects
+    postProcessStyle?: PostProcessEffectTypes
   ) => {
     if (
       (type === "camera" &&

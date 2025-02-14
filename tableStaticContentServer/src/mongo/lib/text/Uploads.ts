@@ -10,17 +10,17 @@ import {
   postProcessEffectEncodingMap,
 } from "../typeConstant";
 import Encoder from "./Encoder";
-import { ImageEffectStylesType, ImageEffectTypes } from "./typeConstant";
+import { TextEffectStylesType, TextEffectTypes } from "./typeConstant";
 
 class Uploads {
   constructor(
-    private tableImagesCollection: Collection,
+    private tableTextsCollection: Collection,
     private encoder: Encoder
   ) {}
 
   uploadMetaData = async (data: {
     table_id: string;
-    imageId: string;
+    textId: string;
     positioning: {
       position: {
         left: number;
@@ -33,32 +33,32 @@ class Uploads {
       rotation: number;
     };
     effects: {
-      [effectType in ImageEffectTypes]: boolean;
+      [effectType in TextEffectTypes]: boolean;
     };
-    effectStyles: ImageEffectStylesType;
+    effectStyles: TextEffectStylesType;
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
     try {
-      await this.tableImagesCollection?.insertOne(mongoData);
+      await this.tableTextsCollection?.insertOne(mongoData);
     } catch (err) {
       console.error("Error uploading data:", err);
     }
   };
 
   editMetaData = async (
-    filter: { table_id: string; imageId: string },
+    filter: { table_id: string; textId: string },
     updateData: Partial<{
       positioning: {
         position?: { left?: number; top?: number };
         scale?: { x?: number; y?: number };
         rotation?: number;
       };
-      effects?: { [effectType in ImageEffectTypes]?: boolean };
-      effectStyles?: ImageEffectStylesType;
+      effects?: { [effectType in TextEffectTypes]?: boolean };
+      effectStyles?: TextEffectStylesType;
     }>
   ) => {
-    if (!this.tableImagesCollection) {
+    if (!this.tableTextsCollection) {
       console.error("Database not connected");
       return;
     }
@@ -129,8 +129,8 @@ class Uploads {
     }
 
     try {
-      const result = await this.tableImagesCollection.updateOne(
-        { tid: filter.table_id, iid: filter.imageId },
+      const result = await this.tableTextsCollection.updateOne(
+        { tid: filter.table_id, vid: filter.textId },
         { $set: updateFields }
       );
       return result;

@@ -6,7 +6,7 @@ import {
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-  PostProcessEffects,
+  PostProcessEffectTypes,
 } from "../../context/effectsContext/typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -1167,7 +1167,7 @@ export const beardsLabels: {
 };
 
 export const postProcessEffectsChoices: {
-  [postProcessEffect in PostProcessEffects]?: {
+  [postProcessEffectType in PostProcessEffectTypes]?: {
     label: string;
     image: string;
     imageSmall: string;

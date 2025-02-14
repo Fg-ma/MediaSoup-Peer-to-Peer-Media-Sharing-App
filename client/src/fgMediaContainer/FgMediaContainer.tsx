@@ -24,6 +24,7 @@ export default function FgMediaContainer({
   bundleRef,
   media,
   rootMedia,
+  className,
   lowerPopupElements,
   leftLowerControls,
   rightLowerControls,
@@ -42,6 +43,7 @@ export default function FgMediaContainer({
   bundleRef: React.RefObject<HTMLDivElement>;
   media?: React.ReactNode;
   rootMedia: HTMLImageElement | HTMLVideoElement;
+  className?: string;
   lowerPopupElements?: (React.ReactNode | null)[];
   leftLowerControls?: (React.ReactNode | null)[];
   rightLowerControls?: (React.ReactNode | null)[];
@@ -230,7 +232,7 @@ export default function FgMediaContainer({
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
-      } flex items-center justify-center`}
+      } ${className} flex items-center justify-center`}
       style={{
         position: "absolute",
         left: `${positioning.current.position.left}%`,

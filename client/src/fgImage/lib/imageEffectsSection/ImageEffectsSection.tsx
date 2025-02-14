@@ -56,13 +56,11 @@ const EffectSectionTransition: Transition = {
 
 export default function ImageEffectsSection({
   imageId,
-  imageContainerRef,
   lowerImageController,
   tintColor,
   imageMedia,
 }: {
   imageId: string;
-  imageContainerRef: React.RefObject<HTMLDivElement>;
   lowerImageController: LowerImageController;
   tintColor: React.MutableRefObject<string>;
   imageMedia: ImageMedia;
@@ -114,7 +112,7 @@ export default function ImageEffectsSection({
       ref={effectsContainerRef}
       className={`${
         overflow ? "pb-1" : "pb-2"
-      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center justify-center pointer-events-auto`}
+      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-5 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center pointer-events-auto`}
       variants={EffectSectionVar}
       initial='init'
       animate='animate'

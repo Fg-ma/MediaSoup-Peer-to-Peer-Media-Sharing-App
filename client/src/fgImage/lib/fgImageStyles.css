@@ -21,8 +21,6 @@
   bottom: 1rem;
 }
 
-.image-container.in-image .captions,
-.image-container.paused .captions,
 .image-container.in-effects .captions,
 .image-container.in-settings .captions,
 .image-container.in-audio-effects .captions {
@@ -44,13 +42,9 @@
   word-break: break-word;
 }
 
-.image-container.mini-player .main-image {
-  transform: scaleX(1);
-}
-
 .image-container {
-  --primary-image-color: #f56114;
-  --closed-captions-font-family: "K2D";
+  --primary-image-color: #d40213;
+  --closed-captions-font-family: K2D;
   --closed-captions-font-color: white;
   --closed-captions-font-size: 2rem;
   --closed-captions-background-color: black;
@@ -58,43 +52,6 @@
   --closed-captions-character-edge-style: none;
 }
 
-.image-container .image-controls-container,
-.image-container .image-upper-controls,
-.image-container .controls-gradient {
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 150ms ease-in-out;
-}
-
-.image-controls-container {
-  pointer-events: none;
-}
-
-.image-controls {
-  pointer-events: auto;
-  padding-inline: 1rem;
-  margin-bottom: 0.375rem;
-}
-
-.image-upper-controls {
-  padding-left: 1.25rem;
-  padding-right: 0.25rem;
-  margin-top: 0.375rem;
-}
-
-.image-container .pan-btn,
-.image-container .scale-btn,
-.image-container .rotate-btn {
-  display: none;
-  transition: display 150ms ease-in-out;
-}
-
-.image-container.adjusting-dimensions .pan-btn,
-.image-container.adjusting-dimensions .scale-btn,
-.image-container.adjusting-dimensions .rotate-btn,
-.image-container.in-image .pan-btn,
-.image-container.in-image .scale-btn,
-.image-container.in-image .rotate-btn,
 .image-container.paused .pan-btn,
 .image-container.paused .scale-btn,
 .image-container.paused .rotate-btn,
@@ -110,9 +67,6 @@
   display: block;
 }
 
-.image-container.in-image .image-controls-container,
-.image-container.in-image .image-upper-controls,
-.image-container.in-image .controls-gradient,
 .image-container.paused .image-controls-container,
 .image-container.paused .image-upper-controls,
 .image-container.paused .controls-gradient,
@@ -128,11 +82,6 @@
   opacity: 1;
 }
 
-.image-container {
-  cursor: none;
-}
-
-.image-container.in-image,
 .image-container.paused,
 .image-container.in-effects,
 .image-container.in-settings,
@@ -175,50 +124,4 @@
   height: 2px;
   border-radius: 1px;
   background-color: var(--primary-image-color);
-}
-
-.animated-border-box,
-.animated-border-box-glow {
-  height: calc(100% + 8px);
-  width: calc(100% + 8px);
-  position: absolute;
-  overflow: hidden;
-  z-index: 0;
-  border-radius: 0.375rem;
-}
-
-.animated-border-box-glow {
-  overflow: hidden;
-  filter: blur(15px);
-}
-
-.animated-border-box:before,
-.animated-border-box-glow:before {
-  content: "";
-  z-index: -2;
-  text-align: center;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(0deg);
-  position: absolute;
-  width: 1000%;
-  height: 1000%;
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  /*border color, change middle color*/
-  background-image: conic-gradient(
-    rgba(0, 0, 0, 0) 0deg,
-    #f56114 90deg,
-    rgba(0, 0, 0, 0) 95deg,
-    #f56114 180deg,
-    rgba(0, 0, 0, 0) 185deg
-  );
-  /* change speed here */
-  animation: rotate 3s linear infinite;
-}
-
-@keyframes rotate {
-  100% {
-    transform: translate(-50%, -50%) rotate(1turn);
-  }
 }

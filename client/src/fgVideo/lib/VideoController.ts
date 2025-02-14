@@ -1,4 +1,4 @@
-import LowerVideoController from "./lowerVideoControls/lib/LowerVideoController";
+import LowerVideoController from "./lowerVideoControls/LowerVideoController";
 import { VideoOptions } from "./typeConstant";
 import TableStaticContentSocketController, {
   IncomingTableStaticContentMessages,
@@ -126,6 +126,77 @@ class VideoController {
 
     this.setRerender((prev) => !prev);
   };
+
+  // handlePlaybackSpeed = () => {
+  //   if (!this.videoRef.current || !this.playbackSpeedButtonRef.current) return;
+
+  //   const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+  //   const currentPlaybackRateIndex = playbackRates.findIndex(
+  //     (rate) => rate === this.videoRef.current?.playbackRate
+  //   );
+
+  //   const nextPlaybackRateIndex =
+  //     (currentPlaybackRateIndex + 1) % playbackRates.length;
+
+  //   this.videoRef.current.playbackRate = playbackRates[nextPlaybackRateIndex];
+  //   this.playbackSpeedButtonRef.current.textContent = `${playbackRates[nextPlaybackRateIndex]}x`;
+  // };
+
+  // extractThumbnails = async (): Promise<string[]> => {
+  //   if (!this.videoRef.current) {
+  //     return [];
+  //   }
+
+  //   const thumbnails: string[] = [];
+  //   const offscreenVideo = document.createElement("video");
+  //   const canvas = document.createElement("canvas");
+  //   const ctx = canvas.getContext("2d");
+  //   const videoWidth = this.videoRef.current.videoWidth;
+  //   const videoHeight = this.videoRef.current.videoHeight;
+  //   const videoAspectRatio = videoWidth / videoHeight;
+
+  //   if (!ctx) throw new Error("Failed to get 2D context");
+
+  //   offscreenVideo.src = this.videoRef.current.src;
+  //   offscreenVideo.crossOrigin = "anonymous";
+
+  //   await new Promise<void>((resolve) => {
+  //     offscreenVideo.onloadedmetadata = () => {
+  //       resolve();
+  //     };
+  //   });
+
+  //   const duration = offscreenVideo.duration;
+  //   const thumbnailHeight = Math.max(videoHeight / this.thumbnailClarity, 90);
+  //   const thumbnailWidth = Math.max(
+  //     videoWidth / this.thumbnailClarity,
+  //     90 * videoAspectRatio
+  //   );
+
+  //   for (let time = 0; time < duration; time += this.thumbnailInterval) {
+  //     offscreenVideo.currentTime = time;
+
+  //     await new Promise<void>((resolve) => {
+  //       offscreenVideo.onseeked = () => {
+  //         canvas.width = thumbnailWidth;
+  //         canvas.height = thumbnailHeight;
+  //         ctx.drawImage(offscreenVideo, 0, 0, thumbnailWidth, thumbnailHeight);
+  //         const thumbnail = canvas.toDataURL("image/png");
+  //         thumbnails.push(thumbnail);
+  //         resolve();
+  //       };
+  //     });
+  //   }
+
+  //   return thumbnails;
+  // };
+
+  // loadThumbnails = async () => {
+  //   if (this.videoRef.current) {
+  //     const generatedThumbnails = await this.extractThumbnails();
+  //     this.thumbnails.current = generatedThumbnails;
+  //   }
+  // };
 }
 
 export default VideoController;

@@ -17,7 +17,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   HideBackgroundEffectTypes,
-  PostProcessEffects,
+  PostProcessEffectTypes,
   ScreenEffectTypes,
   UserEffectsStylesType,
   UserStreamEffectsType,
@@ -824,7 +824,7 @@ export type onEffectChangeRequestedType = {
     style?: string;
     hideBackgroundStyle?: HideBackgroundEffectTypes;
     hideBackgroundColor?: string;
-    postProcessStyle?: PostProcessEffects;
+    postProcessStyle?: PostProcessEffectTypes;
   };
 };
 

@@ -71,8 +71,6 @@ export default function FgVideo({
 
   const [_, setCaptionsActive] = useState(false);
 
-  const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
-
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
     structuredClone(defaultSettings)
@@ -103,6 +101,13 @@ export default function FgVideo({
     rotation: 0,
   });
 
+  const timelineContainerRef = useRef<HTMLDivElement>(null);
+  const previewImgRef = useRef<HTMLImageElement>(null);
+  const thumbnailImgRef = useRef<HTMLImageElement>(null);
+  const isScrubbing = useRef(false);
+  const thumbnails = useRef<string[]>([]);
+  const wasPaused = useRef(false);
+
   const lowerVideoController = new LowerVideoController(
     videoId,
     videoMedia,
@@ -123,7 +128,13 @@ export default function FgVideo({
     setSettingsActive,
     recording,
     downloadRecordingReady,
-    setRerender
+    setRerender,
+    timelineContainerRef,
+    previewImgRef,
+    thumbnailImgRef,
+    isScrubbing,
+    thumbnails,
+    wasPaused
   );
 
   const videoController = new VideoController(
@@ -161,9 +172,9 @@ export default function FgVideo({
 
     // Keep video time
     lowerVideoController.timeUpdate();
-    timeUpdateInterval.current = setInterval(
-      lowerVideoController.timeUpdate,
-      1000
+    videoMedia.video.addEventListener(
+      "timeupdate",
+      lowerVideoController.timeUpdate
     );
 
     // Add eventlisteners
@@ -194,10 +205,6 @@ export default function FgVideo({
       tableStaticContentSocket.current?.removeMessageListener(
         videoController.handleTableStaticContentMessage
       );
-      if (timeUpdateInterval.current !== undefined) {
-        clearInterval(timeUpdateInterval.current);
-        timeUpdateInterval.current = undefined;
-      }
       document.removeEventListener(
         "fullscreenchange",
         lowerVideoController.handleFullScreenChange
@@ -244,11 +251,24 @@ export default function FgVideo({
       kind='video'
       rootMedia={videoMedia.video}
       bundleRef={bundleRef}
+      media={
+        <div
+          ref={timelineContainerRef}
+          className='timeline-container z-20'
+          onPointerMove={lowerVideoController.handleTimelineUpdate}
+          onPointerDown={lowerVideoController.handleScrubbing}
+        >
+          <div className='timeline'>
+            <img ref={previewImgRef} className='preview-img shadow-md' />
+            <div className='thumb-indicator'></div>
+          </div>
+        </div>
+      }
+      className='video-container'
       lowerPopupElements={[
         videoEffectsActive ? (
           <VideoEffectsSection
             videoId={videoId}
-            videoContainerRef={videoContainerRef}
             lowerVideoController={lowerVideoController}
             tintColor={tintColor}
             videoMedia={videoMedia}

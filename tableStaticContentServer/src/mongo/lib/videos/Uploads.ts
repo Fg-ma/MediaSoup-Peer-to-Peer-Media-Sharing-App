@@ -18,6 +18,34 @@ class Uploads {
     private encoder: Encoder
   ) {}
 
+  uploadMetaData = async (data: {
+    table_id: string;
+    videoId: string;
+    positioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    };
+    effects: {
+      [effectType in VideoEffectTypes]: boolean;
+    };
+    effectStyles: VideoEffectStylesType;
+  }) => {
+    const mongoData = this.encoder.encodeMetaData(data);
+
+    try {
+      await this.tableVideosCollection?.insertOne(mongoData);
+    } catch (err) {
+      console.error("Error uploading data:", err);
+    }
+  };
+
   editMetaData = async (
     filter: { table_id: string; videoId: string },
     updateData: Partial<{
@@ -31,7 +59,8 @@ class Uploads {
     }>
   ) => {
     if (!this.tableVideosCollection) {
-      throw new Error("Database not connected");
+      console.error("Database not connected");
+      return;
     }
 
     const updateFields: any = {};
@@ -107,34 +136,6 @@ class Uploads {
       return result;
     } catch (err) {
       console.error("Error updating data:", err);
-    }
-  };
-
-  uploadMetaData = async (data: {
-    table_id: string;
-    videoId: string;
-    positioning: {
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    };
-    effects: {
-      [effectType in VideoEffectTypes]: boolean;
-    };
-    effectStyles: VideoEffectStylesType;
-  }) => {
-    const mongoData = this.encoder.encodeMetaData(data);
-
-    try {
-      await this.tableVideosCollection?.insertOne(mongoData);
-    } catch (err) {
-      console.error("Error uploading data:", err);
     }
   };
 }

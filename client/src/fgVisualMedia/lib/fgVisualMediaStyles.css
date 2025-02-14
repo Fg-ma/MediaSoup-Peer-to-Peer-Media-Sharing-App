@@ -204,15 +204,13 @@
   height: 1000%;
   background-repeat: no-repeat;
   background-position: 0 0;
-  /*border color, change middle color*/
   background-image: conic-gradient(
     rgba(0, 0, 0, 0) 0deg,
-    #f56114 90deg,
+    #e62833 90deg,
     rgba(0, 0, 0, 0) 95deg,
-    #f56114 180deg,
+    #e62833 180deg,
     rgba(0, 0, 0, 0) 185deg
   );
-  /* change speed here */
   animation: rotate 3s linear infinite;
 }
 

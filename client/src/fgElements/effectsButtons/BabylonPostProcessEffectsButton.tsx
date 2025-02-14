@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
-import { PostProcessEffects } from "../../context/effectsContext/typeConstant";
+import { PostProcessEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgImageElement from "../fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import { postProcessEffectsChoices } from "./typeConstant";
@@ -20,10 +20,10 @@ export default function BabylonPostProcessEffectsButton({
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   streamEffects: boolean;
   effectsStyles: {
-    style: PostProcessEffects;
+    style: PostProcessEffectTypes;
   };
   clickFunctionCallback?: () => Promise<void>;
-  holdFunctionCallback?: (effectType: PostProcessEffects) => Promise<void>;
+  holdFunctionCallback?: (effectType: PostProcessEffectTypes) => Promise<void>;
 }) {
   const [_, setRerender] = useState(0);
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
@@ -51,7 +51,7 @@ export default function BabylonPostProcessEffectsButton({
     setEffectsDisabled(true);
 
     const effectType = target.dataset
-      .postProcessEffectsButtonValue as PostProcessEffects;
+      .postProcessEffectsButtonValue as PostProcessEffectTypes;
 
     if (effectsStyles.style !== effectType || !streamEffects) {
       if (holdFunctionCallback) await holdFunctionCallback(effectType);

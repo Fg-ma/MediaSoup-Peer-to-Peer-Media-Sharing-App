@@ -273,7 +273,6 @@ export default function FgLowerVisualMediaControls({
                       defaultFgVisualMediaOptions.permissions
                         .acceptsScreenEffects
                 }
-                visualMediaContainerRef={visualMediaContainerRef}
                 handleVisualEffectChange={handleVisualEffectChange}
                 tintColor={tintColor}
               />
@@ -281,9 +280,9 @@ export default function FgLowerVisualMediaControls({
           )}
         </AnimatePresence>
       </div>
-      <div className='video-controls w-full h-10 flex justify-between'>
+      <div className='flex video-controls w-full h-10 justify-between'>
         <div
-          className='w-max h-10 z-20 flex items-center space-x-2'
+          className='flex w-max h-10 z-20 items-center space-x-2'
           style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
         >
           {fgVisualMediaOptions.isPlayPause && (

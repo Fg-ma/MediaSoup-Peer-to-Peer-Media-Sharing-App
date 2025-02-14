@@ -1,11 +1,5 @@
 import React, { useRef, useState, Suspense } from "react";
-import { useMediaContext } from "../../context/mediaContext/MediaContext";
-import {
-  HideBackgroundEffectTypes,
-  PostProcessEffects,
-  CameraEffectTypes,
-  ScreenEffectTypes,
-} from "../../context/effectsContext/typeConstant";
+import { HideBackgroundEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import FgImageElement from "../fgImageElement/FgImageElement";

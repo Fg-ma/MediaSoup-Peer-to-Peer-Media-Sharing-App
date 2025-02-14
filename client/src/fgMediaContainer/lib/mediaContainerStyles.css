@@ -2,62 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.media-container .captions {
-  font-family: var(--closed-captions-font-family);
-  color: var(--closed-captions-font-color);
-  font-size: var(--closed-captions-font-size);
-  line-height: calc(var(--closed-captions-font-size) + 0.5rem);
-  opacity: var(--closed-captions-background-opacity);
-  text-shadow: var(--closed-captions-character-edge-style);
-  transition: line-height 150ms ease-in-out;
-  transform: translateX(-50%);
-  position: absolute;
-  left: 50%;
-  padding-right: 0.625rem;
-  padding-left: 0.625rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  bottom: 1rem;
-}
-
-.media-container.in-media .captions,
-.media-container.paused .captions,
-.media-container.in-effects .captions,
-.media-container.in-settings .captions,
-.media-container.in-audio-effects .captions {
-  bottom: 4rem;
-}
-
-.media-container .caption-text {
-  background-color: var(--closed-captions-background-color);
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  text-align: center;
-  whitespace: normal;
-  border-radius: 0.125rem;
-  overflow: hidden;
-  max-height: calc((var(--closed-captions-font-size) + 0.5rem) * 3);
-  width: max-content;
-  hyphens: auto;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.media-container.mini-player .main-media {
-  transform: scaleX(1);
-}
-
-.media-container {
-  --primary-media-color: #f56114;
-  --closed-captions-font-family: "K2D";
-  --closed-captions-font-color: white;
-  --closed-captions-font-size: 2rem;
-  --closed-captions-background-color: black;
-  --closed-captions-background-opacity: 75%;
-  --closed-captions-character-edge-style: none;
-}
-
 .media-container .media-controls-container,
 .media-container .media-upper-controls,
 .media-container .controls-gradient {
@@ -94,37 +38,13 @@
 .media-container.adjusting-dimensions .rotate-btn,
 .media-container.in-media .pan-btn,
 .media-container.in-media .scale-btn,
-.media-container.in-media .rotate-btn,
-.media-container.paused .pan-btn,
-.media-container.paused .scale-btn,
-.media-container.paused .rotate-btn,
-.media-container.in-effects .pan-btn,
-.media-container.in-effects .scale-btn,
-.media-container.in-effects .rotate-btn,
-.media-container.in-settings .pan-btn,
-.media-container.in-settings .scale-btn,
-.media-container.in-settings .rotate-btn,
-.media-container.in-audio-effects .pan-btn,
-.media-container.in-audio-effects .scale-btn,
-.media-container.in-audio-effects .rotate-btn {
+.media-container.in-media .rotate-btn {
   display: block;
 }
 
 .media-container.in-media .media-controls-container,
 .media-container.in-media .media-upper-controls,
-.media-container.in-media .controls-gradient,
-.media-container.paused .media-controls-container,
-.media-container.paused .media-upper-controls,
-.media-container.paused .controls-gradient,
-.media-container.in-effects .media-controls-container,
-.media-container.in-effects .media-upper-controls,
-.media-container.in-effects .controls-gradient,
-.media-container.in-settings .media-controls-container,
-.media-container.in-settings .media-upper-controls,
-.media-container.in-settings .controls-gradient,
-.media-container.in-audio-effects .media-controls-container,
-.media-container.in-audio-effects .media-upper-controls,
-.media-container.in-audio-effects .controls-gradient {
+.media-container.in-media .controls-gradient {
   opacity: 1;
 }
 
@@ -132,52 +52,8 @@
   cursor: none;
 }
 
-.media-container.in-media,
-.media-container.paused,
-.media-container.in-effects,
-.media-container.in-settings,
-.media-container.in-audio-effects {
+.media-container.in-media {
   cursor: auto;
-}
-
-/* full-screen */
-.media-container.full-screen {
-  max-width: initial;
-  width: 100% !important;
-  max-height: 100vh !important;
-  left: 0% !important;
-  top: 0% !important;
-  rotate: 0deg !important;
-}
-
-.media-container.full-screen .sub-media-container {
-  border-radius: 0%;
-}
-
-.media-container.full-screen .media-controls {
-  padding-inline: 2.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.media-container.full-screen .media-upper-controls {
-  padding-left: 2.5rem;
-  padding-right: 1.5rem;
-  margin-top: 1.25rem;
-}
-
-/* mini-player */
-.media-container.mini-player {
-  max-width: initial;
-  width: 100%;
-  max-height: 100vh;
-}
-
-/* closed captions */
-.caption-button-underline {
-  width: 100%;
-  height: 2px;
-  border-radius: 1px;
-  background-color: var(--primary-media-color);
 }
 
 .animated-border-box,
@@ -208,15 +84,13 @@
   height: 1000%;
   background-repeat: no-repeat;
   background-position: 0 0;
-  /*border color, change middle color*/
   background-image: conic-gradient(
     rgba(0, 0, 0, 0) 0deg,
-    #f56114 90deg,
+    #e62833 90deg,
     rgba(0, 0, 0, 0) 95deg,
-    #f56114 180deg,
+    #e62833 180deg,
     rgba(0, 0, 0, 0) 185deg
   );
-  /* change speed here */
   animation: rotate 3s linear infinite;
 }
 

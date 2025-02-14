@@ -41,7 +41,13 @@ class LowerVideoController {
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private recording: React.MutableRefObject<boolean>,
     private downloadRecordingReady: React.MutableRefObject<boolean>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private timelineContainerRef: React.RefObject<HTMLDivElement>,
+    private previewImgRef: React.RefObject<HTMLImageElement>,
+    private thumbnailImgRef: React.RefObject<HTMLImageElement>,
+    private isScrubbing: React.MutableRefObject<boolean>,
+    private thumbnails: React.MutableRefObject<string[]>,
+    private wasPaused: React.MutableRefObject<boolean>
   ) {
     this.initTime = Date.now();
   }
@@ -207,6 +213,11 @@ class LowerVideoController {
     this.handleVideoEffect("pause", false);
 
     this.paused.current = !this.paused.current;
+    if (this.paused.current) {
+      this.videoMedia.video.pause();
+    } else {
+      this.videoMedia.video.play();
+    }
 
     this.setPausedState((prev) => !prev);
   };
@@ -325,6 +336,69 @@ class LowerVideoController {
 
   handleSettings = () => {
     this.setSettingsActive((prev) => !prev);
+  };
+
+  handleScrubbing = (event: React.PointerEvent) => {
+    if (!this.timelineContainerRef.current || !this.currentTimeRef.current)
+      return;
+
+    const rect = this.timelineContainerRef.current.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
+
+    this.isScrubbing.current = (event.buttons & 1) === 1;
+    this.videoContainerRef.current?.classList.toggle(
+      "scrubbing",
+      this.isScrubbing.current
+    );
+    if (this.isScrubbing.current) {
+      this.videoContainerRef.current?.classList.add("scrubbing");
+      this.wasPaused.current = this.videoMedia.video.paused;
+      this.videoMedia.video.pause();
+    } else {
+      this.videoContainerRef.current?.classList.remove("scrubbing");
+      this.videoMedia.video.currentTime =
+        percent * this.videoMedia.video.duration;
+      if (!this.wasPaused) this.videoMedia.video.play();
+    }
+
+    this.handleTimelineUpdate(event);
+  };
+
+  handleTimelineUpdate = (event: React.PointerEvent) => {
+    if (!this.timelineContainerRef.current || !this.previewImgRef.current)
+      return;
+
+    const rect = this.timelineContainerRef.current.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
+    const previewImgIndex = Math.max(
+      1,
+      Math.floor((percent * this.videoMedia.video.duration) / 10)
+    );
+    const previewImgSrc = this.thumbnails.current[previewImgIndex];
+    this.previewImgRef.current.src = previewImgSrc;
+    this.timelineContainerRef.current.style.setProperty(
+      "--preview-position",
+      `${percent}`
+    );
+
+    if (
+      this.isScrubbing.current &&
+      this.thumbnailImgRef.current &&
+      this.currentTimeRef.current
+    ) {
+      event.preventDefault();
+      this.thumbnailImgRef.current.src = previewImgSrc;
+      this.timelineContainerRef.current.style.setProperty(
+        "--progress-position",
+        `${percent}`
+      );
+
+      this.currentTimeRef.current.textContent = this.formatDuration(
+        percent * this.videoMedia.video.duration
+      );
+    }
   };
 }
 

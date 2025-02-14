@@ -10,17 +10,20 @@ import {
   postProcessEffectEncodingMap,
 } from "../typeConstant";
 import Encoder from "./Encoder";
-import { ImageEffectStylesType, ImageEffectTypes } from "./typeConstant";
+import {
+  ApplicationEffectStylesType,
+  ApplicationEffectTypes,
+} from "./typeConstant";
 
 class Uploads {
   constructor(
-    private tableImagesCollection: Collection,
+    private tableApplicationsCollection: Collection,
     private encoder: Encoder
   ) {}
 
   uploadMetaData = async (data: {
     table_id: string;
-    imageId: string;
+    applicationId: string;
     positioning: {
       position: {
         left: number;
@@ -33,32 +36,32 @@ class Uploads {
       rotation: number;
     };
     effects: {
-      [effectType in ImageEffectTypes]: boolean;
+      [effectType in ApplicationEffectTypes]: boolean;
     };
-    effectStyles: ImageEffectStylesType;
+    effectStyles: ApplicationEffectStylesType;
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
     try {
-      await this.tableImagesCollection?.insertOne(mongoData);
+      await this.tableApplicationsCollection?.insertOne(mongoData);
     } catch (err) {
       console.error("Error uploading data:", err);
     }
   };
 
   editMetaData = async (
-    filter: { table_id: string; imageId: string },
+    filter: { table_id: string; applicationId: string },
     updateData: Partial<{
       positioning: {
         position?: { left?: number; top?: number };
         scale?: { x?: number; y?: number };
         rotation?: number;
       };
-      effects?: { [effectType in ImageEffectTypes]?: boolean };
-      effectStyles?: ImageEffectStylesType;
+      effects?: { [effectType in ApplicationEffectTypes]?: boolean };
+      effectStyles?: ApplicationEffectStylesType;
     }>
   ) => {
-    if (!this.tableImagesCollection) {
+    if (!this.tableApplicationsCollection) {
       console.error("Database not connected");
       return;
     }
@@ -129,8 +132,8 @@ class Uploads {
     }
 
     try {
-      const result = await this.tableImagesCollection.updateOne(
-        { tid: filter.table_id, iid: filter.imageId },
+      const result = await this.tableApplicationsCollection.updateOne(
+        { tid: filter.table_id, vid: filter.applicationId },
         { $set: updateFields }
       );
       return result;

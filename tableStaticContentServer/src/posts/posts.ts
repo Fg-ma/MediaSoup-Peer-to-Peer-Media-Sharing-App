@@ -7,252 +7,541 @@ import {
   tableTopMongo,
 } from "../index";
 import Utils from "./lib/Utils";
-import { TableTopStaticMimeType } from "src/typeConstant";
+import { mimeToExtension, TableTopStaticMimeType } from "../typeConstant";
 
 const utils = new Utils();
 
-const handlePosts = (app: uWS.TemplatedApp) => {
-  app.post("/upload/*", (res, req) => {
-    const url = req.getUrl();
-    const table_id = url.split("/")[2];
-    const contentId = url.split("/")[3];
+class Posts {
+  constructor(app: uWS.TemplatedApp) {
+    app.post("/upload/*", (res, req) => {
+      const url = req.getUrl();
+      const table_id = url.split("/")[2];
+      const contentId = url.split("/")[3];
 
-    res.cork(() => {
-      res.writeHeader("Access-Control-Allow-Origin", "https://localhost:8080");
-    });
+      res.cork(() => {
+        res.writeHeader(
+          "Access-Control-Allow-Origin",
+          "https://localhost:8080"
+        );
+      });
 
-    const headers: { [header: string]: string } = {};
-    req.forEach((key, value) => {
-      headers[key] = value;
-    });
+      const headers: { [header: string]: string } = {};
+      req.forEach((key, value) => {
+        headers[key] = value;
+      });
 
-    const bb = busboy({ headers });
+      const bb = busboy({ headers });
 
-    bb.on("file", (name, file, info) => {
-      const { mimeType } = info;
+      bb.on("file", (name, file, info) => {
+        const { mimeType } = info;
 
-      // Map MIME types to file extensions
-      const mimeToExtension: { [key: string]: string } = {
-        "image/jpeg": ".jpg",
-        "image/png": ".png",
-        "image/webp": ".webp",
-        "video/mp4": ".mp4",
-        "video/mpeg": ".mpeg",
-        "image/gif": ".gif",
-        "application/pdf": ".pdf",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-          ".docx",
-      };
+        const extension = mimeToExtension[mimeType] || ".bin";
+        const filename = `${utils.random()}${extension}`;
 
-      const extension = mimeToExtension[mimeType] || ".bin";
-      const filename = `${utils.random()}${extension}`;
+        tableTopCeph.uploadFile("mybucket", filename, file).then(async () => {
+          const url = `https://localhost:8045/stream/${filename}`;
 
-      tableTopCeph.uploadFile("mybucket", filename, file).then(async () => {
-        const url = `https://localhost:8045/stream/${filename}`;
-
-        // Differentiate handling based on file type
-        if (mimeType.startsWith("video/")) {
-          tableContentController.setContent(table_id, "video", contentId, [
-            { property: "url", value: url },
-            { property: "mimeType", value: mimeType as TableTopStaticMimeType },
-          ]);
-
-          await tableTopMongo.tableVideos?.uploads.uploadMetaData({
-            table_id,
-            videoId: contentId,
-            positioning: {
-              position: {
-                left: 50,
-                top: 50,
-              },
-              scale: {
-                x: 25,
-                y: 25,
-              },
-              rotation: 0,
-            },
-            effects: {
-              postProcess: false,
-              hideBackground: false,
-              blur: false,
-              tint: false,
-              glasses: false,
-              beards: false,
-              mustaches: false,
-              masks: false,
-              hats: false,
-              pets: false,
-            },
-            effectStyles: {
-              postProcess: {
-                style: "prismaColors",
-              },
-              hideBackground: {
-                style: "beach",
-                color: "#d40213",
-              },
-              glasses: {
-                style: "defaultGlasses",
-              },
-              beards: {
-                style: "classicalCurlyBeard",
-              },
-              mustaches: {
-                style: "mustache1",
-              },
-              masks: {
-                style: "baseMask",
-              },
-              hats: {
-                style: "stylishHat",
-              },
-              pets: {
-                style: "beardedDragon",
-              },
-            },
-          });
-
-          const originalVideoMessage = {
-            type: "originalVideoReady",
-            header: {
-              videoId: contentId,
-            },
-            data: {
-              filename,
+          // Differentiate handling based on file type
+          if (mimeType.startsWith("video/")) {
+            await this.handleVideoUploads(
+              table_id,
+              contentId,
               url,
-              mimeType,
-            },
-          };
-          broadcaster.broadcastToTable(table_id, originalVideoMessage);
+              mimeType as TableTopStaticMimeType,
+              filename
+            );
+          } else if (mimeType.startsWith("image/")) {
+            await this.handleImageUploads(
+              table_id,
+              contentId,
+              url,
+              mimeType as TableTopStaticMimeType,
+              filename
+            );
+          } else if (mimeType.startsWith("audio/")) {
+            await this.handleAudioUploads(
+              table_id,
+              contentId,
+              url,
+              mimeType as TableTopStaticMimeType,
+              filename
+            );
+          } else if (mimeType.startsWith("application/")) {
+            await this.handleApplicationUploads(
+              table_id,
+              contentId,
+              url,
+              mimeType as TableTopStaticMimeType,
+              filename
+            );
+          } else if (mimeType.startsWith("text/")) {
+            await this.handleTextUploads(
+              table_id,
+              contentId,
+              url,
+              mimeType as TableTopStaticMimeType,
+              filename
+            );
+          } else {
+            console.warn(`Unsupported file type uploaded: ${mimeType}`);
+          }
+        });
 
-          // Process video into DASH format in the background
-          // try {
-          //   // await processVideoWithABR(saveTo, processedDir, filename);
+        file.on("error", (err) => {
+          console.error(`Error writing file ${info.filename}:`, err);
+        });
+      });
 
-          //   // Notify clients to switch to the DASH stream
-          //   const dashVideoUrl = `https://localhost:8045/processed/${filename.slice(
-          //     0,
-          //     -4
-          //   )}.mpd`;
+      bb.on("close", () => {
+        res.cork(() => {
+          console.log("Upload complete");
+          res.writeStatus("200 OK").end("That's all folks!");
+        });
+      });
 
-          //   tableContentController.setContent(table_id, "video", contentId, [
-          //     { property: "dashURL", value: dashVideoUrl },
-          //   ]);
+      let bodyBuffer = Buffer.alloc(0);
 
-          //   const dashVideoMessage = {
-          //     type: "dashVideoReady",
-          //     header: {
-          //       videoId: contentId,
-          //     },
-          //     data: {
-          //       filename,
-          //       url: dashVideoUrl,
-          //     },
-          //   };
-          //   broadcaster.broadcastToTable(table_id, dashVideoMessage);
-          // } catch (error) {
-          //   console.error("Error during video processing:", error);
-          // }
-        } else if (mimeType.startsWith("image/")) {
-          await tableTopMongo.tableImages?.uploads.uploadMetaData({
-            table_id,
-            imageId: contentId,
-            positioning: {
-              position: {
-                left: 50,
-                top: 50,
-              },
-              scale: {
-                x: 25,
-                y: 25,
-              },
-              rotation: 0,
-            },
-            effects: {
-              postProcess: false,
-              hideBackground: false,
-              blur: false,
-              tint: false,
-              glasses: false,
-              beards: false,
-              mustaches: false,
-              masks: false,
-              hats: false,
-              pets: false,
-            },
-            effectStyles: {
-              postProcess: {
-                style: "prismaColors",
-              },
-              hideBackground: {
-                style: "beach",
-                color: "#d40213",
-              },
-              glasses: {
-                style: "defaultGlasses",
-              },
-              beards: {
-                style: "classicalCurlyBeard",
-              },
-              mustaches: {
-                style: "mustache1",
-              },
-              masks: {
-                style: "baseMask",
-              },
-              hats: {
-                style: "stylishHat",
-              },
-              pets: {
-                style: "beardedDragon",
-              },
-            },
-          });
+      res.onData((chunk, isLast) => {
+        bodyBuffer = Buffer.concat([bodyBuffer, Buffer.from(chunk)]);
 
-          tableContentController.setContent(table_id, "image", contentId, [
-            { property: "url", value: url },
-            { property: "mimeType", value: mimeType as TableTopStaticMimeType },
-          ]);
-
-          broadcaster.broadcastToTable(table_id, {
-            type: "imageReady",
-            header: { contentId },
-            data: { filename: filename, url, mimeType },
-          });
+        if (isLast) {
+          bb.end(bodyBuffer);
         } else {
-          console.warn(`Unsupported file type uploaded: ${mimeType}`);
+          bb.write(bodyBuffer);
+          bodyBuffer = Buffer.alloc(0);
         }
       });
 
-      file.on("error", (err) => {
-        console.error(`Error writing file ${info.filename}:`, err);
+      res.onAborted(() => {
+        bb.destroy();
       });
     });
+  }
 
-    bb.on("close", () => {
-      res.cork(() => {
-        console.log("Upload complete");
-        res.writeStatus("200 OK").end("That's all folks!");
-      });
+  private handleVideoUploads = async (
+    table_id: string,
+    contentId: string,
+    url: string,
+    mimeType: TableTopStaticMimeType,
+    filename: string
+  ) => {
+    tableContentController.setContent(table_id, "video", contentId, [
+      { property: "url", value: url },
+      {
+        property: "mimeType",
+        value: mimeType,
+      },
+    ]);
+
+    await tableTopMongo.tableVideos?.uploads.uploadMetaData({
+      table_id,
+      videoId: contentId,
+      positioning: {
+        position: {
+          left: 50,
+          top: 50,
+        },
+        scale: {
+          x: 25,
+          y: 25,
+        },
+        rotation: 0,
+      },
+      effects: {
+        postProcess: false,
+        hideBackground: false,
+        blur: false,
+        tint: false,
+        glasses: false,
+        beards: false,
+        mustaches: false,
+        masks: false,
+        hats: false,
+        pets: false,
+      },
+      effectStyles: {
+        postProcess: {
+          style: "prismaColors",
+        },
+        hideBackground: {
+          style: "beach",
+          color: "#d40213",
+        },
+        glasses: {
+          style: "defaultGlasses",
+        },
+        beards: {
+          style: "classicalCurlyBeard",
+        },
+        mustaches: {
+          style: "mustache1",
+        },
+        masks: {
+          style: "baseMask",
+        },
+        hats: {
+          style: "stylishHat",
+        },
+        pets: {
+          style: "beardedDragon",
+        },
+      },
     });
 
-    let bodyBuffer = Buffer.alloc(0);
+    const originalVideoMessage = {
+      type: "originalVideoReady",
+      header: {
+        videoId: contentId,
+      },
+      data: {
+        filename,
+        url,
+        mimeType,
+      },
+    };
+    broadcaster.broadcastToTable(table_id, originalVideoMessage);
 
-    res.onData((chunk, isLast) => {
-      bodyBuffer = Buffer.concat([bodyBuffer, Buffer.from(chunk)]);
+    // Process video into DASH format in the background
+    // try {
+    //   // await processVideoWithABR(saveTo, processedDir, filename);
 
-      if (isLast) {
-        bb.end(bodyBuffer);
-      } else {
-        bb.write(bodyBuffer);
-        bodyBuffer = Buffer.alloc(0);
-      }
+    //   // Notify clients to switch to the DASH stream
+    //   const dashVideoUrl = `https://localhost:8045/processed/${filename.slice(
+    //     0,
+    //     -4
+    //   )}.mpd`;
+
+    //   tableContentController.setContent(table_id, "video", contentId, [
+    //     { property: "dashURL", value: dashVideoUrl },
+    //   ]);
+
+    //   const dashVideoMessage = {
+    //     type: "dashVideoReady",
+    //     header: {
+    //       videoId: contentId,
+    //     },
+    //     data: {
+    //       filename,
+    //       url: dashVideoUrl,
+    //     },
+    //   };
+    //   broadcaster.broadcastToTable(table_id, dashVideoMessage);
+    // } catch (error) {
+    //   console.error("Error during video processing:", error);
+    // }
+  };
+
+  private handleImageUploads = async (
+    table_id: string,
+    contentId: string,
+    url: string,
+    mimeType: TableTopStaticMimeType,
+    filename: string
+  ) => {
+    await tableTopMongo.tableImages?.uploads.uploadMetaData({
+      table_id,
+      imageId: contentId,
+      positioning: {
+        position: {
+          left: 50,
+          top: 50,
+        },
+        scale: {
+          x: 25,
+          y: 25,
+        },
+        rotation: 0,
+      },
+      effects: {
+        postProcess: false,
+        hideBackground: false,
+        blur: false,
+        tint: false,
+        glasses: false,
+        beards: false,
+        mustaches: false,
+        masks: false,
+        hats: false,
+        pets: false,
+      },
+      effectStyles: {
+        postProcess: {
+          style: "prismaColors",
+        },
+        hideBackground: {
+          style: "beach",
+          color: "#d40213",
+        },
+        glasses: {
+          style: "defaultGlasses",
+        },
+        beards: {
+          style: "classicalCurlyBeard",
+        },
+        mustaches: {
+          style: "mustache1",
+        },
+        masks: {
+          style: "baseMask",
+        },
+        hats: {
+          style: "stylishHat",
+        },
+        pets: {
+          style: "beardedDragon",
+        },
+      },
     });
 
-    res.onAborted(() => {
-      bb.destroy();
-    });
-  });
-};
+    tableContentController.setContent(table_id, "image", contentId, [
+      { property: "url", value: url },
+      {
+        property: "mimeType",
+        value: mimeType,
+      },
+    ]);
 
-export default handlePosts;
+    broadcaster.broadcastToTable(table_id, {
+      type: "imageReady",
+      header: { contentId },
+      data: { filename: filename, url, mimeType },
+    });
+  };
+
+  private handleAudioUploads = async (
+    table_id: string,
+    contentId: string,
+    url: string,
+    mimeType: TableTopStaticMimeType,
+    filename: string
+  ) => {
+    await tableTopMongo.tableAudio?.uploads.uploadMetaData({
+      table_id,
+      audioId: contentId,
+      positioning: {
+        position: {
+          left: 50,
+          top: 50,
+        },
+        scale: {
+          x: 25,
+          y: 25,
+        },
+        rotation: 0,
+      },
+      effects: {
+        robot: false,
+        echo: false,
+        alien: false,
+        underwater: false,
+        telephone: false,
+        space: false,
+        distortion: false,
+        vintage: false,
+        psychedelic: false,
+        deepBass: false,
+        highEnergy: false,
+        ambient: false,
+        glitch: false,
+        muffled: false,
+        crystal: false,
+        heavyMetal: false,
+        dreamy: false,
+        horror: false,
+        sciFi: false,
+        dystopian: false,
+        retroGame: false,
+        ghostly: false,
+        metallic: false,
+        hypnotic: false,
+        cyberpunk: false,
+        windy: false,
+        radio: false,
+        explosion: false,
+        whisper: false,
+        submarine: false,
+        windTunnel: false,
+        crushedBass: false,
+        ethereal: false,
+        electroSting: false,
+        heartbeat: false,
+        underworld: false,
+        sizzling: false,
+        staticNoise: false,
+        bubbly: false,
+        thunder: false,
+        echosOfThePast: false,
+      },
+    });
+
+    tableContentController.setContent(table_id, "audio", contentId, [
+      { property: "url", value: url },
+      {
+        property: "mimeType",
+        value: mimeType,
+      },
+    ]);
+
+    broadcaster.broadcastToTable(table_id, {
+      type: "audioReady",
+      header: { contentId },
+      data: { filename: filename, url, mimeType },
+    });
+  };
+
+  private handleApplicationUploads = async (
+    table_id: string,
+    contentId: string,
+    url: string,
+    mimeType: TableTopStaticMimeType,
+    filename: string
+  ) => {
+    await tableTopMongo.tableApplications?.uploads.uploadMetaData({
+      table_id,
+      applicationId: contentId,
+      positioning: {
+        position: {
+          left: 50,
+          top: 50,
+        },
+        scale: {
+          x: 25,
+          y: 25,
+        },
+        rotation: 0,
+      },
+      effects: {
+        postProcess: false,
+        hideBackground: false,
+        blur: false,
+        tint: false,
+        glasses: false,
+        beards: false,
+        mustaches: false,
+        masks: false,
+        hats: false,
+        pets: false,
+      },
+      effectStyles: {
+        postProcess: {
+          style: "prismaColors",
+        },
+        hideBackground: {
+          style: "beach",
+          color: "#d40213",
+        },
+        glasses: {
+          style: "defaultGlasses",
+        },
+        beards: {
+          style: "classicalCurlyBeard",
+        },
+        mustaches: {
+          style: "mustache1",
+        },
+        masks: {
+          style: "baseMask",
+        },
+        hats: {
+          style: "stylishHat",
+        },
+        pets: {
+          style: "beardedDragon",
+        },
+      },
+    });
+
+    tableContentController.setContent(table_id, "application", contentId, [
+      { property: "url", value: url },
+      {
+        property: "mimeType",
+        value: mimeType,
+      },
+    ]);
+
+    broadcaster.broadcastToTable(table_id, {
+      type: "applicationReady",
+      header: { contentId },
+      data: { filename: filename, url, mimeType },
+    });
+  };
+
+  private handleTextUploads = async (
+    table_id: string,
+    contentId: string,
+    url: string,
+    mimeType: TableTopStaticMimeType,
+    filename: string
+  ) => {
+    await tableTopMongo.tableText?.uploads.uploadMetaData({
+      table_id,
+      textId: contentId,
+      positioning: {
+        position: {
+          left: 50,
+          top: 50,
+        },
+        scale: {
+          x: 25,
+          y: 25,
+        },
+        rotation: 0,
+      },
+      effects: {
+        postProcess: false,
+        hideBackground: false,
+        blur: false,
+        tint: false,
+        glasses: false,
+        beards: false,
+        mustaches: false,
+        masks: false,
+        hats: false,
+        pets: false,
+      },
+      effectStyles: {
+        postProcess: {
+          style: "prismaColors",
+        },
+        hideBackground: {
+          style: "beach",
+          color: "#d40213",
+        },
+        glasses: {
+          style: "defaultGlasses",
+        },
+        beards: {
+          style: "classicalCurlyBeard",
+        },
+        mustaches: {
+          style: "mustache1",
+        },
+        masks: {
+          style: "baseMask",
+        },
+        hats: {
+          style: "stylishHat",
+        },
+        pets: {
+          style: "beardedDragon",
+        },
+      },
+    });
+
+    tableContentController.setContent(table_id, "text", contentId, [
+      { property: "url", value: url },
+      {
+        property: "mimeType",
+        value: mimeType,
+      },
+    ]);
+
+    broadcaster.broadcastToTable(table_id, {
+      type: "textReady",
+      header: { contentId },
+      data: { filename: filename, url, mimeType },
+    });
+  };
+}
+
+export default Posts;
