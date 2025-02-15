@@ -1,13 +1,15 @@
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import { DataProducer } from "mediasoup-client/lib/DataProducer";
 import AudioMedia from "../../lib/AudioMedia";
-import CameraMedia from "../../lib/CameraMedia";
+import CameraMedia from "../../media/fgVisualMedia/CameraMedia";
 import SnakeGameMedia from "../../lib/SnakeGameMedia";
 import ScreenAudioMedia from "../../lib/ScreenAudioMedia";
-import ScreenMedia from "../../lib/ScreenMedia";
+import ScreenMedia from "../../media/fgVisualMedia/ScreenMedia";
 import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
-import VideoMedia from "../../lib/VideoMedia";
-import ImageMedia from "src/lib/ImageMedia";
+import VideoMedia from "../../media/fgVideo/VideoMedia";
+import ImageMedia from "../../media/fgImage/ImageMedia";
+import ApplicationsMedia from "../../media/fgApplications/ApplicationsMedia";
+import TextMedia from "../../lib/TextMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -26,6 +28,12 @@ export type UserMediaType = {
   image: {
     [imageId: string]: ImageMedia;
   };
+  applications: {
+    [applicationsId: string]: ApplicationsMedia;
+  };
+  text: {
+    [textId: string]: TextMedia;
+  };
   gamesSignaling: GamesSignalingMedia | undefined;
   games: {
     snake?: {
@@ -41,9 +49,6 @@ export type RemoteMediaType = {
       screen?: { [screenId: string]: MediaStreamTrack };
       screenAudio?: { [screenAudioId: string]: MediaStreamTrack };
       audio?: MediaStreamTrack;
-      video?: {
-        [videoId: string]: { video: MediaStreamTrack; audio: MediaStreamTrack };
-      };
     };
   };
 };

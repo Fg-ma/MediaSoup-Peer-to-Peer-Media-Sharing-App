@@ -1,0 +1,50 @@
+import React from "react";
+import FgButton from "../../../../../fgElements/fgButton/FgButton";
+import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import LowerTextController from "../LowerTextController";
+
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const effectIcon = nginxAssetSeverBaseUrl + "svgs/effectIcon.svg";
+const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
+
+export default function TextEffectsButton({
+  lowerTextController,
+  textEffectsActive,
+  scrollingContainerRef,
+}: {
+  lowerTextController: LowerTextController;
+  textEffectsActive: boolean;
+  scrollingContainerRef: React.RefObject<HTMLDivElement>;
+}) {
+  return (
+    <FgButton
+      clickFunction={() => {
+        lowerTextController.handleTextEffects();
+      }}
+      contentFunction={() => {
+        const iconSrc = textEffectsActive ? effectOffIcon : effectIcon;
+
+        return (
+          <FgSVG
+            src={iconSrc}
+            attributes={[
+              { key: "width", value: "100%" },
+              { key: "height", value: "100%" },
+              { key: "fill", value: "white" },
+              { key: "stroke", value: "white" },
+            ]}
+          />
+        );
+      }}
+      hoverContent={
+        !textEffectsActive ? (
+          <FgHoverContentStandard content='Effects (e)' style='dark' />
+        ) : undefined
+      }
+      scrollingContainerRef={scrollingContainerRef}
+      className='flex items-center justify-center h-full aspect-square relative scale-x-[-1] pointer-events-auto'
+    />
+  );
+}

@@ -81,6 +81,10 @@ export type ImageEffectTypes =
   | "hats"
   | "pets";
 
+export type ApplicationsEffectTypes = "postProcess" | "blur" | "tint";
+
+export type TextEffectTypes = "postProcess" | "blur" | "tint";
+
 export type UserStreamEffectsType = {
   camera: {
     [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -103,6 +107,16 @@ export type UserStreamEffectsType = {
   image: {
     [imageId: string]: {
       [effectType in ImageEffectTypes]: boolean;
+    };
+  };
+  applications: {
+    [applicationId: string]: {
+      [effectType in ApplicationsEffectTypes]: boolean;
+    };
+  };
+  text: {
+    [textId: string]: {
+      [effectType in TextEffectTypes]: boolean;
     };
   };
 };
@@ -385,6 +399,30 @@ export type ImageEffectStylesType = {
   };
 };
 
+export type ApplicationsEffectStylesType = {
+  blur: {
+    style: "";
+  };
+  tint: {
+    style: "";
+  };
+  postProcess: {
+    style: PostProcessEffectTypes;
+  };
+};
+
+export type TextEffectStylesType = {
+  blur: {
+    style: "";
+  };
+  tint: {
+    style: "";
+  };
+  postProcess: {
+    style: PostProcessEffectTypes;
+  };
+};
+
 export type BackgroundMusicTypes =
   | "adventureTime"
   | "bottledNoise"
@@ -437,6 +475,12 @@ export type UserEffectsStylesType = {
   };
   image: {
     [imageId: string]: ImageEffectStylesType;
+  };
+  applications: {
+    [applicationsId: string]: ApplicationsEffectStylesType;
+  };
+  text: {
+    [textId: string]: TextEffectStylesType;
   };
 };
 
@@ -546,6 +590,22 @@ export const defaultImageStreamEffects: {
   masks: false,
   hats: false,
   pets: false,
+});
+
+export const defaultApplicationsStreamEffects: {
+  [effect in ApplicationsEffectTypes]: boolean;
+} = Object.freeze({
+  postProcess: false,
+  blur: false,
+  tint: false,
+});
+
+export const defaultTextStreamEffects: {
+  [effect in TextEffectTypes]: boolean;
+} = Object.freeze({
+  postProcess: false,
+  blur: false,
+  tint: false,
 });
 
 export const defaultPostProcess: PostProcessEffectTypes = "prismaColors";
@@ -679,5 +739,30 @@ export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
   }),
   pets: Object.freeze({
     style: defaultPet,
+  }),
+});
+
+export const defaultApplicationsEffectsStyles: ApplicationsEffectStylesType =
+  Object.freeze({
+    blur: Object.freeze({
+      style: "",
+    }),
+    tint: Object.freeze({
+      style: "",
+    }),
+    postProcess: Object.freeze({
+      style: defaultPostProcess,
+    }),
+  });
+
+export const defaultTextEffectsStyles: TextEffectStylesType = Object.freeze({
+  blur: Object.freeze({
+    style: "",
+  }),
+  tint: Object.freeze({
+    style: "",
+  }),
+  postProcess: Object.freeze({
+    style: defaultPostProcess,
   }),
 });

@@ -8,10 +8,10 @@ import { useSocketContext } from "../context/socketContext/SocketContext";
 import BundleController from "./lib/BundleController";
 
 const UserVisualMedia = React.lazy(
-  () => import("../fgVisualMedia/UserVisualMedia")
+  () => import("../media/fgVisualMedia/UserVisualMedia")
 );
 const RemoteVisualMedia = React.lazy(
-  () => import("../fgVisualMedia/RemoteVisualMedia")
+  () => import("../media/fgVisualMedia/RemoteVisualMedia")
 );
 const FgAudioElementContainer = React.lazy(
   () => import("../fgAudioElement/FgAudioElementContainer")

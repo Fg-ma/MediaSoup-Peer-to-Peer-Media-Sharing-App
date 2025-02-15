@@ -5,8 +5,8 @@ import {
 import { UserMediaType } from "../context/mediaContext/typeConstant";
 import Deadbanding from "../babylon/Deadbanding";
 import UserDevice from "./UserDevice";
-import VideoMedia from "./VideoMedia";
-import ImageMedia from "./ImageMedia";
+import VideoMedia from "../media/fgVideo/VideoMedia";
+import ImageMedia from "../media/fgImage/ImageMedia";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"

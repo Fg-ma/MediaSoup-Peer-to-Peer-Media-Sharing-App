@@ -5,13 +5,13 @@ import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import SharedBundleController from "./lib/SharedBundleController";
 import { IncomingTableStaticContentMessages } from "../lib/TableStaticContentSocketController";
-import VideoMedia from "../lib/VideoMedia";
+import VideoMedia from "../media/fgVideo/VideoMedia";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
-import FgVideo from "../fgVideo/FgVideo";
-import ImageMedia from "../lib/ImageMedia";
-import FgImage from "../fgImage/FgImage";
+import ImageMedia from "../media/fgImage/ImageMedia";
+import FgImage from "../media/fgImage/FgImage";
+import FgVideo from "../media/fgVideo/FgVideo";
 
 const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 

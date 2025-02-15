@@ -17,8 +17,8 @@ import {
   UserDataStreamsType,
   UserMediaType,
 } from "../context/mediaContext/typeConstant";
-import CameraMedia from "./CameraMedia";
-import ScreenMedia from "./ScreenMedia";
+import CameraMedia from "../media/fgVisualMedia/CameraMedia";
+import ScreenMedia from "../media/fgVisualMedia/ScreenMedia";
 import AudioMedia from "./AudioMedia";
 import UserDevice from "./UserDevice";
 import BrowserMedia from "./BrowserMedia";

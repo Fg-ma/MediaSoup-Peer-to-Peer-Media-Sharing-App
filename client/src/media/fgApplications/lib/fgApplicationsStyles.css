@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.applications-container .captions {
+  font-family: var(--closed-captions-font-family);
+  color: var(--closed-captions-font-color);
+  font-size: var(--closed-captions-font-size);
+  line-height: calc(var(--closed-captions-font-size) + 0.5rem);
+  opacity: var(--closed-captions-background-opacity);
+  text-shadow: var(--closed-captions-character-edge-style);
+  transition: line-height 150ms ease-in-out;
+  transform: translateX(-50%);
+  position: absolute;
+  left: 50%;
+  padding-right: 0.625rem;
+  padding-left: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 1rem;
+}
+
+.applications-container.in-effects .captions,
+.applications-container.in-settings .captions,
+.applications-container.in-audio-effects .captions {
+  bottom: 4rem;
+}
+
+.applications-container .caption-text {
+  background-color: var(--closed-captions-background-color);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  text-align: center;
+  whitespace: normal;
+  border-radius: 0.125rem;
+  overflow: hidden;
+  max-height: calc((var(--closed-captions-font-size) + 0.5rem) * 3);
+  width: max-content;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.applications-container {
+  --primary-applications-color: #d40213;
+  --closed-captions-font-family: K2D;
+  --closed-captions-font-color: white;
+  --closed-captions-font-size: 2rem;
+  --closed-captions-background-color: black;
+  --closed-captions-background-opacity: 75%;
+  --closed-captions-character-edge-style: none;
+}
+
+.applications-container.paused .pan-btn,
+.applications-container.paused .scale-btn,
+.applications-container.paused .rotate-btn,
+.applications-container.in-effects .pan-btn,
+.applications-container.in-effects .scale-btn,
+.applications-container.in-effects .rotate-btn,
+.applications-container.in-settings .pan-btn,
+.applications-container.in-settings .scale-btn,
+.applications-container.in-settings .rotate-btn,
+.applications-container.in-audio-effects .pan-btn,
+.applications-container.in-audio-effects .scale-btn,
+.applications-container.in-audio-effects .rotate-btn {
+  display: block;
+}
+
+.applications-container.paused .media-controls-container,
+.applications-container.paused .media-upper-controls,
+.applications-container.paused .controls-gradient,
+.applications-container.in-effects .media-controls-container,
+.applications-container.in-effects .media-upper-controls,
+.applications-container.in-effects .controls-gradient,
+.applications-container.in-settings .media-controls-container,
+.applications-container.in-settings .media-upper-controls,
+.applications-container.in-settings .controls-gradient,
+.applications-container.in-audio-effects .media-controls-container,
+.applications-container.in-audio-effects .media-upper-controls,
+.applications-container.in-audio-effects .controls-gradient {
+  opacity: 1;
+}
+
+.applications-container.paused,
+.applications-container.in-effects,
+.applications-container.in-settings,
+.applications-container.in-audio-effects {
+  cursor: auto;
+}
+
+/* full-screen */
+.applications-container.full-screen {
+  max-width: initial;
+  width: 100% !important;
+  max-height: 100vh !important;
+  left: 0% !important;
+  top: 0% !important;
+  rotate: 0deg !important;
+  border-radius: 0%;
+}
+
+.applications-container.full-screen .media-controls {
+  padding-inline: 2.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.applications-container.full-screen .media-upper-controls {
+  padding-left: 2.5rem;
+  padding-right: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+/* mini-player */
+.applications-container.mini-player {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}
+
+/* closed captions */
+.caption-button-underline {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--primary-applications-color);
+}

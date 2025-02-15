@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.text-container .captions {
+  font-family: var(--closed-captions-font-family);
+  color: var(--closed-captions-font-color);
+  font-size: var(--closed-captions-font-size);
+  line-height: calc(var(--closed-captions-font-size) + 0.5rem);
+  opacity: var(--closed-captions-background-opacity);
+  text-shadow: var(--closed-captions-character-edge-style);
+  transition: line-height 150ms ease-in-out;
+  transform: translateX(-50%);
+  position: absolute;
+  left: 50%;
+  padding-right: 0.625rem;
+  padding-left: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 1rem;
+}
+
+.text-container.in-effects .captions,
+.text-container.in-settings .captions,
+.text-container.in-audio-effects .captions {
+  bottom: 4rem;
+}
+
+.text-container .caption-text {
+  background-color: var(--closed-captions-background-color);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  text-align: center;
+  whitespace: normal;
+  border-radius: 0.125rem;
+  overflow: hidden;
+  max-height: calc((var(--closed-captions-font-size) + 0.5rem) * 3);
+  width: max-content;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.text-container {
+  --primary-text-color: #d40213;
+  --closed-captions-font-family: K2D;
+  --closed-captions-font-color: white;
+  --closed-captions-font-size: 2rem;
+  --closed-captions-background-color: black;
+  --closed-captions-background-opacity: 75%;
+  --closed-captions-character-edge-style: none;
+}
+
+.text-container.paused .pan-btn,
+.text-container.paused .scale-btn,
+.text-container.paused .rotate-btn,
+.text-container.in-effects .pan-btn,
+.text-container.in-effects .scale-btn,
+.text-container.in-effects .rotate-btn,
+.text-container.in-settings .pan-btn,
+.text-container.in-settings .scale-btn,
+.text-container.in-settings .rotate-btn,
+.text-container.in-audio-effects .pan-btn,
+.text-container.in-audio-effects .scale-btn,
+.text-container.in-audio-effects .rotate-btn {
+  display: block;
+}
+
+.text-container.paused .media-controls-container,
+.text-container.paused .media-upper-controls,
+.text-container.paused .controls-gradient,
+.text-container.in-effects .media-controls-container,
+.text-container.in-effects .media-upper-controls,
+.text-container.in-effects .controls-gradient,
+.text-container.in-settings .media-controls-container,
+.text-container.in-settings .media-upper-controls,
+.text-container.in-settings .controls-gradient,
+.text-container.in-audio-effects .media-controls-container,
+.text-container.in-audio-effects .media-upper-controls,
+.text-container.in-audio-effects .controls-gradient {
+  opacity: 1;
+}
+
+.text-container.paused,
+.text-container.in-effects,
+.text-container.in-settings,
+.text-container.in-audio-effects {
+  cursor: auto;
+}
+
+/* full-screen */
+.text-container.full-screen {
+  max-width: initial;
+  width: 100% !important;
+  max-height: 100vh !important;
+  left: 0% !important;
+  top: 0% !important;
+  rotate: 0deg !important;
+  border-radius: 0%;
+}
+
+.text-container.full-screen .media-controls {
+  padding-inline: 2.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.text-container.full-screen .media-upper-controls {
+  padding-left: 2.5rem;
+  padding-right: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+/* mini-player */
+.text-container.mini-player {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}
+
+/* closed captions */
+.caption-button-underline {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--primary-text-color);
+}

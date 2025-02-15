@@ -41,7 +41,6 @@ class Posts {
         tableTopCeph.uploadFile("mybucket", filename, file).then(async () => {
           const url = `https://localhost:8045/stream/${filename}`;
 
-          // Differentiate handling based on file type
           if (mimeType.startsWith("video/")) {
             await this.handleVideoUploads(
               table_id,
