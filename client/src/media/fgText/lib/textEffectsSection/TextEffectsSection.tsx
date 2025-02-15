@@ -4,9 +4,9 @@ import { useEffectsContext } from "../../../../context/effectsContext/EffectsCon
 import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
 import TextMedia from "../../../../lib/TextMedia";
 import LowerTextController from "../lowerTextControls/LowerTextController";
-import BabylonPostProcessEffectsButton from "../../../../fgElements/effectsButtons/BabylonPostProcessEffectsButton";
-import BlurButton from "../../../../fgElements/effectsButtons/BlurButton";
-import TintSection from "../../../../fgElements/effectsButtons/TintSection";
+import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
+import BlurButton from "../../../../elements/effectsButtons/BlurButton";
+import TintSection from "../../../../elements/effectsButtons/TintSection";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },

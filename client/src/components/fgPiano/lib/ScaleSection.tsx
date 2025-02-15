@@ -2,7 +2,7 @@ import React, { useEffect, useRef, Suspense } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Scale from "./Scale";
 import { Notes, NoteStore, Octaves, StringOctaves } from "../FgPiano";
-import VerticalSplitPanes from "../../../fgElements/verticalSplitPane/VerticalSplitPanes";
+import VerticalSplitPanes from "../../../elements/verticalSplitPane/VerticalSplitPanes";
 import FgPianoController from "./FgPianoController";
 
 const KeyVisualizer = React.lazy(() => import("./KeyVisualizer"));

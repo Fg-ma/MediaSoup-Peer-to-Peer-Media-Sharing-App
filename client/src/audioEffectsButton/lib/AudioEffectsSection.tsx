@@ -2,15 +2,15 @@ import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
-import FgPanel from "../../fgElements/fgPanel/FgPanel";
-import FgButton from "../../fgElements/fgButton/FgButton";
-import FgSVG from "../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgPanel from "../../elements/fgPanel/FgPanel";
+import FgButton from "../../elements/fgButton/FgButton";
+import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import AudioEffectButton from "./AudioEffectButton";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
 import { audioEffectTemplates } from "./typeConstant";
 import { IncomingMediasoupMessages } from "../../lib/MediasoupSocketController";
-import LazyScrollingContainer from "../../fgElements/lazyScrollingContainer/LazyScrollingContainer";
+import LazyScrollingContainer from "../../elements/lazyScrollingContainer/LazyScrollingContainer";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

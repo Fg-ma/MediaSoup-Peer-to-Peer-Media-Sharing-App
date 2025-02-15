@@ -2,11 +2,11 @@ import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
-import FgButton from "../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../fgElements/fgSVG/FgSVG";
-import FgPanel from "../../../fgElements/fgPanel/FgPanel";
-import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
-import LazyScrollingContainer from "../../../fgElements/lazyScrollingContainer/LazyScrollingContainer";
+import FgButton from "../../../elements/fgButton/FgButton";
+import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgPanel from "../../../elements/fgPanel/FgPanel";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import LazyScrollingContainer from "../../../elements/lazyScrollingContainer/LazyScrollingContainer";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

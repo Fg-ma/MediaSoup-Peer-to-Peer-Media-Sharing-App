@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { KaldiRecognizer, Model } from "vosk-browser";
-import FgButton from "../../../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";

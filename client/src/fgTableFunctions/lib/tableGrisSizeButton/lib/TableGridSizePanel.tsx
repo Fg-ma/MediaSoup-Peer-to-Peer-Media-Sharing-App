@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import FgPanel from "../../../../fgElements/fgPanel/FgPanel";
-import FgSlider from "../../../../fgElements/fgSlider/FgSlider";
-import FgToggleButton from "../../../../fgElements/fgToggleButton/FgToggleButton";
+import FgPanel from "../../../../elements/fgPanel/FgPanel";
+import FgSlider from "../../../../elements/fgSlider/FgSlider";
+import FgToggleButton from "../../../../elements/fgToggleButton/FgToggleButton";
 
 export default function TableGridSizePanel({
   tableGridSizeButtonRef,

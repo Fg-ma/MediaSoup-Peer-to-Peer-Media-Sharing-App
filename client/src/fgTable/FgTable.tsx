@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import FgTableController from "./lib/FgTableController";
-import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElement";
+import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElement";
 import TableGridOverlay from "./lib/TableGridOverlay";
 import UploadTableLayer from "../uploadTableLayer/UploadTableLayer";
 import SharedBundle from "../sharedBundle/SharedBundle";

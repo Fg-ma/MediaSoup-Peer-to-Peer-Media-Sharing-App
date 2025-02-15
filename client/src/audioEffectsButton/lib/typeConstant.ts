@@ -1,4 +1,4 @@
-import { SliderOptions } from "../../fgElements/fgSlider/FgSlider";
+import { SliderOptions } from "../../elements/fgSlider/FgSlider";
 import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
 import {
   AudioMixEffectsType,

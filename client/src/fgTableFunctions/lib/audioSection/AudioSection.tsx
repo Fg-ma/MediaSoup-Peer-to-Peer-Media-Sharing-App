@@ -1,8 +1,8 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
-import FgSVG from "../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import ProducersController from "../../../lib/ProducersController";
 import AudioSectionController from "./lib/audioSectionController";
 import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
@@ -13,7 +13,7 @@ const shareAudioIcon = nginxAssetSeverBaseUrl + "svgs/shareAudioIcon.svg";
 const removeAudioIcon = nginxAssetSeverBaseUrl + "svgs/removeAudioIcon.svg";
 
 const FgButton = React.lazy(
-  () => import("../../../fgElements/fgButton/FgButton")
+  () => import("../../../elements/fgButton/FgButton")
 );
 const VolumeSVG = React.lazy(
   () => import("../../../fgVolumeElement/lib/VolumeSVG")

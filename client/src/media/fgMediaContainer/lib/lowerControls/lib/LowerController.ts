@@ -1,5 +1,5 @@
 import TableStaticContentSocketController from "../../../../../lib/TableStaticContentSocketController";
-import FgContentAdjustmentController from "../../../../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaKinds } from "../../typeConstant";
 
 class LowerController {

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
-import FgPanel from "../../fgElements/fgPanel/FgPanel";
-import FgButton from "../../fgElements/fgButton/FgButton";
+import FgPanel from "../../elements/fgPanel/FgPanel";
+import FgButton from "../../elements/fgButton/FgButton";
 import FgSoundBoardController from "./lib/FgSoundBoardController";
 import {
   BoardModes,
@@ -12,8 +12,8 @@ import {
   SoundEffects,
   SoundEffectsMetaData,
 } from "./lib/typeConstant";
-import FgSVG from "../../fgElements/fgSVG/FgSVG";
-import FgTriToggleButton from "../../fgElements/fgTriToggleButton/FgTriToggleButton";
+import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgTriToggleButton from "../../elements/fgTriToggleButton/FgTriToggleButton";
 import "./lib/soundBoard.css";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -128,7 +128,7 @@ export default function FgSoundBoard({
             className='w-full min-h-10 h-10 z-[2] px-4 flex items-center justify-between'
             style={{
               // prettier-ignore
-              boxShadow: `0px 10px 5px -5px ${focus ? "#ffffff" : "#f3f3f3"}`,
+              boxShadow: `0px 10px 5px -5px ${focus ? "#f2f2f2" : "#d6d6d6"}`,
             }}
             transition={{
               boxShadow: { duration: 0.3, ease: "linear" },

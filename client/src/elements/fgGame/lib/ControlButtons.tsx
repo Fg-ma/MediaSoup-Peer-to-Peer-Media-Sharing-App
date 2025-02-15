@@ -1,6 +1,6 @@
 import React from "react";
 import FgGameButton from "../../fgGameButton/FgGameButton";
-import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 export default function ControlButtons({
   startGameFunction,

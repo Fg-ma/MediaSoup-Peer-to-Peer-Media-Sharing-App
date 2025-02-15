@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
-import FgButton from "../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../fgElements/fgSVG/FgSVG";
+import FgButton from "../../../elements/fgButton/FgButton";
+import FgSVG from "../../../elements/fgSVG/FgSVG";
 import MoreTableFunctionsSection from "../moreTableFunctionsSection/MoreTableFunctionsSection";
-import { FgBackground } from "../../../fgElements/fgBackgroundSelector/lib/typeConstant";
-import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import { FgBackground } from "../../../elements/fgBackgroundSelector/lib/typeConstant";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

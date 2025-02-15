@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
-import FgButton from "../../fgElements/fgButton/FgButton";
-import FgSVG from "../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../elements/fgButton/FgButton";
+import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import { AudioEffectTemplate } from "./typeConstant";
 
 export default function AudioEffectButton({

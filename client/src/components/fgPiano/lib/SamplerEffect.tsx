@@ -1,10 +1,10 @@
 import React from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { SamplerEffectType } from "./SamplerEffectsToolbar";
-import FgKnobButton from "../../../fgElements/fgKnobButton/FgKnobButton";
-import FgButton from "../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgKnobButton from "../../../elements/fgKnobButton/FgKnobButton";
+import FgButton from "../../../elements/fgButton/FgButton";
+import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,

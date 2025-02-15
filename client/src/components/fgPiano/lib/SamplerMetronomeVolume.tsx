@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
-import FgButton from "../../../fgElements/fgButton/FgButton";
+import FgButton from "../../../elements/fgButton/FgButton";
 import VolumeSVG from "../../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
 

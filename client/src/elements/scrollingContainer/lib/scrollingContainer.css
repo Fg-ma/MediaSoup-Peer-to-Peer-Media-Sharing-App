@@ -3,7 +3,7 @@
 }
 
 .scrolling-container-button.selected .scrolling-container-button-underline {
-  background-color: #f56114;
+  background-color: #e62833;
 }
 
 .scrolling-container-button:hover:not(.selected)

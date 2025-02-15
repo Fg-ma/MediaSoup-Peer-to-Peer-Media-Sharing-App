@@ -1,7 +1,7 @@
 import React, { useRef, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 
-const FgPortal = React.lazy(() => import("../../fgElements/fgPortal/FgPortal"));
+const FgPortal = React.lazy(() => import("../../elements/fgPortal/FgPortal"));
 
 const positionVariants = {
   0: {

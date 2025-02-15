@@ -4,9 +4,9 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import AudioMixEffect from "./AudioMixEffect";
-import ScrollingContainer from "../../fgElements/scrollingContainer/ScrollingContainer";
-import ScrollingContainerButton from "../../fgElements/scrollingContainer/lib/ScrollingContainerButton";
-import FgPanel from "../../fgElements/fgPanel/FgPanel";
+import ScrollingContainer from "../../elements/scrollingContainer/ScrollingContainer";
+import ScrollingContainerButton from "../../elements/scrollingContainer/lib/ScrollingContainerButton";
+import FgPanel from "../../elements/fgPanel/FgPanel";
 import { DynamicMixEffect, staticMixEffects } from "./typeConstant";
 import {
   AudioMixEffectsType,
@@ -476,9 +476,7 @@ export default function AudioMixEffectsPortal({
                   )}
                 </div>
               }
-              buttonBackgroundColor={
-                focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"
-              }
+              buttonBackgroundColor={focus ? "#f2f2f2" : "#d6d6d6"}
             />
           </div>
           <div className='relative'>

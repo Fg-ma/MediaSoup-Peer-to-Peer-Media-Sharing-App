@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import FgButton from "../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../fgElements/fgSVG/FgSVG";
-import FgPortal from "../../../fgElements/fgPortal/FgPortal";
+import FgButton from "../../../elements/fgButton/FgButton";
+import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgPortal from "../../../elements/fgPortal/FgPortal";
 import { Octaves } from "../FgPiano";
 import { navTransition, navVar } from "./SamplerToolbar";
 

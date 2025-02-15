@@ -5,7 +5,7 @@ import React, {
   useCallback,
   Suspense,
 } from "react";
-import FgPanel from "../../fgElements/fgPanel/FgPanel";
+import FgPanel from "../../elements/fgPanel/FgPanel";
 import ScaleSection from "./lib/ScaleSection";
 import FgPianoController, { keysMap } from "./lib/FgPianoController";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";

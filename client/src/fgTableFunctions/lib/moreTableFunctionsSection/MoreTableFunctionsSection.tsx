@@ -5,11 +5,11 @@ import { usePermissionsContext } from "../../../context/permissionsContext/Permi
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import GamesSection from "../gamesSection/GamesSection";
-import FgBackgroundSelector from "../../../fgElements/fgBackgroundSelector/FgBackgroundSelector";
+import FgBackgroundSelector from "../../../elements/fgBackgroundSelector/FgBackgroundSelector";
 import TableGridButton from "../tableGridButton/TableGridButton";
-import { FgBackground } from "../../../fgElements/fgBackgroundSelector/lib/typeConstant";
+import { FgBackground } from "../../../elements/fgBackgroundSelector/lib/typeConstant";
 import TableGridSizeButton from "../tableGrisSizeButton/TableGridSizeButton";
-import FgPanel from "../../../fgElements/fgPanel/FgPanel";
+import FgPanel from "../../../elements/fgPanel/FgPanel";
 
 const AudioEffectsButton = React.lazy(
   () => import("../../../audioEffectsButton/AudioEffectsButton")

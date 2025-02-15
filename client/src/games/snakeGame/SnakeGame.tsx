@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
-import FgGame from "../../fgElements/fgGame/FgGame";
-import FgButton from "../../fgElements/fgButton/FgButton";
-import FgSVG from "../../fgElements/fgSVG/FgSVG";
-import FgImageElement from "../../fgElements/fgImageElement/FgImageElement";
+import FgGame from "../../elements/fgGame/FgGame";
+import FgButton from "../../elements/fgButton/FgButton";
+import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgImageElement from "../../elements/fgImageElement/FgImageElement";
 import SnakeGameController from "./lib/SnakeGameController";
 import SnakeColorPickerPanel from "./lib/SnakeColorPickerPanel";
 import SnakeGridSizePanel from "./lib/SnakeGridSizePanel";

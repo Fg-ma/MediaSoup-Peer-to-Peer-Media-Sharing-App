@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
-import FgButton from "../../../../../../fgElements/fgButton/FgButton";
+import FgButton from "../../../../../../elements/fgButton/FgButton";
 import {
   Settings,
   ActivePages,

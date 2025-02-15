@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../elements/fgButton/FgButton";
+import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
 import { ActivePages, Settings } from "../../typeConstant";
 

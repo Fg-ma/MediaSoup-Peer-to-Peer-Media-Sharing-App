@@ -4,12 +4,12 @@ import { Octaves } from "../FgPiano";
 import SelectSampler, { samplerBackgroundMap } from "./SelectSampler";
 import SamplerVolume from "./SamplerVolume";
 import OctaveSelection from "./OctaveSelection";
-import FgButton from "../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../elements/fgButton/FgButton";
+import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgPianoController from "./FgPianoController";
 import SamplerMetronome from "./SamplerMetronome";
-import FgBackgroundSelector from "../../../fgElements/fgBackgroundSelector/FgBackgroundSelector";
+import FgBackgroundSelector from "../../../elements/fgBackgroundSelector/FgBackgroundSelector";
 import { FgSamplers } from "../../../audioEffects/fgSamplers";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;

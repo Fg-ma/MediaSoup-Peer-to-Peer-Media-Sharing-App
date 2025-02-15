@@ -39,7 +39,7 @@ const scrollButtonsTransition: Transition = {
 export default function ScrollingContainer({
   externalRef,
   content,
-  buttonBackgroundColor = "rbga(255, 255, 255, 1)",
+  buttonBackgroundColor = "#f2f2f2",
   buttonBackgroundColorTransition = {
     backgroundColor: { duration: 0.3, ease: "linear" },
     boxShadow: {
@@ -138,7 +138,7 @@ export default function ScrollingContainer({
       <AnimatePresence>
         {showLeftScroll && (
           <motion.div
-            className='w-8 h-full bg-white flex items-center justify-center z-10'
+            className='flex w-8 h-full bg-white items-center justify-center z-10'
             variants={scrollButtonsVar}
             initial='leftInit'
             exit='leftInit'
@@ -181,7 +181,7 @@ export default function ScrollingContainer({
       </AnimatePresence>
       <div
         ref={externalRef ? externalRef : scrollingContainerRef}
-        className='hide-scroll-bar grow flex items-center justify-start overflow-x-auto w-full'
+        className='flex hide-scroll-bar grow items-center justify-start overflow-x-auto w-full'
         onScroll={handleScroll}
       >
         {content}
@@ -189,7 +189,7 @@ export default function ScrollingContainer({
       <AnimatePresence>
         {showRightScroll && (
           <motion.div
-            className='w-8 h-full bg-white flex items-center justify-center z-10'
+            className='flex w-8 h-full bg-white items-center justify-center z-10'
             style={{
               boxShadow: "-1px 0 6px 8px rgba(255, 255, 255, 1)",
             }}

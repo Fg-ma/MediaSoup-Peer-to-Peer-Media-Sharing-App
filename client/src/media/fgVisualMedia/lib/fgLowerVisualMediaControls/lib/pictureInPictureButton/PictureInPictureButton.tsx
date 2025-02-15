@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import FgButton from "../../../../../../fgElements/fgButton/FgButton";
-import FgHoverContentStandard from "../../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../../elements/fgButton/FgButton";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
 export default function PictureInPictureButton({

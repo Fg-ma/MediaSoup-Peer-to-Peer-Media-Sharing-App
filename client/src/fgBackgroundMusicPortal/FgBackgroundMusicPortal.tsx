@@ -1,13 +1,13 @@
 import React, { useRef, useState } from "react";
-import FgPanel from "../fgElements/fgPanel/FgPanel";
-import FgButton from "../fgElements/fgButton/FgButton";
+import FgPanel from "../elements/fgPanel/FgPanel";
+import FgButton from "../elements/fgButton/FgButton";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { BackgroundMusicTypes } from "../context/effectsContext/typeConstant";
-import FgImageElement from "../fgElements/fgImageElement/FgImageElement";
-import FgSVG from "../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgImageElement from "../elements/fgImageElement/FgImageElement";
+import FgSVG from "../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../elements/fgHoverContentStandard/FgHoverContentStandard";
 import { backgroundMusicStatic } from "./lib/typeConstant";
-import LazyScrollingContainer from "../fgElements/lazyScrollingContainer/LazyScrollingContainer";
+import LazyScrollingContainer from "../elements/lazyScrollingContainer/LazyScrollingContainer";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

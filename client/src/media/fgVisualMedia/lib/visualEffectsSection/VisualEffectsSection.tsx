@@ -16,33 +16,33 @@ import { useEffectsContext } from "../../../../context/effectsContext/EffectsCon
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
 import { IncomingMediasoupMessages } from "../../../../lib/MediasoupSocketController";
-import HideBackgroundButton from "../../../../fgElements/effectsButtons/HideBackgroundButton";
-import TintSection from "../../../../fgElements/effectsButtons/TintSection";
-import BlurButtton from "../../../../fgElements/effectsButtons/BlurButton";
+import HideBackgroundButton from "../../../../elements/effectsButtons/HideBackgroundButton";
+import TintSection from "../../../../elements/effectsButtons/TintSection";
+import BlurButtton from "../../../../elements/effectsButtons/BlurButton";
 
 const BabylonPostProcessEffectsButton = React.lazy(
   () =>
     import(
-      "../../../../fgElements/effectsButtons/BabylonPostProcessEffectsButton"
+      "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton"
     )
 );
 const GlassesButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/GlassesButton")
+  () => import("../../../../elements/effectsButtons/GlassesButton")
 );
 const BeardsButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/BeardsButton")
+  () => import("../../../../elements/effectsButtons/BeardsButton")
 );
 const MustachesButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/MustachesButton")
+  () => import("../../../../elements/effectsButtons/MustachesButton")
 );
 const MasksButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/MasksButton")
+  () => import("../../../../elements/effectsButtons/MasksButton")
 );
 const HatsButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/HatsButton")
+  () => import("../../../../elements/effectsButtons/HatsButton")
 );
 const PetsButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/PetsButton")
+  () => import("../../../../elements/effectsButtons/PetsButton")
 );
 
 const EffectSectionVar: Variants = {

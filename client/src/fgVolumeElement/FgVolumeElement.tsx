@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
-import FgButton from "../fgElements/fgButton/FgButton";
-import FgHoverContentStandard from "../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../elements/fgButton/FgButton";
+import FgHoverContentStandard from "../elements/fgHoverContentStandard/FgHoverContentStandard";
 import volumeSVGPaths from "../fgVolumeElement/lib/volumeSVGPaths";
 import FgVolumeElementController from "../fgVolumeElement/lib/FgVolumeElementController";
 import VolumeSVG from "../fgVolumeElement/lib/VolumeSVG";

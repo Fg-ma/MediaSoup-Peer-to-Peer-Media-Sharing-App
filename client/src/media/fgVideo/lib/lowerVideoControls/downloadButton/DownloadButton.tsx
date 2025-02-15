@@ -1,7 +1,7 @@
 import React from "react";
-import FgButton from "../../../../../fgElements/fgButton/FgButton";
-import FgSVG from "../../../../../fgElements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerVideoController from "../LowerVideoController";
 import { Settings } from "../../typeConstant";
 

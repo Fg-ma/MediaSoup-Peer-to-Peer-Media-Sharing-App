@@ -10,30 +10,30 @@ import { useEffectsContext } from "../../../../context/effectsContext/EffectsCon
 import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
 import ImageMedia from "../../ImageMedia";
 import LowerImageController from "../lowerImageControls/LowerImageController";
-import BabylonPostProcessEffectsButton from "../../../../fgElements/effectsButtons/BabylonPostProcessEffectsButton";
-import BlurButton from "../../../../fgElements/effectsButtons/BlurButton";
-import TintSection from "../../../../fgElements/effectsButtons/TintSection";
+import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
+import BlurButton from "../../../../elements/effectsButtons/BlurButton";
+import TintSection from "../../../../elements/effectsButtons/TintSection";
 
 const HideBackgroundButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/HideBackgroundButton")
+  () => import("../../../../elements/effectsButtons/HideBackgroundButton")
 );
 const GlassesButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/GlassesButton")
+  () => import("../../../../elements/effectsButtons/GlassesButton")
 );
 const BeardsButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/BeardsButton")
+  () => import("../../../../elements/effectsButtons/BeardsButton")
 );
 const MustachesButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/MustachesButton")
+  () => import("../../../../elements/effectsButtons/MustachesButton")
 );
 const MasksButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/MasksButton")
+  () => import("../../../../elements/effectsButtons/MasksButton")
 );
 const HatsButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/HatsButton")
+  () => import("../../../../elements/effectsButtons/HatsButton")
 );
 const PetsButton = React.lazy(
-  () => import("../../../../fgElements/effectsButtons/PetsButton")
+  () => import("../../../../elements/effectsButtons/PetsButton")
 );
 
 const EffectSectionVar: Variants = {

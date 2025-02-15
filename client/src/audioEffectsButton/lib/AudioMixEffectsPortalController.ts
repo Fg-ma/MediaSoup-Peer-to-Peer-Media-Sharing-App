@@ -1,6 +1,6 @@
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
-import { SliderChangeEvent } from "../../fgElements/fgSlider/FgSlider";
+import { SliderChangeEvent } from "../../elements/fgSlider/FgSlider";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,

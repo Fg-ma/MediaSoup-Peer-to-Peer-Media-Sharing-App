@@ -13,7 +13,7 @@ import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import FgVisualMediaController from "./lib/FgVisualMediaController";
-import FgContentAdjustmentController from "../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import {
   defaultFgVisualMediaOptions,

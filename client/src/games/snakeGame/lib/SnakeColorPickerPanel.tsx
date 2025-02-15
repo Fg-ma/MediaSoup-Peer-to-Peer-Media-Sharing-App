@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
-import FgPanel from "../../../fgElements/fgPanel/FgPanel";
-import FgButton from "../../../fgElements/fgButton/FgButton";
-import FgImageElement from "../../../fgElements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgPanel from "../../../elements/fgPanel/FgPanel";
+import FgButton from "../../../elements/fgButton/FgButton";
+import FgImageElement from "../../../elements/fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import {
   PlayersState,
   snakeColorIconMap,

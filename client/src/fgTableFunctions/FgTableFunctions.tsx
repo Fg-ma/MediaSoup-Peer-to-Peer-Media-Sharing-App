@@ -7,7 +7,7 @@ import AudioSection from "./lib/audioSection/AudioSection";
 import ScreenSection from "./lib/screenSection/ScreenSection";
 import ProducersController from "../lib/ProducersController";
 import TableFunctionsController from "./lib/TableFunctionsController";
-import { FgBackground } from "../fgElements/fgBackgroundSelector/lib/typeConstant";
+import { FgBackground } from "../elements/fgBackgroundSelector/lib/typeConstant";
 import UploadMediaButton from "./lib/uploadMediaButton/UploadMediaButton";
 import MoreTableFunctionsButton from "./lib/moreTableFunctionsButton/MoreTableFunctionsButton";
 import MessageTableSection from "./lib/messageTableSection/MessageTableSection";

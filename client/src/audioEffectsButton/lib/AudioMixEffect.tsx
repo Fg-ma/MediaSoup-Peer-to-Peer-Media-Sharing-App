@@ -1,9 +1,7 @@
 import React from "react";
-import FgSVG from "../../fgElements/fgSVG/FgSVG";
-import FgSlider, {
-  SliderChangeEvent,
-} from "../../fgElements/fgSlider/FgSlider";
-import FgHoverContentStandard from "../../fgElements/fgHoverContentStandard/FgHoverContentStandard";
+import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgSlider, { SliderChangeEvent } from "../../elements/fgSlider/FgSlider";
+import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,

@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import CreditItem from "./lib/CreditItem";
 import CreditSection from "./lib/CreditSection";
-import FgScrollbarElement from "../fgElements/fgScrollbarElement/FgScrollbarElement";
+import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElement";
 
 export default function CreditPage() {
   const scrollingContentRef = useRef<HTMLDivElement>(null);

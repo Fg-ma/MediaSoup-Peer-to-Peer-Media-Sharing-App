@@ -1,4 +1,4 @@
-import { FgBackground } from "../fgElements/fgBackgroundSelector/lib/typeConstant";
+import { FgBackground } from "../elements/fgBackgroundSelector/lib/typeConstant";
 
 export type TableColors =
   | "cyan"

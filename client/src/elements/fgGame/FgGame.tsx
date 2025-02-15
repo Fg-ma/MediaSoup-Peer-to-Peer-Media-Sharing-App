@@ -3,7 +3,7 @@ import { Transition, Variants, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
-import FgContentAdjustmentController from "../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import FgGameController from "./lib/FgGameController";
 import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
 import ControlButtons from "./lib/ControlButtons";

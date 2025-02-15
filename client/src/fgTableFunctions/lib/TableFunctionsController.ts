@@ -1,4 +1,4 @@
-import { FgBackground } from "../../fgElements/fgBackgroundSelector/lib/typeConstant";
+import { FgBackground } from "../../elements/fgBackgroundSelector/lib/typeConstant";
 import { IncomingTableMessages } from "../../lib/TableSocketController";
 
 class TableFunctionsController {

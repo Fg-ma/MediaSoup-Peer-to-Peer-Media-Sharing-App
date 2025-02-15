@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
-import FgImage from "../../fgElements/fgImageElement/FgImageElement";
-import FgButton from "../../fgElements/fgButton/FgButton";
-import FgPanel from "../../fgElements/fgPanel/FgPanel";
+import FgImage from "../../elements/fgImageElement/FgImageElement";
+import FgButton from "../../elements/fgButton/FgButton";
+import FgPanel from "../../elements/fgPanel/FgPanel";
 import FriendStatusButton from "./tableUserFunctions/FriendStatusButton";
 import PrivateMessageButton from "./tableUserFunctions/PrivateMessageButton";
 import PingButton from "./tableUserFunctions/PingButton";
@@ -10,7 +10,7 @@ import OpenKidsTableButton from "./tableUserFunctions/OpenKidsTableButton";
 import KickFromTableButton from "./tableUserFunctions/KickFromTableButton";
 import SilenceButton from "./tableUserFunctions/SilenceButton";
 import HideContentFromButton from "./tableUserFunctions/HideContentFromButton";
-import FgSVG from "../../fgElements/fgSVG/FgSVG";
+import FgSVG from "../../elements/fgSVG/FgSVG";
 import { TableColors } from "../../lib/TableSocketController";
 import SwapSeatsbutton from "./tableUserFunctions/SwapSeatsButton";
 

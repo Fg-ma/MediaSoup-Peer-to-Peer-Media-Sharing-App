@@ -43,9 +43,7 @@ const AudioEffectsButton = React.lazy(
 );
 const FgHoverContentStandard = React.lazy(
   () =>
-    import(
-      "../../../../fgElements/fgHoverContentStandard/FgHoverContentStandard"
-    )
+    import("../../../../elements/fgHoverContentStandard/FgHoverContentStandard")
 );
 
 export type FontFamilies =

@@ -5,7 +5,7 @@ import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContex
 import LowerControls from "./lib/lowerControls/LowerControls";
 import MediaContainerController from "./lib/MediaContainerController";
 import LowerController from "./lib/lowerControls/lib/LowerController";
-import FgContentAdjustmentController from "../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import {
   defaultMediaContainerOptions,
   MediaContainerOptions,

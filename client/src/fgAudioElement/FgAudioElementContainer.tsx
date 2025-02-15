@@ -5,14 +5,14 @@ import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import FgAudioElement from "./FgAudioElement";
-import FgContentAdjustmentController from "../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
-import PanButton from "../fgElements/fgAdjustmentElements/PanButton";
-import RotateButton from "../fgElements/fgAdjustmentElements/RotateButton";
-import ScaleButton from "../fgElements/fgAdjustmentElements/ScaleButton";
+import FgContentAdjustmentController from "../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import PanButton from "../elements/fgAdjustmentElements/PanButton";
+import RotateButton from "../elements/fgAdjustmentElements/RotateButton";
+import ScaleButton from "../elements/fgAdjustmentElements/ScaleButton";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
 import "./lib/audioElement.css";
 
-const FgPortal = React.lazy(() => import("../fgElements/fgPortal/FgPortal"));
+const FgPortal = React.lazy(() => import("../elements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
   () => import("../audioEffectsButton/lib/AudioEffectsSection")
 );

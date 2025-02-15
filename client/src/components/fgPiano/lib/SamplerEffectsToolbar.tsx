@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { KnobButtonOptions } from "../../../fgElements/fgKnobButton/FgKnobButton";
-import ScrollingContainer from "../../../fgElements/scrollingContainer/ScrollingContainer";
+import { KnobButtonOptions } from "../../../elements/fgKnobButton/FgKnobButton";
+import ScrollingContainer from "../../../elements/scrollingContainer/ScrollingContainer";
 import SamplerEffect from "./SamplerEffect";
 import {
   AudioMixEffectsType,
@@ -653,9 +653,7 @@ export default function SamplerEffectsToolbar({ focus }: { focus: boolean }) {
             ))}
           </div>
         }
-        buttonBackgroundColor={
-          focus ? "rgba(255, 255, 255, 1)" : "rgba(243, 243, 243, 1)"
-        }
+        buttonBackgroundColor={focus ? "#f2f2f2" : "#d6d6d6"}
       />
     </div>
   );

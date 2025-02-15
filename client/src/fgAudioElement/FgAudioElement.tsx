@@ -3,7 +3,7 @@ import { useSpring, animated, SpringValue } from "react-spring";
 import { colors } from "../fgVisualMedia/lib/colors";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
-import FgButton from "../fgElements/fgButton/FgButton";
+import FgButton from "../elements/fgButton/FgButton";
 import FgAudioElementController from "./lib/FgAudioElementController";
 import { FgAudioElementContainerOptionsType } from "./FgAudioElementContainer";
 

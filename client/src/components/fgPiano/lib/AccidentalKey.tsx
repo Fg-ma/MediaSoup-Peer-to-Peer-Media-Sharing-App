@@ -1,6 +1,6 @@
 import React from "react";
 import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
-import FgButton from "../../../fgElements/fgButton/FgButton";
+import FgButton from "../../../elements/fgButton/FgButton";
 
 const AccidentalKeyVar: Variants = {
   init: { opacity: 0, bottom: "9.5%" },

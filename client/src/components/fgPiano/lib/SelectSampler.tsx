@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
-import FgButton from "../../../fgElements/fgButton/FgButton";
-import FgSelectionButton from "../../../fgElements/fgSelectionButton/FgSelectionButton";
-import FgSVG from "../../../fgElements/fgSVG/FgSVG";
-import FgPortal from "../../../fgElements/fgPortal/FgPortal";
+import FgButton from "../../../elements/fgButton/FgButton";
+import FgSelectionButton from "../../../elements/fgSelectionButton/FgSelectionButton";
+import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgPortal from "../../../elements/fgPortal/FgPortal";
 import { navTransition, navVar } from "./SamplerToolbar";
 import { FgSamplers } from "../../../audioEffects/fgSamplers";
 
