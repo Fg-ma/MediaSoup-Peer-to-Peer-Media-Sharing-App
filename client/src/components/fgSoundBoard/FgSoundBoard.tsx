@@ -131,7 +131,10 @@ export default function FgSoundBoard({
               boxShadow: `0px 10px 5px -5px ${focus ? "#f2f2f2" : "#d6d6d6"}`,
             }}
             transition={{
-              boxShadow: { duration: 0.3, ease: "linear" },
+              boxShadow: {
+                duration: 0.3,
+                ease: "linear",
+              },
             }}
           >
             <div className='w-24 h-8'>
