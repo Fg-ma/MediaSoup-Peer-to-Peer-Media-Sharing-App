@@ -12,7 +12,7 @@ import {
   ImageOptions,
   Settings,
 } from "./lib/typeConstant";
-import FgMediaContainer from "../../fgMediaContainer/FgMediaContainer";
+import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import FullScreenButton from "./lib/lowerImageControls/fullScreenButton/FullScreenButton";
 import ImageEffectsButton from "./lib/lowerImageControls/imageEffectsButton/ImageEffectsButton";
 import ImageEffectsSection from "./lib/imageEffectsSection/ImageEffectsSection";

@@ -1,5 +1,5 @@
 import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
-import FgContentAdjustmentController from "../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import FgContentAdjustmentController from "../../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import MediasoupSocketController, {
   IncomingMediasoupMessages,
   onRequestedGameCatchUpDataType,

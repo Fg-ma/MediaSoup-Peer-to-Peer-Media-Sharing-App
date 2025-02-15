@@ -4,7 +4,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../../context/effectsContext/typeConstant";
-import FgContentAdjustmentController from "../../../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import FgContentAdjustmentController from "../../../../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { FgVisualMediaOptions, Settings } from "../../typeConstant";
 import MediasoupSocketController from "../../../../../lib/MediasoupSocketController";
 

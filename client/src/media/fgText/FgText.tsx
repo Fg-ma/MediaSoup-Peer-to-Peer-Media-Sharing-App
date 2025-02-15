@@ -12,7 +12,7 @@ import {
   TextOptions,
   Settings,
 } from "./lib/typeConstant";
-import FgMediaContainer from "../../fgMediaContainer/FgMediaContainer";
+import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import FullScreenButton from "./lib/lowerTextControls/fullScreenButton/FullScreenButton";
 import TextEffectsButton from "./lib/lowerTextControls/textEffectsButton/TextEffectsButton";
 import TextEffectsSection from "./lib/textEffectsSection/TextEffectsSection";

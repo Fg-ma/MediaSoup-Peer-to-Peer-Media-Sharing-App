@@ -12,7 +12,7 @@ import {
   ApplicationsOptions,
   Settings,
 } from "./lib/typeConstant";
-import FgMediaContainer from "../../fgMediaContainer/FgMediaContainer";
+import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import FullScreenButton from "./lib/lowerApplicationsControls/fullScreenButton/FullScreenButton";
 import ApplicationsEffectsButton from "./lib/lowerApplicationsControls/applicationsEffectsButton/ApplicationsEffectsButton";
 import ApplicationsEffectsSection from "./lib/applicationsEffectsSection/ApplicationsEffectsSection";

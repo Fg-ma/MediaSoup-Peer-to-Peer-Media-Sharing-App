@@ -12,7 +12,7 @@ import {
   defaultSettings,
   defaultActivePages,
 } from "./lib/typeConstant";
-import FgMediaContainer from "../../fgMediaContainer/FgMediaContainer";
+import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import VideoEffectsSection from "./lib/videoEffectsSection/VideoEffectsSection";
 import FullScreenButton from "./lib/lowerVideoControls/fullScreenButton/FullScreenButton";
 import VideoEffectsButton from "./lib/lowerVideoControls/videoEffectsButton/VideoEffectsButton";

@@ -4,7 +4,7 @@ import RotateButton from "../../../fgElements/fgAdjustmentElements/RotateButton"
 import ScaleButton from "../../../fgElements/fgAdjustmentElements/ScaleButton";
 import FgContentAdjustmentController from "../../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 
-export default function VisualMediaAdjustmentButtons({
+export default function AdjustmentButtons({
   bundleRef,
   panBtnRef,
   positioning,

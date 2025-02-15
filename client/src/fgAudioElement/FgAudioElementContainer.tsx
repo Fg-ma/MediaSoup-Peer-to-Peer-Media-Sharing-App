@@ -5,10 +5,10 @@ import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import FgAudioElement from "./FgAudioElement";
-import FgContentAdjustmentController from "../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
-import PanButton from "../fgAdjustmentComponents/PanButton";
-import RotateButton from "../fgAdjustmentComponents/RotateButton";
-import ScaleButton from "../fgAdjustmentComponents/ScaleButton";
+import FgContentAdjustmentController from "../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import PanButton from "../fgElements/fgAdjustmentElements/PanButton";
+import RotateButton from "../fgElements/fgAdjustmentElements/RotateButton";
+import ScaleButton from "../fgElements/fgAdjustmentElements/ScaleButton";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
 import "./lib/audioElement.css";
 

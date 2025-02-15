@@ -1,8 +1,8 @@
 import React from "react";
-import PanButton from "../../../fgAdjustmentComponents/PanButton";
-import RotateButton from "../../../fgAdjustmentComponents/RotateButton";
-import ScaleButton from "../../../fgAdjustmentComponents/ScaleButton";
-import FgContentAdjustmentController from "../../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import PanButton from "../../../fgElements/fgAdjustmentElements/PanButton";
+import RotateButton from "../../../fgElements/fgAdjustmentElements/RotateButton";
+import ScaleButton from "../../../fgElements/fgAdjustmentElements/ScaleButton";
+import FgContentAdjustmentController from "../../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 
 export default function FgGameAdjustmentButtons({
   sharedBundleRef,

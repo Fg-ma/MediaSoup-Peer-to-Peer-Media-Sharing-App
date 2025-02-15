@@ -11,7 +11,7 @@ import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpper
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 import FgVisualMediaController from "./lib/FgVisualMediaController";
 import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
-import FgContentAdjustmentController from "../../fgAdjustmentComponents/lib/FgContentAdjustmentControls";
+import FgContentAdjustmentController from "../../fgElements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import {
   defaultFgVisualMediaOptions,
   FgVisualMediaOptions,

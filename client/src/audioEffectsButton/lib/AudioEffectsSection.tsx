@@ -36,9 +36,9 @@ const backgroundMusicOffIcon =
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")
 );
-const FgPiano = React.lazy(() => import("../../fgPiano/FgPiano"));
+const FgPiano = React.lazy(() => import("../../components/fgPiano/FgPiano"));
 const FgSoundBoard = React.lazy(
-  () => import("../../fgSoundBoard/FgSoundBoard")
+  () => import("../../components/fgSoundBoard/FgSoundBoard")
 );
 
 export default function AudioEffectsSection({
