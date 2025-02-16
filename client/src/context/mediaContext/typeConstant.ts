@@ -8,8 +8,8 @@ import ScreenMedia from "../../media/fgVisualMedia/ScreenMedia";
 import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
 import VideoMedia from "../../media/fgVideo/VideoMedia";
 import ImageMedia from "../../media/fgImage/ImageMedia";
-import ApplicationsMedia from "../../media/fgApplications/ApplicationsMedia";
-import TextMedia from "../../lib/TextMedia";
+import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
+import TextMedia from "../../media/fgText/TextMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -29,7 +29,7 @@ export type UserMediaType = {
     [imageId: string]: ImageMedia;
   };
   applications: {
-    [applicationsId: string]: ApplicationsMedia;
+    [applicationsId: string]: ApplicationMedia;
   };
   text: {
     [textId: string]: TextMedia;

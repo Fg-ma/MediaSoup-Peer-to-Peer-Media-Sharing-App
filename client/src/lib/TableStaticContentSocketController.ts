@@ -1,12 +1,23 @@
 import {
+  ApplicationsEffectStylesType,
+  ApplicationsEffectTypes,
+  AudioEffectTypes,
+  ImageEffectStylesType,
+  ImageEffectTypes,
+  TextEffectStylesType,
+  TextEffectTypes,
   UserEffectsStylesType,
   UserStreamEffectsType,
+  VideoEffectStylesType,
+  VideoEffectTypes,
 } from "../context/effectsContext/typeConstant";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
 import Deadbanding from "../babylon/Deadbanding";
 import UserDevice from "./UserDevice";
 import VideoMedia from "../media/fgVideo/VideoMedia";
 import ImageMedia from "../media/fgImage/ImageMedia";
+import TextMedia from "../media/fgText/TextMedia";
+import ApplicationMedia from "../media/fgApplication/ApplicationMedia";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"
@@ -22,10 +33,10 @@ type OutGoingTableStaticContentMessages =
   | onJoinTableType
   | onLeaveTableType
   | onRequestCatchUpTableDataType
-  | onRequestCatchUpContentDataType
   | onDeleteContentType
-  | onCatchUpContentDataResponseType
-  | onGetFileType;
+  | onGetFileType
+  | onUpdateContentPositioningType
+  | onUpdateContentEffectsType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -54,17 +65,6 @@ type onRequestCatchUpTableDataType = {
   };
 };
 
-type onRequestCatchUpContentDataType = {
-  type: "requestCatchUpContentData";
-  header: {
-    table_id: string;
-    inquiringUsername: string;
-    inquiringInstance: string;
-    contentType: TableContentTypes;
-    contentId: string;
-  };
-};
-
 type onDeleteContentType = {
   type: "deleteContent";
   header: {
@@ -77,46 +77,6 @@ type onDeleteContentType = {
   };
 };
 
-type onCatchUpContentDataResponseType = {
-  type: "catchUpContentDataResponse";
-  header: {
-    table_id: string;
-    inquiringUsername: string;
-    inquiringInstance: string;
-    contentType: TableContentTypes;
-    contentId: string;
-  };
-  data:
-    | {
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-        videoTime: number;
-        timeMeasured: number;
-      }
-    | {
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      };
-};
-
 type onGetFileType = {
   type: "getFile";
   header: {
@@ -127,7 +87,48 @@ type onGetFileType = {
   data: { key: string };
 };
 
-export type TableContentTypes = "video" | "image";
+type onUpdateContentPositioningType = {
+  type: "updateContentPositioning";
+  header: {
+    table_id: string;
+    contentType: TableContentTypes;
+    contentId: string;
+  };
+  data: {
+    positioning: {
+      position?: {
+        left: number;
+        top: number;
+      };
+      scale?: {
+        x: number;
+        y: number;
+      };
+      rotation?: number;
+    };
+  };
+};
+
+type onUpdateContentEffectsType = {
+  type: "updateContentEffects";
+  header: {
+    table_id: string;
+    contentType: TableContentTypes;
+    contentId: string;
+  };
+  data: {
+    effects: {
+      [effectType: string]: boolean;
+    };
+    effectStyles?:
+      | VideoEffectStylesType
+      | ImageEffectStylesType
+      | TextEffectStylesType
+      | ApplicationsEffectStylesType;
+  };
+};
+
+export type TableContentTypes = "video" | "image" | "text" | "applications";
 
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
@@ -137,9 +138,7 @@ export type IncomingTableStaticContentMessages =
   | onChunkType
   | onDownloadCompleteType
   | onResponsedCatchUpTableDataType
-  | onRequestedCatchUpContentDataType
-  | onContentDeletedType
-  | onCatchUpContentDataRespondedType;
+  | onContentDeletedType;
 
 export type onOriginalVideoReadyType = {
   type: "originalVideoReady";
@@ -148,7 +147,6 @@ export type onOriginalVideoReadyType = {
   };
   data: {
     filename: string;
-    url: string;
     mimeType: TableTopStaticMimeType;
   };
 };
@@ -160,7 +158,6 @@ export type onDashVideoReadyType = {
   };
   data: {
     filename: string;
-    url: string;
   };
 };
 
@@ -171,7 +168,6 @@ export type onImageReadyType = {
   };
   data: {
     filename: string;
-    url: string;
     mimeType: TableTopStaticMimeType;
   };
 };
@@ -190,23 +186,110 @@ export type onDownloadCompleteType = {
 export type onResponsedCatchUpTableDataType = {
   type: "responsedCatchUpTableData";
   data: {
-    [tableContentType in TableContentTypes]?: {
-      [contentId: string]: {
-        url?: string;
-        dashURL?: string;
-        mimeType?: TableTopStaticMimeType;
-      };
-    };
-  };
-};
-
-export type onRequestedCatchUpContentDataType = {
-  type: "requestedCatchUpContentData";
-  header: {
-    inquiringUsername: string;
-    inquiringInstance: string;
-    contentType: TableContentTypes;
-    contentId: string;
+    images:
+      | {
+          table_id: string;
+          imageId: string;
+          filename: string;
+          mimeType: string;
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
+          effects: { [effectType in ImageEffectTypes]: boolean };
+          effectStyles: ImageEffectStylesType;
+        }[]
+      | undefined;
+    videos:
+      | {
+          table_id: string;
+          videoId: string;
+          filename: string;
+          mimeType: string;
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
+          effects: { [effectType in VideoEffectTypes]: boolean };
+          effectStyles: VideoEffectStylesType;
+        }[]
+      | undefined;
+    text:
+      | {
+          table_id: string;
+          textId: string;
+          filename: string;
+          mimeType: string;
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
+          effects: { [effectType in TextEffectTypes]: boolean };
+          effectStyles: TextEffectStylesType;
+        }[]
+      | undefined;
+    audio:
+      | {
+          table_id: string;
+          audioId: string;
+          filename: string;
+          mimeType: string;
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
+          effects: { [effectType in AudioEffectTypes]: boolean };
+        }[]
+      | undefined;
+    applications:
+      | {
+          table_id: string;
+          applicationId: string;
+          filename: string;
+          mimeType: string;
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
+          effects: { [effectType in ApplicationsEffectTypes]: boolean };
+          effectStyles: ApplicationsEffectStylesType;
+        }[]
+      | undefined;
   };
 };
 
@@ -216,43 +299,6 @@ export type onContentDeletedType = {
     contentType: TableContentTypes;
     contentId: string;
   };
-};
-
-export type onCatchUpContentDataRespondedType = {
-  type: "catchUpContentDataResponded";
-  header: {
-    contentType: TableContentTypes;
-    contentId: string;
-  };
-  data:
-    | {
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-        videoTime: number;
-        timeMeasured: number;
-      }
-    | {
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      };
 };
 
 class TableStaticContentSocketController {
@@ -389,54 +435,56 @@ class TableStaticContentSocketController {
     });
   };
 
-  requestCatchUpContentData = (
-    contentType: TableContentTypes,
-    contentId: string
-  ) => {
-    this.sendMessage({
-      type: "requestCatchUpContentData",
-      header: {
-        table_id: this.table_id,
-        inquiringUsername: this.username,
-        inquiringInstance: this.instance,
-        contentType,
-        contentId,
-      },
-    });
-  };
-
-  catchUpContentDataResponse = (
-    inquiringUsername: string,
-    inquiringInstance: string,
+  updateContentPositioning = (
     contentType: TableContentTypes,
     contentId: string,
     positioning: {
-      position: {
+      position?: {
         left: number;
         top: number;
       };
-      scale: {
+      scale?: {
         x: number;
         y: number;
       };
-      rotation: number;
-    },
-    videoTime: number,
-    timeMeasured: number
+      rotation?: number;
+    }
   ) => {
     this.sendMessage({
-      type: "catchUpContentDataResponse",
+      type: "updateContentPositioning",
       header: {
         table_id: this.table_id,
-        inquiringUsername,
-        inquiringInstance,
         contentType,
         contentId,
       },
       data: {
         positioning,
-        videoTime,
-        timeMeasured,
+      },
+    });
+  };
+
+  updateContentEffects = (
+    contentType: TableContentTypes,
+    contentId: string,
+    effects: {
+      [effectType: string]: boolean;
+    },
+    effectStyles?:
+      | VideoEffectStylesType
+      | ImageEffectStylesType
+      | TextEffectStylesType
+      | ApplicationsEffectStylesType
+  ) => {
+    this.sendMessage({
+      type: "updateContentEffects",
+      header: {
+        table_id: this.table_id,
+        contentType,
+        contentId,
+      },
+      data: {
+        effects,
+        effectStyles,
       },
     });
   };
@@ -447,9 +495,6 @@ class TableStaticContentSocketController {
     switch (message.type) {
       case "responsedCatchUpTableData":
         this.onResponsedCatchUpTableData(message);
-        break;
-      case "requestedCatchUpContentData":
-        this.onRequestedCatchUpContentData(message);
         break;
       case "contentDeleted":
         this.onContentDeleted(message);
@@ -462,57 +507,104 @@ class TableStaticContentSocketController {
   private onResponsedCatchUpTableData = (
     event: onResponsedCatchUpTableDataType
   ) => {
-    const tableContent = event.data;
-    for (const contentType in tableContent) {
-      for (const contentId in tableContent[contentType as TableContentTypes]) {
-        const tableContentData =
-          tableContent[contentType as TableContentTypes]?.[contentId];
-        if (tableContentData) {
-          if (contentType === "video") {
-            if (tableContentData.url && tableContentData.mimeType) {
-              this.userMedia.current.video[contentId] = new VideoMedia(
-                contentId,
-                this.getFilename(tableContentData.url),
-                tableContentData.mimeType,
-                tableContentData.url,
-                this.userDevice,
-                this.deadbanding,
-                this.userEffectsStyles,
-                this.userStreamEffects,
-                this.userMedia,
-                this.getFile,
-                this.addMessageListener,
-                this.removeMessageListener,
-                tableContentData.dashURL
-              );
-            }
-          } else if (contentType === "image") {
-            if (tableContentData.url && tableContentData.mimeType) {
-              this.userMedia.current.image[contentId] = new ImageMedia(
-                contentId,
-                this.getFilename(tableContentData.url),
-                tableContentData.mimeType,
-                tableContentData.url,
-                this.userEffectsStyles,
-                this.userStreamEffects,
-                this.getFile,
-                this.addMessageListener,
-                this.removeMessageListener,
-                this.userDevice,
-                this.deadbanding,
-                this.userMedia
-              );
-            }
-          }
-        }
+    const { images, videos, text, applications, audio } = event.data;
+
+    if (videos) {
+      for (const video of videos) {
+        this.userStreamEffects.current.video[video.videoId].video =
+          video.effects as { [effectType in VideoEffectTypes]: boolean };
+        this.userEffectsStyles.current.video[video.videoId].video =
+          video.effectStyles as VideoEffectStylesType;
+
+        this.userMedia.current.video[video.videoId] = new VideoMedia(
+          video.videoId,
+          video.filename,
+          video.mimeType as TableTopStaticMimeType,
+          this.userDevice,
+          this.deadbanding,
+          this.userEffectsStyles,
+          this.userStreamEffects,
+          this.userMedia,
+          this.getFile,
+          this.addMessageListener,
+          this.removeMessageListener,
+          video.positioning
+        );
       }
     }
-  };
+    if (images) {
+      for (const image of images) {
+        this.userStreamEffects.current.image[image.imageId] = image.effects as {
+          [effectType in VideoEffectTypes]: boolean;
+        };
+        this.userEffectsStyles.current.image[image.imageId] =
+          image.effectStyles as VideoEffectStylesType;
 
-  private onRequestedCatchUpContentData = (
-    event: onRequestedCatchUpContentDataType
-  ) => {
-    const { inquiringUsername, inquiringInstance } = event.header;
+        this.userMedia.current.image[image.imageId] = new ImageMedia(
+          image.imageId,
+          image.filename,
+          image.mimeType as TableTopStaticMimeType,
+          this.userEffectsStyles,
+          this.userStreamEffects,
+          this.getFile,
+          this.addMessageListener,
+          this.removeMessageListener,
+          this.userDevice,
+          this.deadbanding,
+          this.userMedia,
+          image.positioning
+        );
+      }
+    }
+    if (text) {
+      for (const textItem of text) {
+        this.userStreamEffects.current.text[textItem.textId] =
+          textItem.effects as {
+            [effectType in VideoEffectTypes]: boolean;
+          };
+        this.userEffectsStyles.current.text[textItem.textId] =
+          textItem.effectStyles as VideoEffectStylesType;
+
+        this.userMedia.current.text[textItem.textId] = new TextMedia(
+          textItem.textId,
+          textItem.filename,
+          textItem.mimeType as TableTopStaticMimeType,
+          this.userEffectsStyles,
+          this.userStreamEffects,
+          this.getFile,
+          this.addMessageListener,
+          this.removeMessageListener,
+          this.userDevice,
+          this.userMedia,
+          textItem.positioning
+        );
+      }
+    }
+    if (applications) {
+      for (const application of applications) {
+        this.userStreamEffects.current.applications[application.applicationId] =
+          application.effects as {
+            [effectType in VideoEffectTypes]: boolean;
+          };
+        this.userEffectsStyles.current.applications[application.applicationId] =
+          application.effectStyles as VideoEffectStylesType;
+
+        this.userMedia.current.applications[application.applicationId] =
+          new ApplicationMedia(
+            application.applicationId,
+            application.filename,
+            application.mimeType as TableTopStaticMimeType,
+            this.userEffectsStyles,
+            this.userStreamEffects,
+            this.getFile,
+            this.addMessageListener,
+            this.removeMessageListener,
+            this.userDevice,
+            this.userMedia,
+            application.positioning
+          );
+      }
+    }
   };
 
   private onContentDeleted = (event: onContentDeletedType) => {
@@ -522,14 +614,6 @@ class TableStaticContentSocketController {
       this.userMedia.current[contentType][contentId].deconstructor();
       delete this.userMedia.current[contentType][contentId];
     }
-  };
-
-  private getFilename = (input: string): string => {
-    const lastSlashIndex = input.lastIndexOf("/");
-    if (lastSlashIndex === -1) {
-      return input;
-    }
-    return input.substring(lastSlashIndex + 1);
   };
 }
 

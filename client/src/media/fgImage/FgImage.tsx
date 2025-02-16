@@ -16,10 +16,10 @@ import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import FullScreenButton from "./lib/lowerImageControls/fullScreenButton/FullScreenButton";
 import ImageEffectsButton from "./lib/lowerImageControls/imageEffectsButton/ImageEffectsButton";
 import ImageEffectsSection from "./lib/imageEffectsSection/ImageEffectsSection";
-import "./lib/fgImageStyles.css";
 import DownloadButton from "./lib/lowerImageControls/downloadButton/DownloadButton";
 import SettingsButton from "./lib/lowerImageControls/settingsButton/SettingsButton";
 import DownloadRecordingButton from "./lib/lowerImageControls/downloadButton/DownloadRecordingButton";
+import "./lib/fgImageStyles.css";
 
 export default function FgImage({
   imageId,
@@ -38,7 +38,7 @@ export default function FgImage({
   };
 
   const { userMedia } = useMediaContext();
-  const { userStreamEffects } = useEffectsContext();
+  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const imageMedia = userMedia.current.image[imageId];
@@ -86,41 +86,27 @@ export default function FgImage({
     setImageEffectsActive,
     tintColor,
     userStreamEffects,
+    userEffectsStyles,
     userMedia,
     setSettingsActive,
     settings,
     recording,
     downloadRecordingReady,
-    setRerender
+    setRerender,
+    tableStaticContentSocket
   );
 
   const imageController = new ImageController(
-    tableStaticContentSocket,
-    imageId,
-    imageMedia,
-    positioning,
     imageContainerRef,
-    subContainerRef,
     imageOptions,
-    setRerender,
     setSettingsActive
   );
 
   useEffect(() => {
     subContainerRef.current?.appendChild(imageMedia.canvas);
 
-    tableStaticContentSocket.current?.requestCatchUpContentData(
-      "image",
-      imageId
-    );
-
     // Set up initial conditions
     imageController.init();
-
-    // Listen for messages on tableStaticContentSocket
-    tableStaticContentSocket.current?.addMessageListener(
-      imageController.handleTableStaticContentMessage
-    );
 
     // Add eventlisteners
     document.addEventListener(
@@ -138,9 +124,6 @@ export default function FgImage({
     );
 
     return () => {
-      tableStaticContentSocket.current?.removeMessageListener(
-        imageController.handleTableStaticContentMessage
-      );
       document.removeEventListener(
         "fullscreenchange",
         lowerImageController.handleFullScreenChange

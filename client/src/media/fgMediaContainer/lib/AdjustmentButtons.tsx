@@ -3,14 +3,22 @@ import PanButton from "../../../elements/fgAdjustmentElements/PanButton";
 import RotateButton from "../../../elements/fgAdjustmentElements/RotateButton";
 import ScaleButton from "../../../elements/fgAdjustmentElements/ScaleButton";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import TableStaticContentSocketController, {
+  TableContentTypes,
+} from "../../../lib/TableStaticContentSocketController";
 
 export default function AdjustmentButtons({
+  kind,
+  mediaId,
   bundleRef,
   panBtnRef,
   positioning,
   fgContentAdjustmentController,
+  tableStaticContentSocket,
   aspectRatio,
 }: {
+  kind: TableContentTypes;
+  mediaId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   panBtnRef: React.RefObject<HTMLButtonElement>;
   positioning: React.MutableRefObject<{
@@ -25,6 +33,9 @@ export default function AdjustmentButtons({
     rotation: number;
   }>;
   fgContentAdjustmentController: FgContentAdjustmentController;
+  tableStaticContentSocket: React.MutableRefObject<
+    TableStaticContentSocketController | undefined
+  >;
   aspectRatio: number | undefined;
 }) {
   return (
@@ -53,9 +64,15 @@ export default function AdjustmentButtons({
         pointerDownFunction={
           fgContentAdjustmentController.adjustmentBtnPointerDownFunction
         }
-        pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
-        }
+        pointerUpFunction={() => {
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+
+          tableStaticContentSocket.current?.updateContentPositioning(
+            kind,
+            mediaId,
+            { rotation: positioning.current.rotation }
+          );
+        }}
       />
       <PanButton
         externalRef={panBtnRef}
@@ -108,9 +125,15 @@ export default function AdjustmentButtons({
             { rotationPointPlacement: "topLeft" }
           )
         }
-        pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
-        }
+        pointerUpFunction={() => {
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+
+          tableStaticContentSocket.current?.updateContentPositioning(
+            kind,
+            mediaId,
+            { position: positioning.current.position }
+          );
+        }}
       />
       <ScaleButton
         className='scale-btn absolute left-full top-full aspect-square z-10 pl-1 pt-1 w-[10%] min-w-6 max-w-10'
@@ -140,9 +163,15 @@ export default function AdjustmentButtons({
         pointerDownFunction={
           fgContentAdjustmentController.adjustmentBtnPointerDownFunction
         }
-        pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
-        }
+        pointerUpFunction={() => {
+          fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+
+          tableStaticContentSocket.current?.updateContentPositioning(
+            kind,
+            mediaId,
+            { scale: positioning.current.scale }
+          );
+        }}
       />
     </>
   );

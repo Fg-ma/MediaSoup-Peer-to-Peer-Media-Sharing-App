@@ -2,7 +2,7 @@ import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import LowerApplicationsController from "../LowerApplicationsController";
+import LowerApplicationController from "../LowerApplicationController";
 import { Settings } from "../../typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -15,20 +15,20 @@ const recordOffIcon = nginxAssetSeverBaseUrl + "svgs/recordOffIcon.svg";
 export default function DownloadButton({
   settings,
   recording,
-  lowerApplicationsController,
-  applicationsEffectsActive,
+  lowerApplicationController,
+  applicationEffectsActive,
   scrollingContainerRef,
 }: {
   settings: Settings;
   recording: React.MutableRefObject<boolean>;
-  lowerApplicationsController: LowerApplicationsController;
-  applicationsEffectsActive: boolean;
+  lowerApplicationController: LowerApplicationController;
+  applicationEffectsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        lowerApplicationsController.handleDownload();
+        lowerApplicationController.handleDownload();
       }}
       contentFunction={() => {
         const src =
@@ -53,7 +53,7 @@ export default function DownloadButton({
         );
       }}
       hoverContent={
-        !applicationsEffectsActive ? (
+        !applicationEffectsActive ? (
           <FgHoverContentStandard
             content={
               settings.downloadType.value === "snapShot"

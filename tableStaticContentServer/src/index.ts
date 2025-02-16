@@ -5,7 +5,6 @@ import Broadcaster from "./lib/Broadcaster";
 import handleMessage from "./lib/websocketMessages";
 import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
-import TableContentController from "./lib/TableContentController";
 import Cleanup from "./lib/Cleanup";
 import TableTopCeph from "./lib/TableTopCeph";
 import Gets from "./gets/gets";
@@ -20,7 +19,6 @@ export const broadcaster = new Broadcaster();
 export const tablesController = new TablesController(broadcaster);
 export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
-export const tableContentController = new TableContentController();
 export const cleanup = new Cleanup(broadcaster);
 
 // tableTopCeph.emptyBucket("mybucket");
@@ -84,7 +82,6 @@ app
       res.writeHeader("Access-Control-Allow-Origin", "*");
       res.writeHeader("Access-Control-Allow-Methods", "GET");
       res.writeHeader("Access-Control-Allow-Headers", "Content-Type");
-      res.writeHeader("Content-Type", "image/png");
     });
   })
   .listen(8045, (token) => {

@@ -10,7 +10,11 @@ import {
   postProcessEffectEncodingMap,
 } from "../typeConstant";
 import Encoder from "./Encoder";
-import { TextEffectStylesType, TextEffectTypes } from "./typeConstant";
+import {
+  textEffectEncodingMap,
+  TextEffectStylesType,
+  TextEffectTypes,
+} from "./typeConstant";
 
 class Uploads {
   constructor(
@@ -21,6 +25,8 @@ class Uploads {
   uploadMetaData = async (data: {
     table_id: string;
     textId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -49,7 +55,7 @@ class Uploads {
   editMetaData = async (
     filter: { table_id: string; textId: string },
     updateData: Partial<{
-      positioning: {
+      positioning?: {
         position?: { left?: number; top?: number };
         scale?: { x?: number; y?: number };
         rotation?: number;
@@ -67,7 +73,6 @@ class Uploads {
 
     if (updateData.positioning) {
       if (updateData.positioning.position) {
-        updateFields["p.p"] = {};
         if (updateData.positioning.position.left !== undefined) {
           updateFields["p.p.l"] = updateData.positioning.position.left;
         }
@@ -76,7 +81,6 @@ class Uploads {
         }
       }
       if (updateData.positioning.scale) {
-        updateFields["p.s"] = {};
         if (updateData.positioning.scale.x !== undefined) {
           updateFields["p.s.x"] = updateData.positioning.scale.x;
         }
@@ -95,7 +99,10 @@ class Uploads {
           (effect) =>
             updateData.effects?.[effect as keyof typeof updateData.effects]
         )
-        .map((effect) => parseInt(effect));
+        .map(
+          (effect) =>
+            textEffectEncodingMap[effect as keyof typeof updateData.effects]
+        );
     }
 
     if (updateData.effectStyles) {
@@ -105,26 +112,6 @@ class Uploads {
             updateData.effectStyles.postProcess.style
           ],
         },
-        "1": {
-          s: hideBackgroundEffectEncodingMap[
-            updateData.effectStyles.hideBackground.style
-          ],
-          c: updateData.effectStyles.hideBackground.color,
-        },
-        "2": {
-          s: glassesEffectEncodingMap[updateData.effectStyles.glasses.style],
-        },
-        "3": {
-          s: beardsEffectEncodingMap[updateData.effectStyles.beards.style],
-        },
-        "4": {
-          s: mustachesEffectEncodingMap[
-            updateData.effectStyles.mustaches.style
-          ],
-        },
-        "5": { s: masksEffectEncodingMap[updateData.effectStyles.masks.style] },
-        "6": { s: hatsEffectEncodingMap[updateData.effectStyles.hats.style] },
-        "7": { s: petsEffectEncodingMap[updateData.effectStyles.pets.style] },
       };
     }
 

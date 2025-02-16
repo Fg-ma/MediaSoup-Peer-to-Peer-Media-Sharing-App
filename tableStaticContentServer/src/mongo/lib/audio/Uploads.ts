@@ -1,6 +1,6 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
-import { AudioEffectTypes } from "./typeConstant";
+import { audioEffectEncodingMap, AudioEffectTypes } from "./typeConstant";
 
 class Uploads {
   constructor(
@@ -11,6 +11,8 @@ class Uploads {
   uploadMetaData = async (data: {
     table_id: string;
     audioId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -38,7 +40,7 @@ class Uploads {
   editMetaData = async (
     filter: { table_id: string; audioId: string },
     updateData: Partial<{
-      positioning: {
+      positioning?: {
         position?: { left?: number; top?: number };
         scale?: { x?: number; y?: number };
         rotation?: number;
@@ -55,7 +57,6 @@ class Uploads {
 
     if (updateData.positioning) {
       if (updateData.positioning.position) {
-        updateFields["p.p"] = {};
         if (updateData.positioning.position.left !== undefined) {
           updateFields["p.p.l"] = updateData.positioning.position.left;
         }
@@ -64,7 +65,6 @@ class Uploads {
         }
       }
       if (updateData.positioning.scale) {
-        updateFields["p.s"] = {};
         if (updateData.positioning.scale.x !== undefined) {
           updateFields["p.s.x"] = updateData.positioning.scale.x;
         }
@@ -83,7 +83,10 @@ class Uploads {
           (effect) =>
             updateData.effects?.[effect as keyof typeof updateData.effects]
         )
-        .map((effect) => parseInt(effect));
+        .map(
+          (effect) =>
+            audioEffectEncodingMap[effect as keyof typeof updateData.effects]
+        );
     }
 
     try {

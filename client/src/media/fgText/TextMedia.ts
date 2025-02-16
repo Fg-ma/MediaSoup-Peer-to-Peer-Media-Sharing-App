@@ -19,7 +19,6 @@ class TextMedia {
 
   filename: string;
   mimeType: TableTopStaticMimeType;
-  textURL: string;
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
@@ -31,11 +30,22 @@ class TextMedia {
     [textEffect in TextEffectTypes]?: boolean;
   } = {};
 
+  initPositioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
+
   constructor(
     private textId: string,
     filename: string,
     mimeType: TableTopStaticMimeType,
-    textURL: string,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private getText: (key: string) => void,
@@ -46,11 +56,22 @@ class TextMedia {
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
     private userDevice: UserDevice,
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    initPositioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }
   ) {
     this.filename = filename;
     this.mimeType = mimeType;
-    this.textURL = textURL;
+    this.initPositioning = initPositioning;
 
     this.userStreamEffects.current.text[this.textId] = structuredClone(
       defaultTextStreamEffects
@@ -117,7 +138,7 @@ class TextMedia {
         undefined,
         undefined,
         this.userDevice,
-        undefined,
+        [0],
         this.userMedia
       );
 

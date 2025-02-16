@@ -9,7 +9,7 @@ import {
   postProcessEffectDecodingMap,
 } from "../typeConstant";
 import {
-  imageEffectStylesEncodingMap,
+  imageEffectEncodingMap,
   ImageEffectStylesType,
   ImageEffectTypes,
 } from "./typeConstant";
@@ -20,6 +20,8 @@ class Decoder {
   decodeMetaData = (data: {
     tid: string;
     iid: string;
+    n: string;
+    m: string;
     p: {
       p: {
         l: number;
@@ -62,6 +64,8 @@ class Decoder {
   }): {
     table_id: string;
     imageId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -78,10 +82,10 @@ class Decoder {
     };
     effectStyles: ImageEffectStylesType;
   } => {
-    const { tid, iid, p, e, es } = data;
+    const { tid, iid, n, m, p, e, es } = data;
 
     const effects: { [effectType in ImageEffectTypes]: boolean } = Object.keys(
-      imageEffectStylesEncodingMap
+      imageEffectEncodingMap
     ).reduce((acc, key) => {
       acc[key as ImageEffectTypes] = e.includes(parseInt(key));
       return acc;
@@ -90,6 +94,8 @@ class Decoder {
     return {
       table_id: tid,
       imageId: iid,
+      filename: n,
+      mimeType: m,
       positioning: {
         position: {
           left: p.p.l,

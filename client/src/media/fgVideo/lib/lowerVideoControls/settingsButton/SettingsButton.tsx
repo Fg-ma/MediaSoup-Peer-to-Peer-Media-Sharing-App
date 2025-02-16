@@ -3,6 +3,7 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
 import { ActivePages, Settings } from "../../typeConstant";
+import LowerVideoController from "../LowerVideoController";
 
 type RecursiveObject = {
   active?: boolean;
@@ -10,6 +11,7 @@ type RecursiveObject = {
 };
 
 export default function SettingsButton({
+  lowerVideoController,
   videoEffectsActive,
   videoContainerRef,
   settingsActive,
@@ -20,6 +22,7 @@ export default function SettingsButton({
   setSettings,
   scrollingContainerRef,
 }: {
+  lowerVideoController: LowerVideoController;
   videoEffectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
@@ -125,6 +128,7 @@ export default function SettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
+          lowerVideoController={lowerVideoController}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}

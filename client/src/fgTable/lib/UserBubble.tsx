@@ -141,7 +141,7 @@ export default function UserBubble({
           content={
             <div
               ref={userPanelRef}
-              className='small-vertical-scroll-bar w-full h-full overflow-y-auto py-2 flex flex-col space-y-2'
+              className='flex small-vertical-scroll-bar w-full h-full overflow-y-auto py-2 flex-col space-y-2'
             >
               <div className='flex items-center justify-center h-max w-full space-x-2'>
                 <div

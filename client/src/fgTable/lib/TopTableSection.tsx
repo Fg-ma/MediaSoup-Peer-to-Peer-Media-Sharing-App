@@ -1,7 +1,7 @@
 import React from "react";
 import { TableColors } from "../../lib/TableSocketController";
 import UserBubble from "./UserBubble";
-import { tableColorMap } from "../FgTable";
+import { tableColorMap } from "./tableColors";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

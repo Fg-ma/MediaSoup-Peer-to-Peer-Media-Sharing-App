@@ -1,17 +1,8 @@
+import { postProcessEffectEncodingMap } from "../typeConstant";
 import {
-  ImageEffectStylesType,
-  ImageEffectTypes,
-} from "../images/typeConstant";
-import {
-  beardsEffectEncodingMap,
-  glassesEffectEncodingMap,
-  hatsEffectEncodingMap,
-  hideBackgroundEffectEncodingMap,
-  masksEffectEncodingMap,
-  mustachesEffectEncodingMap,
-  petsEffectEncodingMap,
-  postProcessEffectEncodingMap,
-} from "../typeConstant";
+  ApplicationEffectStylesType,
+  ApplicationEffectTypes,
+} from "./typeConstant";
 
 class Encoder {
   constructor() {}
@@ -19,6 +10,8 @@ class Encoder {
   encodeMetaData = (data: {
     table_id: string;
     applicationId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -31,12 +24,14 @@ class Encoder {
       rotation: number;
     };
     effects: {
-      [effectType in ImageEffectTypes]: boolean;
+      [effectType in ApplicationEffectTypes]: boolean;
     };
-    effectStyles: ImageEffectStylesType;
+    effectStyles: ApplicationEffectStylesType;
   }): {
     tid: string;
     aid: string;
+    n: string;
+    m: string;
     p: {
       p: {
         l: number;
@@ -53,32 +48,17 @@ class Encoder {
       "0": {
         s: number;
       };
-      "1": {
-        s: number;
-        c: string;
-      };
-      "2": {
-        s: number;
-      };
-      "3": {
-        s: number;
-      };
-      "4": {
-        s: number;
-      };
-      "5": {
-        s: number;
-      };
-      "6": {
-        s: number;
-      };
-      "7": {
-        s: number;
-      };
     };
   } => {
-    const { table_id, applicationId, positioning, effects, effectStyles } =
-      data;
+    const {
+      table_id,
+      applicationId,
+      filename,
+      mimeType,
+      positioning,
+      effects,
+      effectStyles,
+    } = data;
 
     const e: number[] = Object.keys(effects)
       .filter((effect) => effects[effect as keyof typeof effects])
@@ -87,6 +67,8 @@ class Encoder {
     return {
       tid: table_id,
       aid: applicationId,
+      n: filename,
+      m: mimeType,
       p: {
         p: {
           l: positioning.position.left,
@@ -102,28 +84,6 @@ class Encoder {
       es: {
         "0": {
           s: postProcessEffectEncodingMap[effectStyles.postProcess.style],
-        },
-        "1": {
-          s: hideBackgroundEffectEncodingMap[effectStyles.hideBackground.style],
-          c: effectStyles.hideBackground.color,
-        },
-        "2": {
-          s: glassesEffectEncodingMap[effectStyles.glasses.style],
-        },
-        "3": {
-          s: beardsEffectEncodingMap[effectStyles.beards.style],
-        },
-        "4": {
-          s: mustachesEffectEncodingMap[effectStyles.mustaches.style],
-        },
-        "5": {
-          s: masksEffectEncodingMap[effectStyles.masks.style],
-        },
-        "6": {
-          s: hatsEffectEncodingMap[effectStyles.hats.style],
-        },
-        "7": {
-          s: petsEffectEncodingMap[effectStyles.pets.style],
         },
       },
     };

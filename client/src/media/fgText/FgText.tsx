@@ -38,7 +38,7 @@ export default function FgText({
   };
 
   const { userMedia } = useMediaContext();
-  const { userStreamEffects } = useEffectsContext();
+  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const textMedia = userMedia.current.text[textId];
@@ -86,38 +86,27 @@ export default function FgText({
     setTextEffectsActive,
     tintColor,
     userStreamEffects,
+    userEffectsStyles,
     userMedia,
     setSettingsActive,
     settings,
     recording,
     downloadRecordingReady,
-    setRerender
+    setRerender,
+    tableStaticContentSocket
   );
 
   const textController = new TextController(
-    tableStaticContentSocket,
-    textId,
-    textMedia,
-    positioning,
     textContainerRef,
-    subContainerRef,
     textOptions,
-    setRerender,
     setSettingsActive
   );
 
   useEffect(() => {
     subContainerRef.current?.appendChild(textMedia.canvas);
 
-    tableStaticContentSocket.current?.requestCatchUpContentData("text", textId);
-
     // Set up initial conditions
     textController.init();
-
-    // Listen for messages on tableStaticContentSocket
-    tableStaticContentSocket.current?.addMessageListener(
-      textController.handleTableStaticContentMessage
-    );
 
     // Add eventlisteners
     document.addEventListener(
@@ -135,9 +124,6 @@ export default function FgText({
     );
 
     return () => {
-      tableStaticContentSocket.current?.removeMessageListener(
-        textController.handleTableStaticContentMessage
-      );
       document.removeEventListener(
         "fullscreenchange",
         lowerTextController.handleFullScreenChange

@@ -66,7 +66,7 @@ export default function SliderValuePortal({
       ref={portalRef}
       className={`slider-value-portal ${
         !portalPosition.top && !portalPosition.left && "opacity-0"
-      } absolute w-max h-min z-[60] bg-white rounded p-1 font-K2D text-md shadow`}
+      } absolute w-max h-min z-[100000000000] bg-white rounded p-1 font-K2D text-md shadow`}
       style={{
         top: `${portalPosition.top}%`,
         left: `${portalPosition.left}%`,

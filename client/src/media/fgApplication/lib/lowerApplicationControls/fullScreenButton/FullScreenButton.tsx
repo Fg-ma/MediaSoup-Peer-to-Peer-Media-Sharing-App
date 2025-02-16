@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import LowerApplicationsController from "../LowerApplicationsController";
+import LowerApplicationController from "../LowerApplicationController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -10,12 +10,12 @@ const fullScreenIcon = nginxAssetSeverBaseUrl + "svgs/fullScreenIcon.svg";
 const fullScreenOffIcon = nginxAssetSeverBaseUrl + "svgs/fullScreenOffIcon.svg";
 
 export default function FullScreenButton({
-  lowerApplicationsController,
-  applicationsEffectsActive,
+  lowerApplicationController,
+  applicationEffectsActive,
   scrollingContainerRef,
 }: {
-  lowerApplicationsController: LowerApplicationsController;
-  applicationsEffectsActive: boolean;
+  lowerApplicationController: LowerApplicationController;
+  applicationEffectsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const [active, setActive] = useState(false);
@@ -23,7 +23,7 @@ export default function FullScreenButton({
   return (
     <FgButton
       clickFunction={() => {
-        lowerApplicationsController.handleFullScreen();
+        lowerApplicationController.handleFullScreen();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {
@@ -41,7 +41,7 @@ export default function FullScreenButton({
         );
       }}
       hoverContent={
-        !applicationsEffectsActive ? (
+        !applicationEffectsActive ? (
           <FgHoverContentStandard content='Full screen (f)' style='dark' />
         ) : undefined
       }

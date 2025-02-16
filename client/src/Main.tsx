@@ -15,7 +15,7 @@ import { useSocketContext } from "./context/socketContext/SocketContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import UserDevice from "./lib/UserDevice";
-import BrowserMedia from "./lib/BrowserMedia";
+import BrowserMedia from "./media/BrowserMedia";
 import BundlesController from "./lib/BundlesController";
 import Deadbanding from "./babylon/Deadbanding";
 import Metadata from "./lib/Metadata";

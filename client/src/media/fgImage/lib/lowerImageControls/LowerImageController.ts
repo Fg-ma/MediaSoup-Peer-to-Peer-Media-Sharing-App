@@ -1,8 +1,10 @@
-import { UserMediaType } from "src/context/mediaContext/typeConstant";
+import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserStreamEffectsType,
   ImageEffectTypes,
+  UserEffectsStylesType,
 } from "../../../../context/effectsContext/typeConstant";
+import TableStaticContentSocketController from "../../../../lib/TableStaticContentSocketController";
 import ImageMedia from "../../ImageMedia";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
 
@@ -18,12 +20,16 @@ class LowerImageController {
     >,
     private tintColor: React.MutableRefObject<string>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private recording: React.MutableRefObject<boolean>,
     private downloadRecordingReady: React.MutableRefObject<boolean>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >
   ) {}
 
   handleImageEffects = () => {
@@ -126,6 +132,13 @@ class LowerImageController {
       effect,
       this.tintColor.current,
       blockStateChange
+    );
+
+    this.tableStaticContentSocket.current?.updateContentEffects(
+      "image",
+      this.imageId,
+      this.userStreamEffects.current.image[this.imageId],
+      this.userEffectsStyles.current.image[this.imageId]
     );
   };
 

@@ -1,4 +1,4 @@
-import { audioEffectStylesEncodingMap, AudioEffectTypes } from "./typeConstant";
+import { audioEffectEncodingMap, AudioEffectTypes } from "./typeConstant";
 
 class Decoder {
   constructor() {}
@@ -6,6 +6,8 @@ class Decoder {
   decodeMetaData = (data: {
     tid: string;
     aid: string;
+    n: string;
+    m: string;
     p: {
       p: {
         l: number;
@@ -21,6 +23,8 @@ class Decoder {
   }): {
     table_id: string;
     audioId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -36,10 +40,10 @@ class Decoder {
       [effectType in AudioEffectTypes]: boolean;
     };
   } => {
-    const { tid, aid, p, e } = data;
+    const { tid, aid, n, m, p, e } = data;
 
     const effects: { [effectType in AudioEffectTypes]: boolean } = Object.keys(
-      audioEffectStylesEncodingMap
+      audioEffectEncodingMap
     ).reduce((acc, key) => {
       acc[key as AudioEffectTypes] = e.includes(parseInt(key));
       return acc;
@@ -48,6 +52,8 @@ class Decoder {
     return {
       table_id: tid,
       audioId: aid,
+      filename: n,
+      mimeType: m,
       positioning: {
         position: {
           left: p.p.l,

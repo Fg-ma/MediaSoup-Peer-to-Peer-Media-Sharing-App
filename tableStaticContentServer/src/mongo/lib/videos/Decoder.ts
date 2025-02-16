@@ -9,7 +9,7 @@ import {
   postProcessEffectDecodingMap,
 } from "../typeConstant";
 import {
-  videoEffectStylesEncodingMap,
+  videoEffectEncodingMap,
   VideoEffectStylesType,
   VideoEffectTypes,
 } from "./typeConstant";
@@ -20,6 +20,8 @@ class Decoder {
   decodeMetaData = (data: {
     tid: string;
     vid: string;
+    n: string;
+    m: string;
     p: {
       p: {
         l: number;
@@ -62,6 +64,8 @@ class Decoder {
   }): {
     table_id: string;
     videoId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -78,10 +82,10 @@ class Decoder {
     };
     effectStyles: VideoEffectStylesType;
   } => {
-    const { tid, vid, p, e, es } = data;
+    const { tid, vid, n, m, p, e, es } = data;
 
     const effects: { [effectType in VideoEffectTypes]: boolean } = Object.keys(
-      videoEffectStylesEncodingMap
+      videoEffectEncodingMap
     ).reduce((acc, key) => {
       acc[key as VideoEffectTypes] = e.includes(parseInt(key));
       return acc;
@@ -90,6 +94,8 @@ class Decoder {
     return {
       table_id: tid,
       videoId: vid,
+      filename: n,
+      mimeType: m,
       positioning: {
         position: {
           left: p.p.l,

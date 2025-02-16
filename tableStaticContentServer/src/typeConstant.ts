@@ -1,4 +1,8 @@
 import uWS from "uWebSockets.js";
+import { VideoEffectStylesType } from "./mongo/lib/videos/typeConstant";
+import { ImageEffectStylesType } from "./mongo/lib/images/typeConstant";
+import { ApplicationEffectStylesType } from "./mongo/lib/applications/typeConstant";
+import { TextEffectStylesType } from "./mongo/lib/text/typeConstant";
 
 export interface Tables {
   [table_id: string]: {
@@ -70,18 +74,6 @@ export const mimeToExtension: { [key: string]: string } = {
   "text/plain": ".txt",
 };
 
-export interface TableContent {
-  [table_id: string]: {
-    [tableContentType in TableContentTypes]?: {
-      [contentId: string]: {
-        url?: string;
-        dashURL?: string;
-        mimeType?: TableTopStaticMimeType;
-      };
-    };
-  };
-}
-
 export interface TableStaticContentWebSocket extends uWS.WebSocket<SocketData> {
   id: string;
   table_id: string;
@@ -100,10 +92,10 @@ export type MessageTypes =
   | onJoinTableType
   | onLeaveTableType
   | onRequestCatchUpTableDataType
-  | onRequestCatchUpContentDataType
   | onDeleteContentType
-  | onCatchUpContentDataResponseType
-  | onGetFileType;
+  | onGetFileType
+  | onUpdateContentPositioningType
+  | onUpdateContentEffectsType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -132,17 +124,6 @@ export type onRequestCatchUpTableDataType = {
   };
 };
 
-export type onRequestCatchUpContentDataType = {
-  type: "requestCatchUpContentData";
-  header: {
-    table_id: string;
-    inquiringUsername: string;
-    inquiringInstance: string;
-    contentType: TableContentTypes;
-    contentId: string;
-  };
-};
-
 export type onDeleteContentType = {
   type: "deleteContent";
   header: {
@@ -152,32 +133,6 @@ export type onDeleteContentType = {
   };
   data: {
     filename: string;
-  };
-};
-
-export type onCatchUpContentDataResponseType = {
-  type: "catchUpContentDataResponse";
-  header: {
-    table_id: string;
-    inquiringUsername: string;
-    inquiringInstance: string;
-    contentType: TableContentTypes;
-    contentId: string;
-  };
-  data: {
-    positioning: {
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    };
-    videoTime: number;
-    timeMeasured: number;
   };
 };
 
@@ -193,5 +148,45 @@ export type onGetFileType = {
   };
 };
 
+export type onUpdateContentPositioningType = {
+  type: "updateContentPositioning";
+  header: {
+    table_id: string;
+    contentType: TableContentTypes;
+    contentId: string;
+  };
+  data: {
+    positioning: {
+      position?: {
+        left: number;
+        top: number;
+      };
+      scale?: {
+        x: number;
+        y: number;
+      };
+      rotation?: number;
+    };
+  };
+};
+
+export type onUpdateContentEffectsType = {
+  type: "updateContentEffects";
+  header: {
+    table_id: string;
+    contentType: TableContentTypes;
+    contentId: string;
+  };
+  data: {
+    effects: {
+      [effectType: string]: boolean;
+    };
+    effectStyles?:
+      | VideoEffectStylesType
+      | ImageEffectStylesType
+      | TextEffectStylesType
+      | ApplicationEffectStylesType;
+  };
+};
+
 export const tables: Tables = {};
-export const tableContent: TableContent = {};

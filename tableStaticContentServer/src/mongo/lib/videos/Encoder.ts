@@ -1,8 +1,4 @@
 import {
-  ImageEffectStylesType,
-  ImageEffectTypes,
-} from "../images/typeConstant";
-import {
   beardsEffectEncodingMap,
   glassesEffectEncodingMap,
   hatsEffectEncodingMap,
@@ -12,6 +8,11 @@ import {
   petsEffectEncodingMap,
   postProcessEffectEncodingMap,
 } from "../typeConstant";
+import {
+  videoEffectEncodingMap,
+  VideoEffectStylesType,
+  VideoEffectTypes,
+} from "./typeConstant";
 
 class Encoder {
   constructor() {}
@@ -19,6 +20,8 @@ class Encoder {
   encodeMetaData = (data: {
     table_id: string;
     videoId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -31,12 +34,14 @@ class Encoder {
       rotation: number;
     };
     effects: {
-      [effectType in ImageEffectTypes]: boolean;
+      [effectType in VideoEffectTypes]: boolean;
     };
-    effectStyles: ImageEffectStylesType;
+    effectStyles: VideoEffectStylesType;
   }): {
     tid: string;
     vid: string;
+    n: string;
+    m: string;
     p: {
       p: {
         l: number;
@@ -77,15 +82,25 @@ class Encoder {
       };
     };
   } => {
-    const { table_id, videoId, positioning, effects, effectStyles } = data;
+    const {
+      table_id,
+      videoId,
+      filename,
+      mimeType,
+      positioning,
+      effects,
+      effectStyles,
+    } = data;
 
     const e: number[] = Object.keys(effects)
       .filter((effect) => effects[effect as keyof typeof effects])
-      .map((effect) => parseInt(effect));
+      .map((effect) => videoEffectEncodingMap[effect as keyof typeof effects]);
 
     return {
       tid: table_id,
       vid: videoId,
+      n: filename,
+      m: mimeType,
       p: {
         p: {
           l: positioning.position.left,

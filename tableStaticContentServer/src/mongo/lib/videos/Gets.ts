@@ -25,6 +25,27 @@ class Gets {
       return null;
     }
   };
+
+  getAllBy_TID = async (table_id: string) => {
+    try {
+      const videoData = await this.tableVideosCollection
+        .find({ tid: table_id })
+        .toArray();
+
+      if (!videoData || videoData.length === 0) {
+        return [];
+      }
+
+      // Decode metadata for all documents
+      return videoData.map((data) =>
+        // @ts-expect-error: mongo doesn't have typing
+        this.decoder.decodeMetaData(data)
+      );
+    } catch (err) {
+      console.error("Error retrieving data by TID:", err);
+      return [];
+    }
+  };
 }
 
 export default Gets;

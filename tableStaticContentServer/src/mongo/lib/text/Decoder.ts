@@ -1,13 +1,4 @@
-import {
-  beardsEffectDecodingMap,
-  glassesEffectDecodingMap,
-  hatsEffectDecodingMap,
-  hideBackgroundEffectDecodingMap,
-  masksEffectDecodingMap,
-  mustachesEffectDecodingMap,
-  petsEffectDecodingMap,
-  postProcessEffectDecodingMap,
-} from "../typeConstant";
+import { postProcessEffectDecodingMap } from "../typeConstant";
 import {
   textEffectStylesEncodingMap,
   TextEffectStylesType,
@@ -20,6 +11,8 @@ class Decoder {
   decodeMetaData = (data: {
     tid: string;
     vid: string;
+    n: string;
+    m: string;
     p: {
       p: {
         l: number;
@@ -62,6 +55,8 @@ class Decoder {
   }): {
     table_id: string;
     textId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -78,7 +73,7 @@ class Decoder {
     };
     effectStyles: TextEffectStylesType;
   } => {
-    const { tid, vid, p, e, es } = data;
+    const { tid, vid, n, m, p, e, es } = data;
 
     const effects: { [effectType in TextEffectTypes]: boolean } = Object.keys(
       textEffectStylesEncodingMap
@@ -90,6 +85,8 @@ class Decoder {
     return {
       table_id: tid,
       textId: vid,
+      filename: n,
+      mimeType: m,
       positioning: {
         position: {
           left: p.p.l,
@@ -105,28 +102,6 @@ class Decoder {
       effectStyles: {
         postProcess: {
           style: postProcessEffectDecodingMap[es["0"].s],
-        },
-        hideBackground: {
-          style: hideBackgroundEffectDecodingMap[es["1"].s],
-          color: es["1"].c,
-        },
-        glasses: {
-          style: glassesEffectDecodingMap[es["2"].s],
-        },
-        beards: {
-          style: beardsEffectDecodingMap[es["3"].s],
-        },
-        mustaches: {
-          style: mustachesEffectDecodingMap[es["4"].s],
-        },
-        masks: {
-          style: masksEffectDecodingMap[es["5"].s],
-        },
-        hats: {
-          style: hatsEffectDecodingMap[es["6"].s],
-        },
-        pets: {
-          style: petsEffectDecodingMap[es["7"].s],
         },
       },
     };

@@ -62,17 +62,19 @@ export interface SliderChangeEvent {
 }
 
 export default function FgSlider({
+  className,
   externalValue,
   externalStyleValue,
   onValueChange,
   disabled = false,
   options,
 }: {
+  className?: string;
   externalValue?: number;
   externalStyleValue?: number;
   onValueChange?: (event: SliderChangeEvent) => void;
   disabled?: boolean;
-  options: SliderOptions;
+  options?: SliderOptions;
 }) {
   const fgSliderOptions = {
     ...defaultFgSliderOptions,
@@ -246,7 +248,7 @@ export default function FgSlider({
       className={`flex items-center justify-center relative flex-col
         ${fgSliderOptions.orientation === "vertical" ? "w-16 h-full" : ""}
         ${fgSliderOptions.orientation === "horizontal" ? "h-16 w-full" : ""}
-      `}
+      ${className}`}
     >
       {fgSliderOptions.topLabel && (
         <div
@@ -300,7 +302,7 @@ export default function FgSlider({
                 : fgSliderOptions.orientation === "horizontal"
                 ? "right"
                 : "top"
-            }, ${disabled ? "#EF9668" : "#F56114"} ${
+            }, ${disabled ? "#b20203" : "#d40213"} ${
               externalStyleValue ? externalStyleValue : styleValue
             }%, #e6e6e6 ${
               externalStyleValue ? externalStyleValue : styleValue

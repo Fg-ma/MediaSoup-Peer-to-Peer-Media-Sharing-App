@@ -4,14 +4,13 @@ import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import SharedBundleController from "./lib/SharedBundleController";
-import { IncomingTableStaticContentMessages } from "../lib/TableStaticContentSocketController";
-import VideoMedia from "../media/fgVideo/VideoMedia";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
-import ImageMedia from "../media/fgImage/ImageMedia";
-import FgImage from "../media/fgImage/FgImage";
 import FgVideo from "../media/fgVideo/FgVideo";
+import FgImage from "../media/fgImage/FgImage";
+import FgApplication from "../media/fgApplication/FgApplication";
+import FgText from "../media/fgText/FgText";
 
 const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
@@ -45,7 +44,15 @@ export default function SharedBundle({
 
   const [_, setRerender] = useState(false);
 
-  const sharedBundleController = new SharedBundleController(setRerender);
+  const sharedBundleController = new SharedBundleController(
+    setRerender,
+    userDevice,
+    deadbanding,
+    userEffectsStyles,
+    userStreamEffects,
+    userMedia,
+    tableStaticContentSocket
+  );
 
   useEffect(() => {
     userMedia.current.gamesSignaling?.addMessageListener(
@@ -61,86 +68,14 @@ export default function SharedBundle({
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      handleTableStaticContentMessage
+      sharedBundleController.handleTableStaticContentMessage
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        handleTableStaticContentMessage
+        sharedBundleController.handleTableStaticContentMessage
       );
   }, [tableStaticContentSocket.current]);
-
-  const handleTableStaticContentMessage = (
-    message: IncomingTableStaticContentMessages
-  ) => {
-    switch (message.type) {
-      case "originalVideoReady":
-        {
-          const { videoId } = message.header;
-          const { filename, url, mimeType } = message.data;
-          if (tableStaticContentSocket.current) {
-            userMedia.current.video[videoId] = new VideoMedia(
-              videoId,
-              filename,
-              mimeType,
-              url,
-              userDevice,
-              deadbanding,
-              userEffectsStyles,
-              userStreamEffects,
-              userMedia,
-              tableStaticContentSocket.current.getFile,
-              tableStaticContentSocket.current.addMessageListener,
-              tableStaticContentSocket.current.removeMessageListener
-            );
-          }
-          setRerender((prev) => !prev);
-        }
-        break;
-      case "dashVideoReady":
-        {
-          const { videoId } = message.header;
-          const { url } = message.data;
-
-          userMedia.current.video[videoId]?.preloadDashStream(url);
-        }
-        break;
-      case "imageReady":
-        {
-          const { contentId } = message.header;
-          const { filename, url, mimeType } = message.data;
-
-          if (tableStaticContentSocket.current) {
-            userMedia.current.image[contentId] = new ImageMedia(
-              contentId,
-              filename,
-              mimeType,
-              url,
-              userEffectsStyles,
-              userStreamEffects,
-              tableStaticContentSocket.current.getFile,
-              tableStaticContentSocket.current.addMessageListener,
-              tableStaticContentSocket.current.removeMessageListener,
-              userDevice,
-              deadbanding,
-              userMedia
-            );
-          }
-          setRerender((prev) => !prev);
-        }
-        break;
-      case "contentDeleted":
-        setRerender((prev) => !prev);
-        break;
-      // case "truncatedVideoReady":
-      //   shakaPlayer.current?.load(message.url).then(() => {
-      //     console.log("Original video loaded successfully");
-      //   });
-      //   break;
-      default:
-        break;
-    }
-  };
 
   return (
     <div
@@ -175,6 +110,28 @@ export default function SharedBundle({
           <Suspense key={imageId} fallback={<div>Loading...</div>}>
             <FgImage
               imageId={imageId}
+              bundleRef={sharedBundleRef}
+              tableRef={tableRef}
+            />
+          </Suspense>
+        ))}
+      {userMedia.current.applications &&
+        Object.keys(userMedia.current.applications).length !== 0 &&
+        Object.keys(userMedia.current.applications).map((applicationId) => (
+          <Suspense key={applicationId} fallback={<div>Loading...</div>}>
+            <FgApplication
+              applicationId={applicationId}
+              bundleRef={sharedBundleRef}
+              tableRef={tableRef}
+            />
+          </Suspense>
+        ))}
+      {userMedia.current.text &&
+        Object.keys(userMedia.current.text).length !== 0 &&
+        Object.keys(userMedia.current.text).map((textId) => (
+          <Suspense key={textId} fallback={<div>Loading...</div>}>
+            <FgText
+              textId={textId}
               bundleRef={sharedBundleRef}
               tableRef={tableRef}
             />

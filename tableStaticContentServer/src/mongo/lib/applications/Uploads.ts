@@ -1,16 +1,8 @@
 import { Collection } from "mongodb";
-import {
-  beardsEffectEncodingMap,
-  glassesEffectEncodingMap,
-  hatsEffectEncodingMap,
-  hideBackgroundEffectEncodingMap,
-  masksEffectEncodingMap,
-  mustachesEffectEncodingMap,
-  petsEffectEncodingMap,
-  postProcessEffectEncodingMap,
-} from "../typeConstant";
+import { postProcessEffectEncodingMap } from "../typeConstant";
 import Encoder from "./Encoder";
 import {
+  applicationEffectEncodingMap,
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
 } from "./typeConstant";
@@ -24,6 +16,8 @@ class Uploads {
   uploadMetaData = async (data: {
     table_id: string;
     applicationId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -52,7 +46,7 @@ class Uploads {
   editMetaData = async (
     filter: { table_id: string; applicationId: string },
     updateData: Partial<{
-      positioning: {
+      positioning?: {
         position?: { left?: number; top?: number };
         scale?: { x?: number; y?: number };
         rotation?: number;
@@ -70,7 +64,6 @@ class Uploads {
 
     if (updateData.positioning) {
       if (updateData.positioning.position) {
-        updateFields["p.p"] = {};
         if (updateData.positioning.position.left !== undefined) {
           updateFields["p.p.l"] = updateData.positioning.position.left;
         }
@@ -79,7 +72,6 @@ class Uploads {
         }
       }
       if (updateData.positioning.scale) {
-        updateFields["p.s"] = {};
         if (updateData.positioning.scale.x !== undefined) {
           updateFields["p.s.x"] = updateData.positioning.scale.x;
         }
@@ -98,7 +90,12 @@ class Uploads {
           (effect) =>
             updateData.effects?.[effect as keyof typeof updateData.effects]
         )
-        .map((effect) => parseInt(effect));
+        .map(
+          (effect) =>
+            applicationEffectEncodingMap[
+              effect as keyof typeof updateData.effects
+            ]
+        );
     }
 
     if (updateData.effectStyles) {
@@ -108,26 +105,6 @@ class Uploads {
             updateData.effectStyles.postProcess.style
           ],
         },
-        "1": {
-          s: hideBackgroundEffectEncodingMap[
-            updateData.effectStyles.hideBackground.style
-          ],
-          c: updateData.effectStyles.hideBackground.color,
-        },
-        "2": {
-          s: glassesEffectEncodingMap[updateData.effectStyles.glasses.style],
-        },
-        "3": {
-          s: beardsEffectEncodingMap[updateData.effectStyles.beards.style],
-        },
-        "4": {
-          s: mustachesEffectEncodingMap[
-            updateData.effectStyles.mustaches.style
-          ],
-        },
-        "5": { s: masksEffectEncodingMap[updateData.effectStyles.masks.style] },
-        "6": { s: hatsEffectEncodingMap[updateData.effectStyles.hats.style] },
-        "7": { s: petsEffectEncodingMap[updateData.effectStyles.pets.style] },
       };
     }
 

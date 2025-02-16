@@ -45,7 +45,7 @@ export default function FgVideo({
   };
 
   const { userMedia } = useMediaContext();
-  const { userStreamEffects } = useEffectsContext();
+  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const videoMedia = userMedia.current.video[videoId];
@@ -120,6 +120,7 @@ export default function FgVideo({
     setAudioEffectsActive,
     tintColor,
     userStreamEffects,
+    userEffectsStyles,
     userMedia,
     initTimeOffset,
     setSettingsActive,
@@ -128,19 +129,15 @@ export default function FgVideo({
     setRerender,
     timelineContainerRef,
     isScrubbing,
-    wasPaused
+    wasPaused,
+    tableStaticContentSocket
   );
 
   const videoController = new VideoController(
-    tableStaticContentSocket,
-    videoId,
     videoMedia,
     subContainerRef,
-    lowerVideoController,
-    positioning,
     videoContainerRef,
-    videoOptions,
-    setRerender
+    videoOptions
   );
 
   useEffect(() => {
@@ -151,18 +148,8 @@ export default function FgVideo({
 
     videoController.scaleCallback();
 
-    tableStaticContentSocket.current?.requestCatchUpContentData(
-      "video",
-      videoId
-    );
-
     // Set up initial conditions
     videoController.init();
-
-    // Listen for messages on tableStaticContentSocket
-    tableStaticContentSocket.current?.addMessageListener(
-      videoController.handleTableStaticContentMessage
-    );
 
     // Keep video time
     lowerVideoController.timeUpdate();
@@ -196,9 +183,6 @@ export default function FgVideo({
         )
       );
       positioningListeners.current = {};
-      tableStaticContentSocket.current?.removeMessageListener(
-        videoController.handleTableStaticContentMessage
-      );
       document.removeEventListener(
         "fullscreenchange",
         lowerVideoController.handleFullScreenChange
@@ -292,6 +276,7 @@ export default function FgVideo({
           scrollingContainerRef={rightLowerVideoControlsRef}
         />,
         <SettingsButton
+          lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
           videoContainerRef={videoContainerRef}
           settingsActive={settingsActive}

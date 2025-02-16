@@ -2,32 +2,38 @@ import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserStreamEffectsType,
   ApplicationsEffectTypes,
+  UserEffectsStylesType,
 } from "../../../../context/effectsContext/typeConstant";
-import ApplicationsMedia from "../../ApplicationsMedia";
+import ApplicationMedia from "../../ApplicationMedia";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
+import TableStaticContentSocketController from "../../../../lib/TableStaticContentSocketController";
 
-class LowerApplicationsController {
+class LowerApplicationController {
   constructor(
-    private applicationsId: string,
-    private applicationsMedia: ApplicationsMedia,
-    private applicationsContainerRef: React.RefObject<HTMLDivElement>,
+    private applicationId: string,
+    private applicationMedia: ApplicationMedia,
+    private applicationContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
-    private setApplicationsEffectsActive: React.Dispatch<
+    private setApplicationEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
     private tintColor: React.MutableRefObject<string>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private recording: React.MutableRefObject<boolean>,
     private downloadRecordingReady: React.MutableRefObject<boolean>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >
   ) {}
 
-  handleApplicationsEffects = () => {
-    this.setApplicationsEffectsActive((prev) => !prev);
+  handleApplicationEffects = () => {
+    this.setApplicationEffectsActive((prev) => !prev);
   };
 
   handleFullScreen = () => {
@@ -35,18 +41,16 @@ class LowerApplicationsController {
       document
         .exitFullscreen()
         .then(() => {
-          this.applicationsContainerRef.current?.classList.remove(
-            "full-screen"
-          );
+          this.applicationContainerRef.current?.classList.remove("full-screen");
         })
         .catch((error) => {
           console.error("Failed to exit full screen:", error);
         });
     } else {
-      this.applicationsContainerRef.current
+      this.applicationContainerRef.current
         ?.requestFullscreen()
         .then(() => {
-          this.applicationsContainerRef.current?.classList.add("full-screen");
+          this.applicationContainerRef.current?.classList.add("full-screen");
         })
         .catch((error) => {
           console.error("Failed to request full screen:", error);
@@ -56,14 +60,14 @@ class LowerApplicationsController {
 
   handleFullScreenChange = () => {
     if (!document.fullscreenElement) {
-      this.applicationsContainerRef.current?.classList.remove("full-screen");
+      this.applicationContainerRef.current?.classList.remove("full-screen");
     }
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
-      !this.applicationsContainerRef.current?.classList.contains("in-media") ||
+      !this.applicationContainerRef.current?.classList.contains("in-media") ||
       this.controlPressed.current ||
       this.shiftPressed.current
     ) {
@@ -84,7 +88,7 @@ class LowerApplicationsController {
         this.handleFullScreen();
         break;
       case "e":
-        this.handleApplicationsEffects();
+        this.handleApplicationEffects();
         break;
       case "d":
         this.handleDownload();
@@ -115,32 +119,39 @@ class LowerApplicationsController {
     }
   };
 
-  handleApplicationsEffect = async (
+  handleApplicationEffect = async (
     effect: ApplicationsEffectTypes,
     blockStateChange: boolean
   ) => {
     if (!blockStateChange) {
-      this.userStreamEffects.current.applications[this.applicationsId][effect] =
-        !this.userStreamEffects.current.applications[this.applicationsId][
+      this.userStreamEffects.current.applications[this.applicationId][effect] =
+        !this.userStreamEffects.current.applications[this.applicationId][
           effect
         ];
     }
 
-    this.userMedia.current.applications[this.applicationsId].changeEffects(
+    this.userMedia.current.applications[this.applicationId].changeEffects(
       effect,
       this.tintColor.current,
       blockStateChange
+    );
+
+    this.tableStaticContentSocket.current?.updateContentEffects(
+      "applications",
+      this.applicationId,
+      this.userStreamEffects.current.applications[this.applicationId],
+      this.userEffectsStyles.current.applications[this.applicationId]
     );
   };
 
   handleDownload = () => {
     if (this.settings.downloadType.value === "snapShot") {
-      this.applicationsMedia.babylonScene?.downloadSnapShot();
+      this.applicationMedia.babylonScene?.downloadSnapShot();
     } else if (this.settings.downloadType.value === "original") {
-      this.applicationsMedia.downloadApplications();
+      this.applicationMedia.downloadApplication();
     } else if (this.settings.downloadType.value === "record") {
       if (!this.recording.current) {
-        this.applicationsMedia.babylonScene?.startRecording(
+        this.applicationMedia.babylonScene?.startRecording(
           downloadRecordingMimeMap[
             this.settings.downloadType.downloadTypeOptions.mimeType.value
           ],
@@ -153,7 +164,7 @@ class LowerApplicationsController {
         );
         this.downloadRecordingReady.current = false;
       } else {
-        this.applicationsMedia.babylonScene?.stopRecording();
+        this.applicationMedia.babylonScene?.stopRecording();
         this.downloadRecordingReady.current = true;
       }
 
@@ -163,7 +174,7 @@ class LowerApplicationsController {
   };
 
   handleDownloadRecording = () => {
-    this.applicationsMedia.babylonScene?.downloadRecording();
+    this.applicationMedia.babylonScene?.downloadRecording();
   };
 
   handleSettings = () => {
@@ -171,4 +182,4 @@ class LowerApplicationsController {
   };
 }
 
-export default LowerApplicationsController;
+export default LowerApplicationController;

@@ -111,7 +111,13 @@ class BabylonScene {
 
   constructor(
     private id: string,
-    private type: "camera" | "screen" | "image" | "video",
+    private type:
+      | "camera"
+      | "screen"
+      | "image"
+      | "video"
+      | "application"
+      | "text",
     private canvas: HTMLCanvasElement,
     private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private faceLandmarks: FaceLandmarks | undefined,

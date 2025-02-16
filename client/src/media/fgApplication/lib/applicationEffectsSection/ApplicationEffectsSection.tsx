@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
-import ApplicationsMedia from "../../ApplicationsMedia";
-import LowerApplicationsController from "../lowerApplicationsControls/LowerApplicationsController";
+import ApplicationMedia from "../../ApplicationMedia";
+import LowerApplicationController from "../lowerApplicationControls/LowerApplicationController";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
@@ -26,16 +26,16 @@ const EffectSectionTransition: Transition = {
   },
 };
 
-export default function ApplicationsEffectsSection({
-  applicationsId,
-  lowerApplicationsController,
+export default function ApplicationEffectsSection({
+  applicationId,
+  lowerApplicationController,
   tintColor,
-  applicationsMedia,
+  applicationMedia,
 }: {
-  applicationsId: string;
-  lowerApplicationsController: LowerApplicationsController;
+  applicationId: string;
+  lowerApplicationController: LowerApplicationController;
   tintColor: React.MutableRefObject<string>;
-  applicationsMedia: ApplicationsMedia;
+  applicationMedia: ApplicationMedia;
 }) {
   const { userEffectsStyles, userStreamEffects } = useEffectsContext();
   const { userMedia } = useMediaContext();
@@ -96,38 +96,38 @@ export default function ApplicationsEffectsSection({
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
         streamEffects={
-          userStreamEffects.current.applications[applicationsId].postProcess
+          userStreamEffects.current.applications[applicationId].postProcess
         }
         effectsStyles={
-          userEffectsStyles.current.applications[applicationsId].postProcess
+          userEffectsStyles.current.applications[applicationId].postProcess
         }
         clickFunctionCallback={async () => {
           userMedia.current.applications[
-            applicationsId
+            applicationId
           ].babylonScene?.babylonShaderController.swapPostProcessEffects(
-            userEffectsStyles.current.applications[applicationsId].postProcess
+            userEffectsStyles.current.applications[applicationId].postProcess
               .style
           );
 
-          await lowerApplicationsController.handleApplicationsEffect(
+          await lowerApplicationController.handleApplicationEffect(
             "postProcess",
             false
           );
         }}
         holdFunctionCallback={async (effectType) => {
           userEffectsStyles.current.applications[
-            applicationsId
+            applicationId
           ].postProcess.style = effectType;
 
           userMedia.current.applications[
-            applicationsId
+            applicationId
           ].babylonScene?.babylonShaderController.swapPostProcessEffects(
             effectType
           );
 
-          await lowerApplicationsController.handleApplicationsEffect(
+          await lowerApplicationController.handleApplicationEffect(
             "postProcess",
-            userStreamEffects.current.applications[applicationsId].postProcess
+            userStreamEffects.current.applications[applicationId].postProcess
           );
         }}
       />
@@ -137,10 +137,10 @@ export default function ApplicationsEffectsSection({
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
         streamEffects={
-          userStreamEffects.current.applications[applicationsId].blur
+          userStreamEffects.current.applications[applicationId].blur
         }
         clickFunctionCallback={async () => {
-          await lowerApplicationsController.handleApplicationsEffect(
+          await lowerApplicationController.handleApplicationEffect(
             "blur",
             false
           );
@@ -153,18 +153,18 @@ export default function ApplicationsEffectsSection({
         setEffectsDisabled={setEffectsDisabled}
         scrollingContainerRef={effectsContainerRef}
         streamEffects={
-          userStreamEffects.current.applications[applicationsId].tint
+          userStreamEffects.current.applications[applicationId].tint
         }
         clickFunctionCallback={async () => {
-          await lowerApplicationsController.handleApplicationsEffect(
+          await lowerApplicationController.handleApplicationEffect(
             "tint",
             false
           );
         }}
         acceptColorCallback={async () => {
-          await lowerApplicationsController.handleApplicationsEffect(
+          await lowerApplicationController.handleApplicationEffect(
             "tint",
-            userStreamEffects.current.applications[applicationsId].tint
+            userStreamEffects.current.applications[applicationId].tint
           );
         }}
       />

@@ -2,11 +2,10 @@ import { Upload } from "@aws-sdk/lib-storage";
 import {
   S3Client,
   ListObjectsCommand,
-  GetObjectCommand,
   DeleteObjectCommand,
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
-import internal, { PassThrough } from "stream";
+import internal from "stream";
 import dotenv from "dotenv";
 
 dotenv.config();

@@ -9,11 +9,11 @@ import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/l
 import {
   defaultMediaContainerOptions,
   MediaContainerOptions,
-  MediaKinds,
 } from "./lib/typeConstant";
 import Gradient from "./lib/Gradient";
-import "./lib/mediaContainerStyles.css";
 import UpperControls from "./lib/upperControls/UpperControls";
+import { TableContentTypes } from "../../lib/TableStaticContentSocketController";
+import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
 
@@ -39,7 +39,7 @@ export default function FgMediaContainer({
 }: {
   mediaId: string;
   filename: string;
-  kind: MediaKinds;
+  kind: TableContentTypes;
   bundleRef: React.RefObject<HTMLDivElement>;
   media?: React.ReactNode;
   rootMedia: HTMLImageElement | HTMLVideoElement;
@@ -247,10 +247,13 @@ export default function FgMediaContainer({
       data-positioning={JSON.stringify(positioning.current)}
     >
       <AdjustmentButtons
+        kind={kind}
+        mediaId={mediaId}
         bundleRef={bundleRef}
         panBtnRef={panBtnRef}
         positioning={positioning}
         fgContentAdjustmentController={fgContentAdjustmentController}
+        tableStaticContentSocket={tableStaticContentSocket}
         aspectRatio={aspectRatio}
       />
       {adjustingDimensions && (

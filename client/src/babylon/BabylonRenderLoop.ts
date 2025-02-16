@@ -42,7 +42,13 @@ class BabylonRenderLoop {
 
   constructor(
     private id: string,
-    private type: "camera" | "screen" | "image" | "video",
+    private type:
+      | "camera"
+      | "screen"
+      | "image"
+      | "video"
+      | "text"
+      | "application",
     private scene: Scene,
     private camera: UniversalCamera,
     private faceLandmarks: FaceLandmarks | undefined,
@@ -365,9 +371,12 @@ class BabylonRenderLoop {
     this.hideBackgroundCtx.globalCompositeOperation = "source-atop";
 
     if (
-      (this.type === "camera" || this.type === "image") &&
-      this.userEffectsStyles.current[this.type][this.id].hideBackground
-        .style !== "color"
+      ((this.type === "camera" || this.type === "image") &&
+        this.userEffectsStyles.current[this.type][this.id].hideBackground
+          .style !== "color") ||
+      (this.type === "video" &&
+        this.userEffectsStyles.current[this.type][this.id].video.hideBackground
+          .style !== "color")
     ) {
       this.hideBackgroundCtx.drawImage(
         this.hideBackgroundEffectImage,

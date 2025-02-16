@@ -1,5 +1,3 @@
-export type MediaKinds = "image" | "video";
-
 export interface MediaContainerOptions {
   controlsVanishTime?: number;
   closedCaptionsDecoratorColor?: string;

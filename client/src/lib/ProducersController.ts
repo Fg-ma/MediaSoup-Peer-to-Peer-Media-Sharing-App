@@ -21,7 +21,7 @@ import CameraMedia from "../media/fgVisualMedia/CameraMedia";
 import ScreenMedia from "../media/fgVisualMedia/ScreenMedia";
 import AudioMedia from "./AudioMedia";
 import UserDevice from "./UserDevice";
-import BrowserMedia from "./BrowserMedia";
+import BrowserMedia from "../media/BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import ScreenAudioMedia from "./ScreenAudioMedia";
 import { Permissions } from "../context/permissionsContext/typeConstant";

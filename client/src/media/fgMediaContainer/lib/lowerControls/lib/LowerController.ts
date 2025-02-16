@@ -1,6 +1,7 @@
-import TableStaticContentSocketController from "../../../../../lib/TableStaticContentSocketController";
+import TableStaticContentSocketController, {
+  TableContentTypes,
+} from "../../../../../lib/TableStaticContentSocketController";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
-import { MediaKinds } from "../../typeConstant";
 
 class LowerController {
   constructor(
@@ -9,7 +10,7 @@ class LowerController {
     >,
     private mediaId: string,
     private filename: string,
-    private kind: MediaKinds,
+    private kind: TableContentTypes,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private mediaContainerRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
@@ -92,18 +93,36 @@ class LowerController {
     this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.scaleFuntion);
     document.removeEventListener("pointerdown", this.scaleFunctionEnd);
+
+    this.tableStaticContentSocket.current?.updateContentPositioning(
+      this.kind,
+      this.mediaId,
+      { scale: this.positioning.current.scale }
+    );
   };
 
   rotateFunctionEnd = () => {
     this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.rotateFunction);
     document.removeEventListener("pointerdown", this.rotateFunctionEnd);
+
+    this.tableStaticContentSocket.current?.updateContentPositioning(
+      this.kind,
+      this.mediaId,
+      { rotation: this.positioning.current.rotation }
+    );
   };
 
   moveFunctionEnd = () => {
     this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.moveFunction);
     document.removeEventListener("pointerdown", this.moveFunctionEnd);
+
+    this.tableStaticContentSocket.current?.updateContentPositioning(
+      this.kind,
+      this.mediaId,
+      { position: this.positioning.current.position }
+    );
   };
 
   moveFunction = (event: PointerEvent) => {

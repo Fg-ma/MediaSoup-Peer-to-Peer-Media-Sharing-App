@@ -2,29 +2,29 @@ import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import LowerApplicationsController from "../LowerApplicationsController";
+import LowerApplicationController from "../LowerApplicationController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const effectIcon = nginxAssetSeverBaseUrl + "svgs/effectIcon.svg";
 const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
 
-export default function ApplicationsEffectsButton({
-  lowerApplicationsController,
-  applicationsEffectsActive,
+export default function ApplicationEffectsButton({
+  lowerApplicationController,
+  applicationEffectsActive,
   scrollingContainerRef,
 }: {
-  lowerApplicationsController: LowerApplicationsController;
-  applicationsEffectsActive: boolean;
+  lowerApplicationController: LowerApplicationController;
+  applicationEffectsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        lowerApplicationsController.handleApplicationsEffects();
+        lowerApplicationController.handleApplicationEffects();
       }}
       contentFunction={() => {
-        const iconSrc = applicationsEffectsActive ? effectOffIcon : effectIcon;
+        const iconSrc = applicationEffectsActive ? effectOffIcon : effectIcon;
 
         return (
           <FgSVG
@@ -39,7 +39,7 @@ export default function ApplicationsEffectsButton({
         );
       }}
       hoverContent={
-        !applicationsEffectsActive ? (
+        !applicationEffectsActive ? (
           <FgHoverContentStandard content='Effects (e)' style='dark' />
         ) : undefined
       }

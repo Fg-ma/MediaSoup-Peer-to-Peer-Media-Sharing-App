@@ -1,11 +1,6 @@
 import uWS from "uWebSockets.js";
 import busboy from "busboy";
-import {
-  broadcaster,
-  tableContentController,
-  tableTopCeph,
-  tableTopMongo,
-} from "../index";
+import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
 import Utils from "./lib/Utils";
 import { mimeToExtension, TableTopStaticMimeType } from "../typeConstant";
 
@@ -36,16 +31,13 @@ class Posts {
         const { mimeType } = info;
 
         const extension = mimeToExtension[mimeType] || ".bin";
-        const filename = `${utils.random()}${extension}`;
+        const filename = `${contentId}${extension}`;
 
         tableTopCeph.uploadFile("mybucket", filename, file).then(async () => {
-          const url = `https://localhost:8045/stream/${filename}`;
-
           if (mimeType.startsWith("video/")) {
             await this.handleVideoUploads(
               table_id,
               contentId,
-              url,
               mimeType as TableTopStaticMimeType,
               filename
             );
@@ -53,7 +45,6 @@ class Posts {
             await this.handleImageUploads(
               table_id,
               contentId,
-              url,
               mimeType as TableTopStaticMimeType,
               filename
             );
@@ -61,7 +52,6 @@ class Posts {
             await this.handleAudioUploads(
               table_id,
               contentId,
-              url,
               mimeType as TableTopStaticMimeType,
               filename
             );
@@ -69,7 +59,6 @@ class Posts {
             await this.handleApplicationUploads(
               table_id,
               contentId,
-              url,
               mimeType as TableTopStaticMimeType,
               filename
             );
@@ -77,7 +66,6 @@ class Posts {
             await this.handleTextUploads(
               table_id,
               contentId,
-              url,
               mimeType as TableTopStaticMimeType,
               filename
             );
@@ -120,21 +108,14 @@ class Posts {
   private handleVideoUploads = async (
     table_id: string,
     contentId: string,
-    url: string,
     mimeType: TableTopStaticMimeType,
     filename: string
   ) => {
-    tableContentController.setContent(table_id, "video", contentId, [
-      { property: "url", value: url },
-      {
-        property: "mimeType",
-        value: mimeType,
-      },
-    ]);
-
     await tableTopMongo.tableVideos?.uploads.uploadMetaData({
       table_id,
       videoId: contentId,
+      filename,
+      mimeType,
       positioning: {
         position: {
           left: 50,
@@ -187,18 +168,16 @@ class Posts {
       },
     });
 
-    const originalVideoMessage = {
+    broadcaster.broadcastToTable(table_id, {
       type: "originalVideoReady",
       header: {
         videoId: contentId,
       },
       data: {
         filename,
-        url,
         mimeType,
       },
-    };
-    broadcaster.broadcastToTable(table_id, originalVideoMessage);
+    });
 
     // Process video into DASH format in the background
     // try {
@@ -233,13 +212,14 @@ class Posts {
   private handleImageUploads = async (
     table_id: string,
     contentId: string,
-    url: string,
     mimeType: TableTopStaticMimeType,
     filename: string
   ) => {
     await tableTopMongo.tableImages?.uploads.uploadMetaData({
       table_id,
       imageId: contentId,
+      filename,
+      mimeType,
       positioning: {
         position: {
           left: 50,
@@ -292,31 +272,24 @@ class Posts {
       },
     });
 
-    tableContentController.setContent(table_id, "image", contentId, [
-      { property: "url", value: url },
-      {
-        property: "mimeType",
-        value: mimeType,
-      },
-    ]);
-
     broadcaster.broadcastToTable(table_id, {
       type: "imageReady",
       header: { contentId },
-      data: { filename: filename, url, mimeType },
+      data: { filename: filename, mimeType },
     });
   };
 
   private handleAudioUploads = async (
     table_id: string,
     contentId: string,
-    url: string,
     mimeType: TableTopStaticMimeType,
     filename: string
   ) => {
     await tableTopMongo.tableAudio?.uploads.uploadMetaData({
       table_id,
       audioId: contentId,
+      filename,
+      mimeType,
       positioning: {
         position: {
           left: 50,
@@ -373,31 +346,24 @@ class Posts {
       },
     });
 
-    tableContentController.setContent(table_id, "audio", contentId, [
-      { property: "url", value: url },
-      {
-        property: "mimeType",
-        value: mimeType,
-      },
-    ]);
-
     broadcaster.broadcastToTable(table_id, {
       type: "audioReady",
       header: { contentId },
-      data: { filename: filename, url, mimeType },
+      data: { filename: filename, mimeType },
     });
   };
 
   private handleApplicationUploads = async (
     table_id: string,
     contentId: string,
-    url: string,
     mimeType: TableTopStaticMimeType,
     filename: string
   ) => {
     await tableTopMongo.tableApplications?.uploads.uploadMetaData({
       table_id,
       applicationId: contentId,
+      filename,
+      mimeType,
       positioning: {
         position: {
           left: 50,
@@ -411,70 +377,34 @@ class Posts {
       },
       effects: {
         postProcess: false,
-        hideBackground: false,
         blur: false,
         tint: false,
-        glasses: false,
-        beards: false,
-        mustaches: false,
-        masks: false,
-        hats: false,
-        pets: false,
       },
       effectStyles: {
         postProcess: {
           style: "prismaColors",
         },
-        hideBackground: {
-          style: "beach",
-          color: "#d40213",
-        },
-        glasses: {
-          style: "defaultGlasses",
-        },
-        beards: {
-          style: "classicalCurlyBeard",
-        },
-        mustaches: {
-          style: "mustache1",
-        },
-        masks: {
-          style: "baseMask",
-        },
-        hats: {
-          style: "stylishHat",
-        },
-        pets: {
-          style: "beardedDragon",
-        },
       },
     });
-
-    tableContentController.setContent(table_id, "application", contentId, [
-      { property: "url", value: url },
-      {
-        property: "mimeType",
-        value: mimeType,
-      },
-    ]);
 
     broadcaster.broadcastToTable(table_id, {
       type: "applicationReady",
       header: { contentId },
-      data: { filename: filename, url, mimeType },
+      data: { filename: filename, mimeType },
     });
   };
 
   private handleTextUploads = async (
     table_id: string,
     contentId: string,
-    url: string,
     mimeType: TableTopStaticMimeType,
     filename: string
   ) => {
     await tableTopMongo.tableText?.uploads.uploadMetaData({
       table_id,
       textId: contentId,
+      filename,
+      mimeType,
       positioning: {
         position: {
           left: 50,
@@ -488,57 +418,20 @@ class Posts {
       },
       effects: {
         postProcess: false,
-        hideBackground: false,
         blur: false,
         tint: false,
-        glasses: false,
-        beards: false,
-        mustaches: false,
-        masks: false,
-        hats: false,
-        pets: false,
       },
       effectStyles: {
         postProcess: {
           style: "prismaColors",
         },
-        hideBackground: {
-          style: "beach",
-          color: "#d40213",
-        },
-        glasses: {
-          style: "defaultGlasses",
-        },
-        beards: {
-          style: "classicalCurlyBeard",
-        },
-        mustaches: {
-          style: "mustache1",
-        },
-        masks: {
-          style: "baseMask",
-        },
-        hats: {
-          style: "stylishHat",
-        },
-        pets: {
-          style: "beardedDragon",
-        },
       },
     });
-
-    tableContentController.setContent(table_id, "text", contentId, [
-      { property: "url", value: url },
-      {
-        property: "mimeType",
-        value: mimeType,
-      },
-    ]);
 
     broadcaster.broadcastToTable(table_id, {
       type: "textReady",
       header: { contentId },
-      data: { filename: filename, url, mimeType },
+      data: { filename: filename, mimeType },
     });
   };
 }

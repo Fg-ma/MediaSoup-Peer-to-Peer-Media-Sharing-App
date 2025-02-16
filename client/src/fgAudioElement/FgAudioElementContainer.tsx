@@ -10,6 +10,7 @@ import PanButton from "../elements/fgAdjustmentElements/PanButton";
 import RotateButton from "../elements/fgAdjustmentElements/RotateButton";
 import ScaleButton from "../elements/fgAdjustmentElements/ScaleButton";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
+import { TableColors } from "../lib/TableSocketController";
 import "./lib/audioElement.css";
 
 const FgPortal = React.lazy(() => import("../elements/fgPortal/FgPortal"));
@@ -25,10 +26,10 @@ export type FgAudioElementContainerOptionsType = {
   bellCurveAmplitude: number;
   bellCurveMean: number;
   bellCurveStdDev: number;
-  shadowColor: string;
-  volumeColor: string;
-  primaryMuteColor: string;
-  secondaryMuteColor: string;
+  shadowColor: TableColors;
+  volumeColor: TableColors;
+  primaryMuteColor: TableColors;
+  secondaryMuteColor: TableColors;
   muteStyleOption: "morse" | "smile";
 };
 
@@ -42,8 +43,8 @@ const defaultFgAudioElementContainerOptions: FgAudioElementContainerOptionsType 
     bellCurveMean: 0.5,
     bellCurveStdDev: 0.4,
     shadowColor: "black",
-    volumeColor: "FgPrimary",
-    primaryMuteColor: "FgPrimary",
+    volumeColor: "tableTop",
+    primaryMuteColor: "tableTop",
     secondaryMuteColor: "black",
     muteStyleOption: "smile",
   };
@@ -92,10 +93,10 @@ export default function FgAudioElementContainer({
     bellCurveAmplitude?: number;
     bellCurveMean?: number;
     bellCurveStdDev?: number;
-    shadowColor?: string;
-    volumeColor?: string;
-    primaryMuteColor?: string;
-    secondaryMuteColor?: string;
+    shadowColor?: TableColors;
+    volumeColor?: TableColors;
+    primaryMuteColor?: TableColors;
+    secondaryMuteColor?: TableColors;
     muteStyleOption?: "morse" | "smile";
   };
 }) {

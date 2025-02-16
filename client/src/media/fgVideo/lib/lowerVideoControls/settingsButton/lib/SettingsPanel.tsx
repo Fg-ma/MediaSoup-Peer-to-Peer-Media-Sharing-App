@@ -20,6 +20,8 @@ import {
 } from "../../../typeConstant";
 import DownloadTypePage from "./DownloadTypePage";
 import DownloadTypeOptionsPage from "./DownloadTypeOptionsPage";
+import VideoSpeedPage, { videoSpeedSelections } from "./VideoSpeedPage";
+import LowerVideoController from "../../LowerVideoController";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -88,6 +90,7 @@ const closedCaptionOptionsPageTitles = {
 };
 
 export default function SettingsPanel({
+  lowerVideoController,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -95,6 +98,7 @@ export default function SettingsPanel({
   settings,
   setSettings,
 }: {
+  lowerVideoController: LowerVideoController;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -196,6 +200,16 @@ export default function SettingsPanel({
     });
   };
 
+  const handleVideoSpeedActive = () => {
+    setActivePages((prev) => {
+      const newActivePages = { ...prev };
+
+      newActivePages.videoSpeed.active = !newActivePages.videoSpeed.active;
+
+      return newActivePages;
+    });
+  };
+
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
@@ -233,6 +247,18 @@ export default function SettingsPanel({
                 </div>
               )}
               clickFunction={handleDownloadTypeActive}
+            />
+            <FgButton
+              className='w-full'
+              contentFunction={() => (
+                <div className='flex w-full text-nowrap hover:bg-gray-400 justify-between px-2 rounded items-center'>
+                  <div>Video speed</div>
+                  <div>{`${parseFloat(
+                    settings.videoSpeed.value.toFixed(2)
+                  )}x`}</div>
+                </div>
+              )}
+              clickFunction={handleVideoSpeedActive}
             />
             <FgButton
               className='w-full'
@@ -484,6 +510,25 @@ export default function SettingsPanel({
                   )
                 );
               })}
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.videoSpeed.active &&
+          !isDescendantActive(activePages.videoSpeed) && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <VideoSpeedPage
+                lowerVideoController={lowerVideoController}
+                setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
+              />
             </motion.div>
           )}
       </AnimatePresence>

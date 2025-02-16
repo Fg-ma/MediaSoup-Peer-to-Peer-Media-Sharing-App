@@ -26,7 +26,6 @@ class ImageMedia {
 
   filename: string;
   mimeType: TableTopStaticMimeType;
-  imageURL: string;
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
@@ -52,11 +51,22 @@ class ImageMedia {
   private selfieSegmentationResults: ImageData[] = [];
   private selfieSegmentationProcessing = [false];
 
+  initPositioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
+
   constructor(
     private imageId: string,
     filename: string,
     mimeType: TableTopStaticMimeType,
-    imageURL: string,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private getImage: (key: string) => void,
@@ -68,11 +78,22 @@ class ImageMedia {
     ) => void,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    initPositioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }
   ) {
     this.filename = filename;
     this.mimeType = mimeType;
-    this.imageURL = imageURL;
+    this.initPositioning = initPositioning;
 
     this.userStreamEffects.current.image[this.imageId] = structuredClone(
       defaultImageStreamEffects

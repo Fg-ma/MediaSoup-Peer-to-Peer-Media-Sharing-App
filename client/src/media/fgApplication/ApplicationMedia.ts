@@ -13,13 +13,12 @@ import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 
-class ApplicationsMedia {
+class ApplicationMedia {
   canvas: HTMLCanvasElement;
-  applications: HTMLImageElement;
+  application: HTMLImageElement;
 
   filename: string;
   mimeType: TableTopStaticMimeType;
-  applicationsURL: string;
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
@@ -28,17 +27,28 @@ class ApplicationsMedia {
   babylonScene: BabylonScene | undefined;
 
   private effects: {
-    [applicationsEffect in ApplicationsEffectTypes]?: boolean;
+    [applicationEffect in ApplicationsEffectTypes]?: boolean;
   } = {};
 
+  initPositioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
+
   constructor(
-    private applicationsId: string,
+    private applicationId: string,
     filename: string,
     mimeType: TableTopStaticMimeType,
-    applicationsURL: string,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
-    private getApplications: (key: string) => void,
+    private getApplication: (key: string) => void,
     private addMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
@@ -46,28 +56,39 @@ class ApplicationsMedia {
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
     private userDevice: UserDevice,
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    initPositioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }
   ) {
     this.filename = filename;
     this.mimeType = mimeType;
-    this.applicationsURL = applicationsURL;
+    this.initPositioning = initPositioning;
 
-    this.userStreamEffects.current.applications[this.applicationsId] =
+    this.userStreamEffects.current.applications[this.applicationId] =
       structuredClone(defaultApplicationsStreamEffects);
 
-    if (!this.userEffectsStyles.current.applications[this.applicationsId]) {
-      this.userEffectsStyles.current.applications[this.applicationsId] =
+    if (!this.userEffectsStyles.current.applications[this.applicationId]) {
+      this.userEffectsStyles.current.applications[this.applicationId] =
         structuredClone(defaultApplicationsEffectsStyles);
     }
 
-    this.applications = document.createElement("img");
-    this.applications.onloadedmetadata = () => {
-      this.canvas.width = this.applications.width;
-      this.canvas.height = this.applications.height;
+    this.application = document.createElement("img");
+    this.application.onloadedmetadata = () => {
+      this.canvas.width = this.application.width;
+      this.canvas.height = this.application.height;
     };
 
-    this.getApplications(this.filename);
-    this.addMessageListener(this.getApplicationsListener);
+    this.getApplication(this.filename);
+    this.addMessageListener(this.getApplicationListener);
 
     this.canvas = document.createElement("canvas");
     this.canvas.classList.add("babylonJS-canvas");
@@ -77,10 +98,10 @@ class ApplicationsMedia {
   }
 
   deconstructor() {
-    this.applications.src = "";
+    this.application.src = "";
   }
 
-  private getApplicationsListener = (
+  private getApplicationListener = (
     message: IncomingTableStaticContentMessages
   ) => {
     if (message.type === "chunk") {
@@ -98,13 +119,13 @@ class ApplicationsMedia {
 
       const blob = new Blob([mergedBuffer], { type: this.mimeType });
       this.blobURL = URL.createObjectURL(blob);
-      this.applications.src = this.blobURL;
+      this.application.src = this.blobURL;
 
       this.babylonScene = new BabylonScene(
-        this.applicationsId,
-        "applications",
+        this.applicationId,
+        "application",
         this.canvas,
-        this.applications,
+        this.application,
         undefined,
         this.effects,
         this.userEffectsStyles,
@@ -117,15 +138,15 @@ class ApplicationsMedia {
         undefined,
         undefined,
         this.userDevice,
-        undefined,
+        [0],
         this.userMedia
       );
 
-      this.removeMessageListener(this.getApplicationsListener);
+      this.removeMessageListener(this.getApplicationListener);
     }
   };
 
-  downloadApplications = () => {
+  downloadApplication = () => {
     if (!this.blobURL) {
       return;
     }
@@ -195,4 +216,4 @@ class ApplicationsMedia {
   };
 }
 
-export default ApplicationsMedia;
+export default ApplicationMedia;

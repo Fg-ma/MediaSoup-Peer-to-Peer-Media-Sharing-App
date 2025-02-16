@@ -8,7 +8,11 @@ import {
   petsEffectEncodingMap,
   postProcessEffectEncodingMap,
 } from "../typeConstant";
-import { ImageEffectStylesType, ImageEffectTypes } from "./typeConstant";
+import {
+  imageEffectEncodingMap,
+  ImageEffectStylesType,
+  ImageEffectTypes,
+} from "./typeConstant";
 
 class Encoder {
   constructor() {}
@@ -16,6 +20,8 @@ class Encoder {
   encodeMetaData = (data: {
     table_id: string;
     imageId: string;
+    filename: string;
+    mimeType: string;
     positioning: {
       position: {
         left: number;
@@ -34,6 +40,8 @@ class Encoder {
   }): {
     tid: string;
     iid: string;
+    n: string;
+    m: string;
     p: {
       p: {
         l: number;
@@ -74,15 +82,25 @@ class Encoder {
       };
     };
   } => {
-    const { table_id, imageId, positioning, effects, effectStyles } = data;
+    const {
+      table_id,
+      imageId,
+      filename,
+      mimeType,
+      positioning,
+      effects,
+      effectStyles,
+    } = data;
 
     const e: number[] = Object.keys(effects)
       .filter((effect) => effects[effect as keyof typeof effects])
-      .map((effect) => parseInt(effect));
+      .map((effect) => imageEffectEncodingMap[effect as keyof typeof effects]);
 
     return {
       tid: table_id,
       iid: imageId,
+      n: filename,
+      m: mimeType,
       p: {
         p: {
           l: positioning.position.left,

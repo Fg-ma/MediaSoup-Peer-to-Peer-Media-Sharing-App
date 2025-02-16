@@ -47,6 +47,9 @@ export interface Settings {
       };
     };
   };
+  videoSpeed: {
+    value: number;
+  };
 }
 
 export const defaultVideoOptions: {
@@ -175,6 +178,9 @@ export interface ActivePages {
       };
     };
   };
+  videoSpeed: {
+    active: boolean;
+  };
 }
 
 export const fontSizeMap = {
@@ -224,7 +230,7 @@ export const characterEdgeStyleMap = {
     "-1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black, 1px 1px 0px black",
 };
 
-export const defaultActivePages = {
+export const defaultActivePages: ActivePages = {
   closedCaption: {
     active: false,
     closedCaptionOptionsActive: {
@@ -249,6 +255,9 @@ export const defaultActivePages = {
         active: false,
       },
     },
+  },
+  videoSpeed: {
+    active: false,
   },
 };
 
@@ -278,4 +287,7 @@ export const defaultSettings = Object.freeze({
       }),
     }),
   }),
+  videoSpeed: {
+    value: 1.0,
+  },
 });

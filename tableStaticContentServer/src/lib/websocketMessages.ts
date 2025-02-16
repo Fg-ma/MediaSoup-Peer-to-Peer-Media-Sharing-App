@@ -1,4 +1,10 @@
-import { cleanup, gets, metadataController, tablesController } from "../index";
+import {
+  cleanup,
+  gets,
+  metadataController,
+  tablesController,
+  tableTopMongo,
+} from "../index";
 import { MessageTypes, TableStaticContentWebSocket } from "../typeConstant";
 
 const handleMessage = (
@@ -15,17 +21,17 @@ const handleMessage = (
     case "requestCatchUpTableData":
       metadataController.onRequestCatchUpTableData(event);
       break;
-    case "requestCatchUpContentData":
-      metadataController.onRequestCatchUpContentData(event);
-      break;
     case "deleteContent":
       cleanup.onDeleteContent(event);
       break;
-    case "catchUpContentDataResponse":
-      metadataController.onCatchUpContentDataResponse(event);
-      break;
     case "getFile":
       gets.getFile(event);
+      break;
+    case "updateContentPositioning":
+      tableTopMongo.updateContentPositioning(event);
+      break;
+    case "updateContentEffects":
+      tableTopMongo.updateContentEffects(event);
       break;
     default:
       break;

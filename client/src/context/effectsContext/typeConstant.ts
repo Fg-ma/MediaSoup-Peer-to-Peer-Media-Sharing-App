@@ -141,15 +141,6 @@ export type RemoteStreamEffectsType = {
 };
 
 export type CameraEffectStylesType = {
-  pause: {
-    style: "";
-  };
-  blur: {
-    style: "";
-  };
-  tint: {
-    style: "";
-  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -333,17 +324,12 @@ export interface ScreenEffectStylesType {
 export type AudioEffectStylesType = object;
 
 export type VideoEffectStylesType = {
-  pause: {
-    style: "";
-  };
-  blur: {
-    style: "";
-  };
-  tint: {
-    style: "";
-  };
   postProcess: {
     style: PostProcessEffectTypes;
+  };
+  hideBackground: {
+    style: HideBackgroundEffectTypes;
+    color: string;
   };
   glasses: {
     style: GlassesEffectTypes;
@@ -366,12 +352,6 @@ export type VideoEffectStylesType = {
 };
 
 export type ImageEffectStylesType = {
-  blur: {
-    style: "";
-  };
-  tint: {
-    style: "";
-  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -400,24 +380,12 @@ export type ImageEffectStylesType = {
 };
 
 export type ApplicationsEffectStylesType = {
-  blur: {
-    style: "";
-  };
-  tint: {
-    style: "";
-  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
 };
 
 export type TextEffectStylesType = {
-  blur: {
-    style: "";
-  };
-  tint: {
-    style: "";
-  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -622,15 +590,6 @@ export const defaultBackgroundMusic: BackgroundMusicTypes = "mischief";
 
 export const defaultCameraEffectsStyles: CameraEffectStylesType = Object.freeze(
   {
-    pause: Object.freeze({
-      style: "",
-    }),
-    blur: Object.freeze({
-      style: "",
-    }),
-    tint: Object.freeze({
-      style: "",
-    }),
     postProcess: Object.freeze({
       style: defaultPostProcess,
     }),
@@ -672,15 +631,6 @@ export const defaultAudioEffectsStyles: AudioEffectStylesType = Object.freeze(
 );
 
 export const defaultVideoEffectsStyles: VideoEffectStylesType = Object.freeze({
-  pause: Object.freeze({
-    style: "",
-  }),
-  blur: Object.freeze({
-    style: "",
-  }),
-  tint: Object.freeze({
-    style: "",
-  }),
   postProcess: Object.freeze({
     style: defaultPostProcess,
   }),
@@ -709,12 +659,6 @@ export const defaultVideoEffectsStyles: VideoEffectStylesType = Object.freeze({
 });
 
 export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
-  blur: Object.freeze({
-    style: "",
-  }),
-  tint: Object.freeze({
-    style: "",
-  }),
   postProcess: Object.freeze({
     style: defaultPostProcess,
   }),
@@ -744,24 +688,12 @@ export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
 
 export const defaultApplicationsEffectsStyles: ApplicationsEffectStylesType =
   Object.freeze({
-    blur: Object.freeze({
-      style: "",
-    }),
-    tint: Object.freeze({
-      style: "",
-    }),
     postProcess: Object.freeze({
       style: defaultPostProcess,
     }),
   });
 
 export const defaultTextEffectsStyles: TextEffectStylesType = Object.freeze({
-  blur: Object.freeze({
-    style: "",
-  }),
-  tint: Object.freeze({
-    style: "",
-  }),
   postProcess: Object.freeze({
     style: defaultPostProcess,
   }),

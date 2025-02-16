@@ -32,7 +32,6 @@ class VideoMedia {
 
   filename: string;
   mimeType: TableTopStaticMimeType;
-  originalVideoURL: string;
   dashUrl: string | undefined;
 
   private fileChunks: Uint8Array[] = [];
@@ -61,11 +60,22 @@ class VideoMedia {
 
   babylonScene: BabylonScene | undefined;
 
+  initPositioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
+
   constructor(
     private videoId: string,
     filename: string,
     mimeType: TableTopStaticMimeType,
-    originalVideoURL: string,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -78,12 +88,21 @@ class VideoMedia {
     private removeMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
-    dashUrl?: string | undefined
+    initPositioning: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }
   ) {
     this.filename = filename;
     this.mimeType = mimeType;
-    this.originalVideoURL = originalVideoURL;
-    this.dashUrl = dashUrl;
+    this.initPositioning = initPositioning;
 
     this.userStreamEffects.current.video[this.videoId] = {
       video: structuredClone(defaultVideoStreamEffects),

@@ -59,6 +59,18 @@ class Utils {
       });
     });
   };
+
+  sanitizeFilename = (filename: string) => {
+    const baseName = path.basename(filename);
+
+    let sanitized = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+    if (sanitized.length > 255) {
+      sanitized = sanitized.substring(0, 255);
+    }
+
+    return sanitized;
+  };
 }
 
 export default Utils;

@@ -1,19 +1,19 @@
-export interface ApplicationsOptions {
+export interface ApplicationOptions {
   controlsVanishTime?: number;
   closedCaptionsDecoratorColor?: string;
-  primaryApplicationsColor?: string;
+  primaryApplicationColor?: string;
   initialVolume?: "high" | "low" | "off";
 }
 
-export const defaultApplicationsOptions: {
+export const defaultApplicationOptions: {
   controlsVanishTime: number;
   closedCaptionsDecoratorColor: string;
-  primaryApplicationsColor: string;
+  primaryApplicationColor: string;
   initialVolume: "high" | "low" | "off";
 } = {
   controlsVanishTime: 1250,
   closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
-  primaryApplicationsColor: "#f56114",
+  primaryApplicationColor: "#f56114",
   initialVolume: "high",
 };
 

@@ -6,7 +6,7 @@ import Uploads from "./Uploads";
 import Deletes from "./Deletes";
 
 class TableText {
-  private tableTextsCollection: Collection;
+  private tableTextCollection: Collection;
 
   private encoder: Encoder;
   private decoder: Decoder;
@@ -15,13 +15,13 @@ class TableText {
   deletes: Deletes;
 
   constructor(private db: Db) {
-    this.tableTextsCollection = this.db.collection("tableTexts");
+    this.tableTextCollection = this.db.collection("tableTexts");
 
     this.encoder = new Encoder();
     this.decoder = new Decoder();
-    this.gets = new Gets(this.tableTextsCollection, this.decoder);
-    this.uploads = new Uploads(this.tableTextsCollection, this.encoder);
-    this.deletes = new Deletes(this.tableTextsCollection);
+    this.gets = new Gets(this.tableTextCollection, this.decoder);
+    this.uploads = new Uploads(this.tableTextCollection, this.encoder);
+    this.deletes = new Deletes(this.tableTextCollection);
   }
 }
 

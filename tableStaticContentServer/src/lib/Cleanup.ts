@@ -1,4 +1,4 @@
-import { tableContentController, tableTopCeph, tableTopMongo } from "../index";
+import { tableTopCeph, tableTopMongo } from "../index";
 import Broadcaster from "./Broadcaster";
 import { onDeleteContentType } from "../typeConstant";
 
@@ -12,8 +12,6 @@ class Cleanup {
     await tableTopCeph.deleteFile("mybucket", filename);
 
     await tableTopMongo.deleteDocument(table_id, contentType, contentId);
-
-    tableContentController.deleteContent(table_id, contentType, contentId);
 
     this.broadcaster.broadcastToTable(table_id, {
       type: "contentDeleted",

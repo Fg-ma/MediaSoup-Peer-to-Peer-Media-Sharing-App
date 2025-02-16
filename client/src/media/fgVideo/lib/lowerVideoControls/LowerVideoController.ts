@@ -1,6 +1,8 @@
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
+  UserEffectsStylesType,
   UserStreamEffectsType,
+  VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
 import {
@@ -13,6 +15,7 @@ import {
   Settings,
 } from "../typeConstant";
 import VideoMedia from "../../VideoMedia";
+import TableStaticContentSocketController from "../../../../lib/TableStaticContentSocketController";
 
 class LowerVideoController {
   constructor(
@@ -34,6 +37,7 @@ class LowerVideoController {
     >,
     private tintColor: React.MutableRefObject<string>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private initTimeOffset: React.MutableRefObject<number>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -42,7 +46,10 @@ class LowerVideoController {
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private timelineContainerRef: React.RefObject<HTMLDivElement>,
     private isScrubbing: React.MutableRefObject<boolean>,
-    private wasPaused: React.MutableRefObject<boolean>
+    private wasPaused: React.MutableRefObject<boolean>,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >
   ) {}
 
   formatDuration = (time: number) => {
@@ -289,6 +296,13 @@ class LowerVideoController {
       this.tintColor.current,
       blockStateChange
     );
+
+    this.tableStaticContentSocket.current?.updateContentEffects(
+      "video",
+      this.videoId,
+      this.userStreamEffects.current.video[this.videoId].video,
+      this.userEffectsStyles.current.video[this.videoId].video
+    );
   };
 
   setInitTimeOffset = (offset: number) => {
@@ -416,6 +430,10 @@ class LowerVideoController {
       "--preview-position",
       `${percent}`
     );
+  };
+
+  handlePlaybackSpeed = (playbackRate: number) => {
+    this.videoMedia.video.playbackRate = playbackRate;
   };
 }
 

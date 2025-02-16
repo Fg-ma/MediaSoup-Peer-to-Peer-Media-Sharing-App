@@ -21,6 +21,19 @@ export type ImageEffectTypes =
   | "hats"
   | "pets";
 
+export const imageEffectEncodingMap = {
+  postProcess: 0,
+  hideBackground: 1,
+  blur: 2,
+  tint: 3,
+  glasses: 4,
+  beards: 5,
+  mustaches: 6,
+  masks: 7,
+  hats: 8,
+  pets: 9,
+};
+
 export type ImageEffectStylesType = {
   postProcess: {
     style: PostProcessEffectTypes;

@@ -41,7 +41,7 @@ export type AudioEffectTypes =
   | "thunder"
   | "echosOfThePast";
 
-export const audioEffectStylesEncodingMap = {
+export const audioEffectEncodingMap = {
   robot: 0,
   echo: 1,
   alien: 2,
