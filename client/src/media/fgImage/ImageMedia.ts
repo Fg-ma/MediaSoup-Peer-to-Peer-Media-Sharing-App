@@ -290,10 +290,30 @@ class ImageMedia {
 
   private getImageListener = (message: IncomingTableStaticContentMessages) => {
     if (message.type === "chunk") {
+      const { contentType, contentId, key } = message.header;
+
+      if (
+        contentType !== "image" ||
+        contentId !== this.imageId ||
+        key !== this.filename
+      ) {
+        return;
+      }
+
       const chunkData = new Uint8Array(message.data.chunk.data);
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
+      const { contentType, contentId, key } = message.header;
+
+      if (
+        contentType !== "image" ||
+        contentId !== this.imageId ||
+        key !== this.filename
+      ) {
+        return;
+      }
+
       const mergedBuffer = new Uint8Array(this.totalSize);
       let offset = 0;
 

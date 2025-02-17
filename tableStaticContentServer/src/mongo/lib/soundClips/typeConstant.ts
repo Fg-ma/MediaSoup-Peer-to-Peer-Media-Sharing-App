@@ -1,4 +1,4 @@
-export type AudioEffectTypes =
+export type SoundClipEffectTypes =
   | "robot"
   | "echo"
   | "alien"
@@ -41,7 +41,7 @@ export type AudioEffectTypes =
   | "thunder"
   | "echosOfThePast";
 
-export const audioEffectEncodingMap = {
+export const soundClipEffectEncodingMap = {
   robot: 0,
   echo: 1,
   alien: 2,

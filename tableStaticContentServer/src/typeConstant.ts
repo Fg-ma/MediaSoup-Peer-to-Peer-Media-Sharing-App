@@ -15,7 +15,7 @@ export interface Tables {
 export type TableContentTypes =
   | "video"
   | "image"
-  | "audio"
+  | "soundClip"
   | "application"
   | "text";
 

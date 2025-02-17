@@ -135,7 +135,7 @@ export type TableContentTypes =
   | "image"
   | "text"
   | "application"
-  | "audio";
+  | "soundClip";
 
 export type IncomingTableStaticContentMessages =
   | { type: undefined }

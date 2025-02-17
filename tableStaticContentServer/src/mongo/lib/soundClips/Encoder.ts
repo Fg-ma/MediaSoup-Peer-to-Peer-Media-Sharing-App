@@ -1,11 +1,14 @@
-import { audioEffectEncodingMap, AudioEffectTypes } from "./typeConstant";
+import {
+  soundClipEffectEncodingMap,
+  SoundClipEffectTypes,
+} from "./typeConstant";
 
 class Encoder {
   constructor() {}
 
   encodeMetaData = (data: {
     table_id: string;
-    audioId: string;
+    soundClipId: string;
     filename: string;
     mimeType: string;
     positioning: {
@@ -20,11 +23,11 @@ class Encoder {
       rotation: number;
     };
     effects: {
-      [effectType in AudioEffectTypes]: boolean;
+      [effectType in SoundClipEffectTypes]: boolean;
     };
   }): {
     tid: string;
-    aid: string;
+    sid: string;
     n: string;
     m: string;
     p: {
@@ -40,16 +43,18 @@ class Encoder {
     };
     e: number[];
   } => {
-    const { table_id, audioId, filename, mimeType, positioning, effects } =
+    const { table_id, soundClipId, filename, mimeType, positioning, effects } =
       data;
 
     const e: number[] = Object.keys(effects)
       .filter((effect) => effects[effect as keyof typeof effects])
-      .map((effect) => audioEffectEncodingMap[effect as keyof typeof effects]);
+      .map(
+        (effect) => soundClipEffectEncodingMap[effect as keyof typeof effects]
+      );
 
     return {
       tid: table_id,
-      aid: audioId,
+      sid: soundClipId,
       n: filename,
       m: mimeType,
       p: {

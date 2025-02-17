@@ -23,6 +23,7 @@ import {
   TableContentTypes,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import VideoAudioMedia from "./VideoAudioMedia";
 
 class VideoMedia {
   canvas: HTMLCanvasElement;
@@ -73,6 +74,9 @@ class VideoMedia {
     rotation: number;
   };
 
+  private audioStream?: MediaStream;
+  private videoAudioMedia?: VideoAudioMedia;
+
   constructor(
     private videoId: string,
     filename: string,
@@ -114,6 +118,10 @@ class VideoMedia {
         video: structuredClone(defaultVideoStreamEffects),
         audio: structuredClone(defaultAudioStreamEffects),
       };
+    }
+    if (!this.userStreamEffects.current.video[this.videoId].audio) {
+      this.userStreamEffects.current.video[this.videoId].audio =
+        structuredClone(defaultAudioStreamEffects);
     }
 
     this.canvas = document.createElement("canvas");
@@ -247,6 +255,17 @@ class VideoMedia {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
     };
+    this.video.onloadeddata = () => {
+      this.audioStream = (this.video as any).captureStream();
+
+      if (this.audioStream) {
+        this.videoAudioMedia = new VideoAudioMedia(
+          this.videoId,
+          this.audioStream,
+          this.userStreamEffects
+        );
+      }
+    };
 
     this.getVideo("video", this.videoId, this.filename);
     this.addMessageListener(this.getVideoListener);
@@ -295,10 +314,30 @@ class VideoMedia {
 
   private getVideoListener = (message: IncomingTableStaticContentMessages) => {
     if (message.type === "chunk") {
+      const { contentType, contentId, key } = message.header;
+
+      if (
+        contentType !== "video" ||
+        contentId !== this.videoId ||
+        key !== this.filename
+      ) {
+        return;
+      }
+
       const chunkData = new Uint8Array(message.data.chunk.data);
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
+      const { contentType, contentId, key } = message.header;
+
+      if (
+        contentType !== "video" ||
+        contentId !== this.videoId ||
+        key !== this.filename
+      ) {
+        return;
+      }
+
       const mergedBuffer = new Uint8Array(this.totalSize);
       let offset = 0;
 

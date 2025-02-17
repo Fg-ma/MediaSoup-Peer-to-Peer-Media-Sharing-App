@@ -43,6 +43,7 @@ export function EffectsContextProvider({
     image: {},
     application: {},
     text: {},
+    soundClip: {},
   });
   const remoteStreamEffects = useRef<RemoteStreamEffectsType>({});
   const userEffectsStyles = useRef<UserEffectsStylesType>({
@@ -54,6 +55,7 @@ export function EffectsContextProvider({
     image: {},
     application: {},
     text: {},
+    soundClip: {},
   });
   const remoteEffectsStyles = useRef<RemoteEffectStylesType>({});
 

@@ -5,8 +5,8 @@ import Gets from "./Gets";
 import Uploads from "./Uploads";
 import Deletes from "./Deletes";
 
-class TableAudio {
-  private tableAudioCollection: Collection;
+class TableSoundClips {
+  private tableSoundClipsCollection: Collection;
 
   private encoder: Encoder;
   private decoder: Decoder;
@@ -15,14 +15,14 @@ class TableAudio {
   deletes: Deletes;
 
   constructor(private db: Db) {
-    this.tableAudioCollection = this.db.collection("tableAudio");
+    this.tableSoundClipsCollection = this.db.collection("tableSoundClips");
 
     this.encoder = new Encoder();
     this.decoder = new Decoder();
-    this.gets = new Gets(this.tableAudioCollection, this.decoder);
-    this.uploads = new Uploads(this.tableAudioCollection, this.encoder);
-    this.deletes = new Deletes(this.tableAudioCollection);
+    this.gets = new Gets(this.tableSoundClipsCollection, this.decoder);
+    this.uploads = new Uploads(this.tableSoundClipsCollection, this.encoder);
+    this.deletes = new Deletes(this.tableSoundClipsCollection);
   }
 }
 
-export default TableAudio;
+export default TableSoundClips;

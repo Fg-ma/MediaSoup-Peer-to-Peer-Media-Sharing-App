@@ -119,6 +119,9 @@ export type UserStreamEffectsType = {
       [effectType in TextEffectTypes]: boolean;
     };
   };
+  soundClip: {
+    [soundClipId: string]: { [effectType in AudioEffectTypes]: boolean };
+  };
 };
 
 export type RemoteStreamEffectsType = {
@@ -467,6 +470,9 @@ export type UserEffectsStylesType = {
   };
   text: {
     [textId: string]: TextEffectStylesType;
+  };
+  soundClip: {
+    [soundClipId: string]: AudioEffectStylesType;
   };
 };
 

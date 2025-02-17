@@ -1,7 +1,7 @@
 import { MongoClient, Db } from "mongodb";
 import TableImages from "./lib/images/TableImages";
 import TableVideos from "./lib/videos/TableVideos";
-import TableAudio from "./lib/audio/TableAudio";
+import TableSoundClips from "./lib/soundClips/TableSoundClips";
 import TableApplications from "./lib/applications/TableApplications";
 import TableText from "./lib/text/TableText";
 import {
@@ -21,7 +21,7 @@ class TableTopMongo {
 
   tableImages: TableImages | undefined;
   tableVideos: TableVideos | undefined;
-  tableAudio: TableAudio | undefined;
+  tableSoundClips: TableSoundClips | undefined;
   tableApplications: TableApplications | undefined;
   tableText: TableText | undefined;
 
@@ -42,7 +42,7 @@ class TableTopMongo {
 
     this.tableImages = new TableImages(this.db);
     this.tableVideos = new TableVideos(this.db);
-    this.tableAudio = new TableAudio(this.db);
+    this.tableSoundClips = new TableSoundClips(this.db);
     this.tableApplications = new TableApplications(this.db);
     this.tableText = new TableText(this.db);
   };
@@ -62,8 +62,8 @@ class TableTopMongo {
         table_id,
         contentId
       );
-    } else if (contentType === "audio") {
-      await this.tableAudio?.deletes.deleteMetaDataBy_TID_AID(
+    } else if (contentType === "soundClip") {
+      await this.tableSoundClips?.deletes.deleteMetaDataBy_TID_AID(
         table_id,
         contentId
       );
@@ -99,9 +99,9 @@ class TableTopMongo {
           }
         );
         break;
-      case "audio":
-        this.tableAudio?.uploads.editMetaData(
-          { table_id, audioId: contentId },
+      case "soundClip":
+        this.tableSoundClips?.uploads.editMetaData(
+          { table_id, soundClipId: contentId },
           {
             positioning,
           }
@@ -152,9 +152,9 @@ class TableTopMongo {
           }
         );
         break;
-      case "audio":
-        this.tableAudio?.uploads.editMetaData(
-          { table_id, audioId: contentId },
+      case "soundClip":
+        this.tableSoundClips?.uploads.editMetaData(
+          { table_id, soundClipId: contentId },
           {
             effects,
           }

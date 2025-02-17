@@ -1,16 +1,19 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
-import { audioEffectEncodingMap, AudioEffectTypes } from "./typeConstant";
+import {
+  soundClipEffectEncodingMap,
+  SoundClipEffectTypes,
+} from "./typeConstant";
 
 class Uploads {
   constructor(
-    private tableAudioCollection: Collection,
+    private tableSoundClipsCollection: Collection,
     private encoder: Encoder
   ) {}
 
   uploadMetaData = async (data: {
     table_id: string;
-    audioId: string;
+    soundClipId: string;
     filename: string;
     mimeType: string;
     positioning: {
@@ -25,30 +28,30 @@ class Uploads {
       rotation: number;
     };
     effects: {
-      [effectType in AudioEffectTypes]: boolean;
+      [effectType in SoundClipEffectTypes]: boolean;
     };
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
     try {
-      await this.tableAudioCollection?.insertOne(mongoData);
+      await this.tableSoundClipsCollection?.insertOne(mongoData);
     } catch (err) {
       console.error("Error uploading data:", err);
     }
   };
 
   editMetaData = async (
-    filter: { table_id: string; audioId: string },
+    filter: { table_id: string; soundClipId: string },
     updateData: Partial<{
       positioning?: {
         position?: { left?: number; top?: number };
         scale?: { x?: number; y?: number };
         rotation?: number;
       };
-      effects?: { [effectType in AudioEffectTypes]?: boolean };
+      effects?: { [effectType in SoundClipEffectTypes]?: boolean };
     }>
   ) => {
-    if (!this.tableAudioCollection) {
+    if (!this.tableSoundClipsCollection) {
       console.error("Database not connected");
       return;
     }
@@ -85,13 +88,15 @@ class Uploads {
         )
         .map(
           (effect) =>
-            audioEffectEncodingMap[effect as keyof typeof updateData.effects]
+            soundClipEffectEncodingMap[
+              effect as keyof typeof updateData.effects
+            ]
         );
     }
 
     try {
-      const result = await this.tableAudioCollection.updateOne(
-        { tid: filter.table_id, iid: filter.audioId },
+      const result = await this.tableSoundClipsCollection.updateOne(
+        { tid: filter.table_id, iid: filter.soundClipId },
         { $set: updateFields }
       );
       return result;

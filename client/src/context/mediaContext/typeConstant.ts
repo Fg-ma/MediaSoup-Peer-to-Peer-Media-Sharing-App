@@ -10,6 +10,7 @@ import VideoMedia from "../../media/fgVideo/VideoMedia";
 import ImageMedia from "../../media/fgImage/ImageMedia";
 import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 import TextMedia from "../../media/fgText/TextMedia";
+import SoundClipMedia from "../../media/soundClip/SoundClipMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -33,6 +34,9 @@ export type UserMediaType = {
   };
   text: {
     [textId: string]: TextMedia;
+  };
+  soundClip: {
+    [soundClipId: string]: SoundClipMedia;
   };
   gamesSignaling: GamesSignalingMedia | undefined;
   games: {

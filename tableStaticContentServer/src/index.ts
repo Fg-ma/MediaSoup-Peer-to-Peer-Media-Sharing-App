@@ -7,7 +7,7 @@ import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
 import Cleanup from "./lib/Cleanup";
 import TableTopCeph from "./ceph/TableTopCeph";
-import Gets from "./gets/gets";
+import Gets from "./gets/Gets";
 import TableTopMongo from "./mongo/TableTopMongo";
 import Posts from "./posts/posts";
 

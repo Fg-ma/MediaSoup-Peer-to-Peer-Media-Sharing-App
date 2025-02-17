@@ -3,41 +3,44 @@ import Decoder from "./Decoder";
 
 class Gets {
   constructor(
-    private tableAudioCollection: Collection,
+    private tableSoundClipsCollection: Collection,
     private decoder: Decoder
   ) {}
 
-  getAudioMetaDataBy_TID_AID = async (table_id: string, audioId: string) => {
+  getSoundClipMetaDataBy_TID_AID = async (
+    table_id: string,
+    soundClipId: string
+  ) => {
     try {
-      const audioData = await this.tableAudioCollection.findOne({
+      const soundClipData = await this.tableSoundClipsCollection.findOne({
         tid: table_id,
-        aid: audioId,
+        aid: soundClipId,
       });
 
-      if (!audioData) {
+      if (!soundClipData) {
         return null;
       }
 
       // @ts-expect-error: mongo doesn't have typing
-      return this.decoder.decodeMetaData(audioData);
+      return this.decoder.decodeMetaData(soundClipData);
     } catch (err) {
-      console.error("Error retrieving audio data:", err);
+      console.error("Error retrieving sound clip data:", err);
       return null;
     }
   };
 
   getAllBy_TID = async (table_id: string) => {
     try {
-      const audioData = await this.tableAudioCollection
+      const soundClipsData = await this.tableSoundClipsCollection
         .find({ tid: table_id })
         .toArray();
 
-      if (!audioData || audioData.length === 0) {
+      if (!soundClipsData || soundClipsData.length === 0) {
         return [];
       }
 
       // Decode metadata for all documents
-      return audioData.map((data) =>
+      return soundClipsData.map((data) =>
         // @ts-expect-error: mongo doesn't have typing
         this.decoder.decodeMetaData(data)
       );

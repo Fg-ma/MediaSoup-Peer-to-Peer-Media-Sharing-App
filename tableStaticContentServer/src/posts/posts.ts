@@ -291,9 +291,9 @@ class Posts {
     mimeType: TableTopStaticMimeType,
     filename: string
   ) => {
-    await tableTopMongo.tableAudio?.uploads.uploadMetaData({
+    await tableTopMongo.tableSoundClips?.uploads.uploadMetaData({
       table_id,
-      audioId: contentId,
+      soundClipId: contentId,
       filename,
       mimeType,
       positioning: {
