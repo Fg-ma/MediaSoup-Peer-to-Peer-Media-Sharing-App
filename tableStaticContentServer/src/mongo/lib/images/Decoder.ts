@@ -84,12 +84,11 @@ class Decoder {
   } => {
     const { tid, iid, n, m, p, e, es } = data;
 
-    const effects: { [effectType in ImageEffectTypes]: boolean } = Object.keys(
-      imageEffectEncodingMap
-    ).reduce((acc, key) => {
-      acc[key as ImageEffectTypes] = e.includes(parseInt(key));
+    const effects = Object.keys(imageEffectEncodingMap).reduce((acc, key) => {
+      const value = imageEffectEncodingMap[key as ImageEffectTypes];
+      acc[key as ImageEffectTypes] = e.includes(value);
       return acc;
-    }, {} as { [effectType in ImageEffectTypes]: boolean });
+    }, {} as Record<ImageEffectTypes, boolean>);
 
     return {
       table_id: tid,

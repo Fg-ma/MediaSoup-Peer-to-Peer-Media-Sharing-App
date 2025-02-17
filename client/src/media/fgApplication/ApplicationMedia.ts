@@ -1,14 +1,15 @@
 import {
   UserEffectsStylesType,
   UserStreamEffectsType,
-  defaultApplicationsStreamEffects,
-  defaultApplicationsEffectsStyles,
-  ApplicationsEffectTypes,
+  defaultApplicationStreamEffects,
+  defaultApplicationEffectsStyles,
+  ApplicationEffectTypes,
 } from "../../context/effectsContext/typeConstant";
 import {
   IncomingTableStaticContentMessages,
+  TableContentTypes,
   TableTopStaticMimeType,
-} from "../../lib/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
@@ -27,7 +28,7 @@ class ApplicationMedia {
   babylonScene: BabylonScene | undefined;
 
   private effects: {
-    [applicationEffect in ApplicationsEffectTypes]?: boolean;
+    [applicationEffect in ApplicationEffectTypes]?: boolean;
   } = {};
 
   initPositioning: {
@@ -48,7 +49,11 @@ class ApplicationMedia {
     mimeType: TableTopStaticMimeType,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
-    private getApplication: (key: string) => void,
+    private getApplication: (
+      contentType: TableContentTypes,
+      contentId: string,
+      key: string
+    ) => void,
     private addMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
@@ -73,12 +78,14 @@ class ApplicationMedia {
     this.mimeType = mimeType;
     this.initPositioning = initPositioning;
 
-    this.userStreamEffects.current.applications[this.applicationId] =
-      structuredClone(defaultApplicationsStreamEffects);
+    if (!this.userStreamEffects.current.application[this.applicationId]) {
+      this.userStreamEffects.current.application[this.applicationId] =
+        structuredClone(defaultApplicationStreamEffects);
+    }
 
-    if (!this.userEffectsStyles.current.applications[this.applicationId]) {
-      this.userEffectsStyles.current.applications[this.applicationId] =
-        structuredClone(defaultApplicationsEffectsStyles);
+    if (!this.userEffectsStyles.current.application[this.applicationId]) {
+      this.userEffectsStyles.current.application[this.applicationId] =
+        structuredClone(defaultApplicationEffectsStyles);
     }
 
     this.application = document.createElement("img");
@@ -87,7 +94,7 @@ class ApplicationMedia {
       this.canvas.height = this.application.height;
     };
 
-    this.getApplication(this.filename);
+    this.getApplication("application", this.applicationId, this.filename);
     this.addMessageListener(this.getApplicationListener);
 
     this.canvas = document.createElement("canvas");
@@ -161,7 +168,7 @@ class ApplicationMedia {
   };
 
   changeEffects = (
-    effect: ApplicationsEffectTypes,
+    effect: ApplicationEffectTypes,
     tintColor?: string,
     blockStateChange: boolean = false
   ) => {

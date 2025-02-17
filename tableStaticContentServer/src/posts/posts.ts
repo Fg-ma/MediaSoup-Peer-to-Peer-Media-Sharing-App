@@ -118,8 +118,8 @@ class Posts {
       mimeType,
       positioning: {
         position: {
-          left: 50,
-          top: 50,
+          left: 32.5,
+          top: 32.5,
         },
         scale: {
           x: 25,
@@ -222,8 +222,8 @@ class Posts {
       mimeType,
       positioning: {
         position: {
-          left: 50,
-          top: 50,
+          left: 32.5,
+          top: 32.5,
         },
         scale: {
           x: 25,
@@ -292,8 +292,8 @@ class Posts {
       mimeType,
       positioning: {
         position: {
-          left: 50,
-          top: 50,
+          left: 32.5,
+          top: 32.5,
         },
         scale: {
           x: 25,
@@ -366,8 +366,8 @@ class Posts {
       mimeType,
       positioning: {
         position: {
-          left: 50,
-          top: 50,
+          left: 32.5,
+          top: 32.5,
         },
         scale: {
           x: 25,
@@ -407,8 +407,8 @@ class Posts {
       mimeType,
       positioning: {
         position: {
-          left: 50,
-          top: 50,
+          left: 32.5,
+          top: 32.5,
         },
         scale: {
           x: 25,

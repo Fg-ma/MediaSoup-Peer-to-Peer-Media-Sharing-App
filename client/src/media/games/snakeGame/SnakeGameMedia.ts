@@ -1,5 +1,5 @@
-import { SnakeColorsType } from "../games/snakeGame/lib/typeConstant";
-import GameMediaUniversalFunctions from "./GameMediaUniversalFunctions";
+import { SnakeColorsType } from "../../../games/snakeGame/lib/typeConstant";
+import GameMediaUniversalFunctions from "../GameMediaUniversalFunctions";
 
 type OutGoingMessages =
   | {

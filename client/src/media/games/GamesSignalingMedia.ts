@@ -1,6 +1,9 @@
-import BundlesController from "../lib/BundlesController";
-import { GameTypes, UserMediaType } from "../context/mediaContext/typeConstant";
-import SnakeGameMedia from "./SnakeGameMedia";
+import BundlesController from "../../lib/BundlesController";
+import {
+  GameTypes,
+  UserMediaType,
+} from "../../context/mediaContext/typeConstant";
+import SnakeGameMedia from "./snakeGame/SnakeGameMedia";
 
 type OutGoingMessages = onJoinTableType | onLeaveTableType | onInitiateGameType;
 

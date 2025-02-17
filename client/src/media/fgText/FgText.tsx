@@ -49,11 +49,7 @@ export default function FgText({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>({
-    position: { left: 32.5, top: 32.5 },
-    scale: { x: 35, y: 35 },
-    rotation: 0,
-  });
+  }>(textMedia.initPositioning);
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);

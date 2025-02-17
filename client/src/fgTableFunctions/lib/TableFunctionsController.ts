@@ -1,5 +1,5 @@
 import { FgBackground } from "../../elements/fgBackgroundSelector/lib/typeConstant";
-import { IncomingTableMessages } from "../../lib/TableSocketController";
+import { IncomingTableMessages } from "../../serverControllers/tableServer/TableSocketController";
 
 class TableFunctionsController {
   constructor(

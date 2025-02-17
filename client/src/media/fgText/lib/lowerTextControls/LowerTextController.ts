@@ -7,7 +7,7 @@ import {
 } from "../../../../context/effectsContext/typeConstant";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
 import TextMedia from "../../TextMedia";
-import TableStaticContentSocketController from "../../../../lib/TableStaticContentSocketController";
+import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 class LowerTextController {
   constructor(

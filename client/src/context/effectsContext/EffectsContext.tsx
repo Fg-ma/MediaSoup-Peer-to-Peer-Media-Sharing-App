@@ -41,7 +41,7 @@ export function EffectsContextProvider({
     audio: structuredClone(defaultAudioStreamEffects),
     video: {},
     image: {},
-    applications: {},
+    application: {},
     text: {},
   });
   const remoteStreamEffects = useRef<RemoteStreamEffectsType>({});
@@ -52,7 +52,7 @@ export function EffectsContextProvider({
     audio: structuredClone(defaultAudioEffectsStyles),
     video: {},
     image: {},
-    applications: {},
+    application: {},
     text: {},
   });
   const remoteEffectsStyles = useRef<RemoteEffectStylesType>({});

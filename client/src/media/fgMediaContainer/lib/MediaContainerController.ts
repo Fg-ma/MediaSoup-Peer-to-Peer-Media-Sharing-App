@@ -1,12 +1,15 @@
-import { MediaContainerOptions, MediaKinds } from "./typeConstant";
-import { IncomingMediasoupMessages } from "../../../lib/MediasoupSocketController";
+import { MediaContainerOptions } from "./typeConstant";
+import { IncomingMediasoupMessages } from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
+import TableStaticContentSocketController, {
+  TableContentTypes,
+} from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 class MediaContainerController {
   constructor(
     private table_id: React.MutableRefObject<string>,
     private mediaId: string,
-    private kind: MediaKinds,
+    private kind: TableContentTypes,
     private rootMedia: HTMLVideoElement | HTMLImageElement,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
@@ -33,7 +36,10 @@ class MediaContainerController {
     private setInMedia: React.Dispatch<React.SetStateAction<boolean>>,
     private leaveTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private movementTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >
   ) {}
 
   init = () => {
@@ -103,6 +109,12 @@ class MediaContainerController {
       this.positioning.current.scale.y =
         this.positioning.current.scale.x / computedAspectRatio;
       this.setAspectRatio(computedAspectRatio);
+
+      this.tableStaticContentSocket.current?.updateContentPositioning(
+        this.kind,
+        this.mediaId,
+        { position: this.positioning.current.position }
+      );
     }
   };
 

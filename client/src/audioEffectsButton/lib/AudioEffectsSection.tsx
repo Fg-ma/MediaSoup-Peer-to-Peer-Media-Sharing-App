@@ -9,7 +9,7 @@ import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHove
 import AudioEffectButton from "./AudioEffectButton";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
 import { audioEffectTemplates } from "./typeConstant";
-import { IncomingMediasoupMessages } from "../../lib/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import LazyScrollingContainer from "../../elements/lazyScrollingContainer/LazyScrollingContainer";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;

@@ -1,11 +1,11 @@
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import { DataProducer } from "mediasoup-client/lib/DataProducer";
-import AudioMedia from "../../lib/AudioMedia";
+import AudioMedia from "../../media/audio/AudioMedia";
 import CameraMedia from "../../media/fgVisualMedia/CameraMedia";
-import SnakeGameMedia from "../../lib/SnakeGameMedia";
-import ScreenAudioMedia from "../../lib/ScreenAudioMedia";
+import SnakeGameMedia from "../../media/games/snakeGame/SnakeGameMedia";
+import ScreenAudioMedia from "../../media/screenAudio/ScreenAudioMedia";
 import ScreenMedia from "../../media/fgVisualMedia/ScreenMedia";
-import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
+import GamesSignalingMedia from "../../media/games/GamesSignalingMedia";
 import VideoMedia from "../../media/fgVideo/VideoMedia";
 import ImageMedia from "../../media/fgImage/ImageMedia";
 import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
@@ -28,8 +28,8 @@ export type UserMediaType = {
   image: {
     [imageId: string]: ImageMedia;
   };
-  applications: {
-    [applicationsId: string]: ApplicationMedia;
+  application: {
+    [applicationId: string]: ApplicationMedia;
   };
   text: {
     [textId: string]: TextMedia;

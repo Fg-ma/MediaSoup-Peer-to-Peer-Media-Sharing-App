@@ -6,7 +6,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
-import { IncomingMediasoupMessages } from "../../../../lib/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
 import {
   defaultFgVisualMediaOptions,

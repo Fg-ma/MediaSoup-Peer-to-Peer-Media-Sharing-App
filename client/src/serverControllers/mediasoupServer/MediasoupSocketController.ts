@@ -11,8 +11,8 @@ import { SctpStreamParameters } from "mediasoup-client/lib/SctpParameters";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../audioEffects/typeConstant";
-import { DataStreamTypes } from "../context/mediaContext/typeConstant";
+} from "../../audioEffects/typeConstant";
+import { DataStreamTypes } from "../../context/mediaContext/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
@@ -21,13 +21,13 @@ import {
   ScreenEffectTypes,
   UserEffectsStylesType,
   UserStreamEffectsType,
-} from "../context/effectsContext/typeConstant";
-import { Permissions } from "../context/permissionsContext/typeConstant";
-import ProducersController from "./ProducersController";
-import ConsumersController from "./ConsumersController";
-import PermissionsController from "./PermissionsController";
-import Metadata from "./Metadata";
-import CleanupController from "./CleanupController";
+} from "../../context/effectsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
+import ProducersController from "../../lib/ProducersController";
+import ConsumersController from "../../lib/ConsumersController";
+import PermissionsController from "../../lib/PermissionsController";
+import Metadata from "../../lib/Metadata";
+import CleanupController from "../../lib/CleanupController";
 
 type OutGoingMediasoupMessages =
   | onJoinTableType

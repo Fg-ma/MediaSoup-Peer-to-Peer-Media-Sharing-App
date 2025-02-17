@@ -1,4 +1,4 @@
-import { GameTypes } from "../context/mediaContext/typeConstant";
+import { GameTypes } from "../../context/mediaContext/typeConstant";
 
 type OutGoingUniversalMessages =
   | {

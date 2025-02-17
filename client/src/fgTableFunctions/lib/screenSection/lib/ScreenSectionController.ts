@@ -1,7 +1,7 @@
 import { types } from "mediasoup-client";
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import ProducersController from "../../../../lib/ProducersController";
-import MediasoupSocketController from "../../../../lib/MediasoupSocketController";
+import MediasoupSocketController from "../../../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class ScreenSectionController {
   constructor(

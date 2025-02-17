@@ -115,9 +115,9 @@ export default function SharedBundle({
             />
           </Suspense>
         ))}
-      {userMedia.current.applications &&
-        Object.keys(userMedia.current.applications).length !== 0 &&
-        Object.keys(userMedia.current.applications).map((applicationId) => (
+      {userMedia.current.application &&
+        Object.keys(userMedia.current.application).length !== 0 &&
+        Object.keys(userMedia.current.application).map((applicationId) => (
           <Suspense key={applicationId} fallback={<div>Loading...</div>}>
             <FgApplication
               applicationId={applicationId}

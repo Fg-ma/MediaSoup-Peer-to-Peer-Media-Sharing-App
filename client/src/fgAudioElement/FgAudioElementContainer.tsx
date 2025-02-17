@@ -10,7 +10,7 @@ import PanButton from "../elements/fgAdjustmentElements/PanButton";
 import RotateButton from "../elements/fgAdjustmentElements/RotateButton";
 import ScaleButton from "../elements/fgAdjustmentElements/ScaleButton";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
-import { TableColors } from "../lib/TableSocketController";
+import { TableColors } from "../serverControllers/tableServer/TableSocketController";
 import "./lib/audioElement.css";
 
 const FgPortal = React.lazy(() => import("../elements/fgPortal/FgPortal"));

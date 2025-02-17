@@ -1,6 +1,6 @@
 import TableStaticContentSocketController, {
   TableContentTypes,
-} from "../../../../../lib/TableStaticContentSocketController";
+} from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 
 class LowerController {

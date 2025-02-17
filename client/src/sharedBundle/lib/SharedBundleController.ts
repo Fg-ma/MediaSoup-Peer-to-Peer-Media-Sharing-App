@@ -1,7 +1,7 @@
 import VideoMedia from "../../media/fgVideo/VideoMedia";
 import TableStaticContentSocketController, {
   IncomingTableStaticContentMessages,
-} from "../../lib/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import SharedBundleSocket from "./SharedBundleSocket";
 import ImageMedia from "../../media/fgImage/ImageMedia";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
@@ -51,6 +51,9 @@ class SharedBundleController extends SharedBundleSocket {
     message: IncomingTableStaticContentMessages
   ) => {
     switch (message.type) {
+      case "responsedCatchUpTableData":
+        this.setRerender((prev) => !prev);
+        break;
       case "originalVideoReady":
         {
           const { videoId } = message.header;

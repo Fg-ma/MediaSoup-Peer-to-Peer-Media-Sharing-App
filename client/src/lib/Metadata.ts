@@ -5,7 +5,7 @@ import {
 import MediasoupSocketController, {
   onBundleMetadataRequestedType,
   onRequestedCatchUpDataType,
-} from "./MediasoupSocketController";
+} from "../serverControllers/mediasoupServer/MediasoupSocketController";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
 
 class Metadata {

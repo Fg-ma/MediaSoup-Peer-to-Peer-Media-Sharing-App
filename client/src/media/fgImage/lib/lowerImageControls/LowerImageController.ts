@@ -4,7 +4,7 @@ import {
   ImageEffectTypes,
   UserEffectsStylesType,
 } from "../../../../context/effectsContext/typeConstant";
-import TableStaticContentSocketController from "../../../../lib/TableStaticContentSocketController";
+import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import ImageMedia from "../../ImageMedia";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
 

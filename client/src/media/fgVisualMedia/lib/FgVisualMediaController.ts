@@ -13,7 +13,7 @@ import {
   onClientEffectChangedType,
   onEffectChangeRequestedType,
   onResponsedCatchUpDataType,
-} from "../../../lib/MediasoupSocketController";
+} from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import {
   RemoteDataStreamsType,
   UserMediaType,

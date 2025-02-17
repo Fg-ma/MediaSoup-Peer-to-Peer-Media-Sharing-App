@@ -8,8 +8,9 @@ import {
 } from "../../context/effectsContext/typeConstant";
 import {
   IncomingTableStaticContentMessages,
+  TableContentTypes,
   TableTopStaticMimeType,
-} from "../../lib/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import BabylonScene, {
   EffectType,
   validEffectTypes,
@@ -69,7 +70,11 @@ class ImageMedia {
     mimeType: TableTopStaticMimeType,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
-    private getImage: (key: string) => void,
+    private getImage: (
+      contentType: TableContentTypes,
+      contentId: string,
+      key: string
+    ) => void,
     private addMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
@@ -95,9 +100,11 @@ class ImageMedia {
     this.mimeType = mimeType;
     this.initPositioning = initPositioning;
 
-    this.userStreamEffects.current.image[this.imageId] = structuredClone(
-      defaultImageStreamEffects
-    );
+    if (!this.userStreamEffects.current.image[this.imageId]) {
+      this.userStreamEffects.current.image[this.imageId] = structuredClone(
+        defaultImageStreamEffects
+      );
+    }
 
     if (!this.userEffectsStyles.current.image[this.imageId]) {
       this.userEffectsStyles.current.image[this.imageId] = structuredClone(
@@ -111,7 +118,7 @@ class ImageMedia {
       this.canvas.height = this.image.height;
     };
 
-    this.getImage(this.filename);
+    this.getImage("image", this.imageId, this.filename);
     this.addMessageListener(this.getImageListener);
 
     this.canvas = document.createElement("canvas");
@@ -321,6 +328,27 @@ class ImageMedia {
       );
 
       this.removeMessageListener(this.getImageListener);
+
+      for (const effect in this.userStreamEffects.current.image[this.imageId]) {
+        if (
+          this.userStreamEffects.current.image[this.imageId][
+            effect as ImageEffectTypes
+          ]
+        ) {
+          if (effect === "hideBackground") {
+            this.babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+              this.userEffectsStyles.current.image[this.imageId].hideBackground
+                .style
+            );
+          } else if (effect === "postProcess") {
+            this.babylonScene.babylonShaderController.swapPostProcessEffects(
+              this.userEffectsStyles.current.image[this.imageId].postProcess
+                .style
+            );
+          }
+          this.changeEffects(effect as ImageEffectTypes);
+        }
+      }
     }
   };
 

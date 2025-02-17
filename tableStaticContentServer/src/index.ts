@@ -6,7 +6,7 @@ import handleMessage from "./lib/websocketMessages";
 import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
 import Cleanup from "./lib/Cleanup";
-import TableTopCeph from "./lib/TableTopCeph";
+import TableTopCeph from "./ceph/TableTopCeph";
 import Gets from "./gets/gets";
 import TableTopMongo from "./mongo/TableTopMongo";
 import Posts from "./posts/posts";
@@ -21,7 +21,7 @@ export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup(broadcaster);
 
-// tableTopCeph.emptyBucket("mybucket");
+// tableTopCeph.emptyBucket("mybucket");s
 // tableTopCeph.listBucketContents("mybucket");
 
 const sslOptions = {

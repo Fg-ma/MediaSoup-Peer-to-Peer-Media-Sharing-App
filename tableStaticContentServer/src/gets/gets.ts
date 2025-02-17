@@ -8,7 +8,8 @@ class Gets {
   constructor(private broadcaster: Broadcaster) {}
 
   getFile = async (event: onGetFileType) => {
-    const { table_id, username, instance } = event.header;
+    const { table_id, username, instance, contentType, contentId } =
+      event.header;
     const key = event.data.key;
 
     if (!key) return;
@@ -23,12 +24,14 @@ class Gets {
         data.Body.on("data", (chunk) => {
           this.broadcaster.broadcastToInstance(table_id, username, instance, {
             type: "chunk",
+            header: { contentType, contentId, key },
             data: { chunk },
           });
         })
           .on("end", () => {
             this.broadcaster.broadcastToInstance(table_id, username, instance, {
               type: "downloadComplete",
+              header: { contentType, contentId, key },
             });
           })
           .on("error", (err) => {

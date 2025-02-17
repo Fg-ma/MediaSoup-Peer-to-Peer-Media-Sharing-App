@@ -11,7 +11,7 @@ import KickFromTableButton from "./tableUserFunctions/KickFromTableButton";
 import SilenceButton from "./tableUserFunctions/SilenceButton";
 import HideContentFromButton from "./tableUserFunctions/HideContentFromButton";
 import FgSVG from "../../elements/fgSVG/FgSVG";
-import { TableColors } from "../../lib/TableSocketController";
+import { TableColors } from "../../serverControllers/tableServer/TableSocketController";
 import SwapSeatsbutton from "./tableUserFunctions/SwapSeatsButton";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;

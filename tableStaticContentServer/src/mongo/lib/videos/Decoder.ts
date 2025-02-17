@@ -84,12 +84,11 @@ class Decoder {
   } => {
     const { tid, vid, n, m, p, e, es } = data;
 
-    const effects: { [effectType in VideoEffectTypes]: boolean } = Object.keys(
-      videoEffectEncodingMap
-    ).reduce((acc, key) => {
-      acc[key as VideoEffectTypes] = e.includes(parseInt(key));
+    const effects = Object.keys(videoEffectEncodingMap).reduce((acc, key) => {
+      const value = videoEffectEncodingMap[key as VideoEffectTypes];
+      acc[key as VideoEffectTypes] = e.includes(value);
       return acc;
-    }, {} as { [effectType in VideoEffectTypes]: boolean });
+    }, {} as Record<VideoEffectTypes, boolean>);
 
     return {
       table_id: tid,

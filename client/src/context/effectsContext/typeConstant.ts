@@ -81,7 +81,7 @@ export type ImageEffectTypes =
   | "hats"
   | "pets";
 
-export type ApplicationsEffectTypes = "postProcess" | "blur" | "tint";
+export type ApplicationEffectTypes = "postProcess" | "blur" | "tint";
 
 export type TextEffectTypes = "postProcess" | "blur" | "tint";
 
@@ -109,9 +109,9 @@ export type UserStreamEffectsType = {
       [effectType in ImageEffectTypes]: boolean;
     };
   };
-  applications: {
+  application: {
     [applicationId: string]: {
-      [effectType in ApplicationsEffectTypes]: boolean;
+      [effectType in ApplicationEffectTypes]: boolean;
     };
   };
   text: {
@@ -379,7 +379,7 @@ export type ImageEffectStylesType = {
   };
 };
 
-export type ApplicationsEffectStylesType = {
+export type ApplicationEffectStylesType = {
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -444,8 +444,8 @@ export type UserEffectsStylesType = {
   image: {
     [imageId: string]: ImageEffectStylesType;
   };
-  applications: {
-    [applicationsId: string]: ApplicationsEffectStylesType;
+  application: {
+    [applicationId: string]: ApplicationEffectStylesType;
   };
   text: {
     [textId: string]: TextEffectStylesType;
@@ -560,8 +560,8 @@ export const defaultImageStreamEffects: {
   pets: false,
 });
 
-export const defaultApplicationsStreamEffects: {
-  [effect in ApplicationsEffectTypes]: boolean;
+export const defaultApplicationStreamEffects: {
+  [effect in ApplicationEffectTypes]: boolean;
 } = Object.freeze({
   postProcess: false,
   blur: false,
@@ -686,7 +686,7 @@ export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
   }),
 });
 
-export const defaultApplicationsEffectsStyles: ApplicationsEffectStylesType =
+export const defaultApplicationEffectsStyles: ApplicationEffectStylesType =
   Object.freeze({
     postProcess: Object.freeze({
       style: defaultPostProcess,

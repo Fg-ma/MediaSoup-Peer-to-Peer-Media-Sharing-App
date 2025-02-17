@@ -19,7 +19,7 @@ import MediasoupSocketController, {
   onNewProducerWasCreatedType,
   onPermissionsResponsedType,
   onProducerDisconnectedType,
-} from "../../lib/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class BundleSocket {
   constructor(

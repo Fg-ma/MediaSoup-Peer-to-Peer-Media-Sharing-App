@@ -12,7 +12,7 @@ import MediasoupSocketController, {
   onClientMixEffectValueChangedType,
   onMixEffectActivityChangeRequestedType,
   onMixEffectValueChangeRequestedType,
-} from "../../lib/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class AudioMixEffectsPortalController {
   constructor(

@@ -12,7 +12,7 @@ import MediasoupSocketController, {
   onNewConsumerSubscribedType,
   onNewJSONConsumerSubscribedType,
   onSubscribedType,
-} from "./MediasoupSocketController";
+} from "../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class ConsumersController {
   constructor(

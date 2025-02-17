@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import shaka from "shaka-player";
 import { useSocketContext } from "./context/socketContext/SocketContext";
-import { IncomingTableStaticContentMessages } from "./lib/TableStaticContentSocketController";
+import { IncomingTableStaticContentMessages } from "./serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 export default function FileReceiver() {
   const { tableStaticContentSocket } = useSocketContext();

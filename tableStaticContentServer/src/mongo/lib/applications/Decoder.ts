@@ -53,11 +53,15 @@ class Decoder {
   } => {
     const { tid, aid, n, m, p, e, es } = data;
 
-    const effects: { [effectType in ApplicationEffectTypes]: boolean } =
-      Object.keys(applicationEffectEncodingMap).reduce((acc, key) => {
-        acc[key as ApplicationEffectTypes] = e.includes(parseInt(key));
+    const effects = Object.keys(applicationEffectEncodingMap).reduce(
+      (acc, key) => {
+        const value =
+          applicationEffectEncodingMap[key as ApplicationEffectTypes];
+        acc[key as ApplicationEffectTypes] = e.includes(value);
         return acc;
-      }, {} as { [effectType in ApplicationEffectTypes]: boolean });
+      },
+      {} as Record<ApplicationEffectTypes, boolean>
+    );
 
     return {
       table_id: tid,

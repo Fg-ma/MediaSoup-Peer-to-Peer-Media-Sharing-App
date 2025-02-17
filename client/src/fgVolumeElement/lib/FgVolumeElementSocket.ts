@@ -1,7 +1,7 @@
 import {
   onClientMuteChangeType,
   onClientMuteStateResponsedType,
-} from "../../lib/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class FgVolumeElementSocket {
   constructor(

@@ -142,6 +142,8 @@ export type onGetFileType = {
     table_id: string;
     username: string;
     instance: string;
+    contentType: TableContentTypes;
+    contentId: string;
   };
   data: {
     key: string;

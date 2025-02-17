@@ -7,8 +7,9 @@ import {
 } from "../../context/effectsContext/typeConstant";
 import {
   IncomingTableStaticContentMessages,
+  TableContentTypes,
   TableTopStaticMimeType,
-} from "../../lib/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
@@ -48,7 +49,11 @@ class TextMedia {
     mimeType: TableTopStaticMimeType,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
-    private getText: (key: string) => void,
+    private getText: (
+      contentType: TableContentTypes,
+      contentId: string,
+      key: string
+    ) => void,
     private addMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
@@ -73,9 +78,11 @@ class TextMedia {
     this.mimeType = mimeType;
     this.initPositioning = initPositioning;
 
-    this.userStreamEffects.current.text[this.textId] = structuredClone(
-      defaultTextStreamEffects
-    );
+    if (!this.userStreamEffects.current.text[this.textId]) {
+      this.userStreamEffects.current.text[this.textId] = structuredClone(
+        defaultTextStreamEffects
+      );
+    }
 
     if (!this.userEffectsStyles.current.text[this.textId]) {
       this.userEffectsStyles.current.text[this.textId] = structuredClone(
@@ -89,7 +96,7 @@ class TextMedia {
       this.canvas.height = this.text.height;
     };
 
-    this.getText(this.filename);
+    this.getText("text", this.textId, this.filename);
     this.addMessageListener(this.getTextListener);
 
     this.canvas = document.createElement("canvas");

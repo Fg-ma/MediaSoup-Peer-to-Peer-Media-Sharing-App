@@ -1,4 +1,4 @@
-import MediasoupSocketController from "../../../../lib/MediasoupSocketController";
+import MediasoupSocketController from "../../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import ProducersController from "../../../../lib/ProducersController";
 
 class AudioSectionController {

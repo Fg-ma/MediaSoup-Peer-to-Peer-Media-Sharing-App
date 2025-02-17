@@ -6,7 +6,7 @@ import {
   onUserJoinedTableType,
   onUserLeftTableType,
   TableColors,
-} from "../../lib/TableSocketController";
+} from "../../serverControllers/tableServer/TableSocketController";
 
 class FgTableController {
   constructor(

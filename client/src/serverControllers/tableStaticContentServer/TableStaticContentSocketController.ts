@@ -1,6 +1,6 @@
 import {
-  ApplicationsEffectStylesType,
-  ApplicationsEffectTypes,
+  ApplicationEffectStylesType,
+  ApplicationEffectTypes,
   AudioEffectTypes,
   ImageEffectStylesType,
   ImageEffectTypes,
@@ -10,14 +10,14 @@ import {
   UserStreamEffectsType,
   VideoEffectStylesType,
   VideoEffectTypes,
-} from "../context/effectsContext/typeConstant";
-import { UserMediaType } from "../context/mediaContext/typeConstant";
-import Deadbanding from "../babylon/Deadbanding";
-import UserDevice from "./UserDevice";
-import VideoMedia from "../media/fgVideo/VideoMedia";
-import ImageMedia from "../media/fgImage/ImageMedia";
-import TextMedia from "../media/fgText/TextMedia";
-import ApplicationMedia from "../media/fgApplication/ApplicationMedia";
+} from "../../context/effectsContext/typeConstant";
+import { UserMediaType } from "../../context/mediaContext/typeConstant";
+import Deadbanding from "../../babylon/Deadbanding";
+import UserDevice from "../../lib/UserDevice";
+import VideoMedia from "../../media/fgVideo/VideoMedia";
+import ImageMedia from "../../media/fgImage/ImageMedia";
+import TextMedia from "../../media/fgText/TextMedia";
+import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"
@@ -83,6 +83,8 @@ type onGetFileType = {
     table_id: string;
     username: string;
     instance: string;
+    contentType: TableContentTypes;
+    contentId: string;
   };
   data: { key: string };
 };
@@ -124,11 +126,16 @@ type onUpdateContentEffectsType = {
       | VideoEffectStylesType
       | ImageEffectStylesType
       | TextEffectStylesType
-      | ApplicationsEffectStylesType;
+      | ApplicationEffectStylesType;
   };
 };
 
-export type TableContentTypes = "video" | "image" | "text" | "applications";
+export type TableContentTypes =
+  | "video"
+  | "image"
+  | "text"
+  | "application"
+  | "audio";
 
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
@@ -174,6 +181,11 @@ export type onImageReadyType = {
 
 export type onChunkType = {
   type: "chunk";
+  header: {
+    contentType: TableContentTypes;
+    contentId: string;
+    key: string;
+  };
   data: {
     chunk: { data: number[] };
   };
@@ -181,6 +193,11 @@ export type onChunkType = {
 
 export type onDownloadCompleteType = {
   type: "downloadComplete";
+  header: {
+    contentType: TableContentTypes;
+    contentId: string;
+    key: string;
+  };
 };
 
 export type onResponsedCatchUpTableDataType = {
@@ -286,8 +303,8 @@ export type onResponsedCatchUpTableDataType = {
             };
             rotation: number;
           };
-          effects: { [effectType in ApplicationsEffectTypes]: boolean };
-          effectStyles: ApplicationsEffectStylesType;
+          effects: { [effectType in ApplicationEffectTypes]: boolean };
+          effectStyles: ApplicationEffectStylesType;
         }[]
       | undefined;
   };
@@ -405,13 +422,19 @@ class TableStaticContentSocketController {
     });
   };
 
-  getFile = (key: string) => {
+  getFile = (
+    contentType: TableContentTypes,
+    contentId: string,
+    key: string
+  ) => {
     this.sendMessage({
       type: "getFile",
       header: {
         table_id: this.table_id,
         username: this.username,
         instance: this.instance,
+        contentType,
+        contentId,
       },
       data: { key },
     });
@@ -473,7 +496,7 @@ class TableStaticContentSocketController {
       | VideoEffectStylesType
       | ImageEffectStylesType
       | TextEffectStylesType
-      | ApplicationsEffectStylesType
+      | ApplicationEffectStylesType
   ) => {
     this.sendMessage({
       type: "updateContentEffects",
@@ -582,14 +605,14 @@ class TableStaticContentSocketController {
     }
     if (applications) {
       for (const application of applications) {
-        this.userStreamEffects.current.applications[application.applicationId] =
+        this.userStreamEffects.current.application[application.applicationId] =
           application.effects as {
             [effectType in VideoEffectTypes]: boolean;
           };
-        this.userEffectsStyles.current.applications[application.applicationId] =
+        this.userEffectsStyles.current.application[application.applicationId] =
           application.effectStyles as VideoEffectStylesType;
 
-        this.userMedia.current.applications[application.applicationId] =
+        this.userMedia.current.application[application.applicationId] =
           new ApplicationMedia(
             application.applicationId,
             application.filename,

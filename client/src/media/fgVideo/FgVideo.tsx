@@ -95,11 +95,7 @@ export default function FgVideo({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>({
-    position: { left: 32.5, top: 32.5 },
-    scale: { x: 35, y: 35 },
-    rotation: 0,
-  });
+  }>(videoMedia.initPositioning);
 
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const isScrubbing = useRef(false);

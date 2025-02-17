@@ -3,13 +3,12 @@ import {
   AudioEffectTypes,
   defaultAudioStreamEffects,
   UserStreamEffectsType,
-} from "../context/effectsContext/typeConstant";
-import AudioEffects from "../audioEffects/AudioEffects";
-import { FgSamplers } from "../audioEffects/fgSamplers";
+} from "../../context/effectsContext/typeConstant";
+import AudioEffects from "../../audioEffects/AudioEffects";
 import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
-} from "../audioEffects/typeConstant";
+} from "../../audioEffects/typeConstant";
 
 class ScreenAudioMedia {
   private audioSource: MediaStreamAudioSourceNode;

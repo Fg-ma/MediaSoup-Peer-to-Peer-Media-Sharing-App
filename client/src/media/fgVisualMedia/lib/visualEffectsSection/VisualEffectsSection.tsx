@@ -15,7 +15,7 @@ import {
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
-import { IncomingMediasoupMessages } from "../../../../lib/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import HideBackgroundButton from "../../../../elements/effectsButtons/HideBackgroundButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
 import BlurButtton from "../../../../elements/effectsButtons/BlurButton";

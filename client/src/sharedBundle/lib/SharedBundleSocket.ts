@@ -12,7 +12,7 @@ import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import MediasoupSocketController, {
   onBundleMetadataResponsedType,
-} from "../../lib/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class SharedBundleSocket {
   constructor() {}

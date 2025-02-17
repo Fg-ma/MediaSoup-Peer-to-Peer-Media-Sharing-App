@@ -6,7 +6,7 @@ import {
 } from "../../../../../context/effectsContext/typeConstant";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { FgVisualMediaOptions, Settings } from "../../typeConstant";
-import MediasoupSocketController from "../../../../../lib/MediasoupSocketController";
+import MediasoupSocketController from "../../../../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 const fontSizeMap = {
   xsmall: "0.75rem",

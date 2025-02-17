@@ -11,7 +11,7 @@ import BabylonScene, {
   EffectType,
   validEffectTypes,
 } from "../../babylon/BabylonScene";
-import MediasoupSocketController from "../../lib/MediasoupSocketController";
+import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class ScreenMedia {
   canvas: HTMLCanvasElement;

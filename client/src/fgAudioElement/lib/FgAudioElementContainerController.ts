@@ -3,7 +3,7 @@ import { Permissions } from "../../context/permissionsContext/typeConstant";
 import {
   IncomingMediasoupMessages,
   onResponsedCatchUpDataType,
-} from "../../lib/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class FgAudioElementContainerController {
   constructor(

@@ -12,7 +12,7 @@ import LeftTableSection from "./lib/LeftTableSection";
 import RightTableSection from "./lib/RightTableSection";
 import TopTableSection from "./lib/TopTableSection";
 import BottomTableSection from "./lib/BottomTableSection";
-import { TableColors } from "../lib/TableSocketController";
+import { TableColors } from "../serverControllers/tableServer/TableSocketController";
 import "./lib/fgTable.css";
 
 export default function FgTable({

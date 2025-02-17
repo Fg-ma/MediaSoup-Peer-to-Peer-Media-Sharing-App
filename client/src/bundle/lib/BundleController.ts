@@ -11,7 +11,7 @@ import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import MediasoupSocketController, {
   IncomingMediasoupMessages,
-} from "../../lib/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class BundleController extends BundleSocket {
   constructor(

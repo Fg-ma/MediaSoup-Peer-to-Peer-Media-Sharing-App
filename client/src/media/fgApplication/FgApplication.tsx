@@ -41,7 +41,7 @@ export default function FgApplication({
   const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const applicationMedia = userMedia.current.applications[applicationId];
+  const applicationMedia = userMedia.current.application[applicationId];
 
   const [applicationEffectsActive, setApplicationEffectsActive] =
     useState(false);
@@ -50,11 +50,7 @@ export default function FgApplication({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>({
-    position: { left: 32.5, top: 32.5 },
-    scale: { x: 35, y: 35 },
-    rotation: 0,
-  });
+  }>(applicationMedia.initPositioning);
 
   const applicationContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -163,7 +159,7 @@ export default function FgApplication({
     <FgMediaContainer
       mediaId={applicationId}
       filename={applicationMedia.filename}
-      kind='applications'
+      kind='application'
       rootMedia={applicationMedia.application}
       bundleRef={bundleRef}
       className='application-container'

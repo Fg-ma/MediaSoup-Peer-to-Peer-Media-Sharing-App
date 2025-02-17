@@ -15,7 +15,7 @@ import {
   Settings,
 } from "../typeConstant";
 import VideoMedia from "../../VideoMedia";
-import TableStaticContentSocketController from "../../../../lib/TableStaticContentSocketController";
+import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 class LowerVideoController {
   constructor(

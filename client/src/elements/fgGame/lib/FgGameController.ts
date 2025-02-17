@@ -4,7 +4,7 @@ import MediasoupSocketController, {
   IncomingMediasoupMessages,
   onRequestedGameCatchUpDataType,
   onResponsedGameCatchUpDataType,
-} from "../../../lib/MediasoupSocketController";
+} from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class FgGameController {
   constructor(

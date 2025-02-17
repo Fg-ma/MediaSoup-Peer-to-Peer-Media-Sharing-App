@@ -42,12 +42,11 @@ class Decoder {
   } => {
     const { tid, aid, n, m, p, e } = data;
 
-    const effects: { [effectType in AudioEffectTypes]: boolean } = Object.keys(
-      audioEffectEncodingMap
-    ).reduce((acc, key) => {
-      acc[key as AudioEffectTypes] = e.includes(parseInt(key));
+    const effects = Object.keys(audioEffectEncodingMap).reduce((acc, key) => {
+      const value = audioEffectEncodingMap[key as AudioEffectTypes];
+      acc[key as AudioEffectTypes] = e.includes(value);
       return acc;
-    }, {} as { [effectType in AudioEffectTypes]: boolean });
+    }, {} as Record<AudioEffectTypes, boolean>);
 
     return {
       table_id: tid,

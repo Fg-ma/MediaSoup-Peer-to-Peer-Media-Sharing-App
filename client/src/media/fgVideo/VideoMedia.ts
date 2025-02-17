@@ -20,8 +20,9 @@ import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
 import {
   IncomingTableStaticContentMessages,
+  TableContentTypes,
   TableTopStaticMimeType,
-} from "../../lib/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 class VideoMedia {
   canvas: HTMLCanvasElement;
@@ -81,7 +82,11 @@ class VideoMedia {
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private getVideo: (key: string) => void,
+    private getVideo: (
+      contentType: TableContentTypes,
+      contentId: string,
+      key: string
+    ) => void,
     private addMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
@@ -104,10 +109,12 @@ class VideoMedia {
     this.mimeType = mimeType;
     this.initPositioning = initPositioning;
 
-    this.userStreamEffects.current.video[this.videoId] = {
-      video: structuredClone(defaultVideoStreamEffects),
-      audio: structuredClone(defaultAudioStreamEffects),
-    };
+    if (!this.userStreamEffects.current.video[this.videoId]) {
+      this.userStreamEffects.current.video[this.videoId] = {
+        video: structuredClone(defaultVideoStreamEffects),
+        audio: structuredClone(defaultAudioStreamEffects),
+      };
+    }
 
     this.canvas = document.createElement("canvas");
     this.canvas.classList.add("babylonJS-canvas");
@@ -241,7 +248,7 @@ class VideoMedia {
       this.canvas.height = this.video.videoHeight;
     };
 
-    this.getVideo(this.filename);
+    this.getVideo("video", this.videoId, this.filename);
     this.addMessageListener(this.getVideoListener);
   }
 

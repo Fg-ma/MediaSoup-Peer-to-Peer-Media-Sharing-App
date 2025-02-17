@@ -8,14 +8,14 @@ import {
   UserEffectsStylesType,
   UserStreamEffectsType,
 } from "../../context/effectsContext/typeConstant";
-import GamesSignalingMedia from "../../lib/GamesSignalingMedia";
+import GamesSignalingMedia from "../../media/games/GamesSignalingMedia";
 import BundlesController from "../../lib/BundlesController";
 import onRouterCapabilities from "../../lib/onRouterCapabilities";
-import TableSocketController from "../../lib/TableSocketController";
-import TableStaticContentSocketController from "../../lib/TableStaticContentSocketController";
+import TableSocketController from "../../serverControllers/tableServer/TableSocketController";
+import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import MediasoupSocketController, {
   IncomingMediasoupMessages,
-} from "../../lib/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import ProducersController from "../../lib/ProducersController";
 import ConsumersController from "../../lib/ConsumersController";
 import PermissionsController from "../../lib/PermissionsController";

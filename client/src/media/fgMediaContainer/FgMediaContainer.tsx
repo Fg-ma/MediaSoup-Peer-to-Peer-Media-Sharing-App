@@ -12,7 +12,7 @@ import {
 } from "./lib/typeConstant";
 import Gradient from "./lib/Gradient";
 import UpperControls from "./lib/upperControls/UpperControls";
-import { TableContentTypes } from "../../lib/TableStaticContentSocketController";
+import { TableContentTypes } from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
@@ -150,7 +150,8 @@ export default function FgMediaContainer({
     setInMedia,
     leaveTimer,
     movementTimeout,
-    setRerender
+    setRerender,
+    tableStaticContentSocket
   );
 
   useEffect(() => {

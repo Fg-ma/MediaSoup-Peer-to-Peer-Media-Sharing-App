@@ -1,12 +1,12 @@
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserStreamEffectsType,
-  ApplicationsEffectTypes,
+  ApplicationEffectTypes,
   UserEffectsStylesType,
 } from "../../../../context/effectsContext/typeConstant";
 import ApplicationMedia from "../../ApplicationMedia";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
-import TableStaticContentSocketController from "../../../../lib/TableStaticContentSocketController";
+import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 class LowerApplicationController {
   constructor(
@@ -120,27 +120,25 @@ class LowerApplicationController {
   };
 
   handleApplicationEffect = async (
-    effect: ApplicationsEffectTypes,
+    effect: ApplicationEffectTypes,
     blockStateChange: boolean
   ) => {
     if (!blockStateChange) {
-      this.userStreamEffects.current.applications[this.applicationId][effect] =
-        !this.userStreamEffects.current.applications[this.applicationId][
-          effect
-        ];
+      this.userStreamEffects.current.application[this.applicationId][effect] =
+        !this.userStreamEffects.current.application[this.applicationId][effect];
     }
 
-    this.userMedia.current.applications[this.applicationId].changeEffects(
+    this.userMedia.current.application[this.applicationId].changeEffects(
       effect,
       this.tintColor.current,
       blockStateChange
     );
 
     this.tableStaticContentSocket.current?.updateContentEffects(
-      "applications",
+      "application",
       this.applicationId,
-      this.userStreamEffects.current.applications[this.applicationId],
-      this.userEffectsStyles.current.applications[this.applicationId]
+      this.userStreamEffects.current.application[this.applicationId],
+      this.userEffectsStyles.current.application[this.applicationId]
     );
   };
 

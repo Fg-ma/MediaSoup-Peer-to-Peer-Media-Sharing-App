@@ -1,6 +1,6 @@
 import { postProcessEffectDecodingMap } from "../typeConstant";
 import {
-  textEffectStylesEncodingMap,
+  textEffectEncodingMap,
   TextEffectStylesType,
   TextEffectTypes,
 } from "./typeConstant";
@@ -75,12 +75,11 @@ class Decoder {
   } => {
     const { tid, vid, n, m, p, e, es } = data;
 
-    const effects: { [effectType in TextEffectTypes]: boolean } = Object.keys(
-      textEffectStylesEncodingMap
-    ).reduce((acc, key) => {
-      acc[key as TextEffectTypes] = e.includes(parseInt(key));
+    const effects = Object.keys(textEffectEncodingMap).reduce((acc, key) => {
+      const value = textEffectEncodingMap[key as TextEffectTypes];
+      acc[key as TextEffectTypes] = e.includes(value);
       return acc;
-    }, {} as { [effectType in TextEffectTypes]: boolean });
+    }, {} as Record<TextEffectTypes, boolean>);
 
     return {
       table_id: tid,
