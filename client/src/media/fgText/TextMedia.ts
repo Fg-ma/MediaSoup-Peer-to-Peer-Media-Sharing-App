@@ -150,6 +150,33 @@ class TextMedia {
       );
 
       this.removeMessageListener(this.getTextListener);
+
+      for (const effect in this.userStreamEffects.current.text[this.textId]) {
+        if (
+          this.userStreamEffects.current.text[this.textId][
+            effect as TextEffectTypes
+          ]
+        ) {
+          if (effect === "postProcess") {
+            this.babylonScene.babylonShaderController.swapPostProcessEffects(
+              this.userEffectsStyles.current.text[this.textId].postProcess.style
+            );
+
+            this.changeEffects(effect as TextEffectTypes);
+          } else if (effect === "tint") {
+            this.setTintColor(
+              this.userEffectsStyles.current.text[this.textId].tint.color
+            );
+
+            this.changeEffects(
+              effect as TextEffectTypes,
+              this.userEffectsStyles.current.text[this.textId].tint.color
+            );
+          } else {
+            this.changeEffects(effect as TextEffectTypes);
+          }
+        }
+      }
     }
   };
 

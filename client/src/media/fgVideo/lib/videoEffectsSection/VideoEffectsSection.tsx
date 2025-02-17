@@ -169,9 +169,15 @@ export default function VideoEffectsSection({
         scrollingContainerRef={effectsContainerRef}
         streamEffects={userStreamEffects.current.video[videoId].video.tint}
         clickFunctionCallback={async () => {
+          userEffectsStyles.current.video[videoId].video.tint.color =
+            tintColor.current;
+
           await lowerVideoController.handleVideoEffect("tint", false);
         }}
         acceptColorCallback={async () => {
+          userEffectsStyles.current.video[videoId].video.tint.color =
+            tintColor.current;
+
           await lowerVideoController.handleVideoEffect(
             "tint",
             userStreamEffects.current.video[videoId].video.tint

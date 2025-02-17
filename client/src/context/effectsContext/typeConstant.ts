@@ -141,6 +141,9 @@ export type RemoteStreamEffectsType = {
 };
 
 export type CameraEffectStylesType = {
+  tint: {
+    color: string;
+  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -316,6 +319,9 @@ export type PetsEffectTypes =
   | "TRex";
 
 export interface ScreenEffectStylesType {
+  tint: {
+    color: string;
+  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -324,6 +330,9 @@ export interface ScreenEffectStylesType {
 export type AudioEffectStylesType = object;
 
 export type VideoEffectStylesType = {
+  tint: {
+    color: string;
+  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -352,6 +361,9 @@ export type VideoEffectStylesType = {
 };
 
 export type ImageEffectStylesType = {
+  tint: {
+    color: string;
+  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -380,12 +392,18 @@ export type ImageEffectStylesType = {
 };
 
 export type ApplicationEffectStylesType = {
+  tint: {
+    color: string;
+  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
 };
 
 export type TextEffectStylesType = {
+  tint: {
+    color: string;
+  };
   postProcess: {
     style: PostProcessEffectTypes;
   };
@@ -579,6 +597,7 @@ export const defaultTextStreamEffects: {
 export const defaultPostProcess: PostProcessEffectTypes = "prismaColors";
 export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
 export const defaultHideBackgroundColor = "#d40213";
+export const defaultTintColor = "#d40213";
 export const defaultBeard: BeardsEffectTypes = "classicalCurlyBeard";
 export const defaultGlasses: GlassesEffectTypes = "defaultGlasses";
 export const defaultMustache: MustachesEffectTypes = "mustache1";
@@ -590,6 +609,9 @@ export const defaultBackgroundMusic: BackgroundMusicTypes = "mischief";
 
 export const defaultCameraEffectsStyles: CameraEffectStylesType = Object.freeze(
   {
+    tint: Object.freeze({
+      color: defaultTintColor,
+    }),
     postProcess: Object.freeze({
       style: defaultPostProcess,
     }),
@@ -620,6 +642,9 @@ export const defaultCameraEffectsStyles: CameraEffectStylesType = Object.freeze(
 
 export const defaultScreenEffectsStyles: ScreenEffectStylesType = Object.freeze(
   {
+    tint: Object.freeze({
+      color: defaultTintColor,
+    }),
     postProcess: Object.freeze({
       style: defaultPostProcess,
     }),
@@ -631,6 +656,9 @@ export const defaultAudioEffectsStyles: AudioEffectStylesType = Object.freeze(
 );
 
 export const defaultVideoEffectsStyles: VideoEffectStylesType = Object.freeze({
+  tint: Object.freeze({
+    color: defaultTintColor,
+  }),
   postProcess: Object.freeze({
     style: defaultPostProcess,
   }),
@@ -659,6 +687,9 @@ export const defaultVideoEffectsStyles: VideoEffectStylesType = Object.freeze({
 });
 
 export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
+  tint: Object.freeze({
+    color: defaultTintColor,
+  }),
   postProcess: Object.freeze({
     style: defaultPostProcess,
   }),
@@ -688,12 +719,18 @@ export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
 
 export const defaultApplicationEffectsStyles: ApplicationEffectStylesType =
   Object.freeze({
+    tint: Object.freeze({
+      color: defaultTintColor,
+    }),
     postProcess: Object.freeze({
       style: defaultPostProcess,
     }),
   });
 
 export const defaultTextEffectsStyles: TextEffectStylesType = Object.freeze({
+  tint: Object.freeze({
+    color: defaultTintColor,
+  }),
   postProcess: Object.freeze({
     style: defaultPostProcess,
   }),

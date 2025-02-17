@@ -1,13 +1,4 @@
-import {
-  BeardsEffectTypes,
-  GlassesEffectTypes,
-  HatsEffectTypes,
-  HideBackgroundEffectTypes,
-  MasksEffectTypes,
-  MustachesEffectTypes,
-  PetsEffectTypes,
-  PostProcessEffectTypes,
-} from "../typeConstant";
+import { PostProcessEffectTypes } from "../typeConstant";
 
 export type ApplicationEffectTypes = "postProcess" | "blur" | "tint";
 
@@ -21,8 +12,12 @@ export type ApplicationEffectStylesType = {
   postProcess: {
     style: PostProcessEffectTypes;
   };
+  tint: {
+    color: string;
+  };
 };
 
 export const applicationEffectStylesEncodingMap = {
   postProcess: 0,
+  tint: 1,
 };

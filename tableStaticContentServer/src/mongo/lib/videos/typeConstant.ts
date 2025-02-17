@@ -42,6 +42,9 @@ export type VideoEffectStylesType = {
     style: HideBackgroundEffectTypes;
     color: string;
   };
+  tint: {
+    color: string;
+  };
   glasses: {
     style: GlassesEffectTypes;
   };
@@ -65,10 +68,11 @@ export type VideoEffectStylesType = {
 export const videoEffectStylesEncodingMap = {
   postProcess: 0,
   hideBackground: 1,
-  glasses: 2,
-  beards: 3,
-  mustaches: 4,
-  masks: 5,
-  hats: 6,
-  pets: 7,
+  tint: 2,
+  glasses: 3,
+  beards: 4,
+  mustaches: 5,
+  masks: 6,
+  hats: 7,
+  pets: 8,
 };

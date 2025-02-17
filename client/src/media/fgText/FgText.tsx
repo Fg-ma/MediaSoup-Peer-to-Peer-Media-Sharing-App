@@ -55,7 +55,7 @@ export default function FgText({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerTextControlsRef = useRef<HTMLDivElement>(null);
 
-  const tintColor = useRef("#F56114");
+  const tintColor = useRef(userEffectsStyles.current.text[textId].tint.color);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);

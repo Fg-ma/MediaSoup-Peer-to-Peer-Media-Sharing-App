@@ -340,13 +340,26 @@ class ImageMedia {
               this.userEffectsStyles.current.image[this.imageId].hideBackground
                 .style
             );
+
+            this.changeEffects(effect as ImageEffectTypes);
           } else if (effect === "postProcess") {
             this.babylonScene.babylonShaderController.swapPostProcessEffects(
               this.userEffectsStyles.current.image[this.imageId].postProcess
                 .style
             );
+
+            this.changeEffects(effect as ImageEffectTypes);
+          } else if (effect === "tint") {
+            this.setTintColor(
+              this.userEffectsStyles.current.image[this.imageId].tint.color
+            );
+            this.changeEffects(
+              effect as ImageEffectTypes,
+              this.userEffectsStyles.current.image[this.imageId].tint.color
+            );
+          } else {
+            this.changeEffects(effect as ImageEffectTypes);
           }
-          this.changeEffects(effect as ImageEffectTypes);
         }
       }
     }

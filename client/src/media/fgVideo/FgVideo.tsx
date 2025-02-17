@@ -65,7 +65,9 @@ export default function FgVideo({
 
   const [audioEffectsActive, setAudioEffectsActive] = useState(false);
 
-  const tintColor = useRef("#F56114");
+  const tintColor = useRef(
+    userEffectsStyles.current.video[videoId].video.tint.color
+  );
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
 

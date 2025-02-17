@@ -12,8 +12,12 @@ export type TextEffectStylesType = {
   postProcess: {
     style: PostProcessEffectTypes;
   };
+  tint: {
+    color: string;
+  };
 };
 
 export const textEffectStylesEncodingMap = {
   postProcess: 0,
+  tint: 1,
 };

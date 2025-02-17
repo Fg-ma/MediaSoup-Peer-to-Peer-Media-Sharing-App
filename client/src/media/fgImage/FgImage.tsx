@@ -55,7 +55,7 @@ export default function FgImage({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerImageControlsRef = useRef<HTMLDivElement>(null);
 
-  const tintColor = useRef("#F56114");
+  const tintColor = useRef(userEffectsStyles.current.image[imageId].tint.color);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);

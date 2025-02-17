@@ -30,26 +30,7 @@ class Decoder {
         s: number;
       };
       "1": {
-        s: number;
         c: string;
-      };
-      "2": {
-        s: number;
-      };
-      "3": {
-        s: number;
-      };
-      "4": {
-        s: number;
-      };
-      "5": {
-        s: number;
-      };
-      "6": {
-        s: number;
-      };
-      "7": {
-        s: number;
       };
     };
   }): {
@@ -101,6 +82,9 @@ class Decoder {
       effectStyles: {
         postProcess: {
           style: postProcessEffectDecodingMap[es["0"].s],
+        },
+        tint: {
+          color: es["1"].c,
         },
       },
     };

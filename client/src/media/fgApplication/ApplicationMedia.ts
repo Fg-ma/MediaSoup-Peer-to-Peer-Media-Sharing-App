@@ -150,6 +150,38 @@ class ApplicationMedia {
       );
 
       this.removeMessageListener(this.getApplicationListener);
+
+      for (const effect in this.userStreamEffects.current.application[
+        this.applicationId
+      ]) {
+        if (
+          this.userStreamEffects.current.application[this.applicationId][
+            effect as ApplicationEffectTypes
+          ]
+        ) {
+          if (effect === "postProcess") {
+            this.babylonScene.babylonShaderController.swapPostProcessEffects(
+              this.userEffectsStyles.current.application[this.applicationId]
+                .postProcess.style
+            );
+
+            this.changeEffects(effect as ApplicationEffectTypes);
+          } else if (effect === "tint") {
+            this.setTintColor(
+              this.userEffectsStyles.current.application[this.applicationId]
+                .tint.color
+            );
+
+            this.changeEffects(
+              effect as ApplicationEffectTypes,
+              this.userEffectsStyles.current.application[this.applicationId]
+                .tint.color
+            );
+          } else {
+            this.changeEffects(effect as ApplicationEffectTypes);
+          }
+        }
+      }
     }
   };
 

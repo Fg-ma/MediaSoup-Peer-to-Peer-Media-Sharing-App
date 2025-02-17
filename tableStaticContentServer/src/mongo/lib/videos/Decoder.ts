@@ -43,7 +43,7 @@ class Decoder {
         c: string;
       };
       "2": {
-        s: number;
+        c: string;
       };
       "3": {
         s: number;
@@ -58,6 +58,9 @@ class Decoder {
         s: number;
       };
       "7": {
+        s: number;
+      };
+      "8": {
         s: number;
       };
     };
@@ -115,23 +118,26 @@ class Decoder {
           style: hideBackgroundEffectDecodingMap[es["1"].s],
           color: es["1"].c,
         },
+        tint: {
+          color: es["2"].c,
+        },
         glasses: {
-          style: glassesEffectDecodingMap[es["2"].s],
+          style: glassesEffectDecodingMap[es["3"].s],
         },
         beards: {
-          style: beardsEffectDecodingMap[es["3"].s],
+          style: beardsEffectDecodingMap[es["4"].s],
         },
         mustaches: {
-          style: mustachesEffectDecodingMap[es["4"].s],
+          style: mustachesEffectDecodingMap[es["5"].s],
         },
         masks: {
-          style: masksEffectDecodingMap[es["5"].s],
+          style: masksEffectDecodingMap[es["6"].s],
         },
         hats: {
-          style: hatsEffectDecodingMap[es["6"].s],
+          style: hatsEffectDecodingMap[es["7"].s],
         },
         pets: {
-          style: petsEffectDecodingMap[es["7"].s],
+          style: petsEffectDecodingMap[es["8"].s],
         },
       },
     };

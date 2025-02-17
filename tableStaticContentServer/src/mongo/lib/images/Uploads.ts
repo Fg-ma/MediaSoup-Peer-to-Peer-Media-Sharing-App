@@ -119,19 +119,22 @@ class Uploads {
           c: updateData.effectStyles.hideBackground.color,
         },
         "2": {
-          s: glassesEffectEncodingMap[updateData.effectStyles.glasses.style],
+          c: updateData.effectStyles.tint.color,
         },
         "3": {
-          s: beardsEffectEncodingMap[updateData.effectStyles.beards.style],
+          s: glassesEffectEncodingMap[updateData.effectStyles.glasses.style],
         },
         "4": {
+          s: beardsEffectEncodingMap[updateData.effectStyles.beards.style],
+        },
+        "5": {
           s: mustachesEffectEncodingMap[
             updateData.effectStyles.mustaches.style
           ],
         },
-        "5": { s: masksEffectEncodingMap[updateData.effectStyles.masks.style] },
-        "6": { s: hatsEffectEncodingMap[updateData.effectStyles.hats.style] },
-        "7": { s: petsEffectEncodingMap[updateData.effectStyles.pets.style] },
+        "6": { s: masksEffectEncodingMap[updateData.effectStyles.masks.style] },
+        "7": { s: hatsEffectEncodingMap[updateData.effectStyles.hats.style] },
+        "8": { s: petsEffectEncodingMap[updateData.effectStyles.pets.style] },
       };
     }
 

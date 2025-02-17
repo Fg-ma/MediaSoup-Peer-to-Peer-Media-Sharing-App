@@ -63,7 +63,7 @@ class Encoder {
         c: string;
       };
       "2": {
-        s: number;
+        c: string;
       };
       "3": {
         s: number;
@@ -78,6 +78,9 @@ class Encoder {
         s: number;
       };
       "7": {
+        s: number;
+      };
+      "8": {
         s: number;
       };
     };
@@ -122,21 +125,24 @@ class Encoder {
           c: effectStyles.hideBackground.color,
         },
         "2": {
-          s: glassesEffectEncodingMap[effectStyles.glasses.style],
+          c: effectStyles.tint.color,
         },
         "3": {
-          s: beardsEffectEncodingMap[effectStyles.beards.style],
+          s: glassesEffectEncodingMap[effectStyles.glasses.style],
         },
         "4": {
-          s: mustachesEffectEncodingMap[effectStyles.mustaches.style],
+          s: beardsEffectEncodingMap[effectStyles.beards.style],
         },
         "5": {
-          s: masksEffectEncodingMap[effectStyles.masks.style],
+          s: mustachesEffectEncodingMap[effectStyles.mustaches.style],
         },
         "6": {
-          s: hatsEffectEncodingMap[effectStyles.hats.style],
+          s: masksEffectEncodingMap[effectStyles.masks.style],
         },
         "7": {
+          s: hatsEffectEncodingMap[effectStyles.hats.style],
+        },
+        "8": {
           s: petsEffectEncodingMap[effectStyles.pets.style],
         },
       },

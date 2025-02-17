@@ -147,6 +147,9 @@ class Posts {
           style: "beach",
           color: "#d40213",
         },
+        tint: {
+          color: "#d40213",
+        },
         glasses: {
           style: "defaultGlasses",
         },
@@ -249,6 +252,9 @@ class Posts {
         },
         hideBackground: {
           style: "beach",
+          color: "#d40213",
+        },
+        tint: {
           color: "#d40213",
         },
         glasses: {
@@ -384,6 +390,9 @@ class Posts {
         postProcess: {
           style: "prismaColors",
         },
+        tint: {
+          color: "#d40213",
+        },
       },
     });
 
@@ -424,6 +433,9 @@ class Posts {
       effectStyles: {
         postProcess: {
           style: "prismaColors",
+        },
+        tint: {
+          color: "#d40213",
         },
       },
     });

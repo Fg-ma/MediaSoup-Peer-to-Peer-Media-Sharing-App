@@ -333,6 +333,44 @@ class VideoMedia {
       );
 
       this.removeMessageListener(this.getVideoListener);
+
+      for (const effect in this.userStreamEffects.current.video[this.videoId]
+        .video) {
+        if (
+          this.userStreamEffects.current.video[this.videoId].video[
+            effect as VideoEffectTypes
+          ]
+        ) {
+          if (effect === "hideBackground") {
+            this.babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+              this.userEffectsStyles.current.video[this.videoId].video
+                .hideBackground.style
+            );
+
+            this.changeEffects(effect as VideoEffectTypes);
+          } else if (effect === "postProcess") {
+            this.babylonScene.babylonShaderController.swapPostProcessEffects(
+              this.userEffectsStyles.current.video[this.videoId].video
+                .postProcess.style
+            );
+
+            this.changeEffects(effect as VideoEffectTypes);
+          } else if (effect === "tint") {
+            this.setTintColor(
+              this.userEffectsStyles.current.video[this.videoId].video.tint
+                .color
+            );
+
+            this.changeEffects(
+              effect as VideoEffectTypes,
+              this.userEffectsStyles.current.video[this.videoId].video.tint
+                .color
+            );
+          } else {
+            this.changeEffects(effect as VideoEffectTypes);
+          }
+        }
+      }
     }
   };
 

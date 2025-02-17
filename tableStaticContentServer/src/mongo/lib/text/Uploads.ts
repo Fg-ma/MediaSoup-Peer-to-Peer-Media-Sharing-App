@@ -112,6 +112,9 @@ class Uploads {
             updateData.effectStyles.postProcess.style
           ],
         },
+        "1": {
+          c: updateData.effectStyles.tint.color,
+        },
       };
     }
 

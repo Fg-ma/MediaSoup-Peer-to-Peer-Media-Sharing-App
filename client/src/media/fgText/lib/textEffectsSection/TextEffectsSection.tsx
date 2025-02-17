@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
-import TextMedia from "../../../../lib/TextMedia";
 import LowerTextController from "../lowerTextControls/LowerTextController";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
+import TextMedia from "../../TextMedia";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -139,9 +139,13 @@ export default function TextEffectsSection({
         scrollingContainerRef={effectsContainerRef}
         streamEffects={userStreamEffects.current.text[textId].tint}
         clickFunctionCallback={async () => {
+          userEffectsStyles.current.text[textId].tint.color = tintColor.current;
+
           await lowerTextController.handleTextEffect("tint", false);
         }}
         acceptColorCallback={async () => {
+          userEffectsStyles.current.text[textId].tint.color = tintColor.current;
+
           await lowerTextController.handleTextEffect(
             "tint",
             userStreamEffects.current.text[textId].tint

@@ -56,7 +56,9 @@ export default function FgApplication({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerApplicationControlsRef = useRef<HTMLDivElement>(null);
 
-  const tintColor = useRef("#F56114");
+  const tintColor = useRef(
+    userEffectsStyles.current.application[applicationId].tint.color
+  );
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);

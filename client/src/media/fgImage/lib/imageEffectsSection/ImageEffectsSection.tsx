@@ -239,9 +239,15 @@ export default function ImageEffectsSection({
         scrollingContainerRef={effectsContainerRef}
         streamEffects={userStreamEffects.current.image[imageId].tint}
         clickFunctionCallback={async () => {
+          userEffectsStyles.current.image[imageId].tint.color =
+            tintColor.current;
+
           await lowerImageController.handleImageEffect("tint", false);
         }}
         acceptColorCallback={async () => {
+          userEffectsStyles.current.image[imageId].tint.color =
+            tintColor.current;
+
           await lowerImageController.handleImageEffect(
             "tint",
             userStreamEffects.current.image[imageId].tint

@@ -28,7 +28,7 @@ export default function TintSection({
   clickFunctionCallback?: () => Promise<void>;
   acceptColorCallback?: () => Promise<void>;
 }) {
-  const [color, setColor] = useState("#F56114");
+  const [color, setColor] = useState(tintColor.current);
   const [isColorPicker, setIsColorPicker] = useState(false);
   const [tempColor, setTempColor] = useState(color);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);

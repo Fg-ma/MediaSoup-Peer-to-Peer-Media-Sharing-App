@@ -156,12 +156,18 @@ export default function ApplicationEffectsSection({
           userStreamEffects.current.application[applicationId].tint
         }
         clickFunctionCallback={async () => {
+          userEffectsStyles.current.application[applicationId].tint.color =
+            tintColor.current;
+
           await lowerApplicationController.handleApplicationEffect(
             "tint",
             false
           );
         }}
         acceptColorCallback={async () => {
+          userEffectsStyles.current.application[applicationId].tint.color =
+            tintColor.current;
+
           await lowerApplicationController.handleApplicationEffect(
             "tint",
             userStreamEffects.current.application[applicationId].tint

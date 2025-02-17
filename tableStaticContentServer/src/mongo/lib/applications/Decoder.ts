@@ -29,6 +29,9 @@ class Decoder {
       "0": {
         s: number;
       };
+      "1": {
+        c: string;
+      };
     };
   }): {
     table_id: string;
@@ -83,6 +86,9 @@ class Decoder {
       effectStyles: {
         postProcess: {
           style: postProcessEffectDecodingMap[es["0"].s],
+        },
+        tint: {
+          color: es["1"].c,
         },
       },
     };

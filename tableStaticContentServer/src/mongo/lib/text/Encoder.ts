@@ -49,6 +49,9 @@ class Encoder {
       "0": {
         s: number;
       };
+      "1": {
+        c: string;
+      };
     };
   } => {
     const {
@@ -85,6 +88,9 @@ class Encoder {
       es: {
         "0": {
           s: postProcessEffectEncodingMap[effectStyles.postProcess.style],
+        },
+        "1": {
+          c: effectStyles.tint.color,
         },
       },
     };
