@@ -1,15 +1,18 @@
 import React, { useEffect, useRef } from "react";
+import { MediaContainerOptions } from "../typeConstant";
 
 export default function LowerControls({
   externalRightLowerControlsRef,
   leftLowerControls,
   rightLowerControls,
   lowerPopupElements,
+  mediaContainerOptions,
 }: {
   externalRightLowerControlsRef?: React.RefObject<HTMLDivElement>;
   leftLowerControls?: (React.ReactNode | null)[];
   rightLowerControls?: (React.ReactNode | null)[];
   lowerPopupElements?: (React.ReactNode | null)[];
+  mediaContainerOptions: MediaContainerOptions;
 }) {
   const rightControlsRef = externalRightLowerControlsRef
     ? externalRightLowerControlsRef
@@ -37,7 +40,13 @@ export default function LowerControls({
   }, []);
 
   return (
-    <div className='media-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20 pointer-events-none'>
+    <div
+      className={`media-controls-container ${
+        mediaContainerOptions.controlsPlacement === "inside"
+          ? "bottom-0"
+          : "top-full"
+      } absolute w-full h-max flex-col items-end justify-center z-20 pointer-events-none`}
+    >
       {lowerPopupElements &&
         lowerPopupElements.length > 0 &&
         lowerPopupElements.map((element, index) => (

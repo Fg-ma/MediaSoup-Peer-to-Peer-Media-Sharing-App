@@ -11,11 +11,9 @@ const fullScreenOffIcon = nginxAssetSeverBaseUrl + "svgs/fullScreenOffIcon.svg";
 
 export default function FullScreenButton({
   lowerTextController,
-  textEffectsActive,
   scrollingContainerRef,
 }: {
   lowerTextController: LowerTextController;
-  textEffectsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const [active, setActive] = useState(false);
@@ -41,9 +39,7 @@ export default function FullScreenButton({
         );
       }}
       hoverContent={
-        !textEffectsActive ? (
-          <FgHoverContentStandard content='Full screen (f)' style='dark' />
-        ) : undefined
+        <FgHoverContentStandard content='Full screen (f)' style='dark' />
       }
       scrollingContainerRef={scrollingContainerRef}
       className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'

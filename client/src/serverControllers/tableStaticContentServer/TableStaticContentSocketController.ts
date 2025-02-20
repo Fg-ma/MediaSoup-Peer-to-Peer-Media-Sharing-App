@@ -4,8 +4,6 @@ import {
   AudioEffectTypes,
   ImageEffectStylesType,
   ImageEffectTypes,
-  TextEffectStylesType,
-  TextEffectTypes,
   UserEffectsStylesType,
   UserStreamEffectsType,
   VideoEffectStylesType,
@@ -125,7 +123,6 @@ type onUpdateContentEffectsType = {
     effectStyles?:
       | VideoEffectStylesType
       | ImageEffectStylesType
-      | TextEffectStylesType
       | ApplicationEffectStylesType;
   };
 };
@@ -142,6 +139,7 @@ export type IncomingTableStaticContentMessages =
   | onOriginalVideoReadyType
   | onDashVideoReadyType
   | onImageReadyType
+  | onTextReadyType
   | onChunkType
   | onDownloadCompleteType
   | onResponsedCatchUpTableDataType
@@ -170,6 +168,17 @@ export type onDashVideoReadyType = {
 
 export type onImageReadyType = {
   type: "imageReady";
+  header: {
+    contentId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onTextReadyType = {
+  type: "textReady";
   header: {
     contentId: string;
   };
@@ -262,8 +271,6 @@ export type onResponsedCatchUpTableDataType = {
             };
             rotation: number;
           };
-          effects: { [effectType in TextEffectTypes]: boolean };
-          effectStyles: TextEffectStylesType;
         }[]
       | undefined;
     audio:
@@ -495,7 +502,6 @@ class TableStaticContentSocketController {
     effectStyles?:
       | VideoEffectStylesType
       | ImageEffectStylesType
-      | TextEffectStylesType
       | ApplicationEffectStylesType
   ) => {
     this.sendMessage({
@@ -581,24 +587,13 @@ class TableStaticContentSocketController {
     }
     if (text) {
       for (const textItem of text) {
-        this.userStreamEffects.current.text[textItem.textId] =
-          textItem.effects as {
-            [effectType in VideoEffectTypes]: boolean;
-          };
-        this.userEffectsStyles.current.text[textItem.textId] =
-          textItem.effectStyles as VideoEffectStylesType;
-
         this.userMedia.current.text[textItem.textId] = new TextMedia(
           textItem.textId,
           textItem.filename,
           textItem.mimeType as TableTopStaticMimeType,
-          this.userEffectsStyles,
-          this.userStreamEffects,
           this.getFile,
           this.addMessageListener,
           this.removeMessageListener,
-          this.userDevice,
-          this.userMedia,
           textItem.positioning
         );
       }

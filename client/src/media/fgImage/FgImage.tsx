@@ -7,9 +7,7 @@ import LowerImageController from "./lib/lowerImageControls/LowerImageController"
 import {
   ActivePages,
   defaultActiveSettingsPages,
-  defaultImageOptions,
   defaultSettings,
-  ImageOptions,
   Settings,
 } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
@@ -25,18 +23,11 @@ export default function FgImage({
   imageId,
   bundleRef,
   tableRef,
-  options,
 }: {
   imageId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
-  options?: ImageOptions;
 }) {
-  const imageOptions = {
-    ...defaultImageOptions,
-    ...options,
-  };
-
   const { userMedia } = useMediaContext();
   const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
@@ -92,17 +83,10 @@ export default function FgImage({
     tableStaticContentSocket
   );
 
-  const imageController = new ImageController(
-    imageContainerRef,
-    imageOptions,
-    setSettingsActive
-  );
+  const imageController = new ImageController(setSettingsActive);
 
   useEffect(() => {
     subContainerRef.current?.appendChild(imageMedia.canvas);
-
-    // Set up initial conditions
-    imageController.init();
 
     // Add eventlisteners
     document.addEventListener(

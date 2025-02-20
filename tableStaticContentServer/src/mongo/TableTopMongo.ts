@@ -62,6 +62,16 @@ class TableTopMongo {
         table_id,
         contentId
       );
+    } else if (contentType === "application") {
+      await this.tableApplications?.deletes.deleteMetaDataBy_TID_AID(
+        table_id,
+        contentId
+      );
+    } else if (contentType === "text") {
+      await this.tableText?.deletes.deleteMetaDataBy_TID_XID(
+        table_id,
+        contentId
+      );
     } else if (contentType === "soundClip") {
       await this.tableSoundClips?.deletes.deleteMetaDataBy_TID_AID(
         table_id,
@@ -144,13 +154,6 @@ class TableTopMongo {
         );
         break;
       case "text":
-        this.tableText?.uploads.editMetaData(
-          { table_id, textId: contentId },
-          {
-            effects,
-            effectStyles,
-          }
-        );
         break;
       case "soundClip":
         this.tableSoundClips?.uploads.editMetaData(

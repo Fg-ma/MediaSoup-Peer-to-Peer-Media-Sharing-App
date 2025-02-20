@@ -1,24 +1,9 @@
 import { Collection } from "mongodb";
-import {
-  beardsEffectEncodingMap,
-  glassesEffectEncodingMap,
-  hatsEffectEncodingMap,
-  hideBackgroundEffectEncodingMap,
-  masksEffectEncodingMap,
-  mustachesEffectEncodingMap,
-  petsEffectEncodingMap,
-  postProcessEffectEncodingMap,
-} from "../typeConstant";
 import Encoder from "./Encoder";
-import {
-  textEffectEncodingMap,
-  TextEffectStylesType,
-  TextEffectTypes,
-} from "./typeConstant";
 
 class Uploads {
   constructor(
-    private tableTextsCollection: Collection,
+    private tableTextCollection: Collection,
     private encoder: Encoder
   ) {}
 
@@ -38,15 +23,11 @@ class Uploads {
       };
       rotation: number;
     };
-    effects: {
-      [effectType in TextEffectTypes]: boolean;
-    };
-    effectStyles: TextEffectStylesType;
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
     try {
-      await this.tableTextsCollection?.insertOne(mongoData);
+      await this.tableTextCollection?.insertOne(mongoData);
     } catch (err) {
       console.error("Error uploading data:", err);
     }
@@ -60,11 +41,9 @@ class Uploads {
         scale?: { x?: number; y?: number };
         rotation?: number;
       };
-      effects?: { [effectType in TextEffectTypes]?: boolean };
-      effectStyles?: TextEffectStylesType;
     }>
   ) => {
-    if (!this.tableTextsCollection) {
+    if (!this.tableTextCollection) {
       console.error("Database not connected");
       return;
     }
@@ -93,34 +72,9 @@ class Uploads {
       }
     }
 
-    if (updateData.effects) {
-      updateFields["e"] = Object.keys(updateData.effects)
-        .filter(
-          (effect) =>
-            updateData.effects?.[effect as keyof typeof updateData.effects]
-        )
-        .map(
-          (effect) =>
-            textEffectEncodingMap[effect as keyof typeof updateData.effects]
-        );
-    }
-
-    if (updateData.effectStyles) {
-      updateFields["es"] = {
-        "0": {
-          s: postProcessEffectEncodingMap[
-            updateData.effectStyles.postProcess.style
-          ],
-        },
-        "1": {
-          c: updateData.effectStyles.tint.color,
-        },
-      };
-    }
-
     try {
-      const result = await this.tableTextsCollection.updateOne(
-        { tid: filter.table_id, vid: filter.textId },
+      const result = await this.tableTextCollection.updateOne(
+        { tid: filter.table_id, xid: filter.textId },
         { $set: updateFields }
       );
       return result;

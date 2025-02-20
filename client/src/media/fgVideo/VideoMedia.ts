@@ -272,6 +272,8 @@ class VideoMedia {
   }
 
   deconstructor() {
+    if (this.blobURL) URL.revokeObjectURL(this.blobURL);
+
     // Pause and cleanup video elements
     this.video.pause();
     this.video.srcObject = null;

@@ -237,13 +237,11 @@ class LowerController {
   };
 
   handleClose = () => {
-    if (this.kind === "image" || this.kind === "video") {
-      this.tableStaticContentSocket.current?.deleteContent(
-        this.kind,
-        this.mediaId,
-        this.filename
-      );
-    }
+    this.tableStaticContentSocket.current?.deleteContent(
+      this.kind,
+      this.mediaId,
+      this.filename
+    );
   };
 }
 

@@ -1,10 +1,3 @@
-import { postProcessEffectEncodingMap } from "../typeConstant";
-import {
-  textEffectEncodingMap,
-  TextEffectStylesType,
-  TextEffectTypes,
-} from "./typeConstant";
-
 class Encoder {
   constructor() {}
 
@@ -24,10 +17,6 @@ class Encoder {
       };
       rotation: number;
     };
-    effects: {
-      [effectType in TextEffectTypes]: boolean;
-    };
-    effectStyles: TextEffectStylesType;
   }): {
     tid: string;
     xid: string;
@@ -44,29 +33,8 @@ class Encoder {
       };
       r: number;
     };
-    e: number[];
-    es: {
-      "0": {
-        s: number;
-      };
-      "1": {
-        c: string;
-      };
-    };
   } => {
-    const {
-      table_id,
-      textId,
-      filename,
-      mimeType,
-      positioning,
-      effects,
-      effectStyles,
-    } = data;
-
-    const e: number[] = Object.keys(effects)
-      .filter((effect) => effects[effect as keyof typeof effects])
-      .map((effect) => textEffectEncodingMap[effect as keyof typeof effects]);
+    const { table_id, textId, filename, mimeType, positioning } = data;
 
     return {
       tid: table_id,
@@ -83,15 +51,6 @@ class Encoder {
           y: positioning.scale.y,
         },
         r: positioning.rotation,
-      },
-      e,
-      es: {
-        "0": {
-          s: postProcessEffectEncodingMap[effectStyles.postProcess.style],
-        },
-        "1": {
-          c: effectStyles.tint.color,
-        },
       },
     };
   };

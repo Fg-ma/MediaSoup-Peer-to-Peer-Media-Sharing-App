@@ -21,7 +21,7 @@ class Gets {
       // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(textData);
     } catch (err) {
-      console.error("Error retrieving vidoe data:", err);
+      console.error("Error retrieving text data:", err);
       return null;
     }
   };

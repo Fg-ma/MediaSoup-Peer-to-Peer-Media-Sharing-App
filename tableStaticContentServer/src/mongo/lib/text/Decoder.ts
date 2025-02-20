@@ -1,16 +1,9 @@
-import { postProcessEffectDecodingMap } from "../typeConstant";
-import {
-  textEffectEncodingMap,
-  TextEffectStylesType,
-  TextEffectTypes,
-} from "./typeConstant";
-
 class Decoder {
   constructor() {}
 
   decodeMetaData = (data: {
     tid: string;
-    vid: string;
+    xid: string;
     n: string;
     m: string;
     p: {
@@ -23,15 +16,6 @@ class Decoder {
         y: number;
       };
       r: number;
-    };
-    e: number[];
-    es: {
-      "0": {
-        s: number;
-      };
-      "1": {
-        c: string;
-      };
     };
   }): {
     table_id: string;
@@ -49,22 +33,12 @@ class Decoder {
       };
       rotation: number;
     };
-    effects: {
-      [effectType in TextEffectTypes]: boolean;
-    };
-    effectStyles: TextEffectStylesType;
   } => {
-    const { tid, vid, n, m, p, e, es } = data;
-
-    const effects = Object.keys(textEffectEncodingMap).reduce((acc, key) => {
-      const value = textEffectEncodingMap[key as TextEffectTypes];
-      acc[key as TextEffectTypes] = e.includes(value);
-      return acc;
-    }, {} as Record<TextEffectTypes, boolean>);
+    const { tid, xid, n, m, p } = data;
 
     return {
       table_id: tid,
-      textId: vid,
+      textId: xid,
       filename: n,
       mimeType: m,
       positioning: {
@@ -77,15 +51,6 @@ class Decoder {
           y: p.s.y,
         },
         rotation: p.r,
-      },
-      effects,
-      effectStyles: {
-        postProcess: {
-          style: postProcessEffectDecodingMap[es["0"].s],
-        },
-        tint: {
-          color: es["1"].c,
-        },
       },
     };
   };

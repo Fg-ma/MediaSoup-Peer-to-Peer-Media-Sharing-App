@@ -10,7 +10,7 @@ class MediaContainerController {
     private table_id: React.MutableRefObject<string>,
     private mediaId: string,
     private kind: TableContentTypes,
-    private rootMedia: HTMLVideoElement | HTMLImageElement,
+    private rootMedia: HTMLVideoElement | HTMLImageElement | undefined,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: () => void;
@@ -41,13 +41,6 @@ class MediaContainerController {
       TableStaticContentSocketController | undefined
     >
   ) {}
-
-  init = () => {
-    this.mediaContainerRef.current?.style.setProperty(
-      "--primary-media-color",
-      `${this.mediaContainerOptions.primaryMediaColor}`
-    );
-  };
 
   handlePointerMove = () => {
     this.setInMedia(true);
@@ -95,6 +88,8 @@ class MediaContainerController {
   };
 
   handleMetadataLoaded = () => {
+    if (!this.rootMedia) return;
+
     const width =
       this.rootMedia instanceof HTMLVideoElement
         ? this.rootMedia.videoWidth

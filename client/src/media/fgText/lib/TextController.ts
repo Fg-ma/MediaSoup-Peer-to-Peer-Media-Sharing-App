@@ -1,21 +1,18 @@
-import { TextOptions } from "./typeConstant";
+import { TextMediaEvents } from "../TextMedia";
 
 class TextController {
   constructor(
-    private textContainerRef: React.RefObject<HTMLDivElement>,
-    private textOptions: TextOptions,
-    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
-  init = () => {
-    this.textContainerRef.current?.style.setProperty(
-      "--primary-text-color",
-      `${this.textOptions.primaryTextColor}`
-    );
-  };
-
-  handleTableScroll = () => {
-    this.setSettingsActive(false);
+  handleTextMediaEvents = (event: TextMediaEvents) => {
+    switch (event.type) {
+      case "textFinishedLoading":
+        this.setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
   };
 }
 

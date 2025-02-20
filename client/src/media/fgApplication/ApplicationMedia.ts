@@ -106,6 +106,8 @@ class ApplicationMedia {
 
   deconstructor() {
     this.application.src = "";
+
+    if (this.blobURL) URL.revokeObjectURL(this.blobURL);
   }
 
   private getApplicationListener = (

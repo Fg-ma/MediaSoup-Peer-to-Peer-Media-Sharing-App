@@ -83,8 +83,6 @@ export type ImageEffectTypes =
 
 export type ApplicationEffectTypes = "postProcess" | "blur" | "tint";
 
-export type TextEffectTypes = "postProcess" | "blur" | "tint";
-
 export type UserStreamEffectsType = {
   camera: {
     [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -112,11 +110,6 @@ export type UserStreamEffectsType = {
   application: {
     [applicationId: string]: {
       [effectType in ApplicationEffectTypes]: boolean;
-    };
-  };
-  text: {
-    [textId: string]: {
-      [effectType in TextEffectTypes]: boolean;
     };
   };
   soundClip: {
@@ -403,15 +396,6 @@ export type ApplicationEffectStylesType = {
   };
 };
 
-export type TextEffectStylesType = {
-  tint: {
-    color: string;
-  };
-  postProcess: {
-    style: PostProcessEffectTypes;
-  };
-};
-
 export type BackgroundMusicTypes =
   | "adventureTime"
   | "bottledNoise"
@@ -467,9 +451,6 @@ export type UserEffectsStylesType = {
   };
   application: {
     [applicationId: string]: ApplicationEffectStylesType;
-  };
-  text: {
-    [textId: string]: TextEffectStylesType;
   };
   soundClip: {
     [soundClipId: string]: AudioEffectStylesType;
@@ -586,14 +567,6 @@ export const defaultImageStreamEffects: {
 
 export const defaultApplicationStreamEffects: {
   [effect in ApplicationEffectTypes]: boolean;
-} = Object.freeze({
-  postProcess: false,
-  blur: false,
-  tint: false,
-});
-
-export const defaultTextStreamEffects: {
-  [effect in TextEffectTypes]: boolean;
 } = Object.freeze({
   postProcess: false,
   blur: false,
@@ -732,12 +705,3 @@ export const defaultApplicationEffectsStyles: ApplicationEffectStylesType =
       style: defaultPostProcess,
     }),
   });
-
-export const defaultTextEffectsStyles: TextEffectStylesType = Object.freeze({
-  tint: Object.freeze({
-    color: defaultTintColor,
-  }),
-  postProcess: Object.freeze({
-    style: defaultPostProcess,
-  }),
-});

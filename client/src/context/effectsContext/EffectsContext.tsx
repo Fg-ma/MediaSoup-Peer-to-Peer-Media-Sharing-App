@@ -42,7 +42,6 @@ export function EffectsContextProvider({
     video: {},
     image: {},
     application: {},
-    text: {},
     soundClip: {},
   });
   const remoteStreamEffects = useRef<RemoteStreamEffectsType>({});
@@ -54,7 +53,6 @@ export function EffectsContextProvider({
     video: {},
     image: {},
     application: {},
-    text: {},
     soundClip: {},
   });
   const remoteEffectsStyles = useRef<RemoteEffectStylesType>({});

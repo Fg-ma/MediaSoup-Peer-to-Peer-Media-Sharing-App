@@ -1,15 +1,15 @@
 export interface MediaContainerOptions {
   controlsVanishTime?: number;
-  closedCaptionsDecoratorColor?: string;
-  primaryMediaColor?: string;
+  gradient?: boolean;
+  controlsPlacement?: "outside" | "inside";
 }
 
 export const defaultMediaContainerOptions: {
   controlsVanishTime: number;
-  closedCaptionsDecoratorColor: string;
-  primaryMediaColor: string;
+  gradient: boolean;
+  controlsPlacement: "outside" | "inside";
 } = {
   controlsVanishTime: 1250,
-  closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
-  primaryMediaColor: "#f56114",
+  gradient: true,
+  controlsPlacement: "inside",
 };

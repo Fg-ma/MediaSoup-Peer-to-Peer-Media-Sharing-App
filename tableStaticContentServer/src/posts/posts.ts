@@ -425,25 +425,12 @@ class Posts {
         },
         rotation: 0,
       },
-      effects: {
-        postProcess: false,
-        blur: false,
-        tint: false,
-      },
-      effectStyles: {
-        postProcess: {
-          style: "prismaColors",
-        },
-        tint: {
-          color: "#d40213",
-        },
-      },
     });
 
     broadcaster.broadcastToTable(table_id, {
       type: "textReady",
       header: { contentId },
-      data: { filename: filename, mimeType },
+      data: { filename, mimeType },
     });
   };
 }

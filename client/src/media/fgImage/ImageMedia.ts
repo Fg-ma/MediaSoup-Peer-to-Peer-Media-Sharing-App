@@ -286,6 +286,8 @@ class ImageMedia {
 
   deconstructor() {
     this.image.src = "";
+
+    if (this.blobURL) URL.revokeObjectURL(this.blobURL);
   }
 
   private getImageListener = (message: IncomingTableStaticContentMessages) => {

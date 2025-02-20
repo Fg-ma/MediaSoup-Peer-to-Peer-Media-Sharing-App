@@ -15,7 +15,7 @@ class TableText {
   deletes: Deletes;
 
   constructor(private db: Db) {
-    this.tableTextCollection = this.db.collection("tableTexts");
+    this.tableTextCollection = this.db.collection("tableText");
 
     this.encoder = new Encoder();
     this.decoder = new Decoder();

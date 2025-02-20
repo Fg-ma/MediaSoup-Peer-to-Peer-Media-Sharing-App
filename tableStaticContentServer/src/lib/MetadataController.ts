@@ -11,7 +11,9 @@ class MetadataController {
     const images = await tableTopMongo.tableImages?.gets.getAllBy_TID(table_id);
     const videos = await tableTopMongo.tableVideos?.gets.getAllBy_TID(table_id);
     const text = await tableTopMongo.tableText?.gets.getAllBy_TID(table_id);
-    const audio = await tableTopMongo.tableAudio?.gets.getAllBy_TID(table_id);
+    const audio = await tableTopMongo.tableSoundClips?.gets.getAllBy_TID(
+      table_id
+    );
     const applications =
       await tableTopMongo.tableApplications?.gets.getAllBy_TID(table_id);
 

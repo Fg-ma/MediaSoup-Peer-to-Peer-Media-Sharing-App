@@ -11,6 +11,7 @@ import {
 } from "../../context/effectsContext/typeConstant";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
+import TextMedia from "../../media/fgText/TextMedia";
 
 class SharedBundleController extends SharedBundleSocket {
   constructor(
@@ -94,6 +95,11 @@ class SharedBundleController extends SharedBundleSocket {
           // this.userMedia.current.video[videoId]?.preloadDashStream(url);
         }
         break;
+      // case "truncatedVideoReady":
+      //   shakaPlayer.current?.load(message.url).then(() => {
+      //     console.log("Original video loaded successfully");
+      //   });
+      //   break;
       case "imageReady":
         {
           const { contentId } = message.header;
@@ -128,14 +134,38 @@ class SharedBundleController extends SharedBundleSocket {
           this.setRerender((prev) => !prev);
         }
         break;
+      case "textReady":
+        {
+          const { contentId } = message.header;
+          const { filename, mimeType } = message.data;
+
+          if (this.tableStaticContentSocket.current) {
+            this.userMedia.current.text[contentId] = new TextMedia(
+              contentId,
+              filename,
+              mimeType,
+              this.tableStaticContentSocket.current.getFile,
+              this.tableStaticContentSocket.current.addMessageListener,
+              this.tableStaticContentSocket.current.removeMessageListener,
+              {
+                position: {
+                  left: 50,
+                  top: 50,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              }
+            );
+          }
+          this.setRerender((prev) => !prev);
+        }
+        break;
       case "contentDeleted":
         this.setRerender((prev) => !prev);
         break;
-      // case "truncatedVideoReady":
-      //   shakaPlayer.current?.load(message.url).then(() => {
-      //     console.log("Original video loaded successfully");
-      //   });
-      //   break;
       default:
         break;
     }

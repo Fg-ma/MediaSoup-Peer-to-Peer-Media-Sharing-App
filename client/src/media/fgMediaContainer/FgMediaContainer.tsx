@@ -42,7 +42,7 @@ export default function FgMediaContainer({
   kind: TableContentTypes;
   bundleRef: React.RefObject<HTMLDivElement>;
   media?: React.ReactNode;
-  rootMedia: HTMLImageElement | HTMLVideoElement;
+  rootMedia?: HTMLImageElement | HTMLVideoElement;
   className?: string;
   lowerPopupElements?: (React.ReactNode | null)[];
   leftLowerControls?: (React.ReactNode | null)[];
@@ -157,9 +157,6 @@ export default function FgMediaContainer({
   useEffect(() => {
     mediaContainerController.attachPositioningListeners();
 
-    // Set up initial conditions
-    mediaContainerController.init();
-
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
       mediaContainerController.handleMediasoupMessage
@@ -169,17 +166,12 @@ export default function FgMediaContainer({
 
     document.addEventListener("keyup", lowerController.handleKeyUp);
 
-    rootMedia.addEventListener(
+    rootMedia?.addEventListener(
       "load",
       mediaContainerController.handleMetadataLoaded
     );
 
-    rootMedia.addEventListener(
-      "load",
-      mediaContainerController.handleMetadataLoaded
-    );
-
-    rootMedia.addEventListener(
+    rootMedia?.addEventListener(
       "loadedmetadata",
       mediaContainerController.handleMetadataLoaded
     );
@@ -196,11 +188,11 @@ export default function FgMediaContainer({
       );
       document.removeEventListener("keydown", lowerController.handleKeyDown);
       document.removeEventListener("keyup", lowerController.handleKeyUp);
-      rootMedia.removeEventListener(
+      rootMedia?.removeEventListener(
         "load",
         mediaContainerController.handleMetadataLoaded
       );
-      rootMedia.removeEventListener(
+      rootMedia?.removeEventListener(
         "loadedmetadata",
         mediaContainerController.handleMetadataLoaded
       );
@@ -263,24 +255,48 @@ export default function FgMediaContainer({
           <div className='animated-border-box'></div>
         </>
       )}
+      {mediaContainerOptions.controlsPlacement === "outside" && (
+        <>
+          <UpperControls
+            desync={desync}
+            lowerController={lowerController}
+            leftUpperControls={leftUpperControls}
+            rightUpperControls={rightUpperControls}
+            mediaContainerOptions={mediaContainerOptions}
+          />
+          <LowerControls
+            externalRightLowerControlsRef={externalRightLowerControlsRef}
+            leftLowerControls={leftLowerControls}
+            rightLowerControls={rightLowerControls}
+            lowerPopupElements={lowerPopupElements}
+            mediaContainerOptions={mediaContainerOptions}
+          />
+        </>
+      )}
       <div
         ref={subContainerRef}
         className='flex sub-media-container relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
         {media && media}
-        <UpperControls
-          desync={desync}
-          lowerController={lowerController}
-          leftUpperControls={leftUpperControls}
-          rightUpperControls={rightUpperControls}
-        />
-        <LowerControls
-          externalRightLowerControlsRef={externalRightLowerControlsRef}
-          leftLowerControls={leftLowerControls}
-          rightLowerControls={rightLowerControls}
-          lowerPopupElements={lowerPopupElements}
-        />
-        <Gradient />
+        {mediaContainerOptions.controlsPlacement === "inside" && (
+          <>
+            <UpperControls
+              desync={desync}
+              lowerController={lowerController}
+              leftUpperControls={leftUpperControls}
+              rightUpperControls={rightUpperControls}
+              mediaContainerOptions={mediaContainerOptions}
+            />
+            <LowerControls
+              externalRightLowerControlsRef={externalRightLowerControlsRef}
+              leftLowerControls={leftLowerControls}
+              rightLowerControls={rightLowerControls}
+              lowerPopupElements={lowerPopupElements}
+              mediaContainerOptions={mediaContainerOptions}
+            />
+          </>
+        )}
+        {mediaContainerOptions.gradient && <Gradient />}
       </div>
     </div>
   );
