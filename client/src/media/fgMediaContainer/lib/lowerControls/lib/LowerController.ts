@@ -2,6 +2,7 @@ import TableStaticContentSocketController, {
   TableContentTypes,
 } from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import { MediaContainerOptions } from "../../typeConstant";
 
 class LowerController {
   constructor(
@@ -27,13 +28,16 @@ class LowerController {
         y: number;
       };
       rotation: number;
-    }>
+    }>,
+    private setFullScreen: React.Dispatch<React.SetStateAction<boolean>>,
+    private mediaContainerOptions: MediaContainerOptions
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
-      !this.mediaContainerRef.current?.classList.contains("in-media") ||
+      (!this.mediaContainerRef.current?.classList.contains("in-media") &&
+        !this.mediaContainerRef.current?.classList.contains("full-screen")) ||
       this.mediaContainerRef.current?.classList.contains("in-piano") ||
       this.controlPressed.current ||
       this.shiftPressed.current
@@ -81,6 +85,9 @@ class LowerController {
         break;
       case "h":
         this.handleDesync();
+        break;
+      case "f":
+        this.handleFullScreen();
         break;
       default:
         break;
@@ -190,7 +197,7 @@ class LowerController {
     };
 
     this.fgContentAdjustmentController.scaleDragFunction(
-      "aspect",
+      this.mediaContainerOptions.resizeType ?? "aspect",
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
@@ -242,6 +249,37 @@ class LowerController {
       this.mediaId,
       this.filename
     );
+  };
+
+  handleFullScreen = () => {
+    if (document.fullscreenElement) {
+      document
+        .exitFullscreen()
+        .then(() => {
+          this.mediaContainerRef.current?.classList.remove("full-screen");
+        })
+        .catch((error) => {
+          console.error("Failed to exit full screen:", error);
+        });
+      this.setFullScreen(false);
+    } else {
+      this.mediaContainerRef.current
+        ?.requestFullscreen()
+        .then(() => {
+          this.mediaContainerRef.current?.classList.add("full-screen");
+        })
+        .catch((error) => {
+          console.error("Failed to request full screen:", error);
+        });
+      this.setFullScreen(true);
+    }
+  };
+
+  handleFullScreenChange = () => {
+    if (!document.fullscreenElement) {
+      this.mediaContainerRef.current?.classList.remove("full-screen");
+      this.setFullScreen(false);
+    }
   };
 }
 

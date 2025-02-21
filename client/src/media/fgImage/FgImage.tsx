@@ -11,7 +11,6 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
-import FullScreenButton from "./lib/lowerImageControls/fullScreenButton/FullScreenButton";
 import ImageEffectsButton from "./lib/lowerImageControls/imageEffectsButton/ImageEffectsButton";
 import ImageEffectsSection from "./lib/imageEffectsSection/ImageEffectsSection";
 import DownloadButton from "./lib/lowerImageControls/downloadButton/DownloadButton";
@@ -88,12 +87,6 @@ export default function FgImage({
   useEffect(() => {
     subContainerRef.current?.appendChild(imageMedia.canvas);
 
-    // Add eventlisteners
-    document.addEventListener(
-      "fullscreenchange",
-      lowerImageController.handleFullScreenChange
-    );
-
     document.addEventListener("keydown", lowerImageController.handleKeyDown);
 
     document.addEventListener("keyup", lowerImageController.handleKeyUp);
@@ -104,10 +97,6 @@ export default function FgImage({
     );
 
     return () => {
-      document.removeEventListener(
-        "fullscreenchange",
-        lowerImageController.handleFullScreenChange
-      );
       document.removeEventListener(
         "keydown",
         lowerImageController.handleKeyDown
@@ -152,11 +141,6 @@ export default function FgImage({
       ]}
       leftLowerControls={[]}
       rightLowerControls={[
-        <FullScreenButton
-          lowerImageController={lowerImageController}
-          imageEffectsActive={imageEffectsActive}
-          scrollingContainerRef={rightLowerImageControlsRef}
-        />,
         <SettingsButton
           effectsActive={imageEffectsActive}
           containerRef={imageContainerRef}
@@ -190,6 +174,7 @@ export default function FgImage({
         />,
       ]}
       inMediaVariables={[imageEffectsActive, settingsActive]}
+      preventLowerLabelsVariables={[settingsActive, imageEffectsActive]}
       externalPositioning={positioning}
       externalMediaContainerRef={imageContainerRef}
       externalSubContainerRef={subContainerRef}

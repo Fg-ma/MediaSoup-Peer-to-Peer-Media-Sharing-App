@@ -13,7 +13,6 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
-import FullScreenButton from "./lib/lowerApplicationControls/fullScreenButton/FullScreenButton";
 import ApplicationEffectsButton from "./lib/lowerApplicationControls/applicationEffectsButton/ApplicationEffectsButton";
 import ApplicationEffectsSection from "./lib/applicationEffectsSection/ApplicationEffectsSection";
 import DownloadButton from "./lib/lowerApplicationControls/downloadButton/DownloadButton";
@@ -107,12 +106,6 @@ export default function FgApplication({
     // Set up initial conditions
     applicationController.init();
 
-    // Add eventlisteners
-    document.addEventListener(
-      "fullscreenchange",
-      lowerApplicationController.handleFullScreenChange
-    );
-
     document.addEventListener(
       "keydown",
       lowerApplicationController.handleKeyDown
@@ -126,10 +119,6 @@ export default function FgApplication({
     );
 
     return () => {
-      document.removeEventListener(
-        "fullscreenchange",
-        lowerApplicationController.handleFullScreenChange
-      );
       document.removeEventListener(
         "keydown",
         lowerApplicationController.handleKeyDown
@@ -177,11 +166,6 @@ export default function FgApplication({
       ]}
       leftLowerControls={[]}
       rightLowerControls={[
-        <FullScreenButton
-          lowerApplicationController={lowerApplicationController}
-          applicationEffectsActive={applicationEffectsActive}
-          scrollingContainerRef={rightLowerApplicationControlsRef}
-        />,
         <SettingsButton
           effectsActive={applicationEffectsActive}
           containerRef={applicationContainerRef}
@@ -215,6 +199,7 @@ export default function FgApplication({
         />,
       ]}
       inMediaVariables={[applicationEffectsActive, settingsActive]}
+      preventLowerLabelsVariables={[settingsActive, applicationEffectsActive]}
       externalPositioning={positioning}
       externalMediaContainerRef={applicationContainerRef}
       externalSubContainerRef={subContainerRef}

@@ -6,6 +6,7 @@ import FgContentAdjustmentController from "../../../elements/fgAdjustmentElement
 import TableStaticContentSocketController, {
   TableContentTypes,
 } from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { MediaContainerOptions } from "./typeConstant";
 
 export default function AdjustmentButtons({
   kind,
@@ -16,6 +17,7 @@ export default function AdjustmentButtons({
   fgContentAdjustmentController,
   tableStaticContentSocket,
   aspectRatio,
+  mediaContainerOptions,
 }: {
   kind: TableContentTypes;
   mediaId: string;
@@ -37,6 +39,7 @@ export default function AdjustmentButtons({
     TableStaticContentSocketController | undefined
   >;
   aspectRatio: number | undefined;
+  mediaContainerOptions: MediaContainerOptions;
 }) {
   return (
     <>
@@ -152,7 +155,7 @@ export default function AdjustmentButtons({
           };
 
           fgContentAdjustmentController.scaleDragFunction(
-            "aspect",
+            mediaContainerOptions.resizeType ?? "aspect",
             displacement,
             referencePoint,
             referencePoint,

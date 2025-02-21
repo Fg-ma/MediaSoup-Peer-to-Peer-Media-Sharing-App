@@ -2,6 +2,7 @@ import { TextMediaEvents } from "../TextMedia";
 
 class TextController {
   constructor(
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
@@ -13,6 +14,10 @@ class TextController {
       default:
         break;
     }
+  };
+
+  handleTableScroll = () => {
+    this.setSettingsActive(false);
   };
 }
 

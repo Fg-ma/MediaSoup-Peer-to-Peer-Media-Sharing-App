@@ -73,6 +73,7 @@ export default function FgButton({
   setExternalClickToggleState,
   className,
   style,
+  type = "button",
   options,
   animationOptions,
   ...rest
@@ -101,6 +102,7 @@ export default function FgButton({
   setExternalClickToggleState?: React.Dispatch<React.SetStateAction<boolean>>;
   className?: string;
   style?: React.CSSProperties;
+  type?: "button" | "submit" | "reset";
   options?: FgButtonOptions;
   animationOptions?: {
     variants: Variants;
@@ -252,6 +254,7 @@ export default function FgButton({
           exit: animationOptions.exit,
           whileHover: animationOptions.whileHover,
         })}
+        type={type}
         {...rest}
       >
         {contentFunction && contentFunction()}

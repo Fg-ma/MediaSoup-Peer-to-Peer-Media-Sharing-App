@@ -2,11 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import LowerTextController from "./lib/lowerTextControls/LowerTextController";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
-import FullScreenButton from "./lib/lowerTextControls/fullScreenButton/FullScreenButton";
 import DownloadButton from "./lib/lowerTextControls/downloadButton/DownloadButton";
 import "./lib/fgTextStyles.css";
 import TextController from "./lib/TextController";
 import SettingsButton from "./lib/lowerTextControls/settingsButton/SettingsButton";
+import {
+  ActivePages,
+  defaultActiveSettingsPages,
+  defaultSettings,
+  Settings,
+} from "./lib/typeConstant";
 
 export default function FgText({
   textId,
@@ -34,7 +39,15 @@ export default function FgText({
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
 
-  const [rerender, setRerender] = useState(false);
+  const [_rerender, setRerender] = useState(false);
+
+  const [settingsActive, setSettingsActive] = useState(false);
+  const [settings, setSettings] = useState<Settings>(
+    structuredClone(defaultSettings)
+  );
+  const [activePages, setActivePages] = useState<ActivePages>(
+    defaultActiveSettingsPages
+  );
 
   const lowerTextController = new LowerTextController(
     textMedia,
@@ -43,33 +56,31 @@ export default function FgText({
     controlPressed
   );
 
-  const textController = new TextController(setRerender);
+  const textController = new TextController(setSettingsActive, setRerender);
 
   useEffect(() => {
-    // Add eventlisteners
-    document.addEventListener(
-      "fullscreenchange",
-      lowerTextController.handleFullScreenChange
-    );
-
     document.addEventListener("keydown", lowerTextController.handleKeyDown);
 
     document.addEventListener("keyup", lowerTextController.handleKeyUp);
 
     textMedia.addListener(textController.handleTextMediaEvents);
 
+    tableRef.current?.addEventListener(
+      "scroll",
+      textController.handleTableScroll
+    );
+
     return () => {
-      document.removeEventListener(
-        "fullscreenchange",
-        lowerTextController.handleFullScreenChange
-      );
       document.removeEventListener(
         "keydown",
         lowerTextController.handleKeyDown
       );
       document.removeEventListener("keyup", lowerTextController.handleKeyUp);
-
       textMedia.removeListener(textController.handleTextMediaEvents);
+      tableRef.current?.removeEventListener(
+        "scroll",
+        textController.handleTableScroll
+      );
     };
   }, []);
 
@@ -79,11 +90,20 @@ export default function FgText({
       filename={textMedia.filename}
       kind='text'
       media={
-        <pre className='w-full h-full overflow-auto px-4 pt-3 small-multidirectional-scroll-bar bg-fg-tone-black-1 text-fg-white'>
+        <pre
+          className='w-full h-full overflow-auto px-4 pt-3 small-multidirectional-scroll-bar bg-fg-tone-black-1 text-fg-white'
+          style={{
+            backgroundColor: settings.colors.backgroundColor.value,
+            color: settings.colors.textColor.value,
+          }}
+        >
           {textMedia.text &&
             textMedia.text.split("\n").map((line, index) => (
               <div key={index}>
-                <span className='text-[#22c55e]'>[{index + 1}]</span> {line}
+                <span style={{ color: settings.colors.indexColor.value }}>
+                  [{index + 1}]
+                </span>{" "}
+                {line}
               </div>
             ))}
         </pre>
@@ -91,28 +111,32 @@ export default function FgText({
       bundleRef={bundleRef}
       className='text-container'
       rightLowerControls={[
-        <FullScreenButton
-          lowerTextController={lowerTextController}
-          scrollingContainerRef={rightLowerTextControlsRef}
-        />,
         <SettingsButton
-          settingsPanelRef={}
-          settingsButtonRef={}
-          activePages={}
-          setActivePages={}
-          settings={}
-          setSettings={}
+          containerRef={textContainerRef}
+          settingsActive={settingsActive}
+          setSettingsActive={setSettingsActive}
+          activePages={activePages}
+          setActivePages={setActivePages}
+          settings={settings}
+          setSettings={setSettings}
+          scrollingContainerRef={rightLowerTextControlsRef}
         />,
         <DownloadButton
           lowerTextController={lowerTextController}
           scrollingContainerRef={rightLowerTextControlsRef}
         />,
       ]}
+      inMediaVariables={[settingsActive]}
+      preventLowerLabelsVariables={[settingsActive]}
       externalPositioning={positioning}
       externalMediaContainerRef={textContainerRef}
       externalSubContainerRef={subContainerRef}
       externalRightLowerControlsRef={rightLowerTextControlsRef}
-      options={{ gradient: false, controlsPlacement: "outside" }}
+      options={{
+        gradient: false,
+        controlsPlacement: "outside",
+        resizeType: "any",
+      }}
     />
   );
 }

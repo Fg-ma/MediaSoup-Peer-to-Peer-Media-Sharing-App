@@ -36,34 +36,6 @@ class LowerApplicationController {
     this.setApplicationEffectsActive((prev) => !prev);
   };
 
-  handleFullScreen = () => {
-    if (document.fullscreenElement) {
-      document
-        .exitFullscreen()
-        .then(() => {
-          this.applicationContainerRef.current?.classList.remove("full-screen");
-        })
-        .catch((error) => {
-          console.error("Failed to exit full screen:", error);
-        });
-    } else {
-      this.applicationContainerRef.current
-        ?.requestFullscreen()
-        .then(() => {
-          this.applicationContainerRef.current?.classList.add("full-screen");
-        })
-        .catch((error) => {
-          console.error("Failed to request full screen:", error);
-        });
-    }
-  };
-
-  handleFullScreenChange = () => {
-    if (!document.fullscreenElement) {
-      this.applicationContainerRef.current?.classList.remove("full-screen");
-    }
-  };
-
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
@@ -83,9 +55,6 @@ class LowerApplicationController {
         break;
       case "control":
         this.controlPressed.current = true;
-        break;
-      case "f":
-        this.handleFullScreen();
         break;
       case "e":
         this.handleApplicationEffects();

@@ -210,9 +210,7 @@ class FgContentAdjustmentController {
               },
       };
       this.setRerender((prev) => !prev);
-    } else if (isOutside && kind !== "square") {
-      // Keep existing outside handling logic...
-    } else if (isOutside && kind === "square") {
+    } else if (kind === "square") {
       const maxDims =
         (this.getMaxSquareAspectDim(
           referenceX,
@@ -237,6 +235,99 @@ class FgContentAdjustmentController {
         },
       };
       this.setRerender((prev) => !prev);
+    } else if (kind === "aspect") {
+      const maxDims = this.getMaxAspectDim(
+        referenceX,
+        referenceY,
+        theta,
+        rotationPoint.x,
+        rotationPoint.y,
+        width,
+        height,
+        aspectRatio!
+      );
+
+      this.positioning.current = {
+        ...this.positioning.current,
+        scale: {
+          x: (maxDims.width / this.bundleRef.current.clientWidth) * 100,
+          y: (maxDims.height / this.bundleRef.current.clientHeight) * 100,
+        },
+      };
+      this.setRerender((prev) => !prev);
+    } else {
+      const isWidthOutside = this.isBoxOutside(
+        referenceX,
+        referenceY,
+        theta,
+        ADotB,
+        (this.positioning.current.scale.y / 100) *
+          this.bundleRef.current.clientHeight,
+        referenceX,
+        referenceY
+      );
+
+      if (!isWidthOutside) {
+        const maxHeight =
+          (this.getMaxHeight(
+            referenceX,
+            referenceY,
+            theta,
+            rotationPoint.x,
+            rotationPoint.y,
+            ADotB,
+            (this.positioning.current.scale.y / 100) *
+              this.bundleRef.current.clientHeight
+          ) /
+            this.bundleRef.current.clientHeight) *
+          100;
+
+        this.positioning.current = {
+          ...this.positioning.current,
+          scale: {
+            x: width,
+            y:
+              height > maxHeight ? maxHeight : this.positioning.current.scale.y,
+          },
+        };
+        this.setRerender((prev) => !prev);
+      } else {
+        const isHeightOutside = this.isBoxOutside(
+          referenceX,
+          referenceY,
+          theta,
+          (this.positioning.current.scale.x / 100) *
+            this.bundleRef.current.clientWidth,
+          BPerpMag,
+          referenceX,
+          referenceY
+        );
+
+        if (!isHeightOutside) {
+          const maxWidth =
+            (this.getMaxWidth(
+              referenceX,
+              referenceY,
+              theta,
+              rotationPoint.x,
+              rotationPoint.y,
+              (this.positioning.current.scale.x / 100) *
+                this.bundleRef.current.clientWidth,
+              BPerpMag
+            ) /
+              this.bundleRef.current.clientWidth) *
+            100;
+
+          this.positioning.current = {
+            ...this.positioning.current,
+            scale: {
+              x: width > maxWidth ? maxWidth : this.positioning.current.scale.x,
+              y: height,
+            },
+          };
+          this.setRerender((prev) => !prev);
+        }
+      }
     }
   };
 
@@ -490,6 +581,153 @@ class FgContentAdjustmentController {
     }
 
     return startDim + i - 1;
+  };
+
+  private getMaxAspectDim = (
+    left: number,
+    top: number,
+    theta: number,
+    rotationPointX: number,
+    rotationPointY: number,
+    width: number,
+    height: number,
+    aspectRatio: number
+  ) => {
+    let isOutside = false;
+    let i = -8;
+
+    const startWidth = Math.min(width, height * aspectRatio);
+    const startHeight = startWidth / aspectRatio;
+
+    while (!isOutside) {
+      i += 8;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        startWidth + i,
+        (startWidth + i) / aspectRatio,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    isOutside = false;
+    i -= 9;
+
+    while (!isOutside) {
+      i += 1;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        startWidth + i,
+        (startWidth + i) / aspectRatio,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    return {
+      width: startWidth + i - 1,
+      height: (startWidth + i - 1) / aspectRatio,
+    };
+  };
+
+  private getMaxWidth = (
+    left: number,
+    top: number,
+    theta: number,
+    rotationPointX: number,
+    rotationPointY: number,
+    startWidth: number,
+    height: number
+  ) => {
+    let isOutside = false;
+    let i = -4;
+
+    while (!isOutside) {
+      i += 4;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        startWidth + i,
+        height,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    isOutside = false;
+
+    i -= 5;
+
+    while (!isOutside) {
+      i += 1;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        startWidth + i,
+        height,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    return startWidth + i - 1;
+  };
+
+  private getMaxHeight = (
+    left: number,
+    top: number,
+    theta: number,
+    rotationPointX: number,
+    rotationPointY: number,
+    width: number,
+    startHeight: number
+  ) => {
+    let isOutside = false;
+    let i = -4;
+
+    while (!isOutside) {
+      i += 4;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        width,
+        startHeight + i,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    isOutside = false;
+
+    i -= 5;
+
+    while (!isOutside) {
+      i += 1;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        width,
+        startHeight + i,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    return startHeight + i - 1;
   };
 
   private calculateRotationAngle = (

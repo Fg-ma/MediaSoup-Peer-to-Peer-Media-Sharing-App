@@ -31,6 +31,7 @@ export default function FgMediaContainer({
   leftUpperControls,
   rightUpperControls,
   inMediaVariables,
+  preventLowerLabelsVariables,
   externalPositioning,
   externalMediaContainerRef,
   externalSubContainerRef,
@@ -50,6 +51,7 @@ export default function FgMediaContainer({
   leftUpperControls?: (React.ReactNode | null)[];
   rightUpperControls?: (React.ReactNode | null)[];
   inMediaVariables?: boolean[];
+  preventLowerLabelsVariables?: boolean[];
   externalPositioning?: React.MutableRefObject<{
     position: {
       left: number;
@@ -82,6 +84,7 @@ export default function FgMediaContainer({
   const panBtnRef = useRef<HTMLButtonElement>(null);
 
   const [inMedia, setInMedia] = useState(false);
+  const [fullscreen, setFullScreen] = useState(false);
 
   const leaveTimer = useRef<NodeJS.Timeout | undefined>(undefined);
   const movementTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -133,7 +136,9 @@ export default function FgMediaContainer({
     shiftPressed,
     controlPressed,
     fgContentAdjustmentController,
-    positioning
+    positioning,
+    setFullScreen,
+    mediaContainerOptions
   );
 
   const mediaContainerController = new MediaContainerController(
@@ -176,6 +181,11 @@ export default function FgMediaContainer({
       mediaContainerController.handleMetadataLoaded
     );
 
+    document.addEventListener(
+      "fullscreenchange",
+      lowerController.handleFullScreenChange
+    );
+
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
@@ -195,6 +205,10 @@ export default function FgMediaContainer({
       rootMedia?.removeEventListener(
         "loadedmetadata",
         mediaContainerController.handleMetadataLoaded
+      );
+      document.removeEventListener(
+        "fullscreenchange",
+        lowerController.handleFullScreenChange
       );
     };
   }, []);
@@ -225,6 +239,8 @@ export default function FgMediaContainer({
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
+      } ${
+        fullscreen ? "full-screen" : ""
       } ${className} flex items-center justify-center`}
       style={{
         position: "absolute",
@@ -248,6 +264,7 @@ export default function FgMediaContainer({
         fgContentAdjustmentController={fgContentAdjustmentController}
         tableStaticContentSocket={tableStaticContentSocket}
         aspectRatio={aspectRatio}
+        mediaContainerOptions={mediaContainerOptions}
       />
       {adjustingDimensions && (
         <>
@@ -255,7 +272,7 @@ export default function FgMediaContainer({
           <div className='animated-border-box'></div>
         </>
       )}
-      {mediaContainerOptions.controlsPlacement === "outside" && (
+      {mediaContainerOptions.controlsPlacement === "outside" && !fullscreen && (
         <>
           <UpperControls
             desync={desync}
@@ -263,13 +280,17 @@ export default function FgMediaContainer({
             leftUpperControls={leftUpperControls}
             rightUpperControls={rightUpperControls}
             mediaContainerOptions={mediaContainerOptions}
+            fullscreen={fullscreen}
           />
           <LowerControls
+            lowerController={lowerController}
             externalRightLowerControlsRef={externalRightLowerControlsRef}
             leftLowerControls={leftLowerControls}
             rightLowerControls={rightLowerControls}
             lowerPopupElements={lowerPopupElements}
             mediaContainerOptions={mediaContainerOptions}
+            preventLowerLabelsVariables={preventLowerLabelsVariables}
+            fullscreen={fullscreen}
           />
         </>
       )}
@@ -278,7 +299,8 @@ export default function FgMediaContainer({
         className='flex sub-media-container relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
         {media && media}
-        {mediaContainerOptions.controlsPlacement === "inside" && (
+        {(mediaContainerOptions.controlsPlacement === "inside" ||
+          fullscreen) && (
           <>
             <UpperControls
               desync={desync}
@@ -286,17 +308,21 @@ export default function FgMediaContainer({
               leftUpperControls={leftUpperControls}
               rightUpperControls={rightUpperControls}
               mediaContainerOptions={mediaContainerOptions}
+              fullscreen={fullscreen}
             />
             <LowerControls
+              lowerController={lowerController}
               externalRightLowerControlsRef={externalRightLowerControlsRef}
               leftLowerControls={leftLowerControls}
               rightLowerControls={rightLowerControls}
               lowerPopupElements={lowerPopupElements}
               mediaContainerOptions={mediaContainerOptions}
+              preventLowerLabelsVariables={preventLowerLabelsVariables}
+              fullscreen={fullscreen}
             />
           </>
         )}
-        {mediaContainerOptions.gradient && <Gradient />}
+        {(mediaContainerOptions.gradient || fullscreen) && <Gradient />}
       </div>
     </div>
   );

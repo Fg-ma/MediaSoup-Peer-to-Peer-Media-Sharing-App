@@ -1,18 +1,26 @@
 import React, { useEffect, useRef } from "react";
 import { MediaContainerOptions } from "../typeConstant";
+import FullScreenButton from "./lib/fullScreenButton/FullScreenButton";
+import LowerController from "./lib/LowerController";
 
 export default function LowerControls({
+  lowerController,
   externalRightLowerControlsRef,
   leftLowerControls,
   rightLowerControls,
   lowerPopupElements,
   mediaContainerOptions,
+  preventLowerLabelsVariables,
+  fullscreen,
 }: {
+  lowerController: LowerController;
   externalRightLowerControlsRef?: React.RefObject<HTMLDivElement>;
   leftLowerControls?: (React.ReactNode | null)[];
   rightLowerControls?: (React.ReactNode | null)[];
   lowerPopupElements?: (React.ReactNode | null)[];
   mediaContainerOptions: MediaContainerOptions;
+  preventLowerLabelsVariables?: boolean[];
+  fullscreen: boolean;
 }) {
   const rightControlsRef = externalRightLowerControlsRef
     ? externalRightLowerControlsRef
@@ -42,7 +50,7 @@ export default function LowerControls({
   return (
     <div
       className={`media-controls-container ${
-        mediaContainerOptions.controlsPlacement === "inside"
+        mediaContainerOptions.controlsPlacement === "inside" || fullscreen
           ? "bottom-0"
           : "top-full"
       } absolute w-full h-max flex-col items-end justify-center z-20 pointer-events-none`}
@@ -67,6 +75,11 @@ export default function LowerControls({
           ref={rightControlsRef}
           className='hide-scroll-bar w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
         >
+          <FullScreenButton
+            lowerController={lowerController}
+            preventLowerLabelsVariables={preventLowerLabelsVariables}
+            scrollingContainerRef={rightControlsRef}
+          />
           {rightLowerControls &&
             rightLowerControls.length > 0 &&
             rightLowerControls.map((control, index) => (

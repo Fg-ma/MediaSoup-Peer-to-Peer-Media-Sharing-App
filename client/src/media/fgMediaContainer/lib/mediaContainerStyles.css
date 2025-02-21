@@ -99,3 +99,25 @@
     transform: translate(-50%, -50%) rotate(1turn);
   }
 }
+
+/* full-screen */
+.media-container.full-screen {
+  max-width: initial;
+  width: 100% !important;
+  max-height: 100vh !important;
+  left: 0% !important;
+  top: 0% !important;
+  rotate: 0deg !important;
+  border-radius: 0%;
+}
+
+.media-container.full-screen .media-controls {
+  padding-inline: 2.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.media-container.full-screen .media-upper-controls {
+  padding-left: 2.5rem;
+  padding-right: 1.5rem;
+  margin-top: 1.25rem;
+}

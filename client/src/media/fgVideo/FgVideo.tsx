@@ -14,7 +14,6 @@ import {
 } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import VideoEffectsSection from "./lib/videoEffectsSection/VideoEffectsSection";
-import FullScreenButton from "./lib/lowerVideoControls/fullScreenButton/FullScreenButton";
 import VideoEffectsButton from "./lib/lowerVideoControls/videoEffectsButton/VideoEffectsButton";
 import PlayPauseButton from "./lib/lowerVideoControls/playPauseButton/PlayPauseButton";
 import PictureInPictureButton from "./lib/lowerVideoControls/pictureInPictureButton/PictureInPictureButton";
@@ -156,12 +155,6 @@ export default function FgVideo({
       lowerVideoController.timeUpdate
     );
 
-    // Add eventlisteners
-    document.addEventListener(
-      "fullscreenchange",
-      lowerVideoController.handleFullScreenChange
-    );
-
     document.addEventListener("keydown", lowerVideoController.handleKeyDown);
 
     document.addEventListener("keyup", lowerVideoController.handleKeyUp);
@@ -181,10 +174,6 @@ export default function FgVideo({
         )
       );
       positioningListeners.current = {};
-      document.removeEventListener(
-        "fullscreenchange",
-        lowerVideoController.handleFullScreenChange
-      );
       document.removeEventListener(
         "keydown",
         lowerVideoController.handleKeyDown
@@ -262,11 +251,6 @@ export default function FgVideo({
         </div>,
       ]}
       rightLowerControls={[
-        <FullScreenButton
-          lowerVideoController={lowerVideoController}
-          videoEffectsActive={videoEffectsActive}
-          scrollingContainerRef={rightLowerVideoControlsRef}
-        />,
         <PictureInPictureButton
           lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
@@ -345,6 +329,7 @@ export default function FgVideo({
         // />,
       ]}
       inMediaVariables={[videoEffectsActive, pausedState, settingsActive]}
+      preventLowerLabelsVariables={[settingsActive, videoEffectsActive]}
       externalPositioning={positioning}
       externalMediaContainerRef={videoContainerRef}
       externalSubContainerRef={subContainerRef}

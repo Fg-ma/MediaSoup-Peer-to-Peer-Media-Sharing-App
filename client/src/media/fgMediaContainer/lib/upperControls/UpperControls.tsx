@@ -10,17 +10,19 @@ export default function UpperControls({
   leftUpperControls,
   rightUpperControls,
   mediaContainerOptions,
+  fullscreen,
 }: {
   desync: boolean;
   lowerController: LowerController;
   leftUpperControls?: (React.ReactNode | null)[];
   rightUpperControls?: (React.ReactNode | null)[];
   mediaContainerOptions: MediaContainerOptions;
+  fullscreen: boolean;
 }) {
   return (
     <div
       className={`flex media-upper-controls ${
-        mediaContainerOptions.controlsPlacement === "inside"
+        mediaContainerOptions.controlsPlacement === "inside" || fullscreen
           ? "top-0"
           : "bottom-full"
       } absolute w-full h-10 items-center justify-between z-20`}

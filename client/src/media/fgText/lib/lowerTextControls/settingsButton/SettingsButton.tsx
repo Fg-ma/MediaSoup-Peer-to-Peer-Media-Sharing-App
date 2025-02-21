@@ -10,7 +10,6 @@ type RecursiveObject = {
 };
 
 export default function SettingsButton({
-  effectsActive,
   containerRef,
   settingsActive,
   setSettingsActive,
@@ -20,7 +19,6 @@ export default function SettingsButton({
   setSettings,
   scrollingContainerRef,
 }: {
-  effectsActive: boolean;
   containerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -117,7 +115,7 @@ export default function SettingsButton({
           </svg>
         )}
         hoverContent={
-          !effectsActive && !settingsActive ? (
+          !settingsActive ? (
             <FgHoverContentStandard content='Settings (U)' style='dark' />
           ) : undefined
         }

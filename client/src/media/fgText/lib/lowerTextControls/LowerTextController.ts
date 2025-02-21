@@ -11,34 +11,6 @@ class LowerTextController {
     private controlPressed: React.MutableRefObject<boolean>
   ) {}
 
-  handleFullScreen = () => {
-    if (document.fullscreenElement) {
-      document
-        .exitFullscreen()
-        .then(() => {
-          this.textContainerRef.current?.classList.remove("full-screen");
-        })
-        .catch((error) => {
-          console.error("Failed to exit full screen:", error);
-        });
-    } else {
-      this.textContainerRef.current
-        ?.requestFullscreen()
-        .then(() => {
-          this.textContainerRef.current?.classList.add("full-screen");
-        })
-        .catch((error) => {
-          console.error("Failed to request full screen:", error);
-        });
-    }
-  };
-
-  handleFullScreenChange = () => {
-    if (!document.fullscreenElement) {
-      this.textContainerRef.current?.classList.remove("full-screen");
-    }
-  };
-
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
@@ -58,9 +30,6 @@ class LowerTextController {
         break;
       case "control":
         this.controlPressed.current = true;
-        break;
-      case "f":
-        this.handleFullScreen();
         break;
       case "d":
         this.handleDownload();

@@ -84,34 +84,6 @@ class LowerVideoController {
     this.setAudioEffectsActive((prev) => !prev);
   };
 
-  handleFullScreen = () => {
-    if (document.fullscreenElement) {
-      document
-        .exitFullscreen()
-        .then(() => {
-          this.videoContainerRef.current?.classList.remove("full-screen");
-        })
-        .catch((error) => {
-          console.error("Failed to exit full screen:", error);
-        });
-    } else {
-      this.videoContainerRef.current
-        ?.requestFullscreen()
-        .then(() => {
-          this.videoContainerRef.current?.classList.add("full-screen");
-        })
-        .catch((error) => {
-          console.error("Failed to request full screen:", error);
-        });
-    }
-  };
-
-  handleFullScreenChange = () => {
-    if (!document.fullscreenElement) {
-      this.videoContainerRef.current?.classList.remove("full-screen");
-    }
-  };
-
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
@@ -142,9 +114,6 @@ class LowerVideoController {
         break;
       case "k":
         this.handlePausePlay();
-        break;
-      case "f":
-        this.handleFullScreen();
         break;
       case "i":
         this.handleMiniPlayer();
