@@ -3,6 +3,7 @@ import TableStaticContentSocketController, {
 } from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaContainerOptions } from "../../typeConstant";
+import { TableReactions } from "../../upperControls/lib/reactButton/lib/typeConstant";
 
 class LowerController {
   constructor(
@@ -30,7 +31,11 @@ class LowerController {
       rotation: number;
     }>,
     private setFullScreen: React.Dispatch<React.SetStateAction<boolean>>,
-    private mediaContainerOptions: MediaContainerOptions
+    private mediaContainerOptions: MediaContainerOptions,
+    private setDesync: React.Dispatch<React.SetStateAction<boolean>>,
+    private setReactionsPanelActive: React.Dispatch<
+      React.SetStateAction<boolean>
+    >
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -89,12 +94,17 @@ class LowerController {
       case "f":
         this.handleFullScreen();
         break;
+      case "q":
+        this.handleReact();
+        break;
       default:
         break;
     }
   };
 
-  handleDesync = () => {};
+  handleDesync = () => {
+    this.setDesync((prev) => !prev);
+  };
 
   scaleFunctionEnd = () => {
     this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
@@ -281,6 +291,12 @@ class LowerController {
       this.setFullScreen(false);
     }
   };
+
+  handleReact = () => {
+    this.setReactionsPanelActive((prev) => !prev);
+  };
+
+  handleReaction = (reaction: TableReactions) => {};
 }
 
 export default LowerController;

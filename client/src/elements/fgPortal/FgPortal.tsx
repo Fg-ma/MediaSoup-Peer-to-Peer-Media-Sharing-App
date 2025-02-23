@@ -22,21 +22,31 @@ const FgPortalTransition: Transition = {
 };
 
 export default function FgPortal({
-  type,
+  className,
+  type = "above",
   mouseType = "topRight",
   spacing,
   content,
   externalRef,
   externalPortalRef,
+  insertionPoint,
   zValue = 51,
+  options = {
+    animate: true,
+  },
 }: {
-  type: "above" | "below" | "left" | "right" | "mouse";
+  className?: string;
+  type?: "above" | "below" | "left" | "right" | "mouse";
   mouseType?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
   spacing?: number;
-  content: React.ReactElement;
+  content?: React.ReactElement;
   externalRef?: React.RefObject<HTMLElement>;
   externalPortalRef?: React.RefObject<HTMLDivElement>;
+  insertionPoint?: React.RefObject<HTMLElement>;
   zValue?: number;
+  options?: {
+    animate: boolean;
+  };
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -55,13 +65,17 @@ export default function FgPortal({
   );
 
   useEffect(() => {
-    if (
-      type === "above" ||
-      type === "below" ||
-      type === "left" ||
-      type === "right"
-    ) {
-      fgPortalController.getStaticPortalPosition();
+    if (insertionPoint) {
+      setPortalPosition({ left: 0, top: 0 });
+    } else {
+      if (
+        type === "above" ||
+        type === "below" ||
+        type === "left" ||
+        type === "right"
+      ) {
+        fgPortalController.getStaticPortalPosition();
+      }
     }
 
     if (type === "mouse")
@@ -84,20 +98,26 @@ export default function FgPortal({
   return ReactDOM.createPortal(
     <motion.div
       ref={portalRef}
-      className={`absolute`}
+      className={`${className} absolute`}
       style={{
         top: `${portalPosition?.top}px`,
         left: `${portalPosition?.left}px`,
         zIndex: zValue,
       }}
-      variants={FgPortalVar}
-      initial='init'
-      animate='animate'
-      exit='init'
-      transition={FgPortalTransition}
+      {...(options.animate
+        ? {
+            variants: FgPortalVar,
+            initial: "init",
+            animate: "animate",
+            exit: "init",
+            transition: FgPortalTransition,
+          }
+        : {})}
     >
       {content}
     </motion.div>,
-    document.body
+    insertionPoint && insertionPoint.current
+      ? insertionPoint.current
+      : document.body
   );
 }

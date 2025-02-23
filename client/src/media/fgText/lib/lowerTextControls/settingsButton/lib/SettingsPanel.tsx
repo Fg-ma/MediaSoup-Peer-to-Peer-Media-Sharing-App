@@ -49,6 +49,7 @@ export default function SettingsPanel({
   setActivePages,
   settings,
   setSettings,
+  externalColorPickerPanelRefs,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -56,6 +57,11 @@ export default function SettingsPanel({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  externalColorPickerPanelRefs: {
+    backgroundColor: React.RefObject<HTMLDivElement>;
+    textColor: React.RefObject<HTMLDivElement>;
+    indexColor: React.RefObject<HTMLDivElement>;
+  };
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -143,7 +149,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-fg-tone-black-1 font-K2D text-base text-white pointer-events-auto'
+      className='flex max-h-80 w-64 absolute z-10 p-2 h-max shadow-md rounded-md bg-fg-tone-black-1 font-K2D text-base text-white pointer-events-auto'
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -189,6 +195,7 @@ export default function SettingsPanel({
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}
+                externalColorPickerPanelRefs={externalColorPickerPanelRefs}
               />
             </motion.div>
           )}

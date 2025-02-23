@@ -1,15 +1,20 @@
-import { TextMediaEvents } from "../TextMedia";
+import TextMedia, { TextMediaEvents } from "../TextMedia";
 
 class TextController {
   constructor(
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private text: React.MutableRefObject<string>,
+    private textMedia: TextMedia
   ) {}
 
   handleTextMediaEvents = (event: TextMediaEvents) => {
     switch (event.type) {
       case "textFinishedLoading":
-        this.setRerender((prev) => !prev);
+        if (this.textMedia.text) {
+          this.text.current = this.textMedia.text;
+          this.setRerender((prev) => !prev);
+        }
         break;
       default:
         break;

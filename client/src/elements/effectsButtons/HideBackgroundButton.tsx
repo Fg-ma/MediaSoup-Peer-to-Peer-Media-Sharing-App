@@ -1,4 +1,4 @@
-import React, { useRef, useState, Suspense } from "react";
+import React, { useRef, useState } from "react";
 import { HideBackgroundEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
@@ -6,8 +6,7 @@ import FgImageElement from "../fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingContainer";
 import { backgroundChoices, hideBackgroundLabels } from "./typeConstant";
-
-const ColorPicker = React.lazy(() => import("./ColorPicker"));
+import ColorPickerButton from "../colorPickerButton/ColorPickerButton";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -41,17 +40,8 @@ export default function HideBackgroundButton({
   acceptColorCallback?: (color: string) => Promise<void>;
 }) {
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
-  const [color, setColor] = useState("#F56114");
-  const [isColorPicker, setIsColorPicker] = useState(false);
-  const [tempColor, setTempColor] = useState(color);
-  const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
   const hideBackgroundContainerRef = useRef<HTMLDivElement>(null);
-  const colorRef = useRef("#F56114");
-
-  const handleColorPicker = () => {
-    setTempColor(colorRef.current);
-    setIsColorPicker((prev) => !prev);
-  };
+  const colorRef = useRef("#d40213");
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
@@ -194,34 +184,13 @@ export default function HideBackgroundButton({
           holdKind: "toggle",
         }}
       />
-      <div className='flex items-center justify-center min-w-10 w-10 aspect-square'>
-        <FgButton
-          externalRef={colorPickerBtnRef}
-          clickFunction={() => handleColorPicker()}
-          hoverContent={<FgHoverContentStandard content='Color picker' />}
-          scrollingContainerRef={scrollingContainerRef}
-          className='border w-6 h-6 m-2 border-white rounded'
-          style={{ backgroundColor: tempColor }}
-          options={{
-            hoverTimeoutDuration: 750,
-            disabled: effectsDisabled,
-          }}
-        />
-        {isColorPicker && (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ColorPicker
-              color={color}
-              setColor={setColor}
-              tempColor={tempColor}
-              setTempColor={setTempColor}
-              setIsColorPicker={setIsColorPicker}
-              colorRef={colorRef}
-              colorPickerBtnRef={colorPickerBtnRef}
-              handleAcceptColorCallback={handleAcceptColorCallback}
-            />
-          </Suspense>
-        )}
-      </div>
+      <ColorPickerButton
+        className='min-w-8 w-8 mx-1'
+        scrollingContainerRef={scrollingContainerRef}
+        handleAcceptColorCallback={handleAcceptColorCallback}
+        externalColorRef={colorRef}
+        disabled={effectsDisabled}
+      />
     </div>
   );
 }

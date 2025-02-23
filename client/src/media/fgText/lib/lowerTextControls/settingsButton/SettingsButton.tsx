@@ -30,6 +30,9 @@ export default function SettingsButton({
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
+  const backgroundColorPickerPanelRef = useRef<HTMLDivElement>(null);
+  const textColorPickerPanelRef = useRef<HTMLDivElement>(null);
+  const indexColorPickerPanelRef = useRef<HTMLDivElement>(null);
 
   const deactivateAll = (obj: RecursiveObject) => {
     // Check if the current object has an 'active' property and if it's true
@@ -67,18 +70,21 @@ export default function SettingsButton({
     }
   };
 
+  const handleCloseSettings = (event: PointerEvent) => {
+    const target = event.target as Node;
+
+    if (
+      !settingsButtonRef.current?.contains(target) &&
+      !settingsPanelRef.current?.contains(target) &&
+      !backgroundColorPickerPanelRef.current?.contains(target) &&
+      !textColorPickerPanelRef.current?.contains(target) &&
+      !indexColorPickerPanelRef.current?.contains(target)
+    ) {
+      toggleSettings();
+    }
+  };
+
   useEffect(() => {
-    const handleCloseSettings = (event: PointerEvent) => {
-      const target = event.target as Node;
-
-      if (
-        !settingsButtonRef.current?.contains(target) &&
-        !settingsPanelRef.current?.contains(target)
-      ) {
-        toggleSettings();
-      }
-    };
-
     if (settingsActive) {
       document.addEventListener("pointerdown", handleCloseSettings);
     }
@@ -129,6 +135,11 @@ export default function SettingsButton({
           setActivePages={setActivePages}
           settings={settings}
           setSettings={setSettings}
+          externalColorPickerPanelRefs={{
+            backgroundColor: backgroundColorPickerPanelRef,
+            textColor: textColorPickerPanelRef,
+            indexColor: indexColorPickerPanelRef,
+          }}
         />
       )}
     </>

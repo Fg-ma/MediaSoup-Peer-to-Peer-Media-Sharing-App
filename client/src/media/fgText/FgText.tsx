@@ -12,6 +12,7 @@ import {
   defaultSettings,
   Settings,
 } from "./lib/typeConstant";
+import EditableText from "./EditableText";
 
 export default function FgText({
   textId,
@@ -39,7 +40,7 @@ export default function FgText({
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
 
-  const [_rerender, setRerender] = useState(false);
+  const text = useRef("");
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
@@ -49,6 +50,8 @@ export default function FgText({
     defaultActiveSettingsPages
   );
 
+  const [_, setRerender] = useState(false);
+
   const lowerTextController = new LowerTextController(
     textMedia,
     textContainerRef,
@@ -56,7 +59,12 @@ export default function FgText({
     controlPressed
   );
 
-  const textController = new TextController(setSettingsActive, setRerender);
+  const textController = new TextController(
+    setSettingsActive,
+    setRerender,
+    text,
+    textMedia
+  );
 
   useEffect(() => {
     document.addEventListener("keydown", lowerTextController.handleKeyDown);
@@ -90,23 +98,38 @@ export default function FgText({
       filename={textMedia.filename}
       kind='text'
       media={
-        <pre
-          className='w-full h-full overflow-auto px-4 pt-3 small-multidirectional-scroll-bar bg-fg-tone-black-1 text-fg-white'
-          style={{
-            backgroundColor: settings.colors.backgroundColor.value,
-            color: settings.colors.textColor.value,
-          }}
-        >
-          {textMedia.text &&
-            textMedia.text.split("\n").map((line, index) => (
-              <div key={index}>
-                <span style={{ color: settings.colors.indexColor.value }}>
-                  [{index + 1}]
-                </span>{" "}
-                {line}
-              </div>
-            ))}
-        </pre>
+        // <pre
+        //   className='w-full h-full overflow-auto px-4 pt-3 small-multidirectional-scroll-bar bg-fg-tone-black-1 text-fg-white'
+        //   style={{
+        //     backgroundColor: settings.colors.backgroundColor.value,
+        //     color: settings.colors.textColor.value,
+        //   }}
+        //   contentEditable
+        //   suppressContentEditableWarning // Prevent React warnings about contentEditable
+        // >
+        //   {textMedia.text &&
+        //     (() => {
+        //       const maxDigits = String(
+        //         textMedia.text.split("\n").length
+        //       ).length; // Get max digit length
+        //       return textMedia.text.split("\n").map((line, index) => (
+        //         <div key={index}>
+        //           <span
+        //             className='select-none'
+        //             style={{
+        //               color: settings.colors.indexColor.value,
+        //               whiteSpace: "pre",
+        //             }}
+        //             contentEditable={false}
+        //           >
+        //             [{String(index + 1).padStart(maxDigits, " ")}]{" "}
+        //           </span>
+        //           {line}
+        //         </div>
+        //       ));
+        //     })()}
+        // </pre>
+        <EditableText text={text} settings={settings} />
       }
       bundleRef={bundleRef}
       className='text-container'

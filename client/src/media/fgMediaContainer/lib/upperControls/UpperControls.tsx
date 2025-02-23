@@ -2,10 +2,12 @@ import React from "react";
 import LowerController from "../lowerControls/lib/LowerController";
 import CloseButton from "./lib/closeButton/CloseButton";
 import SyncButton from "./lib/syncButton/SyncButton";
+import ReactButton from "./lib/reactButton/ReactButton";
 import { MediaContainerOptions } from "../typeConstant";
 
 export default function UpperControls({
   desync,
+  reactionsPanelActive,
   lowerController,
   leftUpperControls,
   rightUpperControls,
@@ -13,6 +15,7 @@ export default function UpperControls({
   fullscreen,
 }: {
   desync: boolean;
+  reactionsPanelActive: boolean;
   lowerController: LowerController;
   leftUpperControls?: (React.ReactNode | null)[];
   rightUpperControls?: (React.ReactNode | null)[];
@@ -34,6 +37,10 @@ export default function UpperControls({
         {rightUpperControls &&
           rightUpperControls.length > 0 &&
           rightUpperControls}
+        <ReactButton
+          reactionsPanelActive={reactionsPanelActive}
+          lowerController={lowerController}
+        />
         <SyncButton desync={desync} lowerController={lowerController} />
         <CloseButton lowerController={lowerController} />
       </div>

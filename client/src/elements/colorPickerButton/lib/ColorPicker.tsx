@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import FgPanel from "../fgPanel/FgPanel";
+import FgPanel from "../../fgPanel/FgPanel";
 
 export default function ColorPicker({
   color,
@@ -11,6 +11,7 @@ export default function ColorPicker({
   colorRef,
   colorPickerBtnRef,
   handleAcceptColorCallback,
+  externalColorPickerPanelRef,
 }: {
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
@@ -20,6 +21,7 @@ export default function ColorPicker({
   colorRef: React.MutableRefObject<string>;
   colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
   handleAcceptColorCallback?: () => void;
+  externalColorPickerPanelRef?: React.RefObject<HTMLDivElement>;
 }) {
   const [hexValue, setHexValue] = useState(color.slice(1));
   const colorPickerRef = useRef<HTMLDivElement>(null);
@@ -107,6 +109,7 @@ export default function ColorPicker({
 
   return (
     <FgPanel
+      externalRef={externalColorPickerPanelRef}
       content={
         <div ref={colorPickerRef} className='flex flex-col space-y-2'>
           <HexColorPicker color={tempColor} onChange={handleChangeComplete} />
