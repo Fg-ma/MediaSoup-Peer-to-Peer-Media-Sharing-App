@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import { Settings, ActivePages } from "../../../typeConstant";
 import ColorsPage from "./ColorsPage";
+import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+
+const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
+const minusIcon = nginxAssetSeverBaseUrl + "svgs/minusIcon.svg";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -170,14 +177,82 @@ export default function SettingsPanel({
             exit='exit'
           >
             <FgButton
-              className='w-full'
+              className='w-full h-7'
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-gray-400 justify-start px-2 rounded items-center'>
+                <div className='flex w-full text-nowrap hover:bg-gray-400 justify-start px-2 rounded items-center text-lg'>
                   Colors
                 </div>
               )}
               clickFunction={handleColorsActive}
             />
+            <div className='flex w-full h-7 items-center justify-between'>
+              <div className='flex w-max text-nowrap justify-start px-2 rounded items-center text-lg'>
+                Font size
+              </div>
+              <div className='flex w-max h-full items-center justify-center space-x-1'>
+                <FgButton
+                  className='h-full'
+                  contentFunction={() => (
+                    <FgSVG
+                      src={additionIcon}
+                      className='h-full aspect-square'
+                      attributes={[
+                        { key: "width", value: "100%" },
+                        { key: "height", value: "100%" },
+                        { key: "fill", value: "white" },
+                        { key: "stroke", value: "white" },
+                      ]}
+                    />
+                  )}
+                  hoverContent={
+                    <FgHoverContentStandard content='Increase' style='light' />
+                  }
+                  options={{
+                    hoverType: "above",
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 2500,
+                  }}
+                />
+                <FgButton
+                  className='h-full'
+                  contentFunction={() => (
+                    <FgSVG
+                      src={additionIcon}
+                      className='h-full aspect-square'
+                      attributes={[
+                        { key: "width", value: "100%" },
+                        { key: "height", value: "100%" },
+                        { key: "fill", value: "white" },
+                        { key: "stroke", value: "white" },
+                      ]}
+                    />
+                  )}
+                />
+                <FgButton
+                  className='h-full'
+                  contentFunction={() => (
+                    <FgSVG
+                      src={minusIcon}
+                      className='h-full aspect-square'
+                      attributes={[
+                        { key: "width", value: "100%" },
+                        { key: "height", value: "100%" },
+                        { key: "fill", value: "white" },
+                        { key: "stroke", value: "white" },
+                      ]}
+                    />
+                  )}
+                  hoverContent={
+                    <FgHoverContentStandard content='Decrease' style='light' />
+                  }
+                  options={{
+                    hoverType: "above",
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 2500,
+                  }}
+                />
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

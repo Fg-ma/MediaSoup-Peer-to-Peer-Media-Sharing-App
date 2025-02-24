@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgImageElement from "../../../../../../elements/fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerController from "../../../lowerControls/lib/LowerController";
 import FgPanel from "../../../../../../elements/fgPanel/FgPanel";
@@ -98,18 +99,26 @@ export default function ReactButton({
                         reaction as TableReactions
                       );
                     }}
-                    contentFunction={() => (
-                      <FgSVG
-                        src={meta.src}
-                        className='flex items-center justify-center'
-                        attributes={[
-                          { key: "width", value: "90%" },
-                          { key: "height", value: "90%" },
-                          { key: "fill", value: "white" },
-                          { key: "stroke", value: "white" },
-                        ]}
-                      />
-                    )}
+                    contentFunction={() =>
+                      meta.type === "svg" ? (
+                        <FgSVG
+                          src={meta.src}
+                          className='flex items-center justify-center'
+                          attributes={[
+                            { key: "width", value: "90%" },
+                            { key: "height", value: "90%" },
+                            { key: "fill", value: "white" },
+                            { key: "stroke", value: "white" },
+                          ]}
+                        />
+                      ) : (
+                        <FgImageElement
+                          src={meta.src}
+                          srcLoading={meta.srcLoading}
+                          style={{ width: "90%", height: "90%" }}
+                        />
+                      )
+                    }
                     hoverContent={
                       <FgHoverContentStandard content={meta.name} />
                     }

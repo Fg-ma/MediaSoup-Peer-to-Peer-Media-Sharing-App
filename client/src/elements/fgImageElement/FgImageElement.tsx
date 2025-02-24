@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "./lib/fgImageElement.css";
 
-export default function FgImage({
+export default function FgImageElement({
   src,
   srcLoading,
   alt,

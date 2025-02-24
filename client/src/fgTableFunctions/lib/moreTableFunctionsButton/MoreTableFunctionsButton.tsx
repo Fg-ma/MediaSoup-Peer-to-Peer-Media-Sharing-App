@@ -58,10 +58,10 @@ export default function MoreTableFunctionsButton({
           return (
             <FgSVG
               src={additionIcon}
-              className='h-full aspect-square'
+              className='flex h-full aspect-square items-center justify-center'
               attributes={[
-                { key: "width", value: "100%" },
-                { key: "height", value: "100%" },
+                { key: "width", value: "75%" },
+                { key: "height", value: "75%" },
                 { key: "fill", value: "#e80110" },
                 { key: "stroke", value: "#e80110" },
               ]}

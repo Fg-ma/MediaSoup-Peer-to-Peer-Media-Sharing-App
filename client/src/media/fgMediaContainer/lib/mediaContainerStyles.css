@@ -2,14 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.media-container .media-controls-container,
-.media-container .media-upper-controls,
-.media-container .controls-gradient {
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 150ms ease-in-out;
-}
-
 .media-controls-container {
   pointer-events: none;
 }
@@ -26,25 +18,33 @@
   margin-top: 0.375rem;
 }
 
+.media-container .media-controls-container,
+.media-container .media-upper-controls,
+.media-container .controls-gradient,
+.media-container .media-floating-content,
 .media-container .pan-btn,
 .media-container .scale-btn,
 .media-container .rotate-btn {
-  display: none;
-  transition: display 150ms ease-in-out;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
 }
 
+.media-container.adjusting-dimensions .media-controls-container,
+.media-container.adjusting-dimensions .media-upper-controls,
+.media-container.adjusting-dimensions .controls-gradient,
+.media-container.adjusting-dimensions .media-floating-content,
 .media-container.adjusting-dimensions .pan-btn,
 .media-container.adjusting-dimensions .scale-btn,
 .media-container.adjusting-dimensions .rotate-btn,
+.media-container.in-media .media-controls-container,
+.media-container.in-media .media-upper-controls,
+.media-container.in-media .controls-gradient,
+.media-container.in-media .media-floating-content,
 .media-container.in-media .pan-btn,
 .media-container.in-media .scale-btn,
 .media-container.in-media .rotate-btn {
-  display: block;
-}
-
-.media-container.in-media .media-controls-container,
-.media-container.in-media .media-upper-controls,
-.media-container.in-media .controls-gradient {
+  pointer-events: auto;
   opacity: 1;
 }
 

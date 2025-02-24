@@ -23,6 +23,7 @@ export default function FgMediaContainer({
   kind,
   bundleRef,
   media,
+  floatingTagContent,
   rootMedia,
   className,
   lowerPopupElements,
@@ -43,6 +44,7 @@ export default function FgMediaContainer({
   kind: TableContentTypes;
   bundleRef: React.RefObject<HTMLDivElement>;
   media?: React.ReactNode;
+  floatingTagContent?: React.ReactNode[];
   rootMedia?: HTMLImageElement | HTMLVideoElement;
   className?: string;
   lowerPopupElements?: (React.ReactNode | null)[];
@@ -117,6 +119,7 @@ export default function FgMediaContainer({
     });
 
   const [desync, setDesync] = useState(false);
+
   const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
 
   const fgContentAdjustmentController = new FgContentAdjustmentController(
@@ -258,6 +261,10 @@ export default function FgMediaContainer({
       onPointerLeave={() => mediaContainerController.handlePointerLeave()}
       data-positioning={JSON.stringify(positioning.current)}
     >
+      {floatingTagContent &&
+        floatingTagContent.map((item, index) => (
+          <React.Fragment key={index}>{item}</React.Fragment>
+        ))}
       <AdjustmentButtons
         kind={kind}
         mediaId={mediaId}

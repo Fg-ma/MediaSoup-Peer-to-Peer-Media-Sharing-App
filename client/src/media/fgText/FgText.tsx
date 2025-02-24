@@ -12,7 +12,8 @@ import {
   defaultSettings,
   Settings,
 } from "./lib/typeConstant";
-import EditableText from "./EditableText";
+import EditableText from "./lib/EditableText";
+import ExpandLineNumbers from "./lib/ExpandLineNumbers";
 
 export default function FgText({
   textId,
@@ -49,6 +50,9 @@ export default function FgText({
   const [activePages, setActivePages] = useState<ActivePages>(
     defaultActiveSettingsPages
   );
+
+  const expandLineNumbersButtonRef = useRef<HTMLButtonElement>(null);
+  const lineNumbersRef = useRef<HTMLDivElement>(null);
 
   const [_, setRerender] = useState(false);
 
@@ -98,39 +102,19 @@ export default function FgText({
       filename={textMedia.filename}
       kind='text'
       media={
-        // <pre
-        //   className='w-full h-full overflow-auto px-4 pt-3 small-multidirectional-scroll-bar bg-fg-tone-black-1 text-fg-white'
-        //   style={{
-        //     backgroundColor: settings.colors.backgroundColor.value,
-        //     color: settings.colors.textColor.value,
-        //   }}
-        //   contentEditable
-        //   suppressContentEditableWarning // Prevent React warnings about contentEditable
-        // >
-        //   {textMedia.text &&
-        //     (() => {
-        //       const maxDigits = String(
-        //         textMedia.text.split("\n").length
-        //       ).length; // Get max digit length
-        //       return textMedia.text.split("\n").map((line, index) => (
-        //         <div key={index}>
-        //           <span
-        //             className='select-none'
-        //             style={{
-        //               color: settings.colors.indexColor.value,
-        //               whiteSpace: "pre",
-        //             }}
-        //             contentEditable={false}
-        //           >
-        //             [{String(index + 1).padStart(maxDigits, " ")}]{" "}
-        //           </span>
-        //           {line}
-        //         </div>
-        //       ));
-        //     })()}
-        // </pre>
-        <EditableText text={text} settings={settings} />
+        <EditableText
+          text={text}
+          settings={settings}
+          expandLineNumbersButtonRef={expandLineNumbersButtonRef}
+          lineNumbersRef={lineNumbersRef}
+        />
       }
+      floatingTagContent={[
+        <ExpandLineNumbers
+          expandLineNumbersButtonRef={expandLineNumbersButtonRef}
+          lineNumbersRef={lineNumbersRef}
+        />,
+      ]}
       bundleRef={bundleRef}
       className='text-container'
       rightLowerControls={[
