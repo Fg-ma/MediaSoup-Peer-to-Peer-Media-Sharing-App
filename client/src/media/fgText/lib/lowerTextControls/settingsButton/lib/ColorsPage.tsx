@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import {
@@ -32,7 +32,6 @@ export default function ColorsPage({
   };
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
-  const [_rerender, setRerender] = useState(false);
 
   const handleCloseColorsPage = () => {
     setActivePages((prev) => {

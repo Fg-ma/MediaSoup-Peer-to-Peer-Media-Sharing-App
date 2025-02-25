@@ -18,7 +18,7 @@ export default function EditableText({
 
   return (
     <div
-      className='flex w-full h-full overflow-auto px-4 py-3 small-multidirectional-scroll-bar bg-fg-tone-black-1 text-fg-white'
+      className='flex w-full h-full overflow-auto px-4 py-3 small-multidirectional-scroll-bar bg-fg-tone-black-1'
       style={{
         backgroundColor: settings.colors.backgroundColor.value,
       }}

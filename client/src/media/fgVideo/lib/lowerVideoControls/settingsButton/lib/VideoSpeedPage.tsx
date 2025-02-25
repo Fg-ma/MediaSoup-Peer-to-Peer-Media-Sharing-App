@@ -106,10 +106,10 @@ export default function VideoSpeedPage({
           .map(([key, speed]) => (
             <div
               key={key}
-              className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center ${
+              className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
                 parseFloat(speed) === settings.videoSpeed.value
-                  ? "bg-gray-400"
-                  : "hover:bg-gray-400"
+                  ? "hover:bg-fg-white hover:text-fg-tone-black-1"
+                  : ""
               }`}
             >
               <FgButton

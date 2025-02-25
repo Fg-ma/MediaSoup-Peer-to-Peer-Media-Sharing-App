@@ -81,7 +81,7 @@ export default function DownloadTypeOptionsPage({
               )
             }
             contentFunction={() => (
-              <div className='flex w-full justify-between space-x-4 px-2 bg-opacity-75 hover:bg-gray-400 rounded text-nowrap'>
+              <div className='flex w-full justify-between space-x-4 px-2 bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap'>
                 <div>
                   {
                     downloadTypeOptionsTitles[

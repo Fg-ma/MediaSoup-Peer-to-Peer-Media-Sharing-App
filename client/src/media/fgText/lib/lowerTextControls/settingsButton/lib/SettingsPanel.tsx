@@ -6,6 +6,7 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import { Settings, ActivePages } from "../../../typeConstant";
 import ColorsPage from "./ColorsPage";
 import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FontStylePage from "./FontStylePage";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -153,6 +154,30 @@ export default function SettingsPanel({
     });
   };
 
+  const handleSetAsBackground = () => {
+    setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      if (newSettings.background.value === "true") {
+        newSettings.background.value = "false";
+      } else {
+        newSettings.background.value = "true";
+      }
+
+      return newSettings;
+    });
+  };
+
+  const handleFontStyleActive = () => {
+    setActivePages((prev) => {
+      const newActivePages = { ...prev };
+
+      newActivePages.fontStyle.active = !newActivePages.fontStyle.active;
+
+      return newActivePages;
+    });
+  };
+
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
@@ -179,7 +204,22 @@ export default function SettingsPanel({
             <FgButton
               className='w-full h-7'
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-gray-400 justify-start px-2 rounded items-center text-lg'>
+                <div
+                  className={`${
+                    settings.background.value === "true"
+                      ? "bg-fg-white text-fg-tone-black-1"
+                      : ""
+                  } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
+                >
+                  Set as background
+                </div>
+              )}
+              clickFunction={handleSetAsBackground}
+            />
+            <FgButton
+              className='w-full h-7'
+              contentFunction={() => (
+                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg'>
                   Colors
                 </div>
               )}
@@ -253,6 +293,15 @@ export default function SettingsPanel({
                 />
               </div>
             </div>
+            <FgButton
+              className='w-full h-7'
+              contentFunction={() => (
+                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg'>
+                  Font style
+                </div>
+              )}
+              clickFunction={handleFontStyleActive}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -271,6 +320,24 @@ export default function SettingsPanel({
                 settings={settings}
                 setSettings={setSettings}
                 externalColorPickerPanelRefs={externalColorPickerPanelRefs}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.fontStyle.active &&
+          !isDescendantActive(activePages.fontStyle) && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <FontStylePage
+                setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
               />
             </motion.div>
           )}

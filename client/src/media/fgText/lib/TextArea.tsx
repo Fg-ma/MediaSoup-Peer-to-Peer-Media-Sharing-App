@@ -33,10 +33,13 @@ export default function TextArea({
           ref={textAreaRef}
           contentEditable
           suppressContentEditableWarning
-          className='min-w-full w-max h-max outline-none'
+          className='min-w-full w-max h-max outline-none font-K2D text-lg'
           style={{
             color: settings.colors.textColor.value,
             whiteSpace: "pre",
+            fontFamily: settings.fontStyle.value,
+            fontSize: settings.fontSize.value,
+            lineHeight: `calc(${settings.fontSize.value} + 8px)`,
           }}
         >
           {text.current}

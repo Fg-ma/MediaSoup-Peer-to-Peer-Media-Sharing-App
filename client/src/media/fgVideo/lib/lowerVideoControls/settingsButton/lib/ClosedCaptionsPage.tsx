@@ -113,7 +113,7 @@ export default function ClosedCaptionsPage({
         </div>
         <FgButton
           contentFunction={() => (
-            <div className='px-2 bg-opacity-75 hover:bg-gray-400 rounded font-Josefin text-lg font-bold pt-0.5'>
+            <div className='px-2 bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 rounded font-Josefin text-lg font-bold pt-0.5'>
               Options
             </div>
           )}
@@ -128,10 +128,10 @@ export default function ClosedCaptionsPage({
         {Object.entries(closedCaptionsSelections).map(([key, lang]) => (
           <div
             key={key}
-            className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center ${
+            className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
               key === settings.closedCaption.value
-                ? "bg-gray-400"
-                : "hover:bg-gray-400"
+                ? "bg-fg-white text-fg-tone-black-1"
+                : ""
             }`}
           >
             <FgButton

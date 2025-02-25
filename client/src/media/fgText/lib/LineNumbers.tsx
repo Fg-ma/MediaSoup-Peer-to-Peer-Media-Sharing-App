@@ -45,7 +45,6 @@ export default function LineNumbers({
     }
 
     if (expandLineNumbersButtonRef.current) {
-      console.log(expandLineNumbersButtonRef.current);
       expandLineNumbersButtonRef.current.addEventListener(
         "pointerdown",
         handleClick

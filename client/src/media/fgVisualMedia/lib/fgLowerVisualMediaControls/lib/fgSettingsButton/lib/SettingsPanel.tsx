@@ -206,7 +206,7 @@ export default function SettingsPanel({
               <FgButton
                 className='w-full'
                 contentFunction={() => (
-                  <div className='flex w-full text-nowrap hover:bg-gray-400 justify-between px-2 rounded items-center'>
+                  <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
                     <div>Subtitles</div>
                     <div>
                       {Object.prototype.hasOwnProperty.call(
@@ -293,10 +293,10 @@ export default function SettingsPanel({
                       ].map((type) => (
                         <FgButton
                           key={type}
-                          className={`w-full rounded bg-opacity-75 min-w-32 px-2 ${
+                          className={`w-full rounded bg-opacity-75 min-w-32 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                             type === activeSetting.value
-                              ? "bg-gray-400"
-                              : "hover:bg-gray-400"
+                              ? "bg-fg-white text-fg-tone-black-1"
+                              : ""
                           }`}
                           contentFunction={() => (
                             <div className='flex justify-start items-start'>
