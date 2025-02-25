@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: "B612Mono";
-  src: url("https://localhost:8044/fonts/B612Mono-Regular.ttf");
+  src: url("https://localhost:8044/fonts/B612Mono/B612Mono-Regular.ttf");
   font-weight: normal;
   font-style: normal;
 }

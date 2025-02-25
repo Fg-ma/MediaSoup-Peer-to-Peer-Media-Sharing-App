@@ -4,10 +4,10 @@
 
 @font-face {
   font-family: "Josefin";
-  src: url("https://localhost:8044/fonts/JosefinSans-Regular.ttf");
+  src: url("https://localhost:8044/fonts/josefinSans/static/JosefinSans-Regular.ttf");
 }
 
 @font-face {
   font-family: "K2D";
-  src: url("https://localhost:8044/fonts/K2D-Bold.ttf");
+  src: url("https://localhost:8044/fonts/K2D/K2D-Bold.ttf");
 }

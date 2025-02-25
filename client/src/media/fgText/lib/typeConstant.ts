@@ -73,7 +73,7 @@ export type FontStyles = "K2D" | "josefin" | "B612Mono";
 export const fontStylesOptionsMeta: {
   [fontStyle in FontStyles]: { title: string; value: string };
 } = {
+  B612Mono: { title: "B612 Monospace", value: "B612Mono, monospace" },
   K2D: { title: "K2D", value: "K2D, sans" },
   josefin: { title: "Josefin", value: "Josefin, sans" },
-  B612Mono: { title: "B612 Monospace", value: "B612Mono, monospace" },
 };

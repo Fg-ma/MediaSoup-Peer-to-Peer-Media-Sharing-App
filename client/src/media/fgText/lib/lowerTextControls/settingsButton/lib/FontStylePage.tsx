@@ -6,6 +6,7 @@ import {
   ActivePages,
   fontStylesOptionsMeta,
 } from "../../../typeConstant";
+import "./fontStyles.css";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
