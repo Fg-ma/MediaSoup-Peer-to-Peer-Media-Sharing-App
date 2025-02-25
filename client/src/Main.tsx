@@ -24,9 +24,10 @@ import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
 import PermissionsController from "./lib/PermissionsController";
 import CleanupController from "./lib/CleanupController";
 import JoinTableSection from "./joinTableSection/JoinTableSection";
-import "./scrollbar.css";
 import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
 import CreditPage from "./creditPage/CreditPage";
+import "./scrollbar.css";
+import "./fontStyles.css";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -147,6 +148,8 @@ export default function Main() {
         audio: structuredClone(defaultAudioEffectsStyles),
         video: {},
         image: {},
+        application: {},
+        soundClip: {},
       };
     }
 

@@ -178,6 +178,26 @@ export default function SettingsPanel({
     });
   };
 
+  const handleFontSizeChange = (
+    type: "increment" | "decrement" | "value",
+    value: number
+  ) => {
+    setSettings((prev) => {
+      const newSettings = { ...prev };
+      const currentValue = parseInt(newSettings.fontSize.value.slice(0, -2));
+
+      if (type === "increment") {
+        newSettings.fontSize.value = `${currentValue + value}px`;
+      } else if (type === "decrement") {
+        newSettings.fontSize.value = `${Math.max(1, currentValue - value)}px`;
+      } else {
+        newSettings.fontSize.value = `${Math.max(1, value)}px`;
+      }
+
+      return newSettings;
+    });
+  };
+
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
@@ -232,6 +252,7 @@ export default function SettingsPanel({
               <div className='flex w-max h-full items-center justify-center space-x-1'>
                 <FgButton
                   className='h-full'
+                  clickFunction={() => handleFontSizeChange("increment", 1)}
                   contentFunction={() => (
                     <FgSVG
                       src={additionIcon}
@@ -253,23 +274,24 @@ export default function SettingsPanel({
                     hoverTimeoutDuration: 2500,
                   }}
                 />
-                <FgButton
-                  className='h-full'
-                  contentFunction={() => (
-                    <FgSVG
-                      src={additionIcon}
-                      className='h-full aspect-square'
-                      attributes={[
-                        { key: "width", value: "100%" },
-                        { key: "height", value: "100%" },
-                        { key: "fill", value: "white" },
-                        { key: "stroke", value: "white" },
-                      ]}
-                    />
-                  )}
+                <input
+                  type='text'
+                  className='flex h-full w-12 font-K2D bg-transparent focus:outline-none text-center text-xl'
+                  value={settings.fontSize.value.slice(0, -2)}
+                  onChange={(event) => {
+                    const inputValue = event.target.value;
+                    const parsedValue =
+                      inputValue.trim() !== "" && !isNaN(Number(inputValue))
+                        ? parseInt(inputValue, 10)
+                        : 1;
+
+                    handleFontSizeChange("value", parsedValue);
+                  }}
+                  placeholder='Size...'
                 />
                 <FgButton
                   className='h-full'
+                  clickFunction={() => handleFontSizeChange("decrement", 1)}
                   contentFunction={() => (
                     <FgSVG
                       src={minusIcon}

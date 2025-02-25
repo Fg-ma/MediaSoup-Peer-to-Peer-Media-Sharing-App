@@ -6,7 +6,7 @@ import {
   ActivePages,
   fontStylesOptionsMeta,
 } from "../../../typeConstant";
-import "./fontStyles.css";
+import LazyFontButton from "./LazyFontButton";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -74,18 +74,23 @@ export default function FontStylePage({
         className='w-full flex flex-col space-y-4 overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
       >
         {Object.entries(fontStylesOptionsMeta).map(([key, meta]) => (
-          <FgButton
+          <LazyFontButton
             key={key}
-            className={`${
-              settings.fontStyle.value === meta.value
-                ? "bg-fg-white text-fg-tone-black-1"
-                : ""
-            } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
-            style={{
-              fontFamily: meta.value,
-            }}
-            contentFunction={() => <>{meta.title}</>}
-            clickFunction={() => handleSelectFontStyle(meta.value)}
+            scrollingContainerRef={scrollingContainerRef}
+            item={
+              <FgButton
+                className={`${
+                  settings.fontStyle.value === meta.value
+                    ? "bg-fg-white text-fg-tone-black-1"
+                    : ""
+                } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
+                style={{
+                  fontFamily: meta.value,
+                }}
+                contentFunction={() => <>{meta.title}</>}
+                clickFunction={() => handleSelectFontStyle(meta.value)}
+              />
+            }
           />
         ))}
       </div>

@@ -1,6 +1,19 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@font-face {
+  font-family: "Josefin";
+  src: url("https://localhost:8044/fonts/josefinSans/static/JosefinSans-Regular.ttf");
+}
+
+@font-face {
+  font-family: "K2D";
+  src: url("https://localhost:8044/fonts/K2D/K2D-Bold.ttf");
+}
+
+@font-face {
+  font-family: "B612Mono";
+  src: url("https://localhost:8044/fonts/B612Mono/B612Mono-Regular.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
 
 @font-face {
   font-family: "AnnieUseYourTelescope";
@@ -95,13 +108,13 @@
 
 @font-face {
   font-family: "FunnelSans";
-  src: url("https://localhost:8044/fonts/FunnelSans/FunnelSans-VariableFont_wght.ttf");
+  src: url("https://localhost:8044/fonts/funnelSans/FunnelSans-VariableFont_wght.ttf");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "GrenzeGotisch-VariableFont_wght";
+  font-family: "GrenzeGotisch";
   src: url("https://localhost:8044/fonts/grenzeGotisch/GrenzeGotisch-VariableFont_wght.ttf");
   font-weight: normal;
   font-style: normal;
@@ -200,7 +213,7 @@
 
 @font-face {
   font-family: "PirataOne";
-  src: url("https://localhost:8044/fonts/pirataOne/PirataOne.ttf");
+  src: url("https://localhost:8044/fonts/pirataOne/PirataOne-Regular.ttf");
   font-weight: normal;
   font-style: normal;
 }
@@ -214,7 +227,7 @@
 
 @font-face {
   font-family: "PlaywriteITModerna";
-  src: url("https://localhost:8044/fonts/playwriteITModerna/PlaywriteITModerna-VariableFont_wght-Regular.ttf");
+  src: url("https://localhost:8044/fonts/playwriteITModerna/PlaywriteITModerna-VariableFont_wght.ttf");
   font-weight: normal;
   font-style: normal;
 }

@@ -83,7 +83,11 @@ export default function LineNumbers({
         <motion.div
           key='line-numbers'
           ref={lineNumbersRef}
-          className='flex h-max flex-col text-right pr-2 cursor-pointer'
+          className='flex h-max flex-col text-right pr-2 cursor-pointer font-B612Mono'
+          style={{
+            fontSize: settings.fontSize.value,
+            lineHeight: `calc(${settings.fontSize.value} + 8px)`,
+          }}
           onPointerDown={handleClick}
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -101,7 +105,7 @@ export default function LineNumbers({
             return (
               <span
                 key={index}
-                className='select-none font-B612Mono'
+                className='select-none'
                 style={{
                   color: settings.colors.indexColor.value,
                 }}
