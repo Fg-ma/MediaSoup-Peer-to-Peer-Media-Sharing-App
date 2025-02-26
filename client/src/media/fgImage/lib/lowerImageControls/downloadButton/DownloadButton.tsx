@@ -17,12 +17,14 @@ export default function DownloadButton({
   recording,
   lowerImageController,
   imageEffectsActive,
+  settingsActive,
   scrollingContainerRef,
 }: {
   settings: Settings;
   recording: React.MutableRefObject<boolean>;
   lowerImageController: LowerImageController;
   imageEffectsActive: boolean;
+  settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
@@ -53,7 +55,7 @@ export default function DownloadButton({
         );
       }}
       hoverContent={
-        !imageEffectsActive ? (
+        !imageEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content={
               settings.downloadType.value === "snapShot"

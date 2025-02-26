@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVG from "../../../elements/fgSVG/FgSVG";
 import MoreTableFunctionsSection from "../moreTableFunctionsSection/MoreTableFunctionsSection";
@@ -47,6 +47,23 @@ export default function MoreTableFunctionsButton({
   const [moreTableFunctionsActive, setMoreTableFunctionsActive] =
     useState(false);
   const moreTableFunctionsButtonRef = useRef<HTMLButtonElement>(null);
+  const moreTableFunctionsPanelRef = useRef<HTMLDivElement>(null);
+
+  const handlePointerDown = (event: PointerEvent) => {
+    if (!moreTableFunctionsPanelRef.current?.contains(event.target as Node)) {
+      setMoreTableFunctionsActive(false);
+    }
+  };
+
+  useEffect(() => {
+    if (moreTableFunctionsActive) {
+      document.addEventListener("pointerdown", handlePointerDown);
+
+      return () => {
+        document.removeEventListener("pointerdown", handlePointerDown);
+      };
+    }
+  }, [moreTableFunctionsActive]);
 
   return (
     <>
@@ -87,6 +104,7 @@ export default function MoreTableFunctionsButton({
         <MoreTableFunctionsSection
           tableTopRef={tableTopRef}
           moreTableFunctionsButtonRef={moreTableFunctionsButtonRef}
+          moreTableFunctionsPanelRef={moreTableFunctionsPanelRef}
           mutedAudioRef={mutedAudioRef}
           isAudio={isAudio}
           setMoreTableFunctionsActive={setMoreTableFunctionsActive}

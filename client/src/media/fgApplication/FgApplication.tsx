@@ -91,7 +91,8 @@ export default function FgApplication({
     recording,
     downloadRecordingReady,
     setRerender,
-    tableStaticContentSocket
+    tableStaticContentSocket,
+    setSettings
   );
 
   const applicationController = new ApplicationController(
@@ -153,6 +154,7 @@ export default function FgApplication({
       kind='application'
       rootMedia={applicationMedia.application}
       bundleRef={bundleRef}
+      backgroundMedia={settings.background.value === "true"}
       className='application-container'
       lowerPopupElements={[
         applicationEffectsActive ? (
@@ -176,6 +178,7 @@ export default function FgApplication({
           settings={settings}
           setSettings={setSettings}
           scrollingContainerRef={rightLowerApplicationControlsRef}
+          lowerApplicationController={lowerApplicationController}
         />,
         <DownloadButton
           settings={settings}

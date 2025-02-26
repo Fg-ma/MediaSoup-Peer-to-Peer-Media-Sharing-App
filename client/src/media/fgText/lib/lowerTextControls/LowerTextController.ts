@@ -1,14 +1,12 @@
-import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
-import { Settings } from "../typeConstant";
 import TextMedia from "../../TextMedia";
-import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-
+import { Settings } from "../typeConstant";
 class LowerTextController {
   constructor(
     private textMedia: TextMedia,
     private textContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>
+    private controlPressed: React.MutableRefObject<boolean>,
+    private setSettings: React.Dispatch<React.SetStateAction<Settings>>
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -34,6 +32,9 @@ class LowerTextController {
       case "d":
         this.handleDownload();
         break;
+      case "b":
+        this.handleSetAsBackground();
+        break;
       default:
         break;
     }
@@ -56,6 +57,20 @@ class LowerTextController {
 
   handleDownload = () => {
     this.textMedia.downloadText();
+  };
+
+  handleSetAsBackground = () => {
+    this.setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      if (newSettings.background.value === "true") {
+        newSettings.background.value = "false";
+      } else {
+        newSettings.background.value = "true";
+      }
+
+      return newSettings;
+    });
   };
 }
 

@@ -7,6 +7,7 @@ import { Settings, ActivePages } from "../../../typeConstant";
 import ColorsPage from "./ColorsPage";
 import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import FontStylePage from "./FontStylePage";
+import LowerTextController from "../../LowerTextController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -58,6 +59,7 @@ export default function SettingsPanel({
   settings,
   setSettings,
   externalColorPickerPanelRefs,
+  lowerTextController,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -70,6 +72,7 @@ export default function SettingsPanel({
     textColor: React.RefObject<HTMLDivElement>;
     indexColor: React.RefObject<HTMLDivElement>;
   };
+  lowerTextController: LowerTextController;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -154,20 +157,6 @@ export default function SettingsPanel({
     });
   };
 
-  const handleSetAsBackground = () => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
-
-      if (newSettings.background.value === "true") {
-        newSettings.background.value = "false";
-      } else {
-        newSettings.background.value = "true";
-      }
-
-      return newSettings;
-    });
-  };
-
   const handleFontStyleActive = () => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
@@ -231,10 +220,10 @@ export default function SettingsPanel({
                       : ""
                   } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
                 >
-                  Set as background
+                  Set as background (b)
                 </div>
               )}
-              clickFunction={handleSetAsBackground}
+              clickFunction={lowerTextController.handleSetAsBackground}
             />
             <FgButton
               className='w-full h-7'

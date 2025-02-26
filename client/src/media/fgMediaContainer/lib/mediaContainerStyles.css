@@ -149,6 +149,8 @@
   z-index: 100;
   aspect-ratio: 1 / 1;
   pointer-events: auto;
+  top: 50%;
+  left: 50%;
 }
 
 @keyframes expand-rotating {
@@ -168,6 +170,8 @@
   z-index: 100;
   aspect-ratio: 1 / 1;
   pointer-events: auto;
+  top: 50%;
+  left: 50%;
 }
 
 @keyframes expand {
@@ -176,5 +180,27 @@
   }
   100% {
     transform: translate(-50%, -50%) scale(10);
+  }
+}
+
+.hiding-reaction-particle {
+  position: absolute;
+  background-size: cover;
+  pointer-events: none;
+  animation: hide 1.25s ease-out forwards;
+  z-index: -100;
+  aspect-ratio: 1 / 1;
+  pointer-events: auto;
+  top: 8%;
+  left: 85%;
+  rotate: 15deg;
+}
+
+@keyframes hide {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.1);
   }
 }

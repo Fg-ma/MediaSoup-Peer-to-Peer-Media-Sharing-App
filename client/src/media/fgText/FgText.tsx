@@ -60,7 +60,8 @@ export default function FgText({
     textMedia,
     textContainerRef,
     shiftPressed,
-    controlPressed
+    controlPressed,
+    setSettings
   );
 
   const textController = new TextController(
@@ -116,6 +117,7 @@ export default function FgText({
         />,
       ]}
       bundleRef={bundleRef}
+      backgroundMedia={settings.background.value === "true"}
       className='text-container'
       rightLowerControls={[
         <SettingsButton
@@ -127,8 +129,10 @@ export default function FgText({
           settings={settings}
           setSettings={setSettings}
           scrollingContainerRef={rightLowerTextControlsRef}
+          lowerTextController={lowerTextController}
         />,
         <DownloadButton
+          settingsActive={settingsActive}
           lowerTextController={lowerTextController}
           scrollingContainerRef={rightLowerTextControlsRef}
         />,

@@ -22,6 +22,7 @@ export default function FgMediaContainer({
   filename,
   kind,
   bundleRef,
+  backgroundMedia,
   media,
   floatingTagContent,
   rootMedia,
@@ -43,6 +44,7 @@ export default function FgMediaContainer({
   filename: string;
   kind: TableContentTypes;
   bundleRef: React.RefObject<HTMLDivElement>;
+  backgroundMedia: boolean;
   media?: React.ReactNode;
   floatingTagContent?: React.ReactNode[];
   rootMedia?: HTMLImageElement | HTMLVideoElement;
@@ -83,7 +85,8 @@ export default function FgMediaContainer({
     externalMediaContainerRef ?? useRef<HTMLDivElement>(null);
   const subContainerRef =
     externalSubContainerRef ?? useRef<HTMLDivElement>(null);
-  const effectsContainerRef = useRef<HTMLDivElement>(null);
+  const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
+  const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
   const panBtnRef = useRef<HTMLButtonElement>(null);
 
   const [inMedia, setInMedia] = useState(false);
@@ -146,7 +149,8 @@ export default function FgMediaContainer({
     mediaContainerOptions,
     setDesync,
     setReactionsPanelActive,
-    effectsContainerRef
+    behindEffectsContainerRef,
+    frontEffectsContainerRef
   );
 
   const mediaContainerController = new MediaContainerController(
@@ -251,15 +255,27 @@ export default function FgMediaContainer({
           : "pointer-events-auto"
       } ${
         fullscreen ? "full-screen" : ""
-      } ${className} flex items-center justify-center relative`}
-      style={{
-        left: `${positioning.current.position.left}%`,
-        top: `${positioning.current.position.top}%`,
-        width: `${positioning.current.scale.x}%`,
-        height: `${positioning.current.scale.y}%`,
-        rotate: `${positioning.current.rotation}deg`,
-        transformOrigin: "0% 0%",
-      }}
+      } ${className} flex items-center justify-center absolute`}
+      style={
+        backgroundMedia
+          ? {
+              left: "0%",
+              top: "0%",
+              width: "100%",
+              height: "100%",
+              rotate: "0deg",
+              zIndex: 0,
+            }
+          : {
+              left: `${positioning.current.position.left}%`,
+              top: `${positioning.current.position.top}%`,
+              width: `${positioning.current.scale.x}%`,
+              height: `${positioning.current.scale.y}%`,
+              rotate: `${positioning.current.rotation}deg`,
+              transformOrigin: "0% 0%",
+              zIndex: 10,
+            }
+      }
       onPointerEnter={() => mediaContainerController.handlePointerEnter()}
       onPointerLeave={() => mediaContainerController.handlePointerLeave()}
       data-positioning={JSON.stringify(positioning.current)}
@@ -285,43 +301,9 @@ export default function FgMediaContainer({
           <div className='animated-border-box'></div>
         </>
       )}
-      {mediaContainerOptions.controlsPlacement === "outside" && !fullscreen && (
-        <>
-          <UpperControls
-            desync={desync}
-            reactionsPanelActive={reactionsPanelActive}
-            setReactionsPanelActive={setReactionsPanelActive}
-            lowerController={lowerController}
-            leftUpperControls={leftUpperControls}
-            rightUpperControls={rightUpperControls}
-            mediaContainerOptions={mediaContainerOptions}
-            fullscreen={fullscreen}
-          />
-          <LowerControls
-            lowerController={lowerController}
-            externalRightLowerControlsRef={externalRightLowerControlsRef}
-            leftLowerControls={leftLowerControls}
-            rightLowerControls={rightLowerControls}
-            lowerPopupElements={lowerPopupElements}
-            mediaContainerOptions={mediaContainerOptions}
-            preventLowerLabelsVariables={preventLowerLabelsVariables}
-            fullscreen={fullscreen}
-          />
-        </>
-      )}
-      <div className='w-full h-full absolute top-0 left-0 z-[100] pointer-events-none'>
-        <div
-          ref={effectsContainerRef}
-          className='w-full h-full relative z-[100] pointer-events-none'
-        />
-      </div>
-      <div
-        ref={subContainerRef}
-        className='flex sub-media-container relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
-      >
-        {media && media}
-        {(mediaContainerOptions.controlsPlacement === "inside" ||
-          fullscreen) && (
+      {mediaContainerOptions.controlsPlacement === "outside" &&
+        !fullscreen &&
+        !backgroundMedia && (
           <>
             <UpperControls
               desync={desync}
@@ -332,6 +314,7 @@ export default function FgMediaContainer({
               rightUpperControls={rightUpperControls}
               mediaContainerOptions={mediaContainerOptions}
               fullscreen={fullscreen}
+              backgroundMedia={backgroundMedia}
             />
             <LowerControls
               lowerController={lowerController}
@@ -342,6 +325,52 @@ export default function FgMediaContainer({
               mediaContainerOptions={mediaContainerOptions}
               preventLowerLabelsVariables={preventLowerLabelsVariables}
               fullscreen={fullscreen}
+              backgroundMedia={backgroundMedia}
+            />
+          </>
+        )}
+      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+        <div
+          ref={frontEffectsContainerRef}
+          className='w-full h-full relative z-[100] pointer-events-none'
+        />
+      </div>
+      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+        <div
+          ref={behindEffectsContainerRef}
+          className='w-full h-full relative -z-[100] pointer-events-none'
+        />
+      </div>
+      <div
+        ref={subContainerRef}
+        className='flex sub-media-container absolute items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
+      >
+        {media && media}
+        {(mediaContainerOptions.controlsPlacement === "inside" ||
+          fullscreen ||
+          backgroundMedia) && (
+          <>
+            <UpperControls
+              desync={desync}
+              reactionsPanelActive={reactionsPanelActive}
+              setReactionsPanelActive={setReactionsPanelActive}
+              lowerController={lowerController}
+              leftUpperControls={leftUpperControls}
+              rightUpperControls={rightUpperControls}
+              mediaContainerOptions={mediaContainerOptions}
+              fullscreen={fullscreen}
+              backgroundMedia={backgroundMedia}
+            />
+            <LowerControls
+              lowerController={lowerController}
+              externalRightLowerControlsRef={externalRightLowerControlsRef}
+              leftLowerControls={leftLowerControls}
+              rightLowerControls={rightLowerControls}
+              lowerPopupElements={lowerPopupElements}
+              mediaContainerOptions={mediaContainerOptions}
+              preventLowerLabelsVariables={preventLowerLabelsVariables}
+              fullscreen={fullscreen}
+              backgroundMedia={backgroundMedia}
             />
           </>
         )}

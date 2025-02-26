@@ -9,9 +9,11 @@ const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const downloadIcon = nginxAssetSeverBaseUrl + "svgs/downloadIcon.svg";
 
 export default function DownloadButton({
+  settingsActive,
   lowerTextController,
   scrollingContainerRef,
 }: {
+  settingsActive: boolean;
   lowerTextController: LowerTextController;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -32,7 +34,9 @@ export default function DownloadButton({
         />
       )}
       hoverContent={
-        <FgHoverContentStandard content={"Download (d)"} style='dark' />
+        !settingsActive ? (
+          <FgHoverContentStandard content='Download (d)' style='dark' />
+        ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
       className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'

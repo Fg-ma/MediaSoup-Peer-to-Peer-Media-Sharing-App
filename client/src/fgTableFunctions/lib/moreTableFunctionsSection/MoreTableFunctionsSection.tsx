@@ -18,6 +18,7 @@ const AudioEffectsButton = React.lazy(
 export default function MoreTableFunctionsSection({
   tableTopRef,
   moreTableFunctionsButtonRef,
+  moreTableFunctionsPanelRef,
   mutedAudioRef,
   isAudio,
   setMoreTableFunctionsActive,
@@ -33,6 +34,7 @@ export default function MoreTableFunctionsSection({
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   moreTableFunctionsButtonRef: React.RefObject<HTMLButtonElement>;
+  moreTableFunctionsPanelRef: React.RefObject<HTMLDivElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
   isAudio: React.MutableRefObject<boolean>;
   setMoreTableFunctionsActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -90,6 +92,7 @@ export default function MoreTableFunctionsSection({
 
   return (
     <FgPanel
+      externalRef={moreTableFunctionsPanelRef}
       content={
         <div className='w-full h-full overflow-y-auto small-vertical-scroll-bar'>
           <div className='grid grid-cols-3 w-full my-2 h-max gap-3'>

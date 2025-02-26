@@ -11,10 +11,12 @@ const downloadIcon = nginxAssetSeverBaseUrl + "svgs/downloadIcon.svg";
 export default function DownloadRecordingButton({
   lowerImageController,
   imageEffectsActive,
+  settingsActive,
   scrollingContainerRef,
 }: {
   lowerImageController: LowerImageController;
   imageEffectsActive: boolean;
+  settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
@@ -34,7 +36,7 @@ export default function DownloadRecordingButton({
         />
       )}
       hoverContent={
-        !imageEffectsActive ? (
+        !imageEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content='Download recording (h)'
             style='dark'

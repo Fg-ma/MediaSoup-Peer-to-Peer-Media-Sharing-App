@@ -14,6 +14,7 @@ import {
 import DownloadTypePage from "./DownloadTypePage";
 import DownloadTypeOptionsPage from "./DownloadTypeOptionsPage";
 import PageTemplate from "./PageTemplate";
+import LowerImageController from "../../LowerImageController";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -59,6 +60,7 @@ export default function SettingsPanel({
   setActivePages,
   settings,
   setSettings,
+  lowerImageController,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -66,6 +68,7 @@ export default function SettingsPanel({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  lowerImageController: LowerImageController;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -173,6 +176,21 @@ export default function SettingsPanel({
             animate='animate'
             exit='exit'
           >
+            <FgButton
+              className='w-full h-7'
+              contentFunction={() => (
+                <div
+                  className={`${
+                    settings.background.value === "true"
+                      ? "bg-fg-white text-fg-tone-black-1"
+                      : ""
+                  } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
+                >
+                  Set as background (b)
+                </div>
+              )}
+              clickFunction={lowerImageController.handleSetAsBackground}
+            />
             <FgButton
               className='w-full'
               contentFunction={() => (

@@ -33,14 +33,20 @@ export default function ReactButton({
     if (!reactionsPanelScrollingContainerRef.current) return;
 
     const width = reactionsPanelScrollingContainerRef.current.clientWidth;
-    if (width < 300) {
+    if (width < 100) {
       if (cols !== 3) setCols(3);
-    } else if (width < 500) {
+    } else if (width < 300) {
       if (cols !== 4) setCols(4);
-    } else if (width < 700) {
+    } else if (width < 400) {
       if (cols !== 5) setCols(5);
-    } else if (width >= 700) {
+    } else if (width < 500) {
       if (cols !== 6) setCols(6);
+    } else if (width < 600) {
+      if (cols !== 7) setCols(7);
+    } else if (width < 700) {
+      if (cols !== 8) setCols(8);
+    } else if (width >= 800) {
+      if (cols !== 9) setCols(9);
     }
   };
 
@@ -109,7 +115,15 @@ export default function ReactButton({
                   ? "grid-cols-4"
                   : cols === 5
                   ? "grid-cols-5"
-                  : "grid-cols-6"
+                  : cols === 6
+                  ? "grid-cols-6"
+                  : cols === 7
+                  ? "grid-cols-7"
+                  : cols === 8
+                  ? "grid-cols-8"
+                  : cols === 9
+                  ? "grid-cols-9"
+                  : "grid-cols-10"
               }`}
               items={[
                 ...Object.entries(reactionsMeta).map(([reaction, meta]) => (

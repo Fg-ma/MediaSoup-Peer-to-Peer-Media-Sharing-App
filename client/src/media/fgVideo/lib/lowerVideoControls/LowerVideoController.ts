@@ -2,7 +2,6 @@ import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserEffectsStylesType,
   UserStreamEffectsType,
-  VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
 import {
@@ -49,7 +48,8 @@ class LowerVideoController {
     private wasPaused: React.MutableRefObject<boolean>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
-    >
+    >,
+    private setSettings: React.Dispatch<React.SetStateAction<Settings>>
   ) {}
 
   formatDuration = (time: number) => {
@@ -143,6 +143,9 @@ class LowerVideoController {
         break;
       case "h":
         this.handleDownloadRecording();
+        break;
+      case "b":
+        this.handleSetAsBackground();
         break;
       default:
         break;
@@ -403,6 +406,20 @@ class LowerVideoController {
 
   handlePlaybackSpeed = (playbackRate: number) => {
     this.videoMedia.video.playbackRate = playbackRate;
+  };
+
+  handleSetAsBackground = () => {
+    this.setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      if (newSettings.background.value === "true") {
+        newSettings.background.value = "false";
+      } else {
+        newSettings.background.value = "true";
+      }
+
+      return newSettings;
+    });
   };
 }
 

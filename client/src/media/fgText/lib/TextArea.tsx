@@ -27,8 +27,8 @@ export default function TextArea({
   };
 
   return (
-    <div className='grow h-max'>
-      <div className='h-full w-max min-w-full' onClick={handleDivClick}>
+    <div className='grow h-max min-h-full' onClick={handleDivClick}>
+      <div className='h-full w-max min-w-full'>
         <pre
           ref={textAreaRef}
           contentEditable

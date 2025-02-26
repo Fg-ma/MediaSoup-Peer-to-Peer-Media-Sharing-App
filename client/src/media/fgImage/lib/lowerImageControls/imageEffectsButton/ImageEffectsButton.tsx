@@ -12,10 +12,12 @@ const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
 export default function ImageEffectsButton({
   lowerImageController,
   imageEffectsActive,
+  settingsActive,
   scrollingContainerRef,
 }: {
   lowerImageController: LowerImageController;
   imageEffectsActive: boolean;
+  settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
@@ -39,7 +41,7 @@ export default function ImageEffectsButton({
         );
       }}
       hoverContent={
-        !imageEffectsActive ? (
+        !imageEffectsActive && !settingsActive ? (
           <FgHoverContentStandard content='Effects (e)' style='dark' />
         ) : undefined
       }

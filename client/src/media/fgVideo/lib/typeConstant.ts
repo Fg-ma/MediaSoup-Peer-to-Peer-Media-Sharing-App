@@ -22,6 +22,9 @@ export type DownloadRecordingFPSTypes =
   | "60 fps";
 
 export interface Settings {
+  background: {
+    value: "true" | "false";
+  };
   closedCaption: {
     value: keyof typeof closedCaptionsSelections;
     closedCaptionOptionsActive: {
@@ -261,7 +264,8 @@ export const defaultActivePages: ActivePages = {
   },
 };
 
-export const defaultSettings = Object.freeze({
+export const defaultSettings: Settings = Object.freeze({
+  background: Object.freeze({ value: "false" }),
   closedCaption: Object.freeze({
     value: "en-US",
     closedCaptionOptionsActive: Object.freeze({

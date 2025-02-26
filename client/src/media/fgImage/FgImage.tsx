@@ -79,7 +79,8 @@ export default function FgImage({
     recording,
     downloadRecordingReady,
     setRerender,
-    tableStaticContentSocket
+    tableStaticContentSocket,
+    setSettings
   );
 
   const imageController = new ImageController(setSettingsActive);
@@ -128,6 +129,7 @@ export default function FgImage({
       kind='image'
       rootMedia={imageMedia.image}
       bundleRef={bundleRef}
+      backgroundMedia={settings.background.value === "true"}
       className='image-container'
       lowerPopupElements={[
         imageEffectsActive ? (
@@ -151,12 +153,14 @@ export default function FgImage({
           settings={settings}
           setSettings={setSettings}
           scrollingContainerRef={rightLowerImageControlsRef}
+          lowerImageController={lowerImageController}
         />,
         <DownloadButton
           settings={settings}
           recording={recording}
           lowerImageController={lowerImageController}
           imageEffectsActive={imageEffectsActive}
+          settingsActive={settingsActive}
           scrollingContainerRef={rightLowerImageControlsRef}
         />,
         settings.downloadType.value === "record" &&
@@ -164,12 +168,14 @@ export default function FgImage({
           <DownloadRecordingButton
             lowerImageController={lowerImageController}
             imageEffectsActive={imageEffectsActive}
+            settingsActive={settingsActive}
             scrollingContainerRef={rightLowerImageControlsRef}
           />
         ) : null,
         <ImageEffectsButton
           lowerImageController={lowerImageController}
           imageEffectsActive={imageEffectsActive}
+          settingsActive={settingsActive}
           scrollingContainerRef={rightLowerImageControlsRef}
         />,
       ]}

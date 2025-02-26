@@ -12,6 +12,7 @@ export default function LowerControls({
   mediaContainerOptions,
   preventLowerLabelsVariables,
   fullscreen,
+  backgroundMedia,
 }: {
   lowerController: LowerController;
   externalRightLowerControlsRef?: React.RefObject<HTMLDivElement>;
@@ -21,6 +22,7 @@ export default function LowerControls({
   mediaContainerOptions: MediaContainerOptions;
   preventLowerLabelsVariables?: boolean[];
   fullscreen: boolean;
+  backgroundMedia: boolean;
 }) {
   const rightControlsRef = externalRightLowerControlsRef
     ? externalRightLowerControlsRef
@@ -50,7 +52,9 @@ export default function LowerControls({
   return (
     <div
       className={`media-controls-container ${
-        mediaContainerOptions.controlsPlacement === "inside" || fullscreen
+        mediaContainerOptions.controlsPlacement === "inside" ||
+        fullscreen ||
+        backgroundMedia
           ? "bottom-0"
           : "top-full"
       } absolute w-full h-max flex-col items-end justify-center z-20 pointer-events-none`}

@@ -29,7 +29,8 @@ class LowerImageController {
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
-    >
+    >,
+    private setSettings: React.Dispatch<React.SetStateAction<Settings>>
   ) {}
 
   handleImageEffects = () => {
@@ -67,6 +68,9 @@ class LowerImageController {
         break;
       case "h":
         this.handleDownloadRecording();
+        break;
+      case "b":
+        this.handleSetAsBackground();
         break;
       default:
         break;
@@ -146,6 +150,20 @@ class LowerImageController {
 
   handleSettings = () => {
     this.setSettingsActive((prev) => !prev);
+  };
+
+  handleSetAsBackground = () => {
+    this.setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      if (newSettings.background.value === "true") {
+        newSettings.background.value = "false";
+      } else {
+        newSettings.background.value = "true";
+      }
+
+      return newSettings;
+    });
   };
 }
 

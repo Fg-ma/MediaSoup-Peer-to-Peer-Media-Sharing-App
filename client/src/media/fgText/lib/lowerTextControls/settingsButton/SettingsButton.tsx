@@ -3,6 +3,7 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
 import { Settings, ActivePages } from "../../typeConstant";
+import LowerTextController from "../LowerTextController";
 
 type RecursiveObject = {
   active?: boolean;
@@ -18,6 +19,7 @@ export default function SettingsButton({
   settings,
   setSettings,
   scrollingContainerRef,
+  lowerTextController,
 }: {
   containerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
@@ -27,6 +29,7 @@ export default function SettingsButton({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  lowerTextController: LowerTextController;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -140,6 +143,7 @@ export default function SettingsButton({
             textColor: textColorPickerPanelRef,
             indexColor: indexColorPickerPanelRef,
           }}
+          lowerTextController={lowerTextController}
         />
       )}
     </>

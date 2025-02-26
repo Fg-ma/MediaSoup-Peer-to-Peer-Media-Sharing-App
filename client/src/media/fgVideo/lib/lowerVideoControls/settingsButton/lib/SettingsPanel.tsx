@@ -234,6 +234,21 @@ export default function SettingsPanel({
             exit='exit'
           >
             <FgButton
+              className='w-full h-7'
+              contentFunction={() => (
+                <div
+                  className={`${
+                    settings.background.value === "true"
+                      ? "bg-fg-white text-fg-tone-black-1"
+                      : ""
+                  } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
+                >
+                  Set as background (b)
+                </div>
+              )}
+              clickFunction={lowerVideoController.handleSetAsBackground}
+            />
+            <FgButton
               className='w-full'
               contentFunction={() => (
                 <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>

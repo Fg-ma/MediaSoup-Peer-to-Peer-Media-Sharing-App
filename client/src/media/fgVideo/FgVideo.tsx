@@ -127,7 +127,8 @@ export default function FgVideo({
     timelineContainerRef,
     isScrubbing,
     wasPaused,
-    tableStaticContentSocket
+    tableStaticContentSocket,
+    setSettings
   );
 
   const videoController = new VideoController(
@@ -216,6 +217,7 @@ export default function FgVideo({
       kind='video'
       rootMedia={videoMedia.video}
       bundleRef={bundleRef}
+      backgroundMedia={settings.background.value === "true"}
       media={
         <div
           ref={timelineContainerRef}
