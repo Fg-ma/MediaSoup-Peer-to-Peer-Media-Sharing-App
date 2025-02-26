@@ -83,6 +83,7 @@ export default function FgMediaContainer({
     externalMediaContainerRef ?? useRef<HTMLDivElement>(null);
   const subContainerRef =
     externalSubContainerRef ?? useRef<HTMLDivElement>(null);
+  const effectsContainerRef = useRef<HTMLDivElement>(null);
   const panBtnRef = useRef<HTMLButtonElement>(null);
 
   const [inMedia, setInMedia] = useState(false);
@@ -144,7 +145,8 @@ export default function FgMediaContainer({
     setFullScreen,
     mediaContainerOptions,
     setDesync,
-    setReactionsPanelActive
+    setReactionsPanelActive,
+    effectsContainerRef
   );
 
   const mediaContainerController = new MediaContainerController(
@@ -240,16 +242,17 @@ export default function FgMediaContainer({
       ref={mediaContainerRef}
       id={`${mediaId}_media_container`}
       className={`media-container ${
-        inMedia || inMediaVariables?.some(Boolean) ? "in-media" : ""
+        inMedia || reactionsPanelActive || inMediaVariables?.some(Boolean)
+          ? "in-media"
+          : ""
       } ${
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
       } ${
         fullscreen ? "full-screen" : ""
-      } ${className} flex items-center justify-center`}
+      } ${className} flex items-center justify-center relative`}
       style={{
-        position: "absolute",
         left: `${positioning.current.position.left}%`,
         top: `${positioning.current.position.top}%`,
         width: `${positioning.current.scale.x}%`,
@@ -287,6 +290,7 @@ export default function FgMediaContainer({
           <UpperControls
             desync={desync}
             reactionsPanelActive={reactionsPanelActive}
+            setReactionsPanelActive={setReactionsPanelActive}
             lowerController={lowerController}
             leftUpperControls={leftUpperControls}
             rightUpperControls={rightUpperControls}
@@ -305,6 +309,12 @@ export default function FgMediaContainer({
           />
         </>
       )}
+      <div className='w-full h-full absolute top-0 left-0 z-[100] pointer-events-none'>
+        <div
+          ref={effectsContainerRef}
+          className='w-full h-full relative z-[100] pointer-events-none'
+        />
+      </div>
       <div
         ref={subContainerRef}
         className='flex sub-media-container relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
@@ -316,6 +326,7 @@ export default function FgMediaContainer({
             <UpperControls
               desync={desync}
               reactionsPanelActive={reactionsPanelActive}
+              setReactionsPanelActive={setReactionsPanelActive}
               lowerController={lowerController}
               leftUpperControls={leftUpperControls}
               rightUpperControls={rightUpperControls}

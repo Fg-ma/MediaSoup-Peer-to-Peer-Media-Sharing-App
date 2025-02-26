@@ -21,7 +21,7 @@ export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup(broadcaster);
 
-// tableTopCeph.emptyBucket("mybucket");
+tableTopCeph.emptyBucket("mybucket");
 // tableTopCeph.listBucketContents("mybucket");
 
 const sslOptions = {

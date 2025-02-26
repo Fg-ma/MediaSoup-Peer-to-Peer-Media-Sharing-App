@@ -117,3 +117,64 @@
   padding-right: 1.5rem;
   margin-top: 1.25rem;
 }
+
+.exploding-reaction-particle {
+  position: absolute;
+  background-size: cover;
+  pointer-events: none;
+  animation: explode 1.25s ease-out forwards;
+  z-index: 100;
+  aspect-ratio: 1 / 1;
+  pointer-events: auto;
+  top: 50%;
+  left: 50%;
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.expanding-rotating-reaction-particle {
+  position: absolute;
+  background-size: cover;
+  pointer-events: none;
+  animation: expand-rotating 1.25s ease-out forwards;
+  z-index: 100;
+  aspect-ratio: 1 / 1;
+  pointer-events: auto;
+}
+
+@keyframes expand-rotating {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(10) rotate(360deg);
+  }
+}
+
+.expanding-reaction-particle {
+  position: absolute;
+  background-size: cover;
+  pointer-events: none;
+  animation: expand 1.25s ease-out forwards;
+  z-index: 100;
+  aspect-ratio: 1 / 1;
+  pointer-events: auto;
+}
+
+@keyframes expand {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(10);
+  }
+}

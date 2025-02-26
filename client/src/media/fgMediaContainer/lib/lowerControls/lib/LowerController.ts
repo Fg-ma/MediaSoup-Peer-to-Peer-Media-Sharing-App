@@ -3,7 +3,10 @@ import TableStaticContentSocketController, {
 } from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaContainerOptions } from "../../typeConstant";
-import { TableReactions } from "../../upperControls/lib/reactButton/lib/typeConstant";
+import {
+  reactionsMeta,
+  TableReactions,
+} from "../../upperControls/lib/reactButton/lib/typeConstant";
 
 class LowerController {
   constructor(
@@ -35,7 +38,8 @@ class LowerController {
     private setDesync: React.Dispatch<React.SetStateAction<boolean>>,
     private setReactionsPanelActive: React.Dispatch<
       React.SetStateAction<boolean>
-    >
+    >,
+    private effectsContainerRef: React.RefObject<HTMLDivElement>
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -296,7 +300,74 @@ class LowerController {
     this.setReactionsPanelActive((prev) => !prev);
   };
 
-  handleReaction = (reaction: TableReactions) => {};
+  handleReaction = (reaction: TableReactions) => {
+    const reactionSrc = reactionsMeta[reaction].src;
+
+    if (Math.random() < 0.5) {
+      this.explodeReaction(reactionSrc);
+    } else {
+      this.expandReaction(reactionSrc);
+    }
+  };
+
+  private expandReaction = (reaction: string) => {
+    if (!this.effectsContainerRef.current) return;
+
+    // Number of particles
+    const particle = document.createElement("div");
+    particle.classList.add(
+      Math.random() < 0.5
+        ? "expanding-reaction-particle"
+        : "expanding-rotating-reaction-particle"
+    );
+    particle.style.backgroundImage = `url(${reaction})`;
+
+    particle.style.left = "50%";
+    particle.style.top = "50%";
+    particle.style.width = `${
+      Math.min(
+        this.effectsContainerRef.current.clientWidth,
+        this.effectsContainerRef.current.clientHeight
+      ) / 12
+    }px`;
+    this.effectsContainerRef.current.appendChild(particle);
+
+    // Remove particle after animation
+    setTimeout(() => {
+      particle.remove();
+    }, 1500);
+  };
+
+  private explodeReaction = (reaction: string) => {
+    if (!this.effectsContainerRef.current) return;
+
+    for (let i = 0; i < 40; i++) {
+      // Number of particles
+      const particle = document.createElement("div");
+      particle.classList.add("exploding-reaction-particle");
+      particle.style.backgroundImage = `url(${reaction})`;
+
+      // Random position and movement
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * 150 + 50;
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance;
+      const size = Math.max(15, Math.random() * 50);
+      const rotation = Math.random() * 360;
+
+      particle.style.setProperty("--x", `calc(${x}px - 50%)`);
+      particle.style.setProperty("--y", `calc(${y}px - 50%)`);
+
+      particle.style.width = `${size}px`;
+      particle.style.rotate = `${rotation}deg`;
+      this.effectsContainerRef.current.appendChild(particle);
+
+      // Remove particle after animation
+      setTimeout(() => {
+        particle.remove();
+      }, 1500);
+    }
+  };
 }
 
 export default LowerController;

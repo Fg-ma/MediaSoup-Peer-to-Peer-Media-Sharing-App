@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import FgImageElement from "../../../../../../elements/fgImageElement/FgImageElement";
@@ -17,14 +17,17 @@ const reactionsOffIcon =
 
 export default function ReactButton({
   reactionsPanelActive,
+  setReactionsPanelActive,
   lowerController,
 }: {
   reactionsPanelActive: boolean;
+  setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   lowerController: LowerController;
 }) {
   const [cols, setCols] = useState(3);
   const reactionsButtonRef = useRef<HTMLButtonElement>(null);
   const reactionsPanelScrollingContainerRef = useRef<HTMLDivElement>(null);
+  const reactionsPanelRef = useRef<HTMLDivElement>(null);
 
   const gridColumnsChange = () => {
     if (!reactionsPanelScrollingContainerRef.current) return;
@@ -40,6 +43,25 @@ export default function ReactButton({
       if (cols !== 6) setCols(6);
     }
   };
+
+  const handlePointerDown = (event: PointerEvent) => {
+    if (
+      !reactionsButtonRef.current?.contains(event.target as Node) &&
+      !reactionsPanelRef.current?.contains(event.target as Node)
+    ) {
+      setReactionsPanelActive(false);
+    }
+  };
+
+  useEffect(() => {
+    if (reactionsPanelActive) {
+      document.addEventListener("pointerdown", handlePointerDown);
+    }
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [reactionsPanelActive]);
 
   return (
     <>
@@ -66,8 +88,8 @@ export default function ReactButton({
           <FgHoverContentStandard
             content={
               reactionsPanelActive
-                ? "Open reactions (Q)"
-                : "Close reactions (Q)"
+                ? "Close reactions (Q)"
+                : "Open reactions (Q)"
             }
           />
         }
@@ -76,6 +98,7 @@ export default function ReactButton({
       />
       {reactionsPanelActive && (
         <FgPanel
+          externalRef={reactionsPanelRef}
           content={
             <LazyScrollingContainer
               externalRef={reactionsPanelScrollingContainerRef}
@@ -130,7 +153,7 @@ export default function ReactButton({
           }
           initPosition={{
             referenceElement: reactionsButtonRef.current ?? undefined,
-            placement: "below",
+            placement: "above",
             padding: 4,
           }}
           initWidth={"278px"}

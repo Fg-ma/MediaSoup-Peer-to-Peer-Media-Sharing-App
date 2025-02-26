@@ -8,6 +8,7 @@ import { MediaContainerOptions } from "../typeConstant";
 export default function UpperControls({
   desync,
   reactionsPanelActive,
+  setReactionsPanelActive,
   lowerController,
   leftUpperControls,
   rightUpperControls,
@@ -16,6 +17,7 @@ export default function UpperControls({
 }: {
   desync: boolean;
   reactionsPanelActive: boolean;
+  setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   lowerController: LowerController;
   leftUpperControls?: (React.ReactNode | null)[];
   rightUpperControls?: (React.ReactNode | null)[];
@@ -39,6 +41,7 @@ export default function UpperControls({
           rightUpperControls}
         <ReactButton
           reactionsPanelActive={reactionsPanelActive}
+          setReactionsPanelActive={setReactionsPanelActive}
           lowerController={lowerController}
         />
         <SyncButton desync={desync} lowerController={lowerController} />
