@@ -1,5 +1,6 @@
 import uWS from "uWebSockets.js";
 import dotenv from "dotenv";
+import path from "path";
 import { tables, TableStaticContentWebSocket } from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
 import handleMessage from "./lib/websocketMessages";
@@ -11,7 +12,9 @@ import Posts from "./posts/posts";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
 
-dotenv.config();
+dotenv.config({
+  path: path.resolve(__dirname, "../../.env"),
+});
 
 export const tableTopCeph = new TableTopCeph();
 export const tableTopMongo = new TableTopMongo();

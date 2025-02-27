@@ -7,8 +7,11 @@ import {
 } from "@aws-sdk/client-s3";
 import internal from "stream";
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+dotenv.config({
+  path: path.resolve(__dirname, "../../.env"),
+});
 
 const cephRegion = process.env.CEPH_REGION;
 const cephEndpoint = process.env.CEPH_ENDPOINT;

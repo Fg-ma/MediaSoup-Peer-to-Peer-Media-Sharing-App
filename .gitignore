@@ -1,6 +1,8 @@
-certs
+node_modules
 
 .env
+
+certs
 
 nginx-1.27.3
 nginx-1.27.3-2
@@ -10,15 +12,10 @@ disney.mp4
 disney2.mp4
 disney3.mp4
 disney4.mp4
-
 testVideo.mp4
-
 portrait1.jpg
 portrait2.jpg
 portrait3.jpg
-
 cube.gif
-
 helloWorld.docx
-
 L1.pdf

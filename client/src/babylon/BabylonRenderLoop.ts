@@ -48,7 +48,8 @@ class BabylonRenderLoop {
       | "image"
       | "video"
       | "text"
-      | "application",
+      | "application"
+      | "capture",
     private scene: Scene,
     private camera: UniversalCamera,
     private faceLandmarks: FaceLandmarks | undefined,
