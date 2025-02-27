@@ -17,7 +17,8 @@ class TableFunctionsController {
     private captureMedia: React.MutableRefObject<CaptureMedia | undefined>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private effectsStyles: React.MutableRefObject<VideoEffectStylesType>
+    private effectsStyles: React.MutableRefObject<VideoEffectStylesType>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   handleTableSocketMessage = (message: IncomingTableMessages) => {
@@ -41,6 +42,8 @@ class TableFunctionsController {
       );
 
       this.captureMedia.current.video.srcObject = stream;
+
+      this.setRerender((prev) => !prev);
     } catch (error) {
       console.error("Error accessing media devices:", error);
       this.setCaptureMediaActive(false);

@@ -117,7 +117,8 @@ class BabylonScene {
       | "image"
       | "video"
       | "application"
-      | "text",
+      | "text"
+      | "capture",
     private canvas: HTMLCanvasElement,
     private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private faceLandmarks: FaceLandmarks | undefined,

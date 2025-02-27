@@ -143,12 +143,12 @@ class CaptureMedia {
 
     this.babylonScene = new BabylonScene(
       this.captureId,
-      "video",
+      "capture",
       this.canvas,
       this.video,
       this.faceLandmarks,
       this.effects,
-      this.userEffectsStyles,
+      undefined,
       this.faceMeshWorker,
       this.faceMeshResults,
       this.faceMeshProcessing,
@@ -159,7 +159,7 @@ class CaptureMedia {
       this.selfieSegmentationProcessing,
       this.userDevice,
       this.maxFaces,
-      this.userMedia
+      undefined
     );
   }
 

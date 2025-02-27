@@ -109,6 +109,8 @@ export default function FgTableFunctions({
     structuredClone(defaultVideoEffectsStyles)
   );
 
+  const [_, setRerender] = useState(false);
+
   const tableFunctionsController = new TableFunctionsController(
     externalBackgroundChange,
     setTableBackground,
@@ -116,7 +118,8 @@ export default function FgTableFunctions({
     captureMedia,
     userDevice,
     deadbanding,
-    effectsStyles
+    effectsStyles,
+    setRerender
   );
 
   const handleExternalMute = () => {
