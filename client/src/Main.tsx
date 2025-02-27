@@ -341,6 +341,8 @@ export default function Main() {
         gridSize={gridSize}
         setGridSize={setGridSize}
         producersController={producersController}
+        userDevice={userDevice}
+        deadbanding={deadbanding}
       />
       <JoinTableSection
         producerTransport={producerTransport}

@@ -22,6 +22,8 @@ export default function MoreTableFunctionsButton({
   tableBackground,
   externalBackgroundChange,
   handleExternalMute,
+  captureMediaActive,
+  setCaptureMediaActive,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
@@ -43,6 +45,8 @@ export default function MoreTableFunctionsButton({
   tableBackground: FgBackground | undefined;
   externalBackgroundChange: React.MutableRefObject<boolean>;
   handleExternalMute: () => void;
+  captureMediaActive: boolean;
+  setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [moreTableFunctionsActive, setMoreTableFunctionsActive] =
     useState(false);
@@ -117,6 +121,8 @@ export default function MoreTableFunctionsButton({
           tableBackground={tableBackground}
           externalBackgroundChange={externalBackgroundChange}
           handleExternalMute={handleExternalMute}
+          captureMediaActive={captureMediaActive}
+          setCaptureMediaActive={setCaptureMediaActive}
         />
       )}
     </>

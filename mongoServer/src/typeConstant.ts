@@ -1,15 +1,6 @@
-import uWS from "uWebSockets.js";
-import { VideoEffectStylesType } from "./mongo/lib/videos/typeConstant";
-import { ImageEffectStylesType } from "./mongo/lib/images/typeConstant";
-import { ApplicationEffectStylesType } from "./mongo/lib/applications/typeConstant";
-
-export interface Tables {
-  [table_id: string]: {
-    [username: string]: {
-      [instance: string]: TableStaticContentWebSocket;
-    };
-  };
-}
+import { ApplicationEffectStylesType } from "./lib/applications/typeConstant";
+import { ImageEffectStylesType } from "./lib/images/typeConstant";
+import { VideoEffectStylesType } from "./lib/videos/typeConstant";
 
 export type TableContentTypes =
   | "video"
@@ -73,82 +64,6 @@ export const mimeToExtension: { [key: string]: string } = {
   "text/plain": ".txt",
 };
 
-export interface TableStaticContentWebSocket extends uWS.WebSocket<SocketData> {
-  id: string;
-  table_id: string;
-  username: string;
-  instance: string;
-}
-
-export interface SocketData {
-  id: string;
-  table_id: string;
-  username: string;
-  instance: string;
-}
-
-export type MessageTypes =
-  | onJoinTableType
-  | onLeaveTableType
-  | onRequestCatchUpTableDataType
-  | onDeleteContentType
-  | onGetFileType
-  | onUpdateContentPositioningType
-  | onUpdateContentEffectsType;
-
-export type onJoinTableType = {
-  type: "joinTable";
-  header: {
-    table_id: string;
-    username: string;
-    instance: string;
-  };
-};
-
-export type onLeaveTableType = {
-  type: "leaveTable";
-  header: {
-    table_id: string;
-    username: string;
-    instance: string;
-  };
-};
-
-export type onRequestCatchUpTableDataType = {
-  type: "requestCatchUpTableData";
-  header: {
-    table_id: string;
-    username: string;
-    instance: string;
-  };
-};
-
-export type onDeleteContentType = {
-  type: "deleteContent";
-  header: {
-    table_id: string;
-    contentType: TableContentTypes;
-    contentId: string;
-  };
-  data: {
-    filename: string;
-  };
-};
-
-export type onGetFileType = {
-  type: "getFile";
-  header: {
-    table_id: string;
-    username: string;
-    instance: string;
-    contentType: TableContentTypes;
-    contentId: string;
-  };
-  data: {
-    key: string;
-  };
-};
-
 export type onUpdateContentPositioningType = {
   type: "updateContentPositioning";
   header: {
@@ -188,5 +103,3 @@ export type onUpdateContentEffectsType = {
       | ApplicationEffectStylesType;
   };
 };
-
-export const tables: Tables = {};

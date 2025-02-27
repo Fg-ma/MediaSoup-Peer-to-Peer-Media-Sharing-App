@@ -8,9 +8,10 @@ import {
   onUpdateContentEffectsType,
   onUpdateContentPositioningType,
   TableContentTypes,
-} from "../typeConstant";
+} from "./typeConstant";
 import { ImageEffectStylesType } from "./lib/images/typeConstant";
 import { VideoEffectStylesType } from "./lib/videos/typeConstant";
+import TablesMeta from "./lib/meta/TablesMeta";
 
 const uri = "mongodb://localhost:27017";
 const dbName = "tableTopMongo";
@@ -19,6 +20,7 @@ class TableTopMongo {
   private client: MongoClient | undefined;
   private db: Db | undefined;
 
+  tablesMeta: TablesMeta | undefined;
   tableImages: TableImages | undefined;
   tableVideos: TableVideos | undefined;
   tableSoundClips: TableSoundClips | undefined;
@@ -40,6 +42,7 @@ class TableTopMongo {
 
     this.db = this.client.db(dbName);
 
+    this.tablesMeta = new TablesMeta(this.db);
     this.tableImages = new TableImages(this.db);
     this.tableVideos = new TableVideos(this.db);
     this.tableSoundClips = new TableSoundClips(this.db);

@@ -11,6 +11,16 @@ import { FgBackground } from "../elements/fgBackgroundSelector/lib/typeConstant"
 import UploadMediaButton from "./lib/uploadMediaButton/UploadMediaButton";
 import MoreTableFunctionsButton from "./lib/moreTableFunctionsButton/MoreTableFunctionsButton";
 import MessageTableSection from "./lib/messageTableSection/MessageTableSection";
+import CaptureMediaPortal from "./lib/captureMediaPortal/CaptureMediaPortal";
+import CaptureMedia from "../media/capture/CaptureMedia";
+import {
+  defaultVideoEffectsStyles,
+  defaultVideoStreamEffects,
+  VideoEffectStylesType,
+  VideoEffectTypes,
+} from "../context/effectsContext/typeConstant";
+import UserDevice from "../lib/UserDevice";
+import Deadbanding from "../babylon/Deadbanding";
 
 export default function FgTableFunctions({
   tableTopRef,
@@ -36,6 +46,8 @@ export default function FgTableFunctions({
   gridSize,
   setGridSize,
   producersController,
+  userDevice,
+  deadbanding,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   isCamera: React.MutableRefObject<boolean>;
@@ -71,6 +83,8 @@ export default function FgTableFunctions({
     }>
   >;
   producersController: ProducersController;
+  userDevice: UserDevice;
+  deadbanding: Deadbanding;
 }) {
   const { setSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
@@ -85,9 +99,24 @@ export default function FgTableFunctions({
     FgBackground | undefined
   >();
 
+  const [captureMediaActive, setCaptureMediaActive] = useState(false);
+  const captureMedia = useRef<CaptureMedia | undefined>(undefined);
+
+  const streamEffects = useRef<{ [effectType in VideoEffectTypes]: boolean }>(
+    structuredClone(defaultVideoStreamEffects)
+  );
+  const effectsStyles = useRef<VideoEffectStylesType>(
+    structuredClone(defaultVideoEffectsStyles)
+  );
+
   const tableFunctionsController = new TableFunctionsController(
     externalBackgroundChange,
-    setTableBackground
+    setTableBackground,
+    setCaptureMediaActive,
+    captureMedia,
+    userDevice,
+    deadbanding,
+    effectsStyles
   );
 
   const handleExternalMute = () => {
@@ -121,9 +150,15 @@ export default function FgTableFunctions({
     };
   }, [tableSocket.current]);
 
+  useEffect(() => {
+    if (!captureMediaActive) return;
+
+    tableFunctionsController.getVideo();
+  }, [captureMediaActive]);
+
   return (
     <div className='w-full h-16 flex items-center justify-center space-x-5 px-[5%]'>
-      <div className='w-max h-full py-2 px-4 flex space-x-3 bg-fg-tone-black-6 rounded-xl border-2 border-fg-off-white'>
+      <div className='flex w-max h-full py-2 px-4 space-x-3 bg-fg-tone-black-6 rounded-xl border-2 border-fg-off-white'>
         <MoreTableFunctionsButton
           tableTopRef={tableTopRef}
           mutedAudioRef={mutedAudioRef}
@@ -137,6 +172,8 @@ export default function FgTableFunctions({
           tableBackground={tableBackground}
           externalBackgroundChange={externalBackgroundChange}
           handleExternalMute={handleExternalMute}
+          captureMediaActive={captureMediaActive}
+          setCaptureMediaActive={setCaptureMediaActive}
         />
         <CameraSection
           cameraBtnRef={cameraBtnRef}
@@ -168,6 +205,14 @@ export default function FgTableFunctions({
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <UploadMediaButton />
+        {captureMediaActive && (
+          <CaptureMediaPortal
+            captureMedia={captureMedia}
+            tableFunctionsController={tableFunctionsController}
+            streamEffects={streamEffects}
+            effectsStyles={effectsStyles}
+          />
+        )}
       </div>
       <MessageTableSection />
     </div>

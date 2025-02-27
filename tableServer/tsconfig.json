@@ -15,6 +15,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["src", "src/postgresSQLPool.ts"],
+  "include": ["src", "../mongo"],
   "exclude": ["node_modules"]
 }

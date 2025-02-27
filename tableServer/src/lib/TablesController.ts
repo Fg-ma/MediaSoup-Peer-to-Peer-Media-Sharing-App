@@ -17,6 +17,10 @@ import Broadcaster from "./Broadcaster";
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
+  onCreateTable = (ws: TableWebSocket, event: onCreateTableType) => {
+    const { username } = event.header;
+  };
+
   onJoinTable = (ws: TableWebSocket, event: onJoinTableType) => {
     const { table_id, username, instance } = event.header;
 

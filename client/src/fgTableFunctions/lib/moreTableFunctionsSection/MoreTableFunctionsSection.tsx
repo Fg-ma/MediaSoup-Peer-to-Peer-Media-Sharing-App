@@ -10,6 +10,7 @@ import TableGridButton from "../tableGridButton/TableGridButton";
 import { FgBackground } from "../../../elements/fgBackgroundSelector/lib/typeConstant";
 import TableGridSizeButton from "../tableGrisSizeButton/TableGridSizeButton";
 import FgPanel from "../../../elements/fgPanel/FgPanel";
+import CaptureMediaButton from "../captureMediaButton/CaptureMediaButton";
 
 const AudioEffectsButton = React.lazy(
   () => import("../../../audioEffectsButton/AudioEffectsButton")
@@ -31,6 +32,8 @@ export default function MoreTableFunctionsSection({
   tableBackground,
   externalBackgroundChange,
   handleExternalMute,
+  captureMediaActive,
+  setCaptureMediaActive,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   moreTableFunctionsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -55,6 +58,8 @@ export default function MoreTableFunctionsSection({
   tableBackground: FgBackground | undefined;
   externalBackgroundChange: React.MutableRefObject<boolean>;
   handleExternalMute: () => void;
+  captureMediaActive: boolean;
+  setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
@@ -140,6 +145,10 @@ export default function MoreTableFunctionsSection({
                 />
               </Suspense>
             )}
+            <CaptureMediaButton
+              captureMediaActive={captureMediaActive}
+              setCaptureMediaActive={setCaptureMediaActive}
+            />
             {
               // Clock
               // Weather

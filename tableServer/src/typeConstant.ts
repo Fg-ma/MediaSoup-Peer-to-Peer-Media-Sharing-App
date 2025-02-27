@@ -18,6 +18,25 @@ export type TableColors =
   | "lightBlue"
   | "tableTop";
 
+export const tableColorEncodingMap = {
+  cyan: 0,
+  orange: 1,
+  blue: 2,
+  green: 3,
+  yellow: 4,
+  purple: 5,
+  pink: 6,
+  black: 7,
+  white: 8,
+  brown: 9,
+  lime: 10,
+  coral: 11,
+  gray: 12,
+  navy: 13,
+  lightBlue: 14,
+  tableTop: 15,
+};
+
 export interface Tables {
   [table_id: string]: {
     [username: string]: {

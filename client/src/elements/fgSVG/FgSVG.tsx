@@ -93,6 +93,9 @@ export default function FgSVG({
             } else {
               const element = svgDoc.getElementById(id);
               if (element) {
+                try {
+                  element.style[key as any] = "";
+                } catch (error) {}
                 element.setAttribute(key, value);
               }
             }

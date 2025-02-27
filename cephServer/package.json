@@ -4,17 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec tsx src/index.ts"
+    "dev": "nodemon --exec tsx src/TableTopCeph.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/mongodb": "^4.0.7",
-    "mongodb": "^6.12.0",
+    "@aws-sdk/client-s3": "^3.735.0",
+    "@aws-sdk/lib-storage": "^3.741.0",
+    "dotenv": "^16.4.7",
     "nodemon": "^3.1.9",
-    "typescript": "^5.7.2",
-    "uuid": "^11.0.3",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.50.0"
+    "typescript": "^5.7.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

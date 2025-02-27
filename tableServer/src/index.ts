@@ -9,15 +9,9 @@ import {
 import Broadcaster from "./lib/Broadcaster";
 import TablesController from "./lib/TablesController";
 import handleMessage from "./lib/websocketMessages";
-import { uploadDataToMongoDB } from "./MongoUpload";
+import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 
-// uploadDataToMongoDB({
-//   name: "John Doe",
-//   email: "john.doe@example.com",
-//   age: 30,
-//   active: true,
-// });
-
+export const tableTopMongo = new TableTopMongo();
 export const broadcaster = new Broadcaster();
 export const tablesController = new TablesController(broadcaster);
 

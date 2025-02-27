@@ -10,7 +10,13 @@ class FgPortalController {
     private externalRef: React.RefObject<HTMLElement> | undefined,
     private portalRef: React.RefObject<HTMLDivElement>,
     private spacing: number | undefined,
-    private type: "above" | "below" | "left" | "right" | "mouse",
+    private type:
+      | "above"
+      | "below"
+      | "left"
+      | "right"
+      | "mouse"
+      | "staticTopDomain",
     private mouseType: "topLeft" | "topRight" | "bottomLeft" | "bottomRight",
     private setPortalPosition: React.Dispatch<
       React.SetStateAction<{

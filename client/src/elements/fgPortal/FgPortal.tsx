@@ -31,12 +31,14 @@ export default function FgPortal({
   externalPortalRef,
   insertionPoint,
   zValue = 51,
+  top = 50,
+  left = 50,
   options = {
     animate: true,
   },
 }: {
   className?: string;
-  type?: "above" | "below" | "left" | "right" | "mouse";
+  type?: "above" | "below" | "left" | "right" | "mouse" | "staticTopDomain";
   mouseType?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
   spacing?: number;
   content?: React.ReactElement;
@@ -44,6 +46,8 @@ export default function FgPortal({
   externalPortalRef?: React.RefObject<HTMLDivElement>;
   insertionPoint?: React.RefObject<HTMLElement>;
   zValue?: number;
+  top?: number;
+  left?: number;
   options?: {
     animate: boolean;
   };
@@ -84,13 +88,13 @@ export default function FgPortal({
         fgPortalController.getDynamicPortalPosition
       );
 
-    return () => {
-      if (type === "mouse")
+    if (type === "mouse")
+      return () => {
         window.removeEventListener(
           "pointermove",
           fgPortalController.getDynamicPortalPosition
         );
-    };
+      };
   }, [content]);
 
   if (type === "mouse" && portalPosition === null) return;
@@ -100,8 +104,10 @@ export default function FgPortal({
       ref={portalRef}
       className={`${className} absolute`}
       style={{
-        top: `${portalPosition?.top}px`,
-        left: `${portalPosition?.left}px`,
+        top:
+          type !== "staticTopDomain" ? `${portalPosition?.top}px` : `${top}%`,
+        left:
+          type !== "staticTopDomain" ? `${portalPosition?.left}px` : `${left}%`,
         zIndex: zValue,
       }}
       {...(options.animate
@@ -116,7 +122,7 @@ export default function FgPortal({
     >
       {content}
     </motion.div>,
-    insertionPoint && insertionPoint.current
+    insertionPoint && insertionPoint.current && type !== "staticTopDomain"
       ? insertionPoint.current
       : document.body
   );
