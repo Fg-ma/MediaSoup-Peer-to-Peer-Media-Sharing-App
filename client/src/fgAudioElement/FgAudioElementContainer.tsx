@@ -400,37 +400,8 @@ export default function FgAudioElementContainer({
             return;
           }
 
-          const pixelScale = {
-            x:
-              (positioning.current.scale.x / 100) *
-              bundleRef.current.clientWidth,
-            y:
-              (positioning.current.scale.y / 100) *
-              bundleRef.current.clientHeight,
-          };
-
           fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-            "scale",
-            {
-              aspect: "square",
-              referencePoint: {
-                x:
-                  (positioning.current.position.left / 100) *
-                  bundleRef.current.clientWidth,
-                y:
-                  (positioning.current.position.top / 100) *
-                  bundleRef.current.clientHeight,
-              },
-              rotationPoint: {
-                x:
-                  (positioning.current.position.left / 100) *
-                  bundleRef.current.clientWidth,
-                y:
-                  (positioning.current.position.top / 100) *
-                    bundleRef.current.clientHeight +
-                  pixelScale.y / 2,
-              },
-            }
+            "scale"
           );
         }}
         pointerUpFunction={

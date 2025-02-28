@@ -16,9 +16,7 @@ class MediaContainerController {
         [instance: string]: () => void;
       };
     }>,
-    private setAspectRatio: React.Dispatch<
-      React.SetStateAction<number | undefined>
-    >,
+    private aspectRatio: React.MutableRefObject<number | undefined>,
     private positioning: React.MutableRefObject<{
       position: {
         left: number;
@@ -103,7 +101,8 @@ class MediaContainerController {
       const computedAspectRatio = width / height;
       this.positioning.current.scale.y =
         this.positioning.current.scale.x / computedAspectRatio;
-      this.setAspectRatio(computedAspectRatio);
+
+      this.aspectRatio.current = computedAspectRatio;
 
       this.tableStaticContentSocket.current?.updateContentPositioning(
         this.kind,

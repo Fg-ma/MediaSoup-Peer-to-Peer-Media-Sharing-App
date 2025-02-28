@@ -1,36 +1,21 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
-import BlurButton from "../../../../elements/effectsButtons/BlurButton";
-import TintSection from "../../../../elements/effectsButtons/TintSection";
 import {
   CameraEffectStylesType,
   CameraEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
 import CaptureMedia from "../../../../media/capture/CaptureMedia";
+import BlurButton from "../../../../elements/effectsButtons/BlurButton";
+import TintSection from "../../../../elements/effectsButtons/TintSection";
 import CaptureMediaController from "./CaptureMediaController";
-
-const HideBackgroundButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/HideBackgroundButton")
-);
-const GlassesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/GlassesButton")
-);
-const BeardsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/BeardsButton")
-);
-const MustachesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MustachesButton")
-);
-const MasksButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MasksButton")
-);
-const HatsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/HatsButton")
-);
-const PetsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/PetsButton")
-);
+import HideBackgroundButton from "../../../../elements/effectsButtons/HideBackgroundButton";
+import GlassesButton from "../../../../elements/effectsButtons/GlassesButton";
+import BeardsButton from "../../../../elements/effectsButtons/BeardsButton";
+import MustachesButton from "../../../../elements/effectsButtons/MustachesButton";
+import MasksButton from "../../../../elements/effectsButtons/MasksButton";
+import HatsButton from "../../../../elements/effectsButtons/HatsButton";
+import PetsButton from "../../../../elements/effectsButtons/PetsButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -62,7 +47,7 @@ export default function CaptureMediaEffectsSection({
     [effectType in CameraEffectTypes]: boolean;
   }>;
   effectsStyles: React.MutableRefObject<CameraEffectStylesType>;
-  captureMedia: CaptureMedia;
+  captureMedia: React.RefObject<CaptureMedia | undefined>;
   captureMediaController: CaptureMediaController;
 }) {
   const [effectsDisabled, setEffectsDisabled] = useState(false);
@@ -109,7 +94,7 @@ export default function CaptureMediaEffectsSection({
       ref={effectsContainerRef}
       className={`${
         overflow ? "pb-1" : "pb-2"
-      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-2 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center pointer-events-auto`}
+      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-2 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-[9%] items-center pointer-events-auto`}
       variants={EffectSectionVar}
       initial='init'
       animate='animate'
@@ -123,7 +108,7 @@ export default function CaptureMediaEffectsSection({
         streamEffects={streamEffects.current.postProcess}
         effectsStyles={effectsStyles.current.postProcess}
         clickFunctionCallback={async () => {
-          captureMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+          captureMedia.current?.babylonScene?.babylonShaderController.swapPostProcessEffects(
             effectsStyles.current.postProcess.style
           );
 
@@ -135,7 +120,7 @@ export default function CaptureMediaEffectsSection({
         holdFunctionCallback={async (effectType) => {
           effectsStyles.current.postProcess.style = effectType;
 
-          captureMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+          captureMedia.current?.babylonScene?.babylonShaderController.swapPostProcessEffects(
             effectType
           );
 
@@ -153,7 +138,7 @@ export default function CaptureMediaEffectsSection({
         streamEffects={streamEffects.current.hideBackground}
         effectsStyles={effectsStyles.current.hideBackground}
         clickFunctionCallback={async () => {
-          captureMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+          captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
             effectsStyles.current.hideBackground.style
           );
 
@@ -165,7 +150,7 @@ export default function CaptureMediaEffectsSection({
         holdFunctionCallback={async (effectType) => {
           effectsStyles.current.hideBackground.style = effectType;
 
-          captureMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+          captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
             effectType
           );
 
@@ -178,7 +163,7 @@ export default function CaptureMediaEffectsSection({
           const styles = effectsStyles.current.hideBackground;
           const effects = streamEffects.current.hideBackground;
 
-          captureMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+          captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
             color
           );
 

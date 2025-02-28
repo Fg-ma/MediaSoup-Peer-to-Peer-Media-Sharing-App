@@ -214,21 +214,20 @@ export default function FgButton({
   }, [closeHoldToggle]);
 
   useEffect(() => {
-    if (!hoverContent) {
-      return;
-    }
+    if (!isHover) return;
 
-    const handleVisibilityChange = () => {
-      clearTimeout(hoverTimeout.current);
-      setIsHover(false);
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener(
+      "visibilitychange",
+      fgButtonController.handleVisibilityChange
+    );
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener(
+        "visibilitychange",
+        fgButtonController.handleVisibilityChange
+      );
     };
-  }, [hoverContent]);
+  }, [isHover]);
 
   const ButtonComponent = animationOptions ? motion.button : "button";
 

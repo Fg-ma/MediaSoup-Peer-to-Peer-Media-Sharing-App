@@ -14,7 +14,7 @@ export default function CaptureButton() {
 
     setTimeout(() => {
       setClicked(false);
-    }, 250);
+    }, 150);
   };
 
   return (

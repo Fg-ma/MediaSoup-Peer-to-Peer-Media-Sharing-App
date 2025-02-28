@@ -75,6 +75,8 @@ class BabylonScene {
   scene: Scene;
   private camera: UniversalCamera;
 
+  private resizeObserver: ResizeObserver;
+
   private backgroundLight: HemisphericLight | undefined;
   private ambientLightThreeDimMeshes: HemisphericLight | undefined;
   private ambientLightTwoDimMeshes: HemisphericLight | undefined;
@@ -212,6 +214,13 @@ class BabylonScene {
     window.addEventListener("resize", this.canvasSizeChange);
     window.addEventListener("fullscreenchange", this.canvasSizeChange);
 
+    this.resizeObserver = new ResizeObserver(() => {
+      requestAnimationFrame(() => {
+        this.canvasSizeChange();
+      });
+    });
+    this.resizeObserver.observe(this.canvas);
+
     setTimeout(() => {
       this.canvasSizeChange();
     }, 1000);
@@ -229,6 +238,8 @@ class BabylonScene {
 
     window.removeEventListener("resize", this.canvasSizeChange);
     window.removeEventListener("fullscreenchange", this.canvasSizeChange);
+
+    this.resizeObserver.disconnect();
   };
 
   private engineRenderLoop = () => {
@@ -320,7 +331,7 @@ class BabylonScene {
 
     // Update the plane scaling
     plane.scaling = new Vector3(
-      (this.type === "camera" ? -1 : 1) * planeWidth,
+      (this.type === "camera" || this.type === "capture" ? -1 : 1) * planeWidth,
       planeScaledHeight,
       1
     );

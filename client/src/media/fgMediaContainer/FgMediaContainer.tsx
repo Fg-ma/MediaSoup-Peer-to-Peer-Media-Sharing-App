@@ -108,7 +108,7 @@ export default function FgMediaContainer({
     };
   }>({});
 
-  const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
+  const aspectRatio = useRef<number | undefined>(undefined);
 
   const positioning =
     externalPositioning ??
@@ -145,6 +145,7 @@ export default function FgMediaContainer({
     controlPressed,
     fgContentAdjustmentController,
     positioning,
+    aspectRatio,
     setFullScreen,
     mediaContainerOptions,
     setDesync,
@@ -159,7 +160,7 @@ export default function FgMediaContainer({
     kind,
     rootMedia,
     positioningListeners,
-    setAspectRatio,
+    aspectRatio,
     positioning,
     remoteDataStreams,
     mediaContainerRef,

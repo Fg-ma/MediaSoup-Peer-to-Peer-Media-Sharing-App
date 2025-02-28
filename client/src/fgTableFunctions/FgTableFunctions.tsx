@@ -208,7 +208,7 @@ export default function FgTableFunctions({
           handleDisableEnableBtns={handleDisableEnableBtns}
         />
         <UploadMediaButton />
-        {captureMediaActive && (
+        {captureMediaActive && captureMedia.current && (
           <CaptureMediaPortal
             captureMedia={captureMedia}
             tableFunctionsController={tableFunctionsController}

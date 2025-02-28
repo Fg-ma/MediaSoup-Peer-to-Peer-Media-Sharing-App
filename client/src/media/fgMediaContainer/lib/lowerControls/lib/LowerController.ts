@@ -9,6 +9,10 @@ import {
 } from "../../upperControls/lib/reactButton/lib/typeConstant";
 
 class LowerController {
+  private moving: boolean = false;
+  private scaling: boolean = false;
+  private rotating: boolean = false;
+
   constructor(
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
@@ -33,6 +37,7 @@ class LowerController {
       };
       rotation: number;
     }>,
+    private aspectRatio: React.MutableRefObject<number | undefined>,
     private setFullScreen: React.Dispatch<React.SetStateAction<boolean>>,
     private mediaContainerOptions: MediaContainerOptions,
     private setDesync: React.Dispatch<React.SetStateAction<boolean>>,
@@ -72,26 +77,41 @@ class LowerController {
         this.handleClose();
         break;
       case "s":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "scale"
-        );
-        document.addEventListener("pointermove", this.scaleFuntion);
-        document.addEventListener("pointerdown", this.scaleFunctionEnd);
+        this.scaling = !this.scaling;
+        if (this.scaling) {
+          this.scaleFunctionEnd();
+        } else {
+          this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+            "scale"
+          );
+          document.addEventListener("pointermove", this.scaleFuntion);
+          document.addEventListener("pointerdown", this.scaleFunctionEnd);
+        }
         break;
       case "g":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "position",
-          { rotationPointPlacement: "topLeft" }
-        );
-        document.addEventListener("pointermove", this.moveFunction);
-        document.addEventListener("pointerdown", this.moveFunctionEnd);
+        this.moving = !this.moving;
+        if (this.moving) {
+          this.moveFunctionEnd();
+        } else {
+          this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+            "position",
+            { rotationPointPlacement: "topLeft" }
+          );
+          document.addEventListener("pointermove", this.moveFunction);
+          document.addEventListener("pointerdown", this.moveFunctionEnd);
+        }
         break;
       case "r":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "rotation"
-        );
-        document.addEventListener("pointermove", this.rotateFunction);
-        document.addEventListener("pointerdown", this.rotateFunctionEnd);
+        this.rotating = !this.rotating;
+        if (this.rotating) {
+          this.rotateFunctionEnd();
+        } else {
+          this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+            "rotation"
+          );
+          document.addEventListener("pointermove", this.rotateFunction);
+          document.addEventListener("pointerdown", this.rotateFunctionEnd);
+        }
         break;
       case "h":
         this.handleDesync();
@@ -218,7 +238,8 @@ class LowerController {
         y: event.clientY - rect.top,
       },
       referencePoint,
-      referencePoint
+      referencePoint,
+      this.aspectRatio.current
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };

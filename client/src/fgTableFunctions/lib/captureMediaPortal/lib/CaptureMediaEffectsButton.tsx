@@ -18,30 +18,26 @@ export default function CaptureMediaEffectsButton({
 }) {
   return (
     <FgButton
+      className='flex items-center justify-center h-full aspect-square relative pointer-events-auto'
       clickFunction={() => {
         captureMediaController.handleEffects();
       }}
-      contentFunction={() => {
-        const iconSrc = captureMediaEffectsActive ? effectOffIcon : effectIcon;
-
-        return (
-          <FgSVG
-            src={iconSrc}
-            attributes={[
-              { key: "width", value: "100%" },
-              { key: "height", value: "100%" },
-              { key: "fill", value: "white" },
-              { key: "stroke", value: "white" },
-            ]}
-          />
-        );
-      }}
+      contentFunction={() => (
+        <FgSVG
+          src={captureMediaEffectsActive ? effectOffIcon : effectIcon}
+          attributes={[
+            { key: "width", value: "100%" },
+            { key: "height", value: "100%" },
+            { key: "fill", value: "white" },
+            { key: "stroke", value: "white" },
+          ]}
+        />
+      )}
       hoverContent={
         !captureMediaEffectsActive ? (
           <FgHoverContentStandard content='Effects (e)' style='dark' />
         ) : undefined
       }
-      className='flex items-center justify-center h-full aspect-square relative scale-x-[-1] pointer-events-auto'
     />
   );
 }

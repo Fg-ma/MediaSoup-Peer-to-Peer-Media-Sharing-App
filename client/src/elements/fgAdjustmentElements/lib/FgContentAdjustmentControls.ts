@@ -855,25 +855,7 @@ class FgContentAdjustmentController {
     kind?: AdjustmentTypes,
     details?: AdjustmentBtnPointerDownDetails
   ) => {
-    if (kind === "scale") {
-      if (
-        details &&
-        details.aspect &&
-        details.referencePoint &&
-        details.rotationPoint &&
-        details.aspect === "square"
-      ) {
-        if (!this.bundleRef.current) {
-          return;
-        }
-
-        let theta =
-          2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
-        if (theta > 2 * Math.PI - 0.0000001) {
-          theta = 0;
-        }
-      }
-    } else if (kind === "position") {
+    if (kind === "position") {
       if (details && details.rotationPointPlacement) {
         if (!this.bundleRef.current) {
           return;

@@ -45,6 +45,7 @@ class CaptureMedia {
   ) {
     this.canvas = document.createElement("canvas");
     this.canvas.style.width = "100%";
+    this.canvas.style.height = "100%";
     this.canvas.classList.add("babylonJS-canvas");
 
     this.faceLandmarks = new FaceLandmarks(
@@ -165,6 +166,10 @@ class CaptureMedia {
 
   deconstructor() {
     this.video.pause();
+    const stream = this.video.srcObject as MediaStream;
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
     this.video.srcObject = null;
 
     this.canvas.remove();

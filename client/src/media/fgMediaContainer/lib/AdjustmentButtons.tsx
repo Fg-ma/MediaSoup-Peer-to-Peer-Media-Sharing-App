@@ -38,7 +38,7 @@ export default function AdjustmentButtons({
   tableStaticContentSocket: React.MutableRefObject<
     TableStaticContentSocketController | undefined
   >;
-  aspectRatio: number | undefined;
+  aspectRatio: React.MutableRefObject<number | undefined>;
   mediaContainerOptions: MediaContainerOptions;
 }) {
   return (
@@ -159,7 +159,7 @@ export default function AdjustmentButtons({
             displacement,
             referencePoint,
             referencePoint,
-            aspectRatio
+            aspectRatio.current
           );
         }}
         bundleRef={bundleRef}

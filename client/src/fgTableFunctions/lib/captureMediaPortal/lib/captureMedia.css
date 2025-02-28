@@ -1,0 +1,10 @@
+.capture-media-container .capture-media-overlay-container {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+}
+
+.capture-media-container.in-capture-media .capture-media-overlay-container {
+  pointer-events: auto;
+  opacity: 1;
+}

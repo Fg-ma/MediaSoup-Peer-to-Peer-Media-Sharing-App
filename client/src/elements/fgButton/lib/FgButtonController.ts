@@ -210,6 +210,11 @@ class FgButtonController {
       this.startDragPosition.current = { x: event.clientX, y: event.clientY };
     }
   };
+
+  handleVisibilityChange = () => {
+    clearTimeout(this.hoverTimeout.current);
+    this.setIsHover(false);
+  };
 }
 
 export default FgButtonController;

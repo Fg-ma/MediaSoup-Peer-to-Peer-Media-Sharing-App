@@ -52,12 +52,9 @@ class TableFunctionsController {
 
   stopVideo = async () => {
     if (this.captureMedia.current) {
-      const stream = this.captureMedia.current.video.srcObject as MediaStream;
+      this.captureMedia.current.deconstructor();
 
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-        this.captureMedia.current.video.srcObject = null;
-      }
+      this.captureMedia.current = undefined;
     }
 
     this.setCaptureMediaActive(false);
