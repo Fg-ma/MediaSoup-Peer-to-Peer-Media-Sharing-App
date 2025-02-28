@@ -15,6 +15,7 @@ export default function CloseButton({
 }) {
   return (
     <FgButton
+      className='flex items-center justify-end h-full !aspect-square pointer-events-auto'
       clickFunction={() => {
         lowerController.handleClose();
       }}
@@ -31,7 +32,6 @@ export default function CloseButton({
         );
       }}
       hoverContent={<FgHoverContentStandard content='Close (x)' />}
-      className='flex items-center justify-end w-10 aspect-square pointer-events-auto'
       options={{ hoverType: "below" }}
     />
   );

@@ -66,6 +66,7 @@ export default function MustachesButton({
 
   return (
     <FgButton
+      className='flex items-center justify-center h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
       clickFunction={clickFunction}
       holdFunction={holdFunction}
       contentFunction={() => {
@@ -83,9 +84,11 @@ export default function MustachesButton({
             return (
               <FgSVG
                 src={iconSrc}
+                className='flex h-full w-full items-center justify-center'
                 attributes={[
-                  { key: "width", value: "95%" },
-                  { key: "height", value: "95%" },
+                  { key: "width", value: "90%" },
+                  { key: "height", value: "90%" },
+                  { key: "fill", value: "#f2f2f2" },
                 ]}
                 data-mustaches-effects-button-value={effectsStyles.style}
               />
@@ -169,7 +172,6 @@ export default function MustachesButton({
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center min-w-10 w-10 aspect-square'
       options={{
         defaultDataValue: effectsStyles?.style,
         hoverTimeoutDuration: 750,

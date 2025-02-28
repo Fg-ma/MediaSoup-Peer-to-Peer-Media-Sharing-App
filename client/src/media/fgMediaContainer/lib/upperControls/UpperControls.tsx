@@ -34,7 +34,7 @@ export default function UpperControls({
         backgroundMedia
           ? "top-0"
           : "bottom-full"
-      } absolute w-full h-10 items-center justify-between z-20`}
+      } absolute w-full h-[12%] max-h-12 min-h-6 items-center justify-between z-20`}
     >
       <div>
         {leftUpperControls && leftUpperControls.length > 0 && leftUpperControls}

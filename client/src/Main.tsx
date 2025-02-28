@@ -37,6 +37,7 @@ export default function Main() {
     remoteEffectsStyles,
     userStreamEffects,
     remoteStreamEffects,
+    captureEffectsStyles,
   } = useEffectsContext();
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket } = useSocketContext();
@@ -229,7 +230,7 @@ export default function Main() {
 
   const userDevice = new UserDevice();
 
-  const deadbanding = new Deadbanding(userEffectsStyles);
+  const deadbanding = new Deadbanding(userEffectsStyles, captureEffectsStyles);
 
   const browserMedia = new BrowserMedia(
     device,

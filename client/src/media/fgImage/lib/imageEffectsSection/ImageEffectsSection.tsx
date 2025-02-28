@@ -112,7 +112,7 @@ export default function ImageEffectsSection({
       ref={effectsContainerRef}
       className={`${
         overflow ? "pb-1" : "pb-2"
-      } tiny-horizontal-scroll-bar left-1/2 h-max w-max max-w-[90%] overflow-x-auto rounded mb-2 border-2 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 shadow-xl flex space-x-1 px-2 pt-2 absolute bottom-full items-center pointer-events-auto`}
+      } small-horizontal-scroll-bar left-1/2 h-[12%] w-max max-w-full overflow-x-auto rounded mb-2 flex space-x-2 px-[1%] pt-2 absolute bottom-[9%] items-center pointer-events-auto`}
       variants={EffectSectionVar}
       initial='init'
       animate='animate'

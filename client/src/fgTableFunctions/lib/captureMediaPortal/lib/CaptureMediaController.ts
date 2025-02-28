@@ -3,7 +3,7 @@ import CaptureMedia from "../../../../media/capture/CaptureMedia";
 
 class CaptureMediaController {
   constructor(
-    private streamEffects: React.MutableRefObject<{
+    private captureStreamEffects: React.MutableRefObject<{
       [effectType in CameraEffectTypes]: boolean;
     }>,
     private captureMedia: React.RefObject<CaptureMedia | undefined>,
@@ -26,7 +26,8 @@ class CaptureMediaController {
     blockStateChange: boolean
   ) => {
     if (!blockStateChange) {
-      this.streamEffects.current[effect] = !this.streamEffects.current[effect];
+      this.captureStreamEffects.current[effect] =
+        !this.captureStreamEffects.current[effect];
     }
 
     this.captureMedia.current?.changeEffects(

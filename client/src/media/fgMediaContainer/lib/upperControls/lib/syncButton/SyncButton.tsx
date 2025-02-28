@@ -18,6 +18,7 @@ export default function SyncButton({
 }) {
   return (
     <FgButton
+      className='flex items-center justify-end h-full !aspect-square pointer-events-auto'
       clickFunction={() => {
         lowerController.handleDesync();
       }}
@@ -40,7 +41,6 @@ export default function SyncButton({
           content={desync ? "Sync content (H)" : "Desync content (H)"}
         />
       }
-      className='flex items-center justify-end w-10 aspect-square pointer-events-auto'
       options={{ hoverType: "below" }}
     />
   );

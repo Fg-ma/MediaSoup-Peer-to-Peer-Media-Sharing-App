@@ -22,6 +22,7 @@ export default function FullScreenButton({
 
   return (
     <FgButton
+      className='flex items-center justify-center h-full !aspect-square scale-x-[-1] pointer-events-auto'
       clickFunction={() => {
         lowerController.handleFullScreen();
         setActive((prev) => !prev);
@@ -46,7 +47,6 @@ export default function FullScreenButton({
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'
     />
   );
 }

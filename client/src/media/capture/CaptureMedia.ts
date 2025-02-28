@@ -1,8 +1,7 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
-  VideoEffectTypes,
-  VideoEffectStylesType,
-  CameraEffectStylesType,
+  CaptureEffectStylesType,
+  CaptureEffectTypes,
 } from "../../context/effectsContext/typeConstant";
 import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
@@ -30,7 +29,7 @@ class CaptureMedia {
   private selfieSegmentationProcessing = [false];
 
   private effects: {
-    [videoEffect in VideoEffectTypes]?: boolean;
+    [captureEffect in CaptureEffectTypes]?: boolean;
   } = {};
 
   private maxFaces: [number] = [1];
@@ -41,7 +40,7 @@ class CaptureMedia {
   constructor(
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private effectsStyles: React.MutableRefObject<CameraEffectStylesType>
+    private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>
   ) {
     this.canvas = document.createElement("canvas");
     this.canvas.style.width = "100%";
@@ -49,7 +48,7 @@ class CaptureMedia {
     this.canvas.classList.add("babylonJS-canvas");
 
     this.faceLandmarks = new FaceLandmarks(
-      "video",
+      "capture",
       this.captureId,
       this.deadbanding
     );
@@ -149,7 +148,7 @@ class CaptureMedia {
       this.video,
       this.faceLandmarks,
       this.effects,
-      this.effectsStyles.current,
+      this.captureEffectsStyles.current,
       this.faceMeshWorker,
       this.faceMeshResults,
       this.faceMeshProcessing,
@@ -194,7 +193,7 @@ class CaptureMedia {
 
     for (const effect in this.effects) {
       if (
-        !this.effects[effect as VideoEffectTypes] ||
+        !this.effects[effect as CaptureEffectTypes] ||
         !validEffectTypes.includes(effect as EffectType)
       ) {
         continue;
@@ -210,7 +209,7 @@ class CaptureMedia {
 
       if (count < this.maxFaces[0]) {
         const currentEffectStyle =
-          this.effectsStyles.current[effect as EffectType];
+          this.captureEffectsStyles.current[effect as EffectType];
 
         if (effect === "masks" && currentEffectStyle.style === "baseMask") {
           for (let i = count; i < this.maxFaces[0]; i++) {
@@ -271,7 +270,7 @@ class CaptureMedia {
   };
 
   changeEffects = (
-    effect: VideoEffectTypes,
+    effect: CaptureEffectTypes,
     tintColor?: string,
     blockStateChange: boolean = false
   ) => {
@@ -288,7 +287,7 @@ class CaptureMedia {
     if (validEffectTypes.includes(effect as EffectType)) {
       if (
         effect !== "masks" ||
-        this.effectsStyles.current.masks.style !== "baseMask"
+        this.captureEffectsStyles.current.masks.style !== "baseMask"
       ) {
         this.drawNewEffect(effect as EffectType);
       } else {
@@ -301,7 +300,7 @@ class CaptureMedia {
         }
       }
     }
-    this.deadbanding.update("video", this.captureId, this.effects);
+    this.deadbanding.update("capture", this.captureId, this.effects);
 
     if (tintColor) {
       this.setTintColor(tintColor);
@@ -335,7 +334,7 @@ class CaptureMedia {
   drawNewEffect = (effect: EffectType) => {
     if (!this.babylonScene) return;
 
-    const currentStyle = this.effectsStyles.current[effect];
+    const currentStyle = this.captureEffectsStyles.current[effect];
 
     if (!currentStyle) {
       return;

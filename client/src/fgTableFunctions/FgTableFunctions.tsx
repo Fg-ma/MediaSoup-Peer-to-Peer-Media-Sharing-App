@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
+import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
 import ScreenSection from "./lib/screenSection/ScreenSection";
@@ -13,12 +14,6 @@ import MoreTableFunctionsButton from "./lib/moreTableFunctionsButton/MoreTableFu
 import MessageTableSection from "./lib/messageTableSection/MessageTableSection";
 import CaptureMediaPortal from "./lib/captureMediaPortal/CaptureMediaPortal";
 import CaptureMedia from "../media/capture/CaptureMedia";
-import {
-  CameraEffectStylesType,
-  CameraEffectTypes,
-  defaultVideoEffectsStyles,
-  defaultVideoStreamEffects,
-} from "../context/effectsContext/typeConstant";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 
@@ -89,6 +84,7 @@ export default function FgTableFunctions({
   const { setSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
   const { table_id, username, instance } = useUserInfoContext();
+  const { captureEffectsStyles } = useEffectsContext();
 
   const externalBackgroundChange = useRef(false);
 
@@ -102,13 +98,6 @@ export default function FgTableFunctions({
   const [captureMediaActive, setCaptureMediaActive] = useState(false);
   const captureMedia = useRef<CaptureMedia | undefined>(undefined);
 
-  const streamEffects = useRef<{ [effectType in CameraEffectTypes]: boolean }>(
-    structuredClone(defaultVideoStreamEffects)
-  );
-  const effectsStyles = useRef<CameraEffectStylesType>(
-    structuredClone(defaultVideoEffectsStyles)
-  );
-
   const [_, setRerender] = useState(false);
 
   const tableFunctionsController = new TableFunctionsController(
@@ -118,7 +107,7 @@ export default function FgTableFunctions({
     captureMedia,
     userDevice,
     deadbanding,
-    effectsStyles,
+    captureEffectsStyles,
     setRerender
   );
 
@@ -212,8 +201,6 @@ export default function FgTableFunctions({
           <CaptureMediaPortal
             captureMedia={captureMedia}
             tableFunctionsController={tableFunctionsController}
-            streamEffects={streamEffects}
-            effectsStyles={effectsStyles}
           />
         )}
       </div>

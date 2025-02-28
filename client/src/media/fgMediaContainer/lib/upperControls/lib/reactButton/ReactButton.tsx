@@ -73,6 +73,7 @@ export default function ReactButton({
     <>
       <FgButton
         externalRef={reactionsButtonRef}
+        className='flex items-center justify-end h-full !aspect-square pointer-events-auto'
         clickFunction={() => {
           lowerController.handleReact();
         }}
@@ -99,7 +100,6 @@ export default function ReactButton({
             }
           />
         }
-        className='flex items-center justify-end w-10 aspect-square pointer-events-auto'
         options={{ hoverType: "below" }}
       />
       {reactionsPanelActive && (

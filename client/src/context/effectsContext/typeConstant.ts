@@ -83,6 +83,19 @@ export type ImageEffectTypes =
 
 export type ApplicationEffectTypes = "postProcess" | "blur" | "tint";
 
+export type CaptureEffectTypes =
+  | "pause"
+  | "postProcess"
+  | "hideBackground"
+  | "blur"
+  | "tint"
+  | "glasses"
+  | "beards"
+  | "mustaches"
+  | "masks"
+  | "hats"
+  | "pets";
+
 export type UserStreamEffectsType = {
   camera: {
     [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -134,6 +147,10 @@ export type RemoteStreamEffectsType = {
       audio: { [effectType in AudioEffectTypes]: boolean };
     };
   };
+};
+
+export type CaptureStreamEffectsType = {
+  [effectType in CaptureEffectTypes]: boolean;
 };
 
 export type CameraEffectStylesType = {
@@ -396,6 +413,37 @@ export type ApplicationEffectStylesType = {
   };
 };
 
+export type CaptureEffectStylesType = {
+  tint: {
+    color: string;
+  };
+  postProcess: {
+    style: PostProcessEffectTypes;
+  };
+  hideBackground: {
+    style: HideBackgroundEffectTypes;
+    color: string;
+  };
+  glasses: {
+    style: GlassesEffectTypes;
+  };
+  beards: {
+    style: BeardsEffectTypes;
+  };
+  mustaches: {
+    style: MustachesEffectTypes;
+  };
+  masks: {
+    style: MasksEffectTypes;
+  };
+  hats: {
+    style: HatsEffectTypes;
+  };
+  pets: {
+    style: PetsEffectTypes;
+  };
+};
+
 export type BackgroundMusicTypes =
   | "adventureTime"
   | "bottledNoise"
@@ -573,6 +621,22 @@ export const defaultApplicationStreamEffects: {
   tint: false,
 });
 
+export const defaultCaptureStreamEffects: {
+  [effect in CaptureEffectTypes]: boolean;
+} = Object.freeze({
+  pause: false,
+  postProcess: false,
+  hideBackground: false,
+  blur: false,
+  tint: false,
+  glasses: false,
+  beards: false,
+  mustaches: false,
+  masks: false,
+  hats: false,
+  pets: false,
+});
+
 export const defaultPostProcess: PostProcessEffectTypes = "prismaColors";
 export const defaultHideBackground: HideBackgroundEffectTypes = "beach";
 export const defaultHideBackgroundColor = "#d40213";
@@ -703,5 +767,37 @@ export const defaultApplicationEffectsStyles: ApplicationEffectStylesType =
     }),
     postProcess: Object.freeze({
       style: defaultPostProcess,
+    }),
+  });
+
+export const defaultCaptureEffectsStyles: CaptureEffectStylesType =
+  Object.freeze({
+    tint: Object.freeze({
+      color: defaultTintColor,
+    }),
+    postProcess: Object.freeze({
+      style: defaultPostProcess,
+    }),
+    hideBackground: Object.freeze({
+      style: defaultHideBackground,
+      color: defaultHideBackgroundColor,
+    }),
+    glasses: Object.freeze({
+      style: defaultGlasses,
+    }),
+    beards: Object.freeze({
+      style: defaultBeard,
+    }),
+    mustaches: Object.freeze({
+      style: defaultMustache,
+    }),
+    masks: Object.freeze({
+      style: defaultMask,
+    }),
+    hats: Object.freeze({
+      style: defaultHat,
+    }),
+    pets: Object.freeze({
+      style: defaultPet,
     }),
   });

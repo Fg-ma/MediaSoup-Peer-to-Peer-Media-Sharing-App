@@ -63,16 +63,16 @@ export default function BabylonPostProcessEffectsButton({
 
   return (
     <FgButton
-      className='flex items-center justify-center min-w-10 w-10 aspect-square'
+      className='flex items-center justify-center h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
       clickFunction={clickFunction}
       contentFunction={() => (
         <svg
           xmlns='http://www.w3.org/2000/svg'
           viewBox='0 0 100 100'
           style={{
-            width: "95%",
-            height: "95%",
-            fill: "white",
+            width: "90%",
+            height: "90%",
+            fill: "#f2f2f2",
             transform: streamEffects ? "rotate(30deg)" : "rotate(0deg)",
             transition: "transform 0.2s linear",
           }}

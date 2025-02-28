@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
 import CloseButton from "./lib/CloseButton";
 import CaptureButton from "./lib/CaptureButton";
@@ -6,10 +7,6 @@ import TableFunctionsController from "../TableFunctionsController";
 import MediaTypeButton from "./lib/MediaTypeButton";
 import CaptureMediaEffectsButton from "./lib/CaptureMediaEffectsButton";
 import CaptureMediaController from "./lib/CaptureMediaController";
-import {
-  CameraEffectStylesType,
-  CameraEffectTypes,
-} from "../../../context/effectsContext/typeConstant";
 import CaptureMedia from "../../../media/capture/CaptureMedia";
 import CaptureMediaEffectsSection from "./lib/CaptureMediaEffectsSection";
 import "./lib/captureMedia.css";
@@ -17,29 +14,25 @@ import "./lib/captureMedia.css";
 export default function CaptureMediaPortal({
   captureMedia,
   tableFunctionsController,
-  streamEffects,
-  effectsStyles,
 }: {
   captureMedia: React.RefObject<CaptureMedia | undefined>;
   tableFunctionsController: TableFunctionsController;
-  streamEffects: React.MutableRefObject<{
-    [effectType in CameraEffectTypes]: boolean;
-  }>;
-  effectsStyles: React.MutableRefObject<CameraEffectStylesType>;
 }) {
+  const { captureStreamEffects, captureEffectsStyles } = useEffectsContext();
+
   const [inCaptureMedia, setInCaptureMedia] = useState(false);
   const [captureMediaEffectsActive, setCaptureMediaEffectsActive] =
     useState(false);
 
   const mediaContainerRef = useRef<HTMLDivElement>(null);
 
-  const tintColor = useRef(effectsStyles.current.tint.color);
+  const tintColor = useRef(captureEffectsStyles.current.tint.color);
 
   const leaveTimer = useRef<NodeJS.Timeout | undefined>(undefined);
   const movementTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const captureMediaController = new CaptureMediaController(
-    streamEffects,
+    captureStreamEffects,
     captureMedia,
     mediaContainerRef,
     setCaptureMediaEffectsActive,
@@ -57,7 +50,7 @@ export default function CaptureMediaPortal({
   return (
     <FgPortal
       className={`${
-        inCaptureMedia ? "in-capture-media" : ""
+        inCaptureMedia || captureMediaEffectsActive ? "in-capture-media" : ""
       } capture-media-container w-full aspect h-full bg-fg-tone-black-4 bg-opacity-45 pointer-events-none`}
       type='staticTopDomain'
       top={0}
@@ -75,8 +68,6 @@ export default function CaptureMediaPortal({
               {captureMediaEffectsActive && (
                 <CaptureMediaEffectsSection
                   tintColor={tintColor}
-                  streamEffects={streamEffects}
-                  effectsStyles={effectsStyles}
                   captureMedia={captureMedia}
                   captureMediaController={captureMediaController}
                 />

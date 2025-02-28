@@ -6,6 +6,10 @@ import {
   UserStreamEffectsType,
   RemoteStreamEffectsType,
   defaultAudioStreamEffects,
+  CaptureStreamEffectsType,
+  CaptureEffectStylesType,
+  defaultCaptureStreamEffects,
+  defaultCaptureEffectsStyles,
 } from "./typeConstant";
 
 export interface EffectsContextProviderProps {
@@ -17,6 +21,8 @@ export interface EffectsContextType {
   remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>;
   userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>;
   remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>;
+  captureStreamEffects: React.MutableRefObject<CaptureStreamEffectsType>;
+  captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>;
 }
 
 const EffectsContext = createContext<EffectsContextType | undefined>(undefined);
@@ -56,6 +62,12 @@ export function EffectsContextProvider({
     soundClip: {},
   });
   const remoteEffectsStyles = useRef<RemoteEffectStylesType>({});
+  const captureStreamEffects = useRef<CaptureStreamEffectsType>(
+    structuredClone(defaultCaptureStreamEffects)
+  );
+  const captureEffectsStyles = useRef<CaptureEffectStylesType>(
+    structuredClone(defaultCaptureEffectsStyles)
+  );
 
   return (
     <EffectsContext.Provider
@@ -64,6 +76,8 @@ export function EffectsContextProvider({
         remoteStreamEffects,
         userEffectsStyles,
         remoteEffectsStyles,
+        captureStreamEffects,
+        captureEffectsStyles,
       }}
     >
       {children}

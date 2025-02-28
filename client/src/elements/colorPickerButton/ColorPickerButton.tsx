@@ -40,14 +40,14 @@ export default function ColorPickerButton({
 
   return (
     <div
-      className={`${className} flex items-center justify-center aspect-square`}
+      className={`${className} flex items-center justify-center !aspect-square`}
     >
       <FgButton
         externalRef={colorPickerBtnRef}
         clickFunction={() => handleColorPicker()}
         hoverContent={<FgHoverContentStandard content='Color picker' />}
         scrollingContainerRef={scrollingContainerRef}
-        className='border w-full h-full border-white rounded'
+        className='border-2 border-fg-white border-opacity-90 w-full h-full rounded-full hover:border-fg-red-light'
         style={{
           backgroundColor: tempColor,
         }}

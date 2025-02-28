@@ -51,22 +51,22 @@ export default function LowerControls({
 
   return (
     <div
-      className={`media-controls-container ${
+      className={`media-lower-controls ${
         mediaContainerOptions.controlsPlacement === "inside" ||
         fullscreen ||
         backgroundMedia
           ? "bottom-0"
           : "top-full"
-      } absolute w-full h-max flex-col items-end justify-center z-20 pointer-events-none`}
+      } absolute w-full h-[12%] max-h-12 min-h-6 flex-col items-end justify-center z-20 pointer-events-none`}
     >
       {lowerPopupElements &&
         lowerPopupElements.length > 0 &&
         lowerPopupElements.map((element, index) => (
           <React.Fragment key={index}>{element}</React.Fragment>
         ))}
-      <div className='flex media-controls w-full h-10 justify-between'>
+      <div className='flex w-full h-full justify-between'>
         <div
-          className='flex w-max h-10 z-20 items-center space-x-2'
+          className='flex w-max h-full z-20 items-center space-x-2'
           style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
         >
           {leftLowerControls &&
@@ -77,7 +77,7 @@ export default function LowerControls({
         </div>
         <div
           ref={rightControlsRef}
-          className='hide-scroll-bar w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
+          className='hide-scroll-bar w-max h-full overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
         >
           <FullScreenButton
             lowerController={lowerController}

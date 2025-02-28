@@ -7,6 +7,7 @@ import {
   MustachesEffectTypes,
   PetsEffectTypes,
   CameraEffectTypes,
+  CaptureEffectStylesType,
 } from "../context/effectsContext/typeConstant";
 import { LandmarkTypes } from "./FaceLandmarks";
 
@@ -649,19 +650,49 @@ const deadbandingValues: DeadbandingValues = {
   },
 };
 
-export type DeadbandingMediaTypes = "camera" | "image" | "video";
+const defaultDeadbandingValues = {
+  interocularDistances: 0.0,
+  headRotationAngles: 0.0,
+  headYawAngles: 0.0,
+  headPitchAngles: 0.0,
+  eyesCenterPositions: 0.0,
+  chinPositions: 0.0,
+  nosePositions: 0.0,
+  foreheadPositions: 0.0,
+};
+
+export type DeadbandingMediaTypes = "camera" | "image" | "video" | "capture";
 
 class Deadbanding {
   private deadbandingMap: {
-    [mediaType in DeadbandingMediaTypes]: {
+    camera: {
       [mediaId: string]: {
         [landmarkType in LandmarkTypes]: number;
       };
     };
-  } = { camera: {}, image: {}, video: {} };
+    image: {
+      [mediaId: string]: {
+        [landmarkType in LandmarkTypes]: number;
+      };
+    };
+    video: {
+      [mediaId: string]: {
+        [landmarkType in LandmarkTypes]: number;
+      };
+    };
+    capture: {
+      [landmarkType in LandmarkTypes]: number;
+    };
+  } = {
+    camera: {},
+    image: {},
+    video: {},
+    capture: defaultDeadbandingValues,
+  };
 
   constructor(
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>
   ) {}
 
   update = (
@@ -671,32 +702,28 @@ class Deadbanding {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     }
   ) => {
-    if (!this.deadbandingMap[mediaType][id]) {
-      this.deadbandingMap[mediaType][id] = {
-        interocularDistances: 0.0,
-        headRotationAngles: 0.0,
-        headYawAngles: 0.0,
-        headPitchAngles: 0.0,
-        eyesCenterPositions: 0.0,
-        chinPositions: 0.0,
-        nosePositions: 0.0,
-        foreheadPositions: 0.0,
-      };
+    if (mediaType !== "capture" && !this.deadbandingMap[mediaType][id]) {
+      this.deadbandingMap[mediaType][id] = defaultDeadbandingValues;
     }
-
+    console.log(mediaType);
     for (const type in deadbandingValues) {
       const effectType = type as DeadbandingTypes;
       if (
         effects[effectType] &&
         ((mediaType === "video" &&
           this.userEffectsStyles.current[mediaType][id].video[effectType]) ||
+          (mediaType === "capture" &&
+            this.captureEffectsStyles.current[effectType]) ||
           (mediaType !== "video" &&
+            mediaType !== "capture" &&
             this.userEffectsStyles.current[mediaType][id][effectType]))
       ) {
         const style =
           mediaType === "video"
             ? this.userEffectsStyles.current[mediaType][id].video[effectType]
                 .style
+            : mediaType === "capture"
+            ? this.captureEffectsStyles.current[effectType]
             : this.userEffectsStyles.current[mediaType][id][effectType];
 
         // @ts-expect-error: no enforcement between effectType and style
@@ -709,14 +736,22 @@ class Deadbanding {
 
           if (newDeadbandingValue) {
             const currentDeadbandingValue =
-              this.deadbandingMap[mediaType][id][
-                deadbandingType as LandmarkTypes
-              ] ?? 0;
+              mediaType === "capture"
+                ? this.deadbandingMap[mediaType][
+                    deadbandingType as LandmarkTypes
+                  ] ?? 0
+                : this.deadbandingMap[mediaType][id][
+                    deadbandingType as LandmarkTypes
+                  ] ?? 0;
 
             if (currentDeadbandingValue < newDeadbandingValue) {
-              this.deadbandingMap[mediaType][id][
-                deadbandingType as LandmarkTypes
-              ] = newDeadbandingValue;
+              mediaType === "capture"
+                ? this.deadbandingMap[mediaType][
+                    deadbandingType as LandmarkTypes
+                  ]
+                : (this.deadbandingMap[mediaType][id][
+                    deadbandingType as LandmarkTypes
+                  ] = newDeadbandingValue);
             }
           }
         }
@@ -728,8 +763,12 @@ class Deadbanding {
     return this.deadbandingMap;
   }
 
-  getDeadbandingMapById(mediaType: DeadbandingMediaTypes, id: string) {
-    return this.deadbandingMap[mediaType][id];
+  getDeadbandingMapById(mediaType: DeadbandingMediaTypes, id?: string) {
+    return mediaType === "capture"
+      ? this.deadbandingMap.capture
+      : id
+      ? this.deadbandingMap[mediaType][id]
+      : null;
   }
 }
 

@@ -28,8 +28,9 @@ export default function TintSection({
   acceptColorCallback?: () => Promise<void>;
 }) {
   return (
-    <div className='flex w-max items-center justify-center'>
+    <div className='flex h-full w-max items-center justify-center'>
       <FgButton
+        className='flex items-center justify-center h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
         clickFunction={async () => {
           setEffectsDisabled(true);
 
@@ -41,24 +42,24 @@ export default function TintSection({
           return (
             <FgSVG
               src={streamEffects ? tintOffIcon : tintIcon}
+              className='flex h-full w-full items-center justify-center'
               attributes={[
-                { key: "width", value: "95%" },
-                { key: "height", value: "95%" },
-                { key: "fill", value: tintColor.current, id: "tintColorPath" },
+                { key: "width", value: "90%" },
+                { key: "height", value: "90%" },
+                { key: "fill", value: "#f2f2f2" },
               ]}
             />
           );
         }}
         hoverContent={<FgHoverContentStandard content='Tint' />}
         scrollingContainerRef={scrollingContainerRef}
-        className='flex items-center justify-center min-w-10 w-10 aspect-square'
         options={{
           hoverTimeoutDuration: 750,
           disabled: effectsDisabled,
         }}
       />
       <ColorPickerButton
-        className='min-w-8 w-8 mx-1'
+        className='h-full mx-1'
         scrollingContainerRef={scrollingContainerRef}
         handleAcceptColorCallback={async () => {
           setEffectsDisabled(true);

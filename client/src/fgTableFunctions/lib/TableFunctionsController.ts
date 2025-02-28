@@ -3,7 +3,7 @@ import { FgBackground } from "../../elements/fgBackgroundSelector/lib/typeConsta
 import { IncomingTableMessages } from "../../serverControllers/tableServer/TableSocketController";
 import UserDevice from "../../lib/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
-import { VideoEffectStylesType } from "../../context/effectsContext/typeConstant";
+import { CaptureEffectStylesType } from "../../context/effectsContext/typeConstant";
 
 class TableFunctionsController {
   constructor(
@@ -17,7 +17,7 @@ class TableFunctionsController {
     private captureMedia: React.MutableRefObject<CaptureMedia | undefined>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private effectsStyles: React.MutableRefObject<VideoEffectStylesType>,
+    private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
@@ -38,7 +38,7 @@ class TableFunctionsController {
       this.captureMedia.current = new CaptureMedia(
         this.userDevice,
         this.deadbanding,
-        this.effectsStyles
+        this.captureEffectsStyles
       );
 
       this.captureMedia.current.video.srcObject = stream;
