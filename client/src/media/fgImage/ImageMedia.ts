@@ -335,7 +335,7 @@ class ImageMedia {
         this.image,
         this.faceLandmarks,
         this.effects,
-        this.userEffectsStyles,
+        this.userEffectsStyles.current.image[this.imageId],
         this.faceMeshWorker,
         this.faceMeshResults,
         this.faceMeshProcessing,

@@ -10,9 +10,7 @@ import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config({
-  path: path.resolve(__dirname, "../../.env"),
-});
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const key = fs.readFileSync(process.env.SSL_KEY_FILE, "utf8");
 const cert = fs.readFileSync(process.env.SSL_CRT_FILE, "utf8");

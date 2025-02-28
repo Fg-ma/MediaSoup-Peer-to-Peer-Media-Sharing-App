@@ -4,8 +4,8 @@ import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
 import {
-  VideoEffectStylesType,
-  VideoEffectTypes,
+  CameraEffectStylesType,
+  CameraEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
 import CaptureMedia from "../../../../media/capture/CaptureMedia";
 import CaptureMediaController from "./CaptureMediaController";
@@ -59,9 +59,9 @@ export default function CaptureMediaEffectsSection({
 }: {
   tintColor: React.MutableRefObject<string>;
   streamEffects: React.MutableRefObject<{
-    [effectType in VideoEffectTypes]: boolean;
+    [effectType in CameraEffectTypes]: boolean;
   }>;
-  effectsStyles: React.MutableRefObject<VideoEffectStylesType>;
+  effectsStyles: React.MutableRefObject<CameraEffectStylesType>;
   captureMedia: CaptureMedia;
   captureMediaController: CaptureMediaController;
 }) {

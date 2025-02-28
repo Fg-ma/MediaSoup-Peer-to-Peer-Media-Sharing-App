@@ -8,9 +8,14 @@ import {
 } from "@babylonjs/core";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
-  UserEffectsStylesType,
   HideBackgroundEffectTypes,
   CameraEffectTypes,
+  CameraEffectStylesType,
+  ScreenEffectStylesType,
+  AudioEffectStylesType,
+  VideoEffectStylesType,
+  ImageEffectStylesType,
+  ApplicationEffectStylesType,
 } from "../context/effectsContext/typeConstant";
 import UserDevice from "../lib/UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
@@ -58,7 +63,13 @@ class BabylonRenderLoop {
     private effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     },
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private effectsStyles:
+      | CameraEffectStylesType
+      | ScreenEffectStylesType
+      | AudioEffectStylesType
+      | VideoEffectStylesType
+      | ImageEffectStylesType
+      | ApplicationEffectStylesType,
     private faceMeshWorker: Worker | undefined,
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
     private faceMeshProcessing: boolean[] | undefined,
@@ -214,12 +225,8 @@ class BabylonRenderLoop {
           height: this.offscreenCanvas.height,
           smooth:
             this.effects.masks &&
-            (((this.type === "camera" || this.type === "image") &&
-              this.userEffectsStyles.current[this.type][this.id].masks.style ===
-                "baseMask") ||
-              (this.type === "video" &&
-                this.userEffectsStyles.current[this.type][this.id].video.masks
-                  .style === "baseMask"))
+            "masks" in this.effectsStyles &&
+            this.effectsStyles.masks.style === "baseMask"
               ? true
               : false,
         });
@@ -372,12 +379,8 @@ class BabylonRenderLoop {
     this.hideBackgroundCtx.globalCompositeOperation = "source-atop";
 
     if (
-      ((this.type === "camera" || this.type === "image") &&
-        this.userEffectsStyles.current[this.type][this.id].hideBackground
-          .style !== "color") ||
-      (this.type === "video" &&
-        this.userEffectsStyles.current[this.type][this.id].video.hideBackground
-          .style !== "color")
+      "hideBackground" in this.effectsStyles &&
+      this.effectsStyles.hideBackground.style !== "color"
     ) {
       this.hideBackgroundCtx.drawImage(
         this.hideBackgroundEffectImage,

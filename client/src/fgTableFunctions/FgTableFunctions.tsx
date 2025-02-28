@@ -14,10 +14,10 @@ import MessageTableSection from "./lib/messageTableSection/MessageTableSection";
 import CaptureMediaPortal from "./lib/captureMediaPortal/CaptureMediaPortal";
 import CaptureMedia from "../media/capture/CaptureMedia";
 import {
+  CameraEffectStylesType,
+  CameraEffectTypes,
   defaultVideoEffectsStyles,
   defaultVideoStreamEffects,
-  VideoEffectStylesType,
-  VideoEffectTypes,
 } from "../context/effectsContext/typeConstant";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
@@ -102,10 +102,10 @@ export default function FgTableFunctions({
   const [captureMediaActive, setCaptureMediaActive] = useState(false);
   const captureMedia = useRef<CaptureMedia | undefined>(undefined);
 
-  const streamEffects = useRef<{ [effectType in VideoEffectTypes]: boolean }>(
+  const streamEffects = useRef<{ [effectType in CameraEffectTypes]: boolean }>(
     structuredClone(defaultVideoStreamEffects)
   );
-  const effectsStyles = useRef<VideoEffectStylesType>(
+  const effectsStyles = useRef<CameraEffectStylesType>(
     structuredClone(defaultVideoEffectsStyles)
   );
 

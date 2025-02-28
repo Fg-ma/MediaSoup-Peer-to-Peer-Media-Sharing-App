@@ -22,8 +22,13 @@ import {
 } from "@babylonjs/core";
 import "@babylonjs/inspector";
 import {
+  ApplicationEffectStylesType,
+  AudioEffectStylesType,
+  CameraEffectStylesType,
   CameraEffectTypes,
-  UserEffectsStylesType,
+  ImageEffectStylesType,
+  ScreenEffectStylesType,
+  VideoEffectStylesType,
 } from "../context/effectsContext/typeConstant";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
 import BabylonMeshes from "./BabylonMeshes";
@@ -69,8 +74,6 @@ class BabylonScene {
   private engine: Engine;
   scene: Scene;
   private camera: UniversalCamera;
-
-  private resizeObserver: ResizeObserver;
 
   private backgroundLight: HemisphericLight | undefined;
   private ambientLightThreeDimMeshes: HemisphericLight | undefined;
@@ -125,7 +128,13 @@ class BabylonScene {
     private effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     },
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private effectsStyles:
+      | CameraEffectStylesType
+      | ScreenEffectStylesType
+      | AudioEffectStylesType
+      | VideoEffectStylesType
+      | ImageEffectStylesType
+      | ApplicationEffectStylesType,
     private faceMeshWorker: Worker | undefined,
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
     private faceMeshProcessing: boolean[] | undefined,
@@ -136,7 +145,7 @@ class BabylonScene {
     private selfieSegmentationProcessing: boolean[] | undefined,
     private userDevice: UserDevice,
     private maxFaces: [number],
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType> | undefined
   ) {
     this.engine = new Engine(this.canvas, true);
 
@@ -176,7 +185,7 @@ class BabylonScene {
       this.canvas,
       this.backgroundMedia,
       this.effects,
-      this.userEffectsStyles,
+      this.effectsStyles,
       this.faceMeshWorker,
       this.faceMeshResults,
       this.faceMeshProcessing,
@@ -203,9 +212,6 @@ class BabylonScene {
     window.addEventListener("resize", this.canvasSizeChange);
     window.addEventListener("fullscreenchange", this.canvasSizeChange);
 
-    this.resizeObserver = new ResizeObserver(this.canvasSizeChange);
-    this.resizeObserver.observe(this.canvas);
-
     setTimeout(() => {
       this.canvasSizeChange();
     }, 1000);
@@ -223,8 +229,6 @@ class BabylonScene {
 
     window.removeEventListener("resize", this.canvasSizeChange);
     window.removeEventListener("fullscreenchange", this.canvasSizeChange);
-
-    this.resizeObserver.disconnect();
   };
 
   private engineRenderLoop = () => {

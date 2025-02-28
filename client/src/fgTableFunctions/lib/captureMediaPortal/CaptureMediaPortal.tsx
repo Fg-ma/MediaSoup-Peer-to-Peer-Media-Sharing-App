@@ -7,8 +7,8 @@ import MediaTypeButton from "./lib/MediaTypeButton";
 import CaptureMediaEffectsButton from "./lib/CaptureMediaEffectsButton";
 import CaptureMediaController from "./lib/CaptureMediaController";
 import {
-  VideoEffectStylesType,
-  VideoEffectTypes,
+  CameraEffectStylesType,
+  CameraEffectTypes,
 } from "../../../context/effectsContext/typeConstant";
 import CaptureMedia from "../../../media/capture/CaptureMedia";
 
@@ -21,9 +21,9 @@ export default function CaptureMediaPortal({
   captureMedia: React.RefObject<CaptureMedia | undefined>;
   tableFunctionsController: TableFunctionsController;
   streamEffects: React.MutableRefObject<{
-    [effectType in VideoEffectTypes]: boolean;
+    [effectType in CameraEffectTypes]: boolean;
   }>;
-  effectsStyles: React.MutableRefObject<VideoEffectStylesType>;
+  effectsStyles: React.MutableRefObject<CameraEffectStylesType>;
 }) {
   const [captureMediaEffectsActive, setCaptureMediaEffectsActive] =
     useState(false);
@@ -41,7 +41,7 @@ export default function CaptureMediaPortal({
   useEffect(() => {
     if (captureMedia.current)
       mediaContainerRef.current?.appendChild(captureMedia.current?.canvas);
-  }, []);
+  }, [captureMedia.current]);
 
   return (
     <FgPortal

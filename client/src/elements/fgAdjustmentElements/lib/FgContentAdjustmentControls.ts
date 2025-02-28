@@ -192,8 +192,12 @@ class FgContentAdjustmentController {
       referenceX,
       referenceY,
       theta,
-      kind === "square" ? Math.max(ADotB, BPerpMag) : ADotB,
-      kind === "square" ? Math.max(ADotB, BPerpMag) : BPerpMag,
+      kind === "square"
+        ? Math.max(ADotB, BPerpMag)
+        : (width * this.bundleRef.current.clientWidth) / 100,
+      kind === "square"
+        ? Math.max(ADotB, BPerpMag)
+        : (height * this.bundleRef.current.clientHeight) / 100,
       rotationPoint.x,
       rotationPoint.y
     );
@@ -249,15 +253,15 @@ class FgContentAdjustmentController {
 
       if (!isWidthOutside) {
         const maxHeight =
-          (this.getMaxHeight(
+          (this.getMaxAspectHeight(
             referenceX,
             referenceY,
             theta,
             rotationPoint.x,
             rotationPoint.y,
-            ADotB,
             (this.positioning.current.scale.y / 100) *
-              this.bundleRef.current.clientHeight
+              this.bundleRef.current.clientHeight,
+            aspectRatio ?? 1
           ) /
             this.bundleRef.current.clientHeight) *
           100;
@@ -268,9 +272,8 @@ class FgContentAdjustmentController {
             x:
               height > maxHeight
                 ? maxHeight * (aspectRatio ?? 1)
-                : this.positioning.current.scale.y * (aspectRatio ?? 1),
-            y:
-              height > maxHeight ? maxHeight : this.positioning.current.scale.y,
+                : height * (aspectRatio ?? 1),
+            y: height > maxHeight ? maxHeight : height,
           },
         };
         this.setRerender((prev) => !prev);
@@ -288,7 +291,7 @@ class FgContentAdjustmentController {
 
         if (!isHeightOutside) {
           const maxWidth =
-            (this.getMaxWidth(
+            (this.getMaxAspectWidth(
               referenceX,
               referenceY,
               theta,
@@ -296,7 +299,7 @@ class FgContentAdjustmentController {
               rotationPoint.y,
               (this.positioning.current.scale.x / 100) *
                 this.bundleRef.current.clientWidth,
-              BPerpMag
+              aspectRatio ?? 1
             ) /
               this.bundleRef.current.clientWidth) *
             100;
@@ -304,11 +307,11 @@ class FgContentAdjustmentController {
           this.positioning.current = {
             ...this.positioning.current,
             scale: {
-              x: width > maxWidth ? maxWidth : this.positioning.current.scale.x,
+              x: width > maxWidth ? maxWidth : width,
               y:
                 width > maxWidth
                   ? maxWidth / (aspectRatio ?? 1)
-                  : this.positioning.current.scale.x / (aspectRatio ?? 1),
+                  : width / (aspectRatio ?? 1),
             },
           };
           this.setRerender((prev) => !prev);
@@ -727,6 +730,100 @@ class FgContentAdjustmentController {
         top,
         theta,
         width,
+        startHeight + i,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    return startHeight + i - 1;
+  };
+
+  private getMaxAspectWidth = (
+    left: number,
+    top: number,
+    theta: number,
+    rotationPointX: number,
+    rotationPointY: number,
+    startWidth: number,
+    aspectRatio: number
+  ) => {
+    let isOutside = false;
+    let i = -4;
+
+    while (!isOutside) {
+      i += 4;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        startWidth + i,
+        (startWidth + i) / aspectRatio,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    isOutside = false;
+
+    i -= 5;
+
+    while (!isOutside) {
+      i += 1;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        startWidth + i,
+        (startWidth + i) / aspectRatio,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    return startWidth + i - 1;
+  };
+
+  private getMaxAspectHeight = (
+    left: number,
+    top: number,
+    theta: number,
+    rotationPointX: number,
+    rotationPointY: number,
+    startHeight: number,
+    aspectRatio: number
+  ) => {
+    let isOutside = false;
+    let i = -4;
+
+    while (!isOutside) {
+      i += 4;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        (startHeight + i) * aspectRatio,
+        startHeight + i,
+        rotationPointX,
+        rotationPointY
+      );
+    }
+
+    isOutside = false;
+
+    i -= 5;
+
+    while (!isOutside) {
+      i += 1;
+
+      isOutside = this.isBoxOutside(
+        left,
+        top,
+        theta,
+        (startHeight + i) * aspectRatio,
         startHeight + i,
         rotationPointX,
         rotationPointY

@@ -157,7 +157,7 @@ class ApplicationMedia {
         this.application,
         undefined,
         this.effects,
-        this.userEffectsStyles,
+        this.userEffectsStyles.current.application[this.applicationId],
         undefined,
         undefined,
         undefined,

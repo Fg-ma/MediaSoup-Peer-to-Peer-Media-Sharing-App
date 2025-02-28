@@ -160,7 +160,7 @@ class CameraMedia {
       this.video,
       this.faceLandmarks,
       this.effects,
-      this.userEffectsStyles,
+      this.userEffectsStyles.current.camera[this.cameraId],
       this.faceMeshWorker,
       this.faceMeshResults,
       this.faceMeshProcessing,

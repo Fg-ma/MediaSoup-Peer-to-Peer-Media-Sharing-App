@@ -47,7 +47,7 @@ class BabylonMeshes {
     private ambientLightThreeDimMeshes: HemisphericLight | undefined,
     private ambientLightTwoDimMeshes: HemisphericLight | undefined,
     private threeDimMeshesZCoord: number,
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType> | undefined
   ) {
     this.meshLoaders = new MeshLoaders(this.scene);
 
@@ -409,7 +409,7 @@ class BabylonMeshes {
       return;
     }
 
-    this.userMedia.current.audio?.audioEffects.fgAssetSoundEffects.toggleAudio(
+    this.userMedia?.current.audio?.audioEffects.fgAssetSoundEffects.toggleAudio(
       meshMetaData.audioURL
     );
   };

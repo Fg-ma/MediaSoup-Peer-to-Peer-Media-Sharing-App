@@ -67,7 +67,7 @@ class ScreenMedia {
       this.video,
       undefined,
       this.effects,
-      this.userEffectsStyles,
+      this.userEffectsStyles.current.screen[this.screenId],
       undefined,
       undefined,
       undefined,

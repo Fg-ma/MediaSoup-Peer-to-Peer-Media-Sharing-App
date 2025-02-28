@@ -359,7 +359,7 @@ class VideoMedia {
         this.video,
         this.faceLandmarks,
         this.effects,
-        this.userEffectsStyles,
+        this.userEffectsStyles.current.video[this.videoId],
         this.faceMeshWorker,
         this.faceMeshResults,
         this.faceMeshProcessing,

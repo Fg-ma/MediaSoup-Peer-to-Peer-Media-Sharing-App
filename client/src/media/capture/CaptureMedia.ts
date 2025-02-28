@@ -2,6 +2,7 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   VideoEffectTypes,
   VideoEffectStylesType,
+  CameraEffectStylesType,
 } from "../../context/effectsContext/typeConstant";
 import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
@@ -40,7 +41,7 @@ class CaptureMedia {
   constructor(
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private effectsStyles: React.MutableRefObject<VideoEffectStylesType>
+    private effectsStyles: React.MutableRefObject<CameraEffectStylesType>
   ) {
     this.canvas = document.createElement("canvas");
     this.canvas.style.width = "100%";
@@ -135,7 +136,6 @@ class CaptureMedia {
     };
 
     this.video = document.createElement("video");
-    this.video.autoplay = true;
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
@@ -148,7 +148,7 @@ class CaptureMedia {
       this.video,
       this.faceLandmarks,
       this.effects,
-      undefined,
+      this.effectsStyles.current,
       this.faceMeshWorker,
       this.faceMeshResults,
       this.faceMeshProcessing,

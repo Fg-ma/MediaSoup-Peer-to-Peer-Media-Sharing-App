@@ -1,10 +1,10 @@
-import { VideoEffectTypes } from "../../../../context/effectsContext/typeConstant";
+import { CameraEffectTypes } from "../../../../context/effectsContext/typeConstant";
 import CaptureMedia from "../../../../media/capture/CaptureMedia";
 
 class CaptureMediaController {
   constructor(
     private streamEffects: React.MutableRefObject<{
-      [effectType in VideoEffectTypes]: boolean;
+      [effectType in CameraEffectTypes]: boolean;
     }>,
     private captureMedia: React.RefObject<CaptureMedia | undefined>,
     private tintColor: React.MutableRefObject<string>
@@ -13,7 +13,7 @@ class CaptureMediaController {
   handleEffects = () => {};
 
   handleCaptureEffect = async (
-    effect: VideoEffectTypes,
+    effect: CameraEffectTypes,
     blockStateChange: boolean
   ) => {
     if (!blockStateChange) {
