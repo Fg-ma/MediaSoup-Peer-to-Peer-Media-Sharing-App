@@ -303,11 +303,11 @@ export default function FgBackgroundMusicPortal({
                           : backgroundMusicStatic[key as BackgroundMusicTypes]
                               .bgColor === "white"
                           ? "border-2 border-fg-black-35 border-opacity-75"
-                          : "border-2 border-white border-opacity-75"
+                          : "border-2 border-fg-white border-opacity-75"
                       } ${
                         backgroundMusicStatic[key as BackgroundMusicTypes]
                           .bgColor === "white"
-                          ? "bg-white"
+                          ? "bg-fg-white"
                           : ""
                       } ${
                         backgroundMusicStatic[key as BackgroundMusicTypes]
@@ -341,8 +341,8 @@ export default function FgBackgroundMusicPortal({
                           attributes={[
                             { key: "width", value: "100%" },
                             { key: "height", value: "100%" },
-                            { key: "fill", value: "white" },
-                            { key: "stroke", value: "white" },
+                            { key: "fill", value: "#f2f2f2" },
+                            { key: "stroke", value: "#f2f2f2" },
                           ]}
                           data-background-music-effects-button-value={key}
                         />

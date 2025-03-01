@@ -15,9 +15,9 @@ export const defaultFgVolumeElementOptions = {
   volumeSliderHeight: "0.25rem",
   volumeSliderWidth: "5rem",
   volumeSliderThumbSize: "0.9375rem",
-  primaryColor: "white",
+  primaryColor: "#f2f2f2",
   isSlider: true,
   initialVolume: "high",
-  primaryVolumeSliderColor: "white",
+  primaryVolumeSliderColor: "#f2f2f2",
   secondaryVolumeSliderColor: "rgba(150, 150, 150, 0.5)",
 };

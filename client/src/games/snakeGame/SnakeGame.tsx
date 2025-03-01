@@ -121,26 +121,26 @@ function SnakeGame({
         content={
           <div
             ref={boardRef}
-            className='snake-game-board w-full aspect-square relative rounded overflow-hidden flex flex-col'
+            className='flex snake-game-board w-full aspect-square relative rounded overflow-hidden flex-col'
           >
             {snakeGameController.renderBoard()}
             {gameOver && (
               <div
-                className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 cursor-pointer'
+                className='flex absolute top-0 left-0 w-full h-full items-center justify-center bg-black bg-opacity-30 cursor-pointer'
                 onClick={snakeGameController.startGameClick}
               >
                 <div
-                  className='w-4/5 h-3/5 rounded-lg flex items-center justify-center font-K2D text-2xl bg-no-repeat bg-cover'
+                  className='flex w-4/5 h-3/5 rounded-lg items-center justify-center font-K2D text-2xl bg-no-repeat bg-cover'
                   style={{ backgroundImage: `url(${gameOverCard})` }}
                 ></div>
               </div>
             )}
             {!started && !gameOver && (
               <div
-                className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30'
+                className='flex absolute top-0 left-0 w-full h-full items-center justify-center bg-black bg-opacity-30'
                 onClick={snakeGameController.startGameClick}
               >
-                <div className='w-4/5 h-3/5 rounded-lg bg-fg-white-95 flex items-center justify-center font-K2D text-2xl select-none'>
+                <div className='flex w-4/5 h-3/5 rounded-lg bg-fg-white-95 items-center justify-center font-K2D text-2xl select-none'>
                   Press any key to start
                 </div>
               </div>
@@ -186,8 +186,8 @@ function SnakeGame({
                         attributes={[
                           { key: "width", value: "100%" },
                           { key: "height", value: "100%" },
-                          { key: "fill", value: "white" },
-                          { key: "stroke", value: "white" },
+                          { key: "fill", value: "#f2f2f2" },
+                          { key: "stroke", value: "#f2f2f2" },
                           ...(snakeColorPanelActive
                             ? [
                                 {
@@ -226,8 +226,8 @@ function SnakeGame({
                           attributes={[
                             { key: "width", value: "100%" },
                             { key: "height", value: "100%" },
-                            { key: "fill", value: "white" },
-                            { key: "stroke", value: "white" },
+                            { key: "fill", value: "#f2f2f2" },
+                            { key: "stroke", value: "#f2f2f2" },
                           ]}
                         />
                       );

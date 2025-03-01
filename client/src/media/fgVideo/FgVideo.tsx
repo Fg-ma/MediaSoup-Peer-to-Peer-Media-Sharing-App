@@ -218,7 +218,17 @@ export default function FgVideo({
       rootMedia={videoMedia.video}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
-      media={
+      className='video-container'
+      popupElements={[
+        videoEffectsActive ? (
+          <VideoEffectsSection
+            videoId={videoId}
+            lowerVideoController={lowerVideoController}
+            tintColor={tintColor}
+            videoMedia={videoMedia}
+            videoContainerRef={videoContainerRef}
+          />
+        ) : null,
         <div
           ref={timelineContainerRef}
           className='timeline-container'
@@ -228,18 +238,7 @@ export default function FgVideo({
           <div className='timeline'>
             <div className='thumb-indicator'></div>
           </div>
-        </div>
-      }
-      className='video-container'
-      lowerPopupElements={[
-        videoEffectsActive ? (
-          <VideoEffectsSection
-            videoId={videoId}
-            lowerVideoController={lowerVideoController}
-            tintColor={tintColor}
-            videoMedia={videoMedia}
-          />
-        ) : null,
+        </div>,
       ]}
       leftLowerControls={[
         <PlayPauseButton

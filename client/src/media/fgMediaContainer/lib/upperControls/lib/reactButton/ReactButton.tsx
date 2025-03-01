@@ -86,7 +86,7 @@ export default function ReactButton({
               attributes={[
                 { key: "width", value: "80%" },
                 { key: "height", value: "80%" },
-                { key: "fill", value: "white" },
+                { key: "fill", value: "#f2f2f2" },
               ]}
             />
           );
@@ -144,8 +144,8 @@ export default function ReactButton({
                           attributes={[
                             { key: "width", value: "90%" },
                             { key: "height", value: "90%" },
-                            { key: "fill", value: "white" },
-                            { key: "stroke", value: "white" },
+                            { key: "fill", value: "#f2f2f2" },
+                            { key: "stroke", value: "#f2f2f2" },
                           ]}
                         />
                       ) : (

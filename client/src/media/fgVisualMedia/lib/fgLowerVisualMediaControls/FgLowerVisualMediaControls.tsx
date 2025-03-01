@@ -250,270 +250,237 @@ export default function FgLowerVisualMediaControls({
   }, []);
 
   return (
-    <div className='video-controls-container absolute bottom-0 w-full h-max flex-col items-end justify-center z-20 pointer-events-none'>
-      <div className='relative pointer-events-auto'>
-        <AnimatePresence>
-          {visualEffectsActive && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <VisualEffectsSection
-                username={username}
-                instance={instance}
-                type={type}
-                visualMediaId={visualMediaId}
-                isUser={
-                  fgVisualMediaOptions.isUser ??
-                  defaultFgVisualMediaOptions.isUser
+    <div className='flex visual-media-lower-controls absolute bottom-[1%] left-0 w-full h-[12%] max-h-12 min-h-6 justify-between z-20 pointer-events-none px-3'>
+      <div
+        className='flex w-max h-full z-20 items-center space-x-2'
+        style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
+      >
+        {fgVisualMediaOptions.isPlayPause && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <PlayPauseButton
+              pausedState={pausedState}
+              fgLowerVisualMediaController={fgLowerVisualMediaController}
+              visualEffectsActive={visualEffectsActive}
+              settingsActive={settingsActive}
+            />
+          </Suspense>
+        )}
+        {(fgVisualMediaOptions.isVolume ||
+          (screenAudioStream &&
+            (fgVisualMediaOptions.isUser ||
+              fgVisualMediaOptions.permissions
+                ?.acceptsScreenAudioEffects))) && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <FgVolumeElement
+              table_id={table_id}
+              username={username}
+              instance={instance}
+              isUser={
+                fgVisualMediaOptions.isUser ??
+                defaultFgVisualMediaOptions.isUser
+              }
+              producerType={screenAudioStream ? "screenAudio" : "audio"}
+              producerId={
+                screenAudioStream ? `${visualMediaId}_audio` : undefined
+              }
+              audioRef={audioRef}
+              clientMute={clientMute}
+              screenAudioClientMute={screenAudioClientMute}
+              localMute={localMute}
+              screenAudioLocalMute={screenAudioLocalMute}
+              visualEffectsActive={visualEffectsActive}
+              settingsActive={settingsActive}
+              options={{
+                isSlider: fgVisualMediaOptions.isSlider,
+                initialVolume: fgVisualMediaOptions.initialVolume ?? "high",
+              }}
+              handleMuteCallback={() => {
+                if (handleMuteCallback !== undefined) {
+                  handleMuteCallback(
+                    screenAudioStream ? "screenAudio" : "audio",
+                    screenAudioStream ? `${visualMediaId}_audio` : undefined
+                  );
                 }
-                acceptsVisualEffects={
-                  type === "camera"
-                    ? fgVisualMediaOptions.permissions?.acceptsCameraEffects ??
-                      defaultFgVisualMediaOptions.permissions
-                        .acceptsCameraEffects
-                    : fgVisualMediaOptions.permissions?.acceptsScreenEffects ??
-                      defaultFgVisualMediaOptions.permissions
-                        .acceptsScreenEffects
-                }
-                handleVisualEffectChange={handleVisualEffectChange}
-                tintColor={tintColor}
-              />
-            </Suspense>
-          )}
-        </AnimatePresence>
+
+                setRerender((prev) => !prev);
+              }}
+              handleVolumeSliderCallback={handleVolumeSliderCallback}
+              tracksColorSetterCallback={tracksColorSetterCallback}
+            />
+          </Suspense>
+        )}
+        {fgVisualMediaOptions.isCurrentTime && (
+          <div className='flex items-center gap-1 px-1 select-none'>
+            <div ref={currentTimeRef} className='font-K2D text-lg'></div>
+          </div>
+        )}
       </div>
-      <div className='flex video-controls w-full h-10 justify-between'>
-        <div
-          className='flex w-max h-10 z-20 items-center space-x-2'
-          style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
-        >
-          {fgVisualMediaOptions.isPlayPause && (
+      <div
+        ref={rightVisualMediaControlsRef}
+        className='hide-scroll-bar w-max h-full overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
+      >
+        {fgVisualMediaOptions.isFullScreen && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <FullScreenButton
+              fgLowerVisualMediaController={fgLowerVisualMediaController}
+              visualEffectsActive={visualEffectsActive}
+              settingsActive={settingsActive}
+              scrollingContainerRef={rightVisualMediaControlsRef}
+            />
+          </Suspense>
+        )}
+        {fgVisualMediaOptions.isPictureInPicture && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <PictureInPictureButton
+              fgLowerVisualMediaController={fgLowerVisualMediaController}
+              visualEffectsActive={visualEffectsActive}
+              settingsActive={settingsActive}
+              scrollingContainerRef={rightVisualMediaControlsRef}
+            />
+          </Suspense>
+        )}
+        {fgVisualMediaOptions.isClosedCaptions &&
+          fgVisualMediaOptions.isVolume &&
+          audioStream && (
             <Suspense fallback={<div>Loading...</div>}>
-              <PlayPauseButton
-                pausedState={pausedState}
+              <CaptionButton
                 fgLowerVisualMediaController={fgLowerVisualMediaController}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
-              />
-            </Suspense>
-          )}
-          {(fgVisualMediaOptions.isVolume ||
-            (screenAudioStream &&
-              (fgVisualMediaOptions.isUser ||
-                fgVisualMediaOptions.permissions
-                  ?.acceptsScreenAudioEffects))) && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <FgVolumeElement
-                table_id={table_id}
-                username={username}
-                instance={instance}
-                isUser={
-                  fgVisualMediaOptions.isUser ??
-                  defaultFgVisualMediaOptions.isUser
-                }
-                producerType={screenAudioStream ? "screenAudio" : "audio"}
-                producerId={
-                  screenAudioStream ? `${visualMediaId}_audio` : undefined
-                }
-                audioRef={audioRef}
-                clientMute={clientMute}
-                screenAudioClientMute={screenAudioClientMute}
-                localMute={localMute}
-                screenAudioLocalMute={screenAudioLocalMute}
-                visualEffectsActive={visualEffectsActive}
-                settingsActive={settingsActive}
-                options={{
-                  isSlider: fgVisualMediaOptions.isSlider,
-                  initialVolume: fgVisualMediaOptions.initialVolume ?? "high",
-                }}
-                handleMuteCallback={() => {
-                  if (handleMuteCallback !== undefined) {
-                    handleMuteCallback(
-                      screenAudioStream ? "screenAudio" : "audio",
-                      screenAudioStream ? `${visualMediaId}_audio` : undefined
-                    );
-                  }
-
-                  setRerender((prev) => !prev);
-                }}
-                handleVolumeSliderCallback={handleVolumeSliderCallback}
-                tracksColorSetterCallback={tracksColorSetterCallback}
-              />
-            </Suspense>
-          )}
-          {fgVisualMediaOptions.isCurrentTime && (
-            <div className='flex items-center gap-1 px-1 select-none'>
-              <div ref={currentTimeRef} className='font-K2D text-lg'></div>
-            </div>
-          )}
-        </div>
-        <div
-          ref={rightVisualMediaControlsRef}
-          className='hide-scroll-bar w-max h-10 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
-        >
-          {fgVisualMediaOptions.isFullScreen && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <FullScreenButton
-                fgLowerVisualMediaController={fgLowerVisualMediaController}
-                visualEffectsActive={visualEffectsActive}
-                settingsActive={settingsActive}
-                scrollingContainerRef={rightVisualMediaControlsRef}
-              />
-            </Suspense>
-          )}
-          {fgVisualMediaOptions.isPictureInPicture && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <PictureInPictureButton
-                fgLowerVisualMediaController={fgLowerVisualMediaController}
-                visualEffectsActive={visualEffectsActive}
-                settingsActive={settingsActive}
-                scrollingContainerRef={rightVisualMediaControlsRef}
-              />
-            </Suspense>
-          )}
-          {fgVisualMediaOptions.isClosedCaptions &&
-            fgVisualMediaOptions.isVolume &&
-            audioStream && (
-              <Suspense fallback={<div>Loading...</div>}>
-                <CaptionButton
-                  fgLowerVisualMediaController={fgLowerVisualMediaController}
-                  visualEffectsActive={visualEffectsActive}
-                  settingsActive={settingsActive}
-                  settings={settings}
-                  audioStream={audioStream}
-                  visualMediaContainerRef={visualMediaContainerRef}
-                  scrollingContainerRef={rightVisualMediaControlsRef}
-                  containerRef={subContainerRef}
-                />
-              </Suspense>
-            )}
-          {fgVisualMediaOptions.isVolume && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <FgSettingsButton
-                fgVisualMediaOptions={fgVisualMediaOptions}
-                visualEffectsActive={visualEffectsActive}
-                visualMediaContainerRef={visualMediaContainerRef}
-                settingsActive={settingsActive}
-                setSettingsActive={setSettingsActive}
-                activePages={activePages}
-                setActivePages={setActivePages}
                 settings={settings}
-                setSettings={setSettings}
-                scrollingContainerRef={rightVisualMediaControlsRef}
-              />
-            </Suspense>
-          )}
-          {(fgVisualMediaOptions.isUser ||
-            (type === "camera" &&
-              fgVisualMediaOptions.permissions?.acceptsCameraEffects) ||
-            (type === "screen" &&
-              fgVisualMediaOptions.permissions?.acceptsScreenEffects)) &&
-            fgVisualMediaOptions.isEffects && (
-              <Suspense fallback={<div>Loading...</div>}>
-                <VisualEffectsButton
-                  fgLowerVisualMediaController={fgLowerVisualMediaController}
-                  visualEffectsActive={visualEffectsActive}
-                  settingsActive={settingsActive}
-                  scrollingContainerRef={rightVisualMediaControlsRef}
-                />
-              </Suspense>
-            )}
-          {(((fgVisualMediaOptions.isUser ||
-            fgVisualMediaOptions.permissions?.acceptsAudioEffects) &&
-            fgVisualMediaOptions.isVolume) ||
-            ((fgVisualMediaOptions.isUser ||
-              fgVisualMediaOptions.permissions?.acceptsScreenAudioEffects) &&
-              screenAudioStream)) && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <AudioEffectsButton
-                table_id={table_id}
-                username={username}
-                instance={instance}
-                isUser={
-                  fgVisualMediaOptions.isUser ??
-                  defaultFgVisualMediaOptions.isUser
-                }
-                permissions={
-                  fgVisualMediaOptions.permissions ??
-                  defaultFgVisualMediaOptions.permissions
-                }
-                producerType={screenAudioStream ? "screenAudio" : "audio"}
-                producerId={
-                  screenAudioStream ? `${visualMediaId}_audio` : undefined
-                }
-                audioEffectsActive={audioEffectsActive}
-                setAudioEffectsActive={setAudioEffectsActive}
-                handleAudioEffectChange={handleAudioEffectChange}
-                handleMute={() => {
-                  if (!screenAudioStream) {
-                    if (clientMute.current) {
-                      return;
-                    }
-
-                    localMute.current = !localMute.current;
-
-                    if (!audioRef.current) {
-                      return;
-                    }
-
-                    if (!fgVisualMediaOptions.isUser) {
-                      audioRef.current.muted = localMute.current;
-                    }
-                  } else {
-                    if (
-                      screenAudioClientMute.current[`${visualMediaId}_audio`]
-                    ) {
-                      return;
-                    }
-
-                    screenAudioLocalMute.current[`${visualMediaId}_audio`] =
-                      !screenAudioLocalMute.current[`${visualMediaId}_audio`];
-
-                    const audioElement = document.getElementById(
-                      `${visualMediaId}_audio`
-                    ) as HTMLAudioElement | null;
-
-                    if (!audioElement) {
-                      return;
-                    }
-
-                    if (!fgVisualMediaOptions.isUser) {
-                      audioElement.muted =
-                        screenAudioLocalMute.current[`${visualMediaId}_audio`];
-                    }
-                  }
-
-                  if (handleMuteCallback !== undefined) {
-                    handleMuteCallback(
-                      screenAudioStream ? "screenAudio" : "audio",
-                      screenAudioStream ? `${visualMediaId}_audio` : undefined
-                    );
-                  }
-
-                  setRerender((prev) => !prev);
-                }}
-                clientMute={clientMute}
-                screenAudioClientMute={screenAudioClientMute}
-                localMute={localMute}
-                screenAudioLocalMute={screenAudioLocalMute}
+                audioStream={audioStream}
                 visualMediaContainerRef={visualMediaContainerRef}
-                closeLabelElement={
-                  <FgHoverContentStandard content='Close (x)' style='dark' />
-                }
-                hoverLabelElement={
-                  <FgHoverContentStandard
-                    content='Audio effects (a)'
-                    style='dark'
-                  />
-                }
                 scrollingContainerRef={rightVisualMediaControlsRef}
-                style={{ transform: "scaleX(-1)" }}
-                options={{
-                  backgroundColor: "rgba(10, 10, 10, 1)",
-                  secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
-                }}
+                containerRef={subContainerRef}
               />
             </Suspense>
           )}
-        </div>
+        {fgVisualMediaOptions.isVolume && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <FgSettingsButton
+              fgVisualMediaOptions={fgVisualMediaOptions}
+              visualEffectsActive={visualEffectsActive}
+              visualMediaContainerRef={visualMediaContainerRef}
+              settingsActive={settingsActive}
+              setSettingsActive={setSettingsActive}
+              activePages={activePages}
+              setActivePages={setActivePages}
+              settings={settings}
+              setSettings={setSettings}
+              scrollingContainerRef={rightVisualMediaControlsRef}
+            />
+          </Suspense>
+        )}
+        {(fgVisualMediaOptions.isUser ||
+          (type === "camera" &&
+            fgVisualMediaOptions.permissions?.acceptsCameraEffects) ||
+          (type === "screen" &&
+            fgVisualMediaOptions.permissions?.acceptsScreenEffects)) &&
+          fgVisualMediaOptions.isEffects && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <VisualEffectsButton
+                fgLowerVisualMediaController={fgLowerVisualMediaController}
+                visualEffectsActive={visualEffectsActive}
+                settingsActive={settingsActive}
+                scrollingContainerRef={rightVisualMediaControlsRef}
+              />
+            </Suspense>
+          )}
+        {(((fgVisualMediaOptions.isUser ||
+          fgVisualMediaOptions.permissions?.acceptsAudioEffects) &&
+          fgVisualMediaOptions.isVolume) ||
+          ((fgVisualMediaOptions.isUser ||
+            fgVisualMediaOptions.permissions?.acceptsScreenAudioEffects) &&
+            screenAudioStream)) && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <AudioEffectsButton
+              table_id={table_id}
+              username={username}
+              instance={instance}
+              isUser={
+                fgVisualMediaOptions.isUser ??
+                defaultFgVisualMediaOptions.isUser
+              }
+              permissions={
+                fgVisualMediaOptions.permissions ??
+                defaultFgVisualMediaOptions.permissions
+              }
+              producerType={screenAudioStream ? "screenAudio" : "audio"}
+              producerId={
+                screenAudioStream ? `${visualMediaId}_audio` : undefined
+              }
+              audioEffectsActive={audioEffectsActive}
+              setAudioEffectsActive={setAudioEffectsActive}
+              handleAudioEffectChange={handleAudioEffectChange}
+              handleMute={() => {
+                if (!screenAudioStream) {
+                  if (clientMute.current) {
+                    return;
+                  }
+
+                  localMute.current = !localMute.current;
+
+                  if (!audioRef.current) {
+                    return;
+                  }
+
+                  if (!fgVisualMediaOptions.isUser) {
+                    audioRef.current.muted = localMute.current;
+                  }
+                } else {
+                  if (screenAudioClientMute.current[`${visualMediaId}_audio`]) {
+                    return;
+                  }
+
+                  screenAudioLocalMute.current[`${visualMediaId}_audio`] =
+                    !screenAudioLocalMute.current[`${visualMediaId}_audio`];
+
+                  const audioElement = document.getElementById(
+                    `${visualMediaId}_audio`
+                  ) as HTMLAudioElement | null;
+
+                  if (!audioElement) {
+                    return;
+                  }
+
+                  if (!fgVisualMediaOptions.isUser) {
+                    audioElement.muted =
+                      screenAudioLocalMute.current[`${visualMediaId}_audio`];
+                  }
+                }
+
+                if (handleMuteCallback !== undefined) {
+                  handleMuteCallback(
+                    screenAudioStream ? "screenAudio" : "audio",
+                    screenAudioStream ? `${visualMediaId}_audio` : undefined
+                  );
+                }
+
+                setRerender((prev) => !prev);
+              }}
+              clientMute={clientMute}
+              screenAudioClientMute={screenAudioClientMute}
+              localMute={localMute}
+              screenAudioLocalMute={screenAudioLocalMute}
+              visualMediaContainerRef={visualMediaContainerRef}
+              closeLabelElement={
+                <FgHoverContentStandard content='Close (x)' style='dark' />
+              }
+              hoverLabelElement={
+                <FgHoverContentStandard
+                  content='Audio effects (a)'
+                  style='dark'
+                />
+              }
+              scrollingContainerRef={rightVisualMediaControlsRef}
+              style={{ transform: "scaleX(-1)" }}
+              options={{
+                backgroundColor: "rgba(10, 10, 10, 1)",
+                secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
+              }}
+            />
+          </Suspense>
+        )}
       </div>
     </div>
   );

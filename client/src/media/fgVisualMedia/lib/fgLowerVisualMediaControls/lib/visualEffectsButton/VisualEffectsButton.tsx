@@ -31,11 +31,12 @@ export default function VisualEffectsButton({
         return (
           <FgSVG
             src={iconSrc}
+            className='flex items-center justify-center'
             attributes={[
-              { key: "width", value: "95%" },
-              { key: "height", value: "95%" },
-              { key: "fill", value: "white" },
-              { key: "stroke", value: "white" },
+              { key: "width", value: "85%" },
+              { key: "height", value: "85%" },
+              { key: "fill", value: "#f2f2f2" },
+              { key: "stroke", value: "#f2f2f2" },
             ]}
           />
         );
@@ -46,7 +47,7 @@ export default function VisualEffectsButton({
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center w-10 min-w-10 aspect-square relative scale-x-[-1] pointer-events-auto'
+      className='flex items-center justify-center h-10 aspect-square relative scale-x-[-1] pointer-events-auto'
     />
   );
 }

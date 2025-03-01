@@ -156,13 +156,14 @@ export default function FgApplication({
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
       className='application-container'
-      lowerPopupElements={[
+      popupElements={[
         applicationEffectsActive ? (
           <ApplicationEffectsSection
             applicationId={applicationId}
             lowerApplicationController={lowerApplicationController}
             tintColor={tintColor}
             applicationMedia={applicationMedia}
+            applicationContainerRef={applicationContainerRef}
           />
         ) : null,
       ]}

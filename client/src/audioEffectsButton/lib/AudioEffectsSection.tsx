@@ -369,8 +369,8 @@ export default function AudioEffectsSection({
                       attributes={[
                         { key: "width", value: "90%" },
                         { key: "height", value: "90%" },
-                        { key: "fill", value: "white" },
-                        { key: "stroke", value: "white" },
+                        { key: "fill", value: "#f2f2f2" },
+                        { key: "stroke", value: "#f2f2f2" },
                       ]}
                     />
                   );
@@ -417,8 +417,8 @@ export default function AudioEffectsSection({
                         attributes={[
                           { key: "width", value: "90%" },
                           { key: "height", value: "90%" },
-                          { key: "fill", value: "white" },
-                          { key: "stroke", value: "white" },
+                          { key: "fill", value: "#f2f2f2" },
+                          { key: "stroke", value: "#f2f2f2" },
                         ]}
                       />
                     );
@@ -449,8 +449,8 @@ export default function AudioEffectsSection({
                         attributes={[
                           { key: "width", value: "90%" },
                           { key: "height", value: "90%" },
-                          { key: "fill", value: "white" },
-                          { key: "stroke", value: "white" },
+                          { key: "fill", value: "#f2f2f2" },
+                          { key: "stroke", value: "#f2f2f2" },
                         ]}
                       />
                     );
@@ -485,8 +485,8 @@ export default function AudioEffectsSection({
                         attributes={[
                           { key: "width", value: "90%" },
                           { key: "height", value: "90%" },
-                          { key: "fill", value: "white" },
-                          { key: "stroke", value: "white" },
+                          { key: "fill", value: "#f2f2f2" },
+                          { key: "stroke", value: "#f2f2f2" },
                         ]}
                       />
                     );

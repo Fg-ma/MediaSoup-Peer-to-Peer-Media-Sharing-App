@@ -22,16 +22,18 @@ export default function CloseButton({
         return (
           <FgSVG
             src={closeIcon}
+            className='flex items-center justify-start'
             attributes={[
               { key: "width", value: "60%" },
               { key: "height", value: "60%" },
-              { key: "fill", value: "white" },
+              { key: "fill", value: "#f2f2f2" },
+              { key: "stroke", value: "#f2f2f2" },
             ]}
           />
         );
       }}
       hoverContent={<FgHoverContentStandard content='Close (x)' />}
-      className='flex items-center justify-end w-10 aspect-square pointer-events-auto'
+      className='flex items-center justify-end h-full aspect-square pointer-events-auto'
       options={{ hoverType: "below" }}
     />
   );

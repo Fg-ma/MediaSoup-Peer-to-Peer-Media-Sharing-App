@@ -97,8 +97,8 @@ export default function UserBubble({
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
-                  { key: "stroke", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
+                  { key: "stroke", value: "#f2f2f2" },
                 ]}
               />
             )}
@@ -128,8 +128,8 @@ export default function UserBubble({
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
-                  { key: "stroke", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
+                  { key: "stroke", value: "#f2f2f2" },
                 ]}
               />
             )}

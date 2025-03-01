@@ -7,7 +7,7 @@ class CaptureMediaController {
       [effectType in CameraEffectTypes]: boolean;
     }>,
     private captureMedia: React.RefObject<CaptureMedia | undefined>,
-    private mediaContainerRef: React.RefObject<HTMLDivElement>,
+    private captureContainerRef: React.RefObject<HTMLDivElement>,
     private setCaptureMediaEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
@@ -40,7 +40,7 @@ class CaptureMediaController {
   handlePointerMove = () => {
     this.setInCaptureMedia(true);
 
-    if (this.mediaContainerRef.current) {
+    if (this.captureContainerRef.current) {
       clearTimeout(this.movementTimeout.current);
       this.movementTimeout.current = undefined;
     }
@@ -53,7 +53,7 @@ class CaptureMediaController {
   handlePointerEnter = () => {
     this.setInCaptureMedia(true);
 
-    this.mediaContainerRef.current?.addEventListener(
+    this.captureContainerRef.current?.addEventListener(
       "pointermove",
       this.handlePointerMove
     );
@@ -65,12 +65,12 @@ class CaptureMediaController {
   };
 
   handlePointerLeave = () => {
-    this.mediaContainerRef.current?.removeEventListener(
+    this.captureContainerRef.current?.removeEventListener(
       "pointermove",
       this.handlePointerMove
     );
 
-    if (this.mediaContainerRef.current) {
+    if (this.captureContainerRef.current) {
       clearTimeout(this.movementTimeout.current);
       this.movementTimeout.current = undefined;
     }

@@ -11,7 +11,7 @@ export default function VolumeSVG({
   volumeState,
   movingPath,
   stationaryPaths,
-  color = "white",
+  color = "#f2f2f2",
   duration = 0.6,
 }: {
   volumeState: {

@@ -16,7 +16,7 @@ export default function FgUpperVisualMediaControls({
   fgLowerVisualMediaController: FgLowerVisualMediaController;
 }) {
   return (
-    <div className='visual-media-upper-controls absolute top-0 w-full h-10 flex items-center justify-center z-20 space-x-2'>
+    <div className='visual-media-upper-controls absolute top-[1%] left-0 w-full h-[12%] max-h-12 min-h-6 flex items-center justify-center z-20 space-x-2 pr-0.5 pl-4'>
       <div className='grow text-lg cursor-default select-none'>
         {name ? name : username}
       </div>

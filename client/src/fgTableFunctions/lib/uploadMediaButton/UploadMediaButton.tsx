@@ -56,7 +56,7 @@ export default function UploadMediaButton() {
         onChange={handleFileChange}
       />
       <FgButton
-        className='h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        className='flex h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
         clickFunction={clickFunction}
         contentFunction={() => (
           <FgSVG
@@ -65,7 +65,7 @@ export default function UploadMediaButton() {
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
-              { key: "fill", value: "white" },
+              { key: "fill", value: "#f2f2f2" },
             ]}
           />
         )}

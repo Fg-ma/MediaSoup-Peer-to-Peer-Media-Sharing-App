@@ -99,14 +99,13 @@ export default function FgSettingsButton({
     <>
       <FgButton
         externalRef={settingsButtonRef}
-        className='flex items-center justify-center pointer-events-auto'
+        className='flex items-center justify-center pointer-events-auto h-full aspect-square'
         clickFunction={toggleSettings}
         contentFunction={() => (
           <svg
+            className='h-full aspect-square'
             xmlns='http://www.w3.org/2000/svg'
             viewBox='0 0 100 100'
-            height='32'
-            width='32'
             style={{
               transform: settingsActive ? "rotate(-30deg)" : "rotate(0deg)",
               transition: "transform 0.2s linear",

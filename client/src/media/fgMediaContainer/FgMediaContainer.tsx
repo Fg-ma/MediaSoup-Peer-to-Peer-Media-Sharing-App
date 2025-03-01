@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { motion, Transition, Variants } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
@@ -17,6 +18,24 @@ import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
 
+const MediaContainerVar: Variants = {
+  init: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      scale: { type: "spring", stiffness: 100 },
+    },
+  },
+};
+
+const MediaContainerTransition: Transition = {
+  transition: {
+    opacity: { duration: 0.001 },
+    scale: { duration: 0.001 },
+  },
+};
+
 export default function FgMediaContainer({
   mediaId,
   filename,
@@ -27,7 +46,7 @@ export default function FgMediaContainer({
   floatingTagContent,
   rootMedia,
   className,
-  lowerPopupElements,
+  popupElements,
   leftLowerControls,
   rightLowerControls,
   leftUpperControls,
@@ -49,7 +68,7 @@ export default function FgMediaContainer({
   floatingTagContent?: React.ReactNode[];
   rootMedia?: HTMLImageElement | HTMLVideoElement;
   className?: string;
-  lowerPopupElements?: (React.ReactNode | null)[];
+  popupElements?: (React.ReactNode | null)[];
   leftLowerControls?: (React.ReactNode | null)[];
   rightLowerControls?: (React.ReactNode | null)[];
   leftUpperControls?: (React.ReactNode | null)[];
@@ -243,7 +262,7 @@ export default function FgMediaContainer({
   }, [positioning.current]);
 
   return (
-    <div
+    <motion.div
       ref={mediaContainerRef}
       id={`${mediaId}_media_container`}
       className={`media-container ${
@@ -280,6 +299,11 @@ export default function FgMediaContainer({
       onPointerEnter={() => mediaContainerController.handlePointerEnter()}
       onPointerLeave={() => mediaContainerController.handlePointerLeave()}
       data-positioning={JSON.stringify(positioning.current)}
+      variants={MediaContainerVar}
+      initial='init'
+      animate='animate'
+      exit='init'
+      transition={MediaContainerTransition}
     >
       {floatingTagContent &&
         floatingTagContent.map((item, index) => (
@@ -322,7 +346,6 @@ export default function FgMediaContainer({
               externalRightLowerControlsRef={externalRightLowerControlsRef}
               leftLowerControls={leftLowerControls}
               rightLowerControls={rightLowerControls}
-              lowerPopupElements={lowerPopupElements}
               mediaContainerOptions={mediaContainerOptions}
               preventLowerLabelsVariables={preventLowerLabelsVariables}
               fullscreen={fullscreen}
@@ -347,6 +370,13 @@ export default function FgMediaContainer({
         className='flex sub-media-container absolute items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden bg-black'
       >
         {media && media}
+        <div className='media-lower-controls pointer-events-none w-full h-full absolute top-0 left-0'>
+          {popupElements &&
+            popupElements.length > 0 &&
+            popupElements.map((element, index) => (
+              <React.Fragment key={index}>{element}</React.Fragment>
+            ))}
+        </div>
         {(mediaContainerOptions.controlsPlacement === "inside" ||
           fullscreen ||
           backgroundMedia) && (
@@ -367,7 +397,6 @@ export default function FgMediaContainer({
               externalRightLowerControlsRef={externalRightLowerControlsRef}
               leftLowerControls={leftLowerControls}
               rightLowerControls={rightLowerControls}
-              lowerPopupElements={lowerPopupElements}
               mediaContainerOptions={mediaContainerOptions}
               preventLowerLabelsVariables={preventLowerLabelsVariables}
               fullscreen={fullscreen}
@@ -377,6 +406,6 @@ export default function FgMediaContainer({
         )}
         {(mediaContainerOptions.gradient || fullscreen) && <Gradient />}
       </div>
-    </div>
+    </motion.div>
   );
 }

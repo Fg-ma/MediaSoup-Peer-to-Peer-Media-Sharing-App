@@ -10,7 +10,7 @@ export interface BundleOptions {
 
 export const defaultBundleOptions = {
   isUser: false,
-  primaryVolumeSliderColor: "white",
+  primaryVolumeSliderColor: "#f2f2f2",
   secondaryVolumeSliderColor: "rgba(150, 150, 150, 0.5)",
   permissions: {
     acceptsCameraEffects: false,

@@ -52,11 +52,11 @@ export default function CameraSection({
   );
 
   return (
-    <div className='h-full flex space-x-4'>
+    <div className='flex h-full space-x-4'>
       <FgButton
         externalRef={cameraBtnRef}
         clickFunction={() => cameraSectionController.shareCamera()}
-        className='disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        className='flex disabled:opacity-25 h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
         contentFunction={() => {
           if (cameraActive) {
             return (
@@ -66,7 +66,7 @@ export default function CameraSection({
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
                 ]}
               />
             );
@@ -78,7 +78,7 @@ export default function CameraSection({
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
                 ]}
               />
             );
@@ -105,7 +105,7 @@ export default function CameraSection({
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
-              { key: "fill", value: "white" },
+              { key: "fill", value: "#f2f2f2" },
             ]}
           />
         )}

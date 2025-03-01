@@ -2,6 +2,10 @@ import {
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
   AudioEffectTypes,
+  defaultAudioEffectsStyles,
+  defaultAudioStreamEffects,
+  defaultVideoEffectsStyles,
+  defaultVideoStreamEffects,
   ImageEffectStylesType,
   ImageEffectTypes,
   UserEffectsStylesType,
@@ -540,8 +544,20 @@ class TableStaticContentSocketController {
 
     if (videos) {
       for (const video of videos) {
+        if (!this.userStreamEffects.current.video[video.videoId]) {
+          this.userStreamEffects.current.video[video.videoId] = {
+            video: structuredClone(defaultVideoStreamEffects),
+            audio: structuredClone(defaultAudioStreamEffects),
+          };
+        }
         this.userStreamEffects.current.video[video.videoId].video =
           video.effects as { [effectType in VideoEffectTypes]: boolean };
+        if (!this.userEffectsStyles.current.video[video.videoId]) {
+          this.userEffectsStyles.current.video[video.videoId] = {
+            video: structuredClone(defaultVideoEffectsStyles),
+            audio: structuredClone(defaultAudioEffectsStyles),
+          };
+        }
         this.userEffectsStyles.current.video[video.videoId].video =
           video.effectStyles as VideoEffectStylesType;
 
@@ -564,10 +580,10 @@ class TableStaticContentSocketController {
     if (images) {
       for (const image of images) {
         this.userStreamEffects.current.image[image.imageId] = image.effects as {
-          [effectType in VideoEffectTypes]: boolean;
+          [effectType in ImageEffectTypes]: boolean;
         };
         this.userEffectsStyles.current.image[image.imageId] =
-          image.effectStyles as VideoEffectStylesType;
+          image.effectStyles as ImageEffectStylesType;
 
         this.userMedia.current.image[image.imageId] = new ImageMedia(
           image.imageId,
@@ -602,10 +618,10 @@ class TableStaticContentSocketController {
       for (const application of applications) {
         this.userStreamEffects.current.application[application.applicationId] =
           application.effects as {
-            [effectType in VideoEffectTypes]: boolean;
+            [effectType in ApplicationEffectTypes]: boolean;
           };
         this.userEffectsStyles.current.application[application.applicationId] =
-          application.effectStyles as VideoEffectStylesType;
+          application.effectStyles as ApplicationEffectStylesType;
 
         this.userMedia.current.application[application.applicationId] =
           new ApplicationMedia(

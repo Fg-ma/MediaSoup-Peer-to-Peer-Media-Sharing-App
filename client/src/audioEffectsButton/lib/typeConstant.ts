@@ -897,8 +897,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
       {
         key: "fill",
         id: "eyes",
@@ -914,11 +914,11 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "stroke", value: "white" },
+      { key: "stroke", value: "#f2f2f2" },
       {
         key: "fill",
-        value: "white",
-        activityDependentValue: { active: "none", deactive: "white" },
+        value: "#f2f2f2",
+        activityDependentValue: { active: "none", deactive: "#f2f2f2" },
       },
     ],
     hoverContent: { active: "Echo effect", deactive: "Remove echo effect" },
@@ -938,8 +938,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Underwater effect",
@@ -952,8 +952,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Telephone effect",
@@ -966,8 +966,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Space effect",
@@ -980,8 +980,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Distortion effect",
@@ -994,13 +994,13 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
       {
         key: "fill",
         id: "center",
-        value: "#f56114",
-        activityDependentValue: { active: "none", deactive: "#f56114" },
+        value: "#d40213",
+        activityDependentValue: { active: "none", deactive: "#d402134" },
       },
     ],
     hoverContent: {
@@ -1026,12 +1026,12 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "stroke", value: "white" },
+      { key: "stroke", value: "#f2f2f2" },
       {
         id: "innerEllipse",
         key: "fill",
-        value: "white",
-        activityDependentValue: { active: "white", deactive: "white" },
+        value: "#f2f2f2",
+        activityDependentValue: { active: "#f2f2f2", deactive: "#f2f2f2" },
       },
     ],
     hoverContent: {
@@ -1045,8 +1045,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "High energy effect",
@@ -1059,8 +1059,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Ambient effect",
@@ -1085,7 +1085,7 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "stroke", value: "white" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Muffled effect",
@@ -1110,8 +1110,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Heavy metal effect",
@@ -1124,8 +1124,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Dreamy effect",
@@ -1150,8 +1150,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Sci-fi effect",
@@ -1176,8 +1176,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Retro game effect",
@@ -1238,8 +1238,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Windy effect",
@@ -1252,8 +1252,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Radio effect",
@@ -1266,8 +1266,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Explosion effect",
@@ -1352,8 +1352,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Heartbeat effect",
@@ -1402,8 +1402,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Bubbly effect",
@@ -1416,8 +1416,8 @@ export const audioEffectTemplates: AudioEffectTemplates = {
     attributes: [
       { key: "width", value: "90%" },
       { key: "height", value: "90%" },
-      { key: "fill", value: "white" },
-      { key: "stroke", value: "white" },
+      { key: "fill", value: "#f2f2f2" },
+      { key: "stroke", value: "#f2f2f2" },
     ],
     hoverContent: {
       active: "Thunder effect",

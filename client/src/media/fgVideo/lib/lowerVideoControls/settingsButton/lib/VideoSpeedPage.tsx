@@ -66,8 +66,8 @@ export default function VideoSpeedPage({
                 attributes={[
                   { key: "width", value: "95%" },
                   { key: "height", value: "95%" },
-                  { key: "fill", value: "white" },
-                  { key: "stroke", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
+                  { key: "stroke", value: "#f2f2f2" },
                 ]}
               />
             )}

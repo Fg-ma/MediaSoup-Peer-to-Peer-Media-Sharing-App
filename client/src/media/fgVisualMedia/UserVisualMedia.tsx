@@ -19,6 +19,8 @@ import {
 } from "./lib/typeConstant";
 import VisualMediaGradient from "./lib/VisualMediaGradient";
 import "./lib/fgVisualMediaStyles.css";
+import { AnimatePresence } from "framer-motion";
+import VisualEffectsSection from "./lib/visualEffectsSection/VisualEffectsSection";
 
 const VisualMediaAdjustmentButtons = React.lazy(
   () => import("./lib/VisualMediaAdjustmentButtons")
@@ -129,7 +131,7 @@ export default function UserVisualMedia({
 
   const [audioEffectsActive, setAudioEffectsActive] = useState(false);
 
-  const tintColor = useRef("#F56114");
+  const tintColor = useRef("#d40213");
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
@@ -498,6 +500,34 @@ export default function UserVisualMedia({
         ref={subContainerRef}
         className='flex relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
       >
+        <AnimatePresence>
+          {visualEffectsActive && (
+            <Suspense fallback={<div>Loading...</div>}>
+              <VisualEffectsSection
+                username={username}
+                instance={instance}
+                type={type}
+                visualMediaId={visualMediaId}
+                isUser={
+                  fgVisualMediaOptions.isUser ??
+                  defaultFgVisualMediaOptions.isUser
+                }
+                acceptsVisualEffects={
+                  type === "camera"
+                    ? fgVisualMediaOptions.permissions?.acceptsCameraEffects ??
+                      defaultFgVisualMediaOptions.permissions
+                        .acceptsCameraEffects
+                    : fgVisualMediaOptions.permissions?.acceptsScreenEffects ??
+                      defaultFgVisualMediaOptions.permissions
+                        .acceptsScreenEffects
+                }
+                handleVisualEffectChange={handleVisualEffectChange}
+                tintColor={tintColor}
+                visualMediaContainerRef={visualMediaContainerRef}
+              />
+            </Suspense>
+          )}
+        </AnimatePresence>
         <FgUpperVisualMediaControls
           name={name}
           username={username}

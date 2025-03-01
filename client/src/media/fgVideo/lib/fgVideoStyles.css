@@ -106,11 +106,10 @@
   opacity: 0;
   height: 8px;
   width: calc(100% - 1.5rem);
-  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  bottom: 2.75rem;
+  bottom: calc(max(2rem, min(12% + 0.5rem, 3.5rem)));
   position: absolute;
   z-index: 20;
 }

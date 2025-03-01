@@ -117,10 +117,11 @@ export default function CaptionButton({
             <>
               <FgSVG
                 src={captionsIcon}
+                className='flex items-center justify-center'
                 attributes={[
-                  { key: "width", value: "36px" },
-                  { key: "height", value: "36px" },
-                  { key: "fill", value: "white" },
+                  { key: "width", value: "85%" },
+                  { key: "height", value: "85%" },
+                  { key: "fill", value: "#f2f2f2" },
                 ]}
               />
               {active && <div className='caption-button-underline'></div>}
@@ -133,7 +134,7 @@ export default function CaptionButton({
           ) : undefined
         }
         scrollingContainerRef={scrollingContainerRef}
-        className='caption-button flex-col items-center justify-center scale-x-[-1] pointer-events-auto'
+        className='h-full aspect-square flex-col items-center justify-center scale-x-[-1] pointer-events-auto'
       />
       {active && (
         <Captions

@@ -13,7 +13,7 @@ export const defaultApplicationOptions: {
 } = {
   controlsVanishTime: 1250,
   closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
-  primaryApplicationColor: "#f56114",
+  primaryApplicationColor: "#d40213",
   initialVolume: "high",
 };
 

@@ -31,7 +31,7 @@ export default function SyncButton({
             attributes={[
               { key: "width", value: "80%" },
               { key: "height", value: "80%" },
-              { key: "fill", value: "white" },
+              { key: "fill", value: "#f2f2f2" },
             ]}
           />
         );

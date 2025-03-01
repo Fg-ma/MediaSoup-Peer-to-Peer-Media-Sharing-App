@@ -131,9 +131,9 @@ export default function BeardsButton({
                         : ""
                     } ${effect.flipped && "scale-x-[-1]"} ${
                       effect.bgColor === "white" &&
-                      "bg-white border-fg-black-35"
+                      "bg-fg-white border-fg-black-35"
                     } ${
-                      effect.bgColor === "black" && "border-white"
+                      effect.bgColor === "black" && "border-fg-white"
                     } flex items-center justify-center w-full h-full hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
                     onClick={(event) => {
                       holdFunction(event as unknown as PointerEvent);

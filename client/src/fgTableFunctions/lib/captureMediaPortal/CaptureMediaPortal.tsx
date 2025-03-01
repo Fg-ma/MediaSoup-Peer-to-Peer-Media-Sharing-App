@@ -24,7 +24,7 @@ export default function CaptureMediaPortal({
   const [captureMediaEffectsActive, setCaptureMediaEffectsActive] =
     useState(false);
 
-  const mediaContainerRef = useRef<HTMLDivElement>(null);
+  const captureContainerRef = useRef<HTMLDivElement>(null);
 
   const tintColor = useRef(captureEffectsStyles.current.tint.color);
 
@@ -34,7 +34,7 @@ export default function CaptureMediaPortal({
   const captureMediaController = new CaptureMediaController(
     captureStreamEffects,
     captureMedia,
-    mediaContainerRef,
+    captureContainerRef,
     setCaptureMediaEffectsActive,
     setInCaptureMedia,
     leaveTimer,
@@ -44,7 +44,7 @@ export default function CaptureMediaPortal({
 
   useEffect(() => {
     if (captureMedia.current)
-      mediaContainerRef.current?.appendChild(captureMedia.current.canvas);
+      captureContainerRef.current?.appendChild(captureMedia.current.canvas);
   }, []);
 
   return (
@@ -59,7 +59,7 @@ export default function CaptureMediaPortal({
       content={
         <div className='flex absolute w-4/5 h-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'>
           <div
-            ref={mediaContainerRef}
+            ref={captureContainerRef}
             className='min-w-full w-full h-max rounded-md overflow-hidden relative pointer-events-auto'
             onPointerEnter={captureMediaController.handlePointerEnter}
             onPointerLeave={captureMediaController.handlePointerLeave}
@@ -70,14 +70,15 @@ export default function CaptureMediaPortal({
                   tintColor={tintColor}
                   captureMedia={captureMedia}
                   captureMediaController={captureMediaController}
+                  captureContainerRef={captureContainerRef}
                 />
               )}
-              <div className='flex top-[1%] w-full h-[6%] absolute left-0 items-center justify-center'>
+              <div className='flex top-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center'>
                 <CloseButton
                   tableFunctionsController={tableFunctionsController}
                 />
               </div>
-              <div className='flex bottom-[1%] w-full h-[7%] absolute left-0 items-center justify-center space-x-3'>
+              <div className='flex bottom-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center space-x-3'>
                 <MediaTypeButton />
                 <CaptureButton />
                 <CaptureMediaEffectsButton

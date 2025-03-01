@@ -56,7 +56,7 @@ export default function ScreenSection({
       <FgButton
         externalRef={screenBtnRef}
         clickFunction={() => screenSectionController.shareScreen()}
-        className='disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        className='flex disabled:opacity-25 h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
         contentFunction={() => {
           if (screenActive) {
             return (
@@ -66,7 +66,7 @@ export default function ScreenSection({
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
                 ]}
               />
             );
@@ -78,7 +78,7 @@ export default function ScreenSection({
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
                 ]}
               />
             );
@@ -105,7 +105,7 @@ export default function ScreenSection({
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
-              { key: "fill", value: "white" },
+              { key: "fill", value: "#f2f2f2" },
             ]}
           />
         )}

@@ -20,7 +20,7 @@ const defaultAudioEffectsButtonOptions: {
   color: string;
   placement: "above" | "below" | "left" | "right";
   hoverTimeoutDuration: number;
-} = { color: "white", placement: "above", hoverTimeoutDuration: 0 };
+} = { color: "#f2f2f2", placement: "above", hoverTimeoutDuration: 0 };
 
 export default function AudioEffectsButton({
   table_id,

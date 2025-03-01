@@ -10,7 +10,7 @@ import {
 
 export default function SVGMorpher({
   pathArrays,
-  color = "white",
+  color = "#f2f2f2",
 }: {
   pathArrays: string[][];
   color?: string;

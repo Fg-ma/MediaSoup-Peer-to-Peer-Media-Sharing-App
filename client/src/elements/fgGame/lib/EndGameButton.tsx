@@ -14,7 +14,7 @@ export default function EndGameButton({
 }) {
   return (
     <FgButton
-      className='h-full aspect-square rounded flex items-end justify-end py-2 pr-2'
+      className='flex h-full aspect-square rounded items-end justify-end py-2 pr-2'
       clickFunction={closeGameFunction}
       contentFunction={() => (
         <FgSVG
@@ -23,8 +23,8 @@ export default function EndGameButton({
           attributes={[
             { key: "width", value: "80%" },
             { key: "height", value: "80%" },
-            { key: "stroke", value: "white" },
-            { key: "fill", value: "white" },
+            { key: "stroke", value: "#f2f2f2" },
+            { key: "fill", value: "#f2f2f2" },
           ]}
         />
       )}

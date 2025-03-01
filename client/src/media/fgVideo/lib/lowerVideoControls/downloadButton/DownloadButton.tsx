@@ -43,11 +43,12 @@ export default function DownloadButton({
         return (
           <FgSVG
             src={src}
+            className='flex items-center justify-center'
             attributes={[
               { key: "width", value: "85%" },
               { key: "height", value: "85%" },
-              { key: "fill", value: "white" },
-              { key: "stroke", value: "white" },
+              { key: "fill", value: "#f2f2f2" },
+              { key: "stroke", value: "#f2f2f2" },
             ]}
           />
         );

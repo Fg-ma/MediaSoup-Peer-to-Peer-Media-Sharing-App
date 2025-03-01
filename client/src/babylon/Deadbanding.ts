@@ -705,7 +705,6 @@ class Deadbanding {
     if (mediaType !== "capture" && !this.deadbandingMap[mediaType][id]) {
       this.deadbandingMap[mediaType][id] = defaultDeadbandingValues;
     }
-    console.log(mediaType);
     for (const type in deadbandingValues) {
       const effectType = type as DeadbandingTypes;
       if (

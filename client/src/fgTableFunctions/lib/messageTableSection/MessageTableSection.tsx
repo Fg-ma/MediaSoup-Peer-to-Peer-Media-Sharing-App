@@ -46,7 +46,7 @@ export default function MessageTableSection() {
               attributes={[
                 { key: "width", value: "80%" },
                 { key: "height", value: "80%" },
-                { key: "fill", value: "white" },
+                { key: "fill", value: "#f2f2f2" },
               ]}
               className='flex items-center justify-center h-full aspect-square'
               style={{
@@ -63,7 +63,7 @@ export default function MessageTableSection() {
               attributes={[
                 { key: "width", value: "80%" },
                 { key: "height", value: "80%" },
-                { key: "fill", value: "white" },
+                { key: "fill", value: "#f2f2f2" },
               ]}
               className='flex items-center justify-center h-full aspect-square relative'
               style={{

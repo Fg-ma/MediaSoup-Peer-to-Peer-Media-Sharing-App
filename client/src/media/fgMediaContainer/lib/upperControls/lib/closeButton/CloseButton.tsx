@@ -26,7 +26,7 @@ export default function CloseButton({
             attributes={[
               { key: "width", value: "60%" },
               { key: "height", value: "60%" },
-              { key: "fill", value: "white" },
+              { key: "fill", value: "#f2f2f2" },
             ]}
           />
         );

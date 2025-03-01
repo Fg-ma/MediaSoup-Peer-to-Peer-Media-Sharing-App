@@ -8,7 +8,6 @@ export default function LowerControls({
   externalRightLowerControlsRef,
   leftLowerControls,
   rightLowerControls,
-  lowerPopupElements,
   mediaContainerOptions,
   preventLowerLabelsVariables,
   fullscreen,
@@ -18,7 +17,6 @@ export default function LowerControls({
   externalRightLowerControlsRef?: React.RefObject<HTMLDivElement>;
   leftLowerControls?: (React.ReactNode | null)[];
   rightLowerControls?: (React.ReactNode | null)[];
-  lowerPopupElements?: (React.ReactNode | null)[];
   mediaContainerOptions: MediaContainerOptions;
   preventLowerLabelsVariables?: boolean[];
   fullscreen: boolean;
@@ -59,11 +57,6 @@ export default function LowerControls({
           : "top-full"
       } absolute w-full h-[12%] max-h-12 min-h-6 flex-col items-end justify-center z-20 pointer-events-none`}
     >
-      {lowerPopupElements &&
-        lowerPopupElements.length > 0 &&
-        lowerPopupElements.map((element, index) => (
-          <React.Fragment key={index}>{element}</React.Fragment>
-        ))}
       <div className='flex w-full h-full justify-between'>
         <div
           className='flex w-max h-full z-20 items-center space-x-2'

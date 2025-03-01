@@ -258,7 +258,7 @@ class VideoMedia {
     this.video.onloadeddata = () => {
       this.audioStream = (this.video as any).captureStream();
 
-      if (this.audioStream) {
+      if (this.audioStream && this.audioStream.getAudioTracks().length > 0) {
         this.videoAudioMedia = new VideoAudioMedia(
           this.videoId,
           this.audioStream,

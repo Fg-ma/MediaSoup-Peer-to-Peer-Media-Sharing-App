@@ -83,9 +83,9 @@ export default function HideBackgroundButton({
   };
 
   return (
-    <div className='flex h-full w-max items-center justify-center'>
+    <>
       <FgButton
-        className='flex items-center justify-center h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full overflow-hidden hover:border-fg-red-light'
+        className='flex items-center justify-center h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
         clickFunction={clickFunction}
         contentFunction={() => {
           return (
@@ -93,8 +93,8 @@ export default function HideBackgroundButton({
               src={streamEffects ? hideBackgroundOffIcon : hideBackgroundIcon}
               className='flex h-full w-full items-center justify-center'
               attributes={[
-                { key: "width", value: "80%" },
-                { key: "height", value: "80%" },
+                { key: "width", value: "70%" },
+                { key: "height", value: "70%" },
                 { key: "fill", value: "#f2f2f2" },
               ]}
             />
@@ -186,12 +186,12 @@ export default function HideBackgroundButton({
         }}
       />
       <ColorPickerButton
-        className='h-full mx-1'
+        className='h-full'
         scrollingContainerRef={scrollingContainerRef}
         handleAcceptColorCallback={handleAcceptColorCallback}
         externalColorRef={colorRef}
         disabled={effectsDisabled}
       />
-    </div>
+    </>
   );
 }

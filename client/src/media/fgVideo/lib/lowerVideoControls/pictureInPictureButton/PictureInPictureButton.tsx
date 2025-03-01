@@ -23,16 +23,18 @@ export default function PictureInPictureButton({
         setActive((prev) => !prev);
       }}
       contentFunction={() => {
-        return active ? (
-          <div className='flex h-9 w-9 items-center justify-center'>
-            <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-start items-start'>
-              <div className='bg-white w-3 h-2 rounded-sm ml-0.5 mt-0.5'></div>
-            </div>
-          </div>
-        ) : (
-          <div className='flex h-9 w-9 items-center justify-center'>
-            <div className='border-3 border-white w-8 h-6.5 rounded-md flex justify-end items-end'>
-              <div className='bg-white w-3 h-2 rounded-sm mr-0.5 mb-0.5'></div>
+        return (
+          <div className='flex h-[90%] aspect-square items-center justify-center'>
+            <div
+              className={`border-3 border-white w-[80%] h-[65%] rounded-md flex ${
+                active ? "justify-start items-start" : "justify-end items-end"
+              }`}
+            >
+              <div
+                className={`bg-white w-[60%] h-[50%] rounded-sm ${
+                  active ? "ml-[10%] mt-[10%]" : "mr-[10%] mb-[10%]"
+                }`}
+              ></div>
             </div>
           </div>
         );
@@ -46,7 +48,7 @@ export default function PictureInPictureButton({
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center w-10 aspect-square scale-x-[-1] pointer-events-auto'
+      className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'
     />
   );
 }

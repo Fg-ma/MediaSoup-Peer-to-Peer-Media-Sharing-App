@@ -131,13 +131,14 @@ export default function FgImage({
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
       className='image-container'
-      lowerPopupElements={[
+      popupElements={[
         imageEffectsActive ? (
           <ImageEffectsSection
             imageId={imageId}
             lowerImageController={lowerImageController}
             tintColor={tintColor}
             imageMedia={imageMedia}
+            imageContainerRef={imageContainerRef}
           />
         ) : null,
       ]}

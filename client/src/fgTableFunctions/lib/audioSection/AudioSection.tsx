@@ -78,7 +78,7 @@ export default function AudioSection({
       <FgButton
         externalRef={audioBtnRef}
         clickFunction={() => audioSectionController.shareAudio()}
-        className='disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        className='flex disabled:opacity-25 h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
         contentFunction={() => {
           if (audioActive) {
             return (
@@ -88,7 +88,7 @@ export default function AudioSection({
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
                 ]}
               />
             );
@@ -100,7 +100,7 @@ export default function AudioSection({
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
-                  { key: "fill", value: "white" },
+                  { key: "fill", value: "#f2f2f2" },
                 ]}
               />
             );
@@ -125,7 +125,7 @@ export default function AudioSection({
               }));
               handleExternalMute();
             }}
-            className='disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+            className='flex disabled:opacity-25 h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
             contentFunction={() => (
               <svg
                 className='h-[75%] aspect-square'

@@ -55,8 +55,8 @@ export default function DownloadTypeOptionsPage({
               attributes={[
                 { key: "width", value: "95%" },
                 { key: "height", value: "95%" },
-                { key: "fill", value: "white" },
-                { key: "stroke", value: "white" },
+                { key: "fill", value: "#f2f2f2" },
+                { key: "stroke", value: "#f2f2f2" },
               ]}
             />
           )}
@@ -102,8 +102,8 @@ export default function DownloadTypeOptionsPage({
                     attributes={[
                       { key: "width", value: "1.25rem" },
                       { key: "height", value: "1.25rem" },
-                      { key: "fill", value: "white" },
-                      { key: "stroke", value: "white" },
+                      { key: "fill", value: "#f2f2f2" },
+                      { key: "stroke", value: "#f2f2f2" },
                     ]}
                   />
                 </div>

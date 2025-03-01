@@ -31,10 +31,11 @@ export default function PlayPauseButton({
         return (
           <FgSVG
             src={iconSrc}
+            className='flex items-center justify-center'
             attributes={[
-              { key: "width", value: "36px" },
-              { key: "height", value: "36px" },
-              { key: "fill", value: "white" },
+              { key: "width", value: "85%" },
+              { key: "height", value: "85%" },
+              { key: "fill", value: "#f2f2f2" },
             ]}
           />
         );
@@ -47,7 +48,7 @@ export default function PlayPauseButton({
           />
         ) : undefined
       }
-      className='flex items-center justify-center w-10 aspect-square pointer-events-auto'
+      className='flex items-center justify-center h-full aspect-square pointer-events-auto'
     />
   );
 }

@@ -45,7 +45,7 @@
 }
 
 .visual-media-container {
-  --primary-video-color: #f56114;
+  --primary-video-color: #d40213;
   --closed-captions-font-family: "K2D";
   --closed-captions-font-color: white;
   --closed-captions-font-size: 2rem;
@@ -54,28 +54,12 @@
   --closed-captions-character-edge-style: none;
 }
 
-.visual-media-container .video-controls-container,
+.visual-media-container .visual-media-lower-controls,
 .visual-media-container .visual-media-upper-controls,
 .visual-media-container .controls-gradient {
   pointer-events: none;
   opacity: 0;
   transition: opacity 150ms ease-in-out;
-}
-
-.video-controls-container {
-  pointer-events: none;
-}
-
-.video-controls {
-  pointer-events: auto;
-  padding-inline: 1rem;
-  margin-bottom: 0.375rem;
-}
-
-.visual-media-upper-controls {
-  padding-left: 1.25rem;
-  padding-right: 0.25rem;
-  margin-top: 0.375rem;
 }
 
 .visual-media-container .pan-btn,
@@ -106,19 +90,22 @@
   display: block;
 }
 
-.visual-media-container.in-visual-media .video-controls-container,
+.visual-media-container.adjusting-dimensions .visual-media-lower-controls,
+.visual-media-container.adjusting-dimensions .visual-media-upper-controls,
+.visual-media-container.adjusting-dimensions .controls-gradient,
+.visual-media-container.in-visual-media .visual-media-lower-controls,
 .visual-media-container.in-visual-media .visual-media-upper-controls,
 .visual-media-container.in-visual-media .controls-gradient,
-.visual-media-container.paused .video-controls-container,
+.visual-media-container.paused .visual-media-lower-controls,
 .visual-media-container.paused .visual-media-upper-controls,
 .visual-media-container.paused .controls-gradient,
-.visual-media-container.in-effects .video-controls-container,
+.visual-media-container.in-effects .visual-media-lower-controls,
 .visual-media-container.in-effects .visual-media-upper-controls,
 .visual-media-container.in-effects .controls-gradient,
-.visual-media-container.in-settings .video-controls-container,
+.visual-media-container.in-settings .visual-media-lower-controls,
 .visual-media-container.in-settings .visual-media-upper-controls,
 .visual-media-container.in-settings .controls-gradient,
-.visual-media-container.in-audio-effects .video-controls-container,
+.visual-media-container.in-audio-effects .visual-media-lower-controls,
 .visual-media-container.in-audio-effects .visual-media-upper-controls,
 .visual-media-container.in-audio-effects .controls-gradient {
   opacity: 1;
@@ -144,17 +131,6 @@
   left: 0% !important;
   top: 0% !important;
   rotate: 0deg !important;
-}
-
-.visual-media-container.full-screen .video-controls {
-  padding-inline: 2.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.visual-media-container.full-screen .visual-media-upper-controls {
-  padding-left: 2.5rem;
-  padding-right: 1.5rem;
-  margin-top: 1.25rem;
 }
 
 /* mini-player */

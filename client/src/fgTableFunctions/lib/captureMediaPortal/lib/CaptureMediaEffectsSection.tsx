@@ -40,17 +40,23 @@ export default function CaptureMediaEffectsSection({
   tintColor,
   captureMedia,
   captureMediaController,
+  captureContainerRef,
 }: {
   tintColor: React.MutableRefObject<string>;
   captureMedia: React.RefObject<CaptureMedia | undefined>;
   captureMediaController: CaptureMediaController;
+  captureContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { captureStreamEffects, captureEffectsStyles } = useEffectsContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(false);
-  const [overflow, setOverflow] = useState(false);
 
   const effectsContainerRef = useRef<HTMLDivElement>(null);
+  const subEffectsContainerRef = useRef<HTMLDivElement>(null);
+
+  const overflow = useRef(false);
+
+  const [_, setRerender] = useState(false);
 
   const handleWheel = (event: WheelEvent) => {
     event.stopPropagation();
@@ -70,247 +76,279 @@ export default function CaptureMediaEffectsSection({
   }, []);
 
   useLayoutEffect(() => {
-    if (!effectsContainerRef.current) {
+    if (!captureContainerRef.current) {
       return;
     }
 
     const observer = new ResizeObserver(() => {
-      const el = effectsContainerRef.current;
-      if (el) {
-        setOverflow(el.clientWidth < el.scrollWidth);
+      if (effectsContainerRef.current && subEffectsContainerRef.current) {
+        overflow.current =
+          effectsContainerRef.current.clientWidth <
+          subEffectsContainerRef.current.clientWidth;
+        setRerender((prev) => !prev);
       }
     });
 
-    observer.observe(effectsContainerRef.current);
+    observer.observe(captureContainerRef.current);
+
+    if (effectsContainerRef.current && subEffectsContainerRef.current) {
+      overflow.current =
+        effectsContainerRef.current.clientWidth <
+        subEffectsContainerRef.current.clientWidth;
+      setRerender((prev) => !prev);
+    }
 
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (effectsContainerRef.current && subEffectsContainerRef.current) {
+      overflow.current =
+        effectsContainerRef.current.clientWidth <
+        subEffectsContainerRef.current.clientWidth;
+      setRerender((prev) => !prev);
+    }
+  }, [captureMedia.current?.maxFacesDetected]);
+
   return (
     <motion.div
       ref={effectsContainerRef}
-      className={`${
-        overflow ? "pb-1" : "pb-2"
-      } small-horizontal-scroll-bar left-1/2 h-[12%] w-max max-w-full overflow-x-auto rounded mb-2 flex space-x-2 px-[1%] pt-2 absolute bottom-[9%] items-center pointer-events-auto`}
+      className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+      style={{
+        bottom: "calc(max(2rem, min(13% + 0.5rem, 3.5rem)))",
+        height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
+        maxHeight: overflow.current ? "6.75rem" : "5rem",
+        minHeight: overflow.current ? "4.75rem" : "3rem",
+        overflowX: overflow.current ? "auto" : "hidden",
+        justifyContent: overflow.current ? "flex-start" : "center",
+      }}
       variants={EffectSectionVar}
       initial='init'
       animate='animate'
       exit='init'
       transition={EffectSectionTransition}
     >
-      <BabylonPostProcessEffectsButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.postProcess}
-        effectsStyles={captureEffectsStyles.current.postProcess}
-        clickFunctionCallback={async () => {
-          captureMedia.current?.babylonScene?.babylonShaderController.swapPostProcessEffects(
-            captureEffectsStyles.current.postProcess.style
-          );
+      <div
+        ref={subEffectsContainerRef}
+        className='flex h-full w-max items-center justify-center px-4 space-x-2'
+      >
+        <BabylonPostProcessEffectsButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.postProcess}
+          effectsStyles={captureEffectsStyles.current.postProcess}
+          clickFunctionCallback={async () => {
+            captureMedia.current?.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              captureEffectsStyles.current.postProcess.style
+            );
 
-          await captureMediaController.handleCaptureEffect(
-            "postProcess",
-            false
-          );
-        }}
-        holdFunctionCallback={async (effectType) => {
-          captureEffectsStyles.current.postProcess.style = effectType;
+            await captureMediaController.handleCaptureEffect(
+              "postProcess",
+              false
+            );
+          }}
+          holdFunctionCallback={async (effectType) => {
+            captureEffectsStyles.current.postProcess.style = effectType;
 
-          captureMedia.current?.babylonScene?.babylonShaderController.swapPostProcessEffects(
-            effectType
-          );
+            captureMedia.current?.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              effectType
+            );
 
-          await captureMediaController.handleCaptureEffect(
-            "postProcess",
-            captureStreamEffects.current.postProcess
-          );
-        }}
-      />
-      <HideBackgroundButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.hideBackground}
-        effectsStyles={captureEffectsStyles.current.hideBackground}
-        clickFunctionCallback={async () => {
-          captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-            captureEffectsStyles.current.hideBackground.style
-          );
-
-          await captureMediaController.handleCaptureEffect(
-            "hideBackground",
-            false
-          );
-        }}
-        holdFunctionCallback={async (effectType) => {
-          captureEffectsStyles.current.hideBackground.style = effectType;
-
-          captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-            effectType
-          );
-
-          await captureMediaController.handleCaptureEffect(
-            "hideBackground",
-            captureStreamEffects.current.hideBackground
-          );
-        }}
-        acceptColorCallback={async (color) => {
-          const styles = captureEffectsStyles.current.hideBackground;
-          const effects = captureStreamEffects.current.hideBackground;
-
-          captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-            color
-          );
-
-          if (styles.style !== "color" || !effects) {
-            styles.style = "color";
-            styles.color = color;
+            await captureMediaController.handleCaptureEffect(
+              "postProcess",
+              captureStreamEffects.current.postProcess
+            );
+          }}
+        />
+        <HideBackgroundButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.hideBackground}
+          effectsStyles={captureEffectsStyles.current.hideBackground}
+          clickFunctionCallback={async () => {
+            captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+              captureEffectsStyles.current.hideBackground.style
+            );
 
             await captureMediaController.handleCaptureEffect(
               "hideBackground",
-              effects
+              false
             );
-          }
-        }}
-      />
-      <BlurButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.blur}
-        clickFunctionCallback={async () => {
-          await captureMediaController.handleCaptureEffect("blur", false);
-        }}
-      />
-      <TintSection
-        tintColor={tintColor}
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.tint}
-        clickFunctionCallback={async () => {
-          captureEffectsStyles.current.tint.color = tintColor.current;
+          }}
+          holdFunctionCallback={async (effectType) => {
+            captureEffectsStyles.current.hideBackground.style = effectType;
 
-          await captureMediaController.handleCaptureEffect("tint", false);
-        }}
-        acceptColorCallback={async () => {
-          captureEffectsStyles.current.tint.color = tintColor.current;
+            captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+              effectType
+            );
 
-          await captureMediaController.handleCaptureEffect(
-            "tint",
-            captureStreamEffects.current.tint
-          );
-        }}
-      />
-      <GlassesButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.glasses}
-        effectsStyles={captureEffectsStyles.current.glasses}
-        clickFunctionCallback={async () => {
-          await captureMediaController.handleCaptureEffect("glasses", false);
-        }}
-        holdFunctionCallback={async (effectType) => {
-          captureEffectsStyles.current.glasses.style = effectType;
+            await captureMediaController.handleCaptureEffect(
+              "hideBackground",
+              captureStreamEffects.current.hideBackground
+            );
+          }}
+          acceptColorCallback={async (color) => {
+            const styles = captureEffectsStyles.current.hideBackground;
+            const effects = captureStreamEffects.current.hideBackground;
 
-          await captureMediaController.handleCaptureEffect(
-            "glasses",
-            captureStreamEffects.current.glasses
-          );
-        }}
-      />
-      <BeardsButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.beards}
-        effectsStyles={captureEffectsStyles.current.beards}
-        clickFunctionCallback={async () => {
-          await captureMediaController.handleCaptureEffect("beards", false);
-        }}
-        holdFunctionCallback={async (effectType) => {
-          captureEffectsStyles.current.beards.style = effectType;
+            captureMedia.current?.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+              color
+            );
 
-          await captureMediaController.handleCaptureEffect(
-            "beards",
-            captureStreamEffects.current.beards
-          );
-        }}
-      />
-      <MustachesButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.mustaches}
-        effectsStyles={captureEffectsStyles.current.mustaches}
-        clickFunctionCallback={async () => {
-          await captureMediaController.handleCaptureEffect("mustaches", false);
-        }}
-        holdFunctionCallback={async (effectType) => {
-          captureEffectsStyles.current.mustaches.style = effectType;
+            if (styles.style !== "color" || !effects) {
+              styles.style = "color";
+              styles.color = color;
 
-          await captureMediaController.handleCaptureEffect(
-            "mustaches",
-            captureStreamEffects.current.mustaches
-          );
-        }}
-      />
-      <MasksButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.masks}
-        effectsStyles={captureEffectsStyles.current.masks}
-        clickFunctionCallback={async () => {
-          await captureMediaController.handleCaptureEffect("masks", false);
-        }}
-        holdFunctionCallback={async (effectType) => {
-          captureEffectsStyles.current.masks.style = effectType;
+              await captureMediaController.handleCaptureEffect(
+                "hideBackground",
+                effects
+              );
+            }
+          }}
+        />
+        <BlurButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.blur}
+          clickFunctionCallback={async () => {
+            await captureMediaController.handleCaptureEffect("blur", false);
+          }}
+        />
+        <TintSection
+          tintColor={tintColor}
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.tint}
+          clickFunctionCallback={async () => {
+            captureEffectsStyles.current.tint.color = tintColor.current;
 
-          await captureMediaController.handleCaptureEffect(
-            "masks",
-            captureStreamEffects.current.masks
-          );
-        }}
-      />
-      <HatsButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.hats}
-        effectsStyles={captureEffectsStyles.current.hats}
-        clickFunctionCallback={async () => {
-          await captureMediaController.handleCaptureEffect("hats", false);
-        }}
-        holdFunctionCallback={async (effectType) => {
-          captureEffectsStyles.current.hats.style = effectType;
+            await captureMediaController.handleCaptureEffect("tint", false);
+          }}
+          acceptColorCallback={async () => {
+            captureEffectsStyles.current.tint.color = tintColor.current;
 
-          await captureMediaController.handleCaptureEffect(
-            "hats",
-            captureStreamEffects.current.hats
-          );
-        }}
-      />
-      <PetsButton
-        effectsDisabled={effectsDisabled}
-        setEffectsDisabled={setEffectsDisabled}
-        scrollingContainerRef={effectsContainerRef}
-        streamEffects={captureStreamEffects.current.pets}
-        effectsStyles={captureEffectsStyles.current.pets}
-        clickFunctionCallback={async () => {
-          await captureMediaController.handleCaptureEffect("pets", false);
-        }}
-        holdFunctionCallback={async (effectType) => {
-          captureEffectsStyles.current.pets.style = effectType;
+            await captureMediaController.handleCaptureEffect(
+              "tint",
+              captureStreamEffects.current.tint
+            );
+          }}
+        />
+        <GlassesButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.glasses}
+          effectsStyles={captureEffectsStyles.current.glasses}
+          clickFunctionCallback={async () => {
+            await captureMediaController.handleCaptureEffect("glasses", false);
+          }}
+          holdFunctionCallback={async (effectType) => {
+            captureEffectsStyles.current.glasses.style = effectType;
 
-          await captureMediaController.handleCaptureEffect(
-            "pets",
-            captureStreamEffects.current.pets
-          );
-        }}
-      />
+            await captureMediaController.handleCaptureEffect(
+              "glasses",
+              captureStreamEffects.current.glasses
+            );
+          }}
+        />
+        <BeardsButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.beards}
+          effectsStyles={captureEffectsStyles.current.beards}
+          clickFunctionCallback={async () => {
+            await captureMediaController.handleCaptureEffect("beards", false);
+          }}
+          holdFunctionCallback={async (effectType) => {
+            captureEffectsStyles.current.beards.style = effectType;
+
+            await captureMediaController.handleCaptureEffect(
+              "beards",
+              captureStreamEffects.current.beards
+            );
+          }}
+        />
+        <MustachesButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.mustaches}
+          effectsStyles={captureEffectsStyles.current.mustaches}
+          clickFunctionCallback={async () => {
+            await captureMediaController.handleCaptureEffect(
+              "mustaches",
+              false
+            );
+          }}
+          holdFunctionCallback={async (effectType) => {
+            captureEffectsStyles.current.mustaches.style = effectType;
+
+            await captureMediaController.handleCaptureEffect(
+              "mustaches",
+              captureStreamEffects.current.mustaches
+            );
+          }}
+        />
+        <MasksButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.masks}
+          effectsStyles={captureEffectsStyles.current.masks}
+          clickFunctionCallback={async () => {
+            await captureMediaController.handleCaptureEffect("masks", false);
+          }}
+          holdFunctionCallback={async (effectType) => {
+            captureEffectsStyles.current.masks.style = effectType;
+
+            await captureMediaController.handleCaptureEffect(
+              "masks",
+              captureStreamEffects.current.masks
+            );
+          }}
+        />
+        <HatsButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.hats}
+          effectsStyles={captureEffectsStyles.current.hats}
+          clickFunctionCallback={async () => {
+            await captureMediaController.handleCaptureEffect("hats", false);
+          }}
+          holdFunctionCallback={async (effectType) => {
+            captureEffectsStyles.current.hats.style = effectType;
+
+            await captureMediaController.handleCaptureEffect(
+              "hats",
+              captureStreamEffects.current.hats
+            );
+          }}
+        />
+        <PetsButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          streamEffects={captureStreamEffects.current.pets}
+          effectsStyles={captureEffectsStyles.current.pets}
+          clickFunctionCallback={async () => {
+            await captureMediaController.handleCaptureEffect("pets", false);
+          }}
+          holdFunctionCallback={async (effectType) => {
+            captureEffectsStyles.current.pets.style = effectType;
+
+            await captureMediaController.handleCaptureEffect(
+              "pets",
+              captureStreamEffects.current.pets
+            );
+          }}
+        />
+      </div>
     </motion.div>
   );
 }

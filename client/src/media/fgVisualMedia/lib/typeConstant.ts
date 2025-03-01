@@ -69,5 +69,5 @@ export const defaultFgVisualMediaOptions = {
   isFullScreen: true,
   controlsVanishTime: 1250,
   closedCaptionsDecoratorColor: "rgba(30, 30, 30, 0.6)",
-  primaryVideoColor: "#f56114",
+  primaryVideoColor: "#d40213",
 };
