@@ -37,6 +37,8 @@ class CaptureMedia {
 
   babylonScene: BabylonScene | undefined;
 
+  private videoStopped = false;
+
   constructor(
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
@@ -187,6 +189,25 @@ class CaptureMedia {
     // Call the BabylonScene deconstructor
     this.babylonScene?.deconstructor();
   }
+
+  stopVideo = () => {
+    if (!this.videoStopped) {
+      this.videoStopped = true;
+      this.video.pause();
+      const stream = this.video.srcObject as MediaStream;
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    }
+  };
+
+  restartVideo = async () => {
+    if (this.videoStopped) {
+      this.videoStopped = false;
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      this.video.srcObject = stream;
+    }
+  };
 
   private rectifyEffectMeshCount = () => {
     if (!this.babylonScene) return;

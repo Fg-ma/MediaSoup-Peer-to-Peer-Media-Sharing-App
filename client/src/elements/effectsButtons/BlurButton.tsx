@@ -51,6 +51,7 @@ export default function BlurButton({
       hoverContent={<FgHoverContentStandard content='Blur' />}
       scrollingContainerRef={scrollingContainerRef}
       options={{
+        hoverZValue: 500000000001,
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,
       }}

@@ -156,7 +156,7 @@ export default function BeardsButton({
                 }
                 scrollingContainerRef={beardsContainerRef}
                 options={{
-                  hoverZValue: 999999999999999,
+                  hoverZValue: 500000000001,
                   hoverTimeoutDuration: 750,
                 }}
               />
@@ -169,6 +169,7 @@ export default function BeardsButton({
       setCloseHoldToggle={setCloseHoldToggle}
       scrollingContainerRef={scrollingContainerRef}
       options={{
+        hoverZValue: 500000000001,
         defaultDataValue: effectsStyles?.style,
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,

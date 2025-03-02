@@ -1,48 +1,36 @@
 import React from "react";
 import FgButton from "../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../elements/fgSVG/FgSVG";
-import CaptureMediaController from "./CaptureMediaController";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import CaptureMediaController from "./CaptureMediaController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const recordOffIcon = nginxAssetServerBaseUrl + "svgs/recordOffIcon.svg";
+const checkIcon = nginxAssetServerBaseUrl + "svgs/checkIcon.svg";
 
-export default function CaptureButton({
-  recording,
+export default function ConfirmButton({
   captureMediaController,
 }: {
-  recording: boolean;
   captureMediaController: CaptureMediaController;
 }) {
   return (
     <FgButton
-      className='h-full aspect-square'
-      clickFunction={captureMediaController.handleCapture}
+      className='flex h-full aspect-square rounded-full items-center justify-center bg-fg-red-light bg-opacity-80'
+      clickFunction={captureMediaController.confirmCapture}
       contentFunction={() => (
         <FgSVG
-          src={recordOffIcon}
+          src={checkIcon}
+          className='w-[75%] aspect-square flex items-center justify-center'
           attributes={[
             { key: "fill", value: "#f2f2f2" },
             { key: "stroke", value: "#f2f2f2" },
             { key: "width", value: "100%" },
             { key: "height", value: "100%" },
-            recording
-              ? {
-                  key: "fill",
-                  value: "#d40213",
-                  id: "buttonInside",
-                }
-              : {
-                  key: "fill",
-                  value: "#f2f2f2",
-                  id: "buttonInside",
-                },
           ]}
         />
       )}
       hoverContent={
-        <FgHoverContentStandard content='Capture (k)' style='light' />
+        <FgHoverContentStandard content='Confirm and upload' style='light' />
       }
       options={{
         hoverSpacing: 4,

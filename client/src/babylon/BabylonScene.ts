@@ -114,6 +114,10 @@ class BabylonScene {
   recordingURL: string | undefined;
   recordingMimeType: string | undefined;
 
+  snapShotURL: string | undefined;
+
+  private screenShotSuccessCallbacks: (() => void)[] = [];
+
   constructor(
     private id: string,
     private type:
@@ -680,7 +684,27 @@ class BabylonScene {
     }
   };
 
-  startRecording(mimeType: string, fps: number) {
+  takeSnapShot = () => {
+    if (this.engine) {
+      Tools.CreateScreenshotUsingRenderTarget(
+        this.engine,
+        this.camera,
+        { width: this.canvas.width, height: this.canvas.height },
+        (dataUrl) => {
+          this.snapShotURL = dataUrl;
+          this.screenShotSuccessCallbacks.map((screenShotSuccessCallback) =>
+            screenShotSuccessCallback()
+          );
+        }
+      );
+    }
+  };
+
+  downloadSnapShotLink = () => {
+    return this.snapShotURL;
+  };
+
+  startRecording = (mimeType: string, fps: number) => {
     this.chunks = [];
     if (this.recordingURL) {
       URL.revokeObjectURL(this.recordingURL);
@@ -715,11 +739,11 @@ class BabylonScene {
 
     // Start recording
     this.mediaRecorder.start();
-  }
+  };
 
-  stopRecording() {
+  stopRecording = () => {
     this.mediaRecorder?.stop();
-  }
+  };
 
   downloadRecording = () => {
     if (!this.recordingURL || !this.recordingMimeType) return;
@@ -734,6 +758,20 @@ class BabylonScene {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  downloadRecordingLink = () => {
+    return this.recordingURL;
+  };
+
+  addScreenShotSuccessCallback = (screenShotSuccessCallback: () => void) => {
+    this.screenShotSuccessCallbacks.push(screenShotSuccessCallback);
+  };
+
+  removeScreenShotSuccessCallback = (screenShotSuccessCallback: () => void) => {
+    this.screenShotSuccessCallbacks = this.screenShotSuccessCallbacks.filter(
+      (callback) => callback !== screenShotSuccessCallback
+    );
   };
 }
 

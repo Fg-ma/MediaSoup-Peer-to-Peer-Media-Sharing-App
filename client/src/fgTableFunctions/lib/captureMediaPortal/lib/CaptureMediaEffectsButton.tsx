@@ -12,9 +12,11 @@ const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
 export default function CaptureMediaEffectsButton({
   captureMediaController,
   captureMediaEffectsActive,
+  captureMediaTypeActive,
 }: {
   captureMediaController: CaptureMediaController;
   captureMediaEffectsActive: boolean;
+  captureMediaTypeActive: boolean;
 }) {
   return (
     <FgButton
@@ -34,10 +36,16 @@ export default function CaptureMediaEffectsButton({
         />
       )}
       hoverContent={
-        !captureMediaEffectsActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='dark' />
+        !captureMediaEffectsActive && !captureMediaTypeActive ? (
+          <FgHoverContentStandard content='Effects (e)' style='light' />
         ) : undefined
       }
+      options={{
+        hoverSpacing: 4,
+        hoverTimeoutDuration: 1750,
+        hoverType: "above",
+        hoverZValue: 500000000,
+      }}
     />
   );
 }

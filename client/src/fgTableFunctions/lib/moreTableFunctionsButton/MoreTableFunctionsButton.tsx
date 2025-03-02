@@ -54,7 +54,10 @@ export default function MoreTableFunctionsButton({
   const moreTableFunctionsPanelRef = useRef<HTMLDivElement>(null);
 
   const handlePointerDown = (event: PointerEvent) => {
-    if (!moreTableFunctionsPanelRef.current?.contains(event.target as Node)) {
+    if (
+      !moreTableFunctionsPanelRef.current?.contains(event.target as Node) &&
+      !moreTableFunctionsButtonRef.current?.contains(event.target as Node)
+    ) {
       setMoreTableFunctionsActive(false);
     }
   };

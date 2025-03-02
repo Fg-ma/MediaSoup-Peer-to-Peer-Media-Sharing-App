@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
-import {
-  CameraEffectStylesType,
-  CameraEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import CaptureMedia from "../../../../media/capture/CaptureMedia";
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
@@ -115,7 +111,7 @@ export default function CaptureMediaEffectsSection({
       ref={effectsContainerRef}
       className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
       style={{
-        bottom: "calc(max(2rem, min(13% + 0.5rem, 3.5rem)))",
+        bottom: "calc(max(2.5rem, min(13% + 1rem, 4rem)))",
         height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
         maxHeight: overflow.current ? "6.75rem" : "5rem",
         minHeight: overflow.current ? "4.75rem" : "3rem",

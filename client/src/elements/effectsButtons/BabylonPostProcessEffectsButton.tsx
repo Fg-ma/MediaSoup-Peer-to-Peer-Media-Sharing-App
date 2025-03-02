@@ -126,7 +126,7 @@ export default function BabylonPostProcessEffectsButton({
                   }
                   scrollingContainerRef={postProcessEffectsContainerRef}
                   options={{
-                    hoverZValue: 999999999999999,
+                    hoverZValue: 500000000001,
                     hoverTimeoutDuration: 750,
                   }}
                 />
@@ -141,6 +141,7 @@ export default function BabylonPostProcessEffectsButton({
       scrollingContainerRef={scrollingContainerRef}
       options={{
         hoverTimeoutDuration: 750,
+        hoverZValue: 500000000001,
         disabled: effectsDisabled,
         holdKind: "toggle",
       }}

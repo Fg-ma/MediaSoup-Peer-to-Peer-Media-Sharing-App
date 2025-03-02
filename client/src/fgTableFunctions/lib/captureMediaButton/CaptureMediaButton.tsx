@@ -4,7 +4,7 @@ import FgSVG from "../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
-const captureMediaIcon = nginxAssetServerBaseUrl + "svgs/captureMediaIcon.svg";
+const cameraIcon = nginxAssetServerBaseUrl + "svgs/cameraIcon.svg";
 
 export default function CaptureMediaButton({
   captureMediaActive,
@@ -25,7 +25,7 @@ export default function CaptureMediaButton({
       clickFunction={handleClick}
       contentFunction={() => (
         <FgSVG
-          src={captureMediaIcon}
+          src={cameraIcon}
           attributes={[
             { key: "width", value: "100%" },
             { key: "height", value: "100%" },

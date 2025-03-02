@@ -55,6 +55,7 @@ export default function TintSection({
         hoverContent={<FgHoverContentStandard content='Tint' />}
         scrollingContainerRef={scrollingContainerRef}
         options={{
+          hoverZValue: 500000000001,
           hoverTimeoutDuration: 750,
           disabled: effectsDisabled,
         }}

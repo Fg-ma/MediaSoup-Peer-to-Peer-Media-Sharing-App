@@ -305,7 +305,11 @@ export default function FgPanel({
       onHoverEnd={closeCallback && (() => setIsHover(false))}
       onHoverStart={closeCallback && (() => setIsHover(true))}
       className={`fg-panel ${
-        focusClicked ? "z-[50]" : focus ? "z-[49]" : "z-0"
+        focusClicked
+          ? "z-[500000000000]"
+          : focus
+          ? "z-[499999999999]"
+          : "z-[499999999998]"
       } shadow-lg rounded absolute p-3 overflow-hidden`}
       style={{
         opacity:

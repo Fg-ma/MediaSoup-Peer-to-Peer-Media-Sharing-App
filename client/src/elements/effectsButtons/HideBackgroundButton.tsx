@@ -166,7 +166,7 @@ export default function HideBackgroundButton({
                     }
                     scrollingContainerRef={hideBackgroundContainerRef}
                     options={{
-                      hoverZValue: 999999999999999,
+                      hoverZValue: 500000000001,
                       hoverTimeoutDuration: 750,
                     }}
                   />
@@ -179,6 +179,7 @@ export default function HideBackgroundButton({
         setCloseHoldToggle={setCloseHoldToggle}
         scrollingContainerRef={scrollingContainerRef}
         options={{
+          hoverZValue: 500000000001,
           defaultDataValue: effectsStyles?.style,
           hoverTimeoutDuration: 750,
           disabled: effectsDisabled,
