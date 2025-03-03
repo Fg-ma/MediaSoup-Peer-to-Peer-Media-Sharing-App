@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
-import { Settings, ActivePages } from "../../../typeConstant";
-import LowerVideoController from "../../LowerVideoController";
+import { Settings, ActivePages } from "../../typeConstant";
 import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
+import CaptureMediaController from "../../CaptureMediaController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -20,12 +20,12 @@ export const videoSpeedSelections = [
 ];
 
 export default function VideoSpeedPage({
-  lowerVideoController,
+  captureMediaController,
   setActivePages,
   settings,
   setSettings,
 }: {
-  lowerVideoController: LowerVideoController;
+  captureMediaController: CaptureMediaController;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
@@ -41,7 +41,7 @@ export default function VideoSpeedPage({
       return newSettings;
     });
 
-    lowerVideoController.handlePlaybackSpeed(videoSpeed);
+    captureMediaController.handlePlaybackSpeed(videoSpeed);
   };
 
   const handleCloseVideoSpeedPage = () => {
@@ -90,7 +90,7 @@ export default function VideoSpeedPage({
         <FgSlider
           className='h-10'
           externalValue={settings.videoSpeed.value}
-          externalStyleValue={(settings.videoSpeed.value / 5) * 100}
+          externalStyleValue={settings.videoSpeed.value}
           onValueChange={(value) => {
             setVideoSpeed(value.value);
           }}

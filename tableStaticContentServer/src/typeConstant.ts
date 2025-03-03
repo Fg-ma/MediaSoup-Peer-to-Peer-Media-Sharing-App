@@ -1,7 +1,7 @@
 import uWS from "uWebSockets.js";
-import { VideoEffectStylesType } from "./mongo/lib/videos/typeConstant";
-import { ImageEffectStylesType } from "./mongo/lib/images/typeConstant";
-import { ApplicationEffectStylesType } from "./mongo/lib/applications/typeConstant";
+import { ImageEffectStylesType } from "../../mongoServer/src/lib/images/typeConstant";
+import { ApplicationEffectStylesType } from "../../mongoServer/src/lib/applications/typeConstant";
+import { VideoEffectStylesType } from "../../mongoServer/src/lib/videos/typeConstant";
 
 export interface Tables {
   [table_id: string]: {

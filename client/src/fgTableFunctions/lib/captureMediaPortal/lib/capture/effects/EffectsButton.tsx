@@ -1,15 +1,15 @@
 import React from "react";
-import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import CaptureMediaController from "./CaptureMediaController";
+import FgButton from "../../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import CaptureMediaController from "../../CaptureMediaController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const effectIcon = nginxAssetSeverBaseUrl + "svgs/effectIcon.svg";
 const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
 
-export default function CaptureMediaEffectsButton({
+export default function EffectsButton({
   captureMediaController,
   captureMediaEffectsActive,
   captureMediaTypeActive,
@@ -20,8 +20,9 @@ export default function CaptureMediaEffectsButton({
 }) {
   return (
     <FgButton
-      className='flex items-center justify-center h-full aspect-square relative pointer-events-auto'
-      clickFunction={() => {
+      className='flex items-center justify-center h-full aspect-square relative pointer-events-auto z-20'
+      clickFunction={(event) => {
+        event?.stopPropagation();
         captureMediaController.handleEffects();
       }}
       contentFunction={() => (

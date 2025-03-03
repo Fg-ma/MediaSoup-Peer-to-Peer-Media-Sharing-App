@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
-import CaptureMedia from "../../../../media/capture/CaptureMedia";
-import CaptureMediaController from "./CaptureMediaController";
-import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import { captureMediaTypeMeta, CaptureMediaTypes } from "./typeConstant";
+import CaptureMedia from "../../../../../../media/capture/CaptureMedia";
+import FgButton from "../../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import { captureMediaTypeMeta, CaptureMediaTypes } from "../../typeConstant";
 
 const CaptureMediaTypeSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -25,7 +24,7 @@ const CaptureMediaTypeSectionTransition: Transition = {
   },
 };
 
-export default function CaptureMediaTypeSection({
+export default function TypeSection({
   captureMedia,
   captureContainerRef,
   setMediaType,

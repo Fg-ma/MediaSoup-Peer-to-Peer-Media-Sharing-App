@@ -242,6 +242,48 @@ export default function FgSlider({
     }
   }, [value, styleValue]);
 
+  const externalStyleValueRef = useRef(
+    Math.max(
+      5,
+      Math.min(
+        95,
+        rescaleValue(
+          snapPositions(
+            rescaleValue(
+              externalStyleValue ?? 0,
+              [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
+              [0, 100]
+            )
+          ),
+          [0, 100],
+          [5, 95]
+        )
+      )
+    )
+  );
+
+  useEffect(() => {
+    if (externalStyleValue === undefined) return;
+
+    externalStyleValueRef.current = Math.max(
+      5,
+      Math.min(
+        95,
+        rescaleValue(
+          snapPositions(
+            rescaleValue(
+              externalStyleValue,
+              [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
+              [0, 100]
+            )
+          ),
+          [0, 100],
+          [5, 95]
+        )
+      )
+    );
+  }, [externalStyleValue]);
+
   return (
     <div
       id={fgSliderOptions.id}
@@ -303,9 +345,9 @@ export default function FgSlider({
                 ? "right"
                 : "top"
             }, ${disabled ? "#b20203" : "#d40213"} ${
-              externalStyleValue ? externalStyleValue : styleValue
+              externalStyleValue ? externalStyleValueRef.current : styleValue
             }%, #e6e6e6 ${
-              externalStyleValue ? externalStyleValue : styleValue
+              externalStyleValue ? externalStyleValueRef.current : styleValue
             }%)`,
             boxShadow: sliding ? "inset 0 0 1.25px rgba(0, 0, 0, 0.3)" : "",
           }}
@@ -427,7 +469,7 @@ export default function FgSlider({
                 : fgSliderOptions.orientation === "horizontal"
                 ? "left"
                 : "bottom"]: `calc(${
-                externalStyleValue ? externalStyleValue : styleValue
+                externalStyleValue ? externalStyleValueRef.current : styleValue
               }% - 5px)`,
             }}
             ref={handleRef}

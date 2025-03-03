@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
-import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import CaptureMedia from "../../../../media/capture/CaptureMedia";
-import BlurButton from "../../../../elements/effectsButtons/BlurButton";
-import TintSection from "../../../../elements/effectsButtons/TintSection";
-import CaptureMediaController from "./CaptureMediaController";
-import HideBackgroundButton from "../../../../elements/effectsButtons/HideBackgroundButton";
-import GlassesButton from "../../../../elements/effectsButtons/GlassesButton";
-import BeardsButton from "../../../../elements/effectsButtons/BeardsButton";
-import MustachesButton from "../../../../elements/effectsButtons/MustachesButton";
-import MasksButton from "../../../../elements/effectsButtons/MasksButton";
-import HatsButton from "../../../../elements/effectsButtons/HatsButton";
-import PetsButton from "../../../../elements/effectsButtons/PetsButton";
+import BabylonPostProcessEffectsButton from "../../../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
+import { useEffectsContext } from "../../../../../../context/effectsContext/EffectsContext";
+import CaptureMedia from "../../../../../../media/capture/CaptureMedia";
+import BlurButton from "../../../../../../elements/effectsButtons/BlurButton";
+import TintSection from "../../../../../../elements/effectsButtons/TintSection";
+import CaptureMediaController from "../../CaptureMediaController";
+import HideBackgroundButton from "../../../../../../elements/effectsButtons/HideBackgroundButton";
+import GlassesButton from "../../../../../../elements/effectsButtons/GlassesButton";
+import BeardsButton from "../../../../../../elements/effectsButtons/BeardsButton";
+import MustachesButton from "../../../../../../elements/effectsButtons/MustachesButton";
+import MasksButton from "../../../../../../elements/effectsButtons/MasksButton";
+import HatsButton from "../../../../../../elements/effectsButtons/HatsButton";
+import PetsButton from "../../../../../../elements/effectsButtons/PetsButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -32,7 +32,7 @@ const EffectSectionTransition: Transition = {
   },
 };
 
-export default function CaptureMediaEffectsSection({
+export default function EffectsSection({
   tintColor,
   captureMedia,
   captureMediaController,
@@ -109,7 +109,7 @@ export default function CaptureMediaEffectsSection({
   return (
     <motion.div
       ref={effectsContainerRef}
-      className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+      className='flex small-horizontal-scroll-bar z-20 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
       style={{
         bottom: "calc(max(2.5rem, min(13% + 1rem, 4rem)))",
         height: overflow.current ? "calc(1.75rem + 10%)" : "10%",

@@ -20,12 +20,14 @@ export default function CloseButton({
 }) {
   return (
     <FgButton
-      className='flex shadow h-full aspect-square rounded-full bg-fg-tone-black-4 bg-opacity-80 items-center justify-center'
-      clickFunction={
+      className='flex shadow z-20 h-full aspect-square rounded-full bg-fg-tone-black-4 bg-opacity-80 items-center justify-center pointer-events-auto'
+      clickFunction={(event) => {
+        event.stopPropagation();
+
         finalizeCapture
-          ? captureMediaController.handleExitFinialization
-          : tableFunctionsController.stopVideo
-      }
+          ? captureMediaController.handleExitFinialization()
+          : tableFunctionsController.stopVideo();
+      }}
       contentFunction={() => (
         <FgSVG
           src={closeIcon}

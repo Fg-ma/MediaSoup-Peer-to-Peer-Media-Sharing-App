@@ -117,6 +117,7 @@ class BabylonScene {
   snapShotURL: string | undefined;
 
   private screenShotSuccessCallbacks: (() => void)[] = [];
+  private videoSuccessCallbacks: (() => void)[] = [];
 
   constructor(
     private id: string,
@@ -735,6 +736,10 @@ class BabylonScene {
 
       // Create a download link
       this.recordingURL = URL.createObjectURL(blob);
+
+      this.videoSuccessCallbacks.map((videoSuccessCallback) =>
+        videoSuccessCallback()
+      );
     };
 
     // Start recording
@@ -753,7 +758,7 @@ class BabylonScene {
     a.download = `recording${
       recordingMimeTypeExtensionMap[
         this.recordingMimeType as keyof typeof recordingMimeTypeExtensionMap
-      ] ?? ".webp"
+      ] ?? ".webm"
     }`;
     document.body.appendChild(a);
     a.click();
@@ -771,6 +776,16 @@ class BabylonScene {
   removeScreenShotSuccessCallback = (screenShotSuccessCallback: () => void) => {
     this.screenShotSuccessCallbacks = this.screenShotSuccessCallbacks.filter(
       (callback) => callback !== screenShotSuccessCallback
+    );
+  };
+
+  addVideoSuccessCallback = (videoSuccessCallback: () => void) => {
+    this.videoSuccessCallbacks.push(videoSuccessCallback);
+  };
+
+  removeVideoSuccessCallback = (VideoSuccessCallback: () => void) => {
+    this.videoSuccessCallbacks = this.videoSuccessCallbacks.filter(
+      (callback) => callback !== VideoSuccessCallback
     );
   };
 }

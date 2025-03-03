@@ -1,18 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
-import CaptureMediaController from "./CaptureMediaController";
-import { captureMediaTypeMeta, CaptureMediaTypes } from "./typeConstant";
-import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import CaptureMediaController from "../../CaptureMediaController";
+import { captureMediaTypeMeta, CaptureMediaTypes } from "../../typeConstant";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
-export default function MediaTypeButton({
+export default function TypeButton({
   mediaType,
   recordingCount,
+  recording,
   captureMediaController,
   captureMediaEffectsActive,
   captureMediaTypeActive,
 }: {
   mediaType: CaptureMediaTypes;
+  recording: boolean;
   recordingCount: number;
   captureMediaController: CaptureMediaController;
   captureMediaEffectsActive: boolean;
@@ -36,14 +38,33 @@ export default function MediaTypeButton({
     if (counterRef.current) observer.observe(counterRef.current);
 
     return () => observer.disconnect();
-  }, [mediaType]);
+  }, [mediaType, recording]);
+
+  const formatTime = (time: number) => {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = Math.floor(time % 60);
+
+    if (time < 60) {
+      return `${seconds}`;
+    }
+
+    return hours > 0
+      ? `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
+          .toString()
+          .padStart(2, "0")}`
+      : `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   return (
     <FgButton
-      className='max-h-full h-full w-max relative overflow-hidden'
-      clickFunction={captureMediaController.handleCaptureMediaType}
+      className='max-h-full h-full w-max relative overflow-hidden pointer-events-auto z-20'
+      clickFunction={(event) => {
+        event.stopPropagation();
+        captureMediaController.handleCaptureMediaType();
+      }}
       contentFunction={() =>
-        mediaType === "camera" || mediaType === "video" ? (
+        mediaType === "camera" || (mediaType === "video" && !recording) ? (
           <FgSVG
             src={captureMediaTypeMeta[mediaType].icon}
             className='h-full aspect-square'
@@ -57,10 +78,12 @@ export default function MediaTypeButton({
         ) : (
           <div
             ref={counterRef}
-            className='flex h-full w-max aspect-square font-Josefin text-fg-white items-center justify-center'
+            className='flex h-full w-max font-Josefin text-fg-white items-center justify-center'
             style={{ fontSize, lineHeight: "0.8lh", paddingTop }}
           >
-            {recordingCount}
+            {recording && mediaType === "video"
+              ? formatTime(recordingCount)
+              : recordingCount}
           </div>
         )
       }

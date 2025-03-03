@@ -1,8 +1,8 @@
 import React from "react";
-import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import CaptureMediaController from "./CaptureMediaController";
+import FgButton from "../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import CaptureMediaController from "../CaptureMediaController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -15,8 +15,11 @@ export default function DownloadButton({
 }) {
   return (
     <FgButton
-      className='flex h-full aspect-square items-center justify-center'
-      clickFunction={captureMediaController.downloadCapture}
+      className='flex z-20 h-full aspect-square items-center justify-center pointer-events-auto'
+      clickFunction={(event) => {
+        event.stopPropagation();
+        captureMediaController.downloadCapture();
+      }}
       contentFunction={() => (
         <FgSVG
           src={downloadIcon}
@@ -29,9 +32,7 @@ export default function DownloadButton({
           ]}
         />
       )}
-      hoverContent={
-        <FgHoverContentStandard content='Confirm and upload' style='light' />
-      }
+      hoverContent={<FgHoverContentStandard content='Download' style='light' />}
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,

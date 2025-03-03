@@ -1,8 +1,8 @@
 import React from "react";
-import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
-import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import CaptureMediaController from "./CaptureMediaController";
+import FgButton from "../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import CaptureMediaController from "../CaptureMediaController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -15,8 +15,11 @@ export default function ConfirmButton({
 }) {
   return (
     <FgButton
-      className='flex h-full aspect-square rounded-full items-center justify-center bg-fg-red-light bg-opacity-80'
-      clickFunction={captureMediaController.confirmCapture}
+      className='flex z-20 h-full aspect-square rounded-full items-center justify-center bg-fg-red-light bg-opacity-80 pointer-events-auto'
+      clickFunction={(event) => {
+        event.stopPropagation();
+        captureMediaController.confirmCapture();
+      }}
       contentFunction={() => (
         <FgSVG
           src={checkIcon}

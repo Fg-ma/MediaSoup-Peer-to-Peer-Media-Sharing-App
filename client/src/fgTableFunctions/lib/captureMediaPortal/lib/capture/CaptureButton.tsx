@@ -1,8 +1,8 @@
 import React from "react";
-import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
-import CaptureMediaController from "./CaptureMediaController";
-import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import CaptureMediaController from "../CaptureMediaController";
+import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -17,8 +17,11 @@ export default function CaptureButton({
 }) {
   return (
     <FgButton
-      className='h-full aspect-square'
-      clickFunction={captureMediaController.handleCapture}
+      className='h-full aspect-square pointer-events-auto z-20'
+      clickFunction={(event) => {
+        event?.stopPropagation();
+        captureMediaController.handleCapture();
+      }}
       contentFunction={() => (
         <FgSVG
           src={recordOffIcon}

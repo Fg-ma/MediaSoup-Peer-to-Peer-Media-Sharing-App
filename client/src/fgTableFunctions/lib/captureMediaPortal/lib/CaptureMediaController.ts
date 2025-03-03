@@ -1,20 +1,24 @@
+import { v4 as uuidv4 } from "uuid";
 import { CameraEffectTypes } from "../../../../context/effectsContext/typeConstant";
 import CaptureMedia from "../../../../media/capture/CaptureMedia";
 import TableFunctionsController from "../../TableFunctionsController";
-import { CaptureMediaTypes } from "./typeConstant";
+import {
+  CaptureMediaTypes,
+  downloadRecordingMimeMap,
+  Settings,
+} from "./typeConstant";
 
 class CaptureMediaController {
   constructor(
+    private table_id: React.RefObject<string>,
     private captureStreamEffects: React.MutableRefObject<{
       [effectType in CameraEffectTypes]: boolean;
     }>,
     private captureMedia: React.RefObject<CaptureMedia | undefined>,
     private captureContainerRef: React.RefObject<HTMLDivElement>,
-    private captureMediaEffectsActive: boolean,
     private setCaptureMediaEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
-    private captureMediaTypeActive: boolean,
     private setCaptureMediaTypeActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
@@ -26,7 +30,6 @@ class CaptureMediaController {
     private setRecordingCount: React.Dispatch<React.SetStateAction<number>>,
     private recording: boolean,
     private setRecording: React.Dispatch<React.SetStateAction<boolean>>,
-    private finalizeCapture: boolean,
     private setFinalizeCapture: React.Dispatch<React.SetStateAction<boolean>>,
     private countDownTimeout: React.MutableRefObject<
       NodeJS.Timeout | undefined
@@ -37,7 +40,17 @@ class CaptureMediaController {
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
     private captureMediaPortalRef: React.RefObject<HTMLDivElement>,
-    private tableFunctionsController: TableFunctionsController
+    private tableFunctionsController: TableFunctionsController,
+    private finalizingCapture: React.MutableRefObject<boolean>,
+    private finalizedCaptureType: React.MutableRefObject<
+      "video" | "image" | undefined
+    >,
+    private videoRef: React.RefObject<HTMLVideoElement>,
+    private imageRef: React.RefObject<HTMLImageElement>,
+    private settings: Settings,
+    private timelineContainerRef: React.RefObject<HTMLDivElement>,
+    private isScrubbing: React.MutableRefObject<boolean>,
+    private wasPaused: React.MutableRefObject<boolean>
   ) {}
 
   handleEffects = () => {
@@ -114,6 +127,8 @@ class CaptureMediaController {
   };
 
   handleCapture = () => {
+    this.setCaptureMediaTypeActive(false);
+
     if (
       this.mediaType === "10s" ||
       this.mediaType === "15s" ||
@@ -121,6 +136,13 @@ class CaptureMediaController {
       this.mediaType === "60s"
     ) {
       if (!this.recording) {
+        this.captureMedia.current?.babylonScene?.startRecording(
+          downloadRecordingMimeMap[
+            this.settings.downloadOptions.mimeType.value
+          ],
+          parseInt(this.settings.downloadOptions.fps.value.slice(0, -4))
+        );
+
         if (this.mediaType === "10s") {
           this.setRecordingCount(10);
         } else if (this.mediaType === "15s") {
@@ -136,6 +158,8 @@ class CaptureMediaController {
         }, 1000);
         this.countDownTimeout.current = setTimeout(
           () => {
+            this.captureMedia.current?.babylonScene?.stopRecording();
+
             this.setRecording(false);
 
             clearInterval(this.countDownInterval.current);
@@ -152,6 +176,10 @@ class CaptureMediaController {
             } else if (this.mediaType === "60s") {
               this.setRecordingCount(60);
             }
+
+            this.captureMedia.current?.babylonScene?.addVideoSuccessCallback(
+              this.addVideoSuccessCallback
+            );
           },
           this.mediaType === "60s"
             ? 60000
@@ -164,6 +192,8 @@ class CaptureMediaController {
             : 0
         );
       } else {
+        this.captureMedia.current?.babylonScene?.stopRecording();
+
         clearInterval(this.countDownInterval.current);
         this.countDownInterval.current = undefined;
         clearTimeout(this.countDownTimeout.current);
@@ -178,6 +208,10 @@ class CaptureMediaController {
         } else if (this.mediaType === "60s") {
           this.setRecordingCount(60);
         }
+
+        this.captureMedia.current?.babylonScene?.addVideoSuccessCallback(
+          this.addVideoSuccessCallback
+        );
       }
 
       this.setRecording((prev) => !prev);
@@ -205,6 +239,8 @@ class CaptureMediaController {
       }, 150);
 
       this.setFinalizeCapture(true);
+      this.finalizingCapture.current = true;
+      this.finalizedCaptureType.current = "image";
 
       this.captureMedia.current?.babylonScene?.addScreenShotSuccessCallback(
         this.addScreenShotSuccessCallback
@@ -215,24 +251,88 @@ class CaptureMediaController {
       clearTimeout(this.countDownTimeout.current);
       this.countDownTimeout.current = undefined;
 
-      this.setRecordingCount(0);
+      this.setRecordingCount(1);
+
+      this.countDownInterval.current = setInterval(() => {
+        this.setRecordingCount((prev) => prev + 1);
+      }, 1000);
 
       if (!this.recording) {
         this.captureMedia.current?.babylonScene?.startRecording(
-          "video/webm; codecs=vp9",
-          30
+          downloadRecordingMimeMap[
+            this.settings.downloadOptions.mimeType.value
+          ],
+          parseInt(this.settings.downloadOptions.fps.value.slice(0, -4))
         );
       } else {
         this.captureMedia.current?.babylonScene?.stopRecording();
+
+        clearInterval(this.countDownInterval.current);
+        this.countDownInterval.current = undefined;
+
+        this.captureMedia.current?.babylonScene?.addVideoSuccessCallback(
+          this.addVideoSuccessCallback
+        );
       }
 
       this.setRecording((prev) => !prev);
     }
   };
 
-  confirmCapture = () => {};
+  confirmCapture = async () => {
+    if (this.videoRef.current && this.videoRef.current.src) {
+      const url = `https://localhost:8045/upload/${
+        this.table_id.current
+      }/${uuidv4()}`;
+      const formData = new FormData();
+      try {
+        const response = await fetch(this.videoRef.current.src);
+        const blob = await response.blob();
+        formData.append("file", blob, "video.mp4");
 
-  downloadCapture = () => {};
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.send(formData);
+      } catch (error) {
+        console.error("Error uploading video source:", error);
+      }
+    } else if (this.imageRef.current && this.imageRef.current.src) {
+      const url = `https://localhost:8045/upload/${
+        this.table_id.current
+      }/${uuidv4()}`;
+      const formData = new FormData();
+      try {
+        const response = await fetch(this.imageRef.current.src);
+        const blob = await response.blob();
+        formData.append("file", blob, "video.mp4");
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.send(formData);
+      } catch (error) {
+        console.error("Error uploading video source:", error);
+      }
+    }
+  };
+
+  downloadCapture = () => {
+    if (this.finalizedCaptureType.current === "image") {
+      const url =
+        this.captureMedia.current?.babylonScene?.downloadSnapShotLink();
+
+      if (!url) return;
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "snapshot.png";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (this.finalizedCaptureType.current === "video") {
+      this.captureMedia.current?.babylonScene?.downloadRecording();
+    }
+  };
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
@@ -263,13 +363,21 @@ class CaptureMediaController {
         this.handleCaptureMediaType();
         break;
       case "k":
-        this.handleCapture();
+        if (this.finalizingCapture.current) {
+          this.handlePausePlay();
+        } else {
+          this.handleCapture();
+        }
         break;
       case " ":
-        this.handleCapture();
+        if (this.finalizingCapture.current) {
+          this.handlePausePlay();
+        } else {
+          this.handleCapture();
+        }
         break;
       case "x":
-        if (this.finalizeCapture) {
+        if (this.finalizingCapture.current) {
           this.handleExitFinialization();
         } else {
           this.tableFunctionsController.stopVideo();
@@ -295,8 +403,19 @@ class CaptureMediaController {
     }
   };
 
+  handlePausePlay = () => {
+    if (!this.videoRef.current) return;
+
+    if (this.videoRef.current.paused) {
+      this.videoRef.current.play();
+    } else {
+      this.videoRef.current.pause();
+    }
+  };
+
   handleExitFinialization = () => {
     this.setFinalizeCapture(false);
+    this.finalizingCapture.current = false;
   };
 
   private addScreenShotSuccessCallback = () => {
@@ -304,6 +423,121 @@ class CaptureMediaController {
 
     this.captureMedia.current?.babylonScene?.removeScreenShotSuccessCallback(
       this.addScreenShotSuccessCallback
+    );
+  };
+
+  private addVideoSuccessCallback = () => {
+    this.setFinalizeCapture(true);
+    this.finalizingCapture.current = true;
+    this.finalizedCaptureType.current = "video";
+
+    this.captureMedia.current?.stopVideo();
+
+    this.captureMedia.current?.babylonScene?.removeVideoSuccessCallback(
+      this.addVideoSuccessCallback
+    );
+  };
+
+  handlePlaybackSpeed = (playbackSpeed: number) => {
+    if (this.videoRef.current)
+      this.videoRef.current.playbackRate = playbackSpeed;
+  };
+
+  timeUpdate = () => {
+    if (!this.videoRef.current) return;
+
+    const currentTime = this.videoRef.current.currentTime;
+
+    const percent =
+      currentTime /
+      (isFinite(this.videoRef.current.duration)
+        ? this.videoRef.current.duration
+        : 1);
+
+    this.timelineContainerRef.current?.style.setProperty(
+      "--progress-position",
+      `${percent}`
+    );
+  };
+
+  handleStartScrubbing = (event: React.PointerEvent) => {
+    if (
+      !this.timelineContainerRef.current ||
+      !this.videoRef.current ||
+      this.isScrubbing.current
+    )
+      return;
+
+    document.addEventListener(
+      "pointermove",
+      this.handleScrubbingTimelineUpdate
+    );
+    document.addEventListener("pointerup", this.handleStopScrubbing);
+
+    this.isScrubbing.current = true;
+    if (this.isScrubbing.current) {
+      this.captureMediaPortalRef.current?.classList.add("scrubbing");
+      this.wasPaused.current = this.videoRef.current.paused;
+      this.videoRef.current.pause();
+    }
+
+    this.handleScrubbingTimelineUpdate(event as unknown as PointerEvent);
+  };
+
+  handleStopScrubbing = (event: PointerEvent) => {
+    if (!this.timelineContainerRef.current || !this.videoRef.current) return;
+
+    document.removeEventListener(
+      "pointermove",
+      this.handleScrubbingTimelineUpdate
+    );
+    document.removeEventListener("pointerup", this.handleStopScrubbing);
+
+    const rect = this.timelineContainerRef.current.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
+
+    this.isScrubbing.current = false;
+
+    this.captureMediaPortalRef.current?.classList.remove("scrubbing");
+    this.videoRef.current.currentTime =
+      percent * this.videoRef.current.duration;
+
+    if (!this.wasPaused.current) {
+      this.videoRef.current.play();
+    }
+
+    this.handleScrubbingTimelineUpdate(event);
+  };
+
+  handleScrubbingTimelineUpdate = (event: PointerEvent) => {
+    if (!this.timelineContainerRef.current) return;
+
+    const rect = this.timelineContainerRef.current.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
+    this.timelineContainerRef.current.style.setProperty(
+      "--preview-position",
+      `${percent}`
+    );
+
+    if (this.isScrubbing.current) {
+      this.timelineContainerRef.current.style.setProperty(
+        "--progress-position",
+        `${percent}`
+      );
+    }
+  };
+
+  handleHoverTimelineUpdate = (event: React.PointerEvent) => {
+    if (!this.timelineContainerRef.current) return;
+
+    const rect = this.timelineContainerRef.current.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
+    this.timelineContainerRef.current.style.setProperty(
+      "--preview-position",
+      `${percent}`
     );
   };
 }
