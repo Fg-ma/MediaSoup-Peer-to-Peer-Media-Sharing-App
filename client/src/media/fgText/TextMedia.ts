@@ -2,7 +2,7 @@ import {
   IncomingTableStaticContentMessages,
   TableContentTypes,
   TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 
 export type TextMediaEvents = onTextFinishedLoadingType;
 

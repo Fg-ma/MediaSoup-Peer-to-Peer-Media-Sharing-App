@@ -1,5 +1,8 @@
 import { tableTopMongo } from "src";
-import { onRequestCatchUpTableDataType } from "../typeConstant";
+import {
+  onRequestCatchUpTableDataType,
+  onUpdateContentEffectsType,
+} from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 
 class MetadataController {
@@ -21,6 +24,19 @@ class MetadataController {
       type: "responsedCatchUpTableData",
       data: { images, videos, text, audio, applications },
     });
+  };
+
+  onUpdateContentEffects = (event: onUpdateContentEffectsType) => {
+    tableTopMongo.updateContentEffects(event);
+
+    const { table_id, contentType, contentId } = event.header;
+
+    const msg = {
+      type: "updatedContentEffects",
+      header: { contentType, contentId },
+      data: event.data,
+    };
+    this.broadcaster.broadcastToTable(table_id, msg);
   };
 }
 

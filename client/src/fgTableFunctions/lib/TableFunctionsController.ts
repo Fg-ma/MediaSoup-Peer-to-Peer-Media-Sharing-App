@@ -3,7 +3,10 @@ import { FgBackground } from "../../elements/fgBackgroundSelector/lib/typeConsta
 import { IncomingTableMessages } from "../../serverControllers/tableServer/TableSocketController";
 import UserDevice from "../../lib/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
-import { CaptureEffectStylesType } from "../../context/effectsContext/typeConstant";
+import {
+  CaptureEffectStylesType,
+  CaptureStreamEffectsType,
+} from "../../context/effectsContext/typeConstant";
 
 class TableFunctionsController {
   constructor(
@@ -17,6 +20,7 @@ class TableFunctionsController {
     private captureMedia: React.MutableRefObject<CaptureMedia | undefined>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
+    private captureStreamEffects: React.MutableRefObject<CaptureStreamEffectsType>,
     private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
@@ -38,6 +42,7 @@ class TableFunctionsController {
       this.captureMedia.current = new CaptureMedia(
         this.userDevice,
         this.deadbanding,
+        this.captureStreamEffects,
         this.captureEffectsStyles
       );
 

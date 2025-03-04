@@ -9,9 +9,8 @@ import {
 import BundleSocket from "./BundleSocket";
 import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
-import MediasoupSocketController, {
-  IncomingMediasoupMessages,
-} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 
 class BundleController extends BundleSocket {
   constructor(

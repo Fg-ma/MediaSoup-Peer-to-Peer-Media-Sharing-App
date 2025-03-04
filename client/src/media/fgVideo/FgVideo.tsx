@@ -132,10 +132,15 @@ export default function FgVideo({
   );
 
   const videoController = new VideoController(
+    videoId,
     videoMedia,
     subContainerRef,
     videoContainerRef,
-    videoOptions
+    videoOptions,
+    userStreamEffects,
+    userEffectsStyles,
+    tintColor,
+    setRerender
   );
 
   useEffect(() => {
@@ -209,6 +214,17 @@ export default function FgVideo({
   useEffect(() => {
     videoController.scaleCallback();
   }, [positioning.current.scale]);
+
+  useEffect(() => {
+    tableStaticContentSocket.current?.addMessageListener(
+      videoController.handleTableStaticContentMessage
+    );
+
+    return () =>
+      tableStaticContentSocket.current?.removeMessageListener(
+        videoController.handleTableStaticContentMessage
+      );
+  }, [tableStaticContentSocket.current]);
 
   return (
     <FgMediaContainer

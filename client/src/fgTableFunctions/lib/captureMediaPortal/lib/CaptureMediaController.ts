@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import { CameraEffectTypes } from "../../../../context/effectsContext/typeConstant";
+import {
+  CameraEffectTypes,
+  CaptureEffectTypes,
+} from "../../../../context/effectsContext/typeConstant";
 import CaptureMedia from "../../../../media/capture/CaptureMedia";
 import TableFunctionsController from "../../TableFunctionsController";
 import {
@@ -14,7 +17,7 @@ class CaptureMediaController {
     private captureStreamEffects: React.MutableRefObject<{
       [effectType in CameraEffectTypes]: boolean;
     }>,
-    private captureMedia: React.RefObject<CaptureMedia | undefined>,
+    private captureMedia: React.MutableRefObject<CaptureMedia | undefined>,
     private captureContainerRef: React.RefObject<HTMLDivElement>,
     private setCaptureMediaEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
@@ -50,7 +53,8 @@ class CaptureMediaController {
     private settings: Settings,
     private timelineContainerRef: React.RefObject<HTMLDivElement>,
     private isScrubbing: React.MutableRefObject<boolean>,
-    private wasPaused: React.MutableRefObject<boolean>
+    private wasPaused: React.MutableRefObject<boolean>,
+    private setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   handleEffects = () => {
@@ -66,19 +70,23 @@ class CaptureMediaController {
   };
 
   handleCaptureEffect = async (
-    effect: CameraEffectTypes,
+    effect: CaptureEffectTypes | "clearAll",
     blockStateChange: boolean
   ) => {
-    if (!blockStateChange) {
-      this.captureStreamEffects.current[effect] =
-        !this.captureStreamEffects.current[effect];
-    }
+    if (effect !== "clearAll") {
+      if (!blockStateChange) {
+        this.captureStreamEffects.current[effect] =
+          !this.captureStreamEffects.current[effect];
+      }
 
-    this.captureMedia.current?.changeEffects(
-      effect,
-      this.tintColor.current,
-      blockStateChange
-    );
+      this.captureMedia.current?.changeEffects(
+        effect,
+        this.tintColor.current,
+        blockStateChange
+      );
+    } else {
+      this.captureMedia.current?.clearAllEffects();
+    }
   };
 
   handlePointerMove = () => {
@@ -284,7 +292,9 @@ class CaptureMediaController {
       const url = `https://localhost:8045/upload/${
         this.table_id.current
       }/${uuidv4()}`;
+
       const formData = new FormData();
+
       try {
         const response = await fetch(this.videoRef.current.src);
         const blob = await response.blob();
@@ -300,7 +310,9 @@ class CaptureMediaController {
       const url = `https://localhost:8045/upload/${
         this.table_id.current
       }/${uuidv4()}`;
+
       const formData = new FormData();
+
       try {
         const response = await fetch(this.imageRef.current.src);
         const blob = await response.blob();
@@ -313,6 +325,13 @@ class CaptureMediaController {
         console.error("Error uploading video source:", error);
       }
     }
+
+    this.setFinalizeCapture(false);
+    this.finalizingCapture.current = false;
+
+    this.captureMedia.current?.deconstructor();
+    this.captureMedia.current = undefined;
+    this.setCaptureMediaActive(false);
   };
 
   downloadCapture = () => {

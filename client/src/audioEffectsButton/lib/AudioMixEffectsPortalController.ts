@@ -6,13 +6,14 @@ import {
   MixEffectsOptionsType,
 } from "../../audioEffects/typeConstant";
 import { DynamicMixEffect, staticMixEffects } from "./typeConstant";
-import MediasoupSocketController, {
+import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+import {
   IncomingMediasoupMessages,
   onClientMixEffectActivityChangedType,
   onClientMixEffectValueChangedType,
   onMixEffectActivityChangeRequestedType,
   onMixEffectValueChangeRequestedType,
-} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/lib/typeConstant";
 
 class AudioMixEffectsPortalController {
   constructor(

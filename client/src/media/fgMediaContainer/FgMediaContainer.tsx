@@ -13,7 +13,7 @@ import {
 } from "./lib/typeConstant";
 import Gradient from "./lib/Gradient";
 import UpperControls from "./lib/upperControls/UpperControls";
-import { TableContentTypes } from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { TableContentTypes } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));

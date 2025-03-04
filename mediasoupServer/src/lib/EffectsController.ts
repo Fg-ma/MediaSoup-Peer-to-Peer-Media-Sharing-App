@@ -1,7 +1,9 @@
 import {
+  onClientClearEffectsType,
   onClientEffectChangeType,
   onClientMixEffectActivityChangeType,
   onClientMixEffectValueChangeType,
+  onRequestClearEffectsType,
   onRequestEffectChangeType,
   onRequestMixEffectActivityChangeType,
   onRequestMixEffectValueChangeType,
@@ -187,6 +189,48 @@ class EffectsController {
       requestedInstance,
       msg
     );
+  };
+
+  onRequestClearEffects = (event: onRequestClearEffectsType) => {
+    const {
+      table_id,
+      requestedUsername,
+      requestedInstance,
+      requestedProducerType,
+      requestedProducerId,
+    } = event.header;
+
+    const msg = {
+      type: "requestedClearEffects",
+      header: {
+        requestedProducerType,
+        requestedProducerId,
+      },
+    };
+
+    this.broadcaster.broadcastToInstance(
+      table_id,
+      requestedUsername,
+      requestedInstance,
+      msg
+    );
+  };
+
+  onClientClearEffects = (event: onClientClearEffectsType) => {
+    const { table_id, username, instance, producerType, producerId } =
+      event.header;
+
+    const msg = {
+      type: "clientClearedEffects",
+      header: {
+        username,
+        instance,
+        producerType,
+        producerId,
+      },
+    };
+
+    this.broadcaster.broadcastToTable(table_id, msg);
   };
 }
 

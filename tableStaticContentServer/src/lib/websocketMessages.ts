@@ -1,4 +1,5 @@
 import {
+  broadcaster,
   cleanup,
   gets,
   metadataController,
@@ -31,7 +32,7 @@ const handleMessage = (
       tableTopMongo.updateContentPositioning(event);
       break;
     case "updateContentEffects":
-      tableTopMongo.updateContentEffects(event);
+      metadataController.onUpdateContentEffects(event);
       break;
     default:
       break;

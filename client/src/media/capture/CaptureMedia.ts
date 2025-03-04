@@ -2,6 +2,8 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   CaptureEffectStylesType,
   CaptureEffectTypes,
+  CaptureStreamEffectsType,
+  defaultCaptureStreamEffects,
 } from "../../context/effectsContext/typeConstant";
 import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
@@ -42,6 +44,7 @@ class CaptureMedia {
   constructor(
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
+    private captureStreamEffects: React.MutableRefObject<CaptureStreamEffectsType>,
     private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>
   ) {
     this.canvas = document.createElement("canvas");
@@ -288,6 +291,36 @@ class CaptureMedia {
     const b = bigint & 255;
 
     return [r / 255, g / 255, b / 255];
+  };
+
+  clearAllEffects = () => {
+    if (!this.babylonScene) return;
+
+    Object.entries(this.effects).map(([effect, value]) => {
+      if (value) {
+        this.captureStreamEffects.current[effect as CaptureEffectTypes] = false;
+
+        if (effect === "tint") {
+          this.babylonScene?.toggleTintPlane(false);
+        } else if (effect === "blur") {
+          this.babylonScene?.toggleBlurEffect(false);
+        } else if (effect === "pause") {
+          this.babylonScene?.togglePauseEffect(false);
+        } else if (effect === "hideBackground") {
+          this.babylonScene?.toggleHideBackgroundPlane(false);
+        } else if (effect === "postProcess") {
+          this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+            false
+          );
+        } else {
+          this.babylonScene?.deleteEffectMeshes(effect);
+        }
+      }
+    });
+
+    this.effects = structuredClone(defaultCaptureStreamEffects);
+
+    this.deadbanding.update("capture", this.captureId, this.effects);
   };
 
   changeEffects = (

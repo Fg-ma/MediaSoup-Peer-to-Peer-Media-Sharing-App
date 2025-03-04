@@ -9,7 +9,7 @@ import {
   IncomingTableStaticContentMessages,
   TableContentTypes,
   TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";

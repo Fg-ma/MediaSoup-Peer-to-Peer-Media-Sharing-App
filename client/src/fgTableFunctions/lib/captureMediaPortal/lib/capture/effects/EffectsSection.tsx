@@ -13,6 +13,7 @@ import MustachesButton from "../../../../../../elements/effectsButtons/Mustaches
 import MasksButton from "../../../../../../elements/effectsButtons/MasksButton";
 import HatsButton from "../../../../../../elements/effectsButtons/HatsButton";
 import PetsButton from "../../../../../../elements/effectsButtons/PetsButton";
+import ClearAllButton from "../../../../../../elements/effectsButtons/ClearAllButton";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -128,6 +129,14 @@ export default function EffectsSection({
         ref={subEffectsContainerRef}
         className='flex h-full w-max items-center justify-center px-4 space-x-2'
       >
+        <ClearAllButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          clickFunctionCallback={async () => {
+            await captureMediaController.handleCaptureEffect("clearAll", false);
+          }}
+        />
         <BabylonPostProcessEffectsButton
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}

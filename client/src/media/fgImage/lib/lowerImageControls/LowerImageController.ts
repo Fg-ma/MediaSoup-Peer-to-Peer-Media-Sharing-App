@@ -93,26 +93,37 @@ class LowerImageController {
   };
 
   handleImageEffect = async (
-    effect: ImageEffectTypes,
+    effect: ImageEffectTypes | "clearAll",
     blockStateChange: boolean
   ) => {
-    if (!blockStateChange) {
-      this.userStreamEffects.current.image[this.imageId][effect] =
-        !this.userStreamEffects.current.image[this.imageId][effect];
+    if (effect !== "clearAll") {
+      if (!blockStateChange) {
+        this.userStreamEffects.current.image[this.imageId][effect] =
+          !this.userStreamEffects.current.image[this.imageId][effect];
+      }
+
+      this.userMedia.current.image[this.imageId].changeEffects(
+        effect,
+        this.tintColor.current,
+        blockStateChange
+      );
+
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "image",
+        this.imageId,
+        this.userStreamEffects.current.image[this.imageId],
+        this.userEffectsStyles.current.image[this.imageId]
+      );
+    } else {
+      this.userMedia.current.image[this.imageId].clearAllEffects();
+
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "image",
+        this.imageId,
+        this.userStreamEffects.current.image[this.imageId],
+        this.userEffectsStyles.current.image[this.imageId]
+      );
     }
-
-    this.userMedia.current.image[this.imageId].changeEffects(
-      effect,
-      this.tintColor.current,
-      blockStateChange
-    );
-
-    this.tableStaticContentSocket.current?.updateContentEffects(
-      "image",
-      this.imageId,
-      this.userStreamEffects.current.image[this.imageId],
-      this.userEffectsStyles.current.image[this.imageId]
-    );
   };
 
   handleDownload = () => {

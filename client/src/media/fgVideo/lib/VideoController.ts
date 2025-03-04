@@ -1,12 +1,27 @@
 import { VideoOptions } from "./typeConstant";
 import VideoMedia from "../VideoMedia";
+import {
+  IncomingTableStaticContentMessages,
+  onUpdatedContentEffectsType,
+} from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import {
+  UserEffectsStylesType,
+  UserStreamEffectsType,
+  VideoEffectStylesType,
+  VideoEffectTypes,
+} from "../../../context/effectsContext/typeConstant";
 
 class VideoController {
   constructor(
+    private videoId: string,
     private videoMedia: VideoMedia,
     private subContainerRef: React.RefObject<HTMLDivElement>,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
-    private videoOptions: VideoOptions
+    private videoOptions: VideoOptions,
+    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private tintColor: React.MutableRefObject<string>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   init = () => {
@@ -48,6 +63,40 @@ class VideoController {
         this.videoMedia.hiddenVideo.style.width = "100%";
         this.videoMedia.hiddenVideo.style.height = "auto";
       }
+    }
+  };
+
+  onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
+    const { contentType, contentId } = event.header;
+    const { effects, effectStyles } = event.data;
+
+    if (contentType === "video" && contentId === this.videoId) {
+      this.userStreamEffects.current.video[this.videoId].video = effects as {
+        [effectType in VideoEffectTypes]: boolean;
+      };
+
+      if (effectStyles !== undefined) {
+        this.userEffectsStyles.current.video[this.videoId].video =
+          effectStyles as VideoEffectStylesType;
+
+        this.tintColor.current = effectStyles.tint.color;
+      }
+
+      this.videoMedia.updateAllEffects();
+
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  handleTableStaticContentMessage = (
+    event: IncomingTableStaticContentMessages
+  ) => {
+    switch (event.type) {
+      case "updatedContentEffects":
+        this.onUpdatedContentEffects(event);
+        break;
+      default:
+        break;
     }
   };
 }

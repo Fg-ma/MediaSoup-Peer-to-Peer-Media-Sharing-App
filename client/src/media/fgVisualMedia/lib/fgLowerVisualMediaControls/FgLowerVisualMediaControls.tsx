@@ -1,12 +1,11 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { AnimatePresence } from "framer-motion";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../context/effectsContext/typeConstant";
-import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/lib/typeConstant";
 import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
 import {
   defaultFgVisualMediaOptions,

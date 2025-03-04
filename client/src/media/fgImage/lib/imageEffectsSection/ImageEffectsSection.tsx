@@ -13,6 +13,7 @@ import LowerImageController from "../lowerImageControls/LowerImageController";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
+import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
 
 const HideBackgroundButton = React.lazy(
   () => import("../../../../elements/effectsButtons/HideBackgroundButton")
@@ -153,6 +154,14 @@ export default function ImageEffectsSection({
         ref={subEffectsContainerRef}
         className='flex h-full w-max items-center justify-center px-4 space-x-2'
       >
+        <ClearAllButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          clickFunctionCallback={async () => {
+            await lowerImageController.handleImageEffect("clearAll", false);
+          }}
+        />
         <BabylonPostProcessEffectsButton
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}

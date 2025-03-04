@@ -46,15 +46,6 @@ class BabylonRenderLoop {
   private detectFacesTimeout = 1000;
 
   constructor(
-    private id: string,
-    private type:
-      | "camera"
-      | "screen"
-      | "image"
-      | "video"
-      | "text"
-      | "application"
-      | "capture",
     private scene: Scene,
     private camera: UniversalCamera,
     private faceLandmarks: FaceLandmarks | undefined,
@@ -437,7 +428,8 @@ class BabylonRenderLoop {
     hideBackgroundEffect: HideBackgroundEffectTypes
   ) => {
     const src = hideBackgroundEffectImagesMap[hideBackgroundEffect];
-    if (src) this.hideBackgroundEffectImage.src = src;
+    if (src && src !== this.hideBackgroundEffectImage.src)
+      this.hideBackgroundEffectImage.src = src;
   };
 
   swapHideBackgroundContextFillColor = (color: string) => {

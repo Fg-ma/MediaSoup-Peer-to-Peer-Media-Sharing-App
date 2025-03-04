@@ -189,7 +189,7 @@ export default function RemoteVisualMedia({
   const [aspectRatio, setAspectRatio] = useState(0);
 
   const handleVisualEffectChange = async (
-    effect: CameraEffectTypes | ScreenEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
     blockStateChange: boolean = false,
     hideBackgroundStyle?: HideBackgroundEffectTypes,
     hideBackgroundColor?: string,
@@ -201,28 +201,41 @@ export default function RemoteVisualMedia({
       (type === "screen" &&
         fgVisualMediaOptions.permissions.acceptsScreenEffects)
     ) {
-      mediasoupSocket?.current?.sendMessage({
-        type: "requestEffectChange",
-        header: {
-          table_id,
-          requestedUsername: username,
-          requestedInstance: instance,
-          requestedProducerType: type,
-          requestedProducerId: visualMediaId,
-        },
-        data: {
-          effect: effect,
-          blockStateChange: blockStateChange,
-          style:
-            // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
-            remoteEffectsStyles.current[username][instance][type][
-              visualMediaId
-            ][effect],
-          hideBackgroundStyle: hideBackgroundStyle,
-          hideBackgroundColor: hideBackgroundColor,
-          postProcessStyle: postProcessStyle,
-        },
-      });
+      if (effect !== "clearAll") {
+        mediasoupSocket?.current?.sendMessage({
+          type: "requestEffectChange",
+          header: {
+            table_id,
+            requestedUsername: username,
+            requestedInstance: instance,
+            requestedProducerType: type,
+            requestedProducerId: visualMediaId,
+          },
+          data: {
+            effect: effect,
+            blockStateChange: blockStateChange,
+            style:
+              // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
+              remoteEffectsStyles.current[username][instance][type][
+                visualMediaId
+              ][effect],
+            hideBackgroundStyle: hideBackgroundStyle,
+            hideBackgroundColor: hideBackgroundColor,
+            postProcessStyle: postProcessStyle,
+          },
+        });
+      } else {
+        mediasoupSocket?.current?.sendMessage({
+          type: "requestClearEffects",
+          header: {
+            table_id,
+            requestedUsername: username,
+            requestedInstance: instance,
+            requestedProducerType: type,
+            requestedProducerId: visualMediaId,
+          },
+        });
+      }
     }
   };
 
@@ -294,7 +307,8 @@ export default function RemoteVisualMedia({
     leaveVisualMediaTimer,
     visualMediaMovementTimeout,
     setRerender,
-    setAspectRatio
+    setAspectRatio,
+    mediasoupSocket
   );
 
   useEffect(() => {

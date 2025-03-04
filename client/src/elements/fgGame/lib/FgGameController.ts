@@ -1,10 +1,11 @@
 import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
-import MediasoupSocketController, {
+import MediasoupSocketController from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
+import {
   IncomingMediasoupMessages,
   onRequestedGameCatchUpDataType,
   onResponsedGameCatchUpDataType,
-} from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
+} from "../../../serverControllers/mediasoupServer/lib/typeConstant";
 
 class FgGameController {
   constructor(

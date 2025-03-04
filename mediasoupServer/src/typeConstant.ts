@@ -214,7 +214,9 @@ export type MediasoupSocketEvents =
   | onClientMixEffectActivityChangeType
   | onRequestMixEffectValueChangeType
   | onClientMixEffectValueChangeType
-  | onRequestRemoveProducerType;
+  | onRequestRemoveProducerType
+  | onRequestClearEffectsType
+  | onClientClearEffectsType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -688,6 +690,28 @@ export type onRequestRemoveProducerType = {
     username: string;
     instance: string;
     producerType: ProducerTypes;
+    producerId: string;
+  };
+};
+
+export type onRequestClearEffectsType = {
+  type: "requestClearEffects";
+  header: {
+    table_id: string;
+    requestedUsername: string;
+    requestedInstance: string;
+    requestedProducerType: "camera" | "screen" | "screenAudio" | "audio";
+    requestedProducerId: string;
+  };
+};
+
+export type onClientClearEffectsType = {
+  type: "clientClearEffects";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+    producerType: "camera" | "screen" | "screenAudio" | "audio";
     producerId: string;
   };
 };

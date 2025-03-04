@@ -10,7 +10,8 @@ import {
 } from "../../context/effectsContext/typeConstant";
 import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
-import MediasoupSocketController, {
+import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+import {
   onBundleMetadataResponsedType,
   onClientEffectChangedType,
   onClientMuteChangeType,
@@ -19,7 +20,7 @@ import MediasoupSocketController, {
   onNewProducerWasCreatedType,
   onPermissionsResponsedType,
   onProducerDisconnectedType,
-} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+} from "../../serverControllers/mediasoupServer/lib/typeConstant";
 
 class BundleSocket {
   constructor(

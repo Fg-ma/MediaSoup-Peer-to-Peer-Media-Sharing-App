@@ -1,7 +1,6 @@
 import VideoMedia from "../../media/fgVideo/VideoMedia";
-import TableStaticContentSocketController, {
-  IncomingTableStaticContentMessages,
-} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { IncomingTableStaticContentMessages } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import SharedBundleSocket from "./SharedBundleSocket";
 import ImageMedia from "../../media/fgImage/ImageMedia";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";

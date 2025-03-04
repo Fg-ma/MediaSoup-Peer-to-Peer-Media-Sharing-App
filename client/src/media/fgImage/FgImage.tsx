@@ -50,7 +50,7 @@ export default function FgImage({
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
 
-  const [_rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
@@ -83,7 +83,15 @@ export default function FgImage({
     setSettings
   );
 
-  const imageController = new ImageController(setSettingsActive);
+  const imageController = new ImageController(
+    imageId,
+    imageMedia,
+    setSettingsActive,
+    userStreamEffects,
+    userEffectsStyles,
+    tintColor,
+    setRerender
+  );
 
   useEffect(() => {
     subContainerRef.current?.appendChild(imageMedia.canvas);
@@ -121,6 +129,17 @@ export default function FgImage({
       recording.current = false;
     }
   }, [settings.downloadType.value]);
+
+  useEffect(() => {
+    tableStaticContentSocket.current?.addMessageListener(
+      imageController.handleTableStaticContentMessage
+    );
+
+    return () =>
+      tableStaticContentSocket.current?.removeMessageListener(
+        imageController.handleTableStaticContentMessage
+      );
+  }, [tableStaticContentSocket.current]);
 
   return (
     <FgMediaContainer

@@ -1,9 +1,8 @@
 import { MediaContainerOptions } from "./typeConstant";
-import { IncomingMediasoupMessages } from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
 import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
-import TableStaticContentSocketController, {
-  TableContentTypes,
-} from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { TableContentTypes } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 
 class MediaContainerController {
   constructor(

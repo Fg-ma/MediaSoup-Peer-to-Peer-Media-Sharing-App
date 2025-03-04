@@ -1,4 +1,4 @@
-import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import FgVolumeElementSocket from "../../fgVolumeElement/lib/FgVolumeElementSocket";
 import { FgVolumeElementOptions } from "./typeConstant";
 

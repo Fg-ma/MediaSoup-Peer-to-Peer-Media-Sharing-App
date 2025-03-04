@@ -13,9 +13,8 @@ import BundlesController from "../../lib/BundlesController";
 import onRouterCapabilities from "../../lib/onRouterCapabilities";
 import TableSocketController from "../../serverControllers/tableServer/TableSocketController";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import MediasoupSocketController, {
-  IncomingMediasoupMessages,
-} from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import ProducersController from "../../lib/ProducersController";
 import ConsumersController from "../../lib/ConsumersController";
 import PermissionsController from "../../lib/PermissionsController";

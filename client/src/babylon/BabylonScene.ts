@@ -184,8 +184,6 @@ class BabylonScene {
     );
 
     this.babylonRenderLoop = new BabylonRenderLoop(
-      this.id,
-      this.type,
       this.scene,
       this.camera,
       this.faceLandmarks,

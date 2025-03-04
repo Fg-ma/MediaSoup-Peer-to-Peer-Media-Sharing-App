@@ -25,14 +25,15 @@ import BrowserMedia from "../media/BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import ScreenAudioMedia from "../media/screenAudio/ScreenAudioMedia";
 import { Permissions } from "../context/permissionsContext/typeConstant";
-import MediasoupSocketController, {
+import MediasoupSocketController from "../serverControllers/mediasoupServer/MediasoupSocketController";
+import {
   IncomingMediasoupMessages,
   onNewJSONProducerAvailableType,
   onNewProducerAvailableType,
   onProducerDisconnectedType,
   onProducerTransportCreatedType,
   onRemoveProducerRequestedType,
-} from "../serverControllers/mediasoupServer/MediasoupSocketController";
+} from "../serverControllers/mediasoupServer/lib/typeConstant";
 
 class ProducersController {
   constructor(

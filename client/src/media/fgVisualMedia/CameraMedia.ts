@@ -291,6 +291,38 @@ class CameraMedia {
     return [r / 255, g / 255, b / 255];
   };
 
+  clearAllEffects = () => {
+    if (!this.babylonScene) return;
+
+    Object.entries(this.effects).map(([effect, value]) => {
+      if (value) {
+        this.userStreamEffects.current.camera[this.cameraId][
+          effect as EffectType
+        ] = false;
+
+        if (effect === "tint") {
+          this.babylonScene?.toggleTintPlane(false);
+        } else if (effect === "blur") {
+          this.babylonScene?.toggleBlurEffect(false);
+        } else if (effect === "pause") {
+          this.babylonScene?.togglePauseEffect(false);
+        } else if (effect === "hideBackground") {
+          this.babylonScene?.toggleHideBackgroundPlane(false);
+        } else if (effect === "postProcess") {
+          this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+            false
+          );
+        } else {
+          this.babylonScene?.deleteEffectMeshes(effect);
+        }
+      }
+    });
+
+    this.effects = structuredClone(defaultCameraStreamEffects);
+
+    this.deadbanding.update("capture", this.cameraId, this.effects);
+  };
+
   changeEffects = (
     effect: CameraEffectTypes,
     tintColor?: string,

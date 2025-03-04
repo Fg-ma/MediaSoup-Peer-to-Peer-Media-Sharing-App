@@ -84,7 +84,7 @@ export default function FgTableFunctions({
   const { setSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
   const { table_id, username, instance } = useUserInfoContext();
-  const { captureEffectsStyles } = useEffectsContext();
+  const { captureStreamEffects, captureEffectsStyles } = useEffectsContext();
 
   const externalBackgroundChange = useRef(false);
 
@@ -107,6 +107,7 @@ export default function FgTableFunctions({
     captureMedia,
     userDevice,
     deadbanding,
+    captureStreamEffects,
     captureEffectsStyles,
     setRerender
   );
@@ -201,6 +202,7 @@ export default function FgTableFunctions({
           <CaptureMediaPortal
             captureMedia={captureMedia}
             tableFunctionsController={tableFunctionsController}
+            setCaptureMediaActive={setCaptureMediaActive}
           />
         )}
       </div>

@@ -4,20 +4,25 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   RemoteStreamEffectsType,
+  defaultCameraStreamEffects,
+  defaultScreenStreamEffects,
 } from "../../../context/effectsContext/typeConstant";
 import { Permissions } from "../../../context/permissionsContext/typeConstant";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import { FgVisualMediaOptions } from "./typeConstant";
 import {
   IncomingMediasoupMessages,
+  onClientClearedEffectsType,
   onClientEffectChangedType,
   onEffectChangeRequestedType,
+  onRequestedClearEffectsType,
   onResponsedCatchUpDataType,
-} from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
+} from "../../../serverControllers/mediasoupServer/lib/typeConstant";
 import {
   RemoteDataStreamsType,
   UserMediaType,
 } from "../../../context/mediaContext/typeConstant";
+import MediasoupSocketController from "src/serverControllers/mediasoupServer/MediasoupSocketController";
 
 class FgVisualMediaController {
   constructor(
@@ -67,7 +72,10 @@ class FgVisualMediaController {
       NodeJS.Timeout | undefined
     >,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
-    private setAspectRatio: React.Dispatch<React.SetStateAction<number>>
+    private setAspectRatio: React.Dispatch<React.SetStateAction<number>>,
+    private mediasoupSocket: React.MutableRefObject<
+      MediasoupSocketController | undefined
+    >
   ) {}
 
   init = () => {
@@ -255,6 +263,54 @@ class FgVisualMediaController {
     }
   };
 
+  onRequestedClearEffects = (event: onRequestedClearEffectsType) => {
+    const { requestedProducerType, requestedProducerId } = event.header;
+
+    if (
+      ((this.type === "camera" &&
+        this.fgVisualMediaOptions.permissions?.acceptsCameraEffects) ||
+        (this.type === "screen" &&
+          this.fgVisualMediaOptions.permissions?.acceptsScreenEffects)) &&
+      requestedProducerType === this.type &&
+      requestedProducerId === this.visualMediaId
+    ) {
+      this.userMedia.current[this.type][this.visualMediaId].clearAllEffects();
+
+      this.mediasoupSocket?.current?.sendMessage({
+        type: "clientClearEffects",
+        header: {
+          table_id: this.table_id,
+          username: this.username,
+          instance: this.instance,
+          producerType: this.type,
+          producerId: this.visualMediaId,
+        },
+      });
+    }
+  };
+
+  onClientClearedEffects = (event: onClientClearedEffectsType) => {
+    const { username, instance, producerType, producerId } = event.header;
+
+    if (
+      !this.fgVisualMediaOptions.isUser &&
+      username === this.username &&
+      instance === this.instance &&
+      producerType === this.type &&
+      producerId === this.visualMediaId
+    ) {
+      this.remoteStreamEffects.current[this.username][this.instance][this.type][
+        this.visualMediaId
+      ] = structuredClone(
+        this.type === "camera"
+          ? defaultCameraStreamEffects
+          : defaultScreenStreamEffects
+      );
+
+      this.setRerender((prev) => !prev);
+    }
+  };
+
   handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "effectChangeRequested":
@@ -271,6 +327,12 @@ class FgVisualMediaController {
           this.attachPositioningListeners(
             this.fgVisualMediaOptions.permissions
           );
+        break;
+      case "requestedClearEffects":
+        this.onRequestedClearEffects(event);
+        break;
+      case "clientClearedEffects":
+        this.onClientClearedEffects(event);
         break;
       default:
         break;

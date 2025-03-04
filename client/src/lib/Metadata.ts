@@ -2,10 +2,11 @@ import {
   UserEffectsStylesType,
   UserStreamEffectsType,
 } from "../context/effectsContext/typeConstant";
-import MediasoupSocketController, {
+import MediasoupSocketController from "../serverControllers/mediasoupServer/MediasoupSocketController";
+import {
   onBundleMetadataRequestedType,
   onRequestedCatchUpDataType,
-} from "../serverControllers/mediasoupServer/MediasoupSocketController";
+} from "../serverControllers/mediasoupServer/lib/typeConstant";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
 
 class Metadata {

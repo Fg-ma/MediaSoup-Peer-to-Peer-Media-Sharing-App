@@ -255,26 +255,31 @@ class LowerVideoController {
   };
 
   handleVideoEffect = async (
-    effect: VideoEffectTypes,
+    effect: VideoEffectTypes | "clearAll",
     blockStateChange: boolean
   ) => {
-    if (!blockStateChange) {
-      this.userStreamEffects.current.video[this.videoId].video[effect] =
-        !this.userStreamEffects.current.video[this.videoId].video[effect];
+    if (effect !== "clearAll") {
+      if (!blockStateChange) {
+        this.userStreamEffects.current.video[this.videoId].video[effect] =
+          !this.userStreamEffects.current.video[this.videoId].video[effect];
+      }
+
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "video",
+        this.videoId,
+        this.userStreamEffects.current.video[this.videoId].video,
+        this.userEffectsStyles.current.video[this.videoId].video
+      );
+    } else {
+      this.userMedia.current.video[this.videoId].clearAllEffects();
+
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "video",
+        this.videoId,
+        this.userStreamEffects.current.video[this.videoId].video,
+        this.userEffectsStyles.current.video[this.videoId].video
+      );
     }
-
-    this.userMedia.current.video[this.videoId].changeEffects(
-      effect,
-      this.tintColor.current,
-      blockStateChange
-    );
-
-    this.tableStaticContentSocket.current?.updateContentEffects(
-      "video",
-      this.videoId,
-      this.userStreamEffects.current.video[this.videoId].video,
-      this.userEffectsStyles.current.video[this.videoId].video
-    );
   };
 
   setInitTimeOffset = (offset: number) => {

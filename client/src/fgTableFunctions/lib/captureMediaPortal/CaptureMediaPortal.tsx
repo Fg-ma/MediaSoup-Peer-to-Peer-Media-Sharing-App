@@ -27,9 +27,11 @@ import "./lib/captureMedia.css";
 export default function CaptureMediaPortal({
   captureMedia,
   tableFunctionsController,
+  setCaptureMediaActive,
 }: {
-  captureMedia: React.RefObject<CaptureMedia | undefined>;
+  captureMedia: React.MutableRefObject<CaptureMedia | undefined>;
   tableFunctionsController: TableFunctionsController;
+  setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { captureStreamEffects, captureEffectsStyles } = useEffectsContext();
   const { table_id } = useUserInfoContext();
@@ -109,7 +111,8 @@ export default function CaptureMediaPortal({
     settings,
     timelineContainerRef,
     isScrubbing,
-    wasPaused
+    wasPaused,
+    setCaptureMediaActive
   );
 
   useEffect(() => {

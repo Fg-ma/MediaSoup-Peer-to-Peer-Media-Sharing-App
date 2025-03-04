@@ -3,9 +3,8 @@ import PanButton from "../../../elements/fgAdjustmentElements/PanButton";
 import RotateButton from "../../../elements/fgAdjustmentElements/RotateButton";
 import ScaleButton from "../../../elements/fgAdjustmentElements/ScaleButton";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
-import TableStaticContentSocketController, {
-  TableContentTypes,
-} from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { TableContentTypes } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { MediaContainerOptions } from "./typeConstant";
 
 export default function AdjustmentButtons({

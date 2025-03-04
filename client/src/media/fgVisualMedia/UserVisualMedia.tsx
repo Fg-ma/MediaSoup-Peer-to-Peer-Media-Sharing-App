@@ -183,32 +183,47 @@ export default function UserVisualMedia({
   });
 
   const handleVisualEffectChange = async (
-    effect: CameraEffectTypes | ScreenEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
     blockStateChange: boolean = false
   ) => {
-    fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
+    if (effect !== "clearAll") {
+      fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
 
-    if (
-      (type === "camera" &&
-        fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
-      (type === "screen" &&
-        fgVisualMediaOptions.permissions.acceptsScreenEffects)
-    ) {
+      if (
+        (type === "camera" &&
+          fgVisualMediaOptions.permissions.acceptsCameraEffects) ||
+        (type === "screen" &&
+          fgVisualMediaOptions.permissions.acceptsScreenEffects)
+      ) {
+        mediasoupSocket?.current?.sendMessage({
+          type: "clientEffectChange",
+          header: {
+            table_id,
+            username,
+            instance,
+            producerType: type,
+            producerId: visualMediaId,
+          },
+          data: {
+            effect: effect,
+            effectStyle:
+              // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
+              userEffectsStyles.current[type][visualMediaId][effect],
+            blockStateChange: blockStateChange,
+          },
+        });
+      }
+    } else {
+      userMedia.current[type][visualMediaId].clearAllEffects();
+
       mediasoupSocket?.current?.sendMessage({
-        type: "clientEffectChange",
+        type: "clientClearEffects",
         header: {
           table_id,
           username,
           instance,
           producerType: type,
           producerId: visualMediaId,
-        },
-        data: {
-          effect: effect,
-          effectStyle:
-            // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
-            userEffectsStyles.current[type][visualMediaId][effect],
-          blockStateChange: blockStateChange,
         },
       });
     }
@@ -282,7 +297,8 @@ export default function UserVisualMedia({
     leaveVisualMediaTimer,
     visualMediaMovementTimeout,
     setRerender,
-    setAspectRatio
+    setAspectRatio,
+    mediasoupSocket
   );
 
   useEffect(() => {

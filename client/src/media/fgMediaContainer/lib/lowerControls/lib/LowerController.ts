@@ -1,6 +1,5 @@
-import TableStaticContentSocketController, {
-  TableContentTypes,
-} from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import TableStaticContentSocketController from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { TableContentTypes } from "../../../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaContainerOptions } from "../../typeConstant";
 import {

@@ -15,10 +15,11 @@ import {
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
-import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/MediasoupSocketController";
+import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/lib/typeConstant";
 import HideBackgroundButton from "../../../../elements/effectsButtons/HideBackgroundButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
 import BlurButtton from "../../../../elements/effectsButtons/BlurButton";
+import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
 
 const BabylonPostProcessEffectsButton = React.lazy(
   () =>
@@ -81,7 +82,7 @@ export default function VisualEffectsSection({
   isUser: boolean;
   acceptsVisualEffects: boolean;
   handleVisualEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
     blockStateChange?: boolean,
     hideBackgroundStyle?: HideBackgroundEffectTypes,
     hideBackgroundColor?: string,
@@ -203,6 +204,14 @@ export default function VisualEffectsSection({
         ref={subEffectsContainerRef}
         className='flex h-full w-max items-center justify-center px-4 space-x-2'
       >
+        <ClearAllButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          clickFunctionCallback={async () => {
+            await handleVisualEffectChange("clearAll");
+          }}
+        />
         <BabylonPostProcessEffectsButton
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}

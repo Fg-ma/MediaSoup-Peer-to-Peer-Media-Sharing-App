@@ -13,7 +13,11 @@ import lowerVideoController from "../lowerVideoControls/LowerVideoController";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
+import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
 
+const HideBackgroundButton = React.lazy(
+  () => import("../../../../elements/effectsButtons/HideBackgroundButton")
+);
 const GlassesButton = React.lazy(
   () => import("../../../../elements/effectsButtons/GlassesButton")
 );
@@ -152,6 +156,14 @@ export default function VideoEffectsSection({
         ref={subEffectsContainerRef}
         className='flex h-full w-max items-center justify-center px-4 space-x-2'
       >
+        <ClearAllButton
+          effectsDisabled={effectsDisabled}
+          setEffectsDisabled={setEffectsDisabled}
+          scrollingContainerRef={effectsContainerRef}
+          clickFunctionCallback={async () => {
+            await lowerVideoController.handleVideoEffect("clearAll", false);
+          }}
+        />
         <BabylonPostProcessEffectsButton
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
@@ -187,6 +199,76 @@ export default function VideoEffectsSection({
             );
           }}
         />
+        {videoMedia.maxFacesDetected > 0 && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <HideBackgroundButton
+              effectsDisabled={effectsDisabled}
+              setEffectsDisabled={setEffectsDisabled}
+              scrollingContainerRef={effectsContainerRef}
+              streamEffects={
+                userStreamEffects.current.video[videoId].video.hideBackground
+              }
+              effectsStyles={
+                userEffectsStyles.current.video[videoId].video.hideBackground
+              }
+              clickFunctionCallback={async () => {
+                const effectsStyles =
+                  userEffectsStyles.current.video[videoId].video.hideBackground;
+
+                userMedia.current.video[
+                  videoId
+                ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                  effectsStyles.style
+                );
+
+                await lowerVideoController.handleVideoEffect(
+                  "hideBackground",
+                  false
+                );
+              }}
+              holdFunctionCallback={async (effectType) => {
+                const effectsStyles =
+                  userEffectsStyles.current.video[videoId].video.hideBackground;
+                const streamEffects =
+                  userStreamEffects.current.video[videoId].video.hideBackground;
+
+                effectsStyles.style = effectType;
+                userMedia.current.video[
+                  videoId
+                ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                  effectType
+                );
+
+                await lowerVideoController.handleVideoEffect(
+                  "hideBackground",
+                  streamEffects
+                );
+              }}
+              acceptColorCallback={async (color) => {
+                const effectsStyles =
+                  userEffectsStyles.current.video[videoId].video.hideBackground;
+                const streamEffects =
+                  userStreamEffects.current.video[videoId].video.hideBackground;
+
+                userMedia.current.video[
+                  videoId
+                ].babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                  color
+                );
+
+                if (effectsStyles.style !== "color" || !streamEffects) {
+                  effectsStyles.style = "color";
+                  effectsStyles.color = color;
+
+                  await lowerVideoController.handleVideoEffect(
+                    "hideBackground",
+                    streamEffects
+                  );
+                }
+              }}
+            />
+          </Suspense>
+        )}
         <BlurButton
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}

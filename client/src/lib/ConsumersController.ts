@@ -6,13 +6,14 @@ import {
   RemoteDataStreamsType,
   RemoteMediaType,
 } from "../context/mediaContext/typeConstant";
-import MediasoupSocketController, {
+import MediasoupSocketController from "../serverControllers/mediasoupServer/MediasoupSocketController";
+import {
   IncomingMediasoupMessages,
   onConsumerTransportCreatedType,
   onNewConsumerSubscribedType,
   onNewJSONConsumerSubscribedType,
   onSubscribedType,
-} from "../serverControllers/mediasoupServer/MediasoupSocketController";
+} from "../serverControllers/mediasoupServer/lib/typeConstant";
 
 class ConsumersController {
   constructor(

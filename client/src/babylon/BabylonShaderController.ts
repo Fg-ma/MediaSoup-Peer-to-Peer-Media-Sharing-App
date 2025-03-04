@@ -602,6 +602,8 @@ class BabylonShaderController {
   };
 
   swapPostProcessEffects = (postProcessEffect: PostProcessEffectTypes) => {
+    if (this.activeShaders[postProcessEffect]) return;
+
     for (const shader in this.activeShaders) {
       if (this.activeShaders[shader as PostProcessEffectTypes]) {
         this.removePostProcessEffect(shader as PostProcessEffectTypes);

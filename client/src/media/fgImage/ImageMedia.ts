@@ -5,12 +5,13 @@ import {
   defaultImageStreamEffects,
   defaultImageEffectsStyles,
   ImageEffectTypes,
+  ImageEffectStylesType,
 } from "../../context/effectsContext/typeConstant";
 import {
   IncomingTableStaticContentMessages,
   TableContentTypes,
   TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import BabylonScene, {
   EffectType,
   validEffectTypes,
@@ -399,6 +400,204 @@ class ImageMedia {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  clearAllEffects = () => {
+    if (!this.babylonScene) return;
+
+    Object.entries(this.effects).map(([effect, value]) => {
+      if (value) {
+        this.userStreamEffects.current.image[this.imageId][
+          effect as EffectType
+        ] = false;
+
+        if (effect === "tint") {
+          this.babylonScene?.toggleTintPlane(false);
+        } else if (effect === "blur") {
+          this.babylonScene?.toggleBlurEffect(false);
+        } else if (effect === "pause") {
+          this.babylonScene?.togglePauseEffect(false);
+        } else if (effect === "hideBackground") {
+          this.babylonScene?.toggleHideBackgroundPlane(false);
+        } else if (effect === "postProcess") {
+          this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+            false
+          );
+        } else {
+          this.babylonScene?.deleteEffectMeshes(effect);
+        }
+      }
+    });
+
+    this.effects = structuredClone(defaultImageStreamEffects);
+
+    this.deadbanding.update("capture", this.imageId, this.effects);
+  };
+
+  updateAllEffects = (oldEffectStyles: ImageEffectStylesType) => {
+    if (!this.babylonScene) return;
+
+    Object.entries(this.userStreamEffects.current.image[this.imageId]).map(
+      ([effect, value]) => {
+        if (this.effects[effect as EffectType] && !value) {
+          this.effects[effect as ImageEffectTypes] = false;
+
+          if (effect === "tint") {
+            this.babylonScene?.toggleTintPlane(false);
+          } else if (effect === "blur") {
+            this.babylonScene?.toggleBlurEffect(false);
+          } else if (effect === "hideBackground") {
+            this.babylonScene?.toggleHideBackgroundPlane(false);
+          } else if (effect === "postProcess") {
+            this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+              false
+            );
+          } else {
+            this.babylonScene?.deleteEffectMeshes(effect);
+          }
+        } else if (!this.effects[effect as EffectType] && value) {
+          this.effects[effect as EffectType] = true;
+
+          if (validEffectTypes.includes(effect as EffectType)) {
+            if (
+              effect !== "masks" ||
+              this.userEffectsStyles.current.image[this.imageId].masks.style !==
+                "baseMask"
+            ) {
+              this.drawNewEffect(effect as EffectType);
+            } else {
+              this.babylonScene?.deleteEffectMeshes(effect);
+
+              if (this.effects[effect]) {
+                for (let i = 0; i < this.maxFaces[0]; i++) {
+                  this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
+                }
+              }
+            }
+          }
+
+          if (effect === "tint") {
+            this.setTintColor(
+              this.userEffectsStyles.current.image[this.imageId][effect].color
+            );
+            this.babylonScene?.toggleTintPlane(
+              this.effects[effect] ?? false,
+              this.hexToNormalizedRgb(
+                this.userEffectsStyles.current.image[this.imageId][effect].color
+              )
+            );
+          }
+
+          if (effect === "blur") {
+            this.babylonScene?.toggleBlurEffect(this.effects[effect] ?? false);
+          }
+
+          if (effect === "hideBackground") {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+              this.userEffectsStyles.current.image[this.imageId][effect].style
+            );
+
+            this.babylonScene?.toggleHideBackgroundPlane(
+              this.effects[effect] ?? false
+            );
+          }
+
+          if (effect === "postProcess") {
+            this.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              this.userEffectsStyles.current.image[this.imageId][effect].style
+            );
+
+            this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+              this.effects[effect] ?? false
+            );
+          }
+        } else if (this.effects[effect as EffectType] && value) {
+          if (
+            validEffectTypes.includes(effect as EffectType) &&
+            oldEffectStyles[effect as EffectType].style !==
+              this.userEffectsStyles.current.image[this.imageId][
+                effect as EffectType
+              ].style
+          ) {
+            if (
+              effect !== "masks" ||
+              this.userEffectsStyles.current.image[this.imageId].masks.style !==
+                "baseMask"
+            ) {
+              this.babylonScene?.deleteEffectMeshes(effect);
+
+              this.drawNewEffect(effect as EffectType);
+            } else {
+              this.babylonScene?.deleteEffectMeshes(effect);
+
+              if (this.effects[effect]) {
+                for (let i = 0; i < this.maxFaces[0]; i++) {
+                  this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
+                }
+              }
+            }
+          }
+
+          if (
+            effect === "tint" &&
+            oldEffectStyles[effect].color !==
+              this.userEffectsStyles.current.image[this.imageId][effect].color
+          ) {
+            this.babylonScene?.toggleTintPlane(false);
+
+            this.setTintColor(
+              this.userEffectsStyles.current.image[this.imageId][effect].color
+            );
+            this.babylonScene?.toggleTintPlane(
+              this.effects[effect] ?? false,
+              this.hexToNormalizedRgb(
+                this.userEffectsStyles.current.image[this.imageId][effect].color
+              )
+            );
+          }
+
+          if (
+            effect === "hideBackground" &&
+            (oldEffectStyles[effect].color !==
+              this.userEffectsStyles.current.image[this.imageId][effect]
+                .color ||
+              oldEffectStyles[effect].style !==
+                this.userEffectsStyles.current.image[this.imageId][effect]
+                  .style)
+          ) {
+            this.babylonScene?.toggleHideBackgroundPlane(false);
+
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+              this.userEffectsStyles.current.image[this.imageId][effect].style
+            );
+            this.babylonScene?.toggleHideBackgroundPlane(
+              this.effects[effect] ?? false
+            );
+          }
+
+          if (
+            effect === "postProcess" &&
+            oldEffectStyles[effect].style !==
+              this.userEffectsStyles.current.image[this.imageId][effect].style
+          ) {
+            this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+              false
+            );
+
+            this.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              this.userEffectsStyles.current.image[this.imageId][effect].style
+            );
+            this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+              this.effects[effect] ?? false
+            );
+          }
+        }
+      }
+    );
+
+    this.deadbanding.update("image", this.imageId, this.effects);
+
+    this.babylonScene.imageAlreadyProcessed = 1;
   };
 
   changeEffects = (

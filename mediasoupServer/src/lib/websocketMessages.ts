@@ -113,6 +113,12 @@ const handleMessage = async (
     case "requestRemoveProducer":
       producersController.onRequestRemoveProducer(event);
       break;
+    case "clientClearEffects":
+      effectsController.onClientClearEffects(event);
+      break;
+    case "requestClearEffects":
+      effectsController.onRequestClearEffects(event);
+      break;
     default:
       break;
   }
