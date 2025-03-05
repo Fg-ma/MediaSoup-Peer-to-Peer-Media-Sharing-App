@@ -37,6 +37,7 @@ class Encoder {
       [effectType in VideoEffectTypes]: boolean;
     };
     effectStyles: VideoEffectStylesType;
+    videoPosition: number;
   }): {
     tid: string;
     vid: string;
@@ -84,6 +85,7 @@ class Encoder {
         s: number;
       };
     };
+    vp: number;
   } => {
     const {
       table_id,
@@ -93,6 +95,7 @@ class Encoder {
       positioning,
       effects,
       effectStyles,
+      videoPosition,
     } = data;
 
     const e: number[] = Object.keys(effects)
@@ -146,6 +149,7 @@ class Encoder {
           s: petsEffectEncodingMap[effectStyles.pets.style],
         },
       },
+      vp: videoPosition,
     };
   };
 }

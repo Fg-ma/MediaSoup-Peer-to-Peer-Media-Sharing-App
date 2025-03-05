@@ -129,6 +129,7 @@ class ImageMedia {
     this.canvas.style.objectFit = "contain";
 
     this.faceLandmarks = new FaceLandmarks(
+      true,
       "image",
       this.imageId,
       this.deadbanding
@@ -352,39 +353,7 @@ class ImageMedia {
 
       this.removeMessageListener(this.getImageListener);
 
-      for (const effect in this.userStreamEffects.current.image[this.imageId]) {
-        if (
-          this.userStreamEffects.current.image[this.imageId][
-            effect as ImageEffectTypes
-          ]
-        ) {
-          if (effect === "hideBackground") {
-            this.babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
-              this.userEffectsStyles.current.image[this.imageId].hideBackground
-                .style
-            );
-
-            this.changeEffects(effect as ImageEffectTypes);
-          } else if (effect === "postProcess") {
-            this.babylonScene.babylonShaderController.swapPostProcessEffects(
-              this.userEffectsStyles.current.image[this.imageId].postProcess
-                .style
-            );
-
-            this.changeEffects(effect as ImageEffectTypes);
-          } else if (effect === "tint") {
-            this.setTintColor(
-              this.userEffectsStyles.current.image[this.imageId].tint.color
-            );
-            this.changeEffects(
-              effect as ImageEffectTypes,
-              this.userEffectsStyles.current.image[this.imageId].tint.color
-            );
-          } else {
-            this.changeEffects(effect as ImageEffectTypes);
-          }
-        }
-      }
+      this.updateAllEffects();
     }
   };
 
@@ -434,7 +403,7 @@ class ImageMedia {
     this.deadbanding.update("capture", this.imageId, this.effects);
   };
 
-  updateAllEffects = (oldEffectStyles: ImageEffectStylesType) => {
+  updateAllEffects = (oldEffectStyles?: ImageEffectStylesType) => {
     if (!this.babylonScene) return;
 
     Object.entries(this.userStreamEffects.current.image[this.imageId]).map(
@@ -493,9 +462,18 @@ class ImageMedia {
           }
 
           if (effect === "hideBackground") {
-            this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-              this.userEffectsStyles.current.image[this.imageId][effect].style
-            );
+            if (
+              this.userEffectsStyles.current.image[this.imageId][effect]
+                .style === "color"
+            ) {
+              this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                this.userEffectsStyles.current.image[this.imageId][effect].color
+              );
+            } else {
+              this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                this.userEffectsStyles.current.image[this.imageId][effect].style
+              );
+            }
 
             this.babylonScene?.toggleHideBackgroundPlane(
               this.effects[effect] ?? false
@@ -514,10 +492,11 @@ class ImageMedia {
         } else if (this.effects[effect as EffectType] && value) {
           if (
             validEffectTypes.includes(effect as EffectType) &&
-            oldEffectStyles[effect as EffectType].style !==
-              this.userEffectsStyles.current.image[this.imageId][
-                effect as EffectType
-              ].style
+            (!oldEffectStyles ||
+              oldEffectStyles[effect as EffectType].style !==
+                this.userEffectsStyles.current.image[this.imageId][
+                  effect as EffectType
+                ].style)
           ) {
             if (
               effect !== "masks" ||
@@ -540,8 +519,10 @@ class ImageMedia {
 
           if (
             effect === "tint" &&
-            oldEffectStyles[effect].color !==
-              this.userEffectsStyles.current.image[this.imageId][effect].color
+            (!oldEffectStyles ||
+              oldEffectStyles[effect].color !==
+                this.userEffectsStyles.current.image[this.imageId][effect]
+                  .color)
           ) {
             this.babylonScene?.toggleTintPlane(false);
 
@@ -558,18 +539,28 @@ class ImageMedia {
 
           if (
             effect === "hideBackground" &&
-            (oldEffectStyles[effect].color !==
-              this.userEffectsStyles.current.image[this.imageId][effect]
-                .color ||
+            (!oldEffectStyles ||
+              oldEffectStyles[effect].color !==
+                this.userEffectsStyles.current.image[this.imageId][effect]
+                  .color ||
               oldEffectStyles[effect].style !==
                 this.userEffectsStyles.current.image[this.imageId][effect]
                   .style)
           ) {
             this.babylonScene?.toggleHideBackgroundPlane(false);
 
-            this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-              this.userEffectsStyles.current.image[this.imageId][effect].style
-            );
+            if (
+              this.userEffectsStyles.current.image[this.imageId][effect]
+                .style === "color"
+            ) {
+              this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                this.userEffectsStyles.current.image[this.imageId][effect].color
+              );
+            } else {
+              this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                this.userEffectsStyles.current.image[this.imageId][effect].style
+              );
+            }
             this.babylonScene?.toggleHideBackgroundPlane(
               this.effects[effect] ?? false
             );
@@ -577,8 +568,10 @@ class ImageMedia {
 
           if (
             effect === "postProcess" &&
-            oldEffectStyles[effect].style !==
-              this.userEffectsStyles.current.image[this.imageId][effect].style
+            (!oldEffectStyles ||
+              oldEffectStyles[effect].style !==
+                this.userEffectsStyles.current.image[this.imageId][effect]
+                  .style)
           ) {
             this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
               false
@@ -649,7 +642,24 @@ class ImageMedia {
     }
 
     if (effect === "hideBackground") {
-      this.babylonScene?.toggleHideBackgroundPlane(this.effects[effect]);
+      this.babylonScene?.toggleHideBackgroundPlane(false);
+
+      if (
+        this.userEffectsStyles.current.image[this.imageId][effect].style ===
+        "color"
+      ) {
+        this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+          this.userEffectsStyles.current.image[this.imageId][effect].color
+        );
+      } else {
+        this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+          this.userEffectsStyles.current.image[this.imageId][effect].style
+        );
+      }
+
+      if (this.effects[effect]) {
+        this.babylonScene?.toggleHideBackgroundPlane(true);
+      }
     }
 
     if (effect === "postProcess") {

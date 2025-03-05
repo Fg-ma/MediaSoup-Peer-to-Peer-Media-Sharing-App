@@ -4,6 +4,7 @@ import {
   onUpdateContentEffectsType,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
+import { onUpdateVideoPositionType } from "../../../mongoServer/src/typeConstant";
 
 class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
@@ -35,6 +36,20 @@ class MetadataController {
       type: "updatedContentEffects",
       header: { contentType, contentId },
       data: event.data,
+    };
+    this.broadcaster.broadcastToTable(table_id, msg);
+  };
+
+  onUpdateVideoPosition = async (event: onUpdateVideoPositionType) => {
+    await tableTopMongo.updateVideoPosition(event);
+
+    const { table_id, contentType, contentId } = event.header;
+    const { videoPosition } = event.data;
+
+    const msg = {
+      type: "updatedVideoPosition",
+      header: { contentType, contentId },
+      data: { videoPosition },
     };
     this.broadcaster.broadcastToTable(table_id, msg);
   };

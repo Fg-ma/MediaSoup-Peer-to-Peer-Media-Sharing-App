@@ -103,6 +103,8 @@ class MediaContainerController {
 
       this.aspectRatio.current = computedAspectRatio;
 
+      this.setRerender((prev) => !prev);
+
       this.tableStaticContentSocket.current?.updateContentPositioning(
         this.kind,
         this.mediaId,

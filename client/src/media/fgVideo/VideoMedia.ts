@@ -8,6 +8,7 @@ import {
   defaultVideoEffectsStyles,
   defaultAudioEffectsStyles,
   VideoEffectTypes,
+  VideoEffectStylesType,
 } from "../../context/effectsContext/typeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import UserDevice from "../../lib/UserDevice";
@@ -135,6 +136,7 @@ class VideoMedia {
     }
 
     this.faceLandmarks = new FaceLandmarks(
+      true,
       "video",
       this.videoId,
       this.deadbanding
@@ -251,11 +253,15 @@ class VideoMedia {
     //   this.hiddenVideo.muted = true;
     //   this.hiddenShakaPlayer = new shaka.Player(this.hiddenVideo);
     // }
-    this.video.onloadedmetadata = () => {
+    this.video.onloadedmetadata = async () => {
+      this.video.onloadedmetadata = null;
+
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
     };
     this.video.onloadeddata = () => {
+      this.video.onloadeddata = null;
+
       this.audioStream = (this.video as any).captureStream();
 
       if (this.audioStream && this.audioStream.getAudioTracks().length > 0) {
@@ -275,6 +281,8 @@ class VideoMedia {
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
     // Pause and cleanup video elements
+    this.video.onloadedmetadata = null;
+    this.video.onloadeddata = null;
     this.video.pause();
     this.video.srcObject = null;
 
@@ -313,6 +321,10 @@ class VideoMedia {
     // Call the BabylonScene deconstructor
     this.babylonScene?.deconstructor();
   }
+
+  updateVideoPosition = async (videoPosition: number) => {
+    this.video.currentTime = videoPosition;
+  };
 
   private getVideoListener = (message: IncomingTableStaticContentMessages) => {
     if (message.type === "chunk") {
@@ -375,43 +387,9 @@ class VideoMedia {
 
       this.removeMessageListener(this.getVideoListener);
 
-      for (const effect in this.userStreamEffects.current.video[this.videoId]
-        .video) {
-        if (
-          this.userStreamEffects.current.video[this.videoId].video[
-            effect as VideoEffectTypes
-          ]
-        ) {
-          if (effect === "hideBackground") {
-            this.babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
-              this.userEffectsStyles.current.video[this.videoId].video
-                .hideBackground.style
-            );
+      this.updateAllEffects();
 
-            this.changeEffects(effect as VideoEffectTypes);
-          } else if (effect === "postProcess") {
-            this.babylonScene.babylonShaderController.swapPostProcessEffects(
-              this.userEffectsStyles.current.video[this.videoId].video
-                .postProcess.style
-            );
-
-            this.changeEffects(effect as VideoEffectTypes);
-          } else if (effect === "tint") {
-            this.setTintColor(
-              this.userEffectsStyles.current.video[this.videoId].video.tint
-                .color
-            );
-
-            this.changeEffects(
-              effect as VideoEffectTypes,
-              this.userEffectsStyles.current.video[this.videoId].video.tint
-                .color
-            );
-          } else {
-            this.changeEffects(effect as VideoEffectTypes);
-          }
-        }
-      }
+      this.tableStaticServer.requestCatchUpVideoPosition();
     }
   };
 
@@ -600,7 +578,7 @@ class VideoMedia {
     this.deadbanding.update("capture", this.videoId, this.effects);
   };
 
-  updateAllEffects = () => {
+  updateAllEffects = (oldEffectStyles?: VideoEffectStylesType) => {
     if (!this.babylonScene) return;
 
     Object.entries(
@@ -647,30 +625,41 @@ class VideoMedia {
 
         if (effect === "tint") {
           this.setTintColor(
-            this.userEffectsStyles.current.video[this.videoId].video.tint.color
+            this.userEffectsStyles.current.video[this.videoId].video[effect]
+              .color
           );
           this.babylonScene?.toggleTintPlane(
             this.effects[effect] ?? false,
             this.hexToNormalizedRgb(
-              this.userEffectsStyles.current.video[this.videoId].video.tint
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
                 .color
             )
           );
-        }
-
-        if (effect === "pause") {
-          this.babylonScene?.togglePauseEffect(this.effects[effect] ?? false);
         }
 
         if (effect === "blur") {
           this.babylonScene?.toggleBlurEffect(this.effects[effect] ?? false);
         }
 
+        if (effect === "pause") {
+          this.babylonScene?.togglePauseEffect(this.effects[effect] ?? false);
+        }
+
         if (effect === "hideBackground") {
-          this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-            this.userEffectsStyles.current.video[this.videoId].video
-              .hideBackground.style
-          );
+          if (
+            this.userEffectsStyles.current.video[this.videoId].video[effect]
+              .style === "color"
+          ) {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
+                .color
+            );
+          } else {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
+                .style
+            );
+          }
 
           this.babylonScene?.toggleHideBackgroundPlane(
             this.effects[effect] ?? false
@@ -679,7 +668,7 @@ class VideoMedia {
 
         if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.swapPostProcessEffects(
-            this.userEffectsStyles.current.video[this.videoId].video.postProcess
+            this.userEffectsStyles.current.video[this.videoId].video[effect]
               .style
           );
 
@@ -687,41 +676,102 @@ class VideoMedia {
             this.effects[effect] ?? false
           );
         }
-      } else {
-        if (effect === "tint") {
+      } else if (this.effects[effect as EffectType] && value) {
+        if (
+          validEffectTypes.includes(effect as EffectType) &&
+          (!oldEffectStyles ||
+            oldEffectStyles[effect as EffectType].style !==
+              this.userEffectsStyles.current.video[this.videoId].video[
+                effect as EffectType
+              ].style)
+        ) {
+          if (
+            effect !== "masks" ||
+            this.userEffectsStyles.current.video[this.videoId].video.masks
+              .style !== "baseMask"
+          ) {
+            this.babylonScene?.deleteEffectMeshes(effect);
+
+            this.drawNewEffect(effect as EffectType);
+          } else {
+            this.babylonScene?.deleteEffectMeshes(effect);
+
+            if (this.effects[effect]) {
+              for (let i = 0; i < this.maxFaces[0]; i++) {
+                this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
+              }
+            }
+          }
+        }
+
+        if (
+          effect === "tint" &&
+          (!oldEffectStyles ||
+            oldEffectStyles[effect].color !==
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
+                .color)
+        ) {
+          this.babylonScene?.toggleTintPlane(false);
+
           this.setTintColor(
-            this.userEffectsStyles.current.video[this.videoId].video.tint.color
+            this.userEffectsStyles.current.video[this.videoId].video[effect]
+              .color
           );
           this.babylonScene?.toggleTintPlane(
             this.effects[effect] ?? false,
             this.hexToNormalizedRgb(
-              this.userEffectsStyles.current.video[this.videoId].video.tint
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
                 .color
             )
           );
         }
 
-        if (effect === "pause") {
-          this.babylonScene?.togglePauseEffect(this.effects[effect] ?? false);
-        }
+        if (
+          effect === "hideBackground" &&
+          (!oldEffectStyles ||
+            oldEffectStyles[effect].color !==
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
+                .color ||
+            oldEffectStyles[effect].style !==
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
+                .style)
+        ) {
+          this.babylonScene?.toggleHideBackgroundPlane(false);
 
-        if (effect === "hideBackground") {
-          this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-            this.userEffectsStyles.current.video[this.videoId].video
-              .hideBackground.style
-          );
-
+          if (
+            this.userEffectsStyles.current.video[this.videoId].video[effect]
+              .style === "color"
+          ) {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
+                .color
+            );
+          } else {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
+                .style
+            );
+          }
           this.babylonScene?.toggleHideBackgroundPlane(
             this.effects[effect] ?? false
           );
         }
 
-        if (effect === "postProcess") {
-          this.babylonScene?.babylonShaderController.swapPostProcessEffects(
-            this.userEffectsStyles.current.video[this.videoId].video.postProcess
-              .style
+        if (
+          effect === "postProcess" &&
+          (!oldEffectStyles ||
+            oldEffectStyles[effect].style !==
+              this.userEffectsStyles.current.video[this.videoId].video[effect]
+                .style)
+        ) {
+          this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+            false
           );
 
+          this.babylonScene?.babylonShaderController.swapPostProcessEffects(
+            this.userEffectsStyles.current.video[this.videoId].video[effect]
+              .style
+          );
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
             this.effects[effect] ?? false
           );

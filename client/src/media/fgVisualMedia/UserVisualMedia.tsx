@@ -165,7 +165,7 @@ export default function UserVisualMedia({
     };
   }>({});
 
-  const [aspectRatio, setAspectRatio] = useState(
+  const aspectRatio = useRef(
     userMedia.current[type][visualMediaId].aspectRatio ?? 1 - 0.01
   );
 
@@ -177,7 +177,7 @@ export default function UserVisualMedia({
     position: { left: 32.5, top: 32.5 },
     scale: {
       x: 35,
-      y: 35 / aspectRatio,
+      y: 35 / aspectRatio.current,
     },
     rotation: 0,
   });
@@ -297,7 +297,7 @@ export default function UserVisualMedia({
     leaveVisualMediaTimer,
     visualMediaMovementTimeout,
     setRerender,
-    setAspectRatio,
+    aspectRatio,
     mediasoupSocket
   );
 

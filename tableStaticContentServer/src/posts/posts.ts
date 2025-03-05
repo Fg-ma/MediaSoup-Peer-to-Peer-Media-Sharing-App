@@ -169,6 +169,7 @@ class Posts {
           style: "beardedDragon",
         },
       },
+      videoPosition: 0,
     });
 
     broadcaster.broadcastToTable(table_id, {

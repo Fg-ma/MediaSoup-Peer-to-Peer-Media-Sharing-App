@@ -7,6 +7,7 @@ import TableText from "./lib/text/TableText";
 import {
   onUpdateContentEffectsType,
   onUpdateContentPositioningType,
+  onUpdateVideoPositionType,
   TableContentTypes,
 } from "./typeConstant";
 import { ImageEffectStylesType } from "./lib/images/typeConstant";
@@ -178,6 +179,17 @@ class TableTopMongo {
       default:
         break;
     }
+  };
+
+  updateVideoPosition = async (event: onUpdateVideoPositionType) => {
+    const { table_id, contentId } = event.header;
+
+    this.tableVideos?.uploads.editMetaData(
+      { table_id, videoId: contentId },
+      {
+        videoPosition: event.data.videoPosition,
+      }
+    );
   };
 }
 

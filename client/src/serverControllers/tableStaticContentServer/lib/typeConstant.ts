@@ -25,7 +25,8 @@ export type OutGoingTableStaticContentMessages =
   | onDeleteContentType
   | onGetFileType
   | onUpdateContentPositioningType
-  | onUpdateContentEffectsType;
+  | onUpdateContentEffectsType
+  | onUpdateVideoPositionType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -118,6 +119,18 @@ type onUpdateContentEffectsType = {
   };
 };
 
+type onUpdateVideoPositionType = {
+  type: "updateVideoPosition";
+  header: {
+    table_id: string;
+    contentType: "video";
+    contentId: string;
+  };
+  data: {
+    videoPosition: number;
+  };
+};
+
 export type TableContentTypes =
   | "video"
   | "image"
@@ -135,7 +148,8 @@ export type IncomingTableStaticContentMessages =
   | onDownloadCompleteType
   | onResponsedCatchUpTableDataType
   | onContentDeletedType
-  | onUpdatedContentEffectsType;
+  | onUpdatedContentEffectsType
+  | onUpdatedVideoPositionType;
 
 export type onOriginalVideoReadyType = {
   type: "originalVideoReady";
@@ -244,6 +258,7 @@ export type onResponsedCatchUpTableDataType = {
           };
           effects: { [effectType in VideoEffectTypes]: boolean };
           effectStyles: VideoEffectStylesType;
+          videoPosition: number;
         }[]
       | undefined;
     text:
@@ -328,5 +343,16 @@ export type onUpdatedContentEffectsType = {
       | VideoEffectStylesType
       | ImageEffectStylesType
       | ApplicationEffectStylesType;
+  };
+};
+
+export type onUpdatedVideoPositionType = {
+  type: "updatedVideoPosition";
+  header: {
+    contentType: "video";
+    contentId: string;
+  };
+  data: {
+    videoPosition: number;
   };
 };

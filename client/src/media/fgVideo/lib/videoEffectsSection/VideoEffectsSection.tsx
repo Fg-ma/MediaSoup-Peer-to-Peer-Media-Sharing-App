@@ -256,15 +256,13 @@ export default function VideoEffectsSection({
                   color
                 );
 
-                if (effectsStyles.style !== "color" || !streamEffects) {
-                  effectsStyles.style = "color";
-                  effectsStyles.color = color;
+                effectsStyles.style = "color";
+                effectsStyles.color = color;
 
-                  await lowerVideoController.handleVideoEffect(
-                    "hideBackground",
-                    streamEffects
-                  );
-                }
+                await lowerVideoController.handleVideoEffect(
+                  "hideBackground",
+                  streamEffects
+                );
               }}
             />
           </Suspense>

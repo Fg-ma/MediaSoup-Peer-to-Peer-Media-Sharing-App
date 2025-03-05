@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { HideBackgroundEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
@@ -41,7 +41,9 @@ export default function HideBackgroundButton({
 }) {
   const [closeHoldToggle, setCloseHoldToggle] = useState(false);
   const hideBackgroundContainerRef = useRef<HTMLDivElement>(null);
-  const colorRef = useRef("#d40213");
+  const colorRef = useRef(effectsStyles.color);
+
+  const [_, setRerender] = useState(false);
 
   const clickFunction = async () => {
     setEffectsDisabled(true);
@@ -81,6 +83,11 @@ export default function HideBackgroundButton({
 
     setEffectsDisabled(false);
   };
+
+  useEffect(() => {
+    colorRef.current = effectsStyles.color;
+    setRerender((prev) => !prev);
+  }, [effectsStyles.color]);
 
   return (
     <>
@@ -191,6 +198,7 @@ export default function HideBackgroundButton({
         scrollingContainerRef={scrollingContainerRef}
         handleAcceptColorCallback={handleAcceptColorCallback}
         externalColorRef={colorRef}
+        defaultColor={colorRef.current}
         disabled={effectsDisabled}
       />
     </>

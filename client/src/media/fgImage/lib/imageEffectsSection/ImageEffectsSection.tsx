@@ -226,12 +226,18 @@ export default function ImageEffectsSection({
                 const streamEffects =
                   userStreamEffects.current.image[imageId].hideBackground;
 
-                effectsStyles.style = effectType;
-                userMedia.current.image[
-                  imageId
-                ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-                  effectType
-                );
+                userEffectsStyles.current.image[imageId].hideBackground.style =
+                  effectType;
+
+                if (effectType !== "color") {
+                  imageMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                    effectType
+                  );
+                } else {
+                  imageMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                    effectsStyles.color
+                  );
+                }
 
                 await lowerImageController.handleImageEffect(
                   "hideBackground",
@@ -244,21 +250,17 @@ export default function ImageEffectsSection({
                 const streamEffects =
                   userStreamEffects.current.image[imageId].hideBackground;
 
-                userMedia.current.image[
-                  imageId
-                ].babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                imageMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                   color
                 );
 
-                if (effectsStyles.style !== "color" || !streamEffects) {
-                  effectsStyles.style = "color";
-                  effectsStyles.color = color;
+                effectsStyles.style = "color";
+                effectsStyles.color = color;
 
-                  await lowerImageController.handleImageEffect(
-                    "hideBackground",
-                    streamEffects
-                  );
-                }
+                await lowerImageController.handleImageEffect(
+                  "hideBackground",
+                  streamEffects
+                );
               }}
             />
           </Suspense>

@@ -42,6 +42,7 @@ class Uploads {
       [effectType in VideoEffectTypes]: boolean;
     };
     effectStyles: VideoEffectStylesType;
+    videoPosition: number;
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
@@ -62,6 +63,7 @@ class Uploads {
       };
       effects?: { [effectType in VideoEffectTypes]?: boolean };
       effectStyles?: VideoEffectStylesType;
+      videoPosition?: number;
     }>
   ) => {
     if (!this.tableVideosCollection) {
@@ -136,6 +138,13 @@ class Uploads {
         "7": { s: hatsEffectEncodingMap[updateData.effectStyles.hats.style] },
         "8": { s: petsEffectEncodingMap[updateData.effectStyles.pets.style] },
       };
+    }
+
+    if (
+      updateData.videoPosition &&
+      typeof updateData.videoPosition === "number"
+    ) {
+      updateFields["vp"] = updateData.videoPosition;
     }
 
     try {

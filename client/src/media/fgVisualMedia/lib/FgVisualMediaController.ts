@@ -72,7 +72,7 @@ class FgVisualMediaController {
       NodeJS.Timeout | undefined
     >,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
-    private setAspectRatio: React.Dispatch<React.SetStateAction<number>>,
+    private aspectRatio: React.MutableRefObject<number>,
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
     >
@@ -111,12 +111,12 @@ class FgVisualMediaController {
 
   handleVideoMetadataLoaded = (videoElement: HTMLVideoElement) => {
     if (videoElement) {
-      const aspectRatio = videoElement.videoWidth / videoElement.videoHeight;
+      const newAspectRatio = videoElement.videoWidth / videoElement.videoHeight;
 
       // Update the positioning scale based on the aspect ratio
       this.positioning.current.scale.y =
-        this.positioning.current.scale.x / aspectRatio;
-      this.setAspectRatio(aspectRatio);
+        this.positioning.current.scale.x / newAspectRatio;
+      this.aspectRatio.current = newAspectRatio;
     }
   };
 

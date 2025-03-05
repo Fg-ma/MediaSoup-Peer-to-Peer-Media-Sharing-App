@@ -1,5 +1,4 @@
 import {
-  broadcaster,
   cleanup,
   gets,
   metadataController,
@@ -33,6 +32,9 @@ const handleMessage = (
       break;
     case "updateContentEffects":
       metadataController.onUpdateContentEffects(event);
+      break;
+    case "updateVideoPosition":
+      metadataController.onUpdateVideoPosition(event);
       break;
     default:
       break;

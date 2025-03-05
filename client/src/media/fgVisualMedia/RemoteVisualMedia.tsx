@@ -186,7 +186,7 @@ export default function RemoteVisualMedia({
     rotation: 0,
   });
 
-  const [aspectRatio, setAspectRatio] = useState(0);
+  const aspectRatio = useRef(0);
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
@@ -307,7 +307,7 @@ export default function RemoteVisualMedia({
     leaveVisualMediaTimer,
     visualMediaMovementTimeout,
     setRerender,
-    setAspectRatio,
+    aspectRatio,
     mediasoupSocket
   );
 

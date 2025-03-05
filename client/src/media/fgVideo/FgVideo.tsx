@@ -82,8 +82,6 @@ export default function FgVideo({
   const recording = useRef(false);
   const downloadRecordingReady = useRef(false);
 
-  const initTimeOffset = useRef(0);
-
   const [_rerender, setRerender] = useState(false);
 
   const positioningListeners = useRef<{
@@ -119,7 +117,6 @@ export default function FgVideo({
     userStreamEffects,
     userEffectsStyles,
     userMedia,
-    initTimeOffset,
     setSettingsActive,
     recording,
     downloadRecordingReady,
@@ -140,7 +137,9 @@ export default function FgVideo({
     userStreamEffects,
     userEffectsStyles,
     tintColor,
-    setRerender
+    paused,
+    setPausedState,
+    lowerVideoController
   );
 
   useEffect(() => {

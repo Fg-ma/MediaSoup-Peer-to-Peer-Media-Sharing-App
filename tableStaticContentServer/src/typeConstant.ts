@@ -2,6 +2,7 @@ import uWS from "uWebSockets.js";
 import { ImageEffectStylesType } from "../../mongoServer/src/lib/images/typeConstant";
 import { ApplicationEffectStylesType } from "../../mongoServer/src/lib/applications/typeConstant";
 import { VideoEffectStylesType } from "../../mongoServer/src/lib/videos/typeConstant";
+import { onUpdateLastPauseType } from "../../mongoServer/src/typeConstant";
 
 export interface Tables {
   [table_id: string]: {
@@ -94,7 +95,8 @@ export type MessageTypes =
   | onDeleteContentType
   | onGetFileType
   | onUpdateContentPositioningType
-  | onUpdateContentEffectsType;
+  | onUpdateContentEffectsType
+  | onUpdateLastPauseType;
 
 export type onJoinTableType = {
   type: "joinTable";

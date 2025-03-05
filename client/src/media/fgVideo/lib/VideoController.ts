@@ -3,6 +3,7 @@ import VideoMedia from "../VideoMedia";
 import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
+  onUpdatedVideoPositionType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
   UserEffectsStylesType,
@@ -10,6 +11,7 @@ import {
   VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../context/effectsContext/typeConstant";
+import LowerVideoController from "./lowerVideoControls/LowerVideoController";
 
 class VideoController {
   constructor(
@@ -21,7 +23,9 @@ class VideoController {
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private tintColor: React.MutableRefObject<string>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private paused: React.MutableRefObject<boolean>,
+    private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
+    private lowerVideoController: LowerVideoController
   ) {}
 
   init = () => {
@@ -75,6 +79,10 @@ class VideoController {
         [effectType in VideoEffectTypes]: boolean;
       };
 
+      const oldEffectStyle = structuredClone(
+        this.userEffectsStyles.current.video[this.videoId].video
+      );
+
       if (effectStyles !== undefined) {
         this.userEffectsStyles.current.video[this.videoId].video =
           effectStyles as VideoEffectStylesType;
@@ -82,9 +90,33 @@ class VideoController {
         this.tintColor.current = effectStyles.tint.color;
       }
 
-      this.videoMedia.updateAllEffects();
+      this.videoMedia.updateAllEffects(oldEffectStyle);
 
-      this.setRerender((prev) => !prev);
+      if (this.userStreamEffects.current.video[this.videoId].video.pause) {
+        this.paused.current = true;
+        if (!this.videoMedia.video.paused) {
+          this.videoMedia.video.pause();
+        }
+
+        this.setPausedState(true);
+      } else {
+        this.paused.current = false;
+        if (this.videoMedia.video.paused) {
+          this.videoMedia.video.play();
+        }
+
+        this.setPausedState(false);
+      }
+    }
+  };
+
+  onUpdateVideoPosition = (event: onUpdatedVideoPositionType) => {
+    const { contentType, contentId } = event.header;
+
+    if (contentType === "video" && contentId === this.videoId) {
+      this.videoMedia.updateVideoPosition(event.data.videoPosition);
+
+      this.lowerVideoController.timeUpdate();
     }
   };
 
@@ -94,6 +126,9 @@ class VideoController {
     switch (event.type) {
       case "updatedContentEffects":
         this.onUpdatedContentEffects(event);
+        break;
+      case "updatedVideoPosition":
+        this.onUpdateVideoPosition(event);
         break;
       default:
         break;

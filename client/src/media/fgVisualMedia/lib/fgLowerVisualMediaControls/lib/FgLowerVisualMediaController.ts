@@ -122,7 +122,7 @@ class FgLowerVisualMediaController {
       };
       rotation: number;
     }>,
-    private aspectRatio: number,
+    private aspectRatio: React.MutableRefObject<number>,
     private screenAudioStream?: MediaStream
   ) {
     this.initTime = Date.now();
@@ -437,7 +437,7 @@ class FgLowerVisualMediaController {
       },
       referencePoint,
       referencePoint,
-      this.aspectRatio
+      this.aspectRatio.current
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };

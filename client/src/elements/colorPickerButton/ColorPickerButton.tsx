@@ -38,6 +38,14 @@ export default function ColorPickerButton({
     setTempColor(colorRef.current);
   }, [defaultColor]);
 
+  useEffect(() => {
+    if (!externalColorRef) return;
+
+    colorRef.current = externalColorRef.current;
+    setColor(colorRef.current);
+    setTempColor(colorRef.current);
+  }, [externalColorRef?.current]);
+
   return (
     <div
       className={`${className} flex items-center justify-center !aspect-square`}

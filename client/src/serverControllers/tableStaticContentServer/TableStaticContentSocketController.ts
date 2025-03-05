@@ -221,6 +221,24 @@ class TableStaticContentSocketController {
     });
   };
 
+  updateVideoPosition = (
+    contentType: "video",
+    contentId: string,
+    videoPosition: number
+  ) => {
+    this.sendMessage({
+      type: "updateVideoPosition",
+      header: {
+        table_id: this.table_id,
+        contentType,
+        contentId,
+      },
+      data: {
+        videoPosition,
+      },
+    });
+  };
+
   private handleMessage = (
     message: { type: undefined } | IncomingTableStaticContentMessages
   ) => {

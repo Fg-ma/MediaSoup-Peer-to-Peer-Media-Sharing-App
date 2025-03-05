@@ -68,6 +68,7 @@ class CameraMedia {
     }
 
     this.faceLandmarks = new FaceLandmarks(
+      false,
       "camera",
       this.cameraId,
       this.deadbanding

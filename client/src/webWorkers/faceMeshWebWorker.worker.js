@@ -86,7 +86,8 @@ class FaceMeshWebWorker {
       multiFaceLandmarks.push(
         face.scaledMesh.map(([x, y, z], landmarkIndex) => {
           // Normalize coordinates
-          const normX = (x / event.data.width) * 2 - 1;
+          const normX =
+            ((x / event.data.width) * 2 - 1) * (event.data.flipped ? 1 : -1);
           const normY = ((y / event.data.height) * 2 - 1) * -1;
           const adjustedZ = (z - Math.min(...zValues)) / (zRange || 1);
 

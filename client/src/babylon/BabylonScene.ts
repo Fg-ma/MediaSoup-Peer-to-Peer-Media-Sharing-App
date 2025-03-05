@@ -119,6 +119,8 @@ class BabylonScene {
   private screenShotSuccessCallbacks: (() => void)[] = [];
   private videoSuccessCallbacks: (() => void)[] = [];
 
+  private flip: boolean;
+
   constructor(
     private id: string,
     private type:
@@ -154,6 +156,8 @@ class BabylonScene {
     private maxFaces: [number],
     private userMedia: React.MutableRefObject<UserMediaType> | undefined
   ) {
+    this.flip = this.type === "camera" || this.type === "capture";
+
     this.engine = new Engine(this.canvas, true);
 
     this.scene = new Scene(this.engine);
@@ -184,6 +188,7 @@ class BabylonScene {
     );
 
     this.babylonRenderLoop = new BabylonRenderLoop(
+      this.flip,
       this.scene,
       this.camera,
       this.faceLandmarks,
@@ -249,10 +254,10 @@ class BabylonScene {
     if (
       !(
         this.backgroundMedia instanceof HTMLImageElement &&
-        this.imageAlreadyProcessed > 20
+        this.imageAlreadyProcessed > 100
       )
     ) {
-      if (this.imageAlreadyProcessed <= 20) {
+      if (this.imageAlreadyProcessed <= 100) {
         this.imageAlreadyProcessed += 1;
       }
 
@@ -334,7 +339,7 @@ class BabylonScene {
 
     // Update the plane scaling
     plane.scaling = new Vector3(
-      (this.type === "camera" || this.type === "capture" ? -1 : 1) * planeWidth,
+      (this.flip ? -1 : 1) * planeWidth,
       planeScaledHeight,
       1
     );

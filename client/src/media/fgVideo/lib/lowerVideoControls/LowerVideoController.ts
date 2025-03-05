@@ -38,7 +38,6 @@ class LowerVideoController {
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private initTimeOffset: React.MutableRefObject<number>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private recording: React.MutableRefObject<boolean>,
     private downloadRecordingReady: React.MutableRefObject<boolean>,
@@ -135,6 +134,12 @@ class LowerVideoController {
       case "arrowdown":
         this.volumeControl(-0.05);
         break;
+      case "arrowleft":
+        this.skipInVideo(-5);
+        break;
+      case "arrowright":
+        this.skipInVideo(5);
+        break;
       case "d":
         this.handleDownload();
         break;
@@ -181,6 +186,22 @@ class LowerVideoController {
     }
   };
 
+  skipInVideo = (amount: number) => {
+    this.videoMedia.video.currentTime = Math.max(
+      0,
+      Math.min(
+        this.videoMedia.video.currentTime + amount,
+        this.videoMedia.video.duration
+      )
+    );
+
+    this.tableStaticContentSocket.current?.updateVideoPosition(
+      "video",
+      this.videoId,
+      this.videoMedia.video.currentTime
+    );
+  };
+
   handlePausePlay = () => {
     this.handleVideoEffect("pause", false);
 
@@ -192,6 +213,12 @@ class LowerVideoController {
     }
 
     this.setPausedState((prev) => !prev);
+
+    this.tableStaticContentSocket.current?.updateVideoPosition(
+      "video",
+      this.videoId,
+      this.videoMedia.video.currentTime
+    );
   };
 
   handlePictureInPicture = (action: string) => {
@@ -204,8 +231,7 @@ class LowerVideoController {
 
   timeUpdate = () => {
     if (this.currentTimeRef.current) {
-      const currentTime =
-        this.videoMedia.video.currentTime + this.initTimeOffset.current / 1000;
+      const currentTime = this.videoMedia.video.currentTime;
       const percent = currentTime / this.videoMedia.video.duration;
 
       this.currentTimeRef.current.textContent =
@@ -264,6 +290,12 @@ class LowerVideoController {
           !this.userStreamEffects.current.video[this.videoId].video[effect];
       }
 
+      this.userMedia.current.video[this.videoId].changeEffects(
+        effect,
+        this.tintColor.current,
+        blockStateChange
+      );
+
       this.tableStaticContentSocket.current?.updateContentEffects(
         "video",
         this.videoId,
@@ -280,10 +312,6 @@ class LowerVideoController {
         this.userEffectsStyles.current.video[this.videoId].video
       );
     }
-  };
-
-  setInitTimeOffset = (offset: number) => {
-    this.initTimeOffset.current = offset;
   };
 
   handleDownload = () => {
@@ -366,6 +394,12 @@ class LowerVideoController {
     this.videoContainerRef.current?.classList.remove("scrubbing");
     this.videoMedia.video.currentTime =
       percent * this.videoMedia.video.duration;
+
+    this.tableStaticContentSocket.current?.updateVideoPosition(
+      "video",
+      this.videoId,
+      this.videoMedia.video.currentTime
+    );
 
     if (!this.wasPaused.current) {
       this.videoMedia.video.play();

@@ -119,7 +119,7 @@ export default function FgMediaContainer({
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
 
-  const [_rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
 
   const positioningListeners = useRef<{
     [username: string]: {
@@ -193,7 +193,9 @@ export default function FgMediaContainer({
 
   useEffect(() => {
     mediaContainerController.attachPositioningListeners();
+  }, [JSON.stringify(remoteDataStreams.current)]);
 
+  useEffect(() => {
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
       mediaContainerController.handleMediasoupMessage

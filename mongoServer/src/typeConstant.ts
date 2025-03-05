@@ -103,3 +103,13 @@ export type onUpdateContentEffectsType = {
       | ApplicationEffectStylesType;
   };
 };
+
+export type onUpdateVideoPositionType = {
+  type: "updateVideoPosition";
+  header: {
+    table_id: string;
+    contentType: "video";
+    contentId: string;
+  };
+  data: { videoPosition: number };
+};

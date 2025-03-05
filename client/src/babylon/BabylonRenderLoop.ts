@@ -45,7 +45,10 @@ class BabylonRenderLoop {
 
   private detectFacesTimeout = 1000;
 
+  private hidebackgroundType: "image" | "color" = "image";
+
   constructor(
+    private flip: boolean,
     private scene: Scene,
     private camera: UniversalCamera,
     private faceLandmarks: FaceLandmarks | undefined,
@@ -97,20 +100,21 @@ class BabylonRenderLoop {
         willReadFrequently: true,
       });
     this.hideBackgroundOffscreenCanvas.width = 320;
-    this.hideBackgroundOffscreenCanvas.height = 180;
+    this.hideBackgroundOffscreenCanvas.height = (320 / this.canvas.width) * 180;
 
     this.hideBackgroundCanvas = document.createElement("canvas");
-    if (this.backgroundMedia instanceof HTMLImageElement) {
-      this.hideBackgroundCanvas.width = this.canvas.width;
-      this.hideBackgroundCanvas.height = this.canvas.height;
-    }
+    this.hideBackgroundCanvas.width = this.canvas.width;
+    this.hideBackgroundCanvas.height = this.canvas.height;
 
     this.hideBackgroundCtx = this.hideBackgroundCanvas.getContext("2d", {
       alpha: true,
       willReadFrequently: true,
     });
 
-    this.tempHideBackgroundCanvas = new OffscreenCanvas(320, 180);
+    this.tempHideBackgroundCanvas = new OffscreenCanvas(
+      320,
+      (320 / this.canvas.width) * 180
+    );
     this.tempHideBackgroundCtx = this.tempHideBackgroundCanvas.getContext(
       "2d",
       { alpha: true, willReadFrequently: true }
@@ -220,6 +224,7 @@ class BabylonRenderLoop {
             this.effectsStyles.masks.style === "baseMask"
               ? true
               : false,
+          flipped: this.flip,
         });
       }
       if (
@@ -233,7 +238,7 @@ class BabylonRenderLoop {
 
         this.faceDetectionWorker?.postMessage({
           message: "FRAME",
-          data: buffer, // Send the ArrayBuffer
+          data: buffer,
           width: this.offscreenCanvas.width,
           height: this.offscreenCanvas.height,
         });
@@ -369,10 +374,7 @@ class BabylonRenderLoop {
 
     this.hideBackgroundCtx.globalCompositeOperation = "source-atop";
 
-    if (
-      "hideBackground" in this.effectsStyles &&
-      this.effectsStyles.hideBackground.style !== "color"
-    ) {
+    if (this.hidebackgroundType === "image") {
       this.hideBackgroundCtx.drawImage(
         this.hideBackgroundEffectImage,
         0,
@@ -427,12 +429,14 @@ class BabylonRenderLoop {
   swapHideBackgroundEffectImage = (
     hideBackgroundEffect: HideBackgroundEffectTypes
   ) => {
+    this.hidebackgroundType = "image";
     const src = hideBackgroundEffectImagesMap[hideBackgroundEffect];
     if (src && src !== this.hideBackgroundEffectImage.src)
       this.hideBackgroundEffectImage.src = src;
   };
 
   swapHideBackgroundContextFillColor = (color: string) => {
+    this.hidebackgroundType = "color";
     if (this.hideBackgroundCtx) {
       this.hideBackgroundCtx.fillStyle = color;
       this.hideBackgroundCtxFillStyle = color;

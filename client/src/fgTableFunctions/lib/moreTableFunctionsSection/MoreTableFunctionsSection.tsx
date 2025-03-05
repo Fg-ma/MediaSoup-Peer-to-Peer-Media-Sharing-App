@@ -145,10 +145,12 @@ export default function MoreTableFunctionsSection({
                 />
               </Suspense>
             )}
-            <CaptureMediaButton
-              captureMediaActive={captureMediaActive}
-              setCaptureMediaActive={setCaptureMediaActive}
-            />
+            {table_id.current && username.current && (
+              <CaptureMediaButton
+                captureMediaActive={captureMediaActive}
+                setCaptureMediaActive={setCaptureMediaActive}
+              />
+            )}
             {
               // Clock
               // Weather

@@ -64,6 +64,7 @@ class Decoder {
         s: number;
       };
     };
+    vp: number;
   }): {
     table_id: string;
     videoId: string;
@@ -84,8 +85,9 @@ class Decoder {
       [effectType in VideoEffectTypes]: boolean;
     };
     effectStyles: VideoEffectStylesType;
+    videoPosition: number;
   } => {
-    const { tid, vid, n, m, p, e, es } = data;
+    const { tid, vid, n, m, p, e, es, vp } = data;
 
     const effects = Object.keys(videoEffectEncodingMap).reduce((acc, key) => {
       const value = videoEffectEncodingMap[key as VideoEffectTypes];
@@ -140,6 +142,7 @@ class Decoder {
           style: petsEffectDecodingMap[es["8"].s],
         },
       },
+      videoPosition: vp,
     };
   };
 }

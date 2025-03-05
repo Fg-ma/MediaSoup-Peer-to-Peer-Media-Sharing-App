@@ -53,6 +53,7 @@ class CaptureMedia {
     this.canvas.classList.add("babylonJS-canvas");
 
     this.faceLandmarks = new FaceLandmarks(
+      false,
       "capture",
       this.captureId,
       this.deadbanding

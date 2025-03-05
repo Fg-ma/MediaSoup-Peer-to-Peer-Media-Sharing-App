@@ -25,7 +25,7 @@ export default function VisualMediaAdjustmentButtons({
     rotation: number;
   }>;
   fgContentAdjustmentController: FgContentAdjustmentController;
-  aspectRatio: number | undefined;
+  aspectRatio: React.MutableRefObject<number>;
 }) {
   return (
     <>
@@ -133,7 +133,7 @@ export default function VisualMediaAdjustmentButtons({
             displacement,
             referencePoint,
             referencePoint,
-            aspectRatio
+            aspectRatio.current
           );
         }}
         bundleRef={bundleRef}

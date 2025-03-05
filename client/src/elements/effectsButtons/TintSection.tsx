@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
@@ -27,6 +27,12 @@ export default function TintSection({
   clickFunctionCallback?: () => Promise<void>;
   acceptColorCallback?: () => Promise<void>;
 }) {
+  const [_, setRerender] = useState(false);
+
+  useEffect(() => {
+    setRerender((prev) => !prev);
+  }, [tintColor.current]);
+
   return (
     <>
       <FgButton
@@ -69,6 +75,7 @@ export default function TintSection({
 
           setEffectsDisabled(false);
         }}
+        defaultColor={tintColor.current}
         externalColorRef={tintColor}
         disabled={effectsDisabled}
       />

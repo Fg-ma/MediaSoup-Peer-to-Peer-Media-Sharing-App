@@ -94,6 +94,7 @@ class FaceLandmarks {
   private faceTrackers: Point2D[] = [{ x: 0, y: 0 }];
 
   constructor(
+    private flip: boolean,
     private type: DeadbandingMediaTypes,
     private id: string,
     private deadbanding: Deadbanding
@@ -197,7 +198,7 @@ class FaceLandmarks {
     rightNoseBase: NormalizedLandmark
   ) => {
     // Calculate the difference in coordinated of eyes
-    const dxEyes = leftEye.x - rightEye.x;
+    const dxEyes = (leftEye.x - rightEye.x) * (this.flip ? -1 : 1);
     const dyEyes = rightEye.y - leftEye.y;
     const dzEyes = leftEye.z - rightEye.z;
 
@@ -212,7 +213,7 @@ class FaceLandmarks {
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headYawAngles",
       faceId,
-      Math.atan2(dzEyes, dxEyes) / 1.4
+      (Math.atan2(dzEyes, dxEyes) / 1.4) * (this.flip ? -1 : 1)
     );
 
     // Calculate the pitch using the distances between points
