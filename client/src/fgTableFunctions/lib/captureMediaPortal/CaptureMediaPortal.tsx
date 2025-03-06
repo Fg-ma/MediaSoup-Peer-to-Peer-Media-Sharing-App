@@ -82,6 +82,8 @@ export default function CaptureMediaPortal({
   const isScrubbing = useRef(false);
   const wasPaused = useRef(false);
 
+  const [_, setRerender] = useState(false);
+
   const captureMediaController = new CaptureMediaController(
     table_id,
     captureStreamEffects,
@@ -112,7 +114,8 @@ export default function CaptureMediaPortal({
     timelineContainerRef,
     isScrubbing,
     wasPaused,
-    setCaptureMediaActive
+    setCaptureMediaActive,
+    setRerender
   );
 
   useEffect(() => {
@@ -206,7 +209,7 @@ export default function CaptureMediaPortal({
                 largestDim === "width" ? "w-full" : "h-full"
               } max-w-[95%] max-h-[95%] rounded-md overflow-hidden relative pointer-events-auto bg-transparent`}
               style={{
-                aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
+                aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight} !important`,
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
@@ -255,11 +258,7 @@ export default function CaptureMediaPortal({
                     captureMediaController={captureMediaController}
                   />
                   <div
-                    className={`${
-                      mediaType !== "camera"
-                        ? "justify-between"
-                        : "justify-start"
-                    } flex h-full items-center pr-3 overflow-hidden`}
+                    className='flex justify-between h-full items-center pr-3 overflow-hidden'
                     style={{ width: `calc(50% - ${controlsHeight / 2}px` }}
                   >
                     <EffectsButton
@@ -267,20 +266,19 @@ export default function CaptureMediaPortal({
                       captureMediaEffectsActive={captureMediaEffectsActive}
                       captureMediaTypeActive={captureMediaTypeActive}
                     />
-                    {mediaType !== "camera" && (
-                      <SettingsButton
-                        captureMediaController={captureMediaController}
-                        captureMediaEffectsActive={captureMediaEffectsActive}
-                        captureMediaTypeActive={captureMediaTypeActive}
-                        settingsActive={settingsActive}
-                        setSettingsActive={setSettingsActive}
-                        activePages={activePages}
-                        setActivePages={setActivePages}
-                        settings={settings}
-                        setSettings={setSettings}
-                        finalizeCapture={finalizeCapture}
-                      />
-                    )}
+                    <SettingsButton
+                      captureMediaController={captureMediaController}
+                      captureMediaEffectsActive={captureMediaEffectsActive}
+                      captureMediaTypeActive={captureMediaTypeActive}
+                      settingsActive={settingsActive}
+                      setSettingsActive={setSettingsActive}
+                      activePages={activePages}
+                      setActivePages={setActivePages}
+                      settings={settings}
+                      setSettings={setSettings}
+                      finalizeCapture={finalizeCapture}
+                      mediaType={mediaType}
+                    />
                   </div>
                 </div>
               </div>
@@ -394,6 +392,7 @@ export default function CaptureMediaPortal({
                         settings={settings}
                         setSettings={setSettings}
                         finalizeCapture={finalizeCapture}
+                        mediaType={mediaType}
                       />
                     )}
                   </div>

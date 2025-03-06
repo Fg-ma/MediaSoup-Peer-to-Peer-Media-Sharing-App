@@ -101,6 +101,7 @@ export default function VideoSpeedPage({
             rangeMin: 0,
             precision: 2,
             orientation: "horizontal",
+            tickLabels: false,
           }}
         />
         {Object.entries(videoSpeedSelections)

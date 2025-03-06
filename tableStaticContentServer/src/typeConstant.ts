@@ -2,7 +2,8 @@ import uWS from "uWebSockets.js";
 import { ImageEffectStylesType } from "../../mongoServer/src/lib/images/typeConstant";
 import { ApplicationEffectStylesType } from "../../mongoServer/src/lib/applications/typeConstant";
 import { VideoEffectStylesType } from "../../mongoServer/src/lib/videos/typeConstant";
-import { onUpdateLastPauseType } from "../../mongoServer/src/typeConstant";
+import { onUpdateVideoPositionType } from "../../mongoServer/src/typeConstant";
+import { StaticContentTypes } from "../../universal/typeConstant";
 
 export interface Tables {
   [table_id: string]: {
@@ -11,13 +12,6 @@ export interface Tables {
     };
   };
 }
-
-export type TableContentTypes =
-  | "video"
-  | "image"
-  | "soundClip"
-  | "application"
-  | "text";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"
@@ -96,7 +90,9 @@ export type MessageTypes =
   | onGetFileType
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
-  | onUpdateLastPauseType;
+  | onUpdateVideoPositionType
+  | onRequestCatchUpVideoPositionType
+  | onResponseCatchUpVideoPositionType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -129,7 +125,7 @@ export type onDeleteContentType = {
   type: "deleteContent";
   header: {
     table_id: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
@@ -143,7 +139,7 @@ export type onGetFileType = {
     table_id: string;
     username: string;
     instance: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
@@ -155,7 +151,7 @@ export type onUpdateContentPositioningType = {
   type: "updateContentPositioning";
   header: {
     table_id: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
@@ -177,7 +173,7 @@ export type onUpdateContentEffectsType = {
   type: "updateContentEffects";
   header: {
     table_id: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
@@ -188,6 +184,31 @@ export type onUpdateContentEffectsType = {
       | VideoEffectStylesType
       | ImageEffectStylesType
       | ApplicationEffectStylesType;
+  };
+};
+
+export type onRequestCatchUpVideoPositionType = {
+  type: "requestCatchUpVideoPosition";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+    contentType: "video";
+    contentId: string;
+  };
+};
+
+export type onResponseCatchUpVideoPositionType = {
+  type: "responseCatchUpVideoPosition";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+    contentType: "video";
+    contentId: string;
+  };
+  data: {
+    currentVideoPosition: number;
   };
 };
 

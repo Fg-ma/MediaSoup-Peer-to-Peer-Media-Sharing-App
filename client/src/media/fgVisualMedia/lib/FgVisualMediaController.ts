@@ -23,6 +23,10 @@ import {
   UserMediaType,
 } from "../../../context/mediaContext/typeConstant";
 import MediasoupSocketController from "src/serverControllers/mediasoupServer/MediasoupSocketController";
+import {
+  IncomingTableMessages,
+  onReactionOccurredType,
+} from "src/serverControllers/tableServer/lib/typeConstant";
 
 class FgVisualMediaController {
   constructor(
@@ -80,11 +84,7 @@ class FgVisualMediaController {
 
   init = () => {
     // Set videoStream as srcObject
-    if (
-      this.videoRef.current &&
-      this.fgVisualMediaOptions.isStream &&
-      this.videoStream
-    ) {
+    if (this.videoRef.current && this.videoStream) {
       this.videoRef.current.srcObject = this.videoStream!;
     }
 
@@ -113,10 +113,11 @@ class FgVisualMediaController {
     if (videoElement) {
       const newAspectRatio = videoElement.videoWidth / videoElement.videoHeight;
 
-      // Update the positioning scale based on the aspect ratio
       this.positioning.current.scale.y =
         this.positioning.current.scale.x / newAspectRatio;
       this.aspectRatio.current = newAspectRatio;
+
+      this.setRerender((prev) => !prev);
     }
   };
 
@@ -440,6 +441,29 @@ class FgVisualMediaController {
             () => stream.off("message", handleMessage);
         }
       }
+    }
+  };
+
+  reactionOccurred = (event: onReactionOccurredType) => {
+    const { contentType, contentId } = event.header;
+    const { reaction, reactionStyle } = event.data;
+
+    if (contentType === this.type && contentId === this.visualMediaId) {
+      this.fgLowerVisualMediaController.reactController.handleReaction(
+        reaction,
+        false,
+        reactionStyle
+      );
+    }
+  };
+
+  handleTableMessage = (event: IncomingTableMessages) => {
+    switch (event.type) {
+      case "reactionOccurred":
+        this.reactionOccurred(event);
+        break;
+      default:
+        break;
     }
   };
 }

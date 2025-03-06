@@ -5,6 +5,7 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import PageTemplate from "./PageTemplate";
 import {
   ActivePages,
+  CaptureMediaTypes,
   downloadOptions,
   downloadOptionsArrays,
   downloadOptionsTitles,
@@ -14,6 +15,7 @@ import {
 import DownloadOptionsPage from "./DownloadOptionsPage";
 import VideoSpeedPage from "./VideoSpeedPage";
 import CaptureMediaController from "../../CaptureMediaController";
+import DelayPage from "./DelayPage";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -61,6 +63,7 @@ export default function SettingsPanel({
   settings,
   setSettings,
   finalizeCapture,
+  mediaType,
 }: {
   captureMediaController: CaptureMediaController;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
@@ -70,6 +73,7 @@ export default function SettingsPanel({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   finalizeCapture: boolean;
+  mediaType: CaptureMediaTypes;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -165,6 +169,16 @@ export default function SettingsPanel({
     });
   };
 
+  const handleDelayActive = () => {
+    setActivePages((prev) => {
+      const newActivePages = { ...prev };
+
+      newActivePages.delay.active = !newActivePages.delay.active;
+
+      return newActivePages;
+    });
+  };
+
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
@@ -189,6 +203,18 @@ export default function SettingsPanel({
             exit='exit'
           >
             {!finalizeCapture && (
+              <FgButton
+                className='w-full'
+                contentFunction={() => (
+                  <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
+                    <div>Delay</div>
+                    <div>{`${settings.delay.value}s`}</div>
+                  </div>
+                )}
+                clickFunction={handleDelayActive}
+              />
+            )}
+            {!finalizeCapture && mediaType !== "camera" && (
               <FgButton
                 className='w-full'
                 contentFunction={() => (
@@ -323,6 +349,23 @@ export default function SettingsPanel({
               />
             </motion.div>
           )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.delay.active && !isDescendantActive(activePages.delay) && (
+          <motion.div
+            className='w-full'
+            variants={panelVariants}
+            initial='init'
+            animate='animate'
+            exit='exit'
+          >
+            <DelayPage
+              setActivePages={setActivePages}
+              settings={settings}
+              setSettings={setSettings}
+            />
+          </motion.div>
+        )}
       </AnimatePresence>
     </motion.div>,
     document.body

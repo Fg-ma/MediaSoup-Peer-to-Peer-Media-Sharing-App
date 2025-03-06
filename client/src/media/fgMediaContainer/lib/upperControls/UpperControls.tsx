@@ -2,8 +2,8 @@ import React from "react";
 import LowerController from "../lowerControls/lib/LowerController";
 import CloseButton from "./lib/closeButton/CloseButton";
 import SyncButton from "./lib/syncButton/SyncButton";
-import ReactButton from "./lib/reactButton/ReactButton";
 import { MediaContainerOptions } from "../typeConstant";
+import ReactButton from "../../../../elements/reactButton/ReactButton";
 
 export default function UpperControls({
   desync,
@@ -46,7 +46,8 @@ export default function UpperControls({
         <ReactButton
           reactionsPanelActive={reactionsPanelActive}
           setReactionsPanelActive={setReactionsPanelActive}
-          lowerController={lowerController}
+          clickFunction={lowerController.handleReact}
+          reactionFunction={lowerController.reactController.handleReaction}
         />
         <SyncButton desync={desync} lowerController={lowerController} />
         <CloseButton lowerController={lowerController} />

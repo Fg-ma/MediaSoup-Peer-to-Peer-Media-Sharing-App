@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgImage from "../../elements/fgImageElement/FgImageElement";
 import FgButton from "../../elements/fgButton/FgButton";
@@ -11,7 +11,7 @@ import KickFromTableButton from "./tableUserFunctions/KickFromTableButton";
 import SilenceButton from "./tableUserFunctions/SilenceButton";
 import HideContentFromButton from "./tableUserFunctions/HideContentFromButton";
 import FgSVG from "../../elements/fgSVG/FgSVG";
-import { TableColors } from "../../serverControllers/tableServer/TableSocketController";
+import { TableColors } from "../../serverControllers/tableServer/lib/typeConstant";
 import SwapSeatsbutton from "./tableUserFunctions/SwapSeatsButton";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -51,6 +51,25 @@ export default function UserBubble({
     useState(false);
   const userBubbleButtonRef = useRef<HTMLButtonElement>(null);
   const userPanelRef = useRef<HTMLDivElement>(null);
+
+  const handlePointerDown = (event: PointerEvent) => {
+    if (
+      !userPanelRef.current?.contains(event.target as Node) &&
+      !userBubbleButtonRef.current?.contains(event.target as Node)
+    ) {
+      setMoreUserInformationActive(false);
+    }
+  };
+
+  useEffect(() => {
+    if (moreUserInformationActive) {
+      document.addEventListener("pointerdown", handlePointerDown);
+
+      return () => {
+        document.removeEventListener("pointerdown", handlePointerDown);
+      };
+    }
+  }, [moreUserInformationActive]);
 
   return (
     <div

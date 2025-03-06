@@ -1,4 +1,9 @@
 import uWS from "uWebSockets.js";
+import {
+  ContentTypes,
+  TableReactions,
+  TableReactionStyles,
+} from "../../universal/typeConstant";
 
 export type TableColors =
   | "cyan"
@@ -71,7 +76,8 @@ export type MessageTypes =
   | onChangeTableBackgroundType
   | onMoveSeatsType
   | onSwapSeatsType
-  | onKickFromTableType;
+  | onKickFromTableType
+  | onReactionType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -126,6 +132,16 @@ export type onKickFromTableType = {
     username: string;
     targetUsername: string;
   };
+};
+
+export type onReactionType = {
+  type: "reaction";
+  header: {
+    table_id: string;
+    contentType: ContentTypes;
+    contentId: string;
+  };
+  data: { reaction: TableReactions; reactionStyle: TableReactionStyles };
 };
 
 export const tables: Tables = {};

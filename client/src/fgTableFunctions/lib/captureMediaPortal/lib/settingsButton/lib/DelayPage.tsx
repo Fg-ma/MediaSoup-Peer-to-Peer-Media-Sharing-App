@@ -3,52 +3,39 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import { Settings, ActivePages } from "../../typeConstant";
 import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
-import CaptureMediaController from "../../CaptureMediaController";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
 
-export const videoSpeedSelections = [
-  "0.25",
-  "0.5",
-  "0.75",
-  "1",
-  "2",
-  "2.5",
-  "3",
-];
+export const delaySelections = ["0", "3", "5", "10", "15", "30", "60"];
 
-export default function VideoSpeedPage({
-  captureMediaController,
+export default function DelayPage({
   setActivePages,
   settings,
   setSettings,
 }: {
-  captureMediaController: CaptureMediaController;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
-  const setVideoSpeed = (videoSpeed: number) => {
+  const setDelay = (delay: number) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
 
-      newSettings.videoSpeed.value = videoSpeed;
+      newSettings.delay.value = delay;
 
       return newSettings;
     });
-
-    captureMediaController.handlePlaybackSpeed(videoSpeed);
   };
 
-  const handleCloseVideoSpeedPage = () => {
+  const handleCloseDelayPage = () => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.videoSpeed.active = !newActivePages.videoSpeed.active;
+      newActivePages.delay.active = !newActivePages.delay.active;
 
       return newActivePages;
     });
@@ -71,13 +58,13 @@ export default function VideoSpeedPage({
                 ]}
               />
             )}
-            clickFunction={handleCloseVideoSpeedPage}
+            clickFunction={handleCloseDelayPage}
           />
           <div
             className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
-            onClick={handleCloseVideoSpeedPage}
+            onClick={handleCloseDelayPage}
           >
-            Video speed
+            Delay
           </div>
         </div>
         <div></div>
@@ -89,28 +76,28 @@ export default function VideoSpeedPage({
       >
         <FgSlider
           className='h-10'
-          externalValue={settings.videoSpeed.value}
-          externalStyleValue={settings.videoSpeed.value}
+          externalValue={settings.delay.value}
+          externalStyleValue={settings.delay.value}
           onValueChange={(value) => {
-            setVideoSpeed(value.value);
+            setDelay(value.value);
           }}
           options={{
-            initValue: settings.videoSpeed.value,
-            ticks: 6,
-            rangeMax: 5,
+            initValue: settings.delay.value,
+            ticks: 7,
+            rangeMax: 600,
             rangeMin: 0,
-            precision: 2,
+            snapToWholeNum: true,
             orientation: "horizontal",
             tickLabels: false,
           }}
         />
-        {Object.entries(videoSpeedSelections)
-          .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
-          .map(([key, speed]) => (
+        {Object.entries(delaySelections)
+          .sort(([a], [b]) => parseInt(a) - parseInt(b))
+          .map(([key, delay]) => (
             <div
               key={key}
               className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
-                parseFloat(speed) === settings.videoSpeed.value
+                parseInt(delay) === settings.delay.value
                   ? "bg-fg-white text-fg-tone-black-1"
                   : ""
               }`}
@@ -119,11 +106,11 @@ export default function VideoSpeedPage({
                 className='flex items-center justify-center grow'
                 contentFunction={() => (
                   <div className='flex w-full bg-opacity-75 px-2 items-start'>
-                    {speed}
+                    {delay} seconds
                   </div>
                 )}
                 clickFunction={() => {
-                  setVideoSpeed(parseFloat(speed));
+                  setDelay(parseInt(delay));
                 }}
               />
             </div>

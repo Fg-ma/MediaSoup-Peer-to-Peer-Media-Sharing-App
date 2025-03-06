@@ -13,7 +13,7 @@ import {
 } from "./lib/typeConstant";
 import Gradient from "./lib/Gradient";
 import UpperControls from "./lib/upperControls/UpperControls";
-import { TableContentTypes } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import { StaticContentTypes } from "../../../../universal/typeConstant";
 import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
@@ -61,7 +61,7 @@ export default function FgMediaContainer({
 }: {
   mediaId: string;
   filename: string;
-  kind: TableContentTypes;
+  kind: StaticContentTypes;
   bundleRef: React.RefObject<HTMLDivElement>;
   backgroundMedia: boolean;
   media?: React.ReactNode;
@@ -97,7 +97,8 @@ export default function FgMediaContainer({
   };
 
   const { userDataStreams, remoteDataStreams } = useMediaContext();
-  const { mediasoupSocket, tableStaticContentSocket } = useSocketContext();
+  const { mediasoupSocket, tableStaticContentSocket, tableSocket } =
+    useSocketContext();
   const { table_id } = useUserInfoContext();
 
   const mediaContainerRef =
@@ -170,7 +171,8 @@ export default function FgMediaContainer({
     setDesync,
     setReactionsPanelActive,
     behindEffectsContainerRef,
-    frontEffectsContainerRef
+    frontEffectsContainerRef,
+    tableSocket
   );
 
   const mediaContainerController = new MediaContainerController(
@@ -188,7 +190,8 @@ export default function FgMediaContainer({
     leaveTimer,
     movementTimeout,
     setRerender,
-    tableStaticContentSocket
+    tableStaticContentSocket,
+    lowerController
   );
 
   useEffect(() => {
@@ -199,6 +202,9 @@ export default function FgMediaContainer({
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
       mediaContainerController.handleMediasoupMessage
+    );
+    tableSocket.current?.addMessageListener(
+      mediaContainerController.handleTableMessage
     );
 
     document.addEventListener("keydown", lowerController.handleKeyDown);
@@ -229,6 +235,9 @@ export default function FgMediaContainer({
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
         mediaContainerController.handleMediasoupMessage
+      );
+      tableSocket.current?.removeMessageListener(
+        mediaContainerController.handleTableMessage
       );
       document.removeEventListener("keydown", lowerController.handleKeyDown);
       document.removeEventListener("keyup", lowerController.handleKeyUp);

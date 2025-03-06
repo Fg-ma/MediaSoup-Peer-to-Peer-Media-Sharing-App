@@ -5,6 +5,7 @@ import {
   onKickFromTableType,
   onLeaveTableType,
   onMoveSeatsType,
+  onReactionType,
   onSwapSeatsType,
   TableColors,
   tables,
@@ -16,10 +17,6 @@ import Broadcaster from "./Broadcaster";
 
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
-
-  onCreateTable = (ws: TableWebSocket, event: onCreateTableType) => {
-    const { username } = event.header;
-  };
 
   onJoinTable = (ws: TableWebSocket, event: onJoinTableType) => {
     const { table_id, username, instance } = event.header;
@@ -176,6 +173,19 @@ class TablesController {
       data: {
         userData: tablesUserData[table_id],
       },
+    });
+  };
+
+  onReaction = (event: onReactionType) => {
+    const { table_id, contentType, contentId } = event.header;
+
+    this.broadcaster.broadcastToTable(table_id, {
+      type: "reactionOccurred",
+      header: {
+        contentType,
+        contentId,
+      },
+      data: event.data,
     });
   };
 

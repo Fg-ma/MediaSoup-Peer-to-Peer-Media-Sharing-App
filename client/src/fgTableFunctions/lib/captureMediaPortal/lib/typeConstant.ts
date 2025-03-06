@@ -32,6 +32,8 @@ export type DownloadRecordingMimeTypes =
   | "webm/av1"
   | "ogg";
 
+export type DownloadImageMimeTypes = "jpg" | "png" | "webp" | "tiff" | "heic";
+
 export type DownloadRecordingFPSTypes =
   | "24 fps"
   | "25 fps"
@@ -48,7 +50,16 @@ export interface Settings {
       value: DownloadRecordingMimeTypes;
     };
   };
+  downloadImageOptions: {
+    value: "";
+    mimeType: {
+      value: DownloadImageMimeTypes;
+    };
+  };
   videoSpeed: {
+    value: number;
+  };
+  delay: {
     value: number;
   };
 }
@@ -97,6 +108,9 @@ export interface ActivePages {
   videoSpeed: {
     active: boolean;
   };
+  delay: {
+    active: boolean;
+  };
 }
 
 export const defaultActivePages: ActivePages = {
@@ -110,6 +124,9 @@ export const defaultActivePages: ActivePages = {
     },
   },
   videoSpeed: {
+    active: false,
+  },
+  delay: {
     active: false,
   },
 };
@@ -127,4 +144,5 @@ export const defaultSettings: Settings = Object.freeze({
   videoSpeed: {
     value: 1.0,
   },
+  delay: { value: 0 },
 });

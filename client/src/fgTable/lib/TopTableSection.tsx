@@ -1,5 +1,5 @@
 import React from "react";
-import { TableColors } from "../../serverControllers/tableServer/TableSocketController";
+import { TableColors } from "../../serverControllers/tableServer/lib/typeConstant";
 import UserBubble from "./UserBubble";
 import { tableColorMap } from "./tableColors";
 

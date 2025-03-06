@@ -1,6 +1,6 @@
+import { StaticContentTypes } from "../../../../universal/typeConstant";
 import {
   IncomingTableStaticContentMessages,
-  TableContentTypes,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 
@@ -37,7 +37,7 @@ class TextMedia {
     filename: string,
     mimeType: TableTopStaticMimeType,
     private getText: (
-      contentType: TableContentTypes,
+      contentType: StaticContentTypes,
       contentId: string,
       key: string
     ) => void,

@@ -1,3 +1,4 @@
+import { StaticContentTypes } from "../../../../../universal/typeConstant";
 import {
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
@@ -26,7 +27,9 @@ export type OutGoingTableStaticContentMessages =
   | onGetFileType
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
-  | onUpdateVideoPositionType;
+  | onUpdateVideoPositionType
+  | onRequestCatchUpVideoPositionType
+  | onResponseCatchUpVideoPositionType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -59,7 +62,7 @@ type onDeleteContentType = {
   type: "deleteContent";
   header: {
     table_id: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
@@ -73,7 +76,7 @@ type onGetFileType = {
     table_id: string;
     username: string;
     instance: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: { key: string };
@@ -83,7 +86,7 @@ type onUpdateContentPositioningType = {
   type: "updateContentPositioning";
   header: {
     table_id: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
@@ -105,7 +108,7 @@ type onUpdateContentEffectsType = {
   type: "updateContentEffects";
   header: {
     table_id: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
@@ -131,12 +134,30 @@ type onUpdateVideoPositionType = {
   };
 };
 
-export type TableContentTypes =
-  | "video"
-  | "image"
-  | "text"
-  | "application"
-  | "soundClip";
+type onRequestCatchUpVideoPositionType = {
+  type: "requestCatchUpVideoPosition";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+    contentType: "video";
+    contentId: string;
+  };
+};
+
+type onResponseCatchUpVideoPositionType = {
+  type: "responseCatchUpVideoPosition";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+    contentType: "video";
+    contentId: string;
+  };
+  data: {
+    currentVideoPosition: number;
+  };
+};
 
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
@@ -149,7 +170,9 @@ export type IncomingTableStaticContentMessages =
   | onResponsedCatchUpTableDataType
   | onContentDeletedType
   | onUpdatedContentEffectsType
-  | onUpdatedVideoPositionType;
+  | onUpdatedVideoPositionType
+  | onRequestedCatchUpVideoPositionType
+  | onRespondedCatchUpVideoPositionType;
 
 export type onOriginalVideoReadyType = {
   type: "originalVideoReady";
@@ -197,7 +220,7 @@ export type onTextReadyType = {
 export type onChunkType = {
   type: "chunk";
   header: {
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
     key: string;
   };
@@ -209,7 +232,7 @@ export type onChunkType = {
 export type onDownloadCompleteType = {
   type: "downloadComplete";
   header: {
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
     key: string;
   };
@@ -327,14 +350,14 @@ export type onResponsedCatchUpTableDataType = {
 export type onContentDeletedType = {
   type: "contentDeleted";
   header: {
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
 };
 
 export type onUpdatedContentEffectsType = {
   type: "updatedContentEffects";
-  header: { contentType: TableContentTypes; contentId: string };
+  header: { contentType: StaticContentTypes; contentId: string };
   data: {
     effects: {
       [effectType: string]: boolean;
@@ -354,5 +377,26 @@ export type onUpdatedVideoPositionType = {
   };
   data: {
     videoPosition: number;
+  };
+};
+
+export type onRequestedCatchUpVideoPositionType = {
+  type: "requestedCatchUpVideoPosition";
+  header: {
+    username: string;
+    instance: string;
+    contentType: "video";
+    contentId: string;
+  };
+};
+
+export type onRespondedCatchUpVideoPositionType = {
+  type: "respondedCatchUpVideoPosition";
+  header: {
+    contentType: "video";
+    contentId: string;
+  };
+  data: {
+    currentVideoPosition: number;
   };
 };

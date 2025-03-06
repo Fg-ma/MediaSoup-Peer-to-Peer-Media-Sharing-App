@@ -1,16 +1,21 @@
 import TableStaticContentSocketController from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import { TableContentTypes } from "../../../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaContainerOptions } from "../../typeConstant";
 import {
-  reactionsMeta,
+  StaticContentTypes,
   TableReactions,
-} from "../../upperControls/lib/reactButton/lib/typeConstant";
+  TableReactionStyles,
+} from "../../../../../../../universal/typeConstant";
+import TableSocketController from "../../../../../serverControllers/tableServer/TableSocketController";
+import ReactController from "../../../../../elements/reactButton/lib/ReactController";
+import { reactionsMeta } from "src/elements/reactButton/lib/typeConstant";
 
 class LowerController {
   private moving: boolean = false;
   private scaling: boolean = false;
   private rotating: boolean = false;
+
+  reactController: ReactController;
 
   constructor(
     private tableStaticContentSocket: React.MutableRefObject<
@@ -18,7 +23,7 @@ class LowerController {
     >,
     private mediaId: string,
     private filename: string,
-    private kind: TableContentTypes,
+    private kind: StaticContentTypes,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private mediaContainerRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
@@ -44,8 +49,19 @@ class LowerController {
       React.SetStateAction<boolean>
     >,
     private behindEffectsContainerRef: React.RefObject<HTMLDivElement>,
-    private frontEffectsContainerRef: React.RefObject<HTMLDivElement>
-  ) {}
+    private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,
+    private tableSocket: React.MutableRefObject<
+      TableSocketController | undefined
+    >
+  ) {
+    this.reactController = new ReactController(
+      this.mediaId,
+      this.kind,
+      this.behindEffectsContainerRef,
+      this.frontEffectsContainerRef,
+      this.tableSocket
+    );
+  }
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
@@ -319,118 +335,6 @@ class LowerController {
 
   handleReact = () => {
     this.setReactionsPanelActive((prev) => !prev);
-  };
-
-  handleReaction = (reaction: TableReactions) => {
-    const reactionSrc = reactionsMeta[reaction].src;
-
-    const actions = [
-      this.explodeReaction,
-      this.expandReaction,
-      this.hidingReaction,
-    ];
-
-    const randomAction = actions[Math.floor(Math.random() * actions.length)];
-    randomAction.call(this, reactionSrc);
-  };
-
-  private expandReaction = (reaction: string) => {
-    if (!this.frontEffectsContainerRef.current) return;
-
-    this.frontEffectsContainerRef.current.style.zIndex = "100";
-
-    // Number of particles
-    const particle = document.createElement("div");
-    particle.classList.add(
-      Math.random() < 0.5
-        ? "expanding-reaction-particle"
-        : "expanding-rotating-reaction-particle"
-    );
-    particle.style.backgroundImage = `url(${reaction})`;
-
-    particle.style.width = `${
-      Math.min(
-        this.frontEffectsContainerRef.current.clientWidth,
-        this.frontEffectsContainerRef.current.clientHeight
-      ) / 12
-    }px`;
-    this.frontEffectsContainerRef.current.appendChild(particle);
-
-    // Remove particle after animation
-    setTimeout(() => {
-      particle.remove();
-    }, 1250);
-  };
-
-  private explodeReaction = (reaction: string) => {
-    if (!this.frontEffectsContainerRef.current) return;
-    if (!this.behindEffectsContainerRef.current) return;
-
-    let behind = false;
-    if (Math.random() < 0.5) {
-      behind = true;
-    }
-
-    for (let i = 0; i < 40; i++) {
-      // Number of particles
-      const particle = document.createElement("div");
-      particle.classList.add("exploding-reaction-particle");
-      particle.style.backgroundImage = `url(${reaction})`;
-
-      // Random position and movement
-      const angle = Math.random() * Math.PI * 2;
-      const distance = behind
-        ? Math.random() *
-          Math.min(
-            this.frontEffectsContainerRef.current.clientWidth,
-            this.frontEffectsContainerRef.current.clientHeight
-          )
-        : (Math.random() *
-            Math.min(
-              this.frontEffectsContainerRef.current.clientWidth,
-              this.frontEffectsContainerRef.current.clientHeight
-            )) /
-          1.5;
-      const x = Math.cos(angle) * distance;
-      const y = Math.sin(angle) * distance;
-      const size = Math.max(15, Math.random() * 50);
-      const rotation = Math.random() * 360;
-
-      particle.style.setProperty("--x", `calc(${x}px - 50%)`);
-      particle.style.setProperty("--y", `calc(${y}px - 50%)`);
-
-      particle.style.width = `${size}px`;
-      particle.style.rotate = `${rotation}deg`;
-      (behind
-        ? this.behindEffectsContainerRef.current
-        : this.frontEffectsContainerRef.current
-      ).appendChild(particle);
-
-      // Remove particle after animation
-      setTimeout(() => {
-        particle.remove();
-      }, 1250);
-    }
-  };
-
-  private hidingReaction = (reaction: string) => {
-    if (!this.behindEffectsContainerRef.current) return;
-
-    const particle = document.createElement("div");
-    particle.classList.add("hiding-reaction-particle");
-    particle.style.backgroundImage = `url(${reaction})`;
-
-    particle.style.width = `${
-      Math.min(
-        this.behindEffectsContainerRef.current.clientWidth,
-        this.behindEffectsContainerRef.current.clientHeight
-      ) / 1.5
-    }px`;
-    this.behindEffectsContainerRef.current.appendChild(particle);
-
-    setTimeout(() => {
-      particle.remove();
-    }, 1250);
   };
 }
 

@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
-import FgImageElement from "../../../../../../elements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import LowerController from "../../../lowerControls/lib/LowerController";
-import FgPanel from "../../../../../../elements/fgPanel/FgPanel";
-import LazyScrollingContainer from "../../../../../../elements/lazyScrollingContainer/LazyScrollingContainer";
-import { reactionsMeta, TableReactions } from "./lib/typeConstant";
+import FgButton from "../fgButton/FgButton";
+import FgSVG from "../fgSVG/FgSVG";
+import FgImageElement from "../fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
+import FgPanel from "../fgPanel/FgPanel";
+import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingContainer";
+import { reactionsMeta } from "./lib/typeConstant";
+import { TableReactions } from "../../../../universal/typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -18,11 +18,13 @@ const reactionsOffIcon =
 export default function ReactButton({
   reactionsPanelActive,
   setReactionsPanelActive,
-  lowerController,
+  clickFunction,
+  reactionFunction,
 }: {
   reactionsPanelActive: boolean;
   setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
-  lowerController: LowerController;
+  clickFunction: () => void;
+  reactionFunction: (reaction: TableReactions) => void;
 }) {
   const [cols, setCols] = useState(3);
   const reactionsButtonRef = useRef<HTMLButtonElement>(null);
@@ -74,9 +76,7 @@ export default function ReactButton({
       <FgButton
         externalRef={reactionsButtonRef}
         className='flex items-center justify-end h-full !aspect-square pointer-events-auto'
-        clickFunction={() => {
-          lowerController.handleReact();
-        }}
+        clickFunction={clickFunction}
         contentFunction={() => {
           const src = reactionsPanelActive ? reactionsOffIcon : reactionsIcon;
 
@@ -131,11 +131,9 @@ export default function ReactButton({
                     key={reaction}
                     scrollingContainerRef={reactionsPanelScrollingContainerRef}
                     className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-                    clickFunction={() => {
-                      lowerController.handleReaction(
-                        reaction as TableReactions
-                      );
-                    }}
+                    clickFunction={() =>
+                      reactionFunction(reaction as TableReactions)
+                    }
                     contentFunction={() =>
                       meta.type === "svg" ? (
                         <FgSVG
@@ -175,7 +173,7 @@ export default function ReactButton({
           minWidth={204}
           minHeight={190}
           resizeCallback={gridColumnsChange}
-          closeCallback={lowerController.handleReact}
+          closeCallback={clickFunction}
           closeLabelElement={
             <FgHoverContentStandard content='Close (x)' style='dark' />
           }

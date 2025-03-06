@@ -7,6 +7,8 @@ import {
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { FgVisualMediaOptions, Settings } from "../../typeConstant";
 import MediasoupSocketController from "../../../../../serverControllers/mediasoupServer/MediasoupSocketController";
+import ReactController from "../../../../../elements/reactButton/lib/ReactController";
+import TableSocketController from "src/serverControllers/tableServer/TableSocketController";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -57,6 +59,8 @@ const characterEdgeStyleMap = {
 
 class FgLowerVisualMediaController {
   private initTime: number;
+
+  reactController: ReactController;
 
   constructor(
     private mediasoupSocket: React.MutableRefObject<
@@ -123,9 +127,25 @@ class FgLowerVisualMediaController {
       rotation: number;
     }>,
     private aspectRatio: React.MutableRefObject<number>,
-    private screenAudioStream?: MediaStream
+    private screenAudioStream: MediaStream | undefined,
+    private behindEffectsContainerRef: React.RefObject<HTMLDivElement>,
+    private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,
+    private tableSocket: React.MutableRefObject<
+      TableSocketController | undefined
+    >,
+    private setReactionsPanelActive: React.Dispatch<
+      React.SetStateAction<boolean>
+    >
   ) {
     this.initTime = Date.now();
+
+    this.reactController = new ReactController(
+      this.visualMediaId,
+      this.type,
+      this.behindEffectsContainerRef,
+      this.frontEffectsContainerRef,
+      this.tableSocket
+    );
   }
 
   formatDuration = (time: number) => {
@@ -661,6 +681,10 @@ class FgLowerVisualMediaController {
 
   setInitTimeOffset = (offset: number) => {
     this.initTimeOffset.current = offset;
+  };
+
+  handleReact = () => {
+    this.setReactionsPanelActive((prev) => !prev);
   };
 }
 

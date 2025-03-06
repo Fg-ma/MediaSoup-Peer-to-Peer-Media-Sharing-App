@@ -35,7 +35,7 @@ export default function SwapSeatsbutton({
       )}
       hoverContent={<FgHoverContentStandard content='Swap seats' />}
       scrollingContainerRef={userPanelRef}
-      options={{ hoverTimeoutDuration: 750 }}
+      options={{ hoverTimeoutDuration: 750, hoverZValue: 5000000000 }}
     />
   );
 }

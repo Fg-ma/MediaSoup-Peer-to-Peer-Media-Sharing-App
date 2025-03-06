@@ -81,7 +81,8 @@ class SharedBundleController extends SharedBundleSocket {
                   y: 25,
                 },
                 rotation: 0,
-              }
+              },
+              this.tableStaticContentSocket.current.requestCatchUpVideoPosition
             );
           }
           this.setRerender((prev) => !prev);

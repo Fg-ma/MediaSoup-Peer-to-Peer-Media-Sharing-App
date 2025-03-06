@@ -1,143 +1,13 @@
+import {
+  ContentTypes,
+  TableReactions,
+  TableReactionStyles,
+} from "../../../../universal/typeConstant";
 import { FgBackground } from "../../elements/fgBackgroundSelector/lib/typeConstant";
-
-export type TableColors =
-  | "cyan"
-  | "orange"
-  | "blue"
-  | "green"
-  | "yellow"
-  | "purple"
-  | "pink"
-  | "black"
-  | "white"
-  | "brown"
-  | "lime"
-  | "coral"
-  | "gray"
-  | "navy"
-  | "lightBlue"
-  | "tableTop";
-
-type OutGoingTableMessages =
-  | onJoinTableType
-  | onLeaveTableType
-  | onChangeTableBackgroundType
-  | onMoveSeatsType
-  | onSwapSeatsType
-  | onKickFromTableType;
-
-type onJoinTableType = {
-  type: "joinTable";
-  header: {
-    table_id: string;
-    username: string;
-    instance: string;
-  };
-};
-
-type onLeaveTableType = {
-  type: "leaveTable";
-  header: {
-    table_id: string;
-    username: string;
-    instance: string;
-  };
-};
-
-type onChangeTableBackgroundType = {
-  type: "changeTableBackground";
-  header: {
-    table_id: string;
-    username: string;
-    instance: string;
-  };
-  data: { background: FgBackground };
-};
-
-type onMoveSeatsType = {
-  type: "moveSeats";
-  header: {
-    table_id: string;
-    username: string;
-  };
-  data: { direction: "left" | "right" };
-};
-
-type onSwapSeatsType = {
-  type: "swapSeats";
-  header: {
-    table_id: string;
-    username: string;
-    targetUsername: string;
-  };
-};
-
-type onKickFromTableType = {
-  type: "kickFromTable";
-  header: {
-    table_id: string;
-    username: string;
-    targetUsername: string;
-  };
-};
-
-export type IncomingTableMessages =
-  | onTableBackgroundChangedType
-  | onUserJoinedTableType
-  | onUserLeftTableType
-  | onSeatsMovedType
-  | onSeatsSwapedType
-  | onKickedFromTableType;
-
-export type onTableBackgroundChangedType = {
-  type: "tableBackgroundChanged";
-  data: { background: FgBackground };
-};
-
-export type onUserJoinedTableType = {
-  type: "userJoinedTable";
-  data: {
-    userData: {
-      [username: string]: { color: TableColors; seat: number; online: boolean };
-    };
-  };
-};
-
-export type onUserLeftTableType = {
-  type: "userLeftTable";
-  data: {
-    userData: {
-      [username: string]: { color: TableColors; seat: number; online: boolean };
-    };
-  };
-};
-
-export type onSeatsMovedType = {
-  type: "seatsMoved";
-  data: {
-    userData: {
-      [username: string]: { color: TableColors; seat: number; online: boolean };
-    };
-  };
-};
-
-export type onSeatsSwapedType = {
-  type: "seatsSwaped";
-  data: {
-    userData: {
-      [username: string]: { color: TableColors; seat: number; online: boolean };
-    };
-  };
-};
-
-export type onKickedFromTableType = {
-  type: "kickedFromTable";
-  data: {
-    userData: {
-      [username: string]: { color: TableColors; seat: number; online: boolean };
-    };
-  };
-};
+import {
+  IncomingTableMessages,
+  OutGoingTableMessages,
+} from "./lib/typeConstant";
 
 class TableSocketController {
   private ws: WebSocket | undefined;
@@ -269,6 +139,23 @@ class TableSocketController {
         username: this.username,
         targetUsername,
       },
+    });
+  };
+
+  reaction = (
+    contentType: ContentTypes,
+    contentId: string,
+    reaction: TableReactions,
+    reactionStyle: TableReactionStyles
+  ) => {
+    this.sendMessage({
+      type: "reaction",
+      header: {
+        table_id: this.table_id,
+        contentType,
+        contentId,
+      },
+      data: { reaction, reactionStyle },
     });
   };
 }

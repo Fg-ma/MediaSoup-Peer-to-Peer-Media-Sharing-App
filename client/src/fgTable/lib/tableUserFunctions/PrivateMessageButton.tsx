@@ -28,7 +28,7 @@ export default function PrivateMessageButton({
       )}
       hoverContent={<FgHoverContentStandard content={"Private message"} />}
       scrollingContainerRef={userPanelRef}
-      options={{ hoverTimeoutDuration: 750 }}
+      options={{ hoverTimeoutDuration: 750, hoverZValue: 5000000000 }}
     />
   );
 }

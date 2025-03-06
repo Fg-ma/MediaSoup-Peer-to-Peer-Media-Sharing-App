@@ -38,6 +38,8 @@ const defaultFgSliderOptions = {
   snapToWholeNum: false,
   snapToNearestTick: false,
   orientation: "vertical",
+  tickLabels: true,
+  tickLabelsColor: "#090909",
 };
 
 export interface SliderOptions {
@@ -53,6 +55,8 @@ export interface SliderOptions {
   snapToWholeNum?: boolean;
   snapToNearestTick?: boolean;
   orientation?: "vertical" | "horizontal";
+  tickLabels?: boolean;
+  tickLabelsColor?: string;
 }
 
 export interface SliderChangeEvent {
@@ -133,7 +137,7 @@ export default function FgSlider({
     rescaleValue(
       snapPositions(
         rescaleValue(
-          fgSliderOptions.initValue
+          fgSliderOptions.initValue !== undefined
             ? fgSliderOptions.initValue
             : (fgSliderOptions.rangeMax + fgSliderOptions.rangeMin) / 2,
           [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
@@ -294,8 +298,8 @@ export default function FgSlider({
     >
       {fgSliderOptions.topLabel && (
         <div
-          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
-            ${disabled ? "text-fg-black-25" : "text-black"}
+          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center text-fg-tone-black-1
+            ${disabled ? "text-opacity-75" : ""}
             ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
             ${
               fgSliderOptions.orientation === "horizontal"
@@ -345,9 +349,13 @@ export default function FgSlider({
                 ? "right"
                 : "top"
             }, ${disabled ? "#b20203" : "#d40213"} ${
-              externalStyleValue ? externalStyleValueRef.current : styleValue
+              externalStyleValue !== undefined
+                ? externalStyleValueRef.current
+                : styleValue
             }%, #e6e6e6 ${
-              externalStyleValue ? externalStyleValueRef.current : styleValue
+              externalStyleValue !== undefined
+                ? externalStyleValueRef.current
+                : styleValue
             }%)`,
             boxShadow: sliding ? "inset 0 0 1.25px rgba(0, 0, 0, 0.3)" : "",
           }}
@@ -358,7 +366,7 @@ export default function FgSlider({
             <div key={pos}>
               <div
                 className={`absolute rounded-1.5
-                  ${disabled ? "bg-fg-black-25" : "bg-black"}
+                  ${disabled ? "bg-fg-tone-black-5" : "bg-fg-tone-black-1"}
                   ${
                     fgSliderOptions.orientation === "vertical"
                       ? "w-3.5 h-1 left-1/2 -translate-x-1/2"
@@ -389,7 +397,7 @@ export default function FgSlider({
                   setTickHovering(false);
                 }}
               ></div>
-              {tickHovering && !sliding && (
+              {fgSliderOptions.tickLabels && tickHovering && !sliding && (
                 <AnimatePresence>
                   <motion.div
                     style={{
@@ -399,9 +407,10 @@ export default function FgSlider({
                       [fgSliderOptions.orientation === "horizontal"
                         ? "left"
                         : ""]: `${pos}%`,
+                      color: fgSliderOptions.tickLabelsColor,
                     }}
-                    className={`select-none font-K2D text-sm absolute w-max flex justify-center items-center
-                      ${disabled ? "text-fg-black-25" : "text-black"}
+                    className={`select-none font-K2D text-sm absolute w-max flex justify-center items-center 
+                      ${disabled ? "text-opacity-75" : ""}
                       ${
                         fgSliderOptions.orientation === "vertical"
                           ? "left-3.5"
@@ -451,7 +460,7 @@ export default function FgSlider({
           ))}
           <div
             className={`absolute rounded cursor-pointer
-              ${disabled ? "bg-fg-black-35" : "bg-fg-black-20"}
+              ${disabled ? "bg-fg-tone-black-6" : "bg-fg-tone-black-3"}
               ${
                 fgSliderOptions.orientation === "vertical"
                   ? "w-4.5 h-2.5 left-1/2 -translate-x-1/2"
@@ -469,7 +478,9 @@ export default function FgSlider({
                 : fgSliderOptions.orientation === "horizontal"
                 ? "left"
                 : "bottom"]: `calc(${
-                externalStyleValue ? externalStyleValueRef.current : styleValue
+                externalStyleValue !== undefined
+                  ? externalStyleValueRef.current
+                  : styleValue
               }% - 5px)`,
             }}
             ref={handleRef}
@@ -483,7 +494,7 @@ export default function FgSlider({
           {(sliding || handleHovering) && (
             <Suspense fallback={<div>Loading...</div>}>
               <SliderValuePortal
-                value={externalValue ? externalValue : value}
+                value={externalValue !== undefined ? externalValue : value}
                 handleRef={handleRef}
                 precision={fgSliderOptions.precision}
                 units={fgSliderOptions.units}
@@ -494,8 +505,8 @@ export default function FgSlider({
       </div>
       {fgSliderOptions.bottomLabel && (
         <div
-          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
-            ${disabled ? "text-fg-black-25" : "text-black"}
+          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center text-fg-tone-black-1
+            ${disabled ? "text-opacity-75" : ""}
             ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
             ${
               fgSliderOptions.orientation === "horizontal"

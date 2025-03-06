@@ -15,6 +15,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["src", "../mongo"],
+  "include": ["src", "../mongo", "../universal"],
   "exclude": ["node_modules"]
 }

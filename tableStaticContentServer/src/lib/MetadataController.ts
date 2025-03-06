@@ -1,6 +1,8 @@
 import { tableTopMongo } from "src";
 import {
   onRequestCatchUpTableDataType,
+  onRequestCatchUpVideoPositionType,
+  onResponseCatchUpVideoPositionType,
   onUpdateContentEffectsType,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
@@ -52,6 +54,42 @@ class MetadataController {
       data: { videoPosition },
     };
     this.broadcaster.broadcastToTable(table_id, msg);
+  };
+
+  onRequestCatchUpVideoPosition = (
+    event: onRequestCatchUpVideoPositionType
+  ) => {
+    const { table_id, username, instance, contentType, contentId } =
+      event.header;
+
+    this.broadcaster.broadcastToFirstFoundInstance(table_id, {
+      type: "requestedCatchUpVideoPosition",
+      header: {
+        username,
+        instance,
+        contentType,
+        contentId,
+      },
+    });
+  };
+
+  onResponseCatchUpVideoPosition = (
+    event: onResponseCatchUpVideoPositionType
+  ) => {
+    const { table_id, username, instance, contentType, contentId } =
+      event.header;
+    const { currentVideoPosition } = event.data;
+
+    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+      type: "respondedCatchUpVideoPosition",
+      header: {
+        contentType,
+        contentId,
+      },
+      data: {
+        currentVideoPosition,
+      },
+    });
   };
 }
 

@@ -41,7 +41,7 @@ export default function HideContentFromButton({
         />
       }
       scrollingContainerRef={userPanelRef}
-      options={{ hoverTimeoutDuration: 750 }}
+      options={{ hoverTimeoutDuration: 750, hoverZValue: 5000000000 }}
     />
   );
 }

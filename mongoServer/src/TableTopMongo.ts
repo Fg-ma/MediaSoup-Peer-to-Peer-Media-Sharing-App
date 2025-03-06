@@ -8,11 +8,11 @@ import {
   onUpdateContentEffectsType,
   onUpdateContentPositioningType,
   onUpdateVideoPositionType,
-  TableContentTypes,
 } from "./typeConstant";
 import { ImageEffectStylesType } from "./lib/images/typeConstant";
 import { VideoEffectStylesType } from "./lib/videos/typeConstant";
 import TablesMeta from "./lib/meta/TablesMeta";
+import { StaticContentTypes } from "../../universal/typeConstant";
 
 const uri = "mongodb://localhost:27017";
 const dbName = "tableTopMongo";
@@ -53,7 +53,7 @@ class TableTopMongo {
 
   deleteDocument = async (
     table_id: string,
-    contentType: TableContentTypes,
+    contentType: StaticContentTypes,
     contentId: string
   ) => {
     if (contentType === "image") {

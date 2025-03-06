@@ -4,8 +4,8 @@ import RotateButton from "../../../elements/fgAdjustmentElements/RotateButton";
 import ScaleButton from "../../../elements/fgAdjustmentElements/ScaleButton";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import { TableContentTypes } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { MediaContainerOptions } from "./typeConstant";
+import { StaticContentTypes } from "../../../../../universal/typeConstant";
 
 export default function AdjustmentButtons({
   kind,
@@ -18,7 +18,7 @@ export default function AdjustmentButtons({
   aspectRatio,
   mediaContainerOptions,
 }: {
-  kind: TableContentTypes;
+  kind: StaticContentTypes;
   mediaId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   panBtnRef: React.RefObject<HTMLButtonElement>;

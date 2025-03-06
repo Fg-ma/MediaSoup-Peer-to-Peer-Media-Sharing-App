@@ -7,12 +7,12 @@ import {
 } from "../../context/effectsContext/typeConstant";
 import {
   IncomingTableStaticContentMessages,
-  TableContentTypes,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
+import { StaticContentTypes } from "../../../../universal/typeConstant";
 
 class ApplicationMedia {
   canvas: HTMLCanvasElement;
@@ -50,7 +50,7 @@ class ApplicationMedia {
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private getApplication: (
-      contentType: TableContentTypes,
+      contentType: StaticContentTypes,
       contentId: string,
       key: string
     ) => void,

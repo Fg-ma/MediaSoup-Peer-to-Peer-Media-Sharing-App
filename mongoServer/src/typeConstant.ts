@@ -1,13 +1,7 @@
+import { StaticContentTypes } from "../../universal/typeConstant";
 import { ApplicationEffectStylesType } from "./lib/applications/typeConstant";
 import { ImageEffectStylesType } from "./lib/images/typeConstant";
 import { VideoEffectStylesType } from "./lib/videos/typeConstant";
-
-export type TableContentTypes =
-  | "video"
-  | "image"
-  | "soundClip"
-  | "application"
-  | "text";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"
@@ -68,7 +62,7 @@ export type onUpdateContentPositioningType = {
   type: "updateContentPositioning";
   header: {
     table_id: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
@@ -90,7 +84,7 @@ export type onUpdateContentEffectsType = {
   type: "updateContentEffects";
   header: {
     table_id: string;
-    contentType: TableContentTypes;
+    contentType: StaticContentTypes;
     contentId: string;
   };
   data: {

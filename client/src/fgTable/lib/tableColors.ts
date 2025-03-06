@@ -1,4 +1,4 @@
-import { TableColors } from "../../serverControllers/tableServer/TableSocketController";
+import { TableColors } from "../../serverControllers/tableServer/lib/typeConstant";
 
 export const tableColorMap: {
   [tableColor in TableColors]: {

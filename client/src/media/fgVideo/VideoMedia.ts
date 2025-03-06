@@ -21,10 +21,10 @@ import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
 import {
   IncomingTableStaticContentMessages,
-  TableContentTypes,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import VideoAudioMedia from "./VideoAudioMedia";
+import { StaticContentTypes } from "../../../../universal/typeConstant";
 
 class VideoMedia {
   canvas: HTMLCanvasElement;
@@ -88,7 +88,7 @@ class VideoMedia {
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private getVideo: (
-      contentType: TableContentTypes,
+      contentType: StaticContentTypes,
       contentId: string,
       key: string
     ) => void,
@@ -108,7 +108,11 @@ class VideoMedia {
         y: number;
       };
       rotation: number;
-    }
+    },
+    private requestCatchUpVideoPosition: (
+      contentType: "video",
+      contentId: string
+    ) => void
   ) {
     this.filename = filename;
     this.mimeType = mimeType;
@@ -389,7 +393,7 @@ class VideoMedia {
 
       this.updateAllEffects();
 
-      this.tableStaticServer.requestCatchUpVideoPosition();
+      this.requestCatchUpVideoPosition("video", this.videoId);
     }
   };
 

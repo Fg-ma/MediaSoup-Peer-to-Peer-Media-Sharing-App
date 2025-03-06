@@ -54,7 +54,10 @@ class CaptureMediaController {
     private timelineContainerRef: React.RefObject<HTMLDivElement>,
     private isScrubbing: React.MutableRefObject<boolean>,
     private wasPaused: React.MutableRefObject<boolean>,
-    private setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>
+    private setCaptureMediaActive: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   handleEffects = () => {
@@ -438,6 +441,8 @@ class CaptureMediaController {
   };
 
   private addScreenShotSuccessCallback = () => {
+    this.setRerender((prev) => !prev);
+
     this.captureMedia.current?.stopVideo();
 
     this.captureMedia.current?.babylonScene?.removeScreenShotSuccessCallback(

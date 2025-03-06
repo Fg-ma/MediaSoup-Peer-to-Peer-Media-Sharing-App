@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
-import { ActivePages, Settings } from "../typeConstant";
+import { ActivePages, CaptureMediaTypes, Settings } from "../typeConstant";
 import CaptureMediaController from "../CaptureMediaController";
 
 type RecursiveObject = {
@@ -21,6 +21,7 @@ export default function SettingsButton({
   settings,
   setSettings,
   finalizeCapture,
+  mediaType,
 }: {
   captureMediaController: CaptureMediaController;
   captureMediaEffectsActive: boolean;
@@ -32,6 +33,7 @@ export default function SettingsButton({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   finalizeCapture: boolean;
+  mediaType: CaptureMediaTypes;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -133,6 +135,7 @@ export default function SettingsButton({
           settings={settings}
           setSettings={setSettings}
           finalizeCapture={finalizeCapture}
+          mediaType={mediaType}
         />
       )}
     </>

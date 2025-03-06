@@ -2,13 +2,18 @@ import { MediaContainerOptions } from "./typeConstant";
 import { IncomingMediasoupMessages } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
 import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import { TableContentTypes } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import {
+  IncomingTableMessages,
+  onReactionOccurredType,
+} from "../../../serverControllers/tableServer/lib/typeConstant";
+import { StaticContentTypes } from "../../../../../universal/typeConstant";
+import LowerController from "./lowerControls/lib/LowerController";
 
 class MediaContainerController {
   constructor(
     private table_id: React.MutableRefObject<string>,
     private mediaId: string,
-    private kind: TableContentTypes,
+    private kind: StaticContentTypes,
     private rootMedia: HTMLVideoElement | HTMLImageElement | undefined,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
@@ -36,7 +41,8 @@ class MediaContainerController {
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
-    >
+    >,
+    private lowerController: LowerController
   ) {}
 
   handlePointerMove = () => {
@@ -161,6 +167,29 @@ class MediaContainerController {
             () => stream.off("message", handleMessage);
         }
       }
+    }
+  };
+
+  reactionOccurred = (event: onReactionOccurredType) => {
+    const { contentType, contentId } = event.header;
+    const { reaction, reactionStyle } = event.data;
+
+    if (contentType === this.kind && contentId === this.mediaId) {
+      this.lowerController.reactController.handleReaction(
+        reaction,
+        false,
+        reactionStyle
+      );
+    }
+  };
+
+  handleTableMessage = (event: IncomingTableMessages) => {
+    switch (event.type) {
+      case "reactionOccurred":
+        this.reactionOccurred(event);
+        break;
+      default:
+        break;
     }
   };
 }

@@ -104,10 +104,12 @@ export default function UserVisualMedia({
     userStreamEffects,
     remoteStreamEffects,
   } = useEffectsContext();
-  const { mediasoupSocket } = useSocketContext();
+  const { mediasoupSocket, tableSocket } = useSocketContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
+  const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
+  const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(document.createElement("video"));
   const panBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -181,6 +183,8 @@ export default function UserVisualMedia({
     },
     rotation: 0,
   });
+
+  const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
@@ -268,7 +272,11 @@ export default function UserVisualMedia({
     fgContentAdjustmentController,
     positioning,
     aspectRatio,
-    screenAudioStream
+    screenAudioStream,
+    behindEffectsContainerRef,
+    frontEffectsContainerRef,
+    tableSocket,
+    setReactionsPanelActive
   );
 
   const fgVisualMediaController = new FgVisualMediaController(
@@ -317,6 +325,10 @@ export default function UserVisualMedia({
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
       fgVisualMediaController.handleMessage
+    );
+
+    tableSocket.current?.addMessageListener(
+      fgVisualMediaController.handleTableMessage
     );
 
     // Keep video time
@@ -377,6 +389,10 @@ export default function UserVisualMedia({
       mediasoupSocket.current?.removeMessageListener(
         fgVisualMediaController.handleMessage
       );
+      tableSocket.current?.removeMessageListener(
+        fgVisualMediaController.handleTableMessage
+      );
+
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
         timeUpdateInterval.current = undefined;
@@ -512,6 +528,18 @@ export default function UserVisualMedia({
           <div className='animated-border-box'></div>
         </>
       )}
+      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+        <div
+          ref={frontEffectsContainerRef}
+          className='w-full h-full relative z-[100] pointer-events-none'
+        />
+      </div>
+      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+        <div
+          ref={behindEffectsContainerRef}
+          className='w-full h-full relative -z-[100] pointer-events-none'
+        />
+      </div>
       <div
         ref={subContainerRef}
         className='flex relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
@@ -549,6 +577,8 @@ export default function UserVisualMedia({
           username={username}
           fgVisualMediaOptions={fgVisualMediaOptions}
           fgLowerVisualMediaController={fgLowerVisualMediaController}
+          reactionsPanelActive={reactionsPanelActive}
+          setReactionsPanelActive={setReactionsPanelActive}
         />
         <FgLowerVisualMediaControls
           table_id={table_id}

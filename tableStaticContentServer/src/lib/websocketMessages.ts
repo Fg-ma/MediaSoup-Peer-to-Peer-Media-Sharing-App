@@ -36,6 +36,12 @@ const handleMessage = (
     case "updateVideoPosition":
       metadataController.onUpdateVideoPosition(event);
       break;
+    case "requestCatchUpVideoPosition":
+      metadataController.onRequestCatchUpVideoPosition(event);
+      break;
+    case "responseCatchUpVideoPosition":
+      metadataController.onResponseCatchUpVideoPosition(event);
+      break;
     default:
       break;
   }

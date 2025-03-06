@@ -9,7 +9,6 @@ import {
 } from "../../context/effectsContext/typeConstant";
 import {
   IncomingTableStaticContentMessages,
-  TableContentTypes,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import BabylonScene, {
@@ -21,6 +20,7 @@ import Deadbanding from "../../babylon/Deadbanding";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import assetMeshes from "../../babylon/meshes";
+import { StaticContentTypes } from "../../../../universal/typeConstant";
 
 class ImageMedia {
   canvas: HTMLCanvasElement;
@@ -72,7 +72,7 @@ class ImageMedia {
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private getImage: (
-      contentType: TableContentTypes,
+      contentType: StaticContentTypes,
       contentId: string,
       key: string
     ) => void,

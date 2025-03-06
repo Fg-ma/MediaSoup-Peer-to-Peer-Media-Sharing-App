@@ -21,6 +21,9 @@ const handleMessage = (ws: TableWebSocket, event: MessageTypes) => {
     case "kickFromTable":
       tablesController.onKickFromTable(event);
       break;
+    case "reaction":
+      tablesController.onReaction(event);
+      break;
     default:
       break;
   }
