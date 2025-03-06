@@ -156,7 +156,7 @@ export default function FgSlider({
         rescaleValue(
           snapPositions(
             rescaleValue(
-              fgSliderOptions.initValue
+              fgSliderOptions.initValue !== undefined
                 ? fgSliderOptions.initValue
                 : (fgSliderOptions.rangeMax + fgSliderOptions.rangeMin) / 2,
               [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
@@ -169,6 +169,43 @@ export default function FgSlider({
       )
     )
   );
+
+  useEffect(() => {
+    if (fgSliderOptions.initValue === undefined) return;
+
+    setValue(
+      rescaleValue(
+        snapPositions(
+          rescaleValue(
+            fgSliderOptions.initValue,
+            [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
+            [0, 100]
+          )
+        ),
+        [0, 100],
+        [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax]
+      )
+    );
+    setStyleValue(
+      Math.max(
+        5,
+        Math.min(
+          95,
+          rescaleValue(
+            snapPositions(
+              rescaleValue(
+                fgSliderOptions.initValue,
+                [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
+                [0, 100]
+              )
+            ),
+            [0, 100],
+            [5, 95]
+          )
+        )
+      )
+    );
+  }, [fgSliderOptions.initValue]);
 
   const handlePointerMove = (event: React.PointerEvent | PointerEvent) => {
     if (!trackRef.current) {

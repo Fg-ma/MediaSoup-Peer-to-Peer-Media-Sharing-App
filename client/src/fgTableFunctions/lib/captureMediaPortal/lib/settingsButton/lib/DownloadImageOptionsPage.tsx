@@ -4,8 +4,8 @@ import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import {
   Settings,
   ActivePages,
-  downloadOptionsTitles,
-  downloadOptionsArrays,
+  downloadImageOptionsTitles,
+  downloadImageOptionsArrays,
 } from "../../typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -13,30 +13,32 @@ const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
 const navigateForwardIcon = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
 
-export default function DownloadsOptionsPage({
+export default function DownloadImageOptionsPage({
   setActivePages,
   settings,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
 }) {
-  const handleDownloadOptionsActive = () => {
+  const handleDownloadImageOptionsActive = () => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.downloadOptions.active =
-        !newActivePages.downloadOptions.active;
+      newActivePages.downloadImageOptions.active =
+        !newActivePages.downloadImageOptions.active;
 
       return newActivePages;
     });
   };
 
-  const handleOptionSelect = (option: keyof typeof downloadOptionsTitles) => {
+  const handleOptionSelect = (
+    option: keyof typeof downloadImageOptionsTitles
+  ) => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.downloadOptions[option].active =
-        !newActivePages.downloadOptions[option].active;
+      newActivePages.downloadImageOptions[option].active =
+        !newActivePages.downloadImageOptions[option].active;
 
       return newActivePages;
     });
@@ -58,38 +60,40 @@ export default function DownloadsOptionsPage({
               ]}
             />
           )}
-          clickFunction={handleDownloadOptionsActive}
+          clickFunction={handleDownloadImageOptionsActive}
         />
         <div
           className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
-          onClick={handleDownloadOptionsActive}
+          onClick={handleDownloadImageOptionsActive}
         >
           Download options
         </div>
       </div>
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
       <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
-        {Object.keys(downloadOptionsArrays).map((option) => (
+        {Object.keys(downloadImageOptionsArrays).map((option) => (
           <FgButton
             key={option}
             className='w-full h-8'
             clickFunction={() =>
-              handleOptionSelect(option as keyof typeof downloadOptionsArrays)
+              handleOptionSelect(
+                option as keyof typeof downloadImageOptionsArrays
+              )
             }
             contentFunction={() => (
               <div className='flex w-full justify-between space-x-4 px-2 bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap'>
                 <div>
                   {
-                    downloadOptionsTitles[
-                      option as keyof typeof downloadOptionsArrays
+                    downloadImageOptionsTitles[
+                      option as keyof typeof downloadImageOptionsArrays
                     ]
                   }
                 </div>
                 <div className='flex space-x-1 items-center justify-center'>
                   <div>
                     {
-                      settings.downloadOptions[
-                        option as keyof typeof downloadOptionsArrays
+                      settings.downloadImageOptions[
+                        option as keyof typeof downloadImageOptionsArrays
                       ].value
                     }
                   </div>

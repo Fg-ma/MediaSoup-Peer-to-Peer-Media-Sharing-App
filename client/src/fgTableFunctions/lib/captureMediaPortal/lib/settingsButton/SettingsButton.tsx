@@ -124,6 +124,12 @@ export default function SettingsButton({
             <FgHoverContentStandard content='Settings' style='light' />
           ) : undefined
         }
+        options={{
+          hoverSpacing: 4,
+          hoverTimeoutDuration: 1750,
+          hoverType: "above",
+          hoverZValue: 500000000,
+        }}
       />
       {settingsActive && (
         <SettingsPanel

@@ -84,7 +84,7 @@ export default function DelayPage({
           options={{
             initValue: settings.delay.value,
             ticks: 7,
-            rangeMax: 600,
+            rangeMax: 120,
             rangeMin: 0,
             snapToWholeNum: true,
             orientation: "horizontal",

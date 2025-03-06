@@ -41,7 +41,7 @@ export type DownloadRecordingFPSTypes =
   | "60 fps";
 
 export interface Settings {
-  downloadOptions: {
+  downloadVideoOptions: {
     value: "";
     fps: {
       value: DownloadRecordingFPSTypes;
@@ -73,21 +73,55 @@ export const downloadRecordingMimeMap: {
   ogg: "video/ogg",
 };
 
-export const downloadOptions: DownloadOptionsTypes[] = ["fps", "mimeType"];
+export const downloadRecordingExtensionsMap: {
+  [downloadRecordingMimeType in DownloadRecordingMimeTypes]: string;
+} = {
+  "webm/vp9": "webm",
+  "webm/vp8": "webm",
+  "webm/av1": "webm",
+  ogg: "ogv",
+};
 
-export interface DownloadOptions {
+export const downloadImageMimeMap: {
+  [downloadImageMimeType in DownloadImageMimeTypes]: string;
+} = {
+  jpg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  tiff: "image/tiff",
+  heic: "image/heic",
+};
+
+export const downloadVideoOptions: DownloadVideoOptionsTypes[] = [
+  "fps",
+  "mimeType",
+];
+
+export const downloadImageOptions: DownloadImageOptionsTypes[] = ["mimeType"];
+
+export interface DownloadVideoOptions {
   fps: DownloadRecordingFPSTypes;
   mimeType: DownloadRecordingMimeTypes;
 }
 
-export type DownloadOptionsTypes = "fps" | "mimeType";
+export interface DownloadImageOptions {
+  mimeType: DownloadRecordingMimeTypes;
+}
 
-export const downloadOptionsTitles = {
+export type DownloadVideoOptionsTypes = "fps" | "mimeType";
+
+export type DownloadImageOptionsTypes = "mimeType";
+
+export const downloadVideoOptionsTitles = {
   fps: "FPS",
   mimeType: "Mime type",
 };
 
-export const downloadOptionsArrays: {
+export const downloadImageOptionsTitles = {
+  mimeType: "Mime type",
+};
+
+export const downloadVideoOptionsArrays: {
   fps: DownloadRecordingFPSTypes[];
   mimeType: DownloadRecordingMimeTypes[];
 } = {
@@ -95,12 +129,24 @@ export const downloadOptionsArrays: {
   mimeType: ["webm/vp9", "webm/vp8", "webm/av1", "ogg"],
 };
 
+export const downloadImageOptionsArrays: {
+  mimeType: DownloadImageMimeTypes[];
+} = {
+  mimeType: ["jpg", "png", "webp", "tiff", "heic"],
+};
+
 export interface ActivePages {
-  downloadOptions: {
+  downloadVideoOptions: {
     active: boolean;
     fps: {
       active: boolean;
     };
+    mimeType: {
+      active: boolean;
+    };
+  };
+  downloadImageOptions: {
+    active: boolean;
     mimeType: {
       active: boolean;
     };
@@ -114,11 +160,17 @@ export interface ActivePages {
 }
 
 export const defaultActivePages: ActivePages = {
-  downloadOptions: {
+  downloadVideoOptions: {
     active: false,
     fps: {
       active: false,
     },
+    mimeType: {
+      active: false,
+    },
+  },
+  downloadImageOptions: {
+    active: false,
     mimeType: {
       active: false,
     },
@@ -132,13 +184,19 @@ export const defaultActivePages: ActivePages = {
 };
 
 export const defaultSettings: Settings = Object.freeze({
-  downloadOptions: Object.freeze({
+  downloadVideoOptions: Object.freeze({
     value: "",
     fps: Object.freeze({
       value: "30 fps",
     }),
     mimeType: Object.freeze({
       value: "webm/vp9",
+    }),
+  }),
+  downloadImageOptions: Object.freeze({
+    value: "",
+    mimeType: Object.freeze({
+      value: "jpg",
     }),
   }),
   videoSpeed: {

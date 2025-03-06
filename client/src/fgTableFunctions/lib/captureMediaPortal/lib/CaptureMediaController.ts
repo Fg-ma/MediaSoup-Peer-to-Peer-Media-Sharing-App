@@ -7,6 +7,8 @@ import CaptureMedia from "../../../../media/capture/CaptureMedia";
 import TableFunctionsController from "../../TableFunctionsController";
 import {
   CaptureMediaTypes,
+  downloadImageMimeMap,
+  downloadRecordingExtensionsMap,
   downloadRecordingMimeMap,
   Settings,
 } from "./typeConstant";
@@ -57,7 +59,13 @@ class CaptureMediaController {
     private setCaptureMediaActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private setDelayCountDown: React.Dispatch<React.SetStateAction<number>>,
+    private delayTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private delayCountDownInterval: React.MutableRefObject<
+      NodeJS.Timeout | undefined
+    >,
+    private delaying: React.MutableRefObject<boolean>
   ) {}
 
   handleEffects = () => {
@@ -137,22 +145,71 @@ class CaptureMediaController {
     }, 1250);
   };
 
-  handleCapture = () => {
-    this.setCaptureMediaTypeActive(false);
+  private cameraCapture = () => {
+    clearInterval(this.countDownInterval.current);
+    this.countDownInterval.current = undefined;
+    clearTimeout(this.countDownTimeout.current);
+    this.countDownTimeout.current = undefined;
 
-    if (
-      this.mediaType === "10s" ||
-      this.mediaType === "15s" ||
-      this.mediaType === "30s" ||
-      this.mediaType === "60s"
-    ) {
-      if (!this.recording) {
-        this.captureMedia.current?.babylonScene?.startRecording(
-          downloadRecordingMimeMap[
-            this.settings.downloadOptions.mimeType.value
-          ],
-          parseInt(this.settings.downloadOptions.fps.value.slice(0, -4))
-        );
+    this.setRecordingCount(0);
+
+    this.setRecording(true);
+
+    this.captureMedia.current?.babylonScene?.takeSnapShot(
+      downloadImageMimeMap[this.settings.downloadImageOptions.mimeType.value]
+    );
+
+    this.countDownTimeout.current = setTimeout(() => {
+      this.setRecording(false);
+
+      clearInterval(this.countDownInterval.current);
+      this.countDownInterval.current = undefined;
+      clearTimeout(this.countDownTimeout.current);
+      this.countDownTimeout.current = undefined;
+
+      this.setRecordingCount(0);
+    }, 150);
+
+    this.setFinalizeCapture(true);
+    this.finalizingCapture.current = true;
+    this.finalizedCaptureType.current = "image";
+
+    this.captureMedia.current?.babylonScene?.addScreenShotSuccessCallback(
+      this.addScreenShotSuccessCallback
+    );
+  };
+
+  private startTimedVideoCapture = () => {
+    this.captureMedia.current?.babylonScene?.startRecording(
+      downloadRecordingMimeMap[
+        this.settings.downloadVideoOptions.mimeType.value
+      ],
+      parseInt(this.settings.downloadVideoOptions.fps.value.slice(0, -4))
+    );
+
+    if (this.mediaType === "10s") {
+      this.setRecordingCount(10);
+    } else if (this.mediaType === "15s") {
+      this.setRecordingCount(15);
+    } else if (this.mediaType === "30s") {
+      this.setRecordingCount(30);
+    } else if (this.mediaType === "60s") {
+      this.setRecordingCount(60);
+    }
+
+    this.countDownInterval.current = setInterval(() => {
+      this.setRecordingCount((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    this.countDownTimeout.current = setTimeout(
+      () => {
+        this.captureMedia.current?.babylonScene?.stopRecording();
+
+        this.setRecording(false);
+
+        clearInterval(this.countDownInterval.current);
+        this.countDownInterval.current = undefined;
+        clearTimeout(this.countDownTimeout.current);
+        this.countDownTimeout.current = undefined;
 
         if (this.mediaType === "10s") {
           this.setRecordingCount(10);
@@ -164,44 +221,82 @@ class CaptureMediaController {
           this.setRecordingCount(60);
         }
 
-        this.countDownInterval.current = setInterval(() => {
-          this.setRecordingCount((prev) => Math.max(0, prev - 1));
-        }, 1000);
-        this.countDownTimeout.current = setTimeout(
-          () => {
-            this.captureMedia.current?.babylonScene?.stopRecording();
-
-            this.setRecording(false);
-
-            clearInterval(this.countDownInterval.current);
-            this.countDownInterval.current = undefined;
-            clearTimeout(this.countDownTimeout.current);
-            this.countDownTimeout.current = undefined;
-
-            if (this.mediaType === "10s") {
-              this.setRecordingCount(10);
-            } else if (this.mediaType === "15s") {
-              this.setRecordingCount(15);
-            } else if (this.mediaType === "30s") {
-              this.setRecordingCount(30);
-            } else if (this.mediaType === "60s") {
-              this.setRecordingCount(60);
-            }
-
-            this.captureMedia.current?.babylonScene?.addVideoSuccessCallback(
-              this.addVideoSuccessCallback
-            );
-          },
-          this.mediaType === "60s"
-            ? 60000
-            : this.mediaType === "30s"
-            ? 30000
-            : this.mediaType === "15s"
-            ? 15000
-            : this.mediaType === "10s"
-            ? 10000
-            : 0
+        this.captureMedia.current?.babylonScene?.addVideoSuccessCallback(
+          this.addVideoSuccessCallback
         );
+      },
+      this.mediaType === "60s"
+        ? 60000
+        : this.mediaType === "30s"
+        ? 30000
+        : this.mediaType === "15s"
+        ? 15000
+        : this.mediaType === "10s"
+        ? 10000
+        : 0
+    );
+  };
+
+  private startVideoCapture = () => {
+    this.setRecordingCount(1);
+
+    this.countDownInterval.current = setInterval(() => {
+      this.setRecordingCount((prev) => prev + 1);
+    }, 1000);
+
+    this.captureMedia.current?.babylonScene?.startRecording(
+      downloadRecordingMimeMap[
+        this.settings.downloadVideoOptions.mimeType.value
+      ],
+      parseInt(this.settings.downloadVideoOptions.fps.value.slice(0, -4))
+    );
+  };
+
+  private setDelay = (delayedFunction: () => void) => {
+    this.delaying.current = true;
+    this.setDelayCountDown(this.settings.delay.value);
+
+    this.delayTimeout.current = setTimeout(() => {
+      this.delaying.current = false;
+      delayedFunction();
+
+      clearTimeout(this.delayTimeout.current);
+      this.delayTimeout.current = undefined;
+      clearInterval(this.delayCountDownInterval.current);
+      this.delayCountDownInterval.current = undefined;
+    }, this.settings.delay.value * 1000);
+    this.delayCountDownInterval.current = setInterval(() => {
+      this.setDelayCountDown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+  };
+
+  clearDelay = () => {
+    this.delaying.current = false;
+
+    clearTimeout(this.delayTimeout.current);
+    this.delayTimeout.current = undefined;
+    clearInterval(this.delayCountDownInterval.current);
+    this.delayCountDownInterval.current = undefined;
+
+    this.setRecording(false);
+    this.setRerender((prev) => !prev);
+  };
+
+  handleCapture = () => {
+    this.setCaptureMediaTypeActive(false);
+
+    if (
+      this.mediaType === "10s" ||
+      this.mediaType === "15s" ||
+      this.mediaType === "30s" ||
+      this.mediaType === "60s"
+    ) {
+      if (!this.recording) {
+        if (this.settings.delay.value !== 0) {
+          this.setDelay(this.startTimedVideoCapture);
+        } else {
+          this.startTimedVideoCapture();
+        }
       } else {
         this.captureMedia.current?.babylonScene?.stopRecording();
 
@@ -227,54 +322,18 @@ class CaptureMediaController {
 
       this.setRecording((prev) => !prev);
     } else if (this.mediaType === "camera") {
-      clearInterval(this.countDownInterval.current);
-      this.countDownInterval.current = undefined;
-      clearTimeout(this.countDownTimeout.current);
-      this.countDownTimeout.current = undefined;
-
-      this.setRecordingCount(0);
-
-      this.setRecording(true);
-
-      this.captureMedia.current?.babylonScene?.takeSnapShot();
-
-      this.countDownTimeout.current = setTimeout(() => {
-        this.setRecording(false);
-
-        clearInterval(this.countDownInterval.current);
-        this.countDownInterval.current = undefined;
-        clearTimeout(this.countDownTimeout.current);
-        this.countDownTimeout.current = undefined;
-
-        this.setRecordingCount(0);
-      }, 150);
-
-      this.setFinalizeCapture(true);
-      this.finalizingCapture.current = true;
-      this.finalizedCaptureType.current = "image";
-
-      this.captureMedia.current?.babylonScene?.addScreenShotSuccessCallback(
-        this.addScreenShotSuccessCallback
-      );
+      if (this.settings.delay.value !== 0) {
+        this.setDelay(this.cameraCapture);
+      } else {
+        this.cameraCapture();
+      }
     } else if (this.mediaType === "video") {
-      clearInterval(this.countDownInterval.current);
-      this.countDownInterval.current = undefined;
-      clearTimeout(this.countDownTimeout.current);
-      this.countDownTimeout.current = undefined;
-
-      this.setRecordingCount(1);
-
-      this.countDownInterval.current = setInterval(() => {
-        this.setRecordingCount((prev) => prev + 1);
-      }, 1000);
-
       if (!this.recording) {
-        this.captureMedia.current?.babylonScene?.startRecording(
-          downloadRecordingMimeMap[
-            this.settings.downloadOptions.mimeType.value
-          ],
-          parseInt(this.settings.downloadOptions.fps.value.slice(0, -4))
-        );
+        if (this.settings.delay.value !== 0) {
+          this.setDelay(this.startVideoCapture);
+        } else {
+          this.startVideoCapture();
+        }
       } else {
         this.captureMedia.current?.babylonScene?.stopRecording();
 
@@ -301,7 +360,15 @@ class CaptureMediaController {
       try {
         const response = await fetch(this.videoRef.current.src);
         const blob = await response.blob();
-        formData.append("file", blob, "video.mp4");
+        formData.append(
+          "file",
+          blob,
+          `video.${
+            downloadRecordingExtensionsMap[
+              this.settings.downloadVideoOptions.mimeType.value
+            ]
+          }`
+        );
 
         const xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
@@ -319,7 +386,11 @@ class CaptureMediaController {
       try {
         const response = await fetch(this.imageRef.current.src);
         const blob = await response.blob();
-        formData.append("file", blob, "video.mp4");
+        formData.append(
+          "file",
+          blob,
+          `image.${this.settings.downloadImageOptions.mimeType.value}`
+        );
 
         const xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
@@ -346,7 +417,7 @@ class CaptureMediaController {
 
       const link = document.createElement("a");
       link.href = url;
-      link.download = "snapshot.png";
+      link.download = `snapshot.${this.settings.downloadImageOptions.mimeType.value}`;
 
       document.body.appendChild(link);
       link.click();
@@ -399,7 +470,9 @@ class CaptureMediaController {
         }
         break;
       case "x":
-        if (this.finalizingCapture.current) {
+        if (this.delaying.current) {
+          this.clearDelay();
+        } else if (this.finalizingCapture.current) {
           this.handleExitFinialization();
         } else {
           this.tableFunctionsController.stopVideo();

@@ -10,10 +10,12 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 
 export default function CloseButton({
+  delaying,
   finalizeCapture,
   tableFunctionsController,
   captureMediaController,
 }: {
+  delaying: React.MutableRefObject<boolean>;
   finalizeCapture: boolean;
   tableFunctionsController: TableFunctionsController;
   captureMediaController: CaptureMediaController;
@@ -24,7 +26,9 @@ export default function CloseButton({
       clickFunction={(event) => {
         event.stopPropagation();
 
-        finalizeCapture
+        delaying.current
+          ? captureMediaController.clearDelay()
+          : finalizeCapture
           ? captureMediaController.handleExitFinialization()
           : tableFunctionsController.stopVideo();
       }}

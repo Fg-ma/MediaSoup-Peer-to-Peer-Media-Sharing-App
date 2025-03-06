@@ -688,7 +688,7 @@ class BabylonScene {
     }
   };
 
-  takeSnapShot = () => {
+  takeSnapShot = (mimeType?: string) => {
     if (this.engine) {
       Tools.CreateScreenshotUsingRenderTarget(
         this.engine,
@@ -699,7 +699,8 @@ class BabylonScene {
           this.screenShotSuccessCallbacks.map((screenShotSuccessCallback) =>
             screenShotSuccessCallback()
           );
-        }
+        },
+        mimeType ?? "image/png"
       );
     }
   };

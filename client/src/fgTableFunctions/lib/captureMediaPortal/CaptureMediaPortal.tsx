@@ -23,6 +23,7 @@ import DownloadButton from "./lib/finalize/DownloadButton";
 import SettingsButton from "./lib/settingsButton/SettingsButton";
 import VideoDurationSection from "./lib/finalize/VideoDurationSection";
 import "./lib/captureMedia.css";
+import DelayCountDownButton from "./lib/delay/DelayCountDownButton";
 
 export default function CaptureMediaPortal({
   captureMedia,
@@ -84,6 +85,11 @@ export default function CaptureMediaPortal({
 
   const [_, setRerender] = useState(false);
 
+  const delaying = useRef(false);
+  const [delayCountDown, setDelayCountDown] = useState(0);
+  const delayTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+  const delayCountDownInterval = useRef<NodeJS.Timeout | undefined>(undefined);
+
   const captureMediaController = new CaptureMediaController(
     table_id,
     captureStreamEffects,
@@ -115,52 +121,65 @@ export default function CaptureMediaPortal({
     isScrubbing,
     wasPaused,
     setCaptureMediaActive,
-    setRerender
+    setRerender,
+    setDelayCountDown,
+    delayTimeout,
+    delayCountDownInterval,
+    delaying
   );
 
+  const handleResize = () => {
+    if (!captureMedia.current || !captureMainContainerRef.current) return;
+
+    const aspect =
+      captureMedia.current.video.videoWidth /
+      captureMedia.current.video.videoHeight;
+
+    const maxHeight = captureMainContainerRef.current.clientHeight;
+    const maxWidth = captureMainContainerRef.current.clientWidth;
+
+    const calculatedMaxWidthHeight = maxWidth / aspect;
+
+    if (calculatedMaxWidthHeight > maxHeight) {
+      setLargestDim("height");
+    } else {
+      setLargestDim("width");
+    }
+
+    setControlsHeight(
+      Math.max(
+        24,
+        Math.min(48, captureMainContainerRef.current.clientHeight * 0.12)
+      )
+    );
+  };
+
   useEffect(() => {
-    if (finalizeCapture) {
+    if (delaying) {
+      if (captureMedia.current) {
+        captureMedia.current.canvas.remove();
+        captureContainerRef.current?.appendChild(captureMedia.current.canvas);
+        captureMedia.current?.restartVideo();
+      }
+    } else if (finalizeCapture) {
       if (captureMedia.current) {
         captureMedia.current.canvas.remove();
       }
     } else {
       if (captureMedia.current) {
+        captureMedia.current?.canvas.remove();
         captureContainerRef.current?.appendChild(captureMedia.current.canvas);
+        captureMedia.current?.restartVideo();
       }
-      captureMedia.current?.restartVideo();
     }
-  }, [finalizeCapture]);
+  }, [finalizeCapture, delaying.current]);
 
   useLayoutEffect(() => {
     if (!captureMainContainerRef.current) {
       return;
     }
 
-    const observer = new ResizeObserver(() => {
-      if (!captureMedia.current || !captureMainContainerRef.current) return;
-
-      const aspect =
-        captureMedia.current.video.videoWidth /
-        captureMedia.current.video.videoHeight;
-
-      const maxHeight = captureMainContainerRef.current.clientHeight * 0.95;
-      const maxWidth = captureMainContainerRef.current.clientWidth * 0.95;
-
-      const calculatedMaxWidthHeight = maxWidth / aspect;
-
-      if (calculatedMaxWidthHeight > maxHeight) {
-        setLargestDim("height");
-      } else {
-        setLargestDim("width");
-      }
-
-      setControlsHeight(
-        Math.max(
-          24,
-          Math.min(48, captureMainContainerRef.current.clientHeight * 0.12)
-        )
-      );
-    });
+    const observer = new ResizeObserver(handleResize);
 
     observer.observe(captureMainContainerRef.current);
 
@@ -170,6 +189,11 @@ export default function CaptureMediaPortal({
   useEffect(() => {
     document.addEventListener("keydown", captureMediaController.handleKeyDown);
     document.addEventListener("keyup", captureMediaController.handleKeyUp);
+    if (captureMedia.current)
+      captureMedia.current.video.addEventListener(
+        "loadedmetadata",
+        handleResize
+      );
 
     return () => {
       document.removeEventListener(
@@ -177,10 +201,15 @@ export default function CaptureMediaPortal({
         captureMediaController.handleKeyDown
       );
       document.removeEventListener("keyup", captureMediaController.handleKeyUp);
+      if (captureMedia.current)
+        captureMedia.current.video.removeEventListener(
+          "loadedmetadata",
+          handleResize
+        );
     };
   }, []);
 
-  return !finalizeCapture ? (
+  return !finalizeCapture && !delaying.current ? (
     <FgPortal
       type='staticTopDomain'
       top={0}
@@ -201,15 +230,15 @@ export default function CaptureMediaPortal({
         >
           <div
             ref={captureMainContainerRef}
-            className='flex absolute w-4/5 h-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'
+            className='flex absolute w-4/5 h-[95%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'
           >
             <div
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
-              } max-w-[95%] max-h-[95%] rounded-md overflow-hidden relative pointer-events-auto bg-transparent`}
+              } rounded-md overflow-hidden relative pointer-events-auto bg-transparent`}
               style={{
-                aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight} !important`,
+                aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
@@ -234,6 +263,7 @@ export default function CaptureMediaPortal({
                 )}
                 <div className='flex top-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center'>
                   <CloseButton
+                    delaying={delaying}
                     finalizeCapture={finalizeCapture}
                     tableFunctionsController={tableFunctionsController}
                     captureMediaController={captureMediaController}
@@ -280,6 +310,50 @@ export default function CaptureMediaPortal({
                       mediaType={mediaType}
                     />
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    />
+  ) : delaying.current ? (
+    <FgPortal
+      className='w-full h-full'
+      type='staticTopDomain'
+      top={0}
+      left={0}
+      zValue={499999998}
+      content={
+        <div
+          ref={captureMediaPortalRef}
+          className={`${
+            inCaptureMedia || settingsActive ? "in-capture-media" : ""
+          } capture-media-container w-full aspect h-full bg-fg-tone-black-4 bg-opacity-45`}
+        >
+          <div className='flex absolute w-4/5 h-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'>
+            <div
+              ref={captureContainerRef}
+              className={`${
+                largestDim === "width" ? "w-full" : "h-full"
+              } max-w-[95%] max-h-[95%] rounded-md overflow-hidden relative bg-transparent`}
+              style={{
+                aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
+              }}
+              onPointerEnter={captureMediaController.handlePointerEnter}
+              onPointerLeave={captureMediaController.handlePointerLeave}
+            >
+              <div className='flex capture-media-overlay-container items-center z-20 justify-center w-full h-full absolute top-0 left-0 pointer-events-none'>
+                <div className='flex top-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center z-[100]'>
+                  <CloseButton
+                    delaying={delaying}
+                    finalizeCapture={finalizeCapture}
+                    tableFunctionsController={tableFunctionsController}
+                    captureMediaController={captureMediaController}
+                  />
+                </div>
+                <div className='flex bottom-[1%] w-full h-[16%] max-h-20 min-h-10 absolute left-0 items-center justify-center z-[100]'>
+                  <DelayCountDownButton delayCountDown={delayCountDown} />
                 </div>
               </div>
             </div>
@@ -349,6 +423,7 @@ export default function CaptureMediaPortal({
                 )}
                 <div className='flex top-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center z-[100]'>
                   <CloseButton
+                    delaying={delaying}
                     finalizeCapture={finalizeCapture}
                     tableFunctionsController={tableFunctionsController}
                     captureMediaController={captureMediaController}
