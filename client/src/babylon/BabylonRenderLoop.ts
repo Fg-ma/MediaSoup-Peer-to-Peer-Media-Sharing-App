@@ -138,6 +138,15 @@ class BabylonRenderLoop {
   };
 
   private processEffects = async () => {
+    this.frameCounter++;
+
+    if (
+      this.FACE_MESH_DETECTION_INTERVAL === 1 ||
+      this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
+    ) {
+      await this.detectFaces();
+    }
+
     if (
       !this.faceMeshWorker ||
       !this.faceMeshResults ||
@@ -153,15 +162,6 @@ class BabylonRenderLoop {
     ) {
       this.finishedProcessingEffects = true;
       return;
-    }
-
-    this.frameCounter++;
-
-    if (
-      this.FACE_MESH_DETECTION_INTERVAL === 1 ||
-      this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
-    ) {
-      await this.detectFaces();
     }
 
     this.finishedProcessingEffects = true;

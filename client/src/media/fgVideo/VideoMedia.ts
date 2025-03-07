@@ -784,8 +784,6 @@ class VideoMedia {
     });
 
     this.deadbanding.update("video", this.videoId, this.effects);
-
-    this.babylonScene.imageAlreadyProcessed = 1;
   };
 
   changeEffects = (

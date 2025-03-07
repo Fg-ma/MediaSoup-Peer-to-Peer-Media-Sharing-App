@@ -24,6 +24,7 @@ import SettingsButton from "./lib/settingsButton/SettingsButton";
 import VideoDurationSection from "./lib/finalize/VideoDurationSection";
 import "./lib/captureMedia.css";
 import DelayCountDownButton from "./lib/delay/DelayCountDownButton";
+import ShutterSVG from "./lib/ShutterSVG";
 
 export default function CaptureMediaPortal({
   captureMedia,
@@ -155,13 +156,13 @@ export default function CaptureMediaPortal({
   };
 
   useEffect(() => {
-    if (delaying) {
+    if (delaying.current) {
       if (captureMedia.current) {
         captureMedia.current.canvas.remove();
         captureContainerRef.current?.appendChild(captureMedia.current.canvas);
         captureMedia.current?.restartVideo();
       }
-    } else if (finalizeCapture) {
+    } else if (finalizingCapture.current) {
       if (captureMedia.current) {
         captureMedia.current.canvas.remove();
       }
@@ -172,7 +173,7 @@ export default function CaptureMediaPortal({
         captureMedia.current?.restartVideo();
       }
     }
-  }, [finalizeCapture, delaying.current]);
+  }, [finalizingCapture.current, delaying.current]);
 
   useLayoutEffect(() => {
     if (!captureMainContainerRef.current) {
@@ -184,7 +185,11 @@ export default function CaptureMediaPortal({
     observer.observe(captureMainContainerRef.current);
 
     return () => observer.disconnect();
-  }, []);
+  }, [
+    captureMainContainerRef.current,
+    finalizingCapture.current,
+    delaying.current,
+  ]);
 
   useEffect(() => {
     document.addEventListener("keydown", captureMediaController.handleKeyDown);
@@ -336,7 +341,7 @@ export default function CaptureMediaPortal({
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
-              } max-w-[95%] max-h-[95%] rounded-md overflow-hidden relative bg-transparent`}
+              } rounded-md overflow-hidden relative pointer-events-auto bg-transparent`}
               style={{
                 aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
@@ -380,13 +385,14 @@ export default function CaptureMediaPortal({
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
-              } max-w-[95%] max-h-[95%] rounded-md overflow-hidden relative bg-transparent`}
+              } rounded-md overflow-hidden relative pointer-events-auto bg-transparent`}
               style={{
                 aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
             >
+              {finalizedCaptureType.current === "image" && <ShutterSVG />}
               {finalizedCaptureType.current === "image" ? (
                 <img
                   ref={imageRef}

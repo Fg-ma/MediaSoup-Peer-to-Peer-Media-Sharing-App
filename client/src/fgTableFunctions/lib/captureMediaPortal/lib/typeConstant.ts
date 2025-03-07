@@ -43,11 +43,14 @@ export type DownloadRecordingFPSTypes =
 export interface Settings {
   downloadVideoOptions: {
     value: "";
+    mimeType: {
+      value: DownloadRecordingMimeTypes;
+    };
     fps: {
       value: DownloadRecordingFPSTypes;
     };
-    mimeType: {
-      value: DownloadRecordingMimeTypes;
+    bitRate: {
+      value: number | "default";
     };
   };
   downloadImageOptions: {
@@ -55,6 +58,9 @@ export interface Settings {
     mimeType: {
       value: DownloadImageMimeTypes;
     };
+    samples: { value: number };
+    antialiasing: { value: boolean };
+    quality: { value: number };
   };
   videoSpeed: {
     value: number;
@@ -93,11 +99,17 @@ export const downloadImageMimeMap: {
 };
 
 export const downloadVideoOptions: DownloadVideoOptionsTypes[] = [
-  "fps",
   "mimeType",
+  "fps",
+  "bitRate",
 ];
 
-export const downloadImageOptions: DownloadImageOptionsTypes[] = ["mimeType"];
+export const downloadImageOptions: DownloadImageOptionsTypes[] = [
+  "mimeType",
+  "samples",
+  "antialiasing",
+  "quality",
+];
 
 export interface DownloadVideoOptions {
   fps: DownloadRecordingFPSTypes;
@@ -106,48 +118,76 @@ export interface DownloadVideoOptions {
 
 export interface DownloadImageOptions {
   mimeType: DownloadRecordingMimeTypes;
+  samples: number;
+  antialiasing: boolean;
+  quality: number;
 }
 
-export type DownloadVideoOptionsTypes = "fps" | "mimeType";
+export type DownloadVideoOptionsTypes = "mimeType" | "fps" | "bitRate";
 
-export type DownloadImageOptionsTypes = "mimeType";
+export type DownloadImageOptionsTypes =
+  | "mimeType"
+  | "samples"
+  | "antialiasing"
+  | "quality";
 
 export const downloadVideoOptionsTitles = {
-  fps: "FPS",
   mimeType: "Mime type",
+  fps: "FPS",
+  bitRate: "Bit rate",
 };
 
 export const downloadImageOptionsTitles = {
   mimeType: "Mime type",
+  samples: "Samples",
+  antialiasing: "Antialiasing",
+  quality: "Quality",
 };
 
 export const downloadVideoOptionsArrays: {
-  fps: DownloadRecordingFPSTypes[];
   mimeType: DownloadRecordingMimeTypes[];
+  fps: DownloadRecordingFPSTypes[];
+  bitRate: (number | "default")[];
 } = {
-  fps: ["24 fps", "25 fps", "30 fps", "60 fps"],
   mimeType: ["webm/vp9", "webm/vp8", "webm/av1", "ogg"],
+  fps: ["24 fps", "25 fps", "30 fps", "60 fps"],
+  bitRate: ["default", 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 4, 5],
 };
 
 export const downloadImageOptionsArrays: {
   mimeType: DownloadImageMimeTypes[];
+  samples: number[];
+  antialiasing: [];
+  quality: number[];
 } = {
   mimeType: ["jpg", "png", "webp", "tiff", "heic"],
+  samples: [1, 4, 8, 16, 32],
+  antialiasing: [],
+  quality: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
 };
 
 export interface ActivePages {
   downloadVideoOptions: {
     active: boolean;
+    mimeType: {
+      active: boolean;
+    };
     fps: {
       active: boolean;
     };
-    mimeType: {
+    bitRate: {
       active: boolean;
     };
   };
   downloadImageOptions: {
     active: boolean;
     mimeType: {
+      active: boolean;
+    };
+    samples: {
+      active: boolean;
+    };
+    quality: {
       active: boolean;
     };
   };
@@ -162,16 +202,25 @@ export interface ActivePages {
 export const defaultActivePages: ActivePages = {
   downloadVideoOptions: {
     active: false,
+    mimeType: {
+      active: false,
+    },
     fps: {
       active: false,
     },
-    mimeType: {
+    bitRate: {
       active: false,
     },
   },
   downloadImageOptions: {
     active: false,
     mimeType: {
+      active: false,
+    },
+    samples: {
+      active: false,
+    },
+    quality: {
       active: false,
     },
   },
@@ -186,11 +235,14 @@ export const defaultActivePages: ActivePages = {
 export const defaultSettings: Settings = Object.freeze({
   downloadVideoOptions: Object.freeze({
     value: "",
+    mimeType: Object.freeze({
+      value: "webm/vp9",
+    }),
     fps: Object.freeze({
       value: "30 fps",
     }),
-    mimeType: Object.freeze({
-      value: "webm/vp9",
+    bitRate: Object.freeze({
+      value: "default",
     }),
   }),
   downloadImageOptions: Object.freeze({
@@ -198,6 +250,15 @@ export const defaultSettings: Settings = Object.freeze({
     mimeType: Object.freeze({
       value: "jpg",
     }),
+    samples: {
+      value: 8,
+    },
+    antialiasing: {
+      value: true,
+    },
+    quality: {
+      value: 0.8,
+    },
   }),
   videoSpeed: {
     value: 1.0,

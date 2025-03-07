@@ -65,6 +65,11 @@ class ImageMedia {
     rotation: number;
   };
 
+  private faceCountChangeListeners: Set<(facesDetected: number) => void> =
+    new Set();
+
+  forcingFaces = false;
+
   constructor(
     private imageId: string,
     filename: string,
@@ -174,6 +179,7 @@ class ImageMedia {
           this.faceDetectionProcessing[0] = false;
           const detectedFaces = event.data.numFacesDetected;
           this.detectedFaces = detectedFaces === undefined ? 0 : detectedFaces;
+
           if (detectedFaces !== this.maxFaces[0]) {
             this.maxFaces[0] = detectedFaces;
 
@@ -182,6 +188,10 @@ class ImageMedia {
               newMaxFace: detectedFaces,
             });
             this.rectifyEffectMeshCount();
+
+            this.faceCountChangeListeners.forEach((listener) => {
+              listener(detectedFaces);
+            });
           }
           break;
         }
@@ -213,6 +223,26 @@ class ImageMedia {
       }
     };
   }
+
+  deconstructor() {
+    this.image.src = "";
+
+    if (this.blobURL) URL.revokeObjectURL(this.blobURL);
+
+    this.faceCountChangeListeners.clear();
+  }
+
+  addFaceCountChangeListener = (
+    listener: (facesDetected: number) => void
+  ): void => {
+    this.faceCountChangeListeners.add(listener);
+  };
+
+  removeFaceCountChangeListener = (
+    listener: (facesDetected: number) => void
+  ): void => {
+    this.faceCountChangeListeners.delete(listener);
+  };
 
   private rectifyEffectMeshCount = () => {
     if (!this.babylonScene) {
@@ -285,12 +315,6 @@ class ImageMedia {
       }
     }
   };
-
-  deconstructor() {
-    this.image.src = "";
-
-    if (this.blobURL) URL.revokeObjectURL(this.blobURL);
-  }
 
   private getImageListener = (message: IncomingTableStaticContentMessages) => {
     if (message.type === "chunk") {
@@ -590,7 +614,7 @@ class ImageMedia {
 
     this.deadbanding.update("image", this.imageId, this.effects);
 
-    this.babylonScene.imageAlreadyProcessed = 1;
+    this.babylonScene.imageAlreadyProcessed[0] = 1;
   };
 
   changeEffects = (
@@ -668,7 +692,7 @@ class ImageMedia {
       );
     }
 
-    this.babylonScene.imageAlreadyProcessed = 1;
+    this.babylonScene.imageAlreadyProcessed[0] = 1;
   };
 
   drawNewEffect = (effect: EffectType) => {
@@ -720,6 +744,10 @@ class ImageMedia {
     const b = bigint & 255;
 
     return [r / 255, g / 255, b / 255];
+  };
+
+  forceRedetectFaces = () => {
+    if (this.babylonScene) this.babylonScene.imageAlreadyProcessed[0] = 1;
   };
 }
 

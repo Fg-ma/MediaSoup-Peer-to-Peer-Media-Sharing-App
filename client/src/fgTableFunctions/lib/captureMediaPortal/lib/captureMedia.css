@@ -74,7 +74,7 @@
 }
 
 .capture-media-container.scrubbing .timeline::before,
-.capture-media-container.scrubbing timeline::after,
+.capture-media-container.scrubbing .timeline::after,
 .capture-media-overlay-container .timeline-container:hover .timeline::before,
 .capture-media-overlay-container .timeline-container:hover .timeline::after {
   border-radius: 0.25rem;

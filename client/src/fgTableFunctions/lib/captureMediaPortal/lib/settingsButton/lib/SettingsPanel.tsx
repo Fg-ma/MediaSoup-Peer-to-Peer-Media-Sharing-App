@@ -21,6 +21,9 @@ import VideoSpeedPage from "./VideoSpeedPage";
 import CaptureMediaController from "../../CaptureMediaController";
 import DelayPage from "./DelayPage";
 import DownloadImageOptionsPage from "./DownloadImageOptionsPage";
+import QualityPage from "./QualityPage";
+import SamplesPage from "./SamplesPage";
+import BitRatePage from "./BitRatePage";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -209,6 +212,7 @@ export default function SettingsPanel({
       exit='init'
       transition={SelectionPanelTransition}
     >
+      {/* Main page */}
       <AnimatePresence>
         {!isDescendantActive(activePages) && (
           <motion.div
@@ -262,6 +266,7 @@ export default function SettingsPanel({
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Download video options page */}
       <AnimatePresence>
         {activePages.downloadVideoOptions.active &&
           !isDescendantActive(activePages.downloadVideoOptions) && (
@@ -279,6 +284,7 @@ export default function SettingsPanel({
             </motion.div>
           )}
       </AnimatePresence>
+      {/* Download image options page */}
       <AnimatePresence>
         {activePages.downloadImageOptions.active &&
           !isDescendantActive(activePages.downloadImageOptions) && (
@@ -292,13 +298,16 @@ export default function SettingsPanel({
               <DownloadImageOptionsPage
                 setActivePages={setActivePages}
                 settings={settings}
+                setSettings={setSettings}
               />
             </motion.div>
           )}
       </AnimatePresence>
+      {/* Download video options option page */}
       <AnimatePresence>
         {activePages.downloadVideoOptions.active &&
-          isDescendantActive(activePages.downloadVideoOptions) && (
+          isDescendantActive(activePages.downloadVideoOptions) &&
+          !activePages.downloadVideoOptions.bitRate.active && (
             <motion.div
               className='w-full'
               variants={panelVariants}
@@ -374,9 +383,32 @@ export default function SettingsPanel({
             </motion.div>
           )}
       </AnimatePresence>
+      {/* Download video options bit rate page */}
+      <AnimatePresence>
+        {activePages.downloadVideoOptions.active &&
+          isDescendantActive(activePages.downloadVideoOptions) &&
+          activePages.downloadVideoOptions.bitRate.active && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <BitRatePage
+                setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      {/* Download image options option page */}
       <AnimatePresence>
         {activePages.downloadImageOptions.active &&
-          isDescendantActive(activePages.downloadImageOptions) && (
+          isDescendantActive(activePages.downloadImageOptions) &&
+          !activePages.downloadImageOptions.quality.active &&
+          !activePages.downloadImageOptions.samples.active && (
             <motion.div
               className='w-full'
               variants={panelVariants}
@@ -385,62 +417,51 @@ export default function SettingsPanel({
               exit='exit'
             >
               {downloadImageOptions.map((option) => {
-                const activePage =
-                  activePages.downloadImageOptions[
-                    option as DownloadImageOptionsTypes
-                  ];
-                const activeSetting =
-                  settings.downloadImageOptions[
-                    option as DownloadImageOptionsTypes
-                  ];
+                if (option === "antialiasing") {
+                  return;
+                }
+
+                const activePage = activePages.downloadImageOptions[option];
+                const activeSetting = settings.downloadImageOptions[option];
 
                 return (
                   activePage.active && (
                     <PageTemplate
                       key={option}
-                      content={downloadImageOptionsArrays[
-                        option as DownloadImageOptionsTypes
-                      ].map((type) => (
-                        <FgButton
-                          key={type}
-                          className={`w-full rounded bg-opacity-75 min-w-32 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
-                            type === activeSetting.value
-                              ? "bg-fg-white text-fg-tone-black-1"
-                              : ""
-                          }`}
-                          contentFunction={() => (
-                            <div className='flex justify-start items-start'>
-                              {type}
-                            </div>
-                          )}
-                          clickFunction={() => {
-                            setSettings((prev) => {
-                              const newSettings = { ...prev };
+                      content={downloadImageOptionsArrays[option].map(
+                        (type) => (
+                          <FgButton
+                            key={type}
+                            className={`w-full rounded bg-opacity-75 min-w-32 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                              type === activeSetting.value
+                                ? "bg-fg-white text-fg-tone-black-1"
+                                : ""
+                            }`}
+                            contentFunction={() => (
+                              <div className='flex justify-start items-start'>
+                                {type}
+                              </div>
+                            )}
+                            clickFunction={() => {
+                              setSettings((prev) => {
+                                const newSettings = { ...prev };
 
-                              newSettings.downloadImageOptions[
-                                option as DownloadImageOptionsTypes
-                              ].value = type;
+                                newSettings.downloadImageOptions[option].value =
+                                  type;
 
-                              return newSettings;
-                            });
-                          }}
-                        />
-                      ))}
-                      pageTitle={
-                        downloadImageOptionsTitles[
-                          option as DownloadImageOptionsTypes
-                        ]
-                      }
+                                return newSettings;
+                              });
+                            }}
+                          />
+                        )
+                      )}
+                      pageTitle={downloadImageOptionsTitles[option]}
                       backFunction={() => {
                         setActivePages((prev) => {
                           const newActivePages = { ...prev };
 
-                          newActivePages.downloadImageOptions[
-                            option as DownloadImageOptionsTypes
-                          ].active =
-                            !newActivePages.downloadImageOptions[
-                              option as DownloadImageOptionsTypes
-                            ].active;
+                          newActivePages.downloadImageOptions[option].active =
+                            !newActivePages.downloadImageOptions[option].active;
 
                           return newActivePages;
                         });
@@ -452,6 +473,47 @@ export default function SettingsPanel({
             </motion.div>
           )}
       </AnimatePresence>
+      {/* Download image options quality page */}
+      <AnimatePresence>
+        {activePages.downloadImageOptions.active &&
+          isDescendantActive(activePages.downloadImageOptions) &&
+          activePages.downloadImageOptions.quality.active && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <QualityPage
+                setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      {/* Download image options samlples page */}
+      <AnimatePresence>
+        {activePages.downloadImageOptions.active &&
+          isDescendantActive(activePages.downloadImageOptions) &&
+          activePages.downloadImageOptions.samples.active && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <SamplesPage
+                setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      {/* Video speed page */}
       <AnimatePresence>
         {activePages.videoSpeed.active &&
           !isDescendantActive(activePages.videoSpeed) && (
@@ -471,6 +533,7 @@ export default function SettingsPanel({
             </motion.div>
           )}
       </AnimatePresence>
+      {/* Delay page */}
       <AnimatePresence>
         {activePages.delay.active && !isDescendantActive(activePages.delay) && (
           <motion.div

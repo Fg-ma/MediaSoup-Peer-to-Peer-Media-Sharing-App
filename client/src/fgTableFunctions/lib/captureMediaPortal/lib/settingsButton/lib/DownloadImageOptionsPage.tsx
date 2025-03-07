@@ -16,9 +16,11 @@ const navigateForwardIcon = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
 export default function DownloadImageOptionsPage({
   setActivePages,
   settings,
+  setSettings,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
   const handleDownloadImageOptionsActive = () => {
     setActivePages((prev) => {
@@ -34,14 +36,25 @@ export default function DownloadImageOptionsPage({
   const handleOptionSelect = (
     option: keyof typeof downloadImageOptionsTitles
   ) => {
-    setActivePages((prev) => {
-      const newActivePages = { ...prev };
+    if (option !== "antialiasing") {
+      setActivePages((prev) => {
+        const newActivePages = { ...prev };
 
-      newActivePages.downloadImageOptions[option].active =
-        !newActivePages.downloadImageOptions[option].active;
+        newActivePages.downloadImageOptions[option].active =
+          !newActivePages.downloadImageOptions[option].active;
 
-      return newActivePages;
-    });
+        return newActivePages;
+      });
+    } else {
+      setSettings((prev) => {
+        const newSettings = { ...prev };
+
+        newSettings.downloadImageOptions[option].value =
+          !newSettings.downloadImageOptions[option].value;
+
+        return newSettings;
+      });
+    }
   };
 
   return (
@@ -81,7 +94,18 @@ export default function DownloadImageOptionsPage({
               )
             }
             contentFunction={() => (
-              <div className='flex w-full justify-between space-x-4 px-2 bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap'>
+              <div
+                className={`${
+                  option !== "antialiasing"
+                    ? "justify-between"
+                    : "justify-center"
+                } ${
+                  option === "antialiasing" &&
+                  settings.downloadImageOptions.antialiasing.value
+                    ? "bg-fg-white text-fg-tone-black-1"
+                    : ""
+                } flex w-full space-x-4 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap`}
+              >
                 <div>
                   {
                     downloadImageOptionsTitles[
@@ -89,24 +113,30 @@ export default function DownloadImageOptionsPage({
                     ]
                   }
                 </div>
-                <div className='flex space-x-1 items-center justify-center'>
-                  <div>
-                    {
-                      settings.downloadImageOptions[
-                        option as keyof typeof downloadImageOptionsArrays
-                      ].value
-                    }
+                {option !== "antialiasing" && (
+                  <div className='flex space-x-1 items-center justify-center'>
+                    <div>
+                      {option === "quality"
+                        ? parseFloat(
+                            settings.downloadImageOptions[option].value.toFixed(
+                              2
+                            )
+                          )
+                        : settings.downloadImageOptions[
+                            option as keyof typeof downloadImageOptionsArrays
+                          ].value}
+                    </div>
+                    <FgSVG
+                      src={navigateForwardIcon}
+                      attributes={[
+                        { key: "width", value: "1.25rem" },
+                        { key: "height", value: "1.25rem" },
+                        { key: "fill", value: "#f2f2f2" },
+                        { key: "stroke", value: "#f2f2f2" },
+                      ]}
+                    />
                   </div>
-                  <FgSVG
-                    src={navigateForwardIcon}
-                    attributes={[
-                      { key: "width", value: "1.25rem" },
-                      { key: "height", value: "1.25rem" },
-                      { key: "fill", value: "#f2f2f2" },
-                      { key: "stroke", value: "#f2f2f2" },
-                    ]}
-                  />
-                </div>
+                )}
               </div>
             )}
           />

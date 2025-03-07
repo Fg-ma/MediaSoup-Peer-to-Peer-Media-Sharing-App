@@ -104,6 +104,8 @@ export default function FgSlider({
     })
   );
 
+  const [_, setRerender] = useState(false);
+
   const rescaleValue = (
     value: number,
     fromRange: [number, number],
@@ -169,43 +171,6 @@ export default function FgSlider({
       )
     )
   );
-
-  useEffect(() => {
-    if (fgSliderOptions.initValue === undefined) return;
-
-    setValue(
-      rescaleValue(
-        snapPositions(
-          rescaleValue(
-            fgSliderOptions.initValue,
-            [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
-            [0, 100]
-          )
-        ),
-        [0, 100],
-        [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax]
-      )
-    );
-    setStyleValue(
-      Math.max(
-        5,
-        Math.min(
-          95,
-          rescaleValue(
-            snapPositions(
-              rescaleValue(
-                fgSliderOptions.initValue,
-                [fgSliderOptions.rangeMin, fgSliderOptions.rangeMax],
-                [0, 100]
-              )
-            ),
-            [0, 100],
-            [5, 95]
-          )
-        )
-      )
-    );
-  }, [fgSliderOptions.initValue]);
 
   const handlePointerMove = (event: React.PointerEvent | PointerEvent) => {
     if (!trackRef.current) {
@@ -323,6 +288,8 @@ export default function FgSlider({
         )
       )
     );
+
+    setRerender((prev) => !prev);
   }, [externalStyleValue]);
 
   return (

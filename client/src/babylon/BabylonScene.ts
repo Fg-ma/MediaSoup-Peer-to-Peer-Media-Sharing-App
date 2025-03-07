@@ -107,7 +107,7 @@ class BabylonScene {
   twoDimMeshesZCoord = 90;
   threeDimMeshesZCoord = 100;
 
-  imageAlreadyProcessed = 1;
+  imageAlreadyProcessed = [1];
 
   mediaRecorder: MediaRecorder | undefined = undefined;
   chunks: Blob[] = [];
@@ -120,6 +120,8 @@ class BabylonScene {
   private videoSuccessCallbacks: (() => void)[] = [];
 
   private flip: boolean;
+
+  private forceFaceDetectEndListeners: Set<() => void> = new Set();
 
   constructor(
     private id: string,
@@ -248,22 +250,25 @@ class BabylonScene {
     window.removeEventListener("fullscreenchange", this.canvasSizeChange);
 
     this.resizeObserver.disconnect();
+
+    this.forceFaceDetectEndListeners.clear();
   };
 
   private engineRenderLoop = () => {
     if (
-      !(
-        this.backgroundMedia instanceof HTMLImageElement &&
-        this.imageAlreadyProcessed > 100
-      )
+      !(this.backgroundMedia instanceof HTMLImageElement) ||
+      this.imageAlreadyProcessed[0] < 100
     ) {
-      if (this.imageAlreadyProcessed <= 100) {
-        this.imageAlreadyProcessed += 1;
-      }
+      this.imageAlreadyProcessed[0] += 1;
 
       this.babylonRenderLoop.renderLoop();
+    } else if (this.imageAlreadyProcessed[0] === 100) {
+      this.imageAlreadyProcessed[0] += 1;
+
+      this.forceFaceDetectEndListeners.forEach((listener) => {
+        listener();
+      });
     }
-    this.babylonShaderController.renderLoop();
 
     this.scene.render();
   };
@@ -688,7 +693,12 @@ class BabylonScene {
     }
   };
 
-  takeSnapShot = (mimeType?: string) => {
+  takeSnapShot = (
+    mimeType?: string,
+    samples?: number,
+    antialiasing?: boolean,
+    quality?: number
+  ) => {
     if (this.engine) {
       Tools.CreateScreenshotUsingRenderTarget(
         this.engine,
@@ -700,7 +710,14 @@ class BabylonScene {
             screenShotSuccessCallback()
           );
         },
-        mimeType ?? "image/png"
+        mimeType ?? "image/png",
+        samples,
+        antialiasing,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        quality
       );
     }
   };
@@ -709,7 +726,11 @@ class BabylonScene {
     return this.snapShotURL;
   };
 
-  startRecording = (mimeType: string, fps: number) => {
+  startRecording = (
+    mimeType: string,
+    fps: number,
+    bitRate?: number | "default"
+  ) => {
     this.chunks = [];
     if (this.recordingURL) {
       URL.revokeObjectURL(this.recordingURL);
@@ -718,11 +739,21 @@ class BabylonScene {
 
     const stream = this.canvas.captureStream(fps);
     try {
-      this.mediaRecorder = new MediaRecorder(stream, { mimeType });
+      const options: MediaRecorderOptions = {
+        mimeType,
+      };
+      if (bitRate && bitRate !== "default") {
+        options["videoBitsPerSecond"] = bitRate;
+      }
+
+      this.mediaRecorder = new MediaRecorder(stream, options);
       this.recordingMimeType = mimeType;
     } catch {
       this.mediaRecorder = new MediaRecorder(stream, {
         mimeType: "video/webm; codecs=vp9",
+        ...(bitRate && bitRate !== "default"
+          ? { videoBitsPerSecond: bitRate }
+          : {}),
       });
       this.recordingMimeType = mimeType;
     }
@@ -791,6 +822,14 @@ class BabylonScene {
     this.videoSuccessCallbacks = this.videoSuccessCallbacks.filter(
       (callback) => callback !== VideoSuccessCallback
     );
+  };
+
+  addForceFaceDetectEndListener = (listener: () => void): void => {
+    this.forceFaceDetectEndListeners.add(listener);
+  };
+
+  removeForceFaceDetectEndListener = (listener: () => void): void => {
+    this.forceFaceDetectEndListeners.delete(listener);
   };
 }
 

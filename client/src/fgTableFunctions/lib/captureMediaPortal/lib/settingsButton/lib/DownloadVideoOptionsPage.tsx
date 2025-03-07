@@ -91,11 +91,18 @@ export default function DownloadsVideoOptionsPage({
                 </div>
                 <div className='flex space-x-1 items-center justify-center'>
                   <div>
-                    {
-                      settings.downloadVideoOptions[
-                        option as keyof typeof downloadVideoOptionsArrays
-                      ].value
-                    }
+                    {option === "bitRate"
+                      ? settings.downloadVideoOptions[option].value ===
+                        "default"
+                        ? settings.downloadVideoOptions[option].value
+                        : `${parseFloat(
+                            settings.downloadVideoOptions[option].value.toFixed(
+                              2
+                            )
+                          )} Mbps`
+                      : settings.downloadVideoOptions[
+                          option as keyof typeof downloadVideoOptionsArrays
+                        ].value}
                   </div>
                   <FgSVG
                     src={navigateForwardIcon}

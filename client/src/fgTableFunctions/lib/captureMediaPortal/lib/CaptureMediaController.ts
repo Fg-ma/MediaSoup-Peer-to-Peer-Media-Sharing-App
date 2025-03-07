@@ -156,7 +156,10 @@ class CaptureMediaController {
     this.setRecording(true);
 
     this.captureMedia.current?.babylonScene?.takeSnapShot(
-      downloadImageMimeMap[this.settings.downloadImageOptions.mimeType.value]
+      downloadImageMimeMap[this.settings.downloadImageOptions.mimeType.value],
+      this.settings.downloadImageOptions.samples.value,
+      this.settings.downloadImageOptions.antialiasing.value,
+      this.settings.downloadImageOptions.quality.value
     );
 
     this.countDownTimeout.current = setTimeout(() => {
@@ -184,7 +187,10 @@ class CaptureMediaController {
       downloadRecordingMimeMap[
         this.settings.downloadVideoOptions.mimeType.value
       ],
-      parseInt(this.settings.downloadVideoOptions.fps.value.slice(0, -4))
+      parseInt(this.settings.downloadVideoOptions.fps.value.slice(0, -4)),
+      this.settings.downloadVideoOptions.bitRate.value !== "default"
+        ? this.settings.downloadVideoOptions.bitRate.value * 1000000
+        : this.settings.downloadVideoOptions.bitRate.value
     );
 
     if (this.mediaType === "10s") {

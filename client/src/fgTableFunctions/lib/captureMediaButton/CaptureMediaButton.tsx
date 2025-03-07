@@ -9,14 +9,18 @@ const cameraIcon = nginxAssetServerBaseUrl + "svgs/cameraIcon.svg";
 export default function CaptureMediaButton({
   captureMediaActive,
   setCaptureMediaActive,
+  setMoreTableFunctionsActive,
 }: {
   captureMediaActive: boolean;
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setMoreTableFunctionsActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const handleClick = async () => {
     if (captureMediaActive) return;
 
     setCaptureMediaActive(true);
+
+    setMoreTableFunctionsActive(false);
   };
 
   return (

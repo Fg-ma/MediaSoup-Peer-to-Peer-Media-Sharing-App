@@ -36,6 +36,9 @@ const HatsButton = React.lazy(
 const PetsButton = React.lazy(
   () => import("../../../../elements/effectsButtons/PetsButton")
 );
+const FaceCountButton = React.lazy(
+  () => import("../../../../elements/effectsButtons/FaceCountButton")
+);
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -80,6 +83,11 @@ export default function ImageEffectsSection({
 
   const [_, setRerender] = useState(false);
 
+  const [faceDetectedCount, setFaceDetectedCount] = useState(
+    imageMedia.detectedFaces
+  );
+  const [forceDetectingFaces, setForceDetectingFaces] = useState(false);
+
   const handleWheel = (event: WheelEvent) => {
     event.stopPropagation();
     event.preventDefault();
@@ -89,10 +97,26 @@ export default function ImageEffectsSection({
     }
   };
 
+  const handleFaceDetectedCountChange = (facesDetected: number) => {
+    setFaceDetectedCount(facesDetected);
+  };
+
+  const handleForceFaceDetectEnd = () => {
+    setForceDetectingFaces(false);
+  };
+
   useEffect(() => {
+    imageMedia.addFaceCountChangeListener(handleFaceDetectedCountChange);
+    imageMedia.babylonScene?.addForceFaceDetectEndListener(
+      handleForceFaceDetectEnd
+    );
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
+      imageMedia.removeFaceCountChangeListener(handleFaceDetectedCountChange);
+      imageMedia.babylonScene?.removeForceFaceDetectEndListener(
+        handleForceFaceDetectEnd
+      );
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
     };
   }, []);
@@ -132,15 +156,27 @@ export default function ImageEffectsSection({
     }
   }, [imageMedia.detectedFaces]);
 
-  return (
+  return ({faceDetectedCount === 0 && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <FaceCountButton
+            scrollingContainerRef={effectsContainerRef}
+            clickFunctionCallback={() => {
+              setForceDetectingFaces(true);
+
+              imageMedia.forceRedetectFaces();
+            }}
+            forceDetectingFaces={forceDetectingFaces}
+          />
+        </Suspense>
+      )}
     <motion.div
       ref={effectsContainerRef}
-      className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+      className='flex pt-4 small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
       style={{
         bottom: "calc(max(2rem, min(12% + 0.5rem, 3.5rem)))",
-        height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
-        maxHeight: overflow.current ? "6.75rem" : "5rem",
-        minHeight: overflow.current ? "4.75rem" : "3rem",
+        height: overflow.current ? "calc(2.75rem + 10%)" : "calc(1rem + 10%)",
+        maxHeight: overflow.current ? "7.75rem" : "6rem",
+        minHeight: overflow.current ? "5.75rem" : "4rem",
         overflowX: overflow.current ? "auto" : "hidden",
         justifyContent: overflow.current ? "flex-start" : "center",
       }}
@@ -193,7 +229,7 @@ export default function ImageEffectsSection({
             );
           }}
         />
-        {imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <HideBackgroundButton
               effectsDisabled={effectsDisabled}
@@ -296,7 +332,7 @@ export default function ImageEffectsSection({
             );
           }}
         />
-        {imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <GlassesButton
               effectsDisabled={effectsDisabled}
@@ -319,7 +355,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <BeardsButton
               effectsDisabled={effectsDisabled}
@@ -342,7 +378,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <MustachesButton
               effectsDisabled={effectsDisabled}
@@ -368,7 +404,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <MasksButton
               effectsDisabled={effectsDisabled}
@@ -391,7 +427,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <HatsButton
               effectsDisabled={effectsDisabled}
@@ -414,7 +450,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <PetsButton
               effectsDisabled={effectsDisabled}

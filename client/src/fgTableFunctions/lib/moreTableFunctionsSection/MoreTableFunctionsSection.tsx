@@ -149,6 +149,7 @@ export default function MoreTableFunctionsSection({
               <CaptureMediaButton
                 captureMediaActive={captureMediaActive}
                 setCaptureMediaActive={setCaptureMediaActive}
+                setMoreTableFunctionsActive={setMoreTableFunctionsActive}
               />
             )}
             {
