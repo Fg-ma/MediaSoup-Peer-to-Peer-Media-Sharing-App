@@ -610,15 +610,15 @@ class BabylonScene {
     if (active) {
       if (!this.blurPostProcessX && !this.blurPostProcessX) {
         this.blurPostProcessX = new BlurPostProcess(
-          "blurEffect", // Name of the effect
+          "blurEffectX", // Name of the effect
           new Vector2(1.0, 0.0), // Direction of the blur
           80.0, // Blur kernel size (affects intensity)
-          1.0, // Ratio (resolution scaling factor)
+          0.5, // Ratio (resolution scaling factor)
           this.camera // Apply blur to the camera
         );
 
         this.blurPostProcessY = new BlurPostProcess(
-          "blurEffect", // Name of the effect
+          "blurEffectY", // Name of the effect
           new Vector2(0.0, 1.0), // Direction of the blur
           80.0, // Blur kernel size (affects intensity)
           0.5, // Ratio (resolution scaling factor)

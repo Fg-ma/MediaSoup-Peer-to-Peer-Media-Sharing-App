@@ -1,5 +1,5 @@
-import { FgAudioElementContainerOptionsType } from "../FgAudioElementContainer";
 import PathGenerator from "./PathGenerator";
+import { FgAudioElementContainerOptionsType } from "./typeConstant";
 
 class FgAudioElementController {
   constructor(
@@ -62,12 +62,36 @@ class FgAudioElementController {
       0
     );
 
-    this.bellCurveY.current = this.pathGenerator.current.generateBellCurve(
-      this.fgAudioElementContainerOptions.numFixedPoints - 1,
-      this.fgAudioElementContainerOptions.bellCurveAmplitude,
-      this.fgAudioElementContainerOptions.bellCurveMean,
-      this.fgAudioElementContainerOptions.bellCurveStdDev
-    );
+    this.bellCurveY.current =
+      this.pathGenerator.current.generateGaussianMixture(
+        this.fgAudioElementContainerOptions.numFixedPoints - 1,
+        [
+          { amplitude: 0.8, mean: 0.2, stdDev: 0.05 }, // First peak (sharp)
+          { amplitude: 0.6, mean: 0.5, stdDev: 0.1 }, // Second peak (wider)
+          { amplitude: 0.4, mean: 0.8, stdDev: 0.07 }, // Third peak
+        ]
+      );
+    // this.pathGenerator.current.generateSigmoid(
+    //   this.fgAudioElementContainerOptions.numFixedPoints - 1,
+    //   0.8,
+    //   0.5
+    // );
+    // this.pathGenerator.current.generateSymmetricExponentialDecay(
+    //   this.fgAudioElementContainerOptions.numFixedPoints - 1,
+    //   0.7,
+    //   0,
+    //   4
+    // );
+    // this.pathGenerator.current.generateTriangle(
+    //   this.fgAudioElementContainerOptions.numFixedPoints - 1,
+    //   this.fgAudioElementContainerOptions.bellCurveAmplitude
+    // );
+    // this.pathGenerator.current.generateBellCurve(
+    //   this.fgAudioElementContainerOptions.numFixedPoints - 1,
+    //   this.fgAudioElementContainerOptions.bellCurveAmplitude,
+    //   this.fgAudioElementContainerOptions.bellCurveMean,
+    //   this.fgAudioElementContainerOptions.bellCurveStdDev
+    // );
   };
 
   handleVolumeSlider = (volume: number) => {

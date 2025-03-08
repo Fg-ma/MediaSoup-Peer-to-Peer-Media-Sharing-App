@@ -337,83 +337,6 @@ export default function AudioMixEffectsPortal({
       preDelay: 0,
     },
   });
-  const [sliderStyleValues, setSliderStyleValues] = useState<{
-    [mixEffect in AudioMixEffectsType]: {
-      [option in MixEffectsOptionsType]?: number;
-    };
-  }>({
-    autoFilter: {
-      frequency: 0,
-      baseFrequency: 0,
-      octaves: 0,
-    },
-    autoPanner: {
-      frequency: 0,
-    },
-    autoWah: {
-      baseFrequency: 0,
-      octaves: 0,
-      sensitivity: 0,
-    },
-    bitCrusher: {
-      bits: 0,
-    },
-    chebyshev: {
-      order: 0,
-    },
-    chorus: {
-      frequency: 0,
-      delayTime: 0,
-      depth: 0,
-    },
-    freeverb: {
-      roomSize: 0,
-      dampening: 0,
-    },
-    JCReverb: {
-      roomSize: 0,
-    },
-    pingPongDelay: {
-      delayTime: 0,
-      feedback: 0,
-    },
-    stereoWidener: {
-      width: 0,
-    },
-    tremolo: {
-      frequency: 0,
-      depth: 0,
-    },
-    vibrato: {
-      frequency: 0,
-      depth: 0,
-    },
-    distortion: {
-      distortion: 0,
-      oversample: 0,
-    },
-    EQ: {
-      high: 0,
-      mid: 0,
-      low: 0,
-    },
-    feedbackDelay: {
-      delayTime: 0,
-      feedback: 0,
-    },
-    phaser: {
-      frequency: 0,
-      octaves: 0,
-      baseFrequency: 0,
-    },
-    pitchShift: {
-      pitch: 0,
-    },
-    reverb: {
-      decay: 0,
-      preDelay: 0,
-    },
-  });
 
   const audioMixEffectsPortalController = new AudioMixEffectsPortalController(
     mediasoupSocket,
@@ -428,8 +351,7 @@ export default function AudioMixEffectsPortal({
     setRerender,
     dynamicMixEffects,
     portalRef,
-    setSliderValues,
-    setSliderStyleValues
+    setSliderValues
   );
 
   useEffect(() => {
@@ -502,7 +424,6 @@ export default function AudioMixEffectsPortal({
                         ]
                       }
                       sliderValues={sliderValues}
-                      sliderStyleValues={sliderStyleValues}
                       mixEffectValueChange={
                         audioMixEffectsPortalController.mixEffectValueChange
                       }

@@ -92,7 +92,7 @@ type onReactionType = {
   header: {
     table_id: string;
     contentType: ContentTypes;
-    contentId: string;
+    contentId: string | undefined;
   };
   data: { reaction: TableReactions; reactionStyle: TableReactionStyles };
 };
@@ -160,7 +160,7 @@ export type onReactionOccurredType = {
   type: "reactionOccurred";
   header: {
     contentType: ContentTypes;
-    contentId: string;
+    contentId: string | undefined;
   };
   data: {
     reaction: TableReactions;

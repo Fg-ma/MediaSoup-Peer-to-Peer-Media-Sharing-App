@@ -19,7 +19,6 @@ export default function AudioMixEffect({
   effectLabel,
   labelPlacement,
   sliderValues,
-  sliderStyleValues,
   mixEffectValueChange,
 }: {
   effect: AudioMixEffectsType;
@@ -28,11 +27,6 @@ export default function AudioMixEffect({
   effectLabel: string;
   labelPlacement: LabelPlacementType;
   sliderValues: {
-    [mixEffect in AudioMixEffectsType]: {
-      [option in MixEffectsOptionsType]?: number;
-    };
-  };
-  sliderStyleValues: {
     [mixEffect in AudioMixEffectsType]: {
       [option in MixEffectsOptionsType]?: number;
     };
@@ -135,12 +129,9 @@ export default function AudioMixEffect({
         {Object.entries(staticMixEffect.options).map(([key, option], index) => (
           <FgSlider
             key={index}
-            externalValue={
-              sliderValues[effect][key as MixEffectsOptionsType] ?? undefined
-            }
+            externalValue={sliderValues[effect][key as MixEffectsOptionsType]}
             externalStyleValue={
-              sliderStyleValues[effect][key as MixEffectsOptionsType] ??
-              undefined
+              sliderValues[effect][key as MixEffectsOptionsType]
             }
             options={{
               id: `${effect}_${key}`,

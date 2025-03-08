@@ -229,6 +229,23 @@ class ImageMedia {
 
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
+    // Remove canvas element
+    this.canvas.remove();
+
+    // Terminate workers to prevent memory leaks
+    if (this.faceMeshWorker) {
+      this.faceMeshWorker.terminate();
+    }
+    if (this.faceDetectionWorker) {
+      this.faceDetectionWorker.terminate();
+    }
+    if (this.selfieSegmentationWorker) {
+      this.selfieSegmentationWorker.terminate();
+    }
+
+    // Call the BabylonScene deconstructor
+    this.babylonScene?.deconstructor();
+
     this.faceCountChangeListeners.clear();
   }
 

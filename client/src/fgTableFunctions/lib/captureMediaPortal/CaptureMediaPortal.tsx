@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Transition, Variants, motion } from "framer-motion";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
@@ -22,9 +23,27 @@ import ConfirmButton from "./lib/finalize/ConfirmButton";
 import DownloadButton from "./lib/finalize/DownloadButton";
 import SettingsButton from "./lib/settingsButton/SettingsButton";
 import VideoDurationSection from "./lib/finalize/VideoDurationSection";
-import "./lib/captureMedia.css";
 import DelayCountDownButton from "./lib/delay/DelayCountDownButton";
-import ShutterSVG from "./lib/ShutterSVG";
+import ShutterSVG from "../../../elements/shutterSVG/ShutterSVG";
+import "./lib/captureMedia.css";
+
+const CaptureMediaVar: Variants = {
+  init: { opacity: 0, scale: 0.8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      scale: { type: "spring", stiffness: 100 },
+    },
+  },
+};
+
+const CaptureMediaTransition: Transition = {
+  transition: {
+    opacity: { duration: 0.001 },
+    scale: { duration: 0.001 },
+  },
+};
 
 export default function CaptureMediaPortal({
   captureMedia,
@@ -36,7 +55,7 @@ export default function CaptureMediaPortal({
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { captureStreamEffects, captureEffectsStyles } = useEffectsContext();
-  const { table_id } = useUserInfoContext();
+  const { table_id, preferences } = useUserInfoContext();
 
   const [inCaptureMedia, setInCaptureMedia] = useState(false);
   const [captureMediaEffectsActive, setCaptureMediaEffectsActive] =
@@ -237,7 +256,7 @@ export default function CaptureMediaPortal({
             ref={captureMainContainerRef}
             className='flex absolute w-4/5 h-[95%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'
           >
-            <div
+            <motion.div
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
@@ -247,6 +266,11 @@ export default function CaptureMediaPortal({
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
+              variants={CaptureMediaVar}
+              initial='init'
+              animate='animate'
+              exit='init'
+              transition={CaptureMediaTransition}
             >
               <div className='capture-media-overlay-container w-full h-full z-10 absolute top-0 left-0 pointer-events-none'>
                 {captureMediaTypeActive && (
@@ -317,10 +341,11 @@ export default function CaptureMediaPortal({
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       }
+      options={{ animate: false }}
     />
   ) : delaying.current ? (
     <FgPortal
@@ -336,8 +361,8 @@ export default function CaptureMediaPortal({
             inCaptureMedia || settingsActive ? "in-capture-media" : ""
           } capture-media-container w-full aspect h-full bg-fg-tone-black-4 bg-opacity-45`}
         >
-          <div className='flex absolute w-4/5 h-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'>
-            <div
+          <div className='flex absolute w-4/5 h-[95%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'>
+            <motion.div
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
@@ -347,6 +372,11 @@ export default function CaptureMediaPortal({
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
+              variants={CaptureMediaVar}
+              initial='init'
+              animate='animate'
+              exit='init'
+              transition={CaptureMediaTransition}
             >
               <div className='flex capture-media-overlay-container items-center z-20 justify-center w-full h-full absolute top-0 left-0 pointer-events-none'>
                 <div className='flex top-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center z-[100]'>
@@ -361,10 +391,11 @@ export default function CaptureMediaPortal({
                   <DelayCountDownButton delayCountDown={delayCountDown} />
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       }
+      options={{ animate: false }}
     />
   ) : (
     <FgPortal
@@ -380,8 +411,8 @@ export default function CaptureMediaPortal({
             inCaptureMedia || settingsActive ? "in-capture-media" : ""
           } capture-media-container w-full aspect h-full bg-fg-tone-black-4 bg-opacity-45`}
         >
-          <div className='flex absolute w-4/5 h-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'>
-            <div
+          <div className='flex absolute w-4/5 h-[95%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'>
+            <motion.div
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
@@ -391,8 +422,15 @@ export default function CaptureMediaPortal({
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
+              variants={CaptureMediaVar}
+              initial='init'
+              animate='animate'
+              exit='init'
+              transition={CaptureMediaTransition}
             >
-              {finalizedCaptureType.current === "image" && <ShutterSVG />}
+              {finalizedCaptureType.current === "image" && (
+                <ShutterSVG soundEffect={preferences.current.soundEffects} />
+              )}
               {finalizedCaptureType.current === "image" ? (
                 <img
                   ref={imageRef}
@@ -479,10 +517,11 @@ export default function CaptureMediaPortal({
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       }
+      options={{ animate: false }}
     />
   );
 }

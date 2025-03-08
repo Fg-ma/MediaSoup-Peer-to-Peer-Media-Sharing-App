@@ -1,11 +1,19 @@
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
-import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../../context/permissionsContext/typeConstant";
 import {
   IncomingMediasoupMessages,
   onResponsedCatchUpDataType,
-} from "../../serverControllers/mediasoupServer/lib/typeConstant";
+} from "../../../serverControllers/mediasoupServer/lib/typeConstant";
+import ReactController from "../../../elements/reactButton/lib/ReactController";
+import TableSocketController from "../../../serverControllers/tableServer/TableSocketController";
+import {
+  IncomingTableMessages,
+  onReactionOccurredType,
+} from "../../../serverControllers/tableServer/lib/typeConstant";
 
 class FgAudioElementContainerController {
+  reactController: ReactController;
+
   constructor(
     private isUser: boolean,
     private table_id: string,
@@ -35,8 +43,21 @@ class FgAudioElementContainerController {
         [instance: string]: () => void;
       };
     }>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
-  ) {}
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private tableSocket: React.MutableRefObject<
+      TableSocketController | undefined
+    >,
+    private behindEffectsContainerRef: React.RefObject<HTMLDivElement>,
+    private frontEffectsContainerRef: React.RefObject<HTMLDivElement>
+  ) {
+    this.reactController = new ReactController(
+      `audio_${this.table_id}_${this.username}_${this.instance}`,
+      "audio",
+      this.behindEffectsContainerRef,
+      this.frontEffectsContainerRef,
+      this.tableSocket
+    );
+  }
 
   onResponsedCatchUpData = (event: onResponsedCatchUpDataType) => {
     const { inquiredUsername, inquiredInstance, inquiredType } = event.header;
@@ -132,6 +153,28 @@ class FgAudioElementContainerController {
             () => stream.off("message", handleMessage);
         }
       }
+    }
+  };
+
+  reactionOccurred = (event: onReactionOccurredType) => {
+    const { contentType, contentId } = event.header;
+    const { reaction, reactionStyle } = event.data;
+
+    if (
+      contentType === "audio" &&
+      contentId === `audio_${this.table_id}_${this.username}_${this.instance}`
+    ) {
+      this.reactController.handleReaction(reaction, false, reactionStyle);
+    }
+  };
+
+  handleTableMessage = (event: IncomingTableMessages) => {
+    switch (event.type) {
+      case "reactionOccurred":
+        this.reactionOccurred(event);
+        break;
+      default:
+        break;
     }
   };
 }

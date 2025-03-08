@@ -1,14 +1,9 @@
 import TableStaticContentSocketController from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaContainerOptions } from "../../typeConstant";
-import {
-  StaticContentTypes,
-  TableReactions,
-  TableReactionStyles,
-} from "../../../../../../../universal/typeConstant";
+import { StaticContentTypes } from "../../../../../../../universal/typeConstant";
 import TableSocketController from "../../../../../serverControllers/tableServer/TableSocketController";
 import ReactController from "../../../../../elements/reactButton/lib/ReactController";
-import { reactionsMeta } from "src/elements/reactButton/lib/typeConstant";
 
 class LowerController {
   private moving: boolean = false;

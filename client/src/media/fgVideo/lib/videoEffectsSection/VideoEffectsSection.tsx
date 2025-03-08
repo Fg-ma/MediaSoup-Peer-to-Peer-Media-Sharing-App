@@ -78,6 +78,8 @@ export default function VideoEffectsSection({
 
   const overflow = useRef(false);
 
+  const faceDetectedCount = useRef(videoMedia.maxFacesDetected);
+
   const [_, setRerender] = useState(false);
 
   const handleWheel = (event: WheelEvent) => {
@@ -89,10 +91,24 @@ export default function VideoEffectsSection({
     }
   };
 
+  const handleFaceDetectedCountChange = (facesDetected: number) => {
+    if (facesDetected > faceDetectedCount.current) {
+      faceDetectedCount.current = facesDetected;
+
+      setRerender((prev) => !prev);
+    }
+  };
+
   useEffect(() => {
+    if (faceDetectedCount.current === 0) {
+      videoMedia.addFaceCountChangeListener(handleFaceDetectedCountChange);
+    }
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
+      if (faceDetectedCount.current === 0) {
+        videoMedia.removeFaceCountChangeListener(handleFaceDetectedCountChange);
+      }
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
     };
   }, []);
@@ -130,7 +146,7 @@ export default function VideoEffectsSection({
         subEffectsContainerRef.current.clientWidth;
       setRerender((prev) => !prev);
     }
-  }, [videoMedia.maxFacesDetected]);
+  }, [faceDetectedCount.current]);
 
   return (
     <motion.div
@@ -199,7 +215,7 @@ export default function VideoEffectsSection({
             );
           }}
         />
-        {videoMedia.maxFacesDetected > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <HideBackgroundButton
               effectsDisabled={effectsDisabled}
@@ -298,7 +314,7 @@ export default function VideoEffectsSection({
             );
           }}
         />
-        {videoMedia.maxFacesDetected > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <GlassesButton
               effectsDisabled={effectsDisabled}
@@ -325,7 +341,7 @@ export default function VideoEffectsSection({
             />
           </Suspense>
         )}
-        {videoMedia.maxFacesDetected > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <BeardsButton
               effectsDisabled={effectsDisabled}
@@ -352,7 +368,7 @@ export default function VideoEffectsSection({
             />
           </Suspense>
         )}
-        {videoMedia.maxFacesDetected > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <MustachesButton
               effectsDisabled={effectsDisabled}
@@ -382,7 +398,7 @@ export default function VideoEffectsSection({
             />
           </Suspense>
         )}
-        {videoMedia.maxFacesDetected > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <MasksButton
               effectsDisabled={effectsDisabled}
@@ -409,7 +425,7 @@ export default function VideoEffectsSection({
             />
           </Suspense>
         )}
-        {videoMedia.maxFacesDetected > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <HatsButton
               effectsDisabled={effectsDisabled}
@@ -436,7 +452,7 @@ export default function VideoEffectsSection({
             />
           </Suspense>
         )}
-        {videoMedia.maxFacesDetected > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <PetsButton
               effectsDisabled={effectsDisabled}

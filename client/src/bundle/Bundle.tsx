@@ -14,7 +14,7 @@ const RemoteVisualMedia = React.lazy(
   () => import("../media/fgVisualMedia/RemoteVisualMedia")
 );
 const FgAudioElementContainer = React.lazy(
-  () => import("../fgAudioElement/FgAudioElementContainer")
+  () => import("../media/audio/FgAudioElementContainer")
 );
 
 export default function Bundle({

@@ -144,7 +144,7 @@ class TableSocketController {
 
   reaction = (
     contentType: ContentTypes,
-    contentId: string,
+    contentId: string | undefined,
     reaction: TableReactions,
     reactionStyle: TableReactionStyles
   ) => {

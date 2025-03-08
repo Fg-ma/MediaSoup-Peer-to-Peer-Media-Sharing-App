@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated, SpringValue } from "react-spring";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
-import FgButton from "../elements/fgButton/FgButton";
+import FgButton from "../../elements/fgButton/FgButton";
 import FgAudioElementController from "./lib/FgAudioElementController";
-import { FgAudioElementContainerOptionsType } from "./FgAudioElementContainer";
-import { tableColorMap } from "../fgTable/lib/tableColors";
+import { tableColorMap } from "../../fgTable/lib/tableColors";
+import { FgAudioElementContainerOptionsType } from "./lib/typeConstant";
 
 export default function FgAudioElement({
   svgRef,

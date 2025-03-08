@@ -78,6 +78,9 @@ class VideoMedia {
   private audioStream?: MediaStream;
   private videoAudioMedia?: VideoAudioMedia;
 
+  private faceCountChangeListeners: Set<(facesDetected: number) => void> =
+    new Set();
+
   constructor(
     private videoId: string,
     filename: string,
@@ -197,6 +200,10 @@ class VideoMedia {
               newMaxFace: detectedFaces,
             });
             this.rectifyEffectMeshCount();
+
+            this.faceCountChangeListeners.forEach((listener) => {
+              listener(detectedFaces);
+            });
           }
           break;
         }
@@ -324,7 +331,21 @@ class VideoMedia {
 
     // Call the BabylonScene deconstructor
     this.babylonScene?.deconstructor();
+
+    this.faceCountChangeListeners.clear();
   }
+
+  addFaceCountChangeListener = (
+    listener: (facesDetected: number) => void
+  ): void => {
+    this.faceCountChangeListeners.add(listener);
+  };
+
+  removeFaceCountChangeListener = (
+    listener: (facesDetected: number) => void
+  ): void => {
+    this.faceCountChangeListeners.delete(listener);
+  };
 
   updateVideoPosition = async (videoPosition: number) => {
     this.video.currentTime = videoPosition;

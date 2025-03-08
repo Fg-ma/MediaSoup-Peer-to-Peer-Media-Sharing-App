@@ -39,13 +39,6 @@ class AudioMixEffectsPortalController {
           [option in MixEffectsOptionsType]?: number;
         };
       }>
-    >,
-    private setSliderStyleValues: React.Dispatch<
-      React.SetStateAction<{
-        [mixEffect in AudioMixEffectsType]: {
-          [option in MixEffectsOptionsType]?: number;
-        };
-      }>
     >
   ) {}
 
@@ -63,18 +56,6 @@ class AudioMixEffectsPortalController {
           [effect]: {
             ...prev[effect as AudioMixEffectsType],
             [option]: value,
-          },
-        };
-      });
-    }
-
-    if (styleValue) {
-      this.setSliderStyleValues((prev) => {
-        return {
-          ...prev,
-          [effect]: {
-            ...prev[effect as AudioMixEffectsType],
-            [option]: styleValue,
           },
         };
       });

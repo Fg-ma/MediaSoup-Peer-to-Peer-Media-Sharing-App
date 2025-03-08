@@ -8,7 +8,7 @@ import { reactionsMeta } from "./typeConstant";
 
 class ReactController {
   constructor(
-    private contentId: string,
+    private contentId: string | undefined,
     private contentType: ContentTypes,
     private behindEffectsContainerRef: React.RefObject<HTMLDivElement>,
     private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,

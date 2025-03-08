@@ -1,6 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 
-export default function ShutterSVG() {
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const cameraShutter =
+  nginxAssetServerBaseUrl + "appSoundEffects/cameraShutter.mp3";
+
+export default function ShutterSVG({
+  soundEffect = false,
+}: {
+  soundEffect?: boolean;
+}) {
   const [finished, setFinished] = useState(false);
 
   const progress = useRef(0);
@@ -40,11 +49,11 @@ export default function ShutterSVG() {
     for (let i = 0; i < +count; i++) {
       edges.current.innerHTML += path(
         i,
-        `fill=none stroke=#090909 d='${edge}'`
+        `fill=none stroke=#3e3e3e d='${edge}'`
       );
       bodies.current.innerHTML += path(
         i,
-        `fill=#696969 d='${edge}${arc(p1x, p1y, 0)}'`
+        `fill=#1a1a1a d='${edge}${arc(p1x, p1y, 0)}'`
       );
     }
   };
@@ -90,6 +99,15 @@ export default function ShutterSVG() {
 
     return () => cancelAnimationFrame(frame);
   }, []);
+
+  useEffect(() => {
+    if (soundEffect) {
+      const audio = new Audio(cameraShutter);
+      audio
+        .play()
+        .catch((error) => console.error("Audio playback failed:", error));
+    }
+  }, [soundEffect]);
 
   return !finished ? (
     <svg

@@ -16,15 +16,17 @@ const reactionsOffIcon =
   nginxAssetSeverBaseUrl + "svgs/reactions/reactionsOffIcon.svg";
 
 export default function ReactButton({
+  className,
   reactionsPanelActive,
   setReactionsPanelActive,
   clickFunction,
   reactionFunction,
 }: {
+  className?: string;
   reactionsPanelActive: boolean;
   setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
-  clickFunction: () => void;
-  reactionFunction: (reaction: TableReactions) => void;
+  clickFunction?: () => void;
+  reactionFunction?: (reaction: TableReactions) => void;
 }) {
   const [cols, setCols] = useState(3);
   const reactionsButtonRef = useRef<HTMLButtonElement>(null);
@@ -75,7 +77,7 @@ export default function ReactButton({
     <>
       <FgButton
         externalRef={reactionsButtonRef}
-        className='flex items-center justify-end h-full !aspect-square pointer-events-auto'
+        className={`${className} flex items-center justify-end h-full !aspect-square pointer-events-auto`}
         clickFunction={clickFunction}
         contentFunction={() => {
           const src = reactionsPanelActive ? reactionsOffIcon : reactionsIcon;
@@ -83,6 +85,7 @@ export default function ReactButton({
           return (
             <FgSVG
               src={src}
+              className='flex w-full h-full items-center justify-center'
               attributes={[
                 { key: "width", value: "80%" },
                 { key: "height", value: "80%" },
@@ -92,13 +95,9 @@ export default function ReactButton({
           );
         }}
         hoverContent={
-          <FgHoverContentStandard
-            content={
-              reactionsPanelActive
-                ? "Close reactions (Q)"
-                : "Open reactions (Q)"
-            }
-          />
+          !reactionsPanelActive ? (
+            <FgHoverContentStandard content={"Open reactions (Q)"} />
+          ) : undefined
         }
         options={{ hoverType: "below" }}
       />
@@ -131,8 +130,10 @@ export default function ReactButton({
                     key={reaction}
                     scrollingContainerRef={reactionsPanelScrollingContainerRef}
                     className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
-                    clickFunction={() =>
-                      reactionFunction(reaction as TableReactions)
+                    clickFunction={
+                      reactionFunction
+                        ? () => reactionFunction(reaction as TableReactions)
+                        : undefined
                     }
                     contentFunction={() =>
                       meta.type === "svg" ? (

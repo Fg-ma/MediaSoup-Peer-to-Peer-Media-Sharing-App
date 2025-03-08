@@ -1,53 +1,31 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { useMediaContext } from "../context/mediaContext/MediaContext";
-import { Permissions } from "../context/permissionsContext/typeConstant";
-import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
-import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
-import { useSocketContext } from "../context/socketContext/SocketContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
+import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
+import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
+import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgAudioElement from "./FgAudioElement";
-import FgContentAdjustmentController from "../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
-import PanButton from "../elements/fgAdjustmentElements/PanButton";
-import RotateButton from "../elements/fgAdjustmentElements/RotateButton";
-import ScaleButton from "../elements/fgAdjustmentElements/ScaleButton";
+import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import PanButton from "../../elements/fgAdjustmentElements/PanButton";
+import RotateButton from "../../elements/fgAdjustmentElements/RotateButton";
+import ScaleButton from "../../elements/fgAdjustmentElements/ScaleButton";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
-import { TableColors } from "../serverControllers/tableServer/lib/typeConstant";
+import { TableColors } from "../../serverControllers/tableServer/lib/typeConstant";
+import ReactButton from "../../elements/reactButton/ReactButton";
 import "./lib/audioElement.css";
+import {
+  ActivePages,
+  defaultActiveSettingsPages,
+  defaultFgAudioElementContainerOptions,
+  defaultSettings,
+  Settings,
+} from "./lib/typeConstant";
+import SettingsButton from "./lib/settingsButton/SettingsButton";
 
-const FgPortal = React.lazy(() => import("../elements/fgPortal/FgPortal"));
+const FgPortal = React.lazy(() => import("../../elements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
-  () => import("../audioEffectsButton/lib/AudioEffectsSection")
+  () => import("../../audioEffectsButton/lib/AudioEffectsSection")
 );
-
-export type FgAudioElementContainerOptionsType = {
-  controlsVanishTime: number;
-  springDuration: number;
-  noiseThreshold: number;
-  numFixedPoints: number;
-  bellCurveAmplitude: number;
-  bellCurveMean: number;
-  bellCurveStdDev: number;
-  shadowColor: TableColors;
-  volumeColor: TableColors;
-  primaryMuteColor: TableColors;
-  secondaryMuteColor: TableColors;
-  muteStyleOption: "morse" | "smile";
-};
-
-const defaultFgAudioElementContainerOptions: FgAudioElementContainerOptionsType =
-  {
-    controlsVanishTime: 1250,
-    springDuration: 250,
-    noiseThreshold: 0.2,
-    numFixedPoints: 10,
-    bellCurveAmplitude: 1,
-    bellCurveMean: 0.5,
-    bellCurveStdDev: 0.4,
-    shadowColor: "black",
-    volumeColor: "tableTop",
-    primaryMuteColor: "tableTop",
-    secondaryMuteColor: "black",
-    muteStyleOption: "smile",
-  };
 
 export default function FgAudioElementContainer({
   table_id,
@@ -106,7 +84,7 @@ export default function FgAudioElementContainer({
   };
 
   const { userDataStreams, remoteDataStreams } = useMediaContext();
-  const { mediasoupSocket } = useSocketContext();
+  const { mediasoupSocket, tableSocket } = useSocketContext();
   const { username: activeUsername, instance: activeInstance } =
     useUserInfoContext();
 
@@ -118,6 +96,21 @@ export default function FgAudioElementContainer({
   const [_rerender, setRerender] = useState(false);
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
   const [inAudioContainer, setInAudioContainer] = useState(false);
+
+  const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
+
+  const [settingsActive, setSettingsActive] = useState(false);
+  const [settings, setSettings] = useState<Settings>(
+    structuredClone(defaultSettings)
+  );
+  const [activePages, setActivePages] = useState<ActivePages>(
+    defaultActiveSettingsPages
+  );
+
+  const audioEffectsSectionRef = useRef<HTMLDivElement>(null);
+
+  const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
+  const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
 
   const positioningListeners = useRef<{
     [username: string]: {
@@ -156,12 +149,18 @@ export default function FgAudioElementContainer({
       permissions,
       remoteDataStreams,
       positioningListeners,
-      setRerender
+      setRerender,
+      tableSocket,
+      behindEffectsContainerRef,
+      frontEffectsContainerRef
     );
 
   useEffect(() => {
     mediasoupSocket.current?.addMessageListener(
       fgAudioElementContainerController.handleMessage
+    );
+    tableSocket.current?.addMessageListener(
+      fgAudioElementContainerController.handleTableMessage
     );
 
     // Request initial catch up data
@@ -182,6 +181,9 @@ export default function FgAudioElementContainer({
     return () => {
       mediasoupSocket.current?.removeMessageListener(
         fgAudioElementContainerController.handleMessage
+      );
+      tableSocket.current?.removeMessageListener(
+        fgAudioElementContainerController.handleTableMessage
       );
     };
   }, []);
@@ -262,9 +264,21 @@ export default function FgAudioElementContainer({
       }}
       data-positioning={JSON.stringify(positioning.current)}
     >
+      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+        <div
+          ref={frontEffectsContainerRef}
+          className='w-full h-full relative z-[100] pointer-events-none'
+        />
+      </div>
+      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+        <div
+          ref={behindEffectsContainerRef}
+          className='w-full h-full relative -z-[100] pointer-events-none'
+        />
+      </div>
       <PanButton
         className={
-          "pan-btn min-w-7 w-[5.5%] aspect-square absolute top-1/2 -translate-y-1/2 -left-3" // disapeaing button
+          "pan-btn min-w-7 w-[5.5%] aspect-square absolute top-1/2 -translate-y-1/2 -left-3"
         }
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
@@ -443,6 +457,7 @@ export default function FgAudioElementContainer({
         audioEffectsSectionVisible && (
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsSection
+              externalRef={audioEffectsSectionRef}
               table_id={table_id}
               username={username}
               instance={instance}
@@ -460,6 +475,30 @@ export default function FgAudioElementContainer({
               localMute={localMute}
               clientMute={clientMute}
               closeCallback={() => setAudioEffectsSectionVisible(false)}
+              items={[
+                <SettingsButton
+                  settingsActive={settingsActive}
+                  setSettingsActive={setSettingsActive}
+                  activePages={activePages}
+                  setActivePages={setActivePages}
+                  settings={settings}
+                  setSettings={setSettings}
+                  scrollingContainerRef={audioEffectsSectionRef}
+                  fgAudioElementContainerController={
+                    fgAudioElementContainerController
+                  }
+                />,
+                <ReactButton
+                  className='border-fg-off-white min-w-12 w-full hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
+                  reactionsPanelActive={reactionsPanelActive}
+                  setReactionsPanelActive={setReactionsPanelActive}
+                  clickFunction={() => setReactionsPanelActive((prev) => !prev)}
+                  reactionFunction={
+                    fgAudioElementContainerController.reactController
+                      .handleReaction
+                  }
+                />,
+              ]}
             />
           </Suspense>
         )}

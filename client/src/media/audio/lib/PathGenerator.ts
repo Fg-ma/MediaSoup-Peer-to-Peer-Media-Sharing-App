@@ -1,13 +1,12 @@
 class PathGenerator {
   constructor() {}
 
-  // Envelope bell curve
-  generateBellCurve(
+  generateBellCurve = (
     numPoints: number,
     amplitude: number,
     mean: number,
     stdDev: number
-  ) {
+  ) => {
     const yCoordinates = [];
     const step = 1 / (numPoints - 1);
 
@@ -19,15 +18,14 @@ class PathGenerator {
     }
 
     return yCoordinates;
-  }
+  };
 
-  // Envelope Sine curve
-  generateSineWave(
+  generateSineWave = (
     numPoints: number,
     amplitude: number,
     frequency: number,
     phase: number
-  ) {
+  ) => {
     const yCoordinates = [];
     const step = Math.PI / (numPoints - 1);
 
@@ -38,7 +36,86 @@ class PathGenerator {
     }
 
     return yCoordinates;
-  }
+  };
+
+  generateSymmetricExponentialDecay = (
+    numPoints: number,
+    startAmplitude: number, // Peak amplitude (e.g., 0.9)
+    endAmplitude: number, // Final amplitude (e.g., 0.1)
+    decayRate: number
+  ) => {
+    const yCoordinates = [];
+
+    for (let i = 0; i < numPoints; i++) {
+      const x = i / (numPoints - 1); // Normalize from 0 to 1
+
+      // Standard exponential decay
+      const decay = Math.exp(-decayRate * x);
+
+      // Mirrored exponential decay
+      const mirroredDecay = Math.exp(-decayRate * (1 - x));
+
+      // Combine both (scale to range)
+      const y =
+        endAmplitude +
+        (startAmplitude - endAmplitude) * (decay + mirroredDecay);
+
+      yCoordinates.push(y);
+    }
+
+    return yCoordinates;
+  };
+
+  generateSigmoid = (
+    numPoints: number,
+    amplitude: number,
+    steepness: number
+  ) => {
+    const yCoordinates = [];
+
+    for (let i = 0; i < numPoints; i++) {
+      const x = (i - numPoints / 2) / (numPoints / 10);
+      const y = amplitude / (1 + Math.exp(-steepness * x));
+      yCoordinates.push(y);
+    }
+
+    return yCoordinates;
+  };
+
+  generateTriangle = (numPoints: number, amplitude: number) => {
+    const yCoordinates = [];
+
+    for (let i = 0; i < numPoints; i++) {
+      const x = i / (numPoints - 1);
+      const y = x < 0.5 ? 2 * amplitude * x : 2 * amplitude * (1 - x);
+      yCoordinates.push(y);
+    }
+
+    return yCoordinates;
+  };
+
+  generateGaussianMixture = (
+    numPoints: number,
+    mixtures: { amplitude: number; mean: number; stdDev: number }[]
+  ) => {
+    const yCoordinates = [];
+    const step = 1 / (numPoints - 1);
+
+    for (let i = 0; i < numPoints; i++) {
+      const x = i * step;
+      let y = 0;
+
+      // Sum contributions from all Gaussian mixtures
+      for (const { amplitude, mean, stdDev } of mixtures) {
+        const exponent = -Math.pow((x - mean) / stdDev, 2) / 2;
+        y += amplitude * Math.exp(exponent);
+      }
+
+      yCoordinates.push(y);
+    }
+
+    return yCoordinates;
+  };
 
   // Generate the path data using the fixed and moving points
   generatePathData = (

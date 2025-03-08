@@ -41,8 +41,8 @@ export default function BlurButton({
             src={streamEffects ? blurOffIcon : blurIcon}
             className='flex h-full w-full items-center justify-center'
             attributes={[
-              { key: "width", value: "90%" },
-              { key: "height", value: "90%" },
+              { key: "width", value: "80%" },
+              { key: "height", value: "80%" },
               { key: "fill", value: "#f2f2f2" },
             ]}
           />
