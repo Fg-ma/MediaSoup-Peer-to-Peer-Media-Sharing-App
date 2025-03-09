@@ -39,7 +39,7 @@ const defaultFgSliderOptions = {
   snapToNearestTick: false,
   orientation: "vertical",
   tickLabels: true,
-  tickLabelsColor: "#090909",
+  labelsColor: "#090909",
 };
 
 export interface SliderOptions {
@@ -56,7 +56,7 @@ export interface SliderOptions {
   snapToNearestTick?: boolean;
   orientation?: "vertical" | "horizontal";
   tickLabels?: boolean;
-  tickLabelsColor?: string;
+  labelsColor?: string;
 }
 
 export interface SliderChangeEvent {
@@ -295,14 +295,13 @@ export default function FgSlider({
   return (
     <div
       id={fgSliderOptions.id}
-      className={`flex items-center justify-center relative flex-col
+      className={`${className} flex items-center justify-center relative flex-col
         ${fgSliderOptions.orientation === "vertical" ? "w-16 h-full" : ""}
-        ${fgSliderOptions.orientation === "horizontal" ? "h-16 w-full" : ""}
-      ${className}`}
+        ${fgSliderOptions.orientation === "horizontal" ? "h-16 w-full" : ""}`}
     >
       {fgSliderOptions.topLabel && (
         <div
-          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center text-fg-tone-black-1
+          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
             ${disabled ? "text-opacity-75" : ""}
             ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
             ${
@@ -311,6 +310,7 @@ export default function FgSlider({
                 : ""
             }
           `}
+          style={{ color: fgSliderOptions.labelsColor }}
         >
           <div className='select-none grow'>{fgSliderOptions.topLabel}</div>
           {tickHovering &&
@@ -411,7 +411,7 @@ export default function FgSlider({
                       [fgSliderOptions.orientation === "horizontal"
                         ? "left"
                         : ""]: `${pos}%`,
-                      color: fgSliderOptions.tickLabelsColor,
+                      color: fgSliderOptions.labelsColor,
                     }}
                     className={`select-none font-K2D text-sm absolute w-max flex justify-center items-center 
                       ${disabled ? "text-opacity-75" : ""}
@@ -509,7 +509,7 @@ export default function FgSlider({
       </div>
       {fgSliderOptions.bottomLabel && (
         <div
-          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center text-fg-tone-black-1
+          className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
             ${disabled ? "text-opacity-75" : ""}
             ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
             ${
@@ -518,6 +518,7 @@ export default function FgSlider({
                 : ""
             }
           `}
+          style={{ color: fgSliderOptions.labelsColor }}
         >
           <div className='select-none grow'>{fgSliderOptions.bottomLabel}</div>
           {tickHovering &&

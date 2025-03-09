@@ -1,6 +1,6 @@
 import React from "react";
-import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgButton from "../../../../../elements/fgButton/FgButton";
+import FgSVG from "../../../../../elements/fgSVG/FgSVG";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

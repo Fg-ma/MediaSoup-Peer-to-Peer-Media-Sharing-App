@@ -1,17 +1,15 @@
 import PathGenerator from "./PathGenerator";
-import { FgAudioElementContainerOptionsType } from "./typeConstant";
+import { Settings } from "./typeConstant";
 
 class FgAudioElementController {
   constructor(
     private isUser: boolean,
-    private fgAudioElementContainerOptions: FgAudioElementContainerOptionsType,
     private localMute: React.MutableRefObject<boolean>,
     private clientMute: React.MutableRefObject<boolean>,
     private fixedPointsX: React.MutableRefObject<number[]>,
     private sineCurveY: React.MutableRefObject<number[]>,
-    private bellCurveY: React.MutableRefObject<number[]>,
+    private envelopeY: React.MutableRefObject<number[]>,
     private setMovingY: React.Dispatch<React.SetStateAction<number[]>>,
-    private setFixedY: React.Dispatch<React.SetStateAction<number[]>>,
     private svgRef: React.RefObject<SVGSVGElement>,
     private pathRef: React.RefObject<SVGPathElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
@@ -34,7 +32,8 @@ class FgAudioElementController {
     private handleMute: (
       producerType: "audio" | "screenAudio",
       producerId: string | undefined
-    ) => void
+    ) => void,
+    private settings: Settings
   ) {}
 
   init = () => {
@@ -47,51 +46,102 @@ class FgAudioElementController {
     const startOffset = 16;
     const endOffset = 16;
     const usableWidth = totalWidth - startOffset - endOffset;
-    const step =
-      usableWidth / (this.fgAudioElementContainerOptions.numFixedPoints - 1);
+    const step = usableWidth / (this.settings.numFixedPoints.value - 1);
 
     this.fixedPointsX.current = Array.from(
-      { length: this.fgAudioElementContainerOptions.numFixedPoints },
+      { length: this.settings.numFixedPoints.value },
       (_, i) => startOffset + i * step
     );
 
     this.sineCurveY.current = this.pathGenerator.current.generateSineWave(
-      this.fgAudioElementContainerOptions.numFixedPoints * 2 - 3,
+      this.settings.numFixedPoints.value * 2 - 3,
       1,
       1,
       0
     );
 
-    this.bellCurveY.current =
-      this.pathGenerator.current.generateGaussianMixture(
-        this.fgAudioElementContainerOptions.numFixedPoints - 1,
-        [
-          { amplitude: 0.8, mean: 0.2, stdDev: 0.05 }, // First peak (sharp)
-          { amplitude: 0.6, mean: 0.5, stdDev: 0.1 }, // Second peak (wider)
-          { amplitude: 0.4, mean: 0.8, stdDev: 0.07 }, // Third peak
-        ]
-      );
-    // this.pathGenerator.current.generateSigmoid(
-    //   this.fgAudioElementContainerOptions.numFixedPoints - 1,
-    //   0.8,
-    //   0.5
-    // );
-    // this.pathGenerator.current.generateSymmetricExponentialDecay(
-    //   this.fgAudioElementContainerOptions.numFixedPoints - 1,
-    //   0.7,
-    //   0,
-    //   4
-    // );
-    // this.pathGenerator.current.generateTriangle(
-    //   this.fgAudioElementContainerOptions.numFixedPoints - 1,
-    //   this.fgAudioElementContainerOptions.bellCurveAmplitude
-    // );
-    // this.pathGenerator.current.generateBellCurve(
-    //   this.fgAudioElementContainerOptions.numFixedPoints - 1,
-    //   this.fgAudioElementContainerOptions.bellCurveAmplitude,
-    //   this.fgAudioElementContainerOptions.bellCurveMean,
-    //   this.fgAudioElementContainerOptions.bellCurveStdDev
-    // );
+    this.handleEnvelopeChange();
+  };
+
+  handleEnvelopeChange = () => {
+    if (!this.pathGenerator.current) return;
+
+    switch (this.settings.envelopeType.value) {
+      case "bell":
+        this.envelopeY.current = this.pathGenerator.current.generateBellCurve(
+          this.settings.numFixedPoints.value - 1,
+          this.settings.envelopeType.bellOptions.amplitude.value,
+          this.settings.envelopeType.bellOptions.mean.value,
+          this.settings.envelopeType.bellOptions.stdDev.value
+        );
+        break;
+      case "catenoid":
+        this.envelopeY.current =
+          this.pathGenerator.current.generateSymmetricExponentialDecay(
+            this.settings.numFixedPoints.value - 1,
+            this.settings.envelopeType.catenoidOptions.startAmplitude.value,
+            this.settings.envelopeType.catenoidOptions.endAmplitude.value,
+            this.settings.envelopeType.catenoidOptions.decayRate.value
+          );
+        break;
+      case "cone":
+        this.envelopeY.current = this.pathGenerator.current.generateSigmoid(
+          this.settings.numFixedPoints.value - 1,
+          this.settings.envelopeType.coneOptions.amplitude.value,
+          this.settings.envelopeType.coneOptions.steepness.value
+        );
+        break;
+      case "triangle":
+        this.envelopeY.current = this.pathGenerator.current.generateTriangle(
+          this.settings.numFixedPoints.value - 1,
+          this.settings.envelopeType.triangleOptions.amplitude.value
+        );
+        break;
+      case "mixGaussian":
+        this.envelopeY.current =
+          this.pathGenerator.current.generateGaussianMixture(
+            this.settings.numFixedPoints.value - 1,
+            this.settings.envelopeType.mixGausianEnvelope.value
+          );
+        break;
+      case "smoothNoise":
+        this.envelopeY.current =
+          this.pathGenerator.current.generateBrownianNoise(
+            this.settings.numFixedPoints.value - 1,
+            this.settings.envelopeType.smoothNoiseOptions.amplitude.value
+          );
+        break;
+      case "sawtooth":
+        this.envelopeY.current =
+          this.pathGenerator.current.generateSawtoothWave(
+            this.settings.numFixedPoints.value - 1,
+            this.settings.envelopeType.sawtoothOptions.amplitude.value,
+            this.settings.envelopeType.sawtoothOptions.frequency.value
+          );
+        break;
+      case "chaotic":
+        this.envelopeY.current = this.pathGenerator.current.generateLogisticMap(
+          this.settings.numFixedPoints.value - 1,
+          this.settings.envelopeType.chaoticOptions.amplitude.value
+        );
+        break;
+      case "binary":
+        this.envelopeY.current = this.pathGenerator.current.generateBinaryNoise(
+          this.settings.numFixedPoints.value - 1,
+          this.settings.envelopeType.binaryOptions.amplitude.value
+        );
+        break;
+      case "bumps":
+        this.envelopeY.current =
+          this.pathGenerator.current.generateHalfSineWave(
+            this.settings.numFixedPoints.value - 1,
+            this.settings.envelopeType.bumpsOptions.amplitude.value,
+            this.settings.envelopeType.bumpsOptions.frequency.value
+          );
+        break;
+      default:
+        break;
+    }
   };
 
   handleVolumeSlider = (volume: number) => {
@@ -209,34 +259,21 @@ class FgAudioElementController {
   // Function to update the moving points' Y values
   updateMovingY = (volumeLevel: number) => {
     let movingYArray;
-    let fixedYArray;
     if (
       (!this.localMute.current && !this.clientMute.current) ||
-      this.fgAudioElementContainerOptions.muteStyleOption !== "smile"
+      this.settings.muteStyle.value !== "smile"
     ) {
-      movingYArray = this.bellCurveY.current.map(
+      movingYArray = this.envelopeY.current.map(
         (value, index) => value * volumeLevel * 84 * (-1) ** index + 50
       );
-      fixedYArray = Array(
-        this.fgAudioElementContainerOptions.numFixedPoints - 1
-      ).fill(50);
-    } else if (
-      this.fgAudioElementContainerOptions.muteStyleOption === "smile"
-    ) {
+    } else if (this.settings.muteStyle.value === "smile") {
       movingYArray = this.sineCurveY.current
         .filter((_, index) => index % 2 === 0)
         .map((value) => value * 10 + 50);
-      fixedYArray = this.sineCurveY.current
-        .filter((_, index) => index % 2 === 1)
-        .map((value) => value * 10 + 50);
-      fixedYArray.push(50);
     }
 
     if (movingYArray) {
       this.setMovingY(movingYArray);
-    }
-    if (fixedYArray) {
-      this.setFixedY(fixedYArray);
     }
   };
 }

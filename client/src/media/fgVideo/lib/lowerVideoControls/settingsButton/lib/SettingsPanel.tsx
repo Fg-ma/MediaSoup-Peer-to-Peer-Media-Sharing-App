@@ -20,7 +20,7 @@ import {
 } from "../../../typeConstant";
 import DownloadTypePage from "./DownloadTypePage";
 import DownloadTypeOptionsPage from "./DownloadTypeOptionsPage";
-import VideoSpeedPage, { videoSpeedSelections } from "./VideoSpeedPage";
+import VideoSpeedPage from "./VideoSpeedPage";
 import LowerVideoController from "../../LowerVideoController";
 
 const SelectionPanelVar: Variants = {

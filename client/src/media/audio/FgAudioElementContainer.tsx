@@ -440,6 +440,7 @@ export default function FgAudioElementContainer({
             : undefined
         }
         fgAudioElementContainerOptions={fgAudioElementContainerOptions}
+        settings={settings}
       />
       {popupVisible && (
         <Suspense fallback={<div>Loading...</div>}>
@@ -484,9 +485,6 @@ export default function FgAudioElementContainer({
                   settings={settings}
                   setSettings={setSettings}
                   scrollingContainerRef={audioEffectsSectionRef}
-                  fgAudioElementContainerController={
-                    fgAudioElementContainerController
-                  }
                 />,
                 <ReactButton
                   className='border-fg-off-white min-w-12 w-full hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'

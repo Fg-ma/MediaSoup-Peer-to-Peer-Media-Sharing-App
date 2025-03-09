@@ -3,7 +3,6 @@ import FgButton from "../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
 import { Settings, ActivePages } from "../typeConstant";
-import FgAudioElementContainerController from "../FgAudioElementContainerController";
 
 type RecursiveObject = {
   active?: boolean;
@@ -18,7 +17,6 @@ export default function SettingsButton({
   settings,
   setSettings,
   scrollingContainerRef,
-  fgAudioElementContainerController,
 }: {
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,10 +25,14 @@ export default function SettingsButton({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
-  fgAudioElementContainerController: FgAudioElementContainerController;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+  const shadowColorPickerRef = useRef<HTMLDivElement>(null);
+  const volumeHandleColorPickerRef = useRef<HTMLDivElement>(null);
+  const primaryMuteColorPickerRef = useRef<HTMLDivElement>(null);
+  const secondaryMuteColorPickerRef = useRef<HTMLDivElement>(null);
 
   const deactivateAll = (obj: RecursiveObject) => {
     // Check if the current object has an 'active' property and if it's true
@@ -62,18 +64,23 @@ export default function SettingsButton({
     });
   };
 
+  const handleCloseSettings = (event: PointerEvent) => {
+    const target = event.target as Node;
+
+    if (
+      !settingsButtonRef.current?.contains(target) &&
+      !settingsPanelRef.current?.contains(target) &&
+      !colorPickerRef.current?.contains(target) &&
+      !shadowColorPickerRef.current?.contains(target) &&
+      !volumeHandleColorPickerRef.current?.contains(target) &&
+      !primaryMuteColorPickerRef.current?.contains(target) &&
+      !secondaryMuteColorPickerRef.current?.contains(target)
+    ) {
+      toggleSettings();
+    }
+  };
+
   useEffect(() => {
-    const handleCloseSettings = (event: PointerEvent) => {
-      const target = event.target as Node;
-
-      if (
-        !settingsButtonRef.current?.contains(target) &&
-        !settingsPanelRef.current?.contains(target)
-      ) {
-        toggleSettings();
-      }
-    };
-
     if (settingsActive) {
       document.addEventListener("pointerdown", handleCloseSettings);
     }
@@ -124,7 +131,13 @@ export default function SettingsButton({
           setActivePages={setActivePages}
           settings={settings}
           setSettings={setSettings}
-          fgAudioElementContainerController={fgAudioElementContainerController}
+          colorPickerRefs={{
+            color: colorPickerRef,
+            shadowColor: shadowColorPickerRef,
+            volumeHandleColor: volumeHandleColorPickerRef,
+            primaryMuteColor: primaryMuteColorPickerRef,
+            secondaryMuteColor: secondaryMuteColorPickerRef,
+          }}
         />
       )}
     </>

@@ -13,6 +13,7 @@ export default function FgInput({
   name,
   onSubmit,
   onChange,
+  externalValue,
   options = {
     submitButton: true,
   },
@@ -22,6 +23,7 @@ export default function FgInput({
   name?: string;
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  externalValue?: string;
   options?: {
     submitButton: boolean;
   };
@@ -43,6 +45,7 @@ export default function FgInput({
           type='text'
           className='w-full h-full px-2 focus:outline-none bg-fg-white'
           onChange={onChange}
+          value={externalValue}
         />
       </div>
       {options.submitButton && (
