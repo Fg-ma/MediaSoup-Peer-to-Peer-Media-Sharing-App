@@ -213,7 +213,7 @@ class GamesSignalingMedia {
             this.username,
             this.instance,
             activeGame.gameId,
-            "ws://localhost:8042",
+            "https://localhost:8042",
             false
           );
           await snakeGameMedia.connect();

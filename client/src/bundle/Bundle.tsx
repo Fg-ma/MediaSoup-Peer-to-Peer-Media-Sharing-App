@@ -26,6 +26,9 @@ export default function Bundle({
   initScreenStreams,
   initScreenAudioStreams,
   initAudioStream,
+  handleDisableEnableBtns,
+  isAudio,
+  setAudioActive,
   options,
   handleMuteCallback,
   onRendered,
@@ -39,6 +42,9 @@ export default function Bundle({
   initScreenStreams?: { [screenId: string]: MediaStream };
   initScreenAudioStreams?: { [screenAudioId: string]: MediaStream };
   initAudioStream?: MediaStream;
+  handleDisableEnableBtns: (disabled: boolean) => void;
+  isAudio: React.MutableRefObject<boolean>;
+  setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
   options?: BundleOptions;
   handleMuteCallback?: (
     producerType: "audio" | "screenAudio",
@@ -435,6 +441,9 @@ export default function Bundle({
               isUser={bundleOptions.isUser}
               permissions={permissions}
               clientMute={clientMute}
+              handleDisableEnableBtns={handleDisableEnableBtns}
+              isAudio={isAudio}
+              setAudioActive={setAudioActive}
             />
           </Suspense>
         )}

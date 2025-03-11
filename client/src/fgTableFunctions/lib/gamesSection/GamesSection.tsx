@@ -14,14 +14,17 @@ const joystickIcon = nginxAssetSeverBaseUrl + "svgs/games/joystickIcon.svg";
 const snakeGameIcon =
   nginxAssetSeverBaseUrl + "svgs/games/snake/snakeGameIcon.svg";
 
-export default function GamesSection() {
+export default function GamesSection({
+  gamesSectionRef,
+}: {
+  gamesSectionRef: React.RefObject<HTMLDivElement>;
+}) {
   const { userMedia } = useMediaContext();
   const { table_id, username, instance } = useUserInfoContext();
 
   const [gamesActive, setGamesActive] = useState(false);
   const [cols, setCols] = useState(3);
   const gamesButtonRef = useRef<HTMLButtonElement>(null);
-  const gamesSectionRef = useRef<HTMLDivElement>(null);
 
   const gridColumnsChange = () => {
     if (!gamesSectionRef.current) return;
@@ -66,7 +69,7 @@ export default function GamesSection() {
             content={gamesActive ? "Close games" : "Open games"}
           />
         }
-        options={{ hoverTimeoutDuration: 750 }}
+        options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
         aria-label={"Games"}
       />
       {gamesActive && (

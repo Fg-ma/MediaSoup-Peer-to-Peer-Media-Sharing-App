@@ -6,11 +6,11 @@ import {
   Settings,
   ActivePages,
   envelopeTypesTitles,
-  muteStyleTitles,
   colorSettingsTitles,
   ColorSettingsTypes,
   EnvelopeOptionTypes,
   envelopeTypesSliderOptions,
+  muteStylesMeta,
 } from "../../typeConstant";
 import EnvelopeTypePage from "./EnvelopeTypePage";
 import MuteStylePage from "./MuteStylePage";
@@ -270,7 +270,7 @@ export default function SettingsPanel({
               contentFunction={() => (
                 <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
                   <div>Mute style</div>
-                  <div>{muteStyleTitles[settings.muteStyle.value]}</div>
+                  <div>{muteStylesMeta[settings.muteStyle.value].title}</div>
                 </div>
               )}
               clickFunction={handleMuteStyleActive}

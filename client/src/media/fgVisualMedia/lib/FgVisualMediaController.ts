@@ -312,7 +312,7 @@ class FgVisualMediaController {
     }
   };
 
-  handleMessage = (event: IncomingMediasoupMessages) => {
+  handleMediasoupMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "effectChangeRequested":
         this.onEffectChangeRequested(event);

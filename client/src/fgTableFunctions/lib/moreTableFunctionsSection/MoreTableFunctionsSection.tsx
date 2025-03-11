@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useRef } from "react";
 import { AudioEffectTypes } from "../../../context/effectsContext/typeConstant";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../../../context/permissionsContext/PermissionsContext";
@@ -34,6 +34,7 @@ export default function MoreTableFunctionsSection({
   handleExternalMute,
   captureMediaActive,
   setCaptureMediaActive,
+  gamesSectionRef,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   moreTableFunctionsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -60,6 +61,7 @@ export default function MoreTableFunctionsSection({
   handleExternalMute: () => void;
   captureMediaActive: boolean;
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
+  gamesSectionRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
@@ -101,7 +103,7 @@ export default function MoreTableFunctionsSection({
       content={
         <div className='w-full h-full overflow-y-auto small-vertical-scroll-bar'>
           <div className='grid grid-cols-3 w-full my-2 h-max gap-3'>
-            <GamesSection />
+            <GamesSection gamesSectionRef={gamesSectionRef} />
             <FgBackgroundSelector
               backgroundRef={tableTopRef}
               defaultActiveBackground={tableBackground}

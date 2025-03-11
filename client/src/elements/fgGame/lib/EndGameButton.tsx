@@ -14,15 +14,15 @@ export default function EndGameButton({
 }) {
   return (
     <FgButton
-      className='flex h-full aspect-square rounded items-end justify-end py-2 pr-2'
+      className='h-[60%] aspect-square rounded pb-3 pr-2'
       clickFunction={closeGameFunction}
       contentFunction={() => (
         <FgSVG
-          className='flex items-center justify-center h-full max-h-8 aspect-square'
+          className='flex items-center justify-center h-full aspect-square'
           src={closeIcon}
           attributes={[
-            { key: "width", value: "80%" },
-            { key: "height", value: "80%" },
+            { key: "width", value: "100%" },
+            { key: "height", value: "100%" },
             { key: "stroke", value: "#f2f2f2" },
             { key: "fill", value: "#f2f2f2" },
           ]}

@@ -101,6 +101,7 @@ export default function AudioEffectButton({
       }
       options={{
         hoverTimeoutDuration: 750,
+        hoverZValue: 500000000000,
       }}
     />
   );

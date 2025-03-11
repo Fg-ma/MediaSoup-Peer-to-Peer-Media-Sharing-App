@@ -5,7 +5,7 @@ import {
   Settings,
   ActivePages,
   MuteStyleTypes,
-  muteStyleTitles,
+  muteStylesMeta,
 } from "../../typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -74,7 +74,7 @@ export default function MuteStylePage({
         className='w-full overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
       >
         <div className='flex w-full flex-col space-y-1 h-max'>
-          {Object.entries(muteStyleTitles).map(([key, title]) => (
+          {Object.entries(muteStylesMeta).map(([key, meta]) => (
             <FgButton
               key={key}
               className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
@@ -83,8 +83,23 @@ export default function MuteStylePage({
                   : ""
               }`}
               contentFunction={() => (
-                <div className='flex w-full bg-opacity-75 px-2 items-start'>
-                  {title}
+                <div
+                  className={`${
+                    meta.url ? "justify-between" : "justify-start"
+                  } flex w-full bg-opacity-75 px-2 items-center text-lg`}
+                >
+                  <>{meta.title}</>
+                  {meta.url && (
+                    <FgSVG
+                      src={meta.url}
+                      className='stroke-fg-white h-6 aspect-square'
+                      attributes={[
+                        { key: "height", value: "100%" },
+                        { key: "width", value: "100%" },
+                        { key: "stroke", value: "#f2f2f2" },
+                      ]}
+                    />
+                  )}
                 </div>
               )}
               clickFunction={() => setMuteStyle(key as MuteStyleTypes)}

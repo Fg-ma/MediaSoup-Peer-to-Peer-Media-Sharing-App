@@ -6,7 +6,8 @@ export type ContentTypes =
   | "screen"
   | "text"
   | "soundClip"
-  | "audio";
+  | "audio"
+  | "game";
 
 export type StaticContentTypes =
   | "video"

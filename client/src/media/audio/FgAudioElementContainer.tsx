@@ -41,6 +41,9 @@ export default function FgAudioElementContainer({
   localMute,
   isUser,
   permissions,
+  handleDisableEnableBtns,
+  isAudio,
+  setAudioActive,
   options,
 }: {
   table_id: string;
@@ -63,6 +66,9 @@ export default function FgAudioElementContainer({
   localMute: React.MutableRefObject<boolean>;
   isUser: boolean;
   permissions: Permissions;
+  handleDisableEnableBtns: (disabled: boolean) => void;
+  isAudio: React.MutableRefObject<boolean>;
+  setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
   options?: {
     controlsVanishTime?: number;
     springDuration?: number;
@@ -112,6 +118,11 @@ export default function FgAudioElementContainer({
   const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
   const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
 
+  const audioContainerRef = useRef<HTMLDivElement>(null);
+
+  const shiftPressed = useRef(false);
+  const controlPressed = useRef(false);
+
   const positioningListeners = useRef<{
     [username: string]: {
       [instance: string]: () => void;
@@ -152,15 +163,41 @@ export default function FgAudioElementContainer({
       setRerender,
       tableSocket,
       behindEffectsContainerRef,
-      frontEffectsContainerRef
+      frontEffectsContainerRef,
+      audioContainerRef,
+      shiftPressed,
+      controlPressed,
+      setAudioEffectsSectionVisible,
+      mediasoupSocket,
+      handleDisableEnableBtns,
+      isAudio,
+      setAudioActive,
+      fgContentAdjustmentController,
+      bundleRef
     );
 
   useEffect(() => {
+    if (
+      !remoteDataStreams.current ||
+      (isUser && !permissions.acceptsAudioEffects)
+    ) {
+      fgAudioElementContainerController.attachListeners();
+    }
+
     mediasoupSocket.current?.addMessageListener(
-      fgAudioElementContainerController.handleMessage
+      fgAudioElementContainerController.handleMediasoupMessage
     );
     tableSocket.current?.addMessageListener(
       fgAudioElementContainerController.handleTableMessage
+    );
+
+    document.addEventListener(
+      "keydown",
+      fgAudioElementContainerController.handleKeyDown
+    );
+    document.addEventListener(
+      "keyup",
+      fgAudioElementContainerController.handleKeyUp
     );
 
     // Request initial catch up data
@@ -179,32 +216,24 @@ export default function FgAudioElementContainer({
     }
 
     return () => {
-      mediasoupSocket.current?.removeMessageListener(
-        fgAudioElementContainerController.handleMessage
-      );
-      tableSocket.current?.removeMessageListener(
-        fgAudioElementContainerController.handleTableMessage
-      );
-    };
-  }, []);
-
-  useEffect(() => {
-    // Ensure remoteDataStreams and necessary permissions are valid
-    if (
-      !remoteDataStreams.current ||
-      (isUser && !permissions.acceptsAudioEffects)
-    ) {
-      return;
-    }
-
-    fgAudioElementContainerController.attachListeners();
-
-    // Cleanup on unmount or dependency change
-    return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
           removeListener()
         )
+      );
+      mediasoupSocket.current?.removeMessageListener(
+        fgAudioElementContainerController.handleMediasoupMessage
+      );
+      tableSocket.current?.removeMessageListener(
+        fgAudioElementContainerController.handleTableMessage
+      );
+      document.removeEventListener(
+        "keydown",
+        fgAudioElementContainerController.handleKeyDown
+      );
+      document.removeEventListener(
+        "keyup",
+        fgAudioElementContainerController.handleKeyUp
       );
     };
   }, []);
@@ -229,6 +258,7 @@ export default function FgAudioElementContainer({
 
   return (
     <div
+      ref={audioContainerRef}
       id={`${username}_${instance}_audio_element_container`}
       className={`audio-element-container ${
         adjustingDimensions ? "adjusting-dimensions" : ""
@@ -495,6 +525,7 @@ export default function FgAudioElementContainer({
                     fgAudioElementContainerController.reactController
                       .handleReaction
                   }
+                  options={{ hoverType: "above", hoverTimeoutDuration: 750 }}
                 />,
               ]}
             />

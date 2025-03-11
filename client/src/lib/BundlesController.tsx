@@ -43,7 +43,10 @@ class BundlesController {
       screenAudioIds: (string | undefined)[]
     ) => void,
 
-    private permissions: React.MutableRefObject<Permissions>
+    private permissions: React.MutableRefObject<Permissions>,
+
+    private handleDisableEnableBtns: (disabled: boolean) => void,
+    private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   createProducerBundle = () => {
@@ -84,6 +87,9 @@ class BundlesController {
             this.isScreen.current ? initScreenAudioStreams : undefined
           }
           initAudioStream={this.isAudio.current ? initAudioStream : undefined}
+          handleDisableEnableBtns={this.handleDisableEnableBtns}
+          isAudio={this.isAudio}
+          setAudioActive={this.setAudioActive}
           options={{
             isUser: true,
             permissions: this.permissions.current,
@@ -187,6 +193,9 @@ class BundlesController {
               },
             });
           }}
+          handleDisableEnableBtns={this.handleDisableEnableBtns}
+          isAudio={this.isAudio}
+          setAudioActive={this.setAudioActive}
         />
       );
 

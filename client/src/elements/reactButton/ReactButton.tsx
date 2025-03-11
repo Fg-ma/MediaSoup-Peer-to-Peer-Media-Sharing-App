@@ -5,7 +5,11 @@ import FgImageElement from "../fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import FgPanel from "../fgPanel/FgPanel";
 import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingContainer";
-import { reactionsMeta } from "./lib/typeConstant";
+import {
+  reactButtonDefaultOptions,
+  ReactButtonOptions,
+  reactionsMeta,
+} from "./lib/typeConstant";
 import { TableReactions } from "../../../../universal/typeConstant";
 
 const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -21,13 +25,19 @@ export default function ReactButton({
   setReactionsPanelActive,
   clickFunction,
   reactionFunction,
+  options,
 }: {
   className?: string;
   reactionsPanelActive: boolean;
   setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   clickFunction?: () => void;
   reactionFunction?: (reaction: TableReactions) => void;
+  options?: ReactButtonOptions;
 }) {
+  const reactButtonOptions = {
+    ...reactButtonDefaultOptions,
+    ...options,
+  };
   const [cols, setCols] = useState(3);
   const reactionsButtonRef = useRef<HTMLButtonElement>(null);
   const reactionsPanelScrollingContainerRef = useRef<HTMLDivElement>(null);
@@ -99,7 +109,11 @@ export default function ReactButton({
             <FgHoverContentStandard content={"Open reactions (Q)"} />
           ) : undefined
         }
-        options={{ hoverType: "below" }}
+        options={{
+          hoverType: reactButtonOptions.hoverType,
+          hoverTimeoutDuration: reactButtonOptions.hoverTimeoutDuration,
+          hoverZValue: 500000000000,
+        }}
       />
       {reactionsPanelActive && (
         <FgPanel
@@ -129,7 +143,7 @@ export default function ReactButton({
                   <FgButton
                     key={reaction}
                     scrollingContainerRef={reactionsPanelScrollingContainerRef}
-                    className='flex border-gray-300 items-center justify-center min-w-12 w-full aspect-square hover:border-fg-secondary rounded border-2 hover:border-3 bg-black bg-opacity-75'
+                    className='flex border-fg-off-white items-center justify-center min-w-12 w-full aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-1'
                     clickFunction={
                       reactionFunction
                         ? () => reactionFunction(reaction as TableReactions)
@@ -158,7 +172,7 @@ export default function ReactButton({
                     hoverContent={
                       <FgHoverContentStandard content={meta.name} />
                     }
-                    options={{ hoverTimeoutDuration: 350 }}
+                    options={{ hoverTimeoutDuration: 750 }}
                   />
                 )),
               ]}

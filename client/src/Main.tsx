@@ -225,7 +225,9 @@ export default function Main() {
     setBundles,
     muteAudio,
     setUpEffectContext,
-    permissions
+    permissions,
+    handleDisableEnableBtns,
+    setAudioActive
   );
 
   const userDevice = new UserDevice();
@@ -261,11 +263,13 @@ export default function Main() {
     remoteDataStreams,
     isCamera,
     isScreen,
+    isAudio,
     isSubscribed,
     handleDisableEnableBtns,
     producerTransport,
-    setScreenActive,
     setCameraActive,
+    setScreenActive,
+    setAudioActive,
     bundlesController.createProducerBundle,
     bundles,
     setBundles,

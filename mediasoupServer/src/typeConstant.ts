@@ -690,7 +690,7 @@ export type onRequestRemoveProducerType = {
     username: string;
     instance: string;
     producerType: ProducerTypes;
-    producerId: string;
+    producerId?: string;
   };
 };
 

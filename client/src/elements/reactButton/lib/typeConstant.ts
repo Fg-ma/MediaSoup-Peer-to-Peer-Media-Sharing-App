@@ -882,3 +882,16 @@ export const reactionsMeta: {
     srcLoading: blockHeadDevil_32x32,
   },
 };
+
+export type ReactButtonOptions = {
+  hoverTimeoutDuration?: number;
+  hoverType?: "below" | "above" | "left" | "right";
+};
+
+export const reactButtonDefaultOptions: {
+  hoverTimeoutDuration: number;
+  hoverType: "below" | "above" | "left" | "right";
+} = {
+  hoverTimeoutDuration: 0,
+  hoverType: "below",
+};

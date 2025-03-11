@@ -118,10 +118,11 @@ export default function SettingsButton({
         )}
         hoverContent={
           !settingsActive ? (
-            <FgHoverContentStandard content='Settings (U)' style='dark' />
+            <FgHoverContentStandard content='Settings (U)' style='light' />
           ) : undefined
         }
         scrollingContainerRef={scrollingContainerRef}
+        options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
       />
       {settingsActive && (
         <SettingsPanel

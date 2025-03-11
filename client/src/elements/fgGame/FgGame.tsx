@@ -10,6 +10,7 @@ import ControlButtons from "./lib/ControlButtons";
 import PlayersSection from "./lib/playersSection/PlayersSection";
 import EndGameButton from "./lib/EndGameButton";
 import "./lib/fgGame.css";
+import ReactButton from "../reactButton/ReactButton";
 
 const GameTransition: Transition = {
   transition: {
@@ -78,7 +79,7 @@ export default function FgGame({
 }) {
   const { table_id, username, instance } = useUserInfoContext();
   const { userDataStreams, remoteDataStreams } = useMediaContext();
-  const { mediasoupSocket } = useSocketContext();
+  const { mediasoupSocket, tableSocket } = useSocketContext();
 
   const [_, setRerender] = useState(false);
   const positioning = useRef<{
@@ -97,6 +98,7 @@ export default function FgGame({
   }>({});
   const [hideControls, setHideControls] = useState(true);
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
+  const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
   const panBtnRef = useRef<HTMLButtonElement>(null);
   const isResizing = useRef(false);
@@ -109,6 +111,9 @@ export default function FgGame({
   const pointerStillHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
     undefined
   );
+
+  const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
+  const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
 
   const fgContentAdjustmentController = new FgContentAdjustmentController(
     sharedBundleRef,
@@ -138,7 +143,10 @@ export default function FgGame({
     sharedBundleRef,
     panBtnRef,
     fgContentAdjustmentController,
-    popupRefs
+    popupRefs,
+    behindEffectsContainerRef,
+    frontEffectsContainerRef,
+    tableSocket
   );
 
   useEffect(() => {
@@ -215,6 +223,9 @@ export default function FgGame({
 
   useEffect(() => {
     mediasoupSocket.current?.addMessageListener(fgGameController.handleMessage);
+    tableSocket.current?.addMessageListener(
+      fgGameController.handleTableMessage
+    );
 
     mediasoupSocket.current?.sendMessage({
       type: "requestGameCatchUpData",
@@ -236,6 +247,9 @@ export default function FgGame({
       );
       mediasoupSocket.current?.removeMessageListener(
         fgGameController.handleMessage
+      );
+      tableSocket.current?.removeMessageListener(
+        fgGameController.handleTableMessage
       );
     };
   }, []);
@@ -308,8 +322,10 @@ export default function FgGame({
       onPointerEnter={fgGameController.handlePointerEnter}
       onPointerLeave={fgGameController.handlePointerLeave}
       onPointerMove={fgGameController.handlePointerMove}
-      className={`fg-game ${hideControls ? "z-[5] cursor-none" : "z-[49]"} ${
-        hideControls ? "hide-controls" : ""
+      className={`fg-game ${
+        hideControls && !reactionsPanelActive ? "z-[5] cursor-none" : "z-[49]"
+      } ${
+        hideControls && !reactionsPanelActive ? "hide-controls" : ""
       } rounded absolute pointer-events-auto`}
       style={{
         left: `${positioning.current.position.left}%`,
@@ -331,6 +347,18 @@ export default function FgGame({
       exit='init'
       transition={GameTransition}
     >
+      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+        <div
+          ref={frontEffectsContainerRef}
+          className='w-full h-full relative z-[100] pointer-events-none'
+        />
+      </div>
+      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+        <div
+          ref={behindEffectsContainerRef}
+          className='w-full h-full relative -z-[100] pointer-events-none'
+        />
+      </div>
       <div className='fg-game-left-controls-section absolute right-full bottom-0 flex flex-col items-end justify-between w-[15%] min-w-14 max-w-24 h-full'>
         <div className='w-full h-max z-20'>{gameFunctionsSection}</div>
         <PlayersSection players={players} />
@@ -346,7 +374,17 @@ export default function FgGame({
             (players?.user === undefined ? 0 : 1)
           }
         />
-        <EndGameButton closeGameFunction={closeGameFunction} />
+        <div className='flex w-max h-full items-end justify-center'>
+          <div className='h-[75%] aspect-square pb-1'>
+            <ReactButton
+              reactionsPanelActive={reactionsPanelActive}
+              setReactionsPanelActive={setReactionsPanelActive}
+              clickFunction={() => setReactionsPanelActive((prev) => !prev)}
+              reactionFunction={fgGameController.reactController.handleReaction}
+            />
+          </div>
+          <EndGameButton closeGameFunction={closeGameFunction} />
+        </div>
       </div>
       {content}
       <FgGameAdjustmentButtons

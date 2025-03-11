@@ -325,7 +325,7 @@ export default function RemoteVisualMedia({
 
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
-      fgVisualMediaController.handleMessage
+      fgVisualMediaController.handleMediasoupMessage
     );
 
     tableSocket.current?.addMessageListener(
@@ -397,7 +397,7 @@ export default function RemoteVisualMedia({
       );
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
-        fgVisualMediaController.handleMessage
+        fgVisualMediaController.handleMediasoupMessage
       );
       tableSocket.current?.removeMessageListener(
         fgVisualMediaController.handleTableMessage

@@ -324,7 +324,7 @@ export default function UserVisualMedia({
 
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
-      fgVisualMediaController.handleMessage
+      fgVisualMediaController.handleMediasoupMessage
     );
 
     tableSocket.current?.addMessageListener(
@@ -387,7 +387,7 @@ export default function UserVisualMedia({
       );
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
-        fgVisualMediaController.handleMessage
+        fgVisualMediaController.handleMediasoupMessage
       );
       tableSocket.current?.removeMessageListener(
         fgVisualMediaController.handleTableMessage

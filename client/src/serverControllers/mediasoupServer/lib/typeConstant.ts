@@ -538,7 +538,7 @@ type onRequestRemoveProducerType = {
     username: string;
     instance: string;
     producerType: "camera" | "screen" | "audio" | "screenAudio" | "json";
-    producerId: string;
+    producerId?: string;
   };
 };
 

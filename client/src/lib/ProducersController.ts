@@ -59,14 +59,16 @@ class ProducersController {
 
     private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
+    private isAudio: React.MutableRefObject<boolean>,
     private isSubscribed: React.MutableRefObject<boolean>,
 
     private handleDisableEnableBtns: (disabled: boolean) => void,
     private producerTransport: React.MutableRefObject<
       types.Transport<types.AppData> | undefined
     >,
-    private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
     private setCameraActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
     private createProducerBundle: () => void,
     private bundles: {
       [username: string]: { [instance: string]: React.JSX.Element };
@@ -664,6 +666,13 @@ class ProducersController {
       } else {
         this.isScreen.current = true;
         this.setScreenActive(true);
+      }
+      if (!this.userMedia.current.audio) {
+        this.isAudio.current = false;
+        this.setAudioActive(false);
+      } else {
+        this.isAudio.current = true;
+        this.setAudioActive(true);
       }
 
       // Re-enable button

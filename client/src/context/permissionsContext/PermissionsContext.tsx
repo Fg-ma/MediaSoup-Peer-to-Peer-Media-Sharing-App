@@ -33,8 +33,6 @@ export function PermissionsContextProvider({
     acceptsAudioEffects: true,
     acceptsPositionScaleRotationManipulation: true,
     acceptsCloseMedia: true,
-    acceptsVideoEffects: true,
-    acceptsImageEffects: true,
   });
 
   return (

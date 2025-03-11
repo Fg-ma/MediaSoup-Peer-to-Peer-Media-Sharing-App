@@ -115,7 +115,11 @@ export default function FgBackgroundSelector({
           )
         }
         className='flex items-center justify-center h-full aspect-square relative'
-        options={{ hoverType: hoverType, hoverTimeoutDuration: 750 }}
+        options={{
+          hoverType: hoverType,
+          hoverTimeoutDuration: 750,
+          hoverZValue: 500000000000,
+        }}
       />
       {backgroundSelectorPanelActive && (
         <BackgroundSelectorPanel

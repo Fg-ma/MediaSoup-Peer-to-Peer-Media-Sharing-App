@@ -1,13 +1,21 @@
-import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
-import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
-import MediasoupSocketController from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import {
   IncomingMediasoupMessages,
   onRequestedGameCatchUpDataType,
   onResponsedGameCatchUpDataType,
 } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
+import MediasoupSocketController from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
+import ReactController from "../../../elements/reactButton/lib/ReactController";
+import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
+import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import TableSocketController from "../../../serverControllers/tableServer/TableSocketController";
+import {
+  IncomingTableMessages,
+  onReactionOccurredType,
+} from "../../../serverControllers/tableServer/lib/typeConstant";
 
 class FgGameController {
+  reactController: ReactController;
+
   constructor(
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
@@ -49,8 +57,21 @@ class FgGameController {
     private sharedBundleRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
     private fgContentAdjustmentController: FgContentAdjustmentController,
-    private popupRefs: React.RefObject<HTMLElement>[] | undefined
-  ) {}
+    private popupRefs: React.RefObject<HTMLElement>[] | undefined,
+    private behindEffectsContainerRef: React.RefObject<HTMLDivElement>,
+    private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,
+    private tableSocket: React.MutableRefObject<
+      TableSocketController | undefined
+    >
+  ) {
+    this.reactController = new ReactController(
+      this.gameId,
+      "game",
+      this.behindEffectsContainerRef,
+      this.frontEffectsContainerRef,
+      this.tableSocket
+    );
+  }
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (this.hideControls || event.target instanceof HTMLInputElement) return;
@@ -396,6 +417,25 @@ class FgGameController {
           });
         }
       }, 1250);
+    }
+  };
+
+  reactionOccurred = (event: onReactionOccurredType) => {
+    const { contentType, contentId } = event.header;
+    const { reaction, reactionStyle } = event.data;
+
+    if (contentType === "game" && contentId === this.gameId) {
+      this.reactController.handleReaction(reaction, false, reactionStyle);
+    }
+  };
+
+  handleTableMessage = (event: IncomingTableMessages) => {
+    switch (event.type) {
+      case "reactionOccurred":
+        this.reactionOccurred(event);
+        break;
+      default:
+        break;
     }
   };
 }
