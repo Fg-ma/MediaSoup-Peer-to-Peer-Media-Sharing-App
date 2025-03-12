@@ -3,10 +3,10 @@ import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVG from "../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const privateMessageIcon =
-  nginxAssetSeverBaseUrl + "svgs/userFunctions/privateMessageIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/userFunctions/privateMessageIcon.svg";
 
 export default function PrivateMessageButton({
   userPanelRef,

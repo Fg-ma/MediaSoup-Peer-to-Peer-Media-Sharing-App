@@ -5,9 +5,9 @@ import { Settings, ActivePages } from "../../typeConstant";
 import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
 import CaptureMediaController from "../../CaptureMediaController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
+const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export const videoSpeedSelections = [
   "0.25",

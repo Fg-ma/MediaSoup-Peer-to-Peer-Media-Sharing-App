@@ -4,10 +4,10 @@ import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import CaptureMediaController from "../../CaptureMediaController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const effectIcon = nginxAssetSeverBaseUrl + "svgs/effectIcon.svg";
-const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
+const effectIcon = nginxAssetServerBaseUrl + "svgs/effectIcon.svg";
+const effectOffIcon = nginxAssetServerBaseUrl + "svgs/effectOffIcon.svg";
 
 export default function EffectsButton({
   captureMediaController,

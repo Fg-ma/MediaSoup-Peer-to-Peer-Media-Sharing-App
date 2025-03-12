@@ -1,9 +1,9 @@
 import { Player, Volume, getTransport, ToneAudioNode, Gain } from "tone";
 import { TransportClass } from "tone/build/esm/core/clock/Transport";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const metronomeUrl = nginxAssetSeverBaseUrl + "audioSamples/metronome.wav";
+const metronomeUrl = nginxAssetServerBaseUrl + "audioSamples/metronome.wav";
 
 class FgMetronome {
   private metronome: Player;

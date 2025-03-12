@@ -7,10 +7,10 @@ import ProducersController from "../../../lib/ProducersController";
 import AudioSectionController from "./lib/audioSectionController";
 import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const shareAudioIcon = nginxAssetSeverBaseUrl + "svgs/shareAudioIcon.svg";
-const removeAudioIcon = nginxAssetSeverBaseUrl + "svgs/removeAudioIcon.svg";
+const shareAudioIcon = nginxAssetServerBaseUrl + "svgs/shareAudioIcon.svg";
+const removeAudioIcon = nginxAssetServerBaseUrl + "svgs/removeAudioIcon.svg";
 
 const FgButton = React.lazy(
   () => import("../../../elements/fgButton/FgButton")

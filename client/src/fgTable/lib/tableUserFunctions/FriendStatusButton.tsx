@@ -3,12 +3,12 @@ import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVG from "../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const addFriendIcon =
-  nginxAssetSeverBaseUrl + "svgs/userFunctions/addFriendIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/userFunctions/addFriendIcon.svg";
 const removeFriendIcon =
-  nginxAssetSeverBaseUrl + "svgs/userFunctions/removeFriendIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/userFunctions/removeFriendIcon.svg";
 
 export default function FriendStatusButton({
   userPanelRef,

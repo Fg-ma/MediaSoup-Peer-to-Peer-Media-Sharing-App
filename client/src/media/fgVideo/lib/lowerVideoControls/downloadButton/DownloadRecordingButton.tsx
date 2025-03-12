@@ -4,9 +4,9 @@ import FgSVG from "../../../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerVideoController from "../LowerVideoController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const downloadIcon = nginxAssetSeverBaseUrl + "svgs/downloadIcon.svg";
+const downloadIcon = nginxAssetServerBaseUrl + "svgs/downloadIcon.svg";
 
 export default function DownloadRecordingButton({
   lowerVideoController,

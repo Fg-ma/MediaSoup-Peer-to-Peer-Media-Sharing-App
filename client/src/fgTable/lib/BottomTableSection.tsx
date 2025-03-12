@@ -3,12 +3,12 @@ import { TableColors } from "../../serverControllers/tableServer/lib/typeConstan
 import UserBubble from "./UserBubble";
 import { tableColorMap } from "./tableColors";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const alien_960x960 =
-  nginxAssetSeverBaseUrl + "backgroundImages/space/alien_960x960.jpg";
+  nginxAssetServerBaseUrl + "backgroundImages/space/alien_960x960.jpg";
 const alien_64x64 =
-  nginxAssetSeverBaseUrl + "backgroundImages/space/alien_64x64.jpg";
+  nginxAssetServerBaseUrl + "backgroundImages/space/alien_64x64.jpg";
 
 export default function BottomTableSection({
   userData,

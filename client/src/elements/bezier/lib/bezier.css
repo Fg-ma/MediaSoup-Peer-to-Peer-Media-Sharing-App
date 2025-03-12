@@ -1,0 +1,17 @@
+.svg-editor-control-point {
+  transition: r 0.2s ease;
+}
+
+.svg-editor-control-point:hover,
+.svg-editor-control-point.dragging {
+  r: 1.75;
+}
+
+.svg-editor-split-point {
+  transition: r 0.2s ease;
+}
+
+.svg-editor-split-point.hovering,
+.svg-editor-split-point.dragging {
+  r: 1.75;
+}

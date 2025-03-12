@@ -8,12 +8,12 @@ import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingConta
 import { backgroundChoices, hideBackgroundLabels } from "./typeConstant";
 import ColorPickerButton from "../colorPickerButton/ColorPickerButton";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const hideBackgroundIcon =
-  nginxAssetSeverBaseUrl + "svgs/visualEffects/hideBackgroundIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/visualEffects/hideBackgroundIcon.svg";
 const hideBackgroundOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/visualEffects/hideBackgroundOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/visualEffects/hideBackgroundOffIcon.svg";
 
 export default function HideBackgroundButton({
   effectsDisabled,

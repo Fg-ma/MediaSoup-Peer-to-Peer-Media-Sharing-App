@@ -3,11 +3,11 @@ import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const blurIcon = nginxAssetSeverBaseUrl + "svgs/visualEffects/blurIcon.svg";
+const blurIcon = nginxAssetServerBaseUrl + "svgs/visualEffects/blurIcon.svg";
 const blurOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/visualEffects/blurOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/visualEffects/blurOffIcon.svg";
 
 export default function BlurButton({
   effectsDisabled,

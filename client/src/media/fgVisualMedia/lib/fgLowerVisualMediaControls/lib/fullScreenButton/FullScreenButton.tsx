@@ -4,10 +4,11 @@ import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const fullScreenIcon = nginxAssetSeverBaseUrl + "svgs/fullScreenIcon.svg";
-const fullScreenOffIcon = nginxAssetSeverBaseUrl + "svgs/fullScreenOffIcon.svg";
+const fullScreenIcon = nginxAssetServerBaseUrl + "svgs/fullScreenIcon.svg";
+const fullScreenOffIcon =
+  nginxAssetServerBaseUrl + "svgs/fullScreenOffIcon.svg";
 
 export default function FullScreenButton({
   fgLowerVisualMediaController,

@@ -4,9 +4,9 @@ import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerController from "../../../lowerControls/lib/LowerController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const closeIcon = nginxAssetSeverBaseUrl + "svgs/closeIcon.svg";
+const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 
 export default function CloseButton({
   lowerController,

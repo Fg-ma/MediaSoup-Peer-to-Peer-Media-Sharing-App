@@ -1,11 +1,11 @@
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const cameraIcon = nginxAssetSeverBaseUrl + "svgs/cameraIcon.svg";
-const videoIcon = nginxAssetSeverBaseUrl + "svgs/videoIcon.svg";
-const icon10s = nginxAssetSeverBaseUrl + "svgs/10sIcon.svg";
-const icon15s = nginxAssetSeverBaseUrl + "svgs/15sIcon.svg";
-const icon30s = nginxAssetSeverBaseUrl + "svgs/30sIcon.svg";
-const icon60s = nginxAssetSeverBaseUrl + "svgs/60sIcon.svg";
+const cameraIcon = nginxAssetServerBaseUrl + "svgs/cameraIcon.svg";
+const videoIcon = nginxAssetServerBaseUrl + "svgs/videoIcon.svg";
+const icon10s = nginxAssetServerBaseUrl + "svgs/10sIcon.svg";
+const icon15s = nginxAssetServerBaseUrl + "svgs/15sIcon.svg";
+const icon30s = nginxAssetServerBaseUrl + "svgs/30sIcon.svg";
+const icon60s = nginxAssetServerBaseUrl + "svgs/60sIcon.svg";
 
 export type CaptureMediaTypes =
   | "camera"

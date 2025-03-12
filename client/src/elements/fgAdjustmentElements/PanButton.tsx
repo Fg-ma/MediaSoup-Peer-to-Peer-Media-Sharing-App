@@ -2,9 +2,9 @@ import React from "react";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const panIcon = nginxAssetSeverBaseUrl + "svgs/panIcon.svg";
+const panIcon = nginxAssetServerBaseUrl + "svgs/panIcon.svg";
 
 export default function PanButton({
   externalRef,

@@ -5,192 +5,192 @@ import {
   MixEffectsOptionsType,
 } from "../../audioEffects/typeConstant";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const backgroundTex1 =
-  nginxAssetSeverBaseUrl + "backgroundTexs/backgroundTex1.jpg";
+  nginxAssetServerBaseUrl + "backgroundTexs/backgroundTex1.jpg";
 const backgroundTex2 =
-  nginxAssetSeverBaseUrl + "backgroundTexs/backgroundTex2.jpg";
+  nginxAssetServerBaseUrl + "backgroundTexs/backgroundTex2.jpg";
 const backgroundTex3 =
-  nginxAssetSeverBaseUrl + "backgroundTexs/backgroundTex3.jpg";
+  nginxAssetServerBaseUrl + "backgroundTexs/backgroundTex3.jpg";
 const backgroundTex4 =
-  nginxAssetSeverBaseUrl + "backgroundTexs/backgroundTex4.jpg";
+  nginxAssetServerBaseUrl + "backgroundTexs/backgroundTex4.jpg";
 const backgroundTex5 =
-  nginxAssetSeverBaseUrl + "backgroundTexs/backgroundTex5.jpg";
+  nginxAssetServerBaseUrl + "backgroundTexs/backgroundTex5.jpg";
 const backgroundTex6 =
-  nginxAssetSeverBaseUrl + "backgroundTexs/backgroundTex6.jpg";
+  nginxAssetServerBaseUrl + "backgroundTexs/backgroundTex6.jpg";
 const backgroundTex7 =
-  nginxAssetSeverBaseUrl + "backgroundTexs/backgroundTex7.jpg";
+  nginxAssetServerBaseUrl + "backgroundTexs/backgroundTex7.jpg";
 
 const autoFilterIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/autoFilterIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/autoFilterIcon.svg";
 const autoPannerIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/autoPannerIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/autoPannerIcon.svg";
 const bitCrusherIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/bitCrusherIcon.svg";
-const chorusIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/chorusIcon.svg";
-const delayIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/delayIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/bitCrusherIcon.svg";
+const chorusIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/chorusIcon.svg";
+const delayIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/delayIcon.svg";
 const distortionIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/distortionIcon.svg";
-const EQIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/EQIcon.svg";
-const phaserIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/phaserIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/distortionIcon.svg";
+const EQIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/EQIcon.svg";
+const phaserIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/phaserIcon.svg";
 const pitchShiftIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/pitchShiftIcon.svg";
-const reverbIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/reverbIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/pitchShiftIcon.svg";
+const reverbIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/reverbIcon.svg";
 const stereoWidenerIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/stereoWidenerIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/stereoWidenerIcon.svg";
 
-const robotIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/robotIcon.svg";
+const robotIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/robotIcon.svg";
 const robotOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/robotOffIcon.svg";
-const echoIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/echoIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/robotOffIcon.svg";
+const echoIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/echoIcon.svg";
 const echoOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/echoOffIcon.svg";
-const alienIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/alienIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/echoOffIcon.svg";
+const alienIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/alienIcon.svg";
 const alienOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/alienOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/alienOffIcon.svg";
 const underwaterIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/underwaterIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/underwaterIcon.svg";
 const underwaterOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/underwaterOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/underwaterOffIcon.svg";
 const telephoneIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/telephoneIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/telephoneIcon.svg";
 const telephoneOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/telephoneOffIcon.svg";
-const spaceIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/spaceIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/telephoneOffIcon.svg";
+const spaceIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/spaceIcon.svg";
 const spaceOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/spaceOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/spaceOffIcon.svg";
 const distortionOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/distortionOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/distortionOffIcon.svg";
 const vintageIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/vintageIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/vintageIcon.svg";
 const vintageOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/vintageOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/vintageOffIcon.svg";
 const psychedelicIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/psychedelicIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/psychedelicIcon.svg";
 const psychedelicOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/psychedelicOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/psychedelicOffIcon.svg";
 const deepBassIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/deepBassIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/deepBassIcon.svg";
 const deepBassOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/deepBassOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/deepBassOffIcon.svg";
 const highEnergyIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/highEnergyIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/highEnergyIcon.svg";
 const highEnergyOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/highEnergyOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/highEnergyOffIcon.svg";
 const ambientIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/ambientIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/ambientIcon.svg";
 const ambientOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/ambientOffIcon.svg";
-const glitchIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/glitchIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/ambientOffIcon.svg";
+const glitchIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/glitchIcon.svg";
 const glitchOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/glitchOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/glitchOffIcon.svg";
 const muffledIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/muffledIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/muffledIcon.svg";
 const muffledOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/muffledOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/muffledOffIcon.svg";
 const crystalIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/crystalIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/crystalIcon.svg";
 const crystalOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/crystalOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/crystalOffIcon.svg";
 const heavyMetalIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/heavyMetalIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/heavyMetalIcon.svg";
 const heavyMetalOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/heavyMetalOffIcon.svg";
-const dreamyIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/dreamyIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/heavyMetalOffIcon.svg";
+const dreamyIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/dreamyIcon.svg";
 const dreamyOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/dreamyOffIcon.svg";
-const horrorIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/horrorIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/dreamyOffIcon.svg";
+const horrorIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/horrorIcon.svg";
 const horrorOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/horrorOffIcon.svg";
-const sciFiIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/sciFiIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/horrorOffIcon.svg";
+const sciFiIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/sciFiIcon.svg";
 const sciFiOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/sciFiOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/sciFiOffIcon.svg";
 const dystopianIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/dystopianIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/dystopianIcon.svg";
 const dystopianOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/dystopianOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/dystopianOffIcon.svg";
 const retroGameIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/retroGameIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/retroGameIcon.svg";
 const retroGameOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/retroGameOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/retroGameOffIcon.svg";
 const ghostlyIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/ghostlyIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/ghostlyIcon.svg";
 const ghostlyOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/ghostlyOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/ghostlyOffIcon.svg";
 const metallicIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/metallicIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/metallicIcon.svg";
 const metallicOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/metallicOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/metallicOffIcon.svg";
 const hypnoticIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/hypnoticIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/hypnoticIcon.svg";
 const hypnoticOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/hypnoticOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/hypnoticOffIcon.svg";
 const cyberpunkIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/cyberpunkIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/cyberpunkIcon.svg";
 const cyberpunkOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/cyberpunkOffIcon.svg";
-const windyIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/windyIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/cyberpunkOffIcon.svg";
+const windyIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/windyIcon.svg";
 const windyOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/windyOffIcon.svg";
-const radioIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/radioIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/windyOffIcon.svg";
+const radioIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/radioIcon.svg";
 const radioOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/radioOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/radioOffIcon.svg";
 const explosionIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/explosionIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/explosionIcon.svg";
 const explosionOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/explosionOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/explosionOffIcon.svg";
 const whisperIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/whisperIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/whisperIcon.svg";
 const whisperOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/whisperOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/whisperOffIcon.svg";
 const submarineIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/submarineIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/submarineIcon.svg";
 const submarineOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/submarineOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/submarineOffIcon.svg";
 const windTunnelIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/windTunnelIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/windTunnelIcon.svg";
 const windTunnelOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/windTunnelOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/windTunnelOffIcon.svg";
 const crushedBassIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/crushedBassIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/crushedBassIcon.svg";
 const crushedBassOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/crushedBassOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/crushedBassOffIcon.svg";
 const etherealIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/etherealIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/etherealIcon.svg";
 const etherealOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/etherealOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/etherealOffIcon.svg";
 const electroStingIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/electroStingIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/electroStingIcon.svg";
 const electroStingOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/electroStingOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/electroStingOffIcon.svg";
 const heartbeatIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/heartbeatIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/heartbeatIcon.svg";
 const heartbeatOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/heartbeatOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/heartbeatOffIcon.svg";
 const underworldIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/underworldIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/underworldIcon.svg";
 const underworldOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/underworldOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/underworldOffIcon.svg";
 const sizzlingIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/sizzlingIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/sizzlingIcon.svg";
 const sizzlingOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/sizzlingOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/sizzlingOffIcon.svg";
 const staticNoiseIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/staticNoiseIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/staticNoiseIcon.svg";
 const staticNoiseOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/staticNoiseOffIcon.svg";
-const bubblyIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/bubblyIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/staticNoiseOffIcon.svg";
+const bubblyIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/bubblyIcon.svg";
 const bubblyOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/bubblyOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/bubblyOffIcon.svg";
 const thunderIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/thunderIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/thunderIcon.svg";
 const thunderOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/thunderOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/thunderOffIcon.svg";
 const echosOfThePastIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/echosOfThePastIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/echosOfThePastIcon.svg";
 const echosOfThePastOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/echosOfThePastOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/echosOfThePastOffIcon.svg";
 
 export type PossibleSizesType = {
   vertical: [number, number];

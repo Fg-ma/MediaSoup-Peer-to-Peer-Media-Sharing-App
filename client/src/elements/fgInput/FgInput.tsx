@@ -3,9 +3,9 @@ import FgButton from "../fgButton/FgButton";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import FgSVG from "../fgSVG/FgSVG";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateForward = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
+const navigateForward = nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
 export default function FgInput({
   placeholder,

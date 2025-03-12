@@ -8,11 +8,11 @@ import FgPanel from "../../../elements/fgPanel/FgPanel";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LazyScrollingContainer from "../../../elements/lazyScrollingContainer/LazyScrollingContainer";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const joystickIcon = nginxAssetSeverBaseUrl + "svgs/games/joystickIcon.svg";
+const joystickIcon = nginxAssetServerBaseUrl + "svgs/games/joystickIcon.svg";
 const snakeGameIcon =
-  nginxAssetSeverBaseUrl + "svgs/games/snake/snakeGameIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/games/snake/snakeGameIcon.svg";
 
 export default function GamesSection({
   gamesSectionRef,

@@ -17,15 +17,16 @@ import {
 } from "./lib/typeConstant";
 import "./lib/snakeGame.css";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const gameOverCard =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/gameOverCard.jpg";
+  nginxAssetServerBaseUrl + "snakeGameAssets/gameOverCard.jpg";
 
 const snakeColorChangeIcon =
-  nginxAssetSeverBaseUrl + "svgs/games/snake/snakeColorChangeIcon.svg";
-const gridIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridIcon.svg";
-const gridOffIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/games/snake/snakeColorChangeIcon.svg";
+const gridIcon = nginxAssetServerBaseUrl + "svgs/games/snake/gridIcon.svg";
+const gridOffIcon =
+  nginxAssetServerBaseUrl + "svgs/games/snake/gridOffIcon.svg";
 
 function SnakeGame({
   snakeGameId,
@@ -76,7 +77,7 @@ function SnakeGame({
 
     boardRef.current?.style.setProperty(
       "--nginx-asset-server-base-url",
-      nginxAssetSeverBaseUrl ?? ""
+      nginxAssetServerBaseUrl ?? ""
     );
 
     return () => {

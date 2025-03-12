@@ -7,25 +7,25 @@ import {
   MixEffectsOptionsType,
 } from "../../../audioEffects/typeConstant";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const autoFilterIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/autoFilterIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/autoFilterIcon.svg";
 const autoPannerIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/autoPannerIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/autoPannerIcon.svg";
 const bitCrusherIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/bitCrusherIcon.svg";
-const chorusIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/chorusIcon.svg";
-const delayIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/delayIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/bitCrusherIcon.svg";
+const chorusIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/chorusIcon.svg";
+const delayIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/delayIcon.svg";
 const distortionIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/distortionIcon.svg";
-const EQIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/EQIcon.svg";
-const phaserIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/phaserIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/distortionIcon.svg";
+const EQIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/EQIcon.svg";
+const phaserIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/phaserIcon.svg";
 const pitchShiftIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/pitchShiftIcon.svg";
-const reverbIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/reverbIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/pitchShiftIcon.svg";
+const reverbIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/reverbIcon.svg";
 const stereoWidenerIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/stereoWidenerIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/stereoWidenerIcon.svg";
 
 export interface SamplerEffectType {
   labelIcon?: string;

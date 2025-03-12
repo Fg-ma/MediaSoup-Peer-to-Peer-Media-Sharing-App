@@ -38,7 +38,7 @@ import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
 import FaceLandmarks from "./FaceLandmarks";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 export type DefaultMeshPlacementType =
   | "forehead"
@@ -653,7 +653,7 @@ class BabylonScene {
         // Create a full-screen layer for the pause image
         this.pauseLayer = new Layer(
           "pauseLayer",
-          nginxAssetSeverBaseUrl + "2DAssets/videoPaused.png",
+          nginxAssetServerBaseUrl + "2DAssets/videoPaused.png",
           this.scene,
           false
         );

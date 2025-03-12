@@ -4,9 +4,9 @@ import FgSVG from "../../../elements/fgSVG/FgSVG";
 import TableGridSizePanel from "./lib/TableGridSizePanel";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const distanceIcon = nginxAssetSeverBaseUrl + "svgs/distanceIcon.svg";
+const distanceIcon = nginxAssetServerBaseUrl + "svgs/distanceIcon.svg";
 
 export default function TableGridSizeButton({
   gridSize,

@@ -12,9 +12,9 @@ import FgInput from "../../../../../../elements/fgInput/FgInput";
 import { tableColorMap } from "../../../../../../fgTable/lib/tableColors";
 import ColorPickerButton from "../../../../../../elements/colorPickerButton/ColorPickerButton";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
+const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function ColorsPage({
   setActivePages,

@@ -13,10 +13,10 @@ import {
 } from "./typeConstant";
 import LazyScrollingContainer from "../../lazyScrollingContainer/LazyScrollingContainer";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
-const navigateBack = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
+const additionIcon = nginxAssetServerBaseUrl + "svgs/additionIcon.svg";
+const navigateBack = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function BackgroundSelectorPanel({
   setBackgroundSelectorPanelActive,

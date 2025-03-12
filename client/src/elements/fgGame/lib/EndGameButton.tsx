@@ -3,9 +3,9 @@ import FgButton from "../../fgButton/FgButton";
 import FgSVG from "../../fgSVG/FgSVG";
 import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const closeIcon = nginxAssetSeverBaseUrl + "svgs/closeIcon.svg";
+const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 
 export default function EndGameButton({
   closeGameFunction,

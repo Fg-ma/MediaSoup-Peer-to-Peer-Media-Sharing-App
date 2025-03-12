@@ -4,10 +4,10 @@ import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerController from "../../../lowerControls/lib/LowerController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const syncIcon = nginxAssetSeverBaseUrl + "svgs/syncIcon.svg";
-const desyncIcon = nginxAssetSeverBaseUrl + "svgs/desyncIcon.svg";
+const syncIcon = nginxAssetServerBaseUrl + "svgs/syncIcon.svg";
+const desyncIcon = nginxAssetServerBaseUrl + "svgs/desyncIcon.svg";
 
 export default function SyncButton({
   desync,

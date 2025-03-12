@@ -3,10 +3,11 @@ import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVG from "../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const gridIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridIcon.svg";
-const gridOffIcon = nginxAssetSeverBaseUrl + "svgs/games/snake/gridOffIcon.svg";
+const gridIcon = nginxAssetServerBaseUrl + "svgs/games/snake/gridIcon.svg";
+const gridOffIcon =
+  nginxAssetServerBaseUrl + "svgs/games/snake/gridOffIcon.svg";
 
 export default function TableGridButton({
   gridActive,

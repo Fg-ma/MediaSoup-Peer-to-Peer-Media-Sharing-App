@@ -12,14 +12,14 @@ import SamplerMetronome from "./SamplerMetronome";
 import FgBackgroundSelector from "../../../elements/fgBackgroundSelector/FgBackgroundSelector";
 import { FgSamplers } from "../../../audioEffects/fgSamplers";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const effectIcon = nginxAssetSeverBaseUrl + "svgs/effectIcon.svg";
-const effectOffIcon = nginxAssetSeverBaseUrl + "svgs/effectOffIcon.svg";
+const effectIcon = nginxAssetServerBaseUrl + "svgs/effectIcon.svg";
+const effectOffIcon = nginxAssetServerBaseUrl + "svgs/effectOffIcon.svg";
 const keyVisualizerIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/keyVisualizerIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/keyVisualizerIcon.svg";
 const keyVisualizerOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/keyVisualizerOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/keyVisualizerOffIcon.svg";
 
 export const navVar: Variants = {
   leftInit: { opacity: 0, x: -20 },

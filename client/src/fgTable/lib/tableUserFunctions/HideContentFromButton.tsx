@@ -3,12 +3,12 @@ import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVG from "../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const hideContentIcon =
-  nginxAssetSeverBaseUrl + "svgs/userFunctions/hideContentIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/userFunctions/hideContentIcon.svg";
 const hideContentOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/userFunctions/hideContentOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/userFunctions/hideContentOffIcon.svg";
 
 export default function HideContentFromButton({
   userPanelRef,

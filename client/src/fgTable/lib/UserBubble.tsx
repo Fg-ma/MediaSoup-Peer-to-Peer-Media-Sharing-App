@@ -14,10 +14,10 @@ import FgSVG from "../../elements/fgSVG/FgSVG";
 import { TableColors } from "../../serverControllers/tableServer/lib/typeConstant";
 import SwapSeatsbutton from "./tableUserFunctions/SwapSeatsButton";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateBack = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
-const navigateForward = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
+const navigateBack = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
+const navigateForward = nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
 export default function UserBubble({
   username,

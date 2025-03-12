@@ -9,9 +9,9 @@ import {
 } from "../../typeConstant";
 import MixGaussianEnvelopeSection from "./MixGaussianEnvelopeSection";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
+const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function EnvelopeTypePage({
   setActivePages,

@@ -9,1116 +9,1146 @@ import {
   PostProcessEffectTypes,
 } from "../../context/effectsContext/typeConstant";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const classicalCurlyBeard_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_512x512.png";
 const classicalCurlyBeard_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/beards/classicalCurlyBeard/classicalCurlyBeard_32x32.png";
 const classicalCurlyBeardIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardIcon.svg";
 const classicalCurlyBeardOffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/beards/classicalCurlyBeard/classicalCurlyBeardOffIcon.svg";
 const chinBeard_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/beards/chinBeard/chinBeard_512x512.png";
 const chinBeard_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/beards/chinBeard/chinBeard_32x32.png";
 const chinBeard_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/beards/chinBeard/chinBeard_off_512x512.png";
 const chinBeard_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/chinBeard/chinBeard_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/beards/chinBeard/chinBeard_off_32x32.png";
 const fullBeard_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/beards/fullBeard/fullBeard_512x512.png";
 const fullBeard_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/beards/fullBeard/fullBeard_32x32.png";
 const fullBeard_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/beards/fullBeard/fullBeard_off_512x512.png";
 const fullBeard_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/beards/fullBeard/fullBeard_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/beards/fullBeard/fullBeard_off_32x32.png";
 
 const prismaColors =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/prismaColors_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/prismaColors_512x512.jpg";
 const prismaColorsSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/prismaColors_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/prismaColors_32x32.jpg";
 const blackAndWhite =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/blackAndWhite_256x256.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/blackAndWhite_256x256.jpg";
 const blackAndWhiteSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/blackAndWhite_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/blackAndWhite_32x32.jpg";
 const bubbleChromatic =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/bubbleChromatic_850x850.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/bubbleChromatic_850x850.jpg";
 const bubbleChromaticSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/bubbleChromatic_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/bubbleChromatic_32x32.jpg";
 const fisheye =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/fisheye_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/fisheye_512x512.jpg";
 const fisheyeSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/fisheye_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/fisheye_32x32.jpg";
 const nightVision =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/nightVision_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/nightVision_512x512.jpg";
 const nightVisionSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/nightVision_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/nightVision_32x32.jpg";
 const vintageTV =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/vintageTV_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/vintageTV_512x512.jpg";
 const vintageTVSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/vintageTV_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/vintageTV_32x32.jpg";
 const motionblur =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/motionBlur_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/motionBlur_512x512.jpg";
 const motionblurSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/motionBlur_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/motionBlur_32x32.jpg";
 const pixelation =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/pixelation_256x256.png";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/pixelation_256x256.png";
 const pixelationSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/pixelation_32x32.png";
-const old = nginxAssetSeverBaseUrl + "2DAssets/postProcess/old_512x512.jpg";
-const oldSmall = nginxAssetSeverBaseUrl + "2DAssets/postProcess/old_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/pixelation_32x32.png";
+const old = nginxAssetServerBaseUrl + "2DAssets/postProcess/old_512x512.jpg";
+const oldSmall = nginxAssetServerBaseUrl + "2DAssets/postProcess/old_32x32.jpg";
 const chromaticAberration =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/postProcess/chromaticAberration_512x512.jpg";
 const chromaticAberrationSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/chromaticAberration_32x32.jpg";
+  nginxAssetServerBaseUrl +
+  "2DAssets/postProcess/chromaticAberration_32x32.jpg";
 const colorSplash =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/colorSplash_850x850.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/colorSplash_850x850.jpg";
 const colorSplashSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/colorSplash_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/colorSplash_32x32.jpg";
 const tonemap =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tonemap_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/tonemap_512x512.jpg";
 const tonemapSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tonemap_32x32.jpg";
-const rays = nginxAssetSeverBaseUrl + "2DAssets/postProcess/rays_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/tonemap_32x32.jpg";
+const rays = nginxAssetServerBaseUrl + "2DAssets/postProcess/rays_512x512.jpg";
 const raysSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/rays_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/rays_32x32.jpg";
 const sharpen =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/sharpen_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/sharpen_512x512.jpg";
 const sharpenSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/sharpen_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/sharpen_32x32.jpg";
 const tiltShift =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tiltShift_512x512.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/tiltShift_512x512.jpg";
 const tiltShiftSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/tiltShift_32x32.jpg";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/tiltShift_32x32.jpg";
 const cartoon =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/cartoon_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/cartoon_512x512.png";
 const cartoonSmall =
-  nginxAssetSeverBaseUrl + "2DAssets/postProcess/cartoon_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/postProcess/cartoon_32x32.png";
 
 const defaultGlasses_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/defaultGlasses/defaultGlasses_512x512.png";
 const defaultGlasses_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/defaultGlasses/defaultGlasses_32x32.png";
 const defaultGlassesIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/glasses/defaultGlasses/defaultGlassesIcon.svg";
 const defaultGlassesOffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/glasses/defaultGlasses/defaultGlassesOffIcon.svg";
 const aviatorGoggles_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/aviatorGoggles/aviatorGoggles_512x512.png";
 const aviatorGoggles_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/aviatorGoggles/aviatorGoggles_32x32.png";
 const aviatorGoggles_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/aviatorGoggles/aviatorGoggles_off_512x512.png";
 const aviatorGoggles_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/aviatorGoggles/aviatorGoggles_off_32x32.png";
 const bloodyGlasses_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/bloodyGlasses/bloodyGlasses_512x512.png";
 const bloodyGlasses_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/bloodyGlasses/bloodyGlasses_32x32.png";
 const bloodyGlasses_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/bloodyGlasses/bloodyGlasses_off_512x512.png";
 const bloodyGlasses_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/bloodyGlasses/bloodyGlasses_off_32x32.png";
 const eyeProtectionGlasses_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_512x512.png";
 const eyeProtectionGlasses_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_32x32.png";
 const eyeProtectionGlasses_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_off_512x512.png";
 const eyeProtectionGlasses_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/eyeProtectionGlasses/eyeProtectionGlasses_off_32x32.png";
 const glasses1_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses1/glasses1_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses1/glasses1_512x512.png";
 const glasses1_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses1/glasses1_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses1/glasses1_32x32.png";
 const glasses1_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses1/glasses1_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/glasses1/glasses1_off_512x512.png";
 const glasses1_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses1/glasses1_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses1/glasses1_off_32x32.png";
 const glasses2_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses2/glasses2_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses2/glasses2_512x512.png";
 const glasses2_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses2/glasses2_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses2/glasses2_32x32.png";
 const glasses2_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses2/glasses2_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/glasses2/glasses2_off_512x512.png";
 const glasses2_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses2/glasses2_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses2/glasses2_off_32x32.png";
 const glasses3_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses3/glasses3_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses3/glasses3_512x512.png";
 const glasses3_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses3/glasses3_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses3/glasses3_32x32.png";
 const glasses3_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses3/glasses3_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/glasses3/glasses3_off_512x512.png";
 const glasses3_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses3/glasses3_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses3/glasses3_off_32x32.png";
 const glasses4_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses4/glasses4_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses4/glasses4_512x512.png";
 const glasses4_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses4/glasses4_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses4/glasses4_32x32.png";
 const glasses4_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses4/glasses4_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/glasses4/glasses4_off_512x512.png";
 const glasses4_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses4/glasses4_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses4/glasses4_off_32x32.png";
 const glasses5_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses5/glasses5_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses5/glasses5_512x512.png";
 const glasses5_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses5/glasses5_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses5/glasses5_32x32.png";
 const glasses5_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses5/glasses5_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/glasses5/glasses5_off_512x512.png";
 const glasses5_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses5/glasses5_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses5/glasses5_off_32x32.png";
 const glasses6_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses6/glasses6_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses6/glasses6_512x512.png";
 const glasses6_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses6/glasses6_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses6/glasses6_32x32.png";
 const glasses6_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses6/glasses6_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/glasses6/glasses6_off_512x512.png";
 const glasses6_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/glasses6/glasses6_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/glasses6/glasses6_off_32x32.png";
 const memeGlasses_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/memeGlasses/memeGlasses_512x512.png";
 const memeGlasses_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/memeGlasses/memeGlasses_32x32.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/memeGlasses/memeGlasses_32x32.png";
 const memeGlassesIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/glasses/memeGlasses/memeGlassesIcon.svg";
 const memeGlassesOffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/glasses/memeGlasses/memeGlassesOffIcon.svg";
 const militaryTacticalGlasses_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_512x512.png";
 const militaryTacticalGlasses_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_32x32.png";
 const militaryTacticalGlasses_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_off_512x512.png";
 const militaryTacticalGlasses_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/militaryTacticalGlasses/militaryTacticalGlasses_off_32x32.png";
 const shades_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/shades/shades_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/shades/shades_512x512.png";
 const shades_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/shades/shades_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/shades/shades_32x32.png";
 const shadesIcon =
-  nginxAssetSeverBaseUrl + "svgs/visualEffects/glasses/shades/shadesIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/visualEffects/glasses/shades/shadesIcon.svg";
 const shadesOffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/glasses/shades/shadesOffIcon.svg";
 const steampunkGlasses_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/steampunkGlasses/steampunkGlasses_512x512.png";
 const steampunkGlasses_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/steampunkGlasses/steampunkGlasses_32x32.png";
 const steampunkGlasses_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/steampunkGlasses/steampunkGlasses_off_512x512.png";
 const steampunkGlasses_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/steampunkGlasses/steampunkGlasses_off_32x32.png";
 const threeDGlasses_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/threeDGlasses/threeDGlasses_512x512.png";
 const threeDGlasses_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/threeDGlasses/threeDGlasses_32x32.png";
 const threeDGlassesIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/glasses/threeDGlasses/threeDGlassesIcon.svg";
 const threeDGlassesOffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/glasses/threeDGlasses/threeDGlassesOffIcon.svg";
 const toyGlasses_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/toyGlasses/toyGlasses_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/toyGlasses/toyGlasses_512x512.png";
 const toyGlasses_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/toyGlasses/toyGlasses_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/toyGlasses/toyGlasses_32x32.png";
 const toyGlasses_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/toyGlasses/toyGlasses_off_512x512.png";
 const toyGlasses_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/toyGlasses/toyGlasses_off_32x32.png";
 const VRGlasses_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/VRGlasses/VRGlasses_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/VRGlasses/VRGlasses_512x512.png";
 const VRGlasses_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/VRGlasses/VRGlasses_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/glasses/VRGlasses/VRGlasses_32x32.png";
 const VRGlasses_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/glasses/VRGlasses/VRGlasses_off_512x512.png";
 const VRGlasses_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/glasses/VRGlasses/VRGlasses_off_32x32.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/glasses/VRGlasses/VRGlasses_off_32x32.png";
 
 const AsianConicalHat_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/AsianConicalHat/AsianConicalHat_512x512.png";
 const AsianConicalHat_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/AsianConicalHat/AsianConicalHat_32x32.png";
 const AsianConicalHat_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/AsianConicalHat/AsianConicalHat_off_512x512.png";
 const AsianConicalHat_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/AsianConicalHat/AsianConicalHat_off_32x32.png";
 const aviatorHelmet_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/aviatorHelmet/aviatorHelmet_512x512.png";
 const aviatorHelmet_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/aviatorHelmet/aviatorHelmet_32x32.png";
 const aviatorHelmet_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/aviatorHelmet/aviatorHelmet_off_512x512.png";
 const aviatorHelmet_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/aviatorHelmet/aviatorHelmet_off_32x32.png";
 const bicornHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/bicornHat/bicornHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/bicornHat/bicornHat_512x512.png";
 const bicornHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/bicornHat/bicornHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/bicornHat/bicornHat_32x32.png";
 const bicornHat_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/bicornHat/bicornHat_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/bicornHat/bicornHat_off_512x512.png";
 const bicornHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/bicornHat/bicornHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/bicornHat/bicornHat_off_32x32.png";
 const bicycleHelmet_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/bicycleHelmet/bicycleHelmet_512x512.png";
 const bicycleHelmet_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/bicycleHelmet/bicycleHelmet_32x32.png";
 const bicycleHelmet_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/bicycleHelmet/bicycleHelmet_off_512x512.png";
 const bicycleHelmet_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/bicycleHelmet/bicycleHelmet_off_32x32.png";
 const captainsHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/captainsHat/captainsHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/captainsHat/captainsHat_512x512.png";
 const captainsHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/captainsHat/captainsHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/captainsHat/captainsHat_32x32.png";
 const captainsHat_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/captainsHat/captainsHat_off_512x512.png";
 const captainsHat_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/captainsHat/captainsHat_off_32x32.png";
 const chefHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/chefHat/chefHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/chefHat/chefHat_512x512.png";
 const chefHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/chefHat/chefHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/chefHat/chefHat_32x32.png";
 const chefHat_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/chefHat/chefHat_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/chefHat/chefHat_off_512x512.png";
 const chefHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/chefHat/chefHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/chefHat/chefHat_off_32x32.png";
 const chickenHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/chickenHat/chickenHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/chickenHat/chickenHat_512x512.png";
 const chickenHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/chickenHat/chickenHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/chickenHat/chickenHat_32x32.png";
 const chickenHat_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/chickenHat/chickenHat_off_512x512.png";
 const chickenHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/chickenHat/chickenHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/chickenHat/chickenHat_off_32x32.png";
 const deadManHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/deadManHat/deadManHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/deadManHat/deadManHat_512x512.png";
 const deadManHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/deadManHat/deadManHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/deadManHat/deadManHat_32x32.png";
 const deadManHat_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/deadManHat/deadManHat_off_512x512.png";
 const deadManHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/deadManHat/deadManHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/deadManHat/deadManHat_off_32x32.png";
 const dogEars_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/dogEars/dogEars_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/dogEars/dogEars_512x512.png";
 const dogEars_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/dogEars/dogEars_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/dogEars/dogEars_32x32.png";
 const dogEarsIcon =
-  nginxAssetSeverBaseUrl + "svgs/visualEffects/hats/dogEars/dogEarsIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/visualEffects/hats/dogEars/dogEarsIcon.svg";
 const dogEarsOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/visualEffects/hats/dogEars/dogEarsOffIcon.svg";
+  nginxAssetServerBaseUrl +
+  "svgs/visualEffects/hats/dogEars/dogEarsOffIcon.svg";
 const flatCap_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/flatCap/flatCap_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/flatCap/flatCap_512x512.png";
 const flatCap_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/flatCap/flatCap_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/flatCap/flatCap_32x32.png";
 const flatCap_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/flatCap/flatCap_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/flatCap/flatCap_off_512x512.png";
 const flatCap_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/flatCap/flatCap_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/flatCap/flatCap_off_32x32.png";
 const hardHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/hardHat/hardHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/hardHat/hardHat_512x512.png";
 const hardHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/hardHat/hardHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/hardHat/hardHat_32x32.png";
 const hardHat_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/hardHat/hardHat_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/hardHat/hardHat_off_512x512.png";
 const hardHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/hardHat/hardHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/hardHat/hardHat_off_32x32.png";
 const hopliteHelmet_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/hopliteHelmet/hopliteHelmet_512x512.png";
 const hopliteHelmet_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/hopliteHelmet/hopliteHelmet_32x32.png";
 const hopliteHelmet_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/hopliteHelmet/hopliteHelmet_off_512x512.png";
 const hopliteHelmet_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/hopliteHelmet/hopliteHelmet_off_32x32.png";
 const militaryHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/militaryHat/militaryHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/militaryHat/militaryHat_512x512.png";
 const militaryHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/militaryHat/militaryHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/militaryHat/militaryHat_32x32.png";
 const militaryHat_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/militaryHat/militaryHat_off_512x512.png";
 const militaryHat_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/militaryHat/militaryHat_off_32x32.png";
 const rabbitEars_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_512x512.png";
 const rabbitEars_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_32x32.png";
 const rabbitEars_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/rabbitEars/rabbitEars_off_512x512.png";
 const rabbitEars_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/rabbitEars/rabbitEars_off_32x32.png";
 const santaHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/santaHat/santaHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/santaHat/santaHat_512x512.png";
 const santaHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/santaHat/santaHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/santaHat/santaHat_32x32.png";
 const santaHat_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/santaHat/santaHat_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/santaHat/santaHat_off_512x512.png";
 const santaHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/santaHat/santaHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/santaHat/santaHat_off_32x32.png";
 const seamanHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/seamanHat/seamanHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/seamanHat/seamanHat_512x512.png";
 const seamanHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/seamanHat/seamanHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/seamanHat/seamanHat_32x32.png";
 const seamanHat_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/seamanHat/seamanHat_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/seamanHat/seamanHat_off_512x512.png";
 const seamanHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/seamanHat/seamanHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/seamanHat/seamanHat_off_32x32.png";
 const stylishHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/stylishHat/stylishHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/stylishHat/stylishHat_512x512.png";
 const stylishHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/stylishHat/stylishHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/stylishHat/stylishHat_32x32.png";
 const stylishHat_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/stylishHat/stylishHat_off_512x512.png";
 const stylishHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/stylishHat/stylishHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/stylishHat/stylishHat_off_32x32.png";
 const ushankaHat_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_512x512.png";
 const ushankaHat_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_32x32.png";
 const ushankaHat_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/ushankaHat/ushankaHat_off_512x512.png";
 const ushankaHat_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/ushankaHat/ushankaHat_off_32x32.png";
 const vikingHelmet_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/vikingHelmet/vikingHelmet_512x512.png";
 const vikingHelmet_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/hats/vikingHelmet/vikingHelmet_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/hats/vikingHelmet/vikingHelmet_32x32.png";
 const vikingHelmet_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/vikingHelmet/vikingHelmet_off_512x512.png";
 const vikingHelmet_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/hats/vikingHelmet/vikingHelmet_off_32x32.png";
 
 const beachBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/beach_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/beach_640x427.jpg";
 const beachBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/beach_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/beach_64x43.jpg";
 const brickWallBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/brickWall_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/brickWall_640x427.jpg";
 const brickWallBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/brickWall_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/brickWall_64x43.jpg";
 const butterfliesBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/butterflies_640x360.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/butterflies_640x360.jpg";
 const butterfliesBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/butterflies_64x36.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/butterflies_64x36.jpg";
 const cafeBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/cafe_427x640.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/cafe_427x640.jpg";
 const cafeBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/cafe_43x64.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/cafe_43x64.jpg";
 const chalkBoardBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/chalkBoard_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/chalkBoard_640x427.jpg";
 const chalkBoardBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/chalkBoard_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/chalkBoard_64x43.jpg";
 const citySkylineBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/citySkyline_640x331.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/citySkyline_640x331.jpg";
 const citySkylineBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/citySkyline_64x33.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/citySkyline_64x33.jpg";
 const cliffPalaceBackground =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_608x750.jpg";
 const cliffPalaceBackgroundSmall =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "videoBackgrounds/cliffPalaceMesaVerdeNationalParkByAnselAdams_52x64.jpg";
 const eveningMcDonaldLakeBackground =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_750x569.jpg";
 const eveningMcDonaldLakeBackgroundSmall =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "videoBackgrounds/eveningMcDonaldLakeGlacierNationalParkMontanaByAnselAdams_64x49.jpg";
 const forestBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/forest_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/forest_640x427.jpg";
 const forestBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/forest_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/forest_64x43.jpg";
 const halfDomeAppleOrchardBackground =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "videoBackgrounds/halfDomeAppleOrchardYosemiteCaliforniaByAnselAdams_750x575.jpg";
 const halfDomeAppleOrchardBackgroundSmall =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "videoBackgrounds/halfDomeAppleOrchardYosemiteCaliforniaByAnselAdams_64x49.jpg";
 const lakeBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/lake_640x457.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/lake_640x457.jpg";
 const lakeBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/lake_64x46.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/lake_64x46.jpg";
 const libraryBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/library_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/library_640x427.jpg";
 const libraryBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/library_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/library_64x43.jpg";
 const milkyWayBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/milkyWay_640x349.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/milkyWay_640x349.jpg";
 const milkyWayBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/milkyWay_64x35.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/milkyWay_64x35.jpg";
 const mountainsBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/mountains_640x425.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/mountains_640x425.jpg";
 const mountainsBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/mountains_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/mountains_64x43.jpg";
 const oceanBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/ocean_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/ocean_640x427.jpg";
 const oceanBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/ocean_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/ocean_64x43.jpg";
 const oldFaithfulGeyserBackground =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "videoBackgrounds/oldFaithfulGeyserYellowstoneNationalParkWyomingByAnselAdams_532x750.jpg";
 const oldFaithfulGeyserBackgroundSmall =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "videoBackgrounds/oldFaithfulGeyserYellowstoneNationalParkWyomingByAnselAdams_45x64.jpg";
 const railroadBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/railroad_640x414.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/railroad_640x414.jpg";
 const railroadBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/railroad_64x41.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/railroad_64x41.jpg";
 const rollingHillsBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/rollingHills_640x417.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/rollingHills_640x417.jpg";
 const rollingHillsBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/rollingHills_64x42.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/rollingHills_64x42.jpg";
 const seaSideHousesBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/seaSideHouses_640x390.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/seaSideHouses_640x390.jpg";
 const seaSideHousesBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/seaSideHouses_64x39.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/seaSideHouses_64x39.jpg";
 const snowCoveredMoutainsBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/snowCoveredMoutains_640x360.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/snowCoveredMoutains_640x360.jpg";
 const snowCoveredMoutainsBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/snowCoveredMoutains_64x36.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/snowCoveredMoutains_64x36.jpg";
 const sunflowersBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/sunflowers_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/sunflowers_640x427.jpg";
 const sunflowersBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/sunflowers_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/sunflowers_64x43.jpg";
 const sunsetBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/sunset_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/sunset_640x427.jpg";
 const sunsetBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/sunset_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/sunset_64x43.jpg";
 const treesBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/trees_640x426.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/trees_640x426.jpg";
 const treesBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/trees_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/trees_64x43.jpg";
 const windingRoadBackground =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/windingRoad_640x427.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/windingRoad_640x427.jpg";
 const windingRoadBackgroundSmall =
-  nginxAssetSeverBaseUrl + "videoBackgrounds/windingRoad_64x43.jpg";
+  nginxAssetServerBaseUrl + "videoBackgrounds/windingRoad_64x43.jpg";
 
 const baseMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/baseMask/baseMask_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/baseMask/baseMask_512x512.png";
 const baseMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/baseMask/baseMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/baseMask/baseMask_32x32.png";
 const baseMaskIcon =
-  nginxAssetSeverBaseUrl + "svgs/visualEffects/masks/baseMask/baseMaskIcon.svg";
+  nginxAssetServerBaseUrl +
+  "svgs/visualEffects/masks/baseMask/baseMaskIcon.svg";
 const baseMaskOffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/masks/baseMask/baseMaskOffIcon.svg";
 const alienMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/alienMask/alienMask_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/alienMask/alienMask_512x512.png";
 const alienMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/alienMask/alienMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/alienMask/alienMask_32x32.png";
 const alienMask_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/alienMask/alienMask_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/alienMask/alienMask_off_512x512.png";
 const alienMask_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/alienMask/alienMask_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/alienMask/alienMask_off_32x32.png";
 const clownMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/clownMask/clownMask_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/clownMask/clownMask_512x512.png";
 const clownMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/clownMask/clownMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/clownMask/clownMask_32x32.png";
 const clownMask_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/clownMask/clownMask_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/clownMask/clownMask_off_512x512.png";
 const clownMask_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/clownMask/clownMask_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/clownMask/clownMask_off_32x32.png";
 const creatureMask_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/creatureMask/creatureMask_512x512.png";
 const creatureMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/creatureMask/creatureMask_32x32.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/creatureMask/creatureMask_32x32.png";
 const creatureMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/creatureMask/creatureMask_off_512x512.png";
 const creatureMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/creatureMask/creatureMask_off_32x32.png";
 const cyberMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/cyberMask/cyberMask_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/cyberMask/cyberMask_512x512.png";
 const cyberMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/cyberMask/cyberMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/cyberMask/cyberMask_32x32.png";
 const cyberMask_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/cyberMask/cyberMask_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/cyberMask/cyberMask_off_512x512.png";
 const cyberMask_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/cyberMask/cyberMask_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/cyberMask/cyberMask_off_32x32.png";
 const darkKnightMask_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/darkKnightMask/darkKnightMask_512x512.png";
 const darkKnightMask_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/darkKnightMask/darkKnightMask_32x32.png";
 const darkKnightMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/darkKnightMask/darkKnightMask_off_512x512.png";
 const darkKnightMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/darkKnightMask/darkKnightMask_off_32x32.png";
 const demonMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/demonMask/demonMask_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/demonMask/demonMask_512x512.png";
 const demonMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/demonMask/demonMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/demonMask/demonMask_32x32.png";
 const demonMask_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/demonMask/demonMask_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/demonMask/demonMask_off_512x512.png";
 const demonMask_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/demonMask/demonMask_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/demonMask/demonMask_off_32x32.png";
 const gasMask1_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask1/gasMask1_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask1/gasMask1_512x512.png";
 const gasMask1_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask1/gasMask1_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask1/gasMask1_32x32.png";
 const gasMask1_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask1/gasMask1_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask1/gasMask1_off_512x512.png";
 const gasMask1_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask1/gasMask1_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask1/gasMask1_off_32x32.png";
 const gasMask2_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask2/gasMask2_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask2/gasMask2_512x512.png";
 const gasMask2_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask2/gasMask2_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask2/gasMask2_32x32.png";
 const gasMask2_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask2/gasMask2_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask2/gasMask2_off_512x512.png";
 const gasMask2_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask2/gasMask2_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask2/gasMask2_off_32x32.png";
 const gasMask3_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask3/gasMask3_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask3/gasMask3_512x512.png";
 const gasMask3_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask3/gasMask3_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask3/gasMask3_32x32.png";
 const gasMask3_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask3/gasMask3_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask3/gasMask3_off_512x512.png";
 const gasMask3_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask3/gasMask3_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask3/gasMask3_off_32x32.png";
 const gasMask4_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask4/gasMask4_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask4/gasMask4_512x512.png";
 const gasMask4_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask4/gasMask4_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask4/gasMask4_32x32.png";
 const gasMask4_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask4/gasMask4_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask4/gasMask4_off_512x512.png";
 const gasMask4_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/gasMask4/gasMask4_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/gasMask4/gasMask4_off_32x32.png";
 const masqueradeMask_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/masqueradeMask/masqueradeMask_512x512.png";
 const masqueradeMask_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/masqueradeMask/masqueradeMask_32x32.png";
 const masqueradeMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/masqueradeMask/masqueradeMask_off_512x512.png";
 const masqueradeMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/masqueradeMask/masqueradeMask_off_32x32.png";
 const metalManMask_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/metalManMask/metalManMask_512x512.png";
 const metalManMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/metalManMask/metalManMask_32x32.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/metalManMask/metalManMask_32x32.png";
 const metalManMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/metalManMask/metalManMask_off_512x512.png";
 const metalManMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/metalManMask/metalManMask_off_32x32.png";
 const oniMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/oniMask/oniMask_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/oniMask/oniMask_512x512.png";
 const oniMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/oniMask/oniMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/oniMask/oniMask_32x32.png";
 const oniMask_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/oniMask/oniMask_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/oniMask/oniMask_off_512x512.png";
 const oniMask_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/oniMask/oniMask_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/oniMask/oniMask_off_32x32.png";
 const plagueDoctorMask_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/plagueDoctorMask/plagueDoctorMask_512x512.png";
 const plagueDoctorMask_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/plagueDoctorMask/plagueDoctorMask_32x32.png";
 const plagueDoctorMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/plagueDoctorMask/plagueDoctorMask_off_512x512.png";
 const plagueDoctorMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/plagueDoctorMask/plagueDoctorMask_off_32x32.png";
 const sixEyesMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/sixEyesMask/sixEyesMask_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/sixEyesMask/sixEyesMask_512x512.png";
 const sixEyesMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/sixEyesMask/sixEyesMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/sixEyesMask/sixEyesMask_32x32.png";
 const sixEyesMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/sixEyesMask/sixEyesMask_off_512x512.png";
 const sixEyesMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/sixEyesMask/sixEyesMask_off_32x32.png";
 const tenguMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/tenguMask/tenguMask_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/tenguMask/tenguMask_512x512.png";
 const tenguMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/tenguMask/tenguMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/tenguMask/tenguMask_32x32.png";
 const tenguMask_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/tenguMask/tenguMask_off_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/tenguMask/tenguMask_off_512x512.png";
 const tenguMask_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/tenguMask/tenguMask_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/tenguMask/tenguMask_off_32x32.png";
 const threeFaceMask_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/threeFaceMask/threeFaceMask_512x512.png";
 const threeFaceMask_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/threeFaceMask/threeFaceMask_32x32.png";
 const threeFaceMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/threeFaceMask/threeFaceMask_off_512x512.png";
 const threeFaceMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/threeFaceMask/threeFaceMask_off_32x32.png";
 const weldingMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/weldingMask/weldingMask_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/weldingMask/weldingMask_512x512.png";
 const weldingMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/weldingMask/weldingMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/weldingMask/weldingMask_32x32.png";
 const weldingMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/weldingMask/weldingMask_off_512x512.png";
 const weldingMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/weldingMask/weldingMask_off_32x32.png";
 const woodlandMask_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/woodlandMask/woodlandMask_512x512.png";
 const woodlandMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/woodlandMask/woodlandMask_32x32.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/woodlandMask/woodlandMask_32x32.png";
 const woodlandMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/woodlandMask/woodlandMask_off_512x512.png";
 const woodlandMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/woodlandMask/woodlandMask_off_32x32.png";
 const woodPaintedMask_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/woodPaintedMask/woodPaintedMask_512x512.png";
 const woodPaintedMask_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/woodPaintedMask/woodPaintedMask_32x32.png";
 const woodPaintedMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/woodPaintedMask/woodPaintedMask_off_512x512.png";
 const woodPaintedMask_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/woodPaintedMask/woodPaintedMask_off_32x32.png";
 const zombieMask_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/zombieMask/zombieMask_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/zombieMask/zombieMask_512x512.png";
 const zombieMask_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/zombieMask/zombieMask_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/masks/zombieMask/zombieMask_32x32.png";
 const zombieMask_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/masks/zombieMask/zombieMask_off_512x512.png";
 const zombieMask_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/masks/zombieMask/zombieMask_off_32x32.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/masks/zombieMask/zombieMask_off_32x32.png";
 
 const disguiseMustache_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/disguiseMustache/disguiseMustache_512x512.png";
 const disguiseMustache_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/disguiseMustache/disguiseMustache_32x32.png";
 const disguiseMustacheIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/disguiseMustache/disguiseMustacheIcon.svg";
 const disguiseMustacheOffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/disguiseMustache/disguiseMustacheOffIcon.svg";
 const fullMustache_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/fullMustache/fullMustache_512x512.png";
 const fullMustache_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/fullMustache/fullMustache_32x32.png";
 const fullMustache_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/fullMustache/fullMustache_off_512x512.png";
 const fullMustache_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/fullMustache/fullMustache_off_32x32.png";
 const mustache1_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache1/mustache1_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/mustaches/mustache1/mustache1_512x512.png";
 const mustache1_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache1/mustache1_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/mustaches/mustache1/mustache1_32x32.png";
 const mustache1Icon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/mustache1/mustache1Icon.svg";
 const mustache1OffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/mustache1/mustache1OffIcon.svg";
 const mustache2_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache2/mustache2_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/mustaches/mustache2/mustache2_512x512.png";
 const mustache2_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache2/mustache2_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/mustaches/mustache2/mustache2_32x32.png";
 const mustache2Icon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/mustache2/mustache2Icon.svg";
 const mustache2OffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/mustache2/mustache2OffIcon.svg";
 const mustache3_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache3/mustache3_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/mustaches/mustache3/mustache3_512x512.png";
 const mustache3_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache3/mustache3_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/mustaches/mustache3/mustache3_32x32.png";
 const mustache3Icon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/mustache3/mustache3Icon.svg";
 const mustache3OffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/mustache3/mustache3OffIcon.svg";
 const mustache4_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache4/mustache4_512x512.png";
+  nginxAssetServerBaseUrl +
+  "2DAssets/mustaches/mustache4/mustache4_512x512.png";
 const mustache4_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/mustaches/mustache4/mustache4_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/mustaches/mustache4/mustache4_32x32.png";
 const mustache4Icon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/mustache4/mustache4Icon.svg";
 const mustache4OffIcon =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "svgs/visualEffects/mustaches/mustache4/mustache4OffIcon.svg";
 const nicodemusMustache_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/nicodemusMustache/nicodemusMustache_512x512.png";
 const nicodemusMustache_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/nicodemusMustache/nicodemusMustache_32x32.png";
 const nicodemusMustache_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/nicodemusMustache/nicodemusMustache_off_512x512.png";
 const nicodemusMustache_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/nicodemusMustache/nicodemusMustache_off_32x32.png";
 const pencilMustache_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/pencilMustache/pencilMustache_512x512.png";
 const pencilMustache_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/pencilMustache/pencilMustache_32x32.png";
 const pencilMustache_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/pencilMustache/pencilMustache_off_512x512.png";
 const pencilMustache_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/pencilMustache/pencilMustache_off_32x32.png";
 const spongebobMustache_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/spongebobMustache/spongebobMustache_512x512.png";
 const spongebobMustache_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/spongebobMustache/spongebobMustache_32x32.png";
 const spongebobMustache_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/spongebobMustache/spongebobMustache_off_512x512.png";
 const spongebobMustache_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/spongebobMustache/spongebobMustache_off_32x32.png";
 const tinyMustache_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/tinyMustache/tinyMustache_512x512.png";
 const tinyMustache_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/tinyMustache/tinyMustache_32x32.png";
 const tinyMustache_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/tinyMustache/tinyMustache_off_512x512.png";
 const tinyMustache_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/tinyMustache/tinyMustache_off_32x32.png";
 const wingedMustache_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/wingedMustache/wingedMustache_512x512.png";
 const wingedMustache_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/wingedMustache/wingedMustache_32x32.png";
 const wingedMustache_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/wingedMustache/wingedMustache_off_512x512.png";
 const wingedMustache_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/mustaches/wingedMustache/wingedMustache_off_32x32.png";
 
 const angryHamster_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/angryHamster/angryHamster_512x512.png";
 const angryHamster_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/angryHamster/angryHamster_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/angryHamster/angryHamster_32x32.png";
 const angryHamster_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/angryHamster/angryHamster_off_512x512.png";
 const angryHamster_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/angryHamster/angryHamster_off_32x32.png";
 const axolotl_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/axolotl/axolotl_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/axolotl/axolotl_512x512.png";
 const axolotl_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/axolotl/axolotl_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/axolotl/axolotl_32x32.png";
 const axolotl_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/axolotl/axolotl_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/axolotl/axolotl_off_512x512.png";
 const axolotl_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/axolotl/axolotl_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/axolotl/axolotl_off_32x32.png";
 const babyDragon_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/babyDragon/babyDragon_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/babyDragon/babyDragon_512x512.png";
 const babyDragon_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/babyDragon/babyDragon_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/babyDragon/babyDragon_32x32.png";
 const babyDragon_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/babyDragon/babyDragon_off_512x512.png";
 const babyDragon_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/babyDragon/babyDragon_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/babyDragon/babyDragon_off_32x32.png";
 const beardedDragon_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/beardedDragon/beardedDragon_512x512.png";
 const beardedDragon_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/beardedDragon/beardedDragon_32x32.png";
 const beardedDragon_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/beardedDragon/beardedDragon_off_512x512.png";
 const beardedDragon_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/beardedDragon/beardedDragon_off_32x32.png";
 const bird1_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/bird1/bird1_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/bird1/bird1_512x512.png";
 const bird1_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/bird1/bird1_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/bird1/bird1_32x32.png";
 const bird1_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/bird1/bird1_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/bird1/bird1_off_512x512.png";
 const bird1_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/bird1/bird1_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/bird1/bird1_off_32x32.png";
 const bird2_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/bird2/bird2_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/bird2/bird2_512x512.png";
 const bird2_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/bird2/bird2_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/bird2/bird2_32x32.png";
 const bird2_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/bird2/bird2_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/bird2/bird2_off_512x512.png";
 const bird2_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/bird2/bird2_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/bird2/bird2_off_32x32.png";
 const boxer_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/boxer/boxer_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/boxer/boxer_512x512.png";
 const boxer_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/boxer/boxer_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/boxer/boxer_32x32.png";
 const boxer_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/boxer/boxer_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/boxer/boxer_off_512x512.png";
 const boxer_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/boxer/boxer_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/boxer/boxer_off_32x32.png";
 const brain_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/brain/brain_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/brain/brain_512x512.png";
 const brain_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/brain/brain_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/brain/brain_32x32.png";
 const brain_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/brain/brain_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/brain/brain_off_512x512.png";
 const brain_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/brain/brain_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/brain/brain_off_32x32.png";
 const buddyHamster_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/buddyHamster/buddyHamster_512x512.png";
 const buddyHamster_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/buddyHamster/buddyHamster_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/buddyHamster/buddyHamster_32x32.png";
 const buddyHamster_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/buddyHamster/buddyHamster_off_512x512.png";
 const buddyHamster_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/buddyHamster/buddyHamster_off_32x32.png";
 const cat1_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/cat1/cat1_512x512.png";
-const cat1_32x32 = nginxAssetSeverBaseUrl + "2DAssets/pets/cat1/cat1_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/cat1/cat1_512x512.png";
+const cat1_32x32 =
+  nginxAssetServerBaseUrl + "2DAssets/pets/cat1/cat1_32x32.png";
 const cat1_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/cat1/cat1_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/cat1/cat1_off_512x512.png";
 const cat1_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/cat1/cat1_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/cat1/cat1_off_32x32.png";
 const cat2_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/cat2/cat2_512x512.png";
-const cat2_32x32 = nginxAssetSeverBaseUrl + "2DAssets/pets/cat2/cat2_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/cat2/cat2_512x512.png";
+const cat2_32x32 =
+  nginxAssetServerBaseUrl + "2DAssets/pets/cat2/cat2_32x32.png";
 const cat2_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/cat2/cat2_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/cat2/cat2_off_512x512.png";
 const cat2_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/cat2/cat2_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/cat2/cat2_off_32x32.png";
 const dodoBird_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/dodoBird/dodoBird_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/dodoBird/dodoBird_512x512.png";
 const dodoBird_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/dodoBird/dodoBird_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/dodoBird/dodoBird_32x32.png";
 const dodoBird_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/dodoBird/dodoBird_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/dodoBird/dodoBird_off_512x512.png";
 const dodoBird_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/dodoBird/dodoBird_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/dodoBird/dodoBird_off_32x32.png";
 const happyHamster_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/happyHamster/happyHamster_512x512.png";
 const happyHamster_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/happyHamster/happyHamster_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/happyHamster/happyHamster_32x32.png";
 const happyHamster_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/happyHamster/happyHamster_off_512x512.png";
 const happyHamster_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/happyHamster/happyHamster_off_32x32.png";
 const mechanicalGrasshopper_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_512x512.png";
 const mechanicalGrasshopper_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_32x32.png";
 const mechanicalGrasshopper_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_off_512x512.png";
 const mechanicalGrasshopper_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/mechanicalGrasshopper/mechanicalGrasshopper_off_32x32.png";
 const panda1_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/panda1/panda1_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/panda1/panda1_512x512.png";
 const panda1_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/panda1/panda1_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/panda1/panda1_32x32.png";
 const panda1_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/panda1/panda1_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/panda1/panda1_off_512x512.png";
 const panda1_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/panda1/panda1_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/panda1/panda1_off_32x32.png";
 const panda2_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/panda2/panda2_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/panda2/panda2_512x512.png";
 const panda2_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/panda2/panda2_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/panda2/panda2_32x32.png";
 const panda2_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/panda2/panda2_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/panda2/panda2_off_512x512.png";
 const panda2_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/panda2/panda2_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/panda2/panda2_off_32x32.png";
 const petRock_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/petRock/petRock_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/petRock/petRock_512x512.png";
 const petRock_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/petRock/petRock_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/petRock/petRock_32x32.png";
 const petRock_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/petRock/petRock_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/petRock/petRock_off_512x512.png";
 const petRock_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/petRock/petRock_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/petRock/petRock_off_32x32.png";
 const pig_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/pig/pig_512x512.png";
-const pig_32x32 = nginxAssetSeverBaseUrl + "2DAssets/pets/pig/pig_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/pig/pig_512x512.png";
+const pig_32x32 = nginxAssetServerBaseUrl + "2DAssets/pets/pig/pig_32x32.png";
 const pig_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/pig/pig_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/pig/pig_off_512x512.png";
 const pig_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/pig/pig_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/pig/pig_off_32x32.png";
 const redFox1_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox1/redFox1_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/redFox1/redFox1_512x512.png";
 const redFox1_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox1/redFox1_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/redFox1/redFox1_32x32.png";
 const redFox1_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox1/redFox1_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/redFox1/redFox1_off_512x512.png";
 const redFox1_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox1/redFox1_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/redFox1/redFox1_off_32x32.png";
 const redFox2_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox2/redFox2_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/redFox2/redFox2_512x512.png";
 const redFox2_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox2/redFox2_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/redFox2/redFox2_32x32.png";
 const redFox2_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox2/redFox2_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/redFox2/redFox2_off_512x512.png";
 const redFox2_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/redFox2/redFox2_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/redFox2/redFox2_off_32x32.png";
 const roboDog_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/roboDog/roboDog_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/roboDog/roboDog_512x512.png";
 const roboDog_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/roboDog/roboDog_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/roboDog/roboDog_32x32.png";
 const roboDog_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/roboDog/roboDog_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/roboDog/roboDog_off_512x512.png";
 const roboDog_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/roboDog/roboDog_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/roboDog/roboDog_off_32x32.png";
 const skeletonTRex_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/skeletonTRex/skeletonTRex_512x512.png";
 const skeletonTRex_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/skeletonTRex/skeletonTRex_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/skeletonTRex/skeletonTRex_32x32.png";
 const skeletonTRex_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/skeletonTRex/skeletonTRex_off_512x512.png";
 const skeletonTRex_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/skeletonTRex/skeletonTRex_off_32x32.png";
 const snail_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/snail/snail_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/snail/snail_512x512.png";
 const snail_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/snail/snail_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/snail/snail_32x32.png";
 const snail_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/snail/snail_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/snail/snail_off_512x512.png";
 const snail_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/snail/snail_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/snail/snail_off_32x32.png";
 const spinosaurus_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/spinosaurus/spinosaurus_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/spinosaurus/spinosaurus_512x512.png";
 const spinosaurus_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/spinosaurus/spinosaurus_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/spinosaurus/spinosaurus_32x32.png";
 const spinosaurus_off_512x512 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/spinosaurus/spinosaurus_off_512x512.png";
 const spinosaurus_off_32x32 =
-  nginxAssetSeverBaseUrl +
+  nginxAssetServerBaseUrl +
   "2DAssets/pets/spinosaurus/spinosaurus_off_32x32.png";
 const TRex_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/TRex/TRex_512x512.png";
-const TRex_32x32 = nginxAssetSeverBaseUrl + "2DAssets/pets/TRex/TRex_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/TRex/TRex_512x512.png";
+const TRex_32x32 =
+  nginxAssetServerBaseUrl + "2DAssets/pets/TRex/TRex_32x32.png";
 const TRex_off_512x512 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/TRex/TRex_off_512x512.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/TRex/TRex_off_512x512.png";
 const TRex_off_32x32 =
-  nginxAssetSeverBaseUrl + "2DAssets/pets/TRex/TRex_off_32x32.png";
+  nginxAssetServerBaseUrl + "2DAssets/pets/TRex/TRex_off_32x32.png";
 
 export const beardsEffects: {
   [key in BeardsEffectTypes]: {

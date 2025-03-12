@@ -1,7 +1,7 @@
 import { createModel, KaldiRecognizer, Model } from "vosk-browser";
 import { RecognizerMessage } from "vosk-browser/dist/interfaces";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 class CaptionsController {
   constructor(
@@ -38,7 +38,7 @@ class CaptionsController {
 
     try {
       const model = await createModel(
-        `${nginxAssetSeverBaseUrl}speechToTextModels/${path}`
+        `${nginxAssetServerBaseUrl}speechToTextModels/${path}`
       );
 
       // Create recognizer

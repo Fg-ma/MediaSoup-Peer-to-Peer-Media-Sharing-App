@@ -307,8 +307,8 @@ export default function FgMediaContainer({
               zIndex: 10,
             }
       }
-      onPointerEnter={() => mediaContainerController.handlePointerEnter()}
-      onPointerLeave={() => mediaContainerController.handlePointerLeave()}
+      onPointerEnter={mediaContainerController.handlePointerEnter}
+      onPointerLeave={mediaContainerController.handlePointerLeave}
       data-positioning={JSON.stringify(positioning.current)}
       variants={MediaContainerVar}
       initial='init'

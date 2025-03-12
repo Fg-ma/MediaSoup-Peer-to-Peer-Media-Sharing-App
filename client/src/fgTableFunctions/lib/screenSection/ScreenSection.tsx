@@ -8,10 +8,10 @@ import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgH
 import ProducersController from "../../../lib/ProducersController";
 import ScreenSectionController from "./lib/ScreenSectionController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const removeScreenIcon = nginxAssetSeverBaseUrl + "svgs/removeScreenIcon.svg";
-const shareScreenIcon = nginxAssetSeverBaseUrl + "svgs/shareScreenIcon.svg";
+const removeScreenIcon = nginxAssetServerBaseUrl + "svgs/removeScreenIcon.svg";
+const shareScreenIcon = nginxAssetServerBaseUrl + "svgs/shareScreenIcon.svg";
 
 export default function ScreenSection({
   screenBtnRef,

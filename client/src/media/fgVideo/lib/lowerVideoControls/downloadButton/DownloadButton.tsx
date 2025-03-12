@@ -5,12 +5,12 @@ import FgHoverContentStandard from "../../../../../elements/fgHoverContentStanda
 import LowerVideoController from "../LowerVideoController";
 import { Settings } from "../../typeConstant";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const snapShotIcon = nginxAssetSeverBaseUrl + "svgs/snapShotIcon.svg";
-const downloadIcon = nginxAssetSeverBaseUrl + "svgs/downloadIcon.svg";
-const recordIcon = nginxAssetSeverBaseUrl + "svgs/recordIcon.svg";
-const recordOffIcon = nginxAssetSeverBaseUrl + "svgs/recordOffIcon.svg";
+const snapShotIcon = nginxAssetServerBaseUrl + "svgs/snapShotIcon.svg";
+const downloadIcon = nginxAssetServerBaseUrl + "svgs/downloadIcon.svg";
+const recordIcon = nginxAssetServerBaseUrl + "svgs/recordIcon.svg";
+const recordOffIcon = nginxAssetServerBaseUrl + "svgs/recordOffIcon.svg";
 
 export default function DownloadButton({
   settings,

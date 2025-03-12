@@ -1,4 +1,4 @@
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 class FaceMeshWebWorker {
   faceMesh;
@@ -16,7 +16,7 @@ class FaceMeshWebWorker {
   }
 
   loadDependencies = async () => {
-    const baseUrl = nginxAssetSeverBaseUrl + "faceMeshModel/";
+    const baseUrl = nginxAssetServerBaseUrl + "faceMeshModel/";
 
     const scripts = [
       "tf-core.js",
@@ -34,7 +34,7 @@ class FaceMeshWebWorker {
 
   loadModel = async () => {
     // eslint-disable-next-line no-undef
-    tf.wasm.setWasmPaths(nginxAssetSeverBaseUrl + "faceMeshModel/");
+    tf.wasm.setWasmPaths(nginxAssetServerBaseUrl + "faceMeshModel/");
     // eslint-disable-next-line no-undef
     await tf.ready();
 

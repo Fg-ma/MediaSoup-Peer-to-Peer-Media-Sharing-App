@@ -7,10 +7,10 @@ import FgPortal from "../../../elements/fgPortal/FgPortal";
 import { navTransition, navVar } from "./SamplerToolbar";
 import { FgSamplers } from "../../../audioEffects/fgSamplers";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateForward = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
-const navigateBack = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
+const navigateForward = nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
+const navigateBack = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 const notes = [
   "C0",

@@ -4,9 +4,9 @@ import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import { Settings, ActivePages } from "../../typeConstant";
 import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
+const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export const delaySelections = ["0", "3", "5", "10", "15", "30", "60"];
 

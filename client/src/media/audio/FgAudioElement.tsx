@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSpring, animated, SpringValue, useSprings } from "react-spring";
+import { animated, useSprings } from "react-spring";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
 import FgButton from "../../elements/fgButton/FgButton";
 import FgAudioElementController from "./lib/FgAudioElementController";
-import { tableColorMap } from "../../fgTable/lib/tableColors";
 import {
   FgAudioElementContainerOptionsType,
   Settings,

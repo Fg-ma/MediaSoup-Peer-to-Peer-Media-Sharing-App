@@ -12,12 +12,12 @@ import {
 } from "./lib/typeConstant";
 import { TableReactions } from "../../../../universal/typeConstant";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const reactionsIcon =
-  nginxAssetSeverBaseUrl + "svgs/reactions/reactionsIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/reactions/reactionsIcon.svg";
 const reactionsOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/reactions/reactionsOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/reactions/reactionsOffIcon.svg";
 
 export default function ReactButton({
   className,

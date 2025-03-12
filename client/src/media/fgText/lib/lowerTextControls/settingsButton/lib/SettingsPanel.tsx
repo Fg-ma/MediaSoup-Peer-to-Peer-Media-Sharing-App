@@ -9,10 +9,10 @@ import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
 import FontStylePage from "./FontStylePage";
 import LowerTextController from "../../LowerTextController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
-const minusIcon = nginxAssetSeverBaseUrl + "svgs/minusIcon.svg";
+const additionIcon = nginxAssetServerBaseUrl + "svgs/additionIcon.svg";
+const minusIcon = nginxAssetServerBaseUrl + "svgs/minusIcon.svg";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },

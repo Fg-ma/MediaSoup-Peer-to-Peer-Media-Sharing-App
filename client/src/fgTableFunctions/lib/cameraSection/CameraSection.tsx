@@ -8,10 +8,10 @@ import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgH
 import ProducersController from "../../../lib/ProducersController";
 import CameraSectionController from "./lib/cameraSectionController";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const shareCameraIcon = nginxAssetSeverBaseUrl + "svgs/shareCameraIcon.svg";
-const removeCameraIcon = nginxAssetSeverBaseUrl + "svgs/removeCameraIcon.svg";
+const shareCameraIcon = nginxAssetServerBaseUrl + "svgs/shareCameraIcon.svg";
+const removeCameraIcon = nginxAssetServerBaseUrl + "svgs/removeCameraIcon.svg";
 
 export default function CameraSection({
   cameraBtnRef,

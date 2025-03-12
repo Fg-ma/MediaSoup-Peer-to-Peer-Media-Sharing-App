@@ -5,9 +5,9 @@ import MoreTableFunctionsSection from "../moreTableFunctionsSection/MoreTableFun
 import { FgBackground } from "../../../elements/fgBackgroundSelector/lib/typeConstant";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
+const additionIcon = nginxAssetServerBaseUrl + "svgs/additionIcon.svg";
 
 export default function MoreTableFunctionsButton({
   tableTopRef,

@@ -2,9 +2,9 @@ import React from "react";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const rotateIcon = nginxAssetSeverBaseUrl + "svgs/rotateIcon.svg";
+const rotateIcon = nginxAssetServerBaseUrl + "svgs/rotateIcon.svg";
 
 export default function RotateButton({
   className,

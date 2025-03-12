@@ -6,12 +6,12 @@ import FgSVG from "../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SamplerMetronomeVolume from "./SamplerMetronomeVolume";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const metronomeIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/metronomeIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/metronomeIcon.svg";
 const metronomeOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/metronomeOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/metronomeOffIcon.svg";
 
 export const bpmInputVar: Variants = {
   init: { opacity: 0, x: -20 },

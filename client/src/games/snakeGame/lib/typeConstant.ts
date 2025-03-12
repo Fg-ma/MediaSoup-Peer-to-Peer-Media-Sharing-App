@@ -1,55 +1,55 @@
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const snakeHeadBlackPink =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlackPink.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBlackPink.png";
 const snakeHeadBlackYellow =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlackYellow.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBlackYellow.png";
 const snakeHeadBlueBlue =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueBlue.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBlueBlue.png";
 const snakeHeadBlueGreen =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueGreen.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBlueGreen.png";
 const snakeHeadBlueOrange =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueOrange.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBlueOrange.png";
 const snakeHeadBluePurple =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBluePurple.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBluePurple.png";
 const snakeHeadBlueRed =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueRed.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBlueRed.png";
 const snakeHeadBlueWhite =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueWhite.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBlueWhite.png";
 const snakeHeadBlueYellow =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadBlueYellow.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadBlueYellow.png";
 const snakeHeadGreenGreen =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadGreenGreen.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadGreenGreen.png";
 const snakeHeadGreenPurple =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadGreenPurple.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadGreenPurple.png";
 const snakeHeadGreenWhite =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadGreenWhite.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadGreenWhite.png";
 const snakeHeadGreenYellow =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadGreenYellow.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadGreenYellow.png";
 const snakeHeadOrangeBlue =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadOrangeBlue.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadOrangeBlue.png";
 const snakeHeadOrangePink =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadOrangePink.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadOrangePink.png";
 const snakeHeadOrangePurple =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadOrangePurple.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadOrangePurple.png";
 const snakeHeadOrangeRed =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadOrangeRed.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadOrangeRed.png";
 const snakeHeadPinkGreen =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadPinkGreen.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadPinkGreen.png";
 const snakeHeadPinkOrange =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadPinkOrange.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadPinkOrange.png";
 const snakeHeadPinkPurple =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadPinkPurple.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadPinkPurple.png";
 const snakeHeadRedBlack =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadRedBlack.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadRedBlack.png";
 const snakeHeadRedYellow =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadRedYellow.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadRedYellow.png";
 const snakeHeadWhiteAqua =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteAqua.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteAqua.png";
 const snakeHeadWhiteRed =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteRed.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteRed.png";
 const snakeHeadWhiteYellow =
-  nginxAssetSeverBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteYellow.png";
+  nginxAssetServerBaseUrl + "snakeGameAssets/snake/snakeHeadWhiteYellow.png";
 
 export type SnakeColorsType =
   | {

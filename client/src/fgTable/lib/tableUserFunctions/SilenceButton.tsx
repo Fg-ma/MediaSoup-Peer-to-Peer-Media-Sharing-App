@@ -3,12 +3,12 @@ import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVG from "../../../elements/fgSVG/FgSVG";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const silenceIcon =
-  nginxAssetSeverBaseUrl + "svgs/userFunctions/silenceIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/userFunctions/silenceIcon.svg";
 const silenceOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/userFunctions/silenceOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/userFunctions/silenceOffIcon.svg";
 
 export default function SilenceButton({
   userPanelRef,

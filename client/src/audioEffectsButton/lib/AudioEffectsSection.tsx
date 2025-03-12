@@ -12,26 +12,26 @@ import { audioEffectTemplates } from "./typeConstant";
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import LazyScrollingContainer from "../../elements/lazyScrollingContainer/LazyScrollingContainer";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
 
 const mixAudioEffectsIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/mixAudioEffectsIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/mixAudioEffectsIcon.svg";
 const mixAudioEffectsOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/mixAudioEffectsOffIcon.svg";
-const pianoIcon = nginxAssetSeverBaseUrl + "svgs/audioEffects/pianoIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/mixAudioEffectsOffIcon.svg";
+const pianoIcon = nginxAssetServerBaseUrl + "svgs/audioEffects/pianoIcon.svg";
 const pianoOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/pianoOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/pianoOffIcon.svg";
 const soundBoardIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/soundBoardIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/soundBoardIcon.svg";
 const soundBoardOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/soundBoardOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/soundBoardOffIcon.svg";
 const backgroundMusicIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/backgroundMusicIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/backgroundMusicIcon.svg";
 const backgroundMusicOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/audioEffects/backgroundMusicOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/audioEffects/backgroundMusicOffIcon.svg";
 
 const AudioMixEffectsPortal = React.lazy(
   () => import("./AudioMixEffectsPortal")

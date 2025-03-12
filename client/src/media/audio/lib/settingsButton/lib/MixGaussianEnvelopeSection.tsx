@@ -4,10 +4,10 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSlider from "../../../../../elements/fgSlider/FgSlider";
 import FgSVG from "../../../../../elements/fgSVG/FgSVG";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const additionIcon = nginxAssetSeverBaseUrl + "svgs/additionIcon.svg";
-const minusIcon = nginxAssetSeverBaseUrl + "svgs/minusIcon.svg";
+const additionIcon = nginxAssetServerBaseUrl + "svgs/additionIcon.svg";
+const minusIcon = nginxAssetServerBaseUrl + "svgs/minusIcon.svg";
 
 export default function MixGaussianEnvelopeSection({
   settings,

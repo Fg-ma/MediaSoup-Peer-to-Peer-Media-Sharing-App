@@ -4,11 +4,11 @@ import FgSVG from "../fgSVG/FgSVG";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import ColorPickerButton from "../colorPickerButton/ColorPickerButton";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const tintIcon = nginxAssetSeverBaseUrl + "svgs/visualEffects/tintIcon.svg";
+const tintIcon = nginxAssetServerBaseUrl + "svgs/visualEffects/tintIcon.svg";
 const tintOffIcon =
-  nginxAssetSeverBaseUrl + "svgs/visualEffects/tintOffIcon.svg";
+  nginxAssetServerBaseUrl + "svgs/visualEffects/tintOffIcon.svg";
 
 export default function TintSection({
   tintColor,

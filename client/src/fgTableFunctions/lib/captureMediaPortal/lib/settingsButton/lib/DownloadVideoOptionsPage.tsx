@@ -8,10 +8,11 @@ import {
   downloadVideoOptionsArrays,
 } from "../../typeConstant";
 
-const nginxAssetSeverBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateBackIcon = nginxAssetSeverBaseUrl + "svgs/navigateBack.svg";
-const navigateForwardIcon = nginxAssetSeverBaseUrl + "svgs/navigateForward.svg";
+const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
+const navigateForwardIcon =
+  nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
 export default function DownloadsVideoOptionsPage({
   setActivePages,
