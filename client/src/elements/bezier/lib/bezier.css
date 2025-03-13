@@ -15,3 +15,29 @@
 .svg-editor-split-point.dragging {
   r: 1.75;
 }
+
+.svg-editor-split-point-square {
+  width: 2px;
+  height: 2px;
+  transform: translate(-1px, -1px);
+  transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+
+.svg-editor-split-point-square.hovering-square {
+  width: 2.5px;
+  height: 2.5px;
+  transform: translate(-1.25px, -1.25px);
+}
+
+.svg-editor-split-point-retangle {
+  width: 3px;
+  height: 2px;
+  transform: translate(-1.5px, -1px);
+  transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+
+.svg-editor-split-point-retangle.hovering-square {
+  width: 3.5px;
+  height: 2.5px;
+  transform: translate(-1.75px, -1.25px);
+}

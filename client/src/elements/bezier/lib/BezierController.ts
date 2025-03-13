@@ -1,16 +1,53 @@
-import { BezierPoint, ControlTypes, cycleControlTypeMap } from "./typeConstant";
+import pako from "pako";
+import {
+  BezierPoint,
+  ControlTypes,
+  cycleControlTypeMap,
+  DownloadMimeTypes,
+  Settings,
+} from "./typeConstant";
 
 class BezierController {
   constructor(
     private points: BezierPoint[],
     private setPoints: React.Dispatch<React.SetStateAction<BezierPoint[]>>,
     private bezierContainerRef: React.RefObject<HTMLDivElement>,
+    private bezierBackgroundContainerRef: React.RefObject<HTMLDivElement>,
     private svgRef: React.RefObject<SVGSVGElement>,
     private setInBezier: React.Dispatch<React.SetStateAction<boolean>>,
+    private setLargestDim: React.Dispatch<
+      React.SetStateAction<"height" | "width">
+    >,
+    private setControlsHeight: React.Dispatch<React.SetStateAction<number>>,
     private leaveTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private movementTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private leavePathTimeout: React.MutableRefObject<
+      NodeJS.Timeout | undefined
+    >,
     private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>
+    private controlPressed: React.MutableRefObject<boolean>,
+    private settings: Settings,
+    private copiedTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private setCopied: React.Dispatch<React.SetStateAction<boolean>>,
+    private confirmBezierCurveFunction:
+      | ((d: string, filters?: string) => void)
+      | undefined,
+    private selectionBox: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      active: boolean;
+    },
+    private setSelectionBox: React.Dispatch<
+      React.SetStateAction<{
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        active: boolean;
+      }>
+    >
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -135,7 +172,12 @@ class BezierController {
     }, 1250);
   };
 
-  handleSVGClick = () => {
+  handleSVGPointerDown = (event: React.PointerEvent) => {
+    if (this.leavePathTimeout.current) {
+      clearTimeout(this.leavePathTimeout.current);
+      this.leavePathTimeout.current = undefined;
+    }
+
     this.setPoints((prev) => {
       let newPoints = [...prev];
 
@@ -143,6 +185,97 @@ class BezierController {
 
       return newPoints;
     });
+
+    if (!this.svgRef.current) return;
+
+    const rect = this.svgRef.current.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+    this.setSelectionBox({
+      x,
+      y,
+      width: 0,
+      height: 0,
+      active: true,
+    });
+  };
+
+  handleSVGPointerMove = (event: React.PointerEvent) => {
+    if (this.leavePathTimeout.current) {
+      clearTimeout(this.leavePathTimeout.current);
+      this.leavePathTimeout.current = undefined;
+    }
+
+    if (!this.selectionBox.active || !this.svgRef.current) return;
+
+    const rect = this.svgRef.current.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+    this.setSelectionBox((prev) => {
+      const width = x - prev.x;
+      const height = y - prev.y;
+
+      this.setPoints((prevPoints) => {
+        return prevPoints.map((point) => {
+          const insideX =
+            Math.min(this.selectionBox.x, this.selectionBox.x + width) <=
+              point.x &&
+            Math.max(this.selectionBox.x, this.selectionBox.x + width) >=
+              point.x;
+          const insideY =
+            Math.min(this.selectionBox.y, this.selectionBox.y + height) <=
+              point.y &&
+            Math.max(this.selectionBox.y, this.selectionBox.y + height) >=
+              point.y;
+
+          return { ...point, selected: insideX && insideY };
+        });
+      });
+
+      return {
+        ...prev,
+        width: x - prev.x,
+        height: y - prev.y,
+      };
+    });
+  };
+
+  handleSVGPointerUp = () => {
+    if (!this.selectionBox.active) return;
+
+    if (this.leavePathTimeout.current) {
+      clearTimeout(this.leavePathTimeout.current);
+      this.leavePathTimeout.current = undefined;
+    }
+
+    this.setPoints((prev) => {
+      return prev.map((point) => {
+        const insideX =
+          Math.min(
+            this.selectionBox.x,
+            this.selectionBox.x + this.selectionBox.width
+          ) <= point.x &&
+          Math.max(
+            this.selectionBox.x,
+            this.selectionBox.x + this.selectionBox.width
+          ) >= point.x;
+        const insideY =
+          Math.min(
+            this.selectionBox.y,
+            this.selectionBox.y + this.selectionBox.height
+          ) <= point.y &&
+          Math.max(
+            this.selectionBox.y,
+            this.selectionBox.y + this.selectionBox.height
+          ) >= point.y;
+
+        return { ...point, selected: insideX && insideY };
+      });
+    });
+
+    this.setSelectionBox({ x: 0, y: 0, width: 0, height: 0, active: false });
   };
 
   handlePointerDown = (
@@ -206,13 +339,31 @@ class BezierController {
       return;
     const { clientX, clientY } = event;
     const rect = this.svgRef.current.getBoundingClientRect();
-    const x = this.applyBoardLimits(((clientX - rect.left) / rect.width) * 100);
-    const y = this.applyBoardLimits(((clientY - rect.top) / rect.height) * 100);
+    let x = this.applyBoardLimits(((clientX - rect.left) / rect.width) * 100);
+    let y = this.applyBoardLimits(((clientY - rect.top) / rect.height) * 100);
 
     this.setPoints((prev) => {
       const newPoints = [...prev];
 
       if (controlType !== undefined) {
+        let point = newPoints[index];
+        let dx = x - point.x;
+        let dy = y - point.y;
+        let angle = Math.atan2(dy, dx);
+        let distance = Math.hypot(dx, dy);
+
+        if (this.controlPressed.current) {
+          const snapAngle = Math.round(angle / (Math.PI / 12)) * (Math.PI / 12);
+          x = this.applyBoardLimits(point.x + Math.cos(snapAngle) * distance);
+          y = this.applyBoardLimits(point.y + Math.sin(snapAngle) * distance);
+        } else if (this.shiftPressed.current) {
+          if (Math.abs(dx) > Math.abs(dy)) {
+            y = point.y;
+          } else {
+            x = point.x;
+          }
+        }
+
         if (newPoints[index].controlType === "free") {
           newPoints[index].controls[controlType] = {
             x,
@@ -327,52 +478,99 @@ class BezierController {
 
   handleDoubleClick = (event: React.MouseEvent) => {
     if (!this.svgRef.current) return;
+
     const rect = this.svgRef.current.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
 
     let splitIndex = -1;
     let minDistance = Infinity;
+    let splitT = 0.5; // Default split position at 50%
 
     for (let i = 0; i < this.points.length - 1; i++) {
       const p1 = this.points[i];
       const p2 = this.points[i + 1];
-      const midpointX = (p1.x + p2.x) / 2;
-      const midpointY = (p1.y + p2.y) / 2;
-      const distance = Math.hypot(midpointX - x, midpointY - y);
 
-      if (distance < minDistance) {
-        minDistance = distance;
-        splitIndex = i;
+      const c1 = p1.controls?.controlOne || p1;
+      const c2 = p2.controls?.controlTwo || p2.controls?.controlOne || p2;
+
+      // Approximate Bézier curve at multiple t values to find the closest point
+      for (let t = 0.1; t < 1; t += 0.1) {
+        const bx =
+          (1 - t) ** 3 * p1.x +
+          3 * (1 - t) ** 2 * t * c1.x +
+          3 * (1 - t) * t ** 2 * c2.x +
+          t ** 3 * p2.x;
+        const by =
+          (1 - t) ** 3 * p1.y +
+          3 * (1 - t) ** 2 * t * c1.y +
+          3 * (1 - t) * t ** 2 * c2.y +
+          t ** 3 * p2.y;
+
+        const distance = Math.hypot(bx - x, by - y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          splitIndex = i;
+          splitT = t;
+        }
       }
     }
 
     if (splitIndex !== -1) {
       this.setPoints((prev) => {
         let newPoints = [...prev];
-
         newPoints = this.handleDeselectAllPoints(newPoints);
 
-        // Add new split point
+        // Nearest segment points
+        const p1 = newPoints[splitIndex];
+        const p2 = newPoints[splitIndex + 1];
+
+        // Compute exact split point on Bézier curve
+        const c1 = p1.controls?.controlOne || p1;
+        const c2 = p2.controls?.controlTwo || p2.controls?.controlOne || p2;
+        const newX =
+          (1 - splitT) ** 3 * p1.x +
+          3 * (1 - splitT) ** 2 * splitT * c1.x +
+          3 * (1 - splitT) * splitT ** 2 * c2.x +
+          splitT ** 3 * p2.x;
+        const newY =
+          (1 - splitT) ** 3 * p1.y +
+          3 * (1 - splitT) ** 2 * splitT * c1.y +
+          3 * (1 - splitT) * splitT ** 2 * c2.y +
+          splitT ** 3 * p2.y;
+
+        // Compute tangent direction at the split point
+        const dx =
+          3 * (1 - splitT) ** 2 * (c1.x - p1.x) +
+          6 * (1 - splitT) * splitT * (c2.x - c1.x) +
+          3 * splitT ** 2 * (p2.x - c2.x);
+        const dy =
+          3 * (1 - splitT) ** 2 * (c1.y - p1.y) +
+          6 * (1 - splitT) * splitT * (c2.y - c1.y) +
+          3 * splitT ** 2 * (p2.y - c2.y);
+        const length = Math.hypot(dx, dy);
+        const normX = dx / length;
+        const normY = dy / length;
+
+        // Control points adapted to local curvature
+        const controlOffset = length * 0.15;
+        const controlOneX = newX + normX * controlOffset;
+        const controlOneY = newY + normY * controlOffset;
+        const controlTwoX = newX - normX * controlOffset;
+        const controlTwoY = newY - normY * controlOffset;
+
+        // Insert new point
         newPoints.splice(splitIndex + 1, 0, {
           type: "splitPoint",
-          x,
-          y,
+          x: newX,
+          y: newY,
           selected: true,
           dragging: false,
           hovering: false,
           controlType: "free",
           controls: {
-            controlOne: {
-              x: x + 5,
-              y: y + 5,
-              dragging: false,
-            },
-            controlTwo: {
-              x: x - 5,
-              y: y - 5,
-              dragging: false,
-            },
+            controlOne: { x: controlOneX, y: controlOneY, dragging: false },
+            controlTwo: { x: controlTwoX, y: controlTwoY, dragging: false },
           },
         });
 
@@ -391,6 +589,29 @@ class BezierController {
 
   handleUnhoverAllPoints = (points: BezierPoint[]) => {
     return points.map((point) => ({ ...point, hovering: false }));
+  };
+
+  handleResize = () => {
+    if (!this.bezierBackgroundContainerRef.current) return;
+
+    if (
+      this.bezierBackgroundContainerRef.current.clientHeight >
+      this.bezierBackgroundContainerRef.current.clientWidth
+    ) {
+      this.setLargestDim("height");
+    } else {
+      this.setLargestDim("width");
+    }
+
+    this.setControlsHeight(
+      Math.max(
+        32,
+        Math.min(
+          64,
+          this.bezierBackgroundContainerRef.current.clientHeight * 0.16
+        )
+      )
+    );
   };
 
   deleteSelectedAndHovering = () => {
@@ -428,120 +649,140 @@ class BezierController {
     this.setPoints((prev) => {
       const newPoints = [...prev];
 
-      let index = prev.findIndex(
-        (point, index) =>
+      // Get all selected points (excluding first & last)
+      const selectedIndices = prev
+        .map((point, index) =>
           point.selected && index !== 0 && index !== prev.length - 1
-      );
+            ? index
+            : -1
+        )
+        .filter((index) => index !== -1);
 
-      if (index === -1) {
-        index = prev.findIndex(
+      // If none are selected, find the first hovered/dragging point
+      if (selectedIndices.length === 0) {
+        const hoveredIndex = prev.findIndex(
           (point, index) =>
-            (point.dragging || point.hovering) &&
+            (point.hovering || point.dragging) &&
             index !== 0 &&
             index !== prev.length - 1
         );
+        if (hoveredIndex !== -1) selectedIndices.push(hoveredIndex);
       }
 
-      if (index === -1) return newPoints;
+      if (selectedIndices.length === 0) return newPoints;
 
-      newPoints[index].controlType = controlType;
+      selectedIndices.forEach((index) => {
+        newPoints[index].controlType = controlType;
+        const x = newPoints[index].controls.controlOne.x;
+        const y = newPoints[index].controls.controlOne.y;
 
-      const x = newPoints[index].controls.controlOne.x;
-      const y = newPoints[index].controls.controlOne.y;
+        if (newPoints[index].controlType === "inlineSymmetric") {
+          const controlTwo = newPoints[index].controls.controlTwo;
+          if (controlTwo) {
+            newPoints[index].controls.controlTwo = {
+              ...controlTwo,
+              x: this.applyBoardLimits(2 * newPoints[index].x - x),
+              y: this.applyBoardLimits(2 * newPoints[index].y - y),
+            };
+          }
+        } else if (newPoints[index].controlType === "inline") {
+          const controlTwo = newPoints[index].controls.controlTwo;
+          if (controlTwo) {
+            const dx = x - newPoints[index].x;
+            const dy = y - newPoints[index].y;
+            const angle = Math.atan2(dy, dx);
 
-      if (newPoints[index].controlType === "inlineSymmetric") {
-        const controlTwo = newPoints[index].controls.controlTwo;
-        if (controlTwo) {
-          newPoints[index].controls.controlTwo = {
-            ...controlTwo,
-            x: this.applyBoardLimits(2 * newPoints[index].x - x),
-            y: this.applyBoardLimits(2 * newPoints[index].y - y),
-          };
+            const distance = Math.hypot(
+              controlTwo.x - newPoints[index].x,
+              controlTwo.y - newPoints[index].y
+            );
+            newPoints[index].controls.controlTwo = {
+              ...controlTwo,
+              x: this.applyBoardLimits(
+                newPoints[index].x - distance * Math.cos(angle)
+              ),
+              y: this.applyBoardLimits(
+                newPoints[index].y - distance * Math.sin(angle)
+              ),
+            };
+          }
         }
-      } else if (newPoints[index].controlType === "inline") {
-        const controlTwo = newPoints[index].controls.controlTwo;
-        if (controlTwo) {
-          const dx = x - newPoints[index].x;
-          const dy = y - newPoints[index].y;
-          const angle = Math.atan2(dy, dx);
-
-          const distance = Math.hypot(
-            (controlTwo.x ?? 0) - newPoints[index].x,
-            (controlTwo.y ?? 0) - newPoints[index].y
-          );
-          newPoints[index].controls.controlTwo = {
-            ...controlTwo,
-            x: this.applyBoardLimits(
-              newPoints[index].x - distance * Math.cos(angle)
-            ),
-            y: this.applyBoardLimits(
-              newPoints[index].y - distance * Math.sin(angle)
-            ),
-          };
-        }
-      }
+      });
 
       return newPoints;
     });
   };
 
-  cycleControlType = () => {
+  cycleControlType = (setIndex?: number) => {
     this.setPoints((prev) => {
       const newPoints = [...prev];
 
-      let index = prev.findIndex(
-        (point, index) =>
-          point.selected && index !== 0 && index !== prev.length - 1
-      );
+      // If an explicit index is given, only update that one
+      let indicesToUpdate = setIndex !== undefined ? [setIndex] : [];
 
-      if (index === -1) {
-        index = prev.findIndex(
-          (point, index) =>
-            (point.dragging || point.hovering) &&
-            index !== 0 &&
-            index !== prev.length - 1
-        );
-      }
+      if (indicesToUpdate.length === 0) {
+        // Get all selected points (excluding first & last)
+        indicesToUpdate = prev
+          .map((point, index) =>
+            point.selected && index !== 0 && index !== prev.length - 1
+              ? index
+              : -1
+          )
+          .filter((index) => index !== -1);
 
-      if (index === -1) return newPoints;
-
-      newPoints[index].controlType =
-        cycleControlTypeMap[newPoints[index].controlType];
-
-      const x = newPoints[index].controls.controlOne.x;
-      const y = newPoints[index].controls.controlOne.y;
-
-      if (newPoints[index].controlType === "inlineSymmetric") {
-        const controlTwo = newPoints[index].controls.controlTwo;
-        if (controlTwo) {
-          newPoints[index].controls.controlTwo = {
-            ...controlTwo,
-            x: this.applyBoardLimits(2 * newPoints[index].x - x),
-            y: this.applyBoardLimits(2 * newPoints[index].y - y),
-          };
-        }
-      } else if (newPoints[index].controlType === "inline") {
-        const controlTwo = newPoints[index].controls.controlTwo;
-        if (controlTwo) {
-          const dx = x - newPoints[index].x;
-          const dy = y - newPoints[index].y;
-          const angle = Math.atan2(dy, dx);
-
-          const distance = Math.hypot(
-            (controlTwo.x ?? 0) - newPoints[index].x,
-            (controlTwo.y ?? 0) - newPoints[index].y
+        // If none are selected, find the first hovered/dragging point
+        if (indicesToUpdate.length === 0) {
+          const hoveredIndex = prev.findIndex(
+            (point, index) =>
+              (point.hovering || point.dragging) &&
+              index !== 0 &&
+              index !== prev.length - 1
           );
-          newPoints[index].controls.controlTwo = {
-            ...controlTwo,
-            x: this.applyBoardLimits(
-              newPoints[index].x - distance * Math.cos(angle)
-            ),
-            y: this.applyBoardLimits(
-              newPoints[index].y - distance * Math.sin(angle)
-            ),
-          };
+          if (hoveredIndex !== -1) indicesToUpdate.push(hoveredIndex);
         }
       }
+
+      if (indicesToUpdate.length === 0) return newPoints;
+
+      indicesToUpdate.forEach((index) => {
+        newPoints[index].controlType =
+          cycleControlTypeMap[newPoints[index].controlType];
+
+        const x = newPoints[index].controls.controlOne.x;
+        const y = newPoints[index].controls.controlOne.y;
+
+        if (newPoints[index].controlType === "inlineSymmetric") {
+          const controlTwo = newPoints[index].controls.controlTwo;
+          if (controlTwo) {
+            newPoints[index].controls.controlTwo = {
+              ...controlTwo,
+              x: this.applyBoardLimits(2 * newPoints[index].x - x),
+              y: this.applyBoardLimits(2 * newPoints[index].y - y),
+            };
+          }
+        } else if (newPoints[index].controlType === "inline") {
+          const controlTwo = newPoints[index].controls.controlTwo;
+          if (controlTwo) {
+            const dx = x - newPoints[index].x;
+            const dy = y - newPoints[index].y;
+            const angle = Math.atan2(dy, dx);
+
+            const distance = Math.hypot(
+              controlTwo.x - newPoints[index].x,
+              controlTwo.y - newPoints[index].y
+            );
+            newPoints[index].controls.controlTwo = {
+              ...controlTwo,
+              x: this.applyBoardLimits(
+                newPoints[index].x - distance * Math.cos(angle)
+              ),
+              y: this.applyBoardLimits(
+                newPoints[index].y - distance * Math.sin(angle)
+              ),
+            };
+          }
+        }
+      });
 
       return newPoints;
     });
@@ -590,7 +831,336 @@ class BezierController {
     return points.slice(1, points.length - 1).some((point) => point.hovering);
   };
 
-  downloadBezierCurve = () => {};
+  isOneDragging = (points: BezierPoint[]): boolean => {
+    return points
+      .slice(1, points.length - 1)
+      .some(
+        (point) =>
+          point.dragging ||
+          point.controls.controlOne.dragging ||
+          point.controls.controlTwo?.dragging
+      );
+  };
+
+  isFilter = (): boolean => {
+    return Object.values(this.settings.filters).some((entry) => entry.value);
+  };
+
+  copyToClipBoardBezierCurve = () => {
+    let svg = this.getCurrentDownloadableSVG();
+
+    if (this.settings.downloadOptions.compression.value === "Minified")
+      svg = this.minifySVG(svg);
+
+    navigator.clipboard.writeText(svg).then(() => {
+      this.setCopied(true);
+
+      if (this.copiedTimeout.current) {
+        clearTimeout(this.copiedTimeout.current);
+        this.copiedTimeout.current = undefined;
+      }
+
+      this.copiedTimeout.current = setTimeout(() => {
+        this.setCopied(false);
+      }, 2250);
+    });
+  };
+
+  private getFilters = () => {
+    return `
+      <defs>
+        ${
+          this.settings.filters.shadow.value
+            ? `<filter id='bezierShadowFilter'>
+          <feGaussianBlur
+            in='SourceAlpha'
+            stdDeviation='0.75'
+            result='blur'
+          />
+          <feOffset in='blur' dx='0.25' dy='0.5' result='offsetBlur' />
+          <feFlood
+            floodColor="${this.settings.filters.shadow.shadowColor.value}"
+            result='colorBlur'
+          />
+          <feComposite
+            in='colorBlur'
+            in2='offsetBlur'
+            operator='in'
+            result='coloredBlur'
+          />
+          <feMerge>
+            <feMergeNode in='coloredBlur' />
+            <feMergeNode in='SourceGraphic' />
+          </feMerge>
+        </filter>`
+            : ""
+        }
+
+        ${
+          this.settings.filters.blur.value
+            ? `<filter id='bezierBlurFilter' x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in='SourceGraphic' stdDeviation='2' />
+        </filter>`
+            : ""
+        }
+
+        ${
+          this.settings.filters.grayscale.value
+            ? `<filter id='bezierGrayscaleFilter'>
+          <feColorMatrix type='saturate' values='0' />
+        </filter>`
+            : ""
+        }
+
+        ${
+          this.settings.filters.saturate.value
+            ? `<filter id='bezierSaturateFilter'>
+          <feColorMatrix type='saturate' values='2' />
+        </filter>`
+            : ""
+        }
+
+        ${
+          this.settings.filters.edgeDetection.value
+            ? `<filter id='bezierEdgeDetectionFilter'>
+                  <feConvolveMatrix
+                    order='3'
+                    kernelMatrix=' -1 -1 -1 -1 8 -1 -1 -1 -1 '
+                    result='edgeDetected'
+                  />
+                </filter>`
+            : ""
+        }
+
+        ${
+          this.settings.filters.colorOverlay.value
+            ? `<filter id='bezierColorOverlayFilter'>
+          <feFlood flood-color='rgba(255, 0, 0, 0.5)' result='flood' />
+          <feComposite
+            in2='SourceAlpha'
+            operator='in'
+            result='overlay'
+          />
+          <feComposite
+            in='overlay'
+            in2='SourceGraphic'
+            operator='over'
+          />
+        </filter>`
+            : ""
+        }
+
+        ${
+          this.settings.filters.waveDistortion.value
+            ? `<filter id='bezierWaveDistortionFilter' x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence
+            type='fractalNoise'
+            baseFrequency='0.05'
+            result='turbulence'
+          />
+          <feDisplacementMap
+            in='SourceGraphic'
+            in2='turbulence'
+            scale='30'
+          />
+        </filter>`
+            : ""
+        }
+
+        ${
+          this.settings.filters.crackedGlass.value
+            ? `<filter id='bezierCrackedGlassFilter' x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence
+            type='fractalNoise'
+            baseFrequency='0.2'
+            numOctaves='2'
+            result='turbulence'
+          />
+          <feDisplacementMap
+            in='SourceGraphic'
+            in2='turbulence'
+            scale='15'
+          />
+        </filter>`
+            : ""
+        }
+
+        ${
+          this.settings.filters.neonGlow.value
+            ? `<filter id='bezierNeonGlowFilter' x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur
+                    in='SourceAlpha'
+                    stdDeviation='3'
+                    result='blurred'
+                  />
+                  <feFlood flood-color='cyan' result='glowColor' />
+                  <feComposite
+                    in='glowColor'
+                    in2='blurred'
+                    operator='in'
+                    result='glow'
+                  />
+                  <feComposite in='SourceGraphic' in2='glow' operator='over' />
+                </filter>`
+            : ""
+        }
+      </defs>
+    `;
+  };
+
+  getFilterURLs = () => {
+    return `${
+      this.settings.filters.shadow.value ? "url(#bezierShadowFilter)" : ""
+    }${this.settings.filters.blur.value ? " url(#bezierBlurFilter)" : ""}${
+      this.settings.filters.grayscale.value
+        ? " url(#bezierGrayscaleFilter)"
+        : ""
+    }${
+      this.settings.filters.saturate.value ? " url(#bezierSaturateFilter)" : ""
+    }${
+      this.settings.filters.edgeDetection.value
+        ? " url(#bezierEdgeDetectionFilter)"
+        : ""
+    }${
+      this.settings.filters.colorOverlay.value
+        ? " url(#bezierColorOverlayFilter)"
+        : ""
+    }${
+      this.settings.filters.waveDistortion.value
+        ? " url(#bezierWaveDistortionFilter)"
+        : ""
+    }${
+      this.settings.filters.crackedGlass.value
+        ? " url(#bezierCrackedGlassFilter)"
+        : ""
+    }${
+      this.settings.filters.neonGlow.value ? " url(#bezierNeonGlowFilter)" : ""
+    }`;
+  };
+
+  private getCurrentDownloadableSVG = () => {
+    const { size } = this.settings.downloadOptions;
+    const svgWidth = size.value;
+    const svgHeight = size.value;
+
+    return `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${svgWidth}" height="${svgHeight}" style="background-color: ${
+      this.settings.backgroundColor.value
+    };">
+      ${this.isFilter() ? this.getFilters() : ""}
+      ${this.isFilter() ? `<g filter="${this.getFilterURLs()}">` : ""}
+        <path
+          d="${this.getPathData()}"
+          stroke="${this.settings.color.value}"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      ${this.isFilter() ? "</g>" : ""}
+    </svg>
+  `;
+  };
+
+  downloadBezierCurve = () => {
+    const { mimeType, compression } = this.settings.downloadOptions;
+
+    // Construct the SVG string
+    let SVG = this.getCurrentDownloadableSVG();
+
+    switch (compression.value) {
+      case "Minified":
+        SVG = this.minifySVG(SVG);
+        break;
+      case "Zipped":
+        return this.convertToSVGZ(SVG);
+      case "Plain":
+      default:
+        break;
+    }
+
+    const blob = new Blob([SVG], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+
+    switch (mimeType.value) {
+      case "svg":
+      case "svgz":
+        this.downloadFile(url, `download.${mimeType.value}`);
+        break;
+      case "png":
+      case "jpg":
+      case "webp":
+      case "tiff":
+      case "heic":
+        this.convertSVGToImage(SVG, mimeType.value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  private minifySVG = (svgString: string) => {
+    return svgString.replace(/\s+/g, " ").trim();
+  };
+
+  private downloadFile = (url: string, filename: string) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  private convertSVGToImage = (
+    svgString: string,
+    format: DownloadMimeTypes
+  ) => {
+    const img = new Image();
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(svgBlob);
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = this.settings.downloadOptions.size.value;
+      canvas.height = this.settings.downloadOptions.size.value;
+      const ctx = canvas.getContext("2d");
+
+      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return;
+
+          const imageUrl = URL.createObjectURL(blob);
+          this.downloadFile(imageUrl, `download.${format}`);
+          URL.revokeObjectURL(imageUrl);
+        },
+        `image/${format === "jpg" ? "jpeg" : format}`,
+        1.0
+      );
+    };
+
+    img.src = url;
+  };
+
+  private convertToSVGZ = (svgString: string) => {
+    const compressed = pako.gzip(svgString, { level: 9 }); // Max compression
+    const blob = new Blob([compressed], { type: "application/gzip" });
+
+    const url = URL.createObjectURL(blob);
+    this.downloadFile(url, "download.svgz");
+    URL.revokeObjectURL(url);
+  };
+
+  confirmBezierCurve = () => {
+    const d = this.getPathData();
+    const filters = this.isFilter() ? this.getFilters() : undefined;
+
+    if (this.confirmBezierCurveFunction)
+      this.confirmBezierCurveFunction(d, filters);
+  };
 
   getPathData = () => {
     if (this.points.length < 2) return "";
