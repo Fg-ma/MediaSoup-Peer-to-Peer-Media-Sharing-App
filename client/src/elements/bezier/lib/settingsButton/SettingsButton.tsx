@@ -11,7 +11,6 @@ type RecursiveObject = {
 };
 
 export default function SettingsButton({
-  bezierController,
   settingsActive,
   setSettingsActive,
   activePages,
@@ -19,7 +18,6 @@ export default function SettingsButton({
   settings,
   setSettings,
 }: {
-  bezierController: BezierController;
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
   activePages: ActivePages;
@@ -73,7 +71,9 @@ export default function SettingsButton({
       !settingsPanelRef.current?.contains(target) &&
       !backgroundColorPickerRef.current?.contains(target) &&
       !colorPickerRef.current?.contains(target) &&
-      !shadowColorPickerRef.current?.contains(target)
+      !shadowColorPickerRef.current?.contains(target) &&
+      !overlayColorPickerRef.current?.contains(target) &&
+      !neonColorPickerRef.current?.contains(target)
     ) {
       toggleSettings();
     }
@@ -130,7 +130,6 @@ export default function SettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
-          bezierController={bezierController}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}

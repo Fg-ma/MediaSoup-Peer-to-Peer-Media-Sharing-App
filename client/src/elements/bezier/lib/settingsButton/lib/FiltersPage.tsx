@@ -6,7 +6,10 @@ import {
   ActivePages,
   filtersMeta,
   FiltersTypes,
+  BezierColorTypes,
 } from "../../typeConstant";
+import FgSlider from "../../../../../elements/fgSlider/FgSlider";
+import ColorPickerButton from "../../../../../elements/colorPickerButton/ColorPickerButton";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -16,10 +19,14 @@ export default function FiltersPage({
   setActivePages,
   settings,
   setSettings,
+  colorPickerRefs,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  colorPickerRefs: {
+    [bezierColorType in BezierColorTypes]: React.RefObject<HTMLDivElement>;
+  };
 }) {
   const handleFiltersActive = () => {
     setActivePages((prev) => {
@@ -36,6 +43,36 @@ export default function FiltersPage({
       const newSettings = { ...prev };
 
       newSettings.filters[option].value = !newSettings.filters[option].value;
+
+      return newSettings;
+    });
+  };
+
+  const handleAcceptColor = (
+    filter: FiltersTypes,
+    option: string,
+    color: string
+  ) => {
+    setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      // @ts-ignore-error no coherence between filter and option
+      newSettings.filters[filter][option].value = color;
+
+      return newSettings;
+    });
+  };
+
+  const handleValueChange = (
+    filter: FiltersTypes,
+    option: string,
+    value: number
+  ) => {
+    setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      // @ts-ignore-error no coherence between filter and option
+      newSettings.filters[filter][option].value = value;
 
       return newSettings;
     });
@@ -69,22 +106,94 @@ export default function FiltersPage({
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
       <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
         {Object.entries(filtersMeta).map(([key, filter]) => (
-          <FgButton
+          <div
             key={key}
-            className='w-full h-8'
-            clickFunction={() => handleOptionSelect(key as FiltersTypes)}
-            contentFunction={() => (
-              <div
-                className={`${
-                  settings.filters[key as FiltersTypes].value === true
-                    ? "bg-fg-white text-fg-tone-black-1"
-                    : ""
-                } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-center px-2 rounded items-center text-lg`}
-              >
-                {filter.title}
-              </div>
-            )}
-          />
+            className={`flex flex-col items-center justify-center w-full h-max space-y-1 rounded ${
+              settings.filters[key as FiltersTypes].value === true &&
+              filter.options.length !== 0
+                ? "bg-fg-tone-black-7"
+                : ""
+            }`}
+          >
+            <FgButton
+              className='w-full h-8'
+              clickFunction={() => handleOptionSelect(key as FiltersTypes)}
+              contentFunction={() => (
+                <div
+                  className={`${
+                    settings.filters[key as FiltersTypes].value === true
+                      ? "bg-fg-white text-fg-tone-black-1"
+                      : ""
+                  } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-center px-2 rounded items-center text-lg`}
+                >
+                  {filter.title}
+                </div>
+              )}
+            />
+            {settings.filters[key as FiltersTypes].value === true &&
+              filter.options.map((option) =>
+                option.type === "number" ? (
+                  <div key={option.key} className='h-max w-[95%]'>
+                    <FgSlider
+                      className='h-16'
+                      externalValue={
+                        // @ts-ignore-error no coherence between filter and option
+                        settings.filters[key as FiltersTypes][option.key].value
+                      }
+                      externalStyleValue={
+                        // @ts-ignore-error no coherence between filter and option
+                        settings.filters[key as FiltersTypes][option.key].value
+                      }
+                      onValueChange={(value) => {
+                        handleValueChange(
+                          key as FiltersTypes,
+                          option.key,
+                          value.value
+                        );
+                      }}
+                      options={{
+                        initValue:
+                          // @ts-ignore-error no coherence between filter and option
+                          settings.filters[key as FiltersTypes][option.key]
+                            .value,
+                        ticks: option.ticks,
+                        rangeMax: option.rangeMax,
+                        rangeMin: option.rangeMin,
+                        orientation: "horizontal",
+                        tickLabels: false,
+                        precision: option.precision,
+                        topLabel: option.title,
+                        labelsColor: "#f2f2f2",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    key={option.key}
+                    className='flex items-center justify-between w-[95%] h-max'
+                  >
+                    {option.title}
+                    <ColorPickerButton
+                      className='h-full aspect-square'
+                      defaultColor={
+                        // @ts-ignore key and option.key are string not types
+                        settings.filters[key][option.key].value
+                      }
+                      externalColorPickerPanelRef={
+                        colorPickerRefs[option.key as BezierColorTypes]
+                      }
+                      handleAcceptColorCallback={(color) =>
+                        handleAcceptColor(
+                          key as FiltersTypes,
+                          option.key,
+                          color
+                        )
+                      }
+                    />
+                  </div>
+                )
+              )}
+          </div>
         ))}
       </div>
     </div>

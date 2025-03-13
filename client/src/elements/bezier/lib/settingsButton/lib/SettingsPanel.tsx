@@ -49,7 +49,6 @@ const panelVariants: Variants = {
 };
 
 export default function SettingsPanel({
-  bezierController,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -58,7 +57,6 @@ export default function SettingsPanel({
   setSettings,
   colorPickerRefs,
 }: {
-  bezierController: BezierController;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -209,6 +207,7 @@ export default function SettingsPanel({
                 handleAcceptColorCallback={(color) =>
                   handleAcceptColor("backgroundColor", color)
                 }
+                isAlpha={true}
               />
             </div>
             <div className='flex w-full text-nowrap justify-between px-2 rounded items-center'>
@@ -220,6 +219,7 @@ export default function SettingsPanel({
                 handleAcceptColorCallback={(color) =>
                   handleAcceptColor("color", color)
                 }
+                isAlpha={true}
               />
             </div>
             <FgButton
@@ -258,6 +258,7 @@ export default function SettingsPanel({
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}
+                colorPickerRefs={colorPickerRefs}
               />
             </motion.div>
           )}

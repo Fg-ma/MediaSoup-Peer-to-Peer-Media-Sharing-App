@@ -12,6 +12,7 @@ export default function ColorPickerButton({
   externalColorRef,
   externalColorPickerPanelRef,
   disabled,
+  isAlpha,
 }: {
   className?: string;
   defaultColor?: string;
@@ -20,6 +21,7 @@ export default function ColorPickerButton({
   externalColorRef?: React.MutableRefObject<string>;
   externalColorPickerPanelRef?: React.RefObject<HTMLDivElement>;
   disabled?: boolean;
+  isAlpha?: boolean;
 }) {
   const colorRef = externalColorRef ? externalColorRef : useRef(defaultColor);
   const [color, setColor] = useState(colorRef.current);
@@ -79,6 +81,7 @@ export default function ColorPickerButton({
                 handleAcceptColorCallback(colorRef.current);
             }}
             externalColorPickerPanelRef={externalColorPickerPanelRef}
+            isAlpha={isAlpha}
           />
         </Suspense>
       )}

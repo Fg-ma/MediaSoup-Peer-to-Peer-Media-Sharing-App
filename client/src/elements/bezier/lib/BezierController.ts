@@ -3,6 +3,8 @@ import {
   BezierPoint,
   ControlTypes,
   cycleControlTypeMap,
+  defaultPoints,
+  defaultSettings,
   DownloadMimeTypes,
   Settings,
 } from "./typeConstant";
@@ -27,6 +29,7 @@ class BezierController {
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
     private settings: Settings,
+    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
     private copiedTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setCopied: React.Dispatch<React.SetStateAction<boolean>>,
     private confirmBezierCurveFunction:
@@ -178,14 +181,6 @@ class BezierController {
       this.leavePathTimeout.current = undefined;
     }
 
-    this.setPoints((prev) => {
-      let newPoints = [...prev];
-
-      newPoints = this.handleDeselectAllPoints(newPoints);
-
-      return newPoints;
-    });
-
     if (!this.svgRef.current) return;
 
     const rect = this.svgRef.current.getBoundingClientRect();
@@ -202,12 +197,12 @@ class BezierController {
   };
 
   handleSVGPointerMove = (event: React.PointerEvent) => {
+    if (!this.selectionBox.active || !this.svgRef.current) return;
+
     if (this.leavePathTimeout.current) {
       clearTimeout(this.leavePathTimeout.current);
       this.leavePathTimeout.current = undefined;
     }
-
-    if (!this.selectionBox.active || !this.svgRef.current) return;
 
     const rect = this.svgRef.current.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
@@ -230,7 +225,7 @@ class BezierController {
             Math.max(this.selectionBox.y, this.selectionBox.y + height) >=
               point.y;
 
-          return { ...point, selected: insideX && insideY };
+          return { ...point, inSelectionBox: insideX && insideY };
         });
       });
 
@@ -271,7 +266,11 @@ class BezierController {
             this.selectionBox.y + this.selectionBox.height
           ) >= point.y;
 
-        return { ...point, selected: insideX && insideY };
+        return {
+          ...point,
+          inSelectionBox: false,
+          selected: insideX && insideY,
+        };
       });
     });
 
@@ -565,6 +564,7 @@ class BezierController {
           x: newX,
           y: newY,
           selected: true,
+          inSelectionBox: false,
           dragging: false,
           hovering: false,
           controlType: "free",
@@ -612,6 +612,11 @@ class BezierController {
         )
       )
     );
+  };
+
+  handleReset = () => {
+    this.setPoints(defaultPoints);
+    this.setSettings(defaultSettings);
   };
 
   deleteSelectedAndHovering = () => {
@@ -827,6 +832,12 @@ class BezierController {
     return points.slice(1, points.length - 1).some((point) => point.selected);
   };
 
+  isOneInSelectionBox = (points: BezierPoint[]): boolean => {
+    return points
+      .slice(1, points.length - 1)
+      .some((point) => point.inSelectionBox);
+  };
+
   isOneHovered = (points: BezierPoint[]): boolean => {
     return points.slice(1, points.length - 1).some((point) => point.hovering);
   };
@@ -871,15 +882,15 @@ class BezierController {
       <defs>
         ${
           this.settings.filters.shadow.value
-            ? `<filter id='bezierShadowFilter'>
+            ? `<filter id='bezierShadowFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feGaussianBlur
             in='SourceAlpha'
-            stdDeviation='0.75'
+            stdDeviation="${this.settings.filters.shadow.strength.value}"
             result='blur'
           />
-          <feOffset in='blur' dx='0.25' dy='0.5' result='offsetBlur' />
+          <feOffset in='blur' dx="${this.settings.filters.shadow.offsetX.value}" dy="${this.settings.filters.shadow.offsetY.value}" result='offsetBlur' />
           <feFlood
-            floodColor="${this.settings.filters.shadow.shadowColor.value}"
+            flood-color='${this.settings.filters.shadow.shadowColor.value}'
             result='colorBlur'
           />
           <feComposite
@@ -898,31 +909,31 @@ class BezierController {
 
         ${
           this.settings.filters.blur.value
-            ? `<filter id='bezierBlurFilter' x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur in='SourceGraphic' stdDeviation='2' />
+            ? `<filter id='bezierBlurFilter' x='-2000' y='-2000' width='4000' height='4000'>
+          <feGaussianBlur in='SourceGraphic' stdDeviation="${this.settings.filters.blur.strength.value}" />
         </filter>`
             : ""
         }
 
         ${
           this.settings.filters.grayscale.value
-            ? `<filter id='bezierGrayscaleFilter'>
-          <feColorMatrix type='saturate' values='0' />
+            ? `<filter id='bezierGrayscaleFilter' x='-2000' y='-2000' width='4000' height='4000'>
+          <feColorMatrix type='saturate' values="${this.settings.filters.grayscale.scale.value}" />
         </filter>`
             : ""
         }
 
         ${
           this.settings.filters.saturate.value
-            ? `<filter id='bezierSaturateFilter'>
-          <feColorMatrix type='saturate' values='2' />
+            ? `<filter id='bezierSaturateFilter' x='-2000' y='-2000' width='4000' height='4000'>
+          <feColorMatrix type='saturate' values="${this.settings.filters.saturate.saturation.value}" />
         </filter>`
             : ""
         }
 
         ${
           this.settings.filters.edgeDetection.value
-            ? `<filter id='bezierEdgeDetectionFilter'>
+            ? `<filter id='bezierEdgeDetectionFilter' x='-2000' y='-2000' width='4000' height='4000'>
                   <feConvolveMatrix
                     order='3'
                     kernelMatrix=' -1 -1 -1 -1 8 -1 -1 -1 -1 '
@@ -934,8 +945,8 @@ class BezierController {
 
         ${
           this.settings.filters.colorOverlay.value
-            ? `<filter id='bezierColorOverlayFilter'>
-          <feFlood flood-color='rgba(255, 0, 0, 0.5)' result='flood' />
+            ? `<filter id='bezierColorOverlayFilter' x='-2000' y='-2000' width='4000' height='4000'>
+          <feFlood flood-color='${this.settings.filters.colorOverlay.overlayColor.value}' result='flood' />
           <feComposite
             in2='SourceAlpha'
             operator='in'
@@ -952,16 +963,16 @@ class BezierController {
 
         ${
           this.settings.filters.waveDistortion.value
-            ? `<filter id='bezierWaveDistortionFilter' x="-20%" y="-20%" width="140%" height="140%">
+            ? `<filter id='bezierWaveDistortionFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feTurbulence
             type='fractalNoise'
-            baseFrequency='0.05'
+            baseFrequency="${this.settings.filters.waveDistortion.frequency.value}"
             result='turbulence'
           />
           <feDisplacementMap
             in='SourceGraphic'
             in2='turbulence'
-            scale='30'
+            scale="${this.settings.filters.waveDistortion.strength.value}"
           />
         </filter>`
             : ""
@@ -969,17 +980,17 @@ class BezierController {
 
         ${
           this.settings.filters.crackedGlass.value
-            ? `<filter id='bezierCrackedGlassFilter' x="-20%" y="-20%" width="140%" height="140%">
+            ? `<filter id='bezierCrackedGlassFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feTurbulence
             type='fractalNoise'
-            baseFrequency='0.2'
-            numOctaves='2'
+            baseFrequency="${this.settings.filters.crackedGlass.density.value}"
+            numOctaves="${this.settings.filters.crackedGlass.detail.value}"
             result='turbulence'
           />
           <feDisplacementMap
             in='SourceGraphic'
             in2='turbulence'
-            scale='15'
+            scale="${this.settings.filters.crackedGlass.strength.value}"
           />
         </filter>`
             : ""
@@ -987,13 +998,13 @@ class BezierController {
 
         ${
           this.settings.filters.neonGlow.value
-            ? `<filter id='bezierNeonGlowFilter' x="-40%" y="-40%" width="180%" height="180%">
+            ? `<filter id='bezierNeonGlowFilter' x='-2000' y='-2000' width='4000' height='4000'>
                   <feGaussianBlur
                     in='SourceAlpha'
                     stdDeviation='3'
                     result='blurred'
                   />
-                  <feFlood flood-color='cyan' result='glowColor' />
+                  <feFlood flood-color='${this.settings.filters.neonGlow.neonColor.value}' result='glowColor' />
                   <feComposite
                     in='glowColor'
                     in2='blurred'

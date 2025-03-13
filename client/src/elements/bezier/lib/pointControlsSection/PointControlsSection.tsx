@@ -6,7 +6,7 @@ import BezierController from "../BezierController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
+const trashIcon = nginxAssetServerBaseUrl + "svgs/trashIcon.svg";
 const freeControlsIcon = nginxAssetServerBaseUrl + "svgs/freeControlsIcon.svg";
 const inlineControlsIcon =
   nginxAssetServerBaseUrl + "svgs/inlineControlsIcon.svg";
@@ -28,8 +28,8 @@ export default function PointControlsSection({
         }}
         contentFunction={() => (
           <FgSVG
-            src={closeIcon}
-            className='h-[40%] w-full stroke-fg-white fill-fg-white'
+            src={trashIcon}
+            className='h-[60%] w-full stroke-fg-white'
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
