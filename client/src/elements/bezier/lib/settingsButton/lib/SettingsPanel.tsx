@@ -219,7 +219,7 @@ export default function SettingsPanel({
                 handleAcceptColorCallback={(color) =>
                   handleAcceptColor("color", color)
                 }
-                isAlpha={true}
+                isAlpha={false}
               />
             </div>
             <FgButton

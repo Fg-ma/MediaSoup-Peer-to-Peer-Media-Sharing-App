@@ -164,9 +164,17 @@ export default function Bezier({
               !bezierController.isOneInSelectionBox(points)
                 ? "cursor-none"
                 : ""
-            } aspect-square bg-fg-tone-black-1 h rounded overflow-hidden relative border-2 border-fg-white`}
+            } aspect-square h rounded overflow-hidden relative border-2`}
             onPointerEnter={bezierController.handlePointerEnterBezier}
             onPointerLeave={bezierController.handlePointerLeaveBezier}
+            style={{
+              backgroundImage: `
+                linear-gradient(45deg, #696969 25%, transparent 25%, transparent 75%, #696969 75%, #696969),
+                linear-gradient(45deg, #696969 25%, #212121 25%, #212121 75%, #696969 75%, #696969)
+              `,
+              backgroundSize: "48px 48px",
+              backgroundPosition: "0 0, 24px 24px",
+            }}
           >
             <svg
               ref={svgRef}

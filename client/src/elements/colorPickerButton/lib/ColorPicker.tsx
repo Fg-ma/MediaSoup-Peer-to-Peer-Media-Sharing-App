@@ -27,141 +27,12 @@ export default function ColorPicker({
   externalColorPickerPanelRef?: React.RefObject<HTMLDivElement>;
   isAlpha?: boolean;
 }) {
-  const [hexValue, setHexValue] = useState(color);
-  const [alpha, setAlpha] = useState(parseFloat(color.slice(7)) || 1);
-  const colorPickerRef = useRef<HTMLDivElement>(null);
-
-  const handleChangeComplete = (color: string) => {
-    if (isAlpha) {
-      setTempColor(color);
-      setHexValue(
-        color +
-          `${Math.round(Math.max(0, Math.min(1, alpha)) * 255)
-            .toString(16)
-            .padStart(2, "0")}`
-      );
-    } else {
-      setTempColor(color);
-      setHexValue(color);
-    }
-  };
-
-  const handleAcceptColor = () => {
-    setColor(tempColor);
-    colorRef.current = tempColor;
-    setIsColorPicker(false);
-    if (handleAcceptColorCallback) {
-      handleAcceptColorCallback();
-    }
-  };
-
-  const handleCancelColor = () => {
-    setTempColor(color);
-    setIsColorPicker(false);
-  };
-
-  const handleHexColorChanges = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setHexValue((prev) =>
-      event.target.value.length > (!isAlpha ? 6 : 8) ? prev : event.target.value
-    );
-    if (isValidHex(event.target.value)) {
-      setTempColor(`#${event.target.value}`);
-    }
-  };
-
-  const handleRGBColorChanges = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    type: "r" | "g" | "b"
-  ) => {
-    if (!isAlpha) {
-      const { r, b, g } = hexToRgb(color);
-      let value = parseInt(event.target.value);
-      if (Number.isNaN(value)) {
-        value = 0;
-      }
-      if (0 <= value && value <= 255) {
-        let hexVal: string | undefined;
-        if (type === "r") {
-          hexVal = rgbToHex(value, b, g);
-        } else if (type === "g") {
-          hexVal = rgbToHex(r, value, g);
-        } else if (type === "b") {
-          hexVal = rgbToHex(r, b, value);
-        }
-        if (hexVal) {
-          setTempColor(hexVal);
-          setHexValue(hexVal.slice(1));
-        }
-      }
-    } else {
-      const { r, b, g, a } = hexToRgba(color);
-      let value = parseInt(event.target.value);
-      if (Number.isNaN(value)) {
-        value = 0;
-      }
-      if (0 <= value && value <= 255) {
-        let hexVal: string | undefined;
-        if (type === "r") {
-          hexVal = rgbaToHex(value, b, g, a);
-        } else if (type === "g") {
-          hexVal = rgbaToHex(r, value, g, a);
-        } else if (type === "b") {
-          hexVal = rgbaToHex(r, b, value, a);
-        }
-        if (hexVal) {
-          setTempColor(hexVal);
-          setHexValue(hexVal.slice(1));
-        }
-      }
-    }
-  };
-
-  const handleAlphaChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { r, b, g } = hexToRgb(color);
-    let value = parseInt(event.target.value);
-    if (Number.isNaN(value)) {
-      value = 0;
-    }
-    if (0 <= value && value <= 255) {
-      let hexVal: string | undefined;
-      hexVal = rgbaToHex(r, b, g, value);
-      if (hexVal) {
-        setTempColor(hexVal);
-        setHexValue(hexVal.slice(1));
-      }
-    }
-  };
-
-  const handleAlphaSliderChanges = (value: number) => {
-    const { r, b, g } = hexToRgb(tempColor);
-
-    if (Number.isNaN(value)) {
-      return;
-    }
-
-    setAlpha(value);
-
-    if (0 <= value && value <= 1) {
-      let hexVal: string | undefined;
-      hexVal = rgbaToHex(r, b, g, value);
-      if (hexVal) {
-        setTempColor(hexVal);
-        setHexValue(hexVal.slice(1));
-      }
-    }
-  };
-
-  const isValidHex = (hex: string) => {
-    if (!isAlpha) {
-      const hexRegex = /^([0-9A-Fa-f]{3}){1,2}$/;
-      return hexRegex.test(hex);
-    } else {
-      const hexRegex = /^([0-9A-Fa-f]{4}){1,2}$/;
-      return hexRegex.test(hex);
-    }
-  };
+  const [hexValue, setHexValue] = useState(
+    color.slice(1) + (isAlpha && color.length !== 9 ? "ff" : "")
+  );
+  const [alpha, setAlpha] = useState(
+    color.length === 9 ? parseInt(color.slice(7), 16) / 255 : 1
+  );
 
   const hexToRgb = (hex: string) => {
     hex = hex.replace(/^#/, "");
@@ -182,6 +53,207 @@ export default function ColorPicker({
     const a = parseInt(hex.substring(6, 8), 16) / 255;
 
     return { r, g, b, a };
+  };
+
+  const [rgba, setRgba] = useState<{
+    r: string;
+    g: string;
+    b: string;
+    a: string;
+  }>(() => {
+    const rgba = isAlpha ? hexToRgba(color) : { ...hexToRgb(color), a: 0 };
+
+    return {
+      r: `${rgba.r}`,
+      g: `${rgba.g}`,
+      b: `${rgba.b}`,
+      a: `${Number.isNaN(rgba.a) ? 1 : rgba.a}`,
+    };
+  });
+
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+
+  const handleChangeComplete = (color: string) => {
+    const { r, g, b } = hexToRgb(color);
+
+    if (isAlpha) {
+      const hexA = `${Math.round(Math.max(0, Math.min(1, alpha)) * 255)
+        .toString(16)
+        .padStart(2, "0")}`;
+
+      setTempColor(color + hexA);
+      setHexValue(color.slice(1) + hexA);
+      setRgba({ r: `${r}`, g: `${g}`, b: `${b}`, a: `${alpha}` });
+    } else {
+      setTempColor(color);
+      setHexValue(color.slice(1));
+
+      setRgba((prev) => ({ r: `${r}`, g: `${g}`, b: `${b}`, a: prev.a }));
+    }
+  };
+
+  const handleAcceptColor = () => {
+    setColor(tempColor);
+    colorRef.current = tempColor;
+    setIsColorPicker(false);
+    if (handleAcceptColorCallback) {
+      handleAcceptColorCallback();
+    }
+  };
+
+  const handleCancelColor = () => {
+    setTempColor(color);
+    setIsColorPicker(false);
+  };
+
+  const handleHexColorChanges = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setHexValue(event.target.value);
+
+    if (isValidHex(event.target.value)) {
+      setTempColor(`#${event.target.value}`);
+      if (isAlpha) {
+        const { r, g, b, a } = hexToRgba(`#${event.target.value}`);
+        setRgba({ r: `${r}`, g: `${g}`, b: `${b}`, a: `${a}` });
+        setAlpha(a);
+      } else {
+        const { r, g, b } = hexToRgb(color);
+        setRgba((prev) => ({ r: `${r}`, g: `${g}`, b: `${b}`, a: prev.a }));
+      }
+    }
+  };
+
+  const handleRGBColorChanges = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "r" | "g" | "b"
+  ) => {
+    if (!isAlpha) {
+      const { r, b, g } = hexToRgb(tempColor);
+
+      setRgba((prev) => {
+        const newRgba = { ...prev };
+
+        newRgba[type] = event.target.value;
+
+        return newRgba;
+      });
+
+      let value = parseInt(event.target.value);
+
+      if (Number.isNaN(value)) {
+        value = 0;
+      }
+
+      if (0 <= value && value <= 255) {
+        let hexVal: string | undefined;
+        if (type === "r") {
+          hexVal = rgbToHex(value, b, g);
+        } else if (type === "g") {
+          hexVal = rgbToHex(r, value, g);
+        } else if (type === "b") {
+          hexVal = rgbToHex(r, b, value);
+        }
+        if (hexVal) {
+          setTempColor(hexVal);
+          setHexValue(hexVal.slice(1));
+        }
+      }
+    } else {
+      const { r, b, g, a } = hexToRgba(tempColor);
+
+      setRgba((prev) => {
+        const newRgba = { ...prev };
+
+        newRgba[type] = event.target.value;
+
+        return newRgba;
+      });
+
+      let value = parseInt(event.target.value);
+
+      if (Number.isNaN(value)) {
+        value = 0;
+      }
+
+      if (0 <= value && value <= 255) {
+        let hexVal: string | undefined;
+        if (type === "r") {
+          hexVal = rgbaToHex(value, b, g, a);
+        } else if (type === "g") {
+          hexVal = rgbaToHex(r, value, g, a);
+        } else if (type === "b") {
+          hexVal = rgbaToHex(r, b, value, a);
+        }
+        if (hexVal) {
+          setTempColor(hexVal);
+          setHexValue(hexVal.slice(1));
+        }
+      }
+    }
+  };
+
+  const handleAlphaChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { r, b, g } = hexToRgba(tempColor);
+
+    setRgba((prev) => {
+      const newRgba = { ...prev };
+
+      newRgba.a = event.target.value;
+
+      return newRgba;
+    });
+
+    let value = parseFloat(event.target.value);
+
+    if (Number.isNaN(value)) {
+      value = 0;
+    }
+
+    if (0 <= value && value <= 1) {
+      setAlpha(value);
+
+      let hexVal: string | undefined;
+      hexVal = rgbaToHex(r, b, g, value);
+      if (hexVal) {
+        setTempColor(hexVal);
+        setHexValue(hexVal.slice(1));
+      }
+    }
+  };
+
+  const handleAlphaSliderChanges = (value: number) => {
+    const { r, g, b } = hexToRgb(tempColor);
+    const alphaValue = parseFloat(value.toFixed(2));
+
+    setRgba((prev) => {
+      const newRgba = { ...prev };
+
+      newRgba.a = `${alphaValue}`;
+
+      return newRgba;
+    });
+
+    setAlpha(alphaValue);
+
+    if (0 <= alphaValue && alphaValue <= 1) {
+      let hexVal: string | undefined;
+      hexVal = rgbaToHex(r, g, b, alphaValue);
+      if (hexVal) {
+        setTempColor(hexVal);
+        setHexValue(hexVal.slice(1));
+      }
+    }
+  };
+
+  const isValidHex = (hex: string) => {
+    if (!isAlpha) {
+      const hexRegex = /^([0-9A-Fa-f]{3}){1,2}$/;
+      return hexRegex.test(hex);
+    } else {
+      const hexRegex = /^([0-9A-Fa-f]{4}){1,2}$/;
+      return hexRegex.test(hex);
+    }
   };
 
   const rgbToHex = (r: number, g: number, b: number) => {
@@ -212,15 +284,24 @@ export default function ColorPicker({
     return `#${rHex}${gHex}${bHex}${aHex}`;
   };
 
-  console.log(color, tempColor, alpha);
-
   return (
     <FgPanel
       externalRef={externalColorPickerPanelRef}
       content={
         <div ref={colorPickerRef} className='flex flex-col space-y-2'>
-          <div className='flex items-center justify-center h-[200px]'>
-            <HexColorPicker color={tempColor} onChange={handleChangeComplete} />
+          <div
+            className={`mb-2 flex items-center justify-center ${
+              isAlpha ? "h-[220px]" : "h-[200px]"
+            }`}
+          >
+            <HexColorPicker
+              color={isAlpha ? tempColor.slice(0, -2) : tempColor}
+              onChange={handleChangeComplete}
+              style={{
+                height: isAlpha ? "220px" : "200px",
+                width: isAlpha ? "220px" : "200px",
+              }}
+            />
             {isAlpha && (
               <FgSlider
                 className='w-10'
@@ -240,7 +321,11 @@ export default function ColorPicker({
             )}
           </div>
           <div className='flex space-x-1'>
-            <div className='flex flex-col space-y-1 items-center justify-center w-[80px]'>
+            <div
+              className={`flex flex-col space-y-1 items-center justify-center ${
+                isAlpha ? "w-[88px]" : "w-[70px]"
+              }`}
+            >
               <label className='flex text-base text-black cursor-pointer flex-col items-center justify-center'>
                 <input
                   type='text'
@@ -259,7 +344,7 @@ export default function ColorPicker({
                   className='w-full bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
                   onChange={(event) => handleRGBColorChanges(event, "r")}
                   autoComplete='off'
-                  value={hexToRgb(tempColor).r ? hexToRgb(tempColor).r : 0}
+                  value={rgba.r}
                 ></input>
                 R
               </label>
@@ -271,7 +356,7 @@ export default function ColorPicker({
                   className='w-full bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
                   onChange={(event) => handleRGBColorChanges(event, "g")}
                   autoComplete='off'
-                  value={hexToRgb(tempColor).g ? hexToRgb(tempColor).g : 0}
+                  value={rgba.g}
                 ></input>
                 G
               </label>
@@ -283,20 +368,20 @@ export default function ColorPicker({
                   className='w-full bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
                   onChange={(event) => handleRGBColorChanges(event, "b")}
                   autoComplete='off'
-                  value={hexToRgb(tempColor).b ? hexToRgb(tempColor).b : 0}
+                  value={rgba.b}
                 ></input>
                 B
               </label>
             </div>
             {isAlpha && (
-              <div className='flex flex-col space-y-1 items-center justify-center w-12'>
+              <div className='flex flex-col space-y-1 items-center justify-center w-[3.25rem] pl-1'>
                 <label className='flex text-base text-black cursor-pointer flex-col items-center justify-center'>
                   <input
                     type='text'
-                    className='w-10 bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                    className='w-full bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
                     onChange={(event) => handleAlphaChanges(event)}
                     autoComplete='off'
-                    value={alpha}
+                    value={rgba.a}
                   ></input>
                   a
                 </label>

@@ -1157,7 +1157,7 @@ class BezierController {
   };
 
   private convertToSVGZ = (svgString: string) => {
-    const compressed = pako.gzip(svgString, { level: 9 }); // Max compression
+    const compressed = pako.gzip(svgString, { level: 9 });
     const blob = new Blob([compressed], { type: "application/gzip" });
 
     const url = URL.createObjectURL(blob);
