@@ -15,13 +15,23 @@ const inlineSymmetricControlsIcon =
 
 export default function PointControlsSection({
   bezierController,
+  largestDim,
 }: {
   bezierController: BezierController;
+  largestDim: "width" | "height";
 }) {
   return (
-    <div className='absolute bottom-0 right-full mr-2 flex flex-col items-center justify-center space-y-2 w-[10%] h-max max-w-16 min-w-8 pointer-events-none'>
+    <div
+      className={`${
+        largestDim === "width"
+          ? "bottom-0 right-full mr-2 flex-col space-y-2 w-[10%] h-max max-w-16 min-w-8"
+          : "top-full right-0 mt-2 space-x-2 h-[10%] w-max max-h-16 min-h-8"
+      } absolute flex items-center justify-center pointer-events-none`}
+    >
       <FgButton
-        className='flex h-full aspect-square pointer-events-auto items-center justify-center'
+        className={`${
+          largestDim === "width" ? "w-full" : "h-full"
+        } aspect-square pointer-events-auto flex items-center justify-center`}
         clickFunction={(event) => {
           event.stopPropagation();
           bezierController.deleteSelectedAndHovering();
@@ -46,7 +56,9 @@ export default function PointControlsSection({
         }}
       />
       <FgButton
-        className='h-full aspect-square pointer-events-auto'
+        className={`${
+          largestDim === "width" ? "w-full" : "h-full"
+        } aspect-square pointer-events-auto`}
         clickFunction={(event) => {
           event.stopPropagation();
           bezierController.swapControlType("inline");
@@ -71,7 +83,9 @@ export default function PointControlsSection({
         }}
       />
       <FgButton
-        className='h-full aspect-square pointer-events-auto'
+        className={`${
+          largestDim === "width" ? "w-full" : "h-full"
+        } aspect-square pointer-events-auto`}
         clickFunction={(event) => {
           event.stopPropagation();
           bezierController.swapControlType("inlineSymmetric");
@@ -99,7 +113,9 @@ export default function PointControlsSection({
         }}
       />
       <FgButton
-        className='h-full aspect-square pointer-events-auto'
+        className={`${
+          largestDim === "width" ? "w-full" : "h-full"
+        } aspect-square pointer-events-auto`}
         clickFunction={(event) => {
           event.stopPropagation();
           bezierController.swapControlType("free");

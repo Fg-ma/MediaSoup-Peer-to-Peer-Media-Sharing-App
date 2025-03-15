@@ -9,12 +9,16 @@ const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 
 export default function CloseButton({
   closeFunction,
+  largestDim,
 }: {
   closeFunction?: () => void;
+  largestDim: "width" | "height";
 }) {
   return (
     <FgButton
-      className='flex shadow z-20 mt-2 h-full aspect-square rounded-full bg-fg-tone-black-4 bg-opacity-80 items-center justify-center pointer-events-auto'
+      className={`${
+        largestDim === "width" ? "w-full" : "h-full"
+      } flex shadow z-20 aspect-square rounded-full bg-fg-tone-black-4 bg-opacity-80 items-center justify-center pointer-events-auto`}
       clickFunction={closeFunction}
       contentFunction={() => (
         <FgSVG

@@ -17,6 +17,7 @@ export default function SettingsButton({
   setActivePages,
   settings,
   setSettings,
+  largestDim,
 }: {
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,6 +25,7 @@ export default function SettingsButton({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  largestDim: "width" | "height";
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -95,7 +97,9 @@ export default function SettingsButton({
     <>
       <FgButton
         externalRef={settingsButtonRef}
-        className='flex items-center justify-center pointer-events-auto h-[85%] aspect-square z-20'
+        className={`${
+          largestDim === "width" ? "w-[85%]" : "h-[85%]"
+        } flex items-center justify-center pointer-events-auto aspect-square z-20`}
         clickFunction={(event) => {
           event.stopPropagation();
           toggleSettings();

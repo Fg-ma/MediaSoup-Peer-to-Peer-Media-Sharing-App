@@ -63,7 +63,6 @@ export default function Bezier({
   });
   const [inBezier, setInBezier] = useState(true);
   const [largestDim, setLargestDim] = useState<"width" | "height">("width");
-  const [controlsHeight, setControlsHeight] = useState(0);
   const [pathHovered, setPathHovered] = useState(true);
 
   const bezierBackgroundContainerRef = useRef<HTMLDivElement>(null);
@@ -95,7 +94,6 @@ export default function Bezier({
     svgRef,
     setInBezier,
     setLargestDim,
-    setControlsHeight,
     leaveTimer,
     movementTimeout,
     leavePathTimeout,
@@ -596,50 +594,85 @@ export default function Bezier({
               settingsActive ||
               bezierController.isOneSelected(points) ||
               bezierController.isOneInSelectionBox(points) ||
-              bezierController.isOneHovered(points)) &&
-              !bezierController.isOneDragging(points) && (
-                <motion.div
-                  variants={BezierVar}
-                  initial='init'
-                  animate='animate'
-                  exit='init'
-                  transition={BezierTransition}
+              bezierController.isOneHovered(points)) && (
+              <motion.div
+                variants={BezierVar}
+                initial='init'
+                animate='animate'
+                exit='init'
+                transition={BezierTransition}
+              >
+                <div
+                  className={`${
+                    largestDim === "width"
+                      ? "top-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
+                      : "bottom-full right-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4"
+                  } absolute flex items-center justify-center z-20 pointer-events-none`}
                 >
-                  <div
-                    className={`${
-                      largestDim === "width"
-                        ? "top-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
-                        : "bottom-full right-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4 flex-row-reverse"
-                    } absolute flex items-center justify-center z-20 pointer-events-none`}
-                  >
-                    <ConfirmButton bezierController={bezierController} />
-                    <CloseButton closeFunction={closeFunction} />
-                    <ResetButton bezierController={bezierController} />
-                  </div>
-                  {(bezierController.isOneSelectedExcludeEndPoints(points) ||
-                    bezierController.isOneHoveredExcludeEndPoints(points)) &&
-                    !bezierController.isOneDraggingExcludeEndPoints(points) && (
-                      <PointControlsSection
+                  {largestDim === "height" && (
+                    <>
+                      <ResetButton
                         bezierController={bezierController}
+                        largestDim={largestDim}
                       />
-                    )}
-                  <div className='absolute bottom-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex flex-col items-center justify-center z-20 pointer-events-none space-y-4'>
-                    <CopyButton
-                      bezierController={bezierController}
-                      copied={copied}
-                    />
-                    <DownloadButton bezierController={bezierController} />
-                    <SettingsButton
-                      settingsActive={settingsActive}
-                      setSettingsActive={setSettingsActive}
-                      activePages={activePages}
-                      setActivePages={setActivePages}
-                      settings={settings}
-                      setSettings={setSettings}
-                    />
-                  </div>
-                </motion.div>
-              )}
+                      <CloseButton
+                        closeFunction={closeFunction}
+                        largestDim={largestDim}
+                      />
+                    </>
+                  )}
+                  <ConfirmButton
+                    bezierController={bezierController}
+                    largestDim={largestDim}
+                  />
+                  {largestDim === "width" && (
+                    <>
+                      <CloseButton
+                        closeFunction={closeFunction}
+                        largestDim={largestDim}
+                      />
+                      <ResetButton
+                        bezierController={bezierController}
+                        largestDim={largestDim}
+                      />{" "}
+                    </>
+                  )}
+                </div>
+                {(bezierController.isOneSelectedExcludeEndPoints(points) ||
+                  bezierController.isOneHoveredExcludeEndPoints(points)) && (
+                  <PointControlsSection
+                    bezierController={bezierController}
+                    largestDim={largestDim}
+                  />
+                )}
+                <div
+                  className={`${
+                    largestDim === "width"
+                      ? "bottom-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
+                      : "bottom-full left-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4"
+                  } absolute flex items-center justify-center z-20 pointer-events-none`}
+                >
+                  <CopyButton
+                    bezierController={bezierController}
+                    copied={copied}
+                    largestDim={largestDim}
+                  />
+                  <DownloadButton
+                    bezierController={bezierController}
+                    largestDim={largestDim}
+                  />
+                  <SettingsButton
+                    settingsActive={settingsActive}
+                    setSettingsActive={setSettingsActive}
+                    activePages={activePages}
+                    setActivePages={setActivePages}
+                    settings={settings}
+                    setSettings={setSettings}
+                    largestDim={largestDim}
+                  />
+                </div>
+              </motion.div>
+            )}
           </div>
         </div>
       }

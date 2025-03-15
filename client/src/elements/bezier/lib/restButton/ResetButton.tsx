@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import FgButton from "../../../fgButton/FgButton";
 import FgHoverContentStandard from "../../../fgHoverContentStandard/FgHoverContentStandard";
 import FgSVG from "../../../fgSVG/FgSVG";
@@ -10,15 +10,16 @@ const resetIcon = nginxAssetServerBaseUrl + "svgs/resetIcon.svg";
 
 export default function ResetButton({
   bezierController,
+  largestDim,
 }: {
   bezierController: BezierController;
+  largestDim: "width" | "height";
 }) {
-  const copiedButtonRef = useRef<HTMLButtonElement>(null);
-
   return (
     <FgButton
-      externalRef={copiedButtonRef}
-      className='flex h-full aspect-square pointer-events-auto items-center justify-center'
+      className={`${
+        largestDim === "width" ? "w-full" : "h-full"
+      } flex aspect-square pointer-events-auto items-center justify-center`}
       clickFunction={(event) => {
         event.stopPropagation();
         bezierController.handleReset();

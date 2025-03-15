@@ -20,7 +20,6 @@ class BezierController {
     private setLargestDim: React.Dispatch<
       React.SetStateAction<"height" | "width">
     >,
-    private setControlsHeight: React.Dispatch<React.SetStateAction<number>>,
     private leaveTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private movementTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private leavePathTimeout: React.MutableRefObject<
@@ -639,16 +638,6 @@ class BezierController {
     } else {
       this.setLargestDim("width");
     }
-
-    this.setControlsHeight(
-      Math.max(
-        32,
-        Math.min(
-          64,
-          this.bezierBackgroundContainerRef.current.clientHeight * 0.16
-        )
-      )
-    );
   };
 
   handleReset = () => {
