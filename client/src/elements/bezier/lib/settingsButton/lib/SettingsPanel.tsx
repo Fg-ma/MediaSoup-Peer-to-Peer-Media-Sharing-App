@@ -204,8 +204,8 @@ export default function SettingsPanel({
                 externalColorPickerPanelRef={colorPickerRefs.backgroundColor}
                 className='h-6 aspect-square'
                 defaultColor={settings.backgroundColor.value}
-                handleAcceptColorCallback={(color) =>
-                  handleAcceptColor("backgroundColor", color)
+                handleAcceptColorCallback={(_hex, hexa) =>
+                  handleAcceptColor("backgroundColor", hexa)
                 }
                 isAlpha={true}
               />
@@ -216,10 +216,10 @@ export default function SettingsPanel({
                 externalColorPickerPanelRef={colorPickerRefs.color}
                 className='h-6 aspect-square'
                 defaultColor={settings.color.value}
-                handleAcceptColorCallback={(color) =>
-                  handleAcceptColor("color", color)
+                handleAcceptColorCallback={(_hex, hexa) =>
+                  handleAcceptColor("color", hexa)
                 }
-                isAlpha={false}
+                isAlpha={true}
               />
             </div>
             <FgButton

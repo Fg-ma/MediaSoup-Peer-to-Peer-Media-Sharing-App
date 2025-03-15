@@ -125,7 +125,7 @@ export default function SettingsButton({
         options={{
           hoverTimeoutDuration: 1750,
           hoverType: "above",
-          hoverZValue: 500000000,
+          hoverZValue: 500000000002,
         }}
       />
       {settingsActive && (

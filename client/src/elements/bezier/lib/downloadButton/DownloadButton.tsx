@@ -32,12 +32,14 @@ export default function DownloadButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Download' style='light' />}
+      hoverContent={
+        <FgHoverContentStandard content='Download (d)' style='light' />
+      }
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000,
+        hoverZValue: 500000000002,
       }}
     />
   );

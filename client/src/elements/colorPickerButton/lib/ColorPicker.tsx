@@ -3,6 +3,13 @@ import { HexColorPicker } from "react-colorful";
 import FgPanel from "../../fgPanel/FgPanel";
 import FgSlider from "../../fgSlider/FgSlider";
 import FgButton from "../../fgButton/FgButton";
+import FgSVG from "../../fgSVG/FgSVG";
+import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
+const checkIcon = nginxAssetServerBaseUrl + "svgs/checkIcon.svg";
 
 export default function ColorPicker({
   color,
@@ -23,7 +30,12 @@ export default function ColorPicker({
   setIsColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
   colorRef: React.MutableRefObject<string>;
   colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
-  handleAcceptColorCallback?: () => void;
+  handleAcceptColorCallback?: (
+    hex: string,
+    hexa: string,
+    a: number,
+    rgba: { r: number; g: number; a: number }
+  ) => void;
   externalColorPickerPanelRef?: React.RefObject<HTMLDivElement>;
   isAlpha?: boolean;
 }) {
@@ -97,7 +109,21 @@ export default function ColorPicker({
     colorRef.current = tempColor;
     setIsColorPicker(false);
     if (handleAcceptColorCallback) {
-      handleAcceptColorCallback();
+      handleAcceptColorCallback(
+        colorRef.current.length === 9
+          ? colorRef.current.slice(0, -2)
+          : colorRef.current,
+        colorRef.current.length === 9
+          ? colorRef.current
+          : colorRef.current +
+              Math.round(Math.max(0, Math.min(1, alpha)) * 255)
+                .toString(16)
+                .padStart(2, "0"),
+        alpha,
+        colorRef.current.length === 9
+          ? hexToRgba(colorRef.current)
+          : { ...hexToRgb(colorRef.current), a: alpha }
+      );
     }
   };
 
@@ -390,34 +416,54 @@ export default function ColorPicker({
           </div>
           <div className='flex space-x-2 w-full items-center justify-center'>
             <FgButton
-              className='px-4 w-max h-max bg-fg-red rounded'
+              className='flex h-10 w-10 bg-fg-red rounded-full items-center justify-center'
               clickFunction={handleAcceptColor}
               contentFunction={() => (
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  height='32px'
-                  viewBox='0 -960 960 960'
-                  width='32px'
-                  fill='white'
-                >
-                  <path d='m382-354 339-339q12-12 28-12t28 12q12 12 12 28.5T777-636L410-268q-12 12-28 12t-28-12L182-440q-12-12-11.5-28.5T183-497q12-12 28.5-12t28.5 12l142 143Z' />
-                </svg>
+                <FgSVG
+                  src={checkIcon}
+                  className='w-[75%] h-[75%]'
+                  attributes={[
+                    { key: "width", value: "100%" },
+                    { key: "height", value: "100%" },
+                    { key: "fill", value: "#f2f2f2" },
+                    { key: "stroke", value: "#f2f2f2" },
+                  ]}
+                />
               )}
+              hoverContent={
+                <FgHoverContentStandard content='Confirm color' style='light' />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 1250,
+                hoverType: "above",
+                hoverZValue: 500000000000,
+              }}
             />
             <FgButton
-              className='px-4 w-max h-max bg-fg-tone-black-4 rounded'
+              className='flex h-10 w-10 bg-fg-tone-black-4 rounded-full items-center justify-center'
               clickFunction={handleCancelColor}
               contentFunction={() => (
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  height='32px'
-                  viewBox='0 -960 960 960'
-                  width='32px'
-                  fill='white'
-                >
-                  <path d='M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z' />
-                </svg>
+                <FgSVG
+                  src={closeIcon}
+                  className='w-[55%] h-[55%]'
+                  attributes={[
+                    { key: "width", value: "100%" },
+                    { key: "height", value: "100%" },
+                    { key: "fill", value: "#f2f2f2" },
+                    { key: "stroke", value: "#f2f2f2" },
+                  ]}
+                />
               )}
+              hoverContent={
+                <FgHoverContentStandard content='Cancel' style='light' />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 1250,
+                hoverType: "above",
+                hoverZValue: 500000000000,
+              }}
             />
           </div>
         </div>

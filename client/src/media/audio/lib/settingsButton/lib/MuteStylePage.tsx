@@ -16,10 +16,12 @@ export default function MuteStylePage({
   setActivePages,
   settings,
   setSettings,
+  setIsBezierCurveEditor,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +76,15 @@ export default function MuteStylePage({
         className='w-full overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
       >
         <div className='flex w-full flex-col space-y-1 h-max'>
+          <FgButton
+            className='flex w-full text-nowrap bg-opacity-75 rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1'
+            contentFunction={() => (
+              <div className='flex justify-start w-full bg-opacity-75 px-2 items-center text-lg'>
+                Make your own
+              </div>
+            )}
+            clickFunction={() => setIsBezierCurveEditor((prev) => !prev)}
+          />
           {Object.entries(muteStylesMeta).map(([key, meta]) => (
             <FgButton
               key={key}

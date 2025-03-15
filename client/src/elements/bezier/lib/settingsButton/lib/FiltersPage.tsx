@@ -182,13 +182,10 @@ export default function FiltersPage({
                       externalColorPickerPanelRef={
                         colorPickerRefs[option.key as BezierColorTypes]
                       }
-                      handleAcceptColorCallback={(color) =>
-                        handleAcceptColor(
-                          key as FiltersTypes,
-                          option.key,
-                          color
-                        )
+                      handleAcceptColorCallback={(_hex, hexa) =>
+                        handleAcceptColor(key as FiltersTypes, option.key, hexa)
                       }
+                      isAlpha={true}
                     />
                   </div>
                 )

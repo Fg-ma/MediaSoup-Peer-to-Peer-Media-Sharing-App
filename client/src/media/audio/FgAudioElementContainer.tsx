@@ -12,7 +12,6 @@ import ScaleButton from "../../elements/fgAdjustmentElements/ScaleButton";
 import FgAudioElementContainerController from "./lib/FgAudioElementContainerController";
 import { TableColors } from "../../serverControllers/tableServer/lib/typeConstant";
 import ReactButton from "../../elements/reactButton/ReactButton";
-import "./lib/audioElement.css";
 import {
   ActivePages,
   defaultActiveSettingsPages,
@@ -21,6 +20,8 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import SettingsButton from "./lib/settingsButton/SettingsButton";
+import Bezier from "../../elements/bezier/Bezier";
+import "./lib/audioElement.css";
 
 const FgPortal = React.lazy(() => import("../../elements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
@@ -112,6 +113,8 @@ export default function FgAudioElementContainer({
   const [activePages, setActivePages] = useState<ActivePages>(
     defaultActiveSettingsPages
   );
+
+  const [isBezierCurveEditor, setIsBezierCurveEditor] = useState(false);
 
   const audioEffectsSectionRef = useRef<HTMLDivElement>(null);
 
@@ -515,6 +518,7 @@ export default function FgAudioElementContainer({
                   settings={settings}
                   setSettings={setSettings}
                   scrollingContainerRef={audioEffectsSectionRef}
+                  setIsBezierCurveEditor={setIsBezierCurveEditor}
                 />,
                 <ReactButton
                   className='border-fg-off-white min-w-12 w-full hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
@@ -531,6 +535,7 @@ export default function FgAudioElementContainer({
             />
           </Suspense>
         )}
+      {isBezierCurveEditor && <Bezier />}
     </div>
   );
 }

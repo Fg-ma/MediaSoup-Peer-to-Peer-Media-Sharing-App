@@ -15,9 +15,9 @@ import ConfirmButton from "./lib/confirmButton/ConfirmButton";
 import SettingsButton from "./lib/settingsButton/SettingsButton";
 import CopyButton from "./lib/copyButton /CopyButton";
 import DownloadButton from "./lib/downloadButton/DownloadButton";
-import Gradient from "./lib/Gradient";
-import "./lib/bezier.css";
 import ResetButton from "./lib/restButton/ResetButton";
+import CloseButton from "./lib/closeButton/CloseButton";
+import "./lib/bezier.css";
 
 const fadeIn = {
   initial: { opacity: 0 },
@@ -40,10 +40,14 @@ const BezierTransition: Transition = {
 
 export default function Bezier({
   confirmBezierCurveFunction,
+  closeFunction,
 }: {
   confirmBezierCurveFunction?: (d: string, filters?: string) => void;
+  closeFunction?: () => void;
 }) {
-  const [points, setPoints] = useState<BezierPoint[]>(defaultPoints);
+  const [points, setPoints] = useState<BezierPoint[]>(
+    structuredClone(defaultPoints)
+  );
   const [selectionBox, setSelectionBox] = useState<{
     x: number;
     y: number;
@@ -99,6 +103,7 @@ export default function Bezier({
     controlPressed,
     settings,
     setSettings,
+    setSettingsActive,
     copiedTimeout,
     setCopied,
     confirmBezierCurveFunction,
@@ -107,12 +112,18 @@ export default function Bezier({
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", bezierController.handleKeyDown);
+    document.addEventListener("keydown", bezierController.handleKeyDown, true);
     document.addEventListener("keyup", bezierController.handleKeyUp);
+    document.addEventListener("wheel", bezierController.handleWheel);
 
     return () => {
-      document.removeEventListener("keydown", bezierController.handleKeyDown);
+      document.removeEventListener(
+        "keydown",
+        bezierController.handleKeyDown,
+        true
+      );
       document.removeEventListener("keyup", bezierController.handleKeyUp);
+      document.removeEventListener("wheel", bezierController.handleWheel);
     };
   }, []);
 
@@ -148,7 +159,7 @@ export default function Bezier({
       type='staticTopDomain'
       top={0}
       left={0}
-      zValue={499999998}
+      zValue={500000000001}
       className='w-screen h-screen'
       content={
         <div
@@ -161,16 +172,17 @@ export default function Bezier({
               !inBezier &&
               !settingsActive &&
               !bezierController.isOneSelected(points) &&
+              !bezierController.isOneHovered(points) &&
               !bezierController.isOneInSelectionBox(points)
                 ? "cursor-none"
                 : ""
-            } aspect-square h rounded overflow-hidden relative border-2`}
+            } aspect-square relative border-2 rounded`}
             onPointerEnter={bezierController.handlePointerEnterBezier}
             onPointerLeave={bezierController.handlePointerLeaveBezier}
             style={{
               backgroundImage: `
-                linear-gradient(45deg, #696969 25%, transparent 25%, transparent 75%, #696969 75%, #696969),
-                linear-gradient(45deg, #696969 25%, #212121 25%, #212121 75%, #696969 75%, #696969)
+                linear-gradient(45deg, #3e3e3e 25%, transparent 25%, transparent 75%, #3e3e3e 75%, #3e3e3e),
+                linear-gradient(45deg, #3e3e3e 25%, #1a1a1a 25%, #1a1a1a 75%, #3e3e3e 75%,#3e3e3e)
               `,
               backgroundSize: "48px 48px",
               backgroundPosition: "0 0, 24px 24px",
@@ -179,7 +191,7 @@ export default function Bezier({
             <svg
               ref={svgRef}
               viewBox='0 0 100 100'
-              className='w-full h-full pointer-events-auto'
+              className='w-full h-full pointer-events-auto rounded overflow-hidden'
               onDoubleClick={bezierController.handleDoubleClick}
               onPointerDown={bezierController.handleSVGPointerDown}
               onPointerUp={bezierController.handleSVGPointerUp}
@@ -392,7 +404,7 @@ export default function Bezier({
                     }
                     leavePathTimeout.current = setTimeout(() => {
                       setPathHovered(false);
-                    }, 3500);
+                    }, 2500);
                   }}
                 />
               </g>
@@ -409,8 +421,8 @@ export default function Bezier({
                   )}
                   width={Math.abs(selectionBox.width)}
                   height={Math.abs(selectionBox.height)}
-                  fill='rgba(0, 0, 255, 0.2)'
-                  stroke='blue'
+                  fill='rgba(29, 105, 202, 0.2)'
+                  stroke='#1d69ca '
                   rx={0.5}
                   ry={0.5}
                   strokeWidth='0.5'
@@ -432,8 +444,8 @@ export default function Bezier({
                             y1={point.y}
                             x2={basePoint.x}
                             y2={basePoint.y}
-                            stroke='#b20203'
-                            strokeOpacity='0.5'
+                            stroke='#f78528'
+                            strokeOpacity='0.8'
                             strokeDasharray={2}
                             strokeWidth={0.5}
                             {...fadeIn}
@@ -448,7 +460,7 @@ export default function Bezier({
                       {(point.controlType === "inline" ||
                         point.type === "endPoint") && (
                         <motion.circle
-                          className={`${
+                          className={`cursor-pointer ${
                             point.type === "endPoint"
                               ? "svg-editor-end-point"
                               : "svg-editor-split-point"
@@ -464,12 +476,12 @@ export default function Bezier({
                             point.hovering
                               ? "#d40213"
                               : point.inSelectionBox
-                              ? "orange"
-                              : "blue"
+                              ? "#f78528"
+                              : "#1d69ca"
                           }
                           onDoubleClick={(event) => {
+                            event.stopPropagation();
                             if (point.type !== "endPoint") {
-                              event.stopPropagation();
                               bezierController.cycleControlType(index);
                             }
                           }}
@@ -487,7 +499,7 @@ export default function Bezier({
                       {point.type !== "endPoint" &&
                         point.controlType === "inlineSymmetric" && (
                           <motion.rect
-                            className={`svg-editor-split-point-retangle ${
+                            className={`cursor-pointer svg-editor-split-point-retangle ${
                               point.dragging ? "dragging" : ""
                             } ${point.selected ? "selected" : ""} ${
                               point.hovering ? "hovering-square" : ""
@@ -500,8 +512,8 @@ export default function Bezier({
                               point.selected || point.hovering
                                 ? "#d40213"
                                 : point.inSelectionBox
-                                ? "orange"
-                                : "blue"
+                                ? "#f78528"
+                                : "#1d69ca"
                             }
                             onDoubleClick={(event) => {
                               event.stopPropagation();
@@ -521,7 +533,7 @@ export default function Bezier({
                       {point.type !== "endPoint" &&
                         point.controlType === "free" && (
                           <motion.rect
-                            className={`svg-editor-split-point-square ${
+                            className={`cursor-pointer svg-editor-split-point-square ${
                               point.dragging ? "dragging" : ""
                             } ${point.selected ? "selected" : ""} ${
                               point.hovering ? "hovering-square" : ""
@@ -534,8 +546,8 @@ export default function Bezier({
                               point.selected || point.hovering
                                 ? "#d40213"
                                 : point.inSelectionBox
-                                ? "orange"
-                                : "blue"
+                                ? "#f78528"
+                                : "#1d69ca"
                             }
                             onDoubleClick={(event) => {
                               event.stopPropagation();
@@ -556,11 +568,11 @@ export default function Bezier({
                         Object.entries(point.controls).map(
                           ([controlType, basePoint]) => (
                             <motion.circle
-                              key={`control-${index}-${controlType}`}
+                              key={`cursor-pointer control-${index}-${controlType}`}
                               cx={basePoint.x}
                               cy={basePoint.y}
                               r='0.75'
-                              fill='green'
+                              fill='#1a8ca2'
                               className={`svg-editor-control-point ${
                                 basePoint.dragging ? "dragging" : ""
                               }`}
@@ -583,68 +595,51 @@ export default function Bezier({
             {(inBezier ||
               settingsActive ||
               bezierController.isOneSelected(points) ||
-              bezierController.isOneInSelectionBox(points)) && (
-              <motion.div
-                className='absolute top-0 left-0 w-full h-full z-10 pointer-events-none'
-                variants={BezierVar}
-                initial='init'
-                animate='animate'
-                exit='init'
-                transition={BezierTransition}
-              >
-                <Gradient />
-                {(bezierController.isOneSelected(points) ||
-                  bezierController.isOneHovered(points) ||
-                  bezierController.isOneInSelectionBox(points)) &&
-                  !bezierController.isOneDragging(points) && (
-                    <motion.div
-                      className='absolute top-0 w-full h-[16%] max-h-16 min-h-10 flex items-center justify-end z-20 px-4 pointer-events-none'
-                      variants={BezierVar}
-                      initial='init'
-                      animate='animate'
-                      exit='init'
-                      transition={BezierTransition}
-                    >
+              bezierController.isOneInSelectionBox(points) ||
+              bezierController.isOneHovered(points)) &&
+              !bezierController.isOneDragging(points) && (
+                <motion.div
+                  variants={BezierVar}
+                  initial='init'
+                  animate='animate'
+                  exit='init'
+                  transition={BezierTransition}
+                >
+                  <div
+                    className={`${
+                      largestDim === "width"
+                        ? "top-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
+                        : "bottom-full right-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4 flex-row-reverse"
+                    } absolute flex items-center justify-center z-20 pointer-events-none`}
+                  >
+                    <ConfirmButton bezierController={bezierController} />
+                    <CloseButton closeFunction={closeFunction} />
+                    <ResetButton bezierController={bezierController} />
+                  </div>
+                  {(bezierController.isOneSelectedExcludeEndPoints(points) ||
+                    bezierController.isOneHoveredExcludeEndPoints(points)) &&
+                    !bezierController.isOneDraggingExcludeEndPoints(points) && (
                       <PointControlsSection
                         bezierController={bezierController}
                       />
-                    </motion.div>
-                  )}
-                {!bezierController.isOneDragging(points) && (
-                  <div className='absolute bottom-[2%] w-full h-[12%] max-h-16 min-h-8 flex items-center justify-center z-20 pointer-events-none space-x-4'>
-                    <div
-                      className='flex h-[80%] items-center justify-end space-x-1'
-                      style={{
-                        width: `calc(50% - ${controlsHeight / 2 - 32}px)`,
-                      }}
-                    >
-                      <CopyButton
-                        bezierController={bezierController}
-                        copied={copied}
-                      />
-                      <DownloadButton bezierController={bezierController} />
-                    </div>
-                    <ConfirmButton bezierController={bezierController} />
-                    <div
-                      className='flex h-[80%] items-center justify-start space-x-3'
-                      style={{
-                        width: `calc(50% - ${controlsHeight / 2 - 32}px)`,
-                      }}
-                    >
-                      <SettingsButton
-                        settingsActive={settingsActive}
-                        setSettingsActive={setSettingsActive}
-                        activePages={activePages}
-                        setActivePages={setActivePages}
-                        settings={settings}
-                        setSettings={setSettings}
-                      />
-                      <ResetButton bezierController={bezierController} />
-                    </div>
+                    )}
+                  <div className='absolute bottom-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex flex-col items-center justify-center z-20 pointer-events-none space-y-4'>
+                    <CopyButton
+                      bezierController={bezierController}
+                      copied={copied}
+                    />
+                    <DownloadButton bezierController={bezierController} />
+                    <SettingsButton
+                      settingsActive={settingsActive}
+                      setSettingsActive={setSettingsActive}
+                      activePages={activePages}
+                      setActivePages={setActivePages}
+                      settings={settings}
+                      setSettings={setSettings}
+                    />
                   </div>
-                )}
-              </motion.div>
-            )}
+                </motion.div>
+              )}
           </div>
         </div>
       }

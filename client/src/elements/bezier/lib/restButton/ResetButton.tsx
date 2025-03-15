@@ -40,7 +40,7 @@ export default function ResetButton({
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000,
+        hoverZValue: 500000000002,
       }}
     />
   );

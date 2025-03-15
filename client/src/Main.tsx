@@ -28,7 +28,6 @@ import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
 import CreditPage from "./creditPage/CreditPage";
 import "./scrollbar.css";
 import "./fontStyles.css";
-import Bezier from "./elements/bezier/Bezier";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -374,7 +373,6 @@ export default function Main() {
         cleanupController={cleanupController}
         setRerender={setRerender}
       />
-      <Bezier />
     </div>
   );
 }

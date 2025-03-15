@@ -41,14 +41,17 @@ export default function CopyButton({
         )}
         hoverContent={
           !copied ? (
-            <FgHoverContentStandard content='Copy to clipboard' style='light' />
+            <FgHoverContentStandard
+              content='Copy to clipboard (c)'
+              style='light'
+            />
           ) : undefined
         }
         options={{
           hoverSpacing: 4,
           hoverTimeoutDuration: 1750,
           hoverType: "above",
-          hoverZValue: 500000000,
+          hoverZValue: 500000000002,
         }}
       />
       {copied && (
@@ -57,7 +60,7 @@ export default function CopyButton({
           spacing={4}
           content={<FgHoverContentStandard content='Copied' style='light' />}
           externalRef={copiedButtonRef}
-          zValue={500000000}
+          zValue={500000000002}
         />
       )}
     </>

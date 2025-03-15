@@ -214,7 +214,7 @@ export const defaultSettings: Settings = Object.freeze({
       neonColor: Object.freeze({ value: "#d40213" }),
     }),
   }),
-  backgroundColor: Object.freeze({ value: "transparent" }),
+  backgroundColor: Object.freeze({ value: "#f2f2f200" }),
   color: Object.freeze({
     value: "#f2f2f2",
   }),

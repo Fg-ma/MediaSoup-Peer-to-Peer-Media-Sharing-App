@@ -32,12 +32,12 @@ export default function ConfirmButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Download' style='light' />}
+      hoverContent={<FgHoverContentStandard content='Confirm' style='light' />}
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000,
+        hoverZValue: 500000000002,
       }}
     />
   );

@@ -17,7 +17,12 @@ export default function ColorPickerButton({
   className?: string;
   defaultColor?: string;
   scrollingContainerRef?: React.RefObject<HTMLDivElement>;
-  handleAcceptColorCallback?: (color: string) => void;
+  handleAcceptColorCallback?: (
+    hex: string,
+    hexa: string,
+    a: number,
+    rgba: { r: number; g: number; a: number }
+  ) => void;
   externalColorRef?: React.MutableRefObject<string>;
   externalColorPickerPanelRef?: React.RefObject<HTMLDivElement>;
   disabled?: boolean;
@@ -76,9 +81,9 @@ export default function ColorPickerButton({
             setIsColorPicker={setIsColorPicker}
             colorRef={colorRef}
             colorPickerBtnRef={colorPickerBtnRef}
-            handleAcceptColorCallback={() => {
+            handleAcceptColorCallback={(hex, hexa, a, rgba) => {
               if (handleAcceptColorCallback)
-                handleAcceptColorCallback(colorRef.current);
+                handleAcceptColorCallback(hex, hexa, a, rgba);
             }}
             externalColorPickerPanelRef={externalColorPickerPanelRef}
             isAlpha={isAlpha}

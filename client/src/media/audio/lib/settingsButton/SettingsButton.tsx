@@ -17,6 +17,7 @@ export default function SettingsButton({
   settings,
   setSettings,
   scrollingContainerRef,
+  setIsBezierCurveEditor,
 }: {
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,6 +26,7 @@ export default function SettingsButton({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -139,6 +141,7 @@ export default function SettingsButton({
             primaryMuteColor: primaryMuteColorPickerRef,
             secondaryMuteColor: secondaryMuteColorPickerRef,
           }}
+          setIsBezierCurveEditor={setIsBezierCurveEditor}
         />
       )}
     </>

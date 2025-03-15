@@ -19,7 +19,7 @@ export default function PointControlsSection({
   bezierController: BezierController;
 }) {
   return (
-    <div className='flex items-center justify-center space-x-2 h-full w-max pointer-events-none'>
+    <div className='absolute bottom-0 right-full mr-2 flex flex-col items-center justify-center space-y-2 w-[10%] h-max max-w-16 min-w-8 pointer-events-none'>
       <FgButton
         className='flex h-full aspect-square pointer-events-auto items-center justify-center'
         clickFunction={(event) => {
@@ -36,22 +36,24 @@ export default function PointControlsSection({
             ]}
           />
         )}
-        hoverContent={<FgHoverContentStandard content='Delete' style='light' />}
+        hoverContent={
+          <FgHoverContentStandard content='Delete (x)' style='light' />
+        }
         options={{
           hoverTimeoutDuration: 1750,
           hoverType: "below",
-          hoverZValue: 500000000,
+          hoverZValue: 500000000002,
         }}
       />
       <FgButton
         className='h-full aspect-square pointer-events-auto'
         clickFunction={(event) => {
           event.stopPropagation();
-          bezierController.swapControlType("free");
+          bezierController.swapControlType("inline");
         }}
         contentFunction={() => (
           <FgSVG
-            src={freeControlsIcon}
+            src={inlineControlsIcon}
             className='h-full w-full stroke-fg-white'
             attributes={[
               { key: "width", value: "100%" },
@@ -59,11 +61,13 @@ export default function PointControlsSection({
             ]}
           />
         )}
-        hoverContent={<FgHoverContentStandard content='Free' style='light' />}
+        hoverContent={
+          <FgHoverContentStandard content='Inline (3)' style='light' />
+        }
         options={{
           hoverTimeoutDuration: 1750,
           hoverType: "below",
-          hoverZValue: 500000000,
+          hoverZValue: 500000000002,
         }}
       />
       <FgButton
@@ -83,23 +87,26 @@ export default function PointControlsSection({
           />
         )}
         hoverContent={
-          <FgHoverContentStandard content='Symmetric inline' style='light' />
+          <FgHoverContentStandard
+            content='Symmetric inline (2)'
+            style='light'
+          />
         }
         options={{
           hoverTimeoutDuration: 1750,
           hoverType: "below",
-          hoverZValue: 500000000,
+          hoverZValue: 500000000002,
         }}
       />
       <FgButton
         className='h-full aspect-square pointer-events-auto'
         clickFunction={(event) => {
           event.stopPropagation();
-          bezierController.swapControlType("inline");
+          bezierController.swapControlType("free");
         }}
         contentFunction={() => (
           <FgSVG
-            src={inlineControlsIcon}
+            src={freeControlsIcon}
             className='h-full w-full stroke-fg-white'
             attributes={[
               { key: "width", value: "100%" },
@@ -107,11 +114,13 @@ export default function PointControlsSection({
             ]}
           />
         )}
-        hoverContent={<FgHoverContentStandard content='Inline' style='light' />}
+        hoverContent={
+          <FgHoverContentStandard content='Free (1)' style='light' />
+        }
         options={{
           hoverTimeoutDuration: 1750,
           hoverType: "below",
-          hoverZValue: 500000000,
+          hoverZValue: 500000000002,
         }}
       />
     </div>

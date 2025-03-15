@@ -30,6 +30,7 @@ class BezierController {
     private controlPressed: React.MutableRefObject<boolean>,
     private settings: Settings,
     private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private copiedTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setCopied: React.Dispatch<React.SetStateAction<boolean>>,
     private confirmBezierCurveFunction:
@@ -54,6 +55,10 @@ class BezierController {
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    event.cancelBubble = true;
+
     if (this.shiftPressed.current || this.controlPressed.current) return;
 
     switch (event.key.toLowerCase()) {
@@ -75,7 +80,7 @@ class BezierController {
       case "r":
         this.simulateHandlePointer("controlTwo");
         break;
-      case "c":
+      case "u":
         this.cycleControlType();
         break;
       case "x":
@@ -89,6 +94,15 @@ class BezierController {
         break;
       case "control":
         this.controlPressed.current = true;
+        break;
+      case "d":
+        this.downloadBezierCurve();
+        break;
+      case "c":
+        this.copyToClipBoardBezierCurve();
+        break;
+      case "s":
+        this.setSettingsActive((prev) => !prev);
         break;
       default:
         break;
@@ -172,7 +186,7 @@ class BezierController {
       this.setInBezier(false);
       clearTimeout(this.leaveTimer.current);
       this.leaveTimer.current = undefined;
-    }, 1250);
+    }, 2500);
   };
 
   handleSVGPointerDown = (event: React.PointerEvent) => {
@@ -470,6 +484,29 @@ class BezierController {
           };
         }
       }
+
+      return newPoints;
+    });
+  };
+
+  handleWheel = (event: WheelEvent) => {
+    this.setPoints((prev) => {
+      const newPoints = [...prev];
+      const direction = event.deltaY < 0 ? 1 : -1;
+
+      const selectedIndices = newPoints
+        .map((point, index) => (point.selected ? index : -1))
+        .filter((index) => index !== -1);
+
+      selectedIndices.forEach((index) => {
+        newPoints[index] = { ...newPoints[index], selected: false };
+      });
+
+      selectedIndices.forEach((index) => {
+        let nextIndex =
+          (index + direction + newPoints.length) % newPoints.length;
+        newPoints[nextIndex] = { ...newPoints[nextIndex], selected: true };
+      });
 
       return newPoints;
     });
@@ -829,20 +866,35 @@ class BezierController {
   };
 
   isOneSelected = (points: BezierPoint[]): boolean => {
-    return points.slice(1, points.length - 1).some((point) => point.selected);
+    return points.some((point) => point.selected);
   };
 
   isOneInSelectionBox = (points: BezierPoint[]): boolean => {
-    return points
-      .slice(1, points.length - 1)
-      .some((point) => point.inSelectionBox);
+    return points.some((point) => point.inSelectionBox);
   };
 
   isOneHovered = (points: BezierPoint[]): boolean => {
-    return points.slice(1, points.length - 1).some((point) => point.hovering);
+    return points.some((point) => point.hovering);
   };
 
   isOneDragging = (points: BezierPoint[]): boolean => {
+    return points.some(
+      (point) =>
+        point.dragging ||
+        point.controls.controlOne.dragging ||
+        point.controls.controlTwo?.dragging
+    );
+  };
+
+  isOneSelectedExcludeEndPoints = (points: BezierPoint[]): boolean => {
+    return points.slice(1, points.length - 1).some((point) => point.selected);
+  };
+
+  isOneHoveredExcludeEndPoints = (points: BezierPoint[]): boolean => {
+    return points.slice(1, points.length - 1).some((point) => point.hovering);
+  };
+
+  isOneDraggingExcludeEndPoints = (points: BezierPoint[]): boolean => {
     return points
       .slice(1, points.length - 1)
       .some(

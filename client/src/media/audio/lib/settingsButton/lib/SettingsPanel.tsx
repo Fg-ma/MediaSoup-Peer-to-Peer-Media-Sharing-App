@@ -64,6 +64,7 @@ export default function SettingsPanel({
   settings,
   setSettings,
   colorPickerRefs,
+  setIsBezierCurveEditor,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -74,6 +75,7 @@ export default function SettingsPanel({
   colorPickerRefs: {
     [colorSettingsType in ColorSettingsTypes]: React.RefObject<HTMLDivElement>;
   };
+  setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -328,6 +330,7 @@ export default function SettingsPanel({
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}
+                setIsBezierCurveEditor={setIsBezierCurveEditor}
               />
             </motion.div>
           )}
