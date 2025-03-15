@@ -11,7 +11,6 @@ class FgAudioElementController {
     private envelopeY: React.MutableRefObject<number[]>,
     private setMovingY: React.Dispatch<React.SetStateAction<number[]>>,
     private svgRef: React.RefObject<SVGSVGElement>,
-    private pathRef: React.RefObject<SVGPathElement>,
     private audioRef: React.RefObject<HTMLAudioElement>,
     private pathGenerator: React.MutableRefObject<PathGenerator | undefined>,
     private timerRef: React.MutableRefObject<NodeJS.Timeout | null>,
@@ -33,7 +32,8 @@ class FgAudioElementController {
       producerType: "audio" | "screenAudio",
       producerId: string | undefined
     ) => void,
-    private settings: Settings
+    private settings: Settings,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   init = () => {
@@ -203,10 +203,12 @@ class FgAudioElementController {
   };
 
   isOnPath = (event: React.PointerEvent) => {
-    const pathElement = this.pathRef.current;
     const svgElement = this.svgRef.current;
 
-    if (!pathElement || !svgElement || this.clientMute.current) return false;
+    if (!svgElement || this.clientMute.current) return false;
+
+    // Get all path elements in the SVG
+    const pathElements = svgElement.querySelectorAll("path");
 
     // Create an SVG point in client coordinates
     const svgPoint = svgElement.createSVGPoint();
@@ -218,8 +220,15 @@ class FgAudioElementController {
       svgElement.getScreenCTM()?.inverse()
     );
 
-    // Check if the point is on the stroke of the path
-    return pathElement.isPointInStroke(svgPointTransformed);
+    // Loop through each path and check if the point is inside the stroke
+    for (const pathElement of pathElements) {
+      if (pathElement.isPointInStroke(svgPointTransformed)) {
+        return true; // Return true if the point is on any of the paths
+      }
+    }
+
+    // Return false if no path contains the point
+    return false;
   };
 
   onClick = (event: React.MouseEvent) => {
@@ -227,6 +236,8 @@ class FgAudioElementController {
 
     if (validClick) {
       this.handleMute("audio", undefined);
+
+      this.setRerender((prev) => !prev);
     }
   };
 
@@ -256,7 +267,6 @@ class FgAudioElementController {
     }
   };
 
-  // Function to update the moving points' Y values
   updateMovingY = (volumeLevel: number) => {
     let movingYArray;
     if (

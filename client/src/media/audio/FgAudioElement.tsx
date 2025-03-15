@@ -5,9 +5,11 @@ import PathGenerator from "./lib/PathGenerator";
 import FgButton from "../../elements/fgButton/FgButton";
 import FgAudioElementController from "./lib/FgAudioElementController";
 import {
+  ExtenalSVGsType,
   FgAudioElementContainerOptionsType,
   Settings,
 } from "./lib/typeConstant";
+import FgSVG from "../../elements/fgSVG/FgSVG";
 
 export default function FgAudioElement({
   svgRef,
@@ -22,8 +24,9 @@ export default function FgAudioElement({
   doubleClickFunction,
   fgAudioElementContainerOptions,
   settings,
+  externalSVGs,
 }: {
-  svgRef: React.RefObject<SVGSVGElement>;
+  svgRef: React.MutableRefObject<SVGSVGElement | null>;
   audioStream?: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   username: string;
@@ -38,6 +41,7 @@ export default function FgAudioElement({
   doubleClickFunction?: (() => void) | undefined;
   fgAudioElementContainerOptions: FgAudioElementContainerOptionsType;
   settings: Settings;
+  externalSVGs: ExtenalSVGsType;
 }) {
   const [movingY, setMovingY] = useState<number[]>(
     Array(settings.numFixedPoints.value - 1).fill(50)
@@ -53,7 +57,6 @@ export default function FgAudioElement({
   const envelopeY = useRef<number[]>([]);
   const sineCurveY = useRef<number[]>([]);
   const fixedPointsX = useRef<number[]>([]);
-  const pathRef = useRef<SVGPathElement>(null);
   const leftHandleRef = useRef<SVGRectElement>(null);
   const rightHandleRef = useRef<SVGRectElement>(null);
   const sideDragging = useRef<"left" | "right" | null>(null);
@@ -69,16 +72,28 @@ export default function FgAudioElement({
     h: 0.23,
   };
 
-  const springs = useSprings(movingY.length + fixedY.length, [
-    ...movingY.map((y) => ({
-      y,
+  const [_, setRerender] = useState(false);
+
+  const [springs, api] = useSprings(
+    movingY.length + fixedY.length,
+    (index) => ({
+      y:
+        index < movingY.length
+          ? movingY[index]
+          : fixedY[index - movingY.length],
       config: { duration: fgAudioElementContainerOptions.springDuration },
-    })),
-    ...fixedY.map((y) => ({
-      y,
+    })
+  );
+
+  useEffect(() => {
+    api.start((index) => ({
+      y:
+        index < movingY.length
+          ? movingY[index]
+          : fixedY[index - movingY.length],
       config: { duration: fgAudioElementContainerOptions.springDuration },
-    })),
-  ]);
+    }));
+  }, [movingY, fixedY, api]);
 
   const fgAudioElementController = new FgAudioElementController(
     isUser,
@@ -89,7 +104,6 @@ export default function FgAudioElement({
     envelopeY,
     setMovingY,
     svgRef,
-    pathRef,
     audioRef,
     pathGenerator,
     timerRef,
@@ -98,7 +112,8 @@ export default function FgAudioElement({
     setRightHandlePosition,
     setPopupVisible,
     handleMute,
-    settings
+    settings,
+    setRerender
   );
 
   const updateFixedY = () => {
@@ -154,7 +169,10 @@ export default function FgAudioElement({
     audioAnalyzer.current = new AudioAnalyser(
       fgAudioElementContainerOptions.noiseThreshold,
       fgAudioElementController.updateMovingY,
-      audioStream
+      audioStream,
+      localMute,
+      clientMute,
+      settings
     );
 
     // Cleanup on unmount
@@ -186,340 +204,364 @@ export default function FgAudioElement({
     <FgButton
       clickFunction={fgAudioElementController.onClick}
       className='w-full h-full'
-      contentFunction={() => (
-        <svg
-          className='w-full h-full'
-          ref={svgRef}
-          viewBox={`0 0 ${viewBoxSize.w} ${viewBoxSize.h}`}
-        >
-          <defs>
-            <filter id={`${username}_shadow`}>
-              <feGaussianBlur
-                in='SourceAlpha'
-                stdDeviation='0.75'
-                result='blur'
-              />
-              <feOffset in='blur' dx='0.25' dy='0.5' result='offsetBlur' />
+      contentFunction={() =>
+        (localMute.current || clientMute.current) &&
+        externalSVGs.find((value) => value.id === settings.muteStyle.value) !==
+          undefined ? (
+          <FgSVG
+            externalRef={svgRef}
+            src={
+              externalSVGs.find(
+                (value) => value.id === settings.muteStyle.value
+              )!.url
+            }
+            className='h-full w-full'
+            attributes={[
+              { key: "height", value: "100%" },
+              { key: "width", value: "100%" },
+            ]}
+          />
+        ) : (
+          <svg
+            className='w-full h-full'
+            ref={svgRef}
+            viewBox={`0 0 ${viewBoxSize.w} ${viewBoxSize.h}`}
+          >
+            <defs>
+              <filter id={`${username}_shadow`}>
+                <feGaussianBlur
+                  in='SourceAlpha'
+                  stdDeviation='0.75'
+                  result='blur'
+                />
+                <feOffset in='blur' dx='0.25' dy='0.5' result='offsetBlur' />
 
-              <feFlood
-                floodColor={settings.shadowColor.value}
-                result='colorBlur'
-              />
-              <feComposite
-                in='colorBlur'
-                in2='offsetBlur'
-                operator='in'
-                result='coloredBlur'
-              />
+                <feFlood
+                  floodColor={settings.shadowColor.value}
+                  result='colorBlur'
+                />
+                <feComposite
+                  in='colorBlur'
+                  in2='offsetBlur'
+                  operator='in'
+                  result='coloredBlur'
+                />
 
-              <feMerge>
-                <feMergeNode in='coloredBlur' />
-                <feMergeNode in='SourceGraphic' />
-              </feMerge>
-            </filter>
+                <feMerge>
+                  <feMergeNode in='coloredBlur' />
+                  <feMergeNode in='SourceGraphic' />
+                </feMerge>
+              </filter>
 
-            <mask id={`${username}_mask`}>
+              <mask id={`${username}_mask`}>
+                <rect
+                  x='0'
+                  y='0'
+                  width={viewBoxSize.w}
+                  height={viewBoxSize.h}
+                  fill='black'
+                />
+                <animated.path
+                  d={animatedPathData}
+                  stroke='white'
+                  strokeWidth='4'
+                  fill='none'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </mask>
+
+              {settings.muteStyle.value === "morse" && (
+                <linearGradient
+                  id={`${username}_mute_morse_gradient`}
+                  x1='0%'
+                  y1='0%'
+                  x2='100%'
+                  y2='0%'
+                  gradientUnits='userSpaceOnUse'
+                >
+                  {/* m */}
+                  <stop
+                    offset='6%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='15.34%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='16.216%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='18.59%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='19.47%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='28.369%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+
+                  <stop
+                    offset='29.249%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='38.146%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+
+                  {/* u */}
+                  <stop
+                    offset='39.026%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='41.40%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='42.28%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='44.658%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='45.538%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='47.91%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='48.79%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='51.17%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='52.05%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='60.947%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+
+                  <stop
+                    offset='61.827%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='70.72%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+
+                  {/* t */}
+                  <stop
+                    offset='71.60%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='80.50%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+
+                  <stop
+                    offset='81.38%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+                  <stop
+                    offset='90.27%'
+                    stopColor={settings.secondaryMuteColor.value}
+                  />
+
+                  {/* e */}
+                  <stop
+                    offset='91.16%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                  <stop
+                    offset='94%'
+                    stopColor={settings.primaryMuteColor.value}
+                  />
+                </linearGradient>
+              )}
+
+              {(leftHandlePosition.y !== 50 ||
+                rightHandlePosition.y !== 50) && (
+                <>
+                  <linearGradient
+                    id={`${username}_top_gradient`}
+                    x1='0%'
+                    y1='0%'
+                    x2='0%'
+                    y2='100%'
+                  >
+                    <stop
+                      offset='45%'
+                      stopColor={settings.volumeHandleColor.value}
+                    />
+                    <stop offset='95%' stopColor={settings.color.value} />
+                  </linearGradient>
+
+                  <linearGradient
+                    id={`${username}_bottom_gradient`}
+                    x1='0%'
+                    y1='0%'
+                    x2='0%'
+                    y2='100%'
+                  >
+                    <stop offset='5%' stopColor={settings.color.value} />
+                    <stop
+                      offset='55%'
+                      stopColor={settings.volumeHandleColor.value}
+                    />
+                  </linearGradient>
+
+                  <pattern
+                    id={`${username}_background_matrix`}
+                    x='0'
+                    y='0'
+                    width={viewBoxSize.w}
+                    height={viewBoxSize.h}
+                    patternUnits='userSpaceOnUse'
+                  >
+                    <rect
+                      x='0'
+                      y='0'
+                      width={viewBoxSize.w * patternSize.w}
+                      height={viewBoxSize.h * patternSize.h}
+                      fill={`url(#${username}_top_gradient)`}
+                    ></rect>
+                    <rect
+                      x={viewBoxSize.w * patternSize.w}
+                      y='0'
+                      width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                      height={viewBoxSize.h * patternSize.h}
+                      fill={settings.color.value}
+                    ></rect>
+                    <rect
+                      x={viewBoxSize.w * (1 - patternSize.w)}
+                      y='0'
+                      width={viewBoxSize.w * patternSize.w}
+                      height={viewBoxSize.h * patternSize.h}
+                      fill={`url(#${username}_top_gradient)`}
+                    ></rect>
+
+                    <rect
+                      x='0'
+                      y={viewBoxSize.h * patternSize.h}
+                      width={viewBoxSize.w * patternSize.w}
+                      height={viewBoxSize.h * (1 - 2 * patternSize.h)}
+                      fill={settings.color.value}
+                    ></rect>
+                    <rect
+                      x={viewBoxSize.w * patternSize.w}
+                      y={viewBoxSize.h * patternSize.h}
+                      width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                      height={viewBoxSize.h * (1 - 2 * patternSize.h)}
+                      fill={settings.color.value}
+                    ></rect>
+                    <rect
+                      x={viewBoxSize.w * (1 - patternSize.w)}
+                      y={viewBoxSize.h * patternSize.h}
+                      width={viewBoxSize.w * patternSize.w}
+                      height={viewBoxSize.h * (1 - 2 * patternSize.h)}
+                      fill={settings.color.value}
+                    ></rect>
+
+                    <rect
+                      x='0'
+                      y={viewBoxSize.h * (1 - patternSize.h)}
+                      width={viewBoxSize.w * patternSize.w}
+                      height={viewBoxSize.h * patternSize.h}
+                      fill={`url(#${username}_bottom_gradient)`}
+                    ></rect>
+                    <rect
+                      x={viewBoxSize.w * patternSize.w}
+                      y={viewBoxSize.h * (1 - patternSize.h)}
+                      width={viewBoxSize.w * (1 - 2 * patternSize.w)}
+                      height={viewBoxSize.h * patternSize.h}
+                      fill={settings.color.value}
+                    ></rect>
+                    <rect
+                      x={viewBoxSize.w * (1 - patternSize.w)}
+                      y={viewBoxSize.h * (1 - patternSize.h)}
+                      width={viewBoxSize.w * patternSize.w}
+                      height={viewBoxSize.h * patternSize.h}
+                      fill={`url(#${username}_bottom_gradient)`}
+                    ></rect>
+                  </pattern>
+                </>
+              )}
+            </defs>
+            <g filter={`url(#${username}_shadow)`}>
               <rect
                 x='0'
                 y='0'
                 width={viewBoxSize.w}
                 height={viewBoxSize.h}
-                fill='black'
+                fill={
+                  (localMute.current || clientMute.current) &&
+                  settings.muteStyle.value === "morse"
+                    ? `url(#${username}_mute_morse_gradient)`
+                    : leftHandlePosition.y !== 50 ||
+                      rightHandlePosition.y !== 50
+                    ? `url(#${username}_background_matrix)`
+                    : settings.color.value
+                }
+                mask={`url(#${username}_mask)`}
               />
-              <animated.path
-                ref={pathRef}
-                d={animatedPathData}
-                stroke='white'
-                strokeWidth='4'
-                fill='none'
-                strokeLinecap='round'
-                strokeLinejoin='round'
+            </g>
+            {!isUser && (
+              <animated.rect
+                ref={leftHandleRef}
+                onPointerDown={(event) => {
+                  if (!isUser)
+                    fgAudioElementController.startDrag(event, "left");
+                }}
+                x={4}
+                y={47}
+                width={16}
+                height={6}
+                rx={3}
+                ry={3}
+                fill='transparent'
+                stroke='transparent'
+                style={{ cursor: "pointer" }}
               />
-            </mask>
-
-            {settings.muteStyle.value === "morse" && (
-              <linearGradient
-                id={`${username}_mute_morse_gradient`}
-                x1='0%'
-                y1='0%'
-                x2='100%'
-                y2='0%'
-                gradientUnits='userSpaceOnUse'
-              >
-                {/* m */}
-                <stop offset='6%' stopColor={settings.primaryMuteColor.value} />
-                <stop
-                  offset='15.34%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='16.216%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='18.59%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='19.47%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='28.369%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-
-                <stop
-                  offset='29.249%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='38.146%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-
-                {/* u */}
-                <stop
-                  offset='39.026%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='41.40%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='42.28%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='44.658%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='45.538%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='47.91%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='48.79%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='51.17%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='52.05%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='60.947%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-
-                <stop
-                  offset='61.827%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='70.72%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-
-                {/* t */}
-                <stop
-                  offset='71.60%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='80.50%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-
-                <stop
-                  offset='81.38%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-                <stop
-                  offset='90.27%'
-                  stopColor={settings.secondaryMuteColor.value}
-                />
-
-                {/* e */}
-                <stop
-                  offset='91.16%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-                <stop
-                  offset='94%'
-                  stopColor={settings.primaryMuteColor.value}
-                />
-              </linearGradient>
             )}
-
-            {(leftHandlePosition.y !== 50 || rightHandlePosition.y !== 50) && (
-              <>
-                <linearGradient
-                  id={`${username}_top_gradient`}
-                  x1='0%'
-                  y1='0%'
-                  x2='0%'
-                  y2='100%'
-                >
-                  <stop
-                    offset='45%'
-                    stopColor={settings.volumeHandleColor.value}
-                  />
-                  <stop offset='95%' stopColor={settings.color.value} />
-                </linearGradient>
-
-                <linearGradient
-                  id={`${username}_bottom_gradient`}
-                  x1='0%'
-                  y1='0%'
-                  x2='0%'
-                  y2='100%'
-                >
-                  <stop offset='5%' stopColor={settings.color.value} />
-                  <stop
-                    offset='55%'
-                    stopColor={settings.volumeHandleColor.value}
-                  />
-                </linearGradient>
-
-                <pattern
-                  id={`${username}_background_matrix`}
-                  x='0'
-                  y='0'
-                  width={viewBoxSize.w}
-                  height={viewBoxSize.h}
-                  patternUnits='userSpaceOnUse'
-                >
-                  <rect
-                    x='0'
-                    y='0'
-                    width={viewBoxSize.w * patternSize.w}
-                    height={viewBoxSize.h * patternSize.h}
-                    fill={`url(#${username}_top_gradient)`}
-                  ></rect>
-                  <rect
-                    x={viewBoxSize.w * patternSize.w}
-                    y='0'
-                    width={viewBoxSize.w * (1 - 2 * patternSize.w)}
-                    height={viewBoxSize.h * patternSize.h}
-                    fill={settings.color.value}
-                  ></rect>
-                  <rect
-                    x={viewBoxSize.w * (1 - patternSize.w)}
-                    y='0'
-                    width={viewBoxSize.w * patternSize.w}
-                    height={viewBoxSize.h * patternSize.h}
-                    fill={`url(#${username}_top_gradient)`}
-                  ></rect>
-
-                  <rect
-                    x='0'
-                    y={viewBoxSize.h * patternSize.h}
-                    width={viewBoxSize.w * patternSize.w}
-                    height={viewBoxSize.h * (1 - 2 * patternSize.h)}
-                    fill={settings.color.value}
-                  ></rect>
-                  <rect
-                    x={viewBoxSize.w * patternSize.w}
-                    y={viewBoxSize.h * patternSize.h}
-                    width={viewBoxSize.w * (1 - 2 * patternSize.w)}
-                    height={viewBoxSize.h * (1 - 2 * patternSize.h)}
-                    fill={settings.color.value}
-                  ></rect>
-                  <rect
-                    x={viewBoxSize.w * (1 - patternSize.w)}
-                    y={viewBoxSize.h * patternSize.h}
-                    width={viewBoxSize.w * patternSize.w}
-                    height={viewBoxSize.h * (1 - 2 * patternSize.h)}
-                    fill={settings.color.value}
-                  ></rect>
-
-                  <rect
-                    x='0'
-                    y={viewBoxSize.h * (1 - patternSize.h)}
-                    width={viewBoxSize.w * patternSize.w}
-                    height={viewBoxSize.h * patternSize.h}
-                    fill={`url(#${username}_bottom_gradient)`}
-                  ></rect>
-                  <rect
-                    x={viewBoxSize.w * patternSize.w}
-                    y={viewBoxSize.h * (1 - patternSize.h)}
-                    width={viewBoxSize.w * (1 - 2 * patternSize.w)}
-                    height={viewBoxSize.h * patternSize.h}
-                    fill={settings.color.value}
-                  ></rect>
-                  <rect
-                    x={viewBoxSize.w * (1 - patternSize.w)}
-                    y={viewBoxSize.h * (1 - patternSize.h)}
-                    width={viewBoxSize.w * patternSize.w}
-                    height={viewBoxSize.h * patternSize.h}
-                    fill={`url(#${username}_bottom_gradient)`}
-                  ></rect>
-                </pattern>
-              </>
+            {!isUser && (
+              <animated.rect
+                ref={rightHandleRef}
+                onPointerDown={(event) => {
+                  if (!isUser)
+                    fgAudioElementController.startDrag(event, "right");
+                }}
+                x={80}
+                y={47}
+                width={16}
+                height={6}
+                rx={3}
+                ry={3}
+                fill='transparent'
+                stroke='transparent'
+                style={{ cursor: "pointer" }}
+              />
             )}
-          </defs>
-          <g filter={`url(#${username}_shadow)`}>
-            <rect
-              x='0'
-              y='0'
-              width={viewBoxSize.w}
-              height={viewBoxSize.h}
-              fill={
-                (localMute.current || clientMute.current) &&
-                settings.muteStyle.value === "morse"
-                  ? `url(#${username}_mute_morse_gradient)`
-                  : leftHandlePosition.y !== 50 || rightHandlePosition.y !== 50
-                  ? `url(#${username}_background_matrix)`
-                  : settings.color.value
-              }
-              mask={`url(#${username}_mask)`}
-            />
-          </g>
-          {!isUser && (
-            <animated.rect
-              ref={leftHandleRef}
-              onPointerDown={(event) => {
-                if (!isUser) fgAudioElementController.startDrag(event, "left");
-              }}
-              x={4}
-              y={47}
-              width={16}
-              height={6}
-              rx={3}
-              ry={3}
-              fill='transparent'
-              stroke='transparent'
-              style={{ cursor: "pointer" }}
-            />
-          )}
-          {!isUser && (
-            <animated.rect
-              ref={rightHandleRef}
-              onPointerDown={(event) => {
-                if (!isUser) fgAudioElementController.startDrag(event, "right");
-              }}
-              x={80}
-              y={47}
-              width={16}
-              height={6}
-              rx={3}
-              ry={3}
-              fill='transparent'
-              stroke='transparent'
-              style={{ cursor: "pointer" }}
-            />
-          )}
-        </svg>
-      )}
+          </svg>
+        )
+      }
       doubleClickFunction={
         doubleClickFunction &&
         ((event) => {

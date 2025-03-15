@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import FgButton from "../fgButton/FgButton";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import FgSVG from "../fgSVG/FgSVG";
+import { defaultInputOptions, InputOptionsType } from "./lib/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -14,9 +15,7 @@ export default function FgInput({
   onSubmit,
   onChange,
   externalValue,
-  options = {
-    submitButton: true,
-  },
+  options,
 }: {
   placeholder?: string;
   className?: string;
@@ -24,10 +23,18 @@ export default function FgInput({
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   externalValue?: string;
-  options?: {
-    submitButton: boolean;
-  };
+  options?: InputOptionsType;
 }) {
+  const fgInputOptions = { ...defaultInputOptions, ...options };
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (fgInputOptions.autoFocus && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [fgInputOptions.autoFocus]);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (onSubmit) onSubmit(event);
@@ -40,15 +47,17 @@ export default function FgInput({
     >
       <div className='grow h-max'>
         <input
+          ref={inputRef}
           placeholder={placeholder}
           name={name ? name : "defaultInput"}
           type='text'
           className='w-full h-full px-2 focus:outline-none bg-fg-white'
           onChange={onChange}
           value={externalValue}
+          autoComplete={fgInputOptions.autocomplete}
         />
       </div>
-      {options.submitButton && (
+      {fgInputOptions.submitButton && (
         <FgButton
           className='h-[90%] aspect-square rounded-full border-fg-red flex items-center justify-center pl-[1%] mr-1'
           style={{ borderWidth: "1px" }}

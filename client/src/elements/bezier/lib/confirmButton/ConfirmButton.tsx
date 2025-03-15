@@ -11,9 +11,13 @@ const checkIcon = nginxAssetServerBaseUrl + "svgs/checkIcon.svg";
 export default function ConfirmButton({
   bezierController,
   largestDim,
+  needsName,
+  setGetNamePopupActive,
 }: {
   bezierController: BezierController;
   largestDim: "width" | "height";
+  needsName: boolean;
+  setGetNamePopupActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <FgButton
@@ -22,7 +26,11 @@ export default function ConfirmButton({
       } flex aspect-square pointer-events-auto items-center justify-center bg-fg-red-light rounded-full`}
       clickFunction={(event) => {
         event.stopPropagation();
-        bezierController.confirmBezierCurve();
+        if (!needsName) {
+          bezierController.confirmBezierCurve();
+        } else {
+          setGetNamePopupActive((prev) => !prev);
+        }
       }}
       contentFunction={() => (
         <FgSVG

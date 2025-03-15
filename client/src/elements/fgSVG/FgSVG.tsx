@@ -23,6 +23,7 @@ const defaultFgSVGOptions: {
 };
 
 export default function FgSVG({
+  externalRef,
   src,
   attributes,
   className,
@@ -30,6 +31,7 @@ export default function FgSVG({
   hoverContent,
   options,
 }: {
+  externalRef?: React.MutableRefObject<SVGSVGElement | null>;
   src: string;
   attributes?: {
     key: string;
@@ -104,6 +106,9 @@ export default function FgSVG({
             }
           });
         }
+
+        if (externalRef)
+          externalRef.current = svgElement as unknown as SVGSVGElement;
 
         if (svgContainerRef.current) {
           svgContainerRef.current.innerHTML = "";

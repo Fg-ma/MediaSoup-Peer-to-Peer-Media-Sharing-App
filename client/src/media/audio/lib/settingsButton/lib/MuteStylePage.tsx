@@ -6,6 +6,7 @@ import {
   ActivePages,
   MuteStyleTypes,
   muteStylesMeta,
+  ExtenalSVGsType,
 } from "../../typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -17,15 +18,17 @@ export default function MuteStylePage({
   settings,
   setSettings,
   setIsBezierCurveEditor,
+  externalSVGs,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
+  externalSVGs: ExtenalSVGsType;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
-  const setMuteStyle = (muteStyle: MuteStyleTypes) => {
+  const setMuteStyle = (muteStyle: MuteStyleTypes | string) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
 
@@ -85,6 +88,36 @@ export default function MuteStylePage({
             )}
             clickFunction={() => setIsBezierCurveEditor((prev) => !prev)}
           />
+          {externalSVGs.map((data) => (
+            <FgButton
+              key={data.id}
+              className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                data.id === settings.muteStyle.value
+                  ? "bg-fg-white text-fg-tone-black-1"
+                  : ""
+              }`}
+              contentFunction={() => (
+                <div
+                  className={`${
+                    data.name ? "justify-between" : "justify-start"
+                  } flex w-full bg-opacity-75 px-2 items-center text-lg`}
+                >
+                  <>{data.name}</>
+                  <FgSVG
+                    src={data.url}
+                    className='h-6 aspect-square'
+                    attributes={[
+                      { key: "height", value: "100%" },
+                      { key: "width", value: "100%" },
+                    ]}
+                  />
+                </div>
+              )}
+              clickFunction={() => {
+                setMuteStyle(data.id);
+              }}
+            />
+          ))}
           {Object.entries(muteStylesMeta).map(([key, meta]) => (
             <FgButton
               key={key}
@@ -107,7 +140,6 @@ export default function MuteStylePage({
                       attributes={[
                         { key: "height", value: "100%" },
                         { key: "width", value: "100%" },
-                        { key: "stroke", value: "#f2f2f2" },
                       ]}
                     />
                   )}

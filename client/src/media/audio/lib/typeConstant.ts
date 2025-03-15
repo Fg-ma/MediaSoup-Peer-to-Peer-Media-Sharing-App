@@ -50,6 +50,13 @@ export const defaultFgAudioElementContainerOptions: FgAudioElementContainerOptio
     noiseThreshold: 0.2,
   };
 
+export type ExtenalSVGsType = {
+  id: string;
+  url: string;
+  svg: string;
+  name?: string;
+}[];
+
 export interface ActivePages {
   envelopeType: {
     active: boolean;
@@ -154,7 +161,7 @@ export interface Settings {
     };
   };
   muteStyle: {
-    value: MuteStyleTypes;
+    value: MuteStyleTypes | string;
   };
   color: {
     value: string;
@@ -464,6 +471,40 @@ export type MuteStyleTypes =
   | "tableTop"
   | "trophy"
   | "wifi";
+
+export const muteStyleTypes: MuteStyleTypes[] = [
+  "morse",
+  "smile",
+  "apple",
+  "battery",
+  "bomb",
+  "bunny",
+  "check",
+  "controller",
+  "crown",
+  "dislike",
+  "ear",
+  "flask",
+  "hand",
+  "heart",
+  "helicopter",
+  "like",
+  "man",
+  "mask",
+  "moon",
+  "music",
+  "oldLady",
+  "owl",
+  "pawn",
+  "person",
+  "planet",
+  "raven",
+  "running",
+  "sprig",
+  "tableTop",
+  "trophy",
+  "wifi",
+];
 
 export const muteStylesMeta: {
   [muteStyle in MuteStyleTypes]: {

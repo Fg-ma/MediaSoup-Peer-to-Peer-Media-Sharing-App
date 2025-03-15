@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 
@@ -9,6 +9,7 @@ const panIcon = nginxAssetServerBaseUrl + "svgs/panIcon.svg";
 export default function PanButton({
   externalRef,
   className,
+  style,
   dragFunction,
   bundleRef,
   pointerDownFunction,
@@ -16,6 +17,7 @@ export default function PanButton({
 }: {
   externalRef?: React.RefObject<HTMLButtonElement>;
   className?: string;
+  style?: CSSProperties;
   dragFunction: (displacement: { x: number; y: number }) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
   pointerDownFunction: () => void;
@@ -25,6 +27,7 @@ export default function PanButton({
     <FgButton
       externalRef={externalRef}
       className={className}
+      style={style}
       pointerDownFunction={pointerDownFunction}
       pointerUpFunction={pointerUpFunction}
       dragFunction={dragFunction}

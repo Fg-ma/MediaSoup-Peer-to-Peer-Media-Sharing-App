@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 
@@ -8,12 +8,14 @@ const rotateIcon = nginxAssetServerBaseUrl + "svgs/rotateIcon.svg";
 
 export default function RotateButton({
   className,
+  style,
   dragFunction,
   bundleRef,
   pointerDownFunction,
   pointerUpFunction,
 }: {
   className?: string;
+  style?: CSSProperties;
   dragFunction: (
     displacement: {
       x: number;
@@ -28,6 +30,7 @@ export default function RotateButton({
   return (
     <FgButton
       className={className}
+      style={style}
       pointerDownFunction={pointerDownFunction}
       pointerUpFunction={pointerUpFunction}
       dragFunction={dragFunction}

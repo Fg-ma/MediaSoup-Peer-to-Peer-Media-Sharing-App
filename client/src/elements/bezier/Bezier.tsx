@@ -17,7 +17,16 @@ import CopyButton from "./lib/copyButton /CopyButton";
 import DownloadButton from "./lib/downloadButton/DownloadButton";
 import ResetButton from "./lib/restButton/ResetButton";
 import CloseButton from "./lib/closeButton/CloseButton";
+import FgInput from "../fgInput/FgInput";
+import FgButton from "../fgButton/FgButton";
+import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
+import FgSVG from "../fgSVG/FgSVG";
 import "./lib/bezier.css";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
+const checkIcon = nginxAssetServerBaseUrl + "svgs/checkIcon.svg";
 
 const fadeIn = {
   initial: { opacity: 0 },
@@ -38,12 +47,35 @@ const BezierTransition: Transition = {
   },
 };
 
+const NamePopupVar: Variants = {
+  init: { opacity: 0, top: "20%" },
+  animate: {
+    opacity: 1,
+    top: "30%",
+  },
+};
+
+const NamePopupTransition: Transition = {
+  transition: {
+    opacity: { duration: 0.1 },
+    top: { duration: 0.1 },
+  },
+};
+
 export default function Bezier({
   confirmBezierCurveFunction,
   closeFunction,
+  needsName = false,
 }: {
-  confirmBezierCurveFunction?: (d: string, filters?: string) => void;
+  confirmBezierCurveFunction?: (
+    url: string,
+    svg: string,
+    d: string,
+    name?: string,
+    filters?: string
+  ) => void;
   closeFunction?: () => void;
+  needsName?: boolean;
 }) {
   const [points, setPoints] = useState<BezierPoint[]>(
     structuredClone(defaultPoints)
@@ -63,6 +95,7 @@ export default function Bezier({
   });
   const [inBezier, setInBezier] = useState(true);
   const [largestDim, setLargestDim] = useState<"width" | "height">("width");
+  const [aspectSquarish, setAspectSquarish] = useState<boolean>(false);
   const [pathHovered, setPathHovered] = useState(true);
 
   const bezierBackgroundContainerRef = useRef<HTMLDivElement>(null);
@@ -86,6 +119,9 @@ export default function Bezier({
   );
   const [copied, setCopied] = useState(false);
 
+  const name = useRef<string | undefined>(undefined);
+  const [getNamePopupActive, setGetNamePopupActive] = useState(false);
+
   const bezierController = new BezierController(
     points,
     setPoints,
@@ -94,6 +130,7 @@ export default function Bezier({
     svgRef,
     setInBezier,
     setLargestDim,
+    setAspectSquarish,
     leaveTimer,
     movementTimeout,
     leavePathTimeout,
@@ -106,7 +143,8 @@ export default function Bezier({
     setCopied,
     confirmBezierCurveFunction,
     selectionBox,
-    setSelectionBox
+    setSelectionBox,
+    name
   );
 
   useEffect(() => {
@@ -166,7 +204,15 @@ export default function Bezier({
         >
           <div
             ref={bezierContainerRef}
-            className={`${largestDim === "height" ? "w-[95%]" : "h-[95%]"} ${
+            className={`${
+              largestDim === "height"
+                ? aspectSquarish
+                  ? "w-[80%]"
+                  : "w-[95%]"
+                : aspectSquarish
+                ? "h-[80%]"
+                : "h-[95%]"
+            } ${
               !inBezier &&
               !settingsActive &&
               !bezierController.isOneSelected(points) &&
@@ -624,6 +670,8 @@ export default function Bezier({
                   <ConfirmButton
                     bezierController={bezierController}
                     largestDim={largestDim}
+                    needsName={needsName}
+                    setGetNamePopupActive={setGetNamePopupActive}
                   />
                   {largestDim === "width" && (
                     <>
@@ -634,7 +682,7 @@ export default function Bezier({
                       <ResetButton
                         bezierController={bezierController}
                         largestDim={largestDim}
-                      />{" "}
+                      />
                     </>
                   )}
                 </div>
@@ -672,6 +720,95 @@ export default function Bezier({
                   />
                 </div>
               </motion.div>
+            )}
+            {getNamePopupActive && (
+              <div className='absolute z-100 top-0 left-0 w-full h-full pointer-events-auto'>
+                <motion.div
+                  className='absolute left-1/2 -translate-x-1/2 flex flex-col space-y-2 w-[60%] min-w-28'
+                  variants={NamePopupVar}
+                  initial='init'
+                  animate='animate'
+                  exit='init'
+                  transition={NamePopupTransition}
+                >
+                  <FgInput
+                    className='h-12 text-2xl rounded-md'
+                    placeholder='Name this beast...'
+                    options={{
+                      submitButton: false,
+                      autoFocus: true,
+                      autocomplete: "off",
+                    }}
+                    onChange={(event) => {
+                      event.stopPropagation();
+                      event.preventDefault();
+
+                      name.current = event.target.value;
+                    }}
+                  />
+                  <div className='flex items-center justify-center space-x-3'>
+                    <FgButton
+                      className='flex h-10 w-10 bg-fg-red rounded-full items-center justify-center'
+                      clickFunction={() => {
+                        bezierController.confirmBezierCurve();
+                        setGetNamePopupActive(false);
+                      }}
+                      contentFunction={() => (
+                        <FgSVG
+                          src={checkIcon}
+                          className='w-[75%] h-[75%]'
+                          attributes={[
+                            { key: "width", value: "100%" },
+                            { key: "height", value: "100%" },
+                            { key: "fill", value: "#f2f2f2" },
+                            { key: "stroke", value: "#f2f2f2" },
+                          ]}
+                        />
+                      )}
+                      hoverContent={
+                        <FgHoverContentStandard
+                          content='Confirm name'
+                          style='light'
+                        />
+                      }
+                      options={{
+                        hoverSpacing: 4,
+                        hoverTimeoutDuration: 1250,
+                        hoverType: "above",
+                        hoverZValue: 500000000000,
+                      }}
+                    />
+                    <FgButton
+                      className='flex h-10 w-10 bg-fg-tone-black-4 rounded-full items-center justify-center'
+                      clickFunction={() => setGetNamePopupActive(false)}
+                      contentFunction={() => (
+                        <FgSVG
+                          src={closeIcon}
+                          className='w-[55%] h-[55%]'
+                          attributes={[
+                            { key: "width", value: "100%" },
+                            { key: "height", value: "100%" },
+                            { key: "fill", value: "#f2f2f2" },
+                            { key: "stroke", value: "#f2f2f2" },
+                          ]}
+                        />
+                      )}
+                      hoverContent={
+                        <FgHoverContentStandard
+                          content='Cancel'
+                          style='light'
+                        />
+                      }
+                      options={{
+                        hoverSpacing: 4,
+                        hoverTimeoutDuration: 1250,
+                        hoverType: "above",
+                        hoverZValue: 500000000000,
+                      }}
+                    />
+                  </div>
+                </motion.div>
+              </div>
             )}
           </div>
         </div>

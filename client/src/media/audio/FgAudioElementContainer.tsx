@@ -1,4 +1,11 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, {
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
@@ -17,6 +24,7 @@ import {
   defaultActiveSettingsPages,
   defaultFgAudioElementContainerOptions,
   defaultSettings,
+  ExtenalSVGsType,
   Settings,
 } from "./lib/typeConstant";
 import SettingsButton from "./lib/settingsButton/SettingsButton";
@@ -98,7 +106,7 @@ export default function FgAudioElementContainer({
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
     useState(false);
-  const audioElementSVGRef = useRef<SVGSVGElement>(null);
+  const audioElementSVGRef = useRef<SVGSVGElement | null>(null);
 
   const [_rerender, setRerender] = useState(false);
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
@@ -115,6 +123,10 @@ export default function FgAudioElementContainer({
   );
 
   const [isBezierCurveEditor, setIsBezierCurveEditor] = useState(false);
+
+  const [externalSVGs, setExternalSVGs] = useState<ExtenalSVGsType>([]);
+
+  const [containerWidth, setContainerWidth] = useState(0);
 
   const audioEffectsSectionRef = useRef<HTMLDivElement>(null);
 
@@ -241,6 +253,23 @@ export default function FgAudioElementContainer({
     };
   }, []);
 
+  useLayoutEffect(() => {
+    if (!audioContainerRef.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      if (!audioContainerRef.current) {
+        return;
+      }
+      setContainerWidth(audioContainerRef.current.clientWidth);
+    });
+
+    observer.observe(audioContainerRef.current);
+
+    return () => observer.disconnect();
+  }, [audioContainerRef.current]);
+
   useEffect(() => {
     if (
       adjustingDimensions &&
@@ -310,9 +339,8 @@ export default function FgAudioElementContainer({
         />
       </div>
       <PanButton
-        className={
-          "pan-btn min-w-7 w-[5.5%] aspect-square absolute top-1/2 -translate-y-1/2 -left-3"
-        }
+        className='pan-btn min-w-7 w-[8%] max-w-14 aspect-square absolute top-1/2 -translate-y-1/2'
+        style={{ right: `calc(100% - ${Math.round(containerWidth * 0.05)}px)` }}
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
@@ -356,9 +384,8 @@ export default function FgAudioElementContainer({
         }
       />
       <RotateButton
-        className={
-          "rotate-btn min-w-7 w-[5.5%] aspect-square absolute top-1/2 -translate-y-[150%] -right-1.5"
-        }
+        className='rotate-btn min-w-7 w-[8%] max-w-14 aspect-square absolute top-1/2 -translate-y-[150%]'
+        style={{ left: `calc(100% - ${Math.round(containerWidth * 0.05)}px)` }}
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
             return;
@@ -396,9 +423,8 @@ export default function FgAudioElementContainer({
         }
       />
       <ScaleButton
-        className={
-          "scale-btn min-w-6 w-[5%] aspect-square absolute top-1/2 translate-y-1/2 -right-1.5"
-        }
+        className='scale-btn min-w-6 w-[7.5%] max-w-12 aspect-square absolute top-1/2 translate-y-1/2'
+        style={{ left: `calc(100% - ${Math.round(containerWidth * 0.05)}px)` }}
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
@@ -474,6 +500,7 @@ export default function FgAudioElementContainer({
         }
         fgAudioElementContainerOptions={fgAudioElementContainerOptions}
         settings={settings}
+        externalSVGs={externalSVGs}
       />
       {popupVisible && (
         <Suspense fallback={<div>Loading...</div>}>
@@ -519,6 +546,7 @@ export default function FgAudioElementContainer({
                   setSettings={setSettings}
                   scrollingContainerRef={audioEffectsSectionRef}
                   setIsBezierCurveEditor={setIsBezierCurveEditor}
+                  externalSVGs={externalSVGs}
                 />,
                 <ReactButton
                   className='border-fg-off-white min-w-12 w-full hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
@@ -535,7 +563,26 @@ export default function FgAudioElementContainer({
             />
           </Suspense>
         )}
-      {isBezierCurveEditor && <Bezier />}
+      {isBezierCurveEditor && (
+        <Bezier
+          confirmBezierCurveFunction={(url, svg, _d, name) => {
+            const id = uuidv4();
+
+            setExternalSVGs((prev) => [...prev, { id, url, svg, name }]);
+
+            setSettings((prev) => {
+              const newSettings = { ...prev };
+
+              newSettings.muteStyle.value = id;
+
+              return newSettings;
+            });
+            setIsBezierCurveEditor(false);
+          }}
+          closeFunction={() => setIsBezierCurveEditor(false)}
+          needsName={true}
+        />
+      )}
     </div>
   );
 }

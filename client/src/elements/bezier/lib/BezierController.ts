@@ -20,6 +20,7 @@ class BezierController {
     private setLargestDim: React.Dispatch<
       React.SetStateAction<"height" | "width">
     >,
+    private setAspectSquarish: React.Dispatch<React.SetStateAction<boolean>>,
     private leaveTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private movementTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private leavePathTimeout: React.MutableRefObject<
@@ -33,7 +34,13 @@ class BezierController {
     private copiedTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setCopied: React.Dispatch<React.SetStateAction<boolean>>,
     private confirmBezierCurveFunction:
-      | ((d: string, filters?: string) => void)
+      | ((
+          url: string,
+          svg: string,
+          d: string,
+          name?: string,
+          filters?: string
+        ) => void)
       | undefined,
     private selectionBox: {
       x: number;
@@ -50,10 +57,13 @@ class BezierController {
         height: number;
         active: boolean;
       }>
-    >
+    >,
+    private name: React.MutableRefObject<string | undefined>
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.target as HTMLElement).tagName.toLowerCase() === "input") return;
+
     event.stopPropagation();
     event.preventDefault();
     event.cancelBubble = true;
@@ -638,6 +648,15 @@ class BezierController {
     } else {
       this.setLargestDim("width");
     }
+
+    const aspect =
+      this.bezierBackgroundContainerRef.current.clientWidth /
+      this.bezierBackgroundContainerRef.current.clientHeight;
+    if (aspect > 0.85 && aspect < 1.15) {
+      this.setAspectSquarish(true);
+    } else {
+      this.setAspectSquarish(false);
+    }
   };
 
   handleReset = () => {
@@ -1105,7 +1124,7 @@ class BezierController {
           d="${this.getPathData()}"
           stroke="${this.settings.color.value}"
           fill="none"
-          stroke-width="2"
+          stroke-width="4"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
@@ -1137,7 +1156,12 @@ class BezierController {
     switch (mimeType.value) {
       case "svg":
       case "svgz":
-        this.downloadFile(url, `download.${mimeType.value}`);
+        this.downloadFile(
+          url,
+          `${this.name.current ? this.name.current : "download"}.${
+            mimeType.value
+          }`
+        );
         break;
       case "png":
       case "jpg":
@@ -1186,7 +1210,10 @@ class BezierController {
           if (!blob) return;
 
           const imageUrl = URL.createObjectURL(blob);
-          this.downloadFile(imageUrl, `download.${format}`);
+          this.downloadFile(
+            imageUrl,
+            `${this.name.current ? this.name.current : "download"}.${format}`
+          );
           URL.revokeObjectURL(imageUrl);
         },
         `image/${format === "jpg" ? "jpeg" : format}`,
@@ -1210,8 +1237,13 @@ class BezierController {
     const d = this.getPathData();
     const filters = this.isFilter() ? this.getFilters() : undefined;
 
+    const svg = this.getCurrentDownloadableSVG();
+
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+
     if (this.confirmBezierCurveFunction)
-      this.confirmBezierCurveFunction(d, filters);
+      this.confirmBezierCurveFunction(url, svg, d, this.name.current, filters);
   };
 
   getPathData = () => {

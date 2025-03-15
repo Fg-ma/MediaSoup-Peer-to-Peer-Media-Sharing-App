@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import FgButton from "../fgButton/FgButton";
 import FgSVG from "../fgSVG/FgSVG";
 
@@ -8,12 +8,14 @@ const scaleIcon = nginxAssetServerBaseUrl + "svgs/scaleIcon.svg";
 
 export default function ScaleButton({
   className,
+  style,
   dragFunction,
   bundleRef,
   pointerDownFunction,
   pointerUpFunction,
 }: {
   className?: string;
+  style?: CSSProperties;
   dragFunction: (displacement: { x: number; y: number }) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
   pointerDownFunction: () => void;
@@ -22,6 +24,7 @@ export default function ScaleButton({
   return (
     <FgButton
       className={className}
+      style={style}
       pointerDownFunction={pointerDownFunction}
       pointerUpFunction={pointerUpFunction}
       dragFunction={dragFunction}

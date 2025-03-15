@@ -1,4 +1,4 @@
-import { muteStylesMeta, MuteStyleTypes } from "./typeConstant";
+import { muteStylesMeta, muteStyleTypes, MuteStyleTypes } from "./typeConstant";
 
 class PathGenerator {
   constructor() {}
@@ -208,7 +208,7 @@ class PathGenerator {
 
   generatePathData = (
     ySprings: number[],
-    muteStyleOption: MuteStyleTypes,
+    muteStyleOption: MuteStyleTypes | string,
     fixedPointsX: React.MutableRefObject<number[]>,
     localMute: React.MutableRefObject<boolean>,
     clientMute: React.MutableRefObject<boolean>,
@@ -234,22 +234,24 @@ class PathGenerator {
         path.push(`Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} 50`);
       }
     } else {
-      switch (muteStyleOption) {
-        case "smile":
-          for (let i = 1; i < fixedPointsX.current.length; i++) {
-            const xMid =
-              fixedPointsX.current[i - 1] +
-              (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
-            path.push(
-              `Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} ${
-                ySprings[fixedPointsX.current.length + i - 2]
-              }`
-            );
-          }
-          break;
-        default:
-          path.push(muteStylesMeta[muteStyleOption].path);
-          break;
+      if (muteStyleTypes.includes(muteStyleOption as MuteStyleTypes)) {
+        switch (muteStyleOption) {
+          case "smile":
+            for (let i = 1; i < fixedPointsX.current.length; i++) {
+              const xMid =
+                fixedPointsX.current[i - 1] +
+                (fixedPointsX.current[i] - fixedPointsX.current[i - 1]) / 2;
+              path.push(
+                `Q${xMid} ${ySprings[i - 1]}, ${fixedPointsX.current[i]} ${
+                  ySprings[fixedPointsX.current.length + i - 2]
+                }`
+              );
+            }
+            break;
+          default:
+            path.push(muteStylesMeta[muteStyleOption as MuteStyleTypes].path);
+            break;
+        }
       }
 
       path.push("M 84,50");

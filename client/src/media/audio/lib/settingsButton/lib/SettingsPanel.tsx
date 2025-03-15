@@ -11,6 +11,9 @@ import {
   EnvelopeOptionTypes,
   envelopeTypesSliderOptions,
   muteStylesMeta,
+  ExtenalSVGsType,
+  muteStyleTypes,
+  MuteStyleTypes,
 } from "../../typeConstant";
 import EnvelopeTypePage from "./EnvelopeTypePage";
 import MuteStylePage from "./MuteStylePage";
@@ -65,6 +68,7 @@ export default function SettingsPanel({
   setSettings,
   colorPickerRefs,
   setIsBezierCurveEditor,
+  externalSVGs,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -76,6 +80,7 @@ export default function SettingsPanel({
     [colorSettingsType in ColorSettingsTypes]: React.RefObject<HTMLDivElement>;
   };
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
+  externalSVGs: ExtenalSVGsType;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -272,7 +277,17 @@ export default function SettingsPanel({
               contentFunction={() => (
                 <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
                   <div>Mute style</div>
-                  <div>{muteStylesMeta[settings.muteStyle.value].title}</div>
+                  <div>
+                    {muteStyleTypes.includes(
+                      settings.muteStyle.value as MuteStyleTypes
+                    )
+                      ? muteStylesMeta[
+                          settings.muteStyle.value as MuteStyleTypes
+                        ].title
+                      : externalSVGs.find(
+                          (value) => value.id === settings.muteStyle.value
+                        )?.name ?? ""}
+                  </div>
                 </div>
               )}
               clickFunction={handleMuteStyleActive}
@@ -331,6 +346,7 @@ export default function SettingsPanel({
                 settings={settings}
                 setSettings={setSettings}
                 setIsBezierCurveEditor={setIsBezierCurveEditor}
+                externalSVGs={externalSVGs}
               />
             </motion.div>
           )}
