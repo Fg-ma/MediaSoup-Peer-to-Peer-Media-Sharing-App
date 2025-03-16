@@ -2,7 +2,12 @@ import uWS from "uWebSockets.js";
 import busboy from "busboy";
 import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
 import Utils from "./lib/Utils";
-import { mimeToExtension, TableTopStaticMimeType } from "../typeConstant";
+import {
+  contentTypeBucketMap,
+  mimeToExtension,
+  mimeTypeContentTypeMap,
+  StaticMimeTypes,
+} from "../typeConstant";
 
 const utils = new Utils();
 
@@ -10,8 +15,10 @@ class Posts {
   constructor(app: uWS.TemplatedApp) {
     app.post("/upload/*", (res, req) => {
       const url = req.getUrl();
-      const table_id = url.split("/")[2];
-      const contentId = url.split("/")[3];
+      const split = url.split("/");
+      const table_id = split[2];
+      const contentId = split[3];
+      const visible = split[4];
 
       res.cork(() => {
         res.writeHeader(
@@ -30,49 +37,62 @@ class Posts {
       bb.on("file", (name, file, info) => {
         const { mimeType } = info;
 
-        const extension = mimeToExtension[mimeType] || ".bin";
+        const extension =
+          mimeToExtension[mimeType as StaticMimeTypes] || ".bin";
         const filename = `${contentId}${extension}`;
+        const staticContentType =
+          mimeTypeContentTypeMap[mimeType as StaticMimeTypes];
 
-        tableTopCeph.uploadFile("mybucket", filename, file).then(async () => {
-          if (mimeType.startsWith("video/")) {
-            await this.handleVideoUploads(
-              table_id,
-              contentId,
-              mimeType as TableTopStaticMimeType,
-              filename
-            );
-          } else if (mimeType.startsWith("image/")) {
-            await this.handleImageUploads(
-              table_id,
-              contentId,
-              mimeType as TableTopStaticMimeType,
-              filename
-            );
-          } else if (mimeType.startsWith("audio/")) {
-            await this.handleAudioUploads(
-              table_id,
-              contentId,
-              mimeType as TableTopStaticMimeType,
-              filename
-            );
-          } else if (mimeType.startsWith("application/")) {
-            await this.handleApplicationUploads(
-              table_id,
-              contentId,
-              mimeType as TableTopStaticMimeType,
-              filename
-            );
-          } else if (mimeType.startsWith("text/")) {
-            await this.handleTextUploads(
-              table_id,
-              contentId,
-              mimeType as TableTopStaticMimeType,
-              filename
-            );
-          } else {
-            console.warn(`Unsupported file type uploaded: ${mimeType}`);
-          }
-        });
+        tableTopCeph
+          .uploadFile(contentTypeBucketMap[staticContentType], filename, file)
+          .then(async () => {
+            if (staticContentType === "video") {
+              await this.handleVideoUploads(
+                table_id,
+                contentId,
+                mimeType as StaticMimeTypes,
+                filename
+              );
+            } else if (staticContentType === "image") {
+              await this.handleImageUploads(
+                table_id,
+                contentId,
+                mimeType as StaticMimeTypes,
+                filename
+              );
+            } else if (staticContentType === "svg") {
+              await this.handleSvgUploads(
+                table_id,
+                contentId,
+                mimeType as StaticMimeTypes,
+                filename,
+                visible === "false" ? false : true
+              );
+            } else if (staticContentType === "soundClip") {
+              await this.handleAudioUploads(
+                table_id,
+                contentId,
+                mimeType as StaticMimeTypes,
+                filename
+              );
+            } else if (staticContentType === "application") {
+              await this.handleApplicationUploads(
+                table_id,
+                contentId,
+                mimeType as StaticMimeTypes,
+                filename
+              );
+            } else if (staticContentType === "text") {
+              await this.handleTextUploads(
+                table_id,
+                contentId,
+                mimeType as StaticMimeTypes,
+                filename
+              );
+            } else {
+              console.warn(`Unsupported file type uploaded: ${mimeType}`);
+            }
+          });
 
         file.on("error", (err) => {
           console.error(`Error writing file ${info.filename}:`, err);
@@ -108,7 +128,7 @@ class Posts {
   private handleVideoUploads = async (
     table_id: string,
     contentId: string,
-    mimeType: TableTopStaticMimeType,
+    mimeType: StaticMimeTypes,
     filename: string
   ) => {
     await tableTopMongo.tableVideos?.uploads.uploadMetaData({
@@ -216,7 +236,7 @@ class Posts {
   private handleImageUploads = async (
     table_id: string,
     contentId: string,
-    mimeType: TableTopStaticMimeType,
+    mimeType: StaticMimeTypes,
     filename: string
   ) => {
     await tableTopMongo.tableImages?.uploads.uploadMetaData({
@@ -286,10 +306,43 @@ class Posts {
     });
   };
 
+  private handleSvgUploads = async (
+    table_id: string,
+    contentId: string,
+    mimeType: StaticMimeTypes,
+    filename: string,
+    visible: boolean
+  ) => {
+    await tableTopMongo.tableSvgs?.uploads.uploadMetaData({
+      table_id,
+      svgId: contentId,
+      filename,
+      mimeType,
+      positioning: {
+        position: {
+          left: 32.5,
+          top: 32.5,
+        },
+        scale: {
+          x: 25,
+          y: 25,
+        },
+        rotation: 0,
+      },
+      visible,
+    });
+
+    broadcaster.broadcastToTable(table_id, {
+      type: "svgReady",
+      header: { contentId },
+      data: { filename: filename, mimeType, visible },
+    });
+  };
+
   private handleAudioUploads = async (
     table_id: string,
     contentId: string,
-    mimeType: TableTopStaticMimeType,
+    mimeType: StaticMimeTypes,
     filename: string
   ) => {
     await tableTopMongo.tableSoundClips?.uploads.uploadMetaData({
@@ -363,7 +416,7 @@ class Posts {
   private handleApplicationUploads = async (
     table_id: string,
     contentId: string,
-    mimeType: TableTopStaticMimeType,
+    mimeType: StaticMimeTypes,
     filename: string
   ) => {
     await tableTopMongo.tableApplications?.uploads.uploadMetaData({
@@ -407,7 +460,7 @@ class Posts {
   private handleTextUploads = async (
     table_id: string,
     contentId: string,
-    mimeType: TableTopStaticMimeType,
+    mimeType: StaticMimeTypes,
     filename: string
   ) => {
     await tableTopMongo.tableText?.uploads.uploadMetaData({

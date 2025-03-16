@@ -71,6 +71,7 @@ export default function Bezier({
     url: string,
     svg: string,
     d: string,
+    blob: Blob,
     name?: string,
     filters?: string
   ) => void;

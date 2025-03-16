@@ -4,6 +4,7 @@ import {
   IncomingMediasoupMessages,
   onResponsedCatchUpDataType,
 } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
+import { IncomingTableStaticContentMessages } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import ReactController from "../../../elements/reactButton/lib/ReactController";
 import TableSocketController from "../../../serverControllers/tableServer/TableSocketController";
 import {
@@ -188,6 +189,17 @@ class FgAudioElementContainerController {
     switch (event.type) {
       case "reactionOccurred":
         this.reactionOccurred(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleTableStaticContentMessage = (
+    event: IncomingTableStaticContentMessages
+  ) => {
+    switch (event.type) {
+      case "svgReady":
         break;
       default:
         break;

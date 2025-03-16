@@ -164,6 +164,7 @@ export type IncomingTableStaticContentMessages =
   | onOriginalVideoReadyType
   | onDashVideoReadyType
   | onImageReadyType
+  | onSvgReadyType
   | onTextReadyType
   | onChunkType
   | onDownloadCompleteType
@@ -203,6 +204,18 @@ export type onImageReadyType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onSvgReadyType = {
+  type: "svgReady";
+  header: {
+    contentId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+    visible: boolean;
   };
 };
 
@@ -260,6 +273,26 @@ export type onResponsedCatchUpTableDataType = {
           };
           effects: { [effectType in ImageEffectTypes]: boolean };
           effectStyles: ImageEffectStylesType;
+        }[]
+      | undefined;
+    svgs:
+      | {
+          table_id: string;
+          imageId: string;
+          filename: string;
+          mimeType: string;
+          positioning: {
+            position: {
+              left: number;
+              top: number;
+            };
+            scale: {
+              x: number;
+              y: number;
+            };
+            rotation: number;
+          };
+          visible: boolean;
         }[]
       | undefined;
     videos:

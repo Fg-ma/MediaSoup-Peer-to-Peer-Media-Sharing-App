@@ -38,6 +38,7 @@ class BezierController {
           url: string,
           svg: string,
           d: string,
+          blob: Blob,
           name?: string,
           filters?: string
         ) => void)
@@ -1243,7 +1244,14 @@ class BezierController {
     const url = URL.createObjectURL(blob);
 
     if (this.confirmBezierCurveFunction)
-      this.confirmBezierCurveFunction(url, svg, d, this.name.current, filters);
+      this.confirmBezierCurveFunction(
+        url,
+        svg,
+        d,
+        blob,
+        this.name.current,
+        filters
+      );
   };
 
   getPathData = () => {

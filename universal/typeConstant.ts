@@ -12,6 +12,7 @@ export type ContentTypes =
 export type StaticContentTypes =
   | "video"
   | "image"
+  | "svg"
   | "application"
   | "text"
   | "soundClip";

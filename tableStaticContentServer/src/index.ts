@@ -24,8 +24,8 @@ export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup(broadcaster);
 
-// tableTopCeph.emptyBucket("mybucket");
-// tableTopCeph.listBucketContents("mybucket");
+// tableTopCeph.emptyBucket("table-images");
+// tableTopCeph.listBucketContents("table-svgs");
 
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",

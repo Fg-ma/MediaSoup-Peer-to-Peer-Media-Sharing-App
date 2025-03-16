@@ -25,10 +25,12 @@ import {
   onRequestedCatchUpVideoPositionType,
   onRespondedCatchUpVideoPositionType,
   onResponsedCatchUpTableDataType,
+  onSvgReadyType,
   OutGoingTableStaticContentMessages,
   TableTopStaticMimeType,
 } from "./lib/typeConstant";
 import { StaticContentTypes } from "../../../../universal/typeConstant";
+import { TableSvgsType } from "../../context/tableStaticContentContext/lib/typeConstant";
 
 class TableStaticContentSocketController {
   private ws: WebSocket | undefined;
@@ -45,7 +47,8 @@ class TableStaticContentSocketController {
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userDevice: UserDevice,
-    private deadbanding: Deadbanding
+    private deadbanding: Deadbanding,
+    private tableSvgs: React.MutableRefObject<TableSvgsType>
   ) {
     this.connect(this.url);
   }
@@ -270,9 +273,24 @@ class TableStaticContentSocketController {
       case "respondedCatchUpVideoPosition":
         this.onRespondedCatchUpVideoPosition(message);
         break;
+      case "svgReady":
+        this.onSvgReady(message);
+        break;
       default:
         break;
     }
+  };
+
+  private onSvgReady = (event: onSvgReadyType) => {
+    const { contentId } = event.header;
+    const { filename, visible } = event.data;
+
+    this.tableSvgs.current[contentId] = {
+      url: "",
+      name: "",
+      filename,
+      visible,
+    };
   };
 
   private onResponsedCatchUpTableData = (
@@ -383,7 +401,10 @@ class TableStaticContentSocketController {
   private onContentDeleted = (event: onContentDeletedType) => {
     const { contentType, contentId } = event.header;
 
-    if (this.userMedia.current[contentType][contentId]) {
+    if (
+      this.userMedia.current[contentType] &&
+      this.userMedia.current[contentType][contentId]
+    ) {
       this.userMedia.current[contentType][contentId].deconstructor();
       delete this.userMedia.current[contentType][contentId];
     }

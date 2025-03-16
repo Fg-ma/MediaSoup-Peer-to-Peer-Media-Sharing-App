@@ -11,6 +11,7 @@ import ImageMedia from "../../media/fgImage/ImageMedia";
 import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 import TextMedia from "../../media/fgText/TextMedia";
 import SoundClipMedia from "../../media/soundClip/SoundClipMedia";
+import SvgMedia from "../../media/fgSvg/SvgMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -28,6 +29,9 @@ export type UserMediaType = {
   };
   image: {
     [imageId: string]: ImageMedia;
+  };
+  svg: {
+    [svgId: string]: SvgMedia;
   };
   application: {
     [applicationId: string]: ApplicationMedia;

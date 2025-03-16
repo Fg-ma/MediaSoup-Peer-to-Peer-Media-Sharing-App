@@ -6,6 +6,7 @@ import { EffectsContextProvider } from "./src/context/effectsContext/EffectsCont
 import { PermissionsContextProvider } from "./src/context/permissionsContext/PermissionsContext";
 import { SocketContextProvider } from "./src/context/socketContext/SocketContext";
 import { UserInfoContextProvider } from "./src/context/userInfoContext/UserInfoContext";
+import { TableStaticContentContextProvider } from "./src/context/tableStaticContentContext/TableStaticContentContext";
 import Main from "./src/Main";
 import "./index.css";
 
@@ -22,7 +23,9 @@ function App() {
           <PermissionsContextProvider>
             <SocketContextProvider>
               <UserInfoContextProvider>
-                <Main />
+                <TableStaticContentContextProvider>
+                  <Main />
+                </TableStaticContentContextProvider>
               </UserInfoContextProvider>
             </SocketContextProvider>
           </PermissionsContextProvider>

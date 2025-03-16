@@ -1,0 +1,43 @@
+.image-container.paused .pan-btn,
+.image-container.paused .scale-btn,
+.image-container.paused .rotate-btn,
+.image-container.in-effects .pan-btn,
+.image-container.in-effects .scale-btn,
+.image-container.in-effects .rotate-btn,
+.image-container.in-settings .pan-btn,
+.image-container.in-settings .scale-btn,
+.image-container.in-settings .rotate-btn,
+.image-container.in-audio-effects .pan-btn,
+.image-container.in-audio-effects .scale-btn,
+.image-container.in-audio-effects .rotate-btn {
+  display: block;
+}
+
+.image-container.paused .media-controls-container,
+.image-container.paused .media-upper-controls,
+.image-container.paused .controls-gradient,
+.image-container.in-effects .media-controls-container,
+.image-container.in-effects .media-upper-controls,
+.image-container.in-effects .controls-gradient,
+.image-container.in-settings .media-controls-container,
+.image-container.in-settings .media-upper-controls,
+.image-container.in-settings .controls-gradient,
+.image-container.in-audio-effects .media-controls-container,
+.image-container.in-audio-effects .media-upper-controls,
+.image-container.in-audio-effects .controls-gradient {
+  opacity: 1;
+}
+
+.image-container.paused,
+.image-container.in-effects,
+.image-container.in-settings,
+.image-container.in-audio-effects {
+  cursor: auto;
+}
+
+/* mini-player */
+.image-container.mini-player {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}

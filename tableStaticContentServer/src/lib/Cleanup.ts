@@ -1,6 +1,6 @@
 import { tableTopCeph, tableTopMongo } from "../index";
 import Broadcaster from "./Broadcaster";
-import { onDeleteContentType } from "../typeConstant";
+import { contentTypeBucketMap, onDeleteContentType } from "../typeConstant";
 
 class Cleanup {
   constructor(private broadcaster: Broadcaster) {}
@@ -9,9 +9,9 @@ class Cleanup {
     const { table_id, contentType, contentId } = event.header;
     const { filename } = event.data;
 
-    await tableTopCeph.deleteFile("mybucket", filename);
+    await tableTopCeph.deleteFile(contentTypeBucketMap[contentType], filename);
 
-    await tableTopMongo.deleteDocument(table_id, contentType, contentId);
+    await tableTopMongo.deleteTableDocument(table_id, contentType, contentId);
 
     this.broadcaster.broadcastToTable(table_id, {
       type: "contentDeleted",

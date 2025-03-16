@@ -1,7 +1,7 @@
 import { PassThrough, Readable } from "stream";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { tableTopCeph } from "../index";
-import { onGetFileType } from "../typeConstant";
+import { contentTypeBucketMap, onGetFileType } from "../typeConstant";
 import Broadcaster from "../lib/Broadcaster";
 
 class Gets {
@@ -15,7 +15,7 @@ class Gets {
     if (!key) return;
 
     try {
-      const params = { Bucket: "mybucket", Key: key };
+      const params = { Bucket: contentTypeBucketMap[contentType], Key: key };
       const data = await tableTopCeph.s3Client.send(
         new GetObjectCommand(params)
       );

@@ -1,7 +1,7 @@
 import uWS from "uWebSockets.js";
-import { ImageEffectStylesType } from "../../mongoServer/src/lib/images/typeConstant";
-import { ApplicationEffectStylesType } from "../../mongoServer/src/lib/applications/typeConstant";
-import { VideoEffectStylesType } from "../../mongoServer/src/lib/videos/typeConstant";
+import { ImageEffectStylesType } from "../../mongoServer/src/lib/tableImages/typeConstant";
+import { ApplicationEffectStylesType } from "../../mongoServer/src/lib/tableApplications/typeConstant";
+import { VideoEffectStylesType } from "../../mongoServer/src/lib/tableVideos/typeConstant";
 import { onUpdateVideoPositionType } from "../../mongoServer/src/typeConstant";
 import { StaticContentTypes } from "../../universal/typeConstant";
 
@@ -13,14 +13,25 @@ export interface Tables {
   };
 }
 
-export type TableTopStaticMimeType =
+export const contentTypeBucketMap: {
+  [staticContentType in StaticContentTypes]: string;
+} = {
+  video: "table-videos",
+  image: "table-images",
+  svg: "table-svgs",
+  application: "table-applications",
+  text: "table-texts",
+  soundClip: "table-sound-clips",
+};
+
+export type StaticMimeTypes =
   | "image/jpeg"
   | "image/png"
   | "image/webp"
   | "image/gif"
-  | "image/svg+xml"
   | "image/bmp"
   | "image/tiff"
+  | "image/svg+xml"
   | "video/mp4"
   | "video/mpeg"
   | "video/webm"
@@ -39,7 +50,41 @@ export type TableTopStaticMimeType =
   | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   | "text/plain";
 
-export const mimeToExtension: { [key: string]: string } = {
+export const mimeTypeContentTypeMap: {
+  [tableTopStaticMimeType in StaticMimeTypes]: StaticContentTypes;
+} = {
+  "image/jpeg": "image",
+  "image/png": "image",
+  "image/webp": "image",
+  "image/gif": "image",
+  "image/bmp": "image",
+  "image/tiff": "image",
+  "image/svg+xml": "svg",
+  "video/mp4": "video",
+  "video/mpeg": "video",
+  "video/webm": "video",
+  "video/ogg": "video",
+  "video/x-msvideo": "video",
+  "audio/mpeg": "soundClip",
+  "audio/ogg": "soundClip",
+  "audio/wav": "soundClip",
+  "audio/webm": "soundClip",
+  "application/pdf": "application",
+  "application/vnd.ms-excel": "application",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+    "application",
+  "application/vnd.ms-powerpoint": "application",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    "application",
+  "application/msword": "application",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "application",
+  "text/plain": "text",
+};
+
+export const mimeToExtension: {
+  [tableTopStaticMimeType in StaticMimeTypes]: string;
+} = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
   "image/webp": ".webp",

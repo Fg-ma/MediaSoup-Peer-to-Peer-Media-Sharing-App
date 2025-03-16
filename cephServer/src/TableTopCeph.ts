@@ -50,7 +50,9 @@ class TableTopCeph {
 
       // Wait for the upload to complete
       await upload.done();
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   listBucketContents = async (bucketName: string) => {

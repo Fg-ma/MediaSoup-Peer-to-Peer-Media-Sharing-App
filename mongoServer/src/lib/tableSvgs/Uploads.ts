@@ -1,19 +1,15 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
-import {
-  soundClipEffectEncodingMap,
-  SoundClipEffectTypes,
-} from "./typeConstant";
 
 class Uploads {
   constructor(
-    private tableSoundClipsCollection: Collection,
+    private tableSvgsCollection: Collection,
     private encoder: Encoder
   ) {}
 
   uploadMetaData = async (data: {
     table_id: string;
-    soundClipId: string;
+    svgId: string;
     filename: string;
     mimeType: string;
     positioning: {
@@ -27,31 +23,31 @@ class Uploads {
       };
       rotation: number;
     };
-    effects: {
-      [effectType in SoundClipEffectTypes]: boolean;
-    };
+    visible: boolean;
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
     try {
-      await this.tableSoundClipsCollection?.insertOne(mongoData);
+      await this.tableSvgsCollection?.insertOne(mongoData);
     } catch (err) {
       console.error("Error uploading data:", err);
     }
   };
 
   editMetaData = async (
-    filter: { table_id: string; soundClipId: string },
+    filter: { table_id: string; svgId: string },
     updateData: Partial<{
       positioning?: {
         position?: { left?: number; top?: number };
         scale?: { x?: number; y?: number };
         rotation?: number;
       };
-      effects?: { [effectType in SoundClipEffectTypes]?: boolean };
+      filename?: string;
+      mimeType?: string;
+      visible?: boolean;
     }>
   ) => {
-    if (!this.tableSoundClipsCollection) {
+    if (!this.tableSvgsCollection) {
       console.error("Database not connected");
       return;
     }
@@ -80,23 +76,21 @@ class Uploads {
       }
     }
 
-    if (updateData.effects) {
-      updateFields["e"] = Object.keys(updateData.effects)
-        .filter(
-          (effect) =>
-            updateData.effects?.[effect as keyof typeof updateData.effects]
-        )
-        .map(
-          (effect) =>
-            soundClipEffectEncodingMap[
-              effect as keyof typeof updateData.effects
-            ]
-        );
+    if (updateData.filename) {
+      updateFields["n"] = updateData.filename;
+    }
+
+    if (updateData.mimeType) {
+      updateFields["m"] = updateData.mimeType;
+    }
+
+    if (updateData.visible) {
+      updateFields["v"] = updateData.visible;
     }
 
     try {
-      const result = await this.tableSoundClipsCollection.updateOne(
-        { tid: filter.table_id, iid: filter.soundClipId },
+      const result = await this.tableSvgsCollection.updateOne(
+        { tid: filter.table_id, sid: filter.svgId },
         { $set: updateFields }
       );
       return result;

@@ -99,7 +99,8 @@ export default function FgAudioElementContainer({
   };
 
   const { userDataStreams, remoteDataStreams } = useMediaContext();
-  const { mediasoupSocket, tableSocket } = useSocketContext();
+  const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
+    useSocketContext();
   const { username: activeUsername, instance: activeInstance } =
     useUserInfoContext();
 
@@ -199,6 +200,24 @@ export default function FgAudioElementContainer({
       fgAudioElementContainerController.attachListeners();
     }
 
+    // Request initial catch up data
+    if (!isUser && activeUsername.current && activeInstance.current) {
+      mediasoupSocket.current?.sendMessage({
+        type: "requestCatchUpData",
+        header: {
+          table_id: table_id,
+          inquiringUsername: activeUsername.current,
+          inquiringInstance: activeInstance.current,
+          inquiredUsername: username,
+          inquiredInstance: instance,
+          inquiredType: "audio",
+        },
+      });
+    }
+
+    tableStaticContentSocket.current?.addMessageListener(
+      fgAudioElementContainerController.handleTableStaticContentMessage
+    );
     mediasoupSocket.current?.addMessageListener(
       fgAudioElementContainerController.handleMediasoupMessage
     );
@@ -215,26 +234,14 @@ export default function FgAudioElementContainer({
       fgAudioElementContainerController.handleKeyUp
     );
 
-    // Request initial catch up data
-    if (!isUser && activeUsername.current && activeInstance.current) {
-      mediasoupSocket.current?.sendMessage({
-        type: "requestCatchUpData",
-        header: {
-          table_id: table_id,
-          inquiringUsername: activeUsername.current,
-          inquiringInstance: activeInstance.current,
-          inquiredUsername: username,
-          inquiredInstance: instance,
-          inquiredType: "audio",
-        },
-      });
-    }
-
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
           removeListener()
         )
+      );
+      tableStaticContentSocket.current?.removeMessageListener(
+        fgAudioElementContainerController.handleTableStaticContentMessage
       );
       mediasoupSocket.current?.removeMessageListener(
         fgAudioElementContainerController.handleMediasoupMessage
@@ -287,6 +294,21 @@ export default function FgAudioElementContainer({
       );
     }
   }, [positioning.current]);
+
+  const handleFileUpload = async (blob: Blob, name?: string) => {
+    const url = `https://localhost:8045/upload/${table_id}/${uuidv4()}/false`;
+    const formData = new FormData();
+
+    formData.append("file", blob, `${name ? name : "image"}.svg`);
+
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", url, true);
+      xhr.send(formData);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
 
   return (
     <div
@@ -565,18 +587,20 @@ export default function FgAudioElementContainer({
         )}
       {isBezierCurveEditor && (
         <Bezier
-          confirmBezierCurveFunction={(url, svg, _d, name) => {
+          confirmBezierCurveFunction={(url, svg, _d, blob, name) => {
             const id = uuidv4();
 
-            setExternalSVGs((prev) => [...prev, { id, url, svg, name }]);
+            handleFileUpload(blob, name);
 
-            setSettings((prev) => {
-              const newSettings = { ...prev };
+            // setExternalSVGs((prev) => [...prev, { id, url, svg, name }]);
 
-              newSettings.muteStyle.value = id;
+            // setSettings((prev) => {
+            //   const newSettings = { ...prev };
 
-              return newSettings;
-            });
+            //   newSettings.muteStyle.value = id;
+
+            //   return newSettings;
+            // });
             setIsBezierCurveEditor(false);
           }}
           closeFunction={() => setIsBezierCurveEditor(false)}

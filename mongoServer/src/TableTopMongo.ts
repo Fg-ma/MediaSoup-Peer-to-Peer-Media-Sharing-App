@@ -1,18 +1,25 @@
 import { MongoClient, Db } from "mongodb";
-import TableImages from "./lib/images/TableImages";
-import TableVideos from "./lib/videos/TableVideos";
-import TableSoundClips from "./lib/soundClips/TableSoundClips";
-import TableApplications from "./lib/applications/TableApplications";
-import TableText from "./lib/text/TableText";
+import TableImages from "./lib/tableImages/TableImages";
+import TableVideos from "./lib/tableVideos/TableVideos";
+import TableSoundClips from "./lib/tableSoundClips/TableSoundClips";
+import TableApplications from "./lib/tableApplications/TableApplications";
+import TableText from "./lib/tableText/TableText";
 import {
   onUpdateContentEffectsType,
   onUpdateContentPositioningType,
   onUpdateVideoPositionType,
 } from "./typeConstant";
-import { ImageEffectStylesType } from "./lib/images/typeConstant";
-import { VideoEffectStylesType } from "./lib/videos/typeConstant";
-import TablesMeta from "./lib/meta/TablesMeta";
+import { ImageEffectStylesType } from "./lib/tableImages/typeConstant";
+import { VideoEffectStylesType } from "./lib/tableVideos/typeConstant";
+import TablesMeta from "./lib/tableMeta/TablesMeta";
 import { StaticContentTypes } from "../../universal/typeConstant";
+import UserImages from "./lib/userImages/UserImages";
+import UserVideos from "./lib/userVideos/UserVideos";
+import UserSoundClips from "./lib/userSoundClips/UserSoundClips";
+import UserApplications from "./lib/userApplications/UserApplications";
+import UserText from "./lib/userText/UserText";
+import TableSvgs from "./lib/tableSvgs/TableSvgs";
+import UserSvgs from "./lib/userSvgs/UserSvgs";
 
 const uri = "mongodb://localhost:27017";
 const dbName = "tableTopMongo";
@@ -27,6 +34,13 @@ class TableTopMongo {
   tableSoundClips: TableSoundClips | undefined;
   tableApplications: TableApplications | undefined;
   tableText: TableText | undefined;
+  tableSvgs: TableSvgs | undefined;
+  userImages: UserImages | undefined;
+  userVideos: UserVideos | undefined;
+  userSoundClips: UserSoundClips | undefined;
+  userApplications: UserApplications | undefined;
+  userText: UserText | undefined;
+  userSvgs: UserSvgs | undefined;
 
   constructor() {
     this.getDbConnection();
@@ -49,15 +63,27 @@ class TableTopMongo {
     this.tableSoundClips = new TableSoundClips(this.db);
     this.tableApplications = new TableApplications(this.db);
     this.tableText = new TableText(this.db);
+    this.tableSvgs = new TableSvgs(this.db);
+    this.userImages = new UserImages(this.db);
+    this.userVideos = new UserVideos(this.db);
+    this.userSoundClips = new UserSoundClips(this.db);
+    this.userApplications = new UserApplications(this.db);
+    this.userText = new UserText(this.db);
+    this.userSvgs = new UserSvgs(this.db);
   };
 
-  deleteDocument = async (
+  deleteTableDocument = async (
     table_id: string,
     contentType: StaticContentTypes,
     contentId: string
   ) => {
     if (contentType === "image") {
       await this.tableImages?.deletes.deleteMetaDataBy_TID_IID(
+        table_id,
+        contentId
+      );
+    } else if (contentType === "svg") {
+      await this.tableSvgs?.deletes.deleteMetaDataBy_TID_SID(
         table_id,
         contentId
       );
@@ -84,6 +110,36 @@ class TableTopMongo {
     }
   };
 
+  deleteUserDocument = async (
+    user_id: string,
+    contentType: StaticContentTypes,
+    contentId: string
+  ) => {
+    if (contentType === "image") {
+      await this.userImages?.deletes.deleteMetaDataBy_UID_IID(
+        user_id,
+        contentId
+      );
+    } else if (contentType === "video") {
+      await this.userVideos?.deletes.deleteMetaDataBy_UID_VID(
+        user_id,
+        contentId
+      );
+    } else if (contentType === "application") {
+      await this.userApplications?.deletes.deleteMetaDataBy_UID_AID(
+        user_id,
+        contentId
+      );
+    } else if (contentType === "text") {
+      await this.userText?.deletes.deleteMetaDataBy_UID_XID(user_id, contentId);
+    } else if (contentType === "soundClip") {
+      await this.userSoundClips?.deletes.deleteMetaDataBy_UID_AID(
+        user_id,
+        contentId
+      );
+    }
+  };
+
   updateContentPositioning = async (event: onUpdateContentPositioningType) => {
     const { table_id, contentType, contentId } = event.header;
     const { positioning } = event.data;
@@ -92,6 +148,14 @@ class TableTopMongo {
       case "image":
         this.tableImages?.uploads.editMetaData(
           { table_id, imageId: contentId },
+          {
+            positioning,
+          }
+        );
+        break;
+      case "svg":
+        this.tableSvgs?.uploads.editMetaData(
+          { table_id, svgId: contentId },
           {
             positioning,
           }

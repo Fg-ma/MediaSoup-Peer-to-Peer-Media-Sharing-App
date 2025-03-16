@@ -113,7 +113,7 @@ class Uploads {
 
     try {
       const result = await this.tableApplicationsCollection.updateOne(
-        { tid: filter.table_id, vid: filter.applicationId },
+        { tid: filter.table_id, aid: filter.applicationId },
         { $set: updateFields }
       );
       return result;

@@ -23,7 +23,7 @@ export const useUserInfoContext = () => {
   const context = useContext(UserInfoContext);
   if (!context) {
     throw new Error(
-      "usePermisionsContext must be used within an UserInfoContextProvider"
+      "useUserInfoContext must be used within an UserInfoContextProvider"
     );
   }
   return context;

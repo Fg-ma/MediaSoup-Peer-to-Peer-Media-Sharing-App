@@ -3,18 +3,18 @@ import Decoder from "./Decoder";
 
 class Gets {
   constructor(
-    private tableSoundClipsCollection: Collection,
+    private userSoundClipsCollection: Collection,
     private decoder: Decoder
   ) {}
 
-  getSoundClipMetaDataBy_TID_AID = async (
-    table_id: string,
+  getSoundClipMetaDataBy_UID_AID = async (
+    user_id: string,
     soundClipId: string
   ) => {
     try {
-      const soundClipData = await this.tableSoundClipsCollection.findOne({
-        tid: table_id,
-        aid: soundClipId,
+      const soundClipData = await this.userSoundClipsCollection.findOne({
+        tid: user_id,
+        sid: soundClipId,
       });
 
       if (!soundClipData) {
@@ -29,10 +29,10 @@ class Gets {
     }
   };
 
-  getAllBy_TID = async (table_id: string) => {
+  getAllBy_UID = async (user_id: string) => {
     try {
-      const soundClipsData = await this.tableSoundClipsCollection
-        .find({ tid: table_id })
+      const soundClipsData = await this.userSoundClipsCollection
+        .find({ uid: user_id })
         .toArray();
 
       if (!soundClipsData || soundClipsData.length === 0) {
@@ -45,7 +45,7 @@ class Gets {
         this.decoder.decodeMetaData(data)
       );
     } catch (err) {
-      console.error("Error retrieving data by TID:", err);
+      console.error("Error retrieving data by UID:", err);
       return [];
     }
   };
