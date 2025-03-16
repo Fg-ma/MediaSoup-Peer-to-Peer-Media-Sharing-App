@@ -87,7 +87,7 @@ export default function Main() {
       if (userMedia.current.audio) {
         userMedia.current.audio.muteMic(mutedAudioRef.current);
       }
-    } else {
+    } else if (producerId === "screenAudio") {
       if (producerId && userMedia.current.screenAudio[producerId]) {
         userMedia.current.screenAudio[producerId].toggleMute();
       }
@@ -149,6 +149,7 @@ export default function Main() {
         audio: structuredClone(defaultAudioEffectsStyles),
         video: {},
         image: {},
+        svg: {},
         application: {},
         soundClip: {},
       };

@@ -14,7 +14,11 @@ class MediaContainerController {
     private table_id: React.MutableRefObject<string>,
     private mediaId: string,
     private kind: StaticContentTypes,
-    private rootMedia: HTMLVideoElement | HTMLImageElement | undefined,
+    private rootMedia:
+      | HTMLVideoElement
+      | HTMLImageElement
+      | SVGSVGElement
+      | undefined,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: () => void;
@@ -96,10 +100,14 @@ class MediaContainerController {
     const width =
       this.rootMedia instanceof HTMLVideoElement
         ? this.rootMedia.videoWidth
+        : this.rootMedia instanceof SVGSVGElement
+        ? this.rootMedia.width.baseVal.value
         : this.rootMedia.width;
     const height =
       this.rootMedia instanceof HTMLVideoElement
         ? this.rootMedia.videoHeight
+        : this.rootMedia instanceof SVGSVGElement
+        ? this.rootMedia.height.baseVal.value
         : this.rootMedia.height;
 
     if (width && height) {

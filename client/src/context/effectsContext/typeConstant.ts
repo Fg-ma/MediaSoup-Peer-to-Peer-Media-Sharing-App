@@ -828,37 +828,37 @@ export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
 });
 
 export const defaultSvgEffectsStyles: SvgEffectStylesType = Object.freeze({
-  shadow: {
+  shadow: Object.freeze({
     shadowColor: "#f2f2f2",
     strength: 0.75,
     offsetX: 0.25,
     offsetY: 0.5,
-  },
-  blur: {
+  }),
+  blur: Object.freeze({
     strength: 2,
-  },
-  grayscale: {
+  }),
+  grayscale: Object.freeze({
     scale: 0,
-  },
-  saturate: {
+  }),
+  saturate: Object.freeze({
     saturation: 2,
-  },
-  edgeDetection: {},
-  colorOverlay: {
+  }),
+  edgeDetection: Object.freeze({}),
+  colorOverlay: Object.freeze({
     overlayColor: "#d40213",
-  },
-  waveDistortion: {
+  }),
+  waveDistortion: Object.freeze({
     frequency: 0.05,
     strength: 30,
-  },
-  crackedGlass: {
+  }),
+  crackedGlass: Object.freeze({
     density: 0.2,
     detail: 2,
     strength: 15,
-  },
-  neonGlow: {
+  }),
+  neonGlow: Object.freeze({
     neonColor: "#d40213",
-  },
+  }),
 });
 
 export const defaultApplicationEffectsStyles: ApplicationEffectStylesType =

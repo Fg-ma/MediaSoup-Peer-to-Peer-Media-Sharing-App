@@ -2,19 +2,12 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import {
-  Settings,
-  ActivePages,
-  downloadTypeSelections,
-  downloadTypeOptions,
-  DownloadTypeOptionsTypes,
-  downloadTypeOptionsTitles,
-  downloadTypeOptionsArrays,
-} from "../../../typeConstant";
-import DownloadTypePage from "./DownloadTypePage";
-import DownloadTypeOptionsPage from "./DownloadTypeOptionsPage";
-import PageTemplate from "./PageTemplate";
-import LowerImageController from "../../LowerImageController";
+import { Settings, ActivePages } from "../../../typeConstant";
+import LowerSvgController from "../../LowerSvgController";
+import MimeTypePage from "./MimeTypePage";
+import SizePage from "./SizePage";
+import CompressionPage from "./CompressionPage";
+import DownloadOptionsPage from "./DownloadOptionsPage";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -60,7 +53,7 @@ export default function SettingsPanel({
   setActivePages,
   settings,
   setSettings,
-  lowerImageController,
+  lowerSvgController,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -68,7 +61,7 @@ export default function SettingsPanel({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
-  lowerImageController: LowerImageController;
+  lowerSvgController: LowerSvgController;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -143,11 +136,12 @@ export default function SettingsPanel({
     });
   };
 
-  const handleDownloadTypeActive = () => {
+  const handleDownloadOptionsActive = () => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.downloadType.active = !newActivePages.downloadType.active;
+      newActivePages.downloadOptions.active =
+        !newActivePages.downloadOptions.active;
 
       return newActivePages;
     });
@@ -189,140 +183,91 @@ export default function SettingsPanel({
                   Set as background (b)
                 </div>
               )}
-              clickFunction={lowerImageController.handleSetAsBackground}
+              clickFunction={lowerSvgController.handleSetAsBackground}
             />
             <FgButton
               className='w-full'
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
-                  <div>Download</div>
-                  <div>
-                    {Object.prototype.hasOwnProperty.call(
-                      downloadTypeSelections,
-                      settings.downloadType.value
-                    ) && downloadTypeSelections[settings.downloadType.value]}
-                  </div>
+                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center'>
+                  Download options
                 </div>
               )}
-              clickFunction={handleDownloadTypeActive}
+              clickFunction={handleDownloadOptionsActive}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>{" "}
+      {/* Download options page */}
+      <AnimatePresence>
+        {activePages.downloadOptions.active &&
+          !isDescendantActive(activePages.downloadOptions) && (
+            <motion.div
+              className='w-full'
+              variants={panelVariants}
+              initial='init'
+              animate='animate'
+              exit='exit'
+            >
+              <DownloadOptionsPage
+                setActivePages={setActivePages}
+                settings={settings}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      {/* Download options mime type page */}
+      <AnimatePresence>
+        {activePages.downloadOptions.mimeType.active && (
+          <motion.div
+            className='w-full'
+            variants={panelVariants}
+            initial='init'
+            animate='animate'
+            exit='exit'
+          >
+            <MimeTypePage
+              setActivePages={setActivePages}
+              settings={settings}
+              setSettings={setSettings}
             />
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Download options size page */}
       <AnimatePresence>
-        {activePages.downloadType.active &&
-          !isDescendantActive(activePages.downloadType) && (
-            <motion.div
-              className='w-full'
-              variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
-            >
-              <DownloadTypePage
-                setActivePages={setActivePages}
-                settings={settings}
-                setSettings={setSettings}
-              />
-            </motion.div>
-          )}
+        {activePages.downloadOptions.size.active && (
+          <motion.div
+            className='w-full'
+            variants={panelVariants}
+            initial='init'
+            animate='animate'
+            exit='exit'
+          >
+            <SizePage
+              setActivePages={setActivePages}
+              settings={settings}
+              setSettings={setSettings}
+            />
+          </motion.div>
+        )}
       </AnimatePresence>
+      {/* Download options compression page */}
       <AnimatePresence>
-        {activePages.downloadType.active &&
-          activePages.downloadType.downloadTypeOptions.active &&
-          !isDescendantActive(activePages.downloadType.downloadTypeOptions) && (
-            <motion.div
-              className='w-full'
-              variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
-            >
-              <DownloadTypeOptionsPage
-                setActivePages={setActivePages}
-                settings={settings}
-              />
-            </motion.div>
-          )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {activePages.downloadType.active &&
-          activePages.downloadType.downloadTypeOptions.active &&
-          isDescendantActive(activePages.downloadType.downloadTypeOptions) && (
-            <motion.div
-              className='w-full'
-              variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
-            >
-              {downloadTypeOptions.map((option) => {
-                const activePage =
-                  activePages.downloadType.downloadTypeOptions[
-                    option as DownloadTypeOptionsTypes
-                  ];
-                const activeSetting =
-                  settings.downloadType.downloadTypeOptions[
-                    option as DownloadTypeOptionsTypes
-                  ];
-
-                return (
-                  activePage.active && (
-                    <PageTemplate
-                      key={option}
-                      content={downloadTypeOptionsArrays[
-                        option as DownloadTypeOptionsTypes
-                      ].map((type) => (
-                        <FgButton
-                          key={type}
-                          className={`w-full rounded bg-opacity-75 min-w-32 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
-                            type === activeSetting.value
-                              ? "bg-fg-white text-fg-tone-black-1"
-                              : ""
-                          }`}
-                          contentFunction={() => (
-                            <div className='flex justify-start items-start'>
-                              {type}
-                            </div>
-                          )}
-                          clickFunction={() => {
-                            setSettings((prev) => {
-                              const newSettings = { ...prev };
-
-                              newSettings.downloadType.downloadTypeOptions[
-                                option as DownloadTypeOptionsTypes
-                              ].value = type;
-
-                              return newSettings;
-                            });
-                          }}
-                        />
-                      ))}
-                      pageTitle={
-                        downloadTypeOptionsTitles[
-                          option as DownloadTypeOptionsTypes
-                        ]
-                      }
-                      backFunction={() => {
-                        setActivePages((prev) => {
-                          const newActivePages = { ...prev };
-
-                          newActivePages.downloadType.downloadTypeOptions[
-                            option as DownloadTypeOptionsTypes
-                          ].active =
-                            !newActivePages.downloadType.downloadTypeOptions[
-                              option as DownloadTypeOptionsTypes
-                            ].active;
-
-                          return newActivePages;
-                        });
-                      }}
-                    />
-                  )
-                );
-              })}
-            </motion.div>
-          )}
+        {activePages.downloadOptions.compression.active && (
+          <motion.div
+            className='w-full'
+            variants={panelVariants}
+            initial='init'
+            animate='animate'
+            exit='exit'
+          >
+            <CompressionPage
+              setActivePages={setActivePages}
+              settings={settings}
+              setSettings={setSettings}
+            />
+          </motion.div>
+        )}
       </AnimatePresence>
     </motion.div>,
     document.body

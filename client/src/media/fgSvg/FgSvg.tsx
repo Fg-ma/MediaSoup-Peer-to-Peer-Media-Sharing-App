@@ -6,7 +6,7 @@ import SvgController from "./lib/SvgController";
 import LowerSvgController from "./lib/lowerSvgControls/LowerSvgController";
 import {
   ActivePages,
-  defaultActiveSettingsPages,
+  defaultActivePages,
   defaultSettings,
   Settings,
 } from "./lib/typeConstant";
@@ -54,7 +54,7 @@ export default function FgSvg({
     structuredClone(defaultSettings)
   );
   const [activePages, setActivePages] = useState<ActivePages>(
-    defaultActiveSettingsPages
+    structuredClone(defaultActivePages)
   );
 
   const lowerSvgController = new LowerSvgController(
@@ -84,117 +84,95 @@ export default function FgSvg({
   );
 
   useEffect(() => {
-    subContainerRef.current?.appendChild(imageMedia.canvas);
+    svgMedia.addDownloadCompleteListener(() => {
+      if (svgMedia.svg) subContainerRef.current?.appendChild(svgMedia.svg);
+    });
 
-    document.addEventListener("keydown", lowerImageController.handleKeyDown);
+    document.addEventListener("keydown", lowerSvgController.handleKeyDown);
 
-    document.addEventListener("keyup", lowerImageController.handleKeyUp);
+    document.addEventListener("keyup", lowerSvgController.handleKeyUp);
 
     tableRef.current?.addEventListener(
       "scroll",
-      imageController.handleTableScroll
+      svgController.handleTableScroll
     );
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        lowerImageController.handleKeyDown
-      );
-      document.removeEventListener("keyup", lowerImageController.handleKeyUp);
+      document.removeEventListener("keydown", lowerSvgController.handleKeyDown);
+      document.removeEventListener("keyup", lowerSvgController.handleKeyUp);
       tableRef.current?.removeEventListener(
         "scroll",
-        imageController.handleTableScroll
+        svgController.handleTableScroll
       );
     };
   }, []);
 
   useEffect(() => {
-    setActivePages(defaultActiveSettingsPages);
+    setActivePages(structuredClone(defaultActivePages));
   }, [settingsActive]);
 
   useEffect(() => {
-    if (settings.downloadType.value !== "record" && recording.current) {
-      imageMedia.babylonScene?.stopRecording();
-      downloadRecordingReady.current = true;
-      recording.current = false;
-    }
-  }, [settings.downloadType.value]);
-
-  useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      imageController.handleTableStaticContentMessage
+      svgController.handleTableStaticContentMessage
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        imageController.handleTableStaticContentMessage
+        svgController.handleTableStaticContentMessage
       );
   }, [tableStaticContentSocket.current]);
 
   return (
     <FgMediaContainer
-      mediaId={imageId}
-      filename={imageMedia.filename}
-      kind='image'
-      rootMedia={imageMedia.image}
+      mediaId={svgId}
+      filename={svgMedia.filename}
+      kind='svg'
+      rootMedia={svgMedia.svg}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
-      className='image-container'
+      className='svg-container'
       popupElements={[
-        imageEffectsActive ? (
-          <ImageEffectsSection
-            imageId={imageId}
-            lowerImageController={lowerImageController}
-            tintColor={tintColor}
-            imageMedia={imageMedia}
-            imageContainerRef={imageContainerRef}
+        svgEffectsActive ? (
+          <SvgEffectsSection
+            lowerSvgController={lowerSvgController}
+            svgContainerRef={svgContainerRef}
           />
         ) : null,
       ]}
       leftLowerControls={[]}
       rightLowerControls={[
         <SettingsButton
-          effectsActive={imageEffectsActive}
-          containerRef={imageContainerRef}
+          effectsActive={svgEffectsActive}
+          containerRef={svgContainerRef}
           settingsActive={settingsActive}
           setSettingsActive={setSettingsActive}
           activePages={activePages}
           setActivePages={setActivePages}
           settings={settings}
           setSettings={setSettings}
-          scrollingContainerRef={rightLowerImageControlsRef}
-          lowerImageController={lowerImageController}
+          scrollingContainerRef={rightLowerSvgControlsRef}
+          lowerSvgController={lowerSvgController}
         />,
         <DownloadButton
-          settings={settings}
-          recording={recording}
-          lowerImageController={lowerImageController}
-          imageEffectsActive={imageEffectsActive}
+          svgMedia={svgMedia}
+          svgEffectsActive={svgEffectsActive}
           settingsActive={settingsActive}
-          scrollingContainerRef={rightLowerImageControlsRef}
+          scrollingContainerRef={rightLowerSvgControlsRef}
         />,
-        settings.downloadType.value === "record" &&
-        downloadRecordingReady.current ? (
-          <DownloadRecordingButton
-            lowerImageController={lowerImageController}
-            imageEffectsActive={imageEffectsActive}
-            settingsActive={settingsActive}
-            scrollingContainerRef={rightLowerImageControlsRef}
-          />
-        ) : null,
-        <ImageEffectsButton
-          lowerImageController={lowerImageController}
-          imageEffectsActive={imageEffectsActive}
+        <SvgEffectsButton
+          lowerSvgController={lowerSvgController}
+          svgEffectsActive={svgEffectsActive}
           settingsActive={settingsActive}
-          scrollingContainerRef={rightLowerImageControlsRef}
+          scrollingContainerRef={rightLowerSvgControlsRef}
         />,
       ]}
-      inMediaVariables={[imageEffectsActive, settingsActive]}
-      preventLowerLabelsVariables={[settingsActive, imageEffectsActive]}
+      inMediaVariables={[svgEffectsActive, settingsActive]}
+      preventLowerLabelsVariables={[settingsActive, svgEffectsActive]}
       externalPositioning={positioning}
-      externalMediaContainerRef={imageContainerRef}
+      externalMediaContainerRef={svgContainerRef}
       externalSubContainerRef={subContainerRef}
-      externalRightLowerControlsRef={rightLowerImageControlsRef}
+      externalRightLowerControlsRef={rightLowerSvgControlsRef}
+      options={{ gradient: false }}
     />
   );
 }

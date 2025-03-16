@@ -118,15 +118,18 @@ export default function SharedBundle({
         ))}
       {userMedia.current.svg &&
         Object.keys(userMedia.current.svg).length !== 0 &&
-        Object.keys(userMedia.current.svg).map((svgId) => (
-          <Suspense key={svgId} fallback={<div>Loading...</div>}>
-            <FgSvg
-              svgId={svgId}
-              bundleRef={sharedBundleRef}
-              tableRef={tableRef}
-            />
-          </Suspense>
-        ))}
+        Object.entries(userMedia.current.svg).map(
+          ([svgId, svgMedia]) =>
+            svgMedia.visible && (
+              <Suspense key={svgId} fallback={<div>Loading...</div>}>
+                <FgSvg
+                  svgId={svgId}
+                  bundleRef={sharedBundleRef}
+                  tableRef={tableRef}
+                />
+              </Suspense>
+            )
+        )}
       {userMedia.current.application &&
         Object.keys(userMedia.current.application).length !== 0 &&
         Object.keys(userMedia.current.application).map((applicationId) => (

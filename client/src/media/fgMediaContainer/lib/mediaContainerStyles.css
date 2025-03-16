@@ -59,8 +59,17 @@
 }
 
 .animated-border-box-glow {
-  overflow: hidden;
   filter: blur(15px);
+  clip-path: polygon(
+    0% 0%,
+    100% 0%,
+    100% 100%,
+    0% 100%,
+    /* Outer square */ 4px 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) calc(100% - 4px),
+    4px calc(100% - 4px) /* Inner cutout */
+  );
 }
 
 .animated-border-box:before,
@@ -84,6 +93,17 @@
     rgba(0, 0, 0, 0) 185deg
   );
   animation: rotate 3s linear infinite;
+
+  clip-path: polygon(
+    0% 0%,
+    100% 0%,
+    100% 100%,
+    0% 100%,
+    /* Outer square */ 4px 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) calc(100% - 4px),
+    4px calc(100% - 4px) /* Inner cutout */
+  );
 }
 
 @keyframes rotate {

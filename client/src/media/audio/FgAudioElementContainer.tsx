@@ -544,13 +544,24 @@ export default function FgAudioElementContainer({
               permissions={permissions}
               producerType={"audio"}
               producerId={undefined}
-              handleAudioEffectChange={handleAudioEffectChange}
+              handleAudioEffectChange={
+                handleAudioEffectChange as (
+                  producerType: "audio" | "screenAudio" | "video",
+                  producerId: string | undefined,
+                  effect: AudioEffectTypes
+                ) => void
+              }
               placement='right'
               referenceElement={
                 audioElementSVGRef as unknown as React.RefObject<HTMLElement>
               }
               padding={12}
-              handleMute={handleMute}
+              handleMute={
+                handleMute as (
+                  producerType: "audio" | "screenAudio" | "video",
+                  producerId: string | undefined
+                ) => void
+              }
               localMute={localMute}
               clientMute={clientMute}
               closeCallback={() => setAudioEffectsSectionVisible(false)}

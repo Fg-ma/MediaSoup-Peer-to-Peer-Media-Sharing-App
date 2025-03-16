@@ -1,115 +1,94 @@
 export interface ActivePages {
-  downloadType: {
+  downloadOptions: {
     active: boolean;
-    downloadTypeOptions: {
+    mimeType: {
       active: boolean;
-      fps: {
-        active: boolean;
-      };
-      mimeType: {
-        active: boolean;
-      };
+    };
+    size: {
+      active: boolean;
+    };
+    compression: {
+      active: boolean;
     };
   };
 }
 
-export type DownloadTypes = "snapShot" | "original" | "record";
-
 export interface Settings {
   background: { value: "true" | "false" };
-  downloadType: {
-    value: DownloadTypes;
-    downloadTypeOptions: {
-      value: "";
-      fps: {
-        value: DownloadRecordingFPSTypes;
-      };
-      mimeType: {
-        value: DownloadRecordingMimeTypes;
-      };
+  downloadOptions: {
+    mimeType: {
+      value: DownloadMimeTypes;
+    };
+    size: {
+      value: number;
+    };
+    compression: {
+      value: DownloadCompressionTypes;
     };
   };
 }
 
 export const defaultSettings: Settings = Object.freeze({
   background: Object.freeze({ value: "false" }),
-  downloadType: Object.freeze({
-    value: "snapShot",
-    downloadTypeOptions: Object.freeze({
-      value: "",
-      fps: Object.freeze({
-        value: "30 fps",
-      }),
-      mimeType: Object.freeze({
-        value: "webm/vp9",
-      }),
+  downloadOptions: Object.freeze({
+    mimeType: Object.freeze({
+      value: "svg",
+    }),
+    size: Object.freeze({
+      value: 1024,
+    }),
+    compression: Object.freeze({
+      value: "Plain",
     }),
   }),
 });
 
-export const downloadTypeSelections = {
-  snapShot: "Snap shot",
-  original: "Original",
-  record: "Record",
-};
-
-export const defaultActiveSettingsPages: ActivePages = {
-  downloadType: {
+export const defaultActivePages: ActivePages = {
+  downloadOptions: Object.freeze({
     active: false,
-    downloadTypeOptions: {
+    mimeType: Object.freeze({
       active: false,
-      fps: {
-        active: false,
-      },
-      mimeType: {
-        active: false,
-      },
-    },
-  },
+    }),
+    size: Object.freeze({
+      active: false,
+    }),
+    compression: Object.freeze({
+      active: false,
+    }),
+  }),
 };
 
-export type DownloadRecordingMimeTypes =
-  | "webm/vp9"
-  | "webm/vp8"
-  | "webm/av1"
-  | "ogg";
+export type DownloadMimeTypes =
+  | "svg"
+  | "svgz"
+  | "jpg"
+  | "png"
+  | "webp"
+  | "tiff"
+  | "heic";
 
-export type DownloadRecordingFPSTypes =
-  | "24 fps"
-  | "25 fps"
-  | "30 fps"
-  | "60 fps";
+export type DownloadSizeTypes =
+  | "256"
+  | "512"
+  | "1024"
+  | "2048"
+  | "4096"
+  | "16384";
 
-export interface DownloadTypeOptions {
-  fps: DownloadRecordingFPSTypes;
-  mimeType: DownloadRecordingMimeTypes;
-}
+export type DownloadCompressionTypes = "Minified" | "Plain" | "Zipped";
 
-export type DownloadTypeOptionsTypes = "fps" | "mimeType";
-
-export const downloadTypeOptions: DownloadTypeOptionsTypes[] = [
-  "fps",
-  "mimeType",
-];
-
-export const downloadTypeOptionsArrays: {
-  fps: DownloadRecordingFPSTypes[];
-  mimeType: DownloadRecordingMimeTypes[];
-} = {
-  fps: ["24 fps", "25 fps", "30 fps", "60 fps"],
-  mimeType: ["webm/vp9", "webm/vp8", "webm/av1", "ogg"],
-};
-
-export const downloadTypeOptionsTitles = {
-  fps: "FPS",
+export const downloadOptionsTitles = {
   mimeType: "Mime type",
+  size: "Size",
+  compression: "Compression",
 };
 
-export const downloadRecordingMimeMap: {
-  [downloadRecordingMimeType in DownloadRecordingMimeTypes]: string;
+export const downloadOptionsArrays: {
+  mimeType: DownloadMimeTypes[];
+  size: DownloadSizeTypes[];
+  compression: DownloadCompressionTypes[];
 } = {
-  "webm/vp9": "video/webm; codecs=vp9",
-  "webm/vp8": "video/webm; codecs=vp8",
-  "webm/av1": "video/webm; codecs=av1",
-  ogg: "video/ogg",
+  mimeType: ["svg", "svgz", "jpg", "png", "webp", "tiff", "heic"],
+  size: ["256", "512", "1024", "2048", "4096", "16384"],
+  compression: ["Minified", "Plain", "Zipped"],
 };

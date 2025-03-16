@@ -33,6 +33,8 @@ class SvgMedia {
     rotation: number;
   };
 
+  private downloadCompleteListeners: Set<() => void> = new Set();
+
   constructor(
     private svgId: string,
     filename: string,
@@ -88,6 +90,8 @@ class SvgMedia {
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
     this.removeMessageListener(this.getSvgListener);
+
+    this.downloadCompleteListeners.clear();
   }
 
   private getSvgListener = async (
@@ -134,9 +138,26 @@ class SvgMedia {
       const parser = new DOMParser();
       const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
       this.svg = svgDoc.documentElement as unknown as SVGSVGElement;
+      this.svg.setAttribute("width", "100%");
+      this.svg.setAttribute("height", "100%");
+      this.svg.setAttribute("fill", "white");
+      this.svg.setAttribute("stroke", "white");
+
+      this.downloadCompleteListeners.forEach((listener) => {
+        listener();
+      });
+      this.downloadCompleteListeners.clear();
 
       this.removeMessageListener(this.getSvgListener);
     }
+  };
+
+  addDownloadCompleteListener = (listener: () => void): void => {
+    this.downloadCompleteListeners.add(listener);
+  };
+
+  removeDownloadCompleteListener = (listener: () => void): void => {
+    this.downloadCompleteListeners.delete(listener);
   };
 
   downloadSvg = () => {

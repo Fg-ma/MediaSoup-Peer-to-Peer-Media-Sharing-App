@@ -71,8 +71,7 @@ class BundleController extends BundleSocket {
           producerType: "audio" | "screenAudio",
           producerId: string | undefined
         ) => void)
-      | undefined,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+      | undefined
   ) {
     super(
       mediasoupSocket,

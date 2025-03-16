@@ -4,8 +4,8 @@ import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import {
   Settings,
   ActivePages,
-  downloadTypeOptionsTitles,
-  downloadTypeOptionsArrays,
+  downloadOptionsTitles,
+  downloadOptionsArrays,
 } from "../../../typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -14,32 +14,30 @@ const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 const navigateForwardIcon =
   nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
-export default function DownloadTypeOptionsPage({
+export default function DownloadOptionsPage({
   setActivePages,
   settings,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
 }) {
-  const handleDownloadTypeOptionsActive = () => {
+  const handleDownloadOptionsActive = () => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.downloadType.downloadTypeOptions.active =
-        !newActivePages.downloadType.downloadTypeOptions.active;
+      newActivePages.downloadOptions.active =
+        !newActivePages.downloadOptions.active;
 
       return newActivePages;
     });
   };
 
-  const handleOptionSelect = (
-    option: keyof typeof downloadTypeOptionsTitles
-  ) => {
+  const handleOptionSelect = (option: keyof typeof downloadOptionsTitles) => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.downloadType.downloadTypeOptions[option].active =
-        !newActivePages.downloadType.downloadTypeOptions[option].active;
+      newActivePages.downloadOptions[option].active =
+        !newActivePages.downloadOptions[option].active;
 
       return newActivePages;
     });
@@ -61,53 +59,55 @@ export default function DownloadTypeOptionsPage({
               ]}
             />
           )}
-          clickFunction={handleDownloadTypeOptionsActive}
+          clickFunction={handleDownloadOptionsActive}
         />
         <div
           className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
-          onClick={handleDownloadTypeOptionsActive}
+          onClick={handleDownloadOptionsActive}
         >
-          Options
+          Download options
         </div>
       </div>
       <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
       <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
-        {Object.keys(downloadTypeOptionsArrays).map((option) => (
+        {Object.keys(downloadOptionsArrays).map((option) => (
           <FgButton
             key={option}
             className='w-full h-8'
             clickFunction={() =>
-              handleOptionSelect(
-                option as keyof typeof downloadTypeOptionsArrays
-              )
+              handleOptionSelect(option as keyof typeof downloadOptionsArrays)
             }
             contentFunction={() => (
-              <div className='flex w-full justify-between space-x-4 px-2 bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap'>
+              <div className='flex justify-between w-full space-x-4 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap'>
                 <div>
                   {
-                    downloadTypeOptionsTitles[
-                      option as keyof typeof downloadTypeOptionsArrays
+                    downloadOptionsTitles[
+                      option as keyof typeof downloadOptionsArrays
                     ]
                   }
                 </div>
-                <div className='flex space-x-1 items-center justify-center'>
-                  <div>
-                    {
-                      settings.downloadType.downloadTypeOptions[
-                        option as keyof typeof downloadTypeOptionsArrays
-                      ].value
-                    }
+                {option !== "antialiasing" && (
+                  <div className='flex space-x-1 items-center justify-center'>
+                    <div>
+                      {option === "size"
+                        ? parseFloat(
+                            settings.downloadOptions[option].value.toFixed(2)
+                          )
+                        : settings.downloadOptions[
+                            option as keyof typeof downloadOptionsArrays
+                          ].value}
+                    </div>
+                    <FgSVGElement
+                      src={navigateForwardIcon}
+                      attributes={[
+                        { key: "width", value: "1.25rem" },
+                        { key: "height", value: "1.25rem" },
+                        { key: "fill", value: "#f2f2f2" },
+                        { key: "stroke", value: "#f2f2f2" },
+                      ]}
+                    />
                   </div>
-                  <FgSVGElement
-                    src={navigateForwardIcon}
-                    attributes={[
-                      { key: "width", value: "1.25rem" },
-                      { key: "height", value: "1.25rem" },
-                      { key: "fill", value: "#f2f2f2" },
-                      { key: "stroke", value: "#f2f2f2" },
-                    ]}
-                  />
-                </div>
+                )}
               </div>
             )}
           />

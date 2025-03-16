@@ -32,7 +32,9 @@ export default function UploadMediaButton() {
       return;
     }
 
-    const url = `https://localhost:8045/upload/${table_id.current}/${uuidv4()}`;
+    const url = `https://localhost:8045/upload/${
+      table_id.current
+    }/${uuidv4()}/true`;
     const formData = new FormData();
     formData.append("file", file.current);
 

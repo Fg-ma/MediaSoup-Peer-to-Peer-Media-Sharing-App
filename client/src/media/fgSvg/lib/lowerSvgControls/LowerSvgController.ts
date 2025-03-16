@@ -1,23 +1,21 @@
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserStreamEffectsType,
-  ImageEffectTypes,
+  SvgEffectTypes,
   UserEffectsStylesType,
 } from "../../../../context/effectsContext/typeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import ImageMedia from "../../ImageMedia";
-import { downloadRecordingMimeMap, Settings } from "../typeConstant";
+import SvgMedia from "../../SvgMedia";
+import { Settings } from "../typeConstant";
 
-class LowerImageController {
+class LowerSvgController {
   constructor(
-    private imageId: string,
-    private imageMedia: ImageMedia,
-    private imageContainerRef: React.RefObject<HTMLDivElement>,
+    private svgId: string,
+    private svgMedia: SvgMedia,
+    private svgContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
-    private setImageEffectsActive: React.Dispatch<
-      React.SetStateAction<boolean>
-    >,
+    private setSvgEffectsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
@@ -30,14 +28,14 @@ class LowerImageController {
     private setSettings: React.Dispatch<React.SetStateAction<Settings>>
   ) {}
 
-  handleImageEffects = () => {
-    this.setImageEffectsActive((prev) => !prev);
+  handleSvgEffects = () => {
+    this.setSvgEffectsActive((prev) => !prev);
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
-      !this.imageContainerRef.current?.classList.contains("in-media") ||
+      !this.svgContainerRef.current?.classList.contains("in-media") ||
       this.controlPressed.current ||
       this.shiftPressed.current
     ) {
@@ -55,16 +53,13 @@ class LowerImageController {
         this.controlPressed.current = true;
         break;
       case "e":
-        this.handleImageEffects();
+        this.handleSvgEffects();
         break;
       case "d":
-        this.handleDownload();
+        this.svgMedia.downloadSvg();
         break;
       case "u":
         this.handleSettings();
-        break;
-      case "h":
-        this.handleDownloadRecording();
         break;
       case "b":
         this.handleSetAsBackground();
@@ -89,71 +84,37 @@ class LowerImageController {
     }
   };
 
-  handleImageEffect = async (
-    effect: ImageEffectTypes | "clearAll",
+  handleSvgEffect = async (
+    effect: SvgEffectTypes | "clearAll",
     blockStateChange: boolean
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.userStreamEffects.current.image[this.imageId][effect] =
-          !this.userStreamEffects.current.image[this.imageId][effect];
+        this.userStreamEffects.current.svg[this.svgId][effect] =
+          !this.userStreamEffects.current.svg[this.svgId][effect];
       }
 
-      this.userMedia.current.image[this.imageId].changeEffects(
-        effect,
-        this.tintColor.current,
-        blockStateChange
-      );
+      // this.svgMedia.changeEffects(
+      //   effect,
+      //   this.tintColor.current,
+      //   blockStateChange
+      // );
 
-      this.tableStaticContentSocket.current?.updateContentEffects(
-        "image",
-        this.imageId,
-        this.userStreamEffects.current.image[this.imageId],
-        this.userEffectsStyles.current.image[this.imageId]
-      );
+      // this.tableStaticContentSocket.current?.updateContentEffects(
+      //   "svg",
+      //   this.svgId,
+      //   this.userStreamEffects.current.svg[this.svgId],
+      //   this.userEffectsStyles.current.svg[this.svgId]
+      // );
     } else {
-      this.userMedia.current.image[this.imageId].clearAllEffects();
-
-      this.tableStaticContentSocket.current?.updateContentEffects(
-        "image",
-        this.imageId,
-        this.userStreamEffects.current.image[this.imageId],
-        this.userEffectsStyles.current.image[this.imageId]
-      );
+      // this.svgMedia.clearAllEffects();
+      // this.tableStaticContentSocket.current?.updateContentEffects(
+      //   "svg",
+      //   this.svgId,
+      //   this.userStreamEffects.current.svg[this.svgId],
+      //   this.userEffectsStyles.current.svg[this.svgId]
+      // );
     }
-  };
-
-  handleDownload = () => {
-    if (this.settings.downloadType.value === "snapShot") {
-      this.imageMedia.babylonScene?.downloadSnapShot();
-    } else if (this.settings.downloadType.value === "original") {
-      this.imageMedia.downloadImage();
-    } else if (this.settings.downloadType.value === "record") {
-      if (!this.recording.current) {
-        this.imageMedia.babylonScene?.startRecording(
-          downloadRecordingMimeMap[
-            this.settings.downloadType.downloadTypeOptions.mimeType.value
-          ],
-          parseInt(
-            this.settings.downloadType.downloadTypeOptions.fps.value.slice(
-              0,
-              -4
-            )
-          )
-        );
-        this.downloadRecordingReady.current = false;
-      } else {
-        this.imageMedia.babylonScene?.stopRecording();
-        this.downloadRecordingReady.current = true;
-      }
-
-      this.recording.current = !this.recording.current;
-      this.setRerender((prev) => !prev);
-    }
-  };
-
-  handleDownloadRecording = () => {
-    this.imageMedia.babylonScene?.downloadRecording();
   };
 
   handleSettings = () => {
@@ -175,4 +136,4 @@ class LowerImageController {
   };
 }
 
-export default LowerImageController;
+export default LowerSvgController;

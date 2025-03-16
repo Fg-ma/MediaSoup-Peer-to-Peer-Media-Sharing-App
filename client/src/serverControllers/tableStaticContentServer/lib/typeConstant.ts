@@ -5,6 +5,7 @@ import {
   AudioEffectTypes,
   ImageEffectStylesType,
   ImageEffectTypes,
+  SvgEffectStylesType,
   VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../context/effectsContext/typeConstant";
@@ -398,7 +399,8 @@ export type onUpdatedContentEffectsType = {
     effectStyles?:
       | VideoEffectStylesType
       | ImageEffectStylesType
-      | ApplicationEffectStylesType;
+      | ApplicationEffectStylesType
+      | SvgEffectStylesType;
   };
 };
 

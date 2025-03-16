@@ -3,7 +3,7 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
 import { Settings, ActivePages } from "../../typeConstant";
-import LowerImageController from "../LowerImageController";
+import LowerSvgController from "../LowerSvgController";
 
 type RecursiveObject = {
   active?: boolean;
@@ -20,7 +20,7 @@ export default function SettingsButton({
   settings,
   setSettings,
   scrollingContainerRef,
-  lowerImageController,
+  lowerSvgController,
 }: {
   effectsActive: boolean;
   containerRef: React.RefObject<HTMLDivElement>;
@@ -31,7 +31,7 @@ export default function SettingsButton({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
-  lowerImageController: LowerImageController;
+  lowerSvgController: LowerSvgController;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -134,7 +134,7 @@ export default function SettingsButton({
           setActivePages={setActivePages}
           settings={settings}
           setSettings={setSettings}
-          lowerImageController={lowerImageController}
+          lowerSvgController={lowerSvgController}
         />
       )}
     </>

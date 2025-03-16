@@ -99,8 +99,6 @@ export default function Bundle({
     bundleOptions.permissions
   );
 
-  const [_, setRerender] = useState(false);
-
   const bundleController = new BundleController(
     mediasoupSocket,
     bundleOptions.isUser,
@@ -125,8 +123,7 @@ export default function Bundle({
     permissions,
     setPermissions,
     onNewConsumerWasCreatedCallback,
-    handleMuteCallback,
-    setRerender
+    handleMuteCallback
   );
 
   useEffect(() => {

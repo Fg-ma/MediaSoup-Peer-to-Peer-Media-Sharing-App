@@ -1,6 +1,6 @@
 import {
-  ImageEffectStylesType,
-  ImageEffectTypes,
+  SvgEffectStylesType,
+  SvgEffectTypes,
   UserEffectsStylesType,
   UserStreamEffectsType,
 } from "../../../context/effectsContext/typeConstant";
@@ -12,8 +12,8 @@ import SvgMedia from "../SvgMedia";
 
 class SvgController {
   constructor(
-    private imageId: string,
-    private imageMedia: ImageMedia,
+    private svgId: string,
+    private svgMedia: SvgMedia,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -28,23 +28,21 @@ class SvgController {
     const { contentType, contentId } = event.header;
     const { effects, effectStyles } = event.data;
 
-    if (contentType === "image" && contentId === this.imageId) {
-      this.userStreamEffects.current.image[this.imageId] = effects as {
-        [effectType in ImageEffectTypes]: boolean;
+    if (contentType === "svg" && contentId === this.svgId) {
+      this.userStreamEffects.current.svg[this.svgId] = effects as {
+        [effectType in SvgEffectTypes]: boolean;
       };
 
       const oldEffectStyle = structuredClone(
-        this.userEffectsStyles.current.image[this.imageId]
+        this.userEffectsStyles.current.svg[this.svgId]
       );
 
       if (effectStyles !== undefined) {
-        this.userEffectsStyles.current.image[this.imageId] =
-          effectStyles as ImageEffectStylesType;
-
-        this.tintColor.current = effectStyles.tint.color;
+        this.userEffectsStyles.current.svg[this.svgId] =
+          effectStyles as SvgEffectStylesType;
       }
 
-      this.imageMedia.updateAllEffects(oldEffectStyle);
+      // this.svgMedia.updateAllEffects(oldEffectStyle);
 
       this.setRerender((prev) => !prev);
     }
@@ -63,4 +61,4 @@ class SvgController {
   };
 }
 
-export default ImageController;
+export default SvgController;

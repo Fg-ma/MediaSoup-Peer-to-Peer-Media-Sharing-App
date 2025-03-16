@@ -5,7 +5,6 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import { ActivePages, BezierColorTypes, Settings } from "../../typeConstant";
 import DownloadOptionsPage from "./DownloadOptionsPage";
 import ColorPickerButton from "../../../../../elements/colorPickerButton/ColorPickerButton";
-import BezierController from "../../BezierController";
 import MimeTypePage from "./MimeTypePage";
 import SizePage from "./SizePage";
 import CompressionPage from "./CompressionPage";
